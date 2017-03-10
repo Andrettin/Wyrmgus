@@ -141,7 +141,10 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 		return;
 	}
 	// tell to go and harvest from a unit
-	const int res = unit.Type->GivesResource;
+	//Wyrmgus start
+//	const int res = unit.Type->GivesResource;
+	const int res = unit.GivesResource;
+	//Wyrmgus end
 
 	if (res
 		&& dest->Type->BoolFlag[HARVESTER_INDEX].value
@@ -229,7 +232,10 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 		return true;
 	}
 	// Go and harvest from a unit
-	const int res = dest.Type->GivesResource;
+	//Wyrmgus start
+//	const int res = dest.Type->GivesResource;
+	const int res = dest.GivesResource;
+	//Wyrmgus end
 	const CUnitType &type = *unit.Type;
 	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
 		//Wyrmgus start
@@ -718,7 +724,10 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 		return true;
 	}
 	// tell to go and harvest from a building
-	const int res = type.GivesResource;
+	//Wyrmgus start
+//	const int res = type.GivesResource;
+	const int res = unit.GivesResource;
+	//Wyrmgus end
 	if (res
 		&& dest.Type->ResInfo[res]
 		&& dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity
@@ -734,7 +743,10 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
 {
 	// Go and harvest from a unit
-	if (dest != NULL && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
+	//Wyrmgus start
+//	if (dest != NULL && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
+	if (dest != NULL && dest->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
+	//Wyrmgus end
 		//Wyrmgus start
 //		&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
 		&& (dest->Player == unit.Player || (dest->Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest->Player)) || dest->Player->Index == PlayerNumNeutral)) {
@@ -1495,7 +1507,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				GameCursor = UI.RedHair.Cursor;
 			} else if (
 				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer &&
-				((UnitUnderCursor->Type->GivesResource && Selected[0]->Type->ResInfo[UnitUnderCursor->Type->GivesResource] && (UnitUnderCursor->Player == ThisPlayer || (UnitUnderCursor->Player->IsAllied(*ThisPlayer) && ThisPlayer->IsAllied(*UnitUnderCursor->Player)) || UnitUnderCursor->Player->Index == PlayerNumNeutral)))
+				((UnitUnderCursor->GivesResource && Selected[0]->Type->ResInfo[UnitUnderCursor->GivesResource] && (UnitUnderCursor->Player == ThisPlayer || (UnitUnderCursor->Player->IsAllied(*ThisPlayer) && ThisPlayer->IsAllied(*UnitUnderCursor->Player)) || UnitUnderCursor->Player->Index == PlayerNumNeutral)))
 			) {
 				GameCursor = UI.YellowHair.Cursor;
 			} else {
@@ -1787,7 +1799,10 @@ static int SendResource(const Vec2i &pos, int flush)
 
 		if (unit.Type->BoolFlag[HARVESTER_INDEX].value) {
 			if (dest
-				&& (res = dest->Type->GivesResource) != 0
+				//Wyrmgus start
+//				&& (res = dest->Type->GivesResource) != 0
+				&& (res = dest->GivesResource) != 0
+				//Wyrmgus end
 				&& unit.Type->ResInfo[res]
 				&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 				&& dest->Type->BoolFlag[CANHARVEST_INDEX].value
@@ -1824,7 +1839,10 @@ static int SendResource(const Vec2i &pos, int flush)
 			}
 		}
 		if (!unit.CanMove()) {
-			if (dest && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value) {
+			//Wyrmgus start
+//			if (dest && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value) {
+			if (dest && dest->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value) {
+			//Wyrmgus end
 				dest->Blink = 4;
 				SendCommandResource(unit, *dest, flush);
 				ret = 1;

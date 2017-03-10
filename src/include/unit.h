@@ -501,6 +501,9 @@ public:
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position
 	unsigned char Direction; //: 8; /// angle (0-255) unit looking
+	//Wyrmgus start
+	unsigned char GivesResource;	/// The resource currently given by the unit
+	//Wyrmgus end
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
 	//Wyrmgus start

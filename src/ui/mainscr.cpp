@@ -399,8 +399,12 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 		case VariableName:
 			if (index == GIVERESOURCE_INDEX) {
 				val.type = USTRINT_STR;
-				val.i = unit.Type->GivesResource;
-				val.s = DefaultResourceNames[unit.Type->GivesResource].c_str();
+				//Wyrmgus start
+//				val.i = unit.Type->GivesResource;
+//				val.s = DefaultResourceNames[unit.Type->GivesResource].c_str();
+				val.i = unit.GivesResource;
+				val.s = DefaultResourceNames[unit.GivesResource].c_str();
+				//Wyrmgus end
 			} else if (index == CARRYRESOURCE_INDEX) {
 				val.type = USTRINT_STR;
 				val.i = unit.CurrentResource;

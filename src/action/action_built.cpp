@@ -280,12 +280,15 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 			
 //	if (type.GivesResource && type.StartingResources != 0) {
-	if (type.GivesResource && type.StartingResources.size() > 0) {
+	if (type.GivesResource) {
 	//Wyrmgus end
 		// Has StartingResources, Use those
 		//Wyrmgus start
 //		unit.ResourcesHeld = type.StartingResources[SyncRand(type.StartingResources.size())];
-		unit.SetResourcesHeld(type.StartingResources[SyncRand(type.StartingResources.size())]);
+		if (type.StartingResources.size() > 0) {
+			unit.SetResourcesHeld(type.StartingResources[SyncRand(type.StartingResources.size())]);
+		}
+		unit.GivesResource = type.GivesResource;
 		//Wyrmgus end
 	}
 

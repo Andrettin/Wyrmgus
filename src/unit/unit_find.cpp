@@ -473,7 +473,7 @@ public:
 		const CUnitType &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((type.GivesResource == resource || DefaultResourceFinalResources[type.GivesResource] == resource)
+		return ((unit->GivesResource == resource || DefaultResourceFinalResources[unit->GivesResource] == resource)
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start
@@ -587,7 +587,7 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 {
 	distance = deposit ? mine.MapDistanceTo(*deposit) : 0;
 	//Wyrmgus start
-	distance = distance * 100 / DefaultResourceFinalResourceConversionRates[mine.Type->GivesResource]; // alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
+	distance = distance * 100 / DefaultResourceFinalResourceConversionRates[mine.GivesResource]; // alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
 	if (!mine.Type->BoolFlag[CANHARVEST_INDEX].value) { // if it is a deposit rather than a readily-harvestable resource, double the distance score
 		distance *= 2;
 	}

@@ -524,6 +524,9 @@ void CUnit::Init()
 	//Wyrmgus end
 	memset(&Anim, 0, sizeof(Anim));
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
+	//Wyrmgus start
+	GivesResource = 0;
+	//Wyrmgus end
 	CurrentResource = 0;
 	Orders.clear();
 	delete SavedOrder;
@@ -2309,6 +2312,12 @@ void CUnit::Init(const CUnitType &type)
 	//Wyrmgus start
 	if (!GameRunning && !SaveGameLoading) { //if unit was created before the game started, it is a starting unit
 		Starting = 1;
+	}
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (type.GivesResource) {
+		this->GivesResource = type.GivesResource;
 	}
 	//Wyrmgus end
 
@@ -4160,7 +4169,10 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	MapMarkUnitSight(*this);
 
 	//  Must change food/gold and other.
-	if (Type->GivesResource) {
+	//Wyrmgus start
+//	if (Type->GivesResource) {
+	if (this->GivesResource) {
+	//Wyrmgus end
 		DebugPrint("Resource transfer not supported\n");
 	}
 	newplayer.Demand += Type->Stats[newplayer.Index].Variables[DEMAND_INDEX].Value;

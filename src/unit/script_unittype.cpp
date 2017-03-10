@@ -3601,7 +3601,10 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.CurrentOrder()->UpdateUnitVariables(unit);
 
 	// Resources.
-	if (unit.Type->GivesResource) {
+	//Wyrmgus start
+//	if (unit.Type->GivesResource) {
+	if (unit.GivesResource) {
+	//Wyrmgus end
 		unit.Variable[GIVERESOURCE_INDEX].Value = unit.ResourcesHeld;
 		unit.Variable[GIVERESOURCE_INDEX].Max = unit.ResourcesHeld > unit.Variable[GIVERESOURCE_INDEX].Max ? unit.ResourcesHeld : unit.Variable[GIVERESOURCE_INDEX].Max;
 		//Wyrmgus start

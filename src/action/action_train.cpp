@@ -183,7 +183,10 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 		}
 		//  Also check if new unit can harvest this specific resource.
 		CUnit *goal = order->GetGoal();
-		if (goal && !unit.Type->ResInfo[goal->Type->GivesResource]) {
+		//Wyrmgus start
+//		if (goal && !unit.Type->ResInfo[goal->Type->GivesResource]) {
+		if (goal && !unit.Type->ResInfo[goal->GivesResource]) {
+		//Wyrmgus end
 			return false;
 		}
 		return true;
@@ -440,7 +443,7 @@ static void AnimateActionTrain(CUnit &unit)
 				if (newUnit->Type->RepairRange && table[j]->Type->RepairHP && table[j]->Variable[HP_INDEX].Value < table[j]->GetModifiedVariable(HP_INDEX, VariableMax) && (table[j]->Player == newUnit->Player || newUnit->IsAllied(*table[j]))) { //see if can repair
 					CommandRepair(*newUnit, unit.RallyPointPos, table[j], FlushCommands, unit.RallyPointMapLayer);
 					command_found = true;
-				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || (table[j]->Player->IsAllied(*newUnit->Player) && newUnit->Player->IsAllied(*table[j]->Player)) || table[j]->Player->Index == PlayerNumNeutral)) { // see if can harvest
+				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->GivesResource && newUnit->Type->ResInfo[table[j]->GivesResource] && table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || (table[j]->Player->IsAllied(*newUnit->Player) && newUnit->Player->IsAllied(*table[j]->Player)) || table[j]->Player->Index == PlayerNumNeutral)) { // see if can harvest
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
 				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit

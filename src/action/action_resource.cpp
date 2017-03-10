@@ -213,8 +213,9 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	order->Resource.Pos = mine.tilePos + mine.Type->GetHalfTileSize();
 	//Wyrmgus start
 	order->Resource.MapLayer = mine.MapLayer;
+//	order->CurrentResource = mine.Type->GivesResource;
+	order->CurrentResource = mine.GivesResource;
 	//Wyrmgus end
-	order->CurrentResource = mine.Type->GivesResource;
 	return order;
 }
 

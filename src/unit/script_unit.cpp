@@ -1682,7 +1682,10 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "ResourcesHeld")) {
 		lua_pushnumber(l, unit->ResourcesHeld);
 	} else if (!strcmp(value, "GiveResourceType")) {
-		lua_pushnumber(l, unit->Type->GivesResource);
+		//Wyrmgus start
+//		lua_pushnumber(l, unit->Type->GivesResource);
+		lua_pushnumber(l, unit->GivesResource);
+		//Wyrmgus end
 	} else if (!strcmp(value, "CurrentResource")) {
 		lua_pushnumber(l, unit->CurrentResource);
 	} else if (!strcmp(value, "Name")) {
@@ -1702,7 +1705,10 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushboolean(l, false);
 		}
 	} else if (!strcmp(value, "GiveResourceTypeName")) {
-		lua_pushstring(l, DefaultResourceNames[unit->Type->GivesResource].c_str());
+		//Wyrmgus start
+//		lua_pushstring(l, DefaultResourceNames[unit->Type->GivesResource].c_str());
+		lua_pushstring(l, DefaultResourceNames[unit->GivesResource].c_str());
+		//Wyrmgus end
 	} else if (!strcmp(value, "CurrentResourceName")) {
 		lua_pushstring(l, DefaultResourceNames[unit->CurrentResource].c_str());
 	} else if (!strcmp(value, "TypeName")) {
