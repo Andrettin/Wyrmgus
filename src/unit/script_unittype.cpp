@@ -733,6 +733,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
 				type->RepairCosts[i] = parent_type->RepairCosts[i];
 				type->DefaultStat.ImproveIncomes[i] = parent_type->DefaultStat.ImproveIncomes[i];
+				type->DefaultStat.ResourceDemand[i] = parent_type->DefaultStat.ResourceDemand[i];
 				type->CanStore[i] = parent_type->CanStore[i];
 				type->GrandStrategyProductionEfficiencyModifier[i] = parent_type->GrandStrategyProductionEfficiencyModifier[i];
 				
@@ -1269,6 +1270,18 @@ static int CclDefineUnitType(lua_State *l)
 				type->DefaultStat.ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1, k + 1);
 			}
 		//Wyrmgus start
+		} else if (!strcmp(value, "ResourceDemand")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				const int res = CclGetResourceByName(l);
+				lua_pop(l, 1);
+				++k;
+				type->DefaultStat.ResourceDemand[res] = LuaToNumber(l, -1, k + 1);
+			}
 		} else if (!strcmp(value, "UnitStock")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2384,6 +2397,21 @@ static int CclDefineUnitStats(lua_State *l)
 				lua_pop(l, 1);
 			}
 		//Wyrmgus start
+		} else if (!strcmp(value, "resource-demand")) {
+			lua_rawgeti(l, 3, j + 1);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, 3, j + 1);
+				value = LuaToString(l, -1, k + 1);
+				++k;
+				const int resId = GetResourceIdByName(l, value);
+				stats->ResourceDemand[resId] = LuaToNumber(l, -1, k + 1);
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "unit-stock")) {
 			lua_rawgeti(l, 3, j + 1);
 			if (!lua_istable(l, -1)) {

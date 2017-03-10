@@ -181,6 +181,7 @@ public:
 		memset(Storing, 0, sizeof(Storing));
 		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 		//Wyrmgus start
+		memset(ResourceDemand, 0, sizeof(ResourceDemand));
 		memset(UnitStock, 0, sizeof(UnitStock));
 		//Wyrmgus end
 	}
@@ -200,6 +201,7 @@ public:
 	int Storing[MaxCosts];          /// storage increasing
 	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
 	//Wyrmgus start
+	int ResourceDemand[MaxCosts];	/// Resource demand
 	int UnitStock[UnitTypeMax];		/// Units in stock
 	//Wyrmgus end
 };

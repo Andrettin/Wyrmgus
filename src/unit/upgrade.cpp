@@ -119,6 +119,9 @@ const CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
 		this->Costs[i] = rhs.Costs[i];
 		this->Storing[i] = rhs.Storing[i];
 		this->ImproveIncomes[i] = rhs.ImproveIncomes[i];
+		//Wyrmgus start
+		this->ResourceDemand[i] = rhs.ResourceDemand[i];
+		//Wyrmgus end
 	}
 	//Wyrmgus start
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
@@ -145,6 +148,11 @@ bool CUnitStats::operator == (const CUnitStats &rhs) const
 		if (this->ImproveIncomes[i] != rhs.ImproveIncomes[i]) {
 			return false;
 		}
+		//Wyrmgus start
+		if (this->ResourceDemand[i] != rhs.ResourceDemand[i]) {
+			return false;
+		}
+		//Wyrmgus end
 	}
 	//Wyrmgus start
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
@@ -752,6 +760,10 @@ static int CclDefineModifier(lua_State *l)
 			const int resId = GetResourceIdByName(l, value);
 			um->Modifier.ImproveIncomes[resId] = LuaToNumber(l, j + 1, 3);
 		//Wyrmgus start
+		} else if (!strcmp(key, "resource-demand")) {
+			const char *value = LuaToString(l, j + 1, 2);
+			const int resId = GetResourceIdByName(l, value);
+			um->Modifier.ResourceDemand[resId] = LuaToNumber(l, j + 1, 3);
 		} else if (!strcmp(key, "unit-stock")) {
 			std::string value = LuaToString(l, j + 1, 2);
 			const int unit_type_id = UnitTypeIdByIdent(value);
@@ -1480,6 +1492,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						player.Incomes[j] = std::max(player.Incomes[j], stat.ImproveIncomes[j]);
 					}
 				}
+				//Wyrmgus start
+				stat.ResourceDemand[j] += um->Modifier.ResourceDemand[j];
+				//Wyrmgus end
 			}
 			
 			//Wyrmgus start
@@ -1776,6 +1791,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 					player.Incomes[j] = m;
 				}
+				//Wyrmgus start
+				stat.ResourceDemand[j] -= um->Modifier.ResourceDemand[j];
+				//Wyrmgus end
 			}
 
 			//Wyrmgus start

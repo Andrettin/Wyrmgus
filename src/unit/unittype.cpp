@@ -996,6 +996,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			for (int i = 0; i < MaxCosts; ++i) {
 				type.MapDefaultStat.Costs[i] += iterator->second.Costs[i];
 				type.MapDefaultStat.ImproveIncomes[i] += iterator->second.ImproveIncomes[i];
+				type.MapDefaultStat.ResourceDemand[i] += iterator->second.ResourceDemand[i];
 			}
 		}
 		for (int player = 0; player < PlayerMax; ++player) {
@@ -1369,6 +1370,13 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ImproveIncomes[i]);
 	}
 	//Wyrmgus start
+	file.printf("},\n\"resource-demand\", {");
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		if (i) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ResourceDemand[i]);
+	}
 	file.printf("},\n\"unit-stock\", {");
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		if (stats.UnitStock[i] == type.DefaultStat.UnitStock[i]) {
