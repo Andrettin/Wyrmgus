@@ -972,6 +972,8 @@ static void DoNextReplay()
 		SendCommandQuest(*unit, GetQuest(val));
 	} else if (!strcmp(action, "buy")) {
 		SendCommandBuy(*unit, dunit, num);
+	} else if (!strcmp(action, "produce-resource")) {
+		SendCommandProduceResource(*unit, num);
 	} else if (!strcmp(action, "sell-resource")) {
 		SendCommandSellResource(*unit, arg1, num);
 	} else if (!strcmp(action, "buy-resource")) {

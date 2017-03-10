@@ -251,6 +251,9 @@ enum {
 	BUILDEROUTSIDE_INDEX,			/// The builder stays outside during the construction.
 	BUILDERLOST_INDEX,				/// The builder is lost after the construction.
 	CANHARVEST_INDEX,				/// Resource can be harvested.
+	//Wyrmgus start
+	INEXHAUSTIBLE_INDEX,			/// Resource is not exhaustible
+	//Wyrmgus end
 	HARVESTER_INDEX,				/// Unit is a resource harvester.
 	SELECTABLEBYRECTANGLE_INDEX,	/// Selectable with mouse rectangle.
 	ISNOTSELECTABLE_INDEX,

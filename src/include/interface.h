@@ -81,6 +81,7 @@ enum ButtonCmd {
 	ButtonRallyPoint,		/// set rally point
 	ButtonQuest,			/// receive quest
 	ButtonBuy,				/// buy item
+	ButtonProduceResource,	/// produce a resource
 	ButtonSellResource,		/// sell a resource
 	ButtonBuyResource,		/// buy a resource
 	ButtonUnit,				/// used to display popups for inventory items and for units in transporters

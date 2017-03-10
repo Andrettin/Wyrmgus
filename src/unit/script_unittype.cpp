@@ -99,6 +99,7 @@ static const char CANDOCK_KEY[] = "CanDock";
 static const char BUILDEROUTSIDE_KEY[] = "BuilderOutside";
 static const char BUILDERLOST_KEY[] = "BuilderLost";
 static const char CANHARVEST_KEY[] = "CanHarvest";
+static const char INEXHAUSTIBLE_KEY[] = "Inexhaustible";
 static const char HARVESTER_KEY[] = "Harvester";
 static const char SELECTABLEBYRECTANGLE_KEY[] = "SelectableByRectangle";
 static const char ISNOTSELECTABLE_KEY[] = "IsNotSelectable";
@@ -278,7 +279,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 //							   SHOREBUILDING_KEY, CANATTACK_KEY, BUILDEROUTSIDE_KEY,
 							   SHOREBUILDING_KEY, CANATTACK_KEY, CANDOCK_KEY, BUILDEROUTSIDE_KEY,
 							   //Wyrmgus end
-							   BUILDERLOST_KEY, CANHARVEST_KEY, HARVESTER_KEY, SELECTABLEBYRECTANGLE_KEY,
+							   BUILDERLOST_KEY, CANHARVEST_KEY, INEXHAUSTIBLE_KEY, HARVESTER_KEY, SELECTABLEBYRECTANGLE_KEY,
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
 							   //Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY

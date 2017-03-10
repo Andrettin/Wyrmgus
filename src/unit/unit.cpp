@@ -39,6 +39,7 @@
 
 #include "action/action_attack.h"
 //Wyrmgus start
+#include "action/action_resource.h"
 #include "action/action_upgradeto.h"
 //Wyrmgus end
 
@@ -2138,6 +2139,30 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 	Players[player].ChangeResource(CopperCost, -sold_unit->GetPrice(), true);
 	if (IsOnlySelected(*this)) {
 		UI.ButtonPanel.Update();
+	}
+}
+
+/**
+**  Produce a resource
+**
+**  @param resource  Resource to be produced.
+*/
+void CUnit::ProduceResource(const int resource)
+{
+	if (resource != 0) {
+		this->GivesResource = resource;
+		this->ResourcesHeld = 10000;
+	} else {
+		this->GivesResource = 0;
+		this->ResourcesHeld = 0;
+		if (this->Resource.Workers) {
+			for (CUnit *uins = this->Resource.Workers; uins; uins = uins->NextWorker) {
+				if (uins != this && uins->CurrentOrder()->Action == UnitActionResource) {
+					COrder_Resource &order = *static_cast<COrder_Resource *>(uins->CurrentOrder());
+					order.LoseResource(*uins, *this);
+				}
+			}
+		}
 	}
 }
 

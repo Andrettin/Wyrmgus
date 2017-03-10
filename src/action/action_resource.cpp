@@ -278,6 +278,13 @@ bool COrder_Resource::IsGatheringStarted() const
 	return this->State > SUB_START_GATHERING;
 }
 
+//Wyrmgus start
+bool COrder_Resource::IsGathering() const
+{
+	return this->State == SUB_START_GATHERING;
+}
+//Wyrmgus end
+
 bool COrder_Resource::IsGatheringFinished() const
 {
 	return this->State >= SUB_STOP_GATHERING;
@@ -1003,7 +1010,9 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //				unit.ResourcesHeld += addload;
 //				source->ResourcesHeld -= addload;
 				unit.ChangeResourcesHeld(addload);
-				source->ChangeResourcesHeld(-addload);
+				if (!source->Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
+					source->ChangeResourcesHeld(-addload);
+				}
 				//Wyrmgus end
 			}
 

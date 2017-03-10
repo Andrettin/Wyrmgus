@@ -199,7 +199,7 @@
 		TriggerData.Upgrade = AllUpgrades[button.Value];
 	}
 	int resource = button.Value;
-	if (button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	std::string text = EvalString(this->Text);
@@ -250,7 +250,7 @@
 		TriggerData.Upgrade = AllUpgrades[button.Value];
 	}
 	int resource = button.Value;
-	if (button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	std::string text = EvalString(this->Text);
@@ -284,7 +284,7 @@
 		TriggerData.Upgrade = AllUpgrades[button.Value];
 	}
 	int resource = button.Value;
-	if (button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	std::string text = EvalString(this->Text);
@@ -508,7 +508,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		TriggerData.Upgrade = AllUpgrades[button.Value];
 	}
 	int resource = button.Value;
-	if (button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
 		TriggerData.Resource = &resource;
 	}
 	//Wyrmgus end
@@ -550,7 +550,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			TriggerData.Upgrade = AllUpgrades[button.Value];
 		}
 		int resource = button.Value;
-		if (button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
 			TriggerData.Resource = &resource;
 		}
 		//Wyrmgus end

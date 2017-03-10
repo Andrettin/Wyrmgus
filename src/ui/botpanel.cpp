@@ -178,6 +178,9 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
 			//Wyrmgus start
+			case ButtonProduceResource:
+				ba->Value = GetResourceIdByName(value.c_str());
+				break;
 			case ButtonSellResource:
 				ba->Value = GetResourceIdByName(value.c_str());
 				break;
@@ -278,6 +281,18 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 	//Wyrmgus start
 	res |= IconCommandButton;
+	
+	if (button.Action == ButtonProduceResource) {
+		size_t i;
+		for (i = 0; i < Selected.size(); ++i) {
+			if (Selected[i]->GivesResource != button.Value) {
+				break;
+			}
+		}
+		if (i == Selected.size()) {
+			res |= IconSelected;
+		}
+	}
 	//Wyrmgus end
 	
 	unsigned int action = UnitActionNone;
@@ -1486,6 +1501,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonRallyPoint:
 		case ButtonUnit:
 		case ButtonEditorUnit:
+		case ButtonProduceResource:
 		case ButtonSellResource:
 		case ButtonBuyResource:
 		//Wyrmgus end
@@ -1689,6 +1705,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonCancelBuild:
 		case ButtonQuest:
 		case ButtonBuy:
+		case ButtonProduceResource:
 		case ButtonSellResource:
 		case ButtonBuyResource:
 			res = true;
@@ -2304,6 +2321,16 @@ void CButtonPanel::DoClicked_Buy(int button)
 	}
 }
 
+void CButtonPanel::DoClicked_ProduceResource(int button)
+{
+	const int resource = CurrentButtons[button].Value;
+	if (resource != Selected[0]->GivesResource) {
+		SendCommandProduceResource(*Selected[0], resource);
+	} else { //if resource production button was clicked when it was already active, then this means it should be toggled off
+		SendCommandProduceResource(*Selected[0], 0);
+	}
+}
+
 void CButtonPanel::DoClicked_SellResource(int button)
 {
 	const int resource = CurrentButtons[button].Value;
@@ -2410,6 +2437,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
 		case ButtonQuest: { DoClicked_Quest(button); break; }
 		case ButtonBuy: { DoClicked_Buy(button); break; }
+		case ButtonProduceResource: { DoClicked_ProduceResource(button); break; }
 		case ButtonSellResource: { DoClicked_SellResource(button); break; }
 		case ButtonBuyResource: { DoClicked_BuyResource(button); break; }
 		//Wyrmgus end

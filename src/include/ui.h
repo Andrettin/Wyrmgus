@@ -315,6 +315,7 @@ private:
 	void DoClicked_RallyPoint(int button);
 	void DoClicked_Quest(int button);
 	void DoClicked_Buy(int button);
+	void DoClicked_ProduceResource(int button);
 	void DoClicked_SellResource(int button);
 	void DoClicked_BuyResource(int button);
 	//Wyrmgus end

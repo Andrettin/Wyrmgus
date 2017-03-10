@@ -71,6 +71,9 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
+	//Wyrmgus start
+	void LoseResource(CUnit &unit, CUnit &source);
+	//Wyrmgus end
 
 	int GetCurrentResource() const { return CurrentResource; }
 	Vec2i GetHarvestLocation() const;
@@ -78,6 +81,9 @@ public:
 	int GetHarvestMapLayer() const;
 	//Wyrmgus end
 	bool IsGatheringStarted() const;
+	//Wyrmgus start
+	bool IsGathering() const;
+	//Wyrmgus end
 	bool IsGatheringFinished() const;
 	bool IsGatheringWaiting() const;
 private:
@@ -86,7 +92,9 @@ private:
 	int MoveToResource(CUnit &unit);
 	void UnitGotoGoal(CUnit &unit, CUnit *const goal, int state);
 	int StartGathering(CUnit &unit);
-	void LoseResource(CUnit &unit, CUnit &source);
+	//Wyrmgus start
+//	void LoseResource(CUnit &unit, CUnit &source);
+	//Wyrmgus end
 	int GatherResource(CUnit &unit);
 	int StopGathering(CUnit &unit);
 	int MoveToDepot(CUnit &unit);

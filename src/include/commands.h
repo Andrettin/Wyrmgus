@@ -87,6 +87,8 @@ extern void CommandPickUp(CUnit &unit, CUnit &dest, int flush);
 extern void CommandQuest(CUnit &unit, CQuest *quest);
 /// Prepare command buy
 extern void CommandBuy(CUnit &unit, CUnit *sold_unit, int player);
+/// Prepare command produce resource
+extern void CommandProduceResource(CUnit &unit, int resource);
 /// Prepare command sell resource
 extern void CommandSellResource(CUnit &unit, int resource, int player);
 /// Prepare command buy resource
@@ -207,6 +209,8 @@ extern void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
 extern void SendCommandQuest(CUnit &unit, CQuest *quest);
 /// Send buy command
 extern void SendCommandBuy(CUnit &unit, CUnit *sold_unit, int player);
+/// Send produce resource command
+extern void SendCommandProduceResource(CUnit &unit, int resource);
 /// Send sell resource command
 extern void SendCommandSellResource(CUnit &unit, int resource, int player);
 /// Send buy resource command

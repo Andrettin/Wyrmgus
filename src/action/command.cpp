@@ -467,10 +467,24 @@ void CommandBuy(CUnit &unit, CUnit *sold_unit, int player)
 }
 
 /**
+**  Produce a resource
+**
+**  @param unit   pointer to unit.
+**  @param resource  index of the resource.
+*/
+void CommandProduceResource(CUnit &unit, int resource)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	unit.ProduceResource(resource);
+}
+
+/**
 **  Sell a resource for copper
 **
-**  @param unit   pointer to unit to buy from.
-**  @param sold_unit  pointer to bought unit.
+**  @param unit   pointer to unit.
+**  @param resource  index of the resource.
 */
 void CommandSellResource(CUnit &unit, int resource, int player)
 {
@@ -483,8 +497,8 @@ void CommandSellResource(CUnit &unit, int resource, int player)
 /**
 **  Buy a resource with copper
 **
-**  @param unit   pointer to unit to buy from.
-**  @param sold_unit  pointer to bought unit.
+**  @param unit   pointer to unit.
+**  @param resource  index of the resource.
 */
 void CommandBuyResource(CUnit &unit, int resource, int player)
 {

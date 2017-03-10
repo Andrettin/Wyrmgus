@@ -194,6 +194,19 @@ void SendCommandBuy(CUnit &unit, CUnit *sold_unit, int player)
 }
 
 /**
+** Send command: Produce a resource.
+*/
+void SendCommandProduceResource(CUnit &unit, int resource)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("produce-resource", &unit, 0, 0, -1, NoUnitP, NULL, resource);
+		CommandProduceResource(unit, resource);
+	} else {
+		NetworkSendCommand(MessageCommandProduceResource, unit, resource, 0, NoUnitP, NULL, 0);
+	}
+}
+
+/**
 ** Send command: Sell a resource for copper.
 */
 void SendCommandSellResource(CUnit &unit, int resource, int player)
@@ -1069,6 +1082,11 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				CommandLog("buy", &unit, 0, -1, -1, &dest, NULL, arg1);
 				CommandBuy(unit, &dest, arg1);
 			}
+			break;
+		}
+		case MessageCommandProduceResource: {
+			CommandLog("produce-resource", &unit, 0, 0, -1, NoUnitP, NULL, arg1);
+			CommandProduceResource(unit, arg1);
 			break;
 		}
 		case MessageCommandSellResource: {
