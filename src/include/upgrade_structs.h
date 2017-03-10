@@ -187,6 +187,10 @@ public:
 
 	bool operator == (const CUnitStats &rhs) const;
 	bool operator != (const CUnitStats &rhs) const;
+	
+	//Wyrmgus start
+ 	int GetPrice() const;
+	//Wyrmgus end
 public:
 	CVariable *Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit

@@ -73,7 +73,7 @@
 	//Wyrmgus start
 	order->Player = player;
 //	trainer.Player->SubUnitType(type);
-	Players[player].SubUnitType(type);
+	Players[player].SubUnitType(type, trainer.Type->Stats[trainer.Player->Index].UnitStock[type.Slot] != 0);
 	//Wyrmgus end
 
 	return order;

@@ -166,6 +166,25 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 	return !(*this == rhs);
 }
 
+//Wyrmgus start
+int CUnitStats::GetPrice() const
+{
+	int cost = 0;
+	
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (this->Costs[i] > 0) {
+			if (i == CopperCost) {
+				cost += this->Costs[i];
+			} else {
+				cost += this->Costs[i] * DefaultResourcePrices[i] / 100;
+			}
+		}
+	}
+	
+	return cost;
+}
+//Wyrmgus end
+
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)

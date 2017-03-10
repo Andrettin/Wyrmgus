@@ -122,7 +122,6 @@ static const char POWERUP_KEY[] = "PowerUp";
 static const char INVENTORY_KEY[] = "Inventory";
 static const char TRAP_KEY[] = "Trap";
 static const char BRIDGE_KEY[] = "Bridge";
-static const char MERCENARY_KEY[] = "Mercenary";
 static const char TRADER_KEY[] = "Trader";
 static const char FAUNA_KEY[] = "Fauna";
 static const char PREDATOR_KEY[] = "Predator";
@@ -285,7 +284,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
 							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, NOFRIENDLYFIRE_KEY,
 							   TOWNHALL_KEY, MARKET_KEY, RECRUITHEROES_KEY, ITEM_KEY, POWERUP_KEY, INVENTORY_KEY, TRAP_KEY, BRIDGE_KEY,
-							   MERCENARY_KEY, TRADER_KEY,
+							   TRADER_KEY,
 							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, DIMINUTIVE_KEY, GIANT_KEY, DRAGON_KEY,
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
@@ -2762,9 +2761,6 @@ static int CclGetUnitTypeData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "Item")) {
 		lua_pushboolean(l, type->BoolFlag[ITEM_INDEX].value);
-		return 1;
-	} else if (!strcmp(data, "Mercenary")) {
-		lua_pushboolean(l, type->BoolFlag[MERCENARY_INDEX].value);
 		return 1;
 	} else if (!strcmp(data, "ButtonPos")) {
 		lua_pushnumber(l, type->ButtonPos);

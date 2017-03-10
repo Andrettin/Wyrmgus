@@ -2415,16 +2415,26 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 **
 **  @return        False if all enough, otherwise a bit mask.
 */
-int CPlayer::CheckUnitType(const CUnitType &type) const
+//Wyrmgus start
+//int CPlayer::CheckUnitType(const CUnitType &type) const
+int CPlayer::CheckUnitType(const CUnitType &type, bool hire) const
+//Wyrmgus end
 {
 	//Wyrmgus start
 //	return this->CheckCosts(type.Stats[this->Index].Costs);
 	int modified_costs[MaxCosts];
-	for (int i = 1; i < MaxCosts; ++i) {
-		modified_costs[i] = type.Stats[this->Index].Costs[i];
-		if (type.TrainQuantity) 
-		{
-			modified_costs[i] *= type.TrainQuantity;
+	memset(modified_costs, 0, sizeof(modified_costs));
+	if (hire) {
+		modified_costs[CopperCost] = type.Stats[this->Index].GetPrice();
+		if (type.TrainQuantity) {
+			modified_costs[CopperCost] *= type.TrainQuantity;
+		}
+	} else {
+		for (int i = 1; i < MaxCosts; ++i) {
+			modified_costs[i] = type.Stats[this->Index].Costs[i];
+			if (type.TrainQuantity) {
+				modified_costs[i] *= type.TrainQuantity;
+			}
 		}
 	}
 	return this->CheckCosts(modified_costs);
@@ -2448,9 +2458,22 @@ void CPlayer::AddCosts(const int *costs)
 **
 **  @param type    Type of unit.
 */
-void CPlayer::AddUnitType(const CUnitType &type)
+//Wyrmgus start
+//void CPlayer::AddUnitType(const CUnitType &type)
+void CPlayer::AddUnitType(const CUnitType &type, bool hire)
+//Wyrmgus end
 {
-	AddCosts(type.Stats[this->Index].Costs);
+	//Wyrmgus start
+//	AddCosts(type.Stats[this->Index].Costs);
+	if (hire) {
+		int hire_costs[MaxCosts];
+		memset(hire_costs, 0, sizeof(hire_costs));
+		hire_costs[CopperCost] = type.Stats[this->Index].GetPrice();
+		AddCostsFactor(hire_costs, 100 * (type.TrainQuantity ? type.TrainQuantity : 1));
+	} else {
+		AddCostsFactor(type.Stats[this->Index].Costs, 100 * (type.TrainQuantity ? type.TrainQuantity : 1));
+	}
+	//Wyrmgus end
 }
 
 /**
@@ -2483,11 +2506,21 @@ void CPlayer::SubCosts(const int *costs)
 **
 **  @param type    Type of unit.
 */
-void CPlayer::SubUnitType(const CUnitType &type)
+//Wyrmgus start
+//void CPlayer::SubUnitType(const CUnitType &type)
+void CPlayer::SubUnitType(const CUnitType &type, bool hire)
+//Wyrmgus end
 {
 	//Wyrmgus start
 //	this->SubCosts(type.Stats[this->Index].Costs);
-	this->SubCostsFactor(type.Stats[this->Index].Costs, 100 * (type.TrainQuantity ? type.TrainQuantity : 1));
+	if (hire) {
+		int hire_costs[MaxCosts];
+		memset(hire_costs, 0, sizeof(hire_costs));
+		hire_costs[CopperCost] = type.Stats[this->Index].GetPrice();
+		this->SubCostsFactor(hire_costs, 100 * (type.TrainQuantity ? type.TrainQuantity : 1));
+	} else {
+		this->SubCostsFactor(type.Stats[this->Index].Costs, 100 * (type.TrainQuantity ? type.TrainQuantity : 1));
+	}
 	//Wyrmgus end
 }
 
@@ -3086,6 +3119,22 @@ bool CPlayer::HasContactWith(const CPlayer &player) const
 }
 
 /**
+**  Check if the player's faction type is a neutral one
+*/
+bool CPlayer::HasNeutralFactionType() const
+{
+	if (
+		this->Race != -1
+		&& this->Faction != -1
+		&& (PlayerRaces.Factions[this->Race][this->Faction]->Type == FactionTypeMercenaryCompany || PlayerRaces.Factions[this->Race][this->Faction]->Type == FactionTypeHolyOrder || PlayerRaces.Factions[this->Race][this->Faction]->Type == FactionTypeTradingCompany)
+	) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
 **  Check if the player can use the buildings of another, for neutral building functions (i.e. unit training)
 */
 bool CPlayer::HasBuildingAccess(const CPlayer &player) const
@@ -3095,9 +3144,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player) const
 	}
 	
 	if (
-		player.Race != -1
-		&& player.Faction != -1
-		&& (PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeMercenaryCompany || PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeHolyOrder || PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeTradingCompany)
+		player.HasNeutralFactionType()
 		&& player.Overlord == NULL || this->IsOverlordOf(player, true)
 	) {
 		if (PlayerRaces.Factions[player.Race][player.Faction]->Type != FactionTypeHolyOrder || std::find(this->Deities.begin(), this->Deities.end(), PlayerRaces.Factions[player.Race][player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity

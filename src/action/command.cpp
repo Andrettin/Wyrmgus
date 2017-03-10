@@ -1041,7 +1041,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 //	if (unit.Player->CheckLimits(type) < 0
 //		|| unit.Player->CheckUnitType(type)) {
 	if (Players[player].CheckLimits(type) < 0
-		|| Players[player].CheckUnitType(type)) {
+		|| Players[player].CheckUnitType(type, unit.Type->Stats[unit.Player->Index].UnitStock[type.Slot] != 0)) {
 	//Wyrmgus end
 		return;
 	}

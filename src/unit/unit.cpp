@@ -2544,15 +2544,6 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		unit->Frame = -unit->Frame - 1;
 	}
 	
-	//Wyrmgus start
-	// make mercenary units only be available once per match
-	if (type.BoolFlag[MERCENARY_INDEX].value) {
-		for (int p = 0; p < PlayerMax; ++p) {
-			AllowUnitId(Players[p], type.Slot, 0);
-		}
-	}
-	//Wyrmgus end
-	
 	return unit;
 }
 
@@ -5077,18 +5068,8 @@ int CUnit::GetHairColor() const
 
 int CUnit::GetPrice() const
 {
-	int cost = 0;
-
-	for (int i = 1; i < MaxCosts; ++i) {
-		if (this->Type->Stats[this->Player->Index].Costs[i] > 0) {
-			if (i == CopperCost) {
-				cost += this->Type->Stats[this->Player->Index].Costs[i];
-			} else {
-				cost += this->Type->Stats[this->Player->Index].Costs[i] * DefaultResourcePrices[i] / 100;
-			}
-		}
-	}
-
+	int cost = this->Type->Stats[this->Player->Index].GetPrice();
+	
 	if (this->Prefix != NULL) {
 		cost += this->Prefix->MagicLevel * 1000;
 	}

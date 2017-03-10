@@ -275,18 +275,27 @@ public:
 	/// Check if enough resources are available for costs
 	int CheckCosts(const int *costs, bool notify = true) const;
 	/// Check if enough resources are available for a new unit-type
-	int CheckUnitType(const CUnitType &type) const;
+	//Wyrmgus start
+//	int CheckUnitType(const CUnitType &type) const;
+	int CheckUnitType(const CUnitType &type, bool hire = false) const;
+	//Wyrmgus end
 
 	/// Add costs to the resources
 	void AddCosts(const int *costs);
 	/// Add costs for an unit-type to the resources
-	void AddUnitType(const CUnitType &type);
+	//Wyrmgus start
+//	void AddUnitType(const CUnitType &type);
+	void AddUnitType(const CUnitType &type, bool hire = false);
+	//Wyrmgus end
 	/// Add a factor of costs to the resources
 	void AddCostsFactor(const int *costs, int factor);
 	/// Remove costs from the resources
 	void SubCosts(const int *costs);
 	/// Remove costs for an unit-type from the resources
-	void SubUnitType(const CUnitType &type);
+	//Wyrmgus start
+//	void SubUnitType(const CUnitType &type);
+	void SubUnitType(const CUnitType &type, bool hire = false);
+	//Wyrmgus end
 	/// Remove a factor of costs from the resources
 	void SubCostsFactor(const int *costs, int factor);
 	
@@ -331,6 +340,7 @@ public:
 	bool IsOverlordOf(const CPlayer &player, bool include_indirect = false) const;
 	bool IsVassalOf(const CPlayer &player, bool include_indirect = false) const;
 	bool HasContactWith(const CPlayer &player) const;
+	bool HasNeutralFactionType() const;
 	bool HasBuildingAccess(const CPlayer &player) const;
 	bool HasHero(const CCharacter *hero) const;
 	//Wyrmgus end

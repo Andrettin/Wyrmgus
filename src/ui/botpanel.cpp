@@ -837,7 +837,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		case ButtonResearch:
 			//Wyrmgus start
 //			memcpy(Costs, AllUpgrades[button.Value]->Costs, sizeof(AllUpgrades[button.Value]->Costs));
-			ThisPlayer->GetUpgradeCosts(AllUpgrades[button.Value], Costs);
+			Selected[0]->Player->GetUpgradeCosts(AllUpgrades[button.Value], Costs);
 			//Wyrmgus end
 			break;
 		case ButtonSpellCast:
@@ -847,21 +847,30 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		case ButtonBuild:
 		case ButtonTrain:
 		case ButtonUpgradeTo:
-			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
-				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
-			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
 			//Wyrmgus start
-			if (button.Action == ButtonTrain && UnitTypes[button.Value]->TrainQuantity > 1) { //if more than one unit is trained in a batch, multiply the costs
-				for (int i = 1; i < MaxCosts; ++i) {
-					Costs[i] *= UnitTypes[button.Value]->TrainQuantity;
+//			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
+//				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
+//			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
+			if (button.Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[button.Value] != 0) {
+				Costs[FoodCost] = UnitTypes[button.Value]->Stats[Selected[0]->Player->Index].Variables[DEMAND_INDEX].Value;
+				Costs[CopperCost] = UnitTypes[button.Value]->Stats[Selected[0]->Player->Index].GetPrice();
+				break;
+			} else {
+				memcpy(Costs, UnitTypes[button.Value]->Stats[Selected[0]->Player->Index].Costs,
+					   sizeof(UnitTypes[button.Value]->Stats[Selected[0]->Player->Index].Costs));
+				Costs[FoodCost] = UnitTypes[button.Value]->Stats[Selected[0]->Player->Index].Variables[DEMAND_INDEX].Value;
+				if (button.Action == ButtonTrain && UnitTypes[button.Value]->TrainQuantity > 1) { //if more than one unit is trained in a batch, multiply the costs
+					for (int i = 1; i < MaxCosts; ++i) {
+						Costs[i] *= UnitTypes[button.Value]->TrainQuantity;
+					}
+					Costs[FoodCost] *= UnitTypes[button.Value]->TrainQuantity;
 				}
-				Costs[FoodCost] *= UnitTypes[button.Value]->TrainQuantity;
 			}
 			//Wyrmgus end
 			break;
 		//Wyrmgus start
 		case ButtonBuy:
-			Costs[FoodCost] = UnitManager.GetSlotUnit(button.Value).Type->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
+			Costs[FoodCost] = UnitManager.GetSlotUnit(button.Value).Variable[DEMAND_INDEX].Value;
 			Costs[CopperCost] = UnitManager.GetSlotUnit(button.Value).GetPrice();
 			break;
 		//Wyrmgus end
@@ -2154,7 +2163,7 @@ void CButtonPanel::DoClicked_Train(int button)
 	
 	if (Selected[best_training_place]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
 		ThisPlayer->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer, "%s", _("Unit training queue is full"));
-	} else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type)) {
+	} else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].UnitStock[type.Slot] != 0)) {
 		SendCommandTrainUnit(*Selected[best_training_place], type, ThisPlayer->Index, !(KeyModifiers & ModifierShift));
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
