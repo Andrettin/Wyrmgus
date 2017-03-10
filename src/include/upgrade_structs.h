@@ -84,9 +84,9 @@ enum CostType {
 	//Wyrmgus start
 	ResearchCost,							/// research resource
 	PrestigeCost,							/// prestige resource
-	Cost9,									/// resource 9 (timber in Wyrmsun)
 	GoldCost,                               /// gold resource
 	SilverCost,								/// silver resource
+	FurnitureCost,							/// furniture resource
 	GrainCost,								/// grain resource
 	MushroomCost,							/// mushroom resource
 	LaborCost,								/// labor resource
@@ -150,6 +150,7 @@ extern int DefaultResourceMaxAmounts[MaxCosts];
 //Wyrmgus start
 extern int DefaultResourceFinalResources[MaxCosts];
 extern int DefaultResourceFinalResourceConversionRates[MaxCosts];
+extern int DefaultResourceInputResources[MaxCosts];
 extern int DefaultResourcePrices[MaxCosts];
 extern int DefaultResourceLaborInputs[MaxCosts];
 extern int DefaultResourceOutputs[MaxCosts];
@@ -164,6 +165,7 @@ extern std::string GetResourceNameById(int resource_id);
 
 extern void SetResourceFinalResource(std::string resource_name, std::string final_resource_name);
 extern void SetResourceFinalResourceConversionRate(std::string resource_name, int conversion_rate);
+extern void SetResourceInputResource(std::string resource_name, std::string input_resource_name);
 //Wyrmgus end
 
 /**

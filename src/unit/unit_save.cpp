@@ -308,6 +308,13 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"current-resource\", \"%s\",\n  ",
 					DefaultResourceNames[unit.CurrentResource].c_str());
 	}
+	
+	//Wyrmgus start
+	if (unit.GivesResource) {
+		file.printf("\"gives-resource\", \"%s\",\n  ",
+					DefaultResourceNames[unit.GivesResource].c_str());
+	}
+	//Wyrmgus end
 
 	unit.pathFinderData->input.Save(file);
 	unit.pathFinderData->output.Save(file);

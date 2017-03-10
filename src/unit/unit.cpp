@@ -2157,11 +2157,14 @@ void CUnit::ProduceResource(const int resource)
 		this->ResourcesHeld = 0;
 		if (this->Resource.Workers) {
 			for (CUnit *uins = this->Resource.Workers; uins; uins = uins->NextWorker) {
-				if (uins != this && uins->CurrentOrder()->Action == UnitActionResource) {
-					COrder_Resource &order = *static_cast<COrder_Resource *>(uins->CurrentOrder());
-					order.LoseResource(*uins, *this);
+				if (uins->Container == this) {
+					uins->CurrentOrder()->Finished = true;
 				}
 			}
+		}
+		this->Resource.Active = 0;
+		if (this->UnitInside) {
+			DropOutAll(*this);
 		}
 	}
 }

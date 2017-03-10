@@ -557,6 +557,13 @@ static int CclUnit(lua_State *l)
 			lua_pushvalue(l, -1);
 			unit->CurrentResource = CclGetResourceByName(l);
 			lua_pop(l, 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "gives-resource")) {
+			lua_rawgeti(l, 2, j + 1);
+			lua_pushvalue(l, -1);
+			unit->GivesResource = CclGetResourceByName(l);
+			lua_pop(l, 1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "pathfinder-input")) {
 			lua_rawgeti(l, 2, j + 1);
 			lua_pushvalue(l, -1);

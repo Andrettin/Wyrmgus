@@ -2177,6 +2177,7 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	for (int i = 0; i < MaxCosts; ++i) {
 		DefaultResourceFinalResources[i] = i;
 		DefaultResourceFinalResourceConversionRates[i] = 100;
+		DefaultResourceInputResources[i] = 0;
 		ResourceGrandStrategyBuildingVariations[i] = 0;
 	}
 	for (int i = 0; i < MaxCosts; ++i) {
@@ -2352,6 +2353,18 @@ void SetResourceFinalResourceConversionRate(std::string resource_name, int conve
 	}
 	
 	DefaultResourceFinalResourceConversionRates[resource] = conversion_rate;
+}
+
+void SetResourceInputResource(std::string resource_name, std::string input_resource_name)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	int input_resource = GetResourceIdByName(input_resource_name.c_str());
+	
+	if (resource == -1 || input_resource == -1) {
+		return;
+	}
+	
+	DefaultResourceInputResources[resource] = input_resource;
 }
 //Wyrmgus end
 

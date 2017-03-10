@@ -278,13 +278,6 @@ bool COrder_Resource::IsGatheringStarted() const
 	return this->State > SUB_START_GATHERING;
 }
 
-//Wyrmgus start
-bool COrder_Resource::IsGathering() const
-{
-	return this->State == SUB_START_GATHERING;
-}
-//Wyrmgus end
-
 bool COrder_Resource::IsGatheringFinished() const
 {
 	return this->State >= SUB_STOP_GATHERING;
@@ -670,6 +663,20 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	Assert(!unit.IY);
 
 	//Wyrmgus start
+	const int input_resource = DefaultResourceInputResources[this->CurrentResource];
+	if (input_resource && (unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource]) == 0) { //if the resource requires an input, but there's none in store, don't gather
+		const char *input_name = DefaultResourceNames[input_resource].c_str();
+		const char *input_actionName = DefaultActions[input_resource].c_str();
+		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
+		if (unit.Player == ThisPlayer && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
+			PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
+		}
+		this->Finished = true;
+		return 0;
+	}
+	//Wyrmgus end
+		
+	//Wyrmgus start
 //	if (resinfo.TerrainHarvester) {
 	if (Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 	//Wyrmgus end
@@ -697,7 +704,11 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	goal = this->GetGoal();
 
 	// Target is dead, stop getting resources.
-	if (!goal || goal->IsVisibleAsGoal(*unit.Player) == false) {
+	//Wyrmgus start
+//	if (!goal || goal->IsVisibleAsGoal(*unit.Player) == false) {
+	//the goal could also have changed its given resource
+	if (!goal || goal->IsVisibleAsGoal(*unit.Player) == false || goal->GivesResource != this->CurrentResource) {
+	//Wyrmgus end
 		// Find an alternative, but don't look too far.
 		this->goalPos.x = -1;
 		this->goalPos.y = -1;
@@ -1009,6 +1020,27 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				//Wyrmgus start
 //				unit.ResourcesHeld += addload;
 //				source->ResourcesHeld -= addload;
+				const int input_resource = DefaultResourceInputResources[this->CurrentResource];
+				if (input_resource) {
+					addload = std::min(unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource], addload);
+					
+					if (!addload) {
+						const char *input_name = DefaultResourceNames[input_resource].c_str();
+						const char *input_actionName = DefaultActions[input_resource].c_str();
+						unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
+						if (unit.Player == ThisPlayer && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
+							PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
+						}
+
+						if (unit.Container) {
+							DropOutOnSide(unit, LookingW, source);
+						}
+						this->Finished = true;
+						return 0;
+					}
+					
+					unit.Player->ChangeResource(input_resource, -addload, true);
+				}
 				unit.ChangeResourcesHeld(addload);
 				if (!source->Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
 					source->ChangeResourcesHeld(-addload);
