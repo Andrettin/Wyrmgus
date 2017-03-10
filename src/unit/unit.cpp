@@ -2315,19 +2315,16 @@ void CUnit::Init(const CUnitType &type)
 	}
 	//Wyrmgus end
 	
-	//Wyrmgus start
-	if (type.GivesResource) {
-		this->GivesResource = type.GivesResource;
-	}
-	//Wyrmgus end
-
 	// Has StartingResources, Use those
 	//Wyrmgus start
 //	this->ResourcesHeld = type.StartingResources;
-	if (type.StartingResources.size() > 0) {
-		this->ResourcesHeld = type.StartingResources[SyncRand(type.StartingResources.size())];
-	} else {
-		this->ResourcesHeld = 0;
+	if (type.GivesResource) {
+		this->GivesResource = type.GivesResource;
+		if (type.StartingResources.size() > 0) {
+			this->ResourcesHeld = type.StartingResources[SyncRand(type.StartingResources.size())];
+		} else {
+			this->ResourcesHeld = 0;
+		}
 	}
 	//Wyrmgus end
 
