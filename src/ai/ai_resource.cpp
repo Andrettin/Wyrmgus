@@ -1479,33 +1479,54 @@ static void AiCollectResources()
 	} while (unit);
 	
 	//Wyrmgus start
-	//buy resources
+	//buy or sell resources
 	for (int c = 1; c < MaxCosts; ++c) {
-		if (percent[c] == 0 || num_units_assigned[c] > 0 || c == CopperCost) { //don't buy a resource if the AI isn't instructed to collect that resource, or if there are already workers assigned to harvesting it
+		if (c == CopperCost) {
 			continue;
 		}
 		
-		if (!AiCanSellResource(CopperCost)) {
-			break;
-		}
-		
-		if (AiCanSellResource(c)) { //if there's enough of the resource stored to sell, then there's no need to buy it
-			continue;
-		}
-		
-		const int n_m = AiHelpers.BuyMarkets[c - 1].size();
+		//buy resource
+		if (
+			percent[c] > 0 //don't buy a resource if the AI isn't instructed to collect that resource
+			&& num_units_assigned[c] == 0 //don't buy a resource if there are already workers assigned to harvesting it
+			&& AiCanSellResource(CopperCost)
+			&& !AiCanSellResource(c) //if there's enough of the resource stored to sell, then there's no need to buy it
+		) {
+			const int n_m = AiHelpers.BuyMarkets[c - 1].size();
 
-		for (int i = 0; i < n_m; ++i) {
-			CUnitType &market_type = *AiHelpers.BuyMarkets[c - 1][i];
+			for (int i = 0; i < n_m; ++i) {
+				CUnitType &market_type = *AiHelpers.BuyMarkets[c - 1][i];
 
-			const int *market_count = AiPlayer->Player->UnitTypesAiActiveCount;
-			if (market_count[market_type.Slot]) {
-				std::vector<CUnit *> market_table;
-				FindPlayerUnitsByType(*AiPlayer->Player, market_type, market_table, true);
+				const int *market_count = AiPlayer->Player->UnitTypesAiActiveCount;
+				if (market_count[market_type.Slot]) {
+					std::vector<CUnit *> market_table;
+					FindPlayerUnitsByType(*AiPlayer->Player, market_type, market_table, true);
 
-				CUnit &market_unit = *market_table[SyncRand() % market_table.size()];
-				CommandBuyResource(market_unit, c, AiPlayer->Player->Index);
-				break;
+					CUnit &market_unit = *market_table[SyncRand() % market_table.size()];
+					CommandBuyResource(market_unit, c, AiPlayer->Player->Index);
+					break;
+				}
+			}
+		//sell resource
+		} else if (
+			(percent[c] == 0 || num_units_assigned[c] > 0) //only sell the resource if either the AI isn't instructed to collect it, or if there are harvesters assigned to it
+			&& !AiCanSellResource(CopperCost)
+			&& AiCanSellResource(c)
+		) {
+			const int n_m = AiHelpers.SellMarkets[c - 1].size();
+
+			for (int i = 0; i < n_m; ++i) {
+				CUnitType &market_type = *AiHelpers.SellMarkets[c - 1][i];
+
+				const int *market_count = AiPlayer->Player->UnitTypesAiActiveCount;
+				if (market_count[market_type.Slot]) {
+					std::vector<CUnit *> market_table;
+					FindPlayerUnitsByType(*AiPlayer->Player, market_type, market_table, true);
+
+					CUnit &market_unit = *market_table[SyncRand() % market_table.size()];
+					CommandSellResource(market_unit, c, AiPlayer->Player->Index);
+					break;
+				}
 			}
 		}
 	}
