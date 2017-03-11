@@ -425,6 +425,12 @@ public:
 	std::vector<std::vector<CUnitType *> > BuyMarkets;
 
 	/**
+	** The index is the unit type id, giving a table of all
+	** resources it can choose to produce.
+	*/
+	std::vector<std::vector<int> > ProducedResources;
+
+	/**
 	** The index is the unit that should acquire an experience upgrade, giving a table of all
 	** possible upgrades for it.
 	*/

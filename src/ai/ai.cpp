@@ -687,6 +687,7 @@ void FreeAi()
 	//Wyrmgus start
 	AiHelpers.SellMarkets.clear();
 	AiHelpers.BuyMarkets.clear();
+	AiHelpers.ProducedResources.clear();
 	AiHelpers.ExperienceUpgrades.clear();
 	AiHelpers.LearnableAbilities.clear();
 	//Wyrmgus end

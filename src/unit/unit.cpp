@@ -2149,23 +2149,30 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 */
 void CUnit::ProduceResource(const int resource)
 {
+	if (resource == this->GivesResource) {
+		return;
+	}
+	
+	int old_resource = this->GivesResource;
+	
 	if (resource != 0) {
 		this->GivesResource = resource;
 		this->ResourcesHeld = 10000;
 	} else {
 		this->GivesResource = 0;
 		this->ResourcesHeld = 0;
+	}
+	
+	if (old_resource != 0) {
 		if (this->Resource.Workers) {
 			for (CUnit *uins = this->Resource.Workers; uins; uins = uins->NextWorker) {
 				if (uins->Container == this) {
 					uins->CurrentOrder()->Finished = true;
+					DropOutOnSide(*uins, LookingW, this);
 				}
 			}
 		}
 		this->Resource.Active = 0;
-		if (this->UnitInside) {
-			DropOutAll(*this);
-		}
 	}
 }
 

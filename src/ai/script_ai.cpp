@@ -71,7 +71,7 @@ static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 
 //Wyrmgus start
 /**
-**  Insert new unit-type element.
+**  Insert new upgrade element.
 **
 **  @param table  Table with elements.
 **  @param n      Index to insert new into table
@@ -89,6 +89,27 @@ static void AiHelperInsert(std::vector<std::vector<CUpgrade *> > &table,
 		return;
 	}
 	table[n].push_back(&base);
+}
+
+/**
+**  Insert new index element.
+**
+**  @param table  Table with elements.
+**  @param n      Index to insert new into table
+**  @param base   Base index to insert into table.
+*/
+static void AiHelperInsert(std::vector<std::vector<int> > &table,
+						   unsigned int n, int base)
+{
+	if (n >= table.size()) {
+		table.resize(n + 1);
+	}
+	// Look if already known
+	std::vector<int>::const_iterator it = std::find(table[n].begin(), table[n].end(), base);
+	if (it != table[n].end()) {
+		return;
+	}
+	table[n].push_back(base);
 }
 //Wyrmgus end
 
@@ -272,6 +293,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 	AiHelpers.Depots.clear();
 	AiHelpers.SellMarkets.clear();
 	AiHelpers.BuyMarkets.clear();
+	AiHelpers.ProducedResources.clear();
 	AiHelpers.ExperienceUpgrades.clear();
 	AiHelpers.LearnableAbilities.clear();
 	//Wyrmgus end
@@ -369,6 +391,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.BuyMarkets, resource - 1, **j);
+				}
+				break;
+			}
+			case ButtonProduceResource : {
+				int resource = GetResourceIdByName(button.ValueStr.c_str());
+
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					AiHelperInsert(aiHelper.ProducedResources, (**j).Slot, resource);
 				}
 				break;
 			}

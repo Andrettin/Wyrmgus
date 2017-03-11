@@ -1087,7 +1087,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 	// Find a resource to harvest from.
 	//Wyrmgus start
 //	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, NULL, false);
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, NULL, false, false, false, resource == CopperCost);
 	//Wyrmgus end
 
 	if (mine) {
@@ -1220,6 +1220,49 @@ static bool AiCanSellResource(int resource)
 	}
 	
 	return true;
+}
+
+static void AiProduceResources()
+{
+	const int n = AiPlayer->Player->GetUnitCount();
+	for (int i = 0; i < n; ++i) {
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
+		if (unit.Type->Slot >= ((int) AiHelpers.ProducedResources.size()) || AiHelpers.ProducedResources[unit.Type->Slot].size() == 0 || !unit.Active) {
+			continue;
+		}
+		
+		if (!unit.IsIdle()) {
+			continue;
+		}
+
+		int chosen_resource = 0;
+		int best_value = 0;
+		for (size_t j = 0; j != AiHelpers.ProducedResources[unit.Type->Slot].size(); ++j) {
+			int resource = AiHelpers.ProducedResources[unit.Type->Slot][j];
+			
+			if (!LuxuryResources[resource] && AiCanSellResource(resource)) {
+				continue;
+			}
+			
+			int input_resource = DefaultResourceInputResources[resource];
+
+			if (input_resource && !AiCanSellResource(input_resource)) {
+				continue;
+			}
+			
+			int resource_value = AiPlayer->Player->Prices[resource];
+			if (input_resource) {
+				resource_value -= AiPlayer->Player->Prices[input_resource];
+			}
+
+			if (resource_value > best_value) {
+				chosen_resource = resource;
+				best_value = resource_value;
+			}
+		}
+
+		CommandProduceResource(unit, chosen_resource);
+	}
 }
 //Wyrmgus end
 
@@ -1492,6 +1535,10 @@ static void AiCollectResources()
 			&& AiCanSellResource(CopperCost)
 			&& !AiCanSellResource(c) //if there's enough of the resource stored to sell, then there's no need to buy it
 		) {
+			if ((c - 1) >= ((int) AiHelpers.BuyMarkets.size())) {
+				continue;
+			}
+
 			const int n_m = AiHelpers.BuyMarkets[c - 1].size();
 
 			for (int i = 0; i < n_m; ++i) {
@@ -1513,6 +1560,21 @@ static void AiCollectResources()
 			&& !AiCanSellResource(CopperCost)
 			&& AiCanSellResource(c)
 		) {
+			bool is_luxury_input = false;
+			for (int i = 1; i < MaxCosts; ++i) {
+				if (LuxuryResources[i] && DefaultResourceInputResources[i] == c) {
+					is_luxury_input = true;
+					break;
+				}
+			}
+			if (is_luxury_input) { //if the resource is a luxury resource input, don't sell it directly, as it makes more sense to transform it into the luxury resource
+				continue;
+			}
+			
+			if ((c - 1) >= ((int) AiHelpers.SellMarkets.size())) {
+				continue;
+			}
+
 			const int n_m = AiHelpers.SellMarkets[c - 1].size();
 
 			for (int i = 0; i < n_m; ++i) {
@@ -1961,6 +2023,9 @@ void AiResourceManager()
 	// Collect resources.
 	if ((GameCycle / CYCLES_PER_SECOND) % COLLECT_RESOURCES_INTERVAL ==
 		(unsigned long)AiPlayer->Player->Index % COLLECT_RESOURCES_INTERVAL) {
+		//Wyrmgus start
+		AiProduceResources(); //handle building resource production choice
+		//Wyrmgus end
 		AiCollectResources();
 	}
 

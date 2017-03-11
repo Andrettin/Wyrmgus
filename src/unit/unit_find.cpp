@@ -466,14 +466,14 @@ class CResourceFinder
 public:
 	//Wyrmgus start
 //	CResourceFinder(int r, bool on_top) : resource(r), mine_on_top(on_top) {}
-	CResourceFinder(int r, bool harvestable) : resource(r), only_harvestable(harvestable) {}
+	CResourceFinder(int r, bool harvestable, bool luxury) : resource(r), only_harvestable(harvestable), include_luxury(luxury) {}
 	//Wyrmgus end
 	bool operator()(const CUnit *const unit) const
 	{
 		const CUnitType &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((unit->GivesResource == resource || DefaultResourceFinalResources[unit->GivesResource] == resource)
+		return ((unit->GivesResource == resource || DefaultResourceFinalResources[unit->GivesResource] == resource || (include_luxury && LuxuryResources[unit->GivesResource]))
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start
@@ -488,6 +488,7 @@ private:
 	//Wyrmgus start
 //	const bool mine_on_top;
 	const bool only_harvestable;
+	const bool include_luxury;
 	//Wyrmgus end
 };
 
@@ -496,7 +497,7 @@ class ResourceUnitFinder
 public:
 	//Wyrmgus start
 //	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine) :
-	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area) :
+	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury) :
 	//Wyrmgus end
 		worker(worker),
 		resinfo(*worker.Type->ResInfo[resource]),
@@ -508,8 +509,9 @@ public:
 		only_harvestable(only_harvestable),
 		ignore_exploration(ignore_exploration),
 		only_unsettled_area(only_unsettled_area),
+		include_luxury(include_luxury),
 //		res_finder(resource, 1),
-		res_finder(resource, only_harvestable),
+		res_finder(resource, only_harvestable, include_luxury),
 		//Wyrmgus end
 		resultMine(resultMine)
 	{
@@ -522,7 +524,10 @@ private:
 
 	struct ResourceUnitFinder_Cost {
 	public:
-		void SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage);
+		//Wyrmgus start
+//		void SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage);
+		void SetFrom(const CUnit &mine, const CUnit *deposit, const CUnit &worker, bool check_usage);
+		//Wyrmgus end
 		bool operator < (const ResourceUnitFinder_Cost &rhs) const
 		{
 			if (waiting != rhs.waiting) {
@@ -553,6 +558,7 @@ private:
 	bool only_harvestable;
 	bool ignore_exploration;
 	bool only_unsettled_area;
+	bool include_luxury;
 	//Wyrmgus end
 	CResourceFinder res_finder;
 	ResourceUnitFinder_Cost bestCost;
@@ -583,11 +589,22 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 			   || (worker.IsAllied(mine) && mine.IsAllied(worker)));
 }
 
-void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage)
+//Wyrmgus start
+//void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage)
+void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, const CUnit *deposit, const CUnit &worker, bool check_usage)
+//Wyrmgus end
 {
 	distance = deposit ? mine.MapDistanceTo(*deposit) : 0;
 	//Wyrmgus start
 	distance = distance * 100 / DefaultResourceFinalResourceConversionRates[mine.GivesResource]; // alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
+	if (LuxuryResources[mine.GivesResource]) {
+		int price_modifier = worker.Player->Prices[mine.GivesResource];
+		if (DefaultResourceInputResources[mine.GivesResource]) {
+			price_modifier -= worker.Player->Prices[DefaultResourceInputResources[mine.GivesResource]];
+		}
+		price_modifier = std::max(price_modifier, 1);
+		distance = distance * 100 / price_modifier;
+	}
 	if (!mine.Type->BoolFlag[CANHARVEST_INDEX].value) { // if it is a deposit rather than a readily-harvestable resource, double the distance score
 		distance *= 2;
 	}
@@ -618,7 +635,10 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
 
-		cost.SetFrom(*mine, deposit, check_usage);
+		//Wyrmgus start
+//		cost.SetFrom(*mine, deposit, check_usage);
+		cost.SetFrom(*mine, deposit, worker, check_usage);
+		//Wyrmgus end
 		if (cost < bestCost && UnitReachable(worker, *mine, 1)) {
 			*resultMine = mine;
 
@@ -658,7 +678,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
 						//Wyrmgus start
 //						bool check_usage, const CUnit *deposit)
-						bool check_usage, const CUnit *deposit, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area)
+						bool check_usage, const CUnit *deposit, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury)
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
@@ -682,7 +702,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	//Wyrmgus start
 //	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
-	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, only_harvestable, ignore_exploration, only_unsettled_area);
+	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, only_harvestable, ignore_exploration, only_unsettled_area, include_luxury);
 	//Wyrmgus end
 
 	terrainTraversal.Run(resourceUnitFinder);
@@ -930,7 +950,7 @@ CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestabl
 {
 	//Wyrmgus start
 //	return Map.Field(pos)->UnitCache.find(CResourceFinder(resource, mine_on_top));
-	return Map.Field(pos, z)->UnitCache.find(CResourceFinder(resource, only_harvestable));
+	return Map.Field(pos, z)->UnitCache.find(CResourceFinder(resource, only_harvestable, false));
 	//Wyrmgus end
 }
 
