@@ -1367,9 +1367,9 @@ void CButtonPanel::Draw()
 				if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0) { //draw the quantity in stock for unit "training" cases which have it
 					number_string = std::to_string((long long) Selected[0]->GetUnitStock(buttons[i].Value)) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value]);
 				} else if (buttons[i].Action == ButtonSellResource) {
-					number_string = std::to_string((long long) Selected[0]->Player->Prices[buttons[i].Value] * Selected[0]->Variable[TRADEEFFICIENCY_INDEX].Value / 100);
+					number_string = std::to_string((long long) Selected[0]->Player->Prices[buttons[i].Value] * (100 - Selected[0]->Variable[TRADECOST_INDEX].Value) / 100);
 				} else if (buttons[i].Action == ButtonBuyResource) {
-					number_string = std::to_string((long long) 100 * 100 / Selected[0]->Player->Prices[buttons[i].Value] * Selected[0]->Variable[TRADEEFFICIENCY_INDEX].Value / 100);
+					number_string = std::to_string((long long) 100 * 100 / Selected[0]->Player->Prices[buttons[i].Value] * (100 - Selected[0]->Variable[TRADECOST_INDEX].Value) / 100);
 				}
 				std::string oldnc;
 				std::string oldrc;

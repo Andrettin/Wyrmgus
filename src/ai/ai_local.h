@@ -414,7 +414,7 @@ public:
 	//Wyrmgus start
 	/**
 	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
-	** units/buildings/mines which can sell this resource.
+	** units/buildings/mines which can sell this resource. In index 0 (respective to CopperCost) we store all units with the "Market" tag instead.
 	*/
 	std::vector<std::vector<CUnitType *> > SellMarkets;
 	

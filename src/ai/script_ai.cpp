@@ -232,6 +232,25 @@ static std::vector<CUnitType *> getRefineryUnits()
 
 }
 
+//Wyrmgus start
+/**
+**  Get list of unit types which are markets.
+*/
+static std::vector<CUnitType *> GetMarketUnits()
+{
+	std::vector<CUnitType *> res;
+
+	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
+		CUnitType &type = **i;
+
+		if (type.BoolFlag[MARKET_INDEX].value > 0) {
+			res.push_back(&type);
+		}
+	}
+	return res;
+}
+//Wyrmgus end
+
 /**
 **  Init AiHelper.
 **
@@ -262,10 +281,18 @@ static void InitAiHelper(AiHelper &aiHelper)
 	std::vector<CUnitType *> reparableUnits = getReparableUnits();
 	std::vector<CUnitType *> supplyUnits = getSupplyUnits();
 	std::vector<CUnitType *> mineUnits = getRefineryUnits();
+	//Wyrmgus start
+	std::vector<CUnitType *> market_units = GetMarketUnits();
+	//Wyrmgus end
 
 	for (std::vector<CUnitType *>::const_iterator i = supplyUnits.begin(); i != supplyUnits.end(); ++i) {
 		AiHelperInsert(aiHelper.UnitLimit, 0, **i);
 	}
+	//Wyrmgus start
+	for (std::vector<CUnitType *>::const_iterator i = market_units.begin(); i != market_units.end(); ++i) {
+		AiHelperInsert(aiHelper.SellMarkets, 0, **i);
+	}
+	//Wyrmgus end
 
 	for (int i = 1; i < MaxCosts; ++i) {
 		for (std::vector<CUnitType *>::const_iterator j = mineUnits.begin(); j != mineUnits.end(); ++j) {
