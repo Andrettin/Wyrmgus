@@ -189,6 +189,9 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	} else {
 		player.Heroes.push_back(&unit);
 	}
+	for (int i = 0; i < MaxCosts; ++i) {
+		player.ResourceDemand[i] += type.Stats[player.Index].ResourceDemand[i];
+	}	
 	
 	if (player.AiEnabled && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && !type.CanCastSpell && Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer) && unit.CanMove() && unit.Active && unit.GroupId != 0 && unit.Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		player.Ai->Scouts.push_back(&unit);

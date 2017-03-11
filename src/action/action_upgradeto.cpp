@@ -159,6 +159,9 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 
 	player.Demand += newtype.Stats[player.Index].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.Index].Variables[DEMAND_INDEX].Value;
 	player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
+	for (int i = 0; i < MaxCosts; ++i) {
+		player.ResourceDemand[i] += newtype.Stats[player.Index].ResourceDemand[i] - oldtype.Stats[player.Index].ResourceDemand[i];
+	}
 
 	// Change resource limit
 	for (int i = 0; i < MaxCosts; ++i) {

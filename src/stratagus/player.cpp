@@ -1733,6 +1733,9 @@ void CPlayer::Clear()
 	memset(LastResources, 0, sizeof(LastResources));
 	memset(Incomes, 0, sizeof(Incomes));
 	memset(Revenue, 0, sizeof(Revenue));
+	//Wyrmgus start
+	memset(ResourceDemand, 0, sizeof(ResourceDemand));
+	//Wyrmgus end
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
 	memset(UnitTypesAiActiveCount, 0, sizeof(UnitTypesAiActiveCount));
 	//Wyrmgus start

@@ -495,6 +495,9 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	} else {
 		build->Player->Heroes.erase(std::remove(build->Player->Heroes.begin(), build->Player->Heroes.end(), build), build->Player->Heroes.end());
 	}
+	for (int i = 0; i < MaxCosts; ++i) {
+		build->Player->ResourceDemand[i] -= build->Type->Stats[build->Player->Index].ResourceDemand[i];
+	}	
 	
 	if (build->Player->AiEnabled && build->Player->Ai && std::find(build->Player->Ai->Scouts.begin(), build->Player->Ai->Scouts.end(), build) != build->Player->Ai->Scouts.end()) {
 		build->Player->Ai->Scouts.erase(std::remove(build->Player->Ai->Scouts.begin(), build->Player->Ai->Scouts.end(), build), build->Player->Ai->Scouts.end());

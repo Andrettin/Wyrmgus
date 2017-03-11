@@ -145,6 +145,7 @@ public:
 	int Revenue[MaxCosts];        /// income rate of the resources
 	//Wyrmgus start
 	int Prices[MaxCosts];		  /// price of each resource
+	int ResourceDemand[MaxCosts]; /// demand for the resources
 	//Wyrmgus end
 
 	int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources

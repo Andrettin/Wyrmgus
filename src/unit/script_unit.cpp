@@ -663,6 +663,9 @@ static int CclUnit(lua_State *l)
 				} else {
 					unit->Player->Heroes.erase(std::remove(unit->Player->Heroes.begin(), unit->Player->Heroes.end(), unit), unit->Player->Heroes.end());
 				}
+				for (int res = 0; res < MaxCosts; ++res) {
+					unit->Player->ResourceDemand[res] -= type->Stats[unit->Player->Index].ResourceDemand[res];
+				}
 				//Wyrmgus end
 			}
 		} else if (!strcmp(value, "critical-order")) {
