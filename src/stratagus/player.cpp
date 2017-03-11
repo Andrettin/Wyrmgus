@@ -1852,6 +1852,48 @@ void CPlayer::UpdateFreeWorkers()
 }
 
 //Wyrmgus start
+void CPlayer::PerformResourceTrade()
+{
+	bool has_market = false;
+	int trade_efficiency = 0;
+	for (int i = 0; i < this->GetUnitCount(); ++i) {
+		CUnit *market_unit = &this->GetUnit(i);
+		if (!market_unit || !market_unit->IsAliveOnMap() || !market_unit->Type->BoolFlag[MARKET_INDEX].value) {
+			continue;
+		}
+		has_market = true;
+		trade_efficiency = market_unit->Variable[TRADEEFFICIENCY_INDEX].Value;
+		break;
+	}
+	
+	if (!has_market) {
+		return;
+	}
+	
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (i == CopperCost) {
+			continue;
+		}
+		if (!LuxuryResources[i]) {
+			continue;
+		}
+		
+		int resource_demand = this->GetEffectiveResourceDemand(i);
+		int resource_supply = this->Resources[i] + this->StoredResources[i];
+
+		int traded_resource_quantity = std::min(resource_demand, resource_supply);
+		this->ChangeResource(i, -traded_resource_quantity, true);
+		this->ChangeResource(CopperCost, traded_resource_quantity * this->Prices[i] * trade_efficiency / 100 / 100, true);
+		
+		if (resource_demand > resource_supply) {
+			this->Prices[i] += 1;
+		} else if (resource_supply > resource_demand) {
+			this->Prices[i] -= 1;
+			this->Prices[i] = std::max(1, this->Prices[i]);
+		}
+	}
+}
+
 void CPlayer::UpdateLevelUpUnits()
 {
 	LevelUpUnits.clear();
@@ -2310,6 +2352,25 @@ bool CPlayer::CheckResource(const int resource, const int value)
 	return result < value ? false : true;
 }
 
+//Wyrmgus start
+/**
+**  Get the effective resource demand for the player, given the current prices
+**
+**  @param resource  Resource.
+*/
+int CPlayer::GetEffectiveResourceDemand(const int resource) const
+{
+	int resource_demand = this->ResourceDemand[resource];
+	
+	if (this->Prices[resource]) {
+		resource_demand *= DefaultResourcePrices[resource];
+		resource_demand /= this->Prices[resource];
+	}
+
+	return resource_demand;
+}
+//Wyrmgus end
+
 int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 {
 	int count = UnitTypesCount[type.Slot];
@@ -2642,6 +2703,7 @@ void PlayersEachSecond(int playerIdx)
 
 	player.UpdateFreeWorkers();
 	//Wyrmgus start
+	player.PerformResourceTrade();
 	player.UpdateCurrentQuests();
 	//Wyrmgus end
 }

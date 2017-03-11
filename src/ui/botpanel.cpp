@@ -1738,7 +1738,7 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 	}
 	char unit_ident[128];
 	//Wyrmgus start
-	char individual_unit_ident[36][128]; // the 36 there is the max selectable quantity; not nice to hardcode it like this, should be changed in the future
+	char individual_unit_ident[200][128]; // the 200 there is the max selectable quantity; not nice to hardcode it like this, should be changed in the future
 	//Wyrmgus end
 
 	sprintf(unit_ident, ",%s-group,", PlayerRaces.Name[ThisPlayer->Race].c_str());

@@ -544,12 +544,12 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	}
 	//Wyrmgus end
 	
-	file.printf("  \"repair-building\", %u\n", ai.LastRepairBuilding);
-	
 	//Wyrmgus start
-	file.printf("  \"pathway-construction-building\", %u\n", ai.LastPathwayConstructionBuilding);
+	file.printf("  \"pathway-construction-building\", %u,\n", ai.LastPathwayConstructionBuilding);
 	//Wyrmgus end
 
+	file.printf("  \"repair-building\", %u\n", ai.LastRepairBuilding);
+	
 	file.printf(")\n\n");
 }
 

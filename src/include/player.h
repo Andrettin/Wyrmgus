@@ -246,6 +246,7 @@ public:
 	void RemoveUnit(CUnit &unit);
 	void UpdateFreeWorkers();
 	//Wyrmgus start
+	void PerformResourceTrade();
 	void UpdateLevelUpUnits();
 	void UpdateQuestPool();
 	void AvailableQuestsChanged();
@@ -267,6 +268,10 @@ public:
 	void SetResource(const int resource, const int value, const int type = STORE_OVERALL);
 	/// Check, if there enough resources for action.
 	bool CheckResource(const int resource, const int value);
+	//Wyrmgus start
+	/// Get the effective resource demand for the player, given the current prices
+	int GetEffectiveResourceDemand(const int resource) const;
+	//Wyrmgus end
 	
 	/// Returns count of specified unittype
 	int GetUnitTotalCount(const CUnitType &type) const;
