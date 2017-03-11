@@ -1219,7 +1219,9 @@ void AiCanNotMove(CUnit &unit)
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 		//Wyrmgus start
-		unit.Wait = CYCLES_PER_SECOND * 10; // wait a bit before trying to move the unit again
+		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+			unit.Wait = CYCLES_PER_SECOND * 10; // wait a bit before trying to move the unit again; this is so when units are attacking an enemy they won't clog performance if one blocks the other; not for workers since otherwise they will spend too much time doing nothing if blocked briefly by another worker during gathering
+		}
 		//Wyrmgus end
 	}
 }
