@@ -700,6 +700,16 @@ bool IsMouseLeftButtonPressed()
 {
 	return (MouseButtons & LeftButton) ? true : false;
 }
+
+std::string GetCurrentButtonValueStr()
+{
+	
+	if (CurrentButtons.empty()) {
+		return "";
+	}
+	
+	return CurrentButtons[ButtonUnderCursor].ValueStr;
+}
 //Wyrmgus end
 
 /**

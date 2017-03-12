@@ -2188,7 +2188,7 @@ void CUnit::SellResource(const int resource, const int player)
 	}
 
 	Players[player].ChangeResource(resource, -100, true);
-	Players[player].ChangeResource(CopperCost, this->Player->Prices[resource] * (100 - this->Variable[TRADECOST_INDEX].Value) / 100, true);
+	Players[player].ChangeResource(CopperCost, this->GetEffectiveResourceSellPrice(resource), true);
 	
 	this->Player->Prices[resource] -= 1;
 	this->Player->Prices[resource] = std::max(1, this->Player->Prices[resource]);
@@ -2201,12 +2201,12 @@ void CUnit::SellResource(const int resource, const int player)
 */
 void CUnit::BuyResource(const int resource, const int player)
 {
-	if ((Players[player].Resources[CopperCost] + Players[player].StoredResources[CopperCost]) < 100) {
+	if ((Players[player].Resources[CopperCost] + Players[player].StoredResources[CopperCost]) < this->GetEffectiveResourceBuyPrice(resource)) {
 		return;
 	}
 
-	Players[player].ChangeResource(CopperCost, -100, true);
-	Players[player].ChangeResource(resource, 100 * 100 / this->Player->Prices[resource] * (100 - this->Variable[TRADECOST_INDEX].Value) / 100, true);
+	Players[player].ChangeResource(resource, 100, true);
+	Players[player].ChangeResource(CopperCost, -this->GetEffectiveResourceBuyPrice(resource), true);
 	
 	this->Player->Prices[resource] += 1;
 }
@@ -5168,6 +5168,26 @@ int CUnit::GetUnitStockReplenishmentTimer(int unit_type_id) const
 	} else {
 		return 0;
 	}
+}
+
+/**
+**  Get the effective sell price of a resource
+*/
+int CUnit::GetEffectiveResourceSellPrice(const int resource, int traded_quantity) const
+{
+	int price = traded_quantity * this->Player->Prices[resource] / 100 * (100 - this->Variable[TRADECOST_INDEX].Value) / 100;
+	price = std::max(1, price);
+	return price;
+}
+
+/**
+**  Get the effective buy quantity of a resource
+*/
+int CUnit::GetEffectiveResourceBuyPrice(const int resource, int traded_quantity) const
+{
+	int price = traded_quantity * this->Player->Prices[resource] / 100 * 100 / (100 - this->Variable[TRADECOST_INDEX].Value);
+	price = std::max(1, price);
+	return price;
 }
 
 bool CUnit::CanAttack(bool count_inside) const

@@ -1564,6 +1564,7 @@ static void AiCollectResources()
 		//sell resource
 		} else if (
 			(percent[c] == 0 || num_units_assigned[c] > 0) //only sell the resource if either the AI isn't instructed to collect it, or if there are harvesters assigned to it
+			&& num_units_assigned[CopperCost] == 0 //don't sell a resource if there are already workers assigned to obtaining copper
 			&& !AiCanSellResource(CopperCost)
 			&& AiCanSellResource(c)
 		) {

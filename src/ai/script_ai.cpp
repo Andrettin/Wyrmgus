@@ -264,7 +264,7 @@ static std::vector<CUnitType *> GetMarketUnits()
 	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
 
-		if (type.BoolFlag[MARKET_INDEX].value > 0) {
+		if (type.BoolFlag[MARKET_INDEX].value) {
 			res.push_back(&type);
 		}
 	}

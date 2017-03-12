@@ -71,6 +71,7 @@
 #include "unittype.h"
 #include "unit.h"
 //Wyrmgus start
+#include "unit_find.h"
 #include "upgrade.h"
 //Wyrmgus end
 #include "ui.h"
@@ -1855,23 +1856,23 @@ void CPlayer::UpdateFreeWorkers()
 //Wyrmgus start
 void CPlayer::PerformResourceTrade()
 {
-	bool has_market = false;
-	int trade_cost = 0;
+	CUnit *market_unit = NULL;
 	
 	const int n_m = AiHelpers.SellMarkets[0].size();
 
 	for (int i = 0; i < n_m; ++i) {
 		CUnitType &market_type = *AiHelpers.SellMarkets[0][i];
 
-		const int *market_count = this->UnitTypesAiActiveCount;
+		const int *market_count = this->UnitTypesCount;
 		if (market_count[market_type.Slot]) {
-			has_market = true;
-			trade_cost = market_type.Stats[this->Index].Variables[TRADECOST_INDEX].Value;
+			std::vector<CUnit *> market_table;
+			FindPlayerUnitsByType(*this, market_type, market_table);
+			market_unit = market_table[SyncRand() % market_table.size()];
 			break;
 		}
 	}
 	
-	if (!has_market) {
+	if (!market_unit) {
 		return;
 	}
 	
@@ -1887,8 +1888,11 @@ void CPlayer::PerformResourceTrade()
 		int resource_supply = this->Resources[i] + this->StoredResources[i];
 
 		int traded_resource_quantity = std::min(resource_demand, resource_supply);
-		this->ChangeResource(i, -traded_resource_quantity, true);
-		this->ChangeResource(CopperCost, traded_resource_quantity * this->Prices[i] * (100 - trade_cost) / 100 / 100, true);
+		
+		if (traded_resource_quantity > 0) {
+			this->ChangeResource(i, -traded_resource_quantity, true);
+			this->ChangeResource(CopperCost, market_unit->GetEffectiveResourceSellPrice(i, traded_resource_quantity), true);
+		}
 		
 		if (resource_demand > resource_supply) {
 			this->Prices[i] += 1;

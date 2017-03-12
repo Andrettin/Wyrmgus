@@ -1367,9 +1367,9 @@ void CButtonPanel::Draw()
 				if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0) { //draw the quantity in stock for unit "training" cases which have it
 					number_string = std::to_string((long long) Selected[0]->GetUnitStock(buttons[i].Value)) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value]);
 				} else if (buttons[i].Action == ButtonSellResource) {
-					number_string = std::to_string((long long) Selected[0]->Player->Prices[buttons[i].Value] * (100 - Selected[0]->Variable[TRADECOST_INDEX].Value) / 100);
+					number_string = std::to_string((long long) Selected[0]->GetEffectiveResourceSellPrice(buttons[i].Value));
 				} else if (buttons[i].Action == ButtonBuyResource) {
-					number_string = std::to_string((long long) 100 * 100 / Selected[0]->Player->Prices[buttons[i].Value] * (100 - Selected[0]->Variable[TRADECOST_INDEX].Value) / 100);
+					number_string = std::to_string((long long) Selected[0]->GetEffectiveResourceBuyPrice(buttons[i].Value));
 				}
 				std::string oldnc;
 				std::string oldrc;
@@ -2353,7 +2353,7 @@ void CButtonPanel::DoClicked_BuyResource(int button)
 	const int resource = CurrentButtons[button].Value;
 	int buy_resource_costs[MaxCosts];
 	memset(buy_resource_costs, 0, sizeof(buy_resource_costs));
-	buy_resource_costs[CopperCost] = 100;
+	buy_resource_costs[CopperCost] = Selected[0]->GetEffectiveResourceBuyPrice(resource);
 	if (!ThisPlayer->CheckCosts(buy_resource_costs)) {
 		SendCommandBuyResource(*Selected[0], resource, ThisPlayer->Index);
 	}

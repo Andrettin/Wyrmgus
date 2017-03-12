@@ -397,6 +397,8 @@ public:
 	int GetPrice() const;
 	int GetUnitStock(int unit_type_id) const;
 	int GetUnitStockReplenishmentTimer(int unit_type_id) const;
+	int GetEffectiveResourceSellPrice(const int resource, int traded_quantity = 100) const;
+	int GetEffectiveResourceBuyPrice(const int resource, int traded_quantity = 100) const;
 	bool CanAttack(bool count_inside = false) const;
 	bool IsInCombat() const;
 	bool IsItemEquipped(const CUnit *item) const;

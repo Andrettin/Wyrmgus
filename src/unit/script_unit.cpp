@@ -1801,6 +1801,26 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushnumber(l, -1);
 		}
 		return 1;
+	} else if (!strcmp(value, "EffectiveResourceSellPrice")) {
+		LuaCheckArgs(l, 3);
+		std::string resource_ident = LuaToString(l, 3);
+		int resource = GetResourceIdByName(resource_ident.c_str());
+		if (resource != -1) {
+			lua_pushnumber(l, unit->GetEffectiveResourceSellPrice(resource));
+		} else {
+			LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
+		}
+		return 1;
+	} else if (!strcmp(value, "EffectiveResourceBuyPrice")) {
+		LuaCheckArgs(l, 3);
+		std::string resource_ident = LuaToString(l, 3);
+		int resource = GetResourceIdByName(resource_ident.c_str());
+		if (resource != -1) {
+			lua_pushnumber(l, unit->GetEffectiveResourceBuyPrice(resource));
+		} else {
+			LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
+		}
+		return 1;
 	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
