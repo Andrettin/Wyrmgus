@@ -1304,7 +1304,14 @@ static void AiCollectResources()
 		if (unit.Orders.size() == 1 &&
 			unit.CurrentAction() == UnitActionResource) {
 			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
-			const int c = order.GetCurrentResource();
+			//Wyrmgus start
+//			const int c = order.GetCurrentResource();
+			int c = DefaultResourceFinalResources[order.GetCurrentResource()];
+			if (LuxuryResources[c]) {
+				num_units_assigned[c]++;
+				c = CopperCost;
+			}
+			//Wyrmgus end
 			units_assigned[c].push_back(&unit);
 			num_units_assigned[c]++;
 			total_harvester++;
@@ -1562,12 +1569,12 @@ static void AiCollectResources()
 		) {
 			bool is_luxury_input = false;
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (LuxuryResources[i] && DefaultResourceInputResources[i] == c) {
+				if (LuxuryResources[i] && DefaultResourceInputResources[i] == c && num_units_assigned[i] > 0) {
 					is_luxury_input = true;
 					break;
 				}
 			}
-			if (is_luxury_input) { //if the resource is a luxury resource input, don't sell it directly, as it makes more sense to transform it into the luxury resource
+			if (is_luxury_input) { //if the resource is a luxury resource input, and there are workers producing that luxury, don't sell it directly, as it makes more sense to transform it into the luxury resource
 				continue;
 			}
 			
