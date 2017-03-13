@@ -1895,10 +1895,9 @@ void CPlayer::PerformResourceTrade()
 		}
 		
 		if (resource_demand > resource_supply) {
-			this->Prices[i] += 1;
+			this->IncreaseResourcePrice(i);
 		} else if (resource_supply > resource_demand) {
-			this->Prices[i] -= 1;
-			this->Prices[i] = std::max(1, this->Prices[i]);
+			this->DecreaseResourcePrice(i);
 		}
 	}
 }
@@ -2362,6 +2361,28 @@ bool CPlayer::CheckResource(const int resource, const int value)
 }
 
 //Wyrmgus start
+/**
+**  Increase resource price
+**
+**  @param resource  Resource.
+*/
+void CPlayer::IncreaseResourcePrice(const int resource)
+{
+	this->Prices[resource] += 1;
+}
+
+/**
+**  Decrease resource price
+**
+**  @param resource  Resource.
+*/
+void CPlayer::DecreaseResourcePrice(const int resource)
+{
+	int price_change = this->Prices[resource] / DefaultResourcePrices[resource];
+	price_change = std::max(1, price_change);
+	this->Prices[resource] -= price_change;
+}
+
 /**
 **  Get the effective resource demand for the player, given the current prices
 **

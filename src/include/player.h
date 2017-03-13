@@ -269,6 +269,10 @@ public:
 	/// Check, if there enough resources for action.
 	bool CheckResource(const int resource, const int value);
 	//Wyrmgus start
+	/// Increase resource price
+	void IncreaseResourcePrice(const int resource);
+	/// Decrease resource price
+	void DecreaseResourcePrice(const int resource);
 	/// Get the effective resource demand for the player, given the current prices
 	int GetEffectiveResourceDemand(const int resource) const;
 	//Wyrmgus end

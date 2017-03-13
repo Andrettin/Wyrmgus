@@ -2190,8 +2190,7 @@ void CUnit::SellResource(const int resource, const int player)
 	Players[player].ChangeResource(resource, -100, true);
 	Players[player].ChangeResource(CopperCost, this->GetEffectiveResourceSellPrice(resource), true);
 	
-	this->Player->Prices[resource] -= 1;
-	this->Player->Prices[resource] = std::max(1, this->Player->Prices[resource]);
+	this->Player->DecreaseResourcePrice(resource);
 }
 
 /**
@@ -2208,7 +2207,7 @@ void CUnit::BuyResource(const int resource, const int player)
 	Players[player].ChangeResource(resource, 100, true);
 	Players[player].ChangeResource(CopperCost, -this->GetEffectiveResourceBuyPrice(resource), true);
 	
-	this->Player->Prices[resource] += 1;
+	this->Player->IncreaseResourcePrice(resource);
 }
 
 void CUnit::Scout()
