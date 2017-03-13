@@ -1313,7 +1313,7 @@ void CButtonPanel::Draw()
 		} else if (gray) {
 			//Wyrmgus start
 //			buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
-			button_icon->DrawGrayscaleIcon(pos);
+//			button_icon->DrawGrayscaleIcon(pos); //better to not show it
 			//Wyrmgus end
 		} else {
 			int player = -1;
@@ -2393,11 +2393,7 @@ void CButtonPanel::DoClicked(int button)
 	//Wyrmgus end
 		return;
 	}
-	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-	if (CurrentButtons[button].CommentSound.Sound) {
-		PlayGameSound(CurrentButtons[button].CommentSound.Sound, MaxSampleVolume);
-	}
-	
+
 	//Wyrmgus start
 	if (!IsButtonUsable(*Selected[0], CurrentButtons[button])) {
 		if (CurrentButtons[button].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, CurrentButtons[button].ValueStr) == 'R') {
@@ -2410,6 +2406,11 @@ void CButtonPanel::DoClicked(int button)
 	}
 	//Wyrmgus end
 
+	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+	if (CurrentButtons[button].CommentSound.Sound) {
+		PlayGameSound(CurrentButtons[button].CommentSound.Sound, MaxSampleVolume);
+	}
+	
 	//  Handle action on button.
 	switch (CurrentButtons[button].Action) {
 		case ButtonUnload: { DoClicked_Unload(button); break; }

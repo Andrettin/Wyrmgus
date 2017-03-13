@@ -114,6 +114,10 @@ CUnit *LastLevelUpUnit;							/// Last called level up unit
 //Wyrmgus start
 int ButtonAction::GetKey() const
 {
+	if ((this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo) && !IsButtonUsable(*Selected[0], *this)) {
+		return 0;
+	}
+
 	if (this->Key == gcn::Key::K_ESCAPE) {
 		return this->Key;
 	}
@@ -158,6 +162,12 @@ int ButtonAction::GetKey() const
 
 std::string ButtonAction::GetHint() const
 {
+	if ((this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo) && !IsButtonUsable(*Selected[0], *this) && this->Key != 0 && !this->Hint.empty()) {
+		std::string hint = this->Hint;
+		hint = FindAndReplaceString(hint, "~!", "");
+		return hint;
+	}
+
 	if (this->Key == gcn::Key::K_ESCAPE) {
 		return this->Hint;
 	}
