@@ -712,7 +712,10 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		// Find an alternative, but don't look too far.
 		this->goalPos.x = -1;
 		this->goalPos.y = -1;
-		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled))) {
+		//Wyrmgus start
+//		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled))) {
+		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, true))) {
+		//Wyrmgus end
 			this->State = SUB_START_RESOURCE;
 			this->SetGoal(goal);
 		} else {
@@ -747,7 +750,10 @@ int COrder_Resource::StartGathering(CUnit &unit)
 //	if (!resinfo.HarvestFromOutside) {
 	if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 	//Wyrmgus end
-		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideCount) {
+		//Wyrmgus start
+//		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideCount) {
+		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->Resource.Active) {
+		//Wyrmgus end
 			this->ClearGoal();
 			int selected = unit.Selected;
 			unit.Remove(goal);
@@ -757,7 +763,10 @@ int COrder_Resource::StartGathering(CUnit &unit)
 				SelectionChanged();
 				unit.Removed = 1;
 			}
-		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->InsideCount) {
+		//Wyrmgus start
+//		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->InsideCount) {
+		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->Resource.Active) {
+		//Wyrmgus end
 			//Resource is full, wait
 			unit.Wait = 10;
 			return 0;
@@ -875,7 +884,10 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	this->goalPos.x = -1;
 	this->goalPos.y = -1;
 	//use depot as goal
-	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled);
+	//Wyrmgus start
+//	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled);
+	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, true);
+	//Wyrmgus end
 	if (depot) {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n"
 				   _C_ unit.Player->Index _C_ UnitNumber(unit));
@@ -1490,9 +1502,10 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		if (!goal) {
 			//Wyrmgus start
 //			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
+//									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
 			goal = UnitFindResource(unit, newdepot ? *newdepot : ((mine && mine->Type) ? *mine : unit), (mine && mine->Type) ? range : 1000,
+									this->CurrentResource, true, newdepot ? newdepot : depot);
 			//Wyrmgus end
-									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
 		}
 
 		if (goal) {
