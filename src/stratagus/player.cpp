@@ -2368,7 +2368,9 @@ bool CPlayer::CheckResource(const int resource, const int value)
 */
 void CPlayer::IncreaseResourcePrice(const int resource)
 {
-	this->Prices[resource] += 1;
+	int price_change = DefaultResourcePrices[resource] / std::max(this->Prices[resource], 100);
+	price_change = std::max(1, price_change);
+	this->Prices[resource] += price_change;
 }
 
 /**
