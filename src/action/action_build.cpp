@@ -654,7 +654,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 							//Wyrmgus start
 							unit.MapLayer,
 //							_("You cannot build %s here"), type.Name.c_str());
-							_("You cannot build %s here"), type.GetDefaultName(*unit.Player).c_str());
+							_("You cannot build a %s here"), type.GetDefaultName(*unit.Player).c_str());
 							//Wyrmgus end
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
