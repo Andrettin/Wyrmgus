@@ -460,7 +460,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 */
 //Wyrmgus start
 //bool CheckDependByIdent(const CPlayer &player, const std::string &target)
-bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool ignore_units, bool is_predependency)
+bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool ignore_units, bool is_predependency, bool is_neutral_use)
 //Wyrmgus end
 {
 	DependRule rule;
@@ -478,9 +478,13 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool i
 	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
 		rule.Kind.Upgrade = CUpgrade::Get(target);
-		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A' && !(is_predependency && UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) == 'R')) {
+		//Wyrmgus start
+//		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
+		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A' && !((is_predependency || is_neutral_use) && UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) == 'R')) {
+		//Wyrmgus end
 			return false;
 		}
+		//Wyrmgus start
 		if (player.Race != -1 && player.Faction != -1 && PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
 			if (PlayerRaces.Factions[player.Race][player.Faction]->HolyOrderDeity) {
 				CUpgrade *deity_upgrade = CUpgrade::Get("upgrade-deity-" + PlayerRaces.Factions[player.Race][player.Faction]->HolyOrderDeity->Ident);
@@ -490,9 +494,15 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool i
 							return false;
 						}
 					}
+					for (size_t z = 0; z < deity_upgrade->UpgradeModifiers.size(); ++z) {
+						if (std::find(deity_upgrade->UpgradeModifiers[z]->RemoveUpgrades.begin(), deity_upgrade->UpgradeModifiers[z]->RemoveUpgrades.end(), rule.Kind.Upgrade) != deity_upgrade->UpgradeModifiers[z]->RemoveUpgrades.end()) {
+							return false;
+						}
+					}
 				}
 			}
 		}
+		//Wyrmgus end
 		rule.Type = DependRuleUpgrade;
 	} else {
 		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());

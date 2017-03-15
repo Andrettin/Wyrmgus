@@ -351,7 +351,7 @@ public:
 	bool IsVassalOf(const CPlayer &player, bool include_indirect = false) const;
 	bool HasContactWith(const CPlayer &player) const;
 	bool HasNeutralFactionType() const;
-	bool HasBuildingAccess(const CPlayer &player) const;
+	bool HasBuildingAccess(const CPlayer &player, int button_action = -1) const;
 	bool HasHero(const CCharacter *hero) const;
 	//Wyrmgus end
 

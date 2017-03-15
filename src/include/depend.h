@@ -135,7 +135,7 @@ extern std::string PrintDependencies(const CPlayer &player, const ButtonAction &
 /// Check a dependency by identifier
 //Wyrmgus start
 //extern bool CheckDependByIdent(const CPlayer &player, const std::string &target);
-extern bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool ignore_units = false, bool is_predependency = false);
+extern bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
 extern bool CheckDependByIdent(const CUnit &unit, const std::string &target, bool ignore_units = false, bool is_predependency = false);
 //Wyrmgus end
 /// Check a dependency by unit type

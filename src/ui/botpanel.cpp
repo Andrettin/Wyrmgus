@@ -1237,7 +1237,7 @@ void CButtonPanel::Draw()
 		if (
 			Selected[0]->Player != ThisPlayer
 			&& !ThisPlayer->IsTeamed(*Selected[0])
-			&& ThisPlayer->HasBuildingAccess(*Selected[0]->Player)
+			&& ThisPlayer->HasBuildingAccess(*Selected[0]->Player, buttons[i].Action)
 			&& !IsNeutralUsableButtonAction(buttons[i].Action)
 		) {
 			continue;
@@ -1326,7 +1326,7 @@ void CButtonPanel::Draw()
 				player = Selected[0]->GetDisplayPlayer();
 
 				//if is accessing a building of another player, set color to that of the person player (i.e. for training buttons)
-				if (ThisPlayer->HasBuildingAccess(Players[player])) {
+				if (ThisPlayer->HasBuildingAccess(Players[player], buttons[i].Action)) {
 					player = ThisPlayer->Index;
 				}
 				
@@ -1495,6 +1495,12 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = false;
 		}
 	}
+	
+	//Wyrmgus start
+	if (!ThisPlayer->IsTeamed(*Selected[0]) && (!ThisPlayer->HasBuildingAccess(*Selected[0]->Player, buttonaction.Action) || !IsNeutralUsableButtonAction(buttonaction.Action))) {
+		return false;
+	}
+	//Wyrmgus end
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
@@ -1557,7 +1563,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonBuild:
 			//Wyrmgus start
 //			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
-			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, true);
+			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, true, !ThisPlayer->IsTeamed(unit));
 			//Wyrmgus end
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				//Wyrmgus start
@@ -1684,7 +1690,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:
-			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, false);
+			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, false, !ThisPlayer->IsTeamed(unit));
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
@@ -2395,7 +2401,7 @@ void CButtonPanel::DoClicked(int button)
 	//
 	//Wyrmgus start
 //	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) || (!ThisPlayer->IsTeamed(*Selected[0]) && ThisPlayer->HasBuildingAccess(*Selected[0]->Player) && !IsNeutralUsableButtonAction(CurrentButtons[button].Action))) { //allow neutral units to be used (but only for training or as transporters)
+	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button].Action)) || (!ThisPlayer->IsTeamed(*Selected[0]) && ThisPlayer->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button].Action) && !IsNeutralUsableButtonAction(CurrentButtons[button].Action))) { //allow neutral units to be used (but only for training or as transporters)
 	//Wyrmgus end
 		return;
 	}

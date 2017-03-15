@@ -3234,7 +3234,7 @@ bool CPlayer::HasNeutralFactionType() const
 /**
 **  Check if the player can use the buildings of another, for neutral building functions (i.e. unit training)
 */
-bool CPlayer::HasBuildingAccess(const CPlayer &player) const
+bool CPlayer::HasBuildingAccess(const CPlayer &player, int button_action) const
 {
 	if (player.Type == PlayerNeutral) {
 		return true;
@@ -3244,7 +3244,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player) const
 		player.HasNeutralFactionType()
 		&& player.Overlord == NULL || this->IsOverlordOf(player, true)
 	) {
-		if (PlayerRaces.Factions[player.Race][player.Faction]->Type != FactionTypeHolyOrder || std::find(this->Deities.begin(), this->Deities.end(), PlayerRaces.Factions[player.Race][player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
+		if (PlayerRaces.Factions[player.Race][player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonTrain && button_action != ButtonBuy) || std::find(this->Deities.begin(), this->Deities.end(), PlayerRaces.Factions[player.Race][player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
 		}
 	}
