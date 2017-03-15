@@ -954,7 +954,10 @@ static void DoNextReplay()
 		SendCommandTransformInto(*unit, *UnitTypeByIdent(val), flags);
 	//Wyrmgus end
 	} else if (!strcmp(action, "research")) {
-		SendCommandResearch(*unit, *CUpgrade::Get(val), flags);
+		//Wyrmgus start
+//		SendCommandResearch(*unit, *CUpgrade::Get(val), flags);
+		SendCommandResearch(*unit, *CUpgrade::Get(val), num, flags);
+		//Wyrmgus end
 	} else if (!strcmp(action, "cancel-research")) {
 		SendCommandCancelResearch(*unit);
 	//Wyrmgus start

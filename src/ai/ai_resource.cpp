@@ -836,7 +836,10 @@ static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
 		CUnit &unit = *table[i];
 
 		if (unit.IsIdle()) {
-			CommandResearch(unit, what, FlushCommands);
+			//Wyrmgus start
+//			CommandResearch(unit, what, FlushCommands);
+			CommandResearch(unit, what, AiPlayer->Player->Index, FlushCommands);
+			//Wyrmgus end
 			return true;
 		}
 	}

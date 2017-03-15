@@ -481,6 +481,18 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool i
 		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A' && !(is_predependency && UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) == 'R')) {
 			return false;
 		}
+		if (player.Race != -1 && player.Faction != -1 && PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
+			if (PlayerRaces.Factions[player.Race][player.Faction]->HolyOrderDeity) {
+				CUpgrade *deity_upgrade = CUpgrade::Get("upgrade-deity-" + PlayerRaces.Factions[player.Race][player.Faction]->HolyOrderDeity->Ident);
+				if (deity_upgrade) {
+					for (size_t z = 0; z < rule.Kind.Upgrade->UpgradeModifiers.size(); ++z) {
+						if (std::find(rule.Kind.Upgrade->UpgradeModifiers[z]->RemoveUpgrades.begin(), rule.Kind.Upgrade->UpgradeModifiers[z]->RemoveUpgrades.end(), deity_upgrade) != rule.Kind.Upgrade->UpgradeModifiers[z]->RemoveUpgrades.end()) {
+							return false;
+						}
+					}
+				}
+			}
+		}
 		rule.Type = DependRuleUpgrade;
 	} else {
 		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());

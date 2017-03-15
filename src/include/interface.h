@@ -528,6 +528,7 @@ extern int GetGameSpeed();
 //Wyrmgus start
 extern std::string GetButtonActionNameById(int button_action);
 extern int GetButtonActionIdByName(std::string button_action);
+extern bool IsNeutralUsableButtonAction(int button_action);
 //Wyrmgus end
 
 //@}

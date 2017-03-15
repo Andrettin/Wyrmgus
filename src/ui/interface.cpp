@@ -2008,6 +2008,11 @@ int GetButtonActionIdByName(std::string button_action)
 
 	return -1;
 }
+
+bool IsNeutralUsableButtonAction(int button_action)
+{
+	return button_action == ButtonTrain || button_action == ButtonCancelTrain || button_action == ButtonBuy || button_action == ButtonSellResource || button_action == ButtonBuyResource || button_action == ButtonResearch;
+}
 //Wyrmgus end
 
 //@}

@@ -639,14 +639,24 @@ void SendCommandTransformInto(CUnit &unit, CUnitType &what, int flush)
 ** @param what     research-type of the research.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush)
+//Wyrmgus start
+//void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush)
+void SendCommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
-		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
-		CommandResearch(unit, what, flush);
+		//Wyrmgus start
+//		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
+//		CommandResearch(unit, what, flush);
+		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), player);
+		CommandResearch(unit, what, player, flush);
+		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandResearch, unit,
-						   what.ID, 0, NoUnitP, NULL, flush);
+						   //Wyrmgus start
+//						   what.ID, 0, NoUnitP, NULL, flush);
+						   what.ID, player, NoUnitP, NULL, flush);
+						   //Wyrmgus end
 	}
 }
 
@@ -1057,8 +1067,14 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandResearch:
 			CommandLog("research", &unit, status, -1, -1, NoUnitP,
-					   AllUpgrades[arg1]->Ident.c_str(), -1);
-			CommandResearch(unit, *AllUpgrades[arg1], status);
+					   //Wyrmgus start
+//					   AllUpgrades[arg1]->Ident.c_str(), -1);
+					   AllUpgrades[arg1]->Ident.c_str(), arg2);
+					   //Wyrmgus end
+			//Wyrmgus start
+//			CommandResearch(unit, *AllUpgrades[arg1], status);
+			CommandResearch(unit, *AllUpgrades[arg1], arg2, status);
+			//Wyrmgus end
 			break;
 		case MessageCommandCancelResearch:
 			CommandLog("cancel-research", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);

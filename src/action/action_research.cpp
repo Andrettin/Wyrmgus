@@ -58,16 +58,20 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
+//Wyrmgus start
+///* static */ COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
+/* static */ COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player)
+//Wyrmgus end
 {
 	COrder_Research *order = new COrder_Research();
 
 	// FIXME: if you give quick an other order, the resources are lost!
 	//Wyrmgus start
+	order->Player = player;
 //	unit.Player->SubCosts(upgrade.Costs);
 	int upgrade_costs[MaxCosts];
-	unit.Player->GetUpgradeCosts(&upgrade, upgrade_costs);
-	unit.Player->SubCosts(upgrade_costs);
+	Players[player].GetUpgradeCosts(&upgrade, upgrade_costs);
+	Players[player].SubCosts(upgrade_costs);
 	//Wyrmgus end
 
 	order->SetUpgrade(upgrade);
@@ -81,6 +85,9 @@
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
+	//Wyrmgus start
+	file.printf("\"player\", %d,", this->Player);
+	//Wyrmgus end
 	if (this->Upgrade) {
 		file.printf(" \"upgrade\", \"%s\"", this->Upgrade->Ident.c_str());
 	}
@@ -92,6 +99,11 @@
 	if (!strcmp(value, "upgrade")) {
 		++j;
 		this->Upgrade = CUpgrade::Get(LuaToString(l, -1, j + 1));
+	//Wyrmgus start
+	} else if (!strcmp(value, "player")) {
+		++j;
+		this->Player = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -110,7 +122,10 @@
 
 /* virtual */ void COrder_Research::UpdateUnitVariables(CUnit &unit) const
 {
-	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->ID];
+	//Wyrmgus start
+//	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->ID];
+	unit.Variable[RESEARCH_INDEX].Value = Players[this->Player].UpgradeTimers.Upgrades[this->Upgrade->ID];
+	//Wyrmgus end
 	unit.Variable[RESEARCH_INDEX].Max = this->Upgrade->Costs[TimeCost];
 }
 
@@ -138,8 +153,9 @@
 		return ;
 	}
 #endif
-	CPlayer &player = *unit.Player;
 	//Wyrmgus start
+//	CPlayer &player = *unit.Player;
+	CPlayer &player = Players[this->Player];
 //	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
 	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	//Wyrmgus end
@@ -156,7 +172,10 @@
 			//Wyrmgus end
 		}
 		if (&player == ThisPlayer) {
-			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
+			//Wyrmgus start
+//			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
+			CSound *sound = GameSounds.ResearchComplete[unit.Player->Race].Sound;
+			//Wyrmgus end
 
 			if (sound) {
 				PlayGameSound(sound, MaxSampleVolume);
@@ -175,9 +194,14 @@
 /* virtual */ void COrder_Research::Cancel(CUnit &unit)
 {
 	const CUpgrade &upgrade = this->GetUpgrade();
-	unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
+	//Wyrmgus start
+//	unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
 
-	unit.Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+//	unit.Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+	Players[this->Player].UpgradeTimers.Upgrades[upgrade.ID] = 0;
+
+	Players[this->Player].AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+	//Wyrmgus end
 }
 
 //@}

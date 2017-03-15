@@ -1212,7 +1212,10 @@ void CommandCancelUpgradeTo(CUnit &unit)
 **  @param what   what to research.
 **  @param flush  if true, flush command queue.
 */
-void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
+//Wyrmgus start
+//void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
+void CommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
+//Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1229,8 +1232,8 @@ void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
 	//Wyrmgus start
 //	if (unit.Player->CheckCosts(what.Costs)) {
 	int upgrade_costs[MaxCosts];
-	unit.Player->GetUpgradeCosts(&what, upgrade_costs);
-	if (unit.Player->CheckCosts(upgrade_costs)) {
+	Players[player].GetUpgradeCosts(&what, upgrade_costs);
+	if (Players[player].CheckCosts(upgrade_costs)) {
 	//Wyrmgus end
 		return;
 	}
@@ -1238,7 +1241,10 @@ void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
 	if (order == NULL) {
 		return;
 	}
-	*order = COrder::NewActionResearch(unit, what);
+	//Wyrmgus start
+//	*order = COrder::NewActionResearch(unit, what);
+	*order = COrder::NewActionResearch(unit, what, player);
+	//Wyrmgus end
 	ClearSavedAction(unit);
 }
 

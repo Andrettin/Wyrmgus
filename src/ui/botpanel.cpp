@@ -858,7 +858,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		case ButtonResearch:
 			//Wyrmgus start
 //			memcpy(Costs, AllUpgrades[button.Value]->Costs, sizeof(AllUpgrades[button.Value]->Costs));
-			Selected[0]->Player->GetUpgradeCosts(AllUpgrades[button.Value], Costs);
+			ThisPlayer->GetUpgradeCosts(AllUpgrades[button.Value], Costs);
 			//Wyrmgus end
 			break;
 		case ButtonSpellCast:
@@ -1238,7 +1238,7 @@ void CButtonPanel::Draw()
 			Selected[0]->Player != ThisPlayer
 			&& !ThisPlayer->IsTeamed(*Selected[0])
 			&& ThisPlayer->HasBuildingAccess(*Selected[0]->Player)
-			&& buttons[i].Action != ButtonTrain && buttons[i].Action != ButtonCancelTrain && buttons[i].Action != ButtonBuy && buttons[i].Action != ButtonSellResource && buttons[i].Action != ButtonBuyResource
+			&& !IsNeutralUsableButtonAction(buttons[i].Action)
 		) {
 			continue;
 		}
@@ -1562,11 +1562,11 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				//Wyrmgus start
 //				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
-				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'R';
+				res = (UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'R') && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, true); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
 					CFaction *upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
 					if (upgrade_faction) {
-						res = unit.Player->CanFoundFaction(upgrade_faction, true);
+						res = ThisPlayer->CanFoundFaction(upgrade_faction, true);
 					}
 				}
 				//Wyrmgus end
@@ -1686,11 +1686,11 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonBuild:
 			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, false);
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
-				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
+				res = UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
 					CFaction *upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
 					if (upgrade_faction) {
-						res = unit.Player->CanFoundFaction(upgrade_faction, false);
+						res = ThisPlayer->CanFoundFaction(upgrade_faction, false);
 					}
 				}
 			}
@@ -1859,7 +1859,10 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 		// Special case for researches
 		int researchCheck = true;
 		if (buttonaction.AlwaysShow && !allow && buttonaction.Action == ButtonResearch
-			&& UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'R') {
+			//Wyrmgus start
+//			&& UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'R') {
+			&& UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'R') {
+			//Wyrmgus end
 			researchCheck = false;
 		}
 		
@@ -2263,12 +2266,15 @@ void CButtonPanel::DoClicked_Research(int button)
 	const int index = CurrentButtons[button].Value;
 	//Wyrmgus start
 	int upgrade_costs[MaxCosts];
-	Selected[0]->Player->GetUpgradeCosts(AllUpgrades[index], upgrade_costs);
+	ThisPlayer->GetUpgradeCosts(AllUpgrades[index], upgrade_costs);
 //	if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
-	if (!Selected[0]->Player->CheckCosts(upgrade_costs)) {
+	if (!ThisPlayer->CheckCosts(upgrade_costs)) {
 	//Wyrmgus end
 		//PlayerSubCosts(player,Upgrades[i].Costs);
-		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
+		//Wyrmgus start
+//		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
+		SendCommandResearch(*Selected[0], *AllUpgrades[index], ThisPlayer->Index, !(KeyModifiers & ModifierShift));
+		//Wyrmgus end
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		//Wyrmgus start
@@ -2389,7 +2395,7 @@ void CButtonPanel::DoClicked(int button)
 	//
 	//Wyrmgus start
 //	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) || (!ThisPlayer->IsTeamed(*Selected[0]) && ThisPlayer->HasBuildingAccess(*Selected[0]->Player) && CurrentButtons[button].Action != ButtonTrain && CurrentButtons[button].Action != ButtonCancelTrain && CurrentButtons[button].Action != ButtonBuy && CurrentButtons[button].Action != ButtonSellResource && CurrentButtons[button].Action != ButtonBuyResource)) { //allow neutral units to be used (but only for training or as transporters)
+	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) || (!ThisPlayer->IsTeamed(*Selected[0]) && ThisPlayer->HasBuildingAccess(*Selected[0]->Player) && !IsNeutralUsableButtonAction(CurrentButtons[button].Action))) { //allow neutral units to be used (but only for training or as transporters)
 	//Wyrmgus end
 		return;
 	}
