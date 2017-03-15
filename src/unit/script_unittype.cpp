@@ -678,7 +678,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[PRIORITY_INDEX].Max  = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max;
 			type->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
 			type->TrainQuantity = parent_type->TrainQuantity;
-			type->Upkeep = parent_type->Upkeep;
 			type->ItemClass = parent_type->ItemClass;
 			type->HairColor = parent_type->HairColor;
 			type->MaxOnBoard = parent_type->MaxOnBoard;
@@ -1979,8 +1978,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->RequirementsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
 			type->TrainQuantity = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Upkeep")) {
-			type->Upkeep = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SoldUnits")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -2699,9 +2696,6 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "TrainQuantity")) {
 		lua_pushnumber(l, type->TrainQuantity);
-		return 1;
-	} else if (!strcmp(data, "Upkeep")) {
-		lua_pushnumber(l, type->Upkeep);
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "DrawLevel")) {

@@ -551,7 +551,7 @@ void CGrandStrategyGame::DrawInterface()
 			int quantity_stored = this->PlayerFaction->Resources[stored_resources[i]];
 			int income = 0;
 			if (stored_resources[i] == CopperCost) {
-				income = this->PlayerFaction->Income[stored_resources[i]] - this->PlayerFaction->Upkeep;
+				income = this->PlayerFaction->Income[stored_resources[i]];
 			} else if (stored_resources[i] == ResearchCost || stored_resources[i] == LeadershipCost) {
 				income = this->PlayerFaction->Income[stored_resources[i]] / this->PlayerFaction->OwnedProvinces.size();
 			} else {
@@ -3818,24 +3818,6 @@ void CGrandStrategyFaction::CalculateIncomes()
 {
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->CalculateIncome(i);
-	}
-}
-
-void CGrandStrategyFaction::CalculateUpkeep()
-{
-	this->Upkeep = 0;
-	
-	if (!this->IsAlive()) {
-		return;
-	}
-	
-	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
-		int province_id = this->OwnedProvinces[i];
-		for (size_t j = 0; j < UnitTypes.size(); ++j) {
-			if (GrandStrategyGame.Provinces[province_id]->Units[j] > 0 && UnitTypes[j]->Upkeep > 0) {
-				this->Upkeep += GrandStrategyGame.Provinces[province_id]->Units[j] * UnitTypes[j]->Upkeep;
-			}
-		}
 	}
 }
 
@@ -7140,7 +7122,7 @@ void FinalizeGrandStrategyInitialization()
 		}
 	}
 
-	// calculate income and upkeep, and set initial ruler (if none is preset) for factions
+	// calculate income, and set initial ruler (if none is preset) for factions
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (GrandStrategyGameLoading == false) {
@@ -7210,7 +7192,6 @@ void FinalizeGrandStrategyInitialization()
 					}
 				}
 				GrandStrategyGame.Factions[i][j]->CalculateIncomes();
-				GrandStrategyGame.Factions[i][j]->CalculateUpkeep();
 			}
 		}
 	}
@@ -7620,15 +7601,6 @@ void CalculateFactionIncomes(std::string civilization_name, std::string faction_
 	GrandStrategyGame.Factions[civilization][faction]->CalculateIncomes();
 }
 
-void CalculateFactionUpkeeps()
-{
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			GrandStrategyGame.Factions[i][j]->CalculateUpkeep();
-		}
-	}
-}
-
 int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -7644,21 +7616,6 @@ int GetFactionIncome(std::string civilization_name, std::string faction_name, st
 	}
 	
 	return GrandStrategyGame.Factions[civilization][faction]->Income[resource];
-}
-
-int GetFactionUpkeep(std::string civilization_name, std::string faction_name)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction = -1;
-	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-	}
-	
-	if (faction == -1) {
-		return 0;
-	}
-	
-	return GrandStrategyGame.Factions[civilization][faction]->Upkeep;
 }
 
 void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology)

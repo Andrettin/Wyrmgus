@@ -2449,7 +2449,10 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 //	if (this->Demand + type.Stats[this->Index].Variables[DEMAND_INDEX].Value > this->Supply && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
 	if (this->Demand + (type.Stats[this->Index].Variables[DEMAND_INDEX].Value * (type.TrainQuantity ? type.TrainQuantity : 1)) > this->Supply && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
 	//Wyrmgus end
-		Notify("%s", _("Insufficient Supply, increase Supply."));
+		//Wyrmgus start
+//		Notify("%s", _("Insufficient Supply, increase Supply."));
+		Notify("%s", _("Insufficient Food Supply, increase Food Supply."));
+		//Wyrmgus end
 		return -3;
 	}
 	if (this->GetUnitCount() >= TotalUnitLimit) {

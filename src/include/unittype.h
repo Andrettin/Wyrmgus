@@ -892,7 +892,6 @@ public:
 	int ShadowOffsetY;                                    /// Shadow vertical offset
 	//Wyrmgus start
 	int TrainQuantity;										/// Quantity to be trained
-	int Upkeep;												/// Copper upkeep (for grand strategy mode)
 	int HairColor;											/// Hair color of the unit type (used for color conversion)
 	int ItemClass;											/// Item class (if the unit type is an item)
 	CSpecies *Species;
