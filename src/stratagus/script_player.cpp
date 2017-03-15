@@ -2564,6 +2564,13 @@ static int CclGetFactionData(lua_State *l)
 	} else if (!strcmp(data, "Type")) {
 		lua_pushstring(l, GetFactionTypeNameById(faction->Type).c_str());
 		return 1;
+	} else if (!strcmp(data, "Civilization")) {
+		if (faction->Civilization != -1) {
+			lua_pushstring(l, PlayerRaces.Name[faction->Civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
 	} else if (!strcmp(data, "Color")) {
 		if (faction->Colors.size() > 0) {
 			lua_pushstring(l, PlayerColorNames[faction->Colors[0]].c_str());

@@ -367,7 +367,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 			
 		//if the unit still has less stock than its max, re-init the unit stock timer
 		if (unit.Type->Stats[unit.Player->Index].UnitStock[i] > 0 && unit.GetUnitStockReplenishmentTimer(i) == 0 && unit.GetUnitStock(i) < unit.Type->Stats[unit.Player->Index].UnitStock[i]) {
-			unit.UnitStockReplenishmentTimers[i] = UnitTypes[i]->Stats[unit.Player->Index].Costs[TimeCost] * 20;
+			unit.UnitStockReplenishmentTimers[i] = UnitTypes[i]->Stats[unit.Player->Index].Costs[TimeCost] * 50;
 		}
 	}
 	//Wyrmgus end
