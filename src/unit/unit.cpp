@@ -3080,7 +3080,7 @@ void CUnit::UpdateSettlementName()
 
 void CUnit::XPChanged()
 {
-	if (!this->Type->BoolFlag[ORGANIC_INDEX].value || this->Type->BoolFlag[BUILDING_INDEX].value || this->Type->BoolFlag[FAUNA_INDEX].value) {
+	if (!this->Type->BoolFlag[ORGANIC_INDEX].value || this->Type->BoolFlag[BUILDING_INDEX].value) {
 		return;
 	}
 	
