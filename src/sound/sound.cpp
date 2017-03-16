@@ -117,7 +117,10 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 				//FIXME: checks for error
 				// check whether the second group is really a group
 				if (SelectionHandler.Sound->Number > 1) {
-					result = SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
+					//Wyrmgus start
+//					result = SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
+					result = SimpleChooseSample(*SelectionHandler.Sound);
+					//Wyrmgus end
 					SelectionHandler.HowMany++;
 					if (SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
 						SelectionHandler.HowMany = 0;
