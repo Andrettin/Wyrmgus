@@ -2059,6 +2059,8 @@ static void SendCommand(const Vec2i &tilePos)
 //			if (CursorAction == ButtonAttack || CursorAction == ButtonAttackGround || CursorAction == ButtonSpellCast) {
 			if (CursorAction == ButtonAttack || CursorAction == ButtonAttackGround) {
 			//Wyrmgus end
+				//Wyrmgus start
+				/*
 				if (Selected[i]->Type->MapSound.Attack.Sound) {
 					PlayUnitSound(*Selected[i], VoiceAttack);
 					break;
@@ -2066,13 +2068,26 @@ static void SendCommand(const Vec2i &tilePos)
 					PlayUnitSound(*Selected[i], VoiceAcknowledging);
 					break;
 				}
-			} else if (CursorAction == ButtonRepair && Selected[i]->Type->MapSound.Repair.Sound) {
+				*/
+				PlayUnitSound(*Selected[i], VoiceAttack);
+				break;
+				//Wyrmgus end
+			//Wyrmgus start
+//			} else if (CursorAction == ButtonRepair && Selected[i]->Type->MapSound.Repair.Sound) {
+			} else if (CursorAction == ButtonRepair) {
+			//Wyrmgus end
 				PlayUnitSound(*Selected[i], VoiceRepairing);
 				break;
-			} else if (CursorAction == ButtonBuild && Selected[i]->Type->MapSound.Build.Sound) {
+			//Wyrmgus start
+//			} else if (CursorAction == ButtonBuild && Selected[i]->Type->MapSound.Build.Sound) {
+			} else if (CursorAction == ButtonBuild) {
+			//Wyrmgus end
 				PlayUnitSound(*Selected[i], VoiceBuild);
 				break;
-			} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
+			//Wyrmgus start
+//			} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
+			} else {
+			//Wyrmgus end
 				PlayUnitSound(*Selected[i], VoiceAcknowledging);
 				break;
 			}

@@ -431,7 +431,7 @@ CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range,
 								//Wyrmgus Start
 //							   int resource, bool check_usage = false, const CUnit *deposit = NULL);
-							   int resource, bool check_usage = false, const CUnit *deposit = NULL, bool only_harvestable = true, bool ignore_exploration = false, bool only_unsettled_area = false, bool include_luxury = false);
+							   int resource, bool check_usage = false, const CUnit *deposit = NULL, bool only_harvestable = true, bool ignore_exploration = false, bool only_unsettled_area = false, bool include_luxury = false, bool only_same = false);
 								//Wyrmgus end
 
 /// Find nearest deposit
@@ -465,7 +465,7 @@ extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos
 /// Return resource, if on map tile
 //Wyrmgus start
 //extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top = true);
-extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestable = true);
+extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestable = true, bool only_same = true);
 //Wyrmgus end
 /// Return resource deposit, if on map tile
 //Wyrmgus start

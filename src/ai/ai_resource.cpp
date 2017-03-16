@@ -586,7 +586,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 		}
 		//Wyrmgus start
 //		CUnit *res = UnitFindResource(worker, unit, range, resource, unit.Player->AiEnabled);
-		CUnit *res = UnitFindResource(worker, unit, range, resource, true);
+		CUnit *res = UnitFindResource(worker, unit, range, resource, true, NULL, true, false, false, false, true);
 		//Wyrmgus end
 		if (res) {
 			*resUnit = res;

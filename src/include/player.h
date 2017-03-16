@@ -535,6 +535,7 @@ public:
 	std::string Adjective;		/// adjective pertaining to the civilization
 	std::string YearLabel;		/// label used for years (i.e. AD)
 	std::string NegativeYearLabel;	/// label used for "negative" years (i.e. BC)
+	CUnitSound UnitSounds;			/// Sounds for unit events
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)

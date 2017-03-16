@@ -165,12 +165,28 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 	//Wyrmgus end
 	switch (voice) {
 		case VoiceAcknowledging:
-			return unit.Type->MapSound.Acknowledgement.Sound;
+			//Wyrmgus start
+//			return unit.Type->MapSound.Acknowledgement.Sound;
+			if (unit.Type->MapSound.Acknowledgement.Sound) {
+				return unit.Type->MapSound.Acknowledgement.Sound;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
+				int civilization = unit.Type->Civilization;
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Race, unit.Player->Faction, unit.Type->Class)) {
+					civilization = unit.Player->Race;
+				}
+				return PlayerRaces.Civilizations[civilization]->UnitSounds.Acknowledgement.Sound;
+			} else {
+				return NULL;
+			}
+			//Wyrmgus end
 		case VoiceAttack:
 			if (unit.Type->MapSound.Attack.Sound) {
 				return unit.Type->MapSound.Attack.Sound;
 			} else {
-				return unit.Type->MapSound.Acknowledgement.Sound;
+				//Wyrmgus start
+//				return unit.Type->MapSound.Acknowledgement.Sound;
+				return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+				//Wyrmgus end
 			}
 		//Wyrmgus start
 		case VoiceIdle:
@@ -201,13 +217,63 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			return unit.Type->MapSound.Used.Sound;
 		//Wyrmgus end
 		case VoiceBuild:
-			return unit.Type->MapSound.Build.Sound;
+			//Wyrmgus start
+//			return unit.Type->MapSound.Build.Sound;
+			if (unit.Type->MapSound.Build.Sound) {
+				return unit.Type->MapSound.Build.Sound;
+			} else {
+				return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+			}
+			//Wyrmgus end
 		case VoiceReady:
-			return unit.Type->MapSound.Ready.Sound;
+			//Wyrmgus start
+//			return unit.Type->MapSound.Ready.Sound;
+			if (unit.Type->MapSound.Ready.Sound) {
+				return unit.Type->MapSound.Ready.Sound;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
+				int civilization = unit.Type->Civilization;
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Race, unit.Player->Faction, unit.Type->Class)) {
+					civilization = unit.Player->Race;
+				}
+				return PlayerRaces.Civilizations[civilization]->UnitSounds.Ready.Sound;
+			} else {
+				return NULL;
+			}
+			//Wyrmgus end
 		case VoiceSelected:
-			return unit.Type->MapSound.Selected.Sound;
+			//Wyrmgus start
+//			return unit.Type->MapSound.Selected.Sound;
+			if (unit.Type->MapSound.Selected.Sound) {
+				return unit.Type->MapSound.Selected.Sound;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
+				int civilization = unit.Type->Civilization;
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Race, unit.Player->Faction, unit.Type->Class)) {
+					civilization = unit.Player->Race;
+				}
+				return PlayerRaces.Civilizations[civilization]->UnitSounds.Selected.Sound;
+			} else {
+				return NULL;
+			}
+			//Wyrmgus end
 		case VoiceHelpMe:
-			return unit.Type->MapSound.Help.Sound;
+			//Wyrmgus start
+//			return unit.Type->MapSound.Help.Sound;
+			if (unit.Type->MapSound.Help.Sound) {
+				return unit.Type->MapSound.Help.Sound;
+			} else if (unit.Type->Civilization != -1) {
+				int civilization = unit.Type->Civilization;
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Race, unit.Player->Faction, unit.Type->Class)) {
+					civilization = unit.Player->Race;
+				}
+				if (unit.Type->BoolFlag[BUILDING_INDEX].value && PlayerRaces.Civilizations[civilization]->UnitSounds.HelpTown.Sound) {
+					return PlayerRaces.Civilizations[civilization]->UnitSounds.HelpTown.Sound;
+				} else {
+					return PlayerRaces.Civilizations[civilization]->UnitSounds.Help.Sound;
+				}
+			} else {
+				return NULL;
+			}
+			//Wyrmgus end
 		case VoiceDying:
 			if (unit.Type->MapSound.Dead[unit.DamagedType].Sound) {
 				return unit.Type->MapSound.Dead[unit.DamagedType].Sound;
@@ -224,7 +290,10 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			if (unit.Type->MapSound.Repair.Sound) {
 				return unit.Type->MapSound.Repair.Sound;
 			} else {
-				return unit.Type->MapSound.Acknowledgement.Sound;
+				//Wyrmgus start
+//				return unit.Type->MapSound.Acknowledgement.Sound;
+				return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+				//Wyrmgus end
 			}
 		case VoiceHarvesting:
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
@@ -233,7 +302,10 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 					if (unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound) {
 						return unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound;
 					} else {
-						return unit.Type->MapSound.Acknowledgement.Sound;
+						//Wyrmgus start
+//						return unit.Type->MapSound.Acknowledgement.Sound;
+						return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+						//Wyrmgus end
 					}
 				}
 			}

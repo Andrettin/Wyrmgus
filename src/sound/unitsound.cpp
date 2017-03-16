@@ -173,6 +173,36 @@ void MapUnitSounds()
 	if (SoundEnabled() == false) {
 		return;
 	}
+	//Wyrmgus start
+	for (size_t i = 0; i < PlayerRaces.Civilizations.size(); ++i) {
+		CCivilization *civilization = PlayerRaces.Civilizations[i];
+		civilization->UnitSounds.Selected.MapSound();
+		civilization->UnitSounds.Acknowledgement.MapSound();
+		civilization->UnitSounds.Attack.MapSound();
+		civilization->UnitSounds.Idle.MapSound();
+		civilization->UnitSounds.Hit.MapSound();
+		civilization->UnitSounds.Miss.MapSound();
+		civilization->UnitSounds.Step.MapSound();
+		civilization->UnitSounds.StepDirt.MapSound();
+		civilization->UnitSounds.StepGrass.MapSound();
+		civilization->UnitSounds.StepGravel.MapSound();
+		civilization->UnitSounds.StepMud.MapSound();
+		civilization->UnitSounds.StepStone.MapSound();
+		civilization->UnitSounds.Used.MapSound();
+		civilization->UnitSounds.Build.MapSound();
+		civilization->UnitSounds.Ready.MapSound();
+		civilization->UnitSounds.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
+		civilization->UnitSounds.Repair.MapSound();
+		for (int j = 0; j < MaxCosts; ++j) {
+			civilization->UnitSounds.Harvest[j].MapSound();
+		}
+		civilization->UnitSounds.Help.MapSound();
+		civilization->UnitSounds.Help.SetSoundRange(INFINITE_SOUND_RANGE);
+		civilization->UnitSounds.HelpTown.MapSound();
+		civilization->UnitSounds.HelpTown.SetSoundRange(INFINITE_SOUND_RANGE);
+	}
+	//Wyrmgus end
+
 	// Parse all units sounds.
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		CUnitType &type = *UnitTypes[i];

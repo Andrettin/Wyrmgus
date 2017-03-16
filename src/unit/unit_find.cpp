@@ -466,14 +466,14 @@ class CResourceFinder
 public:
 	//Wyrmgus start
 //	CResourceFinder(int r, bool on_top) : resource(r), mine_on_top(on_top) {}
-	CResourceFinder(int r, bool harvestable, bool luxury) : resource(r), only_harvestable(harvestable), include_luxury(luxury) {}
+	CResourceFinder(int r, bool harvestable, bool luxury, bool same) : resource(r), only_harvestable(harvestable), include_luxury(luxury), only_same(same) {}
 	//Wyrmgus end
 	bool operator()(const CUnit *const unit) const
 	{
 		const CUnitType &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((unit->GivesResource == resource || DefaultResourceFinalResources[unit->GivesResource] == resource || (include_luxury && LuxuryResources[unit->GivesResource]))
+		return ((unit->GivesResource == resource || (!only_same && DefaultResourceFinalResources[unit->GivesResource] == resource) || (include_luxury && LuxuryResources[unit->GivesResource]))
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start
@@ -489,6 +489,7 @@ private:
 //	const bool mine_on_top;
 	const bool only_harvestable;
 	const bool include_luxury;
+	const bool only_same;
 	//Wyrmgus end
 };
 
@@ -497,7 +498,7 @@ class ResourceUnitFinder
 public:
 	//Wyrmgus start
 //	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine) :
-	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury) :
+	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same) :
 	//Wyrmgus end
 		worker(worker),
 		resinfo(*worker.Type->ResInfo[resource]),
@@ -510,8 +511,9 @@ public:
 		ignore_exploration(ignore_exploration),
 		only_unsettled_area(only_unsettled_area),
 		include_luxury(include_luxury),
+		only_same(only_same),
 //		res_finder(resource, 1),
-		res_finder(resource, only_harvestable, include_luxury),
+		res_finder(resource, only_harvestable, include_luxury, only_same),
 		//Wyrmgus end
 		resultMine(resultMine)
 	{
@@ -559,6 +561,7 @@ private:
 	bool ignore_exploration;
 	bool only_unsettled_area;
 	bool include_luxury;
+	bool only_same;
 	//Wyrmgus end
 	CResourceFinder res_finder;
 	ResourceUnitFinder_Cost bestCost;
@@ -678,7 +681,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
 						//Wyrmgus start
 //						bool check_usage, const CUnit *deposit)
-						bool check_usage, const CUnit *deposit, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury)
+						bool check_usage, const CUnit *deposit, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same)
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
@@ -702,7 +705,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	//Wyrmgus start
 //	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
-	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, only_harvestable, ignore_exploration, only_unsettled_area, include_luxury);
+	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, only_harvestable, ignore_exploration, only_unsettled_area, include_luxury, only_same);
 	//Wyrmgus end
 
 	terrainTraversal.Run(resourceUnitFinder);
@@ -945,12 +948,12 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 */
 //Wyrmgus start
 //CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
-CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestable)
+CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestable, bool only_same)
 //Wyrmgus end
 {
 	//Wyrmgus start
 //	return Map.Field(pos)->UnitCache.find(CResourceFinder(resource, mine_on_top));
-	return Map.Field(pos, z)->UnitCache.find(CResourceFinder(resource, only_harvestable, false));
+	return Map.Field(pos, z)->UnitCache.find(CResourceFinder(resource, only_harvestable, false, only_same));
 	//Wyrmgus end
 }
 

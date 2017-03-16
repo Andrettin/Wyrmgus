@@ -93,6 +93,9 @@ public:
 	SoundConfig Repair;             /// unit repairing
 	SoundConfig Harvest[MaxCosts];  /// unit harvesting
 	SoundConfig Help;               /// unit is attacked
+	//Wyrmgus start
+	SoundConfig HelpTown;           /// building is attacked; used only for civilization unit sounds
+	//Wyrmgus end
 	SoundConfig Dead[ANIMATIONS_DEATHTYPES + 1];             /// unit is killed
 };
 

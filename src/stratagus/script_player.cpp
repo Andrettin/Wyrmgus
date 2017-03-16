@@ -902,6 +902,60 @@ static int CclDefineCivilization(lua_State *l)
 				filler.Y = LuaToNumber(l, -1, j + 1);
 				PlayerRaces.CivilizationUIFillers[civilization_id].push_back(filler);
 			}
+		} else if (!strcmp(value, "UnitSounds")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "selected")) {
+					civilization->UnitSounds.Selected.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "acknowledge")) {
+					civilization->UnitSounds.Acknowledgement.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "attack")) {
+					civilization->UnitSounds.Attack.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "idle")) {
+					civilization->UnitSounds.Idle.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "hit")) {
+					civilization->UnitSounds.Hit.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "miss")) {
+					civilization->UnitSounds.Miss.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "step")) {
+					civilization->UnitSounds.Step.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "step-dirt")) {
+					civilization->UnitSounds.StepDirt.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "step-grass")) {
+					civilization->UnitSounds.StepGrass.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "step-gravel")) {
+					civilization->UnitSounds.StepGravel.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "step-mud")) {
+					civilization->UnitSounds.StepMud.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "step-stone")) {
+					civilization->UnitSounds.StepStone.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "used")) {
+					civilization->UnitSounds.Used.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "build")) {
+					civilization->UnitSounds.Build.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "ready")) {
+					civilization->UnitSounds.Ready.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "repair")) {
+					civilization->UnitSounds.Repair.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "harvest")) {
+					const std::string name = LuaToString(l, -1, k + 1);
+					++k;
+					const int resId = GetResourceIdByName(l, name.c_str());
+					civilization->UnitSounds.Harvest[resId].Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "help")) {
+					civilization->UnitSounds.Help.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "help-town")) {
+					civilization->UnitSounds.HelpTown.Name = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported sound tag: %s" _C_ value);
+				}
+			}
 		} else if (!strcmp(value, "Months")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -994,6 +1048,67 @@ static int CclDefineCivilization(lua_State *l)
 			if (civilization->HistoricalUpgrades.find(iterator->first) == civilization->HistoricalUpgrades.end()) {
 				civilization->HistoricalUpgrades[iterator->first] = iterator->second;
 			}
+		}
+		
+		//unit sounds
+		if (civilization->UnitSounds.Selected.Name.empty()) {
+			civilization->UnitSounds.Selected = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Selected;
+		}
+		if (civilization->UnitSounds.Acknowledgement.Name.empty()) {
+			civilization->UnitSounds.Acknowledgement = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Acknowledgement;
+		}
+		if (civilization->UnitSounds.Attack.Name.empty()) {
+			civilization->UnitSounds.Attack = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Attack;
+		}
+		if (civilization->UnitSounds.Idle.Name.empty()) {
+			civilization->UnitSounds.Idle = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Idle;
+		}
+		if (civilization->UnitSounds.Hit.Name.empty()) {
+			civilization->UnitSounds.Hit = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Hit;
+		}
+		if (civilization->UnitSounds.Miss.Name.empty()) {
+			civilization->UnitSounds.Miss = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Miss;
+		}
+		if (civilization->UnitSounds.Step.Name.empty()) {
+			civilization->UnitSounds.Step = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Step;
+		}
+		if (civilization->UnitSounds.StepDirt.Name.empty()) {
+			civilization->UnitSounds.StepDirt = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.StepDirt;
+		}
+		if (civilization->UnitSounds.StepGrass.Name.empty()) {
+			civilization->UnitSounds.StepGrass = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.StepGrass;
+		}
+		if (civilization->UnitSounds.StepGravel.Name.empty()) {
+			civilization->UnitSounds.StepGravel = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.StepGravel;
+		}
+		if (civilization->UnitSounds.StepMud.Name.empty()) {
+			civilization->UnitSounds.StepMud = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.StepMud;
+		}
+		if (civilization->UnitSounds.StepStone.Name.empty()) {
+			civilization->UnitSounds.StepStone = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.StepStone;
+		}
+		if (civilization->UnitSounds.Used.Name.empty()) {
+			civilization->UnitSounds.Used = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Used;
+		}
+		if (civilization->UnitSounds.Build.Name.empty()) {
+			civilization->UnitSounds.Build = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Build;
+		}
+		if (civilization->UnitSounds.Ready.Name.empty()) {
+			civilization->UnitSounds.Ready = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Ready;
+		}
+		if (civilization->UnitSounds.Repair.Name.empty()) {
+			civilization->UnitSounds.Repair = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Repair;
+		}
+		for (unsigned int j = 0; j < MaxCosts; ++j) {
+			if (civilization->UnitSounds.Harvest[j].Name.empty()) {
+				civilization->UnitSounds.Harvest[j] = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Harvest[j];
+			}
+		}
+		if (civilization->UnitSounds.Help.Name.empty()) {
+			civilization->UnitSounds.Help = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Help;
+		}
+		if (civilization->UnitSounds.HelpTown.Name.empty()) {
+			civilization->UnitSounds.HelpTown = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.HelpTown;
 		}
 	}
 	
