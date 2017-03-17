@@ -5570,7 +5570,7 @@ CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 
 std::string CUnit::GetName() const
 {
-	if (this->Character && this->Character->Deity) {
+	if (GameRunning && this->Character && this->Character->Deity) {
 		if (this->Character->Deity->CulturalNames.find(ThisPlayer->Race) != this->Character->Deity->CulturalNames.end()) {
 			return this->Character->Deity->CulturalNames.find(ThisPlayer->Race)->second;
 		} else {
