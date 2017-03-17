@@ -1089,6 +1089,14 @@ int InitSound()
 	// initialize channels
 	for (int i = 0; i < MaxChannels; ++i) {
 		Channels[i].Point = i + 1;
+		//Wyrmgus start
+		Channels[i].Sample = NULL;
+		Channels[i].Unit = NULL;
+		Channels[i].Volume = 0;
+		Channels[i].Stereo = 0;
+		Channels[i].Voice = -1;
+		Channels[i].Playing = false;
+		//Wyrmgus end
 	}
 
 	// Create mutex and cond for FillThread
