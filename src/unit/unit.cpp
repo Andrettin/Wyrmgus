@@ -2059,6 +2059,7 @@ void CUnit::UpdateSoldUnits()
 	}
 	this->SoldUnits.clear();
 	
+	std::vector<CUnitType *> potential_items;
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL && !GrandStrategy) { // allow heroes to be recruited at town halls
 		int civilization_id = this->Type->Civilization;
@@ -2110,9 +2111,15 @@ void CUnit::UpdateSoldUnits()
 				}
 			}
 		}
+	} else {
+		for (size_t i = 0; i < this->Type->SoldUnits.size(); ++i) {
+			if (CheckDependByType(*this->Player, *this->Type->SoldUnits[i])) {
+				potential_items.push_back(this->Type->SoldUnits[i]);
+			}
+		}
 	}
 	
-	if (this->Type->SoldUnits.empty() && potential_heroes.empty()) {
+	if (potential_items.empty() && potential_heroes.empty()) {
 		return;
 	}
 	
@@ -2126,14 +2133,14 @@ void CUnit::UpdateSoldUnits()
 			new_unit->SetCharacter(chosen_hero->Ident, chosen_hero->Custom);
 			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
 		} else {
-			CUnitType *chosen_unit_type = this->Type->SoldUnits[SyncRand(this->Type->SoldUnits.size())];
+			CUnitType *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
 			new_unit = MakeUnit(*chosen_unit_type, &Players[PlayerNumNeutral]);
 			new_unit->GenerateSpecialProperties(this);
 			new_unit->Identified = true;
 		}
 		new_unit->Remove(this);
 		this->SoldUnits.push_back(new_unit);
-		if (potential_heroes.empty() && this->Type->SoldUnits.empty()) {
+		if (potential_heroes.empty() && potential_items.empty()) {
 			break;
 		}
 	}

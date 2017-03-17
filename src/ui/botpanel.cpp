@@ -1922,7 +1922,11 @@ void CButtonPanel::Update()
 			if (unit.SoldUnits[sold_unit_count]->Character != NULL) {
 				UnitButtonTable[i]->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->GetName();
 			} else {
-				UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
+				if (!unit.SoldUnits[sold_unit_count]->Name.empty()) {
+					UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
+				} else {
+					UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetTypeName();
+				}
 			}
 		}
 		sold_unit_count += 1;
