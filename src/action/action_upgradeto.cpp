@@ -248,6 +248,32 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	unit.Stats = &unit.Type->Stats[player.Index];
 	
 	//Wyrmgus start
+	//change the civilization/faction upgrade markers for those of the new type
+	if (oldtype.Civilization != -1 && !PlayerRaces.CivilizationUpgrades[oldtype.Civilization].empty()) {
+		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[oldtype.Civilization]);
+		if (civilization_upgrade) {
+			unit.IndividualUpgrades[civilization_upgrade->ID] = false;
+		}
+	}
+	if (oldtype.Civilization != -1 && oldtype.Faction != -1 && !PlayerRaces.Factions[oldtype.Civilization][oldtype.Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[oldtype.Civilization][oldtype.Faction]->FactionUpgrade);
+		if (faction_upgrade) {
+			unit.IndividualUpgrades[faction_upgrade->ID] = false;
+		}
+	}
+	if (newtype.Civilization != -1 && !PlayerRaces.CivilizationUpgrades[newtype.Civilization].empty()) {
+		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[newtype.Civilization]);
+		if (civilization_upgrade) {
+			unit.IndividualUpgrades[civilization_upgrade->ID] = true;
+		}
+	}
+	if (newtype.Civilization != -1 && newtype.Faction != -1 && !PlayerRaces.Factions[newtype.Civilization][newtype.Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[newtype.Civilization][newtype.Faction]->FactionUpgrade);
+		if (faction_upgrade) {
+			unit.IndividualUpgrades[faction_upgrade->ID] = true;
+		}
+	}
+	
 	//deequip the current equipment if they are incompatible with the new unit type
 	for (int i = 0; i < MaxItemSlots; ++i) {
 		for (size_t j = 0; j < unit.EquippedItems[i].size(); ++j) {

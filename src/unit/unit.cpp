@@ -874,10 +874,16 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades)); //reset the individual upgrades and then apply the character's
 	this->Trait = NULL;
 	
-	if (this->Character->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[this->Character->Civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Character->Civilization]);
+	if (this->Type->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[this->Type->Civilization].empty()) {
+		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Type->Civilization]);
 		if (civilization_upgrade) {
 			this->IndividualUpgrades[civilization_upgrade->ID] = true;
+		}
+	}
+	if (this->Type->Civilization != -1 && this->Type->Faction != -1 && !PlayerRaces.Factions[this->Type->Civilization][this->Type->Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[this->Type->Civilization][this->Type->Faction]->FactionUpgrade);
+		if (faction_upgrade) {
+			this->IndividualUpgrades[faction_upgrade->ID] = true;
 		}
 	}
 
@@ -2571,6 +2577,20 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	}
 
 	//Wyrmgus start
+	// grant the unit the civilization/faction upgrades of its respective civilization/faction, so that it is able to pursue its upgrade line in experience upgrades even if it changes hands
+	if (unit->Type->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[unit->Type->Civilization].empty()) {
+		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[unit->Type->Civilization]);
+		if (civilization_upgrade) {
+			unit->IndividualUpgrades[civilization_upgrade->ID] = true;
+		}
+	}
+	if (unit->Type->Civilization != -1 && unit->Type->Faction != -1 && !PlayerRaces.Factions[unit->Type->Civilization][unit->Type->Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[unit->Type->Civilization][unit->Type->Faction]->FactionUpgrade);
+		if (faction_upgrade) {
+			unit->IndividualUpgrades[faction_upgrade->ID] = true;
+		}
+	}
+
 	// generate a trait for the unit, if any are available (only if the editor isn't running)
 	if (Editor.Running == EditorNotRunning && unit->Type->Traits.size() > 0) {
 		TraitAcquire(*unit, unit->Type->Traits[SyncRand(unit->Type->Traits.size())]);
