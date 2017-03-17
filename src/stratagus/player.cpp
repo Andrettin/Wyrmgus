@@ -1990,14 +1990,12 @@ void CPlayer::AvailableQuestsChanged()
 
 void CPlayer::UpdateCurrentQuests()
 {
-	for (size_t i = 0; i < this->CurrentQuests.size();) {
+	for (int i = (this->CurrentQuests.size()  - 1); i >= 0; --i) {
 		std::string failed_quest = this->HasFailedQuest(this->CurrentQuests[i]);
 		if (!failed_quest.empty()) {
 			this->FailQuest(this->CurrentQuests[i], failed_quest);
 		} else if (this->HasCompletedQuest(this->CurrentQuests[i])) {
 			this->CompleteQuest(this->CurrentQuests[i]);
-		} else {
-			++i;
 		}
 	}
 }
@@ -2047,7 +2045,7 @@ void CPlayer::AcceptQuest(CQuest *quest)
 
 void CPlayer::CompleteQuest(CQuest *quest)
 {
-	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
+	RemoveCurrentQuest(quest);
 	this->CompletedQuests.push_back(quest);
 	if (quest->Competitive) {
 		quest->CurrentCompleted = true;
@@ -2080,7 +2078,7 @@ void CPlayer::CompleteQuest(CQuest *quest)
 
 void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 {
-	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
+	this->RemoveCurrentQuest(quest);
 	
 	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 	
@@ -2096,6 +2094,47 @@ void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 		}
 
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->Name + " quest! " + fail_reason + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
+	}
+}
+
+void CPlayer::RemoveCurrentQuest(CQuest *quest)
+{
+	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
+	
+	for (int i = (this->QuestBuildUnits.size()  - 1); i >= 0; --i) {
+		if (std::get<0>(this->QuestBuildUnits[i]) == quest) {
+			this->QuestBuildUnits.erase(std::remove(this->QuestBuildUnits.begin(), this->QuestBuildUnits.end(), this->QuestBuildUnits[i]), this->QuestBuildUnits.end());
+		}
+	}
+	
+	for (int i = (this->QuestBuildUnitsOfClass.size()  - 1); i >= 0; --i) {
+		if (std::get<0>(this->QuestBuildUnitsOfClass[i]) == quest) {
+			this->QuestBuildUnitsOfClass.erase(std::remove(this->QuestBuildUnitsOfClass.begin(), this->QuestBuildUnitsOfClass.end(), this->QuestBuildUnitsOfClass[i]), this->QuestBuildUnitsOfClass.end());
+		}
+	}
+	
+	for (int i = (this->QuestResearchUpgrades.size()  - 1); i >= 0; --i) {
+		if (std::get<0>(this->QuestResearchUpgrades[i]) == quest) {
+			this->QuestResearchUpgrades.erase(std::remove(this->QuestResearchUpgrades.begin(), this->QuestResearchUpgrades.end(), this->QuestResearchUpgrades[i]), this->QuestResearchUpgrades.end());
+		}
+	}
+	
+	for (int i = (this->QuestDestroyUnits.size()  - 1); i >= 0; --i) {
+		if (std::get<0>(this->QuestDestroyUnits[i]) == quest) {
+			this->QuestDestroyUnits.erase(std::remove(this->QuestDestroyUnits.begin(), this->QuestDestroyUnits.end(), this->QuestDestroyUnits[i]), this->QuestDestroyUnits.end());
+		}
+	}
+	
+	for (int i = (this->QuestDestroyUniques.size()  - 1); i >= 0; --i) {
+		if (std::get<0>(this->QuestDestroyUniques[i]) == quest) {
+			this->QuestDestroyUniques.erase(std::remove(this->QuestDestroyUniques.begin(), this->QuestDestroyUniques.end(), this->QuestDestroyUniques[i]), this->QuestDestroyUniques.end());
+		}
+	}
+	
+	for (int i = (this->QuestGatherResources.size()  - 1); i >= 0; --i) {
+		if (std::get<0>(this->QuestGatherResources[i]) == quest) {
+			this->QuestGatherResources.erase(std::remove(this->QuestGatherResources.begin(), this->QuestGatherResources.end(), this->QuestGatherResources[i]), this->QuestGatherResources.end());
+		}
 	}
 }
 

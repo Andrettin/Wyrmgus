@@ -254,6 +254,7 @@ public:
 	void AcceptQuest(CQuest *quest);
 	void CompleteQuest(CQuest *quest);
 	void FailQuest(CQuest *quest, std::string fail_reason = "");
+	void RemoveCurrentQuest(CQuest *quest);
 	bool CanAcceptQuest(CQuest *quest);
 	bool HasCompletedQuest(CQuest *quest);
 	std::string HasFailedQuest(CQuest *quest);
