@@ -680,7 +680,7 @@ void CUnit::IncreaseLevel(int level_quantity)
 				//if is a harvester who is currently gathering, try to upgrade to a unit type which is best for harvesting the current resource
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
+					if (CheckDependByType(*this, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
 						if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
 							if (AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource] && AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource]->ResourceStep >= best_gathering_rate) {
 								if (AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource]->ResourceStep > best_gathering_rate) {
@@ -694,7 +694,7 @@ void CUnit::IncreaseLevel(int level_quantity)
 				}
 			} else if (Player->AiEnabled || (this->Character == NULL && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
+					if (CheckDependByType(*this, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
 						if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
 							potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
 						}
@@ -873,6 +873,13 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades)); //reset the individual upgrades and then apply the character's
 	this->Trait = NULL;
+	
+	if (this->Character->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[this->Character->Civilization].empty()) {
+		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Character->Civilization]);
+		if (civilization_upgrade) {
+			this->IndividualUpgrades[civilization_upgrade->ID] = true;
+		}
+	}
 
 	for (size_t i = 0; i < this->Type->StartingAbilities.size(); ++i) {
 		if (CheckDependByIdent(*this, this->Type->StartingAbilities[i]->Ident)) {

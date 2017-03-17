@@ -142,6 +142,7 @@ extern bool CheckDependByIdent(const CUnit &unit, const std::string &target, boo
 //Wyrmgus start
 //extern bool CheckDependByType(const CPlayer &player, const CUnitType &type);
 extern bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore_units = false, bool is_predependency = false);
+extern bool CheckDependByType(const CUnit &unit, const CUnitType &type, bool ignore_units = false, bool is_predependency = false);
 //Wyrmgus end
 //@}
 

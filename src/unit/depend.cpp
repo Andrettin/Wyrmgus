@@ -577,6 +577,28 @@ bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore
 	//Wyrmgus end
 }
 
+//Wyrmgus start
+/**
+**  Check if this upgrade or unit is available.
+**
+**  @param unit  For this unit available.
+**  @param target  Unit or Upgrade.
+**
+**  @return        True if available, false otherwise.
+*/
+bool CheckDependByType(const CUnit &unit, const CUnitType &type, bool ignore_units, bool is_predependency)
+{
+	if (UnitIdAllowed(*unit.Player, type.Slot) == 0) {
+		return false;
+	}
+	DependRule rule;
+
+	rule.Kind.UnitType = &type;
+	rule.Type = DependRuleUnitType;
+	return CheckDependByRule(unit, rule, ignore_units, is_predependency);
+}
+//Wyrmgus end
+
 /**
 **  Initialize unit and upgrade dependencies.
 */

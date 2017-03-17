@@ -1580,7 +1580,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		//Wyrmgus start
 		case ButtonExperienceUpgradeTo:
-			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, true, true);
+			res = CheckDependByIdent(unit, buttonaction.ValueStr, true, true);
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			}
@@ -1702,7 +1702,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 			}
 			break;
 		case ButtonExperienceUpgradeTo:
-			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, true, false);
+			res = CheckDependByIdent(unit, buttonaction.ValueStr, true, false);
 			break;
 		case ButtonLearnAbility:
 			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr));
