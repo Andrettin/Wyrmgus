@@ -2137,6 +2137,9 @@ void CUnit::UpdateSoldUnits()
 			new_unit = MakeUnit(*chosen_unit_type, &Players[PlayerNumNeutral]);
 			new_unit->GenerateSpecialProperties(this);
 			new_unit->Identified = true;
+			if (new_unit->Unique && this->Player == ThisPlayer) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
+				this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer, _("Unique item available for sale"));
+			}
 		}
 		new_unit->Remove(this);
 		this->SoldUnits.push_back(new_unit);
