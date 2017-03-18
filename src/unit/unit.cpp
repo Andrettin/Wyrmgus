@@ -4991,6 +4991,10 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 			value += this->Container->Stats->Variables[index].Value; //treat the container's attack range as a bonus to the unit's attack range
 		}
 		std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
+	} else if (index == SPEED_INDEX) {
+		if (this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) {
+			value += 8 - Map.Field(this->Offset, this->MapLayer)->getCost();
+		}
 	}
 	
 	return value;

@@ -340,24 +340,6 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 	
-	//Wyrmgus start
-	if (t == 0 && (e == VariableValue || e == VariableMax || e == VariableIncrease || e == VariableDiff || e == VariablePercent)) {
-		val.type = USTRINT_INT;
-		if (e == VariableValue) {
-			val.i = unit.GetModifiedVariable(index, VariableValue);
-		} else if (e == VariableMax) {
-			val.i = unit.GetModifiedVariable(index, VariableMax);
-		} else if (e == VariableIncrease) {
-			val.i = unit.GetModifiedVariable(index, VariableIncrease);
-		} else if (e == VariableDiff) {
-			val.i = unit.GetModifiedVariable(index, VariableMax) - unit.GetModifiedVariable(index, VariableValue);
-		} else if (e == VariablePercent) {
-			val.i = 100 * unit.GetModifiedVariable(index, VariableValue) / unit.GetModifiedVariable(index, VariableMax);
-		}
-		return val;
-	}
-	//Wyrmgus end
-
 	switch (t) {
 		case 0: // Unit:
 			var = &unit.Variable[index];
