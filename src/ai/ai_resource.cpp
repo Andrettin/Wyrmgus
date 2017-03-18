@@ -1104,10 +1104,10 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 			CommandResource(unit, *mine, FlushCommands);
 			return 1;
 		} else { // if the resource isn't readily harvestable (but is a deposit), build a mine there
-			const int n = AiHelpers.Refinery[resource - 1].size();
+			const int n = AiHelpers.Refinery[mine->GivesResource - 1].size();
 
 			for (int i = 0; i < n; ++i) {
-				CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
+				CUnitType &type = *AiHelpers.Refinery[mine->GivesResource - 1][i];
 
 				if (CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer)) {
 					CommandBuildBuilding(unit, mine->tilePos, type, FlushCommands, mine->MapLayer);
@@ -1864,39 +1864,39 @@ static void AiCheckRepair()
 */
 static void AiCheckPathwayConstruction()
 {
-	CUnitType *pathway_type = NULL;
+	std::vector<CUnitType *> pathway_types;
 	
-	for (size_t i = 0; i != UnitTypes.size(); ++i) {
+	for (size_t i = 0; i != UnitTypes.size(); ++i) { //assumes the pathways are listed in order of speed bonus
 		CUnitType *type = UnitTypes[i];
 
 		if (!type || !type->TerrainType || !CheckDependByType(*AiPlayer->Player, *type)) {
 			continue;
 		}
 		
-		if ((type->TerrainType->Flags & MapFieldRailroad) && (!pathway_type || !(pathway_type->TerrainType->Flags & MapFieldRailroad))) {
-			pathway_type = type;
-		} else if ((type->TerrainType->Flags & MapFieldRoad) && !pathway_type) {
-			pathway_type = type;
+		if ((type->TerrainType->Flags & MapFieldRoad) || (type->TerrainType->Flags & MapFieldRailroad)) {
+			pathway_types.push_back(type);
 		}
 	}
 	
-	if (!pathway_type) {
+	if (pathway_types.size() == 0) {
 		return;
 	}
 	
 	int n_t = AiHelpers.Build.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
-	if (pathway_type->Slot > n_t) { // Oops not known.
-		DebugPrint("%d: AiCheckPathwayConstruction I: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ pathway_type->Ident.c_str());
-		return;
-	}
-	
-	std::vector<CUnitType *> &table = tablep[pathway_type->Slot];
-	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiCheckPathwayConstruction II: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ pathway_type->Ident.c_str());
-		return;
+	for (size_t i = 0; i != pathway_types.size(); ++i) {
+		if (pathway_types[i]->Slot > n_t) { // Oops not known.
+			DebugPrint("%d: AiCheckPathwayConstruction I: Nothing known about '%s'\n"
+					   _C_ AiPlayer->Player->Index _C_ pathway_types[i]->Ident.c_str());
+			return;
+		}
+		
+		std::vector<CUnitType *> &table = tablep[pathway_types[i]->Slot];
+		if (table.empty()) { // Oops not known.
+			DebugPrint("%d: AiCheckPathwayConstruction II: Nothing known about '%s'\n"
+					   _C_ AiPlayer->Player->Index _C_ pathway_types[i]->Ident.c_str());
+			return;
+		}
 	}
 	
 	bool built_pathway = false;
@@ -1908,7 +1908,7 @@ static void AiCheckPathwayConstruction()
 		for (int i = n - 1; i >= 0; --i) {
 			const CUnit &unit = AiPlayer->Player->GetUnit(i);
 			if (UnitNumber(unit) == AiPlayer->LastPathwayConstructionBuilding) {
-				k = i + 1;
+				k = i;
 			}
 		}
 	}
@@ -1941,40 +1941,42 @@ static void AiCheckPathwayConstruction()
 					if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
 						continue;
 					}
-					if ((!(mf.Flags & MapFieldRailroad) && (pathway_type->TerrainType->Flags & MapFieldRailroad)) || (!(mf.Flags & MapFieldRoad) && !(mf.Flags & MapFieldRailroad) && (pathway_type->TerrainType->Flags & MapFieldRoad))) {
-						Vec2i pathway_pos(x, y);
-						if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit.MapLayer)) {
-							continue;
-						}
-						
-						const int resourceNeeded = AiCheckUnitTypeCosts(*pathway_type);
-						if (resourceNeeded) {
-							AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
-							return;
-						}
-						
-						//
-						// Find a free worker, who can build pathways for this building
-						//
-						const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-						for (unsigned int j = 0; j < table.size(); ++j) {
+					Vec2i pathway_pos(x, y);
+					
+					for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
+						if ((!(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRailroad)) || (!(mf.Flags & MapFieldRoad) && !(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRoad))) {
+							if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer) || !CanBuildHere(NULL, *pathway_types[p], pathway_pos, unit.MapLayer)) {
+								continue;
+							}
+							
+							const int resourceNeeded = AiCheckUnitTypeCosts(*pathway_types[p]);
+							if (resourceNeeded) {
+								AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
+								continue;
+							}
+							
 							//
-							// The type is available
+							// Find a free worker, who can build pathways for this building
 							//
-							if (unit_count[table[j]->Slot]) {
-								if (AiBuildBuilding(*table[j], *pathway_type, pathway_pos, unit.MapLayer)) {
-									built_pathway = true;
-									break;
+							const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+							for (unsigned int j = 0; j < tablep[pathway_types[p]->Slot].size(); ++j) {
+								//
+								// The type is available
+								//
+								if (unit_count[tablep[pathway_types[p]->Slot][j]->Slot]) {
+									if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, unit.MapLayer)) {
+										built_pathway = true;
+										break;
+									}
 								}
 							}
 						}
+						if (built_pathway) { //only one pathway built per second
+							AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
+							return;
+						}
 					}
 				}
-			}
-			
-			if (built_pathway) {
-				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
-				return;
 			}
 		}
 	}
