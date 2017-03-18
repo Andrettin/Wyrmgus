@@ -1123,6 +1123,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					MapFieldWaterAllowed | // can't move on this
 					MapFieldUnpassable;
 			}
+			
+			if (type.BoolFlag[RAIL_INDEX].value) {
+				type.MovementMask |= MapFieldNoRail;
+			}
 			//Wyrmgus end
 			break;
 		case UnitTypeFly:                               // in air

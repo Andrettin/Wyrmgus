@@ -197,6 +197,12 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		this->cost = 8; // default speed
 	}
 	
+	if (this->Flags & MapFieldRailroad) {
+		this->Flags &= ~(MapFieldNoRail);
+	} else {
+		this->Flags |= MapFieldNoRail;
+	}
+	
 	//wood and rock tiles must always begin with the default value for their respective resource types
 	if (terrain->Flags & MapFieldForest) {
 		this->Value = DefaultResourceAmounts[WoodCost];
@@ -238,6 +244,12 @@ void CMapField::RemoveOverlayTerrain()
 		this->cost = 7;
 	} else {
 		this->cost = 8; // default speed
+	}
+	
+	if (this->Flags & MapFieldRailroad) {
+		this->Flags &= ~(MapFieldNoRail);
+	} else {
+		this->Flags |= MapFieldNoRail;
 	}
 	
 	if (this->TerrainFeature) {
@@ -422,6 +434,9 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldRoad) {
 		file.printf(", \"road\"");
 	}
+	if (Flags & MapFieldNoRail) {
+		file.printf(", \"no-rail\"");
+	}
 	if (Flags & MapFieldStoneFloor) {
 		file.printf(", \"stone-floor\"");
 	}
@@ -576,6 +591,8 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldRailroad;
 		} else if (!strcmp(value, "road")) {
 			this->Flags |= MapFieldRoad;
+		} else if (!strcmp(value, "no-rail")) {
+			this->Flags |= MapFieldNoRail;
 		} else if (!strcmp(value, "stone-floor")) {
 			this->Flags |= MapFieldStoneFloor;
 		} else if (!strcmp(value, "stumps")) {
