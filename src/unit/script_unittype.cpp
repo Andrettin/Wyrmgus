@@ -609,6 +609,17 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 			}
 
 			blist.push_back(b);
+		} else if (!strcmp(value, "or")) {
+			CBuildRestrictionOr *b = new CBuildRestrictionOr();
+			std::vector<CBuildRestriction *> and_list;
+			
+			ParseBuildingRules(l, and_list);
+			
+			for (size_t k = 0; k < and_list.size(); ++k) {
+				b->push_back(and_list[k]);
+			}
+
+			blist.push_back(b);
 		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported BuildingRules tag: %s" _C_ value);

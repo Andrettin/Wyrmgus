@@ -128,6 +128,21 @@ bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, co
 	return true;
 }
 
+//Wyrmgus start
+/**
+**  Check Or Restriction
+*/
+bool CBuildRestrictionOr::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
+{
+	for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin(); i != _or_list.end(); ++i) {
+		if ((*i)->Check(builder, type, pos, ontoptarget, z)) {
+			return true;
+		}
+	}
+	return false;
+}
+//Wyrmgus end
+
 /**
 **  Check Distance Restriction
 */
@@ -596,9 +611,14 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 		bool aiChecked = true;
 		size_t count = type.AiBuildingRules.size();
 		if (count > 0) {
-			CUnit *ontoptarget = NULL;
+			//Wyrmgus start
+//			CUnit *ontoptarget = NULL;
+			//Wyrmgus end
 			for (unsigned int i = 0; i < count; ++i) {
 				CBuildRestriction *rule = type.AiBuildingRules[i];
+				//Wyrmgus start
+				CUnit *ontoptarget = NULL;
+				//Wyrmgus end
 				// All checks processed, did we really have success
 				//Wyrmgus start
 //				if (rule->Check(unit, type, pos, ontoptarget)) {

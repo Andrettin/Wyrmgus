@@ -1902,6 +1902,8 @@ static void AiCheckPathwayConstruction()
 	bool built_pathway = false;
 	const int n = AiPlayer->Player->GetUnitCount();
 	int k = 0;
+	
+	const CUnit *test_worker = NULL;
 
 	// Selector for next unit
 	if (AiPlayer->LastPathwayConstructionBuilding) {
@@ -1909,6 +1911,9 @@ static void AiCheckPathwayConstruction()
 			const CUnit &unit = AiPlayer->Player->GetUnit(i);
 			if (UnitNumber(unit) == AiPlayer->LastPathwayConstructionBuilding) {
 				k = i;
+			}
+			if (unit.IsAliveOnMap() && unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+				test_worker = &unit;
 			}
 		}
 	}
@@ -1945,7 +1950,7 @@ static void AiCheckPathwayConstruction()
 					
 					for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
 						if ((!(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRailroad)) || (!(mf.Flags & MapFieldRoad) && !(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRoad))) {
-							if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer) || !CanBuildHere(NULL, *pathway_types[p], pathway_pos, unit.MapLayer)) {
+							if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer) || !CanBuildHere(test_worker, *pathway_types[p], pathway_pos, unit.MapLayer)) {
 								continue;
 							}
 							

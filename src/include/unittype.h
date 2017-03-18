@@ -586,6 +586,33 @@ public:
 	std::vector<CBuildRestriction *> _or_list;
 };
 
+//Wyrmgus start
+class CBuildRestrictionOr : public CBuildRestriction
+{
+public:
+	virtual ~CBuildRestrictionOr()
+	{
+		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
+			 i != _or_list.end(); ++i) {
+			delete *i;
+		}
+		_or_list.clear();
+	}
+	virtual void Init()
+	{
+		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
+			 i != _or_list.end(); ++i) {
+			(*i)->Init();
+		}
+	}
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+
+	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
+public:
+	std::vector<CBuildRestriction *> _or_list;
+};
+//Wyrmgus end
+
 class CBuildRestrictionAddOn : public CBuildRestriction
 {
 	class functor
