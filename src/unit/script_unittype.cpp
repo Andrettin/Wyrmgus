@@ -383,7 +383,9 @@ int ExtraDeathIndex(const char *death)
 */
 static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &blist)
 {
-	CBuildRestrictionAnd *andlist = new CBuildRestrictionAnd();
+	//Wyrmgus start
+//	CBuildRestrictionAnd *andlist = new CBuildRestrictionAnd();
+	//Wyrmgus end
 
 	const int args = lua_rawlen(l, -1);
 	Assert(!(args & 1)); // must be even
@@ -435,7 +437,10 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules distance tag: %s" _C_ value);
 				}
 			}
-			andlist->push_back(b);
+			//Wyrmgus start
+//			andlist->push_back(b);
+			blist.push_back(b);
+			//Wyrmgus end
 		} else if (!strcmp(value, "addon")) {
 			CBuildRestrictionAddOn *b = new CBuildRestrictionAddOn;
 
@@ -451,7 +456,10 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules addon tag: %s" _C_ value);
 				}
 			}
-			andlist->push_back(b);
+			//Wyrmgus start
+//			andlist->push_back(b);
+			blist.push_back(b);
+			//Wyrmgus end
 		} else if (!strcmp(value, "ontop")) {
 			CBuildRestrictionOnTop *b = new CBuildRestrictionOnTop;
 
@@ -467,7 +475,10 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules ontop tag: %s" _C_ value);
 				}
 			}
-			andlist->push_back(b);
+			//Wyrmgus start
+//			andlist->push_back(b);
+			blist.push_back(b);
+			//Wyrmgus end
 		} else if (!strcmp(value, "has-unit")) {
 			CBuildRestrictionHasUnit *b = new CBuildRestrictionHasUnit;
 
@@ -504,7 +515,10 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules has-unit tag: %s" _C_ value);
 				}
 			}
-			andlist->push_back(b);
+			//Wyrmgus start
+//			andlist->push_back(b);
+			blist.push_back(b);
+			//Wyrmgus end
 		} else if (!strcmp(value, "surrounded-by")) {
 			CBuildRestrictionSurroundedBy *b = new CBuildRestrictionSurroundedBy;
 
@@ -566,13 +580,31 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules surrounded-by tag: %s" _C_ value);
 				}
 			}
-			andlist->push_back(b);
+			//Wyrmgus start
+//			andlist->push_back(b);
+			blist.push_back(b);
+			//Wyrmgus end
+		//Wyrmgus start
+		} else if (!strcmp(value, "and")) {
+			CBuildRestrictionAnd *b = new CBuildRestrictionAnd();
+			std::vector<CBuildRestriction *> and_list;
+			
+			ParseBuildingRules(l, and_list);
+			
+			for (size_t k = 0; k < and_list.size(); ++k) {
+				b->push_back(and_list[k]);
+			}
+
+			blist.push_back(b);
+		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported BuildingRules tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}
-	blist.push_back(andlist);
+	//Wyrmgus start
+//	blist.push_back(andlist);
+	//Wyrmgus end
 }
 
 static void UpdateDefaultBoolFlags(CUnitType &type)
@@ -1584,14 +1616,17 @@ static int CclDefineUnitType(lua_State *l)
 				delete *b;
 			}
 			type->BuildingRules.clear();
-			for (int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
-				ParseBuildingRules(l, type->BuildingRules);
-				lua_pop(l, 1);
-			}
+			//Wyrmgus start
+//			for (int k = 0; k < subargs; ++k) {
+//				lua_rawgeti(l, -1, k + 1);
+//				if (!lua_istable(l, -1)) {
+//					LuaError(l, "incorrect argument");
+//				}
+//				ParseBuildingRules(l, type->BuildingRules);
+//				lua_pop(l, 1);
+//			}
+			ParseBuildingRules(l, type->BuildingRules);
+			//Wyrmgus end
 		} else if (!strcmp(value, "AiBuildingRules")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1603,14 +1638,17 @@ static int CclDefineUnitType(lua_State *l)
 				delete *b;
 			}
 			type->AiBuildingRules.clear();
-			for (int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
-				ParseBuildingRules(l, type->AiBuildingRules);
-				lua_pop(l, 1);
-			}
+			//Wyrmgus start
+//			for (int k = 0; k < subargs; ++k) {
+//				lua_rawgeti(l, -1, k + 1);
+//				if (!lua_istable(l, -1)) {
+//					LuaError(l, "incorrect argument");
+//				}
+//				ParseBuildingRules(l, type->AiBuildingRules);
+//				lua_pop(l, 1);
+//			}
+			ParseBuildingRules(l, type->AiBuildingRules);
+			//Wyrmgus end
 		} else if (!strcmp(value, "AutoBuildRate")) {
 			type->AutoBuildRate = LuaToNumber(l, -1);
 		//Wyrmgus start

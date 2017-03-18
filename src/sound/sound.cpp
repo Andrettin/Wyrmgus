@@ -185,6 +185,18 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceAttack:
 			if (unit.Type->MapSound.Attack.Sound) {
 				return unit.Type->MapSound.Attack.Sound;
+			//Wyrmgus start
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
+				int civilization = unit.Type->Civilization;
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Race, unit.Player->Faction, unit.Type->Class)) {
+					civilization = unit.Player->Race;
+				}
+				if (PlayerRaces.Civilizations[civilization]->UnitSounds.Attack.Sound) {
+					return PlayerRaces.Civilizations[civilization]->UnitSounds.Attack.Sound;
+				} else {
+					return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+				}
+			//Wyrmgus end
 			} else {
 				//Wyrmgus start
 //				return unit.Type->MapSound.Acknowledgement.Sound;
@@ -224,6 +236,18 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 //			return unit.Type->MapSound.Build.Sound;
 			if (unit.Type->MapSound.Build.Sound) {
 				return unit.Type->MapSound.Build.Sound;
+			//Wyrmgus start
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
+				int civilization = unit.Type->Civilization;
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Race, unit.Player->Faction, unit.Type->Class)) {
+					civilization = unit.Player->Race;
+				}
+				if (PlayerRaces.Civilizations[civilization]->UnitSounds.Build.Sound) {
+					return PlayerRaces.Civilizations[civilization]->UnitSounds.Build.Sound;
+				} else {
+					return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+				}
+			//Wyrmgus end
 			} else {
 				return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
 			}
@@ -292,6 +316,18 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceRepairing:
 			if (unit.Type->MapSound.Repair.Sound) {
 				return unit.Type->MapSound.Repair.Sound;
+			//Wyrmgus start
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
+				int civilization = unit.Type->Civilization;
+				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Race, unit.Player->Faction, unit.Type->Class)) {
+					civilization = unit.Player->Race;
+				}
+				if (PlayerRaces.Civilizations[civilization]->UnitSounds.Repair.Sound) {
+					return PlayerRaces.Civilizations[civilization]->UnitSounds.Repair.Sound;
+				} else {
+					return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+				}
+			//Wyrmgus end
 			} else {
 				//Wyrmgus start
 //				return unit.Type->MapSound.Acknowledgement.Sound;
@@ -304,6 +340,18 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
 					if (unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound) {
 						return unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound;
+					//Wyrmgus start
+					} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
+						int civilization = unit.Type->Civilization;
+						if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Race, unit.Player->Faction, unit.Type->Class)) {
+							civilization = unit.Player->Race;
+						}
+						if (PlayerRaces.Civilizations[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound) {
+							return PlayerRaces.Civilizations[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound;
+						} else {
+							return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
+						}
+					//Wyrmgus end
 					} else {
 						//Wyrmgus start
 //						return unit.Type->MapSound.Acknowledgement.Sound;

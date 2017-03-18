@@ -180,15 +180,6 @@ void MapUnitSounds()
 		civilization->UnitSounds.Acknowledgement.MapSound();
 		civilization->UnitSounds.Attack.MapSound();
 		civilization->UnitSounds.Idle.MapSound();
-		civilization->UnitSounds.Hit.MapSound();
-		civilization->UnitSounds.Miss.MapSound();
-		civilization->UnitSounds.Step.MapSound();
-		civilization->UnitSounds.StepDirt.MapSound();
-		civilization->UnitSounds.StepGrass.MapSound();
-		civilization->UnitSounds.StepGravel.MapSound();
-		civilization->UnitSounds.StepMud.MapSound();
-		civilization->UnitSounds.StepStone.MapSound();
-		civilization->UnitSounds.Used.MapSound();
 		civilization->UnitSounds.Build.MapSound();
 		civilization->UnitSounds.Ready.MapSound();
 		civilization->UnitSounds.Ready.SetSoundRange(INFINITE_SOUND_RANGE);

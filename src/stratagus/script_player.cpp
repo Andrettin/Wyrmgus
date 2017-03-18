@@ -919,24 +919,6 @@ static int CclDefineCivilization(lua_State *l)
 					civilization->UnitSounds.Attack.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "idle")) {
 					civilization->UnitSounds.Idle.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "hit")) {
-					civilization->UnitSounds.Hit.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "miss")) {
-					civilization->UnitSounds.Miss.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step")) {
-					civilization->UnitSounds.Step.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-dirt")) {
-					civilization->UnitSounds.StepDirt.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-grass")) {
-					civilization->UnitSounds.StepGrass.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-gravel")) {
-					civilization->UnitSounds.StepGravel.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-mud")) {
-					civilization->UnitSounds.StepMud.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-stone")) {
-					civilization->UnitSounds.StepStone.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "used")) {
-					civilization->UnitSounds.Used.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "build")) {
 					civilization->UnitSounds.Build.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "ready")) {
