@@ -872,6 +872,7 @@ public:
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type
 	std::string RequirementsString;	/// Requirements string of the unit type
+	std::string BuildingRulesString;	/// Building rules string of the unit type
 	std::vector<CUnitType *> SoldUnits;		/// Units which this unit can sell.
 	std::vector<CUnitType *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<CUnitType *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.

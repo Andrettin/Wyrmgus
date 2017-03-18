@@ -55,7 +55,7 @@ public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
 		//Wyrmgus start
 		Class(false), Description(false), Quote(false), Encyclopedia(false), SettlementName(false),
-		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Elixir(0), ConsumedElixir(0), Unique(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0), FactionUpgrade(0), ResearchedUpgrade(0), LuxuryResource(0), RequirementsString(0),
+		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Elixir(0), ConsumedElixir(0), Unique(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0), FactionUpgrade(0), ResearchedUpgrade(0), LuxuryResource(0), RequirementsString(0), BuildingRulesString(0),
 //		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
 		ButtonAction(-1), ItemClass(-1), BoolFlags(NULL), Variables(NULL) {}
 		//Wyrmgus end
@@ -107,6 +107,7 @@ public:
 	char ResearchedUpgrade;		/// check if the button's upgrade has already been researched
 	char LuxuryResource;		/// check if the button's resource is a luxury resource
 	char RequirementsString;	/// check if the button's unit type or upgrade has a requirements string
+	char BuildingRulesString;	/// check if the button's unit type has a building rules string
 	//Wyrmgus end
 	char *BoolFlags;            /// array of condition about user flags.
 	char *Variables;            /// array of variable to verify (enable and max > 0)

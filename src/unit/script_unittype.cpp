@@ -754,6 +754,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->RandomMovementProbability = parent_type->RandomMovementProbability;
 			type->RandomMovementDistance = parent_type->RandomMovementDistance;
 			type->RequirementsString = parent_type->RequirementsString;
+			type->BuildingRulesString = parent_type->BuildingRulesString;
 			type->Icon.Name = parent_type->Icon.Name;
 			type->Icon.Icon = NULL;
 			if (!type->Icon.Name.empty()) {
@@ -2027,6 +2028,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "RequirementsString")) {
 			type->RequirementsString = LuaToString(l, -1);
+		} else if (!strcmp(value, "BuildingRulesString")) {
+			type->BuildingRulesString = LuaToString(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
 			type->TrainQuantity = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SoldUnits")) {
@@ -2687,6 +2690,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "RequirementsString")) {
 		lua_pushstring(l, type->RequirementsString.c_str());
+		return 1;
+	} else if (!strcmp(data, "BuildingRulesString")) {
+		lua_pushstring(l, type->BuildingRulesString.c_str());
 		return 1;
 	} else if (!strcmp(data, "Image")) {
 		lua_pushstring(l, type->File.c_str());

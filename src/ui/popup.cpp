@@ -781,6 +781,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->LuxuryResource = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "RequirementsString")) {
 			condition->RequirementsString = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "BuildingRulesString")) {
+			condition->BuildingRulesString = Ccl2Condition(l, LuaToString(l, -1));
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];

@@ -465,6 +465,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			return false;
 		}
 	}
+	
+	if (condition->BuildingRulesString != CONDITION_TRUE) {
+		if ((condition->BuildingRulesString == CONDITION_ONLY) ^ (button.Action == ButtonBuild && type && !type->BuildingRulesString.empty())) {
+			return false;
+		}
+	}
 	//Wyrmgus end
 
 	if (condition->ButtonAction != -1 && button.Action != condition->ButtonAction) {

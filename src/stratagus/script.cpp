@@ -993,6 +993,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "TypeRequirementsString")) {
 			res->e = EString_TypeRequirementsString;
 			res->D.Type = CclParseTypeDesc(l);
+		} else if (!strcmp(key, "TypeBuildingRulesString")) {
+			res->e = EString_TypeBuildingRulesString;
+			res->D.Type = CclParseTypeDesc(l);
 		} else if (!strcmp(key, "UpgradeCivilization")) {
 			res->e = EString_UpgradeCivilization;
 			res->D.Upgrade = CclParseUpgradeDesc(l);
@@ -1384,10 +1387,17 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string("");
 			}
-		case EString_TypeRequirementsString : // name of the unit type's quote
+		case EString_TypeRequirementsString : // name of the unit type's requirements string
 			type = s->D.Type;
 			if (type != NULL) {
 				return (**type).RequirementsString;
+			} else { // ERROR.
+				return std::string("");
+			}
+		case EString_TypeBuildingRulesString : // name of the unit type's building rules string
+			type = s->D.Type;
+			if (type != NULL) {
+				return (**type).BuildingRulesString;
 			} else { // ERROR.
 				return std::string("");
 			}
@@ -1676,7 +1686,10 @@ void FreeStringDesc(StringDesc *s)
 		case EString_TypeQuote : // Quote of the unit type
 			delete *s->D.Type;
 			break;
-		case EString_TypeRequirementsString : // Quote of the unit type
+		case EString_TypeRequirementsString : // Requirements string of the unit type
+			delete *s->D.Type;
+			break;
+		case EString_TypeBuildingRulesString : // Building rules string of the unit type
 			delete *s->D.Type;
 			break;
 		case EString_UpgradeCivilization : // Civilization of the upgrade
@@ -2337,6 +2350,11 @@ static int CclTypeRequirementsString(lua_State *l)
 	return Alias(l, "TypeRequirementsString");
 }
 
+static int CclTypeBuildingRulesString(lua_State *l)
+{
+	return Alias(l, "TypeBuildingRulesString");
+}
+
 static int CclTypeTrainQuantity(lua_State *l)
 {
 	return Alias(l, "TypeTrainQuantity");
@@ -2622,6 +2640,7 @@ static void AliasRegister()
 	lua_register(Lua, "TypeDescription", CclTypeDescription);
 	lua_register(Lua, "TypeQuote", CclTypeQuote);
 	lua_register(Lua, "TypeRequirementsString", CclTypeRequirementsString);
+	lua_register(Lua, "TypeBuildingRulesString", CclTypeBuildingRulesString);
 	lua_register(Lua, "TypeTrainQuantity", CclTypeTrainQuantity);
 	lua_register(Lua, "UpgradeCivilization", CclUpgradeCivilization);
 	lua_register(Lua, "UpgradeFactionType", CclUpgradeFactionType);
