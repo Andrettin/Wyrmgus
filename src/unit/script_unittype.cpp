@@ -585,6 +585,19 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 			blist.push_back(b);
 			//Wyrmgus end
 		//Wyrmgus start
+		} else if (!strcmp(value, "terrain")) {
+			CBuildRestrictionTerrain *b = new CBuildRestrictionTerrain;
+
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "Terrain")) {
+					b->RestrictTerrainTypeName = LuaToString(l, -1);
+				} else {
+					LuaError(l, "Unsupported BuildingRules terrain tag: %s" _C_ value);
+				}
+			}
+
+			blist.push_back(b);
 		} else if (!strcmp(value, "and")) {
 			CBuildRestrictionAnd *b = new CBuildRestrictionAnd();
 			std::vector<CBuildRestriction *> and_list;

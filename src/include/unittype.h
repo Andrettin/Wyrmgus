@@ -698,6 +698,20 @@ public:
 };
 
 //Wyrmgus start
+class CBuildRestrictionTerrain : public CBuildRestriction
+{
+public:
+	CBuildRestrictionTerrain() : RestrictTerrainType(NULL) {};
+	virtual ~CBuildRestrictionTerrain() {};
+	virtual void Init();
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+
+	std::string RestrictTerrainTypeName;
+	CTerrainType *RestrictTerrainType;
+};
+//Wyrmgus end
+
+//Wyrmgus start
 class CSpeciesPhylum
 {
 public:

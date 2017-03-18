@@ -481,6 +481,35 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 	return false;
 }
 
+//Wyrmgus start
+void CBuildRestrictionTerrain::Init()
+{
+	this->RestrictTerrainType = GetTerrainType(this->RestrictTerrainTypeName);
+}
+
+/**
+**  Check Terrain Restriction
+*/
+bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
+{
+	Assert(Map.Info.IsPointOnMap(pos, z));
+
+	for (int x = pos.x; x < pos.x + type.TileWidth; ++x) {
+		for (int y = pos.y; y < pos.y + type.TileHeight; ++y) {
+			if (!Map.Info.IsPointOnMap(x, y, z)) {
+				continue;
+			}
+			Vec2i tile_pos(x, y);
+			CTerrainType *terrain = Map.GetTileTerrain(tile_pos, this->RestrictTerrainType->Overlay, z);
+			if (this->RestrictTerrainType == terrain) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+//Wyrmgus end
 
 /**
 **  Can build unit here.
