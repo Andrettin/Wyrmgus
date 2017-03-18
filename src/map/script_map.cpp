@@ -624,9 +624,13 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 		LuaError(l, "Map template doesn't exist.\n");
 	}
 
-	CTerrainType *terrain = GetTerrainType(LuaToString(l, 2));
-	if (!terrain) {
-		LuaError(l, "Terrain doesn't exist");
+	std::string terrain_ident = LuaToString(l, 2);
+	CTerrainType *terrain = NULL;
+	if (!terrain_ident.empty()) {
+		terrain = GetTerrainType(terrain_ident);
+		if (!terrain) {
+			LuaError(l, "Terrain doesn't exist");
+		}
 	}
 
 	Vec2i pos;

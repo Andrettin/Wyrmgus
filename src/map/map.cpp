@@ -355,7 +355,11 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 		if (CurrentCampaign->StartDate >= std::get<2>(HistoricalTerrains[i]) || std::get<2>(HistoricalTerrains[i]).year == 0) {
 			Vec2i real_pos(map_start_pos.x + history_pos.x - template_start_pos.x, map_start_pos.y + history_pos.y - template_start_pos.y);
-			Map.Field(real_pos, z)->SetTerrain(std::get<1>(HistoricalTerrains[i]));
+			if (std::get<1>(HistoricalTerrains[i])) {
+				Map.Field(real_pos, z)->SetTerrain(std::get<1>(HistoricalTerrains[i]));
+			} else { //if the terrain type is NULL, then that means a previously set overlay terrain should be removed
+				Map.Field(real_pos, z)->RemoveOverlayTerrain();
+			}
 		}
 	}
 	
