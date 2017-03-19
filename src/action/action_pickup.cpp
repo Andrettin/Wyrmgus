@@ -214,6 +214,11 @@ enum {
 			this->Finished = true;
 			return ;
 		}
+		
+		if (!CanPickUp(unit, *goal)) { //cannot pickup (likely, the inventory has become full)
+			this->Finished = true;
+			return;
+		}
 
 		if (unit.HasInventory() && goal && goal->Type->BoolFlag[ITEM_INDEX].value) {
 			goal->TTL = 0; //remove item destruction timer when picked up
