@@ -2124,6 +2124,9 @@ void CUnit::UpdateSoldUnits()
 	}
 	
 	int sold_unit_max = 4;
+	if (!potential_items.empty()) {
+		sold_unit_max = 15;
+	}
 	
 	for (int i = 0; i < sold_unit_max; ++i) {
 		CUnit *new_unit = NULL;
