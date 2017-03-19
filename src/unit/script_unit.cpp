@@ -391,9 +391,6 @@ static int CclUnit(lua_State *l)
 		//Wyrmgus end
 		} else if (!strcmp(value, "current-sight-range")) {
 			unit->CurrentSightRange = LuaToNumber(l, 2, j + 1);
-			//Wyrmgus start
-			UpdateUnitSightRange(*unit);
-			//Wyrmgus end
 		} else if (!strcmp(value, "refs")) {
 			unit->Refs = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "host-info")) {

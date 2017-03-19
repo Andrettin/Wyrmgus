@@ -1975,7 +1975,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	}
 
 	if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-		if (!unit.Removed) {
+		if (!unit.Removed && !SaveGameLoading) {
 			MapUnmarkUnitSight(unit);
 			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value +
 									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
@@ -2081,7 +2081,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	Assert(um);
 
 	if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-		if (!unit.Removed) {
+		if (!unit.Removed && !SaveGameLoading) {
 			MapUnmarkUnitSight(unit);
 			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value -
 									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
