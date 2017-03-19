@@ -174,7 +174,9 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	// HACK: the building is ready now
 	//Wyrmgus start
-	player.NumBuildingsUnderConstruction--;
+	if (!type.TerrainType) {
+		player.NumBuildingsUnderConstruction--;
+	}
 	//Wyrmgus end
 	player.UnitTypesCount[type.Slot]++;
 	if (unit.Active) {

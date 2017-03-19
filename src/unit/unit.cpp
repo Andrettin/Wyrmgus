@@ -5435,6 +5435,10 @@ bool CUnit::HasInventory() const
 		return true;
 	}
 	
+	if (this->Variable[LEVEL_INDEX].Value >= 3 && this->Type->BoolFlag[ORGANIC_INDEX].value && !this->Type->BoolFlag[FAUNA_INDEX].value) {
+		return true;
+	}
+	
 	return false;
 }
 
