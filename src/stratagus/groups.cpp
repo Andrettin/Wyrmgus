@@ -242,6 +242,33 @@ void RemoveUnitFromGroups(CUnit &unit)
 	}
 }
 
+//Wyrmgus start
+/**
+**  Remove unit from its groups that have more than one unit in it
+**
+**  @param unit  Unit to remove from group.
+*/
+void RemoveUnitFromNonSingleGroups(CUnit &unit)
+{
+	Assert(unit.GroupId != 0);  // unit doesn't belong to a group
+
+	for (int num = 0; num < NUM_GROUPS; ++num) {
+		CUnitGroup &group = Groups[num];
+		
+		if (group.getUnits().size() > 1) {
+			for (size_t i = 0; i != group.getUnits().size(); ++i) {
+				if (group.getUnits()[i] == &unit) {
+					Assert(!unit.Destroyed);
+					unit.GroupId &= ~(1 << num);
+					group.remove(unit);
+					break;
+				}
+			}
+		}
+	}
+}
+//Wyrmgus end
+
 // ----------------------------------------------------------------------------
 
 /**

@@ -869,6 +869,10 @@ extern void AddToGroup(CUnit **units, unsigned int nunits, int num);
 extern void SetGroup(CUnit **units, unsigned int nunits, int num);
 /// Remove a unit from a group
 extern void RemoveUnitFromGroups(CUnit &unit);
+//Wyrmgus start
+/// Remove a unit from a group which has more than one unit in it
+extern void RemoveUnitFromNonSingleGroups(CUnit &unit);
+//Wyrmgus end
 /// Register CCL group features
 extern void GroupCclRegister();
 extern bool IsGroupTainted(int num);
@@ -892,6 +896,10 @@ extern int SelectUnit(CUnit &unit);
 extern void SelectSingleUnit(CUnit &unit);
 /// Remove a unit from selection
 extern void UnSelectUnit(CUnit &unit);
+//Wyrmgus start
+/// Check whether two units can be selected together
+extern bool UnitCanBeSelectedWith(CUnit &first_unit, CUnit &second_unit);
+//Wyrmgus end
 /// Add a unit to selected if not already selected, remove it otherwise
 extern int ToggleSelectUnit(CUnit &unit);
 /// Select units from the same type (if selectable by rectangle)

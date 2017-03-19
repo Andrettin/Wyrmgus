@@ -529,6 +529,14 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 		AiUpgradeToComplete(unit, newtype);
 	}
 	this->Finished = true;
+	
+	//Wyrmgus start
+	if (newtype.BoolFlag[BUILDING_INDEX].value && !unit.Player->AiEnabled) { //if the unit is a building, remove it from its group (if any) when upgraded (buildings can only be selected together if they are of the same type
+		if (unit.GroupId) {
+			RemoveUnitFromNonSingleGroups(unit);
+		}
+	}
+	//Wyrmgus end
 }
 
 /* virtual */ void COrder_UpgradeTo::Cancel(CUnit &unit)

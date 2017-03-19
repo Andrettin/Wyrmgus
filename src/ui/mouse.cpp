@@ -2958,11 +2958,10 @@ void UIHandleButtonUp(unsigned button)
 						   && (unit->Player == ThisPlayer || ThisPlayer->IsTeamed(*unit))
 						   //Wyrmgus start
 //						   && !unit->Type->Building
-						   && (!unit->Type->Building || unit->Type == Selected[0]->Type)
+						   && (!Selected.size() || UnitCanBeSelectedWith(*Selected[0], *unit))
 						   //Wyrmgus end
 						   //Wyrmgus start
 //						   && (Selected.size() != 1 || !Selected[0]->Type->Building)
-						   && (!Selected[0]->Type->Building || unit->Type == Selected[0]->Type)
 						   //Wyrmgus end
 						   && (Selected.size() != 1 || Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0]))) {
 					num = ToggleSelectUnit(*unit);

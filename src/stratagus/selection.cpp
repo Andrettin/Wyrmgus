@@ -51,6 +51,10 @@
 #include "unit_find.h"
 #include "unit_manager.h"
 
+//Wyrmgus start
+#include "../ai/ai_local.h" // for AiHelpers
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -319,6 +323,23 @@ void UnSelectUnit(CUnit &unit)
 	UI.SelectedViewport->Unit = NULL;
 }
 
+//Wyrmgus start
+bool UnitCanBeSelectedWith(CUnit &first_unit, CUnit &second_unit)
+{
+	if (first_unit.Type->Building != second_unit.Type->Building) {
+		return false;
+	}
+
+	if (first_unit.Type->Building) {
+		if (second_unit.Type != first_unit.Type) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+//Wyrmgus end
+
 /**
 **  Toggle the selection of a unit in a group of selected units
 **
@@ -332,7 +353,7 @@ int ToggleSelectUnit(CUnit &unit)
 		return 0;
 	}
 	//Wyrmgus start
-	if (Selected.size() && ((Selected[0]->Type->Building && (!unit.Type->Building || unit.Type != Selected[0]->Type)) || Selected[0]->Type->Building != unit.Type->Building)) {
+	if (Selected.size() && !UnitCanBeSelectedWith(*Selected[0], unit)) {
 		return 0;
 	}
 	//Wyrmgus end
@@ -493,7 +514,7 @@ int ToggleUnitsByType(CUnit &base)
 	}
 
 	//Wyrmgus start
-	if (Selected.size() && ((Selected[0]->Type->Building && (!base.Type->Building || base.Type != Selected[0]->Type)) || Selected[0]->Type->Building != base.Type->Building)) {
+	if (Selected.size() && !UnitCanBeSelectedWith(*Selected[0], base)) {
 		return 0;
 	}
 	//Wyrmgus end
@@ -539,11 +560,7 @@ int ToggleUnitsByType(CUnit &base)
 			continue;
 		}
 		//Wyrmgus start
-		if (unit.Type->Building && Selected.size() && (!Selected[0]->Type->Building || unit.Type != Selected[0]->Type)) {
-			continue;
-		}
-		//don't select units if a building is selected
-		if (!unit.Type->Building && Selected.size() && Selected[0]->Type->Building) {
+		if (Selected.size() && !UnitCanBeSelectedWith(*Selected[0], unit)) {
 			continue;
 		}
 		//Wyrmgus end
@@ -607,7 +624,7 @@ int AddGroupFromUnitToSelection(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	if (Selected.size() && ((Selected[0]->Type->Building && (!unit.Type->Building || unit.Type != Selected[0]->Type)) || Selected[0]->Type->Building != unit.Type->Building)) {
+	if (Selected.size() && !UnitCanBeSelectedWith(*Selected[0], unit)) {
 		return 0;
 	}
 	//Wyrmgus end
@@ -689,7 +706,7 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
 		}
 		//Wyrmgus start
 		//only select buildings if another building of the same type is already selected
-		if (added_table == false && unit.Type->Building && ((i != 0 && unit.Type != table[0]->Type) || hasNonBuilding)) {
+		if (added_table == false && unit.Type->Building && ((i != 0 && !UnitCanBeSelectedWith(*table[0], unit)) || hasNonBuilding)) {
 			continue;
 		}
 		//Wyrmgus end
@@ -927,11 +944,7 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 
 	for (size_t i = 0; i < table.size() && Selected.size() < MaxSelectable; ++i) {
 		//Wyrmgus start
-		if (table[i]->Type->Building && Selected.size() && (!Selected[0]->Type->Building || table[i]->Type != Selected[0]->Type)) {
-			continue;
-		}
-		//don't select units if a building is selected
-		if (!table[i]->Type->Building && Selected.size() && Selected[0]->Type->Building) {
+		if (Selected.size() && !UnitCanBeSelectedWith(*Selected[0], *table[i])) {
 			continue;
 		}
 		//Wyrmgus end
