@@ -1815,14 +1815,6 @@ void CUnit::GenerateDrop()
 		return;
 	}
 	
-	int dropper_civilization = this->Type->Civilization;
-	int dropper_faction = -1;
-	if (dropper_civilization != -1 && this->Type->Faction != -1) {
-		dropper_faction = this->Type->Faction;
-	} else if (dropper_civilization != -1 && this->Player->Race == dropper_civilization && this->Player->Faction != -1) {
-		dropper_faction = this->Player->Faction;
-	}
-	
 	Vec2i drop_pos = this->tilePos;
 	drop_pos.x += SyncRand(this->Type->TileWidth);
 	drop_pos.y += SyncRand(this->Type->TileHeight);
@@ -1997,12 +1989,9 @@ void CUnit::GenerateWork(CUnit *dropper)
 		}
 	}
 	if (dropper != NULL) {
-		int dropper_civilization = dropper->Type->Civilization;
-		if (dropper_civilization != -1) {
-			for (size_t i = 0; i < PlayerRaces.LiteraryWorks[dropper_civilization].size(); ++i) {
-				if (this->Type->ItemClass != -1 && PlayerRaces.LiteraryWorks[dropper_civilization][i]->Work == this->Type->ItemClass && !PlayerRaces.LiteraryWorks[dropper_civilization][i]->UniqueOnly) {
-					potential_works.push_back(PlayerRaces.LiteraryWorks[dropper_civilization][i]);
-				}
+		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependByIdent(*dropper->Player, AllUpgrades[i]->Ident) && !AllUpgrades[i]->UniqueOnly) {
+				potential_works.push_back(AllUpgrades[i]);
 			}
 		}
 	}
@@ -2014,8 +2003,6 @@ void CUnit::GenerateWork(CUnit *dropper)
 
 void CUnit::GenerateUnique(CUnit *dropper)
 {
-	int dropper_civilization = dropper != NULL ? dropper->Type->Civilization : -1;
-	
 	std::vector<CUniqueItem *> potential_uniques;
 	for (size_t i = 0; i < UniqueItems.size(); ++i) {
 		if (
@@ -2037,7 +2024,7 @@ void CUnit::GenerateUnique(CUnit *dropper)
 			&& ( //the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Work == NULL
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
-				|| (dropper_civilization != -1 && std::find(PlayerRaces.LiteraryWorks[dropper_civilization].begin(), PlayerRaces.LiteraryWorks[dropper_civilization].end(), UniqueItems[i]->Work) != PlayerRaces.LiteraryWorks[dropper_civilization].end())
+				|| (dropper != NULL && CheckDependByIdent(*dropper->Player, UniqueItems[i]->Work->Ident))
 			)
 			&& UniqueItems[i]->CanDrop()
 		) {

@@ -798,7 +798,6 @@ public:
 	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
 	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
 	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops
-	std::vector<CUpgrade *> LiteraryWorks[MAX_RACES];    				/// literary works
 	int CivilizationLanguage[MAX_RACES];
 	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages

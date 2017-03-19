@@ -661,13 +661,6 @@ static int CclDefineUpgrade(lua_State *l)
 		}
 	}
 	
-	if (upgrade->Work != -1 && upgrade->Civilization != -1) {
-		int civilization_id = upgrade->Civilization;
-		if (std::find(PlayerRaces.LiteraryWorks[civilization_id].begin(), PlayerRaces.LiteraryWorks[civilization_id].end(), upgrade) == PlayerRaces.LiteraryWorks[civilization_id].end()) {
-			PlayerRaces.LiteraryWorks[civilization_id].push_back(upgrade);
-		}
-	}
-	
 	for (unsigned int i = 0; i < UpgradeMax; ++i) { //add the upgrade to the incompatible affix's counterpart list here
 		if (upgrade->IncompatibleAffixes[i]) {
 			AllUpgrades[i]->IncompatibleAffixes[upgrade->ID] = true;
@@ -1043,6 +1036,24 @@ static int CclGetRunicSuffixes(lua_State *l)
 	return 1;
 }
 
+static int CclGetLiteraryWorks(lua_State *l)
+{
+	std::vector<CUpgrade *> literary_works;
+	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+		if (AllUpgrades[i]->Work != -1) {
+			literary_works.push_back(AllUpgrades[i]);
+		}
+	}
+		
+	lua_createtable(l, literary_works.size(), 0);
+	for (size_t i = 1; i <= literary_works.size(); ++i)
+	{
+		lua_pushstring(l, literary_works[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
 /**
 **  Get upgrade data.
 **
@@ -1191,6 +1202,7 @@ void UpgradesCclRegister()
 	lua_register(Lua, "GetItemPrefixes", CclGetItemPrefixes);
 	lua_register(Lua, "GetItemSuffixes", CclGetItemSuffixes);
 	lua_register(Lua, "GetRunicSuffixes", CclGetRunicSuffixes);
+	lua_register(Lua, "GetLiteraryWorks", CclGetLiteraryWorks);
 	lua_register(Lua, "GetUpgradeData", CclGetUpgradeData);
 	//Wyrmgus end
 }
