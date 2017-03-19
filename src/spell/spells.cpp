@@ -310,6 +310,11 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	//Wyrmgus end
 	int range = autocast->Range;
 	int minRange = autocast->MinRange;
+	//Wyrmgus start
+	if (caster.CurrentAction() == UnitActionStandGround) {
+		range = std::min(range, spell.Range);
+	}
+	//Wyrmgus end
 
 	// Select all units aroung the caster
 	std::vector<CUnit *> table;
