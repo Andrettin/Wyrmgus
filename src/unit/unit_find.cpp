@@ -1040,7 +1040,7 @@ private:
 		const CUnitType &dtype = *dest->Type;
 		//Wyrmgus start
 //		const int attackrange = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
-		const int attackrange = attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
+		int attackrange = attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
 		//Wyrmgus end
 
 		//Wyrmgus start
@@ -1059,6 +1059,13 @@ private:
 		if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
 			return INT_MAX;
 		}
+
+		//Wyrmgus start
+		if (CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer) == false) {
+			return INT_MAX;
+		}
+		//Wyrmgus end
+		
 		// Unit in range ?
 		const int d = attacker->MapDistanceTo(*dest);
 
@@ -1298,8 +1305,13 @@ public:
 //				int attackrange = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 				int attackrange = attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
 				//Wyrmgus end
-				if (d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
+				
+				//Wyrmgus start
+//				if (d <= attackrange ||
+//					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
+				if ((d <= attackrange ||
+					(d <= range && UnitReachable(*attacker, *dest, attackrange))) && CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer)) {
+				//Wyrmgus end
 					++enemy_count;
 				} else {
 					dest->CacheLock = 1;

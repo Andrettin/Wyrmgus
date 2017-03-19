@@ -1241,6 +1241,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				type.MovementMask |= MapFieldRoad;
 			}
 		}
+		if (type.BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
+			type.FieldFlags |= MapFieldUnpassable;
+			type.FieldFlags |= MapFieldAirUnpassable;
+		}		
 		//Wyrmgus end
 		//
 		// A little chaos, buildings without HP can be entered.
