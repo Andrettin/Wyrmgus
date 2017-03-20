@@ -1561,10 +1561,12 @@ static void AiCollectResources()
 				if (market_count[market_type.Slot]) {
 					std::vector<CUnit *> market_table;
 					FindPlayerUnitsByType(*AiPlayer->Player, market_type, market_table, true);
-
-					CUnit &market_unit = *market_table[SyncRand() % market_table.size()];
-					CommandBuyResource(market_unit, c, AiPlayer->Player->Index);
-					break;
+					
+					if (market_table.size() > 0) {
+						CUnit &market_unit = *market_table[SyncRand() % market_table.size()];
+						CommandBuyResource(market_unit, c, AiPlayer->Player->Index);
+						break;
+					}
 				}
 			}
 		//sell resource
@@ -1599,9 +1601,11 @@ static void AiCollectResources()
 					std::vector<CUnit *> market_table;
 					FindPlayerUnitsByType(*AiPlayer->Player, market_type, market_table, true);
 
-					CUnit &market_unit = *market_table[SyncRand() % market_table.size()];
-					CommandSellResource(market_unit, c, AiPlayer->Player->Index);
-					break;
+					if (market_table.size() > 0) {
+						CUnit &market_unit = *market_table[SyncRand() % market_table.size()];
+						CommandSellResource(market_unit, c, AiPlayer->Player->Index);
+						break;
+					}
 				}
 			}
 		}
