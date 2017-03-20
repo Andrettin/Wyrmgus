@@ -772,6 +772,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
 			type->RandomMovementProbability = parent_type->RandomMovementProbability;
 			type->RandomMovementDistance = parent_type->RandomMovementDistance;
+			type->GivesResource = parent_type->GivesResource;
 			type->RequirementsString = parent_type->RequirementsString;
 			type->BuildingRulesString = parent_type->BuildingRulesString;
 			type->Icon.Name = parent_type->Icon.Name;

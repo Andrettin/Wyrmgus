@@ -274,8 +274,12 @@ public:
 	void IncreaseResourcePrice(const int resource);
 	/// Decrease resource price
 	void DecreaseResourcePrice(const int resource);
+	/// Converges prices with another player
+	int ConvergePricesWith(CPlayer &player, int max_convergences);
 	/// Get the effective resource demand for the player, given the current prices
 	int GetEffectiveResourceDemand(const int resource) const;
+	/// Get the total price difference between this player and another one
+	int GetTotalPriceDifferenceWith(const CPlayer &player) const;
 	//Wyrmgus end
 	
 	/// Returns count of specified unittype

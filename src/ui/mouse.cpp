@@ -150,6 +150,10 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 		&& dest->Type->BoolFlag[HARVESTER_INDEX].value
 		&& dest->Type->ResInfo[res]
 		&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
+		//Wyrmgus start
+		&& (res != TradeCost || dest->ResourcesHeld == 0)
+		&& (res != TradeCost || dest->Player != unit.Player)
+		//Wyrmgus end
 		&& unit.Type->BoolFlag[CANHARVEST_INDEX].value) {
 		unit.Blink = 4;
 		//  Right mouse with SHIFT appends command to old commands.
@@ -240,11 +244,13 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
 		//Wyrmgus start
 //		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
-		&& (dest.Player == unit.Player || (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)) || dest.Player->Index == PlayerNumNeutral)) {
+		&& (res == TradeCost || dest.Player == unit.Player || (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)) || dest.Player->Index == PlayerNumNeutral)
+		&& (res != TradeCost || dest.Player != unit.Player)
+	) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			if (unit.CurrentResource != res || (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity && (res != TradeCost || unit.ResourcesHeld == 0))) {
 			//Wyrmgus end
 				dest.Blink = 4;
 				SendCommandResource(unit, dest, flush);
@@ -274,7 +280,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
 			//Wyrmgus start
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			if (unit.CurrentResource != res || (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity && (res != TradeCost || unit.ResourcesHeld == 0))) {
 			//Wyrmgus end
 				for (size_t z = 0; z < UnitTypes.size(); ++z) {
 					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
@@ -343,7 +349,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 				acknowledged = 1;
 			}
 			*/
-			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			if (unit.CurrentResource != res || (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity && (res != TradeCost || unit.ResourcesHeld == 0))) {
 				SendCommandResourceLoc(unit, pos, flush, CurrentMapLayer);
 				if (!acknowledged) {
 					PlayUnitSound(unit, VoiceHarvesting);
@@ -483,25 +489,6 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//Wyrmgus end
 	return true;
 }
-
-//Wyrmgus start
-static bool DoRightButton_Trade(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
-{
-	// Go and trade with a unit
-	
-	const CUnitType &type = *unit.Type;
-	if (type.BoolFlag[TRADER_INDEX].value && dest.Type->BoolFlag[MARKET_INDEX].value) {
-		dest.Blink = 4;
-		SendCommandTrade(unit, dest, flush);
-		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
-			acknowledged = 1;
-		}
-		return true;
-	}
-	return false;
-}
-//Wyrmgus end
 
 static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos, int flush, int &acknowledged)
 {
@@ -731,6 +718,10 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 	if (res
 		&& dest.Type->ResInfo[res]
 		&& dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity
+		//Wyrmgus start
+		&& (res != TradeCost || dest.ResourcesHeld == 0)
+		&& (res != TradeCost || dest.Player != unit.Player)
+		//Wyrmgus end
 		&& type.BoolFlag[CANHARVEST_INDEX].value
 		&& dest.Player == unit.Player) {
 		unit.Blink = 4;
@@ -749,7 +740,8 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	//Wyrmgus end
 		//Wyrmgus start
 //		&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
-		&& (dest->Player == unit.Player || (dest->Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest->Player)) || dest->Player->Index == PlayerNumNeutral)) {
+		&& (dest->GivesResource != TradeCost || dest->Player != unit.Player)
+		&& (dest->GivesResource == TradeCost || dest->Player == unit.Player || (dest->Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest->Player)) || dest->Player->Index == PlayerNumNeutral)) {
 		//Wyrmgus end
 		dest->Blink = 4;
 		if (!acknowledged) {
@@ -862,14 +854,6 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 		return;
 	}
 	
-	//Wyrmgus start
-	//  Handle traders.
-	if (action == MouseActionTrade && dest) {
-		DoRightButton_Trade(unit, *dest, flush, acknowledged);
-		return;
-	}
-	//Wyrmgus end
-
 	//  Fighters
 	if (action == MouseActionSpellCast || action == MouseActionAttack) {
 		DoRightButton_Attack(unit, dest, pos, flush, acknowledged);
@@ -1511,7 +1495,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					UnitUnderCursor->GivesResource
 					&& Selected[0]->Type->ResInfo[UnitUnderCursor->GivesResource]
 					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->CanStore[Selected[0]->CurrentResource])
-					&& (UnitUnderCursor->Player == ThisPlayer || (UnitUnderCursor->Player->IsAllied(*ThisPlayer) && ThisPlayer->IsAllied(*UnitUnderCursor->Player)) || UnitUnderCursor->Player->Index == PlayerNumNeutral)
+					&& (UnitUnderCursor->GivesResource != TradeCost || UnitUnderCursor->Player != ThisPlayer)
+					&& (UnitUnderCursor->GivesResource == TradeCost || UnitUnderCursor->Player == ThisPlayer || (UnitUnderCursor->Player->IsAllied(*ThisPlayer) && ThisPlayer->IsAllied(*UnitUnderCursor->Player)) || UnitUnderCursor->Player->Index == PlayerNumNeutral)
 				)
 			) {
 				GameCursor = UI.YellowHair.Cursor;
@@ -1810,10 +1795,15 @@ static int SendResource(const Vec2i &pos, int flush)
 				//Wyrmgus end
 				&& unit.Type->ResInfo[res]
 				&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
+				//Wyrmgus start
+				&& (res != TradeCost || unit.ResourcesHeld == 0)
+				&& (res != TradeCost || dest->Player != unit.Player)
+				//Wyrmgus end
 				&& dest->Type->BoolFlag[CANHARVEST_INDEX].value
 				//Wyrmgus start
 //				&& (dest->Player == unit.Player || dest->Player->Index == PlayerMax - 1)) {
-				&& (dest->Player == unit.Player || (dest->Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest->Player)) || dest->Player->Index == PlayerMax - 1)) {
+				&& (res == TradeCost || dest->Player == unit.Player || (dest->Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest->Player)) || dest->Player->Index == PlayerMax - 1)
+			) {
 				//Wyrmgus end
 				dest->Blink = 4;
 				SendCommandResource(unit, *dest, flush);
@@ -1829,7 +1819,10 @@ static int SendResource(const Vec2i &pos, int flush)
 						//Wyrmgus end
 						&& mf.IsTerrainResourceOnMap(res)
 						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
-						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
+						//Wyrmgus start
+//						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
+						&& (unit.CurrentResource != res || (unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity && (res != TradeCost || unit.ResourcesHeld == 0)))) {
+						//Wyrmgus end
 						//Wyrmgus start
 //						SendCommandResourceLoc(unit, pos, flush);
 						SendCommandResourceLoc(unit, pos, flush, CurrentMapLayer);

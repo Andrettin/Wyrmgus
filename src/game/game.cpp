@@ -2179,6 +2179,7 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 		DefaultResourceFinalResources[i] = i;
 		DefaultResourceFinalResourceConversionRates[i] = 100;
 		DefaultResourceInputResources[i] = 0;
+		DefaultResourcePrices[i] = 0;
 		ResourceGrandStrategyBuildingVariations[i] = 0;
 	}
 	for (int i = 0; i < MaxCosts; ++i) {

@@ -983,7 +983,15 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			addload = unit.GetResourceStep(this->CurrentResource);
 			//Wyrmgus end
 		} else {
-			addload = resinfo.ResourceCapacity;
+			//Wyrmgus start
+//			addload = resinfo.ResourceCapacity;
+			if (this->CurrentResource == TradeCost) { // the load added when trading depends on the price difference between the two players
+				addload = unit.Player->ConvergePricesWith(*unit.Container->Player, resinfo.ResourceCapacity / 10) * 10;
+				addload = std::max(1, addload);
+			} else {
+				addload = resinfo.ResourceCapacity;
+			}
+			//Wyrmgus end
 		}
 		// Make sure we don't bite more than we can chew.
 		if (unit.ResourcesHeld + addload > resinfo.ResourceCapacity) {
@@ -1127,7 +1135,14 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				}
 				return 0;
 			} else {
-				return unit.ResourcesHeld == resinfo.ResourceCapacity && source;
+				//Wyrmgus start
+//				return unit.ResourcesHeld == resinfo.ResourceCapacity && source;
+				if (this->CurrentResource == TradeCost) {
+					return unit.ResourcesHeld > 0 && source;
+				} else {
+					return unit.ResourcesHeld == resinfo.ResourceCapacity && source;
+				}
+				//Wyrmgus end
 			}
 		}
 	}

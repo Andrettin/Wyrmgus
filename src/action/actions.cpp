@@ -194,7 +194,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 
 //Wyrmgus start
 /**
-**  Get goal position
+**  Get goal map layer
 */
 /* virtual */ const int COrder::GetGoalMapLayer() const
 {

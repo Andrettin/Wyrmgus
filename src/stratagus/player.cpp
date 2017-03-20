@@ -1844,7 +1844,10 @@ void CPlayer::UpdateFreeWorkers()
 
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (unit.IsAlive() && unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
+		//Wyrmgus start
+//		if (unit.IsAlive() && unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
+		if (unit.IsAlive() && unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed && !unit.Type->BoolFlag[TRADER_INDEX].value) {
+		//Wyrmgus end
 			if (unit.CurrentAction() == UnitActionStill) {
 				FreeWorkers.push_back(&unit);
 			}
@@ -2423,6 +2426,51 @@ void CPlayer::DecreaseResourcePrice(const int resource)
 	int price_change = this->Prices[resource] / DefaultResourcePrices[resource];
 	price_change = std::max(1, price_change);
 	this->Prices[resource] -= price_change;
+	this->Prices[resource] = std::max(1, this->Prices[resource]);
+}
+
+/**
+**  Converges prices with another player (and returns how many convergences were effected)
+*/
+int CPlayer::ConvergePricesWith(CPlayer &player, int max_convergences)
+{
+	int convergences = 0;
+	
+	bool converged = true;
+	while (converged) {
+		converged = false;
+
+		for (int i = 1; i < MaxCosts; ++i) {
+			if (!DefaultResourcePrices[i]) {
+				continue;
+			}
+			if (this->Prices[i] < player.Prices[i] && convergences < max_convergences) {
+				if (!LuxuryResources[i]) { //don't increase prices for luxury resources for the player with lower price, as that will just cause more luxury resources to be stuck in storage
+					this->IncreaseResourcePrice(i);
+					convergences += 1;
+					converged = true;
+				}
+				
+				if (this->Prices[i] < player.Prices[i] && convergences < max_convergences) { //now do the convergence for the other side as well, if possible
+					player.DecreaseResourcePrice(i);
+					convergences += 1;
+					converged = true;
+				}
+			} else if (this->Prices[i] > player.Prices[i] && convergences < max_convergences) {
+				this->DecreaseResourcePrice(i);
+				convergences += 1;
+				converged = true;
+
+				if (this->Prices[i] > player.Prices[i] && convergences < max_convergences && !LuxuryResources[i]) { //do the convergence for the other side as well, if possible
+					player.IncreaseResourcePrice(i);
+					convergences += 1;
+					converged = true;
+				}
+			}
+		}
+	}
+	
+	return convergences;
 }
 
 /**
@@ -2440,6 +2488,22 @@ int CPlayer::GetEffectiveResourceDemand(const int resource) const
 	}
 
 	return resource_demand;
+}
+
+/**
+**  Get the total price difference between this player and another one
+*/
+int CPlayer::GetTotalPriceDifferenceWith(const CPlayer &player) const
+{
+	int difference = 0;
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (!DefaultResourcePrices[i]) {
+			continue;
+		}
+		difference += abs(this->Prices[i] - player.Prices[i]);
+	}
+
+	return difference;
 }
 //Wyrmgus end
 

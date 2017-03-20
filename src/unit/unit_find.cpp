@@ -473,7 +473,7 @@ public:
 		const CUnitType &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((unit->GivesResource == resource || (!only_same && DefaultResourceFinalResources[unit->GivesResource] == resource) || (include_luxury && LuxuryResources[unit->GivesResource]))
+		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && DefaultResourceFinalResources[unit->GivesResource] == resource) || (include_luxury && LuxuryResources[unit->GivesResource]))
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start
@@ -585,8 +585,12 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 			//Wyrmgus start
 		   && !mine.IsUnusable(false)
 //		   && (resinfo.HarvestFromOutside
+		   && (mine.GivesResource != TradeCost || mine.Player != worker.Player)
 		   && (mine.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value
 			//Wyrmgus end
+			   //Wyrmgus start
+			   || mine.GivesResource == TradeCost
+			   //Wyrmgus end
 			   || mine.Player->Index == PlayerMax - 1
 			   || mine.Player == worker.Player
 			   || (worker.IsAllied(mine) && mine.IsAllied(worker)));

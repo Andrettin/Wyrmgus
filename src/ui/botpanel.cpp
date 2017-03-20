@@ -1549,6 +1549,9 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			if (!unit.CurrentResource
 				|| !(unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->LoseResources)
 				|| (unit.ResourcesHeld != unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity
+					//Wyrmgus start
+					&& (unit.CurrentResource != TradeCost || unit.ResourcesHeld == 0)
+					//Wyrmgus end
 					&& unit.Type->ResInfo[unit.CurrentResource]->LoseResources)) {
 				res = true;
 			}

@@ -433,7 +433,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(",\n  \"rally-point\", %d, %d", unit.RallyPointPos.x, unit.RallyPointPos.y);
 		file.printf(",\n  \"rally-point-map-layer\", %d, ", unit.RallyPointMapLayer);
 	}
-	if (unit.Character != NULL && unit.CurrentAction() != UnitActionDie) {
+	if (unit.Character != NULL && unit.CurrentAction() != UnitActionDie && !unit.Destroyed) {
 		if (!unit.Character->Custom) {
 			file.printf(",\n  \"character\", \"%s\"", unit.Character->Ident.c_str());
 		} else {
