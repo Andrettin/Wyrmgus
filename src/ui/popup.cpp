@@ -586,6 +586,9 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		int value;
 		if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
 			value = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[this->Index].Value;
+			if (value >= 0 && IsBonusVariable(this->Index)) {
+				x += label.Draw(x, y, "+");
+			}
 		} else {
 			if (
 				UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value
@@ -604,7 +607,10 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 				}
 			} else {
 				value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
-				if (UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value && button.Action == ButtonBuy) {
+				if (
+					(UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value && button.Action == ButtonBuy)
+					|| IsBonusVariable(this->Index)
+				) {
 					if (value >= 0) {
 						x += label.Draw(x, y, "+");
 					}

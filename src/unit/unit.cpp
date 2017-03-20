@@ -5225,6 +5225,35 @@ int CUnit::GetEffectiveResourceBuyPrice(const int resource, int traded_quantity)
 	return price;
 }
 
+int CUnit::GetResourceStep(const int resource) const
+{
+	if (!this->Type->ResInfo[resource]) {
+		return 0;
+	}
+
+	int resource_step = this->Type->ResInfo[resource]->ResourceStep;
+	
+	resource_step += this->Variable[GATHERINGBONUS_INDEX].Value;
+	
+	if (resource == CopperCost) {
+		resource_step += this->Variable[COPPERGATHERINGBONUS_INDEX].Value;
+	} else if (resource == SilverCost) {
+		resource_step += this->Variable[SILVERGATHERINGBONUS_INDEX].Value;
+	} else if (resource == GoldCost) {
+		resource_step += this->Variable[GOLDGATHERINGBONUS_INDEX].Value;
+	} else if (resource == WoodCost) {
+		resource_step += this->Variable[LUMBERGATHERINGBONUS_INDEX].Value;
+	} else if (resource == StoneCost) {
+		resource_step += this->Variable[STONEGATHERINGBONUS_INDEX].Value;
+	} else if (resource == CoalCost) {
+		resource_step += this->Variable[COALGATHERINGBONUS_INDEX].Value;
+	} else if (resource == FurnitureCost) {
+		resource_step += this->Variable[FURNITUREGATHERINGBONUS_INDEX].Value;
+	}
+	
+	return resource_step;
+}
+
 bool CUnit::CanAttack(bool count_inside) const
 {
 	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->BoolFlag[CANATTACK_INDEX].value) { //transporters can only attack through a unit within them

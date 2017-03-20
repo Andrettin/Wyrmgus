@@ -77,9 +77,10 @@ enum CostType {
 	Cost4,                                  /// resource 4
 	//Wyrmgus start
 //	Cost5,                                  /// resource 5
+//	Cost6,                                  /// resource 6
 	StoneCost,								/// stone resource
+	CoalCost,								/// coal resource
 	//Wyrmgus end
-	Cost6,                                  /// resource 6
 
 	//Wyrmgus start
 	ResearchCost,							/// research resource
