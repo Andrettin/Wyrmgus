@@ -597,8 +597,18 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 				if (value >= 0) {
 					x += label.Draw(x, y, "+");
 				}
+			} else if (UnitManager.GetSlotUnit(button.Value).Work != NULL || UnitManager.GetSlotUnit(button.Value).Elixir != NULL) {
+				value = UnitManager.GetSlotUnit(button.Value).GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
+				if (value >= 0) {
+					x += label.Draw(x, y, "+");
+				}
 			} else {
 				value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
+				if (UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value && button.Action == ButtonBuy) {
+					if (value >= 0) {
+						x += label.Draw(x, y, "+");
+					}
+				}
 			}
 		}
 		x += label.Draw(x, y, value);

@@ -400,11 +400,23 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 		//Wyrmgus start
 		case VariableChange:
 			val.type = USTRINT_INT;
-			val.i = unit.Container->GetItemVariableChange(&unit, index);
+			if (unit.Container && unit.Container->HasInventory()) {
+				val.i = unit.Container->GetItemVariableChange(&unit, index);
+			} else if (unit.Work || unit.Elixir) {
+				val.i = unit.GetItemVariableChange(&unit, index);
+			} else {
+				val.i = var->Value;
+			}
 			break;
 		case VariableIncreaseChange:
 			val.type = USTRINT_INT;
-			val.i = unit.Container->GetItemVariableChange(&unit, index, true);
+			if (unit.Container && unit.Container->HasInventory()) {
+				val.i = unit.Container->GetItemVariableChange(&unit, index, true);
+			} else if (unit.Work || unit.Elixir) {
+				val.i = unit.GetItemVariableChange(&unit, index, true);
+			} else {
+				val.i = var->Increase;
+			}
 			break;
 		//Wyrmgus end
 	}

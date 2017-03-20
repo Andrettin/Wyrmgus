@@ -512,6 +512,16 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 							return false;
 						}
 					}
+				} else if (unit.Work || unit.Elixir) { //special case for literary works and elixirs that aren't in an inventory
+					if (i == BASICDAMAGE_INDEX) {
+						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.GetItemVariableChange(&unit, i) != 0 || unit.GetItemVariableChange(&unit, PIERCINGDAMAGE_INDEX) != 0)) {
+							return false;
+						}
+					} else {
+						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.GetItemVariableChange(&unit, i) != 0)) { //the former for some reason wasn't working with negative values
+							return false;
+						}
+					}
 				} else {
 					if (i == BASICDAMAGE_INDEX) {
 						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0 || unit.Variable[PIERCINGDAMAGE_INDEX].Value != 0)) {
@@ -539,14 +549,14 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		
 	if (button.Action == ButtonUnit || button.Action == ButtonBuy) {
 		CUnit &unit = UnitManager.GetSlotUnit(button.Value);
-		if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->HasInventory()) {
+		if (unit.Type->BoolFlag[ITEM_INDEX].value) {
 			if (condition->Equipped != CONDITION_TRUE) {
-				if ((condition->Equipped == CONDITION_ONLY) ^ unit.Container->IsItemEquipped(&unit)) {
+				if ((condition->Equipped == CONDITION_ONLY) ^ (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->IsItemEquipped(&unit))) {
 					return false;
 				}
 			}
 			if (condition->Equippable != CONDITION_TRUE) {
-				if ((condition->Equippable == CONDITION_ONLY) ^ unit.Container->CanEquipItem(&unit)) {
+				if ((condition->Equippable == CONDITION_ONLY) ^ (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->CanEquipItem(&unit))) {
 					return false;
 				}
 			}
@@ -566,7 +576,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->ReadWork != CONDITION_TRUE) {
-				if ((condition->ReadWork == CONDITION_ONLY) ^ (unit.Work != NULL && unit.Container->IndividualUpgrades[unit.Work->ID])) {
+				if ((condition->ReadWork == CONDITION_ONLY) ^ (unit.Work != NULL && (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->IndividualUpgrades[unit.Work->ID]))) {
 					return false;
 				}
 			}
@@ -576,12 +586,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->ConsumedElixir != CONDITION_TRUE) {
-				if ((condition->ConsumedElixir == CONDITION_ONLY) ^ (unit.Elixir != NULL && unit.Container->IndividualUpgrades[unit.Elixir->ID])) {
+				if ((condition->ConsumedElixir == CONDITION_ONLY) ^ (unit.Elixir != NULL && (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->IndividualUpgrades[unit.Elixir->ID]))) {
 					return false;
 				}
 			}
 			if (condition->CanUse != CONDITION_TRUE) {
-				if ((condition->CanUse == CONDITION_ONLY) ^ (unit.Container->CanUseItem(&unit))) {
+				if ((condition->CanUse == CONDITION_ONLY) ^ (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->CanUseItem(&unit))) {
 					return false;
 				}
 			}
@@ -621,8 +631,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Regeneration != CONDITION_TRUE) {
-				if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->HasInventory()) {
+				if (unit.Container != NULL && unit.Container->HasInventory()) {
 					if ((condition->Regeneration == CONDITION_ONLY) ^ (unit.Container->GetItemVariableChange(&unit, HITPOINTBONUS_INDEX, true) != 0)) {
+						return false;
+					}
+				} else if (unit.Work || unit.Elixir) { //special case for literary works and elixirs that aren't in an inventory
+					if ((condition->Regeneration == CONDITION_ONLY) ^ (unit.GetItemVariableChange(&unit, HP_INDEX, true) != 0 || unit.GetItemVariableChange(&unit, HITPOINTBONUS_INDEX, true) != 0)) {
 						return false;
 					}
 				} else {
@@ -1910,32 +1924,34 @@ void CButtonPanel::Update()
 	
 	//Wyrmgus start
 	//update the sold item buttons
-	unsigned int sold_unit_count = 0;
-	for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
-		if (UnitButtonTable[i]->Action != ButtonBuy) {
-			continue;
-		}
-		char unit_ident[128];
-		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
-		if (UnitButtonTable[i]->UnitMask[0] != '*' && !strstr(UnitButtonTable[i]->UnitMask.c_str(), unit_ident)) {
-			continue;
-		}
+	if (GameRunning || GameEstablishing) {
+		unsigned int sold_unit_count = 0;
+		for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
+			if (UnitButtonTable[i]->Action != ButtonBuy) {
+				continue;
+			}
+			char unit_ident[128];
+			sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
+			if (UnitButtonTable[i]->UnitMask[0] != '*' && !strstr(UnitButtonTable[i]->UnitMask.c_str(), unit_ident)) {
+				continue;
+			}
 		
-		if (sold_unit_count >= unit.SoldUnits.size()) {
-			UnitButtonTable[i]->Value = -1;
-		} else {
-			UnitButtonTable[i]->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
-			if (unit.SoldUnits[sold_unit_count]->Character != NULL) {
-				UnitButtonTable[i]->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->GetName();
+			if (sold_unit_count >= unit.SoldUnits.size()) {
+				UnitButtonTable[i]->Value = -1;
 			} else {
-				if (!unit.SoldUnits[sold_unit_count]->Name.empty()) {
-					UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
+				UnitButtonTable[i]->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
+				if (unit.SoldUnits[sold_unit_count]->Character != NULL) {
+					UnitButtonTable[i]->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->GetName();
 				} else {
-					UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetTypeName();
+					if (!unit.SoldUnits[sold_unit_count]->Name.empty()) {
+						UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
+					} else {
+						UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetTypeName();
+					}
 				}
 			}
+			sold_unit_count += 1;
 		}
-		sold_unit_count += 1;
 	}
 	//Wyrmgus end
 

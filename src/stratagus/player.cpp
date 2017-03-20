@@ -1866,8 +1866,10 @@ void CPlayer::PerformResourceTrade()
 		if (market_count[market_type.Slot]) {
 			std::vector<CUnit *> market_table;
 			FindPlayerUnitsByType(*this, market_type, market_table);
-			market_unit = market_table[SyncRand() % market_table.size()];
-			break;
+			if (market_table.size() > 0) {
+				market_unit = market_table[SyncRand() % market_table.size()];
+				break;
+			}
 		}
 	}
 	

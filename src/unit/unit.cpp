@@ -5167,7 +5167,7 @@ int CUnit::GetPrice() const
 	}
 	if (this->Work != NULL) {
 		if (this->Type->ItemClass == BookItemClass) {
-			cost += 3000;
+			cost += 5000;
 		} else {
 			cost += 1000;
 		}
