@@ -2026,6 +2026,11 @@ void CUnit::GenerateUnique(CUnit *dropper)
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
 				|| (dropper != NULL && CheckDependByIdent(*dropper->Player, UniqueItems[i]->Work->Ident))
 			)
+			&& ( //the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit must be capable of generating it on its own
+				UniqueItems[i]->Elixir == NULL
+				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Elixir) != this->Type->Affixes.end()
+				|| (dropper != NULL && CheckDependByIdent(*dropper->Player, UniqueItems[i]->Elixir->Ident))
+			)
 			&& UniqueItems[i]->CanDrop()
 		) {
 			potential_uniques.push_back(UniqueItems[i]);
