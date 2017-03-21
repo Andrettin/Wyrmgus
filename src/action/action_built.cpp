@@ -232,7 +232,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 				CommandResource(*table[i], unit, 0);
 			}
 			// If we can reurn goods to a new depot, do it.
-			if (table[i]->CurrentResource && table[i]->ResourcesHeld > 0 && type.CanStore[table[i]->CurrentResource]) {
+			//Wyrmgus start
+//			if (table[i]->CurrentResource && table[i]->ResourcesHeld > 0 && type.CanStore[table[i]->CurrentResource]) {
+			if (table[i]->CanReturnGoodsTo(&unit) && table[i]->ResourcesHeld > 0) {
+			//Wyrmgus end
 				CommandReturnGoods(*table[i], &unit, 0);
 			}
 			worker_count += 1;
@@ -262,7 +265,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 				CommandResource(*worker, unit, 0);
 			}
 			// If we can reurn goods to a new depot, do it.
-			if (worker->CurrentResource && worker->ResourcesHeld > 0 && type.CanStore[worker->CurrentResource]) {
+			//Wyrmgus start
+//			if (worker->CurrentResource && worker->ResourcesHeld > 0 && type.CanStore[worker->CurrentResource]) {
+			if (worker->CanReturnGoodsTo(&unit) && worker->ResourcesHeld > 0) {
+			//Wyrmgus end
 				CommandReturnGoods(*worker, &unit, 0);
 			}
 			

@@ -642,7 +642,10 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 //				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos);
 				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos, ignore_exploration, z);
 				//Wyrmgus end
-			} else {
+			//Wyrmgus start
+//			} else {
+			} else if (i != TradeCost) {
+			//Wyrmgus end
 				//Wyrmgus start
 //				return AiFindHallPlace(worker, type, startPos, i, resultPos);
 				return AiFindHallPlace(worker, type, startPos, i, resultPos, ignore_exploration, z);

@@ -556,7 +556,10 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	for (std::vector<CUnit *>::iterator it = worker.Player->UnitBegin(); it != worker.Player->UnitEnd(); ++it) {
 		CUnit &unit = **it;
 
-		if (unit.Type->CanStore[resource] && !unit.IsUnusable()) {
+		//Wyrmgus start
+//		if (unit.Type->CanStore[resource] && !unit.IsUnusable()) {
+		if (worker.CanReturnGoodsTo(&unit, resource) && !unit.IsUnusable()) {
+		//Wyrmgus end
 			depots.push_back(&unit);
 		}
 	}
@@ -1328,6 +1331,12 @@ static void AiCollectResources()
 		if (!unit.IsIdle()) {
 			continue;
 		}
+		
+		//Wyrmgus start
+		if (unit.GroupId != 0) { //don't gather/trade with units that are parts of forces
+			continue;
+		}
+		//Wyrmgus end
 
 		// Send workers with resources back home.
 		if (unit.ResourcesHeld) {

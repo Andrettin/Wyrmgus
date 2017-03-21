@@ -231,6 +231,9 @@ class BestDepotFinder
 	{
 		/* Only resource depots */
 		if (dest->Type->CanStore[resource]
+			//Wyrmgus start
+			&& (NEARLOCATION || u_near.worker->CanReturnGoodsTo(dest, resource))
+			//Wyrmgus end
 			&& dest->IsAliveOnMap()
 			&& dest->CurrentAction() != UnitActionBuilt) {
 			// Unit in range?

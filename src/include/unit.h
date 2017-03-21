@@ -402,6 +402,8 @@ public:
 	int GetResourceStep(const int resource) const;
 	bool CanAttack(bool count_inside = false) const;
 	bool IsInCombat() const;
+	bool CanHarvest(const CUnit *dest) const;
+	bool CanReturnGoodsTo(const CUnit *dest, int resource = 0) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemClassEquipped(int item_class) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;

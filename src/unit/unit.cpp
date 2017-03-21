@@ -4454,7 +4454,7 @@ void RescueUnits()
 						//        store gold. FIXME!!!
 						//Wyrmgus start
 //						if (unit.Type->CanStore[GoldCost]) {
-						if (unit.Type->CanStore[CopperCost]) {
+						if (unit.Type->BoolFlag[TOWNHALL_INDEX].value) {
 						//Wyrmgus end
 							ChangePlayerOwner(*p, *around[i]->Player);
 							break;
@@ -5291,6 +5291,90 @@ bool CUnit::IsInCombat() const
 	}
 		
 	return inCombat;
+}
+
+bool CUnit::CanHarvest(const CUnit *dest) const
+{
+	if (!dest) {
+		return false;
+	}
+	
+	if (!dest->GivesResource) {
+		return false;
+	}
+	
+	if (!this->Type->ResInfo[dest->GivesResource]) {
+		return false;
+	}
+	
+	if (!dest->Type->BoolFlag[CANHARVEST_INDEX].value) {
+		return false;
+	}
+	
+	if (!this->Type->BoolFlag[HARVESTER_INDEX].value) {
+		return false;
+	}
+	
+	if (dest->GivesResource == TradeCost) {
+		if (dest->Player == this->Player) { //can only trade with markets owned by other players
+			return false;
+		}
+		
+		if (this->Type->UnitType != UnitTypeNaval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can trade with docks
+			return false;
+		}
+		if (this->Type->UnitType == UnitTypeNaval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //ships cannot trade with land markets
+			return false;
+		}
+	} else {
+		if (dest->Player != this->Player && !(dest->Player->IsAllied(*this->Player) && this->Player->IsAllied(*dest->Player)) && dest->Player->Index != PlayerNumNeutral) {
+			return false;
+		}
+	}
+	
+	if (this->BoardCount) { //cannot harvest if carrying units
+		return false;
+	}
+	
+	return true;
+}
+
+bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
+{
+	if (!dest) {
+		return false;
+	}
+	
+	if (!resource) {
+		resource = this->CurrentResource;
+	}
+	
+	if (!resource) {
+		return false;
+	}
+	
+	if (!dest->Type->CanStore[this->CurrentResource]) {
+		return false;
+	}
+	
+	if (resource == TradeCost) {
+		if (dest->Player != this->Player) { //can only return trade to markets owned by the same player
+			return false;
+		}
+		
+		if (this->Type->UnitType != UnitTypeNaval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can return trade to docks
+			return false;
+		}
+		if (this->Type->UnitType == UnitTypeNaval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //ships cannot return trade to land markets
+			return false;
+		}
+	} else {
+		if (dest->Player != this->Player && !(dest->Player->IsAllied(*this->Player) && this->Player->IsAllied(*dest->Player))) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 bool CUnit::IsItemEquipped(const CUnit *item) const
