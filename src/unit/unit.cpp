@@ -6766,7 +6766,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	}
 	*/
 	
-	if (transporter.ResourcesHeld > 0) { //cannot transport units if already has cargo
+	if (transporter.ResourcesHeld > 0 && transporter.CurrentResource) { //cannot transport units if already has cargo
 		return 0;
 	}
 	//Wyrmgus end
