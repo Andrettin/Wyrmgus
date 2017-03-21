@@ -640,7 +640,11 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 			//Wyrmgus end
 				//Wyrmgus start
 //				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos);
-				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos, ignore_exploration, z);
+				if (AiFindLumberMillPlace(worker, type, startPos, i, resultPos, ignore_exploration, z)) {
+					return true;
+				} else {
+					return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos, ignore_exploration, z);
+				}
 				//Wyrmgus end
 			//Wyrmgus start
 //			} else {
@@ -653,7 +657,10 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 			}
 		} else {
 			//mines
-			if (type.GivesResource == i) {
+			//Wyrmgus start
+//			if (type.GivesResource == i) {
+			if (type.GivesResource == i && type.GivesResource != TradeCost) {
+			//Wyrmgus end
 				//Wyrmgus start
 //				if (resinfo && resinfo->RefineryHarvester) {
 				if (resinfo) {
