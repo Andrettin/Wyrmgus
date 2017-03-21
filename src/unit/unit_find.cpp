@@ -644,15 +644,28 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 		//Wyrmgus start
 //		cost.SetFrom(*mine, deposit, check_usage);
 		cost.SetFrom(*mine, deposit, worker, check_usage);
+		if (worker.Container) {
+			UnmarkUnitFieldFlags(*worker.Container);
+		}
 		//Wyrmgus end
 		if (cost < bestCost && UnitReachable(worker, *mine, 1)) {
 			*resultMine = mine;
 
 			if (cost.IsMin()) {
+				//Wyrmgus start
+				if (worker.Container) {
+					MarkUnitFieldFlags(*worker.Container);
+				}
+				//Wyrmgus end
 				return VisitResult_Finished;
 			}
 			bestCost = cost;
 		}
+		//Wyrmgus start
+		if (worker.Container) {
+			MarkUnitFieldFlags(*worker.Container);
+		}
+		//Wyrmgus end
 	}
 	//Wyrmgus start
 //	if (CanMoveToMask(pos, movemask)) { // reachable
