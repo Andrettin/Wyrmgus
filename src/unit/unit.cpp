@@ -6681,6 +6681,10 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 		return 0;
 	}
 	*/
+	
+	if (transporter.ResourcesHeld > 0) { //cannot transport units if already has cargo
+		return 0;
+	}
 	//Wyrmgus end
 
 	if (transporter.BoardCount + unit.Type->BoardSize > transporter.Type->MaxOnBoard) { // too big unit

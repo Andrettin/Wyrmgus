@@ -151,7 +151,6 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 		&& dest->Type->ResInfo[res]
 		&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
 		//Wyrmgus start
-		&& (res != TradeCost || dest->ResourcesHeld == 0)
 		&& (res != TradeCost || dest->Player != unit.Player)
 		//Wyrmgus end
 		&& unit.Type->BoolFlag[CANHARVEST_INDEX].value) {
@@ -250,7 +249,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 		//Wyrmgus end
 			//Wyrmgus start
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-			if (unit.CurrentResource != res || (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity && (res != TradeCost || unit.ResourcesHeld == 0))) {
+			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			//Wyrmgus end
 				dest.Blink = 4;
 				SendCommandResource(unit, dest, flush);
@@ -280,7 +279,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
 			//Wyrmgus start
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-			if (unit.CurrentResource != res || (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity && (res != TradeCost || unit.ResourcesHeld == 0))) {
+			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			//Wyrmgus end
 				for (size_t z = 0; z < UnitTypes.size(); ++z) {
 					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
@@ -349,7 +348,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 				acknowledged = 1;
 			}
 			*/
-			if (unit.CurrentResource != res || (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity && (res != TradeCost || unit.ResourcesHeld == 0))) {
+			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 				SendCommandResourceLoc(unit, pos, flush, CurrentMapLayer);
 				if (!acknowledged) {
 					PlayUnitSound(unit, VoiceHarvesting);
@@ -719,7 +718,6 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 		&& dest.Type->ResInfo[res]
 		&& dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity
 		//Wyrmgus start
-		&& (res != TradeCost || dest.ResourcesHeld == 0)
 		&& (res != TradeCost || dest.Player != unit.Player)
 		//Wyrmgus end
 		&& type.BoolFlag[CANHARVEST_INDEX].value
@@ -1796,7 +1794,6 @@ static int SendResource(const Vec2i &pos, int flush)
 				&& unit.Type->ResInfo[res]
 				&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 				//Wyrmgus start
-				&& (res != TradeCost || unit.ResourcesHeld == 0)
 				&& (res != TradeCost || dest->Player != unit.Player)
 				//Wyrmgus end
 				&& dest->Type->BoolFlag[CANHARVEST_INDEX].value
@@ -1819,10 +1816,7 @@ static int SendResource(const Vec2i &pos, int flush)
 						//Wyrmgus end
 						&& mf.IsTerrainResourceOnMap(res)
 						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
-						//Wyrmgus start
-//						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
-						&& (unit.CurrentResource != res || (unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity && (res != TradeCost || unit.ResourcesHeld == 0)))) {
-						//Wyrmgus end
+						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
 						//Wyrmgus start
 //						SendCommandResourceLoc(unit, pos, flush);
 						SendCommandResourceLoc(unit, pos, flush, CurrentMapLayer);

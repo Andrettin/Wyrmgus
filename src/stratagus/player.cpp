@@ -2444,26 +2444,34 @@ int CPlayer::ConvergePricesWith(CPlayer &player, int max_convergences)
 			if (!DefaultResourcePrices[i]) {
 				continue;
 			}
+			
+			int convergence_increase = 1;
+			if (LuxuryResources[i]) {
+				convergence_increase *= player.ResourceDemand[i];
+			} else {
+				convergence_increase *= 100;
+			}
+			
 			if (this->Prices[i] < player.Prices[i] && convergences < max_convergences) {
 				if (!LuxuryResources[i]) { //don't increase prices for luxury resources for the player with lower price, as that will just cause more luxury resources to be stuck in storage
 					this->IncreaseResourcePrice(i);
-					convergences += 1;
+					convergences += convergence_increase;
 					converged = true;
 				}
 				
 				if (this->Prices[i] < player.Prices[i] && convergences < max_convergences) { //now do the convergence for the other side as well, if possible
 					player.DecreaseResourcePrice(i);
-					convergences += 1;
+					convergences += convergence_increase;
 					converged = true;
 				}
 			} else if (this->Prices[i] > player.Prices[i] && convergences < max_convergences) {
 				this->DecreaseResourcePrice(i);
-				convergences += 1;
+				convergences += convergence_increase;
 				converged = true;
 
 				if (this->Prices[i] > player.Prices[i] && convergences < max_convergences && !LuxuryResources[i]) { //do the convergence for the other side as well, if possible
 					player.IncreaseResourcePrice(i);
-					convergences += 1;
+					convergences += convergence_increase;
 					converged = true;
 				}
 			}
