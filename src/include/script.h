@@ -162,6 +162,7 @@ enum EString {
 	EString_TypeQuote,			/// Unit type's quote
 	EString_TypeRequirementsString,	/// Unit type's requirements string
 	EString_TypeBuildingRulesString,	/// Unit type's building rules string
+	EString_TypeLuxuryDemand,			/// Unit type's luxury demand
 	EString_UpgradeCivilization,	/// Upgrade's civilization
 	EString_UpgradeFactionType,		/// Upgrade's faction's type
 	EString_UpgradeEffectsString,	/// Upgrade's effects string

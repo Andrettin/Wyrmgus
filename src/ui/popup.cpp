@@ -777,6 +777,22 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Bound = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Identified")) {
 			condition->Identified = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "UnitTypeType")) {
+			const char *unit_type_type = LuaToString(l, -1);
+			condition->UnitTypeType = GetUnitTypeClassIndexByName(LuaToString(l, -1));
+			if (!strcmp(unit_type_type, "land")) {
+				condition->UnitTypeType = UnitTypeLand;
+			} else if (!strcmp(unit_type_type, "fly")) {
+				condition->UnitTypeType = UnitTypeFly;
+			} else if (!strcmp(unit_type_type, "fly-low")) {
+				condition->UnitTypeType = UnitTypeFlyLow;
+			} else if (!strcmp(unit_type_type, "naval")) {
+				condition->UnitTypeType = UnitTypeNaval;
+			} else {
+				LuaError(l, "Unsupported Type: %s" _C_ unit_type_type);
+			}
+		} else if (!strcmp(key, "UnitTypeClass")) {
+			condition->UnitTypeClass = GetUnitTypeClassIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(key, "ItemClass")) {
 			condition->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
 		} else if (!strcmp(key, "Weapon")) {

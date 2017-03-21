@@ -426,6 +426,18 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
+	if (condition->UnitTypeClass != -1) {
+		if (!type || condition->UnitTypeClass != type->Class) {
+			return false;
+		}
+	}
+
+	if (condition->UnitTypeType != -1) {
+		if (!type || condition->UnitTypeType != type->UnitType) {
+			return false;
+		}
+	}
+
 	if (condition->Description && type && type->Description.empty()) {
 		return false;
 	}

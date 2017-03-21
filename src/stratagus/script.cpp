@@ -996,6 +996,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "TypeBuildingRulesString")) {
 			res->e = EString_TypeBuildingRulesString;
 			res->D.Type = CclParseTypeDesc(l);
+		} else if (!strcmp(key, "TypeLuxuryDemand")) {
+			res->e = EString_TypeLuxuryDemand;
+			res->D.Type = CclParseTypeDesc(l);
 		} else if (!strcmp(key, "UpgradeCivilization")) {
 			res->e = EString_UpgradeCivilization;
 			res->D.Upgrade = CclParseUpgradeDesc(l);
@@ -1401,6 +1404,27 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string("");
 			}
+		case EString_TypeLuxuryDemand : // unit type's luxury demand
+			type = s->D.Type;
+			if (type != NULL) {
+				std::string luxury_demand;
+				bool first = true;
+				for (int res = 1; res < MaxCosts; ++res) {
+					if ((**type).Stats[ThisPlayer->Index].ResourceDemand[res]) {
+						if (!first) {
+							luxury_demand += "\n";
+						} else {
+							first = false;
+						}
+						luxury_demand += IdentToName(DefaultResourceNames[res]);
+						luxury_demand += " Demand: ";
+						luxury_demand += std::to_string((long long) (**type).Stats[ThisPlayer->Index].ResourceDemand[res]);
+					}
+				}
+				return luxury_demand;
+			} else { // ERROR.
+				return std::string("");
+			}
 		case EString_UpgradeCivilization : // name of the upgrade's civilization
 			upgrade = s->D.Upgrade;
 			if (upgrade != NULL) {
@@ -1690,6 +1714,9 @@ void FreeStringDesc(StringDesc *s)
 			delete *s->D.Type;
 			break;
 		case EString_TypeBuildingRulesString : // Building rules string of the unit type
+			delete *s->D.Type;
+			break;
+		case EString_TypeLuxuryDemand : // Luxury demand of the unit type
 			delete *s->D.Type;
 			break;
 		case EString_UpgradeCivilization : // Civilization of the upgrade
@@ -2355,6 +2382,11 @@ static int CclTypeBuildingRulesString(lua_State *l)
 	return Alias(l, "TypeBuildingRulesString");
 }
 
+static int CclTypeLuxuryDemand(lua_State *l)
+{
+	return Alias(l, "TypeLuxuryDemand");
+}
+
 static int CclTypeTrainQuantity(lua_State *l)
 {
 	return Alias(l, "TypeTrainQuantity");
@@ -2641,6 +2673,7 @@ static void AliasRegister()
 	lua_register(Lua, "TypeQuote", CclTypeQuote);
 	lua_register(Lua, "TypeRequirementsString", CclTypeRequirementsString);
 	lua_register(Lua, "TypeBuildingRulesString", CclTypeBuildingRulesString);
+	lua_register(Lua, "TypeLuxuryDemand", CclTypeLuxuryDemand);
 	lua_register(Lua, "TypeTrainQuantity", CclTypeTrainQuantity);
 	lua_register(Lua, "UpgradeCivilization", CclUpgradeCivilization);
 	lua_register(Lua, "UpgradeFactionType", CclUpgradeFactionType);
