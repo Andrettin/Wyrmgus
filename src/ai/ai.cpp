@@ -261,6 +261,30 @@ static void AiCheckUnits()
 	}
 	
 	//Wyrmgus start
+	//check if can hire any mercenaries
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (i == AiPlayer->Player->Index) {
+			continue;
+		}
+		if (Players[i].Type != PlayerComputer || !AiPlayer->Player->HasBuildingAccess(Players[i])) {
+			continue;
+		}
+		for (int j = 0; j < Players[i].GetUnitCount(); ++j) {
+			CUnit *mercenary_unit = &Players[i].GetUnit(j);
+			if (!mercenary_unit || !mercenary_unit->IsAliveOnMap() || !mercenary_unit->Type->BoolFlag[BUILDING_INDEX].value) {
+				continue;
+			}
+			for (std::map<int, int>::iterator iterator = mercenary_unit->UnitStock.begin(); iterator != mercenary_unit->UnitStock.end(); ++iterator) {
+				if (iterator->second && CheckDependByType(Players[i], *UnitTypes[iterator->first]) && AiPlayer->Player->CheckLimits(*UnitTypes[iterator->first]) >= 1 && !AiPlayer->Player->CheckUnitType(*UnitTypes[iterator->first], true)) {
+					CommandTrainUnit(*mercenary_unit, *UnitTypes[iterator->first], AiPlayer->Player->Index, FlushCommands);
+					break; // only hire one unit per mercenary camp per second
+				}
+			}
+		}
+	}
+	//Wyrmgus end
+	
+	//Wyrmgus start
 	//check if any factions can be founded, and if so, pick one randomly
 	std::vector<CUpgrade *> potential_faction_upgrades;
 	for (int i = 0; i < MAX_RACES; ++i) {
@@ -1246,15 +1270,30 @@ void AiNeedMoreSupply(const CPlayer &player)
 void AiTrainingComplete(CUnit &unit, CUnit &what)
 {
 	DebugPrint("%d: %d(%s) training %s at %d,%d completed\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
+			   //Wyrmgus start
+//			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
+			   what.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
+			   //Wyrmgus end
 			   what.Type->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
-	Assert(unit.Player->Type != PlayerPerson);
+	//Wyrmgus start
+//	Assert(unit.Player->Type != PlayerPerson);
+	Assert(what.Player->Type != PlayerPerson);
+	//Wyrmgus end
 
-	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
+	//Wyrmgus start
+//	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
+	if (unit.Player == what.Player) {
+		AiRemoveFromBuilt(what.Player->Ai, *what.Type);
+	}
+	//Wyrmgus end
 
-	unit.Player->Ai->Force.RemoveDeadUnit();
-	unit.Player->Ai->Force.Assign(what);
+	//Wyrmgus start
+//	unit.Player->Ai->Force.RemoveDeadUnit();
+//	unit.Player->Ai->Force.Assign(what);
+	what.Player->Ai->Force.RemoveDeadUnit();
+	what.Player->Ai->Force.Assign(what, -1, what.Player != unit.Player);
+	//Wyrmgus end
 
 }
 

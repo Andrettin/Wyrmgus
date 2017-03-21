@@ -251,7 +251,10 @@ public:
 
 	int GetForce(const CUnit &unit);
 	void RemoveDeadUnit();
-	bool Assign(CUnit &unit, int force = -1);
+	//Wyrmgus start
+//	bool Assign(CUnit &unit, int force = -1);
+	bool Assign(CUnit &unit, int force = -1, bool mercenary = false);
+	//Wyrmgus end
 	void Update();
 	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault, int begin = 0);
 	void CheckUnits(int *counter);

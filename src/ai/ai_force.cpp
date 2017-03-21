@@ -828,14 +828,20 @@ void AiForceManager::RemoveDeadUnit()
 **
 **  @param unit  Unit to assign to force.
 */
-bool AiForceManager::Assign(CUnit &unit, int force)
+//Wyrmgus start
+//bool AiForceManager::Assign(CUnit &unit, int force)
+bool AiForceManager::Assign(CUnit &unit, int force, bool mercenary)
+//Wyrmgus end
 {
 	if (unit.GroupId != 0) {
 		return false;
 	}
 	if (force != -1) {
 		AiForce &f = forces[AiPlayer->Force.getScriptForce(force)];
-		if (f.IsBelongsTo(*unit.Type)) {
+		//Wyrmgus start
+//		if (f.IsBelongsTo(*unit.Type)) {
+		if (f.IsBelongsTo(*unit.Type) || mercenary) {
+		//Wyrmgus end
 			f.Insert(unit);
 			unit.GroupId = force + 1;
 			return true;
@@ -848,7 +854,10 @@ bool AiForceManager::Assign(CUnit &unit, int force)
 			if (f.IsAttacking()) {
 				continue;
 			}
-			if (f.IsBelongsTo(*unit.Type)) {
+			//Wyrmgus start
+//			if (f.IsBelongsTo(*unit.Type)) {
+			if (f.IsBelongsTo(*unit.Type) || mercenary) {
+			//Wyrmgus end
 				f.Insert(unit);
 				unit.GroupId = i + 1;
 				return true;
