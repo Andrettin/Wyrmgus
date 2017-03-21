@@ -764,7 +764,10 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 					Assert(0);
 					return -1;
 				}
-				if (goal->Moving)  {
+				//Wyrmgus start
+//				if (goal->Moving)  {
+				if (&unit != goal && goal->Moving)  {
+				//Wyrmgus end
 					// moving unit are crossable
 					cost += AStarMovingUnitCrossingCost;
 				} else {
@@ -1113,7 +1116,7 @@ static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
 	if (minrange == 0 && maxrange == 0 && gw == 0 && gh == 0) {
 		//Wyrmgus start
 //		if (goal.x + tilesizex > AStarMapWidth || goal.y + tilesizey > AStarMapHeight) {
-		if (goal.x + tilesizex > AStarMapWidth[z] || goal.y + tilesizey > AStarMapHeight[z]) {
+		if (goal.x + tilesizex - 1 > AStarMapWidth[z] || goal.y + tilesizey - 1 > AStarMapHeight[z]) {
 		//Wyrmgus end
 			ProfileEnd("AStarMarkGoal");
 			return 0;

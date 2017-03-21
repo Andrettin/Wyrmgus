@@ -5293,7 +5293,7 @@ bool CUnit::IsInCombat() const
 	return inCombat;
 }
 
-bool CUnit::CanHarvest(const CUnit *dest) const
+bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const
 {
 	if (!dest) {
 		return false;
@@ -5307,7 +5307,7 @@ bool CUnit::CanHarvest(const CUnit *dest) const
 		return false;
 	}
 	
-	if (!dest->Type->BoolFlag[CANHARVEST_INDEX].value) {
+	if (!dest->Type->BoolFlag[CANHARVEST_INDEX].value && only_harvestable) {
 		return false;
 	}
 	
@@ -5323,7 +5323,7 @@ bool CUnit::CanHarvest(const CUnit *dest) const
 		if (this->Type->UnitType != UnitTypeNaval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can trade with docks
 			return false;
 		}
-		if (this->Type->UnitType == UnitTypeNaval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //ships cannot trade with land markets
+		if (this->Type->UnitType == UnitTypeNaval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->UnitType != UnitTypeNaval) { //ships cannot trade with land markets
 			return false;
 		}
 	} else {
@@ -5365,7 +5365,7 @@ bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
 		if (this->Type->UnitType != UnitTypeNaval && dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //only ships can return trade to docks
 			return false;
 		}
-		if (this->Type->UnitType == UnitTypeNaval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value) { //ships cannot return trade to land markets
+		if (this->Type->UnitType == UnitTypeNaval && !dest->Type->BoolFlag[SHOREBUILDING_INDEX].value && dest->Type->UnitType != UnitTypeNaval) { //ships cannot return trade to land markets
 			return false;
 		}
 	} else {

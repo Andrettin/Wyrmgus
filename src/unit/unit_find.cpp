@@ -583,20 +583,16 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 	}
 	
 //	return mine.Type->BoolFlag[CANHARVEST_INDEX].value && mine.ResourcesHeld
-	return (mine.Type->BoolFlag[CANHARVEST_INDEX].value || !only_harvestable) && mine.ResourcesHeld
+	return mine.ResourcesHeld
 	//Wyrmgus end
 			//Wyrmgus start
 		   && !mine.IsUnusable(false)
 //		   && (resinfo.HarvestFromOutside
-		   && (mine.GivesResource != TradeCost || mine.Player != worker.Player)
-		   && (mine.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value
+//			   || mine.Player->Index == PlayerMax - 1
+//			   || mine.Player == worker.Player
+//			   || (worker.IsAllied(mine) && mine.IsAllied(worker)));
+		   && worker.CanHarvest(&mine, only_harvestable);
 			//Wyrmgus end
-			   //Wyrmgus start
-			   || mine.GivesResource == TradeCost
-			   //Wyrmgus end
-			   || mine.Player->Index == PlayerMax - 1
-			   || mine.Player == worker.Player
-			   || (worker.IsAllied(mine) && mine.IsAllied(worker)));
 }
 
 //Wyrmgus start

@@ -987,7 +987,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //			addload = resinfo.ResourceCapacity;
 			if (this->CurrentResource == TradeCost) { // the load added when trading depends on the price difference between the two players
 				addload = unit.Player->ConvergePricesWith(*unit.Container->Player, resinfo.ResourceCapacity);
-				addload = std::max(10, addload);
+				addload = std::max(resinfo.ResourceCapacity / 10, addload);
 			} else {
 				addload = resinfo.ResourceCapacity;
 			}
