@@ -2059,7 +2059,7 @@ void CUnit::UpdateSoldUnits()
 	
 	std::vector<CUnitType *> potential_items;
 	std::vector<CCharacter *> potential_heroes;
-	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL && !GrandStrategy) { // allow heroes to be recruited at town halls
+	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL) { // allow heroes to be recruited at town halls
 		int civilization_id = this->Type->Civilization;
 		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Race, this->Player->Faction, this->Type->Class)) {
 			civilization_id = this->Player->Race;
@@ -2161,6 +2161,10 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 		sold_unit->ChangeOwner(Players[player]);
 	}
 	Players[player].ChangeResource(CopperCost, -sold_unit->GetPrice(), true);
+	if (Players[player].AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value) { //add the hero to an AI force
+		Players[player].Ai->Force.RemoveDeadUnit();
+		Players[player].Ai->Force.Assign(*sold_unit, -1, true);
+	}
 	if (IsOnlySelected(*this)) {
 		UI.ButtonPanel.Update();
 	}

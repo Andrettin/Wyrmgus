@@ -2049,7 +2049,7 @@ void AiResourceManager()
 	// Look if we can build a farm in advance.
 	//Wyrmgus start
 //	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply == AiPlayer->Player->Demand) {
-	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply <= AiPlayer->Player->Demand) {
+	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply <= (AiPlayer->Player->Demand + 4)) { //try to keep surplus supply (of 4 in this case)
 	//Wyrmgus end
 		AiRequestSupply();
 	}
