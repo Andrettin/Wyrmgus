@@ -1564,6 +1564,11 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 					&& unit.Type->ResInfo[unit.CurrentResource]->LoseResources)) {
 				res = true;
 			}
+			//Wyrmgus start
+			if (unit.BoardCount) {
+				res = false;
+			}
+			//Wyrmgus end
 			break;
 		case ButtonReturn:
 			if (!(!unit.CurrentResource

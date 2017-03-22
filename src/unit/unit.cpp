@@ -1822,15 +1822,21 @@ void CUnit::GenerateDrop()
 	CUnitType *chosen_drop = NULL;
 	std::vector<CUnitType *> potential_drops;
 	for (size_t i = 0; i < this->Type->Drops.size(); ++i) {
-		potential_drops.push_back(this->Type->Drops[i]);
+		if (CheckDependByType(*this->Player, *this->Type->Drops[i])) {
+			potential_drops.push_back(this->Type->Drops[i]);
+		}
 	}
 	if (this->Player->AiEnabled) {
 		for (size_t i = 0; i < this->Type->AiDrops.size(); ++i) {
-			potential_drops.push_back(this->Type->AiDrops[i]);
+			if (CheckDependByType(*this->Player, *this->Type->AiDrops[i])) {
+				potential_drops.push_back(this->Type->AiDrops[i]);
+			}
 		}
 		for (std::map<std::string, std::vector<CUnitType *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
 			for (size_t i = 0; i < iterator->second.size(); ++i) {
-				potential_drops.push_back(iterator->second[i]);
+				if (CheckDependByType(*this->Player, *iterator->second[i])) {
+					potential_drops.push_back(iterator->second[i]);
+				}
 			}
 		}
 	}

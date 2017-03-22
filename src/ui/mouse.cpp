@@ -1495,7 +1495,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			} else if (
 				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer &&
 				(
-					Selected[0]->CanHarvest(UnitUnderCursor)
+					Selected[0]->CanHarvest(UnitUnderCursor, false)
 					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->CanStore[Selected[0]->CurrentResource] || (Selected[0]->CurrentResource == TradeCost && UnitUnderCursor->Player != ThisPlayer))
 				)
 			) {
