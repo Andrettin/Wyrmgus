@@ -2513,6 +2513,29 @@ int CPlayer::GetTotalPriceDifferenceWith(const CPlayer &player) const
 
 	return difference;
 }
+
+/**
+**  Get the trade potential between this player and another one
+*/
+int CPlayer::GetTradePotentialWith(const CPlayer &player) const
+{
+	int trade_potential = 0;
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (!DefaultResourcePrices[i]) {
+			continue;
+		}
+		int price_difference = abs(this->Prices[i] - player.Prices[i]);
+		if (LuxuryResources[i]) {
+			trade_potential += price_difference * player.ResourceDemand[i];
+		} else {
+			trade_potential += price_difference * 100;
+		}
+	}
+	
+	trade_potential = std::max(trade_potential, 10);
+	
+	return trade_potential;
+}
 //Wyrmgus end
 
 int CPlayer::GetUnitTotalCount(const CUnitType &type) const

@@ -280,6 +280,8 @@ public:
 	int GetEffectiveResourceDemand(const int resource) const;
 	/// Get the total price difference between this player and another one
 	int GetTotalPriceDifferenceWith(const CPlayer &player) const;
+	/// Get the trade potential between this player and another one
+	int GetTradePotentialWith(const CPlayer &player) const;
 	//Wyrmgus end
 	
 	/// Returns count of specified unittype

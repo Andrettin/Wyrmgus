@@ -454,6 +454,10 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
+	if (condition->CanActiveHarvest && !(button.Action == ButtonUnit && Selected.size() > 0 && Selected[0]->CanHarvest(&UnitManager.GetSlotUnit(button.Value), false))) {
+		return false;
+	}
+
 	if (condition->FactionUpgrade != CONDITION_TRUE) {
 		if ((condition->FactionUpgrade == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility) && !strncmp(AllUpgrades[button.Value]->Ident.c_str(), "upgrade-faction-", 16))) {
 			return false;

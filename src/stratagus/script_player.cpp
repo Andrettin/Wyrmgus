@@ -2973,6 +2973,20 @@ static int CclGetPlayerData(lua_State *l)
 		const int resId = GetResourceIdByName(l, res.c_str());
 		lua_pushnumber(l, p->GetEffectiveResourceDemand(resId));
 		return 1;
+	} else if (!strcmp(data, "TotalPriceDifferenceWith")) {
+		LuaCheckArgs(l, 3);
+		
+		int other_player = LuaToNumber(l, 3);;
+
+		lua_pushnumber(l, p->GetTotalPriceDifferenceWith(Players[other_player]));
+		return 1;
+	} else if (!strcmp(data, "TradePotentialWith")) {
+		LuaCheckArgs(l, 3);
+		
+		int other_player = LuaToNumber(l, 3);;
+
+		lua_pushnumber(l, p->GetTradePotentialWith(Players[other_player]));
+		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "UnitTypesCount")) {
 		LuaCheckArgs(l, 3);

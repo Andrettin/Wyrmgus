@@ -150,6 +150,13 @@ static CUnit *CclGetUnit(lua_State *l)
 			return UnitUnderCursor;
 		}
 		return NULL;
+	//Wyrmgus start
+	} else if (num == -2) {
+		if (UnitUnderCursor) {
+			return UnitUnderCursor;
+		}
+		return NULL;
+	//Wyrmgus end
 	}
 	return &UnitManager.GetSlotUnit(num);
 }
