@@ -3355,8 +3355,7 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 
 				if (it != unitCache.end()) {
 					CUnit &replacedUnit = **it;
-					unit->SetResourcesHeld(replacedUnit.ResourcesHeld);
-					unit->Variable[GIVERESOURCE_INDEX].Value = replacedUnit.Variable[GIVERESOURCE_INDEX].Value;
+					int resources_held = replacedUnit.ResourcesHeld;
 					unit->Variable[GIVERESOURCE_INDEX].Max = replacedUnit.Variable[GIVERESOURCE_INDEX].Max;
 					unit->Variable[GIVERESOURCE_INDEX].Enable = replacedUnit.Variable[GIVERESOURCE_INDEX].Enable;
 					if (replacedUnit.Unique != NULL) {
@@ -3372,6 +3371,8 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 							unit->SetSpell(replacedUnit.Spell);
 						}
 					}
+					unit->SetResourcesHeld(resources_held);
+					unit->Variable[GIVERESOURCE_INDEX].Value = resources_held;
 					replacedUnit.Remove(NULL);
 					UnitLost(replacedUnit);
 					UnitClearOrders(replacedUnit);
@@ -3709,7 +3710,6 @@ void UnitLost(CUnit &unit)
 			} else {
 				//Wyrmgus start
 //				temp->ResourcesHeld = unit.ResourcesHeld;
-				temp->SetResourcesHeld(unit.ResourcesHeld);
 				//Wyrmgus end
 				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
 				temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
@@ -3728,6 +3728,8 @@ void UnitLost(CUnit &unit)
 						temp->SetSpell(unit.Spell);
 					}
 				}
+				temp->SetResourcesHeld(unit.ResourcesHeld);
+				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
 				//Wyrmgus end
 			}
 		}

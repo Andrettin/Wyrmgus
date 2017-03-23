@@ -356,12 +356,12 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "unique")) {
 			CUniqueItem *unique_item = GetUniqueItem(LuaToString(l, 2, j + 1));
 			unit->Unique = unique_item;
-			if (unit->Unique) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
+			if (unit->Unique && unique_item->Type->BoolFlag[ITEM_INDEX].value) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
 				if (unique_item == NULL) {
 					LuaError(l, "Unique item \"%s\" doesn't exist." _C_ unit->Name.c_str());
 				}
 				unit->Type = unique_item->Type;
-				CUnitType *type = unique_item->Type;
+				type = unique_item->Type;
 				if (unique_item->Prefix != NULL) {
 					unit->Prefix = unique_item->Prefix;
 				}
