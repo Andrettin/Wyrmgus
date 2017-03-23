@@ -6849,7 +6849,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 bool CUnit::IsEnemy(const CPlayer &player) const
 {
 	//Wyrmgus start
-	if (this->Player->Index != player.Index && player.Type != PlayerNeutral && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
+	if (this->Player->Index != player.Index && player.Type != PlayerNeutral && !this->Player->HasBuildingAccess(player) && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
 		return true;
 	}
 	//Wyrmgus end
@@ -6907,7 +6907,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 	}
 	
 	if (
-		this->Player != unit.Player && this->Player->Type != PlayerNeutral && unit.Player->Type != PlayerNeutral
+		this->Player != unit.Player && this->Player->Type != PlayerNeutral && unit.Player->Type != PlayerNeutral && !this->Player->HasBuildingAccess(*unit.Player) && !this->Player->HasNeutralFactionType()
 		&& ((this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) || (unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()))
 	) {
 		return true;

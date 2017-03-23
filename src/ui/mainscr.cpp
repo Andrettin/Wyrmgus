@@ -897,7 +897,7 @@ void DrawPopups()
 					} else {
 						unit_name = UnitUnderCursor->GetTypeName();
 					}
-					if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
+					if (UnitUnderCursor->Player->Index != PlayerNumNeutral && !UnitUnderCursor->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value) {
 						unit_name += " (" + UnitUnderCursor->Player->Name + ")";
 					}
 					//hackish way to make the popup appear correctly for the unit under cursor
