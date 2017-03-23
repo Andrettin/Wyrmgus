@@ -493,6 +493,12 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 */
 void PlayUnitSound(const CUnit &unit, CSound *sound)
 {
+	//Wyrmgus start
+	if (!&unit) {
+		fprintf(stderr, "Error in PlayUnitSound: unit is NULL.\n");
+		return;
+	}
+	
 	if (!sound) {
 		return;
 	}
