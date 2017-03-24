@@ -1458,7 +1458,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					}
 				//Wyrmgus start
 //				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
-				} else if (ThisPlayer->IsEnemy(*UnitUnderCursor) || (UnitUnderCursor->Player->Type == PlayerNeutral && UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
+				} else if (ThisPlayer->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
 				//Wyrmgus end
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 						GameCursor = CursorByIdent(CustomCursor);
@@ -1489,7 +1489,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 //			GameCursor = UI.Glass.Cursor;
 			if (
 				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer && UnitUnderCursor->Player != ThisPlayer
-				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value || (UnitUnderCursor->Player->Type == PlayerNeutral && UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value)) && (UnitUnderCursor->Player->Index != PlayerNumNeutral || UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value)
+				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value)
 			) {
 				GameCursor = UI.RedHair.Cursor;
 			} else if (
