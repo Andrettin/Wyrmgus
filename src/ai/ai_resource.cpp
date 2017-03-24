@@ -1411,6 +1411,12 @@ static void AiCollectResources()
 		// Try to complete each resource in the priority order
 		for (int i = 0; i < MaxCosts; ++i) {
 			int c = priority_resource[i];
+			
+			//Wyrmgus start
+			if (!wanted[c]) {
+				continue;
+			}
+			//Wyrmgus end
 
 			// If there is a free worker for c, take it.
 			if (num_units_unassigned[c]) {
