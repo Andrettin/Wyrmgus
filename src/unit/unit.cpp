@@ -3277,28 +3277,30 @@ void CUnit::Place(const Vec2i &pos, int z)
 	}
 
 	//Wyrmgus start
-	if (this->Type->BoolFlag[BUILDING_INDEX].value && (!this->Type->BoolFlag[TOWNHALL_INDEX].value || (!this->Constructed && this->SettlementName.empty()))) {
-		this->UpdateSettlementName(); // update the settlement name of a building when placing it
-	}
-	
-	//remove pathways under buildings
-	if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
-		for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->TileWidth; ++x) {
-			for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->TileHeight; ++y) {
-				if (!Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
-					continue;
-				}
-				CMapField &mf = *Map.Field(x, y, this->MapLayer);
-				if ((mf.Flags & MapFieldRoad) || (mf.Flags & MapFieldRailroad)) {
-					Map.RemoveTileOverlayTerrain(Vec2i(x, y), this->MapLayer);
+	if (this->IsAlive()) {
+		if (this->Type->BoolFlag[BUILDING_INDEX].value && (!this->Type->BoolFlag[TOWNHALL_INDEX].value || (!this->Constructed && this->SettlementName.empty()))) {
+			this->UpdateSettlementName(); // update the settlement name of a building when placing it
+		}
+		
+		//remove pathways under buildings
+		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
+			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->TileWidth; ++x) {
+				for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->TileHeight; ++y) {
+					if (!Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
+						continue;
+					}
+					CMapField &mf = *Map.Field(x, y, this->MapLayer);
+					if ((mf.Flags & MapFieldRoad) || (mf.Flags & MapFieldRailroad)) {
+						Map.RemoveTileOverlayTerrain(Vec2i(x, y), this->MapLayer);
+					}
 				}
 			}
 		}
-	}
-	
-	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
-	if (varinfo && varinfo->Terrains.size() > 0 && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos, false, this->MapLayer)) == varinfo->Terrains.end()) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation (this isn't perfect though, since the unit may still be allowed to keep the old variation if it has a tile size greater than 1x1)
-		this->ChooseVariation();
+		
+		VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
+		if (varinfo && varinfo->Terrains.size() > 0 && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos, false, this->MapLayer)) == varinfo->Terrains.end()) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation (this isn't perfect though, since the unit may still be allowed to keep the old variation if it has a tile size greater than 1x1)
+			this->ChooseVariation();
+		}
 	}
 	//Wyrmgus end
 }
@@ -5892,7 +5894,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	// This enables us to be tracked.  Possibly for spells (eg raise dead)
 	//Wyrmgus start
 //	if (type->CorpseType || (type->Animations && type->Animations->Death)) {
-	if (type->CorpseType || unit.GetAnimations()) {
+	if (type->CorpseType || (unit.GetAnimations() && unit.GetAnimations()->Death)) {
 	//Wyrmgus end
 		unit.Removed = 0;
 		Map.Insert(unit);
