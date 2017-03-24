@@ -321,16 +321,23 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	input.SetMinRange(this->MinRange);
 	int distance = this->Range;
 	//Wyrmgus start
+	bool check_obstacles = true;
+	//Wyrmgus end
 	if (GameSettings.Inside) {
 		//Wyrmgus start
 //		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
-		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest | MapFieldAirUnpassable, this->MapLayer, &distance);
+		check_obstacles = CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest | MapFieldAirUnpassable, this->MapLayer);
 		//Wyrmgus end
 	//Wyrmgus start
 	} else {
-		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer, &distance);
+		check_obstacles = CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
 	//Wyrmgus end
 	}
+	//Wyrmgus start
+	if (!check_obstacles) {
+		distance = 1;
+	}
+	//Wyrmgus end
 	input.SetMaxRange(distance);
 }
 

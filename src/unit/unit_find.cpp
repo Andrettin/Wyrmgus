@@ -1547,7 +1547,10 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 		} else if ((Map.Field(pos, z)->Flags & flags) && pos != goalPos) { // the goal's tile itself shouldn't be checked for an obstacle
 		//Wyrmgus end
 			if (distance) {
-				*distance = Distance(unitPos, pos);
+				//Wyrmgus start
+//				*distance = Distance(unitPos, pos);
+				*distance = std::min(*distance, Distance(unitPos, pos));
+				//Wyrmgus end
 			}
 			return false;
 		}
