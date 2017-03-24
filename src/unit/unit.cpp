@@ -2059,47 +2059,49 @@ void CUnit::UpdateSoldUnits()
 	
 	std::vector<CUnitType *> potential_items;
 	std::vector<CCharacter *> potential_heroes;
-	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL) { // allow heroes to be recruited at town halls
+	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		int civilization_id = this->Type->Civilization;
 		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Race, this->Player->Faction, this->Type->Class)) {
 			civilization_id = this->Player->Race;
 		}
 		
-		for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-			if (iterator->second->Deity != NULL) {
-				continue;
-			}
-			bool hero_allowed = false;
-			if (this->Player->Index == PlayerNumNeutral) { // if this is a neutral building (i.e. a mercenary camp), see if any player present can have this hero
-				for (int p = 0; p < PlayerMax; ++p) {
-					if (Players[p].Type != PlayerNobody && Players[p].Type != PlayerNeutral && iterator->second->Civilization == Players[p].Race && CheckDependByType(Players[p], *iterator->second->Type, true) && Players[p].StartMapLayer == this->MapLayer) {
-						if (iterator->second->Conditions) {
-							CclCommand("trigger_player = " + std::to_string((long long) this->Player->Index) + ";");
-							iterator->second->Conditions->pushPreamble();
-							iterator->second->Conditions->run(1);
-							if (iterator->second->Conditions->popBoolean()) {
+		if (CurrentQuest == NULL) {
+			for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+				if (iterator->second->Deity != NULL) {
+					continue;
+				}
+				bool hero_allowed = false;
+				if (this->Player->Index == PlayerNumNeutral) { // if this is a neutral building (i.e. a mercenary camp), see if any player present can have this hero
+					for (int p = 0; p < PlayerMax; ++p) {
+						if (Players[p].Type != PlayerNobody && Players[p].Type != PlayerNeutral && iterator->second->Civilization == Players[p].Race && CheckDependByType(Players[p], *iterator->second->Type, true) && Players[p].StartMapLayer == this->MapLayer) {
+							if (iterator->second->Conditions) {
+								CclCommand("trigger_player = " + std::to_string((long long) this->Player->Index) + ";");
+								iterator->second->Conditions->pushPreamble();
+								iterator->second->Conditions->run(1);
+								if (iterator->second->Conditions->popBoolean()) {
+									hero_allowed = true;
+									break;
+								}
+							} else {
 								hero_allowed = true;
 								break;
 							}
-						} else {
-							hero_allowed = true;
-							break;
+						}
+					}
+				} else {
+					hero_allowed = (iterator->second->Civilization == civilization_id && CheckDependByType(*this->Player, *iterator->second->Type, true));
+					if (iterator->second->Conditions) {
+						CclCommand("trigger_player = " + std::to_string((long long) this->Player->Index) + ";");
+						iterator->second->Conditions->pushPreamble();
+						iterator->second->Conditions->run(1);
+						if (iterator->second->Conditions->popBoolean() == false) {
+							hero_allowed = false;
 						}
 					}
 				}
-			} else {
-				hero_allowed = (iterator->second->Civilization == civilization_id && CheckDependByType(*this->Player, *iterator->second->Type, true));
-				if (iterator->second->Conditions) {
-					CclCommand("trigger_player = " + std::to_string((long long) this->Player->Index) + ";");
-					iterator->second->Conditions->pushPreamble();
-					iterator->second->Conditions->run(1);
-					if (iterator->second->Conditions->popBoolean() == false) {
-						hero_allowed = false;
-					}
+				if (hero_allowed && iterator->second->CanAppear()) {
+					potential_heroes.push_back(iterator->second);
 				}
-			}
-			if (hero_allowed && iterator->second->CanAppear()) {
-				potential_heroes.push_back(iterator->second);
 			}
 		}
 		if (this->Player == ThisPlayer) {
