@@ -3633,6 +3633,13 @@ static int CclGetAnimations(lua_State *l)
 void UpdateUnitVariables(CUnit &unit)
 {
 	const CUnitType *type = unit.Type;
+	
+	//Wyrmgus start
+	if (!type) {
+		fprintf(stderr, "Error in UpdateUnitVariables: Unit has not type\n");
+		return;
+	}
+	//Wyrmgus end
 
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
