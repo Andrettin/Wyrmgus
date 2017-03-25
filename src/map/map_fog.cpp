@@ -46,6 +46,9 @@
 //Wyrmgus end
 #include "ui.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unit_manager.h"
 #include "video.h"
 #include "../video/intern_video.h"
@@ -64,7 +67,10 @@ CGraphic *CMap::FogGraphic;
 **  Mapping for fog of war tiles.
 */
 static const int FogTable[16] = {
-	0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
+	//Wyrmgus start
+//	0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
+	0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 16,
+	//Wyrmgus end
 };
 
 //Wyrmgus start
@@ -505,76 +511,6 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		return;
 	}
 	
-	//Wyrmgus start
-	/*
-	std::vector<Vec2i> blocked_tiles;
-	for (int offset = 2; offset <= range; ++offset) {
-		for (int change = -1; change <= 1; change += 2) {
-			int x_offset;
-			int y_offset;
-		
-			x_offset = offset * change;
-			if (change > 0) {
-				x_offset += w - 1;
-			}
-			for (y_offset = -offset; y_offset <= (offset + (h - 1)); ++y_offset) {
-				Vec2i mpos(pos.x + x_offset, pos.y + y_offset);
-				if (!Map.Info.IsPointOnMap(mpos)) {
-					continue;
-				}
-				int direction = GetDirectionFromOffset(x_offset, y_offset);
-				Vec2i reverse_offset = GetDirectionOffset(GetReverseDirection(direction));
-				Vec2i previous_mpos(mpos + reverse_offset);
-				Vec2i previous_mpos_horizontal(mpos.x + reverse_offset.x, mpos.y);
-				Vec2i previous_mpos_vertical(mpos.x, mpos.y + reverse_offset.y);
-				if (!Map.Field(mpos)->Visible[GetReverseDirection(direction)] || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos) != blocked_tiles.end() || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_horizontal) != blocked_tiles.end() || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_vertical) != blocked_tiles.end()) {
-					blocked_tiles.push_back(mpos);
-				}
-			}
-			
-			y_offset = offset * change;
-			if (change > 0) {
-				y_offset += h - 1;
-			}
-			for (x_offset = (-offset + 1); x_offset <= (offset - 1 + w - 1); ++x_offset) {
-				Vec2i mpos(pos.x + x_offset, pos.y + y_offset);
-				if (!Map.Info.IsPointOnMap(mpos)) {
-					continue;
-				}
-				int direction = GetDirectionFromOffset(x_offset, y_offset);
-				Vec2i reverse_offset = GetDirectionOffset(GetReverseDirection(direction));
-				Vec2i previous_mpos(mpos + reverse_offset);
-				Vec2i previous_mpos_horizontal(mpos.x + reverse_offset.x, mpos.y);
-				Vec2i previous_mpos_vertical(mpos.x, mpos.y + reverse_offset.y);
-				if (!Map.Field(mpos)->Visible[GetReverseDirection(direction)] || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos) != blocked_tiles.end() || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_horizontal) != blocked_tiles.end() || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_vertical) != blocked_tiles.end()) {
-					blocked_tiles.push_back(mpos);
-				}
-			}
-			
-			//do another pass just for the vertical/horizontal blocked tiles
-			x_offset = offset * change;
-			if (change > 0) {
-				x_offset += w - 1;
-			}
-			for (y_offset = -offset; y_offset <= (offset + (h - 1)); ++y_offset) {
-				Vec2i mpos(pos.x + x_offset, pos.y + y_offset);
-				if (!Map.Info.IsPointOnMap(mpos) || std::find(blocked_tiles.begin(), blocked_tiles.end(), mpos) != blocked_tiles.end()) {
-					continue;
-				}
-				int direction = GetDirectionFromOffset(x_offset, y_offset);
-				Vec2i reverse_offset = GetDirectionOffset(GetReverseDirection(direction));
-				Vec2i previous_mpos(mpos + reverse_offset);
-				Vec2i previous_mpos_horizontal(mpos.x + reverse_offset.x, mpos.y);
-				Vec2i previous_mpos_vertical(mpos.x, mpos.y + reverse_offset.y);
-				if (std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_horizontal) != blocked_tiles.end() || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_vertical) != blocked_tiles.end()) {
-					blocked_tiles.push_back(mpos);
-				}
-			}
-		}
-	}
-	*/
-	//Wyrmgus end
-	
 	// Up hemi-cyle
 	const int miny = std::max(-range, 0 - pos.y);
 	
@@ -595,11 +531,9 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 			//Wyrmgus start
-			/*
-			if (std::find(blocked_tiles.begin(), blocked_tiles.end(), mpos) != blocked_tiles.end()) {
+			if (Map.IsLayerUnderground(z) && CheckObstaclesBetweenTiles(pos, mpos, MapFieldAirUnpassable, z, 1) == false) {
 				continue;
 			}
-			*/
 			//Wyrmgus end
 #ifdef MARKER_ON_INDEX
 			//Wyrmgus start
@@ -630,11 +564,9 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 			//Wyrmgus start
-			/*
-			if (std::find(blocked_tiles.begin(), blocked_tiles.end(), mpos) != blocked_tiles.end()) {
+			if (Map.IsLayerUnderground(z) && CheckObstaclesBetweenTiles(pos, mpos, MapFieldAirUnpassable, z, 1) == false) {
 				continue;
 			}
-			*/
 			//Wyrmgus end
 #ifdef MARKER_ON_INDEX
 			//Wyrmgus start
@@ -671,11 +603,9 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 			//Wyrmgus start
-			/*
-			if (std::find(blocked_tiles.begin(), blocked_tiles.end(), mpos) != blocked_tiles.end()) {
+			if (Map.IsLayerUnderground(z) && CheckObstaclesBetweenTiles(pos, mpos, MapFieldAirUnpassable, z, 1) == false) {
 				continue;
 			}
-			*/
 			//Wyrmgus end
 #ifdef MARKER_ON_INDEX
 			//Wyrmgus start
@@ -966,12 +896,12 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 	} else if (sx % 2 == 0 && Map.FogGraphic->Surface->h / 32 >= 2) {
 		FogTileVariation = 1;
 	}
-	if (FogTable[fogTileIndex]) {
+	if (FogTable[fogTileIndex] && FogTable[fogTileIndex] != 16) {
 		*fogTile = FogTable[fogTileIndex] + (FogTileVariation * 16);
 	} else {
 		*fogTile = FogTable[fogTileIndex];
 	}
-	if (FogTable[blackFogTileIndex]) {
+	if (FogTable[blackFogTileIndex] && FogTable[blackFogTileIndex] != 16) {
 		*blackFogTile = FogTable[blackFogTileIndex] + (FogTileVariation * 16);
 	} else {
 		*blackFogTile = FogTable[blackFogTileIndex];
@@ -999,7 +929,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 	//Wyrmgus start
 //	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
-	if (IsMapFieldVisibleTable(sx, CurrentMapLayer) || ReplayRevealMap) {
+	if ((IsMapFieldVisibleTable(sx, CurrentMapLayer) && blackFogTile != 16 && fogTile != 16) || ReplayRevealMap) {
 	//Wyrmgus end
 		if (fogTile && fogTile != blackFogTile) {
 #if defined(USE_OPENGL) || defined(USE_GLES)

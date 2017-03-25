@@ -5867,6 +5867,16 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		unit.GenerateDrop();
 	}
 	//Wyrmgus end
+	
+	//Wyrmgus start
+	std::vector<CUnit *> seeing_table; //units seeing this unit
+	if (type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
+		SelectAroundUnit(unit, 16, seeing_table); //a range of 16 should be safe enough; there should be no unit or building in the game with a sight range that high, let alone higher
+		for (size_t i = 0; i != seeing_table.size(); ++i) {
+			MapUnmarkUnitSight(*seeing_table[i]);
+		}
+	}
+	//Wyrmgus end
 
 	unit.Remove(NULL);
 	UnitLost(unit);
@@ -5924,6 +5934,14 @@ void LetUnitDie(CUnit &unit, bool suicide)
 				continue;
 			}
 			settlement_unit->UpdateSettlementName();
+		}
+	}
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
+		for (size_t i = 0; i != seeing_table.size(); ++i) {
+			MapMarkUnitSight(*seeing_table[i]);
 		}
 	}
 	//Wyrmgus end
