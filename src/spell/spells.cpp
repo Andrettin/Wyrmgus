@@ -50,6 +50,9 @@
 #include "commands.h"
 #include "map.h"
 #include "sound.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "unit.h"
 #include "unit_find.h"
 #include "upgrade.h"
@@ -370,6 +373,10 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 						}
 					}
 					//Wyrmgus start
+					if (Map.IsLayerUnderground(table[i]->MapLayer) && !CheckObstaclesBetweenTiles(caster.tilePos, table[i]->tilePos, MapFieldAirUnpassable, table[i]->MapLayer)) {
+						continue;
+					}
+
 					if (!UnitReachable(caster, *table[i], spell.Range)) {
 						continue;
 					}
@@ -423,7 +430,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				if (autocast->Attacker == CONDITION_ONLY) {
 					//Wyrmgus start
 //					const int range = table[i]->Player->Type == PlayerPerson ? table[i]->Type->ReactRangePerson : table[i]->Type->ReactRangeComputer;
-					const int range = table[i]->GetReactionRange();
+					const int react_range = table[i]->GetReactionRange();
 					//Wyrmgus end
 					if ((table[i]->CurrentAction() != UnitActionAttack
 						 && table[i]->CurrentAction() != UnitActionAttackGround
@@ -431,7 +438,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 						|| table[i]->CurrentOrder()->HasGoal() == false
 						//Wyrmgus start
 //						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos()) > range) {
-						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos(), table[i]->CurrentOrder()->GetGoalMapLayer()) > range) {
+						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos(), table[i]->CurrentOrder()->GetGoalMapLayer()) > react_range) {
 						//Wyrmgus end
 						continue;
 					}
@@ -453,6 +460,10 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				}
 				//Wyrmgus end
 				//Wyrmgus start
+				if (Map.IsLayerUnderground(table[i]->MapLayer) && !CheckObstaclesBetweenTiles(caster.tilePos, table[i]->tilePos, MapFieldAirUnpassable, table[i]->MapLayer)) {
+					continue;
+				}
+
 				if (!UnitReachable(caster, *table[i], spell.Range)) {
 					continue;
 				}

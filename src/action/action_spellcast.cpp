@@ -202,7 +202,16 @@
 /* virtual */ void COrder_SpellCast::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
-	input.SetMaxRange(this->Range);
+	//Wyrmgus start
+//	input.SetMaxRange(this->Range);
+	int distance = this->Range;
+	if (Map.IsLayerUnderground(this->MapLayer) && input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
+		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
+			distance = 1;
+		}
+	}
+	input.SetMaxRange(distance);
+	//Wyrmgus end
 
 	Vec2i tileSize;
 	if (this->HasGoal()) {
@@ -352,8 +361,15 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	// when reached DoActionMove changes unit action
 	// FIXME: use return codes from pathfinder
 	CUnit *goal = this->GetGoal();
+	
+	//Wyrmgus start
+	bool obstacle_check = !Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
+	//Wyrmgus end
 
-	if (goal && unit.MapDistanceTo(*goal) <= this->Range) {
+	//Wyrmgus start
+//	if (goal && unit.MapDistanceTo(*goal) <= this->Range) {
+	if (goal && unit.MapDistanceTo(*goal) <= this->Range && obstacle_check) {
+	//Wyrmgus end
 		// there is goal and it is in range
 		//Wyrmgus start
 //		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
@@ -361,7 +377,10 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		//Wyrmgus end
 		this->State++; // cast the spell
 		return false;
-	} else if (!goal && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= this->Range) {
+	//Wyrmgus start
+//	} else if (!goal && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= this->Range) {
+	} else if (!goal && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= this->Range && obstacle_check) {
+	//Wyrmgus end
 		// there is no goal and target spot is in range
 		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
 		this->State++; // cast the spell
