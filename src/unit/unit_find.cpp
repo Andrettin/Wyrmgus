@@ -1077,7 +1077,7 @@ private:
 		}
 
 		//Wyrmgus start
-		if (CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer) == false) {
+		if (Map.IsLayerUnderground(attacker->MapLayer) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer)) {
 			return INT_MAX;
 		}
 		//Wyrmgus end
@@ -1326,7 +1326,7 @@ public:
 //				if (d <= attackrange ||
 //					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 				if ((d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange))) && CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer)) {
+					(d <= range && UnitReachable(*attacker, *dest, attackrange))) && (!Map.IsLayerUnderground(attacker->MapLayer) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer))) {
 				//Wyrmgus end
 					++enemy_count;
 				} else {

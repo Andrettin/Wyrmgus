@@ -2227,10 +2227,19 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 		if (std::get<0>(this->QuestBuildUnits[i]) == quest && std::get<2>(this->QuestBuildUnits[i]) > 0) {
 			bool has_builder = false;
 			CUnitType *type = std::get<1>(this->QuestBuildUnits[i]);
-			for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
-				if (this->UnitTypesCount[AiHelpers.Build[type->Slot][j]->Slot] > 0) {
-					has_builder = true;
-					break;
+			if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < AiHelpers.Build.size()) {
+				for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
+					if (this->UnitTypesCount[AiHelpers.Build[type->Slot][j]->Slot] > 0) {
+						has_builder = true;
+						break;
+					}
+				}
+			} else if (!type->BoolFlag[BUILDING_INDEX].value && type->Slot < AiHelpers.Train.size()) {
+				for (size_t j = 0; j < AiHelpers.Train[type->Slot].size(); ++j) {
+					if (this->UnitTypesCount[AiHelpers.Train[type->Slot][j]->Slot] > 0) {
+						has_builder = true;
+						break;
+					}
 				}
 			}
 			if (!has_builder || !CheckDependByType(*this, *type)) {
@@ -2249,10 +2258,19 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			}
 			
 			CUnitType *type = UnitTypes[unit_type_id];
-			for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
-				if (this->UnitTypesCount[AiHelpers.Build[type->Slot][j]->Slot] > 0) {
-					has_builder = true;
-					break;
+			if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < AiHelpers.Build.size()) {
+				for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
+					if (this->UnitTypesCount[AiHelpers.Build[type->Slot][j]->Slot] > 0) {
+						has_builder = true;
+						break;
+					}
+				}
+			} else if (!type->BoolFlag[BUILDING_INDEX].value && type->Slot < AiHelpers.Train.size()) {
+				for (size_t j = 0; j < AiHelpers.Train[type->Slot].size(); ++j) {
+					if (this->UnitTypesCount[AiHelpers.Train[type->Slot][j]->Slot] > 0) {
+						has_builder = true;
+						break;
+					}
 				}
 			}
 			if (!has_builder || !CheckDependByType(*this, *type)) {

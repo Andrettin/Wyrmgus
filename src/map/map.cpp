@@ -1505,6 +1505,19 @@ bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, int z) const
 
 	return false;
 }
+
+bool CMap::IsLayerUnderground(int z) const
+{
+	if (GameSettings.Inside) {
+		return true;
+	}
+	
+	if (this->Layers[z] > 0) {
+		return true;
+	}
+
+	return false;
+}
 //Wyrmgus end
 
 /**

@@ -443,6 +443,7 @@ public:
 	bool TileBordersBuilding(const Vec2i &pos, int z);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain, int z);
 	bool IsPointInASubtemplateArea(const Vec2i &pos, int z) const;
+	bool IsLayerUnderground(int z) const;
 	//Wyrmgus end
 
 	//UnitCache
