@@ -54,6 +54,9 @@
 #include "settings.h"
 //Wyrmgus end
 #include "tileset.h"
+//Wyrmgus start
+#include "translate.h"
+//Wyrmgus end
 #include "unit.h"
 //Wyrmgus start
 #include "unit_find.h"
@@ -345,6 +348,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		return;
 	}
 	
+	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->Name.c_str());
+	
 	this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
 	this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
 
@@ -354,9 +359,13 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 			continue;
 		}
 		if (CurrentCampaign->StartDate >= std::get<2>(HistoricalTerrains[i]) || std::get<2>(HistoricalTerrains[i]).year == 0) {
+			CTerrainType *historical_terrain = std::get<1>(HistoricalTerrains[i]);
 			Vec2i real_pos(map_start_pos.x + history_pos.x - template_start_pos.x, map_start_pos.y + history_pos.y - template_start_pos.y);
-			if (std::get<1>(HistoricalTerrains[i])) {
-				Map.Field(real_pos, z)->SetTerrain(std::get<1>(HistoricalTerrains[i]));
+			if (historical_terrain) {
+				if (historical_terrain->Overlay && ((historical_terrain->Flags & MapFieldRoad) || (historical_terrain->Flags & MapFieldRailroad)) && !(Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
+					continue;
+				}
+				Map.Field(real_pos, z)->SetTerrain(historical_terrain);
 			} else { //if the terrain type is NULL, then that means a previously set overlay terrain should be removed
 				Map.Field(real_pos, z)->RemoveOverlayTerrain();
 			}
@@ -471,6 +480,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 	}
 	
+	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->Name.c_str());
+
 	for (std::map<std::tuple<int, int, int>, std::string>::iterator iterator = this->CulturalSettlementNames.begin(); iterator != this->CulturalSettlementNames.end(); ++iterator) {
 		int settlement_x = map_start_pos.x + std::get<0>(iterator->first) - template_start_pos.x;
 		int settlement_y = map_start_pos.y + std::get<1>(iterator->first) - template_start_pos.y;
@@ -529,6 +540,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	this->ApplyUnits(template_start_pos, map_start_pos, z);
 	
+	ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
+	
 	for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
 		int map_width = (map_end.x - map_start_pos.x);
 		int map_height = (map_end.y - map_start_pos.y);
@@ -569,6 +582,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
+
+	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->Name.c_str());
 
 	// now, generate the units and heroes that were set to be generated at a random position (by having their position set to {-1, -1})
 	this->ApplyUnits(template_start_pos, map_start_pos, z, true);

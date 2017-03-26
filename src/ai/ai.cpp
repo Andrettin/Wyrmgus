@@ -287,37 +287,39 @@ static void AiCheckUnits()
 		}
 	}
 	
-	//check if can hire any mercenaries
-	for (int i = 0; i < PlayerMax; ++i) {
-		if (i == AiPlayer->Player->Index) {
-			continue;
-		}
-		if (Players[i].Type != PlayerComputer || !AiPlayer->Player->HasBuildingAccess(Players[i])) {
-			continue;
-		}
-		for (int j = 0; j < Players[i].GetUnitCount(); ++j) {
-			CUnit *mercenary_unit = &Players[i].GetUnit(j);
-			if (!mercenary_unit || !mercenary_unit->IsAliveOnMap() || !mercenary_unit->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_unit->IsVisibleAsGoal(*AiPlayer->Player)) {
+	if (!AiPlayer->Player->HasNeutralFactionType()) {
+		//check if can hire any mercenaries
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (i == AiPlayer->Player->Index) {
 				continue;
 			}
+			if (Players[i].Type != PlayerComputer || !AiPlayer->Player->HasBuildingAccess(Players[i])) {
+				continue;
+			}
+			for (int j = 0; j < Players[i].GetUnitCount(); ++j) {
+				CUnit *mercenary_unit = &Players[i].GetUnit(j);
+				if (!mercenary_unit || !mercenary_unit->IsAliveOnMap() || !mercenary_unit->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_unit->IsVisibleAsGoal(*AiPlayer->Player)) {
+					continue;
+				}
 
-			if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && mercenary_unit->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL) { //check if can hire any heroes at the mercenary camp
-				for (size_t k = 0; k < mercenary_unit->SoldUnits.size(); ++k) {
-					int buy_costs[MaxCosts];
-					memset(buy_costs, 0, sizeof(buy_costs));
-					buy_costs[CopperCost] = mercenary_unit->SoldUnits[k]->GetPrice();
-					if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*mercenary_unit->SoldUnits[k]->Type) >= 1) {
-						CommandBuy(*mercenary_unit, mercenary_unit->SoldUnits[k], AiPlayer->Player->Index);
-						break;
+				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && mercenary_unit->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL) { //check if can hire any heroes at the mercenary camp
+					for (size_t k = 0; k < mercenary_unit->SoldUnits.size(); ++k) {
+						int buy_costs[MaxCosts];
+						memset(buy_costs, 0, sizeof(buy_costs));
+						buy_costs[CopperCost] = mercenary_unit->SoldUnits[k]->GetPrice();
+						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*mercenary_unit->SoldUnits[k]->Type) >= 1) {
+							CommandBuy(*mercenary_unit, mercenary_unit->SoldUnits[k], AiPlayer->Player->Index);
+							break;
+						}
 					}
 				}
-			}
-			
-			
-			for (std::map<int, int>::iterator iterator = mercenary_unit->UnitStock.begin(); iterator != mercenary_unit->UnitStock.end(); ++iterator) {
-				if (iterator->second && !UnitTypes[iterator->first]->BoolFlag[ITEM_INDEX].value && CheckDependByType(Players[i], *UnitTypes[iterator->first]) && AiPlayer->Player->CheckLimits(*UnitTypes[iterator->first]) >= 1 && !AiPlayer->Player->CheckUnitType(*UnitTypes[iterator->first], true)) {
-					CommandTrainUnit(*mercenary_unit, *UnitTypes[iterator->first], AiPlayer->Player->Index, FlushCommands);
-					break; // only hire one unit per mercenary camp per second
+				
+				
+				for (std::map<int, int>::iterator iterator = mercenary_unit->UnitStock.begin(); iterator != mercenary_unit->UnitStock.end(); ++iterator) {
+					if (iterator->second && !UnitTypes[iterator->first]->BoolFlag[ITEM_INDEX].value && CheckDependByType(Players[i], *UnitTypes[iterator->first]) && AiPlayer->Player->CheckLimits(*UnitTypes[iterator->first]) >= 1 && !AiPlayer->Player->CheckUnitType(*UnitTypes[iterator->first], true)) {
+						CommandTrainUnit(*mercenary_unit, *UnitTypes[iterator->first], AiPlayer->Player->Index, FlushCommands);
+						break; // only hire one unit per mercenary camp per second
+					}
 				}
 			}
 		}

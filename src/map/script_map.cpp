@@ -676,6 +676,80 @@ static int CclSetMapTemplateTileLabel(lua_State *l)
 	return 1;
 }
 
+static int CclSetMapTemplatePathway(lua_State *l)
+{
+	std::string map_template_ident = LuaToString(l, 1);
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	if (!map_template) {
+		LuaError(l, "Map template doesn't exist.\n");
+	}
+
+	std::string terrain_ident = LuaToString(l, 2);
+	CTerrainType *terrain = NULL;
+	if (!terrain_ident.empty()) {
+		terrain = GetTerrainType(terrain_ident);
+		if (!terrain) {
+			LuaError(l, "Terrain doesn't exist");
+		}
+	}
+
+	Vec2i start_pos;
+	CclGetPos(l, &start_pos.x, &start_pos.y, 3);
+	
+	if (start_pos.x < 0 || start_pos.x >= map_template->Width || start_pos.y < 0 || start_pos.y >= map_template->Height) {
+		LuaError(l, "Invalid map coordinate : (%d, %d)" _C_ start_pos.x _C_ start_pos.y);
+	}
+
+	Vec2i end_pos;
+	CclGetPos(l, &end_pos.x, &end_pos.y, 4);
+	
+	if (end_pos.x < 0 || end_pos.x >= map_template->Width || end_pos.y < 0 || end_pos.y >= map_template->Height) {
+		LuaError(l, "Invalid map coordinate : (%d, %d)" _C_ end_pos.x _C_ end_pos.y);
+	}
+
+	CDate date;
+	date.year = 0;
+	date.month = 1;
+	date.day = 1;
+	const int nargs = lua_gettop(l);
+	if (nargs >= 5) {
+		CclGetDate(l, &date, 5);
+	}
+	
+	Vec2i pos(start_pos);
+	Vec2i pathway_length(end_pos - start_pos);
+	Vec2i pathway_change(pathway_length.x ? pathway_length.x / abs(pathway_length.x) : 0, pathway_length.y ? pathway_length.y / abs(pathway_length.y) : 0);
+	pathway_length.x = abs(pathway_length.x);
+	pathway_length.y = abs(pathway_length.y);
+	while (pos != end_pos) {
+		Vec2i current_length(pos - start_pos);
+		current_length.x = abs(current_length.x);
+		current_length.y = abs(current_length.y);
+		if (current_length.x > 100 || current_length.y > 100) {
+			break;
+		}
+		if (pathway_length.x == pathway_length.y) {
+			pos += pathway_change;
+		} else if (pathway_length.x > pathway_length.y) {
+			pos.x += pathway_change.x;
+			if (pathway_length.y && current_length.x % (std::max(1, pathway_length.x / pathway_length.y)) == 0 && pos.y != end_pos.y) {
+				map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+				pos.y += pathway_change.y;
+			}
+		} else if (pathway_length.y > pathway_length.x) {
+			pos.y += pathway_change.y;
+			if (pathway_length.x && current_length.y % (std::max(1, pathway_length.y / pathway_length.x)) == 0 && pos.x != end_pos.x) {
+				map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+				pos.x += pathway_change.x;
+			}
+		}
+
+		map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+	}
+
+	return 1;
+}
+
 static int CclSetMapTemplateCulturalSettlementName(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
@@ -2069,6 +2143,7 @@ void MapCclRegister()
 	lua_register(Lua, "GetTerrainFeatures", CclGetTerrainFeatures);
 	lua_register(Lua, "SetMapTemplateTileTerrain", CclSetMapTemplateTileTerrain);
 	lua_register(Lua, "SetMapTemplateTileLabel", CclSetMapTemplateTileLabel);
+	lua_register(Lua, "SetMapTemplatePathway", CclSetMapTemplatePathway);
 	lua_register(Lua, "SetMapTemplateCulturalSettlementName", CclSetMapTemplateCulturalSettlementName);
 	lua_register(Lua, "SetMapTemplateFactionCulturalSettlementName", CclSetMapTemplateFactionCulturalSettlementName);
 	lua_register(Lua, "SetMapTemplateResource", CclSetMapTemplateResource);
