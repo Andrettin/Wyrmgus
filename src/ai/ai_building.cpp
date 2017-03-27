@@ -326,6 +326,12 @@ private:
 
 bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 {
+	//Wyrmgus start
+	if (!mine.Type->BoolFlag[BUILDING_INDEX].value || !mine.Type->GivesResource) {
+		return false; //if isn't a building, then it isn't a mine, but a metal rock/resource pile, which is not attractive enough to build a hall nearby; if its type doesn't give a resource, then it isn't a mine but an industrial building, which should already be in a settlement
+	}
+	//Wyrmgus end
+	
 	// Check units around mine
 	const Vec2i offset(5, 5);
 	const Vec2i minpos = mine.tilePos - offset;
@@ -351,7 +357,10 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 			return false;
 		}
 		// Town hall near mine
-		if (unit.Type->CanStore[resource]) {
+		//Wyrmgus start
+//		if (unit.Type->CanStore[resource]) {
+		if (unit.Type->CanStore[mine.GivesResource]) {
+		//Wyrmgus end
 			return false;
 		}
 		// Town hall may not be near but we may be using it, check
@@ -388,7 +397,19 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	//Wyrmgus end
 	//Wyrmgus start
 //	CUnit *mine = ResourceOnMap(pos, resource);
-	CUnit *mine = ResourceOnMap(pos, resource, z, false);
+	CUnit *mine = NULL;
+	if (resource != -1) {
+		mine = ResourceOnMap(pos, resource, z, false);
+	} else {
+		for (int i = 1; i < MaxCosts; ++i) {
+			if (type.CanStore[i]) {
+				mine = ResourceOnMap(pos, i, z, false);
+				if (mine) {
+					break;
+				}
+			}
+		}
+	}
 	//Wyrmgus end
 	if (mine && IsAUsableMine(*mine)) {
 		//Wyrmgus start
@@ -652,7 +673,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 			//Wyrmgus end
 				//Wyrmgus start
 //				return AiFindHallPlace(worker, type, startPos, i, resultPos);
-				return AiFindHallPlace(worker, type, startPos, i, resultPos, ignore_exploration, z);
+				return AiFindHallPlace(worker, type, startPos, -1, resultPos, ignore_exploration, z);
 				//Wyrmgus end
 			}
 		} else {
