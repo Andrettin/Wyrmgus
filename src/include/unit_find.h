@@ -33,6 +33,9 @@
 
 //@{
 
+//Wyrmgus start
+#include "actions.h"
+//Wyrmgus end
 #include "map.h"
 #include "pathfinder.h"
 #include "unit.h"
@@ -149,6 +152,12 @@ class IsOrganicType : public CUnitFilter
 {
 public:
 	bool operator()(const CUnit *unit) const { return unit->Type->BoolFlag[ORGANIC_INDEX].value; }
+};
+
+class IsBuiltUnit : public CUnitFilter
+{
+public:
+	bool operator()(const CUnit *unit) const { return unit->CurrentAction() != UnitActionBuilt; }
 };
 //Wyrmgus end
 
