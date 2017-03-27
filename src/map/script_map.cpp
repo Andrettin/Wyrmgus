@@ -721,27 +721,37 @@ static int CclSetMapTemplatePathway(lua_State *l)
 	Vec2i pathway_change(pathway_length.x ? pathway_length.x / abs(pathway_length.x) : 0, pathway_length.y ? pathway_length.y / abs(pathway_length.y) : 0);
 	pathway_length.x = abs(pathway_length.x);
 	pathway_length.y = abs(pathway_length.y);
+	int offset = 0;
 	while (pos != end_pos) {
 		Vec2i current_length(pos - start_pos);
 		current_length.x = abs(current_length.x);
 		current_length.y = abs(current_length.y);
-		if (current_length.x > 100 || current_length.y > 100) {
-			break;
-		}
 		if (pathway_length.x == pathway_length.y) {
 			pos += pathway_change;
 		} else if (pathway_length.x > pathway_length.y) {
 			pos.x += pathway_change.x;
-			if (pathway_length.y && current_length.x % (std::max(1, pathway_length.x / pathway_length.y)) == 0 && pos.y != end_pos.y) {
-				map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
-				pos.y += pathway_change.y;
+			if (pathway_length.y && pos.y != end_pos.y) {
+				if (pathway_length.x % pathway_length.y != 0 && current_length.x % (pathway_length.x / (pathway_length.x % pathway_length.y)) == 0) {
+					offset += 1;
+				} else if ((current_length.x - offset) % (std::max(1, pathway_length.x / pathway_length.y)) == 0) {
+					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+					pos.y += pathway_change.y;
+				}
 			}
 		} else if (pathway_length.y > pathway_length.x) {
 			pos.y += pathway_change.y;
-			if (pathway_length.x && current_length.y % (std::max(1, pathway_length.y / pathway_length.x)) == 0 && pos.x != end_pos.x) {
-				map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
-				pos.x += pathway_change.x;
+			if (pathway_length.x && pos.x != end_pos.x) {
+				if (pathway_length.y % pathway_length.x != 0 && current_length.y % (pathway_length.y / (pathway_length.y % pathway_length.x)) == 0) {
+					offset += 1;
+				} else if ((current_length.y - offset) % (std::max(1, pathway_length.y / pathway_length.x)) == 0) {
+					map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
+					pos.x += pathway_change.x;
+				}
 			}
+		}
+
+		if (pos.x < 0 || pos.x >= map_template->Width || pos.y < 0 || pos.y >= map_template->Height) {
+			break;
 		}
 
 		map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
