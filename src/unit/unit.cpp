@@ -6379,7 +6379,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 
 	//Wyrmgus start
 //	if (target.Player->AiEnabled == false) {
-	if (target.Player->AiEnabled == false && target.Player->Type != PlayerNeutral && attacker.Player->Type != PlayerNeutral) { // allow neutral units to strike back, or units to strike back from neutral units
+	if (target.Player->AiEnabled == false && target.Player->Type != PlayerNeutral) { // allow neutral units to strike back
 	//Wyrmgus end
 		if (target.CurrentAction() == UnitActionAttack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
