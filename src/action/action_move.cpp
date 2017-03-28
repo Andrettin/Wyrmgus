@@ -38,6 +38,9 @@
 #include "action/action_move.h"
 
 #include "ai.h"
+//Wyrmgus start
+#include "../ai/ai_local.h" //for increasing pathway steps
+//Wyrmgus end
 #include "animation.h"
 //Wyrmgus start
 #include "commands.h"
@@ -297,6 +300,26 @@ int DoActionMove(CUnit &unit)
 		//Wyrmgus end
 		//Wyrmgus start
 		PlayUnitSound(unit, VoiceStep);			
+		//Wyrmgus end
+		//Wyrmgus start
+		const CMapField &mf_next = *Map.Field(pos, unit.MapLayer);
+		if (unit.Player->AiEnabled && unit.Type->UnitType == UnitTypeLand && (mf_next.Flags & MapFieldLandAllowed) && !(mf_next.Flags & MapFieldNoBuilding)) { //if the moving unit is AI controlled, increase the pathway step count (used by the AI to determine where to build roads)
+			if (!(mf_next.Flags & MapFieldRailroad)) {
+				if (unit.CurrentAction() == UnitActionResource) {
+					if (unit.CurrentResource == CopperCost || unit.CurrentResource == SilverCost || unit.CurrentResource == GoldCost || unit.CurrentResource == CoalCost) {
+						if (unit.Player->Ai->MineSteps.find(std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)) == unit.Player->Ai->MineSteps.end()) {
+							unit.Player->Ai->MineSteps[std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)] = 0;
+						}
+						unit.Player->Ai->MineSteps[std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)] += 1;
+					} else if (unit.CurrentResource == TradeCost) {
+						if (unit.Player->Ai->TradeSteps.find(std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)) == unit.Player->Ai->TradeSteps.end()) {
+							unit.Player->Ai->TradeSteps[std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)] = 0;
+						}
+						unit.Player->Ai->TradeSteps[std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)] += 1;
+					}
+				}
+			}
+		}
 		//Wyrmgus end
 
 		// Remove unit from the current selection
