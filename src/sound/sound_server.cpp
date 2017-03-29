@@ -411,14 +411,17 @@ bool SampleIsPlaying(CSample *sample)
 bool UnitSoundIsPlaying(Origin *origin)
 {
 	for (int i = 0; i < MaxChannels; ++i) {
-		if (origin && Channels[i].Unit && origin->Id && Channels[i].Unit->Id
-			//Wyrmgus start
+		//Wyrmgus start
+//		if (origin && Channels[i].Unit && origin->Id && Channels[i].Unit->Id
 //			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
-			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing
-			&& origin->Base && Channels[i].Unit->Base
+		if (
+			origin && Channels[i].Playing
 			&& Channels[i].Voice != -1
-			&& Channels[i].Voice != VoiceHit && Channels[i].Voice != VoiceMiss && Channels[i].Voice != VoiceStep) {
-			//Wyrmgus end
+			&& Channels[i].Voice != VoiceHit && Channels[i].Voice != VoiceMiss && Channels[i].Voice != VoiceStep
+			&& Channels[i].Unit && origin->Id && Channels[i].Unit->Id
+			&& origin->Id == Channels[i].Unit->Id
+		) {
+		//Wyrmgus end
 			return true;
 		}
 	}

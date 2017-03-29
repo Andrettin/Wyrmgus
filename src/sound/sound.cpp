@@ -464,7 +464,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 
 	//Wyrmgus start
 //	if (UnitSoundIsPlaying(&source)) {
-	if (UnitSoundIsPlaying(&source) && voice != VoiceHit && voice != VoiceMiss && voice != VoiceStep) {
+	if (voice != VoiceHit && voice != VoiceMiss && voice != VoiceStep && UnitSoundIsPlaying(&source)) {
 	//Wyrmgus end
 		return;
 	}

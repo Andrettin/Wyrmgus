@@ -322,11 +322,13 @@ static bool PickUpItem(CUnit &unit)
 	SelectAroundUnit(unit, unit.GetReactionRange(), table);
 
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.GetReactionRange())) {
+		if (!table[i]->Removed) {
 			if (CanPickUp(unit, *table[i])) {
 				if (table[i]->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value) >= table[i]->Variable[HITPOINTHEALING_INDEX].Value) {
-					CommandPickUp(unit, *table[i], FlushCommands);
-					return true;
+					if (UnitReachable(unit, *table[i], unit.GetReactionRange())) {
+						CommandPickUp(unit, *table[i], FlushCommands);
+						return true;
+					}
 				}
 			}
 		}
