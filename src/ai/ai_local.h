@@ -37,6 +37,9 @@
 ----------------------------------------------------------------------------*/
 
 #include <vector>
+//Wyrmgus start
+#include <tuple>
+//Wyrmgus end
 
 #include "upgrade_structs.h" // MaxCost
 #include "unit_cache.h"
@@ -353,6 +356,8 @@ public:
 	//Wyrmgus start
 	int LastPathwayConstructionBuilding;		/// Last building checked for pathway construction in this turn
 	std::vector<CUnit *> Scouts;				/// AI scouting units
+	std::map<std::tuple<int, int, int>, int> PathwaySteps;	/// Steps counted for building pathways
+	std::map<std::tuple<int, int, int>, int> RailSteps;		/// Steps counted for building railroads
 	//Wyrmgus end
 };
 

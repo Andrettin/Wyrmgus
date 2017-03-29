@@ -37,7 +37,13 @@
 
 #include "action/action_move.h"
 
+//Wyrmgus start
+#include "action/action_resource.h"
+//Wyrmgus end
 #include "ai.h"
+//Wyrmgus start
+#include "../ai/ai_local.h" //for increasing pathway steps
+//Wyrmgus end
 #include "animation.h"
 //Wyrmgus start
 #include "commands.h"
@@ -297,6 +303,61 @@ int DoActionMove(CUnit &unit)
 		//Wyrmgus end
 		//Wyrmgus start
 		PlayUnitSound(unit, VoiceStep);			
+		//Wyrmgus end
+		//Wyrmgus start
+		const CMapField &mf_next = *Map.Field(pos, unit.MapLayer);
+		if (unit.Player->AiEnabled && unit.CurrentAction() == UnitActionResource && unit.Type->UnitType == UnitTypeLand && (mf_next.Flags & MapFieldLandAllowed) && !(mf_next.Flags & MapFieldNoBuilding)) { //if the moving unit is AI controlled and is a harvester/trader, increase the pathway step count (used by the AI to determine where to build roads)
+			COrder_Resource &resource_order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
+			if (resource_order.GetCurrentResource() != WoodCost && resource_order.GetCurrentResource() != StoneCost) { //only count steps of harvesters (and not those gathering terrain resources, as we don't want harvesters to cover former tree and rock tiles with roads)
+				if (!(mf_next.Flags & MapFieldRoad) && !(mf_next.Flags & MapFieldRailroad)) {
+					if (unit.Player->Ai->PathwaySteps.find(std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)) == unit.Player->Ai->PathwaySteps.end()) {
+						unit.Player->Ai->PathwaySteps[std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)] = 0;
+					}
+					unit.Player->Ai->PathwaySteps[std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)] += 1;
+				}
+
+				if (unit.Type->BoolFlag[RAIL_INDEX].value && !(mf_next.Flags & MapFieldRailroad)) {
+					if (unit.Player->Ai->RailSteps.find(std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)) == unit.Player->Ai->RailSteps.end()) {
+						unit.Player->Ai->RailSteps[std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)] = 0;
+					}
+					unit.Player->Ai->RailSteps[std::tuple<int, int, int>(pos.x, pos.y, unit.MapLayer)] += 1;
+				}
+				if (posd.x != 0 && posd.y != 0) { //if the tile is diagonal, also add step counts to the corresponding non-diagonally adjacent tiles
+					const CMapField &mf_next_hor = *Map.Field(pos.x, pos.y - posd.y, unit.MapLayer);
+					const CMapField &mf_next_ver = *Map.Field(pos.x - posd.x, pos.y, unit.MapLayer);
+					if ((mf_next_hor.Flags & MapFieldLandAllowed) && !(mf_next_hor.Flags & MapFieldNoBuilding)) {
+						if (!(mf_next_hor.Flags & MapFieldRoad) && !(mf_next_hor.Flags & MapFieldRailroad)) {
+							if (unit.Player->Ai->PathwaySteps.find(std::tuple<int, int, int>(pos.x, pos.y - posd.y, unit.MapLayer)) == unit.Player->Ai->PathwaySteps.end()) {
+								unit.Player->Ai->PathwaySteps[std::tuple<int, int, int>(pos.x, pos.y - posd.y, unit.MapLayer)] = 0;
+							}
+							unit.Player->Ai->PathwaySteps[std::tuple<int, int, int>(pos.x, pos.y - posd.y, unit.MapLayer)] += 1;
+						}
+
+						if (unit.Type->BoolFlag[RAIL_INDEX].value && !(mf_next_hor.Flags & MapFieldRailroad)) {
+							if (unit.Player->Ai->RailSteps.find(std::tuple<int, int, int>(pos.x, pos.y - posd.y, unit.MapLayer)) == unit.Player->Ai->RailSteps.end()) {
+								unit.Player->Ai->RailSteps[std::tuple<int, int, int>(pos.x, pos.y - posd.y, unit.MapLayer)] = 0;
+							}
+							unit.Player->Ai->RailSteps[std::tuple<int, int, int>(pos.x, pos.y - posd.y, unit.MapLayer)] += 1;
+						}
+					}
+					if ((mf_next_ver.Flags & MapFieldLandAllowed) && !(mf_next_ver.Flags & MapFieldNoBuilding)) {
+						if (!(mf_next_ver.Flags & MapFieldRoad) && !(mf_next_ver.Flags & MapFieldRailroad)) {
+							if (unit.Player->Ai->PathwaySteps.find(std::tuple<int, int, int>(pos.x - posd.x, pos.y, unit.MapLayer)) == unit.Player->Ai->PathwaySteps.end()) {
+								unit.Player->Ai->PathwaySteps[std::tuple<int, int, int>(pos.x - posd.x, pos.y, unit.MapLayer)] = 0;
+							}
+							unit.Player->Ai->PathwaySteps[std::tuple<int, int, int>(pos.x - posd.x, pos.y, unit.MapLayer)] += 1;
+						}
+
+						if (unit.Type->BoolFlag[RAIL_INDEX].value && !(mf_next_ver.Flags & MapFieldRailroad)) {
+							if (unit.Player->Ai->RailSteps.find(std::tuple<int, int, int>(pos.x - posd.x, pos.y, unit.MapLayer)) == unit.Player->Ai->RailSteps.end()) {
+								unit.Player->Ai->RailSteps[std::tuple<int, int, int>(pos.x - posd.x, pos.y, unit.MapLayer)] = 0;
+							}
+							unit.Player->Ai->RailSteps[std::tuple<int, int, int>(pos.x - posd.x, pos.y, unit.MapLayer)] += 1;
+						}
+					}
+				}
+			}
+		}
 		//Wyrmgus end
 
 		// Remove unit from the current selection

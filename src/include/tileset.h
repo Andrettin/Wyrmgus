@@ -106,7 +106,6 @@ class CUnitType;
 
 #define MapFieldRoad 0x01000000				/// Road (moves faster)
 #define MapFieldRailroad 0x02000000			/// Railroad (moves faster, even faster than with the road)
-#define MapFieldNoRail 0x04000000			/// Marker that there's no railroad, used for rail movemasks
 //Wyrmgus end
 
 /**

@@ -799,7 +799,14 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				cost += AStarUnknownTerrainCost;
 			}
 			// Add tile movement cost
-			cost += mf->getCost();
+			//Wyrmgus start
+//			cost += mf->getCost();
+			if (unit.Type->BoolFlag[RAIL_INDEX].value) {
+				cost += mf->getRailCost();
+			} else {
+				cost += mf->getCost();
+			}
+			//Wyrmgus end
 			++mf;
 		} while (--i);
 		//Wyrmgus start

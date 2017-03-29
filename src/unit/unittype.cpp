@@ -1124,8 +1124,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					MapFieldUnpassable;
 			}
 			
-			if (type.BoolFlag[RAIL_INDEX].value) {
-				type.MovementMask |= MapFieldNoRail;
+			if (type.BoolFlag[RAIL_INDEX].value) { //rail units can move very slowly through non-railed terrain... but can't move at all through rough, non-buildable terrain
+				type.MovementMask |= MapFieldNoBuilding;
 			}
 			//Wyrmgus end
 			break;

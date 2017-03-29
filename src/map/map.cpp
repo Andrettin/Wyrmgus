@@ -1478,22 +1478,38 @@ bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse)
 
 bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
 {
-	for (int sub_x = -2; sub_x <= 2; ++sub_x) {
-		for (int sub_y = -2; sub_y <= 2; ++sub_y) {
+	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
 			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
 			CMapField &mf = *Map.Field(adjacent_pos, z);
 			
-			const CUnitCache &cache = mf.UnitCache;
-			for (size_t i = 0; i != cache.size(); ++i) {
-				CUnit &unit = *cache[i];
-				if (unit.IsAliveOnMap()) {
-					if (unit.Type->BoolFlag[BUILDING_INDEX].value || unit.Type->GivesResource) { // also return true for resource-giving units, so that unpassable terrain isn't generated near them
-						return true;
-					}
-				}
+			if (mf.CheckMask(MapFieldBuilding)) {
+				return true;
+			}
+		}
+	}
+		
+	return false;
+}
+
+bool CMap::TileBordersPathway(const Vec2i &pos, int z, bool only_railroad)
+{
+	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
+				continue;
+			}
+			CMapField &mf = *Map.Field(adjacent_pos, z);
+			
+			if (
+				(!only_railroad && mf.CheckMask(MapFieldRoad))
+				|| mf.CheckMask(MapFieldRailroad)
+			) {
+				return true;
 			}
 		}
 	}

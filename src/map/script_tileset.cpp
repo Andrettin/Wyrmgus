@@ -62,7 +62,6 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 		{"mud", MapFieldMud},
 		{"railroad", MapFieldRailroad},
 		{"road", MapFieldRoad},
-		{"no-rail", MapFieldNoRail},
 		{"stone-floor", MapFieldStoneFloor},
 		{"stumps", MapFieldStumps},
 		//Wyrmgus end
