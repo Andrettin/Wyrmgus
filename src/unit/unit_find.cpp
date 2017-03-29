@@ -611,8 +611,8 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 		price_modifier = std::max(price_modifier, 1);
 		distance = distance * 100 / price_modifier;
 	}
-	if (!mine.Type->BoolFlag[CANHARVEST_INDEX].value) { // if it is a deposit rather than a readily-harvestable resource, double the distance score
-		distance *= 2;
+	if (!mine.Type->BoolFlag[CANHARVEST_INDEX].value) { // if it is a deposit rather than a readily-harvestable resource, multiply the distance score
+		distance *= 8;
 	}
 	//Wyrmgus end
 	if (check_usage) {

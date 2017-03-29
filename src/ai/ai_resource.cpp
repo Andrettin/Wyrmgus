@@ -1955,57 +1955,105 @@ static void AiCheckPathwayConstruction()
 				continue;
 			}
 			
+			std::vector<Vec2i> pathway_tiles;
 			for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->TileWidth + 1; ++x) {
 				for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->TileHeight + 1; ++y) {
-					if (pathway_types.size() == 0) {
-						return;
-					}
-					
-					if (!Map.Info.IsPointOnMap(x, y, unit.MapLayer)) {
-						continue;
-					}
-					CMapField &mf = *Map.Field(x, y, unit.MapLayer);
-					if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
-						continue;
-					}
-					Vec2i pathway_pos(x, y);
-					
-					bool built_pathway = false;
-					
-					for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
-						if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && unit.GivesResource != CopperCost && unit.GivesResource != SilverCost && unit.GivesResource != GoldCost && unit.GivesResource != CoalCost) { //build roads around buildings, not railroads (except for mines)
-							continue;
-						}
-						
-						if ((!(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRailroad)) || (!(mf.Flags & MapFieldRoad) && !(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRoad))) {
-							if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer) || !CanBuildHere(NULL, *pathway_types[p], pathway_pos, unit.MapLayer)) {
-								continue;
-							}
-							
-							const int resourceNeeded = AiCheckUnitTypeCosts(*pathway_types[p]);
-							if (resourceNeeded) {
-								pathway_types.erase(std::remove(pathway_types.begin(), pathway_types.end(), pathway_types[p]), pathway_types.end());
-								continue;
-							}
-							//
-							// Find a free worker, who can build pathways for this building
-							//
-							const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-							for (unsigned int j = 0; j < tablep[pathway_types[p]->Slot].size(); ++j) {
-								//
-								// The type is available
-								//
-								if (unit_count[tablep[pathway_types[p]->Slot][j]->Slot]) {
-									if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, unit.MapLayer)) {
-										built_pathway = true;
-										break;
+					pathway_tiles.push_back(Vec2i(x, y));
+				}
+			}
+
+			if (unit.Type->GivesResource) { //if is a mine, build pathways to the depot as well
+				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), 32, unit.GivesResource, unit.MapLayer);
+				if (depot) {
+					Vec2i pos_diff(depot->tilePos - unit.tilePos);
+					Vec2i pos_dir(pos_diff.x ? pos_diff.x / abs(pos_diff.x) : 0, pos_diff.y ? pos_diff.y / abs(pos_diff.y) : 0);
+					if (pos_dir.y) {
+						for (int x = unit.tilePos.x - 4; x < (unit.tilePos.x + unit.Type->TileWidth + 4); ++x) {
+							for (int sub_x = depot->tilePos.x - 4; sub_x < (depot->tilePos.x + depot->Type->TileWidth + 4); ++sub_x) {
+								if (x == sub_x) {
+									int tile_count = 0;
+									for (int y = unit.tilePos.y; y != (depot->tilePos.y + pos_dir.y); y += pos_dir.y) {
+										pathway_tiles.push_back(Vec2i(x, y));
+										tile_count += 1;
+										if (tile_count > 32) { //something went wrong
+											fprintf(stderr, "Error in AiCheckPathwayConstruction: mine path is too long.\n");
+											break;
+										}
 									}
 								}
 							}
 						}
-						if (built_pathway) {
-							break;
+					}
+					if (pos_dir.x) {
+						for (int y = unit.tilePos.y - 4; (y < unit.tilePos.y + unit.Type->TileHeight + 4); ++y) {
+							for (int sub_y = depot->tilePos.y - 4; sub_y < (depot->tilePos.y + depot->Type->TileHeight + 4); ++sub_y) {
+								if (y == sub_y) {
+									int tile_count = 0;
+									for (int x = unit.tilePos.x; x != (depot->tilePos.x + pos_dir.x); x += pos_dir.x) {
+										pathway_tiles.push_back(Vec2i(x, y));
+										tile_count += 1;
+										if (tile_count > 32) { //something went wrong
+											fprintf(stderr, "Error in AiCheckPathwayConstruction: mine path is too long.\n");
+											break;
+										}
+									}
+								}
+							}
 						}
+					}
+				}
+			}
+			
+			for (size_t z = 0; z != pathway_tiles.size(); ++z) {
+				Vec2i pathway_pos(pathway_tiles[z].x, pathway_tiles[z].y);
+				if (!Map.Info.IsPointOnMap(pathway_pos, unit.MapLayer)) {
+					continue;
+				}
+				CMapField &mf = *Map.Field(pathway_pos, unit.MapLayer);
+				if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+					continue;
+				}
+					
+				if (pathway_types.size() == 0) {
+					AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
+					return;
+				}
+
+				bool built_pathway = false;
+					
+				for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
+					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && unit.GivesResource != CopperCost && unit.GivesResource != SilverCost && unit.GivesResource != GoldCost && unit.GivesResource != CoalCost) { //build roads around buildings, not railroads (except for mines)
+						continue;
+					}
+						
+					if ((!(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRailroad)) || (!(mf.Flags & MapFieldRoad) && !(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRoad))) {
+						if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer) || !CanBuildHere(NULL, *pathway_types[p], pathway_pos, unit.MapLayer)) {
+							continue;
+						}
+							
+						const int resourceNeeded = AiCheckUnitTypeCosts(*pathway_types[p]);
+						if (resourceNeeded) {
+							pathway_types.erase(std::remove(pathway_types.begin(), pathway_types.end(), pathway_types[p]), pathway_types.end());
+							continue;
+						}
+						//
+						// Find a free worker, who can build pathways for this building
+						//
+						const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+						for (unsigned int j = 0; j < tablep[pathway_types[p]->Slot].size(); ++j) {
+							//
+							// The type is available
+							//
+							if (unit_count[tablep[pathway_types[p]->Slot][j]->Slot]) {
+								if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, unit.MapLayer)) {
+									built_pathway = true;
+									break;
+								}
+							}
+						}
+					}
+					if (built_pathway) {
+						break;
 					}
 				}
 			}
