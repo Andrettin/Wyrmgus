@@ -1921,146 +1921,102 @@ static void AiCheckPathwayConstruction()
 	const int n = AiPlayer->Player->GetUnitCount();
 	int k = 0;
 	
-	const CUnit *test_worker = NULL;
-
 	// Selector for next unit
 	if (AiPlayer->LastPathwayConstructionBuilding) {
 		for (int i = n - 1; i >= 0; --i) {
 			const CUnit &unit = AiPlayer->Player->GetUnit(i);
 			if (UnitNumber(unit) == AiPlayer->LastPathwayConstructionBuilding) {
 				k = i;
-			}
-			if (unit.IsAliveOnMap() && unit.Type->BoolFlag[HARVESTER_INDEX].value) {
-				test_worker = &unit;
-			}
-		}
-	}
-	
-	//build railroads
-	for (std::map<std::tuple<int, int, int>, int>::reverse_iterator iterator = AiPlayer->RailSteps.rbegin(); iterator != AiPlayer->RailSteps.rend(); ++iterator) {
-		if (pathway_types.size() == 0) {
-			return;
-		}
-		
-		Vec2i pathway_pos(std::get<0>(iterator->first), std::get<1>(iterator->first));
-		int z = std::get<2>(iterator->first);
-		CMapField &mf = *Map.Field(pathway_pos, z);
-		
-		if (iterator->second < 1) { //need at least 1 step before the AI will build a pathway there
-			continue;
-		}
-		
-		if ((mf.Flags & MapFieldBuilding) || (mf.Flags & MapFieldRailroad)) { //something was built here, or a pathway was already built, clear pathway steps
-			AiPlayer->RailSteps.erase(iterator->first);
-			continue;
-		}
-		
-		if (AiEnemyUnitsInDistance(*AiPlayer->Player, NULL, pathway_pos, 8, z)) { //don't build a pathway close to an enemy
-			continue;
-		}
-
-		bool built_pathway = false;
-		for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
-			if (!(pathway_types[p]->TerrainType->Flags & MapFieldRailroad)) {
-				continue;
-			}
-
-			if (!(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRailroad)) {
-				if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, z) || !CanBuildHere(test_worker, *pathway_types[p], pathway_pos, z)) {
-					continue;
-				}
-							
-				const int resourceNeeded = AiCheckUnitTypeCosts(*pathway_types[p]);
-				if (resourceNeeded) {
-					pathway_types.erase(std::remove(pathway_types.begin(), pathway_types.end(), pathway_types[p]), pathway_types.end());
-					continue;
-				}
-
-				//
-				// Find a free worker, who can build pathways for this building
-				//
-				const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-				for (unsigned int j = 0; j < tablep[pathway_types[p]->Slot].size(); ++j) {
-					//
-					// The type is available
-					//
-					if (unit_count[tablep[pathway_types[p]->Slot][j]->Slot]) {
-						if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, z)) {
-							built_pathway = true;
-							break;
-						}
-					}
-				}
-			}
-			if (built_pathway) {
 				break;
 			}
 		}
 	}
 
-	//build roads
-	for (std::map<std::tuple<int, int, int>, int>::reverse_iterator iterator = AiPlayer->PathwaySteps.rbegin(); iterator != AiPlayer->PathwaySteps.rend(); ++iterator) {
-		if (pathway_types.size() == 0) {
-			return;
-		}
+	//build roads around buildings
+	int checked_buildings = 0;
+	for (int i = k; i < n; ++i) {
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
-		Vec2i pathway_pos(std::get<0>(iterator->first), std::get<1>(iterator->first));
-		int z = std::get<2>(iterator->first);
-		CMapField &mf = *Map.Field(pathway_pos, z);
-		
-		if (iterator->second < 10) { //need at least 10 steps before the AI will build a pathway there
-			continue;
-		}
-		
-		if ((mf.Flags & MapFieldBuilding) || (mf.Flags & MapFieldRailroad) || (mf.Flags & MapFieldRoad)) { //something was built here, or a pathway was already built, clear pathway steps
-			AiPlayer->PathwaySteps.erase(iterator->first);
-			continue;
-		}
-		
-		if (AiEnemyUnitsInDistance(*AiPlayer->Player, NULL, pathway_pos, 8, z)) { //don't build a pathway close to an enemy
+		if (!unit.IsAliveOnMap()) {
 			continue;
 		}
 
-		bool built_pathway = false;
-
-		for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
-			if (!(pathway_types[p]->TerrainType->Flags & MapFieldRoad)) {
+		// Building should have pathways but doesn't?
+		if (
+			unit.Type->BoolFlag[BUILDING_INDEX].value
+			&& unit.CurrentAction() != UnitActionBuilt //only build pathways for buildings that have already been constructed
+		) {
+			checked_buildings += 1;
+			
+			//
+			// FIXME: Construct pathways only for buildings under control
+			//
+			if (AiEnemyUnitsInDistance(unit, 8, unit.MapLayer)) {
 				continue;
 			}
-
-			if (!(mf.Flags & MapFieldRoad) && !(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRoad)) {
-				if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, z) || !CanBuildHere(test_worker, *pathway_types[p], pathway_pos, z)) {
-					continue;
-				}
+			
+			for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->TileWidth + 1; ++x) {
+				for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->TileHeight + 1; ++y) {
+					if (pathway_types.size() == 0) {
+						return;
+					}
+					
+					if (!Map.Info.IsPointOnMap(x, y, unit.MapLayer)) {
+						continue;
+					}
+					CMapField &mf = *Map.Field(x, y, unit.MapLayer);
+					if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+						continue;
+					}
+					Vec2i pathway_pos(x, y);
+					
+					bool built_pathway = false;
+					
+					for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
+						if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && unit.GivesResource != CopperCost && unit.GivesResource != SilverCost && unit.GivesResource != GoldCost && unit.GivesResource != CoalCost) { //build roads around buildings, not railroads (except for mines)
+							continue;
+						}
+						
+						if ((!(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRailroad)) || (!(mf.Flags & MapFieldRoad) && !(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRoad))) {
+							if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer) || !CanBuildHere(NULL, *pathway_types[p], pathway_pos, unit.MapLayer)) {
+								continue;
+							}
 							
-				const int resourceNeeded = AiCheckUnitTypeCosts(*pathway_types[p]);
-				if (resourceNeeded) {
-					pathway_types.erase(std::remove(pathway_types.begin(), pathway_types.end(), pathway_types[p]), pathway_types.end());
-					continue;
-				}
-
-				//
-				// Find a free worker, who can build pathways for this building
-				//
-				const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-				for (unsigned int j = 0; j < tablep[pathway_types[p]->Slot].size(); ++j) {
-					//
-					// The type is available
-					//
-					if (unit_count[tablep[pathway_types[p]->Slot][j]->Slot]) {
-						if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, z)) {
-							built_pathway = true;
+							const int resourceNeeded = AiCheckUnitTypeCosts(*pathway_types[p]);
+							if (resourceNeeded) {
+								pathway_types.erase(std::remove(pathway_types.begin(), pathway_types.end(), pathway_types[p]), pathway_types.end());
+								continue;
+							}
+							//
+							// Find a free worker, who can build pathways for this building
+							//
+							const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+							for (unsigned int j = 0; j < tablep[pathway_types[p]->Slot].size(); ++j) {
+								//
+								// The type is available
+								//
+								if (unit_count[tablep[pathway_types[p]->Slot][j]->Slot]) {
+									if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, unit.MapLayer)) {
+										built_pathway = true;
+										break;
+									}
+								}
+							}
+						}
+						if (built_pathway) {
 							break;
 						}
 					}
 				}
 			}
-			if (built_pathway) {
-				break;
+
+			if (checked_buildings >= 8) { //don't check too many buildings at once, for performance reasons
+				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
+				return;
 			}
 		}
 	}
-
+		
 	AiPlayer->LastPathwayConstructionBuilding = 0;
 }
 //Wyrmgus end
