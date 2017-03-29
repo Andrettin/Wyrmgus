@@ -1911,7 +1911,7 @@ void ReloadGraphics()
 				if (cg->PlayerColorTextures[j]) {
 					delete[] cg->PlayerColorTextures[j];
 					cg->PlayerColorTextures[j] = NULL;
-					MakePlayerColorTexture(cg, j, hair_color);
+					MakePlayerColorTexture(cg, j);
 				}
 				*/
 				//Wyrmgus end
