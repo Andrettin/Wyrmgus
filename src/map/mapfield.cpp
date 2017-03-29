@@ -475,7 +475,7 @@ void CMapField::parse(lua_State *l)
 	const int len = lua_rawlen(l, -1);
 	//Wyrmgus start
 //	if (len < 4) {
-	if (len < 12) {
+	if (len < 13) {
 	//Wyrmgus end
 		LuaError(l, "incorrect argument");
 	}
@@ -504,7 +504,7 @@ void CMapField::parse(lua_State *l)
 
 	//Wyrmgus start
 //	for (int j = 4; j < len; ++j) {
-	for (int j = 12; j < len; ++j) {
+	for (int j = 13; j < len; ++j) {
 	//Wyrmgus end
 		const char *value = LuaToString(l, -1, j + 1);
 
