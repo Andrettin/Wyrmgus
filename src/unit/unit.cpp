@@ -5834,6 +5834,14 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		unit.Goal->Release();
 		unit.Goal = NULL;
 	}
+	
+	//Wyrmgus start
+	for (size_t i = 0; i < unit.SoldUnits.size(); ++i) {
+		DestroyAllInside(*unit.SoldUnits[i]);
+		LetUnitDie(*unit.SoldUnits[i]);
+	}
+	unit.SoldUnits.clear();
+	//Wyrmgus end
 
 	// Transporters lose or save their units and building their workers
 	//Wyrmgus start
