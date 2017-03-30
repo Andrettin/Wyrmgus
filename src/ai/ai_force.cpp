@@ -565,9 +565,17 @@ void AiForce::Attack(const Vec2i &pos, int z)
 
 	if (Units.size() == 0) {
 		this->Attacking = false;
+		//Wyrmgus start
+		AiPlayer->Scouting = false;
+		//Wyrmgus end
 		this->State = AiForceAttackingState_Waiting;
 		return;
 	}
+	//Wyrmgus start
+	if (AiPlayer->Scouting) {
+		return;
+	}
+	//Wyrmgus end
 	if (!this->Attacking) {
 		// Remember the original force position so we can return there after attack
 		if (this->Role == AiForceRoleDefend
@@ -639,6 +647,11 @@ void AiForce::Attack(const Vec2i &pos, int z)
 				}
 			}
 			//Wyrmgus end
+		//Wyrmgus start
+		} else {
+			AiPlayer->Scouting = true;			
+			return;
+		//Wyrmgus end
 		}
 	} else {
 		isDefenceForce = true;
@@ -752,6 +765,9 @@ void AiForce::ReturnToHome()
 	//Wyrmgus end
 	this->Defending = false;
 	this->Attacking = false;
+	//Wyrmgus start
+	AiPlayer->Scouting = false;
+	//Wyrmgus end
 	this->State = AiForceAttackingState_Waiting;
 }
 
@@ -1175,8 +1191,12 @@ void AiForce::Update()
 		return;
 	}
 	//Wyrmgus start
-	//if force still has no goal, run its Attack function again to get a target
+	if (AiPlayer->Scouting) {
+		return;
+	}
+	//Wyrmgus end
 	//Wyrmgus start
+	//if force still has no goal, run its Attack function again to get a target
 //	if (Map.Info.IsPointOnMap(GoalPos) == false) {
 	if (Map.Info.IsPointOnMap(GoalPos, GoalMapLayer) == false) {
 	//Wyrmgus end
@@ -1323,16 +1343,21 @@ void AiForce::Update()
 				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, include_neutral);
 				//Wyrmgus end
 				if (!unit) {
+					//Wyrmgus start
+					/*
 					// No enemy found, give up
 					// FIXME: should the force go home or keep trying to attack?
 					DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
 							   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 					Attacking = false;
 					State = AiForceAttackingState_Waiting;
+					*/
 					GoalPos.x = -1;
 					GoalPos.y = -1;
 					//Wyrmgus start
 					GoalMapLayer = 0;
+					//Wyrmgus end
+					AiPlayer->Scouting = true;
 					//Wyrmgus end
 					return;
 				}
@@ -1419,16 +1444,21 @@ void AiForce::Update()
 			//Wyrmgus end
 		}
 		if (!unit) {
+			//Wyrmgus start
+			/*
 			// No enemy found, give up
 			// FIXME: should the force go home or keep trying to attack?
 			DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
 					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 			Attacking = false;
 			State = AiForceAttackingState_Waiting;
+			*/
 			GoalPos.x = -1;
 			GoalPos.y = -1;
 			//Wyrmgus start
 			GoalMapLayer = 0;
+			//Wyrmgus end
+			AiPlayer->Scouting = true;
 			//Wyrmgus end
 			return;
 		} else {

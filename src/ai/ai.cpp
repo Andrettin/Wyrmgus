@@ -992,12 +992,16 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 		if (aiForce.Size() > 0
 			&& ((aiForce.Role == AiForceRoleDefend && !aiForce.Attacking)
+				//Wyrmgus start
+				|| (aiForce.Role == AiForceRoleAttack && pai.Scouting) // send forces that are scouting for enemies to defend, too
+				//Wyrmgus end
 				|| (aiForce.Role == AiForceRoleAttack && !aiForce.Attacking && !aiForce.State))) {  // none attacking
 			//Wyrmgus start
 //			aiForce.Defending = true;
 			if (!aiForce.Attacking) {
 				aiForce.Defending = true;
 			}
+			pai.Scouting = false;
 //			aiForce.Attack(pos);
 			aiForce.Attack(pos, attacker->MapLayer);
 			//Wyrmgus end

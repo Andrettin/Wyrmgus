@@ -310,6 +310,9 @@ class PlayerAi
 public:
 	PlayerAi() : Player(NULL), AiType(NULL),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
+		//Wyrmgus start
+		Scouting(false),
+		//Wyrmgus end
 		ScriptDebug(false), BuildDepots(true), LastExplorationGameCycle(0),
 		//Wyrmgus start
 //		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
@@ -340,6 +343,9 @@ public:
 	bool NeedSupply;       /// Flag need food
 	bool ScriptDebug;      /// Flag script debugging on/off
 	bool BuildDepots;      /// Build new depots if necessary
+	//Wyrmgus start
+	bool Scouting;		   /// Whether the AI player is currently scouting (has no enemies it knows the location of)
+	//Wyrmgus end
 
 	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
 	unsigned long LastExplorationGameCycle;       /// When did the last explore occur?

@@ -3649,6 +3649,10 @@ void UnitLost(CUnit &unit)
 			
 			if (player.AiEnabled && player.Ai && std::find(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit) != player.Ai->Scouts.end()) {
 				player.Ai->Scouts.erase(std::remove(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit), player.Ai->Scouts.end());
+				
+				if (player.Ai->Scouting) { //if an AI player's scout has been lost, unmark it as "scouting" so that the force can see if it now has a viable target
+					player.Ai->Scouting = false;
+				}
 			}
 			//Wyrmgus end
 		}
