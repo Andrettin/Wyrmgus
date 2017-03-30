@@ -1926,7 +1926,7 @@ static void AiCheckPathwayConstruction()
 		for (int i = n - 1; i >= 0; --i) {
 			const CUnit &unit = AiPlayer->Player->GetUnit(i);
 			if (UnitNumber(unit) == AiPlayer->LastPathwayConstructionBuilding) {
-				k = i;
+				k = i + 1;
 				break;
 			}
 		}
@@ -2058,8 +2058,8 @@ static void AiCheckPathwayConstruction()
 				}
 			}
 
-			if (checked_buildings >= 1) { //don't check too many buildings at once, for performance reasons
-				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit) + 1;
+			if (checked_buildings >= 2) { //don't check too many buildings at once, for performance reasons
+				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
 				return;
 			}
 		}

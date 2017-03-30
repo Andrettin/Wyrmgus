@@ -1536,6 +1536,12 @@ void CUnit::ConsumeElixir(CUpgrade *elixir, bool affect_character)
 
 void CUnit::ApplyAura(int aura_index)
 {
+	if (aura_index == LEADERSHIPAURA_INDEX) {
+		if (!this->IsInCombat()) {
+			return;
+		}
+	}
+	
 	this->ApplyAuraEffect(aura_index);
 			
 	//apply aura to all appropriate nearby units
@@ -1564,7 +1570,7 @@ void CUnit::ApplyAuraEffect(int aura_index)
 {
 	int effect_index = -1;
 	if (aura_index == LEADERSHIPAURA_INDEX) {
-		if (this->Type->BoolFlag[BUILDING_INDEX].value || !this->IsInCombat()) {
+		if (this->Type->BoolFlag[BUILDING_INDEX].value) {
 			return;
 		}
 		effect_index = LEADERSHIP_INDEX;
@@ -1580,8 +1586,8 @@ void CUnit::ApplyAuraEffect(int aura_index)
 	}
 	
 	this->Variable[effect_index].Enable = 1;
-	this->Variable[effect_index].Max = std::max(2, this->Variable[effect_index].Max);
-	this->Variable[effect_index].Value = std::max(2, this->Variable[effect_index].Value);
+	this->Variable[effect_index].Max = std::max(CYCLES_PER_SECOND + 1, this->Variable[effect_index].Max);
+	this->Variable[effect_index].Value = std::max(CYCLES_PER_SECOND + 1, this->Variable[effect_index].Value);
 }
 
 void CUnit::SetPrefix(CUpgrade *prefix)
@@ -2465,7 +2471,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	const CUnitType &type = *Type;
 
 	// Build player unit table
-	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitActionDie) {
+	//Wyrmgus start
+//	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitActionDie) {
+	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitActionDie && !this->Destroyed) {
+	//Wyrmgus end
 		player.AddUnit(*this);
 		if (!SaveGameLoading) {
 			// If unit is dying, it's already been lost by all players
@@ -2525,7 +2534,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	}
 
 	// Don't Add the building if it's dying, used to load a save game
-	if (type.Building && CurrentAction() != UnitActionDie) {
+	//Wyrmgus start
+//	if (type.Building && CurrentAction() != UnitActionDie) {
+	if (type.Building && CurrentAction() != UnitActionDie && !this->Destroyed && !type.BoolFlag[VANISHES_INDEX].value) {
+	//Wyrmgus end
 		// FIXME: support more races
 		//Wyrmgus start
 //		if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
@@ -2551,19 +2563,21 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	}
 	
 	//Wyrmgus start
-	//assign a gender to the unit
-	if (this->Variable[GENDER_INDEX].Value == NoGender && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
-		this->Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
-		this->Variable[GENDER_INDEX].Max = MaxGenders;
-		this->Variable[GENDER_INDEX].Enable = 1;
+	if (!SaveGameLoading) {
+		//assign a gender to the unit
+		if (this->Variable[GENDER_INDEX].Value == NoGender && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
+			this->Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
+			this->Variable[GENDER_INDEX].Max = MaxGenders;
+			this->Variable[GENDER_INDEX].Enable = 1;
+		}
+		
+		//generate a personal name for the unit, if applicable
+		if (this->Character == NULL) {
+			this->UpdatePersonalName();
+		}
+		
+		this->UpdateSoldUnits();
 	}
-	
-	//generate a personal name for the unit, if applicable
-	if (!SaveGameLoading && this->Character == NULL) {
-		this->UpdatePersonalName();
-	}
-	
-	this->UpdateSoldUnits();
 	//Wyrmgus end
 }
 
@@ -5297,22 +5311,17 @@ bool CUnit::IsInCombat() const
 {
 	// Select all units around the unit
 	std::vector<CUnit *> table;
-	SelectAroundUnit(*this, 6, table, HasNotSamePlayerAs(*this->Player));
+	SelectAroundUnit(*this, 6, table, IsEnemyWith(*this->Player));
 
-	// Check each unit if it is hostile.
-	bool inCombat = false;
 	for (size_t i = 0; i < table.size(); ++i) {
 		const CUnit &target = *table[i];
 
-		// Note that CanTarget doesn't take into account (offensive) spells...
-		if (target.IsVisibleAsGoal(*this->Player) && this->IsEnemy(target)
-			&& (CanTarget(*this->Type, *target.Type) || CanTarget(*target.Type, *this->Type))) {
-			inCombat = true;
-			break;
+		if (target.IsVisibleAsGoal(*this->Player)) {
+			return true;
 		}
 	}
 		
-	return inCombat;
+	return false;
 }
 
 bool CUnit::CanHarvest(const CUnit *dest, bool only_harvestable) const

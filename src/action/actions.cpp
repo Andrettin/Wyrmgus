@@ -382,18 +382,6 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		IncreaseVariable(unit, SpellEffects[i]);
 	}
 	
-	//Wyrmgus start
-	if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
-		//apply auras
-		if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0) {
-			unit.ApplyAura(LEADERSHIPAURA_INDEX);
-		}
-		if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) {
-			unit.ApplyAura(REGENERATIONAURA_INDEX);
-		}
-	}
-	//Wyrmgus end
-
 	const bool lastStatusIsHidden = unit.Variable[INVISIBLE_INDEX].Value > 0;
 	if (lastStatusIsHidden && unit.Variable[INVISIBLE_INDEX].Value == 0) {
 		UnHideUnit(unit);
@@ -470,6 +458,18 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		}
 	}
 	
+	//Wyrmgus start
+	if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
+		//apply auras
+		if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0) {
+			unit.ApplyAura(LEADERSHIPAURA_INDEX);
+		}
+		if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) {
+			unit.ApplyAura(REGENERATIONAURA_INDEX);
+		}
+	}
+	//Wyrmgus end
+
 	//Wyrmgus start
 	if (unit.Variable[TERROR_INDEX].Value > 0) { // if unit is terrified, flee at the sight of enemies
 		std::vector<CUnit *> table;

@@ -346,7 +346,7 @@ int DoActionMove(CUnit &unit)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (abs(unit.IX) > (PixelTileSize.x * 2) || abs(unit.IY) > (PixelTileSize.y * 2)) {
+	if (abs(unit.IX) > (PixelTileSize.x * 4) || abs(unit.IY) > (PixelTileSize.y * 4)) {
 		unit.IX = 0;
 		unit.IY = 0;
 		fprintf(stderr, "Error in DoActionMove: unit's pixel movement was too big.\n");
