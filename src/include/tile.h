@@ -265,9 +265,6 @@ public:
 	//Wyrmgus end
 
 	unsigned char getCost() const { return cost; }
-	//Wyrmgus start
-	unsigned char getRailCost() const { return rail_cost; }
-	//Wyrmgus end
 	unsigned int getFlag() const { return Flags; }
 	//Wyrmgus start
 //	void setGraphicTile(unsigned int tile) { this->tile = tile; }
@@ -300,9 +297,6 @@ public:
 	//Wyrmgus end
 private:
 	unsigned char cost;        /// unit cost to move in this tile
-	//Wyrmgus start
-	unsigned char rail_cost;        /// rail unit cost to move in this tile
-	//Wyrmgus end
 public:
 	// FIXME: Value should be removed, walls and regeneration can be handled differently.
 	//Wyrmgus start

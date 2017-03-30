@@ -964,11 +964,21 @@ void CPlayer::Save(CFile &file) const
 	// Resources
 	file.printf("  \"resources\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
+		//Wyrmgus start
+		if (!p.Resources[j]) {
+			continue;
+		}
+		//Wyrmgus end
 		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Resources[j]);
 	}
 	// Stored Resources
 	file.printf("},\n  \"stored-resources\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
+		//Wyrmgus start
+		if (!p.StoredResources[j]) {
+			continue;
+		}
+		//Wyrmgus end
 		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.StoredResources[j]);
 	}
 	// Max Resources
@@ -979,6 +989,11 @@ void CPlayer::Save(CFile &file) const
 	// Last Resources
 	file.printf("},\n  \"last-resources\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
+		//Wyrmgus start
+		if (!p.LastResources[j]) {
+			continue;
+		}
+		//Wyrmgus end
 		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.LastResources[j]);
 	}
 	// Incomes
@@ -996,20 +1011,27 @@ void CPlayer::Save(CFile &file) const
 	// Revenue
 	file.printf("},\n  \"revenue\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
-		if (j) {
-			if (j == MaxCosts / 2) {
-				file.printf("\n ");
-			} else {
-				file.printf(" ");
-			}
+		//Wyrmgus start
+//		if (j) {
+//			if (j == MaxCosts / 2) {
+//				file.printf("\n ");
+//			} else {
+//				file.printf(" ");
+//			}
+//		}
+//		file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Revenue[j]);
+		if (p.Revenue[j]) {
+			file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Revenue[j]);
 		}
-		file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Revenue[j]);
+		//Wyrmgus end
 	}
 	
 	//Wyrmgus start
 	file.printf("},\n  \"prices\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
-		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Prices[j]);
+		if (p.Prices[j]) {
+			file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Prices[j]);
+		}
 	}
 	//Wyrmgus end
 
@@ -1047,11 +1069,13 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"total-razings\", %d,", p.TotalRazings);
 	file.printf("\n  \"total-kills\", %d,", p.TotalKills);
 	//Wyrmgus start
+	file.printf("\n  \"unit-type-kills\", {");
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		if (p.UnitTypeKills[i] != 0) {
-			file.printf("\n  \"unit-type-kills\", \"%s\", %d,", UnitTypes[i]->Ident.c_str(), p.UnitTypeKills[i]);
+			file.printf("\"%s\", %d, ", UnitTypes[i]->Ident.c_str(), p.UnitTypeKills[i]);
 		}
 	}
+	file.printf("},");
 	//Wyrmgus end
 	if (p.LostTownHallTimer != 0) {
 		file.printf("\n  \"lost-town-hall-timer\", %d,", p.LostTownHallTimer);
@@ -1182,11 +1206,24 @@ void CPlayer::Save(CFile &file) const
 	// Allow saved by allow.
 
 	file.printf("\n  \"timers\", {");
+	//Wyrmgus start
+	bool first = true;
+	//Wyrmgus end
 	for (int j = 0; j < UpgradeMax; ++j) {
-		if (j) {
-			file.printf(" ,");
+		//Wyrmgus start
+//		if (j) {
+//			file.printf(" ,");
+//		}
+//		file.printf("%d", p.UpgradeTimers.Upgrades[j]);
+		if (p.UpgradeTimers.Upgrades[j]) {
+			if (first) {
+				first = false;
+			} else {
+				file.printf(", ");
+			}
+			file.printf("\"%s\", %d", AllUpgrades[j]->Ident.c_str(), p.UpgradeTimers.Upgrades[j]);
 		}
-		file.printf("%d", p.UpgradeTimers.Upgrades[j]);
+		//Wyrmgus end
 	}
 	file.printf("}");
 

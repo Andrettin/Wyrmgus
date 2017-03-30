@@ -1309,6 +1309,8 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		flag = MapFieldRailroad;
 	} else if (!strcmp(flag_name, "road")) {
 		flag = MapFieldRoad;
+	} else if (!strcmp(flag_name, "no-rail")) {
+		flag = MapFieldNoRail;
 	} else if (!strcmp(flag_name, "stone-floor")) {
 		flag = MapFieldStoneFloor;
 	} else if (!strcmp(flag_name, "stumps")) {
@@ -1485,6 +1487,8 @@ static int CclDefineTerrainType(lua_State *l)
 					terrain->Flags |= MapFieldRailroad;
 				} else if (tile_flag == "road") {
 					terrain->Flags |= MapFieldRoad;
+				} else if (tile_flag == "no-rail") {
+					terrain->Flags |= MapFieldNoRail;
 				} else if (tile_flag == "stone-floor") {
 					terrain->Flags |= MapFieldStoneFloor;
 				} else if (tile_flag == "stumps") {

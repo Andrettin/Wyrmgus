@@ -312,9 +312,17 @@ void CPlayer::Load(lua_State *l)
 			this->TotalKills = LuaToNumber(l, j + 1);
 		//Wyrmgus start
 		} else if (!strcmp(value, "unit-type-kills")) {
-			int unit_type_id = UnitTypeIdByIdent(LuaToString(l, j + 1));
-			++j;
-			this->UnitTypeKills[unit_type_id] = LuaToNumber(l, j + 1);
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, j + 1, k + 1));
+				++k;
+				if (unit_type) {
+					this->UnitTypeKills[unit_type->Slot] = LuaToNumber(l, j + 1, k + 1);
+				}
+			}
 		} else if (!strcmp(value, "lost-town-hall-timer")) {
 			this->LostTownHallTimer = LuaToNumber(l, j + 1);
 		//Wyrmgus end
@@ -508,11 +516,20 @@ void CPlayer::Load(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
-			if (subargs != UpgradeMax) {
-				LuaError(l, "Wrong upgrade timer length: %d" _C_ subargs);
-			}
+			//Wyrmgus start
+//			if (subargs != UpgradeMax) {
+//				LuaError(l, "Wrong upgrade timer length: %d" _C_ subargs);
+//			}
+			//Wyrmgus end
 			for (int k = 0; k < subargs; ++k) {
-				this->UpgradeTimers.Upgrades[k] = LuaToNumber(l, j + 1, k + 1);
+				//Wyrmgus start
+//				this->UpgradeTimers.Upgrades[k] = LuaToNumber(l, j + 1, k + 1);
+				CUpgrade *timer_upgrade = CUpgrade::Get(LuaToString(l, j + 1, k + 1));
+				++k;
+				if (timer_upgrade) {
+					this->UpgradeTimers.Upgrades[timer_upgrade->ID] = LuaToNumber(l, j + 1, k + 1);
+				}
+				//Wyrmgus end
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

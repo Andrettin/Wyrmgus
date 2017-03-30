@@ -349,7 +349,9 @@ int DoActionMove(CUnit &unit)
 	if (abs(unit.IX) > (PixelTileSize.x * 2) || abs(unit.IY) > (PixelTileSize.y * 2)) {
 		unit.IX = 0;
 		unit.IY = 0;
+#ifdef DEBUG
 		fprintf(stderr, "Error in DoActionMove: unit's pixel movement was too big.\n");
+#endif
 		
 		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 			std::vector<CUnit *> table;

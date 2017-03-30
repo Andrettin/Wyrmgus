@@ -59,9 +59,6 @@ CMapField::CMapField() :
 	//Wyrmgus end
 	Flags(0),
 	cost(0),
-	//Wyrmgus start
-	rail_cost(0),
-	//Wyrmgus end
 	Value(0),
 	//Wyrmgus start
 	AnimationFrame(0),
@@ -193,16 +190,19 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	}
 
 	if (this->Flags & MapFieldRailroad) {
-		this->rail_cost = 6;
 		this->cost = 7;
 	} else if (this->Flags & MapFieldRoad) {
-		this->rail_cost = 240;
 		this->cost = 7;
 	} else {
-		this->rail_cost = 240;
 		this->cost = 8; // default speed
 	}
 	
+	if (this->Flags & MapFieldRailroad) {
+		this->Flags &= ~(MapFieldNoRail);
+	} else {
+		this->Flags |= MapFieldNoRail;
+	}
+
 	//wood and rock tiles must always begin with the default value for their respective resource types
 	if (terrain->Flags & MapFieldForest) {
 		this->Value = DefaultResourceAmounts[WoodCost];
@@ -239,16 +239,19 @@ void CMapField::RemoveOverlayTerrain()
 	}
 	
 	if (this->Flags & MapFieldRailroad) {
-		this->rail_cost = 6;
 		this->cost = 7;
 	} else if (this->Flags & MapFieldRoad) {
-		this->rail_cost = 240;
 		this->cost = 7;
 	} else {
-		this->rail_cost = 240;
 		this->cost = 8; // default speed
 	}
 	
+	if (this->Flags & MapFieldRailroad) {
+		this->Flags &= ~(MapFieldNoRail);
+	} else {
+		this->Flags |= MapFieldNoRail;
+	}
+
 	if (this->TerrainFeature) {
 		this->TerrainFeature = NULL;
 	}
@@ -356,7 +359,7 @@ void CMapField::Save(CFile &file) const
 {
 	//Wyrmgus start
 //	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
-	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d", Terrain ? Terrain->Ident.c_str() : "", OverlayTerrain ? OverlayTerrain->Ident.c_str() : "", OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, rail_cost);
+	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d", Terrain ? Terrain->Ident.c_str() : "", OverlayTerrain ? OverlayTerrain->Ident.c_str() : "", OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost);
 	
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
@@ -431,6 +434,9 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldRoad) {
 		file.printf(", \"road\"");
 	}
+	if (Flags & MapFieldNoRail) {
+		file.printf(", \"no-rail\"");
+	}
 	if (Flags & MapFieldStoneFloor) {
 		file.printf(", \"stone-floor\"");
 	}
@@ -475,7 +481,7 @@ void CMapField::parse(lua_State *l)
 	const int len = lua_rawlen(l, -1);
 	//Wyrmgus start
 //	if (len < 4) {
-	if (len < 13) {
+	if (len < 12) {
 	//Wyrmgus end
 		LuaError(l, "incorrect argument");
 	}
@@ -499,12 +505,11 @@ void CMapField::parse(lua_State *l)
 	this->playerInfo.SeenOverlaySolidTile = LuaToNumber(l, -1, 10);
 	this->Value = LuaToNumber(l, -1, 11);
 	this->cost = LuaToNumber(l, -1, 12);
-	this->rail_cost = LuaToNumber(l, -1, 13);
 	//Wyrmgus end
 
 	//Wyrmgus start
 //	for (int j = 4; j < len; ++j) {
-	for (int j = 13; j < len; ++j) {
+	for (int j = 12; j < len; ++j) {
 	//Wyrmgus end
 		const char *value = LuaToString(l, -1, j + 1);
 
@@ -586,6 +591,8 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldRailroad;
 		} else if (!strcmp(value, "road")) {
 			this->Flags |= MapFieldRoad;
+		} else if (!strcmp(value, "no-rail")) {
+			this->Flags |= MapFieldNoRail;
 		} else if (!strcmp(value, "stone-floor")) {
 			this->Flags |= MapFieldStoneFloor;
 		} else if (!strcmp(value, "stumps")) {
