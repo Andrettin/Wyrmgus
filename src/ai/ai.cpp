@@ -961,15 +961,18 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 //					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
 //					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
 					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
-					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos, attacker->MapLayer);
 					//Wyrmgus end
 
+					//Wyrmgus start
+					/*
 					if (aiunit.CanStoreOrder(savedOrder) == false) {
 						delete savedOrder;
 						savedOrder = NULL;
 					} else {
 						aiunit.SavedOrder = savedOrder;
 					}
+					*/
+					//Wyrmgus end
 				}
 			}
 		}
@@ -1044,15 +1047,18 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 //				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
 //				COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
 				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
-				COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos, attacker->MapLayer);
 				//Wyrmgus end
 
+				//Wyrmgus start
+				/*
 				if (aiunit.CanStoreOrder(savedOrder) == false) {
 					delete savedOrder;
 					savedOrder = NULL;
 				} else {
 					aiunit.SavedOrder = savedOrder;
 				}
+				*/
+				//Wyrmgus end
 			}
 		}
 	}
