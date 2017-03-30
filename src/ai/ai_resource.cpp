@@ -2058,8 +2058,8 @@ static void AiCheckPathwayConstruction()
 				}
 			}
 
-			if (checked_buildings >= 8) { //don't check too many buildings at once, for performance reasons
-				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
+			if (checked_buildings >= 1) { //don't check too many buildings at once, for performance reasons
+				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit) + 1;
 				return;
 			}
 		}

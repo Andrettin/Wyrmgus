@@ -344,6 +344,25 @@ int DoActionMove(CUnit &unit)
 		}
 	}
 	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (abs(unit.IX) > (PixelTileSize.x * 2) || abs(unit.IY) > (PixelTileSize.y * 2)) {
+		unit.IX = 0;
+		unit.IY = 0;
+		fprintf(stderr, "Error in DoActionMove: unit's pixel movement was too big.\n");
+		
+		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
+			std::vector<CUnit *> table;
+			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
+			for (size_t i = 0; i != table.size(); ++i) {
+				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+					table[i]->IX = 0;
+					table[i]->IY = 0;
+				}
+			}
+		}
+	}
+	//Wyrmgus end
 
 	// Finished move animation, set Moving to 0 so we recalculate the path
 	// next frame

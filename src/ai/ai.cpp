@@ -952,6 +952,12 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 				if (shouldAttack) {
 					//Wyrmgus start
+					const int delay = i; // To avoid lot of CPU consuption, send them with a small time difference.
+
+					aiunit.Wait += delay;
+					//Wyrmgus end
+					
+					//Wyrmgus start
 //					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
 //					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
 					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
@@ -986,17 +992,12 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 		if (aiForce.Size() > 0
 			&& ((aiForce.Role == AiForceRoleDefend && !aiForce.Attacking)
-				//Wyrmgus start
-//				|| (aiForce.Role == AiForceRoleAttack && !aiForce.Attacking && !aiForce.State))) {  // none attacking
-				|| (aiForce.Role == AiForceRoleAttack && aiForce.Scouting) // send forces that are scouting for enemies to defend, too
 				|| (aiForce.Role == AiForceRoleAttack && !aiForce.Attacking && !aiForce.State))) {  // none attacking
-				//Wyrmgus end
 			//Wyrmgus start
 //			aiForce.Defending = true;
 			if (!aiForce.Attacking) {
 				aiForce.Defending = true;
 			}
-			aiForce.Scouting = false;
 //			aiForce.Attack(pos);
 			aiForce.Attack(pos, attacker->MapLayer);
 			//Wyrmgus end
