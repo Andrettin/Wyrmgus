@@ -1054,7 +1054,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 		//Wyrmgus start
-		if (Selected.size() == 1 && Selected[0]->HasInventory()) {
+		if (Selected.size() == 1 && Selected[0]->HasInventory() && CurrentButtonLevel == Selected[0]->Type->ButtonLevelForInventory) {
 			const size_t size = UI.InventoryButtons.size();
 
 			for (size_t i = std::min<size_t>(Selected[0]->InsideCount, size); i != 0;) {
