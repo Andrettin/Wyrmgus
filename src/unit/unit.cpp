@@ -2141,12 +2141,12 @@ void CUnit::UpdateSoldUnits()
 		CUnit *new_unit = NULL;
 		if (!potential_heroes.empty()) {
 			CCharacter *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
-			new_unit = MakeUnit(*chosen_hero->Type, &Players[PlayerNumNeutral]);
+			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->Type, &Players[PlayerNumNeutral], this->MapLayer);
 			new_unit->SetCharacter(chosen_hero->Ident, chosen_hero->Custom);
 			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
 		} else {
 			CUnitType *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
-			new_unit = MakeUnit(*chosen_unit_type, &Players[PlayerNumNeutral]);
+			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, &Players[PlayerNumNeutral], this->MapLayer);
 			new_unit->GenerateSpecialProperties(this);
 			new_unit->Identified = true;
 			if (new_unit->Unique && this->Player == ThisPlayer) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
