@@ -917,6 +917,10 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 	PlayerAi &pai = *defender.Player->Ai;
 	AiPlayer = &pai;
+	
+	//Wyrmgus start
+	pai.Scouting = false;
+	//Wyrmgus end
 
 	//  If unit belongs to an attacking force, check if force members can help.
 	if (defender.GroupId) {
@@ -1004,7 +1008,6 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			if (!aiForce.Attacking) {
 				aiForce.Defending = true;
 			}
-			pai.Scouting = false;
 //			aiForce.Attack(pos);
 			aiForce.Attack(pos, attacker->MapLayer);
 			//Wyrmgus end
