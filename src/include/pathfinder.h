@@ -255,6 +255,16 @@ extern int GetAStarMovingUnitCrossingCost();
 extern void SetAStarUnknownTerrainCost(int cost);
 extern int GetAStarUnknownTerrainCost();
 
+//Wyrmgus start
+/// Find and a* path for a unit
+extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
+						 int tilesizex, int tilesizey, int minrange,
+						 //Wyrmgus start
+//						 int maxrange, char *path, int pathlen, const CUnit &unit);
+						 int maxrange, char *path, int pathlen, const CUnit &unit, int max_length, int z);
+						 //Wyrmgus end
+//Wyrmgus end
+
 extern void PathfinderCclRegister();
 
 //@}

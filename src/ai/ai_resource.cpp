@@ -1946,8 +1946,6 @@ static void AiCheckPathwayConstruction()
 			unit.Type->BoolFlag[BUILDING_INDEX].value
 			&& unit.CurrentAction() != UnitActionBuilt //only build pathways for buildings that have already been constructed
 		) {
-			checked_buildings += 1;
-			
 			//
 			// FIXME: Construct pathways only for buildings under control
 			//
@@ -1965,41 +1963,79 @@ static void AiCheckPathwayConstruction()
 			if (unit.Type->GivesResource) { //if is a mine, build pathways to the depot as well
 				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), 32, unit.GivesResource, unit.MapLayer);
 				if (depot) {
-					Vec2i pos_diff(depot->tilePos - unit.tilePos);
-					Vec2i pos_dir(pos_diff.x ? pos_diff.x / abs(pos_diff.x) : 0, pos_diff.y ? pos_diff.y / abs(pos_diff.y) : 0);
-					if (pos_dir.y) {
-						for (int x = unit.tilePos.x - 4; x < (unit.tilePos.x + unit.Type->TileWidth + 4); ++x) {
-							for (int sub_x = depot->tilePos.x - 4; sub_x < (depot->tilePos.x + depot->Type->TileWidth + 4); ++sub_x) {
-								if (x == sub_x) {
-									int tile_count = 0;
-									for (int y = unit.tilePos.y; y != (depot->tilePos.y + pos_dir.y); y += pos_dir.y) {
-										pathway_tiles.push_back(Vec2i(x, y));
-										tile_count += 1;
-										if (tile_count > 32) { //something went wrong
-											fprintf(stderr, "Error in AiCheckPathwayConstruction: mine path is too long.\n");
-											break;
-										}
-									}
-								}
-							}
+					//choose a close-by worker to test the path; the worker can't be a rail one, or the path construction won't work
+					CUnitType *test_worker_type = NULL;
+					for (size_t z = 0; z < UnitTypes.size(); ++z) {
+						if (UnitTypes[z]->BoolFlag[DIMINUTIVE_INDEX].value && UnitTypes[z]->UnitType == UnitTypeLand && UnitTypes[z]->CanMove() && !UnitTypes[z]->BoolFlag[BUILDING_INDEX].value && !UnitTypes[z]->BoolFlag[NONSOLID_INDEX].value && !UnitTypes[z]->BoolFlag[ITEM_INDEX].value && !UnitTypes[z]->BoolFlag[POWERUP_INDEX].value && !UnitTypes[z]->BoolFlag[TRAP_INDEX].value && !UnitTypes[z]->BoolFlag[DECORATION_INDEX].value) {
+							test_worker_type = UnitTypes[z];
+							break;
 						}
 					}
-					if (pos_dir.x) {
-						for (int y = unit.tilePos.y - 4; (y < unit.tilePos.y + unit.Type->TileHeight + 4); ++y) {
-							for (int sub_y = depot->tilePos.y - 4; sub_y < (depot->tilePos.y + depot->Type->TileHeight + 4); ++sub_y) {
-								if (y == sub_y) {
-									int tile_count = 0;
-									for (int x = unit.tilePos.x; x != (depot->tilePos.x + pos_dir.x); x += pos_dir.x) {
-										pathway_tiles.push_back(Vec2i(x, y));
-										tile_count += 1;
-										if (tile_count > 32) { //something went wrong
-											fprintf(stderr, "Error in AiCheckPathwayConstruction: mine path is too long.\n");
-											break;
-										}
-									}
-								}
+					if (test_worker_type) {
+						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos, *test_worker_type, &Players[PlayerNumNeutral], unit.MapLayer);
+						char worker_path[64];
+						UnmarkUnitFieldFlags(unit);
+						UnmarkUnitFieldFlags(*depot);
+						
+						//make the first path
+						int worker_path_length = AStarFindPath(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), depot->tilePos + Vec2i((depot->Type->TileWidth - 1) / 2, (depot->Type->TileHeight - 1) / 2), depot->Type->TileWidth, depot->Type->TileHeight, 1, 1, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer);
+						Vec2i worker_path_pos(unit.tilePos);
+						std::vector<Vec2i> first_path_tiles;
+						while (worker_path_length > 0 && worker_path_length <= 64) {
+							Vec2i pos_change(0, 0);
+							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
+							pos_change.y = Heading2Y[(int)worker_path[worker_path_length - 1]];
+							if (pos_change.x != 0 && pos_change.y != 0) { //if is a diagonal movement, also add horizontally/vertically adjacent tiles, since pathways can't be diagonal in their graphics
+								Vec2i horizontal_tile(worker_path_pos.x + pos_change.x, worker_path_pos.y);
+								pathway_tiles.push_back(horizontal_tile);
+								first_path_tiles.push_back(horizontal_tile);
+								
+								Vec2i diagonal_tile(worker_path_pos.x, worker_path_pos.y + pos_change.y);
+								pathway_tiles.push_back(diagonal_tile);
+								first_path_tiles.push_back(diagonal_tile);
 							}
+							worker_path_pos += pos_change;
+							pathway_tiles.push_back(worker_path_pos);
+							if (worker_path_length > 1) {
+								first_path_tiles.push_back(worker_path_pos);
+							}
+							worker_path_length -= 1;
 						}
+						
+						// mark the tiles of the first path (that aren't the first and last tile) as unpassable, so that the second path has to follow a different way
+						for (size_t z = 1; z < first_path_tiles.size(); ++z) {
+							Map.Field(first_path_tiles[z], unit.MapLayer)->Flags |= MapFieldUnpassable;
+						}
+						
+						//make the second path
+						worker_path_length = AStarFindPath(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), depot->tilePos + Vec2i((depot->Type->TileWidth - 1) / 2, (depot->Type->TileHeight - 1) / 2), depot->Type->TileWidth, depot->Type->TileHeight, test_worker->Type->TileWidth, test_worker->Type->TileHeight, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer);
+						worker_path_pos = unit.tilePos;
+						while (worker_path_length > 0 && worker_path_length <= 64) {
+							Vec2i pos_change(0, 0);
+							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
+							pos_change.y = Heading2Y[(int)worker_path[worker_path_length - 1]];
+							if (pos_change.x != 0 && pos_change.y != 0) { //if is a diagonal movement, also add horizontally/vertically adjacent tiles, since pathways can't be diagonal in their graphics
+								Vec2i horizontal_tile(worker_path_pos.x + pos_change.x, worker_path_pos.y);
+								pathway_tiles.push_back(horizontal_tile);
+								
+								Vec2i diagonal_tile(worker_path_pos.x, worker_path_pos.y + pos_change.y);
+								pathway_tiles.push_back(diagonal_tile);
+							}
+							worker_path_pos += pos_change;
+							pathway_tiles.push_back(worker_path_pos);
+							worker_path_length -= 1;
+						}
+						
+						//unmark the tiles of the first path
+						for (size_t z = 1; z < first_path_tiles.size(); ++z) {
+							Map.Field(first_path_tiles[z], unit.MapLayer)->Flags &= ~(MapFieldUnpassable);
+						}
+						
+						MarkUnitFieldFlags(unit);
+						MarkUnitFieldFlags(*depot);
+						
+						test_worker->Remove(NULL);
+						LetUnitDie(*test_worker);
 					}
 				}
 			}
@@ -2058,6 +2094,7 @@ static void AiCheckPathwayConstruction()
 				}
 			}
 
+			checked_buildings += 1;
 			if (checked_buildings >= 2) { //don't check too many buildings at once, for performance reasons
 				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
 				return;

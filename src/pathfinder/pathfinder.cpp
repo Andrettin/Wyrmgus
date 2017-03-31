@@ -56,12 +56,16 @@ extern void InitAStar();
 extern void FreeAStar();
 
 /// Find and a* path for a unit
+//Wyrmgus start
+/*
 extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 						 int tilesizex, int tilesizey, int minrange,
 						 //Wyrmgus start
 //						 int maxrange, char *path, int pathlen, const CUnit &unit);
 						 int maxrange, char *path, int pathlen, const CUnit &unit, int max_length, int z);
 						 //Wyrmgus end
+*/
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables

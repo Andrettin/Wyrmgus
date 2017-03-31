@@ -1487,7 +1487,10 @@ void AiForce::Update()
 	/*
 	for (size_t i = 0; i != idleUnits.size(); ++i) {
 		CUnit &aiunit = *idleUnits[i];
-		const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+		//Wyrmgus start
+//		const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+		const int delay = i; // To avoid lot of CPU consuption, send them with a small time difference.
+		//Wyrmgus end
 
 		//Wyrmgus start
 //		aiunit.Wait = delay;
