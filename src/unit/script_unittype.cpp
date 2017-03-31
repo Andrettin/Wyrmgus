@@ -2380,19 +2380,6 @@ static int CclDefineUnitType(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (type->BoolFlag[HARVESTER_INDEX].value) {
-		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 5,\n";
-		button_definition += "\tLevel = 0,\n";
-		button_definition += "\tAction = \"return-goods\",\n";
-		button_definition += "\tPopup = \"popup-commands\",\n";
-		button_definition += "\tKey = \"g\",\n";
-		button_definition += "\tHint = _(\"Return with ~!Goods\"),\n";
-		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
-		button_definition += "})";
-		CclCommand(button_definition);
-	}
-	
 	// make units allowed by default
 	for (int i = 0; i < PlayerMax; ++i) {
 		AllowUnitId(Players[i], type->Slot, 65536);
