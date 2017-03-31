@@ -377,7 +377,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 						continue;
 					}
 
-					if (!UnitReachable(caster, *table[i], spell.Range)) {
+					if (!UnitReachable(caster, *table[i], spell.Range, caster.GetReactionRange() * 8)) {
 						continue;
 					}
 					//Wyrmgus end
@@ -464,7 +464,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 					continue;
 				}
 
-				if (!UnitReachable(caster, *table[i], spell.Range)) {
+				if (!UnitReachable(caster, *table[i], spell.Range, caster.GetReactionRange() * 8)) {
 					continue;
 				}
 				//Wyrmgus end

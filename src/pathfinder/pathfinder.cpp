@@ -248,7 +248,10 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 **
 **  @return       Distance to place.
 */
-int UnitReachable(const CUnit &src, const CUnit &dst, int range)
+//Wyrmgus start
+//int UnitReachable(const CUnit &src, const CUnit &dst, int range)
+int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length)
+//Wyrmgus end
 {
 	//  Find a path to the goal.
 	if (src.Type->Building) {
@@ -257,7 +260,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range)
 	const int depth = PlaceReachable(src, dst.tilePos,
 									 //Wyrmgus start
 //									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range);
-									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range, 0, dst.MapLayer);
+									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range, max_length, dst.MapLayer);
 									 //Wyrmgus end
 	if (depth <= 0) {
 		return 0;

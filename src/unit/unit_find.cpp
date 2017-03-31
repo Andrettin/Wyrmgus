@@ -1085,7 +1085,7 @@ private:
 		// Unit in range ?
 		const int d = attacker->MapDistanceTo(*dest);
 
-		if (d > attackrange && !UnitReachable(*attacker, *dest, attackrange)) {
+		if (d > attackrange && !UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8)) {
 			return INT_MAX;
 		}
 
@@ -1326,7 +1326,7 @@ public:
 //				if (d <= attackrange ||
 //					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 				if ((d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange))) && (!Map.IsLayerUnderground(attacker->MapLayer) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer))) {
+					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!Map.IsLayerUnderground(attacker->MapLayer) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer))) {
 				//Wyrmgus end
 					++enemy_count;
 				} else {

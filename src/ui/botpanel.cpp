@@ -1928,7 +1928,10 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 */
 void CButtonPanel::Update()
 {
-	if (Selected.empty()) {
+	//Wyrmgus start
+//	if (Selected.empty()) {
+	if (Selected.empty() || (!GameRunning && !GameEstablishing)) {
+	//Wyrmgus end
 		CurrentButtons.clear();
 		return;
 	}

@@ -231,7 +231,10 @@ extern void FreePathfinder();
 /// Returns the next element of the path
 extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
 /// Return distance to unit.
-extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);
+//Wyrmgus start
+//extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);
+extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range, int max_length = 0);
+//Wyrmgus end
 /// Can the unit 'src' reach the place x,y
 extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
 						  //Wyrmgus start
