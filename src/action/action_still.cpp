@@ -324,7 +324,7 @@ static bool PickUpItem(CUnit &unit)
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (!table[i]->Removed) {
 			if (CanPickUp(unit, *table[i])) {
-				if (table[i]->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value) >= table[i]->Variable[HITPOINTHEALING_INDEX].Value) {
+				if (table[i]->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value) > 0) {
 					if (UnitReachable(unit, *table[i], 1, unit.GetReactionRange() * 8)) {
 						CommandPickUp(unit, *table[i], FlushCommands);
 						return true;
