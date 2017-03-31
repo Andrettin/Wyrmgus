@@ -467,6 +467,12 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	file.printf("  \"script-debug\", %s,\n", ai.ScriptDebug ? "true" : "false");
 	file.printf("  \"sleep-cycles\", %lu,\n", ai.SleepCycles);
 
+	//Wyrmgus start
+	if (ai.Scouting) {
+		file.printf("  \"scouting\",\n");
+	}
+	//Wyrmgus end
+	
 	//  All forces
 	for (size_t i = 0; i < ai.Force.Size(); ++i) {
 		file.printf("  \"force\", {%d, %s%s%s", (int) i,
@@ -1442,5 +1448,26 @@ void AiEachSecond(CPlayer &player)
 		AiSendExplorers();
 	}
 }
+
+//Wyrmgus start
+/**
+**  This is called for each player each minute.
+**
+**  @param player  The player structure pointer.
+*/
+void AiEachMinute(CPlayer &player)
+{
+	AiPlayer = player.Ai;
+#ifdef DEBUG
+	if (!AiPlayer) {
+		return;
+	}
+#endif
+
+	if (AiPlayer->Scouting) { //check periodically if has found new enemies
+		AiPlayer->Scouting = false;
+	}
+}
+//Wyrmgus end
 
 //@}

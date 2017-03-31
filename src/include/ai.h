@@ -54,6 +54,9 @@ extern int AiSleepCycles;  /// Ai sleeps # cycles
 
 extern void AiEachCycle(CPlayer &player);   /// Called each game cycle
 extern void AiEachSecond(CPlayer &player);  /// Called each second
+//Wyrmgus start
+extern void AiEachMinute(CPlayer &player);  /// Called each minute
+//Wyrmgus end
 
 extern void InitAiModule();       /// Init AI global structures
 extern void AiInit(CPlayer &player);   /// Init AI for this player

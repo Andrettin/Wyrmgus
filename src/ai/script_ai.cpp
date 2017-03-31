@@ -1493,6 +1493,11 @@ static int CclDefineAiPlayer(lua_State *l)
 			ai->ScriptDebug = LuaToBoolean(l, j + 1);
 		} else if (!strcmp(value, "sleep-cycles")) {
 			ai->SleepCycles = LuaToNumber(l, j + 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "scouting")) {
+			ai->Scouting = true;
+			--j;
+		//Wyrmgus end
 		} else if (!strcmp(value, "force")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

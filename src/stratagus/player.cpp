@@ -2943,6 +2943,10 @@ void PlayersEachMinute(int playerIdx)
 {
 	CPlayer &player = Players[playerIdx];
 
+	if (player.AiEnabled) {
+		AiEachMinute(player);
+	}
+
 	player.UpdateQuestPool(); // every minute, update the quest pool
 }
 //Wyrmgus end
