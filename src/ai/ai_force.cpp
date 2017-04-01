@@ -712,6 +712,12 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 		
+		//Wyrmgus start
+		if (!unit->IsIdle()) {
+			continue;
+		}
+		//Wyrmgus end
+		
 		if (unit->Container == NULL) {
 			//Wyrmgus start
 //			const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
@@ -749,6 +755,13 @@ void AiForce::ReturnToHome()
 	//Wyrmgus end
 		for (size_t i = 0; i != this->Units.size(); ++i) {
 			CUnit &unit = *this->Units[i];
+			
+			//Wyrmgus start
+			if (!unit.IsIdle()) {
+				continue;
+			}
+			//Wyrmgus end
+		
 			//Wyrmgus start
 //			CommandMove(unit, this->HomePos, FlushCommands);
 			CommandMove(unit, this->HomePos, FlushCommands, this->HomeMapLayer);
@@ -1376,6 +1389,12 @@ void AiForce::Update()
 			State = AiForceAttackingState_Attacking;
 			for (size_t i = 0; i != this->Size(); ++i) {
 				CUnit &aiunit = *this->Units[i];
+				
+				//Wyrmgus start
+				if (!aiunit.IsIdle()) {
+					continue;
+				}
+				//Wyrmgus end
 				
 				//Wyrmgus start
 //				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
