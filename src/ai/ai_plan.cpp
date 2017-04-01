@@ -645,6 +645,10 @@ static CUnit *GetBestScout(int unit_type)
 		} else {
 			flyeronly = true;
 		}
+		
+		if (unit_type == UnitTypeNaval && unit.Type->CanTransport() && unit.BoardCount) { //if a transporter is carrying a unit, then it shouldn't be used for scouting, as it likely is taking part in an attack
+			continue;
+		}
 
 		int score = unit.Variable[SIGHTRANGE_INDEX].Value - 4;
 		score += unit.Variable[SPEED_INDEX].Value - 10;

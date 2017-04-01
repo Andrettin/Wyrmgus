@@ -939,6 +939,12 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			if (&defender == &aiunit) {
 				continue;
 			}
+			
+			//Wyrmgus start
+			if (aiunit.BoardCount) { //if is transporting a unit, don't go to help, as that may endanger your cargo/passengers
+				continue;
+			}
+			//Wyrmgus end
 
 			// if brother is idle or attack no-agressive target and
 			// can attack our attacker then ask for help
@@ -1033,6 +1039,12 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 		if (!aiunit.IsAliveOnMap()) {
 			continue;
 		}
+
+		//Wyrmgus start
+		if (aiunit.BoardCount) { //if is transporting a unit, don't go to help, as that may endanger your cargo/passengers
+			continue;
+		}
+		//Wyrmgus end
 
 		// if brother is idle or attack no-agressive target and
 		// can attack our attacker then ask for help

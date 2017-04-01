@@ -1209,6 +1209,15 @@ void AiForce::Update()
 	}
 	//Wyrmgus end
 	//Wyrmgus start
+	//if one of the force's units is being used as a scout, stop its function as a scout when the force is used to attack
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit *unit = this->Units[i];
+		if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), unit) != AiPlayer->Scouts.end()) {
+			AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), unit), AiPlayer->Scouts.end());
+		}
+	}
+	//Wyrmgus end
+	//Wyrmgus start
 	//if force still has no goal, run its Attack function again to get a target
 //	if (Map.Info.IsPointOnMap(GoalPos) == false) {
 	if (Map.Info.IsPointOnMap(GoalPos, GoalMapLayer) == false) {

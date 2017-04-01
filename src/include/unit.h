@@ -400,7 +400,7 @@ public:
 	int GetEffectiveResourceSellPrice(const int resource, int traded_quantity = 100) const;
 	int GetEffectiveResourceBuyPrice(const int resource, int traded_quantity = 100) const;
 	int GetResourceStep(const int resource) const;
-	bool CanAttack(bool count_inside = false) const;
+	bool CanAttack(bool count_inside = true) const;
 	bool IsInCombat() const;
 	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;
 	bool CanReturnGoodsTo(const CUnit *dest, int resource = 0) const;

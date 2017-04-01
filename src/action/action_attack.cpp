@@ -835,7 +835,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	if (!unit.CanAttack() && !this->HasGoal()) { //if unit is a transporter that can't attack, return false if the original target no longer exists
+	if (!unit.CanAttack(true) && !this->HasGoal()) { //if unit is a transporter that can't attack, return false if the original target no longer exists
 		this->Finished = true;
 		return;
 	}
