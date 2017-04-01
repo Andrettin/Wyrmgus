@@ -289,7 +289,6 @@ public:
 	CTerrainFeature *TerrainFeature;
 	short SolidTile;
 	short OverlaySolidTile;
-	bool Visible[MaxDirections];			/// whether the tile is visible from a particular direction
 	bool OverlayTerrainDestroyed;
 	bool OverlayTerrainDamaged;
 	std::vector<std::pair<CTerrainType *, short>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
@@ -302,6 +301,7 @@ public:
 	//Wyrmgus start
 //	unsigned char Value;       /// HP for walls/ Wood Regeneration
 	short Value;       /// HP for walls/ Wood Regeneration
+	int Landmass;			   /// To which landmass does this map field belong (if any); 0 means none (is water)
 	//Wyrmgus end
 	CUnitCache UnitCache;      /// A unit on the map field.
 

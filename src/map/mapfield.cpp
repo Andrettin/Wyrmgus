@@ -61,6 +61,7 @@ CMapField::CMapField() :
 	cost(0),
 	Value(0),
 	//Wyrmgus start
+	Landmass(0),
 	AnimationFrame(0),
 	OverlayAnimationFrame(0),
 	Terrain(NULL), OverlayTerrain(NULL),
@@ -70,12 +71,7 @@ CMapField::CMapField() :
 	OverlayTerrainDamaged(false),
 	//Wyrmgus end
 	UnitCache()
-//Wyrmgus start
-//{}
-{
-	memset(Visible, 0, sizeof(Visible));
-}
-//Wyrmgus end
+{}
 
 bool CMapField::IsTerrainResourceOnMap(int resource) const
 {

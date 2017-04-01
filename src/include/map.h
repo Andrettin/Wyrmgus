@@ -358,7 +358,7 @@ public:
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
-	void CalculateTileVisibility(const Vec2i &pos, int z);
+	void CalculateTileLandmass(const Vec2i &pos, int z);
 	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline, int z);
@@ -510,6 +510,7 @@ public:
 	static CGraphic *FogGraphic;      /// graphic for fog of war
 	//Wyrmgus start
 	CGraphic *SolidTileGraphics[16];   /// separate graphics for solid tiles
+	int Landmasses;						/// how many landmasses are there
 	std::vector<int> TimeOfDaySeconds;		/// how many seconds it takes to change the time of day, for each map layer
 	std::vector<int> TimeOfDay;				/// the time of day for each map layer
 	std::vector<CPlane *> Planes;			/// the plane pointer (if any) for each map layer
