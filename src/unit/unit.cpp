@@ -6090,7 +6090,10 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 			&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
 		) {
 		//Wyrmgus end
-			AiHelpMe(attacker, target);
+			//Wyrmgus start
+//			AiHelpMe(attacker, target);
+			AiHelpMe(GetFirstContainer(*attacker), target);
+			//Wyrmgus end
 		}
 	}
 }
@@ -6527,7 +6530,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
 	) {
 	//Wyrmgus end
-		AiHelpMe(attacker, target);
+		//Wyrmgus start
+//		AiHelpMe(attacker, target);
+		AiHelpMe(GetFirstContainer(*attacker), target);
+		//Wyrmgus end
 	}
 
 	// OnHit callback
@@ -6635,7 +6641,11 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	//Wyrmgus end
 		// Attack units in range (which or the attacker?)
 		// Don't bother unit if it casting repeatable spell
-		HitUnit_AttackBack(*attacker, target);
+		//Wyrmgus start
+//		HitUnit_AttackBack(*attacker, target);
+		HitUnit_AttackBack(*GetFirstContainer(*attacker), target); //if the unit is in a container, attack it instead of the unit (which is removed and thus unreachable)
+		
+		//Wyrmgus end
 	}
 
 	// What should we do with workers on :
