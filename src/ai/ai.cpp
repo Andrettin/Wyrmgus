@@ -938,6 +938,8 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 	//Wyrmgus end
 
 	//  If unit belongs to an attacking force, check if force members can help.
+	//Wyrmgus start
+	/*
 	if (defender.GroupId) {
 		AiForce &aiForce = pai.Force[defender.GroupId - 1];
 
@@ -989,14 +991,12 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 					//Wyrmgus end
 
 					//Wyrmgus start
-					/*
-					if (aiunit.CanStoreOrder(savedOrder) == false) {
-						delete savedOrder;
-						savedOrder = NULL;
-					} else {
-						aiunit.SavedOrder = savedOrder;
-					}
-					*/
+//					if (aiunit.CanStoreOrder(savedOrder) == false) {
+//						delete savedOrder;
+//						savedOrder = NULL;
+//					} else {
+//						aiunit.SavedOrder = savedOrder;
+//					}
 					//Wyrmgus end
 				}
 			}
@@ -1010,6 +1010,8 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			return;
 		}
 	}
+	*/
+	//Wyrmgus end
 
 	// Send defending forces, also send attacking forces if they are home/traning.
 	// This is still basic model where we suspect only one base ;(
@@ -1020,7 +1022,11 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 		if (aiForce.Size() > 0
 			&& ((aiForce.Role == AiForceRoleDefend && !aiForce.Attacking)
-				|| (aiForce.Role == AiForceRoleAttack && !aiForce.Attacking && !aiForce.State))) {  // none attacking
+				//Wyrmgus start
+//				|| (aiForce.Role == AiForceRoleAttack && !aiForce.Attacking && !aiForce.State))) {  // none attacking
+				|| (aiForce.Role == AiForceRoleAttack && !aiForce.Attacking && !aiForce.State)
+				|| (defender.GroupId && i == (defender.GroupId - 1)))) {  // none attacking
+				//Wyrmgus end
 			//Wyrmgus start
 //			aiForce.Defending = true;
 			if (!aiForce.Attacking) {
