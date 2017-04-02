@@ -61,16 +61,20 @@
 class EnemyUnitFinder
 {
 public:
-	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, int find_type, bool include_neutral) :
+	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, int find_type, bool include_neutral, bool allow_water) :
 	//Wyrmgus end
 		unit(unit),
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		attackrange(unit.GetModifiedVariable(ATTACKRANGE_INDEX)),
 		find_type(find_type),
 		include_neutral(include_neutral),
+		allow_water(allow_water),
 		result_unit(result_unit)
 	{
 		*result_unit = NULL;
+		if (allow_water) {
+			movemask &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
+		}
 	}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -79,6 +83,7 @@ private:
 	const int attackrange;
 	const int find_type;
 	bool include_neutral;
+	bool allow_water;
 	CUnit **result_unit;
 };
 
@@ -133,7 +138,7 @@ class AiForceEnemyFinder
 public:
 	//Wyrmgus start
 //	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy)
-	AiForceEnemyFinder(int force, const CUnit **enemy, const bool include_neutral) : enemy(enemy), IncludeNeutral(include_neutral)
+	AiForceEnemyFinder(int force, const CUnit **enemy, const bool include_neutral, const bool allow_water) : enemy(enemy), IncludeNeutral(include_neutral), allow_water(allow_water)
 	//Wyrmgus end
 	{
 		Assert(enemy != NULL);
@@ -143,7 +148,7 @@ public:
 
 	//Wyrmgus start
 //	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy)
-	AiForceEnemyFinder(AiForce &force, const CUnit **enemy, const bool include_neutral) : enemy(enemy), IncludeNeutral(include_neutral)
+	AiForceEnemyFinder(AiForce &force, const CUnit **enemy, const bool include_neutral, const bool allow_water) : enemy(enemy), IncludeNeutral(include_neutral), allow_water(allow_water)
 	//Wyrmgus end
 	{
 		Assert(enemy != NULL);
@@ -183,7 +188,7 @@ public:
 
 			CUnit *result_unit = NULL;
 
-			EnemyUnitFinder enemyUnitFinder(*unit, &result_unit, FIND_TYPE, IncludeNeutral);
+			EnemyUnitFinder enemyUnitFinder(*unit, &result_unit, FIND_TYPE, IncludeNeutral, allow_water);
 
 			terrainTraversal.Run(enemyUnitFinder);
 			*enemy = result_unit;
@@ -233,6 +238,7 @@ private:
 	const CUnit **enemy;
 	//Wyrmgus start
 	const bool IncludeNeutral;
+	const bool allow_water;
 	std::vector<const CUnitType *> CheckedTypes;
 	//Wyrmgus end
 };
@@ -623,17 +629,17 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		if (isTransporter) {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy);
-			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy, include_neutral);
+			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy, include_neutral, false);
 			//Wyrmgus end
 		} else if (isNaval) {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy);
-			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy, include_neutral);
+			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy, include_neutral, false);
 			//Wyrmgus end
 		} else {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy);
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy, include_neutral);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy, include_neutral, true);
 			//Wyrmgus end
 		}
 		if (enemy) {
@@ -1357,12 +1363,12 @@ void AiForce::Update()
 
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, include_neutral);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, include_neutral, true);
 			//Wyrmgus end
 			if (!unit) {
 				//Wyrmgus start
 //				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
-				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, include_neutral);
+				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, include_neutral, true);
 				//Wyrmgus end
 				if (!unit) {
 					//Wyrmgus start
@@ -1463,12 +1469,12 @@ void AiForce::Update()
 		if (isNaval) {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
-			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, include_neutral);
+			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, include_neutral, false);
 			//Wyrmgus end
 		} else {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, include_neutral);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, include_neutral, true);
 			//Wyrmgus end
 		}
 		if (!unit) {
@@ -1591,7 +1597,7 @@ void AiForceManager::Update()
 						const CUnit *dummy = NULL;
 						//Wyrmgus start
 //						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
-						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy, false).found()) {
+						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy, false, false).found()) {
 						//Wyrmgus end
 							force.ReturnToHome();
 						}

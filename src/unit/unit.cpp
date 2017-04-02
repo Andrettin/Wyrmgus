@@ -3651,11 +3651,16 @@ void UnitLost(CUnit &unit)
 				player.ResourceDemand[i] -= type.Stats[player.Index].ResourceDemand[i];
 			}
 			
-			if (player.AiEnabled && player.Ai && std::find(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit) != player.Ai->Scouts.end()) {
-				player.Ai->Scouts.erase(std::remove(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit), player.Ai->Scouts.end());
-				
-				if (player.Ai->Scouting) { //if an AI player's scout has been lost, unmark it as "scouting" so that the force can see if it now has a viable target
-					player.Ai->Scouting = false;
+			if (player.AiEnabled && player.Ai) {
+				if (std::find(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit) != player.Ai->Scouts.end()) {
+					player.Ai->Scouts.erase(std::remove(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit), player.Ai->Scouts.end());
+					
+					if (player.Ai->Scouting) { //if an AI player's scout has been lost, unmark it as "scouting" so that the force can see if it now has a viable target
+						player.Ai->Scouting = false;
+					}
+				}
+				if (std::find(player.Ai->Transporters.begin(), player.Ai->Transporters.end(), &unit) != player.Ai->Transporters.end()) {
+					player.Ai->Transporters.erase(std::remove(player.Ai->Transporters.begin(), player.Ai->Transporters.end(), &unit), player.Ai->Transporters.end());
 				}
 			}
 			//Wyrmgus end

@@ -301,7 +301,7 @@ public:
 	//Wyrmgus start
 //	unsigned char Value;       /// HP for walls/ Wood Regeneration
 	short Value;       /// HP for walls/ Wood Regeneration
-	int Landmass;			   /// To which landmass does this map field belong (if any); 0 means none (is water)
+	int Landmass;			   /// To which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
 	//Wyrmgus end
 	CUnitCache UnitCache;      /// A unit on the map field.
 

@@ -614,6 +614,15 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		}
 		file.printf("},\n");
 	}
+	
+	if (!ai.Transporters.empty()) {
+		file.printf("  \"transporters\", {");
+		for (size_t i = 0; i != ai.Transporters.size(); ++i) {
+			const CUnit &aiunit = *ai.Transporters[i];
+			file.printf(" %d, \"%s\",", UnitNumber(aiunit), aiunit.Type->Ident.c_str());
+		}
+		file.printf("},\n");
+	}
 	//Wyrmgus end
 	
 	//Wyrmgus start

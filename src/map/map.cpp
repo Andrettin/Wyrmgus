@@ -1881,6 +1881,7 @@ void CMap::Clean()
 	this->Fields.clear();
 	this->TimeOfDaySeconds.clear();
 	this->TimeOfDay.clear();
+	this->BorderLandmasses.clear();
 	this->Planes.clear();
 	this->Worlds.clear();
 	this->Layers.clear();
@@ -2192,8 +2193,6 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 			}
 		}
 	}
-	
-	this->CalculateTileLandmass(pos, z);
 }
 
 //Wyrmgus start
@@ -2210,7 +2209,6 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	mf.RemoveOverlayTerrain();
 	
 	this->CalculateTileTransitions(pos, true, z);
-	this->CalculateTileLandmass(pos, z);
 	
 	UI.Minimap.UpdateXY(pos, z);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -2529,51 +2527,36 @@ void CMap::CalculateTileLandmass(const Vec2i &pos, int z)
 	}
 	
 	CMapField &mf = *this->Field(pos, z);
+
+	if (mf.Landmass != 0) {
+		return; //already calculated
+	}
 	
-	if ((mf.Flags & MapFieldWaterAllowed) || (mf.Flags & MapFieldCoastAllowed)) { // tile is water, set landmass to zero
-		mf.Landmass = 0;
-	} else {
-		if (mf.Landmass != 0) {
-			return; //already calculated
-		}
+	bool is_water = (mf.Flags & MapFieldWaterAllowed) || (mf.Flags & MapFieldCoastAllowed);
+
+	//doesn't have a landmass ID, and hasn't inherited one from another tile yet, so add a new one
+	mf.Landmass = this->Landmasses + 1;
+	this->Landmasses += 1;
+	this->BorderLandmasses.resize(this->Landmasses + 1);
+	//now, spread the new landmass ID to neighboring land tiles
+	std::vector<Vec2i> landmass_tiles;
+	landmass_tiles.push_back(pos);
+	//calculate the landmass of any neighboring land tiles with no set landmass as well
+	for (size_t i = 0; i < landmass_tiles.size(); ++i) {
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
-					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+					Vec2i adjacent_pos(landmass_tiles[i].x + x_offset, landmass_tiles[i].y + y_offset);
+					if (this->Info.IsPointOnMap(adjacent_pos, z)) {
 						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-							
-						if (adjacent_mf.Landmass != 0) {
-							mf.Landmass = adjacent_mf.Landmass;
-							break;
-						}
-					}
-				}
-			}
-			if (mf.Landmass != 0) {
-				break;
-			}
-		}
-		if (mf.Landmass == 0) { //no adjacent tile has a landmass ID, add a new one
-			mf.Landmass = Map.Landmasses + 1;
-			Map.Landmasses += 1;
-			//now, spread the new landmass ID to neighboring land tiles
-			std::vector<Vec2i> landmass_tiles;
-			landmass_tiles.push_back(pos);
-			//calculate the landmass of any neighboring land tiles with no set landmass as well
-			for (size_t i = 0; i < landmass_tiles.size(); ++i) {
-				for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-					for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-						if (x_offset != 0 || y_offset != 0) {
-							Vec2i adjacent_pos(landmass_tiles[i].x + x_offset, landmass_tiles[i].y + y_offset);
-							if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-								CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-										
-								if (adjacent_mf.Landmass == 0 && !(adjacent_mf.Flags & MapFieldWaterAllowed) && !(adjacent_mf.Flags & MapFieldCoastAllowed)) {
-									adjacent_mf.Landmass = mf.Landmass;
-									landmass_tiles.push_back(adjacent_pos);
-								}
-							}
+						bool adjacent_is_water = (adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed);
+									
+						if (adjacent_is_water == is_water && adjacent_mf.Landmass == 0) {
+							adjacent_mf.Landmass = mf.Landmass;
+							landmass_tiles.push_back(adjacent_pos);
+						} else if (adjacent_is_water != is_water && adjacent_mf.Landmass != 0 && std::find(this->BorderLandmasses[mf.Landmass].begin(), this->BorderLandmasses[mf.Landmass].end(), adjacent_mf.Landmass) == this->BorderLandmasses[mf.Landmass].end()) {
+							this->BorderLandmasses[mf.Landmass].push_back(adjacent_mf.Landmass);
+							this->BorderLandmasses[adjacent_mf.Landmass].push_back(mf.Landmass);
 						}
 					}
 				}

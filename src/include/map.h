@@ -511,6 +511,7 @@ public:
 	//Wyrmgus start
 	CGraphic *SolidTileGraphics[16];   /// separate graphics for solid tiles
 	int Landmasses;						/// how many landmasses are there
+	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
 	std::vector<int> TimeOfDaySeconds;		/// how many seconds it takes to change the time of day, for each map layer
 	std::vector<int> TimeOfDay;				/// the time of day for each map layer
 	std::vector<CPlane *> Planes;			/// the plane pointer (if any) for each map layer

@@ -358,6 +358,7 @@ public:
 	//Wyrmgus start
 	int LastPathwayConstructionBuilding;		/// Last building checked for pathway construction in this turn
 	std::vector<CUnit *> Scouts;				/// AI scouting units
+	std::vector<CUnit *> Transporters;			/// AI transporters
 	//Wyrmgus end
 };
 
