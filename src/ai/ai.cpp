@@ -1018,7 +1018,56 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				aiForce.Defending = true;
 			}
 //			aiForce.Attack(pos);
-			aiForce.Attack(pos, attacker->MapLayer);
+
+			//instead of making the force attack the position, make its units that can target the attacker attack it (so that we don't have, for instance, a melee land force try to attack back ships...
+			for (unsigned int j = 0; j < aiForce.Units.size(); ++j) {
+				CUnit &aiunit = *aiForce.Units[j];
+
+				if (&defender == &aiunit) {
+					continue;
+				}
+				
+				if (aiunit.BoardCount) { //if is transporting a unit, don't go to help, as that may endanger your cargo/passengers
+					continue;
+				}
+
+				// if unit is idle or attacking a non-agressive target and
+				// can attack our attacker then ask for help
+				// FIXME ad support for help from Coward type units
+				if (aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
+					&& aiunit.CurrentOrder()->GetGoal() != attacker) {
+					bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
+
+					if (aiunit.CurrentAction() == UnitActionAttack) {
+						const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
+						const CUnit *oldGoal = orderAttack.GetGoal();
+
+						if (oldGoal == NULL || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
+												//Wyrmgus start
+	//											&& aiunit.MapDistanceTo(defender) <= aiunit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+												&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
+												//Wyrmgus end
+							shouldAttack = true;
+						}
+					}
+
+					if (shouldAttack) {
+						const int delay = j; // To avoid lot of CPU consuption, send them with a small time difference.
+
+						aiunit.Wait += delay;
+						
+						CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
+					}
+				}
+			}
+			if (!aiForce.Defending && aiForce.State > 0) {
+				DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
+						   defender.Player->Index _C_ UnitNumber(defender) _C_ defender.Type->Ident.c_str());
+				// unit belongs to an attacking force,
+				// so don't send others force in such case.
+				// FIXME: there may be other attacking the same place force who can help
+				continue;
+			}
 			//Wyrmgus end
 		}
 	}

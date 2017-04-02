@@ -3642,6 +3642,10 @@ void UnitLost(CUnit &unit)
 			} else {
 				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), &unit), player.Heroes.end());
 			}
+			
+			if (unit.Variable[LEVELUP_INDEX].Value > 0) {
+				player.UpdateLevelUpUnits(); //recalculate level-up units, since this unit no longer should be in that vector
+			}
 
 			for (int i = 0; i < MaxCosts; ++i) {
 				player.ResourceDemand[i] -= type.Stats[player.Index].ResourceDemand[i];
@@ -5936,12 +5940,6 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		// Recalculate the seen count.
 		//UnitCountSeen(unit);
 	}
-	
-	//Wyrmgus start
-	if (unit.Variable[LEVELUP_INDEX].Value > 0) {
-		unit.Player->UpdateLevelUpUnits(); //recalculate level-up units, since this unit no longer should be in that vector
-	}
-	//Wyrmgus end
 	
 	MapMarkUnitSight(unit);
 	
