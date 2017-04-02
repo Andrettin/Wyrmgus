@@ -385,6 +385,7 @@ public:
 	//Wyrmgus start
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay, int z) const;
 	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen, int z) const;
+	int GetTileLandmass(const Vec2i &pos, int z) const;
 	Vec2i GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, Vec2i min_pos, Vec2i max_pos, int z) const;
 	std::string GetSettlementName(const Vec2i &pos, int z, const Vec2i &tile_size, int civilization, int faction) const;
 	//Wyrmgus end

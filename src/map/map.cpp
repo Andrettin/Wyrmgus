@@ -1214,6 +1214,17 @@ CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen, int z) const
 	}
 }
 
+int CMap::GetTileLandmass(const Vec2i &pos, int z) const
+{
+	if (!Map.Info.IsPointOnMap(pos, z)) {
+		return NULL;
+	}
+	
+	CMapField &mf = *this->Field(pos, z);
+	
+	return mf.Landmass;
+}
+
 Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, Vec2i min_pos, Vec2i max_pos, int z) const
 {
 	if (SaveGameLoading) {
