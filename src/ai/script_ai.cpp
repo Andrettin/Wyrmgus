@@ -1671,7 +1671,10 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			int i = 0;
 			if (subargs) {
-				ai->UnitTypeRequests.resize(subargs / 2);
+				//Wyrmgus start
+//				ai->UnitTypeRequests.resize(subargs / 2);
+				ai->UnitTypeRequests.resize(subargs / 3);
+				//Wyrmgus end
 			}
 			for (int k = 0; k < subargs; ++k) {
 				const char *ident = LuaToString(l, j + 1, k + 1);
