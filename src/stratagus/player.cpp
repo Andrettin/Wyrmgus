@@ -1190,6 +1190,17 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
+	file.printf("\n  \"quest-destroy-factions\", {");
+	for (size_t j = 0; j < p.QuestDestroyFactions.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", std::get<0>(p.QuestDestroyFactions[j])->Ident.c_str());
+		file.printf("\"%s\",", std::get<1>(p.QuestDestroyFactions[j])->Ident.c_str());
+		file.printf("%s,", std::get<2>(p.QuestDestroyFactions[j]) ? "true" : "false");
+	}
+	file.printf("},");
+	
 	file.printf("\n  \"quest-gather-resources\", {");
 	for (size_t j = 0; j < p.QuestGatherResources.size(); ++j) {
 		if (j) {
@@ -1789,6 +1800,7 @@ void CPlayer::Clear()
 	this->QuestResearchUpgrades.clear();
 	this->QuestDestroyUnits.clear();
 	this->QuestDestroyUniques.clear();
+	this->QuestDestroyFactions.clear();
 	this->QuestGatherResources.clear();
 	//Wyrmgus end
 	AiEnabled = false;
@@ -2070,6 +2082,10 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		this->QuestDestroyUniques.push_back(std::tuple<CQuest *, CUniqueItem *, bool>(quest, quest->DestroyUniques[i], false));
 	}
 	
+	for (size_t i = 0; i < quest->DestroyFactions.size(); ++i) {
+		this->QuestDestroyFactions.push_back(std::tuple<CQuest *, CFaction *, bool>(quest, quest->DestroyFactions[i], false));
+	}
+	
 	for (size_t i = 0; i < quest->GatherResources.size(); ++i) {
 		this->QuestGatherResources.push_back(std::tuple<CQuest *, int, int>(quest, std::get<0>(quest->GatherResources[i]), std::get<1>(quest->GatherResources[i])));
 	}
@@ -2172,6 +2188,12 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 		}
 	}
 	
+	for (int i = (this->QuestDestroyFactions.size()  - 1); i >= 0; --i) {
+		if (std::get<0>(this->QuestDestroyFactions[i]) == quest) {
+			this->QuestDestroyFactions.erase(std::remove(this->QuestDestroyFactions.begin(), this->QuestDestroyFactions.end(), this->QuestDestroyFactions[i]), this->QuestDestroyFactions.end());
+		}
+	}
+	
 	for (int i = (this->QuestGatherResources.size()  - 1); i >= 0; --i) {
 		if (std::get<0>(this->QuestGatherResources[i]) == quest) {
 			this->QuestGatherResources.erase(std::remove(this->QuestGatherResources.begin(), this->QuestGatherResources.end(), this->QuestGatherResources[i]), this->QuestGatherResources.end());
@@ -2235,6 +2257,12 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 		}
 	}
 	
+	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
+		if (std::get<0>(this->QuestDestroyFactions[i]) == quest && std::get<2>(this->QuestDestroyFactions[i]) == false) {
+			return false;
+		}
+	}
+	
 	for (size_t i = 0; i < this->QuestGatherResources.size(); ++i) {
 		if (std::get<0>(this->QuestGatherResources[i]) == quest && std::get<2>(this->QuestGatherResources[i]) > 0) {
 			return false;
@@ -2252,12 +2280,12 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 		}
 	}
 	
-	if (quest->Unfailable) {
-		return "";
-	}
-
 	if (quest->CurrentCompleted) { // quest already completed by someone else
 		return "Another faction has completed the quest before you.";
+	}
+
+	if (quest->Unfailable) {
+		return "";
 	}
 
 	for (size_t i = 0; i < this->QuestBuildUnits.size(); ++i) {
@@ -2317,8 +2345,17 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 	}
 	
 	for (size_t i = 0; i < this->QuestDestroyUniques.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == true && std::get<1>(this->QuestDestroyUniques[i])->CanDrop()) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+		if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == false && std::get<1>(this->QuestDestroyUniques[i])->CanDrop()) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
 			return "The target no longer exists.";
+		}
+	}
+	
+	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
+		if (std::get<0>(this->QuestDestroyFactions[i]) == quest && std::get<2>(this->QuestDestroyFactions[i]) == false) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+			CPlayer *faction_player = GetFactionPlayer(std::get<1>(this->QuestDestroyFactions[i]));
+			if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
+				return "The target no longer exists.";
+			}
 		}
 	}
 	

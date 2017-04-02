@@ -1304,7 +1304,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		return PF_UNREACHABLE;
 	}
 	
-	if (maxrange <= 1 && (unit.Type->MovementMask & MapFieldWaterAllowed) && Map.Field(startPos, z)->Landmass != Map.Field(goalPos, z)->Landmass) { //if the unit cannot move through water, and the goal pos is on a different landmass than the start pos, it is unreachable
+	if (maxrange <= 1 && (unit.Type->MovementMask & MapFieldWaterAllowed) && Map.Field(startPos, z)->Landmass != 0 && Map.Field(goalPos, z)->Landmass != 0 && Map.Field(startPos, z)->Landmass != Map.Field(goalPos, z)->Landmass) { //if the unit cannot move through water, and the goal pos is on a different landmass than the start pos, it is unreachable
 		return PF_UNREACHABLE;
 	}
 	//Wyrmgus end

@@ -245,6 +245,16 @@ static int CclDefineQuest(lua_State *l)
 				}
 				quest->DestroyUniques.push_back(unique);
 			}
+		} else if (!strcmp(value, "DestroyFactions")) {
+			quest->DestroyFactions.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				CFaction *faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1, j + 1));
+				if (!faction) {
+					LuaError(l, "Faction doesn't exist.");
+				}
+				quest->DestroyFactions.push_back(faction);
+			}
 		} else if (!strcmp(value, "GatherResources")) {
 			quest->GatherResources.clear();
 			const int args = lua_rawlen(l, -1);

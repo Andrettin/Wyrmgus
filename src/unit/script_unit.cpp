@@ -1600,6 +1600,40 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 
 //Wyrmgus start
 /**
+**  Get the players who have units in rectangle box specified with 2 coordinates
+**
+**  @param l  Lua state.
+**
+**  @return   Array of units.
+*/
+static int CclGetPlayersAroundUnit(lua_State *l)
+{
+	const int nargs = lua_gettop(l);
+	if (nargs != 2) {
+		LuaError(l, "incorrect argument\n");
+	}
+	
+	const int slot = LuaToNumber(l, 1);
+	const CUnit &unit = UnitManager.GetSlotUnit(slot);
+	const int range = LuaToNumber(l, 2);
+	lua_newtable(l);
+	std::vector<CUnit *> table;
+	SelectAroundUnit(unit, range, table, MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), HasNotSamePlayerAs(*unit.Player)));
+	std::vector<int> players_around;
+	for (size_t i = 0; i < table.size(); ++i) {
+		if (table[i]->IsAliveOnMap() && std::find(players_around.begin(), players_around.end(), table[i]->Player->Index) == players_around.end()) {
+			players_around.push_back(table[i]->Player->Index);
+		}
+	}
+	size_t n = 0;
+	for (size_t i = 0; i < players_around.size(); ++i) {
+		lua_pushnumber(l, players_around[i]);
+		lua_rawseti(l, -2, ++n);
+	}
+	return 1;
+}
+
+/**
 **  Get a player's units inside another unit
 **
 **  @param l  Lua state.
@@ -2015,6 +2049,8 @@ static int CclSetUnitVariable(lua_State *l)
 		}
 	} else if (!strcmp(name, "GenerateSpecialProperties")) {
 		unit->GenerateSpecialProperties();
+	} else if (!strcmp(name, "TTL")) {
+		unit->TTL = GameCycle + LuaToNumber(l, 3);
 	//Wyrmgus end
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
@@ -2173,6 +2209,7 @@ void UnitCclRegister()
 	lua_register(Lua, "GetUnits", CclGetUnits);
 	lua_register(Lua, "GetUnitsAroundUnit", CclGetUnitsAroundUnit);
 	//Wyrmgus start
+	lua_register(Lua, "GetPlayersAroundUnit", CclGetPlayersAroundUnit);
 	lua_register(Lua, "GetUnitsInsideUnit", CclGetUnitsInsideUnit);
 	lua_register(Lua, "GetSelectedUnits", CclGetSelectedUnits);
 	//Wyrmgus end
