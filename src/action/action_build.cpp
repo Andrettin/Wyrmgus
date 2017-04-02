@@ -66,7 +66,10 @@
 #include "../ai/ai_local.h"
 //Wyrmgus end
 
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
+//Wyrmgus start
+//extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass);
+//Wyrmgus end
 
 enum {
 	State_Start = 0,
@@ -220,7 +223,10 @@ void COrder_Build::AiUnitKilled(CUnit &unit)
 			   unit.Player->Index _C_ UnitNumber(unit) _C_
 			   unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
 	if (this->BuildingUnit == NULL) {
-		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
+		//Wyrmgus start
+//		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
+		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type, Map.GetTileLandmass(this->goalPos, this->MapLayer));
+		//Wyrmgus end
 	}
 }
 
@@ -268,7 +274,10 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 			unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer, _("%s cannot reach building place"), unit.GetMessageName().c_str());
 			//Wyrmgus end
 			if (unit.Player->AiEnabled) {
-				AiCanNotReach(unit, this->GetUnitType());
+				//Wyrmgus start
+//				AiCanNotReach(unit, this->GetUnitType());
+				AiCanNotReach(unit, this->GetUnitType(), Map.GetTileLandmass(this->goalPos, this->MapLayer));
+				//Wyrmgus end
 			}
 			return true;
 		}
@@ -659,7 +668,10 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 							_("You cannot build a %s here"), type.GetDefaultName(*unit.Player).c_str());
 							//Wyrmgus end
 		if (unit.Player->AiEnabled) {
-			AiCanNotBuild(unit, type);
+			//Wyrmgus start
+//			AiCanNotBuild(unit, type);
+			AiCanNotBuild(unit, type, Map.GetTileLandmass(this->goalPos, this->MapLayer));
+			//Wyrmgus end
 		}
 		this->Finished = true;
 		return ;

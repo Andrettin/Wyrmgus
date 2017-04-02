@@ -74,10 +74,16 @@ public:
 class AiRequestType
 {
 public:
-	AiRequestType() : Count(0), Type(NULL) {}
+	//Wyrmgus start
+//	AiRequestType() : Count(0), Type(NULL) {}
+	AiRequestType() : Count(0), Type(NULL), Landmass(0) {}
+	//Wyrmgus end
 
 	unsigned int Count;  /// elements in table
 	CUnitType *Type;     /// the type
+	//Wyrmgus start
+	int Landmass;		 /// in which landmass the unit should be created
+	//Wyrmgus end
 };
 
 /**
@@ -272,7 +278,7 @@ class AiBuildQueue
 public:
 	//Wyrmgus start
 //	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0)
-	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0), MapLayer(0)
+	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0), MapLayer(0), Landmass(0)
 	//WYrmgus end
 	{
 		Pos.x = Pos.y = -1;
@@ -286,6 +292,7 @@ public:
 	Vec2i Pos;          /// build near pos on map
 	//Wyrmgus start
 	int MapLayer;
+	int Landmass;
 	//Wyrmgus end
 };
 
@@ -358,7 +365,7 @@ public:
 	//Wyrmgus start
 	int LastPathwayConstructionBuilding;		/// Last building checked for pathway construction in this turn
 	std::vector<CUnit *> Scouts;				/// AI scouting units
-	std::vector<CUnit *> Transporters;			/// AI transporters
+	std::map<int, std::vector<CUnit *>> Transporters;	/// AI transporters, mapped to the sea (water "landmass") they belong to
 	//Wyrmgus end
 };
 
@@ -471,7 +478,10 @@ extern PlayerAi *AiPlayer; /// Current AI player
 // Resource manager
 //
 /// Add unit-type request to resource manager
-extern void AiAddUnitTypeRequest(CUnitType &type, int count);
+//Wyrmgus start
+//extern void AiAddUnitTypeRequest(CUnitType &type, int count);
+extern void AiAddUnitTypeRequest(CUnitType &type, int count, int landmass = 0);
+//Wyrmgus end
 /// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(CUnitType &type);
 /// Add research request to resource manager

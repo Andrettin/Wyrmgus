@@ -58,8 +58,10 @@
 /// How many resources the player gets back if canceling building
 #define CancelBuildingCostsFactor  75
 
-
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
+//Wyrmgus start
+//extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass);
+//Wyrmgus end
 
 /* static */ COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
 {
@@ -460,7 +462,10 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 {
 	DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
-	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
+	//Wyrmgus start
+//	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
+	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, Map.GetTileLandmass(unit.tilePos, unit.MapLayer));
+	//Wyrmgus end
 }
 
 

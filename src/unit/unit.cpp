@@ -3659,8 +3659,10 @@ void UnitLost(CUnit &unit)
 						player.Ai->Scouting = false;
 					}
 				}
-				if (std::find(player.Ai->Transporters.begin(), player.Ai->Transporters.end(), &unit) != player.Ai->Transporters.end()) {
-					player.Ai->Transporters.erase(std::remove(player.Ai->Transporters.begin(), player.Ai->Transporters.end(), &unit), player.Ai->Transporters.end());
+				for (std::map<int, std::vector<CUnit *>>::iterator iterator = player.Ai->Transporters.begin(); iterator != player.Ai->Transporters.end(); ++iterator) {
+					if (std::find(iterator->second.begin(), iterator->second.end(), &unit) != iterator->second.end()) {
+						iterator->second.erase(std::remove(iterator->second.begin(), iterator->second.end(), &unit), iterator->second.end());
+					}
 				}
 			}
 			//Wyrmgus end

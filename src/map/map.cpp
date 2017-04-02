@@ -1217,7 +1217,7 @@ CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen, int z) const
 int CMap::GetTileLandmass(const Vec2i &pos, int z) const
 {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
-		return NULL;
+		return 0;
 	}
 	
 	CMapField &mf = *this->Field(pos, z);

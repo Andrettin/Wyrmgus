@@ -2114,13 +2114,19 @@ static void AiCheckPathwayConstruction()
 **
 **  @todo         FIXME: should store the end of list and not search it.
 */
-void AiAddUnitTypeRequest(CUnitType &type, int count)
+//Wyrmgus start
+//void AiAddUnitTypeRequest(CUnitType &type, int count)
+void AiAddUnitTypeRequest(CUnitType &type, int count, int landmass)
+//Wyrmgus end
 {
 	AiBuildQueue queue;
 
 	queue.Type = &type;
 	queue.Want = count;
 	queue.Made = 0;
+	//Wyrmgus start
+	queue.Landmass = landmass;
+	//Wyrmgus end
 	AiPlayer->UnitTypeBuilt.push_back(queue);
 }
 

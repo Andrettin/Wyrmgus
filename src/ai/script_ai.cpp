@@ -1415,6 +1415,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 	Vec2i pos(-1, -1);
 	//Wyrmgus start
 	int z = -1;
+	int landmass = 0;
 	//Wyrmgus end
 
 	const int args = lua_rawlen(l, offset);
@@ -1429,6 +1430,8 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 		//Wyrmgus start
 		} else if (!strcmp(value, "map-layer")) {
 			z = LuaToNumber(l, offset, k + 1);
+		} else if (!strcmp(value, "landmass")) {
+			landmass = LuaToNumber(l, offset, k + 1);
 		//Wyrmgus end
 		} else {
 			//ident = LuaToString(l, j + 1, k + 1);
@@ -1444,6 +1447,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			queue.Pos = pos;
 			//Wyrmgus start
 			queue.MapLayer = z;
+			queue.Landmass = landmass;
 			//Wyrmgus end
 
 			ai->UnitTypeBuilt.push_back(queue);
@@ -1673,8 +1677,15 @@ static int CclDefineAiPlayer(lua_State *l)
 				const char *ident = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int count = LuaToNumber(l, j + 1, k + 1);
+				//Wyrmgus start
+				++k;
+				const int landmass = LuaToNumber(l, j + 1, k + 1);
+				//Wyrmgus end
 				ai->UnitTypeRequests[i].Type = UnitTypeByIdent(ident);
 				ai->UnitTypeRequests[i].Count = count;
+				//Wyrmgus start
+				ai->UnitTypeRequests[i].Landmass = landmass;
+				//Wyrmgus end
 				++i;
 			}
 		} else if (!strcmp(value, "upgrade")) {
@@ -1718,9 +1729,10 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				const int num = LuaToNumber(l, j + 1, k + 1);
+				int landmass = LuaToNumber(l, j + 1, k + 1);
 				++k;
-				ai->Transporters.push_back(&UnitManager.GetSlotUnit(num));
+				const int num = LuaToNumber(l, j + 1, k + 1);
+				ai->Transporters[landmass].push_back(&UnitManager.GetSlotUnit(num));
 			}
 		//Wyrmgus end
 		} else {

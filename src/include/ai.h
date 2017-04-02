@@ -87,9 +87,15 @@ extern void AiNeedMoreSupply(const CPlayer &player);
 /// Called if AI unit has completed work
 extern void AiWorkComplete(CUnit *unit, CUnit &what);
 /// Called if AI unit can't build
-extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what);
+//Wyrmgus start
+//extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what);
+extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass = 0);
+//Wyrmgus end
 /// Called if AI unit can't reach building place
-extern void AiCanNotReach(CUnit &unit, const CUnitType &what);
+//Wyrmgus start
+//extern void AiCanNotReach(CUnit &unit, const CUnitType &what);
+extern void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass);
+//Wyrmgus end
 /// Called if an AI unit can't move
 extern void AiCanNotMove(CUnit &unit);
 /// Called if AI unit has completed training

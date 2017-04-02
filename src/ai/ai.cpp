@@ -228,7 +228,10 @@ static void AiCheckUnits()
 		}
 		const int requested = x - e - counter[t];
 		if (requested > 0) {  // Request it.
-			AiAddUnitTypeRequest(*AiPlayer->UnitTypeRequests[i].Type, requested);
+			//Wyrmgus start
+//			AiAddUnitTypeRequest(*AiPlayer->UnitTypeRequests[i].Type, requested);
+			AiAddUnitTypeRequest(*AiPlayer->UnitTypeRequests[i].Type, requested, AiPlayer->UnitTypeRequests[i].Landmass);
+			//Wyrmgus end
 			counter[t] += requested;
 		}
 		counter[t] -= x;
@@ -563,6 +566,9 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	for (size_t i = 0; i != unitTypeRequestsCount; ++i) {
 		file.printf("\"%s\", ", ai.UnitTypeRequests[i].Type->Ident.c_str());
 		file.printf("%d, ", ai.UnitTypeRequests[i].Count);
+		//Wyrmgus start
+		file.printf("%d, ", ai.UnitTypeRequests[i].Landmass);
+		//Wyrmgus end
 	}
 	file.printf("},\n");
 
@@ -595,6 +601,10 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		if (queue.MapLayer != -1) {
 			file.printf("\"map-layer\", %d, ", queue.MapLayer);
 		}
+		
+		if (queue.Landmass != 0) {
+			file.printf("\"landmass\", %d, ", queue.Landmass);
+		}
 		//Wyrmgus end
 		/* */
 
@@ -617,9 +627,11 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	
 	if (!ai.Transporters.empty()) {
 		file.printf("  \"transporters\", {");
-		for (size_t i = 0; i != ai.Transporters.size(); ++i) {
-			const CUnit &aiunit = *ai.Transporters[i];
-			file.printf(" %d, \"%s\",", UnitNumber(aiunit), aiunit.Type->Ident.c_str());
+		for (std::map<int, std::vector<CUnit *>>::const_iterator iterator = ai.Transporters.begin(); iterator != ai.Transporters.end(); ++iterator) {
+			for (size_t i = 0; i != iterator->second.size(); ++i) {
+				const CUnit &aiunit = *iterator->second[i];
+				file.printf(" %d, %d,", iterator->first, UnitNumber(aiunit));
+			}
 		}
 		file.printf("},\n");
 	}
@@ -787,13 +799,19 @@ void FreeAi()
 **  @param type  Unit-type which is now available.
 **  @return      True, if unit-type was found in list.
 */
-static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
+//Wyrmgus start
+//static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
+static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass = 0)
+//Wyrmgus end
 {
 	std::vector<AiBuildQueue>::iterator i;
 
 	for (i = pai->UnitTypeBuilt.begin(); i != pai->UnitTypeBuilt.end(); ++i) {
 		Assert((*i).Want);
-		if (&type == (*i).Type && (*i).Made) {
+		//Wyrmgus start
+//		if (&type == (*i).Type && (*i).Made) {
+		if (&type == (*i).Type && (*i).Made && (!(*i).Landmass || !landmass || (*i).Landmass == landmass)) {
+		//Wyrmgus end
 			--(*i).Made;
 			if (!--(*i).Want) {
 				pai->UnitTypeBuilt.erase(i);
@@ -810,7 +828,10 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
+//Wyrmgus start
+//static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
+static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass)
+//Wyrmgus end
 {
 	//Wyrmgus start
 	if (
@@ -821,7 +842,10 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
 	}
 	//Wyrmgus end
 	
-	if (AiRemoveFromBuilt2(pai, type)) {
+	//Wyrmgus start
+//	if (AiRemoveFromBuilt2(pai, type)) {
+	if (AiRemoveFromBuilt2(pai, type, landmass)) {
+	//Wyrmgus end
 		return;
 	}
 
@@ -829,7 +853,10 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
 	int equivalents[UnitTypeMax + 1];
 	const int equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
 	for (int i = 0; i < equivalentsCount; ++i) {
-		if (AiRemoveFromBuilt2(pai, *UnitTypes[equivalents[i]])) {
+		//Wyrmgus start
+//		if (AiRemoveFromBuilt2(pai, *UnitTypes[equivalents[i]])) {
+		if (AiRemoveFromBuilt2(pai, *UnitTypes[equivalents[i]], landmass)) {
+		//Wyrmgus end
 			return;
 		}
 	}
@@ -847,12 +874,18 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
 **  @param type  Unit-type which is now available.
 **  @return      True if the unit-type could be reduced.
 */
-static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type)
+//Wyrmgus start
+//static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type)
+static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landmass = 0)
+//Wyrmgus end
 {
 	std::vector<AiBuildQueue>::iterator i;
 
 	for (i = pai.UnitTypeBuilt.begin(); i != pai.UnitTypeBuilt.end(); ++i) {
-		if (&type == (*i).Type && (*i).Made) {
+		//Wyrmgus start
+//		if (&type == (*i).Type && (*i).Made) {
+		if (&type == (*i).Type && (*i).Made && (!(*i).Landmass || !landmass || (*i).Landmass == landmass)) {
+		//Wyrmgus end
 			(*i).Made--;
 			return true;
 		}
@@ -866,7 +899,10 @@ static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type)
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
+//Wyrmgus start
+//void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
+void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass)
+//Wyrmgus end
 {
 	//Wyrmgus start
 	if (
@@ -877,7 +913,10 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
 	}
 	//Wyrmgus end
 	
-	if (AiReduceMadeInBuilt2(pai, type)) {
+	//Wyrmgus start
+//	if (AiReduceMadeInBuilt2(pai, type)) {
+	if (AiReduceMadeInBuilt2(pai, type, landmass)) {
+	//Wyrmgus end
 		return;
 	}
 	//  This could happen if an upgrade is ready, look for equivalent units.
@@ -885,7 +924,10 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
 	const unsigned int equivnb = AiFindUnitTypeEquiv(type, equivs);
 
 	for (unsigned int i = 0; i < equivnb; ++i) {
-		if (AiReduceMadeInBuilt2(pai, *UnitTypes[equivs[i]])) {
+		//Wyrmgus start
+//		if (AiReduceMadeInBuilt2(pai, *UnitTypes[equivs[i]])) {
+		if (AiReduceMadeInBuilt2(pai, *UnitTypes[equivs[i]], landmass)) {
+		//Wyrmgus end
 			return;
 		}
 	}
@@ -1194,7 +1236,10 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 	}
 
 	Assert(what.Player->Type != PlayerPerson);
-	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
+	//Wyrmgus start
+//	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
+	AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer));
+	//Wyrmgus end
 }
 
 /**
@@ -1203,14 +1248,20 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotBuild(const CUnit &unit, const CUnitType &what)
+//Wyrmgus start
+//void AiCanNotBuild(const CUnit &unit, const CUnitType &what)
+void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass)
+//Wyrmgus end
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
 			   what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
 	Assert(unit.Player->Type != PlayerPerson);
-	AiReduceMadeInBuilt(*unit.Player->Ai, what);
+	//Wyrmgus start
+//	AiReduceMadeInBuilt(*unit.Player->Ai, what);
+	AiReduceMadeInBuilt(*unit.Player->Ai, what, landmass);
+	//Wyrmgus end
 }
 
 /**
@@ -1219,10 +1270,16 @@ void AiCanNotBuild(const CUnit &unit, const CUnitType &what)
 **  @param unit  Pointer to unit what builds the building.
 **  @param what  Pointer to unit-type.
 */
-void AiCanNotReach(CUnit &unit, const CUnitType &what)
+//Wyrmgus start
+//void AiCanNotReach(CUnit &unit, const CUnitType &what)
+void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass)
+//Wyrmgus end
 {
 	Assert(unit.Player->Type != PlayerPerson);
-	AiReduceMadeInBuilt(*unit.Player->Ai, what);
+	//Wyrmgus start
+//	AiReduceMadeInBuilt(*unit.Player->Ai, what);
+	AiReduceMadeInBuilt(*unit.Player->Ai, what, landmass);
+	//Wyrmgus end
 }
 
 /**
@@ -1419,7 +1476,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
 	if (unit.Player == what.Player) {
-		AiRemoveFromBuilt(what.Player->Ai, *what.Type);
+		AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer));
 	}
 	//Wyrmgus end
 
