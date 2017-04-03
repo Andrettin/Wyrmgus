@@ -759,4 +759,38 @@ void AiSendExplorers()
 	//Wyrmgus end
 }
 
+//Wyrmgus start
+void AiCheckTransporters()
+{
+	AiPlayer->Transporters.clear();
+	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
+
+		if (!unit.IsAliveOnMap()) {
+			continue;
+		}
+		if (!unit.Type->CanTransport()) {
+			continue;
+		}
+		if (unit.Type->UnitType != UnitTypeNaval && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
+			continue;
+		}
+		if (unit.CanMove() == false) {
+			continue;
+		}
+		if (!unit.Active) {
+			continue;
+		}
+		if (unit.GroupId != 0) { //don't use units in forces
+			continue;
+		}
+		
+		int landmass = Map.GetTileLandmass(unit.tilePos, unit.MapLayer);
+		
+		AiPlayer->Transporters[landmass].push_back(&unit);
+	}
+	//Wyrmgus end
+}
+//Wyrmgus end
+
 //@}

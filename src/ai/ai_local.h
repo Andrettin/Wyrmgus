@@ -114,6 +114,9 @@ enum AiForceAttackingState {
 	AiForceAttackingState_GoingToRallyPoint,
 	AiForceAttackingState_AttackingWithTransporter,
 	AiForceAttackingState_Attacking,
+	//W.rmgus.start
+	AiForceAttackingState_WaitingForTransporters,
+	//W.rmgus.end
 };
 
 #define AI_WAIT_ON_RALLY_POINT 60          /// Max seconds AI units will wait on rally point
@@ -185,6 +188,7 @@ public:
 	//Wyrmgus start
 //	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
 	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z);
+	bool CheckTransportersForGoal(const Vec2i &pos, int z);
 	//Wyrmgus end
 	void Insert(CUnit &unit);
 
@@ -457,6 +461,8 @@ public:
 	** abilities that it can learn.
 	*/
 	std::vector<std::vector<CUpgrade *> > LearnableAbilities;
+	
+	std::vector<std::vector<CUnitType *> > NavalTransporters;
 	//Wyrmgus end
 };
 
@@ -503,6 +509,10 @@ extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeM
 extern void AiNewDepotRequest(CUnit &worker);
 extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit);
 
+//Wyrmgus start
+extern void AiTransportCapacityRequest(int capacity_needed, int landmass);
+//Wyrmgus end
+
 //
 // Buildings
 //
@@ -542,6 +552,10 @@ extern int AiFindWall(AiForce *force);
 /// Plan the an attack
 /// Send explorers around the map
 extern void AiSendExplorers();
+//Wyrmgus start
+/// Assign free transporters according to their sea (water "landmass")
+extern void AiCheckTransporters();
+//Wyrmgus end
 /// Enemy units in distance
 extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,
 								  //Wyrmgus start

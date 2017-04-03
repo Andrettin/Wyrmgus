@@ -783,6 +783,7 @@ void FreeAi()
 	AiHelpers.ProducedResources.clear();
 	AiHelpers.ExperienceUpgrades.clear();
 	AiHelpers.LearnableAbilities.clear();
+	AiHelpers.NavalTransporters.clear();
 	//Wyrmgus end
 
 	AiResetUnitTypeEquiv();
@@ -1485,8 +1486,15 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 //	unit.Player->Ai->Force.Assign(what);
 	what.Player->Ai->Force.RemoveDeadUnit();
 	what.Player->Ai->Force.Assign(what, -1, what.Player != unit.Player);
+	
+	if (what.Player->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
+		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeNaval || what.Type->UnitType == UnitTypeFly || what.Type->UnitType == UnitTypeFlyLow)) {
+			int landmass = Map.GetTileLandmass(what.tilePos, what.MapLayer);
+			
+			what.Player->Ai->Transporters[landmass].push_back(&what);
+		}
+	}
 	//Wyrmgus end
-
 }
 
 /**
@@ -1597,6 +1605,8 @@ void AiEachMinute(CPlayer &player)
 	if (AiPlayer->Scouting) { //check periodically if has found new enemies
 		AiPlayer->Scouting = false;
 	}
+	
+	AiCheckTransporters();
 }
 //Wyrmgus end
 

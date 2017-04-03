@@ -270,6 +270,23 @@ static std::vector<CUnitType *> GetMarketUnits()
 	}
 	return res;
 }
+
+/**
+**  Get list of unit types which are transporters.
+*/
+static std::vector<CUnitType *> GetNavalTransporterUnits()
+{
+	std::vector<CUnitType *> res;
+
+	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
+		CUnitType &type = **i;
+
+		if (type.CanTransport() && (type.UnitType == UnitTypeNaval || type.UnitType == UnitTypeFly || type.UnitType == UnitTypeFlyLow)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
+			res.push_back(&type);
+		}
+	}
+	return res;
+}
 //Wyrmgus end
 
 /**
@@ -296,6 +313,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 	AiHelpers.ProducedResources.clear();
 	AiHelpers.ExperienceUpgrades.clear();
 	AiHelpers.LearnableAbilities.clear();
+	AiHelpers.NavalTransporters.clear();
 	//Wyrmgus end
 	
 	extern std::vector<ButtonAction *> UnitButtonTable;
@@ -305,6 +323,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 	std::vector<CUnitType *> mineUnits = getRefineryUnits();
 	//Wyrmgus start
 	std::vector<CUnitType *> market_units = GetMarketUnits();
+	std::vector<CUnitType *> naval_transporter_units = GetNavalTransporterUnits();
 	//Wyrmgus end
 
 	for (std::vector<CUnitType *>::const_iterator i = supplyUnits.begin(); i != supplyUnits.end(); ++i) {
@@ -313,6 +332,9 @@ static void InitAiHelper(AiHelper &aiHelper)
 	//Wyrmgus start
 	for (std::vector<CUnitType *>::const_iterator i = market_units.begin(); i != market_units.end(); ++i) {
 		AiHelperInsert(aiHelper.SellMarkets, 0, **i);
+	}
+	for (std::vector<CUnitType *>::const_iterator i = naval_transporter_units.begin(); i != naval_transporter_units.end(); ++i) {
+		AiHelperInsert(aiHelper.NavalTransporters, 0, **i);
 	}
 	//Wyrmgus end
 

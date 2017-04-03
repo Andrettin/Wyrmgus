@@ -562,6 +562,54 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 }
 
 //Wyrmgus start
+bool AiForce::CheckTransportersForGoal(const Vec2i &pos, int z)
+{
+	int home_landmass = Map.GetTileLandmass(this->HomePos, this->HomeMapLayer);
+	int goal_landmass = Map.GetTileLandmass(pos, z);
+	int water_landmass = 0;
+	for (size_t i = 0; i != Map.BorderLandmasses[goal_landmass].size(); ++i) {
+		if (std::find(Map.BorderLandmasses[home_landmass].begin(), Map.BorderLandmasses[home_landmass].end(), Map.BorderLandmasses[goal_landmass][i]) != Map.BorderLandmasses[home_landmass].end()) {
+			water_landmass = Map.BorderLandmasses[goal_landmass][i];
+			break;
+		}
+	}
+	
+	if (!water_landmass) { //not correct, should give the closest water "landmass" on the way, even if it doesn't border the goal itself
+		return true;
+	}
+	
+	int transport_capacity = 0;
+	for (size_t i = 0; i != AiPlayer->Transporters[water_landmass].size(); ++i) {
+		const CUnit &ai_transporter = *AiPlayer->Transporters[water_landmass][i];
+		transport_capacity += ai_transporter.Type->MaxOnBoard;
+	}
+	
+	int transport_capacity_needed = 0;
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		const CUnit &ai_unit = *this->Units[i];
+		transport_capacity_needed += ai_unit.Type->BoardSize;
+	}
+	
+	transport_capacity_needed -= transport_capacity;
+	
+	if (transport_capacity_needed > 0) {
+		for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
+			const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
+			if (queue.Landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeNaval || queue.Type->UnitType == UnitTypeFly || queue.Type->UnitType == UnitTypeFlyLow)) {
+				transport_capacity_needed -= queue.Want * queue.Type->MaxOnBoard;
+			}
+		}
+		if (transport_capacity_needed > 0) { //if the quantity required is still above zero even after counting the transport capacity under construction, then request more
+			AiTransportCapacityRequest(transport_capacity_needed, water_landmass);
+		}
+		return false;
+	} else {
+		return true;
+	}
+}
+//Wyrmgus end
+
+//Wyrmgus start
 //void AiForce::Attack(const Vec2i &pos)
 void AiForce::Attack(const Vec2i &pos, int z)
 //Wyrmgus end
@@ -682,6 +730,16 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		}
 		return;
 	}
+	//Wyrmgus start
+	if (this->State == AiForceAttackingState_WaitingForTransporters || (!isTransporter && !isNaval && Map.GetTileLandmass(this->HomePos, this->HomeMapLayer) != Map.GetTileLandmass(goalPos, z))) { //if is a land force attacking another landmass, see if there are enough transporters to carry it
+		if (!this->CheckTransportersForGoal(goalPos, z)) {
+			this->State = AiForceAttackingState_WaitingForTransporters;
+			return;
+		} else {
+			this->State = AiForceAttackingState_Waiting;
+		}
+	}
+	//Wyrmgus end
 	if (this->State == AiForceAttackingState_Waiting && isDefenceForce == false) {
 		Vec2i resultPos;
 		//Wyrmgus start

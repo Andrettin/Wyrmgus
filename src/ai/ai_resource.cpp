@@ -387,9 +387,15 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 
 static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
 {
-	const size_t size = AiHelpers.Build[type.Slot].size();
+	//Wyrmgus start
+//	const size_t size = AiHelpers.Build[type.Slot].size();
+	const size_t size = type.BoolFlag[BUILDING_INDEX].value ? AiHelpers.Build[type.Slot].size() : AiHelpers.Train[type.Slot].size();
+	//Wyrmgus end
 	for (size_t i = 0; i != size; ++i) {
-		CUnitType &builder = *AiHelpers.Build[type.Slot][i];
+		//Wyrmgus start
+//		CUnitType &builder = *AiHelpers.Build[type.Slot][i];
+		CUnitType &builder = type.BoolFlag[BUILDING_INDEX].value ? *AiHelpers.Build[type.Slot][i] : *AiHelpers.Train[type.Slot][i];
+		//Wyrmgus end
 
 		if (player.UnitTypesAiActiveCount[builder.Slot] > 0
 			&& CheckDependByType(player, type)) {
@@ -598,6 +604,92 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	}
 	return NULL;
 }
+
+//Wyrmgus start
+void AiTransportCapacityRequest(int capacity_needed, int landmass)
+{
+	CUnitType *best_type = NULL;
+	int best_cost = 0;
+
+	const int n = AiHelpers.NavalTransporters[0].size();
+
+	for (int i = 0; i < n; ++i) {
+		CUnitType &type = *AiHelpers.NavalTransporters[0][i];
+
+		if (!CheckDependByType(*AiPlayer->Player, type)) {
+			continue;
+		}
+
+		int cost = 0;
+		for (int c = 1; c < MaxCosts; ++c) {
+			cost += type.Stats[AiPlayer->Player->Index].Costs[c];
+		}
+		cost /= type.MaxOnBoard;
+
+		if (best_type == NULL || (cost < best_cost)) {
+			best_type = &type;
+			best_cost = cost;
+			//best_mask = needmask;
+		}
+	}
+	
+	int count_requested = capacity_needed / best_type->MaxOnBoard;
+	if (capacity_needed % best_type->MaxOnBoard) {
+		count_requested += 1;
+	}
+
+	if (best_type) {
+		bool has_builder = false;
+		const size_t size = AiHelpers.Train[best_type->Slot].size();
+		for (size_t i = 0; i != size; ++i) {
+			CUnitType &builder = *AiHelpers.Train[best_type->Slot][i];
+
+			if (AiPlayer->Player->UnitTypesAiActiveCount[builder.Slot] > 0) {
+				std::vector<CUnit *> builder_table;
+
+				FindPlayerUnitsByType(*AiPlayer->Player, builder, builder_table, true);
+
+				for (size_t j = 0; j != builder_table.size(); ++j) {
+					CUnit &builder_unit = *builder_table[j];
+					
+					if (Map.GetTileLandmass(builder_unit.tilePos, builder_unit.MapLayer) == landmass) {
+						has_builder = true;
+						break;
+					}
+				}
+				if (has_builder) {
+					break;
+				}
+			}
+		}
+		
+		if (!has_builder) { //if doesn't have an already built builder, see if there's one in the requests already
+			for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
+				const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
+				if (queue.Landmass == landmass && std::find(AiHelpers.Train[best_type->Slot].begin(), AiHelpers.Train[best_type->Slot].end(), queue.Type) != AiHelpers.Train[best_type->Slot].end()) {
+					has_builder = true;
+					break;
+				}
+			}
+		}
+		
+		if (!has_builder) { // if doesn't have a builder, request one
+			const size_t size = AiHelpers.Train[best_type->Slot].size();
+			for (size_t i = 0; i != size; ++i) {
+				CUnitType &builder = *AiHelpers.Train[best_type->Slot][i];
+				
+				if (!AiRequestedTypeAllowed(*AiPlayer->Player, builder)) {
+					continue;
+				}
+
+				AiAddUnitTypeRequest(builder, 1, landmass);
+			}
+		}
+
+		AiAddUnitTypeRequest(*best_type, count_requested, landmass);
+	}
+}
+//Wyrmgus end
 
 /**
 **  Build new units to reduce the food shortage.
