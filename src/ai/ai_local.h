@@ -188,7 +188,7 @@ public:
 	//Wyrmgus start
 //	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
 	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z);
-	bool CheckTransportersForGoal(const Vec2i &pos, int z);
+	bool CheckTransporters(const Vec2i &pos, int z);
 	//Wyrmgus end
 	void Insert(CUnit &unit);
 

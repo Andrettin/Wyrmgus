@@ -562,7 +562,7 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 }
 
 //Wyrmgus start
-bool AiForce::CheckTransportersForGoal(const Vec2i &pos, int z)
+bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 {
 	int home_landmass = Map.GetTileLandmass(this->HomePos, this->HomeMapLayer);
 	int goal_landmass = Map.GetTileLandmass(pos, z);
@@ -574,7 +574,7 @@ bool AiForce::CheckTransportersForGoal(const Vec2i &pos, int z)
 		}
 	}
 	
-	if (!water_landmass) { //not correct, should give the closest water "landmass" on the way, even if it doesn't border the goal itself
+	if (!water_landmass) { //not optimal that this is possible, perhaps should give the closest water "landmass" on the way, even if it doesn't border the goal itself?
 		return true;
 	}
 	
@@ -590,22 +590,116 @@ bool AiForce::CheckTransportersForGoal(const Vec2i &pos, int z)
 		transport_capacity_needed += ai_unit.Type->BoardSize;
 	}
 	
-	transport_capacity_needed -= transport_capacity;
+	int net_transport_capacity_needed = transport_capacity_needed - transport_capacity;
 	
-	if (transport_capacity_needed > 0) {
+	if (net_transport_capacity_needed > 0) {
 		for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
 			const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
 			if (queue.Landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeNaval || queue.Type->UnitType == UnitTypeFly || queue.Type->UnitType == UnitTypeFlyLow)) {
-				transport_capacity_needed -= queue.Want * queue.Type->MaxOnBoard;
+				net_transport_capacity_needed -= queue.Want * queue.Type->MaxOnBoard;
 			}
 		}
-		if (transport_capacity_needed > 0) { //if the quantity required is still above zero even after counting the transport capacity under construction, then request more
-			AiTransportCapacityRequest(transport_capacity_needed, water_landmass);
+		if (net_transport_capacity_needed > 0) { //if the quantity required is still above zero even after counting the transport capacity under construction, then request more
+			AiTransportCapacityRequest(net_transport_capacity_needed, water_landmass);
 		}
 		return false;
-	} else {
-		return true;
 	}
+	
+	//has enough transporters, see then if all units are already boarded
+	//put the possible transporters in a vector
+	std::vector<CUnit *> transporters;
+	for (size_t i = 0; i != AiPlayer->Transporters[water_landmass].size(); ++i) {
+		CUnit *ai_transporter = AiPlayer->Transporters[water_landmass][i];
+		
+		if (!ai_transporter->IsIdle()) { //is already moving, may be going to a unit to transport it
+			continue;
+		}
+		if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) <= 0) { //already full
+			continue;
+		}
+		
+		if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), ai_transporter) != AiPlayer->Scouts.end()) { //the transporters have to stop scouting
+			AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), ai_transporter), AiPlayer->Scouts.end());
+		}
+		
+		transporters.push_back(ai_transporter);
+	}
+		
+	bool has_unboarded_unit = false;
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit &ai_unit = *this->Units[i];
+		
+		if (ai_unit.Removed) { //already in a transporter
+			continue;
+		}
+		
+		if (Map.GetTileLandmass(ai_unit.tilePos, ai_unit.MapLayer) == goal_landmass) { //already unloaded to the enemy's landmass
+			continue;
+		}
+		
+		has_unboarded_unit = true;
+		
+		if (!ai_unit.IsIdle()) { //if the unit isn't idle, don't give it the order to board (it may already be boarding a transporter)
+			continue;
+		}
+		
+		const int delay = i; // To avoid lot of CPU consuption, send them with a small time difference.
+		ai_unit.Wait += delay;
+
+		for (size_t j = 0; j != transporters.size(); ++j) {
+			CUnit *ai_transporter = transporters[j];
+			
+			if ((ai_transporter->Type->MaxOnBoard - ai_transporter->BoardCount) < ai_unit.Type->BoardSize) { //the unit's board size is too big to fit in the transporter
+				continue;
+			}
+			
+			ai_transporter->Wait += delay;
+		
+			CommandBoard(ai_unit, *ai_transporter, FlushCommands);
+			CommandFollow(*ai_transporter, ai_unit, FlushCommands);
+			transporters.erase(std::remove(transporters.begin(), transporters.end(), ai_transporter), transporters.end()); //only tell one unit to board a particular transporter at a single time, to avoid units getting in the way of one another
+			break;
+		}
+		
+		if (transporters.size() == 0) {
+			break;
+		}
+	}
+	
+	if (has_unboarded_unit) {
+		return false;
+	}
+	
+	//everyone is already boarded, time to move to the enemy shores!
+	transporters.clear();
+	
+	bool has_loaded_unit = false;
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit &ai_unit = *this->Units[i];
+		
+		if (Map.GetTileLandmass(ai_unit.tilePos, ai_unit.MapLayer) == goal_landmass) { //already unloaded to the enemy's landmass
+			continue;
+		}
+
+		has_loaded_unit = true;
+
+		if (ai_unit.Container) { //in a transporter
+			if (!ai_unit.Container->IsIdle()) { //already moving (presumably to unload)
+				continue;
+			}
+			
+			const int delay = i; // To avoid lot of CPU consuption, send them with a small time difference.
+			ai_unit.Container->Wait += delay;
+			//tell the transporter to unload to the goal pos
+			CommandUnload(*ai_unit.Container, pos, NULL, FlushCommands, z);
+		}
+	}
+	
+	if (has_loaded_unit) {
+		return false;
+	}
+	
+	return true;
 }
 //Wyrmgus end
 
@@ -732,7 +826,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	}
 	//Wyrmgus start
 	if (this->State == AiForceAttackingState_WaitingForTransporters || (!isTransporter && !isNaval && Map.GetTileLandmass(this->HomePos, this->HomeMapLayer) != Map.GetTileLandmass(goalPos, z))) { //if is a land force attacking another landmass, see if there are enough transporters to carry it
-		if (!this->CheckTransportersForGoal(goalPos, z)) {
+		if (!this->CheckTransporters(goalPos, z)) {
 			this->State = AiForceAttackingState_WaitingForTransporters;
 			return;
 		} else {

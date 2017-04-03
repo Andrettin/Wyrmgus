@@ -646,7 +646,7 @@ static CUnit *GetBestScout(int unit_type)
 			flyeronly = true;
 		}
 		
-		if (unit_type == UnitTypeNaval && unit.Type->CanTransport() && unit.BoardCount) { //if a transporter is carrying a unit, then it shouldn't be used for scouting, as it likely is taking part in an attack
+		if (unit.Type->CanTransport() && unit.BoardCount) { //if a transporter is carrying a unit, then it shouldn't be used for scouting, as it likely is taking part in an attack
 			continue;
 		}
 
