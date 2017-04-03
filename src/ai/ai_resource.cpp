@@ -64,7 +64,7 @@
 
 //Wyrmgus start
 //static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
-static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z);
+static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0);
 //Wyrmgus end
 
 /**
@@ -287,7 +287,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 */
 //Wyrmgus start
 //static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
-static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z)
+static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -303,6 +303,13 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 		//Wyrmgus start
 		if (!unit.Active) {
 			continue;
+		}
+		
+		if (landmass) {
+			int worker_landmass = Map.GetTileLandmass(unit.tilePos, unit.MapLayer);
+			if (worker_landmass != landmass && std::find(Map.BorderLandmasses[landmass].begin(), Map.BorderLandmasses[landmass].end(), worker_landmass) == Map.BorderLandmasses[landmass].end()) { //if the landmass is not the same as the worker's, and the worker isn't in an adjacent landmass, then the worker can't build the building at the appropriate location
+				continue;
+			}
 		}
 		//Wyrmgus end
 
@@ -352,7 +359,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	// Find a place to build.
 	//Wyrmgus start
 //	if (AiFindBuildingPlace(unit, building, nearPos, &pos)) {
-	if (AiFindBuildingPlace(unit, building, nearPos, &pos, true, z)) {
+	if (AiFindBuildingPlace(unit, building, nearPos, &pos, true, z, landmass)) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		CommandBuildBuilding(unit, pos, building, FlushCommands);
@@ -370,7 +377,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 				// Find a place to build.
 				//Wyrmgus start
 //				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos)) {
-				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos, true, z)) {
+				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos, true, z, landmass)) {
 				//Wyrmgus end
 					//Wyrmgus start
 //					CommandBuildBuilding(*table[i], pos, building, FlushCommands);
@@ -839,7 +846,10 @@ static bool AiRequestSupply()
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
+//Wyrmgus start
+//static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
+static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0)
+//Wyrmgus end
 {
 	std::vector<CUnit *> table;
 
@@ -847,6 +857,12 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
+		//Wyrmgus start
+		if (landmass && Map.GetTileLandmass(unit.tilePos, unit.MapLayer) != landmass) {
+			continue;
+		}
+		//Wyrmgus end
+		
 		if (unit.IsIdle()) {
 			//Wyrmgus start
 //			CommandTrainUnit(unit, what, FlushCommands);
@@ -869,7 +885,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 */
 //Wyrmgus start
 //static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
-static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z)
+static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass)
 //Wyrmgus end
 {
 	// Find equivalents unittypes.
@@ -912,12 +928,15 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z)
 				if (type.Building) {
 					//Wyrmgus start
 //					if (AiBuildBuilding(*table[i], type, nearPos)) {
-					if (AiBuildBuilding(*table[i], type, nearPos, z)) {
+					if (AiBuildBuilding(*table[i], type, nearPos, z, landmass)) {
 					//Wyrmgus end
 						return 1;
 					}
 				} else {
-					if (AiTrainUnit(*table[i], type)) {
+					//Wyrmgus start
+//					if (AiTrainUnit(*table[i], type)) {
+					if (AiTrainUnit(*table[i], type, landmass)) {
+					//Wyrmgus end
 						return 1;
 					}
 				}
@@ -1119,7 +1138,7 @@ static void AiCheckingWork()
 		} else if (queuep->Want > queuep->Made && queuep->Wait <= GameCycle) {
 			//Wyrmgus start
 //			if (AiMakeUnit(type, queuep->Pos)) {
-			if (AiMakeUnit(type, queuep->Pos, queuep->MapLayer)) {
+			if (AiMakeUnit(type, queuep->Pos, queuep->MapLayer, queuep->Landmass)) {
 			//Wyrmgus end
 				++queuep->Made;
 				queuep->Wait = 0;
