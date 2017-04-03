@@ -385,7 +385,10 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	return 0;
 }
 
-static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
+//Wyrmgus start
+//static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
+static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool allow_can_build_builder = false)
+//Wyrmgus end
 {
 	//Wyrmgus start
 //	const size_t size = AiHelpers.Build[type.Slot].size();
@@ -397,7 +400,10 @@ static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
 		CUnitType &builder = type.BoolFlag[BUILDING_INDEX].value ? *AiHelpers.Build[type.Slot][i] : *AiHelpers.Train[type.Slot][i];
 		//Wyrmgus end
 
-		if (player.UnitTypesAiActiveCount[builder.Slot] > 0
+		//Wyrmgus start
+//		if (player.UnitTypesAiActiveCount[builder.Slot] > 0
+		if ((player.UnitTypesAiActiveCount[builder.Slot] > 0 || (allow_can_build_builder && AiRequestedTypeAllowed(player, builder)))
+		//Wyrmgus end
 			&& CheckDependByType(player, type)) {
 			return true;
 		}
@@ -616,7 +622,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 	for (int i = 0; i < n; ++i) {
 		CUnitType &type = *AiHelpers.NavalTransporters[0][i];
 
-		if (!CheckDependByType(*AiPlayer->Player, type)) {
+		if (!AiRequestedTypeAllowed(*AiPlayer->Player, type, true)) {
 			continue;
 		}
 
