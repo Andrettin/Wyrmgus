@@ -391,13 +391,22 @@ static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type,
 //Wyrmgus end
 {
 	//Wyrmgus start
+	std::vector<std::vector<CUnitType *> > *tablep;
+	if (type.BoolFlag[BUILDING_INDEX].value) {
+		tablep = &AiHelpers.Build;
+	} else {
+		tablep = &AiHelpers.Train;
+	}
+	if (type.Slot >= (int) (*tablep).size()) {
+		return false;
+	}
 //	const size_t size = AiHelpers.Build[type.Slot].size();
-	const size_t size = type.BoolFlag[BUILDING_INDEX].value ? AiHelpers.Build[type.Slot].size() : AiHelpers.Train[type.Slot].size();
+	const size_t size = (*tablep)[type.Slot].size();
 	//Wyrmgus end
 	for (size_t i = 0; i != size; ++i) {
 		//Wyrmgus start
 //		CUnitType &builder = *AiHelpers.Build[type.Slot][i];
-		CUnitType &builder = type.BoolFlag[BUILDING_INDEX].value ? *AiHelpers.Build[type.Slot][i] : *AiHelpers.Train[type.Slot][i];
+		CUnitType &builder = *(*tablep)[type.Slot][i];
 		//Wyrmgus end
 
 		//Wyrmgus start
@@ -639,12 +648,12 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		}
 	}
 	
-	int count_requested = capacity_needed / best_type->MaxOnBoard;
-	if (capacity_needed % best_type->MaxOnBoard) {
-		count_requested += 1;
-	}
-
 	if (best_type) {
+		int count_requested = capacity_needed / best_type->MaxOnBoard;
+		if (capacity_needed % best_type->MaxOnBoard) {
+			count_requested += 1;
+		}
+
 		bool has_builder = false;
 		const size_t size = AiHelpers.Train[best_type->Slot].size();
 		for (size_t i = 0; i != size; ++i) {
