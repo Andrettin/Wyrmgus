@@ -5311,6 +5311,10 @@ bool CUnit::CanAttack(bool count_inside) const
 		return false;
 	}
 	
+	if (this->Container && (!this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !this->Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
+		return false;
+	}
+	
 	return this->Type->BoolFlag[CANATTACK_INDEX].value;
 }
 

@@ -835,7 +835,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 */
 //Wyrmgus start
 //void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
-void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z)
+void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z, int landmass)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
@@ -853,7 +853,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z)
 	}
 	//Wyrmgus start
 //	*order = COrder::NewActionUnload(pos, what);
-	*order = COrder::NewActionUnload(pos, what, z);
+	*order = COrder::NewActionUnload(pos, what, z, landmass);
 	//Wyrmgus end
 	ClearSavedAction(unit);
 }

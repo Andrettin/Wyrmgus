@@ -72,9 +72,6 @@ public:
 		result_unit(result_unit)
 	{
 		*result_unit = NULL;
-		if (allow_water) {
-			movemask &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
-		}
 	}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -94,6 +91,13 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	}
 	
 	if (!CanMoveToMask(pos, movemask, unit.MapLayer)) { // unreachable
+		if (allow_water) {
+			unsigned int water_movemask = movemask;
+			water_movemask &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
+			if (CanMoveToMask(pos, water_movemask, unit.MapLayer)) {
+				return VisitResult_Ok; //if movement through water is allowed (with transport ships), then don't make water tiles a dead end, but don't look for units in them either
+			}
+		}
 		return VisitResult_DeadEnd;
 	}
 
@@ -581,12 +585,20 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	int transport_capacity = 0;
 	for (size_t i = 0; i != AiPlayer->Transporters[water_landmass].size(); ++i) {
 		const CUnit &ai_transporter = *AiPlayer->Transporters[water_landmass][i];
-		transport_capacity += ai_transporter.Type->MaxOnBoard;
+		transport_capacity += ai_transporter.Type->MaxOnBoard - ai_transporter.BoardCount;
 	}
 	
 	int transport_capacity_needed = 0;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		const CUnit &ai_unit = *this->Units[i];
+		if (ai_unit.Removed) { //already in a transporter
+			continue;
+		}
+		
+		if (Map.GetTileLandmass(ai_unit.tilePos, ai_unit.MapLayer) == goal_landmass) { //already unloaded to the enemy's landmass
+			continue;
+		}
+		
 		transport_capacity_needed += ai_unit.Type->BoardSize;
 	}
 	
@@ -671,8 +683,6 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	}
 	
 	//everyone is already boarded, time to move to the enemy shores!
-	transporters.clear();
-	
 	bool has_loaded_unit = false;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit &ai_unit = *this->Units[i];
@@ -691,7 +701,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 			const int delay = i; // To avoid lot of CPU consuption, send them with a small time difference.
 			ai_unit.Container->Wait += delay;
 			//tell the transporter to unload to the goal pos
-			CommandUnload(*ai_unit.Container, pos, NULL, FlushCommands, z);
+			CommandUnload(*ai_unit.Container, pos, NULL, FlushCommands, z, goal_landmass);
 		}
 	}
 	
@@ -824,16 +834,29 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		}
 		return;
 	}
+	
 	//Wyrmgus start
-	if (this->State == AiForceAttackingState_WaitingForTransporters || (!isTransporter && !isNaval && Map.GetTileLandmass(this->HomePos, this->HomeMapLayer) != Map.GetTileLandmass(goalPos, z))) { //if is a land force attacking another landmass, see if there are enough transporters to carry it
-		if (!this->CheckTransporters(goalPos, z)) {
-			this->State = AiForceAttackingState_WaitingForTransporters;
-			return;
-		} else {
-			this->State = AiForceAttackingState_Waiting;
+	if (!isTransporter && !isNaval) {
+		bool needs_transport = false;
+		for (size_t i = 0; i != this->Units.size(); ++i) {
+			CUnit *const unit = this->Units[i];
+
+			if (unit->Type->UnitType != UnitTypeFly && unit->Type->UnitType != UnitTypeFlyLow && Map.GetTileLandmass(unit->tilePos, unit->MapLayer) != Map.GetTileLandmass(goalPos, z)) {
+				needs_transport = true;
+				break;
+			}
+		}
+		
+		if (needs_transport) { //if is a land force attacking another landmass, see if there are enough transporters to carry it, and whether they are doing the appropriate actions
+			if (!this->CheckTransporters(goalPos, z)) {
+				this->GoalPos = goalPos;
+				this->GoalMapLayer = z;
+				return;
+			}
 		}
 	}
 	//Wyrmgus end
+	
 	if (this->State == AiForceAttackingState_Waiting && isDefenceForce == false) {
 		Vec2i resultPos;
 		//Wyrmgus start
@@ -1471,6 +1494,30 @@ void AiForce::Update()
 		}
 		return;
 	}
+	
+	//Wyrmgus start
+	bool needs_transport = false;
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit *const unit = this->Units[i];
+
+		if (unit->Type->UnitType != UnitTypeFly && unit->Type->UnitType != UnitTypeFlyLow && unit->Type->UnitType != UnitTypeNaval && Map.GetTileLandmass(unit->tilePos, unit->MapLayer) != Map.GetTileLandmass(this->GoalPos, this->GoalMapLayer)) {
+			needs_transport = true;
+			break;
+		}
+	}
+		
+	if (needs_transport) { //if is a land force attacking another landmass, see if there are enough transporters to carry it, and whether they are doing the appropriate actions
+		if (!this->CheckTransporters(this->GoalPos, this->GoalMapLayer)) {
+			return;
+		}
+	}
+	
+	if (this->State == AiForceAttackingState_Waiting) { //if is waiting but has a goal (shouldn't happen?), then try to attack
+		this->Attack(this->GoalPos, this->GoalMapLayer);
+		return;
+	}
+	//Wyrmgus end
+	
 	CUnit *leader = NULL;
 	for (unsigned int i = 0; i != Size(); ++i) {
 		CUnit &aiunit = *Units[i];

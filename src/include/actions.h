@@ -186,7 +186,7 @@ public:
 	static COrder *NewActionTransformInto(CUnitType &type);
 	//Wyrmgus start
 //	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
-	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what, int z);
+	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
 	//Wyrmgus end
 	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 	//Wyrmgus start

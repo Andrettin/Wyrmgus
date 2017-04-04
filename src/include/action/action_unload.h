@@ -38,7 +38,7 @@ class COrder_Unload : public COrder
 {
 	//Wyrmgus start
 //	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
-	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z);
+	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
 	//WYrmgus end
 public:
 	//Wyrmgus start
@@ -69,6 +69,7 @@ private:
 	Vec2i goalPos;
 	//Wyrmgus start
 	int MapLayer;
+	int Landmass;
 	//Wyrmgus end
 };
 

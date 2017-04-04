@@ -762,6 +762,21 @@ void AiSendExplorers()
 //Wyrmgus start
 void AiCheckTransporters()
 {
+	//Wyrmgus start
+	for (std::map<int, std::vector<CUnit *>>::const_iterator iterator = AiPlayer->Transporters.begin(); iterator != AiPlayer->Transporters.end(); ++iterator) {
+		for (size_t i = 0; i != iterator->second.size(); ++i) {
+			CUnit &ai_transporter = *iterator->second[i];
+			
+			CUnit *uins = ai_transporter.UnitInside;
+			for (int j = 0; j < ai_transporter.InsideCount; ++j, uins = uins->NextContained) {
+				if (uins->GroupId == 0) { //if the unit no longer is part of a force, then it likely has been reset and the attack through water has been cancelled, so unload it
+					CommandUnload(ai_transporter, ai_transporter.tilePos, uins, 0, ai_transporter.MapLayer);
+				}
+			}
+		}
+	}
+	//Wyrmgus end
+
 	AiPlayer->Transporters.clear();
 	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);

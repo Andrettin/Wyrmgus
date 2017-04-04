@@ -127,7 +127,7 @@ extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command unload
 //Wyrmgus start
 //extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
-extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0);
+extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0, int landmass = 0);
 //Wyrmgus end
 /// Prepare command build
 //Wyrmgus start

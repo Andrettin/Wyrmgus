@@ -114,9 +114,9 @@ enum AiForceAttackingState {
 	AiForceAttackingState_GoingToRallyPoint,
 	AiForceAttackingState_AttackingWithTransporter,
 	AiForceAttackingState_Attacking,
-	//W.rmgus.start
+	//Wyrmgus start
 	AiForceAttackingState_WaitingForTransporters,
-	//W.rmgus.end
+	//Wyrmgus end
 };
 
 #define AI_WAIT_ON_RALLY_POINT 60          /// Max seconds AI units will wait on rally point

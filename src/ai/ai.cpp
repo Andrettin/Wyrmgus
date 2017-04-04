@@ -1339,7 +1339,9 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		
 		int blocker_force = blocker.Player->Ai->Force.GetForce(blocker);
 		if (blocker_force != -1 && blocker.Player->Ai->Force[blocker_force].Attacking) { //don't try to move the blocker if it is part of a force that is attacking
-			continue;
+			if (unit.CurrentAction() != UnitActionBoard) { //unless the unit is trying to board a ship, in which case the blocker should be moved
+				continue;
+			}
 		}
 		//Wyrmgus end
 		const CUnitType &blockertype = *blocker.Type;
