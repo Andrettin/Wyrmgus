@@ -678,10 +678,6 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 		}
 	}
 	
-	if (has_unboarded_unit) {
-		return false;
-	}
-	
 	//everyone is already boarded, time to move to the enemy shores!
 	bool has_loaded_unit = false;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
@@ -698,6 +694,11 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 				continue;
 			}
 			
+			if (ai_unit.Container->Type->MaxOnBoard > ai_unit.Container->BoardCount && has_unboarded_unit) { //send the transporter to unload units if it is full, or if all of the force's units are already boarded
+				//sending a transporter that is full to unload, even if all of the force's units aren't boarded yet, is useful to prevent transporter congestion
+				continue;
+			}
+			
 			const int delay = i; // To avoid lot of CPU consuption, send them with a small time difference.
 			ai_unit.Container->Wait += delay;
 			//tell the transporter to unload to the goal pos
@@ -705,7 +706,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 		}
 	}
 	
-	if (has_loaded_unit) {
+	if (has_unboarded_unit || has_loaded_unit) {
 		return false;
 	}
 	

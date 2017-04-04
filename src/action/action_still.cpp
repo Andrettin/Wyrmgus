@@ -280,6 +280,7 @@ static bool LeaveShelter(CUnit &unit)
 		!unit.Container
 		|| (unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)
 		|| (!unit.Player->AiEnabled && !(unit.Type->BoolFlag[FAUNA_INDEX].value && unit.Player->Type == PlayerNeutral))
+		|| unit.Container->CanMove() //is a transporter, not a shelter
 	) {
 		return false;
 	}
