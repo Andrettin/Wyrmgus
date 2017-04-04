@@ -1056,6 +1056,8 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 	*/
 	//Wyrmgus end
 
+	//Wyrmgus start
+	/*
 	// Send defending forces, also send attacking forces if they are home/traning.
 	// This is still basic model where we suspect only one base ;(
 	const Vec2i &pos = attacker->tilePos;
@@ -1129,12 +1131,15 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			//Wyrmgus end
 		}
 	}
+	*/
+	//Wyrmgus end
 	
 	//Wyrmgus start
-	//now, check if there are any nearby units with active AI that aren't part of any force, and send them to defend
-	const int ai_unit_count = AiPlayer->Player->GetUnitCount();
-	for (int i = 0; i < ai_unit_count; ++i) {
-		CUnit &aiunit = AiPlayer->Player->GetUnit(i);
+	//check if there are any nearby units with active AI, and send them to help
+	std::vector<CUnit *> helper_table;
+	SelectAroundUnit(defender, 16, helper_table, HasSamePlayerAs(*defender.Player));
+	for (size_t i = 0; i < helper_table.size(); ++i) {
+		CUnit &aiunit = *helper_table[i];
 
 		if (&defender == &aiunit) {
 			continue;
@@ -1144,16 +1149,18 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			continue;
 		}
 
-		//Wyrmgus start
-		if (aiunit.BoardCount) { //if is transporting a unit, don't go to help, as that may endanger your cargo/passengers
+		if (!aiunit.CanMove()) {
 			continue;
 		}
-		//Wyrmgus end
+
+		if (aiunit.BoardCount) { //if is transporting a unit, don't go to help, as that may endanger the cargo/passengers
+			continue;
+		}
 
 		// if brother is idle or attack no-agressive target and
 		// can attack our attacker then ask for help
 		// FIXME ad support for help from Coward type units
-		if (aiunit.Active && aiunit.GroupId == 0 && aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
+		if (aiunit.Active && aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
 			&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 			bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
@@ -1168,22 +1175,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			}
 
 			if (shouldAttack) {
-				//Wyrmgus start
-//				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
-//				COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
 				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
-				//Wyrmgus end
-
-				//Wyrmgus start
-				/*
-				if (aiunit.CanStoreOrder(savedOrder) == false) {
-					delete savedOrder;
-					savedOrder = NULL;
-				} else {
-					aiunit.SavedOrder = savedOrder;
-				}
-				*/
-				//Wyrmgus end
 			}
 		}
 	}
