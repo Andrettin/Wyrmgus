@@ -1512,11 +1512,6 @@ void AiForce::Update()
 			return;
 		}
 	}
-	
-	if (this->State == AiForceAttackingState_Waiting) { //if is waiting but has a goal (shouldn't happen?), then try to attack
-		this->Attack(this->GoalPos, this->GoalMapLayer);
-		return;
-	}
 	//Wyrmgus end
 	
 	CUnit *leader = NULL;

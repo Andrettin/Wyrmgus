@@ -251,7 +251,10 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
 */
-static int UnloadUnit(CUnit &transporter, CUnit &unit)
+//Wyrmgus start
+//static int UnloadUnit(CUnit &transporter, CUnit &unit)
+static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
+//Wyrmgus end
 {
 	const int maxRange = 1;
 	Vec2i pos;
@@ -259,7 +262,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 	Assert(unit.Removed);
 	//Wyrmgus start
 //	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos)) {
-	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos, transporter.MapLayer)) {
+	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos, transporter.MapLayer, landmass)) {
 	//Wyrmgus end
 		return false;
 	}
@@ -505,7 +508,10 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 		}
 		transporter.CurrentOrder()->ClearGoal();
 		// Try to unload the unit. If it doesn't work there is no problem.
-		if (UnloadUnit(transporter, goal)) {
+		//Wyrmgus start
+//		if (UnloadUnit(transporter, goal)) {
+		if (UnloadUnit(transporter, goal, this->Landmass)) {
+		//Wyrmgus end
 			this->ClearGoal();
 		} else {
 			++stillonboard;
@@ -515,7 +521,10 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 		CUnit *goal = transporter.UnitInside;
 		for (int i = transporter.InsideCount; i; --i, goal = goal->NextContained) {
 			if (goal->Boarded) {
-				if (!UnloadUnit(transporter, *goal)) {
+				//Wyrmgus start
+//				if (!UnloadUnit(transporter, *goal)) {
+				if (!UnloadUnit(transporter, *goal, this->Landmass)) {
+				//Wyrmgus end
 					++stillonboard;
 				}
 			}
