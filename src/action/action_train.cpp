@@ -288,6 +288,52 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	*/
 	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (nType.BoolFlag[RAIL_INDEX].value) {
+		bool has_adjacent_rail = false;
+		Vec2i top_left_pos(unit.tilePos - Vec2i(1, 1));
+		Vec2i bottom_right_pos(unit.tilePos + Vec2i(unit.Type->TileWidth - 1, unit.Type->TileHeight - 1));
+		
+		for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
+			Vec2i tile_pos(x, top_left_pos.y);
+			if (Map.Info.IsPointOnMap(tile_pos, unit.MapLayer) && UnitTypeCanBeAt(nType, tile_pos, unit.MapLayer)) {
+				has_adjacent_rail = true;
+				break;
+			}
+			
+			tile_pos.y = bottom_right_pos.y;
+			if (Map.Info.IsPointOnMap(tile_pos, unit.MapLayer) && UnitTypeCanBeAt(nType, tile_pos, unit.MapLayer)) {
+				has_adjacent_rail = true;
+				break;
+			}
+		}
+		
+		if (!has_adjacent_rail) {
+			for (int y = top_left_pos.y; y <= bottom_right_pos.y; ++y) {
+				Vec2i tile_pos(top_left_pos.x, y);
+				if (Map.Info.IsPointOnMap(tile_pos, unit.MapLayer) && UnitTypeCanBeAt(nType, tile_pos, unit.MapLayer)) {
+					has_adjacent_rail = true;
+					break;
+				}
+				
+				tile_pos.x = bottom_right_pos.x;
+				if (Map.Info.IsPointOnMap(tile_pos, unit.MapLayer) && UnitTypeCanBeAt(nType, tile_pos, unit.MapLayer)) {
+					has_adjacent_rail = true;
+					break;
+				}
+			}
+		}
+		
+		if (!has_adjacent_rail) {
+			if (&player == ThisPlayer) {
+				ThisPlayer->Notify(NotifyYellow, unit.tilePos, unit.MapLayer, "%s", _("The unit requires railroads to be placed on"));
+			}
+			unit.Wait = CYCLES_PER_SECOND * 10;
+			return;
+		}
+	}
+	//Wyrmgus end
 
 	//Wyrmgus start
 	int owner_player = this->Player;

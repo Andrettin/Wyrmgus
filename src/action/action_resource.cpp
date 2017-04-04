@@ -989,7 +989,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				addload = unit.Player->ConvergePricesWith(*unit.Container->Player, resinfo.ResourceCapacity);
 				addload = std::max(10, addload);
 			} else {
-				addload = resinfo.ResourceCapacity;
+				addload = std::min(100, resinfo.ResourceCapacity);
 			}
 			//Wyrmgus end
 		}
