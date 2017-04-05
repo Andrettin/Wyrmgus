@@ -445,7 +445,10 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 
 	if (!isTransporterRemoved) {
 		// Remove transporter to avoid "collision" with itself.
-		transporter.Remove(NULL);
+		//Wyrmgus start
+//		transporter.Remove(NULL);
+		UnmarkUnitFieldFlags(transporter);
+		//Wyrmgus end
 	}
 	//Wyrmgus start
 //	const bool res = ClosestFreeDropZone_internal(transporter, startPos, maxRange, resPos);
@@ -454,7 +457,7 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 	if (!isTransporterRemoved) {
 		//Wyrmgus start
 //		transporter.Place(transporter.tilePos);
-		transporter.Place(transporter.tilePos, transporter.MapLayer);
+		MarkUnitFieldFlags(transporter);
 		//Wyrmgus end
 		if (selected) {
 			SelectUnit(transporter);
