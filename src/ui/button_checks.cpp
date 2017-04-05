@@ -110,6 +110,31 @@ bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 	//Wyrmgus end
 }
 
+//Wyrmgus start
+/**
+**  Check for button enabled, if upgrade is ready.
+**
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
+*/
+bool ButtonCheckUpgradeOr(const CUnit &unit, const ButtonAction &button)
+{
+	CPlayer *player = unit.Player;
+	char *buf = new_strdup(button.AllowStr.c_str());
+
+	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
+		if (UpgradeIdentAllowed(*unit.Player, s) == 'R') {
+			delete[] buf;
+			return true;
+		}
+	}
+	delete[] buf;
+	return false;
+}
+//Wyrmgus end
+
 /**
 **  Check for button enabled, if unit has an individual upgrade.
 **
