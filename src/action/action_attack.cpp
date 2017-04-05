@@ -756,7 +756,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 //		|| (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
 		|| (Map.IsLayerUnderground(this->MapLayer) && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldAirUnpassable, MapLayer) == false)) {
 		//Wyrmgus end
+		//Wyrmgus start
 		// towers don't chase after goal
+		/*
 		if (unit.CanMove()) {
 			if (unit.CanStoreOrder(this)) {
 				if (dead) {
@@ -769,6 +771,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				}
 			}
 		}
+		*/
+		//Wyrmgus end
 		unit.Frame = 0;
 		this->State &= WEAK_TARGET;
 		this->State |= MOVE_TO_TARGET;
