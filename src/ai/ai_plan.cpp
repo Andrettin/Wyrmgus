@@ -767,6 +767,10 @@ void AiCheckTransporters()
 		for (size_t i = 0; i != iterator->second.size(); ++i) {
 			CUnit &ai_transporter = *iterator->second[i];
 			
+			if (!ai_transporter.IsIdle()) {
+				continue;
+			}
+			
 			CUnit *uins = ai_transporter.UnitInside;
 			for (int j = 0; j < ai_transporter.InsideCount; ++j, uins = uins->NextContained) {
 				if (uins->GroupId == 0) { //if the unit no longer is part of a force, then it likely has been reset and the attack through water has been cancelled, so unload it

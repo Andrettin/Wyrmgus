@@ -109,6 +109,10 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		CUnit *dest = table[i];
 		const CUnitType &dtype = *dest->Type;
 
+		if (!dest->IsAliveOnMap()) {
+			continue;
+		}
+		
 		if (
 			(
 				!unit.IsEnemy(*dest) // a friend or neutral
@@ -1421,10 +1425,7 @@ void AiForce::Update()
 	for (unsigned int i = 0; i < Size(); ++i) {
 		CUnit *aiunit = Units[i];
 
-		//Wyrmgus start
-//		if (aiunit->Type->CanAttack) {
-		if (aiunit->CanAttack()) {
-		//Wyrmgus end
+		if (aiunit->Type->CanAttack) {
 			Attacking = true;
 			break;
 		}
