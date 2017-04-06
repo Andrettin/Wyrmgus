@@ -374,7 +374,11 @@ enum {
 //	if (unit.Type->CanAttack
 	if (unit.CanAttack()
 	//Wyrmgus end
-		&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill)) {
+		//Wyrmgus start
+		&& unit.MapDistanceTo(this->goalPos, this->MapLayer) <= this->Range //only try to auto-attack if already reached the goal
+//		&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill)) {
+		&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill || goal->CurrentAction() == UnitActionStandGround)) {
+		//Wyrmgus end
 		CUnit *target = AttackUnitsInReactRange(unit);
 		if (target) {
 			// Save current command to come back.
