@@ -265,6 +265,9 @@ public:
 	bool Assign(CUnit &unit, int force = -1, bool mercenary = false);
 	//Wyrmgus end
 	void Update();
+	//Wyrmgus start
+	void UpdatePerMinute();
+	//Wyrmgus end
 	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault, int begin = 0);
 	void CheckUnits(int *counter);
 private:
@@ -543,6 +546,10 @@ extern void AiAttackWithForces(int *forces);
 
 /// Periodic called force manager handler
 extern void AiForceManager();
+
+//Wyrmgus start
+extern void AiForceManagerEachMinute();
+//Wyrmgus end
 
 //
 // Plans

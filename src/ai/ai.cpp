@@ -1601,6 +1601,8 @@ void AiEachMinute(CPlayer &player)
 	}
 	
 	AiCheckTransporters();
+	
+	AiForceManagerEachMinute();
 }
 //Wyrmgus end
 

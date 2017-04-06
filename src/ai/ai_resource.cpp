@@ -660,6 +660,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		if (capacity_needed % best_type->MaxOnBoard) {
 			count_requested += 1;
 		}
+		count_requested = std::max(count_requested, 1);
 
 		bool has_builder = false;
 		const size_t size = AiHelpers.Train[best_type->Slot].size();
