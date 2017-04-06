@@ -694,14 +694,34 @@ static int CclSetMapTemplatePathway(lua_State *l)
 	}
 
 	Vec2i start_pos;
-	CclGetPos(l, &start_pos.x, &start_pos.y, 3);
+	if (lua_istable(l, 3)) { //coordinates
+		CclGetPos(l, &start_pos.x, &start_pos.y, 3);
+	} else { //settlement ident
+		std::string settlement_ident = LuaToString(l, 3);
+		CSettlement *settlement = GetSettlement(settlement_ident);
+		if (!settlement) {
+			LuaError(l, "Settlement \"%s\" doesn't exist.\n" _C_ settlement_ident.c_str());
+		}
+		start_pos.x = settlement->Position.x;
+		start_pos.y = settlement->Position.y;
+	}
 	
 	if (start_pos.x < 0 || start_pos.x >= map_template->Width || start_pos.y < 0 || start_pos.y >= map_template->Height) {
 		LuaError(l, "Invalid map coordinate : (%d, %d)" _C_ start_pos.x _C_ start_pos.y);
 	}
 
 	Vec2i end_pos;
-	CclGetPos(l, &end_pos.x, &end_pos.y, 4);
+	if (lua_istable(l, 4)) { //coordinates
+		CclGetPos(l, &end_pos.x, &end_pos.y, 4);
+	} else { //settlement ident
+		std::string settlement_ident = LuaToString(l, 4);
+		CSettlement *settlement = GetSettlement(settlement_ident);
+		if (!settlement) {
+			LuaError(l, "Settlement \"%s\" doesn't exist.\n" _C_ settlement_ident.c_str());
+		}
+		end_pos.x = settlement->Position.x;
+		end_pos.y = settlement->Position.y;
+	}
 	
 	if (end_pos.x < 0 || end_pos.x >= map_template->Width || end_pos.y < 0 || end_pos.y >= map_template->Height) {
 		LuaError(l, "Invalid map coordinate : (%d, %d)" _C_ end_pos.x _C_ end_pos.y);
