@@ -126,13 +126,20 @@ static bool AnimateActionDie(CUnit &unit)
 	// We have to unmark BEFORE changing the type.
 	// Always do that, since types can have different vision properties.
 
-	unit.Remove(NULL);
+	//Wyrmgus start
+//	unit.Remove(NULL);
+	MapUnmarkUnitSight(unit);
+	//Wyrmgus end
 	unit.Type = &corpseType;
 	unit.Stats = &corpseType.Stats[unit.Player->Index];
+	//Wyrmgus start
+	const unsigned int var_size = UnitTypeVar.GetNumberVariable();
+	std::copy(corpseType.Stats[unit.Player->Index].Variables, corpseType.Stats[unit.Player->Index].Variables + var_size, unit.Variable);
+	//Wyrmgus end
 	UpdateUnitSightRange(unit);
 	//Wyrmgus start
 //	unit.Place(unit.tilePos);
-	unit.Place(unit.tilePos, unit.MapLayer);
+	MapMarkUnitSight(unit);
 	//Wyrmgus end
 
 	unit.Frame = 0;
