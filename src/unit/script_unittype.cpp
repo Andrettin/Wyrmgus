@@ -2016,7 +2016,7 @@ static int CclDefineUnitType(lua_State *l)
 			std::string class_name = LuaToString(l, -1);
 			
 			int class_id = GetUnitTypeClassIndexByName(class_name);
-			if (class_id == -1) {
+			if (class_id == -1 && !class_name.empty()) {
 				SetUnitTypeClassStringToIndex(class_name, UnitTypeClasses.size());
 				class_id = UnitTypeClasses.size();
 				UnitTypeClasses.push_back(class_name);

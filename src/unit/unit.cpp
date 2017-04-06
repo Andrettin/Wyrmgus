@@ -2057,6 +2057,10 @@ void CUnit::GenerateUnique(CUnit *dropper)
 
 void CUnit::UpdateSoldUnits()
 {
+	if (this->CurrentAction() == UnitActionBuilt) {
+		return;
+	}
+	
 	for (size_t i = 0; i < this->SoldUnits.size(); ++i) {
 		DestroyAllInside(*this->SoldUnits[i]);
 		LetUnitDie(*this->SoldUnits[i]);
@@ -6603,7 +6607,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	//Wyrmgus start
 //	if (type->Building && !target.Burning) {
-	if (type->Building && !target.Burning && !target.Constructed && !target.Type->TileWidth == 1 && !target.Type->TileHeight == 1) { //the building shouldn't burn if it's still under construction, or if it's too small
+	if (type->Building && !target.Burning && !target.Constructed && target.Type->TileWidth != 1 && target.Type->TileHeight != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
 	//Wyrmgus end
 		HitUnit_Burning(target);
 	}

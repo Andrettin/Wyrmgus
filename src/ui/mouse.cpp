@@ -412,6 +412,10 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	//Wyrmgus start
+	if (DoRightButton_Transporter(unit, dest, flush, acknowledged)) {
+		return true;
+	}
+	
 	// Pick up an item
 	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
 		&& CanPickUp(unit, *dest)) {
@@ -847,15 +851,24 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	}
 	//Wyrmgus end
 	
-	if (DoRightButton_Transporter(unit, dest, flush, acknowledged)) {
-		return;
-	}
+	//Wyrmgus start
+//	if (DoRightButton_Transporter(unit, dest, flush, acknowledged)) {
+//		return;
+//	}
 
 	//  Handle resource workers.
-	if (action == MouseActionHarvest) {
+//	if (action == MouseActionHarvest) {
+	if (action == MouseActionHarvest && (!dest || !dest->Type->CanTransport() || dest->Player == ThisPlayer || dest->Player->Type != PlayerNeutral)) { //don't harvest neutral garrisonable units (i.e. tree stumps) by right-clicking
+	//Wyrmgus end
 		DoRightButton_Worker(unit, dest, pos, flush, acknowledged);
 		return;
 	}
+
+	//Wyrmgus start
+	if (DoRightButton_Transporter(unit, dest, flush, acknowledged)) {
+		return;
+	}
+	//Wyrmgus end
 	
 	//  Fighters
 	if (action == MouseActionSpellCast || action == MouseActionAttack) {

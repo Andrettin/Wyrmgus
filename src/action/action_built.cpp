@@ -388,6 +388,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	MapMarkUnitSight(unit);
 	//Wyrmgus start
 	unit.UpdatePersonalName();
+	unit.UpdateSoldUnits();
 	//Wyrmgus end
 	order.Finished = true;
 }
