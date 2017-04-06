@@ -327,7 +327,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 */
 //Wyrmgus start
 //static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos)
-static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z, int landmass = 0)
+static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z, int landmass = 0, CUnit *goal = NULL)
 //Wyrmgus end
 {
 	const int maxUnloadRange = 1;
@@ -339,6 +339,8 @@ static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z
 		return false;
 	}
 	Vec2i dummyPos;
+	//Wyrmgus start
+	/*
 	CUnit *unit = transporter.UnitInside;
 	for (int i = 0; i < transporter.InsideCount; ++i, unit = unit->NextContained) {
 		//Wyrmgus start
@@ -348,6 +350,20 @@ static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z
 			return true;
 		}
 	}
+	*/
+	if (goal) {
+		if (FindUnloadPosition(transporter, *goal, pos, maxUnloadRange, &dummyPos, z, landmass)) {
+			return true;
+		}
+	} else {
+		CUnit *unit = transporter.UnitInside;
+		for (int i = 0; i < transporter.InsideCount; ++i, unit = unit->NextContained) {
+			if (FindUnloadPosition(transporter, *unit, pos, maxUnloadRange, &dummyPos, z, landmass)) {
+				return true;
+			}
+		}
+	}
+	//Wyrmgus end
 	// Check unit can be droped from here.
 	return false;
 }
@@ -367,7 +383,7 @@ static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z
 */
 //Wyrmgus start
 //static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos)
-static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos, int z, int landmass)
+static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos, int z, int landmass, CUnit *goal)
 //Wyrmgus end
 {
 	int addx = 0;
@@ -378,7 +394,7 @@ static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &
 		for (int i = addy; i--; ++pos.y) {
 			//Wyrmgus start
 //			if (IsDropZonePossible(transporter, pos)) {
-			if (IsDropZonePossible(transporter, pos, z, landmass)) {
+			if (IsDropZonePossible(transporter, pos, z, landmass, goal)) {
 			//Wyrmgus end
 				*resPos = pos;
 				return true;
@@ -388,7 +404,7 @@ static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &
 		for (int i = addx; i--; ++pos.x) {
 			//Wyrmgus start
 //			if (IsDropZonePossible(transporter, pos)) {
-			if (IsDropZonePossible(transporter, pos, z, landmass)) {
+			if (IsDropZonePossible(transporter, pos, z, landmass, goal)) {
 			//Wyrmgus end
 				*resPos = pos;
 				return true;
@@ -398,7 +414,7 @@ static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &
 		for (int i = addy; i--; --pos.y) {
 			//Wyrmgus start
 //			if (IsDropZonePossible(transporter, pos)) {
-			if (IsDropZonePossible(transporter, pos, z, landmass)) {
+			if (IsDropZonePossible(transporter, pos, z, landmass, goal)) {
 			//Wyrmgus end
 				*resPos = pos;
 				return true;
@@ -408,7 +424,7 @@ static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &
 		for (int i = addx; i--; --pos.x) {
 			//Wyrmgus start
 //			if (IsDropZonePossible(transporter, pos)) {
-			if (IsDropZonePossible(transporter, pos, z, landmass)) {
+			if (IsDropZonePossible(transporter, pos, z, landmass, goal)) {
 			//Wyrmgus end
 				*resPos = pos;
 				return true;
@@ -433,7 +449,7 @@ static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &
 */
 //Wyrmgus start
 //static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos)
-static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos, int z, int landmass)
+static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos, int z, int landmass, CUnit *goal)
 //Wyrmgus end
 {
 	// Check there are units onboard
@@ -452,7 +468,7 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 	}
 	//Wyrmgus start
 //	const bool res = ClosestFreeDropZone_internal(transporter, startPos, maxRange, resPos);
-	const bool res = ClosestFreeDropZone_internal(transporter, startPos, maxRange, resPos, z, landmass);
+	const bool res = ClosestFreeDropZone_internal(transporter, startPos, maxRange, resPos, z, landmass, goal);
 	//Wyrmgus end
 	if (!isTransporterRemoved) {
 		//Wyrmgus start
@@ -509,7 +525,9 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 			this->ClearGoal();
 			return true;
 		}
-		transporter.CurrentOrder()->ClearGoal();
+		//Wyrmgus start
+//		transporter.CurrentOrder()->ClearGoal();
+		//Wyrmgus end
 		// Try to unload the unit. If it doesn't work there is no problem.
 		//Wyrmgus start
 //		if (UnloadUnit(transporter, goal)) {
@@ -578,12 +596,15 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 	}
 	switch (this->State) {
 		case 0: // Choose destination
-			if (!this->HasGoal()) {
+			//Wyrmgus start
+//			if (!this->HasGoal()) {
+			if (true) {
+			//Wyrmgus end
 				Vec2i pos;
 
 				//Wyrmgus start
 //				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos)) {
-				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos, this->MapLayer, this->Landmass)) {
+				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos, this->MapLayer, this->Landmass, this->GetGoal())) {
 				//Wyrmgus end
 					this->Finished = true;
 					return ;
@@ -595,7 +616,10 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 		// follow on next case
 		case 1: // Move unit to destination
 			// The Goal is the unit that we have to unload.
-			if (!this->HasGoal()) {
+			//Wyrmgus start
+//			if (!this->HasGoal()) {
+			if (true) {
+			//Wyrmgus end
 				const int moveResult = MoveToDropZone(unit);
 
 				// We have to unload everything
