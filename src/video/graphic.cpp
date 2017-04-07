@@ -1955,9 +1955,6 @@ void CGraphic::Flip()
 			}
 			break;
 		case 3:
-		//Wyrmgus start
-		case 4: // doesn't work, but at least doesn't cause a crash
-		//Wyrmgus end
 			for (int i = 0; i < s->h; ++i) {
 				for (int j = 0; j < s->w; ++j) {
 					memcpy(&((char *)s->pixels)[j + i * s->pitch],
@@ -1966,8 +1963,17 @@ void CGraphic::Flip()
 			}
 			break;
 		//Wyrmgus start
-		/*
-		case 4: {
+//		case 4: {
+		case 4:
+		//Wyrmgus end
+			//Wyrmgus start
+			for (int i = 0; i < s->h; ++i) {
+				for (int j = 0; j < s->w; ++j) {
+					*(Uint32 *)&((Uint8 *)s->pixels)[((s->w - j - 1) + i * s->w) * 4] = *(Uint32 *)&((Uint8 *)Surface->pixels)[j * 4 + i * Surface->pitch];
+				}
+			}
+			break;
+			/*
 			unsigned int p0 = s->pitch;
 			unsigned int p1 = Surface->pitch;
 			const int width = s->w;
@@ -2753,6 +2759,34 @@ void CGraphic::SetTimeOfDay(int time)
 			}
 			SDL_UnlockSurface(Surface);
 		} else if (bpp == 4) {
+			for (int y = 0; y < Surface->h; ++y) {
+				for (int x = 0; x < Surface->w; ++x) {
+					Uint32 c;
+					SDL_PixelFormat *f = Surface->format;
+					c = *(Uint32 *)&((Uint8 *)Surface->pixels)[x * bpp + y * Surface->pitch];
+					Uint8 red = (std::max<int>(0,std::min<int>(255, ((c & f->Rmask) >> f->Rshift) + time_of_day_red)));
+					Uint8 green = (std::max<int>(0,std::min<int>(255, ((c & f->Gmask) >> f->Gshift) + time_of_day_green)));
+					Uint8 blue = (std::max<int>(0,std::min<int>(255, ((c & f->Bmask) >> f->Bshift) + time_of_day_blue)));
+					Uint8 alpha = ((c & f->Amask) >> f->Ashift);
+					c = Video.MapRGBA(f, red, green, blue, alpha);
+					*(Uint32 *)&((Uint8 *)Surface->pixels)[(x + y * Surface->w) * bpp] = c;
+				}
+			}
+			if (SurfaceFlip) {
+				for (int y = 0; y < SurfaceFlip->h; ++y) {
+					for (int x = 0; x < SurfaceFlip->w; ++x) {
+						Uint32 c;
+						SDL_PixelFormat *f = SurfaceFlip->format;
+						c = *(Uint32 *)&((Uint8 *)SurfaceFlip->pixels)[x * bpp + y * SurfaceFlip->pitch];
+						Uint8 red = (std::max<int>(0,std::min<int>(255, ((c & f->Rmask) >> f->Rshift) + time_of_day_red)));
+						Uint8 green = (std::max<int>(0,std::min<int>(255, ((c & f->Gmask) >> f->Gshift) + time_of_day_green)));
+						Uint8 blue = (std::max<int>(0,std::min<int>(255, ((c & f->Bmask) >> f->Bshift) + time_of_day_blue)));
+						Uint8 alpha = ((c & f->Amask) >> f->Ashift);
+						c = Video.MapRGBA(f, red, green, blue, alpha);
+						*(Uint32 *)&((Uint8 *)SurfaceFlip->pixels)[(x + y * SurfaceFlip->w) * bpp] = c;
+					}
+				}
+			}
 		}
 	}
 }
