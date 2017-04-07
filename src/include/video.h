@@ -74,6 +74,9 @@ class CGraphic : public gcn::Image
 
 protected:
 	CGraphic() : Surface(NULL), SurfaceFlip(NULL), frame_map(NULL),
+		//Wyrmgus start
+		DawnSurface(NULL), DawnSurfaceFlip(NULL), DuskSurface(NULL), DuskSurfaceFlip(NULL), NightSurface(NULL), NightSurfaceFlip(NULL),
+		//Wyrmgus end
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		//Wyrmgus start
 //		Refs(1), Resized(false)
@@ -153,8 +156,7 @@ public:
 	void Resize(int w, int h);
 	void SetOriginalSize();
 	//Wyrmgus start
-	void SetTimeOfDay(int time);
-	void ResetTimeOfDay();
+	SDL_Surface *SetTimeOfDay(int time, bool flipped = false);
 	//Wyrmgus end
 	bool TransparentPixel(int x, int y);
 	void MakeShadow();
@@ -178,6 +180,14 @@ public:
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface;      /// Surface
 	SDL_Surface *SurfaceFlip;  /// Flipped surface
+	//Wyrmgus start
+	SDL_Surface *DawnSurface;      /// Surface
+	SDL_Surface *DawnSurfaceFlip;  /// Flipped surface
+	SDL_Surface *DuskSurface;      /// Surface
+	SDL_Surface *DuskSurfaceFlip;  /// Flipped surface
+	SDL_Surface *NightSurface;      /// Surface
+	SDL_Surface *NightSurfaceFlip;  /// Flipped surface
+	//Wyrmgus end
 	frame_pos_t *frame_map;
 	frame_pos_t *frameFlip_map;
 	void GenFramesMap();

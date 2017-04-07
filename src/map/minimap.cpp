@@ -280,9 +280,9 @@ void CMinimap::Create()
 		} else
 	#endif
 		{
-			SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
-			MinimapTerrainSurface.push_back(SDL_CreateRGBSurface(SDL_SWSURFACE, W, H, 32, TheScreen->format->Rmask, TheScreen->format->Gmask, TheScreen->format->Bmask, 0));
-			MinimapSurface.push_back(SDL_CreateRGBSurface(SDL_SWSURFACE,  W, H, 32, TheScreen->format->Rmask, TheScreen->format->Gmask, TheScreen->format->Bmask, 0));
+			SDL_PixelFormat *f = TheScreen->format;
+			MinimapTerrainSurface.push_back(SDL_CreateRGBSurface(SDL_SWSURFACE, W, H, 32, RMASK, GMASK, BMASK, AMASK));
+			MinimapSurface.push_back(SDL_CreateRGBSurface(SDL_SWSURFACE,  W, H, 32, f->Rmask, f->Gmask, f->Bmask, 0));
 		}
 
 		UpdateTerrain(z);

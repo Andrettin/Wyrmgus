@@ -398,8 +398,8 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_d
 #endif
 	{
 		//Wyrmgus start
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(Map.TimeOfDay[CurrentMapLayer]);
+		if (!ignore_time_of_day && !surface) {
+			surface = SetTimeOfDay(Map.TimeOfDay[CurrentMapLayer], false);
 		}
 		//Wyrmgus end
 		DrawSubClip(frame_map[frame].x, frame_map[frame].y,
@@ -444,8 +444,8 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool 
 #endif
 	{
 		//Wyrmgus start
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(Map.TimeOfDay[CurrentMapLayer]);
+		if (!ignore_time_of_day && !surface) {
+			surface = SetTimeOfDay(Map.TimeOfDay[CurrentMapLayer], false);
 		}
 		//Wyrmgus end
 		DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
@@ -1006,8 +1006,8 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_
 #endif
 	{
 		//Wyrmgus start
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(Map.TimeOfDay[CurrentMapLayer]);
+		if (!ignore_time_of_day && !surface) {
+			surface = SetTimeOfDay(Map.TimeOfDay[CurrentMapLayer], true);
 		}
 		//Wyrmgus end
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
@@ -1071,8 +1071,8 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool
 #endif
 	{
 		//Wyrmgus start
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(Map.TimeOfDay[CurrentMapLayer]);
+		if (!ignore_time_of_day && !surface) {
+			surface = SetTimeOfDay(Map.TimeOfDay[CurrentMapLayer], true);
 		}
 		//Wyrmgus end
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
@@ -1742,6 +1742,25 @@ void CGraphic::Free(CGraphic *g)
 			g->frameFlip_map = NULL;
 			
 			//Wyrmgus start
+			if (g->DawnSurface) {
+				FreeSurface(&g->DawnSurface);
+			}
+			if (g->DawnSurfaceFlip) {
+				FreeSurface(&g->DawnSurfaceFlip);
+			}
+			if (g->DuskSurface) {
+				FreeSurface(&g->DuskSurface);
+			}
+			if (g->DuskSurfaceFlip) {
+				FreeSurface(&g->DuskSurfaceFlip);
+			}
+			if (g->NightSurface) {
+				FreeSurface(&g->NightSurface);
+			}
+			if (g->NightSurfaceFlip) {
+				FreeSurface(&g->NightSurfaceFlip);
+			}
+
 			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 			if (cg) {
 				for (int i = 0; i < PlayerColorMax; ++i) {
@@ -2686,148 +2705,123 @@ void CGraphic::SetOriginalSize()
 **
 **  @param time  New time of day of graphic.
 */
-void CGraphic::SetTimeOfDay(int time)
+SDL_Surface *CGraphic::SetTimeOfDay(int time, bool flipped)
 {
 	Assert(Surface);
 
-	if (TimeOfDay == time || this->Grayscale) {
-		return;
-	}
-
-	// If the image has already had a time of day change, get a clean copy first
-	if (TimeOfDay) {
-		this->ResetTimeOfDay();
-		if (TimeOfDay == time) {
-			return;
+	if (this->Grayscale || !time) {
+		if (flipped && SurfaceFlip) {
+			return SurfaceFlip;
+		} else {
+			return Surface;
+		}
+	} else if (time == DawnTimeOfDay) {
+		if (flipped) {
+			if (DawnSurfaceFlip) {
+				return DawnSurfaceFlip;
+			}
+		} else {
+			if (DawnSurface) {
+				return DawnSurface;
+			}
+		}
+	} else if (time == DuskTimeOfDay) {
+		if (flipped) {
+			if (DuskSurfaceFlip) {
+				return DuskSurfaceFlip;
+			}
+		} else {
+			if (DuskSurface) {
+				return DuskSurface;
+			}
+		}
+	} else if (time == FirstWatchTimeOfDay || time == MidnightTimeOfDay || time == SecondWatchTimeOfDay) {
+		if (flipped) {
+			if (NightSurfaceFlip) {
+				return NightSurfaceFlip;
+			}
+		} else {
+			if (NightSurface) {
+				return NightSurface;
+			}
+		}
+	} else {
+		if (flipped) {
+			return SurfaceFlip;
+		} else {
+			return Surface;
 		}
 	}
 
-	TimeOfDay = time;
-	
+	SDL_Surface *surface = NULL;
+	SDL_Surface *base_surface = flipped ? SurfaceFlip : Surface;
 	int time_of_day_red = 0;
 	int time_of_day_green = 0;
 	int time_of_day_blue = 0;
-	
-	if (time == 1) { // dawn
+
+	if (time == DawnTimeOfDay) {
+		if (flipped) {
+			surface = DawnSurfaceFlip = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		} else {
+			surface = DawnSurface = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		}
 		time_of_day_red = -20;
 		time_of_day_green = -20;
 		time_of_day_blue = 0;
-	} else if (time == 2) { // morning
-		time_of_day_red = 0;
-		time_of_day_green = 0;
-		time_of_day_blue = 0;
-	} else if (time == 3) { // midday
-		time_of_day_red = 0;
-		time_of_day_green = 0;
-		time_of_day_blue = 0;
-	} else if (time == 4) { // afternoon
-		time_of_day_red = 0;
-		time_of_day_green = 0;
-		time_of_day_blue = 0;
-	} else if (time == 5) { // dusk
+	} else if (time == DuskTimeOfDay) {
+		if (flipped) {
+			surface = DuskSurfaceFlip = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		} else {
+			surface = DuskSurface = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		}
 		time_of_day_red = 0;
 		time_of_day_green = -20;
 		time_of_day_blue = -20;
-	} else if (time == 6) { // first watch
-		time_of_day_red = -45;
-		time_of_day_green = -35;
-		time_of_day_blue = -10;
-	} else if (time == 7) { // midnight
-		time_of_day_red = -45;
-		time_of_day_green = -35;
-		time_of_day_blue = -10;
-	} else if (time == 8) { // second watch
+	} else if (time == FirstWatchTimeOfDay || time == MidnightTimeOfDay || time == SecondWatchTimeOfDay) {
+		if (flipped) {
+			surface = NightSurfaceFlip = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		} else {
+			surface = NightSurface = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		}
 		time_of_day_red = -45;
 		time_of_day_green = -35;
 		time_of_day_blue = -10;
 	}
 	
-	if (time && (time_of_day_red != 0 || time_of_day_green != 0 || time_of_day_blue != 0)) {
-		const int bpp = Surface->format->BytesPerPixel;
+	if (time_of_day_red != 0 || time_of_day_green != 0 || time_of_day_blue != 0) {
+		const int bpp = surface->format->BytesPerPixel;
 		if (bpp == 1) {
-			SDL_LockSurface(Surface);
+			SDL_LockSurface(surface);
 			SDL_Color colors[256];
-			SDL_Palette &pal = *Surface->format->palette;
+			SDL_Palette &pal = *surface->format->palette;
 			for (int i = 0; i < 256; ++i) {
 				colors[i].r = std::max<int>(0,std::min<int>(255,int(pal.colors[i].r) + time_of_day_red));
 				colors[i].g = std::max<int>(0,std::min<int>(255,int(pal.colors[i].g) + time_of_day_green));
 				colors[i].b = std::max<int>(0,std::min<int>(255,int(pal.colors[i].b) + time_of_day_blue));
 			}
-			SDL_SetColors(Surface, &colors[0], 0, 256);
+			SDL_SetColors(surface, &colors[0], 0, 256);
 			if (SurfaceFlip) {
 				SDL_SetColors(SurfaceFlip, &colors[0], 0, 256);
 			}
-			SDL_UnlockSurface(Surface);
+			SDL_UnlockSurface(surface);
 		} else if (bpp == 4) {
-			for (int y = 0; y < Surface->h; ++y) {
-				for (int x = 0; x < Surface->w; ++x) {
+			for (int y = 0; y < surface->h; ++y) {
+				for (int x = 0; x < surface->w; ++x) {
 					Uint32 c;
-					SDL_PixelFormat *f = Surface->format;
-					c = *(Uint32 *)&((Uint8 *)Surface->pixels)[x * bpp + y * Surface->pitch];
+					SDL_PixelFormat *f = surface->format;
+					c = *(Uint32 *)&((Uint8 *)surface->pixels)[x * bpp + y * surface->pitch];
 					Uint8 red = (std::max<int>(0,std::min<int>(255, ((c & f->Rmask) >> f->Rshift) + time_of_day_red)));
 					Uint8 green = (std::max<int>(0,std::min<int>(255, ((c & f->Gmask) >> f->Gshift) + time_of_day_green)));
 					Uint8 blue = (std::max<int>(0,std::min<int>(255, ((c & f->Bmask) >> f->Bshift) + time_of_day_blue)));
 					Uint8 alpha = ((c & f->Amask) >> f->Ashift);
 					c = Video.MapRGBA(f, red, green, blue, alpha);
-					*(Uint32 *)&((Uint8 *)Surface->pixels)[(x + y * Surface->w) * bpp] = c;
-				}
-			}
-			if (SurfaceFlip) {
-				for (int y = 0; y < SurfaceFlip->h; ++y) {
-					for (int x = 0; x < SurfaceFlip->w; ++x) {
-						Uint32 c;
-						SDL_PixelFormat *f = SurfaceFlip->format;
-						c = *(Uint32 *)&((Uint8 *)SurfaceFlip->pixels)[x * bpp + y * SurfaceFlip->pitch];
-						Uint8 red = (std::max<int>(0,std::min<int>(255, ((c & f->Rmask) >> f->Rshift) + time_of_day_red)));
-						Uint8 green = (std::max<int>(0,std::min<int>(255, ((c & f->Gmask) >> f->Gshift) + time_of_day_green)));
-						Uint8 blue = (std::max<int>(0,std::min<int>(255, ((c & f->Bmask) >> f->Bshift) + time_of_day_blue)));
-						Uint8 alpha = ((c & f->Amask) >> f->Ashift);
-						c = Video.MapRGBA(f, red, green, blue, alpha);
-						*(Uint32 *)&((Uint8 *)SurfaceFlip->pixels)[(x + y * SurfaceFlip->w) * bpp] = c;
-					}
+					*(Uint32 *)&((Uint8 *)surface->pixels)[(x + y * surface->w) * bpp] = c;
 				}
 			}
 		}
 	}
-}
-
-/**
-**  Resets time of day for a graphic
-**
-*/
-void CGraphic::ResetTimeOfDay()
-{
-	Assert(Surface); // can't resize before it's been loaded
-
-	if (!TimeOfDay) {
-		return;
-	}
 	
-	bool flip_surface = false;
-
-	if (Surface) {
-		FreeSurface(&Surface);
-		Surface = NULL;
-	}
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		if (SurfaceFlip) {
-			flip_surface = true;
-			FreeSurface(&SurfaceFlip);
-			SurfaceFlip = NULL;
-		}
-	}
-
-	this->Surface = NULL;
-	this->Load();
-	
-	if (flip_surface) {
-		this->Flip();
-	}
-
-	TimeOfDay = 0;	
+	return surface;
 }
 //Wyrmgus end
 
