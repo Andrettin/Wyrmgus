@@ -12,6 +12,8 @@ before_build:
   - nsis-2.50.0-Unicode-setup.exe /S /D=C:\Program Files (x86)\NSIS
   - cmake -G "Visual Studio 14 2015" -DCMAKE_PREFIX_PATH="%cd%\\dependencies" -DENABLE_NSIS=ON -DENABLE_STDIO_REDIRECT=ON ..
   - cd ..
+build:
+    project: stratagus.sln
 after_build:
   - 7z a compiled-binaries.zip %cd%\build\stratagus.exe %cd%\build\dependencies\bin\*.dll
 artifacts:
