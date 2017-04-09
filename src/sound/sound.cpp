@@ -799,7 +799,10 @@ CSound::~CSound()
 		delete Sound.OneSound;
 	} else if (this->Number == TWO_GROUPS) {
 	} else {
-		for (int i = 0; i < this->Number; ++i) {
+		//Wyrmgus start
+//		for (int i = 0; i < this->Number; ++i) {
+		for (unsigned int i = 0; i < this->Number; ++i) {
+		//Wyrmgus end
 			delete this->Sound.OneGroup[i];
 			this->Sound.OneGroup[i] = NULL;
 		}
