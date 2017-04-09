@@ -23,10 +23,18 @@ find_package(VorbisFile)
 
 if(OGGVORBIS_FOUND AND VORBISFILE_FOUND)
 	find_path(OAML_INCLUDE_DIRS oaml.h)
-	find_library(OAML_LIBRARY_STATIC oaml)
+	find_library(OAML_LIBRARY_STATIC NAMES liboaml.a)
 	find_library(OAML_LIBRARY_SHARED oaml_shared)
-	find_library(OAML_LIBRARY_STATIC_DEBUG oaml_d)
+	# Shared library named changed right after v1.2
+	if (NOT OAML_LIBRARY_SHARED)
+		find_library(OAML_LIBRARY_SHARED oaml)
+	endif()
+	find_library(OAML_LIBRARY_STATIC_DEBUG liboaml_d.a)
 	find_library(OAML_LIBRARY_SHARED_DEBUG oaml_shared_d)
+	# Shared library named changed right after v1.2
+	if (NOT OAML_LIBRARY_SHARED_DEBUG)
+		find_library(OAML_LIBRARY_SHARED_DEBUG oaml_d)
+	endif()
 
 	if (OAML_LIBRARY_SHARED AND OAML_INCLUDE_DIRS)
 		set(OAML_FOUND "YES")
