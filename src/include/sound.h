@@ -124,7 +124,10 @@ public:
 	**  255 means infinite range of the sound.
 	*/
 	unsigned char Range;        /// Range is a multiplier for DistanceSilent
-	unsigned char Number;       /// single, group, or table of sounds.
+	//Wyrmgus start
+//	unsigned char Number;       /// single, group, or table of sounds.
+	unsigned int Number;       /// single, group, or table of sounds.
+	//Wyrmgus end
 	//Wyrmgus start
 	int VolumePercent;
 	//Wyrmgus end
