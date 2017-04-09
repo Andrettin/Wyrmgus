@@ -556,7 +556,7 @@ void CUnit::Release(bool final)
 	}
 	//Wyrmgus start
 	if (Orders.size() != 1) {
-		fprintf(stderr, "Unit to be released has more than 1 order; Unit Type: \"%s\", Orders: %d, First Order Type: %d.\n", this->Type->Ident.c_str(), Orders.size(), this->CurrentAction());
+		fprintf(stderr, "Unit to be released has more than 1 order; Unit Type: \"%s\", Orders: %d, First Order Type: %d.\n", this->Type->Ident.c_str(), (int)Orders.size(), this->CurrentAction());
 	}
 	//Wyrmgus end
 	Assert(Orders.size() == 1);
@@ -2154,7 +2154,7 @@ void CUnit::UpdateSoldUnits()
 			new_unit->GenerateSpecialProperties(this);
 			new_unit->Identified = true;
 			if (new_unit->Unique && this->Player == ThisPlayer) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
-				this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer, _("Unique item available for sale"));
+				this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer, "%s", _("Unique item available for sale"));
 			}
 		}
 		new_unit->Remove(this);
