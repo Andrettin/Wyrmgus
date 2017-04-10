@@ -2057,7 +2057,7 @@ void CUnit::GenerateUnique(CUnit *dropper)
 
 void CUnit::UpdateSoldUnits()
 {
-	if (this->CurrentAction() == UnitActionBuilt) {
+	if (this->CurrentAction() == UnitActionBuilt || !Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 		return;
 	}
 	
