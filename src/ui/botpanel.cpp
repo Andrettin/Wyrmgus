@@ -666,7 +666,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 		
-		if (condition->Opponent != CONDITION_TRUE) {
+		if (!(button.Action == ButtonBuy && unit.Character) && condition->Opponent != CONDITION_TRUE) {
 			if ((condition->Opponent == CONDITION_ONLY) ^ ThisPlayer->IsEnemy(unit)) {
 				return false;
 			}
