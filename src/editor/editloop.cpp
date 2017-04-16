@@ -984,11 +984,8 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	x -= 1;
 	y -= 1;
 //	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
-	if (Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[tilenum].tileinfo.BaseTerrain].ImageFile.empty()) {
-		Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
-	} else {
-		Map.SolidTileGraphics[Map.Tileset->tiles[tilenum].tileinfo.BaseTerrain]->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
-	}
+	const CTerrainType *terrain = Editor.ShownTileTypes[0];
+	terrain->Graphics->DrawFrameClip(terrain->SolidTiles[0], x, y);
 	//Wyrmgus end
 
 	if (flags & IconSelected) {

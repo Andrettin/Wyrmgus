@@ -394,13 +394,6 @@ void CMinimap::UpdateTerrain(int z)
 	if (UseOpenGL) {
 		SDL_LockSurface(Map.TileGraphic->Surface);
 		//Wyrmgus start
-		for (size_t i = 0; i != Map.Tileset->solidTerrainTypes.size(); ++i) {
-			if (!Map.Tileset->solidTerrainTypes[i].ImageFile.empty()) {
-				SDL_LockSurface(Map.SolidTileGraphics[i]->Surface);
-			}
-		}
-		//Wyrmgus end
-		//Wyrmgus start
 		for (size_t i = 0; i != TerrainTypes.size(); ++i) {
 			if (TerrainTypes[i]->Graphics) {
 				SDL_LockSurface(TerrainTypes[i]->Graphics->Surface);
@@ -555,11 +548,6 @@ void CMinimap::UpdateTerrain(int z)
 	}
 	SDL_UnlockSurface(Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != Map.Tileset->solidTerrainTypes.size(); ++i) {
-		if (!Map.Tileset->solidTerrainTypes[i].ImageFile.empty()) {
-			SDL_UnlockSurface(Map.SolidTileGraphics[i]->Surface);
-		}
-	}
 	for (size_t i = 0; i != TerrainTypes.size(); ++i) {
 		if (TerrainTypes[i]->Graphics) {
 			SDL_UnlockSurface(TerrainTypes[i]->Graphics->Surface);
@@ -630,13 +618,6 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 		//Wyrmgus end
 	}
 	SDL_LockSurface(Map.TileGraphic->Surface);
-	//Wyrmgus start
-	for (size_t i = 0; i != Map.Tileset->solidTerrainTypes.size(); ++i) {
-		if (!Map.Tileset->solidTerrainTypes[i].ImageFile.empty()) {
-			SDL_LockSurface(Map.SolidTileGraphics[i]->Surface);
-		}
-	}
-	//Wyrmgus end
 	//Wyrmgus start
 	for (size_t i = 0; i != TerrainTypes.size(); ++i) {
 		if (TerrainTypes[i]->Graphics) {
@@ -817,11 +798,6 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	}
 	SDL_UnlockSurface(Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != Map.Tileset->solidTerrainTypes.size(); ++i) {
-		if (!Map.Tileset->solidTerrainTypes[i].ImageFile.empty()) {
-			SDL_UnlockSurface(Map.SolidTileGraphics[i]->Surface);
-		}
-	}
 	for (size_t i = 0; i != TerrainTypes.size(); ++i) {
 		if (TerrainTypes[i]->Graphics) {
 			SDL_UnlockSurface(TerrainTypes[i]->Graphics->Surface);

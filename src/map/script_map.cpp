@@ -1146,14 +1146,6 @@ static int CclDefineTileset(lua_State *l)
 	ShowLoadProgress(_("Loading Tileset \"%s\""), Map.Tileset->ImageFile.c_str());
 	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, PixelTileSize.x, PixelTileSize.y);
 	Map.TileGraphic->Load();
-	//Wyrmgus start
-	for (size_t i = 0; i != Map.Tileset->solidTerrainTypes.size(); ++i) {
-		if (!Map.Tileset->solidTerrainTypes[i].ImageFile.empty()) {
-			Map.SolidTileGraphics[i] = CGraphic::New(Map.Tileset->solidTerrainTypes[i].ImageFile, PixelTileSize.x, PixelTileSize.y);
-			Map.SolidTileGraphics[i]->Load();
-		}
-	}
-	//Wyrmgus end
 	return 0;
 }
 /**

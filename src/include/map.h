@@ -510,7 +510,6 @@ public:
 	CGraphic *TileGraphic;     /// graphic for all the tiles
 	static CGraphic *FogGraphic;      /// graphic for fog of war
 	//Wyrmgus start
-	CGraphic *SolidTileGraphics[16];   /// separate graphics for solid tiles
 	int Landmasses;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
 	std::vector<int> TimeOfDaySeconds;		/// how many seconds it takes to change the time of day, for each map layer

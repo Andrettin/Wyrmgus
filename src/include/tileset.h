@@ -238,7 +238,6 @@ struct SolidTerrainInfo {
 	std::string TerrainName;  /// Name of the terrain
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
 	//Wyrmgus start
-	std::string ImageFile;		/// File containing image data
 	int DefaultTileIndex;		/// Index for the default tile for this type
 	//Wyrmgus end
 };
