@@ -840,6 +840,9 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		}
 		Vec2i unit_offset((std::get<1>(this->PlaneConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->PlaneConnectors[i])->TileHeight - 1) / 2);
 		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->PlaneConnectors[i]), &Players[PlayerNumNeutral], z);
+		if (std::get<3>(this->PlaneConnectors[i])) {
+			unit->SetUnique(std::get<3>(this->PlaneConnectors[i]));
+		}
 		Map.LayerConnectors[z].push_back(unit);
 		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
 			bool found_other_connector = false;
@@ -873,6 +876,9 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		}
 		Vec2i unit_offset((std::get<1>(this->WorldConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->WorldConnectors[i])->TileHeight - 1) / 2);
 		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->WorldConnectors[i]), &Players[PlayerNumNeutral], z);
+		if (std::get<3>(this->WorldConnectors[i])) {
+			unit->SetUnique(std::get<3>(this->WorldConnectors[i]));
+		}
 		Map.LayerConnectors[z].push_back(unit);
 		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
 			bool found_other_connector = false;
@@ -906,6 +912,9 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		}
 		Vec2i unit_offset((std::get<1>(this->LayerConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->LayerConnectors[i])->TileHeight - 1) / 2);
 		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->LayerConnectors[i]), &Players[PlayerNumNeutral], z);
+		if (std::get<3>(this->LayerConnectors[i])) {
+			unit->SetUnique(std::get<3>(this->LayerConnectors[i]));
+		}
 		Map.LayerConnectors[z].push_back(unit);
 		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
 			bool found_other_connector = false;
