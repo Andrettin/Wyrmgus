@@ -1665,6 +1665,9 @@ static int CclDefineMapTemplate(lua_State *l)
 			}
 			map->MainTemplate = main_template;
 			main_template->Subtemplates.push_back(map);
+			map->Plane = main_template->Plane;
+			map->World = main_template->World;
+			map->Layer = main_template->Layer;
 		} else if (!strcmp(value, "BaseTerrain")) {
 			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
 			if (!terrain) {
