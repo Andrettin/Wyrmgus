@@ -1615,6 +1615,8 @@ static int CclDefineMapTemplate(lua_State *l)
 		MapTemplateIdentToPointer[map_ident] = map;
 	}
 	
+	Vec2i subtemplate_position_top_left(-1, -1);
+	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
@@ -1654,6 +1656,8 @@ static int CclDefineMapTemplate(lua_State *l)
 			map->TimeOfDaySeconds = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SubtemplatePosition")) {
 			CclGetPos(l, &map->SubtemplatePosition.x, &map->SubtemplatePosition.y);
+		} else if (!strcmp(value, "SubtemplatePositionTopLeft")) {
+			CclGetPos(l, &subtemplate_position_top_left.x, &subtemplate_position_top_left.y);
 		} else if (!strcmp(value, "MainTemplate")) {
 			CMapTemplate *main_template = GetMapTemplate(LuaToString(l, -1));
 			if (!main_template) {
@@ -1752,6 +1756,11 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
+	}
+	
+	if (subtemplate_position_top_left.x != -1 && subtemplate_position_top_left.y != -1) {
+		map->SubtemplatePosition.x = subtemplate_position_top_left.x + ((map->Width - 1) / 2);
+		map->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map->Height - 1) / 2);
 	}
 	
 	return 0;
