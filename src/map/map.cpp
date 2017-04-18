@@ -287,16 +287,18 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 			} else if (TerrainTypeColorToIndex.find(std::tuple<int, int, int>(r, g, b)) != TerrainTypeColorToIndex.end()) {
 				terrain_id = TerrainTypeColorToIndex.find(std::tuple<int, int, int>(r, g, b))->second;
 			}
+			Vec2i real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
 			if (terrain_id != -1) {
-				Vec2i real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
 				Map.Field(real_pos, z)->SetTerrain(TerrainTypes[terrain_id]);
 				
 				if (terrain_feature_id != -1) {
 					Map.Field(real_pos, z)->TerrainFeature = TerrainFeatures[terrain_feature_id];
 				}
 			} else {
-				if (!overlay) {
+				if (r != 0 || g != 0 || b != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
 					fprintf(stderr, "Invalid map terrain: (%d, %d)\n", x, y);
+				} else if (overlay && Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
+					Map.Field(real_pos, z)->RemoveOverlayTerrain();
 				}
 			}
 		}
@@ -318,8 +320,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	
 	if (z >= (int) Map.Fields.size()) {
-		Map.Info.MapWidths.push_back(this->Width);
-		Map.Info.MapHeights.push_back(this->Height);
+		Map.Info.MapWidths.push_back(std::min(this->Width, Map.Info.MapWidth));
+		Map.Info.MapHeights.push_back(std::min(this->Height, Map.Info.MapHeight));
 		Map.Fields.push_back(new CMapField[this->Width * this->Height]);
 		Map.TimeOfDaySeconds.push_back(this->TimeOfDaySeconds);
 		Map.TimeOfDay.push_back(NoTimeOfDay);
