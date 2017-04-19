@@ -537,6 +537,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 	}
 
+	this->ApplyConnectors(template_start_pos, map_start_pos, z);
 	if (CurrentCampaign != NULL) {
 		this->ApplySettlements(template_start_pos, map_start_pos, z);
 	}
@@ -588,6 +589,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->Name.c_str());
 
 	// now, generate the units and heroes that were set to be generated at a random position (by having their position set to {-1, -1})
+	this->ApplyConnectors(template_start_pos, map_start_pos, z, true);
 	this->ApplyUnits(template_start_pos, map_start_pos, z, true);
 
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -822,7 +824,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 	}
 }
 
-void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random)
+void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random)
 {
 	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
 
@@ -933,7 +935,12 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 		}
 	}
-	
+}
+
+void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random)
+{
+	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+
 	for (size_t i = 0; i < this->Units.size(); ++i) {
 		Vec2i unit_raw_pos(std::get<0>(this->Units[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
