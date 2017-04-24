@@ -606,6 +606,7 @@ CUnitType::CUnitType() :
 	Neutral(0),
 	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	//Wyrmgus start
+	Elixir(NULL),
 //	Sprite(NULL), ShadowSprite(NULL)
 	Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL)
 	//Wyrmgus end

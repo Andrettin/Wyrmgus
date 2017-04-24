@@ -776,6 +776,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->GivesResource = parent_type->GivesResource;
 			type->RequirementsString = parent_type->RequirementsString;
 			type->BuildingRulesString = parent_type->BuildingRulesString;
+			type->Elixir = parent_type->Elixir;
 			type->Icon.Name = parent_type->Icon.Name;
 			type->Icon.Icon = NULL;
 			if (!type->Icon.Name.empty()) {
@@ -2053,6 +2054,14 @@ static int CclDefineUnitType(lua_State *l)
 			type->BuildingRulesString = LuaToString(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
 			type->TrainQuantity = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Elixir")) {
+			std::string elixir_ident = LuaToString(l, -1);
+			int elixir_id = UpgradeIdByIdent(elixir_ident);
+			if (elixir_id != -1) {
+				type->Elixir = AllUpgrades[elixir_id];
+			} else {
+				type->Elixir = CUpgrade::New(elixir_ident); //if this elixir upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+			}
 		} else if (!strcmp(value, "SoldUnits")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {

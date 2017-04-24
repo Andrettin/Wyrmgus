@@ -1905,6 +1905,9 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
 		this->GenerateWork(dropper);
 	}
+	if (this->Type->Elixir) { //set the unit type's elixir, if any
+		this->SetElixir(this->Type->Elixir);
+	}
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
 		this->GeneratePrefix(dropper);
 	}
