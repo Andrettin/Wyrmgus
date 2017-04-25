@@ -1782,7 +1782,7 @@ void CUnit::UpdateItemName()
 	}
 	
 	Name = "";
-	if (Prefix == NULL && Spell == NULL && Work == NULL && Elixir == NULL && Suffix == NULL) {
+	if (Prefix == NULL && Spell == NULL && Work == NULL && Suffix == NULL) { //elixirs use the name of their unit type
 		return;
 	}
 	
@@ -1792,8 +1792,6 @@ void CUnit::UpdateItemName()
 	}
 	if (Work != NULL) {
 		Name += _(Work->Name.c_str());
-	} else if (Elixir != NULL) {
-		Name += _(Elixir->Name.c_str());
 	} else {
 		Name += GetTypeName();
 	}
@@ -1904,9 +1902,6 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
 		this->GenerateWork(dropper);
-	}
-	if (this->Type->Elixir) { //set the unit type's elixir, if any
-		this->SetElixir(this->Type->Elixir);
 	}
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
 		this->GeneratePrefix(dropper);
@@ -2641,6 +2636,10 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		if (CheckDependByIdent(*unit, unit->Type->StartingAbilities[i]->Ident)) {
 			IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
 		}
+	}
+	
+	if (unit->Type->Elixir) { //set the unit type's elixir, if any
+		unit->SetElixir(unit->Type->Elixir);
 	}
 	//Wyrmgus end
 	
@@ -5781,7 +5780,7 @@ std::string CUnit::GetMessageName() const
 		return GetTypeName() + " (" + _("Unidentified") + ")";
 	}
 	
-	if (!this->Unique && this->Work == NULL && this->Elixir == NULL && (this->Prefix != NULL || this->Suffix != NULL || this->Spell != NULL)) {
+	if (!this->Unique && this->Work == NULL && (this->Prefix != NULL || this->Suffix != NULL || this->Spell != NULL)) {
 		return name;
 	}
 	

@@ -888,7 +888,7 @@ void DrawPopups()
 					PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
 					unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);
 					std::string unit_name;
-					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
+					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
 						if (!UnitUnderCursor->Identified) {
 							unit_name = UnitUnderCursor->GetTypeName() + " (" + _("Unidentified") + ")";
 						} else {
