@@ -318,7 +318,7 @@ std::string GetItemEffectsString(std::string item_ident)
 				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX
 				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
 				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == BACKSTAB_INDEX
-				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX)
+				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX || var == MANA_INDEX)
 			) {
 				continue;
 			}
@@ -362,6 +362,51 @@ std::string GetItemEffectsString(std::string item_ident)
 				item_effects_string += " ";
 											
 				item_effects_string += GetVariableDisplayName(var, true);
+			}
+			
+			if (item->Elixir) {
+				for (size_t z = 0; z < item->Elixir->UpgradeModifiers.size(); ++z) {
+					if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
+						if (!first_var) {
+							item_effects_string += ", ";
+						} else {
+							first_var = false;
+						}
+												
+						if (IsBooleanVariable(var) && item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value < 0) {
+							item_effects_string += "Lose ";
+						}
+						
+						if (!IsBooleanVariable(var)) {
+							if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+								item_effects_string += "+";
+							}
+							item_effects_string += std::to_string((long long) item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Value);
+							if (IsPercentageVariable(var)) {
+								item_effects_string += "%";
+							}
+							item_effects_string += " ";
+						}
+													
+						item_effects_string += GetVariableDisplayName(var);
+					}
+					
+					if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase != 0) {
+						if (!first_var) {
+							item_effects_string += ", ";
+						} else {
+							first_var = false;
+						}
+													
+						if (item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase > 0) {
+							item_effects_string += "+";
+						}
+						item_effects_string += std::to_string((long long) item->Elixir->UpgradeModifiers[z]->Modifier.Variables[var].Increase);
+						item_effects_string += " ";
+													
+						item_effects_string += GetVariableDisplayName(var, true);
+					}
+				}
 			}
 		}
 			
