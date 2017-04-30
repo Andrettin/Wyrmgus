@@ -41,6 +41,9 @@
 #include "commands.h"
 #include "cursor.h"
 #include "font.h"
+//Wyrmgus start
+#include "game.h"
+//Wyrmgus end
 #include "iolib.h"
 //Wyrmgus start
 #include "map.h"
@@ -1160,7 +1163,10 @@ static int InputKey(int key)
 			} else
 #endif
 				if (!IsNetworkGame()) {
-					if (!GameObserve && !GamePaused && !GameEstablishing) {
+					//Wyrmgus start
+//					if (!GameObserve && !GamePaused && !GameEstablishing) {
+					if (!GameObserve && !GamePaused && !GameEstablishing && !SaveGameLoading) {
+					//Wyrmgus end
 						if (HandleCheats(Input)) {
 							CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
 						}
