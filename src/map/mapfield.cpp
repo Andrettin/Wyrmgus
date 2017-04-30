@@ -204,6 +204,8 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		this->Value = DefaultResourceAmounts[WoodCost];
 	} else if (terrain->Flags & MapFieldRocks) {
 		this->Value = DefaultResourceAmounts[StoneCost];
+	} else if ((terrain->Flags & MapFieldWall) && terrain->UnitType) {
+		this->Value = terrain->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}
 	
 	if (this->TerrainFeature) {
