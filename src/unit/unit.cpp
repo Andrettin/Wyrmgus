@@ -887,12 +887,6 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 	}
 
-	for (size_t i = 0; i < this->Type->StartingAbilities.size(); ++i) {
-		if (CheckDependByIdent(*this, this->Type->StartingAbilities[i]->Ident)) {
-			IndividualUpgradeAcquire(*this, this->Type->StartingAbilities[i]);
-		}
-	}
-	
 	if (this->Character->Trait != NULL) { //set trait
 		TraitAcquire(*this, this->Character->Trait);
 	} else if (Editor.Running == EditorNotRunning && this->Type->Traits.size() > 0) {
@@ -901,6 +895,20 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	
 	if (this->Character->Deity != NULL && this->Character->Deity->CharacterUpgrade != NULL) {
 		IndividualUpgradeAcquire(*this, this->Character->Deity->CharacterUpgrade);
+	}
+	
+	//load worshipped deities
+	for (size_t i = 0; i < this->Character->Deities.size(); ++i) {
+		CUpgrade *deity_upgrade = CUpgrade::Get("upgrade-deity-" + this->Character->Deities[i]->Ident);
+		if (deity_upgrade) {
+			IndividualUpgradeAcquire(*this, deity_upgrade);
+		}
+	}
+	
+	for (size_t i = 0; i < this->Type->StartingAbilities.size(); ++i) {
+		if (CheckDependByIdent(*this, this->Type->StartingAbilities[i]->Ident)) {
+			IndividualUpgradeAcquire(*this, this->Type->StartingAbilities[i]);
+		}
 	}
 	
 	this->Variable[LEVEL_INDEX].Max = 100000; // because the code above sets the max level to the unit type stats' Level variable (which is the same as its value)
@@ -915,14 +923,6 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	//load learned abilities
 	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
 		AbilityAcquire(*this, this->Character->Abilities[i]);
-	}
-	
-	//load worshipped deities
-	for (size_t i = 0; i < this->Character->Deities.size(); ++i) {
-		CUpgrade *deity_upgrade = CUpgrade::Get("upgrade-deity-" + this->Character->Deities[i]->Ident);
-		if (deity_upgrade) {
-			IndividualUpgradeAcquire(*this, deity_upgrade);
-		}
 	}
 	
 	//load read works
