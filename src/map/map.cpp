@@ -922,7 +922,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 			bool found_other_connector = false;
 			if (Map.Layers[second_z] == std::get<2>(this->LayerConnectors[i]) && Map.Worlds[second_z] == this->World && Map.Planes[second_z] == this->Plane) {
 				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
-					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) {
+					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->tilePos == unit->tilePos && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) { //surface layer connectors need to be in the same X and Y coordinates as their destinations
 						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
 						unit->ConnectingDestination = Map.LayerConnectors[second_z][j];
 						found_other_connector = true;
