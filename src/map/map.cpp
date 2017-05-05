@@ -446,13 +446,13 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 		
 		if (found_location) {
-			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0) {
+			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < Map.Info.MapWidths[z] && subtemplate_pos.y < Map.Info.MapHeights[z]) {
 				this->Subtemplates[i]->Apply(Vec2i(0, 0), subtemplate_pos, z);
 			}
 				
 			Map.SubtemplateAreas[z].push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), this->Subtemplates[i]));
 				
-			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0) {
+			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < Map.Info.MapWidths[z] && subtemplate_pos.y < Map.Info.MapHeights[z]) {
 				for (size_t j = 0; j < this->Subtemplates[i]->ExternalGeneratedTerrains.size(); ++j) {
 					Vec2i external_start_pos(subtemplate_pos.x - (this->Subtemplates[i]->Width / 2), subtemplate_pos.y - (this->Subtemplates[i]->Height / 2));
 					Vec2i external_end(subtemplate_pos.x + this->Subtemplates[i]->Width + (this->Subtemplates[i]->Width / 2), subtemplate_pos.y + this->Subtemplates[i]->Height + (this->Subtemplates[i]->Height / 2));
