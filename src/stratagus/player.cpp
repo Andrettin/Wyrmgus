@@ -2091,6 +2091,7 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	}
 	
 	if (this == ThisPlayer) {
+		CclCommand("AddPlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Name + "\");");
 		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 //			SetObjective(quest->Objectives[i].c_str());
 			CclCommand("AddPlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
