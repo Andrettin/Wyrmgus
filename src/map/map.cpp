@@ -1266,6 +1266,11 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 			continue;
 		}
 		
+		if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->Species && std::find(unit_type->Species->Terrains.begin(), unit_type->Species->Terrains.end(), GetTileTopTerrain(random_pos, false, z)) == unit_type->Species->Terrains.end()) { //if the unit is a fauna one, it has to start on terrain it is native to
+			while_count += 1;
+			continue;
+		}
+		
 		std::vector<CUnit *> table;
 		if (player != NULL) {
 			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
