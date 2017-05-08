@@ -2720,6 +2720,9 @@ static int CclGetFactionData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
+	} else if (!strcmp(data, "DefaultAI")) {
+		lua_pushstring(l, faction->DefaultAI.c_str());
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
@@ -3336,6 +3339,10 @@ static int CclSetPlayerData(lua_State *l)
 			LuaError(l, " wrong ident %s\n" _C_ ident);
 		}
 	//Wyrmgus start
+	} else if (!strcmp(data, "AiEnabled")) {
+		p->AiEnabled = LuaToBoolean(l, 3);
+	} else if (!strcmp(data, "Team")) {
+		p->Team = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "AcceptQuest")) {
 		CQuest *quest = GetQuest(LuaToString(l, 3));
 		if (quest) {
@@ -3381,6 +3388,27 @@ static int CclSetAiType(lua_State *l)
 }
 
 //Wyrmgus start
+/**
+**  Init ai for player.
+**
+**  @param l  Lua state.
+*/
+static int CclInitAi(lua_State *l)
+{
+	CPlayer *p;
+
+	if (lua_gettop(l) < 1) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_pushvalue(l, 1);
+	p = CclGetPlayer(l);
+	lua_pop(l, 1);
+
+	AiInit(*p);
+
+	return 0;
+}
+
 static int CclGetLanguages(lua_State *l)
 {
 	bool only_used = false;
@@ -3767,6 +3795,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "SetPlayerData", CclSetPlayerData);
 	lua_register(Lua, "SetAiType", CclSetAiType);
 	//Wyrmgus start
+	lua_register(Lua, "InitAi", CclInitAi);
 	lua_register(Lua, "GetLanguages", CclGetLanguages);
 	lua_register(Lua, "GetLanguageData", CclGetLanguageData);
 	lua_register(Lua, "GetLanguageWordData", CclGetLanguageWordData);
