@@ -203,7 +203,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 	if (z == 0 && (Map.Info.MapWidths.size() == 0 || Map.Info.MapHeights.size() == 0)) {
 		maxPos.x = std::min<int>(maxPos.x, Map.Info.MapWidth - 1);
 		maxPos.y = std::min<int>(maxPos.y, Map.Info.MapHeight - 1);
-	} else {
+	} else if (z != -1) {
 		maxPos.x = std::min<int>(maxPos.x, Map.Info.MapWidths[z] - 1);
 		maxPos.y = std::min<int>(maxPos.y, Map.Info.MapHeights[z] - 1);
 	}
