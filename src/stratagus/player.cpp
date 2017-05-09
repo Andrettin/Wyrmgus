@@ -2124,6 +2124,7 @@ void CPlayer::CompleteQuest(CQuest *quest)
 	}
 	
 	if (this == ThisPlayer) {
+		CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Name + "\");");
 		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 //			SetObjective(quest->Objectives[i].c_str());
 			CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
@@ -2153,6 +2154,7 @@ void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 	}
 	
 	if (this == ThisPlayer) {
+		CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Name + "\");");
 		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 //			SetObjective(quest->Objectives[i].c_str());
 			CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");

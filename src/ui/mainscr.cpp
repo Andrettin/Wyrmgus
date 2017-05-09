@@ -1068,6 +1068,9 @@ void DrawPopups()
 ----------------------------------------------------------------------------*/
 
 #define MESSAGES_MAX  10                       /// How many can be displayed
+//Wyrmgus start
+#define OBJECTIVES_MAX  32					   /// How many objectives be displayed
+//Wyrmgus end
 
 static char MessagesEvent[MESSAGES_MAX][256];  /// Array of event messages
 static Vec2i MessagesEventPos[MESSAGES_MAX];   /// coordinate of event
@@ -1114,7 +1117,7 @@ private:
 	int  MessagesSameCount;                   /// Counts same message repeats
 	int  MessagesScrollY;
 	//Wyrmgus start
-	char Objectives[MESSAGES_MAX][256];         /// Array of objectives
+	char Objectives[OBJECTIVES_MAX][256];         /// Array of objectives
 	int  ObjectivesCount;                       /// Number of objectives
 	//Wyrmgus end
 	unsigned long MessagesFrameTimeout;       /// Frame to expire message
