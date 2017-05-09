@@ -1862,7 +1862,7 @@ void CUnit::GenerateDrop()
 				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(NULL, droppedUnit->Variable[GENDER_INDEX].Value);
 			}
 			
-			droppedUnit->GenerateSpecialProperties(this);
+			droppedUnit->GenerateSpecialProperties(this, this->Player);
 			
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 				int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
@@ -1875,7 +1875,7 @@ void CUnit::GenerateDrop()
 	}
 }
 
-void CUnit::GenerateSpecialProperties(CUnit *dropper)
+void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player)
 {
 	int magic_affix_chance = 10; //10% chance of the unit having a magic prefix or suffix
 	int unique_chance = 5; //0.5% chance of the unit being unique
@@ -1901,19 +1901,19 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 	}
 
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
-		this->GenerateWork(dropper);
+		this->GenerateWork(dropper, dropper_player);
 	}
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
-		this->GeneratePrefix(dropper);
+		this->GeneratePrefix(dropper, dropper_player);
 	}
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
-		this->GenerateSuffix(dropper);
+		this->GenerateSuffix(dropper, dropper_player);
 	}
 	if (this->Prefix == NULL && this->Suffix == NULL && this->Work == NULL && this->Elixir == NULL && SyncRand(100) >= (100 - magic_affix_chance)) {
-		this->GenerateSpell(dropper);
+		this->GenerateSpell(dropper, dropper_player);
 	}
 	if (SyncRand(1000) >= (1000 - unique_chance)) {
-		this->GenerateUnique(dropper);
+		this->GenerateUnique(dropper, dropper_player);
 	}
 	
 	if (this->Type->BoolFlag[ITEM_INDEX].value && (this->Prefix != NULL || this->Suffix != NULL)) {
@@ -1924,11 +1924,11 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 		this->Prefix == NULL && this->Suffix == NULL && this->Spell == NULL && this->Work == NULL && this->Elixir == NULL
 		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == BookItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass || this->Type->ItemClass == HornItemClass)
 	) { //scrolls, books, jewelry and horns must always have a property
-		this->GenerateSpecialProperties(dropper);
+		this->GenerateSpecialProperties(dropper, dropper_player);
 	}
 }
 			
-void CUnit::GeneratePrefix(CUnit *dropper)
+void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUpgrade *> potential_prefixes;
 	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
@@ -1936,9 +1936,9 @@ void CUnit::GeneratePrefix(CUnit *dropper)
 			potential_prefixes.push_back(this->Type->Affixes[i]);
 		}
 	}
-	if (dropper != NULL) {
+	if (dropper_player != NULL) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependByIdent(*dropper->Player, AllUpgrades[i]->Ident)) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependByIdent(*dropper_player, AllUpgrades[i]->Ident)) {
 				potential_prefixes.push_back(AllUpgrades[i]);
 			}
 		}
@@ -1949,7 +1949,7 @@ void CUnit::GeneratePrefix(CUnit *dropper)
 	}
 }
 
-void CUnit::GenerateSuffix(CUnit *dropper)
+void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUpgrade *> potential_suffixes;
 	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
@@ -1959,9 +1959,9 @@ void CUnit::GenerateSuffix(CUnit *dropper)
 			}
 		}
 	}
-	if (dropper != NULL) {
+	if (dropper_player != NULL) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependByIdent(*dropper->Player, AllUpgrades[i]->Ident)) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependByIdent(*dropper_player, AllUpgrades[i]->Ident)) {
 				if (Prefix == NULL || !AllUpgrades[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 					potential_suffixes.push_back(AllUpgrades[i]);
 				}
@@ -1974,7 +1974,7 @@ void CUnit::GenerateSuffix(CUnit *dropper)
 	}
 }
 
-void CUnit::GenerateSpell(CUnit *dropper)
+void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<SpellType *> potential_spells;
 	if (dropper != NULL) {
@@ -1990,7 +1990,7 @@ void CUnit::GenerateSpell(CUnit *dropper)
 	}
 }
 
-void CUnit::GenerateWork(CUnit *dropper)
+void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUpgrade *> potential_works;
 	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
@@ -1998,9 +1998,9 @@ void CUnit::GenerateWork(CUnit *dropper)
 			potential_works.push_back(this->Type->Affixes[i]);
 		}
 	}
-	if (dropper != NULL) {
+	if (dropper_player != NULL) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependByIdent(*dropper->Player, AllUpgrades[i]->Ident) && !AllUpgrades[i]->UniqueOnly) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependByIdent(*dropper_player, AllUpgrades[i]->Ident) && !AllUpgrades[i]->UniqueOnly) {
 				potential_works.push_back(AllUpgrades[i]);
 			}
 		}
@@ -2011,7 +2011,7 @@ void CUnit::GenerateWork(CUnit *dropper)
 	}
 }
 
-void CUnit::GenerateUnique(CUnit *dropper)
+void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUniqueItem *> potential_uniques;
 	for (size_t i = 0; i < UniqueItems.size(); ++i) {
@@ -2019,12 +2019,12 @@ void CUnit::GenerateUnique(CUnit *dropper)
 			Type == UniqueItems[i]->Type
 			&& ( //the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Prefix == NULL
-				|| (dropper != NULL && CheckDependByIdent(*dropper->Player, UniqueItems[i]->Prefix->Ident))
+				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Prefix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Prefix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Suffix == NULL
-				|| (dropper != NULL && CheckDependByIdent(*dropper->Player, UniqueItems[i]->Suffix->Ident))
+				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Suffix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's spell to drop the item
@@ -2034,12 +2034,12 @@ void CUnit::GenerateUnique(CUnit *dropper)
 			&& ( //the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Work == NULL
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
-				|| (dropper != NULL && CheckDependByIdent(*dropper->Player, UniqueItems[i]->Work->Ident))
+				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Work->Ident))
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Elixir == NULL
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Elixir) != this->Type->Affixes.end()
-				|| (dropper != NULL && CheckDependByIdent(*dropper->Player, UniqueItems[i]->Elixir->Ident))
+				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Elixir->Ident))
 			)
 			&& UniqueItems[i]->CanDrop()
 		) {
@@ -2149,7 +2149,7 @@ void CUnit::UpdateSoldUnits()
 		} else {
 			CUnitType *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, &Players[PlayerNumNeutral], this->MapLayer);
-			new_unit->GenerateSpecialProperties(this);
+			new_unit->GenerateSpecialProperties(this, this->Player);
 			new_unit->Identified = true;
 			if (new_unit->Unique && this->Player == ThisPlayer) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
 				this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer, "%s", _("Unique item available for sale"));

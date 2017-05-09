@@ -219,12 +219,12 @@ public:
 	void CheckKnowledgeChange(int variable, int change);
 	void UpdateItemName();
 	void GenerateDrop();
-	void GenerateSpecialProperties(CUnit *dropper = NULL);
-	void GeneratePrefix(CUnit *dropper);
-	void GenerateSuffix(CUnit *dropper);
-	void GenerateSpell(CUnit *dropper);
-	void GenerateWork(CUnit *dropper);
-	void GenerateUnique(CUnit *dropper);
+	void GenerateSpecialProperties(CUnit *dropper = NULL, CPlayer *dropper_player = NULL);
+	void GeneratePrefix(CUnit *dropper, CPlayer *dropper_player);
+	void GenerateSuffix(CUnit *dropper, CPlayer *dropper_player);
+	void GenerateSpell(CUnit *dropper, CPlayer *dropper_player);
+	void GenerateWork(CUnit *dropper, CPlayer *dropper_player);
+	void GenerateUnique(CUnit *dropper, CPlayer *dropper_player);
 	void UpdateSoldUnits();
 	void SellUnit(CUnit *sold_unit, int player);
 	void ProduceResource(const int resource);

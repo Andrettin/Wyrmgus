@@ -356,11 +356,23 @@ static int CclCenterMap(lua_State *l)
 */
 static int CclSetStartView(lua_State *l)
 {
-	LuaCheckArgs(l, 3);
+	//Wyrmgus start
+//	LuaCheckArgs(l, 3);
+	const int nargs = lua_gettop(l);
+	if (nargs < 3 || nargs > 4) {
+		LuaError(l, "incorrect argument\n");
+	}
+	//Wyrmgus end
 
 	const int p = LuaToNumber(l, 1);
 	Players[p].StartPos.x = LuaToNumber(l, 2);
 	Players[p].StartPos.y = LuaToNumber(l, 3);
+	
+	//Wyrmgus start
+	if (nargs >= 4) {
+		Players[p].StartMapLayer = LuaToNumber(l, 4);
+	}
+	//Wyrmgus end
 
 	return 0;
 }

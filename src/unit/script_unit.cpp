@@ -2048,9 +2048,16 @@ static int CclSetUnitVariable(lua_State *l)
 			LuaError(l, "Unique \"%s\" doesn't exist." _C_ unique_name.c_str());
 		}
 	} else if (!strcmp(name, "GenerateSpecialProperties")) {
-		unit->GenerateSpecialProperties();
+		CPlayer *dropper_player = NULL;
+		if (nargs >= 3) {
+			int dropper_player_index = LuaToNumber(l, 3);
+			dropper_player = &Players[dropper_player_index];
+		}
+		unit->GenerateSpecialProperties(NULL, dropper_player);
 	} else if (!strcmp(name, "TTL")) {
 		unit->TTL = GameCycle + LuaToNumber(l, 3);
+	} else if (!strcmp(name, "Identified")) {
+		unit->Identified = LuaToBoolean(l, 3);
 	//Wyrmgus end
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
