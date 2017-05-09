@@ -63,7 +63,7 @@ public:
 	CQuest() :
 		ID(-1), Civilization(-1), PlayerColor(0), HairColor(0), HighestCompletedDifficulty(-1),
 		Hidden(false), Completed(false), CurrentCompleted(false), Competitive(false), Unobtainable(false), Uncompleteable(false), Unfailable(false),
-		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), CompletionEffects(NULL), FailEffects(NULL)
+		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), AcceptEffects(NULL), CompletionEffects(NULL), FailEffects(NULL)
 	{
 	}
 	~CQuest();
@@ -103,6 +103,7 @@ public:
 	CCharacter *QuestGiver;			/// Quest giver
 	CDialogue *IntroductionDialogue;
 	LuaCallback *Conditions;
+	LuaCallback *AcceptEffects;
 	LuaCallback *CompletionEffects;
 	LuaCallback *FailEffects;
 	std::vector<std::string> Objectives;	/// The objectives of this quest

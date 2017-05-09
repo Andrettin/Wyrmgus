@@ -193,6 +193,9 @@ CQuest::~CQuest()
 	if (this->Conditions) {
 		delete Conditions;
 	}
+	if (this->AcceptEffects) {
+		delete AcceptEffects;
+	}
 	if (this->CompletionEffects) {
 		delete CompletionEffects;
 	}

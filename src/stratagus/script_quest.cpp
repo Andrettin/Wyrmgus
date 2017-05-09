@@ -158,6 +158,8 @@ static int CclDefineQuest(lua_State *l)
 			}
 		} else if (!strcmp(value, "Conditions")) {
 			quest->Conditions = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "AcceptEffects")) {
+			quest->AcceptEffects = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "CompletionEffects")) {
 			quest->CompletionEffects = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "FailEffects")) {

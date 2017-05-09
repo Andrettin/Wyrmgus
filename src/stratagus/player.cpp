@@ -2090,6 +2090,13 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		this->QuestGatherResources.push_back(std::tuple<CQuest *, int, int>(quest, std::get<0>(quest->GatherResources[i]), std::get<1>(quest->GatherResources[i])));
 	}
 	
+	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+	
+	if (quest->AcceptEffects) {
+		quest->AcceptEffects->pushPreamble();
+		quest->AcceptEffects->run();
+	}
+	
 	if (this == ThisPlayer) {
 		CclCommand("AddPlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Name + "\");");
 		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
