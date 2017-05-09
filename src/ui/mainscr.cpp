@@ -498,7 +498,11 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		}
 		if (UI.SingleTrainingButton) {
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
-			CIcon &icon = *order.GetUnitType().Icon.Icon;
+			//Wyrmgus sta
+			VariationInfo *varinfo = order.GetUnitType().GetDefaultVariation(*ThisPlayer);
+//			CIcon &icon = *order.GetUnitType().Icon.Icon;
+			CIcon &icon = (varinfo && varinfo->Icon.Icon) ? *varinfo->Icon.Icon : *order.GetUnitType().Icon.Icon;
+			//Wyrmgus end
 			//Wyrmgus start
 //			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
 			unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
