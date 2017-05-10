@@ -886,6 +886,7 @@ static int CclDefineUnitType(lua_State *l)
 					var->HairColor = parent_type->VarInfo[var_n]->HairColor;
 					var->ResourceMin = parent_type->VarInfo[var_n]->ResourceMin;
 					var->ResourceMax = parent_type->VarInfo[var_n]->ResourceMax;
+					var->Weight = parent_type->VarInfo[var_n]->Weight;
 					var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
 					var->Icon.Icon = NULL;
 					if (!var->Icon.Name.empty()) {
@@ -1123,6 +1124,8 @@ static int CclDefineUnitType(lua_State *l)
 						var->ResourceMin = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "resource-max")) {
 						var->ResourceMax = LuaToNumber(l, -1, k + 1);
+					} else if (!strcmp(value, "weight")) {
+						var->Weight = LuaToNumber(l, -1, k + 1);
 					} else {
 						printf("\n%s\n", type->Name.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);

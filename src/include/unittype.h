@@ -156,7 +156,7 @@ class VariationInfo
 {
 public:
 	VariationInfo() : 
-		FrameWidth(0), FrameHeight(0), HairColor(0), ResourceMin(0), ResourceMax(0),
+		FrameWidth(0), FrameHeight(0), HairColor(0), ResourceMin(0), ResourceMax(0), Weight(1),
 		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL)
 	{
 		memset(LayerSprites, 0, sizeof(LayerSprites));
@@ -175,6 +175,7 @@ public:
 	int HairColor;
 	int ResourceMin;
 	int ResourceMax;
+	int Weight;						/// The weight for when randomly choosing a variation
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
 	CGraphic *ShadowSprite;			/// The graphic corresponding to ShadowFile.

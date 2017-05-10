@@ -1110,7 +1110,9 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 			type_variations.clear();
 			break;
 		}
-		type_variations.push_back(i);
+		for (int j = 0; j < varinfo->Weight; ++j) {
+			type_variations.push_back(i);
+		}
 	}
 	if (type_variations.size() > 0) {
 		this->SetVariation(type_variations[SyncRand(type_variations.size())], new_type, image_layer);
