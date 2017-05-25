@@ -877,6 +877,12 @@ static int CclCreateUnit(lua_State *l)
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
+	//Wyrmgus start
+	if (!Map.Info.IsPointOnMap(ipos, z)) {
+		return 0;
+	}
+	//Wyrmgus end
+
 	lua_pushvalue(l, 2);
 	const int playerno = TriggerGetPlayer(l);
 	lua_pop(l, 1);
