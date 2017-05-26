@@ -262,6 +262,8 @@ public:
 	
 	//Wyrmgus start
 	bool IsSeenTileCorrect() const;
+	
+	int GetResource() const;
 	//Wyrmgus end
 
 	unsigned char getCost() const { return cost; }

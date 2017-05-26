@@ -1181,7 +1181,7 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource, int resource_
 	// Code for terrain harvesters. Search for piece of terrain to mine.
 	//Wyrmgus start
 //	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
-	if (resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, resource_range, *unit.Player, unit.tilePos, &forestPos, unit.MapLayer)) {
+	if (FindTerrainType(unit.Type->MovementMask, resource, resource_range, *unit.Player, unit.tilePos, &forestPos, unit.MapLayer)) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		CommandResourceLoc(unit, forestPos, FlushCommands);
@@ -1189,12 +1189,6 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource, int resource_
 		//Wyrmgus end
 		return 1;
 	}
-	//Wyrmgus start
-	if (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, resource_range, *unit.Player, unit.tilePos, &rockPos, unit.MapLayer)) {
-		CommandResourceLoc(unit, rockPos, FlushCommands, unit.MapLayer);
-		return 1;
-	}
-	//Wyrmgus end
 	// Ask the AI to explore...
 	//Wyrmgus start
 //	AiExplore(unit.tilePos, MapFieldLandUnit);

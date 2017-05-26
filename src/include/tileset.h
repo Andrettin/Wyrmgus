@@ -184,7 +184,7 @@ class CTerrainType
 {
 public:
 	CTerrainType() :
-		ID(-1), Flags(0), SolidAnimationFrames(0),
+		ID(-1), Flags(0), SolidAnimationFrames(0), Resource(-1),
 		Overlay(false), Buildable(false), AllowSingle(false),
 		UnitType(NULL), Graphics(NULL)
 	{
@@ -200,6 +200,7 @@ public:
 	CColor Color;
 	int ID;
 	int SolidAnimationFrames;
+	int Resource;
 	unsigned int Flags;
 	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
 	bool Buildable;

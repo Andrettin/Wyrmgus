@@ -1419,6 +1419,8 @@ static int CclDefineTerrainType(lua_State *l)
 			terrain->AllowSingle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SolidAnimationFrames")) {
 			terrain->SolidAnimationFrames = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Resource")) {
+			terrain->Resource = GetResourceIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "BaseTerrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

@@ -86,16 +86,17 @@ public:
 	//Wyrmgus start
 //	NearReachableTerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
 //		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
-	NearReachableTerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos, int z) :
-		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos), z(z) {}
+	NearReachableTerrainFinder(const CPlayer &player, int maxDist, int movemask, int resource, Vec2i *resPos, int z) :
+		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z) {}
 	//Wyrmgus end
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CPlayer &player;
 	int maxDist;
 	int movemask;
-	int resmask;
 	//Wyrmgus start
+//	int resmask;
+	int resource;
 	int z;
 	//Wyrmgus end
 	Vec2i *resPos;
@@ -121,7 +122,7 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 	}
 	//Wyrmgus start
 //	if (Map.Field(pos)->CheckMask(resmask)) { // reachable
-	if (Map.Field(pos, z)->CheckMask(resmask)) { // reachable
+	if (Map.Field(pos, z)->GetResource() == resource) { // reachable
 	//Wyrmgus end
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult_Ok;
@@ -133,7 +134,10 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 	}
 }
 
-static bool FindNearestReachableTerrainType(int movemask, int resmask, int range,
+//Wyrmgus start
+//static bool FindNearestReachableTerrainType(int movemask, int resmask, int range,
+static bool FindNearestReachableTerrainType(int movemask, int resource, int range,
+//Wyrmgus end
 											//Wyrmgus start
 //											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
 											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z)
@@ -149,13 +153,13 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 
 	//Wyrmgus start
 //	Assert(Map.Field(startPos)->CheckMask(resmask));
-	Assert(Map.Field(startPos, z)->CheckMask(resmask));
+	Assert(Map.Field(startPos, z)->GetResource() == resource);
 	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
 //	NearReachableTerrainFinder nearReachableTerrainFinder(player, range, movemask, resmask, terrainPos);
-	NearReachableTerrainFinder nearReachableTerrainFinder(player, range, movemask, resmask, terrainPos, z);
+	NearReachableTerrainFinder nearReachableTerrainFinder(player, range, movemask, resource, terrainPos, z);
 	//Wyrmgus end
 
 	return terrainTraversal.Run(nearReachableTerrainFinder);
@@ -181,24 +185,16 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	order->goalPos = ressourceLoc;
 	order->CurrentResource = WoodCost; // Hard-coded resource.
 	*/
-	if (Map.Info.IsPointOnMap(pos, z) && Map.Field(pos, z)->IsTerrainResourceOnMap(WoodCost)) {
-		order->CurrentResource = WoodCost;
+	if (Map.Info.IsPointOnMap(pos, z) && Map.Field(pos, z)->GetResource() != -1) {
+		order->CurrentResource = Map.Field(pos, z)->GetResource();
 		//  Find the closest piece of wood next to a tile where the unit can move
-		if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, MapFieldForest, 20, *harvester.Player, pos, &ressourceLoc, z)) {
-			DebugPrint("FIXME: Give up???\n");
-			ressourceLoc = pos;
-		}
-	} else if (Map.Info.IsPointOnMap(pos, z) && Map.Field(pos, z)->IsTerrainResourceOnMap(StoneCost)) {
-		order->CurrentResource = StoneCost;
-		//  Find the closest piece of rock next to a tile where the unit can move
-		if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, MapFieldRocks, 20, *harvester.Player, pos, &ressourceLoc, z)) {
+		if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, Map.Field(pos, z)->GetResource(), 20, *harvester.Player, pos, &ressourceLoc, z)) {
 			DebugPrint("FIXME: Give up???\n");
 			ressourceLoc = pos;
 		}
 	}
 	order->goalPos = ressourceLoc;
 	order->MapLayer = z;
-	Assert(order->CurrentResource == WoodCost || order->CurrentResource == StoneCost);
 	//Wyrmgus end
 		
 	return order;
@@ -503,7 +499,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 		&& (!unit.IX) && (!unit.IY)) {
 		//Wyrmgus start
 //		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos, &pos)) {
-		if ((this->CurrentResource == WoodCost && !FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos, &pos, this->MapLayer)) || (this->CurrentResource == StoneCost && !FindTerrainType(unit.Type->MovementMask, MapFieldRocks, 16, *unit.Player, this->goalPos, &pos, this->MapLayer))) {
+		if (!FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 16, *unit.Player, this->goalPos, &pos, this->MapLayer)) {
 		//Wyrmgus end
 			// no wood in range
 			return -1;
@@ -539,7 +535,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 			}
 			//Wyrmgus start
 //			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 9999, *unit.Player, unit.tilePos, &pos)) {
-			if ((this->CurrentResource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, 9999, *unit.Player, unit.tilePos, &pos, z)) || (this->CurrentResource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, 9999, *unit.Player, unit.tilePos, &pos, z))) {
+			if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 9999, *unit.Player, unit.tilePos, &pos, z)) {
 			//Wyrmgus end
 				this->goalPos = pos;
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
@@ -1470,7 +1466,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 		//Wyrmgus start
 //		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, pos, &pos)) {
-		if ((this->CurrentResource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, pos, &pos, z)) || (this->CurrentResource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, 10, *unit.Player, pos, &pos, z))) {
+		if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 10, *unit.Player, pos, &pos, z)) {
 		//Wyrmgus end
 			if (depot) {
 				DropOutNearest(unit, pos, depot);
@@ -1634,7 +1630,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 				Vec2i resPos;
 				//Wyrmgus start
 //				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos, &resPos)) {
-				if ((this->CurrentResource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer)) || (this->CurrentResource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer))) {
+				if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer)) {
 				//Wyrmgus end
 					this->goalPos = resPos;
 					//Wyrmgus start

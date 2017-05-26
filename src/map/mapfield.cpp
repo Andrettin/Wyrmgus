@@ -75,15 +75,14 @@ CMapField::CMapField() :
 
 bool CMapField::IsTerrainResourceOnMap(int resource) const
 {
-	// TODO: Hard coded stuff.
-	if (resource == WoodCost) {
-		return this->ForestOnMap();
 	//Wyrmgus start
-	} else if (resource == StoneCost) {
-		return this->RockOnMap();
+//	// TODO: Hard coded stuff.
+//	if (resource == WoodCost) {
+//		return this->ForestOnMap();
+//	}
+//	return false;
+	return this->GetResource() != -1;
 	//Wyrmgus end
-	}
-	return false;
 }
 
 bool CMapField::IsTerrainResourceOnMap() const
@@ -100,6 +99,15 @@ bool CMapField::IsTerrainResourceOnMap() const
 bool CMapField::IsSeenTileCorrect() const
 {
 	return this->Terrain == this->playerInfo.SeenTerrain && this->OverlayTerrain == this->playerInfo.SeenOverlayTerrain && this->SolidTile == this->playerInfo.SeenSolidTile && this->OverlaySolidTile == this->playerInfo.SeenOverlaySolidTile && this->TransitionTiles == this->playerInfo.SeenTransitionTiles && this->OverlayTransitionTiles == this->playerInfo.SeenOverlayTransitionTiles;
+}
+
+int CMapField::GetResource() const
+{
+	if (this->OverlayTerrain) {
+		return this->OverlayTerrain->Resource;
+	}
+	
+	return -1;
 }
 //Wyrmgus end
 
@@ -200,10 +208,8 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	}
 
 	//wood and rock tiles must always begin with the default value for their respective resource types
-	if (terrain->Flags & MapFieldForest) {
-		this->Value = DefaultResourceAmounts[WoodCost];
-	} else if (terrain->Flags & MapFieldRocks) {
-		this->Value = DefaultResourceAmounts[StoneCost];
+	if (terrain->Overlay && terrain->Resource != -1) {
+		this->Value = DefaultResourceAmounts[terrain->Resource];
 	} else if ((terrain->Flags & MapFieldWall) && terrain->UnitType) {
 		this->Value = terrain->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}

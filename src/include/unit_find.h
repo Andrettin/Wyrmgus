@@ -453,7 +453,10 @@ extern CUnit *FindHomeMarket(const CUnit &unit, int range);
 extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 
 /// Find the neareast piece of terrain with specific flags.
-extern bool FindTerrainType(int movemask, int resmask, int range,
+//Wyrmgus start
+//extern bool FindTerrainType(int movemask, int resmask, int range,
+extern bool FindTerrainType(int movemask, int resource, int range,
+//Wyrmgus end
 							//Wyrmgus start
 //							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
 							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z);
