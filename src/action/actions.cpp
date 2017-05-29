@@ -77,6 +77,9 @@
 #include "player.h"
 #include "script.h"
 #include "spells.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "unit.h"
 #include "unit_find.h"
 #include "unit_manager.h"
@@ -466,6 +469,18 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		}
 		if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) {
 			unit.ApplyAura(REGENERATIONAURA_INDEX);
+		}
+		
+		//apply ambush/camouflage
+		if ((unit.Variable[AMBUSH_INDEX].Value > 0 || unit.Variable[CAMOUFLAGE_INDEX].Value > 0) && Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)) {
+			if (
+				(unit.Variable[CAMOUFLAGE_INDEX].Value > 0 && (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldDesert))
+				&& (unit.Variable[INVISIBLE_INDEX].Value > 0 || !unit.IsInCombat())
+			) {
+				unit.Variable[INVISIBLE_INDEX].Enable = 1;
+				unit.Variable[INVISIBLE_INDEX].Max = std::max(CYCLES_PER_SECOND + 1, unit.Variable[INVISIBLE_INDEX].Max);
+				unit.Variable[INVISIBLE_INDEX].Value = std::max(CYCLES_PER_SECOND + 1, unit.Variable[INVISIBLE_INDEX].Value);
+			}
 		}
 	}
 	//Wyrmgus end

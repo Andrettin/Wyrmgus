@@ -420,6 +420,9 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldAirUnpassable) {
 		file.printf(", \"air-unpassable\"");
 	}
+	if (Flags & MapFieldDesert) {
+		file.printf(", \"desert\"");
+	}
 	if (Flags & MapFieldDirt) {
 		file.printf(", \"dirt\"");
 	}
@@ -584,6 +587,8 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldBridge;
 		} else if (!strcmp(value, "air-unpassable")) {
 			this->Flags |= MapFieldAirUnpassable;
+		} else if (!strcmp(value, "desert")) {
+			this->Flags |= MapFieldDesert;
 		} else if (!strcmp(value, "dirt")) {
 			this->Flags |= MapFieldDirt;
 		} else if (!strcmp(value, "grass")) {

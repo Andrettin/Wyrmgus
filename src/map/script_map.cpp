@@ -1321,6 +1321,8 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(flag_name, "air-unpassable")) {
 		flag = MapFieldAirUnpassable;
+	} else if (!strcmp(flag_name, "desert")) {
+		flag = MapFieldDesert;
 	} else if (!strcmp(flag_name, "dirt")) {
 		flag = MapFieldDirt;
 	} else if (!strcmp(flag_name, "grass")) {
@@ -1501,6 +1503,8 @@ static int CclDefineTerrainType(lua_State *l)
 					terrain->Flags |= MapFieldForest;
 				} else if (tile_flag == "air-unpassable") {
 					terrain->Flags |= MapFieldAirUnpassable;
+				} else if (tile_flag == "desert") {
+					terrain->Flags |= MapFieldDesert;
 				} else if (tile_flag == "dirt") {
 					terrain->Flags |= MapFieldDirt;
 				} else if (tile_flag == "grass") {

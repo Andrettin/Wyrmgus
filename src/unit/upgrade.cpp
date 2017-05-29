@@ -2855,7 +2855,7 @@ bool IsBonusVariable(int var)
 
 bool IsBooleanVariable(int var)
 {
-	return var == DISEMBARKMENTBONUS_INDEX || var == LEADERSHIPAURA_INDEX || var == REGENERATIONAURA_INDEX || var == ETHEREALVISION_INDEX;
+	return var == DISEMBARKMENTBONUS_INDEX || var == AMBUSH_INDEX || var == CAMOUFLAGE_INDEX || var == LEADERSHIPAURA_INDEX || var == REGENERATIONAURA_INDEX || var == ETHEREALVISION_INDEX;
 }
 
 bool IsKnowledgeVariable(int var)
