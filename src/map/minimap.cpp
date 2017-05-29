@@ -326,14 +326,9 @@ void CMinimap::Reload()
 */
 //Wyrmgus start
 //static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp)
-static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp, int z, bool use_base = false)
+static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp, int z, CTerrainType *terrain)
 //Wyrmgus end
 {
-	//Wyrmgus start
-	const CMapField &mf = Map.Fields[z][Minimap2MapX[z][mx] + Minimap2MapY[z][my]];
-	CTerrainType *terrain = (mf.OverlayTerrain && !use_base) ? mf.OverlayTerrain : mf.Terrain;
-	//Wyrmgus end
-
 	//Wyrmgus start
 //	Uint8 *pixels = (Uint8 *)Map.TileGraphic->Surface->pixels;
 	Uint8 *pixels = (Uint8 *)terrain->Graphics->Surface->pixels;
@@ -463,10 +458,10 @@ void CMinimap::UpdateTerrain(int z)
 //					SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[
 //										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp)];
 					SDL_Color color = terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z)];
+										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain)];
 					if (color.r == 255 && color.g == 255 && color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
 						color = base_terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, true)];
+										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain)];
 					}
 					//Wyrmgus end
 					c = Video.MapRGB(0, color.r, color.g, color.b);
@@ -475,11 +470,11 @@ void CMinimap::UpdateTerrain(int z)
 //					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
 					SDL_PixelFormat *f = terrain->Graphics->Surface->format;
 					//Wyrmgus end
-					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z);
+					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
 					//Wyrmgus start
 					if (((c & f->Amask) >> f->Ashift) == 0) { //transparent pixel, use base instead
 						f = base_terrain->Graphics->Surface->format;
-						c = *(Uint32 *)GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, true);
+						c = *(Uint32 *)GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain);
 					}
 					//Wyrmgus end
 					c = Video.MapRGB(0,
@@ -501,11 +496,11 @@ void CMinimap::UpdateTerrain(int z)
 						*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					*/
 					SDL_Color original_color = terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z)];
+										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain)];
 
 					if (original_color.r == 255 && original_color.g == 255 && original_color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
 						original_color = base_terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, true)];
+										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain)];
 					}
 
 					Uint32 color;
@@ -520,7 +515,7 @@ void CMinimap::UpdateTerrain(int z)
 //					Uint8 *d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
 //					Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					Uint8 *d = &((Uint8 *)MinimapTerrainSurface[z]->pixels)[mx * bpp + my * MinimapTerrainSurface[z]->pitch];
-					Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z);
+					Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
 					//Wyrmgus end
 					*d++ = *s++;
 					*d++ = *s++;
@@ -530,7 +525,7 @@ void CMinimap::UpdateTerrain(int z)
 //					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
 //						*(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface[z]->pixels)[mx * bpp + my * MinimapTerrainSurface[z]->pitch] =
-						*(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z);
+						*(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
 					//Wyrmgus end
 				}
 			}
@@ -707,10 +702,10 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 					//Wyrmgus start
 //					const int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 //					const SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[colorIndex];
-					int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z);
+					int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
 					SDL_Color color = terrain->Graphics->Surface->format->palette->colors[colorIndex];
 					if (color.r == 255 && color.g == 255 && color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
-						colorIndex = *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, true);
+						colorIndex = *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain);
 						color = base_terrain->Graphics->Surface->format->palette->colors[colorIndex];
 					}
 					//Wyrmgus end
@@ -724,11 +719,11 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 
 					//Wyrmgus start
 //					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
-					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z);
+					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
 					
 					if (((c & f->Amask) >> f->Ashift) == 0) { //transparent pixel, use base instead
 						f = base_terrain->Graphics->Surface->format;
-						c = *(Uint32 *)GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, true);
+						c = *(Uint32 *)GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain);
 					}
 					//Wyrmgus end
 					c = Video.MapRGB(0,
@@ -747,7 +742,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 //				const int index = mx * bpp + my * MinimapTerrainSurface->pitch;
 //				Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 				const int index = mx * bpp + my * MinimapTerrainSurface[z]->pitch;
-				Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z);
+				Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
 				//Wyrmgus end
 				if (bpp == 1) {
 					//Wyrmgus start
@@ -755,11 +750,11 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 					((Uint8 *)MinimapTerrainSurface->pixels)[index] = *s;
 					*/
 					SDL_Color original_color = terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z)];
+										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain)];
 										  
 					if (original_color.r == 255 && original_color.g == 255 && original_color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
 						original_color = base_terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, true)];
+										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain)];
 					}
 
 					Uint32 color;
