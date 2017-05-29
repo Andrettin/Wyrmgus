@@ -103,7 +103,7 @@ bool CMapField::IsSeenTileCorrect() const
 
 int CMapField::GetResource() const
 {
-	if (this->OverlayTerrain) {
+	if (this->OverlayTerrain && !this->OverlayTerrainDestroyed) {
 		return this->OverlayTerrain->Resource;
 	}
 	
