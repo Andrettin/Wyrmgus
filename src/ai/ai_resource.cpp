@@ -1391,6 +1391,10 @@ static void AiProduceResources()
 			}
 		}
 
+		if (!chosen_resource && unit.Type->GivesResource) { // don't toggle off resource production if a building should always have a resource produce
+			continue;
+		}
+
 		CommandProduceResource(unit, chosen_resource);
 	}
 }
