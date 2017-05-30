@@ -107,7 +107,7 @@ class CUnitType;
 #define MapFieldRoad 0x01000000				/// Road (moves faster)
 #define MapFieldRailroad 0x02000000			/// Railroad (moves faster, even faster than with the road)
 #define MapFieldNoRail 0x04000000			/// Marker that there's no railroad, used for rail movemasks
-#define MapFieldDesert 0x08000000			/// Used for identifying desert tiles for camouflage
+#define MapFieldDesert 0x08000000			/// Used for identifying desert tiles for desertstalk
 //Wyrmgus end
 
 /**

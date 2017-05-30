@@ -471,15 +471,22 @@ static void HandleBuffsEachSecond(CUnit &unit)
 			unit.ApplyAura(REGENERATIONAURA_INDEX);
 		}
 		
-		//apply ambush/camouflage
-		if ((unit.Variable[AMBUSH_INDEX].Value > 0 || unit.Variable[CAMOUFLAGE_INDEX].Value > 0) && Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)) {
+		//apply "-stalk" abilities
+		if ((unit.Variable[DESERTSTALK_INDEX].Value > 0 || unit.Variable[FORESTSTALK_INDEX].Value > 0 || unit.Variable[SWAMPSTALK_INDEX].Value > 0) && Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)) {
 			if (
-				(unit.Variable[CAMOUFLAGE_INDEX].Value > 0 && (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldDesert))
+				(
+					(unit.Variable[DESERTSTALK_INDEX].Value > 0 && (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldDesert))
+					|| (unit.Variable[SWAMPSTALK_INDEX].Value > 0 && (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldMud))
+				)
 				&& (unit.Variable[INVISIBLE_INDEX].Value > 0 || !unit.IsInCombat())
-			) {
-				unit.Variable[INVISIBLE_INDEX].Enable = 1;
-				unit.Variable[INVISIBLE_INDEX].Max = std::max(CYCLES_PER_SECOND + 1, unit.Variable[INVISIBLE_INDEX].Max);
-				unit.Variable[INVISIBLE_INDEX].Value = std::max(CYCLES_PER_SECOND + 1, unit.Variable[INVISIBLE_INDEX].Value);
+			) {				
+				std::vector<CUnit *> table;
+				SelectAroundUnit(unit, 1, table, IsEnemyWith(*unit.Player));
+				if (table.size() == 0) { //only apply the -stalk invisibility if the unit is not adjacent to an enemy unit
+					unit.Variable[INVISIBLE_INDEX].Enable = 1;
+					unit.Variable[INVISIBLE_INDEX].Max = std::max(CYCLES_PER_SECOND + 1, unit.Variable[INVISIBLE_INDEX].Max);
+					unit.Variable[INVISIBLE_INDEX].Value = std::max(CYCLES_PER_SECOND + 1, unit.Variable[INVISIBLE_INDEX].Value);
+				}
 			}
 		}
 	}
