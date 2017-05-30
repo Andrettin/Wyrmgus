@@ -5300,6 +5300,8 @@ int CUnit::GetResourceStep(const int resource) const
 		resource_step += this->Variable[COALGATHERINGBONUS_INDEX].Value;
 	} else if (resource == FurnitureCost) {
 		resource_step += this->Variable[FURNITUREGATHERINGBONUS_INDEX].Value;
+	} else if (resource == LeatherCost) {
+		resource_step += this->Variable[LEATHERGATHERINGBONUS_INDEX].Value;
 	}
 	
 	return resource_step;

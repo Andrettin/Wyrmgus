@@ -89,6 +89,7 @@ enum CostType {
 	SilverCost,								/// silver resource
 	LimestoneCost,							/// limestone resource
 	FurnitureCost,							/// furniture resource
+	LeatherCost,							/// leather resource
 	GrainCost,								/// grain resource
 	MushroomCost,							/// mushroom resource
 	LaborCost,								/// labor resource
