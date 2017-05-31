@@ -476,6 +476,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 			if (
 				(
 					(unit.Variable[DESERTSTALK_INDEX].Value > 0 && (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldDesert))
+					|| (unit.Variable[FORESTSTALK_INDEX].Value > 0 && Map.TileBordersFlag(unit.tilePos, unit.MapLayer, MapFieldForest))
 					|| (unit.Variable[SWAMPSTALK_INDEX].Value > 0 && (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldMud))
 				)
 				&& (unit.Variable[INVISIBLE_INDEX].Value > 0 || !unit.IsInCombat())
