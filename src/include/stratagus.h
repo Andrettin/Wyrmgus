@@ -254,10 +254,13 @@ enum Months {
 	MaxMonths
 };
 
+class CTimeline;
+
 struct CDate {
 	int year;
 	char month;
 	char day;
+	CTimeline *timeline;
 	
 	bool operator <(const CDate& rhs) const {
 		if (year < rhs.year) {
@@ -318,6 +321,8 @@ struct CDate {
 	bool operator ==(const CDate& rhs) const {
 		return year == rhs.year && month == rhs.month && day == rhs.day;
 	}
+	
+	bool ContainsDate(CDate date) const; /// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
 };
 
 #include <vec2i.h>

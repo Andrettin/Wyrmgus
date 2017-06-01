@@ -390,22 +390,7 @@ static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 }
 
 //Wyrmgus start
-/**
-**  Get a date from lua state
-**
-**  @param l  Lua state.
-**  @param d  pointer to output date.
-*/
-static void CclGetDate(lua_State *l, CDate *d, const int offset = -1)
-{
-	if (!lua_istable(l, offset)) {
-		d->year = LuaToNumber(l, offset);
-	} else {
-		d->year = LuaToNumber(l, offset, 1);
-		d->month = LuaToNumber(l, offset, 2);
-		d->day = LuaToNumber(l, offset, 3);
-	}
-}
+extern void CclGetDate(lua_State *l, CDate *d, const int offset = -1);
 //Wyrmgus end
 
 extern NumberDesc *Damage;  /// Damage calculation for missile.

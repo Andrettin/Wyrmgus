@@ -656,6 +656,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 	date.year = 0;
 	date.month = 1;
 	date.day = 1;
+	date.timeline = NULL;
 	const int nargs = lua_gettop(l);
 	if (nargs >= 4) {
 		CclGetDate(l, &date, 4);
@@ -743,6 +744,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 	date.year = 0;
 	date.month = 1;
 	date.day = 1;
+	date.timeline = NULL;
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
 		CclGetDate(l, &date, 5);
@@ -898,15 +900,25 @@ static int CclSetMapTemplateUnit(lua_State *l)
 	std::string faction_name = LuaToString(l, 3);
 	CFaction *faction = PlayerRaces.GetFaction(-1, faction_name);
 
-	int start_year = 0;
-	int end_year = 0;
+	CDate start_date;
+	CDate end_date;
+	start_date.year = 0;
+	start_date.month = 1;
+	start_date.day = 1;
+	start_date.timeline = NULL;
+	end_date.year = 0;
+	end_date.month = 1;
+	end_date.day = 1;
+	end_date.timeline = NULL;
+
 	CUniqueItem *unique = NULL;
+
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
-		start_year = LuaToNumber(l, 5);
+		CclGetDate(l, &start_date, 5);
 	}
 	if (nargs >= 6) {
-		end_year = LuaToNumber(l, 6);
+		CclGetDate(l, &end_date, 6);
 	}
 	if (nargs >= 7) {
 		unique = GetUniqueItem(LuaToString(l, 7));
@@ -915,7 +927,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 		}
 	}
 	
-	map_template->Units.push_back(std::tuple<Vec2i, CUnitType *, CFaction *, int, int, CUniqueItem *>(ipos, unittype, faction, start_year, end_year, unique));
+	map_template->Units.push_back(std::tuple<Vec2i, CUnitType *, CFaction *, CDate, CDate, CUniqueItem *>(ipos, unittype, faction, start_date, end_date, unique));
 	
 	return 1;
 }
@@ -947,9 +959,11 @@ static int CclSetMapTemplateHero(lua_State *l)
 	start_date.year = 0;
 	start_date.month = 1;
 	start_date.day = 1;
+	start_date.timeline = NULL;
 	end_date.year = 0;
 	end_date.month = 1;
 	end_date.day = 1;
+	end_date.timeline = NULL;
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
 		CclGetDate(l, &start_date, 5);
@@ -1849,6 +1863,7 @@ static int CclDefineSettlement(lua_State *l)
 				date.year = 0;
 				date.month = 1;
 				date.day = 1;
+				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -1874,6 +1889,7 @@ static int CclDefineSettlement(lua_State *l)
 				date.year = 0;
 				date.month = 1;
 				date.day = 1;
+				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -1890,6 +1906,7 @@ static int CclDefineSettlement(lua_State *l)
 				date.year = 0;
 				date.month = 1;
 				date.day = 1;
+				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -1928,6 +1945,7 @@ static int CclDefineSettlement(lua_State *l)
 				start_date.year = 0;
 				start_date.month = 1;
 				start_date.day = 1;
+				start_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &start_date);
 				lua_pop(l, 1);
@@ -1936,6 +1954,7 @@ static int CclDefineSettlement(lua_State *l)
 				end_date.year = 0;
 				end_date.month = 1;
 				end_date.day = 1;
+				end_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
@@ -2104,6 +2123,47 @@ static int CclDefineTerrainFeature(lua_State *l)
 }
 
 /**
+**  Define a timeline.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineTimeline(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string timeline_ident = LuaToString(l, 1);
+	CTimeline *timeline = GetTimeline(timeline_ident);
+	if (!timeline) {
+		timeline = new CTimeline;
+		timeline->Ident = timeline_ident;
+		timeline->ID = Timelines.size();
+		timeline->PointOfDivergence.year = 0;
+		timeline->PointOfDivergence.month = 1;
+		timeline->PointOfDivergence.day = 1;
+		timeline->PointOfDivergence.timeline = NULL;
+		Timelines.push_back(timeline);
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			timeline->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "PointOfDivergence")) {
+			CclGetDate(l, &timeline->PointOfDivergence);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Get terrain feature data.
 **
 **  @param l  Lua state.
@@ -2191,6 +2251,7 @@ void MapCclRegister()
 	lua_register(Lua, "DefineMapTemplate", CclDefineMapTemplate);
 	lua_register(Lua, "DefineSettlement", CclDefineSettlement);
 	lua_register(Lua, "DefineTerrainFeature", CclDefineTerrainFeature);
+	lua_register(Lua, "DefineTimeline", CclDefineTimeline);
 	lua_register(Lua, "GetTerrainFeatureData", CclGetTerrainFeatureData);
 	lua_register(Lua, "GetTerrainFeatures", CclGetTerrainFeatures);
 	lua_register(Lua, "SetMapTemplateTileTerrain", CclSetMapTemplateTileTerrain);

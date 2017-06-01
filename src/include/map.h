@@ -158,6 +158,20 @@ public:
 	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the terrain feature for each different faction
 };
 
+class CTimeline
+{
+public:
+	CTimeline() :
+		ID(-1)
+	{
+	}
+	
+	int ID;
+	std::string Ident;
+	std::string Name;
+	CDate PointOfDivergence;											/// The point of divergence for this timeline
+};
+
 class CMapTemplate
 {
 public:
@@ -198,7 +212,7 @@ public:
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
-	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, int, int, CUniqueItem *>> Units; /// Units; first value is the tile position, and the last ones are start year and end year
+	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, CDate, CDate, CUniqueItem *>> Units; /// Units; first value is the tile position, and the last ones are start date and end date
 	std::vector<std::tuple<Vec2i, CCharacter *, CFaction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
 	std::vector<std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
@@ -540,6 +554,8 @@ extern std::map<std::string, CSettlement *> SettlementIdentToPointer;
 extern std::vector<CTerrainFeature *> TerrainFeatures;
 extern std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 extern std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
+extern std::vector<CTimeline *> Timelines;
+extern std::map<std::string, CTimeline *> TimelineIdentToPointer;
 //Wyrmgus end
 
 extern CMap Map;  /// The current map
@@ -567,6 +583,7 @@ extern int ReplayRevealMap;
 extern CMapTemplate *GetMapTemplate(std::string map_ident);
 extern CSettlement *GetSettlement(std::string settlement_ident);
 extern CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident);
+extern CTimeline *GetTimeline(std::string timeline_ident);
 extern std::string GetDegreeLevelNameById(int degree_level);
 extern int GetDegreeLevelIdByName(std::string degree_level);
 //Wyrmgus end

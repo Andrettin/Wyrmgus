@@ -467,9 +467,7 @@ static int CclDefineCampaign(lua_State *l)
 		} else if (!strcmp(value, "StartYear")) {
 			campaign->StartDate.year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "StartDate")) {
-			campaign->StartDate.year = LuaToNumber(l, -1, 1);
-			campaign->StartDate.month = LuaToNumber(l, -1, 2);
-			campaign->StartDate.day = LuaToNumber(l, -1, 2);
+			CclGetDate(l, &campaign->StartDate);
 		} else if (!strcmp(value, "StartEffects")) {
 			campaign->StartEffects = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "MapTemplate")) {

@@ -1007,5 +1007,18 @@ Vec2i GetDirectionOffset(int direction)
 
 	return offset;
 }
+
+bool CDate::ContainsDate(CDate date) const
+{
+	if (this->timeline == date.timeline) {
+		return *this >= date;
+	}
+	
+	if (this->timeline) {
+		return this->timeline->PointOfDivergence.ContainsDate(date);
+	}
+	
+	return false;
+}
 //Wyrmgus end
 //@}

@@ -2851,6 +2851,35 @@ static int CclStdOutPrint(lua_State *l)
 
 	return 1;
 }
+
+/**
+**  Get a date from lua state
+**
+**  @param l  Lua state.
+**  @param d  pointer to output date.
+*/
+void CclGetDate(lua_State *l, CDate *d, const int offset)
+{
+	if (!lua_istable(l, offset)) {
+		d->year = LuaToNumber(l, offset);
+	} else {
+		d->year = LuaToNumber(l, offset, 1);
+		d->month = LuaToNumber(l, offset, 2);
+		d->day = LuaToNumber(l, offset, 3);
+		lua_rawgeti(l, offset, 4);
+		if (lua_isnil(l, -1)) {
+			d->timeline = NULL;
+		} else {
+			std::string timeline_ident = LuaToString(l, -1);
+			CTimeline *timeline = GetTimeline(timeline_ident);
+			if (!timeline) {
+				LuaError(l, "Timeline \"%s\" doesn't exist." _C_ timeline_ident.c_str());
+			}
+			d->timeline = timeline;
+		}
+		lua_pop(l, 1);
+	}
+}
 //Wyrmgus end
 
 /*............................................................................

@@ -1027,6 +1027,7 @@ static int CclDefineCivilization(lua_State *l)
 				date.year = 0;
 				date.month = 1;
 				date.day = 1;
+				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -1988,6 +1989,7 @@ static int CclDefineFaction(lua_State *l)
 				date.year = 0;
 				date.month = 1;
 				date.day = 1;
+				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -2063,14 +2065,9 @@ static int CclDefineFaction(lua_State *l)
 				date.year = 0;
 				date.month = 1;
 				date.day = 1;
+				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
-				if (!lua_istable(l, -1)) {
-					date.year = LuaToNumber(l, -1);
-				} else {
-					date.year = LuaToNumber(l, -1, 1);
-					date.month = LuaToNumber(l, -1, 2);
-					date.day = LuaToNumber(l, -1, 3);
-				}
+				CclGetDate(l, &date);
 				lua_pop(l, 1);
 				++j;
 				
