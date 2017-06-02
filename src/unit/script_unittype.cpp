@@ -844,6 +844,9 @@ static int CclDefineUnitType(lua_State *l)
 			for (size_t i = 0; i < parent_type->SoldUnits.size(); ++i) {
 				type->SoldUnits.push_back(parent_type->SoldUnits[i]);
 			}
+			for (size_t i = 0; i < parent_type->SpawnUnits.size(); ++i) {
+				type->SpawnUnits.push_back(parent_type->SpawnUnits[i]);
+			}
 			for (size_t i = 0; i < parent_type->Drops.size(); ++i) {
 				type->Drops.push_back(parent_type->Drops[i]);
 			}
@@ -2080,6 +2083,16 @@ static int CclDefineUnitType(lua_State *l)
 					type->SoldUnits.push_back(UnitTypes[sold_unit_type_id]);
 				} else { // Error
 					LuaError(l, "incorrect sold unit unit-type");
+				}
+			}
+		} else if (!strcmp(value, "SpawnUnits")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				int sold_unit_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
+				if (sold_unit_type_id != -1) {
+					type->SpawnUnits.push_back(UnitTypes[sold_unit_type_id]);
+				} else { // Error
+					LuaError(l, "incorrect spawn unit unit-type");
 				}
 			}
 		} else if (!strcmp(value, "Drops")) {

@@ -641,6 +641,7 @@ CUnitType::~CUnitType()
 
 	//Wyrmgus start
 	SoldUnits.clear();
+	SpawnUnits.clear();
 	Drops.clear();
 	AiDrops.clear();
 	DropSpells.clear();

@@ -916,6 +916,7 @@ public:
 	std::string BuildingRulesString;	/// Building rules string of the unit type
 	CUpgrade *Elixir;						/// Which elixir does this (item) unit type always have
 	std::vector<CUnitType *> SoldUnits;		/// Units which this unit can sell.
+	std::vector<CUnitType *> SpawnUnits;	/// Units which this unit can spawn.
 	std::vector<CUnitType *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<CUnitType *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<SpellType *> DropSpells;	/// Spells which can be applied to dropped items
