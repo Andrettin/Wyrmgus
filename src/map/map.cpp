@@ -1273,6 +1273,22 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 	}
 	
 	Vec2i random_pos(-1, -1);
+	
+	std::vector<CTerrainType *> allowed_terrains;
+	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->Species) { //if the unit is a fauna one, it has to start on terrain it is native to
+		for (size_t i = 0; i < unit_type->Species->Terrains.size(); ++i) {
+			allowed_terrains.push_back(unit_type->Species->Terrains[i]);
+		}
+	}
+	
+	for (size_t i = 0; i < unit_type->SpawnUnits.size(); ++i) {
+		CUnitType *spawned_type = unit_type->SpawnUnits[i];
+		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->Species) {
+			for (size_t j = 0; j < spawned_type->Species->Terrains.size(); ++j) {
+				allowed_terrains.push_back(spawned_type->Species->Terrains[j]);
+			}
+		}
+	}
 
 	int while_count = 0;
 	
@@ -1284,7 +1300,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 			continue;
 		}
 		
-		if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->Species && std::find(unit_type->Species->Terrains.begin(), unit_type->Species->Terrains.end(), GetTileTopTerrain(random_pos, false, z)) == unit_type->Species->Terrains.end()) { //if the unit is a fauna one, it has to start on terrain it is native to
+		if (allowed_terrains.size() > 0 && std::find(allowed_terrains.begin(), allowed_terrains.end(), GetTileTopTerrain(random_pos, false, z)) == allowed_terrains.end()) { //if the unit is a fauna one, it has to start on terrain it is native to
 			while_count += 1;
 			continue;
 		}
