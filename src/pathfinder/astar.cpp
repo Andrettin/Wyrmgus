@@ -798,6 +798,11 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				// Tend against unknown tiles.
 				cost += AStarUnknownTerrainCost;
 			}
+			//Wyrmgus start
+			if ((mf->Flags & MapFieldDesert) && unit.Type->BoolFlag[ORGANIC_INDEX].value && Map.TimeOfDay[unit.MapLayer] >= DawnTimeOfDay && Map.TimeOfDay[unit.MapLayer] <= DuskTimeOfDay && unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0) {
+				cost += 8; //increase the cost of moving through deserts for units affected by dehydration, as we want the pathfinding to try to avoid that
+			}
+			//Wyrmgus end
 			// Add tile movement cost
 			cost += mf->getCost();
 			++mf;

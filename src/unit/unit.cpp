@@ -1581,6 +1581,11 @@ void CUnit::ApplyAuraEffect(int aura_index)
 			return;
 		}
 		effect_index = REGENERATION_INDEX;
+	} else if (aura_index == HYDRATINGAURA_INDEX) {
+		if (!this->Type->BoolFlag[ORGANIC_INDEX].value) {
+			return;
+		}
+		effect_index = HYDRATING_INDEX;
 	}
 	
 	if (effect_index == -1) {
@@ -6537,8 +6542,13 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 			damage = 0;
 		}
 	}
-	HitUnit_LastAttack(attacker, target);
+	//Wyrmgus start
+//	HitUnit_LastAttack(attacker, target);
+	//Wyrmgus end
 	if (attacker) {
+		//Wyrmgus start
+		HitUnit_LastAttack(attacker, target); //only trigger the help me notification and AI code if there is actually an attacker
+		//Wyrmgus end
 		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
 	}
 

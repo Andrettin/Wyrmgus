@@ -377,7 +377,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	
 	//Wyrmgus start
 //	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
-	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, TERROR_INDEX};
+	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, TERROR_INDEX, DEHYDRATION_INDEX, HYDRATING_INDEX};
 	//Wyrmgus end
 	//  decrease spells effects time.
 	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
@@ -423,7 +423,7 @@ static bool HandleBurnAndPoison(CUnit &unit)
 		return true;
 	}
 	//Wyrmgus start
-	if (unit.Variable[BLEEDING_INDEX].Value) {
+	if (unit.Variable[BLEEDING_INDEX].Value || unit.Variable[DEHYDRATION_INDEX].Value) {
 		HitUnit(NoUnitP, unit, 1, NULL, false);
 		//don't return true since we don't want to stop regeneration (positive or negative) from happening
 	}
@@ -438,12 +438,18 @@ static bool HandleBurnAndPoison(CUnit &unit)
 */
 static void HandleBuffsEachSecond(CUnit &unit)
 {
+	//Wyrmgus start
+	if (unit.Type->BoolFlag[DECORATION_INDEX].value) {
+		return;
+	}
+	//Wyrmgus end
+	
 	// User defined variables
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			//Wyrmgus start
 //			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == INSPIRE_INDEX || i == PRECISION_INDEX || i == REGENERATION_INDEX || i == TERROR_INDEX) {
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == INSPIRE_INDEX || i == PRECISION_INDEX || i == REGENERATION_INDEX || i == TERROR_INDEX || i == DEHYDRATION_INDEX || i == HYDRATING_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -470,6 +476,9 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) {
 			unit.ApplyAura(REGENERATIONAURA_INDEX);
 		}
+		if (unit.Variable[HYDRATINGAURA_INDEX].Value > 0) {
+			unit.ApplyAura(HYDRATINGAURA_INDEX);
+		}
 		
 		//apply "-stalk" abilities
 		if ((unit.Variable[DESERTSTALK_INDEX].Value > 0 || unit.Variable[FORESTSTALK_INDEX].Value > 0 || unit.Variable[SWAMPSTALK_INDEX].Value > 0) && Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)) {
@@ -489,6 +498,12 @@ static void HandleBuffsEachSecond(CUnit &unit)
 					unit.Variable[INVISIBLE_INDEX].Value = std::max(CYCLES_PER_SECOND + 1, unit.Variable[INVISIBLE_INDEX].Value);
 				}
 			}
+		}
+		
+		if (unit.Type->BoolFlag[ORGANIC_INDEX].value && Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer) && (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldDesert) && Map.TimeOfDay[unit.MapLayer] >= DawnTimeOfDay && Map.TimeOfDay[unit.MapLayer] <= DuskTimeOfDay && unit.Variable[HYDRATING_INDEX].Value <= 0 && unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0) { //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
+			unit.Variable[DEHYDRATION_INDEX].Enable = 1;
+			unit.Variable[DEHYDRATION_INDEX].Max = std::max(200, unit.Variable[DEHYDRATION_INDEX].Max);
+			unit.Variable[DEHYDRATION_INDEX].Value = std::max(200, unit.Variable[DEHYDRATION_INDEX].Value);
 		}
 	}
 	//Wyrmgus end
