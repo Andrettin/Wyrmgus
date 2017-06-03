@@ -1586,6 +1586,8 @@ void CUnit::ApplyAuraEffect(int aura_index)
 			return;
 		}
 		effect_index = HYDRATING_INDEX;
+		this->Variable[DEHYDRATION_INDEX].Max = 0;
+		this->Variable[DEHYDRATION_INDEX].Value = 0;
 	}
 	
 	if (effect_index == -1) {
