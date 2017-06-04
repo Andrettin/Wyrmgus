@@ -221,6 +221,12 @@ static int CclGetNumUnitsAt(lua_State *l)
 	for (size_t i = 0; i != units.size(); ++i) {
 		const CUnit &unit = *units[i];
 		// Check unit type
+		
+		//Wyrmgus start
+		if (unit.Type->BoolFlag[REVEALER_INDEX].value) {
+			continue;
+		}
+		//Wyrmgus end
 
 		if (unittype == ANY_UNIT
 			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
