@@ -3466,12 +3466,6 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (!GrandStrategyGame.Heroes[i]->ProvinceOfOriginName.empty()) {
 					fprintf(fd, "\tProvinceOfOrigin = \"%s\",\n", GrandStrategyGame.Heroes[i]->ProvinceOfOriginName.c_str());
 				}
-				if (GrandStrategyGame.Heroes[i]->Year != 0) {
-					fprintf(fd, "\tYear = %d,\n", GrandStrategyGame.Heroes[i]->Year);
-				}
-				if (GrandStrategyGame.Heroes[i]->DeathYear != 0) {
-					fprintf(fd, "\tDeathYear = %d,\n", GrandStrategyGame.Heroes[i]->DeathYear);
-				}
 				if (GrandStrategyGame.Heroes[i]->Father != NULL) {
 					fprintf(fd, "\tFather = \"%s\",\n", GrandStrategyGame.Heroes[i]->Father->GetFullName().c_str());
 				}

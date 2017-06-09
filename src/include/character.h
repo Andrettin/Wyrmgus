@@ -53,6 +53,7 @@
 
 class CDeity;
 class CFaction;
+class CMapTemplate;
 class CPersistentItem;
 class CProvince;
 class CQuest;
@@ -105,12 +106,20 @@ class CCharacter
 {
 public:
 	CCharacter() :
-		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0), ExperiencePercent(0),
+		Civilization(-1), Faction(NULL), Gender(0), Level(0), ExperiencePercent(0),
 		ViolentDeath(false), Custom(false),
 		Type(NULL), Trait(NULL), Deity(NULL),
 		Father(NULL), Mother(NULL),
 		Conditions(NULL)
 	{
+		Date.year = 0;
+		Date.month = 1;
+		Date.day = 1;
+		Date.timeline = NULL;
+		DeathDate.year = 0;
+		DeathDate.month = 1;
+		DeathDate.day = 1;
+		DeathDate.timeline = NULL;
 		memset(Attributes, 0, sizeof(Attributes));
 		memset(ForbiddenUpgrades, 0, sizeof(ForbiddenUpgrades));
 	}
@@ -129,10 +138,10 @@ public:
 	CPersistentItem *GetItem(CUnit &item);
 	void UpdateAttributes();
 
-	int Year;					/// Year in which the character historically starts being active
-	int DeathYear;				/// Year in which the character dies of natural causes
+	CDate Date;					/// Date in which the character historically starts being active
+	CDate DeathDate;			/// Date in which the character historically died
 	int Civilization;			/// Culture to which the character belongs
-	int Faction;				/// Faction to which the character belongs
+	CFaction *Faction;			/// Faction to which the character belongs
 	int Gender;					/// Character's gender
 	int Level;					/// Character's level
 	int ExperiencePercent;		/// Character's experience, as a percentage of the experience required to level up
@@ -169,6 +178,7 @@ public:
 	std::vector<CPersistentItem *> Items;
 	int Attributes[MaxAttributes];
 	bool ForbiddenUpgrades[UnitTypeMax];	/// which unit types this character is forbidden to upgrade to
+	std::vector<std::tuple<CDate, CMapTemplate *, Vec2i>> HistoricalLocations;	/// historical locations of the character; the values are: date, map template, position
 	std::vector<std::tuple<int, int, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning year of the term, the second one the end year, the third the faction it pertains to (if any, if not then it is NULL), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 };

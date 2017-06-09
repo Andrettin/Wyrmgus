@@ -1112,9 +1112,9 @@ void CGrandStrategyGame::DoTurn()
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
 		if (
 			// for historical personages to appear, they require three things: the year of their historical rise to prominence, ownership of the province in which they were born or raised, and that that province be of the correct culture for them, if they belonged to the cultural majority (or if the civilization of the province's owner is the same as the hero, as undoubtedly administrators and the like would exist from the faction's culture in any of its provinces)
-			GrandStrategyYear >= this->Heroes[i]->Year
-			&& GrandStrategyYear <= this->Heroes[i]->DeathYear
-			&& this->Heroes[i]->State == 0
+//			GrandStrategyYear >= this->Heroes[i]->Year
+//			&& GrandStrategyYear <= this->Heroes[i]->DeathYear
+			this->Heroes[i]->State == 0
 			&& !this->Heroes[i]->Existed
 			&& this->Heroes[i]->ProvinceOfOrigin != NULL
 			&& this->Heroes[i]->ProvinceOfOrigin->Owner != NULL
@@ -1163,16 +1163,6 @@ void CGrandStrategyGame::DoTurn()
 		}
 	}
 
-	//check if any heroes should die this year (this needs to be done as its own loop to allow new rulers to appear in the same year their predecessor dies, and succeede him)
-	for (size_t i = 0; i < this->Heroes.size(); ++i) {
-		if (
-			this->Heroes[i]->DeathYear == GrandStrategyYear
-			&& this->Heroes[i]->IsAlive()
-		) {
-			this->Heroes[i]->Die();
-		}
-	}
-	
 	// check if any literary works should be published this year
 	int works_size = this->UnpublishedWorks.size();
 	for (int i = (works_size - 1); i >= 0; --i) {
@@ -3648,8 +3638,8 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 	} else {
 		hero->HairVariation = hero->Type->GetRandomVariationIdent();
 	}
-	hero->Year = GrandStrategyYear;
-	hero->DeathYear = GrandStrategyYear + (SyncRand(45) + 1); //average + 30 years after initially appearing
+//	hero->Year = GrandStrategyYear;
+//	hero->DeathYear = GrandStrategyYear + (SyncRand(45) + 1); //average + 30 years after initially appearing
 	hero->Civilization = civilization;
 	hero->ProvinceOfOrigin = this;
 	hero->ProvinceOfOriginName = hero->ProvinceOfOrigin->Name;
@@ -4669,10 +4659,12 @@ void CGrandStrategyHero::Create()
 	}
 	this->Existed = true;
 	
+	/*
 	if (this->ViolentDeath) { //if the character died a violent death historically, add a random number of years to the hero's natural lifespan
 		this->DeathYear += SyncRand(15);
 		this->ViolentDeath = false;
 	}
+	*/
 	
 	if (this->ProvinceOfOrigin != NULL) {
 		this->ProvinceOfOrigin->SetHero(this->GetFullName(), this->State);
@@ -6644,12 +6636,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 				fprintf(stderr, "Character \"%s\" has no civilization.\n", iterator->second->GetFullName().c_str());
 			}
 			continue;
-		} else if (iterator->second->Year == 0) {
-//			fprintf(stderr, "Character \"%s\" has no start year.\n", iterator->second->GetFullName().c_str());
-			continue;
-		} else if (iterator->second->DeathYear == 0) {
-//			fprintf(stderr, "Character \"%s\" has no death year.\n", iterator->second->GetFullName().c_str());
-			continue;
 		} else if (iterator->second->ProvinceOfOriginName.empty()) {
 			continue;
 		} else if (CurrentCustomHero != NULL && iterator->second->GetFullName() == CurrentCustomHero->GetFullName()) { // temporary work-around for the custom hero duplication bug
@@ -6678,8 +6664,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 			hero->Trait = hero->Type->Traits[SyncRand(hero->Type->Traits.size())];
 		}
 		hero->HairVariation = iterator->second->HairVariation;
-		hero->Year = iterator->second->Year;
-		hero->DeathYear = iterator->second->DeathYear;
 		hero->ViolentDeath = iterator->second->ViolentDeath;
 		hero->Civilization = iterator->second->Civilization;
 		hero->ProvinceOfOriginName = iterator->second->ProvinceOfOriginName;
@@ -6991,26 +6975,6 @@ void FinalizeGrandStrategyInitialization()
 		}
 	}
 	
-	//initialize heroes
-	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		GrandStrategyGame.Heroes[i]->Initialize();
-		
-		if (GrandStrategyGameLoading == false) {
-			if (GrandStrategyYear >= GrandStrategyGame.Heroes[i]->Year) {
-				GrandStrategyGame.Heroes[i]->Existed = true;
-			}
-			
-			if (
-				(GrandStrategyGame.Heroes[i]->State == 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->Year && GrandStrategyYear < GrandStrategyGame.Heroes[i]->DeathYear)
-				|| GrandStrategyGame.Heroes[i]->Custom //create custom hero regardless of date
-			) {
-				GrandStrategyGame.Heroes[i]->Create();
-			} else if (GrandStrategyGame.Heroes[i]->State != 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->DeathYear) {
-				GrandStrategyGame.Heroes[i]->Die();
-			}
-		}
-	}
-
 	//initialize literary works
 	int works_size = GrandStrategyGame.UnpublishedWorks.size();
 	for (int i = (works_size - 1); i >= 0; --i) {

@@ -129,16 +129,21 @@ static int CclDefineCharacter(lua_State *l)
 			} else {
 				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
 			}
-		} else if (!strcmp(value, "Year")) {
-			character->Year = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "DeathYear")) {
-			character->DeathYear = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Date")) {
+			CclGetDate(l, &character->Date);
+		} else if (!strcmp(value, "DeathDate")) {
+			CclGetDate(l, &character->DeathDate);
 		} else if (!strcmp(value, "ViolentDeath")) {
 			character->ViolentDeath = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			character->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
-			faction_ident = LuaToString(l, -1);
+			CFaction *faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1));
+			if (faction != NULL) {
+				character->Faction = faction;
+			} else {
+				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
+			}
 		} else if (!strcmp(value, "ProvinceOfOrigin")) {
 			character->ProvinceOfOriginName = LuaToString(l, -1);
 		} else if (!strcmp(value, "Father")) {
@@ -412,6 +417,45 @@ static int CclDefineCharacter(lua_State *l)
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "HistoricalLocations")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CDate date;
+				date.year = 0;
+				date.month = 1;
+				date.day = 1;
+				date.timeline = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &date);
+				lua_pop(l, 1);
+				++j;
+				
+				CMapTemplate *map_template = GetMapTemplate(LuaToString(l, -1, j + 1));
+				if (!map_template) {
+					LuaError(l, "Map template doesn't exist.");
+				}
+				++j;
+				
+				lua_rawgeti(l, -1, j + 1);
+				Vec2i character_pos;
+				if (lua_istable(l, -1)) { //coordinates
+					CclGetPos(l, &character_pos.x, &character_pos.y);
+				} else { //settlement ident
+					std::string settlement_ident = LuaToString(l, 3);
+					CSettlement *settlement = GetSettlement(settlement_ident);
+					if (!settlement) {
+						LuaError(l, "Settlement \"%s\" doesn't exist.\n" _C_ settlement_ident.c_str());
+					}
+					character_pos.x = settlement->Position.x;
+					character_pos.y = settlement->Position.y;
+				}
+				lua_pop(l, 1);
+
+				character->HistoricalLocations.push_back(std::tuple<CDate, CMapTemplate *, Vec2i>(date, map_template, character_pos));
+			}
 		} else if (!strcmp(value, "HistoricalTitles")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -458,15 +502,6 @@ static int CclDefineCharacter(lua_State *l)
 		}
 	}
 	
-	if (character->Civilization != -1 && !faction_ident.empty()) { //we have to set the faction here, because Lua tables are in an arbitrary order, and the character needs its civilization to have been set before it can find its faction
-		int faction = PlayerRaces.GetFactionIndexByName(character->Civilization, faction_ident);
-		if (faction != -1) {
-			character->Faction = faction;
-		} else {
-			LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
-		}
-	}
-	
 	if (!redefinition) {
 		if (character->Type->BoolFlag[FAUNA_INDEX].value) {
 			character->Type->PersonalNames[character->Gender].push_back(character->Name);
@@ -485,6 +520,13 @@ static int CclDefineCharacter(lua_State *l)
 		if (character->Type != NULL && character->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
 			character->Gender = character->Type->DefaultStat.Variables[GENDER_INDEX].Value;
 		}
+	}
+	
+	if (character->DeathDate.year == 0 && character->Date.year != 0) { //if the character is missing a death date but not a start date, give it +30 years after the start date
+		character->DeathDate.year = character->Date.year + 30;
+		character->DeathDate.month = character->Date.month;
+		character->DeathDate.day = character->Date.day;
+		character->DeathDate.timeline = character->Date.timeline;
 	}
 		
 	//check if the abilities are correct for this character's unit type
@@ -835,10 +877,6 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			} else {
 				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
 			}
-		} else if (!strcmp(value, "Year")) {
-			hero->Year = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "DeathYear")) {
-			hero->DeathYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			hero->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "ProvinceOfOrigin")) {
@@ -956,17 +994,17 @@ static int CclGetCharacterData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
-		if (character->Faction != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[character->Civilization][character->Faction]->Ident.c_str());
+		if (character->Faction != NULL) {
+			lua_pushstring(l, character->Faction->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Year")) {
-		lua_pushnumber(l, character->Year);
+		lua_pushnumber(l, character->Date.year);
 		return 1;
 	} else if (!strcmp(data, "DeathYear")) {
-		lua_pushnumber(l, character->DeathYear);
+		lua_pushnumber(l, character->DeathDate.year);
 		return 1;
 	} else if (!strcmp(data, "ViolentDeath")) {
 		lua_pushboolean(l, character->ViolentDeath);

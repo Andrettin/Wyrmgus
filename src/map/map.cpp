@@ -999,7 +999,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 		}
 	}
-	
+
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
 		Vec2i unit_raw_pos(std::get<0>(this->Heroes[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
@@ -1030,6 +1030,63 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			unit->Active = 0;
 			player->UnitTypesAiActiveCount[hero->Type->Slot]--;
 		}
+	}
+	
+	if (this->IsSubtemplateArea() || random) { //don't perform the dynamic hero application if this is a subtemplate area, to avoid creating multiple copies of the same hero
+		return;
+	}
+	
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+		CCharacter *hero = iterator->second;
+		
+		if (hero->Deity != NULL) {
+			continue;
+		}
+		
+		if (hero->Faction == NULL && !hero->Type->BoolFlag[FAUNA_INDEX].value) { //only fauna "heroes" may have no faction
+			continue;
+		}
+		
+		if (hero->Date.year == 0 || !CurrentCampaign->StartDate.ContainsDate(hero->Date) || CurrentCampaign->StartDate.ContainsDate(hero->DeathDate)) { //contrary to other elements, heroes aren't implemented if their date isn't set
+			continue;
+		}
+
+		CPlayer *hero_player = hero->Faction ? GetFactionPlayer(hero->Faction) : NULL;
+		
+		Vec2i hero_pos(-1, -1);
+		
+		if (hero_player && hero_player->StartMapLayer == z) {
+			hero_pos = hero_player->StartPos;
+		}
+		
+		bool has_map_template_location = false;
+		for (int i = ((int) hero->HistoricalLocations.size() - 1); i >= 0; --i) {
+			if (CurrentCampaign->StartDate.ContainsDate(std::get<0>(hero->HistoricalLocations[i]))) {
+				if (std::get<1>(hero->HistoricalLocations[i]) == this) {
+					hero_pos = map_start_pos + std::get<2>(hero->HistoricalLocations[i]) - template_start_pos;
+				}
+
+				break;
+			}
+		}
+		
+		if (!Map.Info.IsPointOnMap(hero_pos, z) || hero_pos.x < map_start_pos.x || hero_pos.y < map_start_pos.y) { //heroes whose faction hasn't been created already and who don't have a historical location set won't be created
+			continue;
+		}
+		
+		if (hero->Faction) {
+			hero_player = GetOrAddFactionPlayer(hero->Faction);
+			if (hero_player->StartPos.x == 0 && hero_player->StartPos.y == 0) {
+				hero_player->SetStartView(hero_pos, z);
+			}
+		} else {
+			hero_player = &Players[PlayerNumNeutral];
+		}
+		Vec2i unit_offset((hero->Type->TileWidth - 1) / 2, (hero->Type->TileHeight - 1) / 2);
+		CUnit *unit = CreateUnit(hero_pos - unit_offset, *hero->Type, hero_player, z);
+		unit->SetCharacter(hero->Ident);
+		unit->Active = 0;
+		hero_player->UnitTypesAiActiveCount[hero->Type->Slot]--;
 	}
 }
 
