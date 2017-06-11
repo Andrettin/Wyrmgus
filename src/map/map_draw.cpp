@@ -304,6 +304,11 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.TransitionTiles[i].first->Graphics->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
 					}
 				}
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain) {
+					if (Map.BorderTerrain->Graphics) {
+						Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
+					}
+				}
 				if (mf.OverlayTerrain && mf.OverlayTransitionTiles.size() == 0) {
 					if (mf.OverlayTerrain->Graphics) {
 						mf.OverlayTerrain->Graphics->DrawFrameClip(mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
@@ -323,6 +328,11 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenTransitionTiles[i].first->Graphics->DrawFrameClip(mf.playerInfo.SeenTransitionTiles[i].second, dx, dy, false);
 					}
 				}
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain) {
+					if (Map.BorderTerrain->Graphics) {
+						Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
+					}
+				}
 				if (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTransitionTiles.size() == 0) {
 					if (mf.playerInfo.SeenOverlayTerrain->Graphics) {
 						mf.playerInfo.SeenOverlayTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
@@ -332,11 +342,6 @@ void CViewport::DrawMapBackgroundInViewport() const
 					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->Graphics) {
 						mf.playerInfo.SeenOverlayTransitionTiles[i].first->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
 					}
-				}
-			}
-			if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain) {
-				if (Map.BorderTerrain->Graphics) {
-					Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 				}
 			}
 			//Wyrmgus end
