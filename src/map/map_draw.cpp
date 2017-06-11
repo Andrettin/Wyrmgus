@@ -317,7 +317,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.OverlayTerrain->Graphics->DrawFrameClip(mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 					}
 					if (mf.OverlayTerrain->PlayerColorGraphics) {
-						mf.OverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OwnershipBorderTile, dx, dy, false);
+						mf.OverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 					}
 				}
 				for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
@@ -325,7 +325,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.OverlayTransitionTiles[i].first->Graphics->DrawFrameClip(mf.OverlayTransitionTiles[i].second, dx, dy, false);
 					}
 					if (mf.OverlayTransitionTiles[i].first->PlayerColorGraphics) {
-						mf.OverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OwnershipBorderTile, dx, dy, false);
+						mf.OverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
 			} else {
@@ -350,7 +350,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenOverlayTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 					}
 					if (mf.playerInfo.SeenOverlayTerrain->PlayerColorGraphics) {
-						mf.playerInfo.SeenOverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OwnershipBorderTile, dx, dy, false);
+						mf.playerInfo.SeenOverlayTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 					}
 				}
 				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {
@@ -358,7 +358,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenOverlayTransitionTiles[i].first->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
 					}
 					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->PlayerColorGraphics) {
-						mf.playerInfo.SeenOverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OwnershipBorderTile, dx, dy, false);
+						mf.playerInfo.SeenOverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
 			}

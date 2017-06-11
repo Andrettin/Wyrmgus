@@ -2619,7 +2619,9 @@ void CEditor::Init()
 //	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 	Editor.ShownTileTypes.clear();
 	for (size_t i = 0; i < TerrainTypes.size(); ++i) {
-		Editor.ShownTileTypes.push_back(TerrainTypes[i]);
+		if (!TerrainTypes[i]->Hidden) {
+			Editor.ShownTileTypes.push_back(TerrainTypes[i]);
+		}
 	}
 	//Wyrmgus end
 	VisibleTileIcons = CalculateVisibleIcons(true);

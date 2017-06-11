@@ -187,7 +187,7 @@ class CTerrainType
 public:
 	CTerrainType() :
 		ID(-1), Flags(0), SolidAnimationFrames(0), Resource(-1),
-		Overlay(false), Buildable(false), AllowSingle(false),
+		Overlay(false), Buildable(false), AllowSingle(false), Hidden(false),
 		UnitType(NULL), Graphics(NULL), PlayerColorGraphics(NULL)
 	{
 		Color.R = 0;
@@ -207,6 +207,7 @@ public:
 	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
 	bool Buildable;
 	bool AllowSingle;											/// Whether this terrain type has transitions for single tiles
+	bool Hidden;
 	CUnitType *UnitType;
 	CGraphic *Graphics;
 	CPlayerColorGraphic *PlayerColorGraphics;
