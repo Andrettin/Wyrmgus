@@ -566,6 +566,16 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 			}
 		}
 	}
+	
+	if (unit) {
+		for (int x = pos.x; x < pos.x + type.TileWidth; ++x) {
+			for (int y = pos.y; y < pos.y + type.TileHeight; ++y) {
+				if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->Owner != -1 && Map.Field(x, y, z)->Owner != unit->Player->Index) {
+					return NULL;
+				}
+			}
+		}
+	}
 	//Wyrmgus end
 
 	// Must be checked before oil!
