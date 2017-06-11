@@ -1565,6 +1565,15 @@ static int CclDefineTerrainType(lua_State *l)
 				CGraphic *graphics = CGraphic::New(graphics_file, 32, 32);
 			}
 			terrain->Graphics = CGraphic::Get(graphics_file);
+		} else if (!strcmp(value, "PlayerColorGraphics")) {
+			std::string graphics_file = LuaToString(l, -1);
+			if (!CanAccessFile(graphics_file.c_str())) {
+				LuaError(l, "File \"%s\" doesn't exist." _C_ graphics_file.c_str());
+			}
+			if (CPlayerColorGraphic::Get(graphics_file) == NULL) {
+				CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(graphics_file, 32, 32);
+			}
+			terrain->PlayerColorGraphics = CPlayerColorGraphic::Get(graphics_file);
 		} else if (!strcmp(value, "SolidTiles")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

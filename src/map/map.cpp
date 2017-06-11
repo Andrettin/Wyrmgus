@@ -2782,10 +2782,8 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 	int transition_type = GetTransitionType(adjacent_directions, true);
 	
 	if (transition_type != -1) {
-		CTerrainType *border_terrain = GetTerrainType("border");
-		
-		if (border_terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-			mf.OwnershipBorderTile = border_terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(border_terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())];
+		if (Map.BorderTerrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
+			mf.OwnershipBorderTile = Map.BorderTerrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(Map.BorderTerrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())];
 		}
 	}
 }

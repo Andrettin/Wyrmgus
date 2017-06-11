@@ -1046,6 +1046,9 @@ void LoadTerrainTypes()
 		if ((*it)->Graphics) {
 			(*it)->Graphics->Load();
 		}
+		if ((*it)->PlayerColorGraphics) {
+			(*it)->PlayerColorGraphics->Load();
+		}
 	}
 }
 //Wyrmgus end
