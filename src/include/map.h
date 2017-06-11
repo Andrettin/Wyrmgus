@@ -374,6 +374,8 @@ public:
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
 	void CalculateTileLandmass(const Vec2i &pos, int z);
+	void CalculateTileOwnership(const Vec2i &pos, int z);
+	void CalculateTileOwnershipTransition(const Vec2i &pos, int z);
 	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline, int z);
@@ -525,6 +527,7 @@ public:
 	CGraphic *TileGraphic;     /// graphic for all the tiles
 	static CGraphic *FogGraphic;      /// graphic for fog of war
 	//Wyrmgus start
+	CTerrainType *BorderTerrain;      	/// terrain type for borders
 	int Landmasses;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
 	std::vector<int> TimeOfDaySeconds;		/// how many seconds it takes to change the time of day, for each map layer
@@ -652,6 +655,13 @@ extern MapMarkerFunc MapMarkTileRadarJammer;
 /// Unmark a tile as jammed, decrease is jamming'ness
 extern MapMarkerFunc MapUnmarkTileRadarJammer;
 
+//Wyrmgus start
+/// Mark a tile for ownership
+extern MapMarkerFunc MapMarkTileOwnership;
+
+/// Unmark a tile for ownership
+extern MapMarkerFunc MapUnmarkTileOwnership;
+//Wyrmgus end
 
 //
 // in map_wall.c
@@ -803,6 +813,17 @@ inline void MapUnmarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w,
 	MapSight(player, pos, w, h, range, MapUnmarkTileRadarJammer, z);
 	//Wyrmgus end
 }
+
+//Wyrmgus start
+inline void MapMarkOwnership(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
+{
+	MapSight(player, pos, w, h, range, MapMarkTileOwnership, z);
+}
+inline void MapUnmarkOwnership(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
+{
+	MapSight(player, pos, w, h, range, MapUnmarkTileOwnership, z);
+}
+//Wyrmgus end
 
 //@}
 

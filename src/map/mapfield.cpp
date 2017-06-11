@@ -10,7 +10,7 @@
 //
 /**@name mapfield.cpp - The map field. */
 //
-//      (c) Copyright 2013 by Joris Dauphin
+//      (c) Copyright 2013-2017 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -62,6 +62,8 @@ CMapField::CMapField() :
 	Value(0),
 	//Wyrmgus start
 	Landmass(0),
+	Owner(-1),
+	OwnershipBorderTile(-1),
 	AnimationFrame(0),
 	OverlayAnimationFrame(0),
 	Terrain(NULL), OverlayTerrain(NULL),
@@ -363,7 +365,7 @@ void CMapField::Save(CFile &file) const
 {
 	//Wyrmgus start
 //	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
-	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d", Terrain ? Terrain->Ident.c_str() : "", OverlayTerrain ? OverlayTerrain->Ident.c_str() : "", OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass);
+	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, %2d", Terrain ? Terrain->Ident.c_str() : "", OverlayTerrain ? OverlayTerrain->Ident.c_str() : "", OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, Owner);
 	
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
@@ -488,7 +490,7 @@ void CMapField::parse(lua_State *l)
 	const int len = lua_rawlen(l, -1);
 	//Wyrmgus start
 //	if (len < 4) {
-	if (len < 13) {
+	if (len < 14) {
 	//Wyrmgus end
 		LuaError(l, "incorrect argument");
 	}
@@ -513,11 +515,12 @@ void CMapField::parse(lua_State *l)
 	this->Value = LuaToNumber(l, -1, 11);
 	this->cost = LuaToNumber(l, -1, 12);
 	this->Landmass = LuaToNumber(l, -1, 13);
+	this->Owner = LuaToNumber(l, -1, 14);
 	//Wyrmgus end
 
 	//Wyrmgus start
 //	for (int j = 4; j < len; ++j) {
-	for (int j = 13; j < len; ++j) {
+	for (int j = 14; j < len; ++j) {
 	//Wyrmgus end
 		const char *value = LuaToString(l, -1, j + 1);
 

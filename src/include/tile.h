@@ -169,6 +169,9 @@ public:
 		memset(VisEthereal, 0, sizeof(VisEthereal));
 		memset(Radar, 0, sizeof(Radar));
 		memset(RadarJammer, 0, sizeof(RadarJammer));
+		//Wyrmgus start
+		memset(Influence, 0, sizeof(Influence));
+		//Wyrmgus end
 	}
 
 	/// Check if a field for the user is explored.
@@ -205,6 +208,9 @@ public:
 	unsigned char VisEthereal[PlayerMax];    /// Visiblity for ethereal.
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
+	//Wyrmgus start
+	unsigned char Influence[PlayerMax];		/// Ownership influence unit count
+	//Wyrmgus end
 };
 
 /// Describes a field of the map
@@ -304,6 +310,8 @@ public:
 //	unsigned char Value;       /// HP for walls/ Wood Regeneration
 	short Value;       /// HP for walls/ Wood Regeneration
 	int Landmass;			   /// To which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
+	short Owner;			   /// To which player (if any) this tile belongs to
+	short OwnershipBorderTile;	/// The transition type of the border between this tile's owner, and other players' tiles, if applicable)
 	//Wyrmgus end
 	CUnitCache UnitCache;      /// A unit on the map field.
 

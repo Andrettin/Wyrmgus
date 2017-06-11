@@ -546,6 +546,11 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			marker(player, mpos, z);
 			//Wyrmgus end
 #endif
+			//Wyrmgus start
+			if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
+				Map.CalculateTileOwnership(mpos, z);
+			}
+			//Wyrmgus end
 		}
 	}
 	for (int offsety = 0; offsety < h; ++offsety) {
@@ -579,6 +584,11 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			marker(player, mpos, z);
 			//Wyrmgus end
 #endif
+			//Wyrmgus start
+			if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
+				Map.CalculateTileOwnership(mpos, z);
+			}
+			//Wyrmgus end
 		}
 	}
 	// bottom hemi-cycle
@@ -618,6 +628,11 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			marker(player, mpos, z);
 			//Wyrmgus end
 #endif
+			//Wyrmgus start
+			if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
+				Map.CalculateTileOwnership(mpos, z);
+			}
+			//Wyrmgus end
 		}
 	}
 }

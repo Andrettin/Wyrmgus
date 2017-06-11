@@ -2770,6 +2770,13 @@ void MapMarkUnitSight(CUnit &unit)
 							   unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer);
 							   //Wyrmgus end
 		}
+		
+		//Wyrmgus start
+		if (unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
+			MapMarkOwnership(*unit.Player, unit.tilePos, unit.Type->TileWidth,
+							   unit.Type->TileHeight, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.MapLayer);
+		}
+		//Wyrmgus end
 	}
 }
 
@@ -2809,6 +2816,13 @@ void MapUnmarkUnitSight(CUnit &unit)
 								 unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer);
 								 //Wyrmgus end
 		}
+		
+		//Wyrmgus start
+		if (unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
+			MapUnmarkOwnership(*unit.Player, unit.tilePos, unit.Type->TileWidth,
+								 unit.Type->TileHeight, unit.Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value, unit.MapLayer);
+		}
+		//Wyrmgus end
 	}
 }
 

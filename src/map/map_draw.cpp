@@ -334,6 +334,11 @@ void CViewport::DrawMapBackgroundInViewport() const
 					}
 				}
 			}
+			if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain) {
+				if (Map.BorderTerrain->Graphics) {
+					Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
+				}
+			}
 			//Wyrmgus end
 			++sx;
 			dx += PixelTileSize.x;

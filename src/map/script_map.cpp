@@ -547,6 +547,21 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+/**
+**  Define border terrain
+**
+**  @param l  Lua state.
+*/
+static int CclSetBorderTerrain(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	Map.BorderTerrain = GetTerrainType(LuaToString(l, 1));
+
+	return 0;
+}
+//Wyrmgus end
+
 /**
 **  Set a tile
 **
@@ -2227,6 +2242,10 @@ void MapCclRegister()
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 	lua_register(Lua, "SetFogOfWarColor", CclSetFogOfWarColor);
+	
+	//Wyrmgus start
+	lua_register(Lua, "SetBorderTerrain", CclSetBorderTerrain);
+	//Wyrmgus end
 
 	lua_register(Lua, "SetForestRegeneration", CclSetForestRegeneration);
 
