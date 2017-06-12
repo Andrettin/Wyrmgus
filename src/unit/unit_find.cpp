@@ -159,6 +159,13 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
+	
+	//Wyrmgus start
+	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != player.Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !player.HasNeutralFactionType()) {
+		return VisitResult_DeadEnd;
+	}
+	//Wyrmgus end
+	
 	// Look if found what was required.
 	//Wyrmgus start
 //	if (Map.Field(pos)->CheckMask(resmask)) {
@@ -638,11 +645,21 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 	}
 
 	//Wyrmgus start
+	if (Map.Field(pos, worker.MapLayer)->Owner != -1 && Map.Field(pos, worker.MapLayer)->Owner != worker.Player->Index && !Players[Map.Field(pos, worker.MapLayer)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+		return VisitResult_DeadEnd;
+	}
+	
 //	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
 	CUnit *mine = Map.Field(pos, worker.MapLayer)->UnitCache.find(res_finder);
 	//Wyrmgus end
 
-	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
+	//Wyrmgus start
+//	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
+	if (
+		mine && mine != *resultMine && MineIsUsable(*mine)
+		&& (mine->Type->BoolFlag[CANHARVEST_INDEX].value || Map.Field(pos, worker.MapLayer)->Owner == -1 || Map.Field(pos, worker.MapLayer)->Owner == worker.Player->Index) //this is needed to prevent neutral factions from trying to build mines in others' territory
+	) {
+	//Wyrmgus end
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
 
 		//Wyrmgus start

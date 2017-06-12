@@ -218,6 +218,11 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	if (!IgnoreExploration && !Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
 		return VisitResult_DeadEnd;
 	}
+	
+	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != worker.Player->Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) { //buildings cannot be built on other players' land; we return dead end instead of ok because we don't want units to go over another player's territory to build structures elsewhere, resulting in a lot of exclaves; the exception are neutral factions, which should be composed largely of enclaves and exclaves
+		return VisitResult_DeadEnd;
+	}
+	
 //	if (CanBuildUnitType(&worker, type, pos, 1)
 	if (
 		(!landmass || Map.GetTileLandmass(pos, z) == landmass)
@@ -400,6 +405,10 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	}
 	//Wyrmgus end
 	//Wyrmgus start
+	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != worker.Player->Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+		return VisitResult_DeadEnd;
+	}
+	
 //	CUnit *mine = ResourceOnMap(pos, resource);
 	CUnit *mine = NULL;
 	if (resource != -1) {
@@ -537,6 +546,10 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	}
 	//Wyrmgus end
 	//Wyrmgus start
+	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != worker.Player->Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
+		return VisitResult_DeadEnd;
+	}
+	
 //	if (Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
 	if (Map.Field(pos, z)->IsTerrainResourceOnMap(resource)) {
 	//Wyrmgus end

@@ -110,6 +110,13 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
+
+	//Wyrmgus start
+	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != player.Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !player.HasNeutralFactionType()) {
+		return VisitResult_DeadEnd;
+	}
+	//Wyrmgus end
+
 	// Look if found what was required.
 	//Wyrmgus start
 //	if (CanMoveToMask(pos, movemask)) {
