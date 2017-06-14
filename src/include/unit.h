@@ -174,6 +174,7 @@ public:
 	void UpdateXPRequired();
 	void UpdatePersonalName(bool update_settlement_name = true);
 	void UpdateSettlementName();
+	void UpdateBuildingSettlementAssignment(std::string old_settlement_name = ""); //update the settlement assignment of surrounding buildings for this town hall
 	void XPChanged();
 	//Wyrmgus end
 	/// Change owner of unit

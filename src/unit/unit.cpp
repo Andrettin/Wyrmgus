@@ -3139,16 +3139,7 @@ void CUnit::UpdateSettlementName()
 			}
 		}
 		
-		for (int i = 0; i < this->Player->GetUnitCount(); ++i) {
-			CUnit *settlement_unit = &this->Player->GetUnit(i);
-			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
-				continue;
-			}
-			if (!old_settlement_name.empty() && settlement_unit->SettlementName != old_settlement_name) {
-				continue;
-			}
-			settlement_unit->UpdateSettlementName();
-		}
+		this->UpdateBuildingSettlementAssignment(old_settlement_name);
 	} else {
 		CUnit *best_hall = NULL;
 		int best_distance = -1;
@@ -3166,6 +3157,20 @@ void CUnit::UpdateSettlementName()
 		if (best_hall) {
 			this->SettlementName = best_hall->SettlementName;
 		}
+	}
+}
+
+void CUnit::UpdateBuildingSettlementAssignment(std::string old_settlement_name)
+{
+	for (int i = 0; i < this->Player->GetUnitCount(); ++i) {
+		CUnit *settlement_unit = &this->Player->GetUnit(i);
+		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
+			continue;
+		}
+		if (!old_settlement_name.empty() && settlement_unit->SettlementName != old_settlement_name) {
+			continue;
+		}
+		settlement_unit->UpdateSettlementName();
 	}
 }
 

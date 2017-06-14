@@ -776,6 +776,11 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					}
 					first_building = false;
 				}
+				if (type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == settlement_owner) && settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization) != settlement_iterator->second->CulturalNames.end()) { //apply settlement name for the town hall this way, since it may not end exactly on the settlement's assigned spot, and thus end up with a different name
+					std::string old_settlement_name = unit->SettlementName;
+					unit->SettlementName = settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization)->second;
+					unit->UpdateBuildingSettlementAssignment(old_settlement_name);
+				}
 				if (pathway_type) {
 					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileWidth + 1; ++x) {
 						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->TileHeight + 1; ++y) {
@@ -2715,13 +2720,30 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 	}
 
 	if (mf.Owner == -1) {
-		for (int i = 0; i != PlayerMax; ++i) {
-			if (mf.playerInfo.Influence[i] > 0) {
-				mf.Owner = i;
-				break;
+		if (mf.Flags & MapFieldBuilding) { //make sure the place a building is located is set to be owned by its player; this is necessary for scenarios, since when they start buildings could be on another player's territory (i.e. if a farm starts next to a town hall)
+			const CUnitCache &cache = mf.UnitCache;
+			for (size_t i = 0; i != cache.size(); ++i) {
+				CUnit *unit = cache[i];
+				if (!unit) {
+					fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit in the tile's unit cache is NULL.\n", pos.x, pos.y);
+				}
+				if (unit->IsAliveOnMap() && unit->Type->BoolFlag[BUILDING_INDEX].value && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
+					mf.Owner = unit->Player->Index;
+					ownership_changed = true;
+					break;
+				}
 			}
 		}
-		ownership_changed = true;
+
+		if (mf.Owner == -1) { //if no building is on the tile, set it to the player with highest influence
+			for (int i = 0; i != PlayerMax; ++i) {
+				if (mf.playerInfo.Influence[i] > 0) {
+					mf.Owner = i;
+					ownership_changed = true;
+					break;
+				}
+			}
+		}
 	}
 	
 	if (ownership_changed) {
