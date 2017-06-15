@@ -512,6 +512,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	}
 	
 	//Wyrmgus start
+	Vec2i center_pos(pos + Vec2i((w - 1) / 2, (h - 1) / 2));
 	std::vector<unsigned long> obstacle_flags;
 	int max_obstacle_difference = 1; //how many tiles are seen after the obstacle; set to 1 here so that the obstacle tiles themselves don't have fog drawn over them
 	
@@ -548,7 +549,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			//Wyrmgus start
 			bool obstacle_check = true;
 			for (size_t i = 0; i < obstacle_flags.size(); ++i) {
-				if (CheckObstaclesBetweenTiles(pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
+				if (CheckObstaclesBetweenTiles(center_pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
 					obstacle_check = false;
 					break;
 				}
@@ -593,7 +594,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			//Wyrmgus start
 			bool obstacle_check = true;
 			for (size_t i = 0; i < obstacle_flags.size(); ++i) {
-				if (CheckObstaclesBetweenTiles(pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
+				if (CheckObstaclesBetweenTiles(center_pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
 					obstacle_check = false;
 					break;
 				}
@@ -644,7 +645,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			//Wyrmgus start
 			bool obstacle_check = true;
 			for (size_t i = 0; i < obstacle_flags.size(); ++i) {
-				if (CheckObstaclesBetweenTiles(pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
+				if (CheckObstaclesBetweenTiles(center_pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
 					obstacle_check = false;
 					break;
 				}

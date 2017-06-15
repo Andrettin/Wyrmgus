@@ -387,6 +387,8 @@ public:
 	PixelPos GetMapPixelPosCenter() const;
 	
 	//Wyrmgus start
+	Vec2i GetCenterPos() const;
+	
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
 	int GetModifiedVariable(int index, int variable_type = 0) const;
 	int GetReactionRange() const;

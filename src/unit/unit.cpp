@@ -5014,6 +5014,12 @@ PixelPos CUnit::GetMapPixelPosCenter() const
 }
 
 //Wyrmgus start
+Vec2i CUnit::GetCenterPos() const
+{
+	Vec2i unit_offset((this->Type->TileWidth - 1) / 2, (this->Type->TileHeight - 1) / 2);
+	return this->tilePos + unit_offset;
+}
+
 int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 {
 	int value = 0;
