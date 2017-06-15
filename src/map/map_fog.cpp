@@ -511,6 +511,21 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		return;
 	}
 	
+	//Wyrmgus start
+	std::vector<unsigned long> obstacle_flags;
+	int max_obstacle_difference = 1; //how many tiles are seen after the obstacle; set to 1 here so that the obstacle tiles themselves don't have fog drawn over them
+	
+	if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
+		obstacle_flags.push_back(MapFieldWaterAllowed);
+		obstacle_flags.push_back(MapFieldCoastAllowed);
+		max_obstacle_difference = 0;
+	} else {
+		if (Map.IsLayerUnderground(z)) {
+			obstacle_flags.push_back(MapFieldAirUnpassable);
+		}
+	}
+	//Wyrmgus end
+	
 	// Up hemi-cyle
 	const int miny = std::max(-range, 0 - pos.y);
 	
@@ -531,7 +546,14 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 			//Wyrmgus start
-			if (Map.IsLayerUnderground(z) && CheckObstaclesBetweenTiles(pos, mpos, MapFieldAirUnpassable, z, 1) == false) {
+			bool obstacle_check = true;
+			for (size_t i = 0; i < obstacle_flags.size(); ++i) {
+				if (CheckObstaclesBetweenTiles(pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
+					obstacle_check = false;
+					break;
+				}
+			}
+			if (!obstacle_check) {
 				continue;
 			}
 			//Wyrmgus end
@@ -569,7 +591,14 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 			//Wyrmgus start
-			if (Map.IsLayerUnderground(z) && CheckObstaclesBetweenTiles(pos, mpos, MapFieldAirUnpassable, z, 1) == false) {
+			bool obstacle_check = true;
+			for (size_t i = 0; i < obstacle_flags.size(); ++i) {
+				if (CheckObstaclesBetweenTiles(pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
+					obstacle_check = false;
+					break;
+				}
+			}
+			if (!obstacle_check) {
 				continue;
 			}
 			//Wyrmgus end
@@ -613,7 +642,14 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
 			//Wyrmgus start
-			if (Map.IsLayerUnderground(z) && CheckObstaclesBetweenTiles(pos, mpos, MapFieldAirUnpassable, z, 1) == false) {
+			bool obstacle_check = true;
+			for (size_t i = 0; i < obstacle_flags.size(); ++i) {
+				if (CheckObstaclesBetweenTiles(pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
+					obstacle_check = false;
+					break;
+				}
+			}
+			if (!obstacle_check) {
 				continue;
 			}
 			//Wyrmgus end
