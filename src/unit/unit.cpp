@@ -3156,6 +3156,8 @@ void CUnit::UpdateSettlementName()
 		}
 		if (best_hall) {
 			this->SettlementName = best_hall->SettlementName;
+		} else {
+			this->SettlementName = "";
 		}
 	}
 }

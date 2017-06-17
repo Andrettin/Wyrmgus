@@ -601,7 +601,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	*/
-	if (Map.WallOnMap(pos, CurrentMapLayer)) {
+	if (Map.WallOnMap(pos, CurrentMapLayer) && (Map.Field(pos, CurrentMapLayer)->Owner == -1 || ThisPlayer->IsEnemy(Players[Map.Field(pos, CurrentMapLayer)->Owner]))) {
 		if (!Map.Field(pos, CurrentMapLayer)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 			SendCommandAttack(unit, pos, NoUnitP, flush, CurrentMapLayer);
 			return;
