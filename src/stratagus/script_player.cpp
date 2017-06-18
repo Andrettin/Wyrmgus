@@ -2556,19 +2556,23 @@ static int CclDefineLanguage(lua_State *l)
 */
 static int CclGetCivilizations(lua_State *l)
 {
-	LuaCheckArgs(l, 0);
+	const int nargs = lua_gettop(l);
+	bool only_visible = false;
+	if (nargs >= 1) {
+		only_visible = LuaToBoolean(l, 1);
+	}
 
-	int civilization_count = 0;
+	std::vector<std::string> civilization_idents;
 	for (int i = 0; i < MAX_RACES; ++i) {
-		if (!PlayerRaces.Name[i].empty()) { //require visibility to ignore the neutral civilization
-			civilization_count += 1;
+		if (!PlayerRaces.Name[i].empty() && (!only_visible || PlayerRaces.Visible[i])) {
+			civilization_idents.push_back(PlayerRaces.Name[i]);
 		}
 	}
 
-	lua_createtable(l, civilization_count, 0);
-	for (int i = 1; i <= civilization_count; ++i)
+	lua_createtable(l, civilization_idents.size(), 0);
+	for (int i = 1; i <= civilization_idents.size(); ++i)
 	{
-		lua_pushstring(l, PlayerRaces.Name[i-1].c_str());
+		lua_pushstring(l, civilization_idents[i - 1].c_str());
 		lua_rawseti(l, -2, i);
 	}
 	
