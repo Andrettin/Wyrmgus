@@ -2116,28 +2116,6 @@ static int CclDefineTerrainFeature(lua_State *l)
 				
 				terrain_feature->CulturalNames[civilization] = cultural_name;
 			}
-		} else if (!strcmp(value, "FactionCulturalNames")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
-				++j;
-				
-				int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, -1, j + 1));
-				if (faction == -1) {
-					LuaError(l, "Faction doesn't exist.");
-				}
-				++j;
-				
-				std::string cultural_name = LuaToString(l, -1, j + 1);
-				
-				terrain_feature->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = cultural_name;
-			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

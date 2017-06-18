@@ -3327,11 +3327,6 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Rivers[i]->CulturalNames.find(j) != GrandStrategyGame.Rivers[i]->CulturalNames.end()) {
 					fprintf(fd, "SetRiverCulturalName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Rivers[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Rivers[i]->CulturalNames[j].c_str());
 				}
-				for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
-					if (GrandStrategyGame.Rivers[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != GrandStrategyGame.Rivers[i]->FactionCulturalNames.end()) {
-						fprintf(fd, "SetRiverFactionCulturalName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Rivers[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Ident.c_str(), GrandStrategyGame.Rivers[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]].c_str());
-					}
-				}
 			}
 		}
 		

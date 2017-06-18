@@ -155,7 +155,6 @@ public:
 	CTerrainType *TerrainType;
 	CWorld *World;
 	std::map<int, std::string> CulturalNames;							/// Names for the terrain feature for each different culture/civilization
-	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the terrain feature for each different faction
 };
 
 class CTimeline

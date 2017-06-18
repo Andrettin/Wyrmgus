@@ -2231,9 +2231,7 @@ std::string GrandStrategyWorldMapTile::GetCulturalName(int civilization, int fac
 */
 std::string CGrandStrategyRiver::GetCulturalName(int civilization, int faction)
 {
-	if (civilization != -1 && faction != -1 && this->FactionCulturalNames.find(PlayerRaces.Factions[civilization][faction]) != this->FactionCulturalNames.end()) {
-		return this->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]];
-	} else if (civilization != -1 && this->CulturalNames.find(civilization) != this->CulturalNames.end()) {
+	if (civilization != -1 && this->CulturalNames.find(civilization) != this->CulturalNames.end()) {
 		return this->CulturalNames[civilization];
 	} else {
 		return this->Name;
@@ -5531,21 +5529,6 @@ void SetRiverCulturalName(std::string river_name, std::string civilization_name,
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		if (civilization != -1) {
 			GrandStrategyGame.Rivers[river_id]->CulturalNames[civilization] = TransliterateText(cultural_name);
-		}
-	}
-}
-
-void SetRiverFactionCulturalName(std::string river_name, std::string civilization_name, std::string faction_name, std::string cultural_name)
-{
-	int river_id = GetRiverId(river_name);
-	
-	if (river_id != -1) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-			if (faction != -1) {
-				GrandStrategyGame.Rivers[river_id]->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
-			}
 		}
 	}
 }

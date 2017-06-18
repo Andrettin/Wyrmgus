@@ -916,11 +916,15 @@ void DrawPopups()
 				} else if (mf.TerrainFeature) {
 					PixelPos tile_center_pos = Map.TilePosToMapPixelPos_TopLeft(tilePos);
 					tile_center_pos = vp->MapToScreenPixelPos(tile_center_pos);
+					std::string terrain_feature_name = mf.TerrainFeature->Name;
+					if (mf.Owner != -1 && mf.TerrainFeature->CulturalNames.find(Players[mf.Owner].Race) != mf.TerrainFeature->CulturalNames.end()) {
+						terrain_feature_name = mf.TerrainFeature->CulturalNames.find(Players[mf.Owner].Race)->second;
+					}
 					if (!Preference.NoStatusLineTooltips) {
 						CLabel label(GetGameFont());
-						label.Draw(2 + 16, Video.Height + 2 - 16, mf.TerrainFeature->Name);
+						label.Draw(2 + 16, Video.Height + 2 - 16, terrain_feature_name);
 					}
-					DrawGenericPopup(mf.TerrainFeature->Name, tile_center_pos.x, tile_center_pos.y);
+					DrawGenericPopup(terrain_feature_name, tile_center_pos.x, tile_center_pos.y);
 				}
 			}
 		}
