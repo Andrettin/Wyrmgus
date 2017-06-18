@@ -44,6 +44,7 @@
 
 #include "character.h"
 #include "game.h"
+#include "network.h"
 #include "parameters.h"
 #include "player.h"
 #include "unit.h"
@@ -250,18 +251,20 @@ bool IsItemClassConsumable(int item_class)
 bool CUniqueItem::CanDrop() const
 {
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-		for (size_t j = 0; j < iterator->second->Items.size(); ++j) {
-			if (iterator->second->Items[j]->Unique == this && !iterator->second->Items[j]->Bound) {
-				return false;
+	if (!IsNetworkGame()) {
+		for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+			for (size_t j = 0; j < iterator->second->Items.size(); ++j) {
+				if (iterator->second->Items[j]->Unique == this && !iterator->second->Items[j]->Bound) {
+					return false;
+				}
 			}
 		}
-	}
-	
-	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-		for (size_t j = 0; j < iterator->second->Items.size(); ++j) {
-			if (iterator->second->Items[j]->Unique == this && !iterator->second->Items[j]->Bound) {
-				return false;
+		
+		for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+			for (size_t j = 0; j < iterator->second->Items.size(); ++j) {
+				if (iterator->second->Items[j]->Unique == this && !iterator->second->Items[j]->Bound) {
+					return false;
+				}
 			}
 		}
 	}
