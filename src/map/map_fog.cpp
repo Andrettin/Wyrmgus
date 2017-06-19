@@ -519,6 +519,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
 		obstacle_flags.push_back(MapFieldWaterAllowed);
 		obstacle_flags.push_back(MapFieldCoastAllowed);
+		obstacle_flags.push_back(MapFieldUnpassable);
 		max_obstacle_difference = 0;
 	} else {
 		if (Map.IsLayerUnderground(z)) {

@@ -471,6 +471,14 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 			Map.SubtemplateAreas[z].push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), this->Subtemplates[i]));
 				
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < Map.Info.MapWidths[z] && subtemplate_pos.y < Map.Info.MapHeights[z]) {
+				for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+					CUnit *unit = *it;
+					if (unit && unit->IsAliveOnMap() && unit->MapLayer == z && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
+						MapUnmarkUnitSight(*unit);
+					}
+				}
+				
+				
 				for (size_t j = 0; j < this->Subtemplates[i]->ExternalGeneratedTerrains.size(); ++j) {
 					Vec2i external_start_pos(subtemplate_pos.x - (this->Subtemplates[i]->Width / 2), subtemplate_pos.y - (this->Subtemplates[i]->Height / 2));
 					Vec2i external_end(subtemplate_pos.x + this->Subtemplates[i]->Width + (this->Subtemplates[i]->Width / 2), subtemplate_pos.y + this->Subtemplates[i]->Height + (this->Subtemplates[i]->Height / 2));
@@ -495,6 +503,13 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 					}
 						
 					Map.GenerateTerrain(this->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !this->Subtemplates[i]->TerrainFile.empty() || !this->Subtemplates[i]->TerrainImage.empty(), z);
+				}
+				
+				for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+					CUnit *unit = *it;
+					if (unit && unit->IsAliveOnMap() && unit->MapLayer == z && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
+						MapMarkUnitSight(*unit);
+					}
 				}
 			}
 		}
@@ -561,6 +576,13 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	this->ApplyUnits(template_start_pos, map_start_pos, z);
 	
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit *unit = *it;
+		if (unit && unit->IsAliveOnMap() && unit->MapLayer == z && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
+			MapUnmarkUnitSight(*unit);
+		}
+	}
+	
 	ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
 	
 	for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
@@ -602,6 +624,13 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.AdjustTileMapTransitions(map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+	}
+	
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit *unit = *it;
+		if (unit && unit->IsAliveOnMap() && unit->MapLayer == z && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
+			MapMarkUnitSight(*unit);
+		}
 	}
 	
 	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->Name.c_str());
@@ -2274,9 +2303,20 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 	
 	CMapField &mf = *this->Field(pos, z);
 	
-	if (terrain->Overlay)  {
+	std::vector<CUnit *> around_units;
+	
+	if (terrain->Overlay) {
 		if (mf.OverlayTerrain == terrain) {
 			return;
+		}
+		
+		Select(pos - Vec2i(16, 16), pos + Vec2i(16, 16), around_units, z);
+		
+		for (size_t i = 0; i != around_units.size(); ++i) { //
+			CUnit *unit = around_units[i];
+			if (unit && unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) { //recalculate ownership influence range is an overlay terrain is being set, as the overlay may block the ownership spread
+				MapUnmarkUnitSight(*unit);
+			}
 		}
 	} else {
 		if (mf.Terrain == terrain) {
@@ -2312,6 +2352,15 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 			}
 		}
 	}
+	
+	if (terrain->Overlay) {
+		for (size_t i = 0; i != around_units.size(); ++i) {
+			CUnit *unit = around_units[i];
+			if (unit && unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
+				MapMarkUnitSight(*unit);
+			}
+		}
+	}
 }
 
 //Wyrmgus start
@@ -2323,6 +2372,15 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	
 	if (!mf.OverlayTerrain) {
 		return;
+	}
+	
+	std::vector<CUnit *> around_units;
+	Select(pos - Vec2i(16, 16), pos + Vec2i(16, 16), around_units, z);
+	for (size_t i = 0; i != around_units.size(); ++i) { //
+		CUnit *unit = around_units[i];
+		if (unit && unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) { //recalculate ownership influence range is an overlay terrain is being set, as the overlay may block the ownership spread
+			MapUnmarkUnitSight(*unit);
+		}
 	}
 	
 	mf.RemoveOverlayTerrain();
@@ -2351,6 +2409,13 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 			}
 		}
 	}
+	
+	for (size_t i = 0; i != around_units.size(); ++i) {
+		CUnit *unit = around_units[i];
+		if (unit && unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
+			MapMarkUnitSight(*unit);
+		}
+	}
 }
 
 void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
@@ -2359,6 +2424,15 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	
 	if (!mf.OverlayTerrain || mf.OverlayTerrainDestroyed == destroyed) {
 		return;
+	}
+	
+	std::vector<CUnit *> around_units;
+	Select(pos - Vec2i(16, 16), pos + Vec2i(16, 16), around_units, z);
+	for (size_t i = 0; i != around_units.size(); ++i) { //
+		CUnit *unit = around_units[i];
+		if (unit && unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) { //recalculate ownership influence range is an overlay terrain is being set, as the overlay may block the ownership spread
+			MapUnmarkUnitSight(*unit);
+		}
 	}
 	
 	mf.SetOverlayTerrainDestroyed(destroyed);
@@ -2385,6 +2459,13 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 					UI.Minimap.UpdateXY(adjacent_pos, z);
 				}
 			}
+		}
+	}
+	
+	for (size_t i = 0; i != around_units.size(); ++i) {
+		CUnit *unit = around_units[i];
+		if (unit && unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
+			MapMarkUnitSight(*unit);
 		}
 	}
 }
@@ -2790,7 +2871,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-					if ((adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed)) { //water tiles are not owned by any player
+					if ((adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed)) { //don't count water tiles as owned by any player
 						continue;
 					}
 					if (adjacent_mf.Owner != mf.Owner) {
