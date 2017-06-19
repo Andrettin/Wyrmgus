@@ -2443,6 +2443,12 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	
 	mf.SetOverlayTerrainDestroyed(destroyed);
 	
+	if (mf.Flags & MapFieldStumps) { //if is a cleared tree tile regrowing trees
+		mf.Flags &= ~(MapFieldStumps);
+		mf.Flags |= MapFieldForest | MapFieldUnpassable;
+		mf.Value = DefaultResourceAmounts[WoodCost];
+	}
+	
 	this->CalculateTileTransitions(pos, true, z);
 	
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -3403,24 +3409,9 @@ void CMap::RegenerateForestTile(const Vec2i &pos, int z)
 			) {
 				DebugPrint("Real place wood\n");
 				this->SetOverlayTerrainDestroyed(pos + verticalOffset, false, z);
-				verticalMf.Flags &= ~(MapFieldStumps);
-				verticalMf.Flags |= MapFieldForest | MapFieldUnpassable;
-				verticalMf.Value = DefaultResourceAmounts[WoodCost];
-				
 				this->SetOverlayTerrainDestroyed(pos + diagonalOffset, false, z);
-				diagonalMf.Flags &= ~(MapFieldStumps);
-				diagonalMf.Flags |= MapFieldForest | MapFieldUnpassable;
-				diagonalMf.Value = DefaultResourceAmounts[WoodCost];
-				
 				this->SetOverlayTerrainDestroyed(pos + horizontalOffset, false, z);
-				horizontalMf.Flags &= ~(MapFieldStumps);
-				horizontalMf.Flags |= MapFieldForest | MapFieldUnpassable;
-				horizontalMf.Value = DefaultResourceAmounts[WoodCost];
-				
 				this->SetOverlayTerrainDestroyed(pos, false, z);
-				mf.Flags &= ~(MapFieldStumps);
-				mf.Flags |= MapFieldForest | MapFieldUnpassable;
-				mf.Value = DefaultResourceAmounts[WoodCost];
 				
 				return;
 			}
