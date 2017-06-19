@@ -304,7 +304,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.TransitionTiles[i].first->Graphics->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain) {
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && (mf.Flags & MapFieldUnpassable)) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
 					if (Map.BorderTerrain->Graphics) {
 						Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
@@ -328,6 +328,14 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.OverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && !(mf.Flags & MapFieldUnpassable)) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+					if (Map.BorderTerrain->Graphics) {
+						Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
+					}
+					if (Map.BorderTerrain->PlayerColorGraphics) {
+						Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
+					}
+				}
 			} else {
 				if (mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->Graphics) {
 					mf.playerInfo.SeenTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenSolidTile + (mf.playerInfo.SeenTerrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, false);
@@ -337,7 +345,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenTransitionTiles[i].first->Graphics->DrawFrameClip(mf.playerInfo.SeenTransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain) {
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && (mf.Flags & MapFieldUnpassable)) {
 					if (Map.BorderTerrain->Graphics) {
 						Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
@@ -359,6 +367,14 @@ void CViewport::DrawMapBackgroundInViewport() const
 					}
 					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->PlayerColorGraphics) {
 						mf.playerInfo.SeenOverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
+					}
+				}
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && !(mf.Flags & MapFieldUnpassable)) {
+					if (Map.BorderTerrain->Graphics) {
+						Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
+					}
+					if (Map.BorderTerrain->PlayerColorGraphics) {
+						Map.BorderTerrain->PlayerColorGraphics->DrawPlayerColorFrameClip(mf.Owner, mf.OwnershipBorderTile, dx, dy, false);
 					}
 				}
 			}
