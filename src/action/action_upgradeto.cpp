@@ -301,8 +301,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			)
 		)
 	) {
-		bool update_settlement_name = oldtype.Civilization != newtype.Civilization;
-		unit.UpdatePersonalName(update_settlement_name);
+		unit.UpdatePersonalName(false);
 	}
 	//Wyrmgus end
 
@@ -348,6 +347,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 	//Wyrmgus end
 	//Wyrmgus start
+	if ((oldtype.BoolFlag[TOWNHALL_INDEX].value || newtype.BoolFlag[TOWNHALL_INDEX].value) && oldtype.Civilization != -1 && newtype.Civilization != -1 && oldtype.Civilization != newtype.Civilization) { // if is a town hall, update the settlement name if the civilization has changed
+		unit.UpdateSettlementName();
+	}
+	
 	//update the unit's XP required, as its level or points may have changed
 	unit.UpdateXPRequired();
 	
