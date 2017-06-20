@@ -512,7 +512,6 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	}
 	
 	//Wyrmgus start
-	Vec2i center_pos(pos + Vec2i((w - 1) / 2, (h - 1) / 2));
 	std::vector<unsigned long> obstacle_flags;
 	int max_obstacle_difference = 1; //how many tiles are seen after the obstacle; set to 1 here so that the obstacle tiles themselves don't have fog drawn over them
 	
@@ -550,7 +549,19 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			//Wyrmgus start
 			bool obstacle_check = true;
 			for (size_t i = 0; i < obstacle_flags.size(); ++i) {
-				if (CheckObstaclesBetweenTiles(center_pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
+				bool obstacle_subcheck = false;
+				for (int x = 0; x < w; ++x) {
+					for (int y = 0; y < h; ++y) {
+						if (CheckObstaclesBetweenTiles(pos + Vec2i(x, y), mpos, obstacle_flags[i], z, max_obstacle_difference)) { //the obstacle must be avoidable from at least one of the unit's tiles
+							obstacle_subcheck = true;
+							break;
+						}
+					}
+					if (obstacle_subcheck) {
+						break;
+					}
+				}
+				if (!obstacle_subcheck) {
 					obstacle_check = false;
 					break;
 				}
@@ -595,7 +606,19 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			//Wyrmgus start
 			bool obstacle_check = true;
 			for (size_t i = 0; i < obstacle_flags.size(); ++i) {
-				if (CheckObstaclesBetweenTiles(center_pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
+				bool obstacle_subcheck = false;
+				for (int x = 0; x < w; ++x) {
+					for (int y = 0; y < h; ++y) {
+						if (CheckObstaclesBetweenTiles(pos + Vec2i(x, y), mpos, obstacle_flags[i], z, max_obstacle_difference)) { //the obstacle must be avoidable from at least one of the unit's tiles
+							obstacle_subcheck = true;
+							break;
+						}
+					}
+					if (obstacle_subcheck) {
+						break;
+					}
+				}
+				if (!obstacle_subcheck) {
 					obstacle_check = false;
 					break;
 				}
@@ -646,7 +669,19 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			//Wyrmgus start
 			bool obstacle_check = true;
 			for (size_t i = 0; i < obstacle_flags.size(); ++i) {
-				if (CheckObstaclesBetweenTiles(center_pos, mpos, obstacle_flags[i], z, max_obstacle_difference) == false) {
+				bool obstacle_subcheck = false;
+				for (int x = 0; x < w; ++x) {
+					for (int y = 0; y < h; ++y) {
+						if (CheckObstaclesBetweenTiles(pos + Vec2i(x, y), mpos, obstacle_flags[i], z, max_obstacle_difference)) { //the obstacle must be avoidable from at least one of the unit's tiles
+							obstacle_subcheck = true;
+							break;
+						}
+					}
+					if (obstacle_subcheck) {
+						break;
+					}
+				}
+				if (!obstacle_subcheck) {
 					obstacle_check = false;
 					break;
 				}
