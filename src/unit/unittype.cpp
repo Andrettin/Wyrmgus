@@ -960,8 +960,8 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 					}
 				}
 			} else {
-				if (this->Class != -1 && civilization->GetUnitClassNames().find(this->Class) != civilization->GetUnitClassNames().end()) {
-					return civilization->GetUnitClassNames().find(this->Class)->second[SyncRand(civilization->GetUnitClassNames().find(this->Class)->second.size())];
+				if (this->Class != -1 && civilization->GetUnitClassNames(this->Class).size() > 0) {
+					return civilization->GetUnitClassNames(this->Class)[SyncRand(civilization->GetUnitClassNames(this->Class).size())];
 				}
 				
 				if (this->UnitType == UnitTypeNaval) { // if is a ship

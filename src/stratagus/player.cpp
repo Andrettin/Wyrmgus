@@ -770,17 +770,17 @@ std::map<int, std::vector<std::string>> &CCivilization::GetPersonalNames()
 	return this->PersonalNames;
 }
 
-std::map<int, std::vector<std::string>> &CCivilization::GetUnitClassNames()
+std::vector<std::string> &CCivilization::GetUnitClassNames(int class_id)
 {
-	if (this->UnitClassNames.size() > 0) {
-		return this->UnitClassNames;
+	if (this->UnitClassNames[class_id].size() > 0) {
+		return this->UnitClassNames[class_id];
 	}
 	
 	if (this->ParentCivilization != -1) {
-		return PlayerRaces.Civilizations[this->ParentCivilization]->GetUnitClassNames();
+		return PlayerRaces.Civilizations[this->ParentCivilization]->GetUnitClassNames(class_id);
 	}
 	
-	return this->UnitClassNames;
+	return this->UnitClassNames[class_id];
 }
 
 std::vector<std::string> &CCivilization::GetSettlementNames()

@@ -530,7 +530,7 @@ public:
 	
 	std::string GetMonthName(int month);
 	std::map<int, std::vector<std::string>> &GetPersonalNames();
-	std::map<int, std::vector<std::string>> &GetUnitClassNames();
+	std::vector<std::string> &GetUnitClassNames(int class_id);
 	std::vector<std::string> &GetSettlementNames();
 	std::vector<std::string> &GetShipNames();
 	
