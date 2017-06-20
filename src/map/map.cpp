@@ -2443,10 +2443,27 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	
 	mf.SetOverlayTerrainDestroyed(destroyed);
 	
-	if (mf.Flags & MapFieldStumps) { //if is a cleared tree tile regrowing trees
-		mf.Flags &= ~(MapFieldStumps);
-		mf.Flags |= MapFieldForest | MapFieldUnpassable;
-		mf.Value = DefaultResourceAmounts[WoodCost];
+	if (destroyed) {
+		if (mf.OverlayTerrain->Flags & MapFieldForest) {
+			mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
+			mf.Flags |= MapFieldStumps;
+		} else if (mf.OverlayTerrain->Flags & MapFieldRocks) {
+			mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
+			mf.Flags |= MapFieldGravel;
+		} else if (mf.OverlayTerrain->Flags & MapFieldWall) {
+			mf.Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
+			if (GameSettings.Inside) {
+				mf.Flags &= ~(MapFieldAirUnpassable);
+			}
+			mf.Flags |= MapFieldGravel;
+		}
+		mf.Value = 0;
+	} else {
+		if (mf.Flags & MapFieldStumps) { //if is a cleared tree tile regrowing trees
+			mf.Flags &= ~(MapFieldStumps);
+			mf.Flags |= MapFieldForest | MapFieldUnpassable;
+			mf.Value = DefaultResourceAmounts[WoodCost];
+		}
 	}
 	
 	this->CalculateTileTransitions(pos, true, z);
@@ -3239,20 +3256,6 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 	}
 	
 	this->SetOverlayTerrainDestroyed(pos, true, z);
-	if (mf.OverlayTerrain->Flags & MapFieldForest) {
-		mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
-		mf.Flags |= MapFieldStumps;
-	} else if (mf.OverlayTerrain->Flags & MapFieldRocks) {
-		mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
-		mf.Flags |= MapFieldGravel;
-	} else if (mf.OverlayTerrain->Flags & MapFieldWall) {
-		mf.Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
-		if (GameSettings.Inside) {
-			mf.Flags &= ~(MapFieldAirUnpassable);
-		}
-		mf.Flags |= MapFieldGravel;
-	}
-	mf.Value = 0;
 
 	//remove decorations if a wall, tree or rock was removed from the tile
 	std::vector<CUnit *> table;

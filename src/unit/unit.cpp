@@ -3338,7 +3338,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 			this->UpdateSettlementName(); // update the settlement name of a building when placing it
 		}
 		
-		//remove pathways under buildings
+		//remove pathways and destroyed walls under buildings
 		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
 			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->TileWidth; ++x) {
 				for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->TileHeight; ++y) {
@@ -3346,7 +3346,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 						continue;
 					}
 					CMapField &mf = *Map.Field(x, y, this->MapLayer);
-					if ((mf.Flags & MapFieldRoad) || (mf.Flags & MapFieldRailroad)) {
+					if ((mf.Flags & MapFieldRoad) || (mf.Flags & MapFieldRailroad) || (mf.Flags & MapFieldWall)) {
 						Map.RemoveTileOverlayTerrain(Vec2i(x, y), this->MapLayer);
 					}
 				}
