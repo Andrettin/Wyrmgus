@@ -1595,8 +1595,10 @@ void CPlayer::SetFaction(CFaction *faction)
 		}
 		
 		if (color != -1) {
-			this->Color = PlayerColors[color][0];
-			this->UnitColors.Colors = PlayerColorsRGB[color];
+			if (this->Color != PlayerColors[color][0]) {
+				this->Color = PlayerColors[color][0];
+				this->UnitColors.Colors = PlayerColorsRGB[color];
+			}
 		}
 	
 		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty()) {

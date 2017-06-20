@@ -464,6 +464,7 @@ void CMinimap::UpdateTerrain(int z)
 										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain)];
 					}
 					//Wyrmgus end
+					
 					c = Video.MapRGB(0, color.r, color.g, color.b);
 				} else {
 					//Wyrmgus start
@@ -505,8 +506,6 @@ void CMinimap::UpdateTerrain(int z)
 
 					Uint32 color;
 					color = Video.MapRGB(TheScreen->format, original_color.r, original_color.g, original_color.b);
-					SDL_Color c;
-					SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
 
 					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface[z]->pixels)[mx * MinimapSurface[z]->format->BytesPerPixel + my * MinimapTerrainSurface[z]->pitch] = color;
 					//Wyrmgus end
@@ -664,18 +663,19 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 				tile = Map.Fields[x + y].getGraphicTile();
 			}
 			*/
-			CTerrainType *terrain = Map.Fields[z][x + y].playerInfo.SeenOverlayTerrain ? Map.Fields[z][x + y].playerInfo.SeenOverlayTerrain : Map.Fields[z][x + y].playerInfo.SeenTerrain;
-			int tile = Map.Fields[z][x + y].playerInfo.SeenOverlayTerrain ? Map.Fields[z][x + y].playerInfo.SeenOverlaySolidTile : Map.Fields[z][x + y].playerInfo.SeenSolidTile;
+			const CMapField &mf = Map.Fields[z][x + y];
+			CTerrainType *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
+			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
 			if (!terrain) {
-				terrain = Map.Fields[z][x + y].OverlayTerrain ? Map.Fields[z][x + y].OverlayTerrain : Map.Fields[z][x + y].Terrain;
-				tile = Map.Fields[z][x + y].OverlayTerrain ? Map.Fields[z][x + y].OverlaySolidTile : Map.Fields[z][x + y].SolidTile;
+				terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
+				tile = mf.OverlayTerrain ? mf.OverlaySolidTile : mf.SolidTile;
 			}
 			
-			CTerrainType *base_terrain = Map.Fields[z][x + y].playerInfo.SeenTerrain;
-			int base_tile = Map.Fields[z][x + y].playerInfo.SeenSolidTile;
+			CTerrainType *base_terrain = mf.playerInfo.SeenTerrain;
+			int base_tile = mf.playerInfo.SeenSolidTile;
 			if (!base_terrain) {
-				base_terrain = Map.Fields[z][x + y].Terrain;
-				base_tile = Map.Fields[z][x + y].SolidTile;
+				base_terrain = mf.Terrain;
+				base_tile = mf.SolidTile;
 			}
 			//Wyrmgus end
 
@@ -759,9 +759,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 
 					Uint32 color;
 					color = Video.MapRGB(TheScreen->format, original_color.r, original_color.g, original_color.b);
-					SDL_Color c;
-					SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
-
+					
 					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface[z]->pixels)[mx * MinimapSurface[z]->format->BytesPerPixel + my * MinimapTerrainSurface[z]->pitch] = color;
 					//Wyrmgus end
 				} else if (bpp == 3) {
