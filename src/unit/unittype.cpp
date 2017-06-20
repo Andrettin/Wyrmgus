@@ -959,13 +959,19 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 						potential_names.push_back(civilization->GetPersonalNames().find(gender)->second[i]);
 					}
 				}
-			} else if (!this->BoolFlag[ORGANIC_INDEX].value && this->UnitType == UnitTypeNaval) { // if is a ship
-				if (faction && faction->GetShipNames().size() > 0) {
-					return faction->GetShipNames()[SyncRand(faction->GetShipNames().size())];
+			} else {
+				if (this->Class != -1 && civilization->GetUnitClassNames().find(this->Class) != civilization->GetUnitClassNames().end()) {
+					return civilization->GetUnitClassNames().find(this->Class)->second[SyncRand(civilization->GetUnitClassNames().find(this->Class)->second.size())];
 				}
 				
-				if (civilization->GetShipNames().size() > 0) {
-					return civilization->GetShipNames()[SyncRand(civilization->GetShipNames().size())];
+				if (this->UnitType == UnitTypeNaval) { // if is a ship
+					if (faction && faction->GetShipNames().size() > 0) {
+						return faction->GetShipNames()[SyncRand(faction->GetShipNames().size())];
+					}
+					
+					if (civilization->GetShipNames().size() > 0) {
+						return civilization->GetShipNames()[SyncRand(civilization->GetShipNames().size())];
+					}
 				}
 			}
 		}

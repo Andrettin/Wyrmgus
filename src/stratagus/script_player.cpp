@@ -997,6 +997,23 @@ static int CclDefineCivilization(lua_State *l)
 				
 				civilization->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
 			}
+		} else if (!strcmp(value, "UnitClassNames")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string class_name = LuaToString(l, -1, j + 1);
+				if (class_name.empty()) {
+					LuaError(l, "Class is given as a blank string.");
+				}
+				int class_id = GetUnitTypeClassIndexByName(class_name);
+				if (class_id == -1) {
+					SetUnitTypeClassStringToIndex(class_name, UnitTypeClasses.size());
+					class_id = UnitTypeClasses.size();
+					UnitTypeClasses.push_back(class_name);
+				}
+				++j;
+				
+				civilization->UnitClassNames[class_id].push_back(LuaToString(l, -1, j + 1));
+			}
 		} else if (!strcmp(value, "FamilyNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {

@@ -292,7 +292,12 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			oldtype.PersonalNames != newtype.PersonalNames
 			|| (
 				oldtype.Civilization != -1 && newtype.Civilization != -1 && oldtype.Civilization != newtype.Civilization
-				&& (newtype.BoolFlag[ORGANIC_INDEX].value || (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeNaval))
+				&& (
+					newtype.BoolFlag[ORGANIC_INDEX].value
+					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeNaval)
+					|| (PlayerRaces.Civilizations[oldtype.Civilization]->GetUnitClassNames().find(oldtype.Class) != PlayerRaces.Civilizations[oldtype.Civilization]->GetUnitClassNames().end())
+					|| (PlayerRaces.Civilizations[newtype.Civilization]->GetUnitClassNames().find(newtype.Class) != PlayerRaces.Civilizations[newtype.Civilization]->GetUnitClassNames().end())
+				)
 			)
 		)
 	) {

@@ -530,6 +530,7 @@ public:
 	
 	std::string GetMonthName(int month);
 	std::map<int, std::vector<std::string>> &GetPersonalNames();
+	std::map<int, std::vector<std::string>> &GetUnitClassNames();
 	std::vector<std::string> &GetSettlementNames();
 	std::vector<std::string> &GetShipNames();
 	
@@ -547,6 +548,7 @@ public:
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
+	std::map<int, std::vector<std::string>> UnitClassNames;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 	std::vector<std::string> FamilyNames;		/// Family names for the civilization
 	std::vector<std::string> SettlementNames;	/// Settlement names for the civilization
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
