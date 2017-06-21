@@ -731,6 +731,11 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 		}
 		
 		CPlayer *player = GetOrAddFactionPlayer(settlement_owner);
+		
+		if (!player) {
+			continue;
+		}
+		
 		if (player->StartPos.x == 0 && player->StartPos.y == 0) {
 			Vec2i default_pos(map_start_pos + settlement_owner->DefaultStartPos - template_start_pos);
 			if (settlement_owner->DefaultStartPos.x != -1 && settlement_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
@@ -784,6 +789,9 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 				CUnit *unit = NULL;
 				if (building_owner) {
 					CPlayer *building_player = GetOrAddFactionPlayer(building_owner);
+					if (!building_player) {
+						continue;
+					}
 					if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
 						Vec2i default_pos(map_start_pos + building_owner->DefaultStartPos - template_start_pos);
 						if (building_owner->DefaultStartPos.x != -1 && building_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
@@ -847,6 +855,9 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 						CPlayer *unit_player = NULL;
 						if (second_unit_iterator->second.second) {
 							unit_player = GetOrAddFactionPlayer(second_unit_iterator->second.second);
+							if (!unit_player) {
+								break;
+							}
 							if (unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
 								Vec2i default_pos(map_start_pos + second_unit_iterator->second.second->DefaultStartPos - template_start_pos);
 								if (second_unit_iterator->second.second->DefaultStartPos.x != -1 && second_unit_iterator->second.second->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
@@ -1011,6 +1022,9 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			CPlayer *player = NULL;
 			if (std::get<2>(this->Units[i])) {
 				player = GetOrAddFactionPlayer(std::get<2>(this->Units[i]));
+				if (!player) {
+					continue;
+				}
 				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
 					Vec2i default_pos(map_start_pos + std::get<2>(this->Units[i])->DefaultStartPos - template_start_pos);
 					if (std::get<2>(this->Units[i])->DefaultStartPos.x != -1 && std::get<2>(this->Units[i])->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
@@ -1052,6 +1066,9 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			CPlayer *player = NULL;
 			if (std::get<2>(this->Heroes[i])) {
 				player = GetOrAddFactionPlayer(std::get<2>(this->Heroes[i]));
+				if (!player) {
+					continue;
+				}
 				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
 					player->SetStartView(unit_pos, z);
 				}
@@ -1110,6 +1127,9 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		
 		if (hero->Faction) {
 			hero_player = GetOrAddFactionPlayer(hero->Faction);
+			if (!hero_player) {
+				continue;
+			}
 			if (hero_player->StartPos.x == 0 && hero_player->StartPos.y == 0) {
 				hero_player->SetStartView(hero_pos, z);
 			}

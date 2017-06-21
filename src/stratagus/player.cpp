@@ -1312,6 +1312,8 @@ CPlayer *GetOrAddFactionPlayer(CFaction *faction)
 		}
 	}
 	
+	fprintf(stderr, "Cannot add player for faction \"%s\": no player slots available.\n", faction->Ident.c_str());
+	
 	return NULL;
 }
 //Wyrmgus end
