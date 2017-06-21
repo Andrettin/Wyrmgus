@@ -86,10 +86,12 @@ std::vector<unsigned char *> MinimapTerrainSurfaceGL;
 
 //Wyrmgus start
 //static GLuint MinimapTexture;
+//static int MinimapTextureWidth;
+//static int MinimapTextureHeight;
 static std::vector<GLuint> MinimapTexture;
+static std::vector<int> MinimapTextureWidth;
+static std::vector<int> MinimapTextureHeight;
 //Wyrmgus end
-static int MinimapTextureWidth;
-static int MinimapTextureHeight;
 #endif
 
 //Wyrmgus start
@@ -148,10 +150,12 @@ static void CreateMinimapTexture(int z)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth,
-				 MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 	//Wyrmgus start
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth,
+//				 MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 //				 MinimapSurfaceGL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth[z],
+				 MinimapTextureHeight[z], 0, GL_RGBA, GL_UNSIGNED_BYTE,
 				 MinimapSurfaceGL[z]);
 	//Wyrmgus end
 }
@@ -226,6 +230,8 @@ void CMinimap::Create()
 	*/
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	MinimapTexture.resize(Map.Fields.size());
+	MinimapTextureWidth.resize(Map.Fields.size());
+	MinimapTextureHeight.resize(Map.Fields.size());
 #endif
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
 		// Scale to biggest value.
@@ -269,13 +275,13 @@ void CMinimap::Create()
 		// Palette updated from UpdateMinimapTerrain()
 	#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
-			for (MinimapTextureWidth = 1; MinimapTextureWidth < W; MinimapTextureWidth <<= 1) {
+			for (MinimapTextureWidth[z] = 1; MinimapTextureWidth[z] < W; MinimapTextureWidth[z] <<= 1) {
 			}
-			for (MinimapTextureHeight = 1; MinimapTextureHeight < H; MinimapTextureHeight <<= 1) {
+			for (MinimapTextureHeight[z] = 1; MinimapTextureHeight[z] < H; MinimapTextureHeight[z] <<= 1) {
 			}
-			MinimapTerrainSurfaceGL.push_back(new unsigned char[MinimapTextureWidth * MinimapTextureHeight * 4]);
-			MinimapSurfaceGL.push_back(new unsigned char[MinimapTextureWidth * MinimapTextureHeight * 4]);
-			memset(MinimapSurfaceGL[z], 0, MinimapTextureWidth * MinimapTextureHeight * 4);
+			MinimapTerrainSurfaceGL.push_back(new unsigned char[MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4]);
+			MinimapSurfaceGL.push_back(new unsigned char[MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4]);
+			memset(MinimapSurfaceGL[z], 0, MinimapTextureWidth[z] * MinimapTextureHeight[z] * 4);
 			CreateMinimapTexture(z);
 		} else
 	#endif
@@ -485,7 +491,7 @@ void CMinimap::UpdateTerrain(int z)
 				}
 				//Wyrmgus start
 //				*(Uint32 *)&(MinimapTerrainSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = c;
-				*(Uint32 *)&(MinimapTerrainSurfaceGL[z][(mx + my * MinimapTextureWidth) * 4]) = c;
+				*(Uint32 *)&(MinimapTerrainSurfaceGL[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
 				//Wyrmgus end
 			} else
 #endif
@@ -733,7 +739,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 				}
 				//Wyrmgus start
 //				*(Uint32 *)&(MinimapTerrainSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = c;
-				*(Uint32 *)&(MinimapTerrainSurfaceGL[z][(mx + my * MinimapTextureWidth) * 4]) = c;
+				*(Uint32 *)&(MinimapTerrainSurfaceGL[z][(mx + my * MinimapTextureWidth[z]) * 4]) = c;
 				//Wyrmgus end
 			} else
 #endif
@@ -880,7 +886,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 			if (UseOpenGL) {
 				//Wyrmgus start
 //				*(Uint32 *)&(MinimapSurfaceGL[((mx + w) + (my + h) * MinimapTextureWidth) * 4]) = color;
-				*(Uint32 *)&(MinimapSurfaceGL[CurrentMapLayer][((mx + w) + (my + h) * MinimapTextureWidth) * 4]) = color;
+				*(Uint32 *)&(MinimapSurfaceGL[CurrentMapLayer][((mx + w) + (my + h) * MinimapTextureWidth[CurrentMapLayer]) * 4]) = color;
 				//Wyrmgus end
 			} else
 #endif
@@ -923,7 +929,7 @@ void CMinimap::Update()
 		if (UseOpenGL) {
 			//Wyrmgus start
 //			memset(MinimapSurfaceGL, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
-			memset(MinimapSurfaceGL[CurrentMapLayer], 0, MinimapTextureWidth * MinimapTextureHeight * 4);
+			memset(MinimapSurfaceGL[CurrentMapLayer], 0, MinimapTextureWidth[CurrentMapLayer] * MinimapTextureHeight[CurrentMapLayer] * 4);
 			//Wyrmgus end
 		} else
 #endif
@@ -956,7 +962,7 @@ void CMinimap::Update()
 		if (UseOpenGL) {
 			//Wyrmgus start
 //			memcpy(MinimapSurfaceGL, MinimapTerrainSurfaceGL, MinimapTextureWidth * MinimapTextureHeight * 4);
-			memcpy(MinimapSurfaceGL[CurrentMapLayer], MinimapTerrainSurfaceGL[CurrentMapLayer], MinimapTextureWidth * MinimapTextureHeight * 4);
+			memcpy(MinimapSurfaceGL[CurrentMapLayer], MinimapTerrainSurfaceGL[CurrentMapLayer], MinimapTextureWidth[CurrentMapLayer] * MinimapTextureHeight[CurrentMapLayer] * 4);
 			//Wyrmgus end
 		} else
 #endif
@@ -986,7 +992,7 @@ void CMinimap::Update()
 			if (mx < XOffset[CurrentMapLayer] || mx >= W - XOffset[CurrentMapLayer] || my < YOffset[CurrentMapLayer] || my >= H - YOffset[CurrentMapLayer]) {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 				if (UseOpenGL) {
-					*(Uint32 *)&(MinimapSurfaceGL[CurrentMapLayer][(mx + my * MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
+					*(Uint32 *)&(MinimapSurfaceGL[CurrentMapLayer][(mx + my * MinimapTextureWidth[CurrentMapLayer]) * 4]) = Video.MapRGB(0, 0, 0, 0);
 				} else
 #endif
 				{
@@ -1028,7 +1034,7 @@ void CMinimap::Update()
 				if (UseOpenGL) {
 					//Wyrmgus start
 //					*(Uint32 *)&(MinimapSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
-					*(Uint32 *)&(MinimapSurfaceGL[CurrentMapLayer][(mx + my * MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
+					*(Uint32 *)&(MinimapSurfaceGL[CurrentMapLayer][(mx + my * MinimapTextureWidth[CurrentMapLayer]) * 4]) = Video.MapRGB(0, 0, 0, 0);
 					//Wyrmgus end
 				} else
 #endif
@@ -1113,18 +1119,24 @@ void CMinimap::Draw() const
 //		glBindTexture(GL_TEXTURE_2D, MinimapTexture);
 		glBindTexture(GL_TEXTURE_2D, MinimapTexture[CurrentMapLayer]);
 		//Wyrmgus end
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth, MinimapTextureHeight,
-						//Wyrmgus start
+		//Wyrmgus start
+//		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth, MinimapTextureHeight,
 //						GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth[CurrentMapLayer], MinimapTextureHeight[CurrentMapLayer],
 						GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL[CurrentMapLayer]);
-						//Wyrmgus end
+		//Wyrmgus end
 
 #ifdef USE_GLES
 		float texCoord[] = {
 			0.0f, 0.0f,
-			(float)W / MinimapTextureWidth, 0.0f,
-			0.0f, (float)H / MinimapTextureHeight,
-			(float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight
+			//Wyrmgus start
+//			(float)W / MinimapTextureWidth, 0.0f,
+//			0.0f, (float)H / MinimapTextureHeight,
+//			(float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight
+			(float)W / MinimapTextureWidth[CurrentMapLayer], 0.0f,
+			0.0f, (float)H / MinimapTextureHeight[CurrentMapLayer],
+			(float)W / MinimapTextureWidth[CurrentMapLayer], (float)H / MinimapTextureHeight[CurrentMapLayer]
+			//Wyrmgus end
 		};
 
 		float vertex[] = {
@@ -1148,11 +1160,20 @@ void CMinimap::Draw() const
 		glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex2i(X, Y);
-		glTexCoord2f(0.0f, (float)H / MinimapTextureHeight);
+		//Wyrmgus start
+//		glTexCoord2f(0.0f, (float)H / MinimapTextureHeight);
+		glTexCoord2f(0.0f, (float)H / MinimapTextureHeight[CurrentMapLayer]);
+		//Wyrmgus end
 		glVertex2i(X, Y + H);
-		glTexCoord2f((float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight);
+		//Wyrmgus start
+//		glTexCoord2f((float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight);
+		glTexCoord2f((float)W / MinimapTextureWidth[CurrentMapLayer], (float)H / MinimapTextureHeight[CurrentMapLayer]);
+		//Wyrmgus end
 		glVertex2i(X + W, Y + H);
-		glTexCoord2f((float)W / MinimapTextureWidth, 0.0f);
+		//Wyrmgus start
+//		glTexCoord2f((float)W / MinimapTextureWidth, 0.0f);
+		glTexCoord2f((float)W / MinimapTextureWidth[CurrentMapLayer], 0.0f);
+		//Wyrmgus end
 		glVertex2i(X + W, Y);
 		glEnd();
 #endif
