@@ -162,7 +162,7 @@ extern const char NameLine[];
 #define UpgradeMax   2048                /// How many upgrades supported
 //Wyrmgus start
 //#define MAX_RACES 8
-#define MAX_RACES 64
+#define MAX_RACES 128
 #define FactionMax 128				/// Maximum number of factions a civilization can have
 #define PlayerColorMax 32			/// How many player colors are supported
 #define HairColorMax 16				/// How many hair colors are supported
