@@ -220,7 +220,7 @@ public:
 	void CheckKnowledgeChange(int variable, int change);
 	void UpdateItemName();
 	void GenerateDrop();
-	void GenerateSpecialProperties(CUnit *dropper = NULL, CPlayer *dropper_player = NULL);
+	void GenerateSpecialProperties(CUnit *dropper = NULL, CPlayer *dropper_player = NULL, bool allow_unique = true);
 	void GeneratePrefix(CUnit *dropper, CPlayer *dropper_player);
 	void GenerateSuffix(CUnit *dropper, CPlayer *dropper_player);
 	void GenerateSpell(CUnit *dropper, CPlayer *dropper_player);
@@ -698,7 +698,7 @@ extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer 
 //Wyrmgus start
 /// Create a new unit and place it on the map, and update its player accordingly
 extern CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z);
-extern CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z);
+extern CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool allow_unique = true);
 //Wyrmgus end
 /// Find the nearest position at which unit can be placed.
 //Wyrmgus start

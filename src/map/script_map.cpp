@@ -2017,6 +2017,50 @@ static int CclDefineSettlement(lua_State *l)
 
 				settlement->HistoricalBuildings.push_back(std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>(start_date, end_date, building_class_id, unique, building_owner));
 			}
+		} else if (!strcmp(value, "HistoricalResources")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CDate start_date;
+				start_date.year = 0;
+				start_date.month = 1;
+				start_date.day = 1;
+				start_date.timeline = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &start_date);
+				lua_pop(l, 1);
+				++j;
+				CDate end_date;
+				end_date.year = 0;
+				end_date.month = 1;
+				end_date.day = 1;
+				end_date.timeline = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &end_date);
+				lua_pop(l, 1);
+				++j;
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				if (!unit_type) {
+					LuaError(l, "Unit type doesn't exist.");
+				}
+				++j;
+				
+				CUniqueItem *unique = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && GetUniqueItem(LuaToString(l, -1)) != NULL) {
+					unique = GetUniqueItem(LuaToString(l, -1));
+				} else {
+					--j;
+				}
+				lua_pop(l, 1);
+				++j;
+				
+				int quantity = LuaToNumber(l, -1, j + 1);
+
+				settlement->HistoricalResources.push_back(std::tuple<CDate, CDate, CUnitType *, CUniqueItem *, int>(start_date, end_date, unit_type, unique, quantity));
+			}
 		} else if (!strcmp(value, "Regions")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

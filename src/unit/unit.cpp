@@ -1884,7 +1884,7 @@ void CUnit::GenerateDrop()
 	}
 }
 
-void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player)
+void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, bool allow_unique)
 {
 	int magic_affix_chance = 10; //10% chance of the unit having a magic prefix or suffix
 	int unique_chance = 5; //0.5% chance of the unit being unique
@@ -1921,7 +1921,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player)
 	if (this->Prefix == NULL && this->Suffix == NULL && this->Work == NULL && this->Elixir == NULL && SyncRand(100) >= (100 - magic_affix_chance)) {
 		this->GenerateSpell(dropper, dropper_player);
 	}
-	if (SyncRand(1000) >= (1000 - unique_chance)) {
+	if (allow_unique && SyncRand(1000) >= (1000 - unique_chance)) {
 		this->GenerateUnique(dropper, dropper_player);
 	}
 	
@@ -3445,10 +3445,10 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 	return unit;
 }
 
-CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z)
+CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool allow_unique)
 {
 	CUnit *unit = CreateUnit(pos, type, &Players[PlayerNumNeutral], z);
-	unit->GenerateSpecialProperties();
+	unit->GenerateSpecialProperties(NULL, NULL, allow_unique);
 			
 	// create metal rocks near metal resources
 	CUnitType *metal_rock_type = NULL;

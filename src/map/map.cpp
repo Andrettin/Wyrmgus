@@ -718,6 +718,31 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			Map.CulturalSettlementNames[z][std::tuple<int, int, int>(settlement_pos.x, settlement_pos.y, cultural_name_iterator->first)] = cultural_name_iterator->second;
 		}
 		
+		for (size_t j = 0; j < settlement_iterator->second->HistoricalResources.size(); ++j) {
+			if (
+				CurrentCampaign->StartDate.ContainsDate(std::get<0>(settlement_iterator->second->HistoricalResources[j]))
+				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(settlement_iterator->second->HistoricalResources[j])) || std::get<1>(settlement_iterator->second->HistoricalResources[j]).year == 0)
+			) {
+				const CUnitType *type = std::get<2>(settlement_iterator->second->HistoricalResources[j]);
+				if (!type) {
+					fprintf(stderr, "Error in CMap::ApplySettlements (settlement ident \"%s\"): historical resource type is NULL.\n", settlement_iterator->second->Ident.c_str());
+					continue;
+				}
+				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
+				CUnit *unit = CreateResourceUnit(settlement_pos - unit_offset, *type, z, false); // don't generate unique resources when setting special properties, since for map templates unique resources are supposed to be explicitly indicated
+				if (std::get<3>(settlement_iterator->second->HistoricalResources[j])) {
+					unit->SetUnique(std::get<3>(settlement_iterator->second->HistoricalResources[j]));
+				}
+				int resource_quantity = std::get<4>(settlement_iterator->second->HistoricalResources[j]);
+				if (resource_quantity) { //set the resource_quantity after setting the unique unit, so that unique resources can be decreased in quantity over time
+					unit->SetResourcesHeld(resource_quantity);
+					unit->Variable[GIVERESOURCE_INDEX].Value = resource_quantity;
+					unit->Variable[GIVERESOURCE_INDEX].Max = resource_quantity;
+					unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
+				}
+			}
+		}
+		
 		CFaction *settlement_owner = NULL;
 		for (std::map<CDate, CFaction *>::reverse_iterator owner_iterator = settlement_iterator->second->HistoricalOwners.rbegin(); owner_iterator != settlement_iterator->second->HistoricalOwners.rend(); ++owner_iterator) {
 			if (CurrentCampaign->StartDate.ContainsDate(owner_iterator->first)) { // set the owner to the latest historical owner given the scenario's start date
