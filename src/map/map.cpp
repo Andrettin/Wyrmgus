@@ -2828,73 +2828,66 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 
 	CMapField &mf = *this->Field(pos, z);
 	
-	bool ownership_changed = false;
+	int new_owner = -1;
 	
-	if (mf.Owner != -1 && mf.playerInfo.Influence[mf.Owner] == 0) {
-		mf.Owner = -1;
-		ownership_changed = true;
-	}
-
-	if (mf.Owner == -1) {
-		if (mf.Flags & MapFieldBuilding) { //make sure the place a building is located is set to be owned by its player; this is necessary for scenarios, since when they start buildings could be on another player's territory (i.e. if a farm starts next to a town hall)
-			const CUnitCache &cache = mf.UnitCache;
-			for (size_t i = 0; i != cache.size(); ++i) {
-				CUnit *unit = cache[i];
-				if (!unit) {
-					fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit in the tile's unit cache is NULL.\n", pos.x, pos.y);
-				}
-				if (unit->IsAliveOnMap() && unit->Type->BoolFlag[BUILDING_INDEX].value && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
-					mf.Owner = unit->Player->Index;
-					ownership_changed = true;
-					break;
-				}
+	if (mf.Flags & MapFieldBuilding) { //make sure the place a building is located is set to be owned by its player; this is necessary for scenarios, since when they start buildings could be on another player's territory (i.e. if a farm starts next to a town hall)
+		const CUnitCache &cache = mf.UnitCache;
+		for (size_t i = 0; i != cache.size(); ++i) {
+			CUnit *unit = cache[i];
+			if (!unit) {
+				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit in the tile's unit cache is NULL.\n", pos.x, pos.y);
+			}
+			if (unit->IsAliveOnMap() && unit->Type->BoolFlag[BUILDING_INDEX].value && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
+				mf.Owner = unit->Player->Index;
+				break;
 			}
 		}
+	}
 
-		if (mf.Owner == -1) { //if no building is on the tile, set it to the first unit to have influence on it, if that isn't blocked by an obstacle
-			std::vector<unsigned long> obstacle_flags;
-			obstacle_flags.push_back(MapFieldCoastAllowed);
-			obstacle_flags.push_back(MapFieldUnpassable);
+	if (new_owner == -1) { //if no building is on the tile, set it to the first unit to have influence on it, if that isn't blocked by an obstacle
+		std::vector<unsigned long> obstacle_flags;
+		obstacle_flags.push_back(MapFieldCoastAllowed);
+		obstacle_flags.push_back(MapFieldUnpassable);
 
-			std::vector<CUnit *> table;
-			Select(pos - Vec2i(16, 16), pos + Vec2i(16, 16), table, z);
-			for (size_t i = 0; i != table.size(); ++i) {
-				CUnit *unit = table[i];
-				if (!unit) {
-					fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit within the tile's range is NULL.\n", pos.x, pos.y);
-				}
-				if (unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapDistanceTo(pos, z) <= unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value && mf.playerInfo.Influence[unit->Player->Index] > 0) {
-					bool obstacle_check = true;
-					for (size_t j = 0; j < obstacle_flags.size(); ++j) {
-						bool obstacle_subcheck = false;
-						for (int x = 0; x < unit->Type->TileWidth; ++x) {
-							for (int y = 0; y < unit->Type->TileHeight; ++y) {
-								if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, NULL, unit->Player->Index)) { //the obstacle must be avoidable from at least one of the unit's tiles
-									obstacle_subcheck = true;
-									break;
-								}
-							}
-							if (obstacle_subcheck) {
+		std::vector<CUnit *> table;
+		Select(pos - Vec2i(16, 16), pos + Vec2i(16, 16), table, z);
+		for (size_t i = 0; i != table.size(); ++i) {
+			CUnit *unit = table[i];
+			if (!unit) {
+				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit within the tile's range is NULL.\n", pos.x, pos.y);
+			}
+			if (unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapDistanceTo(pos, z) <= unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
+				bool obstacle_check = true;
+				for (size_t j = 0; j < obstacle_flags.size(); ++j) {
+					bool obstacle_subcheck = false;
+					for (int x = 0; x < unit->Type->TileWidth; ++x) {
+						for (int y = 0; y < unit->Type->TileHeight; ++y) {
+							if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, NULL, unit->Player->Index)) { //the obstacle must be avoidable from at least one of the unit's tiles
+								obstacle_subcheck = true;
 								break;
 							}
 						}
-						if (!obstacle_subcheck) {
-							obstacle_check = false;
+						if (obstacle_subcheck) {
 							break;
 						}
 					}
-					if (!obstacle_check) {
-						continue;
+					if (!obstacle_subcheck) {
+						obstacle_check = false;
+						break;
 					}
-					mf.Owner = unit->Player->Index;
-					ownership_changed = true;
-					break;
 				}
+				if (!obstacle_check) {
+					continue;
+				}
+				new_owner = unit->Player->Index;
+				break;
 			}
 		}
 	}
 	
-	if (ownership_changed) {
+	if (new_owner != mf.Owner) {
+		mf.Owner = new_owner;
+		
 		this->CalculateTileOwnershipTransition(pos, z);
 		
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {

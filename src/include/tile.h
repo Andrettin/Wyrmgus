@@ -169,9 +169,6 @@ public:
 		memset(VisEthereal, 0, sizeof(VisEthereal));
 		memset(Radar, 0, sizeof(Radar));
 		memset(RadarJammer, 0, sizeof(RadarJammer));
-		//Wyrmgus start
-		memset(Influence, 0, sizeof(Influence));
-		//Wyrmgus end
 	}
 
 	/// Check if a field for the user is explored.
@@ -208,9 +205,6 @@ public:
 	unsigned char VisEthereal[PlayerMax];    /// Visiblity for ethereal.
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
-	//Wyrmgus start
-	unsigned char Influence[PlayerMax];		/// Ownership influence unit count
-	//Wyrmgus end
 };
 
 /// Describes a field of the map
