@@ -1773,7 +1773,10 @@ MissileType *MissileBurningBuilding(int percent)
 {
 	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
 		 i != BurningBuildingFrames.end(); ++i) {
-		if (percent > (*i)->Percent) {
+		//Wyrmgus start
+//		if (percent > (*i)->Percent) {
+		if (percent >= (*i)->Percent) {
+		//Wyrmgus end
 			return (*i)->Missile;
 		}
 	}
