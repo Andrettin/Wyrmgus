@@ -486,6 +486,7 @@ void CUnit::Init()
 	Colors = NULL;
 	//Wyrmgus start
 	Name = "";
+	SettlementName = "";
 	Variation = 0;
 	memset(LayerVariation, -1, sizeof(LayerVariation));
 	//Wyrmgus end
