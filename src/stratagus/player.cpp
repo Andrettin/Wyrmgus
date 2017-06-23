@@ -1532,10 +1532,6 @@ void CPlayer::SetCivilization(int civilization)
 			UpgradeAcquire(*this, civilization_upgrade);
 		}
 	}
-		
-	if (GrandStrategy && ThisPlayer) {
-		this->SetRandomFaction();
-	}
 }
 
 /**
