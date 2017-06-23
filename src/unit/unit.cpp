@@ -3121,6 +3121,10 @@ void CUnit::UpdateSettlementName()
 		return;
 	}
 	
+	if (!this->Type->BoolFlag[BUILDING_INDEX].value) {
+		return;
+	}
+	
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
 		std::string old_settlement_name = this->SettlementName;
 		
