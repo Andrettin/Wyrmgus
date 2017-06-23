@@ -1780,6 +1780,16 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 		int hp_change = (this->Variable[variable].Value / 5) - ((this->Variable[variable].Value - change) / 5); // +1 max HP for every 5 levels in Knowledge (Warfare)
 		this->Variable[HP_INDEX].Max += hp_change;
 		this->Variable[HP_INDEX].Value += hp_change;
+	} else if (variable == KNOWLEDGEMINING_INDEX) {
+		int stat_change = (this->Variable[variable].Value / 25) - ((this->Variable[variable].Value - change) / 25); // +1 mining gathering bonus for every 25 levels in Knowledge (Mining)
+		this->Variable[COPPERGATHERINGBONUS_INDEX].Max += stat_change;
+		this->Variable[COPPERGATHERINGBONUS_INDEX].Value += stat_change;
+		this->Variable[SILVERGATHERINGBONUS_INDEX].Max += stat_change;
+		this->Variable[SILVERGATHERINGBONUS_INDEX].Value += stat_change;
+		this->Variable[GOLDGATHERINGBONUS_INDEX].Max += stat_change;
+		this->Variable[GOLDGATHERINGBONUS_INDEX].Value += stat_change;
+		this->Variable[COALGATHERINGBONUS_INDEX].Max += stat_change;
+		this->Variable[COALGATHERINGBONUS_INDEX].Value += stat_change;
 	}
 }
 
@@ -2064,7 +2074,7 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 
 void CUnit::UpdateSoldUnits()
 {
-	if (this->CurrentAction() == UnitActionBuilt || !Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
+	if (this->CurrentAction() == UnitActionBuilt || !Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
 		return;
 	}
 	

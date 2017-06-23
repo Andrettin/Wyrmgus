@@ -2860,7 +2860,7 @@ bool IsBooleanVariable(int var)
 
 bool IsKnowledgeVariable(int var)
 {
-	return var == KNOWLEDGEMAGIC_INDEX || var == KNOWLEDGEWARFARE_INDEX;
+	return var == KNOWLEDGEMAGIC_INDEX || var == KNOWLEDGEWARFARE_INDEX || var == KNOWLEDGEMINING_INDEX;;
 }
 
 bool IsPotentiallyNegativeVariable(int var)
