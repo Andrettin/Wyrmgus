@@ -2795,10 +2795,6 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 
 	CMapField &mf = *this->Field(pos, z);
 	
-	if ((mf.Flags & MapFieldWaterAllowed) || (mf.Flags & MapFieldCoastAllowed)) {
-		return;
-	}
-
 	bool ownership_changed = false;
 	
 	if (mf.Owner != -1 && mf.playerInfo.Influence[mf.Owner] == 0) {
@@ -2824,7 +2820,6 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 
 		if (mf.Owner == -1) { //if no building is on the tile, set it to the first unit to have influence on it, if that isn't blocked by an obstacle
 			std::vector<unsigned long> obstacle_flags;
-			obstacle_flags.push_back(MapFieldWaterAllowed);
 			obstacle_flags.push_back(MapFieldCoastAllowed);
 			obstacle_flags.push_back(MapFieldUnpassable);
 
@@ -2910,9 +2905,6 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-					if ((adjacent_mf.Flags & MapFieldWaterAllowed) || (adjacent_mf.Flags & MapFieldCoastAllowed)) { //don't count water tiles as owned by any player
-						continue;
-					}
 					if (adjacent_mf.Owner != mf.Owner) {
 						adjacent_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
 					}
