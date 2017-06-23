@@ -1728,6 +1728,22 @@ bool CPlayer::HasUpgradeClass(std::string upgrade_class_name)
 	return false;
 }
 
+bool CPlayer::HasSettlement(std::string settlement_name) const
+{
+	if (settlement_name.empty()) {
+		return false;
+	}
+	
+	for (int i = 0; i < this->GetUnitCount(); ++i) {
+		CUnit &unit = this->GetUnit(i);
+		if (unit.Type->BoolFlag[TOWNHALL_INDEX].value && unit.SettlementName == settlement_name) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 /**
 **  Check if the player can found a particular faction.
 **
@@ -1758,6 +1774,212 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 	}
 	
 	return true;
+}
+
+std::string CPlayer::GetFactionTitleName() const
+{
+	if (this->Race == -1 || this->Faction == -1) {
+		return "";
+	}
+	
+	CFaction *faction = PlayerRaces.Factions[this->Race][this->Faction];
+	int faction_tier = faction->DefaultTier;
+	int government_type = faction->DefaultGovernmentType;
+	
+	if (faction->Type == FactionTypePolity) {
+		if (!faction->Titles[government_type][faction_tier].empty()) {
+			return faction->Titles[government_type][faction_tier];
+		} else {
+			if (government_type == GovernmentTypeMonarchy) {
+				if (faction_tier == FactionTierBarony) {
+					return "Barony";
+				} else if (faction_tier == FactionTierCounty) {
+					return "County";
+				} else if (faction_tier == FactionTierDuchy) {
+					return "Duchy";
+				} else if (faction_tier == FactionTierGrandDuchy) {
+					return "Grand Duchy";
+				} else if (faction_tier == FactionTierKingdom) {
+					return "Kingdom";
+				} else if (faction_tier == FactionTierEmpire) {
+					return "Empire";
+				}
+			} else if (government_type == GovernmentTypeRepublic) {
+				return "Republic";
+			} else if (government_type == GovernmentTypeTheocracy) {
+				return "Theocracy";
+			}
+		}
+	}
+	
+	return "";
+}
+
+std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
+{
+	if (this->Race == -1 || this->Faction == -1 || title_type == -1 || gender == -1) {
+		return "";
+	}
+	
+	CCivilization *civilization = PlayerRaces.Civilizations[this->Race];
+	CFaction *faction = PlayerRaces.Factions[this->Race][this->Faction];
+	int faction_tier = faction->DefaultTier;
+	int government_type = faction->DefaultGovernmentType;
+	
+	if (faction->Type == FactionTypePolity) {
+		if (!faction->MinisterTitles[title_type][gender][government_type][faction_tier].empty()) {
+			return faction->MinisterTitles[title_type][gender][government_type][faction_tier];
+		} else if (!faction->MinisterTitles[title_type][NoGender][government_type][faction_tier].empty()) {
+			return faction->MinisterTitles[title_type][NoGender][government_type][faction_tier];
+		} else if (!faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][faction_tier].empty()) {
+			return faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][faction_tier];
+		} else if (!faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][faction_tier].empty()) {
+			return faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][faction_tier];
+		} else if (!faction->MinisterTitles[title_type][gender][government_type][FactionTierNoFactionTier].empty()) {
+			return faction->MinisterTitles[title_type][gender][government_type][FactionTierNoFactionTier];
+		} else if (!faction->MinisterTitles[title_type][NoGender][government_type][FactionTierNoFactionTier].empty()) {
+			return faction->MinisterTitles[title_type][NoGender][government_type][FactionTierNoFactionTier];
+		} else if (!faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
+			return faction->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
+		} else if (!faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
+			return faction->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
+		} else if (!civilization->MinisterTitles[title_type][gender][government_type][faction_tier].empty()) {
+			return civilization->MinisterTitles[title_type][gender][government_type][faction_tier];
+		} else if (!civilization->MinisterTitles[title_type][NoGender][government_type][faction_tier].empty()) {
+			return civilization->MinisterTitles[title_type][NoGender][government_type][faction_tier];
+		} else if (!civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][faction_tier].empty()) {
+			return civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][faction_tier];
+		} else if (!civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][faction_tier].empty()) {
+			return civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][faction_tier];
+		} else if (!civilization->MinisterTitles[title_type][gender][government_type][FactionTierNoFactionTier].empty()) {
+			return civilization->MinisterTitles[title_type][gender][government_type][FactionTierNoFactionTier];
+		} else if (!civilization->MinisterTitles[title_type][NoGender][government_type][FactionTierNoFactionTier].empty()) {
+			return civilization->MinisterTitles[title_type][NoGender][government_type][FactionTierNoFactionTier];
+		} else if (!civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
+			return civilization->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
+		} else if (!civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
+			return civilization->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
+		}
+	}
+
+	if (title_type == CharacterTitleHeadOfState) {
+		if (faction->Type == FactionTypeTribe) {
+			if (gender != FemaleGender) {
+				return "Chieftain";
+			} else {
+				return "Chieftess";
+			}
+		} else if (faction->Type == FactionTypePolity) {
+			std::string faction_title = this->GetFactionTitleName();
+			
+			if (faction_title == "Barony") {
+				if (gender != FemaleGender) {
+					return "Baron";
+				} else {
+					return "Baroness";
+				}
+			} else if (faction_title == "Lordship") {
+				if (gender != FemaleGender) {
+					return "Lord";
+				} else {
+					return "Lady";
+				}
+			} else if (faction_title == "County") {
+				if (gender != FemaleGender) {
+					return "Count";
+				} else {
+					return "Countess";
+				}
+			} else if (faction_title == "City-State") {
+				return "Archon";
+			} else if (faction_title == "Duchy") {
+				if (gender != FemaleGender) {
+					return "Duke";
+				} else {
+					return "Duchess";
+				}
+			} else if (faction_title == "Principality") {
+				if (gender != FemaleGender) {
+					return "Prince";
+				} else {
+					return "Princess";
+				}
+			} else if (faction_title == "Margraviate") {
+				return "Margrave";
+			} else if (faction_title == "Landgraviate") {
+				return "Landgrave";
+			} else if (faction_title == "Grand Duchy") {
+				if (gender != FemaleGender) {
+					return "Grand Duke";
+				} else {
+					return "Grand Duchess";
+				}
+			} else if (faction_title == "Archduchy") {
+				if (gender != FemaleGender) {
+					return "Archduke";
+				} else {
+					return "Archduchess";
+				}
+			} else if (faction_title == "Kingdom") {
+				if (gender != FemaleGender) {
+					return "King";
+				} else {
+					return "Queen";
+				}
+			} else if (faction_title == "Khanate") {
+				return "Khan";
+			} else if (faction_title == "Empire") {
+				if (gender != FemaleGender) {
+					return "Emperor";
+				} else {
+					return "Empress";
+				}
+			} else if (faction_title == "Republic") {
+				return "Consul";
+			} else if (faction_title == "Confederation") {
+				return "Chancellor";
+			} else if (faction_title == "Theocracy") {
+				if (gender != FemaleGender) {
+					return "High Priest";
+				} else {
+					return "High Priestess";
+				}
+			} else if (faction_title == "Bishopric") {
+				return "Bishop";
+			} else if (faction_title == "Archbishopric") {
+				return "Archbishop";
+			}
+		}
+	} else if (title_type == CharacterTitleHeadOfGovernment) {
+		return "Prime Minister";
+	} else if (title_type == CharacterTitleEducationMinister) {
+//		return "Education Minister"; //education minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		return "Master Educator";
+	} else if (title_type == CharacterTitleFinanceMinister) {
+//		return "Finance Minister"; //finance minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		return "Treasurer";
+	} else if (title_type == CharacterTitleForeignMinister) {
+//		return "Foreign Minister"; //foreign minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		return "Chancellor";
+	} else if (title_type == CharacterTitleIntelligenceMinister) {
+//		return "Intelligence Minister"; //intelligence minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		return "Spymaster";
+	} else if (title_type == CharacterTitleInteriorMinister) {
+//		return "Interior Minister"; //interior minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		return "High Constable";
+	} else if (title_type == CharacterTitleJusticeMinister) {
+//		return "Justice Minister"; //justice minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		return "Master of Laws";
+	} else if (title_type == CharacterTitleWarMinister) {
+//		return "War Minister"; //war minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		return "Marshal";
+	} else if (title_type == CharacterTitleGovernor) {
+		return "Governor";
+	} else if (title_type == CharacterTitleMayor) {
+		return "Mayor";
+	}
+	
+	return "";
 }
 //Wyrmgus end
 

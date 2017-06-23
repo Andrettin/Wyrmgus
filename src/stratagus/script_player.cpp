@@ -1034,6 +1034,22 @@ static int CclDefineCivilization(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				civilization->ShipNames.push_back(LuaToString(l, -1, j + 1));
 			}
+		} else if (!strcmp(value, "MinisterTitles")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				int title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				int gender = GetGenderIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				int faction_tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				civilization->MinisterTitles[title][gender][government_type][faction_tier] = LuaToString(l, -1, k + 1);
+			}
 		} else if (!strcmp(value, "HistoricalUpgrades")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -3213,6 +3229,23 @@ static int CclGetPlayerData(lua_State *l)
 		} else {
 			lua_pushboolean(l, false);
 		}
+		return 1;
+	} else if (!strcmp(data, "FactionTitle")) {
+		lua_pushstring(l, p->GetFactionTitleName().c_str());
+		return 1;
+	} else if (!strcmp(data, "CharacterTitle")) {
+		LuaCheckArgs(l, 4);
+		std::string title_type_ident = LuaToString(l, 3);
+		std::string gender_ident = LuaToString(l, 4);
+		int title_type_id = GetCharacterTitleIdByName(title_type_ident);
+		int gender_id = GetGenderIdByName(gender_ident);
+		
+		lua_pushstring(l, p->GetCharacterTitleName(title_type_id, gender_id).c_str());
+		return 1;
+	} else if (!strcmp(data, "HasSettlement")) {
+		LuaCheckArgs(l, 3);
+		std::string settlement_name = LuaToString(l, 3);
+		lua_pushboolean(l, p->HasSettlement(settlement_name));
 		return 1;
 	//Wyrmgus end
 	} else {

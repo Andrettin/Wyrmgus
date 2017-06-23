@@ -267,8 +267,6 @@ public:
 	int GetDiplomacyState(CGrandStrategyFaction *faction);
 	int GetDiplomacyStateProposal(CGrandStrategyFaction *faction);
 	std::string GetFullName();
-	std::string GetTitle();
-	std::string GetCharacterTitle(int title_type, int gender);
 	CGrandStrategyProvince *GetRandomProvinceWeightedByPopulation();
 	GrandStrategyWorldMapTile *GetCapitalSettlement();
 	

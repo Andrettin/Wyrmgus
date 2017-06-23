@@ -654,7 +654,7 @@ void CGrandStrategyGame::DrawInterface()
 			interface_state_name = GrandStrategyInterfaceState;
 			
 			if (this->SelectedProvince->Owner != NULL && this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState] != NULL) {
-				interface_state_name = this->SelectedProvince->Owner->GetCharacterTitle(CharacterTitleHeadOfState, this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->Gender);
+//				interface_state_name = this->SelectedProvince->Owner->GetCharacterTitle(CharacterTitleHeadOfState, this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->Gender);
 			
 				std::string ruler_name_string = this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->GetFullName();
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_name_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_name_string);
@@ -3009,9 +3009,9 @@ void CGrandStrategyProvince::SetGovernor(std::string hero_full_name)
 		
 		if (this->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized) {
 			std::string new_minister_message = "if (GenericDialog ~= nil) then GenericDialog(\"";
-			new_minister_message += this->Owner->GetCharacterTitle(CharacterTitleGovernor, this->Governor->Gender) + " " + this->Governor->GetFullName();
+//			new_minister_message += this->Owner->GetCharacterTitle(CharacterTitleGovernor, this->Governor->Gender) + " " + this->Governor->GetFullName();
 			new_minister_message += "\", \"";
-			new_minister_message += "A new " + FullyDecapitalizeString(this->Owner->GetCharacterTitle(CharacterTitleGovernor, this->Governor->Gender));
+//			new_minister_message += "A new " + FullyDecapitalizeString(this->Owner->GetCharacterTitle(CharacterTitleGovernor, this->Governor->Gender));
 			new_minister_message += " of " + this->GetCulturalName();
 			new_minister_message += " has been appointed, ";
 			new_minister_message += this->Governor->GetFullName() + "!\\n\\n";
@@ -4087,9 +4087,9 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 		
 		if (this == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized) {
 			std::string new_minister_message = "if (GenericDialog ~= nil) then GenericDialog(\"";
-			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->GetFullName();
+//			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->GetFullName();
 			new_minister_message += "\", \"";
-			new_minister_message += "A new " + FullyDecapitalizeString(this->GetCharacterTitle(title, this->Ministers[title]->Gender));
+//			new_minister_message += "A new " + FullyDecapitalizeString(this->GetCharacterTitle(title, this->Ministers[title]->Gender));
 			if (title == CharacterTitleHeadOfState) {
 				new_minister_message += " has come to power in our realm, ";
 			} else {
@@ -4398,176 +4398,7 @@ std::string CGrandStrategyFaction::GetFullName()
 	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe) {
 		return PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
 	} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypePolity) {
-		return this->GetTitle() + " of " + PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
-	}
-	
-	return "";
-}
-
-std::string CGrandStrategyFaction::GetTitle()
-{
-	std::string faction_title;
-	
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypePolity) {
-		if (!PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType][this->FactionTier].empty()) {
-			faction_title = PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType][this->FactionTier];
-		} else {
-			if (this->GovernmentType == GovernmentTypeMonarchy) {
-				if (this->FactionTier == FactionTierBarony) {
-					faction_title = "Barony";
-				} else if (this->FactionTier == FactionTierCounty) {
-					faction_title = "County";
-				} else if (this->FactionTier == FactionTierDuchy) {
-					faction_title = "Duchy";
-				} else if (this->FactionTier == FactionTierGrandDuchy) {
-					faction_title = "Grand Duchy";
-				} else if (this->FactionTier == FactionTierKingdom) {
-					faction_title = "Kingdom";
-				} else if (this->FactionTier == FactionTierEmpire) {
-					faction_title = "Empire";
-				}
-			} else if (this->GovernmentType == GovernmentTypeRepublic) {
-				faction_title = "Republic";
-			} else if (this->GovernmentType == GovernmentTypeTheocracy) {
-				faction_title = "Theocracy";
-			}
-		}
-	}
-	
-	return faction_title;
-}
-
-std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
-{
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypePolity) {
-		if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][this->GovernmentType][this->FactionTier].empty()) {
-			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][this->GovernmentType][this->FactionTier];
-		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][this->GovernmentType][this->FactionTier].empty()) {
-			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][this->GovernmentType][this->FactionTier];
-		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][this->FactionTier].empty()) {
-			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][this->FactionTier];
-		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][this->FactionTier].empty()) {
-			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][this->FactionTier];
-		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][this->GovernmentType][FactionTierNoFactionTier].empty()) {
-			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][this->GovernmentType][FactionTierNoFactionTier];
-		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][this->GovernmentType][FactionTierNoFactionTier].empty()) {
-			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][this->GovernmentType][FactionTierNoFactionTier];
-		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
-			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
-		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
-			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
-		}
-	}
-
-	if (title_type == CharacterTitleHeadOfState) {
-		if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe) {
-			if (gender != FemaleGender) {
-				return "Chieftain";
-			} else {
-				return "Chieftess";
-			}
-		} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypePolity) {
-			std::string faction_title = this->GetTitle();
-			
-			if (faction_title == "Barony") {
-				if (gender != FemaleGender) {
-					return "Baron";
-				} else {
-					return "Baroness";
-				}
-			} else if (faction_title == "Lordship") {
-				if (gender != FemaleGender) {
-					return "Lord";
-				} else {
-					return "Lady";
-				}
-			} else if (faction_title == "County") {
-				if (gender != FemaleGender) {
-					return "Count";
-				} else {
-					return "Countess";
-				}
-			} else if (faction_title == "City-State") {
-				return "Archon";
-			} else if (faction_title == "Duchy") {
-				if (gender != FemaleGender) {
-					return "Duke";
-				} else {
-					return "Duchess";
-				}
-			} else if (faction_title == "Principality") {
-				if (gender != FemaleGender) {
-					return "Prince";
-				} else {
-					return "Princess";
-				}
-			} else if (faction_title == "Margraviate") {
-				return "Margrave";
-			} else if (faction_title == "Landgraviate") {
-				return "Landgrave";
-			} else if (faction_title == "Grand Duchy") {
-				if (gender != FemaleGender) {
-					return "Grand Duke";
-				} else {
-					return "Grand Duchess";
-				}
-			} else if (faction_title == "Archduchy") {
-				if (gender != FemaleGender) {
-					return "Archduke";
-				} else {
-					return "Archduchess";
-				}
-			} else if (faction_title == "Kingdom") {
-				if (gender != FemaleGender) {
-					return "King";
-				} else {
-					return "Queen";
-				}
-			} else if (faction_title == "Khanate") {
-				return "Khan";
-			} else if (faction_title == "Empire") {
-				if (gender != FemaleGender) {
-					return "Emperor";
-				} else {
-					return "Empress";
-				}
-			} else if (faction_title == "Republic") {
-				return "Consul";
-			} else if (faction_title == "Confederation") {
-				return "Chancellor";
-			} else if (faction_title == "Theocracy") {
-				if (gender != FemaleGender) {
-					return "High Priest";
-				} else {
-					return "High Priestess";
-				}
-			} else if (faction_title == "Bishopric") {
-				return "Bishop";
-			} else if (faction_title == "Archbishopric") {
-				return "Archbishop";
-			}
-		}
-	} else if (title_type == CharacterTitleHeadOfGovernment) {
-		return "Prime Minister";
-	} else if (title_type == CharacterTitleEducationMinister) {
-		return "Education Minister";
-	} else if (title_type == CharacterTitleFinanceMinister) {
-//		return "Finance Minister"; //finance minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
-		return "Treasurer";
-	} else if (title_type == CharacterTitleForeignMinister) {
-//		return "Foreign Minister"; //foreign minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
-		return "Chancellor";
-	} else if (title_type == CharacterTitleIntelligenceMinister) {
-		return "Intelligence Minister";
-	} else if (title_type == CharacterTitleInteriorMinister) {
-		return "Interior Minister";
-	} else if (title_type == CharacterTitleJusticeMinister) {
-		return "Justice Minister";
-	} else if (title_type == CharacterTitleWarMinister) {
-//		return "War Minister"; //war minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
-		return "Marshal";
-	} else if (title_type == CharacterTitleGovernor) {
-		return "Governor";
+//		return this->GetTitle() + " of " + PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
 	}
 	
 	return "";
@@ -4703,6 +4534,7 @@ void CGrandStrategyHero::Create()
 void CGrandStrategyHero::Die()
 {
 	//show message that the hero has died
+	/*
 	if (GrandStrategyGameInitialized && this->IsVisible()) {
 		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] == this) {
 			char buf[256];
@@ -4722,6 +4554,7 @@ void CGrandStrategyHero::Die()
 			CclCommand(buf);	
 		}
 	}
+	*/
 	
 	if (this->Province != NULL) {
 		if (this->State == 2) {
@@ -4949,6 +4782,7 @@ std::string CGrandStrategyHero::GetBestDisplayTitle()
 {
 	std::string best_title = this->Type->Name;
 	int best_title_type = MaxCharacterTitles;
+	/*
 	for (size_t i = 0; i < this->Titles.size(); ++i) {
 		if (this->Titles[i].second != this->GetFaction()) {
 			continue;
@@ -4964,6 +4798,7 @@ std::string CGrandStrategyHero::GetBestDisplayTitle()
 			best_title_type = this->ProvinceTitles[i].first;
 		}
 	}
+	*/
 	return best_title;
 }
 
@@ -8155,7 +7990,7 @@ std::string GetGrandStrategyHeroTooltip(std::string hero_full_name)
 			hero_tooltip += "\nProvince: " + hero->Province->GetCulturalName();
 			
 			for (size_t i = 0; i < hero->Titles.size(); ++i) {
-				hero_tooltip += "\n" + hero->Titles[i].second->GetCharacterTitle(hero->Titles[i].first, hero->Gender) + " of ";
+//				hero_tooltip += "\n" + hero->Titles[i].second->GetCharacterTitle(hero->Titles[i].first, hero->Gender) + " of ";
 				if (PlayerRaces.Factions[hero->Titles[i].second->Civilization][hero->Titles[i].second->Faction]->Type == FactionTypeTribe) {
 					hero_tooltip += "the ";
 				}

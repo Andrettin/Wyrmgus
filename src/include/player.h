@@ -229,7 +229,10 @@ public:
 	void SetRandomFaction();
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(std::string upgrade_class_name);
+	bool HasSettlement(std::string settlement_name) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
+	std::string GetFactionTitleName() const;
+	std::string GetCharacterTitleName(int title_type, int gender) const;
 	//Wyrmgus end
 
 	/// Clear turn related player data
@@ -553,6 +556,7 @@ public:
 	std::vector<std::string> SettlementNames;	/// Settlement names for the civilization
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 	std::vector<std::string> ShipNames;			/// Ship names for the civilization
+	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 };
 
