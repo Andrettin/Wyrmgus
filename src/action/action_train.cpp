@@ -328,6 +328,7 @@ static void AnimateActionTrain(CUnit &unit)
 		if (!has_adjacent_rail) {
 			if (&player == ThisPlayer) {
 				ThisPlayer->Notify(NotifyYellow, unit.tilePos, unit.MapLayer, "%s", _("The unit requires railroads to be placed on"));
+				PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
 			}
 			unit.Wait = CYCLES_PER_SECOND * 10;
 			return;

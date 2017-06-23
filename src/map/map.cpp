@@ -2838,7 +2838,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit in the tile's unit cache is NULL.\n", pos.x, pos.y);
 			}
 			if (unit->IsAliveOnMap() && unit->Type->BoolFlag[BUILDING_INDEX].value && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
-				mf.Owner = unit->Player->Index;
+				new_owner = unit->Player->Index;
 				break;
 			}
 		}
