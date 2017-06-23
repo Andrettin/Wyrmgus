@@ -516,10 +516,6 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	int max_obstacle_difference = 1; //how many tiles are seen after the obstacle; set to 1 here so that the obstacle tiles themselves don't have fog drawn over them
 	
 	if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
-		obstacle_flags.push_back(MapFieldWaterAllowed);
-		obstacle_flags.push_back(MapFieldCoastAllowed);
-		obstacle_flags.push_back(MapFieldUnpassable);
-		max_obstacle_difference = 0;
 	} else {
 		if (Map.IsLayerUnderground(z)) {
 			obstacle_flags.push_back(MapFieldAirUnpassable);

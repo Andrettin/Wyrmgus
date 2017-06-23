@@ -471,14 +471,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 			Map.SubtemplateAreas[z].push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), this->Subtemplates[i]));
 				
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < Map.Info.MapWidths[z] && subtemplate_pos.y < Map.Info.MapHeights[z]) {
-				for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-					CUnit *unit = *it;
-					if (unit && unit->IsAliveOnMap() && unit->MapLayer == z && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
-						MapUnmarkUnitSight(*unit);
-					}
-				}
-				
-				
 				for (size_t j = 0; j < this->Subtemplates[i]->ExternalGeneratedTerrains.size(); ++j) {
 					Vec2i external_start_pos(subtemplate_pos.x - (this->Subtemplates[i]->Width / 2), subtemplate_pos.y - (this->Subtemplates[i]->Height / 2));
 					Vec2i external_end(subtemplate_pos.x + this->Subtemplates[i]->Width + (this->Subtemplates[i]->Width / 2), subtemplate_pos.y + this->Subtemplates[i]->Height + (this->Subtemplates[i]->Height / 2));
@@ -503,13 +495,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 					}
 						
 					Map.GenerateTerrain(this->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !this->Subtemplates[i]->TerrainFile.empty() || !this->Subtemplates[i]->TerrainImage.empty(), z);
-				}
-				
-				for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-					CUnit *unit = *it;
-					if (unit && unit->IsAliveOnMap() && unit->MapLayer == z && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
-						MapMarkUnitSight(*unit);
-					}
 				}
 			}
 		}
@@ -576,13 +561,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	this->ApplyUnits(template_start_pos, map_start_pos, z);
 	
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit *unit = *it;
-		if (unit && unit->IsAliveOnMap() && unit->MapLayer == z && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
-			MapUnmarkUnitSight(*unit);
-		}
-	}
-	
 	ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
 	
 	for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
@@ -624,13 +602,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.AdjustTileMapTransitions(map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
-	}
-	
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit *unit = *it;
-		if (unit && unit->IsAliveOnMap() && unit->MapLayer == z && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0) {
-			MapMarkUnitSight(*unit);
-		}
 	}
 	
 	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->Name.c_str());
@@ -1893,6 +1864,7 @@ void PreprocessMap()
 				Map.CalculateTileTransitions(Vec2i(ix, iy), false, z);
 				Map.CalculateTileTransitions(Vec2i(ix, iy), true, z);
 				Map.CalculateTileLandmass(Vec2i(ix, iy), z);
+				Map.CalculateTileOwnership(Vec2i(ix, iy), z);
 				mf.UpdateSeenTile();
 				UI.Minimap.UpdateXY(Vec2i(ix, iy), z);
 				if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -2354,15 +2326,6 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 		if (mf.OverlayTerrain == terrain) {
 			return;
 		}
-		
-		if ((terrain->Flags & MapFieldUnpassable) || (old_terrain && (old_terrain->Flags & MapFieldUnpassable))) {
-			for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-				CUnit *unit = *it;
-				if (unit && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapLayer == z && unit->IsAliveOnMap()) { //recalculate ownership influence range is an overlay terrain is being set, as the overlay may block the ownership spread
-					MapUnmarkUnitSight(*unit);
-				}
-			}
-		}
 	} else {
 		if (mf.Terrain == terrain) {
 			return;
@@ -2400,12 +2363,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 	
 	if (terrain->Overlay) {
 		if ((terrain->Flags & MapFieldUnpassable) || (old_terrain && (old_terrain->Flags & MapFieldUnpassable))) {
-			for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-				CUnit *unit = *it;
-				if (unit && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapLayer == z && unit->IsAliveOnMap()) {
-					MapMarkUnitSight(*unit);
-				}
-			}
+			Map.CalculateTileOwnership(pos, z);
 		}
 	}
 }
@@ -2422,15 +2380,6 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	}
 	
 	CTerrainType *old_terrain = mf.OverlayTerrain;
-	
-	if (old_terrain->Flags & MapFieldUnpassable) {
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit *unit = *it;
-			if (unit && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapLayer == z && unit->IsAliveOnMap()) { //recalculate ownership influence range is an overlay terrain is being set, as the overlay may block the ownership spread
-				MapUnmarkUnitSight(*unit);
-			}
-		}
-	}
 	
 	mf.RemoveOverlayTerrain();
 	
@@ -2460,12 +2409,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	}
 	
 	if (old_terrain->Flags & MapFieldUnpassable) {
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit *unit = *it;
-			if (unit && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapLayer == z && unit->IsAliveOnMap()) {
-				MapMarkUnitSight(*unit);
-			}
-		}
+		Map.CalculateTileOwnership(pos, z);
 	}
 }
 
@@ -2475,15 +2419,6 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	
 	if (!mf.OverlayTerrain || mf.OverlayTerrainDestroyed == destroyed) {
 		return;
-	}
-	
-	if (mf.OverlayTerrain->Flags & MapFieldUnpassable) {
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit *unit = *it;
-			if (unit && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapLayer == z && unit->IsAliveOnMap()) { //recalculate ownership influence range is an overlay terrain is being set, as the overlay may block the ownership spread
-				MapUnmarkUnitSight(*unit);
-			}
-		}
 	}
 	
 	mf.SetOverlayTerrainDestroyed(destroyed);
@@ -2537,12 +2472,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	}
 	
 	if (mf.OverlayTerrain->Flags & MapFieldUnpassable) {
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit *unit = *it;
-			if (unit && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapLayer == z && unit->IsAliveOnMap()) {
-				MapMarkUnitSight(*unit);
-			}
-		}
+		Map.CalculateTileOwnership(pos, z);
 	}
 }
 
@@ -2892,10 +2822,43 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 			}
 		}
 
-		if (mf.Owner == -1) { //if no building is on the tile, set it to the player with highest influence
-			for (int i = 0; i != PlayerMax; ++i) {
-				if (mf.playerInfo.Influence[i] > 0) {
-					mf.Owner = i;
+		if (mf.Owner == -1) { //if no building is on the tile, set it to the first unit to have influence on it, if that isn't blocked by an obstacle
+			std::vector<unsigned long> obstacle_flags;
+			obstacle_flags.push_back(MapFieldWaterAllowed);
+			obstacle_flags.push_back(MapFieldCoastAllowed);
+			obstacle_flags.push_back(MapFieldUnpassable);
+
+			std::vector<CUnit *> table;
+			Select(pos - Vec2i(16, 16), pos + Vec2i(16, 16), table, z);
+			for (size_t i = 0; i != table.size(); ++i) {
+				CUnit *unit = table[i];
+				if (!unit) {
+					fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit within the tile's range is NULL.\n", pos.x, pos.y);
+				}
+				if (unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapDistanceTo(pos, z) <= unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value && mf.playerInfo.Influence[unit->Player->Index] > 0) {
+					bool obstacle_check = true;
+					for (size_t j = 0; j < obstacle_flags.size(); ++j) {
+						bool obstacle_subcheck = false;
+						for (int x = 0; x < unit->Type->TileWidth; ++x) {
+							for (int y = 0; y < unit->Type->TileHeight; ++y) {
+								if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, NULL, unit->Player->Index)) { //the obstacle must be avoidable from at least one of the unit's tiles
+									obstacle_subcheck = true;
+									break;
+								}
+							}
+							if (obstacle_subcheck) {
+								break;
+							}
+						}
+						if (!obstacle_subcheck) {
+							obstacle_check = false;
+							break;
+						}
+					}
+					if (!obstacle_check) {
+						continue;
+					}
+					mf.Owner = unit->Player->Index;
 					ownership_changed = true;
 					break;
 				}

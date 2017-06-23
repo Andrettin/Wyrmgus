@@ -2587,7 +2587,7 @@ static int CclGetCivilizations(lua_State *l)
 	}
 
 	lua_createtable(l, civilization_idents.size(), 0);
-	for (int i = 1; i <= civilization_idents.size(); ++i)
+	for (unsigned int i = 1; i <= civilization_idents.size(); ++i)
 	{
 		lua_pushstring(l, civilization_idents[i - 1].c_str());
 		lua_rawseti(l, -2, i);

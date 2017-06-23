@@ -1538,7 +1538,7 @@ struct CompareUnitDistance {
 */
 //Wyrmgus start
 //bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance)
-bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int z, int max_difference, int *distance)
+bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int z, int max_difference, int *distance, int player)
 //Wyrmgus end
 {
 	const Vec2i delta(abs(goalPos.x - unitPos.x), abs(goalPos.y - unitPos.y));
@@ -1565,7 +1565,11 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 			DebugPrint("outside of map\n");
 		//Wyrmgus start
 //		} else if (Map.Field(pos)->Flags & flags) {
-		} else if ((Map.Field(pos, z)->Flags & flags) && pos != goalPos && (abs(pos.x - goalPos.x) > max_difference || abs(pos.y - goalPos.y) > max_difference)) { // the goal's tile itself shouldn't be checked for an obstacle
+		} else if (
+			((Map.Field(pos, z)->Flags & flags) || (player != -1 && Map.Field(pos, z)->Owner != player && Map.Field(pos, z)->Owner != -1))
+			&& pos != goalPos
+			&& (abs(pos.x - goalPos.x) > max_difference || abs(pos.y - goalPos.y) > max_difference)
+		) { // the goal's tile itself shouldn't be checked for an obstacle
 		//Wyrmgus end
 			if (distance) {
 				//Wyrmgus start
