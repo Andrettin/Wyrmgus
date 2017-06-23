@@ -2129,7 +2129,9 @@ static void AiCheckPathwayConstruction()
 						
 						// mark the tiles of the first path (that aren't the first and last tile) as unpassable, so that the second path has to follow a different way
 						for (size_t z = 1; z < first_path_tiles.size(); ++z) {
-							Map.Field(first_path_tiles[z], unit.MapLayer)->Flags |= MapFieldUnpassable;
+							if (!(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldForest) && !(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldRocks) && !(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldWall)) {
+								Map.Field(first_path_tiles[z], unit.MapLayer)->Flags |= MapFieldUnpassable;
+							}
 						}
 						
 						//make the second path
@@ -2153,7 +2155,9 @@ static void AiCheckPathwayConstruction()
 						
 						//unmark the tiles of the first path
 						for (size_t z = 1; z < first_path_tiles.size(); ++z) {
-							Map.Field(first_path_tiles[z], unit.MapLayer)->Flags &= ~(MapFieldUnpassable);
+							if (!(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldForest) && !(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldRocks) && !(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldWall)) {
+								Map.Field(first_path_tiles[z], unit.MapLayer)->Flags &= ~(MapFieldUnpassable);
+							}
 						}
 						
 						MarkUnitFieldFlags(unit);

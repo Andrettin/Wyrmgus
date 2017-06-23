@@ -2364,6 +2364,17 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 	if (terrain->Overlay) {
 		if ((terrain->Flags & MapFieldUnpassable) || (old_terrain && (old_terrain->Flags & MapFieldUnpassable))) {
 			Map.CalculateTileOwnership(pos, z);
+			
+			for (int x_offset = -16; x_offset <= 16; ++x_offset) {
+				for (int y_offset = -16; y_offset <= 16; ++y_offset) {
+					if (x_offset != 0 || y_offset != 0) {
+						Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+						if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+							Map.CalculateTileOwnership(adjacent_pos, z);
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -2410,6 +2421,17 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	
 	if (old_terrain->Flags & MapFieldUnpassable) {
 		Map.CalculateTileOwnership(pos, z);
+			
+		for (int x_offset = -16; x_offset <= 16; ++x_offset) {
+			for (int y_offset = -16; y_offset <= 16; ++y_offset) {
+				if (x_offset != 0 || y_offset != 0) {
+					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+						Map.CalculateTileOwnership(adjacent_pos, z);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -2473,6 +2495,17 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	
 	if (mf.OverlayTerrain->Flags & MapFieldUnpassable) {
 		Map.CalculateTileOwnership(pos, z);
+			
+		for (int x_offset = -16; x_offset <= 16; ++x_offset) {
+			for (int y_offset = -16; y_offset <= 16; ++y_offset) {
+				if (x_offset != 0 || y_offset != 0) {
+					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+						Map.CalculateTileOwnership(adjacent_pos, z);
+					}
+				}
+			}
+		}
 	}
 }
 
