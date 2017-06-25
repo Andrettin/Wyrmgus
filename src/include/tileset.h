@@ -188,7 +188,7 @@ public:
 	CTerrainType() :
 		ID(-1), Flags(0), SolidAnimationFrames(0), Resource(-1),
 		Overlay(false), Buildable(false), AllowSingle(false), Hidden(false),
-		UnitType(NULL), Graphics(NULL), PlayerColorGraphics(NULL)
+		UnitType(NULL), Graphics(NULL), ElevationGraphics(NULL), PlayerColorGraphics(NULL)
 	{
 		Color.R = 0;
 		Color.G = 0;
@@ -210,6 +210,7 @@ public:
 	bool Hidden;
 	CUnitType *UnitType;
 	CGraphic *Graphics;
+	CGraphic *ElevationGraphics;								/// Semi-transparent elevation graphics, separated so that borders look better
 	CPlayerColorGraphic *PlayerColorGraphics;
 	std::vector<CTerrainType *> BaseTerrains;					/// Possible base terrains for this terrain type (if is an overlay terrain)
 	std::vector<CTerrainType *> BorderTerrains;					/// Terrain types which this one can border
