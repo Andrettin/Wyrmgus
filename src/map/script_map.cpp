@@ -803,6 +803,11 @@ static int CclSetMapTemplatePathway(lua_State *l)
 			break;
 		}
 
+		Vec2i pos_diff(end_pos - pos);
+		if ((pos_diff.x < 0 && pathway_change.x >= 0) || (pos_diff.x > 0 && pathway_change.x <= 0) || (pos_diff.y < 0 && pathway_change.y >= 0) || (pos_diff.y > 0 && pathway_change.y <= 0)) {
+			break;
+		}
+
 		map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(Vec2i(pos), terrain, date));
 	}
 
