@@ -283,12 +283,12 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 	Uint8 r, g, b;
 
 	for (int y = 0; y < terrain_image->Height; ++y) {
-		if (y < template_start_pos.y || y >= (template_start_pos.y + Map.Info.MapHeights[z])) {
+		if (y < template_start_pos.y || y >= (template_start_pos.y + (Map.Info.MapHeights[z] / this->Scale))) {
 			continue;
 		}
 		
 		for (int x = 0; x < terrain_image->Width; ++x) {
-			if (x < template_start_pos.x || x >= (template_start_pos.x + Map.Info.MapWidths[z])) {
+			if (x < template_start_pos.x || x >= (template_start_pos.x + (Map.Info.MapWidths[z] / this->Scale))) {
 				continue;
 			}
 
@@ -305,18 +305,27 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 			} else if (TerrainTypeColorToIndex.find(std::tuple<int, int, int>(r, g, b)) != TerrainTypeColorToIndex.end()) {
 				terrain_id = TerrainTypeColorToIndex.find(std::tuple<int, int, int>(r, g, b))->second;
 			}
-			Vec2i real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
-			if (terrain_id != -1) {
-				Map.Field(real_pos, z)->SetTerrain(TerrainTypes[terrain_id]);
-				
-				if (terrain_feature_id != -1) {
-					Map.Field(real_pos, z)->TerrainFeature = TerrainFeatures[terrain_feature_id];
-				}
-			} else {
-				if (r != 0 || g != 0 || b != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
-					fprintf(stderr, "Invalid map terrain: (%d, %d)\n", x, y);
-				} else if (overlay && Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
-					Map.Field(real_pos, z)->RemoveOverlayTerrain();
+			for (int sub_y = 0; sub_y < this->Scale; ++sub_y) {
+				for (int sub_x = 0; sub_x < this->Scale; ++sub_x) {
+					Vec2i real_pos(map_start_pos.x + ((x - template_start_pos.x) * this->Scale) + sub_x, map_start_pos.y + ((y - template_start_pos.y) * this->Scale) + sub_y);
+
+					if (!Map.Info.IsPointOnMap(real_pos, z)) {
+						continue;
+					}
+					
+					if (terrain_id != -1) {
+						Map.Field(real_pos, z)->SetTerrain(TerrainTypes[terrain_id]);
+						
+						if (terrain_feature_id != -1) {
+							Map.Field(real_pos, z)->TerrainFeature = TerrainFeatures[terrain_feature_id];
+						}
+					} else {
+						if (r != 0 || g != 0 || b != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
+							fprintf(stderr, "Invalid map terrain: (%d, %d)\n", x, y);
+						} else if (overlay && Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
+							Map.Field(real_pos, z)->RemoveOverlayTerrain();
+						}
+					}
 				}
 			}
 		}
@@ -338,9 +347,9 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	
 	if (z >= (int) Map.Fields.size()) {
-		Map.Info.MapWidths.push_back(std::min(this->Width, Map.Info.MapWidth));
-		Map.Info.MapHeights.push_back(std::min(this->Height, Map.Info.MapHeight));
-		Map.Fields.push_back(new CMapField[this->Width * this->Height]);
+		Map.Info.MapWidths.push_back(std::min(this->Width * this->Scale, Map.Info.MapWidth));
+		Map.Info.MapHeights.push_back(std::min(this->Height * this->Scale, Map.Info.MapHeight));
+		Map.Fields.push_back(new CMapField[Map.Info.MapWidths[z] * Map.Info.MapHeights[z]]);
 		Map.TimeOfDaySeconds.push_back(this->TimeOfDaySeconds);
 		Map.TimeOfDay.push_back(NoTimeOfDay);
 		Map.Planes.push_back(this->Plane);
@@ -362,7 +371,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.TimeOfDay[z] = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
 	}
 	
-	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + (this->Width * this->Scale)), std::min(Map.Info.MapHeights[z], map_start_pos.y + (this->Height * this->Scale)));
 	if (!Map.Info.IsPointOnMap(map_start_pos, z)) {
 		fprintf(stderr, "Invalid map coordinate for map template \"%s\": (%d, %d)\n", this->Ident.c_str(), map_start_pos.x, map_start_pos.y);
 		return;
@@ -375,19 +384,29 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 
 	for (size_t i = 0; i < HistoricalTerrains.size(); ++i) {
 		Vec2i history_pos = std::get<0>(HistoricalTerrains[i]);
-		if (history_pos.x < template_start_pos.x || history_pos.x >= (template_start_pos.x + Map.Info.MapWidths[z]) || history_pos.y < template_start_pos.y || history_pos.y >= (template_start_pos.y + Map.Info.MapHeights[z])) {
+		if (history_pos.x < template_start_pos.x || history_pos.x >= (template_start_pos.x + (Map.Info.MapWidths[z] / this->Scale)) || history_pos.y < template_start_pos.y || history_pos.y >= (template_start_pos.y + (Map.Info.MapHeights[z] / this->Scale))) {
 			continue;
 		}
 		if (CurrentCampaign->StartDate.ContainsDate(std::get<2>(HistoricalTerrains[i])) || std::get<2>(HistoricalTerrains[i]).year == 0) {
 			CTerrainType *historical_terrain = std::get<1>(HistoricalTerrains[i]);
-			Vec2i real_pos(map_start_pos.x + history_pos.x - template_start_pos.x, map_start_pos.y + history_pos.y - template_start_pos.y);
-			if (historical_terrain) {
-				if (historical_terrain->Overlay && ((historical_terrain->Flags & MapFieldRoad) || (historical_terrain->Flags & MapFieldRailroad)) && !(Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
-					continue;
+			
+			for (int sub_x = 0; sub_x < this->Scale; ++sub_x) {
+				for (int sub_y = 0; sub_y < this->Scale; ++sub_y) {
+					Vec2i real_pos(map_start_pos.x + ((history_pos.x - template_start_pos.x) * this->Scale) + sub_x, map_start_pos.y + ((history_pos.y - template_start_pos.y) * this->Scale) + sub_y);
+
+					if (!Map.Info.IsPointOnMap(real_pos, z)) {
+						continue;
+					}
+					
+					if (historical_terrain) {
+						if (historical_terrain->Overlay && ((historical_terrain->Flags & MapFieldRoad) || (historical_terrain->Flags & MapFieldRailroad)) && !(Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
+							continue;
+						}
+						Map.Field(real_pos, z)->SetTerrain(historical_terrain);
+					} else { //if the terrain type is NULL, then that means a previously set overlay terrain should be removed
+						Map.Field(real_pos, z)->RemoveOverlayTerrain();
+					}
 				}
-				Map.Field(real_pos, z)->SetTerrain(historical_terrain);
-			} else { //if the terrain type is NULL, then that means a previously set overlay terrain should be removed
-				Map.Field(real_pos, z)->RemoveOverlayTerrain();
 			}
 		}
 	}
@@ -503,8 +522,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->Name.c_str());
 
 	for (std::map<std::tuple<int, int, int>, std::string>::iterator iterator = this->CulturalSettlementNames.begin(); iterator != this->CulturalSettlementNames.end(); ++iterator) {
-		int settlement_x = map_start_pos.x + std::get<0>(iterator->first) - template_start_pos.x;
-		int settlement_y = map_start_pos.y + std::get<1>(iterator->first) - template_start_pos.y;
+		int settlement_x = map_start_pos.x + ((std::get<0>(iterator->first) - template_start_pos.x) * this->Scale);
+		int settlement_y = map_start_pos.y + ((std::get<1>(iterator->first) - template_start_pos.y) * this->Scale);
 		int settlement_civilization = std::get<2>(iterator->first);
 		
 		if (!Map.Info.IsPointOnMap(Vec2i(settlement_x, settlement_y), z)) {
@@ -515,8 +534,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	
 	for (std::map<std::tuple<int, int, CFaction *>, std::string>::iterator iterator = this->FactionCulturalSettlementNames.begin(); iterator != this->FactionCulturalSettlementNames.end(); ++iterator) {
-		int settlement_x = map_start_pos.x + std::get<0>(iterator->first) - template_start_pos.x;
-		int settlement_y = map_start_pos.y + std::get<1>(iterator->first) - template_start_pos.y;
+		int settlement_x = map_start_pos.x + ((std::get<0>(iterator->first) - template_start_pos.x) * this->Scale);
+		int settlement_y = map_start_pos.y + ((std::get<1>(iterator->first) - template_start_pos.y) * this->Scale);
 		CFaction *settlement_faction = std::get<2>(iterator->first);
 		
 		if (!Map.Info.IsPointOnMap(Vec2i(settlement_x, settlement_y), z)) {
@@ -679,7 +698,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 
 	for (std::map<std::pair<int, int>, CSettlement *>::iterator settlement_iterator = this->Settlements.begin(); settlement_iterator != this->Settlements.end(); ++settlement_iterator) {
 		Vec2i settlement_raw_pos(settlement_iterator->second->Position);
-		Vec2i settlement_pos(map_start_pos + settlement_raw_pos - template_start_pos);
+		Vec2i settlement_pos(map_start_pos + ((settlement_raw_pos - template_start_pos) * this->Scale));
 
 		if (!Map.Info.IsPointOnMap(settlement_pos, z) || settlement_pos.x < map_start_pos.x || settlement_pos.y < map_start_pos.y) {
 			continue;
@@ -733,7 +752,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 		}
 		
 		if (player->StartPos.x == 0 && player->StartPos.y == 0) {
-			Vec2i default_pos(map_start_pos + settlement_owner->DefaultStartPos - template_start_pos);
+			Vec2i default_pos(map_start_pos + ((settlement_owner->DefaultStartPos - template_start_pos) * this->Scale));
 			if (settlement_owner->DefaultStartPos.x != -1 && settlement_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
 				player->SetStartView(default_pos, z);
 			} else {
@@ -789,7 +808,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 						continue;
 					}
 					if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
-						Vec2i default_pos(map_start_pos + building_owner->DefaultStartPos - template_start_pos);
+						Vec2i default_pos(map_start_pos + ((building_owner->DefaultStartPos - template_start_pos) * this->Scale));
 						if (building_owner->DefaultStartPos.x != -1 && building_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
 							building_player->SetStartView(default_pos, z);
 						} else {
@@ -855,7 +874,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 								break;
 							}
 							if (unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
-								Vec2i default_pos(map_start_pos + second_unit_iterator->second.second->DefaultStartPos - template_start_pos);
+								Vec2i default_pos(map_start_pos + ((second_unit_iterator->second.second->DefaultStartPos - template_start_pos) * this->Scale));
 								if (second_unit_iterator->second.second->DefaultStartPos.x != -1 && second_unit_iterator->second.second->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
 									unit_player->SetStartView(default_pos, z);
 								} else {

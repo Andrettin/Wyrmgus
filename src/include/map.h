@@ -175,7 +175,7 @@ class CMapTemplate
 {
 public:
 	CMapTemplate() :
-		Width(0), Height(0), TimeOfDaySeconds(DefaultTimeOfDaySeconds), Layer(0), SubtemplatePosition(-1, -1),
+		Width(0), Height(0), Scale(1), TimeOfDaySeconds(DefaultTimeOfDaySeconds), Layer(0), SubtemplatePosition(-1, -1),
 		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), BorderTerrain(NULL), SurroundingTerrain(NULL)
 	{
 	}
@@ -196,6 +196,7 @@ public:
 	std::string OverlayTerrainImage;
 	int Width;
 	int Height;
+	int Scale;													/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
 	int TimeOfDaySeconds;
 	int Layer;													/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	Vec2i SubtemplatePosition;

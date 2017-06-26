@@ -1724,6 +1724,8 @@ static int CclDefineMapTemplate(lua_State *l)
 			map->Width = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Height")) {
 			map->Height = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Scale")) {
+			map->Scale = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TimeOfDaySeconds")) {
 			map->TimeOfDaySeconds = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SubtemplatePosition")) {
