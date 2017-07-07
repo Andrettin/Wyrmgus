@@ -83,7 +83,7 @@ bool CMapField::IsTerrainResourceOnMap(int resource) const
 //		return this->ForestOnMap();
 //	}
 //	return false;
-	return this->GetResource() != -1;
+	return this->GetResource() == resource;
 	//Wyrmgus end
 }
 
