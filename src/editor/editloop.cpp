@@ -297,7 +297,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 		bool has_transitions = terrain->Overlay ? (Map.Field(changed_tiles[i], CurrentMapLayer)->OverlayTransitionTiles.size() > 0) : (Map.Field(changed_tiles[i], CurrentMapLayer)->TransitionTiles.size() > 0);
 		bool solid_tile = true;
 		
-		if (!tile_terrain->AllowSingle) {
+		if (tile_terrain && !tile_terrain->AllowSingle) {
 			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 					if (x_offset != 0 || y_offset != 0) {
