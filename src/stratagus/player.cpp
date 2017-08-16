@@ -1643,7 +1643,7 @@ void CPlayer::SetFaction(CFaction *faction)
 			}
 		}
 		if (settlement_names_changed && unit.Type->BoolFlag[TOWNHALL_INDEX].value && !unit.Unique) {
-			unit.UpdateSettlementName();
+			unit.UpdateSettlement();
 		}
 		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character) {
 			unit.UpdatePersonalName();
@@ -1728,15 +1728,15 @@ bool CPlayer::HasUpgradeClass(std::string upgrade_class_name)
 	return false;
 }
 
-bool CPlayer::HasSettlement(std::string settlement_name) const
+bool CPlayer::HasSettlement(CSettlement *settlement) const
 {
-	if (settlement_name.empty()) {
+	if (!settlement) {
 		return false;
 	}
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (unit.Type->BoolFlag[TOWNHALL_INDEX].value && unit.SettlementName == settlement_name) {
+		if (unit.Type->BoolFlag[TOWNHALL_INDEX].value && unit.Settlement == settlement) {
 			return true;
 		}
 	}

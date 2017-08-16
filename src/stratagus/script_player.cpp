@@ -3244,8 +3244,9 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "HasSettlement")) {
 		LuaCheckArgs(l, 3);
-		std::string settlement_name = LuaToString(l, 3);
-		lua_pushboolean(l, p->HasSettlement(settlement_name));
+		std::string settlement_ident = LuaToString(l, 3);
+		CSettlement *settlement = GetSettlement(settlement_ident);
+		lua_pushboolean(l, p->HasSettlement(settlement));
 		return 1;
 	//Wyrmgus end
 	} else {

@@ -829,9 +829,9 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					first_building = false;
 				}
 				if (type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == settlement_owner) && settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization) != settlement_iterator->second->CulturalNames.end()) { //apply settlement name for the town hall this way, since it may not end exactly on the settlement's assigned spot, and thus end up with a different name
-					std::string old_settlement_name = unit->SettlementName;
-					unit->SettlementName = settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization)->second;
-					unit->UpdateBuildingSettlementAssignment(old_settlement_name);
+					CSettlement *old_settlement = unit->Settlement;
+					unit->Settlement = settlement_iterator->second;
+					unit->UpdateBuildingSettlementAssignment(old_settlement);
 				}
 				if (pathway_type) {
 					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileWidth + 1; ++x) {
@@ -1162,6 +1162,18 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 bool CMapTemplate::IsSubtemplateArea()
 {
 	return this->MainTemplate != NULL;
+}
+
+/**
+**  Get a settlement's cultural name.
+*/
+std::string CSettlement::GetCulturalName(int civilization)
+{
+	if (civilization != -1 && this->CulturalNames.find(civilization) != this->CulturalNames.end()) {
+		return this->CulturalNames[civilization];
+	} else {
+		return this->Name;
+	}
 }
 //Wyrmgus end
 

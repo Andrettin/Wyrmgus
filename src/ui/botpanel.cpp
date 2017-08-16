@@ -453,7 +453,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->SettlementName && !(button.Action == ButtonUnit && !UnitManager.GetSlotUnit(button.Value).SettlementName.empty())) {
+	if (condition->SettlementName && !(button.Action == ButtonUnit && UnitManager.GetSlotUnit(button.Value).Settlement)) {
 		return false;
 	}
 	

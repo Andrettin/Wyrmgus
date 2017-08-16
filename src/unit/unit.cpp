@@ -467,6 +467,7 @@ void CUnit::Init()
 	Stats = NULL;
 	//Wyrmgus start
 	Character = NULL;
+	Settlement = NULL;
 	Trait = NULL;
 	Prefix = NULL;
 	Suffix = NULL;
@@ -486,7 +487,6 @@ void CUnit::Init()
 	Colors = NULL;
 	//Wyrmgus start
 	Name = "";
-	SettlementName = "";
 	Variation = 0;
 	memset(LayerVariation, -1, sizeof(LayerVariation));
 	//Wyrmgus end
@@ -599,6 +599,7 @@ void CUnit::Release(bool final)
 	Type = NULL;
 	//Wyrmgus start
 	Character = NULL;
+	Settlement = NULL;
 	Trait = NULL;
 	Prefix = NULL;
 	Suffix = NULL;
@@ -3111,12 +3112,12 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		}
 	}
 	
-	if (update_settlement_name && (this->Type->BoolFlag[TOWNHALL_INDEX].value || (this->Type->BoolFlag[BUILDING_INDEX].value && this->SettlementName.empty()))) {
-		this->UpdateSettlementName();
+	if (update_settlement_name && (this->Type->BoolFlag[TOWNHALL_INDEX].value || (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Settlement))) {
+		this->UpdateSettlement();
 	}
 }
 
-void CUnit::UpdateSettlementName()
+void CUnit::UpdateSettlement()
 {
 	if (this->Removed) {
 		return;
@@ -3127,34 +3128,24 @@ void CUnit::UpdateSettlementName()
 	}
 	
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
-		std::string old_settlement_name = this->SettlementName;
-		
-		int civilization = this->Type->Civilization;
-		int faction = -1;
-		if (civilization != -1 && this->Type->Faction != -1) {
-			faction = this->Type->Faction;
-		} else if (civilization != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization || this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Race, this->Player->Faction, this->Type->Class))) {
-			civilization = this->Player->Race;
-			faction = this->Player->Faction;
-		}
-		int language = PlayerRaces.GetCivilizationLanguage(civilization);
+		if (!this->Settlement) {
+			int civilization = this->Type->Civilization;
+			if (civilization != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization || this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Race, this->Player->Faction, this->Type->Class))) {
+				civilization = this->Player->Race;
+			}
 
-		// first see if can translate the current personal name
-		std::string new_settlement_name = PlayerRaces.TranslateName(this->SettlementName, language);
-		if (!new_settlement_name.empty()) {
-			this->SettlementName = new_settlement_name;
-		} else {
-			new_settlement_name = Map.GetSettlementName(this->tilePos, this->MapLayer, Vec2i(this->Type->TileWidth, this->Type->TileHeight), civilization, faction);
-			if (!new_settlement_name.empty()) {
-				this->SettlementName = new_settlement_name;
-			} else if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->GetSettlementNames().size() > 0) {
-				this->SettlementName = PlayerRaces.Factions[civilization][faction]->GetSettlementNames()[SyncRand(PlayerRaces.Factions[civilization][faction]->GetSettlementNames().size())];
-			} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->GetSettlementNames().size() > 0) {
-				this->SettlementName = PlayerRaces.Civilizations[civilization]->GetSettlementNames()[SyncRand(PlayerRaces.Civilizations[civilization]->GetSettlementNames().size())];
+			std::vector<CSettlement *> potential_settlements;
+			for (size_t i = 0; i < Settlements.size(); ++i) {
+				if (Settlements[i]->CulturalNames.find(civilization) != Settlements[i]->CulturalNames.end()) {
+					potential_settlements.push_back(Settlements[i]);
+				}
+			}
+			
+			if (potential_settlements.size() > 0) {
+				this->Settlement = potential_settlements[SyncRand(potential_settlements.size())];
+				this->UpdateBuildingSettlementAssignment();
 			}
 		}
-		
-		this->UpdateBuildingSettlementAssignment(old_settlement_name);
 	} else {
 		CUnit *best_hall = NULL;
 		int best_distance = -1;
@@ -3170,24 +3161,24 @@ void CUnit::UpdateSettlementName()
 			}
 		}
 		if (best_hall) {
-			this->SettlementName = best_hall->SettlementName;
+			this->Settlement = best_hall->Settlement;
 		} else {
-			this->SettlementName = "";
+			this->Settlement = NULL;
 		}
 	}
 }
 
-void CUnit::UpdateBuildingSettlementAssignment(std::string old_settlement_name)
+void CUnit::UpdateBuildingSettlementAssignment(CSettlement *old_settlement)
 {
 	for (int i = 0; i < this->Player->GetUnitCount(); ++i) {
 		CUnit *settlement_unit = &this->Player->GetUnit(i);
 		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
 			continue;
 		}
-		if (!old_settlement_name.empty() && settlement_unit->SettlementName != old_settlement_name) {
+		if (old_settlement && settlement_unit->Settlement != old_settlement) {
 			continue;
 		}
-		settlement_unit->UpdateSettlementName();
+		settlement_unit->UpdateSettlement();
 	}
 }
 
@@ -3349,8 +3340,8 @@ void CUnit::Place(const Vec2i &pos, int z)
 
 	//Wyrmgus start
 	if (this->IsAlive()) {
-		if (this->Type->BoolFlag[BUILDING_INDEX].value && (!this->Type->BoolFlag[TOWNHALL_INDEX].value || (!this->Constructed && this->SettlementName.empty()))) {
-			this->UpdateSettlementName(); // update the settlement name of a building when placing it
+		if (this->Type->BoolFlag[BUILDING_INDEX].value && (!this->Type->BoolFlag[TOWNHALL_INDEX].value || (!this->Constructed && !this->Settlement))) {
+			this->UpdateSettlement(); // update the settlement name of a building when placing it
 		}
 		
 		//remove pathways and destroyed walls under buildings
@@ -6021,7 +6012,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
 				continue;
 			}
-			settlement_unit->UpdateSettlementName();
+			settlement_unit->UpdateSettlement();
 		}
 	}
 	//Wyrmgus end

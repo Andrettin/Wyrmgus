@@ -232,6 +232,8 @@ public:
 		MapTemplate(NULL)
 	{
 	}
+	
+	std::string GetCulturalName(int civilization);
 
 	std::string Ident;
 	std::string Name;

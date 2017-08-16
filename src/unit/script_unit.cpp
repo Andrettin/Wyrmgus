@@ -341,8 +341,8 @@ static int CclUnit(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "personal-name")) {
 			unit->Name = LuaToString(l, 2, j + 1);
-		} else if (!strcmp(value, "settlement-name")) {
-			unit->SettlementName = LuaToString(l, 2, j + 1);
+		} else if (!strcmp(value, "settlement")) {
+			unit->Settlement = GetSettlement(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "trait")) {
 			unit->Trait = CUpgrade::Get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "prefix")) {

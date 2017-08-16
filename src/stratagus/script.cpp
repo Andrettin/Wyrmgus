@@ -1342,7 +1342,15 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitSettlementName : // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit);
-			return unit->SettlementName;
+			if (unit != NULL && unit->Settlement != NULL) {
+				int civilization = unit->Type->Civilization;
+				if (civilization != -1 && unit->Player->Faction != -1 && (unit->Player->Race == civilization || unit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Player->Race, unit->Player->Faction, unit->Type->Class))) {
+					civilization = unit->Player->Race;
+				}
+				return unit->Settlement->GetCulturalName(civilization);
+			} else {
+				return std::string("");
+			}
 		case EString_TypeName : // name of the unit type
 			type = s->D.Type;
 			if (type != NULL) {

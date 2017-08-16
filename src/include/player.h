@@ -83,6 +83,9 @@ class CReligion;
 
 class CUnit;
 class CUnitType;
+//Wyrmgus start
+class CSettlement;
+//WYrmgus end
 class PlayerAi;
 class CFile;
 //Wyrmgus start
@@ -229,7 +232,7 @@ public:
 	void SetRandomFaction();
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(std::string upgrade_class_name);
-	bool HasSettlement(std::string settlement_name) const;
+	bool HasSettlement(CSettlement *settlement) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(int title_type, int gender) const;
