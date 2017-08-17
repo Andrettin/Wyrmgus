@@ -366,6 +366,8 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 		CommandBuildBuilding(unit, pos, building, FlushCommands, z);
 		//Wyrmgus end
 		return 1;
+	//Wyrmgus start
+	/*
 	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
 		//Wyrmgus start
@@ -387,6 +389,8 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 				}
 			}
 		}
+	*/
+	//Wyrmgus end
 	}
 	
 	return 0;
