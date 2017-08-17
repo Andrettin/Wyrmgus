@@ -3435,6 +3435,9 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 							unit->SetSpell(replacedUnit.Spell);
 						}
 					}
+					if (replacedUnit.Settlement != NULL) {
+						unit->Settlement = replacedUnit.Settlement;
+					}
 					unit->SetResourcesHeld(resources_held);
 					unit->Variable[GIVERESOURCE_INDEX].Value = resources_held;
 					replacedUnit.Remove(NULL);
@@ -3774,7 +3777,10 @@ void UnitLost(CUnit &unit)
 	CBuildRestrictionOnTop *b = OnTopDetails(*unit.Type, NULL);
 	//Wyrmgus end
 	if (b != NULL) {
-		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
+		//Wyrmgus start
+//		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
+		if (b->ReplaceOnDie && (!type.GivesResource || unit.ResourcesHeld != 0)) {
+		//Wyrmgus end
 			//Wyrmgus start
 //			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
 			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral], unit.MapLayer);
@@ -3784,10 +3790,10 @@ void UnitLost(CUnit &unit)
 			} else {
 				//Wyrmgus start
 //				temp->ResourcesHeld = unit.ResourcesHeld;
+//				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
+//				temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
+//				temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
 				//Wyrmgus end
-				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
-				temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
-				temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
 				//Wyrmgus start
 				if (unit.Unique != NULL) {
 					temp->SetUnique(unit.Unique);
@@ -3802,8 +3808,15 @@ void UnitLost(CUnit &unit)
 						temp->SetSpell(unit.Spell);
 					}
 				}
-				temp->SetResourcesHeld(unit.ResourcesHeld);
-				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
+				if (unit.Settlement != NULL) {
+					temp->Settlement = unit.Settlement;
+				}
+				if (type.GivesResource && unit.ResourcesHeld != 0) {
+					temp->SetResourcesHeld(unit.ResourcesHeld);
+					temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
+					temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
+					temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
+				}
 				//Wyrmgus end
 			}
 		}

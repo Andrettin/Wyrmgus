@@ -1268,6 +1268,7 @@ extern CUnitTypeVar UnitTypeVar;
 //Wyrmgus start
 extern std::vector<std::string> UnitTypeClasses; //list of unit type classes; built with CclDefineUnitType
 extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
+extern CUnitType *SettlementSiteUnitType;
 
 extern std::vector<CSpecies *> Species;
 extern std::vector<CSpeciesGenus *> SpeciesGenuses;

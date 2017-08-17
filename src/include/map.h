@@ -229,7 +229,8 @@ class CSettlement
 public:
 	CSettlement() :
 		Position(-1, -1),
-		MapTemplate(NULL)
+		MapTemplate(NULL),
+		Major(false)
 	{
 	}
 	
@@ -237,6 +238,7 @@ public:
 
 	std::string Ident;
 	std::string Name;
+	bool Major;													/// Whether the settlement is a major one; major settlements have settlement sites, and as such can have town halls
 	Vec2i Position;												/// Position of the settlement in its map template
 	CMapTemplate *MapTemplate;									/// Map template where this settlement is located
 	std::vector<CRegion *> Regions;								/// Regions where this settlement is located

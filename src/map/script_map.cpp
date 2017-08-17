@@ -1870,6 +1870,8 @@ static int CclDefineSettlement(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			settlement->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Major")) {
+			settlement->Major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Position")) {
 			CclGetPos(l, &settlement->Position.x, &settlement->Position.y);
 		} else if (!strcmp(value, "MapTemplate")) {

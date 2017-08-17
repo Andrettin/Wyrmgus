@@ -532,6 +532,7 @@ std::vector<std::string> UnitTypeClasses;
 std::map<std::string, int> UnitTypeClassStringToIndex;
 std::vector<std::string> UpgradeClasses;
 std::map<std::string, int> UpgradeClassStringToIndex;
+CUnitType *SettlementSiteUnitType;
 
 std::vector<CSpecies *> Species;
 std::vector<CSpeciesGenus *> SpeciesGenuses;

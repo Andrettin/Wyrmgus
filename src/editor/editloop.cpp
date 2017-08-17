@@ -512,6 +512,9 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 					unit->SetSpell(replacedUnit.Spell);
 				}
 			}
+			if (replacedUnit.Settlement != NULL) {
+				unit->Settlement = replacedUnit.Settlement;
+			}
 			//Wyrmgus end
 			replacedUnit.Remove(NULL); // Destroy building beneath
 			UnitLost(replacedUnit);

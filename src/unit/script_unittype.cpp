@@ -4335,6 +4335,21 @@ static int CclGetSpeciesGenusData(lua_State *l)
 }
 //Wyrmgus end
 
+//Wyrmgus start
+/**
+**  Define settlement site unit
+**
+**  @param l  Lua state.
+*/
+static int CclSetSettlementSiteUnit(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	SettlementSiteUnitType = UnitTypeByIdent(LuaToString(l, 1));
+
+	return 0;
+}
+//Wyrmgus end
+
 /**
 **  Set the map default stat for a unit type
 **
@@ -4711,6 +4726,7 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "GetSpecies", CclGetSpecies);
 	lua_register(Lua, "GetSpeciesData", CclGetSpeciesData);
 	lua_register(Lua, "GetSpeciesGenusData", CclGetSpeciesGenusData);
+	lua_register(Lua, "SetSettlementSiteUnit", CclSetSettlementSiteUnit);
 	lua_register(Lua, "SetModTrains", CclSetModTrains);
 	lua_register(Lua, "SetModAiDrops", CclSetModAiDrops);
 	//Wyrmgus end

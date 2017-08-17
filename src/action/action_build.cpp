@@ -467,6 +467,9 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 					build->SetSpell(ontop.Spell);
 				}
 			}
+			if (ontop.Settlement != NULL) {
+				build->Settlement = ontop.Settlement;
+			}
 			build->SetResourcesHeld(resources_held);
 			build->Variable[GIVERESOURCE_INDEX].Value = resources_held;
 			//Wyrmgus end

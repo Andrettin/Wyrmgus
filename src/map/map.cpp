@@ -708,6 +708,12 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			Map.CulturalSettlementNames[z][std::tuple<int, int, int>(settlement_pos.x, settlement_pos.y, cultural_name_iterator->first)] = cultural_name_iterator->second;
 		}
 		
+		if (settlement_iterator->second->Major && SettlementSiteUnitType) { //add a settlement site for major settlements
+			Vec2i unit_offset((SettlementSiteUnitType->TileWidth - 1) / 2, (SettlementSiteUnitType->TileHeight - 1) / 2);
+			CUnit *unit = CreateUnit(settlement_pos - unit_offset, *SettlementSiteUnitType, &Players[PlayerNumNeutral], z);
+			unit->Settlement = settlement_iterator->second;
+		}
+		
 		for (size_t j = 0; j < settlement_iterator->second->HistoricalResources.size(); ++j) {
 			if (
 				CurrentCampaign->StartDate.ContainsDate(std::get<0>(settlement_iterator->second->HistoricalResources[j]))
@@ -800,6 +806,10 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 				if (type->TerrainType) {
 					continue;
 				}
+				if (type->BoolFlag[TOWNHALL_INDEX].value && !settlement_iterator->second->Major) {
+					fprintf(stderr, "Error in CMap::ApplySettlements (settlement ident \"%s\"): settlement has a town hall, but isn't set as a major one.\n", settlement_iterator->second->Ident.c_str());
+					continue;
+				}
 				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
 				CUnit *unit = NULL;
 				if (building_owner) {
@@ -829,9 +839,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					first_building = false;
 				}
 				if (type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == settlement_owner) && settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization) != settlement_iterator->second->CulturalNames.end()) { //apply settlement name for the town hall this way, since it may not end exactly on the settlement's assigned spot, and thus end up with a different name
-					CSettlement *old_settlement = unit->Settlement;
-					unit->Settlement = settlement_iterator->second;
-					unit->UpdateBuildingSettlementAssignment(old_settlement);
+					unit->UpdateBuildingSettlementAssignment();
 				}
 				if (pathway_type) {
 					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileWidth + 1; ++x) {
