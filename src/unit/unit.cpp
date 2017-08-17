@@ -1870,7 +1870,8 @@ void CUnit::GenerateDrop()
 	}
 		
 	if (chosen_drop != NULL) {
-		if ((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos, this->MapLayer)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
+		CBuildRestrictionOnTop *ontop_b = OnTopDetails(*this->Type, NULL);
+		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos, this->MapLayer)->Flags & MapFieldItem)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
 			Vec2i resPos;
 			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer);
 			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, &Players[PlayerNumNeutral], this->MapLayer);

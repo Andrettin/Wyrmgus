@@ -47,6 +47,7 @@
 #include "action/action_train.h"
 #include "actions.h"
 //Wyrmgus start
+#include "../ai/ai_local.h" //for using AiHelpers
 #include "character.h"
 //Wyrmgus end
 #include "commands.h"
@@ -437,6 +438,24 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 		SendCommandUse(unit, *dest, flush);
 		return true;
+	}
+	
+	//Wyrmgus start
+	//if the clicked unit is a settlement site, build on it
+	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
+		for (size_t z = 0; z < UnitTypes.size(); ++z) {
+			if (UnitTypes[z] && UnitTypes[z]->BoolFlag[TOWNHALL_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest->tilePos, 1, false, dest->MapLayer)) {
+				if (UnitTypes[z]->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[UnitTypes[z]->Slot].begin(), AiHelpers.Build[UnitTypes[z]->Slot].end(), unit.Type) != AiHelpers.Build[UnitTypes[z]->Slot].end()) {
+					dest->Blink = 4;
+					SendCommandBuildBuilding(unit, dest->tilePos, *UnitTypes[z], flush, dest->MapLayer);
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceBuild);
+						acknowledged = 1;
+					}
+					return true;
+				}
+			}
+		}
 	}
 	//Wyrmgus end
 	// Follow another unit

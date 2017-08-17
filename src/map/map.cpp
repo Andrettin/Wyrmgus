@@ -2868,6 +2868,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 	CMapField &mf = *this->Field(pos, z);
 	
 	int new_owner = -1;
+	bool must_have_no_owner = false;
 	
 	if (mf.Flags & MapFieldBuilding) { //make sure the place a building is located is set to be owned by its player; this is necessary for scenarios, since when they start buildings could be on another player's territory (i.e. if a farm starts next to a town hall)
 		const CUnitCache &cache = mf.UnitCache;
@@ -2876,14 +2877,19 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 			if (!unit) {
 				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit in the tile's unit cache is NULL.\n", pos.x, pos.y);
 			}
-			if (unit->IsAliveOnMap() && unit->Type->BoolFlag[BUILDING_INDEX].value && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
-				new_owner = unit->Player->Index;
-				break;
+			if (unit->IsAliveOnMap() && unit->Type->BoolFlag[BUILDING_INDEX].value) {
+				if (unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value && unit->Player->Index != PlayerNumNeutral) {
+					new_owner = unit->Player->Index;
+					break;
+				} else if (unit->Player->Index == PlayerNumNeutral && (unit->Type == SettlementSiteUnitType || (unit->Type->GivesResource && !unit->Type->BoolFlag[CANHARVEST_INDEX].value))) { //there cannot be an owner for the tile of a (neutral) settlement site or deposit, otherwise players might not be able to build over them
+					must_have_no_owner = true;
+					break;
+				}
 			}
 		}
 	}
 
-	if (new_owner == -1) { //if no building is on the tile, set it to the first unit to have influence on it, if that isn't blocked by an obstacle
+	if (new_owner == -1 && !must_have_no_owner) { //if no building is on the tile, set it to the first unit to have influence on it, if that isn't blocked by an obstacle
 		std::vector<unsigned long> obstacle_flags;
 		obstacle_flags.push_back(MapFieldCoastAllowed);
 		obstacle_flags.push_back(MapFieldUnpassable);
