@@ -544,6 +544,7 @@ public:
 	std::vector<std::map<std::tuple<int, int, int>, std::string>> CulturalSettlementNames;
 	std::vector<std::map<std::tuple<int, int, CFaction *>, std::string>> FactionCulturalSettlementNames;
 	std::map<int, std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>>> SubtemplateAreas;
+	std::vector<CUnit *> SettlementUnits;	/// the town hall / settlement site units
 	//Wyrmgus end
 
 	CMapInfo Info;             /// descriptive information

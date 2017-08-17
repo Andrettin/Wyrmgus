@@ -712,6 +712,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			Vec2i unit_offset((SettlementSiteUnitType->TileWidth - 1) / 2, (SettlementSiteUnitType->TileHeight - 1) / 2);
 			CUnit *unit = CreateUnit(settlement_pos - unit_offset, *SettlementSiteUnitType, &Players[PlayerNumNeutral], z);
 			unit->Settlement = settlement_iterator->second;
+			Map.SettlementUnits.push_back(unit);
 		}
 		
 		for (size_t j = 0; j < settlement_iterator->second->HistoricalResources.size(); ++j) {
@@ -2103,6 +2104,7 @@ void CMap::Clean()
 	this->LayerConnectors.clear();
 	this->CulturalSettlementNames.clear();
 	this->FactionCulturalSettlementNames.clear();
+	this->SettlementUnits.clear();
 	//Wyrmgus end
 
 	// Tileset freed by Tileset?

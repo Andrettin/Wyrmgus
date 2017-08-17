@@ -3144,6 +3144,7 @@ void CUnit::UpdateSettlement()
 			
 			if (potential_settlements.size() > 0) {
 				this->Settlement = potential_settlements[SyncRand(potential_settlements.size())];
+				Map.SettlementUnits.push_back(this);
 				this->UpdateBuildingSettlementAssignment();
 			}
 		}
@@ -3438,6 +3439,8 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 					}
 					if (replacedUnit.Settlement != NULL) {
 						unit->Settlement = replacedUnit.Settlement;
+						Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &replacedUnit), Map.SettlementUnits.end());
+						Map.SettlementUnits.push_back(unit);
 					}
 					unit->SetResourcesHeld(resources_held);
 					unit->Variable[GIVERESOURCE_INDEX].Value = resources_held;
@@ -3811,6 +3814,8 @@ void UnitLost(CUnit &unit)
 				}
 				if (unit.Settlement != NULL) {
 					temp->Settlement = unit.Settlement;
+					Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &unit), Map.SettlementUnits.end());
+					Map.SettlementUnits.push_back(temp);
 				}
 				if (type.GivesResource && unit.ResourcesHeld != 0) {
 					temp->SetResourcesHeld(unit.ResourcesHeld);

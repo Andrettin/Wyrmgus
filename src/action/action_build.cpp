@@ -469,6 +469,8 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 			}
 			if (ontop.Settlement != NULL) {
 				build->Settlement = ontop.Settlement;
+				Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &ontop), Map.SettlementUnits.end());
+				Map.SettlementUnits.push_back(build);
 			}
 			build->SetResourcesHeld(resources_held);
 			build->Variable[GIVERESOURCE_INDEX].Value = resources_held;
