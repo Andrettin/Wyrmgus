@@ -1224,6 +1224,15 @@ void CPlayer::Save(CFile &file) const
 		file.printf("%d,", std::get<2>(p.QuestGatherResources[j]));
 	}
 	file.printf("},");
+	
+	file.printf("\n  \"modifiers\", {");
+	for (size_t j = 0; j < p.Modifiers.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\", %d,", p.Modifiers[j].first->Ident.c_str(), p.Modifiers[j].second);
+	}
+	file.printf("},");
 	//Wyrmgus end
 
 	// UnitColors done by init code.
@@ -2037,6 +2046,7 @@ void CPlayer::Clear()
 	this->QuestDestroyUniques.clear();
 	this->QuestDestroyFactions.clear();
 	this->QuestGatherResources.clear();
+	this->Modifiers.clear();
 	//Wyrmgus end
 	AiEnabled = false;
 	//Wyrmgus start
@@ -2605,6 +2615,35 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 	}
 	
 	return "";
+}
+
+void CPlayer::AddModifier(CUpgrade *modifier, int cycles)
+{
+	if (this->Allow.Upgrades[modifier->ID] == 'R') {
+		for (size_t i = 0; i < this->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
+			if (this->Modifiers[i].first == modifier) {
+				this->Modifiers[i].second = std::max(this->Modifiers[i].second, (int) (GameCycle + cycles));
+			}
+		}
+	} else {
+		this->Modifiers.push_back(std::pair<CUpgrade *, int>(modifier, GameCycle + cycles));
+		UpgradeAcquire(*this, modifier);
+	}
+	
+}
+
+void CPlayer::RemoveModifier(CUpgrade *modifier)
+{
+	if (this->Allow.Upgrades[modifier->ID] == 'R') {
+		UpgradeLost(*this, modifier->ID);
+		for (size_t i = 0; i < this->Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
+			if (this->Modifiers[i].first == modifier) {
+				this->Modifiers.erase(std::remove(this->Modifiers.begin(), this->Modifiers.end(), this->Modifiers[i]), this->Modifiers.end());
+				break;
+			}
+		}
+	}
+	
 }
 
 bool CPlayer::AtPeace() const
@@ -3178,6 +3217,14 @@ void PlayersEachCycle()
 				} else {
 					Players[j].Notify("%s", _("Your units have been revealed!"));
 				}
+			}
+		}
+		
+		
+		for (size_t i = 0; i < p.Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
+			if (p.Modifiers[i].second < GameCycle) {
+				p.RemoveModifier(p.Modifiers[i].first); //only remove one modifier per cycle, to prevent too many upgrade changes from happening at the same cycle (for performance reasons)
+				break;
 			}
 		}
 		//Wyrmgus end

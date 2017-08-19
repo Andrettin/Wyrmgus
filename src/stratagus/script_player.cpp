@@ -525,6 +525,19 @@ void CPlayer::Load(lua_State *l)
 					this->QuestGatherResources.push_back(std::tuple<CQuest *, int, int>(quest, resource, quantity));
 				}
 			}
+		} else if (!strcmp(value, "modifiers")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				CUpgrade *modifier_upgrade = CUpgrade::Get(LuaToString(l, j + 1, k + 1));
+				++k;
+				int end_cycle = LuaToNumber(l, j + 1, k + 1);
+				if (modifier_upgrade) {
+					this->Modifiers.push_back(std::pair<CUpgrade *, int>(modifier_upgrade, end_cycle));
+				}
+			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "timers")) {
 			if (!lua_istable(l, j + 1)) {
@@ -3409,6 +3422,13 @@ static int CclSetPlayerData(lua_State *l)
 		CQuest *quest = GetQuest(LuaToString(l, 3));
 		if (quest) {
 			p->FailQuest(quest);
+		}
+	} else if (!strcmp(data, "AddModifier")) {
+		LuaCheckArgs(l, 4);
+		CUpgrade *modifier_upgrade = CUpgrade::Get(LuaToString(l, 3));
+		int cycles = LuaToNumber(l, 4);
+		if (modifier_upgrade) {
+			p->AddModifier(modifier_upgrade, cycles);
 		}
 	//Wyrmgus end
 	} else {
