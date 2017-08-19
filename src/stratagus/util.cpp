@@ -79,9 +79,9 @@ void InitSyncRand()
 		SyncRand(timeinfo->tm_year);
 		SyncRand(timeinfo->tm_mon);
 		SyncRand(timeinfo->tm_mday);
-		SyncRand(timeinfo->tm_hour);
-		SyncRand(timeinfo->tm_min);
-		SyncRand(timeinfo->tm_sec);
+		SyncRand(timeinfo->tm_hour ? timeinfo->tm_hour : 1);
+		SyncRand(timeinfo->tm_min ? timeinfo->tm_min : 1);
+		SyncRand(timeinfo->tm_sec ? timeinfo->tm_sec : 1);
 	}
 	//Wyrmgus end
 }
