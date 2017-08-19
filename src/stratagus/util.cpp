@@ -31,11 +31,18 @@
 
 #include "util.h"
 
+//Wyrmgus start
+#include "network.h"
+//Wyrmgus end
+
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+//Wyrmgus start
+#include <time.h>
+//Wyrmgus end
 
 #ifdef WIN32
 #include <windows.h>
@@ -64,6 +71,19 @@ unsigned SyncRandSeed;				/// sync random seed value.
 void InitSyncRand()
 {
 	SyncRandSeed = 0x87654321;
+	//Wyrmgus start
+	if (!IsNetworkGame()) { //if isn't a network game, make the seed vary according to the computer's date and time
+		time_t time_curr;
+		time(&time_curr);
+		const struct tm *timeinfo = localtime(&time_curr);
+		SyncRand(timeinfo->tm_year);
+		SyncRand(timeinfo->tm_mon);
+		SyncRand(timeinfo->tm_mday);
+		SyncRand(timeinfo->tm_hour);
+		SyncRand(timeinfo->tm_min);
+		SyncRand(timeinfo->tm_sec);
+	}
+	//Wyrmgus end
 }
 
 /**
