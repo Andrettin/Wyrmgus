@@ -381,6 +381,7 @@ public:
 	void CalculateTileLandmass(const Vec2i &pos, int z);
 	void CalculateTileOwnership(const Vec2i &pos, int z);
 	void CalculateTileOwnershipTransition(const Vec2i &pos, int z);
+	void AdjustMap();
 	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline, int z);

@@ -21,6 +21,10 @@ class CMap
 {
 	CMapInfo Info;
 	CTileset *Tileset;
+	
+	//Wyrmgus start
+	void AdjustMap();
+	//Wyrmgus end
 };
 
 extern CMap Map;

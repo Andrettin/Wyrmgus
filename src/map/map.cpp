@@ -2995,6 +2995,20 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 	}
 }
 
+void CMap::AdjustMap()
+{
+	for (size_t z = 0; z < this->Fields.size(); ++z) {
+		Vec2i map_start_pos(0, 0);
+		Vec2i map_end(this->Info.MapWidths[z], this->Info.MapHeights[z]);
+		
+		this->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		this->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+		this->AdjustTileMapTransitions(map_start_pos, map_end, z);
+		this->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		this->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+	}
+}
+
 void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z)
 {
 	bool no_irregularities_found = false;
