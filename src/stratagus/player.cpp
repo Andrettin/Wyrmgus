@@ -1577,10 +1577,8 @@ void CPlayer::SetFaction(CFaction *faction)
 	
 	bool personal_names_changed = true;
 	bool ship_names_changed = true;
-	bool settlement_names_changed = true;
 	if (this->Faction != -1 && faction_id != -1) {
 		ship_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->GetShipNames() != PlayerRaces.Factions[this->Race][faction_id]->GetShipNames();
-		settlement_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->GetSettlementNames() != PlayerRaces.Factions[this->Race][faction_id]->GetSettlementNames();
 		personal_names_changed = false; // setting to a faction of the same civilization
 	}
 	
@@ -1650,9 +1648,6 @@ void CPlayer::SetFaction(CFaction *faction)
 			if (!unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->UnitType == UnitTypeNaval && ship_names_changed) {
 				unit.UpdatePersonalName();
 			}
-		}
-		if (settlement_names_changed && unit.Type->BoolFlag[TOWNHALL_INDEX].value && !unit.Unique) {
-			unit.UpdateSettlement();
 		}
 		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character) {
 			unit.UpdatePersonalName();

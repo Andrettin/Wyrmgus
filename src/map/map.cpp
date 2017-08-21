@@ -839,7 +839,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					}
 					first_building = false;
 				}
-				if (type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == settlement_owner) && settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization) != settlement_iterator->second->CulturalNames.end()) { //apply settlement name for the town hall this way, since it may not end exactly on the settlement's assigned spot, and thus end up with a different name
+				if (type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == settlement_owner) && settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization) != settlement_iterator->second->CulturalNames.end()) {
 					unit->UpdateBuildingSettlementAssignment();
 				}
 				if (pathway_type) {

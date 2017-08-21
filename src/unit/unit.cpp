@@ -3145,15 +3145,20 @@ void CUnit::UpdateSettlement()
 			if (potential_settlements.size() > 0) {
 				this->Settlement = potential_settlements[SyncRand(potential_settlements.size())];
 				Map.SettlementUnits.push_back(this);
-				this->UpdateBuildingSettlementAssignment();
 			}
+		}
+		if (this->Settlement) {
+			this->UpdateBuildingSettlementAssignment();
 		}
 	} else {
 		CUnit *best_hall = NULL;
 		int best_distance = -1;
-		for (int i = 0; i < this->Player->GetUnitCount(); ++i) {
-			CUnit *settlement_unit = &this->Player->GetUnit(i);
-			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
+		for (size_t i = 0; i < Map.SettlementUnits.size(); ++i) {
+			CUnit *settlement_unit = Map.SettlementUnits[i];
+			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || this->MapLayer != settlement_unit->MapLayer) {
+				continue;
+			}
+			if (!this->Player->HasNeutralFactionType() && this->Player != settlement_unit->Player) {
 				continue;
 			}
 			int distance = this->MapDistanceTo(*settlement_unit);
@@ -3172,15 +3177,20 @@ void CUnit::UpdateSettlement()
 
 void CUnit::UpdateBuildingSettlementAssignment(CSettlement *old_settlement)
 {
-	for (int i = 0; i < this->Player->GetUnitCount(); ++i) {
-		CUnit *settlement_unit = &this->Player->GetUnit(i);
-		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
+	for (int p = 0; p < PlayerMax; ++p) {
+		if (!Players[p].HasNeutralFactionType() && this->Player->Index != Players[p].Index) {
 			continue;
 		}
-		if (old_settlement && settlement_unit->Settlement != old_settlement) {
-			continue;
+		for (int i = 0; i < Players[p].GetUnitCount(); ++i) {
+			CUnit *settlement_unit = &Players[p].GetUnit(i);
+			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || this->MapLayer != settlement_unit->MapLayer) {
+				continue;
+			}
+			if (old_settlement && settlement_unit->Settlement != old_settlement) {
+				continue;
+			}
+			settlement_unit->UpdateSettlement();
 		}
-		settlement_unit->UpdateSettlement();
 	}
 }
 
@@ -3342,7 +3352,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 
 	//Wyrmgus start
 	if (this->IsAlive()) {
-		if (this->Type->BoolFlag[BUILDING_INDEX].value && (!this->Type->BoolFlag[TOWNHALL_INDEX].value || (!this->Constructed && !this->Settlement))) {
+		if (this->Type->BoolFlag[BUILDING_INDEX].value) {
 			this->UpdateSettlement(); // update the settlement name of a building when placing it
 		}
 		
@@ -6025,14 +6035,8 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	MapMarkUnitSight(unit);
 	
 	//Wyrmgus start
-	if (type->BoolFlag[TOWNHALL_INDEX].value) {
-		for (int i = 0; i < unit.Player->GetUnitCount(); ++i) {
-			CUnit *settlement_unit = &unit.Player->GetUnit(i);
-			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
-				continue;
-			}
-			settlement_unit->UpdateSettlement();
-		}
+	if (unit.Settlement) {
+		unit.UpdateBuildingSettlementAssignment(unit.Settlement);
 	}
 	//Wyrmgus end
 	
