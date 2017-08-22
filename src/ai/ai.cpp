@@ -1600,6 +1600,8 @@ void AiEachMinute(CPlayer &player)
 		AiPlayer->Scouting = false;
 	}
 	
+	AiCheckSettlementConstruction();
+	
 	AiCheckTransporters();
 	
 	AiForceManagerEachMinute();

@@ -326,7 +326,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	table.resize(num);	
 	
 	CUnit *near_unit = NULL;
-	if (building.TerrainType) { //terrain type units have a particular place to be built, so we need to find the worker with a terrain traversal
+	if (building.TerrainType || building.BoolFlag[TOWNHALL_INDEX].value) { //terrain type units and town halls have a particular place to be built, so we need to find the worker with a terrain traversal
 		TerrainTraversal terrainTraversal;
 
 		terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
@@ -334,8 +334,14 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 
 		terrainTraversal.PushPos(nearPos);
 
-		const int maxRange = 15;
-		const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
+		int maxRange = 15;
+		if (building.BoolFlag[TOWNHALL_INDEX].value) { //for settlements, look farther for builders
+			maxRange = 9999;
+		}
+		int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
+		if (OnTopDetails(building, NULL)) { //if the building is built on top of something else, make sure the building it is built on top of doesn't block the movemask
+			movemask &= ~(MapFieldBuilding);
+		}
 		UnitFinder unitFinder(*AiPlayer->Player, table, maxRange, movemask, &near_unit, z);
 
 		terrainTraversal.Run(unitFinder);
@@ -2236,6 +2242,104 @@ static void AiCheckPathwayConstruction()
 	}
 		
 	AiPlayer->LastPathwayConstructionBuilding = 0;
+}
+
+/**
+**  Check if the AI can build a settlement.
+*/
+void AiCheckSettlementConstruction()
+{
+	int town_hall_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Race, AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("town-hall"));			
+	if (town_hall_type_id == -1) {
+		return;
+	}
+	
+	CUnitType *town_hall_type = UnitTypes[town_hall_type_id];
+	
+	if (!CheckDependByType(*AiPlayer->Player, *town_hall_type)) {
+		return;
+	}
+							
+	const int resourceNeeded = AiCheckUnitTypeCosts(*town_hall_type);
+	if (resourceNeeded) {
+		return;
+	}
+	
+	int n_t = AiHelpers.Build.size();
+	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
+	if (town_hall_type->Slot > n_t) { // Oops not known.
+		DebugPrint("%d: AiCheckPathwayConstruction I: Nothing known about '%s'\n"
+				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
+		return;
+	}
+		
+	std::vector<CUnitType *> &table = tablep[town_hall_type->Slot];
+	if (table.empty()) { // Oops not known.
+		DebugPrint("%d: AiCheckPathwayConstruction II: Nothing known about '%s'\n"
+				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
+		return;
+	}
+
+	//check in which landmasses this player has workers
+	std::vector<int> worker_landmasses;
+
+	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+	for (unsigned int i = 0; i < tablep[town_hall_type->Slot].size(); ++i) {
+		if (unit_count[tablep[town_hall_type->Slot][i]->Slot]) {
+			std::vector<CUnit *> worker_table;
+
+			FindPlayerUnitsByType(*AiPlayer->Player, *tablep[town_hall_type->Slot][i], worker_table, true);
+
+			for (size_t j = 0; j != worker_table.size(); ++j) {
+				int worker_landmass = Map.GetTileLandmass(worker_table[j]->tilePos, worker_table[j]->MapLayer);
+				if (std::find(worker_landmasses.begin(), worker_landmasses.end(), worker_landmass) == worker_landmasses.end()) {
+					worker_landmasses.push_back(worker_landmass);
+				}
+			}
+		}
+	}
+						
+	//check settlement units to see if can build in one
+	for (size_t i = 0; i < Map.SettlementUnits.size(); ++i) {
+		CUnit *settlement_unit = Map.SettlementUnits[i];
+		
+		if (settlement_unit->Player->Index != PlayerNumNeutral) {
+			continue;
+		}
+		
+		if (!settlement_unit->IsVisibleAsGoal(*AiPlayer->Player)) {
+			continue;
+		}
+		
+		int settlement_landmass = Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer);
+		if (std::find(worker_landmasses.begin(), worker_landmasses.end(), settlement_landmass) == worker_landmasses.end()) {
+			continue;
+		}
+		if (!CanBuildHere(NULL, *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer)) {
+			continue;
+		}
+		
+		bool built_settlement = false;
+		//
+		// Find a free worker who can build a settlement on this site
+		//
+		const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+		for (unsigned int j = 0; j < tablep[town_hall_type->Slot].size(); ++j) {
+			//
+			// The type is available
+			//
+			if (unit_count[tablep[town_hall_type->Slot][j]->Slot]) {
+				if (AiBuildBuilding(*tablep[town_hall_type->Slot][j], *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer)) {
+					built_settlement = true;
+					break;
+				}
+			}
+		}
+		
+		if (built_settlement) {
+			break;
+		}
+	}
 }
 //Wyrmgus end
 
