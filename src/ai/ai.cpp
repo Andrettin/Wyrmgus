@@ -838,6 +838,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 	if (
 		(type.GivesResource && type.BoolFlag[CANHARVEST_INDEX].value && type.GivesResource != TradeCost) //don't reduce refineries from the build request, they should be built dynamically via the resource gathering code without being requested
 		|| type.TerrainType // tile units are built without requests
+		|| type.BoolFlag[TOWNHALL_INDEX].value // town halls are built without requests
 	) {
 		return;
 	}
@@ -909,6 +910,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass)
 	if (
 		(type.GivesResource && type.BoolFlag[CANHARVEST_INDEX].value && type.GivesResource != TradeCost) //don't reduce refineries from the build request, they should be built dynamically via the resource gathering code without being requested
 		|| type.TerrainType // tile units are built without requests
+		|| type.BoolFlag[TOWNHALL_INDEX].value // town halls are built without requests
 	) {
 		return;
 	}
