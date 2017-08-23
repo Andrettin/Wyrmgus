@@ -3559,56 +3559,64 @@ void DeleteModFaction(std::string civilization_name, std::string faction_name)
 	}
 }
 
+void DeleteModUnitType(std::string unit_type_ident)
+{
+	CUnitType *unit_type = UnitTypeByIdent(unit_type_ident.c_str());
+	
+	if (Editor.Running == EditorEditing) {
+		Editor.UnitTypes.erase(std::remove(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), unit_type->Ident), Editor.UnitTypes.end());
+		RecalculateShownUnits();
+	}
+	for (int j = 0; j < MAX_RACES; ++j) {
+		for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[j].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[j].rend(); ++iterator) {
+			if (iterator->second == unit_type->Slot) {
+				PlayerRaces.CivilizationClassUnitTypes[j].erase(iterator->first);
+			}
+		}
+		for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
+			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[j][k]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[j][k]->ClassUnitTypes.rend(); ++iterator) {
+				if (iterator->second == unit_type->Slot) {
+					PlayerRaces.Factions[j][k]->ClassUnitTypes.erase(iterator->first);
+				}
+			}
+		}
+	}
+	for (size_t j = 0; j < UnitTypes.size(); ++j) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
+		if (std::find(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), unit_type) != UnitTypes[j]->Trains.end()) {
+			UnitTypes[j]->Trains.erase(std::remove(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), unit_type), UnitTypes[j]->Trains.end());
+		}
+		if (std::find(UnitTypes[j]->TrainedBy.begin(), UnitTypes[j]->TrainedBy.end(), unit_type) != UnitTypes[j]->TrainedBy.end()) {
+			UnitTypes[j]->TrainedBy.erase(std::remove(UnitTypes[j]->TrainedBy.begin(), UnitTypes[j]->TrainedBy.end(), unit_type), UnitTypes[j]->TrainedBy.end());
+		}
+		if (std::find(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), unit_type) != UnitTypes[j]->Drops.end()) {
+			UnitTypes[j]->Drops.erase(std::remove(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), unit_type), UnitTypes[j]->Drops.end());
+		}
+		if (std::find(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), unit_type) != UnitTypes[j]->AiDrops.end()) {
+			UnitTypes[j]->AiDrops.erase(std::remove(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), unit_type), UnitTypes[j]->AiDrops.end());
+		}
+	}
+	int buttons_size = UnitButtonTable.size();
+	for (int j = (buttons_size - 1); j >= 0; --j) {
+		if (UnitButtonTable[j]->UnitMask.find(unit_type->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of buttons
+			UnitButtonTable[j]->UnitMask = FindAndReplaceString(UnitButtonTable[j]->UnitMask, unit_type->Ident + ",", "");
+		}
+		if (UnitButtonTable[j]->Value == unit_type->Slot && UnitButtonTable[j]->ValueStr == unit_type->Ident) {
+			delete UnitButtonTable[j];
+			UnitButtonTable.erase(std::remove(UnitButtonTable.begin(), UnitButtonTable.end(), UnitButtonTable[j]), UnitButtonTable.end());
+		}
+	}
+	UnitTypeMap.erase(unit_type->Ident);
+	delete unit_type;
+	UnitTypes.erase(std::remove(UnitTypes.begin(), UnitTypes.end(), unit_type), UnitTypes.end());
+}
+
 void DisableMod(std::string mod_file)
 {
 	int unit_types_size = UnitTypes.size();
 	for (int i = (unit_types_size - 1); i >= 0; --i) {
+		
 		if (UnitTypes[i]->Mod == mod_file) {
-			if (Editor.Running == EditorEditing) {
-				Editor.UnitTypes.erase(std::remove(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), UnitTypes[i]->Ident), Editor.UnitTypes.end());
-				RecalculateShownUnits();
-			}
-			for (int j = 0; j < MAX_RACES; ++j) {
-				for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[j].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[j].rend(); ++iterator) {
-					if (iterator->second == UnitTypes[i]->Slot) {
-						PlayerRaces.CivilizationClassUnitTypes[j].erase(iterator->first);
-					}
-				}
-				for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
-					for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[j][k]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[j][k]->ClassUnitTypes.rend(); ++iterator) {
-						if (iterator->second == UnitTypes[i]->Slot) {
-							PlayerRaces.Factions[j][k]->ClassUnitTypes.erase(iterator->first);
-						}
-					}
-				}
-			}
-			for (size_t j = 0; j < UnitTypes.size(); ++j) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
-				if (std::find(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), UnitTypes[i]) != UnitTypes[j]->Trains.end()) {
-					UnitTypes[j]->Trains.erase(std::remove(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), UnitTypes[i]), UnitTypes[j]->Trains.end());
-				}
-				if (std::find(UnitTypes[j]->TrainedBy.begin(), UnitTypes[j]->TrainedBy.end(), UnitTypes[i]) != UnitTypes[j]->TrainedBy.end()) {
-					UnitTypes[j]->TrainedBy.erase(std::remove(UnitTypes[j]->TrainedBy.begin(), UnitTypes[j]->TrainedBy.end(), UnitTypes[i]), UnitTypes[j]->TrainedBy.end());
-				}
-				if (std::find(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), UnitTypes[i]) != UnitTypes[j]->Drops.end()) {
-					UnitTypes[j]->Drops.erase(std::remove(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), UnitTypes[i]), UnitTypes[j]->Drops.end());
-				}
-				if (std::find(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), UnitTypes[i]) != UnitTypes[j]->AiDrops.end()) {
-					UnitTypes[j]->AiDrops.erase(std::remove(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), UnitTypes[i]), UnitTypes[j]->AiDrops.end());
-				}
-			}
-			int buttons_size = UnitButtonTable.size();
-			for (int j = (buttons_size - 1); j >= 0; --j) {
-				if (UnitButtonTable[j]->UnitMask.find(UnitTypes[i]->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of buttons
-					UnitButtonTable[j]->UnitMask = FindAndReplaceString(UnitButtonTable[j]->UnitMask, UnitTypes[i]->Ident + ",", "");
-				}
-				if (UnitButtonTable[j]->Value == UnitTypes[i]->Slot && UnitButtonTable[j]->ValueStr == UnitTypes[i]->Ident) {
-					delete UnitButtonTable[j];
-					UnitButtonTable.erase(std::remove(UnitButtonTable.begin(), UnitButtonTable.end(), UnitButtonTable[j]), UnitButtonTable.end());
-				}
-			}
-			UnitTypeMap.erase(UnitTypes[i]->Ident);
-			delete UnitTypes[i];
-			UnitTypes.erase(std::remove(UnitTypes.begin(), UnitTypes.end(), UnitTypes[i]), UnitTypes.end());
+			DeleteModUnitType(UnitTypes[i]->Ident);
 		}
 	}
 		
