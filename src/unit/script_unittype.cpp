@@ -2744,6 +2744,11 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Image")) {
 		lua_pushstring(l, type->File.c_str());
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(data, "Shadow")) {
+		lua_pushstring(l, type->ShadowFile.c_str());
+		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "Width")) {
 		lua_pushnumber(l, type->Width);
 		return 1;
