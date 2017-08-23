@@ -64,6 +64,7 @@
 #include "ui.h"
 #include "unit.h"
 //Wyrmgus start
+#include "unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unittype.h"
 //Wyrmgus end
 
@@ -3564,6 +3565,19 @@ void DeleteModUnitType(std::string unit_type_ident)
 	CUnitType *unit_type = UnitTypeByIdent(unit_type_ident.c_str());
 	
 	if (Editor.Running == EditorEditing) {
+		std::vector<CUnit *> units_to_remove;
+
+		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+			CUnit *unit = *it;
+
+			if (unit->Type == unit_type) {
+				units_to_remove.push_back(unit);
+			}
+		}
+		
+		for (size_t i = 0; i < units_to_remove.size(); ++i) {
+			EditorActionRemoveUnit(*units_to_remove[i], false);
+		}
 		Editor.UnitTypes.erase(std::remove(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), unit_type->Ident), Editor.UnitTypes.end());
 		RecalculateShownUnits();
 	}
