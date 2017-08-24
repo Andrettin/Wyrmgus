@@ -3154,6 +3154,10 @@ void CUnit::UpdateSettlement()
 			this->UpdateBuildingSettlementAssignment();
 		}
 	} else {
+		if (this->Player->Index == PlayerNumNeutral) {
+			return;
+		}
+		
 		CUnit *best_hall = NULL;
 		int best_distance = -1;
 		for (size_t i = 0; i < Map.SettlementUnits.size(); ++i) {
@@ -3180,6 +3184,10 @@ void CUnit::UpdateSettlement()
 
 void CUnit::UpdateBuildingSettlementAssignment(CSettlement *old_settlement)
 {
+	if (this->Player->Index == PlayerNumNeutral) {
+		return;
+	}
+		
 	for (int p = 0; p < PlayerMax; ++p) {
 		if (!Players[p].HasNeutralFactionType() && this->Player->Index != Players[p].Index) {
 			continue;
