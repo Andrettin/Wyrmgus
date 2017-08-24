@@ -3145,6 +3145,9 @@ void CUnit::UpdateSettlement()
 			if (potential_settlements.size() > 0) {
 				this->Settlement = potential_settlements[SyncRand(potential_settlements.size())];
 				Map.SettlementUnits.push_back(this);
+			} else {
+				this->Settlement = Settlements[SyncRand(Settlements.size())];
+				Map.SettlementUnits.push_back(this);
 			}
 		}
 		if (this->Settlement) {

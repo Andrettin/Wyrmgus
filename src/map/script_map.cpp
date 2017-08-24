@@ -285,10 +285,7 @@ static int CclStratagusMap(lua_State *l)
 							if (!lua_istable(l, -1)) {
 								LuaError(l, "incorrect argument");
 							}
-							//Wyrmgus start
-	//						Map.Fields[i].parse(l);
 							Map.Fields[z][i].parse(l);
-							//Wyrmgus end
 							lua_pop(l, 1);
 						}
 						lua_pop(l, 1);
@@ -303,6 +300,15 @@ static int CclStratagusMap(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
+	
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		for (int ix = 0; ix < Map.Info.MapWidths[z]; ++ix) {
+			for (int iy = 0; iy < Map.Info.MapHeights[z]; ++iy) {
+				Map.CalculateTileOwnershipTransition(Vec2i(ix, iy), z); //so that the correct ownership border is shown after a loaded game
+			}
+		}
+	}
+	
 	return 0;
 }
 
