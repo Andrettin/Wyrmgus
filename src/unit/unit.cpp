@@ -10,7 +10,7 @@
 //
 /**@name unit.cpp - The units. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2017 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -3128,7 +3128,7 @@ void CUnit::UpdateSettlement()
 		return;
 	}
 	
-	if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
+	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
 		if (!this->Settlement) {
 			int civilization = this->Type->Civilization;
 			if (civilization != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization || this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Race, this->Player->Faction, this->Type->Class))) {
