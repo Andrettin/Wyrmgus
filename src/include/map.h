@@ -219,8 +219,6 @@ public:
 	std::vector<std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>> LayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 	std::map<std::pair<int, int>, CSettlement *> Settlements;
-	std::map<std::tuple<int, int, int>, std::string> CulturalSettlementNames;
-	std::map<std::tuple<int, int, CFaction *>, std::string> FactionCulturalSettlementNames;
 	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
 };
 
@@ -410,7 +408,6 @@ public:
 	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen, int z) const;
 	int GetTileLandmass(const Vec2i &pos, int z) const;
 	Vec2i GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, Vec2i min_pos, Vec2i max_pos, int z) const;
-	std::string GetSettlementName(const Vec2i &pos, int z, const Vec2i &tile_size, int civilization, int faction) const;
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
@@ -542,8 +539,6 @@ public:
 	std::vector<CWorld *> Worlds;			/// the world pointer (if any) for each map layer
 	std::vector<int> Layers;				/// the surface layer (if any) for each map layer
 	std::vector<std::vector<CUnit *>> LayerConnectors;	/// connectors in a layer that lead to other layers
-	std::vector<std::map<std::tuple<int, int, int>, std::string>> CulturalSettlementNames;
-	std::vector<std::map<std::tuple<int, int, CFaction *>, std::string>> FactionCulturalSettlementNames;
 	std::map<int, std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>>> SubtemplateAreas;
 	std::vector<CUnit *> SettlementUnits;	/// the town hall / settlement site units
 	//Wyrmgus end
