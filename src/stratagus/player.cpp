@@ -3217,7 +3217,7 @@ void PlayersEachCycle()
 		
 		
 		for (size_t i = 0; i < p.Modifiers.size(); ++i) { //if already has the modifier, make it have the greater duration of the new or old one
-			if (p.Modifiers[i].second < GameCycle) {
+			if ((unsigned long) p.Modifiers[i].second < GameCycle) {
 				p.RemoveModifier(p.Modifiers[i].first); //only remove one modifier per cycle, to prevent too many upgrade changes from happening at the same cycle (for performance reasons)
 				break;
 			}
