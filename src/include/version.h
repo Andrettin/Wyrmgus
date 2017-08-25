@@ -22,17 +22,13 @@
 #endif
 
 /// Engine version string
-#ifdef StratagusGitRev
-#define VERSION _version_str2 "-git" _version_stringify(StratagusGitRev)
-#else
 #define VERSION _version_str2
-#endif
 
 /// Stratagus version (1,2,3) -> 10203
 #define StratagusVersion (StratagusMajorVersion * 10000 + StratagusMinorVersion * 100 + StratagusPatchLevel)
 
 /// Homepage
-#define HOMEPAGE "https://github.com/Wargus/stratagus"
+#define HOMEPAGE "https://github.com/Andrettin/Wyrmgus"
 
 /// License
 #define LICENSE "GPL v2"

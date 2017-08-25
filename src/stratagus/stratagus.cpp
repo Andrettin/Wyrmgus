@@ -44,7 +44,7 @@
 **
 ** @section Information Information
 **
-** Visit the https://github.com/Wargus/stratagus web page for the latest news and
+** Visit the https://github.com/Andrettin/Wyrmgus web page for the latest news and
 ** <A HREF="../index.html">Stratagus Info</A> for other documentation.
 **
 ** @section Modules Modules
@@ -708,10 +708,7 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 	MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, NULL, NULL);
 	fprintf(stderr, "Stratagus crashed!\n");
 	fprintf(stderr, "A mini dump file \"crash.dmp\" has been created in the Stratagus folder.\n");
-	//Wyrmgus start
-//	fprintf(stderr, "Please send it to our bug tracker: https://github.com/Wargus/stratagus/issues\n");
 	fprintf(stderr, "Please send this call stack to our bug tracker: https://github.com/Andrettin/Wyrmgus/issues\n");
-	//Wyrmgus end
 	fprintf(stderr, "and tell us what caused this bug to occur.\n");
 	return EXCEPTION_EXECUTE_HANDLER;
 }
@@ -825,10 +822,7 @@ int stratagusMain(int argc, char **argv)
 #ifdef USE_STACKTRACE
 	} catch (const std::exception &e) {
 		fprintf(stderr, "Stratagus crashed!\n");
-		//Wyrmgus start
-//		fprintf(stderr, "Please send this call stack to our bug tracker: https://github.com/Wargus/stratagus/issues\n");
 		fprintf(stderr, "Please send this call stack to our bug tracker: https://github.com/Andrettin/Wyrmgus/issues\n");
-		//Wyrmgus end
 		fprintf(stderr, "and tell us what caused this bug to occur.\n");
 		fprintf(stderr, " === exception state traceback === \n");
 		fprintf(stderr, "%s", e.what());
