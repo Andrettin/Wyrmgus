@@ -122,7 +122,7 @@ class CCampaign
 {
 public:
 	CCampaign() :
-		ID(-1), Civilization(-1),
+		ID(-1),
 		MapSize(256, 256), MapTemplateStartPos(0, 0),
 		Hidden(false), Sandbox(false),
 		Faction(NULL), StartEffects(NULL), MapTemplate(NULL)
@@ -138,7 +138,6 @@ public:
 	std::string Name;				/// Name of the campaign
 	std::string Description;		/// Description of the campaign
 	int ID;
-	int Civilization;				/// Which civilization the campaign belongs to
 	CDate StartDate;				/// The starting date of the campaign
 	bool Hidden;					/// Whether the campaign is hidden
 	bool Sandbox;					/// Whether the campaign is a sandbox one

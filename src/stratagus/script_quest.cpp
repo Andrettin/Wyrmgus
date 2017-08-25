@@ -456,8 +456,6 @@ static int CclDefineCampaign(lua_State *l)
 			campaign->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			campaign->Description = LuaToString(l, -1);
-		} else if (!strcmp(value, "Civilization")) {
-			campaign->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
 			campaign->Faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
@@ -525,13 +523,6 @@ static int CclGetCampaignData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "StartYear")) {
 		lua_pushnumber(l, campaign->StartDate.year);
-		return 1;
-	} else if (!strcmp(data, "Civilization")) {
-		if (campaign->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[campaign->Civilization].c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (campaign->Faction) {
