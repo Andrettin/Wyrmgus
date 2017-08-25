@@ -708,7 +708,7 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 	MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, NULL, NULL);
 	fprintf(stderr, "Stratagus crashed!\n");
 	fprintf(stderr, "A mini dump file \"crash.dmp\" has been created in the Stratagus folder.\n");
-	fprintf(stderr, "Please send this call stack to our bug tracker: https://github.com/Andrettin/Wyrmgus/issues\n");
+	fprintf(stderr, "Please send this call stack to our bug tracker: " HOMEPAGE "/issues\n");
 	fprintf(stderr, "and tell us what caused this bug to occur.\n");
 	return EXCEPTION_EXECUTE_HANDLER;
 }
@@ -822,7 +822,7 @@ int stratagusMain(int argc, char **argv)
 #ifdef USE_STACKTRACE
 	} catch (const std::exception &e) {
 		fprintf(stderr, "Stratagus crashed!\n");
-		fprintf(stderr, "Please send this call stack to our bug tracker: https://github.com/Andrettin/Wyrmgus/issues\n");
+		fprintf(stderr, "Please send this call stack to our bug tracker: " HOMEPAGE "/issues\n");
 		fprintf(stderr, "and tell us what caused this bug to occur.\n");
 		fprintf(stderr, " === exception state traceback === \n");
 		fprintf(stderr, "%s", e.what());
