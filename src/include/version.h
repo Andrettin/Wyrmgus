@@ -1,11 +1,7 @@
 #include "version-generated.h"
 
 /// Name
-#ifdef _WIN64
-#define NAME "Stratagus (64 bit)"
-#else
 #define NAME "Stratagus"
-#endif
 
 /// Description
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
@@ -31,7 +27,7 @@
 #define HOMEPAGE "https://github.com/Andrettin/Wyrmgus"
 
 /// License
-#define LICENSE "GPL v2"
+#define LICENSE "GPL 2.0"
 
 /// Copyright
 #define COPYRIGHT "Copyright (c) 1998-2015 by The Stratagus Project"
