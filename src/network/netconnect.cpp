@@ -886,7 +886,7 @@ void CClient::Parse_EngineMismatch(const unsigned char *buf)
 
 	msg.Deserialize(buf);
 	const std::string serverHostStr = serverHost.toString();
-	fprintf(stderr, "Incompatible Stratagus version %d <-> %d\nfrom %s\n",
+	fprintf(stderr, "Incompatible " NAME " version %d <-> %d\nfrom %s\n",
 			StratagusVersion, msg.Stratagus, serverHostStr.c_str());
 	networkState.State = ccs_incompatibleengine;
 }
@@ -1294,7 +1294,7 @@ static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, cons
 {
 	if (msg.Stratagus != StratagusVersion) {
 		const std::string hostStr = host.toString();
-		fprintf(stderr, "Incompatible Stratagus version %d <-> %d from %s\n",
+		fprintf(stderr, "Incompatible " NAME " version %d <-> %d from %s\n",
 				StratagusVersion, msg.Stratagus, hostStr.c_str());
 
 		const CInitMessage_EngineMismatch message;

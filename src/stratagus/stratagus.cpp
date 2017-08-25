@@ -441,7 +441,7 @@ void Exit(int err)
 	}
 #endif
 
-	fprintf(stdout, "%s", _("Thanks for playing Stratagus.\n"));
+	fprintf(stdout, "%s", _("Thanks for playing " NAME ".\n"));
 	exit(err);
 }
 
@@ -706,7 +706,7 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 	mei.ClientPointers = TRUE;
 	mei.ExceptionPointers = ExceptionInfo;
 	MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, NULL, NULL);
-	fprintf(stderr, "Stratagus crashed!\n");
+	fprintf(stderr, "" NAME " crashed!\n");
 	fprintf(stderr, "A mini dump file \"crash.dmp\" has been created in the Stratagus folder.\n");
 	fprintf(stderr, "Please send this call stack to our bug tracker: " HOMEPAGE "/issues\n");
 	fprintf(stderr, "and tell us what caused this bug to occur.\n");
@@ -821,7 +821,7 @@ int stratagusMain(int argc, char **argv)
 	Exit(0);
 #ifdef USE_STACKTRACE
 	} catch (const std::exception &e) {
-		fprintf(stderr, "Stratagus crashed!\n");
+		fprintf(stderr, "" NAME " crashed!\n");
 		fprintf(stderr, "Please send this call stack to our bug tracker: " HOMEPAGE "/issues\n");
 		fprintf(stderr, "and tell us what caused this bug to occur.\n");
 		fprintf(stderr, " === exception state traceback === \n");

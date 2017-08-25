@@ -92,6 +92,7 @@
 #include "translate.h"
 #include "ui.h"
 #include "unit.h"
+#include "version.h"
 #include "video.h"
 #include "widgets.h"
 
@@ -501,7 +502,7 @@ void InitVideoSdl()
 		} else if (!Parameters::Instance.applicationName.empty()) {
 			SDL_WM_SetCaption(Parameters::Instance.applicationName.c_str(), Parameters::Instance.applicationName.c_str());
 		} else {
-			SDL_WM_SetCaption("Stratagus", "Stratagus");
+			SDL_WM_SetCaption(NAME, NAME);
 		}
 
 #if ! defined(USE_WIN32)

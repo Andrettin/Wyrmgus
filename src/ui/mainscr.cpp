@@ -60,6 +60,7 @@
 #include "util.h"
 //Wyrmgus end
 #include "upgrade.h"
+#include "version.h"
 #include "video.h"
 
 #ifdef DEBUG
@@ -1692,7 +1693,7 @@ static void InfoPanel_draw_no_selection()
 		int y = UI.InfoPanel.Y + 8;
 
 		CLabel label(GetGameFont());
-		label.Draw(x, y, "Stratagus");
+		label.Draw(x, y, NAME);
 		y += 16;
 		label.Draw(x, y,  _("Cycle:"));
 		label.Draw(x + 48, y, GameCycle);
