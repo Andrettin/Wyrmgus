@@ -3308,10 +3308,10 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 	if ((this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
 		const CUnitCache &cache = Map.Field(pos, z)->UnitCache;
 		for (size_t i = 0; i != cache.size(); ++i) {
-			CUnit &unit = *cache[i];
-			if (!&unit) {
+			if (!cache[i]) {
 				fprintf(stderr, "Error in CUnit::MoveToXY (pos %d, %d): a unit in the tile's unit cache is NULL.\n", pos.x, pos.y);
 			}
+			CUnit &unit = *cache[i];
 			if (unit.IsAliveOnMap() && unit.Type->BoolFlag[TRAP_INDEX].value) {
 				FireMissile(unit, this, this->tilePos, this->MapLayer);
 				LetUnitDie(unit);

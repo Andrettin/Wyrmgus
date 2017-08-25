@@ -240,14 +240,12 @@ public:
 			fprintf(stderr, "CUnitTypeFinder Error: Unit is NULL.\n");
 			return false;
 		}
-		//Wyrmgus end
-		const CUnitType &type = *unit->Type;
-		//Wyrmgus start
-		if (!&type) {
+		if (!unit->Type) {
 			fprintf(stderr, "CUnitTypeFinder Error: Unit's type is NULL.\n");
 			return false;
 		}
 		//Wyrmgus end
+		const CUnitType &type = *unit->Type;
 		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
 			return false;
 		}

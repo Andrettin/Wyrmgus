@@ -457,12 +457,6 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 	
 	//Wyrmgus start
-	if (!&source) {
-		return;
-	}
-	//Wyrmgus end
-
-	//Wyrmgus start
 //	if (UnitSoundIsPlaying(&source)) {
 	if (voice != VoiceHit && voice != VoiceMiss && voice != VoiceStep && UnitSoundIsPlaying(&source)) {
 	//Wyrmgus end
