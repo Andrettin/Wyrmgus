@@ -198,6 +198,35 @@ static int CclDefineCharacter(lua_State *l)
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ mother_ident.c_str());
 			}
+		} else if (!strcmp(value, "Children")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string child_ident = LuaToString(l, -1, j + 1);
+				CCharacter *child = GetCharacter(child_ident);
+				if (child) {
+					if (character->Gender == MaleGender) {
+						child->Father = character;
+					} else {
+						child->Mother = character;
+					}
+					if (!character->IsParentOf(child_ident)) { //check whether the character has already been set as a parent of the child
+						character->Children.push_back(child);
+					}
+					// see if the character's other children aren't already included in the child's siblings, and if they aren't, add them (and add the character to the siblings' sibling list too)
+					for (size_t i = 0; i < character->Children.size(); ++i) {
+						if (character->Children[i] != child) {
+							if (!child->IsSiblingOf(character->Children[i]->Ident)) {
+								child->Siblings.push_back(character->Children[i]);
+							}
+							if (!character->Children[i]->IsSiblingOf(child_ident)) {
+								character->Children[i]->Siblings.push_back(child);
+							}
+						}
+					}
+				} else {
+					LuaError(l, "Character \"%s\" doesn't exist." _C_ child_ident.c_str());
+				}
+			}
 		} else if (!strcmp(value, "Gender")) {
 			character->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
@@ -473,18 +502,15 @@ static int CclDefineCharacter(lua_State *l)
 				++j;
 				
 				if (title != CharacterTitleGovernor) {
-					std::string title_civilization_name = LuaToString(l, -1, j + 1);
-					int title_civilization = PlayerRaces.GetRaceIndexByName(title_civilization_name.c_str());
-					++j;
 					std::string title_faction_name = LuaToString(l, -1, j + 1);
-					int title_faction = PlayerRaces.GetFactionIndexByName(title_civilization, title_faction_name);
-					if (title_faction == -1) {
+					CFaction *title_faction = PlayerRaces.GetFaction(-1, title_faction_name);
+					if (!title_faction) {
 						LuaError(l, "Faction \"%s\" doesn't exist." _C_ title_faction_name.c_str());
 					}
 					if (start_year != 0 && end_year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
-						PlayerRaces.Factions[title_civilization][title_faction]->HistoricalMinisters[std::tuple<int, int, int>(start_year, end_year, title)] = character;
+						PlayerRaces.Factions[title_faction->Civilization][title_faction->ID]->HistoricalMinisters[std::tuple<int, int, int>(start_year, end_year, title)] = character;
 					}
-					character->HistoricalTitles.push_back(std::tuple<int, int, CFaction *, int>(start_year, end_year, PlayerRaces.Factions[title_civilization][title_faction], title));
+					character->HistoricalTitles.push_back(std::tuple<int, int, CFaction *, int>(start_year, end_year, title_faction, title));
 				} else {
 					std::string title_province_name = LuaToString(l, -1, j + 1);
 					CProvince *title_province = GetProvince(title_province_name);
@@ -527,6 +553,13 @@ static int CclDefineCharacter(lua_State *l)
 		character->DeathDate.month = character->Date.month;
 		character->DeathDate.day = character->Date.day;
 		character->DeathDate.timeline = character->Date.timeline;
+	}
+		
+	if (character->Date.year == 0 && character->DeathDate.year != 0) { //if the character is missing a start date but not a death date, give it -30 years before the death date
+		character->Date.year = character->DeathDate.year + 30;
+		character->Date.month = character->DeathDate.month;
+		character->Date.day = character->DeathDate.day;
+		character->Date.timeline = character->DeathDate.timeline;
 	}
 		
 	//check if the abilities are correct for this character's unit type
