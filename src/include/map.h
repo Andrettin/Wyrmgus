@@ -144,8 +144,7 @@ class CTerrainFeature
 {
 public:
 	CTerrainFeature() :
-		ID(-1), TerrainType(NULL), World(NULL),
-		RandomAllowed(true)
+		ID(-1), TerrainType(NULL), World(NULL)
 	{
 	}
 	
@@ -155,7 +154,6 @@ public:
 	CColor Color;
 	CTerrainType *TerrainType;
 	CWorld *World;
-	bool RandomAllowed;
 	std::map<int, std::string> CulturalNames;							/// Names for the terrain feature for each different culture/civilization
 };
 

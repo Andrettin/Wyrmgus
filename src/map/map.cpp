@@ -2791,52 +2791,9 @@ void CMap::CalculateTileTerrainFeature(const Vec2i &pos, int z)
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 
-					if (adjacent_mf.TerrainFeature && adjacent_mf.TerrainFeature->TerrainType == GetTileTopTerrain(pos, false, z) && adjacent_mf.TerrainFeature->RandomAllowed) {
+					if (adjacent_mf.TerrainFeature && adjacent_mf.TerrainFeature->TerrainType == GetTileTopTerrain(pos, false, z)) {
 						mf.TerrainFeature = adjacent_mf.TerrainFeature;
 						return;
-					}
-				}
-			}
-		}
-	}
-	
-	std::vector<CTerrainFeature *> potential_terrain_features;
-	
-	if (mf.Owner != -1) { //if the tile has an owner, see if there are terrain features which have a cultural name for the player's civilization
-		for (size_t i = 0; i < TerrainFeatures.size(); ++i) {
-			if (TerrainFeatures[i]->RandomAllowed && TerrainFeatures[i]->TerrainType == GetTileTopTerrain(pos, false, z) && TerrainFeatures[i]->CulturalNames.find(Players[mf.Owner].Race) != TerrainFeatures[i]->CulturalNames.end()) {
-				potential_terrain_features.push_back(TerrainFeatures[i]);
-			}
-		}
-	}
-
-	if (potential_terrain_features.size() == 0) {
-		for (size_t i = 0; i < TerrainFeatures.size(); ++i) {
-			if (TerrainFeatures[i]->RandomAllowed && TerrainFeatures[i]->TerrainType == GetTileTopTerrain(pos, false, z)) {
-				potential_terrain_features.push_back(TerrainFeatures[i]);
-			}
-		}
-	}
-
-	if (potential_terrain_features.size() > 0) {
-		mf.TerrainFeature = potential_terrain_features[SyncRand(potential_terrain_features.size())];
-		
-		//now, spread the new terrain feature to neighboring tiles of the same terrain type, which don't already have a terrain feature
-		std::vector<Vec2i> terrain_feature_tiles;
-		terrain_feature_tiles.push_back(pos);
-		for (size_t i = 0; i < terrain_feature_tiles.size(); ++i) {
-			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-					if ((x_offset != 0 || y_offset != 0) && !(x_offset != 0 && y_offset != 0)) { //only directly adjacent tiles (no diagonal ones, and not the same tile)
-						Vec2i adjacent_pos(terrain_feature_tiles[i].x + x_offset, terrain_feature_tiles[i].y + y_offset);
-						if (this->Info.IsPointOnMap(adjacent_pos, z)) {
-							CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-
-							if (!adjacent_mf.TerrainFeature && GetTileTopTerrain(adjacent_pos, false, z) == GetTileTopTerrain(terrain_feature_tiles[i], false, z)) {
-								adjacent_mf.TerrainFeature = mf.TerrainFeature;
-								terrain_feature_tiles.push_back(adjacent_pos);
-							}
-						}
 					}
 				}
 			}
