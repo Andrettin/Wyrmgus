@@ -1792,6 +1792,8 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 		this->Variable[GOLDGATHERINGBONUS_INDEX].Value += stat_change;
 		this->Variable[COALGATHERINGBONUS_INDEX].Max += stat_change;
 		this->Variable[COALGATHERINGBONUS_INDEX].Value += stat_change;
+		this->Variable[DIAMONDSGATHERINGBONUS_INDEX].Max += stat_change;
+		this->Variable[DIAMONDSGATHERINGBONUS_INDEX].Value += stat_change;
 	}
 }
 
@@ -5383,6 +5385,8 @@ int CUnit::GetResourceStep(const int resource) const
 		resource_step += this->Variable[FURNITUREGATHERINGBONUS_INDEX].Value;
 	} else if (resource == LeatherCost) {
 		resource_step += this->Variable[LEATHERGATHERINGBONUS_INDEX].Value;
+	} else if (resource == DiamondsCost) {
+		resource_step += this->Variable[DIAMONDSGATHERINGBONUS_INDEX].Value;
 	}
 	
 	return resource_step;

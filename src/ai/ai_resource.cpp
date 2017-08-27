@@ -2197,7 +2197,7 @@ static void AiCheckPathwayConstruction()
 				bool built_pathway = false;
 					
 				for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
-					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && unit.GivesResource != CopperCost && unit.GivesResource != SilverCost && unit.GivesResource != GoldCost && unit.GivesResource != CoalCost) { //build roads around buildings, not railroads (except for mines)
+					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && unit.GivesResource != CopperCost && unit.GivesResource != SilverCost && unit.GivesResource != GoldCost && unit.GivesResource != CoalCost && unit.GivesResource != DiamondsCost) { //build roads around buildings, not railroads (except for mines)
 						continue;
 					}
 						
