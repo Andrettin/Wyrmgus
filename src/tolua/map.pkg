@@ -9,6 +9,10 @@ class CMapInfo
 	int MapWidth;
 	int MapHeight;
 	int PlayerType[PlayerMax];
+	
+	//Wyrmgus start
+	bool IsPointOnMap(int x, int y, int z) const;
+	//Wyrmgus end
 };
 
 class CTileset

@@ -2063,6 +2063,8 @@ static int CclDefineTerrainFeature(lua_State *l)
 			} else {
 				LuaError(l, "World doesn't exist.");
 			}
+		} else if (!strcmp(value, "RandomAllowed")) {
+			terrain_feature->RandomAllowed = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");

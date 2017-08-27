@@ -144,7 +144,8 @@ class CTerrainFeature
 {
 public:
 	CTerrainFeature() :
-		ID(-1), TerrainType(NULL), World(NULL)
+		ID(-1), TerrainType(NULL), World(NULL),
+		RandomAllowed(true)
 	{
 	}
 	
@@ -154,6 +155,7 @@ public:
 	CColor Color;
 	CTerrainType *TerrainType;
 	CWorld *World;
+	bool RandomAllowed;
 	std::map<int, std::string> CulturalNames;							/// Names for the terrain feature for each different culture/civilization
 };
 
@@ -377,6 +379,7 @@ public:
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
 	void CalculateTileLandmass(const Vec2i &pos, int z);
+	void CalculateTileTerrainFeature(const Vec2i &pos, int z);
 	void CalculateTileOwnership(const Vec2i &pos, int z);
 	void CalculateTileOwnershipTransition(const Vec2i &pos, int z);
 	void AdjustMap();
