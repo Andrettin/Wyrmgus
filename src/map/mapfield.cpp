@@ -365,7 +365,7 @@ void CMapField::Save(CFile &file) const
 {
 	//Wyrmgus start
 //	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
-	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, %2d", Terrain ? Terrain->Ident.c_str() : "", OverlayTerrain ? OverlayTerrain->Ident.c_str() : "", OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, Owner);
+	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d, %2d, %2d", (TerrainFeature && !TerrainFeature->TerrainType->Overlay) ? TerrainFeature->Ident.c_str() : (Terrain ? Terrain->Ident.c_str() : ""), (TerrainFeature && TerrainFeature->TerrainType->Overlay) ? TerrainFeature->Ident.c_str() : (OverlayTerrain ? OverlayTerrain->Ident.c_str() : ""), OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost, Landmass, Owner);
 	
 	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
 		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
@@ -502,8 +502,24 @@ void CMapField::parse(lua_State *l)
 	this->Value = LuaToNumber(l, -1, 3);
 	this->cost = LuaToNumber(l, -1, 4);
 	*/
-	this->Terrain = GetTerrainType(LuaToString(l, -1, 1));
-	this->OverlayTerrain = GetTerrainType(LuaToString(l, -1, 2));
+	std::string terrain_ident = LuaToString(l, -1, 1);
+	CTerrainFeature *terrain_feature = GetTerrainFeature(terrain_ident);
+	if (terrain_feature) {
+		this->Terrain = terrain_feature->TerrainType;
+		this->TerrainFeature = terrain_feature;
+	} else {
+		this->Terrain = GetTerrainType(terrain_ident);
+	}
+	
+	std::string overlay_terrain_ident = LuaToString(l, -1, 2);
+	CTerrainFeature *overlay_terrain_feature = GetTerrainFeature(overlay_terrain_ident);
+	if (overlay_terrain_feature) {
+		this->OverlayTerrain = overlay_terrain_feature->TerrainType;
+		this->TerrainFeature = overlay_terrain_feature;
+	} else {
+		this->OverlayTerrain = GetTerrainType(overlay_terrain_ident);
+	}
+	
 	this->SetOverlayTerrainDamaged(LuaToBoolean(l, -1, 3));
 	this->SetOverlayTerrainDestroyed(LuaToBoolean(l, -1, 4));
 	this->playerInfo.SeenTerrain = GetTerrainType(LuaToString(l, -1, 5));

@@ -148,16 +148,11 @@ enum {
 		}
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
-	//Wyrmgus start
-//	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
-//	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
-//	Video.FillCircleClip(ColorGreen, targetPos, 3);
 	if (Preference.ShowPathlines) {
 		Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
 		Video.FillCircleClip(ColorGreen, targetPos, 3);
 	}
-	//Wyrmgus end
 	return targetPos;
 }
 
@@ -187,10 +182,7 @@ enum {
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		//Wyrmgus start
-//		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		UnitShowAnimation(unit, unit.GetAnimations()->Still);
-		//Wyrmgus end
 		unit.Wait--;
 		return;
 	}

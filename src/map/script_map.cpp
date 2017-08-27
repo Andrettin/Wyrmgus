@@ -2026,6 +2026,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 		terrain_feature->Ident = terrain_feature_ident;
 		terrain_feature->ID = TerrainFeatures.size();
 		TerrainFeatures.push_back(terrain_feature);
+		TerrainFeatureIdentToPointer[terrain_feature_ident] = terrain_feature;
 	}
 	
 	//  Parse the list:
