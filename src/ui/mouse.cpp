@@ -2354,6 +2354,9 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 	} else if (MouseButtons & MiddleButton) {// enter move map mode
 		CursorStartScreenPos = CursorScreenPos;
 		GameCursor = UI.Scroll.Cursor;
+		//Wyrmgus start
+		UnitUnderCursor = NULL;
+		//Wyrmgus end
 	}
 }
 

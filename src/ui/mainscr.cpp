@@ -888,7 +888,7 @@ void DrawPopups()
 			CMapField &mf = *Map.Field(tilePos, CurrentMapLayer);
 			const bool isMapFieldVisible = mf.playerInfo.IsTeamVisible(*ThisPlayer);
 
-			if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap)) {
+			if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
 				if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
 					PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
 					unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);

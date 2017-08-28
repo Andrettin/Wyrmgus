@@ -3126,7 +3126,7 @@ void CUnit::UpdateSettlement()
 		return;
 	}
 	
-	if (!this->Type->BoolFlag[BUILDING_INDEX].value) {
+	if (!this->Type->BoolFlag[BUILDING_INDEX].value || this->Type->TerrainType) {
 		return;
 	}
 	

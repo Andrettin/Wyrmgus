@@ -1845,6 +1845,9 @@ static void EditorCallbackButtonDown(unsigned button)
 			// enter move map mode
 			CursorStartScreenPos = CursorScreenPos;
 			GameCursor = UI.Scroll.Cursor;
+			//Wyrmgus start
+			UnitUnderCursor = NULL;
+			//Wyrmgus end
 		}
 	}
 }
