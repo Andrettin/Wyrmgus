@@ -680,7 +680,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 
 		if (settlement_iterator->second->Major && SettlementSiteUnitType) { //add a settlement site for major settlements
 			Vec2i unit_offset((SettlementSiteUnitType->TileWidth - 1) / 2, (SettlementSiteUnitType->TileHeight - 1) / 2);
-			if (!UnitTypeCanBeAt(*SettlementSiteUnitType, settlement_pos - unit_offset, z)) {
+			if (!UnitTypeCanBeAt(*SettlementSiteUnitType, settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset + Vec2i(SettlementSiteUnitType->TileWidth - 1, SettlementSiteUnitType->TileHeight - 1), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", settlement_iterator->second->Ident.c_str(), settlement_raw_pos.x, settlement_raw_pos.y);
 			}
 			CUnit *unit = CreateUnit(settlement_pos - unit_offset, *SettlementSiteUnitType, &Players[PlayerNumNeutral], z);
@@ -785,6 +785,11 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					continue;
 				}
 				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
+				if (first_building) {
+					if (!OnTopDetails(*type, NULL) && !UnitTypeCanBeAt(*type, settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset + Vec2i(type->TileWidth - 1, type->TileHeight - 1), z)) {
+						fprintf(stderr, "The \"%s\" representing the minor settlement of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", type->Ident.c_str(), settlement_iterator->second->Ident.c_str(), settlement_raw_pos.x, settlement_raw_pos.y);
+					}
+				}
 				CUnit *unit = NULL;
 				if (building_owner) {
 					CPlayer *building_player = GetOrAddFactionPlayer(building_owner);
@@ -809,9 +814,6 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 				if (first_building) {
 					if (!type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == settlement_owner) && settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization) != settlement_iterator->second->CulturalNames.end()) { //if one building is representing a minor settlement, make it have the settlement's name
 						unit->Name = settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization)->second;
-					}
-					if (!OnTopDetails(*type, NULL) && !UnitTypeCanBeAt(*type, settlement_pos - unit_offset, z)) {
-						fprintf(stderr, "The \"%s\" representing the minor settlement of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", type->Ident.c_str(), settlement_iterator->second->Ident.c_str(), settlement_raw_pos.x, settlement_raw_pos.y);
 					}
 					first_building = false;
 				}
