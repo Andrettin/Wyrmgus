@@ -3494,6 +3494,8 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 		metal_rock_type = UnitTypeByIdent("unit-silver-rock");
 	} else if (type.Ident == "unit-copper-deposit") {
 		metal_rock_type = UnitTypeByIdent("unit-copper-rock");
+	} else if (type.Ident == "unit-diamond-deposit") {
+		metal_rock_type = UnitTypeByIdent("unit-diamond-rock");
 	}
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.TileWidth - 1) / 2, (type.TileHeight - 1) / 2);
