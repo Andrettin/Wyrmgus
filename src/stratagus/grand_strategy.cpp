@@ -6953,10 +6953,10 @@ void FinalizeGrandStrategyInitialization()
 					}
 				}
 				
-				for (std::map<std::tuple<int,int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalMinisters.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalMinisters.end(); ++iterator) { //set the appropriate historical rulers
+				for (std::map<std::tuple<CDate, CDate, int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalMinisters.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalMinisters.end(); ++iterator) { //set the appropriate historical rulers
 					if (
-						GrandStrategyYear >= std::get<0>(iterator->first)
-						&& GrandStrategyYear < std::get<1>(iterator->first)
+						GrandStrategyYear >= std::get<0>(iterator->first).year
+						&& GrandStrategyYear < std::get<1>(iterator->first).year
 						&& (GrandStrategyGame.Factions[i][j]->IsAlive() || std::get<2>(iterator->first) == CharacterTitleHeadOfState)
 						&& GrandStrategyGame.GetHero(iterator->second->GetFullName()) != NULL
 						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsAlive()

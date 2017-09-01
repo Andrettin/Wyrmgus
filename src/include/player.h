@@ -610,7 +610,7 @@ public:
 	std::vector<std::string> SettlementNames;							/// Settlement names for the faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction
-	std::map<std::tuple<int, int, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
+	std::map<std::tuple<CDate, CDate, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, CFaction *> HistoricalFactionDerivations;				/// cases of this faction deriving technologies/governmental system from another, mapped to the date in which it happened
 	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year

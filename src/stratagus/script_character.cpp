@@ -496,32 +496,34 @@ static int CclDefineCharacter(lua_State *l)
 					LuaError(l, "Character title doesn't exist.");
 				}
 				++j;
-				int start_year = LuaToNumber(l, -1, j + 1);
+				CDate start_date;
+				start_date.year = 0;
+				start_date.month = 1;
+				start_date.day = 1;
+				start_date.timeline = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &start_date);
+				lua_pop(l, 1);
 				++j;
-				int end_year = LuaToNumber(l, -1, j + 1);
+				CDate end_date;
+				end_date.year = 0;
+				end_date.month = 1;
+				end_date.day = 1;
+				end_date.timeline = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &end_date);
+				lua_pop(l, 1);
 				++j;
 				
-				if (title != CharacterTitleGovernor) {
-					std::string title_faction_name = LuaToString(l, -1, j + 1);
-					CFaction *title_faction = PlayerRaces.GetFaction(-1, title_faction_name);
-					if (!title_faction) {
-						LuaError(l, "Faction \"%s\" doesn't exist." _C_ title_faction_name.c_str());
-					}
-					if (start_year != 0 && end_year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
-						PlayerRaces.Factions[title_faction->Civilization][title_faction->ID]->HistoricalMinisters[std::tuple<int, int, int>(start_year, end_year, title)] = character;
-					}
-					character->HistoricalTitles.push_back(std::tuple<int, int, CFaction *, int>(start_year, end_year, title_faction, title));
-				} else {
-					std::string title_province_name = LuaToString(l, -1, j + 1);
-					CProvince *title_province = GetProvince(title_province_name);
-					if (title_province == NULL) {
-						LuaError(l, "Province \"%s\" doesn't exist." _C_ title_province_name.c_str());
-					}
-					if (start_year != 0 && end_year != 0) { // don't put in the province's historical data if a blank year was given
-						title_province->HistoricalGovernors[std::tuple<int, int>(start_year, end_year)] = character;
-					}
-					character->HistoricalProvinceTitles.push_back(std::tuple<int, int, CProvince *, int>(start_year, end_year, title_province, title));
+				std::string title_faction_name = LuaToString(l, -1, j + 1);
+				CFaction *title_faction = PlayerRaces.GetFaction(-1, title_faction_name);
+				if (!title_faction) {
+					LuaError(l, "Faction \"%s\" doesn't exist." _C_ title_faction_name.c_str());
 				}
+				if (start_date.year != 0 && end_date.year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
+					PlayerRaces.Factions[title_faction->Civilization][title_faction->ID]->HistoricalMinisters[std::tuple<CDate, CDate, int>(start_date, end_date, title)] = character;
+				}
+				character->HistoricalTitles.push_back(std::tuple<CDate, CDate, CFaction *, int>(start_date, end_date, title_faction, title));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
