@@ -1866,10 +1866,10 @@ void PreprocessMap()
 }
 
 //Wyrmgus start
-int GetMapLayer(std::string plane_name, std::string world_name, int surface_layer)
+int GetMapLayer(std::string plane_ident, std::string world_ident, int surface_layer)
 {
-	CPlane *plane = GetPlane(plane_name);
-	CWorld *world = GetWorld(world_name);
+	CPlane *plane = GetPlane(plane_ident);
+	CWorld *world = GetWorld(world_ident);
 
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
 		if (Map.Planes[z] == plane && Map.Worlds[z] == world && Map.Layers[z] == surface_layer) {
@@ -2090,7 +2090,7 @@ void CMap::Save(CFile &file) const
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");
 	for (size_t z = 0; z < this->Fields.size(); ++z) {
-		file.printf("  {\"%s\", \"%s\", %d},\n", this->Planes[z] ? this->Planes[z]->Name.c_str() : "", this->Worlds[z] ? this->Worlds[z]->Name.c_str() : "", this->Layers[z]);
+		file.printf("  {\"%s\", \"%s\", %d},\n", this->Planes[z] ? this->Planes[z]->Ident.c_str() : "", this->Worlds[z] ? this->Worlds[z]->Ident.c_str() : "", this->Layers[z]);
 	}
 	file.printf("  },\n");
 	//Wyrmgus end

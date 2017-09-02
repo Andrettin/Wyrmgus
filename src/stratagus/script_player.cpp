@@ -3743,7 +3743,7 @@ static int CclGetDeityData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "HomePlane")) {
 		if (deity->HomePlane) {
-			lua_pushstring(l, deity->HomePlane->Name.c_str());
+			lua_pushstring(l, deity->HomePlane->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

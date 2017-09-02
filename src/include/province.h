@@ -115,6 +115,7 @@ public:
 	}
 	
 	int ID;																/// ID of this plane
+	std::string Ident;
 	std::string Name;
 	std::string Description;
 	std::string Background;
@@ -131,6 +132,7 @@ public:
 	}
 	
 	int ID;																/// ID of this world
+	std::string Ident;
 	std::string Name;
 	std::string Description;
 	std::string Background;
@@ -236,8 +238,8 @@ extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 ----------------------------------------------------------------------------*/
 
 extern void CleanWorlds();
-extern CPlane *GetPlane(std::string plane_name);
-extern CWorld *GetWorld(std::string world_name);
+extern CPlane *GetPlane(std::string plane_ident);
+extern CWorld *GetWorld(std::string world_ident);
 extern CRegion *GetRegion(std::string region_name);
 extern CProvince *GetProvince(std::string province_name);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);

@@ -4257,14 +4257,14 @@ static int CclGetSpeciesData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "HomePlane")) {
 		if (species->HomePlane != NULL) {
-			lua_pushstring(l, species->HomePlane->Name.c_str());
+			lua_pushstring(l, species->HomePlane->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Homeworld")) {
 		if (species->Homeworld != NULL) {
-			lua_pushstring(l, species->Homeworld->Name.c_str());
+			lua_pushstring(l, species->Homeworld->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

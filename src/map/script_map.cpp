@@ -2154,7 +2154,7 @@ static int CclGetTerrainFeatureData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "World")) {
 		if (terrain_feature->World != NULL) {
-			lua_pushstring(l, terrain_feature->World->Name.c_str());
+			lua_pushstring(l, terrain_feature->World->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

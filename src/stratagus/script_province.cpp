@@ -112,11 +112,11 @@ static int CclDefinePlane(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string plane_name = LuaToString(l, 1);
-	CPlane *plane = GetPlane(plane_name);
+	std::string plane_ident = LuaToString(l, 1);
+	CPlane *plane = GetPlane(plane_ident);
 	if (!plane) {
 		plane = new CPlane;
-		plane->Name = plane_name;
+		plane->Ident = plane_ident;
 		plane->ID = Planes.size();
 		Planes.push_back(plane);
 	}
@@ -125,7 +125,9 @@ static int CclDefinePlane(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Description")) {
+		if (!strcmp(value, "Name")) {
+			plane->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
 			plane->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
 			plane->Background = LuaToString(l, -1);
@@ -151,11 +153,11 @@ static int CclDefineWorld(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string world_name = LuaToString(l, 1);
-	CWorld *world = GetWorld(world_name);
+	std::string world_ident = LuaToString(l, 1);
+	CWorld *world = GetWorld(world_ident);
 	if (!world) {
 		world = new CWorld;
-		world->Name = world_name;
+		world->Ident = world_ident;
 		world->ID = Worlds.size();
 		Worlds.push_back(world);
 	}
@@ -164,7 +166,9 @@ static int CclDefineWorld(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Description")) {
+		if (!strcmp(value, "Name")) {
+			world->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
 			world->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
 			world->Background = LuaToString(l, -1);
@@ -765,10 +769,10 @@ static int CclGetPlaneData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string plane_name = LuaToString(l, 1);
-	CPlane *plane = GetPlane(plane_name);
+	std::string plane_ident = LuaToString(l, 1);
+	CPlane *plane = GetPlane(plane_ident);
 	if (!plane) {
-		LuaError(l, "Plane \"%s\" doesn't exist." _C_ plane_name.c_str());
+		LuaError(l, "Plane \"%s\" doesn't exist." _C_ plane_ident.c_str());
 	}
 	const char *data = LuaToString(l, 2);
 
@@ -809,10 +813,10 @@ static int CclGetWorldData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string world_name = LuaToString(l, 1);
-	CWorld *world = GetWorld(world_name);
+	std::string world_ident = LuaToString(l, 1);
+	CWorld *world = GetWorld(world_ident);
 	if (!world) {
-		LuaError(l, "World \"%s\" doesn't exist." _C_ world_name.c_str());
+		LuaError(l, "World \"%s\" doesn't exist." _C_ world_ident.c_str());
 	}
 	const char *data = LuaToString(l, 2);
 
@@ -837,7 +841,7 @@ static int CclGetWorldData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Plane")) {
 		if (world->Plane) {
-			lua_pushstring(l, world->Plane->Name.c_str());
+			lua_pushstring(l, world->Plane->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -887,7 +891,7 @@ static int CclGetProvinceData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "World")) {
 		if (province->World != NULL) {
-			lua_pushstring(l, province->World->Name.c_str());
+			lua_pushstring(l, province->World->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -934,7 +938,7 @@ static int CclGetPlanes(lua_State *l)
 	lua_createtable(l, Planes.size(), 0);
 	for (size_t i = 1; i <= Planes.size(); ++i)
 	{
-		lua_pushstring(l, Planes[i-1]->Name.c_str());
+		lua_pushstring(l, Planes[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -945,7 +949,7 @@ static int CclGetWorlds(lua_State *l)
 	lua_createtable(l, Worlds.size(), 0);
 	for (size_t i = 1; i <= Worlds.size(); ++i)
 	{
-		lua_pushstring(l, Worlds[i-1]->Name.c_str());
+		lua_pushstring(l, Worlds[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

@@ -437,7 +437,7 @@ static int CclGetGrandStrategyEventData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "World")) {
 		if (event->World != NULL) {
-			lua_pushstring(l, event->World->Name.c_str());
+			lua_pushstring(l, event->World->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

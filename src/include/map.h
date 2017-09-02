@@ -744,7 +744,7 @@ extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z);
 extern void PreprocessMap();
 
 //Wyrmgus start
-extern int GetMapLayer(std::string plane_name = "", std::string world_name = "", int surface_layer = 0);
+extern int GetMapLayer(std::string plane_ident = "", std::string world_ident = "", int surface_layer = 0);
 extern int GetSubtemplateStartX(std::string subtemplate_ident);
 extern int GetSubtemplateStartY(std::string subtemplate_ident);
 extern void ChangeCurrentMapLayer(int z);

@@ -115,20 +115,20 @@ void CleanWorlds()
 	}
 }
 
-CPlane *GetPlane(std::string plane_name)
+CPlane *GetPlane(std::string plane_ident)
 {
 	for (size_t i = 0; i < Planes.size(); ++i) {
-		if (plane_name == Planes[i]->Name) {
+		if (plane_ident == Planes[i]->Ident) {
 			return Planes[i];
 		}
 	}
 	return NULL;
 }
 
-CWorld *GetWorld(std::string world_name)
+CWorld *GetWorld(std::string world_ident)
 {
 	for (size_t i = 0; i < Worlds.size(); ++i) {
-		if (world_name == Worlds[i]->Name) {
+		if (world_ident == Worlds[i]->Ident) {
 			return Worlds[i];
 		}
 	}

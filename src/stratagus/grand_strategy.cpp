@@ -6464,7 +6464,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 		if (province_of_origin == NULL) {
 			fprintf(stderr, "Hero \"%s\"'s province of origin \"%s\" doesn't exist.\n", iterator->second->GetFullName().c_str(), iterator->second->ProvinceOfOriginName.c_str());
 			continue;
-		} else if (province_of_origin->World->Name != GrandStrategyWorld && GrandStrategyWorld != "Random") {
+		} else if (province_of_origin->World->Ident != GrandStrategyWorld && GrandStrategyWorld != "Random") {
 			continue;
 		}
 		
@@ -6570,7 +6570,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 	
 	if (GrandStrategyGameLoading == false) {
 		for (size_t i = 0; i < GrandStrategyEvents.size(); ++i) {
-			if (GrandStrategyEvents[i]->World != NULL && GrandStrategyEvents[i]->World->Name != GrandStrategyWorld && GrandStrategyWorld != "Random") {
+			if (GrandStrategyEvents[i]->World != NULL && GrandStrategyEvents[i]->World->Ident != GrandStrategyWorld && GrandStrategyWorld != "Random") {
 				continue;
 			}
 			
@@ -6673,7 +6673,7 @@ void InitializeGrandStrategyWorldMap()
 void InitializeGrandStrategyProvinces()
 {
 	for (size_t i = 0; i < Provinces.size(); ++i) {
-		if (Provinces[i]->World->Name != GrandStrategyWorld && GrandStrategyWorld != "Random") {
+		if (Provinces[i]->World->Ident != GrandStrategyWorld && GrandStrategyWorld != "Random") {
 			continue;
 		}
 		CGrandStrategyProvince *province = new CGrandStrategyProvince;
