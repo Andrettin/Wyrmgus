@@ -3369,16 +3369,25 @@ void CUnit::Place(const Vec2i &pos, int z)
 			this->UpdateSettlement(); // update the settlement name of a building when placing it
 		}
 		
-		//remove pathways and destroyed walls under buildings
+		//remove pathways, destroyed walls and decoration units under buildings
 		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
 			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->TileWidth; ++x) {
 				for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->TileHeight; ++y) {
 					if (!Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
 						continue;
 					}
-					CMapField &mf = *Map.Field(x, y, this->MapLayer);
+					Vec2i building_tile_pos(x, y);
+					CMapField &mf = *Map.Field(building_tile_pos, this->MapLayer);
 					if ((mf.Flags & MapFieldRoad) || (mf.Flags & MapFieldRailroad) || (mf.Flags & MapFieldWall)) {
-						Map.RemoveTileOverlayTerrain(Vec2i(x, y), this->MapLayer);
+						Map.RemoveTileOverlayTerrain(building_tile_pos, this->MapLayer);
+					}
+					//remove decorations if a building has been built here
+					std::vector<CUnit *> table;
+					Select(building_tile_pos, building_tile_pos, table, this->MapLayer);
+					for (size_t i = 0; i != table.size(); ++i) {
+						if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+							LetUnitDie(*table[i]);			
+						}
 					}
 				}
 			}

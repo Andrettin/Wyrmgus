@@ -2287,6 +2287,17 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 	
 	mf.SetTerrain(terrain);
 	
+	if (terrain->Overlay) {
+		//remove decorations if the overlay terrain has changed
+		std::vector<CUnit *> table;
+		Select(pos, pos, table, z);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
+				LetUnitDie(*table[i]);			
+			}
+		}
+	}
+	
 	this->CalculateTileTransitions(pos, false, z); //recalculate both, since one may have changed the other
 	this->CalculateTileTransitions(pos, true, z);
 	this->CalculateTileTerrainFeature(pos, z);
