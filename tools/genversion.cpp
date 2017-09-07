@@ -36,8 +36,8 @@
 int main(int argc, char * argv[]) {
 
 	FILE * file;
-	int old_ver[5] = { -1, -1, -1, -1, -1 };
-	int new_ver[5] = { -1, -1, -1, -1, -1 };
+	int old_ver[4] = { -1, -1, -1, -1 };
+	int new_ver[4] = { -1, -1, -1, -1 };
 
 	if ( argc != 3 )
 		return 1;
@@ -50,7 +50,7 @@ int main(int argc, char * argv[]) {
 
 	file = fopen(argv[1], "r");
 	if ( file ) {
-		if ( fscanf(file, "/* %d %d %d %d %d */", &old_ver[0], &old_ver[1], &old_ver[2], &old_ver[3]) != 4 ) {
+		if ( fscanf(file, "/* %d %d %d %d */", &old_ver[0], &old_ver[1], &old_ver[2], &old_ver[3]) != 4 ) {
 			old_ver[0] = -1;
 			old_ver[1] = -1;
 			old_ver[2] = -1;
