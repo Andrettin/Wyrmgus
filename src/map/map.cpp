@@ -380,29 +380,31 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
 	this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
 
-	for (size_t i = 0; i < HistoricalTerrains.size(); ++i) {
-		Vec2i history_pos = std::get<0>(HistoricalTerrains[i]);
-		if (history_pos.x < template_start_pos.x || history_pos.x >= (template_start_pos.x + (Map.Info.MapWidths[z] / this->Scale)) || history_pos.y < template_start_pos.y || history_pos.y >= (template_start_pos.y + (Map.Info.MapHeights[z] / this->Scale))) {
-			continue;
-		}
-		if (CurrentCampaign->StartDate.ContainsDate(std::get<2>(HistoricalTerrains[i])) || std::get<2>(HistoricalTerrains[i]).year == 0) {
-			CTerrainType *historical_terrain = std::get<1>(HistoricalTerrains[i]);
-			
-			for (int sub_x = 0; sub_x < this->Scale; ++sub_x) {
-				for (int sub_y = 0; sub_y < this->Scale; ++sub_y) {
-					Vec2i real_pos(map_start_pos.x + ((history_pos.x - template_start_pos.x) * this->Scale) + sub_x, map_start_pos.y + ((history_pos.y - template_start_pos.y) * this->Scale) + sub_y);
+	if (CurrentCampaign) {
+		for (size_t i = 0; i < HistoricalTerrains.size(); ++i) {
+			Vec2i history_pos = std::get<0>(HistoricalTerrains[i]);
+			if (history_pos.x < template_start_pos.x || history_pos.x >= (template_start_pos.x + (Map.Info.MapWidths[z] / this->Scale)) || history_pos.y < template_start_pos.y || history_pos.y >= (template_start_pos.y + (Map.Info.MapHeights[z] / this->Scale))) {
+				continue;
+			}
+			if (CurrentCampaign->StartDate.ContainsDate(std::get<2>(HistoricalTerrains[i])) || std::get<2>(HistoricalTerrains[i]).year == 0) {
+				CTerrainType *historical_terrain = std::get<1>(HistoricalTerrains[i]);
+				
+				for (int sub_x = 0; sub_x < this->Scale; ++sub_x) {
+					for (int sub_y = 0; sub_y < this->Scale; ++sub_y) {
+						Vec2i real_pos(map_start_pos.x + ((history_pos.x - template_start_pos.x) * this->Scale) + sub_x, map_start_pos.y + ((history_pos.y - template_start_pos.y) * this->Scale) + sub_y);
 
-					if (!Map.Info.IsPointOnMap(real_pos, z)) {
-						continue;
-					}
-					
-					if (historical_terrain) {
-						if (historical_terrain->Overlay && ((historical_terrain->Flags & MapFieldRoad) || (historical_terrain->Flags & MapFieldRailroad)) && !(Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
+						if (!Map.Info.IsPointOnMap(real_pos, z)) {
 							continue;
 						}
-						Map.Field(real_pos, z)->SetTerrain(historical_terrain);
-					} else { //if the terrain type is NULL, then that means a previously set overlay terrain should be removed
-						Map.Field(real_pos, z)->RemoveOverlayTerrain();
+						
+						if (historical_terrain) {
+							if (historical_terrain->Overlay && ((historical_terrain->Flags & MapFieldRoad) || (historical_terrain->Flags & MapFieldRailroad)) && !(Map.Field(real_pos, z)->Flags & MapFieldLandAllowed)) {
+								continue;
+							}
+							Map.Field(real_pos, z)->SetTerrain(historical_terrain);
+						} else { //if the terrain type is NULL, then that means a previously set overlay terrain should be removed
+							Map.Field(real_pos, z)->RemoveOverlayTerrain();
+						}
 					}
 				}
 			}
@@ -548,10 +550,10 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 	}
 
-	this->ApplyConnectors(template_start_pos, map_start_pos, z);
 	if (CurrentCampaign != NULL) {
-		this->ApplySettlements(template_start_pos, map_start_pos, z);
+		this->ApplyConnectors(template_start_pos, map_start_pos, z);
 	}
+	this->ApplySettlements(template_start_pos, map_start_pos, z);
 	this->ApplyUnits(template_start_pos, map_start_pos, z);
 	
 	ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
@@ -600,7 +602,9 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->Name.c_str());
 
 	// now, generate the units and heroes that were set to be generated at a random position (by having their position set to {-1, -1})
-	this->ApplyConnectors(template_start_pos, map_start_pos, z, true);
+	if (CurrentCampaign != NULL) {
+		this->ApplyConnectors(template_start_pos, map_start_pos, z, true);
+	}
 	this->ApplyUnits(template_start_pos, map_start_pos, z, true);
 
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -690,8 +694,11 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 		
 		for (size_t j = 0; j < settlement_iterator->second->HistoricalResources.size(); ++j) {
 			if (
-				CurrentCampaign->StartDate.ContainsDate(std::get<0>(settlement_iterator->second->HistoricalResources[j]))
-				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(settlement_iterator->second->HistoricalResources[j])) || std::get<1>(settlement_iterator->second->HistoricalResources[j]).year == 0)
+				(!CurrentCampaign && std::get<1>(settlement_iterator->second->HistoricalResources[j]).year == 0 && std::get<1>(settlement_iterator->second->HistoricalResources[j]).year == 0)
+				|| (
+					CurrentCampaign && CurrentCampaign->StartDate.ContainsDate(std::get<0>(settlement_iterator->second->HistoricalResources[j]))
+					&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(settlement_iterator->second->HistoricalResources[j])) || std::get<1>(settlement_iterator->second->HistoricalResources[j]).year == 0)
+				)
 			) {
 				const CUnitType *type = std::get<2>(settlement_iterator->second->HistoricalResources[j]);
 				if (!type) {
@@ -711,6 +718,10 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 				}
 			}
+		}
+		
+		if (!CurrentCampaign) {
+			continue;
 		}
 		
 		CFaction *settlement_owner = NULL;
@@ -1056,9 +1067,18 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			continue;
 		}
 		
-		if ((!CurrentCampaign || std::get<3>(this->Units[i]).year == 0 || CurrentCampaign->StartDate.ContainsDate(std::get<3>(this->Units[i]))) && (std::get<4>(this->Units[i]).year == 0 || !CurrentCampaign->StartDate.ContainsDate(std::get<4>(this->Units[i])))) {
+		if (
+			(!CurrentCampaign && std::get<3>(this->Units[i]).year == 0 && std::get<4>(this->Units[i]).year == 0)
+			|| (
+				CurrentCampaign && (std::get<3>(this->Units[i]).year == 0 || CurrentCampaign->StartDate.ContainsDate(std::get<3>(this->Units[i])))
+				&& (std::get<4>(this->Units[i]).year == 0 || (!CurrentCampaign->StartDate.ContainsDate(std::get<4>(this->Units[i]))))
+			)
+		) {
 			CPlayer *player = NULL;
 			if (std::get<2>(this->Units[i])) {
+				if (!CurrentCampaign) { //only apply neutral units for when applying map templates for non-campaign/scenario maps
+					continue;
+				}
 				player = GetOrAddFactionPlayer(std::get<2>(this->Units[i]));
 				if (!player) {
 					continue;
@@ -1084,6 +1104,10 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 				unit->SetUnique(std::get<5>(this->Units[i]));
 			}
 		}
+	}
+
+	if (!CurrentCampaign) {
+		return;
 	}
 
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
