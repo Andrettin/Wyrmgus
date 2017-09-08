@@ -3377,7 +3377,11 @@ void CUnit::Place(const Vec2i &pos, int z)
 					Select(building_tile_pos, building_tile_pos, table, this->MapLayer);
 					for (size_t i = 0; i != table.size(); ++i) {
 						if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
-							LetUnitDie(*table[i]);			
+							if (Editor.Running == EditorNotRunning) {
+								LetUnitDie(*table[i]);			
+							} else {
+								EditorActionRemoveUnit(*table[i], false);
+							}
 						}
 					}
 				}
