@@ -619,7 +619,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		// add five workers at the player's starting location
 		if (Players[i].NumTownHalls > 0) {
 			int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Race, Players[i].Faction, GetUnitTypeClassIndexByName("worker"));			
-			if (worker_type_id != -1) {
+			if (worker_type_id != -1 && Players[i].UnitTypesCount[worker_type_id] == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
 				
 				Vec2i worker_pos(Players[i].StartPos);
