@@ -768,12 +768,6 @@ void CUnit::Retrain()
 									SaveHero(Character);
 									CheckAchievements();
 								}
-								if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode
-									CGrandStrategyHero *hero = GrandStrategyGame.GetHero(Character->GetFullName());
-									if (hero) {
-										hero->SetType(i);
-									}
-								}
 							}
 						}
 						found_previous_unit_type = true;
@@ -846,9 +840,6 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	CCharacter *character = NULL;
 	if (!custom_hero) {
 		character = GetCharacter(character_full_name);
-		if (GrandStrategy && (character == NULL || this->Player->AiEnabled)) {
-			character = GrandStrategyGame.GetHero(character_full_name);
-		}
 	} else {
 		character = GetCustomHero(character_full_name);
 	}

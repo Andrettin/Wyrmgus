@@ -1551,7 +1551,7 @@ void AiEachSecond(CPlayer &player)
 
 	//Wyrmgus start
 	//if doesn't have a faction, set a random one for the AI
-	if (player.Faction == -1 && !GrandStrategy) {
+	if (player.Faction == -1) {
 		player.SetRandomFaction();
 	}
 	//Wyrmgus end

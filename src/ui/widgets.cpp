@@ -75,87 +75,12 @@ static std::stack<MenuScreen *> MenuStack;
 static void MenuHandleButtonDown(unsigned button)
 //Wyrmgus end
 {
-	//Wyrmgus start
-	if ((1 << button) == LeftButton && GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) {
-		//if clicked on the "OK" button in the province interface
-		if (GrandStrategyGame.SelectedProvince != NULL && UI.GrandStrategyOKButton.Contains(CursorScreenPos) && GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy") {
-			UI.GrandStrategyOKButton.Clicked = true;
-		} else if (UI.MenuButton.Contains(CursorScreenPos)) {
-			UI.MenuButton.Clicked = true;
-		} else if (UI.GrandStrategyEndTurnButton.Contains(CursorScreenPos)) {
-			UI.GrandStrategyEndTurnButton.Clicked = true;
-		} else if (GrandStrategyGame.SelectedProvince != NULL && GrandStrategyGame.SelectedProvince->ActiveHeroes.size() > 0 && GrandStrategyGame.SelectedProvince->Owner != NULL && GrandStrategyGame.SelectedProvince->Owner == GrandStrategyGame.PlayerFaction && UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos) && GrandStrategyInterfaceState == "Province") {
-			UI.GrandStrategyShowHeroesButton.Clicked = true;
-		} else if (GrandStrategyGame.SelectedProvince != NULL && UI.GrandStrategyShowRulerButton.X != -1 && GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] != NULL && UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos) && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
-			UI.GrandStrategyShowRulerButton.Clicked = true;
-		}
-	}
-	//Wyrmgus end
 }
 //Wyrmgus start
 //static void MenuHandleButtonUp(unsigned)
 static void MenuHandleButtonUp(unsigned button)
 //Wyrmgus end
 {
-	//Wyrmgus start
-	if ((1 << button) == LeftButton && GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) {
-		//if clicked on the "OK" button in a province's interface
-		if (GrandStrategyGame.SelectedProvince != NULL && !(MouseButtons & LeftButton) && UI.GrandStrategyOKButton.Clicked && GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy") {
-			UI.GrandStrategyOKButton.Clicked = false;
-			if (UI.GrandStrategyOKButton.Contains(CursorScreenPos)) { //if the mouse is still on the button, fire its action
-				if (UI.GrandStrategyOKButton.Callback) {
-					UI.GrandStrategyOKButton.Callback->action("");
-				}
-			}
-		} else if (!(MouseButtons & LeftButton) && UI.MenuButton.Clicked) {
-			UI.MenuButton.Clicked = false;
-			if (UI.MenuButton.Contains(CursorScreenPos)) { //if the mouse is still on the button, fire its action
-				if (UI.MenuButton.Callback) {
-					UI.MenuButton.Callback->action("");
-				}
-			}
-		} else if (!(MouseButtons & LeftButton) && UI.GrandStrategyEndTurnButton.Clicked) {
-			UI.GrandStrategyEndTurnButton.Clicked = false;
-			if (UI.GrandStrategyEndTurnButton.Contains(CursorScreenPos)) { //if the mouse is still on the button, fire its action
-				if (UI.GrandStrategyEndTurnButton.Callback) {
-					UI.GrandStrategyEndTurnButton.Callback->action("");
-				}
-			}
-		} else if (GrandStrategyGame.SelectedProvince != NULL && !(MouseButtons & LeftButton) && UI.GrandStrategyShowHeroesButton.Clicked && GrandStrategyGame.SelectedProvince->ActiveHeroes.size() > 0 && GrandStrategyGame.SelectedProvince->Owner != NULL && GrandStrategyGame.SelectedProvince->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyInterfaceState == "Province") {
-			UI.GrandStrategyShowHeroesButton.Clicked = false;
-			if (UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos)) { //if the mouse is still on the button, fire its action
-				if (UI.GrandStrategyShowHeroesButton.Callback) {
-					UI.GrandStrategyShowHeroesButton.Callback->action("");
-				}
-			}
-		} else if (GrandStrategyGame.SelectedProvince != NULL && !(MouseButtons & LeftButton) && UI.GrandStrategyShowRulerButton.Clicked && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") && UI.GrandStrategyShowRulerButton.X != -1 && GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] != NULL) {
-			UI.GrandStrategyShowRulerButton.Clicked = false;
-			if (UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos)) { //if the mouse is still on the button, fire its action
-				if (UI.GrandStrategyShowRulerButton.Callback) {
-					UI.GrandStrategyShowRulerButton.Callback->action("");
-				}
-			}
-		//if clicked on a tile, update the grand strategy interface
-		} else if (UI.MapArea.Contains(CursorScreenPos) && !(MouseButtons & LeftButton) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1) {
-			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume, false);
-			GrandStrategyGame.SelectedTile = GrandStrategyGame.GetTileUnderCursor();
-			if (GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Province != NULL) {
-				GrandStrategyGame.SetSelectedProvince(GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Province);
-			}
-		//if clicked on the minimap, go to that part of the map
-		} else if (
-			CursorScreenPos.x >= UI.Minimap.X + GrandStrategyGame.MinimapOffsetX
-			&& CursorScreenPos.x < UI.Minimap.X + GrandStrategyGame.MinimapOffsetX + GrandStrategyGame.MinimapTextureWidth
-			&& CursorScreenPos.y >= UI.Minimap.Y + GrandStrategyGame.MinimapOffsetY
-			&& CursorScreenPos.y < UI.Minimap.Y + GrandStrategyGame.MinimapOffsetY + GrandStrategyGame.MinimapTextureHeight
-			&& !(MouseButtons & LeftButton)
-			&& GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]
-		) {
-			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume, false);
-			CenterGrandStrategyMapOnTile(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
-		}
-	}
-	//Wyrmgus end
 }
 static void MenuHandleMouseMove(const PixelPos &screenPos)
 {
@@ -164,86 +89,6 @@ static void MenuHandleMouseMove(const PixelPos &screenPos)
 }
 static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 {
-	//Wyrmgus start
-	if (GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) {// if in grand strategy mode
-		// scroll the map if a directional key was pressed
-		bool scrolled = false;
-		if (key == SDLK_UP || key == SDLK_KP8) {
-			if (WorldMapOffsetY > 0) {
-				if (GrandStrategyMapHeightIndent == 0) {
-					WorldMapOffsetY = WorldMapOffsetY - 1;
-				}
-				GrandStrategyMapHeightIndent -= 32;
-			} else if (WorldMapOffsetY == 0 && GrandStrategyMapHeightIndent == -32) { //this is to make the entire y 0 tiles be shown scrolling to the northmost part of the map
-				GrandStrategyMapHeightIndent -= 32;
-			}
-			scrolled = true;
-		} else if (key == SDLK_DOWN || key == SDLK_KP2) {
-			if (WorldMapOffsetY < GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64)) {
-				if (GrandStrategyMapHeightIndent == -32) {
-					WorldMapOffsetY = WorldMapOffsetY + 1;
-				}
-				GrandStrategyMapHeightIndent += 32;
-			} else if (WorldMapOffsetY == GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64) && GrandStrategyMapHeightIndent == 0) {
-				GrandStrategyMapHeightIndent += 32;
-			}
-			scrolled = true;
-		} else if (key == SDLK_LEFT || key == SDLK_KP4) {
-			if (WorldMapOffsetX > 0) {
-				if (GrandStrategyMapWidthIndent == 0) {
-					WorldMapOffsetX = WorldMapOffsetX - 1;
-				}
-				GrandStrategyMapWidthIndent -= 32;
-			} else if (WorldMapOffsetX == 0 && GrandStrategyMapWidthIndent == -32) { //this is to make the entire x 0 tiles be shown scrolling to the westmost part of the map
-				GrandStrategyMapWidthIndent -= 32;
-			}
-			scrolled = true;
-		} else if (key == SDLK_RIGHT || key == SDLK_KP6) {
-			if (WorldMapOffsetX < GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64)) {
-				if (GrandStrategyMapWidthIndent == -32) {
-					WorldMapOffsetX = WorldMapOffsetX + 1;
-				}
-				GrandStrategyMapWidthIndent += 32;
-			} else if (WorldMapOffsetX == GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64) && GrandStrategyMapWidthIndent == 0 && (UI.MapArea.EndX - UI.MapArea.X + 1) % 64 == 32) {
-				GrandStrategyMapWidthIndent += 32;
-			}
-			scrolled = true;
-		//if pressed the hotkey of the "OK" button in the province interface
-		} else if (GrandStrategyGame.SelectedProvince != NULL && GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy" && key == 'o') {
-			UI.GrandStrategyOKButton.HotkeyPressed = true;
-		} else if (key == SDLK_F5) {
-			CclCommand("if (RunEncyclopediaMenu ~= nil) then RunEncyclopediaMenu() end;");
-		//if pressed the hotkey of the menu button
-		} else if (key == SDLK_F10) {
-			UI.MenuButton.HotkeyPressed = true;
-		} else if (key == SDLK_F11) {
-			CclCommand("if (RunGrandStrategySaveMenu ~= nil) then RunGrandStrategySaveMenu() end;");
-		} else if (key == SDLK_F12) {
-			CclCommand("if (RunGrandStrategyLoadGameMenu ~= nil) then RunGrandStrategyLoadGameMenu() end;");
-		} else if (key == 'e') {
-			UI.GrandStrategyEndTurnButton.HotkeyPressed = true;
-		} else if (GrandStrategyGame.SelectedProvince != NULL && GrandStrategyGame.SelectedProvince->ActiveHeroes.size() > 0 && GrandStrategyGame.SelectedProvince->Owner != NULL && GrandStrategyGame.SelectedProvince->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyInterfaceState == "Province" && key == 'h') {
-			UI.GrandStrategyShowHeroesButton.HotkeyPressed = true;
-		} else if (GrandStrategyGame.SelectedProvince != NULL && UI.GrandStrategyShowRulerButton.X != -1 && GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] != NULL && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") && key == 'r') {
-			UI.GrandStrategyShowRulerButton.HotkeyPressed = true;
-		}
-		
-		if (scrolled) {
-			if (GrandStrategyMapWidthIndent <= -64) {
-				GrandStrategyMapWidthIndent = 0;
-			}
-			if (GrandStrategyMapHeightIndent <= -64) {
-				GrandStrategyMapHeightIndent = 0;
-			}
-			if (GrandStrategyMapWidthIndent > 0) {
-				GrandStrategyMapWidthIndent *= -1;
-			}
-			if (GrandStrategyMapHeightIndent > 0) {
-				GrandStrategyMapHeightIndent *= -1;
-			}
-		}
-	}
-	//Wyrmgus end
 	HandleKeyModifiersDown(key, keychar);
 }
 static void MenuHandleKeyUp(unsigned key, unsigned keychar)
@@ -265,101 +110,11 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 	*/
 	}
 	//Wyrmgus end
-	//Wyrmgus start
-	if (GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) {// if in grand strategy mode
-		if (GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy" && key == 'o' && GrandStrategyGame.SelectedProvince != NULL && UI.GrandStrategyOKButton.HotkeyPressed) {
-			UI.GrandStrategyOKButton.HotkeyPressed = false;
-			if (UI.GrandStrategyOKButton.Callback) {
-				UI.GrandStrategyOKButton.Callback->action("");
-			}
-		} else if (key == SDLK_F10 && UI.MenuButton.HotkeyPressed) {
-			UI.MenuButton.HotkeyPressed = false;
-			if (UI.MenuButton.Callback) {
-				UI.MenuButton.Callback->action("");
-			}
-		} else if (key == 'e' && UI.GrandStrategyEndTurnButton.HotkeyPressed) {
-			UI.GrandStrategyEndTurnButton.HotkeyPressed = false;
-			if (UI.GrandStrategyEndTurnButton.Callback) {
-				UI.GrandStrategyEndTurnButton.Callback->action("");
-			}
-		} else if (key == 'h' && GrandStrategyGame.SelectedProvince != NULL && UI.GrandStrategyShowHeroesButton.HotkeyPressed && GrandStrategyGame.SelectedProvince != NULL && GrandStrategyGame.SelectedProvince->ActiveHeroes.size() > 0 && GrandStrategyGame.SelectedProvince->Owner != NULL && GrandStrategyGame.SelectedProvince->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyInterfaceState == "Province") {
-			UI.GrandStrategyShowHeroesButton.HotkeyPressed = false;
-			if (UI.GrandStrategyShowHeroesButton.Callback) {
-				UI.GrandStrategyShowHeroesButton.Callback->action("");
-			}
-		} else if (key == 'r' && GrandStrategyGame.SelectedProvince != NULL && UI.GrandStrategyShowRulerButton.X != -1 && GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] != NULL && UI.GrandStrategyShowRulerButton.HotkeyPressed && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
-			UI.GrandStrategyShowRulerButton.HotkeyPressed = false;
-			if (UI.GrandStrategyShowRulerButton.Callback) {
-				UI.GrandStrategyShowRulerButton.Callback->action("");
-			}
-		}
-	}
-	//Wyrmgus end
 	HandleKeyModifiersUp(key, keychar);
 }
 static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 {
 	Input->processKeyRepeat();
-	//Wyrmgus start
-	if (GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) { // if in grand strategy mode, scroll the map if a directional key was pressed
-		bool scrolled = false;
-		if (key == SDLK_UP || key == SDLK_KP8) {
-			if (WorldMapOffsetY > 0) {
-				if (GrandStrategyMapHeightIndent == 0) {
-					WorldMapOffsetY = WorldMapOffsetY - 1;
-				}
-				GrandStrategyMapHeightIndent -= 32;
-			} else if (WorldMapOffsetY == 0 && GrandStrategyMapHeightIndent == -32) { //this is to make the entire y 0 tiles be shown scrolling to the northmost part of the map
-				GrandStrategyMapHeightIndent -= 32;
-			}
-			scrolled = true;
-		} else if (key == SDLK_DOWN || key == SDLK_KP2) {
-			if (WorldMapOffsetY < GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64)) {
-				if (GrandStrategyMapHeightIndent == -32) {
-					WorldMapOffsetY = WorldMapOffsetY + 1;
-				}
-				GrandStrategyMapHeightIndent += 32;
-			} else if (WorldMapOffsetY == GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64) && GrandStrategyMapHeightIndent == 0) {
-				GrandStrategyMapHeightIndent += 32;
-			}
-			scrolled = true;
-		} else if (key == SDLK_LEFT || key == SDLK_KP4) {
-			if (WorldMapOffsetX > 0) {
-				if (GrandStrategyMapWidthIndent == 0) {
-					WorldMapOffsetX = WorldMapOffsetX - 1;
-				}
-				GrandStrategyMapWidthIndent -= 32;
-			} else if (WorldMapOffsetX == 0 && GrandStrategyMapWidthIndent == -32) { //this is to make the entire x 0 tiles be shown scrolling to the westmost part of the map
-				GrandStrategyMapWidthIndent -= 32;
-			}
-			scrolled = true;
-		} else if (key == SDLK_RIGHT || key == SDLK_KP6) {
-			if (WorldMapOffsetX < GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64)) {
-				if (GrandStrategyMapWidthIndent == -32) {
-					WorldMapOffsetX = WorldMapOffsetX + 1;
-				}
-				GrandStrategyMapWidthIndent += 32;
-			} else if (WorldMapOffsetX == GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64) && GrandStrategyMapWidthIndent == 0 && (UI.MapArea.EndX - UI.MapArea.X + 1) % 64 == 32) {
-				GrandStrategyMapWidthIndent += 32;
-			}
-			scrolled = true;
-		}
-		if (scrolled) {
-			if (GrandStrategyMapWidthIndent <= -64) {
-				GrandStrategyMapWidthIndent = 0;
-			}
-			if (GrandStrategyMapHeightIndent <= -64) {
-				GrandStrategyMapHeightIndent = 0;
-			}
-			if (GrandStrategyMapWidthIndent > 0) {
-				GrandStrategyMapWidthIndent *= -1;
-			}
-			if (GrandStrategyMapHeightIndent > 0) {
-				GrandStrategyMapHeightIndent *= -1;
-			}
-		}
-	}
-	//Wyrmgus end
 	HandleKeyModifiersDown(key, keychar);
 }
 
@@ -449,15 +204,9 @@ void DrawGuichanWidgets()
 {
 	if (Gui) {
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		//Wyrmgus start
-//		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
-		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running && (!GrandStrategy || GrandStrategyGamePaused));
-		//Wyrmgus end
+		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
 #else
-		//Wyrmgus start
-//		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
-		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running && (!GrandStrategy || GrandStrategyGamePaused));
-		//Wyrmgus end
+		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
 #endif
 		Gui->draw();
 	}

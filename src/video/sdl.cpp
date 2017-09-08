@@ -342,11 +342,6 @@ void ReloadOpenGL()
 	ReloadGraphics();
 	ReloadFonts();
 	UI.Minimap.Reload();
-	//Wyrmgus start
-	if (GrandStrategy) {
-		InitializeGrandStrategyMinimap();
-	}
-	//Wyrmgus end
 }
 
 #endif

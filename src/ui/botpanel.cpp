@@ -2336,12 +2336,6 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 							SaveHero(Selected[i]->Character);
 							CheckAchievements();
 						}
-						if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode
-							CGrandStrategyHero *hero = GrandStrategyGame.GetHero(Selected[i]->Character->GetFullName());
-							if (hero) {
-								hero->SetType(CurrentButtons[button].Value);
-							}
-						}
 					}
 				}
 				SendCommandTransformInto(*Selected[i], type, !(KeyModifiers & ModifierShift));

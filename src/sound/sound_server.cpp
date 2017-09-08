@@ -893,10 +893,6 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 		}
 	}
 	SDL_UnlockMutex(Audio.Lock);
-	
-	if (GrandStrategy && !GameRunning) { // play day music in grand strategy mode
-		SetMusicCondition(OAML_CONDID_MAIN_LOOP, MiddayTimeOfDay);
-	}
 #endif
 }
 

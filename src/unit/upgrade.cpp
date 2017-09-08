@@ -2342,13 +2342,6 @@ void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
 				unit.Character->Abilities.push_back(upgrade);
 				SaveHero(unit.Character);
 			}
-			if (GrandStrategy) { // also save the ability for the character's grand strategy hero version
-				CGrandStrategyHero *hero = GrandStrategyGame.GetHero(unit.Character->GetFullName());
-				if (hero != NULL) {
-					hero->Abilities.push_back(upgrade);
-					hero->UpdateAttributes();
-				}
-			}
 		}
 	}
 	IndividualUpgradeAcquire(unit, upgrade);
@@ -2370,13 +2363,6 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade)
 			if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 				unit.Character->Abilities.erase(std::remove(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade), unit.Character->Abilities.end());
 				SaveHero(unit.Character);
-			}
-			if (GrandStrategy) { // also save the ability for the character's grand strategy hero version
-				CGrandStrategyHero *hero = GrandStrategyGame.GetHero(unit.Character->GetFullName());
-				if (hero != NULL) {
-					hero->Abilities.erase(std::remove(hero->Abilities.begin(), hero->Abilities.end(), upgrade), hero->Abilities.end());
-					hero->UpdateAttributes();
-				}
 			}
 		}
 	}

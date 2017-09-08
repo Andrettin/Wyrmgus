@@ -665,15 +665,12 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 //Wyrmgus end
 {
 	//Wyrmgus start
-	if (!(GrandStrategy && !GameRunning && GameResult == GameNoResult)) {
-		for (int i = 0; i < PlayerColorMax; ++i) {
-			if (PlayerColors[i][0] == Players[player].Color) {
-				player = i;
-				break;
-			}		
+	for (int i = 0; i < PlayerColorMax; ++i) {
+		if (PlayerColors[i][0] == Players[player].Color) {
+			player = i;
+			break;
 		}
 	}
-	//if in grand strategy mode, then treat the "player" variable as the player color index (necessary for drawing a player color graphic outside of a game)
 	
 	//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)

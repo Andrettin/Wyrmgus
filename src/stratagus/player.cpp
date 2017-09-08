@@ -1755,7 +1755,7 @@ bool CPlayer::HasSettlement(CSettlement *settlement) const
 */
 bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 {
-	if (CurrentQuest != NULL || GrandStrategy) {
+	if (CurrentQuest != NULL) {
 		return false;
 	}
 	
