@@ -2353,7 +2353,11 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 		Select(pos, pos, table, z);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
-				LetUnitDie(*table[i]);			
+				if (Editor.Running == EditorNotRunning) {
+					LetUnitDie(*table[i]);			
+				} else {
+					EditorActionRemoveUnit(*table[i], false);
+				}
 			}
 		}
 	}
@@ -3368,7 +3372,11 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 	Select(pos, pos, table, z);
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
-			LetUnitDie(*table[i]);			
+			if (Editor.Running == EditorNotRunning) {
+				LetUnitDie(*table[i]);			
+			} else {
+				EditorActionRemoveUnit(*table[i], false);
+			}
 		}
 	}
 
