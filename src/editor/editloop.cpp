@@ -322,9 +322,13 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 				for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 					for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 						if (x_offset != 0 || y_offset != 0) {
-							if (Map.Info.IsPointOnMap(changed_tiles[i] + Vec2i(x_offset, y_offset), CurrentMapLayer)) {
-								EditTile(changed_tiles[i] + Vec2i(x_offset, y_offset), terrain);
-								changed_tiles.push_back(changed_tiles[i] + Vec2i(x_offset, y_offset));
+							Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
+							if (std::find(changed_tiles.begin(), changed_tiles.end(), adjacent_pos) != changed_tiles.end()) {
+								continue;
+							}
+							if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
+								EditTile(adjacent_pos, terrain);
+								changed_tiles.push_back(adjacent_pos);
 							}
 						}
 					}
