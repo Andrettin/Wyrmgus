@@ -2082,7 +2082,7 @@ int GrandStrategyWorldMapTile::GetResourceIncome(bool ignore_transport_level)
 	int income = 0;
 	
 	if (this->Resource != -1 && this->ResourceProspected && this->Worked) {
-		income += DefaultResourceOutputs[this->Resource];
+		income += 100;
 		income *= 100 + this->Province->GetProductionEfficiencyModifier(this->Resource);
 		income /= 100;
 		if (!ignore_transport_level && income > GetTransportLevelMaximumCapacity(this->TransportLevel)) {
@@ -2819,9 +2819,9 @@ void CGrandStrategyProvince::AllocateLaborToResource(int resource)
 		return;
 	}
 	
-	if (this->ProductionCapacity[resource] > this->ProductionCapacityFulfilled[resource] && this->Labor >= DefaultResourceLaborInputs[resource]) {
-		int employment_change = std::min(this->Labor / DefaultResourceLaborInputs[resource], this->ProductionCapacity[resource] - ProductionCapacityFulfilled[resource]);
-		this->Labor -= employment_change * DefaultResourceLaborInputs[resource];
+	if (this->ProductionCapacity[resource] > this->ProductionCapacityFulfilled[resource] && this->Labor >= 100) {
+		int employment_change = std::min(this->Labor / 100, this->ProductionCapacity[resource] - ProductionCapacityFulfilled[resource]);
+		this->Labor -= employment_change * 100;
 		ProductionCapacityFulfilled[resource] += employment_change;
 		
 		//set new worked tiles
@@ -2843,9 +2843,9 @@ void CGrandStrategyProvince::AllocateLaborToResource(int resource)
 	
 	//recalculate food consumption (workers employed in producing food don't need to consume food)
 	FoodConsumption = this->TotalWorkers * FoodConsumptionPerWorker;
-	FoodConsumption -= (this->ProductionCapacityFulfilled[GrainCost] * DefaultResourceLaborInputs[GrainCost]);
-	FoodConsumption -= (this->ProductionCapacityFulfilled[MushroomCost] * DefaultResourceLaborInputs[MushroomCost]);
-	FoodConsumption -= (this->ProductionCapacityFulfilled[FishCost] * DefaultResourceLaborInputs[FishCost]);
+	FoodConsumption -= (this->ProductionCapacityFulfilled[GrainCost] * 100);
+	FoodConsumption -= (this->ProductionCapacityFulfilled[MushroomCost] * 100);
+	FoodConsumption -= (this->ProductionCapacityFulfilled[FishCost] * 100);
 }
 
 void CGrandStrategyProvince::DeallocateLabor()
@@ -2931,7 +2931,7 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 			}
 		} else {
 			if (this->ProductionCapacityFulfilled[resource] > 0) {
-				income += DefaultResourceOutputs[resource] * this->ProductionCapacityFulfilled[resource];
+				income += 100 * this->ProductionCapacityFulfilled[resource];
 				income *= 100 + this->GetProductionEfficiencyModifier(resource);
 				income /= 100;
 			}
@@ -3349,9 +3349,9 @@ int CGrandStrategyProvince::GetLanguage()
 int CGrandStrategyProvince::GetFoodCapacity(bool subtract_non_food)
 {
 	int food_capacity = 0;
-	food_capacity += this->ProductionCapacity[GrainCost] * DefaultResourceOutputs[GrainCost] * (100 + this->GetProductionEfficiencyModifier(GrainCost)) / 100;
-	food_capacity += this->ProductionCapacity[MushroomCost] * DefaultResourceOutputs[MushroomCost] * (100 + this->GetProductionEfficiencyModifier(MushroomCost)) / 100;
-	food_capacity += this->ProductionCapacity[FishCost] * DefaultResourceOutputs[FishCost] * (100 + this->GetProductionEfficiencyModifier(FishCost)) / 100;
+	food_capacity += this->ProductionCapacity[GrainCost] * 100 * (100 + this->GetProductionEfficiencyModifier(GrainCost)) / 100;
+	food_capacity += this->ProductionCapacity[MushroomCost] * 100 * (100 + this->GetProductionEfficiencyModifier(MushroomCost)) / 100;
+	food_capacity += this->ProductionCapacity[FishCost] * 100 * (100 + this->GetProductionEfficiencyModifier(FishCost)) / 100;
 	
 	
 	if (subtract_non_food) {
@@ -3375,7 +3375,7 @@ int CGrandStrategyProvince::GetDesirabilityRating()
 	food_resources.push_back(FishCost);
 	
 	for (size_t i = 0; i < food_resources.size(); ++i) {
-		desirability += this->ProductionCapacity[food_resources[i]] * DefaultResourceOutputs[food_resources[i]];
+		desirability += this->ProductionCapacity[food_resources[i]] * 100;
 	}
 	
 	std::vector<int> resources;
@@ -3386,7 +3386,7 @@ int CGrandStrategyProvince::GetDesirabilityRating()
 	resources.push_back(StoneCost);
 	
 	for (size_t i = 0; i < resources.size(); ++i) {
-		desirability += this->ProductionCapacity[resources[i]] * DefaultResourceOutputs[resources[i]] * GrandStrategyGame.CommodityPrices[resources[i]] / 100;
+		desirability += this->ProductionCapacity[resources[i]] * 100 * GrandStrategyGame.CommodityPrices[resources[i]] / 100;
 	}
 	
 	if (this->Coastal) {
@@ -5576,17 +5576,6 @@ void CalculateWorldMapTileGraphicTile(int x, int y)
 		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
 			std::string resource_building_filename = "tilesets/world/sites/resource_building_";
 			resource_building_filename += DefaultResourceNames[GrandStrategyGame.WorldMapTiles[x][y]->Resource];
-			
-			//see if the resource has a graphic specific for this tile's terrain, and if so, use it
-			if (ResourceGrandStrategyBuildingTerrainSpecificGraphic[GrandStrategyGame.WorldMapTiles[x][y]->Resource][terrain]) {
-				resource_building_filename += "_";
-				resource_building_filename += WorldMapTerrainTypes[terrain]->Tag;
-			}
-			
-			if (ResourceGrandStrategyBuildingVariations[GrandStrategyGame.WorldMapTiles[x][y]->Resource] > 0 && CanAccessFile((resource_building_filename + "_" + std::to_string((long long) ResourceGrandStrategyBuildingVariations[GrandStrategyGame.WorldMapTiles[x][y]->Resource]) + ".png").c_str())) { //see if the resource has variations, and if so, choose a random one
-				resource_building_filename += "_";
-				resource_building_filename += std::to_string((long long) SyncRand(ResourceGrandStrategyBuildingVariations[GrandStrategyGame.WorldMapTiles[x][y]->Resource]) + 1);
-			}
 			
 			std::string resource_building_player_color_filename = resource_building_filename + "_player_color.png";
 			resource_building_filename += ".png";
@@ -8172,50 +8161,6 @@ void SetResourceBasePrice(std::string resource_name, int price)
 	}
 	
 	DefaultResourcePrices[resource] = price;
-}
-
-void SetResourceBaseLaborInput(std::string resource_name, int input)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource == -1) {
-		return;
-	}
-	
-	DefaultResourceLaborInputs[resource] = input;
-}
-
-void SetResourceBaseOutput(std::string resource_name, int output)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource == -1) {
-		return;
-	}
-	
-	DefaultResourceOutputs[resource] = output;
-}
-
-void SetResourceGrandStrategyBuildingVariations(std::string resource_name, int variation_quantity)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource == -1) {
-		return;
-	}
-	
-	ResourceGrandStrategyBuildingVariations[resource] = variation_quantity;
-}
-
-void SetResourceGrandStrategyBuildingTerrainSpecificGraphic(std::string resource_name, std::string terrain_type_name, bool has_terrain_specific_graphic)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	int terrain_type = GetWorldMapTerrainTypeId(terrain_type_name);
-	if (resource == -1 || terrain_type == -1) {
-		return;
-	}
-	
-	ResourceGrandStrategyBuildingTerrainSpecificGraphic[resource][terrain_type] = has_terrain_specific_graphic;
 }
 
 void CleanGrandStrategyEvents()

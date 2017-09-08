@@ -2172,12 +2172,6 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 		DefaultResourceFinalResourceConversionRates[i] = 100;
 		DefaultResourceInputResources[i] = 0;
 		DefaultResourcePrices[i] = 0;
-		ResourceGrandStrategyBuildingVariations[i] = 0;
-	}
-	for (int i = 0; i < MaxCosts; ++i) {
-		for (int j = 0; j < WorldMapTerrainTypeMax; ++j) {
-			ResourceGrandStrategyBuildingTerrainSpecificGraphic[i][j] = false;
-		}
 	}
 	//Wyrmgus end
 	
