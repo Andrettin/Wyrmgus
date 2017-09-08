@@ -213,7 +213,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 		value = 100;
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
-	Map.SetTileTerrain(pos, terrain, CurrentMapLayer);
+	mf.SetTerrain(terrain);
 	if (!terrain->Overlay && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
 		Map.RemoveTileOverlayTerrain(pos, CurrentMapLayer);
 	}
@@ -282,6 +282,9 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	for (itPos.y = minPos.y; itPos.y <= maxPos.y; ++itPos.y) {
 		for (itPos.x = minPos.x; itPos.x <= maxPos.x; ++itPos.x) {
 			//Wyrmgus start
+			if (Map.GetTileTopTerrain(itPos, false, CurrentMapLayer) == terrain) {
+				continue;
+			}
 //			EditTile(itPos, tile);
 			EditTile(itPos, terrain);
 			changed_tiles.push_back(itPos);
@@ -339,6 +342,11 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	
 	// now check if changing the tiles left any tiles in an incorrect position, and if so, change it accordingly
 	for (size_t i = 0; i != changed_tiles.size(); ++i) {
+		
+		Map.CalculateTileTransitions(changed_tiles[i], false, CurrentMapLayer);
+		Map.CalculateTileTransitions(changed_tiles[i], true, CurrentMapLayer);
+		UI.Minimap.UpdateXY(changed_tiles[i], CurrentMapLayer);
+
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
@@ -348,6 +356,10 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 						continue;
 					}
 					
+					Map.CalculateTileTransitions(adjacent_pos, false, CurrentMapLayer);
+					Map.CalculateTileTransitions(adjacent_pos, true, CurrentMapLayer);
+					UI.Minimap.UpdateXY(adjacent_pos, CurrentMapLayer);
+		
 					if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
 						for (int overlay = 1; overlay >= 0; --overlay) {
 							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, CurrentMapLayer);

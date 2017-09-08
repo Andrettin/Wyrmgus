@@ -2354,7 +2354,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (table[i] && table[i]->IsAlive() && table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
 				if (Editor.Running == EditorNotRunning) {
-					LetUnitDie(*table[i]);			
+					LetUnitDie(*table[i]);
 				} else {
 					EditorActionRemoveUnit(*table[i], false);
 				}
