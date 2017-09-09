@@ -89,70 +89,6 @@ std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPointer;
 ----------------------------------------------------------------------------*/
 
 /**
-**  Clean up the GrandStrategy elements.
-*/
-void CGrandStrategyGame::Clean()
-{
-	for (int x = 0; x < WorldMapWidthMax; ++x) {
-		for (int y = 0; y < WorldMapHeightMax; ++y) {
-			if (this->WorldMapTiles[x][y]) {
-				delete this->WorldMapTiles[x][y];
-			}
-		}
-	}
-	this->WorldMapWidth = 0;
-	this->WorldMapHeight = 0;
-	
-	for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
-		delete GrandStrategyGame.Provinces[i];
-	}
-	GrandStrategyGame.Provinces.clear();
-	
-	for (int i = 0; i < MaxCosts; ++i) {
-		for (int j = 0; j < WorldMapResourceMax; ++j) {
-			this->WorldMapResources[i][j].x = -1;
-			this->WorldMapResources[i][j].y = -1;
-		}
-	}
-	
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < this->Factions[i].size(); ++j) {
-			delete this->Factions[i][j];
-		}
-		this->Factions[i].clear();
-	}
-	
-	for (size_t i = 0; i < GrandStrategyGame.Rivers.size(); ++i) {
-		delete GrandStrategyGame.Rivers[i];
-	}
-	GrandStrategyGame.Rivers.clear();
-	
-	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		delete GrandStrategyGame.Heroes[i];
-	}
-	GrandStrategyGame.Heroes.clear();
-	GrandStrategyHeroStringToIndex.clear();
-	
-	//destroy minimap surface
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		if (this->MinimapSurfaceGL) {
-			glDeleteTextures(1, &this->MinimapTexture);
-			delete[] this->MinimapSurfaceGL;
-			this->MinimapSurfaceGL = NULL;
-		}
-	} else
-#endif
-	{
-		if (this->MinimapSurface) {
-			VideoPaletteListRemove(this->MinimapSurface);
-			SDL_FreeSurface(this->MinimapSurface);
-			this->MinimapSurface = NULL;
-		}
-	}
-}
-
-/**
 **  Draw the grand strategy map.
 */
 void CGrandStrategyGame::DrawMap()
@@ -447,17 +383,6 @@ void CGrandStrategyGame::DrawMap()
 		}
 	}
 	
-	//if is clicking on a tile, draw a square on its borders
-	if (!GrandStrategyGamePaused && UI.MapArea.Contains(CursorScreenPos) && this->WorldMapTiles[this->GetTileUnderCursor().x][this->GetTileUnderCursor().y]->Terrain != -1 && (MouseButtons & LeftButton)) {
-		int tile_screen_x = ((this->GetTileUnderCursor().x - WorldMapOffsetX) * 64) + UI.MapArea.X + width_indent;
-		int tile_screen_y = ((this->GetTileUnderCursor().y - WorldMapOffsetY) * 64) + UI.MapArea.Y + height_indent;
-			
-//		clamp(&tile_screen_x, 0, Video.Width);
-//		clamp(&tile_screen_y, 0, Video.Height);
-			
-		Video.DrawRectangle(ColorWhite, tile_screen_x, tile_screen_y, 64, 64);
-	}
-	
 	//draw fog over terra incognita
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
@@ -466,69 +391,6 @@ void CGrandStrategyGame::DrawMap()
 			}
 		}
 	}
-}
-
-/**
-**  Draw the grand strategy map.
-*/
-void CGrandStrategyGame::DrawMinimap()
-{
-	#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		glBindTexture(GL_TEXTURE_2D, this->MinimapTexture);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->MinimapTextureWidth, this->MinimapTextureHeight,
-						GL_RGBA, GL_UNSIGNED_BYTE, this->MinimapSurfaceGL);
-
-	#ifdef USE_GLES
-		float texCoord[] = {
-			0.0f, 0.0f,
-			(float)this->MinimapTextureWidth / this->MinimapTextureWidth, 0.0f,
-			0.0f, (float)this->MinimapTextureHeight / this->MinimapTextureHeight,
-			(float)this->MinimapTextureWidth / this->MinimapTextureWidth, (float)this->MinimapTextureHeight / this->MinimapTextureHeight
-		};
-
-		float vertex[] = {
-			2.0f / (GLfloat)Video.Width *(UI.Minimap.X + this->MinimapOffsetX) - 1.0f, -2.0f / (GLfloat)Video.Height *(UI.Minimap.Y + this->MinimapOffsetY) + 1.0f,
-			2.0f / (GLfloat)Video.Width *(UI.Minimap.X + this->MinimapOffsetX + this->MinimapTextureWidth) - 1.0f, -2.0f / (GLfloat)Video.Height *(UI.Minimap.Y + this->MinimapOffsetY) + 1.0f,
-			2.0f / (GLfloat)Video.Width *(UI.Minimap.X + this->MinimapOffsetX) - 1.0f, -2.0f / (GLfloat)Video.Height *(UI.Minimap.Y + this->MinimapOffsetY + this->MinimapTextureHeight) + 1.0f,
-			2.0f / (GLfloat)Video.Width *(UI.Minimap.X + this->MinimapOffsetX + this->MinimapTextureWidth) - 1.0f, -2.0f / (GLfloat)Video.Height *(UI.Minimap.Y + this->MinimapOffsetY + this->MinimapTextureHeight) + 1.0f
-		};
-
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
-		glVertexPointer(2, GL_FLOAT, 0, vertex);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		glDisableClientState(GL_VERTEX_ARRAY);
-#endif
-#ifdef USE_OPENGL
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);
-		glVertex2i(UI.Minimap.X + this->MinimapOffsetX, UI.Minimap.Y + this->MinimapOffsetY);
-		glTexCoord2f(0.0f, (float)this->MinimapTextureHeight / this->MinimapTextureHeight);
-		glVertex2i(UI.Minimap.X + this->MinimapOffsetX, UI.Minimap.Y + this->MinimapOffsetY + this->MinimapTextureHeight);
-		glTexCoord2f((float)this->MinimapTextureWidth / this->MinimapTextureWidth, (float)this->MinimapTextureHeight / this->MinimapTextureHeight);
-		glVertex2i(UI.Minimap.X + this->MinimapOffsetX + this->MinimapTextureWidth, UI.Minimap.Y + this->MinimapOffsetY + this->MinimapTextureHeight);
-		glTexCoord2f((float)this->MinimapTextureWidth / this->MinimapTextureWidth, 0.0f);
-		glVertex2i(UI.Minimap.X + this->MinimapOffsetX + this->MinimapTextureWidth, UI.Minimap.Y + this->MinimapOffsetY);
-		glEnd();
-#endif
-	} else
-#endif
-	{
-		SDL_Rect drect = {Sint16(UI.Minimap.X + this->MinimapOffsetX), Sint16(UI.Minimap.Y + this->MinimapOffsetY), 0, 0};
-		SDL_BlitSurface(this->MinimapSurface, NULL, TheScreen, &drect);
-	}
-
-	int start_x = UI.Minimap.X + GrandStrategyGame.MinimapOffsetX + (WorldMapOffsetX * this->MinimapTileWidth / 1000);
-	int start_y = UI.Minimap.Y + GrandStrategyGame.MinimapOffsetY + (WorldMapOffsetY * this->MinimapTileHeight / 1000);
-	int rectangle_width = (((UI.MapArea.EndX - UI.MapArea.X) / 64) + 1) * this->MinimapTileWidth / 1000;
-	int rectangle_height = (((UI.MapArea.EndY - UI.MapArea.Y) / 64) + 1) * this->MinimapTileHeight / 1000;
-
-	Video.DrawRectangle(ColorGray, start_x, start_y, rectangle_width, rectangle_height);
 }
 
 void CGrandStrategyGame::DrawInterface()
@@ -1605,242 +1467,12 @@ bool CGrandStrategyGame::TradePriority(CGrandStrategyFaction &faction_a, CGrandS
 	return faction_a.Resources[PrestigeCost] > faction_b.Resources[PrestigeCost];
 }
 
-Vec2i CGrandStrategyGame::GetTileUnderCursor()
-{
-	Vec2i tile_under_cursor(0, 0);
-
-	if (UI.MapArea.Contains(CursorScreenPos)) {
-		int width_indent = GrandStrategyMapWidthIndent;
-		int height_indent = GrandStrategyMapHeightIndent;
-
-		tile_under_cursor.x = WorldMapOffsetX + ((CursorScreenPos.x - UI.MapArea.X - width_indent) / 64);
-		tile_under_cursor.y = WorldMapOffsetY + ((CursorScreenPos.y - UI.MapArea.Y - height_indent) / 64);
-	} else if (
-		CursorScreenPos.x >= UI.Minimap.X + GrandStrategyGame.MinimapOffsetX
-		&& CursorScreenPos.x < UI.Minimap.X + GrandStrategyGame.MinimapOffsetX + GrandStrategyGame.MinimapTextureWidth
-		&& CursorScreenPos.y >= UI.Minimap.Y + GrandStrategyGame.MinimapOffsetY
-		&& CursorScreenPos.y < UI.Minimap.Y + GrandStrategyGame.MinimapOffsetY + GrandStrategyGame.MinimapTextureHeight
-	) {
-		tile_under_cursor.x = (CursorScreenPos.x - UI.Minimap.X - GrandStrategyGame.MinimapOffsetX) * 1000 / this->MinimapTileWidth;
-		tile_under_cursor.y = (CursorScreenPos.y - UI.Minimap.Y - GrandStrategyGame.MinimapOffsetY) * 1000 / this->MinimapTileHeight;
-	}
-	
-	return tile_under_cursor;
-}
-
 CGrandStrategyHero *CGrandStrategyGame::GetHero(std::string hero_full_name)
 {
 	if (!hero_full_name.empty() && GrandStrategyHeroStringToIndex.find(hero_full_name) != GrandStrategyHeroStringToIndex.end()) {
 		return this->Heroes[GrandStrategyHeroStringToIndex[hero_full_name]];
 	} else {
 		return NULL;
-	}
-}
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-/**
-**  Create the minimap texture
-*/
-void CGrandStrategyGame::CreateMinimapTexture()
-{
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, &this->MinimapTexture);
-	glBindTexture(GL_TEXTURE_2D, this->MinimapTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->MinimapTextureWidth,
-				 this->MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-				 this->MinimapSurfaceGL);
-}
-#endif
-
-void CGrandStrategyGame::UpdateMinimap()
-{
-	// Clear Minimap background if not transparent
-	#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		memset(this->MinimapSurfaceGL, 0, this->MinimapTextureWidth * this->MinimapTextureHeight * 4);
-	} else
-	#endif
-	{
-		SDL_FillRect(this->MinimapSurface, NULL, SDL_MapRGB(this->MinimapSurface->format, 0, 0, 0));
-	}
-
-	int bpp;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		bpp = 0;
-	} else
-#endif
-	{
-		bpp = this->MinimapSurface->format->BytesPerPixel;
-	}
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		SDL_LockSurface(this->MinimapSurface);
-	}
-
-	for (int my = 0; my < this->MinimapTextureHeight; ++my) {
-		for (int mx = 0; mx < this->MinimapTextureWidth; ++mx) {
-			int tile_x = mx * 1000 / this->MinimapTileWidth;
-			int tile_y = my * 1000 / this->MinimapTileHeight;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				if (GrandStrategyGame.WorldMapTiles[tile_x][tile_y] && GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province != NULL) {
-					CGrandStrategyProvince *province = GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province;
-					if (province->Owner != NULL) {
-						int player_color = PlayerRaces.Factions[province->Owner->Civilization][province->Owner->Faction]->Colors[0];
-						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
-					} else if (province->Water) {
-						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 171, 198, 217);
-					} else {
-						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 255, 255, 255);
-					}
-				} else {
-					*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
-				}
-			} else
-#endif
-			{
-				const int index = mx * bpp + my * this->MinimapSurface->pitch;
-				if (GrandStrategyGame.WorldMapTiles[tile_x][tile_y] && GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province != NULL) {
-					CGrandStrategyProvince *province = GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province;
-					if (province->Owner != NULL) {
-						int player_color = PlayerRaces.Factions[province->Owner->Civilization][province->Owner->Faction]->Colors[0];
-						if (bpp == 2) {
-							*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
-						} else {
-							*(Uint32 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
-						}
-					} else if (province->Water) {
-						if (bpp == 2) {
-							*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 171, 198, 217);
-						} else {
-							*(Uint32 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 171, 198, 217);
-						}
-					} else {
-						if (bpp == 2) {
-							*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 255, 255, 255);
-						} else {
-							*(Uint32 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 255, 255, 255);
-						}
-					}
-				} else {
-					if (bpp == 2) {
-						*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = ColorBlack;
-					} else {
-						*(Uint32 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = ColorBlack;
-					}
-				}
-			}
-		}
-	}
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		SDL_UnlockSurface(this->MinimapSurface);
-	}
-}
-
-void GrandStrategyWorldMapTile::UpdateMinimap()
-{
-	if (!(
-		(GetWorldMapWidth() <= UI.Minimap.X && GetWorldMapHeight() <= UI.Minimap.Y)
-		|| (
-			(this->Position.x % std::max(1000 / GrandStrategyGame.MinimapTileWidth, 1)) == 0
-			&& (this->Position.y % std::max(1000 / GrandStrategyGame.MinimapTileHeight, 1)) == 0
-		)
-	)) {
-		return;
-	}
-	
-	int bpp;
-	#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		bpp = 0;
-	} else
-	#endif
-	{
-		bpp = GrandStrategyGame.MinimapSurface->format->BytesPerPixel;
-	}
-
-	#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-	#endif
-	{
-		SDL_LockSurface(GrandStrategyGame.MinimapSurface);
-	}
-
-	int minimap_tile_width = std::max(GrandStrategyGame.MinimapTileWidth / 1000, 1);
-	int minimap_tile_height = std::max(GrandStrategyGame.MinimapTileHeight / 1000, 1);
-	for (int sub_x = 0; sub_x < minimap_tile_width; ++sub_x) {
-		for (int sub_y = 0; sub_y < minimap_tile_height; ++sub_y) {
-			int mx = (this->Position.x * GrandStrategyGame.MinimapTileWidth / 1000) + sub_x;
-			int my = (this->Position.y * GrandStrategyGame.MinimapTileHeight / 1000) + sub_y;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (UseOpenGL) {
-				if (this->Province != NULL) {
-					CGrandStrategyProvince *province = this->Province;
-					if (province->Owner != NULL) {
-						int player_color = PlayerRaces.Factions[province->Owner->Civilization][province->Owner->Faction]->Colors[0];
-						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
-					} else if (province->Water) {
-						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 171, 198, 217);
-					} else {
-						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 255, 255, 255);
-					}
-				} else {
-					*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
-				}
-			} else
-#endif
-			{
-				const int index = mx * bpp + my * GrandStrategyGame.MinimapSurface->pitch;
-				if (this->Province != NULL) {
-					CGrandStrategyProvince *province = this->Province;
-					if (province->Owner != NULL) {
-						int player_color = PlayerRaces.Factions[province->Owner->Civilization][province->Owner->Faction]->Colors[0];
-						if (bpp == 2) {
-							*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
-						} else {
-							*(Uint32 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
-						}
-					} else if (province->Water) {
-						if (bpp == 2) {
-							*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 171, 198, 217);
-						} else {
-							*(Uint32 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 171, 198, 217);
-						}
-					} else {
-						if (bpp == 2) {
-							*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 255, 255, 255);
-						} else {
-							*(Uint32 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 255, 255, 255);
-						}
-					}
-				} else {
-					if (bpp == 2) {
-						*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = ColorBlack;
-					} else {
-						*(Uint32 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = ColorBlack;
-					}
-				}
-			}
-		}
-	}
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		SDL_UnlockSurface(GrandStrategyGame.MinimapSurface);
 	}
 }
 
@@ -2235,17 +1867,6 @@ std::string CGrandStrategyRiver::GetCulturalName(int civilization, int faction)
 		return this->CulturalNames[civilization];
 	} else {
 		return this->Name;
-	}
-}
-
-void CGrandStrategyProvince::UpdateMinimap()
-{
-	for (size_t i = 0; i < this->Tiles.size(); ++i) {
-		int x = this->Tiles[i].x;
-		int y = this->Tiles[i].y;
-		if (GrandStrategyGame.WorldMapTiles[x][y]) {
-			GrandStrategyGame.WorldMapTiles[x][y]->UpdateMinimap();
-		}
 	}
 }
 
@@ -6019,15 +5640,6 @@ void RemoveProvinceClaim(std::string province_name, std::string civilization_nam
 	}
 }
 
-void UpdateProvinceMinimap(std::string province_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->UpdateMinimap();
-	}
-}
-
 /**
 **  Clean the grand strategy variables.
 */
@@ -6090,31 +5702,6 @@ void CleanGrandStrategyGame()
 	GrandStrategyGame.SelectedTile.y = -1;
 	GrandStrategyGame.SelectedUnits.clear();
 	GrandStrategyGame.PlayerFaction = NULL;
-	
-	//destroy minimap surface
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		if (GrandStrategyGame.MinimapSurfaceGL) {
-			glDeleteTextures(1, &GrandStrategyGame.MinimapTexture);
-			delete[] GrandStrategyGame.MinimapSurfaceGL;
-			GrandStrategyGame.MinimapSurfaceGL = NULL;
-		}
-	} else
-#endif
-	{
-		if (GrandStrategyGame.MinimapSurface) {
-			VideoPaletteListRemove(GrandStrategyGame.MinimapSurface);
-			SDL_FreeSurface(GrandStrategyGame.MinimapSurface);
-			GrandStrategyGame.MinimapSurface = NULL;
-		}
-	}
-	
-	GrandStrategyGame.MinimapTextureWidth = 0;
-	GrandStrategyGame.MinimapTextureHeight = 0;
-	GrandStrategyGame.MinimapTileWidth = 0;
-	GrandStrategyGame.MinimapTileHeight = 0;
-	GrandStrategyGame.MinimapOffsetX = 0;
-	GrandStrategyGame.MinimapOffsetY = 0;
 	
 	WorldMapOffsetX = 0;
 	WorldMapOffsetY = 0;
@@ -6568,61 +6155,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 			}
 			
 			GrandStrategyGame.AvailableEvents.push_back(GrandStrategyEvents[i]);
-		}
-	}
-}
-
-void InitializeGrandStrategyMinimap()
-{
-	//calculate the minimap texture width and height
-	if (GrandStrategyGame.WorldMapWidth >= GrandStrategyGame.WorldMapHeight) {
-		GrandStrategyGame.MinimapTextureWidth = UI.Minimap.W;
-		GrandStrategyGame.MinimapTextureHeight = UI.Minimap.H * GrandStrategyGame.WorldMapHeight / GrandStrategyGame.WorldMapWidth;
-	} else {
-		GrandStrategyGame.MinimapTextureWidth = UI.Minimap.W * GrandStrategyGame.WorldMapWidth / GrandStrategyGame.WorldMapHeight;
-		GrandStrategyGame.MinimapTextureHeight = UI.Minimap.H;
-	}
-
-	//calculate the minimap tile width and height
-	GrandStrategyGame.MinimapTileWidth = UI.Minimap.W * 1000 / GetWorldMapWidth();
-	GrandStrategyGame.MinimapTileHeight = UI.Minimap.H * 1000 / GetWorldMapHeight();
-	if (GetWorldMapWidth() >= GetWorldMapHeight()) {
-		GrandStrategyGame.MinimapTileHeight = GrandStrategyGame.MinimapTileWidth;
-	} else {
-		GrandStrategyGame.MinimapTileWidth = GrandStrategyGame.MinimapTileHeight;
-	}
-
-	// create minimap surface
-	#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		if (!GrandStrategyGame.MinimapSurfaceGL) {
-			GrandStrategyGame.MinimapSurfaceGL = new unsigned char[GrandStrategyGame.MinimapTextureWidth * GrandStrategyGame.MinimapTextureHeight * 4];
-			memset(GrandStrategyGame.MinimapSurfaceGL, 0, GrandStrategyGame.MinimapTextureWidth * GrandStrategyGame.MinimapTextureHeight * 4);
-		}
-		GrandStrategyGame.CreateMinimapTexture();
-	} else
-	#endif
-	{
-		if (!GrandStrategyGame.MinimapSurface) {
-			GrandStrategyGame.MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,  GrandStrategyGame.MinimapTextureWidth, GrandStrategyGame.MinimapTextureHeight, 32, TheScreen->format->Rmask, TheScreen->format->Gmask, TheScreen->format->Bmask, 0);
-		}
-	}
-
-	GrandStrategyGame.UpdateMinimap();
-	
-	GrandStrategyGame.MinimapOffsetX = 0;
-	GrandStrategyGame.MinimapOffsetY = 0;
-	if (GetWorldMapWidth() <= UI.Minimap.W && GetWorldMapHeight() <= UI.Minimap.H) {
-		if (GetWorldMapWidth() >= GetWorldMapHeight()) {
-			GrandStrategyGame.MinimapOffsetY = (UI.Minimap.H - (GetWorldMapHeight() * std::max(GrandStrategyGame.MinimapTileHeight / 1000, 1))) / 2;
-		} else {
-			GrandStrategyGame.MinimapOffsetX = (UI.Minimap.W - (GetWorldMapWidth() * std::max(GrandStrategyGame.MinimapTileWidth / 1000, 1))) / 2;
-		}
-	} else {
-		if (GetWorldMapWidth() >= GetWorldMapHeight()) {
-			GrandStrategyGame.MinimapOffsetY = (UI.Minimap.H - ((GetWorldMapHeight() / std::max(1000 / GrandStrategyGame.MinimapTileHeight, 1)) * std::max(GrandStrategyGame.MinimapTileHeight / 1000, 1))) / 2;
-		} else {
-			GrandStrategyGame.MinimapOffsetX = (UI.Minimap.H - ((GetWorldMapWidth() / std::max(1000 / GrandStrategyGame.MinimapTileWidth, 1)) * std::max(GrandStrategyGame.MinimapTileWidth / 1000, 1))) / 2;
 		}
 	}
 }

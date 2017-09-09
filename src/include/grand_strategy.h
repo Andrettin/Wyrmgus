@@ -85,7 +85,6 @@ public:
 		memset(Pathway, -1, sizeof(Pathway));
 	}
 
-	void UpdateMinimap();
 	void SetResourceProspected(int resource_id, bool discovered);
 	void SetPathway(int pathway, int direction, bool secondary_setting = false);
 	void BuildPathway(int pathway, int direction);
@@ -139,7 +138,6 @@ public:
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 	}
 	
-	void UpdateMinimap();
 	void SetOwner(int civilization_id, int faction_id);					/// Set a new owner for the province
 	void SetCivilization(int civilization);
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
@@ -415,9 +413,7 @@ public:
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}
 
-	void Clean();
 	void DrawMap();							/// Draw the map area
-	void DrawMinimap();						/// Draw the minimap
 	void DrawInterface();					/// Draw the interface
 	void DrawTileTooltip(int x, int y);		/// Draw the tooltip for a tile
 	void DoTurn();							/// Process the grand strategy turn
@@ -427,15 +423,10 @@ public:
 	void SetSelectedProvince(CGrandStrategyProvince *province);	/// Set selected province
 	void PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource);
 	void CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province);
-	#if defined(USE_OPENGL) || defined(USE_GLES)
-	void CreateMinimapTexture();
-	#endif
-	void UpdateMinimap();
 	bool IsPointOnMap(int x, int y);
 	bool IsTileResource(int resource);
 	bool IsFoodResource(int resource);
 	bool TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b);
-	Vec2i GetTileUnderCursor();
 	CGrandStrategyHero *GetHero(std::string hero_full_name);
 
 public:
@@ -471,20 +462,6 @@ public:
 	int CommodityPrices[MaxCosts];								/// price for every 100 of each commodity
 	std::map<int, int> SelectedUnits;							/// quantity of selected units, mapped to unit type
 	std::map<std::pair<int, int>, std::pair<int, int>> CurrentPathwayConstructions;	/// Tiles constructing a pathway; mapped to tile x and y, first value of std::pair is the pathway type, and the second one is the direction
-
-	int MinimapTextureWidth;
-	int MinimapTextureHeight;
-	int MinimapTileWidth;										/// minimap tile width (per mil)
-	int MinimapTileHeight;										/// minimap tile height (per mil)
-	int MinimapOffsetX;
-	int MinimapOffsetY;
-
-	#if defined(USE_OPENGL) || defined(USE_GLES)
-	unsigned char *MinimapSurfaceGL;
-	GLuint MinimapTexture;
-	#endif
-
-	SDL_Surface *MinimapSurface;
 };
 
 /*----------------------------------------------------------------------------
@@ -574,10 +551,8 @@ extern void ChangeProvinceFood(std::string province_name, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void RemoveProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
-extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame(bool show_loading = true);
-extern void InitializeGrandStrategyMinimap();
 extern void InitializeGrandStrategyWorldMap();
 extern void InitializeGrandStrategyProvinces();
 extern void FinalizeGrandStrategyInitialization();
