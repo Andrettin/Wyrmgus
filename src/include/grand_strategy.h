@@ -413,7 +413,6 @@ public:
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}
 
-	void DrawMap();							/// Draw the map area
 	void DrawInterface();					/// Draw the interface
 	void DrawTileTooltip(int x, int y);		/// Draw the tooltip for a tile
 	void DoTurn();							/// Process the grand strategy turn
@@ -575,9 +574,6 @@ extern int GetProvinceUnderConstructionUnitQuantity(std::string province_name, s
 extern int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceHero(std::string province_name, std::string hero_full_name);
-extern int GetProvinceLabor(std::string province_name);
-extern int GetProvinceAvailableWorkersForTraining(std::string province_name);
-extern int GetProvinceTotalWorkers(std::string province_name);
 extern int GetProvinceMilitaryScore(std::string province_name, bool attacker, bool count_defenders);
 extern std::string GetProvinceOwner(std::string province_name);
 extern int GetProvinceFoodCapacity(std::string province_name, bool subtract_non_food = false);

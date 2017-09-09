@@ -88,311 +88,6 @@ std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPointer;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**  Draw the grand strategy map.
-*/
-void CGrandStrategyGame::DrawMap()
-{
-	int grand_strategy_map_width = UI.MapArea.EndX - UI.MapArea.X;
-	int grand_strategy_map_height = UI.MapArea.EndY - UI.MapArea.Y;
-	
-	int width_indent = GrandStrategyMapWidthIndent;
-	int height_indent = GrandStrategyMapHeightIndent;
-	
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (this->WorldMapTiles[x][y]->GraphicTile) {
-				if (WorldMapTerrainTypes[this->WorldMapTiles[x][y]->Terrain]->BaseTile != -1 && this->WorldMapTiles[x][y]->BaseTile) {
-					this->WorldMapTiles[x][y]->BaseTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-				}
-				
-				this->WorldMapTiles[x][y]->GraphicTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-			}
-		}
-	}
-	
-	// draw rivers (has to be drawn separately so that they appear over the terrain of the adjacent tiles they go over)
-	std::vector<int> directions; // draw non-diagonal directions
-	directions.push_back(North);
-	directions.push_back(East);
-	directions.push_back(South);
-	directions.push_back(West);
-	
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (this->WorldMapTiles[x][y]->Terrain != -1) {
-				for (size_t d = 0; d < directions.size(); ++d) {
-					int i = directions[d];
-					if (this->WorldMapTiles[x][y]->River[i] != -1) {
-						if (
-							this->WorldMapTiles[x][y]->Province != NULL
-							&& this->WorldMapTiles[x][y]->Province->Water
-							&& this->IsPointOnMap(x + GetDirectionOffset(i).x, y + GetDirectionOffset(i).y)
-							&& this->WorldMapTiles[x + GetDirectionOffset(i).x][y + GetDirectionOffset(i).y]->Province != NULL
-							&& this->WorldMapTiles[x + GetDirectionOffset(i).x][y + GetDirectionOffset(i).y]->Province->Water
-						) { //water tiles use rivermouth graphics if it has a river and the opposite tile is also a water tile
-							//see from which direction the rivermouth comes
-							bool flipped = false;
-							if (i == North) {
-								if (this->IsPointOnMap(x - 1, y) && (this->WorldMapTiles[x - 1][y]->River[North] != -1 || this->WorldMapTiles[x - 1][y]->River[Northwest] != -1)) {
-									flipped = true;
-								}
-							} else if (i == East) {
-								if (this->IsPointOnMap(x, y - 1) && (this->WorldMapTiles[x][y - 1]->River[East] != -1 || this->WorldMapTiles[x][y - 1]->River[Southeast] != -1)) {
-									flipped = true;
-								}
-							} else if (i == South) {
-								if (this->IsPointOnMap(x - 1, y) && (this->WorldMapTiles[x - 1][y]->River[South] != -1 || this->WorldMapTiles[x - 1][y]->River[Southwest] != -1)) {
-									flipped = true;
-								}
-							} else if (i == West) {
-								if (this->IsPointOnMap(x, y - 1) && (this->WorldMapTiles[x][y - 1]->River[West] != -1 || this->WorldMapTiles[x][y - 1]->River[Southwest] != -1)) {
-									flipped = true;
-								}
-							}
-							
-							if (flipped) {
-								this->RivermouthGraphics[i][1]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
-							} else {
-								this->RivermouthGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
-							}
-						} else if (this->WorldMapTiles[x][y]->Riverhead[i] != -1) {
-							//see to which direction the riverhead runs
-							bool flipped = false;
-							if (i == North) {
-								if (this->WorldMapTiles[x][y]->River[Northwest] != -1) {
-									flipped = true;
-								}
-							} else if (i == East) {
-								if (this->WorldMapTiles[x][y]->River[Northeast] != -1) {
-									flipped = true;
-								}
-							} else if (i == South) {
-								if (this->WorldMapTiles[x][y]->River[Southwest] != -1) {
-									flipped = true;
-								}
-							} else if (i == West) {
-								if (this->WorldMapTiles[x][y]->River[Northwest] != -1) {
-									flipped = true;
-								}
-							}
-							
-							if (flipped) {
-								this->RiverheadGraphics[i][1]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
-							} else {
-								this->RiverheadGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
-							}
-						} else {
-							this->RiverGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	directions.clear();
-	directions.push_back(Northeast);
-	directions.push_back(Southeast);
-	directions.push_back(Southwest);
-	directions.push_back(Northwest);
-	
-	//draw diagonal rivers (draw these after non-diagonal ones so that the connections between the rivers look better
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (this->WorldMapTiles[x][y]->Terrain != -1) {
-				for (size_t d = 0; d < directions.size(); ++d) {
-					int i = directions[d];
-					if (this->WorldMapTiles[x][y]->River[i] != -1) {
-						//only draw diagonal directions if inner
-						if (i == Northeast && (this->WorldMapTiles[x][y]->River[North] != -1 || this->WorldMapTiles[x][y]->River[East] != -1)) {
-							continue;
-						} else if (i == Southeast && (this->WorldMapTiles[x][y]->River[South] != -1 || this->WorldMapTiles[x][y]->River[East] != -1)) {
-							continue;
-						} else if (i == Southwest && (this->WorldMapTiles[x][y]->River[South] != -1 || this->WorldMapTiles[x][y]->River[West] != -1)) {
-							continue;
-						} else if (i == Northwest && (this->WorldMapTiles[x][y]->River[North] != -1 || this->WorldMapTiles[x][y]->River[West] != -1)) {
-							continue;
-						}
-							
-						if (this->WorldMapTiles[x][y]->Riverhead[i] != -1) {
-							this->RiverheadGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
-						} else {
-							this->RiverGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	// draw pathways (has to be drawn separately so that they appear over the terrain of the adjacent tiles they go over)
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (this->WorldMapTiles[x][y]->Terrain != -1) {
-				for (int i = 0; i < MaxDirections; ++i) {
-					if (this->WorldMapTiles[x][y]->Pathway[i] != -1) {
-						this->PathwayGraphics[this->WorldMapTiles[x][y]->Pathway[i]][i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 8, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 8, true);
-					}
-				}
-			}
-		}
-	}
-	
-	//draw settlement and resource graphics after rivers and pathways so that they appear over them
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (this->WorldMapTiles[x][y]->Terrain != -1) {
-				int player_color = this->WorldMapTiles[x][y]->Province != NULL && this->WorldMapTiles[x][y]->Province->Owner != NULL ? PlayerRaces.Factions[this->WorldMapTiles[x][y]->Province->Owner->Civilization][this->WorldMapTiles[x][y]->Province->Owner->Faction]->Colors[0] : PlayerNumNeutral;
-				
-				CGrandStrategyProvince *province = this->WorldMapTiles[x][y]->Province;
-				
-				if (this->WorldMapTiles[x][y]->Resource != -1 && this->WorldMapTiles[x][y]->ResourceProspected && this->WorldMapTiles[x][y]->ResourceBuildingGraphics != NULL) {
-					this->WorldMapTiles[x][y]->ResourceBuildingGraphics->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-					
-					if (this->WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor != NULL) {
-						this->WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-					}
-					
-					if (!this->WorldMapTiles[x][y]->Worked && province != NULL && province->Owner == this->PlayerFaction) {
-						this->SymbolResourceNotWorked->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-					}
-				}
-				
-				if (province != NULL) {
-					int civilization = province->Civilization;
-					if (civilization != -1 && province->Owner != NULL) {
-						//draw the province's settlement
-						if (province->SettlementLocation.x == x && province->SettlementLocation.y == y && province->HasBuildingClass("town-hall")) {
-							if (province->Owner->HasTechnologyClass("masonry") && this->SettlementMasonryGraphics[civilization]) {
-								this->SettlementMasonryGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-							} else {
-								this->SettlementGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-								
-								if (this->BarracksGraphics[civilization] && province->HasBuildingClass("barracks")) {
-									this->BarracksGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-								}
-							}
-						}
-					}
-					
-					//draw symbol that the province is being attacked by the human player, if that is the case
-					if (province->AttackedBy != NULL && province->AttackedBy == this->PlayerFaction && province->SettlementLocation.x == x && province->SettlementLocation.y == y) {
-						this->SymbolAttack->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-					} else if (province->Movement && province->Owner != NULL && province->Owner == this->PlayerFaction && province->SettlementLocation.x == x && province->SettlementLocation.y == y) {
-						this->SymbolMove->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-					}
-					
-					if (province->Owner != NULL && province->Owner->Capital == province && province->SettlementLocation.x == x && province->SettlementLocation.y == y) {
-						this->SymbolCapital->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-					}
-					
-					if (province->ActiveHeroes.size() > 0 && province->Owner != NULL && province->Owner == this->PlayerFaction && province->SettlementLocation.x == x && province->SettlementLocation.y == y) {
-						this->SymbolHero->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-					}
-				}
-			}
-		}
-	}
-	
-	//draw the tile borders (they need to be drawn here, so that they appear over all tiles, as they go beyond their own tile)
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			CGrandStrategyProvince *province = this->WorldMapTiles[x][y]->Province;
-			if (province != NULL) {
-				for (int i = 0; i < MaxDirections; ++i) {
-					if (this->WorldMapTiles[x][y]->Borders[i]) {
-						//only draw diagonal directions if inner
-						if (i == Northeast && (this->WorldMapTiles[x][y]->Borders[North] || this->WorldMapTiles[x][y]->Borders[East])) {
-							continue;
-						} else if (i == Southeast && (this->WorldMapTiles[x][y]->Borders[South] || this->WorldMapTiles[x][y]->Borders[East])) {
-							continue;
-						} else if (i == Southwest && (this->WorldMapTiles[x][y]->Borders[South] || this->WorldMapTiles[x][y]->Borders[West])) {
-							continue;
-						} else if (i == Northwest && (this->WorldMapTiles[x][y]->Borders[North] || this->WorldMapTiles[x][y]->Borders[West])) {
-							continue;
-						}
-						int sub_x = 0;
-						int sub_y = 0;
-						if (i == North) {
-							sub_y = -1;
-						} else if (i == Northeast) {
-							sub_x = 1;
-							sub_y = -1;
-						} else if (i == East) {
-							sub_x = 1;
-						} else if (i == Southeast) {
-							sub_x = 1;
-							sub_y = 1;
-						} else if (i == South) {
-							sub_y = 1;
-						} else if (i == Southwest) {
-							sub_x = -1;
-							sub_y = 1;
-						} else if (i == West) {
-							sub_x = -1;
-						} else if (i == Northwest) {
-							sub_x = -1;
-							sub_y = -1;
-						}
-						
-						CGrandStrategyProvince *second_province = NULL;
-						if (this->WorldMapTiles[x + sub_x][y + sub_y]) {
-							second_province = this->WorldMapTiles[x + sub_x][y + sub_y]->Province;
-						}
-						
-						if (second_province == NULL || (province->Owner == second_province->Owner)) { // is not a national border
-							this->BorderGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
-						} else {
-							int player_color;
-							if (province->Owner != NULL) {
-								player_color = PlayerRaces.Factions[province->Owner->Civilization][province->Owner->Faction]->Colors[0];
-							} else {
-								player_color = PlayerNumNeutral;
-							}
-										
-							this->NationalBorderGraphics[i]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	//draw settlement names after everything else, so that they appear over the graphics
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (this->WorldMapTiles[x][y]->Terrain != -1) {
-				CGrandStrategyProvince *province = this->WorldMapTiles[x][y]->Province;
-				
-				if (province != NULL) {
-					if (province->SettlementLocation.x == x && province->SettlementLocation.y == y) {
-						int item_y = 0;
-						if (province->Owner != NULL && province->HasBuildingClass("town-hall") && !this->WorldMapTiles[x][y]->GetCulturalName().empty()) {
-							std::string settlement_string = this->WorldMapTiles[x][y]->GetCulturalName();
-							int string_width = GetSmallFont().Width(settlement_string);
-							settlement_string += ",";
-							CLabel(GetSmallFont()).Draw(64 * (x - WorldMapOffsetX) + width_indent + (64 / 2) - (string_width / 2), 16 + 64 * (y - WorldMapOffsetY) + height_indent + (64 - GetSmallFont().getHeight()) + (GetSmallFont().getHeight() + 1) * item_y, settlement_string);
-							item_y += 1;
-						}
-						std::string province_string = province->GetCulturalName();
-						CLabel(GetSmallFont()).Draw(64 * (x - WorldMapOffsetX) + width_indent + (64 / 2) - (GetSmallFont().Width(province_string) / 2), 16 + 64 * (y - WorldMapOffsetY) + height_indent + (64 - GetSmallFont().getHeight()) + (GetSmallFont().getHeight() + 1) * item_y, province_string);
-					}
-				}
-			}
-		}
-	}
-	
-	//draw fog over terra incognita
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (this->WorldMapTiles[x][y]->Terrain == -1) {
-				this->FogTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 16, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 16, true);
-			}
-		}
-	}
-}
-
 void CGrandStrategyGame::DrawInterface()
 {
 	if (this->PlayerFaction != NULL && this->PlayerFaction->OwnedProvinces.size() > 0) { //draw resource bar
@@ -457,16 +152,6 @@ void CGrandStrategyGame::DrawInterface()
 		std::string interface_state_name;
 		
 		if (GrandStrategyInterfaceState == "Province") {
-			//draw show heroes button
-			if (this->SelectedProvince->ActiveHeroes.size() > 0 && this->SelectedProvince->Owner != NULL && this->SelectedProvince->Owner == this->PlayerFaction && UI.GrandStrategyShowHeroesButton.X != -1) {
-				DrawUIButton(
-					UI.GrandStrategyShowHeroesButton.Style,
-					(UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
-					(UI.GrandStrategyShowHeroesButton.Clicked || UI.GrandStrategyShowHeroesButton.HotkeyPressed ? MI_FLAGS_CLICKED : 0),
-					UI.GrandStrategyShowHeroesButton.X, UI.GrandStrategyShowHeroesButton.Y,
-					UI.GrandStrategyShowHeroesButton.Text
-				);
-			}
 		} else if (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") {
 			if (this->SelectedProvince->Civilization != -1) {
 				std::string province_culture_string = "Province Culture: " + PlayerRaces.Civilizations[this->SelectedProvince->Civilization]->Adjective;
@@ -493,25 +178,10 @@ void CGrandStrategyGame::DrawInterface()
 			
 			UI.Resources[FoodCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), food_string);
-			
-			//draw show ruler button
-			if (UI.GrandStrategyShowRulerButton.X != -1 && GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] != NULL) {
-				DrawUIButton(
-					UI.GrandStrategyShowRulerButton.Style,
-					(UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
-					(UI.GrandStrategyShowRulerButton.Clicked || UI.GrandStrategyShowRulerButton.HotkeyPressed ? MI_FLAGS_CLICKED : 0),
-					UI.GrandStrategyShowRulerButton.X, UI.GrandStrategyShowRulerButton.Y,
-					UI.GrandStrategyShowRulerButton.Text
-				);
-			}
 		} else if (GrandStrategyInterfaceState == "barracks") {
 			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) this->SelectedProvince->GetRevoltRisk()) + "%";
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
 			item_y += 1;
-		} else if (GrandStrategyInterfaceState == "lumber-mill" || GrandStrategyInterfaceState == "smithy") {
-			std::string labor_string = std::to_string((long long) this->SelectedProvince->Labor);
-			UI.Resources[LaborCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
-			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), labor_string);
 		} else if (GrandStrategyInterfaceState == "Ruler") {
 			interface_state_name = GrandStrategyInterfaceState;
 			
@@ -555,39 +225,6 @@ void CGrandStrategyGame::DrawInterface()
 		if (!interface_state_name.empty()) {
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + 109 - (GetGameFont().Width(interface_state_name) / 2), UI.InfoPanel.Y + 53, interface_state_name);
 		}
-		
-		if (GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy") {
-			//draw "OK" button to return to the province interface
-			if (UI.GrandStrategyOKButton.X != -1) {
-				DrawUIButton(
-					UI.GrandStrategyOKButton.Style,
-					(UI.GrandStrategyOKButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
-					(UI.GrandStrategyOKButton.Clicked || UI.GrandStrategyOKButton.HotkeyPressed ? MI_FLAGS_CLICKED : 0),
-					UI.GrandStrategyOKButton.X, UI.GrandStrategyOKButton.Y,
-					UI.GrandStrategyOKButton.Text
-				);
-			}
-		}
-	}
-	
-	if (UI.MenuButton.X != -1) {
-		DrawUIButton(
-			UI.MenuButton.Style,
-			(UI.MenuButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
-			(UI.MenuButton.Clicked || UI.MenuButton.HotkeyPressed ? MI_FLAGS_CLICKED : 0),
-			UI.MenuButton.X, UI.MenuButton.Y,
-			UI.MenuButton.Text
-		);
-	}
-	
-	if (UI.GrandStrategyEndTurnButton.X != -1) {
-		DrawUIButton(
-			UI.GrandStrategyEndTurnButton.Style,
-			(UI.GrandStrategyEndTurnButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
-			(UI.GrandStrategyEndTurnButton.Clicked || UI.GrandStrategyEndTurnButton.HotkeyPressed ? MI_FLAGS_CLICKED : 0),
-			UI.GrandStrategyEndTurnButton.X, UI.GrandStrategyEndTurnButton.Y,
-			UI.GrandStrategyEndTurnButton.Text
-		);
 	}
 }
 
@@ -798,13 +435,6 @@ void CGrandStrategyGame::DoTurn()
 		}
 	}
 
-	//allocate labor
-	for (size_t i = 0; i < this->Provinces.size(); ++i) {
-		if (this->Provinces[i]->Civilization != -1 && this->Provinces[i]->Owner != NULL && this->Provinces[i]->Labor > 0) { // if this province has a culture and an owner, and has surplus labor
-			this->Provinces[i]->AllocateLabor();
-		}
-	}
-	
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (this->Factions[i][j]->IsAlive()) {
@@ -912,23 +542,6 @@ void CGrandStrategyGame::DoTurn()
 						this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, new_units);
 					} else { //if the province's food income is positive, but not enough to sustain a new unit, keep it at the population growth threshold
 						this->Provinces[i]->PopulationGrowthProgress = PopulationGrowthThreshold;
-					}
-				} else if (province_food_income < 0) { // if the province's food income is negative, then try to reallocate labor
-					this->Provinces[i]->ReallocateLabor();
-					province_food_income = this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] + this->Provinces[i]->Income[FishCost] - this->Provinces[i]->FoodConsumption;
-					//if the food income is still negative after reallocating labor (this shouldn't happen most of the time!) then decrease the population by 1 due to starvation; only do this if the population is above 1 (to prevent provinces from being entirely depopulated and unable to grow a population afterwards)
-					if (province_food_income < 0 && this->Provinces[i]->TotalWorkers > 1) {
-						int worker_unit_type = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker"));
-						this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, -1);
-						if (this->Provinces[i]->Owner == this->PlayerFaction) { //if this is one of the player's provinces, display a message about the population starving
-							char buf[256];
-							snprintf(
-								buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-								("Starvation in " + this->Provinces[i]->GetCulturalName()).c_str(),
-								("My lord, food stocks have been depleted in " + this->Provinces[i]->GetCulturalName() + ". The local population is starving!").c_str()
-							);
-							CclCommand(buf);
-						}
 					}
 				}
 				this->Provinces[i]->PopulationGrowthProgress = std::max(0, this->Provinces[i]->PopulationGrowthProgress);
@@ -1093,7 +706,7 @@ void CGrandStrategyGame::DoTrade()
 				for (size_t k = 0; k < this->Factions[i][j]->OwnedProvinces.size(); ++k) {
 					int province_id = this->Factions[i][j]->OwnedProvinces[k];
 					for (int res = 0; res < MaxCosts; ++res) {
-						if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+						if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 							continue;
 						}
 							
@@ -1141,7 +754,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < factions_by_prestige_count; ++i) {
 		if (factions_by_prestige[i]) {
 			for (int res = 0; res < MaxCosts; ++res) {
-				if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+				if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 					continue;
 				}
 				
@@ -1181,7 +794,7 @@ void CGrandStrategyGame::DoTrade()
 						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
 						
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+							if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 								continue;
 							}
 							
@@ -1206,7 +819,7 @@ void CGrandStrategyGame::DoTrade()
 	int remaining_wanted_trade[MaxCosts];
 	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+		if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 			continue;
 		}
 		
@@ -1236,7 +849,7 @@ void CGrandStrategyGame::DoTrade()
 	//now restore the human player's trade settings
 	if (this->PlayerFaction != NULL) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (i == CopperCost || i == GoldCost || i == SilverCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || GrandStrategyGame.IsFoodResource(i) || i == LeadershipCost) {
+			if (i == CopperCost || i == GoldCost || i == SilverCost || i == ResearchCost || i == PrestigeCost || GrandStrategyGame.IsFoodResource(i) || i == LeadershipCost) {
 				continue;
 			}
 		
@@ -1488,10 +1101,8 @@ void GrandStrategyWorldMapTile::SetResourceProspected(int resource_id, bool disc
 		if (this->Province != NULL) {
 			if (this->ResourceProspected) {
 				this->Province->ProductionCapacity[resource_id] += 1;
-				this->Province->AllocateLabor(); //allocate labor so that the 
 			} else {
 				this->Province->ProductionCapacity[resource_id] -= 1;
-				this->Province->ReallocateLabor();
 			}
 		}
 	}
@@ -1933,7 +1544,6 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 		}
 		
 		//also remove its resource incomes from the owner's incomes, and reset the province's income so it won't be deduced from the new owner's income when recalculating it
-		this->DeallocateLabor();
 		for (int i = 0; i < MaxCosts; ++i) {
 			if (this->Income[i] != 0) {
 				this->Owner->Income[i] -= this->Income[i];
@@ -2013,10 +1623,6 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 		this->SetCivilization(-1); //if there is no owner, change the civilization to none
 	}
 	
-	if (this->Owner != NULL && this->Labor > 0 && this->HasBuildingClass("town-hall")) {
-		this->AllocateLabor();
-	}
-
 	if (GrandStrategyGameInitialized) {
 		if (this->Owner != NULL) {
 			this->Owner->CalculateTileTransportLevels();
@@ -2191,11 +1797,6 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 			}
 		}
 	}
-
-	// allocate labor (in case building a town hall or another building may have allowed a new sort of production)
-	if (this->Owner != NULL && this->HasBuildingClass("town-hall")) {
-		this->ReallocateLabor();
-	}
 }
 
 void CGrandStrategyProvince::SetCurrentConstruction(int settlement_building)
@@ -2269,16 +1870,6 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 		int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(UnitTypes[unit_type_id]->Civilization, GetUnitTypeClassIndexByName("militia"));
 		if (militia_unit_type != -1) {
 			this->MilitaryScore += change * ((UnitTypes[militia_unit_type]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0)) / 2);
-		}
-		
-		if (GrandStrategyGameInitialized) {
-			int labor_change = change * 100;
-			if (labor_change >= 0) {
-				this->Labor += labor_change;
-				this->AllocateLabor();
-			} else { //if workers are being removed from the province, reallocate labor
-				this->ReallocateLabor();
-			}		
 		}
 	}
 	
@@ -2400,98 +1991,6 @@ void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 	}
 }
 		
-void CGrandStrategyProvince::AllocateLabor()
-{
-	if (this->Owner == NULL || !this->HasBuildingClass("town-hall")) { //no production if no town hall is in place, or if the province has no owner
-		return;
-	}
-	
-	if (this->Labor == 0) { //if there's no labor, nothing to allocate
-		return;
-	}
-	
-	//first, try to allocate as many workers as possible in food production, to increase the population, then allocate workers to gold, and then to other goods
-//	std::vector<int> resources_by_priority = {GrainCost, MushroomCost, FishCost, GoldCost, WoodCost, StoneCost};
-	std::vector<int> resources_by_priority;
-	resources_by_priority.push_back(GrainCost);
-	resources_by_priority.push_back(MushroomCost);
-	resources_by_priority.push_back(FishCost);
-	resources_by_priority.push_back(GoldCost);
-	resources_by_priority.push_back(SilverCost);
-	resources_by_priority.push_back(CopperCost);
-	resources_by_priority.push_back(WoodCost);
-	resources_by_priority.push_back(StoneCost);
-
-	for (size_t i = 0; i < resources_by_priority.size(); ++i) {
-		this->AllocateLaborToResource(resources_by_priority[i]);
-		if (this->Labor == 0) { //labor depleted
-			return;
-		}
-	}
-}
-
-void CGrandStrategyProvince::AllocateLaborToResource(int resource)
-{
-	if (this->Owner == NULL || !this->HasBuildingClass("town-hall")) { //no production if no town hall is in place, or if the province has no owner
-		return;
-	}
-	
-	if (this->Labor == 0) { //if there's no labor, nothing to allocate
-		return;
-	}
-	
-	if (this->ProductionCapacity[resource] > this->ProductionCapacityFulfilled[resource] && this->Labor >= 100) {
-		int employment_change = std::min(this->Labor / 100, this->ProductionCapacity[resource] - ProductionCapacityFulfilled[resource]);
-		this->Labor -= employment_change * 100;
-		ProductionCapacityFulfilled[resource] += employment_change;
-		
-		//set new worked tiles
-		int new_worked_tiles = employment_change;
-		for (size_t i = 0; i < this->ResourceTiles[resource].size(); ++i) {
-			int x = this->ResourceTiles[resource][i].x;
-			int y = this->ResourceTiles[resource][i].y;
-			if (GrandStrategyGame.WorldMapTiles[x][y] && GrandStrategyGame.WorldMapTiles[x][y]->Worked == false) {
-				GrandStrategyGame.WorldMapTiles[x][y]->Worked = true;
-				new_worked_tiles -= 1;
-			}
-			if (new_worked_tiles <= 0) {
-				break;
-			}
-		}	
-		
-		this->CalculateIncome(resource);
-	}
-	
-	//recalculate food consumption (workers employed in producing food don't need to consume food)
-	FoodConsumption = this->TotalWorkers * FoodConsumptionPerWorker;
-	FoodConsumption -= (this->ProductionCapacityFulfilled[GrainCost] * 100);
-	FoodConsumption -= (this->ProductionCapacityFulfilled[MushroomCost] * 100);
-	FoodConsumption -= (this->ProductionCapacityFulfilled[FishCost] * 100);
-}
-
-void CGrandStrategyProvince::DeallocateLabor()
-{
-	for (int i = 0; i < MaxCosts; ++i) {
-		this->ProductionCapacityFulfilled[i] = 0;
-		
-		for (size_t j = 0; j < this->ResourceTiles[i].size(); ++j) {
-			int x = this->ResourceTiles[i][j].x;
-			int y = this->ResourceTiles[i][j].y;
-			if (GrandStrategyGame.WorldMapTiles[x][y]) {
-				GrandStrategyGame.WorldMapTiles[x][y]->Worked = false;
-			}
-		}	
-	}
-	this->Labor = this->TotalWorkers * 100;
-	this->CalculateIncomes();
-}
-
-void CGrandStrategyProvince::ReallocateLabor()
-{
-	this->DeallocateLabor();
-	this->AllocateLabor();
-}
-
 void CGrandStrategyProvince::CalculateIncome(int resource)
 {
 	if (resource == -1) {
@@ -6412,15 +5911,12 @@ void FinalizeGrandStrategyInitialization()
 					province->GovernorSuccession();
 				}
 			}
-			
-			province->ReallocateLabor(); // allocate labor for provinces
 		}
 		
 		
 		if (province->Civilization != -1 && province->FoodConsumption > province->GetFoodCapacity()) { // remove workers if there are so many the province will starve
 			if (GrandStrategyGameLoading == false) {
 				province->ChangeUnitQuantity(province->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), ((province->GetFoodCapacity() - province->FoodConsumption) / FoodConsumptionPerWorker));
-				province->ReallocateLabor();
 			}
 		}
 	}
@@ -6750,27 +6246,6 @@ int GetProvinceHero(std::string province_name, std::string hero_full_name)
 	}
 	
 	return 0;
-}
-
-int GetProvinceLabor(std::string province_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	return GrandStrategyGame.Provinces[province_id]->Labor;
-}
-
-int GetProvinceAvailableWorkersForTraining(std::string province_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	return GrandStrategyGame.Provinces[province_id]->Labor / 100;
-}
-
-int GetProvinceTotalWorkers(std::string province_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	return GrandStrategyGame.Provinces[province_id]->TotalWorkers;
 }
 
 int GetProvinceMilitaryScore(std::string province_name, bool attacker, bool count_defenders)

@@ -201,12 +201,6 @@ class CUserInterface
 //	CUIButton NetworkMenuButton;
 	//Wyrmgus end
 	CUIButton NetworkDiplomacyButton;
-	//Wyrmgus start
-	CUIButton GrandStrategyOKButton;
-	CUIButton GrandStrategyEndTurnButton;
-	CUIButton GrandStrategyShowHeroesButton;
-	CUIButton GrandStrategyShowRulerButton;
-	//Wyrmgus end
 
 	vector<CUIUserButton> UserButtons;
 

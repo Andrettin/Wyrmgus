@@ -488,12 +488,6 @@ public:
 //	CUIButton NetworkMenuButton;        /// network menu button
 	//Wyrmgus end
 	CUIButton NetworkDiplomacyButton;   /// network diplomacy button
-	//Wyrmgus start
-	CUIButton GrandStrategyOKButton;			/// Grand strategy OK button (returns from province interface)
-	CUIButton GrandStrategyEndTurnButton;		/// Grand strategy end turn button
-	CUIButton GrandStrategyShowHeroesButton;	/// Grand strategy show heroes button
-	CUIButton GrandStrategyShowRulerButton;		/// Grand strategy show ruler button
-	//Wyrmgus end
 
 	// Used defined buttons
 	std::vector<CUIUserButton> UserButtons; /// User buttons
