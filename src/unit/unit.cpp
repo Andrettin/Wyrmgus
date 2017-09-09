@@ -1890,7 +1890,7 @@ void CUnit::GenerateDrop()
 	}
 }
 
-void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, bool allow_unique)
+void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, bool allow_unique, bool sold_item)
 {
 	int magic_affix_chance = 10; //10% chance of the unit having a magic prefix or suffix
 	int unique_chance = 5; //0.5% chance of the unit being unique
@@ -1913,6 +1913,11 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 			magic_affix_chance *= chance_multiplier;
 			unique_chance *= chance_multiplier;
 		}
+	}
+	
+	if (sold_item) {
+		magic_affix_chance /= 4;
+		unique_chance /= 4;
 	}
 
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
@@ -1939,7 +1944,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 		this->Prefix == NULL && this->Suffix == NULL && this->Spell == NULL && this->Work == NULL && this->Elixir == NULL
 		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == BookItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass || this->Type->ItemClass == HornItemClass)
 	) { //scrolls, books, jewelry and horns must always have a property
-		this->GenerateSpecialProperties(dropper, dropper_player);
+		this->GenerateSpecialProperties(dropper, dropper_player, allow_unique, sold_item);
 	}
 }
 			
@@ -2164,7 +2169,7 @@ void CUnit::UpdateSoldUnits()
 		} else {
 			CUnitType *chosen_unit_type = potential_items[SyncRand(potential_items.size())];
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, &Players[PlayerNumNeutral], this->MapLayer);
-			new_unit->GenerateSpecialProperties(this, this->Player);
+			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
 			new_unit->Identified = true;
 			if (new_unit->Unique && this->Player == ThisPlayer) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
 				this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer, "%s", _("Unique item available for sale"));
