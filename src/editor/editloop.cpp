@@ -356,11 +356,11 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 						continue;
 					}
 					
-					Map.CalculateTileTransitions(adjacent_pos, false, CurrentMapLayer);
-					Map.CalculateTileTransitions(adjacent_pos, true, CurrentMapLayer);
-					UI.Minimap.UpdateXY(adjacent_pos, CurrentMapLayer);
-		
 					if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
+						Map.CalculateTileTransitions(adjacent_pos, false, CurrentMapLayer);
+						Map.CalculateTileTransitions(adjacent_pos, true, CurrentMapLayer);
+						UI.Minimap.UpdateXY(adjacent_pos, CurrentMapLayer);
+			
 						for (int overlay = 1; overlay >= 0; --overlay) {
 							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, CurrentMapLayer);
 							if (!adjacent_terrain || adjacent_terrain == Map.GetTileTerrain(changed_tiles[i], overlay, CurrentMapLayer)) {
