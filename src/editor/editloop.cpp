@@ -210,12 +210,12 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	//Wyrmgus start
 	int value = 0;
 	if ((terrain->Flags & MapFieldForest) || (terrain->Flags & MapFieldRocks)) {
-		value = 100;
+		value = DefaultResourceAmounts[terrain->Resource];
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	mf.SetTerrain(terrain);
 	if (!terrain->Overlay && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
-		Map.RemoveTileOverlayTerrain(pos, CurrentMapLayer);
+		mf.RemoveOverlayTerrain();
 	}
 	mf.Value = value;
 //	mf.playerInfo.SeenTile = mf.getGraphicTile();
