@@ -183,8 +183,7 @@ enum {
 	//Wyrmgus end
 
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
-	targetPos.x += (this->GetUnitType().TileWidth - 1) * PixelTileSize.x / 2;
-	targetPos.y += (this->GetUnitType().TileHeight - 1) * PixelTileSize.y / 2;
+	targetPos += (GetUnitType().TileSize - 1) * PixelTileSize / 2;
 
 	const int w = this->GetUnitType().BoxWidth;
 	const int h = this->GetUnitType().BoxHeight;
@@ -207,7 +206,7 @@ enum {
 	input.SetMinRange(this->Type->BoolFlag[BUILDEROUTSIDE_INDEX].value ? 1 : 0);
 	input.SetMaxRange(this->Range);
 
-	const Vec2i tileSize(this->Type->TileWidth, this->Type->TileHeight);
+	const Vec2i tileSize(Type->TileSize);
 	//Wyrmgus start
 //	input.SetGoal(this->goalPos, tileSize);
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
@@ -537,7 +536,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		//Wyrmgus start
 //		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
 //		UnitUpdateHeading(unit);
-		const Vec2i dir = Vec2i(build->tilePos.x * PixelTileSize.x, build->tilePos.y * PixelTileSize.y) + build->Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize();
+		const Vec2i dir = build->tilePos * PixelTileSize + build->Type->GetHalfTilePixelSize() - unit.tilePos * PixelTileSize - unit.Type->GetHalfTilePixelSize();
 		UnitHeadingFromDeltaXY(unit, dir);
 		//Wyrmgus end
 	}

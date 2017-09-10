@@ -530,14 +530,12 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		const int offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
 		//Wyrmgus start
-//		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
-		const int maxx = std::min(Map.Info.MapWidths[z], pos.x + w + offsetx);
+		const int maxx = std::min<int>(Map.Info.LayersSizes[z].x, pos.x + w + offsetx);
 		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + offsety);
 #ifdef MARKER_ON_INDEX
 		//Wyrmgus start
-//		const unsigned int index = mpos.y * Map.Info.MapWidth;
-		const unsigned int index = mpos.y * Map.Info.MapWidths[z];
+		const unsigned int index = mpos.y * Map.Info.LayersSizes[z].x;
 		//Wyrmgus end
 #endif
 
@@ -587,14 +585,12 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	for (int offsety = 0; offsety < h; ++offsety) {
 		const int minx = std::max(0, pos.x - range);
 		//Wyrmgus start
-//		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + range);
-		const int maxx = std::min(Map.Info.MapWidths[z], pos.x + w + range);
+		const int maxx = std::min<int>(Map.Info.LayersSizes[z].x, pos.x + w + range);
 		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + offsety);
 #ifdef MARKER_ON_INDEX
 		//Wyrmgus start
-//		const unsigned int index = mpos.y * Map.Info.MapWidth;
-		const unsigned int index = mpos.y * Map.Info.MapWidths[z];
+		const unsigned int index = mpos.y * Map.Info.LayersSizes[z].x;
 		//Wyrmgus end
 #endif
 
@@ -643,21 +639,18 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	}
 	// bottom hemi-cycle
 	//Wyrmgus start
-//	const int maxy = std::min(range, Map.Info.MapHeight - pos.y - h);
-	const int maxy = std::min(range, Map.Info.MapHeights[z] - pos.y - h);
+	const int maxy = std::min<int>(range, Map.Info.LayersSizes[z].y - pos.y - h);
 	//Wyrmgus end
 	for (int offsety = 0; offsety < maxy; ++offsety) {
 		const int offsetx = isqrt(square(range + 1) - square(offsety + 1) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
 		//Wyrmgus start
-//		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
-		const int maxx = std::min(Map.Info.MapWidths[z], pos.x + w + offsetx);
+		const int maxx = std::min<int>(Map.Info.LayersSizes[z].x, pos.x + w + offsetx);
 		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + h + offsety);
 #ifdef MARKER_ON_INDEX
 		//Wyrmgus start
-//		const unsigned int index = mpos.y * Map.Info.MapWidth;
-		const unsigned int index = mpos.y * Map.Info.MapWidths[z];
+		const unsigned int index = mpos.y * Map.Info.LayersSizes[z].x;
 		//Wyrmgus end
 #endif
 
@@ -715,17 +708,8 @@ void UpdateFogOfWarChange()
 	//  Mark all explored fields as visible again.
 	if (Map.NoFogOfWar) {
 		//Wyrmgus start
-		/*
-		const unsigned int w = Map.Info.MapHeight * Map.Info.MapWidth;
-		for (unsigned int index = 0; index != w; ++index) {
-			CMapField &mf = *Map.Field(index);
-			if (mf.playerInfo.IsExplored(*ThisPlayer)) {
-				Map.MarkSeenTile(mf);
-			}
-		}
-		*/
 		for (size_t z = 0; z < Map.Fields.size(); ++z) {
-			const unsigned int w = Map.Info.MapHeights[z] * Map.Info.MapWidths[z];
+			const unsigned int w = Map.Info.LayersSizes[z].x * Map.Info.LayersSizes[z].y;
 			for (unsigned int index = 0; index != w; ++index) {
 				CMapField &mf = *Map.Field(index, z);
 				if (mf.playerInfo.IsExplored(*ThisPlayer)) {
@@ -801,8 +785,7 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 //Wyrmgus end
 
 	//Wyrmgus start
-//	int w = Map.Info.MapWidth;
-	int w = Map.Info.MapWidths[z];
+	int w = Map.Info.LayersSizes[z].x;
 	//Wyrmgus end
 	int fogTileIndex = 0;
 	int blackFogTileIndex = 0;
@@ -828,8 +811,7 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 
 	if (sy) {
 		//Wyrmgus start
-//		unsigned int index = sy - Map.Info.MapWidth;//(y-1) * Map.Info.MapWidth;
-		unsigned int index = sy - Map.Info.MapWidths[z];//(y-1) * Map.Info.MapWidth;
+		unsigned int index = sy - Map.Info.LayersSizes[z].x;//(y-1) * Map.Info.MapWidth;
 		//Wyrmgus end
 		if (sx != sy) {
 			//if (!IsMapFieldExploredTable(x - 1, y - 1)) {
@@ -915,12 +897,10 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 	}
 
 	//Wyrmgus start
-//	if (sy + w < Map.Info.MapHeight * w) {
-	if (sy + w < Map.Info.MapHeights[z] * w) {
+	if (sy + w < Map.Info.LayersSizes[z].y * w) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		unsigned int index = sy + Map.Info.MapWidth;//(y+1) * Map.Info.MapWidth;
-		unsigned int index = sy + Map.Info.MapWidths[z];//(y+1) * Map.Info.MapWidth;
+		unsigned int index = sy + Map.Info.LayersSizes[z].x;//(y+1) * Map.Info.MapWidth;
 		//Wyrmgus end
 		if (sx != sy) {
 			//if (!IsMapFieldExploredTable(x - 1, y + 1)) {
@@ -1048,21 +1028,18 @@ void CViewport::DrawMapFogOfWar() const
 
 	int sx = std::max<int>(MapPos.x - 1, 0);
 	//Wyrmgus start
-//	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidth);
-	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidths[CurrentMapLayer]);
+	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.LayersSizes[CurrentMapLayer].x);
 	//Wyrmgus end
 	int my = std::max<int>(MapPos.y - 1, 0);
 	//Wyrmgus start
-//	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeight);
-	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeights[CurrentMapLayer]);
+	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.LayersSizes[CurrentMapLayer].y);
 	//Wyrmgus end
 
 	// Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
 
 	//Wyrmgus start
-//	unsigned int my_index = my * Map.Info.MapWidth;
-	unsigned int my_index = my * Map.Info.MapWidths[CurrentMapLayer];
+	unsigned int my_index = my * Map.Info.LayersSizes[CurrentMapLayer].x;
 	//Wyrmgus end
 	for (; my < ey; ++my) {
 		for (int mx = sx; mx < ex; ++mx) {
@@ -1072,14 +1049,12 @@ void CViewport::DrawMapFogOfWar() const
 			//Wyrmgus end
 		}
 		//Wyrmgus start
-//		my_index += Map.Info.MapWidth;
-		my_index += Map.Info.MapWidths[CurrentMapLayer];
+		my_index += Map.Info.LayersSizes[CurrentMapLayer].x;
 		//Wyrmgus end
 	}
 	ex = this->BottomRightPos.x;
 	//Wyrmgus start
-//	int sy = MapPos.y * Map.Info.MapWidth;
-	int sy = MapPos.y * Map.Info.MapWidths[CurrentMapLayer];
+	int sy = MapPos.y * Map.Info.LayersSizes[CurrentMapLayer].x;
 	//Wyrmgus end
 	int dy = this->TopLeftPos.y - Offset.y;
 	ey = this->BottomRightPos.y;
@@ -1100,8 +1075,7 @@ void CViewport::DrawMapFogOfWar() const
 			dx += PixelTileSize.x;
 		}
 		//Wyrmgus start
-//		sy += Map.Info.MapWidth;
-		sy += Map.Info.MapWidths[CurrentMapLayer];
+		sy += Map.Info.LayersSizes[CurrentMapLayer].x;
 		//Wyrmgus end
 		dy += PixelTileSize.y;
 	}
@@ -1202,12 +1176,10 @@ void CMap::InitFogOfWar()
 	}
 
 	//Wyrmgus start
-//	VisibleTable.clear();
-//	VisibleTable.resize(Info.MapWidth * Info.MapHeight);
 	VisibleTable.clear();
 	VisibleTable.resize(this->Fields.size());
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		VisibleTable[z].resize(Info.MapWidths[z] * Info.MapHeights[z]);
+		VisibleTable[z].resize(Info.LayersSizes[z].x * Info.LayersSizes[z].y);
 	}
 	//Wyrmgus end
 }

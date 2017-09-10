@@ -225,7 +225,7 @@ int AiEnemyUnitsInDistance(const CPlayer &player,
 		//Wyrmgus end
 		return static_cast<int>(units.size());
 	} else {
-		const Vec2i typeSize(type->TileWidth - 1, type->TileHeight - 1);
+		const Vec2i typeSize(type->TileSize - 1);
 		const IsAEnemyUnitWhichCanCounterAttackOf pred(player, *type);
 
 		//Wyrmgus start
@@ -329,7 +329,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	if (building.TerrainType || building.BoolFlag[TOWNHALL_INDEX].value) { //terrain type units and town halls have a particular place to be built, so we need to find the worker with a terrain traversal
 		TerrainTraversal terrainTraversal;
 
-		terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+		terrainTraversal.SetSize(Map.Info.LayersSizes[z].x, Map.Info.LayersSizes[z].y);
 		terrainTraversal.Init();
 
 		terrainTraversal.PushPos(nearPos);
@@ -1837,8 +1837,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[building.MapLayer], Map.Info.MapHeights[building.MapLayer]);
+	terrainTraversal.SetSize(Map.Info.LayersSizes[building.MapLayer].x, Map.Info.LayersSizes[building.MapLayer].y);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -2089,14 +2088,14 @@ static void AiCheckPathwayConstruction()
 			}
 			
 			std::vector<Vec2i> pathway_tiles;
-			for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->TileWidth + 1; ++x) {
-				for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->TileHeight + 1; ++y) {
+			for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->TileSize.x + 1; ++x) {
+				for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->TileSize.y + 1; ++y) {
 					pathway_tiles.push_back(Vec2i(x, y));
 				}
 			}
 
 			if (unit.Type->GivesResource) { //if is a mine, build pathways to the depot as well
-				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), 32, unit.GivesResource, unit.MapLayer);
+				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + (unit.Type->TileSize - 1) / 2, 32, unit.GivesResource, unit.MapLayer);
 				if (depot) {
 					//choose a close-by worker to test the path; the worker can't be a rail one, or the path construction won't work
 					CUnitType *test_worker_type = NULL;
@@ -2113,7 +2112,7 @@ static void AiCheckPathwayConstruction()
 						UnmarkUnitFieldFlags(*depot);
 						
 						//make the first path
-						int worker_path_length = AStarFindPath(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), depot->tilePos + Vec2i((depot->Type->TileWidth - 1) / 2, (depot->Type->TileHeight - 1) / 2), depot->Type->TileWidth, depot->Type->TileHeight, 1, 1, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer);
+						int worker_path_length = AStarFindPath(unit.tilePos + (unit.Type->TileSize - 1) / 2, depot->tilePos + (depot->Type->TileSize - 1) / 2, depot->Type->TileSize.x, depot->Type->TileSize.y, 1, 1, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer);
 						Vec2i worker_path_pos(unit.tilePos);
 						std::vector<Vec2i> first_path_tiles;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
@@ -2145,7 +2144,7 @@ static void AiCheckPathwayConstruction()
 						}
 						
 						//make the second path
-						worker_path_length = AStarFindPath(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), depot->tilePos + Vec2i((depot->Type->TileWidth - 1) / 2, (depot->Type->TileHeight - 1) / 2), depot->Type->TileWidth, depot->Type->TileHeight, test_worker->Type->TileWidth, test_worker->Type->TileHeight, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer);
+						worker_path_length = AStarFindPath(unit.tilePos + (unit.Type->TileSize - 1) / 2 , depot->tilePos + (depot->Type->TileSize - 1) / 2 , depot->Type->TileSize.x, depot->Type->TileSize.y, test_worker->Type->TileSize.x, test_worker->Type->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer);
 						worker_path_pos = unit.tilePos;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
 							Vec2i pos_change(0, 0);

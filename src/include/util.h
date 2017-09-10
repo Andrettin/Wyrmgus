@@ -68,8 +68,8 @@ inline int square(int v)
 	return v * v;
 }
 
-template <typename T>
-void clamp(T *value, T minValue, T maxValue)
+template <typename T, typename U>
+void clamp(T *value, U minValue, U maxValue)
 {
 	Assert(minValue <= maxValue);
 
@@ -79,7 +79,6 @@ void clamp(T *value, T minValue, T maxValue)
 		*value = maxValue;
 	}
 }
-
 
 /*----------------------------------------------------------------------------
 --  Strings

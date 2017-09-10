@@ -96,7 +96,7 @@ public:
 
 	bool Contains(const PixelPos &screenPos) const;
 
-	void Restrict(int &screenPosX, int &screenPosY) const;
+	void Restrict(short &screenPosX, short &screenPosY) const;
 
 	PixelSize GetPixelSize() const;
 	const PixelPos &GetTopLeftPos() const { return TopLeftPos;}

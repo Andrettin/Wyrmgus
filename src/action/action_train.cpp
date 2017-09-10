@@ -293,7 +293,7 @@ static void AnimateActionTrain(CUnit &unit)
 	if (nType.BoolFlag[RAIL_INDEX].value) {
 		bool has_adjacent_rail = false;
 		Vec2i top_left_pos(unit.tilePos - Vec2i(1, 1));
-		Vec2i bottom_right_pos(unit.tilePos + Vec2i(unit.Type->TileWidth - 1, unit.Type->TileHeight - 1));
+		Vec2i bottom_right_pos(unit.tilePos + unit.Type->TileSize - 1);
 		
 		for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
 			Vec2i tile_pos(x, top_left_pos.y);

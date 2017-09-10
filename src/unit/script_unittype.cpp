@@ -732,8 +732,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->ShadowOffsetX = parent_type->ShadowOffsetX;
 			type->ShadowOffsetY = parent_type->ShadowOffsetY;
 			type->LightFile = parent_type->LightFile;
-			type->TileWidth = parent_type->TileWidth;
-			type->TileHeight = parent_type->TileHeight;
+			type->TileSize = parent_type->TileSize;
 			type->BoxWidth = parent_type->BoxWidth;
 			type->BoxHeight = parent_type->BoxHeight;
 			type->BoxOffsetX = parent_type->BoxOffsetX;
@@ -1457,7 +1456,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->DefaultStat.Variables[SHIELD_INDEX].Enable = 1;
 			}
 		} else if (!strcmp(value, "TileSize")) {
-			CclGetPos(l, &type->TileWidth, &type->TileHeight);
+			CclGetPos(l, &type->TileSize.x, &type->TileSize.y);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
 			type->NeutralMinimapColorRGB.Parse(l);
 		} else if (!strcmp(value, "BoxSize")) {
@@ -2812,10 +2811,10 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->DrawLevel);
 		return 1;
 	} else if (!strcmp(data, "TileWidth")) {
-		lua_pushnumber(l, type->TileWidth);
+		lua_pushnumber(l, type->TileSize.x);
 		return 1;
 	} else if (!strcmp(data, "TileHeight")) {
-		lua_pushnumber(l, type->TileHeight);
+		lua_pushnumber(l, type->TileSize.y);
 		return 1;
 	//Wyrmgus start
 	/*
@@ -3782,26 +3781,22 @@ void UpdateUnitVariables(CUnit &unit)
 	// Position
 	unit.Variable[POSX_INDEX].Value = unit.tilePos.x;
 	//Wyrmgus start
-//	unit.Variable[POSX_INDEX].Max = Map.Info.MapWidth;
-	unit.Variable[POSX_INDEX].Max = Map.Info.MapWidths[unit.MapLayer];
+	unit.Variable[POSX_INDEX].Max = Map.Info.LayersSizes[unit.MapLayer].x;
 	//Wyrmgus end
 	unit.Variable[POSY_INDEX].Value = unit.tilePos.y;
 	//Wyrmgus start
-//	unit.Variable[POSY_INDEX].Max = Map.Info.MapHeight;
-	unit.Variable[POSY_INDEX].Max = Map.Info.MapHeights[unit.MapLayer];
+	unit.Variable[POSY_INDEX].Max = Map.Info.LayersSizes[unit.MapLayer].y;
 	//Wyrmgus end
 
 	// Target Position
 	const Vec2i goalPos = unit.CurrentOrder()->GetGoalPos();
 	unit.Variable[TARGETPOSX_INDEX].Value = goalPos.x;
 	//Wyrmgus start
-//	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidth;
-	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidths[unit.CurrentOrder()->GetGoalMapLayer()];
+	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.LayersSizes[unit.CurrentOrder()->GetGoalMapLayer()].x;
 	//Wyrmgus end
 	unit.Variable[TARGETPOSY_INDEX].Value = goalPos.y;
 	//Wyrmgus start
-//	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeight;
-	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeights[unit.CurrentOrder()->GetGoalMapLayer()];
+	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.LayersSizes[unit.CurrentOrder()->GetGoalMapLayer()].y;
 	//Wyrmgus end
 
 	// RadarRange

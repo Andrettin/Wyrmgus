@@ -443,10 +443,8 @@ void SaveMapPNG(const char *name)
 	}
 
 	//Wyrmgus start
-//	const size_t imageWidth = Map.Info.MapWidth * PixelTileSize.x;
-//	const size_t imageHeight = Map.Info.MapHeight * PixelTileSize.y;
-	const size_t imageWidth = Map.Info.MapWidths[CurrentMapLayer] * PixelTileSize.x;
-	const size_t imageHeight = Map.Info.MapHeights[CurrentMapLayer] * PixelTileSize.y;
+	const size_t imageWidth = Map.Info.LayersSizes[CurrentMapLayer].x * PixelTileSize.x;
+	const size_t imageHeight = Map.Info.LayersSizes[CurrentMapLayer].y * PixelTileSize.y;
 	//Wyrmgus end
 
 	/* set up the output control if you are using standard C streams */
@@ -462,12 +460,10 @@ void SaveMapPNG(const char *name)
 		imageWidth, imageHeight, 32, RMASK, GMASK, BMASK, 0);
 
 	//Wyrmgus start
-//	for (int i = 0; i < Map.Info.MapHeight; ++i) {
-	for (int i = 0; i < Map.Info.MapHeights[CurrentMapLayer]; ++i) {
+	for (int i = 0; i < Map.Info.LayersSizes[CurrentMapLayer].y; ++i) {
 	//Wyrmgus end
 		//Wyrmgus start
-//		for (int j = 0; j < Map.Info.MapWidth; ++j) {
-		for (int j = 0; j < Map.Info.MapWidths[CurrentMapLayer]; ++j) {
+		for (int j = 0; j < Map.Info.LayersSizes[CurrentMapLayer].x; ++j) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			const CMapField &mf = *Map.Field(i, j);
@@ -565,8 +561,8 @@ void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overl
 		return;
 	}
 
-	const size_t imageWidth = map_template->Width;
-	const size_t imageHeight = map_template->Height;
+	const size_t imageWidth = map_template->Size.x;
+	const size_t imageHeight = map_template->Size.y;
 
 	/* set up the output control if you are using standard C streams */
 	png_init_io(png_ptr, fp);

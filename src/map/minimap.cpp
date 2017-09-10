@@ -95,10 +95,6 @@ static std::vector<int> MinimapTextureHeight;
 #endif
 
 //Wyrmgus start
-//static int *Minimap2MapX;                  /// fast conversion table
-//static int *Minimap2MapY;                  /// fast conversion table
-//static int Map2MinimapX[MaxMapWidth];      /// fast conversion table
-//static int Map2MinimapY[MaxMapHeight];     /// fast conversion table
 static std::vector<int *> Minimap2MapX;                  /// fast conversion table
 static std::vector<int *> Minimap2MapY;                  /// fast conversion table
 static std::vector<int *> Map2MinimapX;      /// fast conversion table
@@ -235,13 +231,13 @@ void CMinimap::Create()
 #endif
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
 		// Scale to biggest value.
-		const int n = std::max(std::max(Map.Info.MapWidths[z], Map.Info.MapHeights[z]), 32);
+		const int n = std::max<int>(std::max(Map.Info.LayersSizes[z].x, Map.Info.LayersSizes[z].y), 32);
 
 		MinimapScaleX.push_back((W * MINIMAP_FAC + n - 1) / n);
 		MinimapScaleY.push_back((H * MINIMAP_FAC + n - 1) / n);
 
-		XOffset.push_back((W - (Map.Info.MapWidths[z] * MinimapScaleX[z]) / MINIMAP_FAC + 1) / 2);
-		YOffset.push_back((H - (Map.Info.MapHeights[z] * MinimapScaleY[z]) / MINIMAP_FAC + 1) / 2);
+		XOffset.push_back((W - (Map.Info.LayersSizes[z].x * MinimapScaleX[z]) / MINIMAP_FAC + 1) / 2);
+		YOffset.push_back((H - (Map.Info.LayersSizes[z].y * MinimapScaleY[z]) / MINIMAP_FAC + 1) / 2);
 
 		DebugPrint("MinimapScale %d %d (%d %d), X off %d, Y off %d\n" _C_
 				   MinimapScaleX[z] / MINIMAP_FAC _C_ MinimapScaleY[z] / MINIMAP_FAC _C_
@@ -259,16 +255,16 @@ void CMinimap::Create()
 			Minimap2MapX[z][i] = ((i - XOffset[z]) * MINIMAP_FAC) / MinimapScaleX[z];
 		}
 		for (int i = YOffset[z]; i < H - YOffset[z]; ++i) {
-			Minimap2MapY[z][i] = (((i - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]) * Map.Info.MapWidths[z];
+			Minimap2MapY[z][i] = (((i - YOffset[z]) * MINIMAP_FAC) / MinimapScaleY[z]) * Map.Info.LayersSizes[z].x;
 		}
-		Map2MinimapX.push_back(new int[Map.Info.MapWidths[z]]);
-		memset(Map2MinimapX[z], 0, Map.Info.MapWidths[z] * sizeof(int));
-		Map2MinimapY.push_back(new int[Map.Info.MapHeights[z]]);
-		memset(Map2MinimapY[z], 0, Map.Info.MapHeights[z] * sizeof(int));
-		for (int i = 0; i < Map.Info.MapWidths[z]; ++i) {
+		Map2MinimapX.push_back(new int[Map.Info.LayersSizes[z].x]);
+		memset(Map2MinimapX[z], 0, Map.Info.LayersSizes[z].x * sizeof(int));
+		Map2MinimapY.push_back(new int[Map.Info.LayersSizes[z].y]);
+		memset(Map2MinimapY[z], 0, Map.Info.LayersSizes[z].y * sizeof(int));
+		for (int i = 0; i < Map.Info.LayersSizes[z].x; ++i) {
 			Map2MinimapX[z][i] = (i * MinimapScaleX[z]) / MINIMAP_FAC;
 		}
-		for (int i = 0; i < Map.Info.MapHeights[z]; ++i) {
+		for (int i = 0; i < Map.Info.LayersSizes[z].y; ++i) {
 			Map2MinimapY[z][i] = (i * MinimapScaleY[z]) / MINIMAP_FAC;
 		}
 
@@ -627,8 +623,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	const int ty = pos.y * Map.Info.MapWidth;
-	const int ty = pos.y * Map.Info.MapWidths[z];
+	const int ty = pos.y * Map.Info.LayersSizes[z].x;
 	//Wyrmgus end
 	const int tx = pos.x;
 	//Wyrmgus start
@@ -850,19 +845,15 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 	}
 
 	//Wyrmgus start
-//	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];
-//	int my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit.tilePos.y];
-//	int w = Map2MinimapX[type->TileWidth];
 	int mx = 1 + UI.Minimap.XOffset[CurrentMapLayer] + Map2MinimapX[CurrentMapLayer][unit.tilePos.x];
 	int my = 1 + UI.Minimap.YOffset[CurrentMapLayer] + Map2MinimapY[CurrentMapLayer][unit.tilePos.y];
-	int w = Map2MinimapX[CurrentMapLayer][type->TileWidth];
+	int w = Map2MinimapX[CurrentMapLayer][type->TileSize.x];
 	//Wyrmgus end
 	if (mx + w >= UI.Minimap.W) { // clip right side
 		w = UI.Minimap.W - mx;
 	}
 	//Wyrmgus start
-//	int h0 = Map2MinimapY[type->TileHeight];
-	int h0 = Map2MinimapY[CurrentMapLayer][type->TileHeight];
+	int h0 = Map2MinimapY[CurrentMapLayer][type->TileSize.y];
 	//Wyrmgus end
 	if (my + h0 >= UI.Minimap.H) { // clip bottom side
 		h0 = UI.Minimap.H - my;
@@ -1022,9 +1013,7 @@ void CMinimap::Update()
 				visiontype = 2;
 			} else {
 				//Wyrmgus start
-//				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
-//				visiontype = Map.Field(tilePos)->playerInfo.TeamVisibilityState(*ThisPlayer);
-				const Vec2i tilePos(Minimap2MapX[CurrentMapLayer][mx], Minimap2MapY[CurrentMapLayer][my] / Map.Info.MapWidths[CurrentMapLayer]);
+				const Vec2i tilePos(Minimap2MapX[CurrentMapLayer][mx], Minimap2MapY[CurrentMapLayer][my] / Map.Info.LayersSizes[CurrentMapLayer].x);
 				visiontype = Map.Field(tilePos, CurrentMapLayer)->playerInfo.TeamVisibilityState(*ThisPlayer);
 				//Wyrmgus end
 			}
@@ -1332,8 +1321,6 @@ void CMinimap::DrawViewportArea(const CViewport &viewport) const
 	// Determine and save region below minimap cursor
 	const PixelPos screenPos = TilePosToScreenPos(viewport.MapPos);
 	//Wyrmgus start
-//	int w = (viewport.MapWidth * MinimapScaleX) / MINIMAP_FAC;
-//	int h = (viewport.MapHeight * MinimapScaleY) / MINIMAP_FAC;
 	int w = (viewport.MapWidth * MinimapScaleX[CurrentMapLayer]) / MINIMAP_FAC;
 	int h = (viewport.MapHeight * MinimapScaleY[CurrentMapLayer]) / MINIMAP_FAC;
 	//Wyrmgus end

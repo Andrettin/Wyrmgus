@@ -175,8 +175,7 @@ enum {
 	Vec2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
-		tileSize.x = goal->Type->TileWidth;
-		tileSize.y = goal->Type->TileHeight;
+		tileSize = goal->Type->TileSize;
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
 	} else {
 		tileSize.x = 0;

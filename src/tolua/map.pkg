@@ -6,8 +6,7 @@ class CMapInfo
 	//Wyrmgus start
 	string Filename;
 	//Wyrmgus end
-	int MapWidth;
-	int MapHeight;
+	Vec2i Size;
 	int PlayerType[PlayerMax];
 	
 	//Wyrmgus start

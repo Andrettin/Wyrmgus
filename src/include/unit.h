@@ -220,7 +220,7 @@ public:
 	void CheckKnowledgeChange(int variable, int change);
 	void UpdateItemName();
 	void GenerateDrop();
-	void GenerateSpecialProperties(CUnit *dropper = NULL, CPlayer *dropper_player = NULL, bool allow_unique = true);
+	void GenerateSpecialProperties(CUnit *dropper = NULL, CPlayer *dropper_player = NULL, bool allow_unique = true, bool sold_item = false);
 	void GeneratePrefix(CUnit *dropper, CPlayer *dropper_player);
 	void GenerateSuffix(CUnit *dropper, CPlayer *dropper_player);
 	void GenerateSpell(CUnit *dropper, CPlayer *dropper_player);
@@ -729,8 +729,6 @@ extern void RescueUnits();
 
 /// Convert direction (dx,dy) to heading (0-255)
 extern int DirectionToHeading(const Vec2i &dir);
-/// Convert direction (dx,dy) to heading (0-255)
-extern int DirectionToHeading(const PixelDiff &dir);
 
 ///Correct directions for placed wall.
 extern void CorrectWallDirections(CUnit &unit);

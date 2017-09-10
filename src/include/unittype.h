@@ -879,9 +879,9 @@ public:
 	CUnitType();
 	~CUnitType();
 
-	Vec2i GetHalfTileSize() const { return Vec2i(TileWidth / 2, TileHeight / 2); }
+	Vec2i GetHalfTileSize() const { return TileSize / 2; }
 	//Wyrmgus start
-	Vec2i GetHalfTilePixelSize() const { return Vec2i(TileWidth * PixelTileSize.x / 2, TileHeight * PixelTileSize.y / 2); }
+	Vec2i GetHalfTilePixelSize() const { return TileSize * PixelTileSize / 2; }
 	//Wyrmgus end
 	PixelSize GetPixelSize() const;
 
@@ -1006,8 +1006,7 @@ public:
 	int RepairHP;                   /// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
 
-	int TileWidth;                  /// Tile size on map width
-	int TileHeight;                 /// Tile size on map height
+	Vec2i TileSize;                 /// Tile size on map size
 	int BoxWidth;                   /// Selected box size width
 	int BoxHeight;                  /// Selected box size height
 	int BoxOffsetX;                 /// Selected box size horizontal offset

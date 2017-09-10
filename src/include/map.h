@@ -119,8 +119,6 @@ class CRegion;
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-//#define MaxMapWidth  256  /// max map width supported
-//#define MaxMapHeight 256  /// max map height supported
 #define MaxMapWidth  512  /// max map width supported
 #define MaxMapHeight 512  /// max map height supported
 #define DefaultTimeOfDaySeconds (10 * 3) // every 10 seconds of gameplay = 1 hour for time of day calculations, change time of day every three hours
@@ -175,7 +173,7 @@ class CMapTemplate
 {
 public:
 	CMapTemplate() :
-		Width(0), Height(0), Scale(1), TimeOfDaySeconds(DefaultTimeOfDaySeconds), Layer(0), SubtemplatePosition(-1, -1),
+		Size({0,0}), Scale(1), TimeOfDaySeconds(DefaultTimeOfDaySeconds), Layer(0), SubtemplatePosition(-1, -1),
 		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), BorderTerrain(NULL), SurroundingTerrain(NULL)
 	{
 	}
@@ -194,8 +192,7 @@ public:
 	std::string OverlayTerrainFile;
 	std::string TerrainImage;
 	std::string OverlayTerrainImage;
-	int Width;
-	int Height;
+	Vec2i Size;
 	int Scale;													/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
 	int TimeOfDaySeconds;
 	int Layer;													/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
@@ -266,8 +263,7 @@ public:
 	//Wyrmgus end
 	{
 		//Wyrmgus start
-//		return (x >= 0 && y >= 0 && x < MapWidth && y < MapHeight);
-		return (z >= 0 && z < (int) MapWidths.size() && z < (int) MapHeights.size() && x >= 0 && y >= 0 && x < MapWidths[z] && y < MapHeights[z]);
+		return (z >= 0 && z < LayersSizes.size() && x >= 0 && y >= 0 && x < LayersSizes[z].x && y < LayersSizes[z].y);
 		//Wyrmgus end
 	}
 
@@ -287,11 +283,9 @@ public:
 public:
 	std::string Description;    /// Map description
 	std::string Filename;       /// Map filename
-	int MapWidth;               /// Map width
-	int MapHeight;              /// Map height
+	Vec2i Size;                 /// Map size
 	//Wyrmgus start
-	std::vector<int> MapWidths;	/// Map width for each map layer
-	std::vector<int> MapHeights; /// Map height for each map layer
+	std::vector<Vec2i> LayersSizes; /// Map sizes for each map layers
 	//Wyrmgus end
 	int PlayerType[PlayerMax];  /// Same player->Type
 	int PlayerSide[PlayerMax];  /// Same player->Side
@@ -315,8 +309,7 @@ public:
 	//Wyrmgus end
 	{
 		//Wyrmgus start
-//		return x + y * this->Info.MapWidth;
-		return x + y * this->Info.MapWidths[z];
+		return x + y * this->Info.LayersSizes[z].x;
 		//Wyrmgus end
 	}
 	//Wyrmgus start
@@ -347,8 +340,7 @@ public:
 	//Wyrmgus end
 	{
 		//Wyrmgus start
-//		return &this->Fields[x + y * this->Info.MapWidth];
-		return &this->Fields[z][x + y * this->Info.MapWidths[z]];
+		return &this->Fields[z][getIndex(x, y, z)];
 		//Wyrmgus end
 	}
 	//Wyrmgus start
@@ -494,10 +486,8 @@ public:
 		minpos.y = std::max<short>(0, minpos.y);
 
 		//Wyrmgus start
-//		maxpos.x = std::min<short>(maxpos.x, Info.MapWidth - 1);
-//		maxpos.y = std::min<short>(maxpos.y, Info.MapHeight - 1);
-		maxpos.x = std::min<short>(maxpos.x, Info.MapWidths[z] - 1);
-		maxpos.y = std::min<short>(maxpos.y, Info.MapHeights[z] - 1);
+		maxpos.x = std::min<short>(maxpos.x, Info.LayersSizes[z].x - 1);
+		maxpos.y = std::min<short>(maxpos.y, Info.LayersSizes[z].y - 1);
 		//Wyrmgus end
 	}
 

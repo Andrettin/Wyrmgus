@@ -297,6 +297,9 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
 		CTerrainType *tile_terrain = Map.GetTileTerrain(changed_tiles[i], terrain->Overlay, CurrentMapLayer);
 		
+		Map.CalculateTileTransitions(changed_tiles[i], false, CurrentMapLayer);
+		Map.CalculateTileTransitions(changed_tiles[i], true, CurrentMapLayer);
+
 		bool has_transitions = terrain->Overlay ? (Map.Field(changed_tiles[i], CurrentMapLayer)->OverlayTransitionTiles.size() > 0) : (Map.Field(changed_tiles[i], CurrentMapLayer)->TransitionTiles.size() > 0);
 		bool solid_tile = true;
 		
@@ -342,11 +345,6 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	
 	// now check if changing the tiles left any tiles in an incorrect position, and if so, change it accordingly
 	for (size_t i = 0; i != changed_tiles.size(); ++i) {
-		
-		Map.CalculateTileTransitions(changed_tiles[i], false, CurrentMapLayer);
-		Map.CalculateTileTransitions(changed_tiles[i], true, CurrentMapLayer);
-		UI.Minimap.UpdateXY(changed_tiles[i], CurrentMapLayer);
-
 		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
@@ -356,16 +354,13 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 						continue;
 					}
 					
-					Map.CalculateTileTransitions(adjacent_pos, false, CurrentMapLayer);
-					Map.CalculateTileTransitions(adjacent_pos, true, CurrentMapLayer);
-					UI.Minimap.UpdateXY(adjacent_pos, CurrentMapLayer);
-		
 					if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
 						for (int overlay = 1; overlay >= 0; --overlay) {
 							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, CurrentMapLayer);
 							if (!adjacent_terrain || adjacent_terrain == Map.GetTileTerrain(changed_tiles[i], overlay, CurrentMapLayer)) {
 								continue;
 							}
+							Map.CalculateTileTransitions(adjacent_pos, overlay == 1, CurrentMapLayer);
 							bool has_transitions = overlay ? (Map.Field(adjacent_pos, CurrentMapLayer)->OverlayTransitionTiles.size() > 0) : (Map.Field(adjacent_pos, CurrentMapLayer)->TransitionTiles.size() > 0);
 							bool solid_tile = true;
 							
@@ -412,6 +407,30 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 			}
 		}
 	}
+	
+	for (size_t i = 0; i != changed_tiles.size(); ++i) {
+		Map.CalculateTileTransitions(changed_tiles[i], false, CurrentMapLayer);
+		Map.CalculateTileTransitions(changed_tiles[i], true, CurrentMapLayer);
+		UI.Minimap.UpdateXY(changed_tiles[i], CurrentMapLayer);
+		
+		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+				if (x_offset != 0 || y_offset != 0) {
+					Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
+					
+					if (std::find(changed_tiles.begin(), changed_tiles.end(), adjacent_pos) != changed_tiles.end()) {
+						continue;
+					}
+					
+					if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
+						Map.CalculateTileTransitions(adjacent_pos, false, CurrentMapLayer);
+						Map.CalculateTileTransitions(adjacent_pos, true, CurrentMapLayer);
+						UI.Minimap.UpdateXY(adjacent_pos, CurrentMapLayer);
+					}
+				}
+			}
+		}
+	}
 	//Wyrmgus end
 }
 
@@ -436,8 +455,7 @@ static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
 		return;
 	}
 	//Wyrmgus start
-//	const Vec2i mpos(Map.Info.MapWidth - size, Map.Info.MapHeight - size);
-	const Vec2i mpos(Map.Info.MapWidths[CurrentMapLayer] - size, Map.Info.MapHeights[CurrentMapLayer] - size);
+	const Vec2i mpos(Map.Info.LayersSizes[CurrentMapLayer].x - size, Map.Info.LayersSizes[CurrentMapLayer].y - size);
 	//Wyrmgus end
 	const Vec2i mirror = mpos - pos;
 	const Vec2i mirrorv(mirror.x, pos.y);
@@ -2551,13 +2569,10 @@ void CEditor::Init()
 		}
 
 		//Wyrmgus start
-//		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 		Map.Fields.clear();
-		Map.Fields.push_back(new CMapField[Map.Info.MapWidth * Map.Info.MapHeight]);
-		Map.Info.MapWidths.clear();
-		Map.Info.MapWidths.push_back(Map.Info.MapWidth);
-		Map.Info.MapHeights.clear();
-		Map.Info.MapHeights.push_back(Map.Info.MapHeight);
+		Map.Fields.push_back(new CMapField[Map.Info.Size.x * Map.Info.Size.y]);
+		Map.Info.LayersSizes.resize(1);
+		Map.Info.LayersSizes.back() = Map.Info.Size;
 		Map.TimeOfDaySeconds.push_back(DefaultTimeOfDaySeconds);
 		Map.TimeOfDay.push_back(NoTimeOfDay);
 		Map.Planes.push_back(NULL);
@@ -2572,16 +2587,8 @@ void CEditor::Init()
 		//Wyrmgus end
 
 		//Wyrmgus start
-		/*
-		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			//Wyrmgus start
-//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
-			Map.Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
-			//Wyrmgus end
-		}
-		*/
 		for (size_t z = 0; z < Map.Fields.size(); ++z) {
-			for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
+			for (int i = 0; i < Map.Info.Size.x * Map.Info.Size.y; ++i) {
 				//Wyrmgus start
 	//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
 				Map.Fields[z][i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
@@ -2875,8 +2882,6 @@ void StartEditor(const char *filename, bool is_mod)
 		// new map, choose some default values
 		strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), "");
 		// Map.Info.Description.clear();
-		// Map.Info.MapWidth = 64;
-		// Map.Info.MapHeight = 64;
 	}
 
 	//Wyrmgus start

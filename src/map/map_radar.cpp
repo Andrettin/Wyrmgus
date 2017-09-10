@@ -79,9 +79,9 @@ IsTileRadarVisible(const CPlayer &pradar, const CPlayer &punit, const CMapFieldP
 
 bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 {
-	const int x_max = Type->TileWidth;
+	const int x_max = Type->TileSize.x;
 	unsigned int index = Offset;
-	int j = Type->TileHeight;
+	int j = Type->TileSize.y;
 	do {
 		//Wyrmgus start
 //		const CMapField *mf = Map.Field(index);
@@ -95,8 +95,7 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 			++mf;
 		} while (--i);
 		//Wyrmgus start
-//		index += Map.Info.MapWidth;
-		index += Map.Info.MapWidths[this->MapLayer];
+		index += Map.Info.LayersSizes[this->MapLayer].x;
 		//Wyrmgus end
 	} while (--j);
 

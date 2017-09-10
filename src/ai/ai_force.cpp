@@ -103,7 +103,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 
 	std::vector<CUnit *> table;
 	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
-	Vec2i maxpos = pos + Vec2i(unit.Type->TileWidth - 1 + attackrange, unit.Type->TileHeight - 1 + attackrange);
+	Vec2i maxpos = pos + Vec2i(unit.Type->TileSize - 1 + attackrange);
 	Select(minpos, maxpos, table, unit.MapLayer, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit *dest = table[i];
@@ -189,7 +189,7 @@ public:
 		} else {
 			TerrainTraversal terrainTraversal;
 
-			terrainTraversal.SetSize(Map.Info.MapWidths[unit->MapLayer], Map.Info.MapHeights[unit->MapLayer]);
+			terrainTraversal.SetSize(Map.Info.LayersSizes[unit->MapLayer].x, Map.Info.LayersSizes[unit->MapLayer].y);
 			terrainTraversal.Init();
 
 			terrainTraversal.PushUnitPosAndNeighboor(*unit);
@@ -202,42 +202,6 @@ public:
 			*enemy = result_unit;
 		//Wyrmgus end
 		//Wyrmgus start
-		/*
-		} else if (FIND_TYPE == AIATTACK_ALLMAP) {
-//			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
-			//Wyrmgus end
-		} else if (FIND_TYPE == AIATTACK_BUILDING) {
-			//Wyrmgus start
-//			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()), false, IncludeNeutral);
-			//Wyrmgus end
-			//Wyrmgus start
-			//why make sure the enemy is NULL?
-//			Assert(!*enemy);
-			//Wyrmgus end
-			if (*enemy == NULL || !(*enemy)->Type->Building) {
-				//Wyrmgus start
-//				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
-				//Wyrmgus end
-			}
-		} else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
-			//Wyrmgus start
-//			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsAggresiveUnit()), false, IncludeNeutral);
-			//Wyrmgus end
-			//Wyrmgus start
-			//why ask that the enemy be NULL?
-//			Assert(!*enemy || (*enemy)->IsAgressive());
-			//Wyrmgus end
-			if (*enemy == NULL) {
-				//Wyrmgus start
-//				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
-				//Wyrmgus end
-			}
-		*/
 		//Wyrmgus end
 		}
 		return *enemy == NULL;
@@ -550,8 +514,7 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(Map.Info.LayersSizes[z].x, Map.Info.LayersSizes[z].y);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -1177,8 +1140,7 @@ void AiAttackWithForceAt(unsigned int force, int x, int y, int z)
 	//Wyrmgus end
 		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ pos.x _C_ pos.y
 				   //Wyrmgus start
-//				   _C_ Map.Info.MapWidth _C_ Map.Info.MapHeight);
-				   _C_ Map.Info.MapWidths[z] _C_ Map.Info.MapHeights[z]);
+				   _C_ Map.Info.LayersSizes[z].x _C_ Map.Info.LayersSizes[z].y);
 				   //Wyrmgus end
 		return ;
 	}

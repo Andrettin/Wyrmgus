@@ -1409,33 +1409,8 @@ void CommandSharedVision(int player, bool state, int opponent)
 		// Don't share vision anymore. Give each other explored terrain for good-bye.
 
 		//Wyrmgus start
-		/*
-		for (int i = 0; i != Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			CMapField &mf = *Map.Field(i);
-			CMapFieldPlayerInfo &mfp = mf.playerInfo;
-
-			//Wyrmgus start
-//			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
-			if (mfp.Visible[player] && !mfp.Visible[opponent] && !Players[player].Revealed) {
-			//Wyrmgus end
-				mfp.Visible[opponent] = 1;
-				if (opponent == ThisPlayer->Index) {
-					Map.MarkSeenTile(mf);
-				}
-			}
-			//Wyrmgus start
-//			if (mfp.Visible[opponent] && !mfp.Visible[player]) {
-			if (mfp.Visible[opponent] && !mfp.Visible[player] && !Players[opponent].Revealed) {
-			//Wyrmgus end
-				mfp.Visible[player] = 1;
-				if (player == ThisPlayer->Index) {
-					Map.MarkSeenTile(mf);
-				}
-			}
-		}
-		*/
 		for (size_t z = 0; z < Map.Fields.size(); ++z) {
-			for (int i = 0; i != Map.Info.MapWidths[z] * Map.Info.MapHeights[z]; ++i) {
+			for (int i = 0; i != Map.Info.LayersSizes[z].x * Map.Info.LayersSizes[z].y; ++i) {
 				CMapField &mf = *Map.Field(i, z);
 				CMapFieldPlayerInfo &mfp = mf.playerInfo;
 

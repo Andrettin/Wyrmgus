@@ -219,8 +219,7 @@ bool FindTerrainType(int movemask, int resource, int range,
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(Map.Info.LayersSizes[z].x, Map.Info.LayersSizes[z].y);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -731,8 +730,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[unit.MapLayer], Map.Info.MapHeights[unit.MapLayer]);
+	terrainTraversal.SetSize(Map.Info.LayersSizes[unit.MapLayer].x, Map.Info.LayersSizes[unit.MapLayer].y);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -1285,7 +1283,7 @@ public:
 				// FIXME : assume that PRIORITY_FACTOR>HEALTH_FACTOR
 				cost = HEALTH_FACTOR * (2 * hp_damage_evaluate -
 										dest->Variable[HP_INDEX].Value) /
-					   (dtype.TileWidth * dtype.TileWidth);
+					   (dtype.TileSize.x * dtype.TileSize.y);
 				cost = std::max(cost, 1);
 				cost = -cost;
 			} else {
@@ -1327,7 +1325,7 @@ public:
 				}
 
 				// the cost may be divided across multiple cells
-				cost = cost / (dtype.TileWidth * dtype.TileWidth);
+				cost = cost / (dtype.TileSize.x * dtype.TileSize.y);
 				cost = std::max(cost, 1);
 
 				// Removed Unit's are in bunkers
@@ -1368,8 +1366,8 @@ public:
 			Assert(x >= 0 && y >= 0);
 
 			// Mark the good/bad array...
-			for (int yy = 0; yy < dtype.TileHeight; ++yy) {
-				for (int xx = 0; xx < dtype.TileWidth; ++xx) {
+			for (int yy = 0; yy < dtype.TileSize.y; ++yy) {
+				for (int xx = 0; xx < dtype.TileSize.x; ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
 					if (pos >= good->size()) {
 						printf("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
@@ -1446,8 +1444,8 @@ private:
 
 		// put in x-y the real point which will be hit...
 		// (only meaningful when dtype->TileWidth > 1)
-		clamp<int>(&x, dest->tilePos.x, dest->tilePos.x + dtype.TileWidth - 1);
-		clamp<int>(&y, dest->tilePos.y, dest->tilePos.y + dtype.TileHeight - 1);
+		clamp<int,int>(&x, dest->tilePos.x, dest->tilePos.x + dtype.TileSize.x - 1);
+		clamp<int,int>(&y, dest->tilePos.y, dest->tilePos.y + dtype.TileSize.y - 1);
 
 		int sbad = 0;
 		int sgood = 0;

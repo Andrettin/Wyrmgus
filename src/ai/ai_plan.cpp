@@ -78,8 +78,8 @@ public:
 		if (unit->Type->UnitType == UnitTypeFly && unit->IsAgressive() == false) {
 			return;
 		}
-		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.TileWidth
-			|| pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type.TileHeight) {
+		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.TileSize.x
+			|| pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type.TileSize.y) {
 			return;
 		}
 		if (!CanTarget(*source->Type, type)) {
@@ -191,8 +191,7 @@ static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[unit.MapLayer], Map.Info.MapHeights[unit.MapLayer]);
+	terrainTraversal.SetSize(Map.Info.LayersSizes[unit.MapLayer].x, Map.Info.LayersSizes[unit.MapLayer].y);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -368,8 +367,7 @@ static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTrans
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[unit.MapLayer], Map.Info.MapHeights[unit.MapLayer]);
+	terrainTraversal.SetSize(Map.Info.LayersSizes[unit.MapLayer].x, Map.Info.LayersSizes[unit.MapLayer].y);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -425,8 +423,7 @@ int AiForce::PlanAttack()
 	TerrainTraversal transporterTerrainTraversal;
 
 	//Wyrmgus start
-//	transporterTerrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	transporterTerrainTraversal.SetSize(Map.Info.MapWidths[this->GoalMapLayer], Map.Info.MapHeights[this->GoalMapLayer]);
+	transporterTerrainTraversal.SetSize(Map.Info.LayersSizes[this->GoalMapLayer].x, Map.Info.LayersSizes[this->GoalMapLayer].y);
 	//Wyrmgus end
 	transporterTerrainTraversal.Init();
 
