@@ -413,6 +413,9 @@ public:
 	bool CanEquipItem(CUnit *item) const;
 	bool CanEquipItemClass(int item_class) const;
 	bool CanUseItem(CUnit *item) const;
+	bool IsItemSetComplete(const CUnit *item) const;
+	bool EquippingItemCompletesSet(const CUnit *item) const;
+	bool DeequippingItemBreaksSet(const CUnit *item) const;
 	bool HasInventory() const;
 	bool CanLearnAbility(CUpgrade *ability) const;
 	bool CanHireMercenary(CUnitType *type, int civilization_id = -1) const;

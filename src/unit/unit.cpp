@@ -1320,6 +1320,12 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
+	if (item.Unique && item.Unique->Set && this->EquippingItemCompletesSet(&item)) {
+		for (size_t z = 0; z < item.Unique->Set->UpgradeModifiers.size(); ++z) {
+			ApplyIndividualUpgradeModifier(*this, item.Unique->Set->UpgradeModifiers[z]);
+		}
+	}
+
 	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
 		if (Character->GetItem(item) != NULL) {
 			if (!Character->IsItemEquipped(Character->GetItem(item))) {
@@ -1420,6 +1426,12 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
+	if (item.Unique && item.Unique->Set && this->DeequippingItemBreaksSet(&item)) {
+		for (size_t z = 0; z < item.Unique->Set->UpgradeModifiers.size(); ++z) {
+			RemoveIndividualUpgradeModifier(*this, item.Unique->Set->UpgradeModifiers[z]);
+		}
+	}
+
 	int item_class = item.Type->ItemClass;
 	int item_slot = GetItemClassSlot(item_class);
 	
@@ -5234,6 +5246,18 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 			}
 		}
 		
+		if (item->Unique && item->Unique->Set) {
+			if (this->EquippingItemCompletesSet(item)) {
+				for (size_t z = 0; z < item->Unique->Set->UpgradeModifiers.size(); ++z) {
+					if (!increase) {
+						value += item->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+					} else {
+						value += item->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+					}
+				}
+			}
+		}
+		
 		if (EquippedItems[item_slot].size() == this->GetItemSlotQuantity(item_slot)) {
 			int item_slot_used = EquippedItems[item_slot].size() - 1;
 			for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
@@ -5245,6 +5269,17 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 				value -= EquippedItems[item_slot][item_slot_used]->Variable[variable_index].Value;
 			} else {
 				value -= EquippedItems[item_slot][item_slot_used]->Variable[variable_index].Increase;
+			}
+			if (EquippedItems[item_slot][item_slot_used] != item && EquippedItems[item_slot][item_slot_used]->Unique && EquippedItems[item_slot][item_slot_used]->Unique->Set) {
+				if (this->DeequippingItemBreaksSet(EquippedItems[item_slot][item_slot_used])) {
+					for (size_t z = 0; z < EquippedItems[item_slot][item_slot_used]->Unique->Set->UpgradeModifiers.size(); ++z) {
+						if (!increase) {
+							value -= EquippedItems[item_slot][item_slot_used]->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+						} else {
+							value -= EquippedItems[item_slot][item_slot_used]->Unique->Set->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+						}
+					}
+				}
 			}
 		} else if (EquippedItems[item_slot].size() == 0 && (item_slot == WeaponItemSlot || item_slot == ShieldItemSlot || item_slot == BootsItemSlot || item_slot == ArrowsItemSlot)) {
 			for (int z = 0; z < NumUpgradeModifiers; ++z) {
@@ -5679,6 +5714,100 @@ bool CUnit::CanUseItem(CUnit *item) const
 	}
 	
 	return true;
+}
+
+bool CUnit::IsItemSetComplete(const CUnit *item) const
+{
+	std::vector<CUniqueItem *> set_items;
+	for (size_t i = 0; i < UniqueItems.size(); ++i) {
+		if (UniqueItems[i]->Set && UniqueItems[i]->Set == item->Unique->Set) {
+			set_items.push_back(UniqueItems[i]);
+		}
+	}
+	
+	for (size_t i = 0; i < set_items.size(); ++i) {
+		int item_slot = GetItemClassSlot(set_items[i]->Type->ItemClass);
+		
+		if (item_slot == -1) {
+			return false;
+		}
+		
+		bool has_item_equipped = false;
+		for (size_t j = 0; j < this->EquippedItems[item_slot].size(); ++j) {
+			if (EquippedItems[item_slot][j]->Unique == set_items[i]) {
+				has_item_equipped = true;
+				break;
+			}
+		}
+		
+		if (!has_item_equipped) {
+			return false;
+		}
+		
+	}
+
+	return true;
+}
+
+bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
+{
+	std::vector<CUniqueItem *> set_items;
+	for (size_t i = 0; i < UniqueItems.size(); ++i) {
+		if (UniqueItems[i]->Set && UniqueItems[i]->Set == item->Unique->Set) {
+			set_items.push_back(UniqueItems[i]);
+		}
+	}
+	
+	for (size_t i = 0; i < set_items.size(); ++i) {
+		int item_slot = GetItemClassSlot(set_items[i]->Type->ItemClass);
+		
+		if (item_slot == -1) {
+			return false;
+		}
+		
+		bool has_item_equipped = false;
+		for (size_t j = 0; j < this->EquippedItems[item_slot].size(); ++j) {
+			if (EquippedItems[item_slot][j]->Unique == set_items[i]) {
+				has_item_equipped = true;
+				break;
+			}
+		}
+		
+		if (has_item_equipped && set_items[i] == item->Unique) { //if the unique item is already equipped, it won't complete the set (either the set is already complete, or needs something else)
+			return false;
+		} else if (!has_item_equipped && set_items[i] != item->Unique) {
+			return false;
+		}
+		
+	}
+
+	return true;
+}
+
+bool CUnit::DeequippingItemBreaksSet(const CUnit *item) const
+{
+	if (!IsItemSetComplete(item)) {
+		return false;
+	}
+	
+	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+		
+	if (item_slot == -1) {
+		return false;
+	}
+		
+	int item_equipped_quantity = 0;
+	for (size_t i = 0; i < this->EquippedItems[item_slot].size(); ++i) {
+		if (EquippedItems[item_slot][i]->Unique == item->Unique) {
+			item_equipped_quantity += 1;
+		}
+	}
+	
+	if (item_equipped_quantity > 1) {
+		return false;
+	} else {
+		return true;
+	}
 }
 
 bool CUnit::HasInventory() const

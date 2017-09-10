@@ -106,6 +106,14 @@ static int CclDefineUniqueItem(lua_State *l)
 			} else {
 				LuaError(l, "Affix upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
 			}
+		} else if (!strcmp(value, "Set")) {
+			std::string set_ident = LuaToString(l, -1);
+			int upgrade_id = UpgradeIdByIdent(set_ident);
+			if (upgrade_id != -1) {
+				item->Set = AllUpgrades[upgrade_id];
+			} else {
+				LuaError(l, "Set upgrade \"%s\" doesn't exist." _C_ set_ident.c_str());
+			}
 		} else if (!strcmp(value, "Spell")) {
 			std::string spell_ident = LuaToString(l, -1);
 			SpellType *spell = SpellTypeByIdent(spell_ident);
@@ -224,6 +232,13 @@ static int CclGetUniqueItemData(lua_State *l)
 	} else if (!strcmp(data, "Suffix")) {
 		if (item->Suffix != NULL) {
 			lua_pushstring(l, item->Suffix->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Set")) {
+		if (item->Set != NULL) {
+			lua_pushstring(l, item->Set->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

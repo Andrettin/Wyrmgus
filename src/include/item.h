@@ -105,7 +105,7 @@ class CUniqueItem
 {
 public:
 	CUniqueItem() :
-		ResourcesHeld(0), Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL), Work(NULL), Elixir(NULL)
+		ResourcesHeld(0), Type(NULL), Prefix(NULL), Suffix(NULL), Set(NULL), Spell(NULL), Work(NULL), Elixir(NULL)
 	{
 	}
 	
@@ -121,6 +121,7 @@ public:
 	CUnitType *Type;			/// Item type of the item
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;
+	CUpgrade *Set;
 	SpellType *Spell;
 	CUpgrade *Work;
 	CUpgrade *Elixir;
