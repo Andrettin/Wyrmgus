@@ -53,8 +53,8 @@ void CMap::Insert(CUnit &unit)
 {
 	Assert(!unit.Removed);
 	unsigned int index = unit.Offset;
-	const int w = unit.Type->TileWidth;
-	const int h = unit.Type->TileHeight;
+	const int w = unit.Type->TileSize.x;
+	const int h = unit.Type->TileSize.y;
 	int j, i = h;
 
 	do {
@@ -67,14 +67,9 @@ void CMap::Insert(CUnit &unit)
 			mf->UnitCache.Insert(&unit);
 			++mf;
 		//Wyrmgus start
-//		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
-//		index += Info.MapWidth;
-		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidths[unit.MapLayer]);
-		index += Info.MapWidths[unit.MapLayer];
-		//Wyrmgus end
-	//Wyrmgus start
-//	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
-	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeights[unit.MapLayer]);
+		} while (--j && unit.tilePos.x + (j - w) < Info.LayersSizes[unit.MapLayer].x);
+		index += Info.LayersSizes[unit.MapLayer].x;
+	} while (--i && unit.tilePos.y + (i - h) < Info.LayersSizes[unit.MapLayer].y);
 	//Wyrmgus end
 }
 
@@ -87,8 +82,8 @@ void CMap::Remove(CUnit &unit)
 {
 	Assert(!unit.Removed);
 	unsigned int index = unit.Offset;
-	const int w = unit.Type->TileWidth;
-	const int h = unit.Type->TileHeight;
+	const int w = unit.Type->TileSize.x;
+	const int h = unit.Type->TileSize.y;
 	int j, i = h;
 
 	do {
@@ -101,14 +96,9 @@ void CMap::Remove(CUnit &unit)
 			mf->UnitCache.Remove(&unit);
 			++mf;
 		//Wyrmgus start
-//		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
-//		index += Info.MapWidth;
-		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidths[unit.MapLayer]);
-		index += Info.MapWidths[unit.MapLayer];
-		//Wyrmgus end
-	//Wyrmgus start
-//	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
-	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeights[unit.MapLayer]);
+		} while (--j && unit.tilePos.x + (j - w) < Info.LayersSizes[unit.MapLayer].x);
+		index += Info.LayersSizes[unit.MapLayer].x;
+	} while (--i && unit.tilePos.y + (i - h) < Info.LayersSizes[unit.MapLayer].y);
 	//Wyrmgus end
 }
 
@@ -118,9 +108,7 @@ void CMap::Clamp(Vec2i &pos, int z) const
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	clamp<short int>(&pos.x, 0, this->Info.MapWidth - 1);
-//	clamp<short int>(&pos.y, 0, this->Info.MapHeight - 1);
-	clamp<short int>(&pos.x, 0, this->Info.MapWidths[z] - 1);
-	clamp<short int>(&pos.y, 0, this->Info.MapHeights[z] - 1);
+	clamp<short int>(&pos.x, 0, this->Info.LayersSizes[z].x - 1);
+	clamp<short int>(&pos.y, 0, this->Info.LayersSizes[z].y - 1);
 	//Wyrmgus end
 }

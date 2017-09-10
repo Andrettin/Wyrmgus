@@ -1135,7 +1135,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 							&& unit.Player != missile.SourceUnit->Player && unit.IsAllied(*missile.SourceUnit) == false) {
 							if (missile.TargetUnit) {
 								missile.TargetUnit = &unit;
-								if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
+								if (unit.Type->TileSize.x == 1 || unit.Type->TileSize.y == 1) {
 									missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
 								}
 							} else {
@@ -1157,7 +1157,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 					if (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit)) {
 					//Wyrmgus end
 						missile.TargetUnit = &unit;
-						if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
+						if (unit.Type->TileSize.x == 1 || unit.Type->TileSize.y == 1) {
 							missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
 						}
 						missile.DestroyMissile = 1;

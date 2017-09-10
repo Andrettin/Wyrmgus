@@ -1515,8 +1515,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			MouseScrollState = ScrollLeftUp;
 			GameCursor = UI.ArrowNW.Cursor;
 		//Wyrmgus start
-//		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeights[CurrentMapLayer] * PixelTileSize.y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.LayersSizes[CurrentMapLayer].y * PixelTileSize.y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
@@ -1527,8 +1526,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowW.Cursor;
 		}
 	//Wyrmgus start
-//	} else if (mousePos.x > SCROLL_RIGHT) {
-	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (Map.Info.MapWidths[CurrentMapLayer] * PixelTileSize.x) - 1) {
+	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (Map.Info.LayersSizes[CurrentMapLayer].x * PixelTileSize.x) - 1) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (mousePos.y < SCROLL_UP) {
@@ -1538,8 +1536,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			MouseScrollState = ScrollRightUp;
 			GameCursor = UI.ArrowNE.Cursor;
 		//Wyrmgus start
-//		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeights[CurrentMapLayer] * PixelTileSize.y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.LayersSizes[CurrentMapLayer].y * PixelTileSize.y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollRightDown;
 			MouseScrollState = ScrollRightDown;
@@ -1558,8 +1555,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			MouseScrollState = ScrollUp;
 			GameCursor = UI.ArrowN.Cursor;
 		//Wyrmgus start
-//		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeights[CurrentMapLayer] * PixelTileSize.y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.LayersSizes[CurrentMapLayer].y * PixelTileSize.y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollDown;
 			MouseScrollState = ScrollDown;
@@ -1577,7 +1573,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 **  @param x  screen pixel X position.
 **  @param y  screen pixel Y position.
 */
-void HandleCursorMove(int *x, int *y)
+void HandleCursorMove(short *x, short *y)
 {
 	//  Reduce coordinates to window-size.
 	clamp(x, 0, Video.Width - 1);

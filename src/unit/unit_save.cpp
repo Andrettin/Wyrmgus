@@ -262,8 +262,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 					unit.Container->MapLayer,
 					//Wyrmgus end
 					unit.Container->tilePos.x, unit.Container->tilePos.y,
-					unit.Container->Type->TileWidth,
-					unit.Container->Type->TileHeight);
+					unit.Container->Type->TileSize.x,
+					unit.Container->Type->TileSize.y);
 	}
 	file.printf(" \"seen-by-player\", \"");
 	for (int i = 0; i < PlayerMax; ++i) {

@@ -291,7 +291,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 		ExitFatal(-1);
 	}
 #endif
-	if (!Map.Info.MapWidth || !Map.Info.MapHeight) {
+	if (!Map.Info.Size.x || !Map.Info.Size.y) {
 		fprintf(stderr, "%s: invalid map\n", mapname.c_str());
 		ExitFatal(-1);
 	}
@@ -365,10 +365,8 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 				for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
 					for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
 						//Wyrmgus start
-//						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth;
-//						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight;
-						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidths[CurrentMapLayer];
-						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeights[CurrentMapLayer];
+						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.LayersSizes[CurrentMapLayer].x;
+						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.LayersSizes[CurrentMapLayer].y;
 						//Wyrmgus end
 						if (miniMapX + j < 0 || miniMapX + j >= UI.Minimap.W) {
 							continue;
@@ -416,10 +414,8 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == CurrentMapLayer) {
 			//Wyrmgus end
 				//Wyrmgus start
-//				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth - rectSize / 2;
-//				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight - rectSize / 2;
-				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidths[CurrentMapLayer] - rectSize / 2;
-				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeights[CurrentMapLayer] - rectSize / 2;
+				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.LayersSizes[CurrentMapLayer].x - rectSize / 2;
+				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.LayersSizes[CurrentMapLayer].y - rectSize / 2;
 				//Wyrmgus end
 				rect.w = rect.h = rectSize;
 				SDL_FillRect(preview, &rect, Players[i].Color);
@@ -487,24 +483,6 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_m
 		// MAPTODO Copyright notice in generated file
 
 		//Wyrmgus start
-		/*
-		f->printf("DefinePlayerTypes(");
-		while (topplayer > 0 && map.Info.PlayerType[topplayer] == PlayerNobody) {
-			--topplayer;
-		}
-		for (int i = 0; i <= topplayer; ++i) {
-			f->printf("%s\"%s\"", (i ? ", " : ""), type[map.Info.PlayerType[i]]);
-			if (map.Info.PlayerType[i] == PlayerPerson) {
-				++numplayers;
-			}
-		}
-		f->printf(")\n");
-
-		f->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
-				  map.Info.Description.c_str(), numplayers, map.Info.MapWidth, map.Info.MapHeight,
-				  map.Info.MapUID + 1);
-		*/
-
 		if (!is_mod) {
 			f->printf("DefinePlayerTypes(");
 			while (topplayer > 0 && map.Info.PlayerType[topplayer] == PlayerNobody) {
@@ -519,7 +497,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_m
 			f->printf(")\n");
 
 			f->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
-					  map.Info.Description.c_str(), numplayers, map.Info.MapWidth, map.Info.MapHeight,
+					  map.Info.Description.c_str(), numplayers, map.Info.Size.x, map.Info.Size.y,
 					  map.Info.MapUID + 1);
 		} else {
 			f->printf("PresentMap(\"%s\")\n", map.Info.Description.c_str());
@@ -864,37 +842,15 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		if (writeTerrain) {
 			f->printf("-- Tiles Map\n");
 			//Wyrmgus start
-			/*
-			for (int i = 0; i < map.Info.MapHeight; ++i) {
-				for (int j = 0; j < map.Info.MapWidth; ++j) {
-					const CMapField &mf = map.Fields[j + i * map.Info.MapWidth];
-					//Wyrmgus start
-//					const int tile = mf.getGraphicTile();
-//					const int n = map.Tileset->findTileIndexByTile(tile);
-					//Wyrmgus end
-					const int value = mf.Value;
-					//Wyrmgus start
-//					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
-					f->printf("SetTileTerrain(\"%s\", %d, %d, %d)\n", mf.Terrain->Ident.c_str(), j, i, 0);
-					if (mf.OverlayTerrain) {
-						f->printf("SetTileTerrain(\"%s\", %d, %d, %d)\n", mf.OverlayTerrain->Ident.c_str(), j, i, value);
-					}
-					//Wyrmgus end
-				}
-			}
-			*/
 			for (size_t z = 0; z < map.Fields.size(); ++z) {
 				//Wyrmgus start
-//				for (int i = 0; i < map.Info.MapHeight; ++i) {
-				for (int i = 0; i < map.Info.MapHeights[z]; ++i) {
+				for (int i = 0; i < map.Info.LayersSizes[z].y; ++i) {
 				//Wyrmgus end
 					//Wyrmgus start
-//					for (int j = 0; j < map.Info.MapWidth; ++j) {
-					for (int j = 0; j < map.Info.MapWidths[z]; ++j) {
+					for (int j = 0; j < map.Info.LayersSizes[z].x; ++j) {
 					//Wyrmgus end
 						//Wyrmgus start
-//						const CMapField &mf = map.Fields[z][j + i * map.Info.MapWidth];
-						const CMapField &mf = map.Fields[z][j + i * map.Info.MapWidths[z]];
+						const CMapField &mf = map.Fields[z][map.getIndex(j, i, z)];
 	//					const int tile = mf.getGraphicTile();
 	//					const int n = map.Tileset->findTileIndexByTile(tile);
 						//Wyrmgus end
@@ -1126,7 +1082,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain, bool is_mod)
 //Wyrmgus end
 {
-	if (!map.Info.MapWidth || !map.Info.MapHeight) {
+	if (!map.Info.Size.x || !map.Info.Size.y) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapName.c_str());
 		ExitFatal(-1);
 	}
@@ -1313,7 +1269,7 @@ static void GameTypeFreeForAll()
 */
 static void GameTypeTopVsBottom()
 {
-	const int middle = Map.Info.MapHeight / 2;
+	const int middle = Map.Info.Size.y / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		const bool top_i = Players[i].StartPos.y <= middle;
@@ -1339,7 +1295,7 @@ static void GameTypeTopVsBottom()
 */
 static void GameTypeLeftVsRight()
 {
-	const int middle = Map.Info.MapWidth / 2;
+	const int middle = Map.Info.Size.x / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		const bool left_i = Players[i].StartPos.x <= middle;

@@ -33,6 +33,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <assert.h>
 #include "stratagus.h"
 
 #include "trigger.h"
@@ -200,12 +201,14 @@ static int CclGetNumUnitsAt(lua_State *l)
 		z = LuaToNumber(l, 5);
 	}
 	
-	if (z == 0 && (Map.Info.MapWidths.size() == 0 || Map.Info.MapHeights.size() == 0)) {
-		maxPos.x = std::min<int>(maxPos.x, Map.Info.MapWidth - 1);
-		maxPos.y = std::min<int>(maxPos.y, Map.Info.MapHeight - 1);
+	if (z == 0 && Map.Info.LayersSizes.empty()) {
+		maxPos.x = std::min<int>(maxPos.x, Map.Info.Size.x - 1);
+		maxPos.y = std::min<int>(maxPos.y, Map.Info.Size.y - 1);
 	} else if (z != -1) {
-		maxPos.x = std::min<int>(maxPos.x, Map.Info.MapWidths[z] - 1);
-		maxPos.y = std::min<int>(maxPos.y, Map.Info.MapHeights[z] - 1);
+		maxPos.x = std::min<int>(maxPos.x, Map.Info.LayersSizes[z].x - 1);
+		maxPos.y = std::min<int>(maxPos.y, Map.Info.LayersSizes[z].y - 1);
+	} else if (z >= Map.Info.LayersSizes.size()) {
+		assert(false);
 	}
 	
 	if (z == -1 || !Map.Info.IsPointOnMap(minPos, z) || !Map.Info.IsPointOnMap(maxPos, z)) {

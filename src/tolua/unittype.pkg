@@ -9,8 +9,7 @@ class CUnitType
 
 	int GivesResource;
 	
-	int TileWidth;
-	int TileHeight;
+	Vec2i TileSize;
 };
 
 CUnitType *UnitTypeByIdent(const std::string ident);

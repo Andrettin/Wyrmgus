@@ -102,21 +102,18 @@ static int CclStratagusMap(lua_State *l)
 
 				if (!strcmp(value, "size")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					CclGetPos(l, &Map.Info.MapWidth, &Map.Info.MapHeight);
+					CclGetPos(l, &Map.Info.Size.x, &Map.Info.Size.y);
 					lua_pop(l, 1);
 
 					//Wyrmgus start
 //					delete[] Map.Fields;
-//					Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 					for (size_t z = 0; z < Map.Fields.size(); ++z) {
 						delete[] Map.Fields[z];
 					}
 					Map.Fields.clear();
-					Map.Fields.push_back(new CMapField[Map.Info.MapWidth * Map.Info.MapHeight]);
-					Map.Info.MapWidths.clear();
-					Map.Info.MapWidths.push_back(Map.Info.MapWidth);
-					Map.Info.MapHeights.clear();
-					Map.Info.MapHeights.push_back(Map.Info.MapHeight);
+					Map.Fields.push_back(new CMapField[Map.Info.Size.x * Map.Info.Size.y]);
+					Map.Info.LayersSizes.resize(1);
+					Map.Info.LayersSizes.back() = Map.Info.Size;
 					//Wyrmgus end
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
@@ -141,8 +138,7 @@ static int CclStratagusMap(lua_State *l)
 						}
 						int map_layer_width = LuaToNumber(l, -1, 1);
 						int map_layer_height = LuaToNumber(l, -1, 2);
-						Map.Info.MapWidths.push_back(map_layer_width);
-						Map.Info.MapHeights.push_back(map_layer_height);
+						Map.Info.LayersSizes.emplace_back(map_layer_width, map_layer_height);
 						Map.Fields.push_back(new CMapField[map_layer_width * map_layer_height]);
 						lua_pop(l, 1);
 					}
@@ -191,25 +187,6 @@ static int CclStratagusMap(lua_State *l)
 				//Wyrmgus end
 				} else if (!strcmp(value, "map-fields")) {
 					//Wyrmgus start
-					/*
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					const int subsubargs = lua_rawlen(l, -1);
-					if (subsubargs != Map.Info.MapWidth * Map.Info.MapHeight) {
-						fprintf(stderr, "Wrong tile table length: %d\n", subsubargs);
-					}
-					for (int i = 0; i < subsubargs; ++i) {
-						lua_rawgeti(l, -1, i + 1);
-						if (!lua_istable(l, -1)) {
-							LuaError(l, "incorrect argument");
-						}
-						Map.Fields[i].parse(l);
-						lua_pop(l, 1);
-					}
-					lua_pop(l, 1);
-					*/
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
@@ -221,7 +198,7 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument");
 						}
 						const int subsubsubargs = lua_rawlen(l, -1);
-						if (subsubsubargs != Map.Info.MapWidths[z] * Map.Info.MapHeights[z]) {
+						if (subsubsubargs != Map.Info.LayersSizes[z].x * Map.Info.LayersSizes[z].y) {
 							fprintf(stderr, "Wrong tile table length: %d\n", subsubsubargs);
 						}
 						for (int i = 0; i < subsubsubargs; ++i) {
@@ -246,8 +223,8 @@ static int CclStratagusMap(lua_State *l)
 	}
 	
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		for (int ix = 0; ix < Map.Info.MapWidths[z]; ++ix) {
-			for (int iy = 0; iy < Map.Info.MapHeights[z]; ++iy) {
+		for (int ix = 0; ix < Map.Info.LayersSizes[z].x; ++ix) {
+			for (int iy = 0; iy < Map.Info.LayersSizes[z].y; ++iy) {
 				Map.CalculateTileOwnershipTransition(Vec2i(ix, iy), z); //so that the correct ownership border is shown after a loaded game
 			}
 		}
@@ -613,7 +590,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 	Vec2i pos;
 	CclGetPos(l, &pos.x, &pos.y, 3);
 	
-	if (pos.x < 0 || pos.x >= map_template->Width || pos.y < 0 || pos.y >= map_template->Height) {
+	if (pos.x < 0 || pos.x >= map_template->Size.x || pos.y < 0 || pos.y >= map_template->Size.y) {
 		LuaError(l, "Invalid map coordinate : (%d, %d)" _C_ pos.x _C_ pos.y);
 	}
 
@@ -684,7 +661,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		start_pos.y = settlement->Position.y;
 	}
 	
-	if (start_pos.x < 0 || start_pos.x >= map_template->Width || start_pos.y < 0 || start_pos.y >= map_template->Height) {
+	if (start_pos.x < 0 || start_pos.x >= map_template->Size.x || start_pos.y < 0 || start_pos.y >= map_template->Size.y) {
 		LuaError(l, "Invalid map coordinate : (%d, %d)" _C_ start_pos.x _C_ start_pos.y);
 	}
 
@@ -701,7 +678,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		end_pos.y = settlement->Position.y;
 	}
 	
-	if (end_pos.x < 0 || end_pos.x >= map_template->Width || end_pos.y < 0 || end_pos.y >= map_template->Height) {
+	if (end_pos.x < 0 || end_pos.x >= map_template->Size.x || end_pos.y < 0 || end_pos.y >= map_template->Size.y) {
 		LuaError(l, "Invalid map coordinate : (%d, %d)" _C_ end_pos.x _C_ end_pos.y);
 	}
 
@@ -749,7 +726,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 			}
 		}
 
-		if (pos.x < 0 || pos.x >= map_template->Width || pos.y < 0 || pos.y >= map_template->Height) {
+		if (pos.x < 0 || pos.x >= map_template->Size.x || pos.y < 0 || pos.y >= map_template->Size.y) {
 			break;
 		}
 
@@ -1233,7 +1210,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	//Wyrmgus start
-	if (pos.x < 0 || pos.x >= Map.Info.MapWidths[z] || pos.y < 0 || pos.y >= Map.Info.MapHeights[z]) {
+	if (pos.x < 0 || pos.x >= Map.Info.LayersSizes[z].x || pos.y < 0 || pos.y >= Map.Info.LayersSizes[z].y) {
 		lua_pushboolean(l, 0);
 		return 1;
 	}
@@ -1621,9 +1598,9 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else if (!strcmp(value, "OverlayTerrainImage")) {
 			map->OverlayTerrainImage = LuaToString(l, -1);
 		} else if (!strcmp(value, "Width")) {
-			map->Width = LuaToNumber(l, -1);
+			map->Size.x = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Height")) {
-			map->Height = LuaToNumber(l, -1);
+			map->Size.y = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Scale")) {
 			map->Scale = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TimeOfDaySeconds")) {
@@ -1736,8 +1713,8 @@ static int CclDefineMapTemplate(lua_State *l)
 	}
 	
 	if (subtemplate_position_top_left.x != -1 && subtemplate_position_top_left.y != -1) {
-		map->SubtemplatePosition.x = subtemplate_position_top_left.x + ((map->Width - 1) / 2);
-		map->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map->Height - 1) / 2);
+		map->SubtemplatePosition.x = subtemplate_position_top_left.x + ((map->Size.x - 1) / 2);
+		map->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map->Size.y - 1) / 2);
 	}
 	
 	return 0;

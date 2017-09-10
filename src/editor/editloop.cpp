@@ -455,8 +455,7 @@ static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
 		return;
 	}
 	//Wyrmgus start
-//	const Vec2i mpos(Map.Info.MapWidth - size, Map.Info.MapHeight - size);
-	const Vec2i mpos(Map.Info.MapWidths[CurrentMapLayer] - size, Map.Info.MapHeights[CurrentMapLayer] - size);
+	const Vec2i mpos(Map.Info.LayersSizes[CurrentMapLayer].x - size, Map.Info.LayersSizes[CurrentMapLayer].y - size);
 	//Wyrmgus end
 	const Vec2i mirror = mpos - pos;
 	const Vec2i mirrorv(mirror.x, pos.y);
@@ -2570,13 +2569,10 @@ void CEditor::Init()
 		}
 
 		//Wyrmgus start
-//		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 		Map.Fields.clear();
-		Map.Fields.push_back(new CMapField[Map.Info.MapWidth * Map.Info.MapHeight]);
-		Map.Info.MapWidths.clear();
-		Map.Info.MapWidths.push_back(Map.Info.MapWidth);
-		Map.Info.MapHeights.clear();
-		Map.Info.MapHeights.push_back(Map.Info.MapHeight);
+		Map.Fields.push_back(new CMapField[Map.Info.Size.x * Map.Info.Size.y]);
+		Map.Info.LayersSizes.resize(1);
+		Map.Info.LayersSizes.back() = Map.Info.Size;
 		Map.TimeOfDaySeconds.push_back(DefaultTimeOfDaySeconds);
 		Map.TimeOfDay.push_back(NoTimeOfDay);
 		Map.Planes.push_back(NULL);
@@ -2591,16 +2587,8 @@ void CEditor::Init()
 		//Wyrmgus end
 
 		//Wyrmgus start
-		/*
-		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			//Wyrmgus start
-//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
-			Map.Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
-			//Wyrmgus end
-		}
-		*/
 		for (size_t z = 0; z < Map.Fields.size(); ++z) {
-			for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
+			for (int i = 0; i < Map.Info.Size.x * Map.Info.Size.y; ++i) {
 				//Wyrmgus start
 	//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
 				Map.Fields[z][i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
@@ -2894,8 +2882,6 @@ void StartEditor(const char *filename, bool is_mod)
 		// new map, choose some default values
 		strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), "");
 		// Map.Info.Description.clear();
-		// Map.Info.MapWidth = 64;
-		// Map.Info.MapHeight = 64;
 	}
 
 	//Wyrmgus start

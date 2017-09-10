@@ -735,8 +735,8 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 			content.pos.x = contentWidth + content.MarginX;
 			content.pos.y = popupHeight + content.MarginY;
 
-			contentWidth += std::max(content.minSize.x, 2 * content.MarginX + content.GetWidth(button, Costs));
-			contentHeight = std::max(content.minSize.y, 2 * content.MarginY + content.GetHeight(button, Costs));
+			contentWidth += std::max<int>(content.minSize.x, 2 * content.MarginX + content.GetWidth(button, Costs));
+			contentHeight = std::max<int>(content.minSize.y, 2 * content.MarginY + content.GetHeight(button, Costs));
 			maxContentHeight = std::max(contentHeight, maxContentHeight);
 			if (content.Wrap) {
 				popupWidth += std::max(0, contentWidth - maxContentWidth);
@@ -2253,8 +2253,8 @@ void CButtonPanel::DoClicked_Train(int button)
 	
 	if (type.BoolFlag[RAIL_INDEX].value) {
 		bool has_adjacent_rail = false;
-		Vec2i top_left_pos(Selected[best_training_place]->tilePos - Vec2i(1, 1));
-		Vec2i bottom_right_pos(Selected[best_training_place]->tilePos + Vec2i(Selected[best_training_place]->Type->TileWidth - 1, Selected[best_training_place]->Type->TileHeight - 1));
+		Vec2i top_left_pos(Selected[best_training_place]->tilePos - 1);
+		Vec2i bottom_right_pos(Selected[best_training_place]->tilePos + Selected[best_training_place]->Type->TileSize - 1);
 		
 		for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
 			Vec2i tile_pos(x, top_left_pos.y);

@@ -303,8 +303,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	Vec2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
-		tileSize.x = goal->Type->TileWidth;
-		tileSize.y = goal->Type->TileHeight;
+		tileSize = goal->Type->TileSize;
 		//Wyrmgus start
 //		input.SetGoal(goal->tilePos, tileSize);
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
@@ -571,8 +570,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 				// Reached another unit, now attacking it
 				unsigned char oldDir = unit.Direction;
 				//Wyrmgus start
-//				const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-				const Vec2i dir = Vec2i(goal->tilePos.x * PixelTileSize.x, goal->tilePos.y * PixelTileSize.y) + goal->Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize();
+				const Vec2i dir = goal->tilePos * PixelTileSize + goal->Type->GetHalfTilePixelSize() - unit.tilePos * PixelTileSize - unit.Type->GetHalfTilePixelSize();
 				//Wyrmgus end
 				UnitHeadingFromDeltaXY(unit, dir);
 				if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {

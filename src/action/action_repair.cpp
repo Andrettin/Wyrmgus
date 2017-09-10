@@ -197,8 +197,7 @@
 
 	Vec2i tileSize;
 	if (ReparableTarget != NULL) {
-		tileSize.x = ReparableTarget->Type->TileWidth;
-		tileSize.y = ReparableTarget->Type->TileHeight;
+		tileSize = ReparableTarget->Type->TileSize;
 		//Wyrmgus start
 //		input.SetGoal(ReparableTarget->tilePos, tileSize);
 		input.SetGoal(ReparableTarget->tilePos, tileSize, ReparableTarget->MapLayer);

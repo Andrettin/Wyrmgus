@@ -442,10 +442,7 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 		minPos.x = 0;
 		minPos.y = 0;
 		//Wyrmgus start
-//		maxPos.x = Map.Info.MapWidth - 1;
-//		maxPos.y = Map.Info.MapHeight - 1;
-		maxPos.x = Map.Info.MapWidths[CurrentMapLayer] - 1;
-		maxPos.y = Map.Info.MapHeights[CurrentMapLayer] - 1;
+		maxPos = Map.Info.LayersSizes[CurrentMapLayer] - 1;
 		//Wyrmgus end
 	}
 	//Wyrmgus end
@@ -854,7 +851,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 int SelectArmy()
 {
 	const Vec2i minPos(0, 0);
-	const Vec2i maxPos(Map.Info.MapWidths[CurrentMapLayer] - 1, Map.Info.MapHeights[CurrentMapLayer] - 1);
+	const Vec2i maxPos(Map.Info.LayersSizes[CurrentMapLayer] - 1);
 	std::vector<CUnit *> table;
 
 	//Wyrmgus start

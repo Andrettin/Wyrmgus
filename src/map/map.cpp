@@ -220,14 +220,14 @@ void CMapTemplate::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 	int y = 0;
 	while (std::getline(is_map, line_str))
 	{
-		if (y < template_start_pos.y || y >= (template_start_pos.y + Map.Info.MapHeights[z])) {
+		if (y < template_start_pos.y || y >= (template_start_pos.y + Map.Info.LayersSizes[z].y)) {
 			y += 1;
 			continue;
 		}
 		int x = 0;
 		
 		for (unsigned int i = 0; i < line_str.length(); ++i) {
-			if (x < template_start_pos.x || x >= (template_start_pos.x + Map.Info.MapWidths[z])) {
+			if (x < template_start_pos.x || x >= (template_start_pos.x + Map.Info.LayersSizes[z].x)) {
 				x += 1;
 				continue;
 			}
@@ -283,12 +283,12 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 	Uint8 r, g, b;
 
 	for (int y = 0; y < terrain_image->Height; ++y) {
-		if (y < template_start_pos.y || y >= (template_start_pos.y + (Map.Info.MapHeights[z] / this->Scale))) {
+		if (y < template_start_pos.y || y >= (template_start_pos.y + (Map.Info.LayersSizes[z].y / this->Scale))) {
 			continue;
 		}
 		
 		for (int x = 0; x < terrain_image->Width; ++x) {
-			if (x < template_start_pos.x || x >= (template_start_pos.x + (Map.Info.MapWidths[z] / this->Scale))) {
+			if (x < template_start_pos.x || x >= (template_start_pos.x + (Map.Info.LayersSizes[z].x / this->Scale))) {
 				continue;
 			}
 
@@ -341,15 +341,14 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		return;
 	}
 	
-	if (template_start_pos.x < 0 || template_start_pos.x >= this->Width || template_start_pos.y < 0 || template_start_pos.y >= this->Height) {
+	if (template_start_pos.x < 0 || template_start_pos.x >= Size.x || template_start_pos.y < 0 || template_start_pos.y >= Size.y) {
 		fprintf(stderr, "Invalid map coordinate for map template \"%s\": (%d, %d)\n", this->Ident.c_str(), template_start_pos.x, template_start_pos.y);
 		return;
 	}
 	
 	if (z >= (int) Map.Fields.size()) {
-		Map.Info.MapWidths.push_back(std::min(this->Width * this->Scale, Map.Info.MapWidth));
-		Map.Info.MapHeights.push_back(std::min(this->Height * this->Scale, Map.Info.MapHeight));
-		Map.Fields.push_back(new CMapField[Map.Info.MapWidths[z] * Map.Info.MapHeights[z]]);
+		Map.Info.LayersSizes.push_back({std::min<short>(Size.x * this->Scale, Map.Info.Size.x), std::min<short>(Size.y * this->Scale, Map.Info.Size.y)});
+		Map.Fields.push_back(new CMapField[Map.Info.LayersSizes[z].x * Map.Info.LayersSizes[z].y]);
 		Map.TimeOfDaySeconds.push_back(this->TimeOfDaySeconds);
 		Map.TimeOfDay.push_back(NoTimeOfDay);
 		Map.Planes.push_back(this->Plane);
@@ -369,7 +368,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.TimeOfDay[z] = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
 	}
 	
-	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + (this->Width * this->Scale)), std::min(Map.Info.MapHeights[z], map_start_pos.y + (this->Height * this->Scale)));
+	Vec2i map_end(std::min<short>(Map.Info.LayersSizes[z].x, map_start_pos.x + (Size.x * this->Scale)), std::min<short>(Map.Info.LayersSizes[z].y, map_start_pos.y + (Size.y * this->Scale)));
 	if (!Map.Info.IsPointOnMap(map_start_pos, z)) {
 		fprintf(stderr, "Invalid map coordinate for map template \"%s\": (%d, %d)\n", this->Ident.c_str(), map_start_pos.x, map_start_pos.y);
 		return;
@@ -383,7 +382,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	if (CurrentCampaign) {
 		for (size_t i = 0; i < HistoricalTerrains.size(); ++i) {
 			Vec2i history_pos = std::get<0>(HistoricalTerrains[i]);
-			if (history_pos.x < template_start_pos.x || history_pos.x >= (template_start_pos.x + (Map.Info.MapWidths[z] / this->Scale)) || history_pos.y < template_start_pos.y || history_pos.y >= (template_start_pos.y + (Map.Info.MapHeights[z] / this->Scale))) {
+			if (history_pos.x < template_start_pos.x || history_pos.x >= (template_start_pos.x + (Map.Info.LayersSizes[z].x / this->Scale)) || history_pos.y < template_start_pos.y || history_pos.y >= (template_start_pos.y + (Map.Info.LayersSizes[z].y / this->Scale))) {
 				continue;
 			}
 			if (CurrentCampaign->StartDate.ContainsDate(std::get<2>(HistoricalTerrains[i])) || std::get<2>(HistoricalTerrains[i]).year == 0) {
@@ -443,22 +442,22 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	
 	for (size_t i = 0; i < this->Subtemplates.size(); ++i) {
-		Vec2i subtemplate_pos(this->Subtemplates[i]->SubtemplatePosition - Vec2i((this->Subtemplates[i]->Width - 1) / 2, (this->Subtemplates[i]->Height - 1) / 2));
+		Vec2i subtemplate_pos(this->Subtemplates[i]->SubtemplatePosition - Vec2i((Subtemplates[i]->Size - 1) / 2));
 		bool found_location = false;
 		
 		if (subtemplate_pos.x < 0 || subtemplate_pos.y < 0) {
 			Vec2i min_pos(map_start_pos);
-			Vec2i max_pos(map_end.x - this->Subtemplates[i]->Width, map_end.y - this->Subtemplates[i]->Height);
+			Vec2i max_pos(map_end - Subtemplates[i]->Size);
 			int while_count = 0;
 			while (while_count < 1000) {
 				subtemplate_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
 				subtemplate_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
 				
-				bool on_map = Map.Info.IsPointOnMap(subtemplate_pos, z) && Map.Info.IsPointOnMap(Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), z);
+				bool on_map = Map.Info.IsPointOnMap(subtemplate_pos, z) && Map.Info.IsPointOnMap(subtemplate_pos + Subtemplates[i]->Size - 1, z);
 				
 				bool on_subtemplate_area = false;
-				for (int x = 0; x < this->Subtemplates[i]->Width; ++x) {
-					for (int y = 0; y < this->Subtemplates[i]->Height; ++y) {
+				for (int x = 0; x < this->Subtemplates[i]->Size.x; ++x) {
+					for (int y = 0; y < this->Subtemplates[i]->Size.y; ++y) {
 						if (Map.IsPointInASubtemplateArea(subtemplate_pos + Vec2i(x, y), z)) {
 							on_subtemplate_area = true;
 							break;
@@ -483,16 +482,16 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 		
 		if (found_location) {
-			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < Map.Info.MapWidths[z] && subtemplate_pos.y < Map.Info.MapHeights[z]) {
+			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < Map.Info.LayersSizes[z].x && subtemplate_pos.y < Map.Info.LayersSizes[z].y) {
 				this->Subtemplates[i]->Apply(Vec2i(0, 0), subtemplate_pos, z);
 			}
 				
-			Map.SubtemplateAreas[z].push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), this->Subtemplates[i]));
+			Map.SubtemplateAreas[z].push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, subtemplate_pos + Subtemplates[i]->Size - 1, this->Subtemplates[i]));
 				
-			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < Map.Info.MapWidths[z] && subtemplate_pos.y < Map.Info.MapHeights[z]) {
+			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < Map.Info.LayersSizes[z].x && subtemplate_pos.y < Map.Info.LayersSizes[z].y) {
 				for (size_t j = 0; j < this->Subtemplates[i]->ExternalGeneratedTerrains.size(); ++j) {
-					Vec2i external_start_pos(subtemplate_pos.x - (this->Subtemplates[i]->Width / 2), subtemplate_pos.y - (this->Subtemplates[i]->Height / 2));
-					Vec2i external_end(subtemplate_pos.x + this->Subtemplates[i]->Width + (this->Subtemplates[i]->Width / 2), subtemplate_pos.y + this->Subtemplates[i]->Height + (this->Subtemplates[i]->Height / 2));
+					Vec2i external_start_pos(subtemplate_pos - Subtemplates[i]->Size / 2);
+					Vec2i external_end(subtemplate_pos + Subtemplates[i]->Size + (Subtemplates[i]->Size / 2));
 					int map_width = (external_end.x - external_start_pos.x);
 					int map_height = (external_end.y - external_start_pos.y);
 					int expansion_number = 0;
@@ -535,7 +534,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 			continue;
 		}
 		
-		Vec2i unit_offset((std::get<0>(iterator->second)->TileWidth - 1) / 2, (std::get<0>(iterator->second)->TileHeight - 1) / 2);
+		Vec2i unit_offset((std::get<0>(iterator->second)->TileSize - 1) / 2);
 		CUnit *unit = CreateResourceUnit(unit_pos - unit_offset, *std::get<0>(iterator->second), z);
 		
 		if (std::get<1>(iterator->second)) {
@@ -624,7 +623,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		if (Players[i].NumTownHalls > 0) {
 			int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Race, Players[i].Faction, GetUnitTypeClassIndexByName("worker"));			
 			if (worker_type_id != -1 && Players[i].UnitTypesCount[worker_type_id] == 0) { //only create if the player doesn't have any workers created in another manner
-				Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
+				Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileSize - 1) / 2);
 				
 				Vec2i worker_pos(Players[i].StartPos);
 
@@ -665,14 +664,14 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	
 	for (size_t i = 0; i < this->GeneratedNeutralUnits.size(); ++i) {
-		bool grouped = this->GeneratedNeutralUnits[i].first->GivesResource && this->GeneratedNeutralUnits[i].first->TileWidth == 1 && this->GeneratedNeutralUnits[i].first->TileHeight == 1; // group small resources
+		bool grouped = this->GeneratedNeutralUnits[i].first->GivesResource && this->GeneratedNeutralUnits[i].first->TileSize == Vec2i(1); // group small resources
 		Map.GenerateNeutralUnits(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
 	}
 }
 
 void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 {
-	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+	Vec2i map_end(std::min<int>(Map.Info.LayersSizes[z].x, map_start_pos.x + this->Size.x), std::min<int>(Map.Info.LayersSizes[z].y, map_start_pos.y + this->Size.y));
 
 	for (std::map<std::pair<int, int>, CSettlement *>::iterator settlement_iterator = this->Settlements.begin(); settlement_iterator != this->Settlements.end(); ++settlement_iterator) {
 		Vec2i settlement_raw_pos(settlement_iterator->second->Position);
@@ -683,8 +682,8 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 		}
 
 		if (settlement_iterator->second->Major && SettlementSiteUnitType) { //add a settlement site for major settlements
-			Vec2i unit_offset((SettlementSiteUnitType->TileWidth - 1) / 2, (SettlementSiteUnitType->TileHeight - 1) / 2);
-			if (!UnitTypeCanBeAt(*SettlementSiteUnitType, settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset + Vec2i(SettlementSiteUnitType->TileWidth - 1, SettlementSiteUnitType->TileHeight - 1), z)) {
+			Vec2i unit_offset((SettlementSiteUnitType->TileSize - 1) / 2);
+			if (!UnitTypeCanBeAt(*SettlementSiteUnitType, settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset + SettlementSiteUnitType->TileSize - 1, z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", settlement_iterator->second->Ident.c_str(), settlement_raw_pos.x, settlement_raw_pos.y);
 			}
 			CUnit *unit = CreateUnit(settlement_pos - unit_offset, *SettlementSiteUnitType, &Players[PlayerNumNeutral], z);
@@ -705,7 +704,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					fprintf(stderr, "Error in CMap::ApplySettlements (settlement ident \"%s\"): historical resource type is NULL.\n", settlement_iterator->second->Ident.c_str());
 					continue;
 				}
-				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
+				Vec2i unit_offset((type->TileSize - 1) / 2);
 				CUnit *unit = CreateResourceUnit(settlement_pos - unit_offset, *type, z, false); // don't generate unique resources when setting special properties, since for map templates unique resources are supposed to be explicitly indicated
 				if (std::get<3>(settlement_iterator->second->HistoricalResources[j])) {
 					unit->SetUnique(std::get<3>(settlement_iterator->second->HistoricalResources[j]));
@@ -795,9 +794,9 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					fprintf(stderr, "Error in CMap::ApplySettlements (settlement ident \"%s\"): settlement has a town hall, but isn't set as a major one.\n", settlement_iterator->second->Ident.c_str());
 					continue;
 				}
-				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
+				Vec2i unit_offset((type->TileSize - 1) / 2);
 				if (first_building) {
-					if (!OnTopDetails(*type, NULL) && !UnitTypeCanBeAt(*type, settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset + Vec2i(type->TileWidth - 1, type->TileHeight - 1), z)) {
+					if (!OnTopDetails(*type, NULL) && !UnitTypeCanBeAt(*type, settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset + type->TileSize - 1, z)) {
 						fprintf(stderr, "The \"%s\" representing the minor settlement of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", type->Ident.c_str(), settlement_iterator->second->Ident.c_str(), settlement_raw_pos.x, settlement_raw_pos.y);
 					}
 				}
@@ -832,8 +831,8 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					unit->UpdateBuildingSettlementAssignment();
 				}
 				if (pathway_type) {
-					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileWidth + 1; ++x) {
-						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->TileHeight + 1; ++y) {
+					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileSize.x + 1; ++x) {
+						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->TileSize.y + 1; ++y) {
 							if (!Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
 								continue;
 							}
@@ -864,7 +863,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 				}
 				CFaction *hero_owner = std::get<3>(settlement_iterator->second->HistoricalHeroes[j]);
 				const CUnitType *type = hero->Type;
-				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
+				Vec2i unit_offset((type->TileSize - 1) / 2);
 				CUnit *unit = NULL;
 				if (hero_owner) {
 					CPlayer *hero_player = GetOrAddFactionPlayer(hero_owner);
@@ -918,7 +917,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 						} else {
 							unit_player = player;
 						}
-						Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
+						Vec2i unit_offset((type->TileSize - 1) / 2);
 						
 						for (int j = 0; j < unit_quantity; ++j) {
 							CUnit *unit = CreateUnit(settlement_pos - unit_offset, *type, unit_player, z);
@@ -938,7 +937,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 
 void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random)
 {
-	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+	Vec2i map_end(std::min<int>(Map.Info.LayersSizes[z].x, map_start_pos.x + this->Size.x), std::min<int>(Map.Info.LayersSizes[z].y, map_start_pos.y + this->Size.y));
 
 	for (size_t i = 0; i < this->PlaneConnectors.size(); ++i) {
 		Vec2i unit_raw_pos(std::get<0>(this->PlaneConnectors[i]));
@@ -952,7 +951,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
-		Vec2i unit_offset((std::get<1>(this->PlaneConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->PlaneConnectors[i])->TileHeight - 1) / 2);
+		Vec2i unit_offset((std::get<1>(this->PlaneConnectors[i])->TileSize - 1) / 2);
 		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->PlaneConnectors[i]), &Players[PlayerNumNeutral], z);
 		if (std::get<3>(this->PlaneConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->PlaneConnectors[i]));
@@ -988,7 +987,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
-		Vec2i unit_offset((std::get<1>(this->WorldConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->WorldConnectors[i])->TileHeight - 1) / 2);
+		Vec2i unit_offset((std::get<1>(this->WorldConnectors[i])->TileSize - 1) / 2);
 		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->WorldConnectors[i]), &Players[PlayerNumNeutral], z);
 		if (std::get<3>(this->WorldConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->WorldConnectors[i]));
@@ -1024,7 +1023,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
-		Vec2i unit_offset((std::get<1>(this->LayerConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->LayerConnectors[i])->TileHeight - 1) / 2);
+		Vec2i unit_offset((std::get<1>(this->LayerConnectors[i])->TileSize - 1) / 2);
 		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->LayerConnectors[i]), &Players[PlayerNumNeutral], z);
 		if (std::get<3>(this->LayerConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->LayerConnectors[i]));
@@ -1051,7 +1050,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 
 void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random)
 {
-	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+	Vec2i map_end(std::min<int>(Map.Info.LayersSizes[z].x, map_start_pos.x + this->Size.x), std::min<int>(Map.Info.LayersSizes[z].y, map_start_pos.y + this->Size.y));
 
 	for (size_t i = 0; i < this->Units.size(); ++i) {
 		Vec2i unit_raw_pos(std::get<0>(this->Units[i]));
@@ -1094,7 +1093,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			} else {
 				player = &Players[PlayerNumNeutral];
 			}
-			Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
+			Vec2i unit_offset((type->TileSize - 1) / 2);
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z);
 			if (!type->BoolFlag[BUILDING_INDEX].value) { // make non-building units not have an active AI
 				unit->Active = 0;
@@ -1137,7 +1136,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			} else {
 				player = &Players[PlayerNumNeutral];
 			}
-			Vec2i unit_offset((hero->Type->TileWidth - 1) / 2, (hero->Type->TileHeight - 1) / 2);
+			Vec2i unit_offset((hero->Type->TileSize - 1) / 2);
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->Type, player, z);
 			unit->SetCharacter(hero->Ident);
 			unit->Active = 0;
@@ -1198,12 +1197,9 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 #ifdef MINIMAP_UPDATE
 	//rb - GRRRRRRRRRRRR
 	//Wyrmgus start
-//	const unsigned int index = &mf - Map.Fields;
-//	const int y = index / Info.MapWidth;
-//	const int x = index - (y * Info.MapWidth);
 	const unsigned int index = &mf - Map.Fields[z];
-	const int y = index / Info.MapWidths[z];
-	const int x = index - (y * Info.MapWidths[z]);
+	const int y = index / Info.LayersSizes[z].x;
+	const int x = index - (y * Info.LayersSizes[z].x);
 	//Wyrmgus end
 	const Vec2i pos = {x, y}
 #endif
@@ -1266,23 +1262,8 @@ void CMap::Reveal(bool only_person_players)
 {
 	//  Mark every explored tile as visible. 1 turns into 2.
 	//Wyrmgus start
-	/*
-	for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
-		CMapField &mf = *this->Field(i);
-		CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
-		for (int p = 0; p < PlayerMax; ++p) {
-			//Wyrmgus start
-//			playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
-			if (Players[p].Type == PlayerPerson || !only_person_players) {
-				playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
-			}
-			//Wyrmgus end
-		}
-		MarkSeenTile(mf);
-	}
-	*/
 	for (size_t z = 0; z < this->Fields.size(); ++z) {
-		for (int i = 0; i != this->Info.MapWidths[z] * this->Info.MapHeights[z]; ++i) {
+		for (int i = 0; i != this->Info.LayersSizes[z].x * this->Info.LayersSizes[z].y; ++i) {
 			CMapField &mf = *this->Field(i, z);
 			CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
 			for (int p = 0; p < PlayerMax; ++p) {
@@ -1418,8 +1399,9 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 	int while_count = 0;
 	
 	while (while_count < 100) {
-		random_pos.x = SyncRand(max_pos.x - (unit_type->TileWidth - 1) - min_pos.x + 1) + min_pos.x;
-		random_pos.y = SyncRand(max_pos.y - (unit_type->TileHeight - 1) - min_pos.y + 1) + min_pos.y;
+		const Vec2i rnd = max_pos - (unit_type->TileSize - 1) - min_pos + 1;
+		random_pos.x = SyncRand(rnd.x) + min_pos.x;
+		random_pos.y = SyncRand(rnd.y) + min_pos.y;
 		
 		if (!this->Info.IsPointOnMap(random_pos, z) || (this->IsPointInASubtemplateArea(random_pos, z) && GameCycle == 0)) {
 			continue;
@@ -1432,21 +1414,21 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 		
 		std::vector<CUnit *> table;
 		if (player != NULL) {
-			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
+			Select(random_pos - 32, random_pos + unit_type->TileSize - 1 + 32, table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
 			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeFly)) {
-				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(16, 16), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+				Select(random_pos - 16, random_pos + unit_type->TileSize - 1 + 16, table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 			} else {
-				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+				Select(random_pos - 8, random_pos + unit_type->TileSize - 1 + 8, table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 			}
 		} else if (unit_type->GivesResource && !unit_type->BoolFlag[BUILDING_INDEX].value) { //for non-building resources (i.e. wood piles), place them within a certain distance of player units, to prevent them from blocking the way
-			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+			Select(random_pos - 4, random_pos + unit_type->TileSize - 1 + 4, table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 		}
 		
 		if (table.size() == 0) {
 			bool passable_surroundings = true; //check if the unit won't be placed next to unpassable terrain
-			for (int x = random_pos.x - 1; x < random_pos.x + unit_type->TileWidth + 1; ++x) {
-				for (int y = random_pos.y - 1; y < random_pos.y + unit_type->TileHeight + 1; ++y) {
+			for (int x = random_pos.x - 1; x < random_pos.x + unit_type->TileSize.x + 1; ++x) {
+				for (int y = random_pos.y - 1; y < random_pos.y + unit_type->TileSize.y + 1; ++y) {
 					if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->CheckMask(MapFieldUnpassable)) {
 						passable_surroundings = false;
 					}
@@ -1769,12 +1751,11 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
 {
 	const int mask = type.MovementMask;
 	//Wyrmgus start
-//	unsigned int index = pos.y * Map.Info.MapWidth;
-	unsigned int index = pos.y * Map.Info.MapWidths[z];
+	unsigned int index = pos.y * Map.Info.LayersSizes[z].x;
 	//Wyrmgus end
 
-	for (int addy = 0; addy < type.TileHeight; ++addy) {
-		for (int addx = 0; addx < type.TileWidth; ++addx) {
+	for (int addy = 0; addy < type.TileSize.y; ++addy) {
+		for (int addx = 0; addx < type.TileSize.x; ++addx) {
 			//Wyrmgus start
 			/*
 			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy) == false
@@ -1787,8 +1768,7 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
 			}
 		}
 		//Wyrmgus start
-//		index += Map.Info.MapWidth;
-		index += Map.Info.MapWidths[z];
+		index += Map.Info.LayersSizes[z].x;
 		//Wyrmgus end
 	}
 	return true;
@@ -1823,17 +1803,9 @@ bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z)
 void PreprocessMap()
 {
 	//Wyrmgus start
-	/*
-	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
-		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
-			CMapField &mf = *Map.Field(ix, iy);
-			mf.playerInfo.SeenTile = mf.getGraphicTile();
-		}
-	}
-	*/
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		for (int ix = 0; ix < Map.Info.MapWidths[z]; ++ix) {
-			for (int iy = 0; iy < Map.Info.MapHeights[z]; ++iy) {
+		for (int ix = 0; ix < Map.Info.LayersSizes[z].x; ++ix) {
+			for (int iy = 0; iy < Map.Info.LayersSizes[z].y; ++iy) {
 				CMapField &mf = *Map.Field(ix, iy, z);
 				Map.CalculateTileTransitions(Vec2i(ix, iy), false, z);
 				Map.CalculateTileTransitions(Vec2i(ix, iy), true, z);
@@ -1848,20 +1820,6 @@ void PreprocessMap()
 			}
 		}
 	}
-	//Wyrmgus end
-	//Wyrmgus start
-	/*
-	// it is required for fixing the wood that all tiles are marked as seen!
-	if (Map.Tileset->TileTypeTable.empty() == false) {
-		Vec2i pos;
-		for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
-			for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {
-				MapFixWallTile(pos);
-				MapFixSeenWallTile(pos);
-			}
-		}
-	}
-	*/
 	//Wyrmgus end
 }
 
@@ -1932,7 +1890,7 @@ void ChangeCurrentMapLayer(int z)
 		return;
 	}
 	
-	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / Map.Info.MapWidths[CurrentMapLayer], UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / Map.Info.MapHeights[CurrentMapLayer]);
+	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos * Map.Info.LayersSizes[z] / Map.Info.LayersSizes[CurrentMapLayer]);
 	
 	CurrentMapLayer = z;
 	UI.Minimap.UpdateCache = true;
@@ -1952,10 +1910,9 @@ void CMapInfo::Clear()
 {
 	this->Description.clear();
 	this->Filename.clear();
-	this->MapWidth = this->MapHeight = 0;
 	//Wyrmgus start
-	this->MapWidths.clear();
-	this->MapHeights.clear();
+	Size = {0, 0};
+	LayersSizes.clear();
 	//Wyrmgus end
 	memset(this->PlayerSide, 0, sizeof(this->PlayerSide));
 	memset(this->PlayerType, 0, sizeof(this->PlayerType));
@@ -1986,10 +1943,8 @@ void CMap::Create()
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
-	this->Fields.push_back(new CMapField[this->Info.MapWidth * this->Info.MapHeight]);
-	this->Info.MapWidths.push_back(this->Info.MapWidth);
-	this->Info.MapHeights.push_back(this->Info.MapHeight);
+	this->Fields.push_back(new CMapField[this->Info.Size.x * this->Info.Size.y]);
+	this->Info.LayersSizes.push_back(Info.Size);
 	this->TimeOfDaySeconds.push_back(DefaultTimeOfDaySeconds);
 	if (!GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning) {
 		this->TimeOfDay.push_back(SyncRand(MaxTimesOfDay - 1) + 1); // begin at a random time of day
@@ -2074,13 +2029,13 @@ void CMap::Save(CFile &file) const
 	file.printf("  \"version\", \"%s\",\n", VERSION);
 	file.printf("  \"description\", \"%s\",\n", this->Info.Description.c_str());
 	file.printf("  \"the-map\", {\n");
-	file.printf("  \"size\", {%d, %d},\n", this->Info.MapWidth, this->Info.MapHeight);
+	file.printf("  \"size\", {%d, %d},\n", this->Info.Size.x, this->Info.Size.y);
 	file.printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
 	file.printf("  \"filename\", \"%s\",\n", this->Info.Filename.c_str());
 	//Wyrmgus start
 	file.printf("  \"extra-map-layers\", {\n");
 	for (size_t z = 1; z < this->Fields.size(); ++z) {
-		file.printf("  {%d, %d},\n", this->Info.MapWidths[z], this->Info.MapHeights[z]);
+		file.printf("  {%d, %d},\n", this->Info.LayersSizes[z].x, this->Info.LayersSizes[z].y);
 	}
 	file.printf("  },\n");
 	file.printf("  \"time-of-day\", {\n");
@@ -2097,26 +2052,11 @@ void CMap::Save(CFile &file) const
 
 	file.printf("  \"map-fields\", {\n");
 	//Wyrmgus start
-	/*
-	for (int h = 0; h < this->Info.MapHeight; ++h) {
-		file.printf("  -- %d\n", h);
-		for (int w = 0; w < this->Info.MapWidth; ++w) {
-			const CMapField &mf = *this->Field(w, h);
-
-			mf.Save(file);
-			if (w & 1) {
-				file.printf(",\n");
-			} else {
-				file.printf(", ");
-			}
-		}
-	}
-	*/
 	for (size_t z = 0; z < this->Fields.size(); ++z) {
 		file.printf("  {\n");
-		for (int h = 0; h < this->Info.MapHeights[z]; ++h) {
+		for (int h = 0; h < this->Info.LayersSizes[z].y; ++h) {
 			file.printf("  -- %d\n", h);
-			for (int w = 0; w < this->Info.MapWidths[z]; ++w) {
+			for (int w = 0; w < this->Info.LayersSizes[z].x; ++w) {
 				const CMapField &mf = *this->Field(w, h, z);
 
 				mf.Save(file);
@@ -2870,8 +2810,8 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 				bool obstacle_check = true;
 				for (size_t j = 0; j < obstacle_flags.size(); ++j) {
 					bool obstacle_subcheck = false;
-					for (int x = 0; x < unit->Type->TileWidth; ++x) {
-						for (int y = 0; y < unit->Type->TileHeight; ++y) {
+					for (int x = 0; x < unit->Type->TileSize.x; ++x) {
+						for (int y = 0; y < unit->Type->TileSize.y; ++y) {
 							if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, NULL, unit->Player->Index)) { //the obstacle must be avoidable from at least one of the unit's tiles
 								obstacle_subcheck = true;
 								break;
@@ -2962,7 +2902,7 @@ void CMap::AdjustMap()
 {
 	for (size_t z = 0; z < this->Fields.size(); ++z) {
 		Vec2i map_start_pos(0, 0);
-		Vec2i map_end(this->Info.MapWidths[z], this->Info.MapHeights[z]);
+		Vec2i map_end(Info.LayersSizes[z]);
 		
 		this->AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		this->AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
@@ -3002,7 +2942,7 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 					nw_quadrant_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidths[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x + 1, y), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.LayersSizes[z].x && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x + 1, y), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					horizontal_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
@@ -3013,7 +2953,7 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 					nw_quadrant_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 				}
-				if ((y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((y + 1) < this->Info.LayersSizes[z].y && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					vertical_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
@@ -3023,15 +2963,15 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 					nw_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
 				}
-				if ((x - 1) >= 0 && (y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x - 1, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x - 1) >= 0 && (y + 1) < this->Info.LayersSizes[z].y && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x - 1, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					sw_quadrant_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidths[z] && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.LayersSizes[z].x && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y - 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					ne_quadrant_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidths[z] && (y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.LayersSizes[z].x && (y + 1) < this->Info.LayersSizes[z].y && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y + 1), overlay, z)) == acceptable_adjacent_tile_types.end()) {
 					se_quadrant_adjacent_tiles += 1;
 					nw_quadrant_adjacent_tiles += 1;
 				}
@@ -3518,16 +3458,9 @@ void CMap::RegenerateForest()
 	}
 	Vec2i pos;
 	//Wyrmgus start
-	/*
-	for (pos.y = 0; pos.y < Info.MapHeight; ++pos.y) {
-		for (pos.x = 0; pos.x < Info.MapWidth; ++pos.x) {
-			RegenerateForestTile(pos);
-		}
-	}
-	*/
 	for (size_t z = 0; z < this->Fields.size(); ++z) {
-		for (pos.y = 0; pos.y < Info.MapHeights[z]; ++pos.y) {
-			for (pos.x = 0; pos.x < Info.MapWidths[z]; ++pos.x) {
+		for (pos.y = 0; pos.y < Info.LayersSizes[z].y; ++pos.y) {
+			for (pos.x = 0; pos.x < Info.LayersSizes[z].x; ++pos.x) {
 				RegenerateForestTile(pos, z);
 			}
 		}

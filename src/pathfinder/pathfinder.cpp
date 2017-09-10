@@ -128,7 +128,7 @@ void TerrainTraversal::PushUnitPosAndNeighboor(const CUnit &unit)
 	}
 	//Wyrmgus end
 	const Vec2i offset(1, 1);
-	const Vec2i extraTileSize(startUnit->Type->TileWidth - 1, startUnit->Type->TileHeight - 1);
+	const Vec2i extraTileSize(startUnit->Type->TileSize - 1);
 	const Vec2i start = startUnit->tilePos - offset;
 	const Vec2i end = startUnit->tilePos + extraTileSize + offset;
 
@@ -215,7 +215,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 	//Wyrmgus end
 	
 	int i = AStarFindPath(src.tilePos, goalPos, w, h,
-						  src.Type->TileWidth, src.Type->TileHeight,
+						  src.Type->TileSize.x, src.Type->TileSize.y,
 						  //Wyrmgus start
 //						  minrange, range, NULL, 0, src);
 						  minrange, range, NULL, 0, src, max_length, z);
@@ -263,8 +263,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length)
 	}
 	const int depth = PlaceReachable(src, dst.tilePos,
 									 //Wyrmgus start
-//									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range);
-									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range, max_length, dst.MapLayer);
+									 dst.Type->TileSize.x, dst.Type->TileSize.y, 0, range, max_length, dst.MapLayer);
 									 //Wyrmgus end
 	if (depth <= 0) {
 		return 0;
@@ -296,7 +295,7 @@ const int PathFinderInput::GetUnitMapLayer() const { return unit->MapLayer; }
 //Wyrmgus end
 Vec2i PathFinderInput::GetUnitSize() const
 {
-	const Vec2i tileSize(unit->Type->TileWidth, unit->Type->TileHeight);
+	const Vec2i tileSize(unit->Type->TileSize);
 	return tileSize;
 }
 
@@ -321,19 +320,11 @@ void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size, int z)
 	Vec2i newPos = pos;
 	// Large units may have a goal that goes outside the map, fix it here
 	//Wyrmgus start
-	/*
-	if (newPos.x + unit->Type->TileWidth - 1 >= Map.Info.MapWidth) {
-		newPos.x = Map.Info.MapWidth - unit->Type->TileWidth;
+	if (newPos.x + unit->Type->TileSize.x - 1 >= Map.Info.LayersSizes[z].x) {
+		newPos.x = Map.Info.LayersSizes[z].x - unit->Type->TileSize.x;
 	}
-	if (newPos.y + unit->Type->TileHeight - 1 >= Map.Info.MapHeight) {
-		newPos.y = Map.Info.MapHeight - unit->Type->TileHeight;
-	}
-	*/
-	if (newPos.x + unit->Type->TileWidth - 1 >= Map.Info.MapWidths[z]) {
-		newPos.x = Map.Info.MapWidths[z] - unit->Type->TileWidth;
-	}
-	if (newPos.y + unit->Type->TileHeight - 1 >= Map.Info.MapHeights[z]) {
-		newPos.y = Map.Info.MapHeights[z] - unit->Type->TileHeight;
+	if (newPos.y + unit->Type->TileSize.y - 1 >= Map.Info.LayersSizes[z].y) {
+		newPos.y = Map.Info.LayersSizes[z].y - unit->Type->TileSize.y;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
@@ -367,8 +358,7 @@ void PathFinderInput::SetMaxRange(int range)
 
 void PathFinderInput::PathRacalculated()
 {
-	unitSize.x = unit->Type->TileWidth;
-	unitSize.y = unit->Type->TileHeight;
+	unitSize = unit->Type->TileSize;
 
 	isRecalculatePathNeeded = false;
 }

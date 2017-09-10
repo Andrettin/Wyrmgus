@@ -75,7 +75,7 @@
 //Wyrmgus end
 {
 	const Vec2i range(this->Range, this->Range);
-	const Vec2i typeSize(caster.Type->TileWidth, caster.Type->TileHeight);
+	const Vec2i typeSize(caster.Type->TileSize);
 	std::vector<CUnit *> units;
 
 	// Get all the units around the unit

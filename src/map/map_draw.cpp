@@ -68,10 +68,10 @@ bool CViewport::Contains(const PixelPos &screenPos) const
 }
 
 
-void CViewport::Restrict(int &screenPosX, int &screenPosY) const
+void CViewport::Restrict(short &screenPosX, short &screenPosY) const
 {
-	clamp(&screenPosX, this->GetTopLeftPos().x, this->GetBottomRightPos().x - 1);
-	clamp(&screenPosY, this->GetTopLeftPos().y, this->GetBottomRightPos().y - 1);
+	clamp<short,int>(&screenPosX, this->GetTopLeftPos().x, this->GetBottomRightPos().x - 1);
+	clamp<short,int>(&screenPosY, this->GetTopLeftPos().y, this->GetBottomRightPos().y - 1);
 }
 
 PixelSize CViewport::GetPixelSize() const
@@ -173,10 +173,8 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const PixelSize pixelSize = this->GetPixelSize();
 	//Wyrmgus start
-//	x = std::min(x, Map.Info.MapWidth * PixelTileSize.x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-//	y = std::min(y, Map.Info.MapHeight * PixelTileSize.y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
-	x = std::min(x, (Map.Info.MapWidths.size() ? Map.Info.MapWidths[CurrentMapLayer] : Map.Info.MapWidth) * PixelTileSize.x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (Map.Info.MapHeights.size() ? Map.Info.MapHeights[CurrentMapLayer] : Map.Info.MapHeight) * PixelTileSize.y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (Map.Info.LayersSizes.size() ? Map.Info.LayersSizes[CurrentMapLayer].x : Map.Info.Size.x) * PixelTileSize.x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (Map.Info.LayersSizes.size() ? Map.Info.LayersSizes[CurrentMapLayer].y : Map.Info.Size.y) * PixelTileSize.y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 	//Wyrmgus end
 
 	this->MapPos.x = x / PixelTileSize.x;
@@ -195,8 +193,9 @@ void CViewport::Set(const PixelPos &mapPos)
 	if (this->Offset.y < 0) {
 		this->Offset.y += PixelTileSize.y;
 	}
-	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / PixelTileSize.x + 1;
-	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / PixelTileSize.y + 1;
+	Vec2i size = (pixelSize + Offset - 1) / PixelTileSize + 1;
+	MapWidth = size.x;
+	MapHeight = size.y;
 }
 
 /**
@@ -254,8 +253,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
 	//Wyrmgus start
-//	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
-	const int map_max = Map.Info.MapWidths[CurrentMapLayer] * Map.Info.MapHeights[CurrentMapLayer];
+	const int map_max = Map.Info.LayersSizes[CurrentMapLayer].x * Map.Info.LayersSizes[CurrentMapLayer].y;
 	//Wyrmgus end
 
 	while (sy  < 0) {
@@ -263,16 +261,14 @@ void CViewport::DrawMapBackgroundInViewport() const
 		dy += PixelTileSize.y;
 	}
 	//Wyrmgus start
-//	sy *=  Map.Info.MapWidth;
-	sy *=  Map.Info.MapWidths[CurrentMapLayer];
+	sy *=  Map.Info.LayersSizes[CurrentMapLayer].x;
 	//Wyrmgus end
 
 	while (dy <= ey && sy  < map_max) {
 		int sx = this->MapPos.x + sy;
 		int dx = this->TopLeftPos.x - this->Offset.x;
 		//Wyrmgus start
-//		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
-		while (dx <= ex && (sx - sy < Map.Info.MapWidths[CurrentMapLayer])) {
+		while (dx <= ex && (sx - sy < Map.Info.LayersSizes[CurrentMapLayer].x)) {
 		//Wyrmgus end
 			if (sx - sy < 0) {
 				++sx;
@@ -393,8 +389,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			dx += PixelTileSize.x;
 		}
 		//Wyrmgus start
-//		sy += Map.Info.MapWidth;
-		sy += Map.Info.MapWidths[CurrentMapLayer];
+		sy += Map.Info.LayersSizes[CurrentMapLayer].x;
 		//Wyrmgus end
 		dy += PixelTileSize.y;
 	}

@@ -639,8 +639,8 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end
 			var.Draw(
-				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileWidth * PixelTileSize.x / 100,
-				y + var.OffsetY + var.OffsetYPercent * unit.Type->TileHeight * PixelTileSize.y / 100,
+				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileSize.x * PixelTileSize.x / 100,
+				y + var.OffsetY + var.OffsetYPercent * unit.Type->TileSize.y * PixelTileSize.y / 100,
 				type, unit.Variable[var.Index]);
 		}
 	}
@@ -660,9 +660,9 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			}
 		}
 		const int width = GetGameFont().Width(groupId);
-		x += (unit.Type->TileWidth * PixelTileSize.x + unit.Type->BoxWidth) / 2 - width;
+		x += (unit.Type->TileSize.x * PixelTileSize.x + unit.Type->BoxWidth) / 2 - width;
 		const int height = GetGameFont().Height();
-		y += (unit.Type->TileHeight * PixelTileSize.y + unit.Type->BoxHeight) / 2 - height;
+		y += (unit.Type->TileSize.y * PixelTileSize.y + unit.Type->BoxHeight) / 2 - height;
 		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}
 }
@@ -689,10 +689,8 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 		return;
 	}
 	PixelPos pos = screenPos;
-	pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
-	pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
-	pos.x += type.OffsetX + type.ShadowOffsetX;
-	pos.y += type.OffsetY + type.ShadowOffsetY;
+	pos -= (Vec2i(type.ShadowWidth, type.ShadowHeight) - type.TileSize * PixelTileSize) /2;
+	pos += Vec2i(type.OffsetX, type.OffsetY) + Vec2i(type.ShadowOffsetX, type.ShadowOffsetY);
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -728,10 +726,7 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 	}
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos.x -= (sprite->Width - type.TileWidth * PixelTileSize.x) / 2;
-	pos.y -= (sprite->Height - type.TileHeight * PixelTileSize.y) / 2;
-	pos.x += type.OffsetX;
-	pos.y += type.OffsetY;
+	pos -= (Vec2i(sprite->Width, sprite->Height) - type.TileSize * PixelTileSize) / 2 + Vec2i(type.OffsetX, type.OffsetY);
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -770,10 +765,7 @@ void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame,
 	}
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos.x -= (sprite->Width - type.TileWidth * PixelTileSize.x) / 2;
-	pos.y -= (sprite->Height - type.TileHeight * PixelTileSize.y) / 2;
-	pos.x += type.OffsetX;
-	pos.y += type.OffsetY;
+	pos -= (Vec2i(sprite->Width, sprite->Height) - type.TileSize * PixelTileSize) / 2 + Vec2i(type.OffsetX, type.OffsetY);
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -883,7 +875,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 //			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
 			const int value = unit.CurrentSightRange;
 			//Wyrmgus end
-			const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
+			const int radius = value * PixelTileSize.x + (type.TileSize.x - 1) * PixelTileSize.x / 2;
 
 			if (value) {
 				// Radius -1 so you can see all ranges
@@ -899,7 +891,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 //				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 				const int value = unit.GetReactionRange();
 				//Wyrmgus end
-				const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
+				const int radius = value * PixelTileSize.x + (type.TileSize.x - 1) * PixelTileSize.x / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -911,7 +903,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 				const int value = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 				
 				//Wyrmgus end
-				const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
+				const int radius = value * PixelTileSize.x + (type.TileSize.x - 1) * PixelTileSize.x / 2;
 
 				if (value) {
 					// Radius +1 so you can see all ranges
@@ -924,8 +916,8 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
 			//show aura range if the unit has an aura
 			if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0 || unit.Variable[REGENERATIONAURA_INDEX].Value > 0 || unit.Variable[HYDRATINGAURA_INDEX].Value > 0) {
-				const int value = AuraRange - (unit.Type->TileWidth - 1);
-				const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
+				const int value = AuraRange - (unit.Type->TileSize.x - 1);
+				const int radius = value * PixelTileSize.x + (type.TileSize.x - 1) * PixelTileSize.x / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -959,27 +951,12 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 	//Wyrmgus start
 	VariationInfo *varinfo = type.VarInfo[unit.Variation];
 	//Wyrmgus end
+	//TODO there is a very huge probability that this function's size can be divided by at least 2.
 	if (cframe->File == ConstructionFileConstruction) {
 		//Wyrmgus start
-		/*
-		if (type.Construction->ShadowSprite) {
-			pos.x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
-			pos.x += type.OffsetX;
-			pos.y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
-			pos.y += type.OffsetY;
-			if (frame < 0) {
-				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-			} else {
-				type.Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
-			}
-		}
-		*/
 		if (varinfo && varinfo->Construction) {
 			if (varinfo->Construction->ShadowSprite) {
-				pos.x -= (varinfo->Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
-				pos.x += type.OffsetX;
-				pos.y -= (varinfo->Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
-				pos.y += type.OffsetY;
+				pos -= (Vec2i(varinfo->Construction->Width, varinfo->Construction->Height) - type.TileSize * PixelTileSize) / 2 + Vec2i(type.OffsetX, type.OffsetY);
 				if (frame < 0) {
 					varinfo->Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 				} else {
@@ -988,10 +965,7 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 			}
 		} else {
 			if (type.Construction->ShadowSprite) {
-				pos.x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
-				pos.x += type.OffsetX;
-				pos.y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
-				pos.y += type.OffsetY;
+				pos -= (Vec2i(type.Construction->Width, type.Construction->Height) - type.TileSize * PixelTileSize) / 2 + Vec2i(type.OffsetX, type.OffsetY);
 				if (frame < 0) {
 					type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 				} else {
@@ -1003,22 +977,16 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 	} else {
 		//Wyrmgus start
 		if (varinfo && varinfo->ShadowSprite) {
-			pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
-			pos.x += type.ShadowOffsetX + type.OffsetX;
-			pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
-			pos.y += type.ShadowOffsetY + type.OffsetY;
+			//TODO I am almost sure there is a bug here.
+			pos -= (Vec2i(type.ShadowWidth, type.ShadowHeight) - type.TileSize * PixelTileSize) / 2 + Vec2i(type.ShadowOffsetX, type.ShadowOffsetY) + Vec2i(type.OffsetX, type.OffsetY);
 			if (frame < 0) {
 				varinfo->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
 				varinfo->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 			}
-//		if (type.ShadowSprite) {
 		} else if (type.ShadowSprite) {
 		//Wyrmgus end
-			pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
-			pos.x += type.ShadowOffsetX + type.OffsetX;
-			pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
-			pos.y += type.ShadowOffsetY + type.OffsetY;
+			pos -= (Vec2i(type.ShadowWidth, type.ShadowHeight) - type.TileSize * PixelTileSize) / 2 + Vec2i(type.ShadowOffsetX, type.ShadowOffsetY) + Vec2i(type.OffsetX, type.OffsetY);
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
@@ -1444,8 +1412,8 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
-		const int pos1 = (c1->tilePos.y + c1->Type->TileHeight - 1) * PixelTileSize.y + c1->IY;
-		const int pos2 = (c2->tilePos.y + c2->Type->TileHeight - 1) * PixelTileSize.y + c2->IY;
+		const int pos1 = (c1->tilePos.y + c1->Type->TileSize.y - 1) * PixelTileSize.y + c1->IY;
+		const int pos2 = (c2->tilePos.y + c2->Type->TileSize.y - 1) * PixelTileSize.y + c2->IY;
 		return pos1 == pos2 ?
 			   (c1->tilePos.x != c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
 	} else {

@@ -208,9 +208,9 @@ void InitUserInterface()
 	//
 	// Calculations
 	//
-	if (Map.Info.MapWidth) {
-		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + Map.Info.MapWidth * PixelTileSize.x - 1);
-		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + Map.Info.MapHeight * PixelTileSize.y - 1);
+	if (Map.Info.Size.x) {
+		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + Map.Info.Size.x * PixelTileSize.x - 1);
+		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + Map.Info.Size.y * PixelTileSize.y - 1);
 	}
 
 	UI.SelectedViewport = UI.Viewports;
@@ -559,10 +559,7 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
 	//Wyrmgus start
-//	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * PixelTileSize.x - 1;
-//	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * PixelTileSize.y - 1;
-	vp.BottomRightPos.x = vp.TopLeftPos.x + (Map.Info.MapWidths.size() ? Map.Info.MapWidths[CurrentMapLayer] : Map.Info.MapWidth) * PixelTileSize.x - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + (Map.Info.MapHeights.size() ? Map.Info.MapHeights[CurrentMapLayer] : Map.Info.MapHeight) * PixelTileSize.y - 1;
+	vp.BottomRightPos = vp.TopLeftPos + (Map.Info.LayersSizes.size() ? Map.Info.LayersSizes[CurrentMapLayer] : Map.Info.Size) * PixelTileSize - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary

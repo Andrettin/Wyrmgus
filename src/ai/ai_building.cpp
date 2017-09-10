@@ -101,8 +101,7 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 {
 	const int surroundRange = type.AiAdjacentRange != -1 ? type.AiAdjacentRange : 1;
 	const Vec2i pos_topLeft(pos.x - surroundRange, pos.y - surroundRange);
-	const Vec2i pos_bottomRight(pos.x + type.TileWidth + surroundRange - 1,
-								pos.y + type.TileHeight + surroundRange - 1);
+	const Vec2i pos_bottomRight(pos + type.TileSize + surroundRange - 1);
 	Vec2i it = pos_topLeft;
 	//Wyrmgus start
 //	const bool firstVal = IsPosFree(it, worker);
@@ -272,8 +271,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, con
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(Map.Info.LayersSizes[z].x, Map.Info.LayersSizes[z].y);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -344,7 +342,7 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 	// Check units around mine
 	const Vec2i offset(5, 5);
 	const Vec2i minpos = mine.tilePos - offset;
-	const Vec2i typeSize(mine.Type->TileWidth - 1, mine.Type->TileHeight - 1);
+	const Vec2i typeSize(mine.Type->TileSize - 1);
 	const Vec2i maxpos = mine.tilePos + typeSize + offset;
 	std::vector<CUnit *> units;
 
@@ -476,8 +474,7 @@ static bool AiFindHallPlace(const CUnit &worker,
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(Map.Info.LayersSizes[z].x, Map.Info.LayersSizes[z].y);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -592,8 +589,7 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, co
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(Map.Info.LayersSizes[z].x, Map.Info.LayersSizes[z].y);
 	//Wyrmgus end
 	terrainTraversal.Init();
 

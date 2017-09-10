@@ -242,74 +242,6 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 		
 	}
 	//Wyrmgus end
-
-	//Wyrmgus start
-	/*
-	if (mf.isAWall()) {
-		Map.SetWall(pos, mf.isHuman());
-		return;
-	}
-	*/
-	//Wyrmgus end
-
-	//Wyrmgus start
-	/*
-	const unsigned int quad = QuadFromTile(pos);
-	const unsigned int TH_QUAD_M = 0xFFFF0000; // Top half quad mask
-	const unsigned int BH_QUAD_M = 0x0000FFFF; // Bottom half quad mask
-	const unsigned int LH_QUAD_M = 0xFF00FF00; // Left half quad mask
-	const unsigned int RH_QUAD_M = 0x00FF00FF; // Right half quad mask
-	const unsigned int DIR_UP =    8; // Go up allowed
-	const unsigned int DIR_DOWN =  4; // Go down allowed
-	const unsigned int DIR_LEFT =  2; // Go left allowed
-	const unsigned int DIR_RIGHT = 1; // Go right allowed
-
-	// How this works:
-	//  first get the quad of the neighbouring tile,
-	//  then check if the margin matches.
-	//  Otherwise, call EditorChangeTile again.
-	if ((d & DIR_UP) && pos.y) {
-		const Vec2i offset(0, -1);
-		// Insert into the bottom the new tile.
-		unsigned q2 = QuadFromTile(pos + offset);
-		unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
-		if (u != q2) {
-			int tile = Map.Tileset->tileFromQuad(u & BH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, d & ~DIR_DOWN);
-		}
-	}
-	if ((d & DIR_DOWN) && pos.y < Map.Info.MapHeight - 1) {
-		const Vec2i offset(0, 1);
-		// Insert into the top the new tile.
-		unsigned q2 = QuadFromTile(pos + offset);
-		unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
-		if (u != q2) {
-			int tile = Map.Tileset->tileFromQuad(u & TH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, d & ~DIR_UP);
-		}
-	}
-	if ((d & DIR_LEFT) && pos.x) {
-		const Vec2i offset(-1, 0);
-		// Insert into the left the new tile.
-		unsigned q2 = QuadFromTile(pos + offset);
-		unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
-		if (u != q2) {
-			int tile = Map.Tileset->tileFromQuad(u & RH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, d & ~DIR_RIGHT);
-		}
-	}
-	if ((d & DIR_RIGHT) && pos.x < Map.Info.MapWidth - 1) {
-		const Vec2i offset(1, 0);
-		// Insert into the right the new tile.
-		unsigned q2 = QuadFromTile(pos + offset);
-		unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
-		if (u != q2) {
-			int tile = Map.Tileset->tileFromQuad(u & LH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, d & ~DIR_LEFT);
-		}
-	}
-	*/
-	//Wyrmgus end
 }
 
 /**
@@ -375,8 +307,7 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 static void EditorRandomizeTile(int tile, int count, int max_size)
 {
 	//Wyrmgus start
-//	const Vec2i mpos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
-	const Vec2i mpos(Map.Info.MapWidths[CurrentMapLayer] - 1, Map.Info.MapHeights[CurrentMapLayer] - 1);
+	const Vec2i mpos(Map.Info.LayersSizes[CurrentMapLayer].x - 1, Map.Info.LayersSizes[CurrentMapLayer].y - 1);
 	//Wyrmgus end
 
 	for (int i = 0; i < count; ++i) {
@@ -409,8 +340,7 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
 	//Wyrmgus start
-//	const Vec2i mpos(Map.Info.MapWidth, Map.Info.MapHeight);
-	const Vec2i mpos(Map.Info.MapWidths[CurrentMapLayer], Map.Info.MapHeights[CurrentMapLayer]);
+	const Vec2i mpos(Map.Info.LayersSizes[CurrentMapLayer].x, Map.Info.LayersSizes[CurrentMapLayer].y);
 	//Wyrmgus end
 	CUnitType *typeptr = UnitTypeByIdent(unit_type);
 
@@ -418,7 +348,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		return;
 	}
 	CUnitType &type = *typeptr;
-	const Vec2i tpos(type.TileWidth, type.TileHeight);
+	const Vec2i tpos(type.TileSize);
 
 	for (int i = 0; i < count; ++i) {
 		const Vec2i rpos(rand() % (mpos.x / 2 - tpos.x + 1), rand() % (mpos.y / 2 - tpos.y + 1));
@@ -429,7 +359,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		const Vec2i tmirrorh(rpos.x, tmirror.y);
 		const Vec2i tmirrorv(tmirror.x, rpos.y);
 		int tile = GRASS_TILE;
-		const int z = type.TileHeight;
+		const int z = type.TileSize.y;
 
 		// FIXME: vladi: the idea is simple: make proper land for unit(s) :)
 		// FIXME: handle units larger than 1 square
@@ -514,8 +444,7 @@ static void EditorDestroyAllUnits()
 void CEditor::CreateRandomMap() const
 {
 	//Wyrmgus start
-//	const int mz = std::max(Map.Info.MapHeight, Map.Info.MapWidth);
-	const int mz = std::max(Map.Info.MapHeights[CurrentMapLayer], Map.Info.MapWidths[CurrentMapLayer]);
+	const int mz = std::max(Map.Info.LayersSizes[CurrentMapLayer].y, Map.Info.LayersSizes[CurrentMapLayer].x);
 	//Wyrmgus end
 
 	// make water-base

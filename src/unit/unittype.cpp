@@ -582,7 +582,7 @@ CUnitType::CUnitType() :
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
 	TeleportCost(0), TeleportEffectIn(NULL), TeleportEffectOut(NULL),
-	CorpseType(NULL), Construction(NULL), RepairHP(0), TileWidth(0), TileHeight(0),
+	CorpseType(NULL), Construction(NULL), RepairHP(0), TileSize(0),
 	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	//Wyrmgus start
 //	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
@@ -713,7 +713,7 @@ CUnitType::~CUnitType()
 
 PixelSize CUnitType::GetPixelSize() const
 {
-	return PixelSize(TileWidth * PixelTileSize.x, TileHeight * PixelTileSize.y);
+	return PixelSize(TileSize * PixelTileSize);
 }
 
 bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
@@ -1533,10 +1533,7 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	//Wyrmgus start
-//	pos.x -= (type.Width - type.TileWidth * PixelTileSize.x) / 2;
-//	pos.y -= (type.Height - type.TileHeight * PixelTileSize.y) / 2;
-	pos.x -= (sprite->Width - type.TileWidth * PixelTileSize.x) / 2;
-	pos.y -= (sprite->Height - type.TileHeight * PixelTileSize.y) / 2;
+	pos -= (Vec2i(sprite->Width, sprite->Height) - type.TileSize * PixelTileSize) / 2;
 	//Wyrmgus end
 	pos.x += type.OffsetX;
 	pos.y += type.OffsetY;

@@ -153,8 +153,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(Map.Info.LayersSizes[z].x, Map.Info.LayersSizes[z].y);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -453,8 +452,7 @@ COrder_Resource::~COrder_Resource()
 	Vec2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
-		tileSize.x = goal->Type->TileWidth;
-		tileSize.y = goal->Type->TileHeight;
+		tileSize = goal->Type->TileSize;
 		//Wyrmgus start
 //		input.SetGoal(goal->tilePos, tileSize);
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);

@@ -1296,7 +1296,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 
 	const CUnitType &unittype = *unit.Type;
 	const Vec2i u0 = unit.tilePos;
-	const Vec2i u1(u0.x + unittype.TileWidth - 1, u0.y + unittype.TileHeight - 1);
+	const Vec2i u1(u0.x + unittype.TileSize - 1);
 
 	movablenb = 0;
 
@@ -1345,13 +1345,13 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		}
 
 		const Vec2i b0 = blocker.tilePos;
-		const Vec2i b1(b0.x + blockertype.TileWidth - 1, b0.y + blockertype.TileHeight - 1);
+		const Vec2i b1(b0.x + blockertype.TileSize - 1);
 
 		if (&unit == &blocker) {
 			continue;
 		}
 		// Check for collision
-		if (unit.MapDistanceTo(blocker) >= unit.Type->TileWidth + 1) {
+		if (unit.MapDistanceTo(blocker) >= unit.Type->TileSize.x + 1) {
 			continue;
 		}
 
@@ -1362,7 +1362,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			r = (r + 1) & 7;
 			--trycount;
 
-			const Vec2i pos = blocker.tilePos + blocker.Type->TileWidth * dirs[r];
+			const Vec2i pos = blocker.tilePos + blocker.Type->TileSize.x * dirs[r];
 
 			// Out of the map => no !
 			//Wyrmgus start

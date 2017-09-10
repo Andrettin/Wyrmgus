@@ -32,12 +32,14 @@
 
 //@{
 
+#include <type_traits>
 template <typename T>
 class Vec2T
 {
 public:
 	Vec2T() : x(0), y(0) {}
 	Vec2T(T x, T y) : x(x), y(y) {}
+	Vec2T(T v) : x(v), y(v) {}
 public:
 	T x;
 	T y;
@@ -57,78 +59,129 @@ inline bool operator != (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
 }
 
 template <typename T>
-inline const Vec2T<T> &operator += (Vec2T<T> &lhs, const Vec2T<T> &rhs)
+inline Vec2T<T> &operator += (Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	lhs.x += rhs.x;
 	lhs.y += rhs.y;
 	return lhs;
 }
 
+template <typename T, typename U, typename = std::enable_if<std::is_integral<U>::value>>
+inline Vec2T<T> &operator += (Vec2T<T> &lhs, U rhs)
+{
+	lhs.x += rhs;
+	lhs.y += rhs;
+	return lhs;
+}
+
+template <typename T, typename U>
+inline Vec2T<T> operator + (const Vec2T<T> &lhs, const U &rhs)
+{
+	Vec2T<T> res(lhs);
+	res += rhs;
+	return res;
+}
+
 template <typename T>
-inline const Vec2T<T> &operator -= (Vec2T<T> &lhs, const Vec2T<T> &rhs)
+inline Vec2T<T> operator + (const T &lhs, const Vec2T<T> &rhs)
+{
+	Vec2T<T> res(lhs);
+	res += rhs;
+	return res;
+}
+
+template <typename T>
+inline Vec2T<T> &operator -= (Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	lhs.x -= rhs.x;
 	lhs.y -= rhs.y;
 	return lhs;
 }
 
+template <typename T, typename U, typename = std::enable_if<std::is_integral<U>::value>>
+inline Vec2T<T> &operator -= (Vec2T<T> &lhs, U rhs)
+{
+	lhs.x -= rhs;
+	lhs.y -= rhs;
+	return lhs;
+}
+
+template <typename T, typename U>
+inline Vec2T<T> operator - (const Vec2T<T> &lhs, const U &rhs)
+{
+	Vec2T<T> res(lhs);
+	res -= rhs;
+	return res;
+}
+
 template <typename T>
-inline const Vec2T<T> &operator *= (Vec2T<T> &lhs, int rhs)
+inline Vec2T<T> operator - (const T &lhs, const Vec2T<T> &rhs)
+{
+	Vec2T<T> res(lhs);
+	res -= rhs;
+	return res;
+}
+
+template <typename T>
+inline Vec2T<T> &operator *= (Vec2T<T> &lhs, const Vec2T<T> &rhs)
+{
+	lhs.x *= rhs.x;
+	lhs.y *= rhs.y;
+	return lhs;
+}
+
+template <typename T, typename U, typename = std::enable_if<std::is_integral<U>::value>>
+inline Vec2T<T> &operator *= (Vec2T<T> &lhs, U rhs)
 {
 	lhs.x *= rhs;
 	lhs.y *= rhs;
 	return lhs;
 }
 
+template <typename T, typename U>
+inline Vec2T<T> operator * (const Vec2T<T> &lhs, const U &rhs)
+{
+	Vec2T<T> res(lhs);
+	res *= rhs;
+	return res;
+}
+
 template <typename T>
-inline const Vec2T<T> &operator /= (Vec2T<T> &lhs, int rhs)
+inline Vec2T<T> operator * (const T &lhs, const Vec2T<T> &rhs)
+{
+	Vec2T<T> res(lhs);
+	res *= rhs;
+	return res;
+}
+
+template <typename T>
+inline Vec2T<T> &operator /= (Vec2T<T> &lhs, const Vec2T<T> &rhs)
+{
+	lhs.x /= rhs.x;
+	lhs.y /= rhs.y;
+	return lhs;
+}
+
+template <typename T, typename U, typename = std::enable_if<std::is_integral<U>::value>>
+inline Vec2T<T> &operator /= (Vec2T<T> &lhs, U rhs)
 {
 	lhs.x /= rhs;
 	lhs.y /= rhs;
 	return lhs;
 }
 
-template <typename T>
-inline Vec2T<T> operator + (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
+template <typename T, typename U>
+inline Vec2T<T> operator / (const Vec2T<T> &lhs, const U &rhs)
 {
 	Vec2T<T> res(lhs);
-
-	res += rhs;
+	res /= rhs;
 	return res;
 }
 
 template <typename T>
-inline Vec2T<T> operator - (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
+inline Vec2T<T> operator / (const T &lhs, const Vec2T<T> &rhs)
 {
 	Vec2T<T> res(lhs);
-
-	res -= rhs;
-	return res;
-}
-
-template <typename T>
-inline Vec2T<T> operator * (const Vec2T<T> &lhs, int rhs)
-{
-	Vec2T<T> res(lhs);
-
-	res *= rhs;
-	return res;
-}
-
-template <typename T>
-inline Vec2T<T> operator * (int lhs, const Vec2T<T> &rhs)
-{
-	Vec2T<T> res(rhs);
-
-	res *= lhs;
-	return res;
-}
-
-template <typename T>
-inline Vec2T<T> operator / (const Vec2T<T> &lhs, int rhs)
-{
-	Vec2T<T> res(lhs);
-
 	res /= rhs;
 	return res;
 }
@@ -148,9 +201,9 @@ inline int Distance(const Vec2T<T> &pos1, const Vec2T<T> &pos2)
 }
 
 typedef Vec2T<short int> Vec2i;
-typedef Vec2T<int> PixelPos;
-typedef Vec2T<int> PixelDiff;
-typedef Vec2T<int> PixelSize;
+typedef Vec2T<short int> PixelPos;
+typedef Vec2T<short int> PixelDiff;
+typedef Vec2T<short int> PixelSize;
 typedef Vec2T<double> PixelPrecise;
 
 //@}

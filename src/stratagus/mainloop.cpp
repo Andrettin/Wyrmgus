@@ -513,7 +513,7 @@ static void DisplayLoop()
 	//do tile animation
 	if (!GamePaused && GameCycle != 0 && GameCycle && GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
 		for (size_t z = 0; z < Map.Fields.size(); ++z) {
-			for (int i = 0; i < Map.Info.MapWidths[z] * Map.Info.MapHeights[z]; ++i) {
+			for (int i = 0; i < Map.Info.LayersSizes[z].x * Map.Info.LayersSizes[z].y; ++i) {
 				CMapField &mf = Map.Fields[z][i];
 				if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
 					mf.AnimationFrame += 1;
