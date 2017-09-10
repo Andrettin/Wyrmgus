@@ -5718,15 +5718,8 @@ bool CUnit::CanUseItem(CUnit *item) const
 
 bool CUnit::IsItemSetComplete(const CUnit *item) const
 {
-	std::vector<CUniqueItem *> set_items;
-	for (size_t i = 0; i < UniqueItems.size(); ++i) {
-		if (UniqueItems[i]->Set && UniqueItems[i]->Set == item->Unique->Set) {
-			set_items.push_back(UniqueItems[i]);
-		}
-	}
-	
-	for (size_t i = 0; i < set_items.size(); ++i) {
-		int item_slot = GetItemClassSlot(set_items[i]->Type->ItemClass);
+	for (size_t i = 0; i < item->Unique->Set->UniqueItems.size(); ++i) {
+		int item_slot = GetItemClassSlot(item->Unique->Set->UniqueItems[i]->Type->ItemClass);
 		
 		if (item_slot == -1) {
 			return false;
@@ -5734,7 +5727,7 @@ bool CUnit::IsItemSetComplete(const CUnit *item) const
 		
 		bool has_item_equipped = false;
 		for (size_t j = 0; j < this->EquippedItems[item_slot].size(); ++j) {
-			if (EquippedItems[item_slot][j]->Unique == set_items[i]) {
+			if (EquippedItems[item_slot][j]->Unique == item->Unique->Set->UniqueItems[i]) {
 				has_item_equipped = true;
 				break;
 			}
@@ -5751,15 +5744,8 @@ bool CUnit::IsItemSetComplete(const CUnit *item) const
 
 bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 {
-	std::vector<CUniqueItem *> set_items;
-	for (size_t i = 0; i < UniqueItems.size(); ++i) {
-		if (UniqueItems[i]->Set && UniqueItems[i]->Set == item->Unique->Set) {
-			set_items.push_back(UniqueItems[i]);
-		}
-	}
-	
-	for (size_t i = 0; i < set_items.size(); ++i) {
-		int item_slot = GetItemClassSlot(set_items[i]->Type->ItemClass);
+	for (size_t i = 0; i < item->Unique->Set->UniqueItems.size(); ++i) {
+		int item_slot = GetItemClassSlot(item->Unique->Set->UniqueItems[i]->Type->ItemClass);
 		
 		if (item_slot == -1) {
 			return false;
@@ -5767,15 +5753,15 @@ bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 		
 		bool has_item_equipped = false;
 		for (size_t j = 0; j < this->EquippedItems[item_slot].size(); ++j) {
-			if (EquippedItems[item_slot][j]->Unique == set_items[i]) {
+			if (EquippedItems[item_slot][j]->Unique == item->Unique->Set->UniqueItems[i]) {
 				has_item_equipped = true;
 				break;
 			}
 		}
 		
-		if (has_item_equipped && set_items[i] == item->Unique) { //if the unique item is already equipped, it won't complete the set (either the set is already complete, or needs something else)
+		if (has_item_equipped && item->Unique->Set->UniqueItems[i] == item->Unique) { //if the unique item is already equipped, it won't complete the set (either the set is already complete, or needs something else)
 			return false;
-		} else if (!has_item_equipped && set_items[i] != item->Unique) {
+		} else if (!has_item_equipped && item->Unique->Set->UniqueItems[i] != item->Unique) {
 			return false;
 		}
 		

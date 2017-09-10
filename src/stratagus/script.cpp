@@ -979,6 +979,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitUniqueSet")) {
 			res->e = EString_UnitUniqueSet;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "UnitUniqueSetItems")) {
+			res->e = EString_UnitUniqueSetItems;
+			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "TypeName")) {
 			res->e = EString_TypeName;
 			res->D.Type = CclParseTypeDesc(l);
@@ -1362,6 +1365,23 @@ std::string EvalString(const StringDesc *s)
 			} else {
 				return std::string("");
 			}
+		case EString_UnitUniqueSetItems : // names of the unit's unique item set's items
+			unit = EvalUnit(s->D.Unit);
+			if (unit != NULL && unit->Unique && unit->Unique->Set) {
+				std::string set_items_string;
+				bool first = true;
+				for (size_t i = 0; i < unit->Unique->Set->UniqueItems.size(); ++i) {
+					if (!first) {
+						set_items_string += "\n";
+					} else {
+						first = false;
+					}
+					set_items_string += unit->Unique->Set->UniqueItems[i]->Name;
+				}
+				return set_items_string;
+			} else {
+				return std::string("");
+			}
 		case EString_TypeName : // name of the unit type
 			type = s->D.Type;
 			if (type != NULL) {
@@ -1715,6 +1735,10 @@ void FreeStringDesc(StringDesc *s)
 			delete s->D.Unit;
 			break;
 		case EString_UnitUniqueSet : // Unique item set name of the unit
+			FreeUnitDesc(s->D.Unit);
+			delete s->D.Unit;
+			break;
+		case EString_UnitUniqueSetItems : // Unique item names for the unit's unique item set name
 			FreeUnitDesc(s->D.Unit);
 			delete s->D.Unit;
 			break;
@@ -2345,6 +2369,20 @@ static int CclUnitUniqueSet(lua_State *l)
 }
 
 /**
+**  Return equivalent lua table for UnitUniqueSetItems.
+**  {"UnitUniqueSetItems", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitUniqueSetItems(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitUniqueSetItems");
+}
+
+/**
 **  Return equivalent lua table for TypeName.
 **  {"TypeName", {}}
 **
@@ -2704,6 +2742,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitQuote", CclUnitQuote);
 	lua_register(Lua, "UnitSettlementName", CclUnitSettlementName);
 	lua_register(Lua, "UnitUniqueSet", CclUnitUniqueSet);
+	lua_register(Lua, "UnitUniqueSetItems", CclUnitUniqueSetItems);
 	lua_register(Lua, "TypeName", CclTypeName);
 	lua_register(Lua, "TypeIdent", CclTypeIdent);
 	lua_register(Lua, "TypeClass", CclTypeClass);

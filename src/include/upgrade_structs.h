@@ -55,6 +55,7 @@ class CVariable;
 class CIcon;
 //Wyrmgus start
 class CCharacter;
+class CUniqueItem;
 class CUpgradeModifier;
 class CFaction;
 //Wyrmgus end
@@ -265,6 +266,7 @@ public:
 	int Year;						/// Year of publication, if is a literary work
 	CCharacter *Author;				/// Author of this literary work (if it is one)
 	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
+	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<CUnitType *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
 	std::vector<CCharacter *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end

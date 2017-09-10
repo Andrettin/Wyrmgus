@@ -111,6 +111,7 @@ static int CclDefineUniqueItem(lua_State *l)
 			int upgrade_id = UpgradeIdByIdent(set_ident);
 			if (upgrade_id != -1) {
 				item->Set = AllUpgrades[upgrade_id];
+				item->Set->UniqueItems.push_back(item);
 			} else {
 				LuaError(l, "Set upgrade \"%s\" doesn't exist." _C_ set_ident.c_str());
 			}
