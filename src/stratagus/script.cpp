@@ -1376,7 +1376,14 @@ std::string EvalString(const StringDesc *s)
 					} else {
 						first = false;
 					}
+					bool item_equipped = unit->Container && unit->Container->IsUniqueItemEquipped(unit->Unique->Set->UniqueItems[i]);
+					if (!item_equipped) {
+						set_items_string += "~<";
+					}
 					set_items_string += unit->Unique->Set->UniqueItems[i]->Name;
+					if (!item_equipped) {
+						set_items_string += "~>";
+					}
 				}
 				return set_items_string;
 			} else {

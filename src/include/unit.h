@@ -410,6 +410,7 @@ public:
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemClassEquipped(int item_class) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
+	bool IsUniqueItemEquipped(const CUniqueItem *unique) const;
 	bool CanEquipItem(CUnit *item) const;
 	bool CanEquipItemClass(int item_class) const;
 	bool CanUseItem(CUnit *item) const;

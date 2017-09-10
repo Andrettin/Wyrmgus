@@ -5609,6 +5609,24 @@ bool CUnit::IsItemTypeEquipped(CUnitType *item_type) const
 	return false;
 }
 
+bool CUnit::IsUniqueItemEquipped(const CUniqueItem *unique) const
+{
+	int item_slot = GetItemClassSlot(unique->Type->ItemClass);
+		
+	if (item_slot == -1) {
+		return false;
+	}
+		
+	int item_equipped_quantity = 0;
+	for (size_t i = 0; i < this->EquippedItems[item_slot].size(); ++i) {
+		if (EquippedItems[item_slot][i]->Unique == unique) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 bool CUnit::CanEquipItem(CUnit *item) const
 {
 	if (item->Container != this) {
@@ -5719,24 +5737,9 @@ bool CUnit::CanUseItem(CUnit *item) const
 bool CUnit::IsItemSetComplete(const CUnit *item) const
 {
 	for (size_t i = 0; i < item->Unique->Set->UniqueItems.size(); ++i) {
-		int item_slot = GetItemClassSlot(item->Unique->Set->UniqueItems[i]->Type->ItemClass);
-		
-		if (item_slot == -1) {
+		if (!this->IsUniqueItemEquipped(item->Unique->Set->UniqueItems[i])) {
 			return false;
 		}
-		
-		bool has_item_equipped = false;
-		for (size_t j = 0; j < this->EquippedItems[item_slot].size(); ++j) {
-			if (EquippedItems[item_slot][j]->Unique == item->Unique->Set->UniqueItems[i]) {
-				has_item_equipped = true;
-				break;
-			}
-		}
-		
-		if (!has_item_equipped) {
-			return false;
-		}
-		
 	}
 
 	return true;
