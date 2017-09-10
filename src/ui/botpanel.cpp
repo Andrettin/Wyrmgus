@@ -687,6 +687,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				return false;
 			}
 		}
+		if (condition->UniqueSet != CONDITION_TRUE) {
+			if ((condition->UniqueSet == CONDITION_ONLY) ^ (unit.Unique && unit.Unique->Set)) {
+				return false;
+			}
+		}
 	} else { // always return false for "Affixed" and "Unique" for buttons that aren't individual unit buttons
 		if (condition->Affixed != CONDITION_TRUE) {
 			if (condition->Affixed == CONDITION_ONLY) {

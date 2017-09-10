@@ -976,6 +976,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitSettlementName")) {
 			res->e = EString_UnitSettlementName;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "UnitUniqueSet")) {
+			res->e = EString_UnitUniqueSet;
+			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "TypeName")) {
 			res->e = EString_TypeName;
 			res->D.Type = CclParseTypeDesc(l);
@@ -1352,6 +1355,13 @@ std::string EvalString(const StringDesc *s)
 			} else {
 				return std::string("");
 			}
+		case EString_UnitUniqueSet : // name of the unit's unique item set
+			unit = EvalUnit(s->D.Unit);
+			if (unit != NULL && unit->Unique && unit->Unique->Set) {
+				return unit->Unique->Set->Name;
+			} else {
+				return std::string("");
+			}
 		case EString_TypeName : // name of the unit type
 			type = s->D.Type;
 			if (type != NULL) {
@@ -1701,6 +1711,10 @@ void FreeStringDesc(StringDesc *s)
 			delete s->D.Unit;
 			break;
 		case EString_UnitSettlementName : // Settlement name of the unit
+			FreeUnitDesc(s->D.Unit);
+			delete s->D.Unit;
+			break;
+		case EString_UnitUniqueSet : // Unique item set name of the unit
 			FreeUnitDesc(s->D.Unit);
 			delete s->D.Unit;
 			break;
@@ -2317,6 +2331,20 @@ static int CclUnitSettlementName(lua_State *l)
 }
 
 /**
+**  Return equivalent lua table for UnitUniqueSet.
+**  {"UnitUniqueSet", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitUniqueSet(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitUniqueSet");
+}
+
+/**
 **  Return equivalent lua table for TypeName.
 **  {"TypeName", {}}
 **
@@ -2675,6 +2703,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitSpell", CclUnitSpell);
 	lua_register(Lua, "UnitQuote", CclUnitQuote);
 	lua_register(Lua, "UnitSettlementName", CclUnitSettlementName);
+	lua_register(Lua, "UnitUniqueSet", CclUnitUniqueSet);
 	lua_register(Lua, "TypeName", CclTypeName);
 	lua_register(Lua, "TypeIdent", CclTypeIdent);
 	lua_register(Lua, "TypeClass", CclTypeClass);

@@ -775,6 +775,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->ConsumedElixir = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Unique")) {
 			condition->Unique = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "UniqueSet")) {
+			condition->UniqueSet = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Bound")) {
 			condition->Bound = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Identified")) {

@@ -1432,29 +1432,6 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		// this modifier should be applied to unittype id == z
 		if (um->ApplyTo[z] == 'X') {
 
-			// If Sight range is upgraded, we need to change EVERY unit
-			// to the new range, otherwise the counters get confused.
-			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade;
-
-				FindUnitsByType(*UnitTypes[z], unitupgrade);
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && !unit.Removed) {
-						MapUnmarkUnitSight(unit);
-						//Wyrmgus start
-//						unit.CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max +
-						unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max +
-						//Wyrmgus end
-												 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
-						//Wyrmgus start
-						UpdateUnitSightRange(unit);
-						//Wyrmgus end
-						MapMarkUnitSight(unit);
-					}
-				}
-			}
-			
 			// if a unit type's supply is changed, we need to update the player's supply accordingly
 			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade;
@@ -1597,6 +1574,12 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.UpdateXPRequired();
 						} else if (IsKnowledgeVariable(j)) {
 							unit.CheckKnowledgeChange(j, um->Modifier.Variables[j].Value);
+						} else if (j == SIGHTRANGE_INDEX && !unit.Removed) {
+							// If Sight range is upgraded, we need to change EVERY unit
+							// to the new range, otherwise the counters get confused.
+							MapUnmarkUnitSight(unit);
+							UpdateUnitSightRange(unit);
+							MapMarkUnitSight(unit);
 						}
 						//Wyrmgus end
 					}
@@ -1728,30 +1711,6 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 		// this modifier should be applied to unittype id == z
 		if (um->ApplyTo[z] == 'X') {
-
-			// If Sight range is upgraded, we need to change EVERY unit
-			// to the new range, otherwise the counters get confused.
-			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade;
-
-				FindUnitsByType(*UnitTypes[z], unitupgrade);
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && !unit.Removed) {
-						MapUnmarkUnitSight(unit);
-						//Wyrmgus start
-//						unit.CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max -
-						unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max -
-						//Wyrmgus end
-												 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
-						//Wyrmgus start
-						UpdateUnitSightRange(unit);
-						//Wyrmgus end
-						MapMarkUnitSight(unit);
-					}
-				}
-			}
-			
 			// if a unit type's supply is changed, we need to update the player's supply accordingly
 			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade;
@@ -1895,6 +1854,12 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.UpdateXPRequired();
 						} else if (IsKnowledgeVariable(j)) {
 							unit.CheckKnowledgeChange(j, - um->Modifier.Variables[j].Value);
+						} else if (j == SIGHTRANGE_INDEX && !unit.Removed) {
+							// If Sight range is upgraded, we need to change EVERY unit
+							// to the new range, otherwise the counters get confused.
+							MapUnmarkUnitSight(unit);
+							UpdateUnitSightRange(unit);
+							MapMarkUnitSight(unit);
 						}
 						//Wyrmgus end
 					}
@@ -1986,16 +1951,6 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 	}
 
-	if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-		if (!unit.Removed && !SaveGameLoading) {
-			MapUnmarkUnitSight(unit);
-			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value +
-									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
-			UpdateUnitSightRange(unit);
-			MapMarkUnitSight(unit);
-		}
-	}
-	
 	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 		if (unit.IsAlive()) {
 			unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
@@ -2026,6 +1981,12 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.UpdateXPRequired();
 		} else if (IsKnowledgeVariable(j)) {
 			unit.CheckKnowledgeChange(j, um->Modifier.Variables[j].Value);
+		} else if (j == SIGHTRANGE_INDEX) {
+			if (!unit.Removed && !SaveGameLoading) {
+				MapUnmarkUnitSight(unit);
+				UpdateUnitSightRange(unit);
+				MapMarkUnitSight(unit);
+			}
 		}
 		//Wyrmgus end
 	}
@@ -2092,16 +2053,6 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 {
 	Assert(um);
 
-	if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-		if (!unit.Removed && !SaveGameLoading) {
-			MapUnmarkUnitSight(unit);
-			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value -
-									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
-			UpdateUnitSightRange(unit);
-			MapMarkUnitSight(unit);
-		}
-	}
-
 	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 		if (unit.IsAlive()) {
 			unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
@@ -2132,6 +2083,12 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.UpdateXPRequired();
 		} else if (IsKnowledgeVariable(j)) {
 			unit.CheckKnowledgeChange(j, - um->Modifier.Variables[j].Value);
+		} else if (j == SIGHTRANGE_INDEX) {
+			if (!unit.Removed && !SaveGameLoading) {
+				MapUnmarkUnitSight(unit);
+				UpdateUnitSightRange(unit);
+				MapMarkUnitSight(unit);
+			}
 		}
 		//Wyrmgus end
 	}
