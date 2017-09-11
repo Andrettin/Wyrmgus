@@ -429,6 +429,7 @@ std::string GetUniqueItemEffectsString(std::string item_ident)
 		std::string item_effects_string;
 		
 		bool first_var = true;
+		
 		for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
 			if (
 				!(var == BASICDAMAGE_INDEX || var == PIERCINGDAMAGE_INDEX || var == THORNSDAMAGE_INDEX
@@ -510,7 +511,78 @@ std::string GetUniqueItemEffectsString(std::string item_ident)
 				item_effects_string += GetVariableDisplayName(var, true);
 			}
 		}
-			
+
+		if (item->Set) {
+			for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
+				if (
+					!(var == BASICDAMAGE_INDEX || var == PIERCINGDAMAGE_INDEX || var == THORNSDAMAGE_INDEX
+					|| var == FIREDAMAGE_INDEX || var == COLDDAMAGE_INDEX || var == ARCANEDAMAGE_INDEX || var == LIGHTNINGDAMAGE_INDEX
+					|| var == AIRDAMAGE_INDEX || var == EARTHDAMAGE_INDEX || var == WATERDAMAGE_INDEX
+					|| var == ARMOR_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX
+					|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX
+					|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
+					|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == BACKSTAB_INDEX
+					|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX || var == GIVERESOURCE_INDEX || var == TIMEEFFICIENCYBONUS_INDEX
+					|| var == KNOWLEDGEMAGIC_INDEX || var == KNOWLEDGEWARFARE_INDEX || var == KNOWLEDGEMINING_INDEX
+					|| var == BONUSAGAINSTMOUNTED_INDEX|| var == BONUSAGAINSTBUILDINGS_INDEX || var == BONUSAGAINSTAIR_INDEX || var == BONUSAGAINSTGIANTS_INDEX || var == BONUSAGAINSTDRAGONS_INDEX
+					|| var == SUPPLY_INDEX)
+				) {
+					continue;
+				}
+				
+				int variable_value = 0;
+				int variable_increase = 0;
+
+				for (size_t z = 0; z < item->Set->UpgradeModifiers.size(); ++z) {
+					variable_value += item->Set->UpgradeModifiers[z]->Modifier.Variables[var].Value;
+					variable_increase += item->Set->UpgradeModifiers[z]->Modifier.Variables[var].Increase;
+				}
+							
+				if (variable_value != 0) {
+					if (!first_var) {
+						item_effects_string += ", ";
+					} else {
+						first_var = false;
+					}
+
+					if (IsBooleanVariable(var) && variable_value < 0) {
+						item_effects_string += "Lose ";
+					}
+					
+					if (!IsBooleanVariable(var)) {
+						if (variable_value >= 0 && var != HITPOINTHEALING_INDEX && var != GIVERESOURCE_INDEX) {
+							item_effects_string += "+";
+						}
+						item_effects_string += std::to_string((long long) variable_value);
+						if (IsPercentageVariable(var)) {
+							item_effects_string += "%";
+						}
+						item_effects_string += " ";
+					}
+												
+					item_effects_string += GetVariableDisplayName(var);
+					item_effects_string += " (Set Bonus)";
+				}
+				
+				if (variable_increase != 0) {
+					if (!first_var) {
+						item_effects_string += ", ";
+					} else {
+						first_var = false;
+					}
+												
+					if (variable_increase > 0) {
+						item_effects_string += "+";
+					}
+					item_effects_string += std::to_string((long long) variable_increase);
+					item_effects_string += " ";
+												
+					item_effects_string += GetVariableDisplayName(var, true);
+					item_effects_string += " (Set Bonus)";
+				}
+			}
+		}
+
 		return item_effects_string;
 	}
 	

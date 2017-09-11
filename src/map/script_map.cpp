@@ -170,7 +170,7 @@ static int CclStratagusMap(lua_State *l)
 				} else if (!strcmp(value, "layer-references")) {
 					Map.Planes.clear();
 					Map.Worlds.clear();
-					Map.Layers.clear();
+					Map.SurfaceLayers.clear();
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument for \"layer-references\"");
@@ -183,7 +183,7 @@ static int CclStratagusMap(lua_State *l)
 						lua_rawgeti(l, -1, z + 1);
 						Map.Planes.push_back(GetPlane(LuaToString(l, -1, 1)));
 						Map.Worlds.push_back(GetWorld(LuaToString(l, -1, 2)));
-						Map.Layers.push_back(LuaToNumber(l, -1, 3));
+						Map.SurfaceLayers.push_back(LuaToNumber(l, -1, 3));
 						Map.LayerConnectors.resize(z + 1);
 						lua_pop(l, 1);
 					}
@@ -926,7 +926,7 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 	
 	if (lua_isnumber(l, 4)) {
 		int layer = LuaToNumber(l, 4);
-		map_template->LayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>(ipos, unittype, layer, unique));
+		map_template->SurfaceLayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>(ipos, unittype, layer, unique));
 	} else if (lua_isstring(l, 4)) {
 		std::string realm = LuaToString(l, 4);
 		if (GetWorld(realm)) {
@@ -1578,13 +1578,13 @@ static int CclDefineMapTemplate(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string map_ident = LuaToString(l, 1);
-	CMapTemplate *map = GetMapTemplate(map_ident);
-	if (map == NULL) {
-		map = new CMapTemplate;
-		map->Ident = map_ident;
-		MapTemplates.push_back(map);
-		MapTemplateIdentToPointer[map_ident] = map;
+	std::string map_template_ident = LuaToString(l, 1);
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	if (map_template == NULL) {
+		map_template = new CMapTemplate;
+		map_template->Ident = map_template_ident;
+		MapTemplates.push_back(map_template);
+		MapTemplateIdentToPointer[map_template_ident] = map_template;
 	}
 	
 	Vec2i subtemplate_position_top_left(-1, -1);
@@ -1594,42 +1594,42 @@ static int CclDefineMapTemplate(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			map->Name = LuaToString(l, -1);
+			map_template->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Plane")) {
 			CPlane *plane = GetPlane(LuaToString(l, -1));
 			if (!plane) {
 				LuaError(l, "Plane doesn't exist.");
 			}
-			map->Plane = plane;
+			map_template->Plane = plane;
 		} else if (!strcmp(value, "World")) {
 			CWorld *world = GetWorld(LuaToString(l, -1));
 			if (!world) {
 				LuaError(l, "World doesn't exist.");
 			}
-			map->World = world;
-		} else if (!strcmp(value, "Layer")) {
-			map->Layer = LuaToNumber(l, -1);
-			if (map->Layer > 0) {
-				map->TimeOfDaySeconds = 0; // no time of day for underground maps
+			map_template->World = world;
+		} else if (!strcmp(value, "SurfaceLayer")) {
+			map_template->SurfaceLayer = LuaToNumber(l, -1);
+			if (map_template->SurfaceLayer > 0) {
+				map_template->TimeOfDaySeconds = 0; // no time of day for underground maps
 			}
 		} else if (!strcmp(value, "TerrainFile")) {
-			map->TerrainFile = LuaToString(l, -1);
+			map_template->TerrainFile = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainFile")) {
-			map->OverlayTerrainFile = LuaToString(l, -1);
+			map_template->OverlayTerrainFile = LuaToString(l, -1);
 		} else if (!strcmp(value, "TerrainImage")) {
-			map->TerrainImage = LuaToString(l, -1);
+			map_template->TerrainImage = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainImage")) {
-			map->OverlayTerrainImage = LuaToString(l, -1);
+			map_template->OverlayTerrainImage = LuaToString(l, -1);
 		} else if (!strcmp(value, "Width")) {
-			map->Width = LuaToNumber(l, -1);
+			map_template->Width = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Height")) {
-			map->Height = LuaToNumber(l, -1);
+			map_template->Height = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Scale")) {
-			map->Scale = LuaToNumber(l, -1);
+			map_template->Scale = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TimeOfDaySeconds")) {
-			map->TimeOfDaySeconds = LuaToNumber(l, -1);
+			map_template->TimeOfDaySeconds = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SubtemplatePosition")) {
-			CclGetPos(l, &map->SubtemplatePosition.x, &map->SubtemplatePosition.y);
+			CclGetPos(l, &map_template->SubtemplatePosition.x, &map_template->SubtemplatePosition.y);
 		} else if (!strcmp(value, "SubtemplatePositionTopLeft")) {
 			CclGetPos(l, &subtemplate_position_top_left.x, &subtemplate_position_top_left.y);
 		} else if (!strcmp(value, "MainTemplate")) {
@@ -1637,29 +1637,29 @@ static int CclDefineMapTemplate(lua_State *l)
 			if (!main_template) {
 				LuaError(l, "Map template doesn't exist.");
 			}
-			map->MainTemplate = main_template;
-			main_template->Subtemplates.push_back(map);
-			map->Plane = main_template->Plane;
-			map->World = main_template->World;
-			map->Layer = main_template->Layer;
+			map_template->MainTemplate = main_template;
+			main_template->Subtemplates.push_back(map_template);
+			map_template->Plane = main_template->Plane;
+			map_template->World = main_template->World;
+			map_template->SurfaceLayer = main_template->SurfaceLayer;
 		} else if (!strcmp(value, "BaseTerrain")) {
 			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
 			if (!terrain) {
 				LuaError(l, "Terrain doesn't exist.");
 			}
-			map->BaseTerrain = terrain;
+			map_template->BaseTerrain = terrain;
 		} else if (!strcmp(value, "BorderTerrain")) {
 			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
 			if (!terrain) {
 				LuaError(l, "Terrain doesn't exist.");
 			}
-			map->BorderTerrain = terrain;
+			map_template->BorderTerrain = terrain;
 		} else if (!strcmp(value, "SurroundingTerrain")) {
 			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
 			if (!terrain) {
 				LuaError(l, "Terrain doesn't exist.");
 			}
-			map->SurroundingTerrain = terrain;
+			map_template->SurroundingTerrain = terrain;
 		} else if (!strcmp(value, "GeneratedTerrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1677,7 +1677,7 @@ static int CclDefineMapTemplate(lua_State *l)
 					LuaError(l, "Degree level doesn't exist.");
 				}
 				
-				map->GeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
+				map_template->GeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
 			}
 		} else if (!strcmp(value, "ExternalGeneratedTerrains")) {
 			if (!lua_istable(l, -1)) {
@@ -1696,7 +1696,7 @@ static int CclDefineMapTemplate(lua_State *l)
 					LuaError(l, "Degree level doesn't exist.");
 				}
 				
-				map->ExternalGeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
+				map_template->ExternalGeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
 			}
 		} else if (!strcmp(value, "GeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {
@@ -1712,7 +1712,7 @@ static int CclDefineMapTemplate(lua_State *l)
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
 				
-				map->GeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+				map_template->GeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
 			}
 		} else if (!strcmp(value, "PlayerLocationGeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {
@@ -1728,7 +1728,7 @@ static int CclDefineMapTemplate(lua_State *l)
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
 				
-				map->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+				map_template->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1736,8 +1736,8 @@ static int CclDefineMapTemplate(lua_State *l)
 	}
 	
 	if (subtemplate_position_top_left.x != -1 && subtemplate_position_top_left.y != -1) {
-		map->SubtemplatePosition.x = subtemplate_position_top_left.x + ((map->Width - 1) / 2);
-		map->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map->Height - 1) / 2);
+		map_template->SubtemplatePosition.x = subtemplate_position_top_left.x + ((map_template->Width - 1) / 2);
+		map_template->SubtemplatePosition.y = subtemplate_position_top_left.y + ((map_template->Height - 1) / 2);
 	}
 	
 	return 0;

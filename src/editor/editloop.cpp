@@ -2581,7 +2581,7 @@ void CEditor::Init()
 		Map.TimeOfDay.push_back(NoTimeOfDay);
 		Map.Planes.push_back(NULL);
 		Map.Worlds.push_back(NULL);
-		Map.Layers.push_back(0);
+		Map.SurfaceLayers.push_back(0);
 		Map.LayerConnectors.resize(1);
 		//Wyrmgus end
 

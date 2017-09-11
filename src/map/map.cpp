@@ -354,14 +354,14 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.TimeOfDay.push_back(NoTimeOfDay);
 		Map.Planes.push_back(this->Plane);
 		Map.Worlds.push_back(this->World);
-		Map.Layers.push_back(this->Layer);
+		Map.SurfaceLayers.push_back(this->SurfaceLayer);
 		Map.LayerConnectors.resize(z + 1);
 	} else {
 		if (!this->IsSubtemplateArea()) {
 			Map.TimeOfDaySeconds[z] = this->TimeOfDaySeconds;
 			Map.Planes[z] = this->Plane;
 			Map.Worlds[z] = this->World;
-			Map.Layers[z] = this->Layer;
+			Map.SurfaceLayers[z] = this->SurfaceLayer;
 		}
 	}
 
@@ -1012,27 +1012,27 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		}
 	}
 	
-	for (size_t i = 0; i < this->LayerConnectors.size(); ++i) {
-		Vec2i unit_raw_pos(std::get<0>(this->LayerConnectors[i]));
+	for (size_t i = 0; i < this->SurfaceLayerConnectors.size(); ++i) {
+		Vec2i unit_raw_pos(std::get<0>(this->SurfaceLayerConnectors[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = Map.GenerateUnitLocation(std::get<1>(this->LayerConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos = Map.GenerateUnitLocation(std::get<1>(this->SurfaceLayerConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
 		}
 		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
-		Vec2i unit_offset((std::get<1>(this->LayerConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->LayerConnectors[i])->TileHeight - 1) / 2);
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->LayerConnectors[i]), &Players[PlayerNumNeutral], z);
-		if (std::get<3>(this->LayerConnectors[i])) {
-			unit->SetUnique(std::get<3>(this->LayerConnectors[i]));
+		Vec2i unit_offset((std::get<1>(this->SurfaceLayerConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->SurfaceLayerConnectors[i])->TileHeight - 1) / 2);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->SurfaceLayerConnectors[i]), &Players[PlayerNumNeutral], z);
+		if (std::get<3>(this->SurfaceLayerConnectors[i])) {
+			unit->SetUnique(std::get<3>(this->SurfaceLayerConnectors[i]));
 		}
 		Map.LayerConnectors[z].push_back(unit);
 		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (Map.Layers[second_z] == std::get<2>(this->LayerConnectors[i]) && Map.Worlds[second_z] == this->World && Map.Planes[second_z] == this->Plane) {
+			if (Map.SurfaceLayers[second_z] == std::get<2>(this->SurfaceLayerConnectors[i]) && Map.Worlds[second_z] == this->World && Map.Planes[second_z] == this->Plane) {
 				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
 					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->tilePos == unit->tilePos && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) { //surface layer connectors need to be in the same X and Y coordinates as their destinations
 						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
@@ -1727,7 +1727,7 @@ bool CMap::IsLayerUnderground(int z) const
 		return true;
 	}
 	
-	if (this->Layers[z] > 0) {
+	if (this->SurfaceLayers[z] > 0) {
 		return true;
 	}
 
@@ -1872,7 +1872,7 @@ int GetMapLayer(std::string plane_ident, std::string world_ident, int surface_la
 	CWorld *world = GetWorld(world_ident);
 
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		if (Map.Planes[z] == plane && Map.Worlds[z] == world && Map.Layers[z] == surface_layer) {
+		if (Map.Planes[z] == plane && Map.Worlds[z] == world && Map.SurfaceLayers[z] == surface_layer) {
 			return z;
 		}
 	}
@@ -1998,7 +1998,7 @@ void CMap::Create()
 	}
 	this->Planes.push_back(NULL);
 	this->Worlds.push_back(NULL);
-	this->Layers.push_back(0);
+	this->SurfaceLayers.push_back(0);
 	this->LayerConnectors.resize(1);
 	//Wyrmgus end
 }
@@ -2033,7 +2033,7 @@ void CMap::Clean()
 	this->BorderLandmasses.clear();
 	this->Planes.clear();
 	this->Worlds.clear();
-	this->Layers.clear();
+	this->SurfaceLayers.clear();
 	this->LayerConnectors.clear();
 	this->SettlementUnits.clear();
 	//Wyrmgus end
@@ -2090,7 +2090,7 @@ void CMap::Save(CFile &file) const
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");
 	for (size_t z = 0; z < this->Fields.size(); ++z) {
-		file.printf("  {\"%s\", \"%s\", %d},\n", this->Planes[z] ? this->Planes[z]->Ident.c_str() : "", this->Worlds[z] ? this->Worlds[z]->Ident.c_str() : "", this->Layers[z]);
+		file.printf("  {\"%s\", \"%s\", %d},\n", this->Planes[z] ? this->Planes[z]->Ident.c_str() : "", this->Worlds[z] ? this->Worlds[z]->Ident.c_str() : "", this->SurfaceLayers[z]);
 	}
 	file.printf("  },\n");
 	//Wyrmgus end
