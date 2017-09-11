@@ -998,21 +998,23 @@ void DrawPopups()
 		}
 	}
 	
-	//
-	//  Update status line for this button and draw popups
-	//
-	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
-		if (ButtonAreaUnderCursor == ButtonAreaButton &&
-			//Wyrmgus start
-//			ButtonUnderCursor == i && KeyState != KeyStateInput) {
-			ButtonUnderCursor == i && KeyState != KeyStateInput
-			&& CurrentButtons[i].Level == CurrentButtonLevel && IsButtonAllowed(*Selected[0], CurrentButtons[i])) {
-			//Wyrmgus end
-				if (!Preference.NoStatusLineTooltips) {
-					UpdateStatusLineForButton(CurrentButtons[i]);
-				}
-				DrawPopup(CurrentButtons[i], UI.ButtonPanel.Buttons[i], UI.ButtonPanel.Buttons[i].X,
-					UI.ButtonPanel.Buttons[i].Y);
+	if (Selected.size() >= 1) {
+		//
+		//  Update status line for this button and draw popups
+		//
+		for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
+			if (ButtonAreaUnderCursor == ButtonAreaButton &&
+				//Wyrmgus start
+	//			ButtonUnderCursor == i && KeyState != KeyStateInput) {
+				ButtonUnderCursor == i && KeyState != KeyStateInput
+				&& CurrentButtons[i].Level == CurrentButtonLevel && IsButtonAllowed(*Selected[0], CurrentButtons[i])) {
+				//Wyrmgus end
+					if (!Preference.NoStatusLineTooltips) {
+						UpdateStatusLineForButton(CurrentButtons[i]);
+					}
+					DrawPopup(CurrentButtons[i], UI.ButtonPanel.Buttons[i], UI.ButtonPanel.Buttons[i].X,
+						UI.ButtonPanel.Buttons[i].Y);
+			}
 		}
 	}
 	

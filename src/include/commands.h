@@ -135,7 +135,7 @@ extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush,
 extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush, int z = 0);
 //Wyrmgus end
 /// Prepare command dismiss
-extern void CommandDismiss(CUnit &unit);
+extern void CommandDismiss(CUnit &unit, bool salvage = false);
 /// Prepare command resource location
 //Wyrmgus start
 //extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
@@ -262,7 +262,7 @@ extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int fl
 extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z = 0);
 //Wyrmgus end
 /// Send cancel building command
-extern void SendCommandDismiss(CUnit &unit);
+extern void SendCommandDismiss(CUnit &unit, bool salvage = false);
 /// Send harvest location command
 //Wyrmgus start
 //extern void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);

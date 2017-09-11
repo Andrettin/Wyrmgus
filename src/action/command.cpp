@@ -904,12 +904,29 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 **
 **  @param unit  pointer to unit.
 */
-void CommandDismiss(CUnit &unit)
+void CommandDismiss(CUnit &unit, bool salvage)
 {
 	// Check if building is still under construction? (NETWORK!)
 	if (unit.CurrentAction() == UnitActionBuilt) {
 		unit.CurrentOrder()->Cancel(unit);
 	} else {
+		if (salvage) {
+			std::vector<CUnit *> table;
+			SelectAroundUnit(unit, 16, table, IsEnemyWith(*unit.Player));
+			for (size_t i = 0; i != table.size(); ++i) {
+				if (
+					(table[i]->CurrentAction() == UnitActionAttack || table[i]->CurrentAction() == UnitActionSpellCast)
+					&& table[i]->CurrentOrder()->HasGoal()
+					&& table[i]->CurrentOrder()->GetGoal() == &unit
+				) {
+					if (unit.Player->Index == ThisPlayer->Index) {
+						ThisPlayer->Notify(NotifyRed, unit.tilePos, unit.MapLayer, "%s", _("Cannot salvage if enemies are attacking the building."));
+					}
+					return;
+				}
+			}
+			unit.Player->AddCostsFactor(unit.Stats->Costs, unit.Variable[SALVAGEFACTOR_INDEX].Value * unit.Variable[HP_INDEX].Value / unit.GetModifiedVariable(HP_INDEX, VariableMax));
+		}
 		DebugPrint("Suicide unit ... \n");
 		LetUnitDie(unit, true);
 	}

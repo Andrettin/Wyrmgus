@@ -2469,7 +2469,9 @@ void CButtonPanel::DoClicked_BuyResource(int button)
 
 void CButtonPanel::DoClicked_Salvage()
 {
-	SendCommandDismiss(*Selected[0]);
+	for (int i = (Selected.size()  - 1); i >= 0; --i) {
+		SendCommandDismiss(*Selected[i], true);
+	}
 }
 //Wyrmgus end
 

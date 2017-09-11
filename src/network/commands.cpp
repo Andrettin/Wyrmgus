@@ -466,14 +466,14 @@ void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, in
 **
 **  @param unit  pointer to unit.
 */
-void SendCommandDismiss(CUnit &unit)
+void SendCommandDismiss(CUnit &unit, bool salvage)
 {
 	// FIXME: currently unit and worker are same?
 	if (!IsNetworkGame()) {
 		CommandLog("dismiss", &unit, FlushCommands, -1, -1, NULL, NULL, -1);
-		CommandDismiss(unit);
+		CommandDismiss(unit, salvage);
 	} else {
-		NetworkSendCommand(MessageCommandDismiss, unit, 0, 0, NULL, 0, FlushCommands);
+		NetworkSendCommand(MessageCommandDismiss, unit, salvage, 0, NULL, 0, FlushCommands);
 	}
 }
 
@@ -1001,8 +1001,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandBuildBuilding(unit, pos, *UnitTypes[dstnr], status);
 			break;
 		case MessageCommandDismiss:
-			CommandLog("dismiss", &unit, FlushCommands, -1, -1, NULL, NULL, -1);
-			CommandDismiss(unit);
+			CommandLog("dismiss", &unit, FlushCommands, arg1, -1, NULL, NULL, -1);
+			CommandDismiss(unit, arg1);
 			break;
 		case MessageCommandResourceLoc:
 			CommandLog("resource-loc", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);

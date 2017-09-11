@@ -3090,6 +3090,10 @@ void CPlayer::AddUnitType(const CUnitType &type, bool hire)
 */
 void CPlayer::AddCostsFactor(const int *costs, int factor)
 {
+	if (!factor) {
+		return;
+	}
+	
 	for (int i = 1; i < MaxCosts; ++i) {
 		ChangeResource(i, costs[i] * factor / 100, true);
 	}

@@ -673,11 +673,11 @@ bool CMapField::RockOnMap() const
 
 bool CMapField::isAWall() const
 {
-	return Flags & MapFieldWall;
+	return CheckMask(MapFieldWall);
 }
 bool CMapField::isHuman() const
 {
-	return Flags & MapFieldHuman;
+	return CheckMask(MapFieldHuman);
 }
 
 //Wyrmgus start

@@ -931,7 +931,7 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "build")) {
 		SendCommandBuildBuilding(*unit, pos, *UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "dismiss")) {
-		SendCommandDismiss(*unit);
+		SendCommandDismiss(*unit, arg1);
 	} else if (!strcmp(action, "resource-loc")) {
 		SendCommandResourceLoc(*unit, pos, flags);
 	} else if (!strcmp(action, "resource")) {
