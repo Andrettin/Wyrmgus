@@ -2599,7 +2599,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 	if (mListBox.getListModel() && mListBox.getSelected() >= 0)
 	{
 		graphics->drawText(mListBox.getListModel()->getElementAt(mListBox.getSelected()),
-			1, (h - getFont()->getHeight()) / 2);
+			2, (h - getFont()->getHeight()) / 2);
 	}
 
 	//Wyrmgus start
