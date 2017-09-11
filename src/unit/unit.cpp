@@ -6121,7 +6121,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	//Wyrmgus start
 	//drop items upon death
-	if (unit.CurrentAction() != UnitActionBuilt && (unit.Character || unit.Type->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
+	if (!suicide && unit.CurrentAction() != UnitActionBuilt && (unit.Character || unit.Type->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
 		unit.GenerateDrop();
 	}
 	//Wyrmgus end

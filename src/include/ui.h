@@ -318,6 +318,7 @@ private:
 	void DoClicked_ProduceResource(int button);
 	void DoClicked_SellResource(int button);
 	void DoClicked_BuyResource(int button);
+	void DoClicked_Salvage();
 	//Wyrmgus end
 
 

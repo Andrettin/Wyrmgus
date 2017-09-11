@@ -1560,6 +1560,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonProduceResource:
 		case ButtonSellResource:
 		case ButtonBuyResource:
+		case ButtonSalvage:
 		//Wyrmgus end
 			res = true;
 			break;
@@ -1733,6 +1734,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonReturn:
 		case ButtonAttack:
 		case ButtonAttackGround:
+		case ButtonSalvage:
 			res = true;
 			break;
 		case ButtonTrain:
@@ -2464,6 +2466,11 @@ void CButtonPanel::DoClicked_BuyResource(int button)
 		SendCommandBuyResource(*Selected[0], resource, ThisPlayer->Index);
 	}
 }
+
+void CButtonPanel::DoClicked_Salvage()
+{
+	SendCommandDismiss(*Selected[0]);
+}
 //Wyrmgus end
 
 void CButtonPanel::DoClicked_CallbackAction(int button)
@@ -2553,6 +2560,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonProduceResource: { DoClicked_ProduceResource(button); break; }
 		case ButtonSellResource: { DoClicked_SellResource(button); break; }
 		case ButtonBuyResource: { DoClicked_BuyResource(button); break; }
+		case ButtonSalvage: { DoClicked_Salvage(); break; }
 		//Wyrmgus end
 	}
 }
