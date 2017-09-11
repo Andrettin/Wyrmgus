@@ -3859,7 +3859,9 @@ void UnitLost(CUnit &unit)
 					}
 				}
 				if (unit.Settlement != NULL) {
-					temp->Settlement = unit.Settlement;
+					if (unit.Type->BoolFlag[TOWNHALL_INDEX].value) {
+						temp->Settlement = unit.Settlement;
+					}
 					Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &unit), Map.SettlementUnits.end());
 					Map.SettlementUnits.push_back(temp);
 				}
