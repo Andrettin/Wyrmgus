@@ -166,18 +166,6 @@ void CGrandStrategyGame::DrawInterface()
 			std::string population_string = "Population: " + std::to_string((long long) this->SelectedProvince->GetPopulation());
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(population_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), population_string);
 			item_y += 1;
-			
-			std::string food_string = std::to_string((long long) this->SelectedProvince->PopulationGrowthProgress) + "/" + std::to_string((long long) PopulationGrowthThreshold);
-			int food_change = this->SelectedProvince->Income[GrainCost] + this->SelectedProvince->Income[MushroomCost] + this->SelectedProvince->Income[FishCost] - this->SelectedProvince->FoodConsumption;
-
-			if (food_change > 0) {
-				food_string += "+" + std::to_string((long long) food_change);
-			} else if (food_change < 0) {
-				food_string += "-" + std::to_string((long long) food_change * -1);
-			}
-			
-			UI.Resources[FoodCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
-			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), food_string);
 		} else if (GrandStrategyInterfaceState == "barracks") {
 			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) this->SelectedProvince->GetRevoltRisk()) + "%";
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
@@ -252,13 +240,6 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		tile_tooltip += " (";
 		tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
 		tile_tooltip += ")";
-		if (province->ProductionCapacityFulfilled[FishCost] > 0 && province->Owner == GrandStrategyGame.PlayerFaction) {
-			tile_tooltip += " (COST_";
-			tile_tooltip += std::to_string((long long) FishCost);
-			tile_tooltip += " ";
-			tile_tooltip += std::to_string((long long) province->Income[FishCost]);
-			tile_tooltip += ")";
-		}
 	} else if (res != -1 && tile->ResourceProspected) {
 		if (!tile->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
 			tile_tooltip += tile->GetCulturalName();
@@ -278,10 +259,6 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 				tile_tooltip += "Timber Lodge";
 			} else if (res == StoneCost) {
 				tile_tooltip += "Quarry";
-			} else if (res == GrainCost) {
-				tile_tooltip += "Grain Farm";
-			} else if (res == MushroomCost) {
-				tile_tooltip += "Mushroom Farm";
 			}
 			tile_tooltip += ", ";
 			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
@@ -301,10 +278,6 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 				tile_tooltip += "Timber Lodge";
 			} else if (res == StoneCost) {
 				tile_tooltip += "Quarry";
-			} else if (res == GrainCost) {
-				tile_tooltip += "Grain Farm";
-			} else if (res == MushroomCost) {
-				tile_tooltip += "Mushroom Farm";
 			}
 			tile_tooltip += " (";
 			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
@@ -440,7 +413,7 @@ void CGrandStrategyGame::DoTurn()
 			if (this->Factions[i][j]->IsAlive()) {
 				//faction income
 				for (int k = 0; k < MaxCosts; ++k) {
-					if (GrandStrategyGame.IsFoodResource(k) || k == GoldCost || k == SilverCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and gold and silver are converted to copper
+					if (k == GoldCost || k == SilverCost) { //gold and silver are converted to copper
 						continue;
 					} else if (k == ResearchCost || k == LeadershipCost) {
 						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->OwnedProvinces.size();
@@ -529,23 +502,6 @@ void CGrandStrategyGame::DoTurn()
 					this->Provinces[i]->AddFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction);
 				}
 					
-				//population growth
-//				this->Provinces[i]->PopulationGrowthProgress += (this->Provinces[i]->GetPopulation() / 2) * BasePopulationGrowthPermyriad / 10000;
-				int province_food_income = this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] + this->Provinces[i]->Income[FishCost] - this->Provinces[i]->FoodConsumption;
-				this->Provinces[i]->PopulationGrowthProgress += province_food_income;
-				if (this->Provinces[i]->PopulationGrowthProgress >= PopulationGrowthThreshold) { //if population growth progress is greater than or equal to the population growth threshold, create a new worker unit
-					if (province_food_income >= 100) { //if province food income is enough to support a new unit
-						int worker_unit_type = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker"));
-						int new_units = this->Provinces[i]->PopulationGrowthProgress / PopulationGrowthThreshold;
-						this->Provinces[i]->PopulationGrowthProgress -= PopulationGrowthThreshold * new_units;
-							
-						this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, new_units);
-					} else { //if the province's food income is positive, but not enough to sustain a new unit, keep it at the population growth threshold
-						this->Provinces[i]->PopulationGrowthProgress = PopulationGrowthThreshold;
-					}
-				}
-				this->Provinces[i]->PopulationGrowthProgress = std::max(0, this->Provinces[i]->PopulationGrowthProgress);
-				
 				if (SyncRand(1000) == 0) { // 0.1% chance per year that a (randomly generated) literary work will be created in a province
 					this->CreateWork(NULL, NULL, this->Provinces[i]);
 				}
@@ -706,7 +662,7 @@ void CGrandStrategyGame::DoTrade()
 				for (size_t k = 0; k < this->Factions[i][j]->OwnedProvinces.size(); ++k) {
 					int province_id = this->Factions[i][j]->OwnedProvinces[k];
 					for (int res = 0; res < MaxCosts; ++res) {
-						if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+						if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LeadershipCost) {
 							continue;
 						}
 							
@@ -754,7 +710,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < factions_by_prestige_count; ++i) {
 		if (factions_by_prestige[i]) {
 			for (int res = 0; res < MaxCosts; ++res) {
-				if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+				if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LeadershipCost) {
 					continue;
 				}
 				
@@ -794,7 +750,7 @@ void CGrandStrategyGame::DoTrade()
 						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
 						
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+							if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LeadershipCost) {
 								continue;
 							}
 							
@@ -819,7 +775,7 @@ void CGrandStrategyGame::DoTrade()
 	int remaining_wanted_trade[MaxCosts];
 	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+		if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LeadershipCost) {
 			continue;
 		}
 		
@@ -849,7 +805,7 @@ void CGrandStrategyGame::DoTrade()
 	//now restore the human player's trade settings
 	if (this->PlayerFaction != NULL) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (i == CopperCost || i == GoldCost || i == SilverCost || i == ResearchCost || i == PrestigeCost || GrandStrategyGame.IsFoodResource(i) || i == LeadershipCost) {
+			if (i == CopperCost || i == GoldCost || i == SilverCost || i == ResearchCost || i == PrestigeCost || i == LeadershipCost) {
 				continue;
 			}
 		
@@ -1067,12 +1023,7 @@ bool CGrandStrategyGame::IsPointOnMap(int x, int y)
 
 bool CGrandStrategyGame::IsTileResource(int resource)
 {
-	return resource == CopperCost || resource == GoldCost || resource == SilverCost || resource == WoodCost || resource == StoneCost || resource == GrainCost || resource == MushroomCost;
-}
-
-bool CGrandStrategyGame::IsFoodResource(int resource)
-{
-	return resource == GrainCost || resource == MushroomCost || resource == FishCost;
+	return resource == CopperCost || resource == GoldCost || resource == SilverCost || resource == WoodCost || resource == StoneCost;
 }
 
 bool CGrandStrategyGame::TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b)
@@ -1769,33 +1720,6 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 		if (!GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port) {
 			GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->SetPort(has_settlement_building);
 		}
-		
-		//allow the province to fish if it has a dock
-		this->ProductionCapacity[FishCost] = 0;
-		if (has_settlement_building) {
-			for (int sub_x = -1; sub_x <= 1; ++sub_x) { //add 1 capacity in fish production for every water tile adjacent to the settlement location
-				if ((this->SettlementLocation.x + sub_x) < 0 || (this->SettlementLocation.x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
-					continue;
-				}
-				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-					if ((this->SettlementLocation.y + sub_y) < 0 || (this->SettlementLocation.y + sub_y) >= GrandStrategyGame.WorldMapHeight) {
-						continue;
-					}
-					if (!(sub_x == 0 && sub_y == 0)) {
-						if (GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x + sub_x][this->SettlementLocation.y + sub_y]->IsWater()) {
-							this->ProductionCapacity[FishCost] += 1;
-						}
-					}
-				}
-			}
-				
-			for (int i = 0; i < MaxDirections; ++i) { //if the settlement location has a river, add one fish production capacity
-				if (GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->River[i] != -1) {
-					this->ProductionCapacity[FishCost] += 1;
-					break;
-				}
-			}
-		}
 	}
 }
 
@@ -2414,10 +2338,6 @@ int CGrandStrategyProvince::GetProductionEfficiencyModifier(int resource)
 	
 	modifier += this->ProductionEfficiencyModifier[resource];
 
-	if (!GrandStrategyGame.IsFoodResource(resource)) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
-		modifier += this->GetAdministrativeEfficiencyModifier();
-	}
-
 	return modifier;
 }
 
@@ -2466,37 +2386,9 @@ int CGrandStrategyProvince::GetLanguage()
 	return PlayerRaces.GetCivilizationLanguage(this->Civilization);
 }
 
-int CGrandStrategyProvince::GetFoodCapacity(bool subtract_non_food)
-{
-	int food_capacity = 0;
-	food_capacity += this->ProductionCapacity[GrainCost] * 100 * (100 + this->GetProductionEfficiencyModifier(GrainCost)) / 100;
-	food_capacity += this->ProductionCapacity[MushroomCost] * 100 * (100 + this->GetProductionEfficiencyModifier(MushroomCost)) / 100;
-	food_capacity += this->ProductionCapacity[FishCost] * 100 * (100 + this->GetProductionEfficiencyModifier(FishCost)) / 100;
-	
-	
-	if (subtract_non_food) {
-		food_capacity -= this->ProductionCapacity[GoldCost] * FoodConsumptionPerWorker;
-		food_capacity -= this->ProductionCapacity[SilverCost] * FoodConsumptionPerWorker;
-		food_capacity -= this->ProductionCapacity[CopperCost] * FoodConsumptionPerWorker;
-		food_capacity -= this->ProductionCapacity[WoodCost] * FoodConsumptionPerWorker;
-		food_capacity -= this->ProductionCapacity[StoneCost] * FoodConsumptionPerWorker;
-	}
-	
-	return food_capacity;
-}
-
 int CGrandStrategyProvince::GetDesirabilityRating()
 {
 	int desirability = 0;
-	
-	std::vector<int> food_resources;
-	food_resources.push_back(GrainCost);
-	food_resources.push_back(MushroomCost);
-	food_resources.push_back(FishCost);
-	
-	for (size_t i = 0; i < food_resources.size(); ++i) {
-		desirability += this->ProductionCapacity[food_resources[i]] * 100;
-	}
 	
 	std::vector<int> resources;
 	resources.push_back(CopperCost);
@@ -5868,13 +5760,6 @@ void FinalizeGrandStrategyInitialization()
 				}
 			}
 		}
-		
-		
-		if (province->Civilization != -1 && province->FoodConsumption > province->GetFoodCapacity()) { // remove workers if there are so many the province will starve
-			if (GrandStrategyGameLoading == false) {
-				province->ChangeUnitQuantity(province->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), ((province->GetFoodCapacity() - province->FoodConsumption) / FoodConsumptionPerWorker));
-			}
-		}
 	}
 
 	// calculate income, and set initial ruler (if none is preset) for factions
@@ -6231,17 +6116,6 @@ std::string GetProvinceOwner(std::string province_name)
 	}
 	
 	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Ident;
-}
-
-int GetProvinceFoodCapacity(std::string province_name, bool subtract_non_food)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id == -1) {
-		return false;
-	}
-	
-	return GrandStrategyGame.Provinces[province_id]->GetFoodCapacity(subtract_non_food);
 }
 
 void SetPlayerFaction(std::string civilization_name, std::string faction_name)

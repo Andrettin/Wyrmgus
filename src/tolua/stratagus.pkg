@@ -67,7 +67,7 @@ $]
 
 //Wyrmgus start
 //#define MaxCosts 7
-#define MaxCosts 20
+#define MaxCosts 17
 //Wyrmgus end
 #define FoodCost MaxCosts
 #define ScoreCost MaxCosts + 1

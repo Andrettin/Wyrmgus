@@ -180,7 +180,6 @@ public:
 	int GetRevoltRisk();
 	int GetClassUnitType(int class_id);
 	int GetLanguage();
-	int GetFoodCapacity(bool subtract_non_food = false);
 	int GetDesirabilityRating();
 	int GetConnectionTransportLevel(CGrandStrategyProvince *province);
 	std::string GetCulturalName();										/// Get the province's cultural name.
@@ -423,7 +422,6 @@ public:
 	void CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province);
 	bool IsPointOnMap(int x, int y);
 	bool IsTileResource(int resource);
-	bool IsFoodResource(int resource);
 	bool TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b);
 	CGrandStrategyHero *GetHero(std::string hero_full_name);
 
@@ -575,7 +573,6 @@ extern int GetProvinceAttackingUnitQuantity(std::string province_name, std::stri
 extern int GetProvinceHero(std::string province_name, std::string hero_full_name);
 extern int GetProvinceMilitaryScore(std::string province_name, bool attacker, bool count_defenders);
 extern std::string GetProvinceOwner(std::string province_name);
-extern int GetProvinceFoodCapacity(std::string province_name, bool subtract_non_food = false);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology);
 extern bool GetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name);
