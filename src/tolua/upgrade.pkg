@@ -23,7 +23,6 @@ class CUpgrade
 	//Wyrmgus end
 	int Costs[MaxCosts];
 	//Wyrmgus start
-	int GrandStrategyCosts[MaxCosts];
 	int GrandStrategyProductionModifier[MaxCosts];
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];
 	int RevoltRiskModifier;

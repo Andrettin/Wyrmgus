@@ -202,7 +202,6 @@ CUpgrade::CUpgrade(const std::string &ident) :
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
 	memset(this->ScaledCosts, 0, sizeof(this->ScaledCosts));
-	memset(this->GrandStrategyCosts, 0, sizeof(this->GrandStrategyCosts));
 	memset(this->GrandStrategyProductionModifier, 0, sizeof(this->GrandStrategyProductionModifier));
 	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
 	memset(this->ItemPrefix, 0, sizeof(this->ItemPrefix));
@@ -361,7 +360,6 @@ static int CclDefineUpgrade(lua_State *l)
 				for (int i = 0; i < MaxCosts; ++i) {
 					upgrade->Costs[i] = parent_upgrade->Costs[i];
 					upgrade->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
-					upgrade->GrandStrategyCosts[i] = parent_upgrade->GrandStrategyCosts[i];
 					upgrade->GrandStrategyProductionModifier[i] = parent_upgrade->GrandStrategyProductionModifier[i];
 					upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
 				}
@@ -504,20 +502,6 @@ static int CclDefineUpgrade(lua_State *l)
 				++j;
 				
 				upgrade->ScaledCosts[resource] = LuaToNumber(l, -1, j + 1);
-			}
-		} else if (!strcmp(value, "GrandStrategyCosts")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
-				if (resource == -1) {
-					LuaError(l, "Resource doesn't exist.");
-				}
-				++j;
-				
-				upgrade->GrandStrategyCosts[resource] = LuaToNumber(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "GrandStrategyProductionModifier")) {
 			if (!lua_istable(l, -1)) {

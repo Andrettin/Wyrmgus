@@ -253,7 +253,6 @@ public:
 	int   Costs[MaxCosts];            /// costs for the upgrade
 	int   ScaledCosts[MaxCosts];      /// scaled costs for the upgrade
 	//Wyrmgus start
-	int GrandStrategyCosts[MaxCosts];	/// Costs for the upgrade for grand strategy mode
 	int GrandStrategyProductionModifier[MaxCosts];	/// Production modifier (absolute increase) for a particular resource for grand strategy mode
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
 	int RevoltRiskModifier;			/// Revolt risk modifier (for the grand strategy mode)
