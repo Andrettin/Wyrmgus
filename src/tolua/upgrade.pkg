@@ -8,7 +8,6 @@ class CUpgrade
 	std::string Description;
 	std::string Quote;
 	std::string Background;
-	std::string ModifierGraphicFile;
 	bool Ability;
 	bool Weapon;
 	bool Shield;
@@ -23,9 +22,7 @@ class CUpgrade
 	//Wyrmgus end
 	int Costs[MaxCosts];
 	//Wyrmgus start
-	int GrandStrategyProductionModifier[MaxCosts];
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];
-	int RevoltRiskModifier;
 	int Work;
 	int Year;
 	//Wyrmgus end

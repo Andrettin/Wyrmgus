@@ -196,13 +196,12 @@ int CUnitStats::GetPrice() const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Class(-1), Civilization(-1), Faction(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), MagicLevel(0), Year(0), Author(NULL)
+	Ident(ident), ID(0), Class(-1), Civilization(-1), Faction(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), MagicLevel(0), Year(0), Author(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
 	memset(this->ScaledCosts, 0, sizeof(this->ScaledCosts));
-	memset(this->GrandStrategyProductionModifier, 0, sizeof(this->GrandStrategyProductionModifier));
 	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
 	memset(this->ItemPrefix, 0, sizeof(this->ItemPrefix));
 	memset(this->ItemSuffix, 0, sizeof(this->ItemSuffix));
@@ -355,20 +354,16 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->Background = parent_upgrade->Background;
 				upgrade->EffectsString = parent_upgrade->EffectsString;
 				upgrade->RequirementsString = parent_upgrade->RequirementsString;
-				upgrade->ModifierGraphicFile = parent_upgrade->ModifierGraphicFile;
 				upgrade->RequiresDeity = parent_upgrade->RequiresDeity;
 				for (int i = 0; i < MaxCosts; ++i) {
 					upgrade->Costs[i] = parent_upgrade->Costs[i];
 					upgrade->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
-					upgrade->GrandStrategyProductionModifier[i] = parent_upgrade->GrandStrategyProductionModifier[i];
 					upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
 				}
 				for (int i = 0; i < MaxItemClasses; ++i) {
 					upgrade->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
 					upgrade->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
 				}
-				upgrade->RevoltRiskModifier = parent_upgrade->RevoltRiskModifier;
-				upgrade->AdministrativeEfficiencyModifier = parent_upgrade->AdministrativeEfficiencyModifier;
 				upgrade->MagicLevel = parent_upgrade->MagicLevel;
 				upgrade->Ability = parent_upgrade->Ability;
 				upgrade->Weapon = parent_upgrade->Weapon;
@@ -431,12 +426,6 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->EffectsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "RequirementsString")) {
 			upgrade->RequirementsString = LuaToString(l, -1);
-		} else if (!strcmp(value, "ModifierGraphicFile")) {
-			upgrade->ModifierGraphicFile = LuaToString(l, -1);
-		} else if (!strcmp(value, "RevoltRiskModifier")) {
-			upgrade->RevoltRiskModifier = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "AdministrativeEfficiencyModifier")) {
-			upgrade->AdministrativeEfficiencyModifier = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MagicLevel")) {
 			upgrade->MagicLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Year")) {
@@ -502,20 +491,6 @@ static int CclDefineUpgrade(lua_State *l)
 				++j;
 				
 				upgrade->ScaledCosts[resource] = LuaToNumber(l, -1, j + 1);
-			}
-		} else if (!strcmp(value, "GrandStrategyProductionModifier")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
-				if (resource == -1) {
-					LuaError(l, "Resource doesn't exist.");
-				}
-				++j;
-				
-				upgrade->GrandStrategyProductionModifier[resource] = LuaToNumber(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "GrandStrategyProductionEfficiencyModifier")) {
 			if (!lua_istable(l, -1)) {
@@ -2676,34 +2651,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 		}
 		
 		if (grand_strategy) {
-			if (upgrade->AdministrativeEfficiencyModifier != 0) {
-				if (!first_element) {
-					upgrade_effects_string += padding_string;
-				} else {
-					first_element = false;
-				}
-
-				if (upgrade->AdministrativeEfficiencyModifier > 0) {
-					upgrade_effects_string += "+";
-				}
-				upgrade_effects_string += std::to_string((long long) upgrade->AdministrativeEfficiencyModifier) + "% "; 
-				upgrade_effects_string += "Administrative Efficiency Modifier";
-			}
-			
 			for (int i = 0; i < MaxCosts; ++i) {
-				if (upgrade->GrandStrategyProductionModifier[i] != 0) {
-					if (!first_element) {
-						upgrade_effects_string += padding_string;
-					} else {
-						first_element = false;
-					}
-
-					if (upgrade->GrandStrategyProductionModifier[i] > 0) {
-						upgrade_effects_string += "+";
-					}
-					upgrade_effects_string += std::to_string((long long) upgrade->GrandStrategyProductionModifier[i]) + " "; 
-					upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
-				}
 				if (upgrade->GrandStrategyProductionEfficiencyModifier[i] != 0) {
 					if (!first_element) {
 						upgrade_effects_string += padding_string;
@@ -2718,20 +2666,6 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 					upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
 					upgrade_effects_string += " Production Efficiency";
 				}
-			}
-			
-			if (upgrade->RevoltRiskModifier != 0) {
-				if (!first_element) {
-					upgrade_effects_string += padding_string;
-				} else {
-					first_element = false;
-				}
-
-				if (upgrade->RevoltRiskModifier > 0) {
-					upgrade_effects_string += "+";
-				}
-				upgrade_effects_string += std::to_string((long long) upgrade->RevoltRiskModifier) + "% "; 
-				upgrade_effects_string += "Revolt Risk";
 			}
 			
 			if (upgrade->Class != -1 && UpgradeClasses[upgrade->Class] == "writing") {

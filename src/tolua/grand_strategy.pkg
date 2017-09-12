@@ -35,7 +35,6 @@ extern void SetWorldMapTileCulturalSettlementName(int x, int y, std::string civi
 extern void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::string civilization_name, std::string faction_name, std::string cultural_name);
 extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string river_name);
 extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name);
-extern void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::string pathway_name);
 extern void SetWorldMapTilePort(int x, int y, bool has_port);
 extern void SetRiverCulturalName(std::string river_name, std::string civilization_name, std::string cultural_name);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);

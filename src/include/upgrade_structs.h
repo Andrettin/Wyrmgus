@@ -230,7 +230,6 @@ public:
 	std::string Background;			/// Encyclopedia entry for the upgrade
 	std::string EffectsString;		/// Effects string of the upgrade
 	std::string RequirementsString;	/// Requirements string of the upgrade
-	std::string ModifierGraphicFile;
 	bool Ability;
 	bool Weapon;
 	bool Shield;
@@ -253,10 +252,7 @@ public:
 	int   Costs[MaxCosts];            /// costs for the upgrade
 	int   ScaledCosts[MaxCosts];      /// scaled costs for the upgrade
 	//Wyrmgus start
-	int GrandStrategyProductionModifier[MaxCosts];	/// Production modifier (absolute increase) for a particular resource for grand strategy mode
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
-	int RevoltRiskModifier;			/// Revolt risk modifier (for the grand strategy mode)
-	int AdministrativeEfficiencyModifier;	/// Administrative efficiency modifier (for the grand strategy mode)
 	int MagicLevel;					/// Magic level of an affix
 	int Work;						/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year;						/// Year of publication, if is a literary work

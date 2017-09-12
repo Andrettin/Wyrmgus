@@ -78,17 +78,6 @@ enum Eras {
 	MaxEras
 };
 
-/**
-**  Indexes into pathway array.
-*/
-enum Pathways {
-	PathwayTrail,
-	PathwayRoad,
-	PathwayRailroad,
-	
-	MaxPathways
-};
-
 class CWorldMapTerrainType
 {
 public:
@@ -245,10 +234,6 @@ extern CProvince *GetProvince(std::string province_name);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern std::string GetEraNameById(int era);
 extern int GetEraIdByName(std::string era);
-extern std::string GetPathwayNameById(int pathway);
-extern int GetPathwayIdByName(std::string pathway);
-extern int GetPathwayTransportLevel(int pathway);
-extern int GetTransportLevelMaximumCapacity(int transport_level);
 extern void ProvinceCclRegister();
 
 //@}

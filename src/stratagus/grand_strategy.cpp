@@ -159,16 +159,8 @@ void CGrandStrategyGame::DrawInterface()
 				item_y += 1;
 			}
 			
-			std::string administrative_efficiency_string = "Administrative Efficiency: " + std::to_string((long long) 100 + this->SelectedProvince->GetAdministrativeEfficiencyModifier()) + "%";
-			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(administrative_efficiency_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), administrative_efficiency_string);
-			item_y += 1;
-			
 			std::string population_string = "Population: " + std::to_string((long long) this->SelectedProvince->GetPopulation());
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(population_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), population_string);
-			item_y += 1;
-		} else if (GrandStrategyInterfaceState == "barracks") {
-			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) this->SelectedProvince->GetRevoltRisk()) + "%";
-			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
 			item_y += 1;
 		} else if (GrandStrategyInterfaceState == "Ruler") {
 			interface_state_name = GrandStrategyInterfaceState;
@@ -283,17 +275,6 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
 			tile_tooltip += ")";
 		}
-		if (tile->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
-			tile_tooltip += " (COST_";
-			tile_tooltip += std::to_string((long long) res);
-			tile_tooltip += " ";
-			tile_tooltip += std::to_string((long long) tile->GetResourceIncome());
-			if (tile->GetResourceIncome() != tile->GetResourceIncome(true)) {
-				tile_tooltip += "/";
-				tile_tooltip += std::to_string((long long) tile->GetResourceIncome(true));
-			}
-			tile_tooltip += ")";
-		}
 	} else if (tile->Terrain != -1) {
 		if (!tile->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
 			tile_tooltip += tile->GetCulturalName();
@@ -338,32 +319,6 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		}
 	}
 				
-	if (province != NULL && !province->Water) {
-		int tooltip_pathways[MaxDirections];
-		memset(tooltip_pathways, -1, sizeof(tooltip_pathways));
-		int tooltip_pathway_count = 0;
-		for (int i = 0; i < MaxDirections; ++i) {
-			if (tile->Pathway[i] != -1) {
-				bool already_in_tooltip = false;
-				for (int j = 0; j < MaxDirections; ++j) {
-					if (tooltip_pathways[j] == -1) { //reached blank spot, no need to continue the loop
-						break;
-					}
-
-					if (tooltip_pathways[j] == tile->Pathway[i]) {
-						already_in_tooltip = true;
-						break;
-					}
-				}
-				if (!already_in_tooltip) {
-					tooltip_pathways[tooltip_pathway_count] = tile->Pathway[i];
-					tooltip_pathway_count += 1;
-					tile_tooltip += " (" + CapitalizeString(GetPathwayNameById(tile->Pathway[i])) + ")";
-				}
-			}
-		}
-	}
-
 	if (tile->Port && province != NULL && province->SettlementLocation.x == x && province->SettlementLocation.y == y) { // ports only possible on settlement locations, at least for now
 		tile_tooltip += " (";
 		tile_tooltip += "Dock";
@@ -385,11 +340,6 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	tile_tooltip += std::to_string((long long) y);
 	tile_tooltip += ")";
 	
-	if (province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
-		tile_tooltip += "\nTransport Capacity: ";
-		tile_tooltip += std::to_string((long long) GetTransportLevelMaximumCapacity(tile->TransportLevel));
-	}
-
 	if (!Preference.NoStatusLineTooltips) {
 		CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY, tile_tooltip);
 	}
@@ -400,14 +350,6 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 
 void CGrandStrategyGame::DoTurn()
 {
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (this->Factions[i][j]->IsAlive() && this->Factions[i][j] != this->PlayerFaction) {
-				this->Factions[i][j]->AiDoTurn();
-			}
-		}
-	}
-
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (this->Factions[i][j]->IsAlive()) {
@@ -458,46 +400,6 @@ void CGrandStrategyGame::DoTurn()
 			}
 				
 			if (this->Provinces[i]->Owner != NULL) {
-				//check revolt risk and potentially trigger a revolt
-				if (
-					this->Provinces[i]->GetRevoltRisk() > 0
-					&& SyncRand(100) < this->Provinces[i]->GetRevoltRisk()
-					&& this->Provinces[i]->AttackedBy == NULL
-					&& this->Provinces[i]->TotalWorkers > 0
-				) { //if a revolt is triggered this turn (a revolt can only happen if the province is not being attacked that turn, and the quantity of revolting units is based on the quantity of workers in the province)
-					int possible_revolters[FactionMax];
-					int possible_revolter_count = 0;
-					for (size_t j = 0; j < this->Provinces[i]->Claims.size(); ++j) {
-						if (
-							this->Provinces[i]->Claims[j]->Civilization == this->Provinces[i]->Civilization
-							&& PlayerRaces.Factions[this->Provinces[i]->Civilization][this->Provinces[i]->Claims[j]->Faction]->Type == PlayerRaces.Factions[this->Provinces[i]->Owner->Civilization][this->Provinces[i]->Owner->Faction]->Type
-							&& !(this->Provinces[i]->Claims[j] == this->Provinces[i]->Owner)
-							&& PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization][GrandStrategyGame.Provinces[i]->Claims[j]->Faction]->Ident != PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Ident // they can't have the same name (this is needed because some of the Lua code identifies factions by name)
-						) { //if faction which has a claim on this province has the same civilization as the province, and if it is of the same faction type as the province's owner
-							possible_revolters[possible_revolter_count] = this->Provinces[i]->Claims[j]->Faction;
-							possible_revolter_count += 1;
-						}
-					}
-					if (possible_revolter_count > 0) {
-						int revolter_faction = possible_revolters[SyncRand(possible_revolter_count)];
-						this->Provinces[i]->AttackedBy = GrandStrategyGame.Factions[this->Provinces[i]->Civilization][revolter_faction];
-							
-						int militia_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("militia"));
-						int spearman_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("spearman"));
-						int infantry_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"));
-							
-						if (militia_id != -1 && this->Provinces[i]->TotalWorkers >= 2) {
-							this->Provinces[i]->SetAttackingUnitQuantity(militia_id, (this->Provinces[i]->TotalWorkers / 2) + (SyncRand(this->Provinces[i]->TotalWorkers / 2)));
-						} else if (spearman_id != -1 && this->Provinces[i]->TotalWorkers >= 4) { //if the province's civilization doesn't have militia units, use spearmen instead (but with 2/3rds the quantity)
-							this->Provinces[i]->SetAttackingUnitQuantity(infantry_id, (this->Provinces[i]->TotalWorkers / 3) + (SyncRand(this->Provinces[i]->TotalWorkers / 3)));
-						} else if (infantry_id != -1 && this->Provinces[i]->TotalWorkers >= 4) { //if the province's civilization doesn't have militia or spearman units, use infantry instead (but with half the quantity)
-							this->Provinces[i]->SetAttackingUnitQuantity(infantry_id, (this->Provinces[i]->TotalWorkers / 4) + (SyncRand(this->Provinces[i]->TotalWorkers / 4)));
-						} else {
-							this->Provinces[i]->AttackedBy = NULL; //no rebels, cancel attack
-						}
-					}
-				}
-					
 				if (!this->Provinces[i]->HasFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction) && SyncRand(100) < 1) { // 1% chance the owner of this province will get a claim on it
 					this->Provinces[i]->AddFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction);
 				}
@@ -513,16 +415,6 @@ void CGrandStrategyGame::DoTurn()
 		}
 		this->Provinces[i]->Movement = false; //after processing the turn, always set the movement to false
 	}
-	
-	// build pathways
-	for (std::map<std::pair<int, int>, std::pair<int, int>>::iterator iterator = this->CurrentPathwayConstructions.begin(); iterator != this->CurrentPathwayConstructions.end(); ++iterator) {
-		int x = iterator->first.first;
-		int y = iterator->first.second;
-		int direction = iterator->second.second;
-		
-		this->WorldMapTiles[x][y]->SetPathway(iterator->second.first, direction);
-	}
-	this->CurrentPathwayConstructions.clear();
 	
 	//research technologies
 	for (int i = 0; i < MAX_RACES; ++i) {
@@ -891,18 +783,6 @@ void CGrandStrategyGame::SetSelectedProvince(CGrandStrategyProvince *province)
 				total_attacking_units += iterator->second;
 			}
 			
-//			if (this->SelectedUnits.size() > 0 && this->SelectedProvince->GetConnectionTransportLevel(province) < 2 && total_attacking_units > 8) {
-			if (false) {
-				std::string dialog_text = "My lord, we cannot attack a province with more than 8 regiments if there are no roads connecting to it!";
-				CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Too Many Regiments\", \"" + dialog_text + "\") end;");
-			} else {
-				for (std::map<int, int>::iterator iterator = this->SelectedUnits.begin(); iterator != this->SelectedUnits.end(); ++iterator) {
-					province->AttackedBy = this->PlayerFaction;
-					province->ChangeAttackingUnitQuantity(iterator->first, iterator->second);
-					this->SelectedProvince->ChangeUnitQuantity(iterator->first, - iterator->second);
-				}
-			}
-			
 			if (!SelectedHero.empty()) {
 				province->AttackedBy = this->PlayerFaction;
 				province->SetHero(SelectedHero, 3);
@@ -930,7 +810,6 @@ void CGrandStrategyGame::SetSelectedProvince(CGrandStrategyProvince *province)
 		SelectedHero = "";
 		this->SelectedUnits.clear();
 	}
-	CclCommand("DrawGrandStrategyInterface();");
 }
 
 void CGrandStrategyGame::PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource)
@@ -1059,43 +938,6 @@ void GrandStrategyWorldMapTile::SetResourceProspected(int resource_id, bool disc
 	}
 }
 
-void GrandStrategyWorldMapTile::SetPathway(int pathway, int direction, bool secondary_setting)
-{
-	this->Pathway[direction] = pathway;
-	if (GrandStrategyGameInitialized) {
-		this->LinkToTransportNetwork(direction);
-	}
-
-	if (this->Port && this->Province != NULL && this->Province->Owner != NULL && GrandStrategyGameInitialized) {
-		this->Province->Owner->CalculateProvincesReachableThroughWater(); // to apply the increased transport levels if has a (now-connected) port
-	}
-	
-	Vec2i offset = GetDirectionOffset(direction);
-
-	if (GrandStrategyGame.IsPointOnMap(this->Position.x + offset.x, this->Position.y + offset.y)) {
-		if (!secondary_setting) {
-			GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->SetPathway(pathway, GetReverseDirection(direction), true);
-		}
-	}
-}
-
-void GrandStrategyWorldMapTile::BuildPathway(int pathway, int direction)
-{
-	int change;
-	if (pathway != -1 && direction != -1) {
-		GrandStrategyGame.CurrentPathwayConstructions[std::pair<int,int>(this->Position.x, this->Position.y)] = std::pair<int,int>(pathway, direction);
-		change = 1;
-	} else {
-		GrandStrategyGame.CurrentPathwayConstructions.erase(std::pair<int,int>(this->Position.x, this->Position.y));
-		change = -1;
-	}
-	
-	if (pathway == PathwayRoad) {
-		this->Province->Owner->Resources[CopperCost] -= 200 * change;
-		this->Province->Owner->Resources[WoodCost] -= 200 * change;
-	}
-}
-
 void GrandStrategyWorldMapTile::SetPort(bool has_port)
 {
 	if (this->Port == has_port) {
@@ -1114,138 +956,6 @@ void GrandStrategyWorldMapTile::SetPort(bool has_port)
 			}
 		}
 	}
-	
-	if (this->Port && this->Province != NULL && this->Province->Owner != NULL && GrandStrategyGameInitialized) {
-		this->Province->Owner->CalculateProvincesReachableThroughWater(); // to apply the increased transport levels due to ports
-	}
-}
-
-void GrandStrategyWorldMapTile::SetTransportLevel(int transport_level)
-{
-	if (this->TransportLevel < transport_level) {
-		this->TransportLevel = transport_level;
-		if (this->Resource != -1 && this->ResourceProspected) {
-			this->Province->CalculateIncome(this->Resource);
-		}
-	}
-}
-
-void GrandStrategyWorldMapTile::LinkToTransportNetwork(int direction_from)
-{
-	if (this->Province == NULL || this->Province->Owner == NULL) {
-		return;
-	}
-	
-	// first, link the tile itself
-	if ((this->Province == this->Province->Owner->Capital || this->Port) && this->Position == this->Province->SettlementLocation) {
-		this->SetTransportLevel(2);
-	} else if (direction_from != -1 && this->Pathway[direction_from] != -1) {
-		Vec2i offset = GetDirectionOffset(direction_from);
-		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y];
-			
-		this->SetTransportLevel(std::min(GetPathwayTransportLevel(this->Pathway[direction_from]), tile->TransportLevel));
-	} else {
-		return;
-	}
-	
-	for (int i = 0; i < MaxDirections; ++i) {
-		Vec2i offset = GetDirectionOffset(i);
-		
-		if (!GrandStrategyGame.IsPointOnMap(this->Position.x + offset.x, this->Position.y + offset.y)) {
-			continue;
-		}
-		
-		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y];
-		
-		if (tile->Province == NULL || this->Pathway[i] == -1) {
-			continue;
-		}
-		
-		if (this->Province != tile->Province) {
-			this->Province->SetBorderProvinceConnectionTransportLevel(tile->Province, GetPathwayTransportLevel(this->Pathway[i]));
-		}
-		
-		if (
-			tile->Province->Owner != this->Province->Owner
-			|| tile->TransportLevel > 1 //don't link the tile to the transport network if it has already been linked
-		) {
-			continue;
-		}
-		
-		tile->LinkToTransportNetwork(GetReverseDirection(i));
-	}
-}
-
-bool GrandStrategyWorldMapTile::AiBuildPathway(int pathway, bool secondary_setting)
-{
-	if (GrandStrategyGame.CurrentPathwayConstructions.find(std::pair<int,int>(this->Position.x, this->Position.y)) != GrandStrategyGame.CurrentPathwayConstructions.end()) { // already building a pathway here
-		return true;
-	}	
-	
-	std::vector<int> directions; // give priority to non-diagonal directions
-	directions.push_back(North);
-	directions.push_back(East);
-	directions.push_back(South);
-	directions.push_back(West);
-	directions.push_back(Northeast);
-	directions.push_back(Southeast);
-	directions.push_back(Southwest);
-	directions.push_back(Northwest);
-		
-	for (size_t i = 0; i < directions.size(); ++i) {
-		if (this->CanBuildPathway(pathway, directions[i], true)) {
-			this->BuildPathway(pathway, directions[i]);
-			return true;
-		}
-	}
-	
-	// if couldn't build a pathway in the tile itself, try to find the closest connected tile, and build a pathway from there in our direction
-	if (!secondary_setting) {
-		std::vector<GrandStrategyWorldMapTile *> all_checked_tiles;
-		std::vector<GrandStrategyWorldMapTile *> currently_checked_tiles;
-		std::vector<GrandStrategyWorldMapTile *> new_checked_tiles;
-		all_checked_tiles.push_back(this);
-		currently_checked_tiles.push_back(this);
-		
-		while (currently_checked_tiles.size() > 0) {
-			for (size_t i = 0; i < currently_checked_tiles.size(); ++i) {
-				Vec2i pos = currently_checked_tiles[i]->Position;
-				
-				for (size_t j = 0; j < directions.size(); ++j) {
-					Vec2i offset = GetDirectionOffset(directions[j]);
-					
-					if (!GrandStrategyGame.IsPointOnMap(pos.x + offset.x, pos.y + offset.y)) {
-						continue;
-					}
-					
-					GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[pos.x + offset.x][pos.y + offset.y];
-					
-					if (
-						tile->Province == NULL
-						|| tile->Province->Owner != this->Province->Owner
-						|| std::find(all_checked_tiles.begin(), all_checked_tiles.end(), tile) != all_checked_tiles.end() //don't ask the tile to build a pathway if that was already done before
-					) {
-						continue;
-					}
-					
-					if (tile->AiBuildPathway(pathway, true)) {
-						return true;
-					} else {
-						all_checked_tiles.push_back(tile);
-						new_checked_tiles.push_back(tile);
-					}
-					
-				}
-			}
-			currently_checked_tiles.clear();
-			for (size_t i = 0; i < new_checked_tiles.size(); ++i) {
-				currently_checked_tiles.push_back(new_checked_tiles[i]);
-			}
-			new_checked_tiles.clear();
-		}
-	}
-	
-	return false;
 }
 
 /**
@@ -1271,22 +981,6 @@ std::string GrandStrategyWorldMapTile::GenerateSettlementName(int civilization, 
 	return "";
 }
 
-int GrandStrategyWorldMapTile::GetResourceIncome(bool ignore_transport_level)
-{
-	int income = 0;
-	
-	if (this->Resource != -1 && this->ResourceProspected && this->Worked) {
-		income += 100;
-		income *= 100 + this->Province->GetProductionEfficiencyModifier(this->Resource);
-		income /= 100;
-		if (!ignore_transport_level && income > GetTransportLevelMaximumCapacity(this->TransportLevel)) {
-			income = GetTransportLevelMaximumCapacity(this->TransportLevel);
-		}
-	}
-	
-	return income;
-}
-
 bool GrandStrategyWorldMapTile::IsWater()
 {
 	if (this->Terrain != -1) {
@@ -1304,38 +998,6 @@ bool GrandStrategyWorldMapTile::HasResource(int resource, bool ignore_prospectio
 		return true;
 	}
 	return false;
-}
-
-bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction, bool check_costs)
-{
-	if (!this->Province->Owner->CanBuildPathway(pathway, check_costs)) {
-		return false;
-	}
-	
-	if (this->Pathway[direction] >= pathway) {
-		return false;
-	}
-	
-	if (GrandStrategyGame.CurrentPathwayConstructions.find(std::pair<int,int>(this->Position.x, this->Position.y)) != GrandStrategyGame.CurrentPathwayConstructions.end()) {
-		return false;
-	}
-	
-	Vec2i offset = GetDirectionOffset(direction);
-			
-	if (
-		!GrandStrategyGame.IsPointOnMap(this->Position.x + offset.x, this->Position.y + offset.y)
-		|| GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Terrain == -1
-		|| GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Province->Water
-		|| GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Province->Owner != this->Province->Owner
-	) {
-		return false;
-	}
-	
-	if (this->TransportLevel < GetPathwayTransportLevel(pathway) && GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->TransportLevel < GetPathwayTransportLevel(pathway)) { // can only build pathways if connected to the capital
-		return false;
-	}
-	
-	return true;
 }
 
 /**
@@ -1575,12 +1237,6 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	}
 	
 	if (GrandStrategyGameInitialized) {
-		if (this->Owner != NULL) {
-			this->Owner->CalculateTileTransportLevels();
-		}
-		if (old_owner != NULL && old_owner->IsAlive()) {
-			old_owner->CalculateTileTransportLevels();
-		}
 		this->CalculateIncomes();
 	}
 }
@@ -1754,11 +1410,6 @@ void CGrandStrategyProvince::SetModifier(CUpgrade *modifier, bool has_modifier)
 	int change = has_modifier ? 1 : -1;
 
 	for (int i = 0; i < MaxCosts; ++i) {
-		if (modifier->GrandStrategyProductionModifier[i] != 0) {
-			if (this->Owner != NULL) {
-				this->CalculateIncome(i);
-			}
-		}
 		if (modifier->GrandStrategyProductionEfficiencyModifier[i] != 0) {
 			this->ProductionEfficiencyModifier[i] += modifier->GrandStrategyProductionEfficiencyModifier[i] * change;
 			if (this->Owner != NULL) {
@@ -1935,12 +1586,6 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 	
 	int income = 0;
 	
-	for (size_t i = 0; i < this->Modifiers.size(); ++i) {
-		if (this->Modifiers[i]->GrandStrategyProductionModifier[resource] != 0) {
-			income += this->Modifiers[i]->GrandStrategyProductionModifier[resource];
-		}
-	}	
-	
 	if (resource == ResearchCost) {
 		// faction's research is 10 if all provinces have town halls, lumber mills and smithies
 		if (this->HasBuildingClass("town-hall")) {
@@ -1967,12 +1612,6 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 		income /= 100;
 	} else {
 		if (GrandStrategyGame.IsTileResource(resource)) {
-			for (size_t i = 0; i < this->ResourceTiles[resource].size(); ++i) {
-				int x = this->ResourceTiles[resource][i].x;
-				int y = this->ResourceTiles[resource][i].y;
-				
-				income += GrandStrategyGame.WorldMapTiles[x][y]->GetResourceIncome();
-			}
 		} else {
 			if (this->ProductionCapacityFulfilled[resource] > 0) {
 				income += 100 * this->ProductionCapacityFulfilled[resource];
@@ -2103,13 +1742,6 @@ void CGrandStrategyProvince::GovernorSuccession()
 	this->Governor = NULL;
 }
 
-void CGrandStrategyProvince::SetBorderProvinceConnectionTransportLevel(CGrandStrategyProvince *province, int transport_level)
-{
-	if (this->GetConnectionTransportLevel(province) < transport_level) {
-		this->BorderProvinceConnectionTransportLevel[province] = transport_level;
-	}
-}
-
 bool CGrandStrategyProvince::HasBuildingClass(std::string building_class_name)
 {
 	if (this->Civilization == -1 || building_class_name.empty()) {
@@ -2140,16 +1772,6 @@ bool CGrandStrategyProvince::BordersModifier(CUpgrade *modifier)
 	
 	for (size_t i = 0; i < this->BorderProvinces.size(); ++i) {
 		CGrandStrategyProvince *border_province = this->BorderProvinces[i];
-		if (border_province->HasModifier(modifier)) {
-			return true;
-		}
-	}
-	
-	for (size_t i = 0; i < this->LandProvincesReachableThroughWater.size(); ++i) {
-		CGrandStrategyProvince *border_province = this->LandProvincesReachableThroughWater[i];
-		if (this->HasBuildingClass("dock") == false || border_province->HasBuildingClass("dock") == false) {
-			continue;
-		}
 		if (border_province->HasModifier(modifier)) {
 			return true;
 		}
@@ -2303,31 +1925,6 @@ int CGrandStrategyProvince::GetResourceDemand(int resource)
 	return quantity;
 }
 
-int CGrandStrategyProvince::GetAdministrativeEfficiencyModifier()
-{
-	int modifier = 0;
-	
-	if (this->Civilization != -1 && this->Owner != NULL) {
-		modifier += this->Civilization == this->Owner->Civilization ? 0 : -25; //if the province is of a different culture than its owner, it gets a cultural penalty to its administrative efficiency modifier
-	}
-	
-	if (this->Owner != NULL) {
-		modifier += this->Owner->GetAdministrativeEfficiencyModifier();
-		
-		if (this->Governor != NULL) {
-			modifier += this->Governor->GetAdministrativeEfficiencyModifier();
-		}
-	}
-	
-	for (size_t i = 0; i < this->Modifiers.size(); ++i) {
-		if (this->Modifiers[i]->AdministrativeEfficiencyModifier != 0) {
-			modifier += this->Modifiers[i]->AdministrativeEfficiencyModifier;
-		}
-	}
-	
-	return modifier;
-}
-
 int CGrandStrategyProvince::GetProductionEfficiencyModifier(int resource)
 {
 	int modifier = 0;
@@ -2339,37 +1936,6 @@ int CGrandStrategyProvince::GetProductionEfficiencyModifier(int resource)
 	modifier += this->ProductionEfficiencyModifier[resource];
 
 	return modifier;
-}
-
-int CGrandStrategyProvince::GetRevoltRisk()
-{
-	int revolt_risk = 0;
-	
-	if (this->Civilization != -1 && this->Owner != NULL) {
-		if (this->Civilization != this->Owner->Civilization) {
-			revolt_risk += 3; //if the province is of a different culture than its owner, it gets plus 3% revolt risk
-		}
-		
-		if (!this->HasFactionClaim(this->Owner->Civilization, this->Owner->Faction)) {
-			revolt_risk += 2; //if the owner does not have a claim to the province, it gets plus 2% revolt risk
-		}
-		
-		revolt_risk += this->Owner->GetRevoltRiskModifier();
-		
-		if (this->Governor != NULL) {
-			revolt_risk += this->Governor->GetRevoltRiskModifier();
-		}
-	}
-	
-	for (size_t i = 0; i < this->Modifiers.size(); ++i) {
-		if (this->Modifiers[i]->RevoltRiskModifier != 0) {
-			revolt_risk += this->Modifiers[i]->RevoltRiskModifier;
-		}
-	}
-	
-	revolt_risk = std::max(0, revolt_risk);
-	
-	return revolt_risk;
 }
 
 int CGrandStrategyProvince::GetClassUnitType(int class_id)
@@ -2406,15 +1972,6 @@ int CGrandStrategyProvince::GetDesirabilityRating()
 	}
 	
 	return desirability;
-}
-
-int CGrandStrategyProvince::GetConnectionTransportLevel(CGrandStrategyProvince *province)
-{
-	if (this->BorderProvinceConnectionTransportLevel.find(province) != this->BorderProvinceConnectionTransportLevel.end()) {
-		return BorderProvinceConnectionTransportLevel[province];
-	}
-	
-	return 0;
 }
 
 /**
@@ -2716,42 +2273,6 @@ CGrandStrategyHero *CGrandStrategyProvince::GetRandomAuthor()
 	}
 }
 
-void CGrandStrategyFaction::AiDoTurn()
-{
-	// if this faction has enough resources to build a road, check if any resource tiles lack roads, and if so try to build roads in them
-	for (size_t i = 0; i < this->OwnedProvinces.size() && this->CanBuildPathway(PathwayRoad, true); ++i) {
-		if (!this->CanBuildPathway(PathwayRoad, true)) {
-			break;
-		}
-		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[this->OwnedProvinces[i]];
-		
-		if (!province->HasBuildingClass("town-hall")) { // don't build roads in the province if it doesn't even have a settlement yet
-			continue;
-		}
-		
-		GrandStrategyWorldMapTile *settlement_tile = GrandStrategyGame.WorldMapTiles[province->SettlementLocation.x][province->SettlementLocation.y];
-		if (settlement_tile->TransportLevel < GetPathwayTransportLevel(PathwayRoad)) {
-			settlement_tile->AiBuildPathway(PathwayRoad); // first link the province's settlement to the transport network, and only afterwards link the resource tiles in the province
-		} else {
-			for (size_t j = 0; j < province->Tiles.size() && this->CanBuildPathway(PathwayRoad, true); ++j) {
-				if (!this->CanBuildPathway(PathwayRoad, true)) {
-					break;
-				}
-				int x = province->Tiles[j].x;
-				int y = province->Tiles[j].y;
-				GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[x][y];
-					
-				if (!tile->Worked || tile->TransportLevel >= GetPathwayTransportLevel(PathwayRoad)) {
-					continue;
-				}
-
-				tile->AiBuildPathway(PathwayRoad);
-			}
-		}
-	}
-
-}
-
 void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting)
 {
 	if (this->Technologies[upgrade_id] == has_technology) {
@@ -2817,57 +2338,6 @@ void CGrandStrategyFaction::CalculateIncomes()
 {
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->CalculateIncome(i);
-	}
-}
-
-void CGrandStrategyFaction::CalculateTileTransportLevels()
-{
-	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
-		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[this->OwnedProvinces[i]];
-		for (size_t j = 0; j < province->Tiles.size(); ++j) {
-			GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[province->Tiles[j].x][province->Tiles[j].y];
-			tile->TransportLevel = 1;
-		}
-		province->BorderProvinceConnectionTransportLevel.clear();
-	}
-	
-	this->GetCapitalSettlement()->LinkToTransportNetwork();
-	
-	this->CalculateProvincesReachableThroughWater();
-}
-
-void CGrandStrategyFaction::CalculateProvincesReachableThroughWater()
-{
-	this->ProvincesLinkedToCapital.clear();
-	this->ProvincesReachableThroughWater.clear();
-
-	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
-		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[this->OwnedProvinces[i]];
-		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[province->SettlementLocation.x][province->SettlementLocation.y];
-		if (tile->TransportLevel >= 2) {
-			this->ProvincesLinkedToCapital.push_back(province);
-		}
-	}
-	
-	for (size_t i = 0; i < this->ProvincesLinkedToCapital.size(); ++i) {
-		if (!this->ProvincesLinkedToCapital[i]->HasBuildingClass("dock")) {
-			continue;
-		}
-		
-		for (size_t j = 0; j < this->ProvincesLinkedToCapital[i]->LandProvincesReachableThroughWater.size(); ++j) {
-			if (this->ProvincesLinkedToCapital[i]->LandProvincesReachableThroughWater[j]->Owner == this && std::find(this->ProvincesReachableThroughWater.begin(), this->ProvincesReachableThroughWater.end(), this->ProvincesLinkedToCapital[i]->LandProvincesReachableThroughWater[j]) == this->ProvincesReachableThroughWater.end()) {
-				this->ProvincesReachableThroughWater.push_back(this->ProvincesLinkedToCapital[i]->LandProvincesReachableThroughWater[j]);
-			}
-		}
-	}
-	
-	// link ports to the network
-	for (size_t i = 0; i < this->ProvincesReachableThroughWater.size(); ++i) {
-		CGrandStrategyProvince *province = this->ProvincesReachableThroughWater[i];
-		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[province->SettlementLocation.x][province->SettlementLocation.y];
-		if (tile->Port) {
-			tile->LinkToTransportNetwork();
-		}
 	}
 }
 
@@ -3037,10 +2507,6 @@ void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int fac
 void CGrandStrategyFaction::SetCapital(CGrandStrategyProvince *province)
 {
 	this->Capital = province;
-
-	if (this->Capital != NULL) {
-		this->CalculateTileTransportLevels();
-	}
 }
 
 void CGrandStrategyFaction::SetDiplomacyState(CGrandStrategyFaction *faction, int diplomacy_state_id)
@@ -3311,62 +2777,9 @@ bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province
 	return true;
 }
 
-bool CGrandStrategyFaction::CanBuildPathway(int pathway, bool check_costs)
-{
-	if (pathway == PathwayRoad && !this->HasTechnologyClass("masonry")) { // only factions that know Masonry can build roads
-		return false;
-	}
-	
-	if (check_costs) {
-		if (pathway == PathwayRoad && (this->Resources[CopperCost] < 200 || this->Resources[WoodCost] < 200)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-int CGrandStrategyFaction::GetAdministrativeEfficiencyModifier()
-{
-	int modifier = 0;
-	
-	if (this->Ministers[CharacterTitleHeadOfState] != NULL) {
-		modifier += this->Ministers[CharacterTitleHeadOfState]->GetAdministrativeEfficiencyModifier();
-	}
-	
-//	if (this->Ministers[CharacterTitleInteriorMinister] != NULL) {
-//		modifier += this->Ministers[CharacterTitleInteriorMinister]->GetAdministrativeEfficiencyModifier();
-//	}
-	
-	if (this->Ministers[CharacterTitleFinanceMinister] != NULL) {
-		modifier += this->Ministers[CharacterTitleFinanceMinister]->GetAdministrativeEfficiencyModifier();
-	}
-	
-	return modifier;
-}
-
 int CGrandStrategyFaction::GetProductionEfficiencyModifier(int resource)
 {
 	int modifier = this->ProductionEfficiencyModifier[resource];
-	
-	return modifier;
-}
-
-int CGrandStrategyFaction::GetRevoltRiskModifier()
-{
-	int modifier = 0;
-	
-//	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe) {
-//		modifier += this->OwnedProvinces.size() - 1; // tribal factions get +1% revolt risk per province owned beyond the first one
-//	}
-	
-	if (this->Ministers[CharacterTitleHeadOfState] != NULL) {
-		modifier += this->Ministers[CharacterTitleHeadOfState]->GetRevoltRiskModifier();
-	}
-	
-	if (this->Ministers[CharacterTitleInteriorMinister] != NULL) {
-		modifier += this->Ministers[CharacterTitleInteriorMinister]->GetRevoltRiskModifier();
-	}
 	
 	return modifier;
 }
@@ -3637,24 +3050,6 @@ bool CGrandStrategyHero::IsEligibleForTitle(int title)
 	return true;
 }
 
-int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
-{
-	int modifier = 0;
-	
-	modifier += this->GetAttributeModifier(IntelligenceAttribute) * 5 / 2; //+2.5% administrative efficiency for every intelligence point above 10, and -2.5% for every point below 10
-	
-	return modifier;
-}
-
-int CGrandStrategyHero::GetRevoltRiskModifier()
-{
-	int modifier = 0;
-	
-	modifier += this->GetAttributeModifier(CharismaAttribute) * -1 / 2; //-0.5% revolt risk per charisma modifier
-	
-	return modifier;
-}
-
 int CGrandStrategyHero::GetTroopCostModifier()
 {
 	int modifier = 0;
@@ -3707,37 +3102,6 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
 	std::string minister_effects_string;
 	
 	bool first = true;
-	
-//	if (title == CharacterTitleHeadOfState || title == CharacterTitleInteriorMinister) {
-	if (title == CharacterTitleHeadOfState || title == CharacterTitleFinanceMinister || title == CharacterTitleGovernor) { // make it be affected by the finance minister instead of the interior one for now, since the primary effect of the administrative efficiency modifier at the moment is to improve production
-		int modifier = this->GetAdministrativeEfficiencyModifier();
-		if (modifier != 0) {
-			if (!first) {
-				minister_effects_string += ", ";
-			} else {
-				first = false;
-			}
-			if (modifier > 0) {
-				minister_effects_string += "+";
-			}
-			minister_effects_string += std::to_string((long long) modifier) + "% Administrative Efficiency";
-		}
-	}
-	
-	if (title == CharacterTitleHeadOfState || title == CharacterTitleInteriorMinister || title == CharacterTitleGovernor) {
-		int modifier = this->GetRevoltRiskModifier();
-		if (modifier != 0) {
-			if (!first) {
-				minister_effects_string += ", ";
-			} else {
-				first = false;
-			}
-			if (modifier > 0) {
-				minister_effects_string += "+";
-			}
-			minister_effects_string += std::to_string((long long) modifier) + "% Revolt Risk";
-		}
-	}
 	
 	if (title == CharacterTitleHeadOfState || title == CharacterTitleWarMinister) {
 		int modifier = this->GetTroopCostModifier();
@@ -4301,31 +3665,6 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 	} else {
 		fprintf(stderr, "Error: Wrong direction set for river.\n");
 	}
-}
-
-/**
-**  Set pathway data for a world map tile.
-*/
-void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::string pathway_name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-
-	int direction = GetDirectionIdByName(direction_name);
-	
-	int pathway_id = GetPathwayIdByName(pathway_name);
-	
-	if (pathway_name == "none") {
-		pathway_id = -1;
-	} else if (pathway_id == -1) {
-		fprintf(stderr, "Pathway \"%s\" does not exist.\n", pathway_name.c_str());
-		return;
-	}
-	
-	if (pathway_id == PathwayTrail) {
-		pathway_id = PathwayRoad; //transform trails into roads for now, while there aren't proper graphics for the trails
-	}
-	
-	GrandStrategyGame.WorldMapTiles[x][y]->SetPathway(pathway_id, direction);
 }
 
 void SetWorldMapTilePort(int x, int y, bool has_port)
@@ -5302,18 +4641,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 				GrandStrategyGame.RiverheadGraphics[i][1] = CGraphic::Get(riverhead_flipped_graphics_file);
 			}
 		}
-		
-		if (CGraphic::Get(road_graphics_file) == NULL) { //use road graphics file for trails for now
-			CGraphic *trail_graphics = CGraphic::New(road_graphics_file, 80, 80);
-			trail_graphics->Load();
-		}
-		GrandStrategyGame.PathwayGraphics[PathwayTrail][i] = CGraphic::Get(road_graphics_file);
-		
-		if (CGraphic::Get(road_graphics_file) == NULL) {
-			CGraphic *road_graphics = CGraphic::New(road_graphics_file, 80, 80);
-			road_graphics->Load();
-		}
-		GrandStrategyGame.PathwayGraphics[PathwayRoad][i] = CGraphic::Get(road_graphics_file);
 	}
 	
 	//load the move symbol
@@ -5860,8 +5187,6 @@ void CalculateProvinceBorders()
 		}
 			
 		GrandStrategyGame.Provinces[i]->BorderProvinces.clear();
-		GrandStrategyGame.Provinces[i]->ReachableWaterProvinces.clear();
-		GrandStrategyGame.Provinces[i]->LandProvincesReachableThroughWater.clear();
 			
 		//calculate which of the province's tiles are border tiles, and which provinces it borders; also whether the province borders water (is coastal) or not
 		for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Tiles.size(); ++j) {
@@ -5892,35 +5217,7 @@ void CalculateProvinceBorders()
 						if (second_province != NULL && !GrandStrategyGame.Provinces[i]->BordersProvince(second_province)) { //if isn't added yet to the border provinces, do so now
 							GrandStrategyGame.Provinces[i]->BorderProvinces.push_back(second_province);
 						}
-								
-						if (second_province != NULL && GrandStrategyGame.Provinces[i]->Water == false && second_province->Water == true) {
-							GrandStrategyGame.Provinces[i]->Coastal = true;
-							GrandStrategyGame.Provinces[i]->ReachableWaterProvinces.push_back(second_province);
-						}
 					}
-				}
-			}
-		}
-	}
-	
-	// now fill the ReachableWaterProvinces and LandProvincesReachableThroughWater vectors
-	for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
-		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[i];
-		
-		for (size_t j = 0; j < province->ReachableWaterProvinces.size(); ++j) {
-			CGrandStrategyProvince *second_province = province->ReachableWaterProvinces[j];
-			for (size_t k = 0; k < second_province->BorderProvinces.size(); ++k) {
-				if (second_province->BorderProvinces[k]->Water && std::find(province->ReachableWaterProvinces.begin(), province->ReachableWaterProvinces.end(), second_province->BorderProvinces[k]) == province->ReachableWaterProvinces.end()) {
-					province->ReachableWaterProvinces.push_back(second_province->BorderProvinces[k]);
-				}
-			}
-		}
-		
-		for (size_t j = 0; j < province->ReachableWaterProvinces.size(); ++j) {
-			CGrandStrategyProvince *second_province = province->ReachableWaterProvinces[j];
-			for (size_t k = 0; k < second_province->BorderProvinces.size(); ++k) {
-				if (!second_province->BorderProvinces[k]->Water && std::find(province->LandProvincesReachableThroughWater.begin(), province->LandProvincesReachableThroughWater.end(), second_province->BorderProvinces[k]) == province->LandProvincesReachableThroughWater.end()) {
-					province->LandProvincesReachableThroughWater.push_back(second_province->BorderProvinces[k]);
 				}
 			}
 		}

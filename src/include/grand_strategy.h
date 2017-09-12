@@ -75,33 +75,24 @@ class GrandStrategyWorldMapTile : public WorldMapTile
 {
 public:
 	GrandStrategyWorldMapTile() : WorldMapTile(),
-		BaseTileVariation(-1), Variation(-1), TransportLevel(1),
+		BaseTileVariation(-1), Variation(-1),
 		ResourceProspected(false), Port(false), Worked(false),
 		Province(NULL), BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
 		memset(River, -1, sizeof(River));
 		memset(Riverhead, -1, sizeof(Riverhead));
-		memset(Pathway, -1, sizeof(Pathway));
 	}
 
 	void SetResourceProspected(int resource_id, bool discovered);
-	void SetPathway(int pathway, int direction, bool secondary_setting = false);
-	void BuildPathway(int pathway, int direction);
 	void SetPort(bool has_port);
-	void SetTransportLevel(int transport_level);
-	void LinkToTransportNetwork(int direction_from = -1);
-	int GetResourceIncome(bool ignore_transport_level = false);
-	bool AiBuildPathway(int pathway, bool secondary_setting = false);	/// Tells the AI to try to build a pathway in the tile, returns true if succeeded, false if didn't
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
-	bool CanBuildPathway(int pathway, int direction, bool check_costs);
 	std::string GetCulturalName(int civilization = -1, int faction = -1, bool only_settlement = false);		/// Get the tile's cultural name.
 	std::string GenerateSettlementName(int civilization, int faction = -1);
 	
 	int BaseTileVariation;					/// Base tile variation
 	int Variation;							/// Tile variation
-	int TransportLevel;						/// Transport level of the tile to the capital settlement of its province
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
 	bool Port;								/// Whether the tile has a port
 	bool Worked;							/// Whether the tile is worked by a worker
@@ -114,7 +105,6 @@ public:
 	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
 	int River[MaxDirections];				/// Whether this tile has a river to a particular direction (the value for each direction is the ID of the river)
 	int Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction (the value for each direction is the ID of the river)
-	int Pathway[MaxDirections];				/// Whether this tile has a pathway (trail or road) to a particular direction
 };
 
 class CGrandStrategyProvince : public CProvince
@@ -162,7 +152,6 @@ public:
 	void RemoveFactionClaim(int civilization_id, int faction_id);
 	void SetGovernor(std::string hero_full_name);
 	void GovernorSuccession();
-	void SetBorderProvinceConnectionTransportLevel(CGrandStrategyProvince *province, int transport_level);
 	bool HasBuildingClass(std::string building_class_name);
 	bool HasModifier(CUpgrade *modifier);
 	bool BordersModifier(CUpgrade *modifier);
@@ -175,13 +164,10 @@ public:
 	int GetAttackingUnitQuantity(int unit_type_id);
 	int GetPopulation();
 	int GetResourceDemand(int resource);
-	int GetAdministrativeEfficiencyModifier();
 	int GetProductionEfficiencyModifier(int resource);
-	int GetRevoltRisk();
 	int GetClassUnitType(int class_id);
 	int GetLanguage();
 	int GetDesirabilityRating();
-	int GetConnectionTransportLevel(CGrandStrategyProvince *province);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GenerateWorkName();
 	CGrandStrategyHero *GenerateHero(std::string type, CGrandStrategyHero *parent = NULL);
@@ -208,10 +194,7 @@ public:
 	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province
 	std::vector<CGrandStrategyHero *> ActiveHeroes;						/// Active (can move, attack and defend) heroes in the province
 	std::vector<CGrandStrategyProvince *> BorderProvinces;				/// Which provinces this province borders
-	std::vector<CGrandStrategyProvince *> ReachableWaterProvinces;		/// Water provinces which are reachable from this province's coasts
-	std::vector<CGrandStrategyProvince *> LandProvincesReachableThroughWater;	/// Which provinces can be reached through water from this province's coasts
 	std::map<int, int> AttackingUnits;									/// Quantity of units of a particular unit type attacking the province
-	std::map<CGrandStrategyProvince *, int> BorderProvinceConnectionTransportLevel;	/// connection transport level of each border province
 	int Income[MaxCosts];												/// Income for each resource.
 	int ProductionCapacity[MaxCosts];									/// The province's capacity to produce each resource (1 for each unit of base output)
 	int ProductionCapacityFulfilled[MaxCosts];							/// How much of the province's production capacity for each resource is actually fulfilled
@@ -236,12 +219,9 @@ public:
 		memset(Ministers, 0, sizeof(Ministers));
 	}
 	
-	void AiDoTurn();						/// Process the grand strategy turn for an AI faction
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
-	void CalculateTileTransportLevels();
-	void CalculateProvincesReachableThroughWater();
 	void CheckFormableFactions(int civilization);
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
@@ -256,10 +236,7 @@ public:
 	bool HasGovernmentPosition(int title);
 	bool CanHaveSuccession(int title, bool family_inheritance);
 	bool IsConquestDesirable(CGrandStrategyProvince *province);
-	bool CanBuildPathway(int pathway, bool check_costs);
-	int GetAdministrativeEfficiencyModifier();
 	int GetProductionEfficiencyModifier(int resource);
-	int GetRevoltRiskModifier();
 	int GetTroopCostModifier();
 	int GetDiplomacyState(CGrandStrategyFaction *faction);
 	int GetDiplomacyStateProposal(CGrandStrategyFaction *faction);
@@ -284,8 +261,6 @@ public:
 	std::map<CGrandStrategyFaction *, int> DiplomacyStateProposals;		/// Diplomacy state being offered by this faction to other factions
 	CGrandStrategyHero *Ministers[MaxCharacterTitles];					/// Ministers of the faction
 	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
-	std::vector<CGrandStrategyProvince *> ProvincesLinkedToCapital;		/// Provinces linked by pathways to this faction's capital
-	std::vector<CGrandStrategyProvince *> ProvincesReachableThroughWater;	/// Provinces (belonging to this faction) reachable through water by provinces linked to this faction's capital
 	std::vector<CGrandStrategyHero *> HistoricalMinisters[MaxCharacterTitles];	/// All characters who had a ministerial (or head of state or government) title in this faction
 	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
 };
@@ -318,8 +293,6 @@ public:
 	bool IsActive();							/// whether the hero can be ordered to move around
 	bool IsGenerated();
 	bool IsEligibleForTitle(int title);
-	int GetAdministrativeEfficiencyModifier();
-	int GetRevoltRiskModifier();
 	int GetTroopCostModifier();
 	int GetLanguage();
 	int GetTitleScore(int title, CGrandStrategyProvince *province = NULL);
@@ -393,11 +366,6 @@ public:
 				RiverheadGraphics[i][j] = NULL;
 			}
 		}
-		for (int i = 0; i < MaxPathways; ++i) {
-			for (int j = 0; j < MaxDirections; ++j) {
-				PathwayGraphics[i][j] = NULL;
-			}
-		}
 		for (int x = 0; x < WorldMapWidthMax; ++x) {
 			for (int y = 0; y < WorldMapHeightMax; ++y) {
 				WorldMapTiles[x][y] = NULL;
@@ -440,7 +408,6 @@ public:
 	CGraphic *RiverGraphics[MaxDirections];
 	CGraphic *RivermouthGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
 	CGraphic *RiverheadGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
-	CGraphic *PathwayGraphics[MaxPathways][MaxDirections];
 	CPlayerColorGraphic *SettlementGraphics[MAX_RACES];
 	CPlayerColorGraphic *BarracksGraphics[MAX_RACES];
 	CPlayerColorGraphic *SettlementMasonryGraphics[MAX_RACES];
@@ -457,7 +424,6 @@ public:
 	Vec2i WorldMapResources[MaxCosts][WorldMapResourceMax];		/// resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 	int CommodityPrices[MaxCosts];								/// price for every 100 of each commodity
 	std::map<int, int> SelectedUnits;							/// quantity of selected units, mapped to unit type
-	std::map<std::pair<int, int>, std::pair<int, int>> CurrentPathwayConstructions;	/// Tiles constructing a pathway; mapped to tile x and y, first value of std::pair is the pathway type, and the second one is the direction
 };
 
 /*----------------------------------------------------------------------------
@@ -513,7 +479,6 @@ extern void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::stri
 extern int GetRiverId(std::string river_name);
 extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string river_name);
 extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name);
-extern void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::string pathway_name);
 extern void SetWorldMapTilePort(int x, int y, bool has_port);
 extern void SetRiverCulturalName(std::string river_name, std::string civilization_name, std::string cultural_name);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
