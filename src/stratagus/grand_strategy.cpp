@@ -2760,7 +2760,6 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 //	hero->DeathYear = GrandStrategyYear + (SyncRand(45) + 1); //average + 30 years after initially appearing
 	hero->Civilization = civilization;
 	hero->ProvinceOfOrigin = this;
-	hero->ProvinceOfOriginName = hero->ProvinceOfOrigin->Name;
 	hero->Gender = gender;
 	hero->Name = hero_name;
 	if (parent != NULL) {
@@ -3548,38 +3547,6 @@ GrandStrategyWorldMapTile *CGrandStrategyFaction::GetCapitalSettlement()
 	}
 	
 	return GrandStrategyGame.WorldMapTiles[this->Capital->SettlementLocation.x][this->Capital->SettlementLocation.y];
-}
-
-void CGrandStrategyHero::Initialize()
-{
-	if (this->Trait == NULL) { //if no trait was set, have the hero be the same trait as the unit type (if the unit type has it predefined)
-		if (this->Type != NULL && this->Type->Traits.size() > 0) {
-			this->Trait = this->Type->Traits[SyncRand(this->Type->Traits.size())];
-		}
-	}
-	if (this->Type != NULL && this->HairVariation.empty()) {
-		this->HairVariation = this->Type->GetRandomVariationIdent();
-	}
-	int province_of_origin_id;
-	if (!this->Custom) {
-		province_of_origin_id = GetProvinceId(this->ProvinceOfOriginName);
-	} else {
-		province_of_origin_id = GrandStrategyGame.PlayerFaction->GetRandomProvinceWeightedByPopulation()->ID;
-	}
-	
-	if (province_of_origin_id == -1) {
-		fprintf(stderr, "Hero \"%s\"'s province of origin \"%s\" doesn't exist.\n", this->GetFullName().c_str(), this->ProvinceOfOriginName.c_str());
-	}
-	
-	this->ProvinceOfOrigin = const_cast<CGrandStrategyProvince *>(&(*GrandStrategyGame.Provinces[province_of_origin_id]));
-	
-	if (!this->Icon.Name.empty()) {
-		this->Icon.Load();
-	}
-	
-	if (!this->HeroicIcon.Name.empty()) {
-		this->HeroicIcon.Load();
-	}
 }
 
 void CGrandStrategyHero::Create()
@@ -5529,17 +5496,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 				fprintf(stderr, "Character \"%s\" has no civilization.\n", iterator->second->GetFullName().c_str());
 			}
 			continue;
-		} else if (iterator->second->ProvinceOfOriginName.empty()) {
-			continue;
 		} else if (CurrentCustomHero != NULL && iterator->second->GetFullName() == CurrentCustomHero->GetFullName()) { // temporary work-around for the custom hero duplication bug
-			continue;
-		}
-		
-		CProvince *province_of_origin = GetProvince(iterator->second->ProvinceOfOriginName);
-		if (province_of_origin == NULL) {
-			fprintf(stderr, "Hero \"%s\"'s province of origin \"%s\" doesn't exist.\n", iterator->second->GetFullName().c_str(), iterator->second->ProvinceOfOriginName.c_str());
-			continue;
-		} else if (province_of_origin->World->Ident != GrandStrategyWorld && GrandStrategyWorld != "Random") {
 			continue;
 		}
 		
@@ -5559,7 +5516,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 		hero->HairVariation = iterator->second->HairVariation;
 		hero->ViolentDeath = iterator->second->ViolentDeath;
 		hero->Civilization = iterator->second->Civilization;
-		hero->ProvinceOfOriginName = iterator->second->ProvinceOfOriginName;
 		hero->Gender = iterator->second->Gender;
 		if (iterator->second->Father != NULL) {
 			hero->Father = GrandStrategyGame.GetHero(iterator->second->Father->GetFullName());
@@ -6895,7 +6851,6 @@ void CreateGrandStrategyCustomHero(std::string hero_full_name)
 	
 	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 
-	hero->Initialize();
 	hero->Create();
 }
 

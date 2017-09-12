@@ -194,7 +194,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	*/
 	if (Map.Info.IsPointOnMap(pos, z) && Map.Field(pos, z)->GetResource() != -1) {
 		order->CurrentResource = Map.Field(pos, z)->GetResource();
-		//  Find the closest piece of wood next to a tile where the unit can move
+		//  Find the closest resource tile next to a tile where the unit can move
 		if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, Map.Field(pos, z)->GetResource(), 20, *harvester.Player, pos, &ressourceLoc, z)) {
 			DebugPrint("FIXME: Give up???\n");
 			ressourceLoc = pos;

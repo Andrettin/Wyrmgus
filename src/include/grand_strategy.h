@@ -311,7 +311,6 @@ public:
 	{
 	}
 	
-	void Initialize();
 	void Create();
 	void Die();
 	void SetType(int unit_type_id);

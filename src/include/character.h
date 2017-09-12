@@ -156,7 +156,6 @@ public:
 	std::string Background;		/// Description of the character from a perspective outside of the game's universe
 	std::string Quote;			/// A quote relating to the character
 	std::string HairVariation;	/// Name of the character's hair variation
-	std::string ProvinceOfOriginName;	/// Name of the province from which the character originates
 	IconConfig Icon;					/// Character's icon
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
 	CUnitType *Type;

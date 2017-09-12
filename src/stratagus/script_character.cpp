@@ -144,8 +144,6 @@ static int CclDefineCharacter(lua_State *l)
 			} else {
 				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
 			}
-		} else if (!strcmp(value, "ProvinceOfOrigin")) {
-			character->ProvinceOfOriginName = LuaToString(l, -1);
 		} else if (!strcmp(value, "Father")) {
 			std::string father_ident = LuaToString(l, -1);
 			CCharacter *father = GetCharacter(father_ident);
@@ -865,125 +863,6 @@ static int CclDefineCustomHero(lua_State *l)
 }
 
 /**
-**  Define a grand strategy hero.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineGrandStrategyHero(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument (expected table)");
-	}
-
-	std::string hero_full_name = TransliterateText(LuaToString(l, 1));
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (!hero) {
-		hero = new CGrandStrategyHero;
-		GrandStrategyGame.Heroes.push_back(hero);
-		GrandStrategyHeroStringToIndex[hero_full_name] = GrandStrategyGame.Heroes.size() - 1;
-	}
-	
-	//  Parse the list:
-	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		
-		if (!strcmp(value, "Name")) {
-			hero->Name = TransliterateText(LuaToString(l, -1));
-		} else if (!strcmp(value, "ExtraName")) {
-			hero->ExtraName = TransliterateText(LuaToString(l, -1));
-		} else if (!strcmp(value, "FamilyName")) {
-			hero->FamilyName = TransliterateText(LuaToString(l, -1));
-		} else if (!strcmp(value, "Dynasty")) { // for backwards compatibility
-			hero->FamilyName = TransliterateText(LuaToString(l, -1));
-		} else if (!strcmp(value, "Type")) {
-			std::string unit_type_ident = LuaToString(l, -1);
-			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-			if (unit_type_id != -1) {
-				hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-			} else {
-				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
-			}
-		} else if (!strcmp(value, "Trait")) {
-			std::string trait_ident = LuaToString(l, -1);
-			int upgrade_id = UpgradeIdByIdent(trait_ident);
-			if (upgrade_id != -1) {
-				hero->Trait = AllUpgrades[upgrade_id];
-			} else {
-				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
-			}
-		} else if (!strcmp(value, "Civilization")) {
-			hero->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
-		} else if (!strcmp(value, "ProvinceOfOrigin")) {
-			hero->ProvinceOfOriginName = LuaToString(l, -1);
-		} else if (!strcmp(value, "Father")) {
-			std::string father_name = TransliterateText(LuaToString(l, -1));
-			CGrandStrategyHero *father = GrandStrategyGame.GetHero(father_name);
-			if (father) {
-				if (father->Gender == MaleGender) {
-					hero->Father = const_cast<CGrandStrategyHero *>(&(*father));
-					if (!father->IsParentOf(hero_full_name)) { //check whether the hero has already been set as a child of the father
-						father->Children.push_back(hero);
-					}
-					// see if the father's other children aren't already included in the hero's siblings, and if they aren't, add them (and add the hero to the siblings' sibling list, of course)
-					for (size_t i = 0; i < father->Children.size(); ++i) {
-						if (father->Children[i]->Ident != hero_full_name) {
-							if (!hero->IsSiblingOf(father->Children[i]->Ident)) {
-								hero->Siblings.push_back(father->Children[i]);
-							}
-							if (!father->Children[i]->IsSiblingOf(hero_full_name)) {
-								father->Children[i]->Siblings.push_back(hero);
-							}
-						}
-					}
-				} else {
-					LuaError(l, "Hero \"%s\" set to be the biological father of \"%s\", but isn't male." _C_ father_name.c_str() _C_ hero_full_name.c_str());
-				}
-			} else {
-				LuaError(l, "Hero \"%s\" doesn't exist." _C_ father_name.c_str());
-			}
-		} else if (!strcmp(value, "Mother")) {
-			std::string mother_name = TransliterateText(LuaToString(l, -1));
-			CGrandStrategyHero *mother = GrandStrategyGame.GetHero(mother_name);
-			if (mother) {
-				if (mother->Gender == FemaleGender) {
-					hero->Mother = const_cast<CGrandStrategyHero *>(&(*mother));
-					if (!mother->IsParentOf(hero_full_name)) { //check whether the hero has already been set as a child of the mother
-						mother->Children.push_back(hero);
-					}
-					// see if the mother's other children aren't already included in the hero's siblings, and if they aren't, add them (and add the hero to the siblings' sibling list, of course)
-					for (size_t i = 0; i < mother->Children.size(); ++i) {
-						if (mother->Children[i]->Ident != hero_full_name) {
-							if (!hero->IsSiblingOf(mother->Children[i]->Ident)) {
-								hero->Siblings.push_back(mother->Children[i]);
-							}
-							if (!mother->Children[i]->IsSiblingOf(hero_full_name)) {
-								mother->Children[i]->Siblings.push_back(hero);
-							}
-						}
-					}
-				} else {
-					LuaError(l, "Hero \"%s\" set to be the biological mother of \"%s\", but isn't female." _C_ mother_name.c_str() _C_ hero_full_name.c_str());
-				}
-			} else {
-				LuaError(l, "Hero \"%s\" doesn't exist." _C_ mother_name.c_str());
-			}
-		} else if (!strcmp(value, "Gender")) {
-			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
-		} else if (!strcmp(value, "HairVariation")) {
-			hero->HairVariation = LuaToString(l, -1);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	hero->Initialize();
-	hero->UpdateAttributes();
-	
-	return 0;
-}
-
-/**
 **  Get character data.
 **
 **  @param l  Lua state.
@@ -1008,9 +887,6 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "FullName")) {
 		lua_pushstring(l, character->GetFullName().c_str());
-		return 1;
-	} else if (!strcmp(data, "ProvinceOfOrigin")) {
-		lua_pushstring(l, character->ProvinceOfOriginName.c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, character->Description.c_str());
@@ -1216,7 +1092,6 @@ void CharacterCclRegister()
 {
 	lua_register(Lua, "DefineCharacter", CclDefineCharacter);
 	lua_register(Lua, "DefineCustomHero", CclDefineCustomHero);
-	lua_register(Lua, "DefineGrandStrategyHero", CclDefineGrandStrategyHero);
 	lua_register(Lua, "GetCharacterData", CclGetCharacterData);
 	lua_register(Lua, "GetCustomHeroData", CclGetCustomHeroData);
 	lua_register(Lua, "GetCharacters", CclGetCharacters);
