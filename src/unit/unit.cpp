@@ -1795,8 +1795,8 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 		this->Variable[GOLDGATHERINGBONUS_INDEX].Value += stat_change;
 		this->Variable[COALGATHERINGBONUS_INDEX].Max += stat_change;
 		this->Variable[COALGATHERINGBONUS_INDEX].Value += stat_change;
-		this->Variable[DIAMONDSGATHERINGBONUS_INDEX].Max += stat_change;
-		this->Variable[DIAMONDSGATHERINGBONUS_INDEX].Value += stat_change;
+		this->Variable[GEMSGATHERINGBONUS_INDEX].Max += stat_change;
+		this->Variable[GEMSGATHERINGBONUS_INDEX].Value += stat_change;
 	}
 }
 
@@ -3517,6 +3517,8 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 		metal_rock_type = UnitTypeByIdent("unit-copper-rock");
 	} else if (type.Ident == "unit-diamond-deposit") {
 		metal_rock_type = UnitTypeByIdent("unit-diamond-rock");
+	} else if (type.Ident == "unit-emerald-deposit") {
+		metal_rock_type = UnitTypeByIdent("unit-emerald-rock");
 	}
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.TileWidth - 1) / 2, (type.TileHeight - 1) / 2);
@@ -5433,8 +5435,8 @@ int CUnit::GetResourceStep(const int resource) const
 		resource_step += this->Variable[FURNITUREGATHERINGBONUS_INDEX].Value;
 	} else if (resource == LeatherCost) {
 		resource_step += this->Variable[LEATHERGATHERINGBONUS_INDEX].Value;
-	} else if (resource == DiamondsCost) {
-		resource_step += this->Variable[DIAMONDSGATHERINGBONUS_INDEX].Value;
+	} else if (resource == DiamondsCost || resource == EmeraldsCost) {
+		resource_step += this->Variable[GEMSGATHERINGBONUS_INDEX].Value;
 	}
 	
 	return resource_step;
