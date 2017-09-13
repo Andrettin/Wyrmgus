@@ -1,0 +1,82 @@
+############################################################
+# Building Wyrmsun on Ubuntu 16.04 LTS
+############################################################
+
+We are going to download and compile Wyrmsun, the open-source retro RTS game.
+
+This guide should work for all recent ubuntu versions. (Tested von 16.04 and 16.10)
+
+Required disk space: about 1 GiB
+
+
+1. Create empty directory:
+
+  mkdir wyrmsun
+  cd wyrmsun
+
+
+
+2. Install git:
+
+  sudo apt install git-core
+
+
+
+3. Git clone the engine and data:
+
+  git clone https://github.com/Andrettin/Wyrmgus.git
+  git clone https://github.com/Andrettin/Wyrmsun.git
+
+
+
+4. Enter the engine repo. First, init the oaml sound submodule:
+
+  cd Wyrmgus
+  git submodule update --init
+
+
+
+5. Prepare the compilation. Create build directory:
+
+  mkdir build
+  cd build
+
+
+
+6. Install dependencies:
+
+  cmake (3.5.1)
+  liblua5.1-0-dev (5.1.5)
+  libtolua++5.1-dev (1.0.93)
+  zlib1g-dev (1.2.8)
+  libpng++-dev (0.2.5)
+  libsdl1.2-dev (1.2.15)
+  libogg-dev (1.3.2)
+  libvorbis-dev (1.3.5)
+
+This is the absolute minimum, install all together with:
+
+  sudo apt install cmake liblua5.1-0-dev libtolua++5.1-dev zlib1g-dev libpng++-dev \
+      libsdl1.2-dev libogg-dev libvorbis-dev
+
+
+
+7. Let's compile! Run this in the build directory:
+
+  cmake ..
+  make
+
+The build will take some time ...
+
+
+
+8. If everything worked out you now have a 'stratagus' executable. Run the game with:
+
+  ./stratagus -d ../../Wyrmsun
+
+The game data will be stored in './wyr'
+
+
+That's it, have fun playing!
+
+
