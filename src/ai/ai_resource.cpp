@@ -2303,6 +2303,10 @@ void AiCheckSettlementConstruction()
 	for (size_t i = 0; i < Map.SettlementUnits.size(); ++i) {
 		CUnit *settlement_unit = Map.SettlementUnits[i];
 		
+		if (!settlement_unit->IsAliveOnMap()) {
+			continue;
+		}
+		
 		if (settlement_unit->Player->Index != PlayerNumNeutral) {
 			continue;
 		}
