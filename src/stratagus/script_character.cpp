@@ -471,7 +471,7 @@ static int CclDefineCharacter(lua_State *l)
 				if (lua_istable(l, -1)) { //coordinates
 					CclGetPos(l, &character_pos.x, &character_pos.y);
 				} else { //settlement ident
-					std::string settlement_ident = LuaToString(l, 3);
+					std::string settlement_ident = LuaToString(l, -1);
 					CSettlement *settlement = GetSettlement(settlement_ident);
 					if (!settlement) {
 						LuaError(l, "Settlement \"%s\" doesn't exist.\n" _C_ settlement_ident.c_str());

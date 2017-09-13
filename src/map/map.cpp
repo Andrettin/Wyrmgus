@@ -861,42 +861,6 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			}
 		}
 		
-		for (size_t j = 0; j < settlement_iterator->second->HistoricalHeroes.size(); ++j) {
-			if (
-				CurrentCampaign->StartDate.ContainsDate(std::get<0>(settlement_iterator->second->HistoricalHeroes[j]))
-				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(settlement_iterator->second->HistoricalHeroes[j])) || std::get<1>(settlement_iterator->second->HistoricalHeroes[j]).year == 0)
-			) {
-				CCharacter *hero = std::get<2>(settlement_iterator->second->HistoricalHeroes[j]);
-				if (!hero || !hero->Type) {
-					continue;
-				}
-				CFaction *hero_owner = std::get<3>(settlement_iterator->second->HistoricalHeroes[j]);
-				const CUnitType *type = hero->Type;
-				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
-				CUnit *unit = NULL;
-				if (hero_owner) {
-					CPlayer *hero_player = GetOrAddFactionPlayer(hero_owner);
-					if (!hero_player) {
-						continue;
-					}
-					if (hero_player->StartPos.x == 0 && hero_player->StartPos.y == 0) {
-						Vec2i default_pos(map_start_pos + ((hero_owner->DefaultStartPos - template_start_pos) * this->Scale));
-						if (hero_owner->DefaultStartPos.x != -1 && hero_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
-							hero_player->SetStartView(default_pos, z);
-						} else {
-							hero_player->SetStartView(settlement_pos - unit_offset, z);
-						}
-					}
-					unit = CreateUnit(settlement_pos - unit_offset, *type, hero_player, z);
-				} else {
-					unit = CreateUnit(settlement_pos - unit_offset, *type, player, z);
-				}
-				unit->SetCharacter(hero->Ident);
-				unit->Active = 0;
-				player->UnitTypesAiActiveCount[hero->Type->Slot]--;
-			}
-		}
-		
 		for (std::map<CUnitType *, std::map<CDate, std::pair<int, CFaction *>>>::iterator unit_iterator = settlement_iterator->second->HistoricalUnits.begin(); unit_iterator != settlement_iterator->second->HistoricalUnits.end(); ++unit_iterator) {
 			const CUnitType *type = unit_iterator->first;
 
@@ -1173,6 +1137,71 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			unit->Active = 0;
 			player->UnitTypesAiActiveCount[hero->Type->Slot]--;
 		}
+	}
+	
+	if (this->IsSubtemplateArea() || random) { //don't perform the dynamic hero application if this is a subtemplate area, to avoid creating multiple copies of the same hero
+		return;
+	}
+	
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+		CCharacter *hero = iterator->second;
+		
+		if (hero->Deity != NULL) {
+			continue;
+		}
+		
+		if (hero->Faction == NULL && !hero->Type->BoolFlag[FAUNA_INDEX].value) { //only fauna "heroes" may have no faction
+			continue;
+		}
+		
+		if (hero->Date.year == 0 || !CurrentCampaign->StartDate.ContainsDate(hero->Date) || CurrentCampaign->StartDate.ContainsDate(hero->DeathDate)) { //contrary to other elements, heroes aren't implemented if their date isn't set
+			continue;
+		}
+
+		CPlayer *hero_player = hero->Faction ? GetFactionPlayer(hero->Faction) : NULL;
+		
+		Vec2i hero_pos(-1, -1);
+		
+		if (hero_player && hero_player->StartMapLayer == z) {
+			hero_pos = hero_player->StartPos;
+		}
+		
+		bool in_another_map_layer = false;
+		for (int i = ((int) hero->HistoricalLocations.size() - 1); i >= 0; --i) {
+			if (CurrentCampaign->StartDate.ContainsDate(std::get<0>(hero->HistoricalLocations[i]))) {
+				if (std::get<1>(hero->HistoricalLocations[i]) == this) {
+					hero_pos = map_start_pos + std::get<2>(hero->HistoricalLocations[i]) - template_start_pos;
+				} else {
+					in_another_map_layer = true;
+				}
+				break;
+			}
+		}
+		
+		if (in_another_map_layer) {
+			continue;
+		}
+		
+		if (!Map.Info.IsPointOnMap(hero_pos, z) || hero_pos.x < map_start_pos.x || hero_pos.y < map_start_pos.y) { //heroes whose faction hasn't been created already and who don't have a historical location set won't be created
+			continue;
+		}
+		
+		if (hero->Faction) {
+			hero_player = GetOrAddFactionPlayer(hero->Faction);
+			if (!hero_player) {
+				continue;
+			}
+			if (hero_player->StartPos.x == 0 && hero_player->StartPos.y == 0) {
+				hero_player->SetStartView(hero_pos, z);
+			}
+		} else {
+			hero_player = &Players[PlayerNumNeutral];
+		}
+		Vec2i unit_offset((hero->Type->TileWidth - 1) / 2, (hero->Type->TileHeight - 1) / 2);
+		CUnit *unit = CreateUnit(hero_pos - unit_offset, *hero->Type, hero_player, z);
+		unit->SetCharacter(hero->Ident);
+		unit->Active = 0;
+		hero_player->UnitTypesAiActiveCount[hero->Type->Slot]--;
 	}
 }
 

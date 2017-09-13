@@ -244,7 +244,6 @@ public:
 	std::map<CDate, CFaction *> HistoricalOwners;				/// Historical owners of the settlement
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::map<CUnitType *, std::map<CDate, std::pair<int, CFaction *>>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
-	std::vector<std::tuple<CDate, CDate, CCharacter *, CFaction *>> HistoricalHeroes; /// Historical heroes, with start and end date
 	std::vector<std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 	std::vector<std::tuple<CDate, CDate, CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
 };

@@ -1881,49 +1881,6 @@ static int CclDefineSettlement(lua_State *l)
 
 				settlement->HistoricalUnits[unit_type][date] = std::pair<int, CFaction *>(unit_quantity, unit_owner);
 			}
-		} else if (!strcmp(value, "HistoricalHeroes")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CDate start_date;
-				start_date.year = 0;
-				start_date.month = 1;
-				start_date.day = 1;
-				start_date.timeline = NULL;
-				lua_rawgeti(l, -1, j + 1);
-				CclGetDate(l, &start_date);
-				lua_pop(l, 1);
-				++j;
-				CDate end_date;
-				end_date.year = 0;
-				end_date.month = 1;
-				end_date.day = 1;
-				end_date.timeline = NULL;
-				lua_rawgeti(l, -1, j + 1);
-				CclGetDate(l, &end_date);
-				lua_pop(l, 1);
-				++j;
-				CCharacter *hero = GetCharacter(LuaToString(l, -1, j + 1));
-				if (!hero) {
-					LuaError(l, "Hero doesn't exist.");
-				}
-				++j;
-				CFaction *hero_owner = NULL;
-				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1)) {
-					hero_owner = PlayerRaces.GetFaction(-1, LuaToString(l, -1));
-					if (!hero_owner) {
-						LuaError(l, "Hero owner faction doesn't exist.\n");
-					}
-				} else {
-					--j;
-				}
-				lua_pop(l, 1);
-
-				settlement->HistoricalHeroes.push_back(std::tuple<CDate, CDate, CCharacter *, CFaction *>(start_date, end_date, hero, hero_owner));
-			}
 		} else if (!strcmp(value, "HistoricalBuildings")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
