@@ -467,6 +467,17 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
+	if (condition->FactionUpgradeCoreSettlements != CONDITION_TRUE) {
+		CFaction *upgrade_faction = NULL;
+		if (!strncmp(AllUpgrades[button.Value]->Ident.c_str(), "upgrade-faction-", 16)) {
+			upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(AllUpgrades[button.Value]->Ident, "upgrade-faction-", ""));
+		}
+
+		if ((condition->FactionUpgradeCoreSettlements == CONDITION_ONLY) ^ (upgrade_faction && upgrade_faction->Cores.size() > 0)) {
+			return false;
+		}
+	}
+	
 	if (condition->ResearchedUpgrade != CONDITION_TRUE) {
 		if ((condition->ResearchedUpgrade == CONDITION_ONLY) ^ (((button.Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, button.ValueStr) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->IndividualUpgrades[button.Value])))) {
 			return false;

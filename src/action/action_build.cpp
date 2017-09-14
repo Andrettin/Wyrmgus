@@ -469,6 +469,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 			}
 			if (ontop.Settlement != NULL) {
 				build->Settlement = ontop.Settlement;
+				build->Settlement->SettlementUnit = build;
 				Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &ontop), Map.SettlementUnits.end());
 				Map.SettlementUnits.push_back(build);
 			}

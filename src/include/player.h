@@ -10,7 +10,7 @@
 //
 /**@name player.h - The player headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2017 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -60,13 +60,6 @@
 #include "vec2i.h"
 
 class CGraphic;
-//Wyrmgus start
-class CCharacter;
-class CProvince;
-class CPlane;
-class CQuest;
-class CReligion;
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -84,6 +77,11 @@ class CReligion;
 class CUnit;
 class CUnitType;
 //Wyrmgus start
+class CCharacter;
+class CProvince;
+class CPlane;
+class CQuest;
+class CReligion;
 class CSettlement;
 //WYrmgus end
 class PlayerAi;
@@ -610,6 +608,7 @@ public:
 	std::vector<std::string> SettlementNames;							/// Settlement names for the faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction
+	std::vector<CSettlement *> Cores;									/// Core settlements of this faction (required to found it)
 	std::map<std::tuple<CDate, CDate, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, CFaction *> HistoricalFactionDerivations;				/// cases of this faction deriving technologies/governmental system from another, mapped to the date in which it happened

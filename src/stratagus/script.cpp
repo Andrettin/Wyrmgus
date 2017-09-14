@@ -39,6 +39,9 @@
 
 #include "script.h"
 
+//Wyrmgus start
+#include "actions.h"
+//Wyrmgus end
 #include "animation/animation_setplayervar.h"
 //Wyrmgus start
 #include "editor.h"
@@ -1004,6 +1007,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UpgradeRequirementsString")) {
 			res->e = EString_UpgradeRequirementsString;
 			res->D.Upgrade = CclParseUpgradeDesc(l);
+		} else if (!strcmp(key, "FactionUpgradeCoreSettlements")) {
+			res->e = EString_FactionUpgradeCoreSettlements;
+			res->D.Upgrade = CclParseUpgradeDesc(l);
 		} else if (!strcmp(key, "ResourceIdent")) {
 			res->e = EString_ResourceIdent;
 			res->D.Resource = CclParseResourceDesc(l);
@@ -1503,6 +1509,39 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string("");
 			}
+		case EString_FactionUpgradeCoreSettlements : // the upgrade's faction's core settlements
+			upgrade = s->D.Upgrade;
+			
+			if (upgrade != NULL) {
+				CFaction *upgrade_faction = NULL;
+				if (!strncmp((**upgrade).Ident.c_str(), "upgrade-faction-", 16)) {
+					upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString((**upgrade).Ident, "upgrade-faction-", ""));
+				}
+				if (upgrade_faction) {
+					std::string settlements_string;
+					bool first = true;
+					for (size_t i = 0; i < upgrade_faction->Cores.size(); ++i) {
+						if (!first) {
+							settlements_string += "\n";
+						} else {
+							first = false;
+						}
+						bool has_settlement = upgrade_faction->Cores[i]->SettlementUnit && upgrade_faction->Cores[i]->SettlementUnit->Player == ThisPlayer && upgrade_faction->Cores[i]->SettlementUnit->CurrentAction() != UnitActionBuilt;
+						if (!has_settlement) {
+							settlements_string += "~<";
+						}
+						settlements_string += upgrade_faction->Cores[i]->GetCulturalName(ThisPlayer->Race);
+						if (!has_settlement) {
+							settlements_string += "~>";
+						}
+					}
+					return settlements_string;
+				} else {
+					return std::string("");
+				}
+			} else { // ERROR.
+				return std::string("");
+			}
 		case EString_ResourceIdent : // resource ident
 			resource = s->D.Resource;
 			if (resource != NULL) {
@@ -1776,6 +1815,9 @@ void FreeStringDesc(StringDesc *s)
 			break;
 		case EString_ResourceName : // Name of the resource
 			delete *s->D.Resource;
+			break;
+		case EString_FactionUpgradeCoreSettlements : // Core settlements of the upgrade's faction
+			delete *s->D.Upgrade;
 			break;
 		//Wyrmgus end
 		case EString_If : // cond ? True : False;
@@ -2513,6 +2555,19 @@ static int CclUpgradeRequirementsString(lua_State *l)
 }
 
 /**
+**  Return equivalent lua table for FactionUpgradeCoreSettlements.
+**  {"FactionUpgradeCoreSettlements", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclFactionUpgradeCoreSettlements(lua_State *l)
+{
+	return Alias(l, "FactionUpgradeCoreSettlements");
+}
+
+/**
 **  Return equivalent lua table for ResourceIdent.
 **  {"ResourceIdent", {}}
 **
@@ -2749,6 +2804,7 @@ static void AliasRegister()
 	lua_register(Lua, "UpgradeFactionType", CclUpgradeFactionType);
 	lua_register(Lua, "UpgradeEffectsString", CclUpgradeEffectsString);
 	lua_register(Lua, "UpgradeRequirementsString", CclUpgradeRequirementsString);
+	lua_register(Lua, "FactionUpgradeCoreSettlements", CclFactionUpgradeCoreSettlements);
 	lua_register(Lua, "ResourceIdent", CclResourceIdent);
 	lua_register(Lua, "ResourceName", CclResourceName);
 	//Wyrmgus end

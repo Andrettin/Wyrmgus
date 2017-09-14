@@ -1799,6 +1799,20 @@ static int CclDefineSettlement(lua_State *l)
 				}
 				PlayerRaces.Civilizations[civilization]->SettlementNames.push_back(cultural_name);
 			}
+		} else if (!strcmp(value, "Cores")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CFaction *faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1, j + 1));
+				if (!faction) {
+					LuaError(l, "Faction doesn't exist.");
+				}
+				
+				settlement->Cores.push_back(faction);
+				faction->Cores.push_back(settlement);
+			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

@@ -344,6 +344,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "settlement")) {
 			unit->Settlement = GetSettlement(LuaToString(l, 2, j + 1));
 			if (type->BoolFlag[TOWNHALL_INDEX].value) {
+				unit->Settlement->SettlementUnit = unit;
 				Map.SettlementUnits.push_back(unit);
 			}
 		} else if (!strcmp(value, "trait")) {

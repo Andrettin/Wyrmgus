@@ -1767,6 +1767,15 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 	}
 	
 	if (!pre) {
+		//check if the required core settlements are owned by the player
+		if (CurrentCampaign != NULL) { //only check for settlements in the Scenario mode
+			for (size_t i = 0; i < faction->Cores.size(); ++i) {
+				if (!faction->Cores[i]->SettlementUnit || faction->Cores[i]->SettlementUnit->Player != this || faction->Cores[i]->SettlementUnit->CurrentAction() == UnitActionBuilt) {
+					return false;
+				}
+			}
+		}
+		
 		if (faction->Conditions) {
 			CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 			faction->Conditions->pushPreamble();

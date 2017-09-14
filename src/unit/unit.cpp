@@ -599,6 +599,9 @@ void CUnit::Release(bool final)
 	Type = NULL;
 	//Wyrmgus start
 	Character = NULL;
+	if (this->Settlement && this->Settlement->SettlementUnit == this) {
+		this->Settlement->SettlementUnit = NULL;
+	}
 	Settlement = NULL;
 	Trait = NULL;
 	Prefix = NULL;
@@ -3147,16 +3150,22 @@ void CUnit::UpdateSettlement()
 
 			std::vector<CSettlement *> potential_settlements;
 			for (size_t i = 0; i < Settlements.size(); ++i) {
-				if (Settlements[i]->CulturalNames.find(civilization) != Settlements[i]->CulturalNames.end()) {
+				if (!Settlements[i]->SettlementUnit && Settlements[i]->CulturalNames.find(civilization) != Settlements[i]->CulturalNames.end()) {
 					potential_settlements.push_back(Settlements[i]);
+				}
+			}
+			
+			if (potential_settlements.size() == 0) {
+				for (size_t i = 0; i < Settlements.size(); ++i) {
+					if (!Settlements[i]->SettlementUnit) {
+						potential_settlements.push_back(Settlements[i]);
+					}
 				}
 			}
 			
 			if (potential_settlements.size() > 0) {
 				this->Settlement = potential_settlements[SyncRand(potential_settlements.size())];
-				Map.SettlementUnits.push_back(this);
-			} else {
-				this->Settlement = Settlements[SyncRand(Settlements.size())];
+				this->Settlement->SettlementUnit = this;
 				Map.SettlementUnits.push_back(this);
 			}
 		}
@@ -3483,6 +3492,7 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 					}
 					if (replacedUnit.Settlement != NULL) {
 						unit->Settlement = replacedUnit.Settlement;
+						unit->Settlement->SettlementUnit = unit;
 						Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &replacedUnit), Map.SettlementUnits.end());
 						Map.SettlementUnits.push_back(unit);
 					}
@@ -3863,9 +3873,10 @@ void UnitLost(CUnit &unit)
 				if (unit.Settlement != NULL) {
 					if (unit.Type->BoolFlag[TOWNHALL_INDEX].value) {
 						temp->Settlement = unit.Settlement;
+						temp->Settlement->SettlementUnit = temp;
+						Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &unit), Map.SettlementUnits.end());
+						Map.SettlementUnits.push_back(temp);
 					}
-					Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &unit), Map.SettlementUnits.end());
-					Map.SettlementUnits.push_back(temp);
 				}
 				if (type.GivesResource && unit.ResourcesHeld != 0) {
 					temp->SetResourcesHeld(unit.ResourcesHeld);
@@ -3875,6 +3886,10 @@ void UnitLost(CUnit &unit)
 				}
 				//Wyrmgus end
 			}
+		//Wyrmgus start
+		} else if (unit.Settlement && unit.Settlement->SettlementUnit == &unit) {
+			unit.Settlement->SettlementUnit = NULL;
+		//Wyrmgus end
 		}
 	}
 }

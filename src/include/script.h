@@ -169,6 +169,7 @@ enum EString {
 	EString_UpgradeFactionType,		/// Upgrade's faction's type
 	EString_UpgradeEffectsString,	/// Upgrade's effects string
 	EString_UpgradeRequirementsString,	/// Upgrade's requirements string
+	EString_FactionUpgradeCoreSettlements,	/// Core settlements of the upgrade's faction
 	EString_ResourceIdent,	/// Resource's ident
 	EString_ResourceName,	/// Resource's name
 	//Wyrmgus end

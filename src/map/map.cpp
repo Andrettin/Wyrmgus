@@ -697,6 +697,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			}
 			CUnit *unit = CreateUnit(settlement_pos - unit_offset, *SettlementSiteUnitType, &Players[PlayerNumNeutral], z);
 			unit->Settlement = settlement_iterator->second;
+			unit->Settlement->SettlementUnit = unit;
 			Map.SettlementUnits.push_back(unit);
 		}
 		
