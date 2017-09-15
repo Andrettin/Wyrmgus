@@ -2011,6 +2011,13 @@ static int CclDefineSettlement(lua_State *l)
 		}
 	}
 	
+	if (!settlement->Major && !settlement->Cores.empty()) { //if the settlement is a minor one, but has faction cores, remove them
+		for (size_t i = 0; i < settlement->Cores.size(); ++i) {
+			settlement->Cores[i]->Cores.erase(std::remove(settlement->Cores[i]->Cores.begin(), settlement->Cores[i]->Cores.end(), settlement), settlement->Cores[i]->Cores.end());
+		}
+		settlement->Cores.clear();
+	}
+	
 	if (settlement->MapTemplate && settlement->Position.x != -1 && settlement->Position.y != -1) {
 		if (settlement->MapTemplate->Settlements.find(std::pair<int, int>(settlement->Position.x, settlement->Position.y)) != settlement->MapTemplate->Settlements.end()) {
 			LuaError(l, "Position (%d, %d) of map template \"%s\" already has a settlement." _C_ settlement->Position.x _C_ settlement->Position.y _C_ settlement->MapTemplate->Ident.c_str());
