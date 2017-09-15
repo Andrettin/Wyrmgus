@@ -416,21 +416,6 @@ void CGrandStrategyGame::DoTurn()
 		this->Provinces[i]->Movement = false; //after processing the turn, always set the movement to false
 	}
 	
-	//research technologies
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (this->Factions[i][j]->IsAlive()) {
-				if (this->Factions[i][j]->CurrentResearch != -1) {
-					this->Factions[i][j]->SetTechnology(this->Factions[i][j]->CurrentResearch, true);
-					this->Factions[i][j]->CurrentResearch = -1;
-				}
-					
-				//see if this faction can form a faction
-				this->Factions[i][j]->CheckFormableFactions(i);
-			}
-		}
-	}
-	
 	//check if any heroes should begin activity this year
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
 		if (
@@ -2338,20 +2323,6 @@ void CGrandStrategyFaction::CalculateIncomes()
 {
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->CalculateIncome(i);
-	}
-}
-
-void CGrandStrategyFaction::CheckFormableFactions(int civilization)
-{
-	for (size_t i = 0; i < PlayerRaces.Factions[this->Civilization][this->Faction]->DevelopsTo.size(); ++i) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, PlayerRaces.Factions[this->Civilization][this->Faction]->DevelopsTo[i]);
-		if (faction != -1 && GrandStrategyGame.Factions[civilization][faction]) {
-			if (GrandStrategyGame.Factions[civilization][faction] != this && !GrandStrategyGame.Factions[civilization][faction]->IsAlive()) {
-				if (CanFormFaction(civilization, faction)) {
-					this->FormFaction(civilization, faction);
-				}
-			}
-		}
 	}
 }
 

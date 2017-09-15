@@ -1665,42 +1665,39 @@ void CPlayer::SetFaction(CFaction *faction)
 void CPlayer::SetRandomFaction()
 {
 	// set random one from the civilization's factions
-	int faction_count = 0;
-	int local_factions[FactionMax];
+	std::vector<CFaction *> local_factions;
 	
 	// first search for valid factions in the current faction's "develops to" list, and only if that fails search in all factions of the civilization
 	if (this->Faction != -1) {
 		for (size_t i = 0; i < PlayerRaces.Factions[this->Race][this->Faction]->DevelopsTo.size(); ++i) {
-			int faction_id = PlayerRaces.GetFactionIndexByName(this->Race, PlayerRaces.Factions[this->Race][this->Faction]->DevelopsTo[i]);
-			if (faction_id != -1) {
+			CFaction *faction = PlayerRaces.Factions[this->Race][this->Faction]->DevelopsTo[i];
+			if (faction) {
 				if (
-					this->CanFoundFaction(PlayerRaces.Factions[this->Race][faction_id])
-					&& ((PlayerRaces.Factions[this->Race][faction_id]->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][faction_id]->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
-					&& PlayerRaces.Factions[this->Race][faction_id]->Playable
+					this->CanFoundFaction(faction)
+					&& ((faction->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((faction->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
+					&& faction->Playable
 				) {
-					local_factions[faction_count] = faction_id;
-					faction_count += 1;
+					local_factions.push_back(faction);
 				}
 			}
 		}
 	}
 	
-	if (faction_count == 0) {
+	if (local_factions.size() == 0) {
 		for (size_t i = 0; i < PlayerRaces.Factions[this->Race].size(); ++i) {
 			if (
 				this->CanFoundFaction(PlayerRaces.Factions[this->Race][i])
 				&& ((PlayerRaces.Factions[this->Race][i]->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][i]->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
 				&& PlayerRaces.Factions[this->Race][i]->Playable
 			) {
-				local_factions[faction_count] = i;
-				faction_count += 1;
+				local_factions.push_back(PlayerRaces.Factions[this->Race][i]);
 			}
 		}
 	}
 	
-	if (faction_count > 0) {
-		int chosen_faction = local_factions[SyncRand(faction_count)];
-		this->SetFaction(PlayerRaces.Factions[this->Race][chosen_faction]);
+	if (local_factions.size() > 0) {
+		CFaction *chosen_faction = local_factions[SyncRand(local_factions.size())];
+		this->SetFaction(chosen_faction);
 	} else {
 		this->SetFaction(NULL);
 	}

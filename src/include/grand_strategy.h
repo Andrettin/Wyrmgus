@@ -222,7 +222,6 @@ public:
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
-	void CheckFormableFactions(int civilization);
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
 	void SetCapital(CGrandStrategyProvince *province);

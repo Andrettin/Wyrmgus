@@ -1909,15 +1909,38 @@ static int CclDefineFaction(lua_State *l)
 			parent_faction = LuaToString(l, -1);
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Icon")) {
+			faction->Icon.Name = LuaToString(l, -1);
+			faction->Icon.Icon = NULL;
+			faction->Icon.Load();
+			faction->Icon.Icon->Load();
 		} else if (!strcmp(value, "DefaultStartPos")) {
 			CclGetPos(l, &faction->DefaultStartPos.x, &faction->DefaultStartPos.y);
+		} else if (!strcmp(value, "DevelopsFrom")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				CFaction *second_faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1, k + 1));
+				if (!second_faction) {
+					LuaError(l, "Faction doesn't exist.");
+				}
+				faction->DevelopsFrom.push_back(second_faction);
+				second_faction->DevelopsTo.push_back(faction);
+			}
 		} else if (!strcmp(value, "DevelopsTo")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				faction->DevelopsTo.push_back(LuaToString(l, -1, k + 1));
+				CFaction *second_faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1, k + 1));
+				if (!second_faction) {
+					LuaError(l, "Faction doesn't exist.");
+				}
+				faction->DevelopsTo.push_back(second_faction);
+				second_faction->DevelopsFrom.push_back(faction);
 			}
 		} else if (!strcmp(value, "Titles")) {
 			if (!lua_istable(l, -1)) {
@@ -2775,32 +2798,6 @@ static int CclGetFactionData(lua_State *l)
 	}
 
 	return 0;
-}
-
-static int CclGetFactionDevelopsTo(lua_State *l)
-{
-	LuaCheckArgs(l, 3);
-	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
-	int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, 2));
-	int current_civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 3));
-
-	int faction_count = 0;
-	std::string develops_to_factions[FactionMax];
-	for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction]->DevelopsTo.size(); ++i) {
-		if (PlayerRaces.GetFactionIndexByName(current_civilization, PlayerRaces.Factions[civilization][faction]->DevelopsTo[i]) != -1) {
-			develops_to_factions[faction_count] = PlayerRaces.Factions[civilization][faction]->DevelopsTo[i];
-			faction_count += 1;
-		}
-	}
-
-	lua_createtable(l, faction_count, 0);
-	for (int i = 1; i <= faction_count; ++i)
-	{
-		lua_pushstring(l, develops_to_factions[i-1].c_str());
-		lua_rawseti(l, -2, i);
-	}
-	
-	return 1;
 }
 //Wyrmgus end
 
@@ -3848,7 +3845,6 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetFactions", CclGetFactions);
 	lua_register(Lua, "GetPlayerColors", CclGetPlayerColors);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);
-	lua_register(Lua, "GetFactionDevelopsTo", CclGetFactionDevelopsTo);
 	//Wyrmgus end
 	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
 	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);

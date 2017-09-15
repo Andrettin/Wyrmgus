@@ -595,11 +595,13 @@ public:
 	int DefaultGovernmentType;											/// default government type
 	int ParentFaction;													/// parent faction of this faction
 	bool Playable;														/// faction playability
+	IconConfig Icon;													/// Faction's icon
 	Vec2i DefaultStartPos;
 	CDeity *HolyOrderDeity;												/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions;
 	std::vector<int> Colors;											/// faction colors
-	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
+	std::vector<CFaction *> DevelopsFrom;								/// from which factions can this faction develop
+	std::vector<CFaction *> DevelopsTo;									/// to which factions this faction can develop
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions

@@ -1356,6 +1356,8 @@ void CButtonPanel::Draw()
 			button_icon = UnitTypes[buttons[i].Value]->Icon.Icon;
 		} else if (buttons[i].Action == ButtonBuy) {
 			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon().Icon;
+		} else if (buttons[i].Action == ButtonResearch && buttons[i].Icon.Name.empty() && AllUpgrades[buttons[i].Value]->Icon) {
+			button_icon = AllUpgrades[buttons[i].Value]->Icon;
 		}
 		//Wyrmgus end
 		
