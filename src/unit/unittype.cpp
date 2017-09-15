@@ -942,7 +942,7 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 				faction = NULL;
 			}
 			if (this->Faction != -1 && !faction) {
-				faction = PlayerRaces.Factions[civilization_id][this->Faction];
+				faction = PlayerRaces.Factions[this->Faction];
 			}
 			
 			if (this->BoolFlag[ORGANIC_INDEX].value) {

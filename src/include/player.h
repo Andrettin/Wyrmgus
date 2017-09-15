@@ -613,7 +613,6 @@ public:
 	std::vector<CSettlement *> Cores;									/// Core settlements of this faction (required to found it)
 	std::map<std::tuple<CDate, CDate, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
-	std::map<int, CFaction *> HistoricalFactionDerivations;				/// cases of this faction deriving technologies/governmental system from another, mapped to the date in which it happened
 	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
 	std::map<std::pair<int, CFaction *>, int> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
@@ -785,8 +784,8 @@ public:
 	void Clean();
 	int GetRaceIndexByName(const char *raceName) const;
 	//Wyrmgus start
-	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
-	CFaction *GetFaction(const int civilization, const std::string faction_name) const;
+	int GetFactionIndexByName(const std::string faction_name) const;
+	CFaction *GetFaction(const std::string faction_name) const;
 	int GetReligionIndexByIdent(std::string religion_ident) const;
 	int GetDeityDomainIndexByIdent(std::string deity_domain_ident) const;
 	int GetDeityIndexByIdent(std::string deity_ident) const;
@@ -794,11 +793,11 @@ public:
 	int GetLanguageIndexByIdent(std::string language_ident) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
-	int GetFactionClassUnitType(int civilization, int faction, int class_id);
-	int GetFactionClassUpgrade(int civilization, int faction, int class_id);
+	int GetFactionClassUnitType(int faction, int class_id);
+	int GetFactionClassUpgrade(int faction, int class_id);
 	int GetCivilizationLanguage(int civilization);
 	std::vector<CFiller> GetCivilizationUIFillers(int civilization);
-	std::vector<CFiller> GetFactionUIFillers(int civilization, int faction);
+	std::vector<CFiller> GetFactionUIFillers(int faction);
 	std::string TranslateName(std::string name, int language);
 	//Wyrmgus end
 
@@ -815,7 +814,7 @@ public:
 	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CCivilization *> Civilizations;    						/// civilizations
-	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
+	std::vector<CFaction *> Factions;    								/// factions
 	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
 	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops
 	int CivilizationLanguage[MAX_RACES];
@@ -914,7 +913,7 @@ extern std::vector<CColor> HairColorsRGB[HairColorMax]; /// Hair colors
 extern std::vector<int> ConversibleHairColors; 			/// Conversible hair colors
 
 extern std::map<std::string, int> CivilizationStringToIndex;
-extern std::map<std::string, int> FactionStringToIndex[MAX_RACES];
+extern std::map<std::string, int> FactionStringToIndex;
 
 extern bool LanguageCacheOutdated;
 //Wyrmgus end
@@ -976,7 +975,7 @@ inline bool CanSelectMultipleUnits(const CPlayer &player) { return &player == Th
 
 //Wyrmgus start
 extern void SetCivilizationStringToIndex(std::string civilization_name, int civilization_id);
-extern void SetFactionStringToIndex(int civilization, std::string faction_name, int faction_id);
+extern void SetFactionStringToIndex(std::string faction_name, int faction_id);
 extern void NetworkSetFaction(int player, std::string faction_name);
 extern int GetPlayerColorIndexByName(std::string player_color_name);
 extern int GetHairColorIndexByName(std::string hair_color_name);

@@ -569,34 +569,32 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		std::string mod_file(mapSetup);
 		mod_file = FindAndReplaceStringBeginning(mod_file, StratagusLibPath + "/", "");
 		
-		for (int i = 0; i < MAX_RACES; ++i) {
-			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-				if (PlayerRaces.Factions[i][j]->Mod != Map.Info.Filename) {
-					continue;
-				}
-				
-				f->printf("DefineFaction(\"%s\", {\n", PlayerRaces.Factions[i][j]->Ident.c_str());
-				f->printf("\tName = \"%s\",\n", PlayerRaces.Factions[i][j]->Name.c_str());
-				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[i].c_str());
-				if (PlayerRaces.Factions[i][j]->Type != FactionTypeNoFactionType) {
-					f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(PlayerRaces.Factions[i][j]->Type).c_str());
-				}
-				if (PlayerRaces.Factions[i][j]->ParentFaction != -1) {
-					f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[i][PlayerRaces.Factions[i][j]->ParentFaction]->Ident.c_str());
-				}
-				if (PlayerRaces.Factions[i][j]->Colors.size() > 0) {
-					f->printf("\tColors = {");
-					for (size_t k = 0; k < PlayerRaces.Factions[i][j]->Colors.size(); ++k) {
-						f->printf("\"%s\", ", PlayerColorNames[PlayerRaces.Factions[i][j]->Colors[k]].c_str());
-					}
-					f->printf("},\n");
-				}
-				if (!PlayerRaces.Factions[i][j]->FactionUpgrade.empty()) {
-					f->printf("\tFactionUpgrade = \"%s\",\n", PlayerRaces.Factions[i][j]->FactionUpgrade.c_str());
-				}
-				f->printf("\tMod = \"%s\"\n", mod_file.c_str());
-				f->printf("})\n\n");
+		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
+			if (PlayerRaces.Factions[i]->Mod != Map.Info.Filename) {
+				continue;
 			}
+				
+			f->printf("DefineFaction(\"%s\", {\n", PlayerRaces.Factions[i]->Ident.c_str());
+			f->printf("\tName = \"%s\",\n", PlayerRaces.Factions[i]->Name.c_str());
+			f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[i].c_str());
+			if (PlayerRaces.Factions[i]->Type != FactionTypeNoFactionType) {
+				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(PlayerRaces.Factions[i]->Type).c_str());
+			}
+			if (PlayerRaces.Factions[i]->ParentFaction != -1) {
+				f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[PlayerRaces.Factions[i]->ParentFaction]->Ident.c_str());
+			}
+			if (PlayerRaces.Factions[i]->Colors.size() > 0) {
+				f->printf("\tColors = {");
+				for (size_t k = 0; k < PlayerRaces.Factions[i]->Colors.size(); ++k) {
+					f->printf("\"%s\", ", PlayerColorNames[PlayerRaces.Factions[i]->Colors[k]].c_str());
+				}
+				f->printf("},\n");
+			}
+			if (!PlayerRaces.Factions[i]->FactionUpgrade.empty()) {
+				f->printf("\tFactionUpgrade = \"%s\",\n", PlayerRaces.Factions[i]->FactionUpgrade.c_str());
+			}
+			f->printf("\tMod = \"%s\"\n", mod_file.c_str());
+			f->printf("})\n\n");
 		}
 		
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
@@ -618,7 +616,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[type.Civilization].c_str());
 			}
 			if (type.Faction != -1) {
-				f->printf("\tFaction = \"%s\",\n", PlayerRaces.Factions[type.Civilization][type.Faction]->Ident.c_str());
+				f->printf("\tFaction = \"%s\",\n", PlayerRaces.Factions[type.Faction]->Ident.c_str());
 			}
 			if (type.Class != -1) {
 				f->printf("\tClass = \"%s\",\n", UnitTypeClasses[type.Class].c_str());
@@ -849,7 +847,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, PlayerRaces.Name[Players[i].Race].c_str());
 				if (Players[i].Faction != -1) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
-							  i, PlayerRaces.Factions[Players[i].Race][Players[i].Faction]->Ident.c_str());
+							  i, PlayerRaces.Factions[Players[i].Faction]->Ident.c_str());
 				}
 				f->printf("SetAiType(%d, \"%s\")\n",
 						  i, Players[i].AiName.c_str());

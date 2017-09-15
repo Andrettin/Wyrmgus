@@ -876,8 +876,8 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 			this->IndividualUpgrades[civilization_upgrade->ID] = true;
 		}
 	}
-	if (this->Type->Civilization != -1 && this->Type->Faction != -1 && !PlayerRaces.Factions[this->Type->Civilization][this->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[this->Type->Civilization][this->Type->Faction]->FactionUpgrade);
+	if (this->Type->Civilization != -1 && this->Type->Faction != -1 && !PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			this->IndividualUpgrades[faction_upgrade->ID] = true;
 		}
@@ -1258,8 +1258,8 @@ void CUnit::ChooseButtonIcon(int button_action)
 			faction = this->Player->Faction;
 		}
 		
-		if (faction != -1 && PlayerRaces.Factions[civilization][faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[civilization][faction]->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = PlayerRaces.Factions[civilization][faction]->ButtonIcons[button_action].Icon;
+		if (faction != -1 && PlayerRaces.Factions[faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[faction]->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = PlayerRaces.Factions[faction]->ButtonIcons[button_action].Icon;
 			return;
 		} else if (PlayerRaces.ButtonIcons[civilization].find(button_action) != PlayerRaces.ButtonIcons[civilization].end()) {
 			this->ButtonIcons[button_action] = PlayerRaces.ButtonIcons[civilization][button_action].Icon;
@@ -2104,7 +2104,7 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		int civilization_id = this->Type->Civilization;
-		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Race, this->Player->Faction, this->Type->Class)) {
+		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Faction, this->Type->Class)) {
 			civilization_id = this->Player->Race;
 		}
 		
@@ -2655,8 +2655,8 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 			unit->IndividualUpgrades[civilization_upgrade->ID] = true;
 		}
 	}
-	if (unit->Type->Civilization != -1 && unit->Type->Faction != -1 && !PlayerRaces.Factions[unit->Type->Civilization][unit->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[unit->Type->Civilization][unit->Type->Faction]->FactionUpgrade);
+	if (unit->Type->Civilization != -1 && unit->Type->Faction != -1 && !PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit->IndividualUpgrades[faction_upgrade->ID] = true;
 		}
@@ -3118,7 +3118,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	} else {
 		CFaction *faction = NULL;
 		if (this->Player->Race != -1 && this->Player->Faction != -1) {
-			faction = PlayerRaces.Factions[this->Player->Race][this->Player->Faction];
+			faction = PlayerRaces.Factions[this->Player->Faction];
 		}
 		this->Name = this->Type->GeneratePersonalName(faction, this->Variable[GENDER_INDEX].Value);
 		if (!this->Type->BoolFlag[FAUNA_INDEX].value && !this->Name.empty() && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
@@ -3144,7 +3144,7 @@ void CUnit::UpdateSettlement()
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
 		if (!this->Settlement) {
 			int civilization = this->Type->Civilization;
-			if (civilization != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization || this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Race, this->Player->Faction, this->Type->Class))) {
+			if (civilization != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization || this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Faction, this->Type->Class))) {
 				civilization = this->Player->Race;
 			}
 
@@ -4469,7 +4469,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Boots || EquippedItems[BootsItemSlot].size() == 0)
 				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Arrows || EquippedItems[ArrowsItemSlot].size() == 0)
 				&& !(newplayer.Race != -1 && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ident == PlayerRaces.CivilizationUpgrades[newplayer.Race])
-				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ident == PlayerRaces.Factions[newplayer.Race][newplayer.Faction]->FactionUpgrade)
+				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ident == PlayerRaces.Factions[newplayer.Faction]->FactionUpgrade)
 			) {
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
@@ -5947,8 +5947,8 @@ CIcon *CUnit::GetButtonIcon(int button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;
-	} else if (this->Player == ThisPlayer && ThisPlayer->Faction != -1 && PlayerRaces.Factions[ThisPlayer->Race][ThisPlayer->Faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[ThisPlayer->Race][ThisPlayer->Faction]->ButtonIcons.end()) {
-		return PlayerRaces.Factions[ThisPlayer->Race][ThisPlayer->Faction]->ButtonIcons[button_action].Icon;
+	} else if (this->Player == ThisPlayer && ThisPlayer->Faction != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[ThisPlayer->Faction]->ButtonIcons.end()) {
+		return PlayerRaces.Factions[ThisPlayer->Faction]->ButtonIcons[button_action].Icon;
 	} else if (this->Player == ThisPlayer && PlayerRaces.ButtonIcons[ThisPlayer->Race].find(button_action) != PlayerRaces.ButtonIcons[ThisPlayer->Race].end()) {
 		return PlayerRaces.ButtonIcons[ThisPlayer->Race][button_action].Icon;
 	}

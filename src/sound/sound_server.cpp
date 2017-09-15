@@ -854,18 +854,18 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 	SDL_LockMutex(Audio.Lock);
 	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		int parent_faction = -1;
 		bool found_music = false;
 		if (faction != -1) {
 			while (true) {
-				parent_faction = PlayerRaces.Factions[civilization][faction]->ParentFaction;
+				parent_faction = PlayerRaces.Factions[faction]->ParentFaction;
 				if (parent_faction == -1) {
 					break;
 				}
 				faction = parent_faction;
 				
-				if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[civilization][faction]->Ident.c_str()) == OAML_OK) {
+				if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[faction]->Ident.c_str()) == OAML_OK) {
 					found_music = true;
 					break;
 				}

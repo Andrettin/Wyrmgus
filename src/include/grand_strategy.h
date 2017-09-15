@@ -88,8 +88,6 @@ public:
 	void SetPort(bool has_port);
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
-	std::string GetCulturalName(int civilization = -1, int faction = -1, bool only_settlement = false);		/// Get the tile's cultural name.
-	std::string GenerateSettlementName(int civilization, int faction = -1);
 	
 	int BaseTileVariation;					/// Base tile variation
 	int Variation;							/// Tile variation
@@ -129,7 +127,6 @@ public:
 	}
 	
 	void SetOwner(int civilization_id, int faction_id);					/// Set a new owner for the province
-	void SetCivilization(int civilization);
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
 	void SetCurrentConstruction(int settlement_building);
 	void SetSettlementLocation(int x, int y);
@@ -150,8 +147,6 @@ public:
 	void CalculateIncomes();
 	void AddFactionClaim(int civilization_id, int faction_id);
 	void RemoveFactionClaim(int civilization_id, int faction_id);
-	void SetGovernor(std::string hero_full_name);
-	void GovernorSuccession();
 	bool HasBuildingClass(std::string building_class_name);
 	bool HasModifier(CUpgrade *modifier);
 	bool BordersModifier(CUpgrade *modifier);
@@ -168,9 +163,7 @@ public:
 	int GetClassUnitType(int class_id);
 	int GetLanguage();
 	int GetDesirabilityRating();
-	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GenerateWorkName();
-	CGrandStrategyHero *GenerateHero(std::string type, CGrandStrategyHero *parent = NULL);
 	CGrandStrategyHero *GetRandomAuthor();
 	
 	int Civilization;													/// Civilization of the province (-1 = no one).
@@ -222,17 +215,12 @@ public:
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
-	void FormFaction(int civilization, int faction);
-	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
 	void SetCapital(CGrandStrategyProvince *province);
 	void SetDiplomacyState(CGrandStrategyFaction *faction, int diplomacy_state_id);
 	void SetMinister(int title, std::string hero_full_name);
 	void MinisterSuccession(int title);
-	void GenerateMinister(int title, bool child_of_current_minister = false);
 	bool IsAlive();
 	bool HasTechnologyClass(std::string technology_class_name);
-	bool CanFormFaction(int civilization, int faction);
-	bool HasGovernmentPosition(int title);
 	bool CanHaveSuccession(int title, bool family_inheritance);
 	bool IsConquestDesirable(CGrandStrategyProvince *province);
 	int GetProductionEfficiencyModifier(int resource);
@@ -270,8 +258,6 @@ public:
 	CGrandStrategyRiver() : CTerrainFeature()
 	{
 	}
-	
-	std::string GetCulturalName(int civilization, int faction = -1);		/// Get the river's cultural name for a particular civilization/faction
 };
 
 class CGrandStrategyHero : public CCharacter
@@ -284,7 +270,6 @@ public:
 	{
 	}
 	
-	void Create();
 	void Die();
 	void SetType(int unit_type_id);
 	bool IsAlive();
@@ -379,11 +364,7 @@ public:
 	}
 
 	void DrawInterface();					/// Draw the interface
-	void DrawTileTooltip(int x, int y);		/// Draw the tooltip for a tile
 	void DoTurn();							/// Process the grand strategy turn
-	void DoTrade();							/// Process trade deals
-	void DoProspection();					/// Process prospection for the turn
-	void DoEvents();
 	void SetSelectedProvince(CGrandStrategyProvince *province);	/// Set selected province
 	void PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource);
 	void CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province);
@@ -483,17 +464,10 @@ extern void SetRiverCulturalName(std::string river_name, std::string civilizatio
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);
-extern std::string GetProvinceCulturalName(std::string province_name);
-extern std::string GetProvinceCivilizationCulturalName(std::string province_name, std::string civilization_name);
-extern std::string GetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name);
-extern std::string GetProvinceCulturalSettlementName(std::string province_name);
-extern std::string GetProvinceCivilizationCulturalSettlementName(std::string province_name, std::string civilization_name);
-extern std::string GetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name);
 extern std::string GetProvinceAttackedBy(std::string province_name);
 extern void SetProvinceName(std::string old_province_name, std::string new_province_name);
 extern void SetProvinceWater(std::string province_name, bool water);
 extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);
-extern void SetProvinceCivilization(std::string province_name, std::string civilization_name);
 extern void SetProvinceSettlementLocation(std::string province_name, int x, int y);
 extern void SetProvinceCulturalName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
 extern void SetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
@@ -514,11 +488,9 @@ extern void RemoveProvinceClaim(std::string province_name, std::string civilizat
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame(bool show_loading = true);
 extern void InitializeGrandStrategyWorldMap();
-extern void InitializeGrandStrategyProvinces();
 extern void FinalizeGrandStrategyInitialization();
 extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
-extern void DoProspection();
 extern void CalculateProvinceBorders();
 extern void CenterGrandStrategyMapOnTile(int x, int y);
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
@@ -549,7 +521,6 @@ extern std::string GetFactionTier(std::string civilization_name, std::string fac
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
 extern std::string GetFactionFullName(std::string civilization_name, std::string faction_name);
-extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
 extern void SetPlayerFaction(std::string civilization_name, std::string faction_name);
 extern std::string GetPlayerFactionName();
 extern void SetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
@@ -561,16 +532,12 @@ extern bool IsGrandStrategyUnit(const CUnitType &type);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern bool IsOffensiveMilitaryUnit(const CUnitType &type);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
-extern void FormFaction(std::string old_civilization_name, std::string old_faction_name, std::string new_civilization_name, std::string new_faction_name);
 extern void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern void ChangeFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name);
-extern bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_full_name);
 extern void SetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name, std::string hero_full_name);
 extern std::string GetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name);
 extern int GetFactionUnitCost(std::string civilization_name, std::string faction_name, std::string unit_type_ident, std::string resource_name);
-extern void CreateGrandStrategyHero(std::string hero_full_name);
-extern void CreateGrandStrategyCustomHero(std::string hero_full_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);
 extern void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident);
 extern std::string GetGrandStrategyHeroUnitType(std::string hero_full_name);

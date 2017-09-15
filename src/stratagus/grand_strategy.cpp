@@ -208,181 +208,8 @@ void CGrandStrategyGame::DrawInterface()
 	}
 }
 
-/**
-**  Draw the grand strategy tile tooltip.
-*/
-void CGrandStrategyGame::DrawTileTooltip(int x, int y)
-{
-	GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[x][y];
-	
-	std::string tile_tooltip;
-	
-	CGrandStrategyProvince *province = tile->Province;
-	int res = tile->Resource;
-	int owner_faction = (province != NULL && province->Owner != NULL && province != NULL && province->Owner->Civilization == province->Civilization) ? province->Owner->Faction : -1;
-	if (province != NULL && province->Owner != NULL && province->SettlementLocation.x == x && province->SettlementLocation.y == y && province->HasBuildingClass("town-hall")) {
-		if (province->Owner->Capital == province) {
-			tile_tooltip += "Capital ";
-		}
-		tile_tooltip += "Settlement";
-		if (!tile->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
-			tile_tooltip += " of ";
-			tile_tooltip += tile->GetCulturalName();
-		}
-		tile_tooltip += " (";
-		tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
-		tile_tooltip += ")";
-	} else if (res != -1 && tile->ResourceProspected) {
-		if (!tile->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
-			tile_tooltip += tile->GetCulturalName();
-			tile_tooltip += " (";
-			
-			if (!tile->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
-				tile_tooltip += "Unused ";
-			}
-			
-			if (res == GoldCost) {
-				tile_tooltip += "Gold Mine";
-			} else if (res == SilverCost) {
-				tile_tooltip += "Silver Mine";
-			} else if (res == CopperCost) {
-				tile_tooltip += "Copper Mine";
-			} else if (res == WoodCost) {
-				tile_tooltip += "Timber Lodge";
-			} else if (res == StoneCost) {
-				tile_tooltip += "Quarry";
-			}
-			tile_tooltip += ", ";
-			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
-			tile_tooltip += ")";
-		} else {
-			if (!tile->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
-				tile_tooltip += "Unused ";
-			}
-			
-			if (res == GoldCost) {
-				tile_tooltip += "Gold Mine";
-			} else if (res == SilverCost) {
-				tile_tooltip += "Silver Mine";
-			} else if (res == CopperCost) {
-				tile_tooltip += "Copper Mine";
-			} else if (res == WoodCost) {
-				tile_tooltip += "Timber Lodge";
-			} else if (res == StoneCost) {
-				tile_tooltip += "Quarry";
-			}
-			tile_tooltip += " (";
-			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
-			tile_tooltip += ")";
-		}
-	} else if (tile->Terrain != -1) {
-		if (!tile->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
-			tile_tooltip += tile->GetCulturalName();
-			tile_tooltip += " (";
-			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
-			tile_tooltip += ")";
-		} else {
-			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
-		}
-	} else {
-		tile_tooltip += "Unexplored";
-	}
-	
-	if (province != NULL && !province->Water) {
-		int tooltip_rivers[MaxDirections];
-		memset(tooltip_rivers, -1, sizeof(tooltip_rivers));
-		int tooltip_river_count = 0;
-		for (int i = 0; i < MaxDirections; ++i) {
-			if (tile->River[i] != -1) {
-				bool already_in_tooltip = false;
-				for (int j = 0; j < MaxDirections; ++j) {
-					if (tooltip_rivers[j] == -1) { //reached blank spot, no need to continue the loop
-						break;
-					}
-
-					if (tooltip_rivers[j] == tile->River[i]) {
-						already_in_tooltip = true;
-						break;
-					}
-				}
-				if (!already_in_tooltip) {
-					tooltip_rivers[tooltip_river_count] = tile->River[i];
-					tooltip_river_count += 1;
-					tile_tooltip += " (";
-					if (!GrandStrategyGame.Rivers[tile->River[i]]->GetCulturalName(province->Civilization, owner_faction).empty()) {
-						tile_tooltip += GrandStrategyGame.Rivers[tile->River[i]]->GetCulturalName(province->Civilization, owner_faction) + " ";
-					}
-					tile_tooltip += "River";
-					tile_tooltip += ")";
-				}
-			}
-		}
-	}
-				
-	if (tile->Port && province != NULL && province->SettlementLocation.x == x && province->SettlementLocation.y == y) { // ports only possible on settlement locations, at least for now
-		tile_tooltip += " (";
-		tile_tooltip += "Dock";
-		tile_tooltip += ")";
-	}
-	
-	if (province != NULL) {
-		tile_tooltip += ",\n";
-		tile_tooltip += province->GetCulturalName();
-		
-		if (province->Owner != NULL) {
-			tile_tooltip += ",\n";
-			tile_tooltip += province->Owner->GetFullName();
-		}
-	}
-	tile_tooltip += "\n(";
-	tile_tooltip += std::to_string((long long) x);
-	tile_tooltip += ", ";
-	tile_tooltip += std::to_string((long long) y);
-	tile_tooltip += ")";
-	
-	if (!Preference.NoStatusLineTooltips) {
-		CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY, tile_tooltip);
-	}
-	
-	//draw tile tooltip as a popup
-	DrawGenericPopup(tile_tooltip, 0, UI.InfoPanel.Y);
-}
-
 void CGrandStrategyGame::DoTurn()
 {
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (this->Factions[i][j]->IsAlive()) {
-				//faction income
-				for (int k = 0; k < MaxCosts; ++k) {
-					if (k == GoldCost || k == SilverCost) { //gold and silver are converted to copper
-						continue;
-					} else if (k == ResearchCost || k == LeadershipCost) {
-						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->OwnedProvinces.size();
-					} else {
-						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k];
-					}
-				}
-					
-				for (int k = 0; k < MaxCharacterTitles; ++k) {
-					// try to perform government position succession for existent factions missing a character in charge of it
-					if (IsMinisterialTitle(k) && GrandStrategyGame.Factions[i][j]->Ministers[k] == NULL && GrandStrategyGame.Factions[i][j]->HasGovernmentPosition(k)) {
-						GrandStrategyGame.Factions[i][j]->MinisterSuccession(k);
-					}
-				}
-			} else {
-				for (int k = 0; k < MaxCharacterTitles; ++k) {
-					if (this->Factions[i][j]->Ministers[k] != NULL && !(k == CharacterTitleHeadOfState && PlayerRaces.Factions[i][j]->Type == FactionTypePolity && this->Factions[i][j]->GovernmentType == GovernmentTypeMonarchy)) {
-						this->Factions[i][j]->SetMinister(k, ""); //"dead" factions should have no ministers, unless it is a head of state title and the faction is a monarchical polity
-					}
-				}
-			}
-		}
-	}
-	
-	//this function takes care only of some things for now, move the rest from Lua later
-	this->DoTrade();
-	
 	for (size_t i = 0; i < this->Provinces.size(); ++i) {
 		if (this->Provinces[i]->Civilization != -1) { // if this province has a culture
 			// construct buildings
@@ -407,70 +234,11 @@ void CGrandStrategyGame::DoTurn()
 				if (SyncRand(1000) == 0) { // 0.1% chance per year that a (randomly generated) literary work will be created in a province
 					this->CreateWork(NULL, NULL, this->Provinces[i]);
 				}
-				
-				if (this->Provinces[i]->Governor == NULL && this->Provinces[i]->Owner->HasGovernmentPosition(CharacterTitleGovernor)) {
-					this->Provinces[i]->GovernorSuccession();
-				}
 			}
 		}
 		this->Provinces[i]->Movement = false; //after processing the turn, always set the movement to false
 	}
 	
-	//check if any heroes should begin activity this year
-	for (size_t i = 0; i < this->Heroes.size(); ++i) {
-		if (
-			// for historical personages to appear, they require three things: the year of their historical rise to prominence, ownership of the province in which they were born or raised, and that that province be of the correct culture for them, if they belonged to the cultural majority (or if the civilization of the province's owner is the same as the hero, as undoubtedly administrators and the like would exist from the faction's culture in any of its provinces)
-//			GrandStrategyYear >= this->Heroes[i]->Year
-//			&& GrandStrategyYear <= this->Heroes[i]->DeathYear
-			this->Heroes[i]->State == 0
-			&& !this->Heroes[i]->Existed
-			&& this->Heroes[i]->ProvinceOfOrigin != NULL
-			&& this->Heroes[i]->ProvinceOfOrigin->Owner != NULL
-			&& (this->Heroes[i]->ProvinceOfOrigin->Civilization == this->Heroes[i]->Civilization || this->Heroes[i]->ProvinceOfOrigin->Owner->Civilization == this->Heroes[i]->Civilization)
-		) {
-			//make heroes appear in their start year
-			if ( // warrior heroes have the additional requirement of needing leadership to be created, unless they belong to the ruling house, in which case they are free
-				!IsOffensiveMilitaryUnit(*this->Heroes[i]->Type)
-				|| (
-					this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState] != NULL
-					&& (
-						this->Heroes[i]->Father == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]
-						|| this->Heroes[i]->Mother == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]
-						|| this->Heroes[i]->FamilyName == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]->FamilyName
-					)
-				)
-				|| this->Heroes[i]->ProvinceOfOrigin->Owner->Resources[LeadershipCost] >= 2000
-			) {
-				this->Heroes[i]->Create();
-				
-				if (
-					IsOffensiveMilitaryUnit(*this->Heroes[i]->Type)
-					&& !(
-						this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState] != NULL
-						&& (
-							this->Heroes[i]->Father == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]
-							|| this->Heroes[i]->Mother == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]
-							|| this->Heroes[i]->FamilyName == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]->FamilyName
-						)
-					)
-				) {
-					this->Heroes[i]->ProvinceOfOrigin->Owner->Resources[LeadershipCost] -= 2000;
-				}
-			}
-		}
-	}
-	
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (this->Factions[i][j]->IsAlive()) {
-				if (this->Factions[i][j]->Resources[LeadershipCost] >= 2000) { // if the faction has 2000 leadership or more, produce a warrior character
-					this->Factions[i][j]->GetRandomProvinceWeightedByPopulation()->GenerateHero("warrior");
-					this->Factions[i][j]->Resources[LeadershipCost] -= 2000;
-				}
-			}
-		}
-	}
-
 	// check if any literary works should be published this year
 	int works_size = this->UnpublishedWorks.size();
 	for (int i = (works_size - 1); i >= 0; --i) {
@@ -508,248 +276,6 @@ void CGrandStrategyGame::DoTurn()
 				this->CreateWork(this->UnpublishedWorks[i], author, author->Province);
 			} else {
 				this->CreateWork(this->UnpublishedWorks[i], author, this->CultureProvinces[civilization][SyncRand(this->CultureProvinces[civilization].size())]);
-			}
-		}
-	}
-	
-	this->DoEvents();
-}
-
-void CGrandStrategyGame::DoTrade()
-{
-	//store the human player's trade settings
-	int player_trade_preferences[MaxCosts];
-	if (this->PlayerFaction != NULL) {
-		for (int i = 0; i < MaxCosts; ++i) {
-			player_trade_preferences[i] = this->PlayerFaction->Trade[i];
-		}
-	}
-	
-	std::vector<bool> province_consumed_commodity[MaxCosts];
-	for (int i = 0; i < MaxCosts; ++i) {
-		for (size_t j = 0; j < this->Provinces.size(); ++j) {
-			province_consumed_commodity[i].push_back(false);
-		}
-	}
-	
-	// first sell to domestic provinces, then to other factions, and only then to foreign provinces
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (this->Factions[i][j]->IsAlive()) {
-				for (size_t k = 0; k < this->Factions[i][j]->OwnedProvinces.size(); ++k) {
-					int province_id = this->Factions[i][j]->OwnedProvinces[k];
-					for (int res = 0; res < MaxCosts; ++res) {
-						if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LeadershipCost) {
-							continue;
-						}
-							
-						if (province_consumed_commodity[res][province_id] == false && this->Factions[i][j]->Trade[res] >= this->Provinces[province_id]->GetResourceDemand(res) && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
-							this->Factions[i][j]->Resources[res] -= this->Provinces[province_id]->GetResourceDemand(res);
-							this->Factions[i][j]->Resources[CopperCost] += this->Provinces[province_id]->GetResourceDemand(res) * this->CommodityPrices[res] / 100;
-							this->Factions[i][j]->Trade[res] -= this->Provinces[province_id]->GetResourceDemand(res);
-							province_consumed_commodity[res][province_id] = true;
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	CGrandStrategyFaction *factions_by_prestige[MAX_RACES * FactionMax];
-	int factions_by_prestige_count = 0;
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (this->Factions[i][j]->IsAlive()) {
-				factions_by_prestige[factions_by_prestige_count] = const_cast<CGrandStrategyFaction *>(&(*this->Factions[i][j]));
-				factions_by_prestige_count += 1;
-			}
-		}
-	}
-	
-	//sort factions by prestige
-	bool swapped = true;
-	for (int passes = 0; passes < factions_by_prestige_count && swapped; ++passes) {
-		swapped = false;
-		for (int i = 0; i < factions_by_prestige_count - 1; ++i) {
-			if (factions_by_prestige[i] && factions_by_prestige[i + 1]) {
-				if (!TradePriority(*factions_by_prestige[i], *factions_by_prestige[i + 1])) {
-					CGrandStrategyFaction *temp_faction = const_cast<CGrandStrategyFaction *>(&(*factions_by_prestige[i]));
-					factions_by_prestige[i] = const_cast<CGrandStrategyFaction *>(&(*factions_by_prestige[i + 1]));
-					factions_by_prestige[i + 1] = const_cast<CGrandStrategyFaction *>(&(*temp_faction));
-					swapped = true;
-				}
-			} else {
-				break;
-			}
-		}
-	}
-
-	for (int i = 0; i < factions_by_prestige_count; ++i) {
-		if (factions_by_prestige[i]) {
-			for (int res = 0; res < MaxCosts; ++res) {
-				if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LeadershipCost) {
-					continue;
-				}
-				
-				if (factions_by_prestige[i]->Trade[res] < 0) { // if wants to import lumber
-					for (int j = 0; j < factions_by_prestige_count; ++j) {
-						if (j != i && factions_by_prestige[j]) {
-							if (factions_by_prestige[j]->Trade[res] > 0) { // if second faction wants to export lumber
-								this->PerformTrade(*factions_by_prestige[i], *factions_by_prestige[j], res);
-							}
-						} else {
-							break;
-						}
-					}
-				} else if (factions_by_prestige[i]->Trade[res] > 0) { // if wants to export lumber
-					for (int j = 0; j < factions_by_prestige_count; ++j) {
-						if (j != i && factions_by_prestige[j]) {
-							if (factions_by_prestige[j]->Trade[res] < 0) { // if second faction wants to import lumber
-								this->PerformTrade(*factions_by_prestige[j], *factions_by_prestige[i], res);
-							}
-						} else {
-							break;
-						}
-					}
-				}
-			}
-		} else {
-			break;
-		}
-	}
-	
-	//sell to foreign provinces
-	for (int i = 0; i < factions_by_prestige_count; ++i) {
-		if (factions_by_prestige[i]) {
-			for (int j = 0; j < factions_by_prestige_count; ++j) {
-				if (j != i && factions_by_prestige[j]) {
-					for (size_t k = 0; k < factions_by_prestige[j]->OwnedProvinces.size(); ++k) {
-						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
-						
-						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LeadershipCost) {
-								continue;
-							}
-							
-							if (province_consumed_commodity[res][province_id] == false && factions_by_prestige[i]->Trade[res] >= this->Provinces[province_id]->GetResourceDemand(res) && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
-								factions_by_prestige[i]->Resources[res] -= this->Provinces[province_id]->GetResourceDemand(res);
-								factions_by_prestige[i]->Resources[CopperCost] += this->Provinces[province_id]->GetResourceDemand(res) * this->CommodityPrices[res] / 100;
-								factions_by_prestige[i]->Trade[res] -= this->Provinces[province_id]->GetResourceDemand(res);
-								province_consumed_commodity[res][province_id] = true;
-							}
-						}
-					}
-				} else {
-					break;
-				}
-			}
-		} else {
-			break;
-		}
-	}
-
-	// check whether offers or bids have been greater, and change the commodity's price accordingly
-	int remaining_wanted_trade[MaxCosts];
-	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
-	for (int res = 0; res < MaxCosts; ++res) {
-		if (res == CopperCost || res == GoldCost || res == SilverCost || res == ResearchCost || res == PrestigeCost || res == LeadershipCost) {
-			continue;
-		}
-		
-		for (int i = 0; i < factions_by_prestige_count; ++i) {
-			if (factions_by_prestige[i]) {
-				remaining_wanted_trade[res] += factions_by_prestige[i]->Trade[res];
-			} else {
-				break;
-			}
-		}
-		
-		for (size_t i = 0; i < this->Provinces.size(); ++i) {
-			if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->Owner != NULL) {
-				if (province_consumed_commodity[res][i] == false) {
-					remaining_wanted_trade[res] -= this->Provinces[i]->GetResourceDemand(res);
-				}
-			}
-		}
-	
-		if (remaining_wanted_trade[res] > 0 && this->CommodityPrices[res] > 1) { // more offers than bids
-			this->CommodityPrices[res] -= 1;
-		} else if (remaining_wanted_trade[res] < 0) { // more bids than offers
-			this->CommodityPrices[res] += 1;
-		}
-	}
-	
-	//now restore the human player's trade settings
-	if (this->PlayerFaction != NULL) {
-		for (int i = 0; i < MaxCosts; ++i) {
-			if (i == CopperCost || i == GoldCost || i == SilverCost || i == ResearchCost || i == PrestigeCost || i == LeadershipCost) {
-				continue;
-			}
-		
-			if (player_trade_preferences[i] > 0 && this->PlayerFaction->Resources[i] < player_trade_preferences[i]) {
-				player_trade_preferences[i] = this->PlayerFaction->Resources[i];
-			} else if (player_trade_preferences[i] < 0 && this->PlayerFaction->Resources[CopperCost] < 0) {
-				player_trade_preferences[i] = 0;
-			} else if (player_trade_preferences[i] < 0 && this->PlayerFaction->Resources[CopperCost] < (player_trade_preferences[i] * -1 * this->CommodityPrices[i] / 100)) {
-				player_trade_preferences[i] = (this->PlayerFaction->Resources[CopperCost] / this->CommodityPrices[i] * 100) * -1;
-			}
-			this->PlayerFaction->Trade[i] = player_trade_preferences[i];
-		}
-	}
-}
-
-void CGrandStrategyGame::DoProspection()
-{
-	for (int i = 0; i < MaxCosts; ++i) {
-		for (int j = 0; j < WorldMapResourceMax; ++j) {
-			if (GrandStrategyGame.WorldMapResources[i][j].x != -1 && GrandStrategyGame.WorldMapResources[i][j].y != -1) {
-				int x = GrandStrategyGame.WorldMapResources[i][j].x;
-				int y = GrandStrategyGame.WorldMapResources[i][j].y;
-				
-				if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) { //already discovered
-					continue;
-				}
-
-				CGrandStrategyProvince *province = GrandStrategyGame.WorldMapTiles[x][y]->Province;
-						
-				if (province != NULL && province->Owner != NULL && province->HasBuildingClass("town-hall")) {
-					if (SyncRand(100) < 1) { // 1% chance of discovery per turn
-						GrandStrategyGame.WorldMapTiles[x][y]->SetResourceProspected(i, true);
-						if (GrandStrategyGame.PlayerFaction == province->Owner) {
-							char buf[256];
-							snprintf(
-								buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-								(CapitalizeString(DefaultResourceNames[i]) + " found in " + province->GetCulturalName()).c_str(),
-								("My lord, " + CapitalizeString(DefaultResourceNames[i]) + " has been found in the " + FullyDecapitalizeString(WorldMapTerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name) + " of " + province->GetCulturalName() + "!").c_str()
-							);
-							CclCommand(buf);
-							
-							/*
-							if (wyr.preferences.ShowTips) {
-								Tip("Gold Discovery in Province", "Congratulations! You have found gold in one of your provinces. Each gold mine provides you with 200 gold per turn, if a town hall is built in its province.")
-							}
-							*/
-						}
-					}
-				}
-			} else {
-				break;
-			}
-		}
-	}
-}
-
-void CGrandStrategyGame::DoEvents()
-{
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
-				for (size_t k = 0; k < GrandStrategyGame.AvailableEvents.size(); ++k) {
-					CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[i][j]->Ident + "\");");
-					if (GrandStrategyGame.AvailableEvents[k]->CanTrigger(GrandStrategyGame.Factions[i][j])) {
-						GrandStrategyGame.AvailableEvents[k]->Trigger(GrandStrategyGame.Factions[i][j]);
-					}
-				}
 			}
 		}
 	}
@@ -859,7 +385,7 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 		if (province->Owner != GrandStrategyGame.PlayerFaction) {
 			work_creation_message += "the foreign lands of ";
 		}
-		work_creation_message += province->GetCulturalName() + "!";
+		work_creation_message += province->Name + "!";
 		if (work != NULL && !work->Description.empty()) {
 			work_creation_message += " " + FindAndReplaceString(FindAndReplaceString(work->Description, "\"", "\\\""), "\n", "\\n");
 		}
@@ -943,29 +469,6 @@ void GrandStrategyWorldMapTile::SetPort(bool has_port)
 	}
 }
 
-/**
-**  Generate a settlement name for the tile.
-**
-**  @param l  Lua state.
-*/
-std::string GrandStrategyWorldMapTile::GenerateSettlementName(int civilization, int faction)
-{
-	//10% chance that the settlement will be named after a named terrain feature in its tile, if there is any
-	if (civilization != -1 && faction == -1 && this->Terrain != -1 && this->CulturalTerrainNames.find(std::pair<int,int>(this->Terrain, civilization)) != this->CulturalTerrainNames.end() && SyncRand(100) < 10) {
-		return this->CulturalTerrainNames[std::pair<int,int>(this->Terrain, civilization)][0];
-	} else if (civilization != -1 && faction != -1 && this->Terrain != -1 && this->FactionCulturalTerrainNames.find(std::pair<int,CFaction *>(this->Terrain, PlayerRaces.Factions[civilization][faction])) != this->FactionCulturalTerrainNames.end() && SyncRand(100) < 10) {
-		return this->FactionCulturalTerrainNames[std::pair<int,CFaction *>(this->Terrain, PlayerRaces.Factions[civilization][faction])][0];
-	}
-	
-	if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->GetSettlementNames().size() > 0) {
-		return PlayerRaces.Factions[civilization][faction]->GetSettlementNames()[SyncRand(PlayerRaces.Factions[civilization][faction]->GetSettlementNames().size())];
-	} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->GetSettlementNames().size() > 0) {
-		return PlayerRaces.Civilizations[civilization]->GetSettlementNames()[SyncRand(PlayerRaces.Civilizations[civilization]->GetSettlementNames().size())];
-	}
-	
-	return "";
-}
-
 bool GrandStrategyWorldMapTile::IsWater()
 {
 	if (this->Terrain != -1) {
@@ -983,100 +486,6 @@ bool GrandStrategyWorldMapTile::HasResource(int resource, bool ignore_prospectio
 		return true;
 	}
 	return false;
-}
-
-/**
-**  Get the tile's cultural name.
-*/
-std::string GrandStrategyWorldMapTile::GetCulturalName(int civilization, int faction, bool only_settlement)
-{
-	if (civilization == -1) {
-		if (this->Province != NULL) {
-			if (!this->Province->Water) {
-				civilization = this->Province->Civilization;
-			} else if (this->Province->Water && this->Province->ReferenceProvince != -1 && GrandStrategyGame.Provinces[this->Province->ReferenceProvince]->Civilization != -1) {
-				civilization = GrandStrategyGame.Provinces[this->Province->ReferenceProvince]->Civilization;
-			}
-		}
-	}
-	
-	if (faction == -1 && civilization != -1) {
-		if (this->Province != NULL) {
-			if (!this->Province->Water && this->Province->Owner != NULL && this->Province->Owner->Civilization == civilization) {
-				faction = this->Province->Owner->Faction;
-			} else if (this->Province->Water && this->Province->ReferenceProvince != -1 && GrandStrategyGame.Provinces[this->Province->ReferenceProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->Province->ReferenceProvince]->Owner->Civilization == civilization) {
-				faction = GrandStrategyGame.Provinces[this->Province->ReferenceProvince]->Owner->Faction;
-			}
-		}
-	}
-	
-	if (
-		this->Province != NULL
-		&& (this->Province->SettlementLocation == this->Position || only_settlement)
-		&& civilization != -1 && faction != -1
-		&& this->FactionCulturalSettlementNames.find(PlayerRaces.Factions[civilization][faction]) != this->FactionCulturalSettlementNames.end()
-	) {
-		return this->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]][0];
-	} else if (
-		this->Province != NULL
-		&& (this->Province->SettlementLocation == this->Position || only_settlement)
-		&& civilization != -1
-		&& this->CulturalSettlementNames.find(civilization) != this->CulturalSettlementNames.end()
-	) {
-		return this->CulturalSettlementNames[civilization][0];
-	} else if (
-		this->Province != NULL
-		&& this->Terrain != -1
-		&& (this->Resource == -1 || !this->ResourceProspected)
-		&& this->Province->SettlementLocation != this->Position && !only_settlement
-		&& civilization != -1 && faction != -1
-		&& this->FactionCulturalTerrainNames.find(std::pair<int,CFaction *>(this->Terrain, PlayerRaces.Factions[civilization][faction])) != this->FactionCulturalTerrainNames.end()
-	) {
-		return this->FactionCulturalTerrainNames[std::pair<int,CFaction *>(this->Terrain, PlayerRaces.Factions[civilization][faction])][0];
-	} else if (
-		this->Province != NULL
-		&& this->Terrain != -1
-		&& (this->Resource == -1 || !this->ResourceProspected)
-		&& this->Province->SettlementLocation != this->Position && !only_settlement
-		&& civilization != -1
-		&& this->CulturalTerrainNames.find(std::pair<int,int>(this->Terrain, civilization)) != this->CulturalTerrainNames.end()
-	) {
-		return this->CulturalTerrainNames[std::pair<int,int>(this->Terrain, civilization)][0];
-	} else if (
-		this->Province != NULL
-		&& this->Resource != -1
-		&& this->ResourceProspected
-		&& this->Province->SettlementLocation != this->Position && !only_settlement
-		&& civilization != -1 && faction != -1
-		&& this->FactionCulturalResourceNames.find(std::pair<int,CFaction *>(this->Resource, PlayerRaces.Factions[civilization][faction])) != this->FactionCulturalResourceNames.end()
-	) {
-		return this->FactionCulturalResourceNames[std::pair<int,CFaction *>(this->Resource, PlayerRaces.Factions[civilization][faction])][0];
-	} else if (
-		this->Province != NULL
-		&& this->Resource != -1
-		&& this->ResourceProspected
-		&& this->Province->SettlementLocation != this->Position && !only_settlement
-		&& civilization != -1
-		&& this->CulturalResourceNames.find(std::pair<int,int>(this->Resource, civilization)) != this->CulturalResourceNames.end()
-	) {
-		return this->CulturalResourceNames[std::pair<int,int>(this->Resource, civilization)][0];
-	} else if (!only_settlement) {
-		return this->Name;
-	} else {
-		return "";
-	}
-}
-
-/**
-**  Get a river's cultural name.
-*/
-std::string CGrandStrategyRiver::GetCulturalName(int civilization, int faction)
-{
-	if (civilization != -1 && this->CulturalNames.find(civilization) != this->CulturalNames.end()) {
-		return this->CulturalNames[civilization];
-	} else {
-		return this->Name;
-	}
 }
 
 void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
@@ -1109,33 +518,6 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 						this->Owner->GetRandomProvinceWeightedByPopulation()->SetHero(this->Owner->Ministers[i]->GetFullName(), this->Owner->Ministers[i]->State);
 					} else {
 						this->Owner->Ministers[i]->Die();
-					}
-				}
-			}
-		}
-		
-		//set the province's faction-specific units back to the corresponding units of the province's civilization
-		if (this->Owner->Civilization == this->Civilization) {
-			for (size_t i = 0; i < UnitTypes.size(); ++i) { //change the province's military score to be appropriate for the new faction's technologies
-				if (
-					IsGrandStrategyUnit(*UnitTypes[i])
-					&& UnitTypes[i]->Class != -1
-					&& UnitTypes[i]->Civilization != -1
-					&& UnitTypes[i]->Faction != -1
-					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, UnitTypes[i]->Class) == i
-					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, UnitTypes[i]->Class) != -1
-					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, UnitTypes[i]->Class) != PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, UnitTypes[i]->Class)
-				) {
-					this->ChangeUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(this->Civilization, UnitTypes[i]->Class), this->Units[i]);
-					this->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(this->Civilization, UnitTypes[i]->Class)] += this->UnderConstructionUnits[i];
-					this->SetUnitQuantity(i, 0);
-					this->UnderConstructionUnits[i] = 0;
-				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && UnitTypes[i]->Civilization != -1 && UnitTypes[i]->Faction != -1) {
-					if (this->SettlementBuildings[i] && PlayerRaces.GetCivilizationClassUnitType(this->Civilization, UnitTypes[i]->Class) != i) {
-						this->SetSettlementBuilding(i, false); // remove building from other civilization
-						if (PlayerRaces.GetCivilizationClassUnitType(this->Civilization, UnitTypes[i]->Class) != -1) {
-							this->SetSettlementBuilding(PlayerRaces.GetCivilizationClassUnitType(this->Civilization, UnitTypes[i]->Class), true);
-						}
 					}
 				}
 			}
@@ -1177,136 +559,13 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 		if (GrandStrategyGameInitialized && this->Owner->Capital == NULL) { //if new owner has no capital, set this province as the capital
 			this->Owner->SetCapital(this);
 		}
-		
-		if (this->Civilization == -1) { // if province has no civilization/culture defined, then make its culture that of its owner
-			this->SetCivilization(this->Owner->Civilization);
-			
-			//if province's settlement location tile has a port but not the province, create a dock for the province's settlement, if its civilization has one
-			if (GrandStrategyGame.IsPointOnMap(this->SettlementLocation.x, this->SettlementLocation.y) && GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port) {
-				int dock_building_type = this->GetClassUnitType(GetUnitTypeClassIndexByName("dock"));
-				if (dock_building_type != -1) {
-					this->SetSettlementBuilding(dock_building_type, true);
-				}
-			}
-		}
-		
-		//set the province's units to their faction-specific equivalents (if any)
-		if (this->Owner->Civilization == this->Civilization) {
-			for (size_t i = 0; i < UnitTypes.size(); ++i) { //change the province's military score to be appropriate for the new faction's technologies
-				if (
-					IsGrandStrategyUnit(*UnitTypes[i])
-					&& UnitTypes[i]->Class != -1
-					&& UnitTypes[i]->Civilization != -1
-					&& UnitTypes[i]->Faction == -1
-					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, UnitTypes[i]->Class) == i
-					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, UnitTypes[i]->Class) != -1
-					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, UnitTypes[i]->Class) != PlayerRaces.GetCivilizationClassUnitType(this->Civilization, UnitTypes[i]->Class)
-				) {
-					this->ChangeUnitQuantity(PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, UnitTypes[i]->Class), this->Units[i]);
-					this->UnderConstructionUnits[PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, UnitTypes[i]->Class)] += this->UnderConstructionUnits[i];
-					this->SetUnitQuantity(i, 0);
-					this->UnderConstructionUnits[i] = 0;
-				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && UnitTypes[i]->Civilization != -1 && UnitTypes[i]->Faction == -1) {
-					if (this->SettlementBuildings[i] && this->GetClassUnitType(UnitTypes[i]->Class) != i) {
-						this->SetSettlementBuilding(i, false); // remove building from other civilization
-						if (this->GetClassUnitType(UnitTypes[i]->Class) != -1) {
-							this->SetSettlementBuilding(this->GetClassUnitType(UnitTypes[i]->Class), true);
-						}
-					}
-				}
-			}
-		}
 	} else {
 		this->Owner = NULL;
-		this->SetCivilization(-1); //if there is no owner, change the civilization to none
 	}
 	
 	if (GrandStrategyGameInitialized) {
 		this->CalculateIncomes();
 	}
-}
-
-void CGrandStrategyProvince::SetCivilization(int civilization)
-{
-	int old_civilization = this->Civilization;
-	
-	if (old_civilization != -1) { // if province had a civilization, remove it from that civilization's culture province vector
-		GrandStrategyGame.CultureProvinces[old_civilization].erase(std::remove(GrandStrategyGame.CultureProvinces[old_civilization].begin(), GrandStrategyGame.CultureProvinces[old_civilization].end(), this), GrandStrategyGame.CultureProvinces[old_civilization].end());
-	}
-	
-	this->Civilization = civilization;
-	GrandStrategyGame.CultureProvinces[civilization].push_back(this);
-	
-	if (civilization != -1) {
-		// create a new cultural name for the province, if there isn't any
-		if (this->CulturalNames.find(civilization) == this->CulturalNames.end()) {
-			std::string new_province_name = "";
-			// first see if can translate the province's current cultural name
-			if (new_province_name == "") {
-				new_province_name = PlayerRaces.TranslateName(this->GetCulturalName(), PlayerRaces.GetCivilizationLanguage(civilization));
-			}
-			if (new_province_name == "") { // try to translate any cultural name
-				for (int i = 0; i < MAX_RACES; ++i) {
-					if (this->CulturalNames.find(i) != this->CulturalNames.end()) {
-						new_province_name = PlayerRaces.TranslateName(this->CulturalNames[i], PlayerRaces.GetCivilizationLanguage(civilization));
-						if (!new_province_name.empty()) {
-							break;
-						}
-					}
-				}
-			}
-			if (new_province_name == "") { // try to translate any faction cultural name
-				for (std::map<CFaction *, std::string>::iterator iterator = this->FactionCulturalNames.begin(); iterator != this->FactionCulturalNames.end(); ++iterator) {
-					new_province_name = PlayerRaces.TranslateName(iterator->second, PlayerRaces.GetCivilizationLanguage(civilization)); 
-					if (!new_province_name.empty()) {
-						break;
-					}
-				}
-			}
-			if (new_province_name != "") {
-				this->CulturalNames[civilization] = new_province_name;
-			}
-		}
-		
-		for (size_t i = 0; i < UnitTypes.size(); ++i) {
-			// replace existent buildings from other civilizations with buildings of the new civilization
-			if (IsGrandStrategyBuilding(*UnitTypes[i]) && UnitTypes[i]->Civilization != -1) {
-				if (this->SettlementBuildings[i] && this->GetClassUnitType(UnitTypes[i]->Class) != i) {
-					this->SetSettlementBuilding(i, false); // remove building from other civilization
-					if (this->GetClassUnitType(UnitTypes[i]->Class) != -1) {
-						this->SetSettlementBuilding(this->GetClassUnitType(UnitTypes[i]->Class), true);
-					}
-				}
-			// replace existent units from the previous civilization with units of the new civilization
-			} else if (
-				IsGrandStrategyUnit(*UnitTypes[i])
-				&& UnitTypes[i]->Class != -1
-				&& UnitTypes[i]->Civilization != -1
-				&& PlayerRaces.GetCivilizationClassUnitType(old_civilization, UnitTypes[i]->Class) == i
-				&& this->GetClassUnitType(UnitTypes[i]->Class) != -1
-				&& this->GetClassUnitType(UnitTypes[i]->Class) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, UnitTypes[i]->Class) // don't replace if both civilizations use the same unit type
-			) {
-				this->ChangeUnitQuantity(this->GetClassUnitType(UnitTypes[i]->Class), this->Units[i]);
-				this->UnderConstructionUnits[this->GetClassUnitType(UnitTypes[i]->Class)] += this->UnderConstructionUnits[i];
-				this->SetUnitQuantity(i, 0);
-				this->UnderConstructionUnits[i] = 0;
-			}
-		}
-		
-		if (old_civilization == -1 && this->TotalWorkers == 0) {
-			//if the province had no culture set and thus has no worker, give it one worker
-			this->SetUnitQuantity(this->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), 1);
-		}
-	} else {
-		//if province is being set to no culture, remove all workers
-		if (old_civilization != -1) {
-			this->SetUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName("worker")), 0);
-		}
-	}
-	
-	this->CurrentConstruction = -1; // under construction buildings get canceled
-	
-	this->CalculateIncomes();
 }
 
 void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_settlement_building)
@@ -1635,98 +894,6 @@ void CGrandStrategyProvince::RemoveFactionClaim(int civilization_id, int faction
 	GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.erase(std::remove(GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.begin(), GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.end(), this), GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.end());
 }
 
-void CGrandStrategyProvince::SetGovernor(std::string hero_full_name)
-{
-	if (this->Governor != NULL && std::find(this->Governor->ProvinceTitles.begin(), this->Governor->ProvinceTitles.end(), std::pair<int, CGrandStrategyProvince *>(CharacterTitleGovernor, this)) != this->Governor->ProvinceTitles.end()) { // remove from the old governor's array
-		this->Governor->ProvinceTitles.erase(std::remove(this->Governor->ProvinceTitles.begin(), this->Governor->ProvinceTitles.end(), std::pair<int, CGrandStrategyProvince *>(CharacterTitleGovernor, this)), this->Governor->ProvinceTitles.end());
-	}
-			
-	if (hero_full_name.empty()) {
-		if (this->Owner->CanHaveSuccession(CharacterTitleGovernor, true) && GrandStrategyGameInitialized) {
-			this->GovernorSuccession();
-		} else {
-			this->Governor = NULL;
-		}
-	} else {
-		CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-		if (hero) {
-			if (hero->State == 0) {
-				hero->Create();
-			}
-			this->Governor = hero;
-			hero->ProvinceTitles.push_back(std::pair<int, CGrandStrategyProvince *>(CharacterTitleGovernor, this));
-			
-			if (this->Owner->IsAlive()) {
-				int titles_size = hero->Titles.size();
-				for (int i = (titles_size - 1); i >= 0; --i) {
-					if (hero->Titles[i].first != CharacterTitleHeadOfState) { // a character can only have multiple head of state titles, but not others
-						hero->Titles[i].second->SetMinister(hero->Titles[i].first, "");
-					}
-				}
-				
-				titles_size = hero->ProvinceTitles.size();
-				for (int i = (titles_size - 1); i >= 0; --i) {
-					if (!(hero->ProvinceTitles[i].first == CharacterTitleGovernor && hero->ProvinceTitles[i].second == this)) {
-						hero->ProvinceTitles[i].second->SetGovernor("");
-					}
-				}
-			}
-		} else {
-			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), GetCharacterTitleNameById(CharacterTitleGovernor).c_str(), this->Name.c_str());
-		}
-		
-		if (this->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized) {
-			std::string new_minister_message = "if (GenericDialog ~= nil) then GenericDialog(\"";
-//			new_minister_message += this->Owner->GetCharacterTitle(CharacterTitleGovernor, this->Governor->Gender) + " " + this->Governor->GetFullName();
-			new_minister_message += "\", \"";
-//			new_minister_message += "A new " + FullyDecapitalizeString(this->Owner->GetCharacterTitle(CharacterTitleGovernor, this->Governor->Gender));
-			new_minister_message += " of " + this->GetCulturalName();
-			new_minister_message += " has been appointed, ";
-			new_minister_message += this->Governor->GetFullName() + "!\\n\\n";
-			new_minister_message += "Type: " + this->Governor->Type->Name + "\\n" + "Trait: " + this->Governor->Trait->Name + "\\n" + "Province of Origin: " + this->Governor->ProvinceOfOrigin->GetCulturalName() + "\\n\\n" + this->Governor->GetMinisterEffectsString(CharacterTitleGovernor);
-			new_minister_message += "\") end;";
-			CclCommand(new_minister_message);
-		}
-		
-		if (this->Owner->IsAlive() && hero->Province != this) {
-			this->SetHero(hero->GetFullName(), hero->State);
-		}
-	}
-	
-	this->CalculateIncomes(); //recalculate incomes, as administrative efficiency may have changed
-}
-
-void CGrandStrategyProvince::GovernorSuccession()
-{
-	CGrandStrategyHero *best_candidate = NULL;
-	int best_score = 0;
-			
-	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		if (
-			GrandStrategyGame.Heroes[i]->IsAlive()
-			&& GrandStrategyGame.Heroes[i]->IsVisible()
-			&& (
-				(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this->Owner)
-				|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this->Owner)
-			)
-			&& !GrandStrategyGame.Heroes[i]->Custom
-			&& GrandStrategyGame.Heroes[i]->IsEligibleForTitle(CharacterTitleGovernor)
-		) {
-			int score = GrandStrategyGame.Heroes[i]->GetTitleScore(CharacterTitleGovernor, this);
-			if (score > best_score) {
-				best_candidate = GrandStrategyGame.Heroes[i];
-				best_score = score;
-			}
-		}
-	}
-	if (best_candidate != NULL) {
-		this->SetGovernor(best_candidate->GetFullName());
-		return;
-	}
-
-	this->Governor = NULL;
-}
-
 bool CGrandStrategyProvince::HasBuildingClass(std::string building_class_name)
 {
 	if (this->Civilization == -1 || building_class_name.empty()) {
@@ -1925,11 +1092,7 @@ int CGrandStrategyProvince::GetProductionEfficiencyModifier(int resource)
 
 int CGrandStrategyProvince::GetClassUnitType(int class_id)
 {
-	if (this->Owner != NULL && this->Civilization == this->Owner->Civilization) {
-		return PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, class_id);
-	} else {
-		return PlayerRaces.GetCivilizationClassUnitType(this->Civilization, class_id);
-	}
+	return PlayerRaces.GetCivilizationClassUnitType(this->Civilization, class_id);
 }
 
 int CGrandStrategyProvince::GetLanguage()
@@ -1959,34 +1122,6 @@ int CGrandStrategyProvince::GetDesirabilityRating()
 	return desirability;
 }
 
-/**
-**  Get the province's cultural name.
-*/
-std::string CGrandStrategyProvince::GetCulturalName()
-{
-	if (this->Owner != NULL && !this->Water && this->FactionCulturalNames.find(PlayerRaces.Factions[this->Owner->Civilization][this->Owner->Faction]) != this->FactionCulturalNames.end() && this->Civilization == this->Owner->Civilization) {
-		return this->FactionCulturalNames[PlayerRaces.Factions[this->Owner->Civilization][this->Owner->Faction]];
-	} else if (!this->Water && this->Civilization != -1 && this->CulturalNames.find(this->Civilization) != this->CulturalNames.end()) {
-		return this->CulturalNames[this->Civilization];
-	} else if (
-		this->Water && this->ReferenceProvince != -1
-		&& GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner != NULL
-		&& !GrandStrategyGame.Provinces[this->ReferenceProvince]->Water
-		&& this->FactionCulturalNames.find(PlayerRaces.Factions[GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner->Civilization][GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner->Faction]) != this->FactionCulturalNames.end()
-		&& GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization == GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner->Civilization
-	) {
-		return this->FactionCulturalNames[PlayerRaces.Factions[GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner->Civilization][GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner->Faction]];
-	} else if (
-		this->Water && this->ReferenceProvince != -1
-		&& GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization != -1
-		&& this->CulturalNames.find(GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization) != this->CulturalNames.end()
-	) {
-		return this->CulturalNames[GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization];
-	} else {
-		return this->Name;
-	}
-}
-
 std::string CGrandStrategyProvince::GenerateWorkName()
 {
 	if (this->Owner == NULL) {
@@ -2012,229 +1147,6 @@ std::string CGrandStrategyProvince::GenerateWorkName()
 	return work_name;
 }
 
-CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGrandStrategyHero *parent)
-{
-	std::vector<int> potential_hero_unit_types;
-	
-	if (type == "head-of-state" && this->Owner == NULL) {
-		return NULL;
-		
-	}
-
-	if (this->Civilization == -1) {
-		return NULL;
-	}
-	
-	int civilization;
-	int faction;
-	std::vector<int> potential_civilizations;
-	
-	if (parent == NULL || PlayerRaces.Species[parent->Civilization] == PlayerRaces.Species[this->Civilization]) {
-		potential_civilizations.push_back(this->Civilization);
-	}
-	
-	if (type == "head-of-state") {
-		if (parent == NULL || PlayerRaces.Species[parent->Civilization] == PlayerRaces.Species[this->Owner->Civilization]) {
-			potential_civilizations.push_back(this->Owner->Civilization);
-		}
-	}
-	 
-	if (parent != NULL) { // if a parent is given, there's a chance that the hero will have the same culture as the parent
-		potential_civilizations.push_back(parent->Civilization);
-	}
-	
-	civilization = potential_civilizations[SyncRand(potential_civilizations.size())];
-	
-	if (this->Owner->Civilization == civilization) {
-		faction = this->Owner->Faction;
-	} else {
-		faction = -1;
-	}
-		
-	if (type == "head-of-state") {
-		if (PlayerRaces.Factions[this->Owner->Civilization][this->Owner->Faction]->Type == FactionTypeTribe || this->Owner->GovernmentType != GovernmentTypeTheocracy) { //exclude priests from ruling non-theocracies
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")));
-			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")));
-			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")));
-			}
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")));
-			}
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")));
-			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")));
-			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
-			}
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")));
-			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
-			}
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")));
-			}
-		} else { //only allow priests to rule theocracies
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")));
-			}
-		}
-		if (this->Owner->GovernmentType == GovernmentTypeRepublic) { // allow workers to rule republics
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker")));
-			}
-		}
-	} else if (type == "warrior") {
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")));
-		}
-	} else if (type == "author") {
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")));
-		}
-		
-		if (potential_hero_unit_types.size() == 0) { //if no scholarly unit types are available, then use warriors, since they were likely to form a nobility which could be a contemplative class
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")));
-			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")));
-			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")));
-			}
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")));
-			}
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")));
-			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")));
-			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
-			}
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")));
-			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
-			}
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
-				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")));
-			}
-		}
-	}
-	
-	int unit_type_id;
-	if (potential_hero_unit_types.size() > 0) {
-		unit_type_id = potential_hero_unit_types[SyncRand(potential_hero_unit_types.size())];
-	} else {
-		return NULL;
-	}
-	
-	int type_civilization = UnitTypes[unit_type_id]->Civilization;
-	if (type_civilization != civilization && PlayerRaces.Species[type_civilization] != PlayerRaces.Species[civilization]) { // if the type civilization and the civilization have different species, use the type civilization instead
-		civilization = type_civilization;
-	}
-	
-	int gender = MaleGender;
-	
-	std::string hero_name = UnitTypes[unit_type_id]->GeneratePersonalName(faction != -1 ? PlayerRaces.Factions[civilization][faction] : NULL, gender);
-	
-	if (hero_name.empty()) {
-		return NULL; //if civilization can't generate personal names, return
-	}
-	
-	CGrandStrategyHero *hero = new CGrandStrategyHero;
-	GrandStrategyGame.Heroes.push_back(hero);
-	hero->Type = UnitTypes[unit_type_id];
-	
-	std::string hero_epithet;
-	if (hero->Type->Traits.size() > 0) {
-		if (parent != NULL && std::find(hero->Type->Traits.begin(), hero->Type->Traits.end(), parent->Trait) != hero->Type->Traits.end() && SyncRand(20) == 0) { // 5% chance that the hero will inherit their trait from their parent
-			hero->Trait = parent->Trait;
-		} else {
-			hero->Trait = hero->Type->Traits[SyncRand(hero->Type->Traits.size())]; //generate a trait
-		}
-		
-		if (SyncRand(4) == 0 && hero->Trait->Epithets.size() > 0) { // 25% chance the hero will get an epithet along with the trait
-			hero_epithet = hero->Trait->Epithets[SyncRand(hero->Trait->Epithets.size())];
-		}
-	}
-	
-	if (parent != NULL && SyncRand(2) == 0) { // 50% chance that the hero will inherit their hair color from their parent
-		hero->HairVariation = parent->HairVariation;
-	} else {
-		hero->HairVariation = hero->Type->GetRandomVariationIdent();
-	}
-//	hero->Year = GrandStrategyYear;
-//	hero->DeathYear = GrandStrategyYear + (SyncRand(45) + 1); //average + 30 years after initially appearing
-	hero->Civilization = civilization;
-	hero->ProvinceOfOrigin = this;
-	hero->Gender = gender;
-	hero->Name = hero_name;
-	if (parent != NULL) {
-		hero->FamilyName = parent->FamilyName;
-	}
-	if (!hero_epithet.empty()) {
-		if (hero->FamilyName.empty()) {
-			hero->ExtraName = hero_epithet;
-		} else {
-			hero->ExtraName = "'" + hero_epithet + "'";
-		}
-	}
-
-	while (GrandStrategyGame.GetHero(hero->GetFullName()) != NULL) { // generate extra given names if this name is already used by an existing hero
-		std::string new_personal_name = UnitTypes[unit_type_id]->GeneratePersonalName(faction != -1 ? PlayerRaces.Factions[civilization][faction] : NULL, gender);
-		if (hero->ExtraName.empty()) {
-			hero->ExtraName = new_personal_name;
-		} else {
-			hero->ExtraName = new_personal_name + " " + hero->ExtraName;
-		}
-	}
-	
-	hero->UpdateAttributes();
-	
-	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
-	
-	if (type == "head-of-state" || type == "author") {
-		if (hero->IsActive()) {
-			hero->State = 2;
-		} else {
-			hero->State = 4;
-		}
-		hero->Existed = true;
-		hero->ProvinceOfOrigin->SetHero(hero->GetFullName(), hero->State);
-	} else {
-		hero->Create();
-	}
-	
-	return hero;
-}
-
 CGrandStrategyHero *CGrandStrategyProvince::GetRandomAuthor()
 {
 	std::vector<CGrandStrategyHero *> potential_authors;
@@ -2254,7 +1166,7 @@ CGrandStrategyHero *CGrandStrategyProvince::GetRandomAuthor()
 	if (potential_authors.size() > 0) { // if a hero was found in the province, return it as the result
 		return potential_authors[SyncRand(potential_authors.size())];
 	} else { // if no hero was found, generate one
-		return this->GenerateHero("author");
+		return NULL;
 	}
 }
 
@@ -2326,155 +1238,6 @@ void CGrandStrategyFaction::CalculateIncomes()
 	}
 }
 
-void CGrandStrategyFaction::FormFaction(int civilization, int faction)
-{
-	int old_civilization = this->Civilization;
-	int old_faction = this->Faction;
-	
-	int new_civilization = civilization;
-	int new_faction = faction;
-	
-	GrandStrategyGame.Factions[new_civilization][new_faction]->AcquireFactionTechnologies(old_civilization, old_faction);
-	
-	//set the ministers from the old faction
-	for (int i = 0; i < MaxCharacterTitles; ++i) {
-		if (IsMinisterialTitle(i) && GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[i] != NULL && GrandStrategyGame.Factions[new_civilization][new_faction]->HasGovernmentPosition(i)) {
-			GrandStrategyGame.Factions[new_civilization][new_faction]->SetMinister(i, GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[i]->GetFullName());
-		}
-	}
-	
-	CGrandStrategyProvince *capital = GrandStrategyGame.Factions[old_civilization][old_faction]->Capital;
-
-	int province_count = this->OwnedProvinces.size();
-	if (province_count > 0) {
-		for (int i = (province_count - 1); i >= 0; --i) {
-			int province_id = this->OwnedProvinces[i];
-
-			//GrandStrategyGame.Provinces[province_id]->SetOwner(new_civilization, new_faction);
-			char buf[256];
-			snprintf(
-				buf, sizeof(buf), "AcquireProvince(GetProvinceFromName(\"%s\"), \"%s\");",
-				(GrandStrategyGame.Provinces[province_id]->Name).c_str(),
-				(PlayerRaces.Factions[new_civilization][new_faction]->Ident).c_str()
-			);
-			CclCommand(buf);
-			
-			// replace existing units from the previous civilization with units of the new civilization, if the civilizations are different
-			if (old_civilization != new_civilization) {
-				for (size_t j = 0; j < UnitTypes.size(); ++j) {
-					if (
-						UnitTypes[j]->Class != -1
-						&& UnitTypes[j]->Civilization != -1
-						&& !UnitTypes[j]->BoolFlag[BUILDING_INDEX].value
-						&& UnitTypes[j]->DefaultStat.Variables[DEMAND_INDEX].Value > 0
-						&& UnitTypes[j]->Civilization == old_civilization
-						&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, UnitTypes[j]->Class) != -1
-						&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, UnitTypes[j]->Class) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, UnitTypes[j]->Class) // don't replace if both civilizations use the same unit type
-					) {
-						GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(new_civilization, UnitTypes[j]->Class), GrandStrategyGame.Provinces[province_id]->Units[j]);
-						GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(new_civilization, UnitTypes[j]->Class)] += GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[j];
-						GrandStrategyGame.Provinces[province_id]->SetUnitQuantity(j, 0);
-						GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[j] = 0;
-					}
-				}
-			}
-		}
-	}
-	
-	for (int i = 0; i < MaxCosts; ++i) {
-		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[i] = this->Resources[i];
-		GrandStrategyGame.Factions[new_civilization][new_faction]->Trade[i] = this->Trade[i];
-		this->Resources[i] = 0;
-		this->Trade[i] = 0;
-	}
-	
-	GrandStrategyGame.Factions[new_civilization][new_faction]->CurrentResearch = GrandStrategyGame.Factions[old_civilization][old_faction]->CurrentResearch;
-
-	for (size_t i = 0; i < this->Claims.size(); ++i) { // the new faction gets the claims of the old one
-		this->Claims[i]->AddFactionClaim(new_civilization, new_faction);
-	}
-
-	GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyStates.clear();
-	GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyStateProposals.clear();
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (GrandStrategyGame.Factions[i][j]->DiplomacyStates.find(GrandStrategyGame.Factions[old_civilization][old_faction]) != GrandStrategyGame.Factions[i][j]->DiplomacyStates.end()) {
-				GrandStrategyGame.Factions[i][j]->DiplomacyStates.erase(GrandStrategyGame.Factions[old_civilization][old_faction]);
-			}
-			if (GrandStrategyGame.Factions[i][j]->DiplomacyStateProposals.find(GrandStrategyGame.Factions[old_civilization][old_faction]) != GrandStrategyGame.Factions[i][j]->DiplomacyStateProposals.end()) {
-				GrandStrategyGame.Factions[i][j]->DiplomacyStateProposals.erase(GrandStrategyGame.Factions[old_civilization][old_faction]);
-			}
-		}
-	}
-	
-	GrandStrategyGame.Factions[new_civilization][new_faction]->SetCapital(capital);
-	
-	GrandStrategyGame.Factions[old_civilization][old_faction]->CalculateIncomes();
-	GrandStrategyGame.Factions[new_civilization][new_faction]->CalculateIncomes();
-
-	//if the faction is civilizing, grant 10 prestige
-	if (PlayerRaces.Factions[old_civilization][old_faction]->Type == FactionTypeTribe && PlayerRaces.Factions[new_civilization][new_faction]->Type == FactionTypePolity) {
-		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[PrestigeCost] += 10;
-	}
-		
-	if (this == GrandStrategyGame.PlayerFaction) {
-		GrandStrategyGame.PlayerFaction = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[new_civilization][new_faction]));
-		
-		char buf[256];
-		snprintf(
-			buf, sizeof(buf), "GrandStrategyFaction = GetFactionFromName(\"%s\");",
-			(PlayerRaces.Factions[new_civilization][new_faction]->Ident).c_str()
-		);
-		CclCommand(buf);
-		
-		StopMusic();
-		PlayMusicByGroupAndFactionRandom("map", PlayerRaces.Name[new_civilization], PlayerRaces.Factions[new_civilization][new_faction]->Ident);
-			
-		std::string dialog_tooltip = "Our faction becomes the " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName();
-		if (PlayerRaces.Factions[old_civilization][old_faction]->Type == FactionTypeTribe && PlayerRaces.Factions[new_civilization][new_faction]->Type == FactionTypePolity) {
-			dialog_tooltip += ", +10 Prestige";
-		}
-		std::string dialog_text;
-		if (PlayerRaces.Factions[new_civilization][new_faction]->Type == FactionTypePolity) {
-			dialog_text = "From the halls of our capital the formation of a new realm has been declared, the ";
-		} else if (PlayerRaces.Factions[new_civilization][new_faction]->Type == FactionTypeTribe) {
-			dialog_text = "Our council of elders has declared the formation of a new tribe, the ";
-		}
-		dialog_text += GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName() + "!";
-		char buf_2[256];
-		snprintf(
-			buf_2, sizeof(buf_2), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\", \"%s\") end;",
-			("The " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName()).c_str(),
-			dialog_text.c_str(),
-			dialog_tooltip.c_str()
-		);
-		CclCommand(buf_2);
-	}
-	
-	for (int i = 0; i < MaxCharacterTitles; ++i) {
-		if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[i] != NULL) {
-			GrandStrategyGame.Factions[old_civilization][old_faction]->SetMinister(i, ""); //do this after changing the PlayerFaction to prevent minister death/rise to power messages, since the ministers are the same
-		}
-	}
-}
-
-void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int faction, int year)
-{
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (
-			GrandStrategyGame.Factions[civilization][faction]->Technologies[i]
-			&& AllUpgrades[i]->Ident != PlayerRaces.CivilizationUpgrades[civilization] //don't acquire civilization upgrades
-			&& AllUpgrades[i]->Ident != PlayerRaces.Factions[civilization][faction]->FactionUpgrade //don't acquire the faction upgrades
-			&& (year == 0 || (GrandStrategyGame.Factions[civilization][faction]->HistoricalTechnologies.find(AllUpgrades[i]) != GrandStrategyGame.Factions[civilization][faction]->HistoricalTechnologies.end() && year >= GrandStrategyGame.Factions[civilization][faction]->HistoricalTechnologies.find(AllUpgrades[i])->second)) // if a year is given, only add the technology if it is present in the historical technologies for the faction, and if the date for the technology is less or equal than the year given
-		) {
-			this->SetTechnology(i, true);
-			if (year != 0) {
-				this->HistoricalTechnologies[AllUpgrades[i]] = year;
-			}
-		}
-	}
-}
-
 void CGrandStrategyFaction::SetCapital(CGrandStrategyProvince *province)
 {
 	this->Capital = province;
@@ -2510,9 +1273,6 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 	} else {
 		CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
 		if (hero) {
-			if (hero->State == 0) {
-				hero->Create();
-			}
 			this->Ministers[title] = const_cast<CGrandStrategyHero *>(&(*hero));
 			hero->Titles.push_back(std::pair<int, CGrandStrategyFaction *>(title, this));
 			
@@ -2522,11 +1282,6 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 					if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != CharacterTitleHeadOfState) { // a character can only have multiple head of state titles, but not others
 						hero->Titles[i].second->SetMinister(hero->Titles[i].first, "");
 					}
-				}
-				
-				titles_size = hero->ProvinceTitles.size();
-				for (int i = (titles_size - 1); i >= 0; --i) {
-					hero->ProvinceTitles[i].second->SetGovernor("");
 				}
 			}
 		} else {
@@ -2544,7 +1299,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 				new_minister_message += " has been appointed, ";
 			}
 			new_minister_message += this->Ministers[title]->GetFullName() + "!\\n\\n";
-			new_minister_message += "Type: " + this->Ministers[title]->Type->Name + "\\n" + "Trait: " + this->Ministers[title]->Trait->Name + "\\n" + "Province of Origin: " + this->Ministers[title]->ProvinceOfOrigin->GetCulturalName() + "\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
+			new_minister_message += "Type: " + this->Ministers[title]->Type->Name + "\\n" + "Trait: " + this->Ministers[title]->Trait->Name + "\\n" +  + "\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
 			new_minister_message += "\") end;";
 			CclCommand(new_minister_message);	
 		}
@@ -2565,7 +1320,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 {
 	if (
 		this->Ministers[title] != NULL
-		&& (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe || this->GovernmentType == GovernmentTypeMonarchy)
+		&& (PlayerRaces.Factions[this->Faction]->Type == FactionTypeTribe || this->GovernmentType == GovernmentTypeMonarchy)
 		&& title == CharacterTitleHeadOfState
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
@@ -2598,12 +1353,6 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 			this->Ministers[title] = NULL;
 			return;
 		}
-		
-		// if ruler succession is by inheritance and no suitable successor could be found, there's a 90% chance that a new ruler that is a child of the current one will be generated
-		if (SyncRand(10) != 0) {
-			this->GenerateMinister(title, true);
-			return;
-		}
 	}
 	
 	CGrandStrategyHero *best_candidate = NULL;
@@ -2632,34 +1381,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 		return;
 	}
 
-	if (title == CharacterTitleHeadOfState) { // only generate characters for rulers, to not grant too many free heroes to the player
-		this->GenerateMinister(title); //if all else failed, try to generate a minister for the faction
-	} else {
-		this->Ministers[title] = NULL;
-	}
-}
-
-void CGrandStrategyFaction::GenerateMinister(int title, bool child_of_current_minister)
-{
-	if (!this->IsAlive()) {
-		fprintf(stderr, "Faction \"%s\" is generating a \"%s\", but has no provinces.\n", PlayerRaces.Factions[this->Civilization][this->Faction]->Ident.c_str(), GetCharacterTitleNameById(title).c_str());
-	}
-	
-	CGrandStrategyProvince *province = NULL;
-	
-	if (child_of_current_minister && this->Ministers[title]->Province->Owner == this) {
-		province = this->Ministers[title]->Province;
-	} else {
-		province = this->GetRandomProvinceWeightedByPopulation();
-	}
-	
-	CGrandStrategyHero *hero = province->GenerateHero(GetCharacterTitleNameById(title), child_of_current_minister ? this->Ministers[title] : NULL);
-	
 	this->Ministers[title] = NULL;
-	
-	if (hero != NULL) {
-		this->SetMinister(title, hero->GetFullName());
-	}
 }
 
 bool CGrandStrategyFaction::IsAlive()
@@ -2673,7 +1395,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 		return false;
 	}
 	
-	int technology_id = PlayerRaces.GetFactionClassUpgrade(this->Civilization, this->Faction, GetUpgradeClassIndexByName(technology_class_name));
+	int technology_id = PlayerRaces.GetFactionClassUpgrade(this->Faction, GetUpgradeClassIndexByName(technology_class_name));
 	
 	if (technology_id != -1 && this->Technologies[technology_id] == true) {
 		return true;
@@ -2682,55 +1404,9 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 	return false;
 }
 
-bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
-{
-	bool civilized = this->HasTechnologyClass("writing") && this->HasTechnologyClass("masonry");
-	
-	if ((PlayerRaces.Factions[civilization][faction]->Type == FactionTypePolity) != civilized) {
-		return false;
-	}
-	
-	if (this->FactionTier > GrandStrategyGame.Factions[civilization][faction]->FactionTier && !(PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe && civilized)) { //only form factions of the same tier or higher, unless is civilizing
-		return false;
-	}
-	
-	//check if owns the majority of the formable faction's claims
-	if (GrandStrategyGame.Factions[civilization][faction]->Claims.size() > 0) {
-		size_t owned_claims = 0;
-		for (size_t i = 0; i < GrandStrategyGame.Factions[civilization][faction]->Claims.size(); ++i) {
-			if (GrandStrategyGame.Factions[civilization][faction]->Claims[i]->Owner == this) {
-				owned_claims += 1;
-			}
-		}
-		
-		if (owned_claims <= (GrandStrategyGame.Factions[civilization][faction]->Claims.size() / 2)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-bool CGrandStrategyFaction::HasGovernmentPosition(int title)
-{
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe && title != CharacterTitleHeadOfState) {
-		return false;
-	}
-	
-	if (title == CharacterTitleGovernor && this->OwnedProvinces.size() <= 1) { // factions with only 1 province don't need governors
-		return false;
-	}
-	
-	if (title == CharacterTitleHeadOfGovernment || title == CharacterTitleEducationMinister || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleJusticeMinister || title == CharacterTitleInteriorMinister) { // these titles don't serve much of a purpose yet
-		return false;
-	}
-	
-	return true;
-}
-
 bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance)
 {
-	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
+	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || PlayerRaces.Factions[this->Faction]->Type == FactionTypeTribe || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
@@ -2739,7 +1415,7 @@ bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance
 
 bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province)
 {
-	if (this->OwnedProvinces.size() == 1 && province->Owner == NULL && PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe) {
+	if (this->OwnedProvinces.size() == 1 && province->Owner == NULL && PlayerRaces.Factions[this->Faction]->Type == FactionTypeTribe) {
 		if (province->GetDesirabilityRating() <= GrandStrategyGame.Provinces[this->OwnedProvinces[0]]->GetDesirabilityRating()) { // if conquering the province would trigger a migration, the conquest is only desirable if the province is worth more
 			return false;
 		}
@@ -2790,10 +1466,10 @@ int CGrandStrategyFaction::GetDiplomacyStateProposal(CGrandStrategyFaction *fact
 
 std::string CGrandStrategyFaction::GetFullName()
 {
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe) {
-		return PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
-	} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypePolity) {
-//		return this->GetTitle() + " of " + PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
+	if (PlayerRaces.Factions[this->Faction]->Type == FactionTypeTribe) {
+		return PlayerRaces.Factions[this->Faction]->Name;
+	} else if (PlayerRaces.Factions[this->Faction]->Type == FactionTypePolity) {
+//		return this->GetTitle() + " of " + PlayerRaces.Factions[this->Faction]->Name;
 	}
 	
 	return "";
@@ -2823,75 +1499,6 @@ GrandStrategyWorldMapTile *CGrandStrategyFaction::GetCapitalSettlement()
 	}
 	
 	return GrandStrategyGame.WorldMapTiles[this->Capital->SettlementLocation.x][this->Capital->SettlementLocation.y];
-}
-
-void CGrandStrategyHero::Create()
-{
-	//show message that the hero has appeared
-	if (
-		this->ProvinceOfOrigin != NULL
-		&& this->ProvinceOfOrigin->Owner != NULL
-		&& this->ProvinceOfOrigin->Owner == GrandStrategyGame.PlayerFaction
-		&& GrandStrategyGameInitialized
-		&& this->IsVisible()
-	) {
-		char buf[256];
-		snprintf(
-			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-			(this->Type->Name + " " + this->GetFullName()).c_str(),
-			("My lord, the " + FullyDecapitalizeString(this->Type->Name) + " " + this->GetFullName() + " has come to renown in " + this->ProvinceOfOrigin->GetCulturalName() + " and has entered our service.").c_str()
-		);
-		CclCommand(buf);	
-	}
-	
-	if (this->IsActive()) { //if the hero is "active", make it available for moving around, attacking and defending
-		this->State = 2;
-	} else {
-		this->State = 4;
-	}
-	this->Existed = true;
-	
-	/*
-	if (this->ViolentDeath) { //if the character died a violent death historically, add a random number of years to the hero's natural lifespan
-		this->DeathYear += SyncRand(15);
-		this->ViolentDeath = false;
-	}
-	*/
-	
-	if (this->ProvinceOfOrigin != NULL) {
-		this->ProvinceOfOrigin->SetHero(this->GetFullName(), this->State);
-		
-		if (this->ProvinceOfOrigin->Owner != NULL) {
-			// see if the character can occupy a vacant ministry slot, choosing the one that best fits
-			int best_title = -1;
-			int best_title_score = 0;
-			
-			for (int i = 2; i < MaxCharacterTitles; ++i) { // begin at 2 to ignore the head of state and head of government titles
-				if (
-					(
-						(IsMinisterialTitle(i) && this->ProvinceOfOrigin->Owner->Ministers[i] == NULL)
-						|| (i == CharacterTitleGovernor && this->ProvinceOfOrigin->Governor == NULL)
-					)
-					&& this->ProvinceOfOrigin->Owner->HasGovernmentPosition(i)
-				) {
-					int title_score = this->GetTitleScore(i, this->ProvinceOfOrigin);
-					
-					if (title_score > best_title_score) {
-						best_title = i;
-						best_title_score = title_score;
-					}
-				}
-			}
-			
-			if (best_title != -1) {
-				if (best_title == CharacterTitleGovernor) {
-					this->ProvinceOfOrigin->SetGovernor(this->GetFullName());
-				} else {
-					this->ProvinceOfOrigin->Owner->SetMinister(best_title, this->GetFullName());
-				}
-			}
-		}
-	}
 }
 
 void CGrandStrategyHero::Die()
@@ -2938,11 +1545,6 @@ void CGrandStrategyHero::Die()
 	int titles_size = this->Titles.size();
 	for (int i = (titles_size - 1); i >= 0; --i) {
 		this->Titles[i].second->SetMinister(this->Titles[i].first, "");
-	}
-				
-	titles_size = this->ProvinceTitles.size();
-	for (int i = (titles_size - 1); i >= 0; --i) {
-		this->ProvinceTitles[i].second->SetGovernor("");
 	}
 	
 	this->Province = NULL;
@@ -3146,9 +1748,9 @@ CGrandStrategyEvent::~CGrandStrategyEvent()
 
 void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
 {
-//	fprintf(stderr, "Triggering event \"%s\" for faction %s.\n", this->Name.c_str(), PlayerRaces.Factions[faction->Civilization][faction->Faction]->Name.c_str());	
+//	fprintf(stderr, "Triggering event \"%s\" for faction %s.\n", this->Name.c_str(), PlayerRaces.Factions[faction->Faction]->Name.c_str());	
 	
-	CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[faction->Civilization][faction->Faction]->Ident + "\");");
+	CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[faction->Faction]->Ident + "\");");
 	CclCommand("GrandStrategyEvent(EventFaction, \"" + this->Name + "\");");
 	CclCommand("EventFaction = nil;");
 	CclCommand("EventProvince = nil;");
@@ -3161,7 +1763,7 @@ void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
 
 bool CGrandStrategyEvent::CanTrigger(CGrandStrategyFaction *faction)
 {
-//	fprintf(stderr, "Checking for triggers for event \"%s\" for faction %s.\n", this->Name.c_str(), PlayerRaces.Factions[faction->Civilization][faction->Faction]->Name.c_str());	
+//	fprintf(stderr, "Checking for triggers for event \"%s\" for faction %s.\n", this->Name.c_str(), PlayerRaces.Factions[faction->Faction]->Name.c_str());	
 	
 	if (this->MinYear && GrandStrategyYear < this->MinYear) {
 		return false;
@@ -3411,9 +2013,9 @@ void SetWorldMapTileFactionCulturalTerrainName(int x, int y, std::string terrain
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		int terrain = GetWorldMapTerrainTypeId(terrain_name);
 		if (terrain != -1 && civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 			if (faction != -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames[std::pair<int, CFaction *>(terrain, PlayerRaces.Factions[civilization][faction])].push_back(TransliterateText(cultural_name));
+				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames[std::pair<int, CFaction *>(terrain, PlayerRaces.Factions[faction])].push_back(TransliterateText(cultural_name));
 			}
 		}
 	}
@@ -3438,9 +2040,9 @@ void SetWorldMapTileFactionCulturalResourceName(int x, int y, std::string resour
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		int resource = GetResourceIdByName(resource_name.c_str());
 		if (resource != -1 && civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 			if (faction != -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames[std::pair<int, CFaction *>(resource, PlayerRaces.Factions[civilization][faction])].push_back(TransliterateText(cultural_name));
+				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames[std::pair<int, CFaction *>(resource, PlayerRaces.Factions[faction])].push_back(TransliterateText(cultural_name));
 			}
 		}
 	}
@@ -3466,9 +2068,9 @@ void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::string civi
 	if (GrandStrategyGame.WorldMapTiles[x][y]) {
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		if (civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 			if (faction != -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]].push_back(TransliterateText(cultural_name));
+				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames[PlayerRaces.Factions[faction]].push_back(TransliterateText(cultural_name));
 			}
 		}
 	}
@@ -3942,127 +2544,13 @@ void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool
 	}
 }
 
-/**
-**  Get the cultural name of a province
-*/
-std::string GetProvinceCulturalName(std::string province_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		return GrandStrategyGame.Provinces[province_id]->GetCulturalName();
-	}
-	
-	return "";
-}
-
-/**
-**  Get the cultural name of a province pertaining to a particular civilization
-*/
-std::string GetProvinceCivilizationCulturalName(std::string province_name, std::string civilization_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
-			return GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization];
-		}
-	}
-	
-	return "";
-}
-
-/**
-**  Get the cultural name of a province pertaining to a particular faction
-*/
-std::string GetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-			if (faction != -1) {
-				return GrandStrategyGame.Provinces[province_id]->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]];
-			}
-		}
-	}
-	
-	return "";
-}
-
-/**
-**  Get the cultural name of a province
-*/
-std::string GetProvinceCulturalSettlementName(std::string province_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		int x = GrandStrategyGame.Provinces[province_id]->SettlementLocation.x;
-		int y = GrandStrategyGame.Provinces[province_id]->SettlementLocation.y;
-		if (x != -1 && y != -1) {
-			return GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName();
-		}
-	}
-	
-	return "";
-}
-
-/**
-**  Get the cultural settlement name of a province pertaining to a particular civilization
-*/
-std::string GetProvinceCivilizationCulturalSettlementName(std::string province_name, std::string civilization_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
-			int x = GrandStrategyGame.Provinces[province_id]->SettlementLocation.x;
-			int y = GrandStrategyGame.Provinces[province_id]->SettlementLocation.y;
-			if (x != -1 && y != -1 && GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.find(civilization) != GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.end()) {
-				return GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames[civilization][0];
-			}
-		}
-	}
-	
-	return "";
-}
-
-/**
-**  Get the cultural settlement name of a province pertaining to a particular faction
-*/
-std::string GetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-			if (faction != -1) {
-				int x = GrandStrategyGame.Provinces[province_id]->SettlementLocation.x;
-				int y = GrandStrategyGame.Provinces[province_id]->SettlementLocation.y;
-				if (x != -1 && y != -1 && GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.find(PlayerRaces.Factions[civilization][faction]) != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.end()) {
-					return GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]][0];
-				}
-			}
-		}
-	}
-	
-	return "";
-}
-
 std::string GetProvinceAttackedBy(std::string province_name)
 {
 	int province_id = GetProvinceId(province_name);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		if (GrandStrategyGame.Provinces[province_id]->AttackedBy != NULL) {
-			return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->AttackedBy->Civilization][GrandStrategyGame.Provinces[province_id]->AttackedBy->Faction]->Ident;
+			return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->AttackedBy->Faction]->Ident;
 		}
 	}
 	
@@ -4091,23 +2579,13 @@ void SetProvinceOwner(std::string province_name, std::string civilization_name, 
 {
 	int province_id = GetProvinceId(province_name);
 	int civilization_id = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, faction_name);
+	int faction_id = PlayerRaces.GetFactionIndexByName(faction_name);
 	
 	if (province_id == -1 || !GrandStrategyGame.Provinces[province_id]) {
 		return;
 	}
 	
 	GrandStrategyGame.Provinces[province_id]->SetOwner(civilization_id, faction_id);
-}
-
-void SetProvinceCivilization(std::string province_name, std::string civilization_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		GrandStrategyGame.Provinces[province_id]->SetCivilization(civilization);
-	}
 }
 
 void SetProvinceSettlementLocation(std::string province_name, int x, int y)
@@ -4138,9 +2616,9 @@ void SetProvinceFactionCulturalName(std::string province_name, std::string civil
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		if (civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 			if (faction != -1) {
-				GrandStrategyGame.Provinces[province_id]->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(province_cultural_name);
+				GrandStrategyGame.Provinces[province_id]->FactionCulturalNames[PlayerRaces.Factions[faction]] = TransliterateText(province_cultural_name);
 			}
 		}
 	}
@@ -4263,7 +2741,7 @@ void SetProvinceAttackedBy(std::string province_name, std::string civilization_n
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		int civilization_id = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, faction_name);
+		int faction_id = PlayerRaces.GetFactionIndexByName(faction_name);
 		if (civilization_id != -1 && faction_id != -1) {
 			GrandStrategyGame.Provinces[province_id]->AttackedBy = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization_id][faction_id]));
 		} else {
@@ -4279,7 +2757,7 @@ void AddProvinceClaim(std::string province_name, std::string civilization_name, 
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		if (civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 			if (faction != -1) {
 				GrandStrategyGame.Provinces[province_id]->AddFactionClaim(civilization, faction);
 			} else {
@@ -4300,7 +2778,7 @@ void RemoveProvinceClaim(std::string province_name, std::string civilization_nam
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		if (civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 			if (faction != -1) {
 				GrandStrategyGame.Provinces[province_id]->RemoveFactionClaim(civilization, faction);
 			}
@@ -4654,26 +3132,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 	}
 	GrandStrategyGame.SymbolResourceNotWorked = CGraphic::Get(resource_not_worked_symbol_filename);
 	
-	//create grand strategy faction instances for all defined factions
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			CGrandStrategyFaction *faction = new CGrandStrategyFaction;
-			GrandStrategyGame.Factions[i].push_back(faction);
-					
-			faction->Civilization = i;
-			faction->Faction = j;
-			faction->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
-			faction->GovernmentType = PlayerRaces.Factions[i][j]->DefaultGovernmentType;
-			
-			if (!PlayerRaces.CivilizationUpgrades[i].empty()) { //if faction's civilization has a civilization upgrade, apply it
-				faction->SetTechnology(UpgradeIdByIdent(PlayerRaces.CivilizationUpgrades[i]), true);
-			}
-			if (!PlayerRaces.Factions[i][j]->FactionUpgrade.empty()) { //if faction has a faction upgrade, apply it
-				faction->SetTechnology(UpgradeIdByIdent(PlayerRaces.Factions[i][j]->FactionUpgrade), true);
-			}
-		}
-	}
-	
 	//set resource prices to base prices
 	for (int i = 0; i < MaxCosts; ++i) {
 		GrandStrategyGame.CommodityPrices[i] = DefaultResourcePrices[i];
@@ -4836,74 +3294,6 @@ void InitializeGrandStrategyWorldMap()
 	}
 }
 
-void InitializeGrandStrategyProvinces()
-{
-	for (size_t i = 0; i < Provinces.size(); ++i) {
-		if (Provinces[i]->World->Ident != GrandStrategyWorld && GrandStrategyWorld != "Random") {
-			continue;
-		}
-		CGrandStrategyProvince *province = new CGrandStrategyProvince;
-		province->ID = GrandStrategyGame.Provinces.size();
-		GrandStrategyGame.Provinces.push_back(province);
-		province->Name = Provinces[i]->Name;
-		province->World = Provinces[i]->World;
-		if (Provinces[i]->ReferenceProvince != -1) {
-//			fprintf(stderr, "Setting the ReferenceProvince of province \"%s\" to \"%s\".\n", province->Name.c_str(), Provinces[Provinces[i]->ReferenceProvince]->Name.c_str());
-			province->ReferenceProvince = GetProvinceId(Provinces[Provinces[i]->ReferenceProvince]->Name);
-		}
-		province->Water = Provinces[i]->Water;
-		province->Coastal = Provinces[i]->Coastal;
-		province->SettlementLocation = Provinces[i]->SettlementLocation;
-		for (int j = 0; j < MAX_RACES; ++j) {
-			if (Provinces[i]->CulturalNames.find(j) != Provinces[i]->CulturalNames.end()) {
-				province->CulturalNames[j] = Provinces[i]->CulturalNames[j];
-			}
-			
-			for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
-				if (Provinces[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != Provinces[i]->FactionCulturalNames.end()) {
-					province->FactionCulturalNames[PlayerRaces.Factions[j][k]] = Provinces[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]];
-				}
-			}
-		}
-		if (GrandStrategyWorld != "Random") {
-			for (size_t j = 0; j < Provinces[i]->Tiles.size(); ++j) {
-				SetWorldMapTileProvince(Provinces[i]->Tiles[j].x, Provinces[i]->Tiles[j].y, province->Name);
-	//			province->Tiles.push_back();
-			}
-		}
-		for (size_t j = 0; j < Provinces[i]->FactionClaims.size(); ++j) {
-			province->AddFactionClaim(Provinces[i]->FactionClaims[j]->Civilization, Provinces[i]->FactionClaims[j]->ID);
-		}
-		if (GrandStrategyGameLoading == false) {
-			for (std::map<int, int>::reverse_iterator iterator = Provinces[i]->HistoricalCultures.rbegin(); iterator != Provinces[i]->HistoricalCultures.rend(); ++iterator) {
-				if (GrandStrategyYear >= iterator->first) { // set the owner to the last historical owner that is still after the chosen start date
-					province->SetCivilization(iterator->second);
-					break;
-				}
-			}
-			
-			for (std::map<int, CFaction *>::reverse_iterator iterator = Provinces[i]->HistoricalOwners.rbegin(); iterator != Provinces[i]->HistoricalOwners.rend(); ++iterator) {
-				if (GrandStrategyYear >= iterator->first) { // set the owner to the last historical owner that is still after the chosen start date
-					if (iterator->second != NULL) {
-						province->SetOwner(iterator->second->Civilization, iterator->second->ID);
-					} else {
-						province->SetOwner(-1, -1);
-					}
-					break;
-				}
-			}
-			
-			for (std::map<int, CFaction *>::iterator iterator = Provinces[i]->HistoricalClaims.begin(); iterator != Provinces[i]->HistoricalClaims.end(); ++iterator) {
-				if (GrandStrategyYear >= iterator->first) { // set the owner to the last historical owner that is still after the chosen start date
-					if (iterator->second != NULL) {
-						province->AddFactionClaim(iterator->second->Civilization, iterator->second->ID);
-					}
-				}
-			}
-		}
-	}
-}
-
 void FinalizeGrandStrategyInitialization()
 {
 	CWorld *world = GetWorld(GrandStrategyWorld);
@@ -4969,19 +3359,6 @@ void FinalizeGrandStrategyInitialization()
 		}
 	}
 	
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (GrandStrategyGameLoading == false) {
-				// inherit technologies from other factions, as appropriate (i.e. when tribes split off from their parent tribe)
-				for (std::map<int, CFaction *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalFactionDerivations.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalFactionDerivations.end(); ++iterator) {
-					if (GrandStrategyYear >= iterator->first) {
-						GrandStrategyGame.Factions[i][j]->AcquireFactionTechnologies(iterator->second->Civilization, iterator->second->ID, iterator->first);
-					}
-				}
-			}
-		}
-	}
-	
 	for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
 		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[i];
 		CProvince *base_province = GetProvince(province->Name);
@@ -5039,97 +3416,6 @@ void FinalizeGrandStrategyInitialization()
 				if (province->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")) != -1 && province->Units[province->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"))] < 2) { // make every province that has an owner start with at least two infantry units
 					province->SetUnitQuantity(province->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")), 2);
 				}
-				
-				for (std::map<std::tuple<int,int>, CCharacter *>::iterator iterator = base_province->HistoricalGovernors.begin(); iterator != base_province->HistoricalGovernors.end(); ++iterator) { //set the appropriate historical governors
-					if (
-						GrandStrategyYear >= std::get<0>(iterator->first)
-						&& GrandStrategyYear < std::get<1>(iterator->first)
-						&& GrandStrategyGame.GetHero(iterator->second->GetFullName()) != NULL
-						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsAlive()
-						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsVisible()
-					) {
-						province->SetGovernor(iterator->second->GetFullName());
-					}
-				}
-				
-				// try to perform governor succession for provinces missing a governor in charge of them
-				if (province->Governor == NULL && province->Owner->HasGovernmentPosition(CharacterTitleGovernor)) {
-					province->GovernorSuccession();
-				}
-			}
-		}
-	}
-
-	// calculate income, and set initial ruler (if none is preset) for factions
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (GrandStrategyGameLoading == false) {
-				for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->HistoricalTiers.rbegin(); iterator != PlayerRaces.Factions[i][j]->HistoricalTiers.rend(); ++iterator) {
-					if (GrandStrategyYear >= iterator->first) {
-						GrandStrategyGame.Factions[i][j]->FactionTier = iterator->second;
-						break;
-					}
-				}
-				
-				for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->HistoricalGovernmentTypes.rbegin(); iterator != PlayerRaces.Factions[i][j]->HistoricalGovernmentTypes.rend(); ++iterator) {
-					if (GrandStrategyYear >= iterator->first) {
-						GrandStrategyGame.Factions[i][j]->GovernmentType = iterator->second;
-						break;
-					}
-				}
-				
-				for (std::map<std::pair<int, CFaction *>, int>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalDiplomacyStates.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
-					if (GrandStrategyYear >= iterator->first.first) {
-						int diplomacy_state_civilization = iterator->first.second->Civilization;
-						int diplomacy_state_faction = iterator->first.second->ID;
-						if (GrandStrategyGame.Factions[diplomacy_state_civilization][diplomacy_state_faction]->IsAlive()) {
-							if (iterator->second == DiplomacyStateAlliance) {
-								GrandStrategyGame.Factions[i][j]->SetDiplomacyState(GrandStrategyGame.Factions[diplomacy_state_civilization][diplomacy_state_faction], DiplomacyStatePeace);
-							} else {
-								GrandStrategyGame.Factions[i][j]->SetDiplomacyState(GrandStrategyGame.Factions[diplomacy_state_civilization][diplomacy_state_faction], iterator->second);
-							}
-						}
-					}
-				}
-				
-				if (GrandStrategyGame.Factions[i][j]->IsAlive()) { // set capital for factions which own territory
-					for (std::map<int, std::string>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->HistoricalCapitals.rbegin(); iterator != PlayerRaces.Factions[i][j]->HistoricalCapitals.rend(); ++iterator) {
-						if (GrandStrategyYear >= iterator->first) {
-							int province_id = GetProvinceId(iterator->second);
-							if (province_id != -1) {
-								GrandStrategyGame.Factions[i][j]->SetCapital(GrandStrategyGame.Provinces[province_id]);
-								break;
-							} else {
-								fprintf(stderr, "Province \"%s\" doesn't exist.\n", iterator->second.c_str());
-							}
-						}
-					}
-					if (GrandStrategyGame.Factions[i][j]->Capital == NULL) { // if has no capital preset, set a random province as the capital
-						GrandStrategyGame.Factions[i][j]->SetCapital(GrandStrategyGame.Factions[i][j]->GetRandomProvinceWeightedByPopulation());
-					}
-				}
-				
-				for (std::map<std::tuple<CDate, CDate, int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalMinisters.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalMinisters.end(); ++iterator) { //set the appropriate historical rulers
-					if (
-						GrandStrategyYear >= std::get<0>(iterator->first).year
-						&& GrandStrategyYear < std::get<1>(iterator->first).year
-						&& (GrandStrategyGame.Factions[i][j]->IsAlive() || std::get<2>(iterator->first) == CharacterTitleHeadOfState)
-						&& GrandStrategyGame.GetHero(iterator->second->GetFullName()) != NULL
-						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsAlive()
-						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsVisible()
-					) {
-						GrandStrategyGame.Factions[i][j]->SetMinister(std::get<2>(iterator->first), iterator->second->GetFullName());
-					}
-				}
-			}
-			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
-				for (int k = 0; k < MaxCharacterTitles; ++k) {
-					// try to perform government position succession for existent factions missing a character in charge of it
-					if (IsMinisterialTitle(k) && GrandStrategyGame.Factions[i][j]->Ministers[k] == NULL && GrandStrategyGame.Factions[i][j]->HasGovernmentPosition(k)) {
-						GrandStrategyGame.Factions[i][j]->MinisterSuccession(k);
-					}
-				}
-				GrandStrategyGame.Factions[i][j]->CalculateIncomes();
 			}
 		}
 	}
@@ -5143,11 +3429,6 @@ void SetGrandStrategyWorld(std::string world)
 void DoGrandStrategyTurn()
 {
 	GrandStrategyGame.DoTurn();
-}
-
-void DoProspection()
-{
-	GrandStrategyGame.DoProspection();
 }
 
 void CalculateProvinceBorders()
@@ -5224,7 +3505,7 @@ bool ProvinceBordersFaction(std::string province_name, std::string faction_civil
 {
 	int province = GetProvinceId(province_name);
 	int civilization = PlayerRaces.GetRaceIndexByName(faction_civilization_name.c_str());
-	int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	
 	if (civilization == -1 || faction == -1) {
 		return false;
@@ -5244,7 +3525,7 @@ bool ProvinceHasClaim(std::string province_name, std::string faction_civilizatio
 {
 	int province = GetProvinceId(province_name);
 	int civilization = PlayerRaces.GetRaceIndexByName(faction_civilization_name.c_str());
-	int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	
 	if (civilization == -1 || faction == -1) {
 		return false;
@@ -5383,7 +3664,7 @@ std::string GetProvinceOwner(std::string province_name)
 		return "";
 	}
 	
-	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Ident;
+	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Ident;
 }
 
 void SetPlayerFaction(std::string civilization_name, std::string faction_name)
@@ -5391,7 +3672,7 @@ void SetPlayerFaction(std::string civilization_name, std::string faction_name)
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	
 	if (faction == -1) {
@@ -5405,7 +3686,7 @@ void SetPlayerFaction(std::string civilization_name, std::string faction_name)
 std::string GetPlayerFactionName()
 {
 	if (GrandStrategyGame.PlayerFaction != NULL) {
-		return PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Civilization][GrandStrategyGame.PlayerFaction->Faction]->Ident;
+		return PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Faction]->Ident;
 	} else {
 		return "";
 	}
@@ -5416,7 +3697,7 @@ void SetFactionResource(std::string civilization_name, std::string faction_name,
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
@@ -5433,7 +3714,7 @@ void ChangeFactionResource(std::string civilization_name, std::string faction_na
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
@@ -5450,7 +3731,7 @@ int GetFactionResource(std::string civilization_name, std::string faction_name, 
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
@@ -5467,7 +3748,7 @@ void CalculateFactionIncomes(std::string civilization_name, std::string faction_
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	
 	if (faction == -1 || !GrandStrategyGame.Factions[civilization][faction]->IsAlive()) {
@@ -5482,7 +3763,7 @@ int GetFactionIncome(std::string civilization_name, std::string faction_name, st
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
@@ -5499,7 +3780,7 @@ void SetFactionTechnology(std::string civilization_name, std::string faction_nam
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int upgrade_id = UpgradeIdByIdent(upgrade_ident);
 	if (civilization != -1 && upgrade_id != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		if (faction != -1) {
 			GrandStrategyGame.Factions[civilization][faction]->SetTechnology(upgrade_id, has_technology);
 		}
@@ -5511,7 +3792,7 @@ bool GetFactionTechnology(std::string civilization_name, std::string faction_nam
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int upgrade_id = UpgradeIdByIdent(upgrade_ident);
 	if (civilization != -1 && upgrade_id != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		if (faction != -1) {
 			return GrandStrategyGame.Factions[civilization][faction]->Technologies[upgrade_id];
 		}
@@ -5531,7 +3812,7 @@ void SetFactionGovernmentType(std::string civilization_name, std::string faction
 	}
 
 	if (civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		if (faction != -1) {
 			GrandStrategyGame.Factions[civilization][faction]->GovernmentType = government_type_id;
 		}
@@ -5550,8 +3831,8 @@ void SetFactionDiplomacyState(std::string civilization_name, std::string faction
 	}
 
 	if (civilization != -1 && second_civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
+		int second_faction = PlayerRaces.GetFactionIndexByName(second_faction_name);
 		if (faction != -1 && second_faction != -1) {
 			GrandStrategyGame.Factions[civilization][faction]->SetDiplomacyState(GrandStrategyGame.Factions[second_civilization][second_faction],diplomacy_state_id);
 		}
@@ -5564,8 +3845,8 @@ std::string GetFactionDiplomacyState(std::string civilization_name, std::string 
 	int second_civilization = PlayerRaces.GetRaceIndexByName(second_civilization_name.c_str());
 	
 	if (civilization != -1 && second_civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
+		int second_faction = PlayerRaces.GetFactionIndexByName(second_faction_name);
 		if (faction != -1 && second_faction != -1) {
 			return GetDiplomacyStateNameById(GrandStrategyGame.Factions[civilization][faction]->GetDiplomacyState(GrandStrategyGame.Factions[second_civilization][second_faction]));
 		}
@@ -5582,8 +3863,8 @@ void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string
 	int diplomacy_state_id = GetDiplomacyStateIdByName(diplomacy_state_name);
 	
 	if (civilization != -1 && second_civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
+		int second_faction = PlayerRaces.GetFactionIndexByName(second_faction_name);
 		if (faction != -1 && second_faction != -1) {
 			GrandStrategyGame.Factions[civilization][faction]->DiplomacyStateProposals[GrandStrategyGame.Factions[second_civilization][second_faction]] = diplomacy_state_id;
 		}
@@ -5596,8 +3877,8 @@ std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std:
 	int second_civilization = PlayerRaces.GetRaceIndexByName(second_civilization_name.c_str());
 	
 	if (civilization != -1 && second_civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
+		int second_faction = PlayerRaces.GetFactionIndexByName(second_faction_name);
 		if (faction != -1 && second_faction != -1) {
 			return GetDiplomacyStateNameById(GrandStrategyGame.Factions[civilization][faction]->GetDiplomacyStateProposal(GrandStrategyGame.Factions[second_civilization][second_faction]));
 		}
@@ -5617,7 +3898,7 @@ void SetFactionTier(std::string civilization_name, std::string faction_name, std
 	}
 
 	if (civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		if (faction != -1) {
 			GrandStrategyGame.Factions[civilization][faction]->FactionTier = faction_tier_id;
 		}
@@ -5628,7 +3909,7 @@ std::string GetFactionTier(std::string civilization_name, std::string faction_na
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	if (civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		if (faction != -1) {
 			return GetFactionTierNameById(GrandStrategyGame.Factions[civilization][faction]->FactionTier);
 		}
@@ -5647,7 +3928,7 @@ void SetFactionCurrentResearch(std::string civilization_name, std::string factio
 		upgrade_id = -1;
 	}
 	if (civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		if (faction != -1) {
 			GrandStrategyGame.Factions[civilization][faction]->CurrentResearch = upgrade_id;
 		}
@@ -5658,7 +3939,7 @@ std::string GetFactionCurrentResearch(std::string civilization_name, std::string
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	if (civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		if (faction != -1) {
 			if (GrandStrategyGame.Factions[civilization][faction]->CurrentResearch != -1) {
 				return AllUpgrades[GrandStrategyGame.Factions[civilization][faction]->CurrentResearch]->Ident;
@@ -5673,26 +3954,13 @@ std::string GetFactionFullName(std::string civilization_name, std::string factio
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	if (civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		if (faction != -1) {
 			return GrandStrategyGame.Factions[civilization][faction]->GetFullName();
 		}
 	}
 	
 	return "";
-}
-
-void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name)
-{
-	int civilization_from = PlayerRaces.GetRaceIndexByName(civilization_from_name.c_str());
-	int civilization_to = PlayerRaces.GetRaceIndexByName(civilization_to_name.c_str());
-	if (civilization_from != -1 && civilization_to != -1) {
-		int faction_from = PlayerRaces.GetFactionIndexByName(civilization_from, faction_from_name);
-		int faction_to = PlayerRaces.GetFactionIndexByName(civilization_to, faction_to_name);
-		if (faction_from != -1 && faction_to != -1) {
-			GrandStrategyGame.Factions[civilization_to][faction_to]->AcquireFactionTechnologies(civilization_from, faction_from);
-		}
-	}
 }
 
 bool IsGrandStrategyUnit(const CUnitType &type)
@@ -5773,33 +4041,12 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 	}
 }
 
-void FormFaction(std::string old_civilization_name, std::string old_faction_name, std::string new_civilization_name, std::string new_faction_name)
-{
-	int old_civilization = PlayerRaces.GetRaceIndexByName(old_civilization_name.c_str());
-	int old_faction = -1;
-	if (old_civilization != -1) {
-		old_faction = PlayerRaces.GetFactionIndexByName(old_civilization, old_faction_name);
-	}
-	
-	int new_civilization = PlayerRaces.GetRaceIndexByName(new_civilization_name.c_str());
-	int new_faction = -1;
-	if (new_civilization != -1) {
-		new_faction = PlayerRaces.GetFactionIndexByName(new_civilization, new_faction_name);
-	}
-	
-	if (old_faction == -1 || new_faction == -1) {
-		return;
-	}
-	
-	GrandStrategyGame.Factions[old_civilization][old_faction]->FormFaction(new_civilization, new_faction);
-}
-
 void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
@@ -5816,7 +4063,7 @@ void ChangeFactionCommodityTrade(std::string civilization_name, std::string fact
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
@@ -5833,7 +4080,7 @@ int GetFactionCommodityTrade(std::string civilization_name, std::string faction_
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
@@ -5845,60 +4092,12 @@ int GetFactionCommodityTrade(std::string civilization_name, std::string faction_
 	return GrandStrategyGame.Factions[civilization][faction]->Trade[resource];
 }
 
-bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_full_name)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction = -1;
-	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-	}
-	
-	if (faction == -1) {
-		return false;
-	}
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		if (hero->State == 0) {
-			return false;
-		}
-		if (hero->Province != NULL) {
-			if (hero->State != 3 && hero->Province->Owner != NULL && hero->Province->Owner->Civilization == civilization && hero->Province->Owner->Faction == faction) {
-				return true;
-			} else if (hero->State == 3 && hero->Province->AttackedBy != NULL && hero->Province->AttackedBy->Civilization == civilization && hero->Province->AttackedBy->Faction == faction) {
-				return true;
-			}
-		}
-		//check if the hero is the ruler of a faction
-		for (int i = 0; i < MAX_RACES; ++i) {
-			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-				if (GrandStrategyGame.Factions[i][j]->Ministers[CharacterTitleHeadOfState] == hero) {
-					if (civilization == i && faction == j) {
-						return true;
-					} else {
-						return false;
-					}
-				}
-			}
-		}
-		if (
-			hero->Province == NULL
-			&& hero->ProvinceOfOrigin != NULL
-			&& hero->ProvinceOfOrigin->Owner != NULL
-			&& hero->ProvinceOfOrigin->Owner->Civilization == civilization
-			&& hero->ProvinceOfOrigin->Owner->Faction == faction
-		) {
-			return true;
-		}
-	}
-	return false;
-}
-
 void SetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name, std::string hero_full_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	int title = GetCharacterTitleIdByName(title_name);
 	
@@ -5914,7 +4113,7 @@ std::string GetFactionMinister(std::string civilization_name, std::string factio
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	int title = GetCharacterTitleIdByName(title_name);
 	
@@ -5934,7 +4133,7 @@ int GetFactionUnitCost(std::string civilization_name, std::string faction_name, 
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	}
 	int unit_type = UnitTypeIdByIdent(unit_type_ident);
 	int resource = GetResourceIdByName(resource_name.c_str());
@@ -5951,49 +4150,6 @@ int GetFactionUnitCost(std::string civilization_name, std::string faction_name, 
 		}
 	}
 	return cost;
-}
-
-void CreateGrandStrategyHero(std::string hero_full_name)
-{
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		hero->Create();
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
-}
-
-void CreateGrandStrategyCustomHero(std::string hero_full_name)
-{
-	CCharacter *custom_hero = GetCustomHero(hero_full_name);
-	if (custom_hero == NULL) {
-		return;
-	}
-	CGrandStrategyHero *hero = new CGrandStrategyHero;
-	GrandStrategyGame.Heroes.push_back(hero);
-	hero->Name = custom_hero->Name;
-	hero->ExtraName = custom_hero->ExtraName;
-	hero->FamilyName = custom_hero->FamilyName;
-	if (custom_hero->Type != NULL) {
-		hero->Type = const_cast<CUnitType *>(&(*custom_hero->Type));
-	}
-	if (custom_hero->Trait != NULL) {
-		hero->Trait = custom_hero->Trait;
-	}
-	hero->HairVariation = custom_hero->HairVariation;
-	hero->Civilization = custom_hero->Civilization;
-	hero->Gender = custom_hero->Gender;
-	hero->Custom = custom_hero->Custom;
-	
-	for (size_t j = 0; j < custom_hero->Abilities.size(); ++j) {
-		hero->Abilities.push_back(custom_hero->Abilities[j]);
-	}
-		
-	hero->UpdateAttributes();
-	
-	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
-
-	hero->Create();
 }
 
 void KillGrandStrategyHero(std::string hero_full_name)
@@ -6080,14 +4236,13 @@ std::string GetGrandStrategyHeroTooltip(std::string hero_full_name)
 			std::string hero_tooltip = hero->GetBestDisplayTitle() + " " + hero->GetFullName();
 			
 			hero_tooltip += "\nTrait: " + hero->Trait->Name;
-			hero_tooltip += "\nProvince: " + hero->Province->GetCulturalName();
 			
 			for (size_t i = 0; i < hero->Titles.size(); ++i) {
 //				hero_tooltip += "\n" + hero->Titles[i].second->GetCharacterTitle(hero->Titles[i].first, hero->Gender) + " of ";
-				if (PlayerRaces.Factions[hero->Titles[i].second->Civilization][hero->Titles[i].second->Faction]->Type == FactionTypeTribe) {
+				if (PlayerRaces.Factions[hero->Titles[i].second->Faction]->Type == FactionTypeTribe) {
 					hero_tooltip += "the ";
 				}
-				hero_tooltip += PlayerRaces.Factions[hero->Titles[i].second->Civilization][hero->Titles[i].second->Faction]->Name;
+				hero_tooltip += PlayerRaces.Factions[hero->Titles[i].second->Faction]->Name;
 			}
 
 			for (size_t i = 0; i < hero->Titles.size(); ++i) {

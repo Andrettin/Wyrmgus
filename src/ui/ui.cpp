@@ -244,7 +244,11 @@ void CUserInterface::Load()
 	CleanUserInterfaceFillers();
 	std::vector<CFiller> new_ui_fillers;
 	if (ThisPlayer) {
-		new_ui_fillers = PlayerRaces.GetFactionUIFillers(ThisPlayer->Race, ThisPlayer->Faction);
+		if (ThisPlayer->Faction != -1) {
+			new_ui_fillers = PlayerRaces.GetFactionUIFillers(ThisPlayer->Faction);
+		} else {
+			new_ui_fillers = PlayerRaces.GetCivilizationUIFillers(ThisPlayer->Race);
+		}
 	}
 	for (size_t i = 0; i < new_ui_fillers.size(); ++i) {
 		CFiller filler = CFiller();

@@ -2054,7 +2054,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
-			CFaction *faction = PlayerRaces.GetFaction(-1, faction_name);
+			CFaction *faction = PlayerRaces.GetFaction(faction_name);
 			if (faction) {
 				type->Faction = faction->ID;
 			} else {
@@ -2259,12 +2259,12 @@ static int CclDefineUnitType(lua_State *l)
 					break;
 				}
 			}
-			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-				for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[i][j]->ClassUnitTypes.rend(); ++iterator) {
-					if (iterator->second == type->Slot) {
-						PlayerRaces.Factions[i][j]->ClassUnitTypes.erase(iterator->first);
-						break;
-					}
+		}
+		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
+			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[i]->ClassUnitTypes.rend(); ++iterator) {
+				if (iterator->second == type->Slot) {
+					PlayerRaces.Factions[i]->ClassUnitTypes.erase(iterator->first);
+					break;
 				}
 			}
 		}
@@ -2274,8 +2274,8 @@ static int CclDefineUnitType(lua_State *l)
 			
 			if (type->Faction != -1) {
 				int faction_id = type->Faction;
-				if (civilization_id != -1 && faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[civilization_id][faction_id]->ClassUnitTypes[class_id] = type->Slot;
+				if (faction_id != -1 && class_id != -1) {
+					PlayerRaces.Factions[faction_id]->ClassUnitTypes[class_id] = type->Slot;
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
@@ -2723,7 +2723,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (type->Faction != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[type->Civilization][type->Faction]->Ident.c_str());
+			lua_pushstring(l, PlayerRaces.Factions[type->Faction]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

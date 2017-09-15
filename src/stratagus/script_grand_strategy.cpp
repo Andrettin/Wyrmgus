@@ -47,49 +47,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Set grand strategy province data.
-**
-**  @param l  Lua state.
-*/
-static int CclSetGrandStrategyProvinceData(lua_State *l)
-{
-	if (lua_gettop(l) < 3) {
-		LuaError(l, "incorrect argument");
-	}
-	std::string province_name = LuaToString(l, 1);
-	int province_id = GetProvinceId(province_name);
-	if (province_id == -1) {
-		LuaError(l, "Province \"%s\" doesn't exist." _C_ province_name.c_str());
-	}
-	CGrandStrategyProvince *province = GrandStrategyGame.Provinces[province_id];
-	
-	const char *data = LuaToString(l, 2);
-	
-	if (!strcmp(data, "Modifier")) {
-		LuaCheckArgs(l, 4);
-		
-		CUpgrade *modifier = CUpgrade::Get(LuaToString(l, 3));
-		if (modifier == NULL) {
-			LuaError(l, "Modifier doesn't exist.");
-		}
-		
-		bool has_modifier = LuaToBoolean(l, 4);
-		
-		province->SetModifier(modifier, has_modifier);
-	} else if (!strcmp(data, "Governor")) {
-		LuaCheckArgs(l, 3);
-		
-		std::string governor_full_name = LuaToString(l, 3);
-		
-		province->SetGovernor(governor_full_name);
-	} else {
-		LuaError(l, "Invalid field: %s" _C_ data);
-	}
-
-	return 0;
-}
-
-/**
 **  Get grand strategy province data.
 **
 **  @param l  Lua state.
@@ -199,7 +156,7 @@ static int CclSetGrandStrategyFactionData(lua_State *l)
 		LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_name.c_str());
 	}
 	std::string faction_name = LuaToString(l, 2);
-	int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, faction_name);
+	int faction_id = PlayerRaces.GetFactionIndexByName(faction_name);
 	if (faction_id == -1) {
 		LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
 	}
@@ -407,7 +364,6 @@ static int CclGetGrandStrategyEventData(lua_State *l)
 */
 void GrandStrategyCclRegister()
 {
-	lua_register(Lua, "SetGrandStrategyProvinceData", CclSetGrandStrategyProvinceData);
 	lua_register(Lua, "GetGrandStrategyProvinceData", CclGetGrandStrategyProvinceData);
 	lua_register(Lua, "GetGrandStrategyProvinces", CclGetGrandStrategyProvinces);
 	lua_register(Lua, "SetGrandStrategyFactionData", CclSetGrandStrategyFactionData);

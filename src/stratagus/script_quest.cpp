@@ -227,7 +227,7 @@ static int CclDefineQuest(lua_State *l)
 				++j;
 				
 				std::string faction_ident = LuaToString(l, -1, j + 1);
-				CFaction *faction = PlayerRaces.GetFaction(-1, faction_ident);
+				CFaction *faction = PlayerRaces.GetFaction(faction_ident);
 				if (!faction && !faction_ident.empty()) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
 				}
@@ -251,7 +251,7 @@ static int CclDefineQuest(lua_State *l)
 			quest->DestroyFactions.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				CFaction *faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1, j + 1));
+				CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1, j + 1));
 				if (!faction) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -457,7 +457,7 @@ static int CclDefineCampaign(lua_State *l)
 		} else if (!strcmp(value, "Description")) {
 			campaign->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Faction")) {
-			campaign->Faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1));
+			campaign->Faction = PlayerRaces.GetFaction(LuaToString(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
 			campaign->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sandbox")) {

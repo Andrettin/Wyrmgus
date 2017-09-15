@@ -77,7 +77,7 @@
 			}
 		} else if (!strcmp(value, "faction")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Faction = PlayerRaces.GetFactionIndexByName(this->Civilization, value);
+			this->Faction = PlayerRaces.GetFactionIndexByName(value);
 			if (this->Faction == -1) {
 				fprintf(stderr, "Faction %s doesn't exist.\n", value);
 			}
@@ -121,7 +121,7 @@
 	if (this->NewForm == NULL) {
 		int new_unit_type = -1;
 		if (this->Civilization != -1 && this->Faction != -1 && this->Civilization == target->Type->Civilization) { //get faction equivalent, if is of the same civilization
-			new_unit_type = PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, target->Type->Class);
+			new_unit_type = PlayerRaces.GetFactionClassUnitType(this->Faction, target->Type->Class);
 		} else if (this->Civilization != -1 && this->Civilization != target->Type->Civilization) {
 			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Civilization, target->Type->Class);
 		}

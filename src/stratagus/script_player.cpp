@@ -473,7 +473,7 @@ void CPlayer::Load(lua_State *l)
 				++k;
 				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, j + 1, k + 1));
 				++k;
-				CFaction *faction = PlayerRaces.GetFaction(-1, LuaToString(l, j + 1, k + 1));
+				CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, j + 1, k + 1));
 				++k;
 				int quantity = LuaToNumber(l, j + 1, k + 1);
 				if (quest) {
@@ -503,7 +503,7 @@ void CPlayer::Load(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
 				++k;
-				CFaction *faction = PlayerRaces.GetFaction(-1, LuaToString(l, j + 1, k + 1));
+				CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, j + 1, k + 1));
 				++k;
 				bool destroyed = LuaToBoolean(l, j + 1, k + 1);
 				if (quest) {
@@ -1679,10 +1679,14 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		
 		std::vector<std::string> factions;
-		for (size_t i = 0; i < PlayerRaces.Factions[civilization_id].size(); ++i)
+		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i)
 		{
-			if (!is_mod || PlayerRaces.Factions[civilization_id][i]->Mod == mod_file) {
-				factions.push_back(PlayerRaces.Factions[civilization_id][i]->Ident);
+			if (PlayerRaces.Factions[i]->Civilization != civilization_id) {
+				continue;
+			}
+			
+			if (!is_mod || PlayerRaces.Factions[i]->Mod == mod_file) {
+				factions.push_back(PlayerRaces.Factions[i]->Ident);
 			}
 		}
 		
@@ -1769,21 +1773,21 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	CFaction *faction = NULL;
 	const int nargs = lua_gettop(l);
 	if (nargs == 2) {
-		faction = PlayerRaces.GetFaction(-1, LuaToString(l, 2));
+		faction = PlayerRaces.GetFaction(LuaToString(l, 2));
 		if (faction) {
 			civilization = faction->Civilization;
 			faction_id = faction->ID;
 		}
 	} else if (nargs == 3) {
 		civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 2));
-		faction = PlayerRaces.GetFaction(civilization, LuaToString(l, 3));
+		faction = PlayerRaces.GetFaction(LuaToString(l, 3));
 		if (faction) {
 			faction_id = faction->ID;
 		}
 	}
 	std::string unit_type_ident;
 	if (civilization != -1 && class_id != -1) {
-		int unit_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction_id, class_id);
+		int unit_type_id = PlayerRaces.GetFactionClassUnitType(faction_id, class_id);
 		if (unit_type_id != -1) {
 			unit_type_ident = UnitTypes[unit_type_id]->Ident;
 		}
@@ -1792,7 +1796,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
 		class_id = GetUpgradeClassIndexByName(class_name);
 		if (civilization != -1 && class_id != -1) {
-			int upgrade_id = PlayerRaces.GetFactionClassUpgrade(civilization, faction_id, class_id);
+			int upgrade_id = PlayerRaces.GetFactionClassUpgrade(faction_id, class_id);
 			if (upgrade_id != -1) {
 				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
 			}
@@ -1821,26 +1825,19 @@ static int CclDefineFaction(lua_State *l)
 	}
 
 	std::string faction_name = LuaToString(l, 1);
-	CFaction *faction = NULL;
-	int civilization = -1;
 	std::string parent_faction;
 	
-	int faction_id = -1;
-	for (int i = 0; i < MAX_RACES; ++i) {
-		faction_id = PlayerRaces.GetFactionIndexByName(i, faction_name);
-		if (faction_id != -1) { // redefinition
-			faction = const_cast<CFaction *>(&(*PlayerRaces.Factions[i][faction_id]));
-			civilization = faction->Civilization;
-			if (faction->ParentFaction != -1) {
-				parent_faction = PlayerRaces.Factions[i][faction->ParentFaction]->Ident;
-			}
-			break;
+	CFaction *faction = PlayerRaces.GetFaction(faction_name);
+	if (faction) { // redefinition
+		if (faction->ParentFaction != -1) {
+			parent_faction = PlayerRaces.Factions[faction->ParentFaction]->Ident;
 		}
-	}
-	
-	if (faction_id == -1) {
+	} else {
 		faction = new CFaction;
 		faction->Ident = faction_name;
+		faction->ID = PlayerRaces.Factions.size();
+		PlayerRaces.Factions.push_back(faction);
+		SetFactionStringToIndex(faction->Ident, faction->ID);
 	}
 	
 	//  Parse the list:
@@ -1848,14 +1845,7 @@ static int CclDefineFaction(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Civilization")) {
-			if (civilization == -1) { //don't change the civilization in redefinitions
-				civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
-				
-				faction->ID = PlayerRaces.Factions[civilization].size();
-				PlayerRaces.Factions[civilization].push_back(faction);
-				SetFactionStringToIndex(civilization, faction->Ident, faction->ID);
-				faction->Civilization = civilization;
-			}
+			faction->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Name")) {
 			faction->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
@@ -1922,7 +1912,7 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				CFaction *second_faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1, k + 1));
+				CFaction *second_faction = PlayerRaces.GetFaction(LuaToString(l, -1, k + 1));
 				if (!second_faction) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -1935,7 +1925,7 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				CFaction *second_faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1, k + 1));
+				CFaction *second_faction = PlayerRaces.GetFaction(LuaToString(l, -1, k + 1));
 				if (!second_faction) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -2030,24 +2020,6 @@ static int CclDefineFaction(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				faction->ShipNames.push_back(LuaToString(l, -1, j + 1));
 			}
-		} else if (!strcmp(value, "HistoricalFactionDerivations")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				int year = LuaToNumber(l, -1, j + 1);
-				++j;
-				std::string predecessor_civilization_name = LuaToString(l, -1, j + 1);
-				int predecessor_civilization = PlayerRaces.GetRaceIndexByName(predecessor_civilization_name.c_str());
-				++j;
-				std::string predecessor_faction_name = LuaToString(l, -1, j + 1);
-				int predecessor_faction = PlayerRaces.GetFactionIndexByName(predecessor_civilization, predecessor_faction_name);
-				if (predecessor_faction == -1) {
-					LuaError(l, "Faction \"%s\" doesn't exist." _C_ predecessor_faction_name.c_str());
-				}
-				faction->HistoricalFactionDerivations[year] = PlayerRaces.Factions[predecessor_civilization][predecessor_faction];
-			}
 		} else if (!strcmp(value, "HistoricalUpgrades")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2111,7 +2083,7 @@ static int CclDefineFaction(lua_State *l)
 				++j;
 				
 				std::string diplomacy_state_faction_ident = LuaToString(l, -1, j + 1);
-				CFaction *diplomacy_state_faction = PlayerRaces.GetFaction(-1, diplomacy_state_faction_ident);
+				CFaction *diplomacy_state_faction = PlayerRaces.GetFaction(diplomacy_state_faction_ident);
 				if (diplomacy_state_faction == NULL) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ diplomacy_state_faction_ident.c_str());
 				}
@@ -2167,25 +2139,25 @@ static int CclDefineFaction(lua_State *l)
 		}
 	}
 	
-	if (civilization != -1 && !parent_faction.empty()) { //process this here, since we have no guarantee that the civilization will get processed before the parent faction
-		faction->ParentFaction = PlayerRaces.GetFactionIndexByName(civilization, parent_faction);
+	if (!parent_faction.empty()) { //process this here
+		faction->ParentFaction = PlayerRaces.GetFactionIndexByName(parent_faction);
 		
 		if (faction->ParentFaction == -1) { //if a parent faction was set but wasn't found, give an error
 			LuaError(l, "Faction %s doesn't exist" _C_ parent_faction.c_str());
 		}
 		
 		if (faction->ParentFaction != -1 && faction->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
-			faction->FactionUpgrade = PlayerRaces.Factions[civilization][faction->ParentFaction]->FactionUpgrade;
+			faction->FactionUpgrade = PlayerRaces.Factions[faction->ParentFaction]->FactionUpgrade;
 		}
 		
 		if (faction->ParentFaction != -1) { //inherit button icons from parent civilization, for button actions which none are specified
-			for (std::map<int, IconConfig>::iterator iterator = PlayerRaces.Factions[civilization][faction->ParentFaction]->ButtonIcons.begin(); iterator != PlayerRaces.Factions[civilization][faction->ParentFaction]->ButtonIcons.end(); ++iterator) {
+			for (std::map<int, IconConfig>::iterator iterator = PlayerRaces.Factions[faction->ParentFaction]->ButtonIcons.begin(); iterator != PlayerRaces.Factions[faction->ParentFaction]->ButtonIcons.end(); ++iterator) {
 				if (faction->ButtonIcons.find(iterator->first) == faction->ButtonIcons.end()) {
 					faction->ButtonIcons[iterator->first] = iterator->second;
 				}
 			}
 			
-			for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = PlayerRaces.Factions[civilization][faction->ParentFaction]->HistoricalUpgrades.begin(); iterator != PlayerRaces.Factions[civilization][faction->ParentFaction]->HistoricalUpgrades.end(); ++iterator) {
+			for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = PlayerRaces.Factions[faction->ParentFaction]->HistoricalUpgrades.begin(); iterator != PlayerRaces.Factions[faction->ParentFaction]->HistoricalUpgrades.end(); ++iterator) {
 				if (faction->HistoricalUpgrades.find(iterator->first) == faction->HistoricalUpgrades.end()) {
 					faction->HistoricalUpgrades[iterator->first] = iterator->second;
 				}
@@ -2420,7 +2392,7 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CFaction *holy_order = PlayerRaces.GetFaction(-1, LuaToString(l, -1, j + 1));
+				CFaction *holy_order = PlayerRaces.GetFaction(LuaToString(l, -1, j + 1));
 				if (!holy_order) {
 					LuaError(l, "Holy order doesn't exist.");
 				}
@@ -2649,27 +2621,6 @@ static int CclGetCivilizations(lua_State *l)
 }
 
 /**
-**  Get a civilization's factions.
-**
-**  @param l  Lua state.
-*/
-static int CclGetCivilizationFactionNames(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
-	lua_pop(l, 1);
-
-	lua_createtable(l, PlayerRaces.Factions[civilization].size(), 0);
-	for (size_t i = 1; i <= PlayerRaces.Factions[civilization].size(); ++i)
-	{
-		lua_pushstring(l, PlayerRaces.Factions[civilization][i-1]->Ident.c_str());
-		lua_rawseti(l, -2, i);
-	}
-	
-	return 1;
-}
-
-/**
 **  Get the factions.
 **
 **  @param l  Lua state.
@@ -2683,17 +2634,14 @@ static int CclGetFactions(lua_State *l)
 	
 	std::vector<std::string> factions;
 	if (civilization != -1) {
-		for (size_t i = 0; i < PlayerRaces.Factions[civilization].size(); ++i)
-		{
-			factions.push_back(PlayerRaces.Factions[civilization][i]->Ident);
+		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
+			if (PlayerRaces.Factions[i]->Civilization == civilization) {
+				factions.push_back(PlayerRaces.Factions[i]->Ident);
+			}
 		}
 	} else {
-		for (int i = 0; i < MAX_RACES; ++i)
-		{
-			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j)
-			{
-				factions.push_back(PlayerRaces.Factions[i][j]->Ident);
-			}
+		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
+			factions.push_back(PlayerRaces.Factions[i]->Ident);
 		}
 	}
 		
@@ -2741,7 +2689,7 @@ static int CclGetFactionData(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	std::string faction_name = LuaToString(l, 1);
-	CFaction *faction = PlayerRaces.GetFaction(-1, faction_name);
+	CFaction *faction = PlayerRaces.GetFaction(faction_name);
 	if (faction == NULL) {
 		LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
 	}
@@ -2785,7 +2733,7 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ParentFaction")) {
 		if (faction->ParentFaction != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[faction->Civilization][faction->ParentFaction]->Ident.c_str());
+			lua_pushstring(l, PlayerRaces.Factions[faction->ParentFaction]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2985,7 +2933,7 @@ static int CclGetPlayerData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		if (p->Race != -1 && p->Faction != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[p->Race][p->Faction]->Ident.c_str());
+			lua_pushstring(l, PlayerRaces.Factions[p->Faction]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3310,7 +3258,7 @@ static int CclSetPlayerData(lua_State *l)
 		if (faction_name == "random") {
 			p->SetRandomFaction();
 		} else {
-			p->SetFaction(PlayerRaces.GetFaction(-1, faction_name));
+			p->SetFaction(PlayerRaces.GetFaction(faction_name));
 		}
 	//Wyrmgus end
 	} else if (!strcmp(data, "Resources")) {
@@ -3841,7 +3789,6 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineDeity", CclDefineDeity);
 	lua_register(Lua, "DefineLanguage", CclDefineLanguage);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
-	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
 	lua_register(Lua, "GetFactions", CclGetFactions);
 	lua_register(Lua, "GetPlayerColors", CclGetPlayerColors);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);

@@ -2249,7 +2249,7 @@ static void AiCheckPathwayConstruction()
 */
 void AiCheckSettlementConstruction()
 {
-	int town_hall_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Race, AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("town-hall"));			
+	int town_hall_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("town-hall"));			
 	if (town_hall_type_id == -1) {
 		return;
 	}

@@ -200,18 +200,11 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			}
 		} else if (!strcmp(value, "faction-equivalent")) {
 			value = LuaToString(l, -1, j + 1);
-			int civilization = PlayerRaces.GetRaceIndexByName(value);
-			if (civilization != -1) {
-				++j;
-				value = LuaToString(l, -1, j + 1);
-				int faction = PlayerRaces.GetFactionIndexByName(civilization, value);
-				if (faction != -1) {
-					condition->FactionEquivalent = const_cast<CFaction *>(&(*PlayerRaces.Factions[civilization][faction]));
-				} else {
-					fprintf(stderr, "Faction \"%s\" doesn't exist.\n", value);
-				}
+			CFaction *faction = PlayerRaces.GetFaction(value);
+			if (faction) {
+					condition->FactionEquivalent = faction;
 			} else {
-				fprintf(stderr, "Civilization \"%s\" doesn't exist.\n", value);
+				fprintf(stderr, "Faction \"%s\" doesn't exist.\n", value);
 			}
 		//Wyrmgus end
 		} else {

@@ -1343,7 +1343,7 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL && unit->Settlement != NULL) {
 				int civilization = unit->Type->Civilization;
-				if (civilization != -1 && unit->Player->Faction != -1 && (unit->Player->Race == civilization || unit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Player->Race, unit->Player->Faction, unit->Type->Class))) {
+				if (civilization != -1 && unit->Player->Faction != -1 && (unit->Player->Race == civilization || unit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Player->Faction, unit->Type->Class))) {
 					civilization = unit->Player->Race;
 				}
 				return unit->Settlement->GetCulturalName(civilization);
@@ -1468,7 +1468,7 @@ std::string EvalString(const StringDesc *s)
 			if (upgrade != NULL) {
 				CFaction *upgrade_faction = NULL;
 				if (!strncmp((**upgrade).Ident.c_str(), "upgrade-faction-", 16)) {
-					upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString((**upgrade).Ident, "upgrade-faction-", ""));
+					upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString((**upgrade).Ident, "upgrade-faction-", ""));
 				}
 				if (upgrade_faction) {
 					return PlayerRaces.Display[upgrade_faction->Civilization];
@@ -1485,7 +1485,7 @@ std::string EvalString(const StringDesc *s)
 			if (upgrade != NULL) {
 				CFaction *upgrade_faction = NULL;
 				if (!strncmp((**upgrade).Ident.c_str(), "upgrade-faction-", 16)) {
-					upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString((**upgrade).Ident, "upgrade-faction-", ""));
+					upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString((**upgrade).Ident, "upgrade-faction-", ""));
 				}
 				if (upgrade_faction) {
 					return IdentToName(GetFactionTypeNameById(upgrade_faction->Type));
@@ -1515,7 +1515,7 @@ std::string EvalString(const StringDesc *s)
 			if (upgrade != NULL) {
 				CFaction *upgrade_faction = NULL;
 				if (!strncmp((**upgrade).Ident.c_str(), "upgrade-faction-", 16)) {
-					upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString((**upgrade).Ident, "upgrade-faction-", ""));
+					upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString((**upgrade).Ident, "upgrade-faction-", ""));
 				}
 				if (upgrade_faction) {
 					std::string settlements_string;
@@ -3329,17 +3329,13 @@ void SavePreferences()
 }
 
 //Wyrmgus start
-void DeleteModFaction(std::string civilization_name, std::string faction_name)
+void DeleteModFaction(std::string faction_name)
 {
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction = -1;
-	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-	}
-	if (faction != -1 && !PlayerRaces.Factions[civilization][faction]->Mod.empty()) {
-		FactionStringToIndex[civilization].erase(PlayerRaces.Factions[civilization][faction]->Ident);
-		delete PlayerRaces.Factions[civilization][faction];
-		PlayerRaces.Factions[civilization].erase(std::remove(PlayerRaces.Factions[civilization].begin(), PlayerRaces.Factions[civilization].end(), PlayerRaces.Factions[civilization][faction]), PlayerRaces.Factions[civilization].end());
+	int faction = PlayerRaces.GetFactionIndexByName(faction_name);
+	if (faction != -1 && !PlayerRaces.Factions[faction]->Mod.empty()) {
+		FactionStringToIndex.erase(PlayerRaces.Factions[faction]->Ident);
+		delete PlayerRaces.Factions[faction];
+		PlayerRaces.Factions.erase(std::remove(PlayerRaces.Factions.begin(), PlayerRaces.Factions.end(), PlayerRaces.Factions[faction]), PlayerRaces.Factions.end());
 	}
 }
 
@@ -3370,11 +3366,11 @@ void DeleteModUnitType(std::string unit_type_ident)
 				PlayerRaces.CivilizationClassUnitTypes[j].erase(iterator->first);
 			}
 		}
-		for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
-			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[j][k]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[j][k]->ClassUnitTypes.rend(); ++iterator) {
-				if (iterator->second == unit_type->Slot) {
-					PlayerRaces.Factions[j][k]->ClassUnitTypes.erase(iterator->first);
-				}
+	}
+	for (size_t j = 0; j < PlayerRaces.Factions.size(); ++j) {
+		for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[j]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[j]->ClassUnitTypes.rend(); ++iterator) {
+			if (iterator->second == unit_type->Slot) {
+				PlayerRaces.Factions[j]->ClassUnitTypes.erase(iterator->first);
 			}
 		}
 	}
@@ -3434,14 +3430,12 @@ void DisableMod(std::string mod_file)
 		}
 	}
 	
-	for (int i = 0; i < MAX_RACES; ++i) {
-		int factions_size = PlayerRaces.Factions[i].size();
-		for (int j = (factions_size - 1); j >= 0; --j) {
-			if (PlayerRaces.Factions[i][j]->Mod == mod_file) {
-				FactionStringToIndex[i].erase(PlayerRaces.Factions[i][j]->Ident);
-				delete PlayerRaces.Factions[i][j];
-				PlayerRaces.Factions[i].erase(std::remove(PlayerRaces.Factions[i].begin(), PlayerRaces.Factions[i].end(), PlayerRaces.Factions[i][j]), PlayerRaces.Factions[i].end());
-			}
+	int factions_size = PlayerRaces.Factions.size();
+	for (int i = (factions_size - 1); i >= 0; --i) {
+		if (PlayerRaces.Factions[i]->Mod == mod_file) {
+			FactionStringToIndex.erase(PlayerRaces.Factions[i]->Ident);
+			PlayerRaces.Factions.erase(std::remove(PlayerRaces.Factions.begin(), PlayerRaces.Factions.end(), PlayerRaces.Factions[i]), PlayerRaces.Factions.end());
+			delete PlayerRaces.Factions[i];
 		}
 	}
 }

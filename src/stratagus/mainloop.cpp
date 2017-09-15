@@ -256,7 +256,7 @@ void UpdateDisplay()
 		//Wyrmgus start
 		//draw worker icon if there are idle workers
 		if (UI.IdleWorkerButton && !ThisPlayer->FreeWorkers.empty()) {
-			int worker_unit_type_id = PlayerRaces.GetFactionClassUnitType(ThisPlayer->Race, ThisPlayer->Faction, GetUnitTypeClassIndexByName("worker"));
+			int worker_unit_type_id = PlayerRaces.GetFactionClassUnitType(ThisPlayer->Faction, GetUnitTypeClassIndexByName("worker"));
 			if (worker_unit_type_id != -1) {
 				const CUnitType &type = *UnitTypes[worker_unit_type_id];
 				
@@ -609,7 +609,7 @@ void GameMainLoop()
 				if (Players[i].Type != PlayerNobody && Players[i].Race != 0 && Players[i].Faction != -1) {
 					if (CurrentCampaign->StartDate.year) {
 						CCivilization *civilization = PlayerRaces.Civilizations[Players[i].Race];
-						CFaction *faction = PlayerRaces.Factions[Players[i].Race][Players[i].Faction];
+						CFaction *faction = PlayerRaces.Factions[Players[i].Faction];
 						
 						for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
 							int upgrade_id = UpgradeIdByIdent(iterator->first);

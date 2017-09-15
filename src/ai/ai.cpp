@@ -332,59 +332,57 @@ static void AiCheckUnits()
 	//Wyrmgus start
 	//check if any factions can be founded, and if so, pick one randomly
 	std::vector<CUpgrade *> potential_faction_upgrades;
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (i == AiPlayer->Player->Race && j == AiPlayer->Player->Faction) {
-				continue;
-			}
-
-			CFaction *possible_faction = PlayerRaces.Factions[i][j];
-			
-			if (possible_faction->FactionUpgrade.empty()) {
-				continue;
-			}
-			
-			CUpgrade *faction_upgrade = CUpgrade::Get(possible_faction->FactionUpgrade);
-			
-			if (!faction_upgrade) {
-				fprintf(stderr, "Faction upgrade \"%s\" doesn't exist.\n", possible_faction->FactionUpgrade.c_str());
-				continue;
-			}
-			
-			if (!CheckDependByIdent(*AiPlayer->Player, possible_faction->FactionUpgrade)) {
-				continue;
-			}
-						
-			if (!AiPlayer->Player->CanFoundFaction(possible_faction)) {
-				continue;
-			}
-			
-			n = AiHelpers.Research.size();
-			std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
-
-			if (faction_upgrade->ID > n) { // Oops not known.
-				continue;
-			}
-			std::vector<CUnitType *> &table = tablep[faction_upgrade->ID];
-			if (table.empty()) { // Oops not known.
-				continue;
-			}
-
-			const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-			bool has_researcher = false;
-			for (unsigned int k = 0; k < table.size(); ++k) {
-				// The type is available
-				if (unit_count[table[k]->Slot]) {
-					has_researcher = true;
-					break;
-				}
-			}
-			if (!has_researcher) {
-				continue;
-			}
-			
-			potential_faction_upgrades.push_back(faction_upgrade);
+	for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
+		if (i == AiPlayer->Player->Faction) {
+			continue;
 		}
+
+		CFaction *possible_faction = PlayerRaces.Factions[i];
+		
+		if (possible_faction->FactionUpgrade.empty()) {
+			continue;
+		}
+			
+		CUpgrade *faction_upgrade = CUpgrade::Get(possible_faction->FactionUpgrade);
+			
+		if (!faction_upgrade) {
+			fprintf(stderr, "Faction upgrade \"%s\" doesn't exist.\n", possible_faction->FactionUpgrade.c_str());
+			continue;
+		}
+			
+		if (!CheckDependByIdent(*AiPlayer->Player, possible_faction->FactionUpgrade)) {
+			continue;
+		}
+						
+		if (!AiPlayer->Player->CanFoundFaction(possible_faction)) {
+			continue;
+		}
+			
+		n = AiHelpers.Research.size();
+		std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
+
+		if (faction_upgrade->ID > n) { // Oops not known.
+			continue;
+		}
+		std::vector<CUnitType *> &table = tablep[faction_upgrade->ID];
+		if (table.empty()) { // Oops not known.
+			continue;
+		}
+
+		const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+		bool has_researcher = false;
+		for (unsigned int k = 0; k < table.size(); ++k) {
+			// The type is available
+			if (unit_count[table[k]->Slot]) {
+				has_researcher = true;
+				break;
+			}
+		}
+		if (!has_researcher) {
+			continue;
+		}
+			
+		potential_faction_upgrades.push_back(faction_upgrade);
 	}
 	
 	if (potential_faction_upgrades.size() > 0) {

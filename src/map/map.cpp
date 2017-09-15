@@ -630,7 +630,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 		// add five workers at the player's starting location
 		if (Players[i].NumTownHalls > 0) {
-			int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Race, Players[i].Faction, GetUnitTypeClassIndexByName("worker"));			
+			int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Faction, GetUnitTypeClassIndexByName("worker"));			
 			if (worker_type_id != -1 && Players[i].UnitTypesCount[worker_type_id] == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
 				
@@ -767,7 +767,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(settlement_iterator->second->HistoricalBuildings[j])) || std::get<1>(settlement_iterator->second->HistoricalBuildings[j]).year == 0)
 			) {
 				int unit_type_id = -1;
-				unit_type_id = PlayerRaces.GetFactionClassUnitType(settlement_owner->Civilization, settlement_owner->ID, std::get<2>(settlement_iterator->second->HistoricalBuildings[j]));
+				unit_type_id = PlayerRaces.GetFactionClassUnitType(settlement_owner->ID, std::get<2>(settlement_iterator->second->HistoricalBuildings[j]));
 				if (unit_type_id == -1) {
 					continue;
 				}
@@ -789,9 +789,9 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 				CFaction *building_owner = std::get<4>(settlement_iterator->second->HistoricalBuildings[j]);
 				int unit_type_id = -1;
 				if (building_owner) {
-					unit_type_id = PlayerRaces.GetFactionClassUnitType(building_owner->Civilization, building_owner->ID, std::get<2>(settlement_iterator->second->HistoricalBuildings[j]));
+					unit_type_id = PlayerRaces.GetFactionClassUnitType(building_owner->ID, std::get<2>(settlement_iterator->second->HistoricalBuildings[j]));
 				} else {
-					unit_type_id = PlayerRaces.GetFactionClassUnitType(settlement_owner->Civilization, settlement_owner->ID, std::get<2>(settlement_iterator->second->HistoricalBuildings[j]));
+					unit_type_id = PlayerRaces.GetFactionClassUnitType(settlement_owner->ID, std::get<2>(settlement_iterator->second->HistoricalBuildings[j]));
 				}
 				if (unit_type_id == -1) {
 					continue;

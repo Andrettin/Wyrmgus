@@ -470,7 +470,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	if (condition->FactionUpgradeCoreSettlements != CONDITION_TRUE) {
 		CFaction *upgrade_faction = NULL;
 		if (!strncmp(AllUpgrades[button.Value]->Ident.c_str(), "upgrade-faction-", 16)) {
-			upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(AllUpgrades[button.Value]->Ident, "upgrade-faction-", ""));
+			upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString(AllUpgrades[button.Value]->Ident, "upgrade-faction-", ""));
 		}
 
 		if ((condition->FactionUpgradeCoreSettlements == CONDITION_ONLY) ^ (upgrade_faction && upgrade_faction->Cores.size() > 0)) {
@@ -1633,7 +1633,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 //				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
 				res = (UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'R') && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, true); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
-					CFaction *upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
+					CFaction *upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
 					if (upgrade_faction) {
 						res = ThisPlayer->CanFoundFaction(upgrade_faction, true);
 					}
@@ -1758,7 +1758,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
-					CFaction *upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
+					CFaction *upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
 					if (upgrade_faction) {
 						res = ThisPlayer->CanFoundFaction(upgrade_faction, false);
 					}
