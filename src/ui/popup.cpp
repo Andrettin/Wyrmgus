@@ -197,6 +197,10 @@
 	}
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[button.Value];
+	} else if (button.Action == ButtonFaction) {
+		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
+			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
+		}
 	}
 	int resource = button.Value;
 	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
@@ -248,6 +252,10 @@
 	}
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[button.Value];
+	} else if (button.Action == ButtonFaction) {
+		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
+			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
+		}
 	}
 	int resource = button.Value;
 	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
@@ -282,6 +290,10 @@
 	}
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[button.Value];
+	} else if (button.Action == ButtonFaction) {
+		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
+			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
+		}
 	}
 	int resource = button.Value;
 	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
@@ -506,6 +518,10 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	}
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[button.Value];
+	} else if (button.Action == ButtonFaction) {
+		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
+			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
+		}
 	}
 	int resource = button.Value;
 	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
@@ -548,6 +564,10 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		}
 		if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 			TriggerData.Upgrade = AllUpgrades[button.Value];
+		} else if (button.Action == ButtonFaction) {
+			if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
+				TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
+			}
 		}
 		int resource = button.Value;
 		if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {

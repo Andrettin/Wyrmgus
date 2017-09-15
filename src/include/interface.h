@@ -79,6 +79,7 @@ enum ButtonCmd {
 	ButtonUpgradeTo,      /// order upgrade
 	//Wyrmgus start
 	ButtonRallyPoint,		/// set rally point
+	ButtonFaction,			/// change faction
 	ButtonQuest,			/// receive quest
 	ButtonBuy,				/// buy item
 	ButtonProduceResource,	/// produce a resource

@@ -462,24 +462,26 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 
 	if (condition->FactionUpgrade != CONDITION_TRUE) {
-		if ((condition->FactionUpgrade == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility) && !strncmp(AllUpgrades[button.Value]->Ident.c_str(), "upgrade-faction-", 16))) {
+		if ((condition->FactionUpgrade == CONDITION_ONLY) ^ (button.Action == ButtonFaction)) {
 			return false;
 		}
 	}
 	
 	if (condition->FactionUpgradeCoreSettlements != CONDITION_TRUE) {
-		CFaction *upgrade_faction = NULL;
-		if (!strncmp(AllUpgrades[button.Value]->Ident.c_str(), "upgrade-faction-", 16)) {
-			upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString(AllUpgrades[button.Value]->Ident, "upgrade-faction-", ""));
-		}
-
-		if ((condition->FactionUpgradeCoreSettlements == CONDITION_ONLY) ^ (upgrade_faction && upgrade_faction->Cores.size() > 0)) {
+		if ((condition->FactionUpgradeCoreSettlements == CONDITION_ONLY) ^ (button.Action == ButtonFaction && button.Value != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
 		}
 	}
 	
+	CUpgrade *upgrade = NULL;
+	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
+		upgrade = AllUpgrades[button.Value];
+	} else if (button.Action == ButtonFaction && !PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
+		upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
+	}
+	
 	if (condition->ResearchedUpgrade != CONDITION_TRUE) {
-		if ((condition->ResearchedUpgrade == CONDITION_ONLY) ^ (((button.Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, button.ValueStr) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->IndividualUpgrades[button.Value])))) {
+		if ((condition->ResearchedUpgrade == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdentAllowed(*ThisPlayer, upgrade->Ident) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->IndividualUpgrades[upgrade->ID])))) {
 			return false;
 		}
 	}
@@ -491,7 +493,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonExperienceUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility) && !AllUpgrades[button.Value]->RequirementsString.empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonExperienceUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction) && !upgrade->RequirementsString.empty())))) {
 			return false;
 		}
 	}
@@ -1358,6 +1360,8 @@ void CButtonPanel::Draw()
 			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon().Icon;
 		} else if (buttons[i].Action == ButtonResearch && buttons[i].Icon.Name.empty() && AllUpgrades[buttons[i].Value]->Icon) {
 			button_icon = AllUpgrades[buttons[i].Value]->Icon;
+		} else if (buttons[i].Action == ButtonFaction && buttons[i].Icon.Name.empty() && !PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttons[i].Value]->Icon.Name.empty()) {
+			button_icon = PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttons[i].Value]->Icon.Icon;
 		}
 		//Wyrmgus end
 		
@@ -1632,12 +1636,6 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 				//Wyrmgus start
 //				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
 				res = (UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'R') && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, true); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
-				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
-					CFaction *upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
-					if (upgrade_faction) {
-						res = ThisPlayer->CanFoundFaction(upgrade_faction, true);
-					}
-				}
 				//Wyrmgus end
 			}
 			break;
@@ -1686,6 +1684,9 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = unit.CurrentAction() == UnitActionBuilt;
 			break;
 		//Wyrmgus start
+		case ButtonFaction:
+			res = ThisPlayer->Faction != -1 && buttonaction.Value != -1 && buttonaction.Value < (int) PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo.size() && ThisPlayer->CanFoundFaction(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttonaction.Value], true);
+			break;
 		case ButtonQuest:
 			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size() && unit.Player->CanAcceptQuest(unit.Player->AvailableQuests[buttonaction.Value]);
 			break;
@@ -1757,12 +1758,6 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, false, !ThisPlayer->IsTeamed(unit));
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
-				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
-					CFaction *upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
-					if (upgrade_faction) {
-						res = ThisPlayer->CanFoundFaction(upgrade_faction, false);
-					}
-				}
 			}
 			break;
 		case ButtonExperienceUpgradeTo:
@@ -1773,6 +1768,9 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		case ButtonSpellCast:
 			res = SpellIsAvailable(unit, buttonaction.Value);
+			break;
+		case ButtonFaction:
+			res = ThisPlayer->CanFoundFaction(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttonaction.Value]);
 			break;
 		case ButtonUnload:
 		case ButtonCancel:
@@ -1973,8 +1971,9 @@ void CButtonPanel::Update()
 	//update the sold item buttons
 	if (GameRunning || GameEstablishing) {
 		unsigned int sold_unit_count = 0;
+		unsigned int potential_faction_count = 0;
 		for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
-			if (UnitButtonTable[i]->Action != ButtonBuy) {
+			if (UnitButtonTable[i]->Action != ButtonFaction && UnitButtonTable[i]->Action != ButtonBuy) {
 				continue;
 			}
 			char unit_ident[128];
@@ -1982,22 +1981,41 @@ void CButtonPanel::Update()
 			if (UnitButtonTable[i]->UnitMask[0] != '*' && !strstr(UnitButtonTable[i]->UnitMask.c_str(), unit_ident)) {
 				continue;
 			}
-		
-			if (sold_unit_count >= unit.SoldUnits.size()) {
-				UnitButtonTable[i]->Value = -1;
-			} else {
-				UnitButtonTable[i]->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
-				if (unit.SoldUnits[sold_unit_count]->Character != NULL) {
-					UnitButtonTable[i]->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->GetName();
+
+			if (UnitButtonTable[i]->Action == ButtonFaction) {
+				if (ThisPlayer->Faction == -1 || potential_faction_count >= PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo.size()) {
+					UnitButtonTable[i]->Value = -1;
 				} else {
-					if (!unit.SoldUnits[sold_unit_count]->Name.empty()) {
-						UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
+					UnitButtonTable[i]->Value = potential_faction_count;
+					UnitButtonTable[i]->Hint = "Found ";
+					if (PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->Type == FactionTypeTribe) {
+						UnitButtonTable[i]->Hint += "the ";
+					}
+					UnitButtonTable[i]->Hint += PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->Name;
+					UnitButtonTable[i]->Description = "Changes your faction to ";
+					if (PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->Type == FactionTypeTribe) {
+						UnitButtonTable[i]->Description += "the ";
+					}
+					UnitButtonTable[i]->Description += PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->Name;
+				}
+				potential_faction_count += 1;
+			} else if (UnitButtonTable[i]->Action == ButtonBuy) {
+				if (sold_unit_count >= unit.SoldUnits.size()) {
+					UnitButtonTable[i]->Value = -1;
+				} else {
+					UnitButtonTable[i]->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
+					if (unit.SoldUnits[sold_unit_count]->Character != NULL) {
+						UnitButtonTable[i]->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->GetName();
 					} else {
-						UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetTypeName();
+						if (!unit.SoldUnits[sold_unit_count]->Name.empty()) {
+							UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
+						} else {
+							UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetTypeName();
+						}
 					}
 				}
+				sold_unit_count += 1;
 			}
-			sold_unit_count += 1;
 		}
 	}
 	//Wyrmgus end
@@ -2418,6 +2436,17 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 	}
 }
 
+void CButtonPanel::DoClicked_Faction(int button)
+{
+	const int index = CurrentButtons[button].Value;
+	SendCommandSetFaction(ThisPlayer->Index, PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[index]->ID);
+	ButtonUnderCursor = -1;
+	OldButtonUnderCursor = -1;
+	if (Selected[0]->Player == ThisPlayer) {
+		SelectedUnitChanged();
+	}
+}
+
 void CButtonPanel::DoClicked_Quest(int button)
 {
 	const int index = CurrentButtons[button].Value;
@@ -2570,6 +2599,7 @@ void CButtonPanel::DoClicked(int button)
 		//Wyrmgus start
 		case ButtonLearnAbility: { DoClicked_LearnAbility(button); break; }
 		case ButtonExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
+		case ButtonFaction: { DoClicked_Faction(button); break; }
 		case ButtonQuest: { DoClicked_Quest(button); break; }
 		case ButtonBuy: { DoClicked_Buy(button); break; }
 		case ButtonProduceResource: { DoClicked_ProduceResource(button); break; }

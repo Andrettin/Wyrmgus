@@ -1524,6 +1524,10 @@ void CPlayer::SetCivilization(int civilization)
 */
 void CPlayer::SetFaction(CFaction *faction)
 {
+	if (faction && faction->Civilization != this->Race) {
+		this->SetCivilization(faction->Civilization);
+	}
+
 	if (this->Faction != -1) {
 		if (!PlayerRaces.Factions[this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.Factions[this->Faction]->FactionUpgrade)->ID] == 'R') {
 			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.Factions[this->Faction]->FactionUpgrade)->ID);
@@ -1733,6 +1737,18 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 		return false;
 	}
 	
+	if (!faction->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(faction->FactionUpgrade);
+		
+		if (faction_upgrade) {
+			if (!CheckDependByIdent(*this, faction->FactionUpgrade, false, pre)) {
+				return false;
+			}
+		} else {
+			fprintf(stderr, "Faction upgrade \"%s\" doesn't exist.\n", faction->FactionUpgrade.c_str());
+		}
+	}
+
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (this->Index != i && Players[i].Type != PlayerNobody && Players[i].Race == faction->Civilization && Players[i].Faction == faction->ID) {
 			// faction is already in use

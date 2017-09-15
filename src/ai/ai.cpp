@@ -331,62 +331,21 @@ static void AiCheckUnits()
 	
 	//Wyrmgus start
 	//check if any factions can be founded, and if so, pick one randomly
-	std::vector<CUpgrade *> potential_faction_upgrades;
-	for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
-		if (i == AiPlayer->Player->Faction) {
-			continue;
-		}
-
-		CFaction *possible_faction = PlayerRaces.Factions[i];
-		
-		if (possible_faction->FactionUpgrade.empty()) {
-			continue;
-		}
+	if (AiPlayer->Player->Faction != -1 && AiPlayer->Player->NumTownHalls > 0) {
+		std::vector<CFaction *> potential_factions;
+		for (size_t i = 0; i < PlayerRaces.Factions[AiPlayer->Player->Faction]->DevelopsTo.size(); ++i) {
+			CFaction *possible_faction = PlayerRaces.Factions[AiPlayer->Player->Faction]->DevelopsTo[i];
 			
-		CUpgrade *faction_upgrade = CUpgrade::Get(possible_faction->FactionUpgrade);
-			
-		if (!faction_upgrade) {
-			fprintf(stderr, "Faction upgrade \"%s\" doesn't exist.\n", possible_faction->FactionUpgrade.c_str());
-			continue;
-		}
-			
-		if (!CheckDependByIdent(*AiPlayer->Player, possible_faction->FactionUpgrade)) {
-			continue;
-		}
-						
-		if (!AiPlayer->Player->CanFoundFaction(possible_faction)) {
-			continue;
-		}
-			
-		n = AiHelpers.Research.size();
-		std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
-
-		if (faction_upgrade->ID > n) { // Oops not known.
-			continue;
-		}
-		std::vector<CUnitType *> &table = tablep[faction_upgrade->ID];
-		if (table.empty()) { // Oops not known.
-			continue;
-		}
-
-		const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-		bool has_researcher = false;
-		for (unsigned int k = 0; k < table.size(); ++k) {
-			// The type is available
-			if (unit_count[table[k]->Slot]) {
-				has_researcher = true;
-				break;
+			if (!AiPlayer->Player->CanFoundFaction(possible_faction)) {
+				continue;
 			}
+				
+			potential_factions.push_back(possible_faction);
 		}
-		if (!has_researcher) {
-			continue;
+		
+		if (potential_factions.size() > 0) {
+			AiPlayer->Player->SetFaction(potential_factions[SyncRand(potential_factions.size())]);
 		}
-			
-		potential_faction_upgrades.push_back(faction_upgrade);
-	}
-	
-	if (potential_faction_upgrades.size() > 0) {
-		UpgradeAcquire(*AiPlayer->Player, potential_faction_upgrades[SyncRand(potential_faction_upgrades.size())]);
 	}
 	
 	//check if any deities can be chosen, and if so, pick one randomly
