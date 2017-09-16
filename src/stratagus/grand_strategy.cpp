@@ -145,79 +145,12 @@ void CGrandStrategyGame::DrawInterface()
 			DrawGenericPopup("Prestige influences trade priority between nations, and factions with negative prestige cannot declare war", hovered_prestige_icon.x, hovered_prestige_icon.y);
 		}
 	}
-	
-	int item_y = 0;
-	
-	if (this->SelectedProvince != NULL) {
-		std::string interface_state_name;
-		
-		if (GrandStrategyInterfaceState == "Province") {
-		} else if (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") {
-			if (this->SelectedProvince->Civilization != -1) {
-				std::string province_culture_string = "Province Culture: " + PlayerRaces.Civilizations[this->SelectedProvince->Civilization]->Adjective;
-				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(province_culture_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), province_culture_string);
-				item_y += 1;
-			}
-			
-			std::string population_string = "Population: " + std::to_string((long long) this->SelectedProvince->GetPopulation());
-			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(population_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), population_string);
-			item_y += 1;
-		} else if (GrandStrategyInterfaceState == "Ruler") {
-			interface_state_name = GrandStrategyInterfaceState;
-			
-			if (this->SelectedProvince->Owner != NULL && this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState] != NULL) {
-//				interface_state_name = this->SelectedProvince->Owner->GetCharacterTitle(CharacterTitleHeadOfState, this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->Gender);
-			
-				std::string ruler_name_string = this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->GetFullName();
-				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_name_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_name_string);
-				item_y += 1;
-				
-				std::string ruler_type_string = "Type: " + this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->Type->Name + " Trait: " + this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->Trait->Name;
-				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_type_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_type_string);
-				item_y += 1;
-				
-				// draw ruler effects string
-				std::string ruler_effects_string = this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->GetMinisterEffectsString(CharacterTitleHeadOfState);
-				
-				int str_width_per_total_width = 1;
-				str_width_per_total_width += GetGameFont().Width(ruler_effects_string) / (218 - 6);
-				
-				int line_length = ruler_effects_string.size() / str_width_per_total_width;
-				
-				int begin = 0;
-				for (int i = 0; i < str_width_per_total_width; ++i) {
-					int end = ruler_effects_string.size();
-					
-					if (i != (str_width_per_total_width - 1)) {
-						end = (i + 1) * line_length;
-						while (ruler_effects_string.substr(end - 1, 1) != " ") {
-							end -= 1;
-						}
-					}
-					
-					CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_effects_string.substr(begin, end - begin)) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23) + i * (GetGameFont().getHeight() + 1), ruler_effects_string.substr(begin, end - begin));
-					
-					begin = end;
-				}
-			}
-		}
-		
-		if (!interface_state_name.empty()) {
-			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + 109 - (GetGameFont().Width(interface_state_name) / 2), UI.InfoPanel.Y + 53, interface_state_name);
-		}
-	}
 }
 
 void CGrandStrategyGame::DoTurn()
 {
 	for (size_t i = 0; i < this->Provinces.size(); ++i) {
 		if (this->Provinces[i]->Civilization != -1) { // if this province has a culture
-			// construct buildings
-			if (this->Provinces[i]->CurrentConstruction != -1) {
-				this->Provinces[i]->SetSettlementBuilding(this->Provinces[i]->CurrentConstruction, true);
-				this->Provinces[i]->CurrentConstruction = -1;
-			}
-					
 			// if the province has a town hall, a barracks and a smithy, give it a mercenary camp; not for Earth for now, since there are no recruitable mercenaries for Earth yet
 			int mercenary_camp_id = UnitTypeIdByIdent("unit-mercenary-camp");
 			if (mercenary_camp_id != -1 && this->Provinces[i]->SettlementBuildings[mercenary_camp_id] == false && GrandStrategyWorld != "Earth") {
@@ -278,48 +211,6 @@ void CGrandStrategyGame::DoTurn()
 				this->CreateWork(this->UnpublishedWorks[i], author, this->CultureProvinces[civilization][SyncRand(this->CultureProvinces[civilization].size())]);
 			}
 		}
-	}
-}
-
-void CGrandStrategyGame::SetSelectedProvince(CGrandStrategyProvince *province)
-{
-	if (province != this->SelectedProvince) {
-		// if the player has units selected and then selects an attackable province, set those units to attack the province
-		if (this->SelectedProvince != NULL && this->PlayerFaction != NULL && this->SelectedProvince->Owner == this->PlayerFaction && this->SelectedProvince->CanAttackProvince(province)) {
-			int total_attacking_units = 0;
-			for (std::map<int, int>::iterator iterator = province->AttackingUnits.begin(); iterator != province->AttackingUnits.end(); ++iterator) {
-				total_attacking_units += iterator->second;
-			}
-			for (std::map<int, int>::iterator iterator = this->SelectedUnits.begin(); iterator != this->SelectedUnits.end(); ++iterator) {
-				total_attacking_units += iterator->second;
-			}
-			
-			if (!SelectedHero.empty()) {
-				province->AttackedBy = this->PlayerFaction;
-				province->SetHero(SelectedHero, 3);
-			}
-		} else if (this->SelectedProvince != NULL && this->PlayerFaction != NULL && this->SelectedProvince->Owner == province->Owner && this->SelectedProvince->Owner == this->PlayerFaction) {
-			for (std::map<int, int>::iterator iterator = this->SelectedUnits.begin(); iterator != this->SelectedUnits.end(); ++iterator) {
-				province->ChangeMovingUnitQuantity(iterator->first, iterator->second);
-				this->SelectedProvince->ChangeUnitQuantity(iterator->first, - iterator->second);
-			}
-
-			if (!SelectedHero.empty() && GetProvinceHero(SelectedProvince->Name, SelectedHero) == 2) {
-				province->SetHero(SelectedHero, 1);
-			}
-		}
-
-		if (this->PlayerFaction != NULL) {
-			if (province != NULL && province->Owner != NULL && !province->Water && province->Owner != this->PlayerFaction) { // if is owned by a foreign faction, use diplomacy interface, if is a self owned province or an empty one, use the normal province interface
-				GrandStrategyInterfaceState = "Diplomacy";
-			} else {
-				GrandStrategyInterfaceState = "Province";
-			}
-		}
-		CclCommand("SelectedProvince = GetProvinceFromName(\"" + province->Name + "\");");
-		this->SelectedProvince = province;
-		SelectedHero = "";
-		this->SelectedUnits.clear();
 	}
 }
 
@@ -409,11 +300,6 @@ bool CGrandStrategyGame::IsPointOnMap(int x, int y)
 		return false;
 	}
 	return true;
-}
-
-bool CGrandStrategyGame::IsTileResource(int resource)
-{
-	return resource == CopperCost || resource == GoldCost || resource == SilverCost || resource == WoodCost || resource == StoneCost;
 }
 
 bool CGrandStrategyGame::TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b)
@@ -562,10 +448,6 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	} else {
 		this->Owner = NULL;
 	}
-	
-	if (GrandStrategyGameInitialized) {
-		this->CalculateIncomes();
-	}
 }
 
 void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_settlement_building)
@@ -592,24 +474,6 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (UnitTypes[building_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
 			this->ProductionEfficiencyModifier[i] += UnitTypes[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
-			if (this->Owner != NULL) {
-				this->CalculateIncome(i);
-			}
-		}
-	}
-	
-	//recalculate the faction incomes if a town hall or a building that provides research was constructed
-	if (this->Owner != NULL && UnitTypes[building_id]->Class != -1) {
-		if (UnitTypeClasses[UnitTypes[building_id]->Class] == "town-hall") {
-			this->CalculateIncomes();
-		} else if (UnitTypeClasses[UnitTypes[building_id]->Class] == "barracks") {
-			this->CalculateIncome(LeadershipCost);
-		} else if (UnitTypeClasses[UnitTypes[building_id]->Class] == "lumber-mill") {
-			this->CalculateIncome(ResearchCost);
-		} else if (UnitTypeClasses[UnitTypes[building_id]->Class] == "smithy") {
-			this->CalculateIncome(ResearchCost);
-		} else if (UnitTypeClasses[UnitTypes[building_id]->Class] == "temple") {
-			this->CalculateIncome(ResearchCost);
 		}
 	}
 	
@@ -620,15 +484,6 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 		if (!GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port) {
 			GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->SetPort(has_settlement_building);
 		}
-	}
-}
-
-void CGrandStrategyProvince::SetCurrentConstruction(int settlement_building)
-{
-	this->CurrentConstruction = settlement_building;
-	
-	if (settlement_building != -1 && UnitTypes[settlement_building]->Class != -1 && UnitTypeClasses[UnitTypes[settlement_building]->Class] == "town-hall" && this->Owner != NULL && this->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized && GrandStrategyGame.SelectedTile.x != -1 && GrandStrategyGame.SelectedTile.y != -1) { // 
-		this->SetSettlementLocation(GrandStrategyGame.SelectedTile.x, GrandStrategyGame.SelectedTile.y);
 	}
 }
 
@@ -656,9 +511,6 @@ void CGrandStrategyProvince::SetModifier(CUpgrade *modifier, bool has_modifier)
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (modifier->GrandStrategyProductionEfficiencyModifier[i] != 0) {
 			this->ProductionEfficiencyModifier[i] += modifier->GrandStrategyProductionEfficiencyModifier[i] * change;
-			if (this->Owner != NULL) {
-				this->CalculateIncome(i);
-			}
 		}
 	}
 }
@@ -807,78 +659,6 @@ void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 		this->MilitaryScore += (hero->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[hero->Type->Slot] : 0));
 	} else if (value == 3) {
 		this->AttackingMilitaryScore += (hero->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->AttackedBy != NULL ? this->AttackedBy->MilitaryScoreBonus[hero->Type->Slot] : 0));
-	}
-}
-		
-void CGrandStrategyProvince::CalculateIncome(int resource)
-{
-	if (resource == -1) {
-		return;
-	}
-	
-	if (this->Owner == NULL || !this->HasBuildingClass("town-hall")) { //don't produce resources if no town hall is in place
-		this->Income[resource] = 0;
-		return;
-	}
-	
-	this->Owner->Income[resource] -= this->Income[resource]; //first, remove the old income from the owner's income
-	if (resource == GoldCost) { //gold and silver are converted to copper
-		this->Owner->Income[CopperCost] -= this->Income[resource] * 4;
-	} else if (resource == SilverCost) {
-		this->Owner->Income[CopperCost] -= this->Income[resource] * 2;
-	}
-	
-	int income = 0;
-	
-	if (resource == ResearchCost) {
-		// faction's research is 10 if all provinces have town halls, lumber mills and smithies
-		if (this->HasBuildingClass("town-hall")) {
-			income += 6;
-		}
-		if (this->HasBuildingClass("lumber-mill")) {
-			income += 2;
-		}
-		if (this->HasBuildingClass("smithy")) {
-			income += 2;
-		}
-		if (this->HasBuildingClass("temple")) { // +2 research if has a temple
-			income += 2;
-		}
-			
-		income *= 100 + this->GetProductionEfficiencyModifier(resource);
-		income /= 100;
-	} else if (resource == LeadershipCost) {
-		if (this->HasBuildingClass("barracks")) {
-			income += 100;
-		}
-			
-		income *= 100 + this->GetProductionEfficiencyModifier(resource);
-		income /= 100;
-	} else {
-		if (GrandStrategyGame.IsTileResource(resource)) {
-		} else {
-			if (this->ProductionCapacityFulfilled[resource] > 0) {
-				income += 100 * this->ProductionCapacityFulfilled[resource];
-				income *= 100 + this->GetProductionEfficiencyModifier(resource);
-				income /= 100;
-			}
-		}
-	}
-	
-	this->Income[resource] = income;
-	
-	this->Owner->Income[resource] += this->Income[resource]; //add the new income to the owner's income
-	if (resource == GoldCost) { //gold and silver are converted to copper
-		this->Owner->Income[CopperCost] += this->Income[resource] * 4;
-	} else if (resource == SilverCost) {
-		this->Owner->Income[CopperCost] += this->Income[resource] * 2;
-	}
-}
-
-void CGrandStrategyProvince::CalculateIncomes()
-{
-	for (int i = 0; i < MaxCosts; ++i) {
-		this->CalculateIncome(i);
 	}
 }
 
@@ -1204,37 +984,6 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 				}
 			}
 		}
-		
-		for (int i = 0; i < MaxCosts; ++i) {
-			if (AllUpgrades[upgrade_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
-				this->ProductionEfficiencyModifier[i] += AllUpgrades[upgrade_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
-				this->CalculateIncome(i);
-			}
-		}
-	}
-}
-
-void CGrandStrategyFaction::CalculateIncome(int resource)
-{
-	if (resource == -1) {
-		return;
-	}
-	
-	if (!this->IsAlive()) {
-		this->Income[resource] = 0;
-		return;
-	}
-	
-	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
-		int province_id = this->OwnedProvinces[i];
-		GrandStrategyGame.Provinces[province_id]->CalculateIncome(resource);
-	}
-}
-
-void CGrandStrategyFaction::CalculateIncomes()
-{
-	for (int i = 0; i < MaxCosts; ++i) {
-		this->CalculateIncome(i);
 	}
 }
 
@@ -1312,8 +1061,6 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 			this->GetRandomProvinceWeightedByPopulation()->SetHero(hero->GetFullName(), hero->State);
 		}
 	}
-	
-	this->CalculateIncomes(); //recalculate incomes, as administrative efficiency may have changed
 }
 
 void CGrandStrategyFaction::MinisterSuccession(int title)
@@ -1939,12 +1686,6 @@ void SetWorldMapTileTerrain(int x, int y, int terrain)
 				GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation = -1;
 			}
 		}
-		
-		if (WorldMapTerrainTypes[terrain]->Water) { //if is a water terrain, remove already-placed rivers, if any
-			for (int i = 0; i < MaxDirections; ++i) {
-				GrandStrategyGame.WorldMapTiles[x][y]->River[i] = -1;
-			}
-		}
 	}
 }
 
@@ -2076,187 +1817,11 @@ void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::string civi
 	}
 }
 
-int GetRiverId(std::string river_name)
-{
-	for (size_t i = 0; i < GrandStrategyGame.Rivers.size(); ++i) {
-		if (GrandStrategyGame.Rivers[i]->Name == river_name) {
-			return i;
-		}
-	}
-	
-	return -1;
-}
-
-/**
-**  Set river data for a world map tile.
-*/
-void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string river_name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	int river_id = GetRiverId(river_name);
-	int direction = GetDirectionIdByName(direction_name);
-		
-	if (river_id == -1) {
-		fprintf(stderr, "River \"%s\" doesn't exist.\n", river_name.c_str());
-		return;
-	}
-	
-	if (direction == -1) {
-		fprintf(stderr, "Direction \"%s\" doesn't exist.\n", direction_name.c_str());
-		return;
-	}
-	
-//	return; //deactivate this for now, while there aren't proper graphics for the rivers
-
-	bool rivermouth = GrandStrategyGame.WorldMapTiles[x][y]->IsWater() && GrandStrategyGame.IsPointOnMap(x + GetDirectionOffset(direction).x, y + GetDirectionOffset(direction).y) && GrandStrategyGame.WorldMapTiles[x + GetDirectionOffset(direction).x][y + GetDirectionOffset(direction).y]->IsWater();
-	
-	if (direction == North) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
-		if (!rivermouth) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = river_id;
-			}
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = river_id;
-			}
-			if (GrandStrategyGame.IsPointOnMap(x + 1, y) && GrandStrategyGame.WorldMapTiles[x + 1][y]->River[Northwest] == -1) {
-				GrandStrategyGame.WorldMapTiles[x + 1][y]->River[Northwest] = river_id;
-			}
-			if (GrandStrategyGame.IsPointOnMap(x - 1, y) && GrandStrategyGame.WorldMapTiles[x - 1][y]->River[Northeast] == -1) {
-				GrandStrategyGame.WorldMapTiles[x - 1][y]->River[Northeast] = river_id;
-			}
-		}
-	} else if (direction == Northeast) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = river_id;
-	} else if (direction == East) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[East] = river_id;
-		if (!rivermouth) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = river_id;
-			}
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = river_id;
-			}
-			if (GrandStrategyGame.IsPointOnMap(x, y + 1) && GrandStrategyGame.WorldMapTiles[x][y + 1]->River[Northeast] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y + 1]->River[Northeast] = river_id;
-			}
-			if (GrandStrategyGame.IsPointOnMap(x, y - 1) && GrandStrategyGame.WorldMapTiles[x][y - 1]->River[Southeast] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y - 1]->River[Southeast] = river_id;
-			}
-		}
-	} else if (direction == Southeast) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = river_id;
-	} else if (direction == South) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[South] = river_id;
-		if (!rivermouth) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = river_id;
-			}
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = river_id;
-			}
-			if (GrandStrategyGame.IsPointOnMap(x + 1, y) && GrandStrategyGame.WorldMapTiles[x + 1][y]->River[Southwest] == -1) {
-				GrandStrategyGame.WorldMapTiles[x + 1][y]->River[Southwest] = river_id;
-			}
-			if (GrandStrategyGame.IsPointOnMap(x - 1, y) && GrandStrategyGame.WorldMapTiles[x - 1][y]->River[Southeast] == -1) {
-				GrandStrategyGame.WorldMapTiles[x - 1][y]->River[Southeast] = river_id;
-			}
-		}
-	} else if (direction == Southwest) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = river_id;
-	} else if (direction == West) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[West] = river_id;
-		if (!rivermouth) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = river_id;
-			}
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = river_id;
-			}
-			if (GrandStrategyGame.IsPointOnMap(x, y + 1) && GrandStrategyGame.WorldMapTiles[x][y + 1]->River[Northwest] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y + 1]->River[Northwest] = river_id;
-			}
-			if (GrandStrategyGame.IsPointOnMap(x, y - 1) && GrandStrategyGame.WorldMapTiles[x][y - 1]->River[Southwest] == -1) {
-				GrandStrategyGame.WorldMapTiles[x][y - 1]->River[Southwest] = river_id;
-			}
-		}
-	} else if (direction == Northwest) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = river_id;
-	} else {
-		fprintf(stderr, "Error: Wrong direction set for river.\n");
-	}
-	
-}
-
-/**
-**  Set riverhead data for a world map tile.
-*/
-void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	int river_id = GetRiverId(river_name);
-	int direction = GetDirectionIdByName(direction_name);
-	
-	if (river_id == -1) {
-		fprintf(stderr, "River \"%s\" doesn't exist.\n", river_name.c_str());
-		return;
-	}
-	
-	if (direction == -1) {
-		fprintf(stderr, "Direction \"%s\" doesn't exist.\n", direction_name.c_str());
-		return;
-	}
-	
-//	return; //deactivate this for now, while there aren't proper graphics for the rivers
-	
-	if (direction == North) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[North] = river_id;
-	} else if (direction == Northeast) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = river_id;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Northeast] = river_id;
-	} else if (direction == East) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[East] = river_id;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[East] = river_id;
-	} else if (direction == Southeast) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = river_id;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Southeast] = river_id;
-	} else if (direction == South) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[South] = river_id;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[South] = river_id;
-	} else if (direction == Southwest) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = river_id;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Southwest] = river_id;
-	} else if (direction == West) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[West] = river_id;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[West] = river_id;
-	} else if (direction == Northwest) {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = river_id;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Northwest] = river_id;
-	} else {
-		fprintf(stderr, "Error: Wrong direction set for river.\n");
-	}
-}
-
 void SetWorldMapTilePort(int x, int y, bool has_port)
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
 	GrandStrategyGame.WorldMapTiles[x][y]->SetPort(has_port);
-}
-
-void SetRiverCulturalName(std::string river_name, std::string civilization_name, std::string cultural_name)
-{
-	int river_id = GetRiverId(river_name);
-	
-	if (river_id != -1) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
-			GrandStrategyGame.Rivers[river_id]->CulturalNames[civilization] = TransliterateText(cultural_name);
-		}
-	}
 }
 
 /**
@@ -2634,20 +2199,6 @@ void SetProvinceSettlementBuilding(std::string province_name, std::string settle
 	}
 }
 
-void SetProvinceCurrentConstruction(std::string province_name, std::string settlement_building_ident)
-{
-	int province_id = GetProvinceId(province_name);
-	int settlement_building;
-	if (!settlement_building_ident.empty()) {
-		settlement_building = UnitTypeIdByIdent(settlement_building_ident);
-	} else {
-		settlement_building = -1;
-	}
-	if (province_id != -1) {
-		GrandStrategyGame.Provinces[province_id]->SetCurrentConstruction(settlement_building);
-	}
-}
-
 void SetProvincePopulation(std::string province_name, int quantity)
 {
 	int province_id = GetProvinceId(province_name);
@@ -2827,11 +2378,6 @@ void CleanGrandStrategyGame()
 	GrandStrategyGame.Provinces.clear();
 	GrandStrategyGame.CultureProvinces.clear();
 
-	for (size_t i = 0; i < GrandStrategyGame.Rivers.size(); ++i) {
-		delete GrandStrategyGame.Rivers[i];
-	}
-	GrandStrategyGame.Rivers.clear();
-	
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		delete GrandStrategyGame.Heroes[i];
 	}
@@ -2843,9 +2389,6 @@ void CleanGrandStrategyGame()
 	
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
-	GrandStrategyGame.SelectedProvince = NULL;
-	GrandStrategyGame.SelectedTile.x = -1;
-	GrandStrategyGame.SelectedTile.y = -1;
 	GrandStrategyGame.SelectedUnits.clear();
 	GrandStrategyGame.PlayerFaction = NULL;
 	
@@ -2859,385 +2402,6 @@ void CleanGrandStrategyGame()
 
 void InitializeGrandStrategyGame(bool show_loading)
 {
-	if (show_loading) {
-		CalculateItemsToLoad(true);
-		UpdateLoadingBar();
-	}
-	
-	//do the same for the fog tile now
-	std::string fog_graphic_tile = "tilesets/world/terrain/fog.png";
-	if (CGraphic::Get(fog_graphic_tile) == NULL) {
-		CGraphic *fog_tile_graphic = CGraphic::New(fog_graphic_tile, 96, 96);
-		fog_tile_graphic->Load();
-	}
-	GrandStrategyGame.FogTile = CGraphic::Get(fog_graphic_tile);
-	
-	// set the settlement graphics
-	for (int i = 0; i < MAX_RACES; ++i) {
-		std::string settlement_graphics_file = "tilesets/world/sites/";
-		settlement_graphics_file += PlayerRaces.Name[i];
-		settlement_graphics_file += "_settlement";
-		std::string settlement_masonry_graphics_file = settlement_graphics_file + "_masonry" + ".png";
-		settlement_graphics_file += ".png";
-		
-		int file_civilization = i;
-		while (!CanAccessFile(settlement_graphics_file.c_str()) && PlayerRaces.Civilizations[file_civilization]->ParentCivilization != -1) {
-			settlement_graphics_file = FindAndReplaceString(settlement_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.Civilizations[file_civilization]->ParentCivilization]);
-			file_civilization = PlayerRaces.Civilizations[file_civilization]->ParentCivilization;
-		}
-		
-		file_civilization = i;
-		while (!CanAccessFile(settlement_masonry_graphics_file.c_str()) && PlayerRaces.Civilizations[file_civilization]->ParentCivilization != -1) {
-			settlement_masonry_graphics_file = FindAndReplaceString(settlement_masonry_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.Civilizations[file_civilization]->ParentCivilization]);
-			file_civilization = PlayerRaces.Civilizations[file_civilization]->ParentCivilization;
-		}
-		
-		if (CanAccessFile(settlement_graphics_file.c_str())) {
-			if (CPlayerColorGraphic::Get(settlement_graphics_file) == NULL) {
-				CPlayerColorGraphic *settlement_graphics = CPlayerColorGraphic::New(settlement_graphics_file, 64, 64);
-				settlement_graphics->Load();
-			}
-			GrandStrategyGame.SettlementGraphics[i] = CPlayerColorGraphic::Get(settlement_graphics_file);
-		}
-		if (CanAccessFile(settlement_masonry_graphics_file.c_str())) {
-			if (CPlayerColorGraphic::Get(settlement_masonry_graphics_file) == NULL) {
-				CPlayerColorGraphic *settlement_graphics = CPlayerColorGraphic::New(settlement_masonry_graphics_file, 64, 64);
-				settlement_graphics->Load();
-			}
-			GrandStrategyGame.SettlementMasonryGraphics[i] = CPlayerColorGraphic::Get(settlement_masonry_graphics_file);
-		}
-		
-		std::string barracks_graphics_file = "tilesets/world/sites/";
-		barracks_graphics_file += PlayerRaces.Name[i];
-		barracks_graphics_file += "_barracks.png";
-		
-		file_civilization = i;
-		while (!CanAccessFile(barracks_graphics_file.c_str()) && PlayerRaces.Civilizations[file_civilization]->ParentCivilization != -1) {
-			barracks_graphics_file = FindAndReplaceString(barracks_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.Civilizations[file_civilization]->ParentCivilization]);
-			file_civilization = PlayerRaces.Civilizations[file_civilization]->ParentCivilization;
-		}
-		
-		if (CanAccessFile(barracks_graphics_file.c_str())) {
-			if (CPlayerColorGraphic::Get(barracks_graphics_file) == NULL) {
-				CPlayerColorGraphic *barracks_graphics = CPlayerColorGraphic::New(barracks_graphics_file, 64, 64);
-				barracks_graphics->Load();
-			}
-			GrandStrategyGame.BarracksGraphics[i] = CPlayerColorGraphic::Get(barracks_graphics_file);
-		}
-	}
-	
-	// set the border graphics
-	for (int i = 0; i < MaxDirections; ++i) {
-		std::string border_graphics_file = "tilesets/world/terrain/";
-		border_graphics_file += "province_border_";
-		
-		std::string national_border_graphics_file = "tilesets/world/terrain/";
-		national_border_graphics_file += "province_national_border_";
-		
-		if (i == North) {
-			border_graphics_file += "north";
-			national_border_graphics_file += "north";
-		} else if (i == Northeast) {
-			border_graphics_file += "northeast_inner";
-			national_border_graphics_file += "northeast_inner";
-		} else if (i == East) {
-			border_graphics_file += "east";
-			national_border_graphics_file += "east";
-		} else if (i == Southeast) {
-			border_graphics_file += "southeast_inner";
-			national_border_graphics_file += "southeast_inner";
-		} else if (i == South) {
-			border_graphics_file += "south";
-			national_border_graphics_file += "south";
-		} else if (i == Southwest) {
-			border_graphics_file += "southwest_inner";
-			national_border_graphics_file += "southwest_inner";
-		} else if (i == West) {
-			border_graphics_file += "west";
-			national_border_graphics_file += "west";
-		} else if (i == Northwest) {
-			border_graphics_file += "northwest_inner";
-			national_border_graphics_file += "northwest_inner";
-		}
-		
-		border_graphics_file += ".png";
-		national_border_graphics_file += ".png";
-		
-		if (CGraphic::Get(border_graphics_file) == NULL) {
-			CGraphic *border_graphics = CGraphic::New(border_graphics_file, 84, 84);
-			border_graphics->Load();
-		}
-		GrandStrategyGame.BorderGraphics[i] = CGraphic::Get(border_graphics_file);
-		
-		if (CPlayerColorGraphic::Get(national_border_graphics_file) == NULL) {
-			CPlayerColorGraphic *national_border_graphics = CPlayerColorGraphic::New(national_border_graphics_file, 84, 84);
-			national_border_graphics->Load();
-		}
-		GrandStrategyGame.NationalBorderGraphics[i] = CPlayerColorGraphic::Get(national_border_graphics_file);
-	}
-	
-	// set the river and road graphics
-	for (int i = 0; i < MaxDirections; ++i) {
-		std::string river_graphics_file = "tilesets/world/terrain/";
-		river_graphics_file += "river_";
-		
-		std::string rivermouth_graphics_file = "tilesets/world/terrain/";
-		rivermouth_graphics_file += "rivermouth_";
-		
-		std::string riverhead_graphics_file = "tilesets/world/terrain/";
-		riverhead_graphics_file += "riverhead_";
-		
-		std::string trail_graphics_file = "tilesets/world/terrain/";
-		trail_graphics_file += "trail_";
-		
-		std::string road_graphics_file = "tilesets/world/terrain/";
-		road_graphics_file += "road_";
-		
-		if (i == North) {
-			river_graphics_file += "north";
-			rivermouth_graphics_file += "north";
-			riverhead_graphics_file += "north";
-			trail_graphics_file += "north";
-			road_graphics_file += "north";
-		} else if (i == Northeast) {
-			river_graphics_file += "northeast_inner";
-			rivermouth_graphics_file += "northeast";
-			trail_graphics_file += "northeast";
-			road_graphics_file += "northeast";
-		} else if (i == East) {
-			river_graphics_file += "east";
-			rivermouth_graphics_file += "east";
-			riverhead_graphics_file += "east";
-			trail_graphics_file += "east";
-			road_graphics_file += "east";
-		} else if (i == Southeast) {
-			river_graphics_file += "southeast_inner";
-			rivermouth_graphics_file += "southeast";
-			trail_graphics_file += "southeast";
-			road_graphics_file += "southeast";
-		} else if (i == South) {
-			river_graphics_file += "south";
-			rivermouth_graphics_file += "south";
-			riverhead_graphics_file += "south";
-			trail_graphics_file += "south";
-			road_graphics_file += "south";
-		} else if (i == Southwest) {
-			river_graphics_file += "southwest_inner";
-			rivermouth_graphics_file += "southwest";
-			trail_graphics_file += "southwest";
-			road_graphics_file += "southwest";
-		} else if (i == West) {
-			river_graphics_file += "west";
-			rivermouth_graphics_file += "west";
-			riverhead_graphics_file += "west";
-			trail_graphics_file += "west";
-			road_graphics_file += "west";
-		} else if (i == Northwest) {
-			river_graphics_file += "northwest_inner";
-			rivermouth_graphics_file += "northwest";
-			trail_graphics_file += "northwest";
-			road_graphics_file += "northwest";
-		}
-		
-		std::string rivermouth_flipped_graphics_file;
-		if (i == North || i == East || i == South || i == West) { //only non-diagonal directions get flipped rivermouth graphics
-			rivermouth_flipped_graphics_file = rivermouth_graphics_file + "_flipped" + ".png";
-		}
-		
-		std::string riverhead_flipped_graphics_file;
-		if (i == North || i == East || i == South || i == West) { //only non-diagonal directions get riverhead graphics
-			riverhead_flipped_graphics_file = riverhead_graphics_file + "_flipped" + ".png";
-		}
-		
-		river_graphics_file += ".png";
-		rivermouth_graphics_file += ".png";
-		riverhead_graphics_file += ".png";
-		trail_graphics_file += ".png";
-		road_graphics_file += ".png";
-		
-		if (CGraphic::Get(river_graphics_file) == NULL) {
-			CGraphic *river_graphics = CGraphic::New(river_graphics_file, 84, 84);
-			river_graphics->Load();
-		}
-		GrandStrategyGame.RiverGraphics[i] = CGraphic::Get(river_graphics_file);
-		
-		if (i == North || i == East || i == South || i == West) { //only non-diagonal directions get rivermouth and riverhead graphics
-			if (CGraphic::Get(rivermouth_graphics_file) == NULL) {
-				CGraphic *rivermouth_graphics = CGraphic::New(rivermouth_graphics_file, 84, 84);
-				rivermouth_graphics->Load();
-			}
-			GrandStrategyGame.RivermouthGraphics[i][0] = CGraphic::Get(rivermouth_graphics_file);
-			
-			if (!rivermouth_flipped_graphics_file.empty()) {
-				if (CGraphic::Get(rivermouth_flipped_graphics_file) == NULL) {
-					CGraphic *rivermouth_flipped_graphics = CGraphic::New(rivermouth_flipped_graphics_file, 84, 84);
-					rivermouth_flipped_graphics->Load();
-				}
-				GrandStrategyGame.RivermouthGraphics[i][1] = CGraphic::Get(rivermouth_flipped_graphics_file);
-			}
-			
-			if (CGraphic::Get(riverhead_graphics_file) == NULL) {
-				CGraphic *riverhead_graphics = CGraphic::New(riverhead_graphics_file, 84, 84);
-				riverhead_graphics->Load();
-			}
-			GrandStrategyGame.RiverheadGraphics[i][0] = CGraphic::Get(riverhead_graphics_file);
-			
-			if (!riverhead_flipped_graphics_file.empty()) {
-				if (CGraphic::Get(riverhead_flipped_graphics_file) == NULL) {
-					CGraphic *riverhead_flipped_graphics = CGraphic::New(riverhead_flipped_graphics_file, 84, 84);
-					riverhead_flipped_graphics->Load();
-				}
-				GrandStrategyGame.RiverheadGraphics[i][1] = CGraphic::Get(riverhead_flipped_graphics_file);
-			}
-		}
-	}
-	
-	//load the move symbol
-	std::string move_symbol_filename = "tilesets/world/sites/move.png";
-	if (CGraphic::Get(move_symbol_filename) == NULL) {
-		CGraphic *move_symbol_graphic = CGraphic::New(move_symbol_filename, 64, 64);
-		move_symbol_graphic->Load();
-	}
-	GrandStrategyGame.SymbolMove = CGraphic::Get(move_symbol_filename);
-	
-	//load the attack symbol
-	std::string attack_symbol_filename = "tilesets/world/sites/attack.png";
-	if (CGraphic::Get(attack_symbol_filename) == NULL) {
-		CGraphic *attack_symbol_graphic = CGraphic::New(attack_symbol_filename, 64, 64);
-		attack_symbol_graphic->Load();
-	}
-	GrandStrategyGame.SymbolAttack = CGraphic::Get(attack_symbol_filename);
-	
-	//load the capital symbol
-	std::string capital_symbol_filename = "tilesets/world/sites/capital.png";
-	if (CGraphic::Get(capital_symbol_filename) == NULL) {
-		CGraphic *capital_symbol_graphic = CGraphic::New(capital_symbol_filename, 64, 64);
-		capital_symbol_graphic->Load();
-	}
-	GrandStrategyGame.SymbolCapital = CGraphic::Get(capital_symbol_filename);
-	
-	//load the hero symbol
-	std::string hero_symbol_filename = "tilesets/world/sites/hero.png";
-	if (CGraphic::Get(hero_symbol_filename) == NULL) {
-		CGraphic *hero_symbol_graphic = CGraphic::New(hero_symbol_filename, 64, 64);
-		hero_symbol_graphic->Load();
-	}
-	GrandStrategyGame.SymbolHero = CGraphic::Get(hero_symbol_filename);
-	
-	//load the resource not worked symbol
-	std::string resource_not_worked_symbol_filename = "tilesets/world/sites/resource_not_worked.png";
-	if (CGraphic::Get(resource_not_worked_symbol_filename) == NULL) {
-		CGraphic *resource_not_worked_symbol_graphic = CGraphic::New(resource_not_worked_symbol_filename, 64, 64);
-		resource_not_worked_symbol_graphic->Load();
-	}
-	GrandStrategyGame.SymbolResourceNotWorked = CGraphic::Get(resource_not_worked_symbol_filename);
-	
-	//set resource prices to base prices
-	for (int i = 0; i < MaxCosts; ++i) {
-		GrandStrategyGame.CommodityPrices[i] = DefaultResourcePrices[i];
-	}
-	
-	//initialize heroes
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-		if (iterator->second->Civilization == -1) {
-			if (!iterator->second->Type->BoolFlag[FAUNA_INDEX].value) {
-				fprintf(stderr, "Character \"%s\" has no civilization.\n", iterator->second->GetFullName().c_str());
-			}
-			continue;
-		} else if (CurrentCustomHero != NULL && iterator->second->GetFullName() == CurrentCustomHero->GetFullName()) { // temporary work-around for the custom hero duplication bug
-			continue;
-		}
-		
-		CGrandStrategyHero *hero = new CGrandStrategyHero;
-		GrandStrategyGame.Heroes.push_back(hero);
-		hero->Name = iterator->second->Name;
-		hero->ExtraName = iterator->second->ExtraName;
-		hero->FamilyName = iterator->second->FamilyName;
-		if (iterator->second->Type != NULL) {
-			hero->Type = const_cast<CUnitType *>(&(*iterator->second->Type));
-		}
-		if (iterator->second->Trait != NULL) {
-			hero->Trait = iterator->second->Trait;
-		} else if (hero->Type != NULL && hero->Type->Traits.size() > 0) {
-			hero->Trait = hero->Type->Traits[SyncRand(hero->Type->Traits.size())];
-		}
-		hero->HairVariation = iterator->second->HairVariation;
-		hero->ViolentDeath = iterator->second->ViolentDeath;
-		hero->Civilization = iterator->second->Civilization;
-		hero->Gender = iterator->second->Gender;
-		if (iterator->second->Father != NULL) {
-			hero->Father = GrandStrategyGame.GetHero(iterator->second->Father->GetFullName());
-			if (hero->Father != NULL) {
-				hero->Father->Children.push_back(hero);
-			}
-		}
-		if (iterator->second->Mother != NULL) {
-			hero->Mother = GrandStrategyGame.GetHero(iterator->second->Mother->GetFullName());
-			if (hero->Mother != NULL) {
-				hero->Mother->Children.push_back(hero);
-			}
-		}
-		for (size_t j = 0; j < iterator->second->Siblings.size(); ++j) {
-			CGrandStrategyHero *sibling = GrandStrategyGame.GetHero(iterator->second->Siblings[j]->GetFullName());
-			if (sibling != NULL) {
-				hero->Siblings.push_back(sibling);
-				sibling->Siblings.push_back(hero); //when the sibling was defined, this character wasn't, since by virtue of not being NULL, the sibling was necessarily defined before the hero
-			}
-		}
-		for (size_t j = 0; j < iterator->second->Children.size(); ++j) {
-			CGrandStrategyHero *child = GrandStrategyGame.GetHero(iterator->second->Children[j]->GetFullName());
-			if (child != NULL) {
-				hero->Children.push_back(child);
-				if (hero->Gender == MaleGender) {
-					child->Father = hero; //when the child was defined, this character wasn't, since by virtue of not being NULL, the child was necessarily defined before the parent
-				} else {
-					child->Mother = hero; //when the child was defined, this character wasn't, since by virtue of not being NULL, the child was necessarily defined before the parent
-				}
-			}
-		}
-		for (size_t j = 0; j < iterator->second->Abilities.size(); ++j) {
-			hero->Abilities.push_back(iterator->second->Abilities[j]);
-		}
-		
-		hero->UpdateAttributes();
-
-		if (!iterator->second->Icon.Name.empty()) {
-			hero->Icon.Name = iterator->second->Icon.Name;
-			hero->Icon.Icon = NULL;
-		}
-		if (!iterator->second->HeroicIcon.Name.empty()) {
-			hero->HeroicIcon.Name = iterator->second->HeroicIcon.Name;
-			hero->HeroicIcon.Icon = NULL;
-		}
-		GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
-	}
-	
-	if (CurrentCustomHero != NULL) { //if a custom hero has been selected, create the hero as a grand strategy hero
-		CGrandStrategyHero *hero = new CGrandStrategyHero;
-		GrandStrategyGame.Heroes.push_back(hero);
-		hero->Name = CurrentCustomHero->Name;
-		hero->ExtraName = CurrentCustomHero->ExtraName;
-		hero->FamilyName = CurrentCustomHero->FamilyName;
-		if (CurrentCustomHero->Type != NULL) {
-			hero->Type = const_cast<CUnitType *>(&(*CurrentCustomHero->Type));
-		}
-		if (CurrentCustomHero->Trait != NULL) {
-			hero->Trait = CurrentCustomHero->Trait;
-		}
-		hero->HairVariation = CurrentCustomHero->HairVariation;
-		hero->Civilization = CurrentCustomHero->Civilization;
-		hero->Gender = CurrentCustomHero->Gender;
-		hero->Custom = CurrentCustomHero->Custom;
-
-		for (size_t j = 0; j < CurrentCustomHero->Abilities.size(); ++j) {
-			hero->Abilities.push_back(CurrentCustomHero->Abilities[j]);
-		}
-		
-		hero->UpdateAttributes();
-		
-		GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
-	}
-	
 	//initialize literary works
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 		if (AllUpgrades[i]->Work == -1 || AllUpgrades[i]->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
@@ -3245,52 +2409,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 		}
 		
 		GrandStrategyGame.UnpublishedWorks.push_back(AllUpgrades[i]);
-	}
-	
-	if (GrandStrategyGameLoading == false) {
-		for (size_t i = 0; i < GrandStrategyEvents.size(); ++i) {
-			if (GrandStrategyEvents[i]->World != NULL && GrandStrategyEvents[i]->World->Ident != GrandStrategyWorld && GrandStrategyWorld != "Random") {
-				continue;
-			}
-			
-			if (GrandStrategyEvents[i]->HistoricalYear && GrandStrategyYear > GrandStrategyEvents[i]->HistoricalYear) {
-				continue;
-			}
-			
-			GrandStrategyGame.AvailableEvents.push_back(GrandStrategyEvents[i]);
-		}
-	}
-}
-
-void InitializeGrandStrategyWorldMap()
-{
-	CWorld *world = GetWorld(GrandStrategyWorld);
-	
-	if (GrandStrategyGameLoading == false && world != NULL) {
-		for (size_t i = 0; i < world->Tiles.size(); ++i) {
-			int x = world->Tiles[i]->Position.x;
-			int y = world->Tiles[i]->Position.y;
-			
-			if (x == -1 || y == -1) {
-				continue;
-			}
-			
-			if (!GrandStrategyGame.WorldMapTiles[x][y]) {
-				GrandStrategyWorldMapTile *world_map_tile = new GrandStrategyWorldMapTile;
-				GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
-				GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
-				GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
-			}
-			
-			GrandStrategyGame.WorldMapTiles[x][y]->Terrain = world->Tiles[i]->Terrain;
-			GrandStrategyGame.WorldMapTiles[x][y]->Resource = world->Tiles[i]->Resource;
-			GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames = world->Tiles[i]->CulturalTerrainNames;
-			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames = world->Tiles[i]->FactionCulturalTerrainNames;
-			GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames = world->Tiles[i]->CulturalResourceNames;
-			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames = world->Tiles[i]->FactionCulturalResourceNames;
-			GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames = world->Tiles[i]->CulturalSettlementNames;
-			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames = world->Tiles[i]->FactionCulturalSettlementNames;
-		}
 	}
 }
 
@@ -3573,18 +2691,6 @@ bool GetProvinceSettlementBuilding(std::string province_name, std::string buildi
 	return GrandStrategyGame.Provinces[province_id]->SettlementBuildings[building_id];
 }
 
-std::string GetProvinceCurrentConstruction(std::string province_name)
-{
-	int province_id = GetProvinceId(province_name);
-	if (province_id != -1) {
-		if (GrandStrategyGame.Provinces[province_id]->CurrentConstruction != -1) {
-			return UnitTypes[GrandStrategyGame.Provinces[province_id]->CurrentConstruction]->Ident;
-		}
-	}
-	
-	return "";
-}
-
 int GetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident)
 {
 	int province_id = GetProvinceId(province_name);
@@ -3741,38 +2847,6 @@ int GetFactionResource(std::string civilization_name, std::string faction_name, 
 	}
 	
 	return GrandStrategyGame.Factions[civilization][faction]->Resources[resource];
-}
-
-void CalculateFactionIncomes(std::string civilization_name, std::string faction_name)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction = -1;
-	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(faction_name);
-	}
-	
-	if (faction == -1 || !GrandStrategyGame.Factions[civilization][faction]->IsAlive()) {
-		return;
-	}
-	
-	GrandStrategyGame.Factions[civilization][faction]->CalculateIncomes();
-}
-
-int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction = -1;
-	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(faction_name);
-	}
-	
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (faction == -1 || resource == -1) {
-		return 0;
-	}
-	
-	return GrandStrategyGame.Factions[civilization][faction]->Income[resource];
 }
 
 void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology)
@@ -4348,22 +3422,6 @@ bool GetGrandStrategyEventTriggered(std::string event_name)
 		fprintf(stderr, "Grand strategy event \"%s\" doesn't exist.\n", event_name.c_str());
 		return false;
 	}
-}
-
-int GetGrandStrategySelectedTileX()
-{
-	return GrandStrategyGame.SelectedTile.x;
-}
-
-int GetGrandStrategySelectedTileY()
-{
-	return GrandStrategyGame.SelectedTile.y;
-}
-
-void SetSelectedTile(int x, int y)
-{
-	GrandStrategyGame.SelectedTile.x = x;
-	GrandStrategyGame.SelectedTile.y = y;
 }
 
 void SetGrandStrategySelectedUnits(std::string unit_type_ident, int quantity)

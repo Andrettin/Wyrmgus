@@ -80,8 +80,6 @@ public:
 		Province(NULL), BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
-		memset(River, -1, sizeof(River));
-		memset(Riverhead, -1, sizeof(Riverhead));
 	}
 
 	void SetResourceProspected(int resource_id, bool discovered);
@@ -101,15 +99,13 @@ public:
 	CGraphic *ResourceBuildingGraphics;
 	CPlayerColorGraphic *ResourceBuildingGraphicsPlayerColor;
 	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
-	int River[MaxDirections];				/// Whether this tile has a river to a particular direction (the value for each direction is the ID of the river)
-	int Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction (the value for each direction is the ID of the river)
 };
 
 class CGrandStrategyProvince : public CProvince
 {
 public:
 	CGrandStrategyProvince() : CProvince(),
-		Civilization(-1), CurrentConstruction(-1),
+		Civilization(-1),
 		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
 		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
 		Movement(false),
@@ -128,7 +124,6 @@ public:
 	
 	void SetOwner(int civilization_id, int faction_id);					/// Set a new owner for the province
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
-	void SetCurrentConstruction(int settlement_building);
 	void SetSettlementLocation(int x, int y);
 	void SetModifier(CUpgrade *modifier, bool has_modifier);
 	void SetUnitQuantity(int unit_type_id, int quantity);
@@ -143,8 +138,6 @@ public:
 	void AllocateLaborToResource(int resource);
 	void DeallocateLabor();
 	void ReallocateLabor();
-	void CalculateIncome(int resource);
-	void CalculateIncomes();
 	void AddFactionClaim(int civilization_id, int faction_id);
 	void RemoveFactionClaim(int civilization_id, int faction_id);
 	bool HasBuildingClass(std::string building_class_name);
@@ -167,7 +160,6 @@ public:
 	CGrandStrategyHero *GetRandomAuthor();
 	
 	int Civilization;													/// Civilization of the province (-1 = no one).
-	int CurrentConstruction;											/// Building currently under construction (unit type index).
 	int TotalUnits;														/// Total quantity of units in the province
 	int TotalWorkers;													/// Total quantity of workers in the province
 	int PopulationGrowthProgress;										/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
@@ -213,8 +205,6 @@ public:
 	}
 	
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
-	void CalculateIncome(int resource);
-	void CalculateIncomes();
 	void SetCapital(CGrandStrategyProvince *province);
 	void SetDiplomacyState(CGrandStrategyFaction *faction, int diplomacy_state_id);
 	void SetMinister(int title, std::string hero_full_name);
@@ -250,14 +240,6 @@ public:
 	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
 	std::vector<CGrandStrategyHero *> HistoricalMinisters[MaxCharacterTitles];	/// All characters who had a ministerial (or head of state or government) title in this faction
 	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
-};
-
-class CGrandStrategyRiver : public CTerrainFeature
-{
-public:
-	CGrandStrategyRiver() : CTerrainFeature()
-	{
-	}
 };
 
 class CGrandStrategyHero : public CCharacter
@@ -334,20 +316,14 @@ class CGrandStrategyGame
 {
 public:
 	CGrandStrategyGame() : 
-		WorldMapWidth(0), WorldMapHeight(0), SelectedTile(-1, -1),
-		SelectedProvince(NULL), FogTile(NULL), SymbolMove(NULL), SymbolAttack(NULL), SymbolCapital(NULL), SymbolHero(NULL), SymbolResourceNotWorked(NULL),
+		WorldMapWidth(0), WorldMapHeight(0),
+		FogTile(NULL), SymbolMove(NULL), SymbolAttack(NULL), SymbolCapital(NULL), SymbolHero(NULL), SymbolResourceNotWorked(NULL),
 		PlayerFaction(NULL)
 	{
 		for (int i = 0; i < MaxCosts; ++i) {
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
 				WorldMapResources[i][j].x = -1;
 				WorldMapResources[i][j].y = -1;
-			}
-		}
-		for (int i = 0; i < MaxDirections; ++i) {
-			for (int j = 0; j < 2; ++j) {
-				RivermouthGraphics[i][j] = NULL;
-				RiverheadGraphics[i][j] = NULL;
 			}
 		}
 		for (int x = 0; x < WorldMapWidthMax; ++x) {
@@ -365,19 +341,15 @@ public:
 
 	void DrawInterface();					/// Draw the interface
 	void DoTurn();							/// Process the grand strategy turn
-	void SetSelectedProvince(CGrandStrategyProvince *province);	/// Set selected province
 	void PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource);
 	void CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province);
 	bool IsPointOnMap(int x, int y);
-	bool IsTileResource(int resource);
 	bool TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b);
 	CGrandStrategyHero *GetHero(std::string hero_full_name);
 
 public:
 	int WorldMapWidth;
 	int WorldMapHeight;
-	Vec2i SelectedTile;
-	CGrandStrategyProvince *SelectedProvince;
 	CGraphic *FogTile;
 	CGraphic *SymbolMove;										///symbol that units are moving to the province (drawn at the settlement location)
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
@@ -385,9 +357,6 @@ public:
 	CGraphic *SymbolHero;										///symbol that a hero is present in the province (drawn at the settlement location)
 	CGraphic *SymbolResourceNotWorked;							///symbol that a resource is not being worked
 	CGraphic *BorderGraphics[MaxDirections];					///one for each direction
-	CGraphic *RiverGraphics[MaxDirections];
-	CGraphic *RivermouthGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
-	CGraphic *RiverheadGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
 	CPlayerColorGraphic *SettlementGraphics[MAX_RACES];
 	CPlayerColorGraphic *BarracksGraphics[MAX_RACES];
 	CPlayerColorGraphic *SettlementMasonryGraphics[MAX_RACES];
@@ -396,7 +365,6 @@ public:
 	std::vector<CGrandStrategyProvince *> Provinces;
 	std::map<int, std::vector<CGrandStrategyProvince *>> CultureProvinces;	/// provinces belonging to each culture
 	std::vector<CGrandStrategyFaction *> Factions[MAX_RACES];
-	std::vector<CGrandStrategyRiver *> Rivers;
 	std::vector<CGrandStrategyHero *> Heroes;
 	std::vector<CUpgrade *> UnpublishedWorks;
 	std::vector<CGrandStrategyEvent *> AvailableEvents;
@@ -456,11 +424,7 @@ extern void SetWorldMapTileCulturalResourceName(int x, int y, std::string resour
 extern void SetWorldMapTileFactionCulturalResourceName(int x, int y, std::string resource_name, std::string civilization_name, std::string faction_name, std::string cultural_name);
 extern void SetWorldMapTileCulturalSettlementName(int x, int y, std::string civilization_name, std::string cultural_name);
 extern void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::string civilization_name, std::string faction_name, std::string cultural_name);
-extern int GetRiverId(std::string river_name);
-extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string river_name);
-extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name);
 extern void SetWorldMapTilePort(int x, int y, bool has_port);
-extern void SetRiverCulturalName(std::string river_name, std::string civilization_name, std::string cultural_name);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);
@@ -472,7 +436,6 @@ extern void SetProvinceSettlementLocation(std::string province_name, int x, int 
 extern void SetProvinceCulturalName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
 extern void SetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
-extern void SetProvinceCurrentConstruction(std::string province_name, std::string settlement_building_ident);
 extern void SetProvincePopulation(std::string province_name, int quantity);
 extern void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
@@ -487,7 +450,6 @@ extern void AddProvinceClaim(std::string province_name, std::string civilization
 extern void RemoveProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame(bool show_loading = true);
-extern void InitializeGrandStrategyWorldMap();
 extern void FinalizeGrandStrategyInitialization();
 extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
@@ -501,7 +463,6 @@ extern bool ProvinceHasResource(std::string province_name, std::string resource_
 extern bool IsGrandStrategyBuilding(const CUnitType &type);
 extern std::string GetProvinceCivilization(std::string province_name);
 extern bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident);
-extern std::string GetProvinceCurrentConstruction(std::string province_name);
 extern int GetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident);
@@ -526,8 +487,6 @@ extern std::string GetPlayerFactionName();
 extern void SetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
 extern void ChangeFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
 extern int GetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name);
-extern void CalculateFactionIncomes(std::string civilization_name, std::string faction_name);
-extern int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern bool IsGrandStrategyUnit(const CUnitType &type);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern bool IsOffensiveMilitaryUnit(const CUnitType &type);
@@ -553,9 +512,6 @@ extern bool GrandStrategyHeroIsCustom(std::string hero_full_name);
 extern void GrandStrategyWorkCreated(std::string work_ident);
 extern void MakeGrandStrategyEventAvailable(std::string event_name);
 extern bool GetGrandStrategyEventTriggered(std::string event_name);
-extern void SetSelectedTile(int x, int y);
-extern int GetGrandStrategySelectedTileX();
-extern int GetGrandStrategySelectedTileY();
 extern void SetGrandStrategySelectedUnits(std::string unit_type_ident, int quantity);
 extern int GetGrandStrategySelectedUnits(std::string unit_type_ident);
 extern void SetCommodityPrice(std::string resource_name, int price);
