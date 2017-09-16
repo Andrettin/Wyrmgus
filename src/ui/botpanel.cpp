@@ -1988,12 +1988,12 @@ void CButtonPanel::Update()
 				} else {
 					UnitButtonTable[i]->Value = potential_faction_count;
 					UnitButtonTable[i]->Hint = "Found ";
-					if (PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->Type == FactionTypeTribe) {
+					if (PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->DefiniteArticle) {
 						UnitButtonTable[i]->Hint += "the ";
 					}
 					UnitButtonTable[i]->Hint += PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->Name;
 					UnitButtonTable[i]->Description = "Changes your faction to ";
-					if (PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->Type == FactionTypeTribe) {
+					if (PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->DefiniteArticle) {
 						UnitButtonTable[i]->Description += "the ";
 					}
 					UnitButtonTable[i]->Description += PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[potential_faction_count]->Name;

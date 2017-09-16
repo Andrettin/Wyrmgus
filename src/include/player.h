@@ -569,7 +569,7 @@ class CFaction
 public:
 	CFaction() : 
 		ID(-1), Civilization(-1), Type(FactionTypeNoFactionType), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1),
-		Playable(true), //factions are playable by default
+		Playable(true), DefiniteArticle(false),
 		DefaultStartPos(-1, -1),
 		DefaultAI("land-attack"),
 		HolyOrderDeity(NULL), Conditions(NULL)
@@ -595,6 +595,7 @@ public:
 	int DefaultGovernmentType;											/// default government type
 	int ParentFaction;													/// parent faction of this faction
 	bool Playable;														/// faction playability
+	bool DefiniteArticle;												/// whether the faction's name should be preceded by a definite article (i.e. "the Netherlands")
 	IconConfig Icon;													/// Faction's icon
 	Vec2i DefaultStartPos;
 	CDeity *HolyOrderDeity;												/// deity this faction belongs to, if it is a holy order

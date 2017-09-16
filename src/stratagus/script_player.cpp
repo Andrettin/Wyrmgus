@@ -1899,6 +1899,8 @@ static int CclDefineFaction(lua_State *l)
 			parent_faction = LuaToString(l, -1);
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "DefiniteArticle")) {
+			faction->DefiniteArticle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			faction->Icon.Name = LuaToString(l, -1);
 			faction->Icon.Icon = NULL;
@@ -2137,6 +2139,10 @@ static int CclDefineFaction(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
+	}
+	
+	if (faction->Type == FactionTypeTribe) {
+		faction->DefiniteArticle = true;
 	}
 	
 	if (!parent_faction.empty()) { //process this here
