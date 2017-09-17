@@ -1072,7 +1072,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 		}
 	}
 	if (!Selected.empty()) {
-		if (Selected.size() == 1 && Selected[0]->Type->CanTransport() && Selected[0]->BoardCount) {
+		if (Selected.size() == 1 && Selected[0]->Type->CanTransport() && Selected[0]->BoardCount && CurrentButtonLevel == Selected[0]->Type->ButtonLevelForTransporter) {
 			const size_t size = UI.TransportingButtons.size();
 
 			for (size_t i = std::min<size_t>(Selected[0]->BoardCount, size); i != 0;) {
