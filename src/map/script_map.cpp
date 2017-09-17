@@ -1862,13 +1862,22 @@ static int CclDefineSettlement(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CDate date;
-				date.year = 0;
-				date.month = 1;
-				date.day = 1;
-				date.timeline = NULL;
+				CDate start_date;
+				start_date.year = 0;
+				start_date.month = 1;
+				start_date.day = 1;
+				start_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
-				CclGetDate(l, &date);
+				CclGetDate(l, &start_date);
+				lua_pop(l, 1);
+				++j;
+				CDate end_date;
+				end_date.year = 0;
+				end_date.month = 1;
+				end_date.day = 1;
+				end_date.timeline = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
 				++j;
 				
@@ -1893,7 +1902,7 @@ static int CclDefineSettlement(lua_State *l)
 				}
 				lua_pop(l, 1);
 
-				settlement->HistoricalUnits[unit_type][date] = std::pair<int, CFaction *>(unit_quantity, unit_owner);
+				settlement->HistoricalUnits.push_back(std::tuple<CDate, CDate, CUnitType *, int, CFaction *>(start_date, end_date, unit_type, unit_quantity, unit_owner));
 			}
 		} else if (!strcmp(value, "HistoricalBuildings")) {
 			if (!lua_istable(l, -1)) {

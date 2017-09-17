@@ -862,47 +862,46 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			}
 		}
 		
-		for (std::map<CUnitType *, std::map<CDate, std::pair<int, CFaction *>>>::iterator unit_iterator = settlement_iterator->second->HistoricalUnits.begin(); unit_iterator != settlement_iterator->second->HistoricalUnits.end(); ++unit_iterator) {
-			const CUnitType *type = unit_iterator->first;
+		for (size_t j = 0; j < settlement_iterator->second->HistoricalUnits.size(); ++j) {
+			if (
+				CurrentCampaign->StartDate.ContainsDate(std::get<0>(settlement_iterator->second->HistoricalUnits[j]))
+				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(settlement_iterator->second->HistoricalUnits[j])) || std::get<1>(settlement_iterator->second->HistoricalUnits[j]).year == 0)
+			) {
+				int unit_quantity = std::get<3>(settlement_iterator->second->HistoricalUnits[j]);
+						
+				if (unit_quantity > 0) {
+					const CUnitType *type = std::get<2>(settlement_iterator->second->HistoricalUnits[j]);
+					if (type->BoolFlag[ORGANIC_INDEX].value) {
+						unit_quantity = std::max(1, unit_quantity / PopulationPerUnit); //each organic unit represents 1,000 people
+					}
+							
+					CPlayer *unit_player = NULL;
+					CFaction *unit_owner = std::get<4>(settlement_iterator->second->HistoricalUnits[j]);
+					if (unit_owner) {
+						unit_player = GetOrAddFactionPlayer(unit_owner);
+						if (!unit_player) {
+							continue;
+						}
+						if (unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
+							Vec2i default_pos(map_start_pos + ((unit_owner->DefaultStartPos - template_start_pos) * this->Scale));
+							if (unit_owner->DefaultStartPos.x != -1 && unit_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
+								unit_player->SetStartView(default_pos, z);
+							} else {
+								unit_player->SetStartView(settlement_pos, z);
+							}
+						}
+					} else {
+						unit_player = player;
+					}
+					Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
 
-			for (std::map<CDate, std::pair<int, CFaction *>>::reverse_iterator second_unit_iterator = unit_iterator->second.rbegin(); second_unit_iterator != unit_iterator->second.rend(); ++second_unit_iterator) {
-				if (CurrentCampaign->StartDate.ContainsDate(second_unit_iterator->first)) { // set the owner to the latest historical owner given the scenario's start date
-					int unit_quantity = second_unit_iterator->second.first;
-					
-					if (unit_quantity > 0) {
-						if (type->BoolFlag[ORGANIC_INDEX].value) {
-							unit_quantity = std::max(1, unit_quantity / PopulationPerUnit); //each organic unit represents 1,000 people
-						}
-						
-						CPlayer *unit_player = NULL;
-						if (second_unit_iterator->second.second) {
-							unit_player = GetOrAddFactionPlayer(second_unit_iterator->second.second);
-							if (!unit_player) {
-								break;
-							}
-							if (unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
-								Vec2i default_pos(map_start_pos + ((second_unit_iterator->second.second->DefaultStartPos - template_start_pos) * this->Scale));
-								if (second_unit_iterator->second.second->DefaultStartPos.x != -1 && second_unit_iterator->second.second->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
-									unit_player->SetStartView(default_pos, z);
-								} else {
-									unit_player->SetStartView(settlement_pos, z);
-								}
-							}
-						} else {
-							unit_player = player;
-						}
-						Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
-						
-						for (int j = 0; j < unit_quantity; ++j) {
-							CUnit *unit = CreateUnit(settlement_pos - unit_offset, *type, unit_player, z);
-							if (!type->BoolFlag[HARVESTER_INDEX].value) { // make non-worker units not have an active AI
-								unit->Active = 0;
-								unit_player->UnitTypesAiActiveCount[type->Slot]--;
-							}
+					for (int j = 0; j < unit_quantity; ++j) {
+						CUnit *unit = CreateUnit(settlement_pos - unit_offset, *type, unit_player, z);
+						if (!type->BoolFlag[HARVESTER_INDEX].value) { // make non-worker units not have an active AI
+							unit->Active = 0;
+							unit_player->UnitTypesAiActiveCount[type->Slot]--;
 						}
 					}
-
-					break;
 				}
 			}
 		}
