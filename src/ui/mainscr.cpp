@@ -671,13 +671,16 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
+		//Wyrmgus start
+		flag |= IconCommandButton;
+		//Wyrmgus end
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 		//Wyrmgus start
 //		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
 		uins->GetIcon().Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->GetDisplayPlayer(), uins->GetHairColor());
 		//Wyrmgus end
-		UiDrawLifeBar(*uins, pos.x, pos.y);
 		//Wyrmgus start
+//		UiDrawLifeBar(*uins, pos.x, pos.y);
 //		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
 		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Enable && uins->GetModifiedVariable(MANA_INDEX, VariableMax)) {
 		//Wyrmgus end
