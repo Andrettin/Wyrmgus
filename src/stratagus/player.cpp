@@ -1524,6 +1524,8 @@ void CPlayer::SetCivilization(int civilization)
 */
 void CPlayer::SetFaction(CFaction *faction)
 {
+	int old_faction_id = this->Faction;
+	
 	if (faction && faction->Civilization != this->Race) {
 		this->SetCivilization(faction->Civilization);
 	}
@@ -1539,15 +1541,17 @@ void CPlayer::SetFaction(CFaction *faction)
 		}
 	}
 
-	int faction_id = PlayerRaces.GetFactionIndexByName(faction ? faction->Ident : "");
+	int faction_id = faction ? faction->ID : -1;
 	
-	for (size_t i = 0; i < UpgradeClasses.size(); ++i) {
-		if (PlayerRaces.GetFactionClassUpgrade(this->Faction, i) != PlayerRaces.GetFactionClassUpgrade(faction_id, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
-			if (PlayerRaces.GetFactionClassUpgrade(this->Faction, i) != -1 && this->Allow.Upgrades[PlayerRaces.GetFactionClassUpgrade(this->Faction, i)] == 'R') {
-				UpgradeLost(*this, PlayerRaces.GetFactionClassUpgrade(this->Faction, i));
+	if (old_faction_id != -1 && faction_id != -1) {
+		for (size_t i = 0; i < UpgradeClasses.size(); ++i) {
+			if (PlayerRaces.GetFactionClassUpgrade(old_faction_id, i) != PlayerRaces.GetFactionClassUpgrade(faction_id, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
+				if (PlayerRaces.GetFactionClassUpgrade(old_faction_id, i) != -1 && this->Allow.Upgrades[PlayerRaces.GetFactionClassUpgrade(old_faction_id, i)] == 'R') {
+					UpgradeLost(*this, PlayerRaces.GetFactionClassUpgrade(old_faction_id, i));
 
-				if (PlayerRaces.GetFactionClassUpgrade(faction_id, i) != -1) {
-					UpgradeAcquire(*this, AllUpgrades[PlayerRaces.GetFactionClassUpgrade(faction_id, i)]);
+					if (PlayerRaces.GetFactionClassUpgrade(faction_id, i) != -1) {
+						UpgradeAcquire(*this, AllUpgrades[PlayerRaces.GetFactionClassUpgrade(faction_id, i)]);
+					}
 				}
 			}
 		}
