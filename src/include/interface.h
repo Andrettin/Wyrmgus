@@ -110,6 +110,8 @@ public:
 		Allowed(NULL), Key(0) {}
 		
 	//Wyrmgus start
+	void SetTriggerData() const;
+	void CleanTriggerData() const;
 	int GetKey() const;
 	std::string GetHint() const;
 	//Wyrmgus end

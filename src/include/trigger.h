@@ -45,6 +45,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+//Wyrmgus start
+class CFaction;
+//Wyrmgus end
 class CUnit;
 class CUnitType;
 //Wyrmgus start
@@ -116,6 +119,7 @@ struct TriggerDataType {
 	//Wyrmgus start
 	CUpgrade *Upgrade; /// Upgrade used in trigger
 	int *Resource;		/// Resource used in trigger
+	CFaction *Faction; /// Faction used in trigger
 	//Wyrmgus end
 };
 

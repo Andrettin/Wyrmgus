@@ -189,28 +189,9 @@
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
-	if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
-		TriggerData.Type = UnitTypes[button.Value];
-	} else {
-		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
-		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
-	}
-	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
-		TriggerData.Upgrade = AllUpgrades[button.Value];
-	} else if (button.Action == ButtonFaction) {
-		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
-		}
-	}
-	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
-		TriggerData.Resource = &resource;
-	}
+	button.SetTriggerData();
 	std::string text = EvalString(this->Text);
-	TriggerData.Type = NULL;
-	TriggerData.Unit = NULL;
-	TriggerData.Upgrade = NULL;
-	TriggerData.Resource = NULL;
+	button.CleanTriggerData();
 	//Wyrmgus end
 	
 	//Wyrmgus start
@@ -244,28 +225,9 @@
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
-	if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
-		TriggerData.Type = UnitTypes[button.Value];
-	} else {
-		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
-		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
-	}
-	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
-		TriggerData.Upgrade = AllUpgrades[button.Value];
-	} else if (button.Action == ButtonFaction) {
-		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
-		}
-	}
-	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
-		TriggerData.Resource = &resource;
-	}
+	button.SetTriggerData();
 	std::string text = EvalString(this->Text);
-	TriggerData.Type = NULL;
-	TriggerData.Unit = NULL;
-	TriggerData.Upgrade = NULL;
-	TriggerData.Resource = NULL;
+	button.CleanTriggerData();
 	//Wyrmgus end
 	int height = 0;
 	int i = 1;
@@ -282,28 +244,9 @@
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
-	if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
-		TriggerData.Type = UnitTypes[button.Value];
-	} else {
-		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
-		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
-	}
-	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
-		TriggerData.Upgrade = AllUpgrades[button.Value];
-	} else if (button.Action == ButtonFaction) {
-		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
-		}
-	}
-	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
-		TriggerData.Resource = &resource;
-	}
+	button.SetTriggerData();
 	std::string text = EvalString(this->Text);
-	TriggerData.Type = NULL;
-	TriggerData.Unit = NULL;
-	TriggerData.Upgrade = NULL;
-	TriggerData.Resource = NULL;
+	button.CleanTriggerData();
 	//Wyrmgus end
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string sub;
@@ -510,30 +453,12 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
 //	TriggerData.Type = UnitTypes[button.Value];
-	if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
-		TriggerData.Type = UnitTypes[button.Value];
-	} else {
-		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
-		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
-	}
-	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
-		TriggerData.Upgrade = AllUpgrades[button.Value];
-	} else if (button.Action == ButtonFaction) {
-		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
-		}
-	}
-	int resource = button.Value;
-	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
-		TriggerData.Resource = &resource;
-	}
+	button.SetTriggerData();
 	//Wyrmgus end
 	std::string text = EvalString(this->Text);
-	TriggerData.Type = NULL;
 	//Wyrmgus start
-	TriggerData.Unit = NULL;
-	TriggerData.Upgrade = NULL;
-	TriggerData.Resource = NULL;
+//	TriggerData.Type = NULL;
+	button.CleanTriggerData();
 	//Wyrmgus end
 	return font.getWidth(text);
 }
@@ -556,30 +481,12 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	if (this->Text) {
 		//Wyrmgus start
 //		TriggerData.Type = UnitTypes[button.Value];
-		if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
-			TriggerData.Type = UnitTypes[button.Value];
-		} else {
-			TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
-			TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
-		}
-		if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
-			TriggerData.Upgrade = AllUpgrades[button.Value];
-		} else if (button.Action == ButtonFaction) {
-			if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
-				TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
-			}
-		}
-		int resource = button.Value;
-		if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
-			TriggerData.Resource = &resource;
-		}
+		button.SetTriggerData();
 		//Wyrmgus end
 		text = EvalString(this->Text);
-		TriggerData.Type = NULL;
 		//Wyrmgus start
-		TriggerData.Unit = NULL;
-		TriggerData.Upgrade = NULL;
-		TriggerData.Resource = NULL;
+//		TriggerData.Type = NULL;
+		button.CleanTriggerData();
 		//Wyrmgus end
 		if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);
@@ -831,8 +738,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Regeneration = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "FactionUpgrade")) {
 			condition->FactionUpgrade = Ccl2Condition(l, LuaToString(l, -1));
-		} else if (!strcmp(key, "FactionUpgradeCoreSettlements")) {
-			condition->FactionUpgradeCoreSettlements = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "FactionCoreSettlements")) {
+			condition->FactionCoreSettlements = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ResearchedUpgrade")) {
 			condition->ResearchedUpgrade = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "LuxuryResource")) {

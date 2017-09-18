@@ -54,9 +54,15 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "translate.h"
+//Wyrmgus start
+#include "trigger.h"
+//Wyrmgus end
 #include "ui.h"
 #include "unit.h"
 #include "unit_find.h"
+//Wyrmgus start
+#include "unit_manager.h"
+//Wyrmgus end
 #include "unittype.h"
 #include "video.h"
 #include "widgets.h"
@@ -115,6 +121,37 @@ CUnit *LastLevelUpUnit;							/// Last called level up unit
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
+void ButtonAction::SetTriggerData() const
+{
+	if (this->Action != ButtonUnit && this->Action != ButtonBuy) {
+		TriggerData.Type = UnitTypes[this->Value];
+	} else {
+		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(this->Value).Type->Slot];
+		TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
+	}
+	if (this->Action == ButtonResearch || this->Action == ButtonLearnAbility) {
+		TriggerData.Upgrade = AllUpgrades[this->Value];
+	} else if (this->Action == ButtonFaction) {
+		TriggerData.Faction = PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value];
+		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
+			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
+		}
+	}
+	int resource = this->Value;
+	if (this->Action == ButtonProduceResource || this->Action == ButtonSellResource || this->Action == ButtonBuyResource) {
+		TriggerData.Resource = &resource;
+	}
+}
+
+void ButtonAction::CleanTriggerData() const
+{
+	TriggerData.Type = NULL;
+	TriggerData.Unit = NULL;
+	TriggerData.Upgrade = NULL;
+	TriggerData.Resource = NULL;
+	TriggerData.Faction = NULL;
+}
+
 int ButtonAction::GetKey() const
 {
 	if ((this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo) && !IsButtonUsable(*Selected[0], *this)) {

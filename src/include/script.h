@@ -54,6 +54,9 @@ extern "C" {
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+//Wyrmgus start
+class CFaction;
+//Wyrmgus end
 class CUnit;
 class CUnitType;
 //Wyrmgus start
@@ -169,7 +172,7 @@ enum EString {
 	EString_UpgradeFactionType,		/// Upgrade's faction's type
 	EString_UpgradeEffectsString,	/// Upgrade's effects string
 	EString_UpgradeRequirementsString,	/// Upgrade's requirements string
-	EString_FactionUpgradeCoreSettlements,	/// Core settlements of the upgrade's faction
+	EString_FactionCoreSettlements,	/// Core settlements of the faction
 	EString_ResourceIdent,	/// Resource's ident
 	EString_ResourceName,	/// Resource's name
 	//Wyrmgus end
@@ -249,6 +252,7 @@ struct NumberDesc {
 		//Wyrmgus start
 		CUnitType **Type;           /// Which unit type.
 		CUpgrade **Upgrade;         /// Which upgrade.
+		CFaction **Faction;			/// Which faction.
 		int **Resource;				/// Which resource
 		//Wyrmgus end
 		BinOp binOp;   /// For binary operand.
@@ -313,6 +317,7 @@ struct StringDesc {
 		//Wyrmgus start
 		CUnitType **Type;           /// Which unit type.
 		CUpgrade **Upgrade;         /// Which upgrade.
+		CFaction **Faction;			/// Which faction.
 		int **Resource;				/// Which resource
 		//Wyrmgus end
 		struct {
@@ -405,7 +410,8 @@ extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit descriptio
 extern CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
 //Wyrmgus start
 extern CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
-extern int **CclParseResourceDesc(lua_State *l);   /// Parse an upgrade description.
+extern int **CclParseResourceDesc(lua_State *l);   /// Parse a resource description.
+extern CFaction **CclParseFactionDesc(lua_State *l);   /// Parse a faction description.
 //Wyrmgus end
 StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
 
