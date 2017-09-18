@@ -1042,15 +1042,18 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UpgradeCivilization")) {
 			res->e = EString_UpgradeCivilization;
 			res->D.Upgrade = CclParseUpgradeDesc(l);
-		} else if (!strcmp(key, "UpgradeFactionType")) {
-			res->e = EString_UpgradeFactionType;
-			res->D.Upgrade = CclParseUpgradeDesc(l);
 		} else if (!strcmp(key, "UpgradeEffectsString")) {
 			res->e = EString_UpgradeEffectsString;
 			res->D.Upgrade = CclParseUpgradeDesc(l);
 		} else if (!strcmp(key, "UpgradeRequirementsString")) {
 			res->e = EString_UpgradeRequirementsString;
 			res->D.Upgrade = CclParseUpgradeDesc(l);
+		} else if (!strcmp(key, "FactionCivilization")) {
+			res->e = EString_FactionCivilization;
+			res->D.Faction = CclParseFactionDesc(l);
+		} else if (!strcmp(key, "FactionType")) {
+			res->e = EString_FactionType;
+			res->D.Faction = CclParseFactionDesc(l);
 		} else if (!strcmp(key, "FactionCoreSettlements")) {
 			res->e = EString_FactionCoreSettlements;
 			res->D.Faction = CclParseFactionDesc(l);
@@ -1511,29 +1514,8 @@ std::string EvalString(const StringDesc *s)
 		case EString_UpgradeCivilization : // name of the upgrade's civilization
 			upgrade = s->D.Upgrade;
 			if (upgrade != NULL) {
-				CFaction *upgrade_faction = NULL;
-				if (!strncmp((**upgrade).Ident.c_str(), "upgrade-faction-", 16)) {
-					upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString((**upgrade).Ident, "upgrade-faction-", ""));
-				}
-				if (upgrade_faction) {
-					return PlayerRaces.Display[upgrade_faction->Civilization];
-				} else if ((**upgrade).Civilization != -1) {
+				if ((**upgrade).Civilization != -1) {
 					return PlayerRaces.Display[(**upgrade).Civilization];
-				} else {
-					return std::string("");
-				}
-			} else { // ERROR.
-				return std::string("");
-			}
-		case EString_UpgradeFactionType : // the upgrade's faction's type
-			upgrade = s->D.Upgrade;
-			if (upgrade != NULL) {
-				CFaction *upgrade_faction = NULL;
-				if (!strncmp((**upgrade).Ident.c_str(), "upgrade-faction-", 16)) {
-					upgrade_faction = PlayerRaces.GetFaction(FindAndReplaceString((**upgrade).Ident, "upgrade-faction-", ""));
-				}
-				if (upgrade_faction) {
-					return IdentToName(GetFactionTypeNameById(upgrade_faction->Type));
 				} else {
 					return std::string("");
 				}
@@ -1552,6 +1534,22 @@ std::string EvalString(const StringDesc *s)
 			if (upgrade != NULL) {
 				return (**upgrade).RequirementsString;
 			} else { // ERROR.
+				return std::string("");
+			}
+		case EString_FactionCivilization : // name of the faction's civilization
+			faction = s->D.Faction;
+			
+			if (faction != NULL) {
+				return PlayerRaces.Display[(**faction).Civilization];
+			} else {
+				return std::string("");
+			}
+		case EString_FactionType : // the faction's type
+			faction = s->D.Faction;
+			
+			if (faction != NULL) {
+				return IdentToName(GetFactionTypeNameById((**faction).Type));
+			} else {
 				return std::string("");
 			}
 		case EString_FactionCoreSettlements : // the faction's core settlements
@@ -1838,9 +1836,6 @@ void FreeStringDesc(StringDesc *s)
 		case EString_UpgradeCivilization : // Civilization of the upgrade
 			delete *s->D.Upgrade;
 			break;
-		case EString_UpgradeFactionType : // Type of the upgrade's faction
-			delete *s->D.Upgrade;
-			break;
 		case EString_UpgradeEffectsString : // Effects string of the upgrade
 			delete *s->D.Upgrade;
 			break;
@@ -1852,6 +1847,12 @@ void FreeStringDesc(StringDesc *s)
 			break;
 		case EString_ResourceName : // Name of the resource
 			delete *s->D.Resource;
+			break;
+		case EString_FactionCivilization : // Civilization of the faction
+			delete *s->D.Faction;
+			break;
+		case EString_FactionType : // Type of the faction
+			delete *s->D.Faction;
 			break;
 		case EString_FactionCoreSettlements : // Core settlements of the faction
 			delete *s->D.Faction;
@@ -2553,19 +2554,6 @@ static int CclUpgradeCivilization(lua_State *l)
 }
 
 /**
-**  Return equivalent lua table for UpgradeFactionType.
-**  {"UpgradeFactionType", {}}
-**
-**  @param l  Lua state.
-**
-**  @return   equivalent lua table.
-*/
-static int CclUpgradeFactionType(lua_State *l)
-{
-	return Alias(l, "UpgradeFactionType");
-}
-
-/**
 **  Return equivalent lua table for UpgradeEffectsString.
 **  {"UpgradeEffectsString", {}}
 **
@@ -2589,6 +2577,32 @@ static int CclUpgradeEffectsString(lua_State *l)
 static int CclUpgradeRequirementsString(lua_State *l)
 {
 	return Alias(l, "UpgradeRequirementsString");
+}
+
+/**
+**  Return equivalent lua table for FactionCivilization.
+**  {"FactionCivilization", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclFactionCivilization(lua_State *l)
+{
+	return Alias(l, "FactionCivilization");
+}
+
+/**
+**  Return equivalent lua table for FactionType.
+**  {"FactionType", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclFactionType(lua_State *l)
+{
+	return Alias(l, "FactionType");
 }
 
 /**
@@ -2838,9 +2852,10 @@ static void AliasRegister()
 	lua_register(Lua, "TypeLuxuryDemand", CclTypeLuxuryDemand);
 	lua_register(Lua, "TypeTrainQuantity", CclTypeTrainQuantity);
 	lua_register(Lua, "UpgradeCivilization", CclUpgradeCivilization);
-	lua_register(Lua, "UpgradeFactionType", CclUpgradeFactionType);
 	lua_register(Lua, "UpgradeEffectsString", CclUpgradeEffectsString);
 	lua_register(Lua, "UpgradeRequirementsString", CclUpgradeRequirementsString);
+	lua_register(Lua, "FactionCivilization", CclFactionCivilization);
+	lua_register(Lua, "FactionType", CclFactionType);
 	lua_register(Lua, "FactionCoreSettlements", CclFactionCoreSettlements);
 	lua_register(Lua, "ResourceIdent", CclResourceIdent);
 	lua_register(Lua, "ResourceName", CclResourceName);

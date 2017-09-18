@@ -169,9 +169,10 @@ enum EString {
 	EString_TypeBuildingRulesString,	/// Unit type's building rules string
 	EString_TypeLuxuryDemand,			/// Unit type's luxury demand
 	EString_UpgradeCivilization,	/// Upgrade's civilization
-	EString_UpgradeFactionType,		/// Upgrade's faction's type
 	EString_UpgradeEffectsString,	/// Upgrade's effects string
 	EString_UpgradeRequirementsString,	/// Upgrade's requirements string
+	EString_FactionCivilization,	/// Faction's civilization
+	EString_FactionType,		/// Faction's type
 	EString_FactionCoreSettlements,	/// Core settlements of the faction
 	EString_ResourceIdent,	/// Resource's ident
 	EString_ResourceName,	/// Resource's name
