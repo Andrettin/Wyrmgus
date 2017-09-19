@@ -1764,6 +1764,12 @@ static int CclGetUnitVariable(lua_State *l)
 		} else {
 			lua_pushboolean(l, false);
 		}
+	} else if (!strcmp(value, "Settlement")) {
+		if (unit->Settlement != NULL) {
+			lua_pushstring(l, unit->Settlement->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 	} else if (!strcmp(value, "GiveResourceTypeName")) {
 		//Wyrmgus start
 //		lua_pushstring(l, DefaultResourceNames[unit->Type->GivesResource].c_str());

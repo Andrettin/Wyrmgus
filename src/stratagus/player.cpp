@@ -1140,6 +1140,18 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
+	file.printf("\n  \"quest-build-settlement-units\", {");
+	for (size_t j = 0; j < p.QuestBuildSettlementUnits.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", std::get<0>(p.QuestBuildSettlementUnits[j])->Ident.c_str());
+		file.printf("\"%s\",", std::get<1>(p.QuestBuildSettlementUnits[j])->Ident.c_str());
+		file.printf("\"%s\",", std::get<2>(p.QuestBuildSettlementUnits[j])->Ident.c_str());
+		file.printf("%d,", std::get<3>(p.QuestBuildSettlementUnits[j]));
+	}
+	file.printf("},");
+	
 	file.printf("\n  \"quest-research-upgrades\", {");
 	for (size_t j = 0; j < p.QuestResearchUpgrades.size(); ++j) {
 		if (j) {
@@ -1720,13 +1732,35 @@ bool CPlayer::HasSettlement(CSettlement *settlement) const
 		return false;
 	}
 	
-	for (int i = 0; i < this->GetUnitCount(); ++i) {
-		CUnit &unit = this->GetUnit(i);
-		if (unit.Type->BoolFlag[TOWNHALL_INDEX].value && unit.Settlement == settlement) {
-			return true;
-		}
+	if (settlement->SettlementUnit && settlement->SettlementUnit->Player == this) {
+		return true;
 	}
 
+	return false;
+}
+
+bool CPlayer::HasUnitBuilder(CUnitType *type) const
+{
+	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
+		for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
+			if (this->UnitTypesCount[AiHelpers.Build[type->Slot][j]->Slot] > 0) {
+				return true;
+			}
+		}
+	} else if (!type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Train.size()) {
+		for (size_t j = 0; j < AiHelpers.Train[type->Slot].size(); ++j) {
+			if (this->UnitTypesCount[AiHelpers.Train[type->Slot][j]->Slot] > 0) {
+				return true;
+			}
+		}
+	}
+	if (type->Slot < (int) AiHelpers.Upgrade.size()) {
+		for (size_t j = 0; j < AiHelpers.Upgrade[type->Slot].size(); ++j) {
+			if (this->UnitTypesCount[AiHelpers.Upgrade[type->Slot][j]->Slot] > 0) {
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
@@ -2039,6 +2073,7 @@ void CPlayer::Clear()
 	this->CompletedQuests.clear();
 	this->QuestBuildUnits.clear();
 	this->QuestBuildUnitsOfClass.clear();
+	this->QuestBuildSettlementUnits.clear();
 	this->QuestResearchUpgrades.clear();
 	this->QuestDestroyUnits.clear();
 	this->QuestDestroyUniques.clear();
@@ -2314,6 +2349,10 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		this->QuestBuildUnitsOfClass.push_back(std::tuple<CQuest *, int, int>(quest, std::get<0>(quest->BuildUnitsOfClass[i]), std::get<1>(quest->BuildUnitsOfClass[i])));
 	}
 	
+	for (size_t i = 0; i < quest->BuildSettlementUnits.size(); ++i) {
+		this->QuestBuildSettlementUnits.push_back(std::tuple<CQuest *, CSettlement *, CUnitType *, int>(quest, std::get<0>(quest->BuildSettlementUnits[i]), std::get<1>(quest->BuildSettlementUnits[i]), std::get<2>(quest->BuildSettlementUnits[i])));
+	}
+	
 	for (size_t i = 0; i < quest->ResearchUpgrades.size(); ++i) {
 		this->QuestResearchUpgrades.push_back(std::tuple<CQuest *, CUpgrade *>(quest, quest->ResearchUpgrades[i]));
 	}
@@ -2424,6 +2463,12 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 		}
 	}
 	
+	for (int i = (this->QuestBuildSettlementUnits.size()  - 1); i >= 0; --i) {
+		if (std::get<0>(this->QuestBuildSettlementUnits[i]) == quest) {
+			this->QuestBuildSettlementUnits.erase(std::remove(this->QuestBuildSettlementUnits.begin(), this->QuestBuildSettlementUnits.end(), this->QuestBuildSettlementUnits[i]), this->QuestBuildSettlementUnits.end());
+		}
+	}
+	
 	for (int i = (this->QuestResearchUpgrades.size()  - 1); i >= 0; --i) {
 		if (std::get<0>(this->QuestResearchUpgrades[i]) == quest) {
 			this->QuestResearchUpgrades.erase(std::remove(this->QuestResearchUpgrades.begin(), this->QuestResearchUpgrades.end(), this->QuestResearchUpgrades[i]), this->QuestResearchUpgrades.end());
@@ -2465,13 +2510,57 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		return false;
 	}
 	
+	for (size_t i = 0; i < quest->BuildUnits.size(); ++i) {
+		CUnitType *type = std::get<0>(quest->BuildUnits[i]);
+		if (!this->HasUnitBuilder(type) || !CheckDependByType(*this, *type)) {
+			return false;
+		}
+	}
+	
+	for (size_t i = 0; i < quest->BuildUnitsOfClass.size(); ++i) {
+		int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, std::get<0>(quest->BuildUnitsOfClass[i]));
+			
+		if (unit_type_id == -1) {
+			return false;
+		}
+
+		CUnitType *type = UnitTypes[unit_type_id];
+		if (!this->HasUnitBuilder(type) || !CheckDependByType(*this, *type)) {
+			return false;
+		}
+	}
+
+	for (size_t i = 0; i < quest->BuildSettlementUnits.size(); ++i) {
+		if (!this->HasSettlement(std::get<0>(quest->BuildSettlementUnits[i]))) {
+			return false;
+		}
+		
+		CUnitType *type = std::get<1>(quest->BuildSettlementUnits[i]);
+		if (!this->HasUnitBuilder(type) || !CheckDependByType(*this, *type)) {
+			return false;
+		}
+	}
+	
+	for (size_t i = 0; i < quest->DestroyUniques.size(); ++i) {
+		if (quest->DestroyUniques[i]->CanDrop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
+			return false;
+		}
+	}
+
+	for (size_t i = 0; i < quest->DestroyFactions.size(); ++i) {
+		CPlayer *faction_player = GetFactionPlayer(quest->DestroyFactions[i]);
+		if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
+			return false;
+		}
+	}	
+	
 	if (quest->Conditions) {
 		CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 		quest->Conditions->pushPreamble();
 		quest->Conditions->run(1);
 		return quest->Conditions->popBoolean();
 	} else {
-		return false;
+		return true;
 	}
 }
 
@@ -2489,6 +2578,12 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 	
 	for (size_t i = 0; i < this->QuestBuildUnitsOfClass.size(); ++i) {
 		if (std::get<0>(this->QuestBuildUnitsOfClass[i]) == quest && std::get<2>(this->QuestBuildUnitsOfClass[i]) > 0) {
+			return false;
+		}
+	}
+	
+	for (size_t i = 0; i < this->QuestBuildSettlementUnits.size(); ++i) {
+		if (std::get<0>(this->QuestBuildSettlementUnits[i]) == quest && std::get<3>(this->QuestBuildSettlementUnits[i]) > 0) {
 			return false;
 		}
 	}
@@ -2544,24 +2639,8 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 
 	for (size_t i = 0; i < this->QuestBuildUnits.size(); ++i) {
 		if (std::get<0>(this->QuestBuildUnits[i]) == quest && std::get<2>(this->QuestBuildUnits[i]) > 0) {
-			bool has_builder = false;
 			CUnitType *type = std::get<1>(this->QuestBuildUnits[i]);
-			if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
-				for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
-					if (this->UnitTypesCount[AiHelpers.Build[type->Slot][j]->Slot] > 0) {
-						has_builder = true;
-						break;
-					}
-				}
-			} else if (!type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Train.size()) {
-				for (size_t j = 0; j < AiHelpers.Train[type->Slot].size(); ++j) {
-					if (this->UnitTypesCount[AiHelpers.Train[type->Slot][j]->Slot] > 0) {
-						has_builder = true;
-						break;
-					}
-				}
-			}
-			if (!has_builder || !CheckDependByType(*this, *type)) {
+			if (!this->HasUnitBuilder(type) || !CheckDependByType(*this, *type)) {
 				return "You can no longer produce the required unit.";
 			}
 		}
@@ -2569,7 +2648,6 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 	
 	for (size_t i = 0; i < this->QuestBuildUnitsOfClass.size(); ++i) {
 		if (std::get<0>(this->QuestBuildUnitsOfClass[i]) == quest && std::get<2>(this->QuestBuildUnitsOfClass[i]) > 0) {
-			bool has_builder = false;
 			int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, std::get<1>(this->QuestBuildUnitsOfClass[i]));
 			
 			if (unit_type_id == -1) {
@@ -2577,23 +2655,23 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			}
 			
 			CUnitType *type = UnitTypes[unit_type_id];
-			if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
-				for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
-					if (this->UnitTypesCount[AiHelpers.Build[type->Slot][j]->Slot] > 0) {
-						has_builder = true;
-						break;
-					}
-				}
-			} else if (!type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Train.size()) {
-				for (size_t j = 0; j < AiHelpers.Train[type->Slot].size(); ++j) {
-					if (this->UnitTypesCount[AiHelpers.Train[type->Slot][j]->Slot] > 0) {
-						has_builder = true;
-						break;
-					}
-				}
-			}
-			if (!has_builder || !CheckDependByType(*this, *type)) {
+			if (!this->HasUnitBuilder(type) || !CheckDependByType(*this, *type)) {
 				return "You cannot longer produce the required unit.";
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < this->QuestBuildSettlementUnits.size(); ++i) {
+		if (std::get<0>(this->QuestBuildSettlementUnits[i]) == quest) {
+			if (!this->HasSettlement(std::get<1>(this->QuestBuildSettlementUnits[i]))) {
+				return "You no longer hold the required settlement.";
+			}
+
+			if (std::get<3>(this->QuestBuildSettlementUnits[i]) > 0) {
+				CUnitType *type = std::get<2>(this->QuestBuildSettlementUnits[i]);
+				if (!this->HasUnitBuilder(type) || !CheckDependByType(*this, *type)) {
+					return "You can no longer produce the required unit.";
+				}
 			}
 		}
 	}
@@ -2603,7 +2681,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			return "The target no longer exists.";
 		}
 	}
-	
+
 	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
 		if (std::get<0>(this->QuestDestroyFactions[i]) == quest && std::get<2>(this->QuestDestroyFactions[i]) == false) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
 			CPlayer *faction_player = GetFactionPlayer(std::get<1>(this->QuestDestroyFactions[i]));

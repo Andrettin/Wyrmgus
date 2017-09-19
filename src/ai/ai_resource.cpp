@@ -918,7 +918,7 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 			n = AiHelpers.Train.size();
 			tablep = &AiHelpers.Train;
 		}
-		if (type.Slot > n) { // Oops not known.
+		if (type.Slot >= n) { // Oops not known.
 			DebugPrint("%d: AiMakeUnit I: Nothing known about '%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 			continue;
@@ -1011,7 +1011,7 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 	const int n = AiHelpers.Research.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
 
-	if (upgrade->ID > n) { // Oops not known.
+	if (upgrade->ID >= n) { // Oops not known.
 		DebugPrint("%d: AiAddResearchRequest I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
 		return;
@@ -1082,7 +1082,7 @@ void AiAddUpgradeToRequest(CUnitType &type)
 	const int n = AiHelpers.Upgrade.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Upgrade;
 
-	if (type.Slot > n) { // Oops not known.
+	if (type.Slot >= n) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return;
@@ -1875,7 +1875,7 @@ static int AiRepairUnit(CUnit &unit)
 	int n = AiHelpers.Repair.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Repair;
 	const CUnitType &type = *unit.Type;
-	if (type.Slot > n) { // Oops not known.
+	if (type.Slot >= n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return 0;
@@ -2039,7 +2039,7 @@ static void AiCheckPathwayConstruction()
 	int n_t = AiHelpers.Build.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
 	for (size_t i = 0; i != pathway_types.size(); ++i) {
-		if (pathway_types[i]->Slot > n_t) { // Oops not known.
+		if (pathway_types[i]->Slot >= n_t) { // Oops not known.
 			DebugPrint("%d: AiCheckPathwayConstruction I: Nothing known about '%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ pathway_types[i]->Ident.c_str());
 			return;
@@ -2267,7 +2267,7 @@ void AiCheckSettlementConstruction()
 	
 	int n_t = AiHelpers.Build.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
-	if (town_hall_type->Slot > n_t) { // Oops not known.
+	if (town_hall_type->Slot >= n_t) { // Oops not known.
 		DebugPrint("%d: AiCheckPathwayConstruction I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
 		return;

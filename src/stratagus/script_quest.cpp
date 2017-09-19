@@ -205,6 +205,26 @@ static int CclDefineQuest(lua_State *l)
 				
 				quest->BuildUnitsOfClass.push_back(std::tuple<int, int>(class_id, quantity));
 			}
+		} else if (!strcmp(value, "BuildSettlementUnits")) {
+			quest->BuildSettlementUnits.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				CSettlement *settlement = GetSettlement(LuaToString(l, -1, j + 1));
+				if (!settlement) {
+					LuaError(l, "Settlement doesn't exist.");
+				}
+				++j;
+				
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				if (!unit_type) {
+					LuaError(l, "Unit type doesn't exist.");
+				}
+				++j;
+				
+				int quantity = LuaToNumber(l, -1, j + 1);
+				
+				quest->BuildSettlementUnits.push_back(std::tuple<CSettlement *, CUnitType *, int>(settlement, unit_type, quantity));
+			}
 		} else if (!strcmp(value, "ResearchUpgrades")) {
 			quest->ResearchUpgrades.clear();
 			const int args = lua_rawlen(l, -1);

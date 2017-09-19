@@ -376,7 +376,7 @@ static void AiCheckUnits()
 			n = AiHelpers.Research.size();
 			std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
 
-			if (deity_upgrade->ID > n) { // Oops not known.
+			if (deity_upgrade->ID >= n) { // Oops not known.
 				continue;
 			}
 			std::vector<CUnitType *> &table = tablep[deity_upgrade->ID];

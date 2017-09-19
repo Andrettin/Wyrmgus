@@ -212,6 +212,12 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			std::get<2>(player.QuestBuildUnitsOfClass[i]) -= 1;
 		}
 	}
+	
+	for (size_t i = 0; i < player.QuestBuildSettlementUnits.size(); ++i) {
+		if (std::get<1>(player.QuestBuildSettlementUnits[i]) == unit.Settlement && std::get<2>(player.QuestBuildSettlementUnits[i]) == &type) {
+			std::get<3>(player.QuestBuildSettlementUnits[i]) -= 1;
+		}
+	}	
 	//Wyrmgus end
 	
 	unit.Constructed = 0;
