@@ -3229,6 +3229,16 @@ static int CclGetPlayerData(lua_State *l)
 		CSettlement *settlement = GetSettlement(settlement_ident);
 		lua_pushboolean(l, p->HasSettlement(settlement));
 		return 1;
+	} else if (!strcmp(data, "SettlementName")) {
+		LuaCheckArgs(l, 3);
+		std::string settlement_ident = LuaToString(l, 3);
+		CSettlement *settlement = GetSettlement(settlement_ident);
+		if (settlement) {
+			lua_pushstring(l, settlement->GetCulturalName(p->Race).c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
 	//Wyrmgus end
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
