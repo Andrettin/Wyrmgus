@@ -2554,6 +2554,12 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		}
 	}	
 	
+	for (size_t i = 0; i < quest->HeroesMustSurvive.size(); ++i) {
+		if (!this->HasHero(quest->HeroesMustSurvive[i])) {
+			return false;
+		}
+	}
+
 	if (quest->Conditions) {
 		CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 		quest->Conditions->pushPreamble();
