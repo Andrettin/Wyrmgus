@@ -2062,6 +2062,10 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Suffix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
 			)
+			&& ( //the dropper unit must be capable of generating this unique item's set to drop the item
+				UniqueItems[i]->Set == NULL
+				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Set->Ident))
+			)
 			&& ( //the dropper unit must be capable of generating this unique item's spell to drop the item
 				UniqueItems[i]->Spell == NULL
 				|| (dropper != NULL && std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), UniqueItems[i]->Spell) != dropper->Type->DropSpells.end())
