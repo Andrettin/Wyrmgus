@@ -110,6 +110,7 @@ public:
 	}
 	
 	bool CanDrop() const;				/// Check whether this unique item can drop
+	int GetMagicLevel() const;			/// Get this unique item's magic level
 
 	int ResourcesHeld;
 	std::string Ident;

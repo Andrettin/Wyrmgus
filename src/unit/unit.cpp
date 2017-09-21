@@ -1714,6 +1714,11 @@ void CUnit::SetElixir(CUpgrade *elixir)
 
 void CUnit::SetUnique(CUniqueItem *unique)
 {
+	if (this->Unique && this->Unique->Set) {
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Unique->Set->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Unique->Set->MagicLevel;
+	}
+		
 	if (unique != NULL) {
 		SetPrefix(unique->Prefix);
 		SetSuffix(unique->Suffix);
@@ -1725,6 +1730,10 @@ void CUnit::SetUnique(CUniqueItem *unique)
 			this->Variable[GIVERESOURCE_INDEX].Value = unique->ResourcesHeld;
 			this->Variable[GIVERESOURCE_INDEX].Max = unique->ResourcesHeld;
 			this->Variable[GIVERESOURCE_INDEX].Enable = 1;
+		}
+		if (unique->Set) {
+			this->Variable[MAGICLEVEL_INDEX].Value += unique->Set->MagicLevel;
+			this->Variable[MAGICLEVEL_INDEX].Max += unique->Set->MagicLevel;
 		}
 		Name = unique->Name;
 		Unique = unique;

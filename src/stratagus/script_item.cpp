@@ -265,6 +265,9 @@ static int CclGetUniqueItemData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
+	} else if (!strcmp(data, "MagicLevel")) {
+		lua_pushnumber(l, item->GetMagicLevel());
+		return 1;
 	} else if (!strcmp(data, "CanDrop")) {
 		lua_pushboolean(l, item->CanDrop());
 		return 1;

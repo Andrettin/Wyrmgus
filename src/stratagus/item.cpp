@@ -281,6 +281,33 @@ bool CUniqueItem::CanDrop() const
 	return true;
 }
 
+int CUniqueItem::GetMagicLevel() const
+{
+	int magic_level = 0;
+	
+	if (this->Prefix) {
+		magic_level += this->Prefix->MagicLevel;
+	}
+	
+	if (this->Suffix) {
+		magic_level += this->Suffix->MagicLevel;
+	}
+	
+	if (this->Set) {
+		magic_level += this->Set->MagicLevel;
+	}
+	
+	if (this->Work) {
+		magic_level += this->Work->MagicLevel;
+	}
+	
+	if (this->Elixir) {
+		magic_level += this->Elixir->MagicLevel;
+	}
+	
+	return magic_level;
+}
+
 void CleanUniqueItems()
 {
 	for (size_t i = 0; i < UniqueItems.size(); ++i) {
