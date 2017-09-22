@@ -1326,6 +1326,12 @@ void CButtonPanel::Draw()
 //				strcpy_s(buf, sizeof(buf), "ESC");
 				strcpy_s(buf, sizeof(buf), "Esc");
 				//Wyrmgus end
+			//Wyrmgus start
+			} else if (buttons[i].GetKey() == gcn::Key::K_PAGE_UP) {
+				strcpy_s(buf, sizeof(buf), "PgUp");
+			} else if (buttons[i].GetKey() == gcn::Key::K_PAGE_DOWN) {
+				strcpy_s(buf, sizeof(buf), "PgDwn");
+			//Wyrmgus end
 			} else {
 				//Wyrmgus start
 //				buf[0] = toupper(buttons[i].Key);
