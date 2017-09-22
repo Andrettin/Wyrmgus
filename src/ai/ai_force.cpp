@@ -61,7 +61,7 @@
 class EnemyUnitFinder
 {
 public:
-	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, int find_type, bool include_neutral, bool allow_water) :
+	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, int find_type, bool include_neutral, bool allow_water) :
 	//Wyrmgus end
 		unit(unit),
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
@@ -69,7 +69,9 @@ public:
 		find_type(find_type),
 		include_neutral(include_neutral),
 		allow_water(allow_water),
-		result_unit(result_unit)
+		result_unit(result_unit),
+		result_enemy_wall_pos(result_enemy_wall_pos),
+		result_enemy_wall_map_layer(result_enemy_wall_map_layer)
 	{
 		*result_unit = NULL;
 	}
@@ -82,12 +84,28 @@ private:
 	bool include_neutral;
 	bool allow_water;
 	CUnit **result_unit;
+	Vec2i *result_enemy_wall_pos;
+	int *result_enemy_wall_map_layer;
 };
 
 VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!Map.Field(pos, unit.MapLayer)->playerInfo.IsTeamExplored(*unit.Player)) {
 		return VisitResult_DeadEnd;
+	}
+	
+	if (Map.Field(pos, unit.MapLayer)->CheckMask(MapFieldWall) && !Map.Info.IsPointOnMap(*result_enemy_wall_pos, *result_enemy_wall_map_layer)) {
+		int tile_owner = Map.Field(pos, unit.MapLayer)->Owner;
+		if (
+			tile_owner != -1
+			&& (
+				unit.IsEnemy(Players[tile_owner])
+				|| (include_neutral && !unit.IsAllied(Players[tile_owner]) && unit.Player->Index != tile_owner && !unit.Player->HasBuildingAccess(Players[tile_owner]))
+			)
+		) {
+			*result_enemy_wall_pos = pos;
+			*result_enemy_wall_map_layer = unit.MapLayer;
+		}
 	}
 	
 	if (!CanMoveToMask(pos, movemask, unit.MapLayer)) { // unreachable
@@ -98,6 +116,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 				return VisitResult_Ok; //if movement through water is allowed (with transport ships), then don't make water tiles a dead end, but don't look for units in them either
 			}
 		}
+		
 		return VisitResult_DeadEnd;
 	}
 
@@ -146,7 +165,7 @@ class AiForceEnemyFinder
 public:
 	//Wyrmgus start
 //	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy)
-	AiForceEnemyFinder(int force, const CUnit **enemy, const bool include_neutral, const bool allow_water) : enemy(enemy), IncludeNeutral(include_neutral), allow_water(allow_water)
+	AiForceEnemyFinder(int force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
 	//Wyrmgus end
 	{
 		Assert(enemy != NULL);
@@ -156,7 +175,7 @@ public:
 
 	//Wyrmgus start
 //	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy)
-	AiForceEnemyFinder(AiForce &force, const CUnit **enemy, const bool include_neutral, const bool allow_water) : enemy(enemy), IncludeNeutral(include_neutral), allow_water(allow_water)
+	AiForceEnemyFinder(AiForce &force, const CUnit **enemy, Vec2i *result_enemy_wall_pos, int *result_enemy_wall_map_layer, const bool include_neutral, const bool allow_water) : enemy(enemy), result_enemy_wall_pos(result_enemy_wall_pos), result_enemy_wall_map_layer(result_enemy_wall_map_layer), IncludeNeutral(include_neutral), allow_water(allow_water)
 	//Wyrmgus end
 	{
 		Assert(enemy != NULL);
@@ -196,7 +215,7 @@ public:
 
 			CUnit *result_unit = NULL;
 
-			EnemyUnitFinder enemyUnitFinder(*unit, &result_unit, FIND_TYPE, IncludeNeutral, allow_water);
+			EnemyUnitFinder enemyUnitFinder(*unit, &result_unit, result_enemy_wall_pos, result_enemy_wall_map_layer, FIND_TYPE, IncludeNeutral, allow_water);
 
 			terrainTraversal.Run(enemyUnitFinder);
 			*enemy = result_unit;
@@ -245,6 +264,8 @@ public:
 private:
 	const CUnit **enemy;
 	//Wyrmgus start
+	Vec2i *result_enemy_wall_pos;
+	int *result_enemy_wall_map_layer;
 	const bool IncludeNeutral;
 	const bool allow_water;
 	std::vector<const CUnitType *> CheckedTypes;
@@ -783,20 +804,22 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		//Wyrmgus end
 		/* Search in entire map */
 		const CUnit *enemy = NULL;
+		Vec2i enemy_wall_pos(-1, -1);
+		int enemy_wall_map_layer = -1;
 		if (isTransporter) {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy);
-			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy, include_neutral, false);
+			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, false);
 			//Wyrmgus end
 		} else if (isNaval) {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy);
-			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy, include_neutral, false);
+			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, false);
 			//Wyrmgus end
 		} else {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy);
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy, include_neutral, true);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, true);
 			//Wyrmgus end
 		}
 		if (enemy) {
@@ -811,6 +834,16 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			}
 			//Wyrmgus end
 		//Wyrmgus start
+		} else if (Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
+			goalPos = enemy_wall_pos;
+			z = enemy_wall_map_layer;
+			int enemy_wall_owner = Map.Field(enemy_wall_pos, enemy_wall_map_layer)->Owner;
+			if (!AiPlayer->Player->IsEnemy(Players[enemy_wall_owner]) && Players[enemy_wall_owner].Type != PlayerNeutral) {
+				AiPlayer->Player->SetDiplomacyEnemyWith(Players[enemy_wall_owner]);
+				if (AiPlayer->Player->IsSharedVision(Players[enemy_wall_owner])) {
+					CommandSharedVision(AiPlayer->Player->Index, false, Players[enemy_wall_owner].Index);
+				}
+			}
 		} else {
 			AiPlayer->Scouting = true;			
 			return;
@@ -1558,15 +1591,18 @@ void AiForce::Update()
 			const CUnit *unit = NULL;
 
 			//Wyrmgus start
+			Vec2i enemy_wall_pos(-1, -1);
+			int enemy_wall_map_layer = -1;
+			
 //			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, include_neutral, true);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, true);
 			//Wyrmgus end
 			if (!unit) {
 				//Wyrmgus start
 //				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
-				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, include_neutral, true);
+				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, true);
 				//Wyrmgus end
-				if (!unit) {
+				if (!unit && !Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 					//Wyrmgus start
 					/*
 					// No enemy found, give up
@@ -1586,16 +1622,26 @@ void AiForce::Update()
 					return;
 				}
 			}
-			this->GoalPos = unit->tilePos;
-			//Wyrmgus start
-			this->GoalMapLayer = unit->MapLayer;
-			if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
-				AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
-				if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
-					CommandSharedVision(AiPlayer->Player->Index, false, unit->Player->Index);
+			if (unit) {
+				this->GoalPos = unit->tilePos;
+				this->GoalMapLayer = unit->MapLayer;
+				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
+					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
+					if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
+						CommandSharedVision(AiPlayer->Player->Index, false, unit->Player->Index);
+					}
+				}
+			} else if (Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
+				this->GoalPos = enemy_wall_pos;
+				this->GoalMapLayer = enemy_wall_map_layer;
+				int enemy_wall_owner = Map.Field(enemy_wall_pos, enemy_wall_map_layer)->Owner;
+				if (!AiPlayer->Player->IsEnemy(Players[enemy_wall_owner]) && Players[enemy_wall_owner].Type != PlayerNeutral) {
+					AiPlayer->Player->SetDiplomacyEnemyWith(Players[enemy_wall_owner]);
+					if (AiPlayer->Player->IsSharedVision(Players[enemy_wall_owner])) {
+						CommandSharedVision(AiPlayer->Player->Index, false, Players[enemy_wall_owner].Index);
+					}
 				}
 			}
-			//Wyrmgus end
 			
 			State = AiForceAttackingState_Attacking;
 			for (size_t i = 0; i != this->Size(); ++i) {
@@ -1650,6 +1696,8 @@ void AiForce::Update()
 
 	if (State == AiForceAttackingState_Attacking && idleUnits.size() == this->Size()) {
 		const CUnit *unit = NULL;
+		Vec2i enemy_wall_pos(-1, -1);
+		int enemy_wall_map_layer = -1;
 
 		bool isNaval = false;
 		for (size_t i = 0; i != this->Units.size(); ++i) {
@@ -1665,15 +1713,15 @@ void AiForce::Update()
 		if (isNaval) {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
-			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, include_neutral, false);
+			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, false);
 			//Wyrmgus end
 		} else {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, include_neutral, true);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, &enemy_wall_pos, &enemy_wall_map_layer, include_neutral, true);
 			//Wyrmgus end
 		}
-		if (!unit) {
+		if (!unit && !Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
 			//Wyrmgus start
 			/*
 			// No enemy found, give up
@@ -1693,23 +1741,34 @@ void AiForce::Update()
 			return;
 		} else {
 			Vec2i resultPos;
-			//Wyrmgus start
-//			NewRallyPoint(unit->tilePos, &resultPos);
-			NewRallyPoint(unit->tilePos, &resultPos, unit->MapLayer);
-			if (resultPos.x == 0 && resultPos.y == 0) {
-				resultPos = unit->tilePos;
-			}
-			//Wyrmgus end
-			this->GoalPos = resultPos;
-			//Wyrmgus start
-			this->GoalMapLayer = unit->MapLayer;
-			if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
-				AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
-				if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
-					CommandSharedVision(AiPlayer->Player->Index, false, unit->Player->Index);
+			if (unit) {
+				NewRallyPoint(unit->tilePos, &resultPos, unit->MapLayer);
+				if (resultPos.x == 0 && resultPos.y == 0) {
+					resultPos = unit->tilePos;
+				}
+				this->GoalPos = resultPos;
+				this->GoalMapLayer = unit->MapLayer;
+				if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
+					AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
+					if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
+						CommandSharedVision(AiPlayer->Player->Index, false, unit->Player->Index);
+					}
+				}
+			} else if (Map.Info.IsPointOnMap(enemy_wall_pos, enemy_wall_map_layer)) {
+				NewRallyPoint(enemy_wall_pos, &resultPos, enemy_wall_map_layer);
+				if (resultPos.x == 0 && resultPos.y == 0) {
+					resultPos = enemy_wall_pos;
+				}
+				this->GoalPos = resultPos;
+				this->GoalMapLayer = enemy_wall_map_layer;
+				int enemy_wall_owner = Map.Field(enemy_wall_pos, enemy_wall_map_layer)->Owner;
+				if (!AiPlayer->Player->IsEnemy(Players[enemy_wall_owner]) && Players[enemy_wall_owner].Type != PlayerNeutral) {
+					AiPlayer->Player->SetDiplomacyEnemyWith(Players[enemy_wall_owner]);
+					if (AiPlayer->Player->IsSharedVision(Players[enemy_wall_owner])) {
+						CommandSharedVision(AiPlayer->Player->Index, false, Players[enemy_wall_owner].Index);
+					}
 				}
 			}
-			//Wyrmgus end
 			this->State = AiForceAttackingState_GoingToRallyPoint;
 		}
 	}
@@ -1791,9 +1850,11 @@ void AiForceManager::Update()
 					//Wyrmgus end
 						//  Look if still enemies in attack range.
 						const CUnit *dummy = NULL;
+						Vec2i dummy_wall_pos(-1, -1);
+						int dummy_wall_map_layer = -1;
 						//Wyrmgus start
 //						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
-						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy, false, false).found()) {
+						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy, &dummy_wall_pos, &dummy_wall_map_layer, false, false).found()) {
 						//Wyrmgus end
 							force.ReturnToHome();
 						}

@@ -1739,7 +1739,7 @@ bool CPlayer::HasSettlement(CSettlement *settlement) const
 	return false;
 }
 
-bool CPlayer::HasUnitBuilder(CUnitType *type) const
+bool CPlayer::HasUnitBuilder(CUnitType *type, CSettlement *settlement) const
 {
 	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
 		for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
@@ -1757,7 +1757,16 @@ bool CPlayer::HasUnitBuilder(CUnitType *type) const
 	if (type->Slot < (int) AiHelpers.Upgrade.size()) {
 		for (size_t j = 0; j < AiHelpers.Upgrade[type->Slot].size(); ++j) {
 			if (this->UnitTypesCount[AiHelpers.Upgrade[type->Slot][j]->Slot] > 0) {
-				return true;
+				if (!settlement) {
+					return true;
+				} else {
+					for (int i = 0; i < this->GetUnitCount(); ++i) {
+						CUnit &unit = this->GetUnit(i);
+						if (unit.Type == AiHelpers.Upgrade[type->Slot][j] && unit.Settlement == settlement) {
+							return true;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -2531,12 +2540,13 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 	}
 
 	for (size_t i = 0; i < quest->BuildSettlementUnits.size(); ++i) {
-		if (!this->HasSettlement(std::get<0>(quest->BuildSettlementUnits[i]))) {
+		CSettlement *settlement = std::get<0>(quest->BuildSettlementUnits[i]);
+		if (!this->HasSettlement(settlement)) {
 			return false;
 		}
 		
 		CUnitType *type = std::get<1>(quest->BuildSettlementUnits[i]);
-		if (!this->HasUnitBuilder(type) || !CheckDependByType(*this, *type)) {
+		if (!this->HasUnitBuilder(type, settlement) || !CheckDependByType(*this, *type)) {
 			return false;
 		}
 	}
@@ -2669,13 +2679,14 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 	
 	for (size_t i = 0; i < this->QuestBuildSettlementUnits.size(); ++i) {
 		if (std::get<0>(this->QuestBuildSettlementUnits[i]) == quest) {
-			if (!this->HasSettlement(std::get<1>(this->QuestBuildSettlementUnits[i]))) {
+			CSettlement *settlement = std::get<1>(this->QuestBuildSettlementUnits[i]);
+			if (!this->HasSettlement(settlement)) {
 				return "You no longer hold the required settlement.";
 			}
 
 			if (std::get<3>(this->QuestBuildSettlementUnits[i]) > 0) {
 				CUnitType *type = std::get<2>(this->QuestBuildSettlementUnits[i]);
-				if (!this->HasUnitBuilder(type) || !CheckDependByType(*this, *type)) {
+				if (!this->HasUnitBuilder(type, settlement) || !CheckDependByType(*this, *type)) {
 					return "You can no longer produce the required unit.";
 				}
 			}

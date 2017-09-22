@@ -2533,10 +2533,11 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				// FIXME: support more races
 				//Wyrmgus start
 //				if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
-				if (!type.BoolFlag[WALL_INDEX].value) {
 				//Wyrmgus end
 					player.TotalBuildings++;
-				}
+				//Wyrmgus start
+//				}
+				//Wyrmgus end
 			} else {
 				player.TotalUnits++;
 				
@@ -2591,7 +2592,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		// FIXME: support more races
 		//Wyrmgus start
 //		if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
-		if (!type.BoolFlag[WALL_INDEX].value) {
 		//Wyrmgus end
 			player.NumBuildings++;
 			//Wyrmgus start
@@ -2599,7 +2599,9 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				player.NumBuildingsUnderConstruction++;
 			}
 			//Wyrmgus end
-		}
+		//Wyrmgus start
+//		}
+		//Wyrmgus end
 	}
 	Player = &player;
 	Stats = &type.Stats[Player->Index];
@@ -3736,7 +3738,6 @@ void UnitLost(CUnit &unit)
 			// FIXME: support more races
 			//Wyrmgus start
 //			if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
-			if (!type.BoolFlag[WALL_INDEX].value) {
 			//Wyrmgus end
 				player.NumBuildings--;
 				//Wyrmgus start
@@ -3744,7 +3745,9 @@ void UnitLost(CUnit &unit)
 					player.NumBuildingsUnderConstruction--;
 				}
 				//Wyrmgus end
-			}
+			//Wyrmgus start
+//			}
+			//Wyrmgus end
 		}
 		if (unit.CurrentAction() != UnitActionBuilt) {
 			player.UnitTypesCount[type.Slot]--;
@@ -4409,9 +4412,13 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//  Now the new side!
 
 	if (Type->Building) {
-		if (!Type->BoolFlag[WALL_INDEX].value) {
+		//Wyrmgus start
+//		if (!Type->BoolFlag[WALL_INDEX].value) {
+		//Wyrmgus end
 			newplayer.TotalBuildings++;
-		}
+		//Wyrmgus start
+//		}
+		//Wyrmgus end
 	} else {
 		newplayer.TotalUnits++;
 	}
@@ -4437,7 +4444,10 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 			newplayer.MaxResources[i] += Type->Stats[newplayer.Index].Storing[i];
 		}
 	}
-	if (Type->Building && !Type->BoolFlag[WALL_INDEX].value) {
+	//Wyrmgus start
+//	if (Type->Building && !Type->BoolFlag[WALL_INDEX].value) {
+	if (Type->Building) {
+	//Wyrmgus end
 		newplayer.NumBuildings++;
 	}
 	//Wyrmgus start

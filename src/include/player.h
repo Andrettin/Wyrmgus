@@ -233,7 +233,7 @@ public:
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(std::string upgrade_class_name);
 	bool HasSettlement(CSettlement *settlement) const;
-	bool HasUnitBuilder(CUnitType *type) const;
+	bool HasUnitBuilder(CUnitType *type, CSettlement *settlement = NULL) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(int title_type, int gender) const;
