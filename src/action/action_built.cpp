@@ -44,6 +44,9 @@
 #include "player.h"
 #include "script.h"
 #include "sound.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "translate.h"
 #include "unit.h"
 //Wyrmgus start
@@ -361,6 +364,9 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus end
 		//Wyrmgus start
 //		Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
+		if (type.TerrainType->Overlay && Map.GetTileTerrain(unit.tilePos, type.TerrainType->Overlay, unit.MapLayer) == type.TerrainType) { //if a destroyed wall of the same type is present here, remove it first so that the new wall can be properly placed
+			Map.RemoveTileOverlayTerrain(unit.tilePos, unit.MapLayer);
+		}
 		Map.SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer);
 		//Wyrmgus end
 		unit.Remove(NULL);
