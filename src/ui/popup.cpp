@@ -190,6 +190,10 @@
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
 	button.SetTriggerData();
+	int resource = button.Value;
+	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		TriggerData.Resource = &resource;
+	}
 	std::string text = EvalString(this->Text);
 	button.CleanTriggerData();
 	//Wyrmgus end
@@ -226,6 +230,10 @@
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
 	button.SetTriggerData();
+	int resource = button.Value;
+	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		TriggerData.Resource = &resource;
+	}
 	std::string text = EvalString(this->Text);
 	button.CleanTriggerData();
 	//Wyrmgus end
@@ -245,6 +253,10 @@
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
 	button.SetTriggerData();
+	int resource = button.Value;
+	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		TriggerData.Resource = &resource;
+	}
 	std::string text = EvalString(this->Text);
 	button.CleanTriggerData();
 	//Wyrmgus end
@@ -454,6 +466,10 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	//Wyrmgus start
 //	TriggerData.Type = UnitTypes[button.Value];
 	button.SetTriggerData();
+	int resource = button.Value;
+	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		TriggerData.Resource = &resource;
+	}
 	//Wyrmgus end
 	std::string text = EvalString(this->Text);
 	//Wyrmgus start
@@ -482,6 +498,10 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		//Wyrmgus start
 //		TriggerData.Type = UnitTypes[button.Value];
 		button.SetTriggerData();
+		int resource = button.Value;
+		if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+			TriggerData.Resource = &resource;
+		}
 		//Wyrmgus end
 		text = EvalString(this->Text);
 		//Wyrmgus start

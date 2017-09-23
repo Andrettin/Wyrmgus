@@ -137,10 +137,6 @@ void ButtonAction::SetTriggerData() const
 			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
 		}
 	}
-	int resource = this->Value;
-	if (this->Action == ButtonProduceResource || this->Action == ButtonSellResource || this->Action == ButtonBuyResource) {
-		TriggerData.Resource = &resource;
-	}
 }
 
 void ButtonAction::CleanTriggerData() const
