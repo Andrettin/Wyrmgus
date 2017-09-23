@@ -188,6 +188,27 @@ static int CclStratagusMap(lua_State *l)
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
+				} else if (!strcmp(value, "landmasses")) {
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument for \"landmasses\"");
+					}
+					const int subsubargs = lua_rawlen(l, -1);
+					Map.Landmasses = subsubargs;
+					Map.BorderLandmasses.resize(Map.Landmasses + 1);
+					for (int z = 0; z < subsubargs; ++z) {
+						int landmass = z + 1;
+						if (!lua_istable(l, -1)) {
+							LuaError(l, "incorrect argument for \"landmasses\"");
+						}
+						lua_rawgeti(l, -1, z + 1);
+						const int subsubsubargs = lua_rawlen(l, -1);
+						for (int n = 0; n < subsubsubargs; ++n) {
+							Map.BorderLandmasses[landmass].push_back(LuaToNumber(l, -1, n + 1));
+						}
+						lua_pop(l, 1);
+					}
+					lua_pop(l, 1);
 				//Wyrmgus end
 				} else if (!strcmp(value, "map-fields")) {
 					//Wyrmgus start

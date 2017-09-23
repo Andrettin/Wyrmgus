@@ -2152,6 +2152,15 @@ void CMap::Save(CFile &file) const
 		file.printf("  {\"%s\", \"%s\", %d},\n", this->Planes[z] ? this->Planes[z]->Ident.c_str() : "", this->Worlds[z] ? this->Worlds[z]->Ident.c_str() : "", this->SurfaceLayers[z]);
 	}
 	file.printf("  },\n");
+	file.printf("  \"landmasses\", {\n");
+	for (int i = 1; i <= this->Landmasses; ++i) {
+		file.printf("  {");
+		for (size_t j = 0; j < this->BorderLandmasses[i].size(); ++j) {
+			file.printf("%d, ", this->BorderLandmasses[i][j]);
+		}
+		file.printf("},\n");
+	}
+	file.printf("  },\n");
 	//Wyrmgus end
 
 	file.printf("  \"map-fields\", {\n");
