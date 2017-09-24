@@ -2385,7 +2385,11 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-						
+					
+					if (terrain->Overlay && adjacent_mf.OverlayTerrain != terrain && Editor.Running == EditorNotRunning) {
+						continue;
+					}
+					
 					this->CalculateTileTransitions(adjacent_pos, false, z);
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
@@ -2445,7 +2449,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-						
+					
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -2519,7 +2523,11 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-						
+					
+					if (adjacent_mf.OverlayTerrain != mf.OverlayTerrain) {
+						continue;
+					}
+					
 					this->CalculateTileTransitions(adjacent_pos, true, z);
 					
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
