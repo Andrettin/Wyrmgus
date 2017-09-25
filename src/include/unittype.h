@@ -10,7 +10,7 @@
 //
 /**@name unittype.h - The unit-types headerfile. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2017 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1294,6 +1294,8 @@ extern int GetUnitTypeClassIndexByName(const std::string &class_name);
 extern void SetUnitTypeClassStringToIndex(std::string class_name, int class_id);
 extern int GetUpgradeClassIndexByName(const std::string &class_name);
 extern void SetUpgradeClassStringToIndex(std::string class_name, int class_id);
+
+extern std::string GetUnitTypeStatsString(std::string unit_type_ident);
 
 extern CSpecies *GetSpecies(std::string species_ident);
 extern CSpeciesGenus *GetSpeciesGenus(std::string genus_ident);

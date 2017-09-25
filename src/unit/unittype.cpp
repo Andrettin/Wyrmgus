@@ -10,7 +10,7 @@
 //
 /**@name unittype.cpp - The unit types. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2017 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -2041,6 +2041,57 @@ VariationInfo::~VariationInfo()
 			CGraphic::Free(this->SpriteWhenEmpty[res]);
 		}
 	}
+}
+
+std::string GetUnitTypeStatsString(std::string unit_type_ident)
+{
+	const CUnitType *unit_type = UnitTypeByIdent(unit_type_ident);
+
+	if (unit_type) {
+		std::string unit_type_stats_string;
+
+		bool first_var = true;
+		for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
+			if (
+				!(var == BASICDAMAGE_INDEX || var == PIERCINGDAMAGE_INDEX || var == THORNSDAMAGE_INDEX
+				|| var == FIREDAMAGE_INDEX || var == COLDDAMAGE_INDEX || var == ARCANEDAMAGE_INDEX || var == LIGHTNINGDAMAGE_INDEX
+				|| var == AIRDAMAGE_INDEX || var == EARTHDAMAGE_INDEX || var == WATERDAMAGE_INDEX
+				|| var == ARMOR_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX
+				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX
+				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
+				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == BACKSTAB_INDEX
+				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX || var == HP_INDEX || var == MANA_INDEX || var == OWNERSHIPINFLUENCERANGE_INDEX || var == LEADERSHIPAURA_INDEX || var == REGENERATIONAURA_INDEX || var == HYDRATINGAURA_INDEX || var == ETHEREALVISION_INDEX || var == SPEEDBONUS_INDEX || var == SUPPLY_INDEX || var == TIMEEFFICIENCYBONUS_INDEX)
+			) {
+				continue;
+			}
+
+			if (unit_type->DefaultStat.Variables[var].Enable) {
+				if (!first_var) {
+					unit_type_stats_string += ", ";
+				} else {
+					first_var = false;
+				}
+
+				if (IsBooleanVariable(var) && unit_type->DefaultStat.Variables[var].Value < 0) {
+					unit_type_stats_string += "Lose ";
+				}
+
+				if (!IsBooleanVariable(var)) {
+					unit_type_stats_string += std::to_string((long long) unit_type->DefaultStat.Variables[var].Value);
+					if (IsPercentageVariable(var)) {
+						unit_type_stats_string += "%";
+					}
+					unit_type_stats_string += " ";
+				}
+
+				unit_type_stats_string += GetVariableDisplayName(var);
+			}
+		}
+			
+		return unit_type_stats_string;
+	}
+	
+	return "";
 }
 
 CSpecies *GetSpecies(std::string species_ident)

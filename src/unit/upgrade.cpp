@@ -2746,7 +2746,8 @@ std::string GetVariableDisplayName(int var, bool increase)
 	variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
 	variable_name = FindAndReplaceString(variable_name, "DaySightBonus", "Day Sight");
 	variable_name = FindAndReplaceString(variable_name, "NightSightBonus", "Night Sight");
-	variable_name = FindAndReplaceString(variable_name, "GiveResource", "ResourcesHeld");
+	variable_name = FindAndReplaceString(variable_name, "Supply", "FoodSupply");
+	variable_name = FindAndReplaceString(variable_name, "Demand", "FoodCost");
 	variable_name = SeparateCapitalizedStringElements(variable_name);
 	variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
 	variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");

@@ -22,3 +22,4 @@ CUnitType *UnitTypeByIdent(const std::string ident);
 
 void SetModStat(std::string mod_file, std::string ident, std::string variable_key, int value, std::string variable_type);
 void SetModSound(std::string mod_file, std::string ident, std::string sound, std::string sound_type, std::string sound_subtype = "");
+extern std::string GetUnitTypeStatsString(std::string unit_type_ident);
