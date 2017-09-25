@@ -1661,34 +1661,16 @@ void CPlayer::SetRandomFaction()
 	// set random one from the civilization's factions
 	std::vector<CFaction *> local_factions;
 	
-	// first search for valid factions in the current faction's "develops to" list, and only if that fails search in all factions of the civilization
-	if (this->Faction != -1) {
-		for (size_t i = 0; i < PlayerRaces.Factions[this->Faction]->DevelopsTo.size(); ++i) {
-			CFaction *faction = PlayerRaces.Factions[this->Faction]->DevelopsTo[i];
-			if (faction) {
-				if (
-					this->CanFoundFaction(faction)
-					&& ((faction->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((faction->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
-					&& faction->Playable
-				) {
-					local_factions.push_back(faction);
-				}
-			}
+	for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
+		if (PlayerRaces.Factions[i]->Civilization != this->Race) {
+			continue;
 		}
-	}
-	
-	if (local_factions.size() == 0) {
-		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
-			if (PlayerRaces.Factions[i]->Civilization != this->Race) {
-				continue;
-			}
-			if (
-				this->CanFoundFaction(PlayerRaces.Factions[i])
-				&& ((PlayerRaces.Factions[i]->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[i]->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
-				&& PlayerRaces.Factions[i]->Playable
-			) {
-				local_factions.push_back(PlayerRaces.Factions[i]);
-			}
+		if (
+			this->CanFoundFaction(PlayerRaces.Factions[i])
+			&& ((PlayerRaces.Factions[i]->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[i]->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
+			&& PlayerRaces.Factions[i]->Playable
+		) {
+			local_factions.push_back(PlayerRaces.Factions[i]);
 		}
 	}
 	
