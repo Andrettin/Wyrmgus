@@ -468,7 +468,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (button.Action == ButtonFaction && button.Value != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CurrentCampaign != NULL && button.Action == ButtonFaction && button.Value != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
 		}
 	}
