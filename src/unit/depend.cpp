@@ -163,6 +163,7 @@ static void AddDependency(const std::string &target, const std::string &required
 		temp->Kind.UnitType = UnitTypeByIdent(required);
 		//Wyrmgus start
 		if (!temp->Kind.UnitType) {
+			fprintf(stderr, "Unit type \"%s\" was set as a dependency for \"%s\", but it doesn't exist.\n", required.c_str(), target.c_str());
 			fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", required.c_str());
 		}
 		//Wyrmgus end
@@ -172,7 +173,7 @@ static void AddDependency(const std::string &target, const std::string &required
 		temp->Kind.Upgrade = CUpgrade::Get(required);
 		//Wyrmgus start
 		if (!temp->Kind.Upgrade) {
-			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", required.c_str());
+			fprintf(stderr, "Upgrade \"%s\" was set as a dependency for \"%s\", but it doesn't exist.\n", required.c_str(), target.c_str());
 		}
 		//Wyrmgus end
 	} else {
