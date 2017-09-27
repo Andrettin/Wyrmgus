@@ -470,6 +470,10 @@ public:
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain, int z);
 	bool IsPointInASubtemplateArea(const Vec2i &pos, int z) const;
 	bool IsLayerUnderground(int z) const;
+	
+	void SetCurrentPlane(CPlane *plane);
+	void SetCurrentWorld(CWorld *world);
+	void SetCurrentSurfaceLayer(int surface_layer);
 	CPlane *GetCurrentPlane() const;
 	CWorld *GetCurrentWorld() const;
 	int GetCurrentSurfaceLayer() const;

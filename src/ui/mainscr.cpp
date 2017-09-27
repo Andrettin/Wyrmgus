@@ -887,14 +887,35 @@ void DrawDayTime() {
 */
 void DrawMapLayerButtons()
 {
+	for (size_t i = 0; i < UI.PlaneButtons.size(); ++i) {
+		if (UI.PlaneButtons[i].X != -1) {
+			DrawUIButton(UI.PlaneButtons[i].Style,
+				(ButtonAreaUnderCursor == ButtonAreaMapLayerPlane && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
+				| ((UI.PlaneButtons[i].Clicked || Map.GetCurrentPlane() == Planes[i]) ? MI_FLAGS_CLICKED : 0),
+				UI.PlaneButtons[i].X, UI.PlaneButtons[i].Y,
+				UI.PlaneButtons[i].Text
+			);
+		}
+	}
+
 	for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
 		if (UI.WorldButtons[i].X != -1) {
 			DrawUIButton(UI.WorldButtons[i].Style,
-				(ButtonAreaUnderCursor == ButtonAreaMenu
-				&& ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
-				((UI.WorldButtons[i].Clicked || Map.GetCurrentWorld() == Worlds[i]) ? MI_FLAGS_CLICKED : 0),
+				(ButtonAreaUnderCursor == ButtonAreaMapLayerWorld && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
+				| ((UI.WorldButtons[i].Clicked || Map.GetCurrentWorld() == Worlds[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.WorldButtons[i].X, UI.WorldButtons[i].Y,
 				UI.WorldButtons[i].Text
+			);
+		}
+	}
+
+	for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
+		if (UI.SurfaceLayerButtons[i].X != -1) {
+			DrawUIButton(UI.SurfaceLayerButtons[i].Style,
+				(ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
+				| ((UI.SurfaceLayerButtons[i].Clicked || Map.GetCurrentSurfaceLayer() == i) ? MI_FLAGS_CLICKED : 0),
+				UI.SurfaceLayerButtons[i].X, UI.SurfaceLayerButtons[i].Y,
+				UI.SurfaceLayerButtons[i].Text
 			);
 		}
 	}

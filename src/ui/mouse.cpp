@@ -60,6 +60,9 @@
 #include "missile.h"
 #include "network.h"
 #include "player.h"
+//Wyrmgus start
+#include "province.h"
+//Wyrmgus end
 #include "sound.h"
 #include "spells.h"
 //Wyrmgus start
@@ -1047,6 +1050,42 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 	}
+	for (size_t i = 0; i < UI.PlaneButtons.size(); ++i) {
+		const CUIButton &button = UI.PlaneButtons[i];
+
+		if (button.X != -1) {
+			if (button.Contains(screenPos)) {
+				ButtonAreaUnderCursor = ButtonAreaMapLayerPlane;
+				ButtonUnderCursor = i;
+				CursorOn = CursorOnButton;
+				return;
+			}
+		}
+	}
+	for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
+		const CUIButton &button = UI.WorldButtons[i];
+
+		if (button.X != -1) {
+			if (button.Contains(screenPos)) {
+				ButtonAreaUnderCursor = ButtonAreaMapLayerWorld;
+				ButtonUnderCursor = i;
+				CursorOn = CursorOnButton;
+				return;
+			}
+		}
+	}
+	for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
+		const CUIButton &button = UI.SurfaceLayerButtons[i];
+
+		if (button.X != -1) {
+			if (button.Contains(screenPos)) {
+				ButtonAreaUnderCursor = ButtonAreaMapLayerSurfaceLayer;
+				ButtonUnderCursor = i;
+				CursorOn = CursorOnButton;
+				return;
+			}
+		}
+	}
 	for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
 		const CUIUserButton &button = UI.UserButtons[i];
 
@@ -1335,6 +1374,27 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	//Wyrmgus end
 		return;
 	} else {
+		for (size_t i = 0; i < UI.PlaneButtons.size(); ++i) {
+			const CUIButton &button = UI.PlaneButtons[i];
+
+			if (button.Clicked) {
+				return;
+			}
+		}
+		for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
+			const CUIButton &button = UI.WorldButtons[i];
+
+			if (button.Clicked) {
+				return;
+			}
+		}
+		for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
+			const CUIButton &button = UI.SurfaceLayerButtons[i];
+
+			if (button.Clicked) {
+				return;
+			}
+		}
 		for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
 			const CUIUserButton &button = UI.UserButtons[i];
 
@@ -2413,7 +2473,34 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				UI.NetworkDiplomacyButton.Clicked = true;
 				//Wyrmgus end
 			}
-			//  clicked on user buttons
+		} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
+			for (size_t i = 0; i < UI.PlaneButtons.size(); ++i) {
+				CUIButton &button = UI.PlaneButtons[i];
+
+				if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
+					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					button.Clicked = true;
+				}
+			}
+		} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
+			for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
+				CUIButton &button = UI.WorldButtons[i];
+
+				if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
+					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					button.Clicked = true;
+				}
+			}
+		} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
+			for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
+				CUIButton &button = UI.SurfaceLayerButtons[i];
+
+				if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
+					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					button.Clicked = true;
+				}
+			}
+		//  clicked on user buttons
 		} else if (ButtonAreaUnderCursor == ButtonAreaUser) {
 			for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
 				CUIUserButton &button = UI.UserButtons[i];
@@ -2858,6 +2945,60 @@ void UIHandleButtonUp(unsigned button)
 				return;
 			}
 		}
+		
+		//
+		//  Plane buttons
+		//
+		for (size_t i = 0; i < UI.PlaneButtons.size(); ++i) {
+			CUIButton &button = UI.PlaneButtons[i];
+
+			if (button.Clicked) {
+				button.Clicked = false;
+				if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
+					Map.SetCurrentPlane(Planes[i]);
+					if (button.Callback) {
+						button.Callback->action("");
+					}
+					return;
+				}
+			}
+		}
+
+		//
+		//  World buttons
+		//
+		for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
+			CUIButton &button = UI.WorldButtons[i];
+
+			if (button.Clicked) {
+				button.Clicked = false;
+				if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
+					Map.SetCurrentWorld(Worlds[i]);
+					if (button.Callback) {
+						button.Callback->action("");
+					}
+					return;
+				}
+			}
+		}
+
+		//
+		//  Surface layer buttons
+		//
+		for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
+			CUIButton &button = UI.SurfaceLayerButtons[i];
+
+			if (button.Clicked) {
+				button.Clicked = false;
+				if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
+					Map.SetCurrentSurfaceLayer(i);
+					if (button.Callback) {
+						button.Callback->action("");
+					}
+					return;
+				}
+			}
+		}
 
 		//
 		//  User buttons
@@ -2875,6 +3016,7 @@ void UIHandleButtonUp(unsigned button)
 				}
 			}
 		}
+		
 		//Wyrmgus start
 //		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && ThisPlayer->IsTeamed(*Selected[0])) {
 		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {

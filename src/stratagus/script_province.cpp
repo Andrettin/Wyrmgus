@@ -119,6 +119,9 @@ static int CclDefinePlane(lua_State *l)
 		plane->Ident = plane_ident;
 		plane->ID = Planes.size();
 		Planes.push_back(plane);
+		UI.PlaneButtons.resize(Planes.size());
+		UI.PlaneButtons[plane->ID].X = -1;
+		UI.PlaneButtons[plane->ID].Y = -1;
 	}
 	
 	//  Parse the list:

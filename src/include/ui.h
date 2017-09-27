@@ -492,7 +492,9 @@ public:
 	CUIButton NetworkDiplomacyButton;   /// network diplomacy button
 	
 	//Wyrmgus start
+	std::vector<CUIButton> PlaneButtons;	/// Button info for plane map layer buttons
 	std::vector<CUIButton> WorldButtons;	/// Button info for world map layer buttons
+	std::vector<CUIButton> SurfaceLayerButtons;	/// Button info for surface layer map layer buttons
 	//Wyrmgus end
 
 	// Used defined buttons

@@ -1793,6 +1793,72 @@ bool CMap::IsLayerUnderground(int z) const
 	return false;
 }
 
+void CMap::SetCurrentPlane(CPlane *plane)
+{
+	int map_layer = -1;
+	
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		if (Map.Planes[z] == plane && Map.SurfaceLayers[z] == this->GetCurrentSurfaceLayer()) {
+			map_layer = z;
+			break;
+		}
+	}
+	
+	if (map_layer == -1) {
+		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+			if (Map.Planes[z] == plane) {
+				map_layer = z;
+				break;
+			}
+		}
+	}
+	
+	if (map_layer != -1) {
+		ChangeCurrentMapLayer(map_layer);
+	}
+}
+
+void CMap::SetCurrentWorld(CWorld *world)
+{
+	int map_layer = -1;
+	
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		if (Map.Worlds[z] == world && Map.SurfaceLayers[z] == this->GetCurrentSurfaceLayer()) {
+			map_layer = z;
+			break;
+		}
+	}
+	
+	if (map_layer == -1) {
+		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+			if (Map.Worlds[z] == world) {
+				map_layer = z;
+				break;
+			}
+		}
+	}
+	
+	if (map_layer != -1) {
+		ChangeCurrentMapLayer(map_layer);
+	}
+}
+
+void CMap::SetCurrentSurfaceLayer(int surface_layer)
+{
+	int map_layer = -1;
+	
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		if (Map.Planes[z] == this->GetCurrentPlane() && Map.Worlds[z] == this->GetCurrentWorld() && Map.SurfaceLayers[z] == surface_layer) {
+			map_layer = z;
+			break;
+		}
+	}
+	
+	if (map_layer != -1) {
+		ChangeCurrentMapLayer(map_layer);
+	}
+}
+
 CPlane *CMap::GetCurrentPlane() const
 {
 	if (CurrentMapLayer < Map.Planes.size()) {
