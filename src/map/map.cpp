@@ -1792,6 +1792,33 @@ bool CMap::IsLayerUnderground(int z) const
 
 	return false;
 }
+
+CPlane *CMap::GetCurrentPlane() const
+{
+	if (CurrentMapLayer < Map.Planes.size()) {
+		return Map.Planes[CurrentMapLayer];
+	} else {
+		return NULL;
+	}
+}
+
+CWorld *CMap::GetCurrentWorld() const
+{
+	if (CurrentMapLayer < Map.Worlds.size()) {
+		return Map.Worlds[CurrentMapLayer];
+	} else {
+		return NULL;
+	}
+}
+
+int CMap::GetCurrentSurfaceLayer() const
+{
+	if (CurrentMapLayer < Map.SurfaceLayers.size()) {
+		return Map.SurfaceLayers[CurrentMapLayer];
+	} else {
+		return 0;
+	}
+}
 //Wyrmgus end
 
 /**

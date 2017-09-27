@@ -47,6 +47,9 @@
 #include "menus.h"
 #include "network.h"
 #include "player.h"
+//Wyrmgus start
+#include "province.h"
+//Wyrmgus end
 #include "sound.h"
 #include "spells.h"
 #include "translate.h"
@@ -873,6 +876,28 @@ void DrawDayTime() {
 
 	// TODO: Instead of a simple text here we could use an icon per time of day
 	label.Draw(UI.TimePanel.X, UI.TimePanel.Y, _(timesText[Map.TimeOfDay[CurrentMapLayer]]));
+}
+
+/*----------------------------------------------------------------------------
+--  Map Layer Buttons
+----------------------------------------------------------------------------*/
+
+/**
+**  Draw the map layer buttons.
+*/
+void DrawMapLayerButtons()
+{
+	for (size_t i = 0; i < UI.WorldButtons.size(); ++i) {
+		if (UI.WorldButtons[i].X != -1) {
+			DrawUIButton(UI.WorldButtons[i].Style,
+				(ButtonAreaUnderCursor == ButtonAreaMenu
+				&& ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
+				((UI.WorldButtons[i].Clicked || Map.GetCurrentWorld() == Worlds[i]) ? MI_FLAGS_CLICKED : 0),
+				UI.WorldButtons[i].X, UI.WorldButtons[i].Y,
+				UI.WorldButtons[i].Text
+			);
+		}
+	}
 }
 
 //Wyrmgus start

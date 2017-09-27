@@ -424,6 +424,8 @@ extern void DrawMessages();
 extern void DrawResources();
 /// Draw the time of day
 extern void DrawDayTime();
+/// Draw the map layer buttons
+extern void DrawMapLayerButtons();
 //Wyrmgus start
 /// Draw certain popups if something is being hovered over
 extern void DrawPopups();

@@ -201,6 +201,10 @@ class CUserInterface
 //	CUIButton NetworkMenuButton;
 	//Wyrmgus end
 	CUIButton NetworkDiplomacyButton;
+	
+	//Wyrmgus start
+	vector<CUIButton> WorldButtons;
+	//Wyrmgus end
 
 	vector<CUIUserButton> UserButtons;
 

@@ -246,6 +246,7 @@ void UpdateDisplay()
 			UI.InfoPanel.Draw();
 			DrawResources();
 			DrawDayTime();
+			DrawMapLayerButtons();
 			UI.StatusLine.Draw();
 			UI.StatusLine.DrawCosts();
 			UI.ButtonPanel.Draw();

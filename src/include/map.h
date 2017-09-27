@@ -470,6 +470,9 @@ public:
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain, int z);
 	bool IsPointInASubtemplateArea(const Vec2i &pos, int z) const;
 	bool IsLayerUnderground(int z) const;
+	CPlane *GetCurrentPlane() const;
+	CWorld *GetCurrentWorld() const;
+	int GetCurrentSurfaceLayer() const;
 	//Wyrmgus end
 
 	//UnitCache
