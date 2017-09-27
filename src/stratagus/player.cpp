@@ -2662,12 +2662,12 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 	for (size_t i = 0; i < this->QuestBuildSettlementUnits.size(); ++i) {
 		if (std::get<0>(this->QuestBuildSettlementUnits[i]) == quest) {
 			CSettlement *settlement = std::get<1>(this->QuestBuildSettlementUnits[i]);
-			if (!this->HasSettlement(settlement)) {
+			CUnitType *type = std::get<2>(this->QuestBuildSettlementUnits[i]);
+			if (!this->HasSettlement(settlement) && !type->BoolFlag[TOWNHALL_INDEX].value) {
 				return "You no longer hold the required settlement.";
 			}
 
 			if (std::get<3>(this->QuestBuildSettlementUnits[i]) > 0) {
-				CUnitType *type = std::get<2>(this->QuestBuildSettlementUnits[i]);
 				if (!this->HasUnitBuilder(type, settlement) || !CheckDependByType(*this, *type)) {
 					return "You can no longer produce the required unit.";
 				}
