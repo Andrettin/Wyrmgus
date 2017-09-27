@@ -43,6 +43,9 @@
 #include "map.h"
 #include "player.h"
 //Wyrmgus start
+#include "province.h"
+//Wyrmgus end
+//Wyrmgus start
 #include "tileset.h"
 //Wyrmgus end
 #include "unit.h"
@@ -1355,18 +1358,31 @@ void CMinimap::DrawViewportArea(const CViewport &viewport) const
 void CMinimap::AddEvent(const Vec2i &pos, int z, Uint32 color)
 //Wyrmgus end
 {
-	//Wyrmgus start
-	if (z != CurrentMapLayer) {
-		return;
-	}
-	//Wyrmgus end
 	if (NumMinimapEvents == MAX_MINIMAP_EVENTS) {
 		return;
 	}
-	MinimapEvents[NumMinimapEvents].pos = TilePosToScreenPos(pos);
-	MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
-	MinimapEvents[NumMinimapEvents].Color = color;
-	++NumMinimapEvents;
+	if (z == CurrentMapLayer) {
+		MinimapEvents[NumMinimapEvents].pos = TilePosToScreenPos(pos);
+		MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
+		MinimapEvents[NumMinimapEvents].Color = color;
+		++NumMinimapEvents;
+	} else {
+		if (Map.Planes[z] != NULL && Map.GetCurrentPlane() != Map.Planes[z] && UI.PlaneButtons[Map.Planes[z]->ID].X != -1) {
+			MinimapEvents[NumMinimapEvents].pos.x = UI.PlaneButtons[Map.Planes[z]->ID].X + (UI.PlaneButtons[Map.Planes[z]->ID].Style->Width / 2);
+			MinimapEvents[NumMinimapEvents].pos.y = UI.PlaneButtons[Map.Planes[z]->ID].Y + (UI.PlaneButtons[Map.Planes[z]->ID].Style->Height / 2);
+		} else if (Map.Worlds[z] != NULL && Map.GetCurrentWorld() != Map.Worlds[z] && UI.WorldButtons[Map.Worlds[z]->ID].X != -1) {
+			MinimapEvents[NumMinimapEvents].pos.x = UI.WorldButtons[Map.Worlds[z]->ID].X + (UI.WorldButtons[Map.Worlds[z]->ID].Style->Width / 2);
+			MinimapEvents[NumMinimapEvents].pos.y = UI.WorldButtons[Map.Worlds[z]->ID].Y + (UI.WorldButtons[Map.Worlds[z]->ID].Style->Height / 2);
+		} else if (Map.GetCurrentSurfaceLayer() != Map.SurfaceLayers[z] && UI.SurfaceLayerButtons[Map.SurfaceLayers[z]].X != -1) {
+			MinimapEvents[NumMinimapEvents].pos.x = UI.SurfaceLayerButtons[Map.SurfaceLayers[z]].X + (UI.SurfaceLayerButtons[Map.SurfaceLayers[z]].Style->Width / 2);
+			MinimapEvents[NumMinimapEvents].pos.y = UI.SurfaceLayerButtons[Map.SurfaceLayers[z]].Y + (UI.SurfaceLayerButtons[Map.SurfaceLayers[z]].Style->Height / 2);
+		} else {
+			return;
+		}
+		MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
+		MinimapEvents[NumMinimapEvents].Color = color;
+		++NumMinimapEvents;
+	}
 }
 
 bool CMinimap::Contains(const PixelPos &screenPos) const

@@ -1861,7 +1861,7 @@ void CMap::SetCurrentSurfaceLayer(int surface_layer)
 
 CPlane *CMap::GetCurrentPlane() const
 {
-	if (CurrentMapLayer < Map.Planes.size()) {
+	if (CurrentMapLayer < (int) Map.Planes.size()) {
 		return Map.Planes[CurrentMapLayer];
 	} else {
 		return NULL;
@@ -1870,7 +1870,7 @@ CPlane *CMap::GetCurrentPlane() const
 
 CWorld *CMap::GetCurrentWorld() const
 {
-	if (CurrentMapLayer < Map.Worlds.size()) {
+	if (CurrentMapLayer < (int) Map.Worlds.size()) {
 		return Map.Worlds[CurrentMapLayer];
 	} else {
 		return NULL;
@@ -1879,7 +1879,7 @@ CWorld *CMap::GetCurrentWorld() const
 
 int CMap::GetCurrentSurfaceLayer() const
 {
-	if (CurrentMapLayer < Map.SurfaceLayers.size()) {
+	if (CurrentMapLayer < (int) Map.SurfaceLayers.size()) {
 		return Map.SurfaceLayers[CurrentMapLayer];
 	} else {
 		return 0;
