@@ -1120,6 +1120,20 @@ void DrawPopups()
 	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].IconX + UI.Resources[ScoreCost].G->Width) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
 		DrawGenericPopup("Score", UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY);
 	}
+	
+	if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
+		DrawGenericPopup(Planes[ButtonUnderCursor]->Name, UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);
+	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
+		DrawGenericPopup(Worlds[ButtonUnderCursor]->Name, UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
+	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
+		std::string surface_layer_string;
+		if (ButtonUnderCursor == 0) {
+			surface_layer_string = "Surface";
+		} else {
+			surface_layer_string = "Underground Layer " + std::to_string((long long) ButtonUnderCursor);
+		}
+		DrawGenericPopup(surface_layer_string, UI.SurfaceLayerButtons[ButtonUnderCursor].X, UI.SurfaceLayerButtons[ButtonUnderCursor].Y);
+	}
 }
 //Wyrmgus end
 
