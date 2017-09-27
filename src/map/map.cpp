@@ -2089,6 +2089,7 @@ void ChangeCurrentMapLayer(int z)
 	CurrentMapLayer = z;
 	UI.Minimap.UpdateCache = true;
 	UI.SelectedViewport->Set(new_viewport_map_pos, PixelTileSize / 2);
+	UpdateSurfaceLayerButtons();
 }
 
 void SetTimeOfDay(int time_of_day, int z)

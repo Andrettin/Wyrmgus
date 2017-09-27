@@ -1633,6 +1633,9 @@ static int CclDefineMapTemplate(lua_State *l)
 			if (map_template->SurfaceLayer > 0) {
 				map_template->TimeOfDaySeconds = 0; // no time of day for underground maps
 			}
+			if (map_template->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
+				UI.SurfaceLayerButtons.resize(map_template->SurfaceLayer + 1);
+			}
 		} else if (!strcmp(value, "TerrainFile")) {
 			map_template->TerrainFile = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainFile")) {

@@ -1842,11 +1842,7 @@ void CalculateWorldMapTileGraphicTile(int x, int y)
 		std::string base_tile_filename;
 		if (WorldMapTerrainTypes[terrain]->BaseTile != -1) {
 			CWorld *world = GetWorld(GrandStrategyWorld);
-			if (world && world->BaseTerrain) {
-				base_tile_filename = "tilesets/world/terrain/" + world->BaseTerrain->Tag;
-			} else {
-				base_tile_filename = "tilesets/world/terrain/plains";
-			}
+			base_tile_filename = "tilesets/world/terrain/plains";
 		}
 		
 		if (WorldMapTerrainTypes[terrain]->HasTransitions) {

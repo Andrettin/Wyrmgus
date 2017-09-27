@@ -580,6 +580,7 @@ extern void SaveUserInterface(CFile &file);
 extern void CleanUserInterface();
 //Wyrmgus start
 void CleanUserInterfaceFillers();
+extern void UpdateSurfaceLayerButtons();
 //Wyrmgus end
 
 extern void FreeButtonStyles();

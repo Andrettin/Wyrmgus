@@ -465,6 +465,26 @@ void CleanUserInterfaceFillers()
 	}
 	UI.Fillers.clear();
 }
+
+void UpdateSurfaceLayerButtons()
+{
+	unsigned int last_surface_layer = 0;
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		if (Map.Planes[CurrentMapLayer] == Map.Planes[z] && Map.Worlds[CurrentMapLayer] == Map.Worlds[z] && Map.SurfaceLayers[z] > (int) last_surface_layer) {
+			last_surface_layer = Map.SurfaceLayers[z];
+		}
+	}
+	
+	for (size_t i = 0; i < UI.SurfaceLayerButtons.size(); ++i) {
+		if (i <= last_surface_layer && last_surface_layer > 0) {
+			UI.SurfaceLayerButtons[i].X = -2;
+			UI.SurfaceLayerButtons[i].Y = Video.Height - 157 + (19  * i);
+		} else {
+			UI.SurfaceLayerButtons[i].X = -1;
+			UI.SurfaceLayerButtons[i].Y = -1;
+		}
+	}
+}
 //Wyrmgus end
 
 void FreeButtonStyles()
