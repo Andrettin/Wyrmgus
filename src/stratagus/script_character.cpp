@@ -87,6 +87,7 @@ static int CclDefineCharacter(lua_State *l)
 	}
 	
 	std::string faction_ident;
+	std::vector<std::string> alternate_names;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -94,6 +95,11 @@ static int CclDefineCharacter(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			character->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "AlternateNames")) { // alternate names the character may have, used for building the civilization's personal names
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				alternate_names.push_back(LuaToString(l, -1, j + 1));
+			}
 		} else if (!strcmp(value, "ExtraName")) {
 			character->ExtraName = LuaToString(l, -1);
 		} else if (!strcmp(value, "FamilyName")) {
@@ -531,8 +537,14 @@ static int CclDefineCharacter(lua_State *l)
 	if (!redefinition) {
 		if (character->Type->BoolFlag[FAUNA_INDEX].value) {
 			character->Type->PersonalNames[character->Gender].push_back(character->Name);
+			for (size_t i = 0; i < alternate_names.size(); ++i) {
+				character->Type->PersonalNames[character->Gender].push_back(alternate_names[i]);
+			}
 		} else if (character->Civilization != -1) {
 			PlayerRaces.Civilizations[character->Civilization]->PersonalNames[character->Gender].push_back(character->Name);
+			for (size_t i = 0; i < alternate_names.size(); ++i) {
+				PlayerRaces.Civilizations[character->Civilization]->PersonalNames[character->Gender].push_back(alternate_names[i]);
+			}
 		}
 	}
 	
