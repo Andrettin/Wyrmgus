@@ -83,7 +83,6 @@ public:
 	}
 
 	void SetResourceProspected(int resource_id, bool discovered);
-	void SetPort(bool has_port);
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
 	
@@ -407,12 +406,8 @@ extern std::string GetDiplomacyStateNameById(int diplomacy_state);
 extern int GetDiplomacyStateIdByName(std::string diplomacy_state);
 extern std::string GetFactionTierNameById(int faction_tier);
 extern int GetFactionTierIdByName(std::string faction_tier);
-extern int GetWorldMapWidth();
-extern int GetWorldMapHeight();
-extern std::string GetWorldMapTileTerrain(int x, int y);
 extern int GetWorldMapTileTerrainVariation(int x, int y);
 extern std::string GetWorldMapTileProvinceName(int x, int y);
-extern bool WorldMapTileHasResource(int x, int y, std::string resource_name, bool ignore_prospection);
 extern int GetProvinceId(std::string province_name);
 extern void SetWorldMapSize(int width, int height);
 extern void SetWorldMapTileTerrain(int x, int y, int terrain);
@@ -424,8 +419,6 @@ extern void SetWorldMapTileCulturalResourceName(int x, int y, std::string resour
 extern void SetWorldMapTileFactionCulturalResourceName(int x, int y, std::string resource_name, std::string civilization_name, std::string faction_name, std::string cultural_name);
 extern void SetWorldMapTileCulturalSettlementName(int x, int y, std::string civilization_name, std::string cultural_name);
 extern void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::string civilization_name, std::string faction_name, std::string cultural_name);
-extern void SetWorldMapTilePort(int x, int y, bool has_port);
-extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);
 extern std::string GetProvinceAttackedBy(std::string province_name);
@@ -454,7 +447,6 @@ extern void FinalizeGrandStrategyInitialization();
 extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
 extern void CalculateProvinceBorders();
-extern void CenterGrandStrategyMapOnTile(int x, int y);
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
@@ -490,7 +482,6 @@ extern int GetFactionResource(std::string civilization_name, std::string faction
 extern bool IsGrandStrategyUnit(const CUnitType &type);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern bool IsOffensiveMilitaryUnit(const CUnitType &type);
-extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
 extern void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern void ChangeFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name);

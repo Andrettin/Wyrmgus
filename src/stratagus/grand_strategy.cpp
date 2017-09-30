@@ -151,14 +151,6 @@ void CGrandStrategyGame::DoTurn()
 {
 	for (size_t i = 0; i < this->Provinces.size(); ++i) {
 		if (this->Provinces[i]->Civilization != -1) { // if this province has a culture
-			// if the province has a town hall, a barracks and a smithy, give it a mercenary camp; not for Earth for now, since there are no recruitable mercenaries for Earth yet
-			int mercenary_camp_id = UnitTypeIdByIdent("unit-mercenary-camp");
-			if (mercenary_camp_id != -1 && this->Provinces[i]->SettlementBuildings[mercenary_camp_id] == false && GrandStrategyWorld != "Earth") {
-				if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->HasBuildingClass("barracks") && this->Provinces[i]->HasBuildingClass("smithy")) {
-					this->Provinces[i]->SetSettlementBuilding(mercenary_camp_id, true);
-				}
-			}
-				
 			if (this->Provinces[i]->Owner != NULL) {
 				if (!this->Provinces[i]->HasFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction) && SyncRand(100) < 1) { // 1% chance the owner of this province will get a claim on it
 					this->Provinces[i]->AddFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction);
@@ -335,26 +327,6 @@ void GrandStrategyWorldMapTile::SetResourceProspected(int resource_id, bool disc
 	}
 }
 
-void GrandStrategyWorldMapTile::SetPort(bool has_port)
-{
-	if (this->Port == has_port) {
-		return;
-	}
-	
-	this->Port = has_port;
-	
-	//if the tile is the same as the province's settlement location, create a dock for the province's settlement, if its civilization has one
-	if (this->Province != NULL && this->Province->SettlementLocation == this->Position && this->Province->HasBuildingClass("dock") == false) {
-		int civilization = this->Province->Civilization;
-		if (civilization != -1) {
-			int building_type = this->Province->GetClassUnitType(GetUnitTypeClassIndexByName("dock"));
-			if (building_type != -1) {
-				this->Province->SetSettlementBuilding(building_type, has_port);
-			}
-		}
-	}
-}
-
 bool GrandStrategyWorldMapTile::IsWater()
 {
 	if (this->Terrain != -1) {
@@ -479,11 +451,6 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	
 	if (UnitTypes[building_id]->Class != -1 && UnitTypeClasses[UnitTypes[building_id]->Class] == "stronghold") { //increase the military score of the province, if this building is a stronghold
 		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
-	} else if (UnitTypes[building_id]->Class != -1 && UnitTypeClasses[UnitTypes[building_id]->Class] == "dock") {
-		//place a port in the province's settlement location, if the building is a dock
-		if (!GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port) {
-			GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->SetPort(has_settlement_building);
-		}
 	}
 }
 
@@ -1532,40 +1499,6 @@ bool CGrandStrategyEvent::CanTrigger(CGrandStrategyFaction *faction)
 }
 
 /**
-**  Get the width of the world map.
-*/
-int GetWorldMapWidth()
-{
-	return GrandStrategyGame.WorldMapWidth;
-}
-
-/**
-**  Get the height of the world map.
-*/
-int GetWorldMapHeight()
-{
-	return GrandStrategyGame.WorldMapHeight;
-}
-
-/**
-**  Get the terrain type of a world map tile.
-*/
-std::string GetWorldMapTileTerrain(int x, int y)
-{
-	
-	clamp(&x, 0, GrandStrategyGame.WorldMapWidth - 1);
-	clamp(&y, 0, GrandStrategyGame.WorldMapHeight - 1);
-
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain == -1) {
-		return "";
-	}
-	
-	return WorldMapTerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
-}
-
-/**
 **  Get the terrain variation of a world map tile.
 */
 int GetWorldMapTileTerrainVariation(int x, int y)
@@ -1590,26 +1523,6 @@ std::string GetWorldMapTileProvinceName(int x, int y)
 	} else {
 		return "";
 	}
-}
-
-bool WorldMapTileHasResource(int x, int y, std::string resource_name, bool ignore_prospection)
-{
-	clamp(&x, 0, GrandStrategyGame.WorldMapWidth - 1);
-	clamp(&y, 0, GrandStrategyGame.WorldMapHeight - 1);
-
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	if (resource_name == "any") {
-		return GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1 && (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected || ignore_prospection);
-	}
-	
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource == -1) {
-		return false;
-	}
-	
-	return GrandStrategyGame.WorldMapTiles[x][y]->HasResource(resource, ignore_prospection);
 }
 
 /**
@@ -1812,238 +1725,6 @@ void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::string civi
 			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 			if (faction != -1) {
 				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames[PlayerRaces.Factions[faction]].push_back(TransliterateText(cultural_name));
-			}
-		}
-	}
-}
-
-void SetWorldMapTilePort(int x, int y, bool has_port)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	GrandStrategyGame.WorldMapTiles[x][y]->SetPort(has_port);
-}
-
-/**
-**  Calculate the graphic tile for a world map tile.
-*/
-void CalculateWorldMapTileGraphicTile(int x, int y)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1);
-	
-	int terrain = GrandStrategyGame.WorldMapTiles[x][y]->Terrain;
-	
-	if (terrain != -1 && WorldMapTerrainTypes[terrain]) {
-		//set the GraphicTile for this world map tile
-		std::string graphic_tile = "tilesets/world/terrain/";
-		graphic_tile += WorldMapTerrainTypes[terrain]->Tag;
-		
-		std::string base_tile_filename;
-		if (WorldMapTerrainTypes[terrain]->BaseTile != -1) {
-			CWorld *world = GetWorld(GrandStrategyWorld);
-			base_tile_filename = "tilesets/world/terrain/plains";
-		}
-		
-		if (WorldMapTerrainTypes[terrain]->HasTransitions) {
-			graphic_tile += "/";
-			graphic_tile += WorldMapTerrainTypes[terrain]->Tag;
-			
-			if (
-				GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_north";
-			}
-			if (
-				GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_south";
-			}
-			if (
-				GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_west";
-			}
-			if (
-				GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_east";
-			}
-			if (
-				GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_northwest_outer";
-			}
-			if (
-				GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_northeast_outer";
-			}
-			if (
-				GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_southwest_outer";
-			}
-			if (
-				GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_southeast_outer";
-			}
-			if (
-				GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_northwest_inner";
-			}
-			if (
-				GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_northeast_inner";
-			}
-			if (
-				GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_southwest_inner";
-			}
-			if (
-				GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_southeast_inner";
-			}
-			if (
-				GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y)
-			) {
-				graphic_tile += "_inner";
-			}
-			if (
-				/*
-				GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y)
-				&& GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y)
-				*/
-				graphic_tile.find("north", 0) == std::string::npos
-				&& graphic_tile.find("south", 0) == std::string::npos
-				&& graphic_tile.find("west", 0) == std::string::npos
-				&& graphic_tile.find("east", 0) == std::string::npos
-				&& graphic_tile.find("inner", 0) == std::string::npos
-			) {
-				graphic_tile += "_outer";
-			}
-			graphic_tile = FindAndReplaceString(graphic_tile, "_northwest_outer_northeast_outer_southwest_outer_southeast_outer", "_outer");
-			graphic_tile = FindAndReplaceString(graphic_tile, "_northwest_outer_northeast_outer_southwest_outer", "_outer");
-			graphic_tile = FindAndReplaceString(graphic_tile, "_northwest_outer_northeast_outer_southeast_outer", "_outer");
-			graphic_tile = FindAndReplaceString(graphic_tile, "_northeast_outer_southwest_outer_southeast_outer", "_outer");
-			graphic_tile = FindAndReplaceString(graphic_tile, "_northeast_outer_southwest_outer_southeast_outer", "_outer");
-		}
-		
-		if (GrandStrategyGame.WorldMapTiles[x][y]->Variation != -1) {
-			graphic_tile += "_";
-			graphic_tile += std::to_string((long long) GrandStrategyGame.WorldMapTiles[x][y]->Variation + 1);
-		}
-		
-		if (WorldMapTerrainTypes[terrain]->BaseTile != -1 && GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation != -1) {
-			base_tile_filename += "_";
-			base_tile_filename += std::to_string((long long) GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation + 1);
-		}
-			
-		graphic_tile += ".png";
-		if (WorldMapTerrainTypes[terrain]->BaseTile != -1) {
-			base_tile_filename += ".png";
-		}
-		
-		if (!CanAccessFile(graphic_tile.c_str()) && GrandStrategyGame.WorldMapTiles[x][y]->Variation != -1) {
-			for (int i = GrandStrategyGame.WorldMapTiles[x][y]->Variation; i > -1; --i) {
-				if (i >= 1) {
-					graphic_tile = FindAndReplaceString(graphic_tile, std::to_string((long long) i + 1), std::to_string((long long) i));
-				} else {
-					graphic_tile = FindAndReplaceString(graphic_tile, "_1", "");
-				}
-				
-				if (CanAccessFile(graphic_tile.c_str())) {
-					break;
-				}
-			}
-		}
-		if (WorldMapTerrainTypes[terrain]->BaseTile != -1) {
-			if (!CanAccessFile(base_tile_filename.c_str()) && GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation != -1) {
-				for (int i = GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation; i > -1; --i) {
-					if (i >= 1) {
-						base_tile_filename = FindAndReplaceString(base_tile_filename, std::to_string((long long) i + 1), std::to_string((long long) i));
-					} else {
-						base_tile_filename = FindAndReplaceString(base_tile_filename, "_1", "");
-					}
-					
-					if (CanAccessFile(base_tile_filename.c_str())) {
-						break;
-					}
-				}
-			}
-		}
-		
-		if (CGraphic::Get(graphic_tile) == NULL) {
-			CGraphic *tile_graphic = CGraphic::New(graphic_tile, 64, 64);
-			tile_graphic->Load();
-		}
-		GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile = CGraphic::Get(graphic_tile);
-		
-		if (WorldMapTerrainTypes[terrain]->BaseTile != -1) {
-			if (CGraphic::Get(base_tile_filename) == NULL) {
-				CGraphic *base_tile_graphic = CGraphic::New(base_tile_filename, 64, 64);
-				base_tile_graphic->Load();
-			}
-			GrandStrategyGame.WorldMapTiles[x][y]->BaseTile = CGraphic::Get(base_tile_filename);
-		}
-		
-		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
-			std::string resource_building_filename = "tilesets/world/sites/resource_building_";
-			resource_building_filename += DefaultResourceNames[GrandStrategyGame.WorldMapTiles[x][y]->Resource];
-			
-			std::string resource_building_player_color_filename = resource_building_filename + "_player_color.png";
-			resource_building_filename += ".png";
-			
-			if (CGraphic::Get(resource_building_filename) == NULL) {
-				CGraphic *resource_building_graphics = CGraphic::New(resource_building_filename, 64, 64);
-				resource_building_graphics->Load();
-			}
-			GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphics = CGraphic::Get(resource_building_filename);
-			
-			if (CanAccessFile(resource_building_player_color_filename.c_str())) {
-				if (CPlayerColorGraphic::Get(resource_building_player_color_filename) == NULL) {
-					CPlayerColorGraphic *resource_building_graphics_player_color = CPlayerColorGraphic::New(resource_building_player_color_filename, 64, 64);
-					resource_building_graphics_player_color->Load();
-				}
-				GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor = CPlayerColorGraphic::Get(resource_building_player_color_filename);
 			}
 		}
 	}
@@ -2511,10 +2192,6 @@ void FinalizeGrandStrategyInitialization()
 					}
 				}
 			}
-			
-			if (province->Coastal && province->Tiles.size() == 1) { //if the province is a 1-tile island, it has to start with a port in its capital to feed itself
-				GrandStrategyGame.WorldMapTiles[province->SettlementLocation.x][province->SettlementLocation.y]->SetPort(true);
-			}
 		}
 		
 		if (province->Civilization != -1 && province->Owner != NULL) {
@@ -2587,23 +2264,6 @@ void CalculateProvinceBorders()
 				}
 			}
 		}
-	}
-}
-
-void CenterGrandStrategyMapOnTile(int x, int y)
-{
-	WorldMapOffsetX = x - (((UI.MapArea.EndX - UI.MapArea.X) / 64) / 2);
-	if (WorldMapOffsetX < 0) {
-		WorldMapOffsetX = 0;
-	} else if (WorldMapOffsetX > GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64)) {
-		WorldMapOffsetX = GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64);
-	}
-
-	WorldMapOffsetY = y - (((UI.MapArea.EndY - UI.MapArea.Y) / 64) / 2);
-	if (WorldMapOffsetY < 0) {
-		WorldMapOffsetY = 0;
-	} else if (WorldMapOffsetY > GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64)) {
-		WorldMapOffsetY = GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64);
 	}
 }
 
@@ -3055,60 +2715,6 @@ bool IsOffensiveMilitaryUnit(const CUnitType &type)
 		return true;
 	}
 	return false;
-}
-
-void CreateProvinceUnits(std::string province_name, int player, int divisor, bool attacking_units, bool ignore_militia)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id == -1) {
-		return;
-	}
-	
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		int units_to_be_created = 0;
-		if (IsMilitaryUnit(*UnitTypes[i]) && UnitTypes[i]->Class != -1 && UnitTypeClasses[UnitTypes[i]->Class] != "militia") {
-			if (!attacking_units) {
-				units_to_be_created = GrandStrategyGame.Provinces[province_id]->Units[i] / divisor;
-				GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(i, - units_to_be_created);
-			} else {
-				units_to_be_created = GrandStrategyGame.Provinces[province_id]->GetAttackingUnitQuantity(i) / divisor;
-				GrandStrategyGame.Provinces[province_id]->ChangeAttackingUnitQuantity(i, - units_to_be_created);
-			}
-		} else if (!attacking_units && UnitTypes[i]->Class != -1 && UnitTypeClasses[UnitTypes[i]->Class] == "worker" && !ignore_militia && UnitTypes[i]->Civilization != -1) { // create militia in the province depending on the amount of workers
-			
-			int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(UnitTypes[i]->Civilization, GetUnitTypeClassIndexByName("militia"));
-			
-			if (militia_unit_type != -1) {
-				units_to_be_created = GrandStrategyGame.Provinces[province_id]->Units[militia_unit_type] / 2 / divisor; //half of the worker population as militia
-			}
-		}
-		
-		if (units_to_be_created > 0) {
-			units_to_be_created *= BattalionMultiplier;
-			for (int j = 0; j < units_to_be_created; ++j) {
-				CUnit *unit = MakeUnit(*UnitTypes[i], &Players[player]);
-				if (unit == NULL) {
-					DebugPrint("Unable to allocate unit");
-					return;
-				} else {
-					if (UnitCanBeAt(*unit, Players[player].StartPos, Players[player].StartMapLayer)) {
-						unit->Place(Players[player].StartPos, Players[player].StartMapLayer);
-					} else {
-						const int heading = SyncRand() % 256;
-
-						unit->tilePos = Players[player].StartPos;
-						unit->MapLayer = Players[player].StartMapLayer;
-						DropOutOnSide(*unit, heading, NULL);
-					}
-					UpdateForNewUnit(*unit, 0);
-					
-					unit->Starting = 1;
-					unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
-				}
-			}
-		}
-	}
 }
 
 void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity)
