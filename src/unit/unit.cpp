@@ -6433,6 +6433,14 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 		}
 	}
 	
+	if (target.Character) {
+		for (size_t i = 0; i < attacker.Player->QuestDestroyCharacters.size(); ++i) {
+			if (std::get<1>(attacker.Player->QuestDestroyCharacters[i]) == target.Character) {
+				std::get<2>(attacker.Player->QuestDestroyCharacters[i]) = true;
+			}
+		}
+	}
+
 	if (target.Unique) {
 		for (size_t i = 0; i < attacker.Player->QuestDestroyUniques.size(); ++i) {
 			if (std::get<1>(attacker.Player->QuestDestroyUniques[i]) == target.Unique) {

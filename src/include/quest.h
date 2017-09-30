@@ -114,6 +114,7 @@ public:
 	std::vector<std::tuple<CSettlement *, CUnitType *, int>> BuildSettlementUnits;	/// Build settlement units objective vector, containing settlement, unit type and quantity
 	std::vector<CUpgrade *> ResearchUpgrades;
 	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
+	std::vector<CCharacter *> DestroyCharacters;
 	std::vector<CUniqueItem *> DestroyUniques;
 	std::vector<CFaction *> DestroyFactions;	/// Destroy factions objective vector
 	std::vector<std::tuple<int, int>> GatherResources;	/// Gather resources objective vector, containing resource ID and quantity

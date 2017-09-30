@@ -257,6 +257,16 @@ static int CclDefineQuest(lua_State *l)
 				
 				quest->DestroyUnits.push_back(std::tuple<CUnitType *, CFaction *, int>(unit_type, faction, quantity));
 			}
+		} else if (!strcmp(value, "DestroyCharacters")) {
+			quest->DestroyCharacters.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				CCharacter *character = GetCharacter(LuaToString(l, -1, j + 1));
+				if (!character) {
+					LuaError(l, "Character doesn't exist.");
+				}
+				quest->DestroyCharacters.push_back(character);
+			}
 		} else if (!strcmp(value, "DestroyUniques")) {
 			quest->DestroyUniques.clear();
 			const int args = lua_rawlen(l, -1);
