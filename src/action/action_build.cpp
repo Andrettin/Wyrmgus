@@ -318,6 +318,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type)
 					  //Wyrmgus end
 		isOk = false;
 	}
+	
 	if (isOk == false && player.AiEnabled) {
 		AiCanNotBuild(unit, type);
 	}

@@ -667,6 +667,10 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 		}
 		return NULL;
 	}
+	
+	if (unit && z != unit->Player->StartMapLayer && (Map.Planes[z] != Map.Planes[unit->Player->StartMapLayer] || Map.Worlds[z] != Map.Worlds[unit->Player->StartMapLayer])) {
+		return NULL;
+	}
 
 	return (unit == NULL) ? (CUnit *)1 : const_cast<CUnit *>(unit);
 }
