@@ -346,6 +346,23 @@ static void AiCheckUnits()
 		if (potential_factions.size() > 0) {
 			AiPlayer->Player->SetFaction(potential_factions[SyncRand(potential_factions.size())]);
 		}
+		
+		if (!AiPlayer->Player->Dynasty) { //if the AI player has no dynasty, pick one if available
+			std::vector<CDynasty *> potential_dynasties;
+			for (size_t i = 0; i < PlayerRaces.Factions[AiPlayer->Player->Faction]->Dynasties.size(); ++i) {
+				CDynasty *possible_dynasty = PlayerRaces.Factions[AiPlayer->Player->Faction]->Dynasties[i];
+				
+				if (!AiPlayer->Player->CanChooseDynasty(possible_dynasty)) {
+					continue;
+				}
+					
+				potential_dynasties.push_back(possible_dynasty);
+			}
+			
+			if (potential_dynasties.size() > 0) {
+				AiPlayer->Player->SetDynasty(potential_dynasties[SyncRand(potential_dynasties.size())]);
+			}
+		}
 	}
 	
 	//check if any deities can be chosen, and if so, pick one randomly

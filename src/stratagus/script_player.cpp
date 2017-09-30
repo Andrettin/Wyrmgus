@@ -151,6 +151,8 @@ void CPlayer::Load(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
 			this->Faction = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "dynasty")) {
+			this->Dynasty = PlayerRaces.GetDynasty(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "color")) {
 			int color_id = LuaToNumber(l, j + 1);
 			this->Color = PlayerColors[color_id][0];
@@ -2194,6 +2196,73 @@ static int CclDefineFaction(lua_State *l)
 }
 
 /**
+**  Define a dynasty.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineDynasty(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string dynasty_ident = LuaToString(l, 1);
+	
+	CDynasty *dynasty = PlayerRaces.GetDynasty(dynasty_ident);
+	if (!dynasty) { // new definition
+		dynasty = new CDynasty;
+		dynasty->Ident = dynasty_ident;
+		dynasty->ID = PlayerRaces.Dynasties.size();
+		PlayerRaces.Dynasties.push_back(dynasty);
+		DynastyStringToIndex[dynasty->Ident] = dynasty->ID;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Civilization")) {
+			dynasty->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "Name")) {
+			dynasty->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			dynasty->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			dynasty->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			dynasty->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Icon")) {
+			dynasty->Icon.Name = LuaToString(l, -1);
+			dynasty->Icon.Icon = NULL;
+			dynasty->Icon.Load();
+			dynasty->Icon.Icon->Load();
+		} else if (!strcmp(value, "Factions")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1, k + 1));
+				if (!faction) {
+					LuaError(l, "Faction doesn't exist.");
+				}
+				dynasty->Factions.push_back(faction);
+				faction->Dynasties.push_back(dynasty);
+			}
+		} else if (!strcmp(value, "DynastyUpgrade")) {
+			dynasty->DynastyUpgrade = CUpgrade::Get(LuaToString(l, -1));
+		} else if (!strcmp(value, "Conditions")) {
+			dynasty->Conditions = new LuaCallback(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a religion.
 **
 **  @param l  Lua state.
@@ -2679,6 +2748,41 @@ static int CclGetFactions(lua_State *l)
 }
 
 /**
+**  Get the dynasties.
+**
+**  @param l  Lua state.
+*/
+static int CclGetDynasties(lua_State *l)
+{
+	int civilization = -1;
+	if (lua_gettop(l) >= 1) {
+		civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	}
+	
+	std::vector<std::string> dynasties;
+	if (civilization != -1) {
+		for (size_t i = 0; i < PlayerRaces.Dynasties.size(); ++i) {
+			if (PlayerRaces.Dynasties[i]->Civilization == civilization) {
+				dynasties.push_back(PlayerRaces.Dynasties[i]->Ident);
+			}
+		}
+	} else {
+		for (size_t i = 0; i < PlayerRaces.Dynasties.size(); ++i) {
+			dynasties.push_back(PlayerRaces.Dynasties[i]->Ident);
+		}
+	}
+		
+	lua_createtable(l, dynasties.size(), 0);
+	for (size_t i = 1; i <= dynasties.size(); ++i)
+	{
+		lua_pushstring(l, dynasties[i-1].c_str());
+		lua_rawseti(l, -2, i);
+	}
+	
+	return 1;
+}
+
+/**
 **  Get the player colors.
 **
 **  @param l  Lua state.
@@ -2763,6 +2867,63 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "DefaultAI")) {
 		lua_pushstring(l, faction->DefaultAI.c_str());
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
+**  Get dynasty data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetDynastyData(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	std::string dynasty_ident = LuaToString(l, 1);
+	CDynasty *dynasty = PlayerRaces.GetDynasty(dynasty_ident);
+	if (dynasty == NULL) {
+		LuaError(l, "Dynasty \"%s\" doesn't exist." _C_ dynasty_ident.c_str());
+	}
+	
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, dynasty->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, dynasty->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, dynasty->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, dynasty->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Civilization")) {
+		if (dynasty->Civilization != -1) {
+			lua_pushstring(l, PlayerRaces.Name[dynasty->Civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "DynastyUpgrade")) {
+		if (dynasty->DynastyUpgrade) {
+			lua_pushstring(l, dynasty->DynastyUpgrade->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Factions")) {
+		lua_createtable(l, dynasty->Factions.size(), 0);
+		for (size_t i = 1; i <= dynasty->Factions.size(); ++i)
+		{
+			lua_pushstring(l, dynasty->Factions[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -2957,6 +3118,13 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "Faction")) {
 		if (p->Race != -1 && p->Faction != -1) {
 			lua_pushstring(l, PlayerRaces.Factions[p->Faction]->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Dynasty")) {
+		if (p->Dynasty) {
+			lua_pushstring(l, p->Dynasty->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3293,6 +3461,9 @@ static int CclSetPlayerData(lua_State *l)
 		} else {
 			p->SetFaction(PlayerRaces.GetFaction(faction_name));
 		}
+	} else if (!strcmp(data, "Dynasty")) {
+		std::string dynasty_ident = LuaToString(l, 3);
+		p->SetDynasty(PlayerRaces.GetDynasty(dynasty_ident));
 	//Wyrmgus end
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 4);
@@ -3817,14 +3988,17 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);
 	lua_register(Lua, "GetFactionClassUnitType", CclGetFactionClassUnitType);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
+	lua_register(Lua, "DefineDynasty", CclDefineDynasty);
 	lua_register(Lua, "DefineReligion", CclDefineReligion);
 	lua_register(Lua, "DefineDeityDomain", CclDefineDeityDomain);
 	lua_register(Lua, "DefineDeity", CclDefineDeity);
 	lua_register(Lua, "DefineLanguage", CclDefineLanguage);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
 	lua_register(Lua, "GetFactions", CclGetFactions);
+	lua_register(Lua, "GetDynasties", CclGetDynasties);
 	lua_register(Lua, "GetPlayerColors", CclGetPlayerColors);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);
+	lua_register(Lua, "GetDynastyData", CclGetDynastyData);
 	//Wyrmgus end
 	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
 	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);

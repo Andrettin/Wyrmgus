@@ -119,6 +119,7 @@ public:
 	//Wyrmgus start
 	int Faction;		/// faction of the player
 	CReligion *Religion;	/// religion of the player
+	CDynasty *Dynasty;		/// ruling dynasty of the player
 	//Wyrmgus end
 	std::string AiName; /// AI for computer
 
@@ -230,11 +231,13 @@ public:
 	void SetCivilization(int civilization);
 	void SetFaction(CFaction *faction);
 	void SetRandomFaction();
+	void SetDynasty(CDynasty *dynasty);
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(std::string upgrade_class_name);
 	bool HasSettlement(CSettlement *settlement) const;
 	bool HasUnitBuilder(CUnitType *type, CSettlement *settlement = NULL) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
+	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(int title_type, int gender) const;
 	//Wyrmgus end
@@ -605,6 +608,7 @@ public:
 	std::vector<int> Colors;											/// faction colors
 	std::vector<CFaction *> DevelopsFrom;								/// from which factions can this faction develop
 	std::vector<CFaction *> DevelopsTo;									/// to which factions this faction can develop
+	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
@@ -624,6 +628,30 @@ public:
 	std::vector<CFiller> UIFillers;
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
+};
+
+class CDynasty
+{
+public:
+	CDynasty() : 
+		ID(-1), Civilization(-1),
+		DynastyUpgrade(NULL), Conditions(NULL)
+	{
+	}
+	
+	~CDynasty();
+	
+	std::string Ident;													/// dynasty name
+	std::string Name;
+	std::string Description;											/// dynasty description
+	std::string Quote;													/// dynasty quote
+	std::string Background;												/// dynasty background
+	CUpgrade *DynastyUpgrade;											/// dynasty upgrade applied when the dynasty is set
+	int ID;																/// dynasty ID
+	int Civilization;													/// dynasty civilization
+	IconConfig Icon;													/// Dynasty's icon
+	LuaCallback *Conditions;
+	std::vector<CFaction *> Factions;									/// to which factions is this dynasty available
 };
 
 class CDeityDomain
@@ -789,6 +817,7 @@ public:
 	//Wyrmgus start
 	int GetFactionIndexByName(const std::string faction_name) const;
 	CFaction *GetFaction(const std::string faction_name) const;
+	CDynasty *GetDynasty(const std::string dynasty_name) const;
 	int GetReligionIndexByIdent(std::string religion_ident) const;
 	int GetDeityDomainIndexByIdent(std::string deity_domain_ident) const;
 	int GetDeityIndexByIdent(std::string deity_ident) const;
@@ -823,6 +852,7 @@ public:
 	int CivilizationLanguage[MAX_RACES];
 	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
+	std::vector<CDynasty *> Dynasties;    								/// dynasties
 	std::vector<CReligion *> Religions;									/// religions
 	std::vector<CDeityDomain *> DeityDomains;							/// deity domains
 	std::vector<CDeity *> Deities;										/// deities
@@ -917,6 +947,7 @@ extern std::vector<int> ConversibleHairColors; 			/// Conversible hair colors
 
 extern std::map<std::string, int> CivilizationStringToIndex;
 extern std::map<std::string, int> FactionStringToIndex;
+extern std::map<std::string, int> DynastyStringToIndex;
 
 extern bool LanguageCacheOutdated;
 //Wyrmgus end

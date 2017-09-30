@@ -368,6 +368,7 @@ int PlayerColorIndexCount;
 //Wyrmgus start
 std::map<std::string, int> CivilizationStringToIndex;
 std::map<std::string, int> FactionStringToIndex;
+std::map<std::string, int> DynastyStringToIndex;
 
 bool LanguageCacheOutdated = false;
 //Wyrmgus end
@@ -436,6 +437,10 @@ void PlayerRace::Clean()
 		delete this->Factions[i];
 	}
 	this->Factions.clear();
+	for (size_t i = 0; i < PlayerRaces.Dynasties.size(); ++i) {
+		delete this->Dynasties[i];
+	}
+	this->Dynasties.clear();
 	//Wyrmgus end
 }
 
@@ -486,6 +491,19 @@ CFaction *PlayerRace::GetFaction(const std::string faction_name) const
 	
 	if (FactionStringToIndex.find(faction_name) != FactionStringToIndex.end()) {
 		return PlayerRaces.Factions[FactionStringToIndex[faction_name]];
+	} else {
+		return NULL;
+	}
+}
+
+CDynasty *PlayerRace::GetDynasty(const std::string dynasty_ident) const
+{
+	if (dynasty_ident.empty()) {
+		return NULL;
+	}
+	
+	if (DynastyStringToIndex.find(dynasty_ident) != DynastyStringToIndex.end()) {
+		return PlayerRaces.Dynasties[DynastyStringToIndex[dynasty_ident]];
 	} else {
 		return NULL;
 	}
@@ -817,6 +835,13 @@ std::vector<std::string> &CFaction::GetShipNames()
 	
 	return PlayerRaces.Civilizations[this->Civilization]->GetShipNames();
 }
+
+CDynasty::~CDynasty()
+{
+	if (this->Conditions) {
+		delete Conditions;
+	}
+}
 //Wyrmgus end
 
 /**
@@ -903,6 +928,9 @@ void CPlayer::Save(CFile &file) const
 	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
 	if (p.Faction != -1) {
 		file.printf(" \"faction\", %d,", p.Faction);
+	}
+	if (p.Dynasty) {
+		file.printf(" \"dynasty\", \"%s\",", p.Dynasty->Ident.c_str());
 	}
 	for (int i = 0; i < PlayerColorMax; ++i) {
 		if (PlayerColors[i][0] == this->Color) {
@@ -1375,6 +1403,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Race = 0;
 	//Wyrmgus start
 	this->Faction = -1;
+	this->Dynasty = NULL;
 	this->Religion = NULL;
 	this->Overlord = NULL;
 	//Wyrmgus end
@@ -1682,6 +1711,43 @@ void CPlayer::SetRandomFaction()
 	}
 }
 
+/**
+**  Change player dynasty.
+**
+**  @param dynasty    New dynasty.
+*/
+void CPlayer::SetDynasty(CDynasty *dynasty)
+{
+	CDynasty *old_dynasty = this->Dynasty;
+	
+	if (this->Dynasty) {
+		if (this->Dynasty->DynastyUpgrade && this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->ID] == 'R') {
+			UpgradeLost(*this, this->Dynasty->DynastyUpgrade->ID);
+		}
+	}
+
+	this->Dynasty = dynasty;
+
+	if (!this->Dynasty) {
+		return;
+	}
+	
+	if (this->Dynasty->DynastyUpgrade) {
+		if (this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->ID] != 'R') {
+			if (GameEstablishing) {
+				AllowUpgradeId(*this, this->Dynasty->DynastyUpgrade->ID, 'R');
+			} else {
+				UpgradeAcquire(*this, this->Dynasty->DynastyUpgrade);
+			}
+		}
+	}
+
+	for (int i = 0; i < this->GetUnitCount(); ++i) {
+		CUnit &unit = this->GetUnit(i);
+		unit.UpdateSoldUnits(); //in case conditions changed (i.e. some heroes may require a certain dynasty)
+	}
+}
+
 bool CPlayer::IsPlayerColorUsed(int color)
 {
 	bool color_used = false;
@@ -1800,6 +1866,39 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 			faction->Conditions->pushPreamble();
 			faction->Conditions->run(1);
 			if (faction->Conditions->popBoolean() == false) {
+				return false;
+			}
+		}
+	}
+	
+	return true;
+}
+
+/**
+**  Check if the player can choose a particular dynasty.
+**
+**  @param dynasty    New dynasty.
+*/
+bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
+{
+	if (CurrentQuest != NULL) {
+		return false;
+	}
+	
+	if (dynasty->DynastyUpgrade) {
+		if (!CheckDependByIdent(*this, dynasty->DynastyUpgrade->Ident, false, pre)) {
+			return false;
+		}
+	} else {
+		return false;
+	}
+
+	if (!pre) {
+		if (dynasty->Conditions) {
+			CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+			dynasty->Conditions->pushPreamble();
+			dynasty->Conditions->run(1);
+			if (dynasty->Conditions->popBoolean() == false) {
 				return false;
 			}
 		}
@@ -2029,6 +2128,7 @@ void CPlayer::Clear()
 	Race = 0;
 	//Wyrmgus start
 	Faction = -1;
+	Dynasty = NULL;
 	Religion = NULL;
 	Overlord = NULL;
 	Vassals.clear();

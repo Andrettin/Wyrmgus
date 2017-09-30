@@ -58,6 +58,7 @@ class CCharacter;
 class CUniqueItem;
 class CUpgradeModifier;
 class CFaction;
+class CDynasty;
 //Wyrmgus end
 struct lua_State;
 
@@ -280,7 +281,7 @@ class CUpgradeModifier
 public:
 	//Wyrmgus start
 //	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL)
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL), ChangeCivilizationTo(-1), ChangeFactionTo(NULL)
+	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL), ChangeCivilizationTo(-1), ChangeFactionTo(NULL), ChangeDynastyTo(NULL)
 	//Wyrmgus end
 	{
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
@@ -315,6 +316,7 @@ public:
 	//Wyrmgus start
 	int ChangeCivilizationTo;			/// changes the player's civilization to this one
 	CFaction *ChangeFactionTo;			/// changes the player's faction to this one
+	CDynasty *ChangeDynastyTo;			/// changes the player's dynasty to this one
 	
 	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
 	//Wyrmgus end

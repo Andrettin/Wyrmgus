@@ -776,6 +776,13 @@ static int CclDefineModifier(lua_State *l)
 			if (um->ChangeFactionTo == NULL) {
 				LuaError(l, "Faction \"%s\" doesn't exist.'" _C_ faction_ident.c_str());
 			}
+		} else if (!strcmp(key, "change-dynasty-to")) {
+			std::string dynasty_ident = LuaToString(l, j + 1, 2);
+			um->ChangeDynastyTo = PlayerRaces.GetDynasty(dynasty_ident);
+			
+			if (um->ChangeDynastyTo == NULL) {
+				LuaError(l, "Dynasty \"%s\" doesn't exist.'" _C_ dynasty_ident.c_str());
+			}
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
@@ -1342,6 +1349,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			player.SetCivilization(um->ChangeFactionTo->Civilization);
 		}
 		player.SetFaction(um->ChangeFactionTo);
+	}
+	if (um->ChangeDynastyTo != NULL && um->ChangeDynastyTo != player.Dynasty) {
+		player.SetDynasty(um->ChangeDynastyTo);
 	}
 	//Wyrmgus end
 
@@ -2646,54 +2656,6 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 							}
 						}
 					}
-				}
-			}
-		}
-		
-		if (grand_strategy) {
-			for (int i = 0; i < MaxCosts; ++i) {
-				if (upgrade->GrandStrategyProductionEfficiencyModifier[i] != 0) {
-					if (!first_element) {
-						upgrade_effects_string += padding_string;
-					} else {
-						first_element = false;
-					}
-
-					if (upgrade->GrandStrategyProductionEfficiencyModifier[i] > 0) {
-						upgrade_effects_string += "+";
-					}
-					upgrade_effects_string += std::to_string((long long) upgrade->GrandStrategyProductionEfficiencyModifier[i]) + "% "; 
-					upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
-					upgrade_effects_string += " Production Efficiency";
-				}
-			}
-			
-			if (upgrade->Class != -1 && UpgradeClasses[upgrade->Class] == "writing") {
-				if (!first_element) {
-					upgrade_effects_string += padding_string;
-				} else {
-					first_element = false;
-				}
-				
-				upgrade_effects_string += "Transforms faction from tribe to polity (with Masonry)";
-			} else if (upgrade->Class != -1 && UpgradeClasses[upgrade->Class] == "masonry") {
-				if (!first_element) {
-					upgrade_effects_string += padding_string;
-				} else {
-					first_element = false;
-				}
-				
-				upgrade_effects_string += "Transforms faction from tribe to polity (with Writing)";
-				upgrade_effects_string += padding_string;
-				upgrade_effects_string += "Allows building of Roads";
-				
-				int civilization_id = upgrade->Civilization;
-				int faction_id = upgrade->Faction;
-				int stronghold_id = PlayerRaces.GetFactionClassUnitType(faction_id, GetUnitTypeClassIndexByName("stronghold"));
-				if (stronghold_id != -1) {
-					upgrade_effects_string += padding_string;
-					upgrade_effects_string += "Allows building of ";
-					upgrade_effects_string += UnitTypes[stronghold_id]->GetNamePlural();
 				}
 			}
 		}
