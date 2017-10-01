@@ -1944,7 +1944,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			//Wyrmgus end
 		}
 		//Wyrmgus start
-		if (j == ATTACKRANGE_INDEX && unit.Container) {
+		if (j == ATTACKRANGE_INDEX && unit.Container && !SaveGameLoading) {
 			unit.Container->UpdateContainerAttackRange();
 		} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 			unit.UpdateXPRequired();
