@@ -4,7 +4,7 @@
 
 We are going to download and compile Wyrmsun, the open-source retro RTS game.
 
-This guide should work for all recent ubuntu versions. (Tested von 16.04 and 16.10)
+This guide should work for all recent ubuntu versions (tested on 16.04 and 16.10). It should also work for all recent Mint versions (tested on 18.2).
 
 Required disk space: about 1 GiB
 
