@@ -1531,158 +1531,141 @@ static void AiCollectResources()
 		}
 	}
 	CUnit *unit;
-	do {
-		// sort resources by priority
-		for (int i = 0; i < MaxCosts; ++i) {
-			for (int j = i + 1; j < MaxCosts; ++j) {
-				if (priority_needed[j] > priority_needed[i]) {
-					std::swap(priority_needed[i], priority_needed[j]);
-					std::swap(priority_resource[i], priority_resource[j]);
-				}
+	// sort resources by priority
+	for (int i = 0; i < MaxCosts; ++i) {
+		for (int j = i + 1; j < MaxCosts; ++j) {
+			if (priority_needed[j] > priority_needed[i]) {
+				std::swap(priority_needed[i], priority_needed[j]);
+				std::swap(priority_resource[i], priority_resource[j]);
 			}
 		}
-		unit = NULL;
+	}
+	unit = NULL;
 
-		// Try to complete each resource in the priority order
-		for (int i = 0; i < MaxCosts; ++i) {
-			int c = priority_resource[i];
+	// Try to complete each resource in the priority order
+	for (int i = 0; i < MaxCosts; ++i) {
+		int c = priority_resource[i];
 			
-			//Wyrmgus start
-			if (!wanted[c]) {
-				continue;
-			}
-			//Wyrmgus end
+		//Wyrmgus start
+		if (!wanted[c]) {
+			continue;
+		}
+		//Wyrmgus end
 
-			// If there is a free worker for c, take it.
-			if (num_units_unassigned[c]) {
-				// Take the unit.
-				while (0 < num_units_unassigned[c] && !AiAssignHarvester(*units_unassigned[c][0], c)) {
-					// can't assign to c => remove from units_unassigned !
-					units_unassigned[c][0] = units_unassigned[c][--num_units_unassigned[c]];
-					units_unassigned[c].pop_back();
-				}
-
+		// If there is a free worker for c, take it.
+		if (num_units_unassigned[c]) {
+			CUnit *unassigned_unit = units_unassigned[c][SyncRand(units_unassigned[c].size())]; //only try to assign one unit (randomly, so it isn't always the first unit) per time, to lessen the strain on performance
+			// Take the unit.
+			if (AiAssignHarvester(*unassigned_unit, c)) {
 				// unit is assigned
-				if (0 < num_units_unassigned[c]) {
-					unit = units_unassigned[c][0];
-					units_unassigned[c][0] = units_unassigned[c][--num_units_unassigned[c]];
-					units_unassigned[c].pop_back();
-
-					// remove it from other ressources
-					for (int j = 0; j < MaxCosts; ++j) {
-						if (j == c || !unit->Type->ResInfo[j]) {
-							continue;
-						}
-						for (int k = 0; k < num_units_unassigned[j]; ++k) {
-							if (units_unassigned[j][k] == unit) {
-								units_unassigned[j][k] = units_unassigned[j][--num_units_unassigned[j]];
-								units_unassigned[j].pop_back();
-								break;
-							}
+				unit = unassigned_unit;
+					
+				// remove it from other ressources
+				for (int j = 0; j < MaxCosts; ++j) {
+					if (j == c || !unit->Type->ResInfo[j]) {
+						continue;
+					}
+					for (int k = 0; k < num_units_unassigned[j]; ++k) {
+						if (units_unassigned[j][k] == unit) {
+							units_unassigned[j][k] = units_unassigned[j][--num_units_unassigned[j]];
+							units_unassigned[j].pop_back();
+							break;
 						}
 					}
 				}
 			}
+		}
 
-			// Else : Take from already assigned worker with lower priority.
-			if (!unit) {
-				// Take from lower priority only (i+1).
-				for (int j = i + 1; j < MaxCosts && !unit; ++j) {
-					// Try to move worker from src_c to c
-					const int src_c = priority_resource[j];
+		// Else : Take from already assigned worker with lower priority.
+		if (!unit) {
+			// Take from lower priority only (i+1).
+			for (int j = i + 1; j < MaxCosts && !unit; ++j) {
+				// Try to move worker from src_c to c
+				const int src_c = priority_resource[j];
 
-					//Wyrmgus start
-					//don't reassign workers from one resource to another, that is too expensive performance-wise (this could be re-implemented if the AI is altered to keep track of found resource spots
-					break;
-					//Wyrmgus end
+				//Wyrmgus start
+				//don't reassign workers from one resource to another, that is too expensive performance-wise (this could be re-implemented if the AI is altered to keep track of found resource spots
+				break;
+				//Wyrmgus end
 					
+				//Wyrmgus start
+				// don't reassign if the src_c resource has no workers, or if the new resource has 0 "wanted"
+				if (num_units_assigned[src_c] == 0 || !wanted[c]) {
+					continue;
+				}
+				//Wyrmgus end
+
+				// Don't complete with lower priority ones...
+				//Wyrmgus start
+				/*
+				if (wanted[src_c] > wanted[c]
+					|| (wanted[src_c] == wanted[c]
+						&& num_units_assigned[src_c] <= num_units_assigned[c] + 1)) {
+				*/
+				if (wanted[src_c] && ((num_units_assigned[src_c] + 1) * 100 / wanted[src_c]) <= (num_units_assigned[c] * 100 / wanted[c])) { // what matters is the percent of "wanted" fulfilled, not the absolute quantity of needed workers for that resource; add one worker to num_units_assigned[src_c] so that you won't get one worker being shuffled back and forth
+					//Wyrmgus end
 					//Wyrmgus start
-					// don't reassign if the src_c resource has no workers, or if the new resource has 0 "wanted"
-					if (num_units_assigned[src_c] == 0 || !wanted[c]) {
+//					continue;
+					if (num_units_assigned[c] != 0) { // if there are no workers for that resource, allow reshuffling regardless of proportion calculation, so that if the game starts with few workers (like two), the AI isn't stuck gathering only the first resource it finds
+						continue;
+					}
+					//Wyrmgus end
+				}
+					
+				//Wyrmgus start
+				if (num_units_assigned[src_c] <= wanted[src_c]) { // don't reassign if the src_c resource already has less workers than desired
+					if (num_units_assigned[c] != 0) {
+						continue;
+					}
+				}
+				//Wyrmgus end
+					
+				//Wyrmgus start
+//				for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
+				for (int k = num_units_assigned[src_c] - 1; k >= 0; --k) { // unit may be NULL now, continue instead of breaking loop if so
+				//Wyrmgus end
+					unit = units_assigned[src_c][k];
+					//Wyrmgus start
+					if (!unit) {
 						continue;
 					}
 					//Wyrmgus end
 
-					// Don't complete with lower priority ones...
-					//Wyrmgus start
-					/*
-					if (wanted[src_c] > wanted[c]
-						|| (wanted[src_c] == wanted[c]
-							&& num_units_assigned[src_c] <= num_units_assigned[c] + 1)) {
-					*/
-					if (wanted[src_c] && ((num_units_assigned[src_c] + 1) * 100 / wanted[src_c]) <= (num_units_assigned[c] * 100 / wanted[c])) { // what matters is the percent of "wanted" fulfilled, not the absolute quantity of needed workers for that resource; add one worker to num_units_assigned[src_c] so that you won't get one worker being shuffled back and forth
-					//Wyrmgus end
-						//Wyrmgus start
-//						continue;
-						if (num_units_assigned[c] != 0) { // if there are no workers for that resource, allow reshuffling regardless of proportion calculation, so that if the game starts with few workers (like two), the AI isn't stuck gathering only the first resource it finds
-							continue;
-						}
-						//Wyrmgus end
+					Assert(unit->CurrentAction() == UnitActionResource);
+					COrder_Resource &order = *static_cast<COrder_Resource *>(unit->CurrentOrder());
+
+					if (order.IsGatheringFinished()) {
+						//worker returning with resource
+						continue;
 					}
-					
+
 					//Wyrmgus start
-					if (num_units_assigned[src_c] <= wanted[src_c]) { // don't reassign if the src_c resource already has less workers than desired
-						if (num_units_assigned[c] != 0) {
-							continue;
-						}
+					if (unit->Removed || unit->CurrentAction() == UnitActionBuild) { //if unit is removed or is currently building something, it can't be told to harvest (do this here so that AiAssignHarvester returning false later on is only because of unit type not being able to harvest something)
+						unit = NULL;
+						continue;
 					}
 					//Wyrmgus end
 					
-					//Wyrmgus start
-//					for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
-					for (int k = num_units_assigned[src_c] - 1; k >= 0; --k) { // unit may be NULL now, continue instead of breaking loop if so
-					//Wyrmgus end
-						unit = units_assigned[src_c][k];
-						//Wyrmgus start
-						if (!unit) {
-							continue;
-						}
-						//Wyrmgus end
-
-						Assert(unit->CurrentAction() == UnitActionResource);
-						COrder_Resource &order = *static_cast<COrder_Resource *>(unit->CurrentOrder());
-
-						if (order.IsGatheringFinished()) {
-							//worker returning with resource
-							continue;
-						}
-
-						//Wyrmgus start
-						if (unit->Removed || unit->CurrentAction() == UnitActionBuild) { //if unit is removed or is currently building something, it can't be told to harvest (do this here so that AiAssignHarvester returning false later on is only because of unit type not being able to harvest something)
-							unit = NULL;
-							continue;
-						}
-						//Wyrmgus end
-						
-						// unit can't harvest : next one
-						if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
-							unit = NULL;
-							continue;
-						}
-
-						// Remove from src_c
-						units_assigned[src_c][k] = units_assigned[src_c][--num_units_assigned[src_c]];
-						units_assigned[src_c].pop_back();
-
-						// j need one more
-						priority_needed[j]++;
-						
-						//Wyrmgus start
-						break; //only reassign one worker per time
-						//Wyrmgus end
+					// unit can't harvest : next one
+					if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
+						unit = NULL;
+						continue;
 					}
+
+					// Remove from src_c
+					units_assigned[src_c][k] = units_assigned[src_c][--num_units_assigned[src_c]];
+					units_assigned[src_c].pop_back();
+
+					// j need one more
+					priority_needed[j]++;
+					
+					//Wyrmgus start
+					break; //only reassign one worker per time
+					//Wyrmgus end
 				}
 			}
-
-			// We just moved an unit. Adjust priority & retry
-			if (unit) {
-				// i got a new unit.
-				priority_needed[i]--;
-				// Recompute priority now
-				break;
-			}
 		}
-	} while (unit);
+	}
 	
 	//Wyrmgus start
 	//buy or sell resources
