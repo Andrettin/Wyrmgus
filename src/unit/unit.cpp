@@ -3148,7 +3148,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 
 void CUnit::UpdateSettlement()
 {
-	if (this->Removed) {
+	if (this->Removed || Editor.Running != EditorNotRunning) {
 		return;
 	}
 	
@@ -3218,6 +3218,10 @@ void CUnit::UpdateSettlement()
 
 void CUnit::UpdateBuildingSettlementAssignment(CSettlement *old_settlement)
 {
+	if (Editor.Running != EditorNotRunning) {
+		return;
+	}
+	
 	if (this->Player->Index == PlayerNumNeutral) {
 		return;
 	}
