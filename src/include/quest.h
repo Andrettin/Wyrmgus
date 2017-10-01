@@ -126,9 +126,8 @@ class CCampaign
 public:
 	CCampaign() :
 		ID(-1),
-		MapSize(256, 256), MapTemplateStartPos(0, 0),
 		Hidden(false), Sandbox(false),
-		Faction(NULL), StartEffects(NULL), MapTemplate(NULL)
+		Faction(NULL), StartEffects(NULL)
 	{
 		StartDate.year = 0;
 		StartDate.month = 1;
@@ -144,10 +143,10 @@ public:
 	CDate StartDate;				/// The starting date of the campaign
 	bool Hidden;					/// Whether the campaign is hidden
 	bool Sandbox;					/// Whether the campaign is a sandbox one
-	Vec2i MapSize;					/// Map size
-	Vec2i MapTemplateStartPos;		/// Map template position the map will start on
+	std::vector<Vec2i> MapSizes;				/// Map sizes
+	std::vector<Vec2i> MapTemplateStartPos;		/// Map template position the map will start on
 	CFaction *Faction;				/// Which faction the player plays as in the campaign
-	CMapTemplate *MapTemplate;		/// Map template used by the campaign
+	std::vector<CMapTemplate *> MapTemplates;		/// Map template used by the campaign
 	LuaCallback *StartEffects;		/// The effects at game start to set up the campaign
 };
 

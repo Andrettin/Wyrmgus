@@ -365,6 +365,11 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 	}
 
+	if (CurrentCampaign) {
+		Map.Info.MapWidths[z] = CurrentCampaign->MapSizes[z].x;
+		Map.Info.MapHeights[z] = CurrentCampaign->MapSizes[z].y;
+	}
+	
 	if (this->TimeOfDaySeconds && !GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning && !this->IsSubtemplateArea()) {
 		Map.TimeOfDay[z] = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
 	}

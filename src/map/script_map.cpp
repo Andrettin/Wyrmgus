@@ -1035,6 +1035,21 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	
 	map_template->Apply(Vec2i(template_start_x, template_start_y), Vec2i(map_start_x, map_start_y), z);
 }
+
+void ApplyCampaignMap(std::string campaign_ident)
+{
+	CCampaign *campaign = GetCampaign(campaign_ident);
+	
+	if (!campaign) {
+		fprintf(stderr, "Campaign \"%s\" doesn't exist.\n", campaign_ident.c_str());
+		return;
+	}
+	
+	for (size_t i = 0; i < campaign->MapTemplates.size(); ++i) {
+		campaign->MapTemplates[i]->CurrentStartPos = campaign->MapTemplateStartPos[i];
+		campaign->MapTemplates[i]->Apply(campaign->MapTemplateStartPos[i], Vec2i(0, 0), i);
+	}
+}
 //Wyrmgus end
 
 /**
@@ -2187,6 +2202,46 @@ static int CclDefineTimeline(lua_State *l)
 }
 
 /**
+**  Get map template data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetMapTemplateData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string map_template_ident = LuaToString(l, 1);
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	if (!map_template) {
+		LuaError(l, "Map template \"%s\" doesn't exist." _C_ map_template_ident.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, map_template->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "World")) {
+		if (map_template->World != NULL) {
+			lua_pushstring(l, map_template->World->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "CurrentStartPosX")) {
+		lua_pushnumber(l, map_template->CurrentStartPos.x);
+		return 1;
+	} else if (!strcmp(data, "CurrentStartPosY")) {
+		lua_pushnumber(l, map_template->CurrentStartPos.y);
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
 **  Get terrain feature data.
 **
 **  @param l  Lua state.
@@ -2199,7 +2254,7 @@ static int CclGetTerrainFeatureData(lua_State *l)
 	std::string terrain_feature_ident = LuaToString(l, 1);
 	CTerrainFeature *terrain_feature = GetTerrainFeature(terrain_feature_ident);
 	if (!terrain_feature) {
-		LuaError(l, "TerrainFeature \"%s\" doesn't exist." _C_ terrain_feature_ident.c_str());
+		LuaError(l, "Terrain feature \"%s\" doesn't exist." _C_ terrain_feature_ident.c_str());
 	}
 	const char *data = LuaToString(l, 2);
 
@@ -2279,6 +2334,7 @@ void MapCclRegister()
 	lua_register(Lua, "DefineSettlement", CclDefineSettlement);
 	lua_register(Lua, "DefineTerrainFeature", CclDefineTerrainFeature);
 	lua_register(Lua, "DefineTimeline", CclDefineTimeline);
+	lua_register(Lua, "GetMapTemplateData", CclGetMapTemplateData);
 	lua_register(Lua, "GetTerrainFeatureData", CclGetTerrainFeatureData);
 	lua_register(Lua, "GetTerrainFeatures", CclGetTerrainFeatures);
 	lua_register(Lua, "SetMapTemplateTileTerrain", CclSetMapTemplateTileTerrain);

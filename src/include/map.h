@@ -175,7 +175,8 @@ class CMapTemplate
 {
 public:
 	CMapTemplate() :
-		Width(0), Height(0), Scale(1), TimeOfDaySeconds(DefaultTimeOfDaySeconds), SurfaceLayer(0), SubtemplatePosition(-1, -1),
+		Width(0), Height(0), Scale(1), TimeOfDaySeconds(DefaultTimeOfDaySeconds), SurfaceLayer(0),
+		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0),
 		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), BorderTerrain(NULL), SurroundingTerrain(NULL)
 	{
 	}
@@ -200,6 +201,7 @@ public:
 	int TimeOfDaySeconds;
 	int SurfaceLayer;											/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	Vec2i SubtemplatePosition;
+	Vec2i CurrentStartPos;
 	CMapTemplate *MainTemplate;									/// Main template in which this one is located
 	CPlane *Plane;
 	CWorld *World;
@@ -715,6 +717,7 @@ inline void SetTileTerrain(std::string terrain_ident, int x, int y, int value = 
 	SetTileTerrain(terrain_ident, pos, value, z);
 }
 extern void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0, int z = 0);
+extern void ApplyCampaignMap(std::string campaign_ident);
 //Wyrmgus end
 
 /// register ccl features

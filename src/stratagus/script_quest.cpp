@@ -498,17 +498,48 @@ static int CclDefineCampaign(lua_State *l)
 			CclGetDate(l, &campaign->StartDate);
 		} else if (!strcmp(value, "StartEffects")) {
 			campaign->StartEffects = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "MapTemplates")) {
+			campaign->MapTemplates.clear();
+			campaign->MapSizes.clear();
+			campaign->MapTemplateStartPos.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string map_template_ident = LuaToString(l, -1, j + 1);
+				CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+				if (!map_template) {
+					LuaError(l, "Map template \"%s\" doesn't exist." _C_ map_template_ident.c_str());
+				}
+				campaign->MapTemplates.push_back(map_template);
+				++j;
+				
+				lua_rawgeti(l, -1, j + 1);
+				Vec2i map_template_start_pos;
+				CclGetPos(l, &map_template_start_pos.x, &map_template_start_pos.y);
+				campaign->MapTemplateStartPos.push_back(map_template_start_pos);
+				lua_pop(l, 1);
+				++j;
+				
+				lua_rawgeti(l, -1, j + 1);
+				Vec2i map_size;
+				CclGetPos(l, &map_size.x, &map_size.y);
+				campaign->MapSizes.push_back(map_size);
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "MapTemplate")) {
 			std::string map_template_ident = LuaToString(l, -1);
 			CMapTemplate *map_template = GetMapTemplate(map_template_ident);
 			if (!map_template) {
 				LuaError(l, "Map template \"%s\" doesn't exist." _C_ map_template_ident.c_str());
 			}
-			campaign->MapTemplate = map_template;
-		} else if (!strcmp(value, "MapSize")) {
-			CclGetPos(l, &campaign->MapSize.x, &campaign->MapSize.y);
+			campaign->MapTemplates.push_back(map_template);
 		} else if (!strcmp(value, "MapTemplateStartPos")) {
-			CclGetPos(l, &campaign->MapTemplateStartPos.x, &campaign->MapTemplateStartPos.y);
+			Vec2i map_template_start_pos;
+			CclGetPos(l, &map_template_start_pos.x, &map_template_start_pos.y);
+			campaign->MapTemplateStartPos.push_back(map_template_start_pos);
+		} else if (!strcmp(value, "MapSize")) {
+			Vec2i map_size;
+			CclGetPos(l, &map_size.x, &map_size.y);
+			campaign->MapSizes.push_back(map_size);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -568,23 +599,23 @@ static int CclGetCampaignData(lua_State *l)
 		lua_pushboolean(l, campaign->Sandbox);
 		return 1;
 	} else if (!strcmp(data, "MapTemplate")) {
-		if (campaign->MapTemplate) {
-			lua_pushstring(l, campaign->MapTemplate->Ident.c_str());
+		if (!campaign->MapTemplates.empty()) {
+			lua_pushstring(l, campaign->MapTemplates[0]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "MapWidth")) {
-		lua_pushnumber(l, campaign->MapSize.x);
+		lua_pushnumber(l, campaign->MapSizes[0].x);
 		return 1;
 	} else if (!strcmp(data, "MapHeight")) {
-		lua_pushnumber(l, campaign->MapSize.y);
+		lua_pushnumber(l, campaign->MapSizes[0].y);
 		return 1;
 	} else if (!strcmp(data, "MapTemplateStartPosX")) {
-		lua_pushnumber(l, campaign->MapTemplateStartPos.x);
+		lua_pushnumber(l, campaign->MapTemplateStartPos[0].x);
 		return 1;
 	} else if (!strcmp(data, "MapTemplateStartPosY")) {
-		lua_pushnumber(l, campaign->MapTemplateStartPos.y);
+		lua_pushnumber(l, campaign->MapTemplateStartPos[0].y);
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
