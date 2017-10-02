@@ -296,6 +296,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			//Wyrmgus start
 //			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 			if (ReplayRevealMap) {
+				bool is_unpassable = mf.OverlayTerrain && (mf.OverlayTerrain->Flags & MapFieldUnpassable) && std::find(mf.OverlayTerrain->DestroyedTiles.begin(), mf.OverlayTerrain->DestroyedTiles.end(), mf.OverlaySolidTile) == mf.OverlayTerrain->DestroyedTiles.end();
 				if (mf.Terrain && mf.Terrain->Graphics) {
 					mf.Terrain->Graphics->DrawFrameClip(mf.SolidTile + (mf.Terrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, false);
 				}
@@ -304,7 +305,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.TransitionTiles[i].first->Graphics->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && (mf.Flags & MapFieldUnpassable)) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
 					if (Map.BorderTerrain->Graphics) {
 						Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
@@ -328,7 +329,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.OverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.OverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && !(mf.Flags & MapFieldUnpassable)) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && !is_unpassable) { //if the tile is not passable, draw the border under its overlay, but otherwise, draw the border over it
 					if (Map.BorderTerrain->Graphics) {
 						Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
@@ -342,6 +343,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 					}
 				}
 			} else {
+				bool is_unpassable_seen = mf.playerInfo.SeenOverlayTerrain && (mf.playerInfo.SeenOverlayTerrain->Flags & MapFieldUnpassable) && std::find(mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.begin(), mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end(), mf.playerInfo.SeenOverlaySolidTile) == mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end();
 				if (mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->Graphics) {
 					mf.playerInfo.SeenTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenSolidTile + (mf.playerInfo.SeenTerrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, false);
 				}
@@ -350,7 +352,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenTransitionTiles[i].first->Graphics->DrawFrameClip(mf.playerInfo.SeenTransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && (mf.Flags & MapFieldUnpassable)) {
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && is_unpassable_seen) {
 					if (Map.BorderTerrain->Graphics) {
 						Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
@@ -374,7 +376,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 						mf.playerInfo.SeenOverlayTransitionTiles[i].first->PlayerColorGraphics->DrawPlayerColorFrameClip((mf.Owner != -1) ? mf.Owner : PlayerNumNeutral, mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
-				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && !(mf.Flags & MapFieldUnpassable)) {
+				if (mf.Owner != -1 && mf.OwnershipBorderTile != -1 && Map.BorderTerrain && !is_unpassable_seen) {
 					if (Map.BorderTerrain->Graphics) {
 						Map.BorderTerrain->Graphics->DrawFrameClip(mf.OwnershipBorderTile, dx, dy, false);
 					}
