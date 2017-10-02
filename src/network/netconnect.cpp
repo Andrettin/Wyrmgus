@@ -1533,13 +1533,19 @@ void NetworkServerStartGame()
 
 	// Calculate NetPlayers
 	NetPlayers = h;
-	int compPlayers = ServerSetupState.Opponents;
+	//Wyrmgus start
+//	int compPlayers = ServerSetupState.Opponents;
+	bool compPlayers = ServerSetupState.Opponents > 0;
+	//Wyrmgus end
 	for (int i = 1; i < h; ++i) {
 		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != 0) {
 			NetPlayers--;
 		} else if (Hosts[i].PlyName[0] == 0) {
 			NetPlayers--;
-			if (--compPlayers >= 0) {
+			//Wyrmgus start
+//			if (--compPlayers >= 0) {
+			if (compPlayers) {
+			//Wyrmgus end
 				// Unused slot gets a computer player
 				ServerSetupState.CompOpt[i] = 1;
 				LocalSetupState.CompOpt[i] = 1;
