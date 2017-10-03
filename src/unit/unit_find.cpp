@@ -645,12 +645,12 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 	}
 
 	//Wyrmgus start
-	if (Map.Field(pos, worker.MapLayer)->Owner != -1 && Map.Field(pos, worker.MapLayer)->Owner != worker.Player->Index && !Players[Map.Field(pos, worker.MapLayer)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType()) {
-		return VisitResult_DeadEnd;
-	}
-	
 //	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
 	CUnit *mine = Map.Field(pos, worker.MapLayer)->UnitCache.find(res_finder);
+	
+	if (Map.Field(pos, worker.MapLayer)->Owner != -1 && Map.Field(pos, worker.MapLayer)->Owner != worker.Player->Index && !Players[Map.Field(pos, worker.MapLayer)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
+		return VisitResult_DeadEnd;
+	}
 	//Wyrmgus end
 
 	//Wyrmgus start
