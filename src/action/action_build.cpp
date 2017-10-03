@@ -447,40 +447,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		//Wyrmgus end
 		Assert(b);
 		if (b->ReplaceOnBuild) {
-			//Wyrmgus start
-//			build->ResourcesHeld = ontop.ResourcesHeld; // We capture the value of what is beneath.
-			int resources_held = ontop.ResourcesHeld; // We capture the value of what is beneath.
-			//Wyrmgus end
-			build->Variable[GIVERESOURCE_INDEX].Value = ontop.Variable[GIVERESOURCE_INDEX].Value;
-			build->Variable[GIVERESOURCE_INDEX].Max = ontop.Variable[GIVERESOURCE_INDEX].Max;
-			build->Variable[GIVERESOURCE_INDEX].Enable = ontop.Variable[GIVERESOURCE_INDEX].Enable;
-			//Wyrmgus start
-			if (ontop.Unique != NULL) {
-				build->SetUnique(ontop.Unique);
-			} else {
-				if (ontop.Prefix != NULL) {
-					build->SetPrefix(ontop.Prefix);
-				}
-				if (ontop.Suffix != NULL) {
-					build->SetSuffix(ontop.Suffix);
-				}
-				if (ontop.Spell != NULL) {
-					build->SetSpell(ontop.Spell);
-				}
-			}
-			if (ontop.Settlement != NULL) {
-				build->Settlement = ontop.Settlement;
-				build->Settlement->SettlementUnit = build;
-				Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &ontop), Map.SettlementUnits.end());
-				Map.SettlementUnits.push_back(build);
-			}
-			build->SetResourcesHeld(resources_held);
-			build->Variable[GIVERESOURCE_INDEX].Value = resources_held;
-			//Wyrmgus end
-			ontop.Remove(NULL); // Destroy building beneath
-			UnitLost(ontop);
-			UnitClearOrders(ontop);
-			ontop.Release();
+			build->ReplaceOnTop(ontop);
 		}
 	}
 

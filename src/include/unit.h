@@ -195,6 +195,7 @@ public:
 	//Wyrmgus start
 	void SetResourcesHeld(int quantity);
 	void ChangeResourcesHeld(int quantity);
+	void ReplaceOnTop(CUnit &replaced_unit);
 	void IncreaseLevel(int level_quantity);
 	void Retrain();
 	void HealingItemAutoUse();

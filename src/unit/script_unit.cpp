@@ -1022,6 +1022,71 @@ static int CclCreateUnitInTransporter(lua_State *l)
 }
 
 /**
+**  Create a unit on top of another (such as a gold mine on top of a gold deposit)
+**
+**  @param l  Lua state.
+**
+**  @return   Returns the slot number of the created unit.
+*/
+static int CclCreateUnitOnTop(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+	
+	if (lua_isnil(l, 3)) {
+		return 0;
+	}
+
+	lua_pushvalue(l, 1);
+	CUnitType *unittype = CclGetUnitType(l);
+	if (unittype == NULL) {
+		LuaError(l, "Bad unittype");
+	}
+	lua_pop(l, 1);
+
+	lua_pushvalue(l, 2);
+	const int playerno = TriggerGetPlayer(l);
+	lua_pop(l, 1);
+
+	lua_pushvalue(l, 3);
+	CUnit *on_top = CclGetUnit(l);
+	lua_pop(l, 1);
+
+	Vec2i ipos;
+	ipos.x = on_top->tilePos.x;
+	ipos.y = on_top->tilePos.y;
+	int z = on_top->MapLayer;
+
+	if (playerno == -1) {
+		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
+		LuaError(l, "bad player");
+		return 0;
+	}
+	if (Players[playerno].Type == PlayerNobody) {
+		printf("CreateUnit: player %d does not exist\n", playerno);
+		LuaError(l, "bad player");
+		return 0;
+	}
+	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
+	if (unit == NULL) {
+		DebugPrint("Unable to allocate unit");
+		return 0;
+	} else {
+		unit->ReplaceOnTop(*on_top);
+		unit->Place(ipos, z);
+		UpdateForNewUnit(*unit, 0);
+
+		if (!unit->Starting) {
+			unit->Starting = 1;
+			unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
+			//make sure the unit is always a "Starting" one if created with this function
+		}
+		
+		lua_pushnumber(l, UnitNumber(*unit));
+		return 1;
+	}
+}
+
+/**
 **  Create a building and place it on a random location map
 **
 **  @param l  Lua state.
@@ -2224,6 +2289,7 @@ void UnitCclRegister()
 	lua_register(Lua, "KillUnitAt", CclKillUnitAt);
 	//Wyrmgus start
 	lua_register(Lua, "CreateUnitInTransporter", CclCreateUnitInTransporter);
+	lua_register(Lua, "CreateUnitOnTop", CclCreateUnitOnTop);
 	lua_register(Lua, "CreateBuildingAtRandomLocationNear", CclCreateBuildingAtRandomLocationNear);
 	lua_register(Lua, "ChangeUnitOwner", CclChangeUnitOwner);
 	lua_register(Lua, "ConvertUnit", CclConvertUnit);

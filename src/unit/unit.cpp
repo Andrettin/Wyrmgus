@@ -649,6 +649,41 @@ void CUnit::ChangeResourcesHeld(int quantity)
 	this->SetResourcesHeld(this->ResourcesHeld + quantity);
 }
 
+void CUnit::ReplaceOnTop(CUnit &replaced_unit)
+{
+	if (replaced_unit.Unique != NULL) {
+		this->SetUnique(replaced_unit.Unique);
+	} else {
+		if (replaced_unit.Prefix != NULL) {
+			this->SetPrefix(replaced_unit.Prefix);
+		}
+		if (replaced_unit.Suffix != NULL) {
+			this->SetSuffix(replaced_unit.Suffix);
+		}
+		if (replaced_unit.Spell != NULL) {
+			this->SetSpell(replaced_unit.Spell);
+		}
+	}
+	if (replaced_unit.Settlement != NULL) {
+		this->Settlement = replaced_unit.Settlement;
+		if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
+			this->Settlement->SettlementUnit = this;
+			Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &replaced_unit), Map.SettlementUnits.end());
+			Map.SettlementUnits.push_back(this);
+		}
+	}
+	
+	this->SetResourcesHeld(replaced_unit.ResourcesHeld); // We capture the value of what is beneath.
+	this->Variable[GIVERESOURCE_INDEX].Value = replaced_unit.Variable[GIVERESOURCE_INDEX].Value;
+	this->Variable[GIVERESOURCE_INDEX].Max = replaced_unit.Variable[GIVERESOURCE_INDEX].Max;
+	this->Variable[GIVERESOURCE_INDEX].Enable = replaced_unit.Variable[GIVERESOURCE_INDEX].Enable;
+	
+	replaced_unit.Remove(NULL); // Destroy building beneath
+	UnitLost(replaced_unit);
+	UnitClearOrders(replaced_unit);
+	replaced_unit.Release();
+}
+
 void CUnit::IncreaseLevel(int level_quantity)
 {
 	while (level_quantity > 0) {
@@ -3493,34 +3528,7 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 
 				if (it != unitCache.end()) {
 					CUnit &replacedUnit = **it;
-					int resources_held = replacedUnit.ResourcesHeld;
-					unit->Variable[GIVERESOURCE_INDEX].Max = replacedUnit.Variable[GIVERESOURCE_INDEX].Max;
-					unit->Variable[GIVERESOURCE_INDEX].Enable = replacedUnit.Variable[GIVERESOURCE_INDEX].Enable;
-					if (replacedUnit.Unique != NULL) {
-						unit->SetUnique(replacedUnit.Unique);
-					} else {
-						if (replacedUnit.Prefix != NULL) {
-							unit->SetPrefix(replacedUnit.Prefix);
-						}
-						if (replacedUnit.Suffix != NULL) {
-							unit->SetSuffix(replacedUnit.Suffix);
-						}
-						if (replacedUnit.Spell != NULL) {
-							unit->SetSpell(replacedUnit.Spell);
-						}
-					}
-					if (replacedUnit.Settlement != NULL) {
-						unit->Settlement = replacedUnit.Settlement;
-						unit->Settlement->SettlementUnit = unit;
-						Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &replacedUnit), Map.SettlementUnits.end());
-						Map.SettlementUnits.push_back(unit);
-					}
-					unit->SetResourcesHeld(resources_held);
-					unit->Variable[GIVERESOURCE_INDEX].Value = resources_held;
-					replacedUnit.Remove(NULL);
-					UnitLost(replacedUnit);
-					UnitClearOrders(replacedUnit);
-					replacedUnit.Release();
+					unit->ReplaceOnTop(replacedUnit);
 				}
 			}
 		}

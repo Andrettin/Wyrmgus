@@ -526,35 +526,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 
 		if (it != unitCache.end()) {
 			CUnit &replacedUnit = **it;
-			//Wyrmgus start
-//			unit->ResourcesHeld = replacedUnit.ResourcesHeld; // We capture the value of what is beneath.
-			unit->SetResourcesHeld(replacedUnit.ResourcesHeld); // We capture the value of what is beneath.
-			//Wyrmgus end
-			unit->Variable[GIVERESOURCE_INDEX].Value = replacedUnit.Variable[GIVERESOURCE_INDEX].Value;
-			unit->Variable[GIVERESOURCE_INDEX].Max = replacedUnit.Variable[GIVERESOURCE_INDEX].Max;
-			unit->Variable[GIVERESOURCE_INDEX].Enable = replacedUnit.Variable[GIVERESOURCE_INDEX].Enable;
-			//Wyrmgus start
-			if (replacedUnit.Unique != NULL) {
-				unit->SetUnique(replacedUnit.Unique);
-			} else {
-				if (replacedUnit.Prefix != NULL) {
-					unit->SetPrefix(replacedUnit.Prefix);
-				}
-				if (replacedUnit.Suffix != NULL) {
-					unit->SetSuffix(replacedUnit.Suffix);
-				}
-				if (replacedUnit.Spell != NULL) {
-					unit->SetSpell(replacedUnit.Spell);
-				}
-			}
-			if (replacedUnit.Settlement != NULL) {
-				unit->Settlement = replacedUnit.Settlement;
-			}
-			//Wyrmgus end
-			replacedUnit.Remove(NULL); // Destroy building beneath
-			UnitLost(replacedUnit);
-			UnitClearOrders(replacedUnit);
-			replacedUnit.Release();
+			unit->ReplaceOnTop(replacedUnit);
 		}
 	}
 	if (unit != NULL) {
