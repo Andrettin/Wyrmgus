@@ -441,6 +441,18 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 
+	if (condition->CanStore != -1) {
+		if (!type || !type->CanStore[condition->CanStore]) {
+			return false;
+		}
+	}
+
+	if (condition->ImproveIncome != -1) {
+		if (!type || type->Stats[ThisPlayer->Index].ImproveIncomes[condition->ImproveIncome] <= DefaultIncomes[condition->ImproveIncome]) {
+			return false;
+		}
+	}
+
 	if (condition->Description && type && type->Description.empty()) {
 		return false;
 	}

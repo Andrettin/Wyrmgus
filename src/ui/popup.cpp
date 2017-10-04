@@ -746,6 +746,10 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->UnitTypeClass = GetUnitTypeClassIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(key, "ItemClass")) {
 			condition->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
+		} else if (!strcmp(key, "CanStore")) {
+			condition->CanStore = GetResourceIdByName(LuaToString(l, -1));
+		} else if (!strcmp(key, "ImproveIncome")) {
+			condition->ImproveIncome = GetResourceIdByName(LuaToString(l, -1));
 		} else if (!strcmp(key, "Weapon")) {
 			condition->Weapon = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Shield")) {
