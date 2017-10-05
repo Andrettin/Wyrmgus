@@ -453,6 +453,22 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 
+	if (condition->ImproveIncomes != CONDITION_TRUE) {
+		if (!type) {
+			return false;
+		}
+		bool improve_incomes = false;
+		for (int i = 1; i < MaxCosts; ++i) {
+			if (type->Stats[ThisPlayer->Index].ImproveIncomes[i] > DefaultIncomes[i]) {
+				improve_incomes = true;
+				break;
+			}
+		}
+		if ((condition->ImproveIncomes == CONDITION_ONLY) ^ improve_incomes) {
+			return false;
+		}
+	}
+
 	if (condition->Description && type && type->Description.empty()) {
 		return false;
 	}

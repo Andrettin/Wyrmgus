@@ -1036,6 +1036,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "TypeBuildingRulesString")) {
 			res->e = EString_TypeBuildingRulesString;
 			res->D.Type = CclParseTypeDesc(l);
+		} else if (!strcmp(key, "TypeImproveIncomes")) {
+			res->e = EString_TypeImproveIncomes;
+			res->D.Type = CclParseTypeDesc(l);
 		} else if (!strcmp(key, "TypeLuxuryDemand")) {
 			res->e = EString_TypeLuxuryDemand;
 			res->D.Type = CclParseTypeDesc(l);
@@ -1490,6 +1493,28 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string("");
 			}
+		case EString_TypeImproveIncomes : // unit type's processing bonuses
+			type = s->D.Type;
+			if (type != NULL) {
+				std::string improve_incomes;
+				bool first = true;
+				for (int res = 1; res < MaxCosts; ++res) {
+					if ((**type).Stats[ThisPlayer->Index].ImproveIncomes[res] > DefaultIncomes[res]) {
+						if (!first) {
+							improve_incomes += "\n";
+						} else {
+							first = false;
+						}
+						improve_incomes += IdentToName(DefaultResourceNames[res]);
+						improve_incomes += " Processing Bonus: +";
+						improve_incomes += std::to_string((long long) (**type).Stats[ThisPlayer->Index].ImproveIncomes[res] - DefaultIncomes[res]);
+						improve_incomes += "%";
+					}
+				}
+				return improve_incomes;
+			} else { // ERROR.
+				return std::string("");
+			}
 		case EString_TypeLuxuryDemand : // unit type's luxury demand
 			type = s->D.Type;
 			if (type != NULL) {
@@ -1810,26 +1835,13 @@ void FreeStringDesc(StringDesc *s)
 			delete s->D.Unit;
 			break;
 		case EString_TypeName : // Name of the unit type
-			delete *s->D.Type;
-			break;
 		case EString_TypeIdent : // Ident of the unit type
-			delete *s->D.Type;
-			break;
 		case EString_TypeClass : // Class of the unit type
-			delete *s->D.Type;
-			break;
 		case EString_TypeDescription : // Description of the unit type
-			delete *s->D.Type;
-			break;
 		case EString_TypeQuote : // Quote of the unit type
-			delete *s->D.Type;
-			break;
 		case EString_TypeRequirementsString : // Requirements string of the unit type
-			delete *s->D.Type;
-			break;
 		case EString_TypeBuildingRulesString : // Building rules string of the unit type
-			delete *s->D.Type;
-			break;
+		case EString_TypeImproveIncomes : // Income improvements of the unit type
 		case EString_TypeLuxuryDemand : // Luxury demand of the unit type
 			delete *s->D.Type;
 			break;
@@ -2530,6 +2542,11 @@ static int CclTypeBuildingRulesString(lua_State *l)
 	return Alias(l, "TypeBuildingRulesString");
 }
 
+static int CclTypeImproveIncomes(lua_State *l)
+{
+	return Alias(l, "TypeImproveIncomes");
+}
+
 static int CclTypeLuxuryDemand(lua_State *l)
 {
 	return Alias(l, "TypeLuxuryDemand");
@@ -2849,6 +2866,7 @@ static void AliasRegister()
 	lua_register(Lua, "TypeQuote", CclTypeQuote);
 	lua_register(Lua, "TypeRequirementsString", CclTypeRequirementsString);
 	lua_register(Lua, "TypeBuildingRulesString", CclTypeBuildingRulesString);
+	lua_register(Lua, "TypeImproveIncomes", CclTypeImproveIncomes);
 	lua_register(Lua, "TypeLuxuryDemand", CclTypeLuxuryDemand);
 	lua_register(Lua, "TypeTrainQuantity", CclTypeTrainQuantity);
 	lua_register(Lua, "UpgradeCivilization", CclUpgradeCivilization);
