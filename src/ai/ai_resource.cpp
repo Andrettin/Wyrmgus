@@ -736,6 +736,10 @@ static bool AiRequestSupply()
 		/* we still need supply */
 		return true;
 	}
+	
+	if (AiPlayer->Player->NumTownHalls < 1) { //don't request supply if has no town hall yet
+		return true;
+	}
 
 	// Count the already made build requests.
 	int counter[UnitTypeMax];

@@ -1508,7 +1508,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			if (longWay || !mine || mine->Type == NULL || (depot->Refs > tooManyWorkers)) {
 			//Wyrmgus end
 				newdepot = AiGetSuitableDepot(unit, *depot, &goal);
-				if (newdepot == NULL && longWay) {
+				if (newdepot == NULL && longWay && unit.Player->NumTownHalls > 0) {
 					// We need a new depot
 					AiNewDepotRequest(unit);
 				}

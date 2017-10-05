@@ -83,6 +83,9 @@ class CPlayer
 	bool IsBothSharedVision(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
+	//Wyrmgus start
+	bool HasNeutralFactionType() const;
+	//Wyrmgus end
 };
 
 extern CPlayer Players[PlayerMax];

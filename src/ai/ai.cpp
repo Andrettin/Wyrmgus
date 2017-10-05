@@ -274,7 +274,7 @@ static void AiCheckUnits()
 	if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && !IsNetworkGame() && CurrentQuest == NULL) {
 		for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
 			CUnit *hero_recruiter = &AiPlayer->Player->GetUnit(i);
-			if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->Type->BoolFlag[RECRUITHEROES_INDEX].value) {
+			if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->Type->BoolFlag[RECRUITHEROES_INDEX].value || hero_recruiter->CurrentAction() == UnitActionBuilt) {
 				continue;
 			}
 			
