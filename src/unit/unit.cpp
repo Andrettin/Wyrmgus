@@ -777,9 +777,9 @@ void CUnit::Retrain()
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 		if (this->IndividualUpgrades[AllUpgrades[i]->ID]) {
 			if (AllUpgrades[i]->Ability && std::find(this->Type->StartingAbilities.begin(), this->Type->StartingAbilities.end(), AllUpgrades[i]) == this->Type->StartingAbilities.end()) {
-				AbilityLost(*this, AllUpgrades[i]);
+				AbilityLost(*this, AllUpgrades[i], true);
 			} else if (!strncmp(AllUpgrades[i]->Ident.c_str(), "upgrade-deity-", 14) && strncmp(AllUpgrades[i]->Ident.c_str(), "upgrade-deity-domain-", 21) && this->Character && this->Character->Custom) { //allow changing the deity for custom heroes
-				IndividualUpgradeLost(*this, AllUpgrades[i]);
+				IndividualUpgradeLost(*this, AllUpgrades[i], true);
 			}
 		}
 	}
@@ -908,13 +908,13 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	if (this->Type->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[this->Type->Civilization].empty()) {
 		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Type->Civilization]);
 		if (civilization_upgrade) {
-			this->IndividualUpgrades[civilization_upgrade->ID] = true;
+			this->IndividualUpgrades[civilization_upgrade->ID] = 1;
 		}
 	}
 	if (this->Type->Civilization != -1 && this->Type->Faction != -1 && !PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
-			this->IndividualUpgrades[faction_upgrade->ID] = true;
+			this->IndividualUpgrades[faction_upgrade->ID] = 1;
 		}
 	}
 
@@ -1328,11 +1328,23 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 				(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X')
 				|| (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->Type->WeaponClasses[0]) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item_class) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end())
 			) {
-				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+				if (this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]) {
+					for (int i = 0; i < this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]; ++i) {
+						RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+					}
+				} else {
+					RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+				}
 			} else if (
 				AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->Type->WeaponClasses[0]) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item_class) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end()
 			) {
-				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+				if (this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]) {
+					for (int i = 0; i < this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]; ++i) {
+						ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+					}
+				} else {
+					ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+				}
 			}
 		}
 	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
@@ -1499,11 +1511,23 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 				(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X')
 				|| (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->Type->WeaponClasses[0]) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item_class) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end())
 			) {
-				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+				if (this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]) {
+					for (int i = 0; i < this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]; ++i) {
+						ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+					}
+				} else {
+					ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+				}
 			} else if (
 				AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->Type->WeaponClasses[0]) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item_class) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end()
 			) {
-				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+				if (this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]) {
+					for (int i = 0; i < this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]; ++i) {
+						RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+					}
+				} else {
+					RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+				}
 			}
 		}
 	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
@@ -2702,13 +2726,13 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	if (unit->Type->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[unit->Type->Civilization].empty()) {
 		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[unit->Type->Civilization]);
 		if (civilization_upgrade) {
-			unit->IndividualUpgrades[civilization_upgrade->ID] = true;
+			unit->IndividualUpgrades[civilization_upgrade->ID] = 1;
 		}
 	}
 	if (unit->Type->Civilization != -1 && unit->Type->Faction != -1 && !PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
-			unit->IndividualUpgrades[faction_upgrade->ID] = true;
+			unit->IndividualUpgrades[faction_upgrade->ID] = 1;
 		}
 	}
 
@@ -5172,9 +5196,7 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	
 	if (!only_units && ((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-			if (!IndividualUpgrades[AiHelpers.LearnableAbilities[Type->Slot][i]->ID]) {
-				value += 1;
-			}
+			value += AiHelpers.LearnableAbilities[Type->Slot][i]->MaxLimit - IndividualUpgrades[AiHelpers.LearnableAbilities[Type->Slot][i]->ID];
 		}
 	}
 	
@@ -5259,7 +5281,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 	
 	int value = 0;
 	if (item->Work != NULL) {
-		if (this->IndividualUpgrades[item->Work->ID] == false) {
+		if (this->IndividualUpgrades[item->Work->ID] == 0) {
 			for (size_t z = 0; z < item->Work->UpgradeModifiers.size(); ++z) {
 				if (!increase) {
 					value += item->Work->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
@@ -5269,7 +5291,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 			}
 		}
 	} else if (item->Elixir != NULL) {
-		if (this->IndividualUpgrades[item->Elixir->ID] == false) {
+		if (this->IndividualUpgrades[item->Elixir->ID] == 0) {
 			for (size_t z = 0; z < item->Elixir->UpgradeModifiers.size(); ++z) {
 				if (!increase) {
 					value += item->Elixir->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
@@ -5349,18 +5371,38 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 					)
 					|| (item_slot == WeaponItemSlot && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->GetCurrentWeaponClass()) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item->Type->ItemClass) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end())
 				) {
-					if (!increase) {
-						value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+					if (this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]) {
+						for (int i = 0; i < this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]; ++i) {
+							if (!increase) {
+								value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+							} else {
+								value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+							}
+						}
 					} else {
-						value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+						if (!increase) {
+							value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+						} else {
+							value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+						}
 					}
 				} else if (
 					AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->GetCurrentWeaponClass()) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item->Type->ItemClass) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end()
 				) {
-					if (!increase) {
-						value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+					if (this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]) {
+						for (int i = 0; i < this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId]; ++i) {
+							if (!increase) {
+								value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+							} else {
+								value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+							}
+						}
 					} else {
-						value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+						if (!increase) {
+							value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+						} else {
+							value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+						}
 					}
 				}
 			}
@@ -5876,7 +5918,7 @@ bool CUnit::CanLearnAbility(CUpgrade *ability) const
 		return false;
 	}
 	
-	if (IndividualUpgrades[ability->ID]) { // already learned
+	if (IndividualUpgrades[ability->ID] >= ability->MaxLimit) { // already learned
 		return false;
 	}
 	

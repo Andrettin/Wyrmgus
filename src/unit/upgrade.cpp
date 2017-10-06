@@ -196,7 +196,7 @@ int CUnitStats::GetPrice() const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Class(-1), Civilization(-1), Faction(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), MagicLevel(0), Year(0), Author(NULL)
+	Ident(ident), ID(0), Class(-1), Civilization(-1), Faction(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), MaxLimit(1), MagicLevel(0), Year(0), Author(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -364,6 +364,7 @@ static int CclDefineUpgrade(lua_State *l)
 					upgrade->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
 					upgrade->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
 				}
+				upgrade->MaxLimit = parent_upgrade->MaxLimit;
 				upgrade->MagicLevel = parent_upgrade->MagicLevel;
 				upgrade->Ability = parent_upgrade->Ability;
 				upgrade->Weapon = parent_upgrade->Weapon;
@@ -426,6 +427,8 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->EffectsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "RequirementsString")) {
 			upgrade->RequirementsString = LuaToString(l, -1);
+		} else if (!strcmp(value, "MaxLimit")) {
+			upgrade->MaxLimit = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MagicLevel")) {
 			upgrade->MagicLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Year")) {
@@ -2280,7 +2283,7 @@ void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
 **  @param unit     Unit losing the upgrade.
 **  @param upgrade  Upgrade lost.
 */
-void AbilityLost(CUnit &unit, CUpgrade *upgrade)
+void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 {
 	unit.Variable[LEVELUP_INDEX].Value += 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
@@ -2294,6 +2297,10 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade)
 	}
 	IndividualUpgradeLost(unit, upgrade);
 	unit.Player->UpdateLevelUpUnits();
+	
+	if (lose_all && unit.IndividualUpgrades[upgrade->ID] > 0) {
+		AbilityLost(unit, upgrade, lose_all);
+	}
 }
 
 void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
@@ -2329,7 +2336,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	}
 	//Wyrmgus end
 	int id = upgrade->ID;
-	unit.IndividualUpgrades[id] = true;
+	unit.IndividualUpgrades[id] += 1;
 	
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
 		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
@@ -2384,7 +2391,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	}
 }
 
-void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
+void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 {
 	//Wyrmgus start
 	if (!GameRunning && !GameEstablishing && !SaveGameLoading) {
@@ -2392,7 +2399,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
 	}
 	//Wyrmgus end
 	int id = upgrade->ID;
-	unit.IndividualUpgrades[id] = false;
+	unit.IndividualUpgrades[id] -= 1;
 
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
 		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
@@ -2437,6 +2444,10 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
 	//
 	if (unit.Player == ThisPlayer) {
 		SelectedUnitChanged();
+	}
+	
+	if (lose_all && unit.IndividualUpgrades[id] > 0) {
+		IndividualUpgradeLost(unit, upgrade, lose_all);
 	}
 }
 

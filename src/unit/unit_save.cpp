@@ -429,7 +429,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 		if (unit.IndividualUpgrades[i]) {
-			file.printf(",\n  \"individual-upgrade\", \"%s\"", AllUpgrades[i]->Ident.c_str());
+			file.printf(",\n  \"individual-upgrade\", \"%s\", %d", AllUpgrades[i]->Ident.c_str(), unit.IndividualUpgrades[i]);
 		}
 	}
 	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1) {

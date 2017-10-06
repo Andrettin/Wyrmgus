@@ -510,7 +510,7 @@ public:
 	CUnit *ConnectingDestination;	/// Which connector this unit connects to (if any)
 	std::map<int, CIcon *> ButtonIcons;				/// icons for button actions
 	//Wyrmgus end
-	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
+	int IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has (and how many of it the unit has)
 
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position

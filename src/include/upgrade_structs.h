@@ -254,6 +254,7 @@ public:
 	int   ScaledCosts[MaxCosts];      /// scaled costs for the upgrade
 	//Wyrmgus start
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
+	int MaxLimit;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
 	int MagicLevel;					/// Magic level of an affix
 	int Work;						/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year;						/// Year of publication, if is a literary work
