@@ -953,7 +953,9 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 			
 	//load learned abilities
 	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
-		AbilityAcquire(*this, this->Character->Abilities[i], false);
+		if (CanLearnAbility(this->Character->Abilities[i])) {
+			AbilityAcquire(*this, this->Character->Abilities[i], false);
+		}
 	}
 	
 	//load read works
