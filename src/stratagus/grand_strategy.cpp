@@ -2864,20 +2864,6 @@ std::string GetGrandStrategyHeroUnitType(std::string hero_full_name)
 	return "";
 }
 
-void AddGrandStrategyHeroAbility(std::string hero_full_name, std::string upgrade_ident)
-{
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
-		if (upgrade != NULL) {
-			hero->Abilities.push_back(upgrade);
-			hero->UpdateAttributes();
-		}
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
-}
-
 std::string GetGrandStrategyHeroIcon(std::string hero_full_name)
 {
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);

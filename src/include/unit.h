@@ -196,7 +196,7 @@ public:
 	void SetResourcesHeld(int quantity);
 	void ChangeResourcesHeld(int quantity);
 	void ReplaceOnTop(CUnit &replaced_unit);
-	void IncreaseLevel(int level_quantity);
+	void IncreaseLevel(int level_quantity, bool automatic_learning = true);
 	void Retrain();
 	void HealingItemAutoUse();
 	void SetCharacter(std::string character_full_name, bool custom_hero = false);

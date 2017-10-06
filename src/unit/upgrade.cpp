@@ -2261,16 +2261,14 @@ void ApplyUpgrades()
 **  @param unit     Unit learning the upgrade.
 **  @param upgrade  Upgrade learned.
 */
-void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
+void AbilityAcquire(CUnit &unit, CUpgrade *upgrade, bool save)
 {
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
-	if (!IsNetworkGame() && unit.Character != NULL) {
-		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) == unit.Character->Abilities.end()) {
-			if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
-				unit.Character->Abilities.push_back(upgrade);
-				SaveHero(unit.Character);
-			}
+	if (!IsNetworkGame() && unit.Character != NULL && save) {
+		if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
+			unit.Character->Abilities.push_back(upgrade);
+			SaveHero(unit.Character);
 		}
 	}
 	IndividualUpgradeAcquire(unit, upgrade);

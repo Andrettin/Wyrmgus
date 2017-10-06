@@ -93,7 +93,7 @@ extern void ApplyUpgrades();
 extern void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um); /// Apply upgrade modifier of an individual upgrade
 //Wyrmgus start
 extern void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um);
-extern void AbilityAcquire(CUnit &unit, CUpgrade *upgrade);
+extern void AbilityAcquire(CUnit &unit, CUpgrade *upgrade, bool save = true);
 extern void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all = false);
 extern void TraitAcquire(CUnit &unit, const CUpgrade *upgrade);
 //Wyrmgus end

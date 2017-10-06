@@ -684,7 +684,7 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	replaced_unit.Release();
 }
 
-void CUnit::IncreaseLevel(int level_quantity)
+void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 {
 	while (level_quantity > 0) {
 		this->Variable[LEVEL_INDEX].Value += 1;
@@ -710,7 +710,7 @@ void CUnit::IncreaseLevel(int level_quantity)
 	UpdateXPRequired();
 	
 	bool upgrade_found = true;
-	while (this->Variable[LEVELUP_INDEX].Value > 0 && upgrade_found) {
+	while (this->Variable[LEVELUP_INDEX].Value > 0 && upgrade_found && automatic_learning) {
 		upgrade_found = false;
 
 		if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
@@ -944,7 +944,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	
 	this->Variable[LEVEL_INDEX].Max = 100000; // because the code above sets the max level to the unit type stats' Level variable (which is the same as its value)
 	if (this->Variable[LEVEL_INDEX].Value < this->Character->Level) {
-		this->IncreaseLevel(this->Character->Level - this->Variable[LEVEL_INDEX].Value);
+		this->IncreaseLevel(this->Character->Level - this->Variable[LEVEL_INDEX].Value, false);
 	}
 	
 	this->Variable[XP_INDEX].Enable = 1;
@@ -953,7 +953,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 			
 	//load learned abilities
 	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
-		AbilityAcquire(*this, this->Character->Abilities[i]);
+		AbilityAcquire(*this, this->Character->Abilities[i], false);
 	}
 	
 	//load read works
@@ -1087,7 +1087,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 					break;
 				}
 			}
-			if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || this->IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
+			if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || this->IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID])) {
 				upgrades_check = false;
 				break;
 			}
