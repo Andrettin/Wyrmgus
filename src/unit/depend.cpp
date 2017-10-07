@@ -344,7 +344,7 @@ static bool CheckDependByRule(const CUnit &unit, DependRule &rule, bool ignore_u
 					}
 					break;
 				case DependRuleUpgrade:
-					i = UpgradeIdAllowed(*unit.Player, temp->Kind.Upgrade->ID) != 'R' && unit.IndividualUpgrades[temp->Kind.Upgrade->ID] < temp->Kind.Upgrade->MaxLimit;
+					i = UpgradeIdAllowed(*unit.Player, temp->Kind.Upgrade->ID) != 'R' && !unit.GetIndividualUpgrade(temp->Kind.Upgrade);
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}

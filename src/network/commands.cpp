@@ -1002,7 +1002,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandDismiss:
 			CommandLog("dismiss", &unit, FlushCommands, arg1, -1, NULL, NULL, -1);
-			CommandDismiss(unit, arg1);
+			CommandDismiss(unit, arg1 > 0);
 			break;
 		case MessageCommandResourceLoc:
 			CommandLog("resource-loc", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);

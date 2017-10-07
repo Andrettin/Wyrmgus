@@ -356,8 +356,8 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 					
 					if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
 						for (int overlay = 1; overlay >= 0; --overlay) {
-							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, CurrentMapLayer);
-							if (!adjacent_terrain || adjacent_terrain == Map.GetTileTerrain(changed_tiles[i], overlay, CurrentMapLayer)) {
+							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay > 0, CurrentMapLayer);
+							if (!adjacent_terrain || adjacent_terrain == Map.GetTileTerrain(changed_tiles[i], overlay > 0, CurrentMapLayer)) {
 								continue;
 							}
 							Map.CalculateTileTransitions(adjacent_pos, overlay == 1, CurrentMapLayer);
@@ -379,7 +379,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 										if (sub_x_offset != 0 || sub_y_offset != 0) {
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
 											if (Map.Info.IsPointOnMap(sub_adjacent_pos, CurrentMapLayer)) {
-												CTerrainType *sub_adjacent_terrain = Map.GetTileTerrain(sub_adjacent_pos, overlay, CurrentMapLayer);
+												CTerrainType *sub_adjacent_terrain = Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, CurrentMapLayer);
 												if (adjacent_terrain->Overlay && sub_adjacent_terrain && Map.Field(sub_adjacent_pos, CurrentMapLayer)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = NULL;
 												}

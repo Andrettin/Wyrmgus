@@ -180,9 +180,9 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//if the old unit type had a starting ability that the new one doesn't have, remove it; and apply it if the reverse happens
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 		if (AllUpgrades[i]->Ability) {
-			if (unit.IndividualUpgrades[AllUpgrades[i]->ID] && std::find(oldtype.StartingAbilities.begin(), oldtype.StartingAbilities.end(), AllUpgrades[i]) != oldtype.StartingAbilities.end() && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) == newtype.StartingAbilities.end()) {
+			if (unit.GetIndividualUpgrade(AllUpgrades[i]) && std::find(oldtype.StartingAbilities.begin(), oldtype.StartingAbilities.end(), AllUpgrades[i]) != oldtype.StartingAbilities.end() && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) == newtype.StartingAbilities.end()) {
 				IndividualUpgradeLost(unit, AllUpgrades[i]);
-			} else if (!unit.IndividualUpgrades[AllUpgrades[i]->ID] && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) != newtype.StartingAbilities.end() && CheckDependByIdent(unit, AllUpgrades[i]->Ident)) {
+			} else if (!unit.GetIndividualUpgrade(AllUpgrades[i]) && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) != newtype.StartingAbilities.end() && CheckDependByIdent(unit, AllUpgrades[i]->Ident)) {
 				IndividualUpgradeAcquire(unit, AllUpgrades[i]);
 			}
 		}
@@ -252,25 +252,25 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	if (oldtype.Civilization != -1 && !PlayerRaces.CivilizationUpgrades[oldtype.Civilization].empty()) {
 		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[oldtype.Civilization]);
 		if (civilization_upgrade) {
-			unit.IndividualUpgrades[civilization_upgrade->ID] = 0;
+			unit.SetIndividualUpgrade(civilization_upgrade, 0);
 		}
 	}
 	if (oldtype.Civilization != -1 && oldtype.Faction != -1 && !PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade);
 		if (faction_upgrade) {
-			unit.IndividualUpgrades[faction_upgrade->ID] = 0;
+			unit.SetIndividualUpgrade(faction_upgrade, 0);
 		}
 	}
 	if (newtype.Civilization != -1 && !PlayerRaces.CivilizationUpgrades[newtype.Civilization].empty()) {
 		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[newtype.Civilization]);
 		if (civilization_upgrade) {
-			unit.IndividualUpgrades[civilization_upgrade->ID] = 1;
+			unit.SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
 	if (newtype.Civilization != -1 && newtype.Faction != -1 && !PlayerRaces.Factions[newtype.Faction]->FactionUpgrade.empty()) {
 		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[newtype.Faction]->FactionUpgrade);
 		if (faction_upgrade) {
-			unit.IndividualUpgrades[faction_upgrade->ID] = 1;
+			unit.SetIndividualUpgrade(faction_upgrade, 1);
 		}
 	}
 	

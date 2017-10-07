@@ -390,6 +390,8 @@ public:
 	//Wyrmgus start
 	Vec2i GetCenterPos() const;
 	
+	void SetIndividualUpgrade(const CUpgrade *upgrade, int quantity);
+	int GetIndividualUpgrade(const CUpgrade *upgrade) const;
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
 	int GetModifiedVariable(int index, int variable_type = 0) const;
 	int GetReactionRange() const;
@@ -510,7 +512,7 @@ public:
 	CUnit *ConnectingDestination;	/// Which connector this unit connects to (if any)
 	std::map<int, CIcon *> ButtonIcons;				/// icons for button actions
 	//Wyrmgus end
-	int IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has (and how many of it the unit has)
+	std::map<int, int> IndividualUpgrades;      /// individual upgrades which the unit has (and how many of it the unit has)
 
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position

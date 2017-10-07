@@ -554,7 +554,7 @@ bool SpellIsAvailable(const CUnit &unit, int spellid)
 
 	//Wyrmgus start
 //	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
-	return dependencyId == -1 || unit.IndividualUpgrades[dependencyId] || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
+	return dependencyId == -1 || unit.GetIndividualUpgrade(AllUpgrades[dependencyId]) > 0 || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
 	//Wyrmgus end
 }
 

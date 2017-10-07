@@ -745,7 +745,7 @@ static int CclUnit(lua_State *l)
 			++j;
 			int individual_upgrade_quantity = LuaToNumber(l, 2, j + 1);
 			if (individual_upgrade) {
-				unit->IndividualUpgrades[individual_upgrade->ID] = individual_upgrade_quantity;
+				unit->SetIndividualUpgrade(individual_upgrade, individual_upgrade_quantity);
 			}
 		} else if (!strcmp(value, "rally-point")) {
 			int rally_point_x = LuaToNumber(l, 2, j + 1);
@@ -1899,7 +1899,7 @@ static int CclGetUnitVariable(lua_State *l)
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
 		if (CUpgrade::Get(upgrade_ident)) {
-			lua_pushnumber(l, unit->IndividualUpgrades[CUpgrade::Get(upgrade_ident)->ID]);
+			lua_pushnumber(l, unit->GetIndividualUpgrade(CUpgrade::Get(upgrade_ident)));
 		} else {
 			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 		}
@@ -2023,9 +2023,9 @@ static int CclSetUnitVariable(lua_State *l)
 		std::string upgrade_ident = LuaToString(l, 3);
 		bool has_upgrade = LuaToBoolean(l, 4);
 		if (CUpgrade::Get(upgrade_ident)) {
-			if (has_upgrade && unit->IndividualUpgrades[CUpgrade::Get(upgrade_ident)->ID] == 0) {
+			if (has_upgrade && unit->GetIndividualUpgrade(CUpgrade::Get(upgrade_ident)) == 0) {
 				IndividualUpgradeAcquire(*unit, CUpgrade::Get(upgrade_ident));
-			} else if (!has_upgrade && unit->IndividualUpgrades[CUpgrade::Get(upgrade_ident)->ID]) {
+			} else if (!has_upgrade && unit->GetIndividualUpgrade(CUpgrade::Get(upgrade_ident))) {
 				IndividualUpgradeLost(*unit, CUpgrade::Get(upgrade_ident));
 			}
 		} else {

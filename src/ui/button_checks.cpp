@@ -145,7 +145,7 @@ bool ButtonCheckUpgradeOr(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckIndividualUpgrade(const CUnit &unit, const ButtonAction &button)
 {
-	return unit.IndividualUpgrades[UpgradeIdByIdent(button.AllowStr)];
+	return unit.GetIndividualUpgrade(CUpgrade::Get(button.AllowStr)) > 0;
 }
 
 /**

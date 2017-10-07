@@ -509,7 +509,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->ResearchedUpgrade != CONDITION_TRUE) {
-		if ((condition->ResearchedUpgrade == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdentAllowed(*ThisPlayer, upgrade->Ident) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->IndividualUpgrades[upgrade->ID])))) {
+		if ((condition->ResearchedUpgrade == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdentAllowed(*ThisPlayer, upgrade->Ident) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(upgrade))))) {
 			return false;
 		}
 	}
@@ -636,7 +636,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->ReadWork != CONDITION_TRUE) {
-				if ((condition->ReadWork == CONDITION_ONLY) ^ (unit.Work != NULL && (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->IndividualUpgrades[unit.Work->ID]))) {
+				if ((condition->ReadWork == CONDITION_ONLY) ^ (unit.Work != NULL && (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->GetIndividualUpgrade(unit.Work)))) {
 					return false;
 				}
 			}
@@ -646,7 +646,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->ConsumedElixir != CONDITION_TRUE) {
-				if ((condition->ConsumedElixir == CONDITION_ONLY) ^ (unit.Elixir != NULL && (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->IndividualUpgrades[unit.Elixir->ID]))) {
+				if ((condition->ConsumedElixir == CONDITION_ONLY) ^ (unit.Elixir != NULL && (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->GetIndividualUpgrade(unit.Elixir)))) {
 					return false;
 				}
 			}

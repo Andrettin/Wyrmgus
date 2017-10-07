@@ -1580,9 +1580,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 				for (size_t i = 0; i < unit.Type->StartingAbilities.size(); ++i) {
-					if (!unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
+					if (!unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeAcquire(unit, unit.Type->StartingAbilities[i]);
-					} else if (unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && !CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
+					} else if (unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && !CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeLost(unit, unit.Type->StartingAbilities[i]);
 					}
 				}
@@ -1860,9 +1860,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 				for (size_t i = 0; i < unit.Type->StartingAbilities.size(); ++i) {
-					if (!unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
+					if (!unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeAcquire(unit, unit.Type->StartingAbilities[i]);
-					} else if (unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && !CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
+					} else if (unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && !CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeLost(unit, unit.Type->StartingAbilities[i]);
 					}
 				}
@@ -1918,8 +1918,8 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	Assert(um);
 
 	for (size_t i = 0; i < um->RemoveUpgrades.size(); ++i) {
-		if (unit.IndividualUpgrades[um->RemoveUpgrades[i]->ID]) {
-			IndividualUpgradeLost(unit, um->RemoveUpgrades[i]);
+		if (unit.GetIndividualUpgrade(um->RemoveUpgrades[i])) {
+			IndividualUpgradeLost(unit, um->RemoveUpgrades[i], true);
 		}
 	}
 
@@ -2296,7 +2296,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	IndividualUpgradeLost(unit, upgrade);
 	unit.Player->UpdateLevelUpUnits();
 	
-	if (lose_all && unit.IndividualUpgrades[upgrade->ID] > 0) {
+	if (lose_all && unit.GetIndividualUpgrade(upgrade) > 0) {
 		AbilityLost(unit, upgrade, lose_all);
 	}
 }
@@ -2333,15 +2333,14 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 		return;
 	}
 	//Wyrmgus end
-	int id = upgrade->ID;
-	unit.IndividualUpgrades[id] += 1;
+	unit.SetIndividualUpgrade(upgrade, unit.GetIndividualUpgrade(upgrade) + 1);
 	
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
 		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
 		if (upgrade_deity) {
 			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
 				CUpgrade *domain_upgrade = CUpgrade::Get("upgrade-deity-domain-" + upgrade_deity->Domains[i]->Ident);
-				if (!unit.IndividualUpgrades[domain_upgrade->ID]) {
+				if (!unit.GetIndividualUpgrade(domain_upgrade)) {
 					IndividualUpgradeAcquire(unit, domain_upgrade);
 				}
 			}
@@ -2396,15 +2395,14 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 		return;
 	}
 	//Wyrmgus end
-	int id = upgrade->ID;
-	unit.IndividualUpgrades[id] -= 1;
+	unit.SetIndividualUpgrade(upgrade, unit.GetIndividualUpgrade(upgrade) - 1);
 
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
 		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
 		if (upgrade_deity) {
 			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
 				CUpgrade *domain_upgrade = CUpgrade::Get("upgrade-deity-domain-" + upgrade_deity->Domains[i]->Ident);
-				if (unit.IndividualUpgrades[domain_upgrade->ID]) {
+				if (unit.GetIndividualUpgrade(domain_upgrade)) {
 					IndividualUpgradeLost(unit, domain_upgrade);
 				}
 			}
@@ -2444,7 +2442,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 		SelectedUnitChanged();
 	}
 	
-	if (lose_all && unit.IndividualUpgrades[id] > 0) {
+	if (lose_all && unit.GetIndividualUpgrade(upgrade) > 0) {
 		IndividualUpgradeLost(unit, upgrade, lose_all);
 	}
 }
