@@ -279,19 +279,6 @@ static int CclDefineProvince(lua_State *l)
 			province->Water = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Coastal")) {
 			province->Coastal = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SettlementLocation")) {
-			CclGetPos(l, &province->SettlementLocation.x, &province->SettlementLocation.y);
-		} else if (!strcmp(value, "Map")) {
-			province->Map = LuaToString(l, -1);
-		} else if (!strcmp(value, "SettlementTerrain")) {
-			province->SettlementTerrain = LuaToString(l, -1);
-		} else if (!strcmp(value, "ReferenceProvince")) {
-			CProvince *reference_province = GetProvince(LuaToString(l, -1));
-			if (reference_province != NULL) {
-				province->ReferenceProvince = reference_province->ID;
-			} else {
-				LuaError(l, "Reference province doesn't exist.");
-			}
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -329,18 +316,6 @@ static int CclDefineProvince(lua_State *l)
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
 				province->FactionCulturalNames[PlayerRaces.Factions[faction]] = TransliterateText(cultural_name);
-			}
-		} else if (!strcmp(value, "Tiles")) {
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				lua_rawgeti(l, -1, j + 1);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument (expected table)");
-				}
-				Vec2i tile;
-				CclGetPos(l, &tile.x, &tile.y);
-				province->Tiles.push_back(tile);
-				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "Claims")) {
 			if (!lua_istable(l, -1)) {
@@ -514,16 +489,6 @@ static int CclDefineWorldMapTile(lua_State *l)
 				world->Tiles.push_back(tile);
 			} else {
 				LuaError(l, "World doesn't exist.");
-			}
-		} else if (!strcmp(value, "Province")) {
-			CProvince *province = GetProvince(LuaToString(l, -1));
-			if (province != NULL) {
-				tile->Province = province;
-				if (tile->Position.x != -1 && tile->Position.y != -1) {
-					province->Tiles.push_back(tile->Position);
-				}
-			} else {
-				LuaError(l, "Province doesn't exist.");
 			}
 		} else if (!strcmp(value, "Terrain")) {
 			int terrain = GetWorldMapTerrainTypeId(LuaToString(l, -1));
@@ -900,30 +865,6 @@ static int CclGetProvinceData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Coastal")) {
 		lua_pushboolean(l, province->Coastal);
-		return 1;
-	} else if (!strcmp(data, "Map")) {
-		lua_pushstring(l, province->Map.c_str());
-		return 1;
-	} else if (!strcmp(data, "SettlementTerrain")) {
-		lua_pushstring(l, province->SettlementTerrain.c_str());
-		return 1;
-	} else if (!strcmp(data, "SettlementLocationX")) {
-		lua_pushnumber(l, province->SettlementLocation.x);
-		return 1;
-	} else if (!strcmp(data, "SettlementLocationY")) {
-		lua_pushnumber(l, province->SettlementLocation.y);
-		return 1;
-	} else if (!strcmp(data, "Tiles")) {
-		lua_createtable(l, province->Tiles.size() * 2, 0);
-		for (size_t i = 1; i <= province->Tiles.size() * 2; ++i)
-		{
-			lua_pushnumber(l, province->Tiles[(i-1) / 2].x);
-			lua_rawseti(l, -2, i);
-			++i;
-
-			lua_pushnumber(l, province->Tiles[(i-1) / 2].y);
-			lua_rawseti(l, -2, i);
-		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

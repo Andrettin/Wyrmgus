@@ -153,25 +153,20 @@ class CProvince
 {
 public:
 	CProvince() :
-		ID(-1), ReferenceProvince(-1),
-		Water(false), Coastal(false), SettlementLocation(-1, -1),
+		ID(-1),
+		Water(false), Coastal(false),
 		World(NULL)
 	{
 	}
 	
 	std::string Name;
 	CWorld *World;
-	std::string Map;
-	std::string SettlementTerrain;
 	int ID;																/// ID of this province
-	int ReferenceProvince;										/// Used by water provinces to see based on which province should they use which cultural name
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
-	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
 	std::map<int, std::string> CulturalNames;							/// Names for the province for each different culture/civilization
 	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
 	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this province
-	std::vector<Vec2i> Tiles;
 	std::vector<CRegion *> Regions;										/// Regions to which this province belongs
 	std::map<int, CFaction *> HistoricalOwners;							/// Historical owners of the province, mapped to the year
 	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the province, mapped to the year
@@ -189,7 +184,7 @@ public:
 		Terrain(-1), Resource(-1),
 		Capital(false),
 		Position(-1, -1),
-		World(NULL), Province(NULL)
+		World(NULL)
 	{
 	}
 
@@ -198,7 +193,6 @@ public:
 	bool Capital;								/// Whether the tile is its province's capital
 	Vec2i Position;								/// Position of the tile
 	CWorld *World;
-	CProvince *Province;
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalTerrainNames;			/// Names for the tile (if it has a certain terrain) for each culture/civilization
 	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalResourceNames;		/// Names for the tile (if it has a certain resource) for each culture/civilization

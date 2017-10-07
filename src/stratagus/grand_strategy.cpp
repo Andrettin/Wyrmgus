@@ -67,18 +67,10 @@ bool GrandStrategy = false;				///if the game is in grand strategy mode
 bool GrandStrategyGamePaused = false;
 bool GrandStrategyGameInitialized = false;
 bool GrandStrategyGameLoading = false;
-bool GrandStrategyBattleBaseBuilding = false;
 int GrandStrategyYear = 0;
 int GrandStrategyMonth = 0;
 std::string GrandStrategyWorld;
-int WorldMapOffsetX;
-int WorldMapOffsetY;
-int GrandStrategyMapWidthIndent;
-int GrandStrategyMapHeightIndent;
-int BattalionMultiplier;
 int PopulationGrowthThreshold = 1000;
-std::string GrandStrategyInterfaceState;
-std::string SelectedHero;
 CGrandStrategyGame GrandStrategyGame;
 std::map<std::string, int> GrandStrategyHeroStringToIndex;
 std::vector<CGrandStrategyEvent *> GrandStrategyEvents;
@@ -161,7 +153,6 @@ void CGrandStrategyGame::DoTurn()
 				}
 			}
 		}
-		this->Provinces[i]->Movement = false; //after processing the turn, always set the movement to false
 	}
 	
 	// check if any literary works should be published this year
@@ -286,14 +277,6 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 	province->Owner->Resources[PrestigeCost] += 1;
 }
 
-bool CGrandStrategyGame::IsPointOnMap(int x, int y)
-{
-	if (x < 0 || x >= this->WorldMapWidth || y < 0 || y >= this->WorldMapHeight || !WorldMapTiles[x][y]) {
-		return false;
-	}
-	return true;
-}
-
 bool CGrandStrategyGame::TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b)
 {
 	return faction_a.Resources[PrestigeCost] > faction_b.Resources[PrestigeCost];
@@ -308,40 +291,10 @@ CGrandStrategyHero *CGrandStrategyGame::GetHero(std::string hero_full_name)
 	}
 }
 
-void GrandStrategyWorldMapTile::SetResourceProspected(int resource_id, bool discovered)
-{
-	if (this->ResourceProspected == discovered) { //no change, return
-		return;
-	}
-	
-	if (resource_id != -1 && this->Resource == resource_id) {
-		this->ResourceProspected = discovered;
-		
-		if (this->Province != NULL) {
-			if (this->ResourceProspected) {
-				this->Province->ProductionCapacity[resource_id] += 1;
-			} else {
-				this->Province->ProductionCapacity[resource_id] -= 1;
-			}
-		}
-	}
-}
-
 bool GrandStrategyWorldMapTile::IsWater()
 {
 	if (this->Terrain != -1) {
 		return WorldMapTerrainTypes[this->Terrain]->Water;
-	}
-	return false;
-}
-
-/**
-**  Get whether the tile has a resource
-*/
-bool GrandStrategyWorldMapTile::HasResource(int resource, bool ignore_prospection)
-{
-	if (resource == this->Resource && (this->ResourceProspected || ignore_prospection)) {
-		return true;
 	}
 	return false;
 }
@@ -454,13 +407,6 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	}
 }
 
-void CGrandStrategyProvince::SetSettlementLocation(int x, int y)
-{
-	this->SettlementLocation.x = x;
-	this->SettlementLocation.y = y;
-	CclCommand("if (GetProvinceFromName(\"" + this->Name + "\") ~= nil) then GetProvinceFromName(\"" + this->Name + "\").SettlementLocation = {" + std::to_string((long long) x) + ", " + std::to_string((long long) y) + "} end;");
-}
-
 void CGrandStrategyProvince::SetModifier(CUpgrade *modifier, bool has_modifier)
 {
 	if (this->HasModifier(modifier) == has_modifier) { // current situation already corresponds to has_modifier setting
@@ -519,44 +465,6 @@ void CGrandStrategyProvince::ChangeUnitQuantity(int unit_type_id, int quantity)
 	this->SetUnitQuantity(unit_type_id, this->Units[unit_type_id] + quantity);
 }
 
-void CGrandStrategyProvince::SetAttackingUnitQuantity(int unit_type_id, int quantity)
-{
-	quantity = std::max(0, quantity);
-	
-	int change = quantity - this->GetAttackingUnitQuantity(unit_type_id);
-	
-	if (IsMilitaryUnit(*UnitTypes[unit_type_id])) {
-		this->AttackingMilitaryScore += change * (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->AttackedBy != NULL ? this->AttackedBy->MilitaryScoreBonus[unit_type_id] : 0));
-	}
-
-	if (quantity > 0) {
-		this->AttackingUnits[unit_type_id] = quantity;
-	} else {
-		this->AttackingUnits.erase(unit_type_id);
-	}
-}
-
-void CGrandStrategyProvince::ChangeAttackingUnitQuantity(int unit_type_id, int quantity)
-{
-	this->SetAttackingUnitQuantity(unit_type_id, this->GetAttackingUnitQuantity(unit_type_id) + quantity);
-}
-
-void CGrandStrategyProvince::SetMovingUnitQuantity(int unit_type_id, int quantity)
-{
-	quantity = std::max(0, quantity);
-	
-	if (quantity > 0) {
-		this->Movement = true;
-	}
-		
-	this->MovingUnits[unit_type_id] = quantity;
-}
-
-void CGrandStrategyProvince::ChangeMovingUnitQuantity(int unit_type_id, int quantity)
-{
-	this->SetMovingUnitQuantity(unit_type_id, this->MovingUnits[unit_type_id] + quantity);
-}
-
 void CGrandStrategyProvince::SetPopulation(int quantity)
 {
 	if (this->Civilization == -1) {
@@ -591,13 +499,6 @@ void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 			hero->Die();
 			return;
 		}
-		if (hero->Province != NULL) {
-			if (hero->State == 2) {
-				hero->Province->MilitaryScore -= (hero->Type->DefaultStat.Variables[POINTS_INDEX].Value + (hero->Province->Owner != NULL ? hero->Province->Owner->MilitaryScoreBonus[hero->Type->Slot] : 0));
-			} else if (hero->State == 3) {
-				hero->Province->AttackingMilitaryScore -= (hero->Type->DefaultStat.Variables[POINTS_INDEX].Value + (hero->Province->AttackedBy != NULL ? hero->Province->AttackedBy->MilitaryScoreBonus[hero->Type->Slot] : 0));
-			}
-		}
 		hero->State = value;
 			
 		if (this != hero->Province || value == 0) { //if the new province is different from the hero's current province
@@ -619,13 +520,6 @@ void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 		//if the hero hasn't been defined yet, give an error message
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
 		return;
-	}
-	
-	
-	if (value == 2) {
-		this->MilitaryScore += (hero->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[hero->Type->Slot] : 0));
-	} else if (value == 3) {
-		this->AttackingMilitaryScore += (hero->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->AttackedBy != NULL ? this->AttackedBy->MilitaryScoreBonus[hero->Type->Slot] : 0));
 	}
 }
 
@@ -689,18 +583,6 @@ bool CGrandStrategyProvince::HasFactionClaim(int civilization_id, int faction_id
 	return false;
 }
 
-bool CGrandStrategyProvince::HasResource(int resource, bool ignore_prospection)
-{
-	for (size_t i = 0; i < this->Tiles.size(); ++i) {
-		int x = this->Tiles[i].x;
-		int y = this->Tiles[i].y;
-		if (GrandStrategyGame.WorldMapTiles[x][y] && GrandStrategyGame.WorldMapTiles[x][y]->HasResource(resource, ignore_prospection)) {
-			return true;
-		}
-	}
-	return false;
-}
-
 bool CGrandStrategyProvince::BordersProvince(CGrandStrategyProvince *province)
 {
 	for (size_t i = 0; i < this->BorderProvinces.size(); ++i) {
@@ -749,54 +631,6 @@ bool CGrandStrategyProvince::BordersFaction(int faction_civilization, int factio
 		}
 	}
 	return false;
-}
-
-bool CGrandStrategyProvince::CanAttackProvince(CGrandStrategyProvince *province)
-{
-	if (
-		this->Owner == province->Owner
-		|| province->Water
-		|| (province->AttackedBy != NULL && province->AttackedBy != this->Owner) // province can only be attacked by one player per turn because of mechanical limitations of the current code
-	) {
-		return false;
-	}
-	
-	// if is at peace or offering peace, can't attack
-	if (
-		province->Owner != NULL
-		&& (
-			this->Owner->GetDiplomacyState(province->Owner) != DiplomacyStateWar
-			|| this->Owner->GetDiplomacyState(province->Owner) == DiplomacyStatePeace
-		)
-	) {
-		return false;
-	}
-	
-	if (
-		this->BordersProvince(province) == false
-		&& (
-			province->Coastal == false
-			|| this->HasBuildingClass("dock") == false
-			|| this->HasSecondaryBorderThroughWaterWith(province) == false
-		)
-	) {
-		return false;
-	}
-	
-	if (this->Owner != GrandStrategyGame.PlayerFaction && !this->Owner->IsConquestDesirable(province)) { // if is AI-controlled, and the conquest isn't desirable, don't attack
-		return false;
-	}
-
-	return true;
-}
-
-int CGrandStrategyProvince::GetAttackingUnitQuantity(int unit_type_id)
-{
-	if (this->AttackingUnits.find(unit_type_id) != this->AttackingUnits.end()) {
-		return this->AttackingUnits[unit_type_id];
-	} else {
-		return 0;
-	}
 }
 
 int CGrandStrategyProvince::GetPopulation()
@@ -1206,15 +1040,6 @@ CGrandStrategyProvince *CGrandStrategyFaction::GetRandomProvinceWeightedByPopula
 	}
 }
 
-GrandStrategyWorldMapTile *CGrandStrategyFaction::GetCapitalSettlement()
-{
-	if (this->Capital == NULL) {
-		return NULL;
-	}
-	
-	return GrandStrategyGame.WorldMapTiles[this->Capital->SettlementLocation.x][this->Capital->SettlementLocation.y];
-}
-
 void CGrandStrategyHero::Die()
 {
 	//show message that the hero has died
@@ -1241,12 +1066,6 @@ void CGrandStrategyHero::Die()
 	*/
 	
 	if (this->Province != NULL) {
-		if (this->State == 2) {
-			this->Province->MilitaryScore -= (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->Owner != NULL ? this->Province->Owner->MilitaryScoreBonus[this->Type->Slot] : 0));
-		} else if (this->State == 3) {
-			this->Province->AttackingMilitaryScore -= (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->AttackedBy != NULL ? this->Province->AttackedBy->MilitaryScoreBonus[this->Type->Slot] : 0));
-		}
-		
 		this->Province->Heroes.erase(std::remove(this->Province->Heroes.begin(), this->Province->Heroes.end(), this), this->Province->Heroes.end());  //remove the hero from its province
 		if (this->IsActive()) {
 			this->Province->ActiveHeroes.erase(std::remove(this->Province->ActiveHeroes.begin(), this->Province->ActiveHeroes.end(), this), this->Province->ActiveHeroes.end());  //remove the hero from its province
@@ -1266,28 +1085,12 @@ void CGrandStrategyHero::Die()
 
 void CGrandStrategyHero::SetType(int unit_type_id)
 {
-	if (this->Province != NULL) {
-		if (this->State == 2) {
-			this->Province->MilitaryScore -= (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->Owner != NULL ? this->Province->Owner->MilitaryScoreBonus[this->Type->Slot] : 0));
-		} else if (this->State == 3) {
-			this->Province->AttackingMilitaryScore -= (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->AttackedBy != NULL ? this->Province->AttackedBy->MilitaryScoreBonus[this->Type->Slot] : 0));
-		}
-	}
-	
 	//if the hero's unit type changed
 	if (unit_type_id != this->Type->Slot) {
 		this->Type = UnitTypes[unit_type_id];
 	}
 	
 	this->UpdateAttributes();
-	
-	if (this->Province != NULL) {
-		if (this->State == 2) {
-			this->Province->MilitaryScore += (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->Owner != NULL ? this->Province->Owner->MilitaryScoreBonus[this->Type->Slot] : 0));
-		} else if (this->State == 3) {
-			this->Province->AttackingMilitaryScore += (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->AttackedBy != NULL ? this->Province->AttackedBy->MilitaryScoreBonus[this->Type->Slot] : 0));
-		}
-	}
 }
 
 bool CGrandStrategyHero::IsAlive()
@@ -1435,11 +1238,7 @@ std::string CGrandStrategyHero::GetBestDisplayTitle()
 CGrandStrategyFaction *CGrandStrategyHero::GetFaction()
 {
 	if (this->Province != NULL) {
-		if (this->State == 3) {
-			return this->Province->AttackedBy;
-		} else {
-			return this->Province->Owner;
-		}
+		return this->Province->Owner;
 	} else {
 		return this->ProvinceOfOrigin->Owner;
 	}
@@ -1499,33 +1298,6 @@ bool CGrandStrategyEvent::CanTrigger(CGrandStrategyFaction *faction)
 }
 
 /**
-**  Get the terrain variation of a world map tile.
-*/
-int GetWorldMapTileTerrainVariation(int x, int y)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1);
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]->Variation != -1);
-	
-	return GrandStrategyGame.WorldMapTiles[x][y]->Variation + 1;
-}
-
-std::string GetWorldMapTileProvinceName(int x, int y)
-{
-	
-	clamp(&x, 0, GrandStrategyGame.WorldMapWidth - 1);
-	clamp(&y, 0, GrandStrategyGame.WorldMapHeight - 1);
-
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	if (GrandStrategyGame.WorldMapTiles[x][y]->Province != NULL) {
-		return GrandStrategyGame.WorldMapTiles[x][y]->Province->Name;
-	} else {
-		return "";
-	}
-}
-
-/**
 **  Get the ID of a province
 */
 int GetProvinceId(std::string province_name)
@@ -1539,31 +1311,6 @@ int GetProvinceId(std::string province_name)
 	}
 	
 	return -1;
-}
-
-/**
-**  Set the size of the world map.
-*/
-void SetWorldMapSize(int width, int height)
-{
-	Assert(width <= WorldMapWidthMax);
-	Assert(height <= WorldMapHeightMax);
-	GrandStrategyGame.WorldMapWidth = width;
-	GrandStrategyGame.WorldMapHeight = height;
-	
-	//create new world map tile objects for the size, if necessary
-	if (!GrandStrategyGame.WorldMapTiles[width - 1][height - 1]) {
-		for (int x = 0; x < GrandStrategyGame.WorldMapWidth; ++x) {
-			for (int y = 0; y < GrandStrategyGame.WorldMapHeight; ++y) {
-				if (!GrandStrategyGame.WorldMapTiles[x][y]) {
-					GrandStrategyWorldMapTile *world_map_tile = new GrandStrategyWorldMapTile;
-					GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
-					GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
-					GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
-				}
-			}
-		}
-	}
 }
 
 /**
@@ -1581,61 +1328,6 @@ void SetWorldMapTileTerrain(int x, int y, int terrain)
 	}
 	
 	GrandStrategyGame.WorldMapTiles[x][y]->Terrain = terrain;
-	
-	if (terrain != -1 && WorldMapTerrainTypes[terrain]) {
-		//randomly select a variation for the world map tile
-		if (WorldMapTerrainTypes[terrain]->Variations > 0) {
-			GrandStrategyGame.WorldMapTiles[x][y]->Variation = SyncRand(WorldMapTerrainTypes[terrain]->Variations);
-		} else {
-			GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
-		}
-		
-		int base_terrain = WorldMapTerrainTypes[terrain]->BaseTile;
-		if (base_terrain != -1 && WorldMapTerrainTypes[base_terrain]) {
-			//randomly select a variation for the world map tile
-			if (WorldMapTerrainTypes[base_terrain]->Variations > 0) {
-				GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation = SyncRand(WorldMapTerrainTypes[base_terrain]->Variations);
-			} else {
-				GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation = -1;
-			}
-		}
-	}
-}
-
-void SetWorldMapTileProvince(int x, int y, std::string province_name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	CGrandStrategyProvince *old_province = GrandStrategyGame.WorldMapTiles[x][y]->Province;
-	if (old_province != NULL) { //if the tile is already assigned to a province, remove it from that province's tile arrays
-		old_province->Tiles.erase(std::remove(old_province->Tiles.begin(), old_province->Tiles.end(), Vec2i(x, y)), old_province->Tiles.end());
-		
-		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
-			int res = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
-			if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
-				old_province->ProductionCapacity[res] -= 1;
-			}
-			old_province->ResourceTiles[res].erase(std::remove(old_province->ResourceTiles[res].begin(), old_province->ResourceTiles[res].end(), Vec2i(x, y)), old_province->ResourceTiles[res].end());
-		}
-	}
-
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.WorldMapTiles[x][y]->Province = GrandStrategyGame.Provinces[province_id];
-		//now add the tile to the province's tile arrays
-		GrandStrategyGame.Provinces[province_id]->Tiles.push_back(Vec2i(x, y));
-		
-		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
-			int res = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
-			if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
-				GrandStrategyGame.Provinces[province_id]->ProductionCapacity[res] += 1;
-			}
-			GrandStrategyGame.Provinces[province_id]->ResourceTiles[res].push_back(Vec2i(x, y));
-		}
-	} else {
-		GrandStrategyGame.WorldMapTiles[x][y]->Province = NULL;
-	}
 }
 
 /**
@@ -1752,9 +1444,7 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 		}
 	
 		if (province != NULL) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
-				province->ProductionCapacity[old_resource] -= 1;
-			}
+			province->ProductionCapacity[old_resource] -= 1;
 			province->ResourceTiles[old_resource].erase(std::remove(province->ResourceTiles[old_resource].begin(), province->ResourceTiles[old_resource].end(), Vec2i(x, y)), province->ResourceTiles[old_resource].end());
 		}
 	}
@@ -1767,7 +1457,6 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 				GrandStrategyGame.WorldMapResources[resource][i].x = x;
 				GrandStrategyGame.WorldMapResources[resource][i].y = y;
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = resource;
-				GrandStrategyGame.WorldMapTiles[x][y]->SetResourceProspected(resource, discovered);
 				break;
 			}
 		}
@@ -1775,28 +1464,6 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 			province->ResourceTiles[resource].push_back(Vec2i(x, y));
 		}
 	}
-}
-
-void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource != -1) {
-		GrandStrategyGame.WorldMapTiles[x][y]->SetResourceProspected(resource, discovered);
-	}
-}
-
-std::string GetProvinceAttackedBy(std::string province_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		if (GrandStrategyGame.Provinces[province_id]->AttackedBy != NULL) {
-			return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->AttackedBy->Faction]->Ident;
-		}
-	}
-	
-	return "";
 }
 
 void SetProvinceName(std::string old_province_name, std::string new_province_name)
@@ -1828,15 +1495,6 @@ void SetProvinceOwner(std::string province_name, std::string civilization_name, 
 	}
 	
 	GrandStrategyGame.Provinces[province_id]->SetOwner(civilization_id, faction_id);
-}
-
-void SetProvinceSettlementLocation(std::string province_name, int x, int y)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->SetSettlementLocation(x, y);
-	}
 }
 
 void SetProvinceCulturalName(std::string province_name, std::string civilization_name, std::string province_cultural_name)
@@ -1905,36 +1563,6 @@ void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type
 	}
 }
 
-void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
-{
-	int province_id = GetProvinceId(province_name);
-	int unit_type = UnitTypeIdByIdent(unit_type_ident);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
-		GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type] = std::max(0, quantity);
-	}
-}
-
-void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
-{
-	int province_id = GetProvinceId(province_name);
-	int unit_type = UnitTypeIdByIdent(unit_type_ident);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
-		GrandStrategyGame.Provinces[province_id]->SetMovingUnitQuantity(unit_type, quantity);
-	}
-}
-
-void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
-{
-	int province_id = GetProvinceId(province_name);
-	int unit_type = UnitTypeIdByIdent(unit_type_ident);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
-		GrandStrategyGame.Provinces[province_id]->SetAttackingUnitQuantity(unit_type, quantity);
-	}
-}
-
 void SetProvinceHero(std::string province_name, std::string hero_full_name, int value)
 {
 	int province_id = GetProvinceId(province_name);
@@ -1960,21 +1588,6 @@ void ChangeProvinceFood(std::string province_name, int quantity)
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress += quantity;
 		GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress = std::max(0, GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress);
-	}
-}
-
-void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		int civilization_id = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		int faction_id = PlayerRaces.GetFactionIndexByName(faction_name);
-		if (civilization_id != -1 && faction_id != -1) {
-			GrandStrategyGame.Provinces[province_id]->AttackedBy = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization_id][faction_id]));
-		} else {
-			GrandStrategyGame.Provinces[province_id]->AttackedBy = NULL;
-		}
 	}
 }
 
@@ -2014,69 +1627,6 @@ void RemoveProvinceClaim(std::string province_name, std::string civilization_nam
 	}
 }
 
-/**
-**  Clean the grand strategy variables.
-*/
-void CleanGrandStrategyGame()
-{
-	for (int x = 0; x < WorldMapWidthMax; ++x) {
-		for (int y = 0; y < WorldMapHeightMax; ++y) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]) {
-				delete GrandStrategyGame.WorldMapTiles[x][y];
-				GrandStrategyGame.WorldMapTiles[x][y] = NULL;
-			} else {
-				break;
-			}
-		}
-	}
-		
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < GrandStrategyGame.Factions[i].size(); ++j) {
-			delete GrandStrategyGame.Factions[i][j];
-		}
-		GrandStrategyGame.Factions[i].clear();
-	}
-	
-	for (int i = 0; i < MaxCosts; ++i) {
-		GrandStrategyGame.CommodityPrices[i] = 0;
-		for (int j = 0; j < WorldMapResourceMax; ++j) {
-			if (GrandStrategyGame.WorldMapResources[i][j].x != -1 || GrandStrategyGame.WorldMapResources[i][j].y != -1) {
-				GrandStrategyGame.WorldMapResources[i][j].x = -1;
-				GrandStrategyGame.WorldMapResources[i][j].y = -1;
-			} else {
-				break;
-			}
-		}
-	}
-	
-	for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
-		delete GrandStrategyGame.Provinces[i];
-	}
-	GrandStrategyGame.Provinces.clear();
-	GrandStrategyGame.CultureProvinces.clear();
-
-	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		delete GrandStrategyGame.Heroes[i];
-	}
-	GrandStrategyGame.Heroes.clear();
-	GrandStrategyHeroStringToIndex.clear();
-	
-	GrandStrategyGame.UnpublishedWorks.clear();
-	GrandStrategyGame.AvailableEvents.clear();
-	
-	GrandStrategyGame.WorldMapWidth = 0;
-	GrandStrategyGame.WorldMapHeight = 0;
-	GrandStrategyGame.SelectedUnits.clear();
-	GrandStrategyGame.PlayerFaction = NULL;
-	
-	WorldMapOffsetX = 0;
-	WorldMapOffsetY = 0;
-	GrandStrategyMapWidthIndent = 0;
-	GrandStrategyMapHeightIndent = 0;
-	
-	GrandStrategyGameInitialized = false;
-}
-
 void InitializeGrandStrategyGame(bool show_loading)
 {
 	//initialize literary works
@@ -2091,59 +1641,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 
 void FinalizeGrandStrategyInitialization()
 {
-	CWorld *world = GetWorld(GrandStrategyWorld);
-	
-	if (world != NULL) { // create tiles which should be randomly placed
-		for (size_t i = 0; i < world->Tiles.size(); ++i) {
-			if (world->Tiles[i]->Position.x != -1 && world->Tiles[i]->Position.y != -1) {
-				continue;
-			}
-			
-			std::vector<GrandStrategyWorldMapTile *> potential_tiles;			
-			
-			if (world->Tiles[i]->Province != NULL && GetProvinceId(world->Tiles[i]->Province->Name) != -1) {
-				CGrandStrategyProvince *province = GrandStrategyGame.Provinces[GetProvinceId(world->Tiles[i]->Province->Name)];
-				for (size_t j = 0; j < province->Tiles.size(); ++j) {
-					GrandStrategyWorldMapTile *province_tile = GrandStrategyGame.WorldMapTiles[province->Tiles[j].x][province->Tiles[j].y];
-					
-					if (
-						(world->Tiles[i]->Terrain == -1 || world->Tiles[i]->Terrain == province_tile->Terrain)
-						&& (world->Tiles[i]->Resource == -1 || world->Tiles[i]->Resource == province_tile->Resource)
-						&& world->Tiles[i]->Capital == (province->SettlementLocation == province_tile->Position)
-					) {
-						potential_tiles.push_back(province_tile);
-					}
-				}
-			} else {
-				for (size_t j = 0; j < GrandStrategyGame.Provinces.size(); ++j) {
-					CGrandStrategyProvince *province = GrandStrategyGame.Provinces[j];
-					for (size_t k = 0; k < province->Tiles.size(); ++k) {
-						GrandStrategyWorldMapTile *province_tile = GrandStrategyGame.WorldMapTiles[province->Tiles[k].x][province->Tiles[k].y];
-						
-						if (
-							(world->Tiles[i]->Terrain == -1 || world->Tiles[i]->Terrain == province_tile->Terrain)
-							&& (world->Tiles[i]->Resource == -1 || world->Tiles[i]->Resource == province_tile->Resource)
-							&& world->Tiles[i]->Capital == (province->SettlementLocation == province_tile->Position)
-						) {
-							potential_tiles.push_back(province_tile);
-						}
-					}
-				}
-			}
-			
-			if (potential_tiles.size() > 0) {
-				GrandStrategyWorldMapTile *tile = potential_tiles[SyncRand(potential_tiles.size())];
-				
-				tile->CulturalTerrainNames = world->Tiles[i]->CulturalTerrainNames;
-				tile->FactionCulturalTerrainNames = world->Tiles[i]->FactionCulturalTerrainNames;
-				tile->CulturalResourceNames = world->Tiles[i]->CulturalResourceNames;
-				tile->FactionCulturalResourceNames = world->Tiles[i]->FactionCulturalResourceNames;
-				tile->CulturalSettlementNames = world->Tiles[i]->CulturalSettlementNames;
-				tile->FactionCulturalSettlementNames = world->Tiles[i]->FactionCulturalSettlementNames;
-			}
-		}
-	}
-	
 	//initialize literary works
 	int works_size = GrandStrategyGame.UnpublishedWorks.size();
 	for (int i = (works_size - 1); i >= 0; --i) {
@@ -2175,37 +1672,12 @@ void FinalizeGrandStrategyInitialization()
 				}
 			}
 				
-			for (std::map<int, std::map<int, bool>>::iterator iterator = base_province->HistoricalSettlementBuildings.begin(); iterator != base_province->HistoricalSettlementBuildings.end(); ++iterator) {
-				for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
-					if (GrandStrategyYear >= second_iterator->first) {
-						province->SetSettlementBuilding(iterator->first, second_iterator->second);
-						break;
-					}
-				}
-			}
-				
 			for (std::map<CUpgrade *, std::map<int, bool>>::iterator iterator = base_province->HistoricalModifiers.begin(); iterator != base_province->HistoricalModifiers.end(); ++iterator) {
 				for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
 					if (GrandStrategyYear >= second_iterator->first) {
 						province->SetModifier(iterator->first, second_iterator->second);
 						break;
 					}
-				}
-			}
-		}
-		
-		if (province->Civilization != -1 && province->Owner != NULL) {
-			if (GrandStrategyGameLoading == false) {
-				if (!province->HasBuildingClass("town-hall")) { // if the province has an owner but no town hall building, give it one; in the future we may want to have gameplay for provinces without town halls (for instance, for nomadic tribes), but at least until then, keep this in place
-					province->SetSettlementBuilding(province->GetClassUnitType(GetUnitTypeClassIndexByName("town-hall")), true);
-				}
-				
-				if (province->TotalWorkers < 4) { // make every province that has an owner start with at least four workers
-					province->SetUnitQuantity(province->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), 4);
-				}
-
-				if (province->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")) != -1 && province->Units[province->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"))] < 2) { // make every province that has an owner start with at least two infantry units
-					province->SetUnitQuantity(province->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")), 2);
 				}
 			}
 		}
@@ -2220,51 +1692,6 @@ void SetGrandStrategyWorld(std::string world)
 void DoGrandStrategyTurn()
 {
 	GrandStrategyGame.DoTurn();
-}
-
-void CalculateProvinceBorders()
-{
-	for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
-		for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Tiles.size(); ++j) {
-			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x][GrandStrategyGame.Provinces[i]->Tiles[j].y]->Province = GrandStrategyGame.Provinces[i]; //tell the tile it belongs to this province
-		}
-			
-		GrandStrategyGame.Provinces[i]->BorderProvinces.clear();
-			
-		//calculate which of the province's tiles are border tiles, and which provinces it borders; also whether the province borders water (is coastal) or not
-		for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Tiles.size(); ++j) {
-			int x = GrandStrategyGame.Provinces[i]->Tiles[j].x;
-			int y = GrandStrategyGame.Provinces[i]->Tiles[j].y;
-			for (int sub_x = -1; sub_x <= 1; ++sub_x) {
-				if ((x + sub_x) < 0 || (x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
-					continue;
-				}
-							
-				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-					if ((y + sub_y) < 0 || (y + sub_y) >= GrandStrategyGame.WorldMapHeight) {
-						continue;
-					}
-							
-					CGrandStrategyProvince *second_province = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
-					if (!(sub_x == 0 && sub_y == 0) && second_province != GrandStrategyGame.Provinces[i] && GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Terrain != -1) {
-						if (second_province == NULL || GrandStrategyGame.Provinces[i]->Water == second_province->Water) {
-							int direction = DirectionToHeading(Vec2i(x + sub_x, y + sub_y) - Vec2i(x, y)) + (32 / 2);
-							if (direction % 32 != 0) {
-								direction = direction - (direction % 32);
-							}
-							direction = direction / 32;
-								
-							GrandStrategyGame.WorldMapTiles[x][y]->Borders[direction] = true;
-						}
-								
-						if (second_province != NULL && !GrandStrategyGame.Provinces[i]->BordersProvince(second_province)) { //if isn't added yet to the border provinces, do so now
-							GrandStrategyGame.Provinces[i]->BorderProvinces.push_back(second_province);
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 bool ProvinceBordersProvince(std::string province_name, std::string second_province_name)
@@ -2308,18 +1735,6 @@ bool ProvinceHasClaim(std::string province_name, std::string faction_civilizatio
 	return GrandStrategyGame.Provinces[province]->HasFactionClaim(civilization, faction);
 }
 
-bool ProvinceHasResource(std::string province_name, std::string resource_name, bool ignore_prospection)
-{
-	int province_id = GetProvinceId(province_name);
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource == -1) {
-		return false;
-	}
-	
-	return GrandStrategyGame.Provinces[province_id]->HasResource(resource, ignore_prospection);
-}
-
 bool IsGrandStrategyBuilding(const CUnitType &type)
 {
 	if (type.BoolFlag[BUILDING_INDEX].value && type.Class != -1 && UnitTypeClasses[type.Class] != "farm" && UnitTypeClasses[type.Class] != "watch-tower" && UnitTypeClasses[type.Class] != "guard-tower") {
@@ -2353,30 +1768,6 @@ int GetProvinceUnitQuantity(std::string province_name, std::string unit_type_ide
 	int unit_type = UnitTypeIdByIdent(unit_type_ident);
 	
 	return GrandStrategyGame.Provinces[province_id]->Units[unit_type];
-}
-
-int GetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident)
-{
-	int province_id = GetProvinceId(province_name);
-	int unit_type = UnitTypeIdByIdent(unit_type_ident);
-	
-	return GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type];
-}
-
-int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident)
-{
-	int province_id = GetProvinceId(province_name);
-	int unit_type = UnitTypeIdByIdent(unit_type_ident);
-	
-	return GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type];
-}
-
-int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident)
-{
-	int province_id = GetProvinceId(province_name);
-	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-	
-	return GrandStrategyGame.Provinces[province_id]->GetAttackingUnitQuantity(unit_type_id);
 }
 
 int GetProvinceHero(std::string province_name, std::string hero_full_name)
@@ -2443,15 +1834,6 @@ void SetPlayerFaction(std::string civilization_name, std::string faction_name)
 	
 	GrandStrategyGame.PlayerFaction = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization][faction]));
 	UI.Load();
-}
-
-std::string GetPlayerFactionName()
-{
-	if (GrandStrategyGame.PlayerFaction != NULL) {
-		return PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Faction]->Ident;
-	} else {
-		return "";
-	}
 }
 
 void SetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity)
@@ -2648,38 +2030,6 @@ std::string GetFactionTier(std::string civilization_name, std::string faction_na
 	return "";
 }
 
-void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int upgrade_id;
-	if (!upgrade_ident.empty()) {
-		upgrade_id = UpgradeIdByIdent(upgrade_ident);
-	} else {
-		upgrade_id = -1;
-	}
-	if (civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-		if (faction != -1) {
-			GrandStrategyGame.Factions[civilization][faction]->CurrentResearch = upgrade_id;
-		}
-	}
-}
-
-std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	if (civilization != -1) {
-		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-		if (faction != -1) {
-			if (GrandStrategyGame.Factions[civilization][faction]->CurrentResearch != -1) {
-				return AllUpgrades[GrandStrategyGame.Factions[civilization][faction]->CurrentResearch]->Ident;
-			}
-		}
-	}
-	
-	return "";
-}
-
 std::string GetFactionFullName(std::string civilization_name, std::string faction_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -2802,30 +2152,6 @@ std::string GetFactionMinister(std::string civilization_name, std::string factio
 	} else {
 		return "";
 	}
-}
-
-int GetFactionUnitCost(std::string civilization_name, std::string faction_name, std::string unit_type_ident, std::string resource_name)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction = -1;
-	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(faction_name);
-	}
-	int unit_type = UnitTypeIdByIdent(unit_type_ident);
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (unit_type == -1 || resource == -1) {
-		return 0;
-	}
-	
-	int cost = UnitTypes[unit_type]->DefaultStat.Costs[resource];
-	if (faction != -1) {
-		if (IsMilitaryUnit(*UnitTypes[unit_type])) {
-			cost *= 100 + GrandStrategyGame.Factions[civilization][faction]->GetTroopCostModifier();
-			cost /= 100;
-		}
-	}
-	return cost;
 }
 
 void KillGrandStrategyHero(std::string hero_full_name)
@@ -3012,29 +2338,6 @@ bool GetGrandStrategyEventTriggered(std::string event_name)
 	}
 }
 
-void SetGrandStrategySelectedUnits(std::string unit_type_ident, int quantity)
-{
-	int unit_type = UnitTypeIdByIdent(unit_type_ident);
-	
-	if (unit_type != -1) {
-		if (quantity > 0) {
-			GrandStrategyGame.SelectedUnits[unit_type] = quantity;
-		} else {
-			GrandStrategyGame.SelectedUnits.erase(unit_type);
-		}
-	}
-}
-
-int GetGrandStrategySelectedUnits(std::string unit_type_ident)
-{
-	int unit_type = UnitTypeIdByIdent(unit_type_ident);
-	
-	if (unit_type == -1 || GrandStrategyGame.SelectedUnits.find(unit_type) == GrandStrategyGame.SelectedUnits.end()) {
-		return 0;
-	}
-	
-	return GrandStrategyGame.SelectedUnits[unit_type];
-}
 void SetCommodityPrice(std::string resource_name, int price)
 {
 	int resource = GetResourceIdByName(resource_name.c_str());

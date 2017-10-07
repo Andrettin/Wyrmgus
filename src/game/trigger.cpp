@@ -236,7 +236,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 			// Check the player
 			//Wyrmgus start
 //			if (plynr == -1 || plynr == unit.Player->Index) {
-			if (plynr == -1 || plynr == unit.Player->Index || (plynr == -2 && unit.Player->Type != PlayerNeutral)) { // -2 can now be used for the player field to mean any non-neutral player
+			if (plynr == -1 || plynr == unit.Player->Index || (plynr == -2 && unit.Player->Type != PlayerNeutral)) { // -2 can be used for the player field to mean any non-neutral player
 			//Wyrmgus end
 				if (unit.IsAlive()) {
 					++s;
