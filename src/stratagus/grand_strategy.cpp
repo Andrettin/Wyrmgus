@@ -64,8 +64,6 @@
 ----------------------------------------------------------------------------*/
 
 bool GrandStrategy = false;				///if the game is in grand strategy mode
-bool GrandStrategyGamePaused = false;
-bool GrandStrategyGameInitialized = false;
 bool GrandStrategyGameLoading = false;
 int GrandStrategyYear = 0;
 int GrandStrategyMonth = 0;
@@ -313,34 +311,6 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	
 	if (this->Owner != NULL) { //if province has a previous owner, remove it from the owner's province list
 		this->Owner->OwnedProvinces.erase(std::remove(this->Owner->OwnedProvinces.begin(), this->Owner->OwnedProvinces.end(), this->ID), this->Owner->OwnedProvinces.end());
-
-		if (GrandStrategyGameInitialized) {
-			if (this->Owner->Capital == this) { // if this was the old owner's capital province, set a random one of the provinces it still has remaining as the capital if it still has territory, set the capital to NULL otherwise
-				if (this->Owner->OwnedProvinces.size() > 0) {
-					this->Owner->SetCapital(this->Owner->GetRandomProvinceWeightedByPopulation());
-				} else {
-					this->Owner->SetCapital(NULL);
-				}
-			}
-			
-			for (int i = 0; i < MaxCharacterTitles; ++i) {
-				if (IsMinisterialTitle(i) && this->Owner->Ministers[i] != NULL && this->Owner->Ministers[i]->Province == this) { // if any ministers of the old owner are in this province, move them to another province they own, or kill them off if none are available
-					if (this->Owner->OwnedProvinces.size() > 0) {
-						this->Owner->GetRandomProvinceWeightedByPopulation()->SetHero(this->Owner->Ministers[i]->GetFullName(), this->Owner->Ministers[i]->State);
-					} else {
-						this->Owner->Ministers[i]->Die();
-					}
-				}
-			}
-		}
-		
-		//also remove its resource incomes from the owner's incomes, and reset the province's income so it won't be deduced from the new owner's income when recalculating it
-		for (int i = 0; i < MaxCosts; ++i) {
-			if (this->Income[i] != 0) {
-				this->Owner->Income[i] -= this->Income[i];
-				this->Income[i] = 0;
-			}
-		}
 	}
 	
 	for (size_t i = 0; i < UnitTypes.size(); ++i) { //change the province's military score to be appropriate for the new faction's technologies
@@ -366,10 +336,6 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	if (civilization_id != -1 && faction_id != -1) {
 		this->Owner = GrandStrategyGame.Factions[civilization_id][faction_id];
 		this->Owner->OwnedProvinces.push_back(this->ID);
-		
-		if (GrandStrategyGameInitialized && this->Owner->Capital == NULL) { //if new owner has no capital, set this province as the capital
-			this->Owner->SetCapital(this);
-		}
 	} else {
 		this->Owner = NULL;
 	}
@@ -815,7 +781,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 	}
 			
 	if (hero_full_name.empty()) {
-		if (this->CanHaveSuccession(title, true) && GrandStrategyGameInitialized) { //if the minister died a violent death, wait until the next turn to replace him
+		if (this->CanHaveSuccession(title, true)) { //if the minister died a violent death, wait until the next turn to replace him
 			this->MinisterSuccession(title);
 		} else {
 			this->Ministers[title] = NULL;
@@ -838,7 +804,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), GetCharacterTitleNameById(title).c_str(), this->GetFullName().c_str());
 		}
 		
-		if (this == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized) {
+		if (this == GrandStrategyGame.PlayerFaction) {
 			std::string new_minister_message = "if (GenericDialog ~= nil) then GenericDialog(\"";
 //			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->GetFullName();
 			new_minister_message += "\", \"";
@@ -1044,7 +1010,7 @@ void CGrandStrategyHero::Die()
 {
 	//show message that the hero has died
 	/*
-	if (GrandStrategyGameInitialized && this->IsVisible()) {
+	if (this->IsVisible()) {
 		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] == this) {
 			char buf[256];
 			snprintf(
@@ -1644,10 +1610,8 @@ void FinalizeGrandStrategyInitialization()
 	//initialize literary works
 	int works_size = GrandStrategyGame.UnpublishedWorks.size();
 	for (int i = (works_size - 1); i >= 0; --i) {
-		if (GrandStrategyGameLoading == false) {
-			if (GrandStrategyGame.UnpublishedWorks[i]->Year != 0 && GrandStrategyYear >= GrandStrategyGame.UnpublishedWorks[i]->Year) { //if the game is starting after the publication date of this literary work, remove it from the work list
-				GrandStrategyGame.UnpublishedWorks.erase(std::remove(GrandStrategyGame.UnpublishedWorks.begin(), GrandStrategyGame.UnpublishedWorks.end(), GrandStrategyGame.UnpublishedWorks[i]), GrandStrategyGame.UnpublishedWorks.end());
-			}
+		if (GrandStrategyGame.UnpublishedWorks[i]->Year != 0 && GrandStrategyYear >= GrandStrategyGame.UnpublishedWorks[i]->Year) { //if the game is starting after the publication date of this literary work, remove it from the work list
+			GrandStrategyGame.UnpublishedWorks.erase(std::remove(GrandStrategyGame.UnpublishedWorks.begin(), GrandStrategyGame.UnpublishedWorks.end(), GrandStrategyGame.UnpublishedWorks[i]), GrandStrategyGame.UnpublishedWorks.end());
 		}
 	}
 	
@@ -1655,29 +1619,27 @@ void FinalizeGrandStrategyInitialization()
 		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[i];
 		CProvince *base_province = GetProvince(province->Name);
 		
-		if (GrandStrategyGameLoading == false) {
-			// add historical population from regions to provinces here, for a lack of a better place (all province's region belongings need to be defined before this takes place, so this can't happen during the province definitions)
-			for (size_t j = 0; j < base_province->Regions.size(); ++j) {
-				for (std::map<int, int>::iterator iterator = base_province->Regions[j]->HistoricalPopulation.begin(); iterator != base_province->Regions[j]->HistoricalPopulation.end(); ++iterator) {
-					if (base_province->HistoricalPopulation.find(iterator->first) == base_province->HistoricalPopulation.end()) { // if the province doesn't have historical population information for a given year but the region does, then use the region's population quantity divided by the number of provinces the region has
-						base_province->HistoricalPopulation[iterator->first] = iterator->second / base_province->Regions[j]->Provinces.size();
-					}
+		// add historical population from regions to provinces here, for a lack of a better place (all province's region belongings need to be defined before this takes place, so this can't happen during the province definitions)
+		for (size_t j = 0; j < base_province->Regions.size(); ++j) {
+			for (std::map<int, int>::iterator iterator = base_province->Regions[j]->HistoricalPopulation.begin(); iterator != base_province->Regions[j]->HistoricalPopulation.end(); ++iterator) {
+				if (base_province->HistoricalPopulation.find(iterator->first) == base_province->HistoricalPopulation.end()) { // if the province doesn't have historical population information for a given year but the region does, then use the region's population quantity divided by the number of provinces the region has
+					base_province->HistoricalPopulation[iterator->first] = iterator->second / base_province->Regions[j]->Provinces.size();
 				}
 			}
+		}
 		
-			for (std::map<int, int>::reverse_iterator iterator = base_province->HistoricalPopulation.rbegin(); iterator != base_province->HistoricalPopulation.rend(); ++iterator) {
-				if (GrandStrategyYear >= iterator->first) {
-					province->SetPopulation(iterator->second);
-					break;
-				}
+		for (std::map<int, int>::reverse_iterator iterator = base_province->HistoricalPopulation.rbegin(); iterator != base_province->HistoricalPopulation.rend(); ++iterator) {
+			if (GrandStrategyYear >= iterator->first) {
+				province->SetPopulation(iterator->second);
+				break;
 			}
+		}
 				
-			for (std::map<CUpgrade *, std::map<int, bool>>::iterator iterator = base_province->HistoricalModifiers.begin(); iterator != base_province->HistoricalModifiers.end(); ++iterator) {
-				for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
-					if (GrandStrategyYear >= second_iterator->first) {
-						province->SetModifier(iterator->first, second_iterator->second);
-						break;
-					}
+		for (std::map<CUpgrade *, std::map<int, bool>>::iterator iterator = base_province->HistoricalModifiers.begin(); iterator != base_province->HistoricalModifiers.end(); ++iterator) {
+			for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+				if (GrandStrategyYear >= second_iterator->first) {
+					province->SetModifier(iterator->first, second_iterator->second);
+					break;
 				}
 			}
 		}

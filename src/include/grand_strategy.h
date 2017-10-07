@@ -336,9 +336,6 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
-extern bool GrandStrategyGamePaused;					/// if the grand strategy game is paused
-extern bool GrandStrategyGameInitialized;				/// if the grand strategy game has been initialized
-extern bool GrandStrategyGameLoading;
 extern int GrandStrategyYear;
 extern int GrandStrategyMonth;
 extern std::string GrandStrategyWorld;
