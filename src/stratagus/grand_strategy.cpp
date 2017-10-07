@@ -466,22 +466,6 @@ void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 			return;
 		}
 		hero->State = value;
-			
-		if (this != hero->Province || value == 0) { //if the new province is different from the hero's current province
-			if (hero->Province != NULL) {
-				hero->Province->Heroes.erase(std::remove(hero->Province->Heroes.begin(), hero->Province->Heroes.end(), hero), hero->Province->Heroes.end());  //remove the hero from the previous province
-				if (hero->IsActive()) {
-					hero->Province->ActiveHeroes.erase(std::remove(hero->Province->ActiveHeroes.begin(), hero->Province->ActiveHeroes.end(), hero), hero->Province->ActiveHeroes.end());
-				}
-			}
-			hero->Province = value != 0 ? const_cast<CGrandStrategyProvince *>(&(*this)) : NULL;
-			if (hero->Province != NULL) {
-				hero->Province->Heroes.push_back(hero); //add the hero to the new province
-				if (hero->IsActive()) {
-					hero->Province->ActiveHeroes.push_back(hero); //add the hero to the new province
-				}
-			}
-		}
 	} else {
 		//if the hero hasn't been defined yet, give an error message
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
@@ -1031,13 +1015,6 @@ void CGrandStrategyHero::Die()
 	}
 	*/
 	
-	if (this->Province != NULL) {
-		this->Province->Heroes.erase(std::remove(this->Province->Heroes.begin(), this->Province->Heroes.end(), this), this->Province->Heroes.end());  //remove the hero from its province
-		if (this->IsActive()) {
-			this->Province->ActiveHeroes.erase(std::remove(this->Province->ActiveHeroes.begin(), this->Province->ActiveHeroes.end(), this), this->Province->ActiveHeroes.end());  //remove the hero from its province
-		}
-	}
-	
 	this->State = 0;
 
 	//check if the hero has government positions in a faction, and if so, remove it from that position
@@ -1067,11 +1044,6 @@ bool CGrandStrategyHero::IsAlive()
 bool CGrandStrategyHero::IsVisible()
 {
 	return this->Type->DefaultStat.Variables[GENDER_INDEX].Value == 0 || this->Gender == this->Type->DefaultStat.Variables[GENDER_INDEX].Value; // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
-}
-
-bool CGrandStrategyHero::IsActive()
-{
-	return this->IsVisible() && IsOffensiveMilitaryUnit(*this->Type);
 }
 
 bool CGrandStrategyHero::IsGenerated()
@@ -1296,98 +1268,6 @@ void SetWorldMapTileTerrain(int x, int y, int terrain)
 	GrandStrategyGame.WorldMapTiles[x][y]->Terrain = terrain;
 }
 
-/**
-**  Set the name of a world map tile.
-*/
-void SetWorldMapTileName(int x, int y, std::string name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	GrandStrategyGame.WorldMapTiles[x][y]->Name = name;
-}
-
-void SetWorldMapTileCulturalTerrainName(int x, int y, std::string terrain_name, std::string civilization_name, std::string cultural_name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	int terrain = GetWorldMapTerrainTypeId(terrain_name);
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	if (terrain != -1 && civilization != -1) {
-		GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames[std::pair<int, int>(terrain, civilization)].push_back(TransliterateText(cultural_name));
-	}
-}
-
-void SetWorldMapTileFactionCulturalTerrainName(int x, int y, std::string terrain_name, std::string civilization_name, std::string faction_name, std::string cultural_name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	if (GrandStrategyGame.WorldMapTiles[x][y]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		int terrain = GetWorldMapTerrainTypeId(terrain_name);
-		if (terrain != -1 && civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-			if (faction != -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames[std::pair<int, CFaction *>(terrain, PlayerRaces.Factions[faction])].push_back(TransliterateText(cultural_name));
-			}
-		}
-	}
-}
-
-void SetWorldMapTileCulturalResourceName(int x, int y, std::string resource_name, std::string civilization_name, std::string cultural_name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	int resource = GetResourceIdByName(resource_name.c_str());
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	if (resource != -1 && civilization != -1) {
-		GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames[std::pair<int, int>(resource, civilization)].push_back(TransliterateText(cultural_name));
-	}
-}
-
-void SetWorldMapTileFactionCulturalResourceName(int x, int y, std::string resource_name, std::string civilization_name, std::string faction_name, std::string cultural_name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	if (GrandStrategyGame.WorldMapTiles[x][y]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		int resource = GetResourceIdByName(resource_name.c_str());
-		if (resource != -1 && civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-			if (faction != -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames[std::pair<int, CFaction *>(resource, PlayerRaces.Factions[faction])].push_back(TransliterateText(cultural_name));
-			}
-		}
-	}
-}
-
-/**
-**  Set the cultural name of a world map tile for a particular civilization.
-*/
-void SetWorldMapTileCulturalSettlementName(int x, int y, std::string civilization_name, std::string cultural_name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	if (civilization != -1) {
-		GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames[civilization].push_back(TransliterateText(cultural_name));
-	}
-}
-
-void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::string civilization_name, std::string faction_name, std::string cultural_name)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	if (GrandStrategyGame.WorldMapTiles[x][y]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-			if (faction != -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames[PlayerRaces.Factions[faction]].push_back(TransliterateText(cultural_name));
-			}
-		}
-	}
-}
-
 void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered)
 {
 	CGrandStrategyProvince *province = GrandStrategyGame.WorldMapTiles[x][y]->Province;
@@ -1432,24 +1312,6 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 	}
 }
 
-void SetProvinceName(std::string old_province_name, std::string new_province_name)
-{
-	int province_id = GetProvinceId(old_province_name);
-
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->Name = new_province_name;
-	}
-}
-
-void SetProvinceWater(std::string province_name, bool water)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->Water = water;
-	}
-}
-
 void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name)
 {
 	int province_id = GetProvinceId(province_name);
@@ -1463,33 +1325,6 @@ void SetProvinceOwner(std::string province_name, std::string civilization_name, 
 	GrandStrategyGame.Provinces[province_id]->SetOwner(civilization_id, faction_id);
 }
 
-void SetProvinceCulturalName(std::string province_name, std::string civilization_name, std::string province_cultural_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
-			GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization] = TransliterateText(province_cultural_name);
-		}
-	}
-}
-
-void SetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
-			int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-			if (faction != -1) {
-				GrandStrategyGame.Provinces[province_id]->FactionCulturalNames[PlayerRaces.Factions[faction]] = TransliterateText(province_cultural_name);
-			}
-		}
-	}
-}
-
 void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building)
 {
 	int province_id = GetProvinceId(province_name);
@@ -1497,15 +1332,6 @@ void SetProvinceSettlementBuilding(std::string province_name, std::string settle
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && settlement_building != -1) {
 		GrandStrategyGame.Provinces[province_id]->SetSettlementBuilding(settlement_building, has_settlement_building);
-	}
-}
-
-void SetProvincePopulation(std::string province_name, int quantity)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->SetPopulation(quantity);
 	}
 }
 
@@ -1682,19 +1508,6 @@ bool ProvinceHasBuildingClass(std::string province_name, std::string building_cl
 	int province_id = GetProvinceId(province_name);
 	
 	return GrandStrategyGame.Provinces[province_id]->HasBuildingClass(building_class);
-}
-
-bool ProvinceHasClaim(std::string province_name, std::string faction_civilization_name, std::string faction_name)
-{
-	int province = GetProvinceId(province_name);
-	int civilization = PlayerRaces.GetRaceIndexByName(faction_civilization_name.c_str());
-	int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-	
-	if (civilization == -1 || faction == -1) {
-		return false;
-	}
-	
-	return GrandStrategyGame.Provinces[province]->HasFactionClaim(civilization, faction);
 }
 
 bool IsGrandStrategyBuilding(const CUnitType &type)
@@ -2021,65 +1834,6 @@ bool IsMilitaryUnit(const CUnitType &type)
 	return false;
 }
 
-bool IsOffensiveMilitaryUnit(const CUnitType &type)
-{
-	if (IsMilitaryUnit(type) && type.Class != -1 && UnitTypeClasses[type.Class] != "militia") {
-		return true;
-	}
-	return false;
-}
-
-void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction = -1;
-	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(faction_name);
-	}
-	
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (faction == -1 || resource == -1) {
-		return;
-	}
-	
-	GrandStrategyGame.Factions[civilization][faction]->Trade[resource] = quantity;
-}
-
-void ChangeFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction = -1;
-	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(faction_name);
-	}
-	
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (faction == -1 || resource == -1) {
-		return;
-	}
-	
-	GrandStrategyGame.Factions[civilization][faction]->Trade[resource] += quantity;
-}
-
-int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction = -1;
-	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(faction_name);
-	}
-	
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (faction == -1 || resource == -1) {
-		return 0;
-	}
-	
-	return GrandStrategyGame.Factions[civilization][faction]->Trade[resource];
-}
-
 void SetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name, std::string hero_full_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -2126,95 +1880,6 @@ void KillGrandStrategyHero(std::string hero_full_name)
 	}
 }
 
-void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident)
-{
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-		if (unit_type_id != -1) {
-			hero->SetType(unit_type_id);
-		}
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
-}
-
-std::string GetGrandStrategyHeroUnitType(std::string hero_full_name)
-{
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		if (hero->Type != NULL) {
-			return hero->Type->Ident;
-		}
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
-	return "";
-}
-
-std::string GetGrandStrategyHeroIcon(std::string hero_full_name)
-{
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		if (hero->Type != NULL) {
-			return hero->GetIcon().Name;
-		}
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
-	return "";
-}
-
-std::string GetGrandStrategyHeroBestDisplayTitle(std::string hero_full_name)
-{
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		if (hero->Type != NULL) {
-			return hero->GetBestDisplayTitle();
-		}
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
-	return "";
-}
-
-std::string GetGrandStrategyHeroTooltip(std::string hero_full_name)
-{
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		if (hero->Type != NULL) {
-			std::string hero_tooltip = hero->GetBestDisplayTitle() + " " + hero->GetFullName();
-			
-			hero_tooltip += "\nTrait: " + hero->Trait->Name;
-			
-			for (size_t i = 0; i < hero->Titles.size(); ++i) {
-//				hero_tooltip += "\n" + hero->Titles[i].second->GetCharacterTitle(hero->Titles[i].first, hero->Gender) + " of ";
-				if (PlayerRaces.Factions[hero->Titles[i].second->Faction]->Type == FactionTypeTribe) {
-					hero_tooltip += "the ";
-				}
-				hero_tooltip += PlayerRaces.Factions[hero->Titles[i].second->Faction]->Name;
-			}
-
-			for (size_t i = 0; i < hero->Titles.size(); ++i) {
-				if (hero->GetFaction() == hero->Titles[i].second && !hero->GetMinisterEffectsString(hero->Titles[i].first).empty()) {
-					hero_tooltip += "\n" + FindAndReplaceString(hero->GetMinisterEffectsString(hero->Titles[i].first), ", ", "\n");
-				}
-			}
-			
-			for (size_t i = 0; i < hero->ProvinceTitles.size(); ++i) {
-				if (hero->GetFaction() == hero->ProvinceTitles[i].second->Owner && !hero->GetMinisterEffectsString(hero->ProvinceTitles[i].first).empty()) {
-					hero_tooltip += "\n" + FindAndReplaceString(hero->GetMinisterEffectsString(hero->ProvinceTitles[i].first), ", ", "\n");
-				}
-			}
-			
-			return hero_tooltip;
-		}
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
-	return "";
-}
-
 void GrandStrategyHeroExisted(std::string hero_full_name)
 {
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
@@ -2230,39 +1895,6 @@ bool GrandStrategyHeroIsAlive(std::string hero_full_name)
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
 	if (hero) {
 		return hero->IsAlive();
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
-	return false;
-}
-
-bool GrandStrategyHeroIsVisible(std::string hero_full_name)
-{
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		return hero->IsVisible();
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
-	return false;
-}
-
-bool GrandStrategyHeroIsActive(std::string hero_full_name)
-{
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		return hero->IsActive();
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
-	return false;
-}
-
-bool GrandStrategyHeroIsCustom(std::string hero_full_name)
-{
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		return hero->Custom;
 	} else {
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
 	}
