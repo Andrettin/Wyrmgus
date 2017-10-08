@@ -391,6 +391,12 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 				std::get<3>(player.QuestBuildSettlementUnits[i]) -= 1;
 			}
 		}	
+	
+		for (size_t i = 0; i < player.QuestBuildSettlementUnitsOfClass.size(); ++i) {
+			if (std::get<1>(player.QuestBuildSettlementUnitsOfClass[i]) == unit.Settlement && std::get<2>(player.QuestBuildSettlementUnitsOfClass[i]) == newtype.Class) {
+				std::get<3>(player.QuestBuildSettlementUnitsOfClass[i]) -= 1;
+			}
+		}	
 	}
 	//Wyrmgus end
 	return 1;
