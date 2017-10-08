@@ -347,6 +347,7 @@ void SaveScreenshotPNG(const char *name)
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
+		glPixelStorei(GL_PACK_ALIGNMENT, 1); //allows screenshots of resolution widths that aren't multiples of 4
 		unsigned char* pixels = new unsigned char[Video.ViewportWidth * Video.ViewportHeight * 3];
 		if (GLShaderPipelineSupported) {
 			// switch to real display
