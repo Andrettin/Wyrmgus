@@ -1359,6 +1359,8 @@ void CButtonPanel::Draw()
 				strcpy_s(buf, sizeof(buf), "PgUp");
 			} else if (buttons[i].GetKey() == gcn::Key::K_PAGE_DOWN) {
 				strcpy_s(buf, sizeof(buf), "PgDwn");
+			} else if (buttons[i].GetKey() == gcn::Key::K_DELETE) {
+				strcpy_s(buf, sizeof(buf), "Del");
 			//Wyrmgus end
 			} else {
 				//Wyrmgus start

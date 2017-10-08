@@ -154,7 +154,7 @@ int ButtonAction::GetKey() const
 		return 0;
 	}
 
-	if (this->Key == gcn::Key::K_ESCAPE) {
+	if (this->Key == gcn::Key::K_ESCAPE || this->Key == gcn::Key::K_DELETE || this->Key == gcn::Key::K_PAGE_DOWN || this->Key == gcn::Key::K_PAGE_UP) {
 		return this->Key;
 	}
 	
