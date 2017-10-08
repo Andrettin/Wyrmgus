@@ -1043,6 +1043,8 @@ static int CclDefineButton(lua_State *l)
 			} else if (!strcmp(value, "check-upgrade")) {
 				ba.Allowed = ButtonCheckUpgrade;
 			//Wyrmgus start
+			} else if (!strcmp(value, "check-upgrade-not")) {
+				ba.Allowed = ButtonCheckUpgradeNot;
 			} else if (!strcmp(value, "check-upgrade-or")) {
 				ba.Allowed = ButtonCheckUpgradeOr;
 			//Wyrmgus end

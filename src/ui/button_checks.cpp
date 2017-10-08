@@ -112,6 +112,19 @@ bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 
 //Wyrmgus start
 /**
+**  Check for the button being enabled, if the upgrade has not been acquired.
+**
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
+*/
+bool ButtonCheckUpgradeNot(const CUnit &unit, const ButtonAction &button)
+{
+	return !ButtonCheckUpgrade(unit, button);
+}
+
+/**
 **  Check for button enabled, if upgrade is ready.
 **
 **  @param unit    Pointer to unit for button.

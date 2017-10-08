@@ -482,6 +482,8 @@ extern bool ButtonCheckFalse(const CUnit &unit, const ButtonAction &button);
 /// Check if allowed upgrade is ready
 extern bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button);
 //Wyrmgus start
+/// Check if the upgrade has not been acquired
+extern bool ButtonCheckUpgradeNot(const CUnit &unit, const ButtonAction &button);
 /// Check if any of the allowed upgrade list are ready
 extern bool ButtonCheckUpgradeOr(const CUnit &unit, const ButtonAction &button);
 //Wyrmgus end
