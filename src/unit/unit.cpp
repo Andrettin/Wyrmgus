@@ -5808,6 +5808,7 @@ bool CUnit::CanEquipItemClass(int item_class) const
 			|| Type->WeaponClasses[0] == DaggerItemClass
 			|| Type->WeaponClasses[0] == ThrowingAxeItemClass
 			|| Type->WeaponClasses[0] == JavelinItemClass
+			|| Type->WeaponClasses[0] == GunItemClass
 			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
 		)
 	) {

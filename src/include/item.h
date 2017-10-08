@@ -80,6 +80,7 @@ enum ItemClasses {
 	BowItemClass,
 	ThrowingAxeItemClass,
 	JavelinItemClass,
+	GunItemClass,
 
 	ShieldItemClass,
 	HornItemClass,

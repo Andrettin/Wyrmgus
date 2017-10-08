@@ -128,6 +128,8 @@ int GetItemClassIdByName(std::string item_class)
 		return ThrowingAxeItemClass;
 	} else if (item_class == "javelin") {
 		return JavelinItemClass;
+	} else if (item_class == "gun") {
+		return GunItemClass;
 	} else if (item_class == "shield") {
 		return ShieldItemClass;
 	} else if (item_class == "horn") {
@@ -177,6 +179,8 @@ std::string GetItemClassNameById(int item_class)
 		return "throwing-axe";
 	} else if (item_class == JavelinItemClass) {
 		return "javelin";
+	} else if (item_class == GunItemClass) {
+		return "gun";
 	} else if (item_class == ShieldItemClass) {
 		return "shield";
 	} else if (item_class == HornItemClass) {
@@ -218,6 +222,7 @@ int GetItemClassSlot(int item_class)
 		|| item_class == BowItemClass
 		|| item_class == ThrowingAxeItemClass
 		|| item_class == JavelinItemClass
+		|| item_class == GunItemClass
 	) {
 		return WeaponItemSlot;
 	} else if (item_class == ShieldItemClass || item_class == HornItemClass) {
