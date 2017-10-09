@@ -1671,7 +1671,8 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				//Wyrmgus start
 //				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
-				res = (UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'R') && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, true); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+				res = (UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'R') && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, true); //also check for the dependencies for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+				res = res && (!unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(buttonaction.ValueStr)] || unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(buttonaction.ValueStr)] == AllUpgrades[UpgradeIdByIdent(buttonaction.ValueStr)]->Costs[TimeCost]); //don't show if is being researched elsewhere
 				//Wyrmgus end
 			}
 			break;

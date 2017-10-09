@@ -5963,12 +5963,6 @@ bool CUnit::CanLearnAbility(CUpgrade *ability) const
 		return false;
 	}
 	
-	for (size_t i = 0; i < ability->RequiredAbilities.size(); ++i) {
-		if (!this->GetIndividualUpgrade(ability->RequiredAbilities[i])) {
-			return false;
-		}
-	}
-
 	return true;
 }
 

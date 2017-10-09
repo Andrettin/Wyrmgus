@@ -212,7 +212,6 @@ CUpgrade::CUpgrade(const std::string &ident) :
 CUpgrade::~CUpgrade()
 {
 	//Wyrmgus start
-	RequiredAbilities.clear();
 	WeaponClasses.clear();
 	Epithets.clear();
 	//Wyrmgus end
@@ -562,19 +561,6 @@ static int CclDefineUpgrade(lua_State *l)
 				}
 
 				upgrade->ScaledCostUnits.push_back(scaled_cost_unit);
-			}
-		} else if (!strcmp(value, "RequiredAbilities")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CUpgrade *required_ability = CUpgrade::Get(LuaToString(l, -1, j + 1));
-				if (required_ability == NULL) {
-					LuaError(l, "Upgrade doesn't exist.");
-				}
-
-				upgrade->RequiredAbilities.push_back(required_ability);
 			}
 		} else if (!strcmp(value, "WeaponClasses")) {
 			if (!lua_istable(l, -1)) {
