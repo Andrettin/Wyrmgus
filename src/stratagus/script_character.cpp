@@ -82,7 +82,7 @@ static int CclDefineCharacter(lua_State *l)
 	} else {
 		redefinition = true;
 		if (!LoadingPersistentHeroes) {
-			fprintf(stderr, "Character \"%s\" is being redefined.", character_ident.c_str());
+			fprintf(stderr, "Character \"%s\" is being redefined.\n", character_ident.c_str());
 		}
 	}
 	
