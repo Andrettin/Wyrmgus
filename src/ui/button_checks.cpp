@@ -379,7 +379,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button)
 	if (unit.CurrentAction() != UnitActionStill) {
 		return false;
 	}
-	return CheckDependByIdent(*unit.Player, button.ValueStr);
+	return CheckDependByIdent(*unit.Player, button.ValueStr, false, true);
 }
 
 /**
