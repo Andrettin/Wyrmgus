@@ -1532,7 +1532,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.UpdateXPRequired();
 						} else if (IsKnowledgeVariable(j)) {
 							unit.CheckKnowledgeChange(j, um->Modifier.Variables[j].Value);
-						} else if (j == SIGHTRANGE_INDEX && !unit.Removed) {
+						} else if ((j == SIGHTRANGE_INDEX || j == DAYSIGHTRANGEBONUS_INDEX || j == NIGHTSIGHTRANGEBONUS_INDEX) && !unit.Removed) {
 							// If Sight range is upgraded, we need to change EVERY unit
 							// to the new range, otherwise the counters get confused.
 							MapUnmarkUnitSight(unit);
@@ -1812,7 +1812,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.UpdateXPRequired();
 						} else if (IsKnowledgeVariable(j)) {
 							unit.CheckKnowledgeChange(j, - um->Modifier.Variables[j].Value);
-						} else if (j == SIGHTRANGE_INDEX && !unit.Removed) {
+						} else if ((j == SIGHTRANGE_INDEX || j == DAYSIGHTRANGEBONUS_INDEX || j == NIGHTSIGHTRANGEBONUS_INDEX) && !unit.Removed) {
 							// If Sight range is upgraded, we need to change EVERY unit
 							// to the new range, otherwise the counters get confused.
 							MapUnmarkUnitSight(unit);
@@ -1939,7 +1939,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.UpdateXPRequired();
 		} else if (IsKnowledgeVariable(j)) {
 			unit.CheckKnowledgeChange(j, um->Modifier.Variables[j].Value);
-		} else if (j == SIGHTRANGE_INDEX) {
+		} else if (j == SIGHTRANGE_INDEX || j == DAYSIGHTRANGEBONUS_INDEX || j == NIGHTSIGHTRANGEBONUS_INDEX) {
 			if (!unit.Removed && !SaveGameLoading) {
 				MapUnmarkUnitSight(unit);
 				UpdateUnitSightRange(unit);
@@ -2041,7 +2041,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.UpdateXPRequired();
 		} else if (IsKnowledgeVariable(j)) {
 			unit.CheckKnowledgeChange(j, - um->Modifier.Variables[j].Value);
-		} else if (j == SIGHTRANGE_INDEX) {
+		} else if (j == SIGHTRANGE_INDEX || j == DAYSIGHTRANGEBONUS_INDEX || j == NIGHTSIGHTRANGEBONUS_INDEX) {
 			if (!unit.Removed && !SaveGameLoading) {
 				MapUnmarkUnitSight(unit);
 				UpdateUnitSightRange(unit);
@@ -2666,7 +2666,7 @@ bool IsPercentageVariable(int var)
 
 bool IsBonusVariable(int var)
 {
-	return var == GATHERINGBONUS_INDEX || var == COPPERGATHERINGBONUS_INDEX || var == SILVERGATHERINGBONUS_INDEX || var == GOLDGATHERINGBONUS_INDEX || var == LUMBERGATHERINGBONUS_INDEX || var == STONEGATHERINGBONUS_INDEX || var == COALGATHERINGBONUS_INDEX || var == FURNITUREGATHERINGBONUS_INDEX || var == LEATHERGATHERINGBONUS_INDEX || var == GEMSGATHERINGBONUS_INDEX || var == SPEEDBONUS_INDEX || var == BACKSTAB_INDEX;
+	return var == GATHERINGBONUS_INDEX || var == COPPERGATHERINGBONUS_INDEX || var == SILVERGATHERINGBONUS_INDEX || var == GOLDGATHERINGBONUS_INDEX || var == LUMBERGATHERINGBONUS_INDEX || var == STONEGATHERINGBONUS_INDEX || var == COALGATHERINGBONUS_INDEX || var == FURNITUREGATHERINGBONUS_INDEX || var == LEATHERGATHERINGBONUS_INDEX || var == GEMSGATHERINGBONUS_INDEX || var == SPEEDBONUS_INDEX || var == BACKSTAB_INDEX || var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX;
 }
 
 bool IsBooleanVariable(int var)
@@ -2696,11 +2696,11 @@ std::string GetVariableDisplayName(int var, bool increase)
 	}
 	
 	variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
+	variable_name = FindAndReplaceString(variable_name, "DaySightRangeBonus", "DaySight");
+	variable_name = FindAndReplaceString(variable_name, "NightSightRangeBonus", "NightSight");
 	variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
 	variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
 	variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
-	variable_name = FindAndReplaceString(variable_name, "DaySightBonus", "Day Sight");
-	variable_name = FindAndReplaceString(variable_name, "NightSightBonus", "Night Sight");
 	variable_name = FindAndReplaceString(variable_name, "Supply", "FoodSupply");
 	variable_name = FindAndReplaceString(variable_name, "Demand", "FoodCost");
 	variable_name = SeparateCapitalizedStringElements(variable_name);

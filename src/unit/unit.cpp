@@ -1438,14 +1438,16 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 			Variable[HP_INDEX].Value += item.Variable[i].Value;
 			Variable[HP_INDEX].Max += item.Variable[i].Max;
 			Variable[HP_INDEX].Increase += item.Variable[i].Increase;
-		} else if (i == SIGHTRANGE_INDEX) {
+		} else if (i == SIGHTRANGE_INDEX || i == DAYSIGHTRANGEBONUS_INDEX || i == NIGHTSIGHTRANGEBONUS_INDEX) {
 			if (!SaveGameLoading) {
 				MapUnmarkUnitSight(*this);
 			}
 			Variable[i].Value += item.Variable[i].Value;
 			Variable[i].Max += item.Variable[i].Max;
 			if (!SaveGameLoading) {
-				CurrentSightRange = Variable[i].Value;
+				if (i == SIGHTRANGE_INDEX) {
+					CurrentSightRange = Variable[i].Value;
+				}
 				UpdateUnitSightRange(*this);
 				MapMarkUnitSight(*this);
 			}
@@ -1472,11 +1474,13 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 			Variable[HP_INDEX].Value -= item.Variable[i].Value;
 			Variable[HP_INDEX].Max -= item.Variable[i].Max;
 			Variable[HP_INDEX].Increase -= item.Variable[i].Increase;
-		} else if (i == SIGHTRANGE_INDEX) {
+		} else if (i == SIGHTRANGE_INDEX || i == DAYSIGHTRANGEBONUS_INDEX || i == NIGHTSIGHTRANGEBONUS_INDEX) {
 			MapUnmarkUnitSight(*this);
 			Variable[i].Value -= item.Variable[i].Value;
 			Variable[i].Max -= item.Variable[i].Max;
-			CurrentSightRange = Variable[i].Value;
+			if (i == SIGHTRANGE_INDEX) {
+				CurrentSightRange = Variable[i].Value;
+			}
 			UpdateUnitSightRange(*this);
 			MapMarkUnitSight(*this);
 		}
