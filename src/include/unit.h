@@ -425,6 +425,7 @@ public:
 	bool CanHireMercenary(CUnitType *type, int civilization_id = -1) const;
 	bool CanEat(const CUnit &unit) const;
 	bool LevelCheck(const int level) const;
+	bool HasAdjacentRailForUnitType(const CUnitType *type) const;
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;

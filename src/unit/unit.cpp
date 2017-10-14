@@ -5833,6 +5833,10 @@ bool CUnit::CanUseItem(CUnit *item) const
 			return false;
 		}
 		
+		if (this->Type->BoolFlag[RAIL_INDEX].value && !item->ConnectingDestination->HasAdjacentRailForUnitType(this->Type)) {
+			return false;
+		}
+		
 		if (this->Player == item->Player || this->Player->IsAllied(*item->Player) || item->Player->Type == PlayerNeutral) {
 			return true;
 		}
@@ -6018,6 +6022,45 @@ bool CUnit::LevelCheck(const int level) const
 	}
 	
 	return SyncRand((this->Variable[LEVEL_INDEX].Value * 2) + 1) >= level;
+}
+
+bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
+{
+	bool has_adjacent_rail = false;
+	Vec2i top_left_pos(this->tilePos - Vec2i(1, 1));
+	Vec2i bottom_right_pos(this->tilePos + Vec2i(this->Type->TileWidth, this->Type->TileHeight));
+			
+	for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
+		Vec2i tile_pos(x, top_left_pos.y);
+		if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer)) {
+			has_adjacent_rail = true;
+			break;
+		}
+				
+		tile_pos.y = bottom_right_pos.y;
+		if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer)) {
+			has_adjacent_rail = true;
+			break;
+		}
+	}
+			
+	if (!has_adjacent_rail) {
+		for (int y = top_left_pos.y; y <= bottom_right_pos.y; ++y) {
+			Vec2i tile_pos(top_left_pos.x, y);
+			if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer)) {
+				has_adjacent_rail = true;
+				break;
+			}
+					
+			tile_pos.x = bottom_right_pos.x;
+			if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer)) {
+				has_adjacent_rail = true;
+				break;
+			}
+		}
+	}
+			
+	return has_adjacent_rail;
 }
 
 CAnimations *CUnit::GetAnimations() const
