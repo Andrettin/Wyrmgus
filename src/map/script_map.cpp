@@ -1643,6 +1643,7 @@ static int CclDefineMapTemplate(lua_State *l)
 				LuaError(l, "World doesn't exist.");
 			}
 			map_template->World = world;
+			map_template->Plane = world->Plane;
 		} else if (!strcmp(value, "SurfaceLayer")) {
 			map_template->SurfaceLayer = LuaToNumber(l, -1);
 			if (map_template->SurfaceLayer > 0) {
@@ -2124,11 +2125,19 @@ static int CclDefineTerrainFeature(lua_State *l)
 				LuaError(l, "Terrain doesn't exist.");
 			}
 			terrain_feature->TerrainType = terrain;
+		} else if (!strcmp(value, "Plane")) {
+			CPlane *plane = GetPlane(LuaToString(l, -1));
+			if (plane != NULL) {
+				terrain_feature->Plane = plane;
+			} else {
+				LuaError(l, "Plane doesn't exist.");
+			}
 		} else if (!strcmp(value, "World")) {
 			CWorld *world = GetWorld(LuaToString(l, -1));
 			if (world != NULL) {
 				terrain_feature->World = world;
 				world->TerrainFeatures.push_back(terrain_feature);
+				terrain_feature->Plane = world->Plane;
 			} else {
 				LuaError(l, "World doesn't exist.");
 			}
@@ -2153,8 +2162,8 @@ static int CclDefineTerrainFeature(lua_State *l)
 		}
 	}
 	
-	if (terrain_feature->World == NULL) {
-		LuaError(l, "Terrain feature \"%s\" is not assigned to any world." _C_ terrain_feature->Ident.c_str());
+	if (terrain_feature->Plane == NULL && terrain_feature->World == NULL) {
+		LuaError(l, "Terrain feature \"%s\" is not assigned to any world or plane." _C_ terrain_feature->Ident.c_str());
 	}
 	
 	return 0;

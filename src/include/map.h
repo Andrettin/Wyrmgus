@@ -144,7 +144,7 @@ class CTerrainFeature
 {
 public:
 	CTerrainFeature() :
-		ID(-1), TerrainType(NULL), World(NULL)
+		ID(-1), TerrainType(NULL), Plane(NULL), World(NULL)
 	{
 	}
 	
@@ -153,6 +153,7 @@ public:
 	std::string Name;
 	CColor Color;
 	CTerrainType *TerrainType;
+	CPlane *Plane;
 	CWorld *World;
 	std::map<int, std::string> CulturalNames;							/// Names for the terrain feature for each different culture/civilization
 };
