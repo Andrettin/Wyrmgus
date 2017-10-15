@@ -891,8 +891,8 @@ static int CclSetMapTemplateHero(lua_State *l)
 
 	std::string faction_name = LuaToString(l, 3);
 	CFaction *faction = PlayerRaces.GetFaction(faction_name);
-	if (!faction) {
-		LuaError(l, "Faction doesn't exist.\n");
+	if (!faction_name.empty() && !faction) {
+		LuaError(l, "Faction \"%s\" doesn't exist.\n" _C_ faction_name.c_str());
 	}
 
 	CDate start_date;
