@@ -228,7 +228,7 @@ static bool MoveRandomly(CUnit &unit)
 			
 			if (unit.Type->BoolFlag[PEOPLEAVERSION_INDEX].value) {
 				std::vector<CUnit *> table;
-				SelectAroundUnit(unit, std::max(6, unit.Type->RandomMovementDistance), table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+				SelectAroundUnit(unit, std::max(6, unit.Type->RandomMovementDistance), table, HasNotSamePlayerAs(*unit.Player));
 				if (!table.size()) { //only avoid going near a settled area if isn't already surrounded by civilizations' units
 					//don't go near settled areas
 					Vec2i minpos = pos;
@@ -238,7 +238,7 @@ static bool MoveRandomly(CUnit &unit)
 					maxpos.x = pos.x + std::max(6, unit.Type->RandomMovementDistance);
 					maxpos.y = pos.y + std::max(6, unit.Type->RandomMovementDistance);
 					std::vector<CUnit *> second_table;
-					Select(minpos, maxpos, second_table, unit.MapLayer, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+					Select(minpos, maxpos, second_table, unit.MapLayer, HasNotSamePlayerAs(*unit.Player));
 
 					if (second_table.size() > 0) {
 						return false;
@@ -251,7 +251,7 @@ static bool MoveRandomly(CUnit &unit)
 					maxpos.x = pos.x + 1;
 					maxpos.y = pos.y + 1;
 					std::vector<CUnit *> second_table;
-					Select(minpos, maxpos, second_table, unit.MapLayer, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+					Select(minpos, maxpos, second_table, unit.MapLayer, HasNotSamePlayerAs(*unit.Player));
 
 					if (second_table.size() > 0) {
 						return false;
