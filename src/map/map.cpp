@@ -1800,6 +1800,10 @@ bool CMap::IsLayerUnderground(int z) const
 
 void CMap::SetCurrentPlane(CPlane *plane)
 {
+	if (Map.Planes[CurrentMapLayer] == plane) {
+		return;
+	}
+	
 	int map_layer = -1;
 	
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
@@ -1825,6 +1829,10 @@ void CMap::SetCurrentPlane(CPlane *plane)
 
 void CMap::SetCurrentWorld(CWorld *world)
 {
+	if (Map.Worlds[CurrentMapLayer] == world) {
+		return;
+	}
+	
 	int map_layer = -1;
 	
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
@@ -1850,6 +1858,10 @@ void CMap::SetCurrentWorld(CWorld *world)
 
 void CMap::SetCurrentSurfaceLayer(int surface_layer)
 {
+	if (Map.SurfaceLayers[CurrentMapLayer] == surface_layer) {
+		return;
+	}
+	
 	int map_layer = -1;
 	
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
