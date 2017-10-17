@@ -1499,7 +1499,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
 			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeFly)) {
-				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(16, 16), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
 			} else {
 				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 			}
