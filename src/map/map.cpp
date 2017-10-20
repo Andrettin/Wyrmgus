@@ -350,7 +350,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.Info.MapWidths.push_back(std::min(this->Width * this->Scale, Map.Info.MapWidth));
 		Map.Info.MapHeights.push_back(std::min(this->Height * this->Scale, Map.Info.MapHeight));
 		Map.Fields.push_back(new CMapField[Map.Info.MapWidths[z] * Map.Info.MapHeights[z]]);
-		Map.TimeOfDaySeconds.push_back(this->TimeOfDaySeconds);
 		Map.TimeOfDay.push_back(NoTimeOfDay);
 		Map.Planes.push_back(this->Plane);
 		Map.Worlds.push_back(this->World);
@@ -358,7 +357,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.LayerConnectors.resize(z + 1);
 	} else {
 		if (!this->IsSubtemplateArea()) {
-			Map.TimeOfDaySeconds[z] = this->TimeOfDaySeconds;
 			Map.Planes[z] = this->Plane;
 			Map.Worlds[z] = this->World;
 			Map.SurfaceLayers[z] = this->SurfaceLayer;
@@ -370,7 +368,14 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.Info.MapHeights[z] = CurrentCampaign->MapSizes[z].y;
 	}
 	
-	if (this->TimeOfDaySeconds && !GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning && !this->IsSubtemplateArea()) {
+	if (
+		((this->World && this->World->TimeOfDaySeconds) || (!this->World && this->Plane && this->Plane->TimeOfDaySeconds))
+		&& this->SurfaceLayer == 0
+		&& !GameSettings.Inside
+		&& !GameSettings.NoTimeOfDay
+		&& Editor.Running == EditorNotRunning
+		&& !this->IsSubtemplateArea()
+	) {
 		Map.TimeOfDay[z] = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
 	}
 	
@@ -2160,7 +2165,6 @@ void CMap::Create()
 	this->Fields.push_back(new CMapField[this->Info.MapWidth * this->Info.MapHeight]);
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
 	this->Info.MapHeights.push_back(this->Info.MapHeight);
-	this->TimeOfDaySeconds.push_back(DefaultTimeOfDaySeconds);
 	if (!GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning) {
 		this->TimeOfDay.push_back(SyncRand(MaxTimesOfDay - 1) + 1); // begin at a random time of day
 	} else {
@@ -2198,7 +2202,6 @@ void CMap::Clean()
 		delete[] this->Fields[z];
 	}
 	this->Fields.clear();
-	this->TimeOfDaySeconds.clear();
 	this->TimeOfDay.clear();
 	this->BorderLandmasses.clear();
 	this->Planes.clear();
@@ -2254,8 +2257,8 @@ void CMap::Save(CFile &file) const
 	}
 	file.printf("  },\n");
 	file.printf("  \"time-of-day\", {\n");
-	for (size_t z = 0; z < this->TimeOfDaySeconds.size(); ++z) {
-		file.printf("  {%d, %d},\n", this->TimeOfDaySeconds[z], this->TimeOfDay[z]);
+	for (size_t z = 0; z < this->TimeOfDay.size(); ++z) {
+		file.printf("  {%d},\n", this->TimeOfDay[z]);
 	}
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");

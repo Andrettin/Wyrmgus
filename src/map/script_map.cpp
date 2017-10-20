@@ -148,7 +148,6 @@ static int CclStratagusMap(lua_State *l)
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "time-of-day")) {
-					Map.TimeOfDaySeconds.clear();
 					Map.TimeOfDay.clear();
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
@@ -160,9 +159,7 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"time-of-day\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						int time_of_day_seconds = LuaToNumber(l, -1, 1);
-						int time_of_day = LuaToNumber(l, -1, 2);
-						Map.TimeOfDaySeconds.push_back(time_of_day_seconds);
+						int time_of_day = LuaToNumber(l, -1, 1);
 						Map.TimeOfDay.push_back(time_of_day);
 						lua_pop(l, 1);
 					}
@@ -1646,9 +1643,6 @@ static int CclDefineMapTemplate(lua_State *l)
 			map_template->Plane = world->Plane;
 		} else if (!strcmp(value, "SurfaceLayer")) {
 			map_template->SurfaceLayer = LuaToNumber(l, -1);
-			if (map_template->SurfaceLayer > 0) {
-				map_template->TimeOfDaySeconds = 0; // no time of day for underground maps
-			}
 			if (map_template->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
 				UI.SurfaceLayerButtons.resize(map_template->SurfaceLayer + 1);
 			}
@@ -1666,8 +1660,6 @@ static int CclDefineMapTemplate(lua_State *l)
 			map_template->Height = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Scale")) {
 			map_template->Scale = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "TimeOfDaySeconds")) {
-			map_template->TimeOfDaySeconds = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SubtemplatePosition")) {
 			CclGetPos(l, &map_template->SubtemplatePosition.x, &map_template->SubtemplatePosition.y);
 		} else if (!strcmp(value, "SubtemplatePositionTopLeft")) {

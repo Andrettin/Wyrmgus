@@ -99,11 +99,12 @@ class CPlane
 {
 public:
 	CPlane() :
-		ID(-1)
+		ID(-1), TimeOfDaySeconds(DefaultTimeOfDaySeconds)
 	{
 	}
 	
 	int ID;																/// ID of this plane
+	int TimeOfDaySeconds;												/// How many seconds does it take to change the time of day in this plane
 	std::string Ident;
 	std::string Name;
 	std::string Description;
@@ -116,11 +117,12 @@ class CWorld
 {
 public:
 	CWorld() :
-		ID(-1), Plane(NULL)
+		ID(-1), Plane(NULL), TimeOfDaySeconds(DefaultTimeOfDaySeconds)
 	{
 	}
 	
 	int ID;																/// ID of this world
+	int TimeOfDaySeconds;												/// How many seconds does it take to change the time of day in this world
 	std::string Ident;
 	std::string Name;
 	std::string Description;

@@ -123,7 +123,6 @@ class CRegion;
 //#define MaxMapHeight 256  /// max map height supported
 #define MaxMapWidth  512  /// max map width supported
 #define MaxMapHeight 512  /// max map height supported
-#define DefaultTimeOfDaySeconds (10 * 3) // every 10 seconds of gameplay = 1 hour for time of day calculations, change time of day every three hours
 //Wyrmgus end
 
 //Wyrmgus start
@@ -176,7 +175,7 @@ class CMapTemplate
 {
 public:
 	CMapTemplate() :
-		Width(0), Height(0), Scale(1), TimeOfDaySeconds(DefaultTimeOfDaySeconds), SurfaceLayer(0),
+		Width(0), Height(0), Scale(1), SurfaceLayer(0),
 		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0),
 		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), BorderTerrain(NULL), SurroundingTerrain(NULL)
 	{
@@ -199,7 +198,6 @@ public:
 	int Width;
 	int Height;
 	int Scale;													/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
-	int TimeOfDaySeconds;
 	int SurfaceLayer;											/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	Vec2i SubtemplatePosition;
 	Vec2i CurrentStartPos;
@@ -546,7 +544,6 @@ public:
 	CTerrainType *BorderTerrain;      	/// terrain type for borders
 	int Landmasses;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
-	std::vector<int> TimeOfDaySeconds;		/// how many seconds it takes to change the time of day, for each map layer
 	std::vector<int> TimeOfDay;				/// the time of day for each map layer
 	std::vector<CPlane *> Planes;			/// the plane pointer (if any) for each map layer
 	std::vector<CWorld *> Worlds;			/// the world pointer (if any) for each map layer

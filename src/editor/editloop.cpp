@@ -2549,7 +2549,6 @@ void CEditor::Init()
 		Map.Info.MapWidths.push_back(Map.Info.MapWidth);
 		Map.Info.MapHeights.clear();
 		Map.Info.MapHeights.push_back(Map.Info.MapHeight);
-		Map.TimeOfDaySeconds.push_back(DefaultTimeOfDaySeconds);
 		Map.TimeOfDay.push_back(NoTimeOfDay);
 		Map.Planes.push_back(NULL);
 		Map.Worlds.push_back(NULL);

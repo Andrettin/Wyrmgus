@@ -415,12 +415,17 @@ static void GameLogicLoop()
 		
 		//Wyrmgus start
 		for (size_t z = 0; z < Map.Fields.size(); ++z) {
-			if (GameSettings.Inside || GameSettings.NoTimeOfDay || !Map.TimeOfDaySeconds[z]) {
-				// indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
-				Map.TimeOfDay[z] = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day"
+			int time_of_day_seconds = DefaultTimeOfDaySeconds;
+			if (Map.Worlds[z]) {
+				time_of_day_seconds = Map.Worlds[z]->TimeOfDaySeconds;
+			} else if (Map.Planes[z]) {
+				time_of_day_seconds = Map.Planes[z]->TimeOfDaySeconds;
+			}
+			if (GameSettings.Inside || GameSettings.NoTimeOfDay || Map.SurfaceLayers[z] > 0 || !time_of_day_seconds) {
+				Map.TimeOfDay[z] = NoTimeOfDay; // make indoors have no time of day setting
 				continue;
 			}
-			if (GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * Map.TimeOfDaySeconds[z]) == 0) { 
+			if (GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * time_of_day_seconds) == 0) { 
 				Map.TimeOfDay[z] += 1;
 				if (Map.TimeOfDay[z] == MaxTimesOfDay) {
 					Map.TimeOfDay[z] = 1;
