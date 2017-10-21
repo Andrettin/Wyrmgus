@@ -2395,6 +2395,7 @@ static int CclDefineDeityDomain(lua_State *l)
 				}
 
 				deity_domain->Abilities.push_back(ability);
+				ability->DeityDomains.push_back(deity_domain);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

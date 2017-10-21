@@ -95,10 +95,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-//Wyrmgus start
-///* virtual */ int Spell_Demolish::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
-/* virtual */ int Spell_Demolish::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z)
-//Wyrmgus end
+/* virtual */ int Spell_Demolish::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z, int modifier)
 {
 	// Allow error margins. (Lame, I know)
 	const Vec2i offset(this->Range + 2, this->Range + 2);
@@ -206,6 +203,8 @@
 					damage += this->AirDamage * (100 - unit.Variable[AIRRESISTANCE_INDEX].Value) / 100;
 					damage += this->EarthDamage * (100 - unit.Variable[EARTHRESISTANCE_INDEX].Value) / 100;
 					damage += this->WaterDamage * (100 - unit.Variable[WATERRESISTANCE_INDEX].Value) / 100;
+					damage *= modifier;
+					damage /= 100;
 					damage -= SyncRand() % ((damage + 2) / 2);
 				}
 				HitUnit(&caster, unit, this->Damage + damage);

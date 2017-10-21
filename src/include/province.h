@@ -56,6 +56,7 @@ class CSpecies;
 class WorldMapTile;
 class CGraphic;
 class CSettlement;
+class CDeityDomain;
 
 /**
 **  Indexes into era array.
@@ -110,6 +111,7 @@ public:
 	std::string Description;
 	std::string Background;
 	std::string Quote;
+	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// Deity domains empowered in this plane
 	std::vector<CSpecies *> Species;									/// Species in this plane
 };
 

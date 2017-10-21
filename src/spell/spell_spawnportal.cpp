@@ -74,10 +74,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-//Wyrmgus start
-///* virtual */ int Spell_SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
-/* virtual */ int Spell_SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z)
-//Wyrmgus end
+/* virtual */ int Spell_SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z, int modifier)
 {
 	// FIXME: vladi: cop should be placed only on explored land
 	CUnit *portal = caster.Goal;

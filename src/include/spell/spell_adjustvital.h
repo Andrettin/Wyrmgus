@@ -43,10 +43,7 @@ class Spell_AdjustVital : public SpellActionType
 public:
 	Spell_AdjustVital() : SpellActionType(1), HP(0), Mana(0), Shield(0), MaxMultiCast(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 //Wyrmgus start
-//					 CUnit *target, const Vec2i &goalPos);
-					 CUnit *target, const Vec2i &goalPos, int z);
-					 //Wyrmgus end
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:

@@ -119,10 +119,7 @@
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-//Wyrmgus start
-///* virtual */ int Spell_AdjustVariable::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &/*goalPos*/)
-/* virtual */ int Spell_AdjustVariable::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/)
-//Wyrmgus end
+/* virtual */ int Spell_AdjustVariable::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		CUnit *unit = (this->Var[i].TargetIsCaster) ? &caster : target;
@@ -130,6 +127,7 @@
 		if (!unit) {
 			continue;
 		}
+		
 		// Enable flag.
 		if (this->Var[i].ModifEnable) {
 			unit->Variable[i].Enable = this->Var[i].Enable;
@@ -150,10 +148,10 @@
 
 		// Value field
 		if (this->Var[i].ModifValue) {
-			unit->Variable[i].Value = this->Var[i].Value;
+			unit->Variable[i].Value = this->Var[i].Value * modifier / 100;
 		}
-		unit->Variable[i].Value += this->Var[i].AddValue;
-		unit->Variable[i].Value += this->Var[i].IncreaseTime * unit->Variable[i].Increase;
+		unit->Variable[i].Value += this->Var[i].AddValue * modifier / 100;
+		unit->Variable[i].Value += this->Var[i].IncreaseTime * unit->Variable[i].Increase * modifier / 100;
 
 		//Wyrmgus start
 //		clamp(&unit->Variable[i].Value, 0, unit->Variable[i].Max);

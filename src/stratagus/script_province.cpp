@@ -138,6 +138,19 @@ static int CclDefinePlane(lua_State *l)
 			plane->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "TimeOfDaySeconds")) {
 			plane->TimeOfDaySeconds = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "EmpoweredDeityDomains")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string deity_domain_ident = LuaToString(l, -1, j + 1);
+				CDeityDomain *deity_domain = PlayerRaces.GetDeityDomain(deity_domain_ident);
+				if (!deity_domain) {
+					LuaError(l, "Deity domain \"%s\" doesn't exist." _C_ deity_domain_ident.c_str());
+				}
+				plane->EmpoweredDeityDomains.push_back(deity_domain);
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

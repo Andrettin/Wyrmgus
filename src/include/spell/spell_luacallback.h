@@ -45,10 +45,7 @@ public:
 	Spell_LuaCallback() : Func(NULL) {};
 	~Spell_LuaCallback() { delete Func; };
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 //Wyrmgus start
-//					 CUnit *target, const Vec2i &goalPos);
-					 CUnit *target, const Vec2i &goalPos, int z);
-					 //Wyrmgus end
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:

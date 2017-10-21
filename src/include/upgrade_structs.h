@@ -55,10 +55,11 @@ class CVariable;
 class CIcon;
 //Wyrmgus start
 class CCharacter;
+class CDeityDomain;
+class CDynasty;
+class CFaction;
 class CUniqueItem;
 class CUpgradeModifier;
-class CFaction;
-class CDynasty;
 //Wyrmgus end
 struct lua_State;
 
@@ -261,6 +262,7 @@ public:
 	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
 	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<CUnitType *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
+	std::vector<CDeityDomain *> DeityDomains;	/// Deity domains to which this ability belongs
 	std::vector<CCharacter *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons

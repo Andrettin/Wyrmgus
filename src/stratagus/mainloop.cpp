@@ -422,7 +422,7 @@ static void GameLogicLoop()
 				time_of_day_seconds = Map.Planes[z]->TimeOfDaySeconds;
 			}
 			if (GameSettings.Inside || GameSettings.NoTimeOfDay || Map.SurfaceLayers[z] > 0 || !time_of_day_seconds) {
-				Map.TimeOfDay[z] = NoTimeOfDay; // make indoors have no time of day setting
+				Map.TimeOfDay[z] = NoTimeOfDay; //the map layer has no time of day
 				continue;
 			}
 			if (GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * time_of_day_seconds) == 0) { 

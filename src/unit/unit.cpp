@@ -6021,6 +6021,28 @@ bool CUnit::LevelCheck(const int level) const
 	return SyncRand((this->Variable[LEVEL_INDEX].Value * 2) + 1) >= level;
 }
 
+bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
+{
+	if (Map.Planes[this->MapLayer] && !Map.Planes[this->MapLayer]->EmpoweredDeityDomains.empty()) {
+		for (size_t i = 0; i < ability->DeityDomains.size(); ++i) {
+			if (std::find(Map.Planes[this->MapLayer]->EmpoweredDeityDomains.begin(), Map.Planes[this->MapLayer]->EmpoweredDeityDomains.end(), ability->DeityDomains[i]) != Map.Planes[this->MapLayer]->EmpoweredDeityDomains.end()) {
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+bool CUnit::IsSpellEmpowered(const SpellType *spell) const
+{
+	if (spell->DependencyId != -1) {
+		return this->IsAbilityEmpowered(AllUpgrades[spell->DependencyId]);
+	} else {
+		return false;
+	}
+}
+
 bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
 {
 	bool has_adjacent_rail = false;

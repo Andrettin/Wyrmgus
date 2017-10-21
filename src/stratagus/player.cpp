@@ -529,6 +529,16 @@ int PlayerRace::GetDeityDomainIndexByIdent(std::string deity_domain_ident) const
 	return -1;
 }
 
+CDeityDomain *PlayerRace::GetDeityDomain(std::string deity_domain_ident) const
+{
+	for (size_t i = 0; i < this->DeityDomains.size(); ++i) {
+		if (deity_domain_ident == this->DeityDomains[i]->Ident) {
+			return this->DeityDomains[i];
+		}
+	}
+	return NULL;
+}
+
 int PlayerRace::GetDeityIndexByIdent(std::string deity_ident) const
 {
 	for (size_t i = 0; i < this->Deities.size(); ++i) {

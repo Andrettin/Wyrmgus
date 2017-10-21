@@ -187,10 +187,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-//Wyrmgus start
-///* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &goalPos)
-/* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &goalPos, int z)
-//Wyrmgus end
+/* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &goalPos, int z, int modifier)
 {
 	PixelPos startPos;
 	PixelPos endPos;
@@ -215,7 +212,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		}
 		if (count > 0) {
 			std::sort(table.begin(), table.begin() + count, CompareUnitDistance(caster));
-			int damageLeft = this->Damage;
+			int damageLeft = this->Damage * modifier / 100;
 			for (std::vector<CUnit *>::iterator it = table.begin(); it != table.begin() + count && damageLeft > 0; ++it) {
 				CUnit &unit = **it;
 				if (unit.IsAliveOnMap()) {
@@ -255,7 +252,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		//Wyrmgus end
 		missile->TTL = this->TTL;
 		missile->Delay = this->Delay;
-		missile->Damage = this->Damage;
+		missile->Damage = this->Damage * modifier / 100;
 		if (this->UseUnitVar) {
 			missile->Damage = 0;
 			missile->SourceUnit = &caster;

@@ -84,14 +84,11 @@
 **  @internal: vladi: blizzard differs than original in this way:
 **   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
-//Wyrmgus start
-///* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
-/* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z)
-//Wyrmgus end
+/* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z, int modifier)
 {
 	int fields = this->Fields;
 	const int shards = this->Shards;
-	const int damage = this->Damage;
+	const int damage = this->Damage * modifier / 100;
 	const PixelDiff offset(this->StartOffsetX, this->StartOffsetY);
 	const MissileType *missile = this->Missile;
 

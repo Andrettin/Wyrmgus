@@ -70,10 +70,7 @@ public:
 	virtual ~SpellActionType() {};
 
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 //Wyrmgus start
-//					 CUnit *target, const Vec2i &goalPos) = 0;
-					 CUnit *target, const Vec2i &goalPos, int z) = 0;
-					 //Wyrmgus end
+					 CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
 	const int ModifyManaCaster;

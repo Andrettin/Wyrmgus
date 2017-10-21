@@ -67,18 +67,15 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-//Wyrmgus start
-///* virtual */ int Spell_AdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &/*goalPos*/)
-/* virtual */ int Spell_AdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/)
-//Wyrmgus end
+/* virtual */ int Spell_AdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &/*goalPos*/, int /*z*/, int modifier)
 {
 	if (!target) {
 		return 0;
 	}
 
-	const int hp = this->HP;
-	const int mana = this->Mana;
-	const int shield = this->Shield;
+	const int hp = this->HP * modifier / 100;
+	const int mana = this->Mana * modifier / 100;
+	const int shield = this->Shield * modifier / 100;
 	const int manacost = spell.ManaCost;
 	int diffHP;
 	int diffMana;

@@ -688,15 +688,19 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 			}
 		//Wyrmgus end
 		}
+		
+		int modifier = 100;
+		if (caster.IsSpellEmpowered(&spell)) {
+			modifier += 100; //empowered spells have double the effect
+		}
+			
 		for (std::vector<SpellActionType *>::const_iterator act = spell.Action.begin();
 			 act != spell.Action.end(); ++act) {
 			if ((*act)->ModifyManaCaster) {
 				mustSubtractMana = false;
 			}
-			//Wyrmgus start
-//			cont = cont & (*act)->Cast(caster, spell, target, pos);
-			cont = cont & (*act)->Cast(caster, spell, target, pos, z);
-			//Wyrmgus end
+			
+			cont = cont & (*act)->Cast(caster, spell, target, pos, z, modifier);
 		}
 		if (mustSubtractMana) {
 			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
