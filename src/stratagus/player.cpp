@@ -1820,6 +1820,46 @@ bool CPlayer::HasSettlement(CSettlement *settlement) const
 	return false;
 }
 
+bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
+{
+	std::vector<CUnit *> settlement_unit_table;
+	
+	int town_hall_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("town-hall"));			
+	if (town_hall_type_id == -1) {
+		return false;
+	}
+	CUnitType *town_hall_type = UnitTypes[town_hall_type_id];
+	
+	int stronghold_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("stronghold"));			
+	CUnitType *stronghold_type = NULL;
+	if (stronghold_type_id != -1) {
+		stronghold_type = UnitTypes[stronghold_type_id];
+	}
+	
+	FindPlayerUnitsByType(*this, *town_hall_type, settlement_unit_table, true);
+	
+	if (stronghold_type) {
+		FindPlayerUnitsByType(*this, *stronghold_type, settlement_unit_table, true); //adds strongholds to the table
+	}
+	for (size_t i = 0; i < settlement_unit_table.size(); ++i) {
+		CUnit *settlement_unit = settlement_unit_table[i];
+		if (!settlement_unit->IsAliveOnMap()) {
+			continue;
+		}
+		
+		int settlement_landmass = Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer);
+		if (std::find(Map.BorderLandmasses[settlement_landmass].begin(), Map.BorderLandmasses[settlement_landmass].end(), water_zone) == Map.BorderLandmasses[settlement_landmass].end()) { //settlement's landmass doesn't even border the water zone, continue
+			continue;
+		}
+		
+		if (FindTerrainType(0, 0, 8, *this, settlement_unit->tilePos, &Vec2i(0, 0), settlement_unit->MapLayer, water_zone)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool CPlayer::HasUnitBuilder(CUnitType *type, CSettlement *settlement) const
 {
 	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
@@ -2144,6 +2184,25 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 	}
 	
 	return "";
+}
+
+void CPlayer::GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building)
+{
+	const int *unit_count = this->UnitTypesAiActiveCount;
+	for (unsigned int i = 0; i < AiHelpers.Build[building->Slot].size(); ++i) {
+		if (unit_count[AiHelpers.Build[building->Slot][i]->Slot]) {
+			std::vector<CUnit *> worker_table;
+
+			FindPlayerUnitsByType(*this, *AiHelpers.Build[building->Slot][i], worker_table, true);
+
+			for (size_t j = 0; j != worker_table.size(); ++j) {
+				int worker_landmass = Map.GetTileLandmass(worker_table[j]->tilePos, worker_table[j]->MapLayer);
+				if (std::find(worker_landmasses.begin(), worker_landmasses.end(), worker_landmass) == worker_landmasses.end()) {
+					worker_landmasses.push_back(worker_landmass);
+				}
+			}
+		}
+	}
 }
 //Wyrmgus end
 

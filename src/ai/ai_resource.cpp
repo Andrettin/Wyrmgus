@@ -2255,36 +2255,21 @@ void AiCheckSettlementConstruction()
 	int n_t = AiHelpers.Build.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
 	if (town_hall_type->Slot >= n_t) { // Oops not known.
-		DebugPrint("%d: AiCheckPathwayConstruction I: Nothing known about '%s'\n"
+		DebugPrint("%d: AiCheckSettlementConstruction I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
 		return;
 	}
 		
 	std::vector<CUnitType *> &table = tablep[town_hall_type->Slot];
 	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiCheckPathwayConstruction II: Nothing known about '%s'\n"
+		DebugPrint("%d: AiCheckSettlementConstruction II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ town_hall_type->Ident.c_str());
 		return;
 	}
 
 	//check in which landmasses this player has workers
 	std::vector<int> worker_landmasses;
-
-	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-	for (unsigned int i = 0; i < tablep[town_hall_type->Slot].size(); ++i) {
-		if (unit_count[tablep[town_hall_type->Slot][i]->Slot]) {
-			std::vector<CUnit *> worker_table;
-
-			FindPlayerUnitsByType(*AiPlayer->Player, *tablep[town_hall_type->Slot][i], worker_table, true);
-
-			for (size_t j = 0; j != worker_table.size(); ++j) {
-				int worker_landmass = Map.GetTileLandmass(worker_table[j]->tilePos, worker_table[j]->MapLayer);
-				if (std::find(worker_landmasses.begin(), worker_landmasses.end(), worker_landmass) == worker_landmasses.end()) {
-					worker_landmasses.push_back(worker_landmass);
-				}
-			}
-		}
-	}
+	AiPlayer->Player->GetWorkerLandmasses(worker_landmasses, town_hall_type);
 						
 	//check settlement units to see if can build in one
 	for (size_t i = 0; i < Map.SettlementUnits.size(); ++i) {
@@ -2329,6 +2314,81 @@ void AiCheckSettlementConstruction()
 		
 		if (built_settlement) {
 			break;
+		}
+	}
+}
+
+/**
+**  Check if the AI should build a dock in a specific "landmass" (water zone).
+*/
+void AiCheckDockConstruction()
+{
+	if (AiPlayer->Player->NumTownHalls < 1) { //don't build docks if has no town hall yet
+		return;
+	}
+
+	int dock_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("dock"));			
+	if (dock_type_id == -1) {
+		return;
+	}
+	
+	CUnitType *dock_type = UnitTypes[dock_type_id];
+	
+	if (!AiRequestedTypeAllowed(*AiPlayer->Player, *dock_type)) {
+		return;
+	}
+
+	//check in which landmasses this player has workers
+	std::vector<int> worker_landmasses;
+	AiPlayer->Player->GetWorkerLandmasses(worker_landmasses, dock_type);
+
+	std::vector<int> neighbor_water_landmasses; //water "landmasses" neighboring the landmasses where the player has workers
+	for (size_t i = 0; i < worker_landmasses.size(); ++i) {
+		int worker_landmass = worker_landmasses[i];
+		for (size_t j = 0; j < Map.BorderLandmasses[worker_landmass].size(); ++j) {
+			int border_landmass = Map.BorderLandmasses[worker_landmass][j];
+			if (std::find(neighbor_water_landmasses.begin(), neighbor_water_landmasses.end(), border_landmass) == neighbor_water_landmasses.end()) {
+				neighbor_water_landmasses.push_back(border_landmass);
+			}
+		}
+	}
+	
+	std::vector<CUnit *> dock_table;
+	FindPlayerUnitsByType(*AiPlayer->Player, *dock_type, dock_table, true);
+		
+	for (size_t i = 0; i < neighbor_water_landmasses.size(); ++i) {
+		int water_landmass = neighbor_water_landmasses[i];
+		if (Map.BorderLandmasses[water_landmass].size() < 2) { //if the water "landmass" only borders one landmass, then there is no need to build a dock on it, as it can lead to no other landmasses
+			continue;
+		}
+		
+		if (!AiPlayer->Player->HasSettlementNearWaterZone(water_landmass)) { //must have a settlement near the water "landmass" before building a dock on it; we don't want workers to go far away from the player's settlements to build a dock
+			continue;
+		}
+		
+		//check if already has a dock in the water "landmass"
+		bool has_dock = false;
+		for (size_t j = 0; j < dock_table.size(); ++j) {
+			CUnit &dock_unit = *dock_table[j];
+					
+			if (Map.GetTileLandmass(dock_unit.tilePos, dock_unit.MapLayer) == water_landmass) {
+				has_dock = true;
+				break;
+			}
+		}
+		
+		if (!has_dock) { //if doesn't have an already built dock, see if there's one in the requests already
+			for (size_t j = 0; j < AiPlayer->UnitTypeBuilt.size(); ++j) {
+				const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[j];
+				if (queue.Landmass == water_landmass && queue.Type == dock_type) {
+					has_dock = true;
+					break;
+				}
+			}
+		}
+		
+		if (!has_dock) { // if doesn't have a dock, request one
+			AiAddUnitTypeRequest(*dock_type, 1, water_landmass);
 		}
 	}
 }

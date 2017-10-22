@@ -135,8 +135,8 @@ public:
 	//Wyrmgus start
 //	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
 //		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
-	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resource, Vec2i *resPos, int z) :
-		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z) {}
+	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resource, Vec2i *resPos, int z, int landmass) :
+		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z), landmass(landmass) {}
 	//Wyrmgus end
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -147,6 +147,7 @@ private:
 //	int resmask;
 	int resource;
 	int z;
+	int landmass;
 	//Wyrmgus end
 	Vec2i *resPos;
 };
@@ -169,7 +170,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 	// Look if found what was required.
 	//Wyrmgus start
 //	if (Map.Field(pos)->CheckMask(resmask)) {
-	if (Map.Field(pos, z)->GetResource() == resource) {
+	if ((!landmass || Map.GetTileLandmass(pos, z) == landmass) && (!resource || Map.Field(pos, z)->GetResource() == resource)) {
 	//Wyrmgus end
 		if (resPos) {
 			*resPos = pos;
@@ -213,7 +214,7 @@ bool FindTerrainType(int movemask, int resource, int range,
 //Wyrmgus end
 					 //Wyrmgus start
 //					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
-					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z)
+					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z, int landmass)
 					 //Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
@@ -228,7 +229,7 @@ bool FindTerrainType(int movemask, int resource, int range,
 
 	//Wyrmgus start
 //	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resmask, terrainPos);
-	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resource, terrainPos, z);
+	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resource, terrainPos, z, landmass);
 	//Wyrmgus end
 
 	return terrainTraversal.Run(terrainFinder);

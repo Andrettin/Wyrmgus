@@ -515,6 +515,7 @@ extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUn
 //Wyrmgus start
 extern void AiTransportCapacityRequest(int capacity_needed, int landmass);
 extern void AiCheckSettlementConstruction();
+extern void AiCheckDockConstruction();
 //Wyrmgus end
 
 //

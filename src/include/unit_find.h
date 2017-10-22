@@ -457,7 +457,7 @@ extern bool FindTerrainType(int movemask, int resource, int range,
 //Wyrmgus end
 							//Wyrmgus start
 //							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
-							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z);
+							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z, int landmass = 0);
 							//Wyrmgus end
 
 extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody = false);
