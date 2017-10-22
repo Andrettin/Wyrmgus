@@ -607,11 +607,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 		return true;
 	}
 	
-	int transport_capacity = 0;
-	for (size_t i = 0; i != AiPlayer->Transporters[water_landmass].size(); ++i) {
-		const CUnit &ai_transporter = *AiPlayer->Transporters[water_landmass][i];
-		transport_capacity += ai_transporter.Type->MaxOnBoard - ai_transporter.BoardCount;
-	}
+	int transport_capacity = AiGetTransportCapacity(water_landmass);
 	
 	int transport_capacity_needed = 0;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
@@ -630,12 +626,7 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 	int net_transport_capacity_needed = transport_capacity_needed - transport_capacity;
 	
 	if (net_transport_capacity_needed > 0) {
-		for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
-			const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
-			if (queue.Landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeNaval || queue.Type->UnitType == UnitTypeFly || queue.Type->UnitType == UnitTypeFlyLow)) {
-				net_transport_capacity_needed -= queue.Want * queue.Type->MaxOnBoard;
-			}
-		}
+		net_transport_capacity_needed -= AiGetRequestedTransportCapacity(water_landmass);
 		if (net_transport_capacity_needed > 0) { //if the quantity required is still above zero even after counting the transport capacity under construction, then request more
 			AiTransportCapacityRequest(net_transport_capacity_needed, water_landmass);
 		}

@@ -810,6 +810,32 @@ void AiCheckTransporters()
 	}
 	//Wyrmgus end
 }
+
+int AiGetTransportCapacity(int water_landmass)
+{
+	int transport_capacity = 0;
+	
+	for (size_t i = 0; i < AiPlayer->Transporters[water_landmass].size(); ++i) {
+		const CUnit &ai_transporter = *AiPlayer->Transporters[water_landmass][i];
+		transport_capacity += ai_transporter.Type->MaxOnBoard - ai_transporter.BoardCount;
+	}
+	
+	return transport_capacity;
+}
+
+int AiGetRequestedTransportCapacity(int water_landmass)
+{
+	int transport_capacity = 0;
+	
+	for (unsigned int i = 0; i < AiPlayer->UnitTypeBuilt.size(); ++i) { //count transport capacity under construction to see if should request more
+		const AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[i];
+		if (queue.Landmass == water_landmass && queue.Type->CanTransport() && (queue.Type->UnitType == UnitTypeNaval || queue.Type->UnitType == UnitTypeFly || queue.Type->UnitType == UnitTypeFlyLow)) {
+			transport_capacity += queue.Want * queue.Type->MaxOnBoard;
+		}
+	}
+	
+	return transport_capacity;
+}
 //Wyrmgus end
 
 //@}

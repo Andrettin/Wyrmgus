@@ -562,8 +562,12 @@ extern int AiFindWall(AiForce *force);
 /// Send explorers around the map
 extern void AiSendExplorers();
 //Wyrmgus start
-/// Assign free transporters according to their sea (water "landmass")
+/// Assign free transporters according to their water zone (water "landmass")
 extern void AiCheckTransporters();
+/// Get the current transport capacity of the AI for a given water zone
+extern int AiGetTransportCapacity(int water_landmass);
+/// Get the current requested transport capacity of the AI for a given water zone
+extern int AiGetRequestedTransportCapacity(int water_landmass);
 //Wyrmgus end
 /// Enemy units in distance
 extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,

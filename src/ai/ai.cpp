@@ -1577,9 +1577,8 @@ void AiEachMinute(CPlayer &player)
 	}
 	
 	AiCheckSettlementConstruction();
-	AiCheckDockConstruction();
-	
 	AiCheckTransporters();
+	AiCheckDockConstruction();
 	
 	AiForceManagerEachMinute();
 }

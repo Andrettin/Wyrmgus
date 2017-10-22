@@ -2355,7 +2355,7 @@ void AiCheckDockConstruction()
 	
 	std::vector<CUnit *> dock_table;
 	FindPlayerUnitsByType(*AiPlayer->Player, *dock_type, dock_table, true);
-		
+	
 	for (size_t i = 0; i < neighbor_water_landmasses.size(); ++i) {
 		int water_landmass = neighbor_water_landmasses[i];
 		if (Map.BorderLandmasses[water_landmass].size() < 2) { //if the water "landmass" only borders one landmass, then there is no need to build a dock on it, as it can lead to no other landmasses
@@ -2389,6 +2389,11 @@ void AiCheckDockConstruction()
 		
 		if (!has_dock) { // if doesn't have a dock, request one
 			AiAddUnitTypeRequest(*dock_type, 1, water_landmass);
+		} else {
+			int transport_capacity = AiGetTransportCapacity(water_landmass) + AiGetRequestedTransportCapacity(water_landmass);
+			if (transport_capacity == 0) { //if the AI has no transporters in the given landmass, build one (for scouting)
+				AiTransportCapacityRequest(1, water_landmass);
+			}
 		}
 	}
 }
