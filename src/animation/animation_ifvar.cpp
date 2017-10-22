@@ -59,9 +59,9 @@ static bool binOpLessEqual(int lhs, int rhs) { return lhs <= rhs; }
 static bool binOpLess(int lhs, int rhs) { return lhs < rhs; }
 static bool binOpEqual(int lhs, int rhs) { return lhs == rhs; }
 static bool binOpNotEqual(int lhs, int rhs) { return lhs != rhs; }
-static bool binOpAnd(int lhs, int rhs) { return (bool)(lhs & rhs); }
-static bool binOpOr(int lhs, int rhs) { return (bool)(lhs | rhs); }
-static bool binOpXor(int lhs, int rhs) { return (bool)(lhs ^ rhs); }
+static bool binOpAnd(int lhs, int rhs) { return (lhs & rhs) != 0; }
+static bool binOpOr(int lhs, int rhs) { return (lhs | rhs) != 0; }
+static bool binOpXor(int lhs, int rhs) { return (lhs ^ rhs) != 0; }
 static bool binOpNot(int lhs, int rhs = 0) { return (bool)(!lhs); }
 static bool returnFalse(int, int) { return false; }
 

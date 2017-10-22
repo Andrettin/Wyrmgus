@@ -3234,7 +3234,7 @@ static bool LuaValueToString(lua_State *l, std::string &value)
 			value = lua_tostring(l, -1); // let lua do the conversion
 			return true;
 		case LUA_TBOOLEAN: {
-			const bool b = lua_toboolean(l, -1);
+			const bool b = (lua_toboolean(l, -1) != 0);
 			value = b ? "true" : "false";
 			return true;
 		}

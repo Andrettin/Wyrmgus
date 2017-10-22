@@ -2238,7 +2238,7 @@ static int CclDefineUnitType(lua_State *l)
 			index = UnitTypeVar.BoolFlagNameLookup[value];
 			if (index != -1) {
 				if (lua_isnumber(l, -1)) {
-					type->BoolFlag[index].value = LuaToNumber(l, -1);
+					type->BoolFlag[index].value = (LuaToNumber(l, -1) != 0);
 				} else {
 					type->BoolFlag[index].value = LuaToBoolean(l, -1);
 				}
