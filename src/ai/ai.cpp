@@ -10,8 +10,8 @@
 //
 /**@name ai.cpp - The computer player AI main file. */
 //
-//      (c) Copyright 2000-2007 by Lutz Sammer, Ludovic Pollet, and
-//                                 Jimmy Salmon
+//      (c) Copyright 2000-2017 by Lutz Sammer, Ludovic Pollet,
+//      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

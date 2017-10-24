@@ -626,11 +626,6 @@ int CGrandStrategyProvince::GetClassUnitType(int class_id)
 	return PlayerRaces.GetCivilizationClassUnitType(this->Civilization, class_id);
 }
 
-int CGrandStrategyProvince::GetLanguage()
-{
-	return PlayerRaces.GetCivilizationLanguage(this->Civilization);
-}
-
 int CGrandStrategyProvince::GetDesirabilityRating()
 {
 	int desirability = 0;
@@ -1085,11 +1080,6 @@ int CGrandStrategyHero::GetTroopCostModifier()
 	modifier += (this->GetAttributeModifier(IntelligenceAttribute) + this->GetAttributeModifier(this->GetMartialAttribute())) / 2 * -5 / 2; //-2.5% troop cost modifier per average of the intelligence modifier and the strength/dexterity one (depending on which one the character uses)
 	
 	return modifier;
-}
-
-int CGrandStrategyHero::GetLanguage()
-{
-	return PlayerRaces.GetCivilizationLanguage(this->Civilization);
 }
 
 int CGrandStrategyHero::GetTitleScore(int title, CGrandStrategyProvince *province)

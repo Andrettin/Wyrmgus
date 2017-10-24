@@ -10,7 +10,7 @@
 //
 /**@name action_pickup.cpp - The item pick up action. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2017 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

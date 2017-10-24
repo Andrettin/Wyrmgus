@@ -54,6 +54,7 @@
 class CDeity;
 class CFaction;
 class CMapTemplate;
+class CLanguage;
 class CPersistentItem;
 class CProvince;
 class CQuest;
@@ -128,7 +129,7 @@ public:
 	
 	int GetMartialAttribute();
 	int GetAttributeModifier(int attribute);
-	int GetLanguage();
+	CLanguage *GetLanguage();
 	bool IsParentOf(std::string child_full_name);
 	bool IsChildOf(std::string parent_full_name);
 	bool IsSiblingOf(std::string sibling_full_name);

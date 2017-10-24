@@ -369,6 +369,7 @@ int PlayerColorIndexCount;
 std::map<std::string, int> CivilizationStringToIndex;
 std::map<std::string, int> FactionStringToIndex;
 std::map<std::string, int> DynastyStringToIndex;
+std::map<std::string, CLanguage *> LanguageIdentToPointer;
 
 bool LanguageCacheOutdated = false;
 //Wyrmgus end
@@ -421,7 +422,6 @@ void PlayerRace::Clean()
 		this->Playable[i] = false;
 		this->Species[i].clear();
 		this->DefaultColor[i].clear();
-		this->CivilizationLanguage[i] = -1;
 		this->DevelopsFrom[i].clear();
 		this->DevelopsTo[i].clear();
 		this->CivilizationUIFillers[i].clear();
@@ -559,14 +559,12 @@ CDeity *PlayerRace::GetDeity(std::string deity_ident) const
 	return NULL;
 }
 
-int PlayerRace::GetLanguageIndexByIdent(std::string language_ident) const
+CLanguage *PlayerRace::GetLanguage(std::string language_ident) const
 {
-	for (size_t i = 0; i < this->Languages.size(); ++i) {
-		if (language_ident == this->Languages[i]->Ident) {
-			return i;
-		}
+	if (LanguageIdentToPointer.find(language_ident) != LanguageIdentToPointer.end()) {
+		return LanguageIdentToPointer[language_ident];
 	}
-	return -1;
+	return NULL;
 }
 
 int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
@@ -637,21 +635,21 @@ int PlayerRace::GetFactionClassUpgrade(int faction, int class_id)
 	return GetCivilizationClassUpgrade(PlayerRaces.Factions[faction]->Civilization, class_id);
 }
 
-int PlayerRace::GetCivilizationLanguage(int civilization)
+CLanguage *PlayerRace::GetCivilizationLanguage(int civilization)
 {
 	if (civilization == -1) {
-		return -1;
+		return NULL;
 	}
 	
-	if (CivilizationLanguage[civilization] != -1) {
-		return CivilizationLanguage[civilization];
+	if (this->Civilizations[civilization] && this->Civilizations[civilization]->Language) {
+		return this->Civilizations[civilization]->Language;
 	}
 	
-	if (PlayerRaces.Civilizations[civilization]->ParentCivilization != -1) {
-		return GetCivilizationLanguage(PlayerRaces.Civilizations[civilization]->ParentCivilization);
+	if (this->Civilizations[civilization]->ParentCivilization != -1) {
+		return GetCivilizationLanguage(this->Civilizations[civilization]->ParentCivilization);
 	}
 	
-	return -1;
+	return NULL;
 }
 
 std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)
@@ -691,17 +689,17 @@ std::vector<CFiller> PlayerRace::GetFactionUIFillers(int faction)
 /**
 **  "Translate" (that is, adapt) a proper name from one culture (civilization) to another.
 */
-std::string PlayerRace::TranslateName(std::string name, int language)
+std::string PlayerRace::TranslateName(std::string name, CLanguage *language)
 {
 	std::string new_name;
 	
-	if (language == -1 || name.empty()) {
+	if (!language || name.empty()) {
 		return new_name;
 	}
 
 	// try to translate the entire name, as a particular translation for it may exist
-	if (PlayerRaces.Languages[language]->NameTranslations.find(name) != PlayerRaces.Languages[language]->NameTranslations.end()) {
-		return PlayerRaces.Languages[language]->NameTranslations[name][SyncRand(PlayerRaces.Languages[language]->NameTranslations[name].size())];
+	if (language->NameTranslations.find(name) != language->NameTranslations.end()) {
+		return language->NameTranslations[name][SyncRand(language->NameTranslations[name].size())];
 	}
 	
 	//if adapting the entire name failed, try to match prefixes and suffixes
@@ -711,11 +709,11 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 				std::string name_prefix = name.substr(0, i + 1);
 				std::string name_suffix = CapitalizeString(name.substr(i + 1, name.size() - (i + 1)));
 			
-	//			fprintf(stdout, "Trying to match prefix \"%s\" and suffix \"%s\" for translating name \"%s\" to the \"%s\" language.\n", name_prefix.c_str(), name_suffix.c_str(), name.c_str(), PlayerRaces.Languages[language]->Name.c_str());
+	//			fprintf(stdout, "Trying to match prefix \"%s\" and suffix \"%s\" for translating name \"%s\" to the \"%s\" language.\n", name_prefix.c_str(), name_suffix.c_str(), name.c_str(), language->Ident.c_str());
 			
-				if (PlayerRaces.Languages[language]->NameTranslations.find(name_prefix) != PlayerRaces.Languages[language]->NameTranslations.end() && PlayerRaces.Languages[language]->NameTranslations.find(name_suffix) != PlayerRaces.Languages[language]->NameTranslations.end()) { // if both a prefix and suffix have been matched
-					name_prefix = PlayerRaces.Languages[language]->NameTranslations[name_prefix][SyncRand(PlayerRaces.Languages[language]->NameTranslations[name_prefix].size())];
-					name_suffix = PlayerRaces.Languages[language]->NameTranslations[name_suffix][SyncRand(PlayerRaces.Languages[language]->NameTranslations[name_suffix].size())];
+				if (language->NameTranslations.find(name_prefix) != language->NameTranslations.end() && language->NameTranslations.find(name_suffix) != language->NameTranslations.end()) { // if both a prefix and suffix have been matched
+					name_prefix = language->NameTranslations[name_prefix][SyncRand(language->NameTranslations[name_prefix].size())];
+					name_suffix = language->NameTranslations[name_suffix][SyncRand(language->NameTranslations[name_suffix].size())];
 					name_suffix = DecapitalizeString(name_suffix);
 					if (name_prefix.substr(name_prefix.size() - 2, 2) == "gs" && name_suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 						name_prefix = FindAndReplaceStringEnding(name_prefix, "gs", "g");
@@ -4692,7 +4690,7 @@ std::string LanguageWord::GetNounInflection(int grammatical_number, int grammati
 		return this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case))->second;
 	}
 	
-	return this->Word + PlayerRaces.Languages[this->Language]->GetNounEnding(grammatical_number, grammatical_case, word_junction_type);
+	return this->Word + this->Language->GetNounEnding(grammatical_number, grammatical_case, word_junction_type);
 }
 
 std::string LanguageWord::GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood)
@@ -4721,7 +4719,7 @@ std::string LanguageWord::GetAdjectiveInflection(int comparison_degree, int arti
 	}
 	
 	if (article_type != -1 && grammatical_case != GrammaticalCaseNoCase && this->ComparisonDegreeCaseInflections[comparison_degree][grammatical_case].empty()) {
-		inflected_word += PlayerRaces.Languages[this->Language]->GetAdjectiveEnding(article_type, grammatical_case, grammatical_number, grammatical_gender);
+		inflected_word += this->Language->GetAdjectiveEnding(article_type, grammatical_case, grammatical_number, grammatical_gender);
 	}
 	
 	return inflected_word;

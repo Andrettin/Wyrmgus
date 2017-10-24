@@ -934,10 +934,10 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "ParentCivilization")) {
 			civilization->ParentCivilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {
-			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
-			if (language != -1) {
-				PlayerRaces.CivilizationLanguage[civilization_id] = language;
-				PlayerRaces.Languages[language]->UsedByCivilizationOrFaction = true;
+			CLanguage *language = PlayerRaces.GetLanguage(LuaToString(l, -1));
+			if (language) {
+				PlayerRaces.Civilizations[civilization_id]->Language = language;
+				language->UsedByCivilizationOrFaction = true;
 			} else {
 				LuaError(l, "Language not found.");
 			}
@@ -1314,14 +1314,14 @@ static int CclDefineLanguageWord(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Language")) {
-			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
+			CLanguage *language = PlayerRaces.GetLanguage(LuaToString(l, -1));
 			
-			if (language != -1) {
-				PlayerRaces.Languages[language]->LanguageWords.push_back(word);
+			if (language) {
+				language->LanguageWords.push_back(word);
 				word->Language = language;
 				
-				for (size_t i = 0; i < PlayerRaces.Languages[language]->Dialects.size(); ++i) { //copy the word over for dialects
-					PlayerRaces.Languages[language]->Dialects[i]->LanguageWords.push_back(word);
+				for (size_t i = 0; i < language->Dialects.size(); ++i) { //copy the word over for dialects
+					language->Dialects[i]->LanguageWords.push_back(word);
 				}
 			} else {
 				LuaError(l, "Language not found.");
@@ -1347,7 +1347,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			int j = 0;
-			int derives_from_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1));
+			CLanguage *derives_from_language = PlayerRaces.GetLanguage(LuaToString(l, -1, j + 1));
 			++j;
 			int derives_from_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
 			++j;
@@ -1364,14 +1364,14 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 			lua_pop(l, 1);
 			
-			if (derives_from_language != -1 && derives_from_word_type != -1) {
+			if (derives_from_language && derives_from_word_type != -1) {
 				std::string derives_from_word = LuaToString(l, -1, j + 1);
-				word->DerivesFrom = const_cast<LanguageWord *>(&(*PlayerRaces.Languages[derives_from_language]->GetWord(derives_from_word, derives_from_word_type, word_meanings)));
+				word->DerivesFrom = derives_from_language->GetWord(derives_from_word, derives_from_word_type, word_meanings);
 				
 				if (word->DerivesFrom != NULL) {
 					word->DerivesFrom->DerivesTo.push_back(word);
 				} else {
-					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ derives_from_word.c_str() _C_ PlayerRaces.Languages[derives_from_language]->Name.c_str() _C_ GetWordTypeNameById(derives_from_word_type).c_str());
+					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ derives_from_word.c_str() _C_ derives_from_language->Ident.c_str() _C_ GetWordTypeNameById(derives_from_word_type).c_str());
 				}
 			} else {
 				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->Word.c_str());
@@ -1381,7 +1381,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			int j = 0;
-			int replaces_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1));
+			CLanguage *replaces_language = PlayerRaces.GetLanguage(LuaToString(l, -1, j + 1));
 			++j;
 			int replaces_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
 			++j;
@@ -1398,12 +1398,12 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 			lua_pop(l, 1);
 			
-			if (replaces_language != -1 && replaces_word_type != -1) {
+			if (replaces_language && replaces_word_type != -1) {
 				std::string replaces_word = LuaToString(l, -1, j + 1);
-				replaces = const_cast<LanguageWord *>(&(*PlayerRaces.Languages[replaces_language]->GetWord(replaces_word, replaces_word_type, word_meanings)));
+				replaces = replaces_language->GetWord(replaces_word, replaces_word_type, word_meanings);
 				
 				if (replaces == NULL) {
-					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ replaces_word.c_str() _C_ PlayerRaces.Languages[replaces_language]->Name.c_str() _C_ GetWordTypeNameById(replaces_word_type).c_str());
+					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ replaces_word.c_str() _C_ replaces_language->Ident.c_str() _C_ GetWordTypeNameById(replaces_word_type).c_str());
 				}
 			} else {
 				LuaError(l, "Word \"%s\"'s replace is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->Word.c_str());
@@ -1421,7 +1421,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				++j;
 				
-				int affix_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1)); // should be the same language as that of the word, but needs to be specified since the word's language may not have been set yet
+				CLanguage *affix_language = PlayerRaces.GetLanguage(LuaToString(l, -1, j + 1)); // should be the same language as that of the word, but needs to be specified since the word's language may not have been set yet
 				++j;
 				int affix_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
 				++j;
@@ -1438,14 +1438,14 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				lua_pop(l, 1);
 
-				if (affix_language != -1 && affix_word_type != -1) {
+				if (affix_language && affix_word_type != -1) {
 					std::string affix_word = LuaToString(l, -1, j + 1);
-					word->CompoundElements[affix_type] = const_cast<LanguageWord *>(&(*PlayerRaces.Languages[affix_language]->GetWord(affix_word, affix_word_type, word_meanings)));
+					word->CompoundElements[affix_type] = affix_language->GetWord(affix_word, affix_word_type, word_meanings);
 					
 					if (word->CompoundElements[affix_type] != NULL) {
 						word->CompoundElements[affix_type]->CompoundElementOf[affix_type].push_back(word);
 					} else {
-						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ affix_word.c_str() _C_ PlayerRaces.Languages[affix_language]->Name.c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
+						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ affix_word.c_str() _C_ affix_language->Ident.c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
 					}
 				} else {
 					LuaError(l, "Word \"%s\"'s compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ word->Word.c_str());
@@ -1601,7 +1601,7 @@ static int CclDefineLanguageWord(lua_State *l)
 		}
 	}
 	
-	if (word->Language == -1) {
+	if (!word->Language) {
 		LuaError(l, "Word \"%s\" has not been assigned to any language" _C_ word->Word.c_str());
 	}
 	
@@ -1610,7 +1610,7 @@ static int CclDefineLanguageWord(lua_State *l)
 	}
 	
 	if (replaces != NULL) {
-		PlayerRaces.Languages[word->Language]->RemoveWord(replaces);
+		word->Language->RemoveWord(replaces);
 	}
 	
 	return 0;
@@ -1678,9 +1678,9 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Language")) {
-		int language = PlayerRaces.GetCivilizationLanguage(civilization_id);
-		if (language != -1) {
-			lua_pushstring(l, PlayerRaces.Languages[language]->Ident.c_str());
+		CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization_id);
+		if (language) {
+			lua_pushstring(l, language->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2600,13 +2600,11 @@ static int CclDefineLanguage(lua_State *l)
 	}
 
 	std::string language_ident = LuaToString(l, 1);
-	CLanguage *language = NULL;
-	int language_id = PlayerRaces.GetLanguageIndexByIdent(language_ident);
-	if (language_id == -1) {
+	CLanguage *language = PlayerRaces.GetLanguage(language_ident);
+	if (!language) {
 		language = new CLanguage;
 		PlayerRaces.Languages.push_back(language);
-	} else {
-		language = const_cast<CLanguage *>(&(*PlayerRaces.Languages[language_id]));
+		LanguageIdentToPointer[language_ident] = language;
 	}
 	
 	language->Ident = language_ident;
@@ -2620,10 +2618,10 @@ static int CclDefineLanguage(lua_State *l)
 		} else if (!strcmp(value, "Family")) {
 			language->Family = LuaToString(l, -1);
 		} else if (!strcmp(value, "DialectOf")) {
-			int parent_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
-			if (parent_language != -1) {
-				language->DialectOf = PlayerRaces.Languages[parent_language];
-				PlayerRaces.Languages[parent_language]->Dialects.push_back(language);
+			CLanguage *parent_language = PlayerRaces.GetLanguage(LuaToString(l, -1));
+			if (parent_language) {
+				language->DialectOf = parent_language;
+				parent_language->Dialects.push_back(language);
 			} else {
 				LuaError(l, "Language not found.");
 			}
@@ -3697,11 +3695,10 @@ static int CclGetLanguageData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string language_name = LuaToString(l, 1);
-	int language_id = PlayerRaces.GetLanguageIndexByIdent(language_name);
-	if (language_id == -1) {
+	const CLanguage *language = PlayerRaces.GetLanguage(language_name);
+	if (!language) {
 		LuaError(l, "Language \"%s\" doesn't exist." _C_ language_name.c_str());
 	}
-	const CLanguage *language = PlayerRaces.Languages[language_id];
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -3736,14 +3733,14 @@ static int CclGetLanguageWordData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string language_name = LuaToString(l, 1);
-	int language_id = PlayerRaces.GetLanguageIndexByIdent(language_name);
-	if (language_id == -1) {
+	const CLanguage *language = PlayerRaces.GetLanguage(language_name);
+	if (!language) {
 		LuaError(l, "Language \"%s\" doesn't exist." _C_ language_name.c_str());
 	}
 	
 	std::string word_name = LuaToString(l, 2);
 	std::vector<std::string> word_meanings;
-	LanguageWord *word = PlayerRaces.Languages[language_id]->GetWord(word_name, -1, word_meanings);
+	const LanguageWord *word = language->GetWord(word_name, -1, word_meanings);
 	if (word == NULL) {
 		LuaError(l, "Word \"%s\" doesn't exist for the \"%s\" language." _C_ word_name.c_str() _C_ language_name.c_str());
 	}

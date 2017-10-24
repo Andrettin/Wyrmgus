@@ -10,7 +10,7 @@
 //
 /**@name ai_local.h - The local AI header file. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer and Antonis Chaniotis.
+//      (c) Copyright 2000-2017 by Lutz Sammer, Antonis Chaniotis and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

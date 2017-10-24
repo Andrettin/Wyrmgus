@@ -10,7 +10,7 @@
 //
 /**@name action_defend.cpp - The defend action. */
 //
-//      (c) Copyright 2012 by cybermind
+//      (c) Copyright 2012-2017 by cybermind and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

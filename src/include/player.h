@@ -78,6 +78,7 @@ class CUnit;
 class CUnitType;
 //Wyrmgus start
 class CCharacter;
+class CLanguage;
 class CProvince;
 class CPlane;
 class CQuest;
@@ -540,7 +541,8 @@ class CCivilization
 {
 public:
 	CCivilization() :
-		ID(-1), ParentCivilization(-1), CalendarStartingYear(0)
+		ID(-1), ParentCivilization(-1), CalendarStartingYear(0),
+		Language(NULL)
 	{
 	}
 	
@@ -561,6 +563,7 @@ public:
 	std::string YearLabel;		/// label used for years (i.e. AD)
 	std::string NegativeYearLabel;	/// label used for "negative" years (i.e. BC)
 	CUnitSound UnitSounds;			/// Sounds for unit events
+	CLanguage *Language;		/// The language used by the civilization
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
@@ -722,8 +725,8 @@ class LanguageWord
 {
 public:
 	LanguageWord() : 
-		Language(-1), Type(-1), Gender(-1), GrammaticalNumber(-1),
-		DerivesFrom(NULL),
+		Type(-1), Gender(-1), GrammaticalNumber(-1),
+		Language(NULL), DerivesFrom(NULL),
 		Archaic(false),
 		Uncountable(false),
 		ArticleType(-1),
@@ -739,7 +742,7 @@ public:
 	void RemoveFromVector(std::vector<LanguageWord *>& word_vector);
 
 	std::string Word;									/// Word name / ID.
-	int Language;
+	CLanguage *Language;								/// The language the word belongs to
 	int Type;											/// Word type
 	int Gender;											/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
 	int GrammaticalNumber;								/// Grammatical number (i.e. whether the word is necessarily plural or not)
@@ -812,7 +815,6 @@ public:
 		memset(Visible, 0, sizeof(Visible));
 		//Wyrmgus start
 		memset(Playable, 0, sizeof(Playable));
-		memset(CivilizationLanguage, -1, sizeof(CivilizationLanguage));
 		//Wyrmgus end
 	}
 
@@ -827,15 +829,15 @@ public:
 	CDeityDomain *GetDeityDomain(std::string deity_domain_ident) const;
 	int GetDeityIndexByIdent(std::string deity_ident) const;
 	CDeity *GetDeity(std::string deity_ident) const;
-	int GetLanguageIndexByIdent(std::string language_ident) const;
+	CLanguage *GetLanguage(std::string language_ident) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
 	int GetFactionClassUnitType(int faction, int class_id);
 	int GetFactionClassUpgrade(int faction, int class_id);
-	int GetCivilizationLanguage(int civilization);
+	CLanguage *GetCivilizationLanguage(int civilization);
 	std::vector<CFiller> GetCivilizationUIFillers(int civilization);
 	std::vector<CFiller> GetFactionUIFillers(int faction);
-	std::string TranslateName(std::string name, int language);
+	std::string TranslateName(std::string name, CLanguage *language);
 	//Wyrmgus end
 
 public:
@@ -854,7 +856,6 @@ public:
 	std::vector<CFaction *> Factions;    								/// factions
 	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
 	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops
-	int CivilizationLanguage[MAX_RACES];
 	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	std::vector<CDynasty *> Dynasties;    								/// dynasties
@@ -1045,6 +1046,12 @@ extern int GetAffixTypeIdByName(std::string affix_type);
 extern std::string GetWordJunctionTypeNameById(int word_junction_type);
 extern int GetWordJunctionTypeIdByName(std::string word_junction_type);
 extern bool IsNameValidForWord(std::string word_name);
+
+/*----------------------------------------------------------------------------
+--  Variables
+----------------------------------------------------------------------------*/
+
+extern std::map<std::string, CLanguage *> LanguageIdentToPointer;
 //Wyrmgus end
 
 //@}

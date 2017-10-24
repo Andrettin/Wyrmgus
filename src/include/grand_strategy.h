@@ -136,7 +136,6 @@ public:
 	int GetResourceDemand(int resource);
 	int GetProductionEfficiencyModifier(int resource);
 	int GetClassUnitType(int class_id);
-	int GetLanguage();
 	int GetDesirabilityRating();
 	std::string GenerateWorkName();
 	CGrandStrategyHero *GetRandomAuthor();
@@ -235,7 +234,6 @@ public:
 	bool IsGenerated();
 	bool IsEligibleForTitle(int title);
 	int GetTroopCostModifier();
-	int GetLanguage();
 	int GetTitleScore(int title, CGrandStrategyProvince *province = NULL);
 	std::string GetMinisterEffectsString(int title);
 	std::string GetBestDisplayTitle();

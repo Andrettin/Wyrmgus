@@ -88,7 +88,7 @@ int CCharacter::GetAttributeModifier(int attribute)
 	return this->Attributes[attribute] - 10;
 }
 
-int CCharacter::GetLanguage()
+CLanguage *CCharacter::GetLanguage()
 {
 	return PlayerRaces.GetCivilizationLanguage(this->Civilization);
 }
