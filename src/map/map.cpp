@@ -1156,7 +1156,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		CCharacter *hero = iterator->second;
 		
-		if (hero->Deity != NULL || !hero->CanAppear()) {
+		if (!hero->CanAppear()) {
 			continue;
 		}
 		
