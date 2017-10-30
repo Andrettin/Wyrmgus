@@ -1850,7 +1850,8 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 			continue;
 		}
 		
-		if (FindTerrainType(0, 0, 8, *this, settlement_unit->tilePos, &Vec2i(0, 0), settlement_unit->MapLayer, water_zone)) {
+		Vec2i pos(0, 0);
+		if (FindTerrainType(0, 0, 8, *this, settlement_unit->tilePos, &pos, settlement_unit->MapLayer, water_zone)) {
 			return true;
 		}
 	}
