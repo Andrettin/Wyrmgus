@@ -1410,7 +1410,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		fprintf(stderr, "Mouse viewport pointer is NULL.\n");
 	}
 	
-	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
+	if (CursorOn == CursorOnMap && UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		const CViewport &vp = *UI.MouseViewport;
 		const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
 
@@ -2241,7 +2241,7 @@ static void UISelectStateButtonDown(unsigned)
 	//
 	//  Clicking on the map.
 	//
-	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
+	if (CursorOn == CursorOnMap && UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CursorState = CursorStatePoint;
@@ -2318,6 +2318,11 @@ static void UISelectStateButtonDown(unsigned)
 static void UIHandleButtonDown_OnMap(unsigned button)
 {
 	Assert(UI.MouseViewport);
+	
+	if (!UI.MouseViewport) {
+		return;
+	}
+
 #ifdef USE_TOUCHSCREEN
 	// Detect double left click
 	const bool doubleLeftButton = MouseButtons & (LeftButton << MouseDoubleShift);
@@ -2339,7 +2344,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		// Possible Selected[0] was removed from map
 		// need to make sure there is a unit to build
 		if (Selected[0] && (MouseButtons & LeftButton)
-			&& UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {// enter select mode
+			&& UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {// enter select mode
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 			bool explored = CanBuildOnArea(*Selected[0], tilePos);
 
@@ -2384,7 +2389,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 #else
 	} else if (MouseButtons & RightButton) {
 #endif
-		if (!GameObserve && !GamePaused && !GameEstablishing && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
+		if (!GameObserve && !GamePaused && !GameEstablishing && UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 			CUnit *unit;
 			// FIXME: Rethink the complete chaos of coordinates here
 			// FIXME: Johns: Perhaps we should use a pixel map coordinates

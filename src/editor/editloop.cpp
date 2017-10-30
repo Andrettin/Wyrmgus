@@ -2453,13 +2453,15 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		}
 		CursorOn = CursorOnMap;
 
-		// Look if there is an unit under the cursor.
-		const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
-		UnitUnderCursor = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
+		if (UI.MouseViewport) {
+			// Look if there is an unit under the cursor.
+			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+			UnitUnderCursor = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
 
-		if (UnitUnderCursor != NULL) {
-			ShowUnitInfo(*UnitUnderCursor);
-			return;
+			if (UnitUnderCursor != NULL) {
+				ShowUnitInfo(*UnitUnderCursor);
+				return;
+			}
 		}
 	}
 	// Scrolling Region Handling
