@@ -72,8 +72,12 @@ int GetItemSlotIdByName(std::string item_slot)
 		return HelmetItemSlot;
 	} else if (item_slot == "armor") {
 		return ArmorItemSlot;
+	} else if (item_slot == "gloves") {
+		return GlovesItemSlot;
 	} else if (item_slot == "boots") {
 		return BootsItemSlot;
+	} else if (item_slot == "belt") {
+		return BeltItemSlot;
 	} else if (item_slot == "amulet") {
 		return AmuletItemSlot;
 	} else if (item_slot == "ring") {
@@ -95,8 +99,12 @@ std::string GetItemSlotNameById(int item_slot)
 		return "helmet";
 	} else if (item_slot == ArmorItemSlot) {
 		return "armor";
+	} else if (item_slot == GlovesItemSlot) {
+		return "gloves";
 	} else if (item_slot == BootsItemSlot) {
 		return "boots";
+	} else if (item_slot == BeltItemSlot) {
+		return "belt";
 	} else if (item_slot == AmuletItemSlot) {
 		return "amulet";
 	} else if (item_slot == RingItemSlot) {
@@ -138,6 +146,12 @@ int GetItemClassIdByName(std::string item_class)
 		return HelmetItemClass;
 	} else if (item_class == "armor") {
 		return ArmorItemClass;
+	} else if (item_class == "cloak") {
+		return CloakItemClass;
+	} else if (item_class == "gloves") {
+		return GlovesItemClass;
+	} else if (item_class == "belt") {
+		return BeltItemClass;
 	} else if (item_class == "boots") {
 		return BootsItemClass;
 	} else if (item_class == "amulet") {
@@ -189,6 +203,12 @@ std::string GetItemClassNameById(int item_class)
 		return "helmet";
 	} else if (item_class == ArmorItemClass) {
 		return "armor";
+	} else if (item_class == CloakItemClass) {
+		return "cloak";
+	} else if (item_class == GlovesItemClass) {
+		return "gloves";
+	} else if (item_class == BeltItemClass) {
+		return "belt";
 	} else if (item_class == BootsItemClass) {
 		return "boots";
 	} else if (item_class == AmuletItemClass) {
@@ -229,10 +249,14 @@ int GetItemClassSlot(int item_class)
 		return ShieldItemSlot;
 	} else if (item_class == HelmetItemClass) {
 		return HelmetItemSlot;
-	} else if (item_class == ArmorItemClass) {
+	} else if (item_class == ArmorItemClass || CloakItemClass) {
 		return ArmorItemSlot;
+	} else if (item_class == GlovesItemClass) {
+		return GlovesItemSlot;
 	} else if (item_class == BootsItemClass) {
 		return BootsItemSlot;
+	} else if (item_class == BeltItemClass) {
+		return BeltItemSlot;
 	} else if (item_class == AmuletItemClass) {
 		return AmuletItemSlot;
 	} else if (item_class == RingItemClass) {

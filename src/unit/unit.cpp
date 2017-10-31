@@ -5787,15 +5787,15 @@ bool CUnit::CanEquipItemClass(int item_class) const
 		return false;
 	}
 	
-	if (GetItemClassSlot(item_class) == WeaponItemSlot && std::find(Type->WeaponClasses.begin(), Type->WeaponClasses.end(), item_class) == Type->WeaponClasses.end()) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
+	if (GetItemClassSlot(item_class) == WeaponItemSlot && std::find(this->Type->WeaponClasses.begin(), this->Type->WeaponClasses.end(), item_class) == this->Type->WeaponClasses.end()) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
 		return false;
 	}
 	
 	if ( //if the item uses the shield (off-hand) slot, but that slot is unavailable for the weapon (because it is two-handed), return false
 		GetItemClassSlot(item_class) == ShieldItemSlot
-		&& Type->WeaponClasses.size() > 0
+		&& this->Type->WeaponClasses.size() > 0
 		&& (
-			Type->WeaponClasses[0] == BowItemClass
+			this->Type->WeaponClasses[0] == BowItemClass
 			// add other two-handed weapons here as necessary
 		)
 	) {

@@ -518,9 +518,8 @@ static int CclDefineUpgrade(lua_State *l)
 				if (item_class == -1) {
 					LuaError(l, "Item class doesn't exist.");
 				}
-				++j;
 				
-				upgrade->ItemPrefix[item_class] = LuaToBoolean(l, -1, j + 1);
+				upgrade->ItemPrefix[item_class] = true;
 			}
 		} else if (!strcmp(value, "ItemSuffix")) {
 			if (!lua_istable(l, -1)) {
@@ -532,9 +531,8 @@ static int CclDefineUpgrade(lua_State *l)
 				if (item_class == -1) {
 					LuaError(l, "Item class doesn't exist.");
 				}
-				++j;
 
-				upgrade->ItemSuffix[item_class] = LuaToBoolean(l, -1, j + 1);
+				upgrade->ItemSuffix[item_class] = true;
 			}
 		} else if (!strcmp(value, "IncompatibleAffixes")) {
 			if (!lua_istable(l, -1)) {

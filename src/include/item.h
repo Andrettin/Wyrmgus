@@ -59,7 +59,9 @@ enum ItemSlots {
 	ShieldItemSlot,
 	HelmetItemSlot,
 	ArmorItemSlot,
+	GlovesItemSlot,
 	BootsItemSlot,
+	BeltItemSlot,
 	AmuletItemSlot,
 	RingItemSlot,
 	ArrowsItemSlot,
@@ -87,6 +89,9 @@ enum ItemClasses {
 
 	HelmetItemClass,
 	ArmorItemClass,
+	CloakItemClass,
+	GlovesItemClass,
+	BeltItemClass,
 	BootsItemClass,
 
 	AmuletItemClass,
