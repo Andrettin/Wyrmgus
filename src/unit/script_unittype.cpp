@@ -902,6 +902,7 @@ static int CclDefineUnitType(lua_State *l)
 						var->FileWhenEmpty[i] = parent_type->VarInfo[var_n]->FileWhenEmpty[i];
 					}
 					var->ShadowFile = parent_type->VarInfo[var_n]->ShadowFile;
+					var->LightFile = parent_type->VarInfo[var_n]->LightFile;
 					var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
 					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
 					var->HairColor = parent_type->VarInfo[var_n]->HairColor;
@@ -1052,6 +1053,8 @@ static int CclDefineUnitType(lua_State *l)
 						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "shadow-file")) {
 						var->ShadowFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "light-file")) {
+						var->LightFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "layer-file")) {
 						int image_layer = GetImageLayerIdByName(LuaToString(l, -1, k + 1));
 						++k;

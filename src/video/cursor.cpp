@@ -283,7 +283,11 @@ void DrawBuildingCursor()
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingRightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}
 
-	DrawOverlay(*CursorBuilding, CursorBuilding->LightSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->LightSprite) {
+		DrawOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->LightSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->LightSprite) {
+		DrawOverlay(*CursorBuilding, CursorBuilding->LightSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
 	//Wyrmgus end
 	
 	//Wyrmgus start

@@ -1422,7 +1422,11 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
 	}
 
-	DrawOverlay(*type, type->LightSprite, player, frame, screenPos);
+	if (varinfo && varinfo->LightSprite) {
+		DrawOverlay(*type, varinfo->LightSprite, player, frame, screenPos);
+	} else if (type->LightSprite) {
+		DrawOverlay(*type, type->LightSprite, player, frame, screenPos);
+	}
 	//Wyrmgus end
 	
 	// Unit's extras not fully supported.. need to be decorations themselves.

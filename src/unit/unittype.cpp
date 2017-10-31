@@ -1794,6 +1794,13 @@ void LoadUnitTypeSprite(CUnitType &type)
 //				varinfo->ShadowSprite->MakeShadow();
 			}
 		}
+		if (!varinfo->LightFile.empty()) {
+			varinfo->LightSprite = CGraphic::New(varinfo->LightFile, frame_width, frame_height);
+			varinfo->LightSprite->Load();
+			if (type.Flip) {
+				varinfo->LightSprite->Flip();
+			}
+		}
 		for (int j = 0; j < MaxImageLayers; ++j) {
 			if (!varinfo->LayerFiles[j].empty()) {
 				varinfo->LayerSprites[j] = CPlayerColorGraphic::New(varinfo->LayerFiles[j], frame_width, frame_height);
@@ -2027,6 +2034,9 @@ VariationInfo::~VariationInfo()
 	}
 	if (this->ShadowSprite) {
 		CGraphic::Free(this->ShadowSprite);
+	}
+	if (this->LightSprite) {
+		CGraphic::Free(this->LightSprite);
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		if (this->LayerSprites[i]) {

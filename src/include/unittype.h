@@ -157,7 +157,7 @@ class VariationInfo
 public:
 	VariationInfo() : 
 		FrameWidth(0), FrameHeight(0), HairColor(0), ResourceMin(0), ResourceMax(0), Weight(1),
-		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL)
+		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL)
 	{
 		memset(LayerSprites, 0, sizeof(LayerSprites));
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));
@@ -170,6 +170,7 @@ public:
 	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.
 	std::string ShadowFile;			/// Variation's shadow graphics.
+	std::string LightFile;			/// Variation's light graphics.
 	int FrameWidth;
 	int FrameHeight;
 	int HairColor;
@@ -179,6 +180,7 @@ public:
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
 	CGraphic *ShadowSprite;			/// The graphic corresponding to ShadowFile.
+	CGraphic *LightSprite;			/// The graphic corresponding to LightFile.
 	CAnimations *Animations;        /// Animation scripts
 	CConstruction *Construction;    /// What is shown in construction phase
 
