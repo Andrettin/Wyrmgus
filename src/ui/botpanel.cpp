@@ -521,7 +521,13 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->RequirementsString != CONDITION_TRUE) {
-		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonExperienceUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction) && !upgrade->RequirementsString.empty())))) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonFaction) && !upgrade->RequirementsString.empty())))) {
+			return false;
+		}
+	}
+	
+	if (condition->ExperienceRequirementsString != CONDITION_TRUE) {
+		if ((condition->ExperienceRequirementsString == CONDITION_ONLY) ^ (button.Action == ButtonExperienceUpgradeTo && !IsButtonUsable(*Selected[0], button) && type && !type->ExperienceRequirementsString.empty())) {
 			return false;
 		}
 	}
@@ -1445,7 +1451,10 @@ void CButtonPanel::Draw()
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
 												   pos, buf, player, hair_color);
-			} else if (buttons[i].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, buttons[i].ValueStr) == 'R') { //draw researched technologies grayed
+			} else if ( //draw researched technologies (or acquired abilities) grayed
+				buttons[i].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, buttons[i].ValueStr) == 'R'
+				|| (buttons[i].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(buttons[i].ValueStr)) == CUpgrade::Get(buttons[i].ValueStr)->MaxLimit)
+			) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
 												   pos, buf, player, hair_color, false, true);
@@ -1687,7 +1696,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			}
 			break;
 		case ButtonLearnAbility:
-			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr)) && (unit.Variable[LEVELUP_INDEX].Value >= 1 || !CUpgrade::Get(buttonaction.ValueStr)->Ability);
+			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr), true);
 			break;
 		//Wyrmgus end
 		case ButtonSpellCast:
@@ -1798,7 +1807,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 			}
 			break;
 		case ButtonExperienceUpgradeTo:
-			res = CheckDependByIdent(unit, buttonaction.ValueStr, true, false);
+			res = CheckDependByIdent(unit, buttonaction.ValueStr, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			break;
 		case ButtonLearnAbility:
 			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr));
@@ -2590,7 +2599,10 @@ void CButtonPanel::DoClicked(int button)
 
 	//Wyrmgus start
 	if (!IsButtonUsable(*Selected[0], CurrentButtons[button])) {
-		if (CurrentButtons[button].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, CurrentButtons[button].ValueStr) == 'R') {
+		if (
+			(CurrentButtons[button].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, CurrentButtons[button].ValueStr) == 'R')
+			|| (CurrentButtons[button].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(CurrentButtons[button].ValueStr)) == CUpgrade::Get(CurrentButtons[button].ValueStr)->MaxLimit)
+		) {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The upgrade has already been acquired"));
 		} else {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The requirements have not been fulfilled"));

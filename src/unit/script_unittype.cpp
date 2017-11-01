@@ -793,6 +793,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->RandomMovementDistance = parent_type->RandomMovementDistance;
 			type->GivesResource = parent_type->GivesResource;
 			type->RequirementsString = parent_type->RequirementsString;
+			type->ExperienceRequirementsString = parent_type->ExperienceRequirementsString;
 			type->BuildingRulesString = parent_type->BuildingRulesString;
 			type->Elixir = parent_type->Elixir;
 			type->Icon.Name = parent_type->Icon.Name;
@@ -2077,6 +2078,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "RequirementsString")) {
 			type->RequirementsString = LuaToString(l, -1);
+		} else if (!strcmp(value, "ExperienceRequirementsString")) {
+			type->ExperienceRequirementsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "BuildingRulesString")) {
 			type->BuildingRulesString = LuaToString(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
@@ -2744,6 +2747,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "RequirementsString")) {
 		lua_pushstring(l, type->RequirementsString.c_str());
+		return 1;
+	} else if (!strcmp(data, "ExperienceRequirementsString")) {
+		lua_pushstring(l, type->ExperienceRequirementsString.c_str());
 		return 1;
 	} else if (!strcmp(data, "BuildingRulesString")) {
 		lua_pushstring(l, type->BuildingRulesString.c_str());

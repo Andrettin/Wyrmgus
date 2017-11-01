@@ -924,6 +924,7 @@ public:
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type
 	std::string RequirementsString;	/// Requirements string of the unit type
+	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type
 	CUpgrade *Elixir;						/// Which elixir does this (item) unit type always have
 	std::vector<CUnitType *> SoldUnits;		/// Units which this unit can sell.

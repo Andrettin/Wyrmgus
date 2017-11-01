@@ -5954,17 +5954,21 @@ bool CUnit::HasInventory() const
 	return false;
 }
 
-bool CUnit::CanLearnAbility(CUpgrade *ability) const
+bool CUnit::CanLearnAbility(CUpgrade *ability, bool pre) const
 {
-	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14) && (!this->Character || !this->Character->Custom || this->Character->Deities.size() > 0)) { //if is a deity choice "ability", only allow for custom heroes, and only allow if doesn't have a deity already
+	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14) && (!this->Character || (!pre && !this->Character->Custom))) { //if is a deity choice "ability", only allow for custom heroes, and only allow if doesn't have a deity already
 		return false;
 	}
 	
-	if (this->GetIndividualUpgrade(ability) >= ability->MaxLimit) { // already learned
+	if (!pre && this->GetIndividualUpgrade(ability) >= ability->MaxLimit) { // already learned
 		return false;
 	}
 	
-	if (!CheckDependByIdent(*this, ability->Ident)) {
+	if (!pre && this->Variable[LEVELUP_INDEX].Value < 1 && ability->Ability) {
+		return false;
+	}
+	
+	if (!CheckDependByIdent(*this, ability->Ident, false, pre)) {
 		return false;
 	}
 	

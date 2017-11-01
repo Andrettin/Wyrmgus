@@ -1898,8 +1898,9 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "IndividualUpgrade")) {
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
-		if (CUpgrade::Get(upgrade_ident)) {
-			lua_pushnumber(l, unit->GetIndividualUpgrade(CUpgrade::Get(upgrade_ident)));
+		CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+		if (upgrade) {
+			lua_pushnumber(l, unit->GetIndividualUpgrade(upgrade));
 		} else {
 			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 		}

@@ -421,7 +421,7 @@ public:
 	bool EquippingItemCompletesSet(const CUnit *item) const;
 	bool DeequippingItemBreaksSet(const CUnit *item) const;
 	bool HasInventory() const;
-	bool CanLearnAbility(CUpgrade *ability) const;
+	bool CanLearnAbility(CUpgrade *ability, bool pre = false) const;
 	bool CanHireMercenary(CUnitType *type, int civilization_id = -1) const;
 	bool CanEat(const CUnit &unit) const;
 	bool LevelCheck(const int level) const;

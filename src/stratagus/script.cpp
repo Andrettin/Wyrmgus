@@ -1033,6 +1033,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "TypeRequirementsString")) {
 			res->e = EString_TypeRequirementsString;
 			res->D.Type = CclParseTypeDesc(l);
+		} else if (!strcmp(key, "TypeExperienceRequirementsString")) {
+			res->e = EString_TypeExperienceRequirementsString;
+			res->D.Type = CclParseTypeDesc(l);
 		} else if (!strcmp(key, "TypeBuildingRulesString")) {
 			res->e = EString_TypeBuildingRulesString;
 			res->D.Type = CclParseTypeDesc(l);
@@ -1050,6 +1053,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			res->D.Upgrade = CclParseUpgradeDesc(l);
 		} else if (!strcmp(key, "UpgradeRequirementsString")) {
 			res->e = EString_UpgradeRequirementsString;
+			res->D.Upgrade = CclParseUpgradeDesc(l);
+		} else if (!strcmp(key, "UpgradeMaxLimit")) {
+			res->e = EString_UpgradeMaxLimit;
 			res->D.Upgrade = CclParseUpgradeDesc(l);
 		} else if (!strcmp(key, "FactionCivilization")) {
 			res->e = EString_FactionCivilization;
@@ -1486,6 +1492,13 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string("");
 			}
+		case EString_TypeExperienceRequirementsString : // name of the unit type's experience requirements string
+			type = s->D.Type;
+			if (type != NULL) {
+				return (**type).ExperienceRequirementsString;
+			} else { // ERROR.
+				return std::string("");
+			}
 		case EString_TypeBuildingRulesString : // name of the unit type's building rules string
 			type = s->D.Type;
 			if (type != NULL) {
@@ -1558,6 +1571,13 @@ std::string EvalString(const StringDesc *s)
 			upgrade = s->D.Upgrade;
 			if (upgrade != NULL) {
 				return (**upgrade).RequirementsString;
+			} else { // ERROR.
+				return std::string("");
+			}
+		case EString_UpgradeMaxLimit : // upgrade's max limit
+			upgrade = s->D.Upgrade;
+			if (upgrade != NULL) {
+				return std::to_string((long long) (**upgrade).MaxLimit);
 			} else { // ERROR.
 				return std::string("");
 			}
@@ -1840,32 +1860,24 @@ void FreeStringDesc(StringDesc *s)
 		case EString_TypeDescription : // Description of the unit type
 		case EString_TypeQuote : // Quote of the unit type
 		case EString_TypeRequirementsString : // Requirements string of the unit type
+		case EString_TypeExperienceRequirementsString : // Experience requirements string of the unit type
 		case EString_TypeBuildingRulesString : // Building rules string of the unit type
 		case EString_TypeImproveIncomes : // Income improvements of the unit type
 		case EString_TypeLuxuryDemand : // Luxury demand of the unit type
 			delete *s->D.Type;
 			break;
 		case EString_UpgradeCivilization : // Civilization of the upgrade
-			delete *s->D.Upgrade;
-			break;
 		case EString_UpgradeEffectsString : // Effects string of the upgrade
-			delete *s->D.Upgrade;
-			break;
 		case EString_UpgradeRequirementsString : // Requirements string of the upgrade
+		case EString_UpgradeMaxLimit : // Requirements string of the upgrade
 			delete *s->D.Upgrade;
 			break;
 		case EString_ResourceIdent : // Ident of the resource
-			delete *s->D.Resource;
-			break;
 		case EString_ResourceName : // Name of the resource
 			delete *s->D.Resource;
 			break;
 		case EString_FactionCivilization : // Civilization of the faction
-			delete *s->D.Faction;
-			break;
 		case EString_FactionType : // Type of the faction
-			delete *s->D.Faction;
-			break;
 		case EString_FactionCoreSettlements : // Core settlements of the faction
 			delete *s->D.Faction;
 			break;
@@ -2537,6 +2549,11 @@ static int CclTypeRequirementsString(lua_State *l)
 	return Alias(l, "TypeRequirementsString");
 }
 
+static int CclTypeExperienceRequirementsString(lua_State *l)
+{
+	return Alias(l, "TypeExperienceRequirementsString");
+}
+
 static int CclTypeBuildingRulesString(lua_State *l)
 {
 	return Alias(l, "TypeBuildingRulesString");
@@ -2594,6 +2611,19 @@ static int CclUpgradeEffectsString(lua_State *l)
 static int CclUpgradeRequirementsString(lua_State *l)
 {
 	return Alias(l, "UpgradeRequirementsString");
+}
+
+/**
+**  Return equivalent lua table for UpgradeMaxLimit.
+**  {"UpgradeMaxLimit", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUpgradeMaxLimit(lua_State *l)
+{
+	return Alias(l, "UpgradeMaxLimit");
 }
 
 /**
@@ -2865,6 +2895,7 @@ static void AliasRegister()
 	lua_register(Lua, "TypeDescription", CclTypeDescription);
 	lua_register(Lua, "TypeQuote", CclTypeQuote);
 	lua_register(Lua, "TypeRequirementsString", CclTypeRequirementsString);
+	lua_register(Lua, "TypeExperienceRequirementsString", CclTypeExperienceRequirementsString);
 	lua_register(Lua, "TypeBuildingRulesString", CclTypeBuildingRulesString);
 	lua_register(Lua, "TypeImproveIncomes", CclTypeImproveIncomes);
 	lua_register(Lua, "TypeLuxuryDemand", CclTypeLuxuryDemand);
@@ -2872,6 +2903,7 @@ static void AliasRegister()
 	lua_register(Lua, "UpgradeCivilization", CclUpgradeCivilization);
 	lua_register(Lua, "UpgradeEffectsString", CclUpgradeEffectsString);
 	lua_register(Lua, "UpgradeRequirementsString", CclUpgradeRequirementsString);
+	lua_register(Lua, "UpgradeMaxLimit", CclUpgradeMaxLimit);
 	lua_register(Lua, "FactionCivilization", CclFactionCivilization);
 	lua_register(Lua, "FactionType", CclFactionType);
 	lua_register(Lua, "FactionCoreSettlements", CclFactionCoreSettlements);
