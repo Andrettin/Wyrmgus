@@ -366,10 +366,10 @@ static void AiCheckUnits()
 	}
 	
 	//check if any deities can be chosen, and if so, pick one randomly
-	if (AiPlayer->Player->Deities.size() == 0 || AiPlayer->Player->Deities[0]->Religions[0]->Domains.size() == 0) { // if the player has no major deity, pick one; or if has a polytheistic faith, see if can get a monotheistic one
+	if (AiPlayer->Player->Deities.size() < 2 || (!AiPlayer->Player->Deities.empty() && AiPlayer->Player->Deities[0]->Religions[0]->Domains.size() == 0)) { // if the player has no major deity, pick one; or if has a polytheistic faith, see if can get a monotheistic one
 		std::vector<CUpgrade *> potential_deity_upgrades;
 		for (size_t i = 0; i < PlayerRaces.Deities.size(); ++i) {
-			if (!PlayerRaces.Deities[i]->Major) { //minor deities aren't supported yet
+			if (!PlayerRaces.Deities[i]->Major && AiPlayer->Player->Deities.empty()) { //don't get a minor deity if has no major deity yet
 				continue;
 			}
 			
@@ -382,7 +382,7 @@ static void AiCheckUnits()
 				continue;
 			}
 			
-			if (AiPlayer->Player->Deities.size() > 0 && AiPlayer->Player->Deities[0]->Religions[0]->Domains.size() == 0 && PlayerRaces.Deities[i]->Religions[0]->Domains.size() == 0) { //if is looking for a monotheistic religion, don't count pagan deities
+			if (AiPlayer->Player->Deities.size() >= 2 && AiPlayer->Player->Deities[0]->Religions[0]->Domains.size() == 0 && PlayerRaces.Deities[i]->Religions[0]->Domains.size() == 0) { //if is looking for a monotheistic religion, don't count pagan deities
 				continue;
 			}
 			
@@ -390,6 +390,21 @@ static void AiCheckUnits()
 				continue;
 			}
 			
+			if (!(AiPlayer->Player->Deities.size() > 0 && AiPlayer->Player->Deities[0]->Religions[0]->Domains.size() == 0 && PlayerRaces.Deities[i]->Religions[0]->Domains.size() > 0)) { //if isn't a pagan player looking for a monotheistic religion to convert to, don't get any deities that will remove existing upgrades
+				bool removes_existing_upgrade = false;
+				for (size_t z = 0; z < deity_upgrade->UpgradeModifiers.size(); ++z) {
+					for (size_t j = 0; j < deity_upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
+						if (UpgradeIdentAllowed(*AiPlayer->Player, deity_upgrade->UpgradeModifiers[z]->RemoveUpgrades[j]->Ident.c_str()) == 'R') {
+							removes_existing_upgrade = true;
+							break;
+						}
+					}
+				}
+				if (removes_existing_upgrade) {
+					continue;
+				}
+			}
+					
 			n = AiHelpers.Research.size();
 			std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
 
