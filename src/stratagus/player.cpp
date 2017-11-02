@@ -1822,13 +1822,13 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 {
 	std::vector<CUnit *> settlement_unit_table;
 	
-	int town_hall_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("town-hall"));			
+	int town_hall_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("town-hall"));			
 	if (town_hall_type_id == -1) {
 		return false;
 	}
 	CUnitType *town_hall_type = UnitTypes[town_hall_type_id];
 	
-	int stronghold_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("stronghold"));			
+	int stronghold_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("stronghold"));			
 	CUnitType *stronghold_type = NULL;
 	if (stronghold_type_id != -1) {
 		stronghold_type = UnitTypes[stronghold_type_id];
@@ -1977,6 +1977,24 @@ bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
 	}
 	
 	return true;
+}
+
+/**
+**  Check if the upgrade removes an existing upgrade of the player.
+**
+**  @param upgrade    Upgrade.
+*/
+bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const
+{
+	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+		for (size_t j = 0; j < upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
+			if (UpgradeIdentAllowed(*this, upgrade->UpgradeModifiers[z]->RemoveUpgrades[j]->Ident.c_str()) == 'R') {
+				return true;
+			}
+		}
+	}
+	
+	return false;
 }
 
 std::string CPlayer::GetFactionTitleName() const

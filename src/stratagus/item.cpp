@@ -249,7 +249,7 @@ int GetItemClassSlot(int item_class)
 		return ShieldItemSlot;
 	} else if (item_class == HelmetItemClass) {
 		return HelmetItemSlot;
-	} else if (item_class == ArmorItemClass || CloakItemClass) {
+	} else if (item_class == ArmorItemClass || item_class == CloakItemClass) {
 		return ArmorItemSlot;
 	} else if (item_class == GlovesItemClass) {
 		return GlovesItemSlot;

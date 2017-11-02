@@ -242,6 +242,7 @@ public:
 	bool HasUnitBuilder(CUnitType *type, CSettlement *settlement = NULL) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
 	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
+	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(int title_type, int gender) const;
 	void GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building);	/// Builds a vector with worker landmasses; the building is the structure to be built by the worker in question

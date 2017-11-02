@@ -391,16 +391,7 @@ static void AiCheckUnits()
 			}
 			
 			if (!(AiPlayer->Player->Deities.size() > 0 && AiPlayer->Player->Deities[0]->Religions[0]->Domains.size() == 0 && PlayerRaces.Deities[i]->Religions[0]->Domains.size() > 0)) { //if isn't a pagan player looking for a monotheistic religion to convert to, don't get any deities that will remove existing upgrades
-				bool removes_existing_upgrade = false;
-				for (size_t z = 0; z < deity_upgrade->UpgradeModifiers.size(); ++z) {
-					for (size_t j = 0; j < deity_upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
-						if (UpgradeIdentAllowed(*AiPlayer->Player, deity_upgrade->UpgradeModifiers[z]->RemoveUpgrades[j]->Ident.c_str()) == 'R') {
-							removes_existing_upgrade = true;
-							break;
-						}
-					}
-				}
-				if (removes_existing_upgrade) {
+				if (AiPlayer->Player->UpgradeRemovesExistingUpgrade(deity_upgrade)) {
 					continue;
 				}
 			}

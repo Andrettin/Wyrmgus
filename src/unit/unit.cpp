@@ -5964,8 +5964,16 @@ bool CUnit::HasInventory() const
 
 bool CUnit::CanLearnAbility(CUpgrade *ability, bool pre) const
 {
-	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14) && (!this->Character || !this->Character->Custom)) { //if is a deity choice "ability", only allow for custom heroes, and only allow if doesn't have a deity already
-		return false;
+	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14)) { //if is a deity choice "ability", only allow for custom heroes (but display the icon for already-acquired deities for all heroes)
+		if (!this->Character) {
+			return false;
+		}
+		if (!this->Character->Custom && this->GetIndividualUpgrade(ability) > 0) {
+			return false;
+		}
+		if (!pre && this->UpgradeRemovesExistingUpgrade(ability)) {
+			return false;
+		}
 	}
 	
 	if (!pre && this->GetIndividualUpgrade(ability) >= ability->MaxLimit) { // already learned
@@ -6053,6 +6061,24 @@ bool CUnit::IsSpellEmpowered(const SpellType *spell) const
 	} else {
 		return false;
 	}
+}
+
+/**
+**  Check if the upgrade removes an existing individual upgrade of the unit.
+**
+**  @param upgrade    Upgrade.
+*/
+bool CUnit::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const
+{
+	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+		for (size_t j = 0; j < upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
+			if (this->GetIndividualUpgrade(upgrade->UpgradeModifiers[z]->RemoveUpgrades[j]) > 0) {
+				return true;
+			}
+		}
+	}
+	
+	return false;
 }
 
 bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
