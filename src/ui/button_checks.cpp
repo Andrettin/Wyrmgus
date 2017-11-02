@@ -155,7 +155,7 @@ bool ButtonCheckIndividualUpgrade(const CUnit &unit, const ButtonAction &button)
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
-		if (unit.GetIndividualUpgrade(CUpgrade::Get(button.AllowStr)) == 0) {
+		if (unit.GetIndividualUpgrade(CUpgrade::Get(s)) == 0) {
 			delete[] buf;
 			return false;
 		}
@@ -177,7 +177,7 @@ bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const ButtonAction &butto
 	char *buf = new_strdup(button.AllowStr.c_str());
 
 	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
-		if (unit.GetIndividualUpgrade(CUpgrade::Get(button.AllowStr)) > 0) {
+		if (unit.GetIndividualUpgrade(CUpgrade::Get(s)) > 0) {
 			delete[] buf;
 			return true;
 		}
