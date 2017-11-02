@@ -93,9 +93,6 @@ bool ButtonCheckFalse(const CUnit &, const ButtonAction &)
 */
 bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 {
-	//Wyrmgus start
-//	return UpgradeIdentAllowed(*unit.Player, button.AllowStr) == 'R';
-	
 	CPlayer *player = unit.Player;
 	char *buf = new_strdup(button.AllowStr.c_str());
 
@@ -107,10 +104,8 @@ bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 	}
 	delete[] buf;
 	return true;
-	//Wyrmgus end
 }
 
-//Wyrmgus start
 /**
 **  Check for the button being enabled, if the upgrade has not been acquired.
 **
@@ -146,7 +141,6 @@ bool ButtonCheckUpgradeOr(const CUnit &unit, const ButtonAction &button)
 	delete[] buf;
 	return false;
 }
-//Wyrmgus end
 
 /**
 **  Check for button enabled, if unit has an individual upgrade.
@@ -158,7 +152,38 @@ bool ButtonCheckUpgradeOr(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckIndividualUpgrade(const CUnit &unit, const ButtonAction &button)
 {
-	return unit.GetIndividualUpgrade(CUpgrade::Get(button.AllowStr)) > 0;
+	char *buf = new_strdup(button.AllowStr.c_str());
+
+	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
+		if (unit.GetIndividualUpgrade(CUpgrade::Get(button.AllowStr)) == 0) {
+			delete[] buf;
+			return false;
+		}
+	}
+	delete[] buf;
+	return true;
+}
+
+/**
+**  Check for button enabled, if unit has any of the individual upgrades.
+**
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
+*/
+bool ButtonCheckIndividualUpgradeOr(const CUnit &unit, const ButtonAction &button)
+{
+	char *buf = new_strdup(button.AllowStr.c_str());
+
+	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
+		if (unit.GetIndividualUpgrade(CUpgrade::Get(button.AllowStr)) > 0) {
+			delete[] buf;
+			return true;
+		}
+	}
+	delete[] buf;
+	return false;
 }
 
 /**

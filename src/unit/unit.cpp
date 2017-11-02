@@ -5956,7 +5956,7 @@ bool CUnit::HasInventory() const
 
 bool CUnit::CanLearnAbility(CUpgrade *ability, bool pre) const
 {
-	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14) && (!this->Character || (!pre && !this->Character->Custom))) { //if is a deity choice "ability", only allow for custom heroes, and only allow if doesn't have a deity already
+	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14) && (!this->Character || !this->Character->Custom)) { //if is a deity choice "ability", only allow for custom heroes, and only allow if doesn't have a deity already
 		return false;
 	}
 	
