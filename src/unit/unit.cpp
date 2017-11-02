@@ -949,10 +949,18 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	this->Variable[XP_INDEX].Max = this->Variable[XP_INDEX].Value;
 			
 	//load learned abilities
+	std::vector<CUpgrade *> abilities_to_remove;
 	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
 		if (CanLearnAbility(this->Character->Abilities[i])) {
 			AbilityAcquire(*this, this->Character->Abilities[i], false);
+		} else { //can't learn the ability? something changed in the game's code, remove it from persistent data and allow the hero to repick the ability
+			abilities_to_remove.push_back(this->Character->Abilities[i]);
 		}
+	}
+	
+	for (size_t i = 0; i < abilities_to_remove.size(); ++i) {
+		this->Character->Abilities.erase(std::remove(this->Character->Abilities.begin(), this->Character->Abilities.end(), abilities_to_remove[i]), this->Character->Abilities.end());
+		SaveHero(this->Character);
 	}
 	
 	//load read works
