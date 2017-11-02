@@ -5969,7 +5969,7 @@ bool CUnit::CanLearnAbility(CUpgrade *ability, bool pre) const
 		if (!this->Character) {
 			return false;
 		}
-		if (!pre && !this->Character->Custom) {
+		if (!this->Character->Custom && this->GetIndividualUpgrade(ability) == 0) {
 			return false;
 		}
 		if (!pre && this->UpgradeRemovesExistingUpgrade(ability)) {
