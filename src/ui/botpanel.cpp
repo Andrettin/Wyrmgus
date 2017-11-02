@@ -2432,10 +2432,11 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 		}
 	}
 	
-	if (Selected[0]->Variable[LEVELUP_INDEX].Value == 0) {
-		CurrentButtonLevel = 0;
-		LastDrawnButtonPopup = NULL;
-		UI.ButtonPanel.Update();
+	LastDrawnButtonPopup = NULL;
+	UI.ButtonPanel.Update();
+	
+	if (Selected[0]->Player == ThisPlayer) {
+		SelectedUnitChanged();
 	}
 }
 //Wyrmgus end
@@ -2472,13 +2473,10 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 	SendCommandLearnAbility(*Selected[0], *AllUpgrades[index]);
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
+	LastDrawnButtonPopup = NULL;
 	
-	if (AllUpgrades[index]->Ability && Selected[0]->Variable[LEVELUP_INDEX].Value == 0) {
-		CurrentButtonLevel = 0;
-		LastDrawnButtonPopup = NULL;
-		ButtonUnderCursor = -1;
-		OldButtonUnderCursor = -1;
-		UI.ButtonPanel.Update();
+	if (Selected[0]->Player == ThisPlayer) {
+		SelectedUnitChanged();
 	}
 }
 
@@ -2488,6 +2486,7 @@ void CButtonPanel::DoClicked_Faction(int button)
 	SendCommandSetFaction(ThisPlayer->Index, PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[index]->ID);
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
+	LastDrawnButtonPopup = NULL;
 	if (Selected[0]->Player == ThisPlayer) {
 		SelectedUnitChanged();
 	}
@@ -2499,6 +2498,7 @@ void CButtonPanel::DoClicked_Quest(int button)
 	SendCommandQuest(*Selected[0], Selected[0]->Player->AvailableQuests[index]);
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
+	LastDrawnButtonPopup = NULL;
 	if (Selected[0]->Player == ThisPlayer) {
 		SelectedUnitChanged();
 	}
@@ -2513,6 +2513,7 @@ void CButtonPanel::DoClicked_Buy(int button)
 		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value), ThisPlayer->Index);
 		ButtonUnderCursor = -1;
 		OldButtonUnderCursor = -1;
+		LastDrawnButtonPopup = NULL;
 		if (IsOnlySelected(*Selected[0])) {
 			SelectedUnitChanged();
 		}
