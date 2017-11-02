@@ -509,7 +509,13 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->ResearchedUpgrade != CONDITION_TRUE) {
-		if ((condition->ResearchedUpgrade == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdentAllowed(*ThisPlayer, upgrade->Ident) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(upgrade))))) {
+		if ((condition->ResearchedUpgrade == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdentAllowed(*ThisPlayer, upgrade->Ident) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
+			return false;
+		}
+	}
+	
+	if (condition->Ability != CONDITION_TRUE) {
+		if ((condition->Ability == CONDITION_ONLY) ^ (upgrade && upgrade->Ability)) {
 			return false;
 		}
 	}
