@@ -795,6 +795,7 @@ void CUnit::Retrain()
 					if (AiHelpers.ExperienceUpgrades[i][j] == this->Type) {
 						this->Variable[LEVELUP_INDEX].Value += 1;
 						this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
+						this->Variable[LEVELUP_INDEX].Enable = 1;
 						TransformUnitIntoType(*this, *UnitTypes[i]);
 						if (!IsNetworkGame() && Character != NULL) {	//save the unit-type experience upgrade for persistent characters
 							if (Character->Type->Slot != i) {

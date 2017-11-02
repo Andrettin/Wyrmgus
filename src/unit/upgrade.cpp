@@ -2266,6 +2266,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 {
 	unit.Variable[LEVELUP_INDEX].Value += 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
+	unit.Variable[LEVELUP_INDEX].Enable = 1;
 	if (!IsNetworkGame() && unit.Character != NULL) {
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) != unit.Character->Abilities.end()) {
 			if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
