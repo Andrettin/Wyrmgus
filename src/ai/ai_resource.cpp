@@ -2435,6 +2435,16 @@ void AiCheckUpgrades()
 		if (AiPlayer->Player->UpgradeRemovesExistingUpgrade(upgrade, true)) {
 			continue;
 		}
+		
+		//remove any removed upgrades from the requests, to prevent mutually-incompatible upgrades from being researched back and forth
+		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+			for (size_t j = 0; j < upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
+				CUpgrade *removed_upgrade = upgrade->UpgradeModifiers[z]->RemoveUpgrades[j];
+				if (std::find(AiPlayer->ResearchRequests.begin(), AiPlayer->ResearchRequests.end(), removed_upgrade) != AiPlayer->ResearchRequests.end()) {
+					AiPlayer->ResearchRequests.erase(std::remove(AiPlayer->ResearchRequests.begin(), AiPlayer->ResearchRequests.end(), removed_upgrade), AiPlayer->ResearchRequests.end());
+				}
+			}
+		}
 
 		AiPlayer->ResearchRequests.push_back(upgrade);
 	}
