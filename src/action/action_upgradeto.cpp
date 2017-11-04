@@ -139,35 +139,39 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		}
 	}
 	//Wyrmgus end
+
 	CPlayer &player = *unit.Player;
-	player.UnitTypesCount[oldtype.Slot]--;
-	player.UnitTypesCount[newtype.Slot]++;
-	if (unit.Active) {
-		player.UnitTypesAiActiveCount[oldtype.Slot]--;
-		player.UnitTypesAiActiveCount[newtype.Slot]++;
-	}
-	//Wyrmgus start
-	if (unit.Character == NULL) {
-		player.UnitTypesNonHeroCount[oldtype.Slot]--;
-		player.UnitTypesNonHeroCount[newtype.Slot]++;
-		if (unit.Starting) {
-			player.UnitTypesStartingNonHeroCount[oldtype.Slot]--;
-			player.UnitTypesStartingNonHeroCount[newtype.Slot]++;
+	if (!unit.Constructed) {
+		player.UnitTypesCount[oldtype.Slot]--;
+		player.UnitTypesCount[newtype.Slot]++;
+		if (unit.Active) {
+			player.UnitTypesAiActiveCount[oldtype.Slot]--;
+			player.UnitTypesAiActiveCount[newtype.Slot]++;
 		}
-	}
-	//Wyrmgus end
+		
+		//Wyrmgus start
+		if (unit.Character == NULL) {
+			player.UnitTypesNonHeroCount[oldtype.Slot]--;
+			player.UnitTypesNonHeroCount[newtype.Slot]++;
+			if (unit.Starting) {
+				player.UnitTypesStartingNonHeroCount[oldtype.Slot]--;
+				player.UnitTypesStartingNonHeroCount[newtype.Slot]++;
+			}
+		}
+		//Wyrmgus end
+		
+		player.Demand += newtype.Stats[player.Index].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.Index].Variables[DEMAND_INDEX].Value;
+		player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
+		for (int i = 0; i < MaxCosts; ++i) {
+			player.ResourceDemand[i] += newtype.Stats[player.Index].ResourceDemand[i] - oldtype.Stats[player.Index].ResourceDemand[i];
+		}
 
-	player.Demand += newtype.Stats[player.Index].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.Index].Variables[DEMAND_INDEX].Value;
-	player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
-	for (int i = 0; i < MaxCosts; ++i) {
-		player.ResourceDemand[i] += newtype.Stats[player.Index].ResourceDemand[i] - oldtype.Stats[player.Index].ResourceDemand[i];
-	}
-
-	// Change resource limit
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (player.MaxResources[i] != -1) {
-			player.MaxResources[i] += newtype.Stats[player.Index].Storing[i] - oldtype.Stats[player.Index].Storing[i];
-			player.SetResource(i, player.StoredResources[i], STORE_BUILDING);
+		// Change resource limit
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (player.MaxResources[i] != -1) {
+				player.MaxResources[i] += newtype.Stats[player.Index].Storing[i] - oldtype.Stats[player.Index].Storing[i];
+				player.SetResource(i, player.StoredResources[i], STORE_BUILDING);
+			}
 		}
 	}
 
@@ -315,7 +319,9 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		memset(unit.SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
 	}
 
-	UpdateForNewUnit(unit, 1);
+	if (!unit.Constructed) {
+		UpdateForNewUnit(unit, 1);
+	}
 	//Wyrmgus start
 	/*
 	//  Update Possible sight range change
@@ -374,29 +380,31 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			SelectedUnitChanged();
 		}
 		
-		for (size_t i = 0; i < player.QuestBuildUnits.size(); ++i) {
-			if (std::get<1>(player.QuestBuildUnits[i]) == &newtype) {
-				std::get<2>(player.QuestBuildUnits[i]) -= 1;
+		if (!unit.Constructed) {
+			for (size_t i = 0; i < player.QuestBuildUnits.size(); ++i) {
+				if (std::get<1>(player.QuestBuildUnits[i]) == &newtype) {
+					std::get<2>(player.QuestBuildUnits[i]) -= 1;
+				}
 			}
-		}
+			
+			for (size_t i = 0; i < player.QuestBuildUnitsOfClass.size(); ++i) {
+				if (std::get<1>(player.QuestBuildUnitsOfClass[i]) == newtype.Class) {
+					std::get<2>(player.QuestBuildUnitsOfClass[i]) -= 1;
+				}
+			}
 		
-		for (size_t i = 0; i < player.QuestBuildUnitsOfClass.size(); ++i) {
-			if (std::get<1>(player.QuestBuildUnitsOfClass[i]) == newtype.Class) {
-				std::get<2>(player.QuestBuildUnitsOfClass[i]) -= 1;
+			for (size_t i = 0; i < player.QuestBuildSettlementUnits.size(); ++i) {
+				if (std::get<1>(player.QuestBuildSettlementUnits[i]) == unit.Settlement && std::get<2>(player.QuestBuildSettlementUnits[i]) == &newtype) {
+					std::get<3>(player.QuestBuildSettlementUnits[i]) -= 1;
+				}
+			}	
+		
+			for (size_t i = 0; i < player.QuestBuildSettlementUnitsOfClass.size(); ++i) {
+				if (std::get<1>(player.QuestBuildSettlementUnitsOfClass[i]) == unit.Settlement && std::get<2>(player.QuestBuildSettlementUnitsOfClass[i]) == newtype.Class) {
+					std::get<3>(player.QuestBuildSettlementUnitsOfClass[i]) -= 1;
+				}
 			}
 		}
-	
-		for (size_t i = 0; i < player.QuestBuildSettlementUnits.size(); ++i) {
-			if (std::get<1>(player.QuestBuildSettlementUnits[i]) == unit.Settlement && std::get<2>(player.QuestBuildSettlementUnits[i]) == &newtype) {
-				std::get<3>(player.QuestBuildSettlementUnits[i]) -= 1;
-			}
-		}	
-	
-		for (size_t i = 0; i < player.QuestBuildSettlementUnitsOfClass.size(); ++i) {
-			if (std::get<1>(player.QuestBuildSettlementUnitsOfClass[i]) == unit.Settlement && std::get<2>(player.QuestBuildSettlementUnitsOfClass[i]) == newtype.Class) {
-				std::get<3>(player.QuestBuildSettlementUnitsOfClass[i]) -= 1;
-			}
-		}	
 	}
 	//Wyrmgus end
 	return 1;
