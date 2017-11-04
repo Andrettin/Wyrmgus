@@ -887,6 +887,9 @@ void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::ve
 		if (unit.Type != &type) {
 			continue;
 		}
+		if (ai_active && !unit.Active) {
+			continue;
+		}
 		if (!unit.IsUnusable()) {
 			table.push_back(&unit);
 		}

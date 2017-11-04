@@ -10,7 +10,7 @@
 //
 /**@name player.cpp - The players. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2017 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -748,7 +748,20 @@ std::string PlayerRace::TranslateName(std::string name, CLanguage *language)
 	return new_name;
 }
 
-std::string CCivilization::GetMonthName(int month)
+int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
+{
+	if (!upgrade) {
+		fprintf(stderr, "Error in CCivilization::GetUpgradePriority: the upgrade is NULL.\n");
+	}
+	
+	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {
+		return this->UpgradePriorities.find(upgrade)->second;
+	}
+	
+	return 100;
+}
+
+std::string CCivilization::GetMonthName(int month) const
 {
 	if (this->Months.find(month) != this->Months.end()) {
 		return this->Months.find(month)->second;
@@ -816,6 +829,23 @@ CFaction::~CFaction()
 	}
 
 	this->UIFillers.clear();
+}
+
+int CFaction::GetUpgradePriority(const CUpgrade *upgrade) const
+{
+	if (!upgrade) {
+		fprintf(stderr, "Error in CFaction::GetUpgradePriority: the upgrade is NULL.\n");
+	}
+	
+	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {
+		return this->UpgradePriorities.find(upgrade)->second;
+	}
+	
+	if (this->Civilization == -1) {
+		fprintf(stderr, "Error in CFaction::GetUpgradePriority: the faction has no civilization.\n");
+	}
+	
+	return PlayerRaces.Civilizations[this->Civilization]->GetUpgradePriority(upgrade);
 }
 
 std::vector<std::string> &CFaction::GetSettlementNames()
@@ -1984,11 +2014,16 @@ bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
 **
 **  @param upgrade    Upgrade.
 */
-bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const
+bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority) const
 {
 	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 		for (size_t j = 0; j < upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
-			if (UpgradeIdentAllowed(*this, upgrade->UpgradeModifiers[z]->RemoveUpgrades[j]->Ident.c_str()) == 'R') {
+			const CUpgrade *removed_upgrade = upgrade->UpgradeModifiers[z]->RemoveUpgrades[j];
+			bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->ID) == 'R');
+			if (has_upgrade) {
+				if (ignore_lower_priority && this->Faction != -1 && PlayerRaces.Factions[this->Faction]->GetUpgradePriority(removed_upgrade) < PlayerRaces.Factions[this->Faction]->GetUpgradePriority(upgrade)) {
+					continue;
+				}
 				return true;
 			}
 		}

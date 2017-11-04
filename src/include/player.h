@@ -242,7 +242,7 @@ public:
 	bool HasUnitBuilder(CUnitType *type, CSettlement *settlement = NULL) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
 	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
-	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
+	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(int title_type, int gender) const;
 	void GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building);	/// Builds a vector with worker landmasses; the building is the structure to be built by the worker in question
@@ -547,7 +547,8 @@ public:
 	{
 	}
 	
-	std::string GetMonthName(int month);
+	int GetUpgradePriority(const CUpgrade *upgrade) const;
+	std::string GetMonthName(int month) const;
 	std::map<int, std::vector<std::string>> &GetPersonalNames();
 	std::vector<std::string> &GetUnitClassNames(int class_id);
 	std::vector<std::string> &GetSettlementNames();
@@ -566,6 +567,7 @@ public:
 	CUnitSound UnitSounds;			/// Sounds for unit events
 	CLanguage *Language;		/// The language used by the civilization
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
+	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	std::map<int, std::vector<std::string>> UnitClassNames;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
@@ -591,6 +593,7 @@ public:
 	
 	~CFaction();
 	
+	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	std::vector<std::string> &GetSettlementNames();
 	std::vector<std::string> &GetShipNames();
 
@@ -619,6 +622,7 @@ public:
 	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
+	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
 	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction

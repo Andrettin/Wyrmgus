@@ -10,7 +10,7 @@
 //
 /**@name upgrade.cpp - The upgrade/allow functions. */
 //
-//      (c) Copyright 1999-2016 by Vladi Belperchinov-Shabanski, Jimmy Salmon
+//      (c) Copyright 1999-2017 by Vladi Belperchinov-Shabanski, Jimmy Salmon
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -504,6 +504,40 @@ static int CclDefineUpgrade(lua_State *l)
 				++j;
 				
 				upgrade->GrandStrategyProductionEfficiencyModifier[resource] = LuaToNumber(l, -1, j + 1);
+			}
+		} else if (!strcmp(value, "CivilizationPriorities")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string civilization_ident = LuaToString(l, -1, j + 1);
+				int priority_civilization = PlayerRaces.GetRaceIndexByName(civilization_ident.c_str());
+				if (priority_civilization == -1) {
+					LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_ident.c_str());
+				}
+				++j;
+				
+				int priority = LuaToNumber(l, -1, j + 1);
+
+				PlayerRaces.Civilizations[priority_civilization]->UpgradePriorities[upgrade] = priority;
+			}
+		} else if (!strcmp(value, "FactionPriorities")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string faction_ident = LuaToString(l, -1, j + 1);
+				CFaction *priority_faction = PlayerRaces.GetFaction(faction_ident);
+				if (!priority_faction) {
+					LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
+				}
+				++j;
+				
+				int priority = LuaToNumber(l, -1, j + 1);
+
+				priority_faction->UpgradePriorities[upgrade] = priority;
 			}
 		} else if (!strcmp(value, "ItemPrefix")) {
 			if (!lua_istable(l, -1)) {

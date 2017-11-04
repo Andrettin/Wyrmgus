@@ -516,6 +516,7 @@ extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUn
 extern void AiTransportCapacityRequest(int capacity_needed, int landmass);
 extern void AiCheckSettlementConstruction();
 extern void AiCheckDockConstruction();
+extern void AiCheckUpgrades();
 //Wyrmgus end
 
 //
@@ -568,6 +569,10 @@ extern void AiCheckTransporters();
 extern int AiGetTransportCapacity(int water_landmass);
 /// Get the current requested transport capacity of the AI for a given water zone
 extern int AiGetRequestedTransportCapacity(int water_landmass);
+/// Get the quantity of units belonging to a particular type, possibly including requests
+extern int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass, bool include_requests);
+/// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
+extern bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_requests);
 //Wyrmgus end
 /// Enemy units in distance
 extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,

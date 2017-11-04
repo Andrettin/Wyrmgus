@@ -437,6 +437,27 @@ static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type,
 	return false;
 }
 
+//Wyrmgus start
+static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upgrade, bool allow_can_build_researcher = false)
+{
+	if (UpgradeIdAllowed(*AiPlayer->Player, upgrade->ID) != 'A') {
+		return false;
+	}
+	if (upgrade->ID >= (int) AiHelpers.Research.size()) {
+		return false;
+	}
+	const size_t size = AiHelpers.Research[upgrade->ID].size();
+	for (size_t i = 0; i < size; ++i) {
+		CUnitType &researcher = *AiHelpers.Research[upgrade->ID][i];
+
+		if ((player.UnitTypesAiActiveCount[researcher.Slot] > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, researcher))) && CheckDependByIdent(player, upgrade->Ident)) {
+			return true;
+		}
+	}
+	return false;
+}
+//Wyrmgus end
+
 struct cnode {
 	int unit_cost;
 	int needmask;
@@ -2395,6 +2416,27 @@ void AiCheckDockConstruction()
 				AiTransportCapacityRequest(1, water_landmass);
 			}
 		}
+	}
+}
+
+void AiCheckUpgrades()
+{
+	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+		CUpgrade *upgrade = AllUpgrades[i];
+		
+		if (!AiRequestedUpgradeAllowed(*AiPlayer->Player, upgrade)) {
+			continue;
+		}
+		
+		if (AiHasUpgrade(*AiPlayer, upgrade, true)) {
+			continue;
+		}
+		
+		if (AiPlayer->Player->UpgradeRemovesExistingUpgrade(upgrade, true)) {
+			continue;
+		}
+
+		AiPlayer->ResearchRequests.push_back(upgrade);
 	}
 }
 //Wyrmgus end
