@@ -311,6 +311,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 	AiHelpers.SellMarkets.clear();
 	AiHelpers.BuyMarkets.clear();
 	AiHelpers.ProducedResources.clear();
+	AiHelpers.ResearchedUpgrades.clear();
 	AiHelpers.ExperienceUpgrades.clear();
 	AiHelpers.LearnableAbilities.clear();
 	AiHelpers.NavalTransporters.clear();
@@ -396,6 +397,10 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					AiHelperInsert(aiHelper.Research, researchId, **j);
+				}
+				
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					AiHelperInsert(aiHelper.ResearchedUpgrades, (**j).Slot, *AllUpgrades[researchId]);
 				}
 				break;
 			}

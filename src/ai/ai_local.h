@@ -454,13 +454,19 @@ public:
 	std::vector<std::vector<int> > ProducedResources;
 
 	/**
+	** The index is the unit type, giving a table of all
+	** upgrades that it can research.
+	*/
+	std::vector<std::vector<CUpgrade *> > ResearchedUpgrades;
+
+	/**
 	** The index is the unit that should acquire an experience upgrade, giving a table of all
 	** possible upgrades for it.
 	*/
 	std::vector<std::vector<CUnitType *> > ExperienceUpgrades;
 	
 	/**
-	** The index is the unit that should acquire a learnable ability, giving a table of all
+	** The index is the unit type that should acquire a learnable ability, giving a table of all
 	** abilities that it can learn.
 	*/
 	std::vector<std::vector<CUpgrade *> > LearnableAbilities;

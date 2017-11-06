@@ -314,8 +314,7 @@ static void AiCheckUnits()
 						}
 					}
 				}
-				
-				
+
 				for (std::map<int, int>::iterator iterator = mercenary_unit->UnitStock.begin(); iterator != mercenary_unit->UnitStock.end(); ++iterator) {
 					if (iterator->second && !UnitTypes[iterator->first]->BoolFlag[ITEM_INDEX].value && CheckDependByType(Players[i], *UnitTypes[iterator->first]) && AiPlayer->Player->CheckLimits(*UnitTypes[iterator->first]) >= 1 && !AiPlayer->Player->CheckUnitType(*UnitTypes[iterator->first], true)) {
 						CommandTrainUnit(*mercenary_unit, *UnitTypes[iterator->first], AiPlayer->Player->Index, FlushCommands);
@@ -696,6 +695,7 @@ void FreeAi()
 	AiHelpers.SellMarkets.clear();
 	AiHelpers.BuyMarkets.clear();
 	AiHelpers.ProducedResources.clear();
+	AiHelpers.ResearchedUpgrades.clear();
 	AiHelpers.ExperienceUpgrades.clear();
 	AiHelpers.LearnableAbilities.clear();
 	AiHelpers.NavalTransporters.clear();
