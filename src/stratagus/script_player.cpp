@@ -3241,27 +3241,15 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		CUnitType *type = CclGetUnitType(l);
 		Assert(type);
-		lua_pushnumber(l, p->UnitTypesCount[type->Slot]);
+		lua_pushnumber(l, p->GetUnitTypeCount(type));
 		return 1;
 	} else if (!strcmp(data, "UnitTypesAiActiveCount")) {
 		LuaCheckArgs(l, 3);
 		CUnitType *type = CclGetUnitType(l);
 		Assert(type);
-		lua_pushnumber(l, p->UnitTypesAiActiveCount[type->Slot]);
+		lua_pushnumber(l, p->GetUnitTypeAiActiveCount(type));
 		return 1;
 	//Wyrmgus start
-	} else if (!strcmp(data, "UnitTypesNonHeroCount")) {
-		LuaCheckArgs(l, 3);
-		CUnitType *type = CclGetUnitType(l);
-		Assert(type);
-		lua_pushnumber(l, p->UnitTypesNonHeroCount[type->Slot]);
-		return 1;
-	} else if (!strcmp(data, "UnitTypesStartingNonHeroCount")) {
-		LuaCheckArgs(l, 3);
-		CUnitType *type = CclGetUnitType(l);
-		Assert(type);
-		lua_pushnumber(l, p->UnitTypesStartingNonHeroCount[type->Slot]);
-		return 1;
 	} else if (!strcmp(data, "Heroes")) {
 		lua_createtable(l, p->Heroes.size(), 0);
 		for (size_t i = 1; i <= p->Heroes.size(); ++i)

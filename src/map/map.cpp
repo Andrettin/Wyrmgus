@@ -641,7 +641,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		// add five workers at the player's starting location
 		if (Players[i].NumTownHalls > 0) {
 			int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Faction, GetUnitTypeClassIndexByName("worker"));			
-			if (worker_type_id != -1 && Players[i].UnitTypesCount[worker_type_id] == 0) { //only create if the player doesn't have any workers created in another manner
+			if (worker_type_id != -1 && Players[i].GetUnitTypeCount(UnitTypes[worker_type_id]) == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
 				
 				Vec2i worker_pos(Players[i].StartPos);
@@ -909,7 +909,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 						CUnit *unit = CreateUnit(settlement_pos - unit_offset, *type, unit_player, z);
 						if (!type->BoolFlag[HARVESTER_INDEX].value) { // make non-worker units not have an active AI
 							unit->Active = 0;
-							unit_player->UnitTypesAiActiveCount[type->Slot]--;
+							unit_player->ChangeUnitTypeAiActiveCount(type, -1);
 						}
 					}
 				}
@@ -1102,7 +1102,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z);
 			if (!type->BoolFlag[BUILDING_INDEX].value) { // make non-building units not have an active AI
 				unit->Active = 0;
-				player->UnitTypesAiActiveCount[type->Slot]--;
+				player->ChangeUnitTypeAiActiveCount(type, -1);
 			}
 			if (std::get<5>(this->Units[i])) {
 				unit->SetUnique(std::get<5>(this->Units[i]));
@@ -1145,7 +1145,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->Type, player, z);
 			unit->SetCharacter(hero->Ident);
 			unit->Active = 0;
-			player->UnitTypesAiActiveCount[hero->Type->Slot]--;
+			player->ChangeUnitTypeAiActiveCount(hero->Type, -1);
 		}
 	}
 	
@@ -1211,7 +1211,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		CUnit *unit = CreateUnit(hero_pos - unit_offset, *hero->Type, hero_player, z);
 		unit->SetCharacter(hero->Ident);
 		unit->Active = 0;
-		hero_player->UnitTypesAiActiveCount[hero->Type->Slot]--;
+		hero_player->ChangeUnitTypeAiActiveCount(hero->Type, -1);
 	}
 }
 

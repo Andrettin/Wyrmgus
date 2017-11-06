@@ -285,11 +285,6 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Active) {
 		file.printf(" \"active\",");
 	}
-	//Wyrmgus start
-	if (unit.Starting) {
-		file.printf(" \"starting\",");
-	}
-	//Wyrmgus end
 	file.printf("\"ttl\", %lu,\n  ", unit.TTL);
 	file.printf("\"threshold\", %d,\n  ", unit.Threshold);
 

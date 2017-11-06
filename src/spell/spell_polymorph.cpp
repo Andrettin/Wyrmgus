@@ -221,7 +221,6 @@
 	if (target->Character && (this->PlayerNeutral == 1 || this->PlayerNeutral == 2)) {
 		target->Player->Heroes.erase(std::remove(target->Player->Heroes.begin(), target->Player->Heroes.end(), target), target->Player->Heroes.end());
 		target->Character = NULL;
-		target->Player->UnitTypesNonHeroCount[target->Type->Slot]++;
 	}
 //	UnitLost(*target);
 //	UnitClearOrders(*target);

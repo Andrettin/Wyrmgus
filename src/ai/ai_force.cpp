@@ -1096,7 +1096,6 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool mercenary)
 void AiForceManager::CheckUnits(int *counter)
 {
 	int attacking[UnitTypeMax];
-	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
 
 	memset(attacking, 0, sizeof(attacking));
 
@@ -1123,10 +1122,10 @@ void AiForceManager::CheckUnits(int *counter)
 			const AiUnitType &aiut = force.UnitTypes[j];
 			const unsigned int t = aiut.Type->Slot;
 			const int wantedCount = aiut.Want;
-			int e = unit_types_count[t];
+			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(UnitTypes[t]);
 			if (t < AiHelpers.Equiv.size()) {
 				for (unsigned int j = 0; j < AiHelpers.Equiv[t].size(); ++j) {
-					e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
+					e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][j]);
 				}
 			}
 			const int requested = wantedCount - (e + counter[t] - attacking[t]);

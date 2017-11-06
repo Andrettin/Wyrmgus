@@ -183,17 +183,15 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		player.NumBuildingsUnderConstruction--;
 	}
 	//Wyrmgus end
-	player.UnitTypesCount[type.Slot]++;
+	player.ChangeUnitTypeCount(&type, 1);
 	if (unit.Active) {
-		player.UnitTypesAiActiveCount[type.Slot]++;
+		player.ChangeUnitTypeAiActiveCount(&type, 1);
 	}
 	//Wyrmgus start
 	if (type.BoolFlag[TOWNHALL_INDEX].value) {
 		player.NumTownHalls++;
 	}
-	if (unit.Character == NULL) {
-		player.UnitTypesNonHeroCount[type.Slot]++;
-	} else {
+	if (unit.Character != NULL) {
 		player.Heroes.push_back(&unit);
 	}
 	for (int i = 0; i < MaxCosts; ++i) {

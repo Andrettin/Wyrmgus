@@ -31,12 +31,6 @@ class CPlayer
 	int Incomes[MaxCosts];
 	const int Revenue[MaxCosts];
 
-	const int UnitTypesCount[UnitTypeMax];
-	const int UnitTypesAiActiveCount[UnitTypeMax];
-	//Wyrmgus start
-	const int UnitTypesNonHeroCount[UnitTypeMax];
-	const int UnitTypesStartingNonHeroCount[UnitTypeMax];
-	//Wyrmgus end
 	bool AiEnabled;
 
 	int NumBuildings;

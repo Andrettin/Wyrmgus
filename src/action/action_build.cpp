@@ -467,17 +467,15 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	//Wyrmgus end
 
 	// HACK: the building is not ready yet
-	build->Player->UnitTypesCount[type.Slot]--;
+	build->Player->ChangeUnitTypeCount(&type, -1);
 	if (build->Active) {
-		build->Player->UnitTypesAiActiveCount[type.Slot]--;
+		build->Player->ChangeUnitTypeAiActiveCount(&type, -1);
 	}
 	//Wyrmgus start
 	if (build->Type->BoolFlag[TOWNHALL_INDEX].value) {
 		build->Player->NumTownHalls--;
 	}
-	if (build->Character == NULL) {
-		build->Player->UnitTypesNonHeroCount[type.Slot]--;
-	} else {
+	if (build->Character != NULL) {
 		build->Player->Heroes.erase(std::remove(build->Player->Heroes.begin(), build->Player->Heroes.end(), build), build->Player->Heroes.end());
 	}
 	for (int i = 0; i < MaxCosts; ++i) {

@@ -158,12 +158,9 @@ public:
 	int SpeedUpgrade;                /// speed factor for upgrading
 	int SpeedResearch;               /// speed factor for researching
 
-	// FIXME: shouldn't use the constant
-	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
-	int UnitTypesAiActiveCount[UnitTypeMax];  /// total units of unit-type that have their AI set to active
+	std::map<const CUnitType *, int> UnitTypesCount;  /// total units of unit-type
+	std::map<const CUnitType *, int> UnitTypesAiActiveCount;  /// total units of unit-type that have their AI set to active
 	//Wyrmgus start
-	int UnitTypesNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character
-	int UnitTypesStartingNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character and which are starting units
 	std::vector<CUnit *> Heroes;					/// hero units owned by this player
 	std::vector<CDeity *> Deities;					/// deities chosen by this player
 	std::vector<CQuest *> AvailableQuests;		/// quests available to this player
@@ -337,6 +334,14 @@ public:
 	
 	//Wyrmgus start
 	void GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs);
+	
+	void SetUnitTypeCount(const CUnitType *type, int quantity);
+	void ChangeUnitTypeCount(const CUnitType *type, int quantity);
+	int GetUnitTypeCount(const CUnitType *type) const;
+	
+	void SetUnitTypeAiActiveCount(const CUnitType *type, int quantity);
+	void ChangeUnitTypeAiActiveCount(const CUnitType *type, int quantity);
+	int GetUnitTypeAiActiveCount(const CUnitType *type) const;
 	//Wyrmgus end
 
 	/// Does the player have units of that type

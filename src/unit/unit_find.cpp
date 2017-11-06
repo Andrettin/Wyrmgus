@@ -867,10 +867,10 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool ev
 void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &table, bool ai_active)
 {
 	const int nunits = player.GetUnitCount();
-	int typecount = player.UnitTypesCount[type.Slot];
+	int typecount = player.GetUnitTypeCount(&type);
 
 	if (ai_active) {
-		typecount = player.UnitTypesAiActiveCount[type.Slot];
+		typecount = player.GetUnitTypeAiActiveCount(&type);
 	}
 	
 	if (typecount < 0) { // if unit type count is negative, something wrong happened

@@ -426,10 +426,7 @@ static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type,
 		CUnitType &builder = *(*tablep)[type.Slot][i];
 		//Wyrmgus end
 
-		//Wyrmgus start
-//		if (player.UnitTypesAiActiveCount[builder.Slot] > 0
-		if ((player.UnitTypesAiActiveCount[builder.Slot] > 0 || (allow_can_build_builder && AiRequestedTypeAllowed(player, builder)))
-		//Wyrmgus end
+		if ((player.GetUnitTypeAiActiveCount(&builder) > 0 || (allow_can_build_builder && AiRequestedTypeAllowed(player, builder)))
 			&& CheckDependByType(player, type)) {
 			return true;
 		}
@@ -450,7 +447,7 @@ static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upg
 	for (size_t i = 0; i < size; ++i) {
 		CUnitType &researcher = *AiHelpers.Research[upgrade->ID][i];
 
-		if ((player.UnitTypesAiActiveCount[researcher.Slot] > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, researcher))) && CheckDependByIdent(player, upgrade->Ident)) {
+		if ((player.GetUnitTypeAiActiveCount(&researcher) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, researcher))) && CheckDependByIdent(player, upgrade->Ident)) {
 			return true;
 		}
 	}
@@ -698,7 +695,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		for (size_t i = 0; i != size; ++i) {
 			CUnitType &builder = *AiHelpers.Train[best_type->Slot][i];
 
-			if (AiPlayer->Player->UnitTypesAiActiveCount[builder.Slot] > 0) {
+			if (AiPlayer->Player->GetUnitTypeAiActiveCount(&builder) > 0) {
 				std::vector<CUnit *> builder_table;
 
 				FindPlayerUnitsByType(*AiPlayer->Player, builder, builder_table, true);
@@ -955,12 +952,11 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 			continue;
 		}
 
-		const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
 		for (unsigned int i = 0; i < table.size(); ++i) {
 			//
 			// The type for builder/trainer is available
 			//
-			if (unit_count[table[i]->Slot]) {
+			if (AiPlayer->Player->GetUnitTypeAiActiveCount(table[i])) {
 				if (type.Building) {
 					//Wyrmgus start
 //					if (AiBuildBuilding(*table[i], type, nearPos)) {
@@ -1048,10 +1044,9 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 		return;
 	}
 
-	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
 	for (unsigned int i = 0; i < table.size(); ++i) {
 		// The type is available
-		if (unit_count[table[i]->Slot]
+		if (AiPlayer->Player->GetUnitTypeAiActiveCount(table[i])
 			&& AiResearchUpgrade(*table[i], *upgrade)) {
 			return;
 		}
@@ -1119,12 +1114,11 @@ void AiAddUpgradeToRequest(CUnitType &type)
 		return;
 	}
 
-	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
 	for (unsigned int i = 0; i < table.size(); ++i) {
 		//
 		// The type is available
 		//
-		if (unit_count[table[i]->Slot]) {
+		if (AiPlayer->Player->GetUnitTypeAiActiveCount(table[i])) {
 			if (AiUpgradeTo(*table[i], type)) {
 				return;
 			}
@@ -1715,8 +1709,7 @@ static void AiCollectResources()
 			for (int i = 0; i < n_m; ++i) {
 				CUnitType &market_type = *AiHelpers.BuyMarkets[c - 1][i];
 
-				const int *market_count = AiPlayer->Player->UnitTypesAiActiveCount;
-				if (market_count[market_type.Slot]) {
+				if (AiPlayer->Player->GetUnitTypeAiActiveCount(&market_type)) {
 					std::vector<CUnit *> market_table;
 					FindPlayerUnitsByType(*AiPlayer->Player, market_type, market_table, true);
 					
@@ -1754,8 +1747,7 @@ static void AiCollectResources()
 			for (int i = 0; i < n_m; ++i) {
 				CUnitType &market_type = *AiHelpers.SellMarkets[c - 1][i];
 
-				const int *market_count = AiPlayer->Player->UnitTypesAiActiveCount;
-				if (market_count[market_type.Slot]) {
+				if (AiPlayer->Player->GetUnitTypeAiActiveCount(&market_type)) {
 					std::vector<CUnit *> market_table;
 					FindPlayerUnitsByType(*AiPlayer->Player, market_type, market_table, true);
 
@@ -1895,12 +1887,11 @@ static int AiRepairUnit(CUnit &unit)
 		return 0;
 	}
 
-	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
 	for (unsigned int i = 0; i < table.size(); ++i) {
 		//
 		// The type is available
 		//
-		if (unit_count[table[i]->Slot]) {
+		if (AiPlayer->Player->GetUnitTypeAiActiveCount(table[i])) {
 			if (AiRepairBuilding(*AiPlayer->Player, *table[i], unit)) {
 				return 1;
 			}
@@ -2222,12 +2213,11 @@ static void AiCheckPathwayConstruction()
 						//
 						// Find a free worker, who can build pathways for this building
 						//
-						const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
 						for (unsigned int j = 0; j < tablep[pathway_types[p]->Slot].size(); ++j) {
 							//
 							// The type is available
 							//
-							if (unit_count[tablep[pathway_types[p]->Slot][j]->Slot]) {
+							if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[pathway_types[p]->Slot][j])) {
 								if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, unit.MapLayer)) {
 									built_pathway = true;
 									break;
@@ -2320,12 +2310,11 @@ void AiCheckSettlementConstruction()
 		//
 		// Find a free worker who can build a settlement on this site
 		//
-		const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
 		for (unsigned int j = 0; j < tablep[town_hall_type->Slot].size(); ++j) {
 			//
 			// The type is available
 			//
-			if (unit_count[tablep[town_hall_type->Slot][j]->Slot]) {
+			if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[town_hall_type->Slot][j])) {
 				if (AiBuildBuilding(*tablep[town_hall_type->Slot][j], *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer)) {
 					built_settlement = true;
 					break;

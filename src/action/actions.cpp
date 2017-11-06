@@ -684,7 +684,7 @@ static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 			CUnitType *spawned_type = unit.Type->SpawnUnits[i];
 			int spawned_type_demand = spawned_type->Stats[unit.Player->Index].Variables[DEMAND_INDEX].Value;
 			if ((GameCycle % (CYCLES_PER_MINUTE * spawned_type_demand)) == 0) { //the quantity of minutes it takes to spawn the unit depends on the unit's supply demand
-				if ((unit.Player->UnitTypesCount[spawned_type->Slot] * spawned_type_demand) >= (unit.Player->UnitTypesCount[unit.Type->Slot] * 5)) { //max limit reached
+				if ((unit.Player->GetUnitTypeCount(spawned_type) * spawned_type_demand) >= (unit.Player->GetUnitTypeCount(unit.Type) * 5)) { //max limit reached
 					continue;
 				}
 				CUnit *spawned_unit = MakeUnit(*spawned_type, unit.Player);

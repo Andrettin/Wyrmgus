@@ -211,8 +211,6 @@ static void AiCheckUnits()
 	int counter[UnitTypeMax];
 	AiGetBuildRequestsCount(*AiPlayer, counter);
 
-	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
-
 	//  Look if some unit-types are missing.
 	int n = AiPlayer->UnitTypeRequests.size();
 	for (int i = 0; i < n; ++i) {
@@ -220,10 +218,10 @@ static void AiCheckUnits()
 		const int x = AiPlayer->UnitTypeRequests[i].Count;
 
 		// Add equivalent units
-		int e = unit_types_count[t];
+		int e = AiPlayer->Player->GetUnitTypeAiActiveCount(AiPlayer->UnitTypeRequests[i].Type);
 		if (t < AiHelpers.Equiv.size()) {
 			for (unsigned int j = 0; j < AiHelpers.Equiv[t].size(); ++j) {
-				e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
+				e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][j]);
 			}
 		}
 		const int requested = x - e - counter[t];
@@ -246,10 +244,10 @@ static void AiCheckUnits()
 		const int x = 1;
 
 		//  Add equivalent units
-		int e = unit_types_count[t];
+		int e = AiPlayer->Player->GetUnitTypeAiActiveCount(AiPlayer->UpgradeToRequests[i]);
 		if (t < AiHelpers.Equiv.size()) {
 			for (unsigned int j = 0; j < AiHelpers.Equiv[t].size(); ++j) {
-				e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
+				e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][j]);
 			}
 		}
 
@@ -1544,7 +1542,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass,
 			}
 		}
 	} else {
-		count += pai.Player->UnitTypesAiActiveCount[type->Slot];
+		count += pai.Player->GetUnitTypeAiActiveCount(type);
 	}
 		
 	if (include_requests) {

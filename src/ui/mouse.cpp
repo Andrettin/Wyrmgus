@@ -3181,16 +3181,16 @@ void UIHandleButtonUp(unsigned button)
 				if (Selected[0]->Player == ThisPlayer && !Selected[0]->Type->BoolFlag[HERO_INDEX].value) { // don't display this for heroes
 				//Wyrmgus end
 					char buf[64];
-					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot] > 1) {
+					if (Selected[0]->Player->GetUnitTypeCount(Selected[0]->Type) > 1) {
 						snprintf(buf, sizeof(buf), _("You have ~<%d~> %ss"),
-								 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
+								 Selected[0]->Player->GetUnitTypeCount(Selected[0]->Type),
 								//Wyrmgus start
 //								 Selected[0]->Type->Name.c_str());
 								 Selected[0]->GetTypeName().c_str());
 								//Wyrmgus end
 					} else {
 						snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
-								 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
+								 Selected[0]->Player->GetUnitTypeCount(Selected[0]->Type),
 								//Wyrmgus start
 //								 Selected[0]->Type->Name.c_str());
 								 Selected[0]->GetTypeName().c_str());

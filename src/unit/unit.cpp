@@ -518,9 +518,6 @@ void CUnit::Init()
 	Summoned = 0;
 	Waiting = 0;
 	MineLow = 0;
-	//Wyrmgus start
-	Starting = 0;
-	//Wyrmgus end
 	memset(&Anim, 0, sizeof(Anim));
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
 	//Wyrmgus start
@@ -862,12 +859,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		return;
 	}
 	
-	if (this->Character == NULL) {
-		this->Player->UnitTypesNonHeroCount[this->Type->Slot]--;
-		if (this->Starting) {
-			this->Player->UnitTypesStartingNonHeroCount[this->Type->Slot]--;
-		}
-	} else {
+	if (this->Character != NULL) {
 		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this), this->Player->Heroes.end());
 		
 		this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 0;
@@ -1004,12 +996,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 	}
 	
-	if (this->Character == NULL) {
-		this->Player->UnitTypesNonHeroCount[this->Type->Slot]++;
-		if (this->Starting) {
-			this->Player->UnitTypesStartingNonHeroCount[this->Type->Slot]++;
-		}
-	} else {
+	if (this->Character != NULL) {
 		this->Player->Heroes.push_back(this);
 	}
 
@@ -2511,11 +2498,6 @@ void CUnit::Init(const CUnitType &type)
 	//Wyrmgus end
 	Active = 1;
 	Removed = 1;
-	//Wyrmgus start
-	if (!GameRunning && !SaveGameLoading) { //if unit was created before the game started, it is a starting unit
-		Starting = 1;
-	}
-	//Wyrmgus end
 	
 	// Has StartingResources, Use those
 	//Wyrmgus start
@@ -2635,20 +2617,15 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				//Wyrmgus end
 			}
 		}
-		player.UnitTypesCount[type.Slot]++;
+		player.ChangeUnitTypeCount(&type, 1);
 		if (Active) {
-			player.UnitTypesAiActiveCount[type.Slot]++;
+			player.ChangeUnitTypeAiActiveCount(&type, 1);
 		}
 		//Wyrmgus start
 		if (type.BoolFlag[TOWNHALL_INDEX].value) {
 			player.NumTownHalls++;
 		}
-		if (this->Character == NULL) {
-			player.UnitTypesNonHeroCount[type.Slot]++;
-			if (this->Starting) {
-				player.UnitTypesStartingNonHeroCount[type.Slot]++;
-			}
-		} else {
+		if (this->Character != NULL) {
 			player.Heroes.push_back(this);
 		}
 
@@ -3806,20 +3783,15 @@ void UnitLost(CUnit &unit)
 			//Wyrmgus end
 		}
 		if (unit.CurrentAction() != UnitActionBuilt) {
-			player.UnitTypesCount[type.Slot]--;
+			player.ChangeUnitTypeCount(&type, -1);
 			if (unit.Active) {
-				player.UnitTypesAiActiveCount[type.Slot]--;
+				player.ChangeUnitTypeAiActiveCount(&type, -1);
 			}
 			//Wyrmgus start
 			if (type.BoolFlag[TOWNHALL_INDEX].value) {
 				player.NumTownHalls--;
 			}
-			if (unit.Character == NULL) {
-				player.UnitTypesNonHeroCount[type.Slot]--;
-				if (unit.Starting) {
-					player.UnitTypesStartingNonHeroCount[type.Slot]--;
-				}
-			} else {
+			if (unit.Character != NULL) {
 				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), &unit), player.Heroes.end());
 			}
 			
@@ -4511,20 +4483,15 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 		newplayer.NumBuildingsUnderConstruction++;
 	}
 	//Wyrmgus end
-	newplayer.UnitTypesCount[Type->Slot]++;
+	newplayer.ChangeUnitTypeCount(this->Type, 1);
 	if (Active) {
-		newplayer.UnitTypesAiActiveCount[Type->Slot]++;
+		newplayer.ChangeUnitTypeAiActiveCount(this->Type, 1);
 	}
 	//Wyrmgus start
 	if (Type->BoolFlag[TOWNHALL_INDEX].value) {
 		newplayer.NumTownHalls++;
 	}
-	if (this->Character == NULL) {
-		newplayer.UnitTypesNonHeroCount[Type->Slot]++;
-		if (this->Starting) {
-			newplayer.UnitTypesStartingNonHeroCount[Type->Slot]++;
-		}
-	} else {
+	if (this->Character != NULL) {
 		newplayer.Heroes.push_back(this);
 	}
 	

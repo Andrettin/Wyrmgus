@@ -1536,11 +1536,9 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 		this->MaxResources[i] = DefaultResourceMaxAmounts[i];
 	}
 
-	memset(this->UnitTypesCount, 0, sizeof(this->UnitTypesCount));
-	memset(this->UnitTypesAiActiveCount, 0, sizeof(this->UnitTypesAiActiveCount));
 	//Wyrmgus start
-	memset(this->UnitTypesNonHeroCount, 0, sizeof(this->UnitTypesNonHeroCount));
-	memset(this->UnitTypesStartingNonHeroCount, 0, sizeof(this->UnitTypesStartingNonHeroCount));
+	this->UnitTypesCount.clear();
+	this->UnitTypesAiActiveCount.clear();
 	this->Heroes.clear();
 	this->Deities.clear();
 	//Wyrmgus end
@@ -1893,20 +1891,20 @@ bool CPlayer::HasUnitBuilder(CUnitType *type, CSettlement *settlement) const
 {
 	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
 		for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
-			if (this->UnitTypesCount[AiHelpers.Build[type->Slot][j]->Slot] > 0) {
+			if (this->GetUnitTypeCount(AiHelpers.Build[type->Slot][j]) > 0) {
 				return true;
 			}
 		}
 	} else if (!type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Train.size()) {
 		for (size_t j = 0; j < AiHelpers.Train[type->Slot].size(); ++j) {
-			if (this->UnitTypesCount[AiHelpers.Train[type->Slot][j]->Slot] > 0) {
+			if (this->GetUnitTypeCount(AiHelpers.Train[type->Slot][j]) > 0) {
 				return true;
 			}
 		}
 	}
 	if (type->Slot < (int) AiHelpers.Upgrade.size()) {
 		for (size_t j = 0; j < AiHelpers.Upgrade[type->Slot].size(); ++j) {
-			if (this->UnitTypesCount[AiHelpers.Upgrade[type->Slot][j]->Slot] > 0) {
+			if (this->GetUnitTypeCount(AiHelpers.Upgrade[type->Slot][j]) > 0) {
 				if (!settlement) {
 					return true;
 				} else {
@@ -2240,9 +2238,8 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 
 void CPlayer::GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building)
 {
-	const int *unit_count = this->UnitTypesAiActiveCount;
 	for (unsigned int i = 0; i < AiHelpers.Build[building->Slot].size(); ++i) {
-		if (unit_count[AiHelpers.Build[building->Slot][i]->Slot]) {
+		if (this->GetUnitTypeAiActiveCount(AiHelpers.Build[building->Slot][i])) {
 			std::vector<CUnit *> worker_table;
 
 			FindPlayerUnitsByType(*this, *AiHelpers.Build[building->Slot][i], worker_table, true);
@@ -2296,11 +2293,9 @@ void CPlayer::Clear()
 	//Wyrmgus start
 	memset(ResourceDemand, 0, sizeof(ResourceDemand));
 	//Wyrmgus end
-	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
-	memset(UnitTypesAiActiveCount, 0, sizeof(UnitTypesAiActiveCount));
+	this->UnitTypesCount.clear();
+	this->UnitTypesAiActiveCount.clear();
 	//Wyrmgus start
-	memset(UnitTypesNonHeroCount, 0, sizeof(UnitTypesNonHeroCount));
-	memset(UnitTypesStartingNonHeroCount, 0, sizeof(UnitTypesStartingNonHeroCount));
 	this->Heroes.clear();
 	this->Deities.clear();
 	this->AvailableQuests.clear();
@@ -2430,8 +2425,7 @@ void CPlayer::PerformResourceTrade()
 	for (int i = 0; i < n_m; ++i) {
 		CUnitType &market_type = *AiHelpers.SellMarkets[0][i];
 
-		const int *market_count = this->UnitTypesCount;
-		if (market_count[market_type.Slot]) {
+		if (this->GetUnitTypeCount(&market_type)) {
 			std::vector<CUnit *> market_table;
 			FindPlayerUnitsByType(*this, market_type, market_table);
 			if (market_table.size() > 0) {
@@ -3321,7 +3315,7 @@ int CPlayer::GetTradePotentialWith(const CPlayer &player) const
 
 int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 {
-	int count = UnitTypesCount[type.Slot];
+	int count = this->GetUnitTypeCount(&type);
 	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
 		//Wyrmgus start
 		if (*it == NULL) {
@@ -3565,11 +3559,69 @@ void CPlayer::GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs)
 	for (int i = 0; i < MaxCosts; ++i) {
 		upgrade_costs[i] = upgrade->Costs[i];
 		for (size_t j = 0; j < upgrade->ScaledCostUnits.size(); ++j) {
-			upgrade_costs[i] += upgrade->ScaledCosts[i] * this->UnitTypesCount[upgrade->ScaledCostUnits[j]->Slot];
+			upgrade_costs[i] += upgrade->ScaledCosts[i] * this->GetUnitTypeCount(upgrade->ScaledCostUnits[j]);
 		}
 	}
 }
 //Wyrmgus end
+
+void CPlayer::SetUnitTypeCount(const CUnitType *type, int quantity)
+{
+	if (!type) {
+		return;
+	}
+	
+	if (quantity <= 0) {
+		if (this->UnitTypesCount.find(type) != this->UnitTypesCount.end()) {
+			this->UnitTypesCount.erase(type);
+		}
+	} else {
+		this->UnitTypesCount[type] = quantity;
+	}
+}
+
+void CPlayer::ChangeUnitTypeCount(const CUnitType *type, int quantity)
+{
+	this->SetUnitTypeCount(type, this->GetUnitTypeCount(type) + quantity);
+}
+
+int CPlayer::GetUnitTypeCount(const CUnitType *type) const
+{
+	if (type && this->UnitTypesCount.find(type) != this->UnitTypesCount.end()) {
+		return this->UnitTypesCount.find(type)->second;
+	} else {
+		return 0;
+	}
+}
+
+void CPlayer::SetUnitTypeAiActiveCount(const CUnitType *type, int quantity)
+{
+	if (!type) {
+		return;
+	}
+	
+	if (quantity <= 0) {
+		if (this->UnitTypesAiActiveCount.find(type) != this->UnitTypesAiActiveCount.end()) {
+			this->UnitTypesAiActiveCount.erase(type);
+		}
+	} else {
+		this->UnitTypesAiActiveCount[type] = quantity;
+	}
+}
+
+void CPlayer::ChangeUnitTypeAiActiveCount(const CUnitType *type, int quantity)
+{
+	this->SetUnitTypeAiActiveCount(type, this->GetUnitTypeAiActiveCount(type) + quantity);
+}
+
+int CPlayer::GetUnitTypeAiActiveCount(const CUnitType *type) const
+{
+	if (type && this->UnitTypesAiActiveCount.find(type) != this->UnitTypesAiActiveCount.end()) {
+		return this->UnitTypesAiActiveCount.find(type)->second;
+	} else {
+		return 0;
+	}
+}
 
 /**
 **  Have unit of type.
@@ -3580,7 +3632,7 @@ void CPlayer::GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs)
 */
 int CPlayer::HaveUnitTypeByType(const CUnitType &type) const
 {
-	return UnitTypesCount[type.Slot];
+	return this->GetUnitTypeCount(&type);
 }
 
 /**
@@ -3594,7 +3646,7 @@ int CPlayer::HaveUnitTypeByType(const CUnitType &type) const
 */
 int CPlayer::HaveUnitTypeByIdent(const std::string &ident) const
 {
-	return UnitTypesCount[UnitTypeByIdent(ident)->Slot];
+	return this->GetUnitTypeCount(UnitTypeByIdent(ident));
 }
 
 /**

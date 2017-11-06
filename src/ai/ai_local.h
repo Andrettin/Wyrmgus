@@ -465,6 +465,10 @@ public:
 	*/
 	std::vector<std::vector<CUpgrade *> > LearnableAbilities;
 	
+	/**
+	** The sole index is 0, giving a table of all
+	** naval transporter units.
+	*/
 	std::vector<std::vector<CUnitType *> > NavalTransporters;
 	//Wyrmgus end
 };

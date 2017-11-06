@@ -545,11 +545,6 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "active")) {
 			unit->Active = 1;
 			--j;
-		//Wyrmgus start
-		} else if (!strcmp(value, "starting")) {
-			unit->Starting = 1;
-			--j;
-		//Wyrmgus end
 		} else if (!strcmp(value, "ttl")) {
 			// FIXME : unsigned long should be better handled
 			unit->TTL = LuaToNumber(l, 2, j + 1);
@@ -657,20 +652,15 @@ static int CclUnit(lua_State *l)
 			if (unit->CurrentAction() == UnitActionBuilt) {
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
-				unit->Player->UnitTypesCount[type->Slot]--;
+				unit->Player->ChangeUnitTypeCount(type, -1);
 				if (unit->Active) {
-					unit->Player->UnitTypesAiActiveCount[type->Slot]--;
+					unit->Player->ChangeUnitTypeAiActiveCount(type, -1);
 				}
 				//Wyrmgus start
 				if (type->BoolFlag[TOWNHALL_INDEX].value) {
 					unit->Player->NumTownHalls--;
 				}
-				if (unit->Character == NULL) {
-					unit->Player->UnitTypesNonHeroCount[type->Slot]--;
-					if (unit->Starting) {
-						unit->Player->UnitTypesStartingNonHeroCount[type->Slot]--;
-					}
-				} else {
+				if (unit->Character != NULL) {
 					unit->Player->Heroes.erase(std::remove(unit->Player->Heroes.begin(), unit->Player->Heroes.end(), unit), unit->Player->Heroes.end());
 				}
 				for (int res = 0; res < MaxCosts; ++res) {
@@ -930,14 +920,6 @@ static int CclCreateUnit(lua_State *l)
 		}
 		UpdateForNewUnit(*unit, 0);
 
-		//Wyrmgus start
-		if (!unit->Starting) {
-			unit->Starting = 1;
-			unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
-			//make sure the unit is always a "Starting" one if created with this function
-		}
-		//Wyrmgus end
-		
 		lua_pushnumber(l, UnitNumber(*unit));
 		return 1;
 	}
@@ -1012,12 +994,6 @@ static int CclCreateUnitInTransporter(lua_State *l)
 
 		UpdateForNewUnit(*unit, 0);
 
-		if (!unit->Starting) {
-			unit->Starting = 1;
-			unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
-			//make sure the unit is always a "Starting" one if created with this function
-		}
-		
 		lua_pushnumber(l, UnitNumber(*unit));
 		return 1;
 	}
@@ -1077,12 +1053,6 @@ static int CclCreateUnitOnTop(lua_State *l)
 		unit->Place(ipos, z);
 		UpdateForNewUnit(*unit, 0);
 
-		if (!unit->Starting) {
-			unit->Starting = 1;
-			unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
-			//make sure the unit is always a "Starting" one if created with this function
-		}
-		
 		lua_pushnumber(l, UnitNumber(*unit));
 		return 1;
 	}
@@ -1153,13 +1123,6 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 			DropOutOnSide(*unit, heading, NULL);
 		}
 		UpdateForNewUnit(*unit, 0);
-
-		//Wyrmgus start
-		if (!unit->Starting) {
-			unit->Starting = 1;
-			unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
-			//make sure the unit is always a "Starting" one if created with this function
-		}
 		//Wyrmgus end
 		
 		lua_pushnumber(l, UnitNumber(*unit));
@@ -2036,26 +1999,16 @@ static int CclSetUnitVariable(lua_State *l)
 		bool ai_active = LuaToBoolean(l, 3);
 		if (ai_active != unit->Active) {
 			if (ai_active) {
-				unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]++;
+				unit->Player->ChangeUnitTypeAiActiveCount(unit->Type, 1);
 			} else {
-				unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]--;
-				if (unit->Player->UnitTypesAiActiveCount[unit->Type->Slot] < 0) { // if unit AI active count is negative, something wrong happened
-					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->Index, unit->Type->Ident.c_str(), unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]);
+				unit->Player->ChangeUnitTypeAiActiveCount(unit->Type, -1);
+				if (unit->Player->GetUnitTypeAiActiveCount(unit->Type) < 0) { // if unit AI active count is negative, something wrong happened
+					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->Index, unit->Type->Ident.c_str(), unit->Player->GetUnitTypeAiActiveCount(unit->Type));
 				}
 			}
 		}
 		unit->Active = ai_active;
 	//Wyrmgus start
-	} else if (!strcmp(name, "Starting")) {
-		bool starting = LuaToBoolean(l, 3);
-		if (starting != unit->Starting && unit->Character == NULL) {
-			if (starting) {
-				unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
-			} else {
-				unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]--;
-			}
-		}
-		unit->Starting = starting;
 	} else if (!strcmp(name, "Character")) {
 		unit->SetCharacter(LuaToString(l, 3));
 	} else if (!strcmp(name, "CustomHero")) {

@@ -885,11 +885,10 @@ static int CclAiWait(lua_State *l)
 	const char *ident = LuaToString(l, 1);
 	if (!strncmp(ident, "unit-", 5)) {
 		const CUnitType *type = UnitTypeByIdent(ident);
-		const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
 		const AiRequestType *autt = FindInUnitTypeRequests(type);
 		if (!autt) {
 			// Look if we have this unit-type.
-			if (unit_types_count[type->Slot]) {
+			if (AiPlayer->Player->GetUnitTypeAiActiveCount(type)) {
 				lua_pushboolean(l, 0);
 				return 1;
 			}
@@ -897,7 +896,7 @@ static int CclAiWait(lua_State *l)
 			// Look if we have equivalent unit-types.
 			if (type->Slot < (int)AiHelpers.Equiv.size()) {
 				for (size_t j = 0; j < AiHelpers.Equiv[type->Slot].size(); ++j) {
-					if (unit_types_count[AiHelpers.Equiv[type->Slot][j]->Slot]) {
+					if (AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[type->Slot][j])) {
 						lua_pushboolean(l, 0);
 						return 1;
 					}
@@ -917,10 +916,10 @@ static int CclAiWait(lua_State *l)
 		//
 		// Add equivalent units
 		//
-		unsigned int n = unit_types_count[type->Slot];
+		unsigned int n = AiPlayer->Player->GetUnitTypeAiActiveCount(type);
 		if (type->Slot < (int)AiHelpers.Equiv.size()) {
 			for (size_t j = 0; j < AiHelpers.Equiv[type->Slot].size(); ++j) {
-				n += unit_types_count[AiHelpers.Equiv[type->Slot][j]->Slot];
+				n += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[type->Slot][j]);
 			}
 		}
 		// units available?
