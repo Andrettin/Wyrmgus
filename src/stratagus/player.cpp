@@ -1839,7 +1839,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		potential_upgrades.push_back(upgrade);
 	}
 	
-	if (potential_upgrades.size() > 0 && SyncRand(2) == 0) { //random chance that an upgrade will actually be acquired
+	if (potential_upgrades.size() > 0) {
 		CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
 		
 		if (!chosen_upgrade->Name.empty()) {
