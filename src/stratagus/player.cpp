@@ -1755,7 +1755,7 @@ void CPlayer::SetRandomFaction()
 		}
 		if (
 			this->CanFoundFaction(PlayerRaces.Factions[i])
-			&& ((PlayerRaces.Factions[i]->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[i]->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
+			&& ((PlayerRaces.Factions[i]->Type == FactionTypeTribe && !this->HasUpgradeClass(GetUpgradeClassIndexByName("writing"))) || ((PlayerRaces.Factions[i]->Type == FactionTypePolity && this->HasUpgradeClass(GetUpgradeClassIndexByName("writing")))))
 			&& PlayerRaces.Factions[i]->Playable
 		) {
 			local_factions.push_back(PlayerRaces.Factions[i]);
@@ -1807,6 +1807,58 @@ void CPlayer::SetDynasty(CDynasty *dynasty)
 	}
 }
 
+void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
+{
+	std::vector<CUpgrade *> upgrade_list = this->GetResearchableUpgrades();
+	std::vector<CUpgrade *> potential_upgrades;
+
+	for (size_t i = 0; i < upgrade_list.size(); ++i) {
+		if (this->Allow.Upgrades[upgrade_list[i]->ID] != 'R') {
+			continue;
+		}
+		
+		if (upgrade_list[i]->Class == -1) {
+			continue;
+		}
+		
+		int upgrade_id = PlayerRaces.GetFactionClassUpgrade(player.Faction, upgrade_list[i]->Class);
+		if (upgrade_id == -1) {
+			continue;
+		}
+		
+		CUpgrade *upgrade = AllUpgrades[upgrade_id];
+		
+		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(player, upgrade->Ident)) {
+			continue;
+		}
+	
+		if (player.UpgradeRemovesExistingUpgrade(upgrade, player.AiEnabled)) {
+			continue;
+		}
+		
+		potential_upgrades.push_back(upgrade);
+	}
+	
+	if (potential_upgrades.size() > 0 && SyncRand(2) == 0) { //random chance that an upgrade will actually be acquired
+		CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
+		
+		if (!chosen_upgrade->Name.empty()) {
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("%s acquired through contact with %s"), chosen_upgrade->Name.c_str(), this->Name.c_str());
+		}
+		if (&player == ThisPlayer) {
+			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
+
+			if (sound) {
+				PlayGameSound(sound, MaxSampleVolume);
+			}
+		}
+		if (player.AiEnabled) {
+			AiResearchComplete(unit, chosen_upgrade);
+		}
+		UpgradeAcquire(player, chosen_upgrade);
+	}
+}
+
 bool CPlayer::IsPlayerColorUsed(int color)
 {
 	bool color_used = false;
@@ -1818,13 +1870,13 @@ bool CPlayer::IsPlayerColorUsed(int color)
 	return color_used;
 }
 
-bool CPlayer::HasUpgradeClass(std::string upgrade_class_name)
+bool CPlayer::HasUpgradeClass(int upgrade_class)
 {
-	if (this->Race == -1 || this->Faction == -1 || upgrade_class_name.empty()) {
+	if (this->Race == -1 || this->Faction == -1 || upgrade_class == -1) {
 		return false;
 	}
 	
-	int upgrade_id = PlayerRaces.GetFactionClassUpgrade(this->Faction, GetUpgradeClassIndexByName(upgrade_class_name));
+	int upgrade_id = PlayerRaces.GetFactionClassUpgrade(this->Faction, upgrade_class);
 	
 	if (upgrade_id != -1 && this->Allow.Upgrades[upgrade_id] == 'R') {
 		return true;
@@ -2252,6 +2304,24 @@ void CPlayer::GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUn
 			}
 		}
 	}
+}
+
+std::vector<CUpgrade *> CPlayer::GetResearchableUpgrades()
+{
+	std::vector<CUpgrade *> researchable_upgrades;
+	for (std::map<const CUnitType *, int>::iterator iterator = this->UnitTypesAiActiveCount.begin(); iterator != this->UnitTypesAiActiveCount.end(); ++iterator) {
+		const CUnitType *type = iterator->first;
+		if (type->Slot < ((int) AiHelpers.ResearchedUpgrades.size())) {
+			for (size_t i = 0; i < AiHelpers.ResearchedUpgrades[type->Slot].size(); ++i) {
+				CUpgrade *upgrade = AiHelpers.ResearchedUpgrades[type->Slot][i];
+				if (std::find(researchable_upgrades.begin(), researchable_upgrades.end(), upgrade) == researchable_upgrades.end()) {
+					researchable_upgrades.push_back(upgrade);
+				}
+			}
+		}
+	}
+	
+	return researchable_upgrades;
 }
 //Wyrmgus end
 

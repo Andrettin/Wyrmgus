@@ -232,8 +232,9 @@ public:
 	void SetFaction(CFaction *faction);
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
+	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorUsed(int color);
-	bool HasUpgradeClass(std::string upgrade_class_name);
+	bool HasUpgradeClass(int upgrade_class);
 	bool HasSettlement(CSettlement *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
 	bool HasUnitBuilder(CUnitType *type, CSettlement *settlement = NULL) const;
@@ -243,6 +244,7 @@ public:
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(int title_type, int gender) const;
 	void GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUnitType *building);	/// Builds a vector with worker landmasses; the building is the structure to be built by the worker in question
+	std::vector<CUpgrade *> GetResearchableUpgrades();
 	//Wyrmgus end
 
 	/// Clear turn related player data

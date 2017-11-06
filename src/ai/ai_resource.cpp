@@ -2410,18 +2410,7 @@ void AiCheckDockConstruction()
 
 void AiCheckUpgrades()
 {
-	std::vector<CUpgrade *> potential_upgrades;
-	for (std::map<const CUnitType *, int>::iterator iterator = AiPlayer->Player->UnitTypesAiActiveCount.begin(); iterator != AiPlayer->Player->UnitTypesAiActiveCount.end(); ++iterator) {
-		const CUnitType *type = iterator->first;
-		if (type->Slot < ((int) AiHelpers.ResearchedUpgrades.size())) {
-			for (size_t i = 0; i < AiHelpers.ResearchedUpgrades[type->Slot].size(); ++i) {
-				CUpgrade *upgrade = AiHelpers.ResearchedUpgrades[type->Slot][i];
-				if (std::find(potential_upgrades.begin(), potential_upgrades.end(), upgrade) == potential_upgrades.end()) {
-					potential_upgrades.push_back(upgrade);
-				}
-			}
-		}
-	}
+	std::vector<CUpgrade *> potential_upgrades = AiPlayer->Player->GetResearchableUpgrades();
 	
 	for (size_t i = 0; i < potential_upgrades.size(); ++i) {
 		CUpgrade *upgrade = potential_upgrades[i];

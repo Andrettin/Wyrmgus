@@ -1083,6 +1083,10 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 		}
 		return;
 	}
+	
+	if (unit.Player->Index != player) { //if the player "training" the unit isn't the same one that owns the trainer building, then make the former share some technological progress with the latter
+		Players[player].ShareUpgradeProgress(*unit.Player, unit);
+	}
 
 	if (unit.Type->Stats[unit.Player->Index].UnitStock[type.Slot] != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
 		if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTrain) {

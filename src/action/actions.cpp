@@ -65,6 +65,7 @@
 
 #include "animation/animation_die.h"
 #include "commands.h"
+#include "depend.h"
 #include "interface.h"
 #include "luacallback.h"
 #include "map.h"
@@ -363,7 +364,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 			
 		//if the unit still has less stock than its max, re-init the unit stock timer
-		if (unit.Type->Stats[unit.Player->Index].UnitStock[i] > 0 && unit.GetUnitStockReplenishmentTimer(i) == 0 && unit.GetUnitStock(i) < unit.Type->Stats[unit.Player->Index].UnitStock[i]) {
+		if (unit.Type->Stats[unit.Player->Index].UnitStock[i] > 0 && unit.GetUnitStockReplenishmentTimer(i) == 0 && unit.GetUnitStock(i) < unit.Type->Stats[unit.Player->Index].UnitStock[i] && CheckDependByType(*unit.Player, *UnitTypes[i])) {
 			unit.UnitStockReplenishmentTimers[i] = UnitTypes[i]->Stats[unit.Player->Index].Costs[TimeCost] * 50;
 		}
 	}
