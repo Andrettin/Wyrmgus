@@ -624,7 +624,7 @@ void GameMainLoop()
 								continue;
 							}
 							for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
-								if (second_iterator->first.year == 0 || CurrentCampaign->StartDate >= second_iterator->first) {
+								if (second_iterator->first.year == 0 || CurrentCampaign->StartDate.ContainsDate(second_iterator->first)) {
 									if (second_iterator->second && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
 										UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
 									} else if (!second_iterator->second) {
@@ -641,7 +641,7 @@ void GameMainLoop()
 								continue;
 							}
 							for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
-								if (second_iterator->first.year == 0 || CurrentCampaign->StartDate >= second_iterator->first) {
+								if (second_iterator->first.year == 0 || CurrentCampaign->StartDate.ContainsDate(second_iterator->first)) {
 									if (second_iterator->second && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
 										UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
 									} else if (!second_iterator->second) {
@@ -652,7 +652,7 @@ void GameMainLoop()
 						}
 
 						for (std::map<std::pair<int, CFaction *>, int>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
-							if (iterator->second == 0 || CurrentCampaign->StartDate.year >= iterator->first.first) {
+							if (iterator->first.first == 0 || CurrentCampaign->StartDate.year >= iterator->first.first) {
 								CPlayer *diplomacy_state_player = GetFactionPlayer(iterator->first.second);
 								if (diplomacy_state_player) {
 									CommandDiplomacy(i, iterator->second, diplomacy_state_player->Index);
@@ -666,7 +666,7 @@ void GameMainLoop()
 						}
 
 						for (std::map<std::pair<CDate, int>, int>::iterator iterator = faction->HistoricalResources.begin(); iterator != faction->HistoricalResources.end(); ++iterator) { //set the appropriate historical resource quantities
-							if (iterator->second == 0 || CurrentCampaign->StartDate >= iterator->first.first) {
+							if (iterator->first.first.year == 0 || CurrentCampaign->StartDate.ContainsDate(iterator->first.first)) {
 								Players[i].SetResource(iterator->first.second, iterator->second);
 							}
 						}
