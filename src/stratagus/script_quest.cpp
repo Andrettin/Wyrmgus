@@ -518,6 +518,18 @@ static int CclDefineCampaign(lua_State *l)
 			CclGetDate(l, &campaign->StartDate);
 		} else if (!strcmp(value, "StartEffects")) {
 			campaign->StartEffects = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "RequiredQuests")) {
+			campaign->RequiredQuests.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string quest_ident = LuaToString(l, -1, j + 1);
+				CQuest *required_quest = GetQuest(quest_ident);
+				if (required_quest) {
+					campaign->RequiredQuests.push_back(required_quest);
+				} else {
+					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_ident.c_str());
+				}
+			}
 		} else if (!strcmp(value, "MapTemplates")) {
 			campaign->MapTemplates.clear();
 			campaign->MapSizes.clear();
@@ -617,6 +629,14 @@ static int CclGetCampaignData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Sandbox")) {
 		lua_pushboolean(l, campaign->Sandbox);
+		return 1;
+	} else if (!strcmp(data, "RequiredQuests")) {
+		lua_createtable(l, campaign->RequiredQuests.size(), 0);
+		for (size_t i = 1; i <= campaign->RequiredQuests.size(); ++i)
+		{
+			lua_pushstring(l, campaign->RequiredQuests[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
 		return 1;
 	} else if (!strcmp(data, "MapTemplate")) {
 		if (!campaign->MapTemplates.empty()) {
