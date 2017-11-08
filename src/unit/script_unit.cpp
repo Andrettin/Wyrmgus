@@ -1238,7 +1238,7 @@ static int CclSetTeleportDestination(lua_State *l)
 */
 static int CclOrderUnit(lua_State *l)
 {
-	LuaCheckArgs(l, 5);
+	LuaCheckArgs(l, 7);
 
 	lua_pushvalue(l, 1);
 	const int plynr = TriggerGetPlayer(l);
@@ -1252,7 +1252,7 @@ static int CclOrderUnit(lua_State *l)
 	Vec2i pos1;
 	pos1.x = LuaToNumber(l, 3, 1);
 	pos1.y = LuaToNumber(l, 3, 2);
-
+	
 	Vec2i pos2;
 	if (lua_rawlen(l, 3) == 4) {
 		pos2.x = LuaToNumber(l, 3, 3);
@@ -1260,41 +1260,30 @@ static int CclOrderUnit(lua_State *l)
 	} else {
 		pos2 = pos1;
 	}
-	//Wyrmgus start
-	/*
-	if (!lua_istable(l, 4)) {
-		LuaError(l, "incorrect argument");
-	}
+	
+	int z = LuaToNumber(l, 4);
+
 	Vec2i dpos1;
 	Vec2i dpos2;
-	dpos1.x = LuaToNumber(l, 4, 1);
-	dpos1.y = LuaToNumber(l, 4, 2);
-	if (lua_rawlen(l, 4) == 4) {
-		dpos2.x = LuaToNumber(l, 4, 3);
-		dpos2.y = LuaToNumber(l, 4, 4);
-	} else {
-		dpos2 = dpos1;
-	}
-	*/
-	Vec2i dpos1;
-	Vec2i dpos2;
-	if (lua_istable(l, 4)) {
-		dpos1.x = LuaToNumber(l, 4, 1);
-		dpos1.y = LuaToNumber(l, 4, 2);
-		if (lua_rawlen(l, 4) == 4) {
-			dpos2.x = LuaToNumber(l, 4, 3);
-			dpos2.y = LuaToNumber(l, 4, 4);
+	if (lua_istable(l, 5)) {
+		dpos1.x = LuaToNumber(l, 5, 1);
+		dpos1.y = LuaToNumber(l, 5, 2);
+		if (lua_rawlen(l, 5) == 4) {
+			dpos2.x = LuaToNumber(l, 5, 3);
+			dpos2.y = LuaToNumber(l, 5, 4);
 		} else {
 			dpos2 = dpos1;
 		}
 	}
-	//Wyrmgus end
-	const char *order = LuaToString(l, 5);
+	
+	int d_z = 0;
+	if (lua_isnumber(l, 6)) {
+		d_z = LuaToNumber(l, 6);
+	}
+
+	const char *order = LuaToString(l, 7);
 	std::vector<CUnit *> table;
-	//Wyrmgus start
-//	Select(pos1, pos2, table);
-	Select(pos1, pos2, table, 0);
-	//Wyrmgus end
+	Select(pos1, pos2, table, z);
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -1306,26 +1295,26 @@ static int CclOrderUnit(lua_State *l)
 				if (!strcmp(order, "move")) {
 					//Wyrmgus start
 //					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
-					CommandMove(unit, (dpos1 + dpos2) / 2, 1, unit.MapLayer);
+					CommandMove(unit, (dpos1 + dpos2) / 2, 1, d_z);
 					//Wyrmgus end
 				} else if (!strcmp(order, "attack")) {
 					CUnit *attack = TargetOnMap(unit, dpos1, dpos2);
 
 					//Wyrmgus start
 //					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
-					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1, unit.MapLayer);
+					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1, d_z);
 					//Wyrmgus end
 				//Wyrmgus start
 				} else if (!strcmp(order, "attack-ground")) {
 					//Wyrmgus start
 //					CommandAttackGround(unit, (dpos1 + dpos2) / 2, 1);
-					CommandAttackGround(unit, (dpos1 + dpos2) / 2, 1, unit.MapLayer);
+					CommandAttackGround(unit, (dpos1 + dpos2) / 2, 1, d_z);
 					//Wyrmgus end
 				//Wyrmgus end
 				} else if (!strcmp(order, "patrol")) {
 					//Wyrmgus start
 //					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
-					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1, unit.MapLayer);
+					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1, d_z);
 					//Wyrmgus end
 				//Wyrmgus start
 				} else if (!strcmp(order, "board")) {
@@ -1335,7 +1324,7 @@ static int CclOrderUnit(lua_State *l)
 				} else if (!strcmp(order, "unload")) {
 					//Wyrmgus start
 //					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1);
-					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1, unit.MapLayer);
+					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1, d_z);
 					//Wyrmgus end
 				} else if (!strcmp(order, "stop")) {					
 					CommandStopUnit(unit);
@@ -1888,6 +1877,8 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushnumber(l, -1);
 		}
 		return 1;
+	} else if (!strcmp(value, "MapLayer")) {
+		lua_pushnumber(l, unit->MapLayer);
 	} else if (!strcmp(value, "EffectiveResourceSellPrice")) {
 		LuaCheckArgs(l, 3);
 		std::string resource_ident = LuaToString(l, 3);
