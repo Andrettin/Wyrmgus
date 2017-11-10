@@ -267,6 +267,7 @@ public:
 	void UpdateQuestPool();
 	void AvailableQuestsChanged();
 	void UpdateCurrentQuests();
+	void UpdateQuest(CQuest *quest);
 	void AcceptQuest(CQuest *quest);
 	void CompleteQuest(CQuest *quest);
 	void FailQuest(CQuest *quest, std::string fail_reason = "");

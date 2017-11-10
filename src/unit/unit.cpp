@@ -6605,14 +6605,6 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 			}
 		}
 	}
-	
-	if (target.Player->GetUnitCount() == 1) {
-		for (size_t i = 0; i < attacker.Player->QuestDestroyFactions.size(); ++i) {
-			if (std::get<1>(attacker.Player->QuestDestroyFactions[i])->Civilization == target.Player->Race && std::get<1>(attacker.Player->QuestDestroyFactions[i])->ID == target.Player->Faction) {
-				std::get<2>(attacker.Player->QuestDestroyFactions[i]) = true;
-			}
-		}
-	}
 	//Wyrmgus end
 }
 

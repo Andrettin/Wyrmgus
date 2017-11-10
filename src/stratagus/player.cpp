@@ -2623,12 +2623,32 @@ void CPlayer::AvailableQuestsChanged()
 
 void CPlayer::UpdateCurrentQuests()
 {
+	for (size_t i = 0; i < this->CurrentQuests.size(); ++i) {
+		this->UpdateQuest(CurrentQuests[i]);
+	}
+	
 	for (int i = (this->CurrentQuests.size()  - 1); i >= 0; --i) {
 		std::string failed_quest = this->HasFailedQuest(this->CurrentQuests[i]);
 		if (!failed_quest.empty()) {
 			this->FailQuest(this->CurrentQuests[i], failed_quest);
 		} else if (this->HasCompletedQuest(this->CurrentQuests[i])) {
 			this->CompleteQuest(this->CurrentQuests[i]);
+		}
+	}
+}
+
+void CPlayer::UpdateQuest(CQuest *quest)
+{
+	if (!quest) {
+		return;
+	}
+	
+	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
+		if (std::get<0>(this->QuestDestroyFactions[i]) == quest && std::get<2>(this->QuestDestroyFactions[i]) == false) { // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
+			CPlayer *faction_player = GetFactionPlayer(std::get<1>(this->QuestDestroyFactions[i]));
+			if (faction_player && faction_player->GetUnitCount() == 0) {
+				std::get<2>(this->QuestDestroyFactions[i]) = true;
+			}
 		}
 	}
 }
@@ -3075,9 +3095,9 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 	}
 
 	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyFactions[i]) == quest && std::get<2>(this->QuestDestroyFactions[i]) == false) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+		if (std::get<0>(this->QuestDestroyFactions[i]) == quest && std::get<2>(this->QuestDestroyFactions[i]) == false) { // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
 			CPlayer *faction_player = GetFactionPlayer(std::get<1>(this->QuestDestroyFactions[i]));
-			if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
+			if (faction_player == NULL) {
 				return "The target no longer exists.";
 			}
 		}
