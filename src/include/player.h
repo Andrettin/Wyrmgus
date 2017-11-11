@@ -202,7 +202,7 @@ public:
 	int    TotalBuildings;
 	int    TotalResources[MaxCosts];
 	int    TotalRazings;
-	int    TotalKills;      /// How many unit killed
+	int    TotalKills;      /// How many units killed
 	//Wyrmgus start
 	int UnitTypeKills[UnitTypeMax];  /// total killed units of unit-type
 	//Wyrmgus end
