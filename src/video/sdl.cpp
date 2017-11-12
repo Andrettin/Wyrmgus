@@ -793,6 +793,10 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 	if (ZoomNoResize && (event.type & (SDL_MOUSEBUTTONUP | SDL_MOUSEBUTTONDOWN | SDL_MOUSEMOTION))) {
 		event.button.x = (Uint16)floorf(event.button.x * float(Video.Width) / Video.ViewportWidth);
 		event.button.y = (Uint16)floorf(event.button.y * float(Video.Height) / Video.ViewportHeight);
+		//Wyrmgus start
+		event.motion.x = (Uint16)floorf(event.motion.x * float(Video.Width) / Video.ViewportWidth);
+		event.motion.y = (Uint16)floorf(event.motion.y * float(Video.Height) / Video.ViewportHeight);
+		//Wyrmgus end
 	}
 #endif
 	switch (event.type) {
