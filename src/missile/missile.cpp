@@ -161,7 +161,7 @@ MissileType *NewMissileTypeSlot(const std::string &ident)
 */
 Missile::Missile() :
 	Type(NULL), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
-	Delay(0), SourceUnit(), TargetUnit(), Damage(0),
+	Delay(0), SourceUnit(), TargetUnit(), Damage(0), LightningDamage(0),
 	TTL(-1), Hidden(0), DestroyMissile(0),
 	CurrentStep(0), TotalStep(0),
 	//Wyrmgus start
