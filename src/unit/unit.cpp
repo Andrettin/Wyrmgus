@@ -692,7 +692,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 			this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 			// if there are no level-up upgrades available for the unit, increase its HP instead
 			if (this->GetAvailableLevelUpUpgrades() < this->Variable[LEVELUP_INDEX].Value) {
-				this->Variable[HP_INDEX].Max += 15;
+				this->Variable[HP_INDEX].Max += 10;
 				this->Variable[LEVELUP_INDEX].Value -= 1;
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 			}

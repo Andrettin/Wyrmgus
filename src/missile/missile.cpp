@@ -360,18 +360,26 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		piercing_damage *= 2;
 	}
 	*/
+	//apply damage modifiers, but don't stack the effects of Blessing, Inspire, Bloodlust and Leadership
 	int damage_modifier = 100;
 	if (attacker.Variable[BLOODLUST_INDEX].Value > 0) {
 		damage_modifier += 100;
-	} else if (attacker.Variable[INSPIRE_INDEX].Value > 0) { // don't stack the effects of Inspire, Bloodlust and Leadership
+	} else if (attacker.Variable[INSPIRE_INDEX].Value > 0 || attacker.Variable[BLESSING_INDEX].Value > 0) {
 		damage_modifier += 50;
 	} else if (attacker.Variable[LEADERSHIP_INDEX].Value > 0) {
 		damage_modifier += 10;
+	} else if (attacker.Variable[WITHER_INDEX].Value > 0) {
+		damage_modifier -= 50;
 	}
 	
 	int accuracy_modifier = 100;
 	if (attacker.Variable[PRECISION_INDEX].Value > 0) {
 		accuracy_modifier += 100;
+	}
+	
+	int evasion_modifier = 100;
+	if (goal && goal->Variable[BLESSING_INDEX].Value > 0) {
+		evasion_modifier += 50;
 	}
 	
 	int critical_strike_chance = attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value;
@@ -492,7 +500,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 				if (goal->Variable[EVASION_INDEX].Value > 0) {
 					damage += accuracy;
 					if (goal->Variable[STUN_INDEX].Value == 0) { //stunned targets cannot evade
-						damage -= goal->Variable[EVASION_INDEX].Value;
+						damage -= goal->Variable[EVASION_INDEX].Value * evasion_modifier / 100;
 					}
 					
 					if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building && goal->Type->NumDirections == 8) { //flanking
@@ -510,7 +518,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 			} else {
 				if (goal_stats.Variables[EVASION_INDEX].Value > 0) {
 					damage += accuracy;
-					damage -= goal_stats.Variables[EVASION_INDEX].Value;
+					damage -= goal_stats.Variables[EVASION_INDEX].Value * evasion_modifier / 100;
 				}
 			}
 		}
@@ -615,6 +623,11 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 		accuracy_modifier += 100;
 	}
 	
+	int evasion_modifier = 100;
+	if (goal && goal->Variable[BLESSING_INDEX].Value > 0) {
+		evasion_modifier += 50;
+	}
+	
 	int accuracy = attacker.Variable[ACCURACY_INDEX].Value;
 	accuracy *= accuracy_modifier;
 	accuracy /= 100;
@@ -643,6 +656,10 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 				evasion = goal_stats.Variables[EVASION_INDEX].Value;
 			}
 		}
+		
+		evasion *= evasion_modifier;
+		evasion /= 100;
+		
 		if (accuracy > 0) {
 			accuracy = SyncRand(accuracy);
 		}
