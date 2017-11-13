@@ -1321,8 +1321,9 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 //			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage) / splash;
 			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage, &missile) / splash;
 			//Wyrmgus end
-		} else if (missile.Damage) {  // direct damage, spells mostly
+		} else if (missile.Damage || missile.LightningDamage) {  // direct damage, spells mostly
 			damage = missile.Damage / splash;
+			damage += missile.LightningDamage * (100 - goal.Variable[LIGHTNINGRESISTANCE_INDEX].Value) / 100 / splash;
 		} else {
 			Assert(missile.SourceUnit != NULL);
 			//Wyrmgus start
@@ -1338,7 +1339,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 
 		HitUnit(missile.SourceUnit, goal, damage, &missile);
 		//Wyrmgus start
-		if (missile.Type->Damage == 0 && missile.Damage == 00 && goal.IsAlive()) {
+		if (missile.Type->Damage == 0 && missile.Damage == 0 && missile.LightningDamage == 0 && goal.IsAlive()) {
 			HitUnit_NormalHitSpecialDamageEffects(*missile.SourceUnit, goal);
 		}
 		//Wyrmgus end
@@ -1377,26 +1378,17 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 	//Wyrmgus end
 		return;
 	}
-	if (missile.Damage) {  // direct damage, spells mostly
-		//Wyrmgus start
-//		Map.HitWall(tilePos, missile.Damage / splash);
-		Map.HitWall(tilePos, missile.Damage / splash, missile.MapLayer);
-		//Wyrmgus end
+	
+	stats = Map.Field(tilePos, missile.MapLayer)->OverlayTerrain->UnitType->Stats;
+	
+	if (missile.Damage || missile.LightningDamage) {  // direct damage, spells mostly
+		int damage = missile.Damage / splash;
+		damage += missile.LightningDamage * (100 - stats->Variables[LIGHTNINGRESISTANCE_INDEX].Value) / 100 / splash;
+		Map.HitWall(tilePos, damage, missile.MapLayer);
 		return;
 	}
 
 	Assert(missile.SourceUnit != NULL);
-	//Wyrmgus start
-	/*
-	if (Map.HumanWallOnMap(tilePos)) {
-		stats = UnitTypeHumanWall->Stats;
-	} else {
-		Assert(Map.OrcWallOnMap(tilePos));
-		stats = UnitTypeOrcWall->Stats;
-	}
-	*/
-	stats = Map.Field(tilePos, missile.MapLayer)->OverlayTerrain->UnitType->Stats;
-	//Wyrmgus end
 
 	//Wyrmgus start
 	if (!missile.AlwaysHits && CalculateHit(*missile.SourceUnit, *stats, NULL) == false) {
@@ -1833,6 +1825,7 @@ void Missile::SaveMissile(CFile &file) const
 		file.printf(" \"target\", \"%s\",", UnitReference(this->TargetUnit).c_str());
 	}
 	file.printf(" \"damage\", %d,", this->Damage);
+	file.printf(" \"lightning-damage\", %d,", this->LightningDamage);
 	file.printf(" \"ttl\", %d,", this->TTL);
 	if (this->Hidden) {
 		file.printf(" \"hidden\", ");

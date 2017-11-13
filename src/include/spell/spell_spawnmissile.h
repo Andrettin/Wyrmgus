@@ -68,7 +68,7 @@ public:
 class Spell_SpawnMissile : public SpellActionType
 {
 public:
-	Spell_SpawnMissile() : Damage(0), TTL(-1), Delay(0), UseUnitVar(false),
+	Spell_SpawnMissile() : Damage(0), LightningDamage(0), TTL(-1), Delay(0), UseUnitVar(false),
 	//Wyrmgus start
 	AlwaysHits(false), AlwaysCritical(false),
 	//Wyrmgus end
@@ -79,6 +79,7 @@ public:
 
 private:
 	int Damage;                             /// Missile damage.
+	int LightningDamage;                    /// Missile lightning damage.
 	int TTL;                                /// Missile TTL.
 	int Delay;                              /// Missile original delay.
 	bool UseUnitVar;                        /// Use the caster's damage parameters

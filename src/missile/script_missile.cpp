@@ -330,6 +330,9 @@ static int CclMissile(lua_State *l)
 		} else if (!strcmp(value, "damage")) {
 			Assert(missile);
 			missile->Damage = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "lightning-damage")) {
+			Assert(missile);
+			missile->LightningDamage = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "ttl")) {
 			Assert(missile);
 			missile->TTL = LuaToNumber(l, j + 1);

@@ -107,6 +107,8 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 		++j;
 		if (!strcmp(value, "damage")) {
 			this->Damage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "lightning-damage")) {
+			this->LightningDamage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "use-unit-var")) {
 			this->UseUnitVar = true;
 			--j;
@@ -252,12 +254,14 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		//Wyrmgus end
 		missile->TTL = this->TTL;
 		missile->Delay = this->Delay;
-		missile->Damage = this->Damage * modifier / 100;
 		if (this->UseUnitVar) {
-			missile->Damage = 0;
 			missile->SourceUnit = &caster;
-		} else if (missile->Damage != 0) {
-			missile->SourceUnit = &caster;
+		} else {
+			missile->Damage = this->Damage * modifier / 100;
+			missile->LightningDamage = this->LightningDamage * modifier / 100;
+			if (missile->Damage != 0 || missile->LightningDamage != 0) {
+				missile->SourceUnit = &caster;
+			}
 		}
 		//Wyrmgus start
 		if (this->AlwaysHits) {

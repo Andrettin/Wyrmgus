@@ -458,7 +458,8 @@ public:
 
 	std::vector<CUnit *> PiercedUnits;	/// Units which are already pierced by this missile
 
-	int Damage;  /// direct damage that missile applies
+	int Damage;				/// direct damage that the missile applies
+	int LightningDamage;	/// direct lightning damage that the missile applies
 
 	int TTL;             /// time to live (ticks) used for spells
 	int Hidden;          /// If this is 1 then the missile is invisible
