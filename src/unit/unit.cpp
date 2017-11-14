@@ -6236,6 +6236,9 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	// removed units,  just remove.
 	if (unit.Removed) {
 		DebugPrint("Killing a removed unit?\n");
+		if (unit.UnitInside) {
+			DestroyAllInside(unit);
+		}
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		unit.Release();
@@ -6291,7 +6294,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	unit.SoldUnits.clear();
 	//Wyrmgus end
 
-	// Transporters lose or save their units and building their workers
+	// Transporters lose or save their units and buildings their workers
 	//Wyrmgus start
 //	if (unit.UnitInside && unit.Type->BoolFlag[SAVECARGO_INDEX].value) {
 	if (
