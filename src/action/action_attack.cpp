@@ -337,7 +337,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 {
 	//Wyrmgus start
 //	Assert(unit.Type->CanAttack);
-	if (!unit.CanAttack()) {
+	if (!unit.CanAttack(false)) {
 		return;
 	}
 	//Wyrmgus end

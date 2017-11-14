@@ -162,7 +162,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 {
 	//Wyrmgus start
 //	if (unit.Type->CanAttack == false) {
-	if (unit.CanAttack() == false) {
+	if (unit.CanAttack(false) == false) {
 	//Wyrmgus end
 		return;
 	}

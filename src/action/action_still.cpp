@@ -162,6 +162,10 @@ private:
 
 /* virtual */ void COrder_Still::OnAnimationAttack(CUnit &unit)
 {
+	if (unit.CanAttack(false) == false) {
+		return;
+	}
+	
 	CUnit *goal = this->GetGoal();
 	if (goal == NULL) {
 		return;
