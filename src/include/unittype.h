@@ -1296,9 +1296,10 @@ extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Up
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
 //Wyrmgus start
-extern int GetUnitTypeClassIndexByName(const std::string &class_name);
+extern int GetUnitTypeClassIndexByName(std::string class_name);
+extern int GetOrAddUnitTypeClassIndexByName(std::string class_name);
 extern void SetUnitTypeClassStringToIndex(std::string class_name, int class_id);
-extern int GetUpgradeClassIndexByName(const std::string &class_name);
+extern int GetUpgradeClassIndexByName(std::string class_name);
 extern void SetUpgradeClassStringToIndex(std::string class_name, int class_id);
 
 extern std::string GetUnitTypeStatsString(std::string unit_type_ident);

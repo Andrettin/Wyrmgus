@@ -1451,12 +1451,27 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 }
 
 //Wyrmgus start
-int GetUnitTypeClassIndexByName(const std::string &class_name)
+int GetUnitTypeClassIndexByName(std::string class_name)
 {
+	if (class_name.empty()) {
+		return -1;
+	}
+	
 	if (UnitTypeClassStringToIndex.find(class_name) != UnitTypeClassStringToIndex.end()) {
-		return UnitTypeClassStringToIndex[class_name];
+		return UnitTypeClassStringToIndex.find(class_name)->second;
 	}
 	return -1;
+}
+
+int GetOrAddUnitTypeClassIndexByName(std::string class_name)
+{
+	int index = GetUnitTypeClassIndexByName(class_name);
+	if (index == -1 && !class_name.empty()) {
+		SetUnitTypeClassStringToIndex(class_name, UnitTypeClasses.size());
+		index = UnitTypeClasses.size();
+		UnitTypeClasses.push_back(class_name);
+	}
+	return index;
 }
 
 void SetUnitTypeClassStringToIndex(std::string class_name, int class_id)
@@ -1464,10 +1479,10 @@ void SetUnitTypeClassStringToIndex(std::string class_name, int class_id)
 	UnitTypeClassStringToIndex[class_name] = class_id;
 }
 
-int GetUpgradeClassIndexByName(const std::string &class_name)
+int GetUpgradeClassIndexByName(std::string class_name)
 {
 	if (UpgradeClassStringToIndex.find(class_name) != UpgradeClassStringToIndex.end()) {
-		return UpgradeClassStringToIndex[class_name];
+		return UpgradeClassStringToIndex.find(class_name)->second;
 	}
 	return -1;
 }

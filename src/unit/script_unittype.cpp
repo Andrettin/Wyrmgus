@@ -2044,16 +2044,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "Class")) {
-			std::string class_name = LuaToString(l, -1);
-			
-			int class_id = GetUnitTypeClassIndexByName(class_name);
-			if (class_id == -1 && !class_name.empty()) {
-				SetUnitTypeClassStringToIndex(class_name, UnitTypeClasses.size());
-				class_id = UnitTypeClasses.size();
-				UnitTypeClasses.push_back(class_name);
-			}
-		
-			type->Class = class_id;
+			type->Class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
 			type->Civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());

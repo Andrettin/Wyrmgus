@@ -1068,12 +1068,7 @@ static int CclDefineCivilization(lua_State *l)
 				if (class_name.empty()) {
 					LuaError(l, "Class is given as a blank string.");
 				}
-				int class_id = GetUnitTypeClassIndexByName(class_name);
-				if (class_id == -1) {
-					SetUnitTypeClassStringToIndex(class_name, UnitTypeClasses.size());
-					class_id = UnitTypeClasses.size();
-					UnitTypeClasses.push_back(class_name);
-				}
+				int class_id = GetOrAddUnitTypeClassIndexByName(class_name);
 				++j;
 				
 				civilization->UnitClassNames[class_id].push_back(LuaToString(l, -1, j + 1));
