@@ -367,7 +367,9 @@ static int CclGetQuestData(lua_State *l)
 	std::string quest_ident = LuaToString(l, 1);
 	const CQuest *quest = GetQuest(quest_ident);
 	if (!quest) {
-		LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_ident.c_str());
+		fprintf(stderr, "Quest \"%s\" doesn't exist.\n", quest_ident.c_str());
+		lua_pushnil(l);
+		return 0;
 	}
 	const char *data = LuaToString(l, 2);
 
