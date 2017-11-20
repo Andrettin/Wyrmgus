@@ -501,9 +501,13 @@ public:
 	int ViewportWidth;         /// Actual width of the window
 	int ViewportHeight;        /// Actual height of the window
 #endif
-#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+//Wyrmgus start
+//#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+//Wyrmgus end
 	SDL_Cursor *blankCursor;
-#endif
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 	int Depth;
 	bool FullScreen;
 };
