@@ -740,11 +740,11 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				this->Variable[LEVELUP_INDEX].Value -= 1;
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 				CUnitType *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
-				TransformUnitIntoType(*this, *chosen_unit_type);
-				upgrade_found = true;
 				if (this->Player == ThisPlayer) {
 					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->Name.c_str());
 				}
+				TransformUnitIntoType(*this, *chosen_unit_type);
+				upgrade_found = true;
 			}
 		}
 			
