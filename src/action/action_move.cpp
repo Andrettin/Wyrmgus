@@ -193,6 +193,7 @@ int DoActionMove(CUnit &unit)
 				if (table[i]->Moving) {
 					unit.Wait = 1;
 					unit.Moving = 0;
+					unit.StepCount = 0;
 					return PF_WAIT;
 				}
 			}
@@ -205,6 +206,7 @@ int DoActionMove(CUnit &unit)
 				if (table[i]->Moving) {
 					unit.Wait = 1;
 					unit.Moving = 0;
+					unit.StepCount = 0;
 					return PF_WAIT;
 				}
 			}
@@ -248,6 +250,7 @@ int DoActionMove(CUnit &unit)
 					AiCanNotMove(unit);
 				}
 				unit.Moving = 0;
+				unit.StepCount = 0;
 				return d;
 			case PF_REACHED: // Reached goal, stop
 				unit.Moving = 0;
@@ -256,6 +259,7 @@ int DoActionMove(CUnit &unit)
 				unit.Wait = 10;
 
 				unit.Moving = 0;
+				unit.StepCount = 0;
 				return d;
 			default: // On the way moving
 				unit.Moving = 1;
@@ -294,6 +298,8 @@ int DoActionMove(CUnit &unit)
 		//Wyrmgus start
 //		unit.MoveToXY(pos);
 		unit.MoveToXY(pos, unit.MapLayer);
+		unit.StepCount++;
+		unit.StepCount = std::min(unit.StepCount, (unsigned char) 10);
 		//Wyrmgus end
 		//Wyrmgus start
 		PlayUnitSound(unit, VoiceStep);			
@@ -372,6 +378,7 @@ int DoActionMove(CUnit &unit)
 	if (!unit.Anim.Unbreakable && !unit.IX && !unit.IY) {
 		unit.Moving = 0;
 	}
+
 	return d;
 }
 

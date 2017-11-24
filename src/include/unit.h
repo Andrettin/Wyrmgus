@@ -580,6 +580,8 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 
 	unsigned int Wait;          /// action counter
 	int Threshold;              /// The counter while ai unit couldn't change target.
+	
+	unsigned char StepCount;	/// How many steps the unit has taken without stopping (maximum 10)
 
 	struct _unit_anim_ {
 		const CAnimation *Anim;      /// Anim

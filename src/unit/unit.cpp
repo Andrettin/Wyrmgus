@@ -524,6 +524,7 @@ void CUnit::Init()
 	GivesResource = 0;
 	//Wyrmgus end
 	CurrentResource = 0;
+	StepCount = 0;
 	Orders.clear();
 	delete SavedOrder;
 	SavedOrder = NULL;
@@ -1433,7 +1434,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 			|| i == ARMOR_INDEX || i == FIRERESISTANCE_INDEX || i == COLDRESISTANCE_INDEX || i == ARCANERESISTANCE_INDEX || i == LIGHTNINGRESISTANCE_INDEX
 			|| i == AIRRESISTANCE_INDEX || i == EARTHRESISTANCE_INDEX || i == WATERRESISTANCE_INDEX
 			|| i == HACKRESISTANCE_INDEX || i == PIERCERESISTANCE_INDEX || i == BLUNTRESISTANCE_INDEX
-			|| i == ACCURACY_INDEX || i == EVASION_INDEX || i == SPEED_INDEX || i == BACKSTAB_INDEX
+			|| i == ACCURACY_INDEX || i == EVASION_INDEX || i == SPEED_INDEX || i == CHARGEBONUS_INDEX || i == BACKSTAB_INDEX
 		) {
 			Variable[i].Value += item.Variable[i].Value;
 			Variable[i].Max += item.Variable[i].Max;
@@ -1469,7 +1470,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 			|| i == ARMOR_INDEX || i == FIRERESISTANCE_INDEX || i == COLDRESISTANCE_INDEX || i == ARCANERESISTANCE_INDEX || i == LIGHTNINGRESISTANCE_INDEX
 			|| i == AIRRESISTANCE_INDEX || i == EARTHRESISTANCE_INDEX || i == WATERRESISTANCE_INDEX
 			|| i == HACKRESISTANCE_INDEX || i == PIERCERESISTANCE_INDEX || i == BLUNTRESISTANCE_INDEX
-			|| i == ACCURACY_INDEX || i == EVASION_INDEX || i == SPEED_INDEX || i == BACKSTAB_INDEX
+			|| i == ACCURACY_INDEX || i == EVASION_INDEX || i == SPEED_INDEX || i == CHARGEBONUS_INDEX || i == BACKSTAB_INDEX
 		) {
 			Variable[i].Value -= item.Variable[i].Value;
 			Variable[i].Max -= item.Variable[i].Max;

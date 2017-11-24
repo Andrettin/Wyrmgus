@@ -551,6 +551,8 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "threshold")) {
 			// FIXME : unsigned long should be better handled
 			unit->Threshold = LuaToNumber(l, 2, j + 1);
+		} else if (!strcmp(value, "step-count")) {
+			unit->StepCount = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "group-id")) {
 			unit->GroupId = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "last-group")) {

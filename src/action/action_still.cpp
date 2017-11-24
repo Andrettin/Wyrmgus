@@ -180,6 +180,7 @@ private:
 	FireMissile(unit, goal, goal->tilePos, goal->MapLayer);
 	//Wyrmgus end
 	UnHideUnit(unit);
+	unit.StepCount = 0;
 }
 
 
@@ -560,6 +561,7 @@ bool AutoAttack(CUnit &unit)
 			if (SyncRand(10000) == 0) {
 				PlayUnitSound(unit, VoiceIdle);
 			}
+			unit.StepCount = 0;
 			//Wyrmgus end
 			break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.

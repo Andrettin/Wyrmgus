@@ -177,6 +177,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 		//Wyrmgus end
 		UnHideUnit(unit); // unit is invisible until attacks
 	}
+	unit.StepCount = 0;
 	// Fixme : Auto select position to attack ?
 }
 

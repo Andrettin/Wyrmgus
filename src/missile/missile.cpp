@@ -372,6 +372,10 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		damage_modifier -= 50;
 	}
 	
+	if (attacker.Variable[CHARGEBONUS_INDEX].Value != 0) {
+		damage_modifier += attacker.Variable[CHARGEBONUS_INDEX].Value * attacker.StepCount;
+	}
+	
 	int accuracy_modifier = 100;
 	if (attacker.Variable[PRECISION_INDEX].Value > 0) {
 		accuracy_modifier += 100;
