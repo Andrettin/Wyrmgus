@@ -966,6 +966,7 @@ public:
 	int ShadowOffsetY;                                    /// Shadow vertical offset
 	//Wyrmgus start
 	int TrainQuantity;										/// Quantity to be trained
+	int CostModifier;										/// Cost modifier (cost increase for every unit of this type the player has)
 	int HairColor;											/// Hair color of the unit type (used for color conversion)
 	int ItemClass;											/// Item class (if the unit type is an item)
 	CSpecies *Species;
@@ -1079,7 +1080,6 @@ public:
 	unsigned AirUnit : 1;           /// Air animated
 	unsigned SeaUnit : 1;           /// Sea animated
 	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
-	unsigned Building : 1;          /// Building
 	unsigned CanAttack : 1;         /// Unit can attack.
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 

@@ -138,14 +138,14 @@ private:
 class IsBuildingType : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return unit->Type->Building; }
+	bool operator()(const CUnit *unit) const { return unit->Type->BoolFlag[BUILDING_INDEX].value; }
 };
 
 //Wyrmgus start
 class IsNotBuildingType : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return !unit->Type->Building; }
+	bool operator()(const CUnit *unit) const { return !unit->Type->BoolFlag[BUILDING_INDEX].value; }
 };
 
 class IsOrganicType : public CUnitFilter

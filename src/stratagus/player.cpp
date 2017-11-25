@@ -3451,11 +3451,11 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 int CPlayer::CheckLimits(const CUnitType &type) const
 {
 	//  Check game limits.
-	if (type.Building && NumBuildings >= BuildingLimit) {
+	if (type.BoolFlag[BUILDING_INDEX].value && NumBuildings >= BuildingLimit) {
 		Notify("%s", _("Building Limit Reached"));
 		return -1;
 	}
-	if (!type.Building && (this->GetUnitCount() - NumBuildings) >= UnitLimit) {
+	if (!type.BoolFlag[BUILDING_INDEX].value && (this->GetUnitCount() - NumBuildings) >= UnitLimit) {
 		Notify("%s", _("Unit Limit Reached"));
 		return -2;
 	}
@@ -3642,14 +3642,20 @@ void CPlayer::GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire
 	}
 	if (hire) {
 		type_costs[CopperCost] = type->Stats[this->Index].GetPrice();
-		if (type->TrainQuantity) {
-			type_costs[CopperCost] *= type->TrainQuantity;
-		}
 	} else {
 		for (int i = 0; i < MaxCosts; ++i) {
 			type_costs[i] = type->Stats[this->Index].Costs[i];
-			if (type->TrainQuantity) {
-				type_costs[i] *= type->TrainQuantity;
+		}
+	}
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (type->TrainQuantity) {
+			type_costs[i] *= type->TrainQuantity;
+		}
+		if (type->CostModifier) {
+			int type_count = this->GetUnitTypeCount(type);
+			for (int j = 0; j < type_count; ++j) {
+				type_costs[i] *= 100 + type->CostModifier;
+				type_costs[i] /= 100;
 			}
 		}
 	}

@@ -665,7 +665,6 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 static void UpdateDefaultBoolFlags(CUnitType &type)
 {
 	// BoolFlag
-	type.BoolFlag[BUILDING_INDEX].value              = type.Building;
 	type.BoolFlag[FLIP_INDEX].value                  = type.Flip;
 	type.BoolFlag[LANDUNIT_INDEX].value              = type.LandUnit;
 	type.BoolFlag[AIRUNIT_INDEX].value               = type.AirUnit;
@@ -765,6 +764,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[PRIORITY_INDEX].Max  = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max;
 			type->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
 			type->TrainQuantity = parent_type->TrainQuantity;
+			type->CostModifier = parent_type->CostModifier;
 			type->ItemClass = parent_type->ItemClass;
 			type->HairColor = parent_type->HairColor;
 			type->MaxOnBoard = parent_type->MaxOnBoard;
@@ -776,7 +776,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->LandUnit = parent_type->LandUnit;
 			type->SeaUnit = parent_type->SeaUnit;
 			type->AirUnit = parent_type->AirUnit;
-			type->Building = parent_type->Building;
 			type->BoardSize = parent_type->BoardSize;
 			type->ButtonLevelForTransporter = parent_type->ButtonLevelForTransporter;
 			type->ButtonLevelForInventory = parent_type->ButtonLevelForInventory;
@@ -1671,8 +1670,6 @@ static int CclDefineUnitType(lua_State *l)
 			} else {
 				type->CanTarget &= ~CanTargetAir;
 			}
-		} else if (!strcmp(value, "Building")) {
-			type->Building = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "BuildingRules")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2079,6 +2076,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->BuildingRulesString = LuaToString(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
 			type->TrainQuantity = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "CostModifier")) {
+			type->CostModifier = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Elixir")) {
 			std::string elixir_ident = LuaToString(l, -1);
 			int elixir_id = UpgradeIdByIdent(elixir_ident);
@@ -2291,7 +2290,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	// If number of directions is not specified, make a guess
 	// Building have 1 direction and units 8
-	if (type->Building && type->NumDirections == 0) {
+	if (type->BoolFlag[BUILDING_INDEX].value && type->NumDirections == 0) {
 		type->NumDirections = 1;
 	} else if (type->NumDirections == 0) {
 		type->NumDirections = 8;
@@ -2814,6 +2813,9 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "TrainQuantity")) {
 		lua_pushnumber(l, type->TrainQuantity);
 		return 1;
+	} else if (!strcmp(data, "CostModifier")) {
+		lua_pushnumber(l, type->CostModifier);
+		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "DrawLevel")) {
 		lua_pushnumber(l, type->DrawLevel);
@@ -2898,7 +2900,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushboolean(l, type->CanAttack);
 		return 1;
 	} else if (!strcmp(data, "Building")) {
-		lua_pushboolean(l, type->Building);
+		lua_pushboolean(l, type->BoolFlag[BUILDING_INDEX].value);
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Item")) {

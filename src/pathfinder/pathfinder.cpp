@@ -258,7 +258,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length)
 //Wyrmgus end
 {
 	//  Find a path to the goal.
-	if (src.Type->Building) {
+	if (src.Type->BoolFlag[BUILDING_INDEX].value) {
 		return 0;
 	}
 	const int depth = PlaceReachable(src, dst.tilePos,

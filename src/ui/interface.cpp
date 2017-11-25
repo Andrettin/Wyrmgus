@@ -344,12 +344,12 @@ static void UiAddGroupToSelection(unsigned group)
 	}
 
 	//  Don't allow to mix units and buildings
-	if (!Selected.empty() && Selected[0]->Type->Building) {
+	if (!Selected.empty() && Selected[0]->Type->BoolFlag[BUILDING_INDEX].value) {
 		return;
 	}
 
 	for (size_t i = 0; i != units.size(); ++i) {
-		if (!(units[i]->Removed || units[i]->Type->Building)) {
+		if (!(units[i]->Removed || units[i]->Type->BoolFlag[BUILDING_INDEX].value)) {
 			SelectUnit(*units[i]);
 		}
 	}

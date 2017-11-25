@@ -2486,7 +2486,7 @@ void CUnit::Init(const CUnitType &type)
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
-	if (type.NumDirections > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false && type.Sprite && !type.Building) {
+	if (type.NumDirections > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false && type.Sprite && !type.BoolFlag[BUILDING_INDEX].value) {
 		Direction = (SyncRand() >> 8) & 0xFF; // random heading
 		UnitUpdateHeading(*this);
 	}
@@ -2601,7 +2601,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		if (!SaveGameLoading) {
 			// If unit is dying, it's already been lost by all players
 			// don't count again
-			if (type.Building) {
+			if (type.BoolFlag[BUILDING_INDEX].value) {
 				// FIXME: support more races
 				//Wyrmgus start
 //				if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
@@ -2653,8 +2653,8 @@ void CUnit::AssignToPlayer(CPlayer &player)
 
 	// Don't Add the building if it's dying, used to load a save game
 	//Wyrmgus start
-//	if (type.Building && CurrentAction() != UnitActionDie) {
-	if (type.Building && CurrentAction() != UnitActionDie && !this->Destroyed && !type.BoolFlag[VANISHES_INDEX].value) {
+//	if (type.BoolFlag[BUILDING_INDEX].value && CurrentAction() != UnitActionDie) {
+	if (type.BoolFlag[BUILDING_INDEX].value && CurrentAction() != UnitActionDie && !this->Destroyed && !type.BoolFlag[VANISHES_INDEX].value) {
 	//Wyrmgus end
 		// FIXME: support more races
 		//Wyrmgus start
@@ -2767,7 +2767,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	}
 
 	//  fancy buildings: mirror buildings (but shadows not correct)
-	if (type.Building && FancyBuildings
+	if (type.BoolFlag[BUILDING_INDEX].value && FancyBuildings
 		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && (SyncRand() & 1) != 0) {
 		unit->Frame = -unit->Frame - 1;
 	}
@@ -3778,7 +3778,7 @@ void UnitLost(CUnit &unit)
 	if (!type.BoolFlag[VANISHES_INDEX].value) {
 		player.RemoveUnit(unit);
 
-		if (type.Building) {
+		if (type.BoolFlag[BUILDING_INDEX].value) {
 			// FIXME: support more races
 			//Wyrmgus start
 //			if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
@@ -4450,7 +4450,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 
 	//  Now the new side!
 
-	if (Type->Building) {
+	if (Type->BoolFlag[BUILDING_INDEX].value) {
 		//Wyrmgus start
 //		if (!Type->BoolFlag[WALL_INDEX].value) {
 		//Wyrmgus end
@@ -4484,8 +4484,8 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 		}
 	}
 	//Wyrmgus start
-//	if (Type->Building && !Type->BoolFlag[WALL_INDEX].value) {
-	if (Type->Building) {
+//	if (Type->BoolFlag[BUILDING_INDEX].value && !Type->BoolFlag[WALL_INDEX].value) {
+	if (Type->BoolFlag[BUILDING_INDEX].value) {
 	//Wyrmgus end
 		newplayer.NumBuildings++;
 	}
@@ -4806,7 +4806,7 @@ void UnitUpdateHeading(CUnit &unit)
 		unit.Frame += 256 / nextdir - dir;
 		unit.Frame = -unit.Frame - 1;
 	}
-	if (neg && !unit.Frame && unit.Type->Building) {
+	if (neg && !unit.Frame && unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		unit.Frame = -1;
 	}
 }
@@ -6526,7 +6526,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 	//moved this because it was causing message spam
 	//Wyrmgus end
 
-	if (attacker && !target.Type->Building) {
+	if (attacker && !target.Type->BoolFlag[BUILDING_INDEX].value) {
 		//Wyrmgus start
 //		if (target.Player->AiEnabled) {
 		if (
@@ -6555,7 +6555,7 @@ static bool HitUnit_IsUnitWillDie(const CUnit *attacker, const CUnit &target, in
 static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 {
 	attacker.Player->Score += target.Variable[POINTS_INDEX].Value;
-	if (target.Type->Building) {
+	if (target.Type->BoolFlag[BUILDING_INDEX].value) {
 		attacker.Player->TotalRazings++;
 	} else {
 		attacker.Player->TotalKills++;
@@ -6682,7 +6682,7 @@ static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, int damage)
 	// Only worker types can capture.
 	// Still possible to destroy building if not careful (too many attackers)
 	if (EnableBuildingCapture && attacker
-		&& target.Type->Building && target.Variable[HP_INDEX].Value <= damage * 3
+		&& target.Type->BoolFlag[BUILDING_INDEX].value && target.Variable[HP_INDEX].Value <= damage * 3
 		&& attacker->IsEnemy(target)
 		&& attacker->Type->RepairRange) {
 		target.ChangeOwner(*attacker->Player);
@@ -6944,7 +6944,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	//Wyrmgus start
 	if ((attacker != NULL && attacker->Player == ThisPlayer) &&
 		target.Player != ThisPlayer &&
-		(type->Building == 1 ||
+		(type->BoolFlag[BUILDING_INDEX].value == 1 ||
 		type->CanAttack == 1)
 		) {
 		// If player is hitting or being hit add tension to our music
@@ -7040,8 +7040,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	HitUnit_ShowImpactMissile(target);
 
 	//Wyrmgus start
-//	if (type->Building && !target.Burning) {
-	if (type->Building && !target.Burning && !target.Constructed && target.Type->TileWidth != 1 && target.Type->TileHeight != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
+//	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning) {
+	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.Constructed && target.Type->TileWidth != 1 && target.Type->TileHeight != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
 	//Wyrmgus end
 		HitUnit_Burning(target);
 	}

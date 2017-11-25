@@ -576,7 +576,7 @@ CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
-	TrainQuantity(0), ItemClass(-1), HairColor(0),
+	TrainQuantity(0), CostModifier(0), ItemClass(-1), HairColor(0),
 	Class(-1), Civilization(-1), Faction(-1), Species(NULL), TerrainType(NULL),
 	//Wyrmgus end
 	Animations(NULL), StillFrame(0),
@@ -598,7 +598,7 @@ CUnitType::CUnitType() :
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
 	MouseAction(0), CanTarget(0),
 	Flip(0), LandUnit(0), AirUnit(0), SeaUnit(0),
-	ExplodeWhenKilled(0), Building(0),
+	ExplodeWhenKilled(0),
 	CanAttack(0),
 	Neutral(0),
 	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
@@ -1080,7 +1080,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 
 	// Non-solid units can always be entered and they don't block anything
 	if (type.BoolFlag[NONSOLID_INDEX].value) {
-		if (type.Building) {
+		if (type.BoolFlag[BUILDING_INDEX].value) {
 			type.MovementMask = MapFieldLandUnit |
 								MapFieldSeaUnit |
 								MapFieldBuilding |
@@ -1223,7 +1223,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			type.MovementMask = 0;
 			break;
 	}
-	if (type.Building || type.BoolFlag[SHOREBUILDING_INDEX].value) {
+	if (type.BoolFlag[BUILDING_INDEX].value || type.BoolFlag[SHOREBUILDING_INDEX].value) {
 		// Shore building is something special.
 		if (type.BoolFlag[SHOREBUILDING_INDEX].value) {
 			type.MovementMask =

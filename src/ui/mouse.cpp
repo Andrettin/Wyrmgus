@@ -3130,11 +3130,11 @@ void UIHandleButtonUp(unsigned button)
 				} else if (KeyModifiers & ModifierShift
 						   && (unit->Player == ThisPlayer || ThisPlayer->IsTeamed(*unit))
 						   //Wyrmgus start
-//						   && !unit->Type->Building
+//						   && !unit->Type->BoolFlag[BUILDING_INDEX].value
 						   && (!Selected.size() || UnitCanBeSelectedWith(*Selected[0], *unit))
 						   //Wyrmgus end
 						   //Wyrmgus start
-//						   && (Selected.size() != 1 || !Selected[0]->Type->Building)
+//						   && (Selected.size() != 1 || !Selected[0]->Type->BoolFlag[BUILDING_INDEX].value)
 						   //Wyrmgus end
 						   && (Selected.size() != 1 || Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0]))) {
 					num = ToggleSelectUnit(*unit);

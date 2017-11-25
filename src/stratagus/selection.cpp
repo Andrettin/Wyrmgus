@@ -326,11 +326,11 @@ void UnSelectUnit(CUnit &unit)
 //Wyrmgus start
 bool UnitCanBeSelectedWith(CUnit &first_unit, CUnit &second_unit)
 {
-	if (first_unit.Type->Building != second_unit.Type->Building) {
+	if (first_unit.Type->BoolFlag[BUILDING_INDEX].value != second_unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		return false;
 	}
 
-	if (first_unit.Type->Building) {
+	if (first_unit.Type->BoolFlag[BUILDING_INDEX].value) {
 		if (second_unit.Type != first_unit.Type) {
 			return false;
 		}
@@ -685,7 +685,7 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
 			
-			if (!unit.Type->Building) {
+			if (!unit.Type->BoolFlag[BUILDING_INDEX].value) {
 				hasNonBuilding = true;
 			}
 		}
@@ -706,7 +706,7 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
 		}
 		//Wyrmgus start
 		//only select buildings if another building of the same type is already selected
-		if (added_table == false && unit.Type->Building && ((i != 0 && !UnitCanBeSelectedWith(*table[0], unit)) || hasNonBuilding)) {
+		if (added_table == false && unit.Type->BoolFlag[BUILDING_INDEX].value && ((i != 0 && !UnitCanBeSelectedWith(*table[0], unit)) || hasNonBuilding)) {
 			continue;
 		}
 		//Wyrmgus end
@@ -816,7 +816,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 		}
 		const CUnitType &type = *unit.Type;
 		// Buildings are visible but not selectable
-		if (type.Building && !unit.IsVisibleOnMap(*ThisPlayer)) {
+		if (type.BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*ThisPlayer)) {
 			continue;
 		}
 		if ((type.GivesResource && !unit.Removed)) { // no built resources.
@@ -833,7 +833,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 			continue;
 		}
 		// Buildings are visible but not selectable
-		if (unit.Type->Building && !unit.IsVisibleOnMap(*ThisPlayer)) {
+		if (unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*ThisPlayer)) {
 			continue;
 		}
 		if (unit.IsAliveOnMap()) {
@@ -878,7 +878,7 @@ int SelectArmy()
 		if (unit.TeamSelected) { // Somebody else on team has this unit
 			continue;
 		}
-		if (unit.Type->Building) { //this selection mode is not for buildings
+		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
 		if (unit.Type->BoolFlag[HARVESTER_INDEX].value) { //this selection mode is not for workers
@@ -991,7 +991,7 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 			continue;
 		}
 		//Wyrmgus start
-		if (unit.Type->Building) { //this selection mode is not for buildings
+		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
 		//Wyrmgus end
@@ -1042,7 +1042,7 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 			continue;
 		}
 		//Wyrmgus start
-		if (unit.Type->Building) { //this selection mode is not for buildings
+		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
 		//Wyrmgus end
@@ -1080,7 +1080,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	// If there is no selected unit yet, do a simple selection.
 	//Wyrmgus start
 //	if (Selected.empty()) {
-	if (Selected.empty() || (Selected.size() && Selected[0]->Type->Building)) {
+	if (Selected.empty() || (Selected.size() && Selected[0]->Type->BoolFlag[BUILDING_INDEX].value)) {
 	//Wyrmgus end
 		return SelectGroundUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
@@ -1114,7 +1114,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 			continue;
 		}
 		//Wyrmgus start
-		if (unit.Type->Building) { //this selection mode is not for buildings
+		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
 		//Wyrmgus end
@@ -1153,7 +1153,7 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	// If there is no selected unit yet, do a simple selection.
 	//Wyrmgus start
 //	if (Selected.empty()) {
-	if (Selected.empty() || (Selected.size() && Selected[0]->Type->Building)) {
+	if (Selected.empty() || (Selected.size() && Selected[0]->Type->BoolFlag[BUILDING_INDEX].value)) {
 	//Wyrmgus end
 		return SelectAirUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
@@ -1185,7 +1185,7 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 			continue;
 		}
 		//Wyrmgus start
-		if (unit.Type->Building) { //this selection mode is not for buildings
+		if (unit.Type->BoolFlag[BUILDING_INDEX].value) { //this selection mode is not for buildings
 			continue;
 		}
 		//Wyrmgus end

@@ -97,7 +97,7 @@
 	}
 	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
 	if (caster.IsEnemy(*target)) {
-		if (target->Type->Building) {
+		if (target->Type->BoolFlag[BUILDING_INDEX].value) {
 			caster.Player->TotalRazings++;
 		} else {
 			caster.Player->TotalKills++;

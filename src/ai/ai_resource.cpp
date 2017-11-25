@@ -943,7 +943,7 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 		//
 		// Check if we have a place for building or a unit to build.
 		//
-		if (type.Building) {
+		if (type.BoolFlag[BUILDING_INDEX].value) {
 			n = AiHelpers.Build.size();
 			tablep = &AiHelpers.Build;
 		} else {
@@ -967,7 +967,7 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 			// The type for builder/trainer is available
 			//
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(table[i])) {
-				if (type.Building) {
+				if (type.BoolFlag[BUILDING_INDEX].value) {
 					//Wyrmgus start
 //					if (AiBuildBuilding(*table[i], type, nearPos)) {
 					if (AiBuildBuilding(*table[i], type, nearPos, z, landmass)) {
@@ -1182,7 +1182,7 @@ static void AiCheckingWork()
 			//Wyrmgus end
 				++queuep->Made;
 				queuep->Wait = 0;
-			} else if (queuep->Type->Building) {
+			} else if (queuep->Type->BoolFlag[BUILDING_INDEX].value) {
 				// Finding a building place is costly, don't try again for a while
 				if (queuep->Wait == 0) {
 					queuep->Wait = GameCycle + 150;

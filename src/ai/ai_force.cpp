@@ -235,7 +235,7 @@ public:
 			//why make sure the enemy is NULL?
 //			Assert(!*enemy);
 			//Wyrmgus end
-			if (*enemy == NULL || !(*enemy)->Type->Building) {
+			if (*enemy == NULL || !(*enemy)->Type->BoolFlag[BUILDING_INDEX].value) {
 				//Wyrmgus start
 //				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);

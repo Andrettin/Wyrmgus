@@ -906,9 +906,9 @@ static int CclCreateUnit(lua_State *l)
 		if (UnitCanBeAt(*unit, ipos, z)
 		//Wyrmgus end
 			//Wyrmgus start
-//			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
+//			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
 //			unit->Place(ipos);
-			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0, true, z))) {
+			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(NULL, *unit->Type, ipos, 0, true, z))) {
 			unit->Place(ipos, z);
 			//Wyrmgus end
 		} else {
@@ -978,7 +978,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, ipos, transporter->MapLayer)
-			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0, true, transporter->MapLayer))) {
+			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(NULL, *unit->Type, ipos, 0, true, transporter->MapLayer))) {
 			unit->Place(ipos, transporter->MapLayer);
 		} else {
 			const int heading = SyncRand() % 256;
@@ -1115,7 +1115,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, new_pos, worker->MapLayer)
-			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, new_pos, 0, true, worker->MapLayer))) {
+			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(NULL, *unit->Type, new_pos, 0, true, worker->MapLayer))) {
 			unit->Place(new_pos, worker->MapLayer);
 		} else {
 			const int heading = SyncRand() % 256;
@@ -1290,8 +1290,8 @@ static int CclOrderUnit(lua_State *l)
 		CUnit &unit = *table[i];
 
 		if (unittype == ANY_UNIT
-			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
-			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
+			|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
+			|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
 			|| unittype == unit.Type) {
 			if (plynr == -1 || plynr == unit.Player->Index) {
 				if (!strcmp(order, "move")) {
@@ -1347,8 +1347,8 @@ public:
 	bool operator()(const CUnit *unit) const
 	{
 		return (type == ANY_UNIT || type == unit->Type
-				|| (type == ALL_FOODUNITS && !unit->Type->Building)
-				|| (type == ALL_BUILDINGS && unit->Type->Building));
+				|| (type == ALL_FOODUNITS && !unit->Type->BoolFlag[BUILDING_INDEX].value)
+				|| (type == ALL_BUILDINGS && unit->Type->BoolFlag[BUILDING_INDEX].value));
 	}
 private:
 	const CUnitType *type;
@@ -1452,8 +1452,8 @@ static int CclKillUnitAt(lua_State *l)
 		CUnit &unit = **it;
 
 		if (unittype == ANY_UNIT
-			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
-			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
+			|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
+			|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
 			|| unittype == unit.Type) {
 			if ((plynr == -1 || plynr == unit.Player->Index) && unit.IsAlive()) {
 				LetUnitDie(unit);

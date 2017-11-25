@@ -229,8 +229,8 @@ static int CclGetNumUnitsAt(lua_State *l)
 		//Wyrmgus end
 
 		if (unittype == ANY_UNIT
-			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
-			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
+			|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
+			|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
 			|| (unittype == unit.Type && !unit.Constructed)) {
 
 			// Check the player
@@ -291,8 +291,8 @@ static int CclIfNearUnit(lua_State *l)
 
 			// Check unit type
 			if (unittype == ANY_UNIT
-				|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
-				|| (unittype == ALL_BUILDINGS && unit.Type->Building)
+				|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
+				|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
 				|| (unittype == unit.Type)) {
 
 				// Check the player
@@ -352,8 +352,8 @@ static int CclIfRescuedNearUnit(lua_State *l)
 				// Check unit type
 
 				if (unittype == ANY_UNIT
-					|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
-					|| (unittype == ALL_BUILDINGS && unit.Type->Building)
+					|| (unittype == ALL_FOODUNITS && !unit.Type->BoolFlag[BUILDING_INDEX].value)
+					|| (unittype == ALL_BUILDINGS && unit.Type->BoolFlag[BUILDING_INDEX].value)
 					|| (unittype == unit.Type)) {
 
 					// Check the player

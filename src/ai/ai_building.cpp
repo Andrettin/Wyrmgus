@@ -375,8 +375,8 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 		// Town hall may not be near but we may be using it, check
 		// for 2 buildings near it and assume it's been used
 		//Wyrmgus start
-//		if (unit.Type->Building && !unit.Type->GivesResource) {
-		if (unit.Type->Building && !unit.GivesResource) {
+//		if (unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.Type->GivesResource) {
+		if (unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.GivesResource) {
 		//Wyrmgus end
 			++buildings;
 			if (buildings == 2) {

@@ -181,7 +181,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 				}
 			}
 		}
-	} else if (CursorBuilding && unit.Type->Building
+	} else if (CursorBuilding && unit.Type->BoolFlag[BUILDING_INDEX].value
 			   && unit.CurrentAction() != UnitActionDie
 			   && (unit.Player == ThisPlayer || ThisPlayer->IsTeamed(unit))) {
 		// If building mark all own buildings
