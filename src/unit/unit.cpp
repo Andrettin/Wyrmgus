@@ -2664,6 +2664,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			//Wyrmgus start
 			if (CurrentAction() == UnitActionBuilt) {
 				player.NumBuildingsUnderConstruction++;
+				player.ChangeUnitTypeUnderConstructionCount(&type, 1);
 			}
 			//Wyrmgus end
 		//Wyrmgus start
@@ -3787,6 +3788,7 @@ void UnitLost(CUnit &unit)
 				//Wyrmgus start
 				if (unit.CurrentAction() == UnitActionBuilt) {
 					player.NumBuildingsUnderConstruction--;
+					player.ChangeUnitTypeUnderConstructionCount(&type, -1);
 				}
 				//Wyrmgus end
 			//Wyrmgus start
@@ -4492,6 +4494,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus start
 	if (CurrentAction() == UnitActionBuilt) {
 		newplayer.NumBuildingsUnderConstruction++;
+		newplayer.ChangeUnitTypeUnderConstructionCount(this->Type, 1);
 	}
 	//Wyrmgus end
 	newplayer.ChangeUnitTypeCount(this->Type, 1);

@@ -111,6 +111,11 @@ int GetPlayerData(const int player, const char *prop, const char *arg)
 		CUnitType *type = UnitTypeByIdent(unit);
 		Assert(type);
 		return Players[player].GetUnitTypeCount(type);
+	} else if (!strcmp(prop, "UnitTypesUnderConstructionCount")) {
+		const std::string unit(arg);
+		CUnitType *type = UnitTypeByIdent(unit);
+		Assert(type);
+		return Players[player].GetUnitTypeUnderConstructionCount(type);
 	} else if (!strcmp(prop, "UnitTypesAiActiveCount")) {
 		const std::string unit(arg);
 		CUnitType *type = UnitTypeByIdent(unit);

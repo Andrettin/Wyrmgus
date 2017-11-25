@@ -3238,6 +3238,12 @@ static int CclGetPlayerData(lua_State *l)
 		Assert(type);
 		lua_pushnumber(l, p->GetUnitTypeCount(type));
 		return 1;
+	} else if (!strcmp(data, "UnitTypesUnderConstructionCount")) {
+		LuaCheckArgs(l, 3);
+		CUnitType *type = CclGetUnitType(l);
+		Assert(type);
+		lua_pushnumber(l, p->GetUnitTypeUnderConstructionCount(type));
+		return 1;
 	} else if (!strcmp(data, "UnitTypesAiActiveCount")) {
 		LuaCheckArgs(l, 3);
 		CUnitType *type = CclGetUnitType(l);

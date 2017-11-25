@@ -464,6 +464,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	//Wyrmgus start
 	build->Player->NumBuildingsUnderConstruction++;
+	build->Player->ChangeUnitTypeUnderConstructionCount(&type, 1);
 	//Wyrmgus end
 
 	// HACK: the building is not ready yet

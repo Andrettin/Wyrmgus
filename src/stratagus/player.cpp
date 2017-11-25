@@ -1538,6 +1538,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	//Wyrmgus start
 	this->UnitTypesCount.clear();
+	this->UnitTypesUnderConstructionCount.clear();
 	this->UnitTypesAiActiveCount.clear();
 	this->Heroes.clear();
 	this->Deities.clear();
@@ -2364,6 +2365,7 @@ void CPlayer::Clear()
 	memset(ResourceDemand, 0, sizeof(ResourceDemand));
 	//Wyrmgus end
 	this->UnitTypesCount.clear();
+	this->UnitTypesUnderConstructionCount.clear();
 	this->UnitTypesAiActiveCount.clear();
 	//Wyrmgus start
 	this->Heroes.clear();
@@ -3652,7 +3654,7 @@ void CPlayer::GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire
 			type_costs[i] *= type->TrainQuantity;
 		}
 		if (type->CostModifier) {
-			int type_count = this->GetUnitTypeCount(type);
+			int type_count = this->GetUnitTypeCount(type) + this->GetUnitTypeUnderConstructionCount(type);
 			for (int j = 0; j < type_count; ++j) {
 				type_costs[i] *= 100 + type->CostModifier;
 				type_costs[i] /= 100;
@@ -3699,6 +3701,35 @@ int CPlayer::GetUnitTypeCount(const CUnitType *type) const
 {
 	if (type && this->UnitTypesCount.find(type) != this->UnitTypesCount.end()) {
 		return this->UnitTypesCount.find(type)->second;
+	} else {
+		return 0;
+	}
+}
+
+void CPlayer::SetUnitTypeUnderConstructionCount(const CUnitType *type, int quantity)
+{
+	if (!type) {
+		return;
+	}
+	
+	if (quantity <= 0) {
+		if (this->UnitTypesUnderConstructionCount.find(type) != this->UnitTypesUnderConstructionCount.end()) {
+			this->UnitTypesUnderConstructionCount.erase(type);
+		}
+	} else {
+		this->UnitTypesUnderConstructionCount[type] = quantity;
+	}
+}
+
+void CPlayer::ChangeUnitTypeUnderConstructionCount(const CUnitType *type, int quantity)
+{
+	this->SetUnitTypeUnderConstructionCount(type, this->GetUnitTypeUnderConstructionCount(type) + quantity);
+}
+
+int CPlayer::GetUnitTypeUnderConstructionCount(const CUnitType *type) const
+{
+	if (type && this->UnitTypesUnderConstructionCount.find(type) != this->UnitTypesUnderConstructionCount.end()) {
+		return this->UnitTypesUnderConstructionCount.find(type)->second;
 	} else {
 		return 0;
 	}

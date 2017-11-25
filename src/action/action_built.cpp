@@ -183,6 +183,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus start
 	if (!type.TerrainType) {
 		player.NumBuildingsUnderConstruction--;
+		player.ChangeUnitTypeUnderConstructionCount(&type, -1);
 	}
 	//Wyrmgus end
 	player.ChangeUnitTypeCount(&type, 1);
