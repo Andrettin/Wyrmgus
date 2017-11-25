@@ -3535,22 +3535,9 @@ int CPlayer::CheckUnitType(const CUnitType &type, bool hire) const
 {
 	//Wyrmgus start
 //	return this->CheckCosts(type.Stats[this->Index].Costs);
-	int modified_costs[MaxCosts];
-	memset(modified_costs, 0, sizeof(modified_costs));
-	if (hire) {
-		modified_costs[CopperCost] = type.Stats[this->Index].GetPrice();
-		if (type.TrainQuantity) {
-			modified_costs[CopperCost] *= type.TrainQuantity;
-		}
-	} else {
-		for (int i = 1; i < MaxCosts; ++i) {
-			modified_costs[i] = type.Stats[this->Index].Costs[i];
-			if (type.TrainQuantity) {
-				modified_costs[i] *= type.TrainQuantity;
-			}
-		}
-	}
-	return this->CheckCosts(modified_costs);
+	int type_costs[MaxCosts];
+	this->GetUnitTypeCosts(&type, type_costs, hire);
+	return this->CheckCosts(type_costs);
 	//Wyrmgus end
 }
 
@@ -3578,14 +3565,9 @@ void CPlayer::AddUnitType(const CUnitType &type, bool hire)
 {
 	//Wyrmgus start
 //	AddCosts(type.Stats[this->Index].Costs);
-	if (hire) {
-		int hire_costs[MaxCosts];
-		memset(hire_costs, 0, sizeof(hire_costs));
-		hire_costs[CopperCost] = type.Stats[this->Index].GetPrice();
-		AddCostsFactor(hire_costs, 100 * (type.TrainQuantity ? type.TrainQuantity : 1));
-	} else {
-		AddCostsFactor(type.Stats[this->Index].Costs, 100 * (type.TrainQuantity ? type.TrainQuantity : 1));
-	}
+	int type_costs[MaxCosts];
+	this->GetUnitTypeCosts(&type, type_costs, hire);
+	AddCostsFactor(type_costs, 100);
 	//Wyrmgus end
 }
 
@@ -3630,14 +3612,9 @@ void CPlayer::SubUnitType(const CUnitType &type, bool hire)
 {
 	//Wyrmgus start
 //	this->SubCosts(type.Stats[this->Index].Costs);
-	if (hire) {
-		int hire_costs[MaxCosts];
-		memset(hire_costs, 0, sizeof(hire_costs));
-		hire_costs[CopperCost] = type.Stats[this->Index].GetPrice();
-		this->SubCostsFactor(hire_costs, 100 * (type.TrainQuantity ? type.TrainQuantity : 1));
-	} else {
-		this->SubCostsFactor(type.Stats[this->Index].Costs, 100 * (type.TrainQuantity ? type.TrainQuantity : 1));
-	}
+	int type_costs[MaxCosts];
+	this->GetUnitTypeCosts(&type, type_costs, hire);
+	this->SubCostsFactor(type_costs, 100);
 	//Wyrmgus end
 }
 
@@ -3655,6 +3632,29 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 }
 
 //Wyrmgus start
+/**
+**  Gives the cost of a unit type for the player
+*/
+void CPlayer::GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire) const
+{
+	for (int i = 0; i < MaxCosts; ++i) {
+		type_costs[i] = 0;
+	}
+	if (hire) {
+		type_costs[CopperCost] = type->Stats[this->Index].GetPrice();
+		if (type->TrainQuantity) {
+			type_costs[CopperCost] *= type->TrainQuantity;
+		}
+	} else {
+		for (int i = 0; i < MaxCosts; ++i) {
+			type_costs[i] = type->Stats[this->Index].Costs[i];
+			if (type->TrainQuantity) {
+				type_costs[i] *= type->TrainQuantity;
+			}
+		}
+	}
+}
+
 /**
 **  Gives the cost of an upgrade for the player
 */

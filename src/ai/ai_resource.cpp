@@ -94,7 +94,8 @@ static int AiCheckCosts(const int *costs)
 
 			if (order.Action == UnitActionBuild) {
 				const COrder_Build &orderBuild = static_cast<const COrder_Build &>(order);
-				const int *building_costs = orderBuild.GetUnitType().Stats[AiPlayer->Player->Index].Costs;
+				int building_costs[MaxCosts];
+				AiPlayer->Player->GetUnitTypeCosts(&orderBuild.GetUnitType(), building_costs);
 
 				for (int j = 1; j < MaxCosts; ++j) {
 					used[j] += building_costs[j];
@@ -167,7 +168,9 @@ static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 */
 static int AiCheckUnitTypeCosts(const CUnitType &type)
 {
-	return AiCheckCosts(type.Stats[AiPlayer->Player->Index].Costs);
+	int type_costs[MaxCosts];
+	AiPlayer->Player->GetUnitTypeCosts(&type, type_costs);
+	return AiCheckCosts(type_costs);
 }
 
 class IsAEnemyUnitOf
@@ -533,9 +536,11 @@ void AiNewDepotRequest(CUnit &worker)
 
 		// Check if resources available.
 		//int needmask = AiCheckUnitTypeCosts(type);
+		int type_costs[MaxCosts];
+		worker.Player->GetUnitTypeCosts(&type, type_costs);
 		int cost = 0;
 		for (int c = 1; c < MaxCosts; ++c) {
-			cost += type.Stats[worker.Player->Index].Costs[c];
+			cost += type_costs[c];
 		}
 
 		if (best_type == NULL || (cost < best_cost)) {
@@ -670,9 +675,11 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 			continue;
 		}
 
+		int type_costs[MaxCosts];
+		AiPlayer->Player->GetUnitTypeCosts(&type, type_costs);
 		int cost = 0;
 		for (int c = 1; c < MaxCosts; ++c) {
-			cost += type.Stats[AiPlayer->Player->Index].Costs[c];
+			cost += type_costs[c];
 		}
 		cost /= type.MaxOnBoard;
 
@@ -792,8 +799,11 @@ static bool AiRequestSupply()
 		//
 		cache[j].needmask = AiCheckUnitTypeCosts(type);
 
+		int type_costs[MaxCosts];
+		AiPlayer->Player->GetUnitTypeCosts(&type, type_costs);
+
 		for (int c = 1; c < MaxCosts; ++c) {
-			cache[j].unit_cost += type.Stats[AiPlayer->Player->Index].Costs[c];
+			cache[j].unit_cost += type_costs[c];
 		}
 		cache[j].unit_cost += type.Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value - 1;
 		cache[j].unit_cost /= type.Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value;
@@ -1936,6 +1946,9 @@ static void AiCheckRepair()
 			continue;
 		}
 
+		int type_costs[MaxCosts];
+		AiPlayer->Player->GetUnitTypeCosts(unit.Type, type_costs);
+			
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
 		if (unit.Type->RepairHP
@@ -1963,7 +1976,7 @@ static void AiCheckRepair()
 			// Must check, if there are enough resources
 			//
 			for (int j = 1; j < MaxCosts; ++j) {
-				if (unit.Stats->Costs[j]
+				if (type_costs[j]
 					&& (AiPlayer->Player->Resources[j] + AiPlayer->Player->StoredResources[j])  < 99) {
 					repair_flag = false;
 					break;
@@ -1996,7 +2009,7 @@ static void AiCheckRepair()
 				// Make sure we have enough resources first
 				for (j = 0; j < MaxCosts; ++j) {
 					// FIXME: the resources don't necessarily have to be in storage
-					if (AiPlayer->Player->Resources[j] + AiPlayer->Player->StoredResources[j] < unit.Stats->Costs[j]) {
+					if (AiPlayer->Player->Resources[j] + AiPlayer->Player->StoredResources[j] < type_costs[j]) {
 						break;
 					}
 				}

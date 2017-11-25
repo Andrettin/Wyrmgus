@@ -162,7 +162,9 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 		DropOutOnSide(*worker, LookingW, &unit);
 	}
 	// Player gets back 75% of the original cost for a building.
-	unit.Player->AddCostsFactor(unit.Stats->Costs, CancelBuildingCostsFactor);
+	int type_costs[MaxCosts];
+	unit.Player->GetUnitTypeCosts(unit.Type, type_costs);
+	unit.Player->AddCostsFactor(type_costs, CancelBuildingCostsFactor);
 	// Cancel building
 	LetUnitDie(unit);
 }

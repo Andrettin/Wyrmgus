@@ -969,21 +969,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 //			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
 //				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
 //			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
-			if (button.Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[button.Value] != 0) {
-				Costs[FoodCost] = UnitTypes[button.Value]->Stats[Selected[0]->Player->Index].Variables[DEMAND_INDEX].Value;
-				Costs[CopperCost] = UnitTypes[button.Value]->Stats[Selected[0]->Player->Index].GetPrice();
-				break;
-			} else {
-				memcpy(Costs, UnitTypes[button.Value]->Stats[Selected[0]->Player->Index].Costs,
-					   sizeof(UnitTypes[button.Value]->Stats[Selected[0]->Player->Index].Costs));
-				Costs[FoodCost] = UnitTypes[button.Value]->Stats[Selected[0]->Player->Index].Variables[DEMAND_INDEX].Value;
-				if (button.Action == ButtonTrain && UnitTypes[button.Value]->TrainQuantity > 1) { //if more than one unit is trained in a batch, multiply the costs
-					for (int i = 1; i < MaxCosts; ++i) {
-						Costs[i] *= UnitTypes[button.Value]->TrainQuantity;
-					}
-					Costs[FoodCost] *= UnitTypes[button.Value]->TrainQuantity;
-				}
-			}
+			int type_costs[MaxCosts];
+			ThisPlayer->GetUnitTypeCosts(UnitTypes[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[button.Value] != 0);
+			memcpy(Costs, type_costs, sizeof(type_costs));
+			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
 			//Wyrmgus end
 			break;
 		//Wyrmgus start
@@ -1558,15 +1547,9 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 			//Wyrmgus start
 //			const CUnitStats &stats = UnitTypes[button.Value]->Stats[ThisPlayer->Index];
 //			UI.StatusLine.SetCosts(0, stats.Variables[DEMAND_INDEX].Value, stats.Costs);
-			int modified_costs[MaxCosts];
-			for (int i = 1; i < MaxCosts; ++i) {
-				modified_costs[i] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs[i];
-				if (UnitTypes[button.Value]->TrainQuantity) 
-				{
-					modified_costs[i] *= UnitTypes[button.Value]->TrainQuantity;
-				}
-			}
-			UI.StatusLine.SetCosts(0, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value * (UnitTypes[button.Value]->TrainQuantity ? UnitTypes[button.Value]->TrainQuantity : 1), modified_costs);
+			int type_costs[MaxCosts];
+			ThisPlayer->GetUnitTypeCosts(UnitTypes[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[button.Value] != 0);
+			UI.StatusLine.SetCosts(0, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value * (UnitTypes[button.Value]->TrainQuantity ? UnitTypes[button.Value]->TrainQuantity : 1), type_costs);
 			//Wyrmgus end
 			break;
 		}
@@ -2270,7 +2253,7 @@ void CButtonPanel::DoClicked_Build(int button)
 {
 	// FIXME: store pointer in button table!
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
-	if (!Selected[0]->Player->CheckUnitType(type)) {
+	if (!ThisPlayer->CheckUnitType(type)) {
 		UI.StatusLine.Set(_("Select Location"));
 		UI.StatusLine.ClearCosts();
 		CursorBuilding = &type;
@@ -2397,7 +2380,7 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 	// FIXME: store pointer in button table!
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[0]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
+		if (Selected[i]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
 			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 				SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();

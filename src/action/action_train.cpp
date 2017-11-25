@@ -133,7 +133,9 @@
 
 	//Wyrmgus start
 //	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelTrainingCostsFactor);
-	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelTrainingCostsFactor * (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1));
+	int type_costs[MaxCosts];
+	player.GetUnitTypeCosts(this->Type, type_costs);
+	player.AddCostsFactor(type_costs, CancelTrainingCostsFactor);
 	//Wyrmgus end
 }
 

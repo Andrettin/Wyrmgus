@@ -555,8 +555,11 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 /* virtual */ void COrder_UpgradeTo::Cancel(CUnit &unit)
 {
 	CPlayer &player = *unit.Player;
+	
+	int type_costs[MaxCosts];
+	player.GetUnitTypeCosts(this->Type, type_costs);
 
-	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelUpgradeCostsFactor);
+	player.AddCostsFactor(type_costs, CancelUpgradeCostsFactor);
 }
 
 /* virtual */ void COrder_UpgradeTo::UpdateUnitVariables(CUnit &unit) const
