@@ -616,9 +616,9 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 	//Wyrmgus start
 	distance = distance * 100 / DefaultResourceFinalResourceConversionRates[mine.GivesResource]; // alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
 	if (LuxuryResources[mine.GivesResource]) {
-		int price_modifier = worker.Player->Prices[mine.GivesResource];
+		int price_modifier = worker.Player->GetResourcePrice(mine.GivesResource);
 		if (DefaultResourceInputResources[mine.GivesResource]) {
-			price_modifier -= worker.Player->Prices[DefaultResourceInputResources[mine.GivesResource]];
+			price_modifier -= worker.Player->GetResourcePrice(DefaultResourceInputResources[mine.GivesResource]);
 		}
 		price_modifier = std::max(price_modifier, 1);
 		distance = distance * 100 / price_modifier;

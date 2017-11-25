@@ -1405,13 +1405,13 @@ static void AiProduceResources()
 			
 			int input_resource = DefaultResourceInputResources[resource];
 
-			if (input_resource && !AiCanSellResource(input_resource)) {
+			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && LuxuryResources[resource])) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
 				continue;
 			}
 			
-			int resource_value = AiPlayer->Player->Prices[resource];
+			int resource_value = AiPlayer->Player->GetResourcePrice(resource);
 			if (input_resource) {
-				resource_value -= AiPlayer->Player->Prices[input_resource];
+				resource_value -= AiPlayer->Player->GetResourcePrice(input_resource);
 			}
 
 			if (resource_value > best_value) {

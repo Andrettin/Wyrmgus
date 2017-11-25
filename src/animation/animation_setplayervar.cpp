@@ -90,7 +90,7 @@ int GetPlayerData(const int player, const char *prop, const char *arg)
 			fprintf(stderr, "Invalid resource \"%s\"", arg);
 			Exit(1);
 		}
-		return Players[player].Prices[resId];
+		return Players[player].GetResourcePrice(resId);
 	} else if (!strcmp(prop, "ResourceDemand")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {

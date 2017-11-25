@@ -91,6 +91,7 @@ enum CostType {
 	GoldCost,                               /// gold resource
 	SilverCost,								/// silver resource
 	LimestoneCost,							/// limestone resource
+	JewelryCost,							/// jewelry resource
 	FurnitureCost,							/// furniture resource
 	LeatherCost,							/// leather resource
 	DiamondsCost,							/// diamonds resource

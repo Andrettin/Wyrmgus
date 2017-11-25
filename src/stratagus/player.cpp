@@ -3347,6 +3347,20 @@ int CPlayer::ConvergePricesWith(CPlayer &player, int max_convergences)
 }
 
 /**
+**  Get the price of a resource for the player
+**
+**  @param resource  Resource.
+*/
+int CPlayer::GetResourcePrice(const int resource) const
+{
+	if (resource == CopperCost) {
+		return 100;
+	}
+	
+	return this->Prices[resource];
+}
+
+/**
 **  Get the effective resource demand for the player, given the current prices
 **
 **  @param resource  Resource.

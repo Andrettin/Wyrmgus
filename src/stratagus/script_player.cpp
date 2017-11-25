@@ -3201,7 +3201,7 @@ static int CclGetPlayerData(lua_State *l)
 
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, p->Prices[resId]);
+		lua_pushnumber(l, p->GetResourcePrice(resId));
 		return 1;
 	} else if (!strcmp(data, "ResourceDemand")) {
 		LuaCheckArgs(l, 3);
