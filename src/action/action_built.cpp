@@ -163,7 +163,7 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 	}
 	// Player gets back 75% of the original cost for a building.
 	int type_costs[MaxCosts];
-	unit.Player->GetUnitTypeCosts(unit.Type, type_costs);
+	unit.Player->GetUnitTypeCosts(unit.Type, type_costs, false, true);
 	unit.Player->AddCostsFactor(type_costs, CancelBuildingCostsFactor);
 	// Cancel building
 	LetUnitDie(unit);

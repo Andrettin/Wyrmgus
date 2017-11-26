@@ -3637,7 +3637,7 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 /**
 **  Gives the cost of a unit type for the player
 */
-void CPlayer::GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire) const
+void CPlayer::GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire, bool ignore_one) const
 {
 	for (int i = 0; i < MaxCosts; ++i) {
 		type_costs[i] = 0;
@@ -3655,6 +3655,9 @@ void CPlayer::GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire
 		}
 		if (type->CostModifier) {
 			int type_count = this->GetUnitTypeCount(type) + this->GetUnitTypeUnderConstructionCount(type);
+			if (ignore_one) {
+				type_count--;
+			}
 			for (int j = 0; j < type_count; ++j) {
 				type_costs[i] *= 100 + type->CostModifier;
 				type_costs[i] /= 100;

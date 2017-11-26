@@ -339,7 +339,7 @@ public:
 	void SubCostsFactor(const int *costs, int factor);
 	
 	//Wyrmgus start
-	void GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire = false) const;
+	void GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire = false, bool ignore_one = false) const;
 	void GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs);
 	
 	void SetUnitTypeCount(const CUnitType *type, int quantity);

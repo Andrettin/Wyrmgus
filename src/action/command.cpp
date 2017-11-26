@@ -926,7 +926,7 @@ void CommandDismiss(CUnit &unit, bool salvage)
 				}
 			}
 			int type_costs[MaxCosts];
-			unit.Player->GetUnitTypeCosts(unit.Type, type_costs);
+			unit.Player->GetUnitTypeCosts(unit.Type, type_costs, false, true);
 			unit.Player->AddCostsFactor(type_costs, unit.Variable[SALVAGEFACTOR_INDEX].Value * unit.Variable[HP_INDEX].Value / unit.GetModifiedVariable(HP_INDEX, VariableMax));
 		}
 		DebugPrint("Suicide unit ... \n");
