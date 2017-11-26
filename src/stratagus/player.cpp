@@ -3379,6 +3379,8 @@ int CPlayer::GetEffectiveResourceDemand(const int resource) const
 	if (DefaultResourceDemandElasticities[resource] != 100) {
 		resource_demand = this->ResourceDemand[resource] + ((resource_demand - this->ResourceDemand[resource]) * DefaultResourceDemandElasticities[resource] / 100);
 	}
+	
+	resource_demand = std::max(resource_demand, 0);
 
 	return resource_demand;
 }
