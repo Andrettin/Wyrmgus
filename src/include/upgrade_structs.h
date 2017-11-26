@@ -159,6 +159,7 @@ extern int DefaultResourceFinalResources[MaxCosts];
 extern int DefaultResourceFinalResourceConversionRates[MaxCosts];
 extern int DefaultResourceInputResources[MaxCosts];
 extern int DefaultResourcePrices[MaxCosts];
+extern int DefaultResourceDemandElasticities[MaxCosts];
 //Wyrmgus end
 
 extern int GetResourceIdByName(const char *resourceName);
@@ -169,6 +170,7 @@ extern std::string GetResourceNameById(int resource_id);
 extern void SetResourceFinalResource(std::string resource_name, std::string final_resource_name);
 extern void SetResourceFinalResourceConversionRate(std::string resource_name, int conversion_rate);
 extern void SetResourceInputResource(std::string resource_name, std::string input_resource_name);
+extern void SetResourceDemandElasticity(std::string resource_name, int elasticity);
 //Wyrmgus end
 
 /**

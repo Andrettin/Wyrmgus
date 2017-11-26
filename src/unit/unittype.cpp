@@ -516,6 +516,7 @@ int DefaultResourceFinalResources[MaxCosts];
 int DefaultResourceFinalResourceConversionRates[MaxCosts];
 int DefaultResourceInputResources[MaxCosts];
 int DefaultResourcePrices[MaxCosts];
+int DefaultResourceDemandElasticities[MaxCosts];
 //Wyrmgus end
 
 /**

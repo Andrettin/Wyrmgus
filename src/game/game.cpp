@@ -2168,6 +2168,7 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 		DefaultResourceFinalResourceConversionRates[i] = 100;
 		DefaultResourceInputResources[i] = 0;
 		DefaultResourcePrices[i] = 0;
+		DefaultResourceDemandElasticities[i] = 100;
 	}
 	//Wyrmgus end
 	
@@ -2370,6 +2371,17 @@ void SetResourceInputResource(std::string resource_name, std::string input_resou
 	}
 	
 	DefaultResourceInputResources[resource] = input_resource;
+}
+
+void SetResourceDemandElasticity(std::string resource_name, int elasticity)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	
+	if (resource == -1) {
+		return;
+	}
+	
+	DefaultResourceDemandElasticities[resource] = elasticity;
 }
 //Wyrmgus end
 

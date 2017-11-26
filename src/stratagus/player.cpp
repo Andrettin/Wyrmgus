@@ -3375,6 +3375,10 @@ int CPlayer::GetEffectiveResourceDemand(const int resource) const
 		resource_demand *= DefaultResourcePrices[resource];
 		resource_demand /= this->Prices[resource];
 	}
+	
+	if (DefaultResourceDemandElasticities[resource] != 100) {
+		resource_demand = this->ResourceDemand[resource] + ((resource_demand - this->ResourceDemand[resource]) * DefaultResourceDemandElasticities[resource] / 100);
+	}
 
 	return resource_demand;
 }
