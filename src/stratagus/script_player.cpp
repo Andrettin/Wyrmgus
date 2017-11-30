@@ -2175,10 +2175,19 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int year = LuaToNumber(l, -1, j + 1);
+				CDate date;
+				date.year = 0;
+				date.month = 1;
+				date.day = 1;
+				date.timeline = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &date);
+				lua_pop(l, 1);
 				++j;
-				std::string province_name = LuaToString(l, -1, j + 1);
-				faction->HistoricalCapitals[year] = province_name;
+				
+				std::string settlement_ident = LuaToString(l, -1, j + 1);
+
+				faction->HistoricalCapitals.push_back(std::pair<CDate, std::string>(date, settlement_ident));
 			}
 		} else if (!strcmp(value, "Mod")) {
 			faction->Mod = LuaToString(l, -1);

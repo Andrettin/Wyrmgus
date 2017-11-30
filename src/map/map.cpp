@@ -761,7 +761,17 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			continue;
 		}
 		
-		if (player->StartPos.x == 0 && player->StartPos.y == 0) {
+		bool is_capital = false;
+		for (int i = ((int) settlement_owner->HistoricalCapitals.size() - 1); i >= 0; --i) {
+			if (CurrentCampaign->StartDate.ContainsDate(settlement_owner->HistoricalCapitals[i].first)) {
+				if (settlement_owner->HistoricalCapitals[i].second == settlement_iterator->second->Ident) {
+					is_capital = true;
+				}
+				break;
+			}
+		}
+		
+		if ((player->StartPos.x == 0 && player->StartPos.y == 0) || is_capital) {
 			Vec2i default_pos(map_start_pos + ((settlement_owner->DefaultStartPos - template_start_pos) * this->Scale));
 			if (settlement_owner->DefaultStartPos.x != -1 && settlement_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
 				player->SetStartView(default_pos, z);

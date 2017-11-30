@@ -652,7 +652,7 @@ public:
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
 	std::map<std::pair<int, CFaction *>, int> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
 	std::map<std::pair<CDate, int>, int> HistoricalResources;	/// dates in which this faction's storage of a particular resource changed; resource quantities mapped to date and resource
-	std::map<int, std::string> HistoricalCapitals;						/// dates in which this faction's capital changed; province mapped to year
+	std::vector<std::pair<CDate, std::string>> HistoricalCapitals;		/// historical capitals of the faction; the values are: date and settlement ident
 	std::vector<CFiller> UIFillers;
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
