@@ -450,6 +450,30 @@ static int CclDefineCharacter(lua_State *l)
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "HistoricalFactions")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CDate date;
+				date.year = 0;
+				date.month = 1;
+				date.day = 1;
+				date.timeline = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &date);
+				lua_pop(l, 1);
+				++j;
+				
+				std::string historical_faction_name = LuaToString(l, -1, j + 1);
+				CFaction *historical_faction = PlayerRaces.GetFaction(historical_faction_name);
+				if (!historical_faction) {
+					LuaError(l, "Faction \"%s\" doesn't exist." _C_ historical_faction_name.c_str());
+				}
+				
+				character->HistoricalFactions.push_back(std::pair<CDate, CFaction *>(date, historical_faction));
+			}
 		} else if (!strcmp(value, "HistoricalLocations")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

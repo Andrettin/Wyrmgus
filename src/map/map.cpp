@@ -1167,8 +1167,16 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		if (hero->Date.year == 0 || !CurrentCampaign->StartDate.ContainsDate(hero->Date) || CurrentCampaign->StartDate.ContainsDate(hero->DeathDate)) { //contrary to other elements, heroes aren't implemented if their date isn't set
 			continue;
 		}
+		
+		CFaction *hero_faction = hero->Faction;
+		for (int i = ((int) hero->HistoricalFactions.size() - 1); i >= 0; --i) {
+			if (CurrentCampaign->StartDate.ContainsDate(hero->HistoricalFactions[i].first)) {
+				hero_faction = hero->HistoricalFactions[i].second;
+				break;
+			}
+		}
 
-		CPlayer *hero_player = hero->Faction ? GetFactionPlayer(hero->Faction) : NULL;
+		CPlayer *hero_player = hero_faction ? GetFactionPlayer(hero_faction) : NULL;
 		
 		Vec2i hero_pos(-1, -1);
 		
@@ -1196,8 +1204,8 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			continue;
 		}
 		
-		if (hero->Faction) {
-			hero_player = GetOrAddFactionPlayer(hero->Faction);
+		if (hero_faction) {
+			hero_player = GetOrAddFactionPlayer(hero_faction);
 			if (!hero_player) {
 				continue;
 			}
