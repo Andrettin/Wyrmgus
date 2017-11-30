@@ -1952,8 +1952,6 @@ static int CclDefineFaction(lua_State *l)
 			faction->Icon.Icon = NULL;
 			faction->Icon.Load();
 			faction->Icon.Icon->Load();
-		} else if (!strcmp(value, "DefaultStartPos")) {
-			CclGetPos(l, &faction->DefaultStartPos.x, &faction->DefaultStartPos.y);
 		} else if (!strcmp(value, "DevelopsFrom")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

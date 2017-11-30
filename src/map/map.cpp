@@ -763,7 +763,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 		
 		bool is_capital = false;
 		for (int i = ((int) settlement_owner->HistoricalCapitals.size() - 1); i >= 0; --i) {
-			if (CurrentCampaign->StartDate.ContainsDate(settlement_owner->HistoricalCapitals[i].first)) {
+			if (CurrentCampaign->StartDate.ContainsDate(settlement_owner->HistoricalCapitals[i].first) || settlement_owner->HistoricalCapitals[i].first.year == 0) {
 				if (settlement_owner->HistoricalCapitals[i].second == settlement_iterator->second->Ident) {
 					is_capital = true;
 				}
@@ -772,12 +772,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 		}
 		
 		if ((player->StartPos.x == 0 && player->StartPos.y == 0) || is_capital) {
-			Vec2i default_pos(map_start_pos + ((settlement_owner->DefaultStartPos - template_start_pos) * this->Scale));
-			if (settlement_owner->DefaultStartPos.x != -1 && settlement_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
-				player->SetStartView(default_pos, z);
-			} else {
-				player->SetStartView(settlement_pos, z);
-			}
+			player->SetStartView(settlement_pos, z);
 		}
 		
 		CUnitType *pathway_type = NULL;
@@ -837,12 +832,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 						continue;
 					}
 					if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
-						Vec2i default_pos(map_start_pos + ((building_owner->DefaultStartPos - template_start_pos) * this->Scale));
-						if (building_owner->DefaultStartPos.x != -1 && building_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
-							building_player->SetStartView(default_pos, z);
-						} else {
-							building_player->SetStartView(settlement_pos - unit_offset, z);
-						}
+						building_player->SetStartView(settlement_pos - unit_offset, z);
 					}
 					unit = CreateUnit(settlement_pos - unit_offset, *type, building_player, z);
 				} else {
@@ -903,12 +893,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 							continue;
 						}
 						if (unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
-							Vec2i default_pos(map_start_pos + ((unit_owner->DefaultStartPos - template_start_pos) * this->Scale));
-							if (unit_owner->DefaultStartPos.x != -1 && unit_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
-								unit_player->SetStartView(default_pos, z);
-							} else {
-								unit_player->SetStartView(settlement_pos, z);
-							}
+							unit_player->SetStartView(settlement_pos, z);
 						}
 					} else {
 						unit_player = player;
@@ -1097,12 +1082,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 					continue;
 				}
 				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
-					Vec2i default_pos(map_start_pos + std::get<2>(this->Units[i])->DefaultStartPos - template_start_pos);
-					if (std::get<2>(this->Units[i])->DefaultStartPos.x != -1 && std::get<2>(this->Units[i])->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
-						player->SetStartView(default_pos, z);
-					} else {
-						player->SetStartView(unit_pos, z);
-					}
+					player->SetStartView(unit_pos, z);
 				}
 			} else {
 				player = &Players[PlayerNumNeutral];
