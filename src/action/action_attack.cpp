@@ -125,6 +125,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	order->Range = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
 	//Wyrmgus end
 	order->MinRange = attacker.Type->MinAttackRange;
+	if (attacker.Player->AiEnabled && attacker.Variable[SPEED_INDEX].Value > target.Variable[SPEED_INDEX].Value && attacker.GetModifiedVariable(ATTACKRANGE_INDEX) > target.GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
+		order->MinRange = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
+	}
 
 	//Wyrmgus start
 	if (!attacker.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && !target.IsEnemy(attacker) && (target.Player->Type == PlayerComputer) && (attacker.Player->Type == PlayerComputer || attacker.Player->Type == PlayerPerson)) {
@@ -462,6 +465,9 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			}
 			this->SetGoal(goal);
 			this->MinRange = unit.Type->MinAttackRange;
+			if (unit.Player->AiEnabled && unit.Variable[SPEED_INDEX].Value > goal->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
+				this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
+			}
 			//Wyrmgus start
 //			this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 			this->Range = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
@@ -490,6 +496,12 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			//Wyrmgus start
 			this->MapLayer = newTarget->MapLayer;
 			//Wyrmgus end
+			
+			//set the MinRange here as well, so that hit-and-run attacks will be conducted properly
+			this->MinRange = unit.Type->MinAttackRange;
+			if (unit.Player->AiEnabled && unit.Variable[SPEED_INDEX].Value > newTarget->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > newTarget->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
+				this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
+			}
 		}
 	}
 
@@ -720,6 +732,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		this->MapLayer = goal->MapLayer;
 		//Wyrmgus end
 		this->MinRange = unit.Type->MinAttackRange;
+		if (unit.Player->AiEnabled && unit.Variable[SPEED_INDEX].Value > goal->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
+			this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
+		}
 		//Wyrmgus start
 //		this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 		this->Range = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
@@ -742,6 +757,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				this->MapLayer = newTarget->MapLayer;
 				//Wyrmgus end
 				this->MinRange = unit.Type->MinAttackRange;
+				if (unit.Player->AiEnabled && unit.Variable[SPEED_INDEX].Value > newTarget->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > newTarget->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
+					this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
+				}
 				this->State = MOVE_TO_TARGET;
 			}
 		}
@@ -778,7 +796,10 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		this->State &= WEAK_TARGET;
 		this->State |= MOVE_TO_TARGET;
 	}
-	if (dist < unit.Type->MinAttackRange) {
+	if (
+		dist < unit.Type->MinAttackRange
+		|| (unit.Player->AiEnabled && dist < unit.GetModifiedVariable(ATTACKRANGE_INDEX) && unit.Variable[SPEED_INDEX].Value > goal->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) //makes fast AI ranged units move away from slower targets that have smaller range
+	) {
 		this->State = MOVE_TO_TARGET;
 	}
 
@@ -860,7 +881,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				if (unit.Type->MinAttackRange < dist &&
 					//Wyrmgus start
 //					dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-					dist <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
+					dist <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)
+					&& !(unit.Player->AiEnabled && dist < unit.GetModifiedVariable(ATTACKRANGE_INDEX) && unit.Variable[SPEED_INDEX].Value > goal.Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal.GetModifiedVariable(ATTACKRANGE_INDEX)) //makes fast AI ranged units move away from slower targets that have smaller range
+				) {
 					//Wyrmgus end
 					//Wyrmgus start
 //					if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {

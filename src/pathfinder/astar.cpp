@@ -1258,6 +1258,9 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 	// Don't allow unit inside destination area
 	if (goal.x <= startPos.x && startPos.x <= goal.x + gw - 1
 		&& goal.y <= startPos.y && startPos.y <= goal.y + gh - 1) {
+		//Wyrmgus start
+		ProfileEnd("AStarFindSimplePath"); // seems like this should be here
+		//Wyrmgus end
 		return PF_FAILED;
 	}
 
@@ -1272,7 +1275,7 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 
 	//Wyrmgus start
 //	if (MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1) {
-	if (MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1 && (!unit.Type->BoolFlag[RAIL_INDEX].value || (diff.x == 0 && diff.y == 0))) {
+	if (minrange <= distance && MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1 && (!unit.Type->BoolFlag[RAIL_INDEX].value || (diff.x == 0 && diff.y == 0))) {
 	//Wyrmgus end
 		// Move to adjacent cell
 		//Wyrmgus start
