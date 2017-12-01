@@ -1449,7 +1449,7 @@ void Missile::MissileHit(CUnit *unit)
 	if (mtype.ImpactSound.Sound) {
 		PlayMissileSound(*this, mtype.ImpactSound.Sound);
 	}
-	const PixelPos pixelPos = this->position + this->Type->size / 2;
+	const PixelPos pixelPos = this->position + mtype.size / 2;
 
 	//
 	// The impact generates a new missile.
@@ -1503,7 +1503,7 @@ void Missile::MissileHit(CUnit *unit)
 			}
 		}
 		MissileHitsGoal(*this, *unit, 1);
-		if (this->Type->Class == MissileClassPointToPointBounce && (unit->Type->TileWidth > this->Type->MaxBounceSize || unit->Type->TileHeight > this->Type->MaxBounceSize)) {
+		if (mtype.Class == MissileClassPointToPointBounce && (unit->Type->TileWidth > mtype.MaxBounceSize || unit->Type->TileHeight > mtype.MaxBounceSize)) {
 			this->TTL = 0;
 		}
 		return;
@@ -1532,8 +1532,12 @@ void Missile::MissileHit(CUnit *unit)
 				this->TargetUnit = NULL;
 				return;
 			}
-			MissileHitsGoal(*this, goal, 1);
-			if (this->Type->Class == MissileClassPointToPointBounce && (goal.Type->TileWidth > this->Type->MaxBounceSize || goal.Type->TileHeight > this->Type->MaxBounceSize)) {
+			int splash = 1;
+			if (mtype.Class == MissileClassPointToPointBounce && this->State > 3) {
+				splash = mtype.SplashFactor;
+			}
+			MissileHitsGoal(*this, goal, splash);
+			if (mtype.Class == MissileClassPointToPointBounce && (goal.Type->TileWidth > mtype.MaxBounceSize || goal.Type->TileHeight > mtype.MaxBounceSize)) {
 				this->TTL = 0;
 			}
 			return;
@@ -1612,9 +1616,12 @@ void Missile::MissileHit(CUnit *unit)
 						//Wyrmgus end
 					} else {
 						splash = 1;
+						if (mtype.Class == MissileClassPointToPointBounce && this->State > 3) {
+							splash = mtype.SplashFactor;
+						}
 					}
 					MissileHitsGoal(*this, goal, splash);
-					if (this->Type->Class == MissileClassPointToPointBounce && (goal.Type->TileWidth > this->Type->MaxBounceSize || goal.Type->TileHeight > this->Type->MaxBounceSize)) {
+					if (mtype.Class == MissileClassPointToPointBounce && (goal.Type->TileWidth > mtype.MaxBounceSize || goal.Type->TileHeight > mtype.MaxBounceSize)) {
 						this->TTL = 0;
 					}
 				}
