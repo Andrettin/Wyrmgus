@@ -256,9 +256,7 @@ static int CclMissile(lua_State *l)
 	PixelPos position(-1, -1);
 	PixelPos destination(-1, -1);
 	PixelPos source(-1, -1);
-	//Wyrmgus start
 	int z = 0;
-	//Wyrmgus end
 	Missile *missile = NULL;
 
 	DebugPrint("FIXME: not finished\n");
@@ -359,9 +357,7 @@ static int CclMissile(lua_State *l)
 	missile->position = position;
 	missile->source = source;
 	missile->destination = destination;
-	//Wyrmgus start
 	missile->MapLayer = z;
-	//Wyrmgus end
 	return 0;
 }
 

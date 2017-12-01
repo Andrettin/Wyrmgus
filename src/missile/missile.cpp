@@ -845,6 +845,13 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		missile->TargetUnit = goal;
 	}
 	missile->SourceUnit = &unit;
+
+	//for pierce missiles, make them continue up to the limits of the attacker's range
+	if (missile->Type->Pierce) {
+		const PixelPos diff(missile->destination - missile->source);
+		PixelPos added_distance((diff * unit.GetModifiedVariable(ATTACKRANGE_INDEX) / unit.MapDistanceTo(dpos, z)) - diff);
+		missile->destination += added_distance;
+	}
 }
 
 /**
@@ -1119,10 +1126,12 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 		CUnit &unit = **it;
 
 		if (unit.IsAliveOnMap()
-			//Wyrmgus start
-//			&& (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player))) {
-			&& (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit))) {
-			//Wyrmgus end
+			&& (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit))
+			&& missile.SourceUnit != &unit //don't hit hte source unit, otherwise it will be hit by pierce as soon as it fires the missile
+			&& (!missile.Type->PierceOnce || !IsPiercedUnit(missile, unit))
+			&& CanTarget(*missile.SourceUnit->Type, *unit.Type)
+			&& !unit.Type->BoolFlag[DECORATION_INDEX].value
+		) {
 			missile.MissileHit(&unit);
 		}
 	}
@@ -1238,7 +1247,7 @@ bool PointToPointMissile(Missile &missile)
 		}
 
 		if (missile.Type->Pierce) {
-			const PixelPos posInt((int)pos.x, (int)pos.y);
+			const PixelPos posInt((int)pos.x + missile.Type->size.x / 2, (int)pos.y + missile.Type->size.y / 2);
 			MissileHandlePierce(missile, Map.MapPixelPosToTilePos(posInt));
 		}
 	}
@@ -1278,7 +1287,7 @@ bool PointToPointMissile(Missile &missile)
 			}
 		}
 	}
-
+	
 	if (missile.CurrentStep == missile.TotalStep) {
 		missile.position = missile.destination;
 		return true;
@@ -1306,13 +1315,10 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		}
 		
 		if (!missile.AlwaysHits && CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
-			if (splash == 1 && missile.Type->Range <= 1) {
+			if (splash == 1 && missile.Type->SplashFactor <= 0) {
 				return;
-			} else if (splash == 1 && missile.Type->Range > 1) {
+			} else if (splash == 1 && missile.Type->SplashFactor > 0) {
 				splash = missile.Type->SplashFactor; // if missile has splash but missed, apply splash damage
-				if (missile.Type->SplashFactor == 0) {
-					splash = 1;
-				}
 			}
 		}
 		//Wyrmgus end
@@ -1335,7 +1341,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 			damage = CalculateDamage(*missile.SourceUnit, goal, Damage, &missile) / splash;
 			//Wyrmgus end
 		}
-		if (missile.Type->Pierce) {  // Handle pierce factor
+		if (missile.Type->Pierce && !missile.PiercedUnits.empty()) {  // Handle pierce factor
 			for (size_t i = 0; i < (missile.PiercedUnits.size() - 1); ++i) {
 				damage *= (double)missile.Type->ReduceFactor / 100;
 			}
@@ -1422,7 +1428,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 **  @return         true if goal is pierced, false else.
 */
 
-static bool IsPiercedUnit(const Missile &missile, const CUnit &unit)
+bool IsPiercedUnit(const Missile &missile, const CUnit &unit)
 {
 	for (std::vector<CUnit *>::const_iterator it = missile.PiercedUnits.begin();
 		 it != missile.PiercedUnits.end(); ++it) {

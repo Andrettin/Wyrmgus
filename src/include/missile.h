@@ -482,6 +482,7 @@ public:
 
 extern bool MissileInitMove(Missile &missile);
 extern bool PointToPointMissile(Missile &missile);
+extern bool IsPiercedUnit(const Missile &missile, const CUnit &unit);
 extern void MissileHandlePierce(Missile &missile, const Vec2i &pos);
 extern bool MissileHandleBlocking(Missile &missile, const PixelPos &position);
 
