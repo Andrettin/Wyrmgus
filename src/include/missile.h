@@ -377,6 +377,7 @@ public:
 	bool AlwaysFire;           /// missile will always fire (even if target is dead)
 	bool Pierce;               /// missile will hit every unit on his way
 	bool PierceOnce;           /// pierce every target only once
+	bool PierceIgnoreBeforeGoal;	/// only pierce targets after the goal
 	bool IgnoreWalls;          /// missile ignores Wall units on it's way
 	bool KillFirstUnit;        /// missile kills first unit blocking it's way
 	//Wyrmgus start
@@ -385,6 +386,7 @@ public:
 
 	int Class;                 /// missile class
 	int NumBounces;            /// number of bounces
+	int MaxBounceSize;		   /// if the unit has a size greater than this, the missile won't bounce further
 	int ParabolCoefficient;    /// parabol coefficient in parabolic missile
 	int StartDelay;            /// missile start delay
 	int Sleep;                 /// missile sleep

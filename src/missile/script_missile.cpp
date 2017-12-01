@@ -134,6 +134,8 @@ void MissileType::Load(lua_State *l)
 			}
 		} else if (!strcmp(value, "NumBounces")) {
 			this->NumBounces = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MaxBounceSize")) {
+			this->MaxBounceSize = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ParabolCoefficient")) {
 			this->ParabolCoefficient = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Delay")) {
@@ -192,6 +194,8 @@ void MissileType::Load(lua_State *l)
 			this->Pierce = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PierceOnce")) {
 			this->PierceOnce = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "PierceIgnoreBeforeGoal")) {
+			this->PierceIgnoreBeforeGoal = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "IgnoreWalls")) {
 			this->IgnoreWalls = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "KillFirstUnit")) {

@@ -848,9 +848,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 
 	//for pierce missiles, make them continue up to the limits of the attacker's range
 	if (missile->Type->Pierce) {
-		const PixelPos diff(missile->destination - missile->source);
-		PixelPos added_distance((diff * unit.GetModifiedVariable(ATTACKRANGE_INDEX) / unit.MapDistanceTo(dpos, z)) - diff);
-		missile->destination += added_distance;
+		for (int i = 0; i < (unit.GetModifiedVariable(ATTACKRANGE_INDEX) - unit.MapDistanceTo(dpos, z)); ++i) {
+			const PixelPos diff(missile->destination - missile->source);
+			missile->destination += diff * ((PixelTileSize.x + PixelTileSize.y) * 3) / 4 / Distance(missile->source, missile->destination);
+		}
 	}
 }
 
@@ -1127,10 +1128,11 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 
 		if (unit.IsAliveOnMap()
 			&& (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit))
-			&& missile.SourceUnit != &unit //don't hit hte source unit, otherwise it will be hit by pierce as soon as it fires the missile
+			&& missile.SourceUnit != &unit //don't hit the source unit, otherwise it will be hit by pierce as soon as it fires the missile
 			&& (!missile.Type->PierceOnce || !IsPiercedUnit(missile, unit))
 			&& CanTarget(*missile.SourceUnit->Type, *unit.Type)
 			&& !unit.Type->BoolFlag[DECORATION_INDEX].value
+			&& (!missile.Type->PierceIgnoreBeforeGoal || !missile.TargetUnit || IsPiercedUnit(missile, *missile.TargetUnit) || missile.TargetUnit == &unit)
 		) {
 			missile.MissileHit(&unit);
 		}
@@ -1402,13 +1404,10 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 
 	//Wyrmgus start
 	if (!missile.AlwaysHits && CalculateHit(*missile.SourceUnit, *stats, NULL) == false) {
-		if (splash == 1 && missile.Type->Range <= 1) {
+		if (splash == 1 && missile.Type->SplashFactor <= 0) {
 			return;
-		} else if (splash == 1 && missile.Type->Range > 1) {
+		} else if (splash == 1 && missile.Type->SplashFactor > 0) {
 			splash = missile.Type->SplashFactor; // if missile has splash but missed, apply splash damage
-			if (missile.Type->SplashFactor == 0) {
-				splash = 1;
-			}
 		}
 	}
 	//Wyrmgus end
@@ -1504,6 +1503,9 @@ void Missile::MissileHit(CUnit *unit)
 			}
 		}
 		MissileHitsGoal(*this, *unit, 1);
+		if (this->Type->Class == MissileClassPointToPointBounce && (unit->Type->TileWidth > this->Type->MaxBounceSize || unit->Type->TileHeight > this->Type->MaxBounceSize)) {
+			this->TTL = 0;
+		}
 		return;
 	}
 	if (!mtype.Range) {
@@ -1531,6 +1533,9 @@ void Missile::MissileHit(CUnit *unit)
 				return;
 			}
 			MissileHitsGoal(*this, goal, 1);
+			if (this->Type->Class == MissileClassPointToPointBounce && (goal.Type->TileWidth > this->Type->MaxBounceSize || goal.Type->TileHeight > this->Type->MaxBounceSize)) {
+				this->TTL = 0;
+			}
 			return;
 		}
 		MissileHitsWall(*this, pos, 1);
@@ -1609,6 +1614,9 @@ void Missile::MissileHit(CUnit *unit)
 						splash = 1;
 					}
 					MissileHitsGoal(*this, goal, splash);
+					if (this->Type->Class == MissileClassPointToPointBounce && (goal.Type->TileWidth > this->Type->MaxBounceSize || goal.Type->TileHeight > this->Type->MaxBounceSize)) {
+						this->TTL = 0;
+					}
 				}
 			}
 		}
@@ -1902,11 +1910,11 @@ MissileType::MissileType(const std::string &ident) :
 //	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(true),
 	//Wyrmgus end
-	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), KillFirstUnit(false),
+	AlwaysFire(false), Pierce(false), PierceOnce(false), PierceIgnoreBeforeGoal(false), IgnoreWalls(true), KillFirstUnit(false),
 	//Wyrmgus start
 	AlwaysHits(false),
 	//Wyrmgus end
-	Class(), NumBounces(0),	ParabolCoefficient(2048), StartDelay(0),
+	Class(), NumBounces(0),	MaxBounceSize(0), ParabolCoefficient(2048), StartDelay(0),
 	//Wyrmgus start
 //	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
 	Sleep(0), Speed(0), BlizzardSpeed(0), AttackSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
