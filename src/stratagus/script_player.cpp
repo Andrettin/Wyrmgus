@@ -2757,15 +2757,26 @@ static int CclGetFactions(lua_State *l)
 		civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
 	}
 	
+	int faction_type = -1;
+	if (lua_gettop(l) >= 2) {
+		faction_type = GetFactionTypeIdByName(LuaToString(l, 2));
+	}
+	
 	std::vector<std::string> factions;
 	if (civilization != -1) {
 		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
+			if (faction_type != -1 && PlayerRaces.Factions[i]->Type != faction_type) {
+				continue;
+			}
 			if (PlayerRaces.Factions[i]->Civilization == civilization) {
 				factions.push_back(PlayerRaces.Factions[i]->Ident);
 			}
 		}
 	} else {
 		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
+			if (faction_type != -1 && PlayerRaces.Factions[i]->Type != faction_type) {
+				continue;
+			}
 			factions.push_back(PlayerRaces.Factions[i]->Ident);
 		}
 	}
