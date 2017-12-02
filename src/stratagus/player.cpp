@@ -1104,6 +1104,7 @@ void CPlayer::Save(CFile &file) const
 	//Wyrmgus end
 	
 	file.printf(" \"supply\", %d,", p.Supply);
+	file.printf(" \"trade-cost\", %d,", p.TradeCost);
 	file.printf(" \"unit-limit\", %d,", p.UnitLimit);
 	file.printf(" \"building-limit\", %d,", p.BuildingLimit);
 	file.printf(" \"total-unit-limit\", %d,", p.TotalUnitLimit);
@@ -1530,6 +1531,8 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->Incomes[i] = DefaultIncomes[i];
 	}
+	
+	this->TradeCost = DefaultTradeCost;
 
 	//  Initial max resource amounts.
 	for (int i = 0; i < MaxCosts; ++i) {
@@ -2403,6 +2406,7 @@ void CPlayer::Clear()
 	//Wyrmgus end
 	Supply = 0;
 	Demand = 0;
+	TradeCost = 0;
 	// FIXME: can't clear limits since it's initialized already
 	//	UnitLimit = 0;
 	//	BuildingLimit = 0;
@@ -3371,6 +3375,30 @@ int CPlayer::GetEffectiveResourceDemand(const int resource) const
 	resource_demand = std::max(resource_demand, 0);
 
 	return resource_demand;
+}
+
+/**
+**  Get the effective sell price of a resource
+*/
+int CPlayer::GetEffectiveResourceSellPrice(const int resource, int traded_quantity) const
+{
+	if (resource == CopperCost) {
+		return 100;
+	}
+	
+	int price = traded_quantity * this->Prices[resource] / 100 * (100 - this->TradeCost) / 100;
+	price = std::max(1, price);
+	return price;
+}
+
+/**
+**  Get the effective buy quantity of a resource
+*/
+int CPlayer::GetEffectiveResourceBuyPrice(const int resource, int traded_quantity) const
+{
+	int price = traded_quantity * this->Prices[resource] / 100 * 100 / (100 - this->TradeCost);
+	price = std::max(1, price);
+	return price;
 }
 
 /**

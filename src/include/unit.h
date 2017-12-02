@@ -403,8 +403,6 @@ public:
 	int GetPrice() const;
 	int GetUnitStock(int unit_type_id) const;
 	int GetUnitStockReplenishmentTimer(int unit_type_id) const;
-	int GetEffectiveResourceSellPrice(const int resource, int traded_quantity = 100) const;
-	int GetEffectiveResourceBuyPrice(const int resource, int traded_quantity = 100) const;
 	int GetResourceStep(const int resource) const;
 	bool CanAttack(bool count_inside = true) const;
 	bool IsInCombat() const;

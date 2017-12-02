@@ -1500,6 +1500,15 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				}
 				//Wyrmgus end
 			}
+			
+			if (um->Modifier.Variables[TRADECOST_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				if (unitupgrade.size() > 0) {
+					player.TradeCost = std::min(player.TradeCost, stat.Variables[TRADECOST_INDEX].Value);
+				}
+			}
 
 			// And now modify ingame units
 			//Wyrmgus start
@@ -1747,7 +1756,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				stat.ResourceDemand[j] -= um->Modifier.ResourceDemand[j];
 				//Wyrmgus end
 			}
-
+			
 			//Wyrmgus start
 			for (size_t j = 0; j < UnitTypes.size(); ++j) {
 				if (um->Modifier.UnitStock[j]) {
@@ -1780,6 +1789,17 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
 				}
 				//Wyrmgus end
+			}
+			
+			if (um->Modifier.Variables[TRADECOST_INDEX].Value && (stat.Variables[TRADECOST_INDEX].Value + um->Modifier.Variables[TRADECOST_INDEX].Value) == player.TradeCost) {
+				int m = DefaultTradeCost;
+
+				for (int k = 0; k < player.GetUnitCount(); ++k) {
+					if (player.GetUnit(k).Type != NULL) {
+						m = std::min(m, player.GetUnit(k).Type->Stats[player.Index].Variables[TRADECOST_INDEX].Value);
+					}
+				}
+				player.TradeCost = m;
 			}
 
 			//Wyrmgus start

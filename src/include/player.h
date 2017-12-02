@@ -70,6 +70,9 @@ class CGraphic;
 #define STORE_BOTH 2
 
 #define SPEEDUP_FACTOR 100
+
+#define DefaultTradeCost 30
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -150,6 +153,8 @@ public:
 	int Prices[MaxCosts];		  /// price of each resource
 	int ResourceDemand[MaxCosts]; /// demand for the resources
 	int StoredResourceDemand[MaxCosts]; /// stored demand for the resources (converted into a trade action when reaches 100)
+	
+	int TradeCost;					/// cost of trading
 	//Wyrmgus end
 
 	int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
@@ -301,6 +306,10 @@ public:
 	int GetResourcePrice(const int resource) const;
 	/// Get the effective resource demand for the player, given the current prices
 	int GetEffectiveResourceDemand(const int resource) const;
+	
+	int GetEffectiveResourceSellPrice(const int resource, int traded_quantity = 100) const;
+	int GetEffectiveResourceBuyPrice(const int resource, int traded_quantity = 100) const;
+
 	/// Get the total price difference between this player and another one
 	int GetTotalPriceDifferenceWith(const CPlayer &player) const;
 	/// Get the trade potential between this player and another one

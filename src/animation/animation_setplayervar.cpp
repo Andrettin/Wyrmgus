@@ -112,6 +112,22 @@ int GetPlayerData(const int player, const char *prop, const char *arg)
 			Exit(1);
 		}
 		return Players[player].GetEffectiveResourceDemand(resId);
+	} else if (!strcmp(prop, "EffectiveResourceBuyPrice")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return Players[player].GetEffectiveResourceBuyPrice(resId);
+	} else if (!strcmp(prop, "EffectiveResourceSellPrice")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return Players[player].GetEffectiveResourceSellPrice(resId);
+	} else if (!strcmp(prop, "TradeCost")) {
+		return Players[player].TradeCost;
 	//Wyrmgus end
 	} else if (!strcmp(prop, "UnitTypesCount")) {
 		const std::string unit(arg);

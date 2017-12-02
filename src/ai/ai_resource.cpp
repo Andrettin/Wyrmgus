@@ -1419,9 +1419,9 @@ static void AiProduceResources()
 				continue;
 			}
 			
-			int resource_value = AiPlayer->Player->GetResourcePrice(resource);
+			int resource_value = AiPlayer->Player->GetEffectiveResourceSellPrice(resource);
 			if (input_resource) {
-				resource_value -= AiPlayer->Player->GetResourcePrice(input_resource);
+				resource_value -= AiPlayer->Player->GetEffectiveResourceSellPrice(input_resource);
 			}
 
 			if (resource_value > best_value) {

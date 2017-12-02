@@ -1886,7 +1886,7 @@ static int CclGetUnitVariable(lua_State *l)
 		std::string resource_ident = LuaToString(l, 3);
 		int resource = GetResourceIdByName(resource_ident.c_str());
 		if (resource != -1) {
-			lua_pushnumber(l, unit->GetEffectiveResourceSellPrice(resource));
+			lua_pushnumber(l, unit->Player->GetEffectiveResourceSellPrice(resource));
 		} else {
 			LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 		}
@@ -1896,7 +1896,7 @@ static int CclGetUnitVariable(lua_State *l)
 		std::string resource_ident = LuaToString(l, 3);
 		int resource = GetResourceIdByName(resource_ident.c_str());
 		if (resource != -1) {
-			lua_pushnumber(l, unit->GetEffectiveResourceBuyPrice(resource));
+			lua_pushnumber(l, unit->Player->GetEffectiveResourceBuyPrice(resource));
 		} else {
 			LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 		}

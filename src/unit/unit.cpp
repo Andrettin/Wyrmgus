@@ -2354,7 +2354,7 @@ void CUnit::SellResource(const int resource, const int player)
 	}
 
 	Players[player].ChangeResource(resource, -100, true);
-	Players[player].ChangeResource(CopperCost, this->GetEffectiveResourceSellPrice(resource), true);
+	Players[player].ChangeResource(CopperCost, this->Player->GetEffectiveResourceSellPrice(resource), true);
 	
 	this->Player->DecreaseResourcePrice(resource);
 }
@@ -2366,12 +2366,12 @@ void CUnit::SellResource(const int resource, const int player)
 */
 void CUnit::BuyResource(const int resource, const int player)
 {
-	if ((Players[player].Resources[CopperCost] + Players[player].StoredResources[CopperCost]) < this->GetEffectiveResourceBuyPrice(resource)) {
+	if ((Players[player].Resources[CopperCost] + Players[player].StoredResources[CopperCost]) < this->Player->GetEffectiveResourceBuyPrice(resource)) {
 		return;
 	}
 
 	Players[player].ChangeResource(resource, 100, true);
-	Players[player].ChangeResource(CopperCost, -this->GetEffectiveResourceBuyPrice(resource), true);
+	Players[player].ChangeResource(CopperCost, -this->Player->GetEffectiveResourceBuyPrice(resource), true);
 	
 	this->Player->IncreaseResourcePrice(resource);
 }
@@ -3863,6 +3863,17 @@ void UnitLost(CUnit &unit)
 			}
 		}
 		
+		if (type.Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {
+			int m = DefaultTradeCost;
+
+			for (int j = 0; j < player.GetUnitCount(); ++j) {
+				if (player.GetUnit(j).Type->Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {
+					m = std::min(m, player.GetUnit(j).Type->Stats[player.Index].Variables[TRADECOST_INDEX].Value);
+				}
+			}
+			player.TradeCost = m;
+		}
+		
 		//Wyrmgus start
 		if (type.BoolFlag[TOWNHALL_INDEX].value) {
 			bool lost_town_hall = true;
@@ -3990,6 +4001,10 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	// Update resources
 	for (int u = 1; u < MaxCosts; ++u) {
 		player.Incomes[u] = std::max(player.Incomes[u], type.Stats[player.Index].ImproveIncomes[u]);
+	}
+	
+	if (type.Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {
+		player.TradeCost = std::min(player.TradeCost, type.Stats[player.Index].Variables[TRADECOST_INDEX].Value);
 	}
 	
 	//Wyrmgus start
@@ -5506,26 +5521,6 @@ int CUnit::GetUnitStockReplenishmentTimer(int unit_type_id) const
 	} else {
 		return 0;
 	}
-}
-
-/**
-**  Get the effective sell price of a resource
-*/
-int CUnit::GetEffectiveResourceSellPrice(const int resource, int traded_quantity) const
-{
-	int price = traded_quantity * this->Player->Prices[resource] / 100 * (100 - this->Variable[TRADECOST_INDEX].Value) / 100;
-	price = std::max(1, price);
-	return price;
-}
-
-/**
-**  Get the effective buy quantity of a resource
-*/
-int CUnit::GetEffectiveResourceBuyPrice(const int resource, int traded_quantity) const
-{
-	int price = traded_quantity * this->Player->Prices[resource] / 100 * 100 / (100 - this->Variable[TRADECOST_INDEX].Value);
-	price = std::max(1, price);
-	return price;
 }
 
 int CUnit::GetResourceStep(const int resource) const

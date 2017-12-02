@@ -296,6 +296,8 @@ void CPlayer::Load(lua_State *l)
 			this->Supply = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "demand")) {
 			this->Demand = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "trade-cost")) {
+			this->TradeCost = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "unit-limit")) {
 			this->UnitLimit = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "building-limit")) {
@@ -3242,6 +3244,20 @@ static int CclGetPlayerData(lua_State *l)
 		const int resId = GetResourceIdByName(l, res.c_str());
 		lua_pushnumber(l, p->GetEffectiveResourceDemand(resId));
 		return 1;
+	} else if (!strcmp(data, "EffectiveResourceSellPrice")) {
+		LuaCheckArgs(l, 3);
+
+		const std::string res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res.c_str());
+		lua_pushnumber(l, p->GetEffectiveResourceSellPrice(resId));
+		return 1;
+	} else if (!strcmp(data, "EffectiveResourceBuyPrice")) {
+		LuaCheckArgs(l, 3);
+
+		const std::string res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res.c_str());
+		lua_pushnumber(l, p->GetEffectiveResourceBuyPrice(resId));
+		return 1;
 	} else if (!strcmp(data, "TotalPriceDifferenceWith")) {
 		LuaCheckArgs(l, 3);
 		
@@ -3305,6 +3321,9 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "NumTownHalls")) {
 		lua_pushnumber(l, p->NumTownHalls);
+		return 1;
+	} else if (!strcmp(data, "TradeCost")) {
+		lua_pushnumber(l, p->TradeCost);
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Supply")) {
