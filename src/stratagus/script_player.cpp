@@ -3228,6 +3228,13 @@ static int CclGetPlayerData(lua_State *l)
 		const int resId = GetResourceIdByName(l, res.c_str());
 		lua_pushnumber(l, p->ResourceDemand[resId]);
 		return 1;
+	} else if (!strcmp(data, "StoredResourceDemand")) {
+		LuaCheckArgs(l, 3);
+
+		const std::string res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res.c_str());
+		lua_pushnumber(l, p->StoredResourceDemand[resId]);
+		return 1;
 	} else if (!strcmp(data, "EffectiveResourceDemand")) {
 		LuaCheckArgs(l, 3);
 

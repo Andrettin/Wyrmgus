@@ -149,6 +149,7 @@ public:
 	//Wyrmgus start
 	int Prices[MaxCosts];		  /// price of each resource
 	int ResourceDemand[MaxCosts]; /// demand for the resources
+	int StoredResourceDemand[MaxCosts]; /// stored demand for the resources (converted into a trade action when reaches 100)
 	//Wyrmgus end
 
 	int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources

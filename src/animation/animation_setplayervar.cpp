@@ -98,6 +98,13 @@ int GetPlayerData(const int player, const char *prop, const char *arg)
 			Exit(1);
 		}
 		return Players[player].ResourceDemand[resId];
+	} else if (!strcmp(prop, "StoredResourceDemand")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return Players[player].StoredResourceDemand[resId];
 	} else if (!strcmp(prop, "EffectiveResourceDemand")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {

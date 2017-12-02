@@ -2363,6 +2363,7 @@ void CPlayer::Clear()
 	memset(Revenue, 0, sizeof(Revenue));
 	//Wyrmgus start
 	memset(ResourceDemand, 0, sizeof(ResourceDemand));
+	memset(StoredResourceDemand, 0, sizeof(StoredResourceDemand));
 	//Wyrmgus end
 	this->UnitTypesCount.clear();
 	this->UnitTypesUnderConstructionCount.clear();
@@ -2519,20 +2520,14 @@ void CPlayer::PerformResourceTrade()
 			continue;
 		}
 		
-		int resource_demand = this->GetEffectiveResourceDemand(i);
-		int resource_supply = this->Resources[i] + this->StoredResources[i];
-
-		int traded_resource_quantity = std::min(resource_demand, resource_supply);
-		
-		if (traded_resource_quantity > 0) {
-			this->ChangeResource(i, -traded_resource_quantity, true);
-			this->ChangeResource(CopperCost, market_unit->GetEffectiveResourceSellPrice(i, traded_resource_quantity), true);
+		while ((this->Resources[i] + this->StoredResources[i]) >= 100) {
+			market_unit->SellResource(i, this->Index);
 		}
 		
-		if (resource_demand > resource_supply) {
+		this->StoredResourceDemand[i] += this->GetEffectiveResourceDemand(i);
+		while (this->StoredResourceDemand[i] >= 100) {
 			this->IncreaseResourcePrice(i);
-		} else if (resource_supply > resource_demand) {
-			this->DecreaseResourcePrice(i);
+			this->StoredResourceDemand[i] -= 100;
 		}
 	}
 }
@@ -3312,19 +3307,12 @@ int CPlayer::ConvergePricesWith(CPlayer &player, int max_convergences)
 				continue;
 			}
 			
-			int convergence_increase = 1;
-			if (LuxuryResources[i]) {
-				convergence_increase *= player.ResourceDemand[i];
-			} else {
-				convergence_increase *= 100;
-			}
+			int convergence_increase = 100;
 			
 			if (this->Prices[i] < player.Prices[i] && convergences < max_convergences) {
-				if (!LuxuryResources[i]) { //don't increase prices for luxury resources for the player with lower price, as that will just cause more luxury resources to be stuck in storage
-					this->IncreaseResourcePrice(i);
-					convergences += convergence_increase;
-					converged = true;
-				}
+				this->IncreaseResourcePrice(i);
+				convergences += convergence_increase;
+				converged = true;
 				
 				if (this->Prices[i] < player.Prices[i] && convergences < max_convergences) { //now do the convergence for the other side as well, if possible
 					player.DecreaseResourcePrice(i);
@@ -3336,7 +3324,7 @@ int CPlayer::ConvergePricesWith(CPlayer &player, int max_convergences)
 				convergences += convergence_increase;
 				converged = true;
 
-				if (this->Prices[i] > player.Prices[i] && convergences < max_convergences && !LuxuryResources[i]) { //do the convergence for the other side as well, if possible
+				if (this->Prices[i] > player.Prices[i] && convergences < max_convergences) { //do the convergence for the other side as well, if possible
 					player.IncreaseResourcePrice(i);
 					convergences += convergence_increase;
 					converged = true;
@@ -3412,11 +3400,7 @@ int CPlayer::GetTradePotentialWith(const CPlayer &player) const
 			continue;
 		}
 		int price_difference = abs(this->Prices[i] - player.Prices[i]);
-		if (LuxuryResources[i]) {
-			trade_potential += price_difference * player.ResourceDemand[i];
-		} else {
-			trade_potential += price_difference * 100;
-		}
+		trade_potential += price_difference * 100;
 	}
 	
 	trade_potential = std::max(trade_potential, 10);
