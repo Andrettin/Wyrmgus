@@ -2361,15 +2361,24 @@ void CButtonPanel::DoClicked_Train(int button)
 		}
 	}
 	
-	if (Selected[best_training_place]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
-		ThisPlayer->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer, "%s", _("Unit training queue is full"));
-	} else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].UnitStock[type.Slot] != 0)) {
-		SendCommandTrainUnit(*Selected[best_training_place], type, ThisPlayer->Index, !(KeyModifiers & ModifierShift));
-		UI.StatusLine.Clear();
-		UI.StatusLine.ClearCosts();
-	} else if (ThisPlayer->CheckLimits(type) == -3) {
-		if (GameSounds.NotEnoughFood[ThisPlayer->Race].Sound) {
-			PlayGameSound(GameSounds.NotEnoughFood[ThisPlayer->Race].Sound, MaxSampleVolume);
+	int unit_count = 1;
+	if (KeyModifiers & ModifierShift) {
+		unit_count = 5;
+	}
+	
+	for (int i = 0; i < unit_count; ++i) {
+		if (Selected[best_training_place]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
+			ThisPlayer->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer, "%s", _("Unit training queue is full"));
+			return;
+		} else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].UnitStock[type.Slot] != 0)) {
+			SendCommandTrainUnit(*Selected[best_training_place], type, ThisPlayer->Index, FlushCommands);
+			UI.StatusLine.Clear();
+			UI.StatusLine.ClearCosts();
+		} else if (ThisPlayer->CheckLimits(type) == -3) {
+			if (GameSounds.NotEnoughFood[ThisPlayer->Race].Sound) {
+				PlayGameSound(GameSounds.NotEnoughFood[ThisPlayer->Race].Sound, MaxSampleVolume);
+			}
+			return;
 		}
 	}
 	//Wyrmgus end

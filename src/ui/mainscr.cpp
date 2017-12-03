@@ -527,23 +527,46 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			label.Draw(UI.TrainingTextX, UI.TrainingTextY, UI.TrainingText);
 		}
 		if (!UI.TrainingButtons.empty()) {
-			for (size_t i = 0; i < unit.Orders.size()
-				 && i < UI.TrainingButtons.size(); ++i) {
+			size_t j = 0;
+			std::vector<int> train_counter;
+			for (size_t i = 0; i < unit.Orders.size() && j < UI.TrainingButtons.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitActionTrain) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i]);
+					if (i > 0 && j > 0 && unit.Orders[i - 1]->Action == UnitActionTrain) {
+						const COrder_Train &previous_order = *static_cast<COrder_Train *>(unit.Orders[i - 1]);
+						if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
+							train_counter[j - 1]++;
+							continue;
+						}
+					}
 					CIcon &icon = *order.GetUnitType().Icon.Icon;
 					//Wyrmgus start
 //					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
 					int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
 					//Wyrmgus end
-									  && static_cast<size_t>(ButtonUnderCursor) == i) ?
+									  && static_cast<size_t>(ButtonUnderCursor) == j) ?
 									 (IconActive | (MouseButtons & LeftButton)) : 0;
-					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
+					const PixelPos pos(UI.TrainingButtons[j].X, UI.TrainingButtons[j].Y);
 					//Wyrmgus start
 					flag |= IconCommandButton;
 //					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.GetDisplayPlayer(), order.GetUnitType().HairColor);
+					icon.DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.GetDisplayPlayer(), order.GetUnitType().HairColor);
 					//Wyrmgus end
+					train_counter.push_back(1);
+					++j;
+				}
+			}
+			
+			for (size_t i = 0; i < train_counter.size(); ++i) {
+				if (train_counter[i] > 1) {
+					std::string number_string = std::to_string((long long) train_counter[i]);
+					std::string oldnc;
+					std::string oldrc;
+					GetDefaultTextColors(oldnc, oldrc);
+					CLabel label(GetGameFont(), oldnc, oldrc);
+
+					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
+					label.Draw(pos.x + 46 - GetGameFont().Width(number_string), pos.y + 0, number_string);
 				}
 			}
 		}
