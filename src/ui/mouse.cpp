@@ -1150,15 +1150,24 @@ static void HandleMouseOn(const PixelPos screenPos)
 					}
 				} else {
 					const size_t size = UI.TrainingButtons.size();
-
-					for (size_t i = std::min(Selected[0]->Orders.size(), size); i != 0;) {
-						--i;
-						if (Selected[0]->Orders[i]->Action == UnitActionTrain
-							&& UI.TrainingButtons[i].Contains(screenPos)) {
-							ButtonAreaUnderCursor = ButtonAreaTraining;
-							ButtonUnderCursor = i;
-							CursorOn = CursorOnButton;
-							return;
+					size_t j = 0;
+					for (size_t i = 0; i < Selected[0]->Orders.size() && j < size; ++i) {
+						if (Selected[0]->Orders[i]->Action == UnitActionTrain) {
+							const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[i]);
+							if (i > 0 && j > 0 && Selected[0]->Orders[i - 1]->Action == UnitActionTrain) {
+								const COrder_Train &previous_order = *static_cast<COrder_Train *>(Selected[0]->Orders[i - 1]);
+								if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
+									continue;
+								}
+							}
+							if (Selected[0]->Orders[i]->Action == UnitActionTrain
+								&& UI.TrainingButtons[j].Contains(screenPos)) {
+								ButtonAreaUnderCursor = ButtonAreaTraining;
+								ButtonUnderCursor = j;
+								CursorOn = CursorOnButton;
+								return;
+							}
+							++j;
 						}
 					}
 				}
@@ -2654,12 +2663,35 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
-				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
-					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
-					const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[ButtonUnderCursor]);
+				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()) {
+					size_t j = 0;
+					int order_slot = -1;
+					for (size_t i = 0; i < Selected[0]->Orders.size(); ++i) {
+						if (Selected[0]->Orders[i]->Action == UnitActionTrain) {
+							const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[i]);
+							if (i > 0 && j > 0 && Selected[0]->Orders[i - 1]->Action == UnitActionTrain) {
+								const COrder_Train &previous_order = *static_cast<COrder_Train *>(Selected[0]->Orders[i - 1]);
+								if (previous_order.GetUnitType().Slot == order.GetUnitType().Slot) {
+									if (order_slot != -1) {
+										order_slot = i; //so that it removes the last training order of that unit type
+									}
+									continue;
+								}
+							}
+							if (j >= UI.TrainingButtons.size() || order_slot != -1) {
+								break;
+							} else if (j == static_cast<size_t>(ButtonUnderCursor)) {
+								order_slot = i;
+							}
+							++j;
+						}
+					}
+					if (order_slot != -1) {
+						const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[order_slot]);
 
-					DebugPrint("Cancel slot %d %s\n" _C_ ButtonUnderCursor _C_ order.GetUnitType().Ident.c_str());
-					SendCommandCancelTraining(*Selected[0], ButtonUnderCursor, &order.GetUnitType());
+						DebugPrint("Cancel slot %d %s\n" _C_ order_slot _C_ order.GetUnitType().Ident.c_str());
+						SendCommandCancelTraining(*Selected[0], order_slot, &order.GetUnitType());
+					}
 				}
 			}
 			//  clicked on upgrading button

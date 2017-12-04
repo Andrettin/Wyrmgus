@@ -529,7 +529,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		if (!UI.TrainingButtons.empty()) {
 			size_t j = 0;
 			std::vector<int> train_counter;
-			for (size_t i = 0; i < unit.Orders.size() && j < UI.TrainingButtons.size(); ++i) {
+			for (size_t i = 0; i < unit.Orders.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitActionTrain) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i]);
 					if (i > 0 && j > 0 && unit.Orders[i - 1]->Action == UnitActionTrain) {
@@ -538,6 +538,9 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 							train_counter[j - 1]++;
 							continue;
 						}
+					}
+					if (j >= UI.TrainingButtons.size()) {
+						break;
 					}
 					CIcon &icon = *order.GetUnitType().Icon.Icon;
 					//Wyrmgus start
