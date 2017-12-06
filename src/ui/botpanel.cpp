@@ -136,7 +136,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 			  const std::string &popup, bool alwaysShow, const std::string &mod_file)
 			  //Wyrmgus end
 {
-	char buf[2048];
+	std::string buf;
 	ButtonAction *ba = new ButtonAction;
 	Assert(ba);
 
@@ -221,9 +221,9 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
 	if (umask[0] == '*') {
-		strcpy_s(buf, sizeof(buf), umask.c_str());
+		buf = umask;
 	} else {
-		sprintf(buf, ",%s,", umask.c_str());
+		buf = "," + umask + ",";
 	}
 	ba->UnitMask = buf;
 	//Wyrmgus start

@@ -167,6 +167,8 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 				return goal->ResourcesHeld;
 			} else if (!strcmp(cur, "ResourceActive")) {
 				return goal->Resource.Active;
+			} else if (!strcmp(cur, "InsideCount")) {
+				return goal->InsideCount;
 			} else if (!strcmp(cur, "_Distance")) {
 				return unit.MapDistanceTo(*goal);
 			}
