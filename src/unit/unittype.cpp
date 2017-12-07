@@ -797,6 +797,41 @@ int CUnitType::GetAvailableLevelUpUpgrades() const
 	return value;
 }
 
+int CUnitType::GetResourceStep(const int resource, const int player) const
+{
+	if (!this->ResInfo[resource]) {
+		return 0;
+	}
+
+	int resource_step = this->ResInfo[resource]->ResourceStep;
+	
+	resource_step += this->Stats[player].Variables[GATHERINGBONUS_INDEX].Value;
+	
+	if (resource == CopperCost) {
+		resource_step += this->Stats[player].Variables[COPPERGATHERINGBONUS_INDEX].Value;
+	} else if (resource == SilverCost) {
+		resource_step += this->Stats[player].Variables[SILVERGATHERINGBONUS_INDEX].Value;
+	} else if (resource == GoldCost) {
+		resource_step += this->Stats[player].Variables[GOLDGATHERINGBONUS_INDEX].Value;
+	} else if (resource == WoodCost) {
+		resource_step += this->Stats[player].Variables[LUMBERGATHERINGBONUS_INDEX].Value;
+	} else if (resource == StoneCost || resource == LimestoneCost) {
+		resource_step += this->Stats[player].Variables[STONEGATHERINGBONUS_INDEX].Value;
+	} else if (resource == CoalCost) {
+		resource_step += this->Stats[player].Variables[COALGATHERINGBONUS_INDEX].Value;
+	} else if (resource == JewelryCost) {
+		resource_step += this->Stats[player].Variables[JEWELRYGATHERINGBONUS_INDEX].Value;
+	} else if (resource == FurnitureCost) {
+		resource_step += this->Stats[player].Variables[FURNITUREGATHERINGBONUS_INDEX].Value;
+	} else if (resource == LeatherCost) {
+		resource_step += this->Stats[player].Variables[LEATHERGATHERINGBONUS_INDEX].Value;
+	} else if (resource == DiamondsCost || resource == EmeraldsCost) {
+		resource_step += this->Stats[player].Variables[GEMSGATHERINGBONUS_INDEX].Value;
+	}
+	
+	return resource_step;
+}
+
 VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player, int image_layer) const
 {
 	int variation_max = image_layer == -1 ? VariationMax : this->LayerVarInfo[image_layer].size();

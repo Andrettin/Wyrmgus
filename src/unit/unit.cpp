@@ -715,14 +715,19 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				//if is a harvester who is currently gathering, try to upgrade to a unit type which is best for harvesting the current resource
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					if (CheckDependByType(*this, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
-						if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
-							if (AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource] && AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource]->ResourceStep >= best_gathering_rate) {
-								if (AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource]->ResourceStep > best_gathering_rate) {
-									best_gathering_rate = AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource]->ResourceStep;
+					CUnitType *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
+					if (CheckDependByType(*this, *experience_upgrade_type, true)) {
+						if (Character == NULL || !Character->ForbiddenUpgrades[experience_upgrade_type->Slot]) {
+							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
+								continue;
+							}
+							int gathering_rate = experience_upgrade_type->GetResourceStep(this->CurrentResource, this->Player->Index);
+							if (gathering_rate >= best_gathering_rate) {
+								if (gathering_rate > best_gathering_rate) {
+									best_gathering_rate = gathering_rate;
 									potential_upgrades.clear();
 								}
-								potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
+								potential_upgrades.push_back(experience_upgrade_type);
 							}
 						}
 					}

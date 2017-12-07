@@ -977,14 +977,8 @@ int COrder_Resource::GatherResource(CUnit &unit)
 		}
 
 		// Calculate how much we can load.
-		//Wyrmgus start
-//		if (resinfo.ResourceStep) {
 		if (unit.GetResourceStep(this->CurrentResource) && (harvest_from_outside || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
-		//Wyrmgus end
-			//Wyrmgus start
-//			addload = resinfo.ResourceStep;
 			addload = unit.GetResourceStep(this->CurrentResource);
-			//Wyrmgus end
 		} else {
 			//Wyrmgus start
 //			addload = resinfo.ResourceCapacity;
