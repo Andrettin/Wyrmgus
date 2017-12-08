@@ -174,7 +174,7 @@ extern const char NameLine[];
 #define WorldMapResourceMax 2048	/// Maximum quantity of resources of a given type which can exist on the world map.
 
 #define AuraRange 6					/// Range of auras
-#define PlayerHeroMax 3				/// Maximum heroes per player
+#define PlayerHeroMax 4				/// Maximum heroes per player
 #define PlayerMinorDeityMax 3		/// Maximum minor deities per player
 
 #define PopulationPerUnit 1000		/// Number of people a unit represents

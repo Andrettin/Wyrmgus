@@ -245,6 +245,16 @@ static int CclDefineQuest(lua_State *l)
 				
 				quest->BuildSettlementUnitsOfClass.push_back(std::tuple<CSettlement *, int, int>(settlement, class_id, quantity));
 			}
+		} else if (!strcmp(value, "RecruitCharacters")) {
+			quest->RecruitCharacters.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				CCharacter *character = GetCharacter(LuaToString(l, -1, j + 1));
+				if (!character) {
+					LuaError(l, "Character doesn't exist.");
+				}
+				quest->RecruitCharacters.push_back(character);
+			}
 		} else if (!strcmp(value, "ResearchUpgrades")) {
 			quest->ResearchUpgrades.clear();
 			const int args = lua_rawlen(l, -1);

@@ -257,20 +257,10 @@ void UpdateDisplay()
 		//Wyrmgus start
 		//draw worker icon if there are idle workers
 		if (UI.IdleWorkerButton && !ThisPlayer->FreeWorkers.empty()) {
-			int worker_unit_type_id = PlayerRaces.GetFactionClassUnitType(ThisPlayer->Faction, GetUnitTypeClassIndexByName("worker"));
-			if (worker_unit_type_id != -1) {
-				const CUnitType &type = *UnitTypes[worker_unit_type_id];
-				
-				const PixelPos pos(UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
-				const int flag = (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
-								 
-				VariationInfo *varinfo = type.GetDefaultVariation(*ThisPlayer);
-				if (varinfo && varinfo->Icon.Icon) { // check if the default variation is valid, and if it is, then make the button use the variation's icon
-					varinfo->Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index, type.GetDefaultHairColor(*ThisPlayer));
-				} else {
-					type.Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index, type.GetDefaultHairColor(*ThisPlayer));
-				}
-			}
+			const PixelPos pos(UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
+			const int flag = (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
+
+			ThisPlayer->FreeWorkers[0]->GetIcon().Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index, ThisPlayer->FreeWorkers[0]->GetHairColor());
 		}
 		
 		//draw icon if there are units with available level up upgrades

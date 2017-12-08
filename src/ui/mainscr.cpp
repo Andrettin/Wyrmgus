@@ -1094,16 +1094,13 @@ void DrawPopups()
 	}
 	
 	if (UI.IdleWorkerButton && !ThisPlayer->FreeWorkers.empty()) {
-		int worker_unit_type_id = PlayerRaces.GetFactionClassUnitType(ThisPlayer->Faction, GetUnitTypeClassIndexByName("worker"));
-		if (worker_unit_type_id != -1) {
-			if (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) { //if the mouse is hovering over the idle worker button, draw a tooltip
-				std::string idle_worker_tooltip = _("Find Idle Worker (~!.)");
-				if (!Preference.NoStatusLineTooltips) {
-					CLabel label(GetGameFont());
-					label.Draw(2 + 16, Video.Height + 2 - 16, idle_worker_tooltip);
-				}
-				DrawGenericPopup(idle_worker_tooltip, UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
+		if (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) { //if the mouse is hovering over the idle worker button, draw a tooltip
+			std::string idle_worker_tooltip = _("Find Idle Worker (~!.)");
+			if (!Preference.NoStatusLineTooltips) {
+				CLabel label(GetGameFont());
+				label.Draw(2 + 16, Video.Height + 2 - 16, idle_worker_tooltip);
 			}
+			DrawGenericPopup(idle_worker_tooltip, UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
 		}
 	}
 		

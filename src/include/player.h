@@ -177,6 +177,7 @@ public:
 	std::vector<std::tuple<CQuest *, int, int>> QuestBuildUnitsOfClass;	/// build units objectives from quests; the first int is the class id, and the second int is the quantity, set at start to be the same as the quest's; every time a unit is built it is reduced by one
 	std::vector<std::tuple<CQuest *, CSettlement *, CUnitType *, int>> QuestBuildSettlementUnits;	/// build settlement units objectives from quests; int is the quantity, set at start to be the same as the quest's; every time a unit is built in the appropriate settlement it is reduced by one
 	std::vector<std::tuple<CQuest *, CSettlement *, int, int>> QuestBuildSettlementUnitsOfClass;	/// build settlement units objectives from quests; the first int is the class id, and the second int is the quantity, set at start to be the same as the quest's; every time a unit is built in the appropriate settlement it is reduced by one
+	std::vector<std::tuple<CQuest *, CCharacter *>> QuestRecruitCharacters;
 	std::vector<std::tuple<CQuest *, CUpgrade *>> QuestResearchUpgrades;
 	std::vector<std::tuple<CQuest *, CUnitType *, CFaction *, int>> QuestDestroyUnits;	/// destroy units objectives from quests; int is the quantity, set at start to be the same as the quest's; every time a unit is destroyed it is reduced by one
 	std::vector<std::tuple<CQuest *, CCharacter *, bool>> QuestDestroyCharacters;
@@ -247,6 +248,7 @@ public:
 	bool HasUnitBuilder(CUnitType *type, CSettlement *settlement = NULL) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
 	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
+	bool CanRecruitHero(const CCharacter *character, bool ignore_neutral = false) const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string GetFactionTitleName() const;
 	std::string GetCharacterTitleName(int title_type, int gender) const;

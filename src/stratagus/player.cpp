@@ -1231,6 +1231,16 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
+	file.printf("\n  \"quest-recruit-characters\", {");
+	for (size_t j = 0; j < p.QuestRecruitCharacters.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", std::get<0>(p.QuestRecruitCharacters[j])->Ident.c_str());
+		file.printf("\"%s\",", std::get<1>(p.QuestRecruitCharacters[j])->Ident.c_str());
+	}
+	file.printf("},");
+	
 	file.printf("\n  \"quest-research-upgrades\", {");
 	for (size_t j = 0; j < p.QuestResearchUpgrades.size(); ++j) {
 		if (j) {
@@ -2064,6 +2074,41 @@ bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
 }
 
 /**
+**  Check if the player can recruit a particular hero.
+**
+**  @param character    Hero.
+*/
+bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) const
+{
+	if (character->Deity != NULL) {
+		return false;
+	}
+	
+	if (character->Civilization != this->Race) {
+		return false;
+	}
+	
+	if (!CheckDependByType(*this, *character->Type, true)) {
+		return false;
+	}
+	
+	if (character->Conditions) {
+		CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+		character->Conditions->pushPreamble();
+		character->Conditions->run(1);
+		if (character->Conditions->popBoolean() == false) {
+			return false;
+		}
+	}
+	
+	if (!character->CanAppear(ignore_neutral)) {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
 **  Check if the upgrade removes an existing upgrade of the player.
 **
 **  @param upgrade    Upgrade.
@@ -2381,6 +2426,7 @@ void CPlayer::Clear()
 	this->QuestBuildUnitsOfClass.clear();
 	this->QuestBuildSettlementUnits.clear();
 	this->QuestBuildSettlementUnitsOfClass.clear();
+	this->QuestRecruitCharacters.clear();
 	this->QuestResearchUpgrades.clear();
 	this->QuestDestroyUnits.clear();
 	this->QuestDestroyCharacters.clear();
@@ -2679,6 +2725,10 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		this->QuestBuildSettlementUnitsOfClass.push_back(std::tuple<CQuest *, CSettlement *, int, int>(quest, std::get<0>(quest->BuildSettlementUnitsOfClass[i]), std::get<1>(quest->BuildSettlementUnitsOfClass[i]), std::get<2>(quest->BuildSettlementUnitsOfClass[i])));
 	}
 	
+	for (size_t i = 0; i < quest->RecruitCharacters.size(); ++i) {
+		this->QuestRecruitCharacters.push_back(std::tuple<CQuest *, CCharacter *>(quest, quest->RecruitCharacters[i]));
+	}
+	
 	for (size_t i = 0; i < quest->ResearchUpgrades.size(); ++i) {
 		this->QuestResearchUpgrades.push_back(std::tuple<CQuest *, CUpgrade *>(quest, quest->ResearchUpgrades[i]));
 	}
@@ -2805,6 +2855,12 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 		}
 	}
 	
+	for (int i = (this->QuestRecruitCharacters.size()  - 1); i >= 0; --i) {
+		if (std::get<0>(this->QuestRecruitCharacters[i]) == quest) {
+			this->QuestRecruitCharacters.erase(std::remove(this->QuestRecruitCharacters.begin(), this->QuestRecruitCharacters.end(), this->QuestRecruitCharacters[i]), this->QuestRecruitCharacters.end());
+		}
+	}
+	
 	for (int i = (this->QuestResearchUpgrades.size()  - 1); i >= 0; --i) {
 		if (std::get<0>(this->QuestResearchUpgrades[i]) == quest) {
 			this->QuestResearchUpgrades.erase(std::remove(this->QuestResearchUpgrades.begin(), this->QuestResearchUpgrades.end(), this->QuestResearchUpgrades[i]), this->QuestResearchUpgrades.end());
@@ -2901,6 +2957,12 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		}
 	}
 	
+	for (size_t i = 0; i < quest->RecruitCharacters.size(); ++i) {
+		if (!this->CanRecruitHero(quest->RecruitCharacters[i], true)) {
+			return false;
+		}
+	}
+
 	for (size_t i = 0; i < quest->DestroyCharacters.size(); ++i) {
 		if (quest->DestroyCharacters[i]->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
 			return false;
@@ -2962,6 +3024,12 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 	
 	for (size_t i = 0; i < this->QuestBuildSettlementUnitsOfClass.size(); ++i) {
 		if (std::get<0>(this->QuestBuildSettlementUnitsOfClass[i]) == quest && std::get<3>(this->QuestBuildSettlementUnitsOfClass[i]) > 0) {
+			return false;
+		}
+	}
+	
+	for (size_t i = 0; i < this->QuestRecruitCharacters.size(); ++i) {
+		if (std::get<0>(this->QuestRecruitCharacters[i]) == quest && !this->HasHero(std::get<1>(this->QuestRecruitCharacters[i]))) {
 			return false;
 		}
 	}
@@ -3082,7 +3150,13 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			}
 		}
 	}
-	
+
+	for (size_t i = 0; i < this->QuestRecruitCharacters.size(); ++i) {
+		if (std::get<0>(this->QuestRecruitCharacters[i]) == quest && !this->HasHero(std::get<1>(this->QuestRecruitCharacters[i])) && !this->CanRecruitHero(std::get<1>(this->QuestRecruitCharacters[i]), true)) {
+			return "The hero can no longer be recruited.";
+		}
+	}
+
 	for (size_t i = 0; i < this->QuestDestroyCharacters.size(); ++i) {
 		if (std::get<0>(this->QuestDestroyCharacters[i]) == quest && std::get<2>(this->QuestDestroyCharacters[i]) == false && std::get<1>(this->QuestDestroyCharacters[i])->CanAppear()) { // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
 			return "The target no longer exists.";

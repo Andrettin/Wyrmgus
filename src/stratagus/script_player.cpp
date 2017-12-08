@@ -488,6 +488,19 @@ void CPlayer::Load(lua_State *l)
 					this->QuestBuildSettlementUnitsOfClass.push_back(std::tuple<CQuest *, CSettlement *, int, int>(quest, settlement, class_id, quantity));
 				}
 			}
+		} else if (!strcmp(value, "quest-recruit-characters")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
+				++k;
+				CCharacter *character = GetCharacter(LuaToString(l, j + 1, k + 1));
+				if (quest) {
+					this->QuestRecruitCharacters.push_back(std::tuple<CQuest *, CCharacter *>(quest, character));
+				}
+			}
 		} else if (!strcmp(value, "quest-research-upgrades")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
