@@ -947,13 +947,13 @@ CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type, int z)
 **
 **  @return        Returns ideal target on map tile.
 */
-CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
+CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2, int z)
 {
 	std::vector<CUnit *> table;
 
 	//Wyrmgus start
 //	Select(pos1, pos2, table);
-	Select(pos1, pos2, table, source.MapLayer);
+	Select(pos1, pos2, table, z);
 	//Wyrmgus end
 	CUnit *best = NULL;
 	for (size_t i = 0; i != table.size(); ++i) {

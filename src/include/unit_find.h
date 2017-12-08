@@ -470,7 +470,7 @@ extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, 
 extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type, int z);// = -1);
 //Wyrmgus end
 /// Return possible attack target on that map area
-extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos2);
+extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos2, int z);
 
 /// Return resource, if on map tile
 //Wyrmgus start

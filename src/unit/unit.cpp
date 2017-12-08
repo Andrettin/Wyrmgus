@@ -721,7 +721,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
 								continue;
 							}
-							int gathering_rate = experience_upgrade_type->GetResourceStep(this->CurrentResource, this->Player->Index);
+							unsigned int gathering_rate = experience_upgrade_type->GetResourceStep(this->CurrentResource, this->Player->Index);
 							if (gathering_rate >= best_gathering_rate) {
 								if (gathering_rate > best_gathering_rate) {
 									best_gathering_rate = gathering_rate;

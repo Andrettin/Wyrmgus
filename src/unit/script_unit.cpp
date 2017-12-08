@@ -1300,7 +1300,7 @@ static int CclOrderUnit(lua_State *l)
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1, d_z);
 					//Wyrmgus end
 				} else if (!strcmp(order, "attack")) {
-					CUnit *attack = TargetOnMap(unit, dpos1, dpos2);
+					CUnit *attack = TargetOnMap(unit, dpos1, dpos2, d_z);
 
 					//Wyrmgus start
 //					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
@@ -1320,7 +1320,7 @@ static int CclOrderUnit(lua_State *l)
 					//Wyrmgus end
 				//Wyrmgus start
 				} else if (!strcmp(order, "board")) {
-					CUnit &transporter = *TargetOnMap(unit, dpos1, dpos2);
+					CUnit &transporter = *TargetOnMap(unit, dpos1, dpos2, d_z);
 
 					CommandBoard(unit, transporter, 1);
 				} else if (!strcmp(order, "unload")) {
