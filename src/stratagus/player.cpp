@@ -1311,6 +1311,17 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
+	file.printf("\n  \"quest-have-resources\", {");
+	for (size_t j = 0; j < p.QuestHaveResources.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", std::get<0>(p.QuestHaveResources[j])->Ident.c_str());
+		file.printf("\"%s\",", DefaultResourceNames[std::get<1>(p.QuestHaveResources[j])].c_str());
+		file.printf("%d,", std::get<2>(p.QuestHaveResources[j]));
+	}
+	file.printf("},");
+	
 	file.printf("\n  \"modifiers\", {");
 	for (size_t j = 0; j < p.Modifiers.size(); ++j) {
 		if (j) {
@@ -2433,6 +2444,7 @@ void CPlayer::Clear()
 	this->QuestDestroyUniques.clear();
 	this->QuestDestroyFactions.clear();
 	this->QuestGatherResources.clear();
+	this->QuestHaveResources.clear();
 	this->Modifiers.clear();
 	//Wyrmgus end
 	AiEnabled = false;
@@ -2753,6 +2765,10 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		this->QuestGatherResources.push_back(std::tuple<CQuest *, int, int>(quest, std::get<0>(quest->GatherResources[i]), std::get<1>(quest->GatherResources[i])));
 	}
 	
+	for (size_t i = 0; i < quest->HaveResources.size(); ++i) {
+		this->QuestHaveResources.push_back(std::tuple<CQuest *, int, int>(quest, std::get<0>(quest->HaveResources[i]), std::get<1>(quest->HaveResources[i])));
+	}
+	
 	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 	
 	if (quest->AcceptEffects) {
@@ -2894,6 +2910,12 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 	for (int i = (this->QuestGatherResources.size()  - 1); i >= 0; --i) {
 		if (std::get<0>(this->QuestGatherResources[i]) == quest) {
 			this->QuestGatherResources.erase(std::remove(this->QuestGatherResources.begin(), this->QuestGatherResources.end(), this->QuestGatherResources[i]), this->QuestGatherResources.end());
+		}
+	}
+	
+	for (int i = (this->QuestHaveResources.size()  - 1); i >= 0; --i) {
+		if (std::get<0>(this->QuestHaveResources[i]) == quest) {
+			this->QuestHaveResources.erase(std::remove(this->QuestHaveResources.begin(), this->QuestHaveResources.end(), this->QuestHaveResources[i]), this->QuestHaveResources.end());
 		}
 	}
 }
@@ -3066,6 +3088,12 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 	
 	for (size_t i = 0; i < this->QuestGatherResources.size(); ++i) {
 		if (std::get<0>(this->QuestGatherResources[i]) == quest && std::get<2>(this->QuestGatherResources[i]) > 0) {
+			return false;
+		}
+	}
+	
+	for (size_t i = 0; i < this->QuestHaveResources.size(); ++i) {
+		if (std::get<0>(this->QuestHaveResources[i]) == quest && std::get<2>(this->QuestHaveResources[i]) > this->GetResource(std::get<1>(this->QuestHaveResources[i]), STORE_BOTH)) {
 			return false;
 		}
 	}

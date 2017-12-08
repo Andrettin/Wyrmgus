@@ -120,6 +120,7 @@ public:
 	std::vector<CUniqueItem *> DestroyUniques;
 	std::vector<CFaction *> DestroyFactions;	/// Destroy factions objective vector
 	std::vector<std::tuple<int, int>> GatherResources;	/// Gather resources objective vector, containing resource ID and quantity
+	std::vector<std::tuple<int, int>> HaveResources;	/// Have resources objective vector, containing resource ID and quantity
 	std::vector<CCharacter *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 };
 

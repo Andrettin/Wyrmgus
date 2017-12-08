@@ -184,6 +184,7 @@ public:
 	std::vector<std::tuple<CQuest *, CUniqueItem *, bool>> QuestDestroyUniques;
 	std::vector<std::tuple<CQuest *, CFaction *, bool>> QuestDestroyFactions;	/// destroy factions objectives from quests; when the faction's last unit is destroyed by the player, the bool is turned to true
 	std::vector<std::tuple<CQuest *, int, int>> QuestGatherResources;	/// gather resources objectives from quests; the first int is the resource ID, and the second one is the quantity, set at start to be the same as the quest's
+	std::vector<std::tuple<CQuest *, int, int>> QuestHaveResources;	/// have resources objectives from quests; the first int is the resource ID, and the second one is the quantity, set at start to be the same as the quest's
 	std::vector<std::pair<CUpgrade *, int>> Modifiers;					/// Modifiers affecting the player, and until which cycle it should last
 	//Wyrmgus end
 

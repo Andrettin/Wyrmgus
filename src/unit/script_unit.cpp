@@ -2081,11 +2081,15 @@ static int CclSetUnitVariable(lua_State *l)
 		}
 	} else if (!strcmp(name, "GenerateSpecialProperties")) {
 		CPlayer *dropper_player = NULL;
+		bool always_magic = false;
 		if (nargs >= 3) {
 			int dropper_player_index = LuaToNumber(l, 3);
 			dropper_player = &Players[dropper_player_index];
 		}
-		unit->GenerateSpecialProperties(NULL, dropper_player);
+		if (nargs >= 4) {
+			always_magic = LuaToBoolean(l, 4);
+		}
+		unit->GenerateSpecialProperties(NULL, dropper_player, true, false, always_magic);
 	} else if (!strcmp(name, "TTL")) {
 		unit->TTL = GameCycle + LuaToNumber(l, 3);
 	} else if (!strcmp(name, "Identified")) {

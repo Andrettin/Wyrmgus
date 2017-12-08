@@ -331,6 +331,20 @@ static int CclDefineQuest(lua_State *l)
 				
 				quest->GatherResources.push_back(std::tuple<int, int>(resource, quantity));
 			}
+		} else if (!strcmp(value, "HaveResources")) {
+			quest->HaveResources.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
+				if (resource == -1) {
+					LuaError(l, "Resource doesn't exist.");
+				}
+				++j;
+				
+				int quantity = LuaToNumber(l, -1, j + 1);
+				
+				quest->HaveResources.push_back(std::tuple<int, int>(resource, quantity));
+			}
 		} else if (!strcmp(value, "HeroesMustSurvive")) {
 			quest->HeroesMustSurvive.clear();
 			const int args = lua_rawlen(l, -1);
