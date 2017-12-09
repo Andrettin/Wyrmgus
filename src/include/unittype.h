@@ -424,6 +424,7 @@ enum {
 	HYDRATING_INDEX,
 	TIMEEFFICIENCYBONUS_INDEX,
 	RESEARCHSPEEDBONUS_INDEX,
+	GARRISONEDRANGEBONUS_INDEX,
 	SPEEDBONUS_INDEX, // dummy variable for terrain types that increase movement speed, so that their bonus shows up correctly in the interface
 	GATHERINGBONUS_INDEX,
 	COPPERGATHERINGBONUS_INDEX,

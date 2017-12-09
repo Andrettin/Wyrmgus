@@ -3116,7 +3116,7 @@ static void RemoveUnitFromContainer(CUnit &unit)
 void CUnit::UpdateContainerAttackRange()
 {
 	//reset attack range, if this unit is a transporter (or garrisonable building) from which units can attack
-	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->CanAttack) {
+	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && !this->Type->CanAttack) {
 		this->Variable[ATTACKRANGE_INDEX].Enable = 0;
 		this->Variable[ATTACKRANGE_INDEX].Max = 0;
 		this->Variable[ATTACKRANGE_INDEX].Value = 0;
@@ -5229,8 +5229,8 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 	}
 	
 	if (index == ATTACKRANGE_INDEX) {
-		if (this->Container) {
-			value += this->Container->Stats->Variables[index].Value; //treat the container's attack range as a bonus to the unit's attack range
+		if (this->Container && this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Enable) {
+			value += this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Value; //treat the container's attack range as a bonus to the unit's attack range
 		}
 		std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
 	} else if (index == SPEED_INDEX) {
@@ -5533,7 +5533,7 @@ int CUnit::GetResourceStep(const int resource) const
 
 bool CUnit::CanAttack(bool count_inside) const
 {
-	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->BoolFlag[CANATTACK_INDEX].value) { //transporters can only attack through a unit within them
+	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && !this->Type->BoolFlag[CANATTACK_INDEX].value) { //transporters without an attack can only attack through a unit within them
 		if (count_inside && this->BoardCount > 0) {
 			CUnit *boarded_unit = this->UnitInside;
 			for (int i = 0; i < this->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
@@ -6913,11 +6913,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->BoolFlag[VANISHES_INDEX].value);
 
 	//Wyrmgus start
-	if ((attacker != NULL && attacker->Player == ThisPlayer) &&
-		target.Player != ThisPlayer &&
-		(type->BoolFlag[BUILDING_INDEX].value == 1 ||
-		type->CanAttack == 1)
-		) {
+	if (
+		(attacker != NULL && attacker->Player == ThisPlayer)
+		&& target.Player != ThisPlayer
+	) {
 		// If player is hitting or being hit add tension to our music
 		AddMusicTension(1);
 	}
