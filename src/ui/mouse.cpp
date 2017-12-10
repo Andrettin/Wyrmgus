@@ -52,6 +52,7 @@
 //Wyrmgus end
 #include "commands.h"
 #include "cursor.h"
+#include "depend.h"
 #include "font.h"
 #include "interface.h"
 #include "map.h"
@@ -290,7 +291,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			//Wyrmgus end
 				for (size_t z = 0; z < UnitTypes.size(); ++z) {
-					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
+					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CheckDependByType(*unit.Player, *UnitTypes[z]) && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
 						dest.Blink = 4;
 						SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush, dest.MapLayer);
 						if (!acknowledged) {
@@ -312,7 +313,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					SendCommandReturnGoods(unit, depot, flush);
 					//Wyrmgus start
 					for (size_t z = 0; z < UnitTypes.size(); ++z) {
-						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
+						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CheckDependByType(*unit.Player, *UnitTypes[z]) && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
 							SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], 0, dest.MapLayer);
 							break;
 						}
@@ -447,7 +448,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//if the clicked unit is a settlement site, build on it
 	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
 		for (size_t z = 0; z < UnitTypes.size(); ++z) {
-			if (UnitTypes[z] && UnitTypes[z]->BoolFlag[TOWNHALL_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest->tilePos, 1, false, dest->MapLayer)) {
+			if (UnitTypes[z] && UnitTypes[z]->BoolFlag[TOWNHALL_INDEX].value && CheckDependByType(*unit.Player, *UnitTypes[z]) && CanBuildUnitType(&unit, *UnitTypes[z], dest->tilePos, 1, false, dest->MapLayer)) {
 				if (UnitTypes[z]->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[UnitTypes[z]->Slot].begin(), AiHelpers.Build[UnitTypes[z]->Slot].end(), unit.Type) != AiHelpers.Build[UnitTypes[z]->Slot].end()) {
 					dest->Blink = 4;
 					SendCommandBuildBuilding(unit, dest->tilePos, *UnitTypes[z], flush, dest->MapLayer);

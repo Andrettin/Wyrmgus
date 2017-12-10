@@ -853,6 +853,8 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			missile->destination += diff * ((PixelTileSize.x + PixelTileSize.y) * 3) / 4 / Distance(missile->source, missile->destination);
 		}
 	}
+	
+	PlayUnitSound(unit, VoiceFireMissile);
 }
 
 /**

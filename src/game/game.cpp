@@ -700,6 +700,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (!type.Sound.Miss.Name.empty() && (parent_type == NULL || type.Sound.Miss.Name != parent_type->Sound.Miss.Name)) {
 				f->printf("\t\t\"miss\", \"%s\",\n", type.Sound.Miss.Name.c_str());
 			}
+			if (!type.Sound.FireMissile.Name.empty() && (parent_type == NULL || type.Sound.FireMissile.Name != parent_type->Sound.FireMissile.Name)) {
+				f->printf("\t\t\"fire-missile\", \"%s\",\n", type.Sound.FireMissile.Name.c_str());
+			}
 			if (!type.Sound.Step.Name.empty() && (parent_type == NULL || type.Sound.Step.Name != parent_type->Sound.Step.Name)) {
 				f->printf("\t\t\"step\", \"%s\",\n", type.Sound.Step.Name.c_str());
 			}
@@ -964,6 +967,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 			if (!type.ModSounds[Map.Info.Filename].Miss.Name.empty()) {
 				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"miss\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Miss.Name.c_str());
+			}
+			if (!type.ModSounds[Map.Info.Filename].FireMissile.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"fire-missile\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].FireMissile.Name.c_str());
 			}
 			if (!type.ModSounds[Map.Info.Filename].Step.Name.empty()) {
 				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Step.Name.c_str());

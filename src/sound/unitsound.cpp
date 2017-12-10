@@ -208,6 +208,7 @@ void MapUnitSounds()
 		type.MapSound.Idle.MapSound();
 		type.MapSound.Hit.MapSound();
 		type.MapSound.Miss.MapSound();
+		type.MapSound.FireMissile.MapSound();
 		type.MapSound.Step.MapSound();
 		type.MapSound.StepDirt.MapSound();
 		type.MapSound.StepGrass.MapSound();

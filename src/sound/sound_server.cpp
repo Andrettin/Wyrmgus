@@ -417,7 +417,7 @@ bool UnitSoundIsPlaying(Origin *origin)
 		if (
 			origin && Channels[i].Playing
 			&& Channels[i].Voice != -1
-			&& Channels[i].Voice != VoiceHit && Channels[i].Voice != VoiceMiss && Channels[i].Voice != VoiceStep
+			&& Channels[i].Voice != VoiceHit && Channels[i].Voice != VoiceMiss && Channels[i].Voice != VoiceFireMissile && Channels[i].Voice != VoiceStep
 			&& Channels[i].Unit && origin->Id && Channels[i].Unit->Id
 			&& origin->Id == Channels[i].Unit->Id
 		) {

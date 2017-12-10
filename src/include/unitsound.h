@@ -80,6 +80,7 @@ public:
 	SoundConfig Idle;				/// idle
 	SoundConfig Hit;				/// hit another unit
 	SoundConfig Miss;				/// attacked another unit, but missed
+	SoundConfig FireMissile;		/// fire a missile at another unit
 	SoundConfig Step;				/// stepped
 	SoundConfig StepDirt;			/// stepped on dirt
 	SoundConfig StepGrass;			/// stepped on grass

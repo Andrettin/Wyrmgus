@@ -1206,6 +1206,9 @@ static int CclDefineCivilization(lua_State *l)
 		if (civilization->UnitSounds.Miss.Name.empty()) {
 			civilization->UnitSounds.Miss = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Miss;
 		}
+		if (civilization->UnitSounds.FireMissile.Name.empty()) {
+			civilization->UnitSounds.FireMissile = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.FireMissile;
+		}
 		if (civilization->UnitSounds.Step.Name.empty()) {
 			civilization->UnitSounds.Step = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Step;
 		}

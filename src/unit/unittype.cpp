@@ -1064,6 +1064,9 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			if (!iterator->second.Miss.Name.empty()) {
 				type.MapSound.Miss = iterator->second.Miss;
 			}
+			if (!iterator->second.FireMissile.Name.empty()) {
+				type.MapSound.FireMissile = iterator->second.FireMissile;
+			}
 			if (!iterator->second.Step.Name.empty()) {
 				type.MapSound.Step = iterator->second.Step;
 			}

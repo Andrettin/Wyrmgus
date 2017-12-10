@@ -1997,6 +1997,8 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.Hit.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "miss")) {
 					type->Sound.Miss.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "fire-missile")) {
+					type->Sound.FireMissile.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "step")) {
 					type->Sound.Step.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "step-dirt")) {
@@ -2366,13 +2368,9 @@ static int CclDefineUnitType(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (type->CanMove() || type->CanAttack) {
+	if (type->CanMove()) {
 		std::string button_definition = "DefineButton({\n";
-		if (type->CanMove()) {
-			button_definition += "\tPos = 2,\n";
-		} else {
-			button_definition += "\tPos = 1,\n";
-		}
+		button_definition += "\tPos = 2,\n";
 		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"stop\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
@@ -2383,13 +2381,9 @@ static int CclDefineUnitType(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (type->CanAttack) {
+	if (type->CanMove() && type->CanAttack) {
 		std::string button_definition = "DefineButton({\n";
-		if (type->CanMove()) {
-			button_definition += "\tPos = 3,\n";
-		} else {
-			button_definition += "\tPos = 2,\n";
-		}
+		button_definition += "\tPos = 3,\n";
 		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"attack\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
@@ -2972,6 +2966,12 @@ static int CclGetUnitTypeData(lua_State *l)
 				lua_pushstring(l, type->Sound.Miss.Name.c_str());
 			} else {
 				lua_pushstring(l, type->MapSound.Miss.Name.c_str());
+			}
+		} else if (sound_type == "fire-missile") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.FireMissile.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.FireMissile.Name.c_str());
 			}
 		} else if (sound_type == "step") {
 			if (!GameRunning && Editor.Running != EditorEditing) {
@@ -4520,6 +4520,8 @@ void SetModSound(std::string mod_file, std::string ident, std::string sound, std
 		type->ModSounds[mod_file].Hit.Name = sound;
 	} else if (sound_type == "miss") {
 		type->ModSounds[mod_file].Miss.Name = sound;
+	} else if (sound_type == "fire-missile") {
+		type->ModSounds[mod_file].FireMissile.Name = sound;
 	} else if (sound_type == "step") {
 		type->ModSounds[mod_file].Step.Name = sound;
 	} else if (sound_type == "step-dirt") {
@@ -4575,6 +4577,8 @@ void SetModSound(std::string mod_file, std::string ident, std::string sound, std
 			type->MapSound.Hit.Name = sound;
 		} else if (sound_type == "miss") {
 			type->MapSound.Miss.Name = sound;
+		} else if (sound_type == "fire-missile") {
+			type->MapSound.FireMissile.Name = sound;
 		} else if (sound_type == "step") {
 			type->MapSound.Step.Name = sound;
 		} else if (sound_type == "step-dirt") {

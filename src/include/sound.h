@@ -78,6 +78,7 @@ enum UnitVoiceGroup {
 	VoiceIdle,				/// Idle sound
 	VoiceHit,				/// Hit another unit
 	VoiceMiss,				/// Attacked another unit, but missed
+	VoiceFireMissile,		/// Fire a missile at another unit
 	VoiceStep,				/// Stepped
 	VoiceUsed,				/// Used (for items)
 	//Wyrmgus end

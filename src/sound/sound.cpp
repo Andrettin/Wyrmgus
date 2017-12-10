@@ -214,6 +214,8 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			} else {
 				return unit.Type->MapSound.Hit.Sound;
 			}
+		case VoiceFireMissile:
+			return unit.Type->MapSound.FireMissile.Sound;
 		case VoiceStep:
 			if (unit.Type->MapSound.StepGravel.Sound && mf.getFlag() & MapFieldGravel) {
 				return unit.Type->MapSound.StepGravel.Sound;
@@ -443,7 +445,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (unit.Variable[STUN_INDEX].Value > 0 && voice != VoiceHit && voice != VoiceMiss && voice != VoiceStep && voice != VoiceDying) { //don't speak if stunned
+	if (unit.Variable[STUN_INDEX].Value > 0 && voice != VoiceHit && voice != VoiceMiss && voice != VoiceFireMissile && voice != VoiceStep && voice != VoiceDying) { //don't speak if stunned
 		return;
 	}
 	//Wyrmgus end
@@ -458,7 +460,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	
 	//Wyrmgus start
 //	if (UnitSoundIsPlaying(&source)) {
-	if (voice != VoiceHit && voice != VoiceMiss && voice != VoiceStep && UnitSoundIsPlaying(&source)) {
+	if (voice != VoiceHit && voice != VoiceMiss && voice != VoiceFireMissile && voice != VoiceStep && UnitSoundIsPlaying(&source)) {
 	//Wyrmgus end
 		return;
 	}
