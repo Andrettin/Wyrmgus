@@ -4455,8 +4455,6 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	MapUnmarkUnitSight(*this);
 	newplayer.AddUnit(*this);
 	Stats = &Type->Stats[newplayer.Index];
-	UpdateUnitSightRange(*this);
-	MapMarkUnitSight(*this);
 
 	//  Must change food/gold and other.
 	//Wyrmgus start
@@ -4527,6 +4525,13 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	}
 
 	UpdateForNewUnit(*this, 1);
+	
+	UpdateUnitSightRange(*this);
+	MapMarkUnitSight(*this);
+	
+	//not very elegant way to make sure the tile ownership is calculated correctly
+	MapUnmarkUnitSight(*this);
+	MapMarkUnitSight(*this);
 	
 	//Wyrmgus start
 	if (newplayer.Index == ThisPlayer->Index && show_change) {
