@@ -2979,6 +2979,10 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		}
 	}
 	
+	if (quest->RecruitCharacters.size() > 0 && (this->Heroes.size() + quest->RecruitCharacters.size()) > PlayerHeroMax) {
+		return false;
+	}
+	
 	for (size_t i = 0; i < quest->RecruitCharacters.size(); ++i) {
 		if (!this->CanRecruitHero(quest->RecruitCharacters[i], true)) {
 			return false;

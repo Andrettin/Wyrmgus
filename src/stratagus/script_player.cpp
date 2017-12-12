@@ -3353,6 +3353,9 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "NumTownHalls")) {
 		lua_pushnumber(l, p->NumTownHalls);
 		return 1;
+	} else if (!strcmp(data, "NumHeroes")) {
+		lua_pushnumber(l, p->Heroes.size());
+		return 1;
 	} else if (!strcmp(data, "TradeCost")) {
 		lua_pushnumber(l, p->TradeCost);
 		return 1;
