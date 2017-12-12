@@ -2625,6 +2625,10 @@ void CPlayer::AvailableQuestsChanged()
 				UnitButtonTable[i]->Description += "\n \nHint: " + quest->Hint;
 			}
 		}
+		
+		if (!Selected.empty() && Selected[0]->Type->BoolFlag[TOWNHALL_INDEX].value) {
+			UI.ButtonPanel.Update();
+		}
 	}
 }
 
