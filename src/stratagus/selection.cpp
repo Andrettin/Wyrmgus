@@ -66,6 +66,7 @@ static std::vector<CUnit *> TeamSelected[PlayerMax];	/// teams currently selecte
 
 static std::vector<CUnit *> _Selected;					/// save of Selected
 static std::vector<CUnit *> _TeamSelected[PlayerMax];	/// save of TeamSelected
+static CUnit *_TrackUnit = NULL;						/// save of the unit being tracked (if any)
 
 static unsigned GroupId;								/// Unique group # for automatic groups
 
@@ -87,6 +88,7 @@ void SaveSelection()
 		_TeamSelected[i] = TeamSelected[i];
 	}
 	_Selected = Selected;
+	_TrackUnit = UI.SelectedViewport->Unit;
 }
 
 /**
@@ -105,6 +107,7 @@ void RestoreSelection()
 	for (size_t i = 0; i != _Selected.size(); ++i) {
 		Selected[i]->Selected = 1;
 	}
+	UI.SelectedViewport->Unit = _TrackUnit;
 }
 
 /**

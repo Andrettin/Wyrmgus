@@ -191,6 +191,9 @@ void DrawMapArea()
 			if (vp->Unit->Destroyed || vp->Unit->CurrentAction() == UnitActionDie) {
 				vp->Unit = NULL;
 			} else {
+				if (CurrentMapLayer != vp->Unit->MapLayer) {
+					ChangeCurrentMapLayer(vp->Unit->MapLayer);
+				}
 				vp->Center(vp->Unit->GetMapPixelPosCenter());
 			}
 		}

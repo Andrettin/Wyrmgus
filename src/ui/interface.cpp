@@ -573,6 +573,9 @@ static void UiCenterOnSelected()
 	//Wyrmgus end
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
+		if (Selected[i]->MapLayer != best_map_layer) {
+			continue;
+		}
 		pos += Selected[i]->GetMapPixelPosCenter();
 	}
 	pos /= Selected.size();
