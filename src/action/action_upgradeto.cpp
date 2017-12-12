@@ -47,6 +47,7 @@
 #include "iolib.h"
 #include "map.h"
 #include "player.h"
+#include "quest.h"
 #include "script.h"
 #include "spells.h"
 //Wyrmgus start
@@ -370,27 +371,14 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		}
 		
 		if (!unit.Constructed) {
-			for (size_t i = 0; i < player.QuestBuildUnits.size(); ++i) {
-				if (std::get<1>(player.QuestBuildUnits[i]) == &newtype) {
-					std::get<2>(player.QuestBuildUnits[i]) -= 1;
-				}
-			}
-			
-			for (size_t i = 0; i < player.QuestBuildUnitsOfClass.size(); ++i) {
-				if (std::get<1>(player.QuestBuildUnitsOfClass[i]) == newtype.Class) {
-					std::get<2>(player.QuestBuildUnitsOfClass[i]) -= 1;
-				}
-			}
-		
-			for (size_t i = 0; i < player.QuestBuildSettlementUnits.size(); ++i) {
-				if (std::get<1>(player.QuestBuildSettlementUnits[i]) == unit.Settlement && std::get<2>(player.QuestBuildSettlementUnits[i]) == &newtype) {
-					std::get<3>(player.QuestBuildSettlementUnits[i]) -= 1;
-				}
-			}	
-		
-			for (size_t i = 0; i < player.QuestBuildSettlementUnitsOfClass.size(); ++i) {
-				if (std::get<1>(player.QuestBuildSettlementUnitsOfClass[i]) == unit.Settlement && std::get<2>(player.QuestBuildSettlementUnitsOfClass[i]) == newtype.Class) {
-					std::get<3>(player.QuestBuildSettlementUnitsOfClass[i]) -= 1;
+			for (size_t i = 0; i < player.QuestObjectives.size(); ++i) {
+				if (
+					(player.QuestObjectives[i]->ObjectiveType == BuildUnitsObjectiveType && player.QuestObjectives[i]->UnitType == &newtype)
+					|| (player.QuestObjectives[i]->ObjectiveType == BuildUnitsOfClassObjectiveType && player.QuestObjectives[i]->UnitClass == newtype.Class)
+				) {
+					if (!player.QuestObjectives[i]->Settlement || player.QuestObjectives[i]->Settlement == unit.Settlement) {
+						player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + 1, player.QuestObjectives[i]->Quantity);
+					}
 				}
 			}
 		}

@@ -42,6 +42,7 @@
 #include "iolib.h"
 #include "map.h"
 #include "player.h"
+#include "quest.h"
 #include "script.h"
 #include "sound.h"
 //Wyrmgus start
@@ -205,29 +206,16 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		player.Ai->Scouts.push_back(&unit);
 	}
 	
-	for (size_t i = 0; i < player.QuestBuildUnits.size(); ++i) {
-		if (std::get<1>(player.QuestBuildUnits[i]) == &type) {
-			std::get<2>(player.QuestBuildUnits[i]) -= 1;
+	for (size_t i = 0; i < player.QuestObjectives.size(); ++i) {
+		if (
+			(player.QuestObjectives[i]->ObjectiveType == BuildUnitsObjectiveType && player.QuestObjectives[i]->UnitType == &type)
+			|| (player.QuestObjectives[i]->ObjectiveType == BuildUnitsOfClassObjectiveType && player.QuestObjectives[i]->UnitClass == type.Class)
+		) {
+			if (!player.QuestObjectives[i]->Settlement || player.QuestObjectives[i]->Settlement == unit.Settlement) {
+				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + 1, player.QuestObjectives[i]->Quantity);
+			}
 		}
 	}
-	
-	for (size_t i = 0; i < player.QuestBuildUnitsOfClass.size(); ++i) {
-		if (std::get<1>(player.QuestBuildUnitsOfClass[i]) == type.Class) {
-			std::get<2>(player.QuestBuildUnitsOfClass[i]) -= 1;
-		}
-	}
-	
-	for (size_t i = 0; i < player.QuestBuildSettlementUnits.size(); ++i) {
-		if (std::get<1>(player.QuestBuildSettlementUnits[i]) == unit.Settlement && std::get<2>(player.QuestBuildSettlementUnits[i]) == &type) {
-			std::get<3>(player.QuestBuildSettlementUnits[i]) -= 1;
-		}
-	}
-
-	for (size_t i = 0; i < player.QuestBuildSettlementUnitsOfClass.size(); ++i) {
-		if (std::get<1>(player.QuestBuildSettlementUnitsOfClass[i]) == unit.Settlement && std::get<2>(player.QuestBuildSettlementUnitsOfClass[i]) == type.Class) {
-			std::get<3>(player.QuestBuildSettlementUnitsOfClass[i]) -= 1;
-		}
-	}	
 	//Wyrmgus end
 	
 	unit.Constructed = 0;

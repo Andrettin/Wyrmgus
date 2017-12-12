@@ -1419,7 +1419,6 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 			if (player.QuestObjectives[i]->Resource == rindex) {
 				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + processed_resource_change, player.QuestObjectives[i]->Quantity);
 			} else if (player.QuestObjectives[i]->Resource == this->CurrentResource) {
-				player.QuestObjectives[i]->Counter += unit.ResourcesHeld;
 				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + unit.ResourcesHeld, player.QuestObjectives[i]->Quantity);
 			}
 		}

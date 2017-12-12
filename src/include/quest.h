@@ -159,10 +159,6 @@ public:
 	std::vector<CQuestObjective *> Objectives;	/// The objectives of this quest
 	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
-	std::vector<std::tuple<CUnitType *, int>> BuildUnits;	/// Build units objective vector, containing unit type and quantity
-	std::vector<std::tuple<int, int>> BuildUnitsOfClass;	/// Build units objective vector, containing class id and quantity
-	std::vector<std::tuple<CSettlement *, CUnitType *, int>> BuildSettlementUnits;	/// Build settlement units objective vector, containing settlement, unit type and quantity
-	std::vector<std::tuple<CSettlement *, int, int>> BuildSettlementUnitsOfClass;	/// Build settlement units objective vector, containing settlement, unit class id and quantity
 	std::vector<CCharacter *> RecruitCharacters;	/// Recruit characters objective vector
 	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
 	std::vector<CCharacter *> DestroyCharacters;
