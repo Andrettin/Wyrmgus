@@ -159,7 +159,6 @@ public:
 	std::vector<CQuestObjective *> Objectives;	/// The objectives of this quest
 	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
-	std::vector<CCharacter *> RecruitCharacters;	/// Recruit characters objective vector
 	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
 	std::vector<CCharacter *> DestroyCharacters;
 	std::vector<CUniqueItem *> DestroyUniques;
