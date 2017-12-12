@@ -576,35 +576,43 @@ void CPlayer::Load(lua_State *l)
 					this->QuestDestroyFactions.push_back(std::tuple<CQuest *, CFaction *, bool>(quest, faction, destroyed));
 				}
 			}
-		} else if (!strcmp(value, "quest-gather-resources")) {
+		} else if (!strcmp(value, "quest-objectives")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
-				++k;
-				int resource = GetResourceIdByName(LuaToString(l, j + 1, k + 1));
-				++k;
-				int quantity = LuaToNumber(l, j + 1, k + 1);
-				if (quest) {
-					this->QuestGatherResources.push_back(std::tuple<CQuest *, int, int>(quest, resource, quantity));
+				lua_rawgeti(l, j + 1, k + 1);
+				CPlayerQuestObjective *objective = new CPlayerQuestObjective;
+				this->QuestObjectives.push_back(objective);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table for quest objectives)");
 				}
-			}
-		} else if (!strcmp(value, "quest-have-resources")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
-				++k;
-				int resource = GetResourceIdByName(LuaToString(l, j + 1, k + 1));
-				++k;
-				int quantity = LuaToNumber(l, j + 1, k + 1);
-				if (quest) {
-					this->QuestHaveResources.push_back(std::tuple<CQuest *, int, int>(quest, resource, quantity));
+				const int subsubargs = lua_rawlen(l, -1);
+				for (int n = 0; n < subsubargs; ++n) {
+					value = LuaToString(l, -1, n + 1);
+					++n;
+					if (!strcmp(value, "quest")) {
+						objective->Quest = GetQuest(LuaToString(l, -1, n + 1));
+						if (!objective->Quest) {
+							LuaError(l, "Quest doesn't exist.");
+						}
+					} else if (!strcmp(value, "objective-type")) {
+						objective->ObjectiveType = GetQuestObjectiveTypeIdByName(LuaToString(l, -1, n + 1));
+						if (objective->ObjectiveType == -1) {
+							LuaError(l, "Objective type doesn't exist.");
+						}
+					} else if (!strcmp(value, "objective-string")) {
+						objective->ObjectiveString = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "quantity")) {
+						objective->Quantity = LuaToNumber(l, -1, n + 1);
+					} else if (!strcmp(value, "counter")) {
+						objective->Counter = LuaToNumber(l, -1, n + 1);
+					} else if (!strcmp(value, "resource")) {
+						objective->Resource = GetResourceIdByName(LuaToString(l, -1, n + 1));
+					}
 				}
+				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "modifiers")) {
 			if (!lua_istable(l, j + 1)) {
@@ -709,14 +717,6 @@ static int CclSetThisPlayer(lua_State *l)
 	
 	//Wyrmgus start
 	UI.Load();
-	
-	if (GameRunning) {
-		for (size_t i = 0; i < ThisPlayer->CurrentQuests.size(); ++i) {
-			for (size_t j = 0; j < ThisPlayer->CurrentQuests[i]->Objectives.size(); ++j) {
-				SetObjective("%s", ThisPlayer->CurrentQuests[i]->Objectives[j].c_str());
-			}
-		}
-	}
 	//Wyrmgus end
 
 	lua_pushnumber(l, plynr);
@@ -3302,6 +3302,13 @@ static int CclGetPlayerData(lua_State *l)
 		int other_player = LuaToNumber(l, 3);;
 
 		lua_pushnumber(l, p->GetTradePotentialWith(Players[other_player]));
+		return 1;
+	} else if (!strcmp(data, "HasHero")) {
+		LuaCheckArgs(l, 3);
+		
+		CCharacter *hero = GetCharacter(LuaToString(l, 3));
+
+		lua_pushboolean(l, p->HasHero(hero));
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "UnitTypesCount")) {

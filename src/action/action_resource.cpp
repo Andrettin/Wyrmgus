@@ -47,6 +47,7 @@
 #include "map.h"
 #include "pathfinder.h"
 #include "player.h"
+#include "quest.h"
 #include "script.h"
 //Wyrmgus start
 #include "settings.h"
@@ -1413,11 +1414,14 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	unit.XPChanged();
 	
 	//update quests
-	for (size_t i = 0; i < player.QuestGatherResources.size(); ++i) {
-		if (std::get<1>(player.QuestGatherResources[i]) == rindex) {
-			std::get<2>(player.QuestGatherResources[i]) -= resource_change;
-		} else if (std::get<1>(player.QuestGatherResources[i]) == this->CurrentResource) {
-			std::get<2>(player.QuestGatherResources[i]) -= unit.ResourcesHeld;
+	for (size_t i = 0; i < player.QuestObjectives.size(); ++i) {
+		if (player.QuestObjectives[i]->ObjectiveType == GatherResourceObjectiveType) {
+			if (player.QuestObjectives[i]->Resource == rindex) {
+				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + processed_resource_change, player.QuestObjectives[i]->Quantity);
+			} else if (player.QuestObjectives[i]->Resource == this->CurrentResource) {
+				player.QuestObjectives[i]->Counter += unit.ResourcesHeld;
+				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + unit.ResourcesHeld, player.QuestObjectives[i]->Quantity);
+			}
 		}
 	}
 	

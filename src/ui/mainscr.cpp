@@ -49,6 +49,7 @@
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
+#include "quest.h"
 //Wyrmgus end
 #include "sound.h"
 #include "spells.h"
@@ -1364,7 +1365,39 @@ void MessagesDisplay::DrawMessages()
 			
 			//Wyrmgus start
 			// Draw objectives
-			for (int z = 0; z < ObjectivesCount; ++z) {
+			int z = 0;
+			for (size_t i = 0; i < ThisPlayer->CurrentQuests.size(); ++i) {
+				const CQuest *quest = ThisPlayer->CurrentQuests[i];
+
+				if (z == 0) {
+					PushClipping();
+					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
+								Video.Height - 1);
+				}
+				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), quest->Name);
+				if (z == 0) {
+					PopClipping();
+				}
+				
+				++z;
+				
+				for (size_t j = 0; j < ThisPlayer->QuestObjectives.size(); ++j) {
+					const CPlayerQuestObjective *objective = ThisPlayer->QuestObjectives[j];
+					if (objective->Quest != quest) {
+						continue;
+					}
+					std::string objective_string = "- " + objective->ObjectiveString;
+					if (objective->Quantity) {
+						objective_string += " (" + std::to_string((long long) objective->Counter) + "/" + std::to_string((long long) objective->Quantity) + ")";
+					}
+					label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), objective_string);
+					++z;
+				}
+				for (size_t j = 0; j < quest->ObjectiveStrings.size(); ++j, ++z) {
+					label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), quest->ObjectiveStrings[j]);
+				}
+			}
+			for (int i = 0; i < ObjectivesCount; ++i, ++z) {
 				if (z == 0) {
 					PushClipping();
 					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
@@ -1372,13 +1405,10 @@ void MessagesDisplay::DrawMessages()
 				}
 				/*
 				 * Due parallel drawing we have to force message copy due temp
-				 * std::string(Objectives[z]) creation because
+				 * std::string(Objectives[i]) creation because
 				 * char * pointer may change during text drawing.
 				 */
-				label.DrawClip(UI.MapArea.X + 8,
-							   UI.MapArea.Y + 8 +
-							   z * (UI.MessageFont->Height() + 1),
-							   std::string(Objectives[z]));
+				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(Objectives[i]));
 				if (z == 0) {
 					PopClipping();
 				}

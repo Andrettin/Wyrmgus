@@ -1300,25 +1300,21 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
-	file.printf("\n  \"quest-gather-resources\", {");
-	for (size_t j = 0; j < p.QuestGatherResources.size(); ++j) {
+	file.printf("\n  \"quest-objectives\", {");
+	for (size_t j = 0; j < p.QuestObjectives.size(); ++j) {
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\",", std::get<0>(p.QuestGatherResources[j])->Ident.c_str());
-		file.printf("\"%s\",", DefaultResourceNames[std::get<1>(p.QuestGatherResources[j])].c_str());
-		file.printf("%d,", std::get<2>(p.QuestGatherResources[j]));
-	}
-	file.printf("},");
-	
-	file.printf("\n  \"quest-have-resources\", {");
-	for (size_t j = 0; j < p.QuestHaveResources.size(); ++j) {
-		if (j) {
-			file.printf(" ");
+		file.printf("{");
+		file.printf("\"quest\", \"%s\",", p.QuestObjectives[j]->Quest->Ident.c_str());
+		file.printf("\"objective-type\", \"%s\",", GetQuestObjectiveTypeNameById(p.QuestObjectives[j]->ObjectiveType).c_str());
+		file.printf("\"objective-string\", \"%s\",", p.QuestObjectives[j]->ObjectiveString.c_str());
+		file.printf("\"quantity\", %d,", p.QuestObjectives[j]->Quantity);
+		file.printf("\"counter\", %d,", p.QuestObjectives[j]->Counter);
+		if (p.QuestObjectives[j]->Resource != -1) {
+			file.printf("\"resource\", \"%s\",", DefaultResourceNames[p.QuestObjectives[j]->Resource].c_str());
 		}
-		file.printf("\"%s\",", std::get<0>(p.QuestHaveResources[j])->Ident.c_str());
-		file.printf("\"%s\",", DefaultResourceNames[std::get<1>(p.QuestHaveResources[j])].c_str());
-		file.printf("%d,", std::get<2>(p.QuestHaveResources[j]));
+		file.printf("},");
 	}
 	file.printf("},");
 	
@@ -2443,8 +2439,10 @@ void CPlayer::Clear()
 	this->QuestDestroyCharacters.clear();
 	this->QuestDestroyUniques.clear();
 	this->QuestDestroyFactions.clear();
-	this->QuestGatherResources.clear();
-	this->QuestHaveResources.clear();
+	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
+		delete this->QuestObjectives[i];
+	}
+	this->QuestObjectives.clear();
 	this->Modifiers.clear();
 	//Wyrmgus end
 	AiEnabled = false;
@@ -2667,8 +2665,8 @@ void CPlayer::AvailableQuestsChanged()
 			
 			UnitButtonTable[i]->Hint = "Quest: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Name;
 			UnitButtonTable[i]->Description = this->AvailableQuests[UnitButtonTable[i]->Value]->Description + "\n \nObjectives:";
-			for (size_t j = 0; j < this->AvailableQuests[UnitButtonTable[i]->Value]->Objectives.size(); ++j) {
-				UnitButtonTable[i]->Description += "\n" + this->AvailableQuests[UnitButtonTable[i]->Value]->Objectives[j];
+			for (size_t j = 0; j < this->AvailableQuests[UnitButtonTable[i]->Value]->ObjectiveStrings.size(); ++j) {
+				UnitButtonTable[i]->Description += "\n" + this->AvailableQuests[UnitButtonTable[i]->Value]->ObjectiveStrings[j];
 			}
 			if (!this->AvailableQuests[UnitButtonTable[i]->Value]->Rewards.empty()) {
 				UnitButtonTable[i]->Description += "\n \nRewards: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Rewards;
@@ -2682,8 +2680,19 @@ void CPlayer::AvailableQuestsChanged()
 
 void CPlayer::UpdateCurrentQuests()
 {
-	for (size_t i = 0; i < this->CurrentQuests.size(); ++i) {
-		this->UpdateQuest(CurrentQuests[i]);
+	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
+		if (std::get<2>(this->QuestDestroyFactions[i]) == false) { // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
+			CPlayer *faction_player = GetFactionPlayer(std::get<1>(this->QuestDestroyFactions[i]));
+			if (faction_player && faction_player->GetUnitCount() == 0) {
+				std::get<2>(this->QuestDestroyFactions[i]) = true;
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
+		if (this->QuestObjectives[i]->ObjectiveType == HaveResourceObjectiveType) {
+			this->QuestObjectives[i]->Counter = std::min(this->GetResource(this->QuestObjectives[i]->Resource, STORE_BOTH), this->QuestObjectives[i]->Quantity);
+		}
 	}
 	
 	for (int i = (this->CurrentQuests.size()  - 1); i >= 0; --i) {
@@ -2692,22 +2701,6 @@ void CPlayer::UpdateCurrentQuests()
 			this->FailQuest(this->CurrentQuests[i], failed_quest);
 		} else if (this->HasCompletedQuest(this->CurrentQuests[i])) {
 			this->CompleteQuest(this->CurrentQuests[i]);
-		}
-	}
-}
-
-void CPlayer::UpdateQuest(CQuest *quest)
-{
-	if (!quest) {
-		return;
-	}
-	
-	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyFactions[i]) == quest && std::get<2>(this->QuestDestroyFactions[i]) == false) { // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
-			CPlayer *faction_player = GetFactionPlayer(std::get<1>(this->QuestDestroyFactions[i]));
-			if (faction_player && faction_player->GetUnitCount() == 0) {
-				std::get<2>(this->QuestDestroyFactions[i]) = true;
-			}
 		}
 	}
 }
@@ -2761,12 +2754,19 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		this->QuestDestroyFactions.push_back(std::tuple<CQuest *, CFaction *, bool>(quest, quest->DestroyFactions[i], false));
 	}
 	
-	for (size_t i = 0; i < quest->GatherResources.size(); ++i) {
-		this->QuestGatherResources.push_back(std::tuple<CQuest *, int, int>(quest, std::get<0>(quest->GatherResources[i]), std::get<1>(quest->GatherResources[i])));
-	}
-	
-	for (size_t i = 0; i < quest->HaveResources.size(); ++i) {
-		this->QuestHaveResources.push_back(std::tuple<CQuest *, int, int>(quest, std::get<0>(quest->HaveResources[i]), std::get<1>(quest->HaveResources[i])));
+	for (size_t i = 0; i < quest->Objectives.size(); ++i) {
+		CPlayerQuestObjective *objective = new CPlayerQuestObjective;
+		objective->ObjectiveType = quest->Objectives[i]->ObjectiveType;
+		objective->Quest = quest->Objectives[i]->Quest;
+		objective->ObjectiveString = quest->Objectives[i]->ObjectiveString;
+		objective->Quantity = quest->Objectives[i]->Quantity;
+		objective->Resource = quest->Objectives[i]->Resource;
+		objective->UnitClass = quest->Objectives[i]->UnitClass;
+		objective->UnitType = quest->Objectives[i]->UnitType;
+		objective->Character = quest->Objectives[i]->Character;
+		objective->Unique = quest->Objectives[i]->Unique;
+		objective->Settlement = quest->Objectives[i]->Settlement;
+		this->QuestObjectives.push_back(objective);
 	}
 	
 	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
@@ -2774,14 +2774,6 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	if (quest->AcceptEffects) {
 		quest->AcceptEffects->pushPreamble();
 		quest->AcceptEffects->run();
-	}
-	
-	if (this == ThisPlayer) {
-		CclCommand("AddPlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Name + "\");");
-		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
-//			SetObjective(quest->Objectives[i].c_str());
-			CclCommand("AddPlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
-		}
 	}
 	
 	this->AvailableQuestsChanged();
@@ -2800,14 +2792,6 @@ void CPlayer::CompleteQuest(CQuest *quest)
 	if (quest->CompletionEffects) {
 		quest->CompletionEffects->pushPreamble();
 		quest->CompletionEffects->run();
-	}
-	
-	if (this == ThisPlayer) {
-		CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Name + "\");");
-		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
-//			SetObjective(quest->Objectives[i].c_str());
-			CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
-		}
 	}
 	
 	if (this == ThisPlayer) {
@@ -2833,12 +2817,6 @@ void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 	}
 	
 	if (this == ThisPlayer) {
-		CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Name + "\");");
-		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
-//			SetObjective(quest->Objectives[i].c_str());
-			CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
-		}
-
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->Name + " quest! " + fail_reason + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
 	}
 }
@@ -2907,15 +2885,9 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 		}
 	}
 	
-	for (int i = (this->QuestGatherResources.size()  - 1); i >= 0; --i) {
-		if (std::get<0>(this->QuestGatherResources[i]) == quest) {
-			this->QuestGatherResources.erase(std::remove(this->QuestGatherResources.begin(), this->QuestGatherResources.end(), this->QuestGatherResources[i]), this->QuestGatherResources.end());
-		}
-	}
-	
-	for (int i = (this->QuestHaveResources.size()  - 1); i >= 0; --i) {
-		if (std::get<0>(this->QuestHaveResources[i]) == quest) {
-			this->QuestHaveResources.erase(std::remove(this->QuestHaveResources.begin(), this->QuestHaveResources.end(), this->QuestHaveResources[i]), this->QuestHaveResources.end());
+	for (int i = (this->QuestObjectives.size()  - 1); i >= 0; --i) {
+		if (this->QuestObjectives[i]->Quest == quest) {
+			this->QuestObjectives.erase(std::remove(this->QuestObjectives.begin(), this->QuestObjectives.end(), this->QuestObjectives[i]), this->QuestObjectives.end());
 		}
 	}
 }
@@ -3090,14 +3062,8 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 		}
 	}
 	
-	for (size_t i = 0; i < this->QuestGatherResources.size(); ++i) {
-		if (std::get<0>(this->QuestGatherResources[i]) == quest && std::get<2>(this->QuestGatherResources[i]) > 0) {
-			return false;
-		}
-	}
-	
-	for (size_t i = 0; i < this->QuestHaveResources.size(); ++i) {
-		if (std::get<0>(this->QuestHaveResources[i]) == quest && std::get<2>(this->QuestHaveResources[i]) > this->GetResource(std::get<1>(this->QuestHaveResources[i]), STORE_BOTH)) {
+	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
+		if (this->QuestObjectives[i]->Quest == quest && this->QuestObjectives[i]->Quantity > 0 && this->QuestObjectives[i]->Counter < this->QuestObjectives[i]->Quantity) {
 			return false;
 		}
 	}
@@ -4527,6 +4493,10 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, int button_action) const
 
 bool CPlayer::HasHero(const CCharacter *hero) const
 {
+	if (!hero) {
+		return false;
+	}
+	
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
 		if (this->Heroes[i]->Character == hero) {
 			return true;

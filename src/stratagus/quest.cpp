@@ -139,6 +139,28 @@ void CheckAchievements()
 	}
 }
 
+std::string GetQuestObjectiveTypeNameById(int objective_type)
+{
+	if (objective_type == GatherResourceObjectiveType) {
+		return "gather-resource";
+	} else if (objective_type == HaveResourceObjectiveType) {
+		return "have-resource";
+	}
+
+	return "";
+}
+
+int GetQuestObjectiveTypeIdByName(std::string objective_type)
+{
+	if (objective_type == "gather-resource") {
+		return GatherResourceObjectiveType;
+	} else if (objective_type == "have-resource") {
+		return HaveResourceObjectiveType;
+	}
+
+	return -1;
+}
+
 CQuest *GetQuest(std::string quest_ident)
 {
 	for (size_t i = 0; i < Quests.size(); ++i) {
@@ -201,6 +223,9 @@ CQuest::~CQuest()
 	}
 	if (this->FailEffects) {
 		delete FailEffects;
+	}
+	for (size_t i = 0; i < this->Objectives.size(); ++i) {
+		delete this->Objectives[i];
 	}
 }
 

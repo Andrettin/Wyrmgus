@@ -164,11 +164,11 @@ static int CclDefineQuest(lua_State *l)
 			quest->CompletionEffects = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "FailEffects")) {
 			quest->FailEffects = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "Objectives")) {
-			quest->Objectives.clear();
+		} else if (!strcmp(value, "ObjectiveStrings")) {
+			quest->ObjectiveStrings.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				quest->Objectives.push_back(LuaToString(l, -1, j + 1));
+				quest->ObjectiveStrings.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "BriefingSounds")) {
 			quest->BriefingSounds.clear();
@@ -177,6 +177,38 @@ static int CclDefineQuest(lua_State *l)
 				quest->BriefingSounds.push_back(LuaToString(l, -1, j + 1));
 			}
 		// objective types
+		} else if (!strcmp(value, "Objectives")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				CQuestObjective *objective = new CQuestObjective;
+				objective->Quest = quest;
+				quest->Objectives.push_back(objective);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table for quest objectives)");
+				}
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
+					if (!strcmp(value, "objective-type")) {
+						objective->ObjectiveType = GetQuestObjectiveTypeIdByName(LuaToString(l, -1, k + 1));
+						if (objective->ObjectiveType == -1) {
+							LuaError(l, "Objective type doesn't exist.");
+						}
+					} else if (!strcmp(value, "objective-string")) {
+						objective->ObjectiveString = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "quantity")) {
+						objective->Quantity = LuaToNumber(l, -1, k + 1);
+					} else if (!strcmp(value, "resource")) {
+						objective->Resource = GetResourceIdByName(LuaToString(l, -1, k + 1));
+					} else {
+						printf("\n%s\n", quest->Ident.c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "BuildUnits")) {
 			quest->BuildUnits.clear();
 			const int args = lua_rawlen(l, -1);
@@ -317,34 +349,6 @@ static int CclDefineQuest(lua_State *l)
 				}
 				quest->DestroyFactions.push_back(faction);
 			}
-		} else if (!strcmp(value, "GatherResources")) {
-			quest->GatherResources.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
-				if (resource == -1) {
-					LuaError(l, "Resource doesn't exist.");
-				}
-				++j;
-				
-				int quantity = LuaToNumber(l, -1, j + 1);
-				
-				quest->GatherResources.push_back(std::tuple<int, int>(resource, quantity));
-			}
-		} else if (!strcmp(value, "HaveResources")) {
-			quest->HaveResources.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
-				if (resource == -1) {
-					LuaError(l, "Resource doesn't exist.");
-				}
-				++j;
-				
-				int quantity = LuaToNumber(l, -1, j + 1);
-				
-				quest->HaveResources.push_back(std::tuple<int, int>(resource, quantity));
-			}
 		} else if (!strcmp(value, "HeroesMustSurvive")) {
 			quest->HeroesMustSurvive.clear();
 			const int args = lua_rawlen(l, -1);
@@ -481,10 +485,10 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushstring(l, quest->QuestGiver->Ident.c_str());
 		return 1;
 	} else if (!strcmp(data, "Objectives")) {
-		lua_createtable(l, quest->Objectives.size(), 0);
-		for (size_t i = 1; i <= quest->Objectives.size(); ++i)
+		lua_createtable(l, quest->ObjectiveStrings.size(), 0);
+		for (size_t i = 1; i <= quest->ObjectiveStrings.size(); ++i)
 		{
-			lua_pushstring(l, quest->Objectives[i-1].c_str());
+			lua_pushstring(l, quest->ObjectiveStrings[i-1].c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

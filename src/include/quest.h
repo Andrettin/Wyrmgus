@@ -51,12 +51,60 @@ class CCharacter;
 class CDialogue;
 class CDialogueNode;
 class CFaction;
+class CQuest;
 class CSettlement;
 class CUniqueItem;
 class CUnitType;
 class CUpgrade;
 class LuaCallback;
 class CMapTemplate;
+
+enum ObjectiveTypes {
+	GatherResourceObjectiveType,
+	HaveResourceObjectiveType,
+	BuildUnitsObjectiveType,
+	BuildUnitsOfClassObjectiveType,
+	DestroyUnitsObjectiveType,
+	ResearchUpgradeObjectiveType,
+	RecruitHeroObjectiveType,
+	DestroyHeroObjectiveType,
+	HeroMustSurviveObjectiveType,
+	DestroyUniqueObjectiveType,
+	DestroyFactionObjectiveType,
+	
+	MaxObjectiveTypes
+};
+
+class CQuestObjective
+{
+public:
+	CQuestObjective() :
+		ObjectiveType(-1), Quantity(0), Resource(-1), UnitClass(-1),
+		Quest(NULL), UnitType(NULL), Character(NULL), Unique(NULL), Settlement(NULL)
+	{
+	}
+	
+	int ObjectiveType;
+	int Quantity;
+	int Resource;
+	int UnitClass;
+	std::string ObjectiveString;
+	CQuest *Quest;
+	CUnitType *UnitType;
+	CCharacter *Character;
+	CUniqueItem *Unique;
+	CSettlement *Settlement;
+};
+
+class CPlayerQuestObjective : public CQuestObjective
+{
+public:
+	CPlayerQuestObjective() : CQuestObjective(), Counter(0)
+	{
+	}
+	
+	int Counter;
+};
 
 class CQuest
 {
@@ -107,7 +155,8 @@ public:
 	LuaCallback *AcceptEffects;
 	LuaCallback *CompletionEffects;
 	LuaCallback *FailEffects;
-	std::vector<std::string> Objectives;	/// The objectives of this quest
+	std::vector<CQuestObjective *> Objectives;	/// The objectives of this quest
+	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<std::tuple<CUnitType *, int>> BuildUnits;	/// Build units objective vector, containing unit type and quantity
 	std::vector<std::tuple<int, int>> BuildUnitsOfClass;	/// Build units objective vector, containing class id and quantity
@@ -119,8 +168,6 @@ public:
 	std::vector<CCharacter *> DestroyCharacters;
 	std::vector<CUniqueItem *> DestroyUniques;
 	std::vector<CFaction *> DestroyFactions;	/// Destroy factions objective vector
-	std::vector<std::tuple<int, int>> GatherResources;	/// Gather resources objective vector, containing resource ID and quantity
-	std::vector<std::tuple<int, int>> HaveResources;	/// Have resources objective vector, containing resource ID and quantity
 	std::vector<CCharacter *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 };
 
@@ -244,6 +291,8 @@ extern void CleanQuests();
 extern void CleanDialogues();
 extern void SaveQuestCompletion();
 extern void CheckAchievements();
+std::string GetQuestObjectiveTypeNameById(int objective_type);
+extern int GetQuestObjectiveTypeIdByName(std::string objective_type);
 extern CQuest *GetQuest(std::string quest_ident);
 extern CCampaign *GetCampaign(std::string campaign_ident);
 extern CAchievement *GetAchievement(std::string achievement_ident);
