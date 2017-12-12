@@ -1416,6 +1416,8 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	for (size_t i = 0; i < player.QuestGatherResources.size(); ++i) {
 		if (std::get<1>(player.QuestGatherResources[i]) == rindex) {
 			std::get<2>(player.QuestGatherResources[i]) -= resource_change;
+		} else if (std::get<1>(player.QuestGatherResources[i]) == this->CurrentResource) {
+			std::get<2>(player.QuestGatherResources[i]) -= unit.ResourcesHeld;
 		}
 	}
 	
