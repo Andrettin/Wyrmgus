@@ -2663,16 +2663,20 @@ void CPlayer::AvailableQuestsChanged()
 				continue;
 			}
 			
-			UnitButtonTable[i]->Hint = "Quest: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Name;
-			UnitButtonTable[i]->Description = this->AvailableQuests[UnitButtonTable[i]->Value]->Description + "\n \nObjectives:";
-			for (size_t j = 0; j < this->AvailableQuests[UnitButtonTable[i]->Value]->ObjectiveStrings.size(); ++j) {
-				UnitButtonTable[i]->Description += "\n" + this->AvailableQuests[UnitButtonTable[i]->Value]->ObjectiveStrings[j];
+			const CQuest *quest = this->AvailableQuests[UnitButtonTable[i]->Value];
+			UnitButtonTable[i]->Hint = "Quest: " + quest->Name;
+			UnitButtonTable[i]->Description = quest->Description + "\n \nObjectives:";
+			for (size_t j = 0; j < quest->Objectives.size(); ++j) {
+				UnitButtonTable[i]->Description += "\n- " + quest->Objectives[j]->ObjectiveString;
 			}
-			if (!this->AvailableQuests[UnitButtonTable[i]->Value]->Rewards.empty()) {
-				UnitButtonTable[i]->Description += "\n \nRewards: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Rewards;
+			for (size_t j = 0; j < quest->ObjectiveStrings.size(); ++j) {
+				UnitButtonTable[i]->Description += "\n" + quest->ObjectiveStrings[j];
 			}
-			if (!this->AvailableQuests[UnitButtonTable[i]->Value]->Hint.empty()) {
-				UnitButtonTable[i]->Description += "\n \nHint: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Hint;
+			if (!quest->Rewards.empty()) {
+				UnitButtonTable[i]->Description += "\n \nRewards: " + quest->Rewards;
+			}
+			if (!quest->Hint.empty()) {
+				UnitButtonTable[i]->Description += "\n \nHint: " + quest->Hint;
 			}
 		}
 	}
@@ -2777,6 +2781,8 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	}
 	
 	this->AvailableQuestsChanged();
+	
+	this->UpdateCurrentQuests();
 }
 
 void CPlayer::CompleteQuest(CQuest *quest)
