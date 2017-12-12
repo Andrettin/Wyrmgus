@@ -80,7 +80,7 @@ class CQuestObjective
 public:
 	CQuestObjective() :
 		ObjectiveType(-1), Quantity(0), Resource(-1), UnitClass(-1),
-		Quest(NULL), UnitType(NULL), Character(NULL), Unique(NULL), Settlement(NULL)
+		Quest(NULL), UnitType(NULL), Upgrade(NULL), Character(NULL), Unique(NULL), Settlement(NULL)
 	{
 	}
 	
@@ -91,6 +91,7 @@ public:
 	std::string ObjectiveString;
 	CQuest *Quest;
 	CUnitType *UnitType;
+	CUpgrade *Upgrade;
 	CCharacter *Character;
 	CUniqueItem *Unique;
 	CSettlement *Settlement;
@@ -163,7 +164,6 @@ public:
 	std::vector<std::tuple<CSettlement *, CUnitType *, int>> BuildSettlementUnits;	/// Build settlement units objective vector, containing settlement, unit type and quantity
 	std::vector<std::tuple<CSettlement *, int, int>> BuildSettlementUnitsOfClass;	/// Build settlement units objective vector, containing settlement, unit class id and quantity
 	std::vector<CCharacter *> RecruitCharacters;	/// Recruit characters objective vector
-	std::vector<CUpgrade *> ResearchUpgrades;
 	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
 	std::vector<CCharacter *> DestroyCharacters;
 	std::vector<CUniqueItem *> DestroyUniques;

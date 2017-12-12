@@ -201,7 +201,47 @@ static int CclDefineQuest(lua_State *l)
 					} else if (!strcmp(value, "quantity")) {
 						objective->Quantity = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "resource")) {
-						objective->Resource = GetResourceIdByName(LuaToString(l, -1, k + 1));
+						int resource = GetResourceIdByName(LuaToString(l, -1, k + 1));
+						if (resource == -1) {
+							LuaError(l, "Resource doesn't exist.");
+						}
+						objective->Resource = resource;
+					} else if (!strcmp(value, "unit-class")) {
+						int unit_class = GetUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
+						if (unit_class == -1) {
+							LuaError(l, "Unit class doesn't exist.");
+						}
+						objective->UnitClass = unit_class;
+					} else if (!strcmp(value, "unit-type")) {
+						CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, k + 1));
+						if (!unit_type) {
+							LuaError(l, "Unit type doesn't exist.");
+						}
+						objective->UnitType = unit_type;
+					} else if (!strcmp(value, "upgrade")) {
+						CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1, k + 1));
+						if (!upgrade) {
+							LuaError(l, "Upgrade doesn't exist.");
+						}
+						objective->Upgrade = upgrade;
+					} else if (!strcmp(value, "character")) {
+						CCharacter *character = GetCharacter(LuaToString(l, -1, k + 1));
+						if (!character) {
+							LuaError(l, "Character doesn't exist.");
+						}
+						objective->Character = character;
+					} else if (!strcmp(value, "unique")) {
+						CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, k + 1));
+						if (!unique) {
+							LuaError(l, "Unique doesn't exist.");
+						}
+						objective->Unique = unique;
+					} else if (!strcmp(value, "settlement")) {
+						CSettlement *settlement = GetSettlement(LuaToString(l, -1, k + 1));
+						if (!settlement) {
+							LuaError(l, "Settlement doesn't exist.");
+						}
+						objective->Settlement = settlement;
 					} else {
 						printf("\n%s\n", quest->Ident.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -286,17 +326,6 @@ static int CclDefineQuest(lua_State *l)
 					LuaError(l, "Character doesn't exist.");
 				}
 				quest->RecruitCharacters.push_back(character);
-			}
-		} else if (!strcmp(value, "ResearchUpgrades")) {
-			quest->ResearchUpgrades.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1, j + 1));
-				if (!upgrade) {
-					LuaError(l, "Upgrade doesn't exist.");
-				}
-				
-				quest->ResearchUpgrades.push_back(upgrade);
 			}
 		} else if (!strcmp(value, "DestroyUnits")) {
 			quest->DestroyUnits.clear();

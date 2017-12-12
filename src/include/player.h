@@ -179,7 +179,6 @@ public:
 	std::vector<std::tuple<CQuest *, CSettlement *, CUnitType *, int>> QuestBuildSettlementUnits;	/// build settlement units objectives from quests; int is the quantity, set at start to be the same as the quest's; every time a unit is built in the appropriate settlement it is reduced by one
 	std::vector<std::tuple<CQuest *, CSettlement *, int, int>> QuestBuildSettlementUnitsOfClass;	/// build settlement units objectives from quests; the first int is the class id, and the second int is the quantity, set at start to be the same as the quest's; every time a unit is built in the appropriate settlement it is reduced by one
 	std::vector<std::tuple<CQuest *, CCharacter *>> QuestRecruitCharacters;
-	std::vector<std::tuple<CQuest *, CUpgrade *>> QuestResearchUpgrades;
 	std::vector<std::tuple<CQuest *, CUnitType *, CFaction *, int>> QuestDestroyUnits;	/// destroy units objectives from quests; int is the quantity, set at start to be the same as the quest's; every time a unit is destroyed it is reduced by one
 	std::vector<std::tuple<CQuest *, CCharacter *, bool>> QuestDestroyCharacters;
 	std::vector<std::tuple<CQuest *, CUniqueItem *, bool>> QuestDestroyUniques;

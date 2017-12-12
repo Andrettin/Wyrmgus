@@ -1241,16 +1241,6 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
-	file.printf("\n  \"quest-research-upgrades\", {");
-	for (size_t j = 0; j < p.QuestResearchUpgrades.size(); ++j) {
-		if (j) {
-			file.printf(" ");
-		}
-		file.printf("\"%s\",", std::get<0>(p.QuestResearchUpgrades[j])->Ident.c_str());
-		file.printf("\"%s\",", std::get<1>(p.QuestResearchUpgrades[j])->Ident.c_str());
-	}
-	file.printf("},");
-	
 	file.printf("\n  \"quest-destroy-units\", {");
 	for (size_t j = 0; j < p.QuestDestroyUnits.size(); ++j) {
 		if (j) {
@@ -1313,6 +1303,24 @@ void CPlayer::Save(CFile &file) const
 		file.printf("\"counter\", %d,", p.QuestObjectives[j]->Counter);
 		if (p.QuestObjectives[j]->Resource != -1) {
 			file.printf("\"resource\", \"%s\",", DefaultResourceNames[p.QuestObjectives[j]->Resource].c_str());
+		}
+		if (p.QuestObjectives[j]->UnitClass != -1) {
+			file.printf("\"unit-class\", \"%s\",", UnitTypeClasses[p.QuestObjectives[j]->UnitClass].c_str());
+		}
+		if (p.QuestObjectives[j]->UnitType) {
+			file.printf("\"unit-type\", \"%s\",", p.QuestObjectives[j]->UnitType->Ident.c_str());
+		}
+		if (p.QuestObjectives[j]->Upgrade) {
+			file.printf("\"upgrade\", \"%s\",", p.QuestObjectives[j]->Upgrade->Ident.c_str());
+		}
+		if (p.QuestObjectives[j]->Character) {
+			file.printf("\"character\", \"%s\",", p.QuestObjectives[j]->Character->Ident.c_str());
+		}
+		if (p.QuestObjectives[j]->Unique) {
+			file.printf("\"unique\", \"%s\",", p.QuestObjectives[j]->Unique->Ident.c_str());
+		}
+		if (p.QuestObjectives[j]->Settlement) {
+			file.printf("\"settlement\", \"%s\",", p.QuestObjectives[j]->Settlement->Ident.c_str());
 		}
 		file.printf("},");
 	}
@@ -2434,7 +2442,6 @@ void CPlayer::Clear()
 	this->QuestBuildSettlementUnits.clear();
 	this->QuestBuildSettlementUnitsOfClass.clear();
 	this->QuestRecruitCharacters.clear();
-	this->QuestResearchUpgrades.clear();
 	this->QuestDestroyUnits.clear();
 	this->QuestDestroyCharacters.clear();
 	this->QuestDestroyUniques.clear();
@@ -2696,6 +2703,8 @@ void CPlayer::UpdateCurrentQuests()
 	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
 		if (this->QuestObjectives[i]->ObjectiveType == HaveResourceObjectiveType) {
 			this->QuestObjectives[i]->Counter = std::min(this->GetResource(this->QuestObjectives[i]->Resource, STORE_BOTH), this->QuestObjectives[i]->Quantity);
+		} else if (this->QuestObjectives[i]->ObjectiveType == ResearchUpgradeObjectiveType) {
+			this->QuestObjectives[i]->Counter = UpgradeIdentAllowed(*this, this->QuestObjectives[i]->Upgrade->Ident) == 'R' ? 1 : 0;
 		}
 	}
 	
@@ -2738,10 +2747,6 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		this->QuestRecruitCharacters.push_back(std::tuple<CQuest *, CCharacter *>(quest, quest->RecruitCharacters[i]));
 	}
 	
-	for (size_t i = 0; i < quest->ResearchUpgrades.size(); ++i) {
-		this->QuestResearchUpgrades.push_back(std::tuple<CQuest *, CUpgrade *>(quest, quest->ResearchUpgrades[i]));
-	}
-	
 	for (size_t i = 0; i < quest->DestroyUnits.size(); ++i) {
 		this->QuestDestroyUnits.push_back(std::tuple<CQuest *, CUnitType *, CFaction *, int>(quest, std::get<0>(quest->DestroyUnits[i]), std::get<1>(quest->DestroyUnits[i]), std::get<2>(quest->DestroyUnits[i])));
 	}
@@ -2767,6 +2772,7 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		objective->Resource = quest->Objectives[i]->Resource;
 		objective->UnitClass = quest->Objectives[i]->UnitClass;
 		objective->UnitType = quest->Objectives[i]->UnitType;
+		objective->Upgrade = quest->Objectives[i]->Upgrade;
 		objective->Character = quest->Objectives[i]->Character;
 		objective->Unique = quest->Objectives[i]->Unique;
 		objective->Settlement = quest->Objectives[i]->Settlement;
@@ -2858,12 +2864,6 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 	for (int i = (this->QuestRecruitCharacters.size()  - 1); i >= 0; --i) {
 		if (std::get<0>(this->QuestRecruitCharacters[i]) == quest) {
 			this->QuestRecruitCharacters.erase(std::remove(this->QuestRecruitCharacters.begin(), this->QuestRecruitCharacters.end(), this->QuestRecruitCharacters[i]), this->QuestRecruitCharacters.end());
-		}
-	}
-	
-	for (int i = (this->QuestResearchUpgrades.size()  - 1); i >= 0; --i) {
-		if (std::get<0>(this->QuestResearchUpgrades[i]) == quest) {
-			this->QuestResearchUpgrades.erase(std::remove(this->QuestResearchUpgrades.begin(), this->QuestResearchUpgrades.end(), this->QuestResearchUpgrades[i]), this->QuestResearchUpgrades.end());
 		}
 	}
 	
@@ -3038,12 +3038,6 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 		}
 	}
 	
-	for (size_t i = 0; i < this->QuestResearchUpgrades.size(); ++i) {
-		if (std::get<0>(this->QuestResearchUpgrades[i]) == quest && UpgradeIdentAllowed(*this, std::get<1>(this->QuestResearchUpgrades[i])->Ident) != 'R') {
-			return false;
-		}
-	}
-	
 	for (size_t i = 0; i < this->QuestDestroyUnits.size(); ++i) {
 		if (std::get<0>(this->QuestDestroyUnits[i]) == quest && std::get<3>(this->QuestDestroyUnits[i]) > 0) {
 			return false;
@@ -3069,7 +3063,10 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 	}
 	
 	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
-		if (this->QuestObjectives[i]->Quest == quest && this->QuestObjectives[i]->Quantity > 0 && this->QuestObjectives[i]->Counter < this->QuestObjectives[i]->Quantity) {
+		if (this->QuestObjectives[i]->Quest != quest) {
+			continue;
+		}
+		if (this->QuestObjectives[i]->Quantity > 0 && this->QuestObjectives[i]->Counter < this->QuestObjectives[i]->Quantity) {
 			return false;
 		}
 	}

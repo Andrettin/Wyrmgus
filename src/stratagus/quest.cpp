@@ -145,6 +145,24 @@ std::string GetQuestObjectiveTypeNameById(int objective_type)
 		return "gather-resource";
 	} else if (objective_type == HaveResourceObjectiveType) {
 		return "have-resource";
+	} else if (objective_type == BuildUnitsObjectiveType) {
+		return "build-units";
+	} else if (objective_type == BuildUnitsOfClassObjectiveType) {
+		return "build-units-of-class";
+	} else if (objective_type == DestroyUnitsObjectiveType) {
+		return "destroy-units";
+	} else if (objective_type == ResearchUpgradeObjectiveType) {
+		return "research-upgrade";
+	} else if (objective_type == RecruitHeroObjectiveType) {
+		return "recruit-hero";
+	} else if (objective_type == DestroyHeroObjectiveType) {
+		return "destroy-hero";
+	} else if (objective_type == HeroMustSurviveObjectiveType) {
+		return "hero-must-survive";
+	} else if (objective_type == DestroyUniqueObjectiveType) {
+		return "destroy-unique";
+	} else if (objective_type == DestroyFactionObjectiveType) {
+		return "destroy-faction";
 	}
 
 	return "";
@@ -156,6 +174,24 @@ int GetQuestObjectiveTypeIdByName(std::string objective_type)
 		return GatherResourceObjectiveType;
 	} else if (objective_type == "have-resource") {
 		return HaveResourceObjectiveType;
+	} else if (objective_type == "build-units") {
+		return BuildUnitsObjectiveType;
+	} else if (objective_type == "build-units-of-class") {
+		return BuildUnitsOfClassObjectiveType;
+	} else if (objective_type == "destroy-units") {
+		return DestroyUnitsObjectiveType;
+	} else if (objective_type == "research-upgrade") {
+		return ResearchUpgradeObjectiveType;
+	} else if (objective_type == "recruit-hero") {
+		return RecruitHeroObjectiveType;
+	} else if (objective_type == "destroy-hero") {
+		return DestroyHeroObjectiveType;
+	} else if (objective_type == "hero-must-survive") {
+		return HeroMustSurviveObjectiveType;
+	} else if (objective_type == "destroy-unique") {
+		return DestroyUniqueObjectiveType;
+	} else if (objective_type == "destroy-faction") {
+		return DestroyFactionObjectiveType;
 	}
 
 	return -1;

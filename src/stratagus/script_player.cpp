@@ -501,19 +501,6 @@ void CPlayer::Load(lua_State *l)
 					this->QuestRecruitCharacters.push_back(std::tuple<CQuest *, CCharacter *>(quest, character));
 				}
 			}
-		} else if (!strcmp(value, "quest-research-upgrades")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
-				++k;
-				CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, j + 1, k + 1));
-				if (quest) {
-					this->QuestResearchUpgrades.push_back(std::tuple<CQuest *, CUpgrade *>(quest, upgrade));
-				}
-			}
 		} else if (!strcmp(value, "quest-destroy-units")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -609,7 +596,47 @@ void CPlayer::Load(lua_State *l)
 					} else if (!strcmp(value, "counter")) {
 						objective->Counter = LuaToNumber(l, -1, n + 1);
 					} else if (!strcmp(value, "resource")) {
-						objective->Resource = GetResourceIdByName(LuaToString(l, -1, n + 1));
+						int resource = GetResourceIdByName(LuaToString(l, -1, n + 1));
+						if (resource == -1) {
+							LuaError(l, "Resource doesn't exist.");
+						}
+						objective->Resource = resource;
+					} else if (!strcmp(value, "unit-class")) {
+						int unit_class = GetUnitTypeClassIndexByName(LuaToString(l, -1, n + 1));
+						if (unit_class == -1) {
+							LuaError(l, "Unit class doesn't exist.");
+						}
+						objective->UnitClass = unit_class;
+					} else if (!strcmp(value, "unit-type")) {
+						CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, n + 1));
+						if (!unit_type) {
+							LuaError(l, "Unit type doesn't exist.");
+						}
+						objective->UnitType = unit_type;
+					} else if (!strcmp(value, "upgrade")) {
+						CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1, n + 1));
+						if (!upgrade) {
+							LuaError(l, "Upgrade doesn't exist.");
+						}
+						objective->Upgrade = upgrade;
+					} else if (!strcmp(value, "character")) {
+						CCharacter *character = GetCharacter(LuaToString(l, -1, n + 1));
+						if (!character) {
+							LuaError(l, "Character doesn't exist.");
+						}
+						objective->Character = character;
+					} else if (!strcmp(value, "unique")) {
+						CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, n + 1));
+						if (!unique) {
+							LuaError(l, "Unique doesn't exist.");
+						}
+						objective->Unique = unique;
+					} else if (!strcmp(value, "settlement")) {
+						CSettlement *settlement = GetSettlement(LuaToString(l, -1, n + 1));
+						if (!settlement) {
+							LuaError(l, "Settlement doesn't exist.");
+						}
+						objective->Settlement = settlement;
 					}
 				}
 				lua_pop(l, 1);
