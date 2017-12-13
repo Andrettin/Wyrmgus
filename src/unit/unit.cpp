@@ -6536,6 +6536,46 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 	}
 }
 
+static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
+{
+	if (!attacker) {
+		return;
+	}
+	
+	int var_index;
+	if (target.Type->BoolFlag[BUILDING_INDEX].value) {
+		var_index = RAIDING_INDEX;
+	} else {
+		var_index = MUGGING_INDEX;
+	}
+	
+	if (!attacker->Variable[var_index].Value) {
+		return;
+	}
+	
+	if (!attacker->Variable[SHIELDPIERCING_INDEX].Value) {
+		int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
+							? std::min(target.Variable[SHIELD_INDEX].Value, damage * (100 - target.Variable[SHIELDPERMEABILITY_INDEX].Value) / 100)
+							: 0;
+		
+		damage -= shieldDamage;
+	}
+	
+	damage = std::min(damage, target.Variable[HP_INDEX].Value);
+	
+	if (damage <= 0) {
+		return;
+	}
+	
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (target.Type->Stats[target.Player->Index].Costs[i] > 0) {
+			int resource_change = target.Type->Stats[target.Player->Index].Costs[i] * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableMax) / 100;
+			attacker->Player->ChangeResource(i, resource_change);
+			attacker->Player->TotalResources[i] += resource_change;
+		}
+	}
+}
+
 static bool HitUnit_IsUnitWillDie(const CUnit *attacker, const CUnit &target, int damage)
 {
 	int shieldDamage = target.Variable[SHIELDPERMEABILITY_INDEX].Value < 100
@@ -7020,6 +7060,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 			missile->Type->OnImpact->run();
 		}
 	}
+	
+	HitUnit_Raid(attacker, target, damage);
 
 	if (HitUnit_IsUnitWillDie(attacker, target, damage)) { // unit is killed or destroyed
 		if (attacker) {
