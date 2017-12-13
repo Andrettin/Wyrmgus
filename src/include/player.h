@@ -174,7 +174,6 @@ public:
 	std::vector<CQuest *> AvailableQuests;		/// quests available to this player
 	std::vector<CQuest *> CurrentQuests;		/// quests being pursued by this player
 	std::vector<CQuest *> CompletedQuests;		/// quests completed by this player
-	std::vector<std::tuple<CQuest *, CFaction *, bool>> QuestDestroyFactions;	/// destroy factions objectives from quests; when the faction's last unit is destroyed by the player, the bool is turned to true
 	std::vector<CPlayerQuestObjective *> QuestObjectives;				/// Objectives of the player's current quests
 	std::vector<std::pair<CUpgrade *, int>> Modifiers;					/// Modifiers affecting the player, and until which cycle it should last
 	//Wyrmgus end

@@ -196,6 +196,9 @@ static int CclDefineQuest(lua_State *l)
 						if (objective->ObjectiveType == -1) {
 							LuaError(l, "Objective type doesn't exist.");
 						}
+						if (objective->ObjectiveType == HeroMustSurviveObjectiveType) {
+							objective->Quantity = 0;
+						}
 					} else if (!strcmp(value, "objective-string")) {
 						objective->ObjectiveString = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "quantity")) {
@@ -254,16 +257,6 @@ static int CclDefineQuest(lua_State *l)
 					}
 				}
 				lua_pop(l, 1);
-			}
-		} else if (!strcmp(value, "DestroyFactions")) {
-			quest->DestroyFactions.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1, j + 1));
-				if (!faction) {
-					LuaError(l, "Faction doesn't exist.");
-				}
-				quest->DestroyFactions.push_back(faction);
 			}
 		} else if (!strcmp(value, "HeroesMustSurvive")) {
 			quest->HeroesMustSurvive.clear();

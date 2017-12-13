@@ -1185,17 +1185,6 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
-	file.printf("\n  \"quest-destroy-factions\", {");
-	for (size_t j = 0; j < p.QuestDestroyFactions.size(); ++j) {
-		if (j) {
-			file.printf(" ");
-		}
-		file.printf("\"%s\",", std::get<0>(p.QuestDestroyFactions[j])->Ident.c_str());
-		file.printf("\"%s\",", std::get<1>(p.QuestDestroyFactions[j])->Ident.c_str());
-		file.printf("%s,", std::get<2>(p.QuestDestroyFactions[j]) ? "true" : "false");
-	}
-	file.printf("},");
-	
 	file.printf("\n  \"quest-objectives\", {");
 	for (size_t j = 0; j < p.QuestObjectives.size(); ++j) {
 		if (j) {
@@ -2346,7 +2335,6 @@ void CPlayer::Clear()
 	this->AvailableQuests.clear();
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
-	this->QuestDestroyFactions.clear();
 	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
 		delete this->QuestObjectives[i];
 	}
@@ -2596,15 +2584,6 @@ void CPlayer::AvailableQuestsChanged()
 
 void CPlayer::UpdateCurrentQuests()
 {
-	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
-		if (std::get<2>(this->QuestDestroyFactions[i]) == false) { // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
-			CPlayer *faction_player = GetFactionPlayer(std::get<1>(this->QuestDestroyFactions[i]));
-			if (faction_player && faction_player->GetUnitCount() == 0) {
-				std::get<2>(this->QuestDestroyFactions[i]) = true;
-			}
-		}
-	}
-	
 	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
 		CPlayerQuestObjective *objective = this->QuestObjectives[i];
 		if (objective->ObjectiveType == HaveResourceObjectiveType) {
@@ -2634,10 +2613,6 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	
 	this->AvailableQuests.erase(std::remove(this->AvailableQuests.begin(), this->AvailableQuests.end(), quest), this->AvailableQuests.end());
 	this->CurrentQuests.push_back(quest);
-	
-	for (size_t i = 0; i < quest->DestroyFactions.size(); ++i) {
-		this->QuestDestroyFactions.push_back(std::tuple<CQuest *, CFaction *, bool>(quest, quest->DestroyFactions[i], false));
-	}
 	
 	for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 		CPlayerQuestObjective *objective = new CPlayerQuestObjective;
@@ -2714,12 +2689,6 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 {
 	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
 	
-	for (int i = (this->QuestDestroyFactions.size()  - 1); i >= 0; --i) {
-		if (std::get<0>(this->QuestDestroyFactions[i]) == quest) {
-			this->QuestDestroyFactions.erase(std::remove(this->QuestDestroyFactions.begin(), this->QuestDestroyFactions.end(), this->QuestDestroyFactions[i]), this->QuestDestroyFactions.end());
-		}
-	}
-	
 	for (int i = (this->QuestObjectives.size()  - 1); i >= 0; --i) {
 		if (this->QuestObjectives[i]->Quest == quest) {
 			this->QuestObjectives.erase(std::remove(this->QuestObjectives.begin(), this->QuestObjectives.end(), this->QuestObjectives[i]), this->QuestObjectives.end());
@@ -2762,12 +2731,26 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 				return false;
 			}
 			recruit_heroes_quantity++;
-		} else if (objective->ObjectiveType == DestroyHeroObjectiveType) {
-			if (objective->Character->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
-				return false;
+		} else if (objective->ObjectiveType == DestroyUnitsObjectiveType || objective->ObjectiveType == DestroyHeroObjectiveType || objective->ObjectiveType == DestroyUniqueObjectiveType) {
+			if (objective->Faction) {
+				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
+				if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
+					return false;
+				}
 			}
-		} else if (objective->ObjectiveType == DestroyUniqueObjectiveType) {
-			if (objective->Unique->CanDrop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
+			
+			if (objective->ObjectiveType == DestroyHeroObjectiveType) {
+				if (objective->Character->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
+					return false;
+				}
+			} else if (objective->ObjectiveType == DestroyUniqueObjectiveType) {
+				if (objective->Unique->CanDrop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
+					return false;
+				}
+			}
+		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
+			CPlayer *faction_player = GetFactionPlayer(objective->Faction);
+			if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
 				return false;
 			}
 		}
@@ -2776,13 +2759,6 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 	if (recruit_heroes_quantity > 0 && (this->Heroes.size() + recruit_heroes_quantity) > PlayerHeroMax) {
 		return false;
 	}
-	
-	for (size_t i = 0; i < quest->DestroyFactions.size(); ++i) {
-		CPlayer *faction_player = GetFactionPlayer(quest->DestroyFactions[i]);
-		if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
-			return false;
-		}
-	}	
 	
 	for (size_t i = 0; i < quest->HeroesMustSurvive.size(); ++i) {
 		if (!this->HasHero(quest->HeroesMustSurvive[i])) {
@@ -2804,12 +2780,6 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 {
 	if (quest->Uncompleteable) {
 		return false;
-	}
-	
-	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyFactions[i]) == quest && std::get<2>(this->QuestDestroyFactions[i]) == false) {
-			return false;
-		}
 	}
 	
 	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
@@ -2864,8 +2834,11 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 				return "The hero can no longer be recruited.";
 			}
 		} else if (objective->ObjectiveType == DestroyUnitsObjectiveType || objective->ObjectiveType == DestroyHeroObjectiveType || objective->ObjectiveType == DestroyUniqueObjectiveType) {
-			if (objective->Faction && !GetFactionPlayer(objective->Faction)) {
-				return "The target no longer exists.";
+			if (objective->Faction && objective->Counter < objective->Quantity) {
+				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
+				if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
+					return "The target no longer exists.";
+				}
 			}
 			
 			if (objective->ObjectiveType == DestroyHeroObjectiveType) {
@@ -2877,14 +2850,12 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 					return "The target no longer exists.";
 				}
 			}
-		}
-	}
-	
-	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyFactions[i]) == quest && std::get<2>(this->QuestDestroyFactions[i]) == false) { // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
-			CPlayer *faction_player = GetFactionPlayer(std::get<1>(this->QuestDestroyFactions[i]));
-			if (faction_player == NULL) {
-				return "The target no longer exists.";
+		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
+			if (objective->Counter == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
+				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
+				if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
+					return "The target no longer exists.";
+				}
 			}
 		}
 	}

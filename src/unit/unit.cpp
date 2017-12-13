@@ -6581,6 +6581,21 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 			if (!objective->Faction || objective->Faction->ID == target.Player->Faction) {
 				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 			}
+		} else if (objective->ObjectiveType == DestroyFactionObjectiveType && objective->Faction->ID == target.Player->Faction && target.Player->GetUnitCount() == 1) {
+			objective->Counter = 1;
+		}
+	}
+	
+	//also increase score for units inside the target that will be destroyed when the target dies
+	if (
+		target.UnitInside
+		&& !target.Type->BoolFlag[SAVECARGO_INDEX].value
+	) {
+		CUnit *boarded_unit = target.UnitInside;
+		for (int i = 0; i < target.InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
+			if (!boarded_unit->Type->BoolFlag[ITEM_INDEX].value) { //ignore items
+				HitUnit_IncreaseScoreForKill(attacker, *boarded_unit);
+			}
 		}
 	}
 	//Wyrmgus end

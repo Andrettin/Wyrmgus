@@ -424,21 +424,6 @@ void CPlayer::Load(lua_State *l)
 					}
 				}
 			}
-		} else if (!strcmp(value, "quest-destroy-factions")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
-				++k;
-				CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, j + 1, k + 1));
-				++k;
-				bool destroyed = LuaToBoolean(l, j + 1, k + 1);
-				if (quest) {
-					this->QuestDestroyFactions.push_back(std::tuple<CQuest *, CFaction *, bool>(quest, faction, destroyed));
-				}
-			}
 		} else if (!strcmp(value, "quest-objectives")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
