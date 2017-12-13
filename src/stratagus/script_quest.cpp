@@ -242,53 +242,18 @@ static int CclDefineQuest(lua_State *l)
 							LuaError(l, "Settlement doesn't exist.");
 						}
 						objective->Settlement = settlement;
+					} else if (!strcmp(value, "faction")) {
+						CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1, k + 1));
+						if (!faction) {
+							LuaError(l, "Faction doesn't exist.");
+						}
+						objective->Faction = faction;
 					} else {
 						printf("\n%s\n", quest->Ident.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
 				lua_pop(l, 1);
-			}
-		} else if (!strcmp(value, "DestroyUnits")) {
-			quest->DestroyUnits.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-				if (!unit_type) {
-					LuaError(l, "Unit type doesn't exist.");
-				}
-				++j;
-				
-				std::string faction_ident = LuaToString(l, -1, j + 1);
-				CFaction *faction = PlayerRaces.GetFaction(faction_ident);
-				if (!faction && !faction_ident.empty()) {
-					LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
-				}
-				++j;
-				
-				int quantity = LuaToNumber(l, -1, j + 1);
-				
-				quest->DestroyUnits.push_back(std::tuple<CUnitType *, CFaction *, int>(unit_type, faction, quantity));
-			}
-		} else if (!strcmp(value, "DestroyCharacters")) {
-			quest->DestroyCharacters.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				CCharacter *character = GetCharacter(LuaToString(l, -1, j + 1));
-				if (!character) {
-					LuaError(l, "Character doesn't exist.");
-				}
-				quest->DestroyCharacters.push_back(character);
-			}
-		} else if (!strcmp(value, "DestroyUniques")) {
-			quest->DestroyUniques.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, j + 1));
-				if (!unique) {
-					LuaError(l, "Unique item doesn't exist.");
-				}
-				quest->DestroyUniques.push_back(unique);
 			}
 		} else if (!strcmp(value, "DestroyFactions")) {
 			quest->DestroyFactions.clear();

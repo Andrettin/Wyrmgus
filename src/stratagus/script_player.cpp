@@ -424,53 +424,6 @@ void CPlayer::Load(lua_State *l)
 					}
 				}
 			}
-		} else if (!strcmp(value, "quest-destroy-units")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
-				++k;
-				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, j + 1, k + 1));
-				++k;
-				CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, j + 1, k + 1));
-				++k;
-				int quantity = LuaToNumber(l, j + 1, k + 1);
-				if (quest) {
-					this->QuestDestroyUnits.push_back(std::tuple<CQuest *, CUnitType *, CFaction *, int>(quest, unit_type, faction, quantity));
-				}
-			}
-		} else if (!strcmp(value, "quest-destroy-characters")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
-				++k;
-				CCharacter *character = GetCharacter(LuaToString(l, j + 1, k + 1));
-				++k;
-				bool destroyed = LuaToBoolean(l, j + 1, k + 1);
-				if (quest) {
-					this->QuestDestroyCharacters.push_back(std::tuple<CQuest *, CCharacter *, bool>(quest, character, destroyed));
-				}
-			}
-		} else if (!strcmp(value, "quest-destroy-uniques")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
-				++k;
-				CUniqueItem *unique = GetUniqueItem(LuaToString(l, j + 1, k + 1));
-				++k;
-				bool destroyed = LuaToBoolean(l, j + 1, k + 1);
-				if (quest) {
-					this->QuestDestroyUniques.push_back(std::tuple<CQuest *, CUniqueItem *, bool>(quest, unique, destroyed));
-				}
-			}
 		} else if (!strcmp(value, "quest-destroy-factions")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -560,6 +513,12 @@ void CPlayer::Load(lua_State *l)
 							LuaError(l, "Settlement doesn't exist.");
 						}
 						objective->Settlement = settlement;
+					} else if (!strcmp(value, "faction")) {
+						CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1, n + 1));
+						if (!faction) {
+							LuaError(l, "Faction doesn't exist.");
+						}
+						objective->Faction = faction;
 					}
 				}
 				lua_pop(l, 1);

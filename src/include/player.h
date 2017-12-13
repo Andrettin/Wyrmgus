@@ -174,9 +174,6 @@ public:
 	std::vector<CQuest *> AvailableQuests;		/// quests available to this player
 	std::vector<CQuest *> CurrentQuests;		/// quests being pursued by this player
 	std::vector<CQuest *> CompletedQuests;		/// quests completed by this player
-	std::vector<std::tuple<CQuest *, CUnitType *, CFaction *, int>> QuestDestroyUnits;	/// destroy units objectives from quests; int is the quantity, set at start to be the same as the quest's; every time a unit is destroyed it is reduced by one
-	std::vector<std::tuple<CQuest *, CCharacter *, bool>> QuestDestroyCharacters;
-	std::vector<std::tuple<CQuest *, CUniqueItem *, bool>> QuestDestroyUniques;
 	std::vector<std::tuple<CQuest *, CFaction *, bool>> QuestDestroyFactions;	/// destroy factions objectives from quests; when the faction's last unit is destroyed by the player, the bool is turned to true
 	std::vector<CPlayerQuestObjective *> QuestObjectives;				/// Objectives of the player's current quests
 	std::vector<std::pair<CUpgrade *, int>> Modifiers;					/// Modifiers affecting the player, and until which cycle it should last

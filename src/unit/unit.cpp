@@ -6571,24 +6571,15 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	attacker.Variable[KILL_INDEX].Enable = 1;
 	
 	//Wyrmgus start
-	for (size_t i = 0; i < attacker.Player->QuestDestroyUnits.size(); ++i) {
-		if (std::get<1>(attacker.Player->QuestDestroyUnits[i]) == target.Type && (std::get<2>(attacker.Player->QuestDestroyUnits[i]) == NULL || (std::get<2>(attacker.Player->QuestDestroyUnits[i])->Civilization == target.Player->Race && std::get<2>(attacker.Player->QuestDestroyUnits[i])->ID == target.Player->Faction))) {
-			std::get<3>(attacker.Player->QuestDestroyUnits[i]) -= 1;
-		}
-	}
-	
-	if (target.Character) {
-		for (size_t i = 0; i < attacker.Player->QuestDestroyCharacters.size(); ++i) {
-			if (std::get<1>(attacker.Player->QuestDestroyCharacters[i]) == target.Character) {
-				std::get<2>(attacker.Player->QuestDestroyCharacters[i]) = true;
-			}
-		}
-	}
-
-	if (target.Unique) {
-		for (size_t i = 0; i < attacker.Player->QuestDestroyUniques.size(); ++i) {
-			if (std::get<1>(attacker.Player->QuestDestroyUniques[i]) == target.Unique) {
-				std::get<2>(attacker.Player->QuestDestroyUniques[i]) = true;
+	for (size_t i = 0; i < attacker.Player->QuestObjectives.size(); ++i) {
+		CPlayerQuestObjective *objective = attacker.Player->QuestObjectives[i];
+		if (
+			(objective->ObjectiveType == DestroyUnitsObjectiveType && objective->UnitType == target.Type)
+			|| (objective->ObjectiveType == DestroyHeroObjectiveType && target.Character && objective->Character == target.Character)
+			|| (objective->ObjectiveType == DestroyUniqueObjectiveType && target.Unique && objective->Unique == target.Unique)
+		) {
+			if (!objective->Faction || objective->Faction->ID == target.Player->Faction) {
+				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 			}
 		}
 	}

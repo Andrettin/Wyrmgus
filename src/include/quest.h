@@ -80,7 +80,7 @@ class CQuestObjective
 public:
 	CQuestObjective() :
 		ObjectiveType(-1), Quantity(0), Resource(-1), UnitClass(-1),
-		Quest(NULL), UnitType(NULL), Upgrade(NULL), Character(NULL), Unique(NULL), Settlement(NULL)
+		Quest(NULL), UnitType(NULL), Upgrade(NULL), Character(NULL), Unique(NULL), Settlement(NULL), Faction(NULL)
 	{
 	}
 	
@@ -95,6 +95,7 @@ public:
 	CCharacter *Character;
 	CUniqueItem *Unique;
 	CSettlement *Settlement;
+	CFaction *Faction;
 };
 
 class CPlayerQuestObjective : public CQuestObjective
@@ -159,9 +160,6 @@ public:
 	std::vector<CQuestObjective *> Objectives;	/// The objectives of this quest
 	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
-	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
-	std::vector<CCharacter *> DestroyCharacters;
-	std::vector<CUniqueItem *> DestroyUniques;
 	std::vector<CFaction *> DestroyFactions;	/// Destroy factions objective vector
 	std::vector<CCharacter *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 };

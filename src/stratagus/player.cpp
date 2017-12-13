@@ -1185,44 +1185,6 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
-	file.printf("\n  \"quest-destroy-units\", {");
-	for (size_t j = 0; j < p.QuestDestroyUnits.size(); ++j) {
-		if (j) {
-			file.printf(" ");
-		}
-		file.printf("\"%s\",", std::get<0>(p.QuestDestroyUnits[j])->Ident.c_str());
-		file.printf("\"%s\",", std::get<1>(p.QuestDestroyUnits[j])->Ident.c_str());
-		if (std::get<2>(p.QuestDestroyUnits[j])) {
-			file.printf("\"%s\",", std::get<2>(p.QuestDestroyUnits[j])->Ident.c_str());
-		} else {
-			file.printf("\"%s\",", "");
-		}
-		file.printf("%d,", std::get<3>(p.QuestDestroyUnits[j]));
-	}
-	file.printf("},");
-	
-	file.printf("\n  \"quest-destroy-characters\", {");
-	for (size_t j = 0; j < p.QuestDestroyCharacters.size(); ++j) {
-		if (j) {
-			file.printf(" ");
-		}
-		file.printf("\"%s\",", std::get<0>(p.QuestDestroyCharacters[j])->Ident.c_str());
-		file.printf("\"%s\",", std::get<1>(p.QuestDestroyCharacters[j])->Ident.c_str());
-		file.printf("%s,", std::get<2>(p.QuestDestroyCharacters[j]) ? "true" : "false");
-	}
-	file.printf("},");
-	
-	file.printf("\n  \"quest-destroy-uniques\", {");
-	for (size_t j = 0; j < p.QuestDestroyUniques.size(); ++j) {
-		if (j) {
-			file.printf(" ");
-		}
-		file.printf("\"%s\",", std::get<0>(p.QuestDestroyUniques[j])->Ident.c_str());
-		file.printf("\"%s\",", std::get<1>(p.QuestDestroyUniques[j])->Ident.c_str());
-		file.printf("%s,", std::get<2>(p.QuestDestroyUniques[j]) ? "true" : "false");
-	}
-	file.printf("},");
-	
 	file.printf("\n  \"quest-destroy-factions\", {");
 	for (size_t j = 0; j < p.QuestDestroyFactions.size(); ++j) {
 		if (j) {
@@ -1265,6 +1227,9 @@ void CPlayer::Save(CFile &file) const
 		}
 		if (p.QuestObjectives[j]->Settlement) {
 			file.printf("\"settlement\", \"%s\",", p.QuestObjectives[j]->Settlement->Ident.c_str());
+		}
+		if (p.QuestObjectives[j]->Faction) {
+			file.printf("\"faction\", \"%s\",", p.QuestObjectives[j]->Faction->Ident.c_str());
 		}
 		file.printf("},");
 	}
@@ -2381,9 +2346,6 @@ void CPlayer::Clear()
 	this->AvailableQuests.clear();
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
-	this->QuestDestroyUnits.clear();
-	this->QuestDestroyCharacters.clear();
-	this->QuestDestroyUniques.clear();
 	this->QuestDestroyFactions.clear();
 	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
 		delete this->QuestObjectives[i];
@@ -2673,18 +2635,6 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	this->AvailableQuests.erase(std::remove(this->AvailableQuests.begin(), this->AvailableQuests.end(), quest), this->AvailableQuests.end());
 	this->CurrentQuests.push_back(quest);
 	
-	for (size_t i = 0; i < quest->DestroyUnits.size(); ++i) {
-		this->QuestDestroyUnits.push_back(std::tuple<CQuest *, CUnitType *, CFaction *, int>(quest, std::get<0>(quest->DestroyUnits[i]), std::get<1>(quest->DestroyUnits[i]), std::get<2>(quest->DestroyUnits[i])));
-	}
-	
-	for (size_t i = 0; i < quest->DestroyCharacters.size(); ++i) {
-		this->QuestDestroyCharacters.push_back(std::tuple<CQuest *, CCharacter *, bool>(quest, quest->DestroyCharacters[i], false));
-	}
-	
-	for (size_t i = 0; i < quest->DestroyUniques.size(); ++i) {
-		this->QuestDestroyUniques.push_back(std::tuple<CQuest *, CUniqueItem *, bool>(quest, quest->DestroyUniques[i], false));
-	}
-	
 	for (size_t i = 0; i < quest->DestroyFactions.size(); ++i) {
 		this->QuestDestroyFactions.push_back(std::tuple<CQuest *, CFaction *, bool>(quest, quest->DestroyFactions[i], false));
 	}
@@ -2702,6 +2652,7 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		objective->Character = quest->Objectives[i]->Character;
 		objective->Unique = quest->Objectives[i]->Unique;
 		objective->Settlement = quest->Objectives[i]->Settlement;
+		objective->Faction = quest->Objectives[i]->Faction;
 		this->QuestObjectives.push_back(objective);
 	}
 	
@@ -2763,24 +2714,6 @@ void CPlayer::RemoveCurrentQuest(CQuest *quest)
 {
 	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
 	
-	for (int i = (this->QuestDestroyUnits.size()  - 1); i >= 0; --i) {
-		if (std::get<0>(this->QuestDestroyUnits[i]) == quest) {
-			this->QuestDestroyUnits.erase(std::remove(this->QuestDestroyUnits.begin(), this->QuestDestroyUnits.end(), this->QuestDestroyUnits[i]), this->QuestDestroyUnits.end());
-		}
-	}
-	
-	for (int i = (this->QuestDestroyCharacters.size()  - 1); i >= 0; --i) {
-		if (std::get<0>(this->QuestDestroyCharacters[i]) == quest) {
-			this->QuestDestroyCharacters.erase(std::remove(this->QuestDestroyCharacters.begin(), this->QuestDestroyCharacters.end(), this->QuestDestroyCharacters[i]), this->QuestDestroyCharacters.end());
-		}
-	}
-	
-	for (int i = (this->QuestDestroyUniques.size()  - 1); i >= 0; --i) {
-		if (std::get<0>(this->QuestDestroyUniques[i]) == quest) {
-			this->QuestDestroyUniques.erase(std::remove(this->QuestDestroyUniques.begin(), this->QuestDestroyUniques.end(), this->QuestDestroyUniques[i]), this->QuestDestroyUniques.end());
-		}
-	}
-	
 	for (int i = (this->QuestDestroyFactions.size()  - 1); i >= 0; --i) {
 		if (std::get<0>(this->QuestDestroyFactions[i]) == quest) {
 			this->QuestDestroyFactions.erase(std::remove(this->QuestDestroyFactions.begin(), this->QuestDestroyFactions.end(), this->QuestDestroyFactions[i]), this->QuestDestroyFactions.end());
@@ -2829,6 +2762,14 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 				return false;
 			}
 			recruit_heroes_quantity++;
+		} else if (objective->ObjectiveType == DestroyHeroObjectiveType) {
+			if (objective->Character->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
+				return false;
+			}
+		} else if (objective->ObjectiveType == DestroyUniqueObjectiveType) {
+			if (objective->Unique->CanDrop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
+				return false;
+			}
 		}
 	}
 	
@@ -2836,18 +2777,6 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		return false;
 	}
 	
-	for (size_t i = 0; i < quest->DestroyCharacters.size(); ++i) {
-		if (quest->DestroyCharacters[i]->CanAppear()) { //if the character "can appear" it doesn't already exist, and thus can't be destroyed
-			return false;
-		}
-	}
-
-	for (size_t i = 0; i < quest->DestroyUniques.size(); ++i) {
-		if (quest->DestroyUniques[i]->CanDrop()) { //if the unique "can drop" it doesn't already exist, and thus can't be destroyed
-			return false;
-		}
-	}
-
 	for (size_t i = 0; i < quest->DestroyFactions.size(); ++i) {
 		CPlayer *faction_player = GetFactionPlayer(quest->DestroyFactions[i]);
 		if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
@@ -2875,24 +2804,6 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 {
 	if (quest->Uncompleteable) {
 		return false;
-	}
-	
-	for (size_t i = 0; i < this->QuestDestroyUnits.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyUnits[i]) == quest && std::get<3>(this->QuestDestroyUnits[i]) > 0) {
-			return false;
-		}
-	}
-	
-	for (size_t i = 0; i < this->QuestDestroyCharacters.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyCharacters[i]) == quest && std::get<2>(this->QuestDestroyCharacters[i]) == false) {
-			return false;
-		}
-	}
-	
-	for (size_t i = 0; i < this->QuestDestroyUniques.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == false) {
-			return false;
-		}
 	}
 	
 	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
@@ -2952,21 +2863,23 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			if (!this->HasHero(objective->Character) && !this->CanRecruitHero(objective->Character, true)) {
 				return "The hero can no longer be recruited.";
 			}
+		} else if (objective->ObjectiveType == DestroyUnitsObjectiveType || objective->ObjectiveType == DestroyHeroObjectiveType || objective->ObjectiveType == DestroyUniqueObjectiveType) {
+			if (objective->Faction && !GetFactionPlayer(objective->Faction)) {
+				return "The target no longer exists.";
+			}
+			
+			if (objective->ObjectiveType == DestroyHeroObjectiveType) {
+				if (objective->Counter == 0 && objective->Character->CanAppear()) {  // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
+					return "The target no longer exists.";
+				}
+			} else if (objective->ObjectiveType == DestroyUniqueObjectiveType) {
+				if (objective->Counter == 0 && objective->Unique->CanDrop()) {  // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+					return "The target no longer exists.";
+				}
+			}
 		}
 	}
 	
-	for (size_t i = 0; i < this->QuestDestroyCharacters.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyCharacters[i]) == quest && std::get<2>(this->QuestDestroyCharacters[i]) == false && std::get<1>(this->QuestDestroyCharacters[i])->CanAppear()) { // if is supposed to destroy a character, but it is nowhere to be found, fail the quest
-			return "The target no longer exists.";
-		}
-	}
-
-	for (size_t i = 0; i < this->QuestDestroyUniques.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == false && std::get<1>(this->QuestDestroyUniques[i])->CanDrop()) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
-			return "The target no longer exists.";
-		}
-	}
-
 	for (size_t i = 0; i < this->QuestDestroyFactions.size(); ++i) {
 		if (std::get<0>(this->QuestDestroyFactions[i]) == quest && std::get<2>(this->QuestDestroyFactions[i]) == false) { // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
 			CPlayer *faction_player = GetFactionPlayer(std::get<1>(this->QuestDestroyFactions[i]));
