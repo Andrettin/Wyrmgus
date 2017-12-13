@@ -6542,6 +6542,10 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 		return;
 	}
 	
+	if (attacker->Player == target.Player || attacker->Player->Index == PlayerNumNeutral || target.Player->Index == PlayerNumNeutral) {
+		return;
+	}
+	
 	int var_index;
 	if (target.Type->BoolFlag[BUILDING_INDEX].value) {
 		var_index = RAIDING_INDEX;
@@ -6570,8 +6574,10 @@ static void HitUnit_Raid(CUnit *attacker, CUnit &target, int damage)
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (target.Type->Stats[target.Player->Index].Costs[i] > 0) {
 			int resource_change = target.Type->Stats[target.Player->Index].Costs[i] * damage * attacker->Variable[var_index].Value / target.GetModifiedVariable(HP_INDEX, VariableMax) / 100;
+			resource_change = std::min(resource_change, target.Player->GetResource(i, STORE_BOTH));
 			attacker->Player->ChangeResource(i, resource_change);
 			attacker->Player->TotalResources[i] += resource_change;
+			target.Player->ChangeResource(i, -resource_change);
 		}
 	}
 }
