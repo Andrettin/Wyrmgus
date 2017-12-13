@@ -7418,6 +7418,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 		&& unit.CurrentAction() == UnitActionAttack
 		&& unit.CurrentOrder()->HasGoal()
 		&& unit.CurrentOrder()->GetGoal()->Player == this->Player
+		&& !unit.CurrentOrder()->GetGoal()->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value
 	) {
 		return true;
 	}

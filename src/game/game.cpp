@@ -1284,7 +1284,15 @@ int GetGameSpeed()
 static void GameTypeMelee()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
+		if (Players[i].HasNeutralFactionType()) {
+			continue;
+		}
+
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
+			if (Players[j].HasNeutralFactionType()) {
+				continue;
+			}
+
 			if (Players[i].Type == PlayerComputer && Players[j].Type == PlayerComputer) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
 				Players[i].ShareVisionWith(Players[j]);
@@ -1305,7 +1313,15 @@ static void GameTypeMelee()
 static void GameTypeFreeForAll()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
+		if (Players[i].HasNeutralFactionType()) {
+			continue;
+		}
+
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
+			if (Players[j].HasNeutralFactionType()) {
+				continue;
+			}
+			
 			CommandDiplomacy(i, DiplomacyEnemy, j);
 			CommandDiplomacy(j, DiplomacyEnemy, i);
 		}
@@ -1320,9 +1336,17 @@ static void GameTypeTopVsBottom()
 	const int middle = Map.Info.MapHeight / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
+		if (Players[i].HasNeutralFactionType()) {
+			continue;
+		}
+
 		const bool top_i = Players[i].StartPos.y <= middle;
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
+			if (Players[j].HasNeutralFactionType()) {
+				continue;
+			}
+
 			const bool top_j = Players[j].StartPos.y <= middle;
 
 			if (top_i == top_j) {
@@ -1346,9 +1370,17 @@ static void GameTypeLeftVsRight()
 	const int middle = Map.Info.MapWidth / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		const bool left_i = Players[i].StartPos.x <= middle;
+		if (Players[i].HasNeutralFactionType()) {
+			continue;
+		}
 
+		const bool left_i = Players[i].StartPos.x <= middle;
+		
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
+			if (Players[j].HasNeutralFactionType()) {
+				continue;
+			}
+		
 			const bool left_j = Players[j].StartPos.x <= middle;
 
 			if (left_i == left_j) {
@@ -1373,10 +1405,18 @@ static void GameTypeManVsMachine()
 		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
 			continue;
 		}
+		if (Players[i].HasNeutralFactionType()) {
+			continue;
+		}
+
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
 			if (Players[j].Type != PlayerPerson && Players[j].Type != PlayerComputer) {
 				continue;
 			}
+			if (Players[j].HasNeutralFactionType()) {
+				continue;
+			}
+
 			if (Players[i].Type == Players[j].Type) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
 				Players[i].ShareVisionWith(Players[j]);
@@ -1399,7 +1439,15 @@ static void GameTypeManTeamVsMachine()
 		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
 			continue;
 		}
+		if (Players[i].HasNeutralFactionType()) {
+			continue;
+		}
+
 		for (int j = 0; j < PlayerMax - 1; ++j) {
+			if (Players[j].HasNeutralFactionType()) {
+				continue;
+			}
+
 			if (i != j) {
 				if (Players[i].Type == Players[j].Type) {
 					CommandDiplomacy(i, DiplomacyAllied, j);
