@@ -404,6 +404,7 @@ public:
 	int GetUnitStock(int unit_type_id) const;
 	int GetUnitStockReplenishmentTimer(int unit_type_id) const;
 	int GetResourceStep(const int resource) const;
+	int GetTotalInsideCount(const CPlayer *player = NULL, const bool ignore_items = true, const bool ignore_saved_cargo = false) const;
 	bool CanAttack(bool count_inside = true) const;
 	bool IsInCombat() const;
 	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;

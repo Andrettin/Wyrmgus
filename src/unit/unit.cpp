@@ -5531,6 +5531,29 @@ int CUnit::GetResourceStep(const int resource) const
 	return resource_step;
 }
 
+int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, const bool ignore_saved_cargo) const
+{
+	if (!this->UnitInside) {
+		return 0;
+	}
+	
+	if (this->Type->BoolFlag[SAVECARGO_INDEX].value && ignore_saved_cargo) {
+		return 0;
+	}
+	
+	int inside_count = 0;
+	
+	CUnit *inside_unit = this->UnitInside;
+	for (int j = 0; j < this->InsideCount; ++j, inside_unit = inside_unit->NextContained) {
+		if ((!player || inside_unit->Player == player) && (!ignore_items || !inside_unit->Type->BoolFlag[ITEM_INDEX].value)) { //only count units of the faction, ignore items
+			inside_count++;
+		}
+		inside_count += inside_unit->GetTotalInsideCount(player, ignore_items, ignore_saved_cargo);
+	}
+
+	return inside_count;
+}
+
 bool CUnit::CanAttack(bool count_inside) const
 {
 	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && !this->Type->BoolFlag[CANATTACK_INDEX].value) { //transporters without an attack can only attack through a unit within them
@@ -6582,18 +6605,15 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 			}
 		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
-			int dying_faction_units = objective->Faction->ID == target.Player->Faction ? 1 : 0;
-			if (target.UnitInside && !target.Type->BoolFlag[SAVECARGO_INDEX].value) {
-				CUnit *boarded_unit = target.UnitInside;
-				for (int j = 0; j < target.InsideCount; ++j, boarded_unit = boarded_unit->NextContained) {
-					if (boarded_unit->Player->Faction == objective->Faction->ID && !boarded_unit->Type->BoolFlag[ITEM_INDEX].value) { //only count units of the faction, ignore items
-						dying_faction_units++;
-					}
-				}
-			}
+			const CPlayer *faction_player = GetFactionPlayer(objective->Faction);
 			
-			if (dying_faction_units > 0 && GetFactionPlayer(objective->Faction)->GetUnitCount() <= dying_faction_units) {
-				objective->Counter = 1;
+			if (faction_player) {
+				int dying_faction_units = faction_player == target.Player ? 1 : 0;
+				dying_faction_units += target.GetTotalInsideCount(faction_player, true, true);
+				
+				if (dying_faction_units > 0 && faction_player->GetUnitCount() <= dying_faction_units) {
+					objective->Counter = 1;
+				}
 			}
 		}
 	}

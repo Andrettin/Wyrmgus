@@ -2574,6 +2574,20 @@ void CPlayer::AvailableQuestsChanged()
 			if (!quest->Hint.empty()) {
 				UnitButtonTable[i]->Description += "\n \nHint: " + quest->Hint;
 			}
+			if (quest->HighestCompletedDifficulty >= 1) {
+				std::string highest_completed_difficulty;
+				if (quest->HighestCompletedDifficulty == 1) {
+					highest_completed_difficulty = "Easy";
+				} else if (quest->HighestCompletedDifficulty == 2) {
+					highest_completed_difficulty = "Normal";
+				} else if (quest->HighestCompletedDifficulty == 3) {
+					highest_completed_difficulty = "Hard";
+				} else if (quest->HighestCompletedDifficulty == 4) {
+					highest_completed_difficulty = "Brutal";
+				}
+				UnitButtonTable[i]->Description += "\n \nHighest Completed Difficulty: " + highest_completed_difficulty;
+			}
+			
 		}
 		
 		if (!Selected.empty() && Selected[0]->Type->BoolFlag[TOWNHALL_INDEX].value) {
