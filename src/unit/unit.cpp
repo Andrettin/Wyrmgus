@@ -6581,8 +6581,20 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 			if (!objective->Faction || objective->Faction->ID == target.Player->Faction) {
 				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 			}
-		} else if (objective->ObjectiveType == DestroyFactionObjectiveType && objective->Faction->ID == target.Player->Faction && target.Player->GetUnitCount() == 1) {
-			objective->Counter = 1;
+		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
+			int dying_faction_units = objective->Faction->ID == target.Player->Faction ? 1 : 0;
+			if (target.UnitInside && !target.Type->BoolFlag[SAVECARGO_INDEX].value) {
+				CUnit *boarded_unit = target.UnitInside;
+				for (int j = 0; j < target.InsideCount; ++j, boarded_unit = boarded_unit->NextContained) {
+					if (boarded_unit->Player->Faction == objective->Faction->ID && !boarded_unit->Type->BoolFlag[ITEM_INDEX].value) { //only count units of the faction, ignore items
+						dying_faction_units++;
+					}
+				}
+			}
+			
+			if (dying_faction_units > 0 && GetFactionPlayer(objective->Faction)->GetUnitCount() <= dying_faction_units) {
+				objective->Counter = 1;
+			}
 		}
 	}
 	
