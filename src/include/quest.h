@@ -204,7 +204,9 @@ public:
 	}
 	
 	void Obtain(bool save = true, bool display = true);
-	bool CanObtain();
+	bool CanObtain() const;
+	int GetProgress() const;
+	int GetProgressMax() const;
 	
 	std::string Ident;				/// Ident of the achievement
 	std::string Name;				/// Name of the achievement

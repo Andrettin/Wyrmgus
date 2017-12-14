@@ -291,14 +291,19 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			//Wyrmgus end
 				for (size_t z = 0; z < UnitTypes.size(); ++z) {
-					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CheckDependByType(*unit.Player, *UnitTypes[z]) && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
-						dest.Blink = 4;
-						SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush, dest.MapLayer);
-						if (!acknowledged) {
-							PlayUnitSound(unit, VoiceBuild);
-							acknowledged = 1;
+					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
+						if (CheckDependByType(*unit.Player, *UnitTypes[z])) {
+							dest.Blink = 4;
+							SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush, dest.MapLayer);
+							if (!acknowledged) {
+								PlayUnitSound(unit, VoiceBuild);
+								acknowledged = 1;
+							}
+							break;
+						} else if (CheckDependByType(*unit.Player, *UnitTypes[z], false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
+							ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer, "%s", _("The requirements have not been fulfilled"));
+							break;
 						}
-						break;
 					}
 				}
 				return true;
@@ -313,9 +318,14 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					SendCommandReturnGoods(unit, depot, flush);
 					//Wyrmgus start
 					for (size_t z = 0; z < UnitTypes.size(); ++z) {
-						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CheckDependByType(*unit.Player, *UnitTypes[z]) && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
-							SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], 0, dest.MapLayer);
-							break;
+						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
+							if (CheckDependByType(*unit.Player, *UnitTypes[z])) {
+								SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], 0, dest.MapLayer);
+								break;
+							} else if (CheckDependByType(*unit.Player, *UnitTypes[z], false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
+								ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer, "%s", _("The requirements have not been fulfilled"));
+								break;
+							}
 						}
 					}
 					//Wyrmgus end

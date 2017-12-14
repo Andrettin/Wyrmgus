@@ -286,7 +286,7 @@ void CAchievement::Obtain(bool save, bool display)
 	}
 }
 
-bool CAchievement::CanObtain()
+bool CAchievement::CanObtain() const
 {
 	if (this->Obtained || this->Unobtainable) {
 		return false;
@@ -323,6 +323,53 @@ bool CAchievement::CanObtain()
 	}
 	
 	return true;
+}
+
+int CAchievement::GetProgress() const
+{
+	if (this->Unobtainable) {
+		return 0;
+	}
+	
+	int progress = 0;
+	
+	for (size_t i = 0; i < this->RequiredQuests.size(); ++i) {
+		if (this->RequiredQuests[i]->Completed && (this->Difficulty == -1 || this->RequiredQuests[i]->HighestCompletedDifficulty >= this->Difficulty)) {
+			progress++;
+		}
+	}
+	
+	if (this->Character) {
+		if (this->CharacterLevel) {
+			progress += std::min(this->Character->Level, this->CharacterLevel);
+		}
+	} else if (this->CharacterLevel) {
+		int highest_level = 0;
+		for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+			highest_level = std::max(highest_level, iterator->second->Level);
+			if (highest_level >= this->CharacterLevel) {
+				highest_level = this->CharacterLevel;
+				break;
+				continue;
+			}
+		}
+		progress += highest_level;
+	}
+	
+	return progress;
+}
+
+int CAchievement::GetProgressMax() const
+{
+	if (this->Unobtainable) {
+		return 0;
+	}
+	
+	int progress_max = 0;
+	progress_max += this->RequiredQuests.size();
+	progress_max += this->CharacterLevel;
+	
+	return progress_max;
 }
 
 CDialogue::~CDialogue()

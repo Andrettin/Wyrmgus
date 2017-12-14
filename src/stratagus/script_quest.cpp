@@ -763,6 +763,12 @@ static int CclGetAchievementData(lua_State *l)
 	} else if (!strcmp(data, "Unobtainable")) {
 		lua_pushboolean(l, achievement->Unobtainable);
 		return 1;
+	} else if (!strcmp(data, "Progress")) {
+		lua_pushnumber(l, achievement->GetProgress());
+		return 1;
+	} else if (!strcmp(data, "ProgressMax")) {
+		lua_pushnumber(l, achievement->GetProgressMax());
+		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, achievement->Icon.Name.c_str());
 		return 1;
