@@ -1887,6 +1887,10 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 		this->Variable[SILVERGATHERINGBONUS_INDEX].Value += stat_change;
 		this->Variable[GOLDGATHERINGBONUS_INDEX].Max += stat_change;
 		this->Variable[GOLDGATHERINGBONUS_INDEX].Value += stat_change;
+		this->Variable[IRONGATHERINGBONUS_INDEX].Max += stat_change;
+		this->Variable[IRONGATHERINGBONUS_INDEX].Value += stat_change;
+		this->Variable[MITHRILGATHERINGBONUS_INDEX].Max += stat_change;
+		this->Variable[MITHRILGATHERINGBONUS_INDEX].Value += stat_change;
 		this->Variable[COALGATHERINGBONUS_INDEX].Max += stat_change;
 		this->Variable[COALGATHERINGBONUS_INDEX].Value += stat_change;
 		this->Variable[GEMSGATHERINGBONUS_INDEX].Max += stat_change;
@@ -5512,6 +5516,10 @@ int CUnit::GetResourceStep(const int resource) const
 		resource_step += this->Variable[SILVERGATHERINGBONUS_INDEX].Value;
 	} else if (resource == GoldCost) {
 		resource_step += this->Variable[GOLDGATHERINGBONUS_INDEX].Value;
+	} else if (resource == IronCost) {
+		resource_step += this->Variable[IRONGATHERINGBONUS_INDEX].Value;
+	} else if (resource == MithrilCost) {
+		resource_step += this->Variable[MITHRILGATHERINGBONUS_INDEX].Value;
 	} else if (resource == WoodCost) {
 		resource_step += this->Variable[LUMBERGATHERINGBONUS_INDEX].Value;
 	} else if (resource == StoneCost || resource == LimestoneCost) {

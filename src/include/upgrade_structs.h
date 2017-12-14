@@ -77,19 +77,16 @@ enum CostType {
 	WoodCost,                               /// wood  resource
 	OilCost,                                /// oil   resource
 	// extensions
-	Cost4,                                  /// resource 4
-	//Wyrmgus start
-//	Cost5,                                  /// resource 5
-//	Cost6,                                  /// resource 6
+	IronCost,								/// iron resource
 	StoneCost,								/// stone resource
 	CoalCost,								/// coal resource
-	//Wyrmgus end
 
 	//Wyrmgus start
 	ResearchCost,							/// research resource
 	PrestigeCost,							/// prestige resource
 	GoldCost,                               /// gold resource
 	SilverCost,								/// silver resource
+	MithrilCost,							/// mithril resource
 	LimestoneCost,							/// limestone resource
 	JewelryCost,							/// jewelry resource
 	FurnitureCost,							/// furniture resource

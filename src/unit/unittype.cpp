@@ -813,6 +813,10 @@ int CUnitType::GetResourceStep(const int resource, const int player) const
 		resource_step += this->Stats[player].Variables[SILVERGATHERINGBONUS_INDEX].Value;
 	} else if (resource == GoldCost) {
 		resource_step += this->Stats[player].Variables[GOLDGATHERINGBONUS_INDEX].Value;
+	} else if (resource == IronCost) {
+		resource_step += this->Stats[player].Variables[IRONGATHERINGBONUS_INDEX].Value;
+	} else if (resource == MithrilCost) {
+		resource_step += this->Stats[player].Variables[MITHRILGATHERINGBONUS_INDEX].Value;
 	} else if (resource == WoodCost) {
 		resource_step += this->Stats[player].Variables[LUMBERGATHERINGBONUS_INDEX].Value;
 	} else if (resource == StoneCost || resource == LimestoneCost) {
