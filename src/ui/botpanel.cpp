@@ -448,7 +448,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 
 	if (condition->ImproveIncome != -1) {
-		if (!type || type->Stats[ThisPlayer->Index].ImproveIncomes[condition->ImproveIncome] <= DefaultIncomes[condition->ImproveIncome]) {
+		if (!type || type->Stats[ThisPlayer->Index].ImproveIncomes[condition->ImproveIncome] <= Resources[condition->ImproveIncome].DefaultIncome) {
 			return false;
 		}
 	}
@@ -462,12 +462,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	if (condition->ImproveIncomes != CONDITION_TRUE) {
 		bool improve_incomes = false;
 		if (button.Action == ButtonProduceResource) {
-			if (ThisPlayer->Incomes[button.Value] > DefaultIncomes[button.Value]) {
+			if (ThisPlayer->Incomes[button.Value] > Resources[button.Value].DefaultIncome) {
 				improve_incomes = true;
 			}
 			for (size_t i = 0; i < Resources[button.Value].ChildResources.size(); ++i) {
 				int res = Resources[button.Value].ChildResources[i];
-				if (ThisPlayer->Incomes[res] > DefaultIncomes[res]) {
+				if (ThisPlayer->Incomes[res] > Resources[res].DefaultIncome) {
 					improve_incomes = true;
 					break;
 				}
@@ -477,7 +477,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				return false;
 			}
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (type->Stats[ThisPlayer->Index].ImproveIncomes[i] > DefaultIncomes[i]) {
+				if (type->Stats[ThisPlayer->Index].ImproveIncomes[i] > Resources[i].DefaultIncome) {
 					improve_incomes = true;
 					break;
 				}

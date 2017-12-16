@@ -3826,7 +3826,7 @@ void UnitLost(CUnit &unit)
 		//  income.
 		for (int i = 1; i < MaxCosts; ++i) {
 			if (player.Incomes[i] && type.Stats[player.Index].ImproveIncomes[i] == player.Incomes[i]) {
-				int m = DefaultIncomes[i];
+				int m = Resources[i].DefaultIncome;
 
 				for (int j = 0; j < player.GetUnitCount(); ++j) {
 					m = std::max(m, player.GetUnit(j).Type->Stats[player.Index].ImproveIncomes[i]);

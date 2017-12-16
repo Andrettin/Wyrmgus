@@ -184,7 +184,7 @@ int CUnitStats::GetPrice() const
 			if (i == CopperCost) {
 				cost += this->Costs[i];
 			} else {
-				cost += this->Costs[i] * DefaultResourcePrices[i] / 100;
+				cost += this->Costs[i] * Resources[i].BasePrice / 100;
 			}
 		}
 	}
@@ -1451,7 +1451,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				stat.Storing[j] += um->Modifier.Storing[j];
 				if (um->Modifier.ImproveIncomes[j]) {
 					if (!stat.ImproveIncomes[j]) {
-						stat.ImproveIncomes[j] += DefaultIncomes[j] + um->Modifier.ImproveIncomes[j];
+						stat.ImproveIncomes[j] += Resources[j].DefaultIncome + um->Modifier.ImproveIncomes[j];
 					} else {
 						stat.ImproveIncomes[j] += um->Modifier.ImproveIncomes[j];
 					}
@@ -1740,7 +1740,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				stat.ImproveIncomes[j] -= um->Modifier.ImproveIncomes[j];
 				//if this was the highest improve income, search for another
 				if (player.Incomes[j] && (stat.ImproveIncomes[j] + um->Modifier.ImproveIncomes[j]) == player.Incomes[j]) {
-					int m = DefaultIncomes[j];
+					int m = Resources[j].DefaultIncome;
 
 					for (int k = 0; k < player.GetUnitCount(); ++k) {
 						//Wyrmgus start

@@ -109,14 +109,21 @@ class CResource
 {
 public:
 	CResource() : 
-		FinalResource(-1), FinalResourceConversionRate(100),
+		DefaultIncome(100), DefaultAmount(1000), DefaultMaxAmount(-1), FinalResource(-1), FinalResourceConversionRate(100), BasePrice(0), DemandElasticity(100), InputResource(0),
 		LuxuryResource(false), Hidden(false)
 	{
 	}
 
 	std::string Name;
+	std::string ActionName;
+	int DefaultIncome;
+	int DefaultAmount;
+	int DefaultMaxAmount;
 	int FinalResource;
 	int FinalResourceConversionRate;
+	int BasePrice;
+	int DemandElasticity;
+	int InputResource;
 	bool LuxuryResource;
 	bool Hidden;
 	std::vector<int> ChildResources;		/// Resources (other than this one) that have this resource as their final resource
@@ -145,45 +152,15 @@ extern int DefaultResourcesMedium[MaxCosts];
 extern int DefaultResourcesHigh[MaxCosts];
 
 /**
-**  Default incomes for a new player.
-*/
-extern int DefaultIncomes[MaxCosts];
-
-/**
-**  Default action for the resources.
-*/
-extern std::string DefaultActions[MaxCosts];
-
-/**
 **  Default names for the resources.
 */
 extern std::string DefaultResourceNames[MaxCosts];
 
-/**
-**  Default amounts for the resources.
-*/
-extern int DefaultResourceAmounts[MaxCosts];
-
-/**
-**  Default max amounts for the resources.
-*/
-extern int DefaultResourceMaxAmounts[MaxCosts];
-
-//Wyrmgus start
-extern int DefaultResourceInputResources[MaxCosts];
-extern int DefaultResourcePrices[MaxCosts];
-extern int DefaultResourceDemandElasticities[MaxCosts];
 extern std::vector<int> LuxuryResources;
-//Wyrmgus end
 
 extern int GetResourceIdByName(const char *resourceName);
 extern int GetResourceIdByName(lua_State *l, const char *resourceName);
-//Wyrmgus start
 extern std::string GetResourceNameById(int resource_id);
-
-extern void SetResourceInputResource(std::string resource_name, std::string input_resource_name);
-extern void SetResourceDemandElasticity(std::string resource_name, int elasticity);
-//Wyrmgus end
 
 /**
 **  These are the current stats of a unit. Upgraded or downgraded.

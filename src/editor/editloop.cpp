@@ -210,7 +210,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	//Wyrmgus start
 	int value = 0;
 	if ((terrain->Flags & MapFieldForest) || (terrain->Flags & MapFieldRocks)) {
-		value = DefaultResourceAmounts[terrain->Resource];
+		value = Resources[terrain->Resource].DefaultAmount;
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	mf.SetTerrain(terrain);
@@ -544,12 +544,9 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 				unit->Variable[GIVERESOURCE_INDEX].Max = unit->ResourcesHeld;
 				//Wyrmgus end
 			} else {
-				//Wyrmgus start
-//				unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
-				unit->SetResourcesHeld(DefaultResourceAmounts[type.GivesResource]);
-				//Wyrmgus end
-				unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
-				unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
+				unit->SetResourcesHeld(Resources[type.GivesResource].DefaultAmount);
+				unit->Variable[GIVERESOURCE_INDEX].Value = Resources[type.GivesResource].DefaultAmount;
+				unit->Variable[GIVERESOURCE_INDEX].Max = Resources[type.GivesResource].DefaultAmount;
 			}
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}

@@ -601,7 +601,7 @@ int CGrandStrategyProvince::GetResourceDemand(int resource)
 	}
 	
 	if (quantity > 0 && GrandStrategyGame.CommodityPrices[resource] > 0) {
-		quantity *= DefaultResourcePrices[resource];
+		quantity *= Resources[resource].BasePrice;
 		quantity /= GrandStrategyGame.CommodityPrices[resource];
 	}
 
@@ -1942,17 +1942,6 @@ int GetCommodityPrice(std::string resource_name)
 	}
 	
 	return GrandStrategyGame.CommodityPrices[resource];
-}
-
-void SetResourceBasePrice(std::string resource_name, int price)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource == -1) {
-		return;
-	}
-	
-	DefaultResourcePrices[resource] = price;
 }
 
 void CleanGrandStrategyEvents()

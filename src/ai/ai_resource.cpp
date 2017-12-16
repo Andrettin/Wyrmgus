@@ -1413,7 +1413,7 @@ static void AiProduceResources()
 				continue;
 			}
 			
-			int input_resource = DefaultResourceInputResources[resource];
+			int input_resource = Resources[resource].InputResource;
 
 			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && Resources[resource].LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
 				continue;
@@ -1739,7 +1739,7 @@ static void AiCollectResources()
 		) {
 			bool is_luxury_input = false;
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (Resources[i].LuxuryResource && DefaultResourceInputResources[i] == c && num_units_assigned[i] > 0) {
+				if (Resources[i].LuxuryResource && Resources[i].InputResource == c && num_units_assigned[i] > 0) {
 					is_luxury_input = true;
 					break;
 				}

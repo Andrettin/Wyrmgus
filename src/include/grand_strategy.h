@@ -402,7 +402,6 @@ extern void MakeGrandStrategyEventAvailable(std::string event_name);
 extern bool GetGrandStrategyEventTriggered(std::string event_name);
 extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);
-extern void SetResourceBasePrice(std::string resource_name, int price);
 extern void CleanGrandStrategyEvents();
 extern CGrandStrategyEvent *GetGrandStrategyEvent(std::string event_name);
 extern void GrandStrategyCclRegister();

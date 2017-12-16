@@ -2194,6 +2194,14 @@ static int CclDefineResource(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			resource->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "DefaultIncome")) {
+			resource->DefaultIncome = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "DefaultAmount")) {
+			resource->DefaultAmount = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "DefaultMaxAmount")) {
+			resource->DefaultMaxAmount = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ActionName")) {
+			resource->ActionName = LuaToString(l, -1);
 		} else if (!strcmp(value, "FinalResource")) {
 			std::string final_resource_ident = LuaToString(l, -1);
 			int final_resource_id = GetResourceIdByName(final_resource_ident.c_str());
@@ -2207,6 +2215,17 @@ static int CclDefineResource(lua_State *l)
 		} else if (!strcmp(value, "LuxuryResource")) {
 			resource->LuxuryResource = LuaToBoolean(l, -1);
 			LuxuryResources.push_back(resource_id);
+		} else if (!strcmp(value, "BasePrice")) {
+			resource->BasePrice = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "DemandElasticity")) {
+			resource->DemandElasticity = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "InputResource")) {
+			std::string input_resource_ident = LuaToString(l, -1);
+			int input_resource_id = GetResourceIdByName(input_resource_ident.c_str());
+			if (input_resource_id == -1) {
+				LuaError(l, "Resource \"%s\" doesn't exist." _C_ input_resource_ident.c_str());
+			}
+			resource->InputResource = input_resource_id;
 		} else if (!strcmp(value, "Hidden")) {
 			resource->Hidden = LuaToBoolean(l, -1);
 		} else {
@@ -2214,37 +2233,6 @@ static int CclDefineResource(lua_State *l)
 		}
 	}
 	
-	return 0;
-}
-
-/**
-**  Define default incomes for a new player.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultIncomes(lua_State *l)
-{
-	const int args = lua_gettop(l);
-	for (int i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultIncomes[i] = LuaToNumber(l, i + 1);
-	}
-	return 0;
-}
-
-/**
-**  Define default action for the resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultActions(lua_State *l)
-{
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		DefaultActions[i].clear();
-	}
-	const unsigned int args = lua_gettop(l);
-	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
-		DefaultActions[i] = LuaToString(l, i + 1);
-	}
 	return 0;
 }
 
@@ -2263,55 +2251,6 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 		DefaultResourceNames[i] = LuaToString(l, i + 1);
 	}
 	
-	//Wyrmgus start
-	//initialize these variables here, for lack of a better place
-	for (int i = 0; i < MaxCosts; ++i) {
-		DefaultResourceInputResources[i] = 0;
-		DefaultResourcePrices[i] = 0;
-		DefaultResourceDemandElasticities[i] = 100;
-	}
-	//Wyrmgus end
-	
-	return 0;
-}
-
-/**
-**  Define default names for the resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultResourceAmounts(lua_State *l)
-{
-	const unsigned int args = lua_gettop(l);
-
-	if (args & 1) {
-		LuaError(l, "incorrect argument");
-	}
-	for (unsigned int j = 0; j < args; ++j) {
-		const std::string resource = LuaToString(l, j + 1);
-		const int resId = GetResourceIdByName(l, resource.c_str());
-
-		++j;
-		DefaultResourceAmounts[resId] = LuaToNumber(l, j + 1);
-	}
-	return 0;
-}
-
-/**
-**  Define max amounts for the resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDefaultResourceMaxAmounts(lua_State *l)
-{
-	const int args = std::min<int>(lua_gettop(l), MaxCosts);
-
-	for (int i = 0; i < args; ++i) {
-		DefaultResourceMaxAmounts[i] = LuaToNumber(l, i + 1);
-	}
-	for (int i = args; i < MaxCosts; ++i) {
-		DefaultResourceMaxAmounts[i] = -1;
-	}
 	return 0;
 }
 
@@ -2416,31 +2355,6 @@ static int CclSavedGameInfo(lua_State *l)
 	return 0;
 }
 
-//Wyrmgus start
-void SetResourceInputResource(std::string resource_name, std::string input_resource_name)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	int input_resource = GetResourceIdByName(input_resource_name.c_str());
-	
-	if (resource == -1 || input_resource == -1) {
-		return;
-	}
-	
-	DefaultResourceInputResources[resource] = input_resource;
-}
-
-void SetResourceDemandElasticity(std::string resource_name, int elasticity)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource == -1) {
-		return;
-	}
-	
-	DefaultResourceDemandElasticities[resource] = elasticity;
-}
-//Wyrmgus end
-
 void LuaRegisterModules()
 {
 	lua_register(Lua, "SetGameName", CclSetGameName);
@@ -2460,11 +2374,7 @@ void LuaRegisterModules()
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
 
 	lua_register(Lua, "DefineResource", CclDefineResource);
-	lua_register(Lua, "DefineDefaultIncomes", CclDefineDefaultIncomes);
-	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
-	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
-	lua_register(Lua, "DefineDefaultResourceMaxAmounts", CclDefineDefaultResourceMaxAmounts);
 
 	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
 	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);

@@ -491,36 +491,11 @@ std::map<std::string, CUnitType *> UnitTypeMap;
 CResource Resources[MaxCosts];
 
 /**
-**  Default incomes for a new player.
-*/
-int DefaultIncomes[MaxCosts];
-
-/**
-**  Default action for the resources.
-*/
-std::string DefaultActions[MaxCosts];
-
-/**
 **  Default names for the resources.
 */
 std::string DefaultResourceNames[MaxCosts];
 
-/**
-**  Default amounts for the resources.
-*/
-int DefaultResourceAmounts[MaxCosts];
-
-/**
-**  Default max amounts for the resources.
-*/
-int DefaultResourceMaxAmounts[MaxCosts];
-
-//Wyrmgus start
-int DefaultResourceInputResources[MaxCosts];
-int DefaultResourcePrices[MaxCosts];
-int DefaultResourceDemandElasticities[MaxCosts];
 std::vector<int> LuxuryResources;
-//Wyrmgus end
 
 /**
 **  Default names for the resources.
