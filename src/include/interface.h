@@ -464,7 +464,7 @@ extern void UpdateStatusLineForButton(const ButtonAction &button);
 /// Draw the Pie Menu
 extern void DrawPieMenu();
 /// Draw the button popup
-extern void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x = 0, int y = 0);
+extern void DrawPopup(const ButtonAction &button, int x = 0, int y = 0);
 //Wyrmgus start
 extern void DrawGenericPopup(std::string popup_text, int x = 0, int y = 0, std::string text_color = "", std::string highlight_color = "");
 //Wyrmgus end

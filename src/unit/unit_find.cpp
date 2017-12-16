@@ -488,7 +488,7 @@ public:
 		const CUnitType &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && DefaultResourceFinalResources[unit->GivesResource] == resource) || (include_luxury && Resources[unit->GivesResource].LuxuryResource))
+		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && Resources[unit->GivesResource].FinalResource == resource) || (include_luxury && Resources[unit->GivesResource].LuxuryResource))
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start
@@ -614,7 +614,7 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 {
 	distance = deposit ? mine.MapDistanceTo(*deposit) : 0;
 	//Wyrmgus start
-	distance = distance * 100 / DefaultResourceFinalResourceConversionRates[mine.GivesResource]; // alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
+	distance = distance * 100 / Resources[mine.GivesResource].FinalResourceConversionRate; // alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
 	if (Resources[mine.GivesResource].LuxuryResource) {
 		int price_modifier = worker.Player->GetResourcePrice(mine.GivesResource);
 		if (DefaultResourceInputResources[mine.GivesResource]) {

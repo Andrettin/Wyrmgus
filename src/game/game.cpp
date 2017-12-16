@@ -2186,6 +2186,7 @@ static int CclDefineResource(lua_State *l)
 		LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 	}
 	CResource *resource = &Resources[resource_id];
+	resource->FinalResource = resource_id;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -2193,6 +2194,16 @@ static int CclDefineResource(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			resource->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "FinalResource")) {
+			std::string final_resource_ident = LuaToString(l, -1);
+			int final_resource_id = GetResourceIdByName(final_resource_ident.c_str());
+			if (final_resource_id == -1) {
+				LuaError(l, "Resource \"%s\" doesn't exist." _C_ final_resource_ident.c_str());
+			}
+			resource->FinalResource = final_resource_id;
+			Resources[final_resource_id].ChildResources.push_back(resource_id);
+		} else if (!strcmp(value, "FinalResourceConversionRate")) {
+			resource->FinalResourceConversionRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "LuxuryResource")) {
 			resource->LuxuryResource = LuaToBoolean(l, -1);
 			LuxuryResources.push_back(resource_id);
@@ -2253,8 +2264,6 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	//Wyrmgus start
 	//initialize these variables here, for lack of a better place
 	for (int i = 0; i < MaxCosts; ++i) {
-		DefaultResourceFinalResources[i] = i;
-		DefaultResourceFinalResourceConversionRates[i] = 100;
 		DefaultResourceInputResources[i] = 0;
 		DefaultResourcePrices[i] = 0;
 		DefaultResourceDemandElasticities[i] = 100;
@@ -2406,29 +2415,6 @@ static int CclSavedGameInfo(lua_State *l)
 }
 
 //Wyrmgus start
-void SetResourceFinalResource(std::string resource_name, std::string final_resource_name)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	int final_resource = GetResourceIdByName(final_resource_name.c_str());
-	
-	if (resource == -1 || final_resource == -1) {
-		return;
-	}
-	
-	DefaultResourceFinalResources[resource] = final_resource;
-}
-
-void SetResourceFinalResourceConversionRate(std::string resource_name, int conversion_rate)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource == -1) {
-		return;
-	}
-	
-	DefaultResourceFinalResourceConversionRates[resource] = conversion_rate;
-}
-
 void SetResourceInputResource(std::string resource_name, std::string input_resource_name)
 {
 	int resource = GetResourceIdByName(resource_name.c_str());

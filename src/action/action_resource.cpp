@@ -1384,12 +1384,8 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	// Update resource.
-	//Wyrmgus start
-//	const int rindex = resinfo.FinalResource;
-//	player.ChangeResource(rindex, (unit.ResourcesHeld * player.Incomes[rindex]) / 100, true);
-//	player.TotalResources[rindex] += (unit.ResourcesHeld * player.Incomes[rindex]) / 100;
-	const int rindex = DefaultResourceFinalResources[this->CurrentResource];
-	int resource_change = unit.ResourcesHeld * DefaultResourceFinalResourceConversionRates[this->CurrentResource] / 100;
+	const int rindex = Resources[this->CurrentResource].FinalResource;
+	int resource_change = unit.ResourcesHeld * Resources[this->CurrentResource].FinalResourceConversionRate / 100;
 	int processed_resource_change = (resource_change * player.Incomes[this->CurrentResource]) / 100;
 	
 	if (player.AiEnabled && GameSettings.Difficulty == 1) {
@@ -1424,7 +1420,6 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		}
 	}
 	
-	//Wyrmgus end
 	//Wyrmgus start
 //	unit.ResourcesHeld = 0;
 	unit.SetResourcesHeld(0);

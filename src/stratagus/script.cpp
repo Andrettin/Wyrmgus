@@ -1072,6 +1072,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "ResourceName")) {
 			res->e = EString_ResourceName;
 			res->D.Resource = CclParseResourceDesc(l);
+		} else if (!strcmp(key, "ResourceImproveIncomes")) {
+			res->e = EString_ResourceImproveIncomes;
+			res->D.Resource = CclParseResourceDesc(l);
 		//Wyrmgus end
 		} else if (!strcmp(key, "If")) {
 			res->e = EString_If;
@@ -1636,6 +1639,36 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string("");
 			}
+		case EString_ResourceImproveIncomes : // unit type's processing bonuses
+			resource = s->D.Resource;
+			if (resource != NULL) {
+				std::string improve_incomes;
+				bool first = true;
+				if (ThisPlayer->Incomes[(**resource)] > DefaultIncomes[(**resource)]) {
+					first = false;
+					improve_incomes += IdentToName(DefaultResourceNames[(**resource)]);
+					improve_incomes += " Processing Bonus: +";
+					improve_incomes += std::to_string((long long) ThisPlayer->Incomes[(**resource)] - DefaultIncomes[(**resource)]);
+					improve_incomes += "%";
+				}
+				for (size_t i = 0; i < Resources[(**resource)].ChildResources.size(); ++i) {
+					int r = Resources[(**resource)].ChildResources[i];
+					if (ThisPlayer->Incomes[r] > DefaultIncomes[r]) {
+						if (!first) {
+							improve_incomes += "\n";
+						} else {
+							first = false;
+						}
+						improve_incomes += IdentToName(DefaultResourceNames[r]);
+						improve_incomes += " Processing Bonus: +";
+						improve_incomes += std::to_string((long long) ThisPlayer->Incomes[r] - DefaultIncomes[r]);
+						improve_incomes += "%";
+					}
+				}
+				return improve_incomes;
+			} else { // ERROR.
+				return std::string("");
+			}
 		//Wyrmgus end
 		case EString_If : // cond ? True : False;
 			if (EvalNumber(s->D.If.Cond)) {
@@ -1874,6 +1907,7 @@ void FreeStringDesc(StringDesc *s)
 			break;
 		case EString_ResourceIdent : // Ident of the resource
 		case EString_ResourceName : // Name of the resource
+		case EString_ResourceImproveIncomes : // Income improvements of the resource
 			delete *s->D.Resource;
 			break;
 		case EString_FactionCivilization : // Civilization of the faction
@@ -2690,6 +2724,12 @@ static int CclResourceName(lua_State *l)
 {
 	return Alias(l, "ResourceName");
 }
+
+static int CclResourceImproveIncomes(lua_State *l)
+{
+	return Alias(l, "ResourceImproveIncomes");
+}
+
 //Wyrmgus end
 
 /**
@@ -2909,6 +2949,7 @@ static void AliasRegister()
 	lua_register(Lua, "FactionCoreSettlements", CclFactionCoreSettlements);
 	lua_register(Lua, "ResourceIdent", CclResourceIdent);
 	lua_register(Lua, "ResourceName", CclResourceName);
+	lua_register(Lua, "ResourceImproveIncomes", CclResourceImproveIncomes);
 	//Wyrmgus end
 	lua_register(Lua, "SubString", CclSubString);
 	lua_register(Lua, "Line", CclLine);

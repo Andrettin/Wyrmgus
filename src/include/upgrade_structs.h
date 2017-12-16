@@ -109,12 +109,16 @@ class CResource
 {
 public:
 	CResource() : 
+		FinalResource(-1), FinalResourceConversionRate(100),
 		LuxuryResource(false)
 	{
 	}
 
 	std::string Name;
+	int FinalResource;
+	int FinalResourceConversionRate;
 	bool LuxuryResource;
+	std::vector<int> ChildResources;		/// Resources (other than this one) that have this resource as their final resource
 };
 
 extern CResource Resources[MaxCosts];
@@ -165,8 +169,6 @@ extern int DefaultResourceAmounts[MaxCosts];
 extern int DefaultResourceMaxAmounts[MaxCosts];
 
 //Wyrmgus start
-extern int DefaultResourceFinalResources[MaxCosts];
-extern int DefaultResourceFinalResourceConversionRates[MaxCosts];
 extern int DefaultResourceInputResources[MaxCosts];
 extern int DefaultResourcePrices[MaxCosts];
 extern int DefaultResourceDemandElasticities[MaxCosts];
@@ -178,8 +180,6 @@ extern int GetResourceIdByName(lua_State *l, const char *resourceName);
 //Wyrmgus start
 extern std::string GetResourceNameById(int resource_id);
 
-extern void SetResourceFinalResource(std::string resource_name, std::string final_resource_name);
-extern void SetResourceFinalResourceConversionRate(std::string resource_name, int conversion_rate);
 extern void SetResourceInputResource(std::string resource_name, std::string input_resource_name);
 extern void SetResourceDemandElasticity(std::string resource_name, int elasticity);
 //Wyrmgus end

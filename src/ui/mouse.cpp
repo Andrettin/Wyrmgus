@@ -3346,8 +3346,7 @@ void DrawPieMenu()
 		if (!Preference.NoStatusLineTooltips) {
 			UpdateStatusLineForButton(buttons[i]);
 		}
-		DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i],
-				  CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
+		DrawPopup(buttons[i], CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
 	}
 }
 

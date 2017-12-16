@@ -619,7 +619,7 @@ void CViewport::Draw() const
 			ba->Action = ButtonUnit;
 			ba->Value = UnitNumber(*UnitUnderCursor);
 			ba->Popup = "popup-unit-under-cursor";
-			DrawPopup(*ba, *UI.SingleSelectedButton, unit_center_pos.x, unit_center_pos.y);
+			DrawPopup(*ba, unit_center_pos.x, unit_center_pos.y);
 			delete ba;
 			LastDrawnButtonPopup = NULL;
 			//Wyrmgus end

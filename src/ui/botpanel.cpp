@@ -454,14 +454,27 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 
 	if (condition->ImproveIncomes != CONDITION_TRUE) {
-		if (!type) {
-			return false;
-		}
 		bool improve_incomes = false;
-		for (int i = 1; i < MaxCosts; ++i) {
-			if (type->Stats[ThisPlayer->Index].ImproveIncomes[i] > DefaultIncomes[i]) {
+		if (button.Action == ButtonProduceResource) {
+			if (ThisPlayer->Incomes[button.Value] > DefaultIncomes[button.Value]) {
 				improve_incomes = true;
-				break;
+			}
+			for (size_t i = 0; i < Resources[button.Value].ChildResources.size(); ++i) {
+				int res = Resources[button.Value].ChildResources[i];
+				if (ThisPlayer->Incomes[res] > DefaultIncomes[res]) {
+					improve_incomes = true;
+					break;
+				}
+			}
+		} else {
+			if (!type) {
+				return false;
+			}
+			for (int i = 1; i < MaxCosts; ++i) {
+				if (type->Stats[ThisPlayer->Index].ImproveIncomes[i] > DefaultIncomes[i]) {
+					improve_incomes = true;
+					break;
+				}
 			}
 		}
 		if ((condition->ImproveIncomes == CONDITION_ONLY) ^ improve_incomes) {
@@ -934,7 +947,7 @@ static struct PopupDrawCache {
 /**
 **  Draw popup
 */
-void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int y)
+void DrawPopup(const ButtonAction &button, int x, int y)
 {
 	CPopup *popup = PopupByIdent(button.Popup);
 	bool useCache = false;
@@ -1020,142 +1033,6 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
 		}
 	}
-
-#if 0 // Fixme: need to remove soon
-	switch (button.Action) {
-		case ButtonResearch: {
-			CLabel label(font, "white", "red");
-			int *Costs = AllUpgrades[button->Value]->Costs;
-			popupWidth = GetPopupCostsS(font, Costs);
-			//Wyrmgus start
-//			popupWidth = std::max<int>(popupWidth, font->Width(button->Hint) + 10);
-			popupWidth = std::max<int>(popupWidth, font->Width(button->GetHint()) + 10);
-			//Wyrmgus end
-
-			popupHeight = 40;
-
-			start_x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
-
-			y = uibutton->Y - popupHeight - 10;
-			x = start_x;
-
-			// Background
-			Video.FillTransRectangle(backgroundColor, x, y,
-									 popupWidth, popupHeight, 128);
-			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
-
-			// Name
-			//Wyrmgus start
-//			label.Draw(x + 5, y + 5, button->Hint);
-			label.Draw(x + 5, y + 5, button->GetHint());
-			//Wyrmgus end
-			Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
-
-			y += 20;
-			x = start_x;
-			DrawPopupCosts(x + 5, y, label, Costs);
-		}
-		break;
-		case ButtonSpellCast: {
-			CLabel label(font, "white", "red");
-			// FIXME: hardcoded image!!!
-			//Wyrmgus start
-//			const int IconID = GoldCost;
-			const int IconID = CopperCost;
-			//Wyrmgus end
-			//SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
-			const CGraphic *G = UI.Resources[IconID].G;
-			const SpellType *spell = SpellTypeTable[button->Value];
-
-			if (spell->ManaCost) {
-				popupHeight = 40;
-				popupWidth = 10;
-				if (UI.Resources[IconID].IconWidth != -1) {
-					popupWidth += (UI.Resources[IconID].IconWidth + 5);
-				} else {
-					if (G) {
-						popupWidth += (G->Width + 5);
-					}
-				}
-				popupWidth += font->Width(spell->ManaCost);
-				popupWidth = std::max<int>(popupWidth, font->Width(spell->Name) + 10);
-			} else {
-				//Wyrmgus start
-//				popupWidth = font->Width(button->Hint) + 10;
-				popupWidth = font->Width(button->GetHint()) + 10;
-				//Wyrmgus end
-				popupHeight = font_height + 10;
-			}
-
-			popupWidth = std::max<int>(popupWidth, 100);
-
-			x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
-			y = uibutton->Y - popupHeight - 10;
-
-			// Background
-			Video.FillTransRectangle(backgroundColor, x, y,
-									 popupWidth, popupHeight, 128);
-			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
-
-			if (spell->ManaCost) {
-				int y_offset = 0;
-				// Name
-				label.Draw(x + 5, y + 5, spell->Name);
-				Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
-				y += 20;
-				if (G) {
-					int x_offset =  UI.Resources[IconID].IconWidth;
-					x += 5;
-					// FIXME: hardcoded image!!!
-					G->DrawFrameClip(3, x, y);
-					x += ((x_offset != -1 ? x_offset : G->Width) + 5);
-					y_offset = G->Height;
-					y_offset -= font_height;
-					y_offset /= 2;
-				}
-				label.Draw(x, y + y_offset, spell->ManaCost);
-			} else {
-				// Only Hint
-				//Wyrmgus start
-//				label.Draw(x + 5, y + (popupHeight - font_height) / 2, button->Hint);
-				label.Draw(x + 5, y + (popupHeight - font_height) / 2, button->GetHint());
-				//Wyrmgus end
-			}
-		}
-		break;
-
-		case ButtonBuild:
-		case ButtonTrain:
-		case ButtonUpgradeTo:
-			DrawPopupUnitInfo(UnitTypes[button->Value],
-							  ThisPlayer->Index, font, backgroundColor,
-							  uibutton->X, uibutton->Y);
-			break;
-
-
-		default:
-			//Wyrmgus start
-//			popupWidth = font->Width(button->Hint) + 10;
-			popupWidth = font->Width(button->GetHint()) + 10;
-			//Wyrmgus end
-			popupHeight = font_height + 10;//19;
-			x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
-			y = uibutton->Y - popupHeight - 10;
-
-			// Background
-			Video.FillTransRectangle(backgroundColor, x, y, popupWidth, popupHeight, 128);
-			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
-
-			// Hint
-			CLabel(font, "white", "red").Draw(x + 5,
-											  //Wyrmgus start
-//											  y + (popupHeight - font_height) / 2, button->Hint);
-											  y + (popupHeight - font_height) / 2, button->GetHint());
-											  //Wyrmgus end
-			break;
-
-	}
-#endif
 }
 
 //Wyrmgus start
@@ -1497,7 +1374,7 @@ void CButtonPanel::Draw()
 				if (!Preference.NoStatusLineTooltips) {
 					UpdateStatusLineForButton(buttons[i]);
 				}
-				DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i], UI.ButtonPanel.Buttons[i].X,
+				DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i].X,
 					UI.ButtonPanel.Buttons[i].Y);
 		}
 	}

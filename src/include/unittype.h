@@ -118,12 +118,8 @@ class ResourceInfo
 {
 public:
 	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
-		//Wyrmgus start
-//		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0),
-//		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0),
 		LoseResources(0),
-		//Wyrmgus end
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{}
 
@@ -134,16 +130,7 @@ public:
 	int      ResourceCapacity;      /// Max amount of resources to carry.
 	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
 	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
-	//Wyrmgus start
-//	unsigned FinalResource;         /// Convert resource when delivered.
-	//Wyrmgus end
-	//Wyrmgus start
-//	unsigned char TerrainHarvester;    /// Unit will harvest terrain(wood only for now).
-	//Wyrmgus end
 	unsigned char LoseResources;       /// The unit will lose it's resource when distracted.
-	//Wyrmgus start
-//	unsigned char HarvestFromOutside;  /// Unit harvests without entering the building.
-	//Wyrmgus end
 	unsigned char RefineryHarvester;   /// Unit have to build Refinery buildings for harvesting.
 	//  Runtime info:
 	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.

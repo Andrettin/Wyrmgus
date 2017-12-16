@@ -987,7 +987,7 @@ void DrawPopups()
 					ba->Action = ButtonUnit;
 					ba->Value = UnitNumber(*UnitUnderCursor);
 					ba->Popup = "popup-unit-under-cursor";
-					DrawPopup(*ba, *UI.SingleSelectedButton, unit_center_pos.x, unit_center_pos.y);
+					DrawPopup(*ba, unit_center_pos.x, unit_center_pos.y);
 					delete ba;
 					LastDrawnButtonPopup = NULL;
 				} else if (mf.TerrainFeature) {
@@ -1019,7 +1019,7 @@ void DrawPopups()
 			ba->Action = ButtonUnit;
 			ba->Value = UnitNumber(*Selected[0]);
 			ba->Popup = "popup-unit";
-			DrawPopup(*ba, *UI.SingleSelectedButton, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
+			DrawPopup(*ba, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 			delete ba;
 			LastDrawnButtonPopup = NULL;
 		}
@@ -1065,7 +1065,7 @@ void DrawPopups()
 					ba->Action = ButtonUnit;
 					ba->Value = UnitNumber(*uins);
 					ba->Popup = "popup-item-inventory";
-					DrawPopup(*ba, UI.InventoryButtons[j], UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
+					DrawPopup(*ba, UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
 					delete ba;
 					LastDrawnButtonPopup = NULL;
 				}
@@ -1088,8 +1088,7 @@ void DrawPopups()
 					if (!Preference.NoStatusLineTooltips) {
 						UpdateStatusLineForButton(CurrentButtons[i]);
 					}
-					DrawPopup(CurrentButtons[i], UI.ButtonPanel.Buttons[i], UI.ButtonPanel.Buttons[i].X,
-						UI.ButtonPanel.Buttons[i].Y);
+					DrawPopup(CurrentButtons[i], UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
 			}
 		}
 	}
@@ -1133,7 +1132,15 @@ void DrawPopups()
 	//draw a popup when hovering over a resource icon
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (UI.Resources[i].G && CursorScreenPos.x >= UI.Resources[i].IconX && CursorScreenPos.x < (UI.Resources[i].IconX + UI.Resources[i].G->Width) && CursorScreenPos.y >= UI.Resources[i].IconY && CursorScreenPos.y < (UI.Resources[i].IconY + UI.Resources[i].G->Height)) {
-			DrawGenericPopup(CapitalizeString(DefaultResourceNames[i]), UI.Resources[i].IconX, UI.Resources[i].IconY);
+			//hackish way to make the popup appear correctly for the resource
+			ButtonAction *ba = new ButtonAction;
+			ba->Hint = CapitalizeString(DefaultResourceNames[i]);
+			ba->Action = ButtonProduceResource;
+			ba->Value = i;
+			ba->Popup = "popup-resource";
+			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY);
+			delete ba;
+			LastDrawnButtonPopup = NULL;
 		}
 	}
 	
@@ -1920,7 +1927,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		ba->Action = ButtonUnit;
 		ba->Value = UnitNumber(unit);
 		ba->Popup = "popup-unit";
-		DrawPopup(*ba, *UI.SingleSelectedButton, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
+		DrawPopup(*ba, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		delete ba;
 		LastDrawnButtonPopup = NULL;
 		//Wyrmgus end

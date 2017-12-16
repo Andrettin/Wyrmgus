@@ -929,7 +929,7 @@ static void DrawUnitIcons()
 			if (i == (int) Editor.ShownUnitTypes.size()) {
 				DrawGenericPopup("Create Unit Type", UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
 			} else {
-				DrawPopup(CurrentButtons[j], UI.ButtonPanel.Buttons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
+				DrawPopup(CurrentButtons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
 			}
 		}
 		

@@ -1479,7 +1479,7 @@ static void AiCollectResources()
 			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 			//Wyrmgus start
 //			const int c = order.GetCurrentResource();
-			int c = DefaultResourceFinalResources[order.GetCurrentResource()];
+			int c = Resources[order.GetCurrentResource()].FinalResource;
 			if (Resources[c].LuxuryResource) {
 				num_units_assigned[c]++;
 				c = CopperCost;

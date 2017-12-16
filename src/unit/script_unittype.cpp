@@ -1802,12 +1802,6 @@ static int CclDefineUnitType(lua_State *l)
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "resource-step")) {
 						res->ResourceStep = LuaToNumber(l, -1, k + 1);
-					//Wyrmgus start
-//					} else if (!strcmp(value, "final-resource")) {
-//						lua_rawgeti(l, -1, k + 1);
-//						res->FinalResource = CclGetResourceByName(l);
-//						lua_pop(l, 1);
-					//Wyrmgus end
 					} else if (!strcmp(value, "wait-at-resource")) {
 						res->WaitAtResource = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "wait-at-depot")) {
@@ -1843,11 +1837,6 @@ static int CclDefineUnitType(lua_State *l)
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
-				//Wyrmgus start
-//				if (!res->FinalResource) {
-//					res->FinalResource = res->ResourceId;
-//				}
-				//Wyrmgus end
 				Assert(res->ResourceId);
 				lua_pop(l, 1);
 			}
