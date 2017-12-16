@@ -1138,18 +1138,18 @@ void DrawPopups()
 			ba->Action = ButtonProduceResource;
 			ba->Value = i;
 			ba->Popup = "popup-resource";
-			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY);
+			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 + GameCursor->G->getHeight() / 2, false);
 			delete ba;
 			LastDrawnButtonPopup = NULL;
 		}
 	}
 	
 	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].IconX + UI.Resources[FoodCost].G->Width) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
-		DrawGenericPopup("Food", UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY);
+		DrawGenericPopup("Food", UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
 	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].IconX + UI.Resources[ScoreCost].G->Width) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
-		DrawGenericPopup("Score", UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY);
+		DrawGenericPopup("Score", UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {

@@ -953,7 +953,7 @@ static struct PopupDrawCache {
 /**
 **  Draw popup
 */
-void DrawPopup(const ButtonAction &button, int x, int y)
+void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 {
 	CPopup *popup = PopupByIdent(button.Popup);
 	bool useCache = false;
@@ -1017,7 +1017,11 @@ void DrawPopup(const ButtonAction &button, int x, int y)
 
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
 	clamp<int>(&x, 0, Video.Width - 1);
-	y = y - popupHeight - 10;
+	if (above) {
+		y = y - popupHeight - 10;
+	} else { //below
+		y = y + 10;
+	}
 	clamp<int>(&y, 0, Video.Height - 1);
 
 	// Background
@@ -1045,7 +1049,7 @@ void DrawPopup(const ButtonAction &button, int x, int y)
 /**
 **  Draw popup
 */
-void DrawGenericPopup(std::string popup_text, int x, int y, std::string text_color, std::string highlight_color)
+void DrawGenericPopup(std::string popup_text, int x, int y, std::string text_color, std::string highlight_color, bool above)
 {
 	const CFont &font = GetGameFont();
 	
@@ -1114,7 +1118,11 @@ void DrawGenericPopup(std::string popup_text, int x, int y, std::string text_col
 
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
 	clamp<int>(&x, 0, Video.Width - 1);
-	y = y - popupHeight - 10;
+	if (above) {
+		y = y - popupHeight - 10;
+	} else { //below
+		y = y + 10;
+	}
 	clamp<int>(&y, 0, Video.Height - 1);
 
 	// Background
