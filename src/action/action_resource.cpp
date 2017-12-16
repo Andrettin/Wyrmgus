@@ -1390,7 +1390,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 //	player.TotalResources[rindex] += (unit.ResourcesHeld * player.Incomes[rindex]) / 100;
 	const int rindex = DefaultResourceFinalResources[this->CurrentResource];
 	int resource_change = unit.ResourcesHeld * DefaultResourceFinalResourceConversionRates[this->CurrentResource] / 100;
-	int processed_resource_change = (resource_change * player.Incomes[rindex]) / 100;
+	int processed_resource_change = (resource_change * player.Incomes[this->CurrentResource]) / 100;
 	
 	if (player.AiEnabled && GameSettings.Difficulty == 1) {
 		processed_resource_change /= 2;
