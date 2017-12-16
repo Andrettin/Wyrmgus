@@ -110,7 +110,7 @@ class CResource
 public:
 	CResource() : 
 		FinalResource(-1), FinalResourceConversionRate(100),
-		LuxuryResource(false)
+		LuxuryResource(false), Hidden(false)
 	{
 	}
 
@@ -118,6 +118,7 @@ public:
 	int FinalResource;
 	int FinalResourceConversionRate;
 	bool LuxuryResource;
+	bool Hidden;
 	std::vector<int> ChildResources;		/// Resources (other than this one) that have this resource as their final resource
 };
 

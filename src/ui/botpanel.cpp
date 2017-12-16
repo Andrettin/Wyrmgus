@@ -453,6 +453,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 
+	if (condition->ChildResources != CONDITION_TRUE) {
+		if ((condition->ChildResources == CONDITION_ONLY) ^ (Resources[button.Value].ChildResources.size() > 0)) {
+			return false;
+		}
+	}
+
 	if (condition->ImproveIncomes != CONDITION_TRUE) {
 		bool improve_incomes = false;
 		if (button.Action == ButtonProduceResource) {

@@ -1072,6 +1072,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "ResourceName")) {
 			res->e = EString_ResourceName;
 			res->D.Resource = CclParseResourceDesc(l);
+		} else if (!strcmp(key, "ResourceConversionRates")) {
+			res->e = EString_ResourceConversionRates;
+			res->D.Resource = CclParseResourceDesc(l);
 		} else if (!strcmp(key, "ResourceImproveIncomes")) {
 			res->e = EString_ResourceImproveIncomes;
 			res->D.Resource = CclParseResourceDesc(l);
@@ -1639,6 +1642,32 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string("");
 			}
+		case EString_ResourceConversionRates : // unit type's processing bonuses
+			resource = s->D.Resource;
+			if (resource != NULL) {
+				std::string conversion_rates;
+				bool first = true;
+				for (size_t i = 0; i < Resources[(**resource)].ChildResources.size(); ++i) {
+					int r = Resources[(**resource)].ChildResources[i];
+					if (r == TradeCost || Resources[r].Hidden) {
+						continue;
+					}
+					if (!first) {
+						conversion_rates += "\n";
+					} else {
+						first = false;
+					}
+					conversion_rates += IdentToName(DefaultResourceNames[r]);
+					conversion_rates += " to ";
+					conversion_rates += IdentToName(DefaultResourceNames[(**resource)]);
+					conversion_rates += " Conversion Rate: ";
+					conversion_rates += std::to_string((long long) Resources[r].FinalResourceConversionRate);
+					conversion_rates += "%";
+				}
+				return conversion_rates;
+			} else { // ERROR.
+				return std::string("");
+			}
 		case EString_ResourceImproveIncomes : // unit type's processing bonuses
 			resource = s->D.Resource;
 			if (resource != NULL) {
@@ -1653,6 +1682,9 @@ std::string EvalString(const StringDesc *s)
 				}
 				for (size_t i = 0; i < Resources[(**resource)].ChildResources.size(); ++i) {
 					int r = Resources[(**resource)].ChildResources[i];
+					if (r == TradeCost || Resources[r].Hidden) {
+						continue;
+					}
 					if (ThisPlayer->Incomes[r] > DefaultIncomes[r]) {
 						if (!first) {
 							improve_incomes += "\n";
@@ -1907,6 +1939,7 @@ void FreeStringDesc(StringDesc *s)
 			break;
 		case EString_ResourceIdent : // Ident of the resource
 		case EString_ResourceName : // Name of the resource
+		case EString_ResourceConversionRates : // Conversion rates of the resource
 		case EString_ResourceImproveIncomes : // Income improvements of the resource
 			delete *s->D.Resource;
 			break;
@@ -2725,11 +2758,15 @@ static int CclResourceName(lua_State *l)
 	return Alias(l, "ResourceName");
 }
 
+static int CclResourceConversionRates(lua_State *l)
+{
+	return Alias(l, "ResourceConversionRates");
+}
+
 static int CclResourceImproveIncomes(lua_State *l)
 {
 	return Alias(l, "ResourceImproveIncomes");
 }
-
 //Wyrmgus end
 
 /**
@@ -2949,6 +2986,7 @@ static void AliasRegister()
 	lua_register(Lua, "FactionCoreSettlements", CclFactionCoreSettlements);
 	lua_register(Lua, "ResourceIdent", CclResourceIdent);
 	lua_register(Lua, "ResourceName", CclResourceName);
+	lua_register(Lua, "ResourceConversionRates", CclResourceConversionRates);
 	lua_register(Lua, "ResourceImproveIncomes", CclResourceImproveIncomes);
 	//Wyrmgus end
 	lua_register(Lua, "SubString", CclSubString);

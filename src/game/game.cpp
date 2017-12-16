@@ -2207,6 +2207,8 @@ static int CclDefineResource(lua_State *l)
 		} else if (!strcmp(value, "LuxuryResource")) {
 			resource->LuxuryResource = LuaToBoolean(l, -1);
 			LuxuryResources.push_back(resource_id);
+		} else if (!strcmp(value, "Hidden")) {
+			resource->Hidden = LuaToBoolean(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
