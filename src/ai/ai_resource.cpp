@@ -1409,13 +1409,13 @@ static void AiProduceResources()
 		for (size_t j = 0; j != AiHelpers.ProducedResources[unit.Type->Slot].size(); ++j) {
 			int resource = AiHelpers.ProducedResources[unit.Type->Slot][j];
 			
-			if (!LuxuryResources[resource] && AiCanSellResource(resource)) {
+			if (!Resources[resource].LuxuryResource && AiCanSellResource(resource)) {
 				continue;
 			}
 			
 			int input_resource = DefaultResourceInputResources[resource];
 
-			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && LuxuryResources[resource])) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
+			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && Resources[resource].LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
 				continue;
 			}
 			
@@ -1480,7 +1480,7 @@ static void AiCollectResources()
 			//Wyrmgus start
 //			const int c = order.GetCurrentResource();
 			int c = DefaultResourceFinalResources[order.GetCurrentResource()];
-			if (LuxuryResources[c]) {
+			if (Resources[c].LuxuryResource) {
 				num_units_assigned[c]++;
 				c = CopperCost;
 			}
@@ -1739,7 +1739,7 @@ static void AiCollectResources()
 		) {
 			bool is_luxury_input = false;
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (LuxuryResources[i] && DefaultResourceInputResources[i] == c && num_units_assigned[i] > 0) {
+				if (Resources[i].LuxuryResource && DefaultResourceInputResources[i] == c && num_units_assigned[i] > 0) {
 					is_luxury_input = true;
 					break;
 				}

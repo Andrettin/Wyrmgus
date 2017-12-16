@@ -105,6 +105,20 @@ enum CostType {
 #define ManaResCost (MaxCosts + 2)
 #define FreeWorkersCount (MaxCosts + 3)
 
+class CResource
+{
+public:
+	CResource() : 
+		LuxuryResource(false)
+	{
+	}
+
+	std::string Name;
+	bool LuxuryResource;
+};
+
+extern CResource Resources[MaxCosts];
+
 /**
 **  Default resources for a new player.
 */
@@ -151,12 +165,12 @@ extern int DefaultResourceAmounts[MaxCosts];
 extern int DefaultResourceMaxAmounts[MaxCosts];
 
 //Wyrmgus start
-extern bool LuxuryResources[MaxCosts];
 extern int DefaultResourceFinalResources[MaxCosts];
 extern int DefaultResourceFinalResourceConversionRates[MaxCosts];
 extern int DefaultResourceInputResources[MaxCosts];
 extern int DefaultResourcePrices[MaxCosts];
 extern int DefaultResourceDemandElasticities[MaxCosts];
+extern std::vector<int> LuxuryResources;
 //Wyrmgus end
 
 extern int GetResourceIdByName(const char *resourceName);

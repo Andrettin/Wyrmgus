@@ -521,7 +521,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->LuxuryResource != CONDITION_TRUE) {
-		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonProduceResource && LuxuryResources[button.Value])) {
+		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonProduceResource && Resources[button.Value].LuxuryResource)) {
 			return false;
 		}
 	}

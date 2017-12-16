@@ -2468,22 +2468,17 @@ void CPlayer::PerformResourceTrade()
 		return;
 	}
 	
-	for (int i = 1; i < MaxCosts; ++i) {
-		if (i == CopperCost) {
-			continue;
-		}
-		if (!LuxuryResources[i]) {
-			continue;
+	for (size_t i = 0; i < LuxuryResources.size(); ++i) {
+		int res = LuxuryResources[i];
+		
+		while ((this->Resources[res] + this->StoredResources[res]) >= 100) {
+			market_unit->SellResource(res, this->Index);
 		}
 		
-		while ((this->Resources[i] + this->StoredResources[i]) >= 100) {
-			market_unit->SellResource(i, this->Index);
-		}
-		
-		this->StoredResourceDemand[i] += this->GetEffectiveResourceDemand(i);
-		while (this->StoredResourceDemand[i] >= 100) {
-			this->IncreaseResourcePrice(i);
-			this->StoredResourceDemand[i] -= 100;
+		this->StoredResourceDemand[res] += this->GetEffectiveResourceDemand(res);
+		while (this->StoredResourceDemand[res] >= 100) {
+			this->IncreaseResourcePrice(res);
+			this->StoredResourceDemand[res] -= 100;
 		}
 	}
 }

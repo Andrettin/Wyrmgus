@@ -2169,6 +2169,42 @@ static int CclSetSpeeds(lua_State *l)
 }
 
 /**
+**  Define a resource.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineResource(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string resource_ident = LuaToString(l, 1);
+	int resource_id = GetResourceIdByName(resource_ident.c_str());
+	if (resource_id == -1) {
+		LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
+	}
+	CResource *resource = &Resources[resource_id];
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			resource->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "LuxuryResource")) {
+			resource->LuxuryResource = LuaToBoolean(l, -1);
+			LuxuryResources.push_back(resource_id);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define default incomes for a new player.
 **
 **  @param l  Lua state.
@@ -2217,7 +2253,6 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	//Wyrmgus start
 	//initialize these variables here, for lack of a better place
 	for (int i = 0; i < MaxCosts; ++i) {
-		LuxuryResources[i] = false;
 		DefaultResourceFinalResources[i] = i;
 		DefaultResourceFinalResourceConversionRates[i] = 100;
 		DefaultResourceInputResources[i] = 0;
@@ -2268,27 +2303,6 @@ static int CclDefineDefaultResourceMaxAmounts(lua_State *l)
 	}
 	return 0;
 }
-
-//Wyrmgus start
-/**
-**  Defines which resources are luxury resources.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineLuxuryResources(lua_State *l)
-{
-	const unsigned int args = lua_gettop(l);
-
-	for (unsigned int j = 0; j < args; ++j) {
-		const std::string resource = LuaToString(l, j + 1);
-		const int resId = GetResourceIdByName(l, resource.c_str());
-
-		LuxuryResources[resId] = true;
-	}
-	return 0;
-}
-
-//Wyrmgus end
 
 /**
 **  Affect UseHPForXp.
@@ -2457,14 +2471,12 @@ void LuaRegisterModules()
 	lua_register(Lua, "SetSpeedResearch", CclSetSpeedResearch);
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
 
+	lua_register(Lua, "DefineResource", CclDefineResource);
 	lua_register(Lua, "DefineDefaultIncomes", CclDefineDefaultIncomes);
 	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
 	lua_register(Lua, "DefineDefaultResourceMaxAmounts", CclDefineDefaultResourceMaxAmounts);
-	//Wyrmgus start
-	lua_register(Lua, "DefineLuxuryResources", CclDefineLuxuryResources);
-	//Wyrmgus end
 
 	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
 	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
