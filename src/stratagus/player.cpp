@@ -2821,6 +2821,9 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 
 	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
 		CPlayerQuestObjective *objective = this->QuestObjectives[i];
+		if (objective->Quest != quest) {
+			continue;
+		}
 		if (objective->ObjectiveType == BuildUnitsObjectiveType || objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
 			CUnitType *type = objective->UnitType;
 			if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
