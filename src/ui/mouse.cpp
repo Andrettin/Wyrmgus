@@ -178,7 +178,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 	// dest is the transporter
 	if (dest->Type->CanTransport()) {
 		// Let the transporter move to the unit. And QUEUE!!!
-		if (dest->CanMove() && CanTransport(*dest, unit)) {
+		if (dest->CanMove() && CanTransport(*dest, unit) && dest->Player == ThisPlayer) {
 			DebugPrint("Send command follow\n");
 			// is flush value correct ?
 			if (!acknowledged) {
@@ -188,7 +188,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			SendCommandFollow(*dest, unit, 0);
 		}
 		// FIXME : manage correctly production units.
-		if (!unit.CanMove() || CanTransport(*dest, unit)) {
+		if ((!unit.CanMove() && dest->Player == ThisPlayer) || CanTransport(*dest, unit)) {
 			dest->Blink = 4;
 			DebugPrint("Board transporter\n");
 			if (!acknowledged) {
@@ -215,14 +215,16 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			DebugPrint("Want to transport but no unit can move\n");
 			return true;
 		}
-		dest->Blink = 4;
-		DebugPrint("Board transporter\n");
-		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
-			acknowledged = 1;
+		if (dest->Player == ThisPlayer) {
+			dest->Blink = 4;
+			DebugPrint("Board transporter\n");
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+			SendCommandBoard(*dest, unit, flush);
+			return true;
 		}
-		SendCommandBoard(*dest, unit, flush);
-		return true;
 	}
 	return false;
 }
