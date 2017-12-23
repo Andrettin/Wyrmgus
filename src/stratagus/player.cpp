@@ -2825,21 +2825,23 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			continue;
 		}
 		if (objective->ObjectiveType == BuildUnitsObjectiveType || objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-			CUnitType *type = objective->UnitType;
-			if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-				int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
-				if (unit_type_id == -1) {
+			if (objective->Counter < objective->Quantity) {
+				CUnitType *type = objective->UnitType;
+				if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+					int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
+					if (unit_type_id == -1) {
+						return "You can no longer produce the required unit.";
+					}
+					type = UnitTypes[unit_type_id];
+				}
+				
+				if (objective->Settlement && !this->HasSettlement(objective->Settlement) && !type->BoolFlag[TOWNHALL_INDEX].value) {
+					return "You no longer hold the required settlement.";
+				}
+				
+				if (!this->HasUnitBuilder(type, objective->Settlement) || !CheckDependByType(*this, *type)) {
 					return "You can no longer produce the required unit.";
 				}
-				type = UnitTypes[unit_type_id];
-			}
-			
-			if (objective->Settlement && !this->HasSettlement(objective->Settlement) && !type->BoolFlag[TOWNHALL_INDEX].value) {
-				return "You no longer hold the required settlement.";
-			}
-			
-			if (!this->HasUnitBuilder(type, objective->Settlement) || !CheckDependByType(*this, *type)) {
-				return "You can no longer produce the required unit.";
 			}
 		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {
 			if (!this->HasHero(objective->Character) && !this->CanRecruitHero(objective->Character, true)) {
