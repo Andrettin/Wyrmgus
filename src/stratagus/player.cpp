@@ -1866,7 +1866,7 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	return false;
 }
 
-bool CPlayer::HasUnitBuilder(CUnitType *type, CSettlement *settlement) const
+bool CPlayer::HasUnitBuilder(const CUnitType *type, const CSettlement *settlement) const
 {
 	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
 		for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
@@ -1894,6 +1894,18 @@ bool CPlayer::HasUnitBuilder(CUnitType *type, CSettlement *settlement) const
 						}
 					}
 				}
+			}
+		}
+	}
+	return false;
+}
+
+bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
+{
+	if (upgrade->ID < (int) AiHelpers.Research.size()) {
+		for (size_t j = 0; j < AiHelpers.Research[upgrade->ID].size(); ++j) {
+			if (this->GetUnitTypeCount(AiHelpers.Research[upgrade->ID][j]) > 0) {
+				return true;
 			}
 		}
 	}
@@ -2735,6 +2747,38 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 			if (!this->HasUnitBuilder(type, objective->Settlement) || !CheckDependByType(*this, *type)) {
 				return false;
 			}
+		} else if (objective->ObjectiveType == ResearchUpgradeObjectiveType) {
+			CUpgrade *upgrade = objective->Upgrade;
+			
+			bool has_researcher = this->HasUpgradeResearcher(upgrade);
+				
+			if (!has_researcher && upgrade->ID < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
+				for (size_t j = 0; j < quest->Objectives.size(); ++j) {
+					CQuestObjective *second_objective = quest->Objectives[j];
+					if (second_objective == objective) {
+						continue;
+					}
+						
+					if (second_objective->ObjectiveType == BuildUnitsObjectiveType || second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+						CUnitType *type = second_objective->UnitType;
+						if (second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+							int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
+							if (unit_type_id == -1) {
+								continue;
+							}
+							type = UnitTypes[unit_type_id];
+						}
+						if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
+							has_researcher = true;
+							break;
+						}
+					}
+				}
+			}
+				
+			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(*this, upgrade->Ident)) {
+				return false;
+			}
 		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {
 			if (!this->CanRecruitHero(objective->Character, true)) {
 				return false;
@@ -2812,7 +2856,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 	}
 	
 	if (quest->CurrentCompleted) { // quest already completed by someone else
-		return "Another faction has completed the quest before you.";
+		return "Another faction has completed the quest before you could.";
 	}
 
 	if (quest->Unfailable) {
@@ -2841,6 +2885,40 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 				
 				if (!this->HasUnitBuilder(type, objective->Settlement) || !CheckDependByType(*this, *type)) {
 					return "You can no longer produce the required unit.";
+				}
+			}
+		} else if (objective->ObjectiveType == ResearchUpgradeObjectiveType) {
+			CUpgrade *upgrade = objective->Upgrade;
+			
+			if (this->Allow.Upgrades[upgrade->ID] != 'R') {
+				bool has_researcher = this->HasUpgradeResearcher(upgrade);
+				
+				if (!has_researcher && upgrade->ID < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
+					for (size_t j = 0; j < this->QuestObjectives.size(); ++j) {
+						CPlayerQuestObjective *second_objective = this->QuestObjectives[j];
+						if (second_objective->Quest != quest || second_objective == objective || second_objective->Counter >= second_objective->Quantity) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
+							continue;
+						}
+						
+						if (second_objective->ObjectiveType == BuildUnitsObjectiveType || second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+							CUnitType *type = second_objective->UnitType;
+							if (second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
+								int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
+								if (unit_type_id == -1) {
+									continue;
+								}
+								type = UnitTypes[unit_type_id];
+							}
+							if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
+								has_researcher = true;
+								break;
+							}
+						}
+					}
+				}
+				
+				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(*this, upgrade->Ident)) {
+					return "You can no longer research the required upgrade.";
 				}
 			}
 		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {

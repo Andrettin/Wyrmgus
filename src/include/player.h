@@ -236,7 +236,8 @@ public:
 	bool HasUpgradeClass(int upgrade_class);
 	bool HasSettlement(CSettlement *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
-	bool HasUnitBuilder(CUnitType *type, CSettlement *settlement = NULL) const;
+	bool HasUnitBuilder(const CUnitType *type, const CSettlement *settlement = NULL) const;
+	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
 	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
 	bool CanRecruitHero(const CCharacter *character, bool ignore_neutral = false) const;
