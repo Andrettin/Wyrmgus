@@ -2666,7 +2666,12 @@ void CPlayer::AcceptQuest(CQuest *quest)
 
 void CPlayer::CompleteQuest(CQuest *quest)
 {
+	if (std::find(this->CompletedQuests.begin(), this->CompletedQuests.end(), quest) != this->CompletedQuests.end()) {
+		return;
+	}
+	
 	RemoveCurrentQuest(quest);
+	
 	this->CompletedQuests.push_back(quest);
 	if (quest->Competitive) {
 		quest->CurrentCompleted = true;
