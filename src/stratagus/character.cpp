@@ -74,7 +74,7 @@ CCharacter::~CCharacter()
 	}
 }
 
-int CCharacter::GetMartialAttribute()
+int CCharacter::GetMartialAttribute() const
 {
 	if ((this->Type->Class != -1 && UnitTypeClasses[this->Type->Class] == "thief") || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
 		return DexterityAttribute;
@@ -83,17 +83,17 @@ int CCharacter::GetMartialAttribute()
 	}
 }
 
-int CCharacter::GetAttributeModifier(int attribute)
+int CCharacter::GetAttributeModifier(int attribute) const
 {
 	return this->Attributes[attribute] - 10;
 }
 
-CLanguage *CCharacter::GetLanguage()
+CLanguage *CCharacter::GetLanguage() const
 {
 	return PlayerRaces.GetCivilizationLanguage(this->Civilization);
 }
 
-bool CCharacter::IsParentOf(std::string child_ident)
+bool CCharacter::IsParentOf(std::string child_ident) const
 {
 	for (size_t i = 0; i < this->Children.size(); ++i) {
 		if (this->Children[i]->Ident == child_ident) {
@@ -103,7 +103,7 @@ bool CCharacter::IsParentOf(std::string child_ident)
 	return false;
 }
 
-bool CCharacter::IsChildOf(std::string parent_ident)
+bool CCharacter::IsChildOf(std::string parent_ident) const
 {
 	if ((this->Father != NULL && this->Father->Ident == parent_ident) || (this->Mother != NULL && this->Mother->Ident == parent_ident)) {
 		return true;
@@ -111,7 +111,7 @@ bool CCharacter::IsChildOf(std::string parent_ident)
 	return false;
 }
 
-bool CCharacter::IsSiblingOf(std::string sibling_ident)
+bool CCharacter::IsSiblingOf(std::string sibling_ident) const
 {
 	for (size_t i = 0; i < this->Siblings.size(); ++i) {
 		if (this->Siblings[i]->Ident == sibling_ident) {
@@ -166,7 +166,7 @@ std::string CCharacter::GetFullName() const
 	return full_name;
 }
 
-IconConfig CCharacter::GetIcon()
+IconConfig CCharacter::GetIcon() const
 {
 	if (this->Level >= 3 && this->HeroicIcon.Icon) {
 		return this->HeroicIcon;
@@ -179,7 +179,7 @@ IconConfig CCharacter::GetIcon()
 	}
 }
 
-CPersistentItem *CCharacter::GetItem(CUnit &item)
+CPersistentItem *CCharacter::GetItem(CUnit &item) const
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
 		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Work == item.Work && this->Items[i]->Elixir == item.Elixir && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound && this->Items[i]->Identified == item.Identified && this->IsItemEquipped(this->Items[i]) == item.Container->IsItemEquipped(&item)) {

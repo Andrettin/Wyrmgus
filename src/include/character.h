@@ -127,17 +127,17 @@ public:
 	}
 	~CCharacter();
 	
-	int GetMartialAttribute();
-	int GetAttributeModifier(int attribute);
-	CLanguage *GetLanguage();
-	bool IsParentOf(std::string child_full_name);
-	bool IsChildOf(std::string parent_full_name);
-	bool IsSiblingOf(std::string sibling_full_name);
+	int GetMartialAttribute() const;
+	int GetAttributeModifier(int attribute) const;
+	CLanguage *GetLanguage() const;
+	bool IsParentOf(std::string child_full_name) const;
+	bool IsChildOf(std::string parent_full_name) const;
+	bool IsSiblingOf(std::string sibling_full_name) const;
 	bool IsItemEquipped(const CPersistentItem *item) const;
 	bool CanAppear(bool ignore_neutral = false) const;
 	std::string GetFullName() const;
-	IconConfig GetIcon();
-	CPersistentItem *GetItem(CUnit &item);
+	IconConfig GetIcon() const;
+	CPersistentItem *GetItem(CUnit &item) const;
 	void UpdateAttributes();
 
 	CDate Date;					/// Date in which the character historically starts being active
