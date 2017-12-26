@@ -271,6 +271,9 @@ static int CclGetUniqueItemData(lua_State *l)
 	} else if (!strcmp(data, "CanDrop")) {
 		lua_pushboolean(l, item->CanDrop());
 		return 1;
+	} else if (!strcmp(data, "Icon")) {
+		lua_pushstring(l, item->GetIcon().Name.c_str());
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

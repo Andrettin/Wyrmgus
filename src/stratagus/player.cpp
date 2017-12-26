@@ -2736,10 +2736,6 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 	for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 		CQuestObjective *objective = quest->Objectives[i];
 		if (objective->ObjectiveType == BuildUnitsObjectiveType || objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-			if (objective->Settlement && !this->HasSettlement(objective->Settlement)) {
-				return false;
-			}
-			
 			CUnitType *type = objective->UnitType;
 			if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
 				int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
@@ -2747,6 +2743,10 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 					return false;
 				}
 				type = UnitTypes[unit_type_id];
+			}
+			
+			if (objective->Settlement && !this->HasSettlement(objective->Settlement) && !type->BoolFlag[TOWNHALL_INDEX].value) {
+				return false;
 			}
 			
 			if (!this->HasUnitBuilder(type, objective->Settlement) || !CheckDependByType(*this, *type)) {

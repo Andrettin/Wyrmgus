@@ -10,7 +10,7 @@
 //
 /**@name item.h - The item headerfile. */
 //
-//      (c) Copyright 2015-2016 by Andrettin
+//      (c) Copyright 2015-2017 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -117,6 +117,7 @@ public:
 	
 	bool CanDrop() const;				/// Check whether this unique item can drop
 	int GetMagicLevel() const;			/// Get this unique item's magic level
+	IconConfig GetIcon() const;
 
 	int ResourcesHeld;
 	std::string Ident;

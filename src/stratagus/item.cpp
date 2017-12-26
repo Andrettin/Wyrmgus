@@ -10,7 +10,7 @@
 //
 /**@name item.cpp - The items. */
 //
-//      (c) Copyright 2015-2016 by Andrettin
+//      (c) Copyright 2015-2017 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -308,6 +308,15 @@ bool CUniqueItem::CanDrop() const
 	}
 
 	return true;
+}
+
+IconConfig CUniqueItem::GetIcon() const
+{
+	if (this->Icon.Icon) {
+		return this->Icon;
+	} else {
+		return this->Type->Icon;
+	}
 }
 
 int CUniqueItem::GetMagicLevel() const
