@@ -286,7 +286,7 @@ public:
 	//Wyrmgus start
 //	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0)
 	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0), MapLayer(0), Landmass(0)
-	//WYrmgus end
+	//Wyrmgus end
 	{
 		Pos.x = Pos.y = -1;
 	}

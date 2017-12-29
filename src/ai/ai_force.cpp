@@ -1063,7 +1063,7 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool mercenary)
 		return false;
 	}
 	if (force != -1) {
-		AiForce &f = forces[AiPlayer->Force.getScriptForce(force)];
+		AiForce &f = forces[force];
 		//Wyrmgus start
 //		if (f.IsBelongsTo(*unit.Type)) {
 		if (f.IsBelongsTo(*unit.Type) || mercenary) {
@@ -1939,6 +1939,50 @@ void AiForceManager::UpdatePerMinute()
 		}
 	}
 	*/
+	
+	bool all_forces_completed = true;
+	
+	for (unsigned int f = 0; f < forces.size(); ++f) {
+		AiForce &force = forces[f];
+		//attack with forces that are completed, but aren't attacking or defending
+		if (force.Completed && !force.Attacking && !force.Defending && force.Units.size() > 0) {
+			const Vec2i invalidPos(-1, -1);
+			int z = force.Units[0]->MapLayer;
+			
+			force.Attack(invalidPos, z);
+		}
+		
+		if (!force.Completed) {
+			all_forces_completed = false;
+		}
+	}
+	
+	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1) { //all current forces completed, create a new one
+		const CForceTemplate *force_template = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplate(LandForceType);
+	
+		if (force_template) {
+			unsigned int new_force_id = this->FindFreeForce();
+			AiForce &new_force = forces[new_force_id];
+			new_force.Reset(true);
+			new_force.State = AiForceAttackingState_Waiting;
+			new_force.Role = AiForceRoleDefault;
+			for (size_t i = 0; i < force_template->Units.size(); ++i) {
+				int class_id = force_template->Units[i].first;
+				int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
+				if (unit_type_id == -1) {
+					continue;
+				}
+				CUnitType *type = UnitTypes[unit_type_id];
+				int count = force_template->Units[i].second;
+				
+				AiUnitType newaiut;
+				newaiut.Want = count;
+				newaiut.Type = type;
+				new_force.UnitTypes.push_back(newaiut);
+			}
+			AiAssignFreeUnitsToForce(new_force_id);
+		}
+	}
 }
 //Wyrmgus end
 

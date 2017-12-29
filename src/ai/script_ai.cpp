@@ -1017,7 +1017,7 @@ static int CclAiForce(lua_State *l)
 		}
 
 	}
-	AiAssignFreeUnitsToForce(force);
+	AiAssignFreeUnitsToForce(AiPlayer->Force.getScriptForce(force));
 	lua_pushboolean(l, 0);
 	return 1;
 }

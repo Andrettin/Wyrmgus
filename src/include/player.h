@@ -459,6 +459,14 @@ enum FactionTiers {
 	MaxFactionTiers
 };
 
+enum ForceTypes {
+	LandForceType,
+	NavalForceType,
+	AirForceType,
+	
+	MaxForceTypes
+};
+
 enum WordTypes {
 	WordTypeNoun,
 	WordTypeVerb,
@@ -557,6 +565,18 @@ enum WordJunctionTypes {
 	MaxWordJunctionTypes
 };
 
+class CForceTemplate
+{
+public:
+	CForceTemplate() :
+		ForceType(-1)
+	{
+	}
+	
+	int ForceType;
+	std::vector<std::pair<int, int>> Units;	/// Vector containing each unit class belonging to the force template, and the respective quantity
+};
+
 class CCivilization
 {
 public:
@@ -565,9 +585,12 @@ public:
 		Language(NULL)
 	{
 	}
+
+	~CCivilization();
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	std::string GetMonthName(int month) const;
+	CForceTemplate *GetForceTemplate(int force_type) const;
 	std::map<int, std::vector<std::string>> &GetPersonalNames();
 	std::vector<std::string> &GetUnitClassNames(int class_id);
 	std::vector<std::string> &GetSettlementNames();
@@ -588,6 +611,7 @@ public:
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
+	std::map<int, CForceTemplate *> ForceTemplates;						/// Force templates, mapped to each force type
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	std::map<int, std::vector<std::string>> UnitClassNames;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 	std::vector<std::string> FamilyNames;		/// Family names for the civilization
@@ -612,6 +636,7 @@ public:
 	~CFaction();
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
+	CForceTemplate *GetForceTemplate(int force_type) const;
 	std::vector<std::string> &GetSettlementNames();
 	std::vector<std::string> &GetShipNames();
 
@@ -647,6 +672,7 @@ public:
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction
 	std::vector<CSettlement *> Cores;									/// Core settlements of this faction (required to found it)
+	std::map<int, CForceTemplate *> ForceTemplates;						/// Force templates, mapped to each force type
 	std::map<std::tuple<CDate, CDate, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year
@@ -1045,6 +1071,8 @@ extern std::string GetFactionTypeNameById(int faction_type);
 extern int GetFactionTypeIdByName(std::string faction_type);
 extern std::string GetGovernmentTypeNameById(int government_type);
 extern int GetGovernmentTypeIdByName(std::string government_type);
+extern std::string GetForceTypeNameById(int force_type);
+extern int GetForceTypeIdByName(std::string force_type);
 extern std::string GetWordTypeNameById(int word_type);
 extern int GetWordTypeIdByName(std::string word_type);
 extern std::string GetArticleTypeNameById(int article_type);

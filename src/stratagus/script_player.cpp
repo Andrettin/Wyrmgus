@@ -901,6 +901,36 @@ static int CclDefineCivilization(lua_State *l)
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
 				}
 			}
+		} else if (!strcmp(value, "ForceTemplates")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				CForceTemplate *force = new CForceTemplate;
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table for force templates)");
+				}
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
+					if (!strcmp(value, "force-type")) {
+						force->ForceType = GetForceTypeIdByName(LuaToString(l, -1, k + 1));
+						if (force->ForceType == -1) {
+							LuaError(l, "Force type doesn't exist.");
+						}
+						civilization->ForceTemplates[force->ForceType] = force;
+					} else if (!strcmp(value, "unit-class")) {
+						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
+						++k;
+						int unit_quantity = LuaToNumber(l, -1, k + 1);
+						force->Units.push_back(std::pair<int, int>(unit_class, unit_quantity));
+					} else {
+						printf("\n%s\n", civilization->Ident.c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "UIFillers")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1951,6 +1981,36 @@ static int CclDefineFaction(lua_State *l)
 				} else {
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
 				}
+			}
+		} else if (!strcmp(value, "ForceTemplates")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				CForceTemplate *force = new CForceTemplate;
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table for force templates)");
+				}
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
+					if (!strcmp(value, "force-type")) {
+						force->ForceType = GetForceTypeIdByName(LuaToString(l, -1, k + 1));
+						if (force->ForceType == -1) {
+							LuaError(l, "Force type doesn't exist.");
+						}
+						faction->ForceTemplates[force->ForceType] = force;
+					} else if (!strcmp(value, "unit-class")) {
+						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
+						++k;
+						int unit_quantity = LuaToNumber(l, -1, k + 1);
+						force->Units.push_back(std::pair<int, int>(unit_class, unit_quantity));
+					} else {
+						printf("\n%s\n", faction->Ident.c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "UIFillers")) {
 			if (!lua_istable(l, -1)) {
