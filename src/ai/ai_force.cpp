@@ -1958,7 +1958,29 @@ void AiForceManager::UpdatePerMinute()
 	}
 	
 	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1) { //all current forces completed, create a new one
-		const CForceTemplate *force_template = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplate(LandForceType);
+		std::vector<CForceTemplate *> potential_force_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplates(LandForceType);
+		for (size_t i = 0; i < potential_force_templates.size();) {
+			bool valid = true;
+			for (size_t j = 0; j < potential_force_templates[i]->Units.size(); ++j) {
+				int class_id = potential_force_templates[i]->Units[j].first;
+				int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
+				CUnitType *type = NULL;
+				if (unit_type_id != -1) {
+					type = UnitTypes[unit_type_id];
+				}
+				if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
+					valid = false;
+					break;
+				}
+			}
+			if (!valid) {
+				potential_force_templates.erase(std::remove(potential_force_templates.begin(), potential_force_templates.end(), potential_force_templates[i]), potential_force_templates.end());
+			} else {
+				++i;
+			}
+		}
+		
+		CForceTemplate *force_template = potential_force_templates.size() ? potential_force_templates[SyncRand(potential_force_templates.size())] : NULL;
 	
 		if (force_template) {
 			unsigned int new_force_id = this->FindFreeForce();
@@ -1969,10 +1991,10 @@ void AiForceManager::UpdatePerMinute()
 			for (size_t i = 0; i < force_template->Units.size(); ++i) {
 				int class_id = force_template->Units[i].first;
 				int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
-				if (unit_type_id == -1) {
-					continue;
+				CUnitType *type = NULL;
+				if (unit_type_id != -1) {
+					type = UnitTypes[unit_type_id];
 				}
-				CUnitType *type = UnitTypes[unit_type_id];
 				int count = force_template->Units[i].second;
 				
 				AiUnitType newaiut;

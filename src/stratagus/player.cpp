@@ -750,8 +750,10 @@ std::string PlayerRace::TranslateName(std::string name, CLanguage *language)
 
 CCivilization::~CCivilization()
 {
-	for (std::map<int, CForceTemplate *>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
-		delete iterator->second;
+	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
+		for (size_t i = 0; i < iterator->second.size(); ++i) {
+			delete iterator->second[i];
+		}
 	}
 }
 
@@ -777,10 +779,10 @@ std::string CCivilization::GetMonthName(int month) const
 	return CapitalizeString(GetMonthNameById(month));
 }
 
-CForceTemplate *CCivilization::GetForceTemplate(int force_type) const
+std::vector<CForceTemplate *> CCivilization::GetForceTemplates(int force_type) const
 {
 	if (force_type == -1) {
-		fprintf(stderr, "Error in CCivilization::GetForceTemplate: the force_type is -1.\n");
+		fprintf(stderr, "Error in CCivilization::GetForceTemplates: the force_type is -1.\n");
 	}
 	
 	if (this->ForceTemplates.find(force_type) != this->ForceTemplates.end()) {
@@ -788,10 +790,10 @@ CForceTemplate *CCivilization::GetForceTemplate(int force_type) const
 	}
 	
 	if (this->ParentCivilization != -1) {
-		return PlayerRaces.Civilizations[this->ParentCivilization]->GetForceTemplate(force_type);
+		return PlayerRaces.Civilizations[this->ParentCivilization]->GetForceTemplates(force_type);
 	}
 	
-	return NULL;
+	return std::vector<CForceTemplate *>();
 }
 
 std::map<int, std::vector<std::string>> &CCivilization::GetPersonalNames()
@@ -848,8 +850,10 @@ std::vector<std::string> &CCivilization::GetShipNames()
 
 CFaction::~CFaction()
 {
-	for (std::map<int, CForceTemplate *>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
-		delete iterator->second;
+	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
+		for (size_t i = 0; i < iterator->second.size(); ++i) {
+			delete iterator->second[i];
+		}
 	}
 	
 	if (this->Conditions) {
@@ -876,10 +880,10 @@ int CFaction::GetUpgradePriority(const CUpgrade *upgrade) const
 	return PlayerRaces.Civilizations[this->Civilization]->GetUpgradePriority(upgrade);
 }
 
-CForceTemplate *CFaction::GetForceTemplate(int force_type) const
+std::vector<CForceTemplate *> CFaction::GetForceTemplates(int force_type) const
 {
 	if (force_type == -1) {
-		fprintf(stderr, "Error in CFaction::GetForceTemplate: the force_type is -1.\n");
+		fprintf(stderr, "Error in CFaction::GetForceTemplates: the force_type is -1.\n");
 	}
 	
 	if (this->ForceTemplates.find(force_type) != this->ForceTemplates.end()) {
@@ -887,14 +891,14 @@ CForceTemplate *CFaction::GetForceTemplate(int force_type) const
 	}
 	
 	if (this->ParentFaction != -1) {
-		return PlayerRaces.Factions[this->ParentFaction]->GetForceTemplate(force_type);
+		return PlayerRaces.Factions[this->ParentFaction]->GetForceTemplates(force_type);
 	}
 	
 	if (this->Civilization == -1) {
-		fprintf(stderr, "Error in CFaction::GetForceTemplate: the faction has no civilization.\n");
+		fprintf(stderr, "Error in CFaction::GetForceTemplates: the faction has no civilization.\n");
 	}
 	
-	return PlayerRaces.Civilizations[this->Civilization]->GetForceTemplate(force_type);
+	return PlayerRaces.Civilizations[this->Civilization]->GetForceTemplates(force_type);
 }
 
 std::vector<std::string> &CFaction::GetSettlementNames()

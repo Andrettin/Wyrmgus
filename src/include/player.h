@@ -590,7 +590,7 @@ public:
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	std::string GetMonthName(int month) const;
-	CForceTemplate *GetForceTemplate(int force_type) const;
+	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::map<int, std::vector<std::string>> &GetPersonalNames();
 	std::vector<std::string> &GetUnitClassNames(int class_id);
 	std::vector<std::string> &GetSettlementNames();
@@ -611,7 +611,7 @@ public:
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
-	std::map<int, CForceTemplate *> ForceTemplates;						/// Force templates, mapped to each force type
+	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;						/// Force templates, mapped to each force type
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	std::map<int, std::vector<std::string>> UnitClassNames;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 	std::vector<std::string> FamilyNames;		/// Family names for the civilization
@@ -636,7 +636,7 @@ public:
 	~CFaction();
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
-	CForceTemplate *GetForceTemplate(int force_type) const;
+	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<std::string> &GetSettlementNames();
 	std::vector<std::string> &GetShipNames();
 
@@ -672,7 +672,7 @@ public:
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction
 	std::vector<CSettlement *> Cores;									/// Core settlements of this faction (required to found it)
-	std::map<int, CForceTemplate *> ForceTemplates;						/// Force templates, mapped to each force type
+	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;						/// Force templates, mapped to each force type
 	std::map<std::tuple<CDate, CDate, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year

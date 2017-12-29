@@ -918,7 +918,7 @@ static int CclDefineCivilization(lua_State *l)
 						if (force->ForceType == -1) {
 							LuaError(l, "Force type doesn't exist.");
 						}
-						civilization->ForceTemplates[force->ForceType] = force;
+						civilization->ForceTemplates[force->ForceType].push_back(force);
 					} else if (!strcmp(value, "unit-class")) {
 						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
 						++k;
@@ -1999,7 +1999,7 @@ static int CclDefineFaction(lua_State *l)
 						if (force->ForceType == -1) {
 							LuaError(l, "Force type doesn't exist.");
 						}
-						faction->ForceTemplates[force->ForceType] = force;
+						faction->ForceTemplates[force->ForceType].push_back(force);
 					} else if (!strcmp(value, "unit-class")) {
 						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
 						++k;

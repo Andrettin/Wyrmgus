@@ -405,10 +405,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	return 0;
 }
 
-//Wyrmgus start
-//static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
-static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool allow_can_build_builder = false)
-//Wyrmgus end
+bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool allow_can_build_builder)
 {
 	//Wyrmgus start
 	std::vector<std::vector<CUnitType *> > *tablep;
