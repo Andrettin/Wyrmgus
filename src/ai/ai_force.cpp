@@ -1958,11 +1958,12 @@ void AiForceManager::UpdatePerMinute()
 	}
 	
 	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1) { //all current forces completed, create a new one
-		std::vector<CForceTemplate *> potential_force_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplates(LandForceType);
-		for (size_t i = 0; i < potential_force_templates.size();) {
+		std::vector<CForceTemplate *> faction_force_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplates(LandForceType);
+		std::vector<CForceTemplate *> potential_force_templates;
+		for (size_t i = 0; i < faction_force_templates.size(); ++i) {
 			bool valid = true;
-			for (size_t j = 0; j < potential_force_templates[i]->Units.size(); ++j) {
-				int class_id = potential_force_templates[i]->Units[j].first;
+			for (size_t j = 0; j < faction_force_templates[i]->Units.size(); ++j) {
+				int class_id = faction_force_templates[i]->Units[j].first;
 				int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
 				CUnitType *type = NULL;
 				if (unit_type_id != -1) {
@@ -1973,10 +1974,8 @@ void AiForceManager::UpdatePerMinute()
 					break;
 				}
 			}
-			if (!valid) {
-				potential_force_templates.erase(std::remove(potential_force_templates.begin(), potential_force_templates.end(), potential_force_templates[i]), potential_force_templates.end());
-			} else {
-				++i;
+			if (valid) {
+				potential_force_templates.push_back(faction_force_templates[i]);
 			}
 		}
 		
