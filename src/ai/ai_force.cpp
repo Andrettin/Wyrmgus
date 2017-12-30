@@ -1931,7 +1931,11 @@ void AiForceManager::UpdatePerHalfMinute()
 	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1) { //all current forces completed, create a new one
 		std::vector<CForceTemplate *> faction_force_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplates(LandForceType);
 		std::vector<CForceTemplate *> potential_force_templates;
+		int priority = 0;
 		for (size_t i = 0; i < faction_force_templates.size(); ++i) {
+			if (faction_force_templates[i]->Priority < priority) {
+				continue;
+			}
 			bool valid = true;
 			for (size_t j = 0; j < faction_force_templates[i]->Units.size(); ++j) {
 				int class_id = faction_force_templates[i]->Units[j].first;
@@ -1946,7 +1950,13 @@ void AiForceManager::UpdatePerHalfMinute()
 				}
 			}
 			if (valid) {
-				potential_force_templates.push_back(faction_force_templates[i]);
+				if (faction_force_templates[i]->Priority > priority) {
+					priority = faction_force_templates[i]->Priority;
+					potential_force_templates.clear();
+				}
+				for (int j = 0; j < faction_force_templates[i]->Weight; ++j) {
+					potential_force_templates.push_back(faction_force_templates[i]);
+				}
 			}
 		}
 		

@@ -569,11 +569,13 @@ class CForceTemplate
 {
 public:
 	CForceTemplate() :
-		ForceType(-1)
+		ForceType(-1), Priority(100), Weight(1)
 	{
 	}
 	
 	int ForceType;
+	int Priority;
+	int Weight;
 	std::vector<std::pair<int, int>> Units;	/// Vector containing each unit class belonging to the force template, and the respective quantity
 };
 
