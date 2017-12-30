@@ -1498,7 +1498,29 @@ void AiEachSecond(CPlayer &player)
 	}
 }
 
-//Wyrmgus start
+/**
+**  This is called for each player each half minute.
+**
+**  @param player  The player structure pointer.
+*/
+void AiEachHalfMinute(CPlayer &player)
+{
+	AiPlayer = player.Ai;
+#ifdef DEBUG
+	if (!AiPlayer) {
+		return;
+	}
+#endif
+
+	if (AiPlayer->Scouting) { //check periodically if has found new enemies
+		AiPlayer->Scouting = false;
+	}
+	
+	AiCheckUpgrades();
+	
+	AiForceManagerEachHalfMinute();
+}
+
 /**
 **  This is called for each player each minute.
 **
@@ -1513,14 +1535,9 @@ void AiEachMinute(CPlayer &player)
 	}
 #endif
 
-	if (AiPlayer->Scouting) { //check periodically if has found new enemies
-		AiPlayer->Scouting = false;
-	}
-	
 	AiCheckSettlementConstruction();
 	AiCheckTransporters();
 	AiCheckDockConstruction();
-	AiCheckUpgrades();
 	
 	AiForceManagerEachMinute();
 }
@@ -1575,6 +1592,5 @@ bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_req
 	
 	return false;
 }
-//Wyrmgus end
 
 //@}

@@ -3791,7 +3791,22 @@ void PlayersEachSecond(int playerIdx)
 	//Wyrmgus end
 }
 
-//Wyrmgus start
+/**
+**  Handle AI of a player each half minute.
+**
+**  @param playerIdx  the player to update AI
+*/
+void PlayersEachHalfMinute(int playerIdx)
+{
+	CPlayer &player = Players[playerIdx];
+
+	if (player.AiEnabled) {
+		AiEachHalfMinute(player);
+	}
+
+	player.UpdateQuestPool(); // every half minute, update the quest pool
+}
+
 /**
 **  Handle AI of a player each minute.
 **
@@ -3804,10 +3819,7 @@ void PlayersEachMinute(int playerIdx)
 	if (player.AiEnabled) {
 		AiEachMinute(player);
 	}
-
-	player.UpdateQuestPool(); // every minute, update the quest pool
 }
-//Wyrmgus end
 
 /**
 **  Change current color set to new player.

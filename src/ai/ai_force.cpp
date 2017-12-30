@@ -1909,37 +1909,8 @@ void AiForceManager::Update()
 }
 
 //Wyrmgus start
-void AiForceManager::UpdatePerMinute()
+void AiForceManager::UpdatePerHalfMinute()
 {
-	/*
-	for (unsigned int f = 0; f < forces.size(); ++f) {
-		AiForce &force = forces[f];
-
-		//if any force is completely idle, reset its goal, so that it chooses a new one to attack
-		std::vector<CUnit *> idleUnits;
-		for (unsigned int i = 0; i != force.Size(); ++i) {
-			CUnit &aiunit = *force.Units[i];
-
-			if (
-				aiunit.IsIdle()
-				|| std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), &aiunit) != AiPlayer->Scouts.end() //count scouts as idle, since they will be moving, but not due to orders for the force
-			) {
-				idleUnits.push_back(&aiunit);
-			}
-		}
-
-		if (idleUnits.empty()) {
-			continue;
-		}
-
-		if (idleUnits.size() == force.Size()) {
-			force.GoalPos.x = -1;
-			force.GoalPos.y = -1;
-			force.GoalMapLayer = 0;
-		}
-	}
-	*/
-	
 	bool all_forces_completed = true;
 	
 	for (unsigned int f = 0; f < forces.size(); ++f) {
@@ -2005,6 +1976,38 @@ void AiForceManager::UpdatePerMinute()
 		}
 	}
 }
+
+void AiForceManager::UpdatePerMinute()
+{
+	/*
+	for (unsigned int f = 0; f < forces.size(); ++f) {
+		AiForce &force = forces[f];
+
+		//if any force is completely idle, reset its goal, so that it chooses a new one to attack
+		std::vector<CUnit *> idleUnits;
+		for (unsigned int i = 0; i != force.Size(); ++i) {
+			CUnit &aiunit = *force.Units[i];
+
+			if (
+				aiunit.IsIdle()
+				|| std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), &aiunit) != AiPlayer->Scouts.end() //count scouts as idle, since they will be moving, but not due to orders for the force
+			) {
+				idleUnits.push_back(&aiunit);
+			}
+		}
+
+		if (idleUnits.empty()) {
+			continue;
+		}
+
+		if (idleUnits.size() == force.Size()) {
+			force.GoalPos.x = -1;
+			force.GoalPos.y = -1;
+			force.GoalMapLayer = 0;
+		}
+	}
+	*/
+}
 //Wyrmgus end
 
 /**
@@ -2016,11 +2019,14 @@ void AiForceManager()
 	AiAssignFreeUnitsToForce();
 }
 
-//Wyrmgus start
+void AiForceManagerEachHalfMinute()
+{
+	AiPlayer->Force.UpdatePerHalfMinute();
+}
+
 void AiForceManagerEachMinute()
 {
 	AiPlayer->Force.UpdatePerMinute();
 }
-//Wyrmgus end
 
 //@}

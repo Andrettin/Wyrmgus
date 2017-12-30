@@ -399,6 +399,12 @@ static void GameLogicLoop()
 			}
 		}
 		
+		player = (GameCycle - 1) % (CYCLES_PER_MINUTE / 2);
+		Assert(player >= 0);
+		if (player < NumPlayers) {
+			PlayersEachHalfMinute(player);
+		}
+
 		player = (GameCycle - 1) % CYCLES_PER_MINUTE;
 		Assert(player >= 0);
 		if (player < NumPlayers) {

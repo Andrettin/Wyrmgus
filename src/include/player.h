@@ -1040,6 +1040,8 @@ extern void PlayersEachCycle();
 /// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
 //Wyrmgus start
+/// Called each half minute for a given player handler (AI)
+extern void PlayersEachHalfMinute(int player);
 /// Called each minute for a given player handler (AI)
 extern void PlayersEachMinute(int player);
 //Wyrmgus end
