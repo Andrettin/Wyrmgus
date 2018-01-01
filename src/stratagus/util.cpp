@@ -70,20 +70,13 @@ unsigned SyncRandSeed;				/// sync random seed value.
 */
 void InitSyncRand()
 {
-	SyncRandSeed = 0x87654321;
-	//Wyrmgus start
 	if (!IsNetworkGame()) { //if isn't a network game, make the seed vary according to the computer's date and time
 		time_t time_curr;
 		time(&time_curr);
-		const struct tm *timeinfo = localtime(&time_curr);
-		SyncRand(timeinfo->tm_year);
-		SyncRand(timeinfo->tm_mon);
-		SyncRand(timeinfo->tm_mday);
-		SyncRand(timeinfo->tm_hour ? timeinfo->tm_hour : 1);
-		SyncRand(timeinfo->tm_min ? timeinfo->tm_min : 1);
-		SyncRand(timeinfo->tm_sec ? timeinfo->tm_sec : 1);
+		SyncRandSeed = static_cast<unsigned>(time_curr);
+	} else {
+		SyncRandSeed = 0x87654321;
 	}
-	//Wyrmgus end
 }
 
 /**
