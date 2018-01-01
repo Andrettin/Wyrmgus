@@ -10,7 +10,7 @@
 //
 /**@name script_ai.cpp - The AI ccl functions. */
 //
-//      (c) Copyright 2000-2017 by Lutz Sammer, Ludovic Pollet,
+//      (c) Copyright 2000-2018 by Lutz Sammer, Ludovic Pollet,
 //      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

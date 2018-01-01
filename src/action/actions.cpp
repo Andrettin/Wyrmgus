@@ -10,7 +10,7 @@
 //
 /**@name actions.cpp - The actions. */
 //
-//      (c) Copyright 1998-2017 by Lutz Sammer, Russell Smith, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2018 by Lutz Sammer, Russell Smith, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

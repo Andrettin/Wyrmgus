@@ -10,7 +10,7 @@
 //
 /**@name action_spellcast.cpp - The spell cast action. */
 //
-//      (c) Copyright 2000-2017 by Vladi Belperchinov-Shabanski, Jimmy Salmon
+//      (c) Copyright 2000-2018 by Vladi Belperchinov-Shabanski, Jimmy Salmon
 //      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

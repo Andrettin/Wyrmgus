@@ -10,7 +10,7 @@
 //
 /**@name ai_resource.cpp - AI resource manager. */
 //
-//      (c) Copyright 2000-2017 by Lutz Sammer, Antonis Chaniotis
+//      (c) Copyright 2000-2018 by Lutz Sammer, Antonis Chaniotis
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

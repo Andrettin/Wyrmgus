@@ -10,7 +10,7 @@
 //
 /**@name map.cpp - The map. */
 //
-//      (c) Copyright 1998-2017 by Lutz Sammer, Vladi Shabanski,
+//      (c) Copyright 1998-2018 by Lutz Sammer, Vladi Shabanski,
 //                                 Francois Beerten and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

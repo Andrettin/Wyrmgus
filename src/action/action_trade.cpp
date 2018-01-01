@@ -10,7 +10,7 @@
 //
 /**@name action_trade.cpp - The trade action. */
 //
-//      (c) Copyright 2017 by Andrettin
+//      (c) Copyright 2017-2018 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
