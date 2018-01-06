@@ -1036,11 +1036,6 @@ static int CclDefineCivilization(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				civilization->FamilyNames.push_back(LuaToString(l, -1, j + 1));
 			}
-		} else if (!strcmp(value, "SettlementNames")) {
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				civilization->SettlementNames.push_back(LuaToString(l, -1, j + 1));
-			}
 		} else if (!strcmp(value, "ProvinceNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -1096,20 +1091,22 @@ static int CclDefineCivilization(lua_State *l)
 	}
 	
 	if (civilization->ParentCivilization != -1) {
-		int parent_civilization = civilization->ParentCivilization;
+		int parent_civilization_id = civilization->ParentCivilization;
+		const CCivilization *parent_civilization = PlayerRaces.Civilizations[parent_civilization_id];
 
-		if (PlayerRaces.CivilizationUpgrades[civilization_id].empty() && !PlayerRaces.CivilizationUpgrades[parent_civilization].empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
-			PlayerRaces.CivilizationUpgrades[civilization_id] = PlayerRaces.CivilizationUpgrades[parent_civilization];
+		if (PlayerRaces.CivilizationUpgrades[civilization_id].empty() && !PlayerRaces.CivilizationUpgrades[parent_civilization_id].empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
+			PlayerRaces.CivilizationUpgrades[civilization_id] = PlayerRaces.CivilizationUpgrades[parent_civilization_id];
 		}
 		
-		//inherit button icons from parent civilization, for button actions which none are specified
-		for (std::map<int, IconConfig>::iterator iterator = PlayerRaces.ButtonIcons[parent_civilization].begin(); iterator != PlayerRaces.ButtonIcons[parent_civilization].end(); ++iterator) {
+		//inherit button icons from the parent civilization, for button actions which none are specified
+		for (std::map<int, IconConfig>::iterator iterator = PlayerRaces.ButtonIcons[parent_civilization_id].begin(); iterator != PlayerRaces.ButtonIcons[parent_civilization_id].end(); ++iterator) {
 			if (PlayerRaces.ButtonIcons[civilization_id].find(iterator->first) == PlayerRaces.ButtonIcons[civilization_id].end()) {
 				PlayerRaces.ButtonIcons[civilization_id][iterator->first] = iterator->second;
 			}
 		}
 		
-		for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = PlayerRaces.Civilizations[parent_civilization]->HistoricalUpgrades.begin(); iterator != PlayerRaces.Civilizations[parent_civilization]->HistoricalUpgrades.end(); ++iterator) {
+		//inherit historical upgrades from the parent civilization, if no historical data is given for that upgrade for this civilization
+		for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = parent_civilization->HistoricalUpgrades.begin(); iterator != parent_civilization->HistoricalUpgrades.end(); ++iterator) {
 			if (civilization->HistoricalUpgrades.find(iterator->first) == civilization->HistoricalUpgrades.end()) {
 				civilization->HistoricalUpgrades[iterator->first] = iterator->second;
 			}
@@ -1117,66 +1114,66 @@ static int CclDefineCivilization(lua_State *l)
 		
 		//unit sounds
 		if (civilization->UnitSounds.Selected.Name.empty()) {
-			civilization->UnitSounds.Selected = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Selected;
+			civilization->UnitSounds.Selected = parent_civilization->UnitSounds.Selected;
 		}
 		if (civilization->UnitSounds.Acknowledgement.Name.empty()) {
-			civilization->UnitSounds.Acknowledgement = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Acknowledgement;
+			civilization->UnitSounds.Acknowledgement = parent_civilization->UnitSounds.Acknowledgement;
 		}
 		if (civilization->UnitSounds.Attack.Name.empty()) {
-			civilization->UnitSounds.Attack = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Attack;
+			civilization->UnitSounds.Attack = parent_civilization->UnitSounds.Attack;
 		}
 		if (civilization->UnitSounds.Idle.Name.empty()) {
-			civilization->UnitSounds.Idle = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Idle;
+			civilization->UnitSounds.Idle = parent_civilization->UnitSounds.Idle;
 		}
 		if (civilization->UnitSounds.Hit.Name.empty()) {
-			civilization->UnitSounds.Hit = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Hit;
+			civilization->UnitSounds.Hit = parent_civilization->UnitSounds.Hit;
 		}
 		if (civilization->UnitSounds.Miss.Name.empty()) {
-			civilization->UnitSounds.Miss = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Miss;
+			civilization->UnitSounds.Miss = parent_civilization->UnitSounds.Miss;
 		}
 		if (civilization->UnitSounds.FireMissile.Name.empty()) {
-			civilization->UnitSounds.FireMissile = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.FireMissile;
+			civilization->UnitSounds.FireMissile = parent_civilization->UnitSounds.FireMissile;
 		}
 		if (civilization->UnitSounds.Step.Name.empty()) {
-			civilization->UnitSounds.Step = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Step;
+			civilization->UnitSounds.Step = parent_civilization->UnitSounds.Step;
 		}
 		if (civilization->UnitSounds.StepDirt.Name.empty()) {
-			civilization->UnitSounds.StepDirt = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.StepDirt;
+			civilization->UnitSounds.StepDirt = parent_civilization->UnitSounds.StepDirt;
 		}
 		if (civilization->UnitSounds.StepGrass.Name.empty()) {
-			civilization->UnitSounds.StepGrass = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.StepGrass;
+			civilization->UnitSounds.StepGrass = parent_civilization->UnitSounds.StepGrass;
 		}
 		if (civilization->UnitSounds.StepGravel.Name.empty()) {
-			civilization->UnitSounds.StepGravel = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.StepGravel;
+			civilization->UnitSounds.StepGravel = parent_civilization->UnitSounds.StepGravel;
 		}
 		if (civilization->UnitSounds.StepMud.Name.empty()) {
-			civilization->UnitSounds.StepMud = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.StepMud;
+			civilization->UnitSounds.StepMud = parent_civilization->UnitSounds.StepMud;
 		}
 		if (civilization->UnitSounds.StepStone.Name.empty()) {
-			civilization->UnitSounds.StepStone = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.StepStone;
+			civilization->UnitSounds.StepStone = parent_civilization->UnitSounds.StepStone;
 		}
 		if (civilization->UnitSounds.Used.Name.empty()) {
-			civilization->UnitSounds.Used = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Used;
+			civilization->UnitSounds.Used = parent_civilization->UnitSounds.Used;
 		}
 		if (civilization->UnitSounds.Build.Name.empty()) {
-			civilization->UnitSounds.Build = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Build;
+			civilization->UnitSounds.Build = parent_civilization->UnitSounds.Build;
 		}
 		if (civilization->UnitSounds.Ready.Name.empty()) {
-			civilization->UnitSounds.Ready = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Ready;
+			civilization->UnitSounds.Ready = parent_civilization->UnitSounds.Ready;
 		}
 		if (civilization->UnitSounds.Repair.Name.empty()) {
-			civilization->UnitSounds.Repair = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Repair;
+			civilization->UnitSounds.Repair = parent_civilization->UnitSounds.Repair;
 		}
 		for (unsigned int j = 0; j < MaxCosts; ++j) {
 			if (civilization->UnitSounds.Harvest[j].Name.empty()) {
-				civilization->UnitSounds.Harvest[j] = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Harvest[j];
+				civilization->UnitSounds.Harvest[j] = parent_civilization->UnitSounds.Harvest[j];
 			}
 		}
 		if (civilization->UnitSounds.Help.Name.empty()) {
-			civilization->UnitSounds.Help = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.Help;
+			civilization->UnitSounds.Help = parent_civilization->UnitSounds.Help;
 		}
 		if (civilization->UnitSounds.HelpTown.Name.empty()) {
-			civilization->UnitSounds.HelpTown = PlayerRaces.Civilizations[parent_civilization]->UnitSounds.HelpTown;
+			civilization->UnitSounds.HelpTown = parent_civilization->UnitSounds.HelpTown;
 		}
 	}
 	
@@ -2043,12 +2040,6 @@ static int CclDefineFaction(lua_State *l)
 			}
 		} else if (!strcmp(value, "Conditions")) {
 			faction->Conditions = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "SettlementNames")) {
-			faction->SettlementNames.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				faction->SettlementNames.push_back(LuaToString(l, -1, j + 1));
-			}
 		} else if (!strcmp(value, "ProvinceNames")) {
 			faction->ProvinceNames.clear();
 			const int args = lua_rawlen(l, -1);

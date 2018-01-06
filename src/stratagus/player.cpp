@@ -822,19 +822,6 @@ std::vector<std::string> &CCivilization::GetUnitClassNames(int class_id)
 	return this->UnitClassNames[class_id];
 }
 
-std::vector<std::string> &CCivilization::GetSettlementNames()
-{
-	if (this->SettlementNames.size() > 0) {
-		return this->SettlementNames;
-	}
-	
-	if (this->ParentCivilization != -1) {
-		return PlayerRaces.Civilizations[this->ParentCivilization]->GetSettlementNames();
-	}
-	
-	return this->SettlementNames;
-}
-
 std::vector<std::string> &CCivilization::GetShipNames()
 {
 	if (this->ShipNames.size() > 0) {
@@ -899,19 +886,6 @@ std::vector<CForceTemplate *> CFaction::GetForceTemplates(int force_type) const
 	}
 	
 	return PlayerRaces.Civilizations[this->Civilization]->GetForceTemplates(force_type);
-}
-
-std::vector<std::string> &CFaction::GetSettlementNames()
-{
-	if (this->SettlementNames.size() > 0) {
-		return this->SettlementNames;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return PlayerRaces.Factions[this->ParentFaction]->GetSettlementNames();
-	}
-	
-	return PlayerRaces.Civilizations[this->Civilization]->GetSettlementNames();
 }
 
 std::vector<std::string> &CFaction::GetShipNames()

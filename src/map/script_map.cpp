@@ -1826,10 +1826,7 @@ static int CclDefineSettlement(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				if (settlement->CulturalNames.find(civilization) == settlement->CulturalNames.end()) { //only set this as the settlement's cultural name for that civilization if none has been set before (so that multiple versions of a name may be given and thus populate the SettlementNames list, without overwriting the cultural name of higher priority)
-					settlement->CulturalNames[civilization] = cultural_name;
-				}
-				PlayerRaces.Civilizations[civilization]->SettlementNames.push_back(cultural_name);
+				settlement->CulturalNames[civilization] = cultural_name;
 			}
 		} else if (!strcmp(value, "Cores")) {
 			if (!lua_istable(l, -1)) {

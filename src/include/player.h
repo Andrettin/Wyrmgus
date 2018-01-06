@@ -595,7 +595,6 @@ public:
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::map<int, std::vector<std::string>> &GetPersonalNames();
 	std::vector<std::string> &GetUnitClassNames(int class_id);
-	std::vector<std::string> &GetSettlementNames();
 	std::vector<std::string> &GetShipNames();
 	
 	int ID;
@@ -617,7 +616,6 @@ public:
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	std::map<int, std::vector<std::string>> UnitClassNames;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 	std::vector<std::string> FamilyNames;		/// Family names for the civilization
-	std::vector<std::string> SettlementNames;	/// Settlement names for the civilization
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 	std::vector<std::string> ShipNames;			/// Ship names for the civilization
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
@@ -639,7 +637,6 @@ public:
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
-	std::vector<std::string> &GetSettlementNames();
 	std::vector<std::string> &GetShipNames();
 
 	std::string Ident;													/// faction name
@@ -670,7 +667,6 @@ public:
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
 	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
-	std::vector<std::string> SettlementNames;							/// Settlement names for the faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction
 	std::vector<CSettlement *> Cores;									/// Core settlements of this faction (required to found it)
