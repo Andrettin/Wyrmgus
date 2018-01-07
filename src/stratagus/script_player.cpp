@@ -1106,7 +1106,7 @@ static int CclDefineCivilization(lua_State *l)
 		}
 		
 		//inherit historical upgrades from the parent civilization, if no historical data is given for that upgrade for this civilization
-		for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = parent_civilization->HistoricalUpgrades.begin(); iterator != parent_civilization->HistoricalUpgrades.end(); ++iterator) {
+		for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = parent_civilization->HistoricalUpgrades.begin(); iterator != parent_civilization->HistoricalUpgrades.end(); ++iterator) {
 			if (civilization->HistoricalUpgrades.find(iterator->first) == civilization->HistoricalUpgrades.end()) {
 				civilization->HistoricalUpgrades[iterator->first] = iterator->second;
 			}
