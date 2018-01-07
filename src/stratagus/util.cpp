@@ -70,7 +70,7 @@ unsigned SyncRandSeed;				/// sync random seed value.
 */
 void InitSyncRand()
 {
-	if (!IsNetworkGame()) { //if isn't a network game, make the seed vary according to the computer's date and time
+	if (!IsNetworkGame()) { //if isn't a network game, make the seed vary according to the date and time
 		time_t time_curr;
 		time(&time_curr);
 		SyncRandSeed = static_cast<unsigned>(time_curr);
