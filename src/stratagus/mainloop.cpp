@@ -317,7 +317,7 @@ static void InitGameCallbacks()
 static void GameLogicLoop()
 {
 	// Can't find a better place.
-	// FIXME: We need find better place!
+	// FIXME: We need to find a better place!
 	SaveGameLoading = false;
 
 #ifdef USE_OAML
@@ -341,6 +341,26 @@ static void GameLogicLoop()
 		PlayersEachCycle(); // handle players
 		UpdateTimer();      // update game timer
 
+		//do tile animation
+		if (GameCycle != 0 && GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
+			for (size_t z = 0; z < Map.Fields.size(); ++z) {
+				for (int i = 0; i < Map.Info.MapWidths[z] * Map.Info.MapHeights[z]; ++i) {
+					CMapField &mf = Map.Fields[z][i];
+					if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
+						mf.AnimationFrame += 1;
+						if (mf.AnimationFrame >= mf.Terrain->SolidAnimationFrames) {
+							mf.AnimationFrame = 0;
+						}
+					}
+					if (mf.OverlayTerrain && mf.OverlayTerrain->SolidAnimationFrames > 0) {
+						mf.OverlayAnimationFrame += 1;
+						if (mf.OverlayAnimationFrame >= mf.OverlayTerrain->SolidAnimationFrames) {
+							mf.OverlayAnimationFrame = 0;
+						}
+					}
+				}
+			}
+		}
 
 		//
 		// Work todo each second.
@@ -509,34 +529,12 @@ static void DisplayLoop()
 
 	//
 	// Map scrolling
+	
 	//
 	DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
 
 	ColorCycle();
 
-	//Wyrmgus start
-	//do tile animation
-	if (!GamePaused && GameCycle != 0 && GameCycle && GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
-		for (size_t z = 0; z < Map.Fields.size(); ++z) {
-			for (int i = 0; i < Map.Info.MapWidths[z] * Map.Info.MapHeights[z]; ++i) {
-				CMapField &mf = Map.Fields[z][i];
-				if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
-					mf.AnimationFrame += 1;
-					if (mf.AnimationFrame >= mf.Terrain->SolidAnimationFrames) {
-						mf.AnimationFrame = 0;
-					}
-				}
-				if (mf.OverlayTerrain && mf.Terrain->SolidAnimationFrames > 0) {
-					mf.OverlayAnimationFrame += 1;
-					if (mf.OverlayAnimationFrame >= mf.Terrain->SolidAnimationFrames) {
-						mf.OverlayAnimationFrame = 0;
-					}
-				}
-			}
-		}
-	}
-	//Wyrmgus end
-		
 #ifdef REALVIDEO
 	if (FastForwardCycle > GameCycle && RealVideoSyncSpeed != VideoSyncSpeed) {
 		RealVideoSyncSpeed = VideoSyncSpeed;
