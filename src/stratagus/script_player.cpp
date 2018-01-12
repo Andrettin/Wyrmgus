@@ -1858,6 +1858,8 @@ static int CclDefineFaction(lua_State *l)
 			faction->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
 			faction->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Adjective")) {
+			faction->Adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string faction_type_name = LuaToString(l, -1);
 			int faction_type = GetFactionTypeIdByName(faction_type_name);
@@ -2864,6 +2866,13 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Background")) {
 		lua_pushstring(l, faction->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Adjective")) {
+		if (!faction->Adjective.empty()) {
+			lua_pushstring(l, faction->Adjective.c_str());
+		} else {
+			lua_pushstring(l, faction->Name.c_str());
+		}
 		return 1;
 	} else if (!strcmp(data, "Type")) {
 		lua_pushstring(l, GetFactionTypeNameById(faction->Type).c_str());

@@ -645,6 +645,7 @@ public:
 	std::string Quote;													/// faction quote
 	std::string Background;												/// faction background
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
+	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI;
 	int ID;																/// faction ID
 	int Civilization;													/// faction civilization
