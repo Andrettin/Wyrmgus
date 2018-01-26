@@ -1517,6 +1517,7 @@ void AiEachHalfMinute(CPlayer &player)
 	}
 	
 	AiCheckUpgrades();
+	AiCheckBuildings();
 	
 	AiForceManagerEachHalfMinute();
 }

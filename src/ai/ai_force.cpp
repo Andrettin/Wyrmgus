@@ -1934,7 +1934,7 @@ void AiForceManager::UpdatePerHalfMinute()
 		int priority = 0;
 		for (size_t i = 0; i < faction_force_templates.size(); ++i) {
 			if (faction_force_templates[i]->Priority < priority) {
-				continue;
+				break; //force templates are ordered by priority, so there is no need to go further
 			}
 			bool valid = true;
 			for (size_t j = 0; j < faction_force_templates[i]->Units.size(); ++j) {

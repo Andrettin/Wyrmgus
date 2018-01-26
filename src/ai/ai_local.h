@@ -527,6 +527,7 @@ extern void AiTransportCapacityRequest(int capacity_needed, int landmass);
 extern void AiCheckSettlementConstruction();
 extern void AiCheckDockConstruction();
 extern void AiCheckUpgrades();
+extern void AiCheckBuildings();
 //Wyrmgus end
 
 //

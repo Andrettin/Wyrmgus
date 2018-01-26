@@ -755,6 +755,10 @@ CCivilization::~CCivilization()
 			delete iterator->second[i];
 		}
 	}
+	
+	for (size_t i = 0; i < this->AiBuildingTemplates.size(); ++i) {
+		delete this->AiBuildingTemplates[i];
+	}
 }
 
 int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
@@ -794,6 +798,19 @@ std::vector<CForceTemplate *> CCivilization::GetForceTemplates(int force_type) c
 	}
 	
 	return std::vector<CForceTemplate *>();
+}
+
+std::vector<CAiBuildingTemplate *> CCivilization::GetAiBuildingTemplates() const
+{
+	if (this->AiBuildingTemplates.size() > 0) {
+		return this->AiBuildingTemplates;
+	}
+	
+	if (this->ParentCivilization != -1) {
+		return PlayerRaces.Civilizations[this->ParentCivilization]->GetAiBuildingTemplates();
+	}
+	
+	return std::vector<CAiBuildingTemplate *>();
 }
 
 std::map<int, std::vector<std::string>> &CCivilization::GetPersonalNames()
@@ -843,6 +860,10 @@ CFaction::~CFaction()
 		}
 	}
 	
+	for (size_t i = 0; i < this->AiBuildingTemplates.size(); ++i) {
+		delete this->AiBuildingTemplates[i];
+	}
+
 	if (this->Conditions) {
 		delete Conditions;
 	}
@@ -886,6 +907,23 @@ std::vector<CForceTemplate *> CFaction::GetForceTemplates(int force_type) const
 	}
 	
 	return PlayerRaces.Civilizations[this->Civilization]->GetForceTemplates(force_type);
+}
+
+std::vector<CAiBuildingTemplate *> CFaction::GetAiBuildingTemplates() const
+{
+	if (this->AiBuildingTemplates.size() > 0) {
+		return this->AiBuildingTemplates;
+	}
+	
+	if (this->ParentFaction != -1) {
+		return PlayerRaces.Factions[this->ParentFaction]->GetAiBuildingTemplates();
+	}
+	
+	if (this->Civilization == -1) {
+		fprintf(stderr, "Error in CFaction::GetAiBuildingTemplates: the faction has no civilization.\n");
+	}
+	
+	return PlayerRaces.Civilizations[this->Civilization]->GetAiBuildingTemplates();
 }
 
 std::vector<std::string> &CFaction::GetShipNames()

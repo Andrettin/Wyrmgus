@@ -579,6 +579,20 @@ public:
 	std::vector<std::pair<int, int>> Units;	/// Vector containing each unit class belonging to the force template, and the respective quantity
 };
 
+class CAiBuildingTemplate
+{
+public:
+	CAiBuildingTemplate() :
+		UnitClass(-1), Priority(100),
+		PerSettlement(false)
+	{
+	}
+	
+	int UnitClass;		/// Building's unit class
+	int Priority;
+	bool PerSettlement;	/// Whether the building should be constructed for each settlement
+};
+
 class CCivilization
 {
 public:
@@ -593,6 +607,7 @@ public:
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	std::string GetMonthName(int month) const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
+	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	std::map<int, std::vector<std::string>> &GetPersonalNames();
 	std::vector<std::string> &GetUnitClassNames(int class_id);
 	std::vector<std::string> &GetShipNames();
@@ -612,7 +627,8 @@ public:
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
-	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;						/// Force templates, mapped to each force type
+	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type
+	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;	/// AI building templates
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	std::map<int, std::vector<std::string>> UnitClassNames;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 	std::vector<std::string> FamilyNames;		/// Family names for the civilization
@@ -637,6 +653,7 @@ public:
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
+	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	std::vector<std::string> &GetShipNames();
 
 	std::string Ident;													/// faction name
@@ -671,7 +688,8 @@ public:
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction
 	std::vector<CSettlement *> Cores;									/// Core settlements of this faction (required to found it)
-	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;						/// Force templates, mapped to each force type
+	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
+	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;				/// AI building templates
 	std::map<std::tuple<CDate, CDate, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year

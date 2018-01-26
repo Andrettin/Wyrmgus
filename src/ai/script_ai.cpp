@@ -912,9 +912,6 @@ static int CclAiWait(lua_State *l)
 				lua_pushboolean(l, 1);
 				return 1;
 			}
-			if (!type->BoolFlag[TOWNHALL_INDEX].value) { // town halls are built by with a special function
-				fprintf(stderr, "Broken? waiting on %s which wasn't requested.\n", type->Ident.c_str());
-			}
 			lua_pushboolean(l, 1);
 			return 1;
 		}

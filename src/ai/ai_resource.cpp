@@ -2027,6 +2027,10 @@ static void AiCheckRepair()
 */
 static void AiCheckPathwayConstruction()
 {
+	if (AiPlayer->Player->NumTownHalls < 1) { //don't build pathways if has no town hall yet
+		return;
+	}
+
 	std::vector<CUnitType *> pathway_types;
 	
 	for (size_t i = 0; i != UnitTypes.size(); ++i) { //assumes the pathways are listed in order of speed bonus
@@ -2449,6 +2453,66 @@ void AiCheckUpgrades()
 
 		AiPlayer->ResearchRequests.push_back(upgrade);
 	}
+}
+
+void AiCheckBuildings()
+{
+	if (AiPlayer->Player->Race == -1 || AiPlayer->Player->Faction == -1) {
+		return;
+	}
+
+	if (AiPlayer->Player->NumTownHalls < 1) { //don't build structures if has no town hall yet
+		return;
+	}
+
+	std::vector<CAiBuildingTemplate *> building_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetAiBuildingTemplates();
+	std::vector<CAiBuildingTemplate *> potential_building_templates;
+	
+	int priority = 0;
+	std::vector<int> want_counter;
+	for (size_t i = 0; i < UnitTypeClasses.size(); ++i) {
+		want_counter.push_back(0);
+	}
+	for (size_t i = 0; i < building_templates.size(); ++i) {
+		if (building_templates[i]->Priority < priority) {
+			break; //building templates are ordered by priority, so there is no need to go further
+		}
+		
+		bool valid = true;
+		int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, building_templates[i]->UnitClass);
+		CUnitType *type = NULL;
+		if (unit_type_id != -1) {
+			type = UnitTypes[unit_type_id];
+		}
+		if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
+			valid = false;
+		}
+		
+		if (valid) {
+			want_counter[building_templates[i]->UnitClass]++;
+			
+			if (AiGetUnitTypeCount(*AiPlayer, type, 0, true) >= want_counter[building_templates[i]->UnitClass]) {
+				continue; //already requested/built, continue
+			}
+			
+			if (building_templates[i]->Priority > priority) {
+				priority = building_templates[i]->Priority;
+				potential_building_templates.clear();
+			}
+			potential_building_templates.push_back(building_templates[i]);
+		}
+	}
+	
+	if (potential_building_templates.empty()) {
+		return;
+	}
+	
+	CAiBuildingTemplate *building_template = potential_building_templates[SyncRand(potential_building_templates.size())];
+	
+	int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, building_template->UnitClass);
+	CUnitType *type = UnitTypes[unit_type_id];
+	
+	AiAddUnitTypeRequest(*type, 1);
 }
 //Wyrmgus end
 
