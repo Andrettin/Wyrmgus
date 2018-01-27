@@ -405,12 +405,20 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	return 0;
 }
 
-bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool allow_can_build_builder)
+bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool allow_can_build_builder, bool include_upgrade)
 {
 	//Wyrmgus start
 	std::vector<std::vector<CUnitType *> > *tablep;
 	if (type.BoolFlag[BUILDING_INDEX].value) {
-		tablep = &AiHelpers.Build;
+		if (
+			include_upgrade
+			&& (type.Slot >= (int) AiHelpers.Build.size() || AiHelpers.Build[type.Slot].empty())
+			&& type.Slot < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[type.Slot].empty()
+		) {
+			tablep = &AiHelpers.Upgrade;
+		} else {
+			tablep = &AiHelpers.Build;
+		}
 	} else {
 		tablep = &AiHelpers.Train;
 	}
@@ -2488,7 +2496,7 @@ void AiCheckBuildings()
 		if (unit_type_id != -1) {
 			type = UnitTypes[unit_type_id];
 		}
-		if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
+		if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type, false, true)) {
 			valid = false;
 		}
 		

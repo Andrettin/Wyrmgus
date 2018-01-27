@@ -522,7 +522,7 @@ extern void AiResetUnitTypeEquiv();
 extern int AiFindUnitTypeEquiv(const CUnitType &type, int *result);
 /// Finds all available equivalents units to a given one, in the preferred order
 extern int AiFindAvailableUnitTypeEquiv(const CUnitType &type, int *result);
-extern bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool allow_can_build_builder = false);
+extern bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool allow_can_build_builder = false, bool include_upgrade = false);
 extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax]);
 
 extern void AiNewDepotRequest(CUnit &worker);
