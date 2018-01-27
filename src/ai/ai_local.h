@@ -459,6 +459,12 @@ public:
 	std::vector<std::vector<CUpgrade *> > ResearchedUpgrades;
 
 	/**
+	** The index is the unit that should perform an upgrade, giving a table of all
+	** possible (non-experience) upgrades for it.
+	*/
+	std::vector<std::vector<CUnitType *> > UpgradesTo;
+	
+	/**
 	** The index is the unit that should acquire an experience upgrade, giving a table of all
 	** possible upgrades for it.
 	*/
@@ -579,7 +585,7 @@ extern int AiGetTransportCapacity(int water_landmass);
 /// Get the current requested transport capacity of the AI for a given water zone
 extern int AiGetRequestedTransportCapacity(int water_landmass);
 /// Get the quantity of units belonging to a particular type, possibly including requests
-extern int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass, bool include_requests);
+extern int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass, bool include_requests, bool include_upgrades);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
 extern bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_requests);
 //Wyrmgus end

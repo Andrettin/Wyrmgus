@@ -696,6 +696,7 @@ void FreeAi()
 	AiHelpers.BuyMarkets.clear();
 	AiHelpers.ProducedResources.clear();
 	AiHelpers.ResearchedUpgrades.clear();
+	AiHelpers.UpgradesTo.clear();
 	AiHelpers.ExperienceUpgrades.clear();
 	AiHelpers.LearnableAbilities.clear();
 	AiHelpers.NavalTransporters.clear();
@@ -1543,7 +1544,7 @@ void AiEachMinute(CPlayer &player)
 	AiForceManagerEachMinute();
 }
 
-int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass, bool include_requests)
+int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass, bool include_requests, bool include_upgrades)
 {
 	int count = 0;
 	
@@ -1552,8 +1553,8 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass,
 		std::vector<CUnit *> table;
 		FindPlayerUnitsByType(*pai.Player, *type, table, true);
 		
-		for (size_t j = 0; j < table.size(); ++j) {
-			CUnit &unit = *table[j];
+		for (size_t i = 0; i < table.size(); ++i) {
+			CUnit &unit = *table[i];
 					
 			if (Map.GetTileLandmass(unit.tilePos, unit.MapLayer) == landmass) {
 				count++;
@@ -1564,10 +1565,18 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass,
 	}
 		
 	if (include_requests) {
-		for (size_t j = 0; j < pai.UnitTypeBuilt.size(); ++j) {
-			const AiBuildQueue &queue = pai.UnitTypeBuilt[j];
+		for (size_t i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
+			const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
 			if ((!landmass || queue.Landmass == landmass) && queue.Type == type) {
 				count += queue.Want;
+			}
+		}
+	}
+	
+	if (include_upgrades) {
+		if (type->Slot < (int) AiHelpers.UpgradesTo.size()) {
+			for (size_t i = 0; i != AiHelpers.UpgradesTo[type->Slot].size(); ++i) {
+				count += AiGetUnitTypeCount(pai, AiHelpers.UpgradesTo[type->Slot][i], landmass, include_requests, include_upgrades);
 			}
 		}
 	}

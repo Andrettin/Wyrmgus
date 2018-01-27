@@ -2470,8 +2470,12 @@ void AiCheckBuildings()
 	
 	int priority = 0;
 	std::vector<int> want_counter;
+	std::vector<int> have_counter;
+	std::vector<int> have_with_requests_counter;
 	for (size_t i = 0; i < UnitTypeClasses.size(); ++i) {
 		want_counter.push_back(0);
+		have_counter.push_back(-1);
+		have_with_requests_counter.push_back(-1);
 	}
 	for (size_t i = 0; i < building_templates.size(); ++i) {
 		if (building_templates[i]->Priority < priority) {
@@ -2491,7 +2495,15 @@ void AiCheckBuildings()
 		if (valid) {
 			want_counter[building_templates[i]->UnitClass]++;
 			
-			if (AiGetUnitTypeCount(*AiPlayer, type, 0, true) >= want_counter[building_templates[i]->UnitClass]) {
+			if (have_counter[building_templates[i]->UnitClass] == -1 || have_with_requests_counter[building_templates[i]->UnitClass] == -1) { //initialize values
+				have_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, type, 0, false, true);
+				have_with_requests_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, type, 0, true, true);
+			}
+			
+			if (have_with_requests_counter[building_templates[i]->UnitClass] >= want_counter[building_templates[i]->UnitClass]) {
+				if (have_counter[building_templates[i]->UnitClass] < want_counter[building_templates[i]->UnitClass]) {
+					priority = building_templates[i]->Priority; //requested but not built, don't build anything of lower priority while this isn't done
+				}
 				continue; //already requested/built, continue
 			}
 			
@@ -2512,7 +2524,13 @@ void AiCheckBuildings()
 	int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, building_template->UnitClass);
 	CUnitType *type = UnitTypes[unit_type_id];
 	
-	AiAddUnitTypeRequest(*type, 1);
+	if (type->Slot < (int) AiHelpers.Build.size() && !AiHelpers.Build[type->Slot].empty()) { //constructed by worker
+		AiAddUnitTypeRequest(*type, 1);
+	} else if (type->Slot < (int) AiHelpers.Upgrade.size() && !AiHelpers.Upgrade[type->Slot].empty()) { //upgraded to from another building
+		AiAddUpgradeToRequest(*type);
+	} else {
+		fprintf(stderr, "Unit type \"%s\" is in an AiBuildingTemplate, but it cannot be built by any worker, and no unit type can upgrade to it.\n", type->Ident.c_str());
+	}
 }
 //Wyrmgus end
 
