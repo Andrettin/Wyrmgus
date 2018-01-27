@@ -2628,7 +2628,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 //	if (type.BoolFlag[BUILDING_INDEX].value && CurrentAction() != UnitActionDie) {
 	if (type.BoolFlag[BUILDING_INDEX].value && CurrentAction() != UnitActionDie && !this->Destroyed && !type.BoolFlag[VANISHES_INDEX].value) {
 	//Wyrmgus end
-		// FIXME: support more races
 		//Wyrmgus start
 //		if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
 		//Wyrmgus end
@@ -6516,30 +6515,17 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				HelpMeLastX = target.tilePos.x;
 				HelpMeLastY = target.tilePos.y;
 				PlayUnitSound(target, VoiceHelpMe);
-				//Wyrmgus start
-				//attacked messages now only appear if the "help" sound would be played too
 				target.Player->Notify(NotifyRed, target.tilePos, target.MapLayer, _("%s attacked"), target.GetMessageName().c_str());
-				//Wyrmgus end
 			}
 		}
 	}
-	//Wyrmgus start
-//	target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
-	//moved this because it was causing message spam
-	//Wyrmgus end
 
-	if (attacker && !target.Type->BoolFlag[BUILDING_INDEX].value) {
-		//Wyrmgus start
-//		if (target.Player->AiEnabled) {
+	if (GameCycle > (lastattack + 2 * (CYCLES_PER_SECOND * 60)) && attacker && !target.Type->BoolFlag[BUILDING_INDEX].value) { //only trigger this every two minutes for the unit
 		if (
 			target.Player->AiEnabled
 			&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
 		) {
-		//Wyrmgus end
-			//Wyrmgus start
-//			AiHelpMe(attacker, target);
 			AiHelpMe(GetFirstContainer(*attacker), target);
-			//Wyrmgus end
 		}
 	}
 }
@@ -7030,21 +7016,6 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		HitUnit_LastAttack(attacker, target); //only trigger the help me notification and AI code if there is actually an attacker
 		//Wyrmgus end
 		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
-	}
-
-	//Wyrmgus start
-//	if (attacker && !target.Type->BoolFlag[WALL_INDEX].value && target.Player->AiEnabled) {
-	if (
-		attacker
-		&& !target.Type->BoolFlag[WALL_INDEX].value
-		&& target.Player->AiEnabled
-		&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
-	) {
-	//Wyrmgus end
-		//Wyrmgus start
-//		AiHelpMe(attacker, target);
-		AiHelpMe(GetFirstContainer(*attacker), target);
-		//Wyrmgus end
 	}
 
 	// OnHit callback

@@ -1054,47 +1054,54 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 	
 	//Wyrmgus start
 	//check if there are any nearby units with active AI, and send them to help
-	std::vector<CUnit *> helper_table;
-	SelectAroundUnit(defender, 16, helper_table, HasSamePlayerAs(*defender.Player));
-	for (size_t i = 0; i < helper_table.size(); ++i) {
-		CUnit &aiunit = *helper_table[i];
+	for (int max_dist = 16; max_dist <= MaxMapWidth; max_dist += 16) { //search for units in increasingly greater distances, until a helper is found
+		bool has_helper = false;
+		std::vector<CUnit *> helper_table;
+		SelectAroundUnit(defender, max_dist, helper_table, HasSamePlayerAs(*defender.Player));
+		for (size_t i = 0; i < helper_table.size(); ++i) {
+			CUnit &aiunit = *helper_table[i];
 
-		if (&defender == &aiunit) {
-			continue;
-		}
-		
-		if (!aiunit.IsAliveOnMap()) {
-			continue;
-		}
+			if (&defender == &aiunit) {
+				continue;
+			}
+			
+			if (!aiunit.IsAliveOnMap()) {
+				continue;
+			}
 
-		if (!aiunit.CanMove()) {
-			continue;
-		}
+			if (!aiunit.CanMove()) {
+				continue;
+			}
 
-		if (aiunit.BoardCount) { //if is transporting a unit, don't go to help, as that may endanger the cargo/passengers
-			continue;
-		}
+			if (aiunit.BoardCount) { //if is transporting a unit, don't go to help, as that may endanger the cargo/passengers
+				continue;
+			}
 
-		// if brother is idle or attack no-agressive target and
-		// can attack our attacker then ask for help
-		// FIXME ad support for help from Coward type units
-		if (aiunit.Active && aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
-			&& aiunit.CurrentOrder()->GetGoal() != attacker) {
-			bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
+			// if brother is idle or attack no-agressive target and
+			// can attack our attacker then ask for help
+			// FIXME ad support for help from Coward type units
+			if (aiunit.Active && aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
+				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
+				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
-			if (aiunit.CurrentAction() == UnitActionAttack) {
-				const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
-				const CUnit *oldGoal = orderAttack.GetGoal();
+				if (aiunit.CurrentAction() == UnitActionAttack) {
+					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
+					const CUnit *oldGoal = orderAttack.GetGoal();
 
-				if (oldGoal == NULL || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
-										&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
-					shouldAttack = true;
+					if (oldGoal == NULL || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
+											&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
+						shouldAttack = true;
+					}
+				}
+
+				if (shouldAttack) {
+					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
+					has_helper = true;
 				}
 			}
-
-			if (shouldAttack) {
-				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
-			}
+		}
+		if (has_helper) {
+			break;
 		}
 	}
 	//Wyrmgus end

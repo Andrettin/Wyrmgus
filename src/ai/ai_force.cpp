@@ -1912,15 +1912,19 @@ void AiForceManager::Update()
 void AiForceManager::UpdatePerHalfMinute()
 {
 	bool all_forces_completed = true;
+	int completed_forces = 0;
 	
 	for (unsigned int f = 0; f < forces.size(); ++f) {
 		AiForce &force = forces[f];
-		//attack with forces that are completed, but aren't attacking or defending
-		if (force.Completed && !force.Attacking && !force.Defending && force.Units.size() > 0) {
-			const Vec2i invalidPos(-1, -1);
-			int z = force.Units[0]->MapLayer;
-			
-			force.Attack(invalidPos, z);
+		if (force.Completed && force.Units.size() > 0) {
+			completed_forces++;
+			//attack with forces that are completed, but aren't attacking or defending
+			if (!force.Attacking && !force.Defending) {
+				const Vec2i invalidPos(-1, -1);
+				int z = force.Units[0]->MapLayer;
+				
+				force.Attack(invalidPos, z);
+			}
 		}
 		
 		if (!force.Completed) {
@@ -1928,7 +1932,7 @@ void AiForceManager::UpdatePerHalfMinute()
 		}
 	}
 	
-	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1) { //all current forces completed, create a new one
+	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1 && completed_forces < AI_MAX_COMPLETED_FORCES) { //all current forces completed and not too many forces are in existence, create a new one
 		std::vector<CForceTemplate *> faction_force_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplates(LandForceType);
 		std::vector<CForceTemplate *> potential_force_templates;
 		int priority = 0;
