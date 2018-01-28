@@ -1068,6 +1068,9 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool mercenary)
 //		if (f.IsBelongsTo(*unit.Type)) {
 		if (f.IsBelongsTo(*unit.Type) || mercenary) {
 		//Wyrmgus end
+			if (mercenary && f.Units.size() > 0) { //make mercenaries and heroes move to where the rest of the force is
+				CommandMove(unit, f.Units[0]->tilePos, FlushCommands, f.Units[0]->MapLayer);
+			}
 			f.Insert(unit);
 			unit.GroupId = force + 1;
 			return true;
@@ -1080,12 +1083,8 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool mercenary)
 			if (f.IsAttacking()) {
 				continue;
 			}
-			//Wyrmgus start
-//			if (f.IsBelongsTo(*unit.Type)) {
-			if (f.IsBelongsTo(*unit.Type) || mercenary) {
-			//Wyrmgus end
-				f.Insert(unit);
-				unit.GroupId = i + 1;
+			
+			if (this->Assign(unit, i, mercenary)) {
 				return true;
 			}
 		}

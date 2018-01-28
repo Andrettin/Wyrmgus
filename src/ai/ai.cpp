@@ -1054,7 +1054,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 	
 	//Wyrmgus start
 	//check if there are any nearby units with active AI, and send them to help
-	for (int max_dist = 16; max_dist <= MaxMapWidth; max_dist += 16) { //search for units in increasingly greater distances, until a helper is found
+	for (int max_dist = 16; max_dist <= MaxMapWidth; max_dist *= 2) { //search for units in increasingly greater distances, until a helper is found
 		bool has_helper = false;
 		std::vector<CUnit *> helper_table;
 		SelectAroundUnit(defender, max_dist, helper_table, HasSamePlayerAs(*defender.Player));
@@ -1388,21 +1388,16 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 			   //Wyrmgus end
 			   what.Type->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
-	//Wyrmgus start
-//	Assert(unit.Player->Type != PlayerPerson);
 	Assert(what.Player->Type != PlayerPerson);
-	//Wyrmgus end
 
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
-	if (unit.Player == what.Player) {
+	if (unit.Player == what.Player) { //mercenaries are recruited without requests, so they don't need to be removed from the requests list
 		AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer));
 	}
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	unit.Player->Ai->Force.RemoveDeadUnit();
-//	unit.Player->Ai->Force.Assign(what);
 	what.Player->Ai->Force.RemoveDeadUnit();
 	what.Player->Ai->Force.Assign(what, -1, what.Player != unit.Player);
 	
