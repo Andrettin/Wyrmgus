@@ -299,7 +299,7 @@ static void AiCheckUnits()
 			}
 			for (int j = 0; j < Players[i].GetUnitCount(); ++j) {
 				CUnit *mercenary_unit = &Players[i].GetUnit(j);
-				if (!mercenary_unit || !mercenary_unit->IsAliveOnMap() || !mercenary_unit->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_unit->IsVisibleAsGoal(*AiPlayer->Player)) {
+				if (!mercenary_unit || !mercenary_unit->IsAliveOnMap() || !mercenary_unit->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_unit->IsVisible(*AiPlayer->Player)) {
 					continue;
 				}
 
