@@ -403,6 +403,14 @@ public:
 	inline void operator()(const CUnit *const unit) const
 	{
 		data[UnitTypeEquivs[unit->Type->Slot]]++;
+		
+		int unit_class = unit->Type->Class;
+		for (size_t i = 0; i < ClassUnitTypes[unit_class].size(); ++i) {
+			const CUnitType *class_unit_type = ClassUnitTypes[unit_class][i];
+			if (class_unit_type != unit->Type) {
+				data[UnitTypeEquivs[class_unit_type->Slot]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
+			}
+		}
 	}
 private:
 	unsigned int *data;//[UnitTypeMax + 1];
@@ -434,8 +442,8 @@ bool AiForce::IsBelongsTo(const CUnitType &type)
 		const AiUnitType &aitype = UnitTypes[i];
 		const int slot = aitype.Type->Slot;
 
-		if (counter[slot] < aitype.Want) {
-			if (UnitTypeEquivs[type.Slot] == slot) {
+		if (counter[slot] < aitype.Want) { //the counter includes other units of the same class
+			if (UnitTypeEquivs[type.Slot] == slot || type.Class == aitype.Type->Class) {
 				if (counter[slot] < aitype.Want - 1) {
 					Completed = false;
 				}
@@ -1056,7 +1064,7 @@ void AiForceManager::RemoveDeadUnit()
 */
 //Wyrmgus start
 //bool AiForceManager::Assign(CUnit &unit, int force)
-bool AiForceManager::Assign(CUnit &unit, int force, bool mercenary)
+bool AiForceManager::Assign(CUnit &unit, int force, bool hero)
 //Wyrmgus end
 {
 	if (unit.GroupId != 0) {
@@ -1066,9 +1074,9 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool mercenary)
 		AiForce &f = forces[force];
 		//Wyrmgus start
 //		if (f.IsBelongsTo(*unit.Type)) {
-		if (f.IsBelongsTo(*unit.Type) || mercenary) {
+		if (f.IsBelongsTo(*unit.Type) || hero) {
 		//Wyrmgus end
-			if (mercenary && f.Units.size() > 0) { //make mercenaries and heroes move to where the rest of the force is
+			if (hero && f.Units.size() > 0) { //make heroes move to where the rest of the force is
 				CommandMove(unit, f.Units[0]->tilePos, FlushCommands, f.Units[0]->MapLayer);
 			}
 			f.Insert(unit);
@@ -1084,7 +1092,7 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool mercenary)
 				continue;
 			}
 			
-			if (this->Assign(unit, i, mercenary)) {
+			if (this->Assign(unit, i, hero)) {
 				return true;
 			}
 		}
@@ -1095,7 +1103,6 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool mercenary)
 void AiForceManager::CheckUnits(int *counter)
 {
 	int attacking[UnitTypeMax];
-
 	memset(attacking, 0, sizeof(attacking));
 
 	// Look through the forces what is missing.
@@ -1120,11 +1127,18 @@ void AiForceManager::CheckUnits(int *counter)
 		for (unsigned int j = 0; j < force.UnitTypes.size(); ++j) {
 			const AiUnitType &aiut = force.UnitTypes[j];
 			const unsigned int t = aiut.Type->Slot;
+			const int unit_class = aiut.Type->Class;
 			const int wantedCount = aiut.Want;
 			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(UnitTypes[t]);
 			if (t < AiHelpers.Equiv.size()) {
-				for (unsigned int j = 0; j < AiHelpers.Equiv[t].size(); ++j) {
-					e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][j]);
+				for (unsigned int k = 0; k < AiHelpers.Equiv[t].size(); ++k) {
+					e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][k]);
+				}
+			}
+			for (size_t k = 0; k < ClassUnitTypes[unit_class].size(); ++k) {
+				const CUnitType *class_unit_type = ClassUnitTypes[unit_class][k];
+				if (class_unit_type != aiut.Type) {
+					e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 				}
 			}
 			const int requested = wantedCount - (e + counter[t] - attacking[t]);

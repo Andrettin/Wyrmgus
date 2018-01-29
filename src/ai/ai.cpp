@@ -216,12 +216,19 @@ static void AiCheckUnits()
 	for (int i = 0; i < n; ++i) {
 		const unsigned int t = AiPlayer->UnitTypeRequests[i].Type->Slot;
 		const int x = AiPlayer->UnitTypeRequests[i].Count;
+		const int unit_class = AiPlayer->UnitTypeRequests[i].Type->Class;
 
 		// Add equivalent units
 		int e = AiPlayer->Player->GetUnitTypeAiActiveCount(AiPlayer->UnitTypeRequests[i].Type);
 		if (t < AiHelpers.Equiv.size()) {
 			for (unsigned int j = 0; j < AiHelpers.Equiv[t].size(); ++j) {
 				e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][j]);
+			}
+		}
+		for (size_t j = 0; j < ClassUnitTypes[unit_class].size(); ++j) {
+			const CUnitType *class_unit_type = ClassUnitTypes[unit_class][j];
+			if (class_unit_type != AiPlayer->UnitTypeRequests[i].Type) {
+				e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 			}
 		}
 		const int requested = x - e - counter[t];
@@ -298,26 +305,45 @@ static void AiCheckUnits()
 				continue;
 			}
 			for (int j = 0; j < Players[i].GetUnitCount(); ++j) {
-				CUnit *mercenary_unit = &Players[i].GetUnit(j);
-				if (!mercenary_unit || !mercenary_unit->IsAliveOnMap() || !mercenary_unit->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_unit->IsVisible(*AiPlayer->Player)) {
+				CUnit *mercenary_building = &Players[i].GetUnit(j);
+				if (!mercenary_building || !mercenary_building->IsAliveOnMap() || !mercenary_building->Type->BoolFlag[BUILDING_INDEX].value || !mercenary_building->IsVisible(*AiPlayer->Player)) {
 					continue;
 				}
 
-				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && mercenary_unit->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL) { //check if can hire any heroes at the mercenary camp
-					for (size_t k = 0; k < mercenary_unit->SoldUnits.size(); ++k) {
+				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && mercenary_building->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL) { //check if can hire any heroes at the mercenary camp
+					for (size_t k = 0; k < mercenary_building->SoldUnits.size(); ++k) {
 						int buy_costs[MaxCosts];
 						memset(buy_costs, 0, sizeof(buy_costs));
-						buy_costs[CopperCost] = mercenary_unit->SoldUnits[k]->GetPrice();
-						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*mercenary_unit->SoldUnits[k]->Type) >= 1) {
-							CommandBuy(*mercenary_unit, mercenary_unit->SoldUnits[k], AiPlayer->Player->Index);
+						buy_costs[CopperCost] = mercenary_building->SoldUnits[k]->GetPrice();
+						if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*mercenary_building->SoldUnits[k]->Type) >= 1) {
+							CommandBuy(*mercenary_building, mercenary_building->SoldUnits[k], AiPlayer->Player->Index);
 							break;
 						}
 					}
 				}
 
-				for (std::map<int, int>::iterator iterator = mercenary_unit->UnitStock.begin(); iterator != mercenary_unit->UnitStock.end(); ++iterator) {
-					if (iterator->second && !UnitTypes[iterator->first]->BoolFlag[ITEM_INDEX].value && CheckDependByType(Players[i], *UnitTypes[iterator->first]) && AiPlayer->Player->CheckLimits(*UnitTypes[iterator->first]) >= 1 && !AiPlayer->Player->CheckUnitType(*UnitTypes[iterator->first], true)) {
-						CommandTrainUnit(*mercenary_unit, *UnitTypes[iterator->first], AiPlayer->Player->Index, FlushCommands);
+				bool mercenary_recruited = false;
+				for (std::map<int, int>::iterator iterator = mercenary_building->UnitStock.begin(); iterator != mercenary_building->UnitStock.end(); ++iterator) {
+					CUnitType *mercenary_type = UnitTypes[iterator->first];
+					if (
+						iterator->second
+						&& !mercenary_type->BoolFlag[ITEM_INDEX].value
+						&& CheckDependByType(Players[i], *mercenary_type)
+						&& AiPlayer->Player->CheckLimits(*mercenary_type) >= 1
+						&& !AiPlayer->Player->CheckUnitType(*mercenary_type, true)
+					) {
+						//see if there are any unit type requests for units of the same class as the mercenary
+						for (size_t k = 0; k < AiPlayer->UnitTypeBuilt.size(); ++k) {
+							AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[k];
+							if (mercenary_type->Class == queue.Type->Class && queue.Want > queue.Made && (!queue.Landmass || queue.Landmass == Map.GetTileLandmass(mercenary_building->tilePos, mercenary_building->MapLayer))) {
+								queue.Made++;
+								CommandTrainUnit(*mercenary_building, *mercenary_type, AiPlayer->Player->Index, FlushCommands);
+								mercenary_recruited = true;
+								break;
+							}
+						}
+					}
+					if (mercenary_recruited) {
 						break; // only hire one unit per mercenary camp per second
 					}
 				}
@@ -1392,14 +1418,19 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
-	if (unit.Player == what.Player) { //mercenaries are recruited without requests, so they don't need to be removed from the requests list
+	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer));
+	} else { //remove the request of the unit the mercenary is substituting
+		int requested_unit_type_id = PlayerRaces.GetFactionClassUnitType(what.Player->Faction, what.Type->Class);
+		if (requested_unit_type_id != -1) {
+			AiRemoveFromBuilt(what.Player->Ai, *UnitTypes[requested_unit_type_id], Map.GetTileLandmass(what.tilePos, what.MapLayer));
+		}
 	}
 	//Wyrmgus end
 
 	//Wyrmgus start
 	what.Player->Ai->Force.RemoveDeadUnit();
-	what.Player->Ai->Force.Assign(what, -1, what.Player != unit.Player);
+	what.Player->Ai->Force.Assign(what, -1);
 	
 	if (what.Player->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
 		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeNaval || what.Type->UnitType == UnitTypeFly || what.Type->UnitType == UnitTypeFlyLow)) {

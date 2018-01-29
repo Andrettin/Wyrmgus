@@ -505,6 +505,7 @@ std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 //Wyrmgus start
 std::vector<std::string> UnitTypeClasses;
 std::map<std::string, int> UnitTypeClassStringToIndex;
+std::vector<std::vector<CUnitType *>> ClassUnitTypes;
 std::vector<std::string> UpgradeClasses;
 std::map<std::string, int> UpgradeClassStringToIndex;
 CUnitType *SettlementSiteUnitType;
@@ -1491,6 +1492,7 @@ int GetOrAddUnitTypeClassIndexByName(std::string class_name)
 		SetUnitTypeClassStringToIndex(class_name, UnitTypeClasses.size());
 		index = UnitTypeClasses.size();
 		UnitTypeClasses.push_back(class_name);
+		ClassUnitTypes.resize(UnitTypeClasses.size());
 	}
 	return index;
 }

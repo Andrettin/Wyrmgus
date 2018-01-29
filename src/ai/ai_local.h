@@ -263,7 +263,7 @@ public:
 	void RemoveDeadUnit();
 	//Wyrmgus start
 //	bool Assign(CUnit &unit, int force = -1);
-	bool Assign(CUnit &unit, int force = -1, bool mercenary = false);
+	bool Assign(CUnit &unit, int force = -1, bool hero = false);
 	//Wyrmgus end
 	void Update();
 	void UpdatePerHalfMinute();
