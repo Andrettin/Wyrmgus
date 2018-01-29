@@ -732,6 +732,9 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			type->Name = parent_type->Name;
 			type->Class = parent_type->Class;
+			if (type->Class != -1 && std::find(ClassUnitTypes[type->Class].begin(), ClassUnitTypes[type->Class].end(), type) == ClassUnitTypes[type->Class].end()) {
+				ClassUnitTypes[type->Class].push_back(type);
+			}
 			type->DrawLevel = parent_type->DrawLevel;
 			type->File = parent_type->File;
 			type->Width = parent_type->Width;
@@ -2042,8 +2045,13 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "Class")) {
+			if (type->Class != -1)  {
+				ClassUnitTypes[type->Class].erase(std::remove(ClassUnitTypes[type->Class].begin(), ClassUnitTypes[type->Class].end(), type), ClassUnitTypes[type->Class].end());
+			}
+			
 			type->Class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1));
-			if (std::find(ClassUnitTypes[type->Class].begin(), ClassUnitTypes[type->Class].end(), type) == ClassUnitTypes[type->Class].end()) {
+			
+			if (type->Class != -1 && std::find(ClassUnitTypes[type->Class].begin(), ClassUnitTypes[type->Class].end(), type) == ClassUnitTypes[type->Class].end()) {
 				ClassUnitTypes[type->Class].push_back(type);
 			}
 		} else if (!strcmp(value, "Civilization")) {
