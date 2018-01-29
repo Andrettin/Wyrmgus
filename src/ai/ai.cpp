@@ -225,10 +225,12 @@ static void AiCheckUnits()
 				e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][j]);
 			}
 		}
-		for (size_t j = 0; j < ClassUnitTypes[unit_class].size(); ++j) {
-			const CUnitType *class_unit_type = ClassUnitTypes[unit_class][j];
-			if (class_unit_type != AiPlayer->UnitTypeRequests[i].Type) {
-				e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
+		if (unit_class != -1) {
+			for (size_t j = 0; j < ClassUnitTypes[unit_class].size(); ++j) {
+				const CUnitType *class_unit_type = ClassUnitTypes[unit_class][j];
+				if (class_unit_type != AiPlayer->UnitTypeRequests[i].Type) {
+					e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
+				}
 			}
 		}
 		const int requested = x - e - counter[t];

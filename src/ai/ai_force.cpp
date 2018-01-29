@@ -405,10 +405,12 @@ public:
 		data[UnitTypeEquivs[unit->Type->Slot]]++;
 		
 		int unit_class = unit->Type->Class;
-		for (size_t i = 0; i < ClassUnitTypes[unit_class].size(); ++i) {
-			const CUnitType *class_unit_type = ClassUnitTypes[unit_class][i];
-			if (class_unit_type != unit->Type) {
-				data[UnitTypeEquivs[class_unit_type->Slot]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
+		if (unit_class != -1) {
+			for (size_t i = 0; i < ClassUnitTypes[unit_class].size(); ++i) {
+				const CUnitType *class_unit_type = ClassUnitTypes[unit_class][i];
+				if (class_unit_type != unit->Type) {
+					data[UnitTypeEquivs[class_unit_type->Slot]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
+				}
 			}
 		}
 	}
@@ -1135,10 +1137,12 @@ void AiForceManager::CheckUnits(int *counter)
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][k]);
 				}
 			}
-			for (size_t k = 0; k < ClassUnitTypes[unit_class].size(); ++k) {
-				const CUnitType *class_unit_type = ClassUnitTypes[unit_class][k];
-				if (class_unit_type != aiut.Type) {
-					e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
+			if (unit_class != -1) {
+				for (size_t k = 0; k < ClassUnitTypes[unit_class].size(); ++k) {
+					const CUnitType *class_unit_type = ClassUnitTypes[unit_class][k];
+					if (class_unit_type != aiut.Type) {
+						e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
+					}
 				}
 			}
 			const int requested = wantedCount - (e + counter[t] - attacking[t]);
