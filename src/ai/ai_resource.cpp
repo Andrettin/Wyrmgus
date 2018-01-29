@@ -2039,6 +2039,10 @@ static void AiCheckPathwayConstruction()
 		return;
 	}
 
+	if (AiPlayer->Player->AiName == "passive") {
+		return;
+	}
+
 	std::vector<CUnitType *> pathway_types;
 	
 	for (size_t i = 0; i != UnitTypes.size(); ++i) { //assumes the pathways are listed in order of speed bonus
@@ -2269,6 +2273,10 @@ static void AiCheckPathwayConstruction()
 */
 void AiCheckSettlementConstruction()
 {
+	if (AiPlayer->Player->AiName == "passive") {
+		return;
+	}
+
 	int town_hall_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("town-hall"));			
 	if (town_hall_type_id == -1) {
 		return;
@@ -2358,6 +2366,10 @@ void AiCheckDockConstruction()
 	if (AiPlayer->Player->NumTownHalls < 1) { //don't build docks if has no town hall yet
 		return;
 	}
+	
+	if (AiPlayer->Player->AiName == "passive") {
+		return;
+	}
 
 	int dock_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("dock"));			
 	if (dock_type_id == -1) {
@@ -2432,6 +2444,10 @@ void AiCheckDockConstruction()
 
 void AiCheckUpgrades()
 {
+	if (AiPlayer->Player->AiName == "passive") {
+		return;
+	}
+
 	std::vector<CUpgrade *> potential_upgrades = AiPlayer->Player->GetResearchableUpgrades();
 	
 	for (size_t i = 0; i < potential_upgrades.size(); ++i) {
@@ -2470,6 +2486,10 @@ void AiCheckBuildings()
 	}
 
 	if (AiPlayer->Player->NumTownHalls < 1) { //don't build structures if has no town hall yet
+		return;
+	}
+
+	if (AiPlayer->Player->AiName == "passive") {
 		return;
 	}
 

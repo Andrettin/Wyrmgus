@@ -1928,6 +1928,10 @@ void AiForceManager::Update()
 //Wyrmgus start
 void AiForceManager::UpdatePerHalfMinute()
 {
+	if (AiPlayer->Player->AiName == "passive") {
+		return;
+	}
+
 	bool all_forces_completed = true;
 	int completed_forces = 0;
 	
