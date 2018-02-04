@@ -1723,7 +1723,7 @@ void CPlayer::SetFaction(CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->Civilization != -1 && PlayerRaces.Species[unit.Type->Civilization] == PlayerRaces.Species[faction->Civilization] && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();

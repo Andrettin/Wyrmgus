@@ -907,6 +907,8 @@ public:
 	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
 	std::string GeneratePersonalName(CFaction *faction, int gender) const;
+	bool IsPersonalNameValid(std::string name, CFaction *faction, int gender) const;
+	std::vector<std::string> GetPotentialPersonalNames(CFaction *faction, int gender) const;
 	//Wyrmgus end
 
 public:

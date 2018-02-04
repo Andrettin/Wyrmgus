@@ -2351,7 +2351,7 @@ void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 		IndividualUpgradeAcquire(unit, upgrade);
 	}
 	
-	unit.UpdatePersonalName();
+	unit.UpdateExtraName();
 
 	//
 	//  Upgrades could change the buttons displayed.

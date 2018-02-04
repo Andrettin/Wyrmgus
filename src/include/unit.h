@@ -173,6 +173,7 @@ public:
 	void UpdateContainerAttackRange();
 	void UpdateXPRequired();
 	void UpdatePersonalName(bool update_settlement_name = true);
+	void UpdateExtraName();
 	void UpdateSettlement();
 	void UpdateBuildingSettlementAssignment(CSettlement *old_settlement = NULL); //update the settlement assignment of surrounding buildings for this town hall
 	void XPChanged();
@@ -426,6 +427,7 @@ public:
 	bool LevelCheck(const int level) const;
 	bool IsAbilityEmpowered(const CUpgrade *ability) const;
 	bool IsSpellEmpowered(const SpellType *spell) const;
+	bool IsNameValid() const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
 	bool HasAdjacentRailForUnitType(const CUnitType *type) const;
 	CAnimations *GetAnimations() const;
@@ -498,7 +500,9 @@ public:
 	int         Frame;      /// Image frame: <0 is mirrored
 	CUnitColors *Colors;    /// Player colors
 	//Wyrmgus start
-	std::string Name;	/// Unit's personal name (if any)
+	std::string Name;		/// Unit's personal/proper name (if any)
+	std::string ExtraName;	/// Unit's "extra" name (i.e. a nickname)
+	std::string FamilyName;	/// Unit's family name
 	CCharacter *Character;	/// Pointer to the character represented by this unit
 	CSettlement *Settlement;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
 	CUpgrade *Trait;	/// Unit's trait

@@ -483,7 +483,9 @@ void CUnit::Init()
 
 	Colors = NULL;
 	//Wyrmgus start
-	Name = "";
+	Name.clear();
+	ExtraName.clear();
+	FamilyName.clear();
 	Variation = 0;
 	memset(LayerVariation, -1, sizeof(LayerVariation));
 	//Wyrmgus end
@@ -520,9 +522,7 @@ void CUnit::Init()
 	MineLow = 0;
 	memset(&Anim, 0, sizeof(Anim));
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
-	//Wyrmgus start
 	GivesResource = 0;
-	//Wyrmgus end
 	CurrentResource = 0;
 	StepCount = 0;
 	Orders.clear();
@@ -895,7 +895,9 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		return;
 	}
 		
-	this->Name = this->Character->GetFullName();
+	this->Name = this->Character->Name;
+	this->ExtraName = this->Character->ExtraName;
+	this->FamilyName = this->Character->FamilyName;
 	
 	if (this->Character->Type != NULL) {
 		if (this->Character->Type != this->Type) { //set type to that of the character
@@ -1820,7 +1822,7 @@ void CUnit::SetUnique(CUniqueItem *unique)
 		Name = unique->Name;
 		Unique = unique;
 	} else {
-		Name = "";
+		Name.clear();
 		Unique = NULL;
 		SetPrefix(NULL);
 		SetSuffix(NULL);
@@ -1905,7 +1907,7 @@ void CUnit::UpdateItemName()
 		return;
 	}
 	
-	Name = "";
+	Name.clear();
 	if (Prefix == NULL && Spell == NULL && Work == NULL && Suffix == NULL) { //elixirs use the name of their unit type
 		return;
 	}
@@ -3156,32 +3158,55 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		return;
 	}
 	
-	int civilization = this->Type->Civilization;
-	int faction = -1;
-	if (civilization != -1 && this->Type->Faction != -1) {
-		faction = this->Type->Faction;
-	} else if (civilization != -1 && this->Player->Race == civilization && this->Player->Faction != -1) {
-		faction = this->Player->Faction;
+	int civilization_id = this->Type->Civilization;
+	int faction_id = -1;
+	if (civilization_id != -1 && this->Type->Faction != -1) {
+		faction_id = this->Type->Faction;
+	} else if (civilization_id != -1 && this->Player->Race == civilization_id && this->Player->Faction != -1) {
+		faction_id = this->Player->Faction;
 	}
-	CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization);
-
-	// first see if can translate the current personal name
-	std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
-	if (!new_personal_name.empty()) {
-		this->Name = new_personal_name;
-	} else {
-		CFaction *faction = NULL;
-		if (this->Player->Race != -1 && this->Player->Faction != -1) {
-			faction = PlayerRaces.Factions[this->Player->Faction];
+	CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization_id);
+	
+	if (this->Name.empty()) { //this is the first time the unit receives a name
+		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
+			this->ExtraName = this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
 		}
-		this->Name = this->Type->GeneratePersonalName(faction, this->Variable[GENDER_INDEX].Value);
-		if (!this->Type->BoolFlag[FAUNA_INDEX].value && !this->Name.empty() && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
-			this->Name += " " + this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
+	}
+	
+	CFaction *faction = NULL;
+	if (this->Player->Race != -1 && this->Player->Faction != -1) {
+		faction = PlayerRaces.Factions[this->Player->Faction];
+	}
+	
+	if (!this->Type->IsPersonalNameValid(this->Name, faction, this->Variable[GENDER_INDEX].Value)) {
+		// first see if can translate the current personal name
+		std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
+		if (!new_personal_name.empty()) {
+			this->Name = new_personal_name;
+		} else {
+			this->Name = this->Type->GeneratePersonalName(faction, this->Variable[GENDER_INDEX].Value);
 		}
 	}
 	
 	if (update_settlement_name && (this->Type->BoolFlag[TOWNHALL_INDEX].value || (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Settlement))) {
 		this->UpdateSettlement();
+	}
+}
+
+void CUnit::UpdateExtraName()
+{
+	if (this->Character != NULL || !this->Type->BoolFlag[ORGANIC_INDEX].value || this->Type->BoolFlag[FAUNA_INDEX].value) {
+		return;
+	}
+	
+	if (this->Trait == NULL) {
+		return;
+	}
+	
+	this->ExtraName.clear();
+	
+	if (this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
+		this->ExtraName = this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
 	}
 }
 
@@ -6183,7 +6208,23 @@ std::string CUnit::GetName() const
 		}
 	}
 	
-	return this->Name;
+	std::string name = this->Name;
+	
+	if (name.empty()) {
+		return name;
+	}
+	
+	if (!this->ExtraName.empty()) {
+		name += " ";
+		name += this->ExtraName;
+	}
+
+	if (!this->FamilyName.empty()) {
+		name += " ";
+		name += this->FamilyName;
+	}
+	
+	return name;
 }
 
 std::string CUnit::GetTypeName() const

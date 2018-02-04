@@ -937,6 +937,32 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 		return "";
 	}
 	
+	std::vector<std::string> potential_names = this->GetPotentialPersonalNames(faction, gender);
+	
+	if (potential_names.size() > 0) {
+		return potential_names[SyncRand(potential_names.size())];
+	}
+
+	return "";
+}
+
+bool CUnitType::IsPersonalNameValid(std::string name, CFaction *faction, int gender) const
+{
+	if (name.empty()) {
+		return false;
+	}
+	
+	std::vector<std::string> potential_names = this->GetPotentialPersonalNames(faction, gender);
+	
+	if (std::find(potential_names.begin(), potential_names.end(), name) != potential_names.end()) {
+		return true;
+	}
+
+	return false;
+}
+
+std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction, int gender) const
+{
 	std::vector<std::string> potential_names;
 	
 	if (this->PersonalNames.find(NoGender) != this->PersonalNames.end()) {
@@ -953,7 +979,7 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 	if (potential_names.size() == 0 && this->Civilization != -1) {
 		int civilization_id = this->Civilization;
 		if (civilization_id != -1) {
-			if (faction && civilization_id != faction->Civilization && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization]) {
+			if (faction && civilization_id != faction->Civilization && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization] && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
 				civilization_id = faction->Civilization;
 			}
 			CCivilization *civilization = PlayerRaces.Civilizations[civilization_id];
@@ -977,27 +1003,23 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 				}
 			} else {
 				if (this->Class != -1 && civilization->GetUnitClassNames(this->Class).size() > 0) {
-					return civilization->GetUnitClassNames(this->Class)[SyncRand(civilization->GetUnitClassNames(this->Class).size())];
+					return civilization->GetUnitClassNames(this->Class);
 				}
 				
 				if (this->UnitType == UnitTypeNaval) { // if is a ship
 					if (faction && faction->GetShipNames().size() > 0) {
-						return faction->GetShipNames()[SyncRand(faction->GetShipNames().size())];
+						return faction->GetShipNames();
 					}
 					
 					if (civilization->GetShipNames().size() > 0) {
-						return civilization->GetShipNames()[SyncRand(civilization->GetShipNames().size())];
+						return civilization->GetShipNames();
 					}
 				}
 			}
 		}
 	}
 	
-	if (potential_names.size() > 0) {
-		return potential_names[SyncRand(potential_names.size())];
-	}
-
-	return "";
+	return potential_names;
 }
 //Wyrmgus end
 
