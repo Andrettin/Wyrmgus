@@ -4334,6 +4334,10 @@ bool CPlayer::HasNeutralFactionType() const
 */
 bool CPlayer::HasBuildingAccess(const CPlayer &player, int button_action) const
 {
+	if (player.IsEnemy(*this)) {
+		return false;
+	}
+	
 	if (player.Type == PlayerNeutral) {
 		return true;
 	}
