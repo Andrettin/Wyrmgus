@@ -588,7 +588,19 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 		// 2) Buffs...
 		HandleBuffsEachSecond(unit);
-		
+	}
+}
+
+template <typename UNITP_ITERATOR>
+static void UnitActionsEachFiveSeconds(UNITP_ITERATOR begin, UNITP_ITERATOR end)
+{
+	for (UNITP_ITERATOR it = begin; it != end; ++it) {
+		CUnit &unit = **it;
+
+		if (unit.Destroyed) {
+			continue;
+		}
+
 		//if the unit is garrisoned within a building that provides garrison training, increase its XP
 		if (unit.Container && unit.Container->Type->BoolFlag[GARRISONTRAINING_INDEX].value) {
 			unit.ChangeExperience(1);
@@ -714,6 +726,10 @@ void UnitActions()
 	// Check for things that only happen every second
 	if (isASecondCycle) {
 		UnitActionsEachSecond(table.begin(), table.end());
+	}
+	
+	if ((GameCycle % (CYCLES_PER_SECOND * 5)) == 0) {
+		UnitActionsEachFiveSeconds(table.begin(), table.end());
 	}
 	// Do all actions
 	UnitActionsEachCycle(table.begin(), table.end());
