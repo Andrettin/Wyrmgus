@@ -153,37 +153,10 @@
 		}
 		//Wyrmgus start
 		caster.Player->UnitTypeKills[target->Type->Slot]++;
-		/*
-		if (UseHPForXp) {
-			caster.Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;
-		} else {
-			caster.Variable[XP_INDEX].Max += target->Variable[POINTS_INDEX].Value;
-		}
-		caster.Variable[XP_INDEX].Value = caster.Variable[XP_INDEX].Max;
-		*/
 		
 		//distribute experience between nearby units belonging to the same player
 		if (!target->Type->BoolFlag[BUILDING_INDEX].value) {
-			std::vector<CUnit *> table;
-			SelectAroundUnit(caster, 6, table, MakeAndPredicate(HasSamePlayerAs(*caster.Player), IsNotBuildingType()));
-
-			if (UseHPForXp) {
-				caster.Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value / (table.size() + 1);
-			} else {
-				caster.Variable[XP_INDEX].Max += target->Variable[POINTS_INDEX].Value / (table.size() + 1);
-			}
-			caster.Variable[XP_INDEX].Value = caster.Variable[XP_INDEX].Max;
-			caster.XPChanged();
-
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (UseHPForXp) {
-					table[i]->Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value / (table.size() + 1);
-				} else {
-					table[i]->Variable[XP_INDEX].Max += target->Variable[POINTS_INDEX].Value / (table.size() + 1);
-				}
-				table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
-				table[i]->XPChanged();
-			}
+			caster.ChangeExperience(UseHPForXp ? target->Variable[HP_INDEX].Value : target->Variable[POINTS_INDEX].Value, ExperienceRange);
 		}
 		//Wyrmgus end
 		caster.Variable[KILL_INDEX].Value++;

@@ -679,6 +679,32 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	replaced_unit.Release();
 }
 
+void CUnit::ChangeExperience(int amount, int around_range)
+{
+	std::vector<CUnit *> table;
+	if (around_range > 0) {
+		SelectAroundUnit(*this, around_range, table, MakeAndPredicate(HasSamePlayerAs(*this->Player), IsNotBuildingType()));
+	}
+	
+	amount /= 1 + table.size();
+
+	if (this->Type->BoolFlag[ORGANIC_INDEX].value) {
+		this->Variable[XP_INDEX].Max += amount;
+		this->Variable[XP_INDEX].Value = this->Variable[XP_INDEX].Max;
+		this->XPChanged();
+	}
+
+	if (around_range > 0) {
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (table[i]->Type->BoolFlag[ORGANIC_INDEX].value) {
+				table[i]->Variable[XP_INDEX].Max += amount;
+				table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
+				table[i]->XPChanged();
+			}
+		}
+	}
+}
+
 void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 {
 	while (level_quantity > 0) {
@@ -6635,41 +6661,16 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	} else {
 		attacker.Player->TotalKills++;
 	}
+	
 	//Wyrmgus start
 	attacker.Player->UnitTypeKills[target.Type->Slot]++;
-	/*
-	if (UseHPForXp) {
-		attacker.Variable[XP_INDEX].Max += target.Variable[HP_INDEX].Value;
-	} else {
-		attacker.Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value;
-	}
-	attacker.Variable[XP_INDEX].Value = attacker.Variable[XP_INDEX].Max;
-	*/
 	
 	//distribute experience between nearby units belonging to the same player
 	if (!target.Type->BoolFlag[BUILDING_INDEX].value) {
-		std::vector<CUnit *> table;
-		SelectAroundUnit(attacker, 6, table, MakeAndPredicate(HasSamePlayerAs(*attacker.Player), IsNotBuildingType()));
-
-		if (UseHPForXp) {
-			attacker.Variable[XP_INDEX].Max += target.Variable[HP_INDEX].Value / (table.size() + 1);
-		} else {
-			attacker.Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value / (table.size() + 1);
-		}
-		attacker.Variable[XP_INDEX].Value = attacker.Variable[XP_INDEX].Max;
-		attacker.XPChanged();
-
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (UseHPForXp) {
-				table[i]->Variable[XP_INDEX].Max += target.Variable[HP_INDEX].Value / (table.size() + 1);
-			} else {
-				table[i]->Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value / (table.size() + 1);
-			}
-			table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
-			table[i]->XPChanged();
-		}
+		attacker.ChangeExperience(UseHPForXp ? target.Variable[HP_INDEX].Value : target.Variable[POINTS_INDEX].Value, ExperienceRange);
 	}
 	//Wyrmgus end
+	
 	attacker.Variable[KILL_INDEX].Value++;
 	attacker.Variable[KILL_INDEX].Max++;
 	attacker.Variable[KILL_INDEX].Enable = 1;
@@ -6728,32 +6729,13 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 		}
 		target.Variable[HP_INDEX].Value -= damage - shieldDamage;
 	}
-	//Wyrmgus start
-	/*
-	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
-		attacker->Variable[XP_INDEX].Value += damage;
-		attacker->Variable[XP_INDEX].Max += damage;
-	}
-	*/
 	
+	//Wyrmgus start
 	//distribute experience between nearby units belonging to the same player
 
-	//Wyrmgus start
 //	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
 	if (UseHPForXp && attacker && (target.IsEnemy(*attacker) || target.Player->Type == PlayerNeutral) && !target.Type->BoolFlag[BUILDING_INDEX].value) {
-	//Wyrmgus end
-		std::vector<CUnit *> table;
-		SelectAroundUnit(*attacker, 6, table, MakeAndPredicate(HasSamePlayerAs(*attacker->Player), IsNotBuildingType()));
-
-		attacker->Variable[XP_INDEX].Value += damage / (table.size() + 1);
-		attacker->Variable[XP_INDEX].Max += damage / (table.size() + 1);
-		attacker->XPChanged();
-
-		for (size_t i = 0; i != table.size(); ++i) {
-			table[i]->Variable[XP_INDEX].Value += damage / (table.size() + 1);
-			table[i]->Variable[XP_INDEX].Max += damage / (table.size() + 1);
-			table[i]->XPChanged();
-		}
+		attacker->ChangeExperience(damage, ExperienceRange);
 	}
 	//Wyrmgus end
 	

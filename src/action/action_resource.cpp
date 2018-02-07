@@ -1399,9 +1399,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
 	int xp_gained = unit.ResourcesHeld;
 	xp_gained /= 20;
-	unit.Variable[XP_INDEX].Max += xp_gained;
-	unit.Variable[XP_INDEX].Value = unit.Variable[XP_INDEX].Max;
-	unit.XPChanged();
+	unit.ChangeExperience(xp_gained);
 	
 	//update quests
 	for (size_t i = 0; i < player.QuestObjectives.size(); ++i) {

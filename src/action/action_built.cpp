@@ -280,9 +280,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			
 			//Wyrmgus start
 			// give experience to the builder
-			worker->Variable[XP_INDEX].Max += xp_gained / worker_count;
-			worker->Variable[XP_INDEX].Value = worker->Variable[XP_INDEX].Max;
-			worker->XPChanged();
+			worker->ChangeExperience(xp_gained / worker_count);
 			//Wyrmgus end
 		}
 	}
@@ -290,9 +288,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus start
 	for (size_t i = 0; i != table.size(); ++i) { // also give experience to all other workers who helped build the structure
 		if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
-			table[i]->Variable[XP_INDEX].Max += xp_gained / worker_count;
-			table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
-			table[i]->XPChanged();
+			table[i]->ChangeExperience(xp_gained / worker_count);
 		}
 	}
 			

@@ -588,6 +588,11 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		}
 		// 2) Buffs...
 		HandleBuffsEachSecond(unit);
+		
+		//if the unit is garrisoned within a building that provides garrison training, increase its XP
+		if (unit.Container && unit.Container->Type->BoolFlag[GARRISONTRAINING_INDEX].value) {
+			unit.ChangeExperience(1);
+		}
 	}
 }
 

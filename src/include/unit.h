@@ -92,6 +92,12 @@ typedef COrder *COrderPtr;
 #define AIPRIORITY_BONUS  0x04000000
 
 
+
+//the range in which experience is distributed
+#define ExperienceRange 6
+
+
+
 /// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
 
@@ -197,6 +203,7 @@ public:
 	void SetResourcesHeld(int quantity);
 	void ChangeResourcesHeld(int quantity);
 	void ReplaceOnTop(CUnit &replaced_unit);
+	void ChangeExperience(int amount, int around_range = 0); //around_range is the range around the unit that other units of the same player will receive experience
 	void IncreaseLevel(int level_quantity, bool automatic_learning = true);
 	void Retrain();
 	void HealingItemAutoUse();
