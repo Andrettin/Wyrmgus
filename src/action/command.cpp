@@ -868,7 +868,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 */
 //Wyrmgus start
 //void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
-void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z)
+void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z, CSettlement *settlement)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
@@ -894,7 +894,7 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 	}
 	//Wyrmgus start
 //	*order = COrder::NewActionBuild(unit, pos, what);
-	*order = COrder::NewActionBuild(unit, pos, what, z);
+	*order = COrder::NewActionBuild(unit, pos, what, z, settlement);
 	//Wyrmgus end
 	ClearSavedAction(unit);
 }
@@ -920,7 +920,7 @@ void CommandDismiss(CUnit &unit, bool salvage)
 					&& table[i]->CurrentOrder()->GetGoal() == &unit
 				) {
 					if (unit.Player->Index == ThisPlayer->Index) {
-						ThisPlayer->Notify(NotifyRed, unit.tilePos, unit.MapLayer, "%s", _("Cannot salvage if enemies are attacking the building."));
+						ThisPlayer->Notify(NotifyRed, unit.tilePos, unit.MapLayer, "%s", _("Cannot salvage if enemies are attacking it."));
 					}
 					return;
 				}

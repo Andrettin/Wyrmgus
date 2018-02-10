@@ -2245,6 +2245,7 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 {
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		DefaultResourceNames[i].clear();
+		Resources[i].ID = i;
 	}
 	const unsigned int args = lua_gettop(l);
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {

@@ -113,9 +113,12 @@ public:
 		LuxuryResource(false), Hidden(false)
 	{
 	}
+	
+	bool IsMineResource() const;
 
 	std::string Name;
 	std::string ActionName;
+	int ID;
 	int DefaultIncome;
 	int DefaultAmount;
 	int DefaultMaxAmount;

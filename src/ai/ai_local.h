@@ -53,6 +53,7 @@ class CUnit;
 class CUnitType;
 class CUpgrade;
 class CPlayer;
+class CSettlement;
 
 /**
 **  Ai Type structure.
@@ -285,7 +286,7 @@ class AiBuildQueue
 public:
 	//Wyrmgus start
 //	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0)
-	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0), MapLayer(0), Landmass(0)
+	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0), MapLayer(0), Landmass(0), Settlement(NULL)
 	//Wyrmgus end
 	{
 		Pos.x = Pos.y = -1;
@@ -300,6 +301,7 @@ public:
 	//Wyrmgus start
 	int MapLayer;
 	int Landmass;
+	CSettlement *Settlement;
 	//Wyrmgus end
 };
 
@@ -426,7 +428,7 @@ public:
 	** The index is the resource id - 1 (we can't mine TIME), giving a table of all
 	** units/buildings/mines which can harvest this resource.
 	*/
-	std::vector<std::vector<CUnitType *> > Refinery;
+	std::vector<std::vector<CUnitType *> > Mines;
 
 	/**
 	** The index is the resource id - 1 (we can't store TIME), giving a table of all
@@ -505,7 +507,7 @@ extern PlayerAi *AiPlayer; /// Current AI player
 /// Add unit-type request to resource manager
 //Wyrmgus start
 //extern void AiAddUnitTypeRequest(CUnitType &type, int count);
-extern void AiAddUnitTypeRequest(CUnitType &type, int count, int landmass = 0);
+extern void AiAddUnitTypeRequest(CUnitType &type, int count, int landmass = 0, CSettlement *settlement = NULL);
 //Wyrmgus end
 /// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(CUnitType &type);
@@ -543,7 +545,7 @@ extern void AiCheckBuildings();
 /// Find nice building place
 //Wyrmgus start
 //extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos);
-extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0);
+extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, CSettlement *settlement = NULL);
 //Wyrmgus end
 
 //

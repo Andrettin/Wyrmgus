@@ -64,7 +64,7 @@
 
 //Wyrmgus start
 //extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass);
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const CSettlement *settlement);
 //Wyrmgus end
 
 /* static */ COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
@@ -468,7 +468,7 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
-	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, Map.GetTileLandmass(unit.tilePos, unit.MapLayer));
+	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type, Map.GetTileLandmass(unit.tilePos, unit.MapLayer), unit.Settlement);
 	//Wyrmgus end
 }
 

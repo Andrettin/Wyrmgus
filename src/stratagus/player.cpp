@@ -1935,6 +1935,33 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	return false;
 }
 
+CSettlement *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
+{
+	CUnit *best_hall = NULL;
+	int best_distance = -1;
+	
+	for (size_t i = 0; i < Map.SettlementUnits.size(); ++i) {
+		CUnit *settlement_unit = Map.SettlementUnits[i];
+		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer) {
+			continue;
+		}
+		if (!this->HasNeutralFactionType() && this != settlement_unit->Player) {
+			continue;
+		}
+		int distance = MapDistance(size, pos, z, Vec2i(settlement_unit->Type->TileWidth, settlement_unit->Type->TileHeight), settlement_unit->tilePos, settlement_unit->MapLayer);
+		if (!best_hall || distance < best_distance) {
+			best_hall = settlement_unit;
+			best_distance = distance;
+		}
+	}
+	
+	if (best_hall) {
+		return best_hall->Settlement;
+	} else {
+		return NULL;
+	}
+}
+
 bool CPlayer::HasUnitBuilder(const CUnitType *type, const CSettlement *settlement) const
 {
 	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {

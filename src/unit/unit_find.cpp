@@ -1728,4 +1728,55 @@ CUnit *AttackUnitsInReactRange(const CUnit &unit, bool include_neutral)
 	//Wyrmgus end
 }
 
+class PathwayConnectionFinder
+{
+public:
+	PathwayConnectionFinder(const CUnit &src_unit, const CUnit &dst_unit, unsigned int flags, bool *result) :
+	//Wyrmgus end
+		src_unit(src_unit),
+		dst_unit(dst_unit),
+		flags(flags),
+		result(result)
+	{
+	}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	const CUnit &src_unit;
+	const CUnit &dst_unit;
+	unsigned int flags;
+	bool *result;
+};
+
+VisitResult PathwayConnectionFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+	if (pos.x >= dst_unit.tilePos.x && pos.x <= (dst_unit.tilePos.x + dst_unit.Type->TileWidth - 1) && pos.y >= dst_unit.tilePos.y && pos.y <= (dst_unit.tilePos.y + dst_unit.Type->TileHeight - 1)) {
+		*result = true;
+		return VisitResult_Finished;
+	}
+	
+	if (!Map.Field(pos, src_unit.MapLayer)->CheckMask(flags)) {
+		return VisitResult_DeadEnd;
+	}
+	
+	return VisitResult_Ok;
+}
+
+bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsigned int flags)
+{
+	TerrainTraversal terrainTraversal;
+
+	terrainTraversal.SetSize(Map.Info.MapWidths[src_unit.MapLayer], Map.Info.MapHeights[src_unit.MapLayer]);
+	terrainTraversal.Init();
+
+	terrainTraversal.PushUnitPosAndNeighboor(src_unit);
+
+	bool result = false;
+
+	PathwayConnectionFinder pathwayConnectionUnitFinder(src_unit, dst_unit, flags, &result);
+
+	terrainTraversal.Run(pathwayConnectionUnitFinder);
+	
+	return result;
+}
+
 //@}

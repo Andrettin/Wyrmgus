@@ -550,6 +550,11 @@ std::string GetResourceNameById(int resource_id)
 		return "";
 	}
 }
+
+bool CResource::IsMineResource() const
+{
+	return this->ID == CopperCost || this->ID == SilverCost || this->ID == GoldCost || this->ID == IronCost || this->ID == MithrilCost || this->ID == CoalCost || this->ID == DiamondsCost || this->ID == EmeraldsCost;
+}
 //Wyrmgus end
 
 CUnitType::CUnitType() :

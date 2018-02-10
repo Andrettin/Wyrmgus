@@ -3299,27 +3299,7 @@ void CUnit::UpdateSettlement()
 			return;
 		}
 		
-		CUnit *best_hall = NULL;
-		int best_distance = -1;
-		for (size_t i = 0; i < Map.SettlementUnits.size(); ++i) {
-			CUnit *settlement_unit = Map.SettlementUnits[i];
-			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || this->MapLayer != settlement_unit->MapLayer) {
-				continue;
-			}
-			if (!this->Player->HasNeutralFactionType() && this->Player != settlement_unit->Player) {
-				continue;
-			}
-			int distance = this->MapDistanceTo(*settlement_unit);
-			if (!best_hall || distance < best_distance) {
-				best_hall = settlement_unit;
-				best_distance = distance;
-			}
-		}
-		if (best_hall) {
-			this->Settlement = best_hall->Settlement;
-		} else {
-			this->Settlement = NULL;
-		}
+		this->Settlement = this->Player->GetNearestSettlement(this->tilePos, this->MapLayer, Vec2i(this->Type->TileWidth, this->Type->TileHeight));
 	}
 }
 
@@ -7238,24 +7218,30 @@ int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, int src_z, const CUnitType &dst, const Vec2i &pos2, int dst_z)
 //Wyrmgus end
 {
-	//Wyrmgus start
+	Vec2i src_size(src.TileWidth, src.TileHeight);
+	Vec2i dst_size(dst.TileWidth, dst.TileHeight);
+	
+	return MapDistance(src_size, pos1, src_z, dst_size, pos2, dst_z);
+}
+
+int MapDistance(const Vec2i &src_size, const Vec2i &pos1, int src_z, const Vec2i &dst_size, const Vec2i &pos2, int dst_z)
+{
 	if (src_z != dst_z) {
 		return 16384;
 	}
-	//Wyrmgus end
 	
 	int dx;
 	int dy;
 
-	if (pos1.x + src.TileWidth <= pos2.x) {
-		dx = std::max<int>(0, pos2.x - pos1.x - src.TileWidth + 1);
+	if (pos1.x + src_size.x <= pos2.x) {
+		dx = std::max<int>(0, pos2.x - pos1.x - src_size.x + 1);
 	} else {
-		dx = std::max<int>(0, pos1.x - pos2.x - dst.TileWidth + 1);
+		dx = std::max<int>(0, pos1.x - pos2.x - dst_size.x + 1);
 	}
-	if (pos1.y + src.TileHeight <= pos2.y) {
-		dy = pos2.y - pos1.y - src.TileHeight + 1;
+	if (pos1.y + src_size.y <= pos2.y) {
+		dy = pos2.y - pos1.y - src_size.y + 1;
 	} else {
-		dy = std::max<int>(0, pos1.y - pos2.y - dst.TileHeight + 1);
+		dy = std::max<int>(0, pos1.y - pos2.y - dst_size.y + 1);
 	}
 	return isqrt(dy * dy + dx * dx);
 }

@@ -237,6 +237,7 @@ public:
 	bool HasUpgradeClass(int upgrade_class);
 	bool HasSettlement(CSettlement *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
+	CSettlement *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
 	bool HasUnitBuilder(const CUnitType *type, const CSettlement *settlement = NULL) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);

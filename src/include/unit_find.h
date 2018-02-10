@@ -504,6 +504,7 @@ extern CUnit *AttackUnitsInRange(const CUnit &unit);
 //extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
 extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, bool include_neutral = false);
 extern CUnit *AttackUnitsInReactRange(const CUnit &unit, bool include_neutral = false);
+extern bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsigned int flags);
 //Wyrmgus end
 
 

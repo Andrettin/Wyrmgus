@@ -295,13 +295,15 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 				for (size_t z = 0; z < UnitTypes.size(); ++z) {
 					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
 						if (CheckDependByType(*unit.Player, *UnitTypes[z])) {
-							dest.Blink = 4;
-							SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush, dest.MapLayer);
-							if (!acknowledged) {
-								PlayUnitSound(unit, VoiceBuild);
-								acknowledged = 1;
+							if (UnitTypes[z]->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[UnitTypes[z]->Slot].begin(), AiHelpers.Build[UnitTypes[z]->Slot].end(), unit.Type) != AiHelpers.Build[UnitTypes[z]->Slot].end()) {
+								dest.Blink = 4;
+								SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush, dest.MapLayer);
+								if (!acknowledged) {
+									PlayUnitSound(unit, VoiceBuild);
+									acknowledged = 1;
+								}
+								break;
 							}
-							break;
 						} else if (CheckDependByType(*unit.Player, *UnitTypes[z], false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
 							ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer, "%s", _("The requirements have not been fulfilled"));
 							break;

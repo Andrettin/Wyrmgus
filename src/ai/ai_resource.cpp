@@ -64,7 +64,7 @@
 
 //Wyrmgus start
 //static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
-static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0);
+static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, CSettlement *settlement = NULL);
 //Wyrmgus end
 
 /**
@@ -290,7 +290,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 */
 //Wyrmgus start
 //static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
-static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0)
+static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, CSettlement *settlement = NULL)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -368,11 +368,11 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	// Find a place to build.
 	//Wyrmgus start
 //	if (AiFindBuildingPlace(unit, building, nearPos, &pos)) {
-	if (AiFindBuildingPlace(unit, building, nearPos, &pos, true, z, landmass)) {
+	if (AiFindBuildingPlace(unit, building, nearPos, &pos, true, z, landmass, settlement)) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		CommandBuildBuilding(unit, pos, building, FlushCommands);
-		CommandBuildBuilding(unit, pos, building, FlushCommands, z);
+		CommandBuildBuilding(unit, pos, building, FlushCommands, z, settlement);
 		//Wyrmgus end
 		return 1;
 	//Wyrmgus start
@@ -527,10 +527,10 @@ void AiNewDepotRequest(CUnit &worker)
 
 	AiGetBuildRequestsCount(*worker.Player->Ai, counter);
 
-	const int n = AiHelpers.Depots[resource - 1].size();
+	const int n = AiHelpers.Depots[resource].size();
 
 	for (int i = 0; i < n; ++i) {
-		CUnitType &type = *AiHelpers.Depots[resource - 1][i];
+		CUnitType &type = *AiHelpers.Depots[resource][i];
 
 		if (counter[type.Slot]) { // Already ordered.
 			return;
@@ -896,7 +896,7 @@ static bool AiRequestSupply()
 */
 //Wyrmgus start
 //static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
-static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0)
+static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0, CSettlement *settlement = NULL)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -907,6 +907,10 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0
 
 		//Wyrmgus start
 		if (landmass && Map.GetTileLandmass(unit.tilePos, unit.MapLayer) != landmass) {
+			continue;
+		}
+		
+		if (settlement && unit.Settlement != settlement) {
 			continue;
 		}
 		//Wyrmgus end
@@ -933,7 +937,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0
 */
 //Wyrmgus start
 //static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
-static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass)
+static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass, CSettlement *settlement)
 //Wyrmgus end
 {
 	// Find equivalents unittypes.
@@ -975,14 +979,14 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int la
 				if (type.BoolFlag[BUILDING_INDEX].value) {
 					//Wyrmgus start
 //					if (AiBuildBuilding(*table[i], type, nearPos)) {
-					if (AiBuildBuilding(*table[i], type, nearPos, z, landmass)) {
+					if (AiBuildBuilding(*table[i], type, nearPos, z, landmass, settlement)) {
 					//Wyrmgus end
 						return 1;
 					}
 				} else {
 					//Wyrmgus start
 //					if (AiTrainUnit(*table[i], type)) {
-					if (AiTrainUnit(*table[i], type, landmass)) {
+					if (AiTrainUnit(*table[i], type, landmass, settlement)) {
 					//Wyrmgus end
 						return 1;
 					}
@@ -1183,7 +1187,7 @@ static void AiCheckingWork()
 		} else if (queuep->Want > queuep->Made && queuep->Wait <= GameCycle) {
 			//Wyrmgus start
 //			if (AiMakeUnit(type, queuep->Pos)) {
-			if (AiMakeUnit(type, queuep->Pos, queuep->MapLayer, queuep->Landmass)) {
+			if (AiMakeUnit(type, queuep->Pos, queuep->MapLayer, queuep->Landmass, queuep->Settlement)) {
 			//Wyrmgus end
 				++queuep->Made;
 				queuep->Wait = 0;
@@ -1272,12 +1276,16 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 			CommandResource(unit, *mine, FlushCommands);
 			return 1;
 		} else { // if the resource isn't readily harvestable (but is a deposit), build a mine there
-			const int n = AiHelpers.Refinery[mine->GivesResource - 1].size();
+			const int n = AiHelpers.Mines[mine->GivesResource].size();
 
 			for (int i = 0; i < n; ++i) {
-				CUnitType &type = *AiHelpers.Refinery[mine->GivesResource - 1][i];
+				CUnitType &type = *AiHelpers.Mines[mine->GivesResource][i];
 
-				if (CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer)) {
+				if (
+					type.Slot < (int) AiHelpers.Build.size()
+					&& std::find(AiHelpers.Build[type.Slot].begin(), AiHelpers.Build[type.Slot].end(), &type) != AiHelpers.Build[type.Slot].end()
+					&& CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer)
+				) {
 					CommandBuildBuilding(unit, mine->tilePos, type, FlushCommands, mine->MapLayer);
 					return 1;
 				}
@@ -2222,7 +2230,7 @@ static void AiCheckPathwayConstruction()
 				bool built_pathway = false;
 					
 				for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
-					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && unit.GivesResource != CopperCost && unit.GivesResource != SilverCost && unit.GivesResource != GoldCost && unit.GivesResource != IronCost && unit.GivesResource != MithrilCost && unit.GivesResource != CoalCost && unit.GivesResource != DiamondsCost && unit.GivesResource != EmeraldsCost) { //build roads around buildings, not railroads (except for mines)
+					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && (unit.GivesResource == -1 || !Resources[unit.GivesResource].IsMineResource())) { //build roads around buildings, not railroads (except for mines)
 						continue;
 					}
 						
@@ -2560,6 +2568,123 @@ void AiCheckBuildings()
 		fprintf(stderr, "Unit type \"%s\" is in an AiBuildingTemplate, but it cannot be built by any worker, and no unit type can upgrade to it.\n", type->Ident.c_str());
 	}
 }
+
+static void AiCheckMinecartConstruction()
+{
+	int minecart_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("minecart"));
+	if (minecart_type_id == -1) {
+		return;
+	}
+	
+	CUnitType *minecart_type = UnitTypes[minecart_type_id];
+		
+	if (!AiRequestedTypeAllowed(*AiPlayer->Player, *minecart_type, false, false)) {
+		return;
+	}
+	
+	int max_minecarts = 5;
+	int minecart_count = AiGetUnitTypeCount(*AiPlayer, minecart_type, 0, true, false);
+	
+	if (minecart_count >= max_minecarts) {
+		return;
+	}
+	
+	std::vector<CSettlement *> potential_settlements;
+		
+	for (int res = 0; res < MaxCosts; ++res) {
+		if (res >= (int) AiHelpers.Mines.size()) {
+			break;
+		}
+		if (!minecart_type->ResInfo[res]) {
+			continue;
+		}
+				
+		for (size_t i = 0; i < AiHelpers.Mines[res].size(); ++i) {
+			CUnitType &mine_type = *AiHelpers.Mines[res][i];
+					
+			std::vector<CUnit *> mine_table;
+			FindPlayerUnitsByType(*AiPlayer->Player, mine_type, mine_table, true);
+					
+			for (size_t j = 0; j < mine_table.size(); ++j) {
+				const CUnit *mine_unit = mine_table[j];
+						
+				if (!mine_unit->Settlement) {
+					continue;
+				}
+						
+				const CUnit *town_hall_unit = mine_unit->Settlement->SettlementUnit;
+				
+				if (!town_hall_unit) {
+					continue;
+				}
+				
+				if (CheckPathwayConnection(*mine_unit, *town_hall_unit, MapFieldRailroad)) {
+					potential_settlements.push_back(mine_unit->Settlement);
+				}
+			}
+		}
+	}
+	
+	if (potential_settlements.size() > 0) {
+		AiAddUnitTypeRequest(*minecart_type, 1, 0, potential_settlements[SyncRand(potential_settlements.size())]);
+	}
+}
+
+static void AiCheckMinecartSalvaging()
+{
+	int minecart_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("minecart"));
+	if (minecart_type_id == -1) {
+		return;
+	}
+	
+	CUnitType *minecart_type = UnitTypes[minecart_type_id];
+	std::vector<CUnit *> minecart_table;
+	FindPlayerUnitsByType(*AiPlayer->Player, *minecart_type, minecart_table, true);
+	
+	for (size_t i = 0; i < minecart_table.size(); ++i) {
+		CUnit *minecart_unit = minecart_table[i];
+		
+		if (!minecart_unit->IsIdle()) {
+			continue;
+		}
+		
+		bool has_accessible_mine = false;
+		
+		for (int res = 0; res < MaxCosts; ++res) {
+			if (!minecart_type->ResInfo[res]) {
+				continue;
+			}
+			
+			if (UnitFindResource(*minecart_unit, *minecart_unit, 1000, res, false, NULL, true, true, false, false, true)) {
+				has_accessible_mine = true;
+			}
+		}
+		
+		//salvage minecarts that have no accessible mines
+		if (!has_accessible_mine) {
+			CommandDismiss(*minecart_unit, true);
+		}
+	}
+}
+	
+void AiCheckWorkers()
+{
+	if (AiPlayer->Player->Race == -1 || AiPlayer->Player->Faction == -1) {
+		return;
+	}
+
+	if (AiPlayer->Player->AiName == "passive") {
+		return;
+	}
+	
+	AiCheckMinecartSalvaging();
+	
+	if (AiPlayer->Player->NumTownHalls < 1) { //don't train workers if has no town hall yet
+		return;
+	}
+
+	AiCheckMinecartConstruction();
+}
 //Wyrmgus end
 
 /**
@@ -2572,7 +2697,7 @@ void AiCheckBuildings()
 */
 //Wyrmgus start
 //void AiAddUnitTypeRequest(CUnitType &type, int count)
-void AiAddUnitTypeRequest(CUnitType &type, int count, int landmass)
+void AiAddUnitTypeRequest(CUnitType &type, int count, int landmass, CSettlement *settlement)
 //Wyrmgus end
 {
 	AiBuildQueue queue;
@@ -2582,6 +2707,7 @@ void AiAddUnitTypeRequest(CUnitType &type, int count, int landmass)
 	queue.Made = 0;
 	//Wyrmgus start
 	queue.Landmass = landmass;
+	queue.Settlement = settlement;
 	//Wyrmgus end
 	AiPlayer->UnitTypeBuilt.push_back(queue);
 }
@@ -2634,6 +2760,7 @@ void AiResourceManager()
 	
 	//Wyrmgus start
 	AiCheckPathwayConstruction();
+	AiCheckWorkers();
 	//Wyrmgus end
 
 	AiPlayer->NeededMask = 0;

@@ -108,6 +108,8 @@ extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1,
 //								   const CUnitType &dst, const Vec2i &pos2);
 								   const CUnitType &dst, const Vec2i &pos2, int dst_z);
 								   //Wyrmgus end
+								   
+extern int MapDistance(const Vec2i &src_size, const Vec2i &pos1, int src_z, const Vec2i &dst_size, const Vec2i &pos2, int dst_z);
 
 /**
 **  Unit/Missile headings.

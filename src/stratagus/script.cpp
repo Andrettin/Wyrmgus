@@ -1404,10 +1404,10 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitSettlementName : // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL && unit->Settlement != NULL) {
-				int civilization = unit->Type->Civilization;
-				if (civilization != -1 && unit->Player->Faction != -1 && (unit->Player->Race == civilization || unit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Player->Faction, unit->Type->Class))) {
-					civilization = unit->Player->Race;
+			if (unit != NULL && unit->Settlement != NULL && unit->Settlement->SettlementUnit != NULL) {
+				int civilization = unit->Settlement->SettlementUnit->Type->Civilization;
+				if (civilization != -1 && unit->Settlement->SettlementUnit->Player->Faction != -1 && (unit->Settlement->SettlementUnit->Player->Race == civilization || unit->Settlement->SettlementUnit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Settlement->SettlementUnit->Player->Faction, unit->Settlement->SettlementUnit->Type->Class))) {
+					civilization = unit->Settlement->SettlementUnit->Player->Race;
 				}
 				return unit->Settlement->GetCulturalName(civilization);
 			} else {

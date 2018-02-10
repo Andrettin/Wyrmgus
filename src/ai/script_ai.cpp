@@ -205,7 +205,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 **
 **  @note Better (MaxOnBoard / cost) first.
 */
-static std::vector<CUnitType *> getRefineryUnits()
+static std::vector<CUnitType *> getMineUnits()
 {
 	std::vector<CUnitType *> res;
 
@@ -306,7 +306,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 	AiHelpers.Research.clear();
 	AiHelpers.Repair.clear();
 	AiHelpers.UnitLimit.clear();
-	AiHelpers.Refinery.clear();
+	AiHelpers.Mines.clear();
 	AiHelpers.Depots.clear();
 	AiHelpers.SellMarkets.clear();
 	AiHelpers.BuyMarkets.clear();
@@ -322,7 +322,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 	std::vector<CUnitType *> reparableUnits = getReparableUnits();
 	std::vector<CUnitType *> supplyUnits = getSupplyUnits();
-	std::vector<CUnitType *> mineUnits = getRefineryUnits();
+	std::vector<CUnitType *> mineUnits = getMineUnits();
 	//Wyrmgus start
 	std::vector<CUnitType *> market_units = GetMarketUnits();
 	std::vector<CUnitType *> naval_transporter_units = GetNavalTransporterUnits();
@@ -343,16 +343,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 	for (int i = 1; i < MaxCosts; ++i) {
 		for (std::vector<CUnitType *>::const_iterator j = mineUnits.begin(); j != mineUnits.end(); ++j) {
 			if ((*j)->GivesResource == i) {
-				/* HACK : we can't mine TIME then use 0 as 1 */
-				AiHelperInsert(aiHelper.Refinery, i - 1, **j);
+				AiHelperInsert(aiHelper.Mines, i, **j);
 			}
 		}
 		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin(); d != UnitTypes.end(); ++d) {
 			CUnitType &type = **d;
 
 			if (type.CanStore[i] > 0) {
-				/* HACK : we can't store TIME then use 0 as 1 */
-				AiHelperInsert(aiHelper.Depots, i - 1, type);
+				AiHelperInsert(aiHelper.Depots, i, type);
 			}
 		}
 	}
@@ -1446,6 +1444,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 	//Wyrmgus start
 	int z = -1;
 	int landmass = 0;
+	CSettlement *settlement = NULL;
 	//Wyrmgus end
 
 	const int args = lua_rawlen(l, offset);
@@ -1462,6 +1461,8 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			z = LuaToNumber(l, offset, k + 1);
 		} else if (!strcmp(value, "landmass")) {
 			landmass = LuaToNumber(l, offset, k + 1);
+		} else if (!strcmp(value, "settlement")) {
+			settlement = GetSettlement(LuaToString(l, offset, k + 1));
 		//Wyrmgus end
 		} else {
 			//ident = LuaToString(l, j + 1, k + 1);
@@ -1478,6 +1479,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			//Wyrmgus start
 			queue.MapLayer = z;
 			queue.Landmass = landmass;
+			queue.Settlement = settlement;
 			//Wyrmgus end
 
 			ai->UnitTypeBuilt.push_back(queue);
@@ -1485,6 +1487,8 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			pos.y = -1;
 			//Wyrmgus start
 			z = -1;
+			landmass = 0;
+			settlement = NULL;
 			//Wyrmgus end
 		}
 	}

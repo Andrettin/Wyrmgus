@@ -337,7 +337,12 @@ static void AiCheckUnits()
 						//see if there are any unit type requests for units of the same class as the mercenary
 						for (size_t k = 0; k < AiPlayer->UnitTypeBuilt.size(); ++k) {
 							AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[k];
-							if (mercenary_type->Class == queue.Type->Class && queue.Want > queue.Made && (!queue.Landmass || queue.Landmass == Map.GetTileLandmass(mercenary_building->tilePos, mercenary_building->MapLayer))) {
+							if (
+								mercenary_type->Class == queue.Type->Class
+								&& queue.Want > queue.Made
+								&& (!queue.Landmass || queue.Landmass == Map.GetTileLandmass(mercenary_building->tilePos, mercenary_building->MapLayer))
+								&& (!queue.Settlement || queue.Settlement == mercenary_building->Settlement)
+							) {
 								queue.Made++;
 								CommandTrainUnit(*mercenary_building, *mercenary_type, AiPlayer->Player->Index, FlushCommands);
 								mercenary_recruited = true;
@@ -547,6 +552,10 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		if (queue.Landmass != 0) {
 			file.printf("\"landmass\", %d, ", queue.Landmass);
 		}
+		
+		if (queue.Settlement != NULL) {
+			file.printf("\"settlement\", \"%s\", ", queue.Settlement->Ident.c_str());
+		}
 		//Wyrmgus end
 		/* */
 
@@ -717,7 +726,7 @@ void FreeAi()
 	AiHelpers.Repair.clear();
 	AiHelpers.UnitLimit.clear();
 	AiHelpers.Equiv.clear();
-	AiHelpers.Refinery.clear();
+	AiHelpers.Mines.clear();
 	AiHelpers.Depots.clear();
 	//Wyrmgus start
 	AiHelpers.SellMarkets.clear();
@@ -746,7 +755,7 @@ void FreeAi()
 */
 //Wyrmgus start
 //static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
-static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass = 0)
+static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass = 0, const CSettlement *settlement = NULL)
 //Wyrmgus end
 {
 	std::vector<AiBuildQueue>::iterator i;
@@ -755,7 +764,12 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass
 		Assert((*i).Want);
 		//Wyrmgus start
 //		if (&type == (*i).Type && (*i).Made) {
-		if (&type == (*i).Type && (*i).Made && (!(*i).Landmass || !landmass || (*i).Landmass == landmass)) {
+		if (
+			&type == (*i).Type
+			&& (*i).Made
+			&& (!(*i).Landmass || !landmass || (*i).Landmass == landmass)
+			&& (!(*i).Settlement || !settlement || (*i).Settlement == settlement)
+		) {
 		//Wyrmgus end
 			--(*i).Made;
 			if (!--(*i).Want) {
@@ -775,7 +789,7 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass
 */
 //Wyrmgus start
 //static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
-static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass)
+static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass, const CSettlement *settlement)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -790,7 +804,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 	
 	//Wyrmgus start
 //	if (AiRemoveFromBuilt2(pai, type)) {
-	if (AiRemoveFromBuilt2(pai, type, landmass)) {
+	if (AiRemoveFromBuilt2(pai, type, landmass, settlement)) {
 	//Wyrmgus end
 		return;
 	}
@@ -801,7 +815,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 	for (int i = 0; i < equivalentsCount; ++i) {
 		//Wyrmgus start
 //		if (AiRemoveFromBuilt2(pai, *UnitTypes[equivalents[i]])) {
-		if (AiRemoveFromBuilt2(pai, *UnitTypes[equivalents[i]], landmass)) {
+		if (AiRemoveFromBuilt2(pai, *UnitTypes[equivalents[i]], landmass, settlement)) {
 		//Wyrmgus end
 			return;
 		}
@@ -822,7 +836,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 */
 //Wyrmgus start
 //static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type)
-static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landmass = 0)
+static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landmass = 0, const CSettlement *settlement = NULL)
 //Wyrmgus end
 {
 	std::vector<AiBuildQueue>::iterator i;
@@ -830,7 +844,12 @@ static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landm
 	for (i = pai.UnitTypeBuilt.begin(); i != pai.UnitTypeBuilt.end(); ++i) {
 		//Wyrmgus start
 //		if (&type == (*i).Type && (*i).Made) {
-		if (&type == (*i).Type && (*i).Made && (!(*i).Landmass || !landmass || (*i).Landmass == landmass)) {
+		if (
+			&type == (*i).Type
+			&& (*i).Made
+			&& (!(*i).Landmass || !landmass || (*i).Landmass == landmass)
+			&& (!(*i).Settlement || !settlement || (*i).Settlement == settlement)
+		) {
 		//Wyrmgus end
 			(*i).Made--;
 			return true;
@@ -847,7 +866,7 @@ static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landm
 */
 //Wyrmgus start
 //void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
-void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass)
+void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const CSettlement *settlement)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -862,7 +881,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass)
 	
 	//Wyrmgus start
 //	if (AiReduceMadeInBuilt2(pai, type)) {
-	if (AiReduceMadeInBuilt2(pai, type, landmass)) {
+	if (AiReduceMadeInBuilt2(pai, type, landmass, settlement)) {
 	//Wyrmgus end
 		return;
 	}
@@ -873,7 +892,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass)
 	for (unsigned int i = 0; i < equivnb; ++i) {
 		//Wyrmgus start
 //		if (AiReduceMadeInBuilt2(pai, *UnitTypes[equivs[i]])) {
-		if (AiReduceMadeInBuilt2(pai, *UnitTypes[equivs[i]], landmass)) {
+		if (AiReduceMadeInBuilt2(pai, *UnitTypes[equivs[i]], landmass, settlement)) {
 		//Wyrmgus end
 			return;
 		}
@@ -1184,7 +1203,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 	Assert(what.Player->Type != PlayerPerson);
 	//Wyrmgus start
 //	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
-	AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer));
+	AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer), what.Settlement);
 	//Wyrmgus end
 }
 
@@ -1196,7 +1215,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 */
 //Wyrmgus start
 //void AiCanNotBuild(const CUnit &unit, const CUnitType &what)
-void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass)
+void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass, CSettlement *settlement)
 //Wyrmgus end
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
@@ -1206,7 +1225,7 @@ void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass)
 	Assert(unit.Player->Type != PlayerPerson);
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, what);
-	AiReduceMadeInBuilt(*unit.Player->Ai, what, landmass);
+	AiReduceMadeInBuilt(*unit.Player->Ai, what, landmass, settlement);
 	//Wyrmgus end
 }
 
@@ -1218,13 +1237,13 @@ void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass)
 */
 //Wyrmgus start
 //void AiCanNotReach(CUnit &unit, const CUnitType &what)
-void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass)
+void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass, CSettlement *settlement)
 //Wyrmgus end
 {
 	Assert(unit.Player->Type != PlayerPerson);
 	//Wyrmgus start
 //	AiReduceMadeInBuilt(*unit.Player->Ai, what);
-	AiReduceMadeInBuilt(*unit.Player->Ai, what, landmass);
+	AiReduceMadeInBuilt(*unit.Player->Ai, what, landmass, settlement);
 	//Wyrmgus end
 }
 
@@ -1421,11 +1440,11 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
 	if (unit.Player == what.Player) {
-		AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer));
+		AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer), what.Settlement);
 	} else { //remove the request of the unit the mercenary is substituting
 		int requested_unit_type_id = PlayerRaces.GetFactionClassUnitType(what.Player->Faction, what.Type->Class);
 		if (requested_unit_type_id != -1) {
-			AiRemoveFromBuilt(what.Player->Ai, *UnitTypes[requested_unit_type_id], Map.GetTileLandmass(what.tilePos, what.MapLayer));
+			AiRemoveFromBuilt(what.Player->Ai, *UnitTypes[requested_unit_type_id], Map.GetTileLandmass(what.tilePos, what.MapLayer), what.Settlement);
 		}
 	}
 	//Wyrmgus end

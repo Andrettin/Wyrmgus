@@ -32,18 +32,20 @@
 
 #include "actions.h"
 
+class CSettlement;
+
 //@{
 
 class COrder_Build : public COrder
 {
 	//Wyrmgus start
 //	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z);
+	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSettlement *settlement);
 	//Wyrmgus end
 public:
 	//Wyrmgus start
 //	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0), Range(0)
-	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0), Range(0), MapLayer(0)
+	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0), Range(0), MapLayer(0), Settlement(NULL)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;
@@ -87,6 +89,7 @@ private:
 	Vec2i goalPos;
 	//Wyrmgus start
 	int MapLayer;
+	CSettlement *Settlement;
 	//Wyrmgus end
 };
 
