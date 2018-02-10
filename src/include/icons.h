@@ -134,7 +134,7 @@ public:
 	void DrawUnitIcon(const ButtonStyle &style,
 					  //Wyrmgus start
 //					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1) const;
-					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, int hair_color = 0, bool transparent = false, bool grayscale = false) const;
+					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, int hair_color = 0, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 					  //Wyrmgus end
 
 	const std::string &GetIdent() const { return this->Ident; }

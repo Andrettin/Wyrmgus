@@ -202,7 +202,7 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 						 //Wyrmgus start
 //						 const PixelPos &pos, const std::string &text, int player) const
-						 const PixelPos &pos, const std::string &text, int player, int hair_color, bool transparent, bool grayscale) const
+						 const PixelPos &pos, const std::string &text, int player, int hair_color, bool transparent, bool grayscale, int show_percent) const
 						 //Wyrmgus end
 {
 	ButtonStyle s(style);
@@ -237,7 +237,10 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		}
 
 		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
-			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, hair_color, transparent);
+			if (show_percent < 100) {
+				DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, hair_color, true);
+			}
+			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, hair_color, transparent, show_percent);
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 48, 40);
 			} else if (flags & IconAutoCast) {
@@ -250,7 +253,10 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			}
 //			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
 		} else {
-			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, transparent);
+			if (show_percent < 100) {
+				DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, true);
+			}
+			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, transparent, show_percent);
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46, 38);
 			} else if (flags & IconAutoCast) {
@@ -286,14 +292,20 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
 			//Wyrmgus start
 //			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
-			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, transparent);
+			if (show_percent < 100) {
+				DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, true);
+			}
+			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, transparent, show_percent);
 			//Wyrmgus end
 		}
 
 		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
 			//Wyrmgus start
 //			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player);
-			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, hair_color, transparent);
+			if (show_percent < 100) {
+				DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, hair_color, true);
+			}
+			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, hair_color, transparent, show_percent);
 			//Wyrmgus end
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x + 1, pos.y + 1, 46, 38);
@@ -307,7 +319,10 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		} else {
 			//Wyrmgus start
 //			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
-			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, transparent);
+			if (show_percent < 100) {
+				DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, true);
+			}
+			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, transparent, show_percent);
 			//Wyrmgus end
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46, 38);
@@ -316,7 +331,10 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 	} else {
 		//Wyrmgus start
 //		DrawUIButton(&s, flags, pos.x, pos.y, text, player);
-		DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, transparent);
+		if (show_percent < 100) {
+			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, true);
+		}
+		DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color, transparent, show_percent);
 		//Wyrmgus end
 	}
 }

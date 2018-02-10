@@ -326,6 +326,9 @@ extern bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction);
 
 // Get the cooldown for the button for the unit.
 extern int GetButtonCooldown(const CUnit &unit, const ButtonAction &buttonaction);
+
+// Get the cooldown percent for the button for the unit.
+extern int GetButtonCooldownPercent(const CUnit &unit, const ButtonAction &buttonaction);
 //Wyrmgus end
 
 //

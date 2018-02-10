@@ -1336,7 +1336,7 @@ void CButtonPanel::Draw()
 			if (IsButtonUsable(*Selected[0], buttons[i])) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player, hair_color);
+												   pos, buf, player, hair_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], buttons[i]));
 			} else if ( //draw researched technologies (or acquired abilities) grayed
 				buttons[i].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, buttons[i].ValueStr) == 'R'
 				|| (buttons[i].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(buttons[i].ValueStr)) == CUpgrade::Get(buttons[i].ValueStr)->MaxLimit)
@@ -1734,6 +1734,30 @@ int GetButtonCooldown(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonBuy:
 			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != NULL) {
 				cooldown = ThisPlayer->HeroCooldownTimer;
+			}
+			break;
+	}
+
+	return cooldown;
+}
+
+/**
+**  Get the cooldown timer for the button, in percent.
+**
+**  @param unit          unit which checks for allow.
+**  @param buttonaction  button to check if it is usable.
+**
+**  @return the cooldown for using the button.
+*/
+int GetButtonCooldownPercent(const CUnit &unit, const ButtonAction &buttonaction)
+{
+	int cooldown = 0;
+
+	// Check button-specific cases
+	switch (buttonaction.Action) {
+		case ButtonBuy:
+			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != NULL) {
+				cooldown = ThisPlayer->HeroCooldownTimer * 100 / HeroCooldownCycles;
 			}
 			break;
 	}
@@ -2514,7 +2538,7 @@ void CButtonPanel::DoClicked(int button)
 	}
 
 	//Wyrmgus start
-	if (!IsButtonUsable(*Selected[0], CurrentButtons[button]) || GetButtonCooldown(*Selected[0], CurrentButtons[button]) > 0) {
+	if (!IsButtonUsable(*Selected[0], CurrentButtons[button])) {
 		if (
 			(CurrentButtons[button].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, CurrentButtons[button].ValueStr) == 'R')
 			|| (CurrentButtons[button].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(CurrentButtons[button].ValueStr)) == CUpgrade::Get(CurrentButtons[button].ValueStr)->MaxLimit)
@@ -2524,9 +2548,13 @@ void CButtonPanel::DoClicked(int button)
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The hero limit has been reached"));
 		} else {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The requirements have not been fulfilled"));
-		} else if (GetButtonCooldown(*Selected[0], CurrentButtons[button]) > 0) {
-			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The cooldown is still active"));
 		}
+		PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
+		return;
+	}
+
+	if (GetButtonCooldown(*Selected[0], CurrentButtons[button]) > 0) {
+		ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The cooldown is active"));
 		PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
 		return;
 	}

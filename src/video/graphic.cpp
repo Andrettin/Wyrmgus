@@ -342,7 +342,7 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 void CGraphic::DoDrawFrameClip(GLuint *textures,
-							   unsigned frame, int x, int y) const
+							   unsigned frame, int x, int y, int show_percent) const
 {
 	int ox;
 	int oy;
@@ -354,8 +354,8 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 	UNUSED(skip);
 	DrawTexture(this, textures, frame_map[frame].x + ox,
 				frame_map[frame].y + oy,
-				frame_map[frame].x + ox + w,
-				frame_map[frame].y + oy + h, x, y, 0);
+				frame_map[frame].x + ox + (w),
+				frame_map[frame].y + oy + (h * show_percent / 100), x, y, 0);
 }
 #endif
 
@@ -368,7 +368,7 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 */
 //Wyrmgus start
 //void CGraphic::DrawFrameClip(unsigned frame, int x, int y) const
-void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day, SDL_Surface *surface)
+void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day, SDL_Surface *surface, int show_percent)
 //Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -376,22 +376,22 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_d
 		//Wyrmgus start
 //		DoDrawFrameClip(Textures, frame, x, y);
 		if (ignore_time_of_day || !Map.TimeOfDay[CurrentMapLayer] || Map.TimeOfDay[CurrentMapLayer] == MorningTimeOfDay || Map.TimeOfDay[CurrentMapLayer] == MiddayTimeOfDay || Map.TimeOfDay[CurrentMapLayer] == AfternoonTimeOfDay) {
-			DoDrawFrameClip(Textures, frame, x, y);
+			DoDrawFrameClip(Textures, frame, x, y, show_percent);
 		} else if (Map.TimeOfDay[CurrentMapLayer] == DawnTimeOfDay) {
 			if (!TexturesDawn) {
 				MakeTexture(this, Map.TimeOfDay[CurrentMapLayer]);
 			}
-			DoDrawFrameClip(TexturesDawn, frame, x, y);
+			DoDrawFrameClip(TexturesDawn, frame, x, y, show_percent);
 		} else if (Map.TimeOfDay[CurrentMapLayer] == DuskTimeOfDay) {
 			if (!TexturesDusk) {
 				MakeTexture(this, Map.TimeOfDay[CurrentMapLayer]);
 			}
-			DoDrawFrameClip(TexturesDusk, frame, x, y);
+			DoDrawFrameClip(TexturesDusk, frame, x, y, show_percent);
 		} else if (Map.TimeOfDay[CurrentMapLayer] == FirstWatchTimeOfDay || Map.TimeOfDay[CurrentMapLayer] == MidnightTimeOfDay || Map.TimeOfDay[CurrentMapLayer] == SecondWatchTimeOfDay) {
 			if (!TexturesNight) {
 				MakeTexture(this, Map.TimeOfDay[CurrentMapLayer]);
 			}
-			DoDrawFrameClip(TexturesNight, frame, x, y);
+			DoDrawFrameClip(TexturesNight, frame, x, y, show_percent);
 		}
 		//Wyrmgus end
 	} else
@@ -405,7 +405,7 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_d
 		DrawSubClip(frame_map[frame].x, frame_map[frame].y,
 					//Wyrmgus start
 //					Width, Height, x, y);
-					Width, Height, x, y, surface);
+					Width, Height * show_percent / 100, x, y, surface);
 					//Wyrmgus end
 	}
 }
@@ -428,7 +428,7 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 
 //Wyrmgus start
 //void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
-void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day, SDL_Surface *surface)
+void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day, SDL_Surface *surface, int show_percent)
 //Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -437,7 +437,7 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool 
 		glColor4ub(255, 255, 255, alpha);
 		//Wyrmgus start
 //		DrawFrameClip(frame, x, y);
-		DrawFrameClip(frame, x, y, ignore_time_of_day);
+		DrawFrameClip(frame, x, y, ignore_time_of_day, surface, show_percent);
 		//Wyrmgus end
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	} else
@@ -451,7 +451,7 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool 
 		DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
 						 //Wyrmgus start
 //						 Width, Height, x, y, alpha);
-						 Width, Height, x, y, alpha, surface);
+						 Width, Height * show_percent / 100, x, y, alpha, surface);
 						 //Wyrmgus end
 	}
 }
@@ -661,7 +661,7 @@ void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped,
 void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 //Wyrmgus start
 //												   int x, int y)
-												   int x, int y, bool ignore_time_of_day, int hair_color)
+												   int x, int y, bool ignore_time_of_day, int hair_color, int show_percent)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -686,22 +686,22 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 			if (!PlayerColorTextures[player][hair_color]) {
 				MakePlayerColorTexture(this, player, NoTimeOfDay, hair_color);
 			}
-			DoDrawFrameClip(PlayerColorTextures[player][hair_color], frame, x, y);
+			DoDrawFrameClip(PlayerColorTextures[player][hair_color], frame, x, y, show_percent);
 		} else if (Map.TimeOfDay[CurrentMapLayer] == DawnTimeOfDay) {
 			if (!PlayerColorTexturesDawn[player][hair_color]) {
 				MakePlayerColorTexture(this, player, Map.TimeOfDay[CurrentMapLayer], hair_color);
 			}
-			DoDrawFrameClip(PlayerColorTexturesDawn[player][hair_color], frame, x, y);
+			DoDrawFrameClip(PlayerColorTexturesDawn[player][hair_color], frame, x, y, show_percent);
 		} else if (Map.TimeOfDay[CurrentMapLayer] == DuskTimeOfDay) {
 			if (!PlayerColorTexturesDusk[player][hair_color]) {
 				MakePlayerColorTexture(this, player, Map.TimeOfDay[CurrentMapLayer], hair_color);
 			}
-			DoDrawFrameClip(PlayerColorTexturesDusk[player][hair_color], frame, x, y);
+			DoDrawFrameClip(PlayerColorTexturesDusk[player][hair_color], frame, x, y, show_percent);
 		} else if (Map.TimeOfDay[CurrentMapLayer] == FirstWatchTimeOfDay || Map.TimeOfDay[CurrentMapLayer] == MidnightTimeOfDay || Map.TimeOfDay[CurrentMapLayer] == SecondWatchTimeOfDay) {
 			if (!PlayerColorTexturesNight[player][hair_color]) {
 				MakePlayerColorTexture(this, player, Map.TimeOfDay[CurrentMapLayer], hair_color);
 			}
-			DoDrawFrameClip(PlayerColorTexturesNight[player][hair_color], frame, x, y);
+			DoDrawFrameClip(PlayerColorTexturesNight[player][hair_color], frame, x, y, show_percent);
 		}
 		//Wyrmgus end
 	} else
@@ -740,7 +740,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 }
 
 //Wyrmgus start
-void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day, int hair_color)
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day, int hair_color, int show_percent)
 {
 	for (int i = 0; i < PlayerColorMax; ++i) {
 		if (PlayerColors[i][0] == Players[player].Color) {
@@ -779,13 +779,13 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 		//Wyrmgus start
 //		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
 		if (ignore_time_of_day || !Map.TimeOfDay[CurrentMapLayer] || Map.TimeOfDay[CurrentMapLayer] == MorningTimeOfDay || Map.TimeOfDay[CurrentMapLayer] == MiddayTimeOfDay || Map.TimeOfDay[CurrentMapLayer] == AfternoonTimeOfDay) {
-			DoDrawFrameClip(PlayerColorTextures[player][hair_color], frame, x, y);
+			DoDrawFrameClip(PlayerColorTextures[player][hair_color], frame, x, y, show_percent);
 		} else if (Map.TimeOfDay[CurrentMapLayer] == DawnTimeOfDay) {
-			DoDrawFrameClip(PlayerColorTexturesDawn[player][hair_color], frame, x, y);
+			DoDrawFrameClip(PlayerColorTexturesDawn[player][hair_color], frame, x, y, show_percent);
 		} else if (Map.TimeOfDay[CurrentMapLayer] == DuskTimeOfDay) {
-			DoDrawFrameClip(PlayerColorTexturesDusk[player][hair_color], frame, x, y);
+			DoDrawFrameClip(PlayerColorTexturesDusk[player][hair_color], frame, x, y, show_percent);
 		} else if (Map.TimeOfDay[CurrentMapLayer] == FirstWatchTimeOfDay || Map.TimeOfDay[CurrentMapLayer] == MidnightTimeOfDay || Map.TimeOfDay[CurrentMapLayer] == SecondWatchTimeOfDay) {
-			DoDrawFrameClip(PlayerColorTexturesNight[player][hair_color], frame, x, y);
+			DoDrawFrameClip(PlayerColorTexturesNight[player][hair_color], frame, x, y, show_percent);
 		}
 		//Wyrmgus end
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);

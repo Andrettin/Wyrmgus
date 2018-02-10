@@ -116,16 +116,16 @@ public:
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	void DoDrawFrameClip(GLuint *textures, unsigned frame, int x, int y) const;
+	void DoDrawFrameClip(GLuint *textures, unsigned frame, int x, int y, int show_percent = 100) const;
 #endif
 	//Wyrmgus start
 //	void DrawFrameClip(unsigned frame, int x, int y) const;
-	void DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = NULL);
+	void DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = NULL, int show_percent = 100);
 	//Wyrmgus end
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
 	//Wyrmgus start
 //	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = NULL);
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = NULL, int show_percent = 100);
 	//Wyrmgus end
 
 	// Draw frame flipped horizontally
@@ -265,9 +265,9 @@ public:
 //	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
 //	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
 	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true, int hair_color = 0);
-	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true, int hair_color = 0);
+	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true, int hair_color = 0, int show_percent = 100);
 	void DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, int hair_color = 0);
-	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, int hair_color = 0);
+	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, int hair_color = 0, int show_percent = 100);
 	//Wyrmgus end
 
 	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
