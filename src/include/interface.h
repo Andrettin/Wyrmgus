@@ -323,6 +323,9 @@ extern bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 //Wyrmgus start
 // Check if the button is usable for the unit.
 extern bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction);
+
+// Get the cooldown for the button for the unit.
+extern int GetButtonCooldown(const CUnit &unit, const ButtonAction &buttonaction);
 //Wyrmgus end
 
 //

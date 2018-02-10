@@ -2308,6 +2308,9 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 		Players[player].Ai->Force.RemoveDeadUnit();
 		Players[player].Ai->Force.Assign(*sold_unit, -1, true);
 	}
+	if (sold_unit->Character) {
+		Players[player].HeroCooldownTimer = HeroCooldownCycles;
+	}
 	if (IsOnlySelected(*this)) {
 		UI.ButtonPanel.Update();
 	}

@@ -1199,6 +1199,9 @@ void CPlayer::Save(CFile &file) const
 	if (p.LostTownHallTimer != 0) {
 		file.printf("\n  \"lost-town-hall-timer\", %d,", p.LostTownHallTimer);
 	}
+	if (p.HeroCooldownTimer != 0) {
+		file.printf("\n  \"hero-cooldown-timer\", %d,", p.HeroCooldownTimer);
+	}
 	//Wyrmgus end
 
 	file.printf("\n  \"speed-resource-harvest\", {");
@@ -1545,6 +1548,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Score = 0;
 	//Wyrmgus start
 	this->LostTownHallTimer = 0;
+	this->HeroCooldownTimer = 0;
 	//Wyrmgus end
 
 	this->Color = PlayerColors[NumPlayers][0];
@@ -2449,6 +2453,7 @@ void CPlayer::Clear()
 	//Wyrmgus start
 	memset(UnitTypeKills, 0, sizeof(UnitTypeKills));
 	LostTownHallTimer = 0;
+	HeroCooldownTimer = 0;
 	//Wyrmgus end
 	Color = 0;
 	UpgradeTimers.Clear();
@@ -3767,6 +3772,10 @@ void PlayersEachCycle()
 				p.RemoveModifier(p.Modifiers[i].first); //only remove one modifier per cycle, to prevent too many upgrade changes from happening at the same cycle (for performance reasons)
 				break;
 			}
+		}
+		
+		if (p.HeroCooldownTimer) {
+			p.HeroCooldownTimer--;
 		}
 		//Wyrmgus end
 

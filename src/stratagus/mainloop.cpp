@@ -274,7 +274,7 @@ void UpdateDisplay()
 			ThisPlayer->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->LevelUpUnits[0]->GetHairColor());
 		}
 		
-		//draw icon if the player has a custom hero
+		//draw icon if the player has a hero
 		for (int i = 0; i < PlayerHeroMax; ++i) {
 			if (UI.HeroUnitButtons[i] && (int) ThisPlayer->Heroes.size() > i) {
 				const PixelPos pos(UI.HeroUnitButtons[i]->X, UI.HeroUnitButtons[i]->Y);

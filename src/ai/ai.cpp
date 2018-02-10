@@ -278,7 +278,7 @@ static void AiCheckUnits()
 	
 	//Wyrmgus start
 	//check if can hire any heroes
-	if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && !IsNetworkGame() && CurrentQuest == NULL) {
+	if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && !IsNetworkGame() && CurrentQuest == NULL) {
 		for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
 			CUnit *hero_recruiter = &AiPlayer->Player->GetUnit(i);
 			if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->Type->BoolFlag[RECRUITHEROES_INDEX].value || hero_recruiter->CurrentAction() == UnitActionBuilt) {
@@ -312,7 +312,7 @@ static void AiCheckUnits()
 					continue;
 				}
 
-				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && mercenary_building->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL) { //check if can hire any heroes at the mercenary camp
+				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && mercenary_building->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL) { //check if can hire any heroes at the mercenary camp
 					for (size_t k = 0; k < mercenary_building->SoldUnits.size(); ++k) {
 						int buy_costs[MaxCosts];
 						memset(buy_costs, 0, sizeof(buy_costs));

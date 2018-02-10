@@ -1618,9 +1618,6 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		case ButtonBuy:
 			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != NULL);
-			if (res && UnitManager.GetSlotUnit(buttonaction.Value).Character != NULL) {
-				res = ThisPlayer->Heroes.size() < PlayerHeroMax;
-			}
 			break;
 		//Wyrmgus end
 	}
@@ -1698,13 +1695,18 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonFaction:
 			res = ThisPlayer->CanFoundFaction(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttonaction.Value]);
 			break;
+		case ButtonBuy:
+			res = true;
+			if (UnitManager.GetSlotUnit(buttonaction.Value).Character != NULL) {
+				res = ThisPlayer->Heroes.size() < PlayerHeroMax;
+			}
+			break;
 		case ButtonUnload:
 		case ButtonCancel:
 		case ButtonCancelUpgrade:
 		case ButtonCancelTrain:
 		case ButtonCancelBuild:
 		case ButtonQuest:
-		case ButtonBuy:
 		case ButtonProduceResource:
 		case ButtonSellResource:
 		case ButtonBuyResource:
@@ -1713,6 +1715,30 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 	}
 
 	return res;
+}
+
+/**
+**  Get the cooldown timer for the button (if any).
+**
+**  @param unit          unit which checks for allow.
+**  @param buttonaction  button to check if it is usable.
+**
+**  @return the cooldown for using the button.
+*/
+int GetButtonCooldown(const CUnit &unit, const ButtonAction &buttonaction)
+{
+	int cooldown = 0;
+
+	// Check button-specific cases
+	switch (buttonaction.Action) {
+		case ButtonBuy:
+			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != NULL) {
+				cooldown = ThisPlayer->HeroCooldownTimer;
+			}
+			break;
+	}
+
+	return cooldown;
 }
 //Wyrmgus end
 
@@ -2488,14 +2514,18 @@ void CButtonPanel::DoClicked(int button)
 	}
 
 	//Wyrmgus start
-	if (!IsButtonUsable(*Selected[0], CurrentButtons[button])) {
+	if (!IsButtonUsable(*Selected[0], CurrentButtons[button]) || GetButtonCooldown(*Selected[0], CurrentButtons[button]) > 0) {
 		if (
 			(CurrentButtons[button].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, CurrentButtons[button].ValueStr) == 'R')
 			|| (CurrentButtons[button].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(CurrentButtons[button].ValueStr)) == CUpgrade::Get(CurrentButtons[button].ValueStr)->MaxLimit)
 		) {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The upgrade has already been acquired"));
+		} else if (CurrentButtons[button].Action == ButtonBuy && ThisPlayer->Heroes.size() >= PlayerHeroMax && CurrentButtons[button].Value != -1 && UnitManager.GetSlotUnit(CurrentButtons[button].Value).Character != NULL) {
+			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The hero limit has been reached"));
 		} else {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The requirements have not been fulfilled"));
+		} else if (GetButtonCooldown(*Selected[0], CurrentButtons[button]) > 0) {
+			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The cooldown is still active"));
 		}
 		PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
 		return;

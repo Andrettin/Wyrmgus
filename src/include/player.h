@@ -208,6 +208,7 @@ public:
 
 	//Wyrmgus start
 	int LostTownHallTimer;	/// The timer for when the player lost the last town hall (to make the player's units be revealed)
+	int HeroCooldownTimer;	/// The cooldown timer for recruiting heroes
 	//Wyrmgus end
 	
 	IntColor Color;           /// color of units on minimap
