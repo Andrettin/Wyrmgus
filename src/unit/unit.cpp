@@ -6340,10 +6340,9 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	if (suicide) {
 		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
 		
-		//Wyrmgus start
-//		MakeMissile(*type->Missile.Missile, pixelPos, pixelPos);
-		MakeMissile(*unit.GetMissile().Missile, pixelPos, pixelPos, unit.MapLayer);
-		//Wyrmgus end
+		if (unit.GetMissile().Missile) {
+			MakeMissile(*unit.GetMissile().Missile, pixelPos, pixelPos, unit.MapLayer);
+		}
 	}
 	// Handle Teleporter Destination Removal
 	if (type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
