@@ -1283,7 +1283,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 
 				if (
 					type.Slot < (int) AiHelpers.Build.size()
-					&& std::find(AiHelpers.Build[type.Slot].begin(), AiHelpers.Build[type.Slot].end(), &type) != AiHelpers.Build[type.Slot].end()
+					&& std::find(AiHelpers.Build[type.Slot].begin(), AiHelpers.Build[type.Slot].end(), unit.Type) != AiHelpers.Build[type.Slot].end()
 					&& CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer)
 				) {
 					CommandBuildBuilding(unit, mine->tilePos, type, FlushCommands, mine->MapLayer);
