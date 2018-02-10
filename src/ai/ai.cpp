@@ -297,7 +297,7 @@ static void AiCheckUnits()
 		}
 	}
 	
-	if (!AiPlayer->Player->HasNeutralFactionType()) {
+	if (AiPlayer->Player->NumTownHalls > 0 && !AiPlayer->Player->HasNeutralFactionType()) {
 		//check if can hire any mercenaries
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (i == AiPlayer->Player->Index) {

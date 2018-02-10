@@ -1931,6 +1931,10 @@ void AiForceManager::UpdatePerHalfMinute()
 	if (AiPlayer->Player->AiName == "passive") {
 		return;
 	}
+	
+	if (AiPlayer->Player->NumTownHalls < 1) { //don't build up forces if the AI has no town hall yet
+		return;
+	}
 
 	bool all_forces_completed = true;
 	int completed_forces = 0;
