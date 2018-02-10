@@ -204,9 +204,13 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		}
 		
 		if (unit.Variable[i].Max && unit.Variable[i].Value) {
-			unit.Variable[i].Value += newstats.Variables[i].Max - oldstats.Variables[i].Max;
+			if (i != MANA_INDEX || (newstats.Variables[i].Max - oldstats.Variables[i].Max) < 0) {
+				unit.Variable[i].Value += newstats.Variables[i].Max - oldstats.Variables[i].Max;
+			}
 		} else {
-			unit.Variable[i].Value += newstats.Variables[i].Value - oldstats.Variables[i].Value;
+			if (i != MANA_INDEX || (newstats.Variables[i].Value - oldstats.Variables[i].Value) < 0) {
+				unit.Variable[i].Value += newstats.Variables[i].Value - oldstats.Variables[i].Value;
+			}
 		}
 		if (i == KILL_INDEX || i == XP_INDEX) {
 			unit.Variable[i].Value = unit.Variable[i].Max;

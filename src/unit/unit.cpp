@@ -921,6 +921,11 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		return;
 	}
 		
+	int old_mana_percent = 0;
+	if (this->Variable[MANA_INDEX].Max > 0) {
+		old_mana_percent = this->Variable[MANA_INDEX].Value * 100 / this->Variable[MANA_INDEX].Max;
+	}
+	
 	this->Name = this->Character->Name;
 	this->ExtraName = this->Character->ExtraName;
 	this->FamilyName = this->Character->FamilyName;
@@ -982,8 +987,12 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	}
 	
 	this->Variable[XP_INDEX].Enable = 1;
-	this->Variable[XP_INDEX].Value = (this->Variable[XPREQUIRED_INDEX].Value * this->Character->ExperiencePercent) / 100;
+	this->Variable[XP_INDEX].Value = this->Variable[XPREQUIRED_INDEX].Value * this->Character->ExperiencePercent / 100;
 	this->Variable[XP_INDEX].Max = this->Variable[XP_INDEX].Value;
+	
+	if (this->Variable[MANA_INDEX].Max > 0) {
+		this->Variable[MANA_INDEX].Value = this->Variable[MANA_INDEX].Max * old_mana_percent / 100;
+	}
 			
 	//load learned abilities
 	std::vector<CUpgrade *> abilities_to_remove;
@@ -1900,7 +1909,9 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 	if (variable == KNOWLEDGEMAGIC_INDEX) {
 		int mana_change = (this->Variable[variable].Value / 5) - ((this->Variable[variable].Value - change) / 5); // +1 max mana for every 5 levels in Knowledge (Magic)
 		this->Variable[MANA_INDEX].Max += mana_change;
-		this->Variable[MANA_INDEX].Value += mana_change;
+		if (mana_change < 0) {
+			this->Variable[MANA_INDEX].Value += mana_change;
+		}
 		
 		this->CheckIdentification();
 	} else if (variable == KNOWLEDGEWARFARE_INDEX) {
@@ -2310,6 +2321,7 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 	}
 	if (sold_unit->Character) {
 		Players[player].HeroCooldownTimer = HeroCooldownCycles;
+		sold_unit->Variable[MANA_INDEX].Value = 0; //start off with 0 mana
 	}
 	if (IsOnlySelected(*this)) {
 		UI.ButtonPanel.Update();
@@ -2761,6 +2773,8 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	if (unit->Type->Elixir) { //set the unit type's elixir, if any
 		unit->SetElixir(unit->Type->Elixir);
 	}
+	
+	unit->Variable[MANA_INDEX].Value = 0; //start off with 0 mana
 	//Wyrmgus end
 	
 	if (unit->Type->OnInit) {

@@ -1484,10 +1484,14 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							   | um->ModifyPercent[j];
 				stat.Variables[j].Enable |= um->Modifier.Variables[j].Enable;
 				if (um->ModifyPercent[j]) {
-					stat.Variables[j].Value += stat.Variables[j].Value * um->ModifyPercent[j] / 100;
+					if (j != MANA_INDEX || um->ModifyPercent[j] < 0) {
+						stat.Variables[j].Value += stat.Variables[j].Value * um->ModifyPercent[j] / 100;
+					}
 					stat.Variables[j].Max += stat.Variables[j].Max * um->ModifyPercent[j] / 100;
 				} else {
-					stat.Variables[j].Value += um->Modifier.Variables[j].Value;
+					if (j != MANA_INDEX || um->Modifier.Variables[j].Value < 0) {
+						stat.Variables[j].Value += um->Modifier.Variables[j].Value;
+					}
 					stat.Variables[j].Max += um->Modifier.Variables[j].Max;
 					stat.Variables[j].Increase += um->Modifier.Variables[j].Increase;
 				}
@@ -1548,10 +1552,14 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 						unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
 						if (um->ModifyPercent[j]) {
-							unit.Variable[j].Value += unit.Variable[j].Value * um->ModifyPercent[j] / 100;
+							if (j != MANA_INDEX || um->ModifyPercent[j] < 0) {
+								unit.Variable[j].Value += unit.Variable[j].Value * um->ModifyPercent[j] / 100;
+							}
 							unit.Variable[j].Max += unit.Variable[j].Max * um->ModifyPercent[j] / 100;
 						} else {
-							unit.Variable[j].Value += um->Modifier.Variables[j].Value;
+							if (j != MANA_INDEX || um->Modifier.Variables[j].Value < 0) {
+								unit.Variable[j].Value += um->Modifier.Variables[j].Value;
+							}
 							unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
 						}
 
@@ -1774,10 +1782,14 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							   | um->ModifyPercent[j];
 				stat.Variables[j].Enable |= um->Modifier.Variables[j].Enable;
 				if (um->ModifyPercent[j]) {
-					stat.Variables[j].Value = stat.Variables[j].Value * 100 / (100 + um->ModifyPercent[j]);
+					if (j != MANA_INDEX || um->Modifier.Variables[j].Value >= 0) {
+						stat.Variables[j].Value = stat.Variables[j].Value * 100 / (100 + um->ModifyPercent[j]);
+					}
 					stat.Variables[j].Max = stat.Variables[j].Max * 100 / (100 + um->ModifyPercent[j]);
 				} else {
-					stat.Variables[j].Value -= um->Modifier.Variables[j].Value;
+					if (j != MANA_INDEX || um->Modifier.Variables[j].Value >= 0) {
+						stat.Variables[j].Value -= um->Modifier.Variables[j].Value;
+					}
 					stat.Variables[j].Max -= um->Modifier.Variables[j].Max;
 					stat.Variables[j].Increase -= um->Modifier.Variables[j].Increase;
 				}
@@ -1838,10 +1850,14 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 						unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
 						if (um->ModifyPercent[j]) {
-							unit.Variable[j].Value = unit.Variable[j].Value * 100 / (100 + um->ModifyPercent[j]);
+							if (j != MANA_INDEX || um->ModifyPercent[j] >= 0) {
+								unit.Variable[j].Value = unit.Variable[j].Value * 100 / (100 + um->ModifyPercent[j]);
+							}
 							unit.Variable[j].Max = unit.Variable[j].Max * 100 / (100 + um->ModifyPercent[j]);
 						} else {
-							unit.Variable[j].Value -= um->Modifier.Variables[j].Value;
+							if (j != MANA_INDEX || um->Modifier.Variables[j].Value >= 0) {
+								unit.Variable[j].Value -= um->Modifier.Variables[j].Value;
+							}
 							unit.Variable[j].Increase -= um->Modifier.Variables[j].Increase;
 						}
 
@@ -1967,10 +1983,14 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
 		if (um->ModifyPercent[j]) {
-			unit.Variable[j].Value += unit.Variable[j].Value * um->ModifyPercent[j] / 100;
+			if (j != MANA_INDEX || um->ModifyPercent[j] < 0) {
+				unit.Variable[j].Value += unit.Variable[j].Value * um->ModifyPercent[j] / 100;
+			}
 			unit.Variable[j].Max += unit.Variable[j].Max * um->ModifyPercent[j] / 100;
 		} else {
-			unit.Variable[j].Value += um->Modifier.Variables[j].Value;
+			if (j != MANA_INDEX || um->Modifier.Variables[j].Value < 0) {
+				unit.Variable[j].Value += um->Modifier.Variables[j].Value;
+			}
 			unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
 		}
 		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
@@ -2069,10 +2089,14 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
 		if (um->ModifyPercent[j]) {
-			unit.Variable[j].Value = unit.Variable[j].Value * 100 / (100 + um->ModifyPercent[j]);
+			if (j != MANA_INDEX || um->ModifyPercent[j] >= 0) {
+				unit.Variable[j].Value = unit.Variable[j].Value * 100 / (100 + um->ModifyPercent[j]);
+			}
 			unit.Variable[j].Max = unit.Variable[j].Max * 100 / (100 + um->ModifyPercent[j]);
 		} else {
-			unit.Variable[j].Value -= um->Modifier.Variables[j].Value;
+			if (j != MANA_INDEX || um->Modifier.Variables[j].Value >= 0) {
+				unit.Variable[j].Value -= um->Modifier.Variables[j].Value;
+			}
 			unit.Variable[j].Increase -= um->Modifier.Variables[j].Increase;
 		}
 		unit.Variable[j].Max -= um->Modifier.Variables[j].Max;
