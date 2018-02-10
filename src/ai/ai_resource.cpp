@@ -2618,6 +2618,12 @@ static void AiCheckMinecartConstruction()
 					continue;
 				}
 				
+				std::vector<CUnit *> settlement_minecart_table;
+				SelectAroundUnit(*mine_unit, 8, settlement_minecart_table, MakeAndPredicate(HasSamePlayerAs(*AiPlayer->Player), HasSameTypeAs(*minecart_type)));
+				if (settlement_minecart_table.size() > 0) { //only build one minecart per mine, to prevent pathway blockage
+					continue;
+				}
+				
 				if (CheckPathwayConnection(*mine_unit, *town_hall_unit, MapFieldRailroad)) {
 					potential_settlements.push_back(mine_unit->Settlement);
 				}
@@ -2648,6 +2654,10 @@ static void AiCheckMinecartSalvaging()
 			continue;
 		}
 		
+		if (minecart_unit->Container) {
+			continue;
+		}
+		
 		bool has_accessible_mine = false;
 		
 		for (int res = 0; res < MaxCosts; ++res) {
@@ -2655,8 +2665,9 @@ static void AiCheckMinecartSalvaging()
 				continue;
 			}
 			
-			if (UnitFindResource(*minecart_unit, *minecart_unit, 1000, res, false, NULL, true, true, false, false, true)) {
+			if (UnitFindResource(*minecart_unit, *minecart_unit, 1000, res, false, NULL, true, true, false, false, true) != NULL) {
 				has_accessible_mine = true;
+				break;
 			}
 		}
 		
