@@ -1571,6 +1571,7 @@ void AiEachHalfMinute(CPlayer &player)
 		AiPlayer->Scouting = false;
 	}
 	
+	AiCheckWorkers();
 	AiCheckUpgrades();
 	AiCheckBuildings();
 	

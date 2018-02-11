@@ -2768,7 +2768,6 @@ void AiResourceManager()
 	
 	//Wyrmgus start
 	AiCheckPathwayConstruction();
-	AiCheckWorkers();
 	//Wyrmgus end
 
 	AiPlayer->NeededMask = 0;

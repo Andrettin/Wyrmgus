@@ -504,6 +504,7 @@ extern PlayerAi *AiPlayer; /// Current AI player
 //
 // Resource manager
 //
+extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
 //Wyrmgus start
 //extern void AiAddUnitTypeRequest(CUnitType &type, int count);
