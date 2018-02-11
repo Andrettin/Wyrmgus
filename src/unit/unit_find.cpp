@@ -513,7 +513,7 @@ class ResourceUnitFinder
 public:
 	//Wyrmgus start
 //	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine) :
-	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same) :
+	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same, bool check_reachable) :
 	//Wyrmgus end
 		worker(worker),
 		resinfo(*worker.Type->ResInfo[resource]),
@@ -527,6 +527,7 @@ public:
 		only_unsettled_area(only_unsettled_area),
 		include_luxury(include_luxury),
 		only_same(only_same),
+		check_reachable(check_reachable),
 //		res_finder(resource, 1),
 		res_finder(resource, only_harvestable, include_luxury, only_same),
 		//Wyrmgus end
@@ -577,6 +578,7 @@ private:
 	bool only_unsettled_area;
 	bool include_luxury;
 	bool only_same;
+	bool check_reachable;
 	//Wyrmgus end
 	CResourceFinder res_finder;
 	ResourceUnitFinder_Cost bestCost;
@@ -670,7 +672,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 			UnmarkUnitFieldFlags(*worker.Container);
 		}
 		//Wyrmgus end
-		if (cost < bestCost && UnitReachable(worker, *mine, 1)) {
+		if (cost < bestCost && (!check_reachable || UnitReachable(worker, *mine, 1))) {
 			*resultMine = mine;
 
 			if (cost.IsMin()) {
@@ -719,7 +721,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
 						//Wyrmgus start
 //						bool check_usage, const CUnit *deposit)
-						bool check_usage, const CUnit *deposit, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same)
+						bool check_usage, const CUnit *deposit, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same, bool check_reachable)
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
@@ -743,7 +745,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	//Wyrmgus start
 //	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
-	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, only_harvestable, ignore_exploration, only_unsettled_area, include_luxury, only_same);
+	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, only_harvestable, ignore_exploration, only_unsettled_area, include_luxury, only_same, check_reachable);
 	//Wyrmgus end
 
 	terrainTraversal.Run(resourceUnitFinder);
