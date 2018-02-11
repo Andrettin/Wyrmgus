@@ -2131,23 +2131,20 @@ static void AiCheckPathwayConstruction()
 			if (unit.Type->GivesResource) { //if is a mine, build pathways to the depot as well
 				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), 32, unit.GivesResource, unit.MapLayer);
 				if (depot) {
-					//choose a close-by worker to test the path; the worker can't be a rail one, or the path construction won't work
-					CUnitType *test_worker_type = NULL;
-					for (size_t z = 0; z < UnitTypes.size(); ++z) {
-						if (UnitTypes[z]->BoolFlag[DIMINUTIVE_INDEX].value && UnitTypes[z]->UnitType == UnitTypeLand && UnitTypes[z]->CanMove() && !UnitTypes[z]->BoolFlag[BUILDING_INDEX].value && !UnitTypes[z]->BoolFlag[NONSOLID_INDEX].value && !UnitTypes[z]->BoolFlag[ITEM_INDEX].value && !UnitTypes[z]->BoolFlag[POWERUP_INDEX].value && !UnitTypes[z]->BoolFlag[TRAP_INDEX].value && !UnitTypes[z]->BoolFlag[DECORATION_INDEX].value) {
-							test_worker_type = UnitTypes[z];
-							break;
-						}
-					}
-					if (test_worker_type) {
-						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos, *test_worker_type, &Players[PlayerNumNeutral], unit.MapLayer);
-						char worker_path[64];
+					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
+					int worker_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("worker"));
+					if (worker_type_id != -1) {
+						CUnitType *test_worker_type = UnitTypes[worker_type_id];
+						
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
 						
+						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), *test_worker_type, &Players[PlayerNumNeutral], unit.MapLayer);
+						char worker_path[64];
+						
 						//make the first path
-						int worker_path_length = AStarFindPath(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), depot->tilePos + Vec2i((depot->Type->TileWidth - 1) / 2, (depot->Type->TileHeight - 1) / 2), depot->Type->TileWidth, depot->Type->TileHeight, 1, 1, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer, false);
-						Vec2i worker_path_pos(unit.tilePos);
+						int worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileWidth, depot->Type->TileHeight, test_worker->Type->TileWidth, test_worker->Type->TileHeight, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer, false);
+						Vec2i worker_path_pos(test_worker->tilePos);
 						std::vector<Vec2i> first_path_tiles;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
 							Vec2i pos_change(0, 0);
@@ -2169,8 +2166,8 @@ static void AiCheckPathwayConstruction()
 						}
 						
 						//make the second path
-						worker_path_length = AStarFindPath(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), depot->tilePos + Vec2i((depot->Type->TileWidth - 1) / 2, (depot->Type->TileHeight - 1) / 2), depot->Type->TileWidth, depot->Type->TileHeight, test_worker->Type->TileWidth, test_worker->Type->TileHeight, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer, false);
-						worker_path_pos = unit.tilePos;
+						worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileWidth, depot->Type->TileHeight, test_worker->Type->TileWidth, test_worker->Type->TileHeight, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer, false);
+						worker_path_pos = test_worker->tilePos;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
 							Vec2i pos_change(0, 0);
 							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
@@ -2218,7 +2215,17 @@ static void AiCheckPathwayConstruction()
 						continue;
 					}
 						
-					if ((!(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRailroad)) || (!(mf.Flags & MapFieldRoad) && !(mf.Flags & MapFieldRailroad) && (pathway_types[p]->TerrainType->Flags & MapFieldRoad))) {
+					if (
+						(
+							!(mf.Flags & MapFieldRailroad)
+							&& (pathway_types[p]->TerrainType->Flags & MapFieldRailroad)
+						)
+						|| (
+							!(mf.Flags & MapFieldRoad)
+							&& !(mf.Flags & MapFieldRailroad)
+							&& (pathway_types[p]->TerrainType->Flags & MapFieldRoad)
+						)
+					) {
 						if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer) || !CanBuildHere(NULL, *pathway_types[p], pathway_pos, unit.MapLayer)) {
 							continue;
 						}

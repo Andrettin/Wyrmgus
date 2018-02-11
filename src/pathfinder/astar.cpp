@@ -1275,7 +1275,7 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 
 	//Wyrmgus start
 //	if (MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1) {
-	if (minrange <= distance && MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1 && (allow_diagonal || (diff.x == 0 && diff.y == 0))) {
+	if (minrange <= distance && MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1 && (allow_diagonal || diff.x == 0 || diff.y == 0)) {
 	//Wyrmgus end
 		// Move to adjacent cell
 		//Wyrmgus start
@@ -1464,7 +1464,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 
 		for (int i = 0; i < 8; ++i) {
 			//Wyrmgus start
-			if (!allow_diagonal && Heading2X[i] != 0 && Heading2Y[i] != 0) { //rail units can't move diagonally
+			if (!allow_diagonal && Heading2X[i] != 0 && Heading2Y[i] != 0) { //can't move diagonally
 				continue;
 			}
 			//Wyrmgus end
