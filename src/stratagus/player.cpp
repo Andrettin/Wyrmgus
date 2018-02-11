@@ -1746,16 +1746,27 @@ void CPlayer::SetRandomFaction()
 	std::vector<CFaction *> local_factions;
 	
 	for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
-		if (PlayerRaces.Factions[i]->Civilization != this->Race) {
+		CFaction *faction = PlayerRaces.Factions[i];
+		if (faction->Civilization != this->Race) {
 			continue;
 		}
-		if (
-			this->CanFoundFaction(PlayerRaces.Factions[i])
-			&& ((PlayerRaces.Factions[i]->Type == FactionTypeTribe && !this->HasUpgradeClass(GetUpgradeClassIndexByName("writing"))) || ((PlayerRaces.Factions[i]->Type == FactionTypePolity && this->HasUpgradeClass(GetUpgradeClassIndexByName("writing")))))
-			&& PlayerRaces.Factions[i]->Playable
-		) {
-			local_factions.push_back(PlayerRaces.Factions[i]);
+		if (!faction->Playable) {
+			continue;
 		}
+		if (!this->CanFoundFaction(faction)) {
+			continue;
+		}
+
+		int faction_type = faction->Type;
+		bool has_writing = this->HasUpgradeClass(GetUpgradeClassIndexByName("writing"));
+		if (
+			!(faction_type == FactionTypeTribe && !has_writing)
+			&& !(faction_type == FactionTypePolity && has_writing)
+		) {
+			continue;
+		}
+
+		local_factions.push_back(faction);
 	}
 	
 	if (local_factions.size() > 0) {
@@ -1868,11 +1879,17 @@ bool CPlayer::IsPlayerColorUsed(int color)
 
 bool CPlayer::HasUpgradeClass(int upgrade_class)
 {
-	if (this->Race == -1 || this->Faction == -1 || upgrade_class == -1) {
+	if (this->Race == -1  || upgrade_class == -1) {
 		return false;
 	}
 	
-	int upgrade_id = PlayerRaces.GetFactionClassUpgrade(this->Faction, upgrade_class);
+	int upgrade_id = -1;
+	
+	if (this->Faction != -1) {
+		upgrade_id = PlayerRaces.GetFactionClassUpgrade(this->Faction, upgrade_class);
+	} else {
+		upgrade_id = PlayerRaces.GetCivilizationClassUpgrade(this->Race, upgrade_class);
+	}
 	
 	if (upgrade_id != -1 && this->Allow.Upgrades[upgrade_id] == 'R') {
 		return true;
