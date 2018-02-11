@@ -236,13 +236,13 @@ extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
 /// Return distance to unit.
 //Wyrmgus start
 //extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);
-extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range, int max_length = 0);
+extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range, int max_length = 0, bool from_outside_container = false);
 //Wyrmgus end
 /// Can the unit 'src' reach the place x,y
 extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
 						  //Wyrmgus start
 //						  int minrange, int maxrange);
-						  int minrange, int maxrange, int max_length, int z);
+						  int minrange, int maxrange, int max_length, int z, bool from_outside_container = false);
 						  //Wyrmgus end
 
 //

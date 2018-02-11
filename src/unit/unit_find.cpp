@@ -513,7 +513,7 @@ class ResourceUnitFinder
 public:
 	//Wyrmgus start
 //	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine) :
-	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same, bool check_reachable) :
+	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same, bool check_reachable, bool from_outside_container) :
 	//Wyrmgus end
 		worker(worker),
 		resinfo(*worker.Type->ResInfo[resource]),
@@ -528,6 +528,7 @@ public:
 		include_luxury(include_luxury),
 		only_same(only_same),
 		check_reachable(check_reachable),
+		from_outside_container(from_outside_container),
 //		res_finder(resource, 1),
 		res_finder(resource, only_harvestable, include_luxury, only_same),
 		//Wyrmgus end
@@ -579,6 +580,7 @@ private:
 	bool include_luxury;
 	bool only_same;
 	bool check_reachable;
+	bool from_outside_container;
 	//Wyrmgus end
 	CResourceFinder res_finder;
 	ResourceUnitFinder_Cost bestCost;
@@ -668,28 +670,15 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 		//Wyrmgus start
 //		cost.SetFrom(*mine, deposit, check_usage);
 		cost.SetFrom(*mine, deposit, worker, check_usage);
-		if (worker.Container) {
-			UnmarkUnitFieldFlags(*worker.Container);
-		}
-		//Wyrmgus end
-		if (cost < bestCost && (!check_reachable || UnitReachable(worker, *mine, 1))) {
+		
+		if (cost < bestCost && (!check_reachable || UnitReachable(worker, *mine, 1, 0, from_outside_container))) {
 			*resultMine = mine;
 
 			if (cost.IsMin()) {
-				//Wyrmgus start
-				if (worker.Container) {
-					MarkUnitFieldFlags(*worker.Container);
-				}
-				//Wyrmgus end
 				return VisitResult_Finished;
 			}
 			bestCost = cost;
 		}
-		//Wyrmgus start
-		if (worker.Container) {
-			MarkUnitFieldFlags(*worker.Container);
-		}
-		//Wyrmgus end
 	}
 	//Wyrmgus start
 //	if (CanMoveToMask(pos, movemask)) { // reachable
@@ -721,13 +710,13 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
 						//Wyrmgus start
 //						bool check_usage, const CUnit *deposit)
-						bool check_usage, const CUnit *deposit, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same, bool check_reachable)
+						bool check_usage, const CUnit *deposit, bool only_harvestable, bool ignore_exploration, bool only_unsettled_area, bool include_luxury, bool only_same, bool check_reachable, bool from_outside_container)
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
 		//Wyrmgus start
 //		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource);
-		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource, unit.MapLayer);
+		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource, startUnit.MapLayer);
 		//Wyrmgus end
 	}
 
@@ -735,7 +724,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	//Wyrmgus start
 //	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[unit.MapLayer], Map.Info.MapHeights[unit.MapLayer]);
+	terrainTraversal.SetSize(Map.Info.MapWidths[startUnit.MapLayer], Map.Info.MapHeights[startUnit.MapLayer]);
 	if (unit.Type->BoolFlag[RAIL_INDEX].value) {
 		terrainTraversal.SetDiagonalAllowed(false);
 	}
@@ -748,7 +737,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	//Wyrmgus start
 //	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
-	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, only_harvestable, ignore_exploration, only_unsettled_area, include_luxury, only_same, check_reachable);
+	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, only_harvestable, ignore_exploration, only_unsettled_area, include_luxury, only_same, check_reachable, from_outside_container);
 	//Wyrmgus end
 
 	terrainTraversal.Run(resourceUnitFinder);

@@ -138,8 +138,8 @@ void TerrainTraversal::PushUnitPosAndNeighbor(const CUnit &unit)
 	const Vec2i start = startUnit->tilePos - offset;
 	const Vec2i end = startUnit->tilePos + extraTileSize + offset;
 
-	for (Vec2i it = start; it.y != end.y; ++it.y) {
-		for (it.x = start.x; it.x != end.x; ++it.x) {
+	for (Vec2i it = start; it.y <= end.y; ++it.y) {
+		for (it.x = start.x; it.x <= end.x; ++it.x) {
 			PushPos(it);
 		}
 	}
@@ -211,7 +211,7 @@ void FreePathfinder()
 */
 //Wyrmgus start
 //int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
-int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range, int max_length, int z)
+int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range, int max_length, int z, bool from_outside_container)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -220,12 +220,34 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 	}
 	//Wyrmgus end
 	
-	int i = AStarFindPath(src.tilePos, goalPos, w, h,
+	int i = PF_FAILED;
+	if (!src.Container || !from_outside_container) {
+		i = AStarFindPath(src.tilePos, goalPos, w, h,
 						  src.Type->TileWidth, src.Type->TileHeight,
-						  //Wyrmgus start
-//						  minrange, range, NULL, 0, src);
 						  minrange, range, NULL, 0, src, max_length, z);
-						  //Wyrmgus end
+	} else {
+		const Vec2i offset(1, 1);
+		const Vec2i extra_tile_size(src.Container->Type->TileWidth - 1, src.Container->Type->TileHeight - 1);
+		const Vec2i start_pos = src.Container->tilePos - offset;
+		const Vec2i end_pos = src.Container->tilePos + extra_tile_size + offset;
+		const Vec2i pos_diff = end_pos - start_pos;
+
+		int temp_i = PF_FAILED;
+		for (Vec2i it = start_pos; it.y <= end_pos.y; it.y += pos_diff.y) {
+			for (it.x = start_pos.x; it.x <= end_pos.x; it.x += pos_diff.x) {
+				if (!Map.Info.IsPointOnMap(it, src.Container->MapLayer)) {
+					continue;
+				}
+				temp_i = AStarFindPath(it, goalPos, w, h,
+						  src.Type->TileWidth, src.Type->TileHeight,
+						  minrange, range, NULL, 0, src, max_length, z);
+						  
+				if (temp_i > i && i < PF_REACHED) {
+					i = temp_i;
+				}
+			}
+		}
+	}
 
 	switch (i) {
 		case PF_FAILED:
@@ -260,7 +282,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 */
 //Wyrmgus start
 //int UnitReachable(const CUnit &src, const CUnit &dst, int range)
-int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length)
+int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length, bool from_outside_container)
 //Wyrmgus end
 {
 	//  Find a path to the goal.
@@ -270,7 +292,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length)
 	const int depth = PlaceReachable(src, dst.tilePos,
 									 //Wyrmgus start
 //									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range);
-									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range, max_length, dst.MapLayer);
+									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range, max_length, dst.MapLayer, from_outside_container);
 									 //Wyrmgus end
 	if (depth <= 0) {
 		return 0;
