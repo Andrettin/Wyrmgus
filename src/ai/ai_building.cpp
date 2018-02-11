@@ -279,7 +279,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, con
 	terrainTraversal.Init();
 
 	if (startUnit != NULL) {
-		terrainTraversal.PushUnitPosAndNeighboor(*startUnit);
+		terrainTraversal.PushUnitPosAndNeighbor(*startUnit);
 	} else {
 		//Wyrmgus start
 //		Assert(Map.Info.IsPointOnMap(startPos));

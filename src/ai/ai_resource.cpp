@@ -1865,7 +1865,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	terrainTraversal.PushUnitPosAndNeighboor(building);
+	terrainTraversal.PushUnitPosAndNeighbor(building);
 
 	const int maxRange = 15;
 	const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
@@ -2146,22 +2146,13 @@ static void AiCheckPathwayConstruction()
 						UnmarkUnitFieldFlags(*depot);
 						
 						//make the first path
-						int worker_path_length = AStarFindPath(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), depot->tilePos + Vec2i((depot->Type->TileWidth - 1) / 2, (depot->Type->TileHeight - 1) / 2), depot->Type->TileWidth, depot->Type->TileHeight, 1, 1, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer);
+						int worker_path_length = AStarFindPath(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), depot->tilePos + Vec2i((depot->Type->TileWidth - 1) / 2, (depot->Type->TileHeight - 1) / 2), depot->Type->TileWidth, depot->Type->TileHeight, 1, 1, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer, false);
 						Vec2i worker_path_pos(unit.tilePos);
 						std::vector<Vec2i> first_path_tiles;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
 							Vec2i pos_change(0, 0);
 							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
 							pos_change.y = Heading2Y[(int)worker_path[worker_path_length - 1]];
-							if (pos_change.x != 0 && pos_change.y != 0) { //if is a diagonal movement, also add horizontally/vertically adjacent tiles, since pathways can't be diagonal in their graphics
-								Vec2i horizontal_tile(worker_path_pos.x + pos_change.x, worker_path_pos.y);
-								pathway_tiles.push_back(horizontal_tile);
-								first_path_tiles.push_back(horizontal_tile);
-								
-								Vec2i diagonal_tile(worker_path_pos.x, worker_path_pos.y + pos_change.y);
-								pathway_tiles.push_back(diagonal_tile);
-								first_path_tiles.push_back(diagonal_tile);
-							}
 							worker_path_pos += pos_change;
 							pathway_tiles.push_back(worker_path_pos);
 							if (worker_path_length > 1) {
@@ -2178,19 +2169,12 @@ static void AiCheckPathwayConstruction()
 						}
 						
 						//make the second path
-						worker_path_length = AStarFindPath(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), depot->tilePos + Vec2i((depot->Type->TileWidth - 1) / 2, (depot->Type->TileHeight - 1) / 2), depot->Type->TileWidth, depot->Type->TileHeight, test_worker->Type->TileWidth, test_worker->Type->TileHeight, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer);
+						worker_path_length = AStarFindPath(unit.tilePos + Vec2i((unit.Type->TileWidth - 1) / 2, (unit.Type->TileHeight - 1) / 2), depot->tilePos + Vec2i((depot->Type->TileWidth - 1) / 2, (depot->Type->TileHeight - 1) / 2), depot->Type->TileWidth, depot->Type->TileHeight, test_worker->Type->TileWidth, test_worker->Type->TileHeight, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer, false);
 						worker_path_pos = unit.tilePos;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
 							Vec2i pos_change(0, 0);
 							pos_change.x = Heading2X[(int)worker_path[worker_path_length - 1]];
 							pos_change.y = Heading2Y[(int)worker_path[worker_path_length - 1]];
-							if (pos_change.x != 0 && pos_change.y != 0) { //if is a diagonal movement, also add horizontally/vertically adjacent tiles, since pathways can't be diagonal in their graphics
-								Vec2i horizontal_tile(worker_path_pos.x + pos_change.x, worker_path_pos.y);
-								pathway_tiles.push_back(horizontal_tile);
-								
-								Vec2i diagonal_tile(worker_path_pos.x, worker_path_pos.y + pos_change.y);
-								pathway_tiles.push_back(diagonal_tile);
-							}
 							worker_path_pos += pos_change;
 							pathway_tiles.push_back(worker_path_pos);
 							worker_path_length -= 1;
@@ -2607,12 +2591,13 @@ static void AiCheckMinecartConstruction()
 					
 			for (size_t j = 0; j < mine_table.size(); ++j) {
 				const CUnit *mine_unit = mine_table[j];
+				CSettlement *mine_settlement = mine_unit->Settlement;
 						
-				if (!mine_unit->Settlement) {
+				if (!mine_settlement) {
 					continue;
 				}
 						
-				const CUnit *town_hall_unit = mine_unit->Settlement->SettlementUnit;
+				const CUnit *town_hall_unit = mine_settlement->SettlementUnit;
 				
 				if (!town_hall_unit) {
 					continue;
@@ -2620,12 +2605,17 @@ static void AiCheckMinecartConstruction()
 				
 				std::vector<CUnit *> settlement_minecart_table;
 				SelectAroundUnit(*mine_unit, 8, settlement_minecart_table, MakeAndPredicate(HasSamePlayerAs(*AiPlayer->Player), HasSameTypeAs(*minecart_type)));
-				if (settlement_minecart_table.size() > 0) { //only build one minecart per mine, to prevent pathway blockage
+				int settlement_minecart_count = settlement_minecart_table.size();
+				settlement_minecart_count += mine_unit->GetTotalInsideCount(AiPlayer->Player, true, false, minecart_type);
+				settlement_minecart_count += town_hall_unit->GetTotalInsideCount(AiPlayer->Player, true, false, minecart_type);
+				settlement_minecart_count += AiGetUnitTypeRequestedCount(*AiPlayer, minecart_type, 0, mine_settlement);
+				
+				if (settlement_minecart_count > 0) { //only build one minecart per mine, to prevent pathway blockage
 					continue;
 				}
 				
 				if (CheckPathwayConnection(*mine_unit, *town_hall_unit, MapFieldRailroad)) {
-					potential_settlements.push_back(mine_unit->Settlement);
+					potential_settlements.push_back(mine_settlement);
 				}
 			}
 		}

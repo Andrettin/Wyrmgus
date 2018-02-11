@@ -588,7 +588,9 @@ extern int AiGetTransportCapacity(int water_landmass);
 /// Get the current requested transport capacity of the AI for a given water zone
 extern int AiGetRequestedTransportCapacity(int water_landmass);
 /// Get the quantity of units belonging to a particular type, possibly including requests
-extern int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass, bool include_requests, bool include_upgrades);
+extern int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int landmass, const bool include_requests, const bool include_upgrades);
+/// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
+extern int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const CUnitType *type, const int landmass = 0, const CSettlement *settlement = NULL);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
 extern bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_requests);
 //Wyrmgus end

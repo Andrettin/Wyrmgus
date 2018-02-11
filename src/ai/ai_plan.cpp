@@ -196,7 +196,7 @@ static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	terrainTraversal.PushUnitPosAndNeighboor(unit);
+	terrainTraversal.PushUnitPosAndNeighbor(unit);
 
 	WallFinder wallFinder(unit, range, wallPos);
 
@@ -297,7 +297,7 @@ VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, co
 
 static void MarkReacheableTerrainType(const CUnit &unit, TerrainTraversal *terrainTraversal)
 {
-	terrainTraversal->PushUnitPosAndNeighboor(unit);
+	terrainTraversal->PushUnitPosAndNeighbor(unit);
 
 	ReachableTerrainMarker reachableTerrainMarker(unit);
 
@@ -373,7 +373,7 @@ static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTrans
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	terrainTraversal.PushUnitPosAndNeighboor(unit);
+	terrainTraversal.PushUnitPosAndNeighbor(unit);
 
 	EnemyFinderWithTransporter enemyFinderWithTransporter(unit, terrainTransporter, resultPos);
 

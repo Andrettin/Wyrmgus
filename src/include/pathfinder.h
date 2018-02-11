@@ -148,12 +148,14 @@ class TerrainTraversal
 public:
 	typedef short int dataType;
 public:
+	TerrainTraversal() : allow_diagonal(true) {}
 	void SetSize(unsigned int width, unsigned int height);
+	void SetDiagonalAllowed(const bool allowed);
 	void Init();
 
 	void PushPos(const Vec2i &pos);
-	void PushNeighboor(const Vec2i &pos);
-	void PushUnitPosAndNeighboor(const CUnit &unit);
+	void PushNeighbor(const Vec2i &pos);
+	void PushUnitPosAndNeighbor(const CUnit &unit);
 
 	template <typename T>
 	bool Run(T &context);
@@ -179,6 +181,7 @@ private:
 	std::queue<PosNode> m_queue;
 	unsigned int m_extented_width;
 	unsigned int m_height;
+	bool allow_diagonal;
 };
 
 template <typename T>
@@ -190,7 +193,7 @@ bool TerrainTraversal::Run(T &context)
 		switch (context.Visit(*this, posNode.pos, posNode.from)) {
 			case VisitResult_Finished: return true;
 			case VisitResult_DeadEnd: Set(posNode.pos, -1); break;
-			case VisitResult_Ok: PushNeighboor(posNode.pos); break;
+			case VisitResult_Ok: PushNeighbor(posNode.pos); break;
 			case VisitResult_Cancel: return false;
 		}
 		Assert(IsVisited(posNode.pos));
@@ -261,7 +264,7 @@ extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, in
 						 int tilesizex, int tilesizey, int minrange,
 						 //Wyrmgus start
 //						 int maxrange, char *path, int pathlen, const CUnit &unit);
-						 int maxrange, char *path, int pathlen, const CUnit &unit, int max_length, int z);
+						 int maxrange, char *path, int pathlen, const CUnit &unit, int max_length, int z, bool allow_diagonal = true);
 						 //Wyrmgus end
 //Wyrmgus end
 

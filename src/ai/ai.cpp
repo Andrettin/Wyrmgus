@@ -1598,7 +1598,7 @@ void AiEachMinute(CPlayer &player)
 	AiForceManagerEachMinute();
 }
 
-int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass, bool include_requests, bool include_upgrades)
+int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int landmass, const bool include_requests, const bool include_upgrades)
 {
 	int count = 0;
 	
@@ -1619,12 +1619,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass,
 	}
 		
 	if (include_requests) {
-		for (size_t i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
-			const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
-			if ((!landmass || queue.Landmass == landmass) && queue.Type == type) {
-				count += queue.Want;
-			}
-		}
+		count += AiGetUnitTypeRequestedCount(pai, type, landmass);
 	}
 	
 	if (include_upgrades) {
@@ -1635,6 +1630,24 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, int landmass,
 		}
 	}
 	
+	return count;
+}
+
+int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const CUnitType *type, const int landmass, const CSettlement *settlement)
+{
+	int count = 0;
+	
+	for (size_t i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
+		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
+		if (
+			queue.Type == type
+			&& (!landmass || queue.Landmass == landmass)
+			&& (!settlement || queue.Settlement == settlement)
+		) {
+			count += queue.Want;
+		}
+	}
+		
 	return count;
 }
 

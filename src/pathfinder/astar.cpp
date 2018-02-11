@@ -1245,7 +1245,7 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 							   int, int, int minrange, int maxrange,
 							   //Wyrmgus start
 //							   char *path, const CUnit &unit)
-							   char *path, const CUnit &unit, int z)
+							   char *path, const CUnit &unit, int z, bool allow_diagonal)
 							   //Wyrmgus end
 {
 	ProfileBegin("AStarFindSimplePath");
@@ -1275,7 +1275,7 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 
 	//Wyrmgus start
 //	if (MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1) {
-	if (minrange <= distance && MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1 && (!unit.Type->BoolFlag[RAIL_INDEX].value || (diff.x == 0 && diff.y == 0))) {
+	if (minrange <= distance && MyAbs(diff.x) <= 1 && MyAbs(diff.y) <= 1 && (allow_diagonal || (diff.x == 0 && diff.y == 0))) {
 	//Wyrmgus end
 		// Move to adjacent cell
 		//Wyrmgus start
@@ -1304,7 +1304,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				  int tilesizex, int tilesizey, int minrange, int maxrange,
 				  //Wyrmgus start
 //				  char *path, int pathlen, const CUnit &unit)
-				  char *path, int pathlen, const CUnit &unit, int max_length, int z)
+				  char *path, int pathlen, const CUnit &unit, int max_length, int z, bool allow_diagonal)
 				  //Wyrmgus end
 {
 	//Wyrmgus start
@@ -1314,6 +1314,8 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	if (unit.MapLayer != z) {
 		return PF_UNREACHABLE;
 	}
+	
+	allow_diagonal = allow_diagonal && !unit.Type->BoolFlag[RAIL_INDEX].value; //rail units cannot move diagonally
 	//Wyrmgus end
 
 	ProfileBegin("AStarFindPath");
@@ -1325,7 +1327,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	int ret = AStarFindSimplePath(startPos, goalPos, gw, gh, tilesizex, tilesizey,
 								  //Wyrmgus start
 //								  minrange, maxrange, path, unit);
-								  minrange, maxrange, path, unit, z);
+								  minrange, maxrange, path, unit, z, allow_diagonal);
 								  //Wyrmgus end
 	if (ret != PF_FAILED) {
 		ProfileEnd("AStarFindPath");
@@ -1462,7 +1464,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 
 		for (int i = 0; i < 8; ++i) {
 			//Wyrmgus start
-			if (unit.Type->BoolFlag[RAIL_INDEX].value && Heading2X[i] != 0 && Heading2Y[i] != 0) { //rail units can't move diagonally
+			if (!allow_diagonal && Heading2X[i] != 0 && Heading2Y[i] != 0) { //rail units can't move diagonally
 				continue;
 			}
 			//Wyrmgus end

@@ -4124,9 +4124,9 @@ void CorrectWallDirections(CUnit &unit)
 //			const CUnitCache &unitCache = Map.Field(pos)->UnitCache;
 			const CUnitCache &unitCache = Map.Field(pos, unit.MapLayer)->UnitCache;
 			//Wyrmgus end
-			const CUnit *neighboor = unitCache.find(HasSamePlayerAndTypeAs(unit));
+			const CUnit *neighbor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
-			if (neighboor != NULL) {
+			if (neighbor != NULL) {
 				flags |= dirFlag;
 			}
 		}
@@ -4158,11 +4158,11 @@ void CorrectWallNeighBours(CUnit &unit)
 //		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
 		CUnitCache &unitCache = Map.Field(pos, unit.MapLayer)->UnitCache;
 		//Wyrmgus end
-		CUnit *neighboor = unitCache.find(HasSamePlayerAndTypeAs(unit));
+		CUnit *neighbor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
-		if (neighboor != NULL) {
-			CorrectWallDirections(*neighboor);
-			UnitUpdateHeading(*neighboor);
+		if (neighbor != NULL) {
+			CorrectWallDirections(*neighbor);
+			UnitUpdateHeading(*neighbor);
 		}
 	}
 }
@@ -5586,7 +5586,7 @@ int CUnit::GetResourceStep(const int resource) const
 	return resource_step;
 }
 
-int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, const bool ignore_saved_cargo) const
+int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, const bool ignore_saved_cargo, const CUnitType *type) const
 {
 	if (!this->UnitInside) {
 		return 0;
@@ -5600,7 +5600,11 @@ int CUnit::GetTotalInsideCount(const CPlayer *player, const bool ignore_items, c
 	
 	CUnit *inside_unit = this->UnitInside;
 	for (int j = 0; j < this->InsideCount; ++j, inside_unit = inside_unit->NextContained) {
-		if ((!player || inside_unit->Player == player) && (!ignore_items || !inside_unit->Type->BoolFlag[ITEM_INDEX].value)) { //only count units of the faction, ignore items
+		if ( //only count units of the faction, ignore items
+			(!player || inside_unit->Player == player)
+			&& (!ignore_items || !inside_unit->Type->BoolFlag[ITEM_INDEX].value)
+			&& (!type || inside_unit->Type == type)
+		) {
 			inside_count++;
 		}
 		inside_count += inside_unit->GetTotalInsideCount(player, ignore_items, ignore_saved_cargo);

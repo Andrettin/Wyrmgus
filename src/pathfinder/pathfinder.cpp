@@ -78,6 +78,11 @@ void TerrainTraversal::SetSize(unsigned int width, unsigned int height)
 	m_height = height;
 }
 
+void TerrainTraversal::SetDiagonalAllowed(const bool allowed)
+{
+	allow_diagonal = allowed;
+}
+
 void TerrainTraversal::Init()
 {
 	const unsigned int height = m_height;
@@ -101,13 +106,14 @@ void TerrainTraversal::PushPos(const Vec2i &pos)
 	}
 }
 
-void TerrainTraversal::PushNeighboor(const Vec2i &pos)
+void TerrainTraversal::PushNeighbor(const Vec2i &pos)
 {
 	const Vec2i offsets[] = {Vec2i(0, -1), Vec2i(-1, 0), Vec2i(1, 0), Vec2i(0, 1),
 							 Vec2i(-1, -1), Vec2i(1, -1), Vec2i(-1, 1), Vec2i(1, 1)
 							};
 
-	for (int i = 0; i != 8; ++i) {
+	int offsets_size = allow_diagonal ? 8 : 4;
+	for (int i = 0; i != offsets_size; ++i) {
 		const Vec2i newPos = pos + offsets[i];
 
 		if (IsVisited(newPos) == false) {
@@ -117,14 +123,14 @@ void TerrainTraversal::PushNeighboor(const Vec2i &pos)
 	}
 }
 
-void TerrainTraversal::PushUnitPosAndNeighboor(const CUnit &unit)
+void TerrainTraversal::PushUnitPosAndNeighbor(const CUnit &unit)
 {
 	const CUnit *startUnit = GetFirstContainer(unit);
 	//Wyrmgus start
 	if (startUnit == NULL) {
-		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighboor() error: startUnit is NULL.\n");
+		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit is NULL.\n");
 	} else if (startUnit->Type == NULL) {
-		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighboor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is NULL.\n", startUnit->Name.c_str(), UnitNumber(*startUnit), startUnit->tilePos.x, startUnit->tilePos.y);
+		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is NULL.\n", startUnit->Name.c_str(), UnitNumber(*startUnit), startUnit->tilePos.x, startUnit->tilePos.y);
 	}
 	//Wyrmgus end
 	const Vec2i offset(1, 1);

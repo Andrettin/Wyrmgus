@@ -211,7 +211,7 @@ public:
 			terrainTraversal.SetSize(Map.Info.MapWidths[unit->MapLayer], Map.Info.MapHeights[unit->MapLayer]);
 			terrainTraversal.Init();
 
-			terrainTraversal.PushUnitPosAndNeighboor(*unit);
+			terrainTraversal.PushUnitPosAndNeighbor(*unit);
 
 			CUnit *result_unit = NULL;
 
