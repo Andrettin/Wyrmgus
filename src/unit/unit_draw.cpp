@@ -636,6 +636,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || (unit.Player == ThisPlayer && var.HideSelf)
 			  || unit.Type->BoolFlag[DECORATION_INDEX].value // don't show decorations for decoration units
 //			  || max == 0)) {
+			  || (var.ShowIfCanCastAnySpell && !unit.CanCastAnySpell())
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end
 			var.Draw(

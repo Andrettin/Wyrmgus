@@ -3452,6 +3452,7 @@ static int CclDefineDecorations(lua_State *l)
 		bool HideSelf;
 		//Wyrmgus end
 		bool ShowOpponent;
+		bool ShowIfCanCastAnySpell;
 	} tmp;
 
 	const int nargs = lua_gettop(l);
@@ -3498,6 +3499,8 @@ static int CclDefineDecorations(lua_State *l)
 			//Wyrmgus end
 			} else if (!strcmp(key, "ShowOpponent")) {
 				tmp.ShowOpponent = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "ShowIfCanCastAnySpell")) {
+				tmp.ShowIfCanCastAnySpell = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "Method")) {
 				Assert(lua_istable(l, -1));
 				lua_rawgeti(l, -1, 1); // MethodName
@@ -3595,6 +3598,7 @@ static int CclDefineDecorations(lua_State *l)
 		decovar->HideSelf = tmp.HideSelf;
 		//Wyrmgus end
 		decovar->ShowOpponent = tmp.ShowOpponent;
+		decovar->ShowIfCanCastAnySpell = tmp.ShowIfCanCastAnySpell;
 		//Wyrmgus start
 //		UnitTypeVar.DecoVar.push_back(decovar);
 		bool already_defined = false;

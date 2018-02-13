@@ -494,6 +494,8 @@ public:
 	bool HideSelf;			/// if true, don't show for own units.
 	//Wyrmgus end
 	bool ShowOpponent;      /// if true, show for opponent unit.
+	
+	bool ShowIfCanCastAnySpell;   /// if true, only show if the unit can cast a spell.
 };
 
 class CDecoVarBar : public CDecoVar

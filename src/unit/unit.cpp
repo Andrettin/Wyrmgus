@@ -5735,6 +5735,21 @@ bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
 	return true;
 }
 
+bool CUnit::CanCastAnySpell() const
+{
+	if (!this->Type->CanCastSpell) {
+		return false;
+	}
+	
+	for (size_t i = 0; i < SpellTypeTable.size(); ++i) {
+		if (this->Type->CanCastSpell[i] && SpellIsAvailable(*this, SpellTypeTable[i]->Slot)) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 bool CUnit::IsItemEquipped(const CUnit *item) const
 {
 	int item_slot = GetItemClassSlot(item->Type->ItemClass);

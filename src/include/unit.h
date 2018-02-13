@@ -419,6 +419,7 @@ public:
 	bool IsInCombat() const;
 	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;
 	bool CanReturnGoodsTo(const CUnit *dest, int resource = 0) const;
+	bool CanCastAnySpell() const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemClassEquipped(int item_class) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
