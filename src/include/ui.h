@@ -187,7 +187,7 @@ class ConditionPanel
 {
 public:
 	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
-		HideAllied(false), ShowOpponent(false), BoolFlags(NULL),
+		HideAllied(false), ShowOpponent(false), ShowIfCanCastAnySpell(false), BoolFlags(NULL),
 		//Wyrmgus start
 		Affixed(0), Unique(0), Replenishment(0),
 		//Wyrmgus end
@@ -203,6 +203,7 @@ public:
 	bool HideNeutral;           /// if true, don't show for neutral unit.
 	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
 	bool ShowOpponent;          /// if true, show for opponent unit.
+	bool ShowIfCanCastAnySpell; /// if true, show only if the unit can cast any spell
 
 	//Wyrmgus start
 	char Affixed;				/// check if the button's unit has an affix

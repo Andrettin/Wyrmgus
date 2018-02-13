@@ -465,6 +465,8 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 			condition->HideAllied = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "ShowOpponent")) {
 			condition->ShowOpponent = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "ShowIfCanCastAnySpell")) {
+			condition->ShowIfCanCastAnySpell = LuaToBoolean(l, -1);
 		//Wyrmgus start
 		} else if (!strcmp(key, "Affixed")) {
 			condition->Affixed = Ccl2Condition(l, LuaToString(l, -1));
