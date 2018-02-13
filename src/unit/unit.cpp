@@ -2659,7 +2659,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			player.ResourceDemand[i] += type.Stats[player.Index].ResourceDemand[i];
 		}
 		
-		if (player.AiEnabled && player.Ai && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && !type.CanCastSpell && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+		if (player.AiEnabled && player.Ai && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && type.Spells.size() == 0 && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 			player.Ai->Scouts.push_back(this);
 		}
 		//Wyrmgus end
@@ -4545,7 +4545,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 		newplayer.ResourceDemand[i] += Type->Stats[newplayer.Index].ResourceDemand[i];
 	}
 	
-	if (newplayer.AiEnabled && newplayer.Ai && this->Type->BoolFlag[COWARD_INDEX].value && !this->Type->BoolFlag[HARVESTER_INDEX].value && !this->Type->CanTransport() && !this->Type->CanCastSpell && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+	if (newplayer.AiEnabled && newplayer.Ai && this->Type->BoolFlag[COWARD_INDEX].value && !this->Type->BoolFlag[HARVESTER_INDEX].value && !this->Type->CanTransport() && this->Type->Spells.size() == 0 && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		newplayer.Ai->Scouts.push_back(this);
 	}
 	//Wyrmgus end
@@ -5737,12 +5737,8 @@ bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
 
 bool CUnit::CanCastAnySpell() const
 {
-	if (!this->Type->CanCastSpell) {
-		return false;
-	}
-	
-	for (size_t i = 0; i < SpellTypeTable.size(); ++i) {
-		if (this->Type->CanCastSpell[i] && SpellIsAvailable(*this, SpellTypeTable[i]->Slot)) {
+	for (size_t i = 0; i < this->Type->Spells.size(); ++i) {
+		if (SpellIsAvailable(*this, this->Type->Spells[i]->Slot)) {
 			return true;
 		}
 	}

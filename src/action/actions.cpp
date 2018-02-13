@@ -343,12 +343,11 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		unit.Threshold = 0;
 	}
 
-	if (unit.Type->CanCastSpell) {
-		// decrease spell countdown timers
-		for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
-			if (unit.SpellCoolDownTimers[i] > 0) {
-				--unit.SpellCoolDownTimers[i];
-			}
+	// decrease spell countdown timers
+	for (size_t i = 0; i < unit.Type->Spells.size(); ++i) {
+		int spell_id = unit.Type->Spells[i]->Slot;
+		if (unit.SpellCoolDownTimers[spell_id] > 0) {
+			--unit.SpellCoolDownTimers[spell_id];
 		}
 	}
 

@@ -332,13 +332,6 @@ static int CclDefineSpell(lua_State *l)
 	} else {
 		spell = new SpellType(SpellTypeTable.size(), identname);
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for caster already defined
-			if (UnitTypes[i]->CanCastSpell) {
-				char *newc = new char[(SpellTypeTable.size() + 1) * sizeof(char)];
-				memcpy(newc, UnitTypes[i]->CanCastSpell, SpellTypeTable.size() * sizeof(char));
-				delete[] UnitTypes[i]->CanCastSpell;
-				UnitTypes[i]->CanCastSpell = newc;
-				UnitTypes[i]->CanCastSpell[SpellTypeTable.size()] = 0;
-			}
 			if (UnitTypes[i]->AutoCastActive) {
 				char *newc = new char[(SpellTypeTable.size() + 1) * sizeof(char)];
 				memcpy(newc, UnitTypes[i]->AutoCastActive, SpellTypeTable.size() * sizeof(char));

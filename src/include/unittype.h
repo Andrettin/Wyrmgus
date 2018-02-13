@@ -1032,7 +1032,7 @@ public:
 	int BurnDamageRate;             /// HP burn rate per sec
 	int RepairRange;                /// Units repair range.
 #define InfiniteRepairRange INT_MAX
-	char *CanCastSpell;             /// Unit is able to use spells.
+	std::vector<SpellType *> Spells;	/// Spells the unit is able to cast.
 	char *AutoCastActive;           /// Default value for autocast.
 	int AutoBuildRate;              /// The rate at which the building builds itself
 	int RandomMovementProbability;  /// Probability to move randomly.

@@ -56,21 +56,20 @@ void AiCheckMagic()
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = player.GetUnit(i);
 
-		if (unit.Type->CanCastSpell) {
+		if (unit.Type->Spells.size() > 0) {
 			// Check only idle magic units
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitActionSpellCast) {
 					return;
 				}
 			}
-			for (unsigned int j = 0; j < SpellTypeTable.size(); ++j) {
+			for (unsigned int j = 0; j < unit.Type->Spells.size(); ++j) {
+				SpellType *spell = unit.Type->Spells[j];
+				int spell_id = spell->Slot;
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-				//Wyrmgus start
-//				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(player, j)
-				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(unit, j)
-				//Wyrmgus end
-					&& SpellTypeTable[j]->AICast) {
-					if (AutoCastSpell(unit, *SpellTypeTable[j])) {
+				if (SpellIsAvailable(unit, spell_id)
+					&& spell->AICast) {
+					if (AutoCastSpell(unit, *spell)) {
 						break;
 					}
 				}

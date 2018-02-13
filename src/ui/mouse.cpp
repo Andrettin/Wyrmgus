@@ -548,12 +548,10 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 			PlayUnitSound(unit, VoiceAttack);
 			acknowledged = 1;
 		}
-		if (action == MouseActionSpellCast) {
+		if (action == MouseActionSpellCast && unit.Type->Spells.size() > 0) {
 			// This is for demolition squads and such
-			Assert(unit.Type->CanCastSpell);
-			size_t spellnum;
-			for (spellnum = 0; !type.CanCastSpell[spellnum] && spellnum < SpellTypeTable.size() ; spellnum++) {
-			}
+			Assert(unit.Type->Spells.size() > 0);
+			int spellnum = type.Spells[0]->Slot;
 			//Wyrmgus start
 //			SendCommandSpellCast(unit, pos, &dest, spellnum, flush);
 			SendCommandSpellCast(unit, pos, &dest, spellnum, flush, CurrentMapLayer);
@@ -2032,7 +2030,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 	 */
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
-		if (!unit.Type->CanCastSpell) {
+		if (unit.Type->Spells.size() == 0) {
 			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
 					   UnitNumber(unit) _C_ unit.Type->Name.c_str());
 			// this unit cannot cast spell

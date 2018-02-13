@@ -814,12 +814,8 @@ static int CclDefineUnitType(lua_State *l)
 			if (!type->Icon.Name.empty()) {
 				type->Icon.Load();
 			}
-			if (parent_type->CanCastSpell) {
-				type->CanCastSpell = new char[SpellTypeTable.size()];
-				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
-				for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
-					type->CanCastSpell[i] = parent_type->CanCastSpell[i];
-				}
+			for (size_t i = 0; i < parent_type->Spells.size(); ++i) {
+				type->Spells.push_back(parent_type->Spells[i]);
 			}
 			if (parent_type->AutoCastActive) {
 				type->AutoCastActive = new char[SpellTypeTable.size()];
@@ -1877,26 +1873,17 @@ static int CclDefineUnitType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			//
-			// Warning: can-cast-spell should only be used AFTER all spells
-			// have been defined. FIXME: MaxSpellType=500 or something?
-			//
-			if (!type->CanCastSpell) {
-				type->CanCastSpell = new char[SpellTypeTable.size()];
-				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
-			}
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
-				delete[] type->CanCastSpell;
-				type->CanCastSpell = NULL;
+				type->Spells.clear();
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
-				const SpellType *spell = SpellTypeByIdent(value);
+				SpellType *spell = SpellTypeByIdent(value);
 				if (spell == NULL) {
 					LuaError(l, "Unknown spell type: %s" _C_ value);
 				}
-				type->CanCastSpell[spell->Slot] = 1;
+				type->Spells.push_back(spell);
 			}
 		} else if (!strcmp(value, "AutoCastActive")) {
 			if (!lua_istable(l, -1)) {

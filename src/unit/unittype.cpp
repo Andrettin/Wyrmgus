@@ -326,9 +326,9 @@
 **
 **    What resource types we can store here.
 **
-**  CUnitType::CanCastSpell
+**  CUnitType::Spells
 **
-**    Unit is able to use spells
+**    Spells the unit is able to use
 **
 **  CUnitType::CanAttack
 **
@@ -574,7 +574,7 @@ CUnitType::CUnitType() :
 	MinAttackRange(0),
 	//Wyrmgus end
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
-	CanCastSpell(NULL), AutoCastActive(NULL),
+	AutoCastActive(NULL),
 	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(1), ClicksToExplode(0),
 	//Wyrmgus start
 //	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
@@ -646,7 +646,6 @@ CUnitType::~CUnitType()
 	}
 	AiBuildingRules.clear();
 
-	delete[] CanCastSpell;
 	delete[] AutoCastActive;
 
 	for (int res = 0; res < MaxCosts; ++res) {

@@ -712,7 +712,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		//Wyrmgus start
 //		UiDrawLifeBar(*uins, pos.x, pos.y);
 //		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Enable && uins->GetModifiedVariable(MANA_INDEX, VariableMax)) {
+		if (uins->Type->Spells.size() > 0 && uins->Variable[MANA_INDEX].Enable && uins->GetModifiedVariable(MANA_INDEX, VariableMax)) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			UiDrawManaBar(*uins, pos.x, pos.y);
