@@ -1210,7 +1210,7 @@ void AiAssignFreeUnitsToForce(int force)
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
 		if (unit.Active && unit.GroupId == 0) {
-			AiPlayer->Force.Assign(unit, force);
+			AiPlayer->Force.Assign(unit, force, unit.Character != NULL && !unit.Type->BoolFlag[HARVESTER_INDEX].value);
 		}
 	}
 }
