@@ -256,6 +256,14 @@ enum Months {
 	MaxMonths
 };
 
+enum Difficulties {
+	DifficultyNoDifficulty = 0,
+	DifficultyEasy,
+	DifficultyNormal,
+	DifficultyHard,
+	DifficultyBrutal
+};
+
 class CTimeline;
 
 struct CDate {

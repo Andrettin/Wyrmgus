@@ -1382,8 +1382,15 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	int resource_change = unit.ResourcesHeld * Resources[this->CurrentResource].FinalResourceConversionRate / 100;
 	int processed_resource_change = (resource_change * player.Incomes[this->CurrentResource]) / 100;
 	
-	if (player.AiEnabled && GameSettings.Difficulty == 1) {
-		processed_resource_change /= 2;
+	if (player.AiEnabled) {
+		if (GameSettings.Difficulty == DifficultyEasy) {
+			processed_resource_change /= 2;
+		} else if (GameSettings.Difficulty == DifficultyHard) {
+			processed_resource_change *= 3;
+			processed_resource_change /= 4;
+		} else if (GameSettings.Difficulty == DifficultyBrutal) {
+			processed_resource_change *= 2;
+		}
 	}
 	
 	if (!player.Overlord) {

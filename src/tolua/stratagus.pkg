@@ -88,6 +88,14 @@ $]
 #define UpButton 16
 #define DownButton 32
 
+enum Difficulties {
+	DifficultyNoDifficulty = 0,
+	DifficultyEasy,
+	DifficultyNormal,
+	DifficultyHard,
+	DifficultyBrutal
+};
+
 $using std::string;
 $using std::vector;
 
@@ -163,7 +171,7 @@ extern void SetCurrentQuest(std::string quest_ident);
 extern std::string GetCurrentQuest();
 extern void SetCurrentCampaign(std::string campaign_ident);
 extern std::string GetCurrentCampaign();
-extern void SetQuestCompleted(std::string quest_ident, int difficulty = 2, bool save = true);
+extern void SetQuestCompleted(std::string quest_ident, int difficulty = DifficultyNormal, bool save = true);
 extern void SetQuestCompleted(std::string quest_ident, bool save);
 extern void SetAchievementObtained(std::string achievement_ident, bool save = true, bool display = true);
 

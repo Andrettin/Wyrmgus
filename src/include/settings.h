@@ -118,20 +118,6 @@ enum GameTypes {
 #endif
 };
 
-//Wyrmgus start
-
-/**
-**  GameType settings
-*/
-enum Difficulties {
-	DifficultyNoDifficulty = 0,
-	DifficultyEasy,
-	DifficultyNormal,
-	DifficultyHard,
-	DifficultyBrutal
-};
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
