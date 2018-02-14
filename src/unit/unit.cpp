@@ -2315,7 +2315,7 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 		sold_unit->ChangeOwner(Players[player]);
 	}
 	Players[player].ChangeResource(CopperCost, -sold_unit->GetPrice(), true);
-	if (Players[player].AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value) { //add the hero to an AI force
+	if (Players[player].AiEnabled && !sold_unit->Type->BoolFlag[ITEM_INDEX].value && !sold_unit->Type->BoolFlag[HARVESTER_INDEX].value) { //add the hero to an AI force, if the hero isn't a harvester
 		Players[player].Ai->Force.RemoveDeadUnit();
 		Players[player].Ai->Force.Assign(*sold_unit, -1, true);
 	}

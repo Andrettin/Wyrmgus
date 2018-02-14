@@ -178,6 +178,8 @@ public:
 
 	inline bool IsAttacking() const { return (!Defending && Attacking); }
 
+	bool IsHeroOnlyForce() const;
+	
 	//Wyrmgus start
 //	void Attack(const Vec2i &pos);
 	void Attack(const Vec2i &pos, int z);
@@ -269,7 +271,7 @@ public:
 	void Update();
 	void UpdatePerHalfMinute();
 	void UpdatePerMinute();
-	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault, int begin = 0);
+	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault, int begin = 0, bool allow_hero_only_force = false);
 	void CheckUnits(int *counter);
 private:
 	std::vector<AiForce> forces;

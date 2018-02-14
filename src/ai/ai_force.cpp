@@ -740,6 +740,22 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 }
 //Wyrmgus end
 
+bool AiForce::IsHeroOnlyForce() const
+{
+	if (this->Units.size() == 0) {
+		return false;
+	}
+	
+	for (size_t i = 0; i < this->Units.size(); ++i) {
+		CUnit *const unit = this->Units[i];
+		if (!unit->Character) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
 //Wyrmgus start
 //void AiForce::Attack(const Vec2i &pos)
 void AiForce::Attack(const Vec2i &pos, int z)
@@ -1010,13 +1026,20 @@ AiForceManager::AiForceManager()
 	memset(script, -1, AI_MAX_FORCES * sizeof(char));
 }
 
-unsigned int AiForceManager::FindFreeForce(AiForceRole role, int begin)
+unsigned int AiForceManager::FindFreeForce(AiForceRole role, int begin, bool allow_hero_only_force)
 {
 	/* find free force */
 	unsigned int f = begin;
-	while (f < forces.size() && (forces[f].State > AiForceAttackingState_Free)) {
-		++f;
-	};
+	for (; f < forces.size(); ++f) {
+		if (forces[f].State == AiForceAttackingState_Free) {
+			break;
+		}
+		
+		if (allow_hero_only_force && forces[f].IsHeroOnlyForce()) {
+			break;
+		}
+	}
+	
 	if (f == forces.size()) {
 		forces.resize(f + 1);
 	}
@@ -1942,7 +1965,9 @@ void AiForceManager::UpdatePerHalfMinute()
 	for (unsigned int f = 0; f < forces.size(); ++f) {
 		AiForce &force = forces[f];
 		if (force.Completed && force.Units.size() > 0) {
-			completed_forces++;
+			if (!force.IsHeroOnlyForce()) {
+				completed_forces++;
+			}
 			//attack with forces that are completed, but aren't attacking or defending
 			if (!force.Attacking && !force.Defending) {
 				const Vec2i invalidPos(-1, -1);
@@ -1992,7 +2017,7 @@ void AiForceManager::UpdatePerHalfMinute()
 		CForceTemplate *force_template = potential_force_templates.size() ? potential_force_templates[SyncRand(potential_force_templates.size())] : NULL;
 	
 		if (force_template) {
-			unsigned int new_force_id = this->FindFreeForce();
+			unsigned int new_force_id = this->FindFreeForce(AiForceRoleDefault, 0, true);
 			AiForce &new_force = forces[new_force_id];
 			new_force.Reset(true);
 			new_force.State = AiForceAttackingState_Waiting;
