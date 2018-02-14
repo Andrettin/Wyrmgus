@@ -1124,6 +1124,10 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				continue;
 			}
 
+			if (aiunit.Type->BoolFlag[HARVESTER_INDEX].value) { //harvesters shouldn't go to help units being attacked
+				continue;
+			}
+			
 			// if brother is idle or attack no-agressive target and
 			// can attack our attacker then ask for help
 			// FIXME ad support for help from Coward type units
