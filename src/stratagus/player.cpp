@@ -3653,7 +3653,7 @@ void CPlayer::GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire
 
 int CPlayer::GetUnitTypeCostsMask(const CUnitType *type, bool hire) const
 {
-	int costs_mask;
+	int costs_mask = 0;
 	
 	int type_costs[MaxCosts];
 	AiPlayer->Player->GetUnitTypeCosts(type, type_costs, hire);
@@ -3682,7 +3682,7 @@ void CPlayer::GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs)
 
 int CPlayer::GetUpgradeCostsMask(const CUpgrade *upgrade) const
 {
-	int costs_mask;
+	int costs_mask = 0;
 	
 	int upgrade_costs[MaxCosts];
 	AiPlayer->Player->GetUpgradeCosts(upgrade, upgrade_costs);
