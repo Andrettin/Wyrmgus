@@ -274,6 +274,7 @@ public:
 	void UpdatePerMinute();
 	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault, int begin = 0, bool allow_hero_only_force = false);
 	void CheckUnits(int *counter);
+	void CheckForceRecruitment();
 private:
 	std::vector<AiForce> forces;
 	char script[AI_MAX_FORCES];
@@ -598,6 +599,8 @@ extern int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const CUnitType *typ
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
 extern bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_requests);
 //Wyrmgus end
+/// Check if the costs for an unit-type are available for the AI
+extern int AiCheckUnitTypeCosts(const CUnitType &type);
 /// Enemy units in distance
 extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,
 								  //Wyrmgus start

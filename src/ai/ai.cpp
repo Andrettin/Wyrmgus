@@ -1538,6 +1538,8 @@ void AiEachSecond(CPlayer &player)
 		return;
 	}
 	//Wyrmgus end
+	
+	AiPlayer->NeededMask = 0;
 
 	//  Look if everything is fine.
 	AiCheckUnits();

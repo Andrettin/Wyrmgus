@@ -166,11 +166,27 @@ static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 **
 **  @return      A bit field of the missing costs.
 */
-static int AiCheckUnitTypeCosts(const CUnitType &type)
+int AiCheckUnitTypeCosts(const CUnitType &type)
 {
 	int type_costs[MaxCosts];
 	AiPlayer->Player->GetUnitTypeCosts(&type, type_costs);
 	return AiCheckCosts(type_costs);
+}
+
+/**
+**  Check if the costs for an upgrade are available for the AI.
+**
+**  Take reserve and already used resources into account.
+**
+**  @param upgrade  Upgrade to check the costs for.
+**
+**  @return      A bit field of the missing costs.
+*/
+static int AiCheckUpgradeCosts(const CUpgrade &upgrade)
+{
+	int upgrade_costs[MaxCosts];
+	AiPlayer->Player->GetUpgradeCosts(&upgrade, upgrade_costs);
+	return AiCheckCosts(upgrade_costs);
 }
 
 class IsAEnemyUnitOf
@@ -1036,9 +1052,7 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 	// Check if resources are available.
 	//Wyrmgus start
 //	const int costNeeded = AiCheckCosts(upgrade->Costs);
-	int upgrade_costs[MaxCosts];
-	AiPlayer->Player->GetUpgradeCosts(upgrade, upgrade_costs);
-	const int costNeeded = AiCheckCosts(upgrade_costs);
+	const int costNeeded = AiCheckUpgradeCosts(*upgrade);
 	//Wyrmgus end
 
 	if (costNeeded) {
@@ -2464,6 +2478,11 @@ void AiCheckUpgrades()
 			continue;
 		}
 		
+		const int resourceNeeded = AiCheckUpgradeCosts(*upgrade);
+		if (AiPlayer->NeededMask & resourceNeeded) { //don't request the upgrade if it is going to use up a resource that is currently needed
+			continue;
+		}
+		
 		//remove any removed upgrades from the requests, to prevent mutually-incompatible upgrades from being researched back and forth
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 			for (size_t j = 0; j < upgrade->UpgradeModifiers[z]->RemoveUpgrades.size(); ++j) {
@@ -2509,37 +2528,39 @@ void AiCheckBuildings()
 			break; //building templates are ordered by priority, so there is no need to go further
 		}
 		
-		bool valid = true;
 		int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, building_templates[i]->UnitClass);
 		CUnitType *type = NULL;
 		if (unit_type_id != -1) {
 			type = UnitTypes[unit_type_id];
 		}
 		if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type, false, true)) {
-			valid = false;
+			continue;
 		}
 		
-		if (valid) {
-			want_counter[building_templates[i]->UnitClass]++;
-			
-			if (have_counter[building_templates[i]->UnitClass] == -1 || have_with_requests_counter[building_templates[i]->UnitClass] == -1) { //initialize values
-				have_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, type, 0, false, true);
-				have_with_requests_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, type, 0, true, true);
-			}
-			
-			if (have_with_requests_counter[building_templates[i]->UnitClass] >= want_counter[building_templates[i]->UnitClass]) {
-				if (have_counter[building_templates[i]->UnitClass] < want_counter[building_templates[i]->UnitClass]) {
-					priority = building_templates[i]->Priority; //requested but not built, don't build anything of lower priority while this isn't done
-				}
-				continue; //already requested/built, continue
-			}
-			
-			if (building_templates[i]->Priority > priority) {
-				priority = building_templates[i]->Priority;
-				potential_building_templates.clear();
-			}
-			potential_building_templates.push_back(building_templates[i]);
+		const int resourceNeeded = AiCheckUnitTypeCosts(*type);
+		if (AiPlayer->NeededMask & resourceNeeded) { //don't request the building if it is going to use up a resource that is currently needed
+			continue;
 		}
+		
+		want_counter[building_templates[i]->UnitClass]++;
+			
+		if (have_counter[building_templates[i]->UnitClass] == -1 || have_with_requests_counter[building_templates[i]->UnitClass] == -1) { //initialize values
+			have_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, type, 0, false, true);
+			have_with_requests_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, type, 0, true, true);
+		}
+			
+		if (have_with_requests_counter[building_templates[i]->UnitClass] >= want_counter[building_templates[i]->UnitClass]) {
+			if (have_counter[building_templates[i]->UnitClass] < want_counter[building_templates[i]->UnitClass]) {
+				priority = building_templates[i]->Priority; //requested but not built, don't build anything of lower priority while this isn't done
+			}
+			continue; //already requested/built, continue
+		}
+			
+		if (building_templates[i]->Priority > priority) {
+			priority = building_templates[i]->Priority;
+			potential_building_templates.clear();
+		}
+		potential_building_templates.push_back(building_templates[i]);
 	}
 	
 	if (potential_building_templates.empty()) {
@@ -2769,8 +2790,6 @@ void AiResourceManager()
 	//Wyrmgus start
 	AiCheckPathwayConstruction();
 	//Wyrmgus end
-
-	AiPlayer->NeededMask = 0;
 }
 
 //@}
