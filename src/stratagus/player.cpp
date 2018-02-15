@@ -3651,6 +3651,22 @@ void CPlayer::GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire
 	}
 }
 
+int CPlayer::GetUnitTypeCostsMask(const CUnitType *type, bool hire) const
+{
+	int costs_mask;
+	
+	int type_costs[MaxCosts];
+	AiPlayer->Player->GetUnitTypeCosts(type, type_costs, hire);
+	
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (type_costs[i] > 0) {
+			costs_mask |= 1 << i;
+		}
+	}
+	
+	return costs_mask;
+}
+
 /**
 **  Gives the cost of an upgrade for the player
 */
@@ -3663,6 +3679,23 @@ void CPlayer::GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs)
 		}
 	}
 }
+
+int CPlayer::GetUpgradeCostsMask(const CUpgrade *upgrade) const
+{
+	int costs_mask;
+	
+	int upgrade_costs[MaxCosts];
+	AiPlayer->Player->GetUpgradeCosts(upgrade, upgrade_costs);
+	
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (upgrade_costs[i] > 0) {
+			costs_mask |= 1 << i;
+		}
+	}
+	
+	return costs_mask;
+}
+
 //Wyrmgus end
 
 void CPlayer::SetUnitTypeCount(const CUnitType *type, int quantity)

@@ -1917,8 +1917,7 @@ void AiForceManager::CheckForceRecruitment()
 					break;
 				}
 				
-				const int resourceNeeded = AiCheckUnitTypeCosts(*type);
-				if (AiPlayer->NeededMask & resourceNeeded) { //don't request the force if it is going to use up a resource that is currently needed
+				if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(type)) { //don't request the force if it is going to use up a resource that is currently needed
 					valid = false;
 					break;
 				}

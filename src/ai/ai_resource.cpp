@@ -2085,6 +2085,11 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 		
+		const int resourceNeeded = AiCheckUnitTypeCosts(*type);
+		if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(type)) { //don't request the pathway type if it is going to use up a resource that is currently needed
+			continue;
+		}
+		
 		if ((type->TerrainType->Flags & MapFieldRoad) || (type->TerrainType->Flags & MapFieldRailroad)) {
 			pathway_types.push_back(type);
 		}
@@ -2256,7 +2261,7 @@ static void AiCheckPathwayConstruction()
 						}
 							
 						const int resourceNeeded = AiCheckUnitTypeCosts(*pathway_types[p]);
-						if (resourceNeeded) {
+						if (resourceNeeded) { //if no longer has the resource, or if the resource is already needed, don't build this pathway type
 							pathway_types.erase(std::remove(pathway_types.begin(), pathway_types.end(), pathway_types[p]), pathway_types.end());
 							continue;
 						}
@@ -2492,8 +2497,7 @@ void AiCheckUpgrades()
 			continue;
 		}
 		
-		const int resourceNeeded = AiCheckUpgradeCosts(*upgrade);
-		if (AiPlayer->NeededMask & resourceNeeded) { //don't request the upgrade if it is going to use up a resource that is currently needed
+		if (AiPlayer->NeededMask & AiPlayer->Player->GetUpgradeCostsMask(upgrade)) { //don't request the upgrade if it is going to use up a resource that is currently needed
 			continue;
 		}
 		
@@ -2551,8 +2555,7 @@ void AiCheckBuildings()
 			continue;
 		}
 		
-		const int resourceNeeded = AiCheckUnitTypeCosts(*type);
-		if (AiPlayer->NeededMask & resourceNeeded) { //don't request the building if it is going to use up a resource that is currently needed
+		if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(type)) { //don't request the building if it is going to use up a resource that is currently needed
 			continue;
 		}
 		

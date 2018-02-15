@@ -345,7 +345,9 @@ public:
 	
 	//Wyrmgus start
 	void GetUnitTypeCosts(const CUnitType *type, int *type_costs, bool hire = false, bool ignore_one = false) const;
+	int GetUnitTypeCostsMask(const CUnitType *type, bool hire = false) const;
 	void GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs);
+	int GetUpgradeCostsMask(const CUpgrade *upgrade) const;
 	
 	void SetUnitTypeCount(const CUnitType *type, int quantity);
 	void ChangeUnitTypeCount(const CUnitType *type, int quantity);
