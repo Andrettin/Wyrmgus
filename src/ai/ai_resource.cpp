@@ -1176,6 +1176,17 @@ static void AiCheckingWork()
 	for (int i = 0; i < sz; ++i) {
 		AiBuildQueue *queuep = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 		CUnitType &type = *queuep->Type;
+		
+		if ( //if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
+			queuep->Settlement
+			&& (
+				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SettlementUnit->Player != AiPlayer->Player)
+				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SettlementUnit->Player->Index != PlayerNumNeutral)
+			)
+		) {
+			AiPlayer->UnitTypeBuilt.erase(AiPlayer->UnitTypeBuilt.begin() + (AiPlayer->UnitTypeBuilt.size() - sz + i));
+			continue;
+		}
 
 		// FIXME: must check if requirements are fulfilled.
 		// Buildings can be destroyed.
@@ -2345,6 +2356,11 @@ void AiCheckSettlementConstruction()
 		if (std::find(worker_landmasses.begin(), worker_landmasses.end(), settlement_landmass) == worker_landmasses.end()) {
 			continue;
 		}
+		
+		if (AiGetUnitTypeRequestedCount(*AiPlayer, town_hall_type, 0, settlement_unit->Settlement) > 0) { //already requested
+			continue;
+		}
+		
 		if (!CanBuildHere(NULL, *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer)) {
 			continue;
 		}
@@ -2358,10 +2374,8 @@ void AiCheckSettlementConstruction()
 			// The type is available
 			//
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[town_hall_type->Slot][j])) {
-				if (AiBuildBuilding(*tablep[town_hall_type->Slot][j], *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer)) {
-					built_settlement = true;
-					break;
-				}
+				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->Settlement, settlement_unit->tilePos, settlement_unit->MapLayer);
+				break;
 			}
 		}
 		
@@ -2726,7 +2740,7 @@ void AiCheckWorkers()
 */
 //Wyrmgus start
 //void AiAddUnitTypeRequest(CUnitType &type, int count)
-void AiAddUnitTypeRequest(CUnitType &type, int count, int landmass, CSettlement *settlement)
+void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass, CSettlement *settlement, const Vec2i pos, int z)
 //Wyrmgus end
 {
 	AiBuildQueue queue;
@@ -2734,10 +2748,10 @@ void AiAddUnitTypeRequest(CUnitType &type, int count, int landmass, CSettlement 
 	queue.Type = &type;
 	queue.Want = count;
 	queue.Made = 0;
-	//Wyrmgus start
 	queue.Landmass = landmass;
 	queue.Settlement = settlement;
-	//Wyrmgus end
+	queue.Pos = pos;
+	queue.MapLayer = z;
 	AiPlayer->UnitTypeBuilt.push_back(queue);
 }
 

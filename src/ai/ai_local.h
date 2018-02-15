@@ -512,7 +512,7 @@ extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
 //Wyrmgus start
 //extern void AiAddUnitTypeRequest(CUnitType &type, int count);
-extern void AiAddUnitTypeRequest(CUnitType &type, int count, int landmass = 0, CSettlement *settlement = NULL);
+extern void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass = 0, CSettlement *settlement = NULL, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
 //Wyrmgus end
 /// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(CUnitType &type);
