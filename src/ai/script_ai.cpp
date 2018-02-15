@@ -166,6 +166,10 @@ static std::vector<CUnitType *> getSupplyUnits()
 
 	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
+		
+		if (type.BoolFlag[TOWNHALL_INDEX].value) {
+			continue;
+		}
 
 		if (type.DefaultStat.Variables[SUPPLY_INDEX].Value > 0) { //supply units are identified as being those with a default stat supply of 1 or more; so if a unit has a supply default stat of 0, but through an upgrade ends up having 1 or more supply, it won't be included here
 			res.push_back(&type);

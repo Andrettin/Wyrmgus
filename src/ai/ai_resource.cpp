@@ -148,6 +148,10 @@ static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 	// Count what we train.
 	for (unsigned int i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
 		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
+		
+		if (queue.Type->BoolFlag[TOWNHALL_INDEX].value) { //don't count town halls
+			continue;
+		}
 
 		remaining -= queue.Made * queue.Type->Stats[pai.Player->Index].Variables[DEMAND_INDEX].Value;
 		if (remaining < 0) {
@@ -2316,12 +2320,7 @@ void AiCheckSettlementConstruction()
 	if (!CheckDependByType(*AiPlayer->Player, *town_hall_type)) {
 		return;
 	}
-							
-	const int resourceNeeded = AiCheckUnitTypeCosts(*town_hall_type);
-	if (resourceNeeded) {
-		return;
-	}
-	
+
 	int n_t = AiHelpers.Build.size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
 	if (town_hall_type->Slot >= n_t) { // Oops not known.
@@ -2370,7 +2369,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		bool built_settlement = false;
+		bool requested_settlement = false;
 		//
 		// Find a free worker who can build a settlement on this site
 		//
@@ -2380,11 +2379,12 @@ void AiCheckSettlementConstruction()
 			//
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[town_hall_type->Slot][j])) {
 				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->Settlement, settlement_unit->tilePos, settlement_unit->MapLayer);
+				requested_settlement = true;
 				break;
 			}
 		}
 		
-		if (built_settlement) {
+		if (requested_settlement) {
 			break;
 		}
 	}
