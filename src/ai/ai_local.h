@@ -227,7 +227,8 @@ public:
 // forces
 #define AI_MAX_FORCES 50							/// How many forces are supported
 #define AI_MAX_FORCE_INTERNAL (AI_MAX_FORCES / 2)	/// The forces after AI_MAX_FORCE_INTERNAL are for internal use
-#define AI_MAX_COMPLETED_FORCES 4					/// How many completed forces the AI should have at maximum
+#define AI_MAX_COMPLETED_FORCES (AI_MAX_FORCE_INTERNAL - 1)	/// How many completed forces the AI should have at maximum
+#define AI_MAX_COMPLETED_FORCE_POP 120				/// How much population the AI completed forces should have at maximum (the AI will produce a new force if it is below this limit, even if that will make it go above it)
 
 /**
 **  AI force manager.

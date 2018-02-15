@@ -1117,7 +1117,7 @@ bool AiForceManager::Assign(CUnit &unit, int force, bool hero)
 				continue;
 			}
 			
-			if (this->Assign(unit, i, hero)) {
+			if (this->Assign(unit, i, hero && i > 0)) {
 				return true;
 			}
 		}
@@ -1982,7 +1982,21 @@ void AiForceManager::UpdatePerHalfMinute()
 		}
 	}
 	
-	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1 && completed_forces < AI_MAX_COMPLETED_FORCES) { //all current forces completed and not too many forces are in existence, create a new one
+	int completed_force_pop = 0;
+	
+	if (all_forces_completed) {
+		for (size_t f = 0; f < forces.size(); ++f) {
+			AiForce &force = forces[f];
+			if (force.Completed) {
+				for (size_t j = 0; j < force.Units.size(); ++j) {
+					CUnit *force_unit = force.Units[j];
+					completed_force_pop += force_unit->Variable[DEMAND_INDEX].Value;
+				}
+			}
+		}
+	}
+	
+	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1 && completed_forces < AI_MAX_COMPLETED_FORCES && completed_force_pop < AI_MAX_COMPLETED_FORCE_POP) { //all current forces completed and not too many forces are in existence, create a new one
 		std::vector<CForceTemplate *> faction_force_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplates(LandForceType);
 		std::vector<CForceTemplate *> potential_force_templates;
 		int priority = 0;
@@ -2017,7 +2031,7 @@ void AiForceManager::UpdatePerHalfMinute()
 		CForceTemplate *force_template = potential_force_templates.size() ? potential_force_templates[SyncRand(potential_force_templates.size())] : NULL;
 	
 		if (force_template) {
-			unsigned int new_force_id = this->FindFreeForce(AiForceRoleDefault, 0, true);
+			unsigned int new_force_id = this->FindFreeForce(AiForceRoleDefault, 1, true);
 			AiForce &new_force = forces[new_force_id];
 			new_force.Reset(true);
 			new_force.State = AiForceAttackingState_Waiting;
