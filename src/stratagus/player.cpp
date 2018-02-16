@@ -2573,22 +2573,7 @@ void CPlayer::UpdateFreeWorkers()
 //Wyrmgus start
 void CPlayer::PerformResourceTrade()
 {
-	CUnit *market_unit = NULL;
-	
-	const int n_m = AiHelpers.SellMarkets[0].size();
-
-	for (int i = 0; i < n_m; ++i) {
-		CUnitType &market_type = *AiHelpers.SellMarkets[0][i];
-
-		if (this->GetUnitTypeCount(&market_type)) {
-			std::vector<CUnit *> market_table;
-			FindPlayerUnitsByType(*this, market_type, market_table);
-			if (market_table.size() > 0) {
-				market_unit = market_table[SyncRand() % market_table.size()];
-				break;
-			}
-		}
-	}
+	CUnit *market_unit = this->GetMarketUnit();
 	
 	if (!market_unit) {
 		return;
@@ -2607,6 +2592,28 @@ void CPlayer::PerformResourceTrade()
 			this->StoredResourceDemand[res] -= 100;
 		}
 	}
+}
+
+CUnit *CPlayer::GetMarketUnit() const
+{
+	CUnit *market_unit = NULL;
+	
+	const int n_m = AiHelpers.SellMarkets[0].size();
+
+	for (int i = 0; i < n_m; ++i) {
+		CUnitType &market_type = *AiHelpers.SellMarkets[0][i];
+
+		if (this->GetUnitTypeCount(&market_type)) {
+			std::vector<CUnit *> market_table;
+			FindPlayerUnitsByType(*this, market_type, market_table);
+			if (market_table.size() > 0) {
+				market_unit = market_table[SyncRand() % market_table.size()];
+				break;
+			}
+		}
+	}
+	
+	return market_unit;
 }
 
 void CPlayer::UpdateLevelUpUnits()

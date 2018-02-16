@@ -1435,6 +1435,8 @@ static bool AiCanSellResource(int resource)
 
 static void AiProduceResources()
 {
+	CUnit *market_unit = AiPlayer->Player->GetMarketUnit();
+	
 	const int n = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
@@ -1452,6 +1454,10 @@ static void AiProduceResources()
 			int resource = AiHelpers.ProducedResources[unit.Type->Slot][j];
 			
 			if (!Resources[resource].LuxuryResource && AiCanSellResource(resource)) {
+				continue;
+			}
+			
+			if (Resources[resource].LuxuryResource && !market_unit) {
 				continue;
 			}
 			
@@ -2085,7 +2091,7 @@ static void AiCheckPathwayConstruction()
 	for (size_t i = 0; i != UnitTypes.size(); ++i) { //assumes the pathways are listed in order of speed bonus
 		CUnitType *type = UnitTypes[i];
 
-		if (!type || !type->TerrainType || !CheckDependByType(*AiPlayer->Player, *type)) {
+		if (!type || !type->TerrainType || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
 			continue;
 		}
 		
@@ -2143,6 +2149,8 @@ static void AiCheckPathwayConstruction()
 			continue;
 		}
 
+		bool built_pathway_for_building = false;
+					
 		// Building should have pathways but doesn't?
 		if (
 			unit.Type->BoolFlag[BUILDING_INDEX].value
@@ -2279,6 +2287,7 @@ static void AiCheckPathwayConstruction()
 							if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[pathway_types[p]->Slot][j])) {
 								if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, unit.MapLayer)) {
 									built_pathway = true;
+									built_pathway_for_building = true;
 									break;
 								}
 							}
@@ -2291,7 +2300,7 @@ static void AiCheckPathwayConstruction()
 			}
 
 			checked_buildings += 1;
-			if (checked_buildings >= 2) { //don't check too many buildings at once, for performance reasons
+			if (built_pathway_for_building || checked_buildings >= 2) { //don't check too many buildings at once, for performance reasons; and stop if succeeded in building a pathway for a building, so that we can check again the next time if that building still needs pathways
 				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
 				return;
 			}

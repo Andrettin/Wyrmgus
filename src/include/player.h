@@ -266,6 +266,7 @@ public:
 	void UpdateFreeWorkers();
 	//Wyrmgus start
 	void PerformResourceTrade();
+	CUnit *GetMarketUnit() const;
 	void UpdateLevelUpUnits();
 	void UpdateQuestPool();
 	void AvailableQuestsChanged();
