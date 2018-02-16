@@ -740,6 +740,38 @@ bool AiForce::CheckTransporters(const Vec2i &pos, int z)
 }
 //Wyrmgus end
 
+int AiForce::GetForceType() const
+{
+	if (this->Units.size() == 0) {
+		return LandForceType;
+	}
+	
+	int force_type = AirForceType;
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit *const unit = this->Units[i];
+		
+		if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack() && !unit->Type->CanTransport()) { //one naval unit that can attack makes this a naval force
+			return NavalForceType;
+		}
+		
+		if (unit->Type->UnitType != UnitTypeFly) { //all units must be of UnitTypeFly for it to be considered an air force
+			force_type = LandForceType;
+		}
+	}
+	
+	return force_type;
+}
+
+bool AiForce::IsNaval() const
+{
+	return this->GetForceType() == NavalForceType;
+}
+
+bool AiForce::IsAirForce() const
+{
+	return this->GetForceType() == AirForceType;
+}
+
 bool AiForce::IsHeroOnlyForce() const
 {
 	if (this->Units.size() == 0) {
@@ -790,17 +822,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	}
 	Vec2i goalPos(pos);
 
-	bool isNaval = false;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *const unit = this->Units[i];
-		//Wyrmgus start
-//		if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
-		if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack() && !unit->Type->CanTransport()) {
-		//Wyrmgus end
-			isNaval = true;
-			break;
-		}
-	}
+	bool isNaval = this->IsNaval();
 	bool isTransporter = false;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
@@ -1729,17 +1751,7 @@ void AiForce::Update()
 		Vec2i enemy_wall_pos(-1, -1);
 		int enemy_wall_map_layer = -1;
 
-		bool isNaval = false;
-		for (size_t i = 0; i != this->Units.size(); ++i) {
-			CUnit *const unit = this->Units[i];
-			//Wyrmgus start
-//			if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
-			if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack() && !unit->Type->CanTransport()) {
-			//Wyrmgus end
-				isNaval = true;
-				break;
-			}
-		}
+		bool isNaval = this->IsNaval();
 		if (isNaval) {
 			//Wyrmgus start
 //			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
@@ -1861,12 +1873,15 @@ void AiForceManager::CheckForceRecruitment()
 
 	bool all_forces_completed = true;
 	int completed_forces = 0;
+	int force_type_count[MaxForceTypes];
+	memset(force_type_count, 0, sizeof(force_type_count));
 	
 	for (unsigned int f = 0; f < forces.size(); ++f) {
 		AiForce &force = forces[f];
 		if (force.Completed && force.Units.size() > 0) {
 			if (!force.IsHeroOnlyForce()) {
 				completed_forces++;
+				force_type_count[force.GetForceType()]++;
 			}
 			//attack with forces that are completed, but aren't attacking or defending
 			if (!force.Attacking && !force.Defending) {
@@ -1897,65 +1912,83 @@ void AiForceManager::CheckForceRecruitment()
 	}
 	
 	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1 && completed_forces < AI_MAX_COMPLETED_FORCES && completed_force_pop < AI_MAX_COMPLETED_FORCE_POP) { //all current forces completed and not too many forces are in existence, create a new one
-		std::vector<CForceTemplate *> faction_force_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplates(LandForceType);
-		std::vector<CForceTemplate *> potential_force_templates;
-		int priority = 0;
-		for (size_t i = 0; i < faction_force_templates.size(); ++i) {
-			if (faction_force_templates[i]->Priority < priority) {
-				break; //force templates are ordered by priority, so there is no need to go further
-			}
-			bool valid = true;
-			for (size_t j = 0; j < faction_force_templates[i]->Units.size(); ++j) {
-				int class_id = faction_force_templates[i]->Units[j].first;
-				int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
-				CUnitType *type = NULL;
-				if (unit_type_id != -1) {
-					type = UnitTypes[unit_type_id];
-				}
-				if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
-					valid = false;
-					break;
-				}
-				
-				if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(type)) { //don't request the force if it is going to use up a resource that is currently needed
-					valid = false;
-					break;
-				}
-			}
-			if (valid) {
-				if (faction_force_templates[i]->Priority > priority) {
-					priority = faction_force_templates[i]->Priority;
-					potential_force_templates.clear();
-				}
-				for (int j = 0; j < faction_force_templates[i]->Weight; ++j) {
-					potential_force_templates.push_back(faction_force_templates[i]);
-				}
-			}
+		int force_type_weights[MaxForceTypes];
+		for (int i = 0; i < MaxForceTypes; ++i) {
+			force_type_weights[i] = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTypeWeight(i);
 		}
 		
-		CForceTemplate *force_template = potential_force_templates.size() ? potential_force_templates[SyncRand(potential_force_templates.size())] : NULL;
-	
-		if (force_template) {
-			unsigned int new_force_id = this->FindFreeForce(AiForceRoleDefault, 1, true);
-			AiForce &new_force = forces[new_force_id];
-			new_force.Reset(true);
-			new_force.State = AiForceAttackingState_Waiting;
-			new_force.Role = AiForceRoleDefault;
-			for (size_t i = 0; i < force_template->Units.size(); ++i) {
-				int class_id = force_template->Units[i].first;
-				int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
-				CUnitType *type = NULL;
-				if (unit_type_id != -1) {
-					type = UnitTypes[unit_type_id];
+		std::vector<int> force_types;
+		while ((int) force_types.size() < MaxForceTypes) {
+			for (int i = 0; i < MaxForceTypes; ++i) {
+				if (force_type_count[i] <= 0) {
+					force_types.push_back(i);
 				}
-				int count = force_template->Units[i].second;
-				
-				AiUnitType newaiut;
-				newaiut.Want = count;
-				newaiut.Type = type;
-				new_force.UnitTypes.push_back(newaiut);
+				force_type_count[i] -= force_type_weights[i];
 			}
-			AiAssignFreeUnitsToForce(new_force_id);
+		}
+
+		for (size_t k = 0; k < force_types.size(); ++k) {
+			std::vector<CForceTemplate *> faction_force_templates = PlayerRaces.Factions[AiPlayer->Player->Faction]->GetForceTemplates(force_types[k]);
+			std::vector<CForceTemplate *> potential_force_templates;
+			int priority = 0;
+			for (size_t i = 0; i < faction_force_templates.size(); ++i) {
+				if (faction_force_templates[i]->Priority < priority) {
+					break; //force templates are ordered by priority, so there is no need to go further
+				}
+				bool valid = true;
+				for (size_t j = 0; j < faction_force_templates[i]->Units.size(); ++j) {
+					int class_id = faction_force_templates[i]->Units[j].first;
+					int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
+					CUnitType *type = NULL;
+					if (unit_type_id != -1) {
+						type = UnitTypes[unit_type_id];
+					}
+					if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
+						valid = false;
+						break;
+					}
+					
+					if (AiPlayer->NeededMask & AiPlayer->Player->GetUnitTypeCostsMask(type)) { //don't request the force if it is going to use up a resource that is currently needed
+						valid = false;
+						break;
+					}
+				}
+				if (valid) {
+					if (faction_force_templates[i]->Priority > priority) {
+						priority = faction_force_templates[i]->Priority;
+						potential_force_templates.clear();
+					}
+					for (int j = 0; j < faction_force_templates[i]->Weight; ++j) {
+						potential_force_templates.push_back(faction_force_templates[i]);
+					}
+				}
+			}
+			
+			CForceTemplate *force_template = potential_force_templates.size() ? potential_force_templates[SyncRand(potential_force_templates.size())] : NULL;
+		
+			if (force_template) {
+				unsigned int new_force_id = this->FindFreeForce(AiForceRoleDefault, 1, true);
+				AiForce &new_force = forces[new_force_id];
+				new_force.Reset(true);
+				new_force.State = AiForceAttackingState_Waiting;
+				new_force.Role = AiForceRoleDefault;
+				for (size_t i = 0; i < force_template->Units.size(); ++i) {
+					int class_id = force_template->Units[i].first;
+					int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
+					CUnitType *type = NULL;
+					if (unit_type_id != -1) {
+						type = UnitTypes[unit_type_id];
+					}
+					int count = force_template->Units[i].second;
+					
+					AiUnitType newaiut;
+					newaiut.Want = count;
+					newaiut.Type = type;
+					new_force.UnitTypes.push_back(newaiut);
+				}
+				AiAssignFreeUnitsToForce(new_force_id);
+				break;
+			}
 		}
 	}
 }

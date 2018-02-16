@@ -903,6 +903,19 @@ static int CclDefineCivilization(lua_State *l)
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
 				}
 			}
+		} else if (!strcmp(value, "ForceTypeWeights")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			
+			civilization->ForceTypeWeights.clear();
+			
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int force_type = GetForceTypeIdByName(LuaToString(l, -1, j + 1));
+				++j;
+				civilization->ForceTypeWeights[force_type] = LuaToNumber(l, -1, j + 1);
+			}
 		} else if (!strcmp(value, "ForceTemplates")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -2021,6 +2034,19 @@ static int CclDefineFaction(lua_State *l)
 				} else {
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
 				}
+			}
+		} else if (!strcmp(value, "ForceTypeWeights")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			
+			faction->ForceTypeWeights.clear();
+			
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int force_type = GetForceTypeIdByName(LuaToString(l, -1, j + 1));
+				++j;
+				faction->ForceTypeWeights[force_type] = LuaToNumber(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "ForceTemplates")) {
 			const int args = lua_rawlen(l, -1);

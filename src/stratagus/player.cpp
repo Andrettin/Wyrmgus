@@ -774,6 +774,23 @@ int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
 	return 100;
 }
 
+int CCivilization::GetForceTypeWeight(int force_type) const
+{
+	if (force_type == -1) {
+		fprintf(stderr, "Error in CCivilization::GetForceTypeWeight: the force_type is -1.\n");
+	}
+	
+	if (this->ForceTypeWeights.find(force_type) != this->ForceTypeWeights.end()) {
+		return this->ForceTypeWeights.find(force_type)->second;
+	}
+	
+	if (this->ParentCivilization != -1) {
+		return PlayerRaces.Civilizations[this->ParentCivilization]->GetForceTypeWeight(force_type);
+	}
+	
+	return 1;
+}
+
 std::string CCivilization::GetMonthName(int month) const
 {
 	if (this->Months.find(month) != this->Months.end()) {
@@ -886,6 +903,27 @@ int CFaction::GetUpgradePriority(const CUpgrade *upgrade) const
 	}
 	
 	return PlayerRaces.Civilizations[this->Civilization]->GetUpgradePriority(upgrade);
+}
+
+int CFaction::GetForceTypeWeight(int force_type) const
+{
+	if (force_type == -1) {
+		fprintf(stderr, "Error in CFaction::GetForceTypeWeight: the force_type is -1.\n");
+	}
+	
+	if (this->ForceTypeWeights.find(force_type) != this->ForceTypeWeights.end()) {
+		return this->ForceTypeWeights.find(force_type)->second;
+	}
+	
+	if (this->ParentFaction != -1) {
+		return PlayerRaces.Factions[this->ParentFaction]->GetForceTypeWeight(force_type);
+	}
+	
+	if (this->Civilization == -1) {
+		fprintf(stderr, "Error in CFaction::GetForceTypeWeight: the faction has no civilization.\n");
+	}
+	
+	return PlayerRaces.Civilizations[this->Civilization]->GetForceTypeWeight(force_type);
 }
 
 std::vector<CForceTemplate *> CFaction::GetForceTemplates(int force_type) const

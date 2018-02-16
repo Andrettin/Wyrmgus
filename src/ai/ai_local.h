@@ -178,6 +178,9 @@ public:
 
 	inline bool IsAttacking() const { return (!Defending && Attacking); }
 
+	int GetForceType() const;
+	bool IsNaval() const;
+	bool IsAirForce() const;
 	bool IsHeroOnlyForce() const;
 	
 	//Wyrmgus start
