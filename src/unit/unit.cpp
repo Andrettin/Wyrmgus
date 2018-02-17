@@ -2643,26 +2643,9 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				}
 			}
 		}
-		player.ChangeUnitTypeCount(&type, 1);
-		if (Active) {
-			player.ChangeUnitTypeAiActiveCount(&type, 1);
-		}
-		//Wyrmgus start
-		if (type.BoolFlag[TOWNHALL_INDEX].value) {
-			player.NumTownHalls++;
-		}
-		if (this->Character != NULL) {
-			player.Heroes.push_back(this);
-		}
-
-		for (int i = 0; i < MaxCosts; ++i) {
-			player.ResourceDemand[i] += type.Stats[player.Index].ResourceDemand[i];
-		}
 		
-		if (player.AiEnabled && player.Ai && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && type.Spells.size() == 0 && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
-			player.Ai->Scouts.push_back(this);
-		}
-		//Wyrmgus end
+		player.IncreaseCountsForUnit(this);
+
 		player.Demand += type.Stats[player.Index].Variables[DEMAND_INDEX].Value; // food needed
 	}
 
@@ -3815,30 +3798,8 @@ void UnitLost(CUnit &unit)
 			//Wyrmgus end
 		}
 		if (unit.CurrentAction() != UnitActionBuilt) {
-			player.ChangeUnitTypeCount(&type, -1);
-			if (unit.Active) {
-				player.ChangeUnitTypeAiActiveCount(&type, -1);
-			}
-			//Wyrmgus start
-			if (type.BoolFlag[TOWNHALL_INDEX].value) {
-				player.NumTownHalls--;
-			}
-			if (unit.Character != NULL) {
-				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), &unit), player.Heroes.end());
-			}
-			
-			if (unit.Variable[LEVELUP_INDEX].Value > 0) {
-				player.UpdateLevelUpUnits(); //recalculate level-up units, since this unit no longer should be in that vector
-			}
-
-			for (int i = 0; i < MaxCosts; ++i) {
-				player.ResourceDemand[i] -= type.Stats[player.Index].ResourceDemand[i];
-			}
-			
 			if (player.AiEnabled && player.Ai) {
 				if (std::find(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit) != player.Ai->Scouts.end()) {
-					player.Ai->Scouts.erase(std::remove(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit), player.Ai->Scouts.end());
-					
 					if (player.Ai->Scouting) { //if an AI player's scout has been lost, unmark it as "scouting" so that the force can see if it now has a viable target
 						player.Ai->Scouting = false;
 					}
@@ -3848,6 +3809,12 @@ void UnitLost(CUnit &unit)
 						iterator->second.erase(std::remove(iterator->second.begin(), iterator->second.end(), &unit), iterator->second.end());
 					}
 				}
+			}
+			
+			player.DecreaseCountsForUnit(&unit);
+			
+			if (unit.Variable[LEVELUP_INDEX].Value > 0) {
+				player.UpdateLevelUpUnits(); //recalculate level-up units, since this unit no longer should be in that vector
 			}
 			//Wyrmgus end
 		}
@@ -4529,26 +4496,6 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 		newplayer.ChangeUnitTypeUnderConstructionCount(this->Type, 1);
 	}
 	//Wyrmgus end
-	newplayer.ChangeUnitTypeCount(this->Type, 1);
-	if (Active) {
-		newplayer.ChangeUnitTypeAiActiveCount(this->Type, 1);
-	}
-	//Wyrmgus start
-	if (Type->BoolFlag[TOWNHALL_INDEX].value) {
-		newplayer.NumTownHalls++;
-	}
-	if (this->Character != NULL) {
-		newplayer.Heroes.push_back(this);
-	}
-	
-	for (int i = 0; i < MaxCosts; ++i) {
-		newplayer.ResourceDemand[i] += Type->Stats[newplayer.Index].ResourceDemand[i];
-	}
-	
-	if (newplayer.AiEnabled && newplayer.Ai && this->Type->BoolFlag[COWARD_INDEX].value && !this->Type->BoolFlag[HARVESTER_INDEX].value && !this->Type->CanTransport() && this->Type->Spells.size() == 0 && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
-		newplayer.Ai->Scouts.push_back(this);
-	}
-	//Wyrmgus end
 
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
@@ -4570,6 +4517,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 		}
 	}
 
+	newplayer.IncreaseCountsForUnit(this);
 	UpdateForNewUnit(*this, 1);
 	
 	UpdateUnitSightRange(*this);

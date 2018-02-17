@@ -3830,6 +3830,78 @@ int CPlayer::GetUnitTypeAiActiveCount(const CUnitType *type) const
 	}
 }
 
+void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
+{
+	const CUnitType *type = unit->Type;
+
+	this->ChangeUnitTypeCount(type, 1);
+	this->UnitsByType[type].push_back(unit);
+	
+	if (unit->Active) {
+		this->ChangeUnitTypeAiActiveCount(type, 1);
+		this->AiActiveUnitsByType[type].push_back(unit);
+	}
+
+	if (type->BoolFlag[TOWNHALL_INDEX].value) {
+		this->NumTownHalls++;
+	}
+	
+	for (int i = 0; i < MaxCosts; ++i) {
+		this->ResourceDemand[i] += type->Stats[this->Index].ResourceDemand[i];
+	}
+	
+	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && Map.Info.IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+		this->Ai->Scouts.push_back(unit);
+	}
+	
+	if (!type_change) {
+		if (unit->Character != NULL) {
+			this->Heroes.push_back(unit);
+		}
+	}
+}
+
+void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
+{
+	const CUnitType *type = unit->Type;
+
+	this->ChangeUnitTypeCount(type, -1);
+	
+	this->UnitsByType[type].erase(std::remove(this->UnitsByType[type].begin(), this->UnitsByType[type].end(), unit), this->UnitsByType[type].end());
+			
+	if (this->UnitsByType[type].empty()) {
+		this->UnitsByType.erase(type);
+	}
+	
+	if (unit->Active) {
+		this->ChangeUnitTypeAiActiveCount(type, -1);
+		
+		this->AiActiveUnitsByType[type].erase(std::remove(this->AiActiveUnitsByType[type].begin(), this->AiActiveUnitsByType[type].end(), unit), this->AiActiveUnitsByType[type].end());
+		
+		if (this->AiActiveUnitsByType[type].empty()) {
+			this->AiActiveUnitsByType.erase(type);
+		}
+	}
+	
+	if (type->BoolFlag[TOWNHALL_INDEX].value) {
+		this->NumTownHalls--;
+	}
+	
+	for (int i = 0; i < MaxCosts; ++i) {
+		this->ResourceDemand[i] -= type->Stats[this->Index].ResourceDemand[i];
+	}
+	
+	if (this->AiEnabled && this->Ai && std::find(this->Ai->Scouts.begin(), this->Ai->Scouts.end(), unit) != this->Ai->Scouts.end()) {
+		this->Ai->Scouts.erase(std::remove(this->Ai->Scouts.begin(), this->Ai->Scouts.end(), unit), this->Ai->Scouts.end());
+	}
+	
+	if (!type_change) {
+		if (unit->Character != NULL) {
+			this->Heroes.erase(std::remove(this->Heroes.begin(), this->Heroes.end(), unit), this->Heroes.end());
+		}
+	}
+}
+
 /**
 **  Have unit of type.
 **

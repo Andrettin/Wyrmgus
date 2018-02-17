@@ -654,21 +654,7 @@ static int CclUnit(lua_State *l)
 			if (unit->CurrentAction() == UnitActionBuilt) {
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
-				unit->Player->ChangeUnitTypeCount(type, -1);
-				if (unit->Active) {
-					unit->Player->ChangeUnitTypeAiActiveCount(type, -1);
-				}
-				//Wyrmgus start
-				if (type->BoolFlag[TOWNHALL_INDEX].value) {
-					unit->Player->NumTownHalls--;
-				}
-				if (unit->Character != NULL) {
-					unit->Player->Heroes.erase(std::remove(unit->Player->Heroes.begin(), unit->Player->Heroes.end(), unit), unit->Player->Heroes.end());
-				}
-				for (int res = 0; res < MaxCosts; ++res) {
-					unit->Player->ResourceDemand[res] -= type->Stats[unit->Player->Index].ResourceDemand[res];
-				}
-				//Wyrmgus end
+				unit->Player->DecreaseCountsForUnit(unit);
 			}
 		} else if (!strcmp(value, "critical-order")) {
 			lua_rawgeti(l, 2, j + 1);

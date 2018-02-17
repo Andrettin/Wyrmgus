@@ -143,18 +143,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 
 	CPlayer &player = *unit.Player;
 	if (!unit.Constructed) {
-		player.ChangeUnitTypeCount(&oldtype, -1);
-		player.ChangeUnitTypeCount(&newtype, 1);
-		if (unit.Active) {
-			player.ChangeUnitTypeAiActiveCount(&oldtype, -1);
-			player.ChangeUnitTypeAiActiveCount(&newtype, 1);
-		}
+		player.DecreaseCountsForUnit(&unit, true);
 		
 		player.Demand += newtype.Stats[player.Index].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.Index].Variables[DEMAND_INDEX].Value;
 		player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
-		for (int i = 0; i < MaxCosts; ++i) {
-			player.ResourceDemand[i] += newtype.Stats[player.Index].ResourceDemand[i] - oldtype.Stats[player.Index].ResourceDemand[i];
-		}
 
 		// Change resource limit
 		for (int i = 0; i < MaxCosts; ++i) {
@@ -315,6 +307,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 
 	if (!unit.Constructed) {
 		UpdateForNewUnit(unit, 1);
+		player.IncreaseCountsForUnit(&unit, true);
 	}
 	//Wyrmgus start
 	/*

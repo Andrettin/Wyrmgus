@@ -187,24 +187,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		player.ChangeUnitTypeUnderConstructionCount(&type, -1);
 	}
 	//Wyrmgus end
-	player.ChangeUnitTypeCount(&type, 1);
-	if (unit.Active) {
-		player.ChangeUnitTypeAiActiveCount(&type, 1);
-	}
-	//Wyrmgus start
-	if (type.BoolFlag[TOWNHALL_INDEX].value) {
-		player.NumTownHalls++;
-	}
-	if (unit.Character != NULL) {
-		player.Heroes.push_back(&unit);
-	}
-	for (int i = 0; i < MaxCosts; ++i) {
-		player.ResourceDemand[i] += type.Stats[player.Index].ResourceDemand[i];
-	}	
 	
-	if (player.AiEnabled && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && type.Spells.size() == 0 && Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer) && unit.CanMove() && unit.Active && unit.GroupId != 0 && unit.Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
-		player.Ai->Scouts.push_back(&unit);
-	}
+	player.IncreaseCountsForUnit(&unit);
 	
 	for (size_t i = 0; i < player.QuestObjectives.size(); ++i) {
 		if (

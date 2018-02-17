@@ -165,17 +165,18 @@ public:
 	int SpeedUpgrade;                /// speed factor for upgrading
 	int SpeedResearch;               /// speed factor for researching
 
-	std::map<const CUnitType *, int> UnitTypesCount;  /// total units of unit-type
-	std::map<const CUnitType *, int> UnitTypesUnderConstructionCount;  /// total under construction units of unit-type
-	std::map<const CUnitType *, int> UnitTypesAiActiveCount;  /// total units of unit-type that have their AI set to active
-	//Wyrmgus start
-	std::vector<CUnit *> Heroes;					/// hero units owned by this player
-	std::vector<CDeity *> Deities;					/// deities chosen by this player
-	std::vector<CQuest *> AvailableQuests;		/// quests available to this player
-	std::vector<CQuest *> CurrentQuests;		/// quests being pursued by this player
-	std::vector<CQuest *> CompletedQuests;		/// quests completed by this player
-	std::vector<CPlayerQuestObjective *> QuestObjectives;				/// Objectives of the player's current quests
-	std::vector<std::pair<CUpgrade *, int>> Modifiers;					/// Modifiers affecting the player, and until which cycle it should last
+	std::map<const CUnitType *, int> UnitTypesCount;  						/// total units of unit-type
+	std::map<const CUnitType *, int> UnitTypesUnderConstructionCount;  		/// total under construction units of unit-type
+	std::map<const CUnitType *, int> UnitTypesAiActiveCount;  				/// total units of unit-type that have their AI set to active
+	std::map<const CUnitType *, std::vector<CUnit *>> UnitsByType;			/// units owned by this player for each type
+	std::map<const CUnitType *, std::vector<CUnit *>> AiActiveUnitsByType;	/// AI active units owned by this player for each type
+	std::vector<CUnit *> Heroes;											/// hero units owned by this player
+	std::vector<CDeity *> Deities;											/// deities chosen by this player
+	std::vector<CQuest *> AvailableQuests;									/// quests available to this player
+	std::vector<CQuest *> CurrentQuests;									/// quests being pursued by this player
+	std::vector<CQuest *> CompletedQuests;									/// quests completed by this player
+	std::vector<CPlayerQuestObjective *> QuestObjectives;					/// Objectives of the player's current quests
+	std::vector<std::pair<CUpgrade *, int>> Modifiers;						/// Modifiers affecting the player, and until which cycle it should last
 	//Wyrmgus end
 
 	bool AiEnabled;        /// handle AI on local computer
@@ -361,6 +362,9 @@ public:
 	void SetUnitTypeAiActiveCount(const CUnitType *type, int quantity);
 	void ChangeUnitTypeAiActiveCount(const CUnitType *type, int quantity);
 	int GetUnitTypeAiActiveCount(const CUnitType *type) const;
+	
+	void IncreaseCountsForUnit(CUnit *unit, bool type_change = false);
+	void DecreaseCountsForUnit(CUnit *unit, bool type_change = false);
 	//Wyrmgus end
 
 	/// Does the player have units of that type

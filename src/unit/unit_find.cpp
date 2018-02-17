@@ -860,36 +860,23 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool ev
 */
 void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &table, bool ai_active)
 {
-	const int nunits = player.GetUnitCount();
-	int typecount = player.GetUnitTypeCount(&type);
+	std::vector<CUnit *> type_units;
 
 	if (ai_active) {
-		typecount = player.GetUnitTypeAiActiveCount(&type);
+		if (player.AiActiveUnitsByType.find(&type) != player.AiActiveUnitsByType.end()) {
+			type_units = player.AiActiveUnitsByType.find(&type)->second;;
+		}
+	} else {
+		if (player.UnitsByType.find(&type) != player.UnitsByType.end()) {
+			type_units = player.UnitsByType.find(&type)->second;;
+		}
 	}
 	
-	if (typecount < 0) { // if unit type count is negative, something wrong happened
-		fprintf(stderr, "Player %d has a negative %s unit type count of %d.\n", player.Index, type.Ident.c_str(), typecount);
-	}
+	for (size_t i = 0; i < type_units.size(); ++i) {
+		CUnit *unit = type_units[i];
 
-	if (typecount == 0) {
-		return;
-	}
-
-	for (int i = 0; i < nunits; ++i) {
-		CUnit &unit = player.GetUnit(i);
-
-		if (unit.Type != &type) {
-			continue;
-		}
-		if (ai_active && !unit.Active) {
-			continue;
-		}
-		if (!unit.IsUnusable()) {
-			table.push_back(&unit);
-		}
-		--typecount;
-		if (typecount == 0) {
-			return ;
+		if (!unit->IsUnusable()) {
+			table.push_back(unit);
 		}
 	}
 }
