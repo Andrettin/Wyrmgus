@@ -73,7 +73,7 @@
 	//Wyrmgus start
 	order->Player = player;
 //	trainer.Player->SubUnitType(type);
-	Players[player].SubUnitType(type, trainer.Type->Stats[trainer.Player->Index].UnitStock[type.Slot] != 0);
+	Players[player].SubUnitType(type, trainer.Type->Stats[trainer.Player->Index].GetUnitStock(&type) != 0);
 	//Wyrmgus end
 
 	return order;
@@ -245,7 +245,7 @@ static void AnimateActionTrain(CUnit &unit)
 //	CPlayer &player = *unit.Player;
 	CPlayer &player = *(&Players[this->Player]);
 	//Wyrmgus end
-	const CUnitType &nType = *this->Type;
+	CUnitType &nType = *this->Type;
 	const int cost = nType.Stats[player.Index].Costs[TimeCost];
 	
 	//Wyrmgus start
@@ -265,7 +265,7 @@ static void AnimateActionTrain(CUnit &unit)
 //	this->Ticks += std::max(1, player.SpeedTrain / SPEEDUP_FACTOR);
 	this->Ticks += std::max(1, (player.SpeedTrain + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	
-	if (unit.Type->Stats[unit.Player->Index].UnitStock[nType.Slot] != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
+	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&nType) != 0) { // if the training unit/building has a "stock" of the trained unit, that means it should be created with no time wait
 		this->Ticks = cost;
 	}
 	//Wyrmgus end
@@ -367,15 +367,13 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	*/
 	for (int i = 0; i < (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1); ++i) {
-		//Wyrmgus start
-		if (unit.Type->Stats[unit.Player->Index].UnitStock[nType.Slot] != 0) {
-			if (unit.GetUnitStock(nType.Slot) > 0) {
-				unit.UnitStock[nType.Slot] -= 1;
+		if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&nType) != 0) {
+			if (unit.GetUnitStock(&nType) > 0) {
+				unit.ChangeUnitStock(&nType, -1);
 			} else {
 				continue; //don't create the unit if no further stock of it is available
 			}
 		}
-		//Wyrmgus end
 		
 		//Wyrmgus start
 //		CUnit *newUnit = MakeUnit(nType, &player);

@@ -648,10 +648,12 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 			f->printf("},\n");
 			f->printf("\tUnitStock = {");
-			for (size_t j = 0; j < UnitTypes.size(); ++j) {
-				if (type.DefaultStat.UnitStock[j] != 0 && (parent_type == NULL || type.DefaultStat.UnitStock[j] != parent_type->DefaultStat.UnitStock[j])) {
-					f->printf("\"%s\", ", UnitTypes[j]->Ident.c_str());
-					f->printf("%d, ", type.DefaultStat.UnitStock[j]);
+			for (std::map<CUnitType *, int>::const_iterator iterator = type.DefaultStat.UnitStock.begin(); iterator != type.DefaultStat.UnitStock.end(); ++iterator) {
+				CUnitType *unit_type = iterator->first;
+				int unit_stock = iterator->second;
+				if (unit_stock != 0 && (parent_type == NULL || unit_stock != parent_type->DefaultStat.GetUnitStock(unit_type))) {
+					f->printf("\"%s\", ", unit_type->Ident.c_str());
+					f->printf("%d, ", unit_stock);
 				}
 			}
 			f->printf("},\n");
@@ -928,9 +930,11 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						f->printf("SetModStat(\"%s\", \"%s\", \"ImproveProduction\", %d, \"%s\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModDefaultStats[Map.Info.Filename].ImproveIncomes[j], DefaultResourceNames[j].c_str());
 					}
 				}
-				for (size_t j = 0; j < UnitTypes.size(); ++j) {
-					if (type.ModDefaultStats[Map.Info.Filename].UnitStock[j] != 0) {
-						f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModDefaultStats[Map.Info.Filename].UnitStock[j], UnitTypes[j]->Ident.c_str());
+				for (std::map<CUnitType *, int>::const_iterator iterator = type.ModDefaultStats[Map.Info.Filename].UnitStock.begin(); iterator != type.ModDefaultStats[Map.Info.Filename].UnitStock.end(); ++iterator) {
+					const CUnitType *unit_type = iterator->first;
+					int unit_stock = iterator->second;
+					if (unit_stock != 0) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), type.Ident.c_str(), unit_stock, unit_type->Ident.c_str());
 					}
 				}
 				for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {

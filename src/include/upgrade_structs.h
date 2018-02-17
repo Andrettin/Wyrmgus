@@ -176,10 +176,7 @@ public:
 		memset(Costs, 0, sizeof(Costs));
 		memset(Storing, 0, sizeof(Storing));
 		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
-		//Wyrmgus start
 		memset(ResourceDemand, 0, sizeof(ResourceDemand));
-		memset(UnitStock, 0, sizeof(UnitStock));
-		//Wyrmgus end
 	}
 	~CUnitStats();
 
@@ -188,18 +185,17 @@ public:
 	bool operator == (const CUnitStats &rhs) const;
 	bool operator != (const CUnitStats &rhs) const;
 	
-	//Wyrmgus start
  	int GetPrice() const;
-	//Wyrmgus end
+	int GetUnitStock(CUnitType *unit_type) const;
+	void SetUnitStock(CUnitType *unit_type, int quantity);
+	void ChangeUnitStock(CUnitType *unit_type, int quantity);
 public:
 	CVariable *Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
 	int Storing[MaxCosts];          /// storage increasing
 	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
-	//Wyrmgus start
 	int ResourceDemand[MaxCosts];	/// Resource demand
-	int UnitStock[UnitTypeMax];		/// Units in stock
-	//Wyrmgus end
+	std::map<CUnitType *, int> UnitStock;	/// Units in stock
 };
 
 /**
@@ -288,6 +284,10 @@ public:
 	{
 		delete [] this->ModifyPercent;
 	}
+	
+	int GetUnitStock(CUnitType *unit_type) const;
+	void SetUnitStock(CUnitType *unit_type, int quantity);
+	void ChangeUnitStock(CUnitType *unit_type, int quantity);
 
 	int UpgradeId;                      /// used to filter required modifier
 
@@ -295,10 +295,7 @@ public:
 	int *ModifyPercent;					/// use for percent modifiers
 	int SpeedResearch;					/// speed factor for researching
 	int ImproveIncomes[MaxCosts];		/// improve incomes
-	//Wyrmgus start
-	int UnitStock[UnitTypeMax];			/// unit stock
-	//Wyrmgus end
-
+	std::map<CUnitType *, int> UnitStock;		/// unit stock
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
 	// TODO: see below allow more semantics?

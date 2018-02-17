@@ -1074,12 +1074,12 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 //	if (unit.Player->CheckLimits(type) < 0
 //		|| unit.Player->CheckUnitType(type)) {
 	if (Players[player].CheckLimits(type) < 0
-		|| Players[player].CheckUnitType(type, unit.Type->Stats[unit.Player->Index].UnitStock[type.Slot] != 0)) {
+		|| Players[player].CheckUnitType(type, unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0)) {
 	//Wyrmgus end
 		return;
 	}
 	//Wyrmgus start
-	if (unit.Type->Stats[unit.Player->Index].UnitStock[type.Slot] != 0 && unit.GetUnitStock(type.Slot) <= 0) {
+	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
 		if (player == ThisPlayer->Index) {
 			ThisPlayer->Notify(NotifyYellow, unit.tilePos, unit.MapLayer, "%s", _("The stock is empty, wait until it is replenished."));
 		}
@@ -1090,7 +1090,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 		Players[player].ShareUpgradeProgress(*unit.Player, unit);
 	}
 
-	if (unit.Type->Stats[unit.Player->Index].UnitStock[type.Slot] != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
+	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
 		if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTrain) {
 			return;
 		}

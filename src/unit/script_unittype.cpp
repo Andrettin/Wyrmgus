@@ -846,9 +846,9 @@ static int CclDefineUnitType(lua_State *l)
 					res->FileWhenLoaded = parent_type->ResInfo[i]->FileWhenLoaded;
 				}
 			}
-			for (size_t i = 0; i < UnitTypes.size(); ++i) {
-				type->DefaultStat.UnitStock[i] = parent_type->DefaultStat.UnitStock[i];
-			}
+			
+			type->DefaultStat.UnitStock = parent_type->DefaultStat.UnitStock;
+			
 			for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 				type->DefaultStat.Variables[i].Enable = parent_type->DefaultStat.Variables[i].Enable;
 				type->DefaultStat.Variables[i].Value = parent_type->DefaultStat.Variables[i].Value;
@@ -1392,9 +1392,12 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				const int unit_type_id = UnitTypeIdByIdent(LuaToString(l, -1, k + 1));
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, k + 1));
+				if (!unit_type) {
+					LuaError(l, "Unit type doesn't exist." _C_ value);
+				}
 				++k;
-				type->DefaultStat.UnitStock[unit_type_id] = LuaToNumber(l, -1, k + 1);
+				type->DefaultStat.SetUnitStock(unit_type, LuaToNumber(l, -1, k + 1));
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "Construction")) {
@@ -2515,9 +2518,12 @@ static int CclDefineUnitStats(lua_State *l)
 
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, 3, j + 1);
-				const int unit_type_id = UnitTypeIdByIdent(LuaToString(l, -1, k + 1));
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, k + 1));
+				if (!unit_type) {
+					LuaError(l, "Unit type doesn't exist.");
+				}
 				++k;
-				stats->UnitStock[unit_type_id] = LuaToNumber(l, -1, k + 1);
+				stats->SetUnitStock(unit_type, LuaToNumber(l, -1, k + 1));
 				lua_pop(l, 1);
 			}
 		//Wyrmgus end
@@ -2793,11 +2799,11 @@ static int CclGetUnitTypeData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "UnitStock")) {
 		LuaCheckArgs(l, 3);
-		const int unit_type_id = UnitTypeIdByIdent(LuaToString(l, 3));
+		CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, 3));
 		if (!GameRunning && Editor.Running != EditorEditing) {
-			lua_pushnumber(l, type->DefaultStat.UnitStock[unit_type_id]);
+			lua_pushnumber(l, type->DefaultStat.GetUnitStock(unit_type));
 		} else {
-			lua_pushnumber(l, type->MapDefaultStat.UnitStock[unit_type_id]);
+			lua_pushnumber(l, type->MapDefaultStat.GetUnitStock(unit_type));
 		}
 		return 1;
 	} else if (!strcmp(data, "TrainQuantity")) {
@@ -4413,18 +4419,18 @@ void SetModStat(std::string mod_file, std::string ident, std::string variable_ke
 			}
 		}
 	} else if (variable_key == "UnitStock") {
-		const int unit_type_id = UnitTypeIdByIdent(variable_type);
+		CUnitType *unit_type = UnitTypeByIdent(variable_type);
 		if (GameRunning || Editor.Running == EditorEditing) {
-			type->MapDefaultStat.UnitStock[unit_type_id] -= type->ModDefaultStats[mod_file].UnitStock[unit_type_id];
+			type->MapDefaultStat.ChangeUnitStock(unit_type, - type->ModDefaultStats[mod_file].GetUnitStock(unit_type));
 			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].UnitStock[unit_type_id] -= type->ModDefaultStats[mod_file].UnitStock[unit_type_id];
+				type->Stats[player].ChangeUnitStock(unit_type, - type->ModDefaultStats[mod_file].GetUnitStock(unit_type));
 			}
 		}
-		type->ModDefaultStats[mod_file].UnitStock[unit_type_id] = value;
+		type->ModDefaultStats[mod_file].SetUnitStock(unit_type, value);
 		if (GameRunning || Editor.Running == EditorEditing) {
-			type->MapDefaultStat.UnitStock[unit_type_id] += type->ModDefaultStats[mod_file].UnitStock[unit_type_id];
+			type->MapDefaultStat.ChangeUnitStock(unit_type, type->ModDefaultStats[mod_file].GetUnitStock(unit_type));
 			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].UnitStock[unit_type_id] += type->ModDefaultStats[mod_file].UnitStock[unit_type_id];
+				type->Stats[player].ChangeUnitStock(unit_type, type->ModDefaultStats[mod_file].GetUnitStock(unit_type));
 			}
 		}
 	} else {

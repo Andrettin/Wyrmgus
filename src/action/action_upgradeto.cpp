@@ -215,13 +215,12 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 
 	//Wyrmgus start
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (newstats.UnitStock[i] != oldstats.UnitStock[i]) {
-			if (unit.UnitStock.find(i) == unit.UnitStock.end()) {
-				unit.UnitStock[i] = 0;
-			}
-			unit.UnitStock[i] += newstats.UnitStock[i] - oldstats.UnitStock[i];
-			unit.UnitStock[i] = std::max(unit.GetUnitStock(i), 0);
+	for (std::map<CUnitType *, int>::iterator iterator = unit.UnitStock.begin(); iterator != unit.UnitStock.end(); ++iterator) {
+		CUnitType *unit_type = iterator->first;
+		
+		int unit_stock_change = newstats.GetUnitStock(unit_type) - oldstats.GetUnitStock(unit_type);
+		if (unit_stock_change < 0) {
+			unit.ChangeUnitStock(unit_type, unit_stock_change);
 		}
 	}
 	//Wyrmgus end

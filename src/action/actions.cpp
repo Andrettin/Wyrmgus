@@ -351,24 +351,26 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 	}
 
-	//Wyrmgus start
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (unit.Type->Stats[unit.Player->Index].UnitStock[i] > 0 && unit.GetUnitStockReplenishmentTimer(i) > 0) {
-			--unit.UnitStockReplenishmentTimers[i];
-			if (unit.GetUnitStockReplenishmentTimer(i) == 0 && unit.GetUnitStock(i) < unit.Type->Stats[unit.Player->Index].UnitStock[i]) { //if timer reached 0, replenish 1 of the stock
-				if (unit.UnitStock.find(i) == unit.UnitStock.end()) {
-					unit.UnitStock[i] = 0;
-				}
-				unit.UnitStock[i] += 1;
+	for (std::map<CUnitType *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->Index].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->Index].UnitStock.end(); ++iterator) {
+		CUnitType *unit_type = iterator->first;
+		int unit_stock = iterator->second;
+		
+		if (unit_stock <= 0) {
+			continue;
+		}
+		
+		if (unit.GetUnitStockReplenishmentTimer(unit_type) > 0) {
+			unit.ChangeUnitStockReplenishmentTimer(unit_type, -1);
+			if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock) { //if timer reached 0, replenish 1 of the stock
+				unit.ChangeUnitStock(unit_type, 1);
 			}
 		}
 			
 		//if the unit still has less stock than its max, re-init the unit stock timer
-		if (unit.Type->Stats[unit.Player->Index].UnitStock[i] > 0 && unit.GetUnitStockReplenishmentTimer(i) == 0 && unit.GetUnitStock(i) < unit.Type->Stats[unit.Player->Index].UnitStock[i] && CheckDependByType(*unit.Player, *UnitTypes[i])) {
-			unit.UnitStockReplenishmentTimers[i] = UnitTypes[i]->Stats[unit.Player->Index].Costs[TimeCost] * 50;
+		if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock && CheckDependByType(*unit.Player, *unit_type)) {
+			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->Index].Costs[TimeCost] * 50);
 		}
 	}
-	//Wyrmgus end
 	
 	//Wyrmgus start
 //	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};

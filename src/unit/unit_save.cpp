@@ -415,17 +415,23 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"layer-variation\", \"%s\", %d", GetImageLayerNameById(i).c_str(), unit.LayerVariation[i]);
 		}
 	}
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (unit.GetUnitStock(i) != 0) {
-			file.printf(",\n  \"unit-stock\", \"%s\", %d", UnitTypes[i]->Ident.c_str(), unit.GetUnitStock(i));
+	for (std::map<CUnitType *, int>::const_iterator iterator = unit.Type->Stats[unit.Player->Index].UnitStock.begin(); iterator != unit.Type->Stats[unit.Player->Index].UnitStock.end(); ++iterator) {
+		CUnitType *unit_type = iterator->first;
+		
+		if (unit.GetUnitStock(unit_type) != 0) {
+			file.printf(",\n  \"unit-stock\", \"%s\", %d", unit_type->Ident.c_str(), unit.GetUnitStock(unit_type));
 		}
-		if (unit.GetUnitStockReplenishmentTimer(i) != 0) {
-			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", UnitTypes[i]->Ident.c_str(), unit.GetUnitStockReplenishmentTimer(i));
+		
+		if (unit.GetUnitStockReplenishmentTimer(unit_type) != 0) {
+			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", unit_type->Ident.c_str(), unit.GetUnitStockReplenishmentTimer(unit_type));
 		}
 	}
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (unit.GetIndividualUpgrade(AllUpgrades[i])) {
-			file.printf(",\n  \"individual-upgrade\", \"%s\", %d", AllUpgrades[i]->Ident.c_str(), unit.GetIndividualUpgrade(AllUpgrades[i]));
+	for (std::map<int, int>::const_iterator iterator = unit.IndividualUpgrades.begin(); iterator != unit.IndividualUpgrades.end(); ++iterator) {
+		int upgrade_id = iterator->first;
+		CUpgrade *upgrade = AllUpgrades[upgrade_id];
+		
+		if (unit.GetIndividualUpgrade(upgrade)) {
+			file.printf(",\n  \"individual-upgrade\", \"%s\", %d", upgrade->Ident.c_str(), unit.GetIndividualUpgrade(upgrade));
 		}
 	}
 	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1) {

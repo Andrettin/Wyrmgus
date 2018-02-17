@@ -989,7 +989,7 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 //				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
 //			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
 			int type_costs[MaxCosts];
-			ThisPlayer->GetUnitTypeCosts(UnitTypes[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[button.Value] != 0);
+			ThisPlayer->GetUnitTypeCosts(UnitTypes[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[button.Value]) != 0);
 			memcpy(Costs, type_costs, sizeof(type_costs));
 			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
 			//Wyrmgus end
@@ -1352,12 +1352,12 @@ void CButtonPanel::Draw()
 			
 			//draw a number over the button in special circumstances
 			if (
-				(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0)
+				(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0)
 				|| buttons[i].Action == ButtonSellResource || buttons[i].Action == ButtonBuyResource
 			) {
 				std::string number_string;
-				if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0) { //draw the quantity in stock for unit "training" cases which have it
-					number_string = std::to_string((long long) Selected[0]->GetUnitStock(buttons[i].Value)) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value]);
+				if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0) { //draw the quantity in stock for unit "training" cases which have it
+					number_string = std::to_string((long long) Selected[0]->GetUnitStock(UnitTypes[buttons[i].Value])) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]));
 				} else if (buttons[i].Action == ButtonSellResource) {
 					number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceSellPrice(buttons[i].Value));
 				} else if (buttons[i].Action == ButtonBuyResource) {
@@ -1439,7 +1439,7 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 //			const CUnitStats &stats = UnitTypes[button.Value]->Stats[ThisPlayer->Index];
 //			UI.StatusLine.SetCosts(0, stats.Variables[DEMAND_INDEX].Value, stats.Costs);
 			int type_costs[MaxCosts];
-			ThisPlayer->GetUnitTypeCosts(UnitTypes[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[button.Value] != 0);
+			ThisPlayer->GetUnitTypeCosts(UnitTypes[button.Value], type_costs, Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[button.Value]) != 0);
 			UI.StatusLine.SetCosts(0, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value * (UnitTypes[button.Value]->TrainQuantity ? UnitTypes[button.Value]->TrainQuantity : 1), type_costs);
 			//Wyrmgus end
 			break;
@@ -2278,7 +2278,7 @@ void CButtonPanel::DoClicked_Train(int button)
 		if (Selected[best_training_place]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
 			ThisPlayer->Notify(NotifyYellow, Selected[best_training_place]->tilePos, Selected[best_training_place]->MapLayer, "%s", _("Unit training queue is full"));
 			return;
-		} else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].UnitStock[type.Slot] != 0)) {
+		} else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type, Selected[best_training_place]->Type->Stats[Selected[best_training_place]->Player->Index].GetUnitStock(UnitTypes[type.Slot]) != 0)) {
 			SendCommandTrainUnit(*Selected[best_training_place], type, ThisPlayer->Index, FlushCommands);
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();

@@ -325,8 +325,8 @@ static void AiCheckUnits()
 				}
 
 				bool mercenary_recruited = false;
-				for (std::map<int, int>::iterator iterator = mercenary_building->UnitStock.begin(); iterator != mercenary_building->UnitStock.end(); ++iterator) {
-					CUnitType *mercenary_type = UnitTypes[iterator->first];
+				for (std::map<CUnitType *, int>::iterator iterator = mercenary_building->UnitStock.begin(); iterator != mercenary_building->UnitStock.end(); ++iterator) {
+					CUnitType *mercenary_type = iterator->first;
 					if (
 						iterator->second
 						&& !mercenary_type->BoolFlag[ITEM_INDEX].value

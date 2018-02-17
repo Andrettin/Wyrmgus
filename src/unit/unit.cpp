@@ -5477,22 +5477,62 @@ int CUnit::GetPrice() const
 	return cost;
 }
 
-int CUnit::GetUnitStock(int unit_type_id) const
+int CUnit::GetUnitStock(CUnitType *unit_type) const
 {
-	if (this->UnitStock.find(unit_type_id) != this->UnitStock.end()) {
-		return this->UnitStock.find(unit_type_id)->second;
+	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
+		return this->UnitStock.find(unit_type)->second;
 	} else {
 		return 0;
 	}
 }
 
-int CUnit::GetUnitStockReplenishmentTimer(int unit_type_id) const
+void CUnit::SetUnitStock(CUnitType *unit_type, int quantity)
 {
-	if (this->UnitStockReplenishmentTimers.find(unit_type_id) != this->UnitStockReplenishmentTimers.end()) {
-		return this->UnitStockReplenishmentTimers.find(unit_type_id)->second;
+	if (!unit_type) {
+		return;
+	}
+	
+	if (quantity <= 0) {
+		if (this->UnitStock.find(unit_type) != this->UnitStock.end()) {
+			this->UnitStock.erase(unit_type);
+		}
+	} else {
+		this->UnitStock[unit_type] = quantity;
+	}
+}
+
+void CUnit::ChangeUnitStock(CUnitType *unit_type, int quantity)
+{
+	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
+}
+
+int CUnit::GetUnitStockReplenishmentTimer(CUnitType *unit_type) const
+{
+	if (this->UnitStockReplenishmentTimers.find(unit_type) != this->UnitStockReplenishmentTimers.end()) {
+		return this->UnitStockReplenishmentTimers.find(unit_type)->second;
 	} else {
 		return 0;
 	}
+}
+
+void CUnit::SetUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity)
+{
+	if (!unit_type) {
+		return;
+	}
+	
+	if (quantity <= 0) {
+		if (this->UnitStockReplenishmentTimers.find(unit_type) != this->UnitStockReplenishmentTimers.end()) {
+			this->UnitStockReplenishmentTimers.erase(unit_type);
+		}
+	} else {
+		this->UnitStockReplenishmentTimers[unit_type] = quantity;
+	}
+}
+
+void CUnit::ChangeUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity)
+{
+	this->SetUnitStockReplenishmentTimer(unit_type, this->GetUnitStockReplenishmentTimer(unit_type) + quantity);
 }
 
 int CUnit::GetResourceStep(const int resource) const

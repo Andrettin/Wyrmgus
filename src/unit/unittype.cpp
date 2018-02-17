@@ -1040,8 +1040,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					type.MapDefaultStat.Variables[i].Enable = iterator->second.Variables[i].Enable;
 				}
 			}
-			for (size_t i = 0; i < UnitTypes.size(); ++i) {
-				type.MapDefaultStat.UnitStock[i] += iterator->second.UnitStock[i];
+			for (std::map<CUnitType *, int>::const_iterator unit_stock_iterator = iterator->second.UnitStock.begin(); unit_stock_iterator != iterator->second.UnitStock.end(); ++unit_stock_iterator) {
+				CUnitType *unit_type = unit_stock_iterator->first;
+				int unit_stock = unit_stock_iterator->second;
+				type.MapDefaultStat.ChangeUnitStock(unit_type, unit_stock);
 			}
 			for (int i = 0; i < MaxCosts; ++i) {
 				type.MapDefaultStat.Costs[i] += iterator->second.Costs[i];
@@ -1440,13 +1442,13 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 	}
 	file.printf("},\n\"unit-stock\", {");
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (stats.UnitStock[i] == type.DefaultStat.UnitStock[i]) {
+		if (stats.GetUnitStock(UnitTypes[i]) == type.DefaultStat.GetUnitStock(UnitTypes[i])) {
 			continue;
 		}
 		if (i) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", UnitTypes[i]->Ident.c_str(), stats.UnitStock[i]);
+		file.printf("\"%s\", %d,", UnitTypes[i]->Ident.c_str(), stats.GetUnitStock(UnitTypes[i]));
 	}
 	//Wyrmgus end
 	file.printf("}})\n");

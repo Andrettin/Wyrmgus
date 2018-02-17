@@ -411,8 +411,12 @@ public:
 	int GetDisplayPlayer() const;
 	int GetHairColor() const;
 	int GetPrice() const;
-	int GetUnitStock(int unit_type_id) const;
-	int GetUnitStockReplenishmentTimer(int unit_type_id) const;
+	int GetUnitStock(CUnitType *unit_type) const;
+	void SetUnitStock(CUnitType *unit_type, int quantity);
+	void ChangeUnitStock(CUnitType *unit_type, int quantity);
+	int GetUnitStockReplenishmentTimer(CUnitType *unit_type) const;
+	void SetUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity);
+	void ChangeUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity);
 	int GetResourceStep(const int resource) const;
 	int GetTotalInsideCount(const CPlayer *player = NULL, const bool ignore_items = true, const bool ignore_saved_cargo = false, const CUnitType *type = NULL) const;
 	bool CanAttack(bool count_inside = true) const;
@@ -539,10 +543,8 @@ public:
 	//Wyrmgus end
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
-	//Wyrmgus start
-	std::map<int, int> UnitStock; 						/// How many of each unit type this unit has stocked
-	std::map<int, int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
-	//Wyrmgus end
+	std::map<CUnitType *, int> UnitStock; 						/// How many of each unit type this unit has stocked
+	std::map<CUnitType *, int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked;      /// gamecycle unit was last attacked

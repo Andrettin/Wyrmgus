@@ -707,13 +707,13 @@ static int CclUnit(lua_State *l)
 				LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
 			}
 		} else if (!strcmp(value, "unit-stock")) {
-			int stocked_unit_type_id = UnitTypeIdByIdent(LuaToString(l, 2, j + 1));
+			CUnitType *stocked_unit_type = UnitTypeByIdent(LuaToString(l, 2, j + 1));
 			++j;
-			unit->UnitStock[stocked_unit_type_id] = LuaToNumber(l, 2, j + 1);
+			unit->SetUnitStock(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "unit-stock-replenishment-timer")) {
-			int stocked_unit_type_id = UnitTypeIdByIdent(LuaToString(l, 2, j + 1));
+			CUnitType *stocked_unit_type = UnitTypeByIdent(LuaToString(l, 2, j + 1));
 			++j;
-			unit->UnitStockReplenishmentTimers[stocked_unit_type_id] = LuaToNumber(l, 2, j + 1);
+			unit->SetUnitStockReplenishmentTimer(stocked_unit_type, LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "character")) {
 			unit->SetCharacter(LuaToString(l, 2, j + 1), false);
 		} else if (!strcmp(value, "custom-hero")) {
