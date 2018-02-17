@@ -1331,17 +1331,6 @@ void CButtonPanel::Draw()
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
 												   pos, buf, player, hair_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], buttons[i]));
-			} else if ( //draw researched technologies (or acquired abilities) grayed
-				buttons[i].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, buttons[i].ValueStr) == 'R'
-				|| (buttons[i].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(buttons[i].ValueStr)) == CUpgrade::Get(buttons[i].ValueStr)->MaxLimit)
-			) {
-				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
-												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player, hair_color, false, true);
-			} else {
-				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
-												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player, hair_color, true);
 												   
 				if (
 					(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0)
@@ -1362,6 +1351,17 @@ void CButtonPanel::Draw()
 
 					label.Draw(pos.x + 46 - GetGameFont().Width(number_string), pos.y + 0, number_string);
 				}
+			} else if ( //draw researched technologies (or acquired abilities) grayed
+				buttons[i].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, buttons[i].ValueStr) == 'R'
+				|| (buttons[i].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(buttons[i].ValueStr)) == CUpgrade::Get(buttons[i].ValueStr)->MaxLimit)
+			) {
+				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+												   GetButtonStatus(buttons[i], ButtonUnderCursor),
+												   pos, buf, player, hair_color, false, true);
+			} else {
+				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+												   GetButtonStatus(buttons[i], ButtonUnderCursor),
+												   pos, buf, player, hair_color, true);
 			}
 		}
 	}
