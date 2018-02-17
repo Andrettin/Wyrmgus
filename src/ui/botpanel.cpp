@@ -1326,12 +1326,6 @@ void CButtonPanel::Draw()
 				}
 				//Wyrmgus end
 			}
-			//Wyrmgus start			
-			/*
-			buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
-											   GetButtonStatus(buttons[i], ButtonUnderCursor),
-											   pos, buf, player);
-			*/
 			
 			if (IsButtonUsable(*Selected[0], buttons[i])) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
@@ -1348,29 +1342,27 @@ void CButtonPanel::Draw()
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
 												   pos, buf, player, hair_color, true);
-			}
-			
-			//draw a number over the button in special circumstances
-			if (
-				(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0)
-				|| buttons[i].Action == ButtonSellResource || buttons[i].Action == ButtonBuyResource
-			) {
-				std::string number_string;
-				if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0) { //draw the quantity in stock for unit "training" cases which have it
-					number_string = std::to_string((long long) Selected[0]->GetUnitStock(UnitTypes[buttons[i].Value])) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]));
-				} else if (buttons[i].Action == ButtonSellResource) {
-					number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceSellPrice(buttons[i].Value));
-				} else if (buttons[i].Action == ButtonBuyResource) {
-					number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceBuyPrice(buttons[i].Value));
-				}
-				std::string oldnc;
-				std::string oldrc;
-				GetDefaultTextColors(oldnc, oldrc);
-				CLabel label(GetGameFont(), oldnc, oldrc);
+												   
+				if (
+					(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0)
+					|| buttons[i].Action == ButtonSellResource || buttons[i].Action == ButtonBuyResource
+				) {
+					std::string number_string;
+					if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0) { //draw the quantity in stock for unit "training" cases which have it
+						number_string = std::to_string((long long) Selected[0]->GetUnitStock(UnitTypes[buttons[i].Value])) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]));
+					} else if (buttons[i].Action == ButtonSellResource) {
+						number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceSellPrice(buttons[i].Value));
+					} else if (buttons[i].Action == ButtonBuyResource) {
+						number_string = std::to_string((long long) Selected[0]->Player->GetEffectiveResourceBuyPrice(buttons[i].Value));
+					}
+					std::string oldnc;
+					std::string oldrc;
+					GetDefaultTextColors(oldnc, oldrc);
+					CLabel label(GetGameFont(), oldnc, oldrc);
 
-				label.Draw(pos.x + 46 - GetGameFont().Width(number_string), pos.y + 0, number_string);
+					label.Draw(pos.x + 46 - GetGameFont().Width(number_string), pos.y + 0, number_string);
+				}
 			}
-			//Wyrmgus end
 		}
 	}
 	//
