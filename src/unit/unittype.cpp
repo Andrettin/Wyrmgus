@@ -561,7 +561,7 @@ CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
-	TrainQuantity(0), CostModifier(0), ItemClass(-1), HairColor(0),
+	TrainQuantity(0), CostModifier(0), ItemClass(-1),
 	Class(-1), Civilization(-1), Faction(-1), Species(NULL), TerrainType(NULL),
 	//Wyrmgus end
 	Animations(NULL), StillFrame(0),
@@ -901,19 +901,6 @@ CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(CPlayer &player, int image
 		return this->LayerSprites[image_layer];
 	} else {
 		return NULL;
-	}
-}
-
-int CUnitType::GetDefaultHairColor(CPlayer &player) const
-{
-	VariationInfo *varinfo = this->GetDefaultVariation(player);
-	VariationInfo *hair_varinfo = this->GetDefaultVariation(player, HairImageLayer);
-	if (hair_varinfo && hair_varinfo->HairColor != 0) {
-		return hair_varinfo->HairColor;
-	} else if (varinfo && varinfo->HairColor != 0) {
-		return varinfo->HairColor;
-	} else {
-		return this->HairColor;
 	}
 }
 
@@ -1585,10 +1572,7 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-//Wyrmgus start
-//void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
-void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, int hair_color)
-//Wyrmgus end
+void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
 {
 	//Wyrmgus start
 	if (sprite == NULL) {
@@ -1629,15 +1613,15 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, hair_color);
+				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
 			} else {
-				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, hair_color);
+				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, hair_color);
+				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, hair_color);
+				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
 			}
 		}
 	} else {
@@ -1649,9 +1633,9 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, hair_color);
+			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, hair_color);
+			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
 		}
 	}
 	//Wyrmgus end

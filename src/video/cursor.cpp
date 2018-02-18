@@ -223,8 +223,6 @@ void DrawBuildingCursor()
 #endif
 	PushClipping();
 	vp.SetClipping();
-	//Wyrmgus start
-	int hair_color = CursorBuilding->GetDefaultHairColor(*ThisPlayer);
 	
 //	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
 	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShadowSprite) {
@@ -243,15 +241,15 @@ void DrawBuildingCursor()
 	// get the first variation which has the proper upgrades for this player (to have the proper appearance of buildings drawn in the cursor, according to the upgrades)
 	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->Sprite) {
 		DrawUnitType(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->Sprite, ThisPlayer->Index,
-				CursorBuilding->StillFrame, screenPos, hair_color);
+				CursorBuilding->StillFrame, screenPos);
 	} else {
 		DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
-				CursorBuilding->StillFrame, screenPos, hair_color);
+				CursorBuilding->StillFrame, screenPos);
 	}
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, HairImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos, hair_color);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, HairImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
 	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, PantsImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
@@ -261,24 +259,24 @@ void DrawBuildingCursor()
 
 	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, BootsImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, LeftArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos, hair_color);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, LeftArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
 	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingLeftArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
 	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ShieldImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	
 	if (CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightHandImageLayer) != NULL) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos, hair_color);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingRightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, WeaponImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 		
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightHandImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos, hair_color);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightHandImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	} else {
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, WeaponImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos, hair_color);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingRightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}

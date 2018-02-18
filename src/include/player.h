@@ -1025,10 +1025,6 @@ extern std::vector<IntColor> PlayerColors[PlayerColorMax]; /// Player colors
 extern std::string PlayerColorNames[PlayerColorMax];  /// Player color names
 extern std::vector<int> ConversiblePlayerColors; 			/// Conversible player colors
 
-extern std::string HairColorNames[HairColorMax];  /// Hair color names
-extern std::vector<CColor> HairColorsRGB[HairColorMax]; /// Hair colors
-extern std::vector<int> ConversibleHairColors; 			/// Conversible hair colors
-
 extern std::map<std::string, int> CivilizationStringToIndex;
 extern std::map<std::string, int> FactionStringToIndex;
 extern std::map<std::string, int> DynastyStringToIndex;
@@ -1098,7 +1094,6 @@ extern void SetCivilizationStringToIndex(std::string civilization_name, int civi
 extern void SetFactionStringToIndex(std::string faction_name, int faction_id);
 extern void NetworkSetFaction(int player, std::string faction_name);
 extern int GetPlayerColorIndexByName(std::string player_color_name);
-extern int GetHairColorIndexByName(std::string hair_color_name);
 extern std::string GetFactionTypeNameById(int faction_type);
 extern int GetFactionTypeIdByName(std::string faction_type);
 extern std::string GetGovernmentTypeNameById(int government_type);

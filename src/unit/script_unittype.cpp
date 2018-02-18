@@ -776,7 +776,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->TrainQuantity = parent_type->TrainQuantity;
 			type->CostModifier = parent_type->CostModifier;
 			type->ItemClass = parent_type->ItemClass;
-			type->HairColor = parent_type->HairColor;
 			type->MaxOnBoard = parent_type->MaxOnBoard;
 			type->RepairRange = parent_type->RepairRange;
 			type->RepairHP = parent_type->RepairHP;
@@ -915,7 +914,6 @@ static int CclDefineUnitType(lua_State *l)
 					var->LightFile = parent_type->VarInfo[var_n]->LightFile;
 					var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
 					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
-					var->HairColor = parent_type->VarInfo[var_n]->HairColor;
 					var->ResourceMin = parent_type->VarInfo[var_n]->ResourceMin;
 					var->ResourceMax = parent_type->VarInfo[var_n]->ResourceMax;
 					var->Weight = parent_type->VarInfo[var_n]->Weight;
@@ -1073,14 +1071,6 @@ static int CclDefineUnitType(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						CclGetPos(l, &var->FrameWidth, &var->FrameHeight);
 						lua_pop(l, 1);
-					} else if (!strcmp(value, "hair-color")) {
-						std::string hair_color_name = LuaToString(l, -1, k + 1);
-						int hair_color = GetHairColorIndexByName(hair_color_name);
-						if (hair_color != 0) {
-							var->HairColor = hair_color;
-						} else {
-							LuaError(l, "Hair color \"%s\" doesn't exist." _C_ hair_color_name.c_str());
-						}
 					} else if (!strcmp(value, "icon")) {
 						var->Icon.Name = LuaToString(l, -1, k + 1);
 						var->Icon.Icon = NULL;
@@ -2174,8 +2164,6 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "ItemClass")) {
 			type->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
-		} else if (!strcmp(value, "HairColor")) {
-			type->HairColor = GetHairColorIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Species")) {
 			type->Species = GetSpecies(LuaToString(l, -1));
 			if (!type->Species) {
@@ -2757,13 +2745,6 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Height")) {
 		lua_pushnumber(l, type->Height);
-		return 1;
-	} else if (!strcmp(data, "HairColor")) {
-		if (type->HairColor != 0) {
-			lua_pushstring(l, HairColorNames[type->HairColor].c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
 		return 1;
 	} else if (!strcmp(data, "Animations")) {
 		if (type->Animations != NULL) {

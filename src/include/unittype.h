@@ -143,7 +143,7 @@ class VariationInfo
 {
 public:
 	VariationInfo() : 
-		FrameWidth(0), FrameHeight(0), HairColor(0), ResourceMin(0), ResourceMax(0), Weight(1),
+		FrameWidth(0), FrameHeight(0), ResourceMin(0), ResourceMax(0), Weight(1),
 		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL)
 	{
 		memset(LayerSprites, 0, sizeof(LayerSprites));
@@ -160,7 +160,6 @@ public:
 	std::string LightFile;			/// Variation's light graphics.
 	int FrameWidth;
 	int FrameHeight;
-	int HairColor;
 	int ResourceMin;
 	int ResourceMax;
 	int Weight;						/// The weight for when randomly choosing a variation
@@ -906,7 +905,6 @@ public:
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	std::string GetDefaultName(CPlayer &player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
-	int GetDefaultHairColor(CPlayer &player) const;
 	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
 	std::string GeneratePersonalName(CFaction *faction, int gender) const;
@@ -965,7 +963,6 @@ public:
 	//Wyrmgus start
 	int TrainQuantity;										/// Quantity to be trained
 	int CostModifier;										/// Cost modifier (cost increase for every unit of this type the player has)
-	int HairColor;											/// Hair color of the unit type (used for color conversion)
 	int ItemClass;											/// Item class (if the unit type is an item)
 	CSpecies *Species;
 	CTerrainType *TerrainType;
@@ -1317,10 +1314,7 @@ extern void SaveUnitTypes(CFile &file);              /// Save the unit-type tabl
 extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
-						 //Wyrmgus start
-//						 int player, int frame, const PixelPos &screenPos);
-						 int player, int frame, const PixelPos &screenPos, int hair_color = 0);
-						 //Wyrmgus end
+						 int player, int frame, const PixelPos &screenPos);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 //Wyrmgus start

@@ -3140,7 +3140,6 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 	return 0;
 }
 
-//Wyrmgus start
 /**
 **  Define conversible player colors.
 **
@@ -3163,73 +3162,6 @@ static int CclDefineConversiblePlayerColors(lua_State *l)
 	
 	return 0;
 }
-
-/**
-**  Define hair colors
-**
-**  @param l  Lua state.
-*/
-static int CclDefineHairColors(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	if (!lua_istable(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-
-	bool first = true;
-	int hair_color_count = 0;
-	HairColorNames[0] = "default";
-	const int args = lua_rawlen(l, 1);
-	for (int i = 0; i < args; ++i) {
-		HairColorNames[(i / 2) + 1] = LuaToString(l, 1, i + 1);
-		++i;
-		lua_rawgeti(l, 1, i + 1);
-		if (!lua_istable(l, -1)) {
-			LuaError(l, "incorrect argument");
-		}
-		const int numcolors = lua_rawlen(l, -1);
-		if (first) {
-			hair_color_count = numcolors;
-			first = false;
-		}
-		if (numcolors != hair_color_count) {
-			LuaError(l, "You should use the same quantity of colors for all hair colors");
-		}
-		HairColorsRGB[(i / 2) + 1].clear();
-		HairColorsRGB[(i / 2) + 1].resize(hair_color_count);
-		for (int j = 0; j < numcolors; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			HairColorsRGB[(i / 2) + 1][j].Parse(l);
-			lua_pop(l, 1);
-		}
-	}
-
-	return 0;
-}
-
-/**
-**  Define conversible hair colors.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineConversibleHairColors(lua_State *l)
-{
-	ConversibleHairColors.clear();
-	
-	const unsigned int args = lua_gettop(l);
-	for (unsigned int i = 0; i < args; ++i) {
-		std::string hair_color_name = LuaToString(l, i + 1);
-		int hair_color = GetHairColorIndexByName(hair_color_name);
-		if (hair_color != -1) {
-			ConversibleHairColors.push_back(hair_color);
-		} else {
-			LuaError(l, "Hair color \"%s\" doesn't exist." _C_ hair_color_name.c_str());
-		}
-	}
-	
-	return 0;
-}
-//Wyrmgus end
 
 // ----------------------------------------------------------------------------
 
@@ -4169,12 +4101,7 @@ void PlayerCclRegister()
 
 	lua_register(Lua, "NewColors", CclNewPlayerColors);
 
-	//Wyrmgus start
 	lua_register(Lua, "DefineConversiblePlayerColors", CclDefineConversiblePlayerColors);
-	
-	lua_register(Lua, "DefineHairColors", CclDefineHairColors);
-	lua_register(Lua, "DefineConversibleHairColors", CclDefineConversibleHairColors);
-	//Wyrmgus end
 	
 	// player member access functions
 	lua_register(Lua, "GetPlayerData", CclGetPlayerData);

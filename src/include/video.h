@@ -227,16 +227,14 @@ protected:
 	{
 		//Wyrmgus start
 		for (int i = 0; i < PlayerColorMax; ++i) {
-			for (int j = 0; j < HairColorMax; ++j) {
-				PlayerColorSurfaces[i][j] = NULL;
-				PlayerColorSurfacesFlip[i][j] = NULL;
-				PlayerColorSurfacesDawn[i][j] = NULL;
-				PlayerColorSurfacesDawnFlip[i][j] = NULL;
-				PlayerColorSurfacesDusk[i][j] = NULL;
-				PlayerColorSurfacesDuskFlip[i][j] = NULL;
-				PlayerColorSurfacesNight[i][j] = NULL;
-				PlayerColorSurfacesNightFlip[i][j] = NULL;
-			}
+			PlayerColorSurfaces[i] = NULL;
+			PlayerColorSurfacesFlip[i] = NULL;
+			PlayerColorSurfacesDawn[i] = NULL;
+			PlayerColorSurfacesDawnFlip[i] = NULL;
+			PlayerColorSurfacesDusk[i] = NULL;
+			PlayerColorSurfacesDuskFlip[i] = NULL;
+			PlayerColorSurfacesNight[i] = NULL;
+			PlayerColorSurfacesNightFlip[i] = NULL;
 		}
 		//Wyrmgus end
 		
@@ -244,12 +242,10 @@ protected:
 		//Wyrmgus start
 //		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
 		for (int i = 0; i < PlayerColorMax; ++i) {
-			for (int j = 0; j < HairColorMax; ++j) {
-				PlayerColorTextures[i][j] = NULL;
-				PlayerColorTexturesDawn[i][j] = NULL;
-				PlayerColorTexturesDusk[i][j] = NULL;
-				PlayerColorTexturesNight[i][j] = NULL;
-			}
+			PlayerColorTextures[i] = NULL;
+			PlayerColorTexturesDawn[i] = NULL;
+			PlayerColorTexturesDusk[i] = NULL;
+			PlayerColorTexturesNight[i] = NULL;
 		}
 		//Wyrmgus end
 #endif
@@ -257,17 +253,17 @@ protected:
 
 public:
 	//Wyrmgus start
-	void MakePlayerColorSurface(int player_color, bool flipped = false, int time_of_day = 0, int hair_color = 0);
+	void MakePlayerColorSurface(int player_color, bool flipped = false, int time_of_day = 0);
 	//Wyrmgus end
 	//Wyrmgus start
-	void DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y, int hair_color = 0);
-	void DrawPlayerColorSubClip(int player, int gx, int gy, int w, int h, int x, int y, int hair_color = 0);
+	void DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y);
+	void DrawPlayerColorSubClip(int player, int gx, int gy, int w, int h, int x, int y);
 //	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
 //	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
-	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true, int hair_color = 0);
-	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true, int hair_color = 0, int show_percent = 100);
-	void DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, int hair_color = 0);
-	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, int hair_color = 0, int show_percent = 100);
+	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true);
+	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true, int show_percent = 100);
+	void DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true);
+	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, int show_percent = 100);
 	//Wyrmgus end
 
 	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
@@ -277,36 +273,36 @@ public:
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;
 	
 	//Wyrmgus start
-	virtual void *_getData(int player_color = -1, int hair_color = 0) {
+	virtual void *_getData(int player_color = -1) {
 		if (player_color == -1) {
 			return Surface;
 		}
 		
-		if (!PlayerColorSurfaces[player_color][hair_color]) {
-			MakePlayerColorSurface(player_color, false, NoTimeOfDay, hair_color);
+		if (!PlayerColorSurfaces[player_color]) {
+			MakePlayerColorSurface(player_color, false, NoTimeOfDay);
 		}
-		return PlayerColorSurfaces[player_color][hair_color];
+		return PlayerColorSurfaces[player_color];
 	}
 	//Wyrmgus end
 
 	//Wyrmgus start
-	SDL_Surface *PlayerColorSurfaces[PlayerColorMax][HairColorMax];      /// Surface
-	SDL_Surface *PlayerColorSurfacesFlip[PlayerColorMax][HairColorMax];  /// Flipped surface
-	SDL_Surface *PlayerColorSurfacesDawn[PlayerColorMax][HairColorMax];      /// Surface
-	SDL_Surface *PlayerColorSurfacesDawnFlip[PlayerColorMax][HairColorMax];  /// Flipped surface
-	SDL_Surface *PlayerColorSurfacesDusk[PlayerColorMax][HairColorMax];      /// Surface
-	SDL_Surface *PlayerColorSurfacesDuskFlip[PlayerColorMax][HairColorMax];  /// Flipped surface
-	SDL_Surface *PlayerColorSurfacesNight[PlayerColorMax][HairColorMax];      /// Surface
-	SDL_Surface *PlayerColorSurfacesNightFlip[PlayerColorMax][HairColorMax];  /// Flipped surface
+	SDL_Surface *PlayerColorSurfaces[PlayerColorMax];			/// Surface
+	SDL_Surface *PlayerColorSurfacesFlip[PlayerColorMax];		/// Flipped surface
+	SDL_Surface *PlayerColorSurfacesDawn[PlayerColorMax];		/// Surface
+	SDL_Surface *PlayerColorSurfacesDawnFlip[PlayerColorMax];	/// Flipped surface
+	SDL_Surface *PlayerColorSurfacesDusk[PlayerColorMax];		/// Surface
+	SDL_Surface *PlayerColorSurfacesDuskFlip[PlayerColorMax];	/// Flipped surface
+	SDL_Surface *PlayerColorSurfacesNight[PlayerColorMax];		/// Surface
+	SDL_Surface *PlayerColorSurfacesNightFlip[PlayerColorMax];	/// Flipped surface
 	//Wyrmgus end
 	
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	//Wyrmgus start
 //	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
-	GLuint *PlayerColorTextures[PlayerColorMax][HairColorMax];/// Textures with player colors
-	GLuint *PlayerColorTexturesDawn[PlayerColorMax][HairColorMax];/// Textures with player colors (dawn)
-	GLuint *PlayerColorTexturesDusk[PlayerColorMax][HairColorMax];/// Textures with player colors (dusk)
-	GLuint *PlayerColorTexturesNight[PlayerColorMax][HairColorMax];/// Textures with player colors (night)
+	GLuint *PlayerColorTextures[PlayerColorMax];				/// Textures with player colors
+	GLuint *PlayerColorTexturesDawn[PlayerColorMax];			/// Textures with player colors (dawn)
+	GLuint *PlayerColorTexturesDusk[PlayerColorMax];			/// Textures with player colors (dusk)
+	GLuint *PlayerColorTexturesNight[PlayerColorMax];			/// Textures with player colors (night)
 	//Wyrmgus end
 #endif
 };
@@ -578,12 +574,12 @@ extern int LoadGraphicPNG(CGraphic *g);
 extern void MakeTexture(CGraphic *graphic, int time_of_day = 0);
 //Wyrmgus end
 //Wyrmgus start
-extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, int ow, int oh, int time_of_day = 0, int hair_color = 0);
+extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, int ow, int oh, int time_of_day = 0);
 //Wyrmgus end
 /// Make an OpenGL texture of the player color pixels only.
 //Wyrmgus start
 //extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
-extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player, int time_of_day = 0, int hair_color = 0);
+extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player, int time_of_day = 0);
 //Wyrmgus end
 
 /// Regenerate Window screen if needed

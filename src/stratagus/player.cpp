@@ -353,10 +353,6 @@ std::vector<CColor> PlayerColorsRGB[PlayerColorMax];
 std::vector<IntColor> PlayerColors[PlayerColorMax];
 std::string PlayerColorNames[PlayerColorMax];
 std::vector<int> ConversiblePlayerColors;
-
-std::vector<CColor> HairColorsRGB[HairColorMax];
-std::string HairColorNames[HairColorMax];
-std::vector<int> ConversibleHairColors;
 //Wyrmgus end
 
 /**
@@ -4596,19 +4592,6 @@ int GetPlayerColorIndexByName(std::string player_color_name)
 		}
 	}
 	return -1;
-}
-
-int GetHairColorIndexByName(std::string hair_color_name)
-{
-	for (int c = 1; c < HairColorMax; ++c) {
-		if (HairColorNames[c].empty()) {
-			break;
-		}
-		if (HairColorNames[c] == hair_color_name) {
-			return c;
-		}
-	}
-	return 0;
 }
 
 std::string GetFactionTypeNameById(int faction_type)

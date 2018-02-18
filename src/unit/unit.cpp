@@ -5435,18 +5435,6 @@ int CUnit::GetDisplayPlayer() const
 	}
 }
 
-int CUnit::GetHairColor() const
-{
-	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
-	if (this->LayerVariation[HairImageLayer] != -1 && this->LayerVariation[HairImageLayer] < ((int) this->Type->LayerVarInfo[HairImageLayer].size()) && this->Type->LayerVarInfo[HairImageLayer][this->LayerVariation[HairImageLayer]]->HairColor != 0) {
-		return this->Type->LayerVarInfo[HairImageLayer][this->LayerVariation[HairImageLayer]]->HairColor;
-	} else if (varinfo && varinfo->HairColor != 0) {
-		return varinfo->HairColor;
-	} else {
-		return this->Type->HairColor;
-	}
-}
-
 int CUnit::GetPrice() const
 {
 	int cost = this->Type->Stats[this->Player->Index].GetPrice();
