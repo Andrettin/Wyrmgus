@@ -198,7 +198,7 @@ namespace gcn
                                    int dstX, int dstY, int width,
 								   //Wyrmgus start
 //                                   int height)
-                                   int height, int player, int hair_color, unsigned int transparency)
+                                   int height, int player, unsigned int transparency)
 								   //Wyrmgus end
     {
         dstX += mClipStack.top().xOffset;
@@ -227,7 +227,7 @@ namespace gcn
         // It uses the image data as a pointer to a GLuint
 		//Wyrmgus start
 //        glBindTexture(GL_TEXTURE_2D, *((GLuint *)(image->_getData())));
-        glBindTexture(GL_TEXTURE_2D, *((GLuint *)(image->_getData(player, hair_color))));
+        glBindTexture(GL_TEXTURE_2D, *((GLuint *)(image->_getData(player))));
 		//Wyrmgus end
 
         glEnable(GL_TEXTURE_2D);

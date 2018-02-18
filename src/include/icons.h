@@ -122,10 +122,7 @@ public:
 	void Load();
 
 	/// Draw icon
-	//Wyrmgus start
-//	void DrawIcon(const PixelPos &pos, const int player = -1) const;
-	void DrawIcon(const PixelPos &pos, const int player = -1, int hair_color = 0) const;
-	//Wyrmgus end
+	void DrawIcon(const PixelPos &pos, const int player = -1) const;
 	/// Draw grayscale icon
 	void DrawGrayscaleIcon(const PixelPos &pos, const int player = -1) const;
 	/// Draw cooldown spell
@@ -134,7 +131,7 @@ public:
 	void DrawUnitIcon(const ButtonStyle &style,
 					  //Wyrmgus start
 //					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1) const;
-					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, int hair_color = 0, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
+					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 					  //Wyrmgus end
 
 	const std::string &GetIdent() const { return this->Ident; }

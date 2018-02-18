@@ -521,7 +521,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
 			//Wyrmgus start
 //			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.GetDisplayPlayer(), order.GetUnitType().HairColor);
+			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.GetDisplayPlayer());
 			//Wyrmgus end
 		}
 	} else {
@@ -556,7 +556,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					//Wyrmgus start
 					flag |= IconCommandButton;
 //					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-					icon.DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.GetDisplayPlayer(), order.GetUnitType().HairColor);
+					icon.DrawUnitIcon(*UI.TrainingButtons[j].Style, flag, pos, "", unit.GetDisplayPlayer());
 					//Wyrmgus end
 					train_counter.push_back(1);
 					++j;
@@ -615,7 +615,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 
 		//Wyrmgus start
 //		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-		unit.GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.GetDisplayPlayer(), unit.GetHairColor());
+		unit.GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 		//Wyrmgus end
 	}
 }
@@ -651,7 +651,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				//Wyrmgus start
 				flag |= IconCommandButton;
 //				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.GetDisplayPlayer(), unit.GetHairColor());
+				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 				//Wyrmgus end
 			}
 			return true;
@@ -674,7 +674,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				//Wyrmgus start
 				flag |= IconCommandButton;
 //				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.GetDisplayPlayer(), unit.GetHairColor());
+				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.GetDisplayPlayer());
 				//Wyrmgus end
 			}
 			return true;
@@ -709,7 +709,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 		//Wyrmgus start
 //		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
-		uins->GetIcon().Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->GetDisplayPlayer(), uins->GetHairColor());
+		uins->GetIcon().Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->GetDisplayPlayer());
 		//Wyrmgus end
 		//Wyrmgus start
 //		UiDrawLifeBar(*uins, pos.x, pos.y);
@@ -756,7 +756,7 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			flag |= IconSelected;
 		}
 		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.Player->Index, uins->GetHairColor());
+		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.Player->Index);
 		++j;
 	}
 }
@@ -1046,7 +1046,7 @@ void DrawPopups()
 					flag |= IconSelected;
 				}
 				const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-				uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->Player->Index, uins->GetHairColor());
+				uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->Player->Index);
 				if (ButtonAreaUnderCursor == ButtonAreaInventory
 					&& static_cast<size_t>(ButtonUnderCursor) == j) {
 					if (!Preference.NoStatusLineTooltips) {
@@ -1955,7 +1955,7 @@ static void InfoPanel_draw_multiple_selection()
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
 						  //Wyrmgus start
 //						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
-						  pos, "", Selected[i]->GetDisplayPlayer(), Selected[i]->GetHairColor());
+						  pos, "", Selected[i]->GetDisplayPlayer());
 						  //Wyrmgus end
 
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);

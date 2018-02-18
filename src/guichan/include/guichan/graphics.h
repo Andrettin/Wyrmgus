@@ -181,7 +181,7 @@ namespace gcn
                                int dstX, int dstY, int width,
 							   //Wyrmgus start
 //                               int height) = 0;
-                               int height, int player = -1, int hair_color = 0, unsigned int transparency = 0) = 0;
+                               int height, int player = -1, unsigned int transparency = 0) = 0;
 							   //Wyrmgus end
         /**
          * Draws an image. A simplified version of the other drawImage.
@@ -191,7 +191,7 @@ namespace gcn
          */
 		//Wyrmgus start
 //        virtual void drawImage(const Image* image, int dstX, int dstY);
-        virtual void drawImage(Image* image, int dstX, int dstY, int player = -1, int hair_color = 0, unsigned int transparency = 0);
+        virtual void drawImage(Image* image, int dstX, int dstY, int player = -1, unsigned int transparency = 0);
 		//Wyrmgus end
 
         /**

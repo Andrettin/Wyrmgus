@@ -166,7 +166,7 @@ public:
 	//guichan
 	//Wyrmgus start
 //	virtual void *_getData() const { return Surface; }
-	virtual void *_getData(int player_color = -1, int hair_color = 0) { return Surface; }
+	virtual void *_getData(int player_color = -1) { return Surface; }
 	//Wyrmgus end
 	virtual int getWidth() const { return Width; }
 	virtual int getHeight() const { return Height; }

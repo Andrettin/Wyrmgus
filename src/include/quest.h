@@ -112,7 +112,7 @@ class CQuest
 {
 public:
 	CQuest() :
-		ID(-1), Civilization(-1), PlayerColor(0), HairColor(0), HighestCompletedDifficulty(-1),
+		ID(-1), Civilization(-1), PlayerColor(0), HighestCompletedDifficulty(-1),
 		Hidden(false), Completed(false), CurrentCompleted(false), Competitive(false), Unobtainable(false), Uncompleteable(false), Unfailable(false),
 		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), AcceptEffects(NULL), CompletionEffects(NULL), FailEffects(NULL)
 	{
@@ -141,7 +141,6 @@ public:
 	int ID;
 	int Civilization;				/// Which civilization the quest belongs to
 	int PlayerColor;				/// Player color used for the quest's icon
-	int HairColor;					/// Hair color used for the quest's icon
 	int HighestCompletedDifficulty;
 	bool Hidden;					/// Whether the quest is hidden
 	bool Completed;					/// Whether the quest has been completed
@@ -197,7 +196,7 @@ class CAchievement
 {
 public:
 	CAchievement() :
-		PlayerColor(0), HairColor(0), CharacterLevel(0), Difficulty(-1),
+		PlayerColor(0), CharacterLevel(0), Difficulty(-1),
 		Hidden(false), Obtained(false), Unobtainable(false),
 		Character(NULL), CharacterType(NULL)
 	{
@@ -212,7 +211,6 @@ public:
 	std::string Name;				/// Name of the achievement
 	std::string Description;		/// Description of the achievement
 	int PlayerColor;				/// Player color used for the achievement's icon
-	int HairColor;					/// Hair color used for the achievement's icon
 	int CharacterLevel;				/// Character level required for the achievement
 	int Difficulty;					/// Which difficulty the achievement's requirements need to be done in
 	bool Hidden;					/// Whether the achievement is hidden

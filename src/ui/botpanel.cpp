@@ -1306,9 +1306,6 @@ void CButtonPanel::Draw()
 			//Wyrmgus end
 		} else {
 			int player = -1;
-			//Wyrmgus start
-			int hair_color = 0;
-			//Wyrmgus end
 			if (Selected.empty() == false && Selected[0]->IsAlive()) {
 				//Wyrmgus start
 //				player = Selected[0]->RescuedFrom ? Selected[0]->RescuedFrom->Index : Selected[0]->Player->Index;
@@ -1318,19 +1315,13 @@ void CButtonPanel::Draw()
 				if (ThisPlayer->HasBuildingAccess(Players[player], buttons[i].Action)) {
 					player = ThisPlayer->Index;
 				}
-				
-				if (buttons[i].Action == ButtonExperienceUpgradeTo || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonPatrol || buttons[i].Action == ButtonReturn) {
-					hair_color = Selected[0]->GetHairColor();
-				} else if (buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild) {
-					hair_color = UnitTypes[buttons[i].Value]->GetDefaultHairColor(Players[player]);
-				}
 				//Wyrmgus end
 			}
 			
 			if (IsButtonUsable(*Selected[0], buttons[i])) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player, hair_color, false, false, 100 - GetButtonCooldownPercent(*Selected[0], buttons[i]));
+												   pos, buf, player, false, false, 100 - GetButtonCooldownPercent(*Selected[0], buttons[i]));
 												   
 				if (
 					(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].GetUnitStock(UnitTypes[buttons[i].Value]) != 0)
@@ -1357,11 +1348,11 @@ void CButtonPanel::Draw()
 			) {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player, hair_color, false, true);
+												   pos, buf, player, false, true);
 			} else {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player, hair_color, true);
+												   pos, buf, player, true);
 			}
 		}
 	}

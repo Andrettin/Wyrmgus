@@ -263,7 +263,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 
-			ThisPlayer->FreeWorkers[0]->GetIcon().Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index, ThisPlayer->FreeWorkers[0]->GetHairColor());
+			ThisPlayer->FreeWorkers[0]->GetIcon().Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index);
 		}
 		
 		//draw icon if there are units with available level up upgrades
@@ -271,7 +271,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 								 
-			ThisPlayer->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->LevelUpUnits[0]->GetHairColor());
+			ThisPlayer->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", ThisPlayer->Index);
 		}
 		
 		//draw icon if the player has a hero
@@ -280,7 +280,7 @@ void UpdateDisplay()
 				const PixelPos pos(UI.HeroUnitButtons[i]->X, UI.HeroUnitButtons[i]->Y);
 				const int flag = (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 									 
-				ThisPlayer->Heroes[i]->GetIcon().Icon->DrawUnitIcon(*UI.HeroUnitButtons[i]->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->Heroes[i]->GetHairColor());
+				ThisPlayer->Heroes[i]->GetIcon().Icon->DrawUnitIcon(*UI.HeroUnitButtons[i]->Style, flag, pos, "", ThisPlayer->Index);
 			}
 		}
 		

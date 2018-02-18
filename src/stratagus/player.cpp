@@ -2850,7 +2850,7 @@ void CPlayer::CompleteQuest(CQuest *quest)
 		if (!quest->Rewards.empty()) {
 			rewards_string = "Rewards: " + quest->Rewards;
 		}
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", \"" + HairColorNames[quest->HairColor] + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
 	}
 }
 

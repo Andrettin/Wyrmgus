@@ -871,7 +871,6 @@ static void DrawUnitIcons()
 		//Wyrmgus start
 //		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
 		CIcon &icon = (i != (int) Editor.ShownUnitTypes.size()) ? *Editor.ShownUnitTypes[i]->Icon.Icon : *CIcon::Get("icon-level-up");
-		int hair_color = (i != (int) Editor.ShownUnitTypes.size()) ? Editor.ShownUnitTypes[i]->HairColor : 0;
 		//Wyrmgus end
 		const PixelPos pos(x, y);
 
@@ -888,10 +887,7 @@ static void DrawUnitIcons()
 		flag |= IconCommandButton;
 		//Wyrmgus end
 
-		//Wyrmgus start
-//		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Players[Editor.SelectedPlayer].Index);
-		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Players[Editor.SelectedPlayer].Index, hair_color);
-		//Wyrmgus end
+		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Players[Editor.SelectedPlayer].Index);
 
 		//Wyrmgus start
 //		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
@@ -1213,10 +1209,7 @@ static void DrawEditorPanel_StartIcon()
 		flag |= IconCommandButton;
 		//Wyrmgus end
 		
-		//Wyrmgus start
-//		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
-		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer, Editor.StartUnit->HairColor);
-		//Wyrmgus end
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
 	} else {
 		//  No unit specified : draw a cross.
 		//  Todo : FIXME Should we just warn user to define Start unit ?
@@ -1389,10 +1382,7 @@ static void DrawStartLocations()
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(Players[i].StartPos);
 
 				if (type) {
-					//Wyrmgus start
-//					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
-					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos, type->HairColor);
-					//Wyrmgus end
+					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
 				} else { // Draw a cross
 					DrawCross(startScreenPos, PixelTileSize, Players[i].Color);
 				}

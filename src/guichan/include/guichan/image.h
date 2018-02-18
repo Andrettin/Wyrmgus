@@ -124,7 +124,7 @@ namespace gcn
          */
 		//Wyrmgus start
 //        virtual void* _getData() const;
-        virtual void* _getData(int player_color = -1, int hair_color = 0);
+        virtual void* _getData(int player_color = -1);
 		//Wyrmgus end
 
         /**
