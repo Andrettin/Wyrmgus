@@ -284,6 +284,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	}
 	if ((condition->ShowOnlySelected && !unit.Selected)
 		|| (unit.Player->Type == PlayerNeutral && condition->HideNeutral)
+		|| (unit.Player != ThisPlayer && !ThisPlayer->IsEnemy(unit) && !ThisPlayer->IsAllied(unit) && condition->HideNeutral)
 		|| (ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent)
 		|| (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && condition->HideAllied)
 		|| (condition->ShowIfCanCastAnySpell && !unit.CanCastAnySpell())
