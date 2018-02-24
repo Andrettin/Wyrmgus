@@ -1570,6 +1570,8 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->UnitTypesAiActiveCount.clear();
 	this->Heroes.clear();
 	this->Deities.clear();
+	this->UnitsByType.clear();
+	this->AiActiveUnitsByType.clear();
 	//Wyrmgus end
 
 	this->Supply = 0;
@@ -2491,6 +2493,8 @@ void CPlayer::Clear()
 	//Wyrmgus start
 	this->Heroes.clear();
 	this->Deities.clear();
+	this->UnitsByType.clear();
+	this->AiActiveUnitsByType.clear();
 	this->AvailableQuests.clear();
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
