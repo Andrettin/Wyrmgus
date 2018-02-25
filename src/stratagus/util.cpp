@@ -1041,7 +1041,7 @@ std::string GetPluralForm(std::string name)
 		name = FindAndReplaceStringEnding(name, "y", "ie");
 	}
 	
-	if (name.substr(name.size() - 2, 2) == "us" || name.substr(name.size() - 1, 1) == "x") {
+	if (name.substr(name.size() - 2, 2) == "os" || name.substr(name.size() - 2, 2) == "us" || name.substr(name.size() - 1, 1) == "x") {
 		name += "es";
 	}
 	
@@ -1052,6 +1052,7 @@ std::string GetPluralForm(std::string name)
 	name = FindAndReplaceString(name, "Barracks", "Barrackses");
 	name = FindAndReplaceString(name, "Dwarfs", "Dwarves");
 	name = FindAndReplaceString(name, "Elfs", "Elves");
+	name = FindAndReplaceString(name, "Ostrichs", "Ostriches");
 	name = FindAndReplaceString(name, "Thiefs", "Thieves");
 	name = FindAndReplaceString(name, "Wolfs", "Wolves");
 	if (name != "Humans") {
