@@ -1041,7 +1041,7 @@ std::string GetPluralForm(std::string name)
 		name = FindAndReplaceStringEnding(name, "y", "ie");
 	}
 	
-	if (name.substr(name.size() - 2, 2) == "us") {
+	if (name.substr(name.size() - 2, 2) == "us" || name.substr(name.size() - 1, 1) == "x") {
 		name += "es";
 	}
 	
