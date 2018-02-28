@@ -1561,7 +1561,7 @@ void CalculateItemsToLoad()
 	}
 
 	if (loadingTips.size() > 0) {
-		std::string base_loadingTip = loadingTips[rand()%loadingTips.size()];
+		std::string base_loadingTip = _(loadingTips[rand()%loadingTips.size()]);
 		
 		int str_width_per_total_width = 1;
 		str_width_per_total_width += GetGameFont().Width(base_loadingTip) / Video.Width;
