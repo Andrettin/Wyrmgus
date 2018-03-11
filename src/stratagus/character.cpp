@@ -136,10 +136,19 @@ bool CCharacter::IsItemEquipped(const CPersistentItem *item) const
 	return false;
 }
 
-bool CCharacter::CanAppear(bool ignore_neutral) const
+bool CCharacter::IsUsable() const
 {
 	if (this->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->Gender != this->Type->DefaultStat.Variables[GENDER_INDEX].Value) {
 		return false; // hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
+	}
+	
+	return true;
+}
+
+bool CCharacter::CanAppear(bool ignore_neutral) const
+{
+	if (!this->IsUsable()) {
+		return false;
 	}
 	
 	for (int i = 0; i < PlayerMax; ++i) {

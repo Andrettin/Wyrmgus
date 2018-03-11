@@ -134,6 +134,7 @@ public:
 	bool IsChildOf(std::string parent_full_name) const;
 	bool IsSiblingOf(std::string sibling_full_name) const;
 	bool IsItemEquipped(const CPersistentItem *item) const;
+	bool IsUsable() const;
 	bool CanAppear(bool ignore_neutral = false) const;
 	std::string GetFullName() const;
 	IconConfig GetIcon() const;

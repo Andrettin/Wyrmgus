@@ -997,6 +997,22 @@ static int CclGetCharacterData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
+	} else if (!strcmp(data, "Children")) {
+		lua_createtable(l, character->Children.size(), 0);
+		for (size_t i = 1; i <= character->Children.size(); ++i)
+		{
+			lua_pushstring(l, character->Children[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "Siblings")) {
+		lua_createtable(l, character->Siblings.size(), 0);
+		for (size_t i = 1; i <= character->Siblings.size(); ++i)
+		{
+			lua_pushstring(l, character->Siblings[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, character->GetIcon().Name.c_str());
 		return 1;
@@ -1005,6 +1021,9 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "HairVariation")) {
 		lua_pushstring(l, character->HairVariation.c_str());
+		return 1;
+	} else if (!strcmp(data, "IsUsable")) {
+		lua_pushboolean(l, character->IsUsable());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
