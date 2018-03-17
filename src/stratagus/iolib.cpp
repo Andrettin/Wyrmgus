@@ -629,6 +629,11 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 		}
 	}
 
+	snprintf(buffer, PATH_MAX, "%s/%s", Parameters::Instance.GetUserDirectory().c_str(), file);
+	if (FindFileWithExtension(buffer)) {
+		return;
+	}
+		
 	// In global shared directory
 	snprintf(buffer, PATH_MAX, "%s/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
