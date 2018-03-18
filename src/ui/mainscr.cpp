@@ -546,7 +546,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					if (j >= UI.TrainingButtons.size()) {
 						break;
 					}
-					CIcon &icon = *order.GetUnitType().Icon.Icon;
+					VariationInfo *varinfo = order.GetUnitType().GetDefaultVariation(*ThisPlayer);
+					CIcon &icon = (varinfo && varinfo->Icon.Icon) ? *varinfo->Icon.Icon : *order.GetUnitType().Icon.Icon;
 					//Wyrmgus start
 //					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
 					int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
