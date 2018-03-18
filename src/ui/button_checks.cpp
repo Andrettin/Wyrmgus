@@ -506,7 +506,7 @@ bool ButtonCheckHasSubButtons(const CUnit &unit, const ButtonAction &button)
 			continue;
 		}
 		
-		if (UnitButtonTable[i]->Action == ButtonButton && UnitButtonTable[i]->Value == button.Level) { //don't count buttons to return to the level where this button is
+		if (UnitButtonTable[i]->Action == ButtonButton && (UnitButtonTable[i]->Value == button.Level || UnitButtonTable[i]->Value == 0)) { //don't count buttons to return to the level where this button is, or buttons to return to the default level
 			continue;
 		}
 
