@@ -4306,7 +4306,7 @@ void CPlayer::ShareVisionWith(const CPlayer &player)
 	this->SharedVision |= (1 << player.Index);
 	
 	//Wyrmgus start
-	if (player.Index == ThisPlayer->Index) {
+	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
 		ThisPlayer->Notify(_("%s is now sharing vision with us"), _(this->Name.c_str()));
 	}
 	//Wyrmgus end
