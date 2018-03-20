@@ -2211,7 +2211,14 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int year = LuaToNumber(l, -1, j + 1);
+				CDate date;
+				date.year = 0;
+				date.month = 1;
+				date.day = 1;
+				date.timeline = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &date);
+				lua_pop(l, 1);
 				++j;
 				
 				std::string diplomacy_state_faction_ident = LuaToString(l, -1, j + 1);
@@ -2226,7 +2233,7 @@ static int CclDefineFaction(lua_State *l)
 				if (diplomacy_state == -1) {
 					LuaError(l, "Diplomacy state \"%s\" doesn't exist." _C_ diplomacy_state_name.c_str());
 				}
-				faction->HistoricalDiplomacyStates[std::pair<int, CFaction *>(year, diplomacy_state_faction)] = diplomacy_state;
+				faction->HistoricalDiplomacyStates[std::pair<CDate, CFaction *>(date, diplomacy_state_faction)] = diplomacy_state;
 			}
 		} else if (!strcmp(value, "HistoricalResources")) {
 			if (!lua_istable(l, -1)) {

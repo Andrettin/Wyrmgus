@@ -648,8 +648,8 @@ void GameMainLoop()
 							}
 						}
 
-						for (std::map<std::pair<int, CFaction *>, int>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
-							if (iterator->first.first == 0 || CurrentCampaign->StartDate.year >= iterator->first.first) {
+						for (std::map<std::pair<CDate, CFaction *>, int>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
+							if (iterator->first.first.year == 0 || CurrentCampaign->StartDate.ContainsDate(iterator->first.first)) {
 								CPlayer *diplomacy_state_player = GetFactionPlayer(iterator->first.second);
 								if (diplomacy_state_player) {
 									CommandDiplomacy(i, iterator->second, diplomacy_state_player->Index);
