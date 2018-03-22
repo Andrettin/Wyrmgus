@@ -7062,11 +7062,25 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		if (attacker) {
 			//  Setting ai threshold counter to 0 so it can target other units
 			attacker->Threshold = 0;
-			//Wyrmgus start
-//			if (target.IsEnemy(*attacker)) {
-			if (target.IsEnemy(*attacker) || target.Player->Type == PlayerNeutral) {
-			//Wyrmgus end
-				HitUnit_IncreaseScoreForKill(*attacker, target);
+		}
+		
+		CUnit *destroyer = attacker;
+		if (!destroyer) {
+			int best_distance = 0;
+			std::vector<CUnit *> table;
+			SelectAroundUnit(target, ExperienceRange, table, IsEnemyWith(*target.Player));
+			for (size_t i = 0; i < table.size(); i++) {
+				CUnit *potential_destroyer = table[i];
+				int distance = target.MapDistanceTo(*potential_destroyer);
+				if (!destroyer || distance < best_distance) {
+					destroyer = potential_destroyer;
+					best_distance = distance;
+				}
+			}
+		}
+		if (destroyer) {
+			if (target.IsEnemy(*destroyer) || target.Player->Type == PlayerNeutral) {
+				HitUnit_IncreaseScoreForKill(*destroyer, target);
 			}
 		}
 		LetUnitDie(target);
