@@ -1082,6 +1082,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 	
 	std::vector<int> type_variations;
 	int variation_max = image_layer == -1 ? VariationMax : (new_type != NULL ? new_type->LayerVarInfo[image_layer].size() : this->Type->LayerVarInfo[image_layer].size());
+	bool found_similar = false;
 	for (int i = 0; i < variation_max; ++i) {
 		VariationInfo *varinfo = image_layer == -1 ? new_type != NULL ? new_type->VarInfo[i] : this->Type->VarInfo[i] : (new_type != NULL ? new_type->LayerVarInfo[image_layer][i] : this->Type->LayerVarInfo[image_layer][i]);
 		if (!varinfo) {
@@ -1184,10 +1185,15 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		if ((requires_weapon && !found_weapon) || (requires_shield && !found_shield)) {
 			continue;
 		}
-		if (!ignore_old_variation && !priority_variation.empty() && (varinfo->VariationId.find(priority_variation) != std::string::npos || priority_variation.find(varinfo->VariationId) != std::string::npos)) { // if the priority variation's ident is included in that of a new viable variation (or vice-versa), choose the latter automatically
-			this->SetVariation(i, new_type, image_layer);
-			type_variations.clear();
-			break;
+		if (!ignore_old_variation && !priority_variation.empty() && (varinfo->VariationId.find(priority_variation) != std::string::npos || priority_variation.find(varinfo->VariationId) != std::string::npos)) { // if the priority variation's ident is included in that of a new viable variation (or vice-versa), give priority to the new variation over others
+			if (!found_similar) {
+				found_similar = true;
+				type_variations.clear();
+			}
+		} else {
+			if (found_similar) {
+				continue;
+			}
 		}
 		for (int j = 0; j < varinfo->Weight; ++j) {
 			type_variations.push_back(i);
