@@ -320,7 +320,7 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 							Map.Field(real_pos, z)->TerrainFeature = TerrainFeatures[terrain_feature_id];
 						}
 					} else {
-						if (r != 0 || g != 0 || b != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
+						if (r != 0 || g != 0 || b != 0 || (!overlay && !this->IsSubtemplateArea())) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
 							fprintf(stderr, "Invalid map terrain: (%d, %d) (RGB: %d/%d/%d)\n", x, y, r, g, b);
 						} else if (overlay && Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
 							Map.Field(real_pos, z)->RemoveOverlayTerrain();
