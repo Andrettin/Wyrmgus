@@ -1385,7 +1385,7 @@ void MessagesDisplay::DrawMessages()
 					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
 								Video.Height - 1);
 				}
-				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), quest->Name);
+				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(quest->Name.c_str())));
 				if (z == 0) {
 					PopClipping();
 				}
@@ -1397,7 +1397,7 @@ void MessagesDisplay::DrawMessages()
 					if (objective->Quest != quest) {
 						continue;
 					}
-					std::string objective_string = "- " + objective->ObjectiveString;
+					std::string objective_string = "- " + std::string(_(objective->ObjectiveString.c_str()));
 					if (objective->Quantity) {
 						objective_string += " (" + std::to_string((long long) objective->Counter) + "/" + std::to_string((long long) objective->Quantity) + ")";
 					}
@@ -1405,7 +1405,7 @@ void MessagesDisplay::DrawMessages()
 					++z;
 				}
 				for (size_t j = 0; j < quest->ObjectiveStrings.size(); ++j, ++z) {
-					label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), quest->ObjectiveStrings[j]);
+					label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(quest->ObjectiveStrings[j].c_str())));
 				}
 			}
 			for (int i = 0; i < ObjectivesCount; ++i, ++z) {
@@ -1419,7 +1419,7 @@ void MessagesDisplay::DrawMessages()
 				 * std::string(Objectives[i]) creation because
 				 * char * pointer may change during text drawing.
 				 */
-				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(Objectives[i]));
+				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(Objectives[i])));
 				if (z == 0) {
 					PopClipping();
 				}
