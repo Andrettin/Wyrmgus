@@ -72,6 +72,8 @@ class Settings {
 	bool NoRandomness;
 	bool NoTimeOfDay;
 	//Wyrmgus end
+	int TechLevel;
+	int MaxTechLevel;
 };
 
 extern Settings GameSettings;

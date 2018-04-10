@@ -96,6 +96,15 @@ enum Difficulties {
 	DifficultyBrutal
 };
 
+enum TechLevels {
+	NoTechLevel = 0,
+	AgrarianBronzeTechLevel,
+	AgrarianIronTechLevel,
+	CivilizedBronzeTechLevel,
+	CivilizedIronTechLevel,
+	CivilizedGunpowderTechLevel
+};
+
 $using std::string;
 $using std::vector;
 

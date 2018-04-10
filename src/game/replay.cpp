@@ -136,7 +136,7 @@ public:
 		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), Inside(false), RevealMap(0),
 		//Wyrmgus start
 //		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
-		MapRichness(0), GameType(0), Opponents(0), NoRandomness(false), NoTimeOfDay(false), Commands(NULL)
+		MapRichness(0), GameType(0), Opponents(0), NoRandomness(false), NoTimeOfDay(false), TechLevel(0), MaxTechLevel(0), Commands(NULL)
 		//Wyrmgus end
 	{
 		memset(Engine, 0, sizeof(Engine));
@@ -171,6 +171,8 @@ public:
 	bool NoRandomness;
 	bool NoTimeOfDay;
 	//Wyrmgus end
+	int TechLevel;
+	int MaxTechLevel;
 	int Engine[3];
 	int Network[3];
 	LogEntry *Commands;
@@ -252,6 +254,8 @@ static FullReplay *StartReplay()
 	//Wyrmgus start
 	replay->NoRandomness = GameSettings.NoRandomness;
 	replay->NoTimeOfDay = GameSettings.NoTimeOfDay;
+	replay->TechLevel = GameSettings.TechLevel;
+	replay->MaxTechLevel = GameSettings.MaxTechLevel;
 	//Wyrmgus end
 
 	replay->Engine[0] = StratagusMajorVersion;
@@ -308,6 +312,8 @@ static void ApplyReplaySettings()
 	//Wyrmgus start
 	GameSettings.NoRandomness = CurrentReplay->NoRandomness;
 	GameSettings.NoTimeOfDay = CurrentReplay->NoTimeOfDay;
+	GameSettings.TechLevel = CurrentReplay->TechLevel;
+	GameSettings.MaxTechLevel = CurrentReplay->MaxTechLevel;
 	//Wyrmgus end
 
 	// FIXME : check engine version
@@ -415,6 +421,8 @@ static void SaveFullLog(CFile &file)
 	//Wyrmgus start
 	file.printf("  NoRandomness = %s,\n", CurrentReplay->NoRandomness ? "true" : "false");
 	file.printf("  NoTimeOfDay = %s,\n", CurrentReplay->NoTimeOfDay ? "true" : "false");
+	file.printf("  TechLevel = %d,\n", CurrentReplay->TechLevel);
+	file.printf("  MaxTechLevel = %d,\n", CurrentReplay->MaxTechLevel);
 	//Wyrmgus end
 	file.printf("  Engine = { %d, %d, %d },\n",
 				CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
@@ -733,6 +741,10 @@ static int CclReplayLog(lua_State *l)
 			replay->NoRandomness = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NoTimeOfDay")) {
 			replay->NoTimeOfDay = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "TechLevel")) {
+			replay->TechLevel = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MaxTechLevel")) {
+			replay->MaxTechLevel = LuaToNumber(l, -1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "MapRichness")) {
 			replay->MapRichness = LuaToNumber(l, -1);

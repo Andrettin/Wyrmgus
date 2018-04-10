@@ -263,6 +263,15 @@ enum Difficulties {
 	DifficultyBrutal
 };
 
+enum TechLevels {
+	NoTechLevel = 0,
+	AgrarianBronzeTechLevel,
+	AgrarianIronTechLevel,
+	CivilizedBronzeTechLevel,
+	CivilizedIronTechLevel,
+	CivilizedGunpowderTechLevel
+};
+
 class CTimeline;
 
 struct CDate {
