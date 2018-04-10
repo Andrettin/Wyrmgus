@@ -530,6 +530,7 @@ void SaveMapPNG(const char *name)
 */
 void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overlay)
 {
+	bool use_terrain_file = true;
 	std::string terrain_file;
 	if (overlay) {
 		terrain_file = map_template->OverlayTerrainFile;
@@ -538,7 +539,7 @@ void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overl
 	}
 	
 	if (terrain_file.empty()) {
-		return;
+		use_terrain_file = false;
 	}
 	
 	FILE *fp = fopen(name, "wb");
@@ -578,48 +579,90 @@ void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overl
 
 	png_write_info(png_ptr, info_ptr);
 
-	const std::string terrain_filename = LibraryFileName(terrain_file.c_str());
-		
-	if (!CanAccessFile(terrain_filename.c_str())) {
-		fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
-	}
-	
 	unsigned char *row = new unsigned char[imageWidth * 3];
 	
-	std::ifstream is_map(terrain_filename);
-	
-	std::string line_str;
-	int y = 0;
-	while (std::getline(is_map, line_str))
-	{
-		int x = 0;
-		
-		for (unsigned int i = 0; i < line_str.length(); ++i) {
-			std::string terrain_character = line_str.substr(i, 1);
-			char terrain_id = -1;
-			if (TerrainTypeCharacterToIndex.find(terrain_character) != TerrainTypeCharacterToIndex.end()) {
-				terrain_id = TerrainTypeCharacterToIndex.find(terrain_character)->second;
-			}
-			Uint8 red = 0;
-			Uint8 green = 0;
-			Uint8 blue = 0;
-			if (terrain_id != -1) {
-				red = TerrainTypes[terrain_id]->Color.R;
-				green = TerrainTypes[terrain_id]->Color.G;
-				blue = TerrainTypes[terrain_id]->Color.B;
-			}
+	if (use_terrain_file) {
+		const std::string terrain_filename = LibraryFileName(terrain_file.c_str());
 			
-			row[x * 3 + 0] = red;
-			row[x * 3 + 1] = green;
-			row[x * 3 + 2] = blue;
-
-			x += 1;
+		if (!CanAccessFile(terrain_filename.c_str())) {
+			fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
 		}
 		
-		png_write_row(png_ptr, row);
+		std::ifstream is_map(terrain_filename);
 		
-		y += 1;
+		std::string line_str;
+		int y = 0;
+		while (std::getline(is_map, line_str))
+		{
+			int x = 0;
+			
+			for (unsigned int i = 0; i < line_str.length(); ++i) {
+				std::string terrain_character = line_str.substr(i, 1);
+				char terrain_id = -1;
+				if (TerrainTypeCharacterToIndex.find(terrain_character) != TerrainTypeCharacterToIndex.end()) {
+					terrain_id = TerrainTypeCharacterToIndex.find(terrain_character)->second;
+				}
+				Uint8 red = 0;
+				Uint8 green = 0;
+				Uint8 blue = 0;
+				if (terrain_id != -1) {
+					red = TerrainTypes[terrain_id]->Color.R;
+					green = TerrainTypes[terrain_id]->Color.G;
+					blue = TerrainTypes[terrain_id]->Color.B;
+				}
+				
+				row[x * 3 + 0] = red;
+				row[x * 3 + 1] = green;
+				row[x * 3 + 2] = blue;
+
+				x += 1;
+			}
+			
+			png_write_row(png_ptr, row);
+			
+			y += 1;
+		}
+	} else {
+		std::map<int, std::map<int, CTerrainType *>> terrain_map;
+		for (size_t i = 0; i < map_template->HistoricalTerrains.size(); ++i) {
+			if (std::get<2>(map_template->HistoricalTerrains[i]).year == 0) {
+				Vec2i terrain_pos = std::get<0>(map_template->HistoricalTerrains[i]);
+				CTerrainType *terrain_type = std::get<1>(map_template->HistoricalTerrains[i]);
+				if (terrain_type->Overlay == overlay) {
+					terrain_map[terrain_pos.y][terrain_pos.x] = terrain_type;
+				}
+			}
+		}
+		
+		for (int y = 0; y < map_template->Height; ++y) {
+			for (int x = 0; x < map_template->Width; ++x) {
+				row[x * 3 + 0] = 0;
+				row[x * 3 + 1] = 0;
+				row[x * 3 + 2] = 0;
+			}
+			
+			for (std::map<int, CTerrainType *>::iterator iterator = terrain_map[y].begin(); iterator != terrain_map[y].end(); ++iterator) {
+				int x = iterator->first;
+				CTerrainType *terrain_type = iterator->second;
+				
+				Uint8 red = 0;
+				Uint8 green = 0;
+				Uint8 blue = 0;
+				if (terrain_type) {
+					red = terrain_type->Color.R;
+					green = terrain_type->Color.G;
+					blue = terrain_type->Color.B;
+				}
+				
+				row[x * 3 + 0] = red;
+				row[x * 3 + 1] = green;
+				row[x * 3 + 2] = blue;
+			}
+			
+			png_write_row(png_ptr, row);
+		}
 	}
+	
 	delete[] row;
 
 	png_write_end(png_ptr, info_ptr);

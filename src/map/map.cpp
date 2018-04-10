@@ -389,6 +389,16 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	
 	this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
 	this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
+	
+	if (this->OutputTerrainImage) {
+		std::string filename = this->Ident;
+		std::string overlay_filename = this->Ident;
+		overlay_filename += "-overlay";
+		filename += ".png";
+		overlay_filename += ".png";
+		SaveMapTemplatePNG(filename.c_str(), this, false);
+		SaveMapTemplatePNG(overlay_filename.c_str(), this, true);
+	}
 
 	if (CurrentCampaign) {
 		for (size_t i = 0; i < HistoricalTerrains.size(); ++i) {
@@ -529,8 +539,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 	}
 	
-	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->Name.c_str());
-
 	if (!this->IsSubtemplateArea()) {
 		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
@@ -539,6 +547,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 	
+	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->Name.c_str());
+
 	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
 		Vec2i unit_raw_pos(iterator->first.first, iterator->first.second);
 		Vec2i unit_pos(map_start_pos.x + unit_raw_pos.x - template_start_pos.x, map_start_pos.y + unit_raw_pos.y - template_start_pos.y);
