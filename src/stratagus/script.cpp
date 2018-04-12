@@ -1468,8 +1468,8 @@ std::string EvalString(const StringDesc *s)
 					str = UnitTypeClasses[(**type).Class].c_str();
 				}
 				str[0] = toupper(str[0]);
-				size_t loc = str.find("-");
-				if (loc != std::string::npos) {
+				size_t loc;
+				while ((loc = str.find("-")) != std::string::npos) {
 					str.replace(loc, 1, " ");
 					str[loc + 1] = toupper(str[loc + 1]);
 				}
