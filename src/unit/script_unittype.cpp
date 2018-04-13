@@ -1144,6 +1144,14 @@ static int CclDefineUnitType(lua_State *l)
 						} else {
 							LuaError(l, "Terrain type \"%s\" doesn't exist." _C_ terrain_ident.c_str());
 						}
+					} else if (!strcmp(value, "terrain-forbidden")) {
+						std::string terrain_ident = LuaToString(l, -1, k + 1);
+						CTerrainType *terrain = GetTerrainType(terrain_ident);
+						if (terrain) {
+							var->TerrainsForbidden.push_back(terrain);
+						} else {
+							LuaError(l, "Terrain type \"%s\" doesn't exist." _C_ terrain_ident.c_str());
+						}
 					} else if (!strcmp(value, "resource-min")) {
 						var->ResourceMin = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "resource-max")) {

@@ -411,7 +411,7 @@ public:
 	
 	//Wyrmgus start
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay, int z) const;
-	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen, int z) const;
+	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen, int z, bool ignore_destroyed = false) const;
 	int GetTileLandmass(const Vec2i &pos, int z) const;
 	Vec2i GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, Vec2i min_pos, Vec2i max_pos, int z) const;
 	//Wyrmgus end

@@ -189,7 +189,7 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 				this->Flags |= MapFieldAirUnpassable;
 			}
 			VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-			if (varinfo && varinfo->Terrains.size() > 0 && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), (this->OverlayTerrain ? this->OverlayTerrain : this->Terrain)) == varinfo->Terrains.end()) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation (this isn't perfect though, since the unit may still be allowed to keep the old variation if it has a tile size greater than 1x1)
+			if (varinfo && !unit.CheckTerrainForVariation(varinfo)) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation
 				unit.ChooseVariation();
 			}
 		}

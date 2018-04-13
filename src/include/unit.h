@@ -210,6 +210,7 @@ public:
 	void Retrain();
 	void HealingItemAutoUse();
 	void SetCharacter(std::string character_full_name, bool custom_hero = false);
+	bool CheckTerrainForVariation(VariationInfo *varinfo);
 	void ChooseVariation(const CUnitType *new_type = NULL, bool ignore_old_variation = false, int image_layer = -1);
 	void SetVariation(int new_variation, const CUnitType *new_type = NULL, int image_layer = -1);
 	void UpdateButtonIcons();

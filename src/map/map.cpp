@@ -1429,7 +1429,7 @@ CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, bool overlay, int z) const
 	}
 }
 
-CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen, int z) const
+CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen, int z, bool ignore_destroyed) const
 {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
 		return NULL;
@@ -1438,7 +1438,7 @@ CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen, int z) const
 	CMapField &mf = *this->Field(pos, z);
 	
 	if (!seen) {
-		if (mf.OverlayTerrain) {
+		if (mf.OverlayTerrain && (!ignore_destroyed || !mf.OverlayTerrainDestroyed)) {
 			return mf.OverlayTerrain;
 		} else {
 			return mf.Terrain;

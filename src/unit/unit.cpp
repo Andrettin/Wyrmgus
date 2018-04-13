@@ -1063,6 +1063,49 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	this->UpdateXPRequired();
 }
 
+bool CUnit::CheckTerrainForVariation(VariationInfo *varinfo)
+{
+	if (varinfo->Terrains.size() > 0) {
+		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
+			return false;
+		}
+		bool terrain_check = false;
+		for (int x = 0; x < this->Type->TileWidth; ++x) {
+			for (int y = 0; y < this->Type->TileHeight; ++y) {
+				if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
+					if (std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer, true)) != varinfo->Terrains.end()) {
+						terrain_check = true;
+						break;
+					}
+				}
+			}
+			if (terrain_check) {
+				break;
+			}
+		}
+		if (!terrain_check) {
+			return false;
+		}
+	}
+	
+	if (varinfo->TerrainsForbidden.size() > 0) {
+		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
+			return false;
+		}
+		for (int x = 0; x < this->Type->TileWidth; ++x) {
+			for (int y = 0; y < this->Type->TileHeight; ++y) {
+				if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
+					if (std::find(varinfo->TerrainsForbidden.begin(), varinfo->TerrainsForbidden.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer, true)) != varinfo->TerrainsForbidden.end()) {
+						return false;
+					}
+				}
+			}
+		}
+	}
+	
+	return true;
+}
+
 void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation, int image_layer)
 {
 	std::string priority_variation;
@@ -1094,26 +1137,11 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		if (varinfo->ResourceMax && this->ResourcesHeld > varinfo->ResourceMax) {
 			continue;
 		}
-		if (varinfo->Terrains.size() > 0) {
-			if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
-				continue;
-			}
-			bool terrain_check = false;
-			for (int x = 0; x < this->Type->TileWidth; ++x) {
-				for (int y = 0; y < this->Type->TileHeight; ++y) {
-					if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer) && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer)) != varinfo->Terrains.end()) {
-						terrain_check = true;
-						break;
-					}
-				}
-				if (terrain_check) {
-					break;
-				}
-			}
-			if (!terrain_check) {
-				continue;
-			}
+		
+		if (!this->CheckTerrainForVariation(varinfo)) {
+			continue;
 		}
+		
 		bool upgrades_check = true;
 		bool requires_weapon = false;
 		bool found_weapon = false;
@@ -3510,7 +3538,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 		}
 		
 		VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
-		if (varinfo && varinfo->Terrains.size() > 0 && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos, false, this->MapLayer)) == varinfo->Terrains.end()) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation (this isn't perfect though, since the unit may still be allowed to keep the old variation if it has a tile size greater than 1x1)
+		if (varinfo && !this->CheckTerrainForVariation(varinfo)) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation
 			this->ChooseVariation();
 		}
 	}
