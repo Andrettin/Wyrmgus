@@ -1069,17 +1069,17 @@ bool CUnit::CheckTerrainForVariation(VariationInfo *varinfo)
 		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
 		}
-		bool terrain_check = false;
+		bool terrain_check = true;
 		for (int x = 0; x < this->Type->TileWidth; ++x) {
 			for (int y = 0; y < this->Type->TileHeight; ++y) {
 				if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-					if (std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer, true)) != varinfo->Terrains.end()) {
-						terrain_check = true;
+					if (std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer, true)) == varinfo->Terrains.end()) {
+						terrain_check = false;
 						break;
 					}
 				}
 			}
-			if (terrain_check) {
+			if (!terrain_check) {
 				break;
 			}
 		}
@@ -1092,14 +1092,22 @@ bool CUnit::CheckTerrainForVariation(VariationInfo *varinfo)
 		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
 		}
+		bool terrain_check = true;
 		for (int x = 0; x < this->Type->TileWidth; ++x) {
 			for (int y = 0; y < this->Type->TileHeight; ++y) {
 				if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-					if (std::find(varinfo->TerrainsForbidden.begin(), varinfo->TerrainsForbidden.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer, true)) != varinfo->TerrainsForbidden.end()) {
-						return false;
+					if (std::find(varinfo->TerrainsForbidden.begin(), varinfo->TerrainsForbidden.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer, true)) == varinfo->TerrainsForbidden.end()) {
+						terrain_check = false;
+						break;
 					}
 				}
 			}
+			if (!terrain_check) {
+				break;
+			}
+		}
+		if (terrain_check) {
+			return false;
 		}
 	}
 	
