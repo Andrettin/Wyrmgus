@@ -1495,6 +1495,10 @@ static void AiProduceResources()
 */
 static void AiCollectResources()
 {
+	if (AiPlayer->Player->AiName == "passive") {
+		return;
+	}
+	
 	std::vector<CUnit *> units_assigned[MaxCosts]; // Worker assigned to resource
 	std::vector<CUnit *> units_unassigned[MaxCosts]; // Unassigned workers
 	int num_units_with_resource[MaxCosts];

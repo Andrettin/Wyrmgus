@@ -320,10 +320,12 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 							Map.Field(real_pos, z)->TerrainFeature = TerrainFeatures[terrain_feature_id];
 						}
 					} else {
-						if (r != 0 || g != 0 || b != 0 || (!overlay && !this->IsSubtemplateArea())) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
-							fprintf(stderr, "Invalid map terrain: (%d, %d) (RGB: %d/%d/%d)\n", x, y, r, g, b);
-						} else if (overlay && Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
-							Map.Field(real_pos, z)->RemoveOverlayTerrain();
+						if (a != 0) { //transparent pixels means leaving the area as it is (e.g. if it is a subtemplate use the main template's terrain for this tile instead)
+							if (r != 0 || g != 0 || b != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
+								fprintf(stderr, "Invalid map terrain: (%d, %d) (RGB: %d/%d/%d)\n", x, y, r, g, b);
+							} else if (overlay && Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
+								Map.Field(real_pos, z)->RemoveOverlayTerrain();
+							}
 						}
 					}
 				}
@@ -1100,7 +1102,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
 
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z);
-			if (!type->BoolFlag[BUILDING_INDEX].value) { // make non-building units not have an active AI
+			if (!type->BoolFlag[BUILDING_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
 				unit->Active = 0;
 				player->ChangeUnitTypeAiActiveCount(type, -1);
 			}
@@ -1144,8 +1146,10 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			Vec2i unit_offset((hero->Type->TileWidth - 1) / 2, (hero->Type->TileHeight - 1) / 2);
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->Type, player, z);
 			unit->SetCharacter(hero->Ident);
-			unit->Active = 0;
-			player->ChangeUnitTypeAiActiveCount(hero->Type, -1);
+			if (!unit->Type->BoolFlag[BUILDING_INDEX].value && !unit->Type->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
+				unit->Active = 0;
+				player->ChangeUnitTypeAiActiveCount(hero->Type, -1);
+			}
 		}
 	}
 	
