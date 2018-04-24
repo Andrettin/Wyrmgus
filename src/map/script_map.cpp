@@ -2242,6 +2242,39 @@ static int CclGetMapTemplateData(lua_State *l)
 }
 
 /**
+**  Get settlement data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetSettlementData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string settlement_ident = LuaToString(l, 1);
+	CSettlement *settlement = GetSettlement(settlement_ident);
+	if (!settlement) {
+		LuaError(l, "Settlement \"%s\" doesn't exist." _C_ settlement_ident.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, settlement->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "PosX")) {
+		lua_pushnumber(l, settlement->Position.x);
+		return 1;
+	} else if (!strcmp(data, "PosY")) {
+		lua_pushnumber(l, settlement->Position.y);
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
 **  Get terrain feature data.
 **
 **  @param l  Lua state.
@@ -2335,6 +2368,7 @@ void MapCclRegister()
 	lua_register(Lua, "DefineTerrainFeature", CclDefineTerrainFeature);
 	lua_register(Lua, "DefineTimeline", CclDefineTimeline);
 	lua_register(Lua, "GetMapTemplateData", CclGetMapTemplateData);
+	lua_register(Lua, "GetSettlementData", CclGetSettlementData);
 	lua_register(Lua, "GetTerrainFeatureData", CclGetTerrainFeatureData);
 	lua_register(Lua, "GetTerrainFeatures", CclGetTerrainFeatures);
 	lua_register(Lua, "SetMapTemplateTileTerrain", CclSetMapTemplateTileTerrain);
