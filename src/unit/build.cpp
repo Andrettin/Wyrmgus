@@ -144,6 +144,15 @@ bool CBuildRestrictionOr::Check(const CUnit *builder, const CUnitType &type, con
 //Wyrmgus end
 
 /**
+**  Init Distance Restriction
+*/
+void CBuildRestrictionDistance::Init()
+{
+	this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);
+	this->RestrictClass = GetOrAddUnitTypeClassIndexByName(this->RestrictClassName);
+}
+
+/**
 **  Check Distance Restriction
 */
 //Wyrmgus start
@@ -189,7 +198,7 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	for (size_t i = 0; i != table.size(); ++i) {
 		if ((builder != table[i] || this->CheckBuilder) &&
 			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
-			(this->RestrictType == table[i]->Type || (!this->RestrictType && this->RestrictTypeOwner.size() > 0)) &&
+			(this->RestrictType == table[i]->Type || (this->RestrictClass != -1 && this->RestrictClass == table[i]->Type->Class) || (!this->RestrictType && this->RestrictClass == -1 && this->RestrictTypeOwner.size() > 0)) &&
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
 			(this->RestrictTypeOwner.size() == 0 ||
 			 (!this->RestrictTypeOwner.compare("self") && player == table[i]->Player) ||

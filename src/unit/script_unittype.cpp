@@ -465,6 +465,8 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					}
 				} else if (!strcmp(value, "Type")) {
 					b->RestrictTypeName = LuaToString(l, -1);
+				} else if (!strcmp(value, "Class")) {
+					b->RestrictClassName = LuaToString(l, -1);
 				} else if (!strcmp(value, "Owner")) {
 					b->RestrictTypeOwner = LuaToString(l, -1);
 				} else if (!strcmp(value, "CheckBuilder")) {

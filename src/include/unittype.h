@@ -692,9 +692,9 @@ public:
 class CBuildRestrictionDistance : public CBuildRestriction
 {
 public:
-	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(NULL), Diagonal(true) {};
+	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(NULL), RestrictClass(-1), Diagonal(true) {};
 	virtual ~CBuildRestrictionDistance() {};
-	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
+	virtual void Init();
 	//Wyrmgus start
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
@@ -705,6 +705,8 @@ public:
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
 	CUnitType *RestrictType;
+	std::string RestrictClassName;
+	int RestrictClass;
 	bool CheckBuilder;
 	bool Diagonal;
 };
