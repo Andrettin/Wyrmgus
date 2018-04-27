@@ -1281,42 +1281,27 @@ static int CclOrderUnit(lua_State *l)
 			|| unittype == unit.Type) {
 			if (plynr == -1 || plynr == unit.Player->Index) {
 				if (!strcmp(order, "move")) {
-					//Wyrmgus start
-//					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1, d_z);
-					//Wyrmgus end
 				} else if (!strcmp(order, "attack")) {
 					CUnit *attack = TargetOnMap(unit, dpos1, dpos2, d_z);
 
-					//Wyrmgus start
-//					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
 					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1, d_z);
-					//Wyrmgus end
-				//Wyrmgus start
+				} else if (!strcmp(order, "attack-move")) {
+					CommandAttack(unit, (dpos1 + dpos2) / 2, NoUnitP, 1, d_z);
 				} else if (!strcmp(order, "attack-ground")) {
-					//Wyrmgus start
-//					CommandAttackGround(unit, (dpos1 + dpos2) / 2, 1);
 					CommandAttackGround(unit, (dpos1 + dpos2) / 2, 1, d_z);
-					//Wyrmgus end
-				//Wyrmgus end
 				} else if (!strcmp(order, "patrol")) {
-					//Wyrmgus start
-//					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
 					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1, d_z);
-					//Wyrmgus end
-				//Wyrmgus start
 				} else if (!strcmp(order, "board")) {
 					CUnit &transporter = *TargetOnMap(unit, dpos1, dpos2, d_z);
 
 					CommandBoard(unit, transporter, 1);
+				} else if (!strcmp(order, "follow")) {
+					CommandMove(unit, (dpos1 + dpos2) / 2, 1, d_z);
 				} else if (!strcmp(order, "unload")) {
-					//Wyrmgus start
-//					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1);
 					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1, d_z);
-					//Wyrmgus end
 				} else if (!strcmp(order, "stop")) {					
 					CommandStopUnit(unit);
-				//Wyrmgus end
 				} else {
 					LuaError(l, "Unsupported order: %s" _C_ order);
 				}

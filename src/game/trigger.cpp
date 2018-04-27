@@ -253,7 +253,11 @@ static int CclGetNumUnitsAt(lua_State *l)
 */
 static int CclIfNearUnit(lua_State *l)
 {
-	LuaCheckArgs(l, 5);
+	const int nargs = lua_gettop(l);
+	if (nargs < 5 || nargs > 6) {
+		LuaError(l, "incorrect argument\n");
+	}
+	
 	lua_pushvalue(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
@@ -262,7 +266,9 @@ static int CclIfNearUnit(lua_State *l)
 	lua_pushvalue(l, 4);
 	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
+	lua_pushvalue(l, 5);
 	const CUnitType *ut2 = CclGetUnitType(l);
+	lua_pop(l, 1);
 	if (!unittype || !ut2) {
 		LuaError(l, "CclIfNearUnit: not a unit-type valid");
 	}
@@ -271,6 +277,13 @@ static int CclIfNearUnit(lua_State *l)
 		LuaError(l, "Illegal comparison operation in if-near-unit: %s" _C_ op);
 	}
 
+	int other_plynr = plynr;
+	if (nargs >= 6) {
+		lua_pushvalue(l, 6);
+		other_plynr = TriggerGetPlayer(l);
+		lua_pop(l, 1);
+	}
+	
 	//
 	// Get all unit types 'near'.
 	//
@@ -281,6 +294,10 @@ static int CclIfNearUnit(lua_State *l)
 	for (size_t i = 0; i != unitsOfType.size(); ++i) {
 		const CUnit &centerUnit = *unitsOfType[i];
 
+		if (other_plynr != -1 && other_plynr != centerUnit.Player->Index) {
+			continue;
+		}
+				
 		std::vector<CUnit *> around;
 		SelectAroundUnit(centerUnit, 1, around);
 
