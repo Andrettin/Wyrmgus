@@ -3162,7 +3162,7 @@ static void RemoveUnitFromContainer(CUnit &unit)
 	CUnit *host = unit.Container; // transporter which contain unit.
 	Assert(unit.Container);
 	Assert(unit.Container->InsideCount > 0);
-
+	
 	host->InsideCount--;
 	unit.NextContained->PrevContained = unit.PrevContained;
 	unit.PrevContained->NextContained = unit.NextContained;

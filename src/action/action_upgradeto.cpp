@@ -224,6 +224,18 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		}
 	}
 	//Wyrmgus end
+	
+	//drop units that can no longer be in the container
+	if (unit.UnitInside) {
+		CUnit *uins = unit.UnitInside;
+		for (int i = unit.InsideCount; i && unit.BoardCount > newtype.MaxOnBoard; --i, uins = uins->NextContained) {
+			if (uins->Boarded) {
+				uins->Boarded = 0;
+				unit.BoardCount -= uins->Type->BoardSize;
+				DropOutOnSide(*uins, LookingW, &unit);
+			}
+		}
+	}
 					
 	//Wyrmgus start
 	//change variation if upgrading (new unit type may have different variations)
