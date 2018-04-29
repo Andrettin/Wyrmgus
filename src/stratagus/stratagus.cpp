@@ -270,17 +270,7 @@ void PreMenuSetup()
 
 	InitVideoCursors();
 
-	if (MenuRace.empty()) {
-		//Wyrmgus start
-//		LoadCursors(PlayerRaces.Name[0]);
-		LoadCursors();
-		//Wyrmgus end
-	} else {
-		//Wyrmgus start
-//		LoadCursors(MenuRace);
-		LoadCursors();
-		//Wyrmgus end
-	}
+	LoadCursors();
 
 	InitSettings();
 

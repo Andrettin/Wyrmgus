@@ -152,24 +152,31 @@ void LoadCursors(const std::string civilization_name)
 */
 CCursor *CursorByIdent(const std::string &ident)
 {
+	CCursor *found_cursor = NULL;
 	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		CCursor &cursor = **i;
 
 		if (cursor.Ident != ident || !cursor.G->IsLoaded()) {
 			continue;
 		}
-		//Wyrmgus start
+
 		if (!ThisPlayer && cursor.Race != PlayerRaces.Name[Players[0].Race] && !cursor.Race.empty()) {
 			continue;
 		}
-		//Wyrmgus end
 		
 		if (cursor.Race.empty() || !ThisPlayer || cursor.Race == PlayerRaces.Name[ThisPlayer->Race]) {
-			return &cursor;
+			found_cursor = &cursor;
+			if (!cursor.Race.empty()) { //if this is a generic cursor, keep searching for a civilization-specific one; stop searching otherwise
+				break;
+			}
 		}
 	}
-	DebugPrint("Cursor '%s' not found, please check your code.\n" _C_ ident.c_str());
-	return NULL;
+	
+	if (!found_cursor) {
+		DebugPrint("Cursor '%s' not found, please check your code.\n" _C_ ident.c_str());
+	}
+	
+	return found_cursor;
 }
 
 /**
