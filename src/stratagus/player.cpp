@@ -4547,7 +4547,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, int button_action) const
 	
 	if (
 		player.HasNeutralFactionType()
-		&& player.Overlord == NULL || this->IsOverlordOf(player, true)
+		&& (player.Overlord == NULL || this->IsOverlordOf(player, true) || player.Overlord->IsAllied(*this))
 	) {
 		if (PlayerRaces.Factions[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonTrain && button_action != ButtonBuy) || std::find(this->Deities.begin(), this->Deities.end(), PlayerRaces.Factions[player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;

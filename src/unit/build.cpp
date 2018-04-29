@@ -548,7 +548,7 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type
 */
 //Wyrmgus start
 //CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
-CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z)
+CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z, bool no_bordering_building)
 //Wyrmgus end
 {
 	//  Can't build outside the map
@@ -566,7 +566,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	}
 	
 	//Wyrmgus start
-	if (CurrentCampaign != NULL && GameCycle == 0 && Editor.Running == EditorNotRunning && type.TileWidth > 1 && type.TileHeight > 1 && !OnTopDetails(type, NULL)) { // if a campaign game is starting, only place buildings with a certain space from other buildings
+	if (no_bordering_building && !OnTopDetails(type, NULL)) { // if a campaign game is starting, only place buildings with a certain space from other buildings
 		for (int x = pos.x - 1; x < pos.x + type.TileWidth + 1; ++x) {
 			for (int y = pos.y - 1; y < pos.y + type.TileHeight + 1; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && (Map.Field(x, y, z)->Flags & MapFieldBuilding)) {

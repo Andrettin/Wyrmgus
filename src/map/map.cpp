@@ -717,7 +717,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			if (!UnitTypeCanBeAt(*SettlementSiteUnitType, settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset, z) && Map.Info.IsPointOnMap(settlement_pos - unit_offset + Vec2i(SettlementSiteUnitType->TileWidth - 1, SettlementSiteUnitType->TileHeight - 1), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", settlement_iterator->second->Ident.c_str(), settlement_raw_pos.x, settlement_raw_pos.y);
 			}
-			CUnit *unit = CreateUnit(settlement_pos - unit_offset, *SettlementSiteUnitType, &Players[PlayerNumNeutral], z);
+			CUnit *unit = CreateUnit(settlement_pos - unit_offset, *SettlementSiteUnitType, &Players[PlayerNumNeutral], z, true);
 			unit->Settlement = settlement_iterator->second;
 			unit->Settlement->SettlementUnit = unit;
 			Map.SettlementUnits.push_back(unit);
@@ -846,9 +846,9 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
 						building_player->SetStartView(settlement_pos - unit_offset, z);
 					}
-					unit = CreateUnit(settlement_pos - unit_offset, *type, building_player, z);
+					unit = CreateUnit(settlement_pos - unit_offset, *type, building_player, z, true);
 				} else {
-					unit = CreateUnit(settlement_pos - unit_offset, *type, player, z);
+					unit = CreateUnit(settlement_pos - unit_offset, *type, player, z, true);
 				}
 				if (std::get<3>(settlement_iterator->second->HistoricalBuildings[j])) {
 					unit->SetUnique(std::get<3>(settlement_iterator->second->HistoricalBuildings[j]));
@@ -949,7 +949,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d), but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y);
 		}
 
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, &Players[PlayerNumNeutral], z);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, &Players[PlayerNumNeutral], z, true);
 		if (std::get<3>(this->PlaneConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->PlaneConnectors[i]));
 		}
@@ -992,7 +992,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d), but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y);
 		}
 
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, &Players[PlayerNumNeutral], z);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, &Players[PlayerNumNeutral], z, true);
 		if (std::get<3>(this->WorldConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->WorldConnectors[i]));
 		}
@@ -1035,7 +1035,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d), but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y);
 		}
 
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, &Players[PlayerNumNeutral], z);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *type, &Players[PlayerNumNeutral], z, true);
 		if (std::get<3>(this->SurfaceLayerConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->SurfaceLayerConnectors[i]));
 		}
@@ -1101,7 +1101,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 			Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
 
-			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z);
+			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z, type->BoolFlag[BUILDING_INDEX].value && type->TileWidth > 1 && type->TileHeight > 1);
 			if (!type->BoolFlag[BUILDING_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
 				unit->Active = 0;
 				player->ChangeUnitTypeAiActiveCount(type, -1);
@@ -3498,7 +3498,7 @@ void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i 
 		if (unit_type->GivesResource) {
 			CUnit *unit = CreateResourceUnit(unit_pos, *unit_type, z);
 		} else {
-			CUnit *unit = CreateUnit(unit_pos, *unit_type, &Players[PlayerNumNeutral], z);
+			CUnit *unit = CreateUnit(unit_pos, *unit_type, &Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->TileWidth > 1 && unit_type->TileHeight > 1);
 		}
 	}
 }

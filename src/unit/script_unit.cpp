@@ -900,11 +900,9 @@ static int CclCreateUnit(lua_State *l)
 		} else {
 			const int heading = SyncRand() % 256;
 
-			unit->tilePos = ipos;
-			//Wyrmgus start
-			unit->MapLayer = z;
-			//Wyrmgus end
-			DropOutOnSide(*unit, heading, NULL);
+			Vec2i res_pos;
+			FindNearestDrop(*unit->Type, ipos, res_pos, heading, z, unit->Type->BoolFlag[BUILDING_INDEX].value && GameCycle > 0); //place buildings with a certain distance of each other, if the game cycle is greater than 0 (so if they weren't intentionally placed side-by-side for a map)
+			unit->Place(res_pos, z);
 		}
 		UpdateForNewUnit(*unit, 0);
 

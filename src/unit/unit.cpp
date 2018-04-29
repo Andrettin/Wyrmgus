@@ -3588,14 +3588,14 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player
 **
 **  @return        Pointer to created unit.
 */
-CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z)
+CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z, bool no_bordering_building)
 {
 	CUnit *unit = MakeUnit(type, player);
 
 	if (unit != NULL) {
 		Vec2i res_pos;
 		const int heading = SyncRand() % 256;
-		FindNearestDrop(type, pos, res_pos, heading, z);
+		FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building);
 		
 		if (type.BoolFlag[BUILDING_INDEX].value) {
 			CBuildRestrictionOnTop *b = OnTopDetails(type, NULL);
@@ -3618,7 +3618,7 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 
 CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool allow_unique)
 {
-	CUnit *unit = CreateUnit(pos, type, &Players[PlayerNumNeutral], z);
+	CUnit *unit = CreateUnit(pos, type, &Players[PlayerNumNeutral], z, true);
 	unit->GenerateSpecialProperties(NULL, NULL, allow_unique);
 			
 	// create metal rocks near metal resources
@@ -3655,7 +3655,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 */
 //Wyrmgus start
 //void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading)
-void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z)
+void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building)
 //Wyrmgus end
 {
 	int addx = 0;
@@ -3680,7 +3680,7 @@ startw:
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)
+				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3693,7 +3693,7 @@ starts:
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)
+				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3706,7 +3706,7 @@ starte:
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)
+				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3719,7 +3719,7 @@ startn:
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
 				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)
+				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
 			) {
 			//Wyrmgus end
 				goto found;

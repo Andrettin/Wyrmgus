@@ -721,13 +721,13 @@ extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer 
 //Wyrmgus end
 //Wyrmgus start
 /// Create a new unit and place it on the map, and update its player accordingly
-extern CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z);
+extern CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z, bool no_bordering_building = false);
 extern CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool allow_unique = true);
 //Wyrmgus end
 /// Find the nearest position at which unit can be placed.
 //Wyrmgus start
 //void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading);
-void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z);
+void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building = false);
 //Wyrmgus end
 /// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);
@@ -782,7 +782,7 @@ extern CBuildRestrictionOnTop *OnTopDetails(const CUnitType &type, const CUnitTy
 /// @todo more docu
 //Wyrmgus start
 //extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos);
-extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z);
+extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z, bool no_bordering_building = false);
 //Wyrmgus end
 /// @todo more docu
 //Wyrmgus start

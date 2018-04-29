@@ -277,27 +277,27 @@ static void AiCheckUnits()
 	}
 	
 	//Wyrmgus start
-	//check if can hire any heroes
-	if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && !IsNetworkGame() && CurrentQuest == NULL) {
-		for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
-			CUnit *hero_recruiter = &AiPlayer->Player->GetUnit(i);
-			if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->Type->BoolFlag[RECRUITHEROES_INDEX].value || hero_recruiter->CurrentAction() == UnitActionBuilt) {
-				continue;
-			}
-			
-			for (size_t j = 0; j < hero_recruiter->SoldUnits.size(); ++j) {
-				int buy_costs[MaxCosts];
-				memset(buy_costs, 0, sizeof(buy_costs));
-				buy_costs[CopperCost] = hero_recruiter->SoldUnits[j]->GetPrice();
-				if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*hero_recruiter->SoldUnits[j]->Type) >= 1) {
-					CommandBuy(*hero_recruiter, hero_recruiter->SoldUnits[j], AiPlayer->Player->Index);
-					break;
+	if (AiPlayer->Player->NumTownHalls > 0 && !AiPlayer->Player->HasNeutralFactionType()) {
+		//check if can hire any heroes
+		if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && !IsNetworkGame() && CurrentQuest == NULL) {
+			for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
+				CUnit *hero_recruiter = &AiPlayer->Player->GetUnit(i);
+				if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->Type->BoolFlag[RECRUITHEROES_INDEX].value || hero_recruiter->CurrentAction() == UnitActionBuilt) {
+					continue;
+				}
+				
+				for (size_t j = 0; j < hero_recruiter->SoldUnits.size(); ++j) {
+					int buy_costs[MaxCosts];
+					memset(buy_costs, 0, sizeof(buy_costs));
+					buy_costs[CopperCost] = hero_recruiter->SoldUnits[j]->GetPrice();
+					if (!AiPlayer->Player->CheckCosts(buy_costs) && AiPlayer->Player->CheckLimits(*hero_recruiter->SoldUnits[j]->Type) >= 1) {
+						CommandBuy(*hero_recruiter, hero_recruiter->SoldUnits[j], AiPlayer->Player->Index);
+						break;
+					}
 				}
 			}
 		}
-	}
-	
-	if (AiPlayer->Player->NumTownHalls > 0 && !AiPlayer->Player->HasNeutralFactionType()) {
+		
 		//check if can hire any mercenaries
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (i == AiPlayer->Player->Index) {
