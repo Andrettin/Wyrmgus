@@ -296,6 +296,10 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 			Uint8 a;
 
 			Video.GetRGBA(c, terrain_image->Surface->format, &r, &g, &b, &a);
+			
+			if (a == 0) { //transparent pixels means leaving the area as it is (e.g. if it is a subtemplate use the main template's terrain for this tile instead)
+				continue;
+			}
 
 			char terrain_id = -1;
 			short terrain_feature_id = -1;
@@ -320,12 +324,10 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 							Map.Field(real_pos, z)->TerrainFeature = TerrainFeatures[terrain_feature_id];
 						}
 					} else {
-						if (a != 0) { //transparent pixels means leaving the area as it is (e.g. if it is a subtemplate use the main template's terrain for this tile instead)
-							if (r != 0 || g != 0 || b != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
-								fprintf(stderr, "Invalid map terrain: (%d, %d) (RGB: %d/%d/%d)\n", x, y, r, g, b);
-							} else if (overlay && Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
-								Map.Field(real_pos, z)->RemoveOverlayTerrain();
-							}
+						if (r != 0 || g != 0 || b != 0 || !overlay) { //fully black pixels represent areas in overlay terrain files that don't have any overlays
+							fprintf(stderr, "Invalid map terrain: (%d, %d) (RGB: %d/%d/%d)\n", x, y, r, g, b);
+						} else if (overlay && Map.Field(real_pos, z)->OverlayTerrain) { //fully black pixel in overlay terrain map = no overlay
+							Map.Field(real_pos, z)->RemoveOverlayTerrain();
 						}
 					}
 				}
