@@ -49,10 +49,14 @@ bool MissileConfig::MapMissileNoLog()
 
 bool MissileConfig::MapMissile()
 {
+	if (Missile != NULL) {
+		return true;
+	}
+	
 	bool res = MapMissileNoLog();
 	if (res == true) {
 		if (Name.empty() == false) {
-			ShowLoadProgress(_("Loading Missile \"%s\""), Name.c_str());
+			UpdateLoadProgress();
 			IncItemsLoaded();
 		}
 	} else {

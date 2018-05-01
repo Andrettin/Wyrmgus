@@ -264,7 +264,7 @@ void PreMenuSetup()
 	//
 	//  Initial menus require some gfx.
 	//
-	SetDefaultTextColors(FontYellow, FontWhite);
+	SetDefaultTextColors(FontWhite, FontYellow);
 
 	LoadFonts();
 

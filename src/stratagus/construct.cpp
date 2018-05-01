@@ -95,7 +95,7 @@ void CConstruction::Load()
 	this->Width = this->File.Width;
 	this->Height = this->File.Height;
 	if (!file.empty()) {
-		ShowLoadProgress(_("Loading Construction \"%s\""), file.c_str());
+		UpdateLoadProgress();
 		this->Sprite = CPlayerColorGraphic::New(file, this->Width, this->Height);
 		this->Sprite->Load();
 		this->Sprite->Flip();
@@ -105,7 +105,7 @@ void CConstruction::Load()
 	this->ShadowWidth = this->ShadowFile.Width;
 	this->ShadowHeight = this->ShadowFile.Height;
 	if (!file.empty()) {
-		ShowLoadProgress(_("Loading Construction \"%s\""), file.c_str());
+		UpdateLoadProgress();
 		this->ShadowSprite = CGraphic::ForceNew(file, this->ShadowWidth, this->ShadowHeight);
 		this->ShadowSprite->Load();
 		this->ShadowSprite->Flip();
@@ -155,6 +155,8 @@ int GetConstructionsCount()
 */
 void LoadConstructions()
 {
+	ShowLoadProgress(_("Loading Construction Graphics"));
+		
 	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
 		 it != Constructions.end();
 		 ++it) {

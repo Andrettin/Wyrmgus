@@ -426,9 +426,14 @@ int GetDecorationsCount()
 */
 void LoadDecorations()
 {
+	ShowLoadProgress(_("Loading Decorations"));
+		
 	std::vector<Decoration>::iterator i;
 	for (i = DecoSprite.SpriteArray.begin(); i != DecoSprite.SpriteArray.end(); ++i) {
-		ShowLoadProgress(_("Loading Decorations \"%s\""), (*i).File.c_str());
+		if ((*i).Sprite) {
+			continue;
+		}
+		UpdateLoadProgress();
 		(*i).Sprite = CGraphic::New((*i).File, (*i).Width, (*i).Height);
 		(*i).Sprite->Load();
 	}

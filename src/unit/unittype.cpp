@@ -1926,36 +1926,8 @@ void LoadUnitTypes()
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		CUnitType &type = *UnitTypes[i];
 
-		//Wyrmgus start
-		/*
-		// Lookup icons.
-		type.Icon.Load();
-
-		// Lookup missiles.
-		type.Missile.MapMissile();
-		type.Explosion.MapMissile();
-
-		// Lookup impacts
-		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 2; ++i) {
-			type.Impact[i].MapMissile();
-		}
-		// Lookup corpse.
-		if (!type.CorpseName.empty()) {
-			type.CorpseType = UnitTypeByIdent(type.CorpseName);
-		}
-#ifndef DYNAMIC_LOAD
-		// Load Sprite
-		if (!type.Sprite) {
-			ShowLoadProgress(_("Loading Unit \"%s\""), type.Name.c_str());
-			LoadUnitTypeSprite(type);
-
-			IncItemsLoaded();
-		}
-#endif
-		// FIXME: should i copy the animations of same graphics?
-		*/
+		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (i + 1) * 100 / UnitTypes.size());
 		LoadUnitType(type);
-		//Wyrmgus end
 	}
 }
 
@@ -1995,7 +1967,6 @@ void LoadUnitType(CUnitType &type)
 #ifndef DYNAMIC_LOAD
 	// Load Sprite
 	if (!type.Sprite) {
-		ShowLoadProgress(_("Loading Unit \"%s\""), type.Name.c_str());
 		LoadUnitTypeSprite(type);
 
 		IncItemsLoaded();

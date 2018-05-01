@@ -638,6 +638,8 @@ extern void CallHandler(unsigned int handle, int value);
 
 /// Show load progress
 extern void ShowLoadProgress(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
+/// Update load progress
+extern void UpdateLoadProgress();
 
 extern void CalculateItemsToLoad();
 extern void UpdateLoadingBar();

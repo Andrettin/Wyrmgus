@@ -48,6 +48,7 @@
 #include "map.h"
 #include "menus.h"
 #include "title.h"
+#include "translate.h"
 #include "ui/contenttype.h"
 #include "ui/popup.h"
 #include "unit.h"
@@ -81,6 +82,8 @@ CUserInterface UI;
 */
 void ShowLoadProgress(const char *fmt, ...)
 {
+	UpdateLoadProgress();
+	
 	va_list va;
 	char temp[4096];
 
@@ -90,10 +93,6 @@ void ShowLoadProgress(const char *fmt, ...)
 	va_end(va);
 
 	if (Video.Depth && IsGameFontReady() && GetGameFont().IsLoaded()) {
-		//Wyrmgus start
-		UpdateLoadingBar();
-		//Wyrmgus end
-		
 		// Remove non printable chars
 		for (unsigned char *s = (unsigned char *)temp; *s; ++s) {
 			if (*s < 32) {
@@ -121,6 +120,18 @@ void ShowLoadProgress(const char *fmt, ...)
 		DebugPrint("!!!!%s\n" _C_ temp);
 	}
 
+	PollEvents();
+}
+
+/**
+**  Update load progress.
+*/
+void UpdateLoadProgress()
+{
+	if (Video.Depth && IsGameFontReady() && GetGameFont().IsLoaded()) {
+		UpdateLoadingBar();
+	}
+	
 	PollEvents();
 }
 
@@ -202,6 +213,8 @@ CPopup *PopupByIdent(const std::string &ident)
 */
 void InitUserInterface()
 {
+	ShowLoadProgress(_("Loading User Interface"));
+	
 	UI.Offset640X = (Video.Width - 640) / 2;
 	UI.Offset480Y = (Video.Height - 480) / 2;
 
