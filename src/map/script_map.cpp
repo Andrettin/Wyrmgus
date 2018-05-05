@@ -2053,7 +2053,8 @@ static int CclDefineSettlement(lua_State *l)
 	
 	if (!settlement->Major && !settlement->Cores.empty()) { //if the settlement is a minor one, but has faction cores, remove them
 		for (size_t i = 0; i < settlement->Cores.size(); ++i) {
-			settlement->Cores[i]->Cores.erase(std::remove(settlement->Cores[i]->Cores.begin(), settlement->Cores[i]->Cores.end(), settlement), settlement->Cores[i]->Cores.end());
+			CFaction *core_faction = settlement->Cores[i];
+			core_faction->Cores.erase(std::remove(core_faction->Cores.begin(), core_faction->Cores.end(), settlement), core_faction->Cores.end());
 		}
 		settlement->Cores.clear();
 	}
