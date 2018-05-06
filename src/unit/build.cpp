@@ -552,6 +552,10 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 //Wyrmgus end
 {
 	//  Can't build outside the map
+	if (!Map.Info.IsPointOnMap(pos, z)) {
+		return NULL;
+	}
+
 	//Wyrmgus start
 //	if (pos.x + type.TileWidth > Map.Info.MapWidth) {
 	if (pos.x + type.TileWidth > Map.Info.MapWidths[z]) {
