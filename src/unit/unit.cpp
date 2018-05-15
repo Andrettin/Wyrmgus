@@ -3227,23 +3227,22 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	}
 	
 	int civilization_id = this->Type->Civilization;
-	int faction_id = -1;
-	if (civilization_id != -1 && this->Type->Faction != -1) {
-		faction_id = this->Type->Faction;
-	} else if (civilization_id != -1 && this->Player->Race == civilization_id && this->Player->Faction != -1) {
-		faction_id = this->Player->Faction;
+	
+	CFaction *faction = NULL;
+	if (this->Player->Faction != -1) {
+		faction = PlayerRaces.Factions[this->Player->Faction];
+		
+		if (civilization_id != -1 && civilization_id != faction->Civilization && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization] && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Type->Class)) {
+			civilization_id = faction->Civilization;
+		}
 	}
+	
 	CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization_id);
 	
 	if (this->Name.empty()) { //this is the first time the unit receives a name
 		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
 			this->ExtraName = this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
 		}
-	}
-	
-	CFaction *faction = NULL;
-	if (this->Player->Race != -1 && this->Player->Faction != -1) {
-		faction = PlayerRaces.Factions[this->Player->Faction];
 	}
 	
 	if (!this->Type->IsPersonalNameValid(this->Name, faction, this->Variable[GENDER_INDEX].Value)) {
