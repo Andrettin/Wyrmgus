@@ -177,6 +177,7 @@ public:
 	std::vector<CQuest *> CompletedQuests;									/// quests completed by this player
 	std::vector<CPlayerQuestObjective *> QuestObjectives;					/// Objectives of the player's current quests
 	std::vector<std::pair<CUpgrade *, int>> Modifiers;						/// Modifiers affecting the player, and until which cycle it should last
+	std::vector<int> AutosellResources;
 	//Wyrmgus end
 
 	bool AiEnabled;        /// handle AI on local computer
@@ -268,6 +269,8 @@ public:
 	//Wyrmgus start
 	void PerformResourceTrade();
 	CUnit *GetMarketUnit() const;
+	std::vector<int> GetAutosellResources() const;
+	void AutosellResource(const int resource);
 	void UpdateLevelUpUnits();
 	void UpdateQuestPool();
 	void AvailableQuestsChanged();

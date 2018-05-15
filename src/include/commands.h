@@ -311,6 +311,7 @@ extern void SendCommandSharedVision(int player, bool state, int opponent);
 //Wyrmgus start
 extern void SendCommandSetFaction(int player, int faction);
 //Wyrmgus end
+extern void SendCommandAutosellResource(int player, int resource);
 
 /// Execute a command (from network).
 extern void ExecCommand(unsigned char type, UnitRef unum, unsigned short x,

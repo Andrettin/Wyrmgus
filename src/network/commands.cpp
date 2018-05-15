@@ -830,6 +830,21 @@ void SendCommandSetFaction(int player, int faction)
 }
 //Wyrmgus end
 
+/**
+** Send command: Toggle resource autosell.
+**
+** @param player     Player which toggles the resource autosell.
+** @param resource   The resource.
+*/
+void SendCommandAutosellResource(int player, int resource)
+{
+	if (!IsNetworkGame()) {
+		Players[player].AutosellResource(resource);
+	} else {
+		NetworkSendExtendedCommand(ExtendedMessageAutosellResource, -1, player, resource, 0, 0);
+	}
+}
+
 //@}
 
 //----------------------------------------------------------------------------
@@ -1178,6 +1193,10 @@ void ExecExtendedCommand(unsigned char type, int status,
 		case ExtendedMessageSetFaction: {
 			//FIXME: should add log for faction change here
 			Players[arg2].SetFaction(PlayerRaces.Factions[arg3]);
+			break;
+		}
+		case ExtendedMessageAutosellResource: {
+			Players[arg2].AutosellResource(arg3);
 			break;
 		}
 		//Wyrmgus end

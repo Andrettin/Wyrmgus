@@ -524,6 +524,17 @@ void CPlayer::Load(lua_State *l)
 				}
 			}
 		//Wyrmgus end
+		} else if (!strcmp(value, "autosell-resources")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				const int res = GetResourceIdByName(LuaToString(l, j + 1, k + 1));
+				if (res != -1) {
+					this->AutosellResources.push_back(res);
+				}
+			}
 		} else if (!strcmp(value, "timers")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

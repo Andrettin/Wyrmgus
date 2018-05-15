@@ -342,7 +342,8 @@ enum _extended_message_type_ {
 	//Wyrmgus start
 //	ExtendedMessageSharedVision   /// Change shared vision
 	ExtendedMessageSharedVision,  /// Change shared vision
-	ExtendedMessageSetFaction	  /// Change faction
+	ExtendedMessageSetFaction,	  /// Change faction
+	ExtendedMessageAutosellResource	  /// Autosell resource
 	//Wyrmgus end
 };
 

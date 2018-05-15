@@ -386,6 +386,10 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 			}
 			break;
 		// FIXME: must handle more actions
+		case ButtonSellResource:
+			if (std::find(ThisPlayer->AutosellResources.begin(), ThisPlayer->AutosellResources.end(), button.Value) != ThisPlayer->AutosellResources.end()) {
+				res |= IconAutoCast;
+			}
 		default:
 			break;
 	}
@@ -2425,12 +2429,18 @@ void CButtonPanel::DoClicked_ProduceResource(int button)
 
 void CButtonPanel::DoClicked_SellResource(int button)
 {
+	const bool toggle_autosell = (KeyModifiers & ModifierControl) != 0;
 	const int resource = CurrentButtons[button].Value;
-	int sell_resource_costs[MaxCosts];
-	memset(sell_resource_costs, 0, sizeof(sell_resource_costs));
-	sell_resource_costs[resource] = 100;
-	if (!ThisPlayer->CheckCosts(sell_resource_costs)) {
-		SendCommandSellResource(*Selected[0], resource, ThisPlayer->Index);
+	
+	if (toggle_autosell && Selected[0]->Player == ThisPlayer) {
+		SendCommandAutosellResource(ThisPlayer->Index, resource);
+	} else {
+		int sell_resource_costs[MaxCosts];
+		memset(sell_resource_costs, 0, sizeof(sell_resource_costs));
+		sell_resource_costs[resource] = 100;
+		if (!ThisPlayer->CheckCosts(sell_resource_costs)) {
+			SendCommandSellResource(*Selected[0], resource, ThisPlayer->Index);
+		}
 	}
 }
 

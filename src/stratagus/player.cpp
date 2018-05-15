@@ -1336,6 +1336,15 @@ void CPlayer::Save(CFile &file) const
 	file.printf("},");
 	//Wyrmgus end
 
+	file.printf("\n  \"autosell-resources\", {");
+	for (size_t j = 0; j < p.AutosellResources.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", DefaultResourceNames[p.AutosellResources[j]].c_str());
+	}
+	file.printf("},");
+	
 	// UnitColors done by init code.
 	// Allow saved by allow.
 
@@ -2498,6 +2507,7 @@ void CPlayer::Clear()
 	this->AvailableQuests.clear();
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
+	this->AutosellResources.clear();
 	for (size_t i = 0; i < this->QuestObjectives.size(); ++i) {
 		delete this->QuestObjectives[i];
 	}
@@ -2617,8 +2627,16 @@ void CPlayer::PerformResourceTrade()
 		return;
 	}
 	
+	for (size_t i = 0; i < this->AutosellResources.size(); ++i) {
+		const int res = this->AutosellResources[i];
+		
+		if ((this->Resources[res] + this->StoredResources[res]) >= 100) { //sell 100 per second, as long as there is enough of the resource stored
+			market_unit->SellResource(res, this->Index);
+		}
+	}
+	
 	for (size_t i = 0; i < LuxuryResources.size(); ++i) {
-		int res = LuxuryResources[i];
+		const int res = LuxuryResources[i];
 		
 		while ((this->Resources[res] + this->StoredResources[res]) >= 100) {
 			market_unit->SellResource(res, this->Index);
@@ -2652,6 +2670,20 @@ CUnit *CPlayer::GetMarketUnit() const
 	}
 	
 	return market_unit;
+}
+
+std::vector<int> CPlayer::GetAutosellResources() const
+{
+	return this->AutosellResources;
+}
+
+void CPlayer::AutosellResource(const int resource)
+{
+	if (std::find(this->AutosellResources.begin(), this->AutosellResources.end(), resource) != this->AutosellResources.end()) {
+		this->AutosellResources.erase(std::remove(this->AutosellResources.begin(), this->AutosellResources.end(), resource), this->AutosellResources.end());
+	} else {
+		this->AutosellResources.push_back(resource);
+	}
 }
 
 void CPlayer::UpdateLevelUpUnits()
