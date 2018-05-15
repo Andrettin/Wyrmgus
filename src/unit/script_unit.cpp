@@ -341,6 +341,10 @@ static int CclUnit(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "personal-name")) {
 			unit->Name = LuaToString(l, 2, j + 1);
+		} else if (!strcmp(value, "extra-name")) {
+			unit->ExtraName = LuaToString(l, 2, j + 1);
+		} else if (!strcmp(value, "family-name")) {
+			unit->FamilyName = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "settlement")) {
 			unit->Settlement = GetSettlement(LuaToString(l, 2, j + 1));
 			if (type->BoolFlag[TOWNHALL_INDEX].value || SettlementSiteUnitType == type) {

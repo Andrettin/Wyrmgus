@@ -175,6 +175,12 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"trait\", \"%s\", ", unit.Trait->Ident.c_str());
 	}
 	file.printf("\"personal-name\", \"%s\", ", unit.Name.c_str());
+	if (!unit.ExtraName.empty()) {
+		file.printf("\"extra-name\", \"%s\", ", unit.ExtraName.c_str());
+	}
+	if (!unit.FamilyName.empty()) {
+		file.printf("\"family-name\", \"%s\", ", unit.FamilyName.c_str());
+	}
 	if (unit.Settlement) {
 		file.printf("\"settlement\", \"%s\", ", unit.Settlement->Ident.c_str());
 	}
