@@ -1237,8 +1237,8 @@ static void HandleMouseOn(const PixelPos screenPos)
 		return;
 	}
 	
-	for (int i = 0; i < PlayerHeroMax; ++i) {
-		if (UI.HeroUnitButtons[i] && UI.HeroUnitButtons[i]->Contains(screenPos) && (int) ThisPlayer->Heroes.size() > i) {
+	for (size_t i = 0; i < UI.HeroUnitButtons.size() && i < ThisPlayer->Heroes.size(); ++i) {
+		if (UI.HeroUnitButtons[i].Contains(screenPos)) {
 			ButtonAreaUnderCursor = ButtonAreaHeroUnit;
 			ButtonUnderCursor = i;
 			CursorOn = CursorOnButton;

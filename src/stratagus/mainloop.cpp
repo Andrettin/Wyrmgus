@@ -275,13 +275,11 @@ void UpdateDisplay()
 		}
 		
 		//draw icon if the player has a hero
-		for (int i = 0; i < PlayerHeroMax; ++i) {
-			if (UI.HeroUnitButtons[i] && (int) ThisPlayer->Heroes.size() > i) {
-				const PixelPos pos(UI.HeroUnitButtons[i]->X, UI.HeroUnitButtons[i]->Y);
-				const int flag = (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) ? (IconActive | (MouseButtons & LeftButton)) : 0;
+		for (size_t i = 0; i < UI.HeroUnitButtons.size() && i < ThisPlayer->Heroes.size(); ++i) {
+			const PixelPos pos(UI.HeroUnitButtons[i].X, UI.HeroUnitButtons[i].Y);
+			const int flag = (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 									 
-				ThisPlayer->Heroes[i]->GetIcon().Icon->DrawUnitIcon(*UI.HeroUnitButtons[i]->Style, flag, pos, "", ThisPlayer->Index);
-			}
+			ThisPlayer->Heroes[i]->GetIcon().Icon->DrawUnitIcon(*UI.HeroUnitButtons[i].Style, flag, pos, "", ThisPlayer->Index);
 		}
 		
 		DrawPopups();

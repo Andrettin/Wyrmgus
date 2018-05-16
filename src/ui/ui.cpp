@@ -185,10 +185,6 @@ CUserInterface::CUserInterface() :
 
 	NormalFontColor = "light-blue";
 	ReverseFontColor = "yellow";
-	
-	//Wyrmgus start
-	memset(HeroUnitButtons, 0, sizeof(HeroUnitButtons));
-	//Wyrmgus end
 }
 
 /**
@@ -443,9 +439,7 @@ void CleanUserInterface()
 	//Wyrmgus start
 	delete UI.IdleWorkerButton;
 	delete UI.LevelUpUnitButton;
-	for (int i = 0; i < PlayerHeroMax; ++i) {
-		delete UI.HeroUnitButtons[i];
-	}
+	UI.HeroUnitButtons.clear();
 	UI.InventoryButtons.clear();
 	//Wyrmgus end
 	UI.UserButtons.clear();

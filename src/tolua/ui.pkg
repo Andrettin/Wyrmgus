@@ -179,7 +179,7 @@ class CUserInterface
 	//Wyrmgus start
 	CUIButton *IdleWorkerButton;
 	CUIButton *LevelUpUnitButton;
-	CUIButton *HeroUnitButtons[PlayerHeroMax];
+	vector<CUIButton> HeroUnitButtons;
 	vector<CUIButton> InventoryButtons;
 	//Wyrmgus end
 
