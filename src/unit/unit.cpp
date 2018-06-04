@@ -3343,7 +3343,7 @@ void CUnit::UpdateBuildingSettlementAssignment(CSettlement *old_settlement)
 		}
 		for (int i = 0; i < Players[p].GetUnitCount(); ++i) {
 			CUnit *settlement_unit = &Players[p].GetUnit(i);
-			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || this->MapLayer != settlement_unit->MapLayer) {
+			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || settlement_unit->Type == SettlementSiteUnitType || this->MapLayer != settlement_unit->MapLayer) {
 				continue;
 			}
 			if (old_settlement && settlement_unit->Settlement != old_settlement) {
