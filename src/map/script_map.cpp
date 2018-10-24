@@ -1502,7 +1502,7 @@ static int CclDefineTerrainType(lua_State *l)
 				LuaError(l, "File \"%s\" doesn't exist." _C_ graphics_file.c_str());
 			}
 			if (CGraphic::Get(graphics_file) == NULL) {
-				CGraphic *graphics = CGraphic::New(graphics_file, 32, 32);
+				CGraphic *graphics = CGraphic::New(graphics_file, PixelTileSize.x, PixelTileSize.y);
 			}
 			terrain->Graphics = CGraphic::Get(graphics_file);
 		} else if (!strcmp(value, "ElevationGraphics")) {
@@ -1511,7 +1511,7 @@ static int CclDefineTerrainType(lua_State *l)
 				LuaError(l, "File \"%s\" doesn't exist." _C_ graphics_file.c_str());
 			}
 			if (CGraphic::Get(graphics_file) == NULL) {
-				CGraphic *graphics = CGraphic::New(graphics_file, 32, 32);
+				CGraphic *graphics = CGraphic::New(graphics_file, PixelTileSize.x, PixelTileSize.y);
 			}
 			terrain->ElevationGraphics = CGraphic::Get(graphics_file);
 		} else if (!strcmp(value, "PlayerColorGraphics")) {
@@ -1520,7 +1520,7 @@ static int CclDefineTerrainType(lua_State *l)
 				LuaError(l, "File \"%s\" doesn't exist." _C_ graphics_file.c_str());
 			}
 			if (CPlayerColorGraphic::Get(graphics_file) == NULL) {
-				CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(graphics_file, 32, 32);
+				CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(graphics_file, PixelTileSize.x, PixelTileSize.y);
 			}
 			terrain->PlayerColorGraphics = CPlayerColorGraphic::Get(graphics_file);
 		} else if (!strcmp(value, "SolidTiles")) {
