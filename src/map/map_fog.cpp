@@ -975,9 +975,9 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 //	*blackFogTile = FogTable[blackFogTileIndex];
 	//apply variation according to tile index (sx is equal to the tile index, so let's use it)
 	int FogTileVariation = 0;
-	if (sx % 3 == 0 && Map.FogGraphic->Surface->h / 32 >= 3) {
+	if (sx % 3 == 0 && Map.FogGraphic->Surface->h / PixelTileSize.y >= 3) {
 		FogTileVariation = 2;
-	} else if (sx % 2 == 0 && Map.FogGraphic->Surface->h / 32 >= 2) {
+	} else if (sx % 2 == 0 && Map.FogGraphic->Surface->h / PixelTileSize.y >= 2) {
 		FogTileVariation = 1;
 	}
 	if (FogTable[fogTileIndex] && FogTable[fogTileIndex] != 16) {
@@ -1195,7 +1195,7 @@ void CMap::InitFogOfWar()
 		AlphaFogG->GraphicHeight = s->h;
 		//Wyrmgus start
 //		AlphaFogG->NumFrames = 16;//1;
-		AlphaFogG->NumFrames = 16 * (s->h / 32);//1;
+		AlphaFogG->NumFrames = 16 * (s->h / PixelTileSize.y);//1;
 		//Wyrmgus end
 		AlphaFogG->GenFramesMap();
 		AlphaFogG->UseDisplayFormat();
