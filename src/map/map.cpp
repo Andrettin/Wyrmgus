@@ -2167,7 +2167,7 @@ CMap::~CMap()
 }
 
 /**
-**  Alocate and initialise map table
+**  Allocate and initialise map table
 */
 void CMap::Create()
 {
