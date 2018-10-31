@@ -155,7 +155,7 @@ int GetConstructionsCount()
 */
 void LoadConstructions()
 {
-	ShowLoadProgress(_("Loading Construction Graphics"));
+	ShowLoadProgress("%s", _("Loading Construction Graphics"));
 		
 	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
 		 it != Constructions.end();
