@@ -522,7 +522,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 {
 	std::string FogGraphicFile;
 
-	LuaCheckArgs(l, 1);
+	LuaCheckArgs(l, 2);
 	FogGraphicFile = LuaToString(l, 1);
 	
 	PixelSize pixel_tile_size(32, 32);
