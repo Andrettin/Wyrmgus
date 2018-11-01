@@ -1709,6 +1709,8 @@ static int CclDefineMapTemplate(lua_State *l)
 			CclGetPos(l, &map_template->SubtemplatePosition.x, &map_template->SubtemplatePosition.y);
 		} else if (!strcmp(value, "SubtemplatePositionTopLeft")) {
 			CclGetPos(l, &subtemplate_position_top_left.x, &subtemplate_position_top_left.y);
+		} else if (!strcmp(value, "PixelTileSize")) {
+			CclGetPos(l, &map_template->PixelTileSize.x, &map_template->PixelTileSize.y);
 		} else if (!strcmp(value, "MainTemplate")) {
 			CMapTemplate *main_template = GetMapTemplate(LuaToString(l, -1));
 			if (!main_template) {
