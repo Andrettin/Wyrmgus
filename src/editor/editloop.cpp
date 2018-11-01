@@ -2619,7 +2619,7 @@ void CEditor::Init()
 //	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 	Editor.ShownTileTypes.clear();
 	for (size_t i = 0; i < TerrainTypes.size(); ++i) {
-		if (!TerrainTypes[i]->Hidden) {
+		if (!TerrainTypes[i]->Hidden && TerrainTypes[i]->PixelTileSize == Map.GetCurrentPixelTileSize()) {
 			Editor.ShownTileTypes.push_back(TerrainTypes[i]);
 		}
 	}
