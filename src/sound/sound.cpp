@@ -416,9 +416,9 @@ unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
 */
 static char CalculateStereo(const CUnit &unit)
 {
-	int stereo = ((unit.tilePos.x * PixelTileSize.x + unit.Type->TileWidth * PixelTileSize.x / 2 +
-				   unit.IX - UI.SelectedViewport->MapPos.x * PixelTileSize.x) * 256 /
-				  ((UI.SelectedViewport->MapWidth - 1) * PixelTileSize.x)) - 128;
+	int stereo = ((unit.tilePos.x * Map.GetCurrentPixelTileSize().x + unit.Type->TileWidth * Map.GetCurrentPixelTileSize().x / 2 +
+				   unit.IX - UI.SelectedViewport->MapPos.x * Map.GetCurrentPixelTileSize().x) * 256 /
+				  ((UI.SelectedViewport->MapWidth - 1) * Map.GetCurrentPixelTileSize().x)) - 128;
 	clamp(&stereo, -128, 127);
 	return stereo;
 }
@@ -532,8 +532,8 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 		return;
 	}
 	int stereo = ((missile.position.x + (missile.Type->G ? missile.Type->G->Width / 2 : 0) +
-				   UI.SelectedViewport->MapPos.x * PixelTileSize.x) * 256 /
-				  ((UI.SelectedViewport->MapWidth - 1) * PixelTileSize.x)) - 128;
+				   UI.SelectedViewport->MapPos.x * Map.GetCurrentPixelTileSize().x) * 256 /
+				  ((UI.SelectedViewport->MapWidth - 1) * Map.GetCurrentPixelTileSize().x)) - 128;
 	clamp(&stereo, -128, 127);
 
 	Origin source = {NULL, 0};
@@ -783,8 +783,8 @@ void InitSoundClient()
 		GameSounds.ChatMessage.MapSound();
 	}
 
-	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + PixelTileSize.x) / PixelTileSize.x;
-	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + PixelTileSize.y) / PixelTileSize.y;
+	int MapWidth = (UI.MapArea.EndX - UI.MapArea.X + Map.GetCurrentPixelTileSize().x) / Map.GetCurrentPixelTileSize().x;
+	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + Map.GetCurrentPixelTileSize().y) / Map.GetCurrentPixelTileSize().y;
 	DistanceSilent = 3 * std::max<int>(MapWidth, MapHeight);
 	ViewPointOffset = std::max<int>(MapWidth / 2, MapHeight / 2);
 }

@@ -444,10 +444,10 @@ void SaveMapPNG(const char *name)
 	}
 
 	//Wyrmgus start
-//	const size_t imageWidth = Map.Info.MapWidth * PixelTileSize.x;
-//	const size_t imageHeight = Map.Info.MapHeight * PixelTileSize.y;
-	const size_t imageWidth = Map.Info.MapWidths[CurrentMapLayer] * PixelTileSize.x;
-	const size_t imageHeight = Map.Info.MapHeights[CurrentMapLayer] * PixelTileSize.y;
+//	const size_t imageWidth = Map.Info.MapWidth * Map.GetCurrentPixelTileSize().x;
+//	const size_t imageHeight = Map.Info.MapHeight * Map.GetCurrentPixelTileSize().y;
+	const size_t imageWidth = Map.Info.MapWidths[CurrentMapLayer] * Map.GetCurrentPixelTileSize().x;
+	const size_t imageHeight = Map.Info.MapHeights[CurrentMapLayer] * Map.GetCurrentPixelTileSize().y;
 	//Wyrmgus end
 
 	/* set up the output control if you are using standard C streams */
@@ -488,10 +488,10 @@ void SaveMapPNG(const char *name)
 			srcRect.x = terrain->Graphics->frame_map[tile].x;
 			srcRect.y = terrain->Graphics->frame_map[tile].y;
 			//Wyrmgus end
-			dstRect.x = i * PixelTileSize.x;
-			dstRect.y = j * PixelTileSize.y;
-			srcRect.w = dstRect.w = PixelTileSize.x;
-			srcRect.h = dstRect.h = PixelTileSize.y;
+			dstRect.x = i * Map.GetCurrentPixelTileSize().x;
+			dstRect.y = j * Map.GetCurrentPixelTileSize().y;
+			srcRect.w = dstRect.w = Map.GetCurrentPixelTileSize().x;
+			srcRect.h = dstRect.h = Map.GetCurrentPixelTileSize().y;
 			//Wyrmgus start
 //			SDL_BlitSurface(Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
 			SDL_BlitSurface(terrain->Graphics->Surface, &srcRect, mapImage, &dstRect);

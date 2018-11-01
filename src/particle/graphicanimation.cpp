@@ -77,10 +77,10 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int 
 	}
 
 	PixelSize graphicSize(g->Width, g->Height);
-	PixelDiff margin(PixelTileSize.x - 1, PixelTileSize.y - 1);
+	PixelDiff margin(Map.GetCurrentPixelTileSize().x - 1, Map.GetCurrentPixelTileSize().y - 1);
 	PixelPos position(pos.x, pos.y);
-	Vec2i minPos = Map.MapPixelPosToTilePos(position);
-	Vec2i maxPos = Map.MapPixelPosToTilePos(position + graphicSize + margin);
+	Vec2i minPos = Map.MapPixelPosToTilePos(position, CurrentMapLayer);
+	Vec2i maxPos = Map.MapPixelPosToTilePos(position + graphicSize + margin, CurrentMapLayer);
 	//Wyrmgus start
 //	Map.Clamp(minPos);
 //	Map.Clamp(maxPos);

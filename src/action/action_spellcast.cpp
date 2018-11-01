@@ -374,7 +374,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		// there is goal and it is in range
 		//Wyrmgus start
 //		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
-		UnitHeadingFromDeltaXY(unit, Vec2i(goal->tilePos.x * PixelTileSize.x, goal->tilePos.y * PixelTileSize.y) + goal->Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize());
+		UnitHeadingFromDeltaXY(unit, Vec2i(goal->tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x, goal->tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y) + goal->Type->GetHalfTilePixelSize(goal->MapLayer) - Vec2i(unit.tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x, unit.tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y) - unit.Type->GetHalfTilePixelSize(unit.MapLayer));
 		//Wyrmgus end
 		this->State++; // cast the spell
 		return false;

@@ -58,8 +58,8 @@ void MissileWhirlwind::Action()
 
 	// Center of the tornado
 	const PixelPos pixelCenter = this->position + this->Type->size / 2;
-	const PixelPos centerOffset(PixelTileSize.x / 2, PixelTileSize.y);
-	const Vec2i center = Map.MapPixelPosToTilePos(pixelCenter + centerOffset);
+	const PixelPos centerOffset(Map.GetMapLayerPixelTileSize(this->MapLayer).x / 2, Map.GetMapLayerPixelTileSize(this->MapLayer).y);
+	const Vec2i center = Map.MapPixelPosToTilePos(pixelCenter + centerOffset, this->MapLayer);
 
 	//Wyrmgus start
 	Assert(this->Type->AttackSpeed);
@@ -80,7 +80,7 @@ void MissileWhirlwind::Action()
 //		} while (!Map.Info.IsPointOnMap(newPos));
 		} while (!Map.Info.IsPointOnMap(newPos, this->MapLayer));
 		//Wyrmgus end
-		this->destination = Map.TilePosToMapPixelPos_Center(newPos);
+		this->destination = Map.TilePosToMapPixelPos_Center(newPos, this->MapLayer);
 		this->source = this->position;
 		this->State = 0;
 		DebugPrint("Whirlwind new direction: %d, %d, TTL: %d\n" _C_

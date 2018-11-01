@@ -585,7 +585,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 				unsigned char oldDir = unit.Direction;
 				//Wyrmgus start
 //				const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-				const Vec2i dir = Vec2i(goal->tilePos.x * PixelTileSize.x, goal->tilePos.y * PixelTileSize.y) + goal->Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize();
+				const Vec2i dir = Vec2i(goal->tilePos.x * Map.GetMapLayerPixelTileSize(this->MapLayer).x, goal->tilePos.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y) + goal->Type->GetHalfTilePixelSize(goal->MapLayer) - Vec2i(unit.tilePos.x * Map.GetMapLayerPixelTileSize(this->MapLayer).x, unit.tilePos.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y) - unit.Type->GetHalfTilePixelSize(unit.MapLayer);
 				//Wyrmgus end
 				UnitHeadingFromDeltaXY(unit, dir);
 				if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
@@ -807,7 +807,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	if (goal) {
 		//Wyrmgus start
 //		const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-		const Vec2i dir = Vec2i(goal->tilePos.x * PixelTileSize.x, goal->tilePos.y * PixelTileSize.y) + goal->Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize();
+		const Vec2i dir = Vec2i(goal->tilePos.x * Map.GetMapLayerPixelTileSize(this->MapLayer).x, goal->tilePos.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y) + goal->Type->GetHalfTilePixelSize(goal->MapLayer) - Vec2i(unit.tilePos.x * Map.GetMapLayerPixelTileSize(this->MapLayer).x, unit.tilePos.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y) - unit.Type->GetHalfTilePixelSize(unit.MapLayer);
 		//Wyrmgus end
 		unsigned char oldDir = unit.Direction;
 		UnitHeadingFromDeltaXY(unit, dir);
@@ -891,7 +891,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					//Wyrmgus end
 						//Wyrmgus start
 //						const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
-						const Vec2i dir = Vec2i(goal.tilePos.x * PixelTileSize.x, goal.tilePos.y * PixelTileSize.y) + goal.Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize();
+						const Vec2i dir = Vec2i(goal.tilePos.x * Map.GetMapLayerPixelTileSize(goal.MapLayer).x, goal.tilePos.y * Map.GetMapLayerPixelTileSize(goal.MapLayer).y) + goal.Type->GetHalfTilePixelSize(goal.MapLayer) - Vec2i(unit.tilePos.x * Map.GetMapLayerPixelTileSize(unit.MapLayer).x, unit.tilePos.y * Map.GetMapLayerPixelTileSize(unit.MapLayer).y) - unit.Type->GetHalfTilePixelSize(unit.MapLayer);
 						//Wyrmgus end
 						unsigned char oldDir = unit.Direction;
 						UnitHeadingFromDeltaXY(unit, dir);

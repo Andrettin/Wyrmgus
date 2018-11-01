@@ -359,11 +359,13 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.Worlds.push_back(this->World);
 		Map.SurfaceLayers.push_back(this->SurfaceLayer);
 		Map.LayerConnectors.resize(z + 1);
+		Map.PixelTileSizes.push_back(this->PixelTileSize);
 	} else {
 		if (!this->IsSubtemplateArea()) {
 			Map.Planes[z] = this->Plane;
 			Map.Worlds[z] = this->World;
 			Map.SurfaceLayers[z] = this->SurfaceLayer;
+			Map.PixelTileSizes[z] = this->PixelTileSize;
 		}
 	}
 
@@ -1400,23 +1402,23 @@ void CMap::Reveal(bool only_person_players)
 --  Map queries
 ----------------------------------------------------------------------------*/
 
-Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos) const
+Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos, const int map_layer) const
 {
-	const Vec2i tilePos(mapPos.x / PixelTileSize.x, mapPos.y / PixelTileSize.y);
+	const Vec2i tilePos(mapPos.x / GetMapLayerPixelTileSize(map_layer).x, mapPos.y / GetMapLayerPixelTileSize(map_layer).y);
 
 	return tilePos;
 }
 
-PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const
+PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const int map_layer) const
 {
-	PixelPos mapPixelPos(tilePos.x * PixelTileSize.x, tilePos.y * PixelTileSize.y);
+	PixelPos mapPixelPos(tilePos.x * GetMapLayerPixelTileSize(map_layer).x, tilePos.y * GetMapLayerPixelTileSize(map_layer).y);
 
 	return mapPixelPos;
 }
 
-PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos) const
+PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos, const int map_layer) const
 {
-	return TilePosToMapPixelPos_TopLeft(tilePos) + PixelTileSize / 2;
+	return TilePosToMapPixelPos_TopLeft(tilePos, map_layer) + GetMapLayerPixelTileSize(map_layer) / 2;
 }
 
 //Wyrmgus start
@@ -1921,6 +1923,20 @@ int CMap::GetCurrentSurfaceLayer() const
 		return 0;
 	}
 }
+
+PixelSize CMap::GetCurrentPixelTileSize() const
+{
+	return GetMapLayerPixelTileSize(CurrentMapLayer);
+}
+
+PixelSize CMap::GetMapLayerPixelTileSize(int map_layer) const
+{
+	if (map_layer >= 0 && map_layer < (int) Map.PixelTileSizes.size()) {
+		return Map.PixelTileSizes[map_layer];
+	} else {
+		return PixelSize(32, 32);
+	}
+}
 //Wyrmgus end
 
 /**
@@ -2126,7 +2142,7 @@ void ChangeCurrentMapLayer(int z)
 	
 	CurrentMapLayer = z;
 	UI.Minimap.UpdateCache = true;
-	UI.SelectedViewport->Set(new_viewport_map_pos, PixelTileSize / 2);
+	UI.SelectedViewport->Set(new_viewport_map_pos, Map.GetCurrentPixelTileSize() / 2);
 	UpdateSurfaceLayerButtons();
 }
 
@@ -2190,6 +2206,7 @@ void CMap::Create()
 	this->Worlds.push_back(NULL);
 	this->SurfaceLayers.push_back(0);
 	this->LayerConnectors.resize(1);
+	this->PixelTileSizes.push_back(PixelSize(32, 32));
 	//Wyrmgus end
 }
 
@@ -2199,7 +2216,9 @@ void CMap::Create()
 */
 void CMap::Init()
 {
-	InitFogOfWar();
+	for (std::map<PixelSize, CGraphic *>::iterator iterator = this->FogGraphics.begin(); iterator != this->FogGraphics.end(); ++iterator) {
+		InitFogOfWar(iterator->first);
+	}
 }
 
 /**
@@ -2225,6 +2244,7 @@ void CMap::Clean()
 	this->SurfaceLayers.clear();
 	this->LayerConnectors.clear();
 	this->SettlementUnits.clear();
+	this->PixelTileSizes.clear();
 	//Wyrmgus end
 
 	// Tileset freed by Tileset?
@@ -2275,6 +2295,11 @@ void CMap::Save(CFile &file) const
 	file.printf("  \"time-of-day\", {\n");
 	for (size_t z = 0; z < this->TimeOfDay.size(); ++z) {
 		file.printf("  {%d},\n", this->TimeOfDay[z]);
+	}
+	file.printf("  },\n");
+	file.printf("  \"pixel-tile-size\", {\n");
+	for (size_t z = 0; z < this->PixelTileSizes.size(); ++z) {
+		file.printf("  {%d, %d},\n", this->PixelTileSizes[z].x, this->PixelTileSizes[z].y);
 	}
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");

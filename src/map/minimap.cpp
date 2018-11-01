@@ -391,7 +391,7 @@ void CMinimap::UpdateTerrain(int z)
 	}
 
 	//Wyrmgus start
-//	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+//	const int tilepitch = Map.TileGraphic->Surface->w / Map.GetCurrentPixelTileSize().x;
 	//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -443,19 +443,19 @@ void CMinimap::UpdateTerrain(int z)
 			//Wyrmgus end
 			
 			//Wyrmgus start
-			int tilepitch = terrain->Graphics->Surface->w / PixelTileSize.x;
+			int tilepitch = terrain->Graphics->Surface->w / Map.GetCurrentPixelTileSize().x;
 			const int bpp = terrain->Graphics->Surface->format->BytesPerPixel;
 			
-			int base_tilepitch = base_terrain->Graphics->Surface->w / PixelTileSize.x;
+			int base_tilepitch = base_terrain->Graphics->Surface->w / Map.GetCurrentPixelTileSize().x;
 			//assumes the BPP for the base terrain is the same as for the top terrain (which may be an overlay)
 			//Wyrmgus end
 	
-			const int xofs = PixelTileSize.x * (tile % tilepitch);
-			const int yofs = PixelTileSize.y * (tile / tilepitch);
+			const int xofs = Map.GetCurrentPixelTileSize().x * (tile % tilepitch);
+			const int yofs = Map.GetCurrentPixelTileSize().y * (tile / tilepitch);
 			
 			//Wyrmgus start
-			const int base_xofs = PixelTileSize.x * (base_tile % base_tilepitch);
-			const int base_yofs = PixelTileSize.y * (base_tile / base_tilepitch);
+			const int base_xofs = Map.GetCurrentPixelTileSize().x * (base_tile % base_tilepitch);
+			const int base_yofs = Map.GetCurrentPixelTileSize().y * (base_tile / base_tilepitch);
 			//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -604,7 +604,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	}
 
 	//Wyrmgus start
-//	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+//	const int tilepitch = Map.TileGraphic->Surface->w / Map.GetCurrentPixelTileSize().x;
 //	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
 
@@ -689,18 +689,18 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			//Wyrmgus end
 
 			//Wyrmgus start
-			int tilepitch = terrain->Graphics->Surface->w / PixelTileSize.x;
+			int tilepitch = terrain->Graphics->Surface->w / Map.GetCurrentPixelTileSize().x;
 			const int bpp = terrain->Graphics->Surface->format->BytesPerPixel;
 			
-			int base_tilepitch = base_terrain->Graphics->Surface->w / PixelTileSize.x;
+			int base_tilepitch = base_terrain->Graphics->Surface->w / Map.GetCurrentPixelTileSize().x;
 			//Wyrmgus end
 	
-			const int xofs = PixelTileSize.x * (tile % tilepitch);
-			const int yofs = PixelTileSize.y * (tile / tilepitch);
+			const int xofs = Map.GetCurrentPixelTileSize().x * (tile % tilepitch);
+			const int yofs = Map.GetCurrentPixelTileSize().y * (tile / tilepitch);
 			
 			//Wyrmgus start
-			const int base_xofs = PixelTileSize.x * (base_tile % base_tilepitch);
-			const int base_yofs = PixelTileSize.y * (base_tile / base_tilepitch);
+			const int base_xofs = Map.GetCurrentPixelTileSize().x * (base_tile % base_tilepitch);
+			const int base_yofs = Map.GetCurrentPixelTileSize().y * (base_tile / base_tilepitch);
 			//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)

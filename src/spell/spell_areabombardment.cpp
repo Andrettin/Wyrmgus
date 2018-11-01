@@ -105,7 +105,7 @@
 		} while (!Map.Info.IsPointOnMap(dpos, z));
 		//Wyrmgus end
 
-		const PixelPos dest = Map.TilePosToMapPixelPos_Center(dpos);
+		const PixelPos dest = Map.TilePosToMapPixelPos_Center(dpos, z);
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
 			//Wyrmgus start
@@ -113,9 +113,9 @@
 			::Missile *mis = MakeMissile(*missile, start, dest, z);
 			//Wyrmgus end
 			if (mis->Type->BlizzardSpeed) {
-				mis->Delay = i * mis->Type->Sleep * 2 * PixelTileSize.x / mis->Type->BlizzardSpeed;
+				mis->Delay = i * mis->Type->Sleep * 2 * Map.GetMapLayerPixelTileSize(mis->MapLayer).x / mis->Type->BlizzardSpeed;
 			} else if (mis->Type->Speed) {
-				mis->Delay = i * mis->Type->Sleep * 2 * PixelTileSize.x / mis->Type->Speed;
+				mis->Delay = i * mis->Type->Sleep * 2 * Map.GetMapLayerPixelTileSize(mis->MapLayer).x / mis->Type->Speed;
 			} else {
 				mis->Delay = i * mis->Type->Sleep * mis->Type->G->NumFrames;
 			}

@@ -70,11 +70,11 @@
 		return;
 	}
 	if ((flags & SM_Pixel)) {
-		start.x = goal->tilePos.x * PixelTileSize.x + goal->IX + moff.x + startx;
-		start.y = goal->tilePos.y * PixelTileSize.y + goal->IY + moff.y + starty;
+		start.x = goal->tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x + goal->IX + moff.x + startx;
+		start.y = goal->tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y + goal->IY + moff.y + starty;
 	} else {
-		start.x = (goal->tilePos.x + startx) * PixelTileSize.x + PixelTileSize.x / 2 + moff.x;
-		start.y = (goal->tilePos.y + starty) * PixelTileSize.y + PixelTileSize.y / 2 + moff.y;
+		start.x = (goal->tilePos.x + startx) * Map.GetMapLayerPixelTileSize(goal->MapLayer).x + Map.GetMapLayerPixelTileSize(goal->MapLayer).x / 2 + moff.x;
+		start.y = (goal->tilePos.y + starty) * Map.GetMapLayerPixelTileSize(goal->MapLayer).y + Map.GetMapLayerPixelTileSize(goal->MapLayer).y / 2 + moff.y;
 	}
 	if ((flags & SM_ToTarget)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
@@ -89,37 +89,37 @@
 				return;
 			} else if (goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionAttackGround) {
 				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
-				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
+				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
 			} else if (goal->CurrentAction() == UnitActionSpellCast) {
 				COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
+				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
 			}
 			if (flags & SM_Pixel) {
 				dest.x += destx;
 				dest.y += desty;
 			} else {
-				dest.x += destx * PixelTileSize.x;
-				dest.y += desty * PixelTileSize.y;
+				dest.x += destx * Map.GetMapLayerPixelTileSize(goal->MapLayer).x;
+				dest.y += desty * Map.GetMapLayerPixelTileSize(goal->MapLayer).y;
 			}
 		} else if (flags & SM_Pixel) {
 			dest.x = target->GetMapPixelPosCenter().x + destx;
 			dest.y = target->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (target->tilePos.x + destx) * PixelTileSize.x;
-			dest.y = (target->tilePos.y + desty) * PixelTileSize.y;
-			dest += target->Type->GetPixelSize() / 2;
+			dest.x = (target->tilePos.x + destx) * Map.GetMapLayerPixelTileSize(target->MapLayer).x;
+			dest.y = (target->tilePos.y + desty) * Map.GetMapLayerPixelTileSize(target->MapLayer).y;
+			dest += target->Type->GetPixelSize(target->MapLayer) / 2;
 		}
 	} else {
 		if ((flags & SM_Pixel)) {
 			dest.x = goal->GetMapPixelPosCenter().x + destx;
 			dest.y = goal->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (goal->tilePos.x + destx) * PixelTileSize.x;
-			dest.y = (goal->tilePos.y + desty) * PixelTileSize.y;
-			dest += goal->Type->GetPixelSize() / 2;
+			dest.x = (goal->tilePos.x + destx) * Map.GetMapLayerPixelTileSize(goal->MapLayer).x;
+			dest.y = (goal->tilePos.y + desty) * Map.GetMapLayerPixelTileSize(goal->MapLayer).y;
+			dest += goal->Type->GetPixelSize(goal->MapLayer) / 2;
 		}
 	}
-	Vec2i destTilePos = Map.MapPixelPosToTilePos(dest);
+	Vec2i destTilePos = Map.MapPixelPosToTilePos(dest, unit.MapLayer);
 	//Wyrmgus start
 //	const int dist = goal->MapDistanceTo(destTilePos);
 	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer);

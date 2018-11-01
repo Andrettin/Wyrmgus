@@ -177,7 +177,7 @@ public:
 	CMapTemplate() :
 		Width(0), Height(0), Scale(1), SurfaceLayer(0),
 		OutputTerrainImage(false),
-		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0),
+		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0), PixelTileSize(32, 32),
 		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), BorderTerrain(NULL), SurroundingTerrain(NULL)
 	{
 	}
@@ -203,6 +203,7 @@ public:
 	bool OutputTerrainImage;
 	Vec2i SubtemplatePosition;
 	Vec2i CurrentStartPos;
+	PixelSize PixelTileSize;
 	CMapTemplate *MainTemplate;									/// Main template in which this one is located
 	CPlane *Plane;
 	CWorld *World;
@@ -402,12 +403,12 @@ public:
 	*/
 	//Wyrmgus end
 
-	/// convert map pixelpos coordonates into tilepos
-	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos) const;
-	/// convert tilepos coordonates into map pixel pos (take the top left of the tile)
-	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const;
-	/// convert tilepos coordonates into map pixel pos (take the center of the tile)
-	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos) const;
+	/// convert map pixelpos coordinates into tilepos
+	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos, const int map_layer) const;
+	/// convert tilepos coordinates into map pixel pos (take the top left of the tile)
+	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const int map_layer) const;
+	/// convert tilepos coordinates into map pixel pos (take the center of the tile)
+	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos, const int map_layer) const;
 	
 	//Wyrmgus start
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay, int z) const;
@@ -480,6 +481,8 @@ public:
 	CPlane *GetCurrentPlane() const;
 	CWorld *GetCurrentWorld() const;
 	int GetCurrentSurfaceLayer() const;
+	PixelSize GetCurrentPixelTileSize() const;
+	PixelSize GetMapLayerPixelTileSize(int map_layer) const;
 	//Wyrmgus end
 
 	//UnitCache
@@ -514,7 +517,7 @@ public:
 
 private:
 	/// Build tables for fog of war
-	void InitFogOfWar();
+	void InitFogOfWar(PixelSize pixel_tile_size);
 
 	//Wyrmgus start
 	/*
@@ -541,7 +544,7 @@ public:
 	CTileset *Tileset;          /// tileset data
 	std::string TileModelsFileName; /// lua filename that loads all tilemodels
 	CGraphic *TileGraphic;     /// graphic for all the tiles
-	static CGraphic *FogGraphic;      /// graphic for fog of war
+	static std::map<PixelSize, CGraphic *> FogGraphics;      /// graphics for fog of war, mapped to their respective pixel sizes
 	//Wyrmgus start
 	CTerrainType *BorderTerrain;      	/// terrain type for borders
 	int Landmasses;						/// how many landmasses are there
@@ -553,6 +556,7 @@ public:
 	std::vector<std::vector<CUnit *>> LayerConnectors;	/// connectors in a layer which lead to other layers
 	std::map<int, std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>>> SubtemplateAreas;
 	std::vector<CUnit *> SettlementUnits;	/// the town hall / settlement site units
+	std::vector<PixelSize> PixelTileSizes;	/// the pixel tile size for each map layer
 	//Wyrmgus end
 
 	CMapInfo Info;             /// descriptive information

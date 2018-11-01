@@ -343,7 +343,7 @@ static void AnimateActionRepair(CUnit &unit)
 					this->RepairCycle = 0;
 					//Wyrmgus start
 //					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-					const Vec2i dir = Vec2i(goal->tilePos.x * PixelTileSize.x, goal->tilePos.y * PixelTileSize.y) + goal->Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize();
+					const Vec2i dir = Vec2i(goal->tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x, goal->tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y) + goal->Type->GetHalfTilePixelSize(goal->MapLayer) - Vec2i(unit.tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x, unit.tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y) - unit.Type->GetHalfTilePixelSize(unit.MapLayer);
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {

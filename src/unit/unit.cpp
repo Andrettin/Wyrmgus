@@ -4397,8 +4397,8 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
 	//Wyrmgus start
-//	int x = tilePos.x * PixelTileSize.x + IX - (Type->Width - Type->TileWidth * PixelTileSize.x) / 2 + Type->OffsetX;
-//	int y = tilePos.y * PixelTileSize.y + IY - (Type->Height - Type->TileHeight * PixelTileSize.y) / 2 + Type->OffsetY;
+//	int x = tilePos.x * Map.GetMapLayerPixelTileSize(this->MapLayer).x + IX - (Type->Width - Type->TileWidth * Map.GetMapLayerPixelTileSize(this->MapLayer).x) / 2 + Type->OffsetX;
+//	int y = tilePos.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y + IY - (Type->Height - Type->TileHeight * Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + Type->OffsetY;
 
 	int frame_width = Type->Width;
 	int frame_height = Type->Height;
@@ -4408,11 +4408,11 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 		frame_height = varinfo->FrameHeight;
 	}
 
-	int x = tilePos.x * PixelTileSize.x + IX - (frame_width - Type->TileWidth * PixelTileSize.x) / 2 + Type->OffsetX;
-	int y = tilePos.y * PixelTileSize.y + IY - (frame_height - Type->TileHeight * PixelTileSize.y) / 2 + Type->OffsetY;
+	int x = tilePos.x * Map.GetMapLayerPixelTileSize(this->MapLayer).x + IX - (frame_width - Type->TileWidth * Map.GetMapLayerPixelTileSize(this->MapLayer).x) / 2 + Type->OffsetX;
+	int y = tilePos.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y + IY - (frame_height - Type->TileHeight * Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + Type->OffsetY;
 	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
-	const PixelPos vpTopLeftMapPos = Map.TilePosToMapPixelPos_TopLeft(vp.MapPos) + vp.Offset;
+	const PixelPos vpTopLeftMapPos = Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, CurrentMapLayer) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
 	//Wyrmgus start
@@ -5185,13 +5185,13 @@ CUnit *UnitOnScreen(int x, int y)
 
 PixelPos CUnit::GetMapPixelPosTopLeft() const
 {
-	const PixelPos pos(tilePos.x * PixelTileSize.x + IX, tilePos.y * PixelTileSize.y + IY);
+	const PixelPos pos(tilePos.x * Map.GetMapLayerPixelTileSize(this->MapLayer).x + IX, tilePos.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y + IY);
 	return pos;
 }
 
 PixelPos CUnit::GetMapPixelPosCenter() const
 {
-	return GetMapPixelPosTopLeft() + Type->GetPixelSize() / 2;
+	return GetMapPixelPosTopLeft() + Type->GetPixelSize(this->MapLayer) / 2;
 }
 
 //Wyrmgus start
@@ -6875,7 +6875,7 @@ static void HitUnit_Burning(CUnit &target)
 
 	if (fire) {
 		const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
-		const PixelDiff offset(0, -PixelTileSize.y);
+		const PixelDiff offset(0, -Map.GetMapLayerPixelTileSize(target.MapLayer).y);
 		//Wyrmgus start
 //		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset);
 		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset, target.MapLayer);

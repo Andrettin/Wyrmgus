@@ -54,7 +54,7 @@ void MissileStraightFly::Action()
 		if (this->TotalStep) {
 			const PixelPos step = (this->destination - this->source);
 
-			this->destination += step * ((PixelTileSize.x + PixelTileSize.y) * 3) / 4 / this->TotalStep;
+			this->destination += step * ((Map.GetMapLayerPixelTileSize(this->MapLayer).x + Map.GetMapLayerPixelTileSize(this->MapLayer).y) * 3) / 4 / this->TotalStep;
 			this->State++; // !(State & 1) to initialise
 			this->source = this->position;
 			PointToPointMissile(*this);

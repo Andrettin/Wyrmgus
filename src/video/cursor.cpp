@@ -298,8 +298,8 @@ void DrawBuildingCursor()
 	//Wyrmgus end
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
-		const PixelPos center(screenPos + CursorBuilding->GetPixelSize() / 2);
-		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1;
+		const PixelPos center(screenPos + CursorBuilding->GetPixelSize(CurrentMapLayer) / 2);
+		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * Map.GetCurrentPixelTileSize().x + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
 
@@ -355,8 +355,8 @@ void DrawBuildingCursor()
 			} else {
 				color = ColorRed;
 			}
-			Video.FillTransRectangleClip(color, screenPos.x + w * PixelTileSize.x,
-										 screenPos.y + h * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 95);
+			Video.FillTransRectangleClip(color, screenPos.x + w * Map.GetCurrentPixelTileSize().x,
+										 screenPos.y + h * Map.GetCurrentPixelTileSize().y, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y, 95);
 		}
 	}
 	PopClipping();

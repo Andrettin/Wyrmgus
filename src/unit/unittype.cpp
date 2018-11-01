@@ -695,9 +695,9 @@ CUnitType::~CUnitType()
 #endif
 }
 
-PixelSize CUnitType::GetPixelSize() const
+PixelSize CUnitType::GetPixelSize(const int map_layer) const
 {
-	return PixelSize(TileWidth * PixelTileSize.x, TileHeight * PixelTileSize.y);
+	return PixelSize(TileWidth * Map.GetMapLayerPixelTileSize(map_layer).x, TileHeight * Map.GetMapLayerPixelTileSize(map_layer).y);
 }
 
 bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
@@ -1583,10 +1583,10 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	//Wyrmgus start
-//	pos.x -= (type.Width - type.TileWidth * PixelTileSize.x) / 2;
-//	pos.y -= (type.Height - type.TileHeight * PixelTileSize.y) / 2;
-	pos.x -= (sprite->Width - type.TileWidth * PixelTileSize.x) / 2;
-	pos.y -= (sprite->Height - type.TileHeight * PixelTileSize.y) / 2;
+//	pos.x -= (type.Width - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
+//	pos.y -= (type.Height - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
+	pos.x -= (sprite->Width - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
+	pos.y -= (sprite->Height - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
 	//Wyrmgus end
 	pos.x += type.OffsetX;
 	pos.y += type.OffsetY;

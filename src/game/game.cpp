@@ -192,7 +192,7 @@ void StartMap(const std::string &filename, bool clean)
 	
 	//Wyrmgus start
 	CurrentMapLayer = ThisPlayer->StartMapLayer;
-	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos));
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, CurrentMapLayer));
 	//Wyrmgus end
 
 	//  Play the game.
@@ -1876,7 +1876,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//Wyrmgus start
 	CurrentMapLayer = ThisPlayer->StartMapLayer;
 	//Wyrmgus end
-	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos));
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, CurrentMapLayer));
 
 	//
 	// Various hacks which must be done after the map is loaded.

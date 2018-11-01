@@ -218,8 +218,8 @@ void InitUserInterface()
 	// Calculations
 	//
 	if (Map.Info.MapWidth) {
-		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + Map.Info.MapWidth * PixelTileSize.x - 1);
-		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + Map.Info.MapHeight * PixelTileSize.y - 1);
+		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + Map.Info.MapWidth * Map.GetCurrentPixelTileSize().x - 1);
+		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + Map.Info.MapHeight * Map.GetCurrentPixelTileSize().y - 1);
 	}
 
 	UI.SelectedViewport = UI.Viewports;
@@ -546,7 +546,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 		if (vp) {
 			const PixelDiff relDiff = new_vps[i].GetTopLeftPos() - vp->GetTopLeftPos();
 
-			new_vps[i].Offset = relDiff + Map.TilePosToMapPixelPos_TopLeft(vp->MapPos) + vp->Offset;
+			new_vps[i].Offset = relDiff + Map.TilePosToMapPixelPos_TopLeft(vp->MapPos, CurrentMapLayer) + vp->Offset;
 		} else {
 			new_vps[i].Offset.x = 0;
 			new_vps[i].Offset.y = 0;
@@ -590,10 +590,10 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
 	//Wyrmgus start
-//	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * PixelTileSize.x - 1;
-//	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * PixelTileSize.y - 1;
-	vp.BottomRightPos.x = vp.TopLeftPos.x + (Map.Info.MapWidths.size() ? Map.Info.MapWidths[CurrentMapLayer] : Map.Info.MapWidth) * PixelTileSize.x - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + (Map.Info.MapHeights.size() ? Map.Info.MapHeights[CurrentMapLayer] : Map.Info.MapHeight) * PixelTileSize.y - 1;
+//	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * Map.GetCurrentPixelTileSize().x - 1;
+//	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * Map.GetCurrentPixelTileSize().y - 1;
+	vp.BottomRightPos.x = vp.TopLeftPos.x + (Map.Info.MapWidths.size() ? Map.Info.MapWidths[CurrentMapLayer] : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - 1;
+	vp.BottomRightPos.y = vp.TopLeftPos.y + (Map.Info.MapHeights.size() ? Map.Info.MapHeights[CurrentMapLayer] : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary

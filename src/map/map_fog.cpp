@@ -61,7 +61,7 @@ int FogOfWarOpacity;                 /// Fog of war Opacity.
 Uint32 FogOfWarColorSDL;
 CColor FogOfWarColor;
 
-CGraphic *CMap::FogGraphic;
+std::map<PixelSize, CGraphic *> CMap::FogGraphics;
 
 /**
 **  Mapping for fog of war tiles.
@@ -78,8 +78,8 @@ static const int FogTable[16] = {
 static std::vector<std::vector<unsigned short>> VisibleTable;
 //Wyrmgus end
 
-static SDL_Surface *OnlyFogSurface;
-static CGraphic *AlphaFogG;
+static std::map<PixelSize, SDL_Surface *> OnlyFogSurfaces;
+static std::map<PixelSize, CGraphic *> AlphaFogGraphics;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -757,10 +757,12 @@ void VideoDrawOnlyFog(int x, int y)
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
-								x, y, PixelTileSize.x, PixelTileSize.y);
+								x, y, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y);
 	} else
 #endif
 	{
+		SDL_Surface *only_fog_surface = OnlyFogSurfaces[Map.GetCurrentPixelTileSize()];
+		
 		int oldx;
 		int oldy;
 		SDL_Rect srect;
@@ -768,8 +770,8 @@ void VideoDrawOnlyFog(int x, int y)
 
 		srect.x = 0;
 		srect.y = 0;
-		srect.w = OnlyFogSurface->w;
-		srect.h = OnlyFogSurface->h;
+		srect.w = only_fog_surface->w;
+		srect.h = only_fog_surface->h;
 
 		oldx = x;
 		oldy = y;
@@ -780,7 +782,7 @@ void VideoDrawOnlyFog(int x, int y)
 		drect.x = x;
 		drect.y = y;
 
-		SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
+		SDL_BlitSurface(only_fog_surface, &srect, TheScreen, &drect);
 	}
 }
 
@@ -975,9 +977,10 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int
 //	*blackFogTile = FogTable[blackFogTileIndex];
 	//apply variation according to tile index (sx is equal to the tile index, so let's use it)
 	int FogTileVariation = 0;
-	if (sx % 3 == 0 && Map.FogGraphic->Surface->h / PixelTileSize.y >= 3) {
+	CGraphic *fog_graphic = Map.FogGraphics[Map.GetCurrentPixelTileSize()];
+	if (sx % 3 == 0 && fog_graphic->Surface->h / Map.GetCurrentPixelTileSize().y >= 3) {
 		FogTileVariation = 2;
-	} else if (sx % 2 == 0 && Map.FogGraphic->Surface->h / PixelTileSize.y >= 2) {
+	} else if (sx % 2 == 0 && fog_graphic->Surface->h / Map.GetCurrentPixelTileSize().y >= 2) {
 		FogTileVariation = 1;
 	}
 	if (FogTable[fogTileIndex] && FogTable[fogTileIndex] != 16) {
@@ -1012,24 +1015,27 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	//Wyrmgus end
 
 	//Wyrmgus start
+	CGraphic *fog_graphic = Map.FogGraphics[Map.GetCurrentPixelTileSize()];
+	CGraphic *alpha_fog_graphic = AlphaFogGraphics[Map.GetCurrentPixelTileSize()];
+	
 //	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
 	if ((IsMapFieldVisibleTable(sx, CurrentMapLayer) && blackFogTile != 16 && fogTile != 16) || ReplayRevealMap) {
 	//Wyrmgus end
 		if (fogTile && fogTile != blackFogTile) {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 			if (UseOpenGL) {
-				Map.FogGraphic->DrawFrameClipTrans(fogTile, dx, dy, FogOfWarOpacity);
+				fog_graphic->DrawFrameClipTrans(fogTile, dx, dy, FogOfWarOpacity);
 			} else
 #endif
 			{
-				AlphaFogG->DrawFrameClip(fogTile, dx, dy);
+				alpha_fog_graphic->DrawFrameClip(fogTile, dx, dy);
 			}
 		}
 	} else {
 		VideoDrawOnlyFog(dx, dy);
 	}
 	if (blackFogTile) {
-		Map.FogGraphic->DrawFrameClip(blackFogTile, dx, dy);
+		fog_graphic->DrawFrameClip(blackFogTile, dx, dy);
 	}
 
 #undef IsMapFieldExploredTable
@@ -1094,16 +1100,16 @@ void CViewport::DrawMapFogOfWar() const
 			//Wyrmgus end
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {
-				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, PixelTileSize.x, PixelTileSize.y);
+				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y);
 			}
 			++sx;
-			dx += PixelTileSize.x;
+			dx += Map.GetCurrentPixelTileSize().x;
 		}
 		//Wyrmgus start
 //		sy += Map.Info.MapWidth;
 		sy += Map.Info.MapWidths[CurrentMapLayer];
 		//Wyrmgus end
-		dy += PixelTileSize.y;
+		dy += Map.GetCurrentPixelTileSize().y;
 	}
 }
 
@@ -1111,15 +1117,17 @@ void CViewport::DrawMapFogOfWar() const
 **  Initialize the fog of war.
 **  Build tables, setup functions.
 */
-void CMap::InitFogOfWar()
+void CMap::InitFogOfWar(PixelSize pixel_tile_size)
 {
+	CGraphic *fog_graphic = this->FogGraphics[pixel_tile_size];
+	
 	//calculate this once from the settings and store it
 	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor);
 
 	Uint8 r, g, b;
 	SDL_Surface *s;
 
-	FogGraphic->Load();
+	fog_graphic->Load();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!UseOpenGL)
@@ -1128,41 +1136,43 @@ void CMap::InitFogOfWar()
 		//
 		// Generate Only Fog surface.
 		//
-		s = SDL_CreateRGBSurface(SDL_SWSURFACE, PixelTileSize.x, PixelTileSize.y,
+		s = SDL_CreateRGBSurface(SDL_SWSURFACE, pixel_tile_size.x, pixel_tile_size.y,
 								 32, RMASK, GMASK, BMASK, AMASK);
 
 		SDL_GetRGB(FogOfWarColorSDL, TheScreen->format, &r, &g, &b);
 		Uint32 color = Video.MapRGB(s->format, r, g, b);
 
 		SDL_FillRect(s, NULL, color);
-		OnlyFogSurface = SDL_DisplayFormat(s);
-		SDL_SetAlpha(OnlyFogSurface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
+		SDL_Surface *only_fog_surface = SDL_DisplayFormat(s);
+		SDL_SetAlpha(only_fog_surface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
 		VideoPaletteListRemove(s);
 		SDL_FreeSurface(s);
+		
+		OnlyFogSurfaces[pixel_tile_size] = only_fog_surface;
 
 		//
 		// Generate Alpha Fog surface.
 		//
-		if (FogGraphic->Surface->format->BytesPerPixel == 1) {
-			s = SDL_DisplayFormat(FogGraphic->Surface);
+		if (fog_graphic->Surface->format->BytesPerPixel == 1) {
+			s = SDL_DisplayFormat(fog_graphic->Surface);
 			SDL_SetAlpha(s, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
 		} else {
 			// Copy the top row to a new surface
-			SDL_PixelFormat *f = FogGraphic->Surface->format;
+			SDL_PixelFormat *f = fog_graphic->Surface->format;
 			//Wyrmgus start
-//			s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, PixelTileSize.y,
-			s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, FogGraphic->Surface->h,
+//			s = SDL_CreateRGBSurface(SDL_SWSURFACE, fog_graphic->Surface->w, pixel_tile_size.y,
+			s = SDL_CreateRGBSurface(SDL_SWSURFACE, fog_graphic->Surface->w, fog_graphic->Surface->h,
 			//Wyrmgus end
 									 f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 			SDL_LockSurface(s);
-			SDL_LockSurface(FogGraphic->Surface);
+			SDL_LockSurface(fog_graphic->Surface);
 			for (int i = 0; i < s->h; ++i) {
 				memcpy(reinterpret_cast<Uint8 *>(s->pixels) + i * s->pitch,
-					   reinterpret_cast<Uint8 *>(FogGraphic->Surface->pixels) + i * FogGraphic->Surface->pitch,
-					   FogGraphic->Surface->w * f->BytesPerPixel);
+					   reinterpret_cast<Uint8 *>(fog_graphic->Surface->pixels) + i * fog_graphic->Surface->pitch,
+					   fog_graphic->Surface->w * f->BytesPerPixel);
 			}
 			SDL_UnlockSurface(s);
-			SDL_UnlockSurface(FogGraphic->Surface);
+			SDL_UnlockSurface(fog_graphic->Surface);
 
 			// Convert any non-transparent pixels to use FogOfWarOpacity as alpha
 			SDL_LockSurface(s);
@@ -1187,18 +1197,19 @@ void CMap::InitFogOfWar()
 			}
 			SDL_UnlockSurface(s);
 		}
-		AlphaFogG = CGraphic::New("");
-		AlphaFogG->Surface = s;
-		AlphaFogG->Width = PixelTileSize.x;
-		AlphaFogG->Height = PixelTileSize.y;
-		AlphaFogG->GraphicWidth = s->w;
-		AlphaFogG->GraphicHeight = s->h;
+		CGraphic *alpha_fog_graphic = CGraphic::New("");
+		alpha_fog_graphic->Surface = s;
+		alpha_fog_graphic->Width = pixel_tile_size.x;
+		alpha_fog_graphic->Height = pixel_tile_size.y;
+		alpha_fog_graphic->GraphicWidth = s->w;
+		alpha_fog_graphic->GraphicHeight = s->h;
 		//Wyrmgus start
-//		AlphaFogG->NumFrames = 16;//1;
-		AlphaFogG->NumFrames = 16 * (s->h / PixelTileSize.y);//1;
+//		alpha_fog_graphic->NumFrames = 16;//1;
+		alpha_fog_graphic->NumFrames = 16 * (s->h / pixel_tile_size.y);//1;
 		//Wyrmgus end
-		AlphaFogG->GenFramesMap();
-		AlphaFogG->UseDisplayFormat();
+		alpha_fog_graphic->GenFramesMap();
+		alpha_fog_graphic->UseDisplayFormat();
+		AlphaFogGraphics[pixel_tile_size] = alpha_fog_graphic;
 	}
 
 	//Wyrmgus start
@@ -1219,21 +1230,27 @@ void CMap::CleanFogOfWar()
 {
 	VisibleTable.clear();
 
-	CGraphic::Free(Map.FogGraphic);
-	FogGraphic = NULL;
-
+	for (std::map<PixelSize, CGraphic *>::iterator iterator = this->FogGraphics.begin(); iterator != this->FogGraphics.end(); ++iterator) {
+		CGraphic::Free(iterator->second);
+		iterator->second = NULL;
+		
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
+		if (!UseOpenGL)
 #endif
-	{
-		if (OnlyFogSurface) {
-			VideoPaletteListRemove(OnlyFogSurface);
-			SDL_FreeSurface(OnlyFogSurface);
-			OnlyFogSurface = NULL;
+		{
+			if (OnlyFogSurfaces.find(iterator->first) != OnlyFogSurfaces.end()) {
+				VideoPaletteListRemove(OnlyFogSurfaces[iterator->first]);
+				SDL_FreeSurface(OnlyFogSurfaces[iterator->first]);
+				OnlyFogSurfaces[iterator->first] = NULL;
+			}
+			CGraphic::Free(AlphaFogGraphics[iterator->first]);
+			AlphaFogGraphics[iterator->first] = NULL;
 		}
-		CGraphic::Free(AlphaFogG);
-		AlphaFogG = NULL;
 	}
+	
+	this->FogGraphics.clear();
+	OnlyFogSurfaces.clear();
+	AlphaFogGraphics.clear();
 }
 
 //@}

@@ -685,8 +685,8 @@ static int CalculateVisibleIcons(bool tiles = false)
 	int h;
 
 	if (tiles) {
-		w = PixelTileSize.x;//+2,
-		h = PixelTileSize.y;//+2
+		w = Map.GetCurrentPixelTileSize().x;//+2,
+		h = Map.GetCurrentPixelTileSize().y;//+2
 	} else {
 		w = IconWidth;
 		h = IconHeight;
@@ -945,35 +945,35 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	/*
 	Uint32 color = (flags & IconActive) ? ColorGray : ColorBlack;
 
-	Video.DrawRectangleClip(color, x, y, PixelTileSize.x + 7, PixelTileSize.y + 7);
-	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, PixelTileSize.x + 5, PixelTileSize.y + 5);
+	Video.DrawRectangleClip(color, x, y, Map.GetCurrentPixelTileSize().x + 7, Map.GetCurrentPixelTileSize().y + 7);
+	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, Map.GetCurrentPixelTileSize().x + 5, Map.GetCurrentPixelTileSize().y + 5);
 
-	Video.DrawVLine(ColorGray, x + PixelTileSize.x + 4, y + 5, PixelTileSize.y - 1); // _|
-	Video.DrawVLine(ColorGray, x + PixelTileSize.x + 5, y + 5, PixelTileSize.y - 1);
-	Video.DrawHLine(ColorGray, x + 5, y + PixelTileSize.y + 4, PixelTileSize.x + 1);
-	Video.DrawHLine(ColorGray, x + 5, y + PixelTileSize.y + 5, PixelTileSize.x + 1);
+	Video.DrawVLine(ColorGray, x + Map.GetCurrentPixelTileSize().x + 4, y + 5, Map.GetCurrentPixelTileSize().y - 1); // _|
+	Video.DrawVLine(ColorGray, x + Map.GetCurrentPixelTileSize().x + 5, y + 5, Map.GetCurrentPixelTileSize().y - 1);
+	Video.DrawHLine(ColorGray, x + 5, y + Map.GetCurrentPixelTileSize().y + 4, Map.GetCurrentPixelTileSize().x + 1);
+	Video.DrawHLine(ColorGray, x + 5, y + Map.GetCurrentPixelTileSize().y + 5, Map.GetCurrentPixelTileSize().x + 1);
 
 	color = (flags & IconClicked) ? ColorGray : ColorWhite;
-	Video.DrawHLine(color, x + 5, y + 3, PixelTileSize.x + 1);
-	Video.DrawHLine(color, x + 5, y + 4, PixelTileSize.x + 1);
-	Video.DrawVLine(color, x + 3, y + 3, PixelTileSize.y + 3);
-	Video.DrawVLine(color, x + 4, y + 3, PixelTileSize.y + 3);
+	Video.DrawHLine(color, x + 5, y + 3, Map.GetCurrentPixelTileSize().x + 1);
+	Video.DrawHLine(color, x + 5, y + 4, Map.GetCurrentPixelTileSize().x + 1);
+	Video.DrawVLine(color, x + 3, y + 3, Map.GetCurrentPixelTileSize().y + 3);
+	Video.DrawVLine(color, x + 4, y + 3, Map.GetCurrentPixelTileSize().y + 3);
 	*/
-	Video.DrawVLine(ColorGray, x + PixelTileSize.x + 4 - 1, y + 5 - 1, PixelTileSize.y - 1 - 1); // _|
-	Video.DrawVLine(ColorGray, x + PixelTileSize.x + 5 - 1, y + 5 - 1, PixelTileSize.y - 1 - 1);
-	Video.DrawHLine(ColorGray, x + 5 - 1, y + PixelTileSize.y + 4 - 1, PixelTileSize.x + 1 - 1);
-	Video.DrawHLine(ColorGray, x + 5 - 1, y + PixelTileSize.y + 5 - 1, PixelTileSize.x + 1 - 1);
+	Video.DrawVLine(ColorGray, x + Map.GetCurrentPixelTileSize().x + 4 - 1, y + 5 - 1, Map.GetCurrentPixelTileSize().y - 1 - 1); // _|
+	Video.DrawVLine(ColorGray, x + Map.GetCurrentPixelTileSize().x + 5 - 1, y + 5 - 1, Map.GetCurrentPixelTileSize().y - 1 - 1);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + Map.GetCurrentPixelTileSize().y + 4 - 1, Map.GetCurrentPixelTileSize().x + 1 - 1);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + Map.GetCurrentPixelTileSize().y + 5 - 1, Map.GetCurrentPixelTileSize().x + 1 - 1);
 
 	Uint32 color = (flags & IconClicked) ? ColorGray : ColorWhite;
-	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, PixelTileSize.x + 1 - 1);
-	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, PixelTileSize.x + 1 - 1);
-	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, PixelTileSize.y + 3 - 1);
-	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, PixelTileSize.y + 3 - 1);
+	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, Map.GetCurrentPixelTileSize().x + 1 - 1);
+	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, Map.GetCurrentPixelTileSize().x + 1 - 1);
+	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, Map.GetCurrentPixelTileSize().y + 3 - 1);
+	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, Map.GetCurrentPixelTileSize().y + 3 - 1);
 	
 	color = (flags & IconActive) ? ColorGray : ColorBlack;
 
-	Video.DrawRectangleClip(color, x, y, PixelTileSize.x + 7, PixelTileSize.y + 7);
-	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, PixelTileSize.x + 5, PixelTileSize.y + 5);
+	Video.DrawRectangleClip(color, x, y, Map.GetCurrentPixelTileSize().x + 7, Map.GetCurrentPixelTileSize().y + 7);
+	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, Map.GetCurrentPixelTileSize().x + 5, Map.GetCurrentPixelTileSize().y + 5);
 	//Wyrmgus end
 
 	if (flags & IconClicked) {
@@ -992,7 +992,7 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	//Wyrmgus end
 
 	if (flags & IconSelected) {
-		Video.DrawRectangleClip(ColorGreen, x, y, PixelTileSize.x, PixelTileSize.y);
+		Video.DrawRectangleClip(ColorGreen, x, y, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y);
 	}
 }
 
@@ -1082,7 +1082,7 @@ static void DrawTileIcons()
 	int i = Editor.TileIndex;
 	Assert(Editor.TileIndex != -1);
 	y = UI.ButtonPanel.Y + 24;
-	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - PixelTileSize.y) {
+	while (y < UI.ButtonPanel.Y + ButtonPanelHeight - Map.GetCurrentPixelTileSize().y) {
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
@@ -1090,7 +1090,7 @@ static void DrawTileIcons()
 //		x = UI.ButtonPanel.X + 10;
 		x = UI.ButtonPanel.X + 10 + 6;
 		//Wyrmgus end
-		while (x < UI.ButtonPanel.X + ButtonPanelWidth - PixelTileSize.x) {
+		while (x < UI.ButtonPanel.X + ButtonPanelWidth - Map.GetCurrentPixelTileSize().x) {
 			if (i >= (int) Editor.ShownTileTypes.size()) {
 				break;
 			}
@@ -1105,28 +1105,28 @@ static void DrawTileIcons()
 				terrain->Graphics->DrawFrameClip(terrain->SolidTiles[0], x, y);
 			}
 			//Wyrmgus end
-			Video.DrawRectangleClip(ColorGray, x, y, PixelTileSize.x, PixelTileSize.y);
+			Video.DrawRectangleClip(ColorGray, x, y, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y);
 
 			if (i == Editor.SelectedTileIndex) {
 				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-										PixelTileSize.x - 2, PixelTileSize.y - 2);
+										Map.GetCurrentPixelTileSize().x - 2, Map.GetCurrentPixelTileSize().y - 2);
 			}
 			if (i == Editor.CursorTileIndex) {
 				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-										PixelTileSize.x + 2, PixelTileSize.y + 2);
+										Map.GetCurrentPixelTileSize().x + 2, Map.GetCurrentPixelTileSize().y + 2);
 				Editor.PopUpX = x;
 				Editor.PopUpY = y;
 			}
 
 			//Wyrmgus start
-//			x += PixelTileSize.x + 8;
-			x += PixelTileSize.x + 30; // to allow 5 tile types per row with the new UI
+//			x += Map.GetCurrentPixelTileSize().x + 8;
+			x += Map.GetCurrentPixelTileSize().x + 30; // to allow 5 tile types per row with the new UI
 			//Wyrmgus end
 			++i;
 		}
 		//Wyrmgus start
-//		y += PixelTileSize.y + 2;
-		y += PixelTileSize.y + 18; // make this space a little larger (as large as the space between the top of the panel and the first icon, minus the parts of the panel which are "lower" so to speak)
+//		y += Map.GetCurrentPixelTileSize().y + 2;
+		y += Map.GetCurrentPixelTileSize().y + 18; // make this space a little larger (as large as the space between the top of the panel and the first icon, minus the parts of the panel which are "lower" so to speak)
 		//Wyrmgus end
 	}
 }
@@ -1320,12 +1320,12 @@ static void DrawMapCursor()
 
 			PixelPos screenPosIt;
 			for (int j = 0; j < TileCursorSize; ++j) {
-				screenPosIt.y = screenPos.y + j * PixelTileSize.y;
+				screenPosIt.y = screenPos.y + j * Map.GetCurrentPixelTileSize().y;
 				if (screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y) {
 					break;
 				}
 				for (int i = 0; i < TileCursorSize; ++i) {
-					screenPosIt.x = screenPos.x + i * PixelTileSize.x;
+					screenPosIt.x = screenPos.x + i * Map.GetCurrentPixelTileSize().x;
 					if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x) {
 						break;
 					}
@@ -1338,7 +1338,7 @@ static void DrawMapCursor()
 					//Wyrmgus end
 				}
 			}
-			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, PixelTileSize.x * TileCursorSize, PixelTileSize.y * TileCursorSize);
+			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.GetCurrentPixelTileSize().x * TileCursorSize, Map.GetCurrentPixelTileSize().y * TileCursorSize);
 			PopClipping();
 		} else {
 			// If there is an unit under the cursor, it's selection thing
@@ -1346,7 +1346,7 @@ static void DrawMapCursor()
 			if (UnitUnderCursor != NULL) {
 				PushClipping();
 				UI.MouseViewport->SetClipping();
-				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, PixelTileSize.x, PixelTileSize.y);
+				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y);
 				PopClipping();
 			}
 		}
@@ -1384,7 +1384,7 @@ static void DrawStartLocations()
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
 				} else { // Draw a cross
-					DrawCross(startScreenPos, PixelTileSize, Players[i].Color);
+					DrawCross(startScreenPos, Map.GetCurrentPixelTileSize(), Players[i].Color);
 				}
 			}
 		}
@@ -1671,7 +1671,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
-			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos));
+			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos, CurrentMapLayer));
 		}
 		return;
 	}
@@ -2170,7 +2170,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 
 	int i = Editor.TileIndex;
 	by = UI.ButtonPanel.Y + 24;
-	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - PixelTileSize.y) {
+	while (by < UI.ButtonPanel.Y + ButtonPanelHeight - Map.GetCurrentPixelTileSize().y) {
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
@@ -2178,12 +2178,12 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 //		bx = UI.ButtonPanel.X + 10;
 		bx = UI.ButtonPanel.X + 10 + 6;
 		//Wyrmgus end
-		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - PixelTileSize.x) {
+		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - Map.GetCurrentPixelTileSize().x) {
 			if (i >= (int)Editor.ShownTileTypes.size()) {
 				break;
 			}
-			if (bx < screenPos.x && screenPos.x < bx + PixelTileSize.x
-				&& by < screenPos.y && screenPos.y < by + PixelTileSize.y) {
+			if (bx < screenPos.x && screenPos.x < bx + Map.GetCurrentPixelTileSize().x
+				&& by < screenPos.y && screenPos.y < by + Map.GetCurrentPixelTileSize().y) {
 				//Wyrmgus start
 //				const int tile = Editor.ShownTileTypes[i];
 //				const int tileindex = Map.Tileset->findTileIndexByTile(tile);
@@ -2195,14 +2195,14 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 				return true;
 			}
 			//Wyrmgus start
-//			bx += PixelTileSize.x + 8;
-			bx += PixelTileSize.x + 30;
+//			bx += Map.GetCurrentPixelTileSize().x + 8;
+			bx += Map.GetCurrentPixelTileSize().x + 30;
 			//Wyrmgus end
 			i++;
 		}
 		//Wyrmgus start
-//		by += PixelTileSize.y + 2;
-		by += PixelTileSize.y + 18;
+//		by += Map.GetCurrentPixelTileSize().y + 2;
+		by += Map.GetCurrentPixelTileSize().y + 18;
 		//Wyrmgus end
 	}
 	return false;
@@ -2252,7 +2252,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			}
 		}
 		UI.MouseWarpPos = CursorStartScreenPos;
-		UI.MouseViewport->Set(tilePos, PixelTileSize / 2);
+		UI.MouseViewport->Set(tilePos, Map.GetCurrentPixelTileSize() / 2);
 		return;
 	}
 
@@ -2271,18 +2271,18 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		// Scroll the map
 		if (CursorScreenPos.x <= UI.SelectedViewport->GetTopLeftPos().x) {
 			vpTilePos.x--;
-			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
+			UI.SelectedViewport->Set(vpTilePos, Map.GetCurrentPixelTileSize() / 2);
 		} else if (CursorScreenPos.x >= UI.SelectedViewport->GetBottomRightPos().x) {
 			vpTilePos.x++;
-			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
+			UI.SelectedViewport->Set(vpTilePos, Map.GetCurrentPixelTileSize() / 2);
 		}
 
 		if (CursorScreenPos.y <= UI.SelectedViewport->GetTopLeftPos().y) {
 			vpTilePos.y--;
-			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
+			UI.SelectedViewport->Set(vpTilePos, Map.GetCurrentPixelTileSize() / 2);
 		} else if (CursorScreenPos.y >= UI.SelectedViewport->GetBottomRightPos().y) {
 			vpTilePos.y++;
-			UI.SelectedViewport->Set(vpTilePos, PixelTileSize / 2);
+			UI.SelectedViewport->Set(vpTilePos, Map.GetCurrentPixelTileSize() / 2);
 		}
 
 		// Scroll the map, if cursor moves outside the viewport.
@@ -2311,7 +2311,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		RestrictCursorToMinimap();
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos));
+		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos, CurrentMapLayer));
 		return;
 	}
 
@@ -2381,12 +2381,12 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	if (Editor.TerrainEditable) {
 		//Wyrmgus start
 //		if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorScreenPos.x
-//			&& CursorScreenPos.x < UI.InfoPanel.X + 4 + TILE_ICON_X + PixelTileSize.x + 7
+//			&& CursorScreenPos.x < UI.InfoPanel.X + 4 + TILE_ICON_X + Map.GetCurrentPixelTileSize().x + 7
 		if (UI.InfoPanel.X + 11 + TILE_ICON_X < CursorScreenPos.x
-			&& CursorScreenPos.x < UI.InfoPanel.X + 11 + TILE_ICON_X + PixelTileSize.x + 7
+			&& CursorScreenPos.x < UI.InfoPanel.X + 11 + TILE_ICON_X + Map.GetCurrentPixelTileSize().x + 7
 		//Wyrmgus end
 			&& UI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorScreenPos.y
-			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + TILE_ICON_Y + PixelTileSize.y + 7) {
+			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + TILE_ICON_Y + Map.GetCurrentPixelTileSize().y + 7) {
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = CursorOnButton;
@@ -2396,9 +2396,9 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	int StartUnitWidth = Editor.StartUnit ?
-						 Editor.StartUnit->Icon.Icon->G->Width : PixelTileSize.x + 7;
+						 Editor.StartUnit->Icon.Icon->G->Width : Map.GetCurrentPixelTileSize().x + 7;
 	int StartUnitHeight = Editor.StartUnit ?
-						  Editor.StartUnit->Icon.Icon->G->Height : PixelTileSize.y + 7;
+						  Editor.StartUnit->Icon.Icon->G->Height : Map.GetCurrentPixelTileSize().y + 7;
 	//Wyrmgus start
 //	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorScreenPos.x
 //		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth
@@ -2543,6 +2543,7 @@ void CEditor::Init()
 		Map.Worlds.push_back(NULL);
 		Map.SurfaceLayers.push_back(0);
 		Map.LayerConnectors.resize(1);
+		Map.PixelTileSizes.push_back(PixelSize(32, 32));
 		//Wyrmgus end
 
 		const int defaultTile = Map.Tileset->getDefaultTileIndex();

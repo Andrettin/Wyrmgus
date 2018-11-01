@@ -164,6 +164,23 @@ static int CclStratagusMap(lua_State *l)
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
+				} else if (!strcmp(value, "pixel-tile-size")) {
+					Map.PixelTileSizes.clear();
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument for \"pixel-tile-size\"");
+					}
+					const int subsubargs = lua_rawlen(l, -1);
+					for (int z = 0; z < subsubargs; ++z) {
+						if (!lua_istable(l, -1)) {
+							LuaError(l, "incorrect argument for \"pixel-tile-size\"");
+						}
+						lua_rawgeti(l, -1, z + 1);
+						PixelSize pixel_tile_size(LuaToNumber(l, -1, 1), LuaToNumber(l, -1, 2));
+						Map.PixelTileSizes.push_back(pixel_tile_size);
+						lua_pop(l, 1);
+					}
+					lua_pop(l, 1);
 				} else if (!strcmp(value, "layer-references")) {
 					Map.Planes.clear();
 					Map.Worlds.clear();
@@ -313,7 +330,7 @@ static int CclCenterMap(lua_State *l)
 	LuaCheckArgs(l, 2);
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
-	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(pos));
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(pos, CurrentMapLayer));
 	return 0;
 }
 
@@ -507,10 +524,18 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 
 	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
-	if (CMap::FogGraphic) {
-		CGraphic::Free(CMap::FogGraphic);
+	
+	PixelSize pixel_tile_size(32, 32);
+	if (lua_istable(l, 2)) {
+		CclGetPos(l, &pixel_tile_size.x, &pixel_tile_size.y, 2);
 	}
-	CMap::FogGraphic = CGraphic::New(FogGraphicFile, PixelTileSize.x, PixelTileSize.y);
+	
+	if (CMap::FogGraphics.find(pixel_tile_size) != CMap::FogGraphics.end()) {
+		CGraphic::Free(CMap::FogGraphics[pixel_tile_size]);
+		CMap::FogGraphics.erase(pixel_tile_size);
+	}
+	
+	CMap::FogGraphics[pixel_tile_size] = CGraphic::New(FogGraphicFile, pixel_tile_size.x, pixel_tile_size.y);
 
 	return 0;
 }
@@ -1120,10 +1145,10 @@ static int CclDefineTileset(lua_State *l)
 	Map.Tileset->parse(l);
 
 	//  Load and prepare the tileset
-	PixelTileSize = Map.Tileset->getPixelTileSize();
+	PixelSize pixelTileSize = Map.Tileset->getPixelTileSize();
 
 	ShowLoadProgress(_("Loading Tileset \"%s\""), Map.Tileset->ImageFile.c_str());
-	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, PixelTileSize.x, PixelTileSize.y);
+	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, pixelTileSize.x, pixelTileSize.y);
 	Map.TileGraphic->Load();
 	return 0;
 }
@@ -1354,6 +1379,10 @@ static int CclDefineTerrainType(lua_State *l)
 		TerrainTypeStringToIndex[terrain_ident] = terrain->ID;
 	}
 	
+	std::string graphics_file;
+	std::string elevation_graphics_file;
+	std::string player_color_graphics_file;
+	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
@@ -1392,6 +1421,12 @@ static int CclDefineTerrainType(lua_State *l)
 			terrain->SolidAnimationFrames = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Resource")) {
 			terrain->Resource = GetResourceIdByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "PixelTileSize")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			terrain->PixelTileSize.x = LuaToNumber(l, -1, 1);
+			terrain->PixelTileSize.y = LuaToNumber(l, -1, 2);
 		} else if (!strcmp(value, "BaseTerrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1497,32 +1532,20 @@ static int CclDefineTerrainType(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "Graphics")) {
-			std::string graphics_file = LuaToString(l, -1);
+			graphics_file = LuaToString(l, -1);
 			if (!CanAccessFile(graphics_file.c_str())) {
 				LuaError(l, "File \"%s\" doesn't exist." _C_ graphics_file.c_str());
 			}
-			if (CGraphic::Get(graphics_file) == NULL) {
-				CGraphic *graphics = CGraphic::New(graphics_file, PixelTileSize.x, PixelTileSize.y);
-			}
-			terrain->Graphics = CGraphic::Get(graphics_file);
 		} else if (!strcmp(value, "ElevationGraphics")) {
-			std::string graphics_file = LuaToString(l, -1);
-			if (!CanAccessFile(graphics_file.c_str())) {
-				LuaError(l, "File \"%s\" doesn't exist." _C_ graphics_file.c_str());
+			elevation_graphics_file = LuaToString(l, -1);
+			if (!CanAccessFile(elevation_graphics_file.c_str())) {
+				LuaError(l, "File \"%s\" doesn't exist." _C_ elevation_graphics_file.c_str());
 			}
-			if (CGraphic::Get(graphics_file) == NULL) {
-				CGraphic *graphics = CGraphic::New(graphics_file, PixelTileSize.x, PixelTileSize.y);
-			}
-			terrain->ElevationGraphics = CGraphic::Get(graphics_file);
 		} else if (!strcmp(value, "PlayerColorGraphics")) {
-			std::string graphics_file = LuaToString(l, -1);
-			if (!CanAccessFile(graphics_file.c_str())) {
-				LuaError(l, "File \"%s\" doesn't exist." _C_ graphics_file.c_str());
+			player_color_graphics_file = LuaToString(l, -1);
+			if (!CanAccessFile(player_color_graphics_file.c_str())) {
+				LuaError(l, "File \"%s\" doesn't exist." _C_ player_color_graphics_file.c_str());
 			}
-			if (CPlayerColorGraphic::Get(graphics_file) == NULL) {
-				CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(graphics_file, PixelTileSize.x, PixelTileSize.y);
-			}
-			terrain->PlayerColorGraphics = CPlayerColorGraphic::Get(graphics_file);
 		} else if (!strcmp(value, "SolidTiles")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1594,6 +1617,26 @@ static int CclDefineTerrainType(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
+	}
+	
+	//save the graphics here, so that we can take the pixel tile size into account
+	if (!graphics_file.empty()) {
+		if (CGraphic::Get(graphics_file) == NULL) {
+			CGraphic *graphics = CGraphic::New(graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
+		}
+		terrain->Graphics = CGraphic::Get(graphics_file);
+	}
+	if (!elevation_graphics_file.empty()) {
+		if (CGraphic::Get(elevation_graphics_file) == NULL) {
+			CGraphic *graphics = CGraphic::New(elevation_graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
+		}
+		terrain->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
+	}
+	if (!player_color_graphics_file.empty()) {
+		if (CPlayerColorGraphic::Get(player_color_graphics_file) == NULL) {
+			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
+		}
+		terrain->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
 	}
 	
 	return 0;

@@ -65,7 +65,7 @@ struct LandMineTargetFinder {
 */
 void MissileLandMine::Action()
 {
-	const Vec2i pos = Map.MapPixelPosToTilePos(this->position);
+	const Vec2i pos = Map.MapPixelPosToTilePos(this->position, this->MapLayer);
 
 	//Wyrmgus start
 //	if (LandMineTargetFinder(this->SourceUnit, this->Type->CanHitOwner).FindOnTile(Map.Field(pos)) != NULL) {

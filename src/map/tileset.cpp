@@ -193,11 +193,6 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-/**
-** Size of a tile in pixel
-*/
-PixelSize PixelTileSize(32, 32);
-
 //Wyrmgus start
 std::vector<CTerrainType *> TerrainTypes;
 std::map<std::string, int> TerrainTypeStringToIndex;

@@ -301,7 +301,7 @@ private:
 public:
 	// FIXME: Value should be removed, walls and regeneration can be handled differently.
 	//Wyrmgus start
-//	unsigned char Value;       /// HP for walls/ Wood Regeneration
+//	unsigned char Value;       /// HP for walls / wood regeneration
 	short Value;       /// HP for walls/ Wood Regeneration
 	int Landmass;			   /// To which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
 	short Owner;			   /// To which player (if any) this tile belongs to
@@ -309,10 +309,8 @@ public:
 	//Wyrmgus end
 	CUnitCache UnitCache;      /// A unit on the map field.
 
-	CMapFieldPlayerInfo playerInfo; /// stuff related to player
+	CMapFieldPlayerInfo playerInfo;	/// stuff related to player
 };
-
-extern PixelSize PixelTileSize; /// Size of a tile in pixels
 
 //@}
 

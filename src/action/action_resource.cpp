@@ -735,7 +735,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	// Update the heading of a harvesting unit to looks straight at the resource.
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, goal->tilePos - unit.tilePos + goal->Type->GetHalfTileSize());
-	UnitHeadingFromDeltaXY(unit, Vec2i(goal->tilePos.x * PixelTileSize.x, goal->tilePos.y * PixelTileSize.y) - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) + goal->Type->GetHalfTilePixelSize() - unit.Type->GetHalfTilePixelSize());
+	UnitHeadingFromDeltaXY(unit, Vec2i(goal->tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x, goal->tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y) - Vec2i(unit.tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x, unit.tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y) + goal->Type->GetHalfTilePixelSize(goal->MapLayer) - unit.Type->GetHalfTilePixelSize(unit.MapLayer));
 	//Wyrmgus end
 
 	// If resource is still under construction, wait!

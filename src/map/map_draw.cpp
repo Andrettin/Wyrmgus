@@ -119,7 +119,7 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 {
 	const PixelDiff relPos = screenPixelPos - this->TopLeftPos + this->Offset;
-	const PixelPos mapPixelPos = relPos + Map.TilePosToMapPixelPos_TopLeft(this->MapPos);
+	const PixelPos mapPixelPos = relPos + Map.TilePosToMapPixelPos_TopLeft(this->MapPos, CurrentMapLayer);
 
 	return mapPixelPos;
 }
@@ -127,7 +127,7 @@ PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 // Convert map pixel coordinates into viewport coordinates
 PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 {
-	const PixelDiff relPos = mapPixelPos - Map.TilePosToMapPixelPos_TopLeft(this->MapPos);
+	const PixelDiff relPos = mapPixelPos - Map.TilePosToMapPixelPos_TopLeft(this->MapPos, CurrentMapLayer);
 
 	return this->TopLeftPos + relPos - this->Offset;
 }
@@ -136,7 +136,7 @@ PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 {
 	const PixelPos mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
-	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos);
+	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos, CurrentMapLayer);
 
 	return tilePos;
 }
@@ -144,7 +144,7 @@ Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 /// convert tilepos coordonates into screen (take the top left of the tile)
 PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 {
-	const PixelPos mapPos = Map.TilePosToMapPixelPos_TopLeft(tilePos);
+	const PixelPos mapPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, CurrentMapLayer);
 
 	return MapToScreenPixelPos(mapPos);
 }
@@ -154,7 +154,7 @@ PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 {
 	const PixelPos topLeft = TilePosToScreen_TopLeft(tilePos);
 
-	return topLeft + PixelTileSize / 2;
+	return topLeft + Map.GetCurrentPixelTileSize() / 2;
 }
 
 /**
@@ -173,30 +173,30 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const PixelSize pixelSize = this->GetPixelSize();
 	//Wyrmgus start
-//	x = std::min(x, Map.Info.MapWidth * PixelTileSize.x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-//	y = std::min(y, Map.Info.MapHeight * PixelTileSize.y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
-	x = std::min(x, (Map.Info.MapWidths.size() ? Map.Info.MapWidths[CurrentMapLayer] : Map.Info.MapWidth) * PixelTileSize.x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (Map.Info.MapHeights.size() ? Map.Info.MapHeights[CurrentMapLayer] : Map.Info.MapHeight) * PixelTileSize.y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+//	x = std::min(x, Map.Info.MapWidth * Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+//	y = std::min(y, Map.Info.MapHeight * Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (Map.Info.MapWidths.size() ? Map.Info.MapWidths[CurrentMapLayer] : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (Map.Info.MapHeights.size() ? Map.Info.MapHeights[CurrentMapLayer] : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 	//Wyrmgus end
 
-	this->MapPos.x = x / PixelTileSize.x;
-	if (x < 0 && x % PixelTileSize.x) {
+	this->MapPos.x = x / Map.GetCurrentPixelTileSize().x;
+	if (x < 0 && x % Map.GetCurrentPixelTileSize().x) {
 		this->MapPos.x--;
 	}
-	this->MapPos.y = y / PixelTileSize.y;
-	if (y < 0 && y % PixelTileSize.y) {
+	this->MapPos.y = y / Map.GetCurrentPixelTileSize().y;
+	if (y < 0 && y % Map.GetCurrentPixelTileSize().y) {
 		this->MapPos.y--;
 	}
-	this->Offset.x = x % PixelTileSize.x;
+	this->Offset.x = x % Map.GetCurrentPixelTileSize().x;
 	if (this->Offset.x < 0) {
-		this->Offset.x += PixelTileSize.x;
+		this->Offset.x += Map.GetCurrentPixelTileSize().x;
 	}
-	this->Offset.y = y % PixelTileSize.y;
+	this->Offset.y = y % Map.GetCurrentPixelTileSize().y;
 	if (this->Offset.y < 0) {
-		this->Offset.y += PixelTileSize.y;
+		this->Offset.y += Map.GetCurrentPixelTileSize().y;
 	}
-	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / PixelTileSize.x + 1;
-	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / PixelTileSize.y + 1;
+	this->MapWidth = (pixelSize.x + this->Offset.x - 1) / Map.GetCurrentPixelTileSize().x + 1;
+	this->MapHeight = (pixelSize.y + this->Offset.y - 1) / Map.GetCurrentPixelTileSize().y + 1;
 }
 
 /**
@@ -207,7 +207,7 @@ void CViewport::Set(const PixelPos &mapPos)
 */
 void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
 {
-	const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_TopLeft(tilePos) + offset;
+	const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, CurrentMapLayer) + offset;
 
 	this->Set(mapPixelPos);
 }
@@ -260,7 +260,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 
 	while (sy  < 0) {
 		sy++;
-		dy += PixelTileSize.y;
+		dy += Map.GetCurrentPixelTileSize().y;
 	}
 	//Wyrmgus start
 //	sy *=  Map.Info.MapWidth;
@@ -276,7 +276,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 		//Wyrmgus end
 			if (sx - sy < 0) {
 				++sx;
-				dx += PixelTileSize.x;
+				dx += Map.GetCurrentPixelTileSize().x;
 				continue;
 			}
 			//Wyrmgus start
@@ -392,13 +392,13 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			//Wyrmgus end
 			++sx;
-			dx += PixelTileSize.x;
+			dx += Map.GetCurrentPixelTileSize().x;
 		}
 		//Wyrmgus start
 //		sy += Map.Info.MapWidth;
 		sy += Map.Info.MapWidths[CurrentMapLayer];
 		//Wyrmgus end
-		dy += PixelTileSize.y;
+		dy += Map.GetCurrentPixelTileSize().y;
 	}
 }
 
@@ -598,7 +598,7 @@ void CViewport::Draw() const
 //			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
 			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
 //			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
+			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
 			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
 			std::string unit_name;
 			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {

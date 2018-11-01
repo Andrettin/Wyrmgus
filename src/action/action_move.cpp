@@ -288,8 +288,8 @@ int DoActionMove(CUnit &unit)
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
 					table[i]->MoveToXY(pos, table[i]->MapLayer);
-					table[i]->IX = -posd.x * PixelTileSize.x;
-					table[i]->IY = -posd.y * PixelTileSize.y;
+					table[i]->IX = -posd.x * Map.GetMapLayerPixelTileSize(unit.MapLayer).x;
+					table[i]->IY = -posd.y * Map.GetMapLayerPixelTileSize(unit.MapLayer).y;
 					UnitHeadingFromDeltaXY(*table[i], posd);
 				}
 			}
@@ -319,8 +319,8 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 
-		unit.IX = -posd.x * PixelTileSize.x;
-		unit.IY = -posd.y * PixelTileSize.y;
+		unit.IX = -posd.x * Map.GetMapLayerPixelTileSize(unit.MapLayer).x;
+		unit.IY = -posd.y * Map.GetMapLayerPixelTileSize(unit.MapLayer).y;
 		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
@@ -352,7 +352,7 @@ int DoActionMove(CUnit &unit)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (abs(unit.IX) > (PixelTileSize.x * 2) || abs(unit.IY) > (PixelTileSize.y * 2)) {
+	if (abs(unit.IX) > (Map.GetMapLayerPixelTileSize(unit.MapLayer).x * 2) || abs(unit.IY) > (Map.GetMapLayerPixelTileSize(unit.MapLayer).y * 2)) {
 		unit.IX = 0;
 		unit.IY = 0;
 #ifdef DEBUG

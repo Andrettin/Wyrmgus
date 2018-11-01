@@ -166,7 +166,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		if (target) {
 			*res = target->GetMapPixelPosCenter();
 		} else {
-			*res = Map.TilePosToMapPixelPos_Center(goalPos);
+			*res = Map.TilePosToMapPixelPos_Center(goalPos, caster.MapLayer);
 		}
 	}
 	res->x += location.AddX;
