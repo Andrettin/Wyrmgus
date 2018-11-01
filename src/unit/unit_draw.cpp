@@ -426,7 +426,7 @@ int GetDecorationsCount()
 */
 void LoadDecorations()
 {
-	ShowLoadProgress(_("Loading Decorations"));
+	ShowLoadProgress("%s", _("Loading Decorations"));
 		
 	std::vector<Decoration>::iterator i;
 	for (i = DecoSprite.SpriteArray.begin(); i != DecoSprite.SpriteArray.end(); ++i) {

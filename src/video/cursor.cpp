@@ -120,7 +120,7 @@ int GetCursorsCount(const std::string &race)
 void LoadCursors(const std::string civilization_name)
 //Wyrmgus end
 {
-	ShowLoadProgress(_("Loading Cursors"));
+	ShowLoadProgress("%s", _("Loading Cursors"));
 			
 	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		CCursor &cursor = **i;

@@ -377,7 +377,7 @@ int GetIconsCount()
 */
 void LoadIcons()
 {
-	ShowLoadProgress(_("Loading Icons"));
+	ShowLoadProgress("%s", _("Loading Icons"));
 		
 	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
 		CIcon &icon = *(*it).second;
