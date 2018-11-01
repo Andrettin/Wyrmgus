@@ -393,6 +393,14 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->Name.c_str());
 	
+	if (this->BaseTerrain) {
+		for (int x = map_start_pos.x; x < map_end.x; ++x) {
+			for (int y = map_start_pos.y; y < map_end.y; ++y) {
+				Map.Field(Vec2i(x, y), z)->SetTerrain(this->BaseTerrain);
+			}
+		}
+	}
+	
 	this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
 	this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
 	
