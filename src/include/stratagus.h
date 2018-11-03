@@ -275,6 +275,11 @@ enum TechLevels {
 class CTimeline;
 
 struct CDate {
+	CDate() :
+		year(0), month(0), day(0), timeline(NULL)
+	{
+	}
+	
 	int year;
 	char month;
 	char day;
@@ -341,6 +346,8 @@ struct CDate {
 	}
 	
 	bool ContainsDate(CDate date) const; /// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
+	
+	static CDate FromString(std::string date_str);
 };
 
 #include <vec2i.h>

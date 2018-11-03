@@ -1004,5 +1004,22 @@ bool CDate::ContainsDate(CDate date) const
 	
 	return false;
 }
+
+CDate CDate::FromString(std::string date_str)
+{
+	CDate date;
+	
+	std::vector<std::string> date_vector = SplitString(date_str, ".");
+	
+	if (date_vector.size() >= 1) {
+		date.year = std::stoi(date_vector[0]);
+	} else if (date_vector.size() >= 2) {
+		date.month = std::stoi(date_vector[1]);
+	} else if (date_vector.size() >= 3) {
+		date.day = std::stoi(date_vector[2]);
+	}
+	
+	return date;
+}
 //Wyrmgus end
 //@}
