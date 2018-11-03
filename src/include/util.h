@@ -40,6 +40,8 @@
 #endif
 
 #include <cstdlib>
+#include <string>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Random
@@ -116,6 +118,8 @@ extern char *strcasestr(const char *str, const char *substr);
 /// determine length of a fixed-length string
 extern size_t strnlen(const char *str, size_t strsize);
 #endif // !HAVE_STRNLEN
+
+extern std::vector<std::string> SplitString(std::string str, std::string separators, std::string comment_chars = "");
 
 /*----------------------------------------------------------------------------
 --  Getopt

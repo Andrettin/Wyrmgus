@@ -284,6 +284,35 @@ char *strcasestr(const char *a, const char *b)
 }
 #endif // !HAVE_STRCASESTR
 
+std::vector<std::string> SplitString(std::string str, std::string separators, std::string comment_chars)
+{
+	std::vector<std::string> output;
+	
+	std::string element;
+	for (size_t i = 0; i < str.length(); ++i) {
+		char c = str[i];
+		
+		if (comment_chars.find(c) != std::string::npos) {
+			break;
+		}
+		
+		if (separators.find(c) != std::string::npos) {
+			if (element.size() > 0) {
+				output.push_back(element);
+				element.clear();
+			}
+			continue;
+		}
+		
+		element += c;
+	}
+	
+	if (element.size() > 0) { //for the last element before the end of the string / before a comment char
+		output.push_back(element);
+	}
+	
+	return output;
+}
 
 /*----------------------------------------------------------------------------
 --  Getopt

@@ -43,6 +43,7 @@
 #include "actions.h"
 //Wyrmgus end
 #include "animation/animation_setplayervar.h"
+#include "config.h"
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
@@ -278,7 +279,16 @@ static int CclLoad(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	const std::string filename = LibraryFileName(LuaToString(l, 1));
-	if (LuaLoadFile(filename) == -1) {
+	std::string file_extension;
+	
+	size_t dot_pos = filename.rfind('.');
+	if (dot_pos != std::string::npos) {
+		file_extension = filename.substr(dot_pos + 1, filename.length() - 1 - dot_pos);
+	}
+	
+	if (file_extension == "cfg") {
+		CConfigData::ParseConfigData(filename);
+	} else if (LuaLoadFile(filename) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ filename.c_str());
 	}
 	return 0;
