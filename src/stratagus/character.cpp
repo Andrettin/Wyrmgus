@@ -42,6 +42,7 @@
 #include <string>
 #include <map>
 
+#include "config.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -71,6 +72,49 @@ CCharacter::~CCharacter()
 {
 	if (this->Conditions) {
 		delete Conditions;
+	}
+}
+
+void CCharacter::ProcessCharacterData(CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "gender") {
+			this->Gender = GetGenderIdByName(value);
+		} else if (key == "type") {
+			value = FindAndReplaceString(value, "_", "-");
+			int unit_type_id = UnitTypeIdByIdent(value);
+			if (unit_type_id != -1) {
+				if (this->Type == NULL || this->Type == UnitTypes[unit_type_id] || this->Type->CanExperienceUpgradeTo(UnitTypes[unit_type_id])) {
+					this->Type = UnitTypes[unit_type_id];
+					if (this->Level < this->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
+						this->Level = this->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
+					}
+				}
+			} else {
+				fprintf(stderr, "Unit type \"%s\" doesn't exist.", value.c_str());
+			}
+		} else if (key == "civilization") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Civilization = PlayerRaces.GetRaceIndexByName(value.c_str());
+		} else if (key == "hair_variation") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->HairVariation = value;
+		} else if (key == "date") {
+			this->Date = CDate::FromString(value);
+		} else if (key == "deity") {
+			value = FindAndReplaceString(value, "_", "-");
+			CDeity *deity = PlayerRaces.GetDeity(value);
+			if (deity) {
+				this->Deities.push_back(deity);
+			} else {
+				fprintf(stderr, "Deity \"%s\" doesn't exist.", value.c_str());
+			}
+		}
 	}
 }
 

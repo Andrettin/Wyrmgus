@@ -51,12 +51,14 @@ public:
 	{
 	}
 	
-	static std::vector<CConfigData *> ParseConfigData(std::string filepath);
+	static void ParseConfigData(std::string filepath);
+	static void ProcessConfigData(const std::vector<CConfigData *> &config_data_list);
 	
 	std::string Tag;
+	std::string Ident;
 	CConfigData *Parent;
 	std::vector<CConfigData *> Children;
-	std::map<std::string, std::string> Values;
+	std::vector<std::pair<std::string, std::string>> Properties;
 };
 
 /*----------------------------------------------------------------------------

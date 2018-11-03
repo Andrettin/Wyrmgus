@@ -37,6 +37,7 @@
 
 #include "config.h"
 
+#include "character.h"
 #include "util.h"
 
 #include <fstream>
@@ -49,7 +50,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-std::vector<CConfigData *> CConfigData::ParseConfigData(std::string filepath)
+void CConfigData::ParseConfigData(std::string filepath)
 {
 	std::vector<std::string> data;
 	std::vector<CConfigData *> output;
@@ -58,7 +59,7 @@ std::vector<CConfigData *> CConfigData::ParseConfigData(std::string filepath)
 	std::string line;
 	
 	while(std::getline(text_stream, line)) {
-		std::vector<std::string> line_data = SplitString(line, " ", "#");
+		std::vector<std::string> line_data = SplitString(line, " \t", "#");
 		
 		for (size_t i = 0; i < line_data.size(); ++i) {
 			data.push_back(line_data[i]);
@@ -97,7 +98,9 @@ std::vector<CConfigData *> CConfigData::ParseConfigData(std::string filepath)
 					if (key.empty()) {
 						key = key_value_strings[j];
 					} else {
-						config_data->Values[key] = key_value_strings[j];
+						std::string value = key_value_strings[j];
+						config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
+						if (key == "ident") config_data->Ident = value;
 						key.clear();
 					}
 				}
@@ -109,12 +112,35 @@ std::vector<CConfigData *> CConfigData::ParseConfigData(std::string filepath)
 		} else if (!key.empty()) { //value
 			std::string value = str;
 			value = FindAndReplaceString(value, "=", "");
-			config_data->Values[key] = value;
+			config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
+			if (key == "ident") config_data->Ident = value;
 			key.clear();
 		}
 	}
 	
-	return output;
+	ProcessConfigData(output);
+}
+
+void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_data_list)
+{
+	for (size_t i = 0; i < config_data_list.size(); ++i) {
+		CConfigData *config_data = config_data_list[i];
+		std::string ident = config_data->Ident;
+		ident = FindAndReplaceString(ident, "_", "-");
+		
+		if (config_data->Tag == "character") {
+			CCharacter *character = GetCharacter(ident);
+			bool redefinition = false;
+			if (!character) {
+				character = new CCharacter;
+				character->Ident = ident;
+				Characters[ident] = character;
+			} else {
+				fprintf(stderr, "Character \"%s\" is being redefined.\n", ident.c_str());
+			}
+			character->ProcessCharacterData(config_data);
+		}
+	}
 }
 
 //@}

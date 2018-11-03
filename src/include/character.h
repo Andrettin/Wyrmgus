@@ -51,6 +51,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CConfigData;
 class CDeity;
 class CFaction;
 class CMapTemplate;
@@ -127,6 +128,7 @@ public:
 	}
 	~CCharacter();
 	
+	void ProcessCharacterData(CConfigData *config_data);
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
 	CLanguage *GetLanguage() const;
