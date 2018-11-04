@@ -79,24 +79,18 @@ CCharacter::~CCharacter()
 
 void CCharacter::ProcessCharacterData(CConfigData *config_data)
 {
+	bool name_changed = false;
+	bool family_name_changed = false;
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
 		if (key == "name") {
 			this->Name = value;
-			
-			if (this->Type && this->Type->BoolFlag[FAUNA_INDEX].value) {
-				this->Type->PersonalNames[this->Gender].push_back(this->Name);
-			} else if (this->Civilization != -1) {
-				PlayerRaces.Civilizations[this->Civilization]->PersonalNames[this->Gender].push_back(this->Name);
-			}
+			name_changed = true;
 		} else if (key == "family_name") {
 			this->FamilyName = value;
-			
-			if (this->Civilization != -1) {
-				PlayerRaces.Civilizations[this->Civilization]->FamilyNames.push_back(this->FamilyName);
-			}
+			family_name_changed = true;
 		} else if (key == "type") {
 			value = FindAndReplaceString(value, "_", "-");
 			int unit_type_id = UnitTypeIdByIdent(value);
@@ -146,6 +140,19 @@ void CCharacter::ProcessCharacterData(CConfigData *config_data)
 			this->Icon.Icon = NULL;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
+		}
+	}
+	
+	if (this->Type != NULL && this->Type->BoolFlag[FAUNA_INDEX].value) {
+		if (name_changed) {
+			this->Type->PersonalNames[this->Gender].push_back(this->Name);
+		}
+	} else if (this->Civilization != -1) {
+		if (name_changed) {
+			PlayerRaces.Civilizations[this->Civilization]->PersonalNames[this->Gender].push_back(this->Name);
+		}
+		if (family_name_changed) {
+			PlayerRaces.Civilizations[this->Civilization]->FamilyNames.push_back(this->FamilyName);
 		}
 	}
 	
