@@ -727,7 +727,7 @@ extern CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z,
 /// Find the nearest position at which unit can be placed.
 //Wyrmgus start
 //void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading);
-void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building = false);
+void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building = false, bool ignore_construction_requirements = false);
 //Wyrmgus end
 /// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);

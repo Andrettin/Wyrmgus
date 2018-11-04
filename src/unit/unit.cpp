@@ -3654,7 +3654,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool a
 */
 //Wyrmgus start
 //void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading)
-void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building)
+void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z, bool no_bordering_building, bool ignore_construction_requirements)
 //Wyrmgus end
 {
 	int addx = 0;
@@ -3678,8 +3678,8 @@ startw:
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL) && !ignore_construction_requirements))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3691,8 +3691,8 @@ starts:
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL) && !ignore_construction_requirements))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3704,8 +3704,8 @@ starte:
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL) && !ignore_construction_requirements))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3717,8 +3717,8 @@ startn:
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL) && !ignore_construction_requirements))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
 			) {
 			//Wyrmgus end
 				goto found;
