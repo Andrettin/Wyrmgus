@@ -289,19 +289,41 @@ std::vector<std::string> SplitString(std::string str, std::string separators, st
 	std::vector<std::string> output;
 	
 	std::string element;
+	bool quotation_marks_opened = false;
 	for (size_t i = 0; i < str.length(); ++i) {
 		char c = str[i];
 		
-		if (comment_chars.find(c) != std::string::npos) {
-			break;
+		if (!quotation_marks_opened) {
+			if (comment_chars.find(c) != std::string::npos) {
+				break;
+			}
+			
+			if (separators.find(c) != std::string::npos) {
+				if (element.size() > 0) {
+					output.push_back(element);
+					element.clear();
+				}
+				continue;
+			}
+		} else {
+			if (c == '\\' && (i == 0 || str[i - 1] != '\\')) {
+				continue;
+			}
 		}
 		
-		if (separators.find(c) != std::string::npos) {
-			if (element.size() > 0) {
-				output.push_back(element);
-				element.clear();
-			}
+		if (c == '\"' && (i == 0 || str[i - 1] != '\\')) {
+			quotation_marks_opened = !quotation_marks_opened;
 			continue;
+		}
+		
+		if (i > 0 && str[i - 1] == '\\') {
+			if (c == 'n') {
+				element += '\n';
+				continue;
+			} else if (c == 't') {
+				element += '\t';
+				continue;
+			}
 		}
 		
 		element += c;

@@ -83,8 +83,8 @@ void CCharacter::ProcessCharacterData(CConfigData *config_data)
 		
 		if (key == "name") {
 			this->Name = value;
-		} else if (key == "gender") {
-			this->Gender = GetGenderIdByName(value);
+		} else if (key == "family_name") {
+			this->FamilyName = value;
 		} else if (key == "type") {
 			value = FindAndReplaceString(value, "_", "-");
 			int unit_type_id = UnitTypeIdByIdent(value);
@@ -98,6 +98,8 @@ void CCharacter::ProcessCharacterData(CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Unit type \"%s\" doesn't exist.", value.c_str());
 			}
+		} else if (key == "gender") {
+			this->Gender = GetGenderIdByName(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Civilization = PlayerRaces.GetRaceIndexByName(value.c_str());
@@ -114,6 +116,18 @@ void CCharacter::ProcessCharacterData(CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Deity \"%s\" doesn't exist.", value.c_str());
 			}
+		} else if (key == "description") {
+			this->Description = value;
+		} else if (key == "background") {
+			this->Background = value;
+		} else if (key == "quote") {
+			this->Quote = value;
+		} else if (key == "icon") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Icon.Name = value;
+			this->Icon.Icon = NULL;
+			this->Icon.Load();
+			this->Icon.Icon->Load();
 		}
 	}
 }
