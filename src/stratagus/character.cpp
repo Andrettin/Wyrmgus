@@ -143,6 +143,7 @@ void CCharacter::ProcessCharacterData(CConfigData *config_data)
 		}
 	}
 	
+	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
 	if (this->Type != NULL && this->Type->BoolFlag[FAUNA_INDEX].value) {
 		if (name_changed) {
 			this->Type->PersonalNames[this->Gender].push_back(this->Name);
