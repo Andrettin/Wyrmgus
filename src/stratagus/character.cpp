@@ -55,6 +55,8 @@
 #include "unit.h"
 #include "upgrade.h"
 
+#include "../ai/ai_local.h" //for using AiHelpers
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -83,8 +85,18 @@ void CCharacter::ProcessCharacterData(CConfigData *config_data)
 		
 		if (key == "name") {
 			this->Name = value;
+			
+			if (this->Type && this->Type->BoolFlag[FAUNA_INDEX].value) {
+				this->Type->PersonalNames[this->Gender].push_back(this->Name);
+			} else if (this->Civilization != -1) {
+				PlayerRaces.Civilizations[this->Civilization]->PersonalNames[this->Gender].push_back(this->Name);
+			}
 		} else if (key == "family_name") {
 			this->FamilyName = value;
+			
+			if (this->Civilization != -1) {
+				PlayerRaces.Civilizations[this->Civilization]->FamilyNames.push_back(this->FamilyName);
+			}
 		} else if (key == "type") {
 			value = FindAndReplaceString(value, "_", "-");
 			int unit_type_id = UnitTypeIdByIdent(value);
@@ -93,6 +105,12 @@ void CCharacter::ProcessCharacterData(CConfigData *config_data)
 					this->Type = UnitTypes[unit_type_id];
 					if (this->Level < this->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
 						this->Level = this->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
+					}
+					
+					if (this->Gender == NoGender) { //if no gender was set so far, have the character be the same gender as the unit type (if the unit type has it predefined)
+						if (this->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
+							this->Gender = this->Type->DefaultStat.Variables[GENDER_INDEX].Value;
+						}
 					}
 				}
 			} else {
@@ -130,6 +148,24 @@ void CCharacter::ProcessCharacterData(CConfigData *config_data)
 			this->Icon.Icon->Load();
 		}
 	}
+	
+	if (this->Trait == NULL) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
+		if (this->Type != NULL && this->Type->Traits.size() == 1) {
+			this->Trait = this->Type->Traits[0];
+		}
+	}
+		
+	//check if the abilities are correct for this character's unit type
+	if (this->Type != NULL && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->Type->Slot) {
+		int ability_count = (int) this->Abilities.size();
+		for (int i = (ability_count - 1); i >= 0; --i) {
+			if (std::find(AiHelpers.LearnableAbilities[this->Type->Slot].begin(), AiHelpers.LearnableAbilities[this->Type->Slot].end(), this->Abilities[i]) == AiHelpers.LearnableAbilities[this->Type->Slot].end()) {
+				this->Abilities.erase(std::remove(this->Abilities.begin(), this->Abilities.end(), this->Abilities[i]), this->Abilities.end());
+			}
+		}
+	}
+
+	this->UpdateAttributes();
 }
 
 int CCharacter::GetMartialAttribute() const
