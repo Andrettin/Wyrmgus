@@ -65,6 +65,7 @@ public:
 	}
 	
 	static CDeity *GetDeity(std::string deity_ident);
+	static CDeity *GetProfileMatch(CDeity *deity_profile);
 	static void Clean();
 	void ProcessConfigData(CConfigData *config_data);
 	

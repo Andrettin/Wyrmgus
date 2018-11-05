@@ -43,6 +43,8 @@
 #include "province.h"
 #include "religion.h"
 
+#include <algorithm>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -62,6 +64,56 @@ CDeity *CDeity::GetDeity(std::string deity_ident)
 	}
 	
 	return NULL;
+}
+
+CDeity *CDeity::GetProfileMatch(CDeity *deity_profile)
+{
+	std::vector<CDeity *> profile_matches;
+	
+	for (size_t i = 0; i < Deities.size(); ++i) {
+		CDeity *deity = Deities[i];
+		
+		bool has_civilizations = true;
+		for (size_t j = 0; j < deity_profile->Civilizations.size(); ++j) {
+			if (std::find(deity->Civilizations.begin(), deity->Civilizations.end(), deity_profile->Civilizations[j]) == deity->Civilizations.end()) {
+				has_civilizations = false;
+				break;
+			}
+		}
+		if (!has_civilizations) {
+			continue;
+		}
+		
+		bool has_religions = true;
+		for (size_t j = 0; j < deity_profile->Religions.size(); ++j) {
+			if (std::find(deity->Religions.begin(), deity->Religions.end(), deity_profile->Religions[j]) == deity->Religions.end()) {
+				has_religions = false;
+				break;
+			}
+		}
+		if (!has_religions) {
+			continue;
+		}
+		
+		bool has_domains = true;
+		for (size_t j = 0; j < deity_profile->Domains.size(); ++j) {
+			if (std::find(deity->Domains.begin(), deity->Domains.end(), deity_profile->Domains[j]) == deity->Domains.end()) {
+				has_domains = false;
+				break;
+			}
+		}
+		if (!has_domains) {
+			continue;
+		}
+		
+		profile_matches.push_back(deity);
+	}
+	
+	if (profile_matches.size() > 0) {
+		return profile_matches[SyncRand(profile_matches.size())];
+	} else {
+		return NULL;
+	}
 }
 
 void CDeity::Clean()

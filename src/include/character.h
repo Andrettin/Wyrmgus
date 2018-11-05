@@ -128,6 +128,9 @@ public:
 	}
 	~CCharacter();
 	
+	static void PrepareCharacters();		/// Prepares temporary data for characters
+	static void ResetCharacters();			/// Removes temporary data from characters
+	
 	void ProcessConfigData(CConfigData *config_data);
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;

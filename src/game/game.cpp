@@ -1865,6 +1865,8 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	// Triggers
 	//
 	InitTriggers();
+	
+	CCharacter::PrepareCharacters(); //prepare character data for play, e.g. by matching deity profiles with deities
 
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 
@@ -1956,6 +1958,7 @@ void CleanGame()
 	CleanGame_Lua();
 	CleanTriggers();
 	CleanAi();
+	CCharacter::ResetCharacters(); //resets character temporary data
 	CleanGroups();
 	CleanMissiles();
 	CleanUnits();

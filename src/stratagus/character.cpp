@@ -82,6 +82,26 @@ CCharacter::~CCharacter()
 	}
 }
 
+void CCharacter::PrepareCharacters()
+{
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+		CCharacter *character = iterator->second;
+		if (character->DeityProfile) {
+			character->Deity = CDeity::GetProfileMatch(character->DeityProfile);
+		}
+	}
+}
+
+void CCharacter::ResetCharacters()
+{
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+		CCharacter *character = iterator->second;
+		if (character->DeityProfile && character->Deity) {
+			character->Deity = NULL;
+		}
+	}
+}
+
 void CCharacter::ProcessConfigData(CConfigData *config_data)
 {
 	bool name_changed = false;
