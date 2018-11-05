@@ -102,6 +102,17 @@ void CCharacter::ResetCharacters()
 	}
 }
 
+void CCharacter::SaveCharacters(CFile &file)
+{
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+		CCharacter *character = iterator->second;
+		if (character->DeityProfile) {
+			character->Save(file);
+		}
+	}
+	file.printf("\n");
+}
+
 void CCharacter::ProcessConfigData(CConfigData *config_data)
 {
 	bool name_changed = false;
@@ -166,6 +177,8 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			this->Icon.Icon = NULL;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
+		} else {
+			fprintf(stderr, "Invalid character property: \"%s\".", key.c_str());
 		}
 	}
 	
@@ -177,6 +190,8 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			deity->Profile = true;
 			deity->ProcessConfigData(config_data);
 			this->DeityProfile = deity;
+		} else {
+			fprintf(stderr, "Invalid character property: \"%s\".", child_config_data->Tag.c_str());
 		}
 	}
 	
@@ -359,6 +374,17 @@ void CCharacter::UpdateAttributes()
 			}
 		}
 	}
+}
+
+void CCharacter::Save(CFile &file)
+{
+	file.printf("\nCharacter(\"%s\", { ", this->Ident.c_str());
+
+	if (this->DeityProfile && this->Deity) {
+		file.printf("\"deity\", \"%s\", ", this->Deity->Ident.c_str());
+	}
+
+	file.printf("})\n");
 }
 
 int GetAttributeVariableIndex(int attribute)

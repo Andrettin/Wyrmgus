@@ -54,6 +54,7 @@
 class CConfigData;
 class CDeity;
 class CFaction;
+class CFile;
 class CMapTemplate;
 class CLanguage;
 class CPersistentItem;
@@ -128,8 +129,9 @@ public:
 	}
 	~CCharacter();
 	
-	static void PrepareCharacters();		/// Prepares temporary data for characters
-	static void ResetCharacters();			/// Removes temporary data from characters
+	static void PrepareCharacters();			/// Prepares temporary data for characters
+	static void ResetCharacters();				/// Removes temporary data from characters
+	static void SaveCharacters(CFile &file);	/// Save temporary data for characters
 	
 	void ProcessConfigData(CConfigData *config_data);
 	int GetMartialAttribute() const;
@@ -145,6 +147,7 @@ public:
 	IconConfig GetIcon() const;
 	CPersistentItem *GetItem(CUnit &item) const;
 	void UpdateAttributes();
+	void Save(CFile &file);		/// Save temporary data for the character
 
 	CDate Date;					/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died

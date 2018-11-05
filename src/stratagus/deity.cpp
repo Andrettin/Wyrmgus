@@ -185,6 +185,8 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Plane \"%s\" doesn't exist.", value.c_str());
 			}
+		} else {
+			fprintf(stderr, "Invalid deity property: \"%s\".", key.c_str());
 		}
 	}
 }

@@ -1138,6 +1138,40 @@ static int CclGetGrandStrategyHeroes(lua_State *l)
 	return 1;
 }
 
+/**
+**  Parse character temporary data
+**
+**  @param l  Lua state.
+*/
+static int CclCharacter(lua_State *l)
+{
+	const std::string ident = LuaToString(l, 1);
+
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	CCharacter *character = GetCharacter(ident);
+	if (!character) {
+		return 0;
+	}
+
+	// Parse the list:
+	const int args = lua_rawlen(l, 2);
+	for (int j = 0; j < args; ++j) {
+		const char *value = LuaToString(l, 2, j + 1);
+		++j;
+
+		if (!strcmp(value, "deity")) {
+			character->Deity = CDeity::GetDeity(LuaToString(l, 2, j + 1));
+		} else {
+			fprintf(stderr, "Unit: Unsupported tag: %s\n", value);
+		}
+	}
+
+	return 0;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -1152,6 +1186,7 @@ void CharacterCclRegister()
 	lua_register(Lua, "GetCharacters", CclGetCharacters);
 	lua_register(Lua, "GetCustomHeroes", CclGetCustomHeroes);
 	lua_register(Lua, "GetGrandStrategyHeroes", CclGetGrandStrategyHeroes);
+	lua_register(Lua, "Character", CclCharacter);
 }
 
 //@}
