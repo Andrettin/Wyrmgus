@@ -336,6 +336,11 @@ std::vector<std::string> SplitString(std::string str, std::string separators, st
 	return output;
 }
 
+bool StringToBool(std::string str)
+{
+	return str == "true" || str == "1";
+}
+
 /*----------------------------------------------------------------------------
 --  Getopt
 ----------------------------------------------------------------------------*/

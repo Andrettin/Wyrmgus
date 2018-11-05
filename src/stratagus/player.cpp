@@ -46,6 +46,8 @@
 //Wyrmgus start
 #include "../ai/ai_local.h" //for using AiHelpers
 #include "commands.h" //for faction setting
+#include "deity.h"
+#include "deity_domain.h"
 #include "depend.h"
 #include "editor.h"
 #include "font.h"
@@ -63,6 +65,7 @@
 //Wyrmgus start
 #include "parameters.h"
 #include "quest.h"
+#include "religion.h"
 #include "settings.h"
 //Wyrmgus end
 #include "sound.h"
@@ -394,18 +397,6 @@ void PlayerRace::Clean()
 			this->Languages[i]->NameTranslations.clear();
 		}
 	}
-	for (size_t i = 0; i < this->Religions.size(); ++i) {
-		delete this->Religions[i];
-	}
-	this->Religions.clear();
-	for (size_t i = 0; i < this->DeityDomains.size(); ++i) {
-		delete this->DeityDomains[i];
-	}
-	this->DeityDomains.clear();
-	for (size_t i = 0; i < this->Deities.size(); ++i) {
-		delete this->Deities[i];
-	}
-	this->Deities.clear();
 	//Wyrmgus end
 	for (unsigned int i = 0; i != this->Count; ++i) {
 		this->Name[i].clear();
@@ -503,56 +494,6 @@ CDynasty *PlayerRace::GetDynasty(const std::string dynasty_ident) const
 	} else {
 		return NULL;
 	}
-}
-
-int PlayerRace::GetReligionIndexByIdent(std::string religion_ident) const
-{
-	for (size_t i = 0; i < this->Religions.size(); ++i) {
-		if (religion_ident == this->Religions[i]->Ident) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-int PlayerRace::GetDeityDomainIndexByIdent(std::string deity_domain_ident) const
-{
-	for (size_t i = 0; i < this->DeityDomains.size(); ++i) {
-		if (deity_domain_ident == this->DeityDomains[i]->Ident) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-CDeityDomain *PlayerRace::GetDeityDomain(std::string deity_domain_ident) const
-{
-	for (size_t i = 0; i < this->DeityDomains.size(); ++i) {
-		if (deity_domain_ident == this->DeityDomains[i]->Ident) {
-			return this->DeityDomains[i];
-		}
-	}
-	return NULL;
-}
-
-int PlayerRace::GetDeityIndexByIdent(std::string deity_ident) const
-{
-	for (size_t i = 0; i < this->Deities.size(); ++i) {
-		if (deity_ident == this->Deities[i]->Ident) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-CDeity *PlayerRace::GetDeity(std::string deity_ident) const
-{
-	for (size_t i = 0; i < this->Deities.size(); ++i) {
-		if (deity_ident == this->Deities[i]->Ident) {
-			return this->Deities[i];
-		}
-	}
-	return NULL;
 }
 
 CLanguage *PlayerRace::GetLanguage(std::string language_ident) const

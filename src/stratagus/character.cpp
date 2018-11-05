@@ -43,6 +43,7 @@
 #include <map>
 
 #include "config.h"
+#include "deity.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -75,12 +76,17 @@ CCharacter::~CCharacter()
 	if (this->Conditions) {
 		delete Conditions;
 	}
+	
+	if (this->DeityProfile) {
+		delete DeityProfile;
+	}
 }
 
-void CCharacter::ProcessCharacterData(CConfigData *config_data)
+void CCharacter::ProcessConfigData(CConfigData *config_data)
 {
 	bool name_changed = false;
 	bool family_name_changed = false;
+	
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
@@ -122,7 +128,7 @@ void CCharacter::ProcessCharacterData(CConfigData *config_data)
 			this->Date = CDate::FromString(value);
 		} else if (key == "deity") {
 			value = FindAndReplaceString(value, "_", "-");
-			CDeity *deity = PlayerRaces.GetDeity(value);
+			CDeity *deity = CDeity::GetDeity(value);
 			if (deity) {
 				this->Deities.push_back(deity);
 			} else {
@@ -140,6 +146,17 @@ void CCharacter::ProcessCharacterData(CConfigData *config_data)
 			this->Icon.Icon = NULL;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
+		}
+	}
+	
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		CConfigData *child_config_data = config_data->Children[i];
+		
+		if (child_config_data->Tag == "deity_profile") {
+			CDeity *deity = new CDeity;
+			deity->Profile = true;
+			deity->ProcessConfigData(config_data);
+			this->DeityProfile = deity;
 		}
 	}
 	

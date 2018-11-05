@@ -37,6 +37,7 @@
 
 #include "character.h"
 
+#include "deity.h"
 #include "grand_strategy.h"
 #include "player.h"
 #include "province.h"
@@ -248,9 +249,8 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "ExperiencePercent")) {
 			character->ExperiencePercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Deity")) {
-			int deity_id = PlayerRaces.GetDeityIndexByIdent(LuaToString(l, -1));
-			if (deity_id != -1) {
-				CDeity *deity = PlayerRaces.Deities[deity_id];
+			CDeity *deity = CDeity::GetDeity(LuaToString(l, -1));
+			if (deity) {
 				character->Deity = deity;
 				if (character->Icon.Name.empty() && !deity->Icon.Name.empty()) {
 					character->Icon.Name = deity->Icon.Name;
@@ -279,7 +279,7 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string deity_ident = LuaToString(l, -1, j + 1);
-				CDeity *deity = PlayerRaces.GetDeity(deity_ident);
+				CDeity *deity = CDeity::GetDeity(deity_ident);
 				if (deity) {
 					character->Deities.push_back(deity);
 				} else {
@@ -698,7 +698,7 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string deity_ident = LuaToString(l, -1, j + 1);
-				CDeity *deity = PlayerRaces.GetDeity(deity_ident);
+				CDeity *deity = CDeity::GetDeity(deity_ident);
 				if (deity) {
 					hero->Deities.push_back(deity);
 				} else {

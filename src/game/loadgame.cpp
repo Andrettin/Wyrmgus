@@ -42,6 +42,8 @@
 //Wyrmgus end
 #include "commands.h"
 #include "construct.h"
+#include "deity.h"
+#include "deity_domain.h"
 #include "depend.h"
 #include "font.h"
 //Wyrmgus start
@@ -56,6 +58,7 @@
 //Wyrmgus start
 #include "quest.h"
 //Wyrmgus end
+#include "religion.h"
 #include "replay.h"
 #include "script.h"
 #include "sound.h"
@@ -106,14 +109,17 @@ void CleanModules()
 	//Wyrmgus end
 	CleanConstructions();
 	CleanDecorations();
+	CDeity::Clean();
 	//Wyrmgus start
 	CleanDialogues();
+	CDeityDomain::Clean();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
 	CleanMissiles();
 	//Wyrmgus start
 	CleanQuests();
 	CleanTexts();
+	CReligion::Clean();
 	CleanUniqueItems();
 	//Wyrmgus end
 	CleanUnits();

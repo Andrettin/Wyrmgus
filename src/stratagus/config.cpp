@@ -138,7 +138,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			} else {
 				fprintf(stderr, "Character \"%s\" is being redefined.\n", ident.c_str());
 			}
-			character->ProcessCharacterData(config_data);
+			character->ProcessConfigData(config_data);
 		}
 	}
 }

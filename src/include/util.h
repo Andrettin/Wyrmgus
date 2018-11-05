@@ -120,6 +120,7 @@ extern size_t strnlen(const char *str, size_t strsize);
 #endif // !HAVE_STRNLEN
 
 extern std::vector<std::string> SplitString(std::string str, std::string separators, std::string comment_chars = "");
+extern bool StringToBool(std::string str);
 
 /*----------------------------------------------------------------------------
 --  Getopt

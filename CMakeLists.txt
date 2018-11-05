@@ -301,6 +301,8 @@ set(stratagusmain_SRCS
 	src/stratagus/config.cpp
 	src/stratagus/construct.cpp
 	#Wyrmgus start
+	src/stratagus/deity.cpp
+	src/stratagus/deity_domain.cpp
 	src/stratagus/grand_strategy.cpp
 	#Wyrmgus end
 	src/stratagus/groups.cpp
@@ -316,6 +318,7 @@ set(stratagusmain_SRCS
 	#Wyrmgus start
 	src/stratagus/province.cpp
 	src/stratagus/quest.cpp
+	src/stratagus/religion.cpp
 	#Wyrmgus end
 	src/stratagus/script.cpp
 	src/stratagus/script_player.cpp
@@ -594,6 +597,8 @@ set(stratagus_generic_HDRS
 	src/include/config.h
 	src/include/construct.h
 	src/include/cursor.h
+	src/include/deity.h
+	src/include/deity_domain.h
 	src/include/depend.h
 	src/include/editor.h
 	src/include/font.h
@@ -629,6 +634,7 @@ set(stratagus_generic_HDRS
 	#Wyrmgus start
 	src/include/province.h
 	src/include/quest.h
+	src/include/religion.h
 	#Wyrmgus end
 	src/include/replay.h
 	src/include/results.h

@@ -38,6 +38,7 @@
 
 #include "depend.h"
 
+#include "deity.h"
 #include "interface.h"
 #include "player.h"
 #include "script.h"

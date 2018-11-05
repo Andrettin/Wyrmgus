@@ -111,7 +111,7 @@ public:
 	CCharacter() :
 		Civilization(-1), Faction(NULL), Gender(0), Level(0), ExperiencePercent(0),
 		ViolentDeath(false), Custom(false),
-		Type(NULL), Trait(NULL), Deity(NULL),
+		Type(NULL), Trait(NULL), Deity(NULL), DeityProfile(NULL),
 		Father(NULL), Mother(NULL),
 		Conditions(NULL)
 	{
@@ -128,7 +128,7 @@ public:
 	}
 	~CCharacter();
 	
-	void ProcessCharacterData(CConfigData *config_data);
+	void ProcessConfigData(CConfigData *config_data);
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
 	CLanguage *GetLanguage() const;
@@ -165,6 +165,7 @@ public:
 	CUnitType *Type;
 	CUpgrade *Trait;
 	CDeity *Deity;						/// The deity which the character is (if it is a deity)
+	CDeity *DeityProfile;
 	CCharacter *Father;					/// Character's father
 	CCharacter *Mother;					/// Character's mother
 	LuaCallback *Conditions;

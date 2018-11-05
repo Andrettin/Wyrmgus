@@ -44,6 +44,8 @@
 //Wyrmgus end
 #include "commands.h"
 //Wyrmgus start
+#include "deity.h"
+#include "deity_domain.h"
 #include "editor.h"
 #include "font.h"
 #include "grand_strategy.h"
@@ -54,6 +56,7 @@
 //Wyrmgus start
 #include "province.h"
 #include "quest.h"
+#include "religion.h"
 //Wyrmgus end
 #include "script.h"
 #include "unittype.h"
@@ -2413,13 +2416,10 @@ static int CclDefineReligion(lua_State *l)
 	}
 
 	std::string religion_ident = LuaToString(l, 1);
-	CReligion *religion = NULL;
-	int religion_id = PlayerRaces.GetReligionIndexByIdent(religion_ident);
-	if (religion_id != -1) {
-		religion = PlayerRaces.Religions[religion_id];
-	} else {
+	CReligion *religion = CReligion::GetReligion(religion_ident);
+	if (!religion) {
 		religion = new CReligion;
-		PlayerRaces.Religions.push_back(religion);
+		CReligion::Religions.push_back(religion);
 	}
 	
 	religion->Ident = religion_ident;
@@ -2444,12 +2444,12 @@ static int CclDefineReligion(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int domain_id = PlayerRaces.GetDeityDomainIndexByIdent(LuaToString(l, -1, j + 1));
-				if (domain_id == -1) {
-					LuaError(l, "Domain doesn't exist.");
+				CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(LuaToString(l, -1, j + 1));
+				if (!deity_domain) {
+					LuaError(l, "Deity domain doesn't exist.");
 				}
 
-				religion->Domains.push_back(PlayerRaces.DeityDomains[domain_id]);
+				religion->Domains.push_back(deity_domain);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2472,13 +2472,10 @@ static int CclDefineDeityDomain(lua_State *l)
 	}
 
 	std::string deity_domain_ident = LuaToString(l, 1);
-	CDeityDomain *deity_domain = NULL;
-	int deity_domain_id = PlayerRaces.GetDeityDomainIndexByIdent(deity_domain_ident);
-	if (deity_domain_id != -1) {
-		deity_domain = PlayerRaces.DeityDomains[deity_domain_id];
-	} else {
+	CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(deity_domain_ident);
+	if (!deity_domain) {
 		deity_domain = new CDeityDomain;
-		PlayerRaces.DeityDomains.push_back(deity_domain);
+		CDeityDomain::DeityDomains.push_back(deity_domain);
 	}
 	
 	deity_domain->Ident = deity_domain_ident;
@@ -2524,13 +2521,10 @@ static int CclDefineDeity(lua_State *l)
 	}
 
 	std::string deity_ident = LuaToString(l, 1);
-	CDeity *deity = NULL;
-	int deity_id = PlayerRaces.GetDeityIndexByIdent(deity_ident);
-	if (deity_id != -1) {
-		deity = PlayerRaces.Deities[deity_id];
-	} else {
+	CDeity *deity = CDeity::GetDeity(deity_ident);
+	if (!deity) {
 		deity = new CDeity;
-		PlayerRaces.Deities.push_back(deity);
+		CDeity::Deities.push_back(deity);
 	}
 	
 	deity->Ident = deity_ident;
@@ -2597,12 +2591,12 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int religion_id = PlayerRaces.GetReligionIndexByIdent(LuaToString(l, -1, j + 1));
-				if (religion_id == -1) {
+				CReligion *religion = CReligion::GetReligion(LuaToString(l, -1, j + 1));
+				if (!religion) {
 					LuaError(l, "Religion doesn't exist.");
 				}
 
-				deity->Religions.push_back(PlayerRaces.Religions[religion_id]);
+				deity->Religions.push_back(religion);
 			}
 		} else if (!strcmp(value, "Domains")) {
 			if (!lua_istable(l, -1)) {
@@ -2610,12 +2604,12 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int domain_id = PlayerRaces.GetDeityDomainIndexByIdent(LuaToString(l, -1, j + 1));
-				if (domain_id == -1) {
+				CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(LuaToString(l, -1, j + 1));
+				if (!deity_domain) {
 					LuaError(l, "Domain doesn't exist.");
 				}
 
-				deity->Domains.push_back(PlayerRaces.DeityDomains[domain_id]);
+				deity->Domains.push_back(deity_domain);
 			}
 		} else if (!strcmp(value, "HolyOrders")) {
 			if (!lua_istable(l, -1)) {
@@ -3861,10 +3855,10 @@ static int CclGetLanguageWordData(lua_State *l)
 
 static int CclGetReligions(lua_State *l)
 {
-	lua_createtable(l, PlayerRaces.Religions.size(), 0);
-	for (size_t i = 1; i <= PlayerRaces.Religions.size(); ++i)
+	lua_createtable(l, CReligion::Religions.size(), 0);
+	for (size_t i = 1; i <= CReligion::Religions.size(); ++i)
 	{
-		lua_pushstring(l, PlayerRaces.Religions[i-1]->Ident.c_str());
+		lua_pushstring(l, CReligion::Religions[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3872,10 +3866,10 @@ static int CclGetReligions(lua_State *l)
 
 static int CclGetDeityDomains(lua_State *l)
 {
-	lua_createtable(l, PlayerRaces.DeityDomains.size(), 0);
-	for (size_t i = 1; i <= PlayerRaces.DeityDomains.size(); ++i)
+	lua_createtable(l, CDeityDomain::DeityDomains.size(), 0);
+	for (size_t i = 1; i <= CDeityDomain::DeityDomains.size(); ++i)
 	{
-		lua_pushstring(l, PlayerRaces.DeityDomains[i-1]->Ident.c_str());
+		lua_pushstring(l, CDeityDomain::DeityDomains[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3883,10 +3877,10 @@ static int CclGetDeityDomains(lua_State *l)
 
 static int CclGetDeities(lua_State *l)
 {
-	lua_createtable(l, PlayerRaces.Deities.size(), 0);
-	for (size_t i = 1; i <= PlayerRaces.Deities.size(); ++i)
+	lua_createtable(l, CDeity::Deities.size(), 0);
+	for (size_t i = 1; i <= CDeity::Deities.size(); ++i)
 	{
-		lua_pushstring(l, PlayerRaces.Deities[i-1]->Ident.c_str());
+		lua_pushstring(l, CDeity::Deities[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3903,11 +3897,10 @@ static int CclGetReligionData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string religion_ident = LuaToString(l, 1);
-	int religion_id = PlayerRaces.GetReligionIndexByIdent(religion_ident);
-	if (religion_id == -1) {
+	const CReligion *religion = CReligion::GetReligion(religion_ident);
+	if (!religion) {
 		LuaError(l, "Religion \"%s\" doesn't exist." _C_ religion_ident.c_str());
 	}
-	const CReligion *religion = PlayerRaces.Religions[religion_id];
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -3943,11 +3936,10 @@ static int CclGetDeityDomainData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string deity_domain_ident = LuaToString(l, 1);
-	int deity_domain_id = PlayerRaces.GetDeityDomainIndexByIdent(deity_domain_ident);
-	if (deity_domain_id == -1) {
+	const CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(deity_domain_ident);
+	if (!deity_domain) {
 		LuaError(l, "Deity domain \"%s\" doesn't exist." _C_ deity_domain_ident.c_str());
 	}
-	const CDeityDomain *deity_domain = PlayerRaces.DeityDomains[deity_domain_id];
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
@@ -3979,11 +3971,10 @@ static int CclGetDeityData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string deity_ident = LuaToString(l, 1);
-	int deity_id = PlayerRaces.GetDeityIndexByIdent(deity_ident);
-	if (deity_id == -1) {
+	const CDeity *deity = CDeity::GetDeity(deity_ident);
+	if (!deity) {
 		LuaError(l, "Deity \"%s\" doesn't exist." _C_ deity_ident.c_str());
 	}
-	const CDeity *deity = PlayerRaces.Deities[deity_id];
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {

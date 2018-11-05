@@ -54,6 +54,7 @@
 //Wyrmgus end
 #include "commands.h"
 #include "construct.h"
+#include "deity.h"
 //Wyrmgus start
 #include "depend.h"	//for using dependency checks
 //Wyrmgus end

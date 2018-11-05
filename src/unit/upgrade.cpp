@@ -51,6 +51,8 @@
 #include "../ai/ai_local.h"
 //Wyrmgus end
 #include "commands.h"
+#include "deity.h"
+#include "deity_domain.h"
 #include "depend.h"
 //Wyrmgus start
 #include "editor.h"
@@ -2221,7 +2223,7 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 
 	//Wyrmgus start
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
+		CDeity *upgrade_deity = CDeity::GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
 		if (upgrade_deity) {
 			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
 				CUpgrade *domain_upgrade = CUpgrade::Get("upgrade-deity-domain-" + upgrade_deity->Domains[i]->Ident);
@@ -2277,7 +2279,7 @@ void UpgradeLost(CPlayer &player, int id)
 	//Wyrmgus start
 	CUpgrade *upgrade = AllUpgrades[id];
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
+		CDeity *upgrade_deity = CDeity::GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
 		if (upgrade_deity) {
 			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
 				CUpgrade *domain_upgrade = CUpgrade::Get("upgrade-deity-domain-" + upgrade_deity->Domains[i]->Ident);
@@ -2428,7 +2430,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	unit.SetIndividualUpgrade(upgrade, unit.GetIndividualUpgrade(upgrade) + 1);
 	
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
+		CDeity *upgrade_deity = CDeity::GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
 		if (upgrade_deity) {
 			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
 				CUpgrade *domain_upgrade = CUpgrade::Get("upgrade-deity-domain-" + upgrade_deity->Domains[i]->Ident);
@@ -2491,7 +2493,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 	unit.SetIndividualUpgrade(upgrade, unit.GetIndividualUpgrade(upgrade) - 1);
 
 	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
-		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
+		CDeity *upgrade_deity = CDeity::GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
 		if (upgrade_deity) {
 			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
 				CUpgrade *domain_upgrade = CUpgrade::Get("upgrade-deity-domain-" + upgrade_deity->Domains[i]->Ident);

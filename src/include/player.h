@@ -81,6 +81,8 @@ class CUnit;
 class CUnitType;
 //Wyrmgus start
 class CCharacter;
+class CDeity;
+class CDeityDomain;
 class CLanguage;
 class CProvince;
 class CPlane;
@@ -742,66 +744,6 @@ public:
 	std::vector<CFaction *> Factions;									/// to which factions is this dynasty available
 };
 
-class CDeityDomain
-{
-public:
-	CDeityDomain() :
-		Ident("")
-	{
-	}
-	
-	std::string Ident;			/// Ident of the domain
-	std::string Name;			/// Name of the domain
-	std::vector<CUpgrade *> Abilities;	/// Abilities linked to this domain
-};
-
-class CReligion
-{
-public:
-	CReligion() :
-		CulturalDeities(false)
-	{
-	}
-	
-	std::string Ident;			/// Ident of the religion
-	std::string Name;			/// Name of the religion
-	std::string Description;
-	std::string Background;
-	std::string Quote;
-	bool CulturalDeities;		/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
-	std::vector<CDeityDomain *> Domains;
-};
-
-class CDeity
-{
-public:
-	CDeity() :
-		Gender(0), Major(false), HomePlane(NULL), DeityUpgrade(NULL), CharacterUpgrade(NULL)
-	{
-	}
-	
-	int Gender;					/// Deity's gender
-	bool Major;					/// Whether the deity is a major one or not
-	std::string Ident;			/// Ident of the deity
-	std::string Name;			/// Name of the deity
-	std::string UpgradeIdent;	/// Ident of the upgrade applied by the deity
-	std::string Pantheon;		/// Pantheon to which the deity belongs
-	std::string Description;
-	std::string Background;
-	std::string Quote;
-	CPlane *HomePlane;			/// The home plane of the deity
-	CUpgrade *DeityUpgrade;		/// The deity's upgrade applied to a player that worships it
-	CUpgrade *CharacterUpgrade;	/// The deity's upgrade applied to its character as an individual upgrade
-	IconConfig Icon;			/// Deity's icon
-	std::vector<int> Civilizations;	/// Civilizations which may worship the deity
-	std::vector<CReligion *> Religions;	/// Religions for which this deity is available
-	std::vector<std::string> Feasts;
-	std::vector<CDeityDomain *> Domains;
-	std::vector<CFaction *> HolyOrders;	/// Holy orders of this deity
-	std::vector<CUpgrade *> Abilities;	/// Abilities linked to this deity
-	std::map<int, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
-};
-
 class LanguageWord
 {
 public:
@@ -905,11 +847,6 @@ public:
 	int GetFactionIndexByName(const std::string faction_name) const;
 	CFaction *GetFaction(const std::string faction_name) const;
 	CDynasty *GetDynasty(const std::string dynasty_name) const;
-	int GetReligionIndexByIdent(std::string religion_ident) const;
-	int GetDeityDomainIndexByIdent(std::string deity_domain_ident) const;
-	CDeityDomain *GetDeityDomain(std::string deity_domain_ident) const;
-	int GetDeityIndexByIdent(std::string deity_ident) const;
-	CDeity *GetDeity(std::string deity_ident) const;
 	CLanguage *GetLanguage(std::string language_ident) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
@@ -940,9 +877,6 @@ public:
 	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	std::vector<CDynasty *> Dynasties;    								/// dynasties
-	std::vector<CReligion *> Religions;									/// religions
-	std::vector<CDeityDomain *> DeityDomains;							/// deity domains
-	std::vector<CDeity *> Deities;										/// deities
 	//Wyrmgus end
 	unsigned int Count;             /// number of races
 };
