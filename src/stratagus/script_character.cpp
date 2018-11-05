@@ -1163,9 +1163,14 @@ static int CclCharacter(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "deity")) {
-			character->Deity = CDeity::GetDeity(LuaToString(l, 2, j + 1));
+			CDeity *deity = CDeity::GetDeity(LuaToString(l, 2, j + 1));
+			if (deity) {
+				character->Deities.push_back(deity);
+			} else {
+				fprintf(stderr, "Deity does not exist.\n");
+			}
 		} else {
-			fprintf(stderr, "Unit: Unsupported tag: %s\n", value);
+			fprintf(stderr, "Character: Unsupported tag: %s\n", value);
 		}
 	}
 

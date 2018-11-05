@@ -112,7 +112,7 @@ public:
 	CCharacter() :
 		Civilization(-1), Faction(NULL), Gender(0), Level(0), ExperiencePercent(0),
 		ViolentDeath(false), Custom(false),
-		Type(NULL), Trait(NULL), Deity(NULL), DeityProfile(NULL),
+		Type(NULL), Trait(NULL), Deity(NULL),
 		Father(NULL), Mother(NULL),
 		Conditions(NULL)
 	{
@@ -171,7 +171,6 @@ public:
 	CUnitType *Type;
 	CUpgrade *Trait;
 	CDeity *Deity;						/// The deity which the character is (if it is a deity)
-	CDeity *DeityProfile;
 	CCharacter *Father;					/// Character's father
 	CCharacter *Mother;					/// Character's mother
 	LuaCallback *Conditions;
@@ -179,6 +178,7 @@ public:
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
+	std::vector<CDeity *> DeityProfiles;
 	std::vector<CUpgrade *> Abilities;
 	std::vector<CUpgrade *> ReadWorks;
 	std::vector<CUpgrade *> ConsumedElixirs;

@@ -77,8 +77,8 @@ CCharacter::~CCharacter()
 		delete Conditions;
 	}
 	
-	if (this->DeityProfile) {
-		delete DeityProfile;
+	for (size_t i = 0; i < this->DeityProfiles.size(); ++i) {
+		delete this->DeityProfiles[i];
 	}
 }
 
@@ -86,8 +86,9 @@ void CCharacter::PrepareCharacters()
 {
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		CCharacter *character = iterator->second;
-		if (character->DeityProfile) {
-			character->Deity = CDeity::GetProfileMatch(character->DeityProfile);
+		
+		for (size_t i = 0; i < character->DeityProfiles.size(); ++i) {
+			character->Deities.push_back(CDeity::GetProfileMatch(character->DeityProfiles[i]));
 		}
 	}
 }
@@ -96,8 +97,8 @@ void CCharacter::ResetCharacters()
 {
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		CCharacter *character = iterator->second;
-		if (character->DeityProfile && character->Deity) {
-			character->Deity = NULL;
+		if (!character->DeityProfiles.empty() && !character->Deities.empty()) {
+			character->Deities.clear();
 		}
 	}
 }
@@ -106,7 +107,7 @@ void CCharacter::SaveCharacters(CFile &file)
 {
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		CCharacter *character = iterator->second;
-		if (character->DeityProfile) {
+		if (!character->DeityProfiles.empty()) {
 			character->Save(file);
 		}
 	}
@@ -188,8 +189,8 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		if (child_config_data->Tag == "deity_profile") {
 			CDeity *deity = new CDeity;
 			deity->Profile = true;
-			deity->ProcessConfigData(config_data);
-			this->DeityProfile = deity;
+			deity->ProcessConfigData(child_config_data);
+			this->DeityProfiles.push_back(deity);
 		} else {
 			fprintf(stderr, "Invalid character property: \"%s\".", child_config_data->Tag.c_str());
 		}
@@ -380,8 +381,10 @@ void CCharacter::Save(CFile &file)
 {
 	file.printf("\nCharacter(\"%s\", { ", this->Ident.c_str());
 
-	if (this->DeityProfile && this->Deity) {
-		file.printf("\"deity\", \"%s\", ", this->Deity->Ident.c_str());
+	if (!this->DeityProfiles.empty() && !this->Deities.empty()) {
+		for (size_t i = 0; i < this->Deities.size(); ++i) {
+			file.printf("\"deity\", \"%s\", ", this->Deities[i]->Ident.c_str());
+		}
 	}
 
 	file.printf("})\n");
