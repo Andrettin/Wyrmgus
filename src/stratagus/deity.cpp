@@ -146,6 +146,7 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 			int civilization = PlayerRaces.GetRaceIndexByName(value.c_str());
 			if (civilization != -1) {
 				this->Civilizations.push_back(civilization);
+				PlayerRaces.Civilizations[civilization]->Deities.push_back(this);
 			} else {
 				fprintf(stderr, "Civilization \"%s\" doesn't exist.", value.c_str());
 			}

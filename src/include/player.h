@@ -650,6 +650,7 @@ public:
 	std::vector<std::string> FamilyNames;		/// Family names for the civilization
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 	std::vector<std::string> ShipNames;			/// Ship names for the civilization
+	std::vector<CDeity *> Deities;
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 };

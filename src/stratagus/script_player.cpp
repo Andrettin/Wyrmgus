@@ -2584,6 +2584,7 @@ static int CclDefineDeity(lua_State *l)
 				}
 
 				deity->Civilizations.push_back(civilization);
+				PlayerRaces.Civilizations[civilization]->Deities.push_back(deity);
 			}
 		} else if (!strcmp(value, "Religions")) {
 			if (!lua_istable(l, -1)) {
