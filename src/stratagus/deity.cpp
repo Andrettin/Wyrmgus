@@ -73,6 +73,10 @@ CDeity *CDeity::GetProfileMatch(CDeity *deity_profile)
 	for (size_t i = 0; i < Deities.size(); ++i) {
 		CDeity *deity = Deities[i];
 		
+		if (deity->Major != deity_profile->Major) {
+			continue;
+		}
+		
 		bool has_civilizations = true;
 		for (size_t j = 0; j < deity_profile->Civilizations.size(); ++j) {
 			if (std::find(deity->Civilizations.begin(), deity->Civilizations.end(), deity_profile->Civilizations[j]) == deity->Civilizations.end()) {

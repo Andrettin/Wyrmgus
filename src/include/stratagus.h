@@ -174,7 +174,9 @@ extern const char NameLine[];
 
 #define AuraRange 6					/// Range of auras
 #define PlayerHeroMax 4				/// Maximum heroes per player
-#define PlayerMinorDeityMax 3		/// Maximum minor deities per player
+#define PlayerMajorDeityMax 1		/// Maximum major deities per player/character
+#define PlayerMinorDeityMax 3		/// Maximum minor deities per player/character
+#define PlayerDeityMax (PlayerMajorDeityMax + PlayerMinorDeityMax)
 
 #define PopulationPerUnit 1000		/// Number of people a unit represents
 
