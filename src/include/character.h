@@ -178,7 +178,6 @@ public:
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
-	std::vector<CDeity *> DeityProfiles;
 	std::vector<CUpgrade *> Abilities;
 	std::vector<CUpgrade *> ReadWorks;
 	std::vector<CUpgrade *> ConsumedElixirs;

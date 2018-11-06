@@ -76,10 +76,6 @@ CCharacter::~CCharacter()
 	if (this->Conditions) {
 		delete Conditions;
 	}
-	
-	for (size_t i = 0; i < this->DeityProfiles.size(); ++i) {
-		delete this->DeityProfiles[i];
-	}
 }
 
 void CCharacter::PrepareCharacters()
@@ -87,9 +83,9 @@ void CCharacter::PrepareCharacters()
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		CCharacter *character = iterator->second;
 		
-		for (size_t i = 0; i < character->DeityProfiles.size(); ++i) {
-			character->Deities.push_back(CDeity::GetProfileMatch(character->DeityProfiles[i]));
-		}
+//		for (size_t i = 0; i < character->DeityProfiles.size(); ++i) {
+//			character->Deities.push_back(CDeity::GetProfileMatch(character->DeityProfiles[i]));
+//		}
 	}
 }
 
@@ -97,9 +93,10 @@ void CCharacter::ResetCharacters()
 {
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		CCharacter *character = iterator->second;
-		if (!character->DeityProfiles.empty() && !character->Deities.empty()) {
-			character->Deities.clear();
-		}
+		
+//		if (!character->DeityProfiles.empty() && !character->Deities.empty()) {
+//			character->Deities.clear();
+//		}
 	}
 }
 
@@ -107,9 +104,9 @@ void CCharacter::SaveCharacters(CFile &file)
 {
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		CCharacter *character = iterator->second;
-		if (!character->DeityProfiles.empty()) {
-			character->Save(file);
-		}
+//		if (!character->DeityProfiles.empty()) {
+//			character->Save(file);
+//		}
 	}
 	file.printf("\n");
 }
@@ -183,18 +180,23 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		}
 	}
 	
+	/*
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
 		CConfigData *child_config_data = config_data->Children[i];
 		
 		if (child_config_data->Tag == "deity_profile") {
 			CDeity *deity = new CDeity;
 			deity->Profile = true;
+			if (this->Civilization != -1) {
+				deity->Civilizations.push_back(this->Civilization);
+			}
 			deity->ProcessConfigData(child_config_data);
 			this->DeityProfiles.push_back(deity);
 		} else {
 			fprintf(stderr, "Invalid character property: \"%s\".", child_config_data->Tag.c_str());
 		}
 	}
+	*/
 	
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
 	if (this->Type != NULL && this->Type->BoolFlag[FAUNA_INDEX].value) {
@@ -381,11 +383,13 @@ void CCharacter::Save(CFile &file)
 {
 	file.printf("\nCharacter(\"%s\", { ", this->Ident.c_str());
 
+	/*
 	if (!this->DeityProfiles.empty() && !this->Deities.empty()) {
 		for (size_t i = 0; i < this->Deities.size(); ++i) {
 			file.printf("\"deity\", \"%s\", ", this->Deities[i]->Ident.c_str());
 		}
 	}
+	*/
 
 	file.printf("})\n");
 }
