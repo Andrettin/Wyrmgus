@@ -120,7 +120,9 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		if (key == "name") {
+		if (key == "ident") {
+			//already processed
+		} else if (key == "name") {
 			this->Name = value;
 			name_changed = true;
 		} else if (key == "family_name") {
@@ -143,7 +145,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 					}
 				}
 			} else {
-				fprintf(stderr, "Unit type \"%s\" doesn't exist.", value.c_str());
+				fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "gender") {
 			this->Gender = GetGenderIdByName(value);
@@ -161,7 +163,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			if (deity) {
 				this->Deities.push_back(deity);
 			} else {
-				fprintf(stderr, "Deity \"%s\" doesn't exist.", value.c_str());
+				fprintf(stderr, "Deity \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "description") {
 			this->Description = value;
@@ -176,7 +178,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			this->Icon.Load();
 			this->Icon.Icon->Load();
 		} else {
-			fprintf(stderr, "Invalid character property: \"%s\".", key.c_str());
+			fprintf(stderr, "Invalid character property: \"%s\".\n", key.c_str());
 		}
 	}
 	
@@ -193,7 +195,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			deity->ProcessConfigData(child_config_data);
 			this->DeityProfiles.push_back(deity);
 		} else {
-			fprintf(stderr, "Invalid character property: \"%s\".", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid character property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
 	*/

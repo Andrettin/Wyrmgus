@@ -134,7 +134,9 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		if (key == "name") {
+		if (key == "ident") {
+			//already processed
+		} else if (key == "name") {
 			this->Name = value;
 		} else if (key == "pantheon") {
 			this->Pantheon = value;
@@ -152,7 +154,7 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 				this->Civilizations.push_back(civilization);
 				PlayerRaces.Civilizations[civilization]->Deities.push_back(this);
 			} else {
-				fprintf(stderr, "Civilization \"%s\" doesn't exist.", value.c_str());
+				fprintf(stderr, "Civilization \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "religion") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -160,7 +162,7 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 			if (religion) {
 				this->Religions.push_back(religion);
 			} else {
-				fprintf(stderr, "Religion \"%s\" doesn't exist.", value.c_str());
+				fprintf(stderr, "Religion \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "domain") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -168,7 +170,7 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 			if (deity_domain) {
 				this->Domains.push_back(deity_domain);
 			} else {
-				fprintf(stderr, "Deity domain \"%s\" doesn't exist.", value.c_str());
+				fprintf(stderr, "Deity domain \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "description") {
 			this->Description = value;
@@ -188,10 +190,10 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 			if (plane) {
 				this->HomePlane = plane;
 			} else {
-				fprintf(stderr, "Plane \"%s\" doesn't exist.", value.c_str());
+				fprintf(stderr, "Plane \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else {
-			fprintf(stderr, "Invalid deity property: \"%s\".", key.c_str());
+			fprintf(stderr, "Invalid deity property: \"%s\".\n", key.c_str());
 		}
 	}
 }
