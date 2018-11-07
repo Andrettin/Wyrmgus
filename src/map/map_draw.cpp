@@ -39,10 +39,9 @@
 #include "particle.h"
 #include "pathfinder.h"
 #include "player.h"
-//Wyrmgus start
+#include "terrain_type.h"
 #include "tileset.h"
 #include "translate.h"
-//Wyrmgus end
 #include "unit.h"
 #include "unittype.h"
 #include "ui.h"

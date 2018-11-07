@@ -57,6 +57,7 @@
 #include "settings.h"
 #include "sound.h"
 #include "sound_server.h"
+#include "terrain_type.h"
 #include "tileset.h"
 #include "translate.h"
 #include "ui.h"
@@ -2618,9 +2619,9 @@ void CEditor::Init()
 	//Wyrmgus start
 //	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 	Editor.ShownTileTypes.clear();
-	for (size_t i = 0; i < TerrainTypes.size(); ++i) {
-		if (!TerrainTypes[i]->Hidden && TerrainTypes[i]->PixelTileSize == Map.GetCurrentPixelTileSize()) {
-			Editor.ShownTileTypes.push_back(TerrainTypes[i]);
+	for (size_t i = 0; i < CTerrainType::TerrainTypes.size(); ++i) {
+		if (!CTerrainType::TerrainTypes[i]->Hidden && CTerrainType::TerrainTypes[i]->PixelSize == Map.GetCurrentPixelTileSize()) {
+			Editor.ShownTileTypes.push_back(CTerrainType::TerrainTypes[i]);
 		}
 	}
 	//Wyrmgus end

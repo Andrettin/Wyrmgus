@@ -62,11 +62,6 @@ std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
 void CleanWorlds()
 {
-	for (size_t i = 0; i < TerrainTypes.size(); ++i) {
-		delete TerrainTypes[i];
-	}
-	TerrainTypes.clear();
-	
 	for (size_t i = 0; i < MapTemplates.size(); ++i) {
 		delete MapTemplates[i];
 	}

@@ -60,7 +60,7 @@ CDeityDomain *CDeityDomain::GetDeityDomain(std::string deity_domain_ident)
 	return NULL;
 }
 
-void CDeityDomain::Clean()
+void CDeityDomain::ClearDeityDomains()
 {
 	for (size_t i = 0; i < DeityDomains.size(); ++i) {
 		delete DeityDomains[i];

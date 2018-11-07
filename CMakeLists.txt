@@ -202,6 +202,7 @@ set(map_SRCS
 	src/map/minimap.cpp
 	src/map/script_map.cpp
 	src/map/script_tileset.cpp
+	src/map/terrain_type.cpp
 	src/map/tileset.cpp
 )
 source_group(map FILES ${map_SRCS})
@@ -646,6 +647,7 @@ set(stratagus_generic_HDRS
 	src/include/sound_server.h
 	src/include/spells.h
 	src/include/stratagus.h
+	src/include/terrain_type.h
 	#Wyrmgus start
 	src/include/text.h
 	#Wyrmgus end

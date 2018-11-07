@@ -65,6 +65,7 @@
 #include "sound.h"
 #include "sound_server.h"
 //Wyrmgus start
+#include "terrain_type.h"
 #include "tileset.h" // for tile animation
 //Wyrmgus end
 #include "translate.h"

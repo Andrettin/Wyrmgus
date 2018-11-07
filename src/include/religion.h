@@ -55,7 +55,7 @@ public:
 	}
 	
 	static CReligion *GetReligion(std::string religion_ident);
-	static void Clean();
+	static void ClearReligions();
 	
 	std::string Ident;							/// Ident of the religion
 	std::string Name;							/// Name of the religion

@@ -120,9 +120,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		if (key == "ident") {
-			//already processed
-		} else if (key == "name") {
+		if (key == "name") {
 			this->Name = value;
 			name_changed = true;
 		} else if (key == "family_name") {

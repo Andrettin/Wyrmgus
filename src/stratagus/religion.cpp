@@ -60,7 +60,7 @@ CReligion *CReligion::GetReligion(std::string religion_ident)
 	return NULL;
 }
 
-void CReligion::Clean()
+void CReligion::ClearReligions()
 {
 	for (size_t i = 0; i < Religions.size(); ++i) {
 		delete Religions[i];

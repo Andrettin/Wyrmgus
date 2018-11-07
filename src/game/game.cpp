@@ -78,9 +78,8 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
-//Wyrmgus start
+#include "terrain_type.h"
 #include "text.h"
-//Wyrmgus end
 #include "tileset.h"
 #include "translate.h"
 #include "trigger.h"
@@ -1796,7 +1795,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	UnitUnderCursor = NoUnitP;
 
 	//Wyrmgus start
-	LoadTerrainTypes();
+	CTerrainType::LoadTerrainTypeGraphics();
 	//Wyrmgus end
 	InitMissileTypes();
 #ifndef DYNAMIC_LOAD

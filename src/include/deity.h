@@ -49,7 +49,6 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
-class CDeity;
 class CDeityDomain;
 class CFaction;
 class CPlane;
@@ -66,7 +65,8 @@ public:
 	
 	static CDeity *GetDeity(std::string deity_ident);
 	static CDeity *GetProfileMatch(CDeity *deity_profile);
-	static void Clean();
+	static void ClearDeities();
+	
 	void ProcessConfigData(CConfigData *config_data);
 	
 	int Gender;									/// Deity's gender

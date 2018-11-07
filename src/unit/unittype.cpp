@@ -55,6 +55,7 @@
 #include "script.h"
 #include "sound.h"
 #include "spells.h"
+#include "terrain_type.h"
 #include "tileset.h"
 #include "translate.h"
 #include "ui.h"

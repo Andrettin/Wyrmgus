@@ -59,6 +59,7 @@
 #include "sound.h"
 #include "spells.h"
 //Wyrmgus start
+#include "terrain_type.h"
 #include "tileset.h"
 //Wyrmgus end
 #include "ui.h"
@@ -1140,7 +1141,7 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "terrain")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
-						CTerrainType *terrain = GetTerrainType(terrain_ident);
+						CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
 						if (terrain) {
 							var->Terrains.push_back(terrain);
 						} else {
@@ -1148,7 +1149,7 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "terrain-forbidden")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
-						CTerrainType *terrain = GetTerrainType(terrain_ident);
+						CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
 						if (terrain) {
 							var->TerrainsForbidden.push_back(terrain);
 						} else {
@@ -2181,7 +2182,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			type->Species->Type = type;
 		} else if (!strcmp(value, "TerrainType")) {
-			type->TerrainType = GetTerrainType(LuaToString(l, -1));
+			type->TerrainType = CTerrainType::GetTerrainType(LuaToString(l, -1));
 			if (!type->TerrainType) {
 				LuaError(l, "Terrain type doesn't exist.");
 			}
@@ -4163,7 +4164,7 @@ static int CclDefineSpecies(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+				CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
 				if (terrain == NULL) {
 					LuaError(l, "Terrain doesn't exist.");
 				}

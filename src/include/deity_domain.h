@@ -55,7 +55,7 @@ public:
 	}
 	
 	static CDeityDomain *GetDeityDomain(std::string deity_domain_ident);
-	static void Clean();
+	static void ClearDeityDomains();
 	
 	std::string Ident;									/// Ident of the domain
 	std::string Name;									/// Name of the domain

@@ -38,6 +38,8 @@
 #include "config.h"
 
 #include "character.h"
+#include "deity.h"
+#include "terrain_type.h"
 #include "util.h"
 
 #include <fstream>
@@ -99,8 +101,11 @@ void CConfigData::ParseConfigData(std::string filepath)
 						key = key_value_strings[j];
 					} else {
 						std::string value = key_value_strings[j];
-						config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
-						if (key == "ident") config_data->Ident = value;
+						if (key == "ident") {
+							config_data->Ident = value;
+						} else {
+							config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
+						}
 						key.clear();
 					}
 				}
@@ -112,8 +117,11 @@ void CConfigData::ParseConfigData(std::string filepath)
 		} else if (!key.empty()) { //value
 			std::string value = str;
 			value = FindAndReplaceString(value, "=", "");
-			config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
-			if (key == "ident") config_data->Ident = value;
+			if (key == "ident") {
+				config_data->Ident = value;
+			} else {
+				config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
+			}
 			key.clear();
 		}
 	}
@@ -130,7 +138,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		
 		if (config_data->Tag == "character") {
 			CCharacter *character = GetCharacter(ident);
-			bool redefinition = false;
 			if (!character) {
 				character = new CCharacter;
 				character->Ident = ident;
@@ -139,6 +146,17 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				fprintf(stderr, "Character \"%s\" is being redefined.\n", ident.c_str());
 			}
 			character->ProcessConfigData(config_data);
+		} else if (config_data->Tag == "deity") {
+			CDeity *deity = CDeity::GetDeity(ident);
+			if (!deity) {
+				deity = new CDeity;
+				deity->Ident = ident;
+				CDeity::Deities.push_back(deity);
+			}
+			deity->ProcessConfigData(config_data);
+		} else if (config_data->Tag == "terrain_type") {
+			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(ident);
+			terrain_type->ProcessConfigData(config_data);
 		}
 	}
 }

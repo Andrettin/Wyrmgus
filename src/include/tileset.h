@@ -181,49 +181,6 @@ enum TransitionTypes {
 	
 	MaxTransitionTypes
 };
-
-class CTerrainType
-{
-public:
-	CTerrainType() :
-		ID(-1), Flags(0), SolidAnimationFrames(0), Resource(-1),
-		Overlay(false), Buildable(false), AllowSingle(false), Hidden(false),
-		PixelTileSize(32, 32),
-		UnitType(NULL), Graphics(NULL), ElevationGraphics(NULL), PlayerColorGraphics(NULL)
-	{
-		Color.R = 0;
-		Color.G = 0;
-		Color.B = 0;
-		Color.A = 0;
-	}
-
-	std::string Name;
-	std::string Ident;
-	std::string Character;
-	CColor Color;
-	int ID;
-	int SolidAnimationFrames;
-	int Resource;
-	unsigned int Flags;
-	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
-	bool Buildable;
-	bool AllowSingle;											/// Whether this terrain type has transitions for single tiles
-	bool Hidden;
-	PixelSize PixelTileSize;
-	CUnitType *UnitType;
-	CGraphic *Graphics;
-	CGraphic *ElevationGraphics;								/// Semi-transparent elevation graphics, separated so that borders look better
-	CPlayerColorGraphic *PlayerColorGraphics;
-	std::vector<CTerrainType *> BaseTerrains;					/// Possible base terrains for this terrain type (if is an overlay terrain)
-	std::vector<CTerrainType *> BorderTerrains;					/// Terrain types which this one can border
-	std::vector<CTerrainType *> InnerBorderTerrains;			/// Terrain types which this one can border, and which "enter" this tile type in transitions
-	std::vector<CTerrainType *> OuterBorderTerrains;			/// Terrain types which this one can border, and which are "entered" by this tile type in transitions
-	std::vector<int> SolidTiles;
-	std::vector<int> DamagedTiles;
-	std::vector<int> DestroyedTiles;
-	std::map<std::tuple<int, int>, std::vector<int>> TransitionTiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
-	std::map<std::tuple<int, int>, std::vector<int>> AdjacentTransitionTiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
-};
 //Wyrmgus end
 
 /// Single tile definition
@@ -399,12 +356,6 @@ private:
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CTerrainType *>  TerrainTypes;
-extern std::map<std::string, int> TerrainTypeStringToIndex;
-extern std::map<std::string, int> TerrainTypeCharacterToIndex;
-extern std::map<std::tuple<int, int, int>, int> TerrainTypeColorToIndex;
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -413,8 +364,6 @@ extern void ParseTilesetTileFlags(lua_State *l, int *back, int *j);
 //Wyrmgus start
 extern std::string GetTransitionTypeNameById(int transition_type);
 extern int GetTransitionTypeIdByName(std::string transition_type);
-extern CTerrainType *GetTerrainType(std::string terrain_ident);
-extern void LoadTerrainTypes();
 //Wyrmgus end
 
 //@}

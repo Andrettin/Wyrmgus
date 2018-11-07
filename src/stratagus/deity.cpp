@@ -120,7 +120,7 @@ CDeity *CDeity::GetProfileMatch(CDeity *deity_profile)
 	}
 }
 
-void CDeity::Clean()
+void CDeity::ClearDeities()
 {
 	for (size_t i = 0; i < Deities.size(); ++i) {
 		delete Deities[i];
@@ -134,9 +134,7 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		if (key == "ident") {
-			//already processed
-		} else if (key == "name") {
+		if (key == "name") {
 			this->Name = value;
 		} else if (key == "pantheon") {
 			this->Pantheon = value;

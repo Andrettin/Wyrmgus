@@ -34,9 +34,7 @@
 #include "action/action_built.h"
 
 #include "ai.h"
-//Wyrmgus start
 #include "character.h"
-//Wyrmgus end
 #include "commands.h"
 #include "construct.h"
 #include "iolib.h"
@@ -45,14 +43,11 @@
 #include "quest.h"
 #include "script.h"
 #include "sound.h"
-//Wyrmgus start
+#include "terrain_type.h"
 #include "tileset.h"
-//Wyrmgus end
 #include "translate.h"
 #include "unit.h"
-//Wyrmgus start
 #include "unit_find.h"
-//Wyrmgus end
 #include "unittype.h"
 
 //Wyrmgus start

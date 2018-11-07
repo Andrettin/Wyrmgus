@@ -42,12 +42,9 @@
 #include "editor.h"
 #include "map.h"
 #include "player.h"
-//Wyrmgus start
 #include "province.h"
-//Wyrmgus end
-//Wyrmgus start
+#include "terrain_type.h"
 #include "tileset.h"
-//Wyrmgus end
 #include "unit.h"
 #include "unit_manager.h"
 #include "ui.h"
@@ -398,9 +395,9 @@ void CMinimap::UpdateTerrain(int z)
 	if (UseOpenGL) {
 		SDL_LockSurface(Map.TileGraphic->Surface);
 		//Wyrmgus start
-		for (size_t i = 0; i != TerrainTypes.size(); ++i) {
-			if (TerrainTypes[i]->Graphics) {
-				SDL_LockSurface(TerrainTypes[i]->Graphics->Surface);
+		for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
+			if (CTerrainType::TerrainTypes[i]->Graphics) {
+				SDL_LockSurface(CTerrainType::TerrainTypes[i]->Graphics->Surface);
 			}
 		}
 		//Wyrmgus end
@@ -551,9 +548,9 @@ void CMinimap::UpdateTerrain(int z)
 	}
 	SDL_UnlockSurface(Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != TerrainTypes.size(); ++i) {
-		if (TerrainTypes[i]->Graphics) {
-			SDL_UnlockSurface(TerrainTypes[i]->Graphics->Surface);
+	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
+		if (CTerrainType::TerrainTypes[i]->Graphics) {
+			SDL_UnlockSurface(CTerrainType::TerrainTypes[i]->Graphics->Surface);
 		}
 	}
 	//Wyrmgus end
@@ -622,9 +619,9 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	}
 	SDL_LockSurface(Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != TerrainTypes.size(); ++i) {
-		if (TerrainTypes[i]->Graphics) {
-			SDL_LockSurface(TerrainTypes[i]->Graphics->Surface);
+	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
+		if (CTerrainType::TerrainTypes[i]->Graphics) {
+			SDL_LockSurface(CTerrainType::TerrainTypes[i]->Graphics->Surface);
 		}
 	}
 	//Wyrmgus end
@@ -800,9 +797,9 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	}
 	SDL_UnlockSurface(Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != TerrainTypes.size(); ++i) {
-		if (TerrainTypes[i]->Graphics) {
-			SDL_UnlockSurface(TerrainTypes[i]->Graphics->Surface);
+	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
+		if (CTerrainType::TerrainTypes[i]->Graphics) {
+			SDL_UnlockSurface(CTerrainType::TerrainTypes[i]->Graphics->Surface);
 		}
 	}
 	//Wyrmgus end

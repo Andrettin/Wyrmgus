@@ -193,13 +193,6 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-std::vector<CTerrainType *> TerrainTypes;
-std::map<std::string, int> TerrainTypeStringToIndex;
-std::map<std::string, int> TerrainTypeCharacterToIndex;
-std::map<std::tuple<int, int, int>, int> TerrainTypeColorToIndex;
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
@@ -1014,39 +1007,6 @@ int GetTransitionTypeIdByName(std::string transition_type)
 		return SoutheastOuterNorthwestInnerTransitionType;
 	} else {
 		return -1;
-	}
-}
-
-/**
-**  Get a terrain type
-*/
-CTerrainType *GetTerrainType(std::string terrain_ident)
-{
-	if (terrain_ident.empty()) {
-		return NULL;
-	}
-	
-	if (TerrainTypeStringToIndex.find(terrain_ident) != TerrainTypeStringToIndex.end()) {
-		return TerrainTypes[TerrainTypeStringToIndex[terrain_ident]];
-	}
-	
-	return NULL;
-}
-
-void LoadTerrainTypes()
-{
-	for (std::vector<CTerrainType *>::iterator it = TerrainTypes.begin();
-		 it != TerrainTypes.end();
-		 ++it) {
-		if ((*it)->Graphics) {
-			(*it)->Graphics->Load();
-		}
-		if ((*it)->ElevationGraphics) {
-			(*it)->ElevationGraphics->Load();
-		}
-		if ((*it)->PlayerColorGraphics) {
-			(*it)->PlayerColorGraphics->Load();
-		}
 	}
 }
 //Wyrmgus end

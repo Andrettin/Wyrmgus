@@ -42,6 +42,7 @@
 #include "stratagus.h"
 #include "map.h"
 //Wyrmgus start
+#include "terrain_type.h"
 #include "tileset.h"
 //Wyrmgus end
 #include "video.h"
@@ -598,17 +599,17 @@ void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overl
 			
 			for (unsigned int i = 0; i < line_str.length(); ++i) {
 				std::string terrain_character = line_str.substr(i, 1);
-				char terrain_id = -1;
-				if (TerrainTypeCharacterToIndex.find(terrain_character) != TerrainTypeCharacterToIndex.end()) {
-					terrain_id = TerrainTypeCharacterToIndex.find(terrain_character)->second;
+				CTerrainType *terrain = NULL;
+				if (CTerrainType::TerrainTypesByCharacter.find(terrain_character) != CTerrainType::TerrainTypesByCharacter.end()) {
+					terrain = CTerrainType::TerrainTypesByCharacter.find(terrain_character)->second;
 				}
 				Uint8 red = 0;
 				Uint8 green = 0;
 				Uint8 blue = 0;
-				if (terrain_id != -1) {
-					red = TerrainTypes[terrain_id]->Color.R;
-					green = TerrainTypes[terrain_id]->Color.G;
-					blue = TerrainTypes[terrain_id]->Color.B;
+				if (terrain) {
+					red = terrain->Color.R;
+					green = terrain->Color.G;
+					blue = terrain->Color.B;
 				}
 				
 				row[x * 3 + 0] = red;

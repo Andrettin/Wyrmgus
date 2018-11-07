@@ -64,10 +64,9 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
-//Wyrmgus start
+#include "terrain_type.h"
 #include "text.h"
 #include "tileset.h"
-//Wyrmgus end
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
@@ -109,18 +108,19 @@ void CleanModules()
 	//Wyrmgus end
 	CleanConstructions();
 	CleanDecorations();
-	CDeity::Clean();
+	CDeity::ClearDeities();
 	//Wyrmgus start
 	CleanDialogues();
-	CDeityDomain::Clean();
+	CDeityDomain::ClearDeityDomains();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
 	CleanMissiles();
 	//Wyrmgus start
 	CleanQuests();
 	CleanTexts();
-	CReligion::Clean();
+	CReligion::ClearReligions();
 	CleanUniqueItems();
+	CTerrainType::ClearTerrainTypes();
 	//Wyrmgus end
 	CleanUnits();
 	CleanUnitTypes();
@@ -195,7 +195,7 @@ void LoadModules()
 	//Wyrmgus end
 	UI.Load();
 	//Wyrmgus start
-	LoadTerrainTypes();
+	CTerrainType::LoadTerrainTypeGraphics();
 	//Wyrmgus end
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();

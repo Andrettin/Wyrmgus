@@ -53,6 +53,7 @@
 #include "sound.h"
 #include "spells.h"
 //Wyrmgus start
+#include "terrain_type.h"
 #include "tileset.h"
 //Wyrmgus end
 #include "trigger.h"

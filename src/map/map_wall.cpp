@@ -40,10 +40,9 @@
 #include "tileset.h"
 #include "ui.h"
 #include "player.h"
-//Wyrmgus start
 #include "settings.h"
+#include "terrain_type.h"
 #include "unit_find.h"
-//Wyrmgus end
 #include "unittype.h"
 
 /*----------------------------------------------------------------------------

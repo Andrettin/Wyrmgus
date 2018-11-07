@@ -46,6 +46,7 @@
 #include "player.h"
 //Wyrmgus start
 #include "quest.h"
+#include "terrain_type.h"
 #include "tileset.h"
 //Wyrmgus end
 #include "unit.h"
@@ -508,7 +509,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 //Wyrmgus start
 void CBuildRestrictionTerrain::Init()
 {
-	this->RestrictTerrainType = GetTerrainType(this->RestrictTerrainTypeName);
+	this->RestrictTerrainType = CTerrainType::GetTerrainType(this->RestrictTerrainTypeName);
 }
 
 /**
