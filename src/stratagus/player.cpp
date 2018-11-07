@@ -2104,7 +2104,7 @@ bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
 */
 bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) const
 {
-	if (character->Deity != NULL) {
+	if (character->Deity != NULL) { //character is a deity
 		return false;
 	}
 	
