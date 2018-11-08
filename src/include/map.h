@@ -178,7 +178,7 @@ public:
 		Width(0), Height(0), Scale(1), SurfaceLayer(0),
 		OutputTerrainImage(false),
 		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0), PixelTileSize(32, 32),
-		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), BorderTerrain(NULL), SurroundingTerrain(NULL)
+		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrainType(NULL), BaseOverlayTerrainType(NULL), BorderTerrainType(NULL), SurroundingTerrainType(NULL)
 	{
 	}
 
@@ -207,9 +207,10 @@ public:
 	CMapTemplate *MainTemplate;									/// Main template in which this one is located
 	CPlane *Plane;
 	CWorld *World;
-	CTerrainType *BaseTerrain;
-	CTerrainType *BorderTerrain;
-	CTerrainType *SurroundingTerrain;
+	CTerrainType *BaseTerrainType;
+	CTerrainType *BaseOverlayTerrainType;
+	CTerrainType *BorderTerrainType;
+	CTerrainType *SurroundingTerrainType;
 	std::vector<CMapTemplate *> Subtemplates;
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
 	std::vector<std::pair<CTerrainType *, int>> ExternalGeneratedTerrains;

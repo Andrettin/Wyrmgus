@@ -1435,7 +1435,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *base_terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+				CTerrainType *base_terrain = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1, j + 1));
 				if (base_terrain == NULL) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
@@ -1723,21 +1723,24 @@ static int CclDefineMapTemplate(lua_State *l)
 			map_template->Plane = main_template->Plane;
 			map_template->World = main_template->World;
 			map_template->SurfaceLayer = main_template->SurfaceLayer;
-		} else if (!strcmp(value, "BaseTerrain")) {
+		} else if (!strcmp(value, "BaseTerrainType")) {
 			CTerrainType *terrain = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1));
-			map_template->BaseTerrain = terrain;
-		} else if (!strcmp(value, "BorderTerrain")) {
+			map_template->BaseTerrainType = terrain;
+		} else if (!strcmp(value, "BaseOverlayTerrainType")) {
+			CTerrainType *terrain = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1));
+			map_template->BaseOverlayTerrainType = terrain;
+		} else if (!strcmp(value, "BorderTerrainType")) {
 			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1));
 			if (!terrain) {
 				LuaError(l, "Terrain doesn't exist.");
 			}
-			map_template->BorderTerrain = terrain;
-		} else if (!strcmp(value, "SurroundingTerrain")) {
+			map_template->BorderTerrainType = terrain;
+		} else if (!strcmp(value, "SurroundingTerrainType")) {
 			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1));
 			if (!terrain) {
 				LuaError(l, "Terrain doesn't exist.");
 			}
-			map_template->SurroundingTerrain = terrain;
+			map_template->SurroundingTerrainType = terrain;
 		} else if (!strcmp(value, "GeneratedTerrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
