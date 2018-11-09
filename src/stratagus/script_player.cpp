@@ -4055,6 +4055,9 @@ static int CclGetDeityData(lua_State *l)
 		}
 		
 		return 1;
+	} else if (!strcmp(data, "Gender")) {
+		lua_pushstring(l, GetGenderNameById(deity->Gender).c_str());
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
