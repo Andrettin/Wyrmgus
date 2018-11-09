@@ -129,11 +129,13 @@ public:
 	}
 	~CCharacter();
 	
-	static void PrepareCharacters();			/// Prepares temporary data for characters
-	static void ResetCharacters();				/// Removes temporary data from characters
-	static void SaveCharacters(CFile &file);	/// Save temporary data for characters
+	static void GenerateCharacterHistory();		/// Generates history for characters
+	static void ResetCharacterHistory();		/// Removes generated history data from characters
 	
 	void ProcessConfigData(CConfigData *config_data);
+	void GenerateHistory();
+	void ResetHistory();
+	void SaveHistory();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
 	CLanguage *GetLanguage() const;
@@ -147,7 +149,7 @@ public:
 	IconConfig GetIcon() const;
 	CPersistentItem *GetItem(CUnit &item) const;
 	void UpdateAttributes();
-	void Save(CFile &file);		/// Save temporary data for the character
+	void SaveHistory(CFile &file);		/// Save generated history data for the character
 
 	CDate Date;					/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
@@ -178,6 +180,7 @@ public:
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
+	std::vector<CDeity *> DeityProfiles;
 	std::vector<CUpgrade *> Abilities;
 	std::vector<CUpgrade *> ReadWorks;
 	std::vector<CUpgrade *> ConsumedElixirs;

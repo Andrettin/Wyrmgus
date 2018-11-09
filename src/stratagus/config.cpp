@@ -39,6 +39,7 @@
 
 #include "character.h"
 #include "deity.h"
+#include "game.h"
 #include "terrain_type.h"
 #include "util.h"
 
@@ -143,7 +144,9 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				character->Ident = ident;
 				Characters[ident] = character;
 			} else {
-				fprintf(stderr, "Character \"%s\" is being redefined.\n", ident.c_str());
+				if (!GeneratingHistory) {
+					fprintf(stderr, "Character \"%s\" is being redefined.\n", ident.c_str());
+				}
 			}
 			character->ProcessConfigData(config_data);
 		} else if (config_data->Tag == "deity") {

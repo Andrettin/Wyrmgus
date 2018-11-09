@@ -76,39 +76,26 @@ CCharacter::~CCharacter()
 	if (this->Conditions) {
 		delete Conditions;
 	}
-}
-
-void CCharacter::PrepareCharacters()
-{
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-		CCharacter *character = iterator->second;
-		
-//		for (size_t i = 0; i < character->DeityProfiles.size(); ++i) {
-//			character->Deities.push_back(CDeity::GetProfileMatch(character->DeityProfiles[i]));
-//		}
+	
+	for (size_t i = 0; i < this->DeityProfiles.size(); ++i) {
+		delete this->DeityProfiles[i];
 	}
 }
 
-void CCharacter::ResetCharacters()
+void CCharacter::GenerateCharacterHistory()
 {
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		CCharacter *character = iterator->second;
-		
-//		if (!character->DeityProfiles.empty() && !character->Deities.empty()) {
-//			character->Deities.clear();
-//		}
+		character->GenerateHistory();
 	}
 }
 
-void CCharacter::SaveCharacters(CFile &file)
+void CCharacter::ResetCharacterHistory()
 {
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		CCharacter *character = iterator->second;
-//		if (!character->DeityProfiles.empty()) {
-//			character->Save(file);
-//		}
+		character->ResetHistory();
 	}
-	file.printf("\n");
 }
 
 void CCharacter::ProcessConfigData(CConfigData *config_data)
@@ -180,7 +167,6 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		}
 	}
 	
-	/*
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
 		CConfigData *child_config_data = config_data->Children[i];
 		
@@ -196,7 +182,6 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			fprintf(stderr, "Invalid character property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
-	*/
 	
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
 	if (this->Type != NULL && this->Type->BoolFlag[FAUNA_INDEX].value) {
@@ -229,6 +214,70 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 	}
 
 	this->UpdateAttributes();
+}
+
+void CCharacter::GenerateHistory()
+{
+	//generate history (but skip already-generated data)
+	bool history_changed = false;
+	
+	if (!this->DeityProfiles.empty() && this->Deities.size() != this->DeityProfiles.size()) {
+		this->Deities.clear();
+		for (size_t i = 0; i < this->DeityProfiles.size(); ++i) {
+			this->Deities.push_back(CDeity::GetProfileMatch(this->DeityProfiles[i]));
+			history_changed = true;
+		}
+	}
+	
+	if (history_changed) {
+		this->SaveHistory();
+	}
+}
+
+void CCharacter::ResetHistory()
+{
+	if (!this->DeityProfiles.empty() && !this->Deities.empty()) {
+		this->Deities.clear();
+	}
+}
+
+void CCharacter::SaveHistory()
+{
+	struct stat tmp;
+	std::string path = Parameters::Instance.GetUserDirectory();
+
+	if (!GameName.empty()) {
+		path += "/";
+		path += GameName;
+	}
+	path += "/";
+	path += "history/";
+	if (stat(path.c_str(), &tmp) < 0) {
+		makedir(path.c_str(), 0777);
+	}
+	path += "characters/";
+	if (stat(path.c_str(), &tmp) < 0) {
+		makedir(path.c_str(), 0777);
+	}
+	path += FindAndReplaceString(this->Ident, "-", "_");
+	path += ".cfg";
+
+	FILE *fd = fopen(path.c_str(), "w");
+	if (!fd) {
+		fprintf(stderr, "Cannot open file %s for writing.\n", path.c_str());
+		return;
+	}
+
+	fprintf(fd, "[character]\n");
+	fprintf(fd, "\tident = %s\n", FindAndReplaceString(this->Ident, "-", "_").c_str());
+	if (!this->DeityProfiles.empty() && !this->Deities.empty()) {
+		for (size_t i = 0; i < this->Deities.size(); ++i) {
+			fprintf(fd, "\tdeity = %s\n", FindAndReplaceString(this->Deities[i]->Ident, "-", "_").c_str());
+		}
+	}
+	fprintf(fd, "[/character]\n");
+		
+	fclose(fd);
 }
 
 int CCharacter::GetMartialAttribute() const
@@ -379,21 +428,6 @@ void CCharacter::UpdateAttributes()
 	}
 }
 
-void CCharacter::Save(CFile &file)
-{
-	file.printf("\nCharacter(\"%s\", { ", this->Ident.c_str());
-
-	/*
-	if (!this->DeityProfiles.empty() && !this->Deities.empty()) {
-		for (size_t i = 0; i < this->Deities.size(); ++i) {
-			file.printf("\"deity\", \"%s\", ", this->Deities[i]->Ident.c_str());
-		}
-	}
-	*/
-
-	file.printf("})\n");
-}
-
 int GetAttributeVariableIndex(int attribute)
 {
 	if (attribute == StrengthAttribute) {
@@ -499,14 +533,14 @@ void SaveHero(CCharacter *hero)
 	}
 	path += "/";
 	path += "heroes/";
+	if (stat(path.c_str(), &tmp) < 0) {
+		makedir(path.c_str(), 0777);
+	}
 	if (hero->Custom) {
+		path += "custom/";
 		if (stat(path.c_str(), &tmp) < 0) {
 			makedir(path.c_str(), 0777);
 		}
-		path += "custom/";
-	}
-	if (stat(path.c_str(), &tmp) < 0) {
-		makedir(path.c_str(), 0777);
 	}
 	std::string old_path = path;
 	path += hero->Ident;

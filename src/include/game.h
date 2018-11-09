@@ -36,6 +36,7 @@ class CFile;
 class CGraphic;
 //Wyrmgus end
 
+extern void GenerateHistory();
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern int SaveGame(const std::string &filename); /// Save game
 extern void DeleteSaveGame(const std::string &filename); /// Delete save game
@@ -57,6 +58,7 @@ extern bool UseHPForXp;                     /// true if gain XP by dealing damag
 
 //Wyrmgus start
 extern CGraphic *loadingBackground;
+extern bool GeneratingHistory;
 //Wyrmgus end
 
 #endif // GAME_H

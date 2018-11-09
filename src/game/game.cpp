@@ -116,6 +116,8 @@ unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 
 bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
 
+bool GeneratingHistory = false;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -1865,8 +1867,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//
 	InitTriggers();
 	
-	CCharacter::PrepareCharacters(); //prepare character data for play, e.g. by matching deity profiles with deities
-
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 
 #if 0
@@ -1957,7 +1957,6 @@ void CleanGame()
 	CleanGame_Lua();
 	CleanTriggers();
 	CleanAi();
-	CCharacter::ResetCharacters(); //resets character temporary data
 	CleanGroups();
 	CleanMissiles();
 	CleanUnits();
@@ -1971,6 +1970,13 @@ void CleanGame()
 	CursorBuilding = NULL;
 	UnitUnderCursor = NULL;
 	GameEstablishing = false;
+}
+
+void GenerateHistory()
+{
+	GeneratingHistory = true;
+	CCharacter::GenerateCharacterHistory(); //generate character history, e.g. by matching deity profiles with deities
+	GeneratingHistory = false;
 }
 
 /**
