@@ -73,6 +73,10 @@ CDeity *CDeity::GetProfileMatch(CDeity *deity_profile)
 	for (size_t i = 0; i < Deities.size(); ++i) {
 		CDeity *deity = Deities[i];
 		
+		if (deity->UpgradeIdent.empty()) {
+			continue; //don't use deities that have no corresponding upgrade for profile matches
+		}
+		
 		if (deity->Major != deity_profile->Major) {
 			continue;
 		}
