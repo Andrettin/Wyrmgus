@@ -39,6 +39,7 @@
 
 #include "character.h"
 #include "luacallback.h"
+#include "map_template.h"
 #include "player.h"
 #include "script.h"
 #include "unittype.h"
@@ -467,7 +468,7 @@ static int CclDefineCampaign(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string map_template_ident = LuaToString(l, -1, j + 1);
-				CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+				CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 				if (!map_template) {
 					LuaError(l, "Map template \"%s\" doesn't exist." _C_ map_template_ident.c_str());
 				}
@@ -489,7 +490,7 @@ static int CclDefineCampaign(lua_State *l)
 			}
 		} else if (!strcmp(value, "MapTemplate")) {
 			std::string map_template_ident = LuaToString(l, -1);
-			CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+			CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 			if (!map_template) {
 				LuaError(l, "Map template \"%s\" doesn't exist." _C_ map_template_ident.c_str());
 			}

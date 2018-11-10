@@ -10,7 +10,7 @@
 //
 /**@name script_unittype.cpp - The unit-type ccl functions. */
 //
-//      (c) Copyright 1999-2016 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1999-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@
 //Wyrmgus start
 #include "network.h" //for updating levels
 //Wyrmgus end
+#include "plane.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -70,6 +71,7 @@
 #include "upgrade.h"
 //Wyrmgus end
 #include "video.h"
+#include "world.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -4142,7 +4144,7 @@ static int CclDefineSpecies(lua_State *l)
 			species->ChildUpgrade = LuaToString(l, -1);
 		} else if (!strcmp(value, "HomePlane")) {
 			std::string plane_ident = LuaToString(l, -1);
-			CPlane *plane = GetPlane(plane_ident);
+			CPlane *plane = CPlane::GetPlane(plane_ident);
 			if (plane) {
 				species->HomePlane = plane;
 				plane->Species.push_back(species);
@@ -4151,7 +4153,7 @@ static int CclDefineSpecies(lua_State *l)
 			}
 		} else if (!strcmp(value, "Homeworld")) {
 			std::string world_ident = LuaToString(l, -1);
-			CWorld *world = GetWorld(world_ident);
+			CWorld *world = CWorld::GetWorld(world_ident);
 			if (world) {
 				species->Homeworld = world;
 				world->Species.push_back(species);

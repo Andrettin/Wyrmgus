@@ -39,6 +39,7 @@
 
 #include "deity.h"
 #include "grand_strategy.h"
+#include "map_template.h"
 #include "player.h"
 #include "province.h"
 #include "quest.h"
@@ -490,7 +491,7 @@ static int CclDefineCharacter(lua_State *l)
 				lua_pop(l, 1);
 				++j;
 				
-				CMapTemplate *map_template = GetMapTemplate(LuaToString(l, -1, j + 1));
+				CMapTemplate *map_template = CMapTemplate::GetMapTemplate(LuaToString(l, -1, j + 1));
 				if (!map_template) {
 					LuaError(l, "Map template doesn't exist.");
 				}

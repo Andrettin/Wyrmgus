@@ -10,7 +10,7 @@
 //
 /**@name province.h - The province headerfile. */
 //
-//      (c) Copyright 2016 by Andrettin
+//      (c) Copyright 2016-2018 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -46,17 +46,19 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CCharacter;
+class CDeityDomain;
+class CFaction;
+class CGraphic;
+class CPlane;
+class CProvince;
+class CSettlement;
+class CSpecies;
+class CTerrainFeature;
 class CUnitType;
 class CUpgrade;
-class CFaction;
-class CProvince;
-class CTerrainFeature;
-class CCharacter;
-class CSpecies;
+class CWorld;
 class WorldMapTile;
-class CGraphic;
-class CSettlement;
-class CDeityDomain;
 
 /**
 **  Indexes into era array.
@@ -94,47 +96,6 @@ public:
 	int ID;
 	int BaseTile;
 	int Variations;					/// quantity of variations
-};
-
-class CPlane
-{
-public:
-	CPlane() :
-		ID(-1), TimeOfDaySeconds(DefaultTimeOfDaySeconds)
-	{
-	}
-	
-	int ID;																/// ID of this plane
-	int TimeOfDaySeconds;												/// How many seconds does it take to change the time of day in this plane
-	std::string Ident;
-	std::string Name;
-	std::string Description;
-	std::string Background;
-	std::string Quote;
-	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// Deity domains empowered in this plane
-	std::vector<CSpecies *> Species;									/// Species in this plane
-};
-
-class CWorld
-{
-public:
-	CWorld() :
-		ID(-1), Plane(NULL), TimeOfDaySeconds(DefaultTimeOfDaySeconds)
-	{
-	}
-	
-	int ID;																/// ID of this world
-	int TimeOfDaySeconds;												/// How many seconds does it take to change the time of day in this world
-	std::string Ident;
-	std::string Name;
-	std::string Description;
-	std::string Background;
-	std::string Quote;
-	CPlane *Plane;
-	std::vector<CProvince *> Provinces;									/// Provinces in this world
-	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
-	std::vector<WorldMapTile *> Tiles;									/// Tiles in the world
-	std::vector<CSpecies *> Species;									/// Species in this world
 };
 
 class CRegion
@@ -212,8 +173,6 @@ public:
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CPlane *> Planes;
-extern std::vector<CWorld *> Worlds;
 extern std::vector<CRegion *> Regions;
 extern std::vector<CProvince *> Provinces;
 extern std::vector<CWorldMapTerrainType *>  WorldMapTerrainTypes;
@@ -223,9 +182,7 @@ extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern void CleanWorlds();
-extern CPlane *GetPlane(std::string plane_ident);
-extern CWorld *GetWorld(std::string world_ident);
+extern void CleanProvinces();
 extern CRegion *GetRegion(std::string region_name);
 extern CProvince *GetProvince(std::string province_name);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);

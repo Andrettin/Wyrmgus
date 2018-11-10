@@ -46,6 +46,7 @@
 #include "map.h"
 #include "menus.h"
 #include "network.h"
+#include "plane.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -66,6 +67,7 @@
 #include "upgrade.h"
 #include "version.h"
 #include "video.h"
+#include "world.h"
 
 #ifdef DEBUG
 #include "../ai/ai_local.h"
@@ -922,7 +924,7 @@ void DrawMapLayerButtons()
 		if (UI.PlaneButtons[i].X != -1) {
 			DrawUIButton(UI.PlaneButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerPlane && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.PlaneButtons[i].Clicked || Map.GetCurrentPlane() == Planes[i]) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.PlaneButtons[i].Clicked || Map.GetCurrentPlane() == CPlane::Planes[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.PlaneButtons[i].X, UI.PlaneButtons[i].Y,
 				UI.PlaneButtons[i].Text
 			);
@@ -933,7 +935,7 @@ void DrawMapLayerButtons()
 		if (UI.WorldButtons[i].X != -1) {
 			DrawUIButton(UI.WorldButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerWorld && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.WorldButtons[i].Clicked || Map.GetCurrentWorld() == Worlds[i]) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.WorldButtons[i].Clicked || Map.GetCurrentWorld() == CWorld::Worlds[i]) ? MI_FLAGS_CLICKED : 0),
 				UI.WorldButtons[i].X, UI.WorldButtons[i].Y,
 				UI.WorldButtons[i].Text
 			);
@@ -1155,9 +1157,9 @@ void DrawPopups()
 	}
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-		DrawGenericPopup(Planes[ButtonUnderCursor]->Name, UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);
+		DrawGenericPopup(CPlane::Planes[ButtonUnderCursor]->Name, UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);
 	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-		DrawGenericPopup(Worlds[ButtonUnderCursor]->Name, UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
+		DrawGenericPopup(CWorld::Worlds[ButtonUnderCursor]->Name, UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
 	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
 		std::string surface_layer_string;
 		if (ButtonUnderCursor == 0) {

@@ -10,7 +10,7 @@
 //
 /**@name province.cpp - The provinces. */
 //
-//      (c) Copyright 2016 by Andrettin
+//      (c) Copyright 2016-2018 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -49,8 +49,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CPlane *> Planes;
-std::vector<CWorld *> Worlds;
 std::vector<CRegion *> Regions;
 std::vector<CProvince *> Provinces;
 std::vector<CWorldMapTerrainType *> WorldMapTerrainTypes;
@@ -60,13 +58,8 @@ std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CleanWorlds()
+void CleanProvinces()
 {
-	for (size_t i = 0; i < MapTemplates.size(); ++i) {
-		delete MapTemplates[i];
-	}
-	MapTemplates.clear();
-	
 	for (size_t i = 0; i < Settlements.size(); ++i) {
 		delete Settlements[i];
 	}
@@ -87,47 +80,9 @@ void CleanWorlds()
 	}
 	WorldMapTerrainTypes.clear();
 	
-	for (size_t i = 0; i < Planes.size(); ++i) {
-		delete Planes[i];
-	}
-	
-	for (size_t i = 0; i < Worlds.size(); ++i) {
-		for (size_t j = 0; j < Worlds[i]->Tiles.size(); ++j) {
-			delete Worlds[i]->Tiles[j];
-		}
-		Worlds[i]->Tiles.clear();
-		
-		for (size_t j = 0; j < Worlds[i]->Provinces.size(); ++j) {
-			delete Worlds[i]->Provinces[j];
-		}
-		Worlds[i]->Provinces.clear();
-		
-		delete Worlds[i];
-	}
-	
 	for (size_t j = 0; j < Regions.size(); ++j) {
 		delete Regions[j];
 	}
-}
-
-CPlane *GetPlane(std::string plane_ident)
-{
-	for (size_t i = 0; i < Planes.size(); ++i) {
-		if (plane_ident == Planes[i]->Ident) {
-			return Planes[i];
-		}
-	}
-	return NULL;
-}
-
-CWorld *GetWorld(std::string world_ident)
-{
-	for (size_t i = 0; i < Worlds.size(); ++i) {
-		if (world_ident == Worlds[i]->Ident) {
-			return Worlds[i];
-		}
-	}
-	return NULL;
 }
 
 CRegion *GetRegion(std::string region_ident)

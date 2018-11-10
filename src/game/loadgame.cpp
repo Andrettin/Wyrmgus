@@ -51,10 +51,12 @@
 #include "item.h"
 //Wyrmgus end
 #include "map.h"
+#include "map_template.h"
 #include "minimap.h"
 #include "missile.h"
 #include "particle.h"
 #include "pathfinder.h"
+#include "plane.h"
 //Wyrmgus start
 #include "quest.h"
 //Wyrmgus end
@@ -74,6 +76,7 @@
 #include "unittype.h"
 #include "upgrade.h"
 #include "video.h"
+#include "world.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -114,8 +117,11 @@ void CleanModules()
 	CDeityDomain::ClearDeityDomains();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
+	CMapTemplate::ClearMapTemplates();
 	CleanMissiles();
 	//Wyrmgus start
+	CPlane::ClearPlanes();
+	CleanProvinces();
 	CleanQuests();
 	CleanTexts();
 	CReligion::ClearReligions();
@@ -124,9 +130,7 @@ void CleanModules()
 	//Wyrmgus end
 	CleanUnits();
 	CleanUnitTypes();
-	//Wyrmgus start
-	CleanWorlds();
-	//Wyrmgus end
+	CWorld::ClearWorlds();
 	CleanPlayers();
 	CleanSelections();
 	CleanGroups();

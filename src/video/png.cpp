@@ -41,6 +41,7 @@
 
 #include "stratagus.h"
 #include "map.h"
+#include "map_template.h"
 //Wyrmgus start
 #include "terrain_type.h"
 #include "tileset.h"

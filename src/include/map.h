@@ -10,8 +10,8 @@
 //
 /**@name map.h - The map headerfile. */
 //
-//      (c) Copyright 1998-2006 by Vladi Shabanski, Lutz Sammer, and
-//                                 Jimmy Salmon
+//      (c) Copyright 1998-2018 by Vladi Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -101,6 +101,7 @@
 class CGraphic;
 class CPlayer;
 class CFile;
+class CMapTemplate;
 class CTileset;
 class CUnit;
 class CUnitType;
@@ -169,62 +170,6 @@ public:
 	std::string Ident;
 	std::string Name;
 	CDate PointOfDivergence;											/// The point of divergence for this timeline
-};
-
-class CMapTemplate
-{
-public:
-	CMapTemplate() :
-		Width(0), Height(0), Scale(1), SurfaceLayer(0),
-		OutputTerrainImage(false),
-		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0), PixelTileSize(32, 32),
-		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrainType(NULL), BaseOverlayTerrainType(NULL), BorderTerrainType(NULL), SurroundingTerrainType(NULL)
-	{
-	}
-
-	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
-	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
-	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z);
-	void ApplySettlements(Vec2i template_start_pos, Vec2i map_start_pos, int z);
-	void ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
-	void ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
-	bool IsSubtemplateArea();
-	
-	std::string Name;
-	std::string Ident;
-	std::string TerrainFile;
-	std::string OverlayTerrainFile;
-	std::string TerrainImage;
-	std::string OverlayTerrainImage;
-	int Width;
-	int Height;
-	int Scale;													/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
-	int SurfaceLayer;											/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
-	bool OutputTerrainImage;
-	Vec2i SubtemplatePosition;
-	Vec2i CurrentStartPos;
-	PixelSize PixelTileSize;
-	CMapTemplate *MainTemplate;									/// Main template in which this one is located
-	CPlane *Plane;
-	CWorld *World;
-	CTerrainType *BaseTerrainType;
-	CTerrainType *BaseOverlayTerrainType;
-	CTerrainType *BorderTerrainType;
-	CTerrainType *SurroundingTerrainType;
-	std::vector<CMapTemplate *> Subtemplates;
-	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
-	std::vector<std::pair<CTerrainType *, int>> ExternalGeneratedTerrains;
-	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
-	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
-	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
-	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, CDate, CDate, CUniqueItem *>> Units; /// Units; first value is the tile position, and the last ones are start date and end date
-	std::vector<std::tuple<Vec2i, CCharacter *, CFaction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
-	std::vector<std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
-	std::vector<std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
-	std::vector<std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>> SurfaceLayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
-	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
-	std::map<std::pair<int, int>, CSettlement *> Settlements;
-	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
 };
 
 class CSettlement
@@ -569,8 +514,6 @@ public:
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-extern std::vector<CMapTemplate *>  MapTemplates;
-extern std::map<std::string, CMapTemplate *> MapTemplateIdentToPointer;
 extern std::vector<CSettlement *>  Settlements;
 extern std::map<std::string, CSettlement *> SettlementIdentToPointer;
 extern std::vector<CTerrainFeature *> TerrainFeatures;
@@ -602,7 +545,6 @@ extern int ReplayRevealMap;
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-extern CMapTemplate *GetMapTemplate(std::string map_ident);
 extern CSettlement *GetSettlement(std::string settlement_ident);
 extern CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident);
 extern CTimeline *GetTimeline(std::string timeline_ident);

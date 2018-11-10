@@ -60,6 +60,7 @@
 #include "minimap.h"
 #include "missile.h"
 #include "network.h"
+#include "plane.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -77,6 +78,7 @@
 #include "unittype.h"
 #include "video.h"
 #include "widgets.h"
+#include "world.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -3009,7 +3011,7 @@ void UIHandleButtonUp(unsigned button)
 			if (button.Clicked) {
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-					Map.SetCurrentPlane(Planes[i]);
+					Map.SetCurrentPlane(CPlane::Planes[i]);
 					if (button.Callback) {
 						button.Callback->action("");
 					}
@@ -3027,7 +3029,7 @@ void UIHandleButtonUp(unsigned button)
 			if (button.Clicked) {
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-					Map.SetCurrentWorld(Worlds[i]);
+					Map.SetCurrentWorld(CWorld::Worlds[i]);
 					if (button.Callback) {
 						button.Callback->action("");
 					}

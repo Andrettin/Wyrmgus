@@ -1,3 +1,4 @@
+$#include "map_template.h"
 $#include "tileset.h"
 
 class CMapInfo

@@ -51,6 +51,7 @@
 //Wyrmgus end
 #include "unit.h"
 #include "unit_find.h"
+#include "world.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -79,6 +79,7 @@
 //Wyrmgus end
 #include "ui.h"
 #include "video.h"
+#include "world.h"
 
 //Wyrmgus start
 #include "../ai/ai_local.h"

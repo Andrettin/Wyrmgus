@@ -39,6 +39,7 @@
 
 #include "config.h"
 #include "deity_domain.h"
+#include "plane.h"
 #include "player.h"
 #include "province.h"
 #include "religion.h"
@@ -188,12 +189,8 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 			this->Icon.Icon->Load();
 		} else if (key == "home_plane") {
 			value = FindAndReplaceString(value, "_", "-");
-			CPlane *plane = GetPlane(value);
-			if (plane) {
-				this->HomePlane = plane;
-			} else {
-				fprintf(stderr, "Plane \"%s\" doesn't exist.\n", value.c_str());
-			}
+			CPlane *plane = CPlane::GetOrAddPlane(value);
+			this->HomePlane = plane;
 		} else {
 			fprintf(stderr, "Invalid deity property: \"%s\".\n", key.c_str());
 		}

@@ -42,7 +42,9 @@
 #include "game.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "map_template.h"
 //Wyrmgus start
+#include "plane.h"
 #include "province.h"
 #include "quest.h"
 //Wyrmgus end
@@ -57,6 +59,7 @@
 #include "unit.h"
 #include "version.h"
 #include "video.h"
+#include "world.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -196,8 +199,8 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"layer-references\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						Map.Planes.push_back(GetPlane(LuaToString(l, -1, 1)));
-						Map.Worlds.push_back(GetWorld(LuaToString(l, -1, 2)));
+						Map.Planes.push_back(CPlane::GetPlane(LuaToString(l, -1, 1)));
+						Map.Worlds.push_back(CWorld::GetWorld(LuaToString(l, -1, 2)));
 						Map.SurfaceLayers.push_back(LuaToNumber(l, -1, 3));
 						Map.LayerConnectors.resize(z + 1);
 						lua_pop(l, 1);
@@ -640,7 +643,7 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value, int 
 static int CclSetMapTemplateTileTerrain(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template doesn't exist.\n");
 	}
@@ -683,7 +686,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 static int CclSetMapTemplateTileLabel(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template doesn't exist.\n");
 	}
@@ -701,7 +704,7 @@ static int CclSetMapTemplateTileLabel(lua_State *l)
 static int CclSetMapTemplatePathway(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template doesn't exist.\n");
 	}
@@ -811,7 +814,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 static int CclSetMapTemplateResource(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template doesn't exist.\n");
 	}
@@ -847,7 +850,7 @@ static int CclSetMapTemplateResource(lua_State *l)
 static int CclSetMapTemplateUnit(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template doesn't exist.\n");
 	}
@@ -899,7 +902,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 static int CclSetMapTemplateHero(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template doesn't exist.\n");
 	}
@@ -944,7 +947,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 static int CclSetMapTemplateLayerConnector(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template doesn't exist.\n");
 	}
@@ -973,10 +976,10 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 		map_template->SurfaceLayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>(ipos, unittype, layer, unique));
 	} else if (lua_isstring(l, 4)) {
 		std::string realm = LuaToString(l, 4);
-		if (GetWorld(realm)) {
-			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>(ipos, unittype, GetWorld(realm), unique));
-		} else if (GetPlane(realm)) {
-			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>(ipos, unittype, GetPlane(realm), unique));
+		if (CWorld::GetWorld(realm)) {
+			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>(ipos, unittype, CWorld::GetWorld(realm), unique));
+		} else if (CPlane::GetPlane(realm)) {
+			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>(ipos, unittype, CPlane::GetPlane(realm), unique));
 		} else {
 			LuaError(l, "incorrect argument");
 		}
@@ -993,7 +996,7 @@ static std::string map_terrains[64][64];
 static int CclCreateMapTemplateTerrainFile(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template doesn't exist.\n");
 	}
@@ -1049,7 +1052,7 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 
 void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int template_start_y, int map_start_x, int map_start_y, int z)
 {
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	
 	if (!map_template) {
 		fprintf(stderr, "Map template \"%s\" doesn't exist.\n", map_template_ident.c_str());
@@ -1657,13 +1660,7 @@ static int CclDefineMapTemplate(lua_State *l)
 	}
 
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
-	if (map_template == NULL) {
-		map_template = new CMapTemplate;
-		map_template->Ident = map_template_ident;
-		MapTemplates.push_back(map_template);
-		MapTemplateIdentToPointer[map_template_ident] = map_template;
-	}
+	CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(map_template_ident);
 	
 	Vec2i subtemplate_position_top_left(-1, -1);
 	
@@ -1674,13 +1671,13 @@ static int CclDefineMapTemplate(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			map_template->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Plane")) {
-			CPlane *plane = GetPlane(LuaToString(l, -1));
+			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
 			if (!plane) {
 				LuaError(l, "Plane doesn't exist.");
 			}
 			map_template->Plane = plane;
 		} else if (!strcmp(value, "World")) {
-			CWorld *world = GetWorld(LuaToString(l, -1));
+			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
 			if (!world) {
 				LuaError(l, "World doesn't exist.");
 			}
@@ -1714,7 +1711,7 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else if (!strcmp(value, "PixelTileSize")) {
 			CclGetPos(l, &map_template->PixelTileSize.x, &map_template->PixelTileSize.y);
 		} else if (!strcmp(value, "MainTemplate")) {
-			CMapTemplate *main_template = GetMapTemplate(LuaToString(l, -1));
+			CMapTemplate *main_template = CMapTemplate::GetMapTemplate(LuaToString(l, -1));
 			if (!main_template) {
 				LuaError(l, "Map template doesn't exist.");
 			}
@@ -1853,7 +1850,7 @@ static int CclDefineSettlement(lua_State *l)
 		} else if (!strcmp(value, "Position")) {
 			CclGetPos(l, &settlement->Position.x, &settlement->Position.y);
 		} else if (!strcmp(value, "MapTemplate")) {
-			CMapTemplate *map_template = GetMapTemplate(LuaToString(l, -1));
+			CMapTemplate *map_template = CMapTemplate::GetMapTemplate(LuaToString(l, -1));
 			if (!map_template) {
 				LuaError(l, "Map template doesn't exist.");
 			}
@@ -2162,14 +2159,14 @@ static int CclDefineTerrainFeature(lua_State *l)
 			}
 			terrain_feature->TerrainType = terrain;
 		} else if (!strcmp(value, "Plane")) {
-			CPlane *plane = GetPlane(LuaToString(l, -1));
+			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
 			if (plane != NULL) {
 				terrain_feature->Plane = plane;
 			} else {
 				LuaError(l, "Plane doesn't exist.");
 			}
 		} else if (!strcmp(value, "World")) {
-			CWorld *world = GetWorld(LuaToString(l, -1));
+			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
 			if (world != NULL) {
 				terrain_feature->World = world;
 				world->TerrainFeatures.push_back(terrain_feature);
@@ -2257,7 +2254,7 @@ static int CclGetMapTemplateData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string map_template_ident = LuaToString(l, 1);
-	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	if (!map_template) {
 		LuaError(l, "Map template \"%s\" doesn't exist." _C_ map_template_ident.c_str());
 	}

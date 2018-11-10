@@ -197,6 +197,7 @@ set(map_SRCS
 	src/map/map_draw.cpp
 	src/map/map_fog.cpp
 	src/map/map_radar.cpp
+	src/map/map_template.cpp
 	src/map/map_wall.cpp
 	src/map/mapfield.cpp
 	src/map/minimap.cpp
@@ -296,49 +297,39 @@ set(spell_SRCS
 source_group(spell FILES ${spell_SRCS})
 
 set(stratagusmain_SRCS
-	#Wyrmgus start
 	src/stratagus/character.cpp
-	#Wyrmgus end
 	src/stratagus/config.cpp
 	src/stratagus/construct.cpp
-	#Wyrmgus start
 	src/stratagus/deity.cpp
 	src/stratagus/deity_domain.cpp
 	src/stratagus/grand_strategy.cpp
-	#Wyrmgus end
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
-	#Wyrmgus start
 	src/stratagus/item.cpp
-	#Wyrmgus end
 	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/parameters.cpp
+	src/stratagus/plane.cpp
 	src/stratagus/player.cpp
-	#Wyrmgus start
 	src/stratagus/province.cpp
 	src/stratagus/quest.cpp
 	src/stratagus/religion.cpp
-	#Wyrmgus end
 	src/stratagus/script.cpp
 	src/stratagus/script_player.cpp
-	#Wyrmgus start
 	src/stratagus/script_character.cpp
 	src/stratagus/script_grand_strategy.cpp
 	src/stratagus/script_item.cpp
 	src/stratagus/script_province.cpp
 	src/stratagus/script_quest.cpp
 	src/stratagus/script_text.cpp
-	#Wyrmgus end
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
-	#Wyrmgus start
 	src/stratagus/text.cpp
-	#Wyrmgus end
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
 	src/stratagus/util.cpp
+	src/stratagus/world.cpp
 )
 source_group(stratagusmain FILES ${stratagus_SRCS})
 
@@ -590,9 +581,7 @@ set(stratagus_generic_HDRS
 	src/include/actions.h
 	src/include/ai.h
 	src/include/animation.h
-	#Wyrmgus start
 	src/include/character.h
-	#Wyrmgus end
 	src/include/color.h
 	src/include/commands.h
 	src/include/config.h
@@ -604,18 +593,15 @@ set(stratagus_generic_HDRS
 	src/include/editor.h
 	src/include/font.h
 	src/include/game.h
-	#Wyrmgus start
 	src/include/grand_strategy.h
-	#Wyrmgus end
 	src/include/icons.h
 	src/include/interface.h
 	src/include/iocompat.h
 	src/include/iolib.h
-	#Wyrmgus start
 	src/include/item.h
-	#Wyrmgus end
 	src/include/luacallback.h
 	src/include/map.h
+	src/include/map_template.h
 	src/include/master.h
 	src/include/menus.h
 	src/include/minimap.h
@@ -631,12 +617,11 @@ set(stratagus_generic_HDRS
 	src/include/parameters.h
 	src/include/particle.h
 	src/include/pathfinder.h
+	src/include/plane.h
 	src/include/player.h
-	#Wyrmgus start
 	src/include/province.h
 	src/include/quest.h
 	src/include/religion.h
-	#Wyrmgus end
 	src/include/replay.h
 	src/include/results.h
 	src/include/script.h
@@ -648,9 +633,7 @@ set(stratagus_generic_HDRS
 	src/include/spells.h
 	src/include/stratagus.h
 	src/include/terrain_type.h
-	#Wyrmgus start
 	src/include/text.h
-	#Wyrmgus end
 	src/include/tile.h
 	src/include/tileset.h
 	src/include/title.h
@@ -677,6 +660,7 @@ set(stratagus_generic_HDRS
 	src/include/viewport.h
 	src/include/wav.h
 	src/include/widgets.h
+	src/include/world.h
 	src/include/SetupConsole_win32.h
 )
 

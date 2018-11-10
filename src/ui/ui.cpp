@@ -53,6 +53,7 @@
 #include "ui/popup.h"
 #include "unit.h"
 #include "video.h"
+#include "world.h"
 
 #include <stdarg.h>
 

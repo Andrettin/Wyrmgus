@@ -1974,6 +1974,7 @@ void CleanGame()
 
 void GenerateHistory()
 {
+	ShowLoadProgress(_("Generating History..."));
 	CCharacter::GenerateCharacterHistory(); //generate character history, e.g. by matching deity profiles with deities
 }
 

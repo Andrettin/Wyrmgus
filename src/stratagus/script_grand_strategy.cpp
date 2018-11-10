@@ -37,6 +37,7 @@
 
 #include "grand_strategy.h"
 #include "luacallback.h"
+#include "world.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -149,7 +150,7 @@ static int CclDefineGrandStrategyEvent(lua_State *l)
 		} else if (!strcmp(value, "HistoricalYear")) {
 			event->HistoricalYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "World")) {
-			CWorld *world = GetWorld(LuaToString(l, -1));
+			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
 			if (world != NULL) {
 				event->World = world;
 			} else {

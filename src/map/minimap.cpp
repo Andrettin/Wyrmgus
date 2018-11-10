@@ -41,6 +41,7 @@
 
 #include "editor.h"
 #include "map.h"
+#include "plane.h"
 #include "player.h"
 #include "province.h"
 #include "terrain_type.h"
@@ -50,6 +51,7 @@
 #include "ui.h"
 #include "unittype.h"
 #include "video.h"
+#include "world.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

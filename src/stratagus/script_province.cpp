@@ -39,12 +39,14 @@
 
 #include "deity_domain.h"
 #include "iolib.h"
+#include "plane.h"
 #include "player.h"
 #include "script.h"
 #include "tileset.h"
 #include "unittype.h"
 #include "upgrade.h"
 #include "video.h"
+#include "world.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -114,16 +116,7 @@ static int CclDefinePlane(lua_State *l)
 	}
 
 	std::string plane_ident = LuaToString(l, 1);
-	CPlane *plane = GetPlane(plane_ident);
-	if (!plane) {
-		plane = new CPlane;
-		plane->Ident = plane_ident;
-		plane->ID = Planes.size();
-		Planes.push_back(plane);
-		UI.PlaneButtons.resize(Planes.size());
-		UI.PlaneButtons[plane->ID].X = -1;
-		UI.PlaneButtons[plane->ID].Y = -1;
-	}
+	CPlane *plane = CPlane::GetOrAddPlane(plane_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -173,16 +166,7 @@ static int CclDefineWorld(lua_State *l)
 	}
 
 	std::string world_ident = LuaToString(l, 1);
-	CWorld *world = GetWorld(world_ident);
-	if (!world) {
-		world = new CWorld;
-		world->Ident = world_ident;
-		world->ID = Worlds.size();
-		Worlds.push_back(world);
-		UI.WorldButtons.resize(Worlds.size());
-		UI.WorldButtons[world->ID].X = -1;
-		UI.WorldButtons[world->ID].Y = -1;
-	}
+	CWorld *world = CWorld::GetOrAddWorld(world_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -197,7 +181,7 @@ static int CclDefineWorld(lua_State *l)
 		} else if (!strcmp(value, "Quote")) {
 			world->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Plane")) {
-			CPlane *plane = GetPlane(LuaToString(l, -1));
+			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
 			if (!plane) {
 				LuaError(l, "Plane doesn't exist.");
 			}
@@ -286,7 +270,7 @@ static int CclDefineProvince(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "World")) {
-			CWorld *world = GetWorld(LuaToString(l, -1));
+			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
 			if (world != NULL) {
 				province->World = world;
 				world->Provinces.push_back(province);
@@ -501,10 +485,9 @@ static int CclDefineWorldMapTile(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "World")) {
-			CWorld *world = GetWorld(LuaToString(l, -1));
+			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
 			if (world != NULL) {
 				tile->World = world;
-				world->Tiles.push_back(tile);
 			} else {
 				LuaError(l, "World doesn't exist.");
 			}
@@ -753,7 +736,7 @@ static int CclGetPlaneData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string plane_ident = LuaToString(l, 1);
-	CPlane *plane = GetPlane(plane_ident);
+	CPlane *plane = CPlane::GetPlane(plane_ident);
 	if (!plane) {
 		LuaError(l, "Plane \"%s\" doesn't exist." _C_ plane_ident.c_str());
 	}
@@ -800,7 +783,7 @@ static int CclGetWorldData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string world_ident = LuaToString(l, 1);
-	CWorld *world = GetWorld(world_ident);
+	CWorld *world = CWorld::GetWorld(world_ident);
 	if (!world) {
 		LuaError(l, "World \"%s\" doesn't exist." _C_ world_ident.c_str());
 	}
@@ -893,10 +876,10 @@ static int CclGetProvinceData(lua_State *l)
 
 static int CclGetPlanes(lua_State *l)
 {
-	lua_createtable(l, Planes.size(), 0);
-	for (size_t i = 1; i <= Planes.size(); ++i)
+	lua_createtable(l, CPlane::Planes.size(), 0);
+	for (size_t i = 1; i <= CPlane::Planes.size(); ++i)
 	{
-		lua_pushstring(l, Planes[i-1]->Ident.c_str());
+		lua_pushstring(l, CPlane::Planes[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -904,10 +887,10 @@ static int CclGetPlanes(lua_State *l)
 
 static int CclGetWorlds(lua_State *l)
 {
-	lua_createtable(l, Worlds.size(), 0);
-	for (size_t i = 1; i <= Worlds.size(); ++i)
+	lua_createtable(l, CWorld::Worlds.size(), 0);
+	for (size_t i = 1; i <= CWorld::Worlds.size(); ++i)
 	{
-		lua_pushstring(l, Worlds[i-1]->Ident.c_str());
+		lua_pushstring(l, CWorld::Worlds[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

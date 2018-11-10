@@ -72,6 +72,7 @@
 #include "missile.h"
 #include "network.h"
 #include "pathfinder.h"
+#include "plane.h"
 #include "player.h"
 //Wyrmgus start
 #include "quest.h"
