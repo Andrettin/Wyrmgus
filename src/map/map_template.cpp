@@ -39,6 +39,7 @@
 
 #include <fstream>
 
+#include "config.h"
 #include "editor.h"
 #include "game.h"
 #include "iolib.h"
@@ -103,6 +104,97 @@ void CMapTemplate::ClearMapTemplates()
 		delete MapTemplates[i];
 	}
 	MapTemplates.clear();
+}
+
+void CMapTemplate::ProcessConfigData(CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "plane") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Plane = CPlane::GetOrAddPlane(value);
+		} else if (key == "world") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->World = CWorld::GetOrAddWorld(value);
+			this->Plane = this->World->Plane;
+		} else if (key == "surface_layer") {
+			this->SurfaceLayer = std::stoi(value);
+			if (this->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
+				UI.SurfaceLayerButtons.resize(this->SurfaceLayer + 1);
+			}
+		} else if (key == "terrain_file") {
+			this->TerrainFile = value;
+		} else if (key == "overlay_terrain_file") {
+			this->OverlayTerrainFile = value;
+		} else if (key == "terrain_image") {
+			this->TerrainImage = value;
+		} else if (key == "overlay_terrain_image") {
+			this->OverlayTerrainImage = value;
+		} else if (key == "width") {
+			this->Width = std::stoi(value);
+		} else if (key == "height") {
+			this->Height = std::stoi(value);
+		} else if (key == "scale") {
+			this->Scale = std::stoi(value);
+		} else if (key == "pixel_tile_width") {
+			this->PixelTileSize.x = std::stoi(value);
+		} else if (key == "pixel_tile_height") {
+			this->PixelTileSize.y = std::stoi(value);
+		} else if (key == "base_terrain_type") {
+			value = FindAndReplaceString(value, "_", "-");
+			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(value);
+			this->BaseTerrainType = terrain_type;
+		} else if (key == "base_overlay_terrain_type") {
+			value = FindAndReplaceString(value, "_", "-");
+			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(value);
+			this->BaseOverlayTerrainType = terrain_type;
+		} else {
+			fprintf(stderr, "Invalid map template property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		CConfigData *child_config_data = config_data->Children[i];
+		
+		if (child_config_data->Tag == "generated_neutral_unit" || child_config_data->Tag == "player_location_generated_neutral_unit") {
+			CUnitType *unit_type = NULL;
+			int quantity = 1;
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "unit_type") {
+					value = FindAndReplaceString(value, "_", "-");
+					unit_type = UnitTypeByIdent(value);
+					if (!unit_type) {
+						fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
+					}
+				} else if (key == "quantity") {
+					quantity = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid generated neutral unit property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (!unit_type) {
+				fprintf(stderr, "Generated neutral unit has no unit type.\n");
+				continue;
+			}
+			
+			if (child_config_data->Tag == "generated_neutral_unit") {
+				this->GeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+			} else if (child_config_data->Tag == "player_location_generated_neutral_unit") {
+				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+			}
+		} else {
+			fprintf(stderr, "Invalid map template property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
 }
 
 void CMapTemplate::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z)

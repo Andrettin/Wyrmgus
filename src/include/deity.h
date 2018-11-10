@@ -67,6 +67,8 @@ public:
 	static CDeity *GetProfileMatch(CDeity *deity_profile);
 	static void ClearDeities();
 	
+	static std::vector<CDeity *> Deities;		/// Deities
+	
 	void ProcessConfigData(CConfigData *config_data);
 	
 	int Gender;									/// Deity's gender
@@ -90,8 +92,6 @@ public:
 	std::vector<CFaction *> HolyOrders;			/// Holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			/// Abilities linked to this deity
 	std::map<int, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
-	
-	static std::vector<CDeity *> Deities;		/// Deities
 };
 
 //@}

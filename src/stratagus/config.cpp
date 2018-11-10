@@ -40,6 +40,7 @@
 #include "character.h"
 #include "deity.h"
 #include "game.h"
+#include "map_template.h"
 #include "terrain_type.h"
 #include "util.h"
 
@@ -157,6 +158,9 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				CDeity::Deities.push_back(deity);
 			}
 			deity->ProcessConfigData(config_data);
+		} else if (config_data->Tag == "map_template") {
+			CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(ident);
+			map_template->ProcessConfigData(config_data);
 		} else if (config_data->Tag == "terrain_type") {
 			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(ident);
 			terrain_type->ProcessConfigData(config_data);

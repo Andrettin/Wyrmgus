@@ -51,6 +51,7 @@
 ----------------------------------------------------------------------------*/
 
 class CCharacter;
+class CConfigData;
 class CFaction;
 class CPlane;
 class CSettlement;
@@ -77,6 +78,7 @@ public:
 	static std::vector<CMapTemplate *> MapTemplates;								/// Map templates
 	static std::map<std::string, CMapTemplate *> MapTemplatesByIdent;
 
+	void ProcessConfigData(CConfigData *config_data);
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z);

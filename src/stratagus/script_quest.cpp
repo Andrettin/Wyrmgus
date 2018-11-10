@@ -468,10 +468,7 @@ static int CclDefineCampaign(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string map_template_ident = LuaToString(l, -1, j + 1);
-				CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
-				if (!map_template) {
-					LuaError(l, "Map template \"%s\" doesn't exist." _C_ map_template_ident.c_str());
-				}
+				CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(map_template_ident);
 				campaign->MapTemplates.push_back(map_template);
 				++j;
 				
@@ -490,10 +487,7 @@ static int CclDefineCampaign(lua_State *l)
 			}
 		} else if (!strcmp(value, "MapTemplate")) {
 			std::string map_template_ident = LuaToString(l, -1);
-			CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
-			if (!map_template) {
-				LuaError(l, "Map template \"%s\" doesn't exist." _C_ map_template_ident.c_str());
-			}
+			CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(map_template_ident);
 			campaign->MapTemplates.push_back(map_template);
 		} else if (!strcmp(value, "MapTemplateStartPos")) {
 			Vec2i map_template_start_pos;

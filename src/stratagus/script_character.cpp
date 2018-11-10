@@ -491,10 +491,7 @@ static int CclDefineCharacter(lua_State *l)
 				lua_pop(l, 1);
 				++j;
 				
-				CMapTemplate *map_template = CMapTemplate::GetMapTemplate(LuaToString(l, -1, j + 1));
-				if (!map_template) {
-					LuaError(l, "Map template doesn't exist.");
-				}
+				CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(LuaToString(l, -1, j + 1));
 				++j;
 				
 				lua_rawgeti(l, -1, j + 1);

@@ -113,7 +113,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		} else if (key == "family_name") {
 			this->FamilyName = value;
 			family_name_changed = true;
-		} else if (key == "type") {
+		} else if (key == "unit_type") {
 			value = FindAndReplaceString(value, "_", "-");
 			int unit_type_id = UnitTypeIdByIdent(value);
 			if (unit_type_id != -1) {
