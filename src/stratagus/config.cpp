@@ -144,7 +144,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				character->Ident = ident;
 				Characters[ident] = character;
 			} else {
-				if (!GeneratingHistory) {
+				if (!LoadingHistory) {
 					fprintf(stderr, "Character \"%s\" is being redefined.\n", ident.c_str());
 				}
 			}
