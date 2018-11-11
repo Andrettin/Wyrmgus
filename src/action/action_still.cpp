@@ -476,7 +476,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	this->SetGoal(autoAttackUnit);
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
-	UnitHeadingFromDeltaXY(unit, Vec2i(autoAttackUnit->tilePos.x * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer).x, autoAttackUnit->tilePos.y * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer).y) + autoAttackUnit->Type->GetHalfTilePixelSize(autoAttackUnit->MapLayer) - Vec2i(unit.tilePos.x * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer).x, unit.tilePos.y * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer).y) - unit.Type->GetHalfTilePixelSize(unit.MapLayer));
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer)) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer)) - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 	return true;
 }

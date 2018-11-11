@@ -53,8 +53,8 @@ void CMap::Insert(CUnit &unit)
 {
 	Assert(!unit.Removed);
 	unsigned int index = unit.Offset;
-	const int w = unit.Type->TileWidth;
-	const int h = unit.Type->TileHeight;
+	const int w = unit.Type->TileSize.x;
+	const int h = unit.Type->TileSize.y;
 	int j, i = h;
 
 	do {
@@ -87,8 +87,8 @@ void CMap::Remove(CUnit &unit)
 {
 	Assert(!unit.Removed);
 	unsigned int index = unit.Offset;
-	const int w = unit.Type->TileWidth;
-	const int h = unit.Type->TileHeight;
+	const int w = unit.Type->TileSize.x;
+	const int h = unit.Type->TileSize.y;
 	int j, i = h;
 
 	do {

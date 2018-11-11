@@ -71,7 +71,7 @@ enum {
 	COrder_Defend *order = new COrder_Defend();
 
 	if (dest.Destroyed) {
-		order->goalPos = dest.tilePos + dest.Type->GetHalfTileSize();
+		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
 		//Wyrmgus start
 		order->MapLayer = dest.MapLayer;
 		//Wyrmgus end
@@ -172,19 +172,12 @@ enum {
 	Vec2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
-		tileSize.x = goal->Type->TileWidth;
-		tileSize.y = goal->Type->TileHeight;
-		//Wyrmgus start
-//		input.SetGoal(goal->tilePos, tileSize);
+		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
-		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		//Wyrmgus start
-//		input.SetGoal(this->goalPos, tileSize);
 		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
-		//Wyrmgus end
 	}
 }
 
@@ -269,10 +262,8 @@ enum {
 	// Target destroyed?
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
-		this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
-		//Wyrmgus start
+		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 		this->MapLayer = goal->MapLayer;
-		//Wyrmgus end
 		this->ClearGoal();
 		goal = NULL;
 		if (this->State == State_Defending) {

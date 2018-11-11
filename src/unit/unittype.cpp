@@ -191,13 +191,9 @@
 **
 **    Costs per repair cycle to fix a unit.
 **
-**  CUnitType::TileWidth
+**  CUnitType::TileSize
 **
-**    Tile size on map width
-**
-**  CUnitType::TileHeight
-**
-**    Tile size on map height
+**    Tile size on map
 **
 **  CUnitType::BoxWidth
 **
@@ -568,7 +564,7 @@ CUnitType::CUnitType() :
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
 	TeleportCost(0), TeleportEffectIn(NULL), TeleportEffectOut(NULL),
-	CorpseType(NULL), Construction(NULL), RepairHP(0), TileWidth(0), TileHeight(0),
+	CorpseType(NULL), Construction(NULL), RepairHP(0), TileSize(0, 0),
 	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	//Wyrmgus start
 //	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
@@ -696,9 +692,19 @@ CUnitType::~CUnitType()
 #endif
 }
 
-PixelSize CUnitType::GetPixelSize(const int map_layer) const
+Vec2i CUnitType::GetTileSize(const int map_layer) const
 {
-	return PixelSize(TileWidth * Map.GetMapLayerPixelTileSize(map_layer).x, TileHeight * Map.GetMapLayerPixelTileSize(map_layer).y);
+	return this->TileSize;
+}
+
+Vec2i CUnitType::GetHalfTileSize(const int map_layer) const
+{
+	return this->GetTileSize(map_layer) / 2;
+}
+
+PixelSize CUnitType::GetTilePixelSize(const int map_layer) const
+{
+	return PixelSize(PixelSize(this->GetTileSize(map_layer)) * Map.GetMapLayerPixelTileSize(map_layer));
 }
 
 bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
@@ -1584,10 +1590,10 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	//Wyrmgus start
-//	pos.x -= (type.Width - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
-//	pos.y -= (type.Height - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
-	pos.x -= (sprite->Width - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
-	pos.y -= (sprite->Height - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
+//	pos.x -= (type.Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
+//	pos.y -= (type.Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
+	pos.x -= (sprite->Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
+	pos.y -= (sprite->Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 	//Wyrmgus end
 	pos.x += type.OffsetX;
 	pos.y += type.OffsetY;

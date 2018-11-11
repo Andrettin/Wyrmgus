@@ -107,7 +107,7 @@
 		} else {
 			dest.x = (target->tilePos.x + destx) * Map.GetMapLayerPixelTileSize(target->MapLayer).x;
 			dest.y = (target->tilePos.y + desty) * Map.GetMapLayerPixelTileSize(target->MapLayer).y;
-			dest += target->Type->GetPixelSize(target->MapLayer) / 2;
+			dest += target->GetTilePixelSize() / 2;
 		}
 	} else {
 		if ((flags & SM_Pixel)) {
@@ -116,7 +116,7 @@
 		} else {
 			dest.x = (goal->tilePos.x + destx) * Map.GetMapLayerPixelTileSize(goal->MapLayer).x;
 			dest.y = (goal->tilePos.y + desty) * Map.GetMapLayerPixelTileSize(goal->MapLayer).y;
-			dest += goal->Type->GetPixelSize(goal->MapLayer) / 2;
+			dest += goal->GetTilePixelSize() / 2;
 		}
 	}
 	Vec2i destTilePos = Map.MapPixelPosToTilePos(dest, unit.MapLayer);

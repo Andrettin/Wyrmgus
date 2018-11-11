@@ -101,8 +101,7 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 {
 	const int surroundRange = type.AiAdjacentRange != -1 ? type.AiAdjacentRange : 1;
 	const Vec2i pos_topLeft(pos.x - surroundRange, pos.y - surroundRange);
-	const Vec2i pos_bottomRight(pos.x + type.TileWidth + surroundRange - 1,
-								pos.y + type.TileHeight + surroundRange - 1);
+	const Vec2i pos_bottomRight(pos + type.TileSize + surroundRange - 1);
 	Vec2i it = pos_topLeft;
 	//Wyrmgus start
 //	const bool firstVal = IsPosFree(it, worker);
@@ -230,7 +229,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		(!landmass || Map.GetTileLandmass(pos, z) == landmass)
 		&& CanBuildUnitType(&worker, type, pos, 1, IgnoreExploration, z)
 		&& !AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8, z)
-		&& (!settlement || settlement == worker.Player->GetNearestSettlement(pos, z, Vec2i(type.TileWidth, type.TileHeight)))
+		&& (!settlement || settlement == worker.Player->GetNearestSettlement(pos, z, type.TileSize))
 	) {
 		//Wyrmgus end
 		bool backupok;
@@ -345,7 +344,7 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 	// Check units around mine
 	const Vec2i offset(5, 5);
 	const Vec2i minpos = mine.tilePos - offset;
-	const Vec2i typeSize(mine.Type->TileWidth - 1, mine.Type->TileHeight - 1);
+	const Vec2i typeSize(mine.Type->TileSize - 1);
 	const Vec2i maxpos = mine.tilePos + typeSize + offset;
 	std::vector<CUnit *> units;
 

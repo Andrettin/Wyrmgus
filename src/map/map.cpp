@@ -448,8 +448,8 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 	int while_count = 0;
 	
 	while (while_count < 100) {
-		random_pos.x = SyncRand(max_pos.x - (unit_type->TileWidth - 1) - min_pos.x + 1) + min_pos.x;
-		random_pos.y = SyncRand(max_pos.y - (unit_type->TileHeight - 1) - min_pos.y + 1) + min_pos.y;
+		random_pos.x = SyncRand(max_pos.x - (unit_type->TileSize.x - 1) - min_pos.x + 1) + min_pos.x;
+		random_pos.y = SyncRand(max_pos.y - (unit_type->TileSize.y - 1) - min_pos.y + 1) + min_pos.y;
 		
 		if (!this->Info.IsPointOnMap(random_pos, z) || (this->IsPointInASubtemplateArea(random_pos, z) && GameCycle == 0)) {
 			continue;
@@ -462,21 +462,21 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 		
 		std::vector<CUnit *> table;
 		if (player != NULL) {
-			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
+			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
 			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeFly)) {
-				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
+				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
 			} else {
-				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 			}
 		} else if (unit_type->GivesResource && !unit_type->BoolFlag[BUILDING_INDEX].value) { //for non-building resources (i.e. wood piles), place them within a certain distance of player units, to prevent them from blocking the way
-			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 		}
 		
 		if (table.size() == 0) {
 			bool passable_surroundings = true; //check if the unit won't be placed next to unpassable terrain
-			for (int x = random_pos.x - 1; x < random_pos.x + unit_type->TileWidth + 1; ++x) {
-				for (int y = random_pos.y - 1; y < random_pos.y + unit_type->TileHeight + 1; ++y) {
+			for (int x = random_pos.x - 1; x < random_pos.x + unit_type->TileSize.x + 1; ++x) {
+				for (int y = random_pos.y - 1; y < random_pos.y + unit_type->TileSize.y + 1; ++y) {
 					if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->CheckMask(MapFieldUnpassable)) {
 						passable_surroundings = false;
 					}
@@ -918,8 +918,8 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
 	unsigned int index = pos.y * Map.Info.MapWidths[z];
 	//Wyrmgus end
 
-	for (int addy = 0; addy < type.TileHeight; ++addy) {
-		for (int addx = 0; addx < type.TileWidth; ++addx) {
+	for (int addy = 0; addy < type.TileSize.y; ++addy) {
+		for (int addx = 0; addx < type.TileSize.x; ++addx) {
 			//Wyrmgus start
 			/*
 			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy) == false
@@ -2030,8 +2030,8 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 				bool obstacle_check = true;
 				for (size_t j = 0; j < obstacle_flags.size(); ++j) {
 					bool obstacle_subcheck = false;
-					for (int x = 0; x < unit->Type->TileWidth; ++x) {
-						for (int y = 0; y < unit->Type->TileHeight; ++y) {
+					for (int x = 0; x < unit->Type->TileSize.x; ++x) {
+						for (int y = 0; y < unit->Type->TileSize.y; ++y) {
 							if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, NULL, unit->Player->Index)) { //the obstacle must be avoidable from at least one of the unit's tiles
 								obstacle_subcheck = true;
 								break;
@@ -2470,7 +2470,7 @@ void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i 
 		if (unit_type->GivesResource) {
 			CUnit *unit = CreateResourceUnit(unit_pos, *unit_type, z);
 		} else {
-			CUnit *unit = CreateUnit(unit_pos, *unit_type, &Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->TileWidth > 1 && unit_type->TileHeight > 1);
+			CUnit *unit = CreateUnit(unit_pos, *unit_type, &Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->TileSize.x > 1 && unit_type->TileSize.y > 1);
 		}
 	}
 }

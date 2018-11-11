@@ -1270,7 +1270,7 @@ public:
 				// FIXME : assume that PRIORITY_FACTOR>HEALTH_FACTOR
 				cost = HEALTH_FACTOR * (2 * hp_damage_evaluate -
 										dest->Variable[HP_INDEX].Value) /
-					   (dtype.TileWidth * dtype.TileWidth);
+					   (dtype.TileSize.x * dtype.TileSize.x);
 				cost = std::max(cost, 1);
 				cost = -cost;
 			} else {
@@ -1312,7 +1312,7 @@ public:
 				}
 
 				// the cost may be divided across multiple cells
-				cost = cost / (dtype.TileWidth * dtype.TileWidth);
+				cost = cost / (dtype.TileSize.x * dtype.TileSize.x);
 				cost = std::max(cost, 1);
 
 				// Removed Unit's are in bunkers
@@ -1353,8 +1353,8 @@ public:
 			Assert(x >= 0 && y >= 0);
 
 			// Mark the good/bad array...
-			for (int yy = 0; yy < dtype.TileHeight; ++yy) {
-				for (int xx = 0; xx < dtype.TileWidth; ++xx) {
+			for (int yy = 0; yy < dtype.TileSize.y; ++yy) {
+				for (int xx = 0; xx < dtype.TileSize.x; ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
 					if (pos >= (int) good->size()) {
 						printf("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
@@ -1430,9 +1430,9 @@ private:
 		int y = attacker->tilePos.y;
 
 		// put in x-y the real point which will be hit...
-		// (only meaningful when dtype->TileWidth > 1)
-		clamp<int>(&x, dest->tilePos.x, dest->tilePos.x + dtype.TileWidth - 1);
-		clamp<int>(&y, dest->tilePos.y, dest->tilePos.y + dtype.TileHeight - 1);
+		// (only meaningful when dtype->TileSize.x > 1)
+		clamp<int>(&x, dest->tilePos.x, dest->tilePos.x + dtype.TileSize.x - 1);
+		clamp<int>(&y, dest->tilePos.y, dest->tilePos.y + dtype.TileSize.y - 1);
 
 		int sbad = 0;
 		int sgood = 0;
@@ -1730,7 +1730,7 @@ private:
 
 VisitResult PathwayConnectionFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (pos.x >= dst_unit.tilePos.x && pos.x <= (dst_unit.tilePos.x + dst_unit.Type->TileWidth - 1) && pos.y >= dst_unit.tilePos.y && pos.y <= (dst_unit.tilePos.y + dst_unit.Type->TileHeight - 1)) {
+	if (pos.x >= dst_unit.tilePos.x && pos.x <= (dst_unit.tilePos.x + dst_unit.Type->TileSize.x - 1) && pos.y >= dst_unit.tilePos.y && pos.y <= (dst_unit.tilePos.y + dst_unit.Type->TileSize.y - 1)) {
 		*result = true;
 		return VisitResult_Finished;
 	}

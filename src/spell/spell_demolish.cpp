@@ -103,7 +103,7 @@
 //	Vec2i minpos = goalPos - offset;
 //	Vec2i maxpos = goalPos + offset;
 	Vec2i minpos = caster.tilePos - offset;
-	Vec2i maxpos = caster.tilePos + Vec2i(caster.Type->TileWidth - 1, caster.Type->TileHeight - 1) + offset;
+	Vec2i maxpos = caster.tilePos + Vec2i(caster.Type->TileSize - 1) + offset;
 	//Wyrmgus end
 
 	//Wyrmgus start

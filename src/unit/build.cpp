@@ -173,22 +173,14 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 		|| this->DistanceType == NotEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance, 0);
-		//Wyrmgus start
-//		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidth);
-//		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeight);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeights[z]);
-		//Wyrmgus end
+		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance, Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.TileSize.y + this->Distance, Map.Info.MapHeights[z]);
 		distance = this->Distance;
 	} else if (this->DistanceType == LessThan || this->DistanceType == GreaterThanEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
-		//Wyrmgus start
-//		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
-//		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeights[z]);
-		//Wyrmgus end
+		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance + 1, Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.TileSize.y + this->Distance + 1, Map.Info.MapHeights[z]);
 		distance = this->Distance - 1;
 	}
 	std::vector<CUnit *> table;
@@ -316,23 +308,15 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 		|| this->DistanceType == NotEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance, 0);
-		//Wyrmgus start
-//		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidth);
-//		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeight);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeights[z]);
-		//Wyrmgus end
+		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance, Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.TileSize.y + this->Distance, Map.Info.MapHeights[z]);
 		distance = this->Distance;
 	}
 	else if (this->DistanceType == LessThan || this->DistanceType == GreaterThanEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
-		//Wyrmgus start
-//		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
-//		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidths[z]);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeights[z]);
-		//Wyrmgus end
+		pos2.x = std::min<int>(pos.x + type.TileSize.x + this->Distance + 1, Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.TileSize.y + this->Distance + 1, Map.Info.MapHeights[z]);
 		distance = this->Distance - 1;
 	}
 	std::vector<CUnit *> table;
@@ -479,7 +463,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 	if (it != cache.end() && (*it)->tilePos == pos) {
 		CUnit &found = **it;
 		std::vector<CUnit *> table;
-		Vec2i endPos(found.tilePos.x + found.Type->TileWidth - 1, found.tilePos.y + found.Type->TileHeight - 1);
+		Vec2i endPos(found.tilePos + found.Type->TileSize - 1);
 		//Wyrmgus start
 //		Select(found.tilePos, endPos, table);
 		Select(found.tilePos, endPos, table, found.MapLayer);
@@ -520,8 +504,8 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type
 {
 	Assert(Map.Info.IsPointOnMap(pos, z));
 
-	for (int x = pos.x; x < pos.x + type.TileWidth; ++x) {
-		for (int y = pos.y; y < pos.y + type.TileHeight; ++y) {
+	for (int x = pos.x; x < pos.x + type.TileSize.x; ++x) {
+		for (int y = pos.y; y < pos.y + type.TileSize.y; ++y) {
 			if (!Map.Info.IsPointOnMap(x, y, z)) {
 				continue;
 			}
@@ -558,23 +542,17 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 		return NULL;
 	}
 
-	//Wyrmgus start
-//	if (pos.x + type.TileWidth > Map.Info.MapWidth) {
-	if (pos.x + type.TileWidth > Map.Info.MapWidths[z]) {
-	//Wyrmgus end
+	if (pos.x + type.TileSize.x > Map.Info.MapWidths[z]) {
 		return NULL;
 	}
-	//Wyrmgus start
-//	if (pos.y + type.TileHeight > Map.Info.MapHeight) {
-	if (pos.y + type.TileHeight > Map.Info.MapHeights[z]) {
-	//Wyrmgus end
+	if (pos.y + type.TileSize.y > Map.Info.MapHeights[z]) {
 		return NULL;
 	}
 	
 	//Wyrmgus start
 	if (no_bordering_building && !OnTopDetails(type, NULL)) { // if a campaign game is starting, only place buildings with a certain space from other buildings
-		for (int x = pos.x - 1; x < pos.x + type.TileWidth + 1; ++x) {
-			for (int y = pos.y - 1; y < pos.y + type.TileHeight + 1; ++y) {
+		for (int x = pos.x - 1; x < pos.x + type.TileSize.x + 1; ++x) {
+			for (int y = pos.y - 1; y < pos.y + type.TileSize.y + 1; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && (Map.Field(x, y, z)->Flags & MapFieldBuilding)) {
 					return NULL;
 				}
@@ -583,8 +561,8 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	}
 	
 	if (unit) {
-		for (int x = pos.x; x < pos.x + type.TileWidth; ++x) {
-			for (int y = pos.y; y < pos.y + type.TileHeight; ++y) {
+		for (int x = pos.x; x < pos.x + type.TileSize.x; ++x) {
+			for (int y = pos.y; y < pos.y + type.TileSize.y; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->Owner != -1 && Map.Field(x, y, z)->Owner != unit->Player->Index) {
 					return NULL;
 				}
@@ -595,8 +573,8 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 
 	// Must be checked before oil!
 	if (type.BoolFlag[SHOREBUILDING_INDEX].value) {
-		const int width = type.TileWidth;
-		int h = type.TileHeight;
+		const int width = type.TileSize.x;
+		int h = type.TileSize.y;
 		bool success = false;
 
 		// Need at least one coast tile
@@ -755,14 +733,14 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 //	unsigned int index = pos.y * Map.Info.MapWidth;
 	unsigned int index = pos.y * Map.Info.MapWidths[z];
 	//Wyrmgus end
-	for (int h = 0; h < type.TileHeight; ++h) {
-		for (int w = type.TileWidth; w--;) {
+	for (int h = 0; h < type.TileSize.y; ++h) {
+		for (int w = type.TileSize.x; w--;) {
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
 			//Wyrmgus start
 //			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h)) {
 			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h, z)) {
 			//Wyrmgus end
-				h = type.TileHeight;
+				h = type.TileSize.y;
 				ontop = NULL;
 				break;
 			}
@@ -782,7 +760,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			const CMapField &mf = *Map.Field(index + pos.x + w, z);
 			//Wyrmgus end
 			if (mf.CheckMask(testmask)) {
-				h = type.TileHeight;
+				h = type.TileSize.y;
 				ontop = NULL;
 				break;
 			}
@@ -790,7 +768,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 //			if (player && !mf.playerInfo.IsExplored(*player)) {
 			if (player && !ignore_exploration && !mf.playerInfo.IsTeamExplored(*player)) {
 			//Wyrmgus end
-				h = type.TileHeight;
+				h = type.TileSize.y;
 				ontop = NULL;
 				break;
 			}

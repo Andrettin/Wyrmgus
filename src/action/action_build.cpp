@@ -190,8 +190,7 @@ enum {
 	//Wyrmgus end
 
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
-	targetPos.x += (this->GetUnitType().TileWidth - 1) * Map.GetMapLayerPixelTileSize(this->MapLayer).x / 2;
-	targetPos.y += (this->GetUnitType().TileHeight - 1) * Map.GetMapLayerPixelTileSize(this->MapLayer).y / 2;
+	targetPos += PixelPos(this->GetUnitType().TileSize - 1) * Map.GetMapLayerPixelTileSize(this->MapLayer) / 2;
 
 	const int w = this->GetUnitType().BoxWidth;
 	const int h = this->GetUnitType().BoxHeight;
@@ -214,11 +213,8 @@ enum {
 	input.SetMinRange(this->Type->BoolFlag[BUILDEROUTSIDE_INDEX].value ? 1 : 0);
 	input.SetMaxRange(this->Range);
 
-	const Vec2i tileSize(this->Type->TileWidth, this->Type->TileHeight);
-	//Wyrmgus start
-//	input.SetGoal(this->goalPos, tileSize);
+	const Vec2i tileSize(this->Type->TileSize);
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
-	//Wyrmgus end
 }
 
 /** Called when unit is killed.
@@ -494,7 +490,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		//Wyrmgus start
 //		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
 //		UnitUpdateHeading(unit);
-		const Vec2i dir = Vec2i(build->tilePos.x * Map.GetMapLayerPixelTileSize(build->MapLayer).x, build->tilePos.y * Map.GetMapLayerPixelTileSize(build->MapLayer).y) + build->Type->GetHalfTilePixelSize(build->MapLayer) - Vec2i(unit.tilePos.x * Map.GetMapLayerPixelTileSize(build->MapLayer).x, unit.tilePos.y * Map.GetMapLayerPixelTileSize(build->MapLayer).y) - unit.Type->GetHalfTilePixelSize(unit.MapLayer);
+		const Vec2i dir = PixelSize(PixelSize(build->tilePos) * Map.GetMapLayerPixelTileSize(build->MapLayer)) + build->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(build->MapLayer)) - unit.GetHalfTilePixelSize();
 		UnitHeadingFromDeltaXY(unit, dir);
 		//Wyrmgus end
 	}

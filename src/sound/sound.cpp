@@ -416,7 +416,7 @@ unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
 */
 static char CalculateStereo(const CUnit &unit)
 {
-	int stereo = ((unit.tilePos.x * Map.GetCurrentPixelTileSize().x + unit.Type->TileWidth * Map.GetCurrentPixelTileSize().x / 2 +
+	int stereo = ((unit.tilePos.x * Map.GetCurrentPixelTileSize().x + unit.Type->TileSize.x * Map.GetCurrentPixelTileSize().x / 2 +
 				   unit.IX - UI.SelectedViewport->MapPos.x * Map.GetCurrentPixelTileSize().x) * 256 /
 				  ((UI.SelectedViewport->MapWidth - 1) * Map.GetCurrentPixelTileSize().x)) - 128;
 	clamp(&stereo, -128, 127);

@@ -399,6 +399,10 @@ public:
 	PixelPos GetMapPixelPosCenter() const;
 	
 	//Wyrmgus start
+	Vec2i GetTileSize() const;
+	PixelSize GetTilePixelSize() const;
+	Vec2i GetHalfTileSize() const;
+	PixelSize GetHalfTilePixelSize() const;
 	Vec2i GetCenterPos() const;
 	
 	void SetIndividualUpgrade(const CUpgrade *upgrade, int quantity);

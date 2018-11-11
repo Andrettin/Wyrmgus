@@ -69,10 +69,8 @@
 	COrder_Repair *order = new COrder_Repair();
 
 	if (target.Destroyed) {
-		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
-		//Wyrmgus start
+		order->goalPos = target.tilePos + target.GetHalfTileSize();
 		order->MapLayer = target.MapLayer;
-		//Wyrmgus end
 	} else {
 		order->SetGoal(&target);
 		order->ReparableTarget = &target;
@@ -197,19 +195,12 @@
 
 	Vec2i tileSize;
 	if (ReparableTarget != NULL) {
-		tileSize.x = ReparableTarget->Type->TileWidth;
-		tileSize.y = ReparableTarget->Type->TileHeight;
-		//Wyrmgus start
-//		input.SetGoal(ReparableTarget->tilePos, tileSize);
+		tileSize = ReparableTarget->GetTileSize();
 		input.SetGoal(ReparableTarget->tilePos, tileSize, ReparableTarget->MapLayer);
-		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		//Wyrmgus start
-//		input.SetGoal(this->goalPos, tileSize);
 		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
-		//Wyrmgus end
 	}
 }
 
@@ -320,10 +311,8 @@ static void AnimateActionRepair(CUnit &unit)
 				if (goal) {
 					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair target gone.\n");
-						this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
-						//Wyrmgus start
+						this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 						this->MapLayer = goal->MapLayer;
-						//Wyrmgus end
 						ReparableTarget = NULL;
 						this->ClearGoal();
 						goal = NULL;
@@ -343,7 +332,7 @@ static void AnimateActionRepair(CUnit &unit)
 					this->RepairCycle = 0;
 					//Wyrmgus start
 //					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-					const Vec2i dir = Vec2i(goal->tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x, goal->tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y) + goal->Type->GetHalfTilePixelSize(goal->MapLayer) - Vec2i(unit.tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x, unit.tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y) - unit.Type->GetHalfTilePixelSize(unit.MapLayer);
+					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer)) - unit.GetHalfTilePixelSize();
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
@@ -382,10 +371,8 @@ static void AnimateActionRepair(CUnit &unit)
 			if (goal) {
 				if (!goal->IsVisibleAsGoal(*unit.Player)) {
 					DebugPrint("repair goal is gone\n");
-					this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
-					//Wyrmgus start
+					this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 					this->MapLayer = goal->MapLayer;
-					//Wyrmgus end
 					// FIXME: should I clear this here?
 					this->ClearGoal();
 					ReparableTarget = NULL;

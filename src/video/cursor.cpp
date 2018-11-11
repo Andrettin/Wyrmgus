@@ -298,8 +298,8 @@ void DrawBuildingCursor()
 	//Wyrmgus end
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
-		const PixelPos center(screenPos + CursorBuilding->GetPixelSize(CurrentMapLayer) / 2);
-		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * Map.GetCurrentPixelTileSize().x + 1;
+		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize(CurrentMapLayer));
+		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * Map.GetCurrentPixelTileSize().x + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
 
@@ -318,20 +318,17 @@ void DrawBuildingCursor()
 			ontop = (ontop == Selected[i] ? NULL : ontop);
 		}
 	} else {
-		//Wyrmgus start
-//		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos)) != NULL);
 		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, CurrentMapLayer)) != NULL);
-		//Wyrmgus end
 		if (!Editor.Running || ontop == (CUnit *)1) {
 			ontop = NULL;
 		}
 	}
 
 	const int mask = CursorBuilding->MovementMask;
-	int h = CursorBuilding->TileHeight;
+	int h = CursorBuilding->TileSize.y;
 	// reduce to view limits
 	h = std::min(h, vp.MapPos.y + vp.MapHeight - mpos.y);
-	int w0 = CursorBuilding->TileWidth;
+	int w0 = CursorBuilding->TileSize.x;
 	w0 = std::min(w0, vp.MapPos.x + vp.MapWidth - mpos.x);
 
 	while (h--) {

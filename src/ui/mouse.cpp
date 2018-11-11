@@ -126,8 +126,8 @@ void CancelBuildingMode()
 
 static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
 {
-	for (int j = 0; j < unit.Type->TileHeight; ++j) {
-		for (int i = 0; i < unit.Type->TileWidth; ++i) {
+	for (int j = 0; j < unit.Type->TileSize.y; ++j) {
+		for (int i = 0; i < unit.Type->TileSize.x; ++i) {
 			const Vec2i tempPos(i, j);
 			//Wyrmgus start
 //			if (!Map.Field(pos + tempPos)->playerInfo.IsExplored(*ThisPlayer)) {
@@ -1454,9 +1454,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					if (order.Action == UnitActionBuild) {
 						COrder_Build &build = dynamic_cast<COrder_Build &>(order);
 						if (tilePos.x >= build.GetGoalPos().x
-							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileWidth
+							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileSize.x
 							&& tilePos.y >= build.GetGoalPos().y
-							&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().TileHeight) {
+							&& tilePos.y < build.GetGoalPos().y + build.GetUnitType().TileSize.y) {
 							buildable = false;
 							break;
 						}

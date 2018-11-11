@@ -76,10 +76,8 @@ enum {
 	// Should be handled in action, but is not possible!
 	// Unit::Refs is used as timeout counter.
 	if (dest.Destroyed) {
-		order->goalPos = dest.tilePos + dest.Type->GetHalfTileSize();
-		//Wyrmgus start
+		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
 		order->MapLayer = dest.MapLayer;
-		//Wyrmgus end
 	} else {
 		order->SetGoal(&dest);
 		order->Range = 1;
@@ -177,19 +175,12 @@ enum {
 	Vec2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
-		tileSize.x = goal->Type->TileWidth;
-		tileSize.y = goal->Type->TileHeight;
-		//Wyrmgus start
-//		input.SetGoal(goal->tilePos, tileSize);
+		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
-		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		//Wyrmgus start
-//		input.SetGoal(this->goalPos, tileSize);
 		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
-		//Wyrmgus end
 	}
 }
 
@@ -355,10 +346,8 @@ enum {
 	// Target destroyed?
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
-		this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
-		//Wyrmgus start
+		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 		this->MapLayer = goal->MapLayer;
-		//Wyrmgus end
 		this->ClearGoal();
 		goal = NULL;
 	}

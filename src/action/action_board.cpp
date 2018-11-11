@@ -161,8 +161,7 @@ enum {
 	Vec2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
-		tileSize.x = goal->Type->TileWidth;
-		tileSize.y = goal->Type->TileHeight;
+		tileSize = goal->GetTileSize();
 		//Wyrmgus start
 //		input.SetGoal(goal->tilePos, tileSize);
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);

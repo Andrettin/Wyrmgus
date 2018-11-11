@@ -63,7 +63,7 @@ void UnitRotate(CUnit &unit, int rotate)
 			order.ClearGoal();
 			return;
 		}
-		const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
+		const Vec2i pos = target.tilePos + target.GetHalfTileSize() - unit.tilePos;
 		UnitHeadingFromDeltaXY(unit, pos);
 	} else {
 		UnitRotate(unit, ParseAnimInt(unit, this->rotateStr.c_str()));

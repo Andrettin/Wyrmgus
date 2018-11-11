@@ -160,10 +160,7 @@
 
 	const Vec2i tileSize(0, 0);
 
-	//Wyrmgus start
-//	input.SetGoal(this->goalPos, tileSize);
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
-	//Wyrmgus end
 }
 
 
@@ -188,10 +185,9 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 {
 	Vec2i pos = startPos;
 
-	pos.x -= unit.Type->TileWidth - 1;
-	pos.y -= unit.Type->TileHeight - 1;
-	int addx = transporter.Type->TileWidth + unit.Type->TileWidth - 1;
-	int addy = transporter.Type->TileHeight + unit.Type->TileHeight - 1;
+	pos -= unit.Type->TileSize - 1;
+	int addx = transporter.Type->TileSize.x + unit.Type->TileSize.x - 1;
+	int addy = transporter.Type->TileSize.y + unit.Type->TileSize.y - 1;
 
 	--pos.x;
 	for (int range = 0; range < maxRange; ++range) {

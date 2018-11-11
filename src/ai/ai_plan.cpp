@@ -78,8 +78,8 @@ public:
 		if (unit->Type->UnitType == UnitTypeFly && unit->IsAgressive() == false) {
 			return;
 		}
-		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.TileWidth
-			|| pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type.TileHeight) {
+		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.TileSize.x
+			|| pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type.TileSize.y) {
 			return;
 		}
 		if (!CanTarget(*source->Type, type)) {

@@ -645,8 +645,8 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end
 			var.Draw(
-				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileWidth * Map.GetCurrentPixelTileSize().x / 100,
-				y + var.OffsetY + var.OffsetYPercent * unit.Type->TileHeight * Map.GetCurrentPixelTileSize().y / 100,
+				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileSize.x * Map.GetCurrentPixelTileSize().x / 100,
+				y + var.OffsetY + var.OffsetYPercent * unit.Type->TileSize.y * Map.GetCurrentPixelTileSize().y / 100,
 				type, unit.Variable[var.Index]);
 		}
 	}
@@ -666,9 +666,9 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			}
 		}
 		const int width = GetGameFont().Width(groupId);
-		x += (unit.Type->TileWidth * Map.GetCurrentPixelTileSize().x + unit.Type->BoxWidth) / 2 - width;
+		x += (unit.Type->TileSize.x * Map.GetCurrentPixelTileSize().x + unit.Type->BoxWidth) / 2 - width;
 		const int height = GetGameFont().Height();
-		y += (unit.Type->TileHeight * Map.GetCurrentPixelTileSize().y + unit.Type->BoxHeight) / 2 - height;
+		y += (unit.Type->TileSize.y * Map.GetCurrentPixelTileSize().y + unit.Type->BoxHeight) / 2 - height;
 		CLabel(GetGameFont()).DrawClip(x, y, groupId);
 	}
 }
@@ -695,8 +695,8 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 		return;
 	}
 	PixelPos pos = screenPos;
-	pos.x -= (type.ShadowWidth - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
-	pos.y -= (type.ShadowHeight - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
+	pos.x -= (type.ShadowWidth - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
+	pos.y -= (type.ShadowHeight - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 	pos.x += type.OffsetX + type.ShadowOffsetX;
 	pos.y += type.OffsetY + type.ShadowOffsetY;
 
@@ -734,8 +734,8 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 	}
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos.x -= (sprite->Width - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
-	pos.y -= (sprite->Height - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
+	pos.x -= (sprite->Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
+	pos.y -= (sprite->Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 	pos.x += type.OffsetX;
 	pos.y += type.OffsetY;
 
@@ -776,8 +776,8 @@ void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame,
 	}
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos.x -= (sprite->Width - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
-	pos.y -= (sprite->Height - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
+	pos.x -= (sprite->Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
+	pos.y -= (sprite->Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 	pos.x += type.OffsetX;
 	pos.y += type.OffsetY;
 
@@ -882,14 +882,14 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 
 	// For debug draw sight, react and attack range!
 	if (IsOnlySelected(unit)) {
-		const PixelPos center(screenPos + type.GetPixelSize(CurrentMapLayer) / 2);
+		const PixelPos center(screenPos + type.GetHalfTilePixelSize(CurrentMapLayer));
 
 		if (Preference.ShowSightRange) {
 			//Wyrmgus start
 //			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
 			const int value = unit.CurrentSightRange;
 			//Wyrmgus end
-			const int radius = value * Map.GetCurrentPixelTileSize().x + (type.TileWidth - 1) * Map.GetCurrentPixelTileSize().x / 2;
+			const int radius = value * Map.GetCurrentPixelTileSize().x + (type.TileSize.x - 1) * Map.GetCurrentPixelTileSize().x / 2;
 
 			if (value) {
 				// Radius -1 so you can see all ranges
@@ -905,7 +905,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 //				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 				const int value = unit.GetReactionRange();
 				//Wyrmgus end
-				const int radius = value * Map.GetCurrentPixelTileSize().x + (type.TileWidth - 1) * Map.GetCurrentPixelTileSize().x / 2;
+				const int radius = value * Map.GetCurrentPixelTileSize().x + (type.TileSize.x - 1) * Map.GetCurrentPixelTileSize().x / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -917,7 +917,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 				const int value = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 				
 				//Wyrmgus end
-				const int radius = value * Map.GetCurrentPixelTileSize().x + (type.TileWidth - 1) * Map.GetCurrentPixelTileSize().x / 2;
+				const int radius = value * Map.GetCurrentPixelTileSize().x + (type.TileSize.x - 1) * Map.GetCurrentPixelTileSize().x / 2;
 
 				if (value) {
 					// Radius +1 so you can see all ranges
@@ -930,8 +930,8 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
 			//show aura range if the unit has an aura
 			if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0 || unit.Variable[REGENERATIONAURA_INDEX].Value > 0 || unit.Variable[HYDRATINGAURA_INDEX].Value > 0) {
-				const int value = AuraRange - (unit.Type->TileWidth - 1);
-				const int radius = value * Map.GetCurrentPixelTileSize().x + (type.TileWidth - 1) * Map.GetCurrentPixelTileSize().x / 2;
+				const int value = AuraRange - (unit.Type->TileSize.x - 1);
+				const int radius = value * Map.GetCurrentPixelTileSize().x + (type.TileSize.x - 1) * Map.GetCurrentPixelTileSize().x / 2;
 
 				if (value) {
 					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
@@ -969,9 +969,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 		//Wyrmgus start
 		/*
 		if (type.Construction->ShadowSprite) {
-			pos.x -= (type.Construction->Width - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
+			pos.x -= (type.Construction->Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
 			pos.x += type.OffsetX;
-			pos.y -= (type.Construction->Height - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
+			pos.y -= (type.Construction->Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 			pos.y += type.OffsetY;
 			if (frame < 0) {
 				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -982,9 +982,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 		*/
 		if (varinfo && varinfo->Construction) {
 			if (varinfo->Construction->ShadowSprite) {
-				pos.x -= (varinfo->Construction->Width - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
+				pos.x -= (varinfo->Construction->Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
 				pos.x += type.OffsetX;
-				pos.y -= (varinfo->Construction->Height - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
+				pos.y -= (varinfo->Construction->Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 				pos.y += type.OffsetY;
 				if (frame < 0) {
 					varinfo->Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -994,9 +994,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 			}
 		} else {
 			if (type.Construction->ShadowSprite) {
-				pos.x -= (type.Construction->Width - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
+				pos.x -= (type.Construction->Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
 				pos.x += type.OffsetX;
-				pos.y -= (type.Construction->Height - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
+				pos.y -= (type.Construction->Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 				pos.y += type.OffsetY;
 				if (frame < 0) {
 					type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -1009,9 +1009,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 	} else {
 		//Wyrmgus start
 		if (varinfo && varinfo->ShadowSprite) {
-			pos.x -= (type.ShadowWidth - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
+			pos.x -= (type.ShadowWidth - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
 			pos.x += type.ShadowOffsetX + type.OffsetX;
-			pos.y -= (type.ShadowHeight - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
+			pos.y -= (type.ShadowHeight - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 			pos.y += type.ShadowOffsetY + type.OffsetY;
 			if (frame < 0) {
 				varinfo->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -1021,9 +1021,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 //		if (type.ShadowSprite) {
 		} else if (type.ShadowSprite) {
 		//Wyrmgus end
-			pos.x -= (type.ShadowWidth - type.TileWidth * Map.GetCurrentPixelTileSize().x) / 2;
+			pos.x -= (type.ShadowWidth - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
 			pos.x += type.ShadowOffsetX + type.OffsetX;
-			pos.y -= (type.ShadowHeight - type.TileHeight * Map.GetCurrentPixelTileSize().y) / 2;
+			pos.y -= (type.ShadowHeight - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 			pos.y += type.ShadowOffsetY + type.OffsetY;
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
@@ -1315,7 +1315,7 @@ void CUnit::Draw(const CViewport &vp) const
 	//
 	if (state == 1) {
 		if (constructed && cframe) {
-			const PixelPos pos(screenPos + (type->GetPixelSize(CurrentMapLayer)) / 2);
+			const PixelPos pos(screenPos + type->GetHalfTilePixelSize(CurrentMapLayer));
 			//Wyrmgus start
 //			DrawConstruction(player, cframe, *type, frame, pos);
 			DrawConstruction(player, cframe, *this, *type, frame, pos);
@@ -1445,8 +1445,8 @@ static inline bool DrawLevelCompare(const CUnit *c1, const CUnit *c2)
 	if (drawlevel1 == drawlevel2) {
 		// diffpos compares unit's Y positions (bottom of sprite) on the map
 		// and uses X position in case Y positions are equal.
-		const int pos1 = (c1->tilePos.y + c1->Type->TileHeight - 1) * Map.GetCurrentPixelTileSize().y + c1->IY;
-		const int pos2 = (c2->tilePos.y + c2->Type->TileHeight - 1) * Map.GetCurrentPixelTileSize().y + c2->IY;
+		const int pos1 = (c1->tilePos.y + c1->Type->TileSize.y - 1) * Map.GetCurrentPixelTileSize().y + c1->IY;
+		const int pos2 = (c2->tilePos.y + c2->Type->TileSize.y - 1) * Map.GetCurrentPixelTileSize().y + c2->IY;
 		return pos1 == pos2 ?
 			   (c1->tilePos.x != c2->tilePos.x ? c1->tilePos.x < c2->tilePos.x : UnitNumber(*c1) < UnitNumber(*c2)) : pos1 < pos2;
 	} else {

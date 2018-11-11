@@ -590,7 +590,7 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
 	
 	//Wyrmgus start
 //	if (Map.Fields) {
-	if (Map.MapLayers.size() >= z) {
+	if ((int) Map.MapLayers.size() >= z) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		CMapField &mf = *Map.Field(pos);
@@ -627,7 +627,7 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value, int 
 		return;
 	}
 	
-	if (Map.MapLayers.size() >= z) {
+	if ((int) Map.MapLayers.size() >= z) {
 		CMapField &mf = *Map.Field(pos, z);
 
 		mf.Value = value;

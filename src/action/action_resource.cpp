@@ -214,12 +214,9 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 
 	order->SetGoal(&mine);
 	order->Resource.Mine = &mine;
-	order->Resource.Pos = mine.tilePos + mine.Type->GetHalfTileSize();
-	//Wyrmgus start
+	order->Resource.Pos = mine.tilePos + mine.GetHalfTileSize();
 	order->Resource.MapLayer = mine.MapLayer;
-//	order->CurrentResource = mine.Type->GivesResource;
 	order->CurrentResource = mine.GivesResource;
-	//Wyrmgus end
 	return order;
 }
 
@@ -454,19 +451,12 @@ COrder_Resource::~COrder_Resource()
 	Vec2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
-		tileSize.x = goal->Type->TileWidth;
-		tileSize.y = goal->Type->TileHeight;
-		//Wyrmgus start
-//		input.SetGoal(goal->tilePos, tileSize);
+		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
-		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		//Wyrmgus start
-//		input.SetGoal(this->goalPos, tileSize);
 		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
-		//Wyrmgus end
 	}
 }
 
@@ -735,7 +725,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	// Update the heading of a harvesting unit to looks straight at the resource.
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, goal->tilePos - unit.tilePos + goal->Type->GetHalfTileSize());
-	UnitHeadingFromDeltaXY(unit, Vec2i(goal->tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x, goal->tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y) - Vec2i(unit.tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x, unit.tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y) + goal->Type->GetHalfTilePixelSize(goal->MapLayer) - unit.Type->GetHalfTilePixelSize(unit.MapLayer));
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer)) - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer)) + goal->GetHalfTilePixelSize() - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 
 	// If resource is still under construction, wait!
@@ -867,7 +857,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	// If we are fully loaded first search for a depot.
 	if (unit.ResourcesHeld && (depot = FindDeposit(unit, 1000, unit.CurrentResource))) {
 		if (unit.Container) {
-			DropOutNearest(unit, depot->tilePos + depot->Type->GetHalfTileSize(), &source);
+			DropOutNearest(unit, depot->tilePos + depot->GetHalfTileSize(), &source);
 		}
 		// Remember where it mined, so it can look around for another resource.
 		//
@@ -1270,7 +1260,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
 		//Wyrmgus end
 			Assert(unit.Container);
-			DropOutNearest(unit, depot->tilePos + depot->Type->GetHalfTileSize(), source);
+			DropOutNearest(unit, depot->tilePos + depot->GetHalfTileSize(), source);
 		}
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 	}
@@ -1520,7 +1510,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 		if (goal) {
 			if (depot) {
-				DropOutNearest(unit, goal->tilePos + goal->Type->GetHalfTileSize(), depot);
+				DropOutNearest(unit, goal->tilePos + goal->GetHalfTileSize(), depot);
 			}
 
 			if (goal != mine) {

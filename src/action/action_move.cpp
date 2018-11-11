@@ -148,10 +148,7 @@
 /* virtual */ void COrder_Move::UpdatePathFinderData(PathFinderInput &input)
 {
 	const Vec2i tileSize(0, 0);
-	//Wyrmgus start
-//	input.SetGoal(this->goalPos, tileSize);
 	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
-	//Wyrmgus end
 
 	int distance = this->Range;
 	//Wyrmgus start

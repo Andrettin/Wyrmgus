@@ -78,7 +78,7 @@ enum {
 	// Should be handled in action, but is not possible!
 	// Unit::Refs is used as timeout counter.
 	if (dest.Destroyed) {
-		order->goalPos = dest.tilePos + dest.Type->GetHalfTileSize();
+		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
 		order->MapLayer = dest.MapLayer;
 	} else {
 		order->SetGoal(&dest);
@@ -164,8 +164,7 @@ enum {
 	Vec2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
-		tileSize.x = goal->Type->TileWidth;
-		tileSize.y = goal->Type->TileHeight;
+		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
 	} else {
 		tileSize.x = 0;
@@ -389,7 +388,7 @@ enum {
 	// Target destroyed?
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
-		this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
+		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 		this->MapLayer = goal->MapLayer;
 		this->ClearGoal();
 		goal = NULL;

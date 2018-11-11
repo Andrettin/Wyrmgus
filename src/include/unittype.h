@@ -476,8 +476,8 @@ public:
 	int OffsetX;            /// Offset in X coord.
 	int OffsetY;            /// Offset in Y coord.
 
-	int OffsetXPercent;     /// Percent offset (TileWidth) in X coord.
-	int OffsetYPercent;     /// Percent offset (TileHeight) in Y coord.
+	int OffsetXPercent;     /// Percent offset (TileSize.x) in X coord.
+	int OffsetYPercent;     /// Percent offset (TileSize.y) in Y coord.
 
 	bool IsCenteredInX;     /// if true, use center of deco instead of left border
 	bool IsCenteredInY;     /// if true, use center of deco instead of upper border
@@ -884,11 +884,10 @@ public:
 	CUnitType();
 	~CUnitType();
 
-	Vec2i GetHalfTileSize() const { return Vec2i(TileWidth / 2, TileHeight / 2); }
-	//Wyrmgus start
-	Vec2i GetHalfTilePixelSize(const int map_layer) const { return Vec2i(TileWidth * Map.GetMapLayerPixelTileSize(map_layer).x / 2, TileHeight * Map.GetMapLayerPixelTileSize(map_layer).y / 2); }
-	//Wyrmgus end
-	PixelSize GetPixelSize(const int map_layer) const;
+	Vec2i GetTileSize(const int map_layer) const;
+	Vec2i GetHalfTileSize(const int map_layer) const;
+	PixelSize GetHalfTilePixelSize(const int map_layer) const { return GetTilePixelSize(map_layer) / 2; }
+	PixelSize GetTilePixelSize(const int map_layer) const;
 
 	bool CheckUserBoolFlags(const char *BoolFlags) const;
 	//Wyrmgus start
@@ -1014,8 +1013,7 @@ public:
 	int RepairHP;                   /// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
 
-	int TileWidth;                  /// Tile size on map width
-	int TileHeight;                 /// Tile size on map height
+	Vec2i TileSize;					/// Tile size
 	int BoxWidth;                   /// Selected box size width
 	int BoxHeight;                  /// Selected box size height
 	int BoxOffsetX;                 /// Selected box size horizontal offset

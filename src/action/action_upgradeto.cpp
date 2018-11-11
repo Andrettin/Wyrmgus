@@ -103,7 +103,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	if (&oldtype == &newtype) { // nothing to do
 		return 1;
 	}
-	const Vec2i pos = unit.tilePos + oldtype.GetHalfTileSize() - newtype.GetHalfTileSize();
+	const Vec2i pos = unit.tilePos + oldtype.GetHalfTileSize(unit.MapLayer) - newtype.GetHalfTileSize(unit.MapLayer);
 	CUnit *container = unit.Container;
 
 	//Wyrmgus start

@@ -1952,7 +1952,7 @@ CSettlement *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i 
 		if (!this->HasNeutralFactionType() && this != settlement_unit->Player) {
 			continue;
 		}
-		int distance = MapDistance(size, pos, z, Vec2i(settlement_unit->Type->TileWidth, settlement_unit->Type->TileHeight), settlement_unit->tilePos, settlement_unit->MapLayer);
+		int distance = MapDistance(size, pos, z, settlement_unit->Type->TileSize, settlement_unit->tilePos, settlement_unit->MapLayer);
 		if (!best_hall || distance < best_distance) {
 			best_hall = settlement_unit;
 			best_distance = distance;

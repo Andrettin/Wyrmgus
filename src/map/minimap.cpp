@@ -854,17 +854,17 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 	//Wyrmgus start
 //	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];
 //	int my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit.tilePos.y];
-//	int w = Map2MinimapX[type->TileWidth];
+//	int w = Map2MinimapX[type->TileSize.x];
 	int mx = 1 + UI.Minimap.XOffset[CurrentMapLayer] + Map2MinimapX[CurrentMapLayer][unit.tilePos.x];
 	int my = 1 + UI.Minimap.YOffset[CurrentMapLayer] + Map2MinimapY[CurrentMapLayer][unit.tilePos.y];
-	int w = Map2MinimapX[CurrentMapLayer][type->TileWidth];
+	int w = Map2MinimapX[CurrentMapLayer][type->TileSize.x];
 	//Wyrmgus end
 	if (mx + w >= UI.Minimap.W) { // clip right side
 		w = UI.Minimap.W - mx;
 	}
 	//Wyrmgus start
-//	int h0 = Map2MinimapY[type->TileHeight];
-	int h0 = Map2MinimapY[CurrentMapLayer][type->TileHeight];
+//	int h0 = Map2MinimapY[type->TileSize.y];
+	int h0 = Map2MinimapY[CurrentMapLayer][type->TileSize.y];
 	//Wyrmgus end
 	if (my + h0 >= UI.Minimap.H) { // clip bottom side
 		h0 = UI.Minimap.H - my;

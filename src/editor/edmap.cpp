@@ -419,7 +419,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		return;
 	}
 	CUnitType &type = *typeptr;
-	const Vec2i tpos(type.TileWidth, type.TileHeight);
+	const Vec2i tpos(type.TileSize);
 
 	for (int i = 0; i < count; ++i) {
 		const Vec2i rpos(rand() % (mpos.x / 2 - tpos.x + 1), rand() % (mpos.y / 2 - tpos.y + 1));
@@ -430,7 +430,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		const Vec2i tmirrorh(rpos.x, tmirror.y);
 		const Vec2i tmirrorv(tmirror.x, rpos.y);
 		int tile = GRASS_TILE;
-		const int z = type.TileHeight;
+		const int z = type.TileSize.y;
 
 		// FIXME: vladi: the idea is simple: make proper land for unit(s) :)
 		// FIXME: handle units larger than 1 square

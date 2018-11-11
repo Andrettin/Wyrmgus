@@ -753,8 +753,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->ShadowOffsetX = parent_type->ShadowOffsetX;
 			type->ShadowOffsetY = parent_type->ShadowOffsetY;
 			type->LightFile = parent_type->LightFile;
-			type->TileWidth = parent_type->TileWidth;
-			type->TileHeight = parent_type->TileHeight;
+			type->TileSize = parent_type->TileSize;
 			type->BoxWidth = parent_type->BoxWidth;
 			type->BoxHeight = parent_type->BoxHeight;
 			type->BoxOffsetX = parent_type->BoxOffsetX;
@@ -1480,7 +1479,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->DefaultStat.Variables[SHIELD_INDEX].Enable = 1;
 			}
 		} else if (!strcmp(value, "TileSize")) {
-			CclGetPos(l, &type->TileWidth, &type->TileHeight);
+			CclGetPos(l, &type->TileSize.x, &type->TileSize.y);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
 			type->NeutralMinimapColorRGB.Parse(l);
 		} else if (!strcmp(value, "BoxSize")) {
@@ -2811,10 +2810,10 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->DrawLevel);
 		return 1;
 	} else if (!strcmp(data, "TileWidth")) {
-		lua_pushnumber(l, type->TileWidth);
+		lua_pushnumber(l, type->TileSize.x);
 		return 1;
 	} else if (!strcmp(data, "TileHeight")) {
-		lua_pushnumber(l, type->TileHeight);
+		lua_pushnumber(l, type->TileSize.y);
 		return 1;
 	//Wyrmgus start
 	/*
