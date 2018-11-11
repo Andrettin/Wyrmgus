@@ -189,8 +189,12 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 			this->Icon.Icon->Load();
 		} else if (key == "home_plane") {
 			value = FindAndReplaceString(value, "_", "-");
-			CPlane *plane = CPlane::GetOrAddPlane(value);
-			this->HomePlane = plane;
+			CPlane *plane = CPlane::GetPlane(value);
+			if (plane) {
+				this->HomePlane = plane;
+			} else {
+				fprintf(stderr, "Plane \"%s\" does not exist.\n", value.c_str());
+			}
 		} else {
 			fprintf(stderr, "Invalid deity property: \"%s\".\n", key.c_str());
 		}

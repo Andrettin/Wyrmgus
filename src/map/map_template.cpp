@@ -116,11 +116,21 @@ void CMapTemplate::ProcessConfigData(CConfigData *config_data)
 			this->Name = value;
 		} else if (key == "plane") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Plane = CPlane::GetOrAddPlane(value);
+			CPlane *plane = CPlane::GetPlane(value);
+			if (plane) {
+				this->Plane = plane;
+			} else {
+				fprintf(stderr, "Plane \"%s\" does not exist.\n", value.c_str());
+			}
 		} else if (key == "world") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->World = CWorld::GetOrAddWorld(value);
-			this->Plane = this->World->Plane;
+			CWorld *world = CWorld::GetWorld(value);
+			if (world) {
+				this->World = world;
+				this->Plane = this->World->Plane;
+			} else {
+				fprintf(stderr, "World \"%s\" does not exist.\n", value.c_str());
+			}
 		} else if (key == "surface_layer") {
 			this->SurfaceLayer = std::stoi(value);
 			if (this->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
@@ -148,12 +158,20 @@ void CMapTemplate::ProcessConfigData(CConfigData *config_data)
 			this->Overland = StringToBool(value);
 		} else if (key == "base_terrain_type") {
 			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(value);
-			this->BaseTerrainType = terrain_type;
+			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+			if (terrain_type) {
+				this->BaseTerrainType = terrain_type;
+			} else {
+				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
+			}
 		} else if (key == "base_overlay_terrain_type") {
 			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(value);
-			this->BaseOverlayTerrainType = terrain_type;
+			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+			if (terrain_type) {
+				this->BaseOverlayTerrainType = terrain_type;
+			} else {
+				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
+			}
 		} else {
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", key.c_str());
 		}
