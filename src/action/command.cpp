@@ -181,8 +181,8 @@ static void StopRaft(CUnit &unit)
 
 static std::vector<CUnit *> GetLayerConnectorPath(CUnit &unit, int old_z, int new_z, std::vector<CUnit *> &checked_connectors)
 {
-	for (size_t i = 0; i != Map.LayerConnectors[old_z].size(); ++i) {
-		CUnit *connector = Map.LayerConnectors[old_z][i];
+	for (size_t i = 0; i != Map.MapLayers[old_z]->LayerConnectors.size(); ++i) {
+		CUnit *connector = Map.MapLayers[old_z]->LayerConnectors[i];
 		CUnit *connector_destination = connector->ConnectingDestination;
 		std::vector<CUnit *> connector_path;
 		if (std::find(checked_connectors.begin(), checked_connectors.end(), connector) == checked_connectors.end() && unit.CanUseItem(connector) && connector->IsVisibleAsGoal(*unit.Player)) {
@@ -1458,7 +1458,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 			}
 		}
 		*/
-		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 			for (int i = 0; i != Map.Info.MapWidths[z] * Map.Info.MapHeights[z]; ++i) {
 				CMapField &mf = *Map.Field(i, z);
 				CMapFieldPlayerInfo &mfp = mf.playerInfo;

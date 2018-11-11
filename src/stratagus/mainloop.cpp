@@ -324,7 +324,7 @@ static void GameLogicLoop()
 #ifdef USE_OAML
 	if (enableOAML && oaml) {
 		// Time of day can change our main music loop, if the current playing track is set for this
-		SetMusicCondition(OAML_CONDID_MAIN_LOOP, Map.TimeOfDay[CurrentMapLayer]);
+		SetMusicCondition(OAML_CONDID_MAIN_LOOP, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
 	}
 #endif
 
@@ -344,9 +344,9 @@ static void GameLogicLoop()
 
 		//do tile animation
 		if (GameCycle != 0 && GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
-			for (size_t z = 0; z < Map.Fields.size(); ++z) {
+			for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 				for (int i = 0; i < Map.Info.MapWidths[z] * Map.Info.MapHeights[z]; ++i) {
-					CMapField &mf = Map.Fields[z][i];
+					CMapField &mf = Map.MapLayers[z]->Fields[i];
 					if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
 						mf.AnimationFrame += 1;
 						if (mf.AnimationFrame >= mf.Terrain->SolidAnimationFrames) {
@@ -434,27 +434,28 @@ static void GameLogicLoop()
 		//Wyrmgus end
 		
 		//Wyrmgus start
-		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+			CMapLayer *map_layer = Map.MapLayers[z];
 			int time_of_day_seconds = DefaultTimeOfDaySeconds;
-			if (Map.Worlds[z]) {
-				time_of_day_seconds = Map.Worlds[z]->TimeOfDaySeconds;
-			} else if (Map.Planes[z]) {
-				time_of_day_seconds = Map.Planes[z]->TimeOfDaySeconds;
+			if (map_layer->World) {
+				time_of_day_seconds = map_layer->World->TimeOfDaySeconds;
+			} else if (map_layer->Plane) {
+				time_of_day_seconds = map_layer->Plane->TimeOfDaySeconds;
 			}
-			if (GameSettings.Inside || GameSettings.NoTimeOfDay || Map.SurfaceLayers[z] > 0 || !time_of_day_seconds) {
-				Map.TimeOfDay[z] = NoTimeOfDay; //the map layer has no time of day
+			if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !time_of_day_seconds) {
+				map_layer->TimeOfDay = NoTimeOfDay; //the map layer has no time of day
 				continue;
 			}
 			if (GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * time_of_day_seconds) == 0) { 
-				Map.TimeOfDay[z] += 1;
-				if (Map.TimeOfDay[z] == MaxTimesOfDay) {
-					Map.TimeOfDay[z] = 1;
+				map_layer->TimeOfDay += 1;
+				if (map_layer->TimeOfDay == MaxTimesOfDay) {
+					map_layer->TimeOfDay = 1;
 				}
 
 #ifdef USE_OAML
 				if (enableOAML && oaml && z == CurrentMapLayer) {
 					// Time of day can change our main music loop, if the current playing track is set for this
-					SetMusicCondition(OAML_CONDID_MAIN_LOOP, Map.TimeOfDay[z]);
+					SetMusicCondition(OAML_CONDID_MAIN_LOOP, Map.MapLayers[z]->TimeOfDay);
 				}
 #endif
 
@@ -464,8 +465,8 @@ static void GameLogicLoop()
 					if (
 						unit && unit->IsAlive() && unit->MapLayer == z &&
 						(
-							((Map.TimeOfDay[z] == MorningTimeOfDay || Map.TimeOfDay[z] == DuskTimeOfDay) && unit->Variable[DAYSIGHTRANGEBONUS_INDEX].Value != 0) // if has day sight bonus and is entering or exiting day
-							|| ((Map.TimeOfDay[z] == FirstWatchTimeOfDay || Map.TimeOfDay[z] == DawnTimeOfDay) && unit->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value != 0) // if has night sight bonus and is entering or exiting night
+							((map_layer->TimeOfDay == MorningTimeOfDay || map_layer->TimeOfDay == DuskTimeOfDay) && unit->Variable[DAYSIGHTRANGEBONUS_INDEX].Value != 0) // if has day sight bonus and is entering or exiting day
+							|| ((map_layer->TimeOfDay == FirstWatchTimeOfDay || map_layer->TimeOfDay == DawnTimeOfDay) && unit->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value != 0) // if has night sight bonus and is entering or exiting night
 						)
 					) {
 						MapUnmarkUnitSight(*unit);

@@ -283,7 +283,7 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 	//Wyrmgus start
 	int best_map_layer = CurrentMapLayer;
 	std::vector<int> map_layer_count;
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 		map_layer_count.push_back(0);
 	}
 	for (size_t i = 0; i != units.size(); ++i) {
@@ -556,7 +556,7 @@ static void UiCenterOnSelected()
 	//Wyrmgus start
 	int best_map_layer = CurrentMapLayer;
 	std::vector<int> map_layer_count;
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 		map_layer_count.push_back(0);
 	}
 	for (size_t i = 0; i != Selected.size(); ++i) {

@@ -477,9 +477,9 @@ void CleanUserInterfaceFillers()
 void UpdateSurfaceLayerButtons()
 {
 	unsigned int last_surface_layer = 0;
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		if (Map.Planes[CurrentMapLayer] == Map.Planes[z] && Map.Worlds[CurrentMapLayer] == Map.Worlds[z] && Map.SurfaceLayers[z] > (int) last_surface_layer) {
-			last_surface_layer = Map.SurfaceLayers[z];
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+		if (Map.MapLayers[CurrentMapLayer]->Plane == Map.MapLayers[z]->Plane && Map.MapLayers[CurrentMapLayer]->World == Map.MapLayers[z]->World && Map.MapLayers[z]->SurfaceLayer > (int) last_surface_layer) {
+			last_surface_layer = Map.MapLayers[z]->SurfaceLayer;
 		}
 	}
 	

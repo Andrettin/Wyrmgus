@@ -2391,7 +2391,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 					CancelBuildingMode();
 				}
 			} else {
-				if (CurrentMapLayer != ThisPlayer->StartMapLayer && (Map.Planes[CurrentMapLayer] != Map.Planes[ThisPlayer->StartMapLayer] || Map.Worlds[CurrentMapLayer] != Map.Worlds[ThisPlayer->StartMapLayer])) {
+				if (CurrentMapLayer != ThisPlayer->StartMapLayer && (Map.MapLayers[CurrentMapLayer]->Plane != Map.MapLayers[ThisPlayer->StartMapLayer]->Plane || Map.MapLayers[CurrentMapLayer]->World != Map.MapLayers[ThisPlayer->StartMapLayer]->World)) {
 					ThisPlayer->Notify("%s", _("Cannot build in another plane or world"));
 				}
 				PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);

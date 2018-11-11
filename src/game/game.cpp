@@ -889,7 +889,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				}
 			}
 			*/
-			for (size_t z = 0; z < map.Fields.size(); ++z) {
+			for (size_t z = 0; z < map.MapLayers.size(); ++z) {
 				//Wyrmgus start
 //				for (int i = 0; i < map.Info.MapHeight; ++i) {
 				for (int i = 0; i < map.Info.MapHeights[z]; ++i) {
@@ -900,7 +900,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 					//Wyrmgus end
 						//Wyrmgus start
 //						const CMapField &mf = map.Fields[z][j + i * map.Info.MapWidth];
-						const CMapField &mf = map.Fields[z][j + i * map.Info.MapWidths[z]];
+						const CMapField &mf = map.MapLayers[z]->Fields[j + i * map.Info.MapWidths[z]];
 	//					const int tile = mf.getGraphicTile();
 	//					const int n = map.Tileset->findTileIndexByTile(tile);
 						//Wyrmgus end

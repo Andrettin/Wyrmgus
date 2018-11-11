@@ -65,7 +65,7 @@ class CMapTemplate
 public:
 	CMapTemplate() :
 		Width(0), Height(0), Scale(1), SurfaceLayer(0),
-		OutputTerrainImage(false),
+		Overland(false), OutputTerrainImage(false),
 		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0), PixelTileSize(32, 32),
 		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrainType(NULL), BaseOverlayTerrainType(NULL), BorderTerrainType(NULL), SurroundingTerrainType(NULL)
 	{
@@ -97,6 +97,7 @@ public:
 	int Height;
 	int Scale;													/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
 	int SurfaceLayer;											/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
+	bool Overland;												/// Whether this is an overland map
 	bool OutputTerrainImage;
 	Vec2i SubtemplatePosition;
 	Vec2i CurrentStartPos;

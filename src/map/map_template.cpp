@@ -144,6 +144,8 @@ void CMapTemplate::ProcessConfigData(CConfigData *config_data)
 			this->PixelTileSize.x = std::stoi(value);
 		} else if (key == "pixel_tile_height") {
 			this->PixelTileSize.y = std::stoi(value);
+		} else if (key == "overland") {
+			this->Overland = StringToBool(value);
 		} else if (key == "base_terrain_type") {
 			value = FindAndReplaceString(value, "_", "-");
 			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(value);
@@ -352,22 +354,22 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		return;
 	}
 	
-	if (z >= (int) Map.Fields.size()) {
+	if (z >= (int) Map.MapLayers.size()) {
+		CMapLayer *map_layer = new CMapLayer;
 		Map.Info.MapWidths.push_back(std::min(this->Width * this->Scale, Map.Info.MapWidth));
 		Map.Info.MapHeights.push_back(std::min(this->Height * this->Scale, Map.Info.MapHeight));
-		Map.Fields.push_back(new CMapField[Map.Info.MapWidths[z] * Map.Info.MapHeights[z]]);
-		Map.TimeOfDay.push_back(NoTimeOfDay);
-		Map.Planes.push_back(this->Plane);
-		Map.Worlds.push_back(this->World);
-		Map.SurfaceLayers.push_back(this->SurfaceLayer);
-		Map.LayerConnectors.resize(z + 1);
-		Map.PixelTileSizes.push_back(this->PixelTileSize);
+		map_layer->Fields = new CMapField[Map.Info.MapWidths[z] * Map.Info.MapHeights[z]];
+		map_layer->Plane = this->Plane;
+		map_layer->World = this->World;
+		map_layer->SurfaceLayer = this->SurfaceLayer;
+		map_layer->PixelTileSize = this->PixelTileSize;
+		Map.MapLayers.push_back(map_layer);
 	} else {
 		if (!this->IsSubtemplateArea()) {
-			Map.Planes[z] = this->Plane;
-			Map.Worlds[z] = this->World;
-			Map.SurfaceLayers[z] = this->SurfaceLayer;
-			Map.PixelTileSizes[z] = this->PixelTileSize;
+			Map.MapLayers[z]->Plane = this->Plane;
+			Map.MapLayers[z]->World = this->World;
+			Map.MapLayers[z]->SurfaceLayer = this->SurfaceLayer;
+			Map.MapLayers[z]->PixelTileSize = this->PixelTileSize;
 		}
 	}
 
@@ -384,7 +386,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		&& Editor.Running == EditorNotRunning
 		&& !this->IsSubtemplateArea()
 	) {
-		Map.TimeOfDay[z] = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
+		Map.MapLayers[z]->TimeOfDay = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
 	}
 	
 	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + (this->Width * this->Scale)), std::min(Map.Info.MapHeights[z], map_start_pos.y + (this->Height * this->Scale)));
@@ -531,7 +533,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 				this->Subtemplates[i]->Apply(Vec2i(0, 0), subtemplate_pos, z);
 			}
 				
-			Map.SubtemplateAreas[z].push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), this->Subtemplates[i]));
+			Map.MapLayers[z]->SubtemplateAreas.push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), this->Subtemplates[i]));
 				
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < Map.Info.MapWidths[z] && subtemplate_pos.y < Map.Info.MapHeights[z]) {
 				for (size_t j = 0; j < this->Subtemplates[i]->ExternalGeneratedTerrains.size(); ++j) {
@@ -975,14 +977,14 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		if (std::get<3>(this->PlaneConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->PlaneConnectors[i]));
 		}
-		Map.LayerConnectors[z].push_back(unit);
-		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
+		Map.MapLayers[z]->LayerConnectors.push_back(unit);
+		for (size_t second_z = 0; second_z < Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (Map.Planes[second_z] == std::get<2>(this->PlaneConnectors[i])) {
-				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
-					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) {
-						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
-						unit->ConnectingDestination = Map.LayerConnectors[second_z][j];
+			if (Map.MapLayers[second_z]->Plane == std::get<2>(this->PlaneConnectors[i])) {
+				for (size_t j = 0; j < Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
+					if (Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == NULL) {
+						Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = Map.MapLayers[second_z]->LayerConnectors[j];
 						found_other_connector = true;
 						break;
 					}
@@ -1018,14 +1020,14 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		if (std::get<3>(this->WorldConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->WorldConnectors[i]));
 		}
-		Map.LayerConnectors[z].push_back(unit);
-		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
+		Map.MapLayers[z]->LayerConnectors.push_back(unit);
+		for (size_t second_z = 0; second_z < Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (Map.Worlds[second_z] == std::get<2>(this->WorldConnectors[i])) {
-				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
-					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) {
-						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
-						unit->ConnectingDestination = Map.LayerConnectors[second_z][j];
+			if (Map.MapLayers[second_z]->World == std::get<2>(this->WorldConnectors[i])) {
+				for (size_t j = 0; j < Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
+					if (Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == NULL) {
+						Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = Map.MapLayers[second_z]->LayerConnectors[j];
 						found_other_connector = true;
 						break;
 					}
@@ -1061,14 +1063,14 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		if (std::get<3>(this->SurfaceLayerConnectors[i])) {
 			unit->SetUnique(std::get<3>(this->SurfaceLayerConnectors[i]));
 		}
-		Map.LayerConnectors[z].push_back(unit);
-		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
+		Map.MapLayers[z]->LayerConnectors.push_back(unit);
+		for (size_t second_z = 0; second_z < Map.MapLayers.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (Map.SurfaceLayers[second_z] == std::get<2>(this->SurfaceLayerConnectors[i]) && Map.Worlds[second_z] == this->World && Map.Planes[second_z] == this->Plane) {
-				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
-					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->tilePos == unit->tilePos && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) { //surface layer connectors need to be in the same X and Y coordinates as their destinations
-						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
-						unit->ConnectingDestination = Map.LayerConnectors[second_z][j];
+			if (Map.MapLayers[second_z]->SurfaceLayer == std::get<2>(this->SurfaceLayerConnectors[i]) && Map.MapLayers[second_z]->World == this->World && Map.MapLayers[second_z]->Plane == this->Plane) {
+				for (size_t j = 0; j < Map.MapLayers[second_z]->LayerConnectors.size(); ++j) {
+					if (Map.MapLayers[second_z]->LayerConnectors[j]->Type == unit->Type && Map.MapLayers[second_z]->LayerConnectors[j]->tilePos == unit->tilePos && Map.MapLayers[second_z]->LayerConnectors[j]->Unique == unit->Unique && Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination == NULL) { //surface layer connectors need to be in the same X and Y coordinates as their destinations
+						Map.MapLayers[second_z]->LayerConnectors[j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = Map.MapLayers[second_z]->LayerConnectors[j];
 						found_other_connector = true;
 						break;
 					}

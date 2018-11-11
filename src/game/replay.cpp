@@ -534,7 +534,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	log->GameCycle = GameCycle;
 	//Wyrmgus start
-	log->GameTimeOfDay = Map.TimeOfDay[0];
+	log->GameTimeOfDay = Map.MapLayers[0]->TimeOfDay;
 	//Wyrmgus end
 
 	log->UnitNumber = (unit ? UnitNumber(*unit) : -1);

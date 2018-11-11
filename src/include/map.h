@@ -253,6 +253,28 @@ public:
 --  Map itself
 ----------------------------------------------------------------------------*/
 
+class CMapLayer
+{
+public:
+	CMapLayer() :
+		TimeOfDay(0), SurfaceLayer(0),
+		PixelTileSize(32, 32),
+		Fields(NULL), Plane(NULL), World(NULL)
+	{
+	}
+
+	~CMapLayer();
+	
+	CMapField *Fields;						/// fields on the map layer
+	int TimeOfDay;							/// the time of day for the map layer
+	CPlane *Plane;							/// the plane pointer (if any) for the map layer
+	CWorld *World;							/// the world pointer (if any) for the map layer
+	int SurfaceLayer;						/// the surface layer for the map layer
+	std::vector<CUnit *> LayerConnectors;	/// connectors in a map layer which lead to other map layers
+	PixelSize PixelTileSize;				/// the pixel tile size for the map layer
+	std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>> SubtemplateAreas;
+};
+
 /// Describes the world map
 class CMap
 {
@@ -288,7 +310,7 @@ public:
 	{
 		//Wyrmgus start
 //		return &this->Fields[index];
-		return &this->Fields[z][index];
+		return &this->MapLayers[z]->Fields[index];
 		//Wyrmgus end
 	}
 	/// Get the MapField at location x,y
@@ -299,7 +321,7 @@ public:
 	{
 		//Wyrmgus start
 //		return &this->Fields[x + y * this->Info.MapWidth];
-		return &this->Fields[z][x + y * this->Info.MapWidths[z]];
+		return &this->MapLayers[z]->Fields[x + y * this->Info.MapWidths[z]];
 		//Wyrmgus end
 	}
 	//Wyrmgus start
@@ -321,6 +343,8 @@ public:
 	void Clean();
 	/// Cleanup memory for fog of war tables
 	void CleanFogOfWar();
+	/// Clear the map layers
+	void ClearMapLayers();
 	
 	//Wyrmgus start
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z);
@@ -481,10 +505,6 @@ private:
 	//Wyrmgus end
 
 public:
-	//Wyrmgus start
-//	CMapField *Fields;              /// fields on map
-	std::vector<CMapField *> Fields;              /// fields on map
-	//Wyrmgus end
 	bool NoFogOfWar;           /// fog of war disabled
 
 	CTileset *Tileset;          /// tileset data
@@ -495,14 +515,8 @@ public:
 	CTerrainType *BorderTerrain;      	/// terrain type for borders
 	int Landmasses;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
-	std::vector<int> TimeOfDay;				/// the time of day for each map layer
-	std::vector<CPlane *> Planes;			/// the plane pointer (if any) for each map layer
-	std::vector<CWorld *> Worlds;			/// the world pointer (if any) for each map layer
-	std::vector<int> SurfaceLayers;			/// the surface layer (if any) for each map layer
-	std::vector<std::vector<CUnit *>> LayerConnectors;	/// connectors in a layer which lead to other layers
-	std::map<int, std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>>> SubtemplateAreas;
 	std::vector<CUnit *> SettlementUnits;	/// the town hall / settlement site units
-	std::vector<PixelSize> PixelTileSizes;	/// the pixel tile size for each map layer
+	std::vector<CMapLayer *> MapLayers;				/// the map layers composing the map
 	//Wyrmgus end
 
 	CMapInfo Info;             /// descriptive information

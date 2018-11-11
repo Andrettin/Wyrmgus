@@ -231,11 +231,11 @@ void CMinimap::Create()
 	UpdateTerrain();
 	*/
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	MinimapTexture.resize(Map.Fields.size());
-	MinimapTextureWidth.resize(Map.Fields.size());
-	MinimapTextureHeight.resize(Map.Fields.size());
+	MinimapTexture.resize(Map.MapLayers.size());
+	MinimapTextureWidth.resize(Map.MapLayers.size());
+	MinimapTextureHeight.resize(Map.MapLayers.size());
 #endif
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 		// Scale to biggest value.
 		const int n = std::max(std::max(Map.Info.MapWidths[z], Map.Info.MapHeights[z]), 32);
 
@@ -322,7 +322,7 @@ void CMinimap::Reload()
 {
 	//Wyrmgus start
 //	CreateMinimapTexture();
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 		CreateMinimapTexture(z);
 	}
 	//Wyrmgus end
@@ -425,7 +425,7 @@ void CMinimap::UpdateTerrain(int z)
 		//Wyrmgus end
 			//Wyrmgus start
 //			const int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getGraphicTile();
-			const CMapField &mf = Map.Fields[z][Minimap2MapX[z][mx] + Minimap2MapY[z][my]];
+			const CMapField &mf = Map.MapLayers[z]->Fields[Minimap2MapX[z][mx] + Minimap2MapY[z][my]];
 			CTerrainType *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
 			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
 			if (!terrain) {
@@ -671,7 +671,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 				tile = Map.Fields[x + y].getGraphicTile();
 			}
 			*/
-			const CMapField &mf = Map.Fields[z][x + y];
+			const CMapField &mf = Map.MapLayers[z]->Fields[x + y];
 			CTerrainType *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
 			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
 			if (!terrain) {
@@ -1366,15 +1366,16 @@ void CMinimap::AddEvent(const Vec2i &pos, int z, Uint32 color)
 		MinimapEvents[NumMinimapEvents].Color = color;
 		++NumMinimapEvents;
 	} else {
-		if (Map.Planes[z] != NULL && Map.GetCurrentPlane() != Map.Planes[z] && UI.PlaneButtons[Map.Planes[z]->ID].X != -1) {
-			MinimapEvents[NumMinimapEvents].pos.x = UI.PlaneButtons[Map.Planes[z]->ID].X + (UI.PlaneButtons[Map.Planes[z]->ID].Style->Width / 2);
-			MinimapEvents[NumMinimapEvents].pos.y = UI.PlaneButtons[Map.Planes[z]->ID].Y + (UI.PlaneButtons[Map.Planes[z]->ID].Style->Height / 2);
-		} else if (Map.Worlds[z] != NULL && Map.GetCurrentWorld() != Map.Worlds[z] && UI.WorldButtons[Map.Worlds[z]->ID].X != -1) {
-			MinimapEvents[NumMinimapEvents].pos.x = UI.WorldButtons[Map.Worlds[z]->ID].X + (UI.WorldButtons[Map.Worlds[z]->ID].Style->Width / 2);
-			MinimapEvents[NumMinimapEvents].pos.y = UI.WorldButtons[Map.Worlds[z]->ID].Y + (UI.WorldButtons[Map.Worlds[z]->ID].Style->Height / 2);
-		} else if (Map.GetCurrentSurfaceLayer() != Map.SurfaceLayers[z] && UI.SurfaceLayerButtons[Map.SurfaceLayers[z]].X != -1) {
-			MinimapEvents[NumMinimapEvents].pos.x = UI.SurfaceLayerButtons[Map.SurfaceLayers[z]].X + (UI.SurfaceLayerButtons[Map.SurfaceLayers[z]].Style->Width / 2);
-			MinimapEvents[NumMinimapEvents].pos.y = UI.SurfaceLayerButtons[Map.SurfaceLayers[z]].Y + (UI.SurfaceLayerButtons[Map.SurfaceLayers[z]].Style->Height / 2);
+		CMapLayer *event_map_layer = Map.MapLayers[z];
+		if (event_map_layer->Plane != NULL && Map.GetCurrentPlane() != event_map_layer->Plane && UI.PlaneButtons[event_map_layer->Plane->ID].X != -1) {
+			MinimapEvents[NumMinimapEvents].pos.x = UI.PlaneButtons[event_map_layer->Plane->ID].X + (UI.PlaneButtons[event_map_layer->Plane->ID].Style->Width / 2);
+			MinimapEvents[NumMinimapEvents].pos.y = UI.PlaneButtons[event_map_layer->Plane->ID].Y + (UI.PlaneButtons[event_map_layer->Plane->ID].Style->Height / 2);
+		} else if (event_map_layer->World != NULL && Map.GetCurrentWorld() != event_map_layer->World && UI.WorldButtons[event_map_layer->World->ID].X != -1) {
+			MinimapEvents[NumMinimapEvents].pos.x = UI.WorldButtons[event_map_layer->World->ID].X + (UI.WorldButtons[event_map_layer->World->ID].Style->Width / 2);
+			MinimapEvents[NumMinimapEvents].pos.y = UI.WorldButtons[event_map_layer->World->ID].Y + (UI.WorldButtons[event_map_layer->World->ID].Style->Height / 2);
+		} else if (Map.GetCurrentSurfaceLayer() != event_map_layer->SurfaceLayer && UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].X != -1) {
+			MinimapEvents[NumMinimapEvents].pos.x = UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].X + (UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].Style->Width / 2);
+			MinimapEvents[NumMinimapEvents].pos.y = UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].Y + (UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].Style->Height / 2);
 		} else {
 			return;
 		}

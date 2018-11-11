@@ -307,7 +307,7 @@ void InitAStar()
 	}
 	*/
 
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 		// Should only be called once
 		Assert(AStarMatrix.size() <= z);
 	
@@ -799,7 +799,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				cost += AStarUnknownTerrainCost;
 			}
 			//Wyrmgus start
-			if ((mf->Flags & MapFieldDesert) && mf->Owner != unit.Player->Index && unit.Type->BoolFlag[ORGANIC_INDEX].value && Map.TimeOfDay[unit.MapLayer] >= DawnTimeOfDay && Map.TimeOfDay[unit.MapLayer] <= DuskTimeOfDay && unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0) {
+			if ((mf->Flags & MapFieldDesert) && mf->Owner != unit.Player->Index && unit.Type->BoolFlag[ORGANIC_INDEX].value && Map.MapLayers[unit.MapLayer]->TimeOfDay >= DawnTimeOfDay && Map.MapLayers[unit.MapLayer]->TimeOfDay <= DuskTimeOfDay && unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0) {
 				cost += 32; //increase the cost of moving through deserts for units affected by dehydration, as we want the pathfinding to try to avoid that
 			}
 			//Wyrmgus end

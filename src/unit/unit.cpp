@@ -3007,9 +3007,9 @@ void UpdateUnitSightRange(CUnit &unit)
 	// FIXME : these values must be configurable.
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
-	if (Map.TimeOfDay[unit.MapLayer] == MorningTimeOfDay || Map.TimeOfDay[unit.MapLayer] == MiddayTimeOfDay || Map.TimeOfDay[unit.MapLayer] == AfternoonTimeOfDay) {
+	if (Map.MapLayers[unit.MapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[unit.MapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[unit.MapLayer]->TimeOfDay == AfternoonTimeOfDay) {
 		unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
-	} else if (Map.TimeOfDay[unit.MapLayer] == FirstWatchTimeOfDay || Map.TimeOfDay[unit.MapLayer] == MidnightTimeOfDay || Map.TimeOfDay[unit.MapLayer] == SecondWatchTimeOfDay) {
+	} else if (Map.MapLayers[unit.MapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[unit.MapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[unit.MapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
 		unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
 	}
 	unit_sight_range = std::max<int>(1, unit_sight_range);
@@ -6107,9 +6107,9 @@ bool CUnit::LevelCheck(const int level) const
 
 bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 {
-	if (Map.Planes[this->MapLayer] && !Map.Planes[this->MapLayer]->EmpoweredDeityDomains.empty()) {
+	if (Map.MapLayers[this->MapLayer]->Plane && !Map.MapLayers[this->MapLayer]->Plane->EmpoweredDeityDomains.empty()) {
 		for (size_t i = 0; i < ability->DeityDomains.size(); ++i) {
-			if (std::find(Map.Planes[this->MapLayer]->EmpoweredDeityDomains.begin(), Map.Planes[this->MapLayer]->EmpoweredDeityDomains.end(), ability->DeityDomains[i]) != Map.Planes[this->MapLayer]->EmpoweredDeityDomains.end()) {
+			if (std::find(Map.MapLayers[this->MapLayer]->Plane->EmpoweredDeityDomains.begin(), Map.MapLayers[this->MapLayer]->Plane->EmpoweredDeityDomains.end(), ability->DeityDomains[i]) != Map.MapLayers[this->MapLayer]->Plane->EmpoweredDeityDomains.end()) {
 				return true;
 			}
 		}

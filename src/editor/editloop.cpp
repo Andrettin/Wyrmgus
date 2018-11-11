@@ -2533,18 +2533,14 @@ void CEditor::Init()
 
 		//Wyrmgus start
 //		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
-		Map.Fields.clear();
-		Map.Fields.push_back(new CMapField[Map.Info.MapWidth * Map.Info.MapHeight]);
+		Map.ClearMapLayers();
+		CMapLayer *map_layer = new CMapLayer;
+		map_layer->Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
+		Map.MapLayers.push_back(map_layer);
 		Map.Info.MapWidths.clear();
 		Map.Info.MapWidths.push_back(Map.Info.MapWidth);
 		Map.Info.MapHeights.clear();
 		Map.Info.MapHeights.push_back(Map.Info.MapHeight);
-		Map.TimeOfDay.push_back(NoTimeOfDay);
-		Map.Planes.push_back(NULL);
-		Map.Worlds.push_back(NULL);
-		Map.SurfaceLayers.push_back(0);
-		Map.LayerConnectors.resize(1);
-		Map.PixelTileSizes.push_back(PixelSize(32, 32));
 		//Wyrmgus end
 
 		const int defaultTile = Map.Tileset->getDefaultTileIndex();
@@ -2561,11 +2557,11 @@ void CEditor::Init()
 			//Wyrmgus end
 		}
 		*/
-		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 			for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 				//Wyrmgus start
 	//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
-				Map.Fields[z][i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
+				Map.MapLayers[z]->Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
 				//Wyrmgus end
 			}
 		}

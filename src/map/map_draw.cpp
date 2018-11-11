@@ -280,7 +280,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			//Wyrmgus start
 //			const CMapField &mf = Map.Fields[sx];
-			const CMapField &mf = Map.Fields[CurrentMapLayer][sx];
+			const CMapField &mf = Map.MapLayers[CurrentMapLayer]->Fields[sx];
 			//Wyrmgus end
 			//Wyrmgus start
 			/*

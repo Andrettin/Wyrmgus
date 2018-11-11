@@ -724,7 +724,7 @@ void UpdateFogOfWarChange()
 			}
 		}
 		*/
-		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 			const unsigned int w = Map.Info.MapHeights[z] * Map.Info.MapWidths[z];
 			for (unsigned int index = 0; index != w; ++index) {
 				CMapField &mf = *Map.Field(index, z);
@@ -1216,8 +1216,8 @@ void CMap::InitFogOfWar(PixelSize pixel_tile_size)
 //	VisibleTable.clear();
 //	VisibleTable.resize(Info.MapWidth * Info.MapHeight);
 	VisibleTable.clear();
-	VisibleTable.resize(this->Fields.size());
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+	VisibleTable.resize(this->MapLayers.size());
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 		VisibleTable[z].resize(Info.MapWidths[z] * Info.MapHeights[z]);
 	}
 	//Wyrmgus end

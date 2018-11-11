@@ -231,7 +231,7 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 //	const unsigned int index = &mf - Map.Fields;
 //	const int y = index / Info.MapWidth;
 //	const int x = index - (y * Info.MapWidth);
-	const unsigned int index = &mf - Map.Fields[z];
+	const unsigned int index = &mf - Map.MapLayers[z]->Fields;
 	const int y = index / Info.MapWidths[z];
 	const int x = index - (y * Info.MapWidths[z]);
 	//Wyrmgus end
@@ -311,7 +311,7 @@ void CMap::Reveal(bool only_person_players)
 		MarkSeenTile(mf);
 	}
 	*/
-	for (size_t z = 0; z < this->Fields.size(); ++z) {
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		for (int i = 0; i != this->Info.MapWidths[z] * this->Info.MapHeights[z]; ++i) {
 			CMapField &mf = *this->Field(i, z);
 			CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
@@ -736,13 +736,9 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *t
 
 bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, int z) const
 {
-	if (this->SubtemplateAreas.find(z) == this->SubtemplateAreas.end()) {
-		return false;
-	}
-	
-	for (size_t i = 0; i < this->SubtemplateAreas.find(z)->second.size(); ++i) {
-		Vec2i min_pos = std::get<0>(this->SubtemplateAreas.find(z)->second[i]);
-		Vec2i max_pos = std::get<1>(this->SubtemplateAreas.find(z)->second[i]);
+	for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
+		Vec2i min_pos = std::get<0>(this->MapLayers[z]->SubtemplateAreas[i]);
+		Vec2i max_pos = std::get<1>(this->MapLayers[z]->SubtemplateAreas[i]);
 		if (pos.x >= min_pos.x && pos.y >= min_pos.y && pos.x <= max_pos.x && pos.y <= max_pos.y) {
 			return true;
 		}
@@ -757,7 +753,7 @@ bool CMap::IsLayerUnderground(int z) const
 		return true;
 	}
 	
-	if (this->SurfaceLayers[z] > 0) {
+	if (this->MapLayers[z]->SurfaceLayer > 0) {
 		return true;
 	}
 
@@ -766,22 +762,22 @@ bool CMap::IsLayerUnderground(int z) const
 
 void CMap::SetCurrentPlane(CPlane *plane)
 {
-	if (Map.Planes[CurrentMapLayer] == plane) {
+	if (Map.MapLayers[CurrentMapLayer]->Plane == plane) {
 		return;
 	}
 	
 	int map_layer = -1;
 	
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		if (Map.Planes[z] == plane && Map.SurfaceLayers[z] == this->GetCurrentSurfaceLayer()) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+		if (Map.MapLayers[z]->Plane == plane && Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
 			map_layer = z;
 			break;
 		}
 	}
 	
 	if (map_layer == -1) {
-		for (size_t z = 0; z < Map.Fields.size(); ++z) {
-			if (Map.Planes[z] == plane) {
+		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+			if (Map.MapLayers[z]->Plane == plane) {
 				map_layer = z;
 				break;
 			}
@@ -795,22 +791,22 @@ void CMap::SetCurrentPlane(CPlane *plane)
 
 void CMap::SetCurrentWorld(CWorld *world)
 {
-	if (Map.Worlds[CurrentMapLayer] == world) {
+	if (Map.MapLayers[CurrentMapLayer]->World == world) {
 		return;
 	}
 	
 	int map_layer = -1;
 	
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		if (Map.Worlds[z] == world && Map.SurfaceLayers[z] == this->GetCurrentSurfaceLayer()) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+		if (Map.MapLayers[z]->World == world && Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
 			map_layer = z;
 			break;
 		}
 	}
 	
 	if (map_layer == -1) {
-		for (size_t z = 0; z < Map.Fields.size(); ++z) {
-			if (Map.Worlds[z] == world) {
+		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+			if (Map.MapLayers[z]->World == world) {
 				map_layer = z;
 				break;
 			}
@@ -824,14 +820,14 @@ void CMap::SetCurrentWorld(CWorld *world)
 
 void CMap::SetCurrentSurfaceLayer(int surface_layer)
 {
-	if (Map.SurfaceLayers[CurrentMapLayer] == surface_layer) {
+	if (Map.MapLayers[CurrentMapLayer]->SurfaceLayer == surface_layer) {
 		return;
 	}
 	
 	int map_layer = -1;
 	
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		if (Map.Planes[z] == this->GetCurrentPlane() && Map.Worlds[z] == this->GetCurrentWorld() && Map.SurfaceLayers[z] == surface_layer) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+		if (Map.MapLayers[z]->Plane == this->GetCurrentPlane() && Map.MapLayers[z]->World == this->GetCurrentWorld() && Map.MapLayers[z]->SurfaceLayer == surface_layer) {
 			map_layer = z;
 			break;
 		}
@@ -844,8 +840,8 @@ void CMap::SetCurrentSurfaceLayer(int surface_layer)
 
 CPlane *CMap::GetCurrentPlane() const
 {
-	if (CurrentMapLayer < (int) Map.Planes.size()) {
-		return Map.Planes[CurrentMapLayer];
+	if (CurrentMapLayer < (int) Map.MapLayers.size()) {
+		return Map.MapLayers[CurrentMapLayer]->Plane;
 	} else {
 		return NULL;
 	}
@@ -853,8 +849,8 @@ CPlane *CMap::GetCurrentPlane() const
 
 CWorld *CMap::GetCurrentWorld() const
 {
-	if (CurrentMapLayer < (int) Map.Worlds.size()) {
-		return Map.Worlds[CurrentMapLayer];
+	if (CurrentMapLayer < (int) Map.MapLayers.size()) {
+		return Map.MapLayers[CurrentMapLayer]->World;
 	} else {
 		return NULL;
 	}
@@ -862,8 +858,8 @@ CWorld *CMap::GetCurrentWorld() const
 
 int CMap::GetCurrentSurfaceLayer() const
 {
-	if (CurrentMapLayer < (int) Map.SurfaceLayers.size()) {
-		return Map.SurfaceLayers[CurrentMapLayer];
+	if (CurrentMapLayer < (int) Map.MapLayers.size()) {
+		return Map.MapLayers[CurrentMapLayer]->SurfaceLayer;
 	} else {
 		return 0;
 	}
@@ -876,8 +872,8 @@ PixelSize CMap::GetCurrentPixelTileSize() const
 
 PixelSize CMap::GetMapLayerPixelTileSize(int map_layer) const
 {
-	if (map_layer >= 0 && map_layer < (int) Map.PixelTileSizes.size()) {
-		return Map.PixelTileSizes[map_layer];
+	if (map_layer >= 0 && map_layer < (int) Map.MapLayers.size()) {
+		return Map.MapLayers[map_layer]->PixelTileSize;
 	} else {
 		return PixelSize(32, 32);
 	}
@@ -982,7 +978,7 @@ void PreprocessMap()
 		}
 	}
 	*/
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 		for (int ix = 0; ix < Map.Info.MapWidths[z]; ++ix) {
 			for (int iy = 0; iy < Map.Info.MapHeights[z]; ++iy) {
 				CMapField &mf = *Map.Field(ix, iy, z);
@@ -1022,8 +1018,8 @@ int GetMapLayer(std::string plane_ident, std::string world_ident, int surface_la
 	CPlane *plane = CPlane::GetPlane(plane_ident);
 	CWorld *world = CWorld::GetWorld(world_ident);
 
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		if (Map.Planes[z] == plane && Map.Worlds[z] == world && Map.SurfaceLayers[z] == surface_layer) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+		if (Map.MapLayers[z]->Plane == plane && Map.MapLayers[z]->World == world && Map.MapLayers[z]->SurfaceLayer == surface_layer) {
 			return z;
 		}
 	}
@@ -1039,13 +1035,10 @@ int GetSubtemplateStartX(std::string subtemplate_ident)
 		return -1;
 	}
 
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		if (Map.SubtemplateAreas.find(z) == Map.SubtemplateAreas.end()) {
-			continue;
-		}
-		for (size_t i = 0; i < Map.SubtemplateAreas.find(z)->second.size(); ++i) {
-			Vec2i min_pos = std::get<0>(Map.SubtemplateAreas.find(z)->second[i]);
-			if (subtemplate == std::get<2>(Map.SubtemplateAreas.find(z)->second[i])) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+		for (size_t i = 0; i < Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
+			Vec2i min_pos = std::get<0>(Map.MapLayers[z]->SubtemplateAreas[i]);
+			if (subtemplate == std::get<2>(Map.MapLayers[z]->SubtemplateAreas[i])) {
 				return min_pos.x;
 			}
 		}
@@ -1062,13 +1055,10 @@ int GetSubtemplateStartY(std::string subtemplate_ident)
 		return -1;
 	}
 
-	for (size_t z = 0; z < Map.Fields.size(); ++z) {
-		if (Map.SubtemplateAreas.find(z) == Map.SubtemplateAreas.end()) {
-			continue;
-		}
-		for (size_t i = 0; i < Map.SubtemplateAreas.find(z)->second.size(); ++i) {
-			Vec2i min_pos = std::get<0>(Map.SubtemplateAreas.find(z)->second[i]);
-			if (subtemplate == std::get<2>(Map.SubtemplateAreas.find(z)->second[i])) {
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+		for (size_t i = 0; i < Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
+			Vec2i min_pos = std::get<0>(Map.MapLayers[z]->SubtemplateAreas[i]);
+			if (subtemplate == std::get<2>(Map.MapLayers[z]->SubtemplateAreas[i])) {
 				return min_pos.y;
 			}
 		}
@@ -1079,7 +1069,7 @@ int GetSubtemplateStartY(std::string subtemplate_ident)
 
 void ChangeCurrentMapLayer(int z)
 {
-	if (z < 0 || z >= (int) Map.Fields.size() || CurrentMapLayer == z) {
+	if (z < 0 || z >= (int) Map.MapLayers.size() || CurrentMapLayer == z) {
 		return;
 	}
 	
@@ -1093,7 +1083,7 @@ void ChangeCurrentMapLayer(int z)
 
 void SetTimeOfDay(int time_of_day, int z)
 {
-	Map.TimeOfDay[z] = time_of_day;
+	Map.MapLayers[z]->TimeOfDay = time_of_day;
 }
 //Wyrmgus end
 
@@ -1114,6 +1104,13 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 }
 
+CMapLayer::~CMapLayer()
+{
+	if (this->Fields) {
+		delete[] this->Fields;
+	}
+}
+
 //Wyrmgus start
 //CMap::CMap() : Fields(NULL), NoFogOfWar(false), TileGraphic(NULL)
 CMap::CMap() : NoFogOfWar(false), TileGraphic(NULL), Landmasses(0), BorderTerrain(NULL)
@@ -1132,26 +1129,19 @@ CMap::~CMap()
 */
 void CMap::Create()
 {
-	//Wyrmgus start
-//	Assert(!this->Fields);
-	Assert(this->Fields.size() == 0);
-	//Wyrmgus end
+	Assert(this->MapLayers.size() == 0);
 
 	//Wyrmgus start
-//	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
-	this->Fields.push_back(new CMapField[this->Info.MapWidth * this->Info.MapHeight]);
+	CMapLayer *map_layer = new CMapLayer;
+	map_layer->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
+	if (!GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning) {
+		map_layer->TimeOfDay = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
+	} else {
+		map_layer->TimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
+	}
+	this->MapLayers.push_back(map_layer);
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
 	this->Info.MapHeights.push_back(this->Info.MapHeight);
-	if (!GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning) {
-		this->TimeOfDay.push_back(SyncRand(MaxTimesOfDay - 1) + 1); // begin at a random time of day
-	} else {
-		this->TimeOfDay.push_back(NoTimeOfDay); // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
-	}
-	this->Planes.push_back(NULL);
-	this->Worlds.push_back(NULL);
-	this->SurfaceLayers.push_back(0);
-	this->LayerConnectors.resize(1);
-	this->PixelTileSizes.push_back(PixelSize(32, 32));
 	//Wyrmgus end
 }
 
@@ -1177,19 +1167,9 @@ void CMap::Clean()
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	delete[] this->Fields;
-	for (size_t z = 0; z < this->Fields.size(); ++z) {
-		delete[] this->Fields[z];
-	}
-	this->Fields.clear();
-	this->TimeOfDay.clear();
+	this->ClearMapLayers();
 	this->BorderLandmasses.clear();
-	this->Planes.clear();
-	this->Worlds.clear();
-	this->SurfaceLayers.clear();
-	this->LayerConnectors.clear();
 	this->SettlementUnits.clear();
-	this->PixelTileSizes.clear();
 	//Wyrmgus end
 
 	// Tileset freed by Tileset?
@@ -1208,10 +1188,14 @@ void CMap::Clean()
 	ReplayRevealMap = 0;
 
 	UI.Minimap.Destroy();
-	
-	//Wyrmgus start
-	SubtemplateAreas.clear();
-	//Wyrmgus end
+}
+
+void CMap::ClearMapLayers()
+{
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
+		delete this->MapLayers[z];
+	}
+	this->MapLayers.clear();
 }
 
 /**
@@ -1233,23 +1217,23 @@ void CMap::Save(CFile &file) const
 	file.printf("  \"filename\", \"%s\",\n", this->Info.Filename.c_str());
 	//Wyrmgus start
 	file.printf("  \"extra-map-layers\", {\n");
-	for (size_t z = 1; z < this->Fields.size(); ++z) {
+	for (size_t z = 1; z < this->MapLayers.size(); ++z) {
 		file.printf("  {%d, %d},\n", this->Info.MapWidths[z], this->Info.MapHeights[z]);
 	}
 	file.printf("  },\n");
 	file.printf("  \"time-of-day\", {\n");
-	for (size_t z = 0; z < this->TimeOfDay.size(); ++z) {
-		file.printf("  {%d},\n", this->TimeOfDay[z]);
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
+		file.printf("  {%d},\n", this->MapLayers[z]->TimeOfDay);
 	}
 	file.printf("  },\n");
 	file.printf("  \"pixel-tile-size\", {\n");
-	for (size_t z = 0; z < this->PixelTileSizes.size(); ++z) {
-		file.printf("  {%d, %d},\n", this->PixelTileSizes[z].x, this->PixelTileSizes[z].y);
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
+		file.printf("  {%d, %d},\n", this->MapLayers[z]->PixelTileSize.x, this->MapLayers[z]->PixelTileSize.y);
 	}
 	file.printf("  },\n");
 	file.printf("  \"layer-references\", {\n");
-	for (size_t z = 0; z < this->Fields.size(); ++z) {
-		file.printf("  {\"%s\", \"%s\", %d},\n", this->Planes[z] ? this->Planes[z]->Ident.c_str() : "", this->Worlds[z] ? this->Worlds[z]->Ident.c_str() : "", this->SurfaceLayers[z]);
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
+		file.printf("  {\"%s\", \"%s\", %d},\n", this->MapLayers[z]->Plane ? this->MapLayers[z]->Plane->Ident.c_str() : "", this->MapLayers[z]->World ? this->MapLayers[z]->World->Ident.c_str() : "", this->MapLayers[z]->SurfaceLayer);
 	}
 	file.printf("  },\n");
 	file.printf("  \"landmasses\", {\n");
@@ -1280,7 +1264,7 @@ void CMap::Save(CFile &file) const
 		}
 	}
 	*/
-	for (size_t z = 0; z < this->Fields.size(); ++z) {
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		file.printf("  {\n");
 		for (int h = 0; h < this->Info.MapHeights[z]; ++h) {
 			file.printf("  -- %d\n", h);
@@ -2136,7 +2120,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 
 void CMap::AdjustMap()
 {
-	for (size_t z = 0; z < this->Fields.size(); ++z) {
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		Vec2i map_start_pos(0, 0);
 		Vec2i map_end(this->Info.MapWidths[z], this->Info.MapHeights[z]);
 		
@@ -2721,7 +2705,7 @@ void CMap::RegenerateForest()
 		}
 	}
 	*/
-	for (size_t z = 0; z < this->Fields.size(); ++z) {
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		for (pos.y = 0; pos.y < Info.MapHeights[z]; ++pos.y) {
 			for (pos.x = 0; pos.x < Info.MapWidths[z]; ++pos.x) {
 				RegenerateForestTile(pos, z);
