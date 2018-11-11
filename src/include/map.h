@@ -258,6 +258,7 @@ class CMapLayer
 public:
 	CMapLayer() :
 		TimeOfDay(0), SurfaceLayer(0),
+		Overland(false),
 		PixelTileSize(32, 32),
 		Fields(NULL), Plane(NULL), World(NULL)
 	{
@@ -267,6 +268,7 @@ public:
 	
 	CMapField *Fields;						/// fields on the map layer
 	int TimeOfDay;							/// the time of day for the map layer
+	bool Overland;
 	CPlane *Plane;							/// the plane pointer (if any) for the map layer
 	CWorld *World;							/// the world pointer (if any) for the map layer
 	int SurfaceLayer;						/// the surface layer for the map layer

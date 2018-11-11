@@ -363,6 +363,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		map_layer->World = this->World;
 		map_layer->SurfaceLayer = this->SurfaceLayer;
 		map_layer->PixelTileSize = this->PixelTileSize;
+		map_layer->Overland = this->Overland;
 		Map.MapLayers.push_back(map_layer);
 	} else {
 		if (!this->IsSubtemplateArea()) {
@@ -370,6 +371,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 			Map.MapLayers[z]->World = this->World;
 			Map.MapLayers[z]->SurfaceLayer = this->SurfaceLayer;
 			Map.MapLayers[z]->PixelTileSize = this->PixelTileSize;
+			Map.MapLayers[z]->Overland = this->Overland;
 		}
 	}
 
