@@ -868,7 +868,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 */
 //Wyrmgus start
 //void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
-void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z, CSettlement *settlement)
+void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z, CSite *settlement)
 //Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {

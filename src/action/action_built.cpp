@@ -59,7 +59,7 @@
 
 //Wyrmgus start
 //extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const CSettlement *settlement);
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const CSite *settlement);
 //Wyrmgus end
 
 /* static */ COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit)

@@ -89,7 +89,7 @@ class CPlane;
 class CPlayerQuestObjective;
 class CQuest;
 class CReligion;
-class CSettlement;
+class CSite;
 //WYrmgus end
 class PlayerAi;
 class CFile;
@@ -239,10 +239,10 @@ public:
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(int upgrade_class);
-	bool HasSettlement(CSettlement *settlement) const;
+	bool HasSettlement(CSite *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
-	CSettlement *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
-	bool HasUnitBuilder(const CUnitType *type, const CSettlement *settlement = NULL) const;
+	CSite *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
+	bool HasUnitBuilder(const CUnitType *type, const CSite *settlement = NULL) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
 	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
@@ -705,7 +705,7 @@ public:
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction
-	std::vector<CSettlement *> Cores;									/// Core settlements of this faction (required to found it)
+	std::vector<CSite *> Cores;											/// Core sites of this faction (required to found it)
 	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
 	std::map<int, int> ForceTypeWeights;								/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;				/// AI building templates

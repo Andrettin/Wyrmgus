@@ -32,7 +32,7 @@
 
 #include "actions.h"
 
-class CSettlement;
+class CSite;
 
 //@{
 
@@ -40,7 +40,7 @@ class COrder_Build : public COrder
 {
 	//Wyrmgus start
 //	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSettlement *settlement);
+	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement);
 	//Wyrmgus end
 public:
 	//Wyrmgus start
@@ -89,7 +89,7 @@ private:
 	Vec2i goalPos;
 	//Wyrmgus start
 	int MapLayer;
-	CSettlement *Settlement;
+	CSite *Settlement;
 	//Wyrmgus end
 };
 

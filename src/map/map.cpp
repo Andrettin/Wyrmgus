@@ -78,8 +78,8 @@
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-std::vector<CSettlement *> Settlements;
-std::map<std::string, CSettlement *> SettlementIdentToPointer;
+std::vector<CSite *> Sites;
+std::map<std::string, CSite *> SiteIdentToPointer;
 std::vector<CTerrainFeature *> TerrainFeatures;
 std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
@@ -97,16 +97,16 @@ char CurrentMapPath[1024];  /// Path of the current map
 
 //Wyrmgus start
 /**
-**  Get a settlement
+**  Get a site
 */
-CSettlement *GetSettlement(std::string settlement_ident)
+CSite *GetSite(std::string site_ident)
 {
-	if (settlement_ident.empty()) {
+	if (site_ident.empty()) {
 		return NULL;
 	}
 	
-	if (SettlementIdentToPointer.find(settlement_ident) != SettlementIdentToPointer.end()) {
-		return SettlementIdentToPointer[settlement_ident];
+	if (SiteIdentToPointer.find(site_ident) != SiteIdentToPointer.end()) {
+		return SiteIdentToPointer[site_ident];
 	}
 	
 	return NULL;
@@ -182,9 +182,9 @@ int GetDegreeLevelIdByName(std::string degree_level)
 }
 
 /**
-**  Get a settlement's cultural name.
+**  Get a site's cultural name.
 */
-std::string CSettlement::GetCulturalName(int civilization)
+std::string CSite::GetCulturalName(int civilization)
 {
 	if (civilization != -1 && this->CulturalNames.find(civilization) != this->CulturalNames.end()) {
 		return this->CulturalNames[civilization];
@@ -1169,7 +1169,7 @@ void CMap::Clean()
 	//Wyrmgus start
 	this->ClearMapLayers();
 	this->BorderLandmasses.clear();
-	this->SettlementUnits.clear();
+	this->SiteUnits.clear();
 	//Wyrmgus end
 
 	// Tileset freed by Tileset?

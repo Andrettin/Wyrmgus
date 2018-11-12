@@ -38,7 +38,7 @@
 
 class CPlayer;
 class CFile;
-class CSettlement;
+class CSite;
 class CUnit;
 class CUnitType;
 class CUpgrade;
@@ -91,12 +91,12 @@ extern void AiWorkComplete(CUnit *unit, CUnit &what);
 /// Called if AI unit can't build
 //Wyrmgus start
 //extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what);
-extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass = 0, CSettlement *settlement = NULL);
+extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass = 0, CSite *settlement = NULL);
 //Wyrmgus end
 /// Called if AI unit can't reach building place
 //Wyrmgus start
 //extern void AiCanNotReach(CUnit &unit, const CUnitType &what);
-extern void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass, CSettlement *settlement);
+extern void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass, CSite *settlement);
 //Wyrmgus end
 /// Called if an AI unit can't move
 extern void AiCanNotMove(CUnit &unit);

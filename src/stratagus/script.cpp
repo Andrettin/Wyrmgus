@@ -1414,10 +1414,10 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitSettlementName : // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL && unit->Settlement != NULL && unit->Settlement->SettlementUnit != NULL) {
-				int civilization = unit->Settlement->SettlementUnit->Type->Civilization;
-				if (civilization != -1 && unit->Settlement->SettlementUnit->Player->Faction != -1 && (unit->Settlement->SettlementUnit->Player->Race == civilization || unit->Settlement->SettlementUnit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Settlement->SettlementUnit->Player->Faction, unit->Settlement->SettlementUnit->Type->Class))) {
-					civilization = unit->Settlement->SettlementUnit->Player->Race;
+			if (unit != NULL && unit->Settlement != NULL && unit->Settlement->SiteUnit != NULL) {
+				int civilization = unit->Settlement->SiteUnit->Type->Civilization;
+				if (civilization != -1 && unit->Settlement->SiteUnit->Player->Faction != -1 && (unit->Settlement->SiteUnit->Player->Race == civilization || unit->Settlement->SiteUnit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->Faction, unit->Settlement->SiteUnit->Type->Class))) {
+					civilization = unit->Settlement->SiteUnit->Player->Race;
 				}
 				return unit->Settlement->GetCulturalName(civilization);
 			} else {
@@ -1625,7 +1625,7 @@ std::string EvalString(const StringDesc *s)
 					} else {
 						first = false;
 					}
-					bool has_settlement = (**faction).Cores[i]->SettlementUnit && (**faction).Cores[i]->SettlementUnit->Player == ThisPlayer && (**faction).Cores[i]->SettlementUnit->CurrentAction() != UnitActionBuilt;
+					bool has_settlement = (**faction).Cores[i]->SiteUnit && (**faction).Cores[i]->SiteUnit->Player == ThisPlayer && (**faction).Cores[i]->SiteUnit->CurrentAction() != UnitActionBuilt;
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}

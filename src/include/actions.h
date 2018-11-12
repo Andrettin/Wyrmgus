@@ -84,7 +84,7 @@ enum UnitAction {
 class CAnimation;
 class CConstructionFrame;
 class CFile;
-class CSettlement;
+class CSite;
 class CUnit;
 class CUnitType;
 class CUpgrade;
@@ -144,7 +144,7 @@ public:
 	static COrder *NewActionBoard(CUnit &unit);
 	//Wyrmgus start
 //	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSettlement *settlement);
+	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement);
 	//Wyrmgus end
 	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
 	static COrder *NewActionDefend(CUnit &dest);

@@ -45,7 +45,7 @@
 class CUnit;
 class CFile;
 class CQuest;
-class CSettlement;
+class CSite;
 class SpellType;
 class CUnitType;
 class CUpgrade;
@@ -131,7 +131,7 @@ extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush,
 /// Prepare command build
 //Wyrmgus start
 //extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush, int z = 0, CSettlement *settlement = NULL);
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush, int z = 0, CSite *settlement = NULL);
 //Wyrmgus end
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit, bool salvage = false);

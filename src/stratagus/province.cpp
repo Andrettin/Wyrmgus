@@ -60,10 +60,10 @@ std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
 void CleanProvinces()
 {
-	for (size_t i = 0; i < Settlements.size(); ++i) {
-		delete Settlements[i];
+	for (size_t i = 0; i < Sites.size(); ++i) {
+		delete Sites[i];
 	}
-	Settlements.clear();
+	Sites.clear();
 	
 	for (size_t i = 0; i < TerrainFeatures.size(); ++i) {
 		delete TerrainFeatures[i];

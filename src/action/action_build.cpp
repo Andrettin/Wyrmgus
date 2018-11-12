@@ -68,7 +68,7 @@
 
 //Wyrmgus start
 //extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
-extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const CSettlement *settlement);
+extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const CSite *settlement);
 //Wyrmgus end
 
 enum {
@@ -88,7 +88,7 @@ enum {
 
 //Wyrmgus start
 ///* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
-/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSettlement *settlement)
+/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -168,7 +168,7 @@ enum {
 		this->MapLayer = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "settlement")) {
 		++j;
-		this->Settlement = GetSettlement(LuaToString(l, -1, j + 1));
+		this->Settlement = GetSite(LuaToString(l, -1, j + 1));
 	//Wyrmgus end
 	} else {
 		return false;
@@ -294,7 +294,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	}
 }
 
-static bool CheckLimit(const CUnit &unit, const CUnitType &type, int landmass, CSettlement *settlement)
+static bool CheckLimit(const CUnit &unit, const CUnitType &type, int landmass, CSite *settlement)
 {
 	const CPlayer &player = *unit.Player;
 	bool isOk = true;

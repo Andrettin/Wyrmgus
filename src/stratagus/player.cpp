@@ -1885,13 +1885,13 @@ bool CPlayer::HasUpgradeClass(int upgrade_class)
 	return false;
 }
 
-bool CPlayer::HasSettlement(CSettlement *settlement) const
+bool CPlayer::HasSettlement(CSite *settlement) const
 {
 	if (!settlement) {
 		return false;
 	}
 	
-	if (settlement->SettlementUnit && settlement->SettlementUnit->Player == this) {
+	if (settlement->SiteUnit && settlement->SiteUnit->Player == this) {
 		return true;
 	}
 
@@ -1939,13 +1939,13 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	return false;
 }
 
-CSettlement *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
+CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
 {
 	CUnit *best_hall = NULL;
 	int best_distance = -1;
 	
-	for (size_t i = 0; i < Map.SettlementUnits.size(); ++i) {
-		CUnit *settlement_unit = Map.SettlementUnits[i];
+	for (size_t i = 0; i < Map.SiteUnits.size(); ++i) {
+		CUnit *settlement_unit = Map.SiteUnits[i];
 		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer) {
 			continue;
 		}
@@ -1966,7 +1966,7 @@ CSettlement *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i 
 	}
 }
 
-bool CPlayer::HasUnitBuilder(const CUnitType *type, const CSettlement *settlement) const
+bool CPlayer::HasUnitBuilder(const CUnitType *type, const CSite *settlement) const
 {
 	if (type->BoolFlag[BUILDING_INDEX].value && type->Slot < (int) AiHelpers.Build.size()) {
 		for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
@@ -2046,7 +2046,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 		//check if the required core settlements are owned by the player
 		if (CurrentCampaign != NULL) { //only check for settlements in the Scenario mode
 			for (size_t i = 0; i < faction->Cores.size(); ++i) {
-				if (!faction->Cores[i]->SettlementUnit || faction->Cores[i]->SettlementUnit->Player != this || faction->Cores[i]->SettlementUnit->CurrentAction() == UnitActionBuilt) {
+				if (!faction->Cores[i]->SiteUnit || faction->Cores[i]->SiteUnit->Player != this || faction->Cores[i]->SiteUnit->CurrentAction() == UnitActionBuilt) {
 					return false;
 				}
 			}

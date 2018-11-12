@@ -498,14 +498,14 @@ static int CclDefineCharacter(lua_State *l)
 				Vec2i character_pos;
 				if (lua_istable(l, -1)) { //coordinates
 					CclGetPos(l, &character_pos.x, &character_pos.y);
-				} else { //settlement ident
-					std::string settlement_ident = LuaToString(l, -1);
-					CSettlement *settlement = GetSettlement(settlement_ident);
-					if (!settlement) {
-						LuaError(l, "Settlement \"%s\" doesn't exist.\n" _C_ settlement_ident.c_str());
+				} else { //site ident
+					std::string site_ident = LuaToString(l, -1);
+					CSite *site = GetSite(site_ident);
+					if (!site) {
+						LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
 					}
-					character_pos.x = settlement->Position.x;
-					character_pos.y = settlement->Position.y;
+					character_pos.x = site->Position.x;
+					character_pos.y = site->Position.y;
 				}
 				lua_pop(l, 1);
 

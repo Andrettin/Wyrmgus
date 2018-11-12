@@ -239,11 +239,11 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->Unique = unique;
 					} else if (!strcmp(value, "settlement")) {
-						CSettlement *settlement = GetSettlement(LuaToString(l, -1, k + 1));
-						if (!settlement) {
-							LuaError(l, "Settlement doesn't exist.");
+						CSite *site = GetSite(LuaToString(l, -1, k + 1));
+						if (!site) {
+							LuaError(l, "Site doesn't exist.");
 						}
-						objective->Settlement = settlement;
+						objective->Settlement = site;
 					} else if (!strcmp(value, "faction")) {
 						CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1, k + 1));
 						if (!faction) {

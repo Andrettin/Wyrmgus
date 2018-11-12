@@ -172,7 +172,7 @@ class BuildingPlaceFinder
 public:
 	//Wyrmgus start
 //	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos) :
-	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, CSettlement *settlement) :
+	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, CSite *settlement) :
 	//Wyrmgus end
 		worker(worker), type(type),
 			movemask(worker.Type->MovementMask 
@@ -201,7 +201,7 @@ private:
 	//Wyrmgus start
 	int z;
 	int landmass;
-	CSettlement *settlement;
+	CSite *settlement;
 	bool IgnoreExploration;
 	//Wyrmgus end
 };
@@ -266,7 +266,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 */
 //Wyrmgus start
 //static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos)
-static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, CSettlement *settlement = NULL)
+static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, CSite *settlement = NULL)
 //Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
@@ -642,7 +642,7 @@ static bool AiFindMiningPlace(const CUnit &worker,
 */
 //Wyrmgus start
 //bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos)
-bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, CSettlement *settlement)
+bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass, CSite *settlement)
 //Wyrmgus end
 {
 	// Find a good place for a new hall

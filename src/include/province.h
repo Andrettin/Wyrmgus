@@ -52,7 +52,7 @@ class CFaction;
 class CGraphic;
 class CPlane;
 class CProvince;
-class CSettlement;
+class CSite;
 class CSpecies;
 class CTerrainFeature;
 class CUnitType;
@@ -110,7 +110,7 @@ public:
 	std::string Name;
 	int ID;																/// ID of this province
 	std::vector<CProvince *> Provinces;									/// Provinces which belong to this region
-	std::vector<CSettlement *> Settlements;								/// Settlements which belong to this region
+	std::vector<CSite *> Sites;											/// Sites which belong to this region
 	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
 };
 

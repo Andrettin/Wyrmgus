@@ -52,7 +52,7 @@ class CDialogue;
 class CDialogueNode;
 class CFaction;
 class CQuest;
-class CSettlement;
+class CSite;
 class CUniqueItem;
 class CUnitType;
 class CUpgrade;
@@ -94,7 +94,7 @@ public:
 	CUpgrade *Upgrade;
 	CCharacter *Character;
 	CUniqueItem *Unique;
-	CSettlement *Settlement;
+	CSite *Settlement;
 	CFaction *Faction;
 };
 

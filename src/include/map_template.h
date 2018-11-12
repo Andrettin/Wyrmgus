@@ -54,7 +54,7 @@ class CCharacter;
 class CConfigData;
 class CFaction;
 class CPlane;
-class CSettlement;
+class CSite;
 class CTerrainType;
 class CUniqueItem;
 class CUnitType;
@@ -82,7 +82,7 @@ public:
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z);
-	void ApplySettlements(Vec2i template_start_pos, Vec2i map_start_pos, int z);
+	void ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
 	void ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
 	bool IsSubtemplateArea();
@@ -121,7 +121,7 @@ public:
 	std::vector<std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>> SurfaceLayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
-	std::map<std::pair<int, int>, CSettlement *> Settlements;
+	std::map<std::pair<int, int>, CSite *> Sites;
 	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
 };
 

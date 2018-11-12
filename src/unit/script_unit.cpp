@@ -346,10 +346,10 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "family-name")) {
 			unit->FamilyName = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "settlement")) {
-			unit->Settlement = GetSettlement(LuaToString(l, 2, j + 1));
+			unit->Settlement = GetSite(LuaToString(l, 2, j + 1));
 			if (type->BoolFlag[TOWNHALL_INDEX].value || SettlementSiteUnitType == type) {
-				unit->Settlement->SettlementUnit = unit;
-				Map.SettlementUnits.push_back(unit);
+				unit->Settlement->SiteUnit = unit;
+				Map.SiteUnits.push_back(unit);
 			}
 		} else if (!strcmp(value, "trait")) {
 			unit->Trait = CUpgrade::Get(LuaToString(l, 2, j + 1));

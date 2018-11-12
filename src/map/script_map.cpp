@@ -703,27 +703,27 @@ static int CclSetMapTemplatePathway(lua_State *l)
 	Vec2i start_pos;
 	if (lua_istable(l, 3)) { //coordinates
 		CclGetPos(l, &start_pos.x, &start_pos.y, 3);
-	} else { //settlement ident
-		std::string settlement_ident = LuaToString(l, 3);
-		CSettlement *settlement = GetSettlement(settlement_ident);
-		if (!settlement) {
-			LuaError(l, "Settlement \"%s\" doesn't exist.\n" _C_ settlement_ident.c_str());
+	} else { //site ident
+		std::string site_ident = LuaToString(l, 3);
+		CSite *site = GetSite(site_ident);
+		if (!site) {
+			LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
 		}
-		start_pos.x = settlement->Position.x;
-		start_pos.y = settlement->Position.y;
+		start_pos.x = site->Position.x;
+		start_pos.y = site->Position.y;
 	}
 	
 	Vec2i end_pos;
 	if (lua_istable(l, 4)) { //coordinates
 		CclGetPos(l, &end_pos.x, &end_pos.y, 4);
-	} else { //settlement ident
-		std::string settlement_ident = LuaToString(l, 4);
-		CSettlement *settlement = GetSettlement(settlement_ident);
-		if (!settlement) {
-			LuaError(l, "Settlement \"%s\" doesn't exist.\n" _C_ settlement_ident.c_str());
+	} else { //site ident
+		std::string site_ident = LuaToString(l, 4);
+		CSite *site = GetSite(site_ident);
+		if (!site) {
+			LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
 		}
-		end_pos.x = settlement->Position.x;
-		end_pos.y = settlement->Position.y;
+		end_pos.x = site->Position.x;
+		end_pos.y = site->Position.y;
 	}
 	
 	if (end_pos.x < 0 || end_pos.x >= map_template->Width || end_pos.y < 0 || end_pos.y >= map_template->Height) {
@@ -1779,24 +1779,24 @@ static int CclDefineMapTemplate(lua_State *l)
 }
 
 /**
-**  Define a settlement.
+**  Define a site.
 **
 **  @param l  Lua state.
 */
-static int CclDefineSettlement(lua_State *l)
+static int CclDefineSite(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string settlement_ident = LuaToString(l, 1);
-	CSettlement *settlement = GetSettlement(settlement_ident);
-	if (settlement == NULL) {
-		settlement = new CSettlement;
-		settlement->Ident = settlement_ident;
-		Settlements.push_back(settlement);
-		SettlementIdentToPointer[settlement_ident] = settlement;
+	std::string site_ident = LuaToString(l, 1);
+	CSite *site = GetSite(site_ident);
+	if (site == NULL) {
+		site = new CSite;
+		site->Ident = site_ident;
+		Sites.push_back(site);
+		SiteIdentToPointer[site_ident] = site;
 	}
 	
 	//  Parse the list:
@@ -1804,14 +1804,14 @@ static int CclDefineSettlement(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			settlement->Name = LuaToString(l, -1);
+			site->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Major")) {
-			settlement->Major = LuaToBoolean(l, -1);
+			site->Major = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Position")) {
-			CclGetPos(l, &settlement->Position.x, &settlement->Position.y);
+			CclGetPos(l, &site->Position.x, &site->Position.y);
 		} else if (!strcmp(value, "MapTemplate")) {
 			CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(LuaToString(l, -1));
-			settlement->MapTemplate = map_template;
+			site->MapTemplate = map_template;
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -1826,7 +1826,7 @@ static int CclDefineSettlement(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				settlement->CulturalNames[civilization] = cultural_name;
+				site->CulturalNames[civilization] = cultural_name;
 			}
 		} else if (!strcmp(value, "Cores")) {
 			if (!lua_istable(l, -1)) {
@@ -1839,8 +1839,8 @@ static int CclDefineSettlement(lua_State *l)
 					LuaError(l, "Faction doesn't exist.");
 				}
 				
-				settlement->Cores.push_back(faction);
-				faction->Cores.push_back(settlement);
+				site->Cores.push_back(faction);
+				faction->Cores.push_back(site);
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
 			if (!lua_istable(l, -1)) {
@@ -1863,9 +1863,9 @@ static int CclDefineSettlement(lua_State *l)
 					if (!owner_faction) {
 						LuaError(l, "Faction \"%s\" doesn't exist." _C_ owner_ident.c_str());
 					}
-					settlement->HistoricalOwners[date] = owner_faction;
+					site->HistoricalOwners[date] = owner_faction;
 				} else {
-					settlement->HistoricalOwners[date] = NULL;
+					site->HistoricalOwners[date] = NULL;
 				}
 			}
 		} else if (!strcmp(value, "HistoricalPopulation")) {
@@ -1883,7 +1883,7 @@ static int CclDefineSettlement(lua_State *l)
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
 				++j;
-				settlement->HistoricalPopulation[date] = LuaToNumber(l, -1, j + 1);
+				site->HistoricalPopulation[date] = LuaToNumber(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "HistoricalUnits")) {
 			if (!lua_istable(l, -1)) {
@@ -1931,7 +1931,7 @@ static int CclDefineSettlement(lua_State *l)
 				}
 				lua_pop(l, 1);
 
-				settlement->HistoricalUnits.push_back(std::tuple<CDate, CDate, CUnitType *, int, CFaction *>(start_date, end_date, unit_type, unit_quantity, unit_owner));
+				site->HistoricalUnits.push_back(std::tuple<CDate, CDate, CUnitType *, int, CFaction *>(start_date, end_date, unit_type, unit_quantity, unit_owner));
 			}
 		} else if (!strcmp(value, "HistoricalBuildings")) {
 			if (!lua_istable(l, -1)) {
@@ -1985,7 +1985,7 @@ static int CclDefineSettlement(lua_State *l)
 				}
 				lua_pop(l, 1);
 
-				settlement->HistoricalBuildings.push_back(std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>(start_date, end_date, building_class_id, unique, building_owner));
+				site->HistoricalBuildings.push_back(std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>(start_date, end_date, building_class_id, unique, building_owner));
 			}
 		} else if (!strcmp(value, "HistoricalResources")) {
 			if (!lua_istable(l, -1)) {
@@ -2029,7 +2029,7 @@ static int CclDefineSettlement(lua_State *l)
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
 
-				settlement->HistoricalResources.push_back(std::tuple<CDate, CDate, CUnitType *, CUniqueItem *, int>(start_date, end_date, unit_type, unique, quantity));
+				site->HistoricalResources.push_back(std::tuple<CDate, CDate, CUnitType *, CUniqueItem *, int>(start_date, end_date, unit_type, unique, quantity));
 			}
 		} else if (!strcmp(value, "Regions")) {
 			if (!lua_istable(l, -1)) {
@@ -2041,27 +2041,27 @@ static int CclDefineSettlement(lua_State *l)
 				if (region == NULL) {
 					LuaError(l, "Region doesn't exist.");
 				}
-				settlement->Regions.push_back(region);
-				region->Settlements.push_back(settlement);
+				site->Regions.push_back(region);
+				region->Sites.push_back(site);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	
-	if (!settlement->Major && !settlement->Cores.empty()) { //if the settlement is a minor one, but has faction cores, remove them
-		for (size_t i = 0; i < settlement->Cores.size(); ++i) {
-			CFaction *core_faction = settlement->Cores[i];
-			core_faction->Cores.erase(std::remove(core_faction->Cores.begin(), core_faction->Cores.end(), settlement), core_faction->Cores.end());
+	if (!site->Major && !site->Cores.empty()) { //if the site is a minor one, but has faction cores, remove them
+		for (size_t i = 0; i < site->Cores.size(); ++i) {
+			CFaction *core_faction = site->Cores[i];
+			core_faction->Cores.erase(std::remove(core_faction->Cores.begin(), core_faction->Cores.end(), site), core_faction->Cores.end());
 		}
-		settlement->Cores.clear();
+		site->Cores.clear();
 	}
 	
-	if (settlement->MapTemplate && settlement->Position.x != -1 && settlement->Position.y != -1) {
-		if (settlement->MapTemplate->Settlements.find(std::pair<int, int>(settlement->Position.x, settlement->Position.y)) != settlement->MapTemplate->Settlements.end()) {
-			LuaError(l, "Position (%d, %d) of map template \"%s\" already has a settlement." _C_ settlement->Position.x _C_ settlement->Position.y _C_ settlement->MapTemplate->Ident.c_str());
+	if (site->MapTemplate && site->Position.x != -1 && site->Position.y != -1) {
+		if (site->MapTemplate->Sites.find(std::pair<int, int>(site->Position.x, site->Position.y)) != site->MapTemplate->Sites.end()) {
+			LuaError(l, "Position (%d, %d) of map template \"%s\" already has a site." _C_ site->Position.x _C_ site->Position.y _C_ site->MapTemplate->Ident.c_str());
 		}
-		settlement->MapTemplate->Settlements[std::pair<int, int>(settlement->Position.x, settlement->Position.y)] = settlement;
+		site->MapTemplate->Sites[std::pair<int, int>(site->Position.x, site->Position.y)] = site;
 	}
 	
 	return 0;
@@ -2241,30 +2241,30 @@ static int CclGetMapTemplateData(lua_State *l)
 }
 
 /**
-**  Get settlement data.
+**  Get site data.
 **
 **  @param l  Lua state.
 */
-static int CclGetSettlementData(lua_State *l)
+static int CclGetSiteData(lua_State *l)
 {
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string settlement_ident = LuaToString(l, 1);
-	CSettlement *settlement = GetSettlement(settlement_ident);
-	if (!settlement) {
-		LuaError(l, "Settlement \"%s\" doesn't exist." _C_ settlement_ident.c_str());
+	std::string site_ident = LuaToString(l, 1);
+	CSite *site = GetSite(site_ident);
+	if (!site) {
+		LuaError(l, "Site \"%s\" doesn't exist." _C_ site_ident.c_str());
 	}
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, settlement->Name.c_str());
+		lua_pushstring(l, site->Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "PosX")) {
-		lua_pushnumber(l, settlement->Position.x);
+		lua_pushnumber(l, site->Position.x);
 		return 1;
 	} else if (!strcmp(data, "PosY")) {
-		lua_pushnumber(l, settlement->Position.y);
+		lua_pushnumber(l, site->Position.y);
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -2363,11 +2363,11 @@ void MapCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "DefineTerrainType", CclDefineTerrainType);
 	lua_register(Lua, "DefineMapTemplate", CclDefineMapTemplate);
-	lua_register(Lua, "DefineSettlement", CclDefineSettlement);
+	lua_register(Lua, "DefineSite", CclDefineSite);
 	lua_register(Lua, "DefineTerrainFeature", CclDefineTerrainFeature);
 	lua_register(Lua, "DefineTimeline", CclDefineTimeline);
 	lua_register(Lua, "GetMapTemplateData", CclGetMapTemplateData);
-	lua_register(Lua, "GetSettlementData", CclGetSettlementData);
+	lua_register(Lua, "GetSiteData", CclGetSiteData);
 	lua_register(Lua, "GetTerrainFeatureData", CclGetTerrainFeatureData);
 	lua_register(Lua, "GetTerrainFeatures", CclGetTerrainFeatures);
 	lua_register(Lua, "SetMapTemplateTileTerrain", CclSetMapTemplateTileTerrain);

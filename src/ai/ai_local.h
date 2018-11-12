@@ -53,7 +53,7 @@ class CUnit;
 class CUnitType;
 class CUpgrade;
 class CPlayer;
-class CSettlement;
+class CSite;
 
 /**
 **  Ai Type structure.
@@ -308,7 +308,7 @@ public:
 	//Wyrmgus start
 	int MapLayer;
 	int Landmass;
-	CSettlement *Settlement;
+	CSite *Settlement;
 	//Wyrmgus end
 };
 
@@ -515,7 +515,7 @@ extern void AiCheckWorkers();
 /// Add unit-type request to resource manager
 //Wyrmgus start
 //extern void AiAddUnitTypeRequest(CUnitType &type, int count);
-extern void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass = 0, CSettlement *settlement = NULL, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
+extern void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass = 0, CSite *settlement = NULL, const Vec2i pos = Vec2i(-1, -1), const int z = 0);
 //Wyrmgus end
 /// Add upgrade-to request to resource manager
 extern void AiAddUpgradeToRequest(CUnitType &type);
@@ -553,7 +553,7 @@ extern void AiCheckBuildings();
 /// Find nice building place
 //Wyrmgus start
 //extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos);
-extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, CSettlement *settlement = NULL);
+extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z, int landmass = 0, CSite *settlement = NULL);
 //Wyrmgus end
 
 //
@@ -598,7 +598,7 @@ extern int AiGetRequestedTransportCapacity(int water_landmass);
 /// Get the quantity of units belonging to a particular type, possibly including requests
 extern int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int landmass, const bool include_requests, const bool include_upgrades);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
-extern int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const CUnitType *type, const int landmass = 0, const CSettlement *settlement = NULL);
+extern int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const CUnitType *type, const int landmass = 0, const CSite *settlement = NULL);
 /// Get whether the AI has a particular upgrade, possibly including requests and currently under research upgrades
 extern bool AiHasUpgrade(const PlayerAi &pai, const CUpgrade *upgrade, bool include_requests);
 //Wyrmgus end

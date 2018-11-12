@@ -98,21 +98,20 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CFaction;
 class CGraphic;
 class CPlayer;
 class CFile;
 class CMapTemplate;
+class CPlane;
+class CRegion;
 class CTileset;
+class CUniqueItem;
 class CUnit;
 class CUnitType;
-//Wyrmgus start
-class CFaction;
-class CCharacter;
-class CUniqueItem;
 class CWorld;
-class CPlane;
-class CSettlement;
-class CRegion;
+//Wyrmgus start
+class CSite;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -172,12 +171,12 @@ public:
 	CDate PointOfDivergence;											/// The point of divergence for this timeline
 };
 
-class CSettlement
+class CSite
 {
 public:
-	CSettlement() :
+	CSite() :
 		Position(-1, -1),
-		MapTemplate(NULL), SettlementUnit(NULL),
+		MapTemplate(NULL), SiteUnit(NULL),
 		Major(false)
 	{
 	}
@@ -186,14 +185,14 @@ public:
 
 	std::string Ident;
 	std::string Name;
-	bool Major;													/// Whether the settlement is a major one; major settlements have settlement sites, and as such can have town halls
-	Vec2i Position;												/// Position of the settlement in its map template
-	CMapTemplate *MapTemplate;									/// Map template where this settlement is located
-	CUnit *SettlementUnit;										/// Unit which represents this settlement
-	std::vector<CRegion *> Regions;								/// Regions where this settlement is located
-	std::vector<CFaction *> Cores;								/// Factions which have this settlement as a core
-	std::map<int, std::string> CulturalNames;					/// Names for the settlement for each different culture/civilization
-	std::map<CDate, CFaction *> HistoricalOwners;				/// Historical owners of the settlement
+	bool Major;													/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
+	Vec2i Position;												/// Position of the site in its map template
+	CMapTemplate *MapTemplate;									/// Map template where this site is located
+	CUnit *SiteUnit;										/// Unit which represents this site
+	std::vector<CRegion *> Regions;								/// Regions where this site is located
+	std::vector<CFaction *> Cores;								/// Factions which have this site as a core
+	std::map<int, std::string> CulturalNames;					/// Names for the site for each different culture/civilization
+	std::map<CDate, CFaction *> HistoricalOwners;				/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::vector<std::tuple<CDate, CDate, CUnitType *, int, CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
 	std::vector<std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
@@ -268,11 +267,11 @@ public:
 	
 	CMapField *Fields;						/// fields on the map layer
 	int TimeOfDay;							/// the time of day for the map layer
-	bool Overland;
+	bool Overland;							/// whether the map layer is an overland map
 	CPlane *Plane;							/// the plane pointer (if any) for the map layer
 	CWorld *World;							/// the world pointer (if any) for the map layer
 	int SurfaceLayer;						/// the surface layer for the map layer
-	std::vector<CUnit *> LayerConnectors;	/// connectors in a map layer which lead to other map layers
+	std::vector<CUnit *> LayerConnectors;	/// connectors in the map layer which lead to other map layers
 	PixelSize PixelTileSize;				/// the pixel tile size for the map layer
 	std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>> SubtemplateAreas;
 };
@@ -517,7 +516,7 @@ public:
 	CTerrainType *BorderTerrain;      	/// terrain type for borders
 	int Landmasses;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
-	std::vector<CUnit *> SettlementUnits;	/// the town hall / settlement site units
+	std::vector<CUnit *> SiteUnits;	/// the town hall / settlement site units
 	std::vector<CMapLayer *> MapLayers;				/// the map layers composing the map
 	//Wyrmgus end
 
@@ -530,8 +529,8 @@ public:
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-extern std::vector<CSettlement *>  Settlements;
-extern std::map<std::string, CSettlement *> SettlementIdentToPointer;
+extern std::vector<CSite *>  Sites;
+extern std::map<std::string, CSite *> SiteIdentToPointer;
 extern std::vector<CTerrainFeature *> TerrainFeatures;
 extern std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 extern std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
@@ -561,7 +560,7 @@ extern int ReplayRevealMap;
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-extern CSettlement *GetSettlement(std::string settlement_ident);
+extern CSite *GetSite(std::string site_ident);
 extern CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident);
 extern CTimeline *GetTimeline(std::string timeline_ident);
 extern std::string GetDegreeLevelNameById(int degree_level);

@@ -596,8 +596,8 @@ void CUnit::Release(bool final)
 	Type = NULL;
 	//Wyrmgus start
 	Character = NULL;
-	if (this->Settlement && this->Settlement->SettlementUnit == this) {
-		this->Settlement->SettlementUnit = NULL;
+	if (this->Settlement && this->Settlement->SiteUnit == this) {
+		this->Settlement->SiteUnit = NULL;
 	}
 	Settlement = NULL;
 	Trait = NULL;
@@ -664,9 +664,9 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	if (replaced_unit.Settlement != NULL) {
 		this->Settlement = replaced_unit.Settlement;
 		if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
-			this->Settlement->SettlementUnit = this;
-			Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &replaced_unit), Map.SettlementUnits.end());
-			Map.SettlementUnits.push_back(this);
+			this->Settlement->SiteUnit = this;
+			Map.SiteUnits.erase(std::remove(Map.SiteUnits.begin(), Map.SiteUnits.end(), &replaced_unit), Map.SiteUnits.end());
+			Map.SiteUnits.push_back(this);
 		}
 	}
 	
@@ -3284,25 +3284,25 @@ void CUnit::UpdateSettlement()
 				civilization = this->Player->Race;
 			}
 
-			std::vector<CSettlement *> potential_settlements;
-			for (size_t i = 0; i < Settlements.size(); ++i) {
-				if (!Settlements[i]->SettlementUnit && Settlements[i]->CulturalNames.find(civilization) != Settlements[i]->CulturalNames.end()) {
-					potential_settlements.push_back(Settlements[i]);
+			std::vector<CSite *> potential_settlements;
+			for (size_t i = 0; i < Sites.size(); ++i) {
+				if (!Sites[i]->SiteUnit && Sites[i]->CulturalNames.find(civilization) != Sites[i]->CulturalNames.end()) {
+					potential_settlements.push_back(Sites[i]);
 				}
 			}
 			
 			if (potential_settlements.size() == 0) {
-				for (size_t i = 0; i < Settlements.size(); ++i) {
-					if (!Settlements[i]->SettlementUnit) {
-						potential_settlements.push_back(Settlements[i]);
+				for (size_t i = 0; i < Sites.size(); ++i) {
+					if (!Sites[i]->SiteUnit) {
+						potential_settlements.push_back(Sites[i]);
 					}
 				}
 			}
 			
 			if (potential_settlements.size() > 0) {
 				this->Settlement = potential_settlements[SyncRand(potential_settlements.size())];
-				this->Settlement->SettlementUnit = this;
-				Map.SettlementUnits.push_back(this);
+				this->Settlement->SiteUnit = this;
+				Map.SiteUnits.push_back(this);
 			}
 		}
 		if (this->Settlement) {
@@ -3317,7 +3317,7 @@ void CUnit::UpdateSettlement()
 	}
 }
 
-void CUnit::UpdateBuildingSettlementAssignment(CSettlement *old_settlement)
+void CUnit::UpdateBuildingSettlementAssignment(CSite *old_settlement)
 {
 	if (Editor.Running != EditorNotRunning) {
 		return;
@@ -3958,9 +3958,9 @@ void UnitLost(CUnit &unit)
 				if (unit.Settlement != NULL) {
 					if (unit.Type->BoolFlag[TOWNHALL_INDEX].value) {
 						temp->Settlement = unit.Settlement;
-						temp->Settlement->SettlementUnit = temp;
-						Map.SettlementUnits.erase(std::remove(Map.SettlementUnits.begin(), Map.SettlementUnits.end(), &unit), Map.SettlementUnits.end());
-						Map.SettlementUnits.push_back(temp);
+						temp->Settlement->SiteUnit = temp;
+						Map.SiteUnits.erase(std::remove(Map.SiteUnits.begin(), Map.SiteUnits.end(), &unit), Map.SiteUnits.end());
+						Map.SiteUnits.push_back(temp);
 					}
 				}
 				if (type.GivesResource && unit.ResourcesHeld != 0) {
@@ -3972,8 +3972,8 @@ void UnitLost(CUnit &unit)
 				//Wyrmgus end
 			}
 		//Wyrmgus start
-		} else if (unit.Settlement && unit.Settlement->SettlementUnit == &unit) {
-			unit.Settlement->SettlementUnit = NULL;
+		} else if (unit.Settlement && unit.Settlement->SiteUnit == &unit) {
+			unit.Settlement->SiteUnit = NULL;
 		//Wyrmgus end
 		}
 	}

@@ -755,7 +755,7 @@ void FreeAi()
 */
 //Wyrmgus start
 //static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
-static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass = 0, const CSettlement *settlement = NULL)
+static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass = 0, const CSite *settlement = NULL)
 //Wyrmgus end
 {
 	std::vector<AiBuildQueue>::iterator i;
@@ -789,7 +789,7 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass
 */
 //Wyrmgus start
 //static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
-static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass, const CSettlement *settlement)
+static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass, const CSite *settlement)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -836,7 +836,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 */
 //Wyrmgus start
 //static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type)
-static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landmass = 0, const CSettlement *settlement = NULL)
+static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landmass = 0, const CSite *settlement = NULL)
 //Wyrmgus end
 {
 	std::vector<AiBuildQueue>::iterator i;
@@ -866,7 +866,7 @@ static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landm
 */
 //Wyrmgus start
 //void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
-void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const CSettlement *settlement)
+void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, const CSite *settlement)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -1219,7 +1219,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 */
 //Wyrmgus start
 //void AiCanNotBuild(const CUnit &unit, const CUnitType &what)
-void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass, CSettlement *settlement)
+void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass, CSite *settlement)
 //Wyrmgus end
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
@@ -1241,7 +1241,7 @@ void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass, CSett
 */
 //Wyrmgus start
 //void AiCanNotReach(CUnit &unit, const CUnitType &what)
-void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass, CSettlement *settlement)
+void AiCanNotReach(CUnit &unit, const CUnitType &what, int landmass, CSite *settlement)
 //Wyrmgus end
 {
 	Assert(unit.Player->Type != PlayerPerson);
@@ -1640,7 +1640,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int lan
 	return count;
 }
 
-int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const CUnitType *type, const int landmass, const CSettlement *settlement)
+int AiGetUnitTypeRequestedCount(const PlayerAi &pai, const CUnitType *type, const int landmass, const CSite *settlement)
 {
 	int count = 0;
 	

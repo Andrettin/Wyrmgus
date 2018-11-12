@@ -65,7 +65,7 @@
 
 //Wyrmgus start
 //static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
-static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, CSettlement *settlement = NULL);
+static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, CSite *settlement = NULL);
 //Wyrmgus end
 
 /**
@@ -311,7 +311,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 */
 //Wyrmgus start
 //static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
-static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, CSettlement *settlement = NULL)
+static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, CSite *settlement = NULL)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -917,7 +917,7 @@ static bool AiRequestSupply()
 */
 //Wyrmgus start
 //static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
-static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0, CSettlement *settlement = NULL)
+static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0, CSite *settlement = NULL)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -958,7 +958,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0
 */
 //Wyrmgus start
 //static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
-static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass, CSettlement *settlement)
+static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z, int landmass, CSite *settlement)
 //Wyrmgus end
 {
 	// Find equivalents unittypes.
@@ -1185,8 +1185,8 @@ static void AiCheckingWork()
 		if ( //if has a build request specific to a settlement, but the player doesn't own the settlement, remove the order
 			queuep->Settlement
 			&& (
-				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SettlementUnit->Player != AiPlayer->Player)
-				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SettlementUnit->Player->Index != PlayerNumNeutral)
+				(!type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SiteUnit->Player != AiPlayer->Player)
+				|| (type.BoolFlag[TOWNHALL_INDEX].value && queuep->Settlement->SiteUnit->Player->Index != PlayerNumNeutral)
 			)
 		) {
 			AiPlayer->UnitTypeBuilt.erase(AiPlayer->UnitTypeBuilt.begin() + (AiPlayer->UnitTypeBuilt.size() - sz + i));
@@ -2355,8 +2355,8 @@ void AiCheckSettlementConstruction()
 	AiPlayer->Player->GetWorkerLandmasses(worker_landmasses, town_hall_type);
 						
 	//check settlement units to see if can build in one
-	for (size_t i = 0; i < Map.SettlementUnits.size(); ++i) {
-		CUnit *settlement_unit = Map.SettlementUnits[i];
+	for (size_t i = 0; i < Map.SiteUnits.size(); ++i) {
+		CUnit *settlement_unit = Map.SiteUnits[i];
 		
 		if (!settlement_unit->IsAliveOnMap()) {
 			continue;
@@ -2632,7 +2632,7 @@ static void AiCheckMinecartConstruction()
 		return;
 	}
 	
-	std::vector<CSettlement *> potential_settlements;
+	std::vector<CSite *> potential_settlements;
 		
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (res >= (int) AiHelpers.Mines.size()) {
@@ -2650,13 +2650,13 @@ static void AiCheckMinecartConstruction()
 					
 			for (size_t j = 0; j < mine_table.size(); ++j) {
 				const CUnit *mine_unit = mine_table[j];
-				CSettlement *mine_settlement = mine_unit->Settlement;
+				CSite *mine_settlement = mine_unit->Settlement;
 						
 				if (!mine_settlement) {
 					continue;
 				}
 						
-				const CUnit *town_hall_unit = mine_settlement->SettlementUnit;
+				const CUnit *town_hall_unit = mine_settlement->SiteUnit;
 				
 				if (!town_hall_unit) {
 					continue;
@@ -2757,7 +2757,7 @@ void AiCheckWorkers()
 */
 //Wyrmgus start
 //void AiAddUnitTypeRequest(CUnitType &type, int count)
-void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass, CSettlement *settlement, const Vec2i pos, int z)
+void AiAddUnitTypeRequest(CUnitType &type, const int count, const int landmass, CSite *settlement, const Vec2i pos, int z)
 //Wyrmgus end
 {
 	AiBuildQueue queue;
