@@ -223,6 +223,7 @@ enum {
 			goal->Remove(&unit);
 			if (!IsNetworkGame() && unit.Character && unit.Player->AiEnabled == false) { //if the unit has a persistent character, store the item for it
 				CPersistentItem *item = new CPersistentItem;
+				item->Owner = unit.Character;
 				unit.Character->Items.push_back(item);
 				item->Type = const_cast<CUnitType *>(goal->Type);
 				if (goal->Prefix != NULL) {

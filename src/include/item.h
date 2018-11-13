@@ -46,6 +46,8 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CCharacter;
+class CConfigData;
 class CUnitType;
 class CUpgrade;
 class SpellType;
@@ -140,9 +142,11 @@ class CPersistentItem
 public:
 	CPersistentItem() :
 		Bound(false), Identified(true),
-		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL), Work(NULL), Elixir(NULL), Unique(NULL)
+		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL), Work(NULL), Elixir(NULL), Unique(NULL), Owner(NULL)
 	{
 	}
+	
+	void ProcessConfigData(CConfigData *config_data);
 	
 	std::string Name;
 	bool Bound;					/// Whether the item is bound to its owner and can't be dropped
@@ -154,6 +158,7 @@ public:
 	CUpgrade *Work;
 	CUpgrade *Elixir;
 	CUniqueItem *Unique;
+	CCharacter *Owner;
 };
 
 /*----------------------------------------------------------------------------

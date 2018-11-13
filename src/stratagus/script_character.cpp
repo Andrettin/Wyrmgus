@@ -343,6 +343,7 @@ static int CclDefineCharacter(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
 				CPersistentItem *item = new CPersistentItem;
+				item->Owner = character;
 				character->Items.push_back(item);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for items)");
@@ -413,7 +414,7 @@ static int CclDefineCharacter(lua_State *l)
 							if (unique_item->Type != NULL) {
 								item->Type = unique_item->Type;
 							} else {
-								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->Name.c_str());
+								fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->Ident.c_str());
 							}
 							item->Prefix = unique_item->Prefix;
 							item->Suffix = unique_item->Suffix;
@@ -732,6 +733,7 @@ static int CclDefineCustomHero(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
 				CPersistentItem *item = new CPersistentItem;
+				item->Owner = hero;
 				hero->Items.push_back(item);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for items)");

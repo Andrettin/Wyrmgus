@@ -43,10 +43,12 @@
 #include <map>
 
 #include "character.h"
+#include "config.h"
 #include "game.h"
 #include "network.h"
 #include "parameters.h"
 #include "player.h"
+#include "spells.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"
@@ -367,6 +369,99 @@ CUniqueItem *GetUniqueItem(std::string item_ident)
 		}
 	}
 	return NULL;
+}
+
+void CPersistentItem::ProcessConfigData(CConfigData *config_data)
+{
+	bool is_equipped = false;
+	
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "type") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUnitType *unit_type = UnitTypeByIdent(value);
+			if (unit_type) {
+				this->Type = unit_type;
+			} else {
+				fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "prefix") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade) {
+				this->Prefix = upgrade;
+			} else {
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "suffix") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade) {
+				this->Suffix = upgrade;
+			} else {
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "spell") {
+			value = FindAndReplaceString(value, "_", "-");
+			SpellType *spell = SpellTypeByIdent(value);
+			if (spell) {
+				this->Spell = spell;
+			} else {
+				fprintf(stderr, "Spell \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "work") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade) {
+				this->Work = upgrade;
+			} else {
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "elixir") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade) {
+				this->Elixir = upgrade;
+			} else {
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "unique") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUniqueItem *unique_item = GetUniqueItem(value);
+			if (unique_item) {
+				this->Unique = unique_item;
+				this->Name = unique_item->Name;
+				if (unique_item->Type != NULL) {
+					this->Type = unique_item->Type;
+				} else {
+					fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->Ident.c_str());
+				}
+				this->Prefix = unique_item->Prefix;
+				this->Suffix = unique_item->Suffix;
+				this->Spell = unique_item->Spell;
+				this->Work = unique_item->Work;
+				this->Elixir = unique_item->Elixir;
+			} else {
+				fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "bound") {
+			this->Bound = StringToBool(value);
+		} else if (key == "identified") {
+			this->Identified = StringToBool(value);
+		} else if (key == "equipped") {
+			is_equipped = StringToBool(value);
+		} else {
+			fprintf(stderr, "Invalid item property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	if (is_equipped && this->Owner && GetItemClassSlot(this->Type->ItemClass) != -1) {
+		this->Owner->EquippedItems[GetItemClassSlot(this->Type->ItemClass)].push_back(this);
+	}
 }
 
 std::string GetItemEffectsString(std::string item_ident)

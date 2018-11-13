@@ -115,10 +115,10 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			family_name_changed = true;
 		} else if (key == "unit_type") {
 			value = FindAndReplaceString(value, "_", "-");
-			int unit_type_id = UnitTypeIdByIdent(value);
-			if (unit_type_id != -1) {
-				if (this->Type == NULL || this->Type == UnitTypes[unit_type_id] || this->Type->CanExperienceUpgradeTo(UnitTypes[unit_type_id])) {
-					this->Type = UnitTypes[unit_type_id];
+			CUnitType *unit_type = UnitTypeByIdent(value);
+			if (unit_type) {
+				if (this->Type == NULL || this->Type == unit_type || this->Type->CanExperienceUpgradeTo(unit_type)) {
+					this->Type = unit_type;
 					if (this->Level < this->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
 						this->Level = this->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
 					}
@@ -140,6 +140,16 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		} else if (key == "hair_variation") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->HairVariation = value;
+		} else if (key == "trait") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade) {
+				this->Trait = upgrade;
+			} else {
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "level") {
+			this->Level = std::stoi(value);
 		} else if (key == "date") {
 			this->Date = CDate::FromString(value);
 		} else if (key == "deity") {
@@ -162,6 +172,30 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			this->Icon.Icon = NULL;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
+		} else if (key == "ability") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUpgrade *ability_upgrade = CUpgrade::Get(value);
+			if (ability_upgrade) {
+				this->Abilities.push_back(ability_upgrade);
+			} else {
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "read_work") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade) {
+				this->ReadWorks.push_back(upgrade);
+			} else {
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "consumed_elixir") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade) {
+				this->ConsumedElixirs.push_back(upgrade);
+			} else {
+				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+			}
 		} else {
 			fprintf(stderr, "Invalid character property: \"%s\".\n", key.c_str());
 		}
@@ -178,6 +212,11 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			}
 			deity->ProcessConfigData(child_config_data);
 			this->DeityProfiles.push_back(deity);
+		} else if (child_config_data->Tag == "item") {
+			CPersistentItem *item = new CPersistentItem;
+			item->Owner = this;
+			this->Items.push_back(item);
+			item->ProcessConfigData(child_config_data);
 		} else {
 			fprintf(stderr, "Invalid character property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
