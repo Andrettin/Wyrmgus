@@ -44,6 +44,8 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CDeityDomain *> CDeityDomain::DeityDomains;
+std::map<std::string, CDeityDomain *> CDeityDomain::DeityDomainsByIdent;
+std::map<const CUpgrade *, CDeityDomain *> CDeityDomain::DeityDomainsByUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -51,10 +53,31 @@ std::vector<CDeityDomain *> CDeityDomain::DeityDomains;
 
 CDeityDomain *CDeityDomain::GetDeityDomain(std::string deity_domain_ident)
 {
-	for (size_t i = 0; i < DeityDomains.size(); ++i) {
-		if (deity_domain_ident == DeityDomains[i]->Ident) {
-			return DeityDomains[i];
-		}
+	if (DeityDomainsByIdent.find(deity_domain_ident) != DeityDomainsByIdent.end()) {
+		return DeityDomainsByIdent.find(deity_domain_ident)->second;
+	}
+	
+	return NULL;
+}
+
+CDeityDomain *CDeityDomain::GetOrAddDeityDomain(std::string deity_domain_ident)
+{
+	CDeityDomain *deity_domain = GetDeityDomain(deity_domain_ident);
+	
+	if (!deity_domain) {
+		deity_domain = new CDeityDomain;
+		deity_domain->Ident = deity_domain_ident;
+		DeityDomains.push_back(deity_domain);
+		DeityDomainsByIdent[deity_domain_ident] = deity_domain;
+	}
+	
+	return deity_domain;
+}
+
+CDeityDomain *CDeityDomain::GetDeityDomainByUpgrade(const CUpgrade *upgrade)
+{
+	if (DeityDomainsByUpgrade.find(upgrade) != DeityDomainsByUpgrade.end()) {
+		return DeityDomainsByUpgrade.find(upgrade)->second;
 	}
 	
 	return NULL;

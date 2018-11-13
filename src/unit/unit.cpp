@@ -971,7 +971,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	
 	//load worshipped deities
 	for (size_t i = 0; i < this->Character->Deities.size(); ++i) {
-		CUpgrade *deity_upgrade = CUpgrade::Get("upgrade-deity-" + this->Character->Deities[i]->Ident);
+		CUpgrade *deity_upgrade = this->Character->Deities[i]->DeityUpgrade;
 		if (deity_upgrade) {
 			IndividualUpgradeAcquire(*this, deity_upgrade);
 		}

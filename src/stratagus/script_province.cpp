@@ -139,7 +139,7 @@ static int CclDefinePlane(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string deity_domain_ident = LuaToString(l, -1, j + 1);
-				CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(deity_domain_ident);
+				CDeityDomain *deity_domain = CDeityDomain::GetOrAddDeityDomain(deity_domain_ident);
 				if (!deity_domain) {
 					LuaError(l, "Deity domain \"%s\" doesn't exist." _C_ deity_domain_ident.c_str());
 				}

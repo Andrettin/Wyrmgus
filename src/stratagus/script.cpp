@@ -287,7 +287,7 @@ static int CclLoad(lua_State *l)
 	}
 	
 	if (file_extension == "cfg") {
-		CConfigData::ParseConfigData(filename);
+		CConfigData::ParseConfigData(filename, DefiningData);
 	} else if (LuaLoadFile(filename) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ filename.c_str());
 	}

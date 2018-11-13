@@ -54,7 +54,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CConfigData::ParseConfigData(std::string filepath)
+void CConfigData::ParseConfigData(std::string filepath, bool define_only)
 {
 	std::vector<std::string> data;
 	std::vector<CConfigData *> output;
@@ -128,10 +128,10 @@ void CConfigData::ParseConfigData(std::string filepath)
 		}
 	}
 	
-	ProcessConfigData(output);
+	ProcessConfigData(output, define_only);
 }
 
-void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_data_list)
+void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_data_list, bool define_only)
 {
 	for (size_t i = 0; i < config_data_list.size(); ++i) {
 		CConfigData *config_data = config_data_list[i];
@@ -144,12 +144,10 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				character = new CCharacter;
 				character->Ident = ident;
 				Characters[ident] = character;
-			} else {
-				if (!LoadingHistory) {
-					fprintf(stderr, "Character \"%s\" is being redefined.\n", ident.c_str());
-				}
 			}
-			character->ProcessConfigData(config_data);
+			if (!define_only) {
+				character->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "deity") {
 			CDeity *deity = CDeity::GetDeity(ident);
 			if (!deity) {
@@ -157,13 +155,19 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				deity->Ident = ident;
 				CDeity::Deities.push_back(deity);
 			}
-			deity->ProcessConfigData(config_data);
+			if (!define_only) {
+				deity->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "map_template") {
 			CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(ident);
-			map_template->ProcessConfigData(config_data);
+			if (!define_only) {
+				map_template->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "terrain_type") {
 			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(ident);
-			terrain_type->ProcessConfigData(config_data);
+			if (!define_only) {
+				terrain_type->ProcessConfigData(config_data);
+			}
 		}
 	}
 }

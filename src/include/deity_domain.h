@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -50,18 +51,23 @@ class CDeityDomain
 {
 public:
 	CDeityDomain() :
-		Ident("")
+		Upgrade(NULL)
 	{
 	}
 	
 	static CDeityDomain *GetDeityDomain(std::string deity_domain_ident);
+	static CDeityDomain *GetOrAddDeityDomain(std::string deity_domain_ident);
+	static CDeityDomain *GetDeityDomainByUpgrade(const CUpgrade *upgrade);
 	static void ClearDeityDomains();
+	
+	static std::vector<CDeityDomain *> DeityDomains;	/// Deity domains
+	static std::map<std::string, CDeityDomain *> DeityDomainsByIdent;
+	static std::map<const CUpgrade *, CDeityDomain *> DeityDomainsByUpgrade;
 	
 	std::string Ident;									/// Ident of the domain
 	std::string Name;									/// Name of the domain
+	CUpgrade *Upgrade;									/// Upgrade corresponding to the domain
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this domain
-	
-	static std::vector<CDeityDomain *> DeityDomains;	/// Deity domains
 };
 
 //@}

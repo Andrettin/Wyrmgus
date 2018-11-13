@@ -117,6 +117,7 @@ unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
 
 bool LoadingHistory = false;
+bool DefiningData = false;
 
 /*----------------------------------------------------------------------------
 --  Functions

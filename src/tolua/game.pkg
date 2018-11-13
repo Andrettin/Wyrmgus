@@ -92,3 +92,4 @@ enum GameTypes {
 
 extern void GenerateHistory();
 extern bool LoadingHistory;
+extern bool DefiningData;

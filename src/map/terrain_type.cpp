@@ -231,8 +231,12 @@ void CTerrainType::ProcessConfigData(CConfigData *config_data)
 				
 				if (key == "terrain_type") {
 					value = FindAndReplaceString(value, "_", "-");
-					CTerrainType *transition_terrain = CTerrainType::GetOrAddTerrainType(value);
-					transition_terrain_id = transition_terrain->ID;
+					CTerrainType *transition_terrain = CTerrainType::GetTerrainType(value);
+					if (!transition_terrain) {
+						fprintf(stderr, "Terrain type \"%s\" doesn't exist.\n", value.c_str());
+					} else {
+						transition_terrain_id = transition_terrain->ID;
+					}
 				} else if (key == "transition_type") {
 					value = FindAndReplaceString(value, "_", "-");
 					transition_type = GetTransitionTypeIdByName(value);

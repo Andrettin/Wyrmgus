@@ -224,8 +224,13 @@ void CCharacter::GenerateHistory()
 	if (!this->DeityProfiles.empty() && this->Deities.size() != this->DeityProfiles.size()) {
 		this->Deities.clear();
 		for (size_t i = 0; i < this->DeityProfiles.size(); ++i) {
-			this->Deities.push_back(CDeity::GetProfileMatch(this->DeityProfiles[i]));
-			history_changed = true;
+			CDeity *deity = CDeity::GetProfileMatch(this->DeityProfiles[i]);
+			if (deity) {
+				this->Deities.push_back(deity);
+				history_changed = true;
+			} else {
+				fprintf(stderr, "No deity could be matched with the deity profile for character \"%s\".\n", this->Ident.c_str());
+			}
 		}
 	}
 	

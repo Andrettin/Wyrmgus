@@ -64,10 +64,14 @@ public:
 	}
 	
 	static CDeity *GetDeity(std::string deity_ident);
+	static CDeity *GetOrAddDeity(std::string deity_ident);
+	static CDeity *GetDeityByUpgrade(const CUpgrade *upgrade);
 	static CDeity *GetProfileMatch(CDeity *deity_profile);
 	static void ClearDeities();
 	
 	static std::vector<CDeity *> Deities;		/// Deities
+	static std::map<std::string, CDeity *> DeitiesByIdent;
+	static std::map<const CUpgrade *, CDeity *> DeitiesByUpgrade;
 	
 	void ProcessConfigData(CConfigData *config_data);
 	
@@ -76,7 +80,6 @@ public:
 	bool Profile;								/// Whether this is not an actual deity, but a deity profile to be substituted by a "random" matching deity when the game starts
 	std::string Ident;							/// Ident of the deity
 	std::string Name;							/// Name of the deity
-	std::string UpgradeIdent;					/// Ident of the upgrade applied by the deity
 	std::string Pantheon;						/// Pantheon to which the deity belongs
 	std::string Description;
 	std::string Background;

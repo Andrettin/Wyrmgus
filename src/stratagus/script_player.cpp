@@ -2475,13 +2475,7 @@ static int CclDefineDeityDomain(lua_State *l)
 	}
 
 	std::string deity_domain_ident = LuaToString(l, 1);
-	CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(deity_domain_ident);
-	if (!deity_domain) {
-		deity_domain = new CDeityDomain;
-		CDeityDomain::DeityDomains.push_back(deity_domain);
-	}
-	
-	deity_domain->Ident = deity_domain_ident;
+	CDeityDomain *deity_domain = CDeityDomain::GetOrAddDeityDomain(deity_domain_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -2489,6 +2483,13 @@ static int CclDefineDeityDomain(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			deity_domain->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Upgrade")) {
+			CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1));
+			if (!upgrade) {
+				LuaError(l, "Upgrade doesn't exist.");
+			}
+			deity_domain->Upgrade = upgrade;
+			CDeityDomain::DeityDomainsByUpgrade[upgrade] = deity_domain;
 		} else if (!strcmp(value, "Abilities")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -2524,13 +2525,7 @@ static int CclDefineDeity(lua_State *l)
 	}
 
 	std::string deity_ident = LuaToString(l, 1);
-	CDeity *deity = CDeity::GetDeity(deity_ident);
-	if (!deity) {
-		deity = new CDeity;
-		CDeity::Deities.push_back(deity);
-	}
-	
-	deity->Ident = deity_ident;
+	CDeity *deity = CDeity::GetOrAddDeity(deity_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -2540,8 +2535,6 @@ static int CclDefineDeity(lua_State *l)
 			deity->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Pantheon")) {
 			deity->Pantheon = LuaToString(l, -1);
-		} else if (!strcmp(value, "Upgrade")) {
-			deity->UpgradeIdent = LuaToString(l, -1);
 		} else if (!strcmp(value, "Gender")) {
 			deity->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {
@@ -2564,6 +2557,7 @@ static int CclDefineDeity(lua_State *l)
 				LuaError(l, "Upgrade doesn't exist.");
 			}
 			deity->DeityUpgrade = upgrade;
+			CDeity::DeitiesByUpgrade[upgrade] = deity;
 		} else if (!strcmp(value, "CharacterUpgrade")) {
 			CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1));
 			if (!upgrade) {

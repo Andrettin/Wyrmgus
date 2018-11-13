@@ -43,6 +43,7 @@
 #include "player.h"
 #include "province.h"
 #include "religion.h"
+#include "upgrade.h"
 
 #include <algorithm>
 
@@ -51,6 +52,8 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CDeity *> CDeity::Deities;
+std::map<std::string, CDeity *> CDeity::DeitiesByIdent;
+std::map<const CUpgrade *, CDeity *> CDeity::DeitiesByUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -58,10 +61,31 @@ std::vector<CDeity *> CDeity::Deities;
 
 CDeity *CDeity::GetDeity(std::string deity_ident)
 {
-	for (size_t i = 0; i < Deities.size(); ++i) {
-		if (deity_ident == Deities[i]->Ident) {
-			return Deities[i];
-		}
+	if (DeitiesByIdent.find(deity_ident) != DeitiesByIdent.end()) {
+		return DeitiesByIdent.find(deity_ident)->second;
+	}
+	
+	return NULL;
+}
+
+CDeity *CDeity::GetOrAddDeity(std::string deity_ident)
+{
+	CDeity *deity = GetDeity(deity_ident);
+	
+	if (!deity) {
+		deity = new CDeity;
+		deity->Ident = deity_ident;
+		Deities.push_back(deity);
+		DeitiesByIdent[deity_ident] = deity;
+	}
+	
+	return deity;
+}
+
+CDeity *CDeity::GetDeityByUpgrade(const CUpgrade *upgrade)
+{
+	if (DeitiesByUpgrade.find(upgrade) != DeitiesByUpgrade.end()) {
+		return DeitiesByUpgrade.find(upgrade)->second;
 	}
 	
 	return NULL;
@@ -74,8 +98,8 @@ CDeity *CDeity::GetProfileMatch(CDeity *deity_profile)
 	for (size_t i = 0; i < Deities.size(); ++i) {
 		CDeity *deity = Deities[i];
 		
-		if (deity->UpgradeIdent.empty()) {
-			continue; //don't use deities that have no corresponding upgrade for profile matches
+		if (!deity->DeityUpgrade) {
+			continue; //don't use deities that have no corresponding deity upgrade for profile matches
 		}
 		
 		if (deity->Major != deity_profile->Major) {
@@ -143,9 +167,6 @@ void CDeity::ProcessConfigData(CConfigData *config_data)
 			this->Name = value;
 		} else if (key == "pantheon") {
 			this->Pantheon = value;
-		} else if (key == "upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->UpgradeIdent = value;
 		} else if (key == "gender") {
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "major") {
