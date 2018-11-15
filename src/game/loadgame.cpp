@@ -37,9 +37,8 @@
 
 #include "actions.h"
 #include "ai.h"
-//Wyrmgus start
+#include "calendar.h"
 #include "character.h"
-//Wyrmgus end
 #include "commands.h"
 #include "construct.h"
 #include "deity.h"
@@ -107,6 +106,7 @@ void CleanModules()
 	CleanTriggers();
 	FreeAi();
 	PlayerRaces.Clean();
+	CCalendar::ClearCalendars();
 	//Wyrmgus start
 	CleanCharacters();
 	//Wyrmgus end

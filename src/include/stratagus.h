@@ -274,6 +274,7 @@ enum TechLevels {
 	CivilizedGunpowderTechLevel
 };
 
+class CCalendar;
 class CTimeline;
 
 struct CDate {
@@ -285,6 +286,9 @@ struct CDate {
 	static CDate FromString(std::string date_str);
 	
 	bool ContainsDate(const CDate &date) const; /// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
+	CDate ToBaseCalendar(const CCalendar *current_calendar) const;
+	std::string ToDisplayString() const;
+	
 	int year;
 	char month;
 	char day;

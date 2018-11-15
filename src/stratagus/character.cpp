@@ -150,8 +150,54 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			}
 		} else if (key == "level") {
 			this->Level = std::stoi(value);
+		} else if (key == "birth_date") {
+			this->BirthDate = CDate::FromString(value);
+			
+			if (this->DeathDate.year == 0) { //if the character is missing a death date so far, give it +60 years after the birth date
+				this->DeathDate.year = this->BirthDate.year + 60;
+				this->DeathDate.month = this->BirthDate.month;
+				this->DeathDate.day = this->BirthDate.day;
+				this->DeathDate.timeline = this->BirthDate.timeline;
+			}
+			
+			if (this->Date.year == 0) { //if the character is missing a start date so far, give it +30 years after the birth date
+				this->Date.year = this->BirthDate.year + 30;
+				this->Date.month = this->BirthDate.month;
+				this->Date.day = this->BirthDate.day;
+				this->Date.timeline = this->BirthDate.timeline;
+			}
 		} else if (key == "date") {
 			this->Date = CDate::FromString(value);
+			
+			if (this->BirthDate.year == 0) { //if the character is missing a birth date so far, give it 30 years before the start date
+				this->BirthDate.year = this->Date.year - 30;
+				this->BirthDate.month = this->Date.month;
+				this->BirthDate.day = this->Date.day;
+				this->BirthDate.timeline = this->Date.timeline;
+			}
+			
+			if (this->DeathDate.year == 0) { //if the character is missing a death date so far, give it +30 years after the start date
+				this->DeathDate.year = this->Date.year + 30;
+				this->DeathDate.month = this->Date.month;
+				this->DeathDate.day = this->Date.day;
+				this->DeathDate.timeline = this->Date.timeline;
+			}
+		} else if (key == "death_date") {
+			this->DeathDate = CDate::FromString(value);
+				
+			if (this->BirthDate.year == 0) { //if the character is missing a birth date so far, give it 60 years before the death date
+				this->BirthDate.year = this->DeathDate.year - 60;
+				this->BirthDate.month = this->DeathDate.month;
+				this->BirthDate.day = this->DeathDate.day;
+				this->BirthDate.timeline = this->DeathDate.timeline;
+			}
+				
+			if (this->Date.year == 0) { //if the character is missing a start date so far, give it 30 years before the death date
+				this->Date.year = this->DeathDate.year - 30;
+				this->Date.month = this->DeathDate.month;
+				this->Date.day = this->DeathDate.day;
+				this->Date.timeline = this->DeathDate.timeline;
+			}
 		} else if (key == "deity") {
 			value = FindAndReplaceString(value, "_", "-");
 			CDeity *deity = CDeity::GetDeity(value);

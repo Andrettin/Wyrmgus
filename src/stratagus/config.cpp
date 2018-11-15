@@ -37,6 +37,7 @@
 
 #include "config.h"
 
+#include "calendar.h"
 #include "character.h"
 #include "deity.h"
 #include "game.h"
@@ -139,7 +140,12 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		std::string ident = config_data->Ident;
 		ident = FindAndReplaceString(ident, "_", "-");
 		
-		if (config_data->Tag == "character") {
+		if (config_data->Tag == "calendar") {
+			CCalendar *calendar = CCalendar::GetOrAddCalendar(ident);
+			if (!define_only) {
+				calendar->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "character") {
 			CCharacter *character = GetCharacter(ident);
 			if (!character) {
 				character = new CCharacter;

@@ -138,10 +138,54 @@ static int CclDefineCharacter(lua_State *l)
 			} else {
 				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
 			}
+		} else if (!strcmp(value, "BirthDate")) {
+			CclGetDate(l, &character->BirthDate);
+			
+			if (character->DeathDate.year == 0) { //if the character is missing a death date so far, give it +60 years after the birth date
+				character->DeathDate.year = character->BirthDate.year + 60;
+				character->DeathDate.month = character->BirthDate.month;
+				character->DeathDate.day = character->BirthDate.day;
+				character->DeathDate.timeline = character->BirthDate.timeline;
+			}
+			
+			if (character->Date.year == 0) { //if the character is missing a start date so far, give it +30 years after the birth date
+				character->Date.year = character->BirthDate.year + 30;
+				character->Date.month = character->BirthDate.month;
+				character->Date.day = character->BirthDate.day;
+				character->Date.timeline = character->BirthDate.timeline;
+			}
 		} else if (!strcmp(value, "Date")) {
 			CclGetDate(l, &character->Date);
+			
+			if (character->BirthDate.year == 0) { //if the character is missing a birth date so far, give it 30 years before the start date
+				character->BirthDate.year = character->Date.year - 30;
+				character->BirthDate.month = character->Date.month;
+				character->BirthDate.day = character->Date.day;
+				character->BirthDate.timeline = character->Date.timeline;
+			}
+			
+			if (character->DeathDate.year == 0) { //if the character is missing a death date so far, give it +30 years after the start date
+				character->DeathDate.year = character->Date.year + 30;
+				character->DeathDate.month = character->Date.month;
+				character->DeathDate.day = character->Date.day;
+				character->DeathDate.timeline = character->Date.timeline;
+			}
 		} else if (!strcmp(value, "DeathDate")) {
 			CclGetDate(l, &character->DeathDate);
+				
+			if (character->BirthDate.year == 0) { //if the character is missing a birth date so far, give it 60 years before the death date
+				character->BirthDate.year = character->DeathDate.year - 60;
+				character->BirthDate.month = character->DeathDate.month;
+				character->BirthDate.day = character->DeathDate.day;
+				character->BirthDate.timeline = character->DeathDate.timeline;
+			}
+				
+			if (character->Date.year == 0) { //if the character is missing a start date so far, give it 30 years before the death date
+				character->Date.year = character->DeathDate.year - 30;
+				character->Date.month = character->DeathDate.month;
+				character->Date.day = character->DeathDate.day;
+				character->Date.timeline = character->DeathDate.timeline;
+			}
 		} else if (!strcmp(value, "ViolentDeath")) {
 			character->ViolentDeath = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
@@ -568,20 +612,6 @@ static int CclDefineCharacter(lua_State *l)
 		}
 	}
 	
-	if (character->DeathDate.year == 0 && character->Date.year != 0) { //if the character is missing a death date but not a start date, give it +30 years after the start date
-		character->DeathDate.year = character->Date.year + 30;
-		character->DeathDate.month = character->Date.month;
-		character->DeathDate.day = character->Date.day;
-		character->DeathDate.timeline = character->Date.timeline;
-	}
-		
-	if (character->Date.year == 0 && character->DeathDate.year != 0) { //if the character is missing a start date but not a death date, give it -30 years before the death date
-		character->Date.year = character->DeathDate.year + 30;
-		character->Date.month = character->DeathDate.month;
-		character->Date.day = character->DeathDate.day;
-		character->Date.timeline = character->DeathDate.timeline;
-	}
-		
 	//check if the abilities are correct for this character's unit type
 	if (character->Type != NULL && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
 		int ability_count = (int) character->Abilities.size();
@@ -932,8 +962,32 @@ static int CclGetCharacterData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
+	} else if (!strcmp(data, "BirthDate")) {
+		if (character->BirthDate.year != 0) {
+			lua_pushstring(l, character->BirthDate.ToDisplayString().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "BirthYear")) {
+		lua_pushnumber(l, character->BirthDate.year);
+		return 1;
+	} else if (!strcmp(data, "Date")) {
+		if (character->Date.year != 0) {
+			lua_pushstring(l, character->Date.ToDisplayString().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
 	} else if (!strcmp(data, "Year")) {
 		lua_pushnumber(l, character->Date.year);
+		return 1;
+	} else if (!strcmp(data, "DeathDate")) {
+		if (character->DeathDate.year != 0) {
+			lua_pushstring(l, character->DeathDate.ToDisplayString().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "DeathYear")) {
 		lua_pushnumber(l, character->DeathDate.year);
@@ -1017,6 +1071,14 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "IsUsable")) {
 		lua_pushboolean(l, character->IsUsable());
+		return 1;
+	} else if (!strcmp(data, "Abilities")) {
+		lua_createtable(l, character->Abilities.size(), 0);
+		for (size_t i = 1; i <= character->Abilities.size(); ++i)
+		{
+			lua_pushstring(l, character->Abilities[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

@@ -180,6 +180,7 @@ extern void beos_init(int argc, char **argv);
 #include "stratagus.h"
 
 #include "ai.h"
+#include "calendar.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
@@ -198,6 +199,7 @@ extern void beos_init(int argc, char **argv);
 #include "results.h"
 #include "settings.h"
 #include "sound_server.h"
+#include "timeline.h"
 #include "title.h"
 #include "translate.h"
 #include "ui.h"
@@ -992,7 +994,54 @@ Vec2i GetDirectionOffset(int direction)
 	return offset;
 }
 
-bool CDate::ContainsDate(CDate date) const
+CDate CDate::FromString(std::string date_str)
+{
+	CDate date;
+	
+	std::vector<std::string> date_vector = SplitString(date_str, ".");
+	
+	CCalendar *calendar = NULL;
+	size_t offset = 0;
+	
+	if (date_vector.size() >= 1 && !IsStringNumber(date_vector[0])) {
+		calendar = CCalendar::GetCalendar(date_vector[0]);
+		if (calendar) {
+			offset += 1;
+		} else if (!CTimeline::GetTimeline(date_vector[0])) { //is neither a calendar nor a timeline
+			fprintf(stderr, "Calendar \"%s\" does not exist.\n", date_vector[0].c_str());
+		}
+	}
+	
+	if (date_vector.size() >= (1 + offset) && !IsStringNumber(date_vector[0 + offset])) {
+		CTimeline *timeline = CTimeline::GetTimeline(date_vector[0 + offset]);
+		if (timeline) {
+			date.timeline = timeline;
+		} else {
+			fprintf(stderr, "Timeline \"%s\" does not exist.\n", date_vector[0 + offset].c_str());
+		}
+		offset += 1;
+	}
+	
+	if (date_vector.size() >= (1 + offset)) {
+		date.year = std::stoi(date_vector[0 + offset]);
+	}
+	
+	if (date_vector.size() >= (2 + offset)) {
+		date.month = std::stoi(date_vector[1 + offset]);
+	}
+	
+	if (date_vector.size() >= (3 + offset)) {
+		date.day = std::stoi(date_vector[2 + offset]);
+	}
+	
+	if (calendar) {
+		date = date.ToBaseCalendar(calendar);
+	}
+	
+	return date;
+}
+
+bool CDate::ContainsDate(const CDate &date) const
 {
 	if (this->timeline == date.timeline) {
 		return *this >= date;
@@ -1005,21 +1054,37 @@ bool CDate::ContainsDate(CDate date) const
 	return false;
 }
 
-CDate CDate::FromString(std::string date_str)
+CDate CDate::ToBaseCalendar(const CCalendar *current_calendar) const
 {
 	CDate date;
+	date.timeline = this->timeline;
+	date.year = this->year;
+	date.month = this->month;
+	date.day = this->day;
 	
-	std::vector<std::string> date_vector = SplitString(date_str, ".");
-	
-	if (date_vector.size() >= 1) {
-		date.year = std::stoi(date_vector[0]);
-	} else if (date_vector.size() >= 2) {
-		date.month = std::stoi(date_vector[1]);
-	} else if (date_vector.size() >= 3) {
-		date.day = std::stoi(date_vector[2]);
+	if (current_calendar->YearDifferences.find(NULL) != current_calendar->YearDifferences.end()) {
+		date.year += current_calendar->YearDifferences.find(NULL)->second;
+	} else {
+		fprintf(stderr, "Dates in calendar \"%s\" cannot be converted to the base calendar.\n", current_calendar->Ident.c_str());
 	}
 	
 	return date;
 }
+
+std::string CDate::ToDisplayString() const
+{
+	std::string display_string;
+	
+	display_string += std::to_string((long long) abs(this->year)) + "." + std::to_string((long long) this->month) + "." + std::to_string((long long) this->day);
+	
+	if (this->year < 0) {
+		display_string += " BC";
+	} else {
+		display_string += " AD";
+	}
+	
+	return display_string;
+}
 //Wyrmgus end
+
 //@}

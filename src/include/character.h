@@ -143,6 +143,7 @@ public:
 	void UpdateAttributes();
 	void SaveHistory(CFile &file);		/// Save generated history data for the character
 
+	CDate BirthDate;			/// Date in which the character was born
 	CDate Date;					/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
 	int Civilization;			/// Culture to which the character belongs
