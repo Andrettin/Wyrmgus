@@ -157,20 +157,6 @@ public:
 	std::map<int, std::string> CulturalNames;							/// Names for the terrain feature for each different culture/civilization
 };
 
-class CTimeline
-{
-public:
-	CTimeline() :
-		ID(-1)
-	{
-	}
-	
-	int ID;
-	std::string Ident;
-	std::string Name;
-	CDate PointOfDivergence;											/// The point of divergence for this timeline
-};
-
 class CSite
 {
 public:
@@ -534,8 +520,6 @@ extern std::map<std::string, CSite *> SiteIdentToPointer;
 extern std::vector<CTerrainFeature *> TerrainFeatures;
 extern std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 extern std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
-extern std::vector<CTimeline *> Timelines;
-extern std::map<std::string, CTimeline *> TimelineIdentToPointer;
 //Wyrmgus end
 
 extern CMap Map;  /// The current map
@@ -562,7 +546,6 @@ extern int ReplayRevealMap;
 //Wyrmgus start
 extern CSite *GetSite(std::string site_ident);
 extern CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident);
-extern CTimeline *GetTimeline(std::string timeline_ident);
 extern std::string GetDegreeLevelNameById(int degree_level);
 extern int GetDegreeLevelIdByName(std::string degree_level);
 //Wyrmgus end

@@ -54,6 +54,7 @@
 //Wyrmgus end
 #include "terrain_type.h"
 #include "tileset.h"
+#include "timeline.h"
 #include "translate.h"
 #include "ui.h"
 #include "unit.h"
@@ -2116,13 +2117,7 @@ static int CclDefineTimeline(lua_State *l)
 	}
 
 	std::string timeline_ident = LuaToString(l, 1);
-	CTimeline *timeline = GetTimeline(timeline_ident);
-	if (!timeline) {
-		timeline = new CTimeline;
-		timeline->Ident = timeline_ident;
-		timeline->ID = Timelines.size();
-		Timelines.push_back(timeline);
-	}
+	CTimeline *timeline = CTimeline::GetOrAddTimeline(timeline_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {

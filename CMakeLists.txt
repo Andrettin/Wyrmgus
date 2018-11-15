@@ -326,6 +326,7 @@ set(stratagusmain_SRCS
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
 	src/stratagus/text.cpp
+	src/stratagus/timeline.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
 	src/stratagus/util.cpp
@@ -636,6 +637,7 @@ set(stratagus_generic_HDRS
 	src/include/text.h
 	src/include/tile.h
 	src/include/tileset.h
+	src/include/timeline.h
 	src/include/title.h
 	src/include/translate.h
 	src/include/trigger.h

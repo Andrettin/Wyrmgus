@@ -69,6 +69,7 @@
 #include "terrain_type.h"
 #include "text.h"
 #include "tileset.h"
+#include "timeline.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
@@ -128,6 +129,7 @@ void CleanModules()
 	CleanUniqueItems();
 	CTerrainType::ClearTerrainTypes();
 	//Wyrmgus end
+	CTimeline::ClearTimelines();
 	CleanUnits();
 	CleanUnitTypes();
 	CWorld::ClearWorlds();

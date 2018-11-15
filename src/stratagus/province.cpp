@@ -70,11 +70,6 @@ void CleanProvinces()
 	}
 	TerrainFeatures.clear();
 	
-	for (size_t i = 0; i < Timelines.size(); ++i) {
-		delete Timelines[i];
-	}
-	Timelines.clear();
-	
 	for (size_t i = 0; i < WorldMapTerrainTypes.size(); ++i) {
 		delete WorldMapTerrainTypes[i];
 	}

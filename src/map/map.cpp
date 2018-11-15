@@ -83,8 +83,6 @@ std::map<std::string, CSite *> SiteIdentToPointer;
 std::vector<CTerrainFeature *> TerrainFeatures;
 std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
-std::vector<CTimeline *> Timelines;
-std::map<std::string, CTimeline *> TimelineIdentToPointer;
 //Wyrmgus end
 CMap Map;                   /// The current map
 //Wyrmgus start
@@ -123,22 +121,6 @@ CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident)
 	
 	if (TerrainFeatureIdentToPointer.find(terrain_feature_ident) != TerrainFeatureIdentToPointer.end()) {
 		return TerrainFeatureIdentToPointer[terrain_feature_ident];
-	}
-	
-	return NULL;
-}
-
-/**
-**  Get a timeline
-*/
-CTimeline *GetTimeline(std::string timeline_ident)
-{
-	if (timeline_ident.empty()) {
-		return NULL;
-	}
-	
-	if (TimelineIdentToPointer.find(timeline_ident) != TimelineIdentToPointer.end()) {
-		return TimelineIdentToPointer[timeline_ident];
 	}
 	
 	return NULL;
