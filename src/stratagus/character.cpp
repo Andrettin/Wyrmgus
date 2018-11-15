@@ -151,6 +151,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		} else if (key == "level") {
 			this->Level = std::stoi(value);
 		} else if (key == "birth_date") {
+			value = FindAndReplaceString(value, "_", "-");
 			this->BirthDate = CDate::FromString(value);
 			
 			if (this->DeathDate.year == 0) { //if the character is missing a death date so far, give it +60 years after the birth date
@@ -167,6 +168,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 				this->Date.timeline = this->BirthDate.timeline;
 			}
 		} else if (key == "date") {
+			value = FindAndReplaceString(value, "_", "-");
 			this->Date = CDate::FromString(value);
 			
 			if (this->BirthDate.year == 0) { //if the character is missing a birth date so far, give it 30 years before the start date
@@ -183,6 +185,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 				this->DeathDate.timeline = this->Date.timeline;
 			}
 		} else if (key == "death_date") {
+			value = FindAndReplaceString(value, "_", "-");
 			this->DeathDate = CDate::FromString(value);
 				
 			if (this->BirthDate.year == 0) { //if the character is missing a birth date so far, give it 60 years before the death date
