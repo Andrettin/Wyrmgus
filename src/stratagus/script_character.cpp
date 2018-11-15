@@ -45,6 +45,7 @@
 #include "quest.h"
 #include "script.h"
 #include "spells.h"
+#include "timeline.h"
 #include "unittype.h"
 #include "upgrade.h"
 

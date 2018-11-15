@@ -63,6 +63,7 @@
 #include "player.h"
 #include "spells.h"
 //Wyrmgus end
+#include "timeline.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui.h"
@@ -3188,7 +3189,7 @@ void CclGetDate(lua_State *l, CDate *d, const int offset)
 			d->timeline = NULL;
 		} else {
 			std::string timeline_ident = LuaToString(l, -1);
-			CTimeline *timeline = GetTimeline(timeline_ident);
+			CTimeline *timeline = CTimeline::GetTimeline(timeline_ident);
 			if (!timeline) {
 				LuaError(l, "Timeline \"%s\" doesn't exist." _C_ timeline_ident.c_str());
 			}
