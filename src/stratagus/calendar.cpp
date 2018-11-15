@@ -133,10 +133,12 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 			
 			this->YearDifferences[calendar] = difference;
 			
-			//get the other year differences from the other calendar as well
-			for (std::map<CCalendar *, int>::const_iterator iterator = calendar->YearDifferences.begin(); iterator != calendar->YearDifferences.end(); ++iterator) {
-				if (iterator->first != this && this->YearDifferences.find(iterator->first) == this->YearDifferences.end()) {
-					this->YearDifferences[iterator->first] = difference + iterator->second;
+			if (calendar) {
+				//get the other year differences from the other calendar as well
+				for (std::map<CCalendar *, int>::const_iterator iterator = calendar->YearDifferences.begin(); iterator != calendar->YearDifferences.end(); ++iterator) {
+					if (iterator->first != this && this->YearDifferences.find(iterator->first) == this->YearDifferences.end()) {
+						this->YearDifferences[iterator->first] = difference + iterator->second;
+					}
 				}
 			}
 		} else {
