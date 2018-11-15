@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name deity_domain.cpp - The deity domains. */
+/**@name deity_domain.cpp - The deity domain source file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //

@@ -653,10 +653,6 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 	CclGetPos(l, &pos.x, &pos.y, 3);
 	
 	CDate date;
-	date.year = 0;
-	date.month = 1;
-	date.day = 1;
-	date.timeline = NULL;
 	const int nargs = lua_gettop(l);
 	if (nargs >= 4) {
 		CclGetDate(l, &date, 4);
@@ -731,10 +727,6 @@ static int CclSetMapTemplatePathway(lua_State *l)
 	}
 
 	CDate date;
-	date.year = 0;
-	date.month = 1;
-	date.day = 1;
-	date.timeline = NULL;
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
 		CclGetDate(l, &date, 5);
@@ -841,14 +833,6 @@ static int CclSetMapTemplateUnit(lua_State *l)
 
 	CDate start_date;
 	CDate end_date;
-	start_date.year = 0;
-	start_date.month = 1;
-	start_date.day = 1;
-	start_date.timeline = NULL;
-	end_date.year = 0;
-	end_date.month = 1;
-	end_date.day = 1;
-	end_date.timeline = NULL;
 
 	CUniqueItem *unique = NULL;
 
@@ -892,14 +876,6 @@ static int CclSetMapTemplateHero(lua_State *l)
 
 	CDate start_date;
 	CDate end_date;
-	start_date.year = 0;
-	start_date.month = 1;
-	start_date.day = 1;
-	start_date.timeline = NULL;
-	end_date.year = 0;
-	end_date.month = 1;
-	end_date.day = 1;
-	end_date.timeline = NULL;
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
 		CclGetDate(l, &start_date, 5);
@@ -1849,10 +1825,6 @@ static int CclDefineSite(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate date;
-				date.year = 0;
-				date.month = 1;
-				date.day = 1;
-				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -1875,10 +1847,6 @@ static int CclDefineSite(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate date;
-				date.year = 0;
-				date.month = 1;
-				date.day = 1;
-				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -1892,19 +1860,11 @@ static int CclDefineSite(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate start_date;
-				start_date.year = 0;
-				start_date.month = 1;
-				start_date.day = 1;
-				start_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &start_date);
 				lua_pop(l, 1);
 				++j;
 				CDate end_date;
-				end_date.year = 0;
-				end_date.month = 1;
-				end_date.day = 1;
-				end_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
@@ -1940,19 +1900,11 @@ static int CclDefineSite(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate start_date;
-				start_date.year = 0;
-				start_date.month = 1;
-				start_date.day = 1;
-				start_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &start_date);
 				lua_pop(l, 1);
 				++j;
 				CDate end_date;
-				end_date.year = 0;
-				end_date.month = 1;
-				end_date.day = 1;
-				end_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
@@ -1994,19 +1946,11 @@ static int CclDefineSite(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate start_date;
-				start_date.year = 0;
-				start_date.month = 1;
-				start_date.day = 1;
-				start_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &start_date);
 				lua_pop(l, 1);
 				++j;
 				CDate end_date;
-				end_date.year = 0;
-				end_date.month = 1;
-				end_date.day = 1;
-				end_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
@@ -2177,10 +2121,6 @@ static int CclDefineTimeline(lua_State *l)
 		timeline = new CTimeline;
 		timeline->Ident = timeline_ident;
 		timeline->ID = Timelines.size();
-		timeline->PointOfDivergence.year = 0;
-		timeline->PointOfDivergence.month = 1;
-		timeline->PointOfDivergence.day = 1;
-		timeline->PointOfDivergence.timeline = NULL;
 		Timelines.push_back(timeline);
 	}
 	

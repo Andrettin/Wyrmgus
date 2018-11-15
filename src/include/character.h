@@ -116,14 +116,6 @@ public:
 		Father(NULL), Mother(NULL),
 		Conditions(NULL)
 	{
-		Date.year = 0;
-		Date.month = 1;
-		Date.day = 1;
-		Date.timeline = NULL;
-		DeathDate.year = 0;
-		DeathDate.month = 1;
-		DeathDate.day = 1;
-		DeathDate.timeline = NULL;
 		memset(Attributes, 0, sizeof(Attributes));
 		memset(ForbiddenUpgrades, 0, sizeof(ForbiddenUpgrades));
 	}

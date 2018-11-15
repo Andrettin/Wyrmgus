@@ -1136,10 +1136,6 @@ static int CclDefineCivilization(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate date;
-				date.year = 0;
-				date.month = 1;
-				date.day = 1;
-				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -2176,10 +2172,6 @@ static int CclDefineFaction(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate date;
-				date.year = 0;
-				date.month = 1;
-				date.day = 1;
-				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -2229,10 +2221,6 @@ static int CclDefineFaction(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate date;
-				date.year = 0;
-				date.month = 1;
-				date.day = 1;
-				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -2259,10 +2247,6 @@ static int CclDefineFaction(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate date;
-				date.year = 0;
-				date.month = 1;
-				date.day = 1;
-				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -2284,10 +2268,6 @@ static int CclDefineFaction(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate date;
-				date.year = 0;
-				date.month = 1;
-				date.day = 1;
-				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);

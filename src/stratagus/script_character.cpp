@@ -10,7 +10,7 @@
 //
 /**@name script_character.cpp - The character ccl functions. */
 //
-//      (c) Copyright 2015-2016 by Andrettin
+//      (c) Copyright 2015-2018 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -459,10 +459,6 @@ static int CclDefineCharacter(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate date;
-				date.year = 0;
-				date.month = 1;
-				date.day = 1;
-				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -483,10 +479,6 @@ static int CclDefineCharacter(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDate date;
-				date.year = 0;
-				date.month = 1;
-				date.day = 1;
-				date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
@@ -524,19 +516,11 @@ static int CclDefineCharacter(lua_State *l)
 				}
 				++j;
 				CDate start_date;
-				start_date.year = 0;
-				start_date.month = 1;
-				start_date.day = 1;
-				start_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &start_date);
 				lua_pop(l, 1);
 				++j;
 				CDate end_date;
-				end_date.year = 0;
-				end_date.month = 1;
-				end_date.day = 1;
-				end_date.timeline = NULL;
 				lua_rawgeti(l, -1, j + 1);
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);

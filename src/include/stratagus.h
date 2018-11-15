@@ -278,7 +278,7 @@ class CTimeline;
 
 struct CDate {
 	CDate() :
-		year(0), month(0), day(0), timeline(NULL)
+		year(0), month(1), day(1), timeline(NULL)
 	{
 	}
 	
@@ -346,10 +346,6 @@ struct CDate {
 	bool operator ==(const CDate& rhs) const {
 		return year == rhs.year && month == rhs.month && day == rhs.day;
 	}
-	
-	bool ContainsDate(CDate date) const; /// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
-	
-	static CDate FromString(std::string date_str);
 };
 
 #include <vec2i.h>

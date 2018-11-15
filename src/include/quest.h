@@ -170,10 +170,6 @@ public:
 		Hidden(false), Sandbox(false),
 		Faction(NULL), StartEffects(NULL)
 	{
-		StartDate.year = 0;
-		StartDate.month = 1;
-		StartDate.day = 1;
-		StartDate.timeline = NULL;
 	}
 	~CCampaign();
 	

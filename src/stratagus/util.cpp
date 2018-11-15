@@ -10,7 +10,7 @@
 //
 /**@name util.cpp - General utilites. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 //Wyrmgus end
 
 #include <ctype.h>
+#include <cctype>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -284,7 +285,7 @@ char *strcasestr(const char *a, const char *b)
 }
 #endif // !HAVE_STRCASESTR
 
-std::vector<std::string> SplitString(std::string str, std::string separators, std::string comment_chars)
+std::vector<std::string> SplitString(const std::string &str, const std::string &separators, const std::string &comment_chars)
 {
 	std::vector<std::string> output;
 	
@@ -336,9 +337,20 @@ std::vector<std::string> SplitString(std::string str, std::string separators, st
 	return output;
 }
 
-bool StringToBool(std::string str)
+bool StringToBool(const std::string &str)
 {
 	return str == "true" || str == "1";
+}
+
+bool IsStringNumber(const std::string &str)
+{
+	for (size_t i = 0; i < str.length(); ++i) {
+		if (!std::isdigit(str[i]) && (i != 0 || str[i] != '-')) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 /*----------------------------------------------------------------------------
