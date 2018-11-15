@@ -62,6 +62,7 @@ public:
 	static std::map<std::string, CCalendar *> CalendarsByIdent;
 	
 	void ProcessConfigData(CConfigData *config_data);
+	void SetYearDifference(CCalendar *calendar, int difference);
 	
 	std::string Ident;
 	std::string Name;

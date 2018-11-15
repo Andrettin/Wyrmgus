@@ -131,18 +131,33 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 				continue;
 			}
 			
-			this->YearDifferences[calendar] = difference;
 			
-			if (calendar) {
-				//get the other year differences from the other calendar as well
-				for (std::map<CCalendar *, int>::const_iterator iterator = calendar->YearDifferences.begin(); iterator != calendar->YearDifferences.end(); ++iterator) {
-					if (iterator->first != this && this->YearDifferences.find(iterator->first) == this->YearDifferences.end()) {
-						this->YearDifferences[iterator->first] = difference + iterator->second;
-					}
-				}
-			}
+			this->SetYearDifference(calendar, difference);
 		} else {
 			fprintf(stderr, "Invalid calendar property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+}
+
+void CCalendar::SetYearDifference(CCalendar *calendar, int difference)
+{
+	this->YearDifferences[calendar] = difference;
+			
+	if (calendar) {
+		calendar->SetYearDifference(this, -difference);
+		
+		//get the other year differences from the other calendar as well
+		for (std::map<CCalendar *, int>::const_iterator iterator = calendar->YearDifferences.begin(); iterator != calendar->YearDifferences.end(); ++iterator) {
+			if (iterator->first != this && this->YearDifferences.find(iterator->first) == this->YearDifferences.end()) {
+				this->YearDifferences[iterator->first] = difference + iterator->second;
+			}
+		}
+	}
+	
+	//set year difference for the new calendar, for other calendars for which this one has year differences
+	for (std::map<CCalendar *, int>::const_iterator iterator = this->YearDifferences.begin(); iterator != this->YearDifferences.end(); ++iterator) {
+		if (iterator->first && iterator->first->YearDifferences.find(calendar) == iterator->first->YearDifferences.end()) {
+			iterator->first->SetYearDifference(calendar, iterator->second + difference);
 		}
 	}
 }
