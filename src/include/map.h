@@ -246,7 +246,7 @@ class CMapLayer
 {
 public:
 	CMapLayer() :
-		TimeOfDay(0), SurfaceLayer(0),
+		ID(-1), HoursPerDay(DefaultHoursPerDay), TimeOfDay(0), SurfaceLayer(0),
 		Overland(false),
 		PixelTileSize(32, 32),
 		Fields(NULL), Plane(NULL), World(NULL)
@@ -254,8 +254,11 @@ public:
 	}
 
 	~CMapLayer();
+	void SetTimeOfDay(const int time_of_day);
 	
+	int ID;
 	CMapField *Fields;						/// fields on the map layer
+	int HoursPerDay;						/// how many hours does a day take in this map layer	
 	int TimeOfDay;							/// the time of day for the map layer
 	bool Overland;							/// whether the map layer is an overland map
 	CPlane *Plane;							/// the plane pointer (if any) for the map layer

@@ -434,47 +434,23 @@ static void GameLogicLoop()
 		//Wyrmgus end
 		
 		//Wyrmgus start
-		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-			CMapLayer *map_layer = Map.MapLayers[z];
-			int cycles_per_time_of_day = DefaultHoursPerDay;
-			if (map_layer->World) {
-				cycles_per_time_of_day = map_layer->World->HoursPerDay;
-			} else if (map_layer->Plane) {
-				cycles_per_time_of_day = map_layer->Plane->HoursPerDay;
-			}
-			cycles_per_time_of_day *= CyclesPerInGameHour;
-			cycles_per_time_of_day /= MaxTimesOfDay - 1;
-			if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !cycles_per_time_of_day) {
-				map_layer->TimeOfDay = NoTimeOfDay; //the map layer has no time of day
-				continue;
-			}
-			if (GameCycle > 0 && GameCycle % cycles_per_time_of_day == 0) { 
-				map_layer->TimeOfDay += 1;
-				if (map_layer->TimeOfDay == MaxTimesOfDay) {
-					map_layer->TimeOfDay = 1;
+		if (GameCycle > 0 && GameCycle % CyclesPerInGameHour == 0) {
+			GameHour++;
+			for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+				CMapLayer *map_layer = Map.MapLayers[z];
+				int cycles_per_time_of_day = map_layer->HoursPerDay;
+				cycles_per_time_of_day *= CyclesPerInGameHour;
+				cycles_per_time_of_day /= MaxTimesOfDay - 1;
+				if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !cycles_per_time_of_day) {
+					map_layer->TimeOfDay = NoTimeOfDay; //the map layer has no time of day
+					continue;
 				}
-
-#ifdef USE_OAML
-				if (enableOAML && oaml && z == CurrentMapLayer) {
-					// Time of day can change our main music loop, if the current playing track is set for this
-					SetMusicCondition(OAML_CONDID_MAIN_LOOP, Map.MapLayers[z]->TimeOfDay);
-				}
-#endif
-
-				//update the sight of all units
-				for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-					CUnit *unit = *it;
-					if (
-						unit && unit->IsAlive() && unit->MapLayer == z &&
-						(
-							((map_layer->TimeOfDay == MorningTimeOfDay || map_layer->TimeOfDay == DuskTimeOfDay) && unit->Variable[DAYSIGHTRANGEBONUS_INDEX].Value != 0) // if has day sight bonus and is entering or exiting day
-							|| ((map_layer->TimeOfDay == FirstWatchTimeOfDay || map_layer->TimeOfDay == DawnTimeOfDay) && unit->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value != 0) // if has night sight bonus and is entering or exiting night
-						)
-					) {
-						MapUnmarkUnitSight(*unit);
-						UpdateUnitSightRange(*unit);
-						MapMarkUnitSight(*unit);
+				if (GameCycle % cycles_per_time_of_day == 0) { 
+					int time_of_day = map_layer->TimeOfDay + 1;
+					if (time_of_day == MaxTimesOfDay) {
+						time_of_day = 1;
 					}
+					map_layer->SetTimeOfDay(time_of_day);
 				}
 			}
 		}
@@ -720,6 +696,7 @@ void GameMainLoop()
 	EndReplayLog();
 
 	GameCycle = 0;//????
+	GameHour = 0;
 	CParticleManager::exit();
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;

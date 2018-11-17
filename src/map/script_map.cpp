@@ -115,6 +115,7 @@ static int CclStratagusMap(lua_State *l)
 //					Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 					Map.ClearMapLayers();
 					CMapLayer *map_layer = new CMapLayer;
+					map_layer->ID = Map.MapLayers.size();
 					map_layer->Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 					Map.MapLayers.push_back(map_layer);
 					Map.Info.MapWidths.clear();
@@ -148,6 +149,7 @@ static int CclStratagusMap(lua_State *l)
 						Map.Info.MapWidths.push_back(map_layer_width);
 						Map.Info.MapHeights.push_back(map_layer_height);
 						CMapLayer *map_layer = new CMapLayer;
+						map_layer->ID = Map.MapLayers.size();
 						map_layer->Fields = new CMapField[map_layer_width * map_layer_height];
 						Map.MapLayers.push_back(map_layer);
 						lua_pop(l, 1);

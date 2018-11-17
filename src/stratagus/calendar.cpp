@@ -87,6 +87,33 @@ void CCalendar::ClearCalendars()
 	BaseCalendar = NULL;
 }
 
+int CCalendar::GetTimeOfDay(const unsigned long hours, const int hours_per_day)
+{
+	int standardized_hour = hours % hours_per_day;
+	standardized_hour *= DefaultHoursPerDay;
+	standardized_hour /= hours_per_day;
+	
+	if (standardized_hour >= 5 && standardized_hour <= 7) {
+		return DawnTimeOfDay;
+	} else if (standardized_hour >= 8 && standardized_hour <= 10) {
+		return MorningTimeOfDay;
+	} else if (standardized_hour >= 11 && standardized_hour <= 13) {
+		return MiddayTimeOfDay;
+	} else if (standardized_hour >= 14 && standardized_hour <= 16) {
+		return AfternoonTimeOfDay;
+	} else if (standardized_hour >= 17 && standardized_hour <= 19) {
+		return DuskTimeOfDay;
+	} else if (standardized_hour >= 20 && standardized_hour <= 22) {
+		return FirstWatchTimeOfDay;
+	} else if (standardized_hour >= 23 || (standardized_hour >= 0 && standardized_hour <= 1)) {
+		return MidnightTimeOfDay;
+	} else if (standardized_hour >= 2 && standardized_hour <= 4) {
+		return SecondWatchTimeOfDay;
+	}
+	
+	return NoTimeOfDay;
+}
+
 void CCalendar::ProcessConfigData(CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {

@@ -44,23 +44,28 @@
 
 class CTimeline;
 
+#define BaseCalendarYearOffsetForHours 10000 //essentially the Human Era
+
 class CDate
 {
 public:
 	CDate() :
-		Year(0), Month(1), Day(1), Timeline(NULL)
+		Year(0), Month(1), Day(1), Hour(DefaultHoursPerDay / 2), Timeline(NULL)
 	{
 	}
 	
 	static CDate FromString(std::string date_str);
-	
-	bool ContainsDate(const CDate &date) const; /// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
+
+	void Clear();
+	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
 	CDate ToBaseCalendar(const CCalendar *current_calendar) const;
 	std::string ToDisplayString(const CCalendar *calendar) const;
+	unsigned long GetTotalHours(const CCalendar *calendar) const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
 	
 	int Year;
 	char Month;
 	char Day;
+	char Hour;
 	CTimeline *Timeline;
 	
 	bool operator <(const CDate& rhs) const {
@@ -70,7 +75,11 @@ public:
 			if (Month < rhs.Month) {
 				return true;
 			} else if (Month == rhs.Month) {
-				return Day < rhs.Day;
+				if (Day < rhs.Day) {
+					return true;
+				} else if (Day == rhs.Day) {
+					return Hour < rhs.Hour;
+				}
 			}
 		}
 
@@ -84,7 +93,11 @@ public:
 			if (Month < rhs.Month) {
 				return true;
 			} else if (Month == rhs.Month) {
-				return Day <= rhs.Day;
+				if (Day < rhs.Day) {
+					return true;
+				} else if (Day == rhs.Day) {
+					return Hour <= rhs.Hour;
+				}
 			}
 		}
 
@@ -98,7 +111,11 @@ public:
 			if (Month > rhs.Month) {
 				return true;
 			} else if (Month == rhs.Month) {
-				return Day > rhs.Day;
+				if (Day > rhs.Day) {
+					return true;
+				} else if (Day == rhs.Day) {
+					return Hour > rhs.Hour;
+				}
 			}
 		}
 
@@ -112,7 +129,11 @@ public:
 			if (Month > rhs.Month) {
 				return true;
 			} else if (Month == rhs.Month) {
-				return Day >= rhs.Day;
+				if (Day > rhs.Day) {
+					return true;
+				} else if (Day == rhs.Day) {
+					return Hour >= rhs.Hour;
+				}
 			}
 		}
 
@@ -120,7 +141,7 @@ public:
 	}
 	
 	bool operator ==(const CDate& rhs) const {
-		return Year == rhs.Year && Month == rhs.Month && Day == rhs.Day;
+		return Year == rhs.Year && Month == rhs.Month && Day == rhs.Day && Hour == rhs.Hour;
 	}
 };
 

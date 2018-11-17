@@ -50,13 +50,14 @@ class CCalendar
 {
 public:
 	CCalendar() :
-		DaysPerYear(365)
+		HoursPerDay(DefaultHoursPerDay), DaysPerMonth(30), MonthsPerYear(12), DaysPerYear(365)
 	{
 	}
 	
 	static CCalendar *GetCalendar(std::string ident);
 	static CCalendar *GetOrAddCalendar(std::string ident);
 	static void ClearCalendars();
+	static int GetTimeOfDay(const unsigned long hours, const int hours_per_day);
 	
 	static std::vector<CCalendar *> Calendars;
 	static std::map<std::string, CCalendar *> CalendarsByIdent;
@@ -67,6 +68,9 @@ public:
 	
 	std::string Ident;
 	std::string Name;
+	int HoursPerDay;
+	int DaysPerMonth;
+	int MonthsPerYear;
 	int DaysPerYear;
 	std::string YearLabel;
 	std::string NegativeYearLabel;

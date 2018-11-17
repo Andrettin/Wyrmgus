@@ -43,6 +43,7 @@
 #include "actions.h"
 #include "ai.h"
 #include "animation.h"
+#include "calendar.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
@@ -101,9 +102,9 @@ extern void CleanGame();
 --  Variables
 ----------------------------------------------------------------------------*/
 
-Settings GameSettings;  /// Game Settings
-static int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
-GameResults GameResult;                      /// Outcome of the game
+Settings GameSettings;					/// Game Settings
+static int LcmPreventRecurse;			/// prevent recursion through LoadGameMap
+GameResults GameResult;					/// Outcome of the game
 
 std::string GameName;
 std::string FullGameName;
@@ -111,10 +112,11 @@ std::string FullGameName;
 std::string PlayerFaction;
 //Wyrmgus end
 
-unsigned long GameCycle;             /// Game simulation cycle counter
-unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
+unsigned long GameCycle;				/// Game simulation cycle counter
+unsigned long GameHour;					/// Game simulation hour counter
+unsigned long FastForwardCycle;			/// Cycle to fastforward to in a replay
 
-bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
+bool UseHPForXp = false;				/// true if gain XP by dealing damage, false if by killing.
 
 bool LoadingHistory = false;
 bool DefiningData = false;
@@ -1669,6 +1671,12 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	if (IsNetworkGame()) { // if is a network game, it is necessary to reinitialize the syncrand variables before beginning to load the map, due to random map generation
 		SyncHash = 0;
 		InitSyncRand();
+	}
+	
+	if (CurrentCampaign) {
+		GameHour = CurrentCampaign->StartDate.GetTotalHours(CCalendar::BaseCalendar);
+	} else {
+		GameHour = SyncRand(DefaultHoursPerDay); //start at a random time of day
 	}
 	//Wyrmgus end
 

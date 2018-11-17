@@ -158,6 +158,7 @@ void CleanModules()
 void InitModules()
 {
 	GameCycle = 0;
+	GameHour = 0;
 	FastForwardCycle = 0;
 	SyncHash = 0;
 
@@ -288,6 +289,7 @@ void LoadGame(const std::string &filename)
 	PlaceUnits();
 
 	const unsigned long game_cycle = GameCycle;
+	const unsigned long game_hour = GameHour;
 	const unsigned syncrand = SyncRandSeed;
 	const unsigned synchash = SyncHash;
 
@@ -295,6 +297,7 @@ void LoadGame(const std::string &filename)
 	LoadModules();
 
 	GameCycle = game_cycle;
+	GameHour = game_hour;
 	SyncRandSeed = syncrand;
 	SyncHash = synchash;
 	SelectionChanged();

@@ -42,6 +42,7 @@
 #include <fstream>
 //Wyrmgus end
 
+#include "calendar.h"
 //Wyrmgus start
 #include "editor.h"
 #include "game.h" // for the SaveGameLoading variable
@@ -54,6 +55,7 @@
 #include "province.h"
 #include "quest.h"
 #include "settings.h"
+#include "sound_server.h"
 //Wyrmgus end
 #include "terrain_type.h"
 #include "tileset.h"
@@ -72,6 +74,13 @@
 #include "version.h"
 #include "video.h"
 #include "world.h"
+
+#ifdef USE_OAML
+#include <oaml.h>
+
+extern oamlApi *oaml;
+extern bool enableOAML;
+#endif
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -1093,6 +1102,44 @@ CMapLayer::~CMapLayer()
 	}
 }
 
+void CMapLayer::SetTimeOfDay(const int time_of_day)
+{
+	if (this->TimeOfDay == time_of_day) {
+		return;
+	}
+	
+	int old_time_of_day = this->TimeOfDay;
+	this->TimeOfDay = time_of_day;
+	
+#ifdef USE_OAML
+	if (enableOAML && oaml && this->ID == CurrentMapLayer) {
+		// Time of day can change our main music loop, if the current playing track is set for this
+		SetMusicCondition(OAML_CONDID_MAIN_LOOP, this->TimeOfDay);
+	}
+#endif
+
+	bool is_day_changed = (this->TimeOfDay == MorningTimeOfDay || this->TimeOfDay == MiddayTimeOfDay || this->TimeOfDay == AfternoonTimeOfDay) != (old_time_of_day == MorningTimeOfDay || old_time_of_day == MiddayTimeOfDay || old_time_of_day == AfternoonTimeOfDay);
+	bool is_night_changed = (this->TimeOfDay == FirstWatchTimeOfDay || this->TimeOfDay == MidnightTimeOfDay || this->TimeOfDay == SecondWatchTimeOfDay) != (old_time_of_day == FirstWatchTimeOfDay || old_time_of_day == MidnightTimeOfDay || old_time_of_day == SecondWatchTimeOfDay);
+	
+	//update the sight of all units
+	if (is_day_changed || is_night_changed) {
+		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+			CUnit *unit = *it;
+			if (
+				unit && unit->IsAlive() && unit->MapLayer == this->ID &&
+				(
+					(is_day_changed && unit->Variable[DAYSIGHTRANGEBONUS_INDEX].Value != 0) // if has day sight bonus and is entering or exiting day
+					|| (is_night_changed && unit->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value != 0) // if has night sight bonus and is entering or exiting night
+				)
+			) {
+				MapUnmarkUnitSight(*unit);
+				UpdateUnitSightRange(*unit);
+				MapMarkUnitSight(*unit);
+			}
+		}
+	}
+}
+
 //Wyrmgus start
 //CMap::CMap() : Fields(NULL), NoFogOfWar(false), TileGraphic(NULL)
 CMap::CMap() : NoFogOfWar(false), TileGraphic(NULL), Landmasses(0), BorderTerrain(NULL)
@@ -1115,9 +1162,10 @@ void CMap::Create()
 
 	//Wyrmgus start
 	CMapLayer *map_layer = new CMapLayer;
+	map_layer->ID = this->MapLayers.size();
 	map_layer->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
 	if (!GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning) {
-		map_layer->TimeOfDay = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
+		map_layer->TimeOfDay = CCalendar::GetTimeOfDay(GameHour, DefaultHoursPerDay);
 	} else {
 		map_layer->TimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 	}

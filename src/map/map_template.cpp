@@ -39,6 +39,7 @@
 
 #include <fstream>
 
+#include "calendar.h"
 #include "config.h"
 #include "editor.h"
 #include "game.h"
@@ -374,6 +375,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	
 	if (z >= (int) Map.MapLayers.size()) {
 		CMapLayer *map_layer = new CMapLayer;
+		map_layer->ID = Map.MapLayers.size();
 		Map.Info.MapWidths.push_back(std::min(this->Width * this->Scale, Map.Info.MapWidth));
 		Map.Info.MapHeights.push_back(std::min(this->Height * this->Scale, Map.Info.MapHeight));
 		map_layer->Fields = new CMapField[Map.Info.MapWidths[z] * Map.Info.MapHeights[z]];
@@ -398,15 +400,23 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.Info.MapHeights[z] = CurrentCampaign->MapSizes[z].y;
 	}
 	
-	if (
-		((this->World && this->World->HoursPerDay) || (!this->World && this->Plane && this->Plane->HoursPerDay))
-		&& this->SurfaceLayer == 0
-		&& !GameSettings.Inside
-		&& !GameSettings.NoTimeOfDay
-		&& Editor.Running == EditorNotRunning
-		&& !this->IsSubtemplateArea()
-	) {
-		Map.MapLayers[z]->TimeOfDay = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
+	if (!this->IsSubtemplateArea()) {
+		Map.MapLayers[z]->TimeOfDay = NoTimeOfDay;
+		if (
+			this->SurfaceLayer == 0
+			&& !GameSettings.Inside
+			&& !GameSettings.NoTimeOfDay
+			&& Editor.Running == EditorNotRunning
+		) {
+			if (this->World && this->World->HoursPerDay) {
+				Map.MapLayers[z]->HoursPerDay = this->World->HoursPerDay;
+			} else if (!this->World && this->Plane && this->Plane->HoursPerDay) {
+				Map.MapLayers[z]->HoursPerDay = this->Plane->HoursPerDay;
+			}
+			if (Map.MapLayers[z]->HoursPerDay) {
+				Map.MapLayers[z]->TimeOfDay = CCalendar::GetTimeOfDay(GameHour, Map.MapLayers[z]->HoursPerDay);
+			}
+		}
 	}
 	
 	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + (this->Width * this->Scale)), std::min(Map.Info.MapHeights[z], map_start_pos.y + (this->Height * this->Scale)));

@@ -95,6 +95,15 @@ CDate CDate::FromString(std::string date_str)
 	return date;
 }
 
+void CDate::Clear()
+{
+	Year = 0;
+	Month = 1;
+	Day = 1;
+	Hour = DefaultHoursPerDay / 2;
+	Timeline = NULL;
+}
+
 bool CDate::ContainsDate(const CDate &date) const
 {
 	if (this->Timeline == date.Timeline) {
@@ -110,11 +119,16 @@ bool CDate::ContainsDate(const CDate &date) const
 
 CDate CDate::ToBaseCalendar(const CCalendar *current_calendar) const
 {
+	if (current_calendar == CCalendar::BaseCalendar) {
+		return *this;
+	}
+	
 	CDate date;
 	date.Timeline = this->Timeline;
 	date.Year = this->Year;
 	date.Month = this->Month;
 	date.Day = this->Day;
+	date.Hour = this->Hour;
 	
 	if (CCalendar::BaseCalendar) {
 		if (current_calendar->YearDifferences.find(CCalendar::BaseCalendar) != current_calendar->YearDifferences.end()) {
@@ -155,6 +169,16 @@ std::string CDate::ToDisplayString(const CCalendar *calendar) const
 	}
 	
 	return display_string;
+}
+
+unsigned long CDate::GetTotalHours(const CCalendar *calendar) const
+{
+	CDate date = this->ToBaseCalendar(calendar);
+	
+	unsigned long hours = date.Hour;
+	hours += (unsigned long) ((date.Year + BaseCalendarYearOffsetForHours) * calendar->DaysPerYear + date.Month * calendar->DaysPerMonth + date.Day) * calendar->HoursPerDay;
+	
+	return hours;
 }
 
 //@}
