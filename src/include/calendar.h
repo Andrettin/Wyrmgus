@@ -60,6 +60,7 @@ public:
 	
 	static std::vector<CCalendar *> Calendars;
 	static std::map<std::string, CCalendar *> CalendarsByIdent;
+	static CCalendar *BaseCalendar;
 	
 	void ProcessConfigData(CConfigData *config_data);
 	void SetYearDifference(CCalendar *calendar, int difference);
@@ -67,6 +68,8 @@ public:
 	std::string Ident;
 	std::string Name;
 	int DaysPerYear;
+	std::string YearLabel;
+	std::string NegativeYearLabel;
 	std::map<CCalendar *, int> YearDifferences;				/// The difference in years between this calendar and other calendars; assumes other calendars have the same month structure and days per year
 };
 

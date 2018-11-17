@@ -116,25 +116,42 @@ CDate CDate::ToBaseCalendar(const CCalendar *current_calendar) const
 	date.Month = this->Month;
 	date.Day = this->Day;
 	
-	if (current_calendar->YearDifferences.find(NULL) != current_calendar->YearDifferences.end()) {
-		date.Year += current_calendar->YearDifferences.find(NULL)->second;
+	if (CCalendar::BaseCalendar) {
+		if (current_calendar->YearDifferences.find(CCalendar::BaseCalendar) != current_calendar->YearDifferences.end()) {
+			date.Year += current_calendar->YearDifferences.find(CCalendar::BaseCalendar)->second;
+		} else {
+			fprintf(stderr, "Dates in calendar \"%s\" cannot be converted to the base calendar.\n", current_calendar->Ident.c_str());
+		}
 	} else {
-		fprintf(stderr, "Dates in calendar \"%s\" cannot be converted to the base calendar.\n", current_calendar->Ident.c_str());
+		fprintf(stderr, "No base calendar has been defined.\n", current_calendar->Ident.c_str());
 	}
 	
 	return date;
 }
 
-std::string CDate::ToDisplayString() const
+std::string CDate::ToDisplayString(const CCalendar *calendar) const
 {
 	std::string display_string;
 	
 	display_string += std::to_string((long long) abs(this->Year)) + "." + std::to_string((long long) this->Month) + "." + std::to_string((long long) this->Day);
 	
+	if (!calendar) {
+		fprintf(stderr, "Calendar does not exist.\n");
+		return display_string;
+	}
+	
 	if (this->Year < 0) {
-		display_string += " BC";
+		if (!calendar->NegativeYearLabel.empty()) {
+			display_string += " " + calendar->NegativeYearLabel;
+		} else {
+			fprintf(stderr, "Calendar \"%s\" has no negative year label.\n", calendar->Ident.c_str());
+		}
 	} else {
-		display_string += " AD";
+		if (!calendar->YearLabel.empty()) {
+			display_string += " " + calendar->YearLabel;
+		} else {
+			fprintf(stderr, "Calendar \"%s\" has no year label.\n", calendar->Ident.c_str());
+		}
 	}
 	
 	return display_string;

@@ -55,6 +55,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CCalendar;
 class CConfigData;
 class CDeity;
 class CFaction;
@@ -136,6 +137,7 @@ public:
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
 	CLanguage *GetLanguage() const;
+	CCalendar *GetCalendar() const;
 	bool IsParentOf(std::string child_full_name) const;
 	bool IsChildOf(std::string parent_full_name) const;
 	bool IsSiblingOf(std::string sibling_full_name) const;

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player.cpp - The players. */
+/**@name player.cpp - The player source file. */
 //
 //      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //		and Andrettin
@@ -45,6 +45,7 @@
 #include "ai.h"
 //Wyrmgus start
 #include "../ai/ai_local.h" //for using AiHelpers
+#include "calendar.h"
 #include "commands.h" //for faction setting
 #include "deity.h"
 #include "deity_domain.h"
@@ -736,6 +737,19 @@ std::string CCivilization::GetMonthName(int month) const
 	}
 	
 	return CapitalizeString(GetMonthNameById(month));
+}
+
+CCalendar *CCivilization::GetCalendar() const
+{
+	if (this->Calendar) {
+		return this->Calendar;
+	}
+	
+	if (this->ParentCivilization != -1) {
+		return PlayerRaces.Civilizations[this->ParentCivilization]->GetCalendar();
+	}
+	
+	return CCalendar::BaseCalendar;
 }
 
 std::vector<CForceTemplate *> CCivilization::GetForceTemplates(int force_type) const

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player.h - The player headerfile. */
+/**@name player.h - The player header file. */
 //
 //      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -84,6 +84,7 @@ class CGraphic;
 class CUnit;
 class CUnitType;
 //Wyrmgus start
+class CCalendar;
 class CCharacter;
 class CDeity;
 class CDeityDomain;
@@ -616,7 +617,7 @@ class CCivilization
 public:
 	CCivilization() :
 		ID(-1), ParentCivilization(-1), CalendarStartingYear(0),
-		Language(NULL)
+		Language(NULL), Calendar(NULL)
 	{
 	}
 
@@ -625,6 +626,7 @@ public:
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
 	std::string GetMonthName(int month) const;
+	CCalendar *GetCalendar() const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	std::map<int, std::vector<std::string>> &GetPersonalNames();
@@ -634,15 +636,16 @@ public:
 	int ID;
 	int ParentCivilization;
 	int CalendarStartingYear;
-	std::string Ident;			/// Ident of the civilization
-	std::string Description;	/// civilization description
-	std::string Quote;			/// civilization quote
-	std::string Background;		/// civilization background
-	std::string Adjective;		/// adjective pertaining to the civilization
-	std::string YearLabel;		/// label used for years (i.e. AD)
+	std::string Ident;				/// Ident of the civilization
+	std::string Description;		/// civilization description
+	std::string Quote;				/// civilization quote
+	std::string Background;			/// civilization background
+	std::string Adjective;			/// adjective pertaining to the civilization
+	std::string YearLabel;			/// label used for years (i.e. AD)
 	std::string NegativeYearLabel;	/// label used for "negative" years (i.e. BC)
 	CUnitSound UnitSounds;			/// Sounds for unit events
-	CLanguage *Language;		/// The language used by the civilization
+	CLanguage *Language;			/// The language used by the civilization
+	CCalendar *Calendar;			/// the calendar used by the civilization
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month

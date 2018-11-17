@@ -42,6 +42,7 @@
 #include <string>
 #include <map>
 
+#include "calendar.h"
 #include "config.h"
 #include "deity.h"
 #include "game.h"
@@ -394,6 +395,15 @@ int CCharacter::GetAttributeModifier(int attribute) const
 CLanguage *CCharacter::GetLanguage() const
 {
 	return PlayerRaces.GetCivilizationLanguage(this->Civilization);
+}
+
+CCalendar *CCharacter::GetCalendar() const
+{
+	if (this->Civilization != -1) {
+		return PlayerRaces.Civilizations[this->Civilization]->GetCalendar();
+	}
+	
+	return CCalendar::BaseCalendar;
 }
 
 bool CCharacter::IsParentOf(std::string child_ident) const

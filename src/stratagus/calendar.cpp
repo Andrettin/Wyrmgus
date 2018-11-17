@@ -45,6 +45,7 @@
 
 std::vector<CCalendar *> CCalendar::Calendars;
 std::map<std::string, CCalendar *> CCalendar::CalendarsByIdent;
+CCalendar * CCalendar::BaseCalendar = NULL;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -82,6 +83,8 @@ void CCalendar::ClearCalendars()
 		delete Calendars[i];
 	}
 	Calendars.clear();
+	
+	BaseCalendar = NULL;
 }
 
 void CCalendar::ProcessConfigData(CConfigData *config_data)
@@ -92,6 +95,15 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 		
 		if (key == "name") {
 			this->Name = value;
+		} else if (key == "base_calendar") {
+			bool is_base_calendar = StringToBool(value);
+			if (is_base_calendar) {
+				CCalendar::BaseCalendar = this;
+			}
+		} else if (key == "year_label") {
+			this->YearLabel = value;
+		} else if (key == "negative_year_label") {
+			this->NegativeYearLabel = value;
 		} else {
 			fprintf(stderr, "Invalid calendar property: \"%s\".\n", key.c_str());
 		}
@@ -112,6 +124,9 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 				if (key == "calendar") {
 					value = FindAndReplaceString(value, "_", "-");
 					calendar = CCalendar::GetCalendar(value);
+					if (!calendar) {
+						fprintf(stderr, "Calendar \"%s\" does not exist.\n", value.c_str());
+					}
 				} else if (key == "difference") {
 					difference = std::stoi(value);
 					difference_changed = true;
@@ -121,9 +136,8 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 			}
 			
 			if (!calendar) {
-				//could be base calendar
-//				fprintf(stderr, "Year difference has no \"calendar\" property.\n");
-//				continue;
+				fprintf(stderr, "Year difference has no \"calendar\" property.\n");
+				continue;
 			}
 			
 			if (!difference_changed) {
@@ -141,16 +155,22 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 
 void CCalendar::SetYearDifference(CCalendar *calendar, int difference)
 {
+	if (!calendar) {
+		return;
+	}
+	
+	if (this->YearDifferences[calendar] == difference) {
+		return;
+	}
+	
 	this->YearDifferences[calendar] = difference;
 			
-	if (calendar) {
-		calendar->SetYearDifference(this, -difference);
+	calendar->SetYearDifference(this, -difference);
 		
-		//get the other year differences from the other calendar as well
-		for (std::map<CCalendar *, int>::const_iterator iterator = calendar->YearDifferences.begin(); iterator != calendar->YearDifferences.end(); ++iterator) {
-			if (iterator->first != this && this->YearDifferences.find(iterator->first) == this->YearDifferences.end()) {
-				this->YearDifferences[iterator->first] = difference + iterator->second;
-			}
+	//get the other year differences from the other calendar as well
+	for (std::map<CCalendar *, int>::const_iterator iterator = calendar->YearDifferences.begin(); iterator != calendar->YearDifferences.end(); ++iterator) {
+		if (iterator->first != this && this->YearDifferences.find(iterator->first) == this->YearDifferences.end()) {
+			this->YearDifferences[iterator->first] = difference + iterator->second;
 		}
 	}
 	

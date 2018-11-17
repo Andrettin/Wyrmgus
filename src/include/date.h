@@ -56,7 +56,7 @@ public:
 	
 	bool ContainsDate(const CDate &date) const; /// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
 	CDate ToBaseCalendar(const CCalendar *current_calendar) const;
-	std::string ToDisplayString() const;
+	std::string ToDisplayString(const CCalendar *calendar) const;
 	
 	int Year;
 	char Month;
