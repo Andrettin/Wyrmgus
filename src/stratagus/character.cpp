@@ -153,54 +153,12 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		} else if (key == "birth_date") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->BirthDate = CDate::FromString(value);
-			
-			if (this->DeathDate.year == 0) { //if the character is missing a death date so far, give it +60 years after the birth date
-				this->DeathDate.year = this->BirthDate.year + 60;
-				this->DeathDate.month = this->BirthDate.month;
-				this->DeathDate.day = this->BirthDate.day;
-				this->DeathDate.timeline = this->BirthDate.timeline;
-			}
-			
-			if (this->Date.year == 0) { //if the character is missing a start date so far, give it +30 years after the birth date
-				this->Date.year = this->BirthDate.year + 30;
-				this->Date.month = this->BirthDate.month;
-				this->Date.day = this->BirthDate.day;
-				this->Date.timeline = this->BirthDate.timeline;
-			}
 		} else if (key == "date") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Date = CDate::FromString(value);
-			
-			if (this->BirthDate.year == 0) { //if the character is missing a birth date so far, give it 30 years before the start date
-				this->BirthDate.year = this->Date.year - 30;
-				this->BirthDate.month = this->Date.month;
-				this->BirthDate.day = this->Date.day;
-				this->BirthDate.timeline = this->Date.timeline;
-			}
-			
-			if (this->DeathDate.year == 0) { //if the character is missing a death date so far, give it +30 years after the start date
-				this->DeathDate.year = this->Date.year + 30;
-				this->DeathDate.month = this->Date.month;
-				this->DeathDate.day = this->Date.day;
-				this->DeathDate.timeline = this->Date.timeline;
-			}
+			this->StartDate = CDate::FromString(value);
 		} else if (key == "death_date") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->DeathDate = CDate::FromString(value);
-				
-			if (this->BirthDate.year == 0) { //if the character is missing a birth date so far, give it 60 years before the death date
-				this->BirthDate.year = this->DeathDate.year - 60;
-				this->BirthDate.month = this->DeathDate.month;
-				this->BirthDate.day = this->DeathDate.day;
-				this->BirthDate.timeline = this->DeathDate.timeline;
-			}
-				
-			if (this->Date.year == 0) { //if the character is missing a start date so far, give it 30 years before the death date
-				this->Date.year = this->DeathDate.year - 30;
-				this->Date.month = this->DeathDate.month;
-				this->Date.day = this->DeathDate.day;
-				this->Date.timeline = this->DeathDate.timeline;
-			}
 		} else if (key == "deity") {
 			value = FindAndReplaceString(value, "_", "-");
 			CDeity *deity = CDeity::GetDeity(value);
@@ -301,6 +259,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		}
 	}
 
+	this->GenerateMissingDates();
 	this->UpdateAttributes();
 }
 
@@ -371,6 +330,51 @@ void CCharacter::SaveHistory()
 	fprintf(fd, "[/character]\n");
 		
 	fclose(fd);
+}
+
+void CCharacter::GenerateMissingDates()
+{
+	if (this->DeathDate.Year == 0 && this->BirthDate.Year != 0) { //if the character is missing a death date so far, give it +60 years after the birth date
+		this->DeathDate.Year = this->BirthDate.Year + 60;
+		this->DeathDate.Month = this->BirthDate.Month;
+		this->DeathDate.Day = this->BirthDate.Day;
+		this->DeathDate.Timeline = this->BirthDate.Timeline;
+	}
+	
+	if (this->BirthDate.Year == 0 && this->DeathDate.Year != 0) { //if the character is missing a birth date so far, give it 60 years before the death date
+		this->BirthDate.Year = this->DeathDate.Year - 60;
+		this->BirthDate.Month = this->DeathDate.Month;
+		this->BirthDate.Day = this->DeathDate.Day;
+		this->BirthDate.Timeline = this->DeathDate.Timeline;
+	}
+	
+	if (this->StartDate.Year == 0 && this->BirthDate.Year != 0) { //if the character is missing a start date so far, give it +30 years after the birth date
+		this->StartDate.Year = this->BirthDate.Year + 30;
+		this->StartDate.Month = this->BirthDate.Month;
+		this->StartDate.Day = this->BirthDate.Day;
+		this->StartDate.Timeline = this->BirthDate.Timeline;
+	}
+	
+	if (this->BirthDate.Year == 0 && this->StartDate.Year != 0) { //if the character is missing a birth date so far, give it 30 years before the start date
+		this->BirthDate.Year = this->StartDate.Year - 30;
+		this->BirthDate.Month = this->StartDate.Month;
+		this->BirthDate.Day = this->StartDate.Day;
+		this->BirthDate.Timeline = this->StartDate.Timeline;
+	}
+	
+	if (this->DeathDate.Year == 0 && this->StartDate.Year != 0) { //if the character is missing a death date so far, give it +30 years after the start date
+		this->DeathDate.Year = this->StartDate.Year + 30;
+		this->DeathDate.Month = this->StartDate.Month;
+		this->DeathDate.Day = this->StartDate.Day;
+		this->DeathDate.Timeline = this->StartDate.Timeline;
+	}
+	
+	if (this->StartDate.Year == 0 && this->DeathDate.Year != 0) { //if the character is missing a start date so far, give it 30 years before the death date
+		this->StartDate.Year = this->DeathDate.Year - 30;
+		this->StartDate.Month = this->DeathDate.Month;
+		this->StartDate.Day = this->DeathDate.Day;
+		this->StartDate.Timeline = this->DeathDate.Timeline;
+	}
 }
 
 int CCharacter::GetMartialAttribute() const

@@ -87,6 +87,10 @@
 #include <map>
 //Wyrmgus end
 
+#ifndef __DATE_H__
+#include "date.h"
+#endif
+
 #ifndef __MAP_TILE_H__
 #include "tile.h"
 #endif

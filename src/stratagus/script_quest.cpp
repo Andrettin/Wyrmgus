@@ -444,7 +444,7 @@ static int CclDefineCampaign(lua_State *l)
 		} else if (!strcmp(value, "Sandbox")) {
 			campaign->Sandbox = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "StartYear")) {
-			campaign->StartDate.year = LuaToNumber(l, -1);
+			campaign->StartDate.Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "StartDate")) {
 			CclGetDate(l, &campaign->StartDate);
 		} else if (!strcmp(value, "StartEffects")) {
@@ -540,7 +540,7 @@ static int CclGetCampaignData(lua_State *l)
 		lua_pushstring(l, campaign->Description.c_str());
 		return 1;
 	} else if (!strcmp(data, "StartYear")) {
-		lua_pushnumber(l, campaign->StartDate.year);
+		lua_pushnumber(l, campaign->StartDate.Year);
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (campaign->Faction) {

@@ -39,6 +39,10 @@
 #include <vector>
 #include <tuple>
 
+#ifndef __DATE_H__
+#include "date.h"
+#endif
+
 #ifndef __ICONS_H__
 #include "icons.h"
 #endif
@@ -128,6 +132,7 @@ public:
 	void GenerateHistory();
 	void ResetHistory();
 	void SaveHistory();
+	void GenerateMissingDates();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
 	CLanguage *GetLanguage() const;
@@ -144,7 +149,7 @@ public:
 	void SaveHistory(CFile &file);		/// Save generated history data for the character
 
 	CDate BirthDate;			/// Date in which the character was born
-	CDate Date;					/// Date in which the character historically starts being active
+	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
 	int Civilization;			/// Culture to which the character belongs
 	CFaction *Faction;			/// Faction to which the character belongs

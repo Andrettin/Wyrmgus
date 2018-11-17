@@ -452,7 +452,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 			if (history_pos.x < template_start_pos.x || history_pos.x >= (template_start_pos.x + (Map.Info.MapWidths[z] / this->Scale)) || history_pos.y < template_start_pos.y || history_pos.y >= (template_start_pos.y + (Map.Info.MapHeights[z] / this->Scale))) {
 				continue;
 			}
-			if (CurrentCampaign->StartDate.ContainsDate(std::get<2>(HistoricalTerrains[i])) || std::get<2>(HistoricalTerrains[i]).year == 0) {
+			if (CurrentCampaign->StartDate.ContainsDate(std::get<2>(HistoricalTerrains[i])) || std::get<2>(HistoricalTerrains[i]).Year == 0) {
 				CTerrainType *historical_terrain = std::get<1>(HistoricalTerrains[i]);
 				
 				for (int sub_x = 0; sub_x < this->Scale; ++sub_x) {
@@ -769,10 +769,10 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 		
 		for (size_t j = 0; j < site_iterator->second->HistoricalResources.size(); ++j) {
 			if (
-				(!CurrentCampaign && std::get<1>(site_iterator->second->HistoricalResources[j]).year == 0 && std::get<1>(site_iterator->second->HistoricalResources[j]).year == 0)
+				(!CurrentCampaign && std::get<1>(site_iterator->second->HistoricalResources[j]).Year == 0 && std::get<1>(site_iterator->second->HistoricalResources[j]).Year == 0)
 				|| (
 					CurrentCampaign && CurrentCampaign->StartDate.ContainsDate(std::get<0>(site_iterator->second->HistoricalResources[j]))
-					&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalResources[j])) || std::get<1>(site_iterator->second->HistoricalResources[j]).year == 0)
+					&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalResources[j])) || std::get<1>(site_iterator->second->HistoricalResources[j]).Year == 0)
 				)
 			) {
 				const CUnitType *type = std::get<2>(site_iterator->second->HistoricalResources[j]);
@@ -819,7 +819,7 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 		
 		bool is_capital = false;
 		for (int i = ((int) site_owner->HistoricalCapitals.size() - 1); i >= 0; --i) {
-			if (CurrentCampaign->StartDate.ContainsDate(site_owner->HistoricalCapitals[i].first) || site_owner->HistoricalCapitals[i].first.year == 0) {
+			if (CurrentCampaign->StartDate.ContainsDate(site_owner->HistoricalCapitals[i].first) || site_owner->HistoricalCapitals[i].first.Year == 0) {
 				if (site_owner->HistoricalCapitals[i].second == site_iterator->second->Ident) {
 					is_capital = true;
 				}
@@ -835,7 +835,7 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 		for (size_t j = 0; j < site_iterator->second->HistoricalBuildings.size(); ++j) {
 			if (
 				CurrentCampaign->StartDate.ContainsDate(std::get<0>(site_iterator->second->HistoricalBuildings[j]))
-				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalBuildings[j])) || std::get<1>(site_iterator->second->HistoricalBuildings[j]).year == 0)
+				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalBuildings[j])) || std::get<1>(site_iterator->second->HistoricalBuildings[j]).Year == 0)
 			) {
 				int unit_type_id = -1;
 				unit_type_id = PlayerRaces.GetFactionClassUnitType(site_owner->ID, std::get<2>(site_iterator->second->HistoricalBuildings[j]));
@@ -855,7 +855,7 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 		for (size_t j = 0; j < site_iterator->second->HistoricalBuildings.size(); ++j) {
 			if (
 				CurrentCampaign->StartDate.ContainsDate(std::get<0>(site_iterator->second->HistoricalBuildings[j]))
-				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalBuildings[j])) || std::get<1>(site_iterator->second->HistoricalBuildings[j]).year == 0)
+				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalBuildings[j])) || std::get<1>(site_iterator->second->HistoricalBuildings[j]).Year == 0)
 			) {
 				CFaction *building_owner = std::get<4>(site_iterator->second->HistoricalBuildings[j]);
 				int unit_type_id = -1;
@@ -931,7 +931,7 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 		for (size_t j = 0; j < site_iterator->second->HistoricalUnits.size(); ++j) {
 			if (
 				CurrentCampaign->StartDate.ContainsDate(std::get<0>(site_iterator->second->HistoricalUnits[j]))
-				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalUnits[j])) || std::get<1>(site_iterator->second->HistoricalUnits[j]).year == 0)
+				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalUnits[j])) || std::get<1>(site_iterator->second->HistoricalUnits[j]).Year == 0)
 			) {
 				int unit_quantity = std::get<3>(site_iterator->second->HistoricalUnits[j]);
 						
@@ -1122,10 +1122,10 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		}
 		
 		if (
-			(!CurrentCampaign && std::get<3>(this->Units[i]).year == 0 && std::get<4>(this->Units[i]).year == 0)
+			(!CurrentCampaign && std::get<3>(this->Units[i]).Year == 0 && std::get<4>(this->Units[i]).Year == 0)
 			|| (
-				CurrentCampaign && (std::get<3>(this->Units[i]).year == 0 || CurrentCampaign->StartDate.ContainsDate(std::get<3>(this->Units[i])))
-				&& (std::get<4>(this->Units[i]).year == 0 || (!CurrentCampaign->StartDate.ContainsDate(std::get<4>(this->Units[i]))))
+				CurrentCampaign && (std::get<3>(this->Units[i]).Year == 0 || CurrentCampaign->StartDate.ContainsDate(std::get<3>(this->Units[i])))
+				&& (std::get<4>(this->Units[i]).Year == 0 || (!CurrentCampaign->StartDate.ContainsDate(std::get<4>(this->Units[i]))))
 			)
 		) {
 			CPlayer *player = NULL;
@@ -1174,7 +1174,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			continue;
 		}
 		
-		if ((!CurrentCampaign || std::get<3>(this->Heroes[i]).year == 0 || CurrentCampaign->StartDate.ContainsDate(std::get<3>(this->Heroes[i]))) && (std::get<4>(this->Heroes[i]).year == 0 || !CurrentCampaign->StartDate.ContainsDate(std::get<4>(this->Heroes[i])))) {
+		if ((!CurrentCampaign || std::get<3>(this->Heroes[i]).Year == 0 || CurrentCampaign->StartDate.ContainsDate(std::get<3>(this->Heroes[i]))) && (std::get<4>(this->Heroes[i]).Year == 0 || !CurrentCampaign->StartDate.ContainsDate(std::get<4>(this->Heroes[i])))) {
 			CPlayer *player = NULL;
 			if (std::get<2>(this->Heroes[i])) {
 				player = GetOrAddFactionPlayer(std::get<2>(this->Heroes[i]));
@@ -1212,7 +1212,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			continue;
 		}
 		
-		if (hero->Date.year == 0 || !CurrentCampaign->StartDate.ContainsDate(hero->Date) || CurrentCampaign->StartDate.ContainsDate(hero->DeathDate)) { //contrary to other elements, heroes aren't implemented if their date isn't set
+		if (hero->StartDate.Year == 0 || !CurrentCampaign->StartDate.ContainsDate(hero->StartDate) || CurrentCampaign->StartDate.ContainsDate(hero->DeathDate)) { //contrary to other elements, heroes aren't implemented if their date isn't set
 			continue;
 		}
 		

@@ -39,6 +39,10 @@
 #include <vector>
 #include <tuple>
 
+#ifndef __DATE_H__
+#include "date.h"
+#endif
+
 #ifndef __ICONS_H__
 #include "icons.h"
 #endif

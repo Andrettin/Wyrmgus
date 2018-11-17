@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name timeline.h - The timeline header file. */
+/**@name date.h - The date header file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TIMELINE_H__
-#define __TIMELINE_H__
+#ifndef __DATE_H__
+#define __DATE_H__
 
 //@{
 
@@ -36,43 +36,94 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <map>
 #include <string>
-#include <vector>
-
-#ifndef __DATE_H__
-#include "date.h"
-#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
+class CTimeline;
 
-class CTimeline
+class CDate
 {
 public:
-	CTimeline() :
-		ID(-1)
+	CDate() :
+		Year(0), Month(1), Day(1), Timeline(NULL)
 	{
 	}
 	
-	static CTimeline *GetTimeline(std::string ident);
-	static CTimeline *GetOrAddTimeline(std::string ident);
-	static void ClearTimelines();
+	static CDate FromString(std::string date_str);
 	
-	static std::vector<CTimeline *> Timelines;
-	static std::map<std::string, CTimeline *> TimelinesByIdent;
+	bool ContainsDate(const CDate &date) const; /// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
+	CDate ToBaseCalendar(const CCalendar *current_calendar) const;
+	std::string ToDisplayString() const;
 	
-	void ProcessConfigData(CConfigData *config_data);
+	int Year;
+	char Month;
+	char Day;
+	CTimeline *Timeline;
 	
-	int ID;
-	std::string Ident;
-	std::string Name;
-	CDate PointOfDivergence;											/// The point of divergence for this timeline
+	bool operator <(const CDate& rhs) const {
+		if (Year < rhs.Year) {
+			return true;
+        } else if (Year == rhs.Year) {
+			if (Month < rhs.Month) {
+				return true;
+			} else if (Month == rhs.Month) {
+				return Day < rhs.Day;
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator <=(const CDate& rhs) const {
+		if (Year < rhs.Year) {
+			return true;
+        } else if (Year == rhs.Year) {
+			if (Month < rhs.Month) {
+				return true;
+			} else if (Month == rhs.Month) {
+				return Day <= rhs.Day;
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator >(const CDate& rhs) const {
+		if (Year > rhs.Year) {
+			return true;
+        } else if (Year == rhs.Year) {
+			if (Month > rhs.Month) {
+				return true;
+			} else if (Month == rhs.Month) {
+				return Day > rhs.Day;
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator >=(const CDate& rhs) const {
+		if (Year > rhs.Year) {
+			return true;
+        } else if (Year == rhs.Year) {
+			if (Month > rhs.Month) {
+				return true;
+			} else if (Month == rhs.Month) {
+				return Day >= rhs.Day;
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator ==(const CDate& rhs) const {
+		return Year == rhs.Year && Month == rhs.Month && Day == rhs.Day;
+	}
 };
 
 //@}
 
-#endif // !__TIMELINE_H__
+#endif // !__DATE_H__

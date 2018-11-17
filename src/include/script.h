@@ -54,6 +54,7 @@ extern "C" {
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CDate;
 //Wyrmgus start
 class CFaction;
 //Wyrmgus end

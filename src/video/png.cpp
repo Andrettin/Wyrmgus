@@ -627,7 +627,7 @@ void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overl
 	} else {
 		std::map<int, std::map<int, CTerrainType *>> terrain_map;
 		for (size_t i = 0; i < map_template->HistoricalTerrains.size(); ++i) {
-			if (std::get<2>(map_template->HistoricalTerrains[i]).year == 0) {
+			if (std::get<2>(map_template->HistoricalTerrains[i]).Year == 0) {
 				Vec2i terrain_pos = std::get<0>(map_template->HistoricalTerrains[i]);
 				CTerrainType *terrain_type = std::get<1>(map_template->HistoricalTerrains[i]);
 				if (terrain_type->Overlay == overlay) {
