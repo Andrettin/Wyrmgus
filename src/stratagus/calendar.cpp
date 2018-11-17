@@ -216,6 +216,16 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 	if (this->Months.empty()) {
 		fprintf(stderr, "No months have been defined for calendar \"%s\".\n", this->Ident.c_str());
 	}
+	
+	this->Initialized = true;
+	
+	//inherit the intersection points calendars with which it has intersection points
+	//inherit the intersection points from the intersecting calendar that it has with third calendars
+	for (std::map<CCalendar *, std::map<CDate, CDate>>::iterator iterator = this->ChronologicalIntersections.begin(); iterator != this->ChronologicalIntersections.end(); ++iterator) {
+		CCalendar *intersecting_calendar = iterator->first;
+		
+		this->InheritChronologicalIntersectionsFromCalendar(intersecting_calendar);
+	}
 }
 
 void CCalendar::AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date)
@@ -232,16 +242,31 @@ void CCalendar::AddChronologicalIntersection(CCalendar *intersecting_calendar, c
 	
 	intersecting_calendar->AddChronologicalIntersection(this, intersecting_date, date);
 	
-	//inherit the intersection points from the intersecting calendar that it has with third calendars
+	InheritChronologicalIntersectionsFromCalendar(intersecting_calendar);
+}
+
+void CCalendar::InheritChronologicalIntersectionsFromCalendar(CCalendar *intersecting_calendar)
+{
+	if (!intersecting_calendar || !intersecting_calendar->IsInitialized()) {
+		return;
+	}
+	
 	for (std::map<CCalendar *, std::map<CDate, CDate>>::iterator iterator = intersecting_calendar->ChronologicalIntersections.begin(); iterator != intersecting_calendar->ChronologicalIntersections.end(); ++iterator) {
 		CCalendar *third_calendar = iterator->first;
-		if (third_calendar == this) {
+		
+		if (third_calendar == this || !third_calendar->IsInitialized()) {
 			continue;
 		}
+		
 		for (std::map<CDate, CDate>::iterator sub_iterator = iterator->second.begin(); sub_iterator != iterator->second.end(); ++sub_iterator) {
 			this->AddChronologicalIntersection(third_calendar, sub_iterator->first.ToCalendar(intersecting_calendar, this), sub_iterator->second);
 		}
 	}
+}
+
+bool CCalendar::IsInitialized()
+{
+	return this->Initialized;
 }
 
 std::pair<CDate, CDate> CCalendar::GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const

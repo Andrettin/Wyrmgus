@@ -117,6 +117,69 @@ bool CDate::ContainsDate(const CDate &date) const
 	return false;
 }
 
+void CDate::AddMonths(CCalendar *calendar, const int months)
+{
+	this->Month += months;
+	
+	if (this->Month > 0) {
+		while (this->Month > (int) calendar->Months.size()) {
+			this->Month -= calendar->Months.size();
+			this->Year++;
+		}
+	} else {
+		while (this->Month <= 0) {
+			this->Month += calendar->Months.size();
+			this->Year--;
+		}
+	}
+}
+
+void CDate::AddDays(CCalendar *calendar, const int days)
+{
+	this->Day += days;
+	
+	if (this->Day > 0) {
+		while (this->Day > calendar->DaysPerYear) {
+			this->Day -= calendar->DaysPerYear;
+			this->Year++;
+		}
+		
+		while (this->Day > calendar->Months[this->Month - 1]->Days) {
+			this->Day -= calendar->Months[this->Month - 1]->Days;
+			this->AddMonths(calendar, 1);
+		}
+	} else {
+		while (this->Day <= (-calendar->DaysPerYear + 1)) {
+			this->Day += calendar->DaysPerYear;
+			this->Year--;
+		}
+		
+		while (this->Day <= 0) {
+			this->Day += calendar->Months[this->Month - 1]->Days;
+			this->AddMonths(calendar, -1);
+		}
+	}
+}
+
+void CDate::AddHours(CCalendar *calendar, const long long int hours)
+{
+	this->AddDays(calendar, hours / calendar->HoursPerDay);
+	
+	this->Hour += hours % calendar->HoursPerDay;
+	
+	if (this->Hour >= 0) {
+		while (this->Hour >= calendar->HoursPerDay) {
+			this->Hour -= calendar->HoursPerDay;
+			this->AddDays(calendar, 1);
+		}
+	} else {
+		while (this->Hour < 0) {
+			this->Hour += calendar->HoursPerDay;
+			this->AddDays(calendar, -1);
+		}
+	}
+}
+
 CDate CDate::ToCalendar(CCalendar *current_calendar, CCalendar *new_calendar) const
 {
 	if (current_calendar == new_calendar) {
@@ -135,6 +198,10 @@ CDate CDate::ToCalendar(CCalendar *current_calendar, CCalendar *new_calendar) co
 	if (chronological_intersection.first.Year != 0) { //whether the chronological intersection returned is valid
 		if (current_calendar->DaysPerYear == new_calendar->DaysPerYear) { //if the quantity of days per year is the same in both calendars, then we can just use the year difference in the intersection to get the resulting year for this date in the new calendar
 			date.Year += chronological_intersection.second.Year - chronological_intersection.first.Year;
+		} else if (current_calendar->HoursPerDay == new_calendar->HoursPerDay) { //if the quantity of days per years is different, but the hours in a day are the same, add the year difference in days
+			date.AddDays(new_calendar, chronological_intersection.second.Year * new_calendar->DaysPerYear - chronological_intersection.first.Year * current_calendar->DaysPerYear);
+		} else {
+			date.AddHours(new_calendar, (long long int) chronological_intersection.second.Year * new_calendar->DaysPerYear * new_calendar->HoursPerDay - (long long int) chronological_intersection.first.Year * current_calendar->DaysPerYear * current_calendar->HoursPerDay);
 		}
 	} else {
 		fprintf(stderr, "Dates in calendar \"%s\" cannot be converted to calendar \"%s\", as no chronological intersections are present.\n", current_calendar->Ident.c_str(), new_calendar->Ident.c_str());
@@ -189,7 +256,7 @@ unsigned long long CDate::GetTotalHours(CCalendar *calendar) const
 	
 	unsigned long long days = 0;
 	days += (date.Year - 1 + BaseCalendarYearOffsetForHours) * calendar->DaysPerYear;
-	for (size_t i = 0; i < (date.Month - 1); ++i) {
+	for (int i = 0; i < (date.Month - 1); ++i) {
 		days += calendar->Months[i]->Days;
 	}
 	days += date.Day - 1;

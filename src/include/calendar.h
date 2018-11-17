@@ -68,7 +68,7 @@ class CCalendar
 {
 public:
 	CCalendar() :
-		HoursPerDay(DefaultHoursPerDay), DaysPerYear(0)
+		Initialized(false), HoursPerDay(DefaultHoursPerDay), DaysPerYear(0)
 	{
 	}
 	
@@ -85,10 +85,13 @@ public:
 	
 	void ProcessConfigData(CConfigData *config_data);
 	void AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date);
+	void InheritChronologicalIntersectionsFromCalendar(CCalendar *intersecting_calendar);
+	bool IsInitialized();
 	std::pair<CDate, CDate> GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const;
 	
 	std::string Ident;
 	std::string Name;
+	bool Initialized;
 	int HoursPerDay;
 	int DaysPerYear;
 	std::string YearLabel;
