@@ -171,11 +171,11 @@ std::string CDate::ToDisplayString(const CCalendar *calendar) const
 	return display_string;
 }
 
-unsigned long CDate::GetTotalHours(const CCalendar *calendar) const
+unsigned long long CDate::GetTotalHours(const CCalendar *calendar) const
 {
 	CDate date = this->ToBaseCalendar(calendar);
 	
-	unsigned long hours = date.Hour;
+	unsigned long long hours = date.Hour;
 	hours += (unsigned long) ((date.Year + BaseCalendarYearOffsetForHours) * calendar->DaysPerYear + date.Month * calendar->DaysPerMonth + date.Day) * calendar->HoursPerDay;
 	
 	return hours;

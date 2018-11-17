@@ -113,7 +113,7 @@ std::string PlayerFaction;
 //Wyrmgus end
 
 unsigned long GameCycle;				/// Game simulation cycle counter
-unsigned long GameHour;					/// Game simulation hour counter
+unsigned long long GameHour;			/// Game simulation hour counter
 unsigned long FastForwardCycle;			/// Cycle to fastforward to in a replay
 
 bool UseHPForXp = false;				/// true if gain XP by dealing damage, false if by killing.

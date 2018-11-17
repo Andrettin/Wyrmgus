@@ -87,7 +87,7 @@ void CCalendar::ClearCalendars()
 	BaseCalendar = NULL;
 }
 
-int CCalendar::GetTimeOfDay(const unsigned long hours, const int hours_per_day)
+int CCalendar::GetTimeOfDay(const unsigned long long hours, const int hours_per_day)
 {
 	int standardized_hour = hours % hours_per_day;
 	standardized_hour *= DefaultHoursPerDay;

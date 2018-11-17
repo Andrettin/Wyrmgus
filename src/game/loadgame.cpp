@@ -289,7 +289,7 @@ void LoadGame(const std::string &filename)
 	PlaceUnits();
 
 	const unsigned long game_cycle = GameCycle;
-	const unsigned long game_hour = GameHour;
+	const unsigned long long game_hour = GameHour;
 	const unsigned syncrand = SyncRandSeed;
 	const unsigned synchash = SyncHash;
 

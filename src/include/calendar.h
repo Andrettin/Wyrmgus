@@ -57,7 +57,7 @@ public:
 	static CCalendar *GetCalendar(std::string ident);
 	static CCalendar *GetOrAddCalendar(std::string ident);
 	static void ClearCalendars();
-	static int GetTimeOfDay(const unsigned long hours, const int hours_per_day);
+	static int GetTimeOfDay(const unsigned long long hours, const int hours_per_day);
 	
 	static std::vector<CCalendar *> Calendars;
 	static std::map<std::string, CCalendar *> CalendarsByIdent;
