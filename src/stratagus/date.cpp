@@ -38,11 +38,16 @@
 #include "date.h"
 
 #include "calendar.h"
+#include "player.h"
+#include "quest.h"
 #include "timeline.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+
+CDate CDate::CurrentDate;
+std::string CDate::CurrentDateDisplayString;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -88,11 +93,27 @@ CDate CDate::FromString(std::string date_str)
 		date.Day = std::stoi(date_vector[2 + offset]);
 	}
 	
+	if (date_vector.size() >= (4 + offset)) {
+		date.Hour = std::stoi(date_vector[3 + offset]);
+	}
+	
 	if (calendar) {
 		date = date.ToBaseCalendar(calendar);
 	}
 	
 	return date;
+}
+
+void CDate::UpdateCurrentDateDisplayString()
+{
+	if (!ThisPlayer) {
+		CurrentDateDisplayString = "";
+		return;
+	}
+	
+	CCalendar *calendar = PlayerRaces.Civilizations[ThisPlayer->Race]->GetCalendar();
+	
+	CurrentDateDisplayString = CurrentDate.ToDisplayString(calendar);
 }
 
 void CDate::Clear()
@@ -220,6 +241,18 @@ CDate CDate::ToBaseCalendar(CCalendar *current_calendar) const
 	return this->ToCalendar(current_calendar, CCalendar::BaseCalendar);
 }
 
+std::string CDate::ToString(const CCalendar *calendar) const
+{
+	std::string date_string;
+	
+	date_string += std::to_string((long long) this->Year);
+	date_string += "." + std::to_string((long long) this->Month);
+	date_string += "." + std::to_string((long long) this->Day);
+	date_string += "." + std::to_string((long long) this->Hour);
+	
+	return date_string;
+}
+
 std::string CDate::ToDisplayString(const CCalendar *calendar) const
 {
 	std::string display_string;
@@ -263,6 +296,12 @@ unsigned long long CDate::GetTotalHours(CCalendar *calendar) const
 	hours += days * calendar->HoursPerDay;
 	
 	return hours;
+}
+
+void SetCurrentDate(std::string date_string)
+{
+	CDate::CurrentDate = CDate::FromString(date_string);
+	CDate::UpdateCurrentDateDisplayString();
 }
 
 //@}

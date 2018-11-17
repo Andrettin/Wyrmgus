@@ -301,6 +301,8 @@ void LoadGame(const std::string &filename)
 	SyncRandSeed = syncrand;
 	SyncHash = synchash;
 	SelectionChanged();
+	
+	CDate::UpdateCurrentDateDisplayString();
 }
 
 //@}

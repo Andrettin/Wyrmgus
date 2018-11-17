@@ -10,7 +10,7 @@
 //
 /**@name savegame.cpp - Save game. */
 //
-//      (c) Copyright 2001-2015 by Lutz Sammer, Andreas Arens and Andrettin
+//      (c) Copyright 2001-2018 by Lutz Sammer, Andreas Arens and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@
 
 #include "actions.h"
 #include "ai.h"
+#include "calendar.h"
 #include "character.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -169,6 +170,7 @@ int SaveGame(const std::string &filename)
 	// FIXME: probably not the right place for this
 	file.printf("GameCycle = %lu\n", GameCycle);
 	file.printf("GameHour = %llu\n", GameHour);
+	file.printf("SetCurrentDate(\"%s\")\n", CDate::CurrentDate.ToString(CCalendar::BaseCalendar).c_str());
 
 	file.printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
 

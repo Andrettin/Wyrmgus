@@ -906,9 +906,17 @@ void DrawDayTime() {
 		"Late Night"
 	};
 	CLabel label(GetGameFont());
+	
+	std::string date_time_text;
+	
+	if (CurrentCampaign) {
+		date_time_text += CDate::CurrentDateDisplayString + " - ";
+	}
+	
+	date_time_text += _(timesText[Map.MapLayers[CurrentMapLayer]->TimeOfDay]);
 
 	// TODO: Instead of a simple text here we could use an icon per time of day
-	label.Draw(UI.TimePanel.X, UI.TimePanel.Y, _(timesText[Map.MapLayers[CurrentMapLayer]->TimeOfDay]));
+	label.Draw(UI.TimePanel.X - GetGameFont().getWidth(date_time_text) / 2, UI.TimePanel.Y, date_time_text);
 }
 
 /*----------------------------------------------------------------------------

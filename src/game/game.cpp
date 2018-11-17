@@ -1675,8 +1675,10 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	
 	if (CurrentCampaign) {
 		GameHour = CurrentCampaign->StartDate.GetTotalHours(CCalendar::BaseCalendar);
+		CDate::CurrentDate = CurrentCampaign->StartDate;
 	} else {
 		GameHour = SyncRand(DefaultHoursPerDay); //start at a random time of day
+		CDate::CurrentDate.Clear();
 	}
 	//Wyrmgus end
 
@@ -1875,6 +1877,8 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	// Triggers
 	//
 	InitTriggers();
+	
+	CDate::UpdateCurrentDateDisplayString();
 	
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 

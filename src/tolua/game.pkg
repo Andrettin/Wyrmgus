@@ -94,3 +94,4 @@ enum GameTypes {
 extern void GenerateHistory();
 extern bool LoadingHistory;
 extern bool DefiningData;
+extern void SetCurrentDate(std::string date_string);

@@ -36,6 +36,7 @@
 #include "stratagus.h"
 
 #include "actions.h"
+#include "calendar.h"
 //Wyrmgus start
 #include "character.h"
 #include "commands.h"
@@ -436,6 +437,8 @@ static void GameLogicLoop()
 		//Wyrmgus start
 		if (GameCycle > 0 && GameCycle % CyclesPerInGameHour == 0) {
 			GameHour++;
+			CDate::CurrentDate.AddHours(CCalendar::BaseCalendar, 1);
+			CDate::UpdateCurrentDateDisplayString();
 			for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 				CMapLayer *map_layer = Map.MapLayers[z];
 				int cycles_per_time_of_day = map_layer->HoursPerDay;
