@@ -180,7 +180,9 @@ extern const char NameLine[];
 
 #define PopulationPerUnit 1000		/// Number of people a unit represents
 
-#define DefaultTimeOfDaySeconds (10 * 3) // every 10 seconds of gameplay = 1 hour for time of day calculations, change time of day every three hours
+#define DefaultHoursPerDay 24
+
+#define CyclesPerInGameHour (CYCLES_PER_SECOND * 10) // every 10 seconds of gameplay = 1 hour for the purposes of ingame time
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)

@@ -50,7 +50,7 @@ class CPlane
 {
 public:
 	CPlane() :
-		ID(-1), TimeOfDaySeconds(DefaultTimeOfDaySeconds)
+		ID(-1), HoursPerDay(DefaultHoursPerDay)
 	{
 	}
 	
@@ -61,7 +61,7 @@ public:
 	static std::vector<CPlane *> Planes;								/// Planes
 
 	int ID;																/// ID of this plane
-	int TimeOfDaySeconds;												/// How many seconds does it take to change the time of day in this plane
+	int HoursPerDay;													/// How many hours does a day in this plane contain
 	std::string Ident;
 	std::string Name;
 	std::string Description;

@@ -52,7 +52,7 @@ class CWorld
 {
 public:
 	CWorld() :
-		ID(-1), Plane(NULL), TimeOfDaySeconds(DefaultTimeOfDaySeconds)
+		ID(-1), Plane(NULL), HoursPerDay(DefaultHoursPerDay)
 	{
 	}
 	
@@ -63,7 +63,7 @@ public:
 	static std::vector<CWorld *> Worlds;								/// Worlds
 
 	int ID;																/// ID of this world
-	int TimeOfDaySeconds;												/// How many seconds does it take to change the time of day in this world
+	int HoursPerDay;													/// How many hours does a day in this world contain
 	std::string Ident;
 	std::string Name;
 	std::string Description;

@@ -436,17 +436,19 @@ static void GameLogicLoop()
 		//Wyrmgus start
 		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 			CMapLayer *map_layer = Map.MapLayers[z];
-			int time_of_day_seconds = DefaultTimeOfDaySeconds;
+			int cycles_per_time_of_day = DefaultHoursPerDay;
 			if (map_layer->World) {
-				time_of_day_seconds = map_layer->World->TimeOfDaySeconds;
+				cycles_per_time_of_day = map_layer->World->HoursPerDay;
 			} else if (map_layer->Plane) {
-				time_of_day_seconds = map_layer->Plane->TimeOfDaySeconds;
+				cycles_per_time_of_day = map_layer->Plane->HoursPerDay;
 			}
-			if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !time_of_day_seconds) {
+			cycles_per_time_of_day *= CyclesPerInGameHour;
+			cycles_per_time_of_day /= MaxTimesOfDay - 1;
+			if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !cycles_per_time_of_day) {
 				map_layer->TimeOfDay = NoTimeOfDay; //the map layer has no time of day
 				continue;
 			}
-			if (GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * time_of_day_seconds) == 0) { 
+			if (GameCycle > 0 && GameCycle % cycles_per_time_of_day == 0) { 
 				map_layer->TimeOfDay += 1;
 				if (map_layer->TimeOfDay == MaxTimesOfDay) {
 					map_layer->TimeOfDay = 1;

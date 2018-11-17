@@ -130,8 +130,8 @@ static int CclDefinePlane(lua_State *l)
 			plane->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			plane->Quote = LuaToString(l, -1);
-		} else if (!strcmp(value, "TimeOfDaySeconds")) {
-			plane->TimeOfDaySeconds = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "HoursPerDay")) {
+			plane->HoursPerDay = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "EmpoweredDeityDomains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -186,8 +186,8 @@ static int CclDefineWorld(lua_State *l)
 				LuaError(l, "Plane doesn't exist.");
 			}
 			world->Plane = plane;
-		} else if (!strcmp(value, "TimeOfDaySeconds")) {
-			world->TimeOfDaySeconds = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "HoursPerDay")) {
+			world->HoursPerDay = LuaToNumber(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

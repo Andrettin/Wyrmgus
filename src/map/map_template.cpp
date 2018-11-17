@@ -399,7 +399,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	
 	if (
-		((this->World && this->World->TimeOfDaySeconds) || (!this->World && this->Plane && this->Plane->TimeOfDaySeconds))
+		((this->World && this->World->HoursPerDay) || (!this->World && this->Plane && this->Plane->HoursPerDay))
 		&& this->SurfaceLayer == 0
 		&& !GameSettings.Inside
 		&& !GameSettings.NoTimeOfDay
