@@ -51,6 +51,30 @@ CCalendar * CCalendar::BaseCalendar = NULL;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+void CMonth::ProcessConfigData(CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "days") {
+			this->Days = std::stoi(value);
+		} else {
+			fprintf(stderr, "Invalid month property: \"%s\".\n", key.c_str());
+		}
+	}
+}
+
+CCalendar::~CCalendar()
+{
+	for (size_t i = 0; i < Months.size(); ++i) {
+		delete Months[i];
+	}
+	Months.clear();
+}
+
 /**
 **  Get a calendar
 */
@@ -139,10 +163,15 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
 		CConfigData *child_config_data = config_data->Children[i];
 		
-		if (child_config_data->Tag == "year_difference") {
+		if (child_config_data->Tag == "month") {
+			CMonth *month = new CMonth;
+			month->ProcessConfigData(child_config_data);
+			this->Months.push_back(month);
+			this->DaysPerYear += month->Days;
+		} else if (child_config_data->Tag == "chronological_intersection") {
 			CCalendar *calendar = NULL;
-			int difference = 0;
-			bool difference_changed = false;
+			CDate date;
+			CDate intersecting_date;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -154,59 +183,79 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 					if (!calendar) {
 						fprintf(stderr, "Calendar \"%s\" does not exist.\n", value.c_str());
 					}
-				} else if (key == "difference") {
-					difference = std::stoi(value);
-					difference_changed = true;
+				} else if (key == "date") {
+					date = CDate::FromString(value);
+				} else if (key == "intersecting_date") {
+					intersecting_date = CDate::FromString(value);
 				} else {
 					fprintf(stderr, "Invalid year difference property: \"%s\".\n", key.c_str());
 				}
 			}
 			
 			if (!calendar) {
-				fprintf(stderr, "Year difference has no \"calendar\" property.\n");
+				fprintf(stderr, "Chronological intersection has no \"calendar\" property.\n");
 				continue;
 			}
 			
-			if (!difference_changed) {
-				fprintf(stderr, "Year difference has no \"difference\" property.\n");
+			if (date.Year == 0) {
+				fprintf(stderr, "Chronological intersection has no \"date\" property.\n");
 				continue;
 			}
 			
+			if (intersecting_date.Year == 0) {
+				fprintf(stderr, "Chronological intersection has no \"intersecting_date\" property.\n");
+				continue;
+			}
 			
-			this->SetYearDifference(calendar, difference);
+			this->AddChronologicalIntersection(calendar, date, intersecting_date);
 		} else {
 			fprintf(stderr, "Invalid calendar property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
+	
+	if (this->Months.empty()) {
+		fprintf(stderr, "No months have been defined for calendar \"%s\".\n", this->Ident.c_str());
+	}
 }
 
-void CCalendar::SetYearDifference(CCalendar *calendar, int difference)
+void CCalendar::AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date)
 {
-	if (!calendar) {
+	if (!intersecting_calendar) {
 		return;
 	}
 	
-	if (this->YearDifferences[calendar] == difference) {
-		return;
+	if (this->ChronologicalIntersections[intersecting_calendar].find(date) != this->ChronologicalIntersections[intersecting_calendar].end()) {
+		return; //already defined
 	}
 	
-	this->YearDifferences[calendar] = difference;
+	this->ChronologicalIntersections[intersecting_calendar][date] = intersecting_date;
 			
-	calendar->SetYearDifference(this, -difference);
+	intersecting_calendar->AddChronologicalIntersection(this, intersecting_date, date);
+}
+
+std::pair<CDate, CDate> CCalendar::GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const
+{
+	std::pair<CDate, CDate> chronological_intersection(*(new CDate), *(new CDate));
+	
+	if (this->ChronologicalIntersections.find(calendar) == this->ChronologicalIntersections.end()) {
+		return chronological_intersection;
+	}
+	
+	int best_year_difference = 0;
+	for (std::map<CDate, CDate>::const_iterator iterator = this->ChronologicalIntersections.find(calendar)->second.begin(); iterator != this->ChronologicalIntersections.find(calendar)->second.end(); ++iterator) {
+		int year_difference = abs(date.Year - iterator->first.Year);
 		
-	//get the other year differences from the other calendar as well
-	for (std::map<CCalendar *, int>::const_iterator iterator = calendar->YearDifferences.begin(); iterator != calendar->YearDifferences.end(); ++iterator) {
-		if (iterator->first != this && this->YearDifferences.find(iterator->first) == this->YearDifferences.end()) {
-			this->YearDifferences[iterator->first] = difference + iterator->second;
+		if (
+			chronological_intersection.first.Year == 0 //invalid chronological intersection (none set yet)
+			|| year_difference < best_year_difference
+		) {
+			chronological_intersection.first = iterator->first;
+			chronological_intersection.second = iterator->second;
+			best_year_difference = year_difference;
 		}
 	}
 	
-	//set year difference for the new calendar, for other calendars for which this one has year differences
-	for (std::map<CCalendar *, int>::const_iterator iterator = this->YearDifferences.begin(); iterator != this->YearDifferences.end(); ++iterator) {
-		if (iterator->first && iterator->first->YearDifferences.find(calendar) == iterator->first->YearDifferences.end()) {
-			iterator->first->SetYearDifference(calendar, iterator->second + difference);
-		}
-	}
+	return chronological_intersection;
 }
 
 //@}

@@ -40,19 +40,39 @@
 #include <string>
 #include <vector>
 
+#ifndef __DATE_H__
+#include "date.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
 
+class CMonth
+{
+public:
+	CMonth() :
+		Days(0)
+	{
+	}
+	
+	void ProcessConfigData(CConfigData *config_data);
+
+	std::string Name;
+	int Days;
+};
+
 class CCalendar
 {
 public:
 	CCalendar() :
-		HoursPerDay(DefaultHoursPerDay), DaysPerMonth(30), MonthsPerYear(12), DaysPerYear(365)
+		HoursPerDay(DefaultHoursPerDay), DaysPerYear(0)
 	{
 	}
+	
+	~CCalendar();
 	
 	static CCalendar *GetCalendar(std::string ident);
 	static CCalendar *GetOrAddCalendar(std::string ident);
@@ -64,17 +84,17 @@ public:
 	static CCalendar *BaseCalendar;
 	
 	void ProcessConfigData(CConfigData *config_data);
-	void SetYearDifference(CCalendar *calendar, int difference);
+	void AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date);
+	std::pair<CDate, CDate> GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const;
 	
 	std::string Ident;
 	std::string Name;
 	int HoursPerDay;
-	int DaysPerMonth;
-	int MonthsPerYear;
 	int DaysPerYear;
 	std::string YearLabel;
 	std::string NegativeYearLabel;
-	std::map<CCalendar *, int> YearDifferences;				/// The difference in years between this calendar and other calendars; assumes other calendars have the same month structure and days per year
+	std::vector<CMonth *> Months;
+	std::map<CCalendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// Chronological intersection points between this calendar and other calendars
 };
 
 //@}

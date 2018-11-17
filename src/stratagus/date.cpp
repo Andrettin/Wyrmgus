@@ -131,13 +131,17 @@ CDate CDate::ToBaseCalendar(const CCalendar *current_calendar) const
 	date.Hour = this->Hour;
 	
 	if (CCalendar::BaseCalendar) {
-		if (current_calendar->YearDifferences.find(CCalendar::BaseCalendar) != current_calendar->YearDifferences.end()) {
-			date.Year += current_calendar->YearDifferences.find(CCalendar::BaseCalendar)->second;
+		std::pair<CDate, CDate> chronological_intersection = current_calendar->GetBestChronologicalIntersectionForDate(CCalendar::BaseCalendar, *this);
+		
+		if (chronological_intersection.first.Year != 0) { //whether the chronological intersection returned is valid
+			if (current_calendar->DaysPerYear == CCalendar::BaseCalendar->DaysPerYear) { //if the quantity of days per year is the same in both calendars, then we can just use the year difference in the intersection to get the resulting year for this date in the base calendar
+				date.Year += chronological_intersection.second.Year - chronological_intersection.first.Year;
+			}
 		} else {
-			fprintf(stderr, "Dates in calendar \"%s\" cannot be converted to the base calendar.\n", current_calendar->Ident.c_str());
+			fprintf(stderr, "Dates in calendar \"%s\" cannot be converted to the base calendar, as no chronological intersections are present.\n", current_calendar->Ident.c_str());
 		}
 	} else {
-		fprintf(stderr, "No base calendar has been defined.\n", current_calendar->Ident.c_str());
+		fprintf(stderr, "No base calendar has been defined.\n");
 	}
 	
 	return date;
@@ -176,7 +180,14 @@ unsigned long long CDate::GetTotalHours(const CCalendar *calendar) const
 	CDate date = this->ToBaseCalendar(calendar);
 	
 	unsigned long long hours = date.Hour;
-	hours += (unsigned long) ((date.Year + BaseCalendarYearOffsetForHours) * calendar->DaysPerYear + date.Month * calendar->DaysPerMonth + date.Day) * calendar->HoursPerDay;
+	
+	unsigned long long days = 0;
+	days += (date.Year - 1 + BaseCalendarYearOffsetForHours) * calendar->DaysPerYear;
+	for (size_t i = 0; i < (date.Month - 1); ++i) {
+		days += calendar->Months[i]->Days;
+	}
+	days += date.Day - 1;
+	hours += days * calendar->HoursPerDay;
 	
 	return hours;
 }
