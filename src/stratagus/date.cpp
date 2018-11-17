@@ -117,9 +117,9 @@ bool CDate::ContainsDate(const CDate &date) const
 	return false;
 }
 
-CDate CDate::ToBaseCalendar(const CCalendar *current_calendar) const
+CDate CDate::ToCalendar(CCalendar *current_calendar, CCalendar *new_calendar) const
 {
-	if (current_calendar == CCalendar::BaseCalendar) {
+	if (current_calendar == new_calendar) {
 		return *this;
 	}
 	
@@ -130,21 +130,27 @@ CDate CDate::ToBaseCalendar(const CCalendar *current_calendar) const
 	date.Day = this->Day;
 	date.Hour = this->Hour;
 	
-	if (CCalendar::BaseCalendar) {
-		std::pair<CDate, CDate> chronological_intersection = current_calendar->GetBestChronologicalIntersectionForDate(CCalendar::BaseCalendar, *this);
-		
-		if (chronological_intersection.first.Year != 0) { //whether the chronological intersection returned is valid
-			if (current_calendar->DaysPerYear == CCalendar::BaseCalendar->DaysPerYear) { //if the quantity of days per year is the same in both calendars, then we can just use the year difference in the intersection to get the resulting year for this date in the base calendar
-				date.Year += chronological_intersection.second.Year - chronological_intersection.first.Year;
-			}
-		} else {
-			fprintf(stderr, "Dates in calendar \"%s\" cannot be converted to the base calendar, as no chronological intersections are present.\n", current_calendar->Ident.c_str());
+	std::pair<CDate, CDate> chronological_intersection = current_calendar->GetBestChronologicalIntersectionForDate(new_calendar, *this);
+	
+	if (chronological_intersection.first.Year != 0) { //whether the chronological intersection returned is valid
+		if (current_calendar->DaysPerYear == new_calendar->DaysPerYear) { //if the quantity of days per year is the same in both calendars, then we can just use the year difference in the intersection to get the resulting year for this date in the new calendar
+			date.Year += chronological_intersection.second.Year - chronological_intersection.first.Year;
 		}
 	} else {
-		fprintf(stderr, "No base calendar has been defined.\n");
+		fprintf(stderr, "Dates in calendar \"%s\" cannot be converted to calendar \"%s\", as no chronological intersections are present.\n", current_calendar->Ident.c_str(), new_calendar->Ident.c_str());
 	}
 	
 	return date;
+}
+
+CDate CDate::ToBaseCalendar(CCalendar *current_calendar) const
+{
+	if (!CCalendar::BaseCalendar) {
+		fprintf(stderr, "No base calendar has been defined.\n");
+		return *this;
+	}
+	
+	return this->ToCalendar(current_calendar, CCalendar::BaseCalendar);
 }
 
 std::string CDate::ToDisplayString(const CCalendar *calendar) const
@@ -175,7 +181,7 @@ std::string CDate::ToDisplayString(const CCalendar *calendar) const
 	return display_string;
 }
 
-unsigned long long CDate::GetTotalHours(const CCalendar *calendar) const
+unsigned long long CDate::GetTotalHours(CCalendar *calendar) const
 {
 	CDate date = this->ToBaseCalendar(calendar);
 	

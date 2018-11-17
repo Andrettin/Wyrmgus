@@ -229,8 +229,19 @@ void CCalendar::AddChronologicalIntersection(CCalendar *intersecting_calendar, c
 	}
 	
 	this->ChronologicalIntersections[intersecting_calendar][date] = intersecting_date;
-			
+	
 	intersecting_calendar->AddChronologicalIntersection(this, intersecting_date, date);
+	
+	//inherit the intersection points from the intersecting calendar that it has with third calendars
+	for (std::map<CCalendar *, std::map<CDate, CDate>>::iterator iterator = intersecting_calendar->ChronologicalIntersections.begin(); iterator != intersecting_calendar->ChronologicalIntersections.end(); ++iterator) {
+		CCalendar *third_calendar = iterator->first;
+		if (third_calendar == this) {
+			continue;
+		}
+		for (std::map<CDate, CDate>::iterator sub_iterator = iterator->second.begin(); sub_iterator != iterator->second.end(); ++sub_iterator) {
+			this->AddChronologicalIntersection(third_calendar, sub_iterator->first.ToCalendar(intersecting_calendar, this), sub_iterator->second);
+		}
+	}
 }
 
 std::pair<CDate, CDate> CCalendar::GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const
