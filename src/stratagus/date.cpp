@@ -138,6 +138,19 @@ bool CDate::ContainsDate(const CDate &date) const
 	return false;
 }
 
+void CDate::AddYears(CCalendar *calendar, const int years)
+{
+	this->Year += years;
+	
+	if (this->Year == 0) {
+		if (years < 0) {
+			this->Year = -1;
+		} else {
+			this->Year = 1;
+		}
+	}
+}
+
 void CDate::AddMonths(CCalendar *calendar, const int months)
 {
 	this->Month += months;
@@ -145,12 +158,12 @@ void CDate::AddMonths(CCalendar *calendar, const int months)
 	if (this->Month > 0) {
 		while (this->Month > (int) calendar->Months.size()) {
 			this->Month -= calendar->Months.size();
-			this->Year++;
+			this->AddYears(calendar, 1);
 		}
 	} else {
 		while (this->Month <= 0) {
 			this->Month += calendar->Months.size();
-			this->Year--;
+			this->AddYears(calendar, -1);
 		}
 	}
 }
@@ -162,7 +175,7 @@ void CDate::AddDays(CCalendar *calendar, const int days)
 	if (this->Day > 0) {
 		while (this->Day > calendar->DaysPerYear) {
 			this->Day -= calendar->DaysPerYear;
-			this->Year++;
+			this->AddYears(calendar, 1);
 		}
 		
 		while (this->Day > calendar->Months[this->Month - 1]->Days) {
@@ -172,7 +185,7 @@ void CDate::AddDays(CCalendar *calendar, const int days)
 	} else {
 		while (this->Day <= (-calendar->DaysPerYear + 1)) {
 			this->Day += calendar->DaysPerYear;
-			this->Year--;
+			this->AddYears(calendar, -1);
 		}
 		
 		while (this->Day <= 0) {

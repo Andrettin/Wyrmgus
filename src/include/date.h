@@ -62,6 +62,7 @@ public:
 
 	void Clear();
 	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
+	void AddYears(CCalendar *calendar, const int years);
 	void AddMonths(CCalendar *calendar, const int months);
 	void AddDays(CCalendar *calendar, const int days);
 	void AddHours(CCalendar *calendar, const long long int hours);
