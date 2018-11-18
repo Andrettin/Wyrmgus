@@ -360,7 +360,7 @@ std::string NumberToRomanNumeral(unsigned number)
 {
 	std::string numeral;
 	
-	for (std::map<int, std::string>::const_iterator iterator = RomanConversionTable.begin(); iterator != RomanConversionTable.end(); ++iterator) {
+	for (std::map<int, std::string>::const_reverse_iterator iterator = RomanConversionTable.rbegin(); iterator != RomanConversionTable.rend(); ++iterator) {
 		while (number >= iterator->first) {
 			numeral += iterator->second;
 			number -= iterator->first;
