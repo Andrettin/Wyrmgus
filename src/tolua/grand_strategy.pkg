@@ -1,7 +1,6 @@
 
 extern bool GrandStrategy;
 extern int GrandStrategyYear;
-extern int GrandStrategyMonth;
 extern std::string GrandStrategyWorld;
 extern int PopulationGrowthThreshold;
 

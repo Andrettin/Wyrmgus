@@ -94,8 +94,8 @@ public:
 	bool Initialized;
 	int HoursPerDay;
 	int DaysPerYear;
-	std::string YearLabel;
-	std::string NegativeYearLabel;
+	std::string YearLabel;														/// label used for years (e.g. AD)
+	std::string NegativeYearLabel;												/// label used for "negative" years (e.g. BC)
 	std::vector<CMonth *> Months;
 	std::map<CCalendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// Chronological intersection points between this calendar and other calendars
 };

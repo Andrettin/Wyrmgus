@@ -181,6 +181,7 @@ extern const char NameLine[];
 #define PopulationPerUnit 1000		/// Number of people a unit represents
 
 #define DefaultHoursPerDay 24
+#define DefaultDaysPerYear 365
 
 #define CyclesPerInGameHour (CYCLES_PER_SECOND * 10) // every 10 seconds of gameplay = 1 hour for the purposes of ingame time
 //Wyrmgus end
@@ -243,23 +244,6 @@ enum TimesOfDay {
 	MaxTimesOfDay
 };
 
-enum Months {
-	JanuaryMonth,
-	FebruaryMonth,
-	MarchMonth,
-	AprilMonth,
-	MayMonth,
-	JuneMonth,
-	JulyMonth,
-	AugustMonth,
-	SeptemberMonth,
-	OctoberMonth,
-	NovemberMonth,
-	DecemberMonth,
-	
-	MaxMonths
-};
-
 enum Difficulties {
 	DifficultyNoDifficulty = 0,
 	DifficultyEasy,
@@ -282,8 +266,6 @@ class CTimeline;
 
 #include <vec2i.h>
 
-extern std::string GetMonthNameById(int month);
-extern int GetMonthIdByName(std::string month);
 extern int GetReverseDirection(int direction);
 extern std::string GetDirectionNameById(int direction);
 extern int GetDirectionIdByName(std::string direction);

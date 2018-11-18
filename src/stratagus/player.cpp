@@ -730,15 +730,6 @@ int CCivilization::GetForceTypeWeight(int force_type) const
 	return 1;
 }
 
-std::string CCivilization::GetMonthName(int month) const
-{
-	if (this->Months.find(month) != this->Months.end()) {
-		return this->Months.find(month)->second;
-	}
-	
-	return CapitalizeString(GetMonthNameById(month));
-}
-
 CCalendar *CCivilization::GetCalendar() const
 {
 	if (this->Calendar) {

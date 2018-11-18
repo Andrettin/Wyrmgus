@@ -39,6 +39,7 @@
 
 #include "actions.h"
 #include "ai.h"
+#include "calendar.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
@@ -862,12 +863,6 @@ static int CclDefineCivilization(lua_State *l)
 			civilization->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Adjective")) {
 			civilization->Adjective = LuaToString(l, -1);
-		} else if (!strcmp(value, "CalendarStartingYear")) {
-			civilization->CalendarStartingYear = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "YearLabel")) {
-			civilization->YearLabel = LuaToString(l, -1);
-		} else if (!strcmp(value, "NegativeYearLabel")) {
-			civilization->NegativeYearLabel = LuaToString(l, -1);
 		} else if (!strcmp(value, "Visible")) {
 			PlayerRaces.Visible[civilization_id] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
@@ -879,11 +874,14 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Language")) {
 			CLanguage *language = PlayerRaces.GetLanguage(LuaToString(l, -1));
 			if (language) {
-				PlayerRaces.Civilizations[civilization_id]->Language = language;
+				civilization->Language = language;
 				language->UsedByCivilizationOrFaction = true;
 			} else {
 				LuaError(l, "Language not found.");
 			}
+		} else if (!strcmp(value, "Calendar")) {
+			CCalendar *calendar = CCalendar::GetOrAddCalendar(LuaToString(l, -1));
+			civilization->Calendar = calendar;
 		} else if (!strcmp(value, "DefaultColor")) {
 			PlayerRaces.DefaultColor[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "CivilizationUpgrade")) {
@@ -1057,21 +1055,6 @@ static int CclDefineCivilization(lua_State *l)
 					civilization->UnitSounds.HelpTown.Name = LuaToString(l, -1, k + 1);
 				} else {
 					LuaError(l, "Unsupported sound tag: %s" _C_ value);
-				}
-			}
-		} else if (!strcmp(value, "Months")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				std::string month_name = LuaToString(l, -1, j + 1);
-				int month = GetMonthIdByName(month_name);
-				if (month != -1) {
-					++j;
-					civilization->Months[month] = LuaToString(l, -1, j + 1);
-				} else {
-					LuaError(l, "Month \"%s\" doesn't exist." _C_ month_name.c_str());
 				}
 			}
 		} else if (!strcmp(value, "PersonalNames")) {
@@ -1670,15 +1653,6 @@ static int CclGetCivilizationData(lua_State *l)
 			lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
 		}
 		return 1;
-	} else if (!strcmp(data, "CalendarStartingYear")) {
-		lua_pushnumber(l, civilization->CalendarStartingYear);
-		return 1;
-	} else if (!strcmp(data, "YearLabel")) {
-		lua_pushstring(l, civilization->YearLabel.c_str());
-		return 1;
-	} else if (!strcmp(data, "NegativeYearLabel")) {
-		lua_pushstring(l, civilization->NegativeYearLabel.c_str());
-		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Playable[civilization_id]);
 		return 1;
@@ -1706,16 +1680,6 @@ static int CclGetCivilizationData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "CivilizationUpgrade")) {
 		lua_pushstring(l, PlayerRaces.CivilizationUpgrades[civilization_id].c_str());
-		return 1;
-	} else if (!strcmp(data, "MonthName")) {
-		LuaCheckArgs(l, 3);		
-		
-		int month = GetMonthIdByName(LuaToString(l, 3));
-		if (month == -1) {
-			LuaError(l, "Month doesn't exist.");
-		}
-		
-		lua_pushstring(l, civilization->GetMonthName(month).c_str());
 		return 1;
 	} else if (!strcmp(data, "DevelopsFrom")) {
 		lua_createtable(l, PlayerRaces.DevelopsFrom[civilization_id].size(), 0);

@@ -334,7 +334,6 @@ public:
 
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
 extern int GrandStrategyYear;
-extern int GrandStrategyMonth;
 extern std::string GrandStrategyWorld;
 extern int PopulationGrowthThreshold;					/// How much population growth progress must be accumulated before a new worker unit is created in the province
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game

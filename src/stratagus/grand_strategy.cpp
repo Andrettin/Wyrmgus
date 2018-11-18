@@ -66,7 +66,6 @@
 bool GrandStrategy = false;				///if the game is in grand strategy mode
 bool GrandStrategyGameLoading = false;
 int GrandStrategyYear = 0;
-int GrandStrategyMonth = 0;
 std::string GrandStrategyWorld;
 int PopulationGrowthThreshold = 1000;
 CGrandStrategyGame GrandStrategyGame;

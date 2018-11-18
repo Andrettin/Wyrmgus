@@ -616,7 +616,7 @@ class CCivilization
 {
 public:
 	CCivilization() :
-		ID(-1), ParentCivilization(-1), CalendarStartingYear(0),
+		ID(-1), ParentCivilization(-1),
 		Language(NULL), Calendar(NULL)
 	{
 	}
@@ -625,7 +625,6 @@ public:
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
-	std::string GetMonthName(int month) const;
 	CCalendar *GetCalendar() const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
@@ -635,20 +634,16 @@ public:
 	
 	int ID;
 	int ParentCivilization;
-	int CalendarStartingYear;
 	std::string Ident;				/// Ident of the civilization
 	std::string Description;		/// civilization description
 	std::string Quote;				/// civilization quote
 	std::string Background;			/// civilization background
 	std::string Adjective;			/// adjective pertaining to the civilization
-	std::string YearLabel;			/// label used for years (i.e. AD)
-	std::string NegativeYearLabel;	/// label used for "negative" years (i.e. BC)
 	CUnitSound UnitSounds;			/// Sounds for unit events
 	CLanguage *Language;			/// The language used by the civilization
 	CCalendar *Calendar;			/// the calendar used by the civilization
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
-	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
 	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type
 	std::map<int, int> ForceTypeWeights;	/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;	/// AI building templates
