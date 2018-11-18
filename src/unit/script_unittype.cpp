@@ -1396,7 +1396,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, k + 1));
 				if (!unit_type) {
-					LuaError(l, "Unit type doesn't exist." _C_ value);
+					LuaError(l, "Unit type \"%s\" does not exist." _C_ value);
 				}
 				++k;
 				type->DefaultStat.SetUnitStock(unit_type, LuaToNumber(l, -1, k + 1));
