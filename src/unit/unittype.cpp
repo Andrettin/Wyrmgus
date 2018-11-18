@@ -579,7 +579,7 @@ CUnitType::CUnitType() :
 	//Wyrmgus end
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
 	MouseAction(0), CanTarget(0),
-	Flip(0), LandUnit(0), AirUnit(0), SeaUnit(0),
+	Flip(1), LandUnit(0), AirUnit(0), SeaUnit(0),
 	ExplodeWhenKilled(0),
 	CanAttack(0),
 	Neutral(0),
@@ -736,6 +736,280 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 		}
 	}
 	return false;
+}
+
+void CUnitType::SetParent(CUnitType *parent_type)
+{
+	this->Parent = parent_type;
+	
+	this->Name = parent_type->Name;
+	this->Class = parent_type->Class;
+	if (this->Class != -1 && std::find(ClassUnitTypes[this->Class].begin(), ClassUnitTypes[this->Class].end(), this) == ClassUnitTypes[this->Class].end()) {
+		ClassUnitTypes[this->Class].push_back(this);
+	}
+	this->DrawLevel = parent_type->DrawLevel;
+	this->File = parent_type->File;
+	this->Width = parent_type->Width;
+	this->Height = parent_type->Height;
+	this->OffsetX = parent_type->OffsetX;
+	this->OffsetY = parent_type->OffsetY;
+	this->ShadowFile = parent_type->ShadowFile;
+	this->ShadowWidth = parent_type->ShadowWidth;
+	this->ShadowHeight = parent_type->ShadowHeight;
+	this->ShadowOffsetX = parent_type->ShadowOffsetX;
+	this->ShadowOffsetY = parent_type->ShadowOffsetY;
+	this->LightFile = parent_type->LightFile;
+	this->TileSize = parent_type->TileSize;
+	this->BoxWidth = parent_type->BoxWidth;
+	this->BoxHeight = parent_type->BoxHeight;
+	this->BoxOffsetX = parent_type->BoxOffsetX;
+	this->BoxOffsetY = parent_type->BoxOffsetY;
+	this->Construction = parent_type->Construction;
+	this->UnitType = parent_type->UnitType;
+	this->Missile.Name = parent_type->Missile.Name;
+	this->Missile.Missile = NULL;
+	this->FireMissile.Name = parent_type->FireMissile.Name;
+	this->FireMissile.Missile = NULL;
+	this->ExplodeWhenKilled = parent_type->ExplodeWhenKilled;
+	this->Explosion.Name = parent_type->Explosion.Name;
+	this->Explosion.Missile = NULL;
+	this->CorpseName = parent_type->CorpseName;
+	this->CorpseType = NULL;
+	this->MinAttackRange = parent_type->MinAttackRange;
+	this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
+	this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
+	this->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value;
+	this->DefaultStat.Variables[PRIORITY_INDEX].Max  = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max;
+	this->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
+	this->TrainQuantity = parent_type->TrainQuantity;
+	this->CostModifier = parent_type->CostModifier;
+	this->ItemClass = parent_type->ItemClass;
+	this->MaxOnBoard = parent_type->MaxOnBoard;
+	this->RepairRange = parent_type->RepairRange;
+	this->RepairHP = parent_type->RepairHP;
+	this->MouseAction = parent_type->MouseAction;
+	this->CanAttack = parent_type->CanAttack;
+	this->CanTarget = parent_type->CanTarget;
+	this->LandUnit = parent_type->LandUnit;
+	this->SeaUnit = parent_type->SeaUnit;
+	this->AirUnit = parent_type->AirUnit;
+	this->BoardSize = parent_type->BoardSize;
+	this->ButtonLevelForTransporter = parent_type->ButtonLevelForTransporter;
+	this->ButtonLevelForInventory = parent_type->ButtonLevelForInventory;
+	this->ButtonPos = parent_type->ButtonPos;
+	this->ButtonLevel = parent_type->ButtonLevel;
+	this->ButtonPopup = parent_type->ButtonPopup;
+	this->ButtonHint = parent_type->ButtonHint;
+	this->ButtonKey = parent_type->ButtonKey;
+	this->BurnPercent = parent_type->BurnPercent;
+	this->BurnDamageRate = parent_type->BurnDamageRate;
+	this->PoisonDrain = parent_type->PoisonDrain;
+	this->AutoBuildRate = parent_type->AutoBuildRate;
+	this->Animations = parent_type->Animations;
+	this->Sound = parent_type->Sound;
+	this->NumDirections = parent_type->NumDirections;
+	this->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
+	this->RandomMovementProbability = parent_type->RandomMovementProbability;
+	this->RandomMovementDistance = parent_type->RandomMovementDistance;
+	this->GivesResource = parent_type->GivesResource;
+	this->RequirementsString = parent_type->RequirementsString;
+	this->ExperienceRequirementsString = parent_type->ExperienceRequirementsString;
+	this->BuildingRulesString = parent_type->BuildingRulesString;
+	this->Elixir = parent_type->Elixir;
+	this->Icon.Name = parent_type->Icon.Name;
+	this->Icon.Icon = NULL;
+	if (!this->Icon.Name.empty()) {
+		this->Icon.Load();
+	}
+	for (size_t i = 0; i < parent_type->Spells.size(); ++i) {
+		this->Spells.push_back(parent_type->Spells[i]);
+	}
+	if (parent_type->AutoCastActive) {
+		this->AutoCastActive = new char[SpellTypeTable.size()];
+		memset(this->AutoCastActive, 0, SpellTypeTable.size() * sizeof(char));
+		for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
+			this->AutoCastActive[i] = parent_type->AutoCastActive[i];
+		}
+	}
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		this->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
+		this->RepairCosts[i] = parent_type->RepairCosts[i];
+		this->DefaultStat.ImproveIncomes[i] = parent_type->DefaultStat.ImproveIncomes[i];
+		this->DefaultStat.ResourceDemand[i] = parent_type->DefaultStat.ResourceDemand[i];
+		this->CanStore[i] = parent_type->CanStore[i];
+		this->GrandStrategyProductionEfficiencyModifier[i] = parent_type->GrandStrategyProductionEfficiencyModifier[i];
+		
+		if (parent_type->ResInfo[i]) {
+			ResourceInfo *res = new ResourceInfo;
+			res->ResourceId = i;
+			this->ResInfo[i] = res;
+			res->ResourceStep = parent_type->ResInfo[i]->ResourceStep;
+			res->WaitAtResource = parent_type->ResInfo[i]->WaitAtResource;
+			res->WaitAtDepot = parent_type->ResInfo[i]->WaitAtDepot;
+			res->ResourceCapacity = parent_type->ResInfo[i]->ResourceCapacity;
+			res->LoseResources = parent_type->ResInfo[i]->LoseResources;
+			res->RefineryHarvester = parent_type->ResInfo[i]->RefineryHarvester;
+			res->FileWhenEmpty = parent_type->ResInfo[i]->FileWhenEmpty;
+			res->FileWhenLoaded = parent_type->ResInfo[i]->FileWhenLoaded;
+		}
+	}
+	
+	this->DefaultStat.UnitStock = parent_type->DefaultStat.UnitStock;
+
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+		this->DefaultStat.Variables[i].Enable = parent_type->DefaultStat.Variables[i].Enable;
+		this->DefaultStat.Variables[i].Value = parent_type->DefaultStat.Variables[i].Value;
+		this->DefaultStat.Variables[i].Max = parent_type->DefaultStat.Variables[i].Max;
+		this->DefaultStat.Variables[i].Increase = parent_type->DefaultStat.Variables[i].Increase;
+	}
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) {
+		this->BoolFlag[i].value = parent_type->BoolFlag[i].value;
+		this->BoolFlag[i].CanTransport = parent_type->BoolFlag[i].CanTransport;
+	}
+	for (size_t i = 0; i < parent_type->WeaponClasses.size(); ++i) {
+		this->WeaponClasses.push_back(parent_type->WeaponClasses[i]);
+	}
+	for (size_t i = 0; i < parent_type->SoldUnits.size(); ++i) {
+		this->SoldUnits.push_back(parent_type->SoldUnits[i]);
+	}
+	for (size_t i = 0; i < parent_type->SpawnUnits.size(); ++i) {
+		this->SpawnUnits.push_back(parent_type->SpawnUnits[i]);
+	}
+	for (size_t i = 0; i < parent_type->Drops.size(); ++i) {
+		this->Drops.push_back(parent_type->Drops[i]);
+	}
+	for (size_t i = 0; i < parent_type->AiDrops.size(); ++i) {
+		this->AiDrops.push_back(parent_type->AiDrops[i]);
+	}
+	for (size_t i = 0; i < parent_type->DropSpells.size(); ++i) {
+		this->DropSpells.push_back(parent_type->DropSpells[i]);
+	}
+	for (size_t i = 0; i < parent_type->Affixes.size(); ++i) {
+		this->Affixes.push_back(parent_type->Affixes[i]);
+	}
+	for (size_t i = 0; i < parent_type->Traits.size(); ++i) {
+		this->Traits.push_back(parent_type->Traits[i]);
+	}
+	for (size_t i = 0; i < parent_type->StartingAbilities.size(); ++i) {
+		this->StartingAbilities.push_back(parent_type->StartingAbilities[i]);
+	}
+	for (size_t i = 0; i < parent_type->Trains.size(); ++i) {
+		this->Trains.push_back(parent_type->Trains[i]);
+		parent_type->Trains[i]->TrainedBy.push_back(this);
+	}
+	for (size_t i = 0; i < parent_type->StartingResources.size(); ++i) {
+		this->StartingResources.push_back(parent_type->StartingResources[i]);
+	}
+	for (std::map<int, std::vector<std::string>>::iterator iterator = parent_type->PersonalNames.begin(); iterator != parent_type->PersonalNames.end(); ++iterator) {
+		for (size_t i = 0; i < iterator->second.size(); ++i) {
+			this->PersonalNames[iterator->first].push_back(iterator->second[i]);				
+		}
+	}
+	for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
+		if (parent_type->VarInfo[var_n]) {
+			VariationInfo *var = new VariationInfo;
+			
+			this->VarInfo[var_n] = var;
+			
+			var->VariationId = parent_type->VarInfo[var_n]->VariationId;
+			var->TypeName = parent_type->VarInfo[var_n]->TypeName;
+			var->File = parent_type->VarInfo[var_n]->File;
+			for (unsigned int i = 0; i < MaxCosts; ++i) {
+				var->FileWhenLoaded[i] = parent_type->VarInfo[var_n]->FileWhenLoaded[i];
+				var->FileWhenEmpty[i] = parent_type->VarInfo[var_n]->FileWhenEmpty[i];
+			}
+			var->ShadowFile = parent_type->VarInfo[var_n]->ShadowFile;
+			var->LightFile = parent_type->VarInfo[var_n]->LightFile;
+			var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
+			var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
+			var->ResourceMin = parent_type->VarInfo[var_n]->ResourceMin;
+			var->ResourceMax = parent_type->VarInfo[var_n]->ResourceMax;
+			var->Weight = parent_type->VarInfo[var_n]->Weight;
+			var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
+			var->Icon.Icon = NULL;
+			if (!var->Icon.Name.empty()) {
+				var->Icon.Load();
+			}
+			if (parent_type->VarInfo[var_n]->Animations) {
+				var->Animations = parent_type->VarInfo[var_n]->Animations;
+			}
+			var->Construction = parent_type->VarInfo[var_n]->Construction;
+			for (int u = 0; u < VariationMax; ++u) {
+				var->UpgradesRequired[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
+				var->UpgradesForbidden[u] = parent_type->VarInfo[var_n]->UpgradesForbidden[u];
+			}
+			for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemClassesEquipped.size(); ++i) {
+				var->ItemClassesEquipped.push_back(parent_type->VarInfo[var_n]->ItemClassesEquipped[i]);
+			}
+			for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemClassesNotEquipped.size(); ++i) {
+				var->ItemClassesNotEquipped.push_back(parent_type->VarInfo[var_n]->ItemClassesNotEquipped[i]);
+			}
+			for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemsEquipped.size(); ++i) {
+				var->ItemsEquipped.push_back(parent_type->VarInfo[var_n]->ItemsEquipped[i]);
+			}
+			for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemsNotEquipped.size(); ++i) {
+				var->ItemsNotEquipped.push_back(parent_type->VarInfo[var_n]->ItemsNotEquipped[i]);
+			}
+			for (size_t i = 0; i < parent_type->VarInfo[var_n]->Terrains.size(); ++i) {
+				var->Terrains.push_back(parent_type->VarInfo[var_n]->Terrains[i]);
+			}
+			
+			for (int i = 0; i < MaxImageLayers; ++i) {
+				var->LayerFiles[i] = parent_type->VarInfo[var_n]->LayerFiles[i];
+			}
+			for (std::map<int, IconConfig>::iterator iterator = parent_type->VarInfo[var_n]->ButtonIcons.begin(); iterator != parent_type->VarInfo[var_n]->ButtonIcons.end(); ++iterator) {
+				var->ButtonIcons[iterator->first].Name = iterator->second.Name;
+				var->ButtonIcons[iterator->first].Icon = NULL;
+				var->ButtonIcons[iterator->first].Load();
+				var->ButtonIcons[iterator->first].Icon->Load();
+			}
+		} else {
+			break;
+		}
+	}
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		this->LayerFiles[i] = parent_type->LayerFiles[i];
+		
+		//inherit layer variations
+		for (size_t j = 0; j < parent_type->LayerVarInfo[i].size(); ++j) {
+			VariationInfo *var = new VariationInfo;
+				
+			this->LayerVarInfo[i].push_back(var);
+				
+			var->VariationId = parent_type->LayerVarInfo[i][j]->VariationId;
+			var->File = parent_type->LayerVarInfo[i][j]->File;
+			for (int u = 0; u < VariationMax; ++u) {
+				var->UpgradesRequired[u] = parent_type->LayerVarInfo[i][j]->UpgradesRequired[u];
+				var->UpgradesForbidden[u] = parent_type->LayerVarInfo[i][j]->UpgradesForbidden[u];
+			}
+			for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemClassesEquipped.size(); ++u) {
+				var->ItemClassesEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemClassesEquipped[u]);
+			}
+			for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemClassesNotEquipped.size(); ++u) {
+				var->ItemClassesNotEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemClassesNotEquipped[u]);
+			}
+			for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemsEquipped.size(); ++u) {
+				var->ItemsEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemsEquipped[u]);
+			}
+			for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemsNotEquipped.size(); ++u) {
+				var->ItemsNotEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemsNotEquipped[u]);
+			}
+			for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->Terrains.size(); ++u) {
+				var->Terrains.push_back(parent_type->LayerVarInfo[i][j]->Terrains[u]);
+			}
+		}
+	}
+	for (std::map<int, IconConfig>::iterator iterator = parent_type->ButtonIcons.begin(); iterator != parent_type->ButtonIcons.end(); ++iterator) {
+		this->ButtonIcons[iterator->first].Name = iterator->second.Name;
+		this->ButtonIcons[iterator->first].Icon = NULL;
+		this->ButtonIcons[iterator->first].Load();
+		this->ButtonIcons[iterator->first].Icon->Load();
+	}
+	for (std::map<int, CUnitType *>::iterator iterator = parent_type->DefaultEquipment.begin(); iterator != parent_type->DefaultEquipment.end(); ++iterator) {
+		this->DefaultEquipment[iterator->first] = iterator->second;
+	}
+	this->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit
+	this->DefaultStat.Variables[PRIORITY_INDEX].Max = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max + 1;
 }
 
 //Wyrmgus start

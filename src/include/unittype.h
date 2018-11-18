@@ -899,6 +899,7 @@ public:
 	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const;
 	
 	//Wyrmgus start
+	void SetParent(CUnitType *parent_type);
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
 	int GetAvailableLevelUpUpgrades() const;
 	int GetResourceStep(const int resource, const int player) const;
@@ -917,8 +918,8 @@ public:
 public:
 	std::string Ident;              /// Identifier
 	std::string Name;               /// Pretty name shown from the engine
+	CUnitType *Parent;				/// Parent unit type
 	//Wyrmgus start
-	std::string Parent;				/// Parent unit type
 	int Class;						/// Class identifier (i.e. infantry, archer, etc.)
 	int Civilization;				/// Which civilization this unit belongs to, if any
 	int Faction;					/// Which faction this unit belongs to, if any
