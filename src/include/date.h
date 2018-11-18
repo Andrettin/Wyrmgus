@@ -42,6 +42,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CCalendar;
 class CTimeline;
 
 #define BaseCalendarYearOffsetForHours 10000 //essentially the Human Era

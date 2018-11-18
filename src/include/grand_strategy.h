@@ -292,17 +292,6 @@ public:
 		WorldMapWidth(0), WorldMapHeight(0),
 		PlayerFaction(NULL)
 	{
-		for (int i = 0; i < MaxCosts; ++i) {
-			for (int j = 0; j < WorldMapResourceMax; ++j) {
-				WorldMapResources[i][j].x = -1;
-				WorldMapResources[i][j].y = -1;
-			}
-		}
-		for (int x = 0; x < WorldMapWidthMax; ++x) {
-			for (int y = 0; y < WorldMapHeightMax; ++y) {
-				WorldMapTiles[x][y] = NULL;
-			}
-		}
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}
 
@@ -316,7 +305,6 @@ public:
 public:
 	int WorldMapWidth;
 	int WorldMapHeight;
-	GrandStrategyWorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	std::vector<CGrandStrategyProvince *> Provinces;
 	std::map<int, std::vector<CGrandStrategyProvince *>> CultureProvinces;	/// provinces belonging to each culture
 	std::vector<CGrandStrategyFaction *> Factions[MAX_RACES];
@@ -324,7 +312,6 @@ public:
 	std::vector<CUpgrade *> UnpublishedWorks;
 	std::vector<CGrandStrategyEvent *> AvailableEvents;
 	CGrandStrategyFaction *PlayerFaction;
-	Vec2i WorldMapResources[MaxCosts][WorldMapResourceMax];		/// resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 	int CommodityPrices[MaxCosts];								/// price for every 100 of each commodity
 };
 
@@ -350,8 +337,6 @@ extern int GetDiplomacyStateIdByName(std::string diplomacy_state);
 extern std::string GetFactionTierNameById(int faction_tier);
 extern int GetFactionTierIdByName(std::string faction_tier);
 extern int GetProvinceId(std::string province_name);
-extern void SetWorldMapTileTerrain(int x, int y, int terrain);
-extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
 extern void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);

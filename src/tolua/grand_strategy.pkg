@@ -5,8 +5,6 @@ extern std::string GrandStrategyWorld;
 extern int PopulationGrowthThreshold;
 
 extern int GetProvinceId(std::string province_name);
-extern void SetWorldMapTileTerrain(int x, int y, int terrain);
-extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
 extern void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);

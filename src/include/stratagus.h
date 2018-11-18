@@ -166,11 +166,6 @@ extern const char NameLine[];
 #define PlayerColorMax 32			/// How many player colors are supported
 #define VariationMax 32				/// Maximum number of variations a unit can have
 
-#define WorldMapWidthMax 1024		/// Maximum width the grand strategy world map can have
-#define WorldMapHeightMax 1024		/// Maximum height the grand strategy world map can have
-#define WorldMapTerrainTypeMax 32	/// Maximum world map terrain types
-#define WorldMapResourceMax 2048	/// Maximum quantity of resources of a given type which can exist on the world map.
-
 #define AuraRange 6					/// Range of auras
 #define PlayerHeroMax 4				/// Maximum heroes per player
 #define PlayerMajorDeityMax 1		/// Maximum major deities per player/character
@@ -259,9 +254,6 @@ enum TechLevels {
 	CivilizedIronTechLevel,
 	CivilizedGunpowderTechLevel
 };
-
-class CCalendar;
-class CTimeline;
 
 #include <vec2i.h>
 

@@ -1240,67 +1240,6 @@ int GetProvinceId(std::string province_name)
 	return -1;
 }
 
-/**
-**  Set the terrain type of a world map tile.
-*/
-void SetWorldMapTileTerrain(int x, int y, int terrain)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	//if tile doesn't exist, create it now
-	if (!GrandStrategyGame.WorldMapTiles[x][y]) {
-		GrandStrategyWorldMapTile *world_map_tile = new GrandStrategyWorldMapTile;
-		GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
-		GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
-		GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
-	}
-	
-	GrandStrategyGame.WorldMapTiles[x][y]->Terrain = terrain;
-}
-
-void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered)
-{
-	CGrandStrategyProvince *province = GrandStrategyGame.WorldMapTiles[x][y]->Province;
-	if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) { //if tile already has a resource, remove it from the old resource's arrays
-		int old_resource = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
-		for (int i = 0; i < WorldMapResourceMax; ++i) { // remove it from the world map resources array
-			if (GrandStrategyGame.WorldMapResources[old_resource][i].x == x && GrandStrategyGame.WorldMapResources[old_resource][i].y == y) { //if tile was found, push every element of the array after it back one step
-				for (int j = i; j < WorldMapResourceMax; ++j) {
-					GrandStrategyGame.WorldMapResources[old_resource][j].x = GrandStrategyGame.WorldMapResources[old_resource][j + 1].x;
-					GrandStrategyGame.WorldMapResources[old_resource][j].y = GrandStrategyGame.WorldMapResources[old_resource][j + 1].y;
-					if (GrandStrategyGame.WorldMapResources[old_resource][j].x == -1 && GrandStrategyGame.WorldMapResources[old_resource][j].y == -1) { // if this is a blank tile slot
-						break;
-					}
-				}
-				break;
-			}
-			if (GrandStrategyGame.WorldMapResources[old_resource][i].x == -1 && GrandStrategyGame.WorldMapResources[old_resource][i].y == -1) { // if this is a blank tile slot
-				break;
-			}
-		}
-	
-		if (province != NULL) {
-			province->ProductionCapacity[old_resource] -= 1;
-			province->ResourceTiles[old_resource].erase(std::remove(province->ResourceTiles[old_resource].begin(), province->ResourceTiles[old_resource].end(), Vec2i(x, y)), province->ResourceTiles[old_resource].end());
-		}
-	}
-	
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource != -1) {
-		for (int i = 0; i < WorldMapResourceMax; ++i) {
-			if (GrandStrategyGame.WorldMapResources[resource][i].x == -1 && GrandStrategyGame.WorldMapResources[resource][i].y == -1) { //if this spot for a world map resource is blank
-				GrandStrategyGame.WorldMapResources[resource][i].x = x;
-				GrandStrategyGame.WorldMapResources[resource][i].y = y;
-				GrandStrategyGame.WorldMapTiles[x][y]->Resource = resource;
-				break;
-			}
-		}
-		if (province != NULL) {
-			province->ResourceTiles[resource].push_back(Vec2i(x, y));
-		}
-	}
-}
-
 void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name)
 {
 	int province_id = GetProvinceId(province_name);
