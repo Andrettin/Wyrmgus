@@ -2133,6 +2133,10 @@ bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) c
 		return false;
 	}
 	
+	if (!character->Factions.empty() && (this->Faction == -1 || std::find(character->Factions.begin(), character->Factions.end(), PlayerRaces.Factions[this->Faction]) == character->Factions.end())) {
+		return false;
+	}
+	
 	if (character->Conditions) {
 		CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 		character->Conditions->pushPreamble();

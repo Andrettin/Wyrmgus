@@ -179,6 +179,7 @@ public:
 	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
+	std::vector<CFaction *> Factions;	/// Factions for which this character is available; if empty, this means all factions of the character's civilization can recruit them
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
 	std::vector<CDeity *> DeityProfiles;
 	std::vector<CUpgrade *> Abilities;

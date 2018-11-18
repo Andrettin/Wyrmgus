@@ -49,6 +49,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "item.h"
+#include "map_template.h"
 #include "parameters.h"
 #include "player.h"
 #include "province.h"
@@ -131,13 +132,22 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 					}
 				}
 			} else {
-				fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "gender") {
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Civilization = PlayerRaces.GetRaceIndexByName(value.c_str());
+		} else if (key == "faction") {
+			value = FindAndReplaceString(value, "_", "-");
+			CFaction *faction = PlayerRaces.GetFaction(value);
+			if (faction) {
+				this->Faction = faction;
+				this->Factions.push_back(faction);
+			} else {
+				fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
+			}
 		} else if (key == "hair_variation") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->HairVariation = value;
@@ -154,12 +164,14 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		} else if (key == "birth_date") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->BirthDate = CDate::FromString(value);
-		} else if (key == "date") {
+		} else if (key == "start_date") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->StartDate = CDate::FromString(value);
 		} else if (key == "death_date") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->DeathDate = CDate::FromString(value);
+		} else if (key == "violent_death") {
+			this->ViolentDeath = StringToBool(value);
 		} else if (key == "deity") {
 			value = FindAndReplaceString(value, "_", "-");
 			CDeity *deity = CDeity::GetDeity(value);
@@ -220,6 +232,57 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			}
 			deity->ProcessConfigData(child_config_data);
 			this->DeityProfiles.push_back(deity);
+		} else if (child_config_data->Tag == "historical_location") {
+			CDate date;
+			CMapTemplate *map_template = NULL;
+			Vec2i character_pos(-1, -1);
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "date") {
+					value = FindAndReplaceString(value, "_", "-");
+					date = CDate::FromString(value);
+				} else if (key == "map_template") {
+					value = FindAndReplaceString(value, "_", "-");
+					map_template = CMapTemplate::GetMapTemplate(value);
+					if (!map_template) {
+						fprintf(stderr, "Map template \"%s\" does not exist.\n", value.c_str());
+					}
+				} else if (key == "site") {
+					value = FindAndReplaceString(value, "_", "-");
+					CSite *site = GetSite(value);
+					if (site) {
+						character_pos = site->Position;
+					} else {
+						fprintf(stderr, "Site \"%s\" does not exist.\n", value.c_str());
+					}
+				} else if (key == "x") {
+					character_pos.x = std::stoi(value);
+				} else if (key == "y") {
+					character_pos.y = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid historical location property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (date.Year == 0) {
+				fprintf(stderr, "Historical location has no date.\n");
+				continue;
+			}
+			
+			if (!map_template) {
+				fprintf(stderr, "Historical location has no map template.\n");
+				continue;
+			}
+			
+			if (character_pos.x == -1 || character_pos.y == -1) {
+				fprintf(stderr, "Historical location has no position for the character.\n");
+				continue;
+			}
+			
+			this->HistoricalLocations.push_back(std::tuple<CDate, CMapTemplate *, Vec2i>(date, map_template, character_pos));
 		} else if (child_config_data->Tag == "item") {
 			CPersistentItem *item = new CPersistentItem;
 			item->Owner = this;
