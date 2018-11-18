@@ -354,13 +354,13 @@ bool IsStringNumber(const std::string &str)
 	return true;
 }
 
-static std::map<int, std::string> RomanConversionTable = {{1000, "M"}, {900, "CM"}, {500, "D"}, {400, "CD"}, {100, "C"}, {90, "XC"}, {50, "L"}, {40, "XL"}, {10, "X"}, {9, "IX"}, {5, "V"}, {4, "IV"}, {1, "I"}};
+static std::map<unsigned, std::string> RomanConversionTable = {{1000, "M"}, {900, "CM"}, {500, "D"}, {400, "CD"}, {100, "C"}, {90, "XC"}, {50, "L"}, {40, "XL"}, {10, "X"}, {9, "IX"}, {5, "V"}, {4, "IV"}, {1, "I"}};
 
 std::string NumberToRomanNumeral(unsigned number)
 {
 	std::string numeral;
 	
-	for (std::map<int, std::string>::const_reverse_iterator iterator = RomanConversionTable.rbegin(); iterator != RomanConversionTable.rend(); ++iterator) {
+	for (std::map<unsigned, std::string>::const_reverse_iterator iterator = RomanConversionTable.rbegin(); iterator != RomanConversionTable.rend(); ++iterator) {
 		while (number >= iterator->first) {
 			numeral += iterator->second;
 			number -= iterator->first;
