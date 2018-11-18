@@ -157,12 +157,12 @@ void CDate::AddMonths(CCalendar *calendar, const int months)
 	
 	if (this->Month > 0) {
 		while (this->Month > (int) calendar->Months.size()) {
-			this->Month -= calendar->Months.size();
+			this->Month -= static_cast<char>(calendar->Months.size());
 			this->AddYears(1);
 		}
 	} else {
 		while (this->Month <= 0) {
-			this->Month += calendar->Months.size();
+			this->Month += static_cast<char>(calendar->Months.size());
 			this->AddYears(-1);
 		}
 	}

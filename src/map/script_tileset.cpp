@@ -660,7 +660,7 @@ void CTileset::buildTable(lua_State *l)
 	
 	//Wyrmgus start
 	for (size_t i = 0; i != this->solidTerrainTypes.size(); ++i) {
-		int default_tile_index = findTileIndex(i, 0);
+		int default_tile_index = findTileIndex(static_cast<unsigned char>(i), 0);
 		if (default_tile_index != -1) {
 			this->solidTerrainTypes[i].DefaultTileIndex = default_tile_index;
 		}
