@@ -113,7 +113,7 @@ void CDate::UpdateCurrentDateDisplayString()
 	
 	CCalendar *calendar = PlayerRaces.Civilizations[ThisPlayer->Race]->GetCalendar();
 	
-	CurrentDateDisplayString = CurrentDate.ToDisplayString(calendar);
+	CurrentDateDisplayString = CurrentDate.ToDayMonthExtendedDisplayString(calendar);
 }
 
 void CDate::Clear()
@@ -138,7 +138,7 @@ bool CDate::ContainsDate(const CDate &date) const
 	return false;
 }
 
-void CDate::AddYears(CCalendar *calendar, const int years)
+void CDate::AddYears(const int years)
 {
 	this->Year += years;
 	
@@ -158,12 +158,12 @@ void CDate::AddMonths(CCalendar *calendar, const int months)
 	if (this->Month > 0) {
 		while (this->Month > (int) calendar->Months.size()) {
 			this->Month -= calendar->Months.size();
-			this->AddYears(calendar, 1);
+			this->AddYears(1);
 		}
 	} else {
 		while (this->Month <= 0) {
 			this->Month += calendar->Months.size();
-			this->AddYears(calendar, -1);
+			this->AddYears(-1);
 		}
 	}
 }
@@ -175,7 +175,7 @@ void CDate::AddDays(CCalendar *calendar, const int days)
 	if (this->Day > 0) {
 		while (this->Day > calendar->DaysPerYear) {
 			this->Day -= calendar->DaysPerYear;
-			this->AddYears(calendar, 1);
+			this->AddYears(1);
 		}
 		
 		while (this->Day > calendar->Months[this->Month - 1]->Days) {
@@ -185,7 +185,7 @@ void CDate::AddDays(CCalendar *calendar, const int days)
 	} else {
 		while (this->Day <= (-calendar->DaysPerYear + 1)) {
 			this->Day += calendar->DaysPerYear;
-			this->AddYears(calendar, -1);
+			this->AddYears(-1);
 		}
 		
 		while (this->Day <= 0) {
@@ -290,6 +290,22 @@ std::string CDate::ToDisplayString(const CCalendar *calendar) const
 			fprintf(stderr, "Calendar \"%s\" has no year label.\n", calendar->Ident.c_str());
 		}
 	}
+	
+	return display_string;
+}
+
+std::string CDate::ToDayMonthExtendedDisplayString(const CCalendar *calendar) const
+{
+	std::string display_string;
+	
+	if (!calendar) {
+		fprintf(stderr, "Calendar does not exist.\n");
+		return display_string;
+	}
+	
+	display_string += std::to_string((long long) this->Day) + " ";
+	
+	display_string += calendar->Months[this->Month - 1]->Name + " (" + NumberToRomanNumeral(this->Month) + ")";
 	
 	return display_string;
 }

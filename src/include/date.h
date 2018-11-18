@@ -62,7 +62,7 @@ public:
 
 	void Clear();
 	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
-	void AddYears(CCalendar *calendar, const int years);
+	void AddYears(const int years);
 	void AddMonths(CCalendar *calendar, const int months);
 	void AddDays(CCalendar *calendar, const int days);
 	void AddHours(CCalendar *calendar, const long long int hours);
@@ -70,6 +70,7 @@ public:
 	CDate ToBaseCalendar(CCalendar *current_calendar) const;
 	std::string ToString(const CCalendar *calendar) const;
 	std::string ToDisplayString(const CCalendar *calendar) const;
+	std::string ToDayMonthExtendedDisplayString(const CCalendar *calendar) const;
 	unsigned long long GetTotalHours(CCalendar *calendar) const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
 	
 	int Year;

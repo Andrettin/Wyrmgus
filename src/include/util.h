@@ -122,6 +122,7 @@ extern size_t strnlen(const char *str, size_t strsize);
 extern std::vector<std::string> SplitString(const std::string &str, const std::string &separators, const std::string &comment_chars = "");
 extern bool StringToBool(const std::string &str);
 extern bool IsStringNumber(const std::string &str);
+extern std::string NumberToRomanNumeral(unsigned number);
 
 /*----------------------------------------------------------------------------
 --  Getopt
