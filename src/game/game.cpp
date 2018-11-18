@@ -1677,8 +1677,12 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		GameHour = CurrentCampaign->StartDate.GetTotalHours(CCalendar::BaseCalendar);
 		CDate::CurrentDate = CurrentCampaign->StartDate;
 	} else {
-		GameHour = SyncRand(DefaultHoursPerDay); //start at a random time of day
 		CDate::CurrentDate.Clear();
+		CDate::CurrentDate.Year = 1;
+		CDate::CurrentDate.Month = SyncRand(CCalendar::BaseCalendar->Months.size()) + 1;
+		CDate::CurrentDate.Day = SyncRand(CCalendar::BaseCalendar->Months[CDate::CurrentDate.Month - 1]->Days) + 1;
+		CDate::CurrentDate.Hour = SyncRand(CCalendar::BaseCalendar->HoursPerDay);
+		GameHour = CDate::CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
 	}
 	//Wyrmgus end
 
