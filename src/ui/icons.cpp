@@ -140,6 +140,7 @@ void CIcon::ProcessConfigData(CConfigData *config_data)
 				std::string value = child_config_data->Properties[j].second;
 				
 				if (key == "file") {
+					file = CMod::GetCurrentModPath() + value;
 				} else if (key == "width") {
 					size.x = std::stoi(value);
 				} else if (key == "height") {

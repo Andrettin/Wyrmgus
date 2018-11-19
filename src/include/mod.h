@@ -49,9 +49,14 @@ public:
 		Ident("")
 	{
 	}
+public:
+	static void SetCurrentModPath(const std::string &path);
+	static std::string GetCurrentModPath();
 	
+private:
 	static std::string CurrentModPath;
 	
+public:
 	std::string Ident;									/// Ident of the mod
 	std::string Name;									/// Name of the mod
 	std::string Path;

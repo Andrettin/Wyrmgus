@@ -1,4 +1,5 @@
 class CMod
 {
-	static std::string CurrentModPath;
+	static void SetCurrentModPath(const std::string &path);
+	static std::string GetCurrentModPath();
 };

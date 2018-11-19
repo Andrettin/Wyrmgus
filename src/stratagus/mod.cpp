@@ -47,4 +47,14 @@ std::string CMod::CurrentModPath;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+void CMod::SetCurrentModPath(const std::string &path)
+{
+	CurrentModPath = path;
+}
+
+std::string CMod::GetCurrentModPath()
+{
+	return CurrentModPath;
+}
+
 //@}
