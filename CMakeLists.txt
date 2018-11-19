@@ -311,6 +311,7 @@ set(stratagusmain_SRCS
 	src/stratagus/item.cpp
 	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
+	src/stratagus/mod.cpp
 	src/stratagus/parameters.cpp
 	src/stratagus/plane.cpp
 	src/stratagus/player.cpp
@@ -411,6 +412,7 @@ set(tolua_FILES
 	src/tolua/map.pkg
 	src/tolua/master.pkg
 	src/tolua/minimap.pkg
+	src/tolua/mod.pkg
 	src/tolua/network.pkg
 	src/tolua/particle.pkg
 	src/tolua/pathfinder.pkg
@@ -612,6 +614,7 @@ set(stratagus_generic_HDRS
 	src/include/minimap.h
 	src/include/missile.h
 	src/include/missileconfig.h
+	src/include/mod.h
 	src/include/movie.h
 	src/include/myendian.h
 	src/include/net_lowlevel.h

@@ -1,0 +1,4 @@
+class CMod
+{
+	static std::string CurrentModPath;
+};
