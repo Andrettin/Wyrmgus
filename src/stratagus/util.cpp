@@ -387,8 +387,7 @@ std::string SnakeCaseToPascalCase(const std::string &str)
 	
 	size_t pos = 0;
 	while ((pos = result.find('_', pos)) != std::string::npos) {
-		result[pos] = ' ';
-		pos += 1;
+		result.replace(pos, 1, "");
 		if (pos < result.length()) {
 			result[pos] = toupper(result[pos]);
 		}
