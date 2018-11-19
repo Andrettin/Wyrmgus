@@ -139,6 +139,9 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Civilization = PlayerRaces.GetRaceIndexByName(value.c_str());
+			if (this->Civilization == -1) {
+				fprintf(stderr, "Civilization \"%s\" does not exist.\n", value.c_str());
+			}
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = PlayerRaces.GetFaction(value);
@@ -157,7 +160,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			if (upgrade) {
 				this->Trait = upgrade;
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "level") {
 			this->Level = std::stoi(value);
@@ -178,7 +181,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			if (deity) {
 				this->Deities.push_back(deity);
 			} else {
-				fprintf(stderr, "Deity \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Deity \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "description") {
 			this->Description = value;
@@ -198,7 +201,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			if (ability_upgrade) {
 				this->Abilities.push_back(ability_upgrade);
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "read_work") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -206,7 +209,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			if (upgrade) {
 				this->ReadWorks.push_back(upgrade);
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "consumed_elixir") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -214,7 +217,7 @@ void CCharacter::ProcessConfigData(CConfigData *config_data)
 			if (upgrade) {
 				this->ConsumedElixirs.push_back(upgrade);
 			} else {
-				fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
 		} else {
 			fprintf(stderr, "Invalid character property: \"%s\".\n", key.c_str());
@@ -876,12 +879,12 @@ void HeroAddQuest(std::string hero_full_name, std::string quest_name)
 {
 	CCharacter *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
-		fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 	}
 	
 	CQuest *quest = GetQuest(quest_name);
 	if (!quest) {
-		fprintf(stderr, "Quest \"%s\" doesn't exist.\n", quest_name.c_str());
+		fprintf(stderr, "Quest \"%s\" does not exist.\n", quest_name.c_str());
 	}
 	
 	hero->QuestsInProgress.push_back(quest);
@@ -891,12 +894,12 @@ void HeroCompleteQuest(std::string hero_full_name, std::string quest_name)
 {
 	CCharacter *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
-		fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 	}
 	
 	CQuest *quest = GetQuest(quest_name);
 	if (!quest) {
-		fprintf(stderr, "Quest \"%s\" doesn't exist.\n", quest_name.c_str());
+		fprintf(stderr, "Quest \"%s\" does not exist.\n", quest_name.c_str());
 	}
 	
 	hero->QuestsInProgress.erase(std::remove(hero->QuestsInProgress.begin(), hero->QuestsInProgress.end(), quest), hero->QuestsInProgress.end());
@@ -907,7 +910,7 @@ void SaveCustomHero(std::string hero_full_name)
 {
 	CCharacter *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
-		fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 	}
 	
 	SaveHero(hero);
@@ -917,7 +920,7 @@ void DeleteCustomHero(std::string hero_full_name)
 {
 	CCharacter *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
-		fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+		fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 	}
 	
 	if (CurrentCustomHero == hero) {
@@ -950,7 +953,7 @@ void SetCurrentCustomHero(std::string hero_full_name)
 	if (!hero_full_name.empty()) {
 		CCharacter *hero = GetCustomHero(hero_full_name);
 		if (!hero) {
-			fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 		}
 		
 		CurrentCustomHero = const_cast<CCharacter *>(&(*hero));
@@ -973,7 +976,7 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 	if (!hero_full_name.empty()) {
 		CCharacter *hero = GetCustomHero(hero_full_name);
 		if (!hero) {
-			fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 		}
 		
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
