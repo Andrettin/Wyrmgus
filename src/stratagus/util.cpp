@@ -354,6 +354,11 @@ bool IsStringNumber(const std::string &str)
 	return true;
 }
 
+bool IsStringBool(const std::string &str)
+{
+	return str == "true" || str == "false";
+}
+
 static std::map<unsigned, std::string> RomanConversionTable = {{1000, "M"}, {900, "CM"}, {500, "D"}, {400, "CD"}, {100, "C"}, {90, "XC"}, {50, "L"}, {40, "XL"}, {10, "X"}, {9, "IX"}, {5, "V"}, {4, "IV"}, {1, "I"}};
 
 std::string NumberToRomanNumeral(unsigned number)
@@ -368,6 +373,28 @@ std::string NumberToRomanNumeral(unsigned number)
 	}
 	
 	return numeral;
+}
+
+std::string SnakeCaseToPascalCase(const std::string &str)
+{
+	if (str.empty()) {
+		return str;
+	}
+	
+	std::string result(str);
+	
+	result[0] = toupper(result[0]);
+	
+	size_t pos = 0;
+	while ((pos = result.find('_', pos)) != std::string::npos) {
+		result[pos] = ' ';
+		pos += 1;
+		if (pos < result.length()) {
+			result[pos] = toupper(result[pos]);
+		}
+	}
+	
+	return result;
 }
 
 /*----------------------------------------------------------------------------
@@ -627,555 +654,585 @@ void PrintOnStdOut(const char *format, ...)
 #include "unittype.h" //for personal name generation
 #include "upgrade.h" //for personal name generation
 
-std::string FindAndReplaceString(std::string text, const std::string& find, const std::string& replace) {
+std::string FindAndReplaceString(const std::string &text, const std::string &find, const std::string &replace)
+{
+	std::string result(text);
+	
 	size_t pos = 0;
-	while ((pos = text.find(find, pos)) != std::string::npos) {
-		text.replace(pos, find.length(), replace);
+	while ((pos = result.find(find, pos)) != std::string::npos) {
+		result.replace(pos, find.length(), replace);
 		pos += replace.length();
 	}
-	return text;
+	
+	return result;
 }
 
-std::string FindAndReplaceStringEnding(std::string text, const std::string& find, const std::string& replace) {
+std::string FindAndReplaceStringEnding(const std::string &text, const std::string &find, const std::string &replace)
+{
+	std::string result(text);
+	
 	size_t pos = text.find(find, text.length() - find.length());
 	if (pos != std::string::npos) {
-		text.replace(pos, find.length(), replace);
+		result.replace(pos, find.length(), replace);
 	}
-	return text;
+	
+	return result;
 }
 
-std::string FindAndReplaceStringBeginning(std::string text, const std::string& find, const std::string& replace) {
+std::string FindAndReplaceStringBeginning(const std::string &text, const std::string &find, const std::string &replace)
+{
+	std::string result(text);
+	
 	size_t pos = text.find(find, 0);
 	if (pos != std::string::npos && pos == 0) {
-		text.replace(pos, find.length(), replace);
+		result.replace(pos, find.length(), replace);
 	}
-	return text;
+	
+	return result;
 }
 
-int GetFileLastModified(std::string file_name)
+int GetFileLastModified(const std::string &file_name)
 {
-	file_name = LibraryFileName(file_name.c_str());
+	std::string library_file_name = LibraryFileName(file_name.c_str());
 	
 	struct stat tmp;
 	
-	stat(file_name.c_str(), &tmp);
+	stat(library_file_name.c_str(), &tmp);
 	
 	int date = tmp.st_mtime;	
 	
 	return date;
 }
 
-std::string TransliterateText(std::string text) //convert special characters into ones more legible for English-speakers
+std::string TransliterateText(const std::string &text) //convert special characters into ones more legible for English-speakers
 {
-	text = FindAndReplaceString(text, "Ā́", "A");
-	text = FindAndReplaceString(text, "ā́", "a");
-	text = FindAndReplaceString(text, "Ā", "A");
-	text = FindAndReplaceString(text, "ā", "a");
-	text = FindAndReplaceString(text, "Ấ", "A");
-	text = FindAndReplaceString(text, "ấ", "a");
-	text = FindAndReplaceString(text, "Ȧ́", "A");
-	text = FindAndReplaceString(text, "ȧ́", "a");
-	text = FindAndReplaceString(text, "Á", "A");
-	text = FindAndReplaceString(text, "á", "a");
-	text = FindAndReplaceString(text, "À", "A");
-	text = FindAndReplaceString(text, "à", "a");
-	text = FindAndReplaceString(text, "Ã", "A");
-	text = FindAndReplaceString(text, "ã", "a");
-	text = FindAndReplaceString(text, "Ä", "A");
-	text = FindAndReplaceString(text, "ä", "a");
-	text = FindAndReplaceString(text, "Ā", "A");
-	text = FindAndReplaceString(text, "ā", "a");
-	text = FindAndReplaceString(text, "Â", "A");
-	text = FindAndReplaceString(text, "â", "a");
-	text = FindAndReplaceString(text, "Ą", "A");
-	text = FindAndReplaceString(text, "ą", "a");
-	text = FindAndReplaceString(text, "ᶏ", "a");
-	text = FindAndReplaceString(text, "Å", "A");
-	text = FindAndReplaceString(text, "å", "a");
-	text = FindAndReplaceString(text, "Ă", "A");
-	text = FindAndReplaceString(text, "ă", "a");
-	text = FindAndReplaceString(text, "Æ̂", "Ae");
-	text = FindAndReplaceString(text, "æ̂", "ae");
-	text = FindAndReplaceString(text, "Æ", "Ae");
-	text = FindAndReplaceString(text, "æ", "ae");
-	text = FindAndReplaceString(text, "Ǣ", "Ae");
-	text = FindAndReplaceString(text, "ǣ", "ae");
-	text = FindAndReplaceString(text, "Ǽ", "Ae");
-	text = FindAndReplaceString(text, "ǽ", "ae");
-	text = FindAndReplaceString(text, "Ƀ", "B");
-	text = FindAndReplaceString(text, "ƀ", "b");
-	text = FindAndReplaceString(text, "Č", "C");
-	text = FindAndReplaceString(text, "č", "c");
-	text = FindAndReplaceString(text, "Ð", "D");
-	text = FindAndReplaceString(text, "ð", "d");
-	text = FindAndReplaceString(text, "Ḍ", "D");
-	text = FindAndReplaceString(text, "ḍ", "d");
-	text = FindAndReplaceString(text, "Đ", "D");
-	text = FindAndReplaceString(text, "đ", "d");
-	text = FindAndReplaceString(text, "ẟ", "d"); //not the same character as "δ"
-	text = FindAndReplaceString(text, "Ę̄", "E");
-	text = FindAndReplaceString(text, "ę̄", "e");
-	text = FindAndReplaceString(text, "Ḗ", "E");
-	text = FindAndReplaceString(text, "ḗ", "e");
-	text = FindAndReplaceString(text, "Ė́", "E");
-	text = FindAndReplaceString(text, "ė́", "e");
-	text = FindAndReplaceString(text, "Ë̃", "E");
-	text = FindAndReplaceString(text, "ë̃", "e");
-	text = FindAndReplaceString(text, "Ë̂", "E");
-	text = FindAndReplaceString(text, "ë̂", "e");
-	text = FindAndReplaceString(text, "É", "E"); 
-	text = FindAndReplaceString(text, "é", "e");
-	text = FindAndReplaceString(text, "È", "E");
-	text = FindAndReplaceString(text, "è", "e");
-	text = FindAndReplaceString(text, "Ē", "E");
-	text = FindAndReplaceString(text, "ē", "e");
-	text = FindAndReplaceString(text, "Ê", "E");
-	text = FindAndReplaceString(text, "ê", "e");
-	text = FindAndReplaceString(text, "Ě", "E");
-	text = FindAndReplaceString(text, "ě", "e");
-	text = FindAndReplaceString(text, "Ė", "E");
-	text = FindAndReplaceString(text, "ė", "e");
-	text = FindAndReplaceString(text, "Ë", "E");
-	text = FindAndReplaceString(text, "ë", "e");
-	text = FindAndReplaceString(text, "Ę", "E");
-	text = FindAndReplaceString(text, "ę", "e");
-	text = FindAndReplaceString(text, "Ĕ", "E");
-	text = FindAndReplaceString(text, "ĕ", "e");
-	text = FindAndReplaceString(text, "Ə", "E");
-	text = FindAndReplaceString(text, "ə", "e");
-	text = FindAndReplaceString(text, "Ǝ", "E");
-	text = FindAndReplaceString(text, "ǝ", "e");
-	text = FindAndReplaceString(text, "ϵ", "e");
-	text = FindAndReplaceString(text, "Ĝ", "G");
-	text = FindAndReplaceString(text, "ĝ", "g");
-	text = FindAndReplaceString(text, "Ī̆", "I");
-	text = FindAndReplaceString(text, "ī̆", "i");
-	text = FindAndReplaceString(text, "Î́", "I");
-	text = FindAndReplaceString(text, "î́", "i");
-	text = FindAndReplaceString(text, "Ī́", "I");
-	text = FindAndReplaceString(text, "ī́", "i");
-	text = FindAndReplaceString(text, "Ī", "I");
-	text = FindAndReplaceString(text, "ī", "i");
-	text = FindAndReplaceString(text, "I̊", "I");
-	text = FindAndReplaceString(text, "i̊", "i");
-	text = FindAndReplaceString(text, "Í", "I");
-	text = FindAndReplaceString(text, "í", "i");
-	text = FindAndReplaceString(text, "Ì", "I");
-	text = FindAndReplaceString(text, "ì", "i");
-	text = FindAndReplaceString(text, "Ī", "I");
-	text = FindAndReplaceString(text, "ī", "i");
-	text = FindAndReplaceString(text, "Î", "I");
-	text = FindAndReplaceString(text, "î", "i");
-	text = FindAndReplaceString(text, "Ĭ", "I");
-	text = FindAndReplaceString(text, "ĭ", "i");
-	text = FindAndReplaceString(text, "Ĩ", "I");
-	text = FindAndReplaceString(text, "ĩ", "i");
-	text = FindAndReplaceString(text, "Ḱ", "K");
-	text = FindAndReplaceString(text, "ḱ", "k");
-	text = FindAndReplaceString(text, "L̥", "L");
-	text = FindAndReplaceString(text, "l̥", "l");
-	text = FindAndReplaceString(text, "Ɫ", "L");
-	text = FindAndReplaceString(text, "ɫ", "l");
-	text = FindAndReplaceString(text, "Ň", "N");
-	text = FindAndReplaceString(text, "ň", "n");
-	text = FindAndReplaceString(text, "Ṇ", "N");
-	text = FindAndReplaceString(text, "ṇ", "n");
-	text = FindAndReplaceString(text, "Ṅ", "N");
-	text = FindAndReplaceString(text, "ṅ", "n");
-	text = FindAndReplaceString(text, "Ṓ", "O");
-	text = FindAndReplaceString(text, "ṓ", "o");
-	text = FindAndReplaceString(text, "Ŏ", "O");
-	text = FindAndReplaceString(text, "ŏ", "o");
-	text = FindAndReplaceString(text, "Ø", "Ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "ø", "ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "Ǫ", "O"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "ǫ", "o"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "Ö", "O");
-	text = FindAndReplaceString(text, "ö", "o");
-	text = FindAndReplaceString(text, "Ó", "O");
-	text = FindAndReplaceString(text, "ó", "o");
-	text = FindAndReplaceString(text, "Ò", "O");
-	text = FindAndReplaceString(text, "ò", "o");
-	text = FindAndReplaceString(text, "Ō", "O");
-	text = FindAndReplaceString(text, "ō", "o");
-	text = FindAndReplaceString(text, "Ô", "O");
-	text = FindAndReplaceString(text, "ô", "o");
-	text = FindAndReplaceString(text, "Ǒ", "O");
-	text = FindAndReplaceString(text, "ǒ", "o");
-	text = FindAndReplaceString(text, "Œ", "Oe");
-	text = FindAndReplaceString(text, "œ", "oe");
-	text = FindAndReplaceString(text, "Ṛ́", "R");
-	text = FindAndReplaceString(text, "ṛ́", "r");
-	text = FindAndReplaceString(text, "Ŗ́", "R");
-	text = FindAndReplaceString(text, "ŗ́", "r");
-	text = FindAndReplaceString(text, "R̄", "R");
-	text = FindAndReplaceString(text, "r̄", "r");
-	text = FindAndReplaceString(text, "Ř", "R");
-	text = FindAndReplaceString(text, "ř", "r");
-	text = FindAndReplaceString(text, "Ṛ", "R");
-	text = FindAndReplaceString(text, "ṛ", "r");
-	text = FindAndReplaceString(text, "Ŕ", "R");
-	text = FindAndReplaceString(text, "ŕ", "r");
-	text = FindAndReplaceString(text, "Ṙ", "R");
-	text = FindAndReplaceString(text, "ṙ", "r");
-	text = FindAndReplaceString(text, "Š", "S");
-	text = FindAndReplaceString(text, "š", "s");
-	text = FindAndReplaceString(text, "Ș", "S");
-	text = FindAndReplaceString(text, "ș", "s");
-	text = FindAndReplaceString(text, "Ś", "S");
-	text = FindAndReplaceString(text, "ś", "s");
-	text = FindAndReplaceString(text, "ß", "ss"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "Ṭ", "T");
-	text = FindAndReplaceString(text, "ṭ", "t");
-	text = FindAndReplaceString(text, "Ț", "T");
-	text = FindAndReplaceString(text, "ț", "t");
-	text = FindAndReplaceString(text, "ÞÞ", "Þ"); //replace double thorns with a single one
-	text = FindAndReplaceString(text, "þþ", "þ"); //replace double thorns with a single one
-	text = FindAndReplaceString(text, "Þ", "Th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "þ", "th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "Ū́", "U");
-	text = FindAndReplaceString(text, "ū́", "u");
-	text = FindAndReplaceString(text, "Ů̃", "U");
-	text = FindAndReplaceString(text, "ů̃", "u");
-	text = FindAndReplaceString(text, "Ü", "U");
-	text = FindAndReplaceString(text, "ü", "u");
-	text = FindAndReplaceString(text, "Ú", "U");
-	text = FindAndReplaceString(text, "ú", "u");
-	text = FindAndReplaceString(text, "Ù", "U");
-	text = FindAndReplaceString(text, "ù", "u");
-	text = FindAndReplaceString(text, "Ū", "U");
-	text = FindAndReplaceString(text, "ū", "u");
-	text = FindAndReplaceString(text, "Û", "U");
-	text = FindAndReplaceString(text, "û", "u");
-	text = FindAndReplaceString(text, "Ŭ", "U");
-	text = FindAndReplaceString(text, "ŭ", "u");
-	text = FindAndReplaceString(text, "Ů", "U");
-	text = FindAndReplaceString(text, "ů", "u");
-	text = FindAndReplaceString(text, "Ũ", "U");
-	text = FindAndReplaceString(text, "ũ", "u");
-	text = FindAndReplaceString(text, "Ṷ", "U");
-	text = FindAndReplaceString(text, "ṷ", "u");
-	text = FindAndReplaceString(text, "ʷ", "w");
-	text = FindAndReplaceString(text, "Ȳ", "Y");
-	text = FindAndReplaceString(text, "ȳ", "y");
-	text = FindAndReplaceString(text, "Ŷ", "Y");
-	text = FindAndReplaceString(text, "ŷ", "y");
-	text = FindAndReplaceString(text, "Ỹ", "Y");
-	text = FindAndReplaceString(text, "ỹ", "y");
-	text = FindAndReplaceString(text, "Ý", "Y");
-	text = FindAndReplaceString(text, "ý", "y");
-	text = FindAndReplaceString(text, "Ž", "Z");
-	text = FindAndReplaceString(text, "ž", "z");
-	text = FindAndReplaceString(text, "Z̨", "Z");
-	text = FindAndReplaceString(text, "z̨", "z");
-	text = FindAndReplaceString(text, "Ż", "Z");
-	text = FindAndReplaceString(text, "ż", "z");
+	std::string result(text);
 	
-	text = FindAndReplaceString(text, "ʔ", "'"); // glottal stop
+	result = FindAndReplaceString(result, "Ā́", "A");
+	result = FindAndReplaceString(result, "ā́", "a");
+	result = FindAndReplaceString(result, "Ā", "A");
+	result = FindAndReplaceString(result, "ā", "a");
+	result = FindAndReplaceString(result, "Ấ", "A");
+	result = FindAndReplaceString(result, "ấ", "a");
+	result = FindAndReplaceString(result, "Ȧ́", "A");
+	result = FindAndReplaceString(result, "ȧ́", "a");
+	result = FindAndReplaceString(result, "Á", "A");
+	result = FindAndReplaceString(result, "á", "a");
+	result = FindAndReplaceString(result, "À", "A");
+	result = FindAndReplaceString(result, "à", "a");
+	result = FindAndReplaceString(result, "Ã", "A");
+	result = FindAndReplaceString(result, "ã", "a");
+	result = FindAndReplaceString(result, "Ä", "A");
+	result = FindAndReplaceString(result, "ä", "a");
+	result = FindAndReplaceString(result, "Ā", "A");
+	result = FindAndReplaceString(result, "ā", "a");
+	result = FindAndReplaceString(result, "Â", "A");
+	result = FindAndReplaceString(result, "â", "a");
+	result = FindAndReplaceString(result, "Ą", "A");
+	result = FindAndReplaceString(result, "ą", "a");
+	result = FindAndReplaceString(result, "ᶏ", "a");
+	result = FindAndReplaceString(result, "Å", "A");
+	result = FindAndReplaceString(result, "å", "a");
+	result = FindAndReplaceString(result, "Ă", "A");
+	result = FindAndReplaceString(result, "ă", "a");
+	result = FindAndReplaceString(result, "Æ̂", "Ae");
+	result = FindAndReplaceString(result, "æ̂", "ae");
+	result = FindAndReplaceString(result, "Æ", "Ae");
+	result = FindAndReplaceString(result, "æ", "ae");
+	result = FindAndReplaceString(result, "Ǣ", "Ae");
+	result = FindAndReplaceString(result, "ǣ", "ae");
+	result = FindAndReplaceString(result, "Ǽ", "Ae");
+	result = FindAndReplaceString(result, "ǽ", "ae");
+	result = FindAndReplaceString(result, "Ƀ", "B");
+	result = FindAndReplaceString(result, "ƀ", "b");
+	result = FindAndReplaceString(result, "Č", "C");
+	result = FindAndReplaceString(result, "č", "c");
+	result = FindAndReplaceString(result, "Ð", "D");
+	result = FindAndReplaceString(result, "ð", "d");
+	result = FindAndReplaceString(result, "Ḍ", "D");
+	result = FindAndReplaceString(result, "ḍ", "d");
+	result = FindAndReplaceString(result, "Đ", "D");
+	result = FindAndReplaceString(result, "đ", "d");
+	result = FindAndReplaceString(result, "ẟ", "d"); //not the same character as "δ"
+	result = FindAndReplaceString(result, "Ę̄", "E");
+	result = FindAndReplaceString(result, "ę̄", "e");
+	result = FindAndReplaceString(result, "Ḗ", "E");
+	result = FindAndReplaceString(result, "ḗ", "e");
+	result = FindAndReplaceString(result, "Ė́", "E");
+	result = FindAndReplaceString(result, "ė́", "e");
+	result = FindAndReplaceString(result, "Ë̃", "E");
+	result = FindAndReplaceString(result, "ë̃", "e");
+	result = FindAndReplaceString(result, "Ë̂", "E");
+	result = FindAndReplaceString(result, "ë̂", "e");
+	result = FindAndReplaceString(result, "É", "E"); 
+	result = FindAndReplaceString(result, "é", "e");
+	result = FindAndReplaceString(result, "È", "E");
+	result = FindAndReplaceString(result, "è", "e");
+	result = FindAndReplaceString(result, "Ē", "E");
+	result = FindAndReplaceString(result, "ē", "e");
+	result = FindAndReplaceString(result, "Ê", "E");
+	result = FindAndReplaceString(result, "ê", "e");
+	result = FindAndReplaceString(result, "Ě", "E");
+	result = FindAndReplaceString(result, "ě", "e");
+	result = FindAndReplaceString(result, "Ė", "E");
+	result = FindAndReplaceString(result, "ė", "e");
+	result = FindAndReplaceString(result, "Ë", "E");
+	result = FindAndReplaceString(result, "ë", "e");
+	result = FindAndReplaceString(result, "Ę", "E");
+	result = FindAndReplaceString(result, "ę", "e");
+	result = FindAndReplaceString(result, "Ĕ", "E");
+	result = FindAndReplaceString(result, "ĕ", "e");
+	result = FindAndReplaceString(result, "Ə", "E");
+	result = FindAndReplaceString(result, "ə", "e");
+	result = FindAndReplaceString(result, "Ǝ", "E");
+	result = FindAndReplaceString(result, "ǝ", "e");
+	result = FindAndReplaceString(result, "ϵ", "e");
+	result = FindAndReplaceString(result, "Ĝ", "G");
+	result = FindAndReplaceString(result, "ĝ", "g");
+	result = FindAndReplaceString(result, "Ī̆", "I");
+	result = FindAndReplaceString(result, "ī̆", "i");
+	result = FindAndReplaceString(result, "Î́", "I");
+	result = FindAndReplaceString(result, "î́", "i");
+	result = FindAndReplaceString(result, "Ī́", "I");
+	result = FindAndReplaceString(result, "ī́", "i");
+	result = FindAndReplaceString(result, "Ī", "I");
+	result = FindAndReplaceString(result, "ī", "i");
+	result = FindAndReplaceString(result, "I̊", "I");
+	result = FindAndReplaceString(result, "i̊", "i");
+	result = FindAndReplaceString(result, "Í", "I");
+	result = FindAndReplaceString(result, "í", "i");
+	result = FindAndReplaceString(result, "Ì", "I");
+	result = FindAndReplaceString(result, "ì", "i");
+	result = FindAndReplaceString(result, "Ī", "I");
+	result = FindAndReplaceString(result, "ī", "i");
+	result = FindAndReplaceString(result, "Î", "I");
+	result = FindAndReplaceString(result, "î", "i");
+	result = FindAndReplaceString(result, "Ĭ", "I");
+	result = FindAndReplaceString(result, "ĭ", "i");
+	result = FindAndReplaceString(result, "Ĩ", "I");
+	result = FindAndReplaceString(result, "ĩ", "i");
+	result = FindAndReplaceString(result, "Ḱ", "K");
+	result = FindAndReplaceString(result, "ḱ", "k");
+	result = FindAndReplaceString(result, "L̥", "L");
+	result = FindAndReplaceString(result, "l̥", "l");
+	result = FindAndReplaceString(result, "Ɫ", "L");
+	result = FindAndReplaceString(result, "ɫ", "l");
+	result = FindAndReplaceString(result, "Ň", "N");
+	result = FindAndReplaceString(result, "ň", "n");
+	result = FindAndReplaceString(result, "Ṇ", "N");
+	result = FindAndReplaceString(result, "ṇ", "n");
+	result = FindAndReplaceString(result, "Ṅ", "N");
+	result = FindAndReplaceString(result, "ṅ", "n");
+	result = FindAndReplaceString(result, "Ṓ", "O");
+	result = FindAndReplaceString(result, "ṓ", "o");
+	result = FindAndReplaceString(result, "Ŏ", "O");
+	result = FindAndReplaceString(result, "ŏ", "o");
+	result = FindAndReplaceString(result, "Ø", "Ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	result = FindAndReplaceString(result, "ø", "ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	result = FindAndReplaceString(result, "Ǫ", "O"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	result = FindAndReplaceString(result, "ǫ", "o"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	result = FindAndReplaceString(result, "Ö", "O");
+	result = FindAndReplaceString(result, "ö", "o");
+	result = FindAndReplaceString(result, "Ó", "O");
+	result = FindAndReplaceString(result, "ó", "o");
+	result = FindAndReplaceString(result, "Ò", "O");
+	result = FindAndReplaceString(result, "ò", "o");
+	result = FindAndReplaceString(result, "Ō", "O");
+	result = FindAndReplaceString(result, "ō", "o");
+	result = FindAndReplaceString(result, "Ô", "O");
+	result = FindAndReplaceString(result, "ô", "o");
+	result = FindAndReplaceString(result, "Ǒ", "O");
+	result = FindAndReplaceString(result, "ǒ", "o");
+	result = FindAndReplaceString(result, "Œ", "Oe");
+	result = FindAndReplaceString(result, "œ", "oe");
+	result = FindAndReplaceString(result, "Ṛ́", "R");
+	result = FindAndReplaceString(result, "ṛ́", "r");
+	result = FindAndReplaceString(result, "Ŗ́", "R");
+	result = FindAndReplaceString(result, "ŗ́", "r");
+	result = FindAndReplaceString(result, "R̄", "R");
+	result = FindAndReplaceString(result, "r̄", "r");
+	result = FindAndReplaceString(result, "Ř", "R");
+	result = FindAndReplaceString(result, "ř", "r");
+	result = FindAndReplaceString(result, "Ṛ", "R");
+	result = FindAndReplaceString(result, "ṛ", "r");
+	result = FindAndReplaceString(result, "Ŕ", "R");
+	result = FindAndReplaceString(result, "ŕ", "r");
+	result = FindAndReplaceString(result, "Ṙ", "R");
+	result = FindAndReplaceString(result, "ṙ", "r");
+	result = FindAndReplaceString(result, "Š", "S");
+	result = FindAndReplaceString(result, "š", "s");
+	result = FindAndReplaceString(result, "Ș", "S");
+	result = FindAndReplaceString(result, "ș", "s");
+	result = FindAndReplaceString(result, "Ś", "S");
+	result = FindAndReplaceString(result, "ś", "s");
+	result = FindAndReplaceString(result, "ß", "ss"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	result = FindAndReplaceString(result, "Ṭ", "T");
+	result = FindAndReplaceString(result, "ṭ", "t");
+	result = FindAndReplaceString(result, "Ț", "T");
+	result = FindAndReplaceString(result, "ț", "t");
+	result = FindAndReplaceString(result, "ÞÞ", "Þ"); //replace double thorns with a single one
+	result = FindAndReplaceString(result, "þþ", "þ"); //replace double thorns with a single one
+	result = FindAndReplaceString(result, "Þ", "Th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	result = FindAndReplaceString(result, "þ", "th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	result = FindAndReplaceString(result, "Ū́", "U");
+	result = FindAndReplaceString(result, "ū́", "u");
+	result = FindAndReplaceString(result, "Ů̃", "U");
+	result = FindAndReplaceString(result, "ů̃", "u");
+	result = FindAndReplaceString(result, "Ü", "U");
+	result = FindAndReplaceString(result, "ü", "u");
+	result = FindAndReplaceString(result, "Ú", "U");
+	result = FindAndReplaceString(result, "ú", "u");
+	result = FindAndReplaceString(result, "Ù", "U");
+	result = FindAndReplaceString(result, "ù", "u");
+	result = FindAndReplaceString(result, "Ū", "U");
+	result = FindAndReplaceString(result, "ū", "u");
+	result = FindAndReplaceString(result, "Û", "U");
+	result = FindAndReplaceString(result, "û", "u");
+	result = FindAndReplaceString(result, "Ŭ", "U");
+	result = FindAndReplaceString(result, "ŭ", "u");
+	result = FindAndReplaceString(result, "Ů", "U");
+	result = FindAndReplaceString(result, "ů", "u");
+	result = FindAndReplaceString(result, "Ũ", "U");
+	result = FindAndReplaceString(result, "ũ", "u");
+	result = FindAndReplaceString(result, "Ṷ", "U");
+	result = FindAndReplaceString(result, "ṷ", "u");
+	result = FindAndReplaceString(result, "ʷ", "w");
+	result = FindAndReplaceString(result, "Ȳ", "Y");
+	result = FindAndReplaceString(result, "ȳ", "y");
+	result = FindAndReplaceString(result, "Ŷ", "Y");
+	result = FindAndReplaceString(result, "ŷ", "y");
+	result = FindAndReplaceString(result, "Ỹ", "Y");
+	result = FindAndReplaceString(result, "ỹ", "y");
+	result = FindAndReplaceString(result, "Ý", "Y");
+	result = FindAndReplaceString(result, "ý", "y");
+	result = FindAndReplaceString(result, "Ž", "Z");
+	result = FindAndReplaceString(result, "ž", "z");
+	result = FindAndReplaceString(result, "Z̨", "Z");
+	result = FindAndReplaceString(result, "z̨", "z");
+	result = FindAndReplaceString(result, "Ż", "Z");
+	result = FindAndReplaceString(result, "ż", "z");
+	
+	result = FindAndReplaceString(result, "ʔ", "'"); // glottal stop
 
 	//replace endings in -r after consonants (which happens in the nominative for Old Norse); Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceStringEnding(text, "dr", "d");
-	text = FindAndReplaceString(text, "dr ", "d ");
-	text = FindAndReplaceStringEnding(text, "fr", "f");
-	text = FindAndReplaceString(text, "fr ", "f ");
-	text = FindAndReplaceStringEnding(text, "gr", "g");
-	text = FindAndReplaceString(text, "gr ", "g ");
-	text = FindAndReplaceStringEnding(text, "kr", "k");
-	text = FindAndReplaceString(text, "kr ", "k ");
-	text = FindAndReplaceStringEnding(text, "mr", "m");
-	text = FindAndReplaceString(text, "mr ", "m ");
-	text = FindAndReplaceStringEnding(text, "nr", "n");
-	text = FindAndReplaceString(text, "nr ", "n ");
-	text = FindAndReplaceStringEnding(text, "pr", "p");
-	text = FindAndReplaceString(text, "pr ", "p ");
-	text = FindAndReplaceStringEnding(text, "rr", "r");
-	text = FindAndReplaceString(text, "rr ", "r ");
-	text = FindAndReplaceStringEnding(text, "tr", "t");
-	text = FindAndReplaceString(text, "tr ", "t ");
+	result = FindAndReplaceStringEnding(result, "dr", "d");
+	result = FindAndReplaceString(result, "dr ", "d ");
+	result = FindAndReplaceStringEnding(result, "fr", "f");
+	result = FindAndReplaceString(result, "fr ", "f ");
+	result = FindAndReplaceStringEnding(result, "gr", "g");
+	result = FindAndReplaceString(result, "gr ", "g ");
+	result = FindAndReplaceStringEnding(result, "kr", "k");
+	result = FindAndReplaceString(result, "kr ", "k ");
+	result = FindAndReplaceStringEnding(result, "mr", "m");
+	result = FindAndReplaceString(result, "mr ", "m ");
+	result = FindAndReplaceStringEnding(result, "nr", "n");
+	result = FindAndReplaceString(result, "nr ", "n ");
+	result = FindAndReplaceStringEnding(result, "pr", "p");
+	result = FindAndReplaceString(result, "pr ", "p ");
+	result = FindAndReplaceStringEnding(result, "rr", "r");
+	result = FindAndReplaceString(result, "rr ", "r ");
+	result = FindAndReplaceStringEnding(result, "tr", "t");
+	result = FindAndReplaceString(result, "tr ", "t ");
 	
 	//Greek characters
-	text = FindAndReplaceString(text, "Ἄ", "A");
-	text = FindAndReplaceString(text, "ἄ", "a");
-	text = FindAndReplaceString(text, "Ά", "A");
-	text = FindAndReplaceString(text, "ά", "a");
-	text = FindAndReplaceString(text, "Ἀ", "A");
-	text = FindAndReplaceString(text, "ἀ", "a");
-	text = FindAndReplaceString(text, "Α", "A");
-	text = FindAndReplaceString(text, "α", "a");
-	text = FindAndReplaceString(text, "Β", "B");
-	text = FindAndReplaceString(text, "β", "b");
-	text = FindAndReplaceString(text, "Χ", "Ch");
-	text = FindAndReplaceString(text, "χ", "ch");
-	text = FindAndReplaceString(text, "Δ", "D");
-	text = FindAndReplaceString(text, "δ", "d");
-	text = FindAndReplaceString(text, "Ἑ", "E");
-	text = FindAndReplaceString(text, "ἑ", "e");
-	text = FindAndReplaceString(text, "Ἔ", "E");
-	text = FindAndReplaceString(text, "ἔ", "e");
-	text = FindAndReplaceString(text, "Έ", "E");
-	text = FindAndReplaceString(text, "έ", "e");
-	text = FindAndReplaceString(text, "Ε", "E");
-	text = FindAndReplaceString(text, "ε", "e");
-	text = FindAndReplaceString(text, "Η", "E");
-	text = FindAndReplaceString(text, "η", "e");
-	text = FindAndReplaceString(text, "Γ", "G");
-	text = FindAndReplaceString(text, "γ", "g");
-	text = FindAndReplaceString(text, "Ῑ́", "I");
-	text = FindAndReplaceString(text, "ῑ́", "i");
-	text = FindAndReplaceString(text, "Ί", "I");
-	text = FindAndReplaceString(text, "ί", "i");
-	text = FindAndReplaceString(text, "ῖ", "i");
-	text = FindAndReplaceString(text, "Ι", "I");
-	text = FindAndReplaceString(text, "ι", "i");
-	text = FindAndReplaceString(text, "Ή", "I");
-	text = FindAndReplaceString(text, "ή", "i");
-	text = FindAndReplaceString(text, "Κ", "K");
-	text = FindAndReplaceString(text, "κ", "k");
-	text = FindAndReplaceString(text, "Λ", "L");
-	text = FindAndReplaceString(text, "λ", "l");
-	text = FindAndReplaceString(text, "Μ", "M");
-	text = FindAndReplaceString(text, "μ", "m");
-	text = FindAndReplaceString(text, "Ν", "N");
-	text = FindAndReplaceString(text, "ν", "n");
-	text = FindAndReplaceString(text, "Ὄ", "O");
-	text = FindAndReplaceString(text, "ὄ", "o");
-	text = FindAndReplaceString(text, "Ὅ", "O");
-	text = FindAndReplaceString(text, "ὅ", "o");
-	text = FindAndReplaceString(text, "Ό", "O");
-	text = FindAndReplaceString(text, "ό", "o");
-	text = FindAndReplaceString(text, "Ὀ", "O");
-	text = FindAndReplaceString(text, "ὀ", "o");
-	text = FindAndReplaceString(text, "Ὁ", "O");
-	text = FindAndReplaceString(text, "ὁ", "o");
-	text = FindAndReplaceString(text, "Ο", "O");
-	text = FindAndReplaceString(text, "ο", "o");
-	text = FindAndReplaceString(text, "Ώ", "O");
-	text = FindAndReplaceString(text, "ώ", "o");
-	text = FindAndReplaceString(text, "Ω", "O");
-	text = FindAndReplaceString(text, "ω", "o");
-	text = FindAndReplaceString(text, "Π", "P");
-	text = FindAndReplaceString(text, "π", "p");
-	text = FindAndReplaceString(text, "Φ", "Ph");
-	text = FindAndReplaceString(text, "φ", "ph");
-	text = FindAndReplaceString(text, "Ψ", "Ps");
-	text = FindAndReplaceString(text, "ψ", "ps");
-	text = FindAndReplaceString(text, "Ρ", "R");
-	text = FindAndReplaceString(text, "ρ", "r");
-	text = FindAndReplaceString(text, "Σ", "S");
-	text = FindAndReplaceString(text, "σ", "s");
-	text = FindAndReplaceString(text, "ς", "s");
-	text = FindAndReplaceString(text, "Τ", "T");
-	text = FindAndReplaceString(text, "τ", "t");
-	text = FindAndReplaceString(text, "Θ", "Th");
-	text = FindAndReplaceString(text, "θ", "th");
-	text = FindAndReplaceString(text, "Ξ", "X");
-	text = FindAndReplaceString(text, "ξ", "x");
-	text = FindAndReplaceString(text, "Ύ", "Y");
-	text = FindAndReplaceString(text, "ύ", "y");
-	text = FindAndReplaceString(text, "Ὑ", "Y");
-	text = FindAndReplaceString(text, "ὑ", "y");
-	text = FindAndReplaceString(text, "Υ", "Y");
-	text = FindAndReplaceString(text, "υ", "y");
-	text = FindAndReplaceString(text, "Ζ", "Z");
-	text = FindAndReplaceString(text, "ζ", "z");
+	result = FindAndReplaceString(result, "Ἄ", "A");
+	result = FindAndReplaceString(result, "ἄ", "a");
+	result = FindAndReplaceString(result, "Ά", "A");
+	result = FindAndReplaceString(result, "ά", "a");
+	result = FindAndReplaceString(result, "Ἀ", "A");
+	result = FindAndReplaceString(result, "ἀ", "a");
+	result = FindAndReplaceString(result, "Α", "A");
+	result = FindAndReplaceString(result, "α", "a");
+	result = FindAndReplaceString(result, "Β", "B");
+	result = FindAndReplaceString(result, "β", "b");
+	result = FindAndReplaceString(result, "Χ", "Ch");
+	result = FindAndReplaceString(result, "χ", "ch");
+	result = FindAndReplaceString(result, "Δ", "D");
+	result = FindAndReplaceString(result, "δ", "d");
+	result = FindAndReplaceString(result, "Ἑ", "E");
+	result = FindAndReplaceString(result, "ἑ", "e");
+	result = FindAndReplaceString(result, "Ἔ", "E");
+	result = FindAndReplaceString(result, "ἔ", "e");
+	result = FindAndReplaceString(result, "Έ", "E");
+	result = FindAndReplaceString(result, "έ", "e");
+	result = FindAndReplaceString(result, "Ε", "E");
+	result = FindAndReplaceString(result, "ε", "e");
+	result = FindAndReplaceString(result, "Η", "E");
+	result = FindAndReplaceString(result, "η", "e");
+	result = FindAndReplaceString(result, "Γ", "G");
+	result = FindAndReplaceString(result, "γ", "g");
+	result = FindAndReplaceString(result, "Ῑ́", "I");
+	result = FindAndReplaceString(result, "ῑ́", "i");
+	result = FindAndReplaceString(result, "Ί", "I");
+	result = FindAndReplaceString(result, "ί", "i");
+	result = FindAndReplaceString(result, "ῖ", "i");
+	result = FindAndReplaceString(result, "Ι", "I");
+	result = FindAndReplaceString(result, "ι", "i");
+	result = FindAndReplaceString(result, "Ή", "I");
+	result = FindAndReplaceString(result, "ή", "i");
+	result = FindAndReplaceString(result, "Κ", "K");
+	result = FindAndReplaceString(result, "κ", "k");
+	result = FindAndReplaceString(result, "Λ", "L");
+	result = FindAndReplaceString(result, "λ", "l");
+	result = FindAndReplaceString(result, "Μ", "M");
+	result = FindAndReplaceString(result, "μ", "m");
+	result = FindAndReplaceString(result, "Ν", "N");
+	result = FindAndReplaceString(result, "ν", "n");
+	result = FindAndReplaceString(result, "Ὄ", "O");
+	result = FindAndReplaceString(result, "ὄ", "o");
+	result = FindAndReplaceString(result, "Ὅ", "O");
+	result = FindAndReplaceString(result, "ὅ", "o");
+	result = FindAndReplaceString(result, "Ό", "O");
+	result = FindAndReplaceString(result, "ό", "o");
+	result = FindAndReplaceString(result, "Ὀ", "O");
+	result = FindAndReplaceString(result, "ὀ", "o");
+	result = FindAndReplaceString(result, "Ὁ", "O");
+	result = FindAndReplaceString(result, "ὁ", "o");
+	result = FindAndReplaceString(result, "Ο", "O");
+	result = FindAndReplaceString(result, "ο", "o");
+	result = FindAndReplaceString(result, "Ώ", "O");
+	result = FindAndReplaceString(result, "ώ", "o");
+	result = FindAndReplaceString(result, "Ω", "O");
+	result = FindAndReplaceString(result, "ω", "o");
+	result = FindAndReplaceString(result, "Π", "P");
+	result = FindAndReplaceString(result, "π", "p");
+	result = FindAndReplaceString(result, "Φ", "Ph");
+	result = FindAndReplaceString(result, "φ", "ph");
+	result = FindAndReplaceString(result, "Ψ", "Ps");
+	result = FindAndReplaceString(result, "ψ", "ps");
+	result = FindAndReplaceString(result, "Ρ", "R");
+	result = FindAndReplaceString(result, "ρ", "r");
+	result = FindAndReplaceString(result, "Σ", "S");
+	result = FindAndReplaceString(result, "σ", "s");
+	result = FindAndReplaceString(result, "ς", "s");
+	result = FindAndReplaceString(result, "Τ", "T");
+	result = FindAndReplaceString(result, "τ", "t");
+	result = FindAndReplaceString(result, "Θ", "Th");
+	result = FindAndReplaceString(result, "θ", "th");
+	result = FindAndReplaceString(result, "Ξ", "X");
+	result = FindAndReplaceString(result, "ξ", "x");
+	result = FindAndReplaceString(result, "Ύ", "Y");
+	result = FindAndReplaceString(result, "ύ", "y");
+	result = FindAndReplaceString(result, "Ὑ", "Y");
+	result = FindAndReplaceString(result, "ὑ", "y");
+	result = FindAndReplaceString(result, "Υ", "Y");
+	result = FindAndReplaceString(result, "υ", "y");
+	result = FindAndReplaceString(result, "Ζ", "Z");
+	result = FindAndReplaceString(result, "ζ", "z");
 	
 	//remove large clusters of the same letters
-	text = FindAndReplaceString(text, "nnn", "nn");
+	result = FindAndReplaceString(result, "nnn", "nn");
 	
-	return text;
+	return result;
 }
 
-std::string CapitalizeString(std::string text)
+std::string CapitalizeString(const std::string &text)
 {
 	if (text.empty()) {
 		return text;
 	}
 	
-	text[0] = toupper(text[0]);
+	std::string result(text);
+	
+	result[0] = toupper(result[0]);
 	
 	// replace special characters which may not have been uppered with the previous method
-	text = FindAndReplaceStringBeginning(text, "ā", "Ā");
-	text = FindAndReplaceStringBeginning(text, "â", "Â");
-	text = FindAndReplaceStringBeginning(text, "æ", "Æ");
-	text = FindAndReplaceStringBeginning(text, "ǣ", "Ǣ");
-	text = FindAndReplaceStringBeginning(text, "ǽ", "Ǽ");
-	text = FindAndReplaceStringBeginning(text, "ð", "Ð");
-	text = FindAndReplaceStringBeginning(text, "ḍ", "Ḍ");
-	text = FindAndReplaceStringBeginning(text, "ē", "Ē");
-	text = FindAndReplaceStringBeginning(text, "ê", "Ê");
-	text = FindAndReplaceStringBeginning(text, "ě", "Ě");
-	text = FindAndReplaceStringBeginning(text, "ī", "Ī");
-	text = FindAndReplaceStringBeginning(text, "î", "Î");
-	text = FindAndReplaceStringBeginning(text, "ĭ", "Ĭ");
-	text = FindAndReplaceStringBeginning(text, "ī̆", "Ī̆");
-	text = FindAndReplaceStringBeginning(text, "ō", "Ō");
-	text = FindAndReplaceStringBeginning(text, "ô", "Ô");
-	text = FindAndReplaceStringBeginning(text, "ø", "Ø");
-	text = FindAndReplaceStringBeginning(text, "ǫ", "Ǫ");
-	text = FindAndReplaceStringBeginning(text, "ș", "Ș");
-	text = FindAndReplaceStringBeginning(text, "ț", "Ț");
-	text = FindAndReplaceStringBeginning(text, "þ", "Þ");
-	text = FindAndReplaceStringBeginning(text, "ū", "Ū");
-	text = FindAndReplaceStringBeginning(text, "û", "Û");
-	text = FindAndReplaceStringBeginning(text, "ŭ", "Ŭ");
-	text = FindAndReplaceStringBeginning(text, "ȳ", "Ȳ");
-	text = FindAndReplaceStringBeginning(text, "ž", "Ž");
+	result = FindAndReplaceStringBeginning(result, "ā", "Ā");
+	result = FindAndReplaceStringBeginning(result, "â", "Â");
+	result = FindAndReplaceStringBeginning(result, "æ", "Æ");
+	result = FindAndReplaceStringBeginning(result, "ǣ", "Ǣ");
+	result = FindAndReplaceStringBeginning(result, "ǽ", "Ǽ");
+	result = FindAndReplaceStringBeginning(result, "ð", "Ð");
+	result = FindAndReplaceStringBeginning(result, "ḍ", "Ḍ");
+	result = FindAndReplaceStringBeginning(result, "ē", "Ē");
+	result = FindAndReplaceStringBeginning(result, "ê", "Ê");
+	result = FindAndReplaceStringBeginning(result, "ě", "Ě");
+	result = FindAndReplaceStringBeginning(result, "ī", "Ī");
+	result = FindAndReplaceStringBeginning(result, "î", "Î");
+	result = FindAndReplaceStringBeginning(result, "ĭ", "Ĭ");
+	result = FindAndReplaceStringBeginning(result, "ī̆", "Ī̆");
+	result = FindAndReplaceStringBeginning(result, "ō", "Ō");
+	result = FindAndReplaceStringBeginning(result, "ô", "Ô");
+	result = FindAndReplaceStringBeginning(result, "ø", "Ø");
+	result = FindAndReplaceStringBeginning(result, "ǫ", "Ǫ");
+	result = FindAndReplaceStringBeginning(result, "ș", "Ș");
+	result = FindAndReplaceStringBeginning(result, "ț", "Ț");
+	result = FindAndReplaceStringBeginning(result, "þ", "Þ");
+	result = FindAndReplaceStringBeginning(result, "ū", "Ū");
+	result = FindAndReplaceStringBeginning(result, "û", "Û");
+	result = FindAndReplaceStringBeginning(result, "ŭ", "Ŭ");
+	result = FindAndReplaceStringBeginning(result, "ȳ", "Ȳ");
+	result = FindAndReplaceStringBeginning(result, "ž", "Ž");
 	
 	//Greek characters
-	text = FindAndReplaceStringBeginning(text, "α", "Α");
-	text = FindAndReplaceStringBeginning(text, "χ", "Χ");
-	text = FindAndReplaceStringBeginning(text, "έ", "Έ");
-	text = FindAndReplaceStringBeginning(text, "ι", "Ι");
-	text = FindAndReplaceStringBeginning(text, "μ", "Μ");
-	text = FindAndReplaceStringBeginning(text, "ν", "Ν");
-	text = FindAndReplaceStringBeginning(text, "ο", "Ο");
-	text = FindAndReplaceStringBeginning(text, "ό", "Ό");
-	text = FindAndReplaceStringBeginning(text, "σ", "Σ");
-	text = FindAndReplaceStringBeginning(text, "θ", "Θ");
-	text = FindAndReplaceStringBeginning(text, "ύ", "Ύ");
+	result = FindAndReplaceStringBeginning(result, "α", "Α");
+	result = FindAndReplaceStringBeginning(result, "χ", "Χ");
+	result = FindAndReplaceStringBeginning(result, "έ", "Έ");
+	result = FindAndReplaceStringBeginning(result, "ι", "Ι");
+	result = FindAndReplaceStringBeginning(result, "μ", "Μ");
+	result = FindAndReplaceStringBeginning(result, "ν", "Ν");
+	result = FindAndReplaceStringBeginning(result, "ο", "Ο");
+	result = FindAndReplaceStringBeginning(result, "ό", "Ό");
+	result = FindAndReplaceStringBeginning(result, "σ", "Σ");
+	result = FindAndReplaceStringBeginning(result, "θ", "Θ");
+	result = FindAndReplaceStringBeginning(result, "ύ", "Ύ");
 	
-	return text;
+	return result;
 }
 
-std::string DecapitalizeString(std::string text)
+std::string DecapitalizeString(const std::string &text)
 {
 	if (text.empty()) {
 		return text;
 	}
 
-	text[0] = tolower(text[0]);
+	std::string result(text);
+	
+	result[0] = tolower(result[0]);
 	
 	// replace special characters which may not have been lowered with the previous method
-	text = FindAndReplaceStringBeginning(text, "Ā", "ā");
-	text = FindAndReplaceStringBeginning(text, "Â", "â");
-	text = FindAndReplaceStringBeginning(text, "Æ", "æ");
-	text = FindAndReplaceStringBeginning(text, "Ǣ", "ǣ");
-	text = FindAndReplaceStringBeginning(text, "Ǽ", "ǽ");
-	text = FindAndReplaceStringBeginning(text, "Ç", "ç");
-	text = FindAndReplaceStringBeginning(text, "Ð", "ð");
-	text = FindAndReplaceStringBeginning(text, "Ḍ", "ḍ");
-	text = FindAndReplaceStringBeginning(text, "Ē", "ē");
-	text = FindAndReplaceStringBeginning(text, "Ê", "ê");
-	text = FindAndReplaceStringBeginning(text, "Ě", "ě");
-	text = FindAndReplaceStringBeginning(text, "Ī", "ī");
-	text = FindAndReplaceStringBeginning(text, "Î", "î");
-	text = FindAndReplaceStringBeginning(text, "Ĭ", "ĭ");
-	text = FindAndReplaceStringBeginning(text, "Ī̆", "ī̆");
-	text = FindAndReplaceStringBeginning(text, "Ō", "ō");
-	text = FindAndReplaceStringBeginning(text, "Ô", "ô");
-	text = FindAndReplaceStringBeginning(text, "Ø", "ø");
-	text = FindAndReplaceStringBeginning(text, "Ǫ", "ǫ");
-	text = FindAndReplaceStringBeginning(text, "Þ", "þ");
-	text = FindAndReplaceStringBeginning(text, "Ū", "ū");
-	text = FindAndReplaceStringBeginning(text, "Û", "û");
-	text = FindAndReplaceStringBeginning(text, "Ŭ", "ŭ");
-	text = FindAndReplaceStringBeginning(text, "Ȳ", "ȳ");
-	text = FindAndReplaceStringBeginning(text, "Ž", "ž");
+	result = FindAndReplaceStringBeginning(result, "Ā", "ā");
+	result = FindAndReplaceStringBeginning(result, "Â", "â");
+	result = FindAndReplaceStringBeginning(result, "Æ", "æ");
+	result = FindAndReplaceStringBeginning(result, "Ǣ", "ǣ");
+	result = FindAndReplaceStringBeginning(result, "Ǽ", "ǽ");
+	result = FindAndReplaceStringBeginning(result, "Ç", "ç");
+	result = FindAndReplaceStringBeginning(result, "Ð", "ð");
+	result = FindAndReplaceStringBeginning(result, "Ḍ", "ḍ");
+	result = FindAndReplaceStringBeginning(result, "Ē", "ē");
+	result = FindAndReplaceStringBeginning(result, "Ê", "ê");
+	result = FindAndReplaceStringBeginning(result, "Ě", "ě");
+	result = FindAndReplaceStringBeginning(result, "Ī", "ī");
+	result = FindAndReplaceStringBeginning(result, "Î", "î");
+	result = FindAndReplaceStringBeginning(result, "Ĭ", "ĭ");
+	result = FindAndReplaceStringBeginning(result, "Ī̆", "ī̆");
+	result = FindAndReplaceStringBeginning(result, "Ō", "ō");
+	result = FindAndReplaceStringBeginning(result, "Ô", "ô");
+	result = FindAndReplaceStringBeginning(result, "Ø", "ø");
+	result = FindAndReplaceStringBeginning(result, "Ǫ", "ǫ");
+	result = FindAndReplaceStringBeginning(result, "Þ", "þ");
+	result = FindAndReplaceStringBeginning(result, "Ū", "ū");
+	result = FindAndReplaceStringBeginning(result, "Û", "û");
+	result = FindAndReplaceStringBeginning(result, "Ŭ", "ŭ");
+	result = FindAndReplaceStringBeginning(result, "Ȳ", "ȳ");
+	result = FindAndReplaceStringBeginning(result, "Ž", "ž");
 	
 	//Greek characters
-	text = FindAndReplaceStringBeginning(text, "Α", "α");
-	text = FindAndReplaceStringBeginning(text, "Χ", "χ");
-	text = FindAndReplaceStringBeginning(text, "Έ", "έ");
-	text = FindAndReplaceStringBeginning(text, "Ι", "ι");
-	text = FindAndReplaceStringBeginning(text, "Μ", "μ");
-	text = FindAndReplaceStringBeginning(text, "Ν", "ν");
-	text = FindAndReplaceStringBeginning(text, "Ο", "ο");
-	text = FindAndReplaceStringBeginning(text, "Ό", "ό");
-	text = FindAndReplaceStringBeginning(text, "Σ", "σ");
-	text = FindAndReplaceStringBeginning(text, "Θ", "θ");
-	text = FindAndReplaceStringBeginning(text, "Ύ", "ύ");
+	result = FindAndReplaceStringBeginning(result, "Α", "α");
+	result = FindAndReplaceStringBeginning(result, "Χ", "χ");
+	result = FindAndReplaceStringBeginning(result, "Έ", "έ");
+	result = FindAndReplaceStringBeginning(result, "Ι", "ι");
+	result = FindAndReplaceStringBeginning(result, "Μ", "μ");
+	result = FindAndReplaceStringBeginning(result, "Ν", "ν");
+	result = FindAndReplaceStringBeginning(result, "Ο", "ο");
+	result = FindAndReplaceStringBeginning(result, "Ό", "ό");
+	result = FindAndReplaceStringBeginning(result, "Σ", "σ");
+	result = FindAndReplaceStringBeginning(result, "Θ", "θ");
+	result = FindAndReplaceStringBeginning(result, "Ύ", "ύ");
 	
-	return text;
+	return result;
 }
 
-std::string FullyCapitalizeString(std::string text)
+std::string FullyCapitalizeString(const std::string &text)
 {
-	text = CapitalizeString(text);
+	std::string result(text);
+	
+	result = CapitalizeString(result);
 	
 	size_t pos = 0;
-	while ((pos = text.find(" ", pos)) != std::string::npos) {
-		std::string replace = CapitalizeString(text.substr(pos + 1, 1));
-		text.replace(pos + 1, 1, replace);
+	while ((pos = result.find(" ", pos)) != std::string::npos) {
+		std::string replace = CapitalizeString(result.substr(pos + 1, 1));
+		result.replace(pos + 1, 1, replace);
 		pos += replace.length();
 	}
 	
-	return text;
+	return result;
 }
 
-std::string FullyDecapitalizeString(std::string text)
+std::string FullyDecapitalizeString(const std::string &text)
 {
-	text = DecapitalizeString(text);
+	std::string result(text);
+	
+	result = DecapitalizeString(result);
 	
 	size_t pos = 0;
-	while ((pos = text.find(" ", pos)) != std::string::npos) {
-		std::string replace = DecapitalizeString(text.substr(pos + 1, 1));
-		text.replace(pos + 1, 1, replace);
+	while ((pos = result.find(" ", pos)) != std::string::npos) {
+		std::string replace = DecapitalizeString(result.substr(pos + 1, 1));
+		result.replace(pos + 1, 1, replace);
 		pos += replace.length();
 	}
 	
-	return text;
+	return result;
 }
 
-std::string GetPluralForm(std::string name)
+std::string GetPluralForm(const std::string &name)
 {
 	if (name == "Einherjar" || name == "Wose") {
 		return name; // no difference
 	}
 	
-	if (name != "Monkey") {
-		name = FindAndReplaceStringEnding(name, "y", "ie");
+	std::string result(name);
+	
+	if (result != "Monkey") {
+		result = FindAndReplaceStringEnding(result, "y", "ie");
 	}
 	
-	if (name.substr(name.size() - 2, 2) == "os" || name.substr(name.size() - 2, 2) == "us" || name.substr(name.size() - 1, 1) == "x") {
-		name += "es";
+	if (result.substr(result.size() - 2, 2) == "os" || result.substr(result.size() - 2, 2) == "us" || result.substr(result.size() - 1, 1) == "x") {
+		result += "es";
 	}
 	
-	if (name.substr(name.size() - 1, 1) != "s") {
-		name += "s";
+	if (result.substr(result.size() - 1, 1) != "s") {
+		result += "s";
 	}
 	
-	name = FindAndReplaceString(name, "Barracks", "Barrackses");
-	name = FindAndReplaceString(name, "Dwarfs", "Dwarves");
-	name = FindAndReplaceString(name, "Elfs", "Elves");
-	name = FindAndReplaceString(name, "Ostrichs", "Ostriches");
-	name = FindAndReplaceString(name, "Thiefs", "Thieves");
-	name = FindAndReplaceString(name, "Wolfs", "Wolves");
-	if (name != "Humans") {
-		name = FindAndReplaceStringEnding(name, "mans", "men");
+	result = FindAndReplaceString(result, "Barracks", "Barrackses");
+	result = FindAndReplaceString(result, "Dwarfs", "Dwarves");
+	result = FindAndReplaceString(result, "Elfs", "Elves");
+	result = FindAndReplaceString(result, "Ostrichs", "Ostriches");
+	result = FindAndReplaceString(result, "Thiefs", "Thieves");
+	result = FindAndReplaceString(result, "Wolfs", "Wolves");
+	if (result != "Humans") {
+		result = FindAndReplaceStringEnding(result, "mans", "men");
 	}
 	
-	return name;
+	return result;
 }
 
-std::string IdentToName(std::string text)
+std::string IdentToName(const std::string &text)
 {
-	text = FindAndReplaceString(text, "-", " ");
-	text = FullyCapitalizeString(text);
+	std::string result(text);
 	
-	return text;
+	result = FindAndReplaceString(result, "-", " ");
+	result = FullyCapitalizeString(result);
+	
+	return result;
 }
 
-std::string NameToIdent(std::string text)
+std::string NameToIdent(const std::string &text)
 {
-	text = FullyDecapitalizeString(text);
-	text = FindAndReplaceString(text, " ", "-");
-	text = FindAndReplaceString(text, "'", "");
+	std::string result(text);
 	
-	return text;
+	result = FullyDecapitalizeString(result);
+	result = FindAndReplaceString(result, " ", "-");
+	result = FindAndReplaceString(result, "'", "");
+	
+	return result;
 }
 
-std::string SeparateCapitalizedStringElements(std::string text)
+std::string SeparateCapitalizedStringElements(const std::string &text)
 {
-	for (size_t pos = 1; pos < text.length(); ++pos) {
-		if (isupper(text[pos])) {
-			text.replace(pos, 1, " " + text.substr(pos, 1));
+	std::string result(text);
+	
+	for (size_t pos = 1; pos < result.length(); ++pos) {
+		if (isupper(result[pos])) {
+			result.replace(pos, 1, " " + result.substr(pos, 1));
 			pos += 1;
 		}
 	}
-	return text;
+	return result;
 }
 
-std::string GeneratePersonalName(std::string unit_type_ident)
+std::string GeneratePersonalName(const std::string &unit_type_ident)
 {
 	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 	return UnitTypes[unit_type_id]->GeneratePersonalName(NULL, UnitTypes[unit_type_id]->DefaultStat.Variables[GENDER_INDEX].Value);

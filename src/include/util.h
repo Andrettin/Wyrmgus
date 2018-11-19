@@ -121,7 +121,9 @@ extern size_t strnlen(const char *str, size_t strsize);
 extern std::vector<std::string> SplitString(const std::string &str, const std::string &separators, const std::string &comment_chars = "");
 extern bool StringToBool(const std::string &str);
 extern bool IsStringNumber(const std::string &str);
+extern bool IsStringBool(const std::string &str);
 extern std::string NumberToRomanNumeral(unsigned number);
+extern std::string SnakeCaseToPascalCase(const std::string &str);
 
 /*----------------------------------------------------------------------------
 --  Getopt
@@ -153,20 +155,20 @@ int UTF8GetPrev(const std::string &text, int curpos);
 //@}
 
 //Wyrmgus start
-extern std::string FindAndReplaceString(std::string text, const std::string& find, const std::string& replace);
-extern std::string FindAndReplaceStringEnding(std::string text, const std::string& find, const std::string& replace);
-extern std::string FindAndReplaceStringBeginning(std::string text, const std::string& find, const std::string& replace);
-extern int GetFileLastModified(std::string file_name);
-extern std::string TransliterateText(std::string text);				/// Convert special characters into ones more legible for English-speakers
-extern std::string CapitalizeString(std::string text);				/// Make the string become capitalized
-extern std::string DecapitalizeString(std::string text);			/// Make the string lose capitalization
-extern std::string FullyCapitalizeString(std::string text);			/// Make every part of the string after a space become capitalized
-extern std::string FullyDecapitalizeString(std::string text);		/// Make every part of the string lose capitalization
-extern std::string GetPluralForm(std::string name);
-extern std::string IdentToName(std::string text);					/// Make the ident string become a display name
-extern std::string NameToIdent(std::string text);					/// Make the name be formatted like an ident string
-extern std::string SeparateCapitalizedStringElements(std::string text);	/// Make the string's capitalized elements become separated
-extern std::string GeneratePersonalName(std::string unit_type_ident);
+extern std::string FindAndReplaceString(const std::string &text, const std::string &find, const std::string &replace);
+extern std::string FindAndReplaceStringEnding(const std::string &text, const std::string &find, const std::string &replace);
+extern std::string FindAndReplaceStringBeginning(const std::string &text, const std::string &find, const std::string &replace);
+extern int GetFileLastModified(const std::string &file_name);
+extern std::string TransliterateText(const std::string &text);			/// Convert special characters into ones more legible for English-speakers
+extern std::string CapitalizeString(const std::string &text);			/// Make the string become capitalized
+extern std::string DecapitalizeString(const std::string &text);			/// Make the string lose capitalization
+extern std::string FullyCapitalizeString(const std::string &text);		/// Make every part of the string after a space become capitalized
+extern std::string FullyDecapitalizeString(const std::string &text);	/// Make every part of the string lose capitalization
+extern std::string GetPluralForm(const std::string &name);
+extern std::string IdentToName(const std::string &text);				/// Make the ident string become a display name
+extern std::string NameToIdent(const std::string &text);				/// Make the name be formatted like an ident string
+extern std::string SeparateCapitalizedStringElements(const std::string &text);	/// Make the string's capitalized elements become separated
+extern std::string GeneratePersonalName(const std::string &unit_type_ident);
 //Wyrmgus end
 
 #endif /* __UTIL_H__ */
