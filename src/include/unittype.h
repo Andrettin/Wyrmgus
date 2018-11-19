@@ -901,6 +901,7 @@ public:
 	//Wyrmgus start
 	void SetParent(CUnitType *parent_type);
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
+	void UpdateDefaultBoolFlags();
 	int GetAvailableLevelUpUpgrades() const;
 	int GetResourceStep(const int resource, const int player) const;
 	VariationInfo *GetDefaultVariation(CPlayer &player, int image_layer = -1) const;

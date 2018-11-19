@@ -1012,6 +1012,17 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	this->DefaultStat.Variables[PRIORITY_INDEX].Max = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max + 1;
 }
 
+void CUnitType::UpdateDefaultBoolFlags()
+{
+	// BoolFlag
+	this->BoolFlag[FLIP_INDEX].value = this->Flip;
+	this->BoolFlag[LANDUNIT_INDEX].value = this->LandUnit;
+	this->BoolFlag[AIRUNIT_INDEX].value = this->AirUnit;
+	this->BoolFlag[SEAUNIT_INDEX].value = this->SeaUnit;
+	this->BoolFlag[EXPLODEWHENKILLED_INDEX].value = this->ExplodeWhenKilled;
+	this->BoolFlag[CANATTACK_INDEX].value = this->CanAttack;
+}
+
 //Wyrmgus start
 void CUnitType::RemoveButtons(int button_action, std::string mod_file)
 {

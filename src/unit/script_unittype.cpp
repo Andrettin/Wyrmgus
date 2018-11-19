@@ -674,17 +674,6 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 	//Wyrmgus end
 }
 
-static void UpdateDefaultBoolFlags(CUnitType &type)
-{
-	// BoolFlag
-	type.BoolFlag[FLIP_INDEX].value                  = type.Flip;
-	type.BoolFlag[LANDUNIT_INDEX].value              = type.LandUnit;
-	type.BoolFlag[AIRUNIT_INDEX].value               = type.AirUnit;
-	type.BoolFlag[SEAUNIT_INDEX].value               = type.SeaUnit;
-	type.BoolFlag[EXPLODEWHENKILLED_INDEX].value     = type.ExplodeWhenKilled;
-	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
-}
-
 /**
 **  Parse unit-type.
 **
@@ -2033,7 +2022,7 @@ static int CclDefineUnitType(lua_State *l)
 	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
 		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->Name.c_str());
 	}
-	UpdateDefaultBoolFlags(*type);
+	type->UpdateDefaultBoolFlags();
 	//Wyrmgus start
 	if (GameRunning || Editor.Running == EditorEditing) {
 		InitUnitType(*type);
