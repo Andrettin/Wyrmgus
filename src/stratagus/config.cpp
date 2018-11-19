@@ -156,12 +156,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				character->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "deity") {
-			CDeity *deity = CDeity::GetDeity(ident);
-			if (!deity) {
-				deity = new CDeity;
-				deity->Ident = ident;
-				CDeity::Deities.push_back(deity);
-			}
+			CDeity *deity = CDeity::GetOrAddDeity(ident);
 			if (!define_only) {
 				deity->ProcessConfigData(config_data);
 			}
