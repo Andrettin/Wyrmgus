@@ -37,7 +37,9 @@
 
 #include "icons.h"
 
+#include "config.h"
 #include "menus.h"
+#include "mod.h"
 #include "player.h"
 #include "translate.h"
 #include "ui.h"
@@ -87,7 +89,7 @@ CIcon::~CIcon()
 **
 **  @return       New icon
 */
-/* static */ CIcon *CIcon::New(const std::string &ident)
+CIcon *CIcon::New(const std::string &ident)
 {
 	CIcon *&icon = Icons[ident];
 
@@ -104,13 +106,69 @@ CIcon::~CIcon()
 **
 **  @return       The icon
 */
-/* static */ CIcon *CIcon::Get(const std::string &ident)
+CIcon *CIcon::Get(const std::string &ident)
 {
 	IconMap::iterator it = Icons.find(ident);
 	if (it == Icons.end()) {
 		DebugPrint("icon not found: %s\n" _C_ ident.c_str());
 	}
 	return it->second;
+}
+
+void CIcon::ProcessConfigData(CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "frame") {
+			this->Frame = std::stoi(value);
+		} else {
+			fprintf(stderr, "Invalid icon property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		CConfigData *child_config_data = config_data->Children[i];
+		
+		if (child_config_data->Tag == "image") {
+			std::string file;
+			Vec2i size(0, 0);
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "file") {
+				} else if (key == "width") {
+					size.x = std::stoi(value);
+				} else if (key == "height") {
+					size.y = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (file.empty()) {
+				fprintf(stderr, "Image has no file.\n");
+				continue;
+			}
+			
+			if (size.x == 0) {
+				fprintf(stderr, "Image has no width.\n");
+				continue;
+			}
+			
+			if (size.y == 0) {
+				fprintf(stderr, "Image has no height.\n");
+				continue;
+			}
+			
+			this->G = CPlayerColorGraphic::New(file, size.x, size.y);
+		} else {
+			fprintf(stderr, "Invalid icon property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
 }
 
 void CIcon::Load()

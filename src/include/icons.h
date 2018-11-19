@@ -104,6 +104,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CConfigData;
 class CGraphic;
 class CPlayerColorGraphic;
 class CPlayer;
@@ -119,6 +120,8 @@ public:
 	static CIcon *New(const std::string &ident);
 	static CIcon *Get(const std::string &ident);
 
+	void ProcessConfigData(CConfigData *config_data);
+	
 	void Load();
 
 	/// Draw icon

@@ -160,6 +160,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				deity->ProcessConfigData(config_data);
 			}
+		} else if (config_data->Tag == "icon") {
+			CIcon *icon = CIcon::New(ident);
+			if (!define_only) {
+				icon->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "map_template") {
 			CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(ident);
 			if (!define_only) {
