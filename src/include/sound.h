@@ -47,10 +47,11 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CUnit;
-class Missile;
+class CConfigData;
 class CSample;
+class CUnit;
 class LuaActionListener;
+class Missile;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -119,6 +120,9 @@ public:
 		memset(&Sound, 0, sizeof(Sound));
 	}
 	~CSound();
+	
+	static void ProcessConfigData(CConfigData *config_data);
+		
 	unsigned int Mapref;
 	/**
 	**  Range is a multiplier for ::DistanceSilent.

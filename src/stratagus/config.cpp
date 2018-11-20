@@ -45,6 +45,7 @@
 #include "icons.h"
 #include "map_template.h"
 #include "missile.h"
+#include "sound.h"
 #include "terrain_type.h"
 #include "timeline.h"
 #include "unittype.h"
@@ -191,6 +192,10 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			}
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "sound") {
+			if (!define_only) {
+				CSound::ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "terrain_type") {
 			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(ident);

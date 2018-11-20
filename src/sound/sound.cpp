@@ -39,7 +39,9 @@
 #include "sound.h"
 
 #include "action/action_resource.h"
+#include "config.h"
 #include "map.h"
+#include "mod.h"
 #include "missile.h"
 #include "sound_server.h"
 //Wyrmgus start
@@ -803,6 +805,48 @@ CSound::~CSound()
 			this->Sound.OneGroup[i] = NULL;
 		}
 		delete[] this->Sound.OneGroup;
+	}
+}
+
+void CSound::ProcessConfigData(CConfigData *config_data)
+{
+	std::string ident = config_data->Ident;
+	ident = FindAndReplaceString(ident, "_", "-");
+	std::vector<std::string> files;
+	std::vector<CSound *> group_sounds; //sounds for sound group
+	unsigned char range = 0;
+	
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "file") {
+			std::string file = CMod::GetCurrentModPath() + value;
+			files.push_back(file);
+		} else if (key == "group_sound") {
+			value = FindAndReplaceString(value, "_", "-");
+			CSound *group_sound = SoundForName(value);
+			if (group_sound) {
+				group_sounds.push_back(group_sound);
+			} else {
+				fprintf(stderr, "Invalid sound: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "range") {
+			range = std::stoi(value);
+		} else {
+			fprintf(stderr, "Invalid sound property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	CSound *sound = NULL;
+	if (group_sounds.size() >= 2) {
+		sound = MakeSoundGroup(ident, group_sounds[0], group_sounds[1]);
+	} else {
+		sound = MakeSound(ident, files);
+	}
+	
+	if (range != 0) {
+		SetSoundRange(sound, range);
 	}
 }
 
