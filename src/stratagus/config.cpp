@@ -41,9 +41,11 @@
 #include "character.h"
 #include "deity.h"
 #include "game.h"
+#include "icons.h"
 #include "map_template.h"
 #include "terrain_type.h"
 #include "timeline.h"
+#include "unittype.h"
 #include "util.h"
 
 #include <fstream>
@@ -179,6 +181,14 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CTimeline *timeline = CTimeline::GetOrAddTimeline(ident);
 			if (!define_only) {
 				timeline->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "unit_type") {
+			CUnitType *unit_type = UnitTypeByIdent(ident);
+			if (!unit_type) {
+				unit_type = NewUnitTypeSlot(ident);
+			}
+			if (!define_only) {
+				unit_type->ProcessConfigData(config_data);
 			}
 		} else {
 			fprintf(stderr, "Invalid data type: \"%s\".\n", config_data->Tag.c_str());

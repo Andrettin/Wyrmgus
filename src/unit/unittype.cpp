@@ -43,6 +43,7 @@
 #include "animation.h"
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
+#include "config.h"
 #include "construct.h"
 //Wyrmgus start
 #include "editor.h" //for personal name generation
@@ -51,6 +52,7 @@
 #include "luacallback.h"
 #include "map.h"
 #include "missile.h"
+#include "mod.h"
 #include "player.h"
 #include "script.h"
 #include "sound.h"
@@ -692,6 +694,326 @@ CUnitType::~CUnitType()
 #endif
 }
 
+void CUnitType::ProcessConfigData(CConfigData *config_data)
+{
+	this->RemoveButtons(ButtonMove);
+	this->RemoveButtons(ButtonStop);
+	this->RemoveButtons(ButtonAttack);
+	this->RemoveButtons(ButtonPatrol);
+	this->RemoveButtons(ButtonStandGround);
+	this->RemoveButtons(ButtonReturn);
+		
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "parent") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUnitType *parent_type = UnitTypeByIdent(value);
+			if (!parent_type) {
+				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
+			}
+			this->SetParent(parent_type);
+		} else if (key == "civilization") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Civilization = PlayerRaces.GetRaceIndexByName(value.c_str());
+			if (this->Civilization == -1) {
+				fprintf(stderr, "Civilization \"%s\" does not exist.\n", value.c_str());
+			}
+		} else if (key == "faction") {
+			value = FindAndReplaceString(value, "_", "-");
+			CFaction *faction = PlayerRaces.GetFaction(value);
+			if (faction) {
+				this->Faction = faction->ID;
+			} else {
+				fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
+			}
+		} else if (key == "animations") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Animations = AnimationsByIdent(value);
+			if (!this->Animations) {
+				fprintf(stderr, "Animations \"%s\" do not exist.\n", value.c_str());
+			}
+		} else if (key == "icon") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Icon.Name = value;
+			this->Icon.Icon = NULL;
+			this->Icon.Load();
+			this->Icon.Icon->Load();
+		} else if (key == "box_width") {
+			this->BoxWidth = std::stoi(value);
+		} else if (key == "box_height") {
+			this->BoxHeight = std::stoi(value);
+		} else if (key == "description") {
+			this->Description = value;
+		} else if (key == "background") {
+			this->Background = value;
+		} else if (key == "quote") {
+			this->Quote = value;
+		} else if (key == "max_attack_range") {
+			this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = std::stoi(value);
+			this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = std::stoi(value);
+			this->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable = 1;
+		} else if (key == "missile") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Missile.Name = value;
+			this->Missile.Missile = NULL;
+		} else if (key == "fire_missile") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->FireMissile.Name = value;
+			this->FireMissile.Missile = NULL;
+		} else if (key == "corpse") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->CorpseName = value;
+			this->CorpseType = NULL;
+		} else {
+			key = SnakeCaseToPascalCase(key);
+			
+			int index = UnitTypeVar.VariableNameLookup[key.c_str()];
+			if (index != -1) { // valid index
+				if (IsStringNumber(value)) {
+					this->DefaultStat.Variables[index].Enable = 1;
+					this->DefaultStat.Variables[index].Value = std::stoi(value);
+					this->DefaultStat.Variables[index].Max = std::stoi(value);
+				} else if (IsStringBool(value)) {
+					this->DefaultStat.Variables[index].Enable = StringToBool(value);
+				} else { // Error
+					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key.c_str(), this->Ident.c_str());
+				}
+				continue;
+			}
+
+			if (this->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
+				this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
+			}
+
+			index = UnitTypeVar.BoolFlagNameLookup[key.c_str()];
+			if (index != -1) {
+				if (IsStringNumber(value)) {
+					this->BoolFlag[index].value = (std::stoi(value) != 0);
+				} else {
+					this->BoolFlag[index].value = StringToBool(value);
+				}
+			} else {
+				fprintf(stderr, "Invalid unit type property: \"%s\".\n", key.c_str());
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		CConfigData *child_config_data = config_data->Children[i];
+		
+		if (child_config_data->Tag == "image") {
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "file") {
+					this->File = CMod::GetCurrentModPath() + value;
+				} else if (key == "width") {
+					this->Width = std::stoi(value);
+				} else if (key == "height") {
+					this->Height = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (this->File.empty()) {
+				fprintf(stderr, "Image has no file.\n");
+			}
+			
+			if (this->Width == 0) {
+				fprintf(stderr, "Image has no width.\n");
+			}
+			
+			if (this->Height == 0) {
+				fprintf(stderr, "Image has no height.\n");
+			}
+			
+			if (this->Sprite) {
+				CGraphic::Free(this->Sprite);
+				this->Sprite = NULL;
+			}
+		} else {
+			fprintf(stderr, "Invalid unit type property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+	
+	if (this->Class != -1) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
+		int class_id = this->Class;
+
+		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
+		for (int i = 0; i < MAX_RACES; ++i) {
+			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[i].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[i].rend(); ++iterator) {
+				if (iterator->second == this->Slot) {
+					PlayerRaces.CivilizationClassUnitTypes[i].erase(iterator->first);
+					break;
+				}
+			}
+		}
+		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
+			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[i]->ClassUnitTypes.rend(); ++iterator) {
+				if (iterator->second == this->Slot) {
+					PlayerRaces.Factions[i]->ClassUnitTypes.erase(iterator->first);
+					break;
+				}
+			}
+		}
+		
+		if (this->Civilization != -1) {
+			int civilization_id = this->Civilization;
+			
+			if (this->Faction != -1) {
+				int faction_id = this->Faction;
+				if (faction_id != -1 && class_id != -1) {
+					PlayerRaces.Factions[faction_id]->ClassUnitTypes[class_id] = this->Slot;
+				}
+			} else {
+				if (civilization_id != -1 && class_id != -1) {
+					PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = this->Slot;
+				}
+			}
+		}
+	}
+	
+	// If number of directions is not specified, make a guess
+	// Building have 1 direction and units 8
+	if (this->BoolFlag[BUILDING_INDEX].value && this->NumDirections == 0) {
+		this->NumDirections = 1;
+	} else if (this->NumDirections == 0) {
+		this->NumDirections = 8;
+	}
+	
+	//Wyrmgus start
+	//unit type's level must be at least 1
+	if (this->DefaultStat.Variables[LEVEL_INDEX].Value == 0) {
+		this->DefaultStat.Variables[LEVEL_INDEX].Enable = 1;
+		this->DefaultStat.Variables[LEVEL_INDEX].Value = 1;
+		this->DefaultStat.Variables[LEVEL_INDEX].Max = 1;
+	}
+	//Wyrmgus end
+
+	// FIXME: try to simplify/combine the flags instead
+	if (this->MouseAction == MouseActionAttack && !this->CanAttack) {
+		fprintf(stderr, "Unit-type '%s': right-attack is set, but can-attack is not.\n", this->Name.c_str());
+	}
+	this->UpdateDefaultBoolFlags();
+	//Wyrmgus start
+	if (GameRunning || Editor.Running == EditorEditing) {
+		InitUnitType(*this);
+		LoadUnitType(*this);
+	}
+	//Wyrmgus end
+	//Wyrmgus start
+//	if (!CclInConfigFile) {
+	if (!CclInConfigFile || GameRunning || Editor.Running == EditorEditing) {
+	//Wyrmgus end
+		UpdateUnitStats(*this, 1);
+	}
+	//Wyrmgus start
+	if (Editor.Running == EditorEditing && std::find(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), this->Ident) == Editor.UnitTypes.end()) {
+		Editor.UnitTypes.push_back(this->Ident);
+		RecalculateShownUnits();
+	}
+	
+	for (size_t i = 0; i < this->Trains.size(); ++i) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = " + std::to_string((long long) this->Trains[i]->ButtonPos) + ",\n";
+		button_definition += "\tLevel = " + std::to_string((long long) this->Trains[i]->ButtonLevel) + ",\n";
+		button_definition += "\tAction = ";
+		if (this->Trains[i]->BoolFlag[BUILDING_INDEX].value) {
+			button_definition += "\"build\"";
+		} else {
+			button_definition += "\"train-unit\"";
+		}
+		button_definition += ",\n";
+		button_definition += "\tValue = \"" + this->Trains[i]->Ident + "\",\n";
+		if (!this->Trains[i]->ButtonPopup.empty()) {
+			button_definition += "\tPopup = \"" + this->Trains[i]->ButtonPopup + "\",\n";
+		}
+		button_definition += "\tKey = \"" + this->Trains[i]->ButtonKey + "\",\n";
+		button_definition += "\tHint = \"" + this->Trains[i]->ButtonHint + "\",\n";
+		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (this->CanMove()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 1,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"move\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"m\",\n";
+		button_definition += "\tHint = _(\"~!Move\"),\n";
+		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (this->CanMove()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 2,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"stop\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"s\",\n";
+		button_definition += "\tHint = _(\"~!Stop\"),\n";
+		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (this->CanMove() && this->CanAttack) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 3,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"attack\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"a\",\n";
+		button_definition += "\tHint = _(\"~!Attack\"),\n";
+		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (this->CanMove() && ((!this->BoolFlag[COWARD_INDEX].value && this->CanAttack) || this->UnitType == UnitTypeFly)) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 4,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"patrol\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"p\",\n";
+		button_definition += "\tHint = _(\"~!Patrol\"),\n";
+		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (this->CanMove() && !this->BoolFlag[COWARD_INDEX].value && this->CanAttack && !(this->CanTransport() && this->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 5,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"stand-ground\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"t\",\n";
+		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
+		button_definition += "\tForUnit = {\"" + this->Ident + "\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	// make units allowed by default
+	for (int i = 0; i < PlayerMax; ++i) {
+		AllowUnitId(Players[i], this->Slot, 65536);
+	}
+	
+	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
+}
+
 Vec2i CUnitType::GetTileSize(const int map_layer) const
 {
 	return this->TileSize;
@@ -742,7 +1064,9 @@ void CUnitType::SetParent(CUnitType *parent_type)
 {
 	this->Parent = parent_type;
 	
-	this->Name = parent_type->Name;
+	if (this->Name.empty()) {
+		this->Name = parent_type->Name;
+	}
 	this->Class = parent_type->Class;
 	if (this->Class != -1 && std::find(ClassUnitTypes[this->Class].begin(), ClassUnitTypes[this->Class].end(), this) == ClassUnitTypes[this->Class].end()) {
 		ClassUnitTypes[this->Class].push_back(this);

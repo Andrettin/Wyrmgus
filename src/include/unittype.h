@@ -884,6 +884,8 @@ public:
 	CUnitType();
 	~CUnitType();
 
+	void ProcessConfigData(CConfigData *config_data);
+	
 	Vec2i GetTileSize(const int map_layer) const;
 	Vec2i GetHalfTileSize(const int map_layer) const;
 	PixelSize GetHalfTilePixelSize(const int map_layer) const { return GetTilePixelSize(map_layer) / 2; }
