@@ -545,13 +545,12 @@ void CAnimations::ProcessConfigData(CConfigData *config_data)
 			std::string death_type;
 			CAnimation *first_anim = NULL;
 			CAnimation *prev_anim = NULL;
-			CAnimation *anim = NULL;
 			
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
 
-				anim = NULL;
+				CAnimation *anim = NULL;
 				
 				if (child_config_data->Tag == "death" && key == "death_type") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -620,8 +619,8 @@ void CAnimations::ProcessConfigData(CConfigData *config_data)
 				}
 			}
 			
-			if (anim && prev_anim) {
-				prev_anim->Next = anim;
+			if (first_anim && prev_anim) {
+				prev_anim->Next = first_anim;
 			}
 			
 			if (child_config_data->Tag == "start") {
