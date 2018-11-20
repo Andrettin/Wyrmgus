@@ -37,12 +37,14 @@
 
 #include "config.h"
 
+#include "animation.h"
 #include "calendar.h"
 #include "character.h"
 #include "deity.h"
 #include "game.h"
 #include "icons.h"
 #include "map_template.h"
+#include "missile.h"
 #include "terrain_type.h"
 #include "timeline.h"
 #include "unittype.h"
@@ -142,7 +144,17 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		std::string ident = config_data->Ident;
 		ident = FindAndReplaceString(ident, "_", "-");
 		
-		if (config_data->Tag == "calendar") {
+		if (config_data->Tag == "animations") {
+			CAnimations *animations = AnimationsByIdent(ident);
+			if (!animations) {
+				animations = new CAnimations;
+				AnimationMap[ident] = animations;
+				animations->Ident = ident;
+			}
+			if (!define_only) {
+				animations->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "calendar") {
 			CCalendar *calendar = CCalendar::GetOrAddCalendar(ident);
 			if (!define_only) {
 				calendar->ProcessConfigData(config_data);
@@ -171,6 +183,14 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(ident);
 			if (!define_only) {
 				map_template->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "missile_type") {
+			MissileType *missile_type = MissileTypeByIdent(ident);
+			if (!missile_type) {
+				missile_type = NewMissileTypeSlot(ident);
+			}
+			if (!define_only) {
+				missile_type->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "terrain_type") {
 			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(ident);

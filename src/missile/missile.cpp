@@ -42,10 +42,12 @@
 #include "action/action_spellcast.h"
 #include "actions.h"
 #include "animation.h"
+#include "config.h"
 #include "font.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "map.h"
+#include "mod.h"
 #include "player.h"
 //Wyrmgus start
 #include "settings.h"
@@ -68,6 +70,31 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+/**
+**  Missile class names, used to load/save the missiles.
+*/
+const char *MissileType::MissileClassNames[] = {
+	"missile-class-none",
+	"missile-class-point-to-point",
+	"missile-class-point-to-point-with-hit",
+	"missile-class-point-to-point-cycle-once",
+	"missile-class-point-to-point-bounce",
+	"missile-class-stay",
+	"missile-class-cycle-once",
+	"missile-class-fire",
+	"missile-class-hit",
+	"missile-class-parabolic",
+	"missile-class-land-mine",
+	"missile-class-whirlwind",
+	"missile-class-flame-shield",
+	"missile-class-death-coil",
+	"missile-class-tracer",
+	"missile-class-clip-to-target",
+	"missile-class-continious",
+	"missile-class-straight-fly",
+	NULL
+};
+
 unsigned int Missile::Count = 0;
 
 static std::vector<Missile *> GlobalMissiles;    /// all global missiles on map
@@ -84,6 +111,144 @@ extern NumberDesc *Damage;                   /// Damage calculation for missile.
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+void MissileType::ProcessConfigData(CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "frames") {
+			this->SpriteFrames = std::stoi(value);
+		} else if (key == "flip") {
+			this->Flip = StringToBool(value);
+		} else if (key == "num_directions") {
+			this->NumDirections = std::stoi(value);
+		} else if (key == "transparency") {
+			this->Transparency = std::stoi(value);
+		} else if (key == "fired_sound") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->FiredSound = value;
+		} else if (key == "impact_sound") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->ImpactSound = value;
+		} else if (key == "class") {
+			value = FindAndReplaceString(value, "_", "-");
+			const char *class_name = value.c_str();
+			unsigned int i = 0;
+			for (; MissileClassNames[i]; ++i) {
+				if (!strcmp(class_name, MissileClassNames[i])) {
+					this->Class = i;
+					break;
+				}
+			}
+			if (!MissileClassNames[i]) {
+				fprintf(stderr, "Invalid missile class: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "num_bounces") {
+			this->NumBounces = std::stoi(value);
+		} else if (key == "max_bounce_size") {
+			this->MaxBounceSize = std::stoi(value);
+		} else if (key == "parabol_coefficient") {
+			this->ParabolCoefficient = std::stoi(value);
+		} else if (key == "delay") {
+			this->StartDelay = std::stoi(value);
+		} else if (key == "sleep") {
+			this->Sleep = std::stoi(value);
+		} else if (key == "speed") {
+			this->Speed = std::stoi(value);
+		} else if (key == "blizzard_speed") {
+			this->BlizzardSpeed = std::stoi(value);
+		} else if (key == "attack_speed") {
+			this->AttackSpeed = std::stoi(value);
+		} else if (key == "ttl") {
+			this->TTL = std::stoi(value);
+		} else if (key == "reduce_factor") {
+			this->ReduceFactor = std::stoi(value);
+		} else if (key == "smoke_precision") {
+			this->SmokePrecision = std::stoi(value);
+		} else if (key == "missile_stop_flags") {
+			this->MissileStopFlags = std::stoi(value);
+		} else if (key == "draw_level") {
+			this->DrawLevel = std::stoi(value);
+		} else if (key == "range") {
+			this->Range = std::stoi(value);
+		} else if (key == "smoke_missile") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Smoke.Name = value;
+		} else if (key == "can_hit_owner") {
+			this->CanHitOwner = StringToBool(value);
+		} else if (key == "always_fire") {
+			this->AlwaysFire = StringToBool(value);
+		} else if (key == "pierce") {
+			this->Pierce = StringToBool(value);
+		} else if (key == "pierce_once") {
+			this->PierceOnce = StringToBool(value);
+		} else if (key == "pierce_ignore_before_goal") {
+			this->PierceIgnoreBeforeGoal = StringToBool(value);
+		} else if (key == "ignore_walls") {
+			this->IgnoreWalls = StringToBool(value);
+		} else if (key == "kill_first_unit") {
+			this->KillFirstUnit = StringToBool(value);
+		} else if (key == "friendly_fire") {
+			this->FriendlyFire = StringToBool(value);
+		} else if (key == "always_hits") {
+			this->AlwaysHits = StringToBool(value);
+		} else if (key == "splash_factor") {
+			this->SplashFactor = std::stoi(value);
+		} else if (key == "correct_sphash_damage") {
+			this->CorrectSphashDamage = StringToBool(value);
+		} else {
+			fprintf(stderr, "Invalid missile type property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		CConfigData *child_config_data = config_data->Children[i];
+		
+		if (child_config_data->Tag == "image") {
+			std::string file;
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "file") {
+					file = CMod::GetCurrentModPath() + value;
+				} else if (key == "width") {
+					this->size.x = std::stoi(value);
+				} else if (key == "height") {
+					this->size.y = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (file.empty()) {
+				fprintf(stderr, "Image has no file.\n");
+				continue;
+			}
+			
+			if (this->size.x == 0) {
+				fprintf(stderr, "Image has no width.\n");
+				continue;
+			}
+			
+			if (this->size.y == 0) {
+				fprintf(stderr, "Image has no height.\n");
+				continue;
+			}
+			
+			this->G = CGraphic::New(file, this->Width(), this->Height());
+		} else {
+			fprintf(stderr, "Invalid icon property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+	
+	if (!this->SmokePrecision) {
+		this->SmokePrecision = this->Speed;
+	}
+}
 
 /**
 **  Load the graphics for a missile type
@@ -1913,10 +2078,10 @@ void InitMissileTypes()
 */
 MissileType::MissileType(const std::string &ident) :
 	Ident(ident), Transparency(0), DrawLevel(0),
-	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
+	SpriteFrames(0), NumDirections(1), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	//Wyrmgus start
 //	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
-	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(true),
+	CorrectSphashDamage(false), Flip(true), CanHitOwner(false), FriendlyFire(true),
 	//Wyrmgus end
 	AlwaysFire(false), Pierce(false), PierceOnce(false), PierceIgnoreBeforeGoal(false), IgnoreWalls(true), KillFirstUnit(false),
 	//Wyrmgus start
@@ -1925,9 +2090,9 @@ MissileType::MissileType(const std::string &ident) :
 	Class(), NumBounces(0),	MaxBounceSize(0), ParabolCoefficient(2048), StartDelay(0),
 	//Wyrmgus start
 //	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
-	Sleep(0), Speed(0), BlizzardSpeed(0), AttackSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
+	Sleep(0), Speed(0), BlizzardSpeed(0), AttackSpeed(10), TTL(-1), ReduceFactor(100), SmokePrecision(0),
 	//Wyrmgus end
-	MissileStopFlags(0), Damage(NULL), Range(0), SplashFactor(0),
+	MissileStopFlags(0), Damage(NULL), Range(0), SplashFactor(100),
 	ImpactParticle(NULL), SmokeParticle(NULL), OnImpact(NULL),
 	G(NULL)
 {

@@ -10,7 +10,7 @@
 //
 /**@name missile.h - The missile headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer
+//      (c) Copyright 1998-2018 by Lutz Sammer and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -346,6 +346,10 @@ public:
 	explicit MissileType(const std::string &ident);
 	~MissileType();
 
+	static const char *MissileClassNames[];
+	
+	void ProcessConfigData(CConfigData *config_data);
+	
 	/// load the graphics for a missile type
 	void LoadMissileSprite();
 	void Init();

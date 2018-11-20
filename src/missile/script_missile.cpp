@@ -48,45 +48,12 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-/**
-**  Missile class names, used to load/save the missiles.
-*/
-static const char *MissileClassNames[] = {
-	"missile-class-none",
-	"missile-class-point-to-point",
-	"missile-class-point-to-point-with-hit",
-	"missile-class-point-to-point-cycle-once",
-	"missile-class-point-to-point-bounce",
-	"missile-class-stay",
-	"missile-class-cycle-once",
-	"missile-class-fire",
-	"missile-class-hit",
-	"missile-class-parabolic",
-	"missile-class-land-mine",
-	"missile-class-whirlwind",
-	"missile-class-flame-shield",
-	"missile-class-death-coil",
-	"missile-class-tracer",
-	"missile-class-clip-to-target",
-	"missile-class-continious",
-	"missile-class-straight-fly",
-	NULL
-};
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 void MissileType::Load(lua_State *l)
 {
-	this->NumDirections = 1;
-	this->Flip = true;
-	// Ensure we don't divide by zero.
-	this->SplashFactor = 100;
-	//Wyrmgus start
-	this->AttackSpeed = 10; //default attack speed (used by whirlwind missiles) is 10
-	//Wyrmgus end
-
 	// Parse the arguments
 	std::string file;
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {

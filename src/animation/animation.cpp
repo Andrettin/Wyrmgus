@@ -63,6 +63,7 @@
 #include "animation/animation_wait.h"
 
 #include "actions.h"
+#include "config.h"
 #include "iolib.h"
 #include "player.h"
 #include "script.h"
@@ -423,7 +424,6 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 	return -1;
 }
 
-
 /* static */ void CAnimations::SaveUnitAnim(CFile &file, const CUnit &unit)
 {
 	file.printf("\"anim-data\", {");
@@ -518,6 +518,171 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 		} else {
 			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value);
 		}
+	}
+}
+
+void CAnimations::ProcessConfigData(CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		CConfigData *child_config_data = config_data->Children[i];
+		
+		if (
+			child_config_data->Tag == "start"
+			|| child_config_data->Tag == "still"
+			|| child_config_data->Tag == "death"
+			|| child_config_data->Tag == "attack"
+			|| child_config_data->Tag == "ranged_attack"
+			|| child_config_data->Tag == "spell_cast"
+			|| child_config_data->Tag == "move"
+			|| child_config_data->Tag == "repair"
+			|| child_config_data->Tag == "train"
+			|| child_config_data->Tag == "research"
+			|| child_config_data->Tag == "upgrade"
+			|| child_config_data->Tag == "build"
+			|| child_config_data->Tag == "harvest"
+		) {
+			int res = -1;
+			std::string death_type;
+			CAnimation *first_anim = NULL;
+			CAnimation *prev_anim = NULL;
+			CAnimation *anim = NULL;
+			
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+
+				anim = NULL;
+				
+				if (child_config_data->Tag == "death" && key == "death_type") {
+					value = FindAndReplaceString(value, "_", "-");
+					death_type = value.c_str();
+				} else if (child_config_data->Tag == "harvest" && key == "resource") {
+					value = FindAndReplaceString(value, "_", "-");
+					res = GetResourceIdByName(value.c_str());
+					if (res == -1) {
+						fprintf(stderr, "Invalid resource for harvest animation: \"%s\".\n", value.c_str());
+					}
+				} else if (key == "frame") {
+					anim = new CAnimation_Frame;
+				} else if (key == "exact-frame") {
+					anim = new CAnimation_ExactFrame;
+				} else if (key == "wait") {
+					anim = new CAnimation_Wait;
+				} else if (key == "random-wait") {
+					anim = new CAnimation_RandomWait;
+				} else if (key == "sound") {
+					anim = new CAnimation_Sound;
+				} else if (key == "random-sound") {
+					anim = new CAnimation_RandomSound;
+				} else if (key == "attack") {
+					anim = new CAnimation_Attack;
+				} else if (key == "spawn-missile") {
+					anim = new CAnimation_SpawnMissile;
+				} else if (key == "spawn-unit") {
+					anim = new CAnimation_SpawnUnit;
+				} else if (key == "if-var") {
+					anim = new CAnimation_IfVar;
+				} else if (key == "set-var") {
+					anim = new CAnimation_SetVar;
+				} else if (key == "set-player-var") {
+					anim = new CAnimation_SetPlayerVar;
+				} else if (key == "die") {
+					anim = new CAnimation_Die();
+				} else if (key == "rotate") {
+					anim = new CAnimation_Rotate;
+				} else if (key == "random-rotate") {
+					anim = new CAnimation_RandomRotate;
+				} else if (key == "move") {
+					anim = new CAnimation_Move;
+				} else if (key == "unbreakable") {
+					anim = new CAnimation_Unbreakable;
+				} else if (key == "goto") {
+					anim = new CAnimation_Goto;
+				} else if (key == "random-goto") {
+					anim = new CAnimation_RandomGoto;
+				} else {
+					fprintf(stderr, "Invalid animation property: \"%s\".\n", key.c_str());
+					continue;
+				}
+				
+				if (anim) {
+					anim->Init(value.c_str(), NULL);
+					
+					if (!first_anim) {
+						first_anim = anim;
+					}
+					
+					if (prev_anim) {
+						prev_anim->Next = anim;
+					}
+					
+					prev_anim = anim;
+				}
+			}
+			
+			if (anim && prev_anim) {
+				prev_anim->Next = anim;
+			}
+			
+			if (child_config_data->Tag == "start") {
+				this->Start = first_anim;
+			} else if (child_config_data->Tag == "still") {
+				this->Still = first_anim;
+			} else if (child_config_data->Tag == "death") {
+				if (!death_type.empty()) {
+					const int death_index = ExtraDeathIndex(death_type.c_str());
+					if (death_index == ANIMATIONS_DEATHTYPES) {
+						this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
+					} else {
+						this->Death[death_index] = first_anim;
+					}
+				} else {
+					this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
+				}
+			} else if (child_config_data->Tag == "attack") {
+				this->Attack = first_anim;
+			} else if (child_config_data->Tag == "ranged_attack") {
+				this->RangedAttack = first_anim;
+			} else if (child_config_data->Tag == "spell_cast") {
+				this->SpellCast = first_anim;
+			} else if (child_config_data->Tag == "move") {
+				this->Move = first_anim;
+			} else if (child_config_data->Tag == "repair") {
+				this->Repair = first_anim;
+			} else if (child_config_data->Tag == "train") {
+				this->Train = first_anim;
+			} else if (child_config_data->Tag == "research") {
+				this->Research = first_anim;
+			} else if (child_config_data->Tag == "upgrade") {
+				this->Upgrade = first_anim;
+			} else if (child_config_data->Tag == "build") {
+				this->Build = first_anim;
+			} else if (child_config_data->Tag == "harvest") {
+				if (res == -1) {
+					fprintf(stderr, "Invalid resource for harvest animation.\n");
+					continue;
+				}
+				this->Harvest[res] = first_anim;
+			}
+		} else {
+			fprintf(stderr, "Invalid animations property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+	
+	// Must add to array in a fixed order for save games
+	AddAnimationToArray(this->Start);
+	AddAnimationToArray(this->Still);
+	for (int i = 0; i != ANIMATIONS_DEATHTYPES + 1; ++i) {
+		AddAnimationToArray(this->Death[i]);
+	}
+	AddAnimationToArray(this->Attack);
+	AddAnimationToArray(this->RangedAttack);
+	AddAnimationToArray(this->SpellCast);
+	AddAnimationToArray(this->Move);
+	AddAnimationToArray(this->Repair);
+	AddAnimationToArray(this->Train);
+	for (int i = 0; i != MaxCosts; ++i) {
+		AddAnimationToArray(this->Harvest[i]);
 	}
 }
 
@@ -669,7 +834,7 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 /**
 **  Add animation to AnimationsArray
 */
-static void AddAnimationToArray(CAnimation *anim)
+void CAnimations::AddAnimationToArray(CAnimation *anim)
 {
 	if (!anim) {
 		return;
@@ -695,9 +860,7 @@ static int CclDefineAnimations(lua_State *l)
 	if (!anims) {
 		anims = new CAnimations;
 		AnimationMap[name] = anims;
-		//Wyrmgus start
 		anims->Ident = std::string(name);
-		//Wyrmgus end
 	}
 
 	lua_pushnil(l);
@@ -746,19 +909,19 @@ static int CclDefineAnimations(lua_State *l)
 		lua_pop(l, 1);
 	}
 	// Must add to array in a fixed order for save games
-	AddAnimationToArray(anims->Start);
-	AddAnimationToArray(anims->Still);
+	CAnimations::AddAnimationToArray(anims->Start);
+	CAnimations::AddAnimationToArray(anims->Still);
 	for (int i = 0; i != ANIMATIONS_DEATHTYPES + 1; ++i) {
-		AddAnimationToArray(anims->Death[i]);
+		CAnimations::AddAnimationToArray(anims->Death[i]);
 	}
-	AddAnimationToArray(anims->Attack);
-	AddAnimationToArray(anims->RangedAttack);
-	AddAnimationToArray(anims->SpellCast);
-	AddAnimationToArray(anims->Move);
-	AddAnimationToArray(anims->Repair);
-	AddAnimationToArray(anims->Train);
+	CAnimations::AddAnimationToArray(anims->Attack);
+	CAnimations::AddAnimationToArray(anims->RangedAttack);
+	CAnimations::AddAnimationToArray(anims->SpellCast);
+	CAnimations::AddAnimationToArray(anims->Move);
+	CAnimations::AddAnimationToArray(anims->Repair);
+	CAnimations::AddAnimationToArray(anims->Train);
 	for (int i = 0; i != MaxCosts; ++i) {
-		AddAnimationToArray(anims->Harvest[i]);
+		CAnimations::AddAnimationToArray(anims->Harvest[i]);
 	}
 	return 0;
 }

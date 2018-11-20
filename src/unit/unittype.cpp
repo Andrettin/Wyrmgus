@@ -742,16 +742,47 @@ void CUnitType::ProcessConfigData(CConfigData *config_data)
 			this->Icon.Icon = NULL;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
+		} else if (key == "tile_width") {
+			this->TileSize.x = std::stoi(value);
+		} else if (key == "tile_height") {
+			this->TileSize.y = std::stoi(value);
 		} else if (key == "box_width") {
 			this->BoxWidth = std::stoi(value);
 		} else if (key == "box_height") {
 			this->BoxHeight = std::stoi(value);
+		} else if (key == "draw_level") {
+			this->DrawLevel = std::stoi(value);
+		} else if (key == "type") {
+			if (value == "land") {
+				this->UnitType = UnitTypeLand;
+				this->LandUnit = true;
+			} else if (value == "fly") {
+				this->UnitType = UnitTypeFly;
+				this->AirUnit = true;
+			} else if (value == "fly_low") {
+				this->UnitType = UnitTypeFlyLow;
+				this->AirUnit = true;
+			} else if (value == "naval") {
+				this->UnitType = UnitTypeNaval;
+				this->SeaUnit = true;
+			} else {
+				fprintf(stderr, "Invalid unit type type: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "priority") {
+			this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
+			this->DefaultStat.Variables[PRIORITY_INDEX].Max  = std::stoi(value);
 		} else if (key == "description") {
 			this->Description = value;
 		} else if (key == "background") {
 			this->Background = value;
 		} else if (key == "quote") {
 			this->Quote = value;
+		} else if (key == "requirements_string") {
+			this->RequirementsString = value;
+		} else if (key == "experience_requirements_string") {
+			this->ExperienceRequirementsString = value;
+		} else if (key == "building_rules_string") {
+			this->BuildingRulesString = value;
 		} else if (key == "max_attack_range") {
 			this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = std::stoi(value);
 			this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = std::stoi(value);
@@ -768,6 +799,22 @@ void CUnitType::ProcessConfigData(CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			this->CorpseName = value;
 			this->CorpseType = NULL;
+		} else if (key == "weapon_class") {
+			value = FindAndReplaceString(value, "_", "-");
+			int weapon_class_id = GetItemClassIdByName(value);
+			if (weapon_class_id != -1) {
+				this->WeaponClasses.push_back(weapon_class_id);
+			} else {
+				fprintf(stderr, "Invalid weapon class: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "ai_drop") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUnitType *drop_type = UnitTypeByIdent(value);
+			if (drop_type) {
+				this->AiDrops.push_back(drop_type);
+			} else {
+				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+			}
 		} else {
 			key = SnakeCaseToPascalCase(key);
 			
@@ -837,6 +884,41 @@ void CUnitType::ProcessConfigData(CConfigData *config_data)
 				CGraphic::Free(this->Sprite);
 				this->Sprite = NULL;
 			}
+		} else if (child_config_data->Tag == "default_equipment") {
+			int item_slot = -1;
+			CUnitType *item = NULL;
+
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				if (key == "item_slot") {
+					value = FindAndReplaceString(value, "_", "-");
+					item_slot = GetItemSlotIdByName(value);
+					if (item_slot == -1) {
+						fprintf(stderr, "Invalid item slot for default equipment: \"%s\".\n", value.c_str());
+					}
+				} else if (key == "item") {
+					value = FindAndReplaceString(value, "_", "-");
+					item = UnitTypeByIdent(value);
+					if (!item) {
+						fprintf(stderr, "Invalid item for default equipment: \"%s\".\n", value.c_str());
+					}
+				} else {
+					fprintf(stderr, "Invalid default equipment property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (item_slot == -1) {
+				fprintf(stderr, "Invalid item slot for default equipment.\n");
+				continue;
+			}
+			
+			if (!item) {
+				fprintf(stderr, "Invalid item for default equipment.\n");
+				continue;
+			}
+			
+			this->DefaultEquipment[item_slot] = item;
 		} else {
 			fprintf(stderr, "Invalid unit type property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
