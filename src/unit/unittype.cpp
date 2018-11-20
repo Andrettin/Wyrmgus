@@ -885,40 +885,26 @@ void CUnitType::ProcessConfigData(CConfigData *config_data)
 				this->Sprite = NULL;
 			}
 		} else if (child_config_data->Tag == "default_equipment") {
-			int item_slot = -1;
-			CUnitType *item = NULL;
-
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
-				if (key == "item_slot") {
-					value = FindAndReplaceString(value, "_", "-");
-					item_slot = GetItemSlotIdByName(value);
-					if (item_slot == -1) {
-						fprintf(stderr, "Invalid item slot for default equipment: \"%s\".\n", value.c_str());
-					}
-				} else if (key == "item") {
-					value = FindAndReplaceString(value, "_", "-");
-					item = UnitTypeByIdent(value);
-					if (!item) {
-						fprintf(stderr, "Invalid item for default equipment: \"%s\".\n", value.c_str());
-					}
-				} else {
-					fprintf(stderr, "Invalid default equipment property: \"%s\".\n", key.c_str());
+				key = FindAndReplaceString(key, "_", "-");
+				value = FindAndReplaceString(value, "_", "-");
+				
+				int item_slot = GetItemSlotIdByName(key);
+				if (item_slot == -1) {
+					fprintf(stderr, "Invalid item slot for default equipment: \"%s\".\n", key.c_str());
+					continue;
 				}
+				
+				CUnitType *item = UnitTypeByIdent(value);
+				if (!item) {
+					fprintf(stderr, "Invalid item for default equipment: \"%s\".\n", value.c_str());
+					continue;
+				}
+				
+				this->DefaultEquipment[item_slot] = item;
 			}
-			
-			if (item_slot == -1) {
-				fprintf(stderr, "Invalid item slot for default equipment.\n");
-				continue;
-			}
-			
-			if (!item) {
-				fprintf(stderr, "Invalid item for default equipment.\n");
-				continue;
-			}
-			
-			this->DefaultEquipment[item_slot] = item;
 		} else {
 			fprintf(stderr, "Invalid unit type property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
