@@ -905,6 +905,75 @@ void CUnitType::ProcessConfigData(CConfigData *config_data)
 				
 				this->DefaultEquipment[item_slot] = item;
 			}
+		} else if (child_config_data->Tag == "sounds") {
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				key = FindAndReplaceString(key, "_", "-");
+				value = FindAndReplaceString(value, "_", "-");
+				
+				if (key == "selected") {
+					this->Sound.Selected.Name = value;
+				} else if (key == "acknowledge") {
+					this->Sound.Acknowledgement.Name = value;
+				} else if (key == "attack") {
+					this->Sound.Attack.Name = value;
+				} else if (key == "idle") {
+					this->Sound.Idle.Name = value;
+				} else if (key == "hit") {
+					this->Sound.Hit.Name = value;
+				} else if (key == "miss") {
+					this->Sound.Miss.Name = value;
+				} else if (key == "fire_missile") {
+					this->Sound.FireMissile.Name = value;
+				} else if (key == "step") {
+					this->Sound.Step.Name = value;
+				} else if (key == "step_dirt") {
+					this->Sound.StepDirt.Name = value;
+				} else if (key == "step_grass") {
+					this->Sound.StepGrass.Name = value;
+				} else if (key == "step_gravel") {
+					this->Sound.StepGravel.Name = value;
+				} else if (key == "step_mud") {
+					this->Sound.StepMud.Name = value;
+				} else if (key == "step_stone") {
+					this->Sound.StepStone.Name = value;
+				} else if (key == "used") {
+					this->Sound.Used.Name = value;
+				} else if (key == "build") {
+					this->Sound.Build.Name = value;
+				} else if (key == "ready") {
+					this->Sound.Ready.Name = value;
+				} else if (key == "repair") {
+					this->Sound.Repair.Name = value;
+				} else if (key.find("harvest_") != std::string::npos) {
+					std::string resource_ident = FindAndReplaceString(key, "harvest_", "");
+					const int res = GetResourceIdByName(resource_ident.c_str());
+					if (res != -1) {
+						this->Sound.Harvest[res].Name = value;
+					} else {
+						fprintf(stderr, "Invalid resource: \"%s\".\n", resource_ident.c_str());
+					}
+				} else if (key == "help") {
+					this->Sound.Help.Name = value;
+				} else if (key == "dead") {
+					this->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = value;
+				} else if (key.find("dead_") != std::string::npos) {
+					std::string death_type_ident = FindAndReplaceString(key, "dead_", "");
+					int death;
+					for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+						if (death_type_ident == ExtraDeathTypes[death]) {
+							this->Sound.Dead[death].Name = value;
+							break;
+						}
+					}
+					if (death == ANIMATIONS_DEATHTYPES) {
+						fprintf(stderr, "Invalid death type: \"%s\".\n", death_type_ident.c_str());
+					}
+				} else {
+					fprintf(stderr, "Invalid sound tag: \"%s\".\n", key.c_str());
+				}
+			}
 		} else {
 			fprintf(stderr, "Invalid unit type property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
