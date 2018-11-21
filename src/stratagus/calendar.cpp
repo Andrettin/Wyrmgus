@@ -321,17 +321,37 @@ std::pair<CDate, CDate> CCalendar::GetBestChronologicalIntersectionForDate(CCale
 		return chronological_intersection;
 	}
 	
-	int best_year_difference = 0;
-	for (std::map<CDate, CDate>::const_iterator iterator = this->ChronologicalIntersections.find(calendar)->second.begin(); iterator != this->ChronologicalIntersections.find(calendar)->second.end(); ++iterator) {
-		int year_difference = abs(date.Year - iterator->first.Year);
+	const std::map<CDate, CDate> &chronological_intersections_submap = this->ChronologicalIntersections.find(calendar)->second;
+	
+	std::map<CDate, CDate>::const_iterator iterator = chronological_intersections_submap.lower_bound(date); //get the lower bound for the chronological intersection submap
+	
+	if (iterator == chronological_intersections_submap.end()) { //no chronological intersections found for the lower bound
+		if (!chronological_intersections_submap.empty()) {
+			iterator--; //get the element just before the end
+			chronological_intersection.first = iterator->first; //date in the given calendar
+			chronological_intersection.second = iterator->second; //date in the calendar we want to convert to
+		}
+		return chronological_intersection;
+	} else {
+		chronological_intersection.first = iterator->first; //date in the given calendar
+		chronological_intersection.second = iterator->second; //date in the calendar we want to convert to
 		
-		if (
-			chronological_intersection.first.Year == 0 //invalid chronological intersection (none set yet)
-			|| year_difference < best_year_difference
-		) {
-			chronological_intersection.first = iterator->first;
-			chronological_intersection.second = iterator->second;
-			best_year_difference = year_difference;
+		if (iterator->first == date) { //exact match, just return this intersection
+			return chronological_intersection;
+		}
+		
+		//see whether the next element has a smaller year difference
+		int first_year_difference = abs(date.Year - iterator->first.Year);
+		
+		iterator++;
+		
+		if (iterator != chronological_intersections_submap.end()) {
+			int second_year_difference = abs(date.Year - iterator->first.Year);
+			
+			if (second_year_difference < first_year_difference) {
+				chronological_intersection.first = iterator->first; //date in the given calendar
+				chronological_intersection.second = iterator->second; //date in the calendar we want to convert to
+			}
 		}
 	}
 	
