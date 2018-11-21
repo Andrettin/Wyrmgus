@@ -46,7 +46,24 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CCalendar;
 class CConfigData;
+
+class CDayOfTheWeek
+{
+public:
+	CDayOfTheWeek() :
+		ID(-1), Calendar(NULL)
+	{
+	}
+	
+	void ProcessConfigData(CConfigData *config_data);
+
+	std::string Ident;
+	std::string Name;
+	int ID;
+	CCalendar *Calendar;
+};
 
 class CMonth
 {
@@ -66,14 +83,14 @@ class CCalendar
 {
 public:
 	CCalendar() :
-		Initialized(false), HoursPerDay(DefaultHoursPerDay), DaysPerYear(0)
+		Initialized(false), HoursPerDay(DefaultHoursPerDay), DaysPerYear(0), BaseDayOfTheWeek(NULL)
 	{
 	}
 	
 	~CCalendar();
 	
-	static CCalendar *GetCalendar(std::string ident);
-	static CCalendar *GetOrAddCalendar(std::string ident);
+	static CCalendar *GetCalendar(const std::string &ident);
+	static CCalendar *GetOrAddCalendar(const std::string &ident);
 	static void ClearCalendars();
 	static int GetTimeOfDay(const unsigned long long hours, const int hours_per_day);
 	
@@ -82,9 +99,10 @@ public:
 	static CCalendar *BaseCalendar;
 	
 	void ProcessConfigData(CConfigData *config_data);
+	bool IsInitialized();
+	CDayOfTheWeek *GetDayOfTheWeekByIdent(const std::string &ident);
 	void AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date);
 	void InheritChronologicalIntersectionsFromCalendar(CCalendar *intersecting_calendar);
-	bool IsInitialized();
 	std::pair<CDate, CDate> GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const;
 	
 	std::string Ident;
@@ -94,8 +112,11 @@ public:
 	int DaysPerYear;
 	std::string YearLabel;														/// label used for years (e.g. AD)
 	std::string NegativeYearLabel;												/// label used for "negative" years (e.g. BC)
+	CDayOfTheWeek *BaseDayOfTheWeek;											/// the day of the week for the first day of the year in the calendar
+	std::vector<CDayOfTheWeek *> DaysOfTheWeek;									/// the days of the week in the calendar
 	std::vector<CMonth *> Months;
-	std::map<CCalendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// Chronological intersection points between this calendar and other calendars
+	std::map<std::string, CDayOfTheWeek *> DaysOfTheWeekByIdent;
+	std::map<CCalendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// chronological intersection points between this calendar and other calendars
 };
 
 //@}

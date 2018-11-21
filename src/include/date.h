@@ -72,6 +72,7 @@ public:
 	std::string ToString(const CCalendar *calendar) const;
 	std::string ToDisplayString(const CCalendar *calendar) const;
 	std::string ToDayMonthExtendedDisplayString(const CCalendar *calendar) const;
+	int GetTotalDays(const CCalendar *calendar) const;					/// gets the total amount of days, counting from the year "zero"
 	unsigned long long GetTotalHours(CCalendar *calendar) const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
 	
 	int Year;

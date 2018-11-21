@@ -303,11 +303,35 @@ std::string CDate::ToDayMonthExtendedDisplayString(const CCalendar *calendar) co
 		return display_string;
 	}
 	
+	if (!calendar->DaysOfTheWeek.empty() && calendar->BaseDayOfTheWeek) {
+		int day_of_the_week = calendar->BaseDayOfTheWeek->ID;
+		
+		day_of_the_week += this->GetTotalDays(calendar) % calendar->DaysOfTheWeek.size();
+		if (day_of_the_week < 0) {
+			day_of_the_week += calendar->DaysOfTheWeek.size();
+		}
+		
+		display_string += calendar->DaysOfTheWeek[day_of_the_week]->Name + ", ";
+	}
+	
 	display_string += std::to_string((long long) this->Day) + " ";
 	
 	display_string += calendar->Months[this->Month - 1]->Name + " (" + NumberToRomanNumeral(this->Month) + ")";
 	
 	return display_string;
+}
+
+int CDate::GetTotalDays(const CCalendar *calendar) const
+{
+	int days = 0;
+	
+	days += (this->Year < 0 ? this->Year : this->Year - 1) * calendar->DaysPerYear;
+	for (int i = 0; i < (this->Month - 1); ++i) {
+		days += calendar->Months[i]->Days;
+	}
+	days += this->Day - 1;
+	
+	return days;
 }
 
 unsigned long long CDate::GetTotalHours(CCalendar *calendar) const

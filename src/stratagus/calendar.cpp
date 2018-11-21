@@ -51,6 +51,20 @@ CCalendar * CCalendar::BaseCalendar = NULL;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+void CDayOfTheWeek::ProcessConfigData(CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else {
+			fprintf(stderr, "Invalid day of the week property: \"%s\".\n", key.c_str());
+		}
+	}
+}
+
 void CMonth::ProcessConfigData(CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -69,6 +83,11 @@ void CMonth::ProcessConfigData(CConfigData *config_data)
 
 CCalendar::~CCalendar()
 {
+	for (size_t i = 0; i < DaysOfTheWeek.size(); ++i) {
+		delete DaysOfTheWeek[i];
+	}
+	DaysOfTheWeek.clear();
+	
 	for (size_t i = 0; i < Months.size(); ++i) {
 		delete Months[i];
 	}
@@ -78,7 +97,7 @@ CCalendar::~CCalendar()
 /**
 **  Get a calendar
 */
-CCalendar *CCalendar::GetCalendar(std::string ident)
+CCalendar *CCalendar::GetCalendar(const std::string &ident)
 {
 	if (CalendarsByIdent.find(ident) != CalendarsByIdent.end()) {
 		return CalendarsByIdent.find(ident)->second;
@@ -87,7 +106,7 @@ CCalendar *CCalendar::GetCalendar(std::string ident)
 	return NULL;
 }
 
-CCalendar *CCalendar::GetOrAddCalendar(std::string ident)
+CCalendar *CCalendar::GetOrAddCalendar(const std::string &ident)
 {
 	CCalendar *calendar = GetCalendar(ident);
 	
@@ -140,6 +159,8 @@ int CCalendar::GetTimeOfDay(const unsigned long long hours, const int hours_per_
 
 void CCalendar::ProcessConfigData(CConfigData *config_data)
 {
+	std::string base_day_of_the_week;
+	
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
@@ -155,6 +176,9 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 			this->YearLabel = value;
 		} else if (key == "negative_year_label") {
 			this->NegativeYearLabel = value;
+		} else if (key == "base_day_of_the_week") {
+			value = FindAndReplaceString(value, "_", "-");
+			base_day_of_the_week = value;
 		} else {
 			fprintf(stderr, "Invalid calendar property: \"%s\".\n", key.c_str());
 		}
@@ -163,7 +187,15 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
 		CConfigData *child_config_data = config_data->Children[i];
 		
-		if (child_config_data->Tag == "month") {
+		if (child_config_data->Tag == "day_of_the_week") {
+			CDayOfTheWeek *day_of_the_week = new CDayOfTheWeek;
+			day_of_the_week->ID = this->DaysOfTheWeek.size();
+			this->DaysOfTheWeek.push_back(day_of_the_week);
+			day_of_the_week->Calendar = this;
+			day_of_the_week->Ident = child_config_data->Ident;
+			this->DaysOfTheWeekByIdent[day_of_the_week->Ident] = day_of_the_week;
+			day_of_the_week->ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "month") {
 			CMonth *month = new CMonth;
 			month->ProcessConfigData(child_config_data);
 			this->Months.push_back(month);
@@ -219,13 +251,30 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 	
 	this->Initialized = true;
 	
-	//inherit the intersection points calendars with which it has intersection points
+	if (!base_day_of_the_week.empty()) {
+		this->BaseDayOfTheWeek = this->GetDayOfTheWeekByIdent(base_day_of_the_week);
+	}
+	
 	//inherit the intersection points from the intersecting calendar that it has with third calendars
 	for (std::map<CCalendar *, std::map<CDate, CDate>>::iterator iterator = this->ChronologicalIntersections.begin(); iterator != this->ChronologicalIntersections.end(); ++iterator) {
 		CCalendar *intersecting_calendar = iterator->first;
 		
 		this->InheritChronologicalIntersectionsFromCalendar(intersecting_calendar);
 	}
+}
+
+bool CCalendar::IsInitialized()
+{
+	return this->Initialized;
+}
+
+CDayOfTheWeek *CCalendar::GetDayOfTheWeekByIdent(const std::string &ident)
+{
+	if (this->DaysOfTheWeekByIdent.find(ident) != this->DaysOfTheWeekByIdent.end()) {
+		return this->DaysOfTheWeekByIdent.find(ident)->second;
+	}
+	
+	return NULL;
 }
 
 void CCalendar::AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date)
@@ -262,11 +311,6 @@ void CCalendar::InheritChronologicalIntersectionsFromCalendar(CCalendar *interse
 			this->AddChronologicalIntersection(third_calendar, sub_iterator->first.ToCalendar(intersecting_calendar, this), sub_iterator->second);
 		}
 	}
-}
-
-bool CCalendar::IsInitialized()
-{
-	return this->Initialized;
 }
 
 std::pair<CDate, CDate> CCalendar::GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const
