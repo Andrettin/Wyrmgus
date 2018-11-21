@@ -909,7 +909,6 @@ void CUnitType::ProcessConfigData(CConfigData *config_data)
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
-				key = FindAndReplaceString(key, "_", "-");
 				value = FindAndReplaceString(value, "_", "-");
 				
 				if (key == "selected") {
@@ -948,6 +947,7 @@ void CUnitType::ProcessConfigData(CConfigData *config_data)
 					this->Sound.Repair.Name = value;
 				} else if (key.find("harvest_") != std::string::npos) {
 					std::string resource_ident = FindAndReplaceString(key, "harvest_", "");
+					resource_ident = FindAndReplaceString(resource_ident, "_", "-");
 					const int res = GetResourceIdByName(resource_ident.c_str());
 					if (res != -1) {
 						this->Sound.Harvest[res].Name = value;
@@ -960,6 +960,7 @@ void CUnitType::ProcessConfigData(CConfigData *config_data)
 					this->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = value;
 				} else if (key.find("dead_") != std::string::npos) {
 					std::string death_type_ident = FindAndReplaceString(key, "dead_", "");
+					death_type_ident = FindAndReplaceString(death_type_ident, "_", "-");
 					int death;
 					for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
 						if (death_type_ident == ExtraDeathTypes[death]) {
