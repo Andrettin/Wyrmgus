@@ -267,6 +267,53 @@ static void UiUnselectAll()
 	SelectionChanged();
 }
 
+static void SetBestMapLayerForUnitGroup(const std::vector<CUnit *> &unit_group)
+{
+	int best_map_layer = CurrentMapLayer;
+	
+	std::vector<int> map_layer_count;
+	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+		map_layer_count.push_back(0);
+	}
+	for (size_t i = 0; i != unit_group.size(); ++i) {
+		if (unit_group[i]->MapLayer < 0 || unit_group[i]->MapLayer >= (int) map_layer_count.size()) {
+			continue;
+		}
+		map_layer_count[unit_group[i]->MapLayer] += 1;
+	}
+	for (size_t i = 0; i < map_layer_count.size(); ++i) {
+		if (map_layer_count[i] > map_layer_count[best_map_layer]) {
+			best_map_layer = i;
+		}
+	}
+	
+	if (best_map_layer != CurrentMapLayer) {
+		ChangeCurrentMapLayer(best_map_layer);
+	}
+}
+
+static PixelPos GetMiddlePositionForUnitGroup(const std::vector<CUnit *> &unit_group)
+{
+	PixelPos pos(-1, -1);
+	
+	int map_layer_units = 0;
+	for (size_t i = 0; i != unit_group.size(); ++i) {
+		if (unit_group[i]->MapLayer != CurrentMapLayer) {
+			continue;
+		}
+		pos += unit_group[i]->GetMapPixelPosCenter();
+		map_layer_units++;
+	}
+
+	if (map_layer_units == 0) {
+		return PixelPos(-1, -1);
+	}	
+	
+	pos /= map_layer_units;
+	
+	return pos;
+}
+
 /**
 **  Center on group.
 **
@@ -278,42 +325,19 @@ static void UiUnselectAll()
 static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY)
 {
 	const std::vector<CUnit *> &units = GetUnitsOfGroup(group);
-	PixelPos pos(-1, -1);
 
-	//Wyrmgus start
-	int best_map_layer = CurrentMapLayer;
-	std::vector<int> map_layer_count;
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		map_layer_count.push_back(0);
-	}
+	std::vector<CUnit *> unit_group;
 	for (size_t i = 0; i != units.size(); ++i) {
 		if (units[i]->Type && units[i]->Type->CanSelect(mode)) {
-			map_layer_count[units[i]->MapLayer] += 1;
+			unit_group.push_back(units[i]);
 		}
 	}
-	for (size_t i = 0; i < map_layer_count.size(); ++i) {
-		if (map_layer_count[i] > map_layer_count[best_map_layer]) {
-			best_map_layer = i;
-		}
-	}
-	if (best_map_layer != CurrentMapLayer) {
-		ChangeCurrentMapLayer(best_map_layer);
-	}
-	//Wyrmgus end
+	
+	SetBestMapLayerForUnitGroup(unit_group);
 	
 	// FIXME: what should we do with the removed units? ignore?
-	for (size_t i = 0; i != units.size(); ++i) {
-		//Wyrmgus start
-//		if (units[i]->Type && units[i]->Type->CanSelect(mode)) {
-		if (units[i]->Type && units[i]->Type->CanSelect(mode) && units[i]->MapLayer == CurrentMapLayer) {
-		//Wyrmgus end
-			if (pos.x != -1) {
-				pos += (units[i]->GetMapPixelPosCenter() - pos) / 2;
-			} else {
-				pos = units[i]->GetMapPixelPosCenter();
-			}
-		}
-	}
+	PixelPos pos = GetMiddlePositionForUnitGroup(unit_group);
+	
 	if (pos.x != -1) {
 		UI.SelectedViewport->Center(pos);
 	}
@@ -551,35 +575,13 @@ static void UiCenterOnSelected()
 		return;
 	}
 
-	PixelPos pos;
+	SetBestMapLayerForUnitGroup(Selected);
 
-	//Wyrmgus start
-	int best_map_layer = CurrentMapLayer;
-	std::vector<int> map_layer_count;
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		map_layer_count.push_back(0);
-	}
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		map_layer_count[Selected[i]->MapLayer] += 1;
-	}
-	for (size_t i = 0; i < map_layer_count.size(); ++i) {
-		if (map_layer_count[i] > map_layer_count[best_map_layer]) {
-			best_map_layer = i;
-		}
-	}
-	if (best_map_layer != CurrentMapLayer) {
-		ChangeCurrentMapLayer(best_map_layer);
-	}
-	//Wyrmgus end
+	PixelPos pos = GetMiddlePositionForUnitGroup(Selected);
 
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[i]->MapLayer != best_map_layer) {
-			continue;
-		}
-		pos += Selected[i]->GetMapPixelPosCenter();
+	if (pos.x != -1) {
+		UI.SelectedViewport->Center(pos);
 	}
-	pos /= Selected.size();
-	UI.SelectedViewport->Center(pos);
 }
 
 /**
