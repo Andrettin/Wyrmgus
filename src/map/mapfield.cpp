@@ -128,6 +128,16 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		}
 		if (this->OverlayTerrain) {
 			this->Flags &= ~(this->OverlayTerrain->Flags);
+			if (this->OverlayTerrainDestroyed) {
+				if (this->OverlayTerrain->Flags & MapFieldForest) {
+					this->Flags &= ~(MapFieldStumps);
+				}
+				
+				if (((this->OverlayTerrain->Flags & MapFieldRocks) || (this->OverlayTerrain->Flags & MapFieldWall)) && !(this->Terrain->Flags & MapFieldGravel)) {
+					this->Flags &= ~(MapFieldGravel);
+				}
+			}
+			this->Flags &= ~(MapFieldGravel);
 		}
 	} else {
 		if (this->Terrain == terrain) {
