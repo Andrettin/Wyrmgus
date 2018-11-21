@@ -36,30 +36,21 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#ifndef __UPGRADE_STRUCTS_H__
-#include "upgrade_structs.h"
-#endif
-
-#ifndef __UNITSOUND_H__
-#include "unitsound.h"
-#endif
-
-#ifndef __ICONS_H__
-#include "icons.h"
-#endif
+#include <algorithm>
+#include <climits>
+#include <cstring>
+#include <map>
+#include <vector>
 
 #include "color.h"
+#include "icons.h"
 //Wyrmgus start
 #include "map.h"	//required for PixelTileSize
 //Wyrmgus end
 #include "missileconfig.h"
+#include "unitsound.h"
+#include "upgrade_structs.h"
 #include "vec2i.h"
-
-#include <climits>
-#include <vector>
-#include <algorithm>
-#include <map>
-#include <cstring>
 
 /*----------------------------------------------------------------------------
 --  Declarations

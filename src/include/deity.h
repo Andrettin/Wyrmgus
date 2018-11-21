@@ -40,9 +40,7 @@
 #include <string>
 #include <vector>
 
-#ifndef __ICONS_H__
 #include "icons.h"
-#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations

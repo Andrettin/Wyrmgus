@@ -37,14 +37,13 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#ifndef __UPGRADE_STRUCTS_H__
 #include "upgrade_structs.h"
-#endif
 
-#define ANIMATIONS_DEATHTYPES 40
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+#define ANIMATIONS_DEATHTYPES 40
 
 class CSound;
 

@@ -42,28 +42,18 @@
 #include <map>
 #include <tuple>
 
-#ifndef __DATE_H__
-#include "date.h"
-#endif
-
-#ifndef __ICONS_H__
-#include "icons.h"
-#endif
-//Wyrmgus end
-
 //Wyrmgus start
 #include "character.h" // because of "MaxCharacterTitles"
-//Wyrmgus end
 #include "color.h"
+//Wyrmgus end
+#include "date.h"
+#include "icons.h"
 //Wyrmgus start
 #include "item.h"
 #include "ui.h" // for the UI fillers
 //Wyrmgus end
 #include "upgrade_structs.h"
-
 #include "vec2i.h"
-
-class CGraphic;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -81,6 +71,7 @@ class CGraphic;
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CGraphic;
 class CUnit;
 class CUnitType;
 //Wyrmgus start

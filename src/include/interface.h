@@ -33,15 +33,14 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Declarations
+--  Includes
 ----------------------------------------------------------------------------*/
-#ifndef __ICONS_H__
-#include "icons.h"
-#endif
 
+#include <vector>
+
+#include "icons.h"
 #include "unitsound.h"
 #include "vec2i.h"
-#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations

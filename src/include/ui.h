@@ -39,26 +39,18 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#ifndef __CURSOR_H__
-#include "cursor.h"
-#endif
-#ifndef __INTERFACE_H__
-#include "interface.h"
-#endif
-#ifndef __SCRIPT_H__
-#include "script.h"
-#endif
-#ifndef __MINIMAP_H__
-#include "minimap.h"
-#endif
-
-#include "color.h"
-#include "viewport.h"
-#include "ui/statusline.h"
-#include "ui/uitimer.h"
 #include <vector>
 #include <string>
 #include <map>
+
+#include "color.h"
+#include "cursor.h"
+#include "interface.h"
+#include "minimap.h"
+#include "script.h"
+#include "viewport.h"
+#include "ui/statusline.h"
+#include "ui/uitimer.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

@@ -127,20 +127,20 @@
 **    top and right most map coordinate.
 */
 
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#ifndef __UNIT_CACHE_H__
-#include "unit_cache.h"
-#endif
-
-#include <vec2i.h>
-
 //Wyrmgus start
 #include <tuple>
 //Wyrmgus end
+
+#include "unit_cache.h"
+#include "vec2i.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
 class CFile;
 class CPlayer;
