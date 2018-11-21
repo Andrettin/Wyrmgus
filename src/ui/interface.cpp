@@ -294,7 +294,7 @@ static void SetBestMapLayerForUnitGroup(const std::vector<CUnit *> &unit_group)
 
 static PixelPos GetMiddlePositionForUnitGroup(const std::vector<CUnit *> &unit_group)
 {
-	PixelPos pos(-1, -1);
+	PixelPos pos(0, 0);
 	
 	int map_layer_units = 0;
 	for (size_t i = 0; i != unit_group.size(); ++i) {
