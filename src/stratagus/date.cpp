@@ -304,10 +304,8 @@ std::string CDate::ToDayMonthExtendedDisplayString(const CCalendar *calendar) co
 	}
 	
 	if (calendar->CurrentDayOfTheWeek != -1) {
-		display_string += calendar->DaysOfTheWeek[calendar->CurrentDayOfTheWeek]->Name + ", ";
+		display_string += calendar->DaysOfTheWeek[calendar->CurrentDayOfTheWeek]->Name + " - ";
 	}
-	
-	display_string += std::to_string((long long) this->Day) + " ";
 	
 	display_string += calendar->Months[this->Month - 1]->Name + " (" + NumberToRomanNumeral(this->Month) + ")";
 	
