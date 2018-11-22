@@ -115,7 +115,7 @@ public:
 	std::string NegativeYearLabel;												/// label used for "negative" years (e.g. BC)
 	CDayOfTheWeek *BaseDayOfTheWeek;											/// the day of the week for the first day of the year in the calendar
 	std::vector<CDayOfTheWeek *> DaysOfTheWeek;									/// the days of the week in the calendar
-	std::vector<CMonth *> Months;
+	std::vector<CMonth *> Months;												/// the months in the calendar
 private:
 	std::map<std::string, CDayOfTheWeek *> DaysOfTheWeekByIdent;
 	std::map<CCalendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// chronological intersection points between this calendar and other calendars
