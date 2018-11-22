@@ -1683,6 +1683,11 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		CDate::CurrentDate.Hour = SyncRand(CCalendar::BaseCalendar->HoursPerDay);
 		GameHour = CDate::CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
 	}
+	
+	for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
+		CCalendar *calendar = CCalendar::Calendars[i];
+		calendar->CurrentDayOfTheWeek = CDate::CurrentDate.GetDayOfTheWeek(calendar);
+	}
 	//Wyrmgus end
 
 	if (Map.Info.Filename.empty() && !filename.empty()) {

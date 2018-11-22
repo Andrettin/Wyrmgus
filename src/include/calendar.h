@@ -83,7 +83,7 @@ class CCalendar
 {
 public:
 	CCalendar() :
-		Initialized(false), HoursPerDay(DefaultHoursPerDay), DaysPerYear(0), BaseDayOfTheWeek(NULL)
+		Initialized(false), HoursPerDay(DefaultHoursPerDay), DaysPerYear(0), BaseDayOfTheWeek(NULL), CurrentDayOfTheWeek(-1)
 	{
 	}
 	
@@ -114,6 +114,7 @@ public:
 	std::string YearLabel;														/// label used for years (e.g. AD)
 	std::string NegativeYearLabel;												/// label used for "negative" years (e.g. BC)
 	CDayOfTheWeek *BaseDayOfTheWeek;											/// the day of the week for the first day of the year in the calendar
+	int CurrentDayOfTheWeek;													/// the current day of the week for this calendar within a game
 	std::vector<CDayOfTheWeek *> DaysOfTheWeek;									/// the days of the week in the calendar
 	std::vector<CMonth *> Months;												/// the months in the calendar
 private:

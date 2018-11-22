@@ -151,7 +151,7 @@ void CDate::AddYears(const int years)
 	}
 }
 
-void CDate::AddMonths(CCalendar *calendar, const int months)
+void CDate::AddMonths(const CCalendar *calendar, const int months)
 {
 	this->Month += months;
 	
@@ -168,9 +168,9 @@ void CDate::AddMonths(CCalendar *calendar, const int months)
 	}
 }
 
-void CDate::AddDays(CCalendar *calendar, const int days)
+void CDate::AddDays(const CCalendar *calendar, const int days, const int day_multiplier)
 {
-	this->Day += days;
+	this->Day += days * day_multiplier;
 	
 	if (this->Day > 0) {
 		while (this->Day > calendar->DaysPerYear) {
@@ -195,21 +195,21 @@ void CDate::AddDays(CCalendar *calendar, const int days)
 	}
 }
 
-void CDate::AddHours(CCalendar *calendar, const long long int hours)
+void CDate::AddHours(const CCalendar *calendar, const long long int hours, const int day_multiplier)
 {
-	this->AddDays(calendar, hours / calendar->HoursPerDay);
+	this->AddDays(calendar, hours / calendar->HoursPerDay, day_multiplier);
 	
 	this->Hour += hours % calendar->HoursPerDay;
 	
 	if (this->Hour >= 0) {
 		while (this->Hour >= calendar->HoursPerDay) {
 			this->Hour -= calendar->HoursPerDay;
-			this->AddDays(calendar, 1);
+			this->AddDays(calendar, 1, day_multiplier);
 		}
 	} else {
 		while (this->Hour < 0) {
 			this->Hour += calendar->HoursPerDay;
-			this->AddDays(calendar, -1);
+			this->AddDays(calendar, -1, day_multiplier);
 		}
 	}
 }
@@ -303,15 +303,8 @@ std::string CDate::ToDayMonthExtendedDisplayString(const CCalendar *calendar) co
 		return display_string;
 	}
 	
-	if (!calendar->DaysOfTheWeek.empty() && calendar->BaseDayOfTheWeek) {
-		int day_of_the_week = calendar->BaseDayOfTheWeek->ID;
-		
-		day_of_the_week += this->GetTotalDays(calendar) % calendar->DaysOfTheWeek.size();
-		if (day_of_the_week < 0) {
-			day_of_the_week += calendar->DaysOfTheWeek.size();
-		}
-		
-		display_string += calendar->DaysOfTheWeek[day_of_the_week]->Name + ", ";
+	if (calendar->CurrentDayOfTheWeek != -1) {
+		display_string += calendar->DaysOfTheWeek[calendar->CurrentDayOfTheWeek]->Name + ", ";
 	}
 	
 	display_string += std::to_string((long long) this->Day) + " ";
@@ -351,10 +344,37 @@ unsigned long long CDate::GetTotalHours(CCalendar *calendar) const
 	return hours;
 }
 
+int CDate::GetDayOfTheWeek(const CCalendar *calendar) const
+{
+	if (!calendar->DaysOfTheWeek.empty() && calendar->BaseDayOfTheWeek) {
+		int day_of_the_week = calendar->BaseDayOfTheWeek->ID;
+		
+		day_of_the_week += this->GetTotalDays(calendar) % calendar->DaysOfTheWeek.size();
+		if (day_of_the_week < 0) {
+			day_of_the_week += calendar->DaysOfTheWeek.size();
+		}
+		
+		return day_of_the_week;
+	}
+	
+	return -1;
+}
+
 void SetCurrentDate(std::string date_string)
 {
 	CDate::CurrentDate = CDate::FromString(date_string);
 	CDate::UpdateCurrentDateDisplayString();
+}
+
+void SetCurrentDayOfTheWeek(std::string calendar_ident, int day_of_the_week)
+{
+	CCalendar *calendar = CCalendar::GetCalendar(calendar_ident);
+	
+	if (!calendar || calendar->DaysOfTheWeek.empty() || !calendar->BaseDayOfTheWeek) {
+		return;
+	}
+	
+	calendar->CurrentDayOfTheWeek = day_of_the_week;
 }
 
 //@}
