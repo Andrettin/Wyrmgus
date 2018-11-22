@@ -437,8 +437,11 @@ static void GameLogicLoop()
 		//Wyrmgus start
 		if (GameCycle > 0 && GameCycle % CyclesPerInGameHour == 0) {
 			GameHour++;
+			int old_day = CDate::CurrentDate.Day;
 			CDate::CurrentDate.AddHours(CCalendar::BaseCalendar, 1);
-			CDate::UpdateCurrentDateDisplayString();
+			if (old_day != CDate::CurrentDate.Day) {
+				CDate::UpdateCurrentDateDisplayString();
+			}
 			for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 				CMapLayer *map_layer = Map.MapLayers[z];
 				int cycles_per_time_of_day = map_layer->HoursPerDay;
