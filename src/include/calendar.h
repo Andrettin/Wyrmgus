@@ -99,10 +99,11 @@ public:
 	static CCalendar *BaseCalendar;
 	
 	void ProcessConfigData(CConfigData *config_data);
-	bool IsInitialized();
+private:
 	CDayOfTheWeek *GetDayOfTheWeekByIdent(const std::string &ident);
 	void AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date);
 	void InheritChronologicalIntersectionsFromCalendar(CCalendar *intersecting_calendar);
+public:
 	std::pair<CDate, CDate> GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const;
 	
 	std::string Ident;
@@ -115,6 +116,7 @@ public:
 	CDayOfTheWeek *BaseDayOfTheWeek;											/// the day of the week for the first day of the year in the calendar
 	std::vector<CDayOfTheWeek *> DaysOfTheWeek;									/// the days of the week in the calendar
 	std::vector<CMonth *> Months;
+private:
 	std::map<std::string, CDayOfTheWeek *> DaysOfTheWeekByIdent;
 	std::map<CCalendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// chronological intersection points between this calendar and other calendars
 };

@@ -263,11 +263,6 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 	}
 }
 
-bool CCalendar::IsInitialized()
-{
-	return this->Initialized;
-}
-
 CDayOfTheWeek *CCalendar::GetDayOfTheWeekByIdent(const std::string &ident)
 {
 	if (this->DaysOfTheWeekByIdent.find(ident) != this->DaysOfTheWeekByIdent.end()) {
@@ -296,14 +291,14 @@ void CCalendar::AddChronologicalIntersection(CCalendar *intersecting_calendar, c
 
 void CCalendar::InheritChronologicalIntersectionsFromCalendar(CCalendar *intersecting_calendar)
 {
-	if (!intersecting_calendar || !intersecting_calendar->IsInitialized()) {
+	if (!intersecting_calendar || !intersecting_calendar->Initialized) {
 		return;
 	}
 	
 	for (std::map<CCalendar *, std::map<CDate, CDate>>::iterator iterator = intersecting_calendar->ChronologicalIntersections.begin(); iterator != intersecting_calendar->ChronologicalIntersections.end(); ++iterator) {
 		CCalendar *third_calendar = iterator->first;
 		
-		if (third_calendar == this || !third_calendar->IsInitialized()) {
+		if (third_calendar == this || !third_calendar->Initialized) {
 			continue;
 		}
 		
