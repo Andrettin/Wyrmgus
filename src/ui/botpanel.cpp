@@ -2478,8 +2478,12 @@ void CButtonPanel::DoClicked_EnterMapLayer()
 		CUnit *connection_destination = Selected[i]->ConnectingDestination;
 		if (connection_destination != NULL) {
 			PlayUnitSound(*connection_destination, VoiceUsed);
+			Selected[i]->Blink = 4;
+			connection_destination->Blink = 4;
 			UnSelectUnit(*Selected[i]);
-			SelectUnit(*connection_destination);
+			if (connection_destination->IsVisible(*ThisPlayer)) {
+				SelectUnit(*connection_destination);
+			}
 			SelectionChanged();
 			ChangeCurrentMapLayer(connection_destination->MapLayer);
 			UI.SelectedViewport->Center(connection_destination->GetMapPixelPosCenter());
