@@ -1,10 +1,15 @@
-#include "version-generated.h"
+//#include "version-generated.h"
 
 /// Name
 #define NAME "Stratagus"
 
 /// Description
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
+
+#define StratagusMajorVersion 3
+#define StratagusMinorVersion 4
+#define StratagusPatchLevel 2
+#define StratagusPatchLevel2 0
 
 #define _version_stringify_(s) #s
 #define _version_stringify(s) _version_stringify_(s)
