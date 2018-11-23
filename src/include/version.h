@@ -1,5 +1,3 @@
-//#include "version-generated.h"
-
 /// Name
 #define NAME "Stratagus"
 
