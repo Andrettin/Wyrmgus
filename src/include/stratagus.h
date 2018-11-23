@@ -189,6 +189,8 @@ extern const char NameLine[];
 
 #define HeroCooldownCycles CYCLES_PER_MINUTE	/// Cooldown (in cycles) for recruiting a hero
 
+#define DefaultTileMovementCost 8
+
 /*----------------------------------------------------------------------------
 --  stratagus.cpp
 ----------------------------------------------------------------------------*/

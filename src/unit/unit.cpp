@@ -5277,7 +5277,7 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 		std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
 	} else if (index == SPEED_INDEX) {
 		if (this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) {
-			value += 8 - Map.Field(this->Offset, this->MapLayer)->getCost();
+			value += DefaultTileMovementCost - Map.Field(this->Offset, this->MapLayer)->getCost();
 		}
 	}
 	

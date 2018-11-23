@@ -329,7 +329,7 @@ int DoActionMove(CUnit &unit)
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
 	//Wyrmgus start
 //	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
-	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move, 8);
+	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move, DefaultTileMovementCost);
 	//Wyrmgus end
 
 	unit.IX += posd.x * move;

@@ -207,11 +207,11 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	}
 
 	if (this->Flags & MapFieldRailroad) {
-		this->cost = 7;
+		this->cost = DefaultTileMovementCost - 1;
 	} else if (this->Flags & MapFieldRoad) {
-		this->cost = 7;
+		this->cost = DefaultTileMovementCost - 1;
 	} else {
-		this->cost = 8; // default speed
+		this->cost = DefaultTileMovementCost; // default speed
 	}
 	
 	if (this->Flags & MapFieldRailroad) {
@@ -256,11 +256,11 @@ void CMapField::RemoveOverlayTerrain()
 	}
 	
 	if (this->Flags & MapFieldRailroad) {
-		this->cost = 7;
+		this->cost = DefaultTileMovementCost - 1;
 	} else if (this->Flags & MapFieldRoad) {
-		this->cost = 7;
+		this->cost = DefaultTileMovementCost - 1;
 	} else {
-		this->cost = 8; // default speed
+		this->cost = DefaultTileMovementCost; // default speed
 	}
 	
 	if (this->Flags & MapFieldRailroad) {
