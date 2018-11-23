@@ -313,6 +313,7 @@ private:
 	void DoClicked_SellResource(int button);
 	void DoClicked_BuyResource(int button);
 	void DoClicked_Salvage();
+	void DoClicked_EnterMapLayer();
 	//Wyrmgus end
 
 

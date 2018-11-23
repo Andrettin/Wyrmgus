@@ -158,7 +158,7 @@ int ButtonAction::GetKey() const
 		return this->Key;
 	}
 	
-	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo || this->Action == ButtonRallyPoint || this->Action == ButtonSalvage))) && this->Key != 0) {
+	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo || this->Action == ButtonRallyPoint || this->Action == ButtonSalvage || this->Action == ButtonEnterMapLayer))) && this->Key != 0) {
 		if (this->Pos == 1) {
 			return 'q';
 		} else if (this->Pos == 2) {
@@ -208,7 +208,7 @@ std::string ButtonAction::GetHint() const
 		return this->Hint;
 	}
 	
-	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo || this->Action == ButtonRallyPoint || this->Action == ButtonSalvage))) && this->Key != 0 && !this->Hint.empty()) {
+	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo || this->Action == ButtonRallyPoint || this->Action == ButtonSalvage || this->Action == ButtonEnterMapLayer))) && this->Key != 0 && !this->Hint.empty()) {
 		std::string hint = this->Hint;
 		hint = FindAndReplaceString(hint, "~!", "");
 		hint += " (~!";
@@ -1973,6 +1973,8 @@ std::string GetButtonActionNameById(int button_action)
 		return "buy-resource";
 	} else if (button_action == ButtonSalvage) {
 		return "salvage";
+	} else if (button_action == ButtonEnterMapLayer) {
+		return "enter-map-layer";
 	} else if (button_action == ButtonUnit) {
 		return "unit";
 	} else if (button_action == ButtonEditorUnit) {
@@ -2044,6 +2046,8 @@ int GetButtonActionIdByName(std::string button_action)
 		return ButtonBuyResource;
 	} else if (button_action == "salvage") {
 		return ButtonSalvage;
+	} else if (button_action == "enter-map-layer") {
+		return ButtonEnterMapLayer;
 	} else if (button_action == "unit") {
 		return ButtonUnit;
 	} else if (button_action == "editor-unit") {

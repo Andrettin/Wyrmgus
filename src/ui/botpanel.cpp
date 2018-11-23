@@ -1216,7 +1216,8 @@ void CButtonPanel::Draw()
 		//Wyrmgus start
 		//for neutral units, don't draw buttons that aren't training buttons (in other words, only draw buttons which are usable by neutral buildings)
 		if (
-			Selected[0]->Player != ThisPlayer
+			!buttons[i].AlwaysShow
+			&& Selected[0]->Player != ThisPlayer
 			&& !ThisPlayer->IsTeamed(*Selected[0])
 			&& ThisPlayer->HasBuildingAccess(*Selected[0]->Player, buttons[i].Action)
 			&& !IsNeutralUsableButtonAction(buttons[i].Action)
@@ -1459,6 +1460,10 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 */
 bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 {
+	if (buttonaction.AlwaysShow) {
+		return true;
+	}
+	
 	bool res = false;
 	if (buttonaction.Allowed) {
 		res = buttonaction.Allowed(unit, buttonaction);
@@ -1490,6 +1495,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonSellResource:
 		case ButtonBuyResource:
 		case ButtonSalvage:
+		case ButtonEnterMapLayer:
 		//Wyrmgus end
 			res = true;
 			break;
@@ -1659,6 +1665,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonAttack:
 		case ButtonAttackGround:
 		case ButtonSalvage:
+		case ButtonEnterMapLayer:
 			res = true;
 			break;
 		case ButtonTrain:
@@ -2461,7 +2468,25 @@ void CButtonPanel::DoClicked_Salvage()
 		SendCommandDismiss(*Selected[i], true);
 	}
 }
-//Wyrmgus end
+
+/**
+**	@brief Enter the map layer that the selected unit leads to.
+*/
+void CButtonPanel::DoClicked_EnterMapLayer()
+{
+	for (size_t i = 0; i < Selected.size(); ++i) {
+		CUnit *connection_destination = Selected[i]->ConnectingDestination;
+		if (connection_destination != NULL) {
+			PlayUnitSound(*connection_destination, VoiceUsed);
+			UnSelectUnit(*Selected[i]);
+			SelectUnit(*connection_destination);
+			SelectionChanged();
+			ChangeCurrentMapLayer(connection_destination->MapLayer);
+			UI.SelectedViewport->Center(connection_destination->GetMapPixelPosCenter());
+			break;
+		}
+	}
+}
 
 void CButtonPanel::DoClicked_CallbackAction(int button)
 {
@@ -2492,7 +2517,7 @@ void CButtonPanel::DoClicked(int button)
 	//
 	//Wyrmgus start
 //	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button].Action)) || (!ThisPlayer->IsTeamed(*Selected[0]) && ThisPlayer->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button].Action) && !IsNeutralUsableButtonAction(CurrentButtons[button].Action))) { //allow neutral units to be used (but only for training or as transporters)
+	if (CurrentButtons[button].Pos == -1 || (!CurrentButtons[button].AlwaysShow && !ThisPlayer->IsTeamed(*Selected[0]) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button].Action)) || (!CurrentButtons[button].AlwaysShow && !ThisPlayer->IsTeamed(*Selected[0]) && ThisPlayer->HasBuildingAccess(*Selected[0]->Player, CurrentButtons[button].Action) && !IsNeutralUsableButtonAction(CurrentButtons[button].Action))) { //allow neutral units to be used (but only for training or as transporters)
 	//Wyrmgus end
 		return;
 	}
@@ -2563,6 +2588,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonSellResource: { DoClicked_SellResource(button); break; }
 		case ButtonBuyResource: { DoClicked_BuyResource(button); break; }
 		case ButtonSalvage: { DoClicked_Salvage(); break; }
+		case ButtonEnterMapLayer: { DoClicked_EnterMapLayer(); break; }
 		//Wyrmgus end
 	}
 }

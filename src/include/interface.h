@@ -85,6 +85,7 @@ enum ButtonCmd {
 	ButtonSellResource,		/// sell a resource
 	ButtonBuyResource,		/// buy a resource
 	ButtonSalvage,			/// salvage a building
+	ButtonEnterMapLayer,	/// enter a map layer
 	ButtonUnit,				/// used to display popups for inventory items and for units in transporters
 	ButtonEditorUnit,		/// used to display popups for editor unit type buttons
 	//Wyrmgus end
@@ -92,10 +93,7 @@ enum ButtonCmd {
 	ButtonCancelUpgrade,  /// cancel upgrade
 	ButtonCancelTrain,    /// cancel training
 	ButtonCancelBuild,    /// cancel building
-	//Wyrmgus start
-//	ButtonCallbackAction
 	ButtonCallbackAction
-	//Wyrmgus end
 };
 
 class ButtonAction;
