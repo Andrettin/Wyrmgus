@@ -890,26 +890,26 @@ void DrawResources()
 **  Draw the day time.
 */
 void DrawDayTime() {
-	if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == NoTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay >= MaxTimesOfDay) {
-		return;
+	std::string date_time_text = CDate::CurrentDateDisplayString;
+	
+	if (Map.MapLayers[CurrentMapLayer]->TimeOfDay != NoTimeOfDay && Map.MapLayers[CurrentMapLayer]->TimeOfDay < MaxTimesOfDay) {
+		char timesText[MaxTimesOfDay][16] = {
+			"NoTime",
+			"Dawn",
+			"Morning",
+			"Midday",
+			"Afternoon",
+			"Dusk",
+			"Early Night",
+			"Midnight",
+			"Late Night"
+		};
+		
+		date_time_text += " - ";
+		date_time_text += _(timesText[Map.MapLayers[CurrentMapLayer]->TimeOfDay]);
 	}
 
-	char timesText[MaxTimesOfDay][16] = {
-		"NoTime",
-		"Dawn",
-		"Morning",
-		"Midday",
-		"Afternoon",
-		"Dusk",
-		"Early Night",
-		"Midnight",
-		"Late Night"
-	};
 	CLabel label(GetGameFont());
-	
-	std::string date_time_text;
-	date_time_text += CDate::CurrentDateDisplayString + " - ";
-	date_time_text += _(timesText[Map.MapLayers[CurrentMapLayer]->TimeOfDay]);
 
 	// TODO: Instead of a simple text here we could use an icon per time of day
 	label.Draw(UI.TimePanel.X - GetGameFont().getWidth(date_time_text) / 2, UI.TimePanel.Y, date_time_text);
