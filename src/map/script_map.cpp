@@ -1375,8 +1375,8 @@ static int CclDefineTerrainType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			terrain->PixelSize.x = LuaToNumber(l, -1, 1);
-			terrain->PixelSize.y = LuaToNumber(l, -1, 2);
+			terrain->PixelTileSize.x = LuaToNumber(l, -1, 1);
+			terrain->PixelTileSize.y = LuaToNumber(l, -1, 2);
 		} else if (!strcmp(value, "BaseTerrainTypes")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1572,19 +1572,19 @@ static int CclDefineTerrainType(lua_State *l)
 	//save the graphics here, so that we can take the pixel tile size into account
 	if (!graphics_file.empty()) {
 		if (CGraphic::Get(graphics_file) == NULL) {
-			CGraphic *graphics = CGraphic::New(graphics_file, terrain->PixelSize.x, terrain->PixelSize.y);
+			CGraphic *graphics = CGraphic::New(graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
 		}
 		terrain->Graphics = CGraphic::Get(graphics_file);
 	}
 	if (!elevation_graphics_file.empty()) {
 		if (CGraphic::Get(elevation_graphics_file) == NULL) {
-			CGraphic *graphics = CGraphic::New(elevation_graphics_file, terrain->PixelSize.x, terrain->PixelSize.y);
+			CGraphic *graphics = CGraphic::New(elevation_graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
 		}
 		terrain->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
 	}
 	if (!player_color_graphics_file.empty()) {
 		if (CPlayerColorGraphic::Get(player_color_graphics_file) == NULL) {
-			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, terrain->PixelSize.x, terrain->PixelSize.y);
+			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
 		}
 		terrain->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
 	}

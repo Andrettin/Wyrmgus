@@ -2617,7 +2617,7 @@ void CEditor::Init()
 //	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 	Editor.ShownTileTypes.clear();
 	for (size_t i = 0; i < CTerrainType::TerrainTypes.size(); ++i) {
-		if (!CTerrainType::TerrainTypes[i]->Hidden && CTerrainType::TerrainTypes[i]->PixelSize == Map.GetCurrentPixelTileSize()) {
+		if (!CTerrainType::TerrainTypes[i]->Hidden && CTerrainType::TerrainTypes[i]->PixelTileSize == Map.GetCurrentPixelTileSize()) {
 			Editor.ShownTileTypes.push_back(CTerrainType::TerrainTypes[i]);
 		}
 	}

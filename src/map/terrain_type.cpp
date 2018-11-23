@@ -203,9 +203,9 @@ void CTerrainType::ProcessConfigData(CConfigData *config_data)
 				fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "pixel_width") {
-			this->PixelSize.x = std::stoi(value);
+			this->PixelTileSize.x = std::stoi(value);
 		} else if (key == "pixel_height") {
-			this->PixelSize.y = std::stoi(value);
+			this->PixelTileSize.y = std::stoi(value);
 		} else if (key == "base_terrain_type") {
 			value = FindAndReplaceString(value, "_", "-");
 			CTerrainType *base_terrain_type = GetOrAddTerrainType(value);
@@ -267,19 +267,19 @@ void CTerrainType::ProcessConfigData(CConfigData *config_data)
 	//get the graphics here, so that we can take the pixel tile size into account
 	if (!graphics_file.empty()) {
 		if (CGraphic::Get(graphics_file) == NULL) {
-			CGraphic *graphics = CGraphic::New(graphics_file, this->PixelSize.x, this->PixelSize.y);
+			CGraphic *graphics = CGraphic::New(graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
 		}
 		this->Graphics = CGraphic::Get(graphics_file);
 	}
 	if (!elevation_graphics_file.empty()) {
 		if (CGraphic::Get(elevation_graphics_file) == NULL) {
-			CGraphic *graphics = CGraphic::New(elevation_graphics_file, this->PixelSize.x, this->PixelSize.y);
+			CGraphic *graphics = CGraphic::New(elevation_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
 		}
 		this->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
 	}
 	if (!player_color_graphics_file.empty()) {
 		if (CPlayerColorGraphic::Get(player_color_graphics_file) == NULL) {
-			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, this->PixelSize.x, this->PixelSize.y);
+			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
 		}
 		this->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
 	}
