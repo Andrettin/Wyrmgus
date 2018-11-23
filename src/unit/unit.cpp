@@ -6011,16 +6011,18 @@ bool CUnit::DeequippingItemBreaksSet(const CUnit *item) const
 
 bool CUnit::HasInventory() const
 {
-	if (Type->BoolFlag[INVENTORY_INDEX].value) {
+	if (this->Type->BoolFlag[INVENTORY_INDEX].value) {
 		return true;
 	}
 	
-	if (Character != NULL) {
-		return true;
-	}
-	
-	if (this->Variable[LEVEL_INDEX].Value >= 3 && this->Type->BoolFlag[ORGANIC_INDEX].value && !this->Type->BoolFlag[FAUNA_INDEX].value) {
-		return true;
+	if (!this->Type->BoolFlag[FAUNA_INDEX].value) {
+		if (this->Character != NULL) {
+			return true;
+		}
+		
+		if (this->Variable[LEVEL_INDEX].Value >= 3 && this->Type->BoolFlag[ORGANIC_INDEX].value) {
+			return true;
+		}
 	}
 	
 	return false;
