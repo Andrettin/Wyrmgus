@@ -43,8 +43,10 @@
 #include <map>
 
 #include "calendar.h"
+#include "civilization.h"
 #include "config.h"
 #include "deity.h"
+#include "deity_domain.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -77,10 +79,6 @@ CCharacter::~CCharacter()
 {
 	if (this->Conditions) {
 		delete Conditions;
-	}
-	
-	for (size_t i = 0; i < this->DeityProfiles.size(); ++i) {
-		delete this->DeityProfiles[i];
 	}
 }
 
@@ -138,10 +136,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Civilization = PlayerRaces.GetRaceIndexByName(value.c_str());
-			if (this->Civilization == -1) {
-				fprintf(stderr, "Civilization \"%s\" does not exist.\n", value.c_str());
-			}
+			this->Civilization = CCivilization::GetCivilization(value);
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = PlayerRaces.GetFaction(value);
@@ -180,6 +175,9 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			CDeity *deity = CDeity::GetDeity(value);
 			if (deity) {
 				this->Deities.push_back(deity);
+				if (LoadingHistory) {
+					this->GeneratedDeities.push_back(deity);
+				}
 			}
 		} else if (key == "description") {
 			this->Description = value;
@@ -217,6 +215,12 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
+		} else if (key == "preferred_deity_domain") {
+			value = FindAndReplaceString(value, "_", "-");
+			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
+			if (deity_domain) {
+				this->PreferredDeityDomains.push_back(deity_domain);
+			}
 		} else {
 			fprintf(stderr, "Invalid character property: \"%s\".\n", key.c_str());
 		}
@@ -225,15 +229,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
 		CConfigData *child_config_data = config_data->Children[i];
 		
-		if (child_config_data->Tag == "deity_profile") {
-			CDeity *deity = new CDeity;
-			deity->Profile = true;
-			if (this->Civilization != -1) {
-				deity->Civilizations.push_back(this->Civilization);
-			}
-			deity->ProcessConfigData(child_config_data);
-			this->DeityProfiles.push_back(deity);
-		} else if (child_config_data->Tag == "historical_location") {
+		if (child_config_data->Tag == "historical_location") {
 			CDate date;
 			CMapTemplate *map_template = NULL;
 			Vec2i character_pos(-1, -1);
@@ -299,12 +295,12 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		if (name_changed) {
 			this->Type->PersonalNames[this->Gender].push_back(this->Name);
 		}
-	} else if (this->Civilization != -1) {
+	} else if (this->Civilization) {
 		if (name_changed) {
-			PlayerRaces.Civilizations[this->Civilization]->PersonalNames[this->Gender].push_back(this->Name);
+			this->Civilization->PersonalNames[this->Gender].push_back(this->Name);
 		}
 		if (family_name_changed) {
-			PlayerRaces.Civilizations[this->Civilization]->FamilyNames.push_back(this->FamilyName);
+			this->Civilization->FamilyNames.push_back(this->FamilyName);
 		}
 	}
 	
@@ -328,20 +324,78 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	this->UpdateAttributes();
 }
 
+/**
+**	@brief	Generate missing data for the character as a part of history generation
+*/
 void CCharacter::GenerateHistory()
 {
 	//generate history (but skip already-generated data)
 	bool history_changed = false;
 	
-	if (!this->DeityProfiles.empty() && this->Deities.size() != this->DeityProfiles.size()) {
-		this->Deities.clear();
-		for (size_t i = 0; i < this->DeityProfiles.size(); ++i) {
-			CDeity *deity = CDeity::GetProfileMatch(this->DeityProfiles[i]);
-			if (deity) {
-				this->Deities.push_back(deity);
+	if (!this->PreferredDeityDomains.empty() && this->Deities.size() < PlayerDeityMax && this->CanWorship()) { //if the character can worship deities, but worships less deities than the maximum, generate them for the character
+		int deities_missing = PlayerDeityMax - this->Deities.size();
+		CReligion *character_religion = NULL;
+		for (size_t i = 0; i < this->Deities.size(); ++i) {
+			if (!this->Deities[i]->Religions.empty()) {
+				character_religion = this->Deities[i]->Religions[0];
+			}
+		}
+		
+		for (int i = 0; i < deities_missing; ++i) {
+			std::vector<CDeity *> potential_deities;
+			int best_score = 0;
+			const bool has_major_deity = this->HasMajorDeity();
+			
+			for (size_t j = 0; j < CDeity::Deities.size(); ++j) {
+				CDeity *deity = CDeity::Deities[j];
+				
+				if (!deity->DeityUpgrade) {
+					continue; //don't use deities that have no corresponding deity upgrade for the character
+				}
+				
+				if (deity->Major == has_major_deity) {
+					continue; //try to get a major deity if the character has none, or a minor deity otherwise
+				}
+				
+				if (std::find(deity->Civilizations.begin(), deity->Civilizations.end(), this->Civilization) == deity->Civilizations.end()) {
+					continue;
+				}
+				
+				if (character_religion && std::find(deity->Religions.begin(), deity->Religions.end(), character_religion) == deity->Religions.end()) {
+					continue; //the deity should be compatible with the character's religion
+				}
+				
+				int score = 0;
+				
+				bool has_domains = true;
+				for (size_t k = 0; k < this->PreferredDeityDomains.size(); ++k) {
+					if (std::find(deity->Domains.begin(), deity->Domains.end(), this->PreferredDeityDomains[k]) != deity->Domains.end()) {
+						score++;
+					}
+				}
+				
+				if (score < best_score) {
+					continue;
+				} else if (score > best_score) {
+					potential_deities.clear();
+					best_score = score;
+				}
+				
+				potential_deities.push_back(deity);
+			}
+			
+			if (!potential_deities.empty()) {
+				CDeity *chosen_deity = potential_deities[SyncRand(potential_deities.size())];
+				this->Deities.push_back(chosen_deity);
+				this->GeneratedDeities.push_back(chosen_deity);
+				
+				if (!character_religion && !chosen_deity->Religions.empty()) {
+					character_religion = chosen_deity->Religions[0];
+				}
+				
 				history_changed = true;
 			} else {
-				fprintf(stderr, "No deity could be matched with the deity profile for character \"%s\".\n", this->Ident.c_str());
+				fprintf(stderr, "Could not generate deity for character: \"%s\".\n", this->Ident.c_str());
 			}
 		}
 	}
@@ -351,13 +405,21 @@ void CCharacter::GenerateHistory()
 	}
 }
 
+/**
+**	@brief	Reset generated history for the character
+*/
 void CCharacter::ResetHistory()
 {
-	if (!this->DeityProfiles.empty() && !this->Deities.empty()) {
-		this->Deities.clear();
+	for (size_t i = 0; i < this->GeneratedDeities.size(); ++i) {
+		this->Deities.erase(std::remove(this->Deities.begin(), this->Deities.end(), this->GeneratedDeities[i]), this->Deities.end());
 	}
+	
+	this->GeneratedDeities.clear();
 }
 
+/**
+**	@brief	Save generated history for the character
+*/
 void CCharacter::SaveHistory()
 {
 	struct stat tmp;
@@ -387,10 +449,8 @@ void CCharacter::SaveHistory()
 
 	fprintf(fd, "[character]\n");
 	fprintf(fd, "\tident = %s\n", FindAndReplaceString(this->Ident, "-", "_").c_str());
-	if (!this->DeityProfiles.empty() && !this->Deities.empty()) {
-		for (size_t i = 0; i < this->Deities.size(); ++i) {
-			fprintf(fd, "\tdeity = %s\n", FindAndReplaceString(this->Deities[i]->Ident, "-", "_").c_str());
-		}
+	for (size_t i = 0; i < this->GeneratedDeities.size(); ++i) {
+		fprintf(fd, "\tdeity = %s\n", FindAndReplaceString(this->GeneratedDeities[i]->Ident, "-", "_").c_str());
 	}
 	fprintf(fd, "[/character]\n");
 		
@@ -458,13 +518,13 @@ int CCharacter::GetAttributeModifier(int attribute) const
 
 CLanguage *CCharacter::GetLanguage() const
 {
-	return PlayerRaces.GetCivilizationLanguage(this->Civilization);
+	return PlayerRaces.GetCivilizationLanguage(this->Civilization->ID);
 }
 
 CCalendar *CCharacter::GetCalendar() const
 {
-	if (this->Civilization != -1) {
-		return PlayerRaces.Civilizations[this->Civilization]->GetCalendar();
+	if (this->Civilization) {
+		return this->Civilization->GetCalendar();
 	}
 	
 	return CCalendar::BaseCalendar;
@@ -538,6 +598,40 @@ bool CCharacter::CanAppear(bool ignore_neutral) const
 	}
 
 	return true;
+}
+
+/**
+**	@brief	Get whether the character can worship a deity
+**
+**	@return True if the character can worship, false otherwise
+*/
+bool CCharacter::CanWorship() const
+{
+	if (this->Deity) {
+		return false; //the character cannot worship a deity if it is itself a deity
+	}
+	
+	if (this->Type->BoolFlag[FAUNA_INDEX].value) {
+		return false; //the character cannot worship a deity if it is not sentient
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Get whether the character has a major deity in its worshipped deities list
+**
+**	@return True if the character has a major deity, false otherwise
+*/
+bool CCharacter::HasMajorDeity() const
+{
+	for (size_t i = 0; i < this->Deities.size(); ++i) {
+		if (this->Deities[i]->Major) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 std::string CCharacter::GetFullName() const
@@ -742,8 +836,8 @@ void SaveHero(CCharacter *hero)
 		if (hero->Gender != NoGender) {
 			fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(hero->Gender).c_str());
 		}
-		if (hero->Civilization != -1) {
-			fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[hero->Civilization].c_str());
+		if (hero->Civilization) {
+			fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[hero->Civilization->ID].c_str());
 		}
 	}
 	if (hero->Type != NULL) {
@@ -977,8 +1071,8 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 		}
 		
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
+		CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
+		if (civilization) {
 			//delete old hero save file
 			std::string path = Parameters::Instance.GetUserDirectory();
 			if (!GameName.empty()) {
@@ -998,7 +1092,7 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 			
 			//now, update the hero
 			hero->Civilization = civilization;
-			int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(hero->Civilization, hero->Type->Class);
+			int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(hero->Civilization->ID, hero->Type->Class);
 			if (new_unit_type_id != -1) {
 				hero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
 				hero->Name = new_hero_name;

@@ -38,6 +38,7 @@
 #include "action/action_upgradeto.h"
 #include "character.h"
 //Wyrmgus end
+#include "civilization.h"
 #include "game.h"
 #include "map.h"
 //Wyrmgus start
@@ -71,9 +72,9 @@
 		//Wyrmgus start
 		} else if (!strcmp(value, "civilization")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Civilization = PlayerRaces.GetRaceIndexByName(value);
-			if (this->Civilization == -1) {
-				fprintf(stderr, "Civilization %s doesn't exist.\n", value);
+			CCivilization *civilization = CCivilization::GetCivilization(value);
+			if (civilization) {
+				this->Civilization = civilization->ID;
 			}
 		} else if (!strcmp(value, "faction")) {
 			value = LuaToString(l, -1, j + 1);
@@ -129,8 +130,8 @@
 			type = UnitTypes[new_unit_type];
 		}
 	}
-	if (target->Character && target->Character->Custom && this->Civilization != -1 && this->Civilization != target->Character->Civilization) {
-		target->Character->Civilization = this->Civilization;
+	if (target->Character && target->Character->Custom && target->Character->Civilization && this->Civilization != -1 && this->Civilization != target->Character->Civilization->ID) {
+		target->Character->Civilization = CCivilization::Civilizations[this->Civilization];
 		SaveHero(target->Character);
 	}
 	if (type == NULL) {

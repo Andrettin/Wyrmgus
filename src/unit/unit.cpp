@@ -49,9 +49,8 @@
 #include "../ai/ai_local.h" //for using AiHelpers
 //Wyrmgus end
 #include "animation.h"
-//Wyrmgus start
 #include "character.h"
-//Wyrmgus end
+#include "civilization.h"
 #include "commands.h"
 #include "construct.h"
 #include "deity.h"
@@ -2301,7 +2300,7 @@ void CUnit::UpdateSoldUnits()
 		if (this->Player == ThisPlayer) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
-					(iterator->second->Civilization == civilization_id || iterator->second->Type->Slot == PlayerRaces.GetCivilizationClassUnitType(civilization_id, iterator->second->Type->Class))
+					(iterator->second->Civilization && iterator->second->Civilization->ID == civilization_id || iterator->second->Type->Slot == PlayerRaces.GetCivilizationClassUnitType(civilization_id, iterator->second->Type->Class))
 					&& CheckDependByType(*this->Player, *iterator->second->Type, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);

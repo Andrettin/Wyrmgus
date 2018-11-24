@@ -46,6 +46,7 @@
 //Wyrmgus start
 #include "../ai/ai_local.h" //for using AiHelpers
 #include "calendar.h"
+#include "civilization.h"
 #include "commands.h" //for faction setting
 #include "deity.h"
 #include "deity_domain.h"
@@ -368,7 +369,6 @@ int PlayerColorIndexStart;
 int PlayerColorIndexCount;
 
 //Wyrmgus start
-std::map<std::string, int> CivilizationStringToIndex;
 std::map<std::string, int> FactionStringToIndex;
 std::map<std::string, int> DynastyStringToIndex;
 std::map<std::string, CLanguage *> LanguageIdentToPointer;
@@ -386,7 +386,7 @@ bool LanguageCacheOutdated = false;
 void PlayerRace::Clean()
 {
 	//Wyrmgus start
-	if (this->Count > 0) { //don't clean the languages if first defining the civilizations
+	if (!CCivilization::Civilizations.empty()) { //don't clean the languages if first defining the civilizations
 		for (size_t i = 0; i < this->Languages.size(); ++i) {
 			for (size_t j = 0; j < this->Languages[i]->LanguageWords.size(); ++j) {
 				for (size_t k = 0; k < this->Languages[i]->Dialects.size(); ++k) { //remove word from dialects, so that they don't try to delete it too
@@ -401,7 +401,7 @@ void PlayerRace::Clean()
 		}
 	}
 	//Wyrmgus end
-	for (unsigned int i = 0; i != this->Count; ++i) {
+	for (size_t i = 0; i != CCivilization::Civilizations.size(); ++i) {
 		this->Name[i].clear();
 		this->Display[i].clear();
 		this->Visible[i] = false;
@@ -417,12 +417,7 @@ void PlayerRace::Clean()
 		this->CivilizationUIFillers[i].clear();
 		//Wyrmgus end
 	}
-	this->Count = 0;
 	//Wyrmgus start
-	for (size_t i = 0; i < PlayerRaces.Civilizations.size(); ++i) {
-		delete this->Civilizations[i];
-	}
-	this->Civilizations.clear();
 	for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
 		delete this->Factions[i];
 	}
@@ -431,31 +426,6 @@ void PlayerRace::Clean()
 		delete this->Dynasties[i];
 	}
 	this->Dynasties.clear();
-	//Wyrmgus end
-}
-
-int PlayerRace::GetRaceIndexByName(const char *raceName) const
-{
-	//Wyrmgus start
-	/*
-	for (unsigned int i = 0; i != this->Count; ++i) {
-		if (this->Name[i].compare(raceName) == 0) {
-			return i;
-		}
-	}
-	return -1;
-	*/
-	std::string civilization_name(raceName);
-	
-	if (civilization_name.empty()) {
-		return -1;
-	}
-	
-	if (CivilizationStringToIndex.find(civilization_name) != CivilizationStringToIndex.end()) {
-		return CivilizationStringToIndex[civilization_name];
-	}
-	
-	return -1;
 	//Wyrmgus end
 }
 
@@ -517,8 +487,8 @@ int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
 		return CivilizationClassUnitTypes[civilization][class_id];
 	}
 	
-	if (PlayerRaces.Civilizations[civilization]->ParentCivilization != -1) {
-		return GetCivilizationClassUnitType(PlayerRaces.Civilizations[civilization]->ParentCivilization, class_id);
+	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
+		return GetCivilizationClassUnitType(CCivilization::Civilizations[civilization]->ParentCivilization->ID, class_id);
 	}
 	
 	return -1;
@@ -534,8 +504,8 @@ int PlayerRace::GetCivilizationClassUpgrade(int civilization, int class_id)
 		return CivilizationClassUpgrades[civilization][class_id];
 	}
 	
-	if (PlayerRaces.Civilizations[civilization]->ParentCivilization != -1) {
-		return GetCivilizationClassUpgrade(PlayerRaces.Civilizations[civilization]->ParentCivilization, class_id);
+	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
+		return GetCivilizationClassUpgrade(CCivilization::Civilizations[civilization]->ParentCivilization->ID, class_id);
 	}
 	
 	return -1;
@@ -581,12 +551,12 @@ CLanguage *PlayerRace::GetCivilizationLanguage(int civilization)
 		return NULL;
 	}
 	
-	if (this->Civilizations[civilization] && this->Civilizations[civilization]->Language) {
-		return this->Civilizations[civilization]->Language;
+	if (CCivilization::Civilizations[civilization] && CCivilization::Civilizations[civilization]->Language) {
+		return CCivilization::Civilizations[civilization]->Language;
 	}
 	
-	if (this->Civilizations[civilization]->ParentCivilization != -1) {
-		return GetCivilizationLanguage(this->Civilizations[civilization]->ParentCivilization);
+	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
+		return GetCivilizationLanguage(CCivilization::Civilizations[civilization]->ParentCivilization->ID);
 	}
 	
 	return NULL;
@@ -602,8 +572,8 @@ std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)
 		return CivilizationUIFillers[civilization];
 	}
 	
-	if (PlayerRaces.Civilizations[civilization]->ParentCivilization != -1) {
-		return GetCivilizationUIFillers(PlayerRaces.Civilizations[civilization]->ParentCivilization);
+	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
+		return GetCivilizationUIFillers(CCivilization::Civilizations[civilization]->ParentCivilization->ID);
 	}
 	
 	return std::vector<CFiller>();
@@ -688,131 +658,6 @@ std::string PlayerRace::TranslateName(std::string name, CLanguage *language)
 	return new_name;
 }
 
-CCivilization::~CCivilization()
-{
-	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
-		for (size_t i = 0; i < iterator->second.size(); ++i) {
-			delete iterator->second[i];
-		}
-	}
-	
-	for (size_t i = 0; i < this->AiBuildingTemplates.size(); ++i) {
-		delete this->AiBuildingTemplates[i];
-	}
-}
-
-int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
-{
-	if (!upgrade) {
-		fprintf(stderr, "Error in CCivilization::GetUpgradePriority: the upgrade is NULL.\n");
-	}
-	
-	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {
-		return this->UpgradePriorities.find(upgrade)->second;
-	}
-	
-	return 100;
-}
-
-int CCivilization::GetForceTypeWeight(int force_type) const
-{
-	if (force_type == -1) {
-		fprintf(stderr, "Error in CCivilization::GetForceTypeWeight: the force_type is -1.\n");
-	}
-	
-	if (this->ForceTypeWeights.find(force_type) != this->ForceTypeWeights.end()) {
-		return this->ForceTypeWeights.find(force_type)->second;
-	}
-	
-	if (this->ParentCivilization != -1) {
-		return PlayerRaces.Civilizations[this->ParentCivilization]->GetForceTypeWeight(force_type);
-	}
-	
-	return 1;
-}
-
-CCalendar *CCivilization::GetCalendar() const
-{
-	if (this->Calendar) {
-		return this->Calendar;
-	}
-	
-	if (this->ParentCivilization != -1) {
-		return PlayerRaces.Civilizations[this->ParentCivilization]->GetCalendar();
-	}
-	
-	return CCalendar::BaseCalendar;
-}
-
-std::vector<CForceTemplate *> CCivilization::GetForceTemplates(int force_type) const
-{
-	if (force_type == -1) {
-		fprintf(stderr, "Error in CCivilization::GetForceTemplates: the force_type is -1.\n");
-	}
-	
-	if (this->ForceTemplates.find(force_type) != this->ForceTemplates.end()) {
-		return this->ForceTemplates.find(force_type)->second;
-	}
-	
-	if (this->ParentCivilization != -1) {
-		return PlayerRaces.Civilizations[this->ParentCivilization]->GetForceTemplates(force_type);
-	}
-	
-	return std::vector<CForceTemplate *>();
-}
-
-std::vector<CAiBuildingTemplate *> CCivilization::GetAiBuildingTemplates() const
-{
-	if (this->AiBuildingTemplates.size() > 0) {
-		return this->AiBuildingTemplates;
-	}
-	
-	if (this->ParentCivilization != -1) {
-		return PlayerRaces.Civilizations[this->ParentCivilization]->GetAiBuildingTemplates();
-	}
-	
-	return std::vector<CAiBuildingTemplate *>();
-}
-
-std::map<int, std::vector<std::string>> &CCivilization::GetPersonalNames()
-{
-	if (this->PersonalNames.size() > 0) {
-		return this->PersonalNames;
-	}
-	
-	if (this->ParentCivilization != -1) {
-		return PlayerRaces.Civilizations[this->ParentCivilization]->GetPersonalNames();
-	}
-	
-	return this->PersonalNames;
-}
-
-std::vector<std::string> &CCivilization::GetUnitClassNames(int class_id)
-{
-	if (this->UnitClassNames[class_id].size() > 0) {
-		return this->UnitClassNames[class_id];
-	}
-	
-	if (this->ParentCivilization != -1) {
-		return PlayerRaces.Civilizations[this->ParentCivilization]->GetUnitClassNames(class_id);
-	}
-	
-	return this->UnitClassNames[class_id];
-}
-
-std::vector<std::string> &CCivilization::GetShipNames()
-{
-	if (this->ShipNames.size() > 0) {
-		return this->ShipNames;
-	}
-	
-	if (this->ParentCivilization != -1) {
-		return PlayerRaces.Civilizations[this->ParentCivilization]->GetShipNames();
-	}
-	
-	return this->ShipNames;
-}
-
 CFaction::~CFaction()
 {
 	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
@@ -846,7 +691,7 @@ int CFaction::GetUpgradePriority(const CUpgrade *upgrade) const
 		fprintf(stderr, "Error in CFaction::GetUpgradePriority: the faction has no civilization.\n");
 	}
 	
-	return PlayerRaces.Civilizations[this->Civilization]->GetUpgradePriority(upgrade);
+	return CCivilization::Civilizations[this->Civilization]->GetUpgradePriority(upgrade);
 }
 
 int CFaction::GetForceTypeWeight(int force_type) const
@@ -867,7 +712,7 @@ int CFaction::GetForceTypeWeight(int force_type) const
 		fprintf(stderr, "Error in CFaction::GetForceTypeWeight: the faction has no civilization.\n");
 	}
 	
-	return PlayerRaces.Civilizations[this->Civilization]->GetForceTypeWeight(force_type);
+	return CCivilization::Civilizations[this->Civilization]->GetForceTypeWeight(force_type);
 }
 
 std::vector<CForceTemplate *> CFaction::GetForceTemplates(int force_type) const
@@ -888,7 +733,7 @@ std::vector<CForceTemplate *> CFaction::GetForceTemplates(int force_type) const
 		fprintf(stderr, "Error in CFaction::GetForceTemplates: the faction has no civilization.\n");
 	}
 	
-	return PlayerRaces.Civilizations[this->Civilization]->GetForceTemplates(force_type);
+	return CCivilization::Civilizations[this->Civilization]->GetForceTemplates(force_type);
 }
 
 std::vector<CAiBuildingTemplate *> CFaction::GetAiBuildingTemplates() const
@@ -905,7 +750,7 @@ std::vector<CAiBuildingTemplate *> CFaction::GetAiBuildingTemplates() const
 		fprintf(stderr, "Error in CFaction::GetAiBuildingTemplates: the faction has no civilization.\n");
 	}
 	
-	return PlayerRaces.Civilizations[this->Civilization]->GetAiBuildingTemplates();
+	return CCivilization::Civilizations[this->Civilization]->GetAiBuildingTemplates();
 }
 
 std::vector<std::string> &CFaction::GetShipNames()
@@ -918,7 +763,7 @@ std::vector<std::string> &CFaction::GetShipNames()
 		return PlayerRaces.Factions[this->ParentFaction]->GetShipNames();
 	}
 	
-	return PlayerRaces.Civilizations[this->Civilization]->GetShipNames();
+	return CCivilization::Civilizations[this->Civilization]->GetShipNames();
 }
 
 CDynasty::~CDynasty()
@@ -2117,7 +1962,7 @@ bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) c
 		return false;
 	}
 	
-	if (character->Civilization != this->Race) {
+	if (!character->Civilization || character->Civilization->ID != this->Race) {
 		return false;
 	}
 	
@@ -2213,7 +2058,7 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 		return "";
 	}
 	
-	CCivilization *civilization = PlayerRaces.Civilizations[this->Race];
+	CCivilization *civilization = CCivilization::Civilizations[this->Race];
 	CFaction *faction = PlayerRaces.Factions[this->Faction];
 	int faction_tier = faction->DefaultTier;
 	int government_type = faction->DefaultGovernmentType;
@@ -4556,11 +4401,6 @@ bool CPlayer::HasHero(const CCharacter *hero) const
 	}
 	
 	return false;
-}
-
-void SetCivilizationStringToIndex(std::string civilization_name, int civilization_id)
-{
-	CivilizationStringToIndex[civilization_name] = civilization_id;
 }
 
 void SetFactionStringToIndex(std::string faction_name, int faction_id)

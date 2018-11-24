@@ -37,6 +37,7 @@
 
 #include "sound.h"
 
+#include "civilization.h"
 #include "player.h"
 #include "script.h"
 #include "sound_server.h"
@@ -219,10 +220,10 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 	if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 		LuaError(l, "incorrect argument");
 	}
-	const char *raceName = LuaToString(l, j + 1, 1);
-	const int raceIndex = PlayerRaces.GetRaceIndexByName(raceName);
-	if (raceIndex == -1) {
-		LuaError(l, "Unknown race: %s" _C_ raceName);
+	const char *civilization_ident = LuaToString(l, j + 1, 1);
+	const CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
+	if (!civilization) {
+		return;
 	}
 	lua_rawgeti(l, j + 1, 2);
 	LuaUserData *data = NULL;
@@ -231,7 +232,7 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 		LuaError(l, "Sound id expected");
 	}
 	lua_pop(l, 1);
-	soundConfigs[raceIndex].Sound = (CSound *)data->Data;
+	soundConfigs[civilization->ID].Sound = (CSound *)data->Data;
 }
 
 /**
@@ -278,10 +279,10 @@ static int CclDefineGameSounds(lua_State *l)
 			}
 			const char *resName = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, resName);
-			const char *raceName = LuaToString(l, j + 1, 2);
-			const int raceIndex = PlayerRaces.GetRaceIndexByName(raceName);
-			if (raceIndex == -1) {
-				LuaError(l, "Unknown race: %s" _C_ raceName);
+			const char *civilization_ident = LuaToString(l, j + 1, 2);
+			const CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
+			if (!civilization) {
+				continue;
 			}
 			lua_rawgeti(l, j + 1, 3);
 			if (!lua_isuserdata(l, -1)
@@ -289,7 +290,7 @@ static int CclDefineGameSounds(lua_State *l)
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
-			GameSounds.NotEnoughRes[raceIndex][resId].Sound = (CSound *)data->Data;
+			GameSounds.NotEnoughRes[civilization->ID][resId].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "not-enough-food")) {
 			SetSoundConfigRace(l, j, GameSounds.NotEnoughFood);
 		} else if (!strcmp(value, "rescue")) {

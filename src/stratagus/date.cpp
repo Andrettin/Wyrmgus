@@ -38,6 +38,7 @@
 #include "date.h"
 
 #include "calendar.h"
+#include "civilization.h"
 #include "player.h"
 #include "quest.h"
 #include "timeline.h"
@@ -111,7 +112,7 @@ void CDate::UpdateCurrentDateDisplayString()
 		return;
 	}
 	
-	CCalendar *calendar = PlayerRaces.Civilizations[ThisPlayer->Race]->GetCalendar();
+	CCalendar *calendar = CCivilization::Civilizations[ThisPlayer->Race]->GetCalendar();
 	
 	CurrentDateDisplayString = CurrentDate.ToDayMonthExtendedDisplayString(calendar);
 }

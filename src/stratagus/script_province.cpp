@@ -37,6 +37,7 @@
 
 #include "province.h"
 
+#include "civilization.h"
 #include "deity_domain.h"
 #include "iolib.h"
 #include "plane.h"
@@ -287,15 +288,15 @@ static int CclDefineProvince(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
+				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
 				++j;
-				
+				if (!civilization) {
+					continue;
+				}
+
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				province->CulturalNames[civilization] = TransliterateText(cultural_name);
+				province->CulturalNames[civilization->ID] = TransliterateText(cultural_name);
 			}
 		} else if (!strcmp(value, "FactionCulturalNames")) {
 			if (!lua_istable(l, -1)) {
@@ -303,12 +304,8 @@ static int CclDefineProvince(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
 				++j;
-				
+
 				int faction = PlayerRaces.GetFactionIndexByName(LuaToString(l, -1, j + 1));
 				if (faction == -1) {
 					LuaError(l, "Faction doesn't exist.");
@@ -325,10 +322,6 @@ static int CclDefineProvince(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
 				++j;
 				
 				int faction = PlayerRaces.GetFactionIndexByName(LuaToString(l, -1, j + 1));
@@ -359,11 +352,9 @@ static int CclDefineProvince(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
-				std::string owner_civilization_name = LuaToString(l, -1, j + 1);
 				++j;
 				std::string owner_faction_name = LuaToString(l, -1, j + 1);
-				if (!owner_civilization_name.empty() && !owner_faction_name.empty()) {
-					int owner_civilization = PlayerRaces.GetRaceIndexByName(owner_civilization_name.c_str());
+				if (!owner_faction_name.empty()) {
 					int owner_faction = PlayerRaces.GetFactionIndexByName(owner_faction_name);
 					if (owner_faction == -1) {
 						LuaError(l, "Faction \"%s\" doesn't exist." _C_ owner_faction_name.c_str());
@@ -381,8 +372,6 @@ static int CclDefineProvince(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
-				std::string claimant_civilization_name = LuaToString(l, -1, j + 1);
-				int claimant_civilization = PlayerRaces.GetRaceIndexByName(claimant_civilization_name.c_str());
 				++j;
 				std::string claimant_faction_name = LuaToString(l, -1, j + 1);
 				int claimant_faction = PlayerRaces.GetFactionIndexByName(claimant_faction_name);
@@ -400,11 +389,12 @@ static int CclDefineProvince(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string historical_civilization_name = LuaToString(l, -1, j + 1);
-				int historical_civilization = PlayerRaces.GetRaceIndexByName(historical_civilization_name.c_str());
-				if (historical_civilization == -1 && !historical_civilization_name.empty()) {
-					LuaError(l, "Civilization \"%s\" doesn't exist." _C_ historical_civilization_name.c_str());
+				if (!historical_civilization_name.empty()) {
+					CCivilization *historical_civilization = CCivilization::GetCivilization(historical_civilization_name);
+					if (historical_civilization) {
+						province->HistoricalCultures[year] = historical_civilization->ID;
+					}
 				}
-				province->HistoricalCultures[year] = historical_civilization;
 			}
 		} else if (!strcmp(value, "HistoricalPopulation")) {
 			if (!lua_istable(l, -1)) {
@@ -521,15 +511,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string name_type = "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name);
 
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
+				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
 				++j;
-				
+				if (!civilization) {
+					continue;
+				}
+
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->CulturalTerrainNames[std::pair<int,int>(terrain, civilization)].push_back(TransliterateText(cultural_name));
+				tile->CulturalTerrainNames[std::pair<int,int>(terrain, civilization->ID)].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "FactionCulturalTerrainNames")) {
 			if (!lua_istable(l, -1)) {
@@ -545,12 +535,8 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string name_type = "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name);
 
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
 				++j;
-				
+
 				int faction = PlayerRaces.GetFactionIndexByName(LuaToString(l, -1, j + 1));
 				if (faction == -1) {
 					LuaError(l, "Faction doesn't exist.");
@@ -575,15 +561,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string name_type = "resource-tile-" + DefaultResourceNames[resource];
 
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
+				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
 				++j;
-				
+				if (!civilization) {
+					continue;
+				}
+
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->CulturalResourceNames[std::pair<int,int>(resource, civilization)].push_back(TransliterateText(cultural_name));
+				tile->CulturalResourceNames[std::pair<int,int>(resource, civilization->ID)].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "FactionCulturalResourceNames")) {
 			if (!lua_istable(l, -1)) {
@@ -599,10 +585,6 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string name_type = "resource-tile-" + DefaultResourceNames[resource];
 
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
 				++j;
 				
 				int faction = PlayerRaces.GetFactionIndexByName(LuaToString(l, -1, j + 1));
@@ -622,15 +604,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
+				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
 				++j;
-				
+				if (!civilization) {
+					continue;
+				}
+
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->CulturalSettlementNames[civilization].push_back(TransliterateText(cultural_name));
+				tile->CulturalSettlementNames[civilization->ID].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "FactionCulturalSettlementNames")) {
 			if (!lua_istable(l, -1)) {
@@ -638,10 +620,6 @@ static int CclDefineWorldMapTile(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
 				++j;
 				
 				int faction = PlayerRaces.GetFactionIndexByName(LuaToString(l, -1, j + 1));
@@ -660,10 +638,6 @@ static int CclDefineWorldMapTile(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
 				++j;
 				
 				int faction = PlayerRaces.GetFactionIndexByName(LuaToString(l, -1, j + 1));
@@ -681,11 +655,9 @@ static int CclDefineWorldMapTile(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
-				std::string owner_civilization_name = LuaToString(l, -1, j + 1);
 				++j;
 				std::string owner_faction_name = LuaToString(l, -1, j + 1);
-				if (!owner_civilization_name.empty() && !owner_faction_name.empty()) {
-					int owner_civilization = PlayerRaces.GetRaceIndexByName(owner_civilization_name.c_str());
+				if (!owner_faction_name.empty()) {
 					int owner_faction = PlayerRaces.GetFactionIndexByName(owner_faction_name);
 					if (owner_faction == -1) {
 						LuaError(l, "Faction \"%s\" doesn't exist." _C_ owner_faction_name.c_str());
@@ -703,8 +675,6 @@ static int CclDefineWorldMapTile(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
-				std::string claimant_civilization_name = LuaToString(l, -1, j + 1);
-				int claimant_civilization = PlayerRaces.GetRaceIndexByName(claimant_civilization_name.c_str());
 				++j;
 				std::string claimant_faction_name = LuaToString(l, -1, j + 1);
 				int claimant_faction = PlayerRaces.GetFactionIndexByName(claimant_faction_name);

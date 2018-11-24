@@ -42,6 +42,7 @@
 //Wyrmgus start
 #include "character.h" //for updating levels
 //Wyrmgus end
+#include "civilization.h"
 #include "construct.h"
 #include "editor.h"
 #include "font.h"
@@ -1762,9 +1763,9 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
-			type->Civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-			if (type->Civilization == -1) {
-				LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_name.c_str());
+			CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
+			if (civilization) {
+				type->Civilization = civilization->ID;
 			}
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);

@@ -10,7 +10,7 @@
 //
 /**@name loadgame.cpp - Load game. */
 //
-//      (c) Copyright 2001-2006 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 2001-2018 by Lutz Sammer, Andreas Arens and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@
 #include "ai.h"
 #include "calendar.h"
 #include "character.h"
+#include "civilization.h"
 #include "commands.h"
 #include "construct.h"
 #include "deity.h"
@@ -111,6 +112,7 @@ void CleanModules()
 	//Wyrmgus start
 	CleanCharacters();
 	//Wyrmgus end
+	CCivilization::ClearCivilizations();
 	CleanConstructions();
 	CleanDecorations();
 	CDeity::ClearDeities();

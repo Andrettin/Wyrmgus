@@ -48,8 +48,10 @@
 ----------------------------------------------------------------------------*/
 
 class CCalendar;
+class CCivilization;
 class CConfigData;
 class CDeity;
+class CDeityDomain;
 class CFaction;
 class CFile;
 class CMapTemplate;
@@ -107,7 +109,7 @@ class CCharacter
 {
 public:
 	CCharacter() :
-		Civilization(-1), Faction(NULL), Gender(0), Level(0), ExperiencePercent(0),
+		Civilization(NULL), Faction(NULL), Gender(0), Level(0), ExperiencePercent(0),
 		ViolentDeath(false), Custom(false),
 		Type(NULL), Trait(NULL), Deity(NULL),
 		Father(NULL), Mother(NULL),
@@ -136,6 +138,8 @@ public:
 	bool IsItemEquipped(const CPersistentItem *item) const;
 	bool IsUsable() const;
 	bool CanAppear(bool ignore_neutral = false) const;
+	bool CanWorship() const;
+	bool HasMajorDeity() const;
 	std::string GetFullName() const;
 	IconConfig GetIcon() const;
 	CPersistentItem *GetItem(CUnit &item) const;
@@ -145,7 +149,7 @@ public:
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
-	int Civilization;			/// Culture to which the character belongs
+	CCivilization *Civilization;	/// Culture to which the character belongs
 	CFaction *Faction;			/// Faction to which the character belongs
 	int Gender;					/// Character's gender
 	int Level;					/// Character's level
@@ -173,7 +177,8 @@ public:
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CFaction *> Factions;	/// Factions for which this character is available; if empty, this means all factions of the character's civilization can recruit them
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
-	std::vector<CDeity *> DeityProfiles;
+	std::vector<CDeity *> GeneratedDeities;		/// Deities picked during history generation for this character to worship
+	std::vector<CDeityDomain *> PreferredDeityDomains;	/// Preferred deity domains for the character, used to generate deities for it if any are lacking
 	std::vector<CUpgrade *> Abilities;
 	std::vector<CUpgrade *> ReadWorks;
 	std::vector<CUpgrade *> ConsumedElixirs;

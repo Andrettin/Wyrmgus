@@ -39,6 +39,7 @@
 
 #include "animation/animation_randomsound.h"
 #include "animation/animation_sound.h"
+#include "civilization.h"
 #include "map.h"
 #include "player.h"
 #include "sound.h"
@@ -173,9 +174,9 @@ void MapUnitSounds()
 	if (SoundEnabled() == false) {
 		return;
 	}
-	//Wyrmgus start
-	for (size_t i = 0; i < PlayerRaces.Civilizations.size(); ++i) {
-		CCivilization *civilization = PlayerRaces.Civilizations[i];
+
+	for (size_t i = 0; i < CCivilization::Civilizations.size(); ++i) {
+		CCivilization *civilization = CCivilization::Civilizations[i];
 		civilization->UnitSounds.Selected.MapSound();
 		civilization->UnitSounds.Acknowledgement.MapSound();
 		civilization->UnitSounds.Attack.MapSound();
@@ -192,7 +193,6 @@ void MapUnitSounds()
 		civilization->UnitSounds.HelpTown.MapSound();
 		civilization->UnitSounds.HelpTown.SetSoundRange(INFINITE_SOUND_RANGE);
 	}
-	//Wyrmgus end
 
 	// Parse all units sounds.
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {

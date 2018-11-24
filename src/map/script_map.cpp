@@ -37,6 +37,7 @@
 
 #include "map.h"
 
+#include "civilization.h"
 //Wyrmgus start
 #include "editor.h"
 #include "game.h"
@@ -1797,15 +1798,15 @@ static int CclDefineSite(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
+				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
 				++j;
-				
+				if (!civilization) {
+					continue;
+				}
+
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				site->CulturalNames[civilization] = cultural_name;
+				site->CulturalNames[civilization->ID] = cultural_name;
 			}
 		} else if (!strcmp(value, "Cores")) {
 			if (!lua_istable(l, -1)) {
@@ -2084,15 +2085,15 @@ static int CclDefineTerrainFeature(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
+				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
 				++j;
-				
+				if (!civilization) {
+					continue;
+				}
+
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				terrain_feature->CulturalNames[civilization] = cultural_name;
+				terrain_feature->CulturalNames[civilization->ID] = cultural_name;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

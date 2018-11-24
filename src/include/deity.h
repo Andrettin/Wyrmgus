@@ -46,6 +46,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CCivilization;
 class CConfigData;
 class CDeityDomain;
 class CFaction;
@@ -57,14 +58,13 @@ class CDeity
 {
 public:
 	CDeity() :
-		Gender(0), Major(false), Profile(false), HomePlane(NULL), DeityUpgrade(NULL), CharacterUpgrade(NULL)
+		Gender(0), Major(false), HomePlane(NULL), DeityUpgrade(NULL), CharacterUpgrade(NULL)
 	{
 	}
 	
 	static CDeity *GetDeity(const std::string &ident, const bool should_find = true);
 	static CDeity *GetOrAddDeity(const std::string &ident);
 	static CDeity *GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
-	static CDeity *GetProfileMatch(const CDeity *deity_profile);
 	static void ClearDeities();
 	
 	static std::vector<CDeity *> Deities;		/// Deities
@@ -75,7 +75,6 @@ public:
 	
 	int Gender;									/// Deity's gender
 	bool Major;									/// Whether the deity is a major one or not
-	bool Profile;								/// Whether this is not an actual deity, but a deity profile to be substituted by a "random" matching deity when the game starts
 	std::string Ident;							/// Ident of the deity
 	std::string Name;							/// Name of the deity
 	std::string Pantheon;						/// Pantheon to which the deity belongs
@@ -86,7 +85,7 @@ public:
 	CUpgrade *DeityUpgrade;						/// The deity's upgrade applied to a player that worships it
 	CUpgrade *CharacterUpgrade;					/// The deity's upgrade applied to its character as an individual upgrade
 	IconConfig Icon;							/// Deity's icon
-	std::vector<int> Civilizations;				/// Civilizations which may worship the deity
+	std::vector<CCivilization *> Civilizations;	/// Civilizations which may worship the deity
 	std::vector<CReligion *> Religions;			/// Religions for which this deity is available
 	std::vector<std::string> Feasts;
 	std::vector<CDeityDomain *> Domains;

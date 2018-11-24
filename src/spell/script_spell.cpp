@@ -36,6 +36,13 @@
 
 #include "spells.h"
 
+#include "civilization.h"
+#include "luacallback.h"
+//Wyrmgus start
+#include "player.h" // for making user of PlayerRaces
+//Wyrmgus end
+#include "script.h"
+#include "script_sound.h"
 #include "spell/spell_adjustvariable.h"
 #include "spell/spell_adjustvital.h"
 #include "spell/spell_areaadjustvital.h"
@@ -51,12 +58,6 @@
 #include "spell/spell_spawnportal.h"
 #include "spell/spell_summon.h"
 #include "spell/spell_teleport.h"
-#include "luacallback.h"
-//Wyrmgus start
-#include "player.h" // for making user of PlayerRaces
-//Wyrmgus end
-#include "script_sound.h"
-#include "script.h"
 #include "unittype.h"
 #include "upgrade.h"
 
@@ -192,11 +193,9 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->FactionUnit = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "civilization-equivalent")) {
 			value = LuaToString(l, -1, j + 1);
-			int civilization = PlayerRaces.GetRaceIndexByName(value);
-			if (civilization != -1) {
-				condition->CivilizationEquivalent = civilization;
-			} else {
-				fprintf(stderr, "Civilization \"%s\" doesn't exist.\n", value);
+			CCivilization *civilization = CCivilization::GetCivilization(value);
+			if (civilization) {
+				condition->CivilizationEquivalent = civilization->ID;
 			}
 		} else if (!strcmp(value, "faction-equivalent")) {
 			value = LuaToString(l, -1, j + 1);

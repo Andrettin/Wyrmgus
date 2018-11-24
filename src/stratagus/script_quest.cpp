@@ -38,6 +38,7 @@
 #include "quest.h"
 
 #include "character.h"
+#include "civilization.h"
 #include "luacallback.h"
 #include "map_template.h"
 #include "player.h"
@@ -115,7 +116,10 @@ static int CclDefineQuest(lua_State *l)
 		} else if (!strcmp(value, "Hint")) {
 			quest->Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
-			quest->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1));
+			if (civilization) {
+				quest->Civilization = civilization->ID;
+			}
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
 			int color = GetPlayerColorIndexByName(color_name);
@@ -272,8 +276,8 @@ static int CclDefineQuest(lua_State *l)
 		}
 	}
 	
-	if (!quest->Hidden && quest->Civilization != -1 && std::find(PlayerRaces.Civilizations[quest->Civilization]->Quests.begin(), PlayerRaces.Civilizations[quest->Civilization]->Quests.end(), quest) == PlayerRaces.Civilizations[quest->Civilization]->Quests.end()) {
-		PlayerRaces.Civilizations[quest->Civilization]->Quests.push_back(quest);
+	if (!quest->Hidden && quest->Civilization != -1 && std::find(CCivilization::Civilizations[quest->Civilization]->Quests.begin(), CCivilization::Civilizations[quest->Civilization]->Quests.end(), quest) == CCivilization::Civilizations[quest->Civilization]->Quests.end()) {
+		CCivilization::Civilizations[quest->Civilization]->Quests.push_back(quest);
 	}
 	
 	return 0;

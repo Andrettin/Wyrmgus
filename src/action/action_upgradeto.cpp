@@ -39,6 +39,7 @@
 
 #include "ai.h"
 #include "animation.h"
+#include "civilization.h"
 //Wyrmgus start
 #include "depend.h"
 #include "game.h"
@@ -296,8 +297,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 				&& (
 					newtype.BoolFlag[ORGANIC_INDEX].value
 					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeNaval)
-					|| (PlayerRaces.Civilizations[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != PlayerRaces.Civilizations[newtype.Civilization]->GetUnitClassNames(newtype.Class))
-					|| (PlayerRaces.Civilizations[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != PlayerRaces.Civilizations[player.Race]->GetUnitClassNames(newtype.Class))
+					|| (CCivilization::Civilizations[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != CCivilization::Civilizations[newtype.Civilization]->GetUnitClassNames(newtype.Class))
+					|| (CCivilization::Civilizations[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != CCivilization::Civilizations[player.Race]->GetUnitClassNames(newtype.Class))
 				)
 			)
 		)

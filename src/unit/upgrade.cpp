@@ -50,6 +50,7 @@
 #include "action/action_upgradeto.h"
 #include "../ai/ai_local.h"
 //Wyrmgus end
+#include "civilization.h"
 #include "commands.h"
 #include "deity.h"
 #include "deity_domain.h"
@@ -453,9 +454,9 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->Class = class_id;
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
-			upgrade->Civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-			if (upgrade->Civilization == -1) {
-				LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_name.c_str());
+			CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
+			if (civilization) {
+				upgrade->Civilization = civilization->ID;
 			}
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
@@ -562,15 +563,15 @@ static int CclDefineUpgrade(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string civilization_ident = LuaToString(l, -1, j + 1);
-				int priority_civilization = PlayerRaces.GetRaceIndexByName(civilization_ident.c_str());
-				if (priority_civilization == -1) {
-					LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_ident.c_str());
-				}
+				CCivilization *priority_civilization = CCivilization::GetCivilization(civilization_ident);
 				++j;
-				
+				if (!priority_civilization) {
+					continue;
+				}
+
 				int priority = LuaToNumber(l, -1, j + 1);
 
-				PlayerRaces.Civilizations[priority_civilization]->UpgradePriorities[upgrade] = priority;
+				priority_civilization->UpgradePriorities[upgrade] = priority;
 			}
 		} else if (!strcmp(value, "FactionPriorities")) {
 			if (!lua_istable(l, -1)) {
@@ -832,10 +833,9 @@ static int CclDefineModifier(lua_State *l)
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "change-civilization-to")) {
 			const char *civilization_ident = LuaToString(l, j + 1, 2);
-			um->ChangeCivilizationTo = PlayerRaces.GetRaceIndexByName(civilization_ident);
-			
-			if (um->ChangeCivilizationTo == -1) {
-				LuaError(l, "invalid civilization name '%s'" _C_ civilization_ident);
+			CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
+			if (civilization) {
+				um->ChangeCivilizationTo = civilization->ID;
 			}
 		} else if (!strcmp(key, "change-faction-to")) {
 			std::string faction_ident = LuaToString(l, j + 1, 2);

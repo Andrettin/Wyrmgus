@@ -299,6 +299,7 @@ source_group(spell FILES ${spell_SRCS})
 set(stratagusmain_SRCS
 	src/stratagus/calendar.cpp
 	src/stratagus/character.cpp
+	src/stratagus/civilization.cpp
 	src/stratagus/config.cpp
 	src/stratagus/construct.cpp
 	src/stratagus/date.cpp
@@ -589,6 +590,7 @@ set(stratagus_generic_HDRS
 	src/include/animation.h
 	src/include/calendar.h
 	src/include/character.h
+	src/include/civilization.h
 	src/include/color.h
 	src/include/commands.h
 	src/include/config.h

@@ -43,6 +43,7 @@
 #include "fluidsynth.h"
 #endif
 
+#include "civilization.h"
 #include "iocompat.h"
 #include "iolib.h"
 //Wyrmgus start
@@ -853,7 +854,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 
 	SDL_LockMutex(Audio.Lock);
 	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
 		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		int parent_faction = -1;
 		bool found_music = false;
@@ -872,16 +873,16 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 			}
 		}
 		if (!found_music && oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
-			int parent_civilization = -1;
-			if (civilization != -1) {
+			CCivilization *parent_civilization = NULL;
+			if (civilization) {
 				while (true) {
-					parent_civilization = PlayerRaces.Civilizations[civilization]->ParentCivilization;
-					if (parent_civilization == -1) {
+					parent_civilization = civilization->ParentCivilization;
+					if (!parent_civilization) {
 						break;
 					}
 					civilization = parent_civilization;
 					
-					if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Name[civilization].c_str()) == OAML_OK) {
+					if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Name[civilization->ID].c_str()) == OAML_OK) {
 						found_music = true;
 						break;
 					}

@@ -43,6 +43,7 @@
 #include "animation.h"
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
+#include "civilization.h"
 #include "config.h"
 #include "construct.h"
 //Wyrmgus start
@@ -719,9 +720,9 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			this->SetParent(parent_type);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Civilization = PlayerRaces.GetRaceIndexByName(value.c_str());
-			if (this->Civilization == -1) {
-				fprintf(stderr, "Civilization \"%s\" does not exist.\n", value.c_str());
+			CCivilization *civilization = CCivilization::GetCivilization(value);
+			if (civilization) {
+				this->Civilization = civilization->ID;
 			}
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -1728,7 +1729,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 			if (faction && civilization_id != faction->Civilization && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization] && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
 				civilization_id = faction->Civilization;
 			}
-			CCivilization *civilization = PlayerRaces.Civilizations[civilization_id];
+			CCivilization *civilization = CCivilization::Civilizations[civilization_id];
 			if (faction && faction->Civilization != civilization_id) {
 				faction = NULL;
 			}

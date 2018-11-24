@@ -37,6 +37,7 @@
 
 #include "deity.h"
 
+#include "civilization.h"
 #include "config.h"
 #include "deity_domain.h"
 #include "plane.h"
@@ -123,71 +124,6 @@ CDeity *CDeity::GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_fin
 }
 
 /**
-**	@brief	Get a deity profile match
-**
-**	@param	deity_profile	The deity profile to be matched to
-**
-**	@return	A deity matching the profile, or null if none are available
-*/
-CDeity *CDeity::GetProfileMatch(const CDeity *deity_profile)
-{
-	std::vector<CDeity *> profile_matches;
-	
-	for (size_t i = 0; i < Deities.size(); ++i) {
-		CDeity *deity = Deities[i];
-		
-		if (!deity->DeityUpgrade) {
-			continue; //don't use deities that have no corresponding deity upgrade for profile matches
-		}
-		
-		if (deity->Major != deity_profile->Major) {
-			continue;
-		}
-		
-		bool has_civilizations = true;
-		for (size_t j = 0; j < deity_profile->Civilizations.size(); ++j) {
-			if (std::find(deity->Civilizations.begin(), deity->Civilizations.end(), deity_profile->Civilizations[j]) == deity->Civilizations.end()) {
-				has_civilizations = false;
-				break;
-			}
-		}
-		if (!has_civilizations) {
-			continue;
-		}
-		
-		bool has_religions = true;
-		for (size_t j = 0; j < deity_profile->Religions.size(); ++j) {
-			if (std::find(deity->Religions.begin(), deity->Religions.end(), deity_profile->Religions[j]) == deity->Religions.end()) {
-				has_religions = false;
-				break;
-			}
-		}
-		if (!has_religions) {
-			continue;
-		}
-		
-		bool has_domains = true;
-		for (size_t j = 0; j < deity_profile->Domains.size(); ++j) {
-			if (std::find(deity->Domains.begin(), deity->Domains.end(), deity_profile->Domains[j]) == deity->Domains.end()) {
-				has_domains = false;
-				break;
-			}
-		}
-		if (!has_domains) {
-			continue;
-		}
-		
-		profile_matches.push_back(deity);
-	}
-	
-	if (profile_matches.size() > 0) {
-		return profile_matches[SyncRand(profile_matches.size())];
-	} else {
-		return NULL;
-	}
-}
-
-/**
 **	@brief	Remove the existing deities
 */
 void CDeity::ClearDeities()
@@ -219,12 +155,10 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			this->Major = StringToBool(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			int civilization = PlayerRaces.GetRaceIndexByName(value.c_str());
-			if (civilization != -1) {
+			CCivilization *civilization = CCivilization::GetCivilization(value);
+			if (civilization != NULL) {
 				this->Civilizations.push_back(civilization);
-				PlayerRaces.Civilizations[civilization]->Deities.push_back(this);
-			} else {
-				fprintf(stderr, "Civilization \"%s\" doesn't exist.\n", value.c_str());
+				civilization->Deities.push_back(this);
 			}
 		} else if (key == "religion") {
 			value = FindAndReplaceString(value, "_", "-");

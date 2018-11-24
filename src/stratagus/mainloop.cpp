@@ -37,10 +37,9 @@
 
 #include "actions.h"
 #include "calendar.h"
-//Wyrmgus start
 #include "character.h"
+#include "civilization.h"
 #include "commands.h"
-//Wyrmgus end
 #include "editor.h"
 //Wyrmgus start
 #include "font.h"
@@ -604,7 +603,7 @@ void GameMainLoop()
 			for (int i = 0; i < NumPlayers; ++i) {
 				if (Players[i].Type != PlayerNobody && Players[i].Race != 0 && Players[i].Faction != -1) {
 					if (CurrentCampaign->StartDate.Year) {
-						CCivilization *civilization = PlayerRaces.Civilizations[Players[i].Race];
+						CCivilization *civilization = CCivilization::Civilizations[Players[i].Race];
 						CFaction *faction = PlayerRaces.Factions[Players[i].Faction];
 						
 						for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {

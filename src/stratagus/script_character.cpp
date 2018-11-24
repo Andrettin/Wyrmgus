@@ -37,6 +37,7 @@
 
 #include "character.h"
 
+#include "civilization.h"
 #include "deity.h"
 #include "grand_strategy.h"
 #include "map_template.h"
@@ -147,7 +148,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "ViolentDeath")) {
 			character->ViolentDeath = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
-			character->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			character->Civilization = CCivilization::GetCivilization(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
 			CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1));
 			if (faction != NULL) {
@@ -546,10 +547,10 @@ static int CclDefineCharacter(lua_State *l)
 			for (size_t i = 0; i < alternate_names.size(); ++i) {
 				character->Type->PersonalNames[character->Gender].push_back(alternate_names[i]);
 			}
-		} else if (character->Civilization != -1) {
-			PlayerRaces.Civilizations[character->Civilization]->PersonalNames[character->Gender].push_back(character->Name);
+		} else if (character->Civilization) {
+			character->Civilization->PersonalNames[character->Gender].push_back(character->Name);
 			for (size_t i = 0; i < alternate_names.size(); ++i) {
-				PlayerRaces.Civilizations[character->Civilization]->PersonalNames[character->Gender].push_back(alternate_names[i]);
+				character->Civilization->PersonalNames[character->Gender].push_back(alternate_names[i]);
 			}
 		}
 	}
@@ -643,7 +644,7 @@ static int CclDefineCustomHero(lua_State *l)
 				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
 			}
 		} else if (!strcmp(value, "Civilization")) {
-			hero->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			hero->Civilization = CCivilization::GetCivilization(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
 			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {
@@ -902,8 +903,8 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushstring(l, character->Quote.c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (character->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[character->Civilization].c_str());
+		if (character->Civilization) {
+			lua_pushstring(l, PlayerRaces.Name[character->Civilization->ID].c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1067,8 +1068,8 @@ static int CclGetCustomHeroData(lua_State *l)
 		lua_pushstring(l, character->GetFullName().c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (character->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[character->Civilization].c_str());
+		if (character->Civilization) {
+			lua_pushstring(l, PlayerRaces.Name[character->Civilization->ID].c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
