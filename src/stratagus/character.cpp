@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name character.cpp - The characters. */
+/**@name character.cpp - The character source file. */
 //
 //      (c) Copyright 2015-2018 by Andrettin
 //
@@ -98,6 +98,11 @@ void CCharacter::ResetCharacterHistory()
 	}
 }
 
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
 void CCharacter::ProcessConfigData(const CConfigData *config_data)
 {
 	bool name_changed = false;

@@ -371,6 +371,11 @@ CUniqueItem *GetUniqueItem(std::string item_ident)
 	return NULL;
 }
 
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
 void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 {
 	bool is_equipped = false;

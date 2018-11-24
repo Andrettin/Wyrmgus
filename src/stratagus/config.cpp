@@ -179,6 +179,9 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		} else if (config_data->Tag == "character") {
 			CCharacter *character = GetCharacter(ident);
 			if (!character) {
+				if (LoadingHistory) {
+					continue;
+				}
 				character = new CCharacter;
 				character->Ident = ident;
 				Characters[ident] = character;
