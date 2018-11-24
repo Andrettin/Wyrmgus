@@ -191,6 +191,20 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Icon = NULL;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
+		} else if (key == "heroic_icon") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->HeroicIcon.Name = value;
+			this->HeroicIcon.Icon = NULL;
+			this->HeroicIcon.Load();
+			this->HeroicIcon.Icon->Load();
+		} else if (key == "forbidden_upgrade") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUnitType *unit_type = UnitTypeByIdent(value);
+			if (unit_type) {
+				this->ForbiddenUpgrades.push_back(unit_type);
+			} else {
+				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
+			}
 		} else if (key == "ability") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUpgrade *ability_upgrade = CUpgrade::Get(value);

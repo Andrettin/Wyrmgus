@@ -745,7 +745,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					CUnitType *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
 					if (CheckDependByType(*this, *experience_upgrade_type, true)) {
-						if (Character == NULL || !Character->ForbiddenUpgrades[experience_upgrade_type->Slot]) {
+						if (this->Character == NULL || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
 								continue;
 							}
@@ -763,7 +763,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 			} else if (this->Player->AiEnabled || (this->Character == NULL && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					if (CheckDependByType(*this, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
-						if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
+						if (this->Character == NULL || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
 							potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
 						}
 					}
@@ -828,7 +828,7 @@ void CUnit::Retrain()
 	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > 1) {
 		bool found_previous_unit_type = false;
 		for (size_t i = 0; i != UnitTypes.size(); ++i) {
-			if (Character != NULL && Character->ForbiddenUpgrades[i]) {
+			if (this->Character != NULL && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), UnitTypes[i]) != this->Character->ForbiddenUpgrades.end()) {
 				continue;
 			}
 			if (((int) AiHelpers.ExperienceUpgrades.size()) > i) {
@@ -5234,7 +5234,7 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	
 	if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-			if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
+			if (this->Character == NULL || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
 				int local_upgrade_value = 1;
 				
 				if (!only_units) {

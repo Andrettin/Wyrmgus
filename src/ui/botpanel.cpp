@@ -1566,7 +1566,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			}
 			if (res && unit.Character != NULL) {
-				res = !unit.Character->ForbiddenUpgrades[buttonaction.Value];
+				res = std::find(unit.Character->ForbiddenUpgrades.begin(), unit.Character->ForbiddenUpgrades.end(), UnitTypes[buttonaction.Value]) == unit.Character->ForbiddenUpgrades.end();
 			}
 			break;
 		case ButtonLearnAbility:

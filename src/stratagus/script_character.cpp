@@ -441,13 +441,13 @@ static int CclDefineCharacter(lua_State *l)
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "ForbiddenUpgrades")) {
-			memset(character->ForbiddenUpgrades, 0, sizeof(character->ForbiddenUpgrades));
+			character->ForbiddenUpgrades.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
 				int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 				if (unit_type_id != -1) {
-					character->ForbiddenUpgrades[unit_type_id] = true;
+					character->ForbiddenUpgrades.push_back(UnitTypes[unit_type_id]);
 				} else {
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
@@ -822,13 +822,13 @@ static int CclDefineCustomHero(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "ForbiddenUpgrades")) {
-			memset(hero->ForbiddenUpgrades, 0, sizeof(hero->ForbiddenUpgrades));
+			hero->ForbiddenUpgrades.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
 				int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 				if (unit_type_id != -1) {
-					hero->ForbiddenUpgrades[unit_type_id] = true;
+					hero->ForbiddenUpgrades.push_back(UnitTypes[unit_type_id]);
 				} else {
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
