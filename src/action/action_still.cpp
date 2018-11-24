@@ -497,7 +497,7 @@ bool COrder_Still::AutoCastStand(CUnit &unit)
 
 
 /**
-**  @brief Auto attack nearby units if possible
+**	@brief	Auto attack nearby units if possible
 */
 bool AutoAttack(CUnit &unit)
 {

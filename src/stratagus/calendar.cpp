@@ -51,6 +51,11 @@ CCalendar * CCalendar::BaseCalendar = NULL;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
 void CDayOfTheWeek::ProcessConfigData(CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -65,6 +70,11 @@ void CDayOfTheWeek::ProcessConfigData(CConfigData *config_data)
 	}
 }
 
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
 void CMonth::ProcessConfigData(CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -81,6 +91,9 @@ void CMonth::ProcessConfigData(CConfigData *config_data)
 	}
 }
 
+/**
+**	@brief	Destructor
+*/
 CCalendar::~CCalendar()
 {
 	for (size_t i = 0; i < DaysOfTheWeek.size(); ++i) {
@@ -95,7 +108,11 @@ CCalendar::~CCalendar()
 }
 
 /**
-**  Get a calendar
+**	@brief	Get a calendar
+**
+**	@param	ident	The calendar's string identifier
+**
+**	@return	A pointer to the calendar if found, null otherwise
 */
 CCalendar *CCalendar::GetCalendar(const std::string &ident)
 {
@@ -106,6 +123,13 @@ CCalendar *CCalendar::GetCalendar(const std::string &ident)
 	return NULL;
 }
 
+/**
+**	@brief	Get or add a calendar
+**
+**	@param	ident	The calendar's string identifier
+**
+**	@return	A pointer to the calendar if found, otherwise a new calendar is created and returned
+*/
 CCalendar *CCalendar::GetOrAddCalendar(const std::string &ident)
 {
 	CCalendar *calendar = GetCalendar(ident);
@@ -120,6 +144,9 @@ CCalendar *CCalendar::GetOrAddCalendar(const std::string &ident)
 	return calendar;
 }
 
+/**
+**	@brief	Remove the existing calendars
+*/
 void CCalendar::ClearCalendars()
 {
 	for (size_t i = 0; i < Calendars.size(); ++i) {
@@ -130,8 +157,17 @@ void CCalendar::ClearCalendars()
 	BaseCalendar = NULL;
 }
 
+/**
+**	@brief	Get the time of day corresponding to a quantity of hours and hours per day
+**
+**	@param	hours			The quantity of hours
+**	@param	hours_per_day	The hours per day which will be used to process the amount of hours
+**
+**	@return	The index of the time of day
+*/
 int CCalendar::GetTimeOfDay(const unsigned long long hours, const int hours_per_day)
 {
+	//in order for getting the time of day to work with days containing more hours than the standard 24, we need to "convert" the hour into its equivalent for a 24-hour day; so that, for instance, the 2nd hour of an 48-hour day will be transformed into the 1st hour of a 24-hour day
 	int standardized_hour = hours % hours_per_day;
 	standardized_hour *= DefaultHoursPerDay;
 	standardized_hour /= hours_per_day;
@@ -157,6 +193,11 @@ int CCalendar::GetTimeOfDay(const unsigned long long hours, const int hours_per_
 	return NoTimeOfDay;
 }
 
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
 void CCalendar::ProcessConfigData(CConfigData *config_data)
 {
 	std::string base_day_of_the_week;
@@ -263,6 +304,13 @@ void CCalendar::ProcessConfigData(CConfigData *config_data)
 	}
 }
 
+/**
+**	@brief	Get a day of the week
+**
+**	@param	ident	The day of the week's string identifier
+**
+**	@return	A pointer to the day of the week if found, null otherwise
+*/
 CDayOfTheWeek *CCalendar::GetDayOfTheWeekByIdent(const std::string &ident)
 {
 	if (this->DaysOfTheWeekByIdent.find(ident) != this->DaysOfTheWeekByIdent.end()) {
@@ -272,6 +320,13 @@ CDayOfTheWeek *CCalendar::GetDayOfTheWeekByIdent(const std::string &ident)
 	return NULL;
 }
 
+/**
+**	@brief	Add a chronological intersection between this calendar and another one
+**
+**	@param	intersecting_calendar	A pointer to the calendar that is being intersected with
+**	@param	date					The date in this calendar for the intersection
+**	@param	intersecting_date		The date in the other calendar for the intersection
+*/
 void CCalendar::AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date)
 {
 	if (!intersecting_calendar) {
@@ -289,6 +344,11 @@ void CCalendar::AddChronologicalIntersection(CCalendar *intersecting_calendar, c
 	InheritChronologicalIntersectionsFromCalendar(intersecting_calendar);
 }
 
+/**
+**	@brief	Inherit the chronological intersections with third calendars from another calendar
+**
+**	@param	intersecting_calendar	A pointer to the calendar from which the intersections are being inherited
+*/
 void CCalendar::InheritChronologicalIntersectionsFromCalendar(CCalendar *intersecting_calendar)
 {
 	if (!intersecting_calendar || !intersecting_calendar->Initialized) {
@@ -308,6 +368,14 @@ void CCalendar::InheritChronologicalIntersectionsFromCalendar(CCalendar *interse
 	}
 }
 
+/**
+**	@brief	Get the closest chronological intersection for a given date
+**
+**	@param	calendar	A pointer to the calendar that is being intersected with
+**	@param	date		A given date in this calendar
+**
+**	@return	The closest chronological intersection with the other calendar for the given date
+*/
 std::pair<CDate, CDate> CCalendar::GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const
 {
 	std::pair<CDate, CDate> chronological_intersection(*(new CDate), *(new CDate));

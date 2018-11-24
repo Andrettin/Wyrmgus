@@ -2470,7 +2470,7 @@ void CButtonPanel::DoClicked_Salvage()
 }
 
 /**
-**	@brief Enter the map layer that the selected unit leads to.
+**	@brief	Enter the map layer that the selected unit leads to.
 */
 void CButtonPanel::DoClicked_EnterMapLayer()
 {
