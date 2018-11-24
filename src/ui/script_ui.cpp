@@ -964,54 +964,6 @@ static int CclDefineButton(lua_State *l)
 			ba.Icon.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Action")) {
 			value = LuaToString(l, -1);
-			//Wyrmgus start
-			/*
-			if (!strcmp(value, "move")) {
-				ba.Action = ButtonMove;
-			} else if (!strcmp(value, "stop")) {
-				ba.Action = ButtonStop;
-			} else if (!strcmp(value, "attack")) {
-				ba.Action = ButtonAttack;
-			} else if (!strcmp(value, "repair")) {
-				ba.Action = ButtonRepair;
-			} else if (!strcmp(value, "harvest")) {
-				ba.Action = ButtonHarvest;
-			} else if (!strcmp(value, "button")) {
-				ba.Action = ButtonButton;
-			} else if (!strcmp(value, "build")) {
-				ba.Action = ButtonBuild;
-			} else if (!strcmp(value, "train-unit")) {
-				ba.Action = ButtonTrain;
-			} else if (!strcmp(value, "patrol")) {
-				ba.Action = ButtonPatrol;
-			} else if (!strcmp(value, "stand-ground")) {
-				ba.Action = ButtonStandGround;
-			} else if (!strcmp(value, "attack-ground")) {
-				ba.Action = ButtonAttackGround;
-			} else if (!strcmp(value, "return-goods")) {
-				ba.Action = ButtonReturn;
-			} else if (!strcmp(value, "cast-spell")) {
-				ba.Action = ButtonSpellCast;
-			} else if (!strcmp(value, "research")) {
-				ba.Action = ButtonResearch;
-			} else if (!strcmp(value, "upgrade-to")) {
-				ba.Action = ButtonUpgradeTo;
-			} else if (!strcmp(value, "unload")) {
-				ba.Action = ButtonUnload;
-			} else if (!strcmp(value, "cancel")) {
-				ba.Action = ButtonCancel;
-			} else if (!strcmp(value, "cancel-upgrade")) {
-				ba.Action = ButtonCancelUpgrade;
-			} else if (!strcmp(value, "cancel-train-unit")) {
-				ba.Action = ButtonCancelTrain;
-			} else if (!strcmp(value, "cancel-build")) {
-				ba.Action = ButtonCancelBuild;
-			} else if (!strcmp(value, "callback")) {
-				ba.Action = ButtonCallbackAction;
-			} else {
-				LuaError(l, "Unsupported button action: %s" _C_ value);
-			}
-			*/
 			int button_action_id = GetButtonActionIdByName(std::string(value));
 			if (button_action_id != -1) {
 				ba.Action = ButtonCmd(button_action_id);

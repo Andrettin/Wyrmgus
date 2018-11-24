@@ -71,8 +71,70 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			ba.Icon.Name = value;
+		} else if (key == "action") {
+			value = FindAndReplaceString(value, "_", "-");
+			const int button_action_id = GetButtonActionIdByName(value);
+			if (button_action_id != -1) {
+				ba.Action = ButtonCmd(button_action_id);
+			} else {
+				fprintf(stderr, "Invalid button action: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "value") {
+			value = FindAndReplaceString(value, "_", "-");
+			ba.ValueStr = value;
+		} else if (key == "allowed") {
+			if (value == "check_true") {
+				ba.Allowed = ButtonCheckTrue;
+			} else if (value == "check_false") {
+				ba.Allowed = ButtonCheckFalse;
+			} else if (value == "check_upgrade") {
+				ba.Allowed = ButtonCheckUpgrade;
+			} else if (value == "check_upgrade_not") {
+				ba.Allowed = ButtonCheckUpgradeNot;
+			} else if (value == "check_upgrade_or") {
+				ba.Allowed = ButtonCheckUpgradeOr;
+			} else if (value == "check_individual_upgrade") {
+				ba.Allowed = ButtonCheckIndividualUpgrade;
+			} else if (value == "check_individual_upgrade_or") {
+				ba.Allowed = ButtonCheckIndividualUpgradeOr;
+			} else if (value == "check_unit_variable") {
+				ba.Allowed = ButtonCheckUnitVariable;
+			} else if (value == "check_units_or") {
+				ba.Allowed = ButtonCheckUnitsOr;
+			} else if (value == "check_units_and") {
+				ba.Allowed = ButtonCheckUnitsAnd;
+			} else if (value == "check_units_not") {
+				ba.Allowed = ButtonCheckUnitsNot;
+			} else if (value == "check_network") {
+				ba.Allowed = ButtonCheckNetwork;
+			} else if (value == "check_no_network") {
+				ba.Allowed = ButtonCheckNoNetwork;
+			} else if (value == "check_no_work") {
+				ba.Allowed = ButtonCheckNoWork;
+			} else if (value == "check_no_research") {
+				ba.Allowed = ButtonCheckNoResearch;
+			} else if (value == "check_attack") {
+				ba.Allowed = ButtonCheckAttack;
+			} else if (value == "check_upgrade_to") {
+				ba.Allowed = ButtonCheckUpgradeTo;
+			} else if (value == "check_research") {
+				ba.Allowed = ButtonCheckResearch;
+			} else if (value == "check_single_research") {
+				ba.Allowed = ButtonCheckSingleResearch;
+			} else if (value == "check_has_inventory") {
+				ba.Allowed = ButtonCheckHasInventory;
+			} else if (value == "check_has_sub_buttons") {
+				ba.Allowed = ButtonCheckHasSubButtons;
+			} else {
+				fprintf(stderr, "Invalid button check: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "allow_arg") {
+			value = FindAndReplaceString(value, "_", "-");
+			if (!ba.AllowStr.empty()) {
+				ba.AllowStr += ",";
+			}
+			ba.AllowStr += value;
 		} else if (key == "key") {
-			std::string key(value);
 			ba.Key = GetHotKey(value);
 		} else if (key == "hint") {
 			ba.Hint = value;
