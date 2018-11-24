@@ -2232,8 +2232,6 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 				}
 			}
 			player.Deities.push_back(upgrade_deity);
-		} else {
-			fprintf(stderr, "Deity \"%s\" has an upgrade, but doesn't exist.\n", upgrade->Ident.c_str());
 		}
 	}
 	
@@ -2288,8 +2286,6 @@ void UpgradeLost(CPlayer &player, int id)
 				}
 			}
 			player.Deities.erase(std::remove(player.Deities.begin(), player.Deities.end(), upgrade_deity), player.Deities.end());
-		} else {
-			fprintf(stderr, "Deity \"%s\" has an upgrade, but doesn't exist.\n", upgrade->Ident.c_str());
 		}
 	}
 
@@ -2442,8 +2438,6 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 				unit.Character->Deities.push_back(upgrade_deity);
 				SaveHero(unit.Character);
 			}
-		} else {
-			fprintf(stderr, "Deity \"%s\" has an upgrade, but doesn't exist.\n", upgrade->Ident.c_str());
 		}
 	}
 
@@ -2505,8 +2499,6 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade, bool lose_all)
 				unit.Character->Deities.erase(std::remove(unit.Character->Deities.begin(), unit.Character->Deities.end(), upgrade_deity), unit.Character->Deities.end());
 				SaveHero(unit.Character);
 			}
-		} else {
-			fprintf(stderr, "Deity \"%s\" has an upgrade, but doesn't exist.\n", upgrade->Ident.c_str());
 		}
 	}
 

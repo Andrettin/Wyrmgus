@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name deity.h - The deity headerfile. */
+/**@name deity.h - The deity header file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -61,10 +61,10 @@ public:
 	{
 	}
 	
-	static CDeity *GetDeity(std::string deity_ident);
-	static CDeity *GetOrAddDeity(std::string deity_ident);
-	static CDeity *GetDeityByUpgrade(const CUpgrade *upgrade);
-	static CDeity *GetProfileMatch(CDeity *deity_profile);
+	static CDeity *GetDeity(const std::string &ident, const bool should_find = true);
+	static CDeity *GetOrAddDeity(const std::string &ident);
+	static CDeity *GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
+	static CDeity *GetProfileMatch(const CDeity *deity_profile);
 	static void ClearDeities();
 	
 	static std::vector<CDeity *> Deities;		/// Deities

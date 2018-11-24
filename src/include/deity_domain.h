@@ -55,9 +55,9 @@ public:
 	{
 	}
 	
-	static CDeityDomain *GetDeityDomain(std::string deity_domain_ident);
-	static CDeityDomain *GetOrAddDeityDomain(std::string deity_domain_ident);
-	static CDeityDomain *GetDeityDomainByUpgrade(const CUpgrade *upgrade);
+	static CDeityDomain *GetDeityDomain(const std::string &ident, bool should_find = true);
+	static CDeityDomain *GetOrAddDeityDomain(const std::string &ident);
+	static CDeityDomain *GetDeityDomainByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
 	static void ClearDeityDomains();
 	
 	static std::vector<CDeityDomain *> DeityDomains;	/// Deity domains

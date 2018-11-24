@@ -38,6 +38,7 @@
 #include "deity_domain.h"
 
 #include "config.h"
+#include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -51,38 +52,72 @@ std::map<const CUpgrade *, CDeityDomain *> CDeityDomain::DeityDomainsByUpgrade;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CDeityDomain *CDeityDomain::GetDeityDomain(std::string deity_domain_ident)
+/**
+**	@brief	Get a deity domain
+**
+**	@param	ident		The deity domain's string identifier
+**	@param	should_find	Whether it is an error if the deity domain could not be found; this is true by default
+**
+**	@return	The deity domain if found, or null otherwise
+*/
+CDeityDomain *CDeityDomain::GetDeityDomain(const std::string &ident, const bool should_find)
 {
-	if (DeityDomainsByIdent.find(deity_domain_ident) != DeityDomainsByIdent.end()) {
-		return DeityDomainsByIdent.find(deity_domain_ident)->second;
+	if (DeityDomainsByIdent.find(ident) != DeityDomainsByIdent.end()) {
+		return DeityDomainsByIdent.find(ident)->second;
+	}
+	
+	if (should_find) {
+		fprintf(stderr, "Invalid deity domain: \"%s\".\n", ident.c_str());
 	}
 	
 	return NULL;
 }
 
-CDeityDomain *CDeityDomain::GetOrAddDeityDomain(std::string deity_domain_ident)
+/**
+**	@brief	Get or add a deity domain
+**
+**	@param	ident	The deity domain's string identifier
+**
+**	@return	The deity domain if found, or a newly-created one otherwise
+*/
+CDeityDomain *CDeityDomain::GetOrAddDeityDomain(const std::string &ident)
 {
-	CDeityDomain *deity_domain = GetDeityDomain(deity_domain_ident);
+	CDeityDomain *deity_domain = GetDeityDomain(ident, false);
 	
 	if (!deity_domain) {
 		deity_domain = new CDeityDomain;
-		deity_domain->Ident = deity_domain_ident;
+		deity_domain->Ident = ident;
 		DeityDomains.push_back(deity_domain);
-		DeityDomainsByIdent[deity_domain_ident] = deity_domain;
+		DeityDomainsByIdent[ident] = deity_domain;
 	}
 	
 	return deity_domain;
 }
 
-CDeityDomain *CDeityDomain::GetDeityDomainByUpgrade(const CUpgrade *upgrade)
+/**
+**	@brief	Get a deity domain by its respective upgrade
+**
+**	@param	upgrade	The deity domain's upgrade
+**	@param	should_find	Whether it is an error if the deity domain could not be found; this is true by default
+**
+**	@return	The upgrade's deity domain, if any
+*/
+CDeityDomain *CDeityDomain::GetDeityDomainByUpgrade(const CUpgrade *upgrade, const bool should_find)
 {
 	if (DeityDomainsByUpgrade.find(upgrade) != DeityDomainsByUpgrade.end()) {
 		return DeityDomainsByUpgrade.find(upgrade)->second;
 	}
 	
+	if (should_find) {
+		fprintf(stderr, "No deity domain found for upgrade: \"%s\".\n", upgrade->Ident.c_str());
+	}
+	
 	return NULL;
 }
 
+/**
+**	@brief	Remove the existing deity domains
+*/
 void CDeityDomain::ClearDeityDomains()
 {
 	for (size_t i = 0; i < DeityDomains.size(); ++i) {

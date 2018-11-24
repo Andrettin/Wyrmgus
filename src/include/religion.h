@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name religion.h - The religion headerfile. */
+/**@name religion.h - The religion header file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -54,8 +55,12 @@ public:
 	{
 	}
 	
-	static CReligion *GetReligion(std::string religion_ident);
+	static CReligion *GetReligion(const std::string &ident, const bool should_find = true);
+	static CReligion *GetOrAddReligion(const std::string &ident);
 	static void ClearReligions();
+	
+	static std::vector<CReligion *> Religions;	/// Religions
+	static std::map<std::string, CReligion *> ReligionsByIdent;
 	
 	std::string Ident;							/// Ident of the religion
 	std::string Name;							/// Name of the religion
@@ -64,8 +69,6 @@ public:
 	std::string Quote;
 	bool CulturalDeities;						/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
 	std::vector<CDeityDomain *> Domains;
-	
-	static std::vector<CReligion *> Religions;	/// Religions
 };
 
 //@}

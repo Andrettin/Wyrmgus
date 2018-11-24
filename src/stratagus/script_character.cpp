@@ -261,8 +261,6 @@ static int CclDefineCharacter(lua_State *l)
 					character->Icon.Icon = NULL;
 					character->Icon.Load();
 				}
-			} else {
-				LuaError(l, "Deity doesn't exist.");
 			}
 		} else if (!strcmp(value, "Conditions")) {
 			character->Conditions = new LuaCallback(l, -1);
@@ -286,8 +284,6 @@ static int CclDefineCharacter(lua_State *l)
 				CDeity *deity = CDeity::GetDeity(deity_ident);
 				if (deity) {
 					character->Deities.push_back(deity);
-				} else {
-					fprintf(stderr, "Deity \"%s\" doesn't exist.", deity_ident.c_str());
 				}
 			}
 		} else if (!strcmp(value, "ReadWorks")) {
@@ -674,8 +670,6 @@ static int CclDefineCustomHero(lua_State *l)
 				CDeity *deity = CDeity::GetDeity(deity_ident);
 				if (deity) {
 					hero->Deities.push_back(deity);
-				} else {
-					fprintf(stderr, "Deity \"%s\" doesn't exist.", deity_ident.c_str());
 				}
 			}
 		} else if (!strcmp(value, "ReadWorks")) {
@@ -1180,8 +1174,6 @@ static int CclCharacter(lua_State *l)
 			CDeity *deity = CDeity::GetDeity(LuaToString(l, 2, j + 1));
 			if (deity) {
 				character->Deities.push_back(deity);
-			} else {
-				fprintf(stderr, "Deity does not exist.\n");
 			}
 		} else {
 			fprintf(stderr, "Character: Unsupported tag: %s\n", value);

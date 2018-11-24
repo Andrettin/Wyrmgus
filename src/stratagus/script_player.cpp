@@ -2362,13 +2362,7 @@ static int CclDefineReligion(lua_State *l)
 	}
 
 	std::string religion_ident = LuaToString(l, 1);
-	CReligion *religion = CReligion::GetReligion(religion_ident);
-	if (!religion) {
-		religion = new CReligion;
-		CReligion::Religions.push_back(religion);
-	}
-	
-	religion->Ident = religion_ident;
+	CReligion *religion = CReligion::GetOrAddReligion(religion_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -2391,11 +2385,9 @@ static int CclDefineReligion(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(LuaToString(l, -1, j + 1));
-				if (!deity_domain) {
-					LuaError(l, "Deity domain doesn't exist.");
+				if (deity_domain) {
+					religion->Domains.push_back(deity_domain);
 				}
-
-				religion->Domains.push_back(deity_domain);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2533,11 +2525,9 @@ static int CclDefineDeity(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CReligion *religion = CReligion::GetReligion(LuaToString(l, -1, j + 1));
-				if (!religion) {
-					LuaError(l, "Religion doesn't exist.");
+				if (religion) {
+					deity->Religions.push_back(religion);
 				}
-
-				deity->Religions.push_back(religion);
 			}
 		} else if (!strcmp(value, "Domains")) {
 			if (!lua_istable(l, -1)) {
@@ -2546,11 +2536,9 @@ static int CclDefineDeity(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(LuaToString(l, -1, j + 1));
-				if (!deity_domain) {
-					LuaError(l, "Domain doesn't exist.");
+				if (deity_domain) {
+					deity->Domains.push_back(deity_domain);
 				}
-
-				deity->Domains.push_back(deity_domain);
 			}
 		} else if (!strcmp(value, "HolyOrders")) {
 			if (!lua_istable(l, -1)) {
@@ -3840,7 +3828,7 @@ static int CclGetReligionData(lua_State *l)
 	std::string religion_ident = LuaToString(l, 1);
 	const CReligion *religion = CReligion::GetReligion(religion_ident);
 	if (!religion) {
-		LuaError(l, "Religion \"%s\" doesn't exist." _C_ religion_ident.c_str());
+		return 0;
 	}
 	const char *data = LuaToString(l, 2);
 
@@ -3879,7 +3867,7 @@ static int CclGetDeityDomainData(lua_State *l)
 	std::string deity_domain_ident = LuaToString(l, 1);
 	const CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(deity_domain_ident);
 	if (!deity_domain) {
-		LuaError(l, "Deity domain \"%s\" doesn't exist." _C_ deity_domain_ident.c_str());
+		return 0;
 	}
 	const char *data = LuaToString(l, 2);
 
@@ -3914,7 +3902,7 @@ static int CclGetDeityData(lua_State *l)
 	std::string deity_ident = LuaToString(l, 1);
 	const CDeity *deity = CDeity::GetDeity(deity_ident);
 	if (!deity) {
-		LuaError(l, "Deity \"%s\" doesn't exist." _C_ deity_ident.c_str());
+		return 0;
 	}
 	const char *data = LuaToString(l, 2);
 

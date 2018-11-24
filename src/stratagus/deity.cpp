@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name deity.cpp - The deities. */
+/**@name deity.cpp - The deity source file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -59,39 +59,77 @@ std::map<const CUpgrade *, CDeity *> CDeity::DeitiesByUpgrade;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CDeity *CDeity::GetDeity(std::string deity_ident)
+/**
+**	@brief	Get a deity
+**
+**	@param	ident		The deity's string identifier
+**	@param	should_find	Whether it is an error if the deity could not be found; this is true by default
+**
+**	@return	The deity if found, or null otherwise
+*/
+CDeity *CDeity::GetDeity(const std::string &ident, const bool should_find)
 {
-	if (DeitiesByIdent.find(deity_ident) != DeitiesByIdent.end()) {
-		return DeitiesByIdent.find(deity_ident)->second;
+	if (DeitiesByIdent.find(ident) != DeitiesByIdent.end()) {
+		return DeitiesByIdent.find(ident)->second;
+	}
+	
+	if (should_find) {
+		fprintf(stderr, "Invalid deity: \"%s\".\n", ident.c_str());
 	}
 	
 	return NULL;
 }
 
-CDeity *CDeity::GetOrAddDeity(std::string deity_ident)
+/**
+**	@brief	Get or add a deity
+**
+**	@param	ident	The deity's string identifier
+**
+**	@return	The deity if found, or a newly-created one otherwise
+*/
+CDeity *CDeity::GetOrAddDeity(const std::string &ident)
 {
-	CDeity *deity = GetDeity(deity_ident);
+	CDeity *deity = GetDeity(ident, false);
 	
 	if (!deity) {
 		deity = new CDeity;
-		deity->Ident = deity_ident;
+		deity->Ident = ident;
 		Deities.push_back(deity);
-		DeitiesByIdent[deity_ident] = deity;
+		DeitiesByIdent[ident] = deity;
 	}
 	
 	return deity;
 }
 
-CDeity *CDeity::GetDeityByUpgrade(const CUpgrade *upgrade)
+/**
+**	@brief	Get a deity by its respective upgrade
+**
+**	@param	upgrade	The deity's upgrade
+**	@param	should_find	Whether it is an error if the deity could not be found; this is true by default
+**
+**	@return	The upgrade's deity, if any
+*/
+CDeity *CDeity::GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_find)
 {
 	if (DeitiesByUpgrade.find(upgrade) != DeitiesByUpgrade.end()) {
 		return DeitiesByUpgrade.find(upgrade)->second;
 	}
 	
+	if (should_find) {
+		fprintf(stderr, "No deity found for upgrade: \"%s\".\n", upgrade->Ident.c_str());
+	}
+	
 	return NULL;
 }
 
-CDeity *CDeity::GetProfileMatch(CDeity *deity_profile)
+/**
+**	@brief	Get a deity profile match
+**
+**	@param	deity_profile	The deity profile to be matched to
+**
+**	@return	A deity matching the profile, or null if none are available
+*/
+CDeity *CDeity::GetProfileMatch(const CDeity *deity_profile)
 {
 	std::vector<CDeity *> profile_matches;
 	
@@ -149,6 +187,9 @@ CDeity *CDeity::GetProfileMatch(CDeity *deity_profile)
 	}
 }
 
+/**
+**	@brief	Remove the existing deities
+*/
 void CDeity::ClearDeities()
 {
 	for (size_t i = 0; i < Deities.size(); ++i) {
@@ -157,6 +198,11 @@ void CDeity::ClearDeities()
 	Deities.clear();
 }
 
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
 void CDeity::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -193,8 +239,6 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value.c_str());
 			if (deity_domain) {
 				this->Domains.push_back(deity_domain);
-			} else {
-				fprintf(stderr, "Deity domain \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "description") {
 			this->Description = value;

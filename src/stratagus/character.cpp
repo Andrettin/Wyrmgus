@@ -180,8 +180,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			CDeity *deity = CDeity::GetDeity(value);
 			if (deity) {
 				this->Deities.push_back(deity);
-			} else {
-				fprintf(stderr, "Deity \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "description") {
 			this->Description = value;
