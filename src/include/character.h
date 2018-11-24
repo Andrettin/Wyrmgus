@@ -59,6 +59,7 @@ class CLanguage;
 class CPersistentItem;
 class CProvince;
 class CQuest;
+class CReligion;
 class CUnitType;
 class CUnit;
 class CUpgrade;
@@ -130,6 +131,7 @@ public:
 	void GenerateMissingDates();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
+	CReligion *GetReligion() const;
 	CLanguage *GetLanguage() const;
 	CCalendar *GetCalendar() const;
 	bool IsParentOf(std::string child_full_name) const;

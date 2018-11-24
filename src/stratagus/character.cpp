@@ -334,12 +334,7 @@ void CCharacter::GenerateHistory()
 	
 	if (!this->PreferredDeityDomains.empty() && this->Deities.size() < PlayerDeityMax && this->CanWorship()) { //if the character can worship deities, but worships less deities than the maximum, generate them for the character
 		int deities_missing = PlayerDeityMax - this->Deities.size();
-		CReligion *character_religion = NULL;
-		for (size_t i = 0; i < this->Deities.size(); ++i) {
-			if (!this->Deities[i]->Religions.empty()) {
-				character_religion = this->Deities[i]->Religions[0];
-			}
-		}
+		CReligion *character_religion = this->GetReligion();
 		
 		for (int i = 0; i < deities_missing; ++i) {
 			std::vector<CDeity *> potential_deities;
@@ -389,8 +384,8 @@ void CCharacter::GenerateHistory()
 				this->Deities.push_back(chosen_deity);
 				this->GeneratedDeities.push_back(chosen_deity);
 				
-				if (!character_religion && !chosen_deity->Religions.empty()) {
-					character_religion = chosen_deity->Religions[0];
+				if (!character_religion) {
+					character_religion = this->GetReligion();
 				}
 				
 				history_changed = true;
@@ -514,6 +509,24 @@ int CCharacter::GetMartialAttribute() const
 int CCharacter::GetAttributeModifier(int attribute) const
 {
 	return this->Attributes[attribute] - 10;
+}
+
+/**
+**	@brief	Get the character's religion
+**
+**	@return	The religion if found, or null otherwise
+*/
+CReligion *CCharacter::GetReligion() const
+{
+	//get the first religion of the character's first deity, since at present we don't set the religion directly for the character
+	
+	for (size_t i = 0; i < this->Deities.size(); ++i) {
+		if (!this->Deities[i]->Religions.empty()) {
+			return this->Deities[i]->Religions[0];
+		}
+	}
+	
+	return NULL;
 }
 
 CLanguage *CCharacter::GetLanguage() const
