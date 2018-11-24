@@ -694,8 +694,6 @@ set(stratagus_HDRS
 	#Wyrmgus start
 	${stratagus_xbrz_HDRS}
 	#Wyrmgus end
-	${CMAKE_CURRENT_BINARY_DIR}/version-generated.h
-	version-generated.h # This line is needed for CMake when generating Doxygen documentation
 )
 
 # Configuration types
