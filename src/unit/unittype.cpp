@@ -60,7 +60,8 @@
 #include "terrain_type.h"
 #include "tileset.h"
 #include "translate.h"
-#include "ui.h"
+#include "ui/button_action.h"
+#include "ui/ui.h"
 #include "unitsound.h"
 #include "util.h"
 #include "video.h"
@@ -694,7 +695,7 @@ CUnitType::~CUnitType()
 #endif
 }
 
-void CUnitType::ProcessConfigData(CConfigData *config_data)
+void CUnitType::ProcessConfigData(const CConfigData *config_data)
 {
 	this->RemoveButtons(ButtonMove);
 	this->RemoveButtons(ButtonStop);

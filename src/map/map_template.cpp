@@ -107,7 +107,7 @@ void CMapTemplate::ClearMapTemplates()
 	MapTemplates.clear();
 }
 
-void CMapTemplate::ProcessConfigData(CConfigData *config_data)
+void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;

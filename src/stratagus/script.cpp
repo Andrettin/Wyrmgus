@@ -66,7 +66,8 @@
 #include "timeline.h"
 #include "translate.h"
 #include "trigger.h"
-#include "ui.h"
+#include "ui/button_action.h"
+#include "ui/ui.h"
 #include "unit.h"
 //Wyrmgus start
 #include "unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed

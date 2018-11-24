@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name interface.cpp - The interface. */
+/**@name interface.cpp - The interface source file. */
 //
-//      (c) Copyright 1998-2011 by Lutz Sammer, Jimmy Salmon and Pali Rohár
+//      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "interface.h"
+#include "ui/interface.h"
 
 #include "ai.h"
 #include "commands.h"
@@ -54,15 +54,10 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "translate.h"
-//Wyrmgus start
-#include "trigger.h"
-//Wyrmgus end
-#include "ui.h"
+#include "ui/button_action.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unit_find.h"
-//Wyrmgus start
-#include "unit_manager.h"
-//Wyrmgus end
 #include "unittype.h"
 #include "video.h"
 #include "widgets.h"
@@ -119,107 +114,6 @@ CUnit *LastLevelUpUnit;							/// Last called level up unit
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-//Wyrmgus start
-void ButtonAction::SetTriggerData() const
-{
-	if (this->Action != ButtonUnit && this->Action != ButtonBuy) {
-		TriggerData.Type = UnitTypes[this->Value];
-	} else {
-		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(this->Value).Type->Slot];
-		TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
-	}
-	if (this->Action == ButtonResearch || this->Action == ButtonLearnAbility) {
-		TriggerData.Upgrade = AllUpgrades[this->Value];
-	} else if (this->Action == ButtonFaction) {
-		TriggerData.Faction = PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value];
-		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
-		}
-	}
-}
-
-void ButtonAction::CleanTriggerData() const
-{
-	TriggerData.Type = NULL;
-	TriggerData.Unit = NULL;
-	TriggerData.Upgrade = NULL;
-	TriggerData.Resource = NULL;
-	TriggerData.Faction = NULL;
-}
-
-int ButtonAction::GetKey() const
-{
-	if ((this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo) && !IsButtonUsable(*Selected[0], *this)) {
-		return 0;
-	}
-
-	if (this->Key == gcn::Key::K_ESCAPE || this->Key == gcn::Key::K_DELETE || this->Key == gcn::Key::K_PAGE_DOWN || this->Key == gcn::Key::K_PAGE_UP) {
-		return this->Key;
-	}
-	
-	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo || this->Action == ButtonRallyPoint || this->Action == ButtonSalvage || this->Action == ButtonEnterMapLayer))) && this->Key != 0) {
-		if (this->Pos == 1) {
-			return 'q';
-		} else if (this->Pos == 2) {
-			return 'w';
-		} else if (this->Pos == 3) {
-			return 'e';
-		} else if (this->Pos == 4) {
-			return 'r';
-		} else if (this->Pos == 5) {
-			return 'a';
-		} else if (this->Pos == 6) {
-			return 's';
-		} else if (this->Pos == 7) {
-			return 'd';
-		} else if (this->Pos == 8) {
-			return 'f';
-		} else if (this->Pos == 9) {
-			return 'z';
-		} else if (this->Pos == 10) {
-			return 'x';
-		} else if (this->Pos == 11) {
-			return 'c';
-		} else if (this->Pos == 12) {
-			return 'v';
-		} else if (this->Pos == 13) {
-			return 't';
-		} else if (this->Pos == 14) {
-			return 'g';
-		} else if (this->Pos == 15) {
-			return 'b';
-		} else if (this->Pos == 16) {
-			return 'y';
-		}
-	}
-	return this->Key;
-}
-
-std::string ButtonAction::GetHint() const
-{
-	if ((this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo) && !IsButtonUsable(*Selected[0], *this) && this->Key != 0 && !this->Hint.empty()) {
-		std::string hint = this->Hint;
-		hint = FindAndReplaceString(hint, "~!", "");
-		return hint;
-	}
-
-	if (this->Key == gcn::Key::K_ESCAPE) {
-		return this->Hint;
-	}
-	
-	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo || this->Action == ButtonRallyPoint || this->Action == ButtonSalvage || this->Action == ButtonEnterMapLayer))) && this->Key != 0 && !this->Hint.empty()) {
-		std::string hint = this->Hint;
-		hint = FindAndReplaceString(hint, "~!", "");
-		hint += " (~!";
-		hint += CapitalizeString(SdlKey2Str(this->GetKey()));
-		hint += ")";
-		return hint;
-	}
-	
-	return this->Hint;
-}
-//Wyrmgus end
 
 /**
 **  Show input.
@@ -1917,158 +1811,5 @@ void SetHoldClickDelay(int delay)
 {
 	HoldClickDelay = delay;
 }
-
-//Wyrmgus start
-std::string GetButtonActionNameById(int button_action)
-{
-	if (button_action == ButtonMove) {
-		return "attack";
-	} else if (button_action == ButtonStop) {
-		return "stop";
-	} else if (button_action == ButtonAttack) {
-		return "attack";
-	} else if (button_action == ButtonRepair) {
-		return "repair";
-	} else if (button_action == ButtonHarvest) {
-		return "harvest";
-	} else if (button_action == ButtonButton) {
-		return "button";
-	} else if (button_action == ButtonBuild) {
-		return "build";
-	} else if (button_action == ButtonTrain) {
-		return "train-unit";
-	} else if (button_action == ButtonPatrol) {
-		return "patrol";
-	} else if (button_action == ButtonStandGround) {
-		return "stand-ground";
-	} else if (button_action == ButtonAttackGround) {
-		return "attack-ground";
-	} else if (button_action == ButtonReturn) {
-		return "return-goods";
-	} else if (button_action == ButtonSpellCast) {
-		return "cast-spell";
-	} else if (button_action == ButtonResearch) {
-		return "research";
-	} else if (button_action == ButtonLearnAbility) {
-		return "learn-ability";
-	} else if (button_action == ButtonExperienceUpgradeTo) {
-		return "experience-upgrade-to";
-	} else if (button_action == ButtonUpgradeTo) {
-		return "upgrade-to";
-	} else if (button_action == ButtonUnload) {
-		return "unload";
-	} else if (button_action == ButtonRallyPoint) {
-		return "rally-point";
-	} else if (button_action == ButtonFaction) {
-		return "faction";
-	} else if (button_action == ButtonQuest) {
-		return "quest";
-	} else if (button_action == ButtonBuy) {
-		return "buy";
-	} else if (button_action == ButtonProduceResource) {
-		return "produce-resource";
-	} else if (button_action == ButtonSellResource) {
-		return "sell-resource";
-	} else if (button_action == ButtonBuyResource) {
-		return "buy-resource";
-	} else if (button_action == ButtonSalvage) {
-		return "salvage";
-	} else if (button_action == ButtonEnterMapLayer) {
-		return "enter-map-layer";
-	} else if (button_action == ButtonUnit) {
-		return "unit";
-	} else if (button_action == ButtonEditorUnit) {
-		return "editor-unit";
-	} else if (button_action == ButtonCancel) {
-		return "cancel";
-	} else if (button_action == ButtonCancelUpgrade) {
-		return "cancel-upgrade";
-	} else if (button_action == ButtonCancelTrain) {
-		return "cancel-train-unit";
-	} else if (button_action == ButtonCancelBuild) {
-		return "cancel-build";
-	}
-
-	return "";
-}
-
-int GetButtonActionIdByName(std::string button_action)
-{
-	if (button_action == "move") {
-		return ButtonMove;
-	} else if (button_action == "stop") {
-		return ButtonStop;
-	} else if (button_action == "attack") {
-		return ButtonAttack;
-	} else if (button_action == "repair") {
-		return ButtonRepair;
-	} else if (button_action == "harvest") {
-		return ButtonHarvest;
-	} else if (button_action == "button") {
-		return ButtonButton;
-	} else if (button_action == "build") {
-		return ButtonBuild;
-	} else if (button_action == "train-unit") {
-		return ButtonTrain;
-	} else if (button_action == "patrol") {
-		return ButtonPatrol;
-	} else if (button_action == "stand-ground") {
-		return ButtonStandGround;
-	} else if (button_action == "attack-ground") {
-		return ButtonAttackGround;
-	} else if (button_action == "return-goods") {
-		return ButtonReturn;
-	} else if (button_action == "cast-spell") {
-		return ButtonSpellCast;
-	} else if (button_action == "research") {
-		return ButtonResearch;
-	} else if (button_action == "learn-ability") {
-		return ButtonLearnAbility;
-	} else if (button_action == "experience-upgrade-to") {
-		return ButtonExperienceUpgradeTo;
-	} else if (button_action == "upgrade-to") {
-		return ButtonUpgradeTo;
-	} else if (button_action == "unload") {
-		return ButtonUnload;
-	} else if (button_action == "rally-point") {
-		return ButtonRallyPoint;
-	} else if (button_action == "faction") {
-		return ButtonFaction;
-	} else if (button_action == "quest") {
-		return ButtonQuest;
-	} else if (button_action == "buy") {
-		return ButtonBuy;
-	} else if (button_action == "produce-resource") {
-		return ButtonProduceResource;
-	} else if (button_action == "sell-resource") {
-		return ButtonSellResource;
-	} else if (button_action == "buy-resource") {
-		return ButtonBuyResource;
-	} else if (button_action == "salvage") {
-		return ButtonSalvage;
-	} else if (button_action == "enter-map-layer") {
-		return ButtonEnterMapLayer;
-	} else if (button_action == "unit") {
-		return ButtonUnit;
-	} else if (button_action == "editor-unit") {
-		return ButtonEditorUnit;
-	} else if (button_action == "cancel") {
-		return ButtonCancel;
-	} else if (button_action == "cancel-upgrade") {
-		return ButtonCancelUpgrade;
-	} else if (button_action == "cancel-train-unit") {
-		return ButtonCancelTrain;
-	} else if (button_action == "cancel-build") {
-		return ButtonCancelBuild;
-	}
-
-	return -1;
-}
-
-bool IsNeutralUsableButtonAction(int button_action)
-{
-	return button_action == ButtonTrain || button_action == ButtonCancelTrain || button_action == ButtonBuy || button_action == ButtonSellResource || button_action == ButtonBuyResource || button_action == ButtonResearch;
-}
-//Wyrmgus end
 
 //@}

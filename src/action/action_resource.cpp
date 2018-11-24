@@ -42,7 +42,6 @@
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
-#include "interface.h"
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
@@ -55,7 +54,8 @@
 #include "sound.h"
 #include "tileset.h"
 #include "translate.h"
-#include "ui.h"
+#include "ui/interface.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"

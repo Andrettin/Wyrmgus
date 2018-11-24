@@ -38,7 +38,7 @@
 #include "world.h"
 
 #include "province.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

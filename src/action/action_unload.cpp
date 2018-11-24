@@ -50,7 +50,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unittype.h"
 #include "video.h"

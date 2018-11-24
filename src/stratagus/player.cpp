@@ -78,7 +78,8 @@
 #include "unit_find.h"
 #include "upgrade.h"
 //Wyrmgus end
-#include "ui.h"
+#include "ui/button_action.h"
+#include "ui/ui.h"
 #include "video.h"
 #include "world.h"
 

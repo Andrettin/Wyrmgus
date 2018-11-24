@@ -71,7 +71,7 @@ public:
 	static std::map<std::string, CDeity *> DeitiesByIdent;
 	static std::map<const CUpgrade *, CDeity *> DeitiesByUpgrade;
 	
-	void ProcessConfigData(CConfigData *config_data);
+	void ProcessConfigData(const CConfigData *config_data);
 	
 	int Gender;									/// Deity's gender
 	bool Major;									/// Whether the deity is a major one or not

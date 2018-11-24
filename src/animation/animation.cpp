@@ -521,7 +521,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	}
 }
 
-void CAnimations::ProcessConfigData(CConfigData *config_data)
+void CAnimations::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
 		CConfigData *child_config_data = config_data->Children[i];

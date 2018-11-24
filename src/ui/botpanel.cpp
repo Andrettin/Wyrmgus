@@ -36,7 +36,7 @@
 
 #include "stratagus.h"
 
-#include "ui.h"
+#include "ui/ui.h"
 
 #include "actions.h"
 //Wyrmgus start
@@ -53,7 +53,6 @@
 //Wyrmgus end
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
-#include "interface.h"
 #include "map.h"
 //Wyrmgus start
 #include "network.h"
@@ -69,6 +68,8 @@
 //Wyrmgus end
 #include "translate.h"
 #include "trigger.h"
+#include "ui/button_action.h"
+#include "ui/interface.h"
 #include "ui/popup.h"
 #include "unit.h"
 //Wyrmgus start

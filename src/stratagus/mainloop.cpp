@@ -48,7 +48,6 @@
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
-#include "interface.h"
 #include "luacallback.h"
 //Wyrmgus end
 #include "map.h"
@@ -72,7 +71,8 @@
 //Wyrmgus end
 #include "translate.h"
 #include "trigger.h"
-#include "ui.h"
+#include "ui/interface.h"
+#include "ui/ui.h"
 #include "unit.h"
 //Wyrmgus start
 #include "unit_manager.h"

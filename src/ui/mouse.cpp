@@ -41,7 +41,7 @@
 
 #include "stratagus.h"
 
-#include "ui.h"
+#include "ui/ui.h"
 
 #include "action/action_build.h"
 #include "action/action_train.h"
@@ -54,7 +54,6 @@
 #include "cursor.h"
 #include "depend.h"
 #include "font.h"
-#include "interface.h"
 #include "map.h"
 #include "menus.h"
 #include "minimap.h"
@@ -72,6 +71,8 @@
 #include "tileset.h"
 //Wyrmgus end
 #include "translate.h"
+#include "ui/button_action.h"
+#include "ui/interface.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unitsound.h"

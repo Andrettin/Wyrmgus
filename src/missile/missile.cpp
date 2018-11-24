@@ -59,7 +59,7 @@
 #include "tileset.h"
 //Wyrmgus end
 #include "trigger.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unitsound.h"
@@ -112,7 +112,7 @@ extern NumberDesc *Damage;                   /// Damage calculation for missile.
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void MissileType::ProcessConfigData(CConfigData *config_data)
+void MissileType::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;

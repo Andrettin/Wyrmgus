@@ -42,7 +42,7 @@
 #include "mod.h"
 #include "player.h"
 #include "translate.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "video.h"
 
@@ -115,7 +115,7 @@ CIcon *CIcon::Get(const std::string &ident)
 	return it->second;
 }
 
-void CIcon::ProcessConfigData(CConfigData *config_data)
+void CIcon::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;

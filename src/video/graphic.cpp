@@ -51,7 +51,7 @@
 //Wyrmgus start
 #include "results.h"
 //Wyrmgus end
-#include "ui.h"
+#include "ui/ui.h"
 //Wyrmgus start
 #include "unit.h" //for using CPreference
 #include "xbrz.h"

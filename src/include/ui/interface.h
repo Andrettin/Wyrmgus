@@ -10,7 +10,7 @@
 //
 /**@name interface.h - The user interface header file. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class ButtonAction;
 class CUIButton;
 class CUnit;
 struct EventCallback;
@@ -53,88 +54,6 @@ struct EventCallback;
 /*----------------------------------------------------------------------------
 --  Definitons
 ----------------------------------------------------------------------------*/
-
-/// Button Commands that need target selection
-enum ButtonCmd {
-	ButtonMove,           /// order move
-	ButtonAttack,         /// order attack
-	ButtonRepair,         /// order repair
-	ButtonHarvest,        /// order harvest
-	ButtonBuild,          /// order build
-	ButtonPatrol,         /// order patrol
-	ButtonAttackGround,   /// order attack ground
-	ButtonSpellCast,      /// order cast spell
-	ButtonUnload,         /// order unload unit
-	ButtonStop,           /// order stop
-	ButtonButton,         /// choose other button set
-	ButtonTrain,          /// order train
-	ButtonStandGround,    /// order stand ground
-	ButtonReturn,         /// order return goods
-	ButtonResearch,       /// order reseach
-	//Wyrmgus start
-	ButtonLearnAbility,   /// order learn ability
-	ButtonExperienceUpgradeTo,   /// order upgrade (experience)
-	//Wyrmgus end
-	ButtonUpgradeTo,      /// order upgrade
-	//Wyrmgus start
-	ButtonRallyPoint,		/// set rally point
-	ButtonFaction,			/// change faction
-	ButtonQuest,			/// receive quest
-	ButtonBuy,				/// buy item
-	ButtonProduceResource,	/// produce a resource
-	ButtonSellResource,		/// sell a resource
-	ButtonBuyResource,		/// buy a resource
-	ButtonSalvage,			/// salvage a building
-	ButtonEnterMapLayer,	/// enter a map layer
-	ButtonUnit,				/// used to display popups for inventory items and for units in transporters
-	ButtonEditorUnit,		/// used to display popups for editor unit type buttons
-	//Wyrmgus end
-	ButtonCancel,         /// cancel
-	ButtonCancelUpgrade,  /// cancel upgrade
-	ButtonCancelTrain,    /// cancel training
-	ButtonCancelBuild,    /// cancel building
-	ButtonCallbackAction
-};
-
-class ButtonAction;
-typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction &);
-
-/// Action of button
-class ButtonAction
-{
-public:
-	ButtonAction() : Pos(0), Level(0), AlwaysShow(false), Action(ButtonMove), Value(0), Payload(NULL),
-		Allowed(NULL), Key(0) {}
-		
-	//Wyrmgus start
-	void SetTriggerData() const;
-	void CleanTriggerData() const;
-	int GetKey() const;
-	std::string GetHint() const;
-	//Wyrmgus end
-
-	int Pos;          /// button position in the grid
-	int Level;        /// requires button level
-	bool AlwaysShow;  /// button is always shown but drawn grayscale if not available
-	ButtonCmd Action; /// command on button press
-	int Value;        /// extra value for command
-	void* Payload;
-	std::string ValueStr;    /// keep original value string
-
-	ButtonCheckFunc Allowed;    /// Check if this button is allowed
-	std::string AllowStr;       /// argument for allowed
-	std::string UnitMask;       /// for which units is it available
-	IconConfig Icon;      /// icon to display
-	int Key;                    /// alternative on keyboard
-	std::string Hint;           /// tip texts
-	std::string Description;    /// description shown on status bar (optional)
-	SoundConfig CommentSound;   /// Sound comment used when you press the button
-	std::string ButtonCursor;   /// Custom cursor for button action (for example, to set spell target)
-	std::string Popup;          /// Popup screen used for button
-	//Wyrmgus start
-	std::string Mod;			/// Mod to which this button belongs to
-	//Wyrmgus end
-};
 
 /// Button area under cursor
 enum _button_area_ {
@@ -145,7 +64,6 @@ enum _button_area_ {
 	ButtonAreaTransporting,  /// Transporting button
 	ButtonAreaButton,        /// Button panel button
 	ButtonAreaMenu,          /// Menu button
-	//Wyrmgus start
 	ButtonAreaIdleWorker,	 /// Idle worker button
 	ButtonAreaLevelUpUnit,	 /// Level up unit button
 	ButtonAreaHeroUnit,		 /// Hero unit button
@@ -153,7 +71,6 @@ enum _button_area_ {
 	ButtonAreaMapLayerPlane,	/// Plane button
 	ButtonAreaMapLayerWorld,	/// World button
 	ButtonAreaMapLayerSurfaceLayer,	/// Surface layer button
-	//Wyrmgus end
 	ButtonAreaUser           /// User buttons
 };
 
@@ -230,7 +147,6 @@ enum _cursor_on_ {
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-extern std::vector<ButtonAction *> UnitButtonTable;
 
 /// Flag telling if the game is running
 extern bool GameRunning;
@@ -297,36 +213,6 @@ extern int HoldClickDelay;
 ----------------------------------------------------------------------------*/
 
 extern CUnit *GetUnitUnderCursor();
-
-//
-// in botpanel.cpp
-//
-/// Generate all buttons
-extern void InitButtons();
-/// Free memory for buttons
-extern void CleanButtons();
-/// Make a new button
-extern int AddButton(int pos, int level, const std::string &IconIdent,
-					 ButtonCmd action, const std::string &value, void* payload, const ButtonCheckFunc func,
-					 const std::string &arg, const int key, const std::string &hint, const std::string &descr,
-					 const std::string &sound, const std::string &cursor, const std::string &umask,
-					 //Wyrmgus start
-//					 const std::string &popup, bool alwaysShow);
-					 const std::string &popup, bool alwaysShow, const std::string &mod_file);
-					 //Wyrmgus end
-// Check if the button is allowed for the unit.
-extern bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction);
-
-//Wyrmgus start
-// Check if the button is usable for the unit.
-extern bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction);
-
-// Get the cooldown for the button for the unit.
-extern int GetButtonCooldown(const CUnit &unit, const ButtonAction &buttonaction);
-
-// Get the cooldown percent for the button for the unit.
-extern int GetButtonCooldownPercent(const CUnit &unit, const ButtonAction &buttonaction);
-//Wyrmgus end
 
 //
 // in mouse.cpp
@@ -542,12 +428,6 @@ extern bool GetGamePaused();
 extern void SetGameSpeed(int speed);
 /// Get the game speed
 extern int GetGameSpeed();
-
-//Wyrmgus start
-extern std::string GetButtonActionNameById(int button_action);
-extern int GetButtonActionIdByName(std::string button_action);
-extern bool IsNeutralUsableButtonAction(int button_action);
-//Wyrmgus end
 
 //@}
 

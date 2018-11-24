@@ -37,7 +37,6 @@
 
 #include "trigger.h"
 
-#include "interface.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "luacallback.h"
@@ -49,6 +48,7 @@
 //Wyrmgus end
 #include "results.h"
 #include "script.h"
+#include "ui/interface.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"

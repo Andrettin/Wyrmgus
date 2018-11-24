@@ -43,9 +43,10 @@
 #include "action/action_upgradeto.h"
 //Wyrmgus end
 #include "depend.h"
-#include "interface.h"
 #include "network.h"
 #include "player.h"
+#include "ui/button_action.h"
+#include "ui/interface.h"
 #include "unit.h"
 #include "unittype.h"
 #include "upgrade.h"

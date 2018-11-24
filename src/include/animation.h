@@ -141,7 +141,7 @@ public:
 	static void LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 	static void LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 
-	void ProcessConfigData(CConfigData *config_data);
+	void ProcessConfigData(const CConfigData *config_data);
 	
 public:
 	std::string Ident;

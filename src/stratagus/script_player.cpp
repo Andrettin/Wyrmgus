@@ -40,9 +40,7 @@
 #include "actions.h"
 #include "ai.h"
 #include "calendar.h"
-//Wyrmgus start
 #include "character.h"
-//Wyrmgus end
 #include "commands.h"
 //Wyrmgus start
 #include "deity.h"
@@ -61,13 +59,14 @@
 #include "religion.h"
 //Wyrmgus end
 #include "script.h"
+#include "ui/button_action.h"
 #include "unittype.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "video.h"
 #include "upgrade.h"
 //Wyrmgus start
-#include "ui.h"
+#include "ui/ui.h"
 #include "util.h"
 //Wyrmgus end
 

@@ -41,7 +41,7 @@
 
 #include "script.h"
 #include "translate.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

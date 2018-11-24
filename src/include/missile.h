@@ -348,7 +348,7 @@ public:
 
 	static const char *MissileClassNames[];
 	
-	void ProcessConfigData(CConfigData *config_data);
+	void ProcessConfigData(const CConfigData *config_data);
 	
 	/// load the graphics for a missile type
 	void LoadMissileSprite();

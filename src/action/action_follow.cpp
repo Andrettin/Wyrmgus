@@ -49,7 +49,7 @@
 //Wyrmgus start
 #include "tileset.h"
 //Wyrmgus end
-#include "ui.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"

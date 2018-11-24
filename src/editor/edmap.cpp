@@ -38,7 +38,7 @@
 #include "map.h"
 #include "terrain_type.h"
 #include "tileset.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "player.h"
 #include "unit.h"
 #include "unit_manager.h"

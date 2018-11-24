@@ -50,7 +50,7 @@
 #include "icons.h"
 //Wyrmgus start
 #include "item.h"
-#include "ui.h" // for the UI fillers
+#include "ui/ui.h" // for the UI fillers
 //Wyrmgus end
 #include "upgrade_structs.h"
 #include "vec2i.h"

@@ -56,7 +56,7 @@
 #include "tileset.h"
 #include "timeline.h"
 #include "translate.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "version.h"
 #include "video.h"

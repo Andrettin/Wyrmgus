@@ -39,11 +39,12 @@
 #include "depend.h"
 
 #include "deity.h"
-#include "interface.h"
 #include "player.h"
 #include "script.h"
 #include "translate.h"
 #include "trigger.h"
+#include "ui/button_action.h"
+#include "ui/interface.h"
 #include "unit.h"
 #include "unittype.h"
 #include "upgrade_structs.h"

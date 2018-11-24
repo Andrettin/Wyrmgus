@@ -63,7 +63,8 @@
 #include "terrain_type.h"
 #include "tileset.h"
 //Wyrmgus end
-#include "ui.h"
+#include "ui/button_action.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unitsound.h"
 #include "unit_manager.h"

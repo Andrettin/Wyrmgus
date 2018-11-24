@@ -100,7 +100,7 @@ void CCharacter::ResetCharacterHistory()
 	}
 }
 
-void CCharacter::ProcessConfigData(CConfigData *config_data)
+void CCharacter::ProcessConfigData(const CConfigData *config_data)
 {
 	bool name_changed = false;
 	bool family_name_changed = false;

@@ -63,7 +63,6 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "interface.h"
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
@@ -85,7 +84,9 @@
 #include "tileset.h"
 //Wyrmgus end
 #include "translate.h"
-#include "ui.h"
+#include "ui/button_action.h"
+#include "ui/interface.h"
+#include "ui/ui.h"
 #include "unit_find.h"
 #include "unit_manager.h"
 #include "unitsound.h"

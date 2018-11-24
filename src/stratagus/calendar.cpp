@@ -56,7 +56,7 @@ CCalendar * CCalendar::BaseCalendar = NULL;
 **
 **	@param	config_data	The configuration data
 */
-void CDayOfTheWeek::ProcessConfigData(CConfigData *config_data)
+void CDayOfTheWeek::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -75,7 +75,7 @@ void CDayOfTheWeek::ProcessConfigData(CConfigData *config_data)
 **
 **	@param	config_data	The configuration data
 */
-void CMonth::ProcessConfigData(CConfigData *config_data)
+void CMonth::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -198,7 +198,7 @@ int CCalendar::GetTimeOfDay(const unsigned long long hours, const int hours_per_
 **
 **	@param	config_data	The configuration data
 */
-void CCalendar::ProcessConfigData(CConfigData *config_data)
+void CCalendar::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string base_day_of_the_week;
 	

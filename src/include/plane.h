@@ -54,8 +54,8 @@ public:
 	{
 	}
 	
-	static CPlane *GetPlane(std::string plane_ident);
-	static CPlane *GetOrAddPlane(std::string plane_ident);
+	static CPlane *GetPlane(const std::string &plane_ident);
+	static CPlane *GetOrAddPlane(const std::string &plane_ident);
 	static void ClearPlanes();
 	
 	static std::vector<CPlane *> Planes;								/// Planes

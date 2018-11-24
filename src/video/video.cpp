@@ -91,7 +91,7 @@
 #include "font.h"
 #include "iolib.h"
 #include "map.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 
 #include "SDL.h"

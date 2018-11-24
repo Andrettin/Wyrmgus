@@ -31,7 +31,7 @@
 
 #include "stratagus.h"
 #include "particle.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "video.h"
 
 #include <algorithm>

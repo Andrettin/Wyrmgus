@@ -124,7 +124,7 @@ void CTerrainType::ClearTerrainTypes()
 	TerrainTypesByColor.clear();
 }
 
-void CTerrainType::ProcessConfigData(CConfigData *config_data)
+void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string graphics_file;
 	std::string elevation_graphics_file;

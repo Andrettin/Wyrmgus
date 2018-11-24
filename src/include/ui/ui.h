@@ -45,10 +45,10 @@
 
 #include "color.h"
 #include "cursor.h"
-#include "interface.h"
 #include "minimap.h"
 #include "script.h"
 #include "viewport.h"
+#include "ui/interface.h"
 #include "ui/statusline.h"
 #include "ui/uitimer.h"
 

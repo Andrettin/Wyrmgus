@@ -40,14 +40,14 @@
 #include "intern_video.h"
 
 #include "editor.h"
-#include "interface.h"
 #include "map.h"
 #include "tileset.h"
 #include "translate.h"
-#include "ui.h"
 #include "unit.h"
 #include "unittype.h"
 #include "video.h"
+#include "ui/interface.h"
+#include "ui/ui.h"
 //Wyrmgus start
 #include "upgrade.h"
 //Wyrmgus end

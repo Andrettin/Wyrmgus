@@ -144,7 +144,7 @@ public:
 	{
 	}
 	
-	void ProcessConfigData(CConfigData *config_data);
+	void ProcessConfigData(const CConfigData *config_data);
 	
 	std::string Name;
 	bool Bound;					/// Whether the item is bound to its owner and can't be dropped

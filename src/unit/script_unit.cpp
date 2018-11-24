@@ -43,7 +43,6 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "interface.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -56,9 +55,8 @@
 #include "translate.h"
 //Wyrmgus end
 #include "trigger.h"
-//Wyrmgus start
-#include "ui.h"
-//Wyrmgus end
+#include "ui/interface.h"
+#include "ui/ui.h"
 #include "unit_find.h"
 #include "unit_manager.h"
 #include "unittype.h"

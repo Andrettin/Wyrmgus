@@ -39,10 +39,11 @@
 #include "ai.h"
 #include "ai_local.h"
 
-#include "interface.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+#include "ui/button_action.h"
+#include "ui/interface.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"

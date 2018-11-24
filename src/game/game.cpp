@@ -55,7 +55,6 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "interface.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map.h"
@@ -84,7 +83,9 @@
 #include "tileset.h"
 #include "translate.h"
 #include "trigger.h"
-#include "ui.h"
+#include "ui/button_action.h"
+#include "ui/interface.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"

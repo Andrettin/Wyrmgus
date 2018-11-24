@@ -37,7 +37,6 @@
 
 #include "netconnect.h"
 
-#include "interface.h"
 #include "map.h"
 #include "master.h"
 #include "network.h"
@@ -45,6 +44,7 @@
 #include "player.h"
 #include "script.h"
 #include "settings.h"
+#include "ui/interface.h"
 #include "version.h"
 #include "video.h"
 

@@ -121,7 +121,7 @@ public:
 	static void GenerateCharacterHistory();		/// Generates history for characters
 	static void ResetCharacterHistory();		/// Removes generated history data from characters
 	
-	void ProcessConfigData(CConfigData *config_data);
+	void ProcessConfigData(const CConfigData *config_data);
 	void GenerateHistory();
 	void ResetHistory();
 	void SaveHistory();

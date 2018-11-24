@@ -50,7 +50,7 @@
 #include "spells.h"
 #include "tileset.h"
 #include "translate.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"

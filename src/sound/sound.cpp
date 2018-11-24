@@ -47,7 +47,7 @@
 //Wyrmgus start
 #include "tileset.h"
 //Wyrmgus end
-#include "ui.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "video.h"
 #include "widgets.h"
@@ -808,7 +808,7 @@ CSound::~CSound()
 	}
 }
 
-void CSound::ProcessConfigData(CConfigData *config_data)
+void CSound::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string ident = config_data->Ident;
 	ident = FindAndReplaceString(ident, "_", "-");

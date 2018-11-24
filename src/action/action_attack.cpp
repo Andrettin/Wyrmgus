@@ -56,7 +56,7 @@
 #include "sound.h"
 #include "spells.h"
 #include "tileset.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"

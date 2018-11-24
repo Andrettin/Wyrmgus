@@ -66,7 +66,6 @@
 #include "animation/animation_die.h"
 #include "commands.h"
 #include "depend.h"
-#include "interface.h"
 #include "luacallback.h"
 #include "map.h"
 #include "missile.h"
@@ -77,6 +76,7 @@
 //Wyrmgus start
 #include "tileset.h"
 //Wyrmgus end
+#include "ui/interface.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unit_manager.h"

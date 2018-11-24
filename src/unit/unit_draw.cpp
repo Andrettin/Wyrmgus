@@ -49,7 +49,6 @@
 #include "cursor.h"
 #include "editor.h"
 #include "font.h"
-#include "interface.h"
 #include "map.h"
 #include "player.h"
 #include "script.h"
@@ -62,7 +61,8 @@
 #include "unit_find.h"
 #include "unitsound.h"
 #include "unittype.h"
-#include "ui.h"
+#include "ui/interface.h"
+#include "ui/ui.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

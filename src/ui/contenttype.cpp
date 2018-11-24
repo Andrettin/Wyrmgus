@@ -41,8 +41,8 @@
 #include "action/action_built.h"
 #include "font.h"
 #include "translate.h"
+#include "ui/ui.h"
 #include "unit.h"
-#include "ui.h"
 #include "video.h"
 
 enum UStrIntType {

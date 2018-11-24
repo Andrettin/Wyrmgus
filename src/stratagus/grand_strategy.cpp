@@ -40,14 +40,14 @@
 #include "character.h"
 #include "game.h"	// for loading screen elements
 #include "font.h"	// for grand strategy mode tooltip drawing
-#include "interface.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "menus.h"
 #include "player.h"
 #include "results.h"
 #include "sound_server.h"
-#include "ui.h"
+#include "ui/interface.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unittype.h"
 #include "upgrade.h"

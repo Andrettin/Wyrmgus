@@ -228,7 +228,6 @@
 
 #include "actions.h"
 #include "commands.h"
-#include "interface.h"
 #include "map.h"
 #include "net_lowlevel.h"
 #include "net_message.h"
@@ -238,6 +237,7 @@
 #include "replay.h"
 #include "sound.h"
 #include "translate.h"
+#include "ui/interface.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"

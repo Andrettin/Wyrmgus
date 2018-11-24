@@ -77,7 +77,7 @@ public:
 	static std::map<std::string, CTerrainType *> TerrainTypesByCharacter;
 	static std::map<std::tuple<int, int, int>, CTerrainType *> TerrainTypesByColor;
 
-	void ProcessConfigData(CConfigData *config_data);
+	void ProcessConfigData(const CConfigData *config_data);
 
 	std::string Ident;
 	std::string Name;

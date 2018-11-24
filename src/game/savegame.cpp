@@ -53,7 +53,7 @@
 #include "replay.h"
 #include "spells.h"
 #include "trigger.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"

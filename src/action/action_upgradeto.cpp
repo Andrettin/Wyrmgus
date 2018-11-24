@@ -42,7 +42,6 @@
 //Wyrmgus start
 #include "depend.h"
 #include "game.h"
-#include "interface.h"
 //Wyrmgus end
 #include "iolib.h"
 #include "map.h"
@@ -54,6 +53,7 @@
 #include "tileset.h"
 //Wyrmgus end
 #include "translate.h"
+#include "ui/interface.h"
 #include "unit.h"
 #include "unittype.h"
 //Wyrmgus start

@@ -61,7 +61,7 @@
 //Wyrmgus start
 #include "stratagus.h"
 #include "font.h"
-#include "interface.h"
+#include "ui/interface.h"
 #include "unit.h"
 #include "video.h"
 //Wyrmgus end

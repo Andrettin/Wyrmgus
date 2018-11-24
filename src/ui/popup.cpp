@@ -45,7 +45,8 @@
 #include "translate.h"
 //Wyrmgus end
 #include "trigger.h"
-#include "ui.h"
+#include "ui/button_action.h"
+#include "ui/ui.h"
 //Wyrmgus start
 #include "unit.h"
 #include "unit_manager.h"

@@ -36,20 +36,21 @@
 
 #include "stratagus.h"
 
-#include "ui.h"
+#include "ui/ui.h"
 
 #include "font.h"
 //Wyrmgus start
 #include "icons.h"
 //Wyrmgus end
-#include "interface.h"
 #include "map.h"
 #include "menus.h"
 #include "script.h"
 #include "spells.h"
 #include "title.h"
 #include "util.h"
+#include "ui/button_action.h"
 #include "ui/contenttype.h"
+#include "ui/interface.h"
 #include "ui/popup.h"
 #include "unit.h"
 #include "unit_manager.h"

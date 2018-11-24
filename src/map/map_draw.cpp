@@ -42,9 +42,9 @@
 #include "terrain_type.h"
 #include "tileset.h"
 #include "translate.h"
+#include "ui/ui.h"
 #include "unit.h"
 #include "unittype.h"
-#include "ui.h"
 #include "video.h"
 
 

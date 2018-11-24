@@ -121,7 +121,7 @@ public:
 	}
 	~CSound();
 	
-	static void ProcessConfigData(CConfigData *config_data);
+	static void ProcessConfigData(const CConfigData *config_data);
 		
 	unsigned int Mapref;
 	/**

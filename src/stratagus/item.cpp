@@ -371,7 +371,7 @@ CUniqueItem *GetUniqueItem(std::string item_ident)
 	return NULL;
 }
 
-void CPersistentItem::ProcessConfigData(CConfigData *config_data)
+void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 {
 	bool is_equipped = false;
 	

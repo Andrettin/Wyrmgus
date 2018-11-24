@@ -57,7 +57,7 @@ public:
 	{
 	}
 	
-	void ProcessConfigData(CConfigData *config_data);
+	void ProcessConfigData(const CConfigData *config_data);
 
 	std::string Ident;
 	std::string Name;
@@ -73,7 +73,7 @@ public:
 	{
 	}
 	
-	void ProcessConfigData(CConfigData *config_data);
+	void ProcessConfigData(const CConfigData *config_data);
 
 	std::string Name;
 	int Days;
@@ -98,7 +98,7 @@ public:
 	static std::map<std::string, CCalendar *> CalendarsByIdent;
 	static CCalendar *BaseCalendar;
 	
-	void ProcessConfigData(CConfigData *config_data);
+	void ProcessConfigData(const CConfigData *config_data);
 private:
 	CDayOfTheWeek *GetDayOfTheWeekByIdent(const std::string &ident);
 	void AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date);

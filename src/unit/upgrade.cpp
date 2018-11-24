@@ -59,7 +59,6 @@
 #include "game.h"
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "interface.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "item.h"
@@ -78,7 +77,8 @@
 #include "unit.h"
 #include "unit_find.h"
 //Wyrmgus start
-#include "ui.h"
+#include "ui/interface.h"
+#include "ui/ui.h"
 #include "unit_manager.h"
 //Wyrmgus end
 #include "unittype.h"

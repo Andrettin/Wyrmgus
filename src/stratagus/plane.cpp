@@ -37,7 +37,7 @@
 
 #include "plane.h"
 
-#include "ui.h"
+#include "ui/ui.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -49,7 +49,7 @@ std::vector<CPlane *> CPlane::Planes;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CPlane *CPlane::GetPlane(std::string plane_ident)
+CPlane *CPlane::GetPlane(const std::string &plane_ident)
 {
 	for (size_t i = 0; i < Planes.size(); ++i) {
 		if (plane_ident == Planes[i]->Ident) {
@@ -60,7 +60,7 @@ CPlane *CPlane::GetPlane(std::string plane_ident)
 	return NULL;
 }
 
-CPlane *CPlane::GetOrAddPlane(std::string plane_ident)
+CPlane *CPlane::GetOrAddPlane(const std::string &plane_ident)
 {
 	CPlane *plane = GetPlane(plane_ident);
 	

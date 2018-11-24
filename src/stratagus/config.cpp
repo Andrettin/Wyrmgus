@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name config.cpp - The config file. */
+/**@name config.cpp - The config source file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -48,6 +48,7 @@
 #include "sound.h"
 #include "terrain_type.h"
 #include "timeline.h"
+#include "ui/button_action.h"
 #include "unittype.h"
 #include "util.h"
 
@@ -61,7 +62,12 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CConfigData::ParseConfigData(std::string filepath, bool define_only)
+/**
+**	@brief	Parse a configuration data file
+**
+**	@param	define_only	Whether the elements in the configuration data should only be defined with their ident, without their properties being processed
+*/
+void CConfigData::ParseConfigData(const std::string &filepath, const bool define_only)
 {
 	std::vector<std::string> data;
 	std::vector<CConfigData *> output;
@@ -138,7 +144,13 @@ void CConfigData::ParseConfigData(std::string filepath, bool define_only)
 	ProcessConfigData(output, define_only);
 }
 
-void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_data_list, bool define_only)
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data_list	The list of configuration data
+**	@param	define_only			Whether the elements in the configuration data should only be defined with their ident, without their properties being processed
+*/
+void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_data_list, const bool define_only)
 {
 	for (size_t i = 0; i < config_data_list.size(); ++i) {
 		CConfigData *config_data = config_data_list[i];
@@ -154,6 +166,10 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			}
 			if (!define_only) {
 				animations->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "button") {
+			if (!define_only) {
+				ButtonAction::ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "calendar") {
 			CCalendar *calendar = CCalendar::GetOrAddCalendar(ident);

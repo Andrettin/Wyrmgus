@@ -85,7 +85,7 @@ void CTimeline::ClearTimelines()
 	Timelines.clear();
 }
 
-void CTimeline::ProcessConfigData(CConfigData *config_data)
+void CTimeline::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;

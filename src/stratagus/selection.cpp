@@ -40,12 +40,12 @@
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end
-#include "interface.h"
 #include "iolib.h"
 #include "map.h"
 #include "network.h"
 #include "player.h"
-#include "ui.h"
+#include "ui/interface.h"
+#include "ui/ui.h"
 #include "unittype.h"
 #include "unit.h"
 #include "unit_find.h"

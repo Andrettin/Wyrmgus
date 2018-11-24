@@ -52,11 +52,11 @@
 #include "tileset.h"
 //Wyrmgus end
 #include "translate.h"
+#include "ui/ui.h"
 #include "unit.h"
 //Wyrmgus start
 #include "unit_find.h"
 //Wyrmgus end
-#include "ui.h"
 #include "unittype.h"
 #include "video.h"
 

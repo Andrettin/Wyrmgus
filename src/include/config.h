@@ -51,8 +51,8 @@ public:
 	{
 	}
 	
-	static void ParseConfigData(std::string filepath, bool define_only);
-	static void ProcessConfigData(const std::vector<CConfigData *> &config_data_list, bool define_only);
+	static void ParseConfigData(const std::string &filepath, const bool define_only);
+	static void ProcessConfigData(const std::vector<CConfigData *> &config_data_list, const bool define_only);
 	
 	std::string Tag;
 	std::string Ident;

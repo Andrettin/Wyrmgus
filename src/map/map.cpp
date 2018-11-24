@@ -62,12 +62,12 @@
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
+#include "ui/ui.h"
 #include "unit.h"
 //Wyrmgus start
 #include "unit_find.h"
 //Wyrmgus end
 #include "unit_manager.h"
-#include "ui.h"
 //Wyrmgus start
 #include "upgrade.h"
 //Wyrmgus end

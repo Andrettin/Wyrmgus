@@ -63,7 +63,7 @@ public:
 	static std::vector<CTimeline *> Timelines;
 	static std::map<std::string, CTimeline *> TimelinesByIdent;
 	
-	void ProcessConfigData(CConfigData *config_data);
+	void ProcessConfigData(const CConfigData *config_data);
 	
 	int ID;
 	std::string Ident;

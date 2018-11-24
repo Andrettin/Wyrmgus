@@ -339,6 +339,7 @@ source_group(stratagusmain FILES ${stratagus_SRCS})
 
 set(ui_SRCS
 	src/ui/botpanel.cpp
+	src/ui/button_action.cpp
 	src/ui/button_checks.cpp
 	src/ui/contenttype.cpp
 	src/ui/icons.cpp
@@ -602,7 +603,6 @@ set(stratagus_generic_HDRS
 	src/include/game.h
 	src/include/grand_strategy.h
 	src/include/icons.h
-	src/include/interface.h
 	src/include/iocompat.h
 	src/include/iolib.h
 	src/include/item.h
@@ -648,11 +648,13 @@ set(stratagus_generic_HDRS
 	src/include/title.h
 	src/include/translate.h
 	src/include/trigger.h
+	src/include/ui/button_action.h
 	src/include/ui/contenttype.h
+	src/include/ui/interface.h
 	src/include/ui/popup.h
 	src/include/ui/statusline.h
+	src/include/ui/ui.h
 	src/include/ui/uitimer.h
-	src/include/ui.h
 	src/include/unit.h
 	src/include/unit_cache.h
 	src/include/unit_find.h
