@@ -299,6 +299,54 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			this->HistoricalLocations.push_back(std::tuple<CDate, CMapTemplate *, Vec2i>(date, map_template, character_pos));
+		} else if (child_config_data->Tag == "historical_title") {
+			int title = -1;
+			CDate start_date;
+			CDate end_date;
+			CFaction *title_faction = NULL;
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "title") {
+					value = FindAndReplaceString(value, "_", "-");
+					title = GetCharacterTitleIdByName(value);
+					if (title == -1) {
+						fprintf(stderr, "Character title \"%s\" does not exist.\n", value.c_str());
+					}
+				} else if (key == "start_date") {
+					value = FindAndReplaceString(value, "_", "-");
+					start_date = CDate::FromString(value);
+				} else if (key == "end_date") {
+					value = FindAndReplaceString(value, "_", "-");
+					end_date = CDate::FromString(value);
+				} else if (key == "faction") {
+					value = FindAndReplaceString(value, "_", "-");
+					title_faction = PlayerRaces.GetFaction(value);
+					if (!title_faction) {
+						fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
+					}
+				} else {
+					fprintf(stderr, "Invalid historical title property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (title == -1) {
+				fprintf(stderr, "Historical title has no title.\n");
+				continue;
+			}
+			
+			if (!title_faction) {
+				fprintf(stderr, "Historical title has no faction.\n");
+				continue;
+			}
+			
+			if (start_date.Year != 0 && end_date.Year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
+				title_faction->HistoricalMinisters[std::tuple<CDate, CDate, int>(start_date, end_date, title)] = this;
+			}
+				
+			this->HistoricalTitles.push_back(std::tuple<CDate, CDate, CFaction *, int>(start_date, end_date, title_faction, title));
 		} else if (child_config_data->Tag == "item") {
 			CPersistentItem *item = new CPersistentItem;
 			item->Owner = this;
