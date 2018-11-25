@@ -42,6 +42,7 @@
 
 #include "action/action_upgradeto.h"
 #include "actions.h"
+#include "age.h"
 #include "ai.h"
 //Wyrmgus start
 #include "../ai/ai_local.h" //for using AiHelpers
@@ -863,6 +864,9 @@ void CPlayer::Save(CFile &file) const
 	if (p.Dynasty) {
 		file.printf(" \"dynasty\", \"%s\",", p.Dynasty->Ident.c_str());
 	}
+	if (p.Age) {
+		file.printf(" \"age\", \"%s\",", p.Age->Ident.c_str());
+	}
 	for (int i = 0; i < PlayerColorMax; ++i) {
 		if (PlayerColors[i][0] == this->Color) {
 			file.printf(" \"color\", %d,", i);
@@ -1291,12 +1295,11 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	this->Type = type;
 	this->Race = 0;
-	//Wyrmgus start
 	this->Faction = -1;
-	this->Dynasty = NULL;
 	this->Religion = NULL;
+	this->Dynasty = NULL;
+	this->Age = NULL;
 	this->Overlord = NULL;
-	//Wyrmgus end
 	this->Team = team;
 	this->Enemy = 0;
 	this->Allied = 0;
@@ -1617,9 +1620,9 @@ void CPlayer::SetRandomFaction()
 }
 
 /**
-**  Change player dynasty.
+**	@brief	Change player dynasty.
 **
-**  @param dynasty    New dynasty.
+**	@param	dynasty	New dynasty.
 */
 void CPlayer::SetDynasty(CDynasty *dynasty)
 {
@@ -1651,6 +1654,47 @@ void CPlayer::SetDynasty(CDynasty *dynasty)
 		CUnit &unit = this->GetUnit(i);
 		unit.UpdateSoldUnits(); //in case conditions changed (i.e. some heroes may require a certain dynasty)
 	}
+}
+
+/**
+**	@brief	Check which age fits the player's current situation best, and set it as the player's age
+*/
+void CPlayer::CheckAge()
+{
+	//pick an age which fits the player, giving priority to the last-defined ones
+	CAge *age = NULL;
+	
+	for (size_t i = 0; i < CAge::Ages.size(); ++i) {
+		CAge *potential_age = CAge::Ages[i];
+		
+		bool has_required_upgrades = true;
+		for (size_t j = 0; j < potential_age->RequiredUpgrades.size(); ++j) {
+			CUpgrade *upgrade = potential_age->RequiredUpgrades[j];
+			if (this->Allow.Upgrades[upgrade->ID] != 'R') {
+				has_required_upgrades = false;
+				break;
+			}
+		}
+		if (!has_required_upgrades) {
+			continue;
+		}
+		
+		bool has_required_upgrade_classes = true;
+		for (size_t j = 0; j < potential_age->RequiredUpgradeClasses.size(); ++j) {
+			int upgrade_class = potential_age->RequiredUpgradeClasses[j];
+			if (!this->HasUpgradeClass(upgrade_class)) {
+				has_required_upgrade_classes = false;
+				break;
+			}
+		}
+		if (!has_required_upgrade_classes) {
+			continue;
+		}
+		
+		age = potential_age;
+	}
+	
+	this->Age = age;
 }
 
 void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
@@ -1718,7 +1762,7 @@ bool CPlayer::IsPlayerColorUsed(int color)
 
 bool CPlayer::HasUpgradeClass(int upgrade_class)
 {
-	if (this->Race == -1  || upgrade_class == -1) {
+	if (this->Race == -1 || upgrade_class == -1) {
 		return false;
 	}
 	
@@ -2267,13 +2311,12 @@ void CPlayer::Clear()
 	Name.clear();
 	Type = 0;
 	Race = 0;
-	//Wyrmgus start
 	Faction = -1;
-	Dynasty = NULL;
 	Religion = NULL;
+	Dynasty = NULL;
+	Age = NULL;
 	Overlord = NULL;
 	Vassals.clear();
-	//Wyrmgus end
 	AiName.clear();
 	Team = 0;
 	Enemy = 0;

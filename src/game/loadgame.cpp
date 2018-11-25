@@ -36,6 +36,7 @@
 #include "stratagus.h"
 
 #include "actions.h"
+#include "age.h"
 #include "ai.h"
 #include "calendar.h"
 #include "character.h"
@@ -106,6 +107,7 @@ void CleanModules()
 	CleanTriggers();
 	FreeAi();
 	PlayerRaces.Clean();
+	CAge::ClearAges();
 	CCalendar::ClearCalendars();
 	//Wyrmgus start
 	CleanCharacters();

@@ -75,6 +75,7 @@ class CGraphic;
 class CUnit;
 class CUnitType;
 //Wyrmgus start
+class CAge;
 class CCalendar;
 class CCharacter;
 class CCivilization;
@@ -120,11 +121,10 @@ public:
 
 	int   Type;         /// type of player (human,computer,...)
 	int   Race;         /// race of player (orc,human,...)
-	//Wyrmgus start
 	int Faction;		/// faction of the player
 	CReligion *Religion;	/// religion of the player
 	CDynasty *Dynasty;		/// ruling dynasty of the player
-	//Wyrmgus end
+	CAge *Age;			/// The current age the player/faction is in
 	std::string AiName; /// AI for computer
 
 	// friend enemy detection
@@ -233,6 +233,7 @@ public:
 	void SetFaction(CFaction *faction);
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
+	void CheckAge();
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(int upgrade_class);

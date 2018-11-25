@@ -2234,19 +2234,14 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 			player.Deities.push_back(upgrade_deity);
 		}
 	}
+	//Wyrmgus end
 	
-	/*
-	for (int z = 0; z < NumUpgradeModifiers; ++z) {
-		if (UpgradeModifiers[z]->UpgradeId == id) {
-			ApplyUpgradeModifier(player, UpgradeModifiers[z]);
-		}
-	}
-	*/
 	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 		ApplyUpgradeModifier(player, upgrade->UpgradeModifiers[z]);
 	}
-	//Wyrmgus end
 
+	player.CheckAge();
+	
 	//
 	//  Upgrades could change the buttons displayed.
 	//
@@ -2325,21 +2320,16 @@ void ApplyUpgrades()
 					Players[p].UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 					AllowUpgradeId(Players[p], id, 'R');  // research done
 
-					//Wyrmgus start
-					/*
-					for (int z = 0; z < NumUpgradeModifiers; ++z) {
-						if (UpgradeModifiers[z]->UpgradeId == id) {
-							ApplyUpgradeModifier(Players[p], UpgradeModifiers[z]);
-						}
-					}
-					*/
 					for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 						ApplyUpgradeModifier(Players[p], upgrade->UpgradeModifiers[z]);
 					}
-					//Wyrmgus end
 				}
 			}
 		}
+	}
+	
+	for (int p = 0; p < PlayerMax; ++p) {
+		Players[p].CheckAge();
 	}
 }
 

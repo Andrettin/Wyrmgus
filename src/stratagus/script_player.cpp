@@ -10,7 +10,7 @@
 //
 /**@name script_player.cpp - The player ccl functions. */
 //
-//      (c) Copyright 2001-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 #include "player.h"
 
 #include "actions.h"
+#include "age.h"
 #include "ai.h"
 #include "calendar.h"
 #include "character.h"
@@ -158,6 +159,8 @@ void CPlayer::Load(lua_State *l)
 			this->Faction = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "dynasty")) {
 			this->Dynasty = PlayerRaces.GetDynasty(LuaToString(l, j + 1));
+		} else if (!strcmp(value, "age")) {
+			this->Age = CAge::GetAge(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "color")) {
 			int color_id = LuaToNumber(l, j + 1);
 			this->Color = PlayerColors[color_id][0];

@@ -298,6 +298,7 @@ set(spell_SRCS
 source_group(spell FILES ${spell_SRCS})
 
 set(stratagusmain_SRCS
+	src/stratagus/age.cpp
 	src/stratagus/calendar.cpp
 	src/stratagus/character.cpp
 	src/stratagus/civilization.cpp
@@ -587,6 +588,7 @@ set(stratagus_generic_HDRS
 	src/video/intern_video.h
 	src/video/renderer.h
 	src/include/actions.h
+	src/include/age.h
 	src/include/ai.h
 	src/include/animation.h
 	src/include/calendar.h

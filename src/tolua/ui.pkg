@@ -165,6 +165,7 @@ class CUserInterface
 	CResourceInfo TimePanel;
 	CResourceInfo MonthPanel;
 	CResourceInfo DatePanel;
+	CResourceInfo AgePanel;
 	CUIButton *SingleSelectedButton;
 
 	vector<CUIButton> SelectedButtons;

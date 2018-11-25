@@ -37,6 +37,7 @@
 
 #include "config.h"
 
+#include "age.h"
 #include "animation.h"
 #include "calendar.h"
 #include "character.h"
@@ -157,7 +158,12 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		std::string ident = config_data->Ident;
 		ident = FindAndReplaceString(ident, "_", "-");
 		
-		if (config_data->Tag == "animations") {
+		if (config_data->Tag == "age") {
+			CAge *age = CAge::GetOrAddAge(ident);
+			if (!define_only) {
+				age->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "animations") {
 			CAnimations *animations = AnimationsByIdent(ident);
 			if (!animations) {
 				animations = new CAnimations;

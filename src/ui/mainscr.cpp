@@ -40,6 +40,7 @@
 #include "action/action_research.h"
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
+#include "age.h"
 #include "calendar.h"
 #include "civilization.h"
 #include "font.h"
@@ -944,6 +945,11 @@ void DrawDayTime() {
 				CLabel label(GetGameFont());
 				label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, date_string);
 			}
+		}
+		
+		if (UI.AgePanel.TextX != -1 && ThisPlayer->Age) {
+			CLabel label(GetGameFont());
+			label.Draw(UI.AgePanel.TextX, UI.AgePanel.TextY, ThisPlayer->Age->Name);
 		}
 	}
 }
