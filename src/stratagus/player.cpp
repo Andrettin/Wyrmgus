@@ -1690,8 +1690,34 @@ void CPlayer::CheckAge()
 			continue;
 		}
 		
-		this->Age = potential_age;
-		break;
+		this->SetAge(potential_age);
+		return;
+	}
+	
+	this->SetAge(NULL);
+}
+
+/**
+**	@brief	Set the player's age
+**
+**	@param	age	The age to be set for the player
+*/
+void CPlayer::SetAge(CAge *age)
+{
+	if (this->Age == age) {
+		return;
+	}
+	
+	this->Age = age;
+	
+	if (this == ThisPlayer) {
+		if (this->Age) {
+			UI.AgePanel.Text = this->Age->Name;
+			UI.AgePanel.G = this->Age->G;
+		} else {
+			UI.AgePanel.Text.clear();
+			UI.AgePanel.G = NULL;
+		}
 	}
 }
 

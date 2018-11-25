@@ -46,14 +46,18 @@
 
 class CAge;
 class CConfigData;
+class CGraphic;
 class CUpgrade;
 
 class CAge
 {
 public:
-	CAge()
+	CAge() :
+		G(NULL)
 	{
 	}
+	
+	~CAge();
 	
 	static CAge *GetAge(const std::string &ident);
 	static CAge *GetOrAddAge(const std::string &ident);
@@ -67,6 +71,7 @@ public:
 public:
 	std::string Ident;
 	std::string Name;
+	CGraphic *G;
 	std::vector<CUpgrade *> RequiredUpgrades;		/// the upgrades required for the age
 	std::vector<int> RequiredUpgradeClasses;		/// the upgrade classes required for the age
 };

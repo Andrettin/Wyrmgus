@@ -946,11 +946,20 @@ void DrawDayTime() {
 				label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, date_string);
 			}
 		}
-		
-		if (UI.AgePanel.TextX != -1 && ThisPlayer->Age) {
-			CLabel label(GetGameFont());
-			label.Draw(UI.AgePanel.TextX, UI.AgePanel.TextY, ThisPlayer->Age->Name);
-		}
+	}
+}
+
+/**
+**	@brief	Draw the age
+*/
+void DrawAge() {
+	if (UI.AgePanel.G) {
+		UI.AgePanel.G->DrawFrameClip(UI.AgePanel.IconFrame, UI.AgePanel.IconX, UI.AgePanel.IconY);
+	}
+	
+	if (UI.AgePanel.TextX != -1 && !UI.AgePanel.Text.empty()) {
+		CLabel label(GetGameFont());
+		label.Draw(UI.AgePanel.TextX, UI.AgePanel.TextY, UI.AgePanel.Text);
 	}
 }
 

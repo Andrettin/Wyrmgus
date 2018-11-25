@@ -239,7 +239,7 @@ void MissileType::ProcessConfigData(const CConfigData *config_data)
 			
 			this->G = CGraphic::New(file, this->Width(), this->Height());
 		} else {
-			fprintf(stderr, "Invalid icon property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid missile type property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
 	

@@ -234,6 +234,7 @@ public:
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
 	void CheckAge();
+	void SetAge(CAge *age);
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(int upgrade_class);
