@@ -170,11 +170,13 @@ int SaveGame(const std::string &filename)
 	// FIXME: probably not the right place for this
 	file.printf("GameCycle = %lu\n", GameCycle);
 	file.printf("GameHour = %llu\n", GameHour);
-	file.printf("SetCurrentDate(\"%s\")\n", CDate::CurrentDate.ToString(CCalendar::BaseCalendar).c_str());
 	for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
 		const CCalendar *calendar = CCalendar::Calendars[i];
 		if (calendar->CurrentDayOfTheWeek != -1) {
 			file.printf("SetCurrentDayOfTheWeek(\"%s\", %d)\n", calendar->Ident.c_str(), calendar->CurrentDayOfTheWeek);
+		}
+		if (calendar->CurrentDate.Year != 0) {
+			file.printf("SetCurrentDate(\"%s\", \"%s\")\n", calendar->Ident.c_str(), calendar->CurrentDate.ToString(CCalendar::BaseCalendar).c_str());
 		}
 	}
 

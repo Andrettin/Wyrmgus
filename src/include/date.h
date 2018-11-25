@@ -56,23 +56,18 @@ public:
 	}
 	
 	static CDate FromString(std::string date_str);
-	static void UpdateCurrentDateDisplayString();
 	
-	static CDate CurrentDate;
-	static std::string CurrentDateDisplayString;
-
 	void Clear();
 	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
 	void AddYears(const int years);
 	void AddMonths(const CCalendar *calendar, const int months);
-	void AddDays(const CCalendar *calendar, const int days, const int day_multiplier = 0);
-	void AddHours(const CCalendar *calendar, const long long int hours, const int day_multiplier = 0);
+	void AddDays(const CCalendar *calendar, const int days, const int day_multiplier = 1);
+	void AddHours(const CCalendar *calendar, const long long int hours, const int day_multiplier = 1);
 	CDate ToCalendar(CCalendar *current_calendar, CCalendar *new_calendar) const;
 	CDate ToBaseCalendar(CCalendar *current_calendar) const;
 	std::string ToString(const CCalendar *calendar) const;
 	std::string ToDisplayString(const CCalendar *calendar) const;
-	std::string ToDayMonthExtendedDisplayString(const CCalendar *calendar) const;
-	int GetTotalDays(const CCalendar *calendar) const;				/// gets the total amount of days, counting from the year "zero"
+	int GetTotalDays(const CCalendar *calendar) const;
 	unsigned long long GetTotalHours(CCalendar *calendar) const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
 	int GetDayOfTheWeek(const CCalendar *calendar) const;			/// gets the day of the week for this date in a given calendar
 	
@@ -163,7 +158,7 @@ public:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void SetCurrentDate(std::string date_string);
+extern void SetCurrentDate(std::string calendar_ident, std::string date_string);
 extern void SetCurrentDayOfTheWeek(std::string calendar_ident, int day_of_the_week);
 
 //@}

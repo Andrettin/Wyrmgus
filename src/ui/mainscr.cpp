@@ -40,6 +40,8 @@
 #include "action/action_research.h"
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
+#include "calendar.h"
+#include "civilization.h"
 #include "font.h"
 #include "icons.h"
 #include "map/map.h"
@@ -899,32 +901,51 @@ void DrawResources()
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Draw the day time.
+**	@brief	Draw the time of day
 */
 void DrawDayTime() {
-	std::string date_time_text = CDate::CurrentDateDisplayString;
-	
-	if (Map.MapLayers[CurrentMapLayer]->TimeOfDay != NoTimeOfDay && Map.MapLayers[CurrentMapLayer]->TimeOfDay < MaxTimesOfDay) {
-		char timesText[MaxTimesOfDay][16] = {
-			"NoTime",
-			"Dawn",
-			"Morning",
-			"Midday",
-			"Afternoon",
-			"Dusk",
-			"Early Night",
-			"Midnight",
-			"Late Night"
-		};
-		
-		date_time_text += " - ";
-		date_time_text += _(timesText[Map.MapLayers[CurrentMapLayer]->TimeOfDay]);
+	if (UI.TimePanel.TextX != -1) {
+		if (Map.MapLayers[CurrentMapLayer]->TimeOfDay != NoTimeOfDay && Map.MapLayers[CurrentMapLayer]->TimeOfDay < MaxTimesOfDay) {
+			char timesText[MaxTimesOfDay][16] = {
+				"NoTime",
+				"Dawn",
+				"Morning",
+				"Midday",
+				"Afternoon",
+				"Dusk",
+				"Early Night",
+				"Midnight",
+				"Late Night"
+			};
+			
+			std::string time_of_day_string = _(timesText[Map.MapLayers[CurrentMapLayer]->TimeOfDay]);
+
+			CLabel label(GetGameFont());
+
+			// TODO: Instead of a simple text here we could use an icon per time of day
+			label.Draw(UI.TimePanel.TextX, UI.TimePanel.TextY, time_of_day_string);
+		}
 	}
-
-	CLabel label(GetGameFont());
-
-	// TODO: Instead of a simple text here we could use an icon per time of day
-	label.Draw(UI.TimePanel.X - GetGameFont().getWidth(date_time_text) / 2, UI.TimePanel.Y, date_time_text);
+	
+	if (ThisPlayer) {
+		CCalendar *calendar = CCivilization::Civilizations[ThisPlayer->Race]->GetCalendar();
+		
+		if (calendar) {
+			if (UI.MonthPanel.TextX != -1) {
+				std::string month_string = calendar->Months[calendar->CurrentDate.Month - 1]->Name;
+				
+				CLabel label(GetGameFont());
+				label.Draw(UI.MonthPanel.TextX, UI.MonthPanel.TextY, month_string);
+			}
+			
+			if (UI.DatePanel.TextX != -1) {
+				std::string date_string = calendar->CurrentDate.ToDisplayString(calendar);
+				
+				CLabel label(GetGameFont());
+				label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, date_string);
+			}
+		}
+	}
 }
 
 /*----------------------------------------------------------------------------

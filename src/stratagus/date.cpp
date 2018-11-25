@@ -47,9 +47,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-CDate CDate::CurrentDate;
-std::string CDate::CurrentDateDisplayString;
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -103,18 +100,6 @@ CDate CDate::FromString(std::string date_str)
 	}
 	
 	return date;
-}
-
-void CDate::UpdateCurrentDateDisplayString()
-{
-	if (!ThisPlayer) {
-		CurrentDateDisplayString = "";
-		return;
-	}
-	
-	CCalendar *calendar = CCivilization::Civilizations[ThisPlayer->Race]->GetCalendar();
-	
-	CurrentDateDisplayString = CurrentDate.ToDayMonthExtendedDisplayString(calendar);
 }
 
 void CDate::Clear()
@@ -271,7 +256,7 @@ std::string CDate::ToDisplayString(const CCalendar *calendar) const
 {
 	std::string display_string;
 	
-	display_string += std::to_string((long long) abs(this->Year)) + "." + std::to_string((long long) this->Month) + "." + std::to_string((long long) this->Day);
+	display_string += std::to_string((long long) this->Day) + "." + std::to_string((long long) this->Month) + "." + std::to_string((long long) abs(this->Year));
 	
 	if (!calendar) {
 		fprintf(stderr, "Calendar does not exist.\n");
@@ -295,24 +280,13 @@ std::string CDate::ToDisplayString(const CCalendar *calendar) const
 	return display_string;
 }
 
-std::string CDate::ToDayMonthExtendedDisplayString(const CCalendar *calendar) const
-{
-	std::string display_string;
-	
-	if (!calendar) {
-		fprintf(stderr, "Calendar does not exist.\n");
-		return display_string;
-	}
-	
-	if (calendar->CurrentDayOfTheWeek != -1) {
-		display_string += calendar->DaysOfTheWeek[calendar->CurrentDayOfTheWeek]->Name + " - ";
-	}
-	
-	display_string += calendar->Months[this->Month - 1]->Name + " (" + NumberToRomanNumeral(this->Month) + ")";
-	
-	return display_string;
-}
-
+/**
+**	@brief	Get the total amount of days counting from the date 1.1.1 of the calendar this date is presumed to use
+**
+**	@param	calendar	The calendar
+**
+**	@return	The amount of days
+*/
 int CDate::GetTotalDays(const CCalendar *calendar) const
 {
 	int days = 0;
@@ -343,6 +317,13 @@ unsigned long long CDate::GetTotalHours(CCalendar *calendar) const
 	return hours;
 }
 
+/**
+**	@brief	Get the day of the week for this date in a calendar (this date is presumed to already be in the calendar)
+**
+**	@param	calendar	The calendar
+**
+**	@return	The ID of the day of the week
+*/
 int CDate::GetDayOfTheWeek(const CCalendar *calendar) const
 {
 	if (!calendar->DaysOfTheWeek.empty() && calendar->BaseDayOfTheWeek) {
@@ -359,10 +340,15 @@ int CDate::GetDayOfTheWeek(const CCalendar *calendar) const
 	return -1;
 }
 
-void SetCurrentDate(std::string date_string)
+void SetCurrentDate(std::string calendar_ident, std::string date_string)
 {
-	CDate::CurrentDate = CDate::FromString(date_string);
-	CDate::UpdateCurrentDateDisplayString();
+	CCalendar *calendar = CCalendar::GetCalendar(calendar_ident);
+	
+	if (!calendar) {
+		return;
+	}
+	
+	calendar->CurrentDate = CDate::FromString(date_string);
 }
 
 void SetCurrentDayOfTheWeek(std::string calendar_ident, int day_of_the_week)

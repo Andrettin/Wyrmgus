@@ -1442,8 +1442,6 @@ void CPlayer::SetCivilization(int civilization)
 		
 		UI.Load();
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
-		
-		CDate::UpdateCurrentDateDisplayString();
 	}
 	
 	if (this->Race != -1) {

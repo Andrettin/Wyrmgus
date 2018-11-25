@@ -1676,19 +1676,21 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	
 	if (CurrentCampaign) {
 		GameHour = CurrentCampaign->StartDate.GetTotalHours(CCalendar::BaseCalendar);
-		CDate::CurrentDate = CurrentCampaign->StartDate;
+		CCalendar::BaseCalendar->CurrentDate = CurrentCampaign->StartDate;
 	} else {
-		CDate::CurrentDate.Clear();
-		CDate::CurrentDate.Year = 1;
-		CDate::CurrentDate.Month = SyncRand(CCalendar::BaseCalendar->Months.size()) + 1;
-		CDate::CurrentDate.Day = SyncRand(CCalendar::BaseCalendar->Months[CDate::CurrentDate.Month - 1]->Days) + 1;
-		CDate::CurrentDate.Hour = SyncRand(CCalendar::BaseCalendar->HoursPerDay);
-		GameHour = CDate::CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
+		CCalendar::BaseCalendar->CurrentDate.Clear();
+		CCalendar::BaseCalendar->CurrentDate.Year = 1;
+		CCalendar::BaseCalendar->CurrentDate.Month = SyncRand(CCalendar::BaseCalendar->Months.size()) + 1;
+		CCalendar::BaseCalendar->CurrentDate.Day = SyncRand(CCalendar::BaseCalendar->Months[CCalendar::BaseCalendar->CurrentDate.Month - 1]->Days) + 1;
+		CCalendar::BaseCalendar->CurrentDate.Hour = SyncRand(CCalendar::BaseCalendar->HoursPerDay);
+		GameHour = CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
 	}
 	
 	for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
 		CCalendar *calendar = CCalendar::Calendars[i];
-		calendar->CurrentDayOfTheWeek = CDate::CurrentDate.GetDayOfTheWeek(calendar);
+		
+		calendar->CurrentDate = CCalendar::BaseCalendar->CurrentDate.ToCalendar(CCalendar::BaseCalendar, calendar);
+		calendar->CurrentDayOfTheWeek = calendar->CurrentDate.GetDayOfTheWeek(calendar);
 	}
 	//Wyrmgus end
 
@@ -1887,8 +1889,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	// Triggers
 	//
 	InitTriggers();
-	
-	CDate::UpdateCurrentDateDisplayString();
 	
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 

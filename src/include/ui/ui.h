@@ -412,33 +412,35 @@ public:
 	/// Middle-Mouse Scroll Speed with Control pressed
 	int MouseScrollSpeedControl;
 
-	PixelPos MouseWarpPos;              /// Cursor warp screen position
+	PixelPos MouseWarpPos;				/// Cursor warp screen position
 
-	std::string NormalFontColor;        /// Color for normal text displayed
-	std::string ReverseFontColor;       /// Color for reverse text displayed
+	std::string NormalFontColor;		/// Color for normal text displayed
+	std::string ReverseFontColor;		/// Color for reverse text displayed
 
-	std::vector<CFiller> Fillers;       /// Filler graphics
+	std::vector<CFiller> Fillers;		/// Filler graphics
 
-	CResourceInfo Resources[MaxResourceInfo];/// Icon+Text of all resources
+	CResourceInfo Resources[MaxResourceInfo];	/// Icon+Text of all resources
 
-	CInfoPanel InfoPanel;               /// Info panel
-	CInfoPanel TimePanel;               /// Time panel
-	std::vector<CUnitInfoPanel *> InfoPanelContents;/// Info panel contents
+	CInfoPanel InfoPanel;				/// Info panel
+	CResourceInfo TimePanel;			/// Time panel
+	CResourceInfo MonthPanel;			/// Month panel
+	CResourceInfo DatePanel;			/// Date panel
+	std::vector<CUnitInfoPanel *> InfoPanelContents;	/// Info panel contents
 
-	std::vector<CPopup *> ButtonPopups; /// Popup windows for buttons
+	std::vector<CPopup *> ButtonPopups;	/// Popup windows for buttons
 
-	CUIButton *SingleSelectedButton;    /// Button for single selected unit
+	CUIButton *SingleSelectedButton;	/// Button for single selected unit
 
-	std::vector<CUIButton> SelectedButtons;/// Selected buttons
-	CFont *MaxSelectedFont;             /// Font type to use
-	int MaxSelectedTextX;               /// position to place '+#' text
-	int MaxSelectedTextY;               /// if > maximum units selected
+	std::vector<CUIButton> SelectedButtons;	/// Selected buttons
+	CFont *MaxSelectedFont;				/// Font type to use
+	int MaxSelectedTextX;				/// position to place '+#' text
+	int MaxSelectedTextY;				/// if > maximum units selected
 
-	CUIButton *SingleTrainingButton;    /// Button for single training
-	std::string SingleTrainingText;     /// Text for single training
-	CFont *SingleTrainingFont;          /// Font for single traning
-	int SingleTrainingTextX;            /// X text position single training
-	int SingleTrainingTextY;            /// Y text position single training
+	CUIButton *SingleTrainingButton;	/// Button for single training
+	std::string SingleTrainingText;		/// Text for single training
+	CFont *SingleTrainingFont;			/// Font for single traning
+	int SingleTrainingTextX;			/// X text position single training
+	int SingleTrainingTextY;			/// Y text position single training
 
 	std::vector<CUIButton> TrainingButtons;/// Training buttons
 	std::string TrainingText;           /// Multiple Training Text

@@ -114,7 +114,8 @@ public:
 	std::string YearLabel;														/// label used for years (e.g. AD)
 	std::string NegativeYearLabel;												/// label used for "negative" years (e.g. BC)
 	CDayOfTheWeek *BaseDayOfTheWeek;											/// the day of the week for the first day of the year in the calendar
-	int CurrentDayOfTheWeek;													/// the current day of the week for this calendar within a game
+	CDate CurrentDate;															/// the current date in this calendar within a game
+	int CurrentDayOfTheWeek;													/// the current day of the week in this calendar within a game
 	std::vector<CDayOfTheWeek *> DaysOfTheWeek;									/// the days of the week in the calendar
 	std::vector<CMonth *> Months;												/// the months in the calendar
 private:
