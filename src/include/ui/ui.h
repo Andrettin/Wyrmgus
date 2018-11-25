@@ -96,7 +96,7 @@ public:
 class ButtonStyle
 {
 public:
-	ButtonStyle() : Width(0), Height(0), Font(0),
+	ButtonStyle() : Width(0), Height(0), Font(NULL),
 		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
 
 	int Width;                      /// Button width
@@ -355,15 +355,17 @@ class CResourceInfo
 {
 public:
 	CResourceInfo() : G(NULL), IconFrame(0), IconX(0), IconY(0), IconWidth(-1),
-		TextX(-1), TextY(-1) {}
+		Font(NULL), TextX(-1), TextY(-1) {}
 
-	CGraphic *G;   /// icon graphic
-	int IconFrame; /// icon frame
-	int IconX;     /// icon X position
-	int IconY;     /// icon Y position
-	int IconWidth; /// icon W size
-	int TextX;     /// text X position
-	int TextY;     /// text Y position
+	CGraphic *G;	/// icon graphic
+	int IconFrame;	/// icon frame
+	int IconX;		/// icon X position
+	int IconY;		/// icon Y position
+	int IconWidth;	/// icon W size
+	CFont *Font;	/// Font
+	std::string Text;	/// text
+	int TextX;	/// text X position
+	int TextY;	/// text Y position
 };
 #define MaxResourceInfo  MaxCosts + 4 /// +4 for food and score and mana and free workers count
 

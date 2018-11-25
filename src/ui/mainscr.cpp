@@ -850,31 +850,41 @@ void DrawResources()
 				const int resAmount = ThisPlayer->StoredResources[i] + ThisPlayer->Resources[i];
 				char tmp[256];
 				snprintf(tmp, sizeof(tmp), "%d (%d)", resAmount, ThisPlayer->MaxResources[i] - ThisPlayer->StoredResources[i]);
-				label.SetFont(GetSmallFont());
+				
+				UI.Resources[i].Text = tmp;
+				UI.Resources[i].Font = &GetSmallFont();
+				label.SetFont(*UI.Resources[i].Font);
 
 				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + 3, tmp);
 			} else {
-				label.SetFont(resourceAmount > 99999 ? GetSmallFont() : GetGameFont());
+				UI.Resources[i].Text = FormatNumber(resourceAmount);
+				UI.Resources[i].Font = resourceAmount > 99999 ? &GetSmallFont() : &GetGameFont();
+				label.SetFont(*UI.Resources[i].Font);
 
-				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + (resourceAmount > 99999) * 3, resourceAmount);
+				label.Draw(UI.Resources[i].TextX, UI.Resources[i].TextY + (resourceAmount > 99999) * 3, UI.Resources[i].Text);
 			}
 		}
 	}
 	if (UI.Resources[FoodCost].TextX != -1) {
 		char tmp[256];
 		snprintf(tmp, sizeof(tmp), "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
-		label.SetFont(GetGameFont());
+		UI.Resources[FoodCost].Text = tmp;
+		UI.Resources[FoodCost].Font = &GetGameFont();
+		label.SetFont(*UI.Resources[FoodCost].Font);
 		if (ThisPlayer->Supply < ThisPlayer->Demand) {
-			label.DrawReverse(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, tmp);
+			label.DrawReverse(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, UI.Resources[FoodCost].Text);
 		} else {
-			label.Draw(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, tmp);
+			label.Draw(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, UI.Resources[FoodCost].Text);
 		}
 	}
 	if (UI.Resources[ScoreCost].TextX != -1) {
 		const int score = ThisPlayer->Score;
 
-		label.SetFont(score > 99999 ? GetSmallFont() : GetGameFont());
-		label.Draw(UI.Resources[ScoreCost].TextX, UI.Resources[ScoreCost].TextY + (score > 99999) * 3, score);
+		UI.Resources[ScoreCost].Text = FormatNumber(score);
+		UI.Resources[ScoreCost].Font = score > 99999 ? &GetSmallFont() : &GetGameFont();
+		
+		label.SetFont(*UI.Resources[ScoreCost].Font);
+		label.Draw(UI.Resources[ScoreCost].TextX, UI.Resources[ScoreCost].TextY + (score > 99999) * 3, UI.Resources[ScoreCost].Text);
 	}
 	if (UI.Resources[FreeWorkersCount].TextX != -1) {
 		const int workers = ThisPlayer->FreeWorkers.size();
@@ -889,7 +899,7 @@ void DrawResources()
 ----------------------------------------------------------------------------*/
 
 /**
-**  Draw the day time.
+**	@brief	Draw the day time.
 */
 void DrawDayTime() {
 	std::string date_time_text = CDate::CurrentDateDisplayString;
@@ -922,7 +932,7 @@ void DrawDayTime() {
 ----------------------------------------------------------------------------*/
 
 /**
-**  Draw the map layer buttons.
+**	@brief	Draw the map layer buttons.
 */
 void DrawMapLayerButtons()
 {
@@ -962,7 +972,7 @@ void DrawMapLayerButtons()
 
 //Wyrmgus start
 /**
-**  Draw certain popups if something is being hovered over
+**	@brief	Draw certain popups if something is being hovered over
 */
 void DrawPopups()
 {
@@ -1141,7 +1151,7 @@ void DrawPopups()
 		
 	//draw a popup when hovering over a resource icon
 	for (int i = 0; i < MaxCosts; ++i) {
-		if (UI.Resources[i].G && CursorScreenPos.x >= UI.Resources[i].IconX && CursorScreenPos.x < (UI.Resources[i].IconX + UI.Resources[i].G->Width) && CursorScreenPos.y >= UI.Resources[i].IconY && CursorScreenPos.y < (UI.Resources[i].IconY + UI.Resources[i].G->Height)) {
+		if (UI.Resources[i].G && CursorScreenPos.x >= UI.Resources[i].IconX && CursorScreenPos.x < (UI.Resources[i].TextX + UI.Resources[i].Font->Width(UI.Resources[i].Text)) && CursorScreenPos.y >= UI.Resources[i].IconY && CursorScreenPos.y < (UI.Resources[i].IconY + UI.Resources[i].G->Height)) {
 			//hackish way to make the popup appear correctly for the resource
 			ButtonAction *ba = new ButtonAction;
 			ba->Hint = CapitalizeString(DefaultResourceNames[i]);
@@ -1154,11 +1164,11 @@ void DrawPopups()
 		}
 	}
 	
-	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].IconX + UI.Resources[FoodCost].G->Width) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
+	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
 		DrawGenericPopup("Food", UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
-	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].IconX + UI.Resources[ScoreCost].G->Width) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
+	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
 		DrawGenericPopup("Score", UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	

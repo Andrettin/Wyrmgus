@@ -123,6 +123,7 @@ extern bool StringToBool(const std::string &str);
 extern bool IsStringNumber(const std::string &str);
 extern bool IsStringBool(const std::string &str);
 extern std::string NumberToRomanNumeral(unsigned number);
+extern std::string FormatNumber(const int number);
 extern std::string SnakeCaseToPascalCase(const std::string &str);
 
 /*----------------------------------------------------------------------------

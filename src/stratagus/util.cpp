@@ -375,6 +375,35 @@ std::string NumberToRomanNumeral(unsigned number)
 	return numeral;
 }
 
+/**
+**	@brief Format a number using commas
+**
+**	@param	number	Number to be formatted
+**
+**	@return	The formatted number as a string
+*/
+std::string FormatNumber(const int number)
+{
+	std::string str;
+	const char sep = ',';
+	char bufs[sizeof(int) * 10 + 2];
+	int s = 0;
+	int d = number < 0 ? 1 : 0;
+	const int sl = snprintf(bufs, sizeof(bufs), "%d", abs(number));
+
+	if (number < 0) {
+		str += '-';
+	}
+	while (s <= sl) {
+		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
+			str += sep;
+		}
+		str += bufs[s++];
+	}
+
+	return str;
+}
+
 std::string SnakeCaseToPascalCase(const std::string &str)
 {
 	if (str.empty()) {

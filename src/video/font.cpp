@@ -38,6 +38,7 @@
 #include "font.h"
 
 #include "intern_video.h"
+#include "util.h"
 #include "video.h"
 
 #include <vector>
@@ -71,9 +72,6 @@ static std::map<const CFont *, FontColorGraphicMap> FontColorGraphics;
 // FIXME: remove these
 static CFont *SmallFont;  /// Small font used in stats
 static CFont *GameFont;   /// Normal font used in game
-
-static int FormatNumber(int number, char *buf);
-
 
 CFont &GetSmallFont()
 {
@@ -313,37 +311,12 @@ int CFont::Width(const int number) const
 #endif
 	int utf8;
 	size_t pos = 0;
-	char text[ sizeof(int) * 10 + 2];
-	const int len = FormatNumber(number, text);
+	std::string text = FormatNumber(number);
+	const int len = text.length();
 
 	DynamicLoad();
-	while (GetUTF8(text, len, pos, utf8)) {
-#if 0
-		if (utf8 == '~') {
-			//if (pos >= text.size()) {  // bad formatted string
-			if (pos >= size) {  // bad formatted string
-				break;
-			}
-			if (text[pos] == '<' || text[pos] == '>') {
-				isformat = false;
-				++pos;
-				continue;
-			}
-			if (text[pos] == '!') {
-				++pos;
-				continue;
-			}
-			if (text[pos] != '~') { // ~~ -> ~
-				isformat = !isformat;
-				continue;
-			}
-		}
-		if (!isformat) {
-			width += this->CharWidth[utf8 - 32] + 1;
-		}
-#else
+	while (GetUTF8(text.c_str(), len, pos, utf8)) {
 		width += this->CharWidth[utf8 - 32] + 1;
-#endif
 	}
 	return width;
 }
@@ -619,9 +592,8 @@ int CLabel::Draw(int x, int y, const std::string &text) const
 
 int CLabel::Draw(int x, int y, int number) const
 {
-	char buf[sizeof(int) * 10 + 2];
-	size_t len = FormatNumber(number, buf);
-	return DoDrawText<false>(x, y, buf, len, normal);
+	std::string str = FormatNumber(number);
+	return DoDrawText<false>(x, y, str.c_str(), str.length(), normal);
 }
 
 /// Draw text/number clipped
@@ -647,9 +619,8 @@ int CLabel::DrawClip(int x, int y, const std::string &text, bool is_normal) cons
 
 int CLabel::DrawClip(int x, int y, int number) const
 {
-	char buf[sizeof(int) * 10 + 2];
-	size_t len = FormatNumber(number, buf);
-	return DoDrawText<true>(x, y, buf, len, normal);
+	std::string str = FormatNumber(number);
+	return DoDrawText<true>(x, y, str.c_str(), str.length(), normal);
 }
 
 
@@ -666,9 +637,8 @@ int CLabel::DrawReverse(int x, int y, const std::string &text) const
 
 int CLabel::DrawReverse(int x, int y, int number) const
 {
-	char buf[sizeof(int) * 10 + 2];
-	size_t len = FormatNumber(number, buf);
-	return DoDrawText<false>(x, y, buf, len, reverse);
+	std::string str = FormatNumber(number);
+	return DoDrawText<false>(x, y, str.c_str(), str.length(), reverse);
 }
 
 /// Draw reverse text/number clipped
@@ -684,9 +654,8 @@ int CLabel::DrawReverseClip(int x, int y, const std::string &text) const
 
 int CLabel::DrawReverseClip(int x, int y, int number) const
 {
-	char buf[sizeof(int) * 10 + 2];
-	size_t len = FormatNumber(number, buf);
-	return DoDrawText<true>(x, y, buf, len, reverse);
+	std::string str = FormatNumber(number);
+	return DoDrawText<true>(x, y, str.c_str(), str.length(), reverse);
 }
 
 int CLabel::DrawCentered(int x, int y, const std::string &text) const
@@ -701,33 +670,6 @@ int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
 	int dx = font->Width(text);
 	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), reverse);
 	return dx / 2;
-}
-
-
-/**
-**  Format a number using commas
-**
-**  @param number  Number to be formatted
-**  @param buf     Buffer to save the formatted number to
-**
-**  @return      The real length of the Formated Number.
-*/
-static int FormatNumber(int number, char *buf)
-{
-	const char sep = ',';
-	char bufs[sizeof(int) * 10 + 2];
-	int s = 0;
-	int d = number < 0 ? 1 : 0;
-	const int sl = snprintf(bufs, sizeof(bufs), "%d", abs(number));
-
-	while (s <= sl) {
-		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
-			buf[d++] = sep;
-		}
-		buf[d++] = bufs[s++];
-	}
-	buf[0] = number < 0 ? '-' : buf[0];
-	return d - 1;
 }
 
 /**
