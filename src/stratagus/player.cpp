@@ -1662,9 +1662,8 @@ void CPlayer::SetDynasty(CDynasty *dynasty)
 void CPlayer::CheckAge()
 {
 	//pick an age which fits the player, giving priority to the last-defined ones
-	CAge *age = NULL;
 	
-	for (size_t i = 0; i < CAge::Ages.size(); ++i) {
+	for (int i = (CAge::Ages.size() - 1); i >= 0; --i) {
 		CAge *potential_age = CAge::Ages[i];
 		
 		bool has_required_upgrades = true;
@@ -1691,10 +1690,9 @@ void CPlayer::CheckAge()
 			continue;
 		}
 		
-		age = potential_age;
+		this->Age = potential_age;
+		break;
 	}
-	
-	this->Age = age;
 }
 
 void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
