@@ -180,7 +180,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CCharacter *character = GetCharacter(ident);
 			if (!character) {
 				if (LoadingHistory) {
-					continue;
+					continue; //don't load the history for characters that are no longer in the character database
 				}
 				character = new CCharacter;
 				character->Ident = ident;

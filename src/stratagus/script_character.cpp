@@ -580,6 +580,8 @@ static int CclDefineCharacter(lua_State *l)
 	character->GenerateMissingDates();
 	character->UpdateAttributes();
 	
+	character->Initialized = true;
+	
 	return 0;
 }
 

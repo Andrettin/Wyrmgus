@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name character.h - The character headerfile. */
+/**@name character.h - The character header file. */
 //
 //      (c) Copyright 2015-2018 by Andrettin
 //
@@ -111,7 +111,7 @@ class CCharacter
 public:
 	CCharacter() :
 		Civilization(NULL), Faction(NULL), Gender(0), Level(0), ExperiencePercent(0),
-		ViolentDeath(false), Custom(false),
+		ViolentDeath(false), Custom(false), Initialized(false),
 		Type(NULL), Trait(NULL), Deity(NULL),
 		Father(NULL), Mother(NULL),
 		Conditions(NULL)
@@ -157,6 +157,7 @@ public:
 	int ExperiencePercent;		/// Character's experience, as a percentage of the experience required to level up
 	bool ViolentDeath;			/// If historical death was violent
 	bool Custom;				/// Whether this character is a custom hero
+	bool Initialized;			/// Whether the character has already been initialized
 	std::string Ident;			/// Ident of the character
 	std::string Name;			/// Given name of the character
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)

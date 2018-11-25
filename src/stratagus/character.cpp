@@ -105,6 +105,10 @@ void CCharacter::ResetCharacterHistory()
 */
 void CCharacter::ProcessConfigData(const CConfigData *config_data)
 {
+	if (this->Initialized) {
+		fprintf(stderr, "Character \"%s\" is being redefined.\n", this->Ident.c_str());
+	}
+				
 	bool name_changed = false;
 	bool family_name_changed = false;
 	
@@ -389,6 +393,8 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 
 	this->GenerateMissingDates();
 	this->UpdateAttributes();
+	
+	this->Initialized = true;
 }
 
 /**
