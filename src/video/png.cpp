@@ -40,11 +40,11 @@
 //Wyrmgus end
 
 #include "stratagus.h"
-#include "map.h"
-#include "map_template.h"
+#include "map/map.h"
+#include "map/map_template.h"
 //Wyrmgus start
-#include "terrain_type.h"
-#include "tileset.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 //Wyrmgus end
 #include "video.h"
 #include "iolib.h"

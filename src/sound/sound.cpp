@@ -41,13 +41,11 @@
 #include "action/action_resource.h"
 #include "civilization.h"
 #include "config.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 #include "mod.h"
 #include "missile.h"
 #include "sound_server.h"
-//Wyrmgus start
-#include "tileset.h"
-//Wyrmgus end
 #include "ui/ui.h"
 #include "unit.h"
 #include "video.h"

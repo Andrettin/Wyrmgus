@@ -34,7 +34,7 @@
 #include "spell/spell_retrain.h"
 
 #include "script.h"
-#include "map.h"
+#include "map/map.h"
 #include "unit.h"
 #include "unit_find.h"
 

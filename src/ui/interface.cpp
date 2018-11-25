@@ -46,7 +46,7 @@
 //Wyrmgus end
 #include "iolib.h"
 //Wyrmgus start
-#include "map.h"
+#include "map/map.h"
 //Wyrmgus end
 #include "network.h"
 #include "player.h"

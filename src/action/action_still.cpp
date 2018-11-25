@@ -46,7 +46,8 @@
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 #include "missile.h"
 #include "player.h"
 //Wyrmgus start
@@ -58,7 +59,6 @@
 #include "sound.h"
 //Wyrmgus end
 #include "spells.h"
-#include "tileset.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"

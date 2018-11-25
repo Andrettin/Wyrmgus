@@ -42,8 +42,8 @@
 #include <string>
 #include <map>
 
-#include "map.h" // for the map templates, which are cleaned here
-#include "tileset.h" // for the terrain types, which are cleaned here
+#include "map/map.h" // for the sites, which are cleaned here
+#include "map/tileset.h" // for the terrain types, which are cleaned here
 
 /*----------------------------------------------------------------------------
 --  Variables

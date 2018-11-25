@@ -54,9 +54,12 @@
 #include "cursor.h"
 #include "depend.h"
 #include "font.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/map_layer.h"
+#include "map/minimap.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "menus.h"
-#include "minimap.h"
 #include "missile.h"
 #include "network.h"
 #include "plane.h"
@@ -66,10 +69,6 @@
 //Wyrmgus end
 #include "sound.h"
 #include "spells.h"
-//Wyrmgus start
-#include "terrain_type.h"
-#include "tileset.h"
-//Wyrmgus end
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/interface.h"

@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_randomsound.cpp - The animation RandomSound. */
+/**@name map_layer.h - The map layer header file. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2018 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,52 +27,59 @@
 //      02111-1307, USA.
 //
 
+#ifndef __MAP_LAYER_H__
+#define __MAP_LAYER_H__
+
 //@{
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
+#include <tuple>
+#include <vector>
 
-#include "animation/animation_randomsound.h"
+#include "vec2i.h"
 
-#include "map/map.h"
-#include "sound.h"
-#include "unit.h"
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
-/* virtual */ void CAnimation_RandomSound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+class CMapField;
+class CMapTemplate;
+class CPlane;
+class CUnit;
+class CWorld;
+
+class CMapLayer
 {
-	Assert(unit.Anim.Anim == this);
-
-	if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
-		const size_t index = SyncRand() % this->sounds.size();
-		PlayUnitSound(unit, this->sounds[index].Sound);
+public:
+	CMapLayer() :
+		ID(-1), HoursPerDay(DefaultHoursPerDay), TimeOfDay(0), SurfaceLayer(0),
+		Overland(false),
+		PixelTileSize(32, 32),
+		Fields(NULL), Plane(NULL), World(NULL)
+	{
 	}
-}
 
-/*
-**  s = "Sound1 [SoundN ...]"
-*/
-/* virtual */ void CAnimation_RandomSound::Init(const char *s, lua_State *)
-{
-	const std::string str(s);
-	const size_t len = str.size();
-
-	for (size_t begin = 0; begin != std::string::npos;) {
-		const size_t end = std::min(len, str.find(' ', begin));
-
-		this->sounds.push_back(SoundConfig(str.substr(begin, end - begin)));
-		begin = str.find_first_not_of(' ', end);
-	}
-}
-
-void CAnimation_RandomSound::MapSound()
-{
-	for (size_t i = 0; i != this->sounds.size(); ++i) {
-		this->sounds[i].MapSound();
-	}
-}
-
+	~CMapLayer();
+	void IncrementTimeOfDay();
+	void SetTimeOfDay(const int time_of_day);
+	int GetCyclesPerTimeOfDay() const;
+	
+	int ID;
+	CMapField *Fields;						/// fields on the map layer
+	int HoursPerDay;						/// how many hours does a day take in this map layer	
+	int TimeOfDay;							/// the time of day for the map layer
+	bool Overland;							/// whether the map layer is an overland map
+	CPlane *Plane;							/// the plane pointer (if any) for the map layer
+	CWorld *World;							/// the world pointer (if any) for the map layer
+	int SurfaceLayer;						/// the surface layer for the map layer
+	std::vector<CUnit *> LayerConnectors;	/// connectors in the map layer which lead to other map layers
+	PixelSize PixelTileSize;				/// the pixel tile size for the map layer
+	std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>> SubtemplateAreas;
+};
 
 //@}
+
+#endif // !__MAP_LAYER_H__

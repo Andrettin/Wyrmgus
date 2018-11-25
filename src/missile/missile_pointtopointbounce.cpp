@@ -37,7 +37,7 @@
 
 #include "missile.h"
 
-#include "map.h"
+#include "map/map.h"
 
 /**
 **  Missile flies from x,y to x1,y1 than bounces NumBounces times

@@ -40,7 +40,7 @@
 /**
 **  @class CMapField tile.h
 **
-**  \#include "tile.h"
+**  \#include "map/tile.h"
 **
 **  CMapFieldPlayerInfo::SeenTile
 **
@@ -69,7 +69,7 @@
 /**
 **  @class CMapField tile.h
 **
-**  \#include "tile.h"
+**  \#include "map/tile.h"
 **
 **  This class contains all information about a field on map.
 **  It contains its look, properties and content.

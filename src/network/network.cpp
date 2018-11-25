@@ -228,7 +228,7 @@
 
 #include "actions.h"
 #include "commands.h"
-#include "map.h"
+#include "map/map.h"
 #include "net_lowlevel.h"
 #include "net_message.h"
 #include "netconnect.h"

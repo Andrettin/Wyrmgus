@@ -57,7 +57,7 @@
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
-#include "map.h"
+#include "map/map.h"
 #include "parameters.h"
 //Wyrmgus start
 #include "player.h"

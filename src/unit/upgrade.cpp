@@ -64,7 +64,8 @@
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
@@ -72,7 +73,6 @@
 #include "script.h"
 //Wyrmgus start
 #include "settings.h"
-#include "tileset.h"
 #include "translate.h"
 //Wyrmgus end
 #include "unit.h"

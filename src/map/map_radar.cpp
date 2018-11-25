@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "map.h"
+#include "map/map.h"
 
 #include "player.h"
 #include "unittype.h"

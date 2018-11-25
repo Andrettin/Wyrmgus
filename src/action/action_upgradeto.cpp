@@ -45,14 +45,12 @@
 #include "game.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 #include "player.h"
 #include "quest.h"
 #include "script.h"
 #include "spells.h"
-//Wyrmgus start
-#include "tileset.h"
-//Wyrmgus end
 #include "translate.h"
 #include "ui/interface.h"
 #include "unit.h"

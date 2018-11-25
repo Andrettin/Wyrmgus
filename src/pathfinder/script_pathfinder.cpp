@@ -37,7 +37,7 @@
 
 #include "pathfinder.h"
 
-#include "map.h"
+#include "map/map.h"
 #include "player.h"
 #include "script.h"
 #include "unittype.h"

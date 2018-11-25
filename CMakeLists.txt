@@ -196,6 +196,7 @@ set(map_SRCS
 	src/map/map.cpp
 	src/map/map_draw.cpp
 	src/map/map_fog.cpp
+	src/map/map_layer.cpp
 	src/map/map_radar.cpp
 	src/map/map_template.cpp
 	src/map/map_wall.cpp
@@ -609,11 +610,15 @@ set(stratagus_generic_HDRS
 	src/include/iolib.h
 	src/include/item.h
 	src/include/luacallback.h
-	src/include/map.h
-	src/include/map_template.h
+	src/include/map/map.h
+	src/include/map/map_layer.h
+	src/include/map/map_template.h
+	src/include/map/minimap.h
+	src/include/map/terrain_type.h
+	src/include/map/tile.h
+	src/include/map/tileset.h
 	src/include/master.h
 	src/include/menus.h
-	src/include/minimap.h
 	src/include/missile.h
 	src/include/missileconfig.h
 	src/include/mod.h
@@ -642,10 +647,7 @@ set(stratagus_generic_HDRS
 	src/include/sound_server.h
 	src/include/spells.h
 	src/include/stratagus.h
-	src/include/terrain_type.h
 	src/include/text.h
-	src/include/tile.h
-	src/include/tileset.h
 	src/include/timeline.h
 	src/include/title.h
 	src/include/translate.h

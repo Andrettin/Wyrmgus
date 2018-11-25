@@ -46,7 +46,9 @@
 #include "font.h"
 #include "iolib.h"
 #include "luacallback.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "mod.h"
 #include "player.h"
 //Wyrmgus start
@@ -54,10 +56,6 @@
 //Wyrmgus end
 #include "sound.h"
 #include "spells.h"
-//Wyrmgus start
-#include "terrain_type.h"
-#include "tileset.h"
-//Wyrmgus end
 #include "trigger.h"
 #include "ui/ui.h"
 #include "unit.h"

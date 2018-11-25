@@ -37,7 +37,7 @@
 
 #include "animation/animation_sound.h"
 
-#include "map.h"
+#include "map/map.h"
 #include "sound.h"
 #include "unit.h"
 

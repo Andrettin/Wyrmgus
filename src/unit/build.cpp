@@ -39,16 +39,13 @@
 #include "unittype.h"
 
 #include "actions.h"
-//Wyrmgus start
 #include "editor.h"
-//Wyrmgus end
-#include "map.h"
+#include "map/map.h"
+#include "map/map_layer.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "player.h"
-//Wyrmgus start
 #include "quest.h"
-#include "terrain_type.h"
-#include "tileset.h"
-//Wyrmgus end
 #include "unit.h"
 #include "unit_find.h"
 #include "world.h"

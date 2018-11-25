@@ -41,13 +41,12 @@
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
 #include "commands.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/map_layer.h"
+#include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"
-//Wyrmgus start
-#include "tileset.h"
-//Wyrmgus end
 #include "translate.h"
 #include "upgrade.h"
 #include "ui/ui.h"

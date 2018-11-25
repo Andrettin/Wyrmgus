@@ -40,7 +40,7 @@
 
 #include "game.h"
 #include "iocompat.h"
-#include "map.h"
+#include "map/map.h"
 #include "parameters.h"
 //Wyrmgus start
 #include "script.h"

@@ -53,7 +53,8 @@
 //Wyrmgus end
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
@@ -63,9 +64,6 @@
 //Wyrmgus end
 #include "sound.h"
 #include "spells.h"
-//Wyrmgus start
-#include "tileset.h"
-//Wyrmgus end
 #include "translate.h"
 #include "trigger.h"
 #include "ui/button_action.h"

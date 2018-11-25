@@ -61,7 +61,8 @@
 #include "grand_strategy.h"
 #include "luacallback.h"
 //Wyrmgus end
-#include "map.h"
+#include "map/map.h"
+#include "map/map_layer.h"
 #include "network.h"
 #include "netconnect.h"
 //Wyrmgus start

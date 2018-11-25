@@ -43,7 +43,8 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "map.h"
+#include "map/map.h"
+#include "map/map_layer.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"

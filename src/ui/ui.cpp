@@ -44,7 +44,8 @@
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/map_layer.h"
 #include "menus.h"
 #include "title.h"
 #include "translate.h"

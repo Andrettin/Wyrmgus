@@ -35,17 +35,17 @@
 
 #include "stratagus.h"
 
-#include "tile.h"
+#include "map/tile.h"
 
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "player.h"
 #include "script.h"
-#include "terrain_type.h"
-#include "tileset.h"
 #include "unit.h"
 #include "unit_manager.h"
 

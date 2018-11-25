@@ -39,10 +39,10 @@
 
 #include "actions.h"
 #include "commands.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
-#include "tileset.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"

@@ -52,7 +52,7 @@
 #include "item.h"
 #include "luacallback.h"
 //Wyrmgus end
-#include "map.h"
+#include "map/map.h"
 #include "plane.h"
 //Wyrmgus start
 #include "province.h"

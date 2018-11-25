@@ -42,7 +42,7 @@
 //Wyrmgus start
 #include "icons.h"
 //Wyrmgus end
-#include "map.h"
+#include "map/map.h"
 #include "menus.h"
 #include "script.h"
 #include "spells.h"

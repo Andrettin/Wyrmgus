@@ -33,7 +33,7 @@
 
 #include "particle.h"
 
-#include "map.h"
+#include "map/map.h"
 #include "player.h"
 #include "ui/ui.h"
 #include "video.h"

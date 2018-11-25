@@ -34,7 +34,7 @@
 #include "spell/spell_teleport.h"
 
 #include "game.h"
-#include "map.h"
+#include "map/map.h"
 #include "script.h"
 #include "unit.h"
 

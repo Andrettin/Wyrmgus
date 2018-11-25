@@ -45,7 +45,7 @@
 
 #include "color.h"
 #include "cursor.h"
-#include "minimap.h"
+#include "map/minimap.h"
 #include "script.h"
 #include "viewport.h"
 #include "ui/interface.h"

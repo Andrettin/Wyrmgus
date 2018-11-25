@@ -40,7 +40,7 @@
 #include "animation/animation_randomsound.h"
 #include "animation/animation_sound.h"
 #include "civilization.h"
-#include "map.h"
+#include "map/map.h"
 #include "player.h"
 #include "sound.h"
 #include "sound_server.h"

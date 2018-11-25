@@ -13,8 +13,8 @@ $#include "iolib.h"
 //Wyrmgus start
 $#include "item.h"
 //Wyrmgus end
-$#include "map.h"
-$#include "minimap.h"
+$#include "map/map.h"
+$#include "map/minimap.h"
 $#include "mod.h"
 $#include "movie.h"
 $#include "netconnect.h"

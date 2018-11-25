@@ -40,7 +40,7 @@
 #include "missile.h"
 
 #include "luacallback.h"
-#include "map.h"
+#include "map/map.h"
 #include "unit_find.h"
 
 /**

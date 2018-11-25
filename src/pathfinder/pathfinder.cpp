@@ -40,7 +40,7 @@
 #include "pathfinder.h"
 
 #include "actions.h"
-#include "map.h"
+#include "map/map.h"
 #include "unittype.h"
 #include "unit.h"
 

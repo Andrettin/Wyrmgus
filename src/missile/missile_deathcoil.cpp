@@ -38,7 +38,7 @@
 #include "missile.h"
 
 #include "actions.h"
-#include "map.h"
+#include "map/map.h"
 #include "unit.h"
 #include "unit_find.h"
 

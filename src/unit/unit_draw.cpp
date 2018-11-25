@@ -49,13 +49,11 @@
 #include "cursor.h"
 #include "editor.h"
 #include "font.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 #include "player.h"
 #include "script.h"
 #include "sound.h"
-//Wyrmgus start
-#include "tileset.h"
-//Wyrmgus end
 #include "translate.h"
 #include "unit.h"
 #include "unit_find.h"

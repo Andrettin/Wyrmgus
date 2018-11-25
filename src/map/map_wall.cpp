@@ -36,12 +36,12 @@
 #include <stdio.h>
 
 #include "stratagus.h"
-#include "map.h"
-#include "tileset.h"
+#include "map/map.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "ui/ui.h"
 #include "player.h"
 #include "settings.h"
-#include "terrain_type.h"
 #include "unit_find.h"
 #include "unittype.h"
 

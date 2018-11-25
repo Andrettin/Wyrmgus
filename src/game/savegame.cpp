@@ -43,7 +43,7 @@
 #include "character.h"
 #include "iocompat.h"
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
 #include "missile.h"
 #include "parameters.h"
 #include "player.h"

@@ -43,7 +43,8 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "quest.h"
@@ -52,7 +53,6 @@
 #include "settings.h"
 //Wyrmgus end
 #include "sound.h"
-#include "tileset.h"
 #include "translate.h"
 #include "ui/interface.h"
 #include "ui/ui.h"

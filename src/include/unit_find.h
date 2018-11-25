@@ -36,7 +36,7 @@
 //Wyrmgus start
 #include "actions.h"
 //Wyrmgus end
-#include "map.h"
+#include "map/map.h"
 #include "pathfinder.h"
 #include "unit.h"
 #include "unittype.h"

@@ -189,7 +189,7 @@ extern void beos_init(int argc, char **argv);
 #include "guichan.h"
 #include "iocompat.h"
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
 #include "netconnect.h"
 #include "network.h"
 #include "parameters.h"

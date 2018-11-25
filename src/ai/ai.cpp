@@ -154,7 +154,7 @@
 //Wyrmgus start
 #include "luacallback.h"
 //Wyrmgus end
-#include "map.h"
+#include "map/map.h"
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end

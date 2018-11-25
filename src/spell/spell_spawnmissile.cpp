@@ -34,7 +34,7 @@
 
 #include "spell/spell_spawnmissile.h"
 
-#include "map.h"
+#include "map/map.h"
 #include "missile.h"
 #include "script.h"
 #include "unit.h"

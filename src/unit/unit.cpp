@@ -66,7 +66,9 @@
 #include "item.h"
 //Wyrmgus end
 #include "luacallback.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/map_layer.h"
+#include "map/tileset.h"
 #include "missile.h"
 #include "network.h"
 #include "pathfinder.h"
@@ -79,9 +81,6 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
-//Wyrmgus start
-#include "tileset.h"
-//Wyrmgus end
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/interface.h"

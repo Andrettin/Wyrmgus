@@ -36,14 +36,12 @@
 
 #include "stratagus.h"
 
-#include "map.h"
+#include "map/map.h"
 
 #include "actions.h"
-#include "minimap.h"
+#include "map/minimap.h"
+#include "map/tileset.h"
 #include "player.h"
-//Wyrmgus start
-#include "tileset.h"
-//Wyrmgus end
 #include "ui/ui.h"
 #include "unit.h"
 //Wyrmgus start

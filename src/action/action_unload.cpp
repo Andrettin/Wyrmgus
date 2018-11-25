@@ -43,7 +43,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end

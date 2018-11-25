@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "map_template.h"
+#include "map/map_template.h"
 
 #include <fstream>
 
@@ -44,13 +44,14 @@
 #include "editor.h"
 #include "game.h"
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/map_layer.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "plane.h"
 #include "player.h"
 #include "quest.h"
 #include "settings.h"
-#include "terrain_type.h"
-#include "tileset.h"
 #include "translate.h"
 #include "unit.h"
 #include "unit_find.h"

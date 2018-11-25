@@ -35,11 +35,11 @@
 
 #include "stratagus.h"
 
-#include "terrain_type.h"
+#include "map/terrain_type.h"
 
 #include "config.h"
 #include "iolib.h"
-#include "tileset.h"
+#include "map/tileset.h"
 #include "video.h"
 
 #include <algorithm>

@@ -37,10 +37,10 @@
 
 #include "ai_local.h"
 
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "tileset.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"

@@ -37,15 +37,16 @@
 
 #include "stratagus.h"
 
-#include "minimap.h"
+#include "map/minimap.h"
 
 #include "editor.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/map_layer.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "plane.h"
 #include "player.h"
 #include "province.h"
-#include "terrain_type.h"
-#include "tileset.h"
 #include "ui/ui.h"
 #include "unit.h"
 #include "unit_manager.h"

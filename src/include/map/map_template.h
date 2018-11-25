@@ -41,7 +41,7 @@
 #include <vector>
 
 #include "date.h"
-#include "tile.h"
+#include "map/tile.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------

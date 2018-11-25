@@ -35,9 +35,9 @@
 
 #include "stratagus.h"
 #include "editor.h"
-#include "map.h"
-#include "terrain_type.h"
-#include "tileset.h"
+#include "map/map.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "ui/ui.h"
 #include "player.h"
 #include "unit.h"

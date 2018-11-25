@@ -41,7 +41,7 @@
 #include "action/action_spellcast.h"
 
 #include "actions.h"
-#include "map.h"
+#include "map/map.h"
 #include "missile.h"
 #include "pathfinder.h"
 #include "unit.h"

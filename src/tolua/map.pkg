@@ -1,5 +1,5 @@
-$#include "map_template.h"
-$#include "tileset.h"
+$#include "map/map_template.h"
+$#include "map/tileset.h"
 
 class CMapInfo
 {

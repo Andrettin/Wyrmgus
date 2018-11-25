@@ -51,7 +51,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "item.h"
-#include "map_template.h"
+#include "map/map_template.h"
 #include "parameters.h"
 #include "player.h"
 #include "province.h"

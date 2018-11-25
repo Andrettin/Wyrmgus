@@ -40,8 +40,8 @@
 #include "intern_video.h"
 
 #include "editor.h"
-#include "map.h"
-#include "tileset.h"
+#include "map/map.h"
+#include "map/tileset.h"
 #include "translate.h"
 #include "unit.h"
 #include "unittype.h"

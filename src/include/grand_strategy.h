@@ -38,7 +38,7 @@
 
 #include <vector>
 
-#include "map.h"
+#include "map/map.h"
 #include "province.h"
 #include "character.h"
 #include "vec2i.h"

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map.cpp - The map. */
+/**@name map.cpp - The map source file. */
 //
 //      (c) Copyright 1998-2018 by Lutz Sammer, Vladi Shabanski,
 //                                 Francois Beerten and Andrettin
@@ -36,7 +36,7 @@
 
 #include "stratagus.h"
 
-#include "map.h"
+#include "map/map.h"
 
 //Wyrmgus start
 #include <fstream>
@@ -48,7 +48,10 @@
 #include "game.h" // for the SaveGameLoading variable
 //Wyrmgus end
 #include "iolib.h"
-#include "map_template.h"
+#include "map/map_layer.h"
+#include "map/map_template.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 #include "plane.h"
 #include "player.h"
 //Wyrmgus start
@@ -57,8 +60,6 @@
 #include "settings.h"
 #include "sound_server.h"
 //Wyrmgus end
-#include "terrain_type.h"
-#include "tileset.h"
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
@@ -1095,55 +1096,7 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 }
 
-CMapLayer::~CMapLayer()
-{
-	if (this->Fields) {
-		delete[] this->Fields;
-	}
-}
-
-void CMapLayer::SetTimeOfDay(const int time_of_day)
-{
-	if (this->TimeOfDay == time_of_day) {
-		return;
-	}
-	
-	int old_time_of_day = this->TimeOfDay;
-	this->TimeOfDay = time_of_day;
-	
-#ifdef USE_OAML
-	if (enableOAML && oaml && this->ID == CurrentMapLayer) {
-		// Time of day can change our main music loop, if the current playing track is set for this
-		SetMusicCondition(OAML_CONDID_MAIN_LOOP, this->TimeOfDay);
-	}
-#endif
-
-	bool is_day_changed = (this->TimeOfDay == MorningTimeOfDay || this->TimeOfDay == MiddayTimeOfDay || this->TimeOfDay == AfternoonTimeOfDay) != (old_time_of_day == MorningTimeOfDay || old_time_of_day == MiddayTimeOfDay || old_time_of_day == AfternoonTimeOfDay);
-	bool is_night_changed = (this->TimeOfDay == FirstWatchTimeOfDay || this->TimeOfDay == MidnightTimeOfDay || this->TimeOfDay == SecondWatchTimeOfDay) != (old_time_of_day == FirstWatchTimeOfDay || old_time_of_day == MidnightTimeOfDay || old_time_of_day == SecondWatchTimeOfDay);
-	
-	//update the sight of all units
-	if (is_day_changed || is_night_changed) {
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-			CUnit *unit = *it;
-			if (
-				unit && unit->IsAlive() && unit->MapLayer == this->ID &&
-				(
-					(is_day_changed && unit->Variable[DAYSIGHTRANGEBONUS_INDEX].Value != 0) // if has day sight bonus and is entering or exiting day
-					|| (is_night_changed && unit->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value != 0) // if has night sight bonus and is entering or exiting night
-				)
-			) {
-				MapUnmarkUnitSight(*unit);
-				UpdateUnitSightRange(*unit);
-				MapMarkUnitSight(*unit);
-			}
-		}
-	}
-}
-
-//Wyrmgus start
-//CMap::CMap() : Fields(NULL), NoFogOfWar(false), TileGraphic(NULL)
 CMap::CMap() : NoFogOfWar(false), TileGraphic(NULL), Landmasses(0), BorderTerrain(NULL)
-//Wyrmgus end
 {
 	Tileset = new CTileset;
 }
@@ -1153,8 +1106,36 @@ CMap::~CMap()
 	delete Tileset;
 }
 
+unsigned int CMap::getIndex(int x, int y, int z) const
+{
+	return x + y * this->Info.MapWidths[z];
+}
+
+unsigned int CMap::getIndex(const Vec2i &pos, int z) const
+{
+	return getIndex(pos.x, pos.y, z);
+}
+
+CMapField *CMap::Field(unsigned int index, int z) const
+{
+	return &this->MapLayers[z]->Fields[index];
+}
+
 /**
-**  Allocate and initialise map table
+**	@brief	Get the MapField at location x, y
+*/
+CMapField *CMap::Field(int x, int y, int z) const
+{
+	return &this->MapLayers[z]->Fields[x + y * this->Info.MapWidths[z]];
+}
+
+CMapField *CMap::Field(const Vec2i &pos, int z) const
+{
+	return Field(pos.x, pos.y, z);
+}
+
+/**
+**	@brief	Allocate and initialize map table
 */
 void CMap::Create()
 {

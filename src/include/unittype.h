@@ -45,7 +45,7 @@
 #include "color.h"
 #include "icons.h"
 //Wyrmgus start
-#include "map.h"	//required for PixelTileSize
+#include "map/map.h"	//required for PixelTileSize
 //Wyrmgus end
 #include "missileconfig.h"
 #include "unitsound.h"

@@ -36,7 +36,7 @@
 /**
 **  @class CTileset tileset.h
 **
-**  \#include "tileset.h"
+**  \#include "map/tileset.h"
 **
 **  This structure contains information about the tileset of the map.
 **  It defines the look and properties of the tiles. Currently only one
@@ -162,7 +162,7 @@
 **
 **  @struct TileInfo tileset.h
 **
-**  \#include "tileset.h"
+**  \#include "map/tileset.h"
 **
 **  This structure includes everything about a specific tile from the tileset.
 **
@@ -183,7 +183,7 @@
 
 #include "stratagus.h"
 
-#include "tileset.h"
+#include "map/tileset.h"
 
 #include <limits.h>
 

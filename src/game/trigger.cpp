@@ -41,7 +41,7 @@
 //Wyrmgus start
 #include "luacallback.h"
 //Wyrmgus end
-#include "map.h"
+#include "map/map.h"
 #include "player.h"
 //Wyrmgus start
 #include "quest.h" // for saving quests

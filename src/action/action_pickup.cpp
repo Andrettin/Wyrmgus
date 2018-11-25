@@ -44,13 +44,11 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "luacallback.h"
+#include "map/tileset.h"
 #include "missile.h"
 #include "network.h"
 #include "pathfinder.h"
 #include "script.h"
-//Wyrmgus start
-#include "tileset.h"
-//Wyrmgus end
 #include "ui/ui.h"
 #include "unit.h"
 #include "unit_find.h"

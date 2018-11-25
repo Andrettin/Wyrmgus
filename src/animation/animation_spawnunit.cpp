@@ -40,7 +40,7 @@
 #include "../ai/ai_local.h"
 
 #include "commands.h"
-#include "map.h"
+#include "map/map.h"
 #include "unit.h"
 
 /* virtual */ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const

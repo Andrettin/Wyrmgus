@@ -39,7 +39,7 @@
 
 #include "actions.h"
 //Wyrmgus start
-#include "map.h" //It contains map width and height
+#include "map/map.h" //it contains map width and height
 //Wyrmgus end
 #include "net_message.h"
 #include "network.h"

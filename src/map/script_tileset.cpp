@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "tileset.h"
+#include "map/tileset.h"
 
 #include "script.h"
 

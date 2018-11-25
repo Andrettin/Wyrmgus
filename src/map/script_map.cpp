@@ -10,7 +10,7 @@
 //
 /**@name script_map.cpp - The map ccl functions. */
 //
-//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "map.h"
+#include "map/map.h"
 
 #include "civilization.h"
 //Wyrmgus start
@@ -43,7 +43,10 @@
 #include "game.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "map_template.h"
+#include "map/map_layer.h"
+#include "map/map_template.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 //Wyrmgus start
 #include "plane.h"
 #include "province.h"
@@ -53,8 +56,6 @@
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
-#include "terrain_type.h"
-#include "tileset.h"
 #include "timeline.h"
 #include "translate.h"
 #include "ui/ui.h"

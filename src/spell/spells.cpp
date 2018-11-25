@@ -49,11 +49,9 @@
 #include "actions.h"
 #include "civilization.h"
 #include "commands.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 #include "sound.h"
-//Wyrmgus start
-#include "tileset.h"
-//Wyrmgus end
 #include "unit.h"
 #include "unit_find.h"
 #include "upgrade.h"

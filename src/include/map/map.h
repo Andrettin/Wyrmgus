@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map.h - The map headerfile. */
+/**@name map.h - The map header file. */
 //
 //      (c) Copyright 1998-2018 by Vladi Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon and Andrettin
@@ -40,7 +40,7 @@
 /**
 **  @class CMap map.h
 **
-**  \#include "map.h"
+**  \#include "map/map.h"
 **
 **  This class contains all information about a Stratagus map.
 **  A map is a rectangle of any size.
@@ -87,7 +87,7 @@
 
 #include "color.h"
 #include "date.h"
-#include "tile.h"
+#include "map/tile.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -98,6 +98,7 @@ class CFaction;
 class CGraphic;
 class CPlayer;
 class CFile;
+class CMapLayer;
 class CMapTemplate;
 class CPlane;
 class CRegion;
@@ -234,33 +235,6 @@ public:
 --  Map itself
 ----------------------------------------------------------------------------*/
 
-class CMapLayer
-{
-public:
-	CMapLayer() :
-		ID(-1), HoursPerDay(DefaultHoursPerDay), TimeOfDay(0), SurfaceLayer(0),
-		Overland(false),
-		PixelTileSize(32, 32),
-		Fields(NULL), Plane(NULL), World(NULL)
-	{
-	}
-
-	~CMapLayer();
-	void SetTimeOfDay(const int time_of_day);
-	
-	int ID;
-	CMapField *Fields;						/// fields on the map layer
-	int HoursPerDay;						/// how many hours does a day take in this map layer	
-	int TimeOfDay;							/// the time of day for the map layer
-	bool Overland;							/// whether the map layer is an overland map
-	CPlane *Plane;							/// the plane pointer (if any) for the map layer
-	CWorld *World;							/// the world pointer (if any) for the map layer
-	int SurfaceLayer;						/// the surface layer for the map layer
-	std::vector<CUnit *> LayerConnectors;	/// connectors in the map layer which lead to other map layers
-	PixelSize PixelTileSize;				/// the pixel tile size for the map layer
-	std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>> SubtemplateAreas;
-};
-
 /// Describes the world map
 class CMap
 {
@@ -268,60 +242,15 @@ public:
 	CMap();
 	~CMap();
 
-	//Wyrmgus start
-//	unsigned int getIndex(int x, int y) const
-	unsigned int getIndex(int x, int y, int z) const
-	//Wyrmgus end
-	{
-		//Wyrmgus start
-//		return x + y * this->Info.MapWidth;
-		return x + y * this->Info.MapWidths[z];
-		//Wyrmgus end
-	}
-	//Wyrmgus start
-//	unsigned int getIndex(const Vec2i &pos) const
-	unsigned int getIndex(const Vec2i &pos, int z) const
-	//Wyrmgus end
-	{
-		//Wyrmgus start
-//		return getIndex(pos.x, pos.y);
-		return getIndex(pos.x, pos.y, z);
-		//Wyrmgus end
-	}
+	unsigned int getIndex(int x, int y, int z) const;
+	unsigned int getIndex(const Vec2i &pos, int z) const;
+	
+	CMapField *Field(unsigned int index, int z) const;
+	/// Get the MapField at location x, y
+	CMapField *Field(int x, int y, int z) const;
+	CMapField *Field(const Vec2i &pos, int z) const;
 
-	//Wyrmgus start
-//	CMapField *Field(unsigned int index) const
-	CMapField *Field(unsigned int index, int z) const
-	//Wyrmgus end
-	{
-		//Wyrmgus start
-//		return &this->Fields[index];
-		return &this->MapLayers[z]->Fields[index];
-		//Wyrmgus end
-	}
-	/// Get the MapField at location x,y
-	//Wyrmgus start
-//	CMapField *Field(int x, int y) const
-	CMapField *Field(int x, int y, int z) const
-	//Wyrmgus end
-	{
-		//Wyrmgus start
-//		return &this->Fields[x + y * this->Info.MapWidth];
-		return &this->MapLayers[z]->Fields[x + y * this->Info.MapWidths[z]];
-		//Wyrmgus end
-	}
-	//Wyrmgus start
-//	CMapField *Field(const Vec2i &pos) const
-	CMapField *Field(const Vec2i &pos, int z) const
-	//Wyrmgus end
-	{
-		//Wyrmgus start
-//		return Field(pos.x, pos.y);
-		return Field(pos.x, pos.y, z);
-		//Wyrmgus end
-	}
-
-	/// Alocate and initialise map table.
+	/// Allocate and initialize map table.
 	void Create();
 	/// Build tables for map
 	void Init();

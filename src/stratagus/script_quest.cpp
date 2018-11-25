@@ -40,7 +40,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "luacallback.h"
-#include "map_template.h"
+#include "map/map_template.h"
 #include "player.h"
 #include "script.h"
 #include "unittype.h"

@@ -43,17 +43,18 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "video.h"
-#include "player.h"
 #include "intern_video.h"
 #include "iocompat.h"
 #include "iolib.h"
+#include "map/map_layer.h"
+#include "player.h"
 //Wyrmgus start
 #include "results.h"
 //Wyrmgus end
 #include "ui/ui.h"
 //Wyrmgus start
 #include "unit.h" //for using CPreference
+#include "video.h"
 #include "xbrz.h"
 //Wyrmgus end
 

@@ -90,7 +90,7 @@
 #include "cursor.h"
 #include "font.h"
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
 #include "ui/ui.h"
 
 

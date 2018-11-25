@@ -40,7 +40,7 @@
 #include "civilization.h"
 #include "deity.h"
 #include "grand_strategy.h"
-#include "map_template.h"
+#include "map/map_template.h"
 #include "player.h"
 #include "province.h"
 #include "quest.h"

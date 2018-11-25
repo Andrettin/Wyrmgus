@@ -47,7 +47,9 @@
 #include "editor.h"
 #include "font.h"
 #include "luacallback.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h"
 //Wyrmgus start
 #include "network.h" //for updating levels
 //Wyrmgus end
@@ -60,10 +62,6 @@
 #include "script.h"
 #include "sound.h"
 #include "spells.h"
-//Wyrmgus start
-#include "terrain_type.h"
-#include "tileset.h"
-//Wyrmgus end
 #include "ui/button_action.h"
 #include "ui/ui.h"
 #include "unit.h"

@@ -46,13 +46,11 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "map.h"
+#include "map/map.h"
+#include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
-//Wyrmgus start
-#include "tileset.h"
-//Wyrmgus end
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit.h"

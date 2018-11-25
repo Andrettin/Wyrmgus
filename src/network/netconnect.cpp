@@ -37,7 +37,7 @@
 
 #include "netconnect.h"
 
-#include "map.h"
+#include "map/map.h"
 #include "master.h"
 #include "network.h"
 #include "parameters.h"

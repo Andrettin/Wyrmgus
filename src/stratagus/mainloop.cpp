@@ -49,7 +49,10 @@
 #include "grand_strategy.h"
 #include "luacallback.h"
 //Wyrmgus end
-#include "map.h"
+#include "map/map.h"
+#include "map/map_layer.h"
+#include "map/terrain_type.h"
+#include "map/tileset.h" //for tile animation
 #include "missile.h"
 #include "network.h"
 #include "particle.h"
@@ -64,10 +67,6 @@
 //Wyrmgus end
 #include "sound.h"
 #include "sound_server.h"
-//Wyrmgus start
-#include "terrain_type.h"
-#include "tileset.h" // for tile animation
-//Wyrmgus end
 #include "translate.h"
 #include "trigger.h"
 #include "ui/interface.h"
@@ -434,35 +433,34 @@ static void GameLogicLoop()
 		//Wyrmgus end
 		
 		//Wyrmgus start
-		if (GameCycle > 0 && GameCycle % CyclesPerInGameHour == 0) {
-			GameHour++;
-			int old_day = CDate::CurrentDate.Day;
-			CDate::CurrentDate.AddHours(CCalendar::BaseCalendar, 1, DayMultiplier);
-			for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
-				CCalendar *calendar = CCalendar::Calendars[i];
-				if (calendar->CurrentDayOfTheWeek != -1 && GameHour % calendar->HoursPerDay == 0) { //day passed in the calendar
-					calendar->CurrentDayOfTheWeek++;
-					calendar->CurrentDayOfTheWeek %= calendar->DaysOfTheWeek.size();
-				}
-			}
-			if (old_day != CDate::CurrentDate.Day) {
-				CDate::UpdateCurrentDateDisplayString();
-			}
-			for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-				CMapLayer *map_layer = Map.MapLayers[z];
-				int cycles_per_time_of_day = map_layer->HoursPerDay;
-				cycles_per_time_of_day *= CyclesPerInGameHour;
-				cycles_per_time_of_day /= MaxTimesOfDay - 1;
-				if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !cycles_per_time_of_day) {
-					map_layer->TimeOfDay = NoTimeOfDay; //the map layer has no time of day
-					continue;
-				}
-				if (GameCycle % cycles_per_time_of_day == 0) { 
-					int time_of_day = map_layer->TimeOfDay + 1;
-					if (time_of_day == MaxTimesOfDay) {
-						time_of_day = 1;
+		if (GameCycle > 0) {
+			if (GameCycle % CyclesPerTimeOfDayHour == 0) {
+				for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+					CMapLayer *map_layer = Map.MapLayers[z];
+					int cycles_per_time_of_day = map_layer->GetCyclesPerTimeOfDay();
+					if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !cycles_per_time_of_day) {
+						map_layer->TimeOfDay = NoTimeOfDay; //the map layer has no time of day
+						continue;
 					}
-					map_layer->SetTimeOfDay(time_of_day);
+					if (GameCycle % cycles_per_time_of_day == 0) { 
+						map_layer->IncrementTimeOfDay();
+					}
+				}
+			}
+			
+			if (GameCycle % CyclesPerInGameHour == 0) {
+				GameHour++;
+				int old_day = CDate::CurrentDate.Day;
+				CDate::CurrentDate.AddHours(CCalendar::BaseCalendar, 1, DayMultiplier);
+				for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
+					CCalendar *calendar = CCalendar::Calendars[i];
+					if (calendar->CurrentDayOfTheWeek != -1 && GameHour % calendar->HoursPerDay == 0) { //day passed in the calendar
+						calendar->CurrentDayOfTheWeek++;
+						calendar->CurrentDayOfTheWeek %= calendar->DaysOfTheWeek.size();
+					}
+				}
+				if (old_day != CDate::CurrentDate.Day) {
+					CDate::UpdateCurrentDateDisplayString();
 				}
 			}
 		}
