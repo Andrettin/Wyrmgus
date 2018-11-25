@@ -843,18 +843,28 @@ static bool CommandKey(int key)
 			UiFindIdleWorker();
 			break;
 
-		case 'm': // CTRL+M Turn music on / off
+		case 'l': // CTRL+L return to previous map layer
 			if (KeyModifiers & ModifierControl) {
-				UiToggleMusic();
-				SavePreferences();
+				ChangeToPreviousMapLayer();
 				break;
-			//Wyrmgus start
 			} else {
 				if (HandleCommandKey(key)) {
 					break;
 				}
 				return false;
-			//Wyrmgus end
+			}
+			break;
+
+		case 'm': // CTRL+M Turn music on / off
+			if (KeyModifiers & ModifierControl) {
+				UiToggleMusic();
+				SavePreferences();
+				break;
+			} else {
+				if (HandleCommandKey(key)) {
+					break;
+				}
+				return false;
 			}
 			break;
 

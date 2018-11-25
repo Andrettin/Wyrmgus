@@ -452,9 +452,8 @@ extern std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 
 extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
-//Wyrmgus start
 extern int CurrentMapLayer;
-//Wyrmgus end
+extern int PreviousMapLayer;
 
 /// Contrast of fog of war
 extern int FogOfWarOpacity;
@@ -632,7 +631,8 @@ extern void PreprocessMap();
 extern int GetMapLayer(std::string plane_ident = "", std::string world_ident = "", int surface_layer = 0);
 extern int GetSubtemplateStartX(std::string subtemplate_ident);
 extern int GetSubtemplateStartY(std::string subtemplate_ident);
-extern void ChangeCurrentMapLayer(int z);
+extern void ChangeToPreviousMapLayer();
+extern void ChangeCurrentMapLayer(const int z);
 extern void SetTimeOfDay(int time_of_day, int z = 0);
 //Wyrmgus end
 

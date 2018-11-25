@@ -95,9 +95,8 @@ std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 //Wyrmgus end
 CMap Map;                   /// The current map
-//Wyrmgus start
 int CurrentMapLayer = 0;
-//Wyrmgus end
+int PreviousMapLayer = -1;
 int FlagRevealMap;          /// Flag must reveal the map
 int ReplayRevealMap;        /// Reveal Map is replay
 int ForestRegeneration;     /// Forest regeneration
@@ -1059,7 +1058,26 @@ int GetSubtemplateStartY(std::string subtemplate_ident)
 	return -1;
 }
 
-void ChangeCurrentMapLayer(int z)
+/**
+**	@brief	Change the map layer currently being displayed to the previous
+**
+**	@param	z	The map layer
+*/
+void ChangeToPreviousMapLayer()
+{
+	if (PreviousMapLayer == -1) {
+		return;
+	}
+	
+	ChangeCurrentMapLayer(PreviousMapLayer);
+}
+
+/**
+**	@brief	Change the map layer currently being displayed
+**
+**	@param	z	The map layer
+*/
+void ChangeCurrentMapLayer(const int z)
 {
 	if (z < 0 || z >= (int) Map.MapLayers.size() || CurrentMapLayer == z) {
 		return;
@@ -1067,6 +1085,7 @@ void ChangeCurrentMapLayer(int z)
 	
 	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / Map.Info.MapWidths[CurrentMapLayer], UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / Map.Info.MapHeights[CurrentMapLayer]);
 	
+	PreviousMapLayer = CurrentMapLayer;
 	CurrentMapLayer = z;
 	UI.Minimap.UpdateCache = true;
 	UI.SelectedViewport->Set(new_viewport_map_pos, Map.GetCurrentPixelTileSize() / 2);
@@ -1174,6 +1193,7 @@ void CMap::Clean()
 {
 	//Wyrmgus start
 	CurrentMapLayer = 0;
+	PreviousMapLayer = -1;
 	this->Landmasses = 0;
 	//Wyrmgus end
 

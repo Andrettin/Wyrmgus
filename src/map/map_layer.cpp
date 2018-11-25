@@ -81,7 +81,7 @@ void CMapLayer::IncrementTimeOfDay()
 /**
 **	@brief	Set the current time of day
 **
-**	@param time_of_day	The time of day
+**	@param	time_of_day	The time of day
 */
 void CMapLayer::SetTimeOfDay(const int time_of_day)
 {
