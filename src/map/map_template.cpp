@@ -415,7 +415,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 				Map.MapLayers[z]->HoursPerDay = this->Plane->HoursPerDay;
 			}
 			if (Map.MapLayers[z]->HoursPerDay) {
-				Map.MapLayers[z]->TimeOfDay = CCalendar::GetTimeOfDay(GameHour, Map.MapLayers[z]->HoursPerDay);
+				Map.MapLayers[z]->TimeOfDay = CCalendar::GetTimeOfDay(CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar), Map.MapLayers[z]->HoursPerDay);
 			}
 		}
 	}

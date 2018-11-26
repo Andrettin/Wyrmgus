@@ -115,7 +115,6 @@ std::string PlayerFaction;
 //Wyrmgus end
 
 unsigned long GameCycle;				/// Game simulation cycle counter
-unsigned long long GameHour;			/// Game simulation hour counter
 unsigned long FastForwardCycle;			/// Cycle to fastforward to in a replay
 
 bool UseHPForXp = false;				/// true if gain XP by dealing damage, false if by killing.
@@ -1675,7 +1674,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	}
 	
 	if (CurrentCampaign) {
-		GameHour = CurrentCampaign->StartDate.GetTotalHours(CCalendar::BaseCalendar);
 		CCalendar::BaseCalendar->CurrentDate = CurrentCampaign->StartDate;
 	} else {
 		CCalendar::BaseCalendar->CurrentDate.Clear();
@@ -1683,7 +1681,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		CCalendar::BaseCalendar->CurrentDate.Month = SyncRand(CCalendar::BaseCalendar->Months.size()) + 1;
 		CCalendar::BaseCalendar->CurrentDate.Day = SyncRand(CCalendar::BaseCalendar->Months[CCalendar::BaseCalendar->CurrentDate.Month - 1]->Days) + 1;
 		CCalendar::BaseCalendar->CurrentDate.Hour = SyncRand(CCalendar::BaseCalendar->HoursPerDay);
-		GameHour = CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
 	}
 	
 	for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {

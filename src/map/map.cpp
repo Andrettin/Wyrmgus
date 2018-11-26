@@ -1165,7 +1165,7 @@ void CMap::Create()
 	map_layer->ID = this->MapLayers.size();
 	map_layer->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
 	if (!GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning) {
-		map_layer->TimeOfDay = CCalendar::GetTimeOfDay(GameHour, DefaultHoursPerDay);
+		map_layer->TimeOfDay = CCalendar::GetTimeOfDay(CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar), DefaultHoursPerDay);
 	} else {
 		map_layer->TimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 	}
