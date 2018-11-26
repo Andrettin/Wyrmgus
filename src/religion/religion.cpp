@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name timeline.h - The timeline header file. */
+/**@name religion.cpp - The religion source file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -27,50 +27,80 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TIMELINE_H__
-#define __TIMELINE_H__
-
 //@{
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <map>
-#include <string>
-#include <vector>
+#include "stratagus.h"
 
-#include "date.h"
+#include "religion/religion.h"
+
+#include "config.h"
 
 /*----------------------------------------------------------------------------
---  Declarations
+--  Variables
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
+std::vector<CReligion *> CReligion::Religions;
+std::map<std::string, CReligion *> CReligion::ReligionsByIdent;
+	
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
 
-class CTimeline
+/**
+**	@brief	Get a religion
+**
+**	@param	ident		The religion's string identifier
+**	@param	should_find	Whether it is an error if the religion could not be found; this is true by default
+**
+**	@return	The religion if found, or null otherwise
+*/
+CReligion *CReligion::GetReligion(const std::string &ident, const bool should_find)
 {
-public:
-	CTimeline() :
-		ID(-1)
-	{
+	if (ReligionsByIdent.find(ident) != ReligionsByIdent.end()) {
+		return ReligionsByIdent.find(ident)->second;
 	}
 	
-	static CTimeline *GetTimeline(std::string ident);
-	static CTimeline *GetOrAddTimeline(std::string ident);
-	static void ClearTimelines();
+	if (should_find) {
+		fprintf(stderr, "Invalid religion: \"%s\".\n", ident.c_str());
+	}
 	
-	static std::vector<CTimeline *> Timelines;
-	static std::map<std::string, CTimeline *> TimelinesByIdent;
+	return NULL;
+}
+
+/**
+**	@brief	Get or add a religion
+**
+**	@param	ident	The religion's string identifier
+**
+**	@return	The religion if found, or a newly-created one otherwise
+*/
+CReligion *CReligion::GetOrAddReligion(const std::string &ident)
+{
+	CReligion *religion = GetReligion(ident, false);
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	if (!religion) {
+		religion = new CReligion;
+		religion->Ident = ident;
+		Religions.push_back(religion);
+		ReligionsByIdent[ident] = religion;
+	}
 	
-	int ID;
-	std::string Ident;
-	std::string Name;
-	CDate PointOfDivergence;											/// The point of divergence for this timeline
-};
+	return religion;
+}
+
+/**
+**	@brief	Remove the existing religions
+*/
+void CReligion::ClearReligions()
+{
+	for (size_t i = 0; i < Religions.size(); ++i) {
+		delete Religions[i];
+	}
+	Religions.clear();
+}
 
 //@}
-
-#endif // !__TIMELINE_H__

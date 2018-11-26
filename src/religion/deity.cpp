@@ -35,15 +35,15 @@
 
 #include "stratagus.h"
 
-#include "deity.h"
+#include "religion/deity.h"
 
 #include "civilization.h"
 #include "config.h"
-#include "deity_domain.h"
 #include "plane.h"
 #include "player.h"
 #include "province.h"
-#include "religion.h"
+#include "religion/deity_domain.h"
+#include "religion/religion.h"
 #include "upgrade.h"
 
 #include <algorithm>

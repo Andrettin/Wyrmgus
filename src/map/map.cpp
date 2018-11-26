@@ -42,7 +42,7 @@
 #include <fstream>
 //Wyrmgus end
 
-#include "calendar.h"
+#include "calendar/calendar.h"
 //Wyrmgus start
 #include "editor.h"
 #include "game.h" // for the SaveGameLoading variable

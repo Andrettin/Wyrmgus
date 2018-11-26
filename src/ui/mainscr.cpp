@@ -41,7 +41,7 @@
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
 #include "age.h"
-#include "calendar.h"
+#include "calendar/calendar.h"
 #include "civilization.h"
 #include "font.h"
 #include "icons.h"

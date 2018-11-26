@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name religion.cpp - The religion source file. */
+/**@name timeline.cpp - The timeline source file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "religion.h"
+#include "calendar/timeline.h"
 
 #include "config.h"
 
@@ -43,64 +43,62 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CReligion *> CReligion::Religions;
-std::map<std::string, CReligion *> CReligion::ReligionsByIdent;
-	
+std::vector<CTimeline *> CTimeline::Timelines;
+std::map<std::string, CTimeline *> CTimeline::TimelinesByIdent;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a religion
-**
-**	@param	ident		The religion's string identifier
-**	@param	should_find	Whether it is an error if the religion could not be found; this is true by default
-**
-**	@return	The religion if found, or null otherwise
+**  Get a timeline
 */
-CReligion *CReligion::GetReligion(const std::string &ident, const bool should_find)
+CTimeline *CTimeline::GetTimeline(std::string ident)
 {
-	if (ReligionsByIdent.find(ident) != ReligionsByIdent.end()) {
-		return ReligionsByIdent.find(ident)->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid religion: \"%s\".\n", ident.c_str());
+	if (TimelinesByIdent.find(ident) != TimelinesByIdent.end()) {
+		return TimelinesByIdent.find(ident)->second;
 	}
 	
 	return NULL;
 }
 
-/**
-**	@brief	Get or add a religion
-**
-**	@param	ident	The religion's string identifier
-**
-**	@return	The religion if found, or a newly-created one otherwise
-*/
-CReligion *CReligion::GetOrAddReligion(const std::string &ident)
+CTimeline *CTimeline::GetOrAddTimeline(std::string ident)
 {
-	CReligion *religion = GetReligion(ident, false);
+	CTimeline *timeline = GetTimeline(ident);
 	
-	if (!religion) {
-		religion = new CReligion;
-		religion->Ident = ident;
-		Religions.push_back(religion);
-		ReligionsByIdent[ident] = religion;
+	if (!timeline) {
+		timeline = new CTimeline;
+		timeline->Ident = ident;
+		timeline->ID = Timelines.size();
+		Timelines.push_back(timeline);
+		TimelinesByIdent[ident] = timeline;
 	}
 	
-	return religion;
+	return timeline;
 }
 
-/**
-**	@brief	Remove the existing religions
-*/
-void CReligion::ClearReligions()
+void CTimeline::ClearTimelines()
 {
-	for (size_t i = 0; i < Religions.size(); ++i) {
-		delete Religions[i];
+	for (size_t i = 0; i < Timelines.size(); ++i) {
+		delete Timelines[i];
 	}
-	Religions.clear();
+	Timelines.clear();
+}
+
+void CTimeline::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "point_of_divergence") {
+			this->PointOfDivergence = CDate::FromString(value);
+		} else {
+			fprintf(stderr, "Invalid timeline property: \"%s\".\n", key.c_str());
+		}
+	}
 }
 
 //@}

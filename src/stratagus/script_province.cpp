@@ -38,11 +38,11 @@
 #include "province.h"
 
 #include "civilization.h"
-#include "deity_domain.h"
 #include "iolib.h"
 #include "map/tileset.h"
 #include "plane.h"
 #include "player.h"
+#include "religion/deity_domain.h"
 #include "script.h"
 #include "unittype.h"
 #include "upgrade.h"

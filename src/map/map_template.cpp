@@ -39,7 +39,7 @@
 
 #include <fstream>
 
-#include "calendar.h"
+#include "calendar/calendar.h"
 #include "config.h"
 #include "editor.h"
 #include "game.h"

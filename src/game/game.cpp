@@ -43,7 +43,7 @@
 #include "actions.h"
 #include "ai.h"
 #include "animation.h"
-#include "calendar.h"
+#include "calendar/calendar.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end

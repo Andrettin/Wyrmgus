@@ -37,7 +37,7 @@
 
 #include "civilization.h"
 
-#include "calendar.h"
+#include "calendar/calendar.h"
 #include "player.h"
 
 /*----------------------------------------------------------------------------

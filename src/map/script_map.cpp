@@ -37,6 +37,7 @@
 
 #include "map/map.h"
 
+#include "calendar/timeline.h"
 #include "civilization.h"
 //Wyrmgus start
 #include "editor.h"
@@ -56,7 +57,6 @@
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
-#include "timeline.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit.h"

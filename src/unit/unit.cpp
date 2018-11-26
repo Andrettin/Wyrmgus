@@ -53,7 +53,6 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
-#include "deity.h"
 //Wyrmgus start
 #include "depend.h"	//for using dependency checks
 //Wyrmgus end
@@ -77,6 +76,7 @@
 //Wyrmgus start
 #include "quest.h"
 //Wyrmgus end
+#include "religion/deity.h"
 #include "script.h"
 #include "sound.h"
 #include "sound_server.h"

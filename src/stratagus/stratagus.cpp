@@ -180,7 +180,8 @@ extern void beos_init(int argc, char **argv);
 #include "stratagus.h"
 
 #include "ai.h"
-#include "calendar.h"
+#include "calendar/calendar.h"
+#include "calendar/timeline.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
@@ -198,7 +199,6 @@ extern void beos_init(int argc, char **argv);
 #include "results.h"
 #include "settings.h"
 #include "sound_server.h"
-#include "timeline.h"
 #include "title.h"
 #include "translate.h"
 #include "ui/interface.h"

@@ -52,8 +52,6 @@
 //Wyrmgus end
 #include "civilization.h"
 #include "commands.h"
-#include "deity.h"
-#include "deity_domain.h"
 #include "depend.h"
 //Wyrmgus start
 #include "editor.h"
@@ -70,6 +68,8 @@
 #include "network.h"
 //Wyrmgus end
 #include "player.h"
+#include "religion/deity.h"
+#include "religion/deity_domain.h"
 #include "script.h"
 //Wyrmgus start
 #include "settings.h"

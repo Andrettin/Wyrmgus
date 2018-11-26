@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "deity_domain.h"
+#include "religion/deity_domain.h"
 
 #include "config.h"
 #include "upgrade_structs.h"

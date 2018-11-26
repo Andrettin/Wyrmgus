@@ -46,11 +46,9 @@
 #include "ai.h"
 //Wyrmgus start
 #include "../ai/ai_local.h" //for using AiHelpers
-#include "calendar.h"
+#include "calendar/calendar.h"
 #include "civilization.h"
 #include "commands.h" //for faction setting
-#include "deity.h"
-#include "deity_domain.h"
 #include "depend.h"
 #include "editor.h"
 #include "font.h"
@@ -69,7 +67,9 @@
 //Wyrmgus start
 #include "parameters.h"
 #include "quest.h"
-#include "religion.h"
+#include "religion/deity.h"
+#include "religion/deity_domain.h"
+#include "religion/religion.h"
 #include "settings.h"
 //Wyrmgus end
 #include "sound.h"

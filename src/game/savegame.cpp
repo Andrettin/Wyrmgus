@@ -39,7 +39,7 @@
 
 #include "actions.h"
 #include "ai.h"
-#include "calendar.h"
+#include "calendar/calendar.h"
 #include "character.h"
 #include "iocompat.h"
 #include "iolib.h"

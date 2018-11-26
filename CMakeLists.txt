@@ -70,9 +70,7 @@ set(action_SRCS
 	src/action/action_die.cpp
 	src/action/action_follow.cpp
 	src/action/action_move.cpp
-	#Wyrmgus start
 	src/action/action_pickup.cpp
-	#Wyrmgus end
 	src/action/action_patrol.cpp
 	src/action/action_repair.cpp
 	src/action/action_research.cpp
@@ -85,9 +83,7 @@ set(action_SRCS
 	src/action/action_train.cpp
 	src/action/action_unload.cpp
 	src/action/action_upgradeto.cpp
-	#Wyrmgus start
 	src/action/action_use.cpp
-	#Wyrmgus end
 	src/action/actions.cpp
 	src/action/command.cpp
 )
@@ -134,6 +130,13 @@ set(beos_SRCS
 	src/beos/beos.cpp
 )
 source_group(beos FILES ${beos_SRCS})
+
+set(calendar_SRCS
+	src/calendar/calendar.cpp
+	src/calendar/date.cpp
+	src/calendar/timeline.cpp
+)
+source_group(calendar FILES ${calendar_SRCS})
 
 set(editor_SRCS
 	src/editor/editloop.cpp
@@ -262,6 +265,13 @@ set(pathfinder_SRCS
 )
 source_group(pathfinder FILES ${pathfinder_SRCS})
 
+set(religion_SRCS
+	src/religion/deity.cpp
+	src/religion/deity_domain.cpp
+	src/religion/religion.cpp
+)
+source_group(religion FILES ${religion_SRCS})
+
 set(sound_SRCS
 	src/sound/fluidsynth.cpp
 	src/sound/mikmod.cpp
@@ -286,9 +296,7 @@ set(spell_SRCS
 	src/spell/spell_demolish.cpp
 	src/spell/spell_luacallback.cpp
 	src/spell/spell_polymorph.cpp
-	#Wyrmgus start
 	src/spell/spell_retrain.cpp
-	#Wyrmgus end
 	src/spell/spell_spawnmissile.cpp
 	src/spell/spell_spawnportal.cpp
 	src/spell/spell_summon.cpp
@@ -299,14 +307,10 @@ source_group(spell FILES ${spell_SRCS})
 
 set(stratagusmain_SRCS
 	src/stratagus/age.cpp
-	src/stratagus/calendar.cpp
 	src/stratagus/character.cpp
 	src/stratagus/civilization.cpp
 	src/stratagus/config.cpp
 	src/stratagus/construct.cpp
-	src/stratagus/date.cpp
-	src/stratagus/deity.cpp
-	src/stratagus/deity_domain.cpp
 	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
@@ -320,7 +324,6 @@ set(stratagusmain_SRCS
 	src/stratagus/player.cpp
 	src/stratagus/province.cpp
 	src/stratagus/quest.cpp
-	src/stratagus/religion.cpp
 	src/stratagus/script.cpp
 	src/stratagus/script_player.cpp
 	src/stratagus/script_character.cpp
@@ -332,7 +335,6 @@ set(stratagusmain_SRCS
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
 	src/stratagus/text.cpp
-	src/stratagus/timeline.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
 	src/stratagus/util.cpp
@@ -438,6 +440,7 @@ set(stratagus_SRCS
 	${action_SRCS}
 	${animation_SRCS}
 	${ai_SRCS}
+	${calendar_SRCS}
 	${editor_SRCS}
 	${game_SRCS}
 	${guichan_SRCS}
@@ -446,6 +449,7 @@ set(stratagus_SRCS
 	${network_SRCS}
 	${particle_SRCS}
 	${pathfinder_SRCS}
+	${religion_SRCS}
 	${sound_SRCS}
 	${spell_SRCS}
 	${stratagusmain_SRCS}
@@ -515,9 +519,7 @@ set(stratagus_action_HDRS
 	src/include/action/action_follow.h
 	src/include/action/action_move.h
 	src/include/action/action_patrol.h
-	#Wyrmgus start
 	src/include/action/action_pickup.h
-	#Wyrmgus end
 	src/include/action/action_repair.h
 	src/include/action/action_research.h
 	src/include/action/action_resource.h
@@ -529,9 +531,7 @@ set(stratagus_action_HDRS
 	src/include/action/action_train.h
 	src/include/action/action_unload.h
 	src/include/action/action_upgradeto.h
-	#Wyrmgus start
 	src/include/action/action_use.h
-	#Wyrmgus end
 )
 
 set(stratagus_animation_HDRS
@@ -558,6 +558,28 @@ set(stratagus_animation_HDRS
 	src/include/animation/animation_wait.h
 )
 
+set(stratagus_calendar_HDRS
+	src/include/calendar/calendar.h
+	src/include/calendar/date.h
+	src/include/calendar/timeline.h
+)
+
+set(stratagus_map_HDRS
+	src/include/map/map.h
+	src/include/map/map_layer.h
+	src/include/map/map_template.h
+	src/include/map/minimap.h
+	src/include/map/terrain_type.h
+	src/include/map/tile.h
+	src/include/map/tileset.h
+)
+
+set(stratagus_religion_HDRS
+	src/include/religion/deity.h
+	src/include/religion/deity_domain.h
+	src/include/religion/religion.h
+)
+
 set(stratagus_spell_HDRS
 	src/include/spell/spell_adjustvariable.h
 	src/include/spell/spell_adjustvital.h
@@ -567,13 +589,21 @@ set(stratagus_spell_HDRS
 	src/include/spell/spell_demolish.h
 	src/include/spell/spell_luacallback.h
 	src/include/spell/spell_polymorph.h
-	#Wyrmgus start
 	src/include/spell/spell_retrain.h
-	#Wyrmgus end
 	src/include/spell/spell_spawnmissile.h
 	src/include/spell/spell_spawnportal.h
 	src/include/spell/spell_summon.h
 	src/include/spell/spell_teleport.h
+)
+
+set(stratagus_ui_HDRS
+	src/include/ui/button_action.h
+	src/include/ui/contenttype.h
+	src/include/ui/interface.h
+	src/include/ui/popup.h
+	src/include/ui/statusline.h
+	src/include/ui/ui.h
+	src/include/ui/uitimer.h
 )
 
 #Wyrmgus start
@@ -591,7 +621,6 @@ set(stratagus_generic_HDRS
 	src/include/age.h
 	src/include/ai.h
 	src/include/animation.h
-	src/include/calendar.h
 	src/include/character.h
 	src/include/civilization.h
 	src/include/color.h
@@ -599,9 +628,6 @@ set(stratagus_generic_HDRS
 	src/include/config.h
 	src/include/construct.h
 	src/include/cursor.h
-	src/include/date.h
-	src/include/deity.h
-	src/include/deity_domain.h
 	src/include/depend.h
 	src/include/editor.h
 	src/include/font.h
@@ -612,13 +638,6 @@ set(stratagus_generic_HDRS
 	src/include/iolib.h
 	src/include/item.h
 	src/include/luacallback.h
-	src/include/map/map.h
-	src/include/map/map_layer.h
-	src/include/map/map_template.h
-	src/include/map/minimap.h
-	src/include/map/terrain_type.h
-	src/include/map/tile.h
-	src/include/map/tileset.h
 	src/include/master.h
 	src/include/menus.h
 	src/include/missile.h
@@ -638,7 +657,6 @@ set(stratagus_generic_HDRS
 	src/include/player.h
 	src/include/province.h
 	src/include/quest.h
-	src/include/religion.h
 	src/include/replay.h
 	src/include/results.h
 	src/include/script.h
@@ -650,17 +668,9 @@ set(stratagus_generic_HDRS
 	src/include/spells.h
 	src/include/stratagus.h
 	src/include/text.h
-	src/include/timeline.h
 	src/include/title.h
 	src/include/translate.h
 	src/include/trigger.h
-	src/include/ui/button_action.h
-	src/include/ui/contenttype.h
-	src/include/ui/interface.h
-	src/include/ui/popup.h
-	src/include/ui/statusline.h
-	src/include/ui/ui.h
-	src/include/ui/uitimer.h
 	src/include/unit.h
 	src/include/unit_cache.h
 	src/include/unit_find.h
@@ -684,8 +694,12 @@ set(stratagus_generic_HDRS
 source_group(include FILES ${stratagus_generic_HDRS})
 source_group(include\\action FILES ${stratagus_action_HDRS})
 source_group(include\\animation FILES ${stratagus_animation_HDRS})
+source_group(include\\calendar FILES ${stratagus_calendar_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
+source_group(include\\map FILES ${stratagus_map_HDRS})
+source_group(include\\religion FILES ${stratagus_religion_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
+source_group(include\\ui FILES ${stratagus_ui_HDRS})
 #Wyrmgus start
 source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
 #Wyrmgus end
@@ -695,8 +709,12 @@ set(stratagus_HDRS
 	${stratagus_generic_HDRS}
 	${stratagus_action_HDRS}
 	${stratagus_animation_HDRS}
+	${stratagus_calendar_HDRS}
 	${stratagus_guichan_HDRS}
+	${stratagus_map_HDRS}
+	${stratagus_religion_HDRS}
 	${stratagus_spell_HDRS}
+	${stratagus_ui_HDRS}
 	#Wyrmgus start
 	${stratagus_xbrz_HDRS}
 	#Wyrmgus end
@@ -791,10 +809,7 @@ option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" OFF)
 option(WITH_PHYSFS "Compile Stratagus with PhysFS support" OFF)
-#Wyrmgus start
-#option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" ON)
 option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" OFF)
-#Wyrmgus end
 option(WITH_MIKMOD "Compile Stratagus with Mikmod sound library" ON)
 option(WITH_MNG "Compile Stratagus with MNG image library" OFF)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)

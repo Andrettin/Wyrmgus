@@ -36,7 +36,7 @@
 #include "stratagus.h"
 
 #include "actions.h"
-#include "calendar.h"
+#include "calendar/calendar.h"
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"

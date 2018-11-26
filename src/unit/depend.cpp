@@ -38,8 +38,8 @@
 
 #include "depend.h"
 
-#include "deity.h"
 #include "player.h"
+#include "religion/deity.h"
 #include "script.h"
 #include "translate.h"
 #include "trigger.h"

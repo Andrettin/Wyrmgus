@@ -37,16 +37,16 @@
 
 #include "character.h"
 
+#include "calendar/timeline.h"
 #include "civilization.h"
-#include "deity.h"
 #include "grand_strategy.h"
 #include "map/map_template.h"
 #include "player.h"
 #include "province.h"
 #include "quest.h"
+#include "religion/deity.h"
 #include "script.h"
 #include "spells.h"
-#include "timeline.h"
 #include "unittype.h"
 #include "upgrade.h"
 
