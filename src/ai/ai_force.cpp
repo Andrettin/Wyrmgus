@@ -377,7 +377,7 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType &unittype, int *usableTypes)
 	int usableTypesCount = AiFindUnitTypeEquiv(unittype, usableTypes);
 	// 2 - Remove unavailable unittypes
 	for (int i = 0; i < usableTypesCount;) {
-		if (!CheckDependByIdent(*AiPlayer->Player, UnitTypes[usableTypes[i]]->Ident)) {
+		if (!CheckDependByIdent(*AiPlayer->Player, DependRuleUnitType, UnitTypes[usableTypes[i]]->Ident)) {
 			// Not available, remove it
 			usableTypes[i] = usableTypes[usableTypesCount - 1];
 			--usableTypesCount;

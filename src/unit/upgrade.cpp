@@ -1658,9 +1658,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 				for (size_t i = 0; i < unit.Type->StartingAbilities.size(); ++i) {
-					if (!unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
+					if (!unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && CheckDependByIdent(unit, DependRuleUpgrade, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeAcquire(unit, unit.Type->StartingAbilities[i]);
-					} else if (unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && !CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
+					} else if (unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && !CheckDependByIdent(unit, DependRuleUpgrade, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeLost(unit, unit.Type->StartingAbilities[i]);
 					}
 				}
@@ -1953,9 +1953,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 				for (size_t i = 0; i < unit.Type->StartingAbilities.size(); ++i) {
-					if (!unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
+					if (!unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && CheckDependByIdent(unit, DependRuleUpgrade, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeAcquire(unit, unit.Type->StartingAbilities[i]);
-					} else if (unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && !CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
+					} else if (unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && !CheckDependByIdent(unit, DependRuleUpgrade, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeLost(unit, unit.Type->StartingAbilities[i]);
 					}
 				}

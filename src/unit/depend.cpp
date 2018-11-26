@@ -8,10 +8,10 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name depend.cpp - The units/upgrade dependencies */
+/**@name depend.cpp - The dependencies source file */
 //
-//      (c) Copyright 2000-2011 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon and Pali Rohár
+//      (c) Copyright 2000-2018 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -66,56 +66,47 @@ static DependRule *PredependHash[101];
 ----------------------------------------------------------------------------*/
 
 /**
-**  Add a new dependency. If already exits append to and rule.
+**	@brief Add a new dependency. If it already exists append to "and" rule
 **
-**  @param target    Target of the dependency.
-**  @param required  Requirement of the dependency.
-**  @param count     Amount of the required needed.
-**  @param or_flag   Start of or rule.
+**	@param	rule_type			The type of the rule (e.g. unit type or upgrade)
+**	@param	target				Target of the dependency
+**	@param	required			Requirement of the dependency
+**	@param	count				Amount of the required needed
+**	@param	or_flag				Start of or rule
+**	@param	is_predependency	Whether the dependency is a predependency
 */
-//Wyrmgus start
-//static void AddDependency(const std::string &target, const std::string &required, int count, int or_flag)
-static void AddDependency(const std::string &target, const std::string &required, int count, int or_flag, bool is_predependency)
-//Wyrmgus end
+void AddDependency(const int rule_type, const std::string &target, const std::string &required, int count, const int or_flag, const bool is_predependency)
 {
 	DependRule rule;
 
 	//  Setup structure.
-	if (!strncmp(target.c_str(), "unit-", 5)) {
+	rule.Type = rule_type;
+	if (rule.Type == DependRuleUnitType) {
 		// target string refers to unit-xxx
-		rule.Type = DependRuleUnitType;
 		rule.Kind.UnitType = UnitTypeByIdent(target);
-		//Wyrmgus start
 		if (!rule.Kind.UnitType) {
 			fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", target.c_str());
 		}
-		//Wyrmgus end
-	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
+	} else if (rule.Type == DependRuleUpgrade) {
 		// target string refers to upgrade-XXX
-		rule.Type = DependRuleUpgrade;
 		rule.Kind.Upgrade = CUpgrade::Get(target);
-		//Wyrmgus start
 		if (!rule.Kind.Upgrade) {
 			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", target.c_str());
 		}
-		//Wyrmgus end
 	} else {
-		DebugPrint("dependency target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
+		fprintf(stderr, "Dependency target '%s' should be unit-type or upgrade\n", target.c_str());
 		return;
 	}
 
-	int hash = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-	//Wyrmgus start
+	int hash;
 	if (is_predependency) {
 		hash = (int)((intptr_t)rule.Kind.UnitType % (sizeof(PredependHash) / sizeof(*PredependHash)));
+	} else {
+		hash = hash = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
 	}
-	//Wyrmgus end
 
 	//  Find correct hash slot.
-	//Wyrmgus start
-//	DependRule *node = DependHash[hash];
 	DependRule *node = is_predependency ? PredependHash[hash] : DependHash[hash];
-	//Wyrmgus end
 
 	if (node) {  // find correct entry
 		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
@@ -137,19 +128,16 @@ static void AddDependency(const std::string &target, const std::string &required
 		node->Rule = NULL;
 		node->Type = rule.Type;
 		node->Kind = rule.Kind;
-		//Wyrmgus start
-//		DependHash[hash] = node;
 		if (is_predependency) {
 			PredependHash[hash] = node;
 		} else {
 			DependHash[hash] = node;
 		}
-		//Wyrmgus end
 	}
 
 	//  Adjust count.
 	if (count < 0 || count > 255) {
-		DebugPrint("wrong count `%d' range 0 .. 255\n" _C_ count);
+		DebugPrint("wrong count '%d' range 0 .. 255\n" _C_ count);
 		count = 255;
 	}
 
@@ -163,21 +151,17 @@ static void AddDependency(const std::string &target, const std::string &required
 		// required string refers to unit-xxx
 		temp->Type = DependRuleUnitType;
 		temp->Kind.UnitType = UnitTypeByIdent(required);
-		//Wyrmgus start
 		if (!temp->Kind.UnitType) {
 			fprintf(stderr, "Unit type \"%s\" was set as a dependency for \"%s\", but it doesn't exist.\n", required.c_str(), target.c_str());
 			fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", required.c_str());
 		}
-		//Wyrmgus end
 	} else if (!strncmp(required.c_str(), "upgrade-", 8)) {
 		// required string refers to upgrade-XXX
 		temp->Type = DependRuleUpgrade;
 		temp->Kind.Upgrade = CUpgrade::Get(required);
-		//Wyrmgus start
 		if (!temp->Kind.Upgrade) {
 			fprintf(stderr, "Upgrade \"%s\" was set as a dependency for \"%s\", but it doesn't exist.\n", required.c_str(), target.c_str());
 		}
-		//Wyrmgus end
 	} else {
 		DebugPrint("dependency required '%s' should be unit-type or upgrade\n" _C_ required.c_str());
 		delete temp;
@@ -236,14 +220,14 @@ static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool igno
 	//Wyrmgus end
 	
 	//  Find rule
-	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-	//Wyrmgus start
+	int i;
 	if (is_predependency) {
 		i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(PredependHash) / sizeof(*PredependHash)));
+	} else {
+		i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
 	}
-//	const DependRule *node = DependHash[i];
+
 	const DependRule *node = is_predependency ? PredependHash[i] : DependHash[i];
-	//Wyrmgus end
 
 	if (node) {  // find correct entry
 		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
@@ -288,7 +272,7 @@ static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool igno
 			}
 			temp = temp->Rule;
 		}
-		return true;  // all rules matches.
+		return true;  // all rules match
 
 try_or:
 		node = node->Next;
@@ -454,40 +438,47 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 }
 
 /**
-**  Check if this upgrade or unit is available.
+**	@brief	Check if this upgrade or unit is available.
 **
-**  @param player  For this player available.
-**  @param target  Unit or Upgrade.
+**	@param	rule_type	The type of the rule (e.g. unit type or upgrade)
+**	@param	player		For this player available.
+**	@param	target		Unit or Upgrade.
 **
-**  @return        True if available, false otherwise.
+**	@return	True if available, false otherwise.
 */
-//Wyrmgus start
-//bool CheckDependByIdent(const CPlayer &player, const std::string &target)
-bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool ignore_units, bool is_predependency, bool is_neutral_use)
-//Wyrmgus end
+bool CheckDependByIdent(const CPlayer &player, const int rule_type, const std::string &target, bool ignore_units, bool is_predependency, bool is_neutral_use)
 {
 	DependRule rule;
 
 	//
 	//  first have to check, if target is allowed itself
 	//
-	if (!strncmp(target.c_str(), "unit-", 5)) {
+	rule.Type = rule_type;
+	if (rule_type == DependRuleUnitType) {
 		// target string refers to unit-XXX
 		rule.Kind.UnitType = UnitTypeByIdent(target);
+		
+		if (!rule.Kind.UnitType) {
+			fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", target.c_str());
+			return false;
+		}
+		
 		if (UnitIdAllowed(player, rule.Kind.UnitType->Slot) == 0) {
 			return false;
 		}
-		rule.Type = DependRuleUnitType;
-	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
+	} else if (rule_type == DependRuleUpgrade) {
 		// target string refers to upgrade-XXX
 		rule.Kind.Upgrade = CUpgrade::Get(target);
-		//Wyrmgus start
-//		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
-		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A' && !((is_predependency || is_neutral_use) && UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) == 'R')) {
-		//Wyrmgus end
+
+		if (!rule.Kind.Upgrade) {
+			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", target.c_str());
 			return false;
 		}
-		//Wyrmgus start
+		
+		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A' && !((is_predependency || is_neutral_use) && UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) == 'R')) {
+			return false;
+		}
+
 		if (player.Faction != -1 && PlayerRaces.Factions[player.Faction]->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
 			if (PlayerRaces.Factions[player.Faction]->HolyOrderDeity) {
 				CUpgrade *deity_upgrade = PlayerRaces.Factions[player.Faction]->HolyOrderDeity->DeityUpgrade;
@@ -505,8 +496,6 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool i
 				}
 			}
 		}
-		//Wyrmgus end
-		rule.Type = DependRuleUpgrade;
 	} else {
 		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return false;
@@ -526,21 +515,21 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool i
 **
 **  @return        True if available, false otherwise.
 */
-bool CheckDependByIdent(const CUnit &unit, const std::string &target, bool ignore_units, bool is_predependency)
+bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::string &target, bool ignore_units, bool is_predependency)
 {
 	DependRule rule;
 
+	rule.Type = rule_type;
 	//
 	//  first have to check, if target is allowed itself
 	//
-	if (!strncmp(target.c_str(), "unit-", 5)) {
+	if (rule.Type == DependRuleUnitType) {
 		// target string refers to unit-XXX
 		rule.Kind.UnitType = UnitTypeByIdent(target);
 		if (UnitIdAllowed(*unit.Player, rule.Kind.UnitType->Slot) == 0) {
 			return false;
 		}
-		rule.Type = DependRuleUnitType;
-	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
+	} else if (rule.Type == DependRuleUpgrade) {
 		rule.Kind.Upgrade = CUpgrade::Get(target);
 		if (UpgradeIdAllowed(*unit.Player, rule.Kind.Upgrade->ID) == 'F') {
 			return false;
@@ -704,10 +693,7 @@ static int CclDefineDependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			//Wyrmgus start
-//			AddDependency(target, required, count, or_flag);
-			AddDependency(target, required, count, or_flag, false);
-			//Wyrmgus end
+			AddDependency(!strncmp(target, "unit-", 5) ? DependRuleUnitType : DependRuleUpgrade, target, required, count, or_flag, false);
 			or_flag = 0;
 		}
 		if (j + 1 < args) {
@@ -748,7 +734,7 @@ static int CclDefinePredependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			AddDependency(target, required, count, or_flag, true);
+			AddDependency(!strncmp(target, "unit-", 5) ? DependRuleUnitType : DependRuleUpgrade, target, required, count, or_flag, true);
 			or_flag = 0;
 		}
 		if (j + 1 < args) {
@@ -799,7 +785,7 @@ static int CclCheckDependency(lua_State *l)
 	}
 	CPlayer &player = Players[plynr];
 
-	lua_pushboolean(l, CheckDependByIdent(player, object));
+	lua_pushboolean(l, CheckDependByIdent(player, !strncmp(object, "unit-", 5) ? DependRuleUnitType : DependRuleUpgrade, object));
 	return 1;
 }
 

@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name depend.h - The units/upgrade dependencies headerfile. */
+/**@name depend.h - The dependencies header file. */
 //
-//      (c) Copyright 2000-2007 by Vladi Belperchinov-Shabanski
+//      (c) Copyright 2000-2018 by Vladi Belperchinov-Shabanski and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -132,18 +132,13 @@ extern void CleanDependencies();
 
 /// Print all unit dependencies into string
 extern std::string PrintDependencies(const CPlayer &player, const ButtonAction &button);
+extern void AddDependency(const int rule_type, const std::string &target, const std::string &required, const int count, const int or_flag, const bool is_predependency);
 /// Check a dependency by identifier
-//Wyrmgus start
-//extern bool CheckDependByIdent(const CPlayer &player, const std::string &target);
-extern bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
-extern bool CheckDependByIdent(const CUnit &unit, const std::string &target, bool ignore_units = false, bool is_predependency = false);
-//Wyrmgus end
+extern bool CheckDependByIdent(const CPlayer &player, const int rule_type, const std::string &target, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
+extern bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::string &target, bool ignore_units = false, bool is_predependency = false);
 /// Check a dependency by unit type
-//Wyrmgus start
-//extern bool CheckDependByType(const CPlayer &player, const CUnitType &type);
 extern bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore_units = false, bool is_predependency = false);
 extern bool CheckDependByType(const CUnit &unit, const CUnitType &type, bool ignore_units = false, bool is_predependency = false);
-//Wyrmgus end
 //@}
 
 #endif // !__DEPEND_H__

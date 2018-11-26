@@ -1424,21 +1424,17 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:
-			//Wyrmgus start
-//			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
-			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, true, !ThisPlayer->IsTeamed(unit));
-			//Wyrmgus end
+			res = CheckDependByIdent(*unit.Player, buttonaction.Action == ButtonResearch ? DependRuleUpgrade : DependRuleUnitType, buttonaction.ValueStr, false, true, !ThisPlayer->IsTeamed(unit));
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				//Wyrmgus start
 //				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
-				res = (UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'R') && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, true); //also check for the dependencies for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+				res = (UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'R') && CheckDependByIdent(*ThisPlayer, DependRuleUpgrade, buttonaction.ValueStr, false, true); //also check for the dependencies for this player (rather than the unit) as an extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 				res = res && (!unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(buttonaction.ValueStr)] || unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(buttonaction.ValueStr)] == AllUpgrades[UpgradeIdByIdent(buttonaction.ValueStr)]->Costs[TimeCost]); //don't show if is being researched elsewhere
 				//Wyrmgus end
 			}
 			break;
-		//Wyrmgus start
 		case ButtonExperienceUpgradeTo:
-			res = CheckDependByIdent(unit, buttonaction.ValueStr, true, true);
+			res = CheckDependByIdent(unit, DependRuleUnitType, buttonaction.ValueStr, true, true);
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			}
@@ -1449,7 +1445,6 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonLearnAbility:
 			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr), true);
 			break;
-		//Wyrmgus end
 		case ButtonSpellCast:
 			//Wyrmgus start
 //			res = SpellIsAvailable(*unit.Player, buttonaction.Value);
@@ -1503,7 +1498,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 
 //Wyrmgus start
 /**
-**  Check if the button is usable for the unit.
+**	Check if the button is usable for the unit.
 **
 **  @param unit          unit which checks for allow.
 **  @param buttonaction  button to check if it is usable.
@@ -1550,13 +1545,13 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:
-			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, false, !ThisPlayer->IsTeamed(unit));
+			res = CheckDependByIdent(*unit.Player, buttonaction.Action == ButtonResearch ? DependRuleUpgrade : DependRuleUnitType, buttonaction.ValueStr, false, false, !ThisPlayer->IsTeamed(unit));
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
-				res = UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' && CheckDependByIdent(*ThisPlayer, buttonaction.ValueStr, false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
+				res = UpgradeIdentAllowed(*ThisPlayer, buttonaction.ValueStr) == 'A' && CheckDependByIdent(*ThisPlayer, DependRuleUpgrade, buttonaction.ValueStr, false, false); //also check for the dependencies of this player extra for researches, so that the player doesn't research too advanced technologies at neutral buildings
 			}
 			break;
 		case ButtonExperienceUpgradeTo:
-			res = CheckDependByIdent(unit, buttonaction.ValueStr, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
+			res = CheckDependByIdent(unit, DependRuleUnitType, buttonaction.ValueStr, true, false) && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			break;
 		case ButtonLearnAbility:
 			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr));

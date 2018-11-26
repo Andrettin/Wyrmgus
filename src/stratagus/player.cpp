@@ -1742,7 +1742,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		
 		CUpgrade *upgrade = AllUpgrades[upgrade_id];
 		
-		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(player, upgrade->Ident)) {
+		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(player, DependRuleUpgrade, upgrade->Ident)) {
 			continue;
 		}
 	
@@ -1947,7 +1947,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 		CUpgrade *faction_upgrade = CUpgrade::Get(faction->FactionUpgrade);
 		
 		if (faction_upgrade) {
-			if (!CheckDependByIdent(*this, faction->FactionUpgrade, false, pre)) {
+			if (!CheckDependByIdent(*this, DependRuleUpgrade, faction->FactionUpgrade, false, pre)) {
 				return false;
 			}
 		} else {
@@ -1997,7 +1997,7 @@ bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
 	}
 	
 	if (dynasty->DynastyUpgrade) {
-		if (!CheckDependByIdent(*this, dynasty->DynastyUpgrade->Ident, false, pre)) {
+		if (!CheckDependByIdent(*this, DependRuleUpgrade, dynasty->DynastyUpgrade->Ident, false, pre)) {
 			return false;
 		}
 	} else {
@@ -2837,7 +2837,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 				}
 			}
 				
-			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(*this, upgrade->Ident)) {
+			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(*this, DependRuleUpgrade, upgrade->Ident)) {
 				return false;
 			}
 		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {
@@ -2978,7 +2978,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 					}
 				}
 				
-				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(*this, upgrade->Ident)) {
+				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(*this, DependRuleUpgrade, upgrade->Ident)) {
 					return "You can no longer research the required upgrade.";
 				}
 			}

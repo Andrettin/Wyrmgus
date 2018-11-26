@@ -405,7 +405,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button)
 	if (unit.CurrentAction() != UnitActionStill) {
 		return false;
 	}
-	return CheckDependByIdent(*unit.Player, button.ValueStr, false, true);
+	return CheckDependByIdent(*unit.Player, DependRuleUnitType, button.ValueStr, false, true);
 }
 
 /**
@@ -440,17 +440,11 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button)
 	}
 
 	// check if allowed
-	//Wyrmgus start
-//	if (!CheckDependByIdent(*unit.Player, button.ValueStr)) {
-	if (!CheckDependByIdent(*unit.Player, button.ValueStr, false, true)) {
-	//Wyrmgus end
+	if (!CheckDependByIdent(*unit.Player, DependRuleUpgrade, button.ValueStr, false, true)) {
 		return false;
 	}
 	if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)
-		//Wyrmgus start
-//		&& UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'A') {
 		&& UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'A' && UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'R') {
-		//Wyrmgus end
 		return false;
 	}
 	return true;

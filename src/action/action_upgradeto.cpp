@@ -167,7 +167,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		if (AllUpgrades[i]->Ability) {
 			if (unit.GetIndividualUpgrade(AllUpgrades[i]) && std::find(oldtype.StartingAbilities.begin(), oldtype.StartingAbilities.end(), AllUpgrades[i]) != oldtype.StartingAbilities.end() && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) == newtype.StartingAbilities.end()) {
 				IndividualUpgradeLost(unit, AllUpgrades[i]);
-			} else if (!unit.GetIndividualUpgrade(AllUpgrades[i]) && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) != newtype.StartingAbilities.end() && CheckDependByIdent(unit, AllUpgrades[i]->Ident)) {
+			} else if (!unit.GetIndividualUpgrade(AllUpgrades[i]) && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) != newtype.StartingAbilities.end() && CheckDependByIdent(unit, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
 				IndividualUpgradeAcquire(unit, AllUpgrades[i]);
 			}
 		}

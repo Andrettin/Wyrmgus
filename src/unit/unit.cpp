@@ -977,7 +977,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	}
 	
 	for (size_t i = 0; i < this->Type->StartingAbilities.size(); ++i) {
-		if (CheckDependByIdent(*this, this->Type->StartingAbilities[i]->Ident)) {
+		if (CheckDependByIdent(*this, DependRuleUpgrade, this->Type->StartingAbilities[i]->Ident)) {
 			IndividualUpgradeAcquire(*this, this->Type->StartingAbilities[i]);
 		}
 	}
@@ -2150,7 +2150,7 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 	}
 	if (dropper_player != NULL) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependByIdent(*dropper_player, AllUpgrades[i]->Ident)) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependByIdent(*dropper_player, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
 				potential_prefixes.push_back(AllUpgrades[i]);
 			}
 		}
@@ -2173,7 +2173,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 	}
 	if (dropper_player != NULL) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependByIdent(*dropper_player, AllUpgrades[i]->Ident)) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependByIdent(*dropper_player, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
 				if (Prefix == NULL || !AllUpgrades[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 					potential_suffixes.push_back(AllUpgrades[i]);
 				}
@@ -2212,7 +2212,7 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 	}
 	if (dropper_player != NULL) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependByIdent(*dropper_player, AllUpgrades[i]->Ident) && !AllUpgrades[i]->UniqueOnly) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependByIdent(*dropper_player, DependRuleUpgrade, AllUpgrades[i]->Ident) && !AllUpgrades[i]->UniqueOnly) {
 				potential_works.push_back(AllUpgrades[i]);
 			}
 		}
@@ -2231,17 +2231,17 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 			Type == UniqueItems[i]->Type
 			&& ( //the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Prefix == NULL
-				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Prefix->Ident))
+				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Prefix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Prefix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Suffix == NULL
-				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Suffix->Ident))
+				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Suffix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's set to drop the item
 				UniqueItems[i]->Set == NULL
-				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Set->Ident))
+				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Set->Ident))
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's spell to drop the item
 				UniqueItems[i]->Spell == NULL
@@ -2250,12 +2250,12 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 			&& ( //the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Work == NULL
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
-				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Work->Ident))
+				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Work->Ident))
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Elixir == NULL
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Elixir) != this->Type->Affixes.end()
-				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, UniqueItems[i]->Elixir->Ident))
+				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Elixir->Ident))
 			)
 			&& UniqueItems[i]->CanDrop()
 		) {
@@ -2791,7 +2791,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	}
 	
 	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
-		if (CheckDependByIdent(*unit, unit->Type->StartingAbilities[i]->Ident)) {
+		if (CheckDependByIdent(*unit, DependRuleUpgrade, unit->Type->StartingAbilities[i]->Ident)) {
 			IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
 		}
 	}
@@ -6049,7 +6049,7 @@ bool CUnit::CanLearnAbility(CUpgrade *ability, bool pre) const
 		return false;
 	}
 	
-	if (!CheckDependByIdent(*this, ability->Ident, false, pre)) {
+	if (!CheckDependByIdent(*this, DependRuleUpgrade, ability->Ident, false, pre)) {
 		return false;
 	}
 	

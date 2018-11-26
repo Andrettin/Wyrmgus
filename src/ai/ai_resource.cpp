@@ -476,7 +476,7 @@ static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upg
 	for (size_t i = 0; i < size; ++i) {
 		CUnitType &researcher = *AiHelpers.Research[upgrade->ID][i];
 
-		if ((player.GetUnitTypeAiActiveCount(&researcher) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, researcher))) && CheckDependByIdent(player, upgrade->Ident)) {
+		if ((player.GetUnitTypeAiActiveCount(&researcher) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, researcher))) && CheckDependByIdent(player, DependRuleUpgrade, upgrade->Ident)) {
 			return true;
 		}
 	}
