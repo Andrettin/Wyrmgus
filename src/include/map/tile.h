@@ -255,26 +255,15 @@ public:
 	bool IsTerrainResourceOnMap(int resource) const;
 	bool IsTerrainResourceOnMap() const;
 	
-	//Wyrmgus start
 	bool IsSeenTileCorrect() const;
 	
 	int GetResource() const;
-	//Wyrmgus end
 
 	unsigned char getCost() const { return cost; }
 	unsigned int getFlag() const { return Flags; }
 	//Wyrmgus start
 //	void setGraphicTile(unsigned int tile) { this->tile = tile; }
 	//Wyrmgus end
-private:
-//Wyrmgus start
-/*
-#ifdef DEBUG
-	unsigned int tilesetTile;  /// tileset tile number
-#endif
-	unsigned short tile;       /// graphic tile number
-*/
-//Wyrmgus end
 public:
 	//Wyrmgus start
 //	unsigned short Flags;      /// field flags

@@ -50,18 +50,9 @@
 #include "unit_manager.h"
 
 CMapField::CMapField() :
-	//Wyrmgus start
-	/*
-#ifdef DEBUG
-	tilesetTile(0),
-#endif
-	tile(0),
-	*/
-	//Wyrmgus end
 	Flags(0),
 	cost(0),
 	Value(0),
-	//Wyrmgus start
 	Landmass(0),
 	Owner(-1),
 	OwnershipBorderTile(-1),
@@ -72,20 +63,13 @@ CMapField::CMapField() :
 	SolidTile(0), OverlaySolidTile(0),
 	OverlayTerrainDestroyed(false),
 	OverlayTerrainDamaged(false),
-	//Wyrmgus end
 	UnitCache()
-{}
+{
+}
 
 bool CMapField::IsTerrainResourceOnMap(int resource) const
 {
-	//Wyrmgus start
-//	// TODO: Hard coded stuff.
-//	if (resource == WoodCost) {
-//		return this->ForestOnMap();
-//	}
-//	return false;
 	return this->GetResource() == resource;
-	//Wyrmgus end
 }
 
 bool CMapField::IsTerrainResourceOnMap() const
@@ -98,7 +82,6 @@ bool CMapField::IsTerrainResourceOnMap() const
 	return false;
 }
 
-//Wyrmgus start
 bool CMapField::IsSeenTileCorrect() const
 {
 	return this->Terrain == this->playerInfo.SeenTerrain && this->OverlayTerrain == this->playerInfo.SeenOverlayTerrain && this->SolidTile == this->playerInfo.SeenSolidTile && this->OverlaySolidTile == this->playerInfo.SeenOverlaySolidTile && this->TransitionTiles == this->playerInfo.SeenTransitionTiles && this->OverlayTransitionTiles == this->playerInfo.SeenOverlayTransitionTiles;
@@ -112,7 +95,6 @@ int CMapField::GetResource() const
 	
 	return -1;
 }
-//Wyrmgus end
 
 //Wyrmgus start
 void CMapField::SetTerrain(CTerrainType *terrain)
