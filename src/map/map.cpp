@@ -505,40 +505,6 @@ bool CMap::WallOnMap(const Vec2i &pos, int z) const
 	//Wyrmgus end
 }
 
-/**
-**  Human wall on map tile.
-**
-**  @param pos  map tile position.
-**
-**  @return    True if human wall, false otherwise.
-*/
-//Wyrmgus start
-/*
-bool CMap::HumanWallOnMap(const Vec2i &pos) const
-{
-	Assert(Map.Info.IsPointOnMap(pos));
-	return Field(pos)->isAHumanWall();
-}
-*/
-//Wyrmgus end
-
-/**
-**  Orc wall on map tile.
-**
-**  @param pos  map tile position.
-**
-**  @return    True if orcish wall, false otherwise.
-*/
-//Wyrmgus start
-/*
-bool CMap::OrcWallOnMap(const Vec2i &pos) const
-{
-	Assert(Map.Info.IsPointOnMap(pos));
-	return Field(pos)->isAOrcWall();
-}
-*/
-//Wyrmgus end
-
 //Wyrmgus start
 bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 {
@@ -1610,7 +1576,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 			mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
 			mf.Flags |= MapFieldGravel;
 		} else if (mf.OverlayTerrain->Flags & MapFieldWall) {
-			mf.Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
+			mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
 			if (GameSettings.Inside) {
 				mf.Flags &= ~(MapFieldAirUnpassable);
 			}

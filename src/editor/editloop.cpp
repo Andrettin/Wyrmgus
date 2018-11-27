@@ -1431,7 +1431,6 @@ static void DrawEditorInfo()
 			flag & MapFieldAirUnpassable   ? 'A' : '-',
 			//Wyrmgus end
 			flag & MapFieldNoBuilding   ? 'n' : '-',
-			flag & MapFieldHuman        ? 'h' : '-',
 			flag & MapFieldWall         ? 'w' : '-',
 			flag & MapFieldRocks        ? 'r' : '-',
 			flag & MapFieldForest       ? 'f' : '-',

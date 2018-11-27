@@ -244,7 +244,7 @@ void CMap::RemoveWall(const Vec2i &pos)
 	mf.Value = 0;
 
 	MapFixWallTile(pos);
-	mf.Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
+	mf.Flags &= ~(MapFieldWall | MapFieldUnpassable);
 	MapFixWallNeighbors(pos);
 
 	UI.Minimap.UpdateXY(pos);

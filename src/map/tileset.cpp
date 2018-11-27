@@ -266,24 +266,10 @@ unsigned int CTileset::getDefaultWoodTileIndex() const
 bool CTileset::isAWallTile(unsigned tile) const
 {
 	if (TileTypeTable.empty() == false) {
-		return (TileTypeTable[tile] == TileTypeHumanWall
-				|| TileTypeTable[tile] == TileTypeOrcWall);
+		return TileTypeTable[tile] == TileTypeWall;
 	}
 	return false;
 }
-
-bool CTileset::isARaceWallTile(unsigned tile, bool human) const
-{
-	if (TileTypeTable.empty() == false) {
-		if (human) {
-			return TileTypeTable[tile] == TileTypeHumanWall;
-		} else {
-			return TileTypeTable[tile] == TileTypeOrcWall;
-		}
-	}
-	return false;
-}
-
 
 bool CTileset::isAWoodTile(unsigned tile) const
 {

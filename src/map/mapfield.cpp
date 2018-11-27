@@ -325,7 +325,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 #if 0
 	this->Flags = tile.flag;
 #else
-	this->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
+	this->Flags &= ~(MapFieldLandAllowed | MapFieldCoastAllowed |
 					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 					 //Wyrmgus start
 //					 MapFieldWall | MapFieldRocks | MapFieldForest);
@@ -398,9 +398,6 @@ void CMapField::Save(CFile &file) const
 		if (playerInfo.Visible[i] == 1) {
 			file.printf(", \"explored\", %d", i);
 		}
-	}
-	if (Flags & MapFieldHuman) {
-		file.printf(", \"human\"");
 	}
 	if (Flags & MapFieldLandAllowed) {
 		file.printf(", \"land\"");
@@ -581,8 +578,6 @@ void CMapField::parse(lua_State *l)
 		//Wyrmgus end
 			++j;
 			this->playerInfo.Visible[LuaToNumber(l, -1, j + 1)] = 1;
-		} else if (!strcmp(value, "human")) {
-			this->Flags |= MapFieldHuman;
 		} else if (!strcmp(value, "land")) {
 			this->Flags |= MapFieldLandAllowed;
 		} else if (!strcmp(value, "coast")) {
@@ -686,25 +681,6 @@ bool CMapField::isAWall() const
 {
 	return CheckMask(MapFieldWall);
 }
-bool CMapField::isHuman() const
-{
-	return CheckMask(MapFieldHuman);
-}
-
-//Wyrmgus start
-/*
-bool CMapField::isAHumanWall() const
-{
-	const unsigned int humanWallFlag = (MapFieldWall | MapFieldHuman);
-	return (Flags & humanWallFlag) == humanWallFlag;
-}
-bool CMapField::isAOrcWall() const
-{
-	const unsigned int humanWallFlag = (MapFieldWall | MapFieldHuman);
-	return (Flags & humanWallFlag) == MapFieldWall;
-}
-*/
-//Wyrmgus end
 
 //
 //  CMapFieldPlayerInfo

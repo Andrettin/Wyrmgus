@@ -74,11 +74,8 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 		{"air-unit", MapFieldAirUnit},
 		{"sea-unit", MapFieldSeaUnit},
 		{"building", MapFieldBuilding},
-		//Wyrmgus start
 		{"item", MapFieldItem},
 		{"bridge", MapFieldBridge},
-		//Wyrmgus end
-		{"human", MapFieldHuman}
 	};
 
 	for (unsigned int i = 0; i != sizeof(flags) / sizeof(*flags); ++i) {
@@ -387,11 +384,7 @@ void CTileset::buildTable(lua_State *l)
 		} else if (flag & MapFieldCoastAllowed) {
 			TileTypeTable[tile] = TileTypeCoast;
 		} else if (flag & MapFieldWall) {
-			if (flag & MapFieldHuman) {
-				TileTypeTable[tile] = TileTypeHumanWall;
-			} else {
-				TileTypeTable[tile] = TileTypeOrcWall;
-			}
+			TileTypeTable[tile] = TileTypeWall;
 		} else if (flag & MapFieldRocks) {
 			TileTypeTable[tile] = TileTypeRock;
 		} else if (flag & MapFieldForest) {

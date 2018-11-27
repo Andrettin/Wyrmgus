@@ -92,7 +92,6 @@
 **
 **    ::MapFieldVisible field is visible.
 **    ::MapFieldExplored field is explored.
-**    ::MapFieldHuman human player is the owner of the field used for walls.
 **    ::MapFieldLandAllowed land units are allowed.
 **    ::MapFieldCoastAllowed coast units (transporter) and coast buildings (shipyard) are allowed.
 **    ::MapFieldWaterAllowed water units allowed.
@@ -252,10 +251,6 @@ public:
 
 	bool isAWall() const;
 	bool isHuman() const;
-	//Wyrmgus start
-//	bool isAHumanWall() const;
-//	bool isAOrcWall() const;
-	//Wyrmgus end
 
 	bool IsTerrainResourceOnMap(int resource) const;
 	bool IsTerrainResourceOnMap() const;

@@ -57,8 +57,6 @@ class CUnitType;
 // Not used until now:
 #define MapFieldSpeedMask 0x0007  /// Move faster on this tile
 
-#define MapFieldHuman 0x0008  /// Human is owner of the field (walls)
-
 #define MapFieldLandAllowed  0x0010  /// Land units allowed
 #define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
 #define MapFieldWaterAllowed 0x0040  /// Water units allowed
@@ -76,9 +74,7 @@ class CUnitType;
 */
 #define MapFieldItem 0x00000004		/// Item on field
 
-#define MapFieldSpeedMask 0x00000007  /// Move faster on this tile
-
-#define MapFieldHuman 0x00000008  /// Human is owner of the field (walls)
+#define MapFieldSpeedMask 0x00000008  /// Move faster on this tile
 
 #define MapFieldLandAllowed  0x00000010  /// Land units allowed
 #define MapFieldCoastAllowed 0x00000020  /// Coast (transporter) units allowed
@@ -119,13 +115,12 @@ class CUnitType;
 **  I'm not sure, if we have seen and real time to considere.
 */
 enum TileType {
-	TileTypeUnknown,    /// Unknown tile type
-	TileTypeWood,       /// Any wood tile
-	TileTypeRock,       /// Any rock tile
-	TileTypeCoast,      /// Any coast tile
-	TileTypeHumanWall,  /// Any human wall tile
-	TileTypeOrcWall,    /// Any orc wall tile
-	TileTypeWater       /// Any water tile
+	TileTypeUnknown,	/// Unknown tile type
+	TileTypeWood,		/// Any wood tile
+	TileTypeRock,		/// Any rock tile
+	TileTypeCoast,		/// Any coast tile
+	TileTypeWall,		/// Any wall tile
+	TileTypeWater		/// Any water tile
 };
 
 //Wyrmgus start
@@ -239,7 +234,6 @@ public:
 	//Wyrmgus end
 
 	bool isAWallTile(unsigned tile) const;
-	bool isARaceWallTile(unsigned tile, bool human) const;
 	bool isAWoodTile(unsigned tile) const;
 	bool isARockTile(unsigned tile) const;
 
