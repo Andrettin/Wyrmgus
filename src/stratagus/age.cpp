@@ -38,6 +38,7 @@
 #include "age.h"
 
 #include "config.h"
+#include "depend.h"
 #include "mod.h"
 #include "unittype.h"
 #include "upgrade_structs.h"
@@ -61,10 +62,14 @@ std::map<std::string, CAge *> CAge::AgesByIdent;
 **
 **	@return	The age if found, null otherwise
 */
-CAge *CAge::GetAge(const std::string &ident)
+CAge *CAge::GetAge(const std::string &ident, const bool should_find)
 {
 	if (AgesByIdent.find(ident) != AgesByIdent.end()) {
 		return AgesByIdent.find(ident)->second;
+	}
+	
+	if (should_find) {
+		fprintf(stderr, "Invalid age: \"%s\".\n", ident.c_str());
 	}
 	
 	return NULL;
@@ -79,7 +84,7 @@ CAge *CAge::GetAge(const std::string &ident)
 */
 CAge *CAge::GetOrAddAge(const std::string &ident)
 {
-	CAge *age = GetAge(ident);
+	CAge *age = GetAge(ident, false);
 	
 	if (!age) {
 		age = new CAge;
@@ -125,22 +130,6 @@ void CAge::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "name") {
 			this->Name = value;
-		} else if (key == "required_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
-			if (upgrade) {
-				this->RequiredUpgrades.push_back(upgrade);
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "required_upgrade_class") {
-			value = FindAndReplaceString(value, "_", "-");
-			int upgrade_class = GetUpgradeClassIndexByName(value);
-			if (upgrade_class != -1) {
-				this->RequiredUpgradeClasses.push_back(upgrade_class);
-			} else {
-				fprintf(stderr, "Invalid upgrade class: \"%s\".\n", value.c_str());
-			}
 		} else {
 			fprintf(stderr, "Invalid age property: \"%s\".\n", key.c_str());
 		}
@@ -186,6 +175,10 @@ void CAge::ProcessConfigData(const CConfigData *config_data)
 			this->G = CGraphic::New(file, size.x, size.y);
 			this->G->Load();
 			this->G->UseDisplayFormat();
+		} else if (child_config_data->Tag == "dependency" || child_config_data->Tag == "predependency") {
+			std::string target = config_data->Ident;
+			target = FindAndReplaceString(target, "_", "-");
+			DependRule::ProcessConfigData(child_config_data, DependRuleAge, target);
 		} else {
 			fprintf(stderr, "Invalid age property: \"%s\".\n", child_config_data->Tag.c_str());
 		}

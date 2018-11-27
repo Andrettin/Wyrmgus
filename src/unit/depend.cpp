@@ -38,6 +38,8 @@
 
 #include "depend.h"
 
+#include "age.h"
+#include "config.h"
 #include "player.h"
 #include "religion/deity.h"
 #include "script.h"
@@ -54,16 +56,121 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-/// All dependencies hash
-static DependRule *DependHash[101];
-//Wyrmgus start
-/// All predependencies hash (predependencies are checked to see whether a button should be displayed at all)
-static DependRule *PredependHash[101];
-//Wyrmgus end
+/// All dependencies map
+static std::map<intptr_t, DependRule *> DependencyMap;
+
+/// All predependencies map (predependencies are checked to see whether a button should be displayed at all)
+static std::map<intptr_t, DependRule *> PredependencyMap;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+**	@param	rule_type	The rule type of the dependency
+**	@param	target		The target of the dependency
+*/
+void DependRule::ProcessConfigData(const CConfigData *config_data, const int rule_type, const std::string &target)
+{
+	bool is_predependency = config_data->Tag == "predependency";
+	
+	bool first_rule_group = true;
+	int or_flag = 0;
+	
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		CConfigData *child_config_data = config_data->Children[i];
+		
+		if (child_config_data->Tag == "rule_group") {
+			if (first_rule_group) {
+				first_rule_group = false;
+			} else {
+				or_flag = 1;
+			}
+			
+			for (size_t j = 0; j < child_config_data->Children.size(); ++j) {
+				CConfigData *grandchild_config_data = child_config_data->Children[j];
+				
+				if (grandchild_config_data->Tag == "rule") {
+					std::string requirement;
+					int count = 1;
+					
+					for (size_t k = 0; k < grandchild_config_data->Properties.size(); ++k) {
+						std::string key = grandchild_config_data->Properties[k].first;
+						std::string value = grandchild_config_data->Properties[k].second;
+						
+						if (key == "requirement") {
+							value = FindAndReplaceString(value, "_", "-");
+							requirement = value;
+						} else if (key == "count") {
+							count = std::stoi(value);
+						} else {
+							fprintf(stderr, "Invalid dependency rule property: \"%s\".\n", key.c_str());
+						}
+					}
+					
+					if (requirement.empty()) {
+						fprintf(stderr, "Dependency rule has no \"requirement\" property.\n");
+						continue;
+					}
+					
+					AddDependency(rule_type, target, requirement, count, or_flag, is_predependency);
+					or_flag = 0;
+				} else {
+					fprintf(stderr, "Invalid dependency rule group property: \"%s\".\n", grandchild_config_data->Tag.c_str());
+				}
+			}
+		} else {
+			fprintf(stderr, "Invalid dependency property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+}
+
+/**
+**	@brief Get the key used for the dependency maps for a given rule
+**
+**	@param	rule	The rule
+**
+**	@return	The key for the dependency map
+*/
+static intptr_t GetDependencyKeyForRule(const DependRule &rule)
+{
+	intptr_t dependency_key;
+	if (rule.Type == DependRuleUnitType) {
+		dependency_key = (intptr_t) rule.Kind.UnitType;
+	} else if (rule.Type == DependRuleUpgrade) {
+		dependency_key = (intptr_t) rule.Kind.Upgrade;
+	} else if (rule.Type == DependRuleAge) {
+		dependency_key = (intptr_t) rule.Kind.Age;
+	} else {
+		fprintf(stderr, "Dependency rule should be unit-type, upgrade or age.\n");
+		return (intptr_t) NULL;
+	}
+	return dependency_key;
+}
+
+/**
+**	@brief Get the dependency node for a given rule
+**
+**	@param	rule				The rule
+**	@param	is_predependency	Whether the rule is a predependency
+**
+**	@return	The dependency node for the rule
+*/
+static DependRule *GetDependencyNodeForRule(const DependRule &rule, const bool is_predependency)
+{
+	intptr_t dependency_key = GetDependencyKeyForRule(rule);
+	
+	std::map<intptr_t, DependRule *> &dependency_map = is_predependency ? PredependencyMap : DependencyMap;
+	
+	if (dependency_map.find(dependency_key) != dependency_map.end()) {
+		return dependency_map.find(dependency_key)->second;
+	}
+	
+	return NULL;
+}
 
 /**
 **	@brief Add a new dependency. If it already exists append to "and" rule
@@ -93,45 +200,27 @@ void AddDependency(const int rule_type, const std::string &target, const std::st
 		if (!rule.Kind.Upgrade) {
 			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", target.c_str());
 		}
+	} else if (rule.Type == DependRuleAge) {
+		rule.Kind.Age = CAge::GetAge(target);
 	} else {
-		fprintf(stderr, "Dependency target '%s' should be unit-type or upgrade\n", target.c_str());
+		fprintf(stderr, "Dependency target '%s' should be unit-type, upgrade or age.\n", target.c_str());
 		return;
 	}
 
-	int hash;
-	if (is_predependency) {
-		hash = (int)((intptr_t)rule.Kind.UnitType % (sizeof(PredependHash) / sizeof(*PredependHash)));
-	} else {
-		hash = hash = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-	}
+	//  Find correct dependency slot.
+	DependRule *node = GetDependencyNodeForRule(rule, is_predependency);
 
-	//  Find correct hash slot.
-	DependRule *node = is_predependency ? PredependHash[hash] : DependHash[hash];
-
-	if (node) {  // find correct entry
-		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
-			if (!node->Next) {  // end of list
-				DependRule *temp = new DependRule;
-				temp->Next = NULL;
-				temp->Rule = NULL;
-				temp->Type = rule.Type;
-				temp->Kind = rule.Kind;
-				node->Next = temp;
-				node = temp;
-				break;
-			}
-			node = node->Next;
-		}
-	} else {  // create new slow
+	if (!node) { //create new entry if not found
 		node = new DependRule;
 		node->Next = NULL;
 		node->Rule = NULL;
 		node->Type = rule.Type;
 		node->Kind = rule.Kind;
+		intptr_t dependency_key = GetDependencyKeyForRule(rule);
 		if (is_predependency) {
-			PredependHash[hash] = node;
+			PredependencyMap[dependency_key] = node;
 		} else {
-			DependHash[hash] = node;
+			DependencyMap[dependency_key] = node;
 		}
 	}
 
@@ -182,21 +271,6 @@ void AddDependency(const int rule_type, const std::string &target, const std::st
 		}
 		node->Rule = temp;
 	}
-
-#ifdef neverDEBUG
-	fprintf(stdout, "New rules are :");
-	node = node->Rule;
-	while (node) {
-		temp = node;
-		while (temp) {
-			fprintf(stdout, "temp->Kind.UnitType=%s ", temp->Kind.UnitType->Ident.c_str());
-			temp = temp->Rule;
-		}
-		node = node->Next;
-		fprintf(stdout, "\n or ... ");
-	}
-	fprintf(stdout, "\n");
-#endif
 }
 
 /**
@@ -207,61 +281,35 @@ void AddDependency(const int rule_type, const std::string &target, const std::st
 **
 **  @return        True if available, false otherwise.
 */
-//Wyrmgus start
-//static bool CheckDependByRule(const CPlayer &player, DependRule &rule)
 static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool ignore_units, bool is_predependency)
-//Wyrmgus end
 {
-	//Wyrmgus start
 	//if is making a normal dependency check, do a predependency check first
 	if (!is_predependency && !CheckDependByRule(player, rule, ignore_units, true)) {
 		return false;
 	}
-	//Wyrmgus end
 	
 	//  Find rule
-	int i;
-	if (is_predependency) {
-		i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(PredependHash) / sizeof(*PredependHash)));
-	} else {
-		i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-	}
+	const DependRule *node = GetDependencyNodeForRule(rule, is_predependency);
 
-	const DependRule *node = is_predependency ? PredependHash[i] : DependHash[i];
-
-	if (node) {  // find correct entry
-		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
-			if (!node->Next) {  // end of list
-				return true;
-			}
-			node = node->Next;
-		}
-	} else {
+	if (!node) { //entry not found
 		return true;
 	}
 
 	//  Prove the rules
 	node = node->Rule;
 
+	int i;
 	while (node) {
 		const DependRule *temp = node;
 		while (temp) {
 			switch (temp->Type) {
 				case DependRuleUnitType:
-					//Wyrmgus start
-					/*
-					i = player.HaveUnitTypeByType(*temp->Kind.UnitType);
-					if (temp->Count ? i < temp->Count : i) {
-						goto try_or;
-					}
-					*/
 					if (!ignore_units) {
 						i = player.HaveUnitTypeByType(*temp->Kind.UnitType);
 						if (temp->Count ? i < temp->Count : i) {
 							goto try_or;
 						}
 					}
-					//Wyrmgus end
 					break;
 				case DependRuleUpgrade:
 					i = UpgradeIdAllowed(player, temp->Kind.Upgrade->ID) != 'R';
@@ -280,7 +328,6 @@ try_or:
 	return false;  // no rule matches
 }
 
-//Wyrmgus start
 /**
 **  Check if this upgrade or unit is available.
 **
@@ -297,26 +344,16 @@ static bool CheckDependByRule(const CUnit &unit, DependRule &rule, bool ignore_u
 	}
 	
 	//  Find rule
-	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-	if (is_predependency) {
-		i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(PredependHash) / sizeof(*PredependHash)));
-	}
-	const DependRule *node = is_predependency ? PredependHash[i] : DependHash[i];
+	const DependRule *node = GetDependencyNodeForRule(rule, is_predependency);
 	
-	if (node) {  // find correct entry
-		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
-			if (!node->Next) {  // end of list
-				return true;
-			}
-			node = node->Next;
-		}
-	} else {
+	if (!node) {  //entry not found
 		return true;
 	}
 
 	//  Prove the rules
 	node = node->Rule;
 
+	int i;
 	while (node) {
 		const DependRule *temp = node;
 		while (temp) {
@@ -345,7 +382,6 @@ try_or:
 	}
 	return false;  // no rule matches
 }
-//Wyrmgus end
 
 /**
 **  Check if this upgrade or unit is available.
@@ -388,23 +424,16 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 	}
 
 	//  Find rule
-	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-	const DependRule *node = DependHash[i];
+	const DependRule *node = GetDependencyNodeForRule(rule, false);
 
-	if (node) {  // find correct entry
-		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
-			if (!node->Next) {  // end of list
-				return rules;
-			}
-			node = node->Next;
-		}
-	} else {
+	if (!node) {  //entry not found
 		return rules;
 	}
 
 	//  Prove the rules
 	node = node->Rule;
 
+	int i;
 	while (node) {
 		const DependRule *temp = node;
 		std::string subrules("");
@@ -496,17 +525,20 @@ bool CheckDependByIdent(const CPlayer &player, const int rule_type, const std::s
 				}
 			}
 		}
+	} else if (rule.Type == DependRuleAge) {
+		rule.Kind.Age = CAge::GetAge(target);
+		
+		if (!rule.Kind.Age) {
+			return false;
+		}
 	} else {
 		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return false;
 	}
-	//Wyrmgus start
-//	return CheckDependByRule(player, rule);
+
 	return CheckDependByRule(player, rule, ignore_units, is_predependency);
-	//Wyrmgus end
 }
 
-//Wyrmgus start
 /**
 **  Check if this upgrade or unit is available for a particular unit.
 **
@@ -526,11 +558,23 @@ bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::strin
 	if (rule.Type == DependRuleUnitType) {
 		// target string refers to unit-XXX
 		rule.Kind.UnitType = UnitTypeByIdent(target);
+		
+		if (!rule.Kind.UnitType) {
+			fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", target.c_str());
+			return false;
+		}
+		
 		if (UnitIdAllowed(*unit.Player, rule.Kind.UnitType->Slot) == 0) {
 			return false;
 		}
 	} else if (rule.Type == DependRuleUpgrade) {
 		rule.Kind.Upgrade = CUpgrade::Get(target);
+		
+		if (!rule.Kind.Upgrade) {
+			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", target.c_str());
+			return false;
+		}
+
 		if (UpgradeIdAllowed(*unit.Player, rule.Kind.Upgrade->ID) == 'F') {
 			return false;
 		}
@@ -541,7 +585,6 @@ bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::strin
 	}
 	return CheckDependByRule(unit, rule, ignore_units, is_predependency);
 }
-//Wyrmgus end
 
 /**
 **  Check if this upgrade or unit is available.
@@ -551,10 +594,7 @@ bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::strin
 **
 **  @return        True if available, false otherwise.
 */
-//Wyrmgus start
-//bool CheckDependByType(const CPlayer &player, const CUnitType &type)
 bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore_units, bool is_predependency)
-//Wyrmgus end
 {
 	if (UnitIdAllowed(player, type.Slot) == 0) {
 		return false;
@@ -563,20 +603,17 @@ bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore
 
 	rule.Kind.UnitType = &type;
 	rule.Type = DependRuleUnitType;
-	//Wyrmgus start
-//	return CheckDependByRule(player, rule);
+
 	return CheckDependByRule(player, rule, ignore_units, is_predependency);
-	//Wyrmgus end
 }
 
-//Wyrmgus start
 /**
-**  Check if this upgrade or unit is available.
+**	@brief Check if this upgrade or unit is available.
 **
-**  @param unit  For this unit available.
-**  @param target  Unit or Upgrade.
+**	@param	unit	For this unit available.
+**	@param	target	Unit or Upgrade.
 **
-**  @return        True if available, false otherwise.
+**	@return	True if available, false otherwise.
 */
 bool CheckDependByType(const CUnit &unit, const CUnitType &type, bool ignore_units, bool is_predependency)
 {
@@ -589,7 +626,6 @@ bool CheckDependByType(const CUnit &unit, const CUnitType &type, bool ignore_uni
 	rule.Type = DependRuleUnitType;
 	return CheckDependByRule(unit, rule, ignore_units, is_predependency);
 }
-//Wyrmgus end
 
 /**
 **  Initialize unit and upgrade dependencies.
@@ -599,14 +635,14 @@ void InitDependencies()
 }
 
 /**
-**  Clean up unit and upgrade dependencies.
+**	@brief	Clean up unit and upgrade dependencies.
 */
 void CleanDependencies()
 {
 	// Free all dependencies
 
-	for (unsigned int u = 0; u < sizeof(DependHash) / sizeof(*DependHash); ++u) {
-		DependRule *node = DependHash[u];
+	for (std::map<intptr_t, DependRule *>::iterator iterator = DependencyMap.begin(); iterator != DependencyMap.end(); ++iterator) {
+		DependRule *node = iterator->second;
 		while (node) {  // all hash links
 			// All or cases
 
@@ -628,12 +664,11 @@ void CleanDependencies()
 			node = node->Next;
 			delete temp;
 		}
-		DependHash[u] = NULL;
 	}
+	DependencyMap.clear();
 	
-	//Wyrmgus start
-	for (unsigned int u = 0; u < sizeof(PredependHash) / sizeof(*PredependHash); ++u) {
-		DependRule *node = PredependHash[u];
+	for (std::map<intptr_t, DependRule *>::iterator iterator = PredependencyMap.begin(); iterator != PredependencyMap.end(); ++iterator) {
+		DependRule *node = iterator->second;
 		while (node) {  // all hash links
 			// All or cases
 
@@ -655,9 +690,8 @@ void CleanDependencies()
 			node = node->Next;
 			delete temp;
 		}
-		PredependHash[u] = NULL;
 	}
-	//Wyrmgus end
+	PredependencyMap.clear();
 }
 
 /*----------------------------------------------------------------------------
@@ -709,7 +743,6 @@ static int CclDefineDependency(lua_State *l)
 	return 0;
 }
 
-//Wyrmgus start
 static int CclDefinePredependency(lua_State *l)
 {
 	const int args = lua_gettop(l);
@@ -749,7 +782,6 @@ static int CclDefinePredependency(lua_State *l)
 	}
 	return 0;
 }
-//Wyrmgus end
 
 /**
 **  Get the dependency.

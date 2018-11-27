@@ -412,10 +412,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return true;
 	}
 
-	//Wyrmgus start
-//	if (condition->HasHint && button.Hint.empty()) {
 	if (condition->HasHint && button.GetHint().empty()) {
-	//Wyrmgus end
 		return false;
 	}
 

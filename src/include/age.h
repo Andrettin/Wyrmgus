@@ -59,7 +59,7 @@ public:
 	
 	~CAge();
 	
-	static CAge *GetAge(const std::string &ident);
+	static CAge *GetAge(const std::string &ident, const bool should_find = true);
 	static CAge *GetOrAddAge(const std::string &ident);
 	static void ClearAges();
 	
@@ -72,8 +72,6 @@ public:
 	std::string Ident;
 	std::string Name;
 	CGraphic *G;
-	std::vector<CUpgrade *> RequiredUpgrades;		/// the upgrades required for the age
-	std::vector<int> RequiredUpgradeClasses;		/// the upgrade classes required for the age
 };
 
 //@}

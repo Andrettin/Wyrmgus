@@ -1666,27 +1666,7 @@ void CPlayer::CheckAge()
 	for (int i = (CAge::Ages.size() - 1); i >= 0; --i) {
 		CAge *potential_age = CAge::Ages[i];
 		
-		bool has_required_upgrades = true;
-		for (size_t j = 0; j < potential_age->RequiredUpgrades.size(); ++j) {
-			CUpgrade *upgrade = potential_age->RequiredUpgrades[j];
-			if (this->Allow.Upgrades[upgrade->ID] != 'R') {
-				has_required_upgrades = false;
-				break;
-			}
-		}
-		if (!has_required_upgrades) {
-			continue;
-		}
-		
-		bool has_required_upgrade_classes = true;
-		for (size_t j = 0; j < potential_age->RequiredUpgradeClasses.size(); ++j) {
-			int upgrade_class = potential_age->RequiredUpgradeClasses[j];
-			if (!this->HasUpgradeClass(upgrade_class)) {
-				has_required_upgrade_classes = false;
-				break;
-			}
-		}
-		if (!has_required_upgrade_classes) {
+		if (!CheckDependByIdent(*this, DependRuleAge, potential_age->Ident)) {
 			continue;
 		}
 		

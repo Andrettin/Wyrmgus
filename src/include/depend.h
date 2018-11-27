@@ -92,31 +92,35 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CAge;
+class CConfigData;
 class CPlayer;
 class CUnitType;
-//Wyrmgus start
 class CUnit;
-//Wyrmgus end
 class CUpgrade;
 class ButtonAction;
 
 enum {
-	DependRuleUnitType,  /// Kind is an unit-type
-	DependRuleUpgrade    /// Kind is an upgrade
+	DependRuleUnitType,		/// Kind is an unit-type
+	DependRuleUpgrade,		/// Kind is an upgrade
+	DependRuleAge			/// Kind is an age
 };
 
 /// Dependency rule
 class DependRule
 {
 public:
-	DependRule *Next;         /// next hash chain, or rules
-	unsigned char Count;      /// how many required
-	char Type;                /// an unit-type or upgrade
+	static void ProcessConfigData(const CConfigData *config_data, const int rule_type, const std::string &target);
+
+	DependRule *Next;			/// next hash chain, or rules
+	unsigned char Count;		/// how many required
+	char Type;					/// a unit-type, upgrade or etc.
 	union {
-		const CUnitType *UnitType;  /// unit-type pointer
-		const CUpgrade  *Upgrade;   /// upgrade pointer
-	} Kind;                   /// required object
-	DependRule *Rule;         /// requirements, and rule
+		const CUnitType *UnitType;	/// unit-type pointer
+		const CUpgrade  *Upgrade;	/// upgrade pointer
+		const CAge *Age;			/// age pointer
+	} Kind;						/// required object
+	DependRule *Rule;			/// requirements, and rule
 };
 
 /*----------------------------------------------------------------------------
