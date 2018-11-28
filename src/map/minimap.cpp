@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name minimap.cpp - The minimap. */
+/**@name minimap.cpp - The minimap source file. */
 //
-//      (c) Copyright 1998-2011 by Lutz Sammer and Jimmy Salmon and Pali Rohár
+//      (c) Copyright 1998-2018 by Lutz Sammer and Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -335,18 +335,18 @@ void CMinimap::Reload()
 */
 //Wyrmgus start
 //static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp)
-static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp, int z, CTerrainType *terrain)
+static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp, int z, CTerrainType *terrain, const bool is_winter)
 //Wyrmgus end
 {
 	//Wyrmgus start
 //	Uint8 *pixels = (Uint8 *)Map.TileGraphic->Surface->pixels;
-	Uint8 *pixels = (Uint8 *)terrain->Graphics->Surface->pixels;
+	Uint8 *pixels = (Uint8 *)terrain->GetGraphics(is_winter)->Surface->pixels;
 	//Wyrmgus end
 	int x = (xofs + 7 + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
 	int y = (yofs + 6 + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
 	//Wyrmgus start
 //	return &pixels[x * bpp + y * Map.TileGraphic->Surface->pitch];
-	return &pixels[x * bpp + y * terrain->Graphics->Surface->pitch];
+	return &pixels[x * bpp + y * terrain->GetGraphics(is_winter)->Surface->pitch];
 	//Wyrmgus end
 }
 
@@ -375,6 +375,8 @@ void CMinimap::UpdateTerrain(int z)
 	//Wyrmgus start
 //	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
+	
+	const bool is_winter = Map.MapLayers[CurrentMapLayer]->IsWinter();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!UseOpenGL)
@@ -399,8 +401,8 @@ void CMinimap::UpdateTerrain(int z)
 		SDL_LockSurface(Map.TileGraphic->Surface);
 		//Wyrmgus start
 		for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-			if (CTerrainType::TerrainTypes[i]->Graphics) {
-				SDL_LockSurface(CTerrainType::TerrainTypes[i]->Graphics->Surface);
+			if (CTerrainType::TerrainTypes[i]->GetGraphics(is_winter)) {
+				SDL_LockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(is_winter)->Surface);
 			}
 		}
 		//Wyrmgus end
@@ -443,10 +445,10 @@ void CMinimap::UpdateTerrain(int z)
 			//Wyrmgus end
 			
 			//Wyrmgus start
-			int tilepitch = terrain->Graphics->Surface->w / Map.GetCurrentPixelTileSize().x;
-			const int bpp = terrain->Graphics->Surface->format->BytesPerPixel;
+			int tilepitch = terrain->GetGraphics(is_winter)->Surface->w / Map.GetCurrentPixelTileSize().x;
+			const int bpp = terrain->GetGraphics(is_winter)->Surface->format->BytesPerPixel;
 			
-			int base_tilepitch = base_terrain->Graphics->Surface->w / Map.GetCurrentPixelTileSize().x;
+			int base_tilepitch = base_terrain->GetGraphics(is_winter)->Surface->w / Map.GetCurrentPixelTileSize().x;
 			//assumes the BPP for the base terrain is the same as for the top terrain (which may be an overlay)
 			//Wyrmgus end
 	
@@ -466,11 +468,11 @@ void CMinimap::UpdateTerrain(int z)
 					//Wyrmgus start
 //					SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[
 //										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp)];
-					SDL_Color color = terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain)];
+					SDL_Color color = terrain->GetGraphics(is_winter)->Surface->format->palette->colors[
+										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, is_winter)];
 					if (color.r == 255 && color.g == 255 && color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
-						color = base_terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain)];
+						color = base_terrain->GetGraphics(is_winter)->Surface->format->palette->colors[
+										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, is_winter)];
 					}
 					//Wyrmgus end
 					
@@ -478,13 +480,13 @@ void CMinimap::UpdateTerrain(int z)
 				} else {
 					//Wyrmgus start
 //					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
-					SDL_PixelFormat *f = terrain->Graphics->Surface->format;
+					SDL_PixelFormat *f = terrain->GetGraphics(is_winter)->Surface->format;
 					//Wyrmgus end
-					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
+					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, is_winter);
 					//Wyrmgus start
 					if (((c & f->Amask) >> f->Ashift) == 0) { //transparent pixel, use base instead
-						f = base_terrain->Graphics->Surface->format;
-						c = *(Uint32 *)GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain);
+						f = base_terrain->GetGraphics(is_winter)->Surface->format;
+						c = *(Uint32 *)GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, is_winter);
 					}
 					//Wyrmgus end
 					c = Video.MapRGB(0,
@@ -505,12 +507,12 @@ void CMinimap::UpdateTerrain(int z)
 					((Uint8 *)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
 						*GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					*/
-					SDL_Color original_color = terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain)];
+					SDL_Color original_color = terrain->GetGraphics(is_winter)->Surface->format->palette->colors[
+										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, is_winter)];
 
 					if (original_color.r == 255 && original_color.g == 255 && original_color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
-						original_color = base_terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain)];
+						original_color = base_terrain->GetGraphics(is_winter)->Surface->format->palette->colors[
+										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, is_winter)];
 					}
 
 					Uint32 color;
@@ -523,7 +525,7 @@ void CMinimap::UpdateTerrain(int z)
 //					Uint8 *d = &((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
 //					Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					Uint8 *d = &((Uint8 *)MinimapTerrainSurface[z]->pixels)[mx * bpp + my * MinimapTerrainSurface[z]->pitch];
-					Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
+					Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, is_winter);
 					//Wyrmgus end
 					*d++ = *s++;
 					*d++ = *s++;
@@ -533,7 +535,7 @@ void CMinimap::UpdateTerrain(int z)
 //					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
 //						*(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					*(Uint32 *)&((Uint8 *)MinimapTerrainSurface[z]->pixels)[mx * bpp + my * MinimapTerrainSurface[z]->pitch] =
-						*(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
+						*(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, is_winter);
 					//Wyrmgus end
 				}
 			}
@@ -552,8 +554,8 @@ void CMinimap::UpdateTerrain(int z)
 	SDL_UnlockSurface(Map.TileGraphic->Surface);
 	//Wyrmgus start
 	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-		if (CTerrainType::TerrainTypes[i]->Graphics) {
-			SDL_UnlockSurface(CTerrainType::TerrainTypes[i]->Graphics->Surface);
+		if (CTerrainType::TerrainTypes[i]->GetGraphics(is_winter)) {
+			SDL_UnlockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(is_winter)->Surface);
 		}
 	}
 	//Wyrmgus end
@@ -608,6 +610,8 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 //	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
 
+	const bool is_winter = Map.MapLayers[CurrentMapLayer]->IsWinter();
+
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
 	//
@@ -623,8 +627,8 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	SDL_LockSurface(Map.TileGraphic->Surface);
 	//Wyrmgus start
 	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-		if (CTerrainType::TerrainTypes[i]->Graphics) {
-			SDL_LockSurface(CTerrainType::TerrainTypes[i]->Graphics->Surface);
+		if (CTerrainType::TerrainTypes[i]->GetGraphics(is_winter)) {
+			SDL_LockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(is_winter)->Surface);
 		}
 	}
 	//Wyrmgus end
@@ -689,10 +693,10 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 			//Wyrmgus end
 
 			//Wyrmgus start
-			int tilepitch = terrain->Graphics->Surface->w / Map.GetCurrentPixelTileSize().x;
-			const int bpp = terrain->Graphics->Surface->format->BytesPerPixel;
+			int tilepitch = terrain->GetGraphics(is_winter)->Surface->w / Map.GetCurrentPixelTileSize().x;
+			const int bpp = terrain->GetGraphics(is_winter)->Surface->format->BytesPerPixel;
 			
-			int base_tilepitch = base_terrain->Graphics->Surface->w / Map.GetCurrentPixelTileSize().x;
+			int base_tilepitch = base_terrain->GetGraphics(is_winter)->Surface->w / Map.GetCurrentPixelTileSize().x;
 			//Wyrmgus end
 	
 			const int xofs = Map.GetCurrentPixelTileSize().x * (tile % tilepitch);
@@ -711,11 +715,11 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 					//Wyrmgus start
 //					const int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 //					const SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[colorIndex];
-					int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
-					SDL_Color color = terrain->Graphics->Surface->format->palette->colors[colorIndex];
+					int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, is_winter);
+					SDL_Color color = terrain->GetGraphics(is_winter)->Surface->format->palette->colors[colorIndex];
 					if (color.r == 255 && color.g == 255 && color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
-						colorIndex = *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain);
-						color = base_terrain->Graphics->Surface->format->palette->colors[colorIndex];
+						colorIndex = *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, is_winter);
+						color = base_terrain->GetGraphics(is_winter)->Surface->format->palette->colors[colorIndex];
 					}
 					//Wyrmgus end
 
@@ -723,16 +727,16 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 				} else {
 					//Wyrmgus start
 //					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
-					SDL_PixelFormat *f = terrain->Graphics->Surface->format;
+					SDL_PixelFormat *f = terrain->GetGraphics(is_winter)->Surface->format;
 					//Wyrmgus end
 
 					//Wyrmgus start
 //					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
-					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
+					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, is_winter);
 					
 					if (((c & f->Amask) >> f->Ashift) == 0) { //transparent pixel, use base instead
-						f = base_terrain->Graphics->Surface->format;
-						c = *(Uint32 *)GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain);
+						f = base_terrain->GetGraphics(is_winter)->Surface->format;
+						c = *(Uint32 *)GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, is_winter);
 					}
 					//Wyrmgus end
 					c = Video.MapRGB(0,
@@ -751,19 +755,19 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 //				const int index = mx * bpp + my * MinimapTerrainSurface->pitch;
 //				Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 				const int index = mx * bpp + my * MinimapTerrainSurface[z]->pitch;
-				Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain);
+				Uint8 *s = GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, is_winter);
 				//Wyrmgus end
 				if (bpp == 1) {
 					//Wyrmgus start
 					/*
 					((Uint8 *)MinimapTerrainSurface->pixels)[index] = *s;
 					*/
-					SDL_Color original_color = terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain)];
+					SDL_Color original_color = terrain->GetGraphics(is_winter)->Surface->format->palette->colors[
+										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp, z, terrain, is_winter)];
 										  
 					if (original_color.r == 255 && original_color.g == 255 && original_color.b == 255) { //completely white pixel, presumed to be a transparent one; use base instead
-						original_color = base_terrain->Graphics->Surface->format->palette->colors[
-										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain)];
+						original_color = base_terrain->GetGraphics(is_winter)->Surface->format->palette->colors[
+										  *GetTileGraphicPixel(base_xofs, base_yofs, mx, my, scalex, scaley, bpp, z, base_terrain, is_winter)];
 					}
 
 					Uint32 color;
@@ -801,8 +805,8 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	SDL_UnlockSurface(Map.TileGraphic->Surface);
 	//Wyrmgus start
 	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-		if (CTerrainType::TerrainTypes[i]->Graphics) {
-			SDL_UnlockSurface(CTerrainType::TerrainTypes[i]->Graphics->Surface);
+		if (CTerrainType::TerrainTypes[i]->GetGraphics(is_winter)) {
+			SDL_UnlockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(is_winter)->Surface);
 		}
 	}
 	//Wyrmgus end

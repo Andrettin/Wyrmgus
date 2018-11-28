@@ -129,9 +129,45 @@ void CMapLayer::SetTimeOfDay(const int time_of_day)
 int CMapLayer::GetCyclesPerTimeOfDay() const
 {
 	int cycles_per_time_of_day = this->HoursPerDay;
-	cycles_per_time_of_day *= CyclesPerTimeOfDayHour;
+	cycles_per_time_of_day *= CyclesPerInGameHour;
 	cycles_per_time_of_day /= MaxTimesOfDay - 1;
 	return cycles_per_time_of_day;
+}
+
+/**
+**	@brief	Increment the current season
+*/
+void CMapLayer::IncrementSeason()
+{
+	this->Season++;
+	if (this->Season == MaxSeasons) {
+		this->Season = 1;
+	}
+}
+
+/**
+**	@brief	Get the quantity of cycles necessary for the passage of a season for this map layer
+**
+**	@return	The quantity of cycles for the passage of a season in this map layer
+*/
+int CMapLayer::GetCyclesPerSeason() const
+{
+	int cycles_per_season = this->DaysPerYear;
+	cycles_per_season *= CyclesPerInGameHour;
+	cycles_per_season *= this->HoursPerDay;
+	cycles_per_season /= DayMultiplier;
+	cycles_per_season /= MaxSeasons - 1;
+	return cycles_per_season;
+}
+
+/**
+**	@brief	Get whether the map layer is currently in winter
+**
+**	@return	Whether the map layer is currently in winter
+*/
+bool CMapLayer::IsWinter() const
+{
+	return this->Season == WinterSeason;
 }
 
 //@}

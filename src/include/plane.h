@@ -50,7 +50,7 @@ class CPlane
 {
 public:
 	CPlane() :
-		ID(-1), HoursPerDay(DefaultHoursPerDay)
+		ID(-1), HoursPerDay(DefaultHoursPerDay), DaysPerYear(DefaultDaysPerYear)
 	{
 	}
 	
@@ -62,6 +62,7 @@ public:
 
 	int ID;																/// ID of this plane
 	int HoursPerDay;													/// How many hours does a day in this plane contain
+	int DaysPerYear;													/// How many days does a year in this plane contain
 	std::string Ident;
 	std::string Name;
 	std::string Description;

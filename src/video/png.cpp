@@ -487,8 +487,8 @@ void SaveMapPNG(const char *name)
 			CTerrainType *terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
 			unsigned short int tile = mf.OverlayTerrain ? mf.OverlaySolidTile : mf.SolidTile;
 
-			srcRect.x = terrain->Graphics->frame_map[tile].x;
-			srcRect.y = terrain->Graphics->frame_map[tile].y;
+			srcRect.x = terrain->GetGraphics()->frame_map[tile].x;
+			srcRect.y = terrain->GetGraphics()->frame_map[tile].y;
 			//Wyrmgus end
 			dstRect.x = i * Map.GetCurrentPixelTileSize().x;
 			dstRect.y = j * Map.GetCurrentPixelTileSize().y;
@@ -496,7 +496,7 @@ void SaveMapPNG(const char *name)
 			srcRect.h = dstRect.h = Map.GetCurrentPixelTileSize().y;
 			//Wyrmgus start
 //			SDL_BlitSurface(Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
-			SDL_BlitSurface(terrain->Graphics->Surface, &srcRect, mapImage, &dstRect);
+			SDL_BlitSurface(terrain->GetGraphics()->Surface, &srcRect, mapImage, &dstRect);
 			//Wyrmgus end
 		}
 	}

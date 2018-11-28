@@ -55,7 +55,7 @@ class CMapLayer
 {
 public:
 	CMapLayer() :
-		ID(-1), HoursPerDay(DefaultHoursPerDay), TimeOfDay(0), SurfaceLayer(0),
+		ID(-1), HoursPerDay(DefaultHoursPerDay), DaysPerYear(DefaultDaysPerYear), TimeOfDay(0), Season(0), SurfaceLayer(0),
 		Overland(false),
 		PixelTileSize(32, 32),
 		Fields(NULL), Plane(NULL), World(NULL)
@@ -66,11 +66,16 @@ public:
 	void IncrementTimeOfDay();
 	void SetTimeOfDay(const int time_of_day);
 	int GetCyclesPerTimeOfDay() const;
+	void IncrementSeason();
+	int GetCyclesPerSeason() const;
+	bool IsWinter() const;
 	
 	int ID;
 	CMapField *Fields;						/// fields on the map layer
-	int HoursPerDay;						/// how many hours does a day take in this map layer	
+	int HoursPerDay;						/// how many hours does a day take in this map layer
+	int DaysPerYear;						/// how many days does a year take in this map layer
 	int TimeOfDay;							/// the time of day for the map layer
+	int Season;								/// the season for the map layer
 	bool Overland;							/// whether the map layer is an overland map
 	CPlane *Plane;							/// the plane pointer (if any) for the map layer
 	CWorld *World;							/// the world pointer (if any) for the map layer

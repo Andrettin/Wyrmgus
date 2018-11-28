@@ -423,7 +423,7 @@ public:
 
 	CInfoPanel InfoPanel;				/// Info panel
 	CResourceInfo TimePanel;			/// Time panel
-	CResourceInfo MonthPanel;			/// Month panel
+	CResourceInfo SeasonPanel;			/// Season panel
 	CResourceInfo DatePanel;			/// Date panel
 	CResourceInfo AgePanel;				/// Age panel
 	std::vector<CUnitInfoPanel *> InfoPanelContents;	/// Info panel contents

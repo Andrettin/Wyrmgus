@@ -403,19 +403,30 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	
 	if (!this->IsSubtemplateArea()) {
 		Map.MapLayers[z]->TimeOfDay = NoTimeOfDay;
-		if (
-			this->SurfaceLayer == 0
-			&& !GameSettings.Inside
-			&& !GameSettings.NoTimeOfDay
-			&& Editor.Running == EditorNotRunning
-		) {
-			if (this->World && this->World->HoursPerDay) {
-				Map.MapLayers[z]->HoursPerDay = this->World->HoursPerDay;
-			} else if (!this->World && this->Plane && this->Plane->HoursPerDay) {
-				Map.MapLayers[z]->HoursPerDay = this->Plane->HoursPerDay;
+		Map.MapLayers[z]->Season = NoSeason;
+		if (Editor.Running == EditorNotRunning) {
+			if (
+				this->SurfaceLayer == 0
+				&& !GameSettings.Inside
+				&& !GameSettings.NoTimeOfDay
+			) {
+				if (this->World && this->World->HoursPerDay) {
+					Map.MapLayers[z]->HoursPerDay = this->World->HoursPerDay;
+				} else if (!this->World && this->Plane && this->Plane->HoursPerDay) {
+					Map.MapLayers[z]->HoursPerDay = this->Plane->HoursPerDay;
+				}
+				if (Map.MapLayers[z]->HoursPerDay) {
+					Map.MapLayers[z]->TimeOfDay = CCalendar::GetTimeOfDay(CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar), Map.MapLayers[z]->HoursPerDay);
+				}
 			}
-			if (Map.MapLayers[z]->HoursPerDay) {
-				Map.MapLayers[z]->TimeOfDay = CCalendar::GetTimeOfDay(CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar), Map.MapLayers[z]->HoursPerDay);
+			
+			if (this->World && this->World->DaysPerYear) {
+				Map.MapLayers[z]->DaysPerYear = this->World->DaysPerYear;
+			} else if (!this->World && this->Plane && this->Plane->DaysPerYear) {
+				Map.MapLayers[z]->DaysPerYear = this->Plane->DaysPerYear;
+			}
+			if (Map.MapLayers[z]->DaysPerYear) {
+				Map.MapLayers[z]->Season = CCalendar::GetSeason(CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar) / Map.MapLayers[z]->HoursPerDay, Map.MapLayers[z]->DaysPerYear);
 			}
 		}
 	}

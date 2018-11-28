@@ -173,6 +173,22 @@ static int CclStratagusMap(lua_State *l)
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
+				} else if (!strcmp(value, "season")) {
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument for \"season\"");
+					}
+					const int subsubargs = lua_rawlen(l, -1);
+					for (int z = 0; z < subsubargs; ++z) {
+						if (!lua_istable(l, -1)) {
+							LuaError(l, "incorrect argument for \"season\"");
+						}
+						lua_rawgeti(l, -1, z + 1);
+						int season = LuaToNumber(l, -1, 1);
+						Map.MapLayers[z]->Season = season;
+						lua_pop(l, 1);
+					}
+					lua_pop(l, 1);
 				} else if (!strcmp(value, "pixel-tile-size")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {

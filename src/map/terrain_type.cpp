@@ -101,11 +101,17 @@ CTerrainType *CTerrainType::GetOrAddTerrainType(const std::string &ident)
 	return terrain_type;
 }
 
+/**
+**	@brief	Load the graphics of the terrain types
+*/
 void CTerrainType::LoadTerrainTypeGraphics()
 {
 	for (std::vector<CTerrainType *>::iterator it = TerrainTypes.begin(); it != TerrainTypes.end(); ++it) {
 		if ((*it)->Graphics) {
 			(*it)->Graphics->Load();
+		}
+		if ((*it)->WinterGraphics) {
+			(*it)->WinterGraphics->Load();
 		}
 		if ((*it)->ElevationGraphics) {
 			(*it)->ElevationGraphics->Load();
@@ -138,6 +144,9 @@ CTerrainType::~CTerrainType()
 	if (this->Graphics) {
 		CGraphic::Free(this->Graphics);
 	}
+	if (this->WinterGraphics) {
+		CGraphic::Free(this->WinterGraphics);
+	}
 	if (this->ElevationGraphics) {
 		CGraphic::Free(this->ElevationGraphics);
 	}
@@ -154,6 +163,7 @@ CTerrainType::~CTerrainType()
 void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string graphics_file;
+	std::string winter_graphics_file;
 	std::string elevation_graphics_file;
 	std::string player_color_graphics_file;
 	
@@ -234,6 +244,11 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "graphics") {
 			graphics_file = value;
 			if (!CanAccessFile(graphics_file.c_str())) {
+				fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
+			}
+		} else if (key == "winter_graphics") {
+			winter_graphics_file = value;
+			if (!CanAccessFile(winter_graphics_file.c_str())) {
 				fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "elevation_graphics") {
@@ -319,6 +334,12 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 		}
 		this->Graphics = CGraphic::Get(graphics_file);
 	}
+	if (!winter_graphics_file.empty()) {
+		if (CGraphic::Get(winter_graphics_file) == nullptr) {
+			CGraphic *graphics = CGraphic::New(winter_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
+		}
+		this->WinterGraphics = CGraphic::Get(winter_graphics_file);
+	}
 	if (!elevation_graphics_file.empty()) {
 		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
 			CGraphic *graphics = CGraphic::New(elevation_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
@@ -330,6 +351,22 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
 		}
 		this->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
+	}
+}
+
+/**
+**	@brief	Get the graphics for the terrain type
+**
+**	@param	is_winter	Whether the graphics to be obtained are the winter ones (if available) or not
+**
+**	@return	The graphics
+*/
+CGraphic *CTerrainType::GetGraphics(const bool is_winter) const
+{
+	if (this->WinterGraphics && is_winter) {
+		return this->WinterGraphics;
+	} else {
+		return this->Graphics;
 	}
 }
 

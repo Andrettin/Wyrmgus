@@ -435,20 +435,6 @@ static void GameLogicLoop()
 		
 		//Wyrmgus start
 		if (GameCycle > 0) {
-			if (GameCycle % CyclesPerTimeOfDayHour == 0) {
-				for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-					CMapLayer *map_layer = Map.MapLayers[z];
-					int cycles_per_time_of_day = map_layer->GetCyclesPerTimeOfDay();
-					if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !cycles_per_time_of_day) {
-						map_layer->TimeOfDay = NoTimeOfDay; //the map layer has no time of day
-						continue;
-					}
-					if (GameCycle % cycles_per_time_of_day == 0) { 
-						map_layer->IncrementTimeOfDay();
-					}
-				}
-			}
-			
 			if (GameCycle % CyclesPerInGameHour == 0) {
 				for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
 					CCalendar *calendar = CCalendar::Calendars[i];
@@ -459,6 +445,28 @@ static void GameLogicLoop()
 					if (calendar->CurrentDayOfTheWeek != -1 && old_day != calendar->CurrentDate.Day) { //day passed in the calendar
 						calendar->CurrentDayOfTheWeek++;
 						calendar->CurrentDayOfTheWeek %= calendar->DaysOfTheWeek.size();
+					}
+				}
+				
+				for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+					CMapLayer *map_layer = Map.MapLayers[z];
+					
+					int cycles_per_time_of_day = map_layer->GetCyclesPerTimeOfDay();
+					if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !cycles_per_time_of_day) {
+						map_layer->TimeOfDay = NoTimeOfDay; //the map layer has no time of day
+						continue;
+					}
+					if (GameCycle % cycles_per_time_of_day == 0) { 
+						map_layer->IncrementTimeOfDay();
+					}
+					
+					int cycles_per_season = map_layer->GetCyclesPerSeason();
+					if (!cycles_per_season) {
+						map_layer->Season = NoSeason; //the map layer has no seasons
+						continue;
+					}
+					if (GameCycle % cycles_per_season == 0) { 
+						map_layer->IncrementSeason();
 					}
 				}
 			}

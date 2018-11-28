@@ -1130,10 +1130,13 @@ void CMap::Create()
 	CMapLayer *map_layer = new CMapLayer;
 	map_layer->ID = this->MapLayers.size();
 	map_layer->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
-	if (!GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning) {
-		map_layer->TimeOfDay = CCalendar::GetTimeOfDay(CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar), DefaultHoursPerDay);
-	} else {
-		map_layer->TimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
+	if (Editor.Running == EditorNotRunning) {
+		if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
+			map_layer->TimeOfDay = CCalendar::GetTimeOfDay(CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar), DefaultHoursPerDay);
+		} else {
+			map_layer->TimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
+		}
+		map_layer->Season = CCalendar::GetSeason(CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar) / DefaultHoursPerDay, DefaultDaysPerYear);
 	}
 	this->MapLayers.push_back(map_layer);
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
@@ -1221,6 +1224,11 @@ void CMap::Save(CFile &file) const
 	file.printf("  \"time-of-day\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
 		file.printf("  {%d},\n", this->MapLayers[z]->TimeOfDay);
+	}
+	file.printf("  },\n");
+	file.printf("  \"season\", {\n");
+	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
+		file.printf("  {%d},\n", this->MapLayers[z]->Season);
 	}
 	file.printf("  },\n");
 	file.printf("  \"pixel-tile-size\", {\n");

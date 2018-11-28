@@ -908,7 +908,7 @@ void DrawDayTime() {
 	if (UI.TimePanel.TextX != -1) {
 		if (Map.MapLayers[CurrentMapLayer]->TimeOfDay != NoTimeOfDay && Map.MapLayers[CurrentMapLayer]->TimeOfDay < MaxTimesOfDay) {
 			char timesText[MaxTimesOfDay][16] = {
-				"NoTime",
+				"No Time",
 				"Dawn",
 				"Morning",
 				"Midday",
@@ -928,17 +928,29 @@ void DrawDayTime() {
 		}
 	}
 	
+	if (UI.SeasonPanel.TextX != -1) {
+		if (Map.MapLayers[CurrentMapLayer]->Season != NoSeason && Map.MapLayers[CurrentMapLayer]->Season < MaxSeasons) {
+			char seasonsText[MaxSeasons][16] = {
+				"No Season",
+				"Spring",
+				"Summer",
+				"Autumn",
+				"Winter"
+			};
+			
+			std::string season_string = _(seasonsText[Map.MapLayers[CurrentMapLayer]->Season]);
+
+			CLabel label(GetGameFont());
+
+			// TODO: Instead of a simple text here we could use an icon per time of day
+			label.Draw(UI.SeasonPanel.TextX, UI.SeasonPanel.TextY, season_string);
+		}
+	}
+	
 	if (ThisPlayer) {
 		CCalendar *calendar = CCivilization::Civilizations[ThisPlayer->Race]->GetCalendar();
 		
 		if (calendar) {
-			if (UI.MonthPanel.TextX != -1) {
-				std::string month_string = calendar->Months[calendar->CurrentDate.Month - 1]->Name;
-				
-				CLabel label(GetGameFont());
-				label.Draw(UI.MonthPanel.TextX, UI.MonthPanel.TextY, month_string);
-			}
-			
 			if (UI.DatePanel.TextX != -1) {
 				std::string date_string = calendar->CurrentDate.ToDisplayString(calendar);
 				

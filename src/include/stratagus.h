@@ -177,10 +177,6 @@ extern const char NameLine[];
 
 #define DefaultHoursPerDay 24
 #define DefaultDaysPerYear 365
-#define DayMultiplier 3 //the purpose of the day multiplier is so that we can effectively have months only taking e.g. 10 days to pass, so that we can have a day/night cycle, different days of the week and months/years, while still months and years not taking an overly long time to pass; the day multiplier should as such NOT affect the changes in day of the week
-
-#define CyclesPerInGameHour 50 // every 50 cycles of gameplay = 1 hour for the purposes of in-game date/time
-#define CyclesPerTimeOfDayHour (CYCLES_PER_SECOND * 10) // every 10 seconds of gameplay = 1 hour for the purposes of the passage of the times of day
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)
@@ -188,6 +184,10 @@ extern const char NameLine[];
 /// Game cycles per second to simulate (original 30-40)
 #define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
 #define CYCLES_PER_MINUTE  (CYCLES_PER_SECOND * 60)
+
+#define CyclesPerInGameHour (CYCLES_PER_SECOND * 10) // every 10 seconds of gameplay = 1 hour for the purposes of in-game date/time
+
+#define DayMultiplier (DefaultDaysPerYear * DefaultHoursPerDay * CyclesPerInGameHour / CYCLES_PER_SECOND / 60 / 60) //the purpose of the day multiplier is so that we can effectively have months only taking e.g. 10 days to pass, so that we can have a day/night cycle, different days of the week and months/years, while still months and years not taking an overly long time to pass; the day multiplier should as such NOT affect the changes in day of the week; here we define the day multiplier to be such that one year equals roughly one hour of gameplay
 
 #define HeroCooldownCycles CYCLES_PER_MINUTE	/// Cooldown (in cycles) for recruiting a hero
 
@@ -240,6 +240,16 @@ enum TimesOfDay {
 	SecondWatchTimeOfDay,
 	
 	MaxTimesOfDay
+};
+
+enum Seasons {
+	NoSeason,
+	SpringSeason,
+	SummerSeason,
+	AutumnSeason,
+	WinterSeason,
+	
+	MaxSeasons
 };
 
 enum Difficulties {

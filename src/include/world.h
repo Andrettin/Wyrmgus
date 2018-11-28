@@ -52,7 +52,7 @@ class CWorld
 {
 public:
 	CWorld() :
-		ID(-1), Plane(NULL), HoursPerDay(DefaultHoursPerDay)
+		ID(-1), Plane(NULL), HoursPerDay(DefaultHoursPerDay), DaysPerYear(DefaultDaysPerYear)
 	{
 	}
 	
@@ -64,6 +64,7 @@ public:
 
 	int ID;																/// ID of this world
 	int HoursPerDay;													/// How many hours does a day in this world contain
+	int DaysPerYear;													/// How many days does a year in this world contain
 	std::string Ident;
 	std::string Name;
 	std::string Description;
