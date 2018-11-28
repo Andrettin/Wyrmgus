@@ -67,8 +67,10 @@ public:
 		Color.A = 0;
 	}
 	
-	static CTerrainType *GetTerrainType(std::string ident);
-	static CTerrainType *GetOrAddTerrainType(std::string ident);
+	~CTerrainType();
+	
+	static CTerrainType *GetTerrainType(const std::string &ident, const bool should_find = true);
+	static CTerrainType *GetOrAddTerrainType(const std::string &ident);
 	static void LoadTerrainTypeGraphics();
 	static void ClearTerrainTypes();
 	

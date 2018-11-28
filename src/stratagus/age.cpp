@@ -72,7 +72,7 @@ CAge *CAge::GetAge(const std::string &ident, const bool should_find)
 		fprintf(stderr, "Invalid age: \"%s\".\n", ident.c_str());
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**

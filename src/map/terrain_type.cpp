@@ -60,24 +60,35 @@ std::map<std::tuple<int, int, int>, CTerrainType *> CTerrainType::TerrainTypesBy
 ----------------------------------------------------------------------------*/
 
 /**
-**  Get a terrain type
+**	@brief	Get a terrain type
+**
+**	@param	ident	The terrain type's string identifier
+**
+**	@return	The terrain type if found, null otherwise
 */
-CTerrainType *CTerrainType::GetTerrainType(std::string ident)
+CTerrainType *CTerrainType::GetTerrainType(const std::string &ident, const bool should_find)
 {
-	if (ident.empty()) {
-		return NULL;
-	}
-	
 	if (TerrainTypesByIdent.find(ident) != TerrainTypesByIdent.end()) {
 		return TerrainTypesByIdent.find(ident)->second;
 	}
 	
-	return NULL;
+	if (should_find) {
+		fprintf(stderr, "Invalid terrain type: \"%s\".\n", ident.c_str());
+	}
+	
+	return nullptr;
 }
 
-CTerrainType *CTerrainType::GetOrAddTerrainType(std::string ident)
+/**
+**	@brief	Get or add a terrain type
+**
+**	@param	ident	The terrain type's string identifier
+**
+**	@return	The terrain type if found, otherwise a new terrain type is created and returned
+*/
+CTerrainType *CTerrainType::GetOrAddTerrainType(const std::string &ident)
 {
-	CTerrainType *terrain_type = GetTerrainType(ident);
+	CTerrainType *terrain_type = GetTerrainType(ident, false);
 	
 	if (!terrain_type) {
 		terrain_type = new CTerrainType;
@@ -105,19 +116,12 @@ void CTerrainType::LoadTerrainTypeGraphics()
 	}
 }
 
+/**
+**	@brief	Remove the existing terrain types
+*/
 void CTerrainType::ClearTerrainTypes()
 {
 	for (size_t i = 0; i < TerrainTypes.size(); ++i) {
-		if (TerrainTypes[i]->Graphics) {
-			CGraphic::Free(TerrainTypes[i]->Graphics);
-		}
-		if (TerrainTypes[i]->ElevationGraphics) {
-			CGraphic::Free(TerrainTypes[i]->ElevationGraphics);
-		}
-		if (TerrainTypes[i]->PlayerColorGraphics) {
-			CPlayerColorGraphic::Free(TerrainTypes[i]->PlayerColorGraphics);
-		}
-		
 		delete TerrainTypes[i];
 	}
 	TerrainTypes.clear();
@@ -126,6 +130,27 @@ void CTerrainType::ClearTerrainTypes()
 	TerrainTypesByColor.clear();
 }
 
+/**
+**	@brief	Destructor
+*/
+CTerrainType::~CTerrainType()
+{
+	if (this->Graphics) {
+		CGraphic::Free(this->Graphics);
+	}
+	if (this->ElevationGraphics) {
+		CGraphic::Free(this->ElevationGraphics);
+	}
+	if (this->PlayerColorGraphics) {
+		CPlayerColorGraphic::Free(this->PlayerColorGraphics);
+	}
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
 void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string graphics_file;
@@ -289,19 +314,19 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 	
 	//get the graphics here, so that we can take the pixel tile size into account
 	if (!graphics_file.empty()) {
-		if (CGraphic::Get(graphics_file) == NULL) {
+		if (CGraphic::Get(graphics_file) == nullptr) {
 			CGraphic *graphics = CGraphic::New(graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
 		}
 		this->Graphics = CGraphic::Get(graphics_file);
 	}
 	if (!elevation_graphics_file.empty()) {
-		if (CGraphic::Get(elevation_graphics_file) == NULL) {
+		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
 			CGraphic *graphics = CGraphic::New(elevation_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
 		}
 		this->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
 	}
 	if (!player_color_graphics_file.empty()) {
-		if (CPlayerColorGraphic::Get(player_color_graphics_file) == NULL) {
+		if (CPlayerColorGraphic::Get(player_color_graphics_file) == nullptr) {
 			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
 		}
 		this->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
