@@ -43,6 +43,8 @@ public:
 	CColor(unsigned char r, unsigned char g, unsigned char b,
 		   unsigned char a = 0) : R(r), G(g), B(b), A(a) {}
 	CColor(const CColor &color) : R(color.R), G(color.G), B(color.B), A(color.A) {}
+	
+	static CColor FromString(const std::string &str);
 
 	void Parse(lua_State *l, int index = -1);
 

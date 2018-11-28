@@ -43,6 +43,27 @@ CColor::operator SDL_Color() const
 	return c;
 }
 
+CColor CColor::FromString(const std::string &str)
+{
+	CColor color;
+	std::vector<std::string> color_vector = SplitString(str, ".");
+	
+	if (color_vector.size() >= 1) {
+		color.R = std::stoi(color_vector[0]);
+	}
+	if (color_vector.size() >= 2) {
+		color.G = std::stoi(color_vector[1]);
+	}
+	if (color_vector.size() >= 3) {
+		color.B = std::stoi(color_vector[2]);
+	}
+	if (color_vector.size() >= 4) {
+		color.A = std::stoi(color_vector[3]);
+	}
+	
+	return color;
+}
+
 void CColor::Parse(lua_State *l, const int offset)
 {
 	if (!lua_istable(l, offset) || lua_rawlen(l, offset) != 3) {

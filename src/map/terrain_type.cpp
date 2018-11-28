@@ -39,7 +39,9 @@
 
 #include "config.h"
 #include "iolib.h"
+#include "map/map.h"
 #include "map/tileset.h"
+#include "upgrade_structs.h"
 #include "video.h"
 
 #include <algorithm>
@@ -136,6 +138,20 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "name") {
 			this->Name = value;
+		} else if (key == "character") {
+			this->Character = value;
+		} else if (key == "color") {
+			this->Color = CColor::FromString(value);
+			
+			if (CTerrainType::TerrainTypesByColor.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != CTerrainType::TerrainTypesByColor.end()) {
+				fprintf(stderr, "Color is already used by another terrain type.\n");
+				continue;
+			}
+			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != TerrainFeatureColorToIndex.end()) {
+				fprintf(stderr, "Color is already used by a terrain feature.\n");
+				continue;
+			}
+			CTerrainType::TerrainTypesByColor[std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)] = this;
 		} else if (key == "overlay") {
 			this->Overlay = StringToBool(value);
 		} else if (key == "buildable") {
@@ -144,6 +160,9 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			this->AllowSingle = StringToBool(value);
 		} else if (key == "hidden") {
 			this->Hidden = StringToBool(value);
+		} else if (key == "resource") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Resource = GetResourceIdByName(value.c_str());
 		} else if (key == "flag") {
 			value = FindAndReplaceString(value, "_", "-");
 			if (value == "land") {
@@ -212,6 +231,10 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			this->BaseTerrainTypes.push_back(base_terrain_type);
 		} else if (key == "solid_tile") {
 			this->SolidTiles.push_back(std::stoi(value));
+		} else if (key == "damaged_tile") {
+			this->DamagedTiles.push_back(std::stoi(value));
+		} else if (key == "destroyed_tile") {
+			this->DestroyedTiles.push_back(std::stoi(value));
 		} else {
 			fprintf(stderr, "Invalid terrain type property: \"%s\".\n", key.c_str());
 		}
