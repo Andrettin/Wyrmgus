@@ -436,13 +436,14 @@ static void GameLogicLoop()
 		//Wyrmgus start
 		if (GameCycle > 0) {
 			if (GameCycle % CyclesPerInGameHour == 0) {
+				CDate::CurrentTotalHours++;
+				
 				for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
 					CCalendar *calendar = CCalendar::Calendars[i];
 
-					int old_day = calendar->CurrentDate.Day;
 					calendar->CurrentDate.AddHours(calendar, 1, DayMultiplier);
 					
-					if (calendar->CurrentDayOfTheWeek != -1 && old_day != calendar->CurrentDate.Day) { //day passed in the calendar
+					if (calendar->CurrentDayOfTheWeek != -1 && CDate::CurrentTotalHours % calendar->HoursPerDay == 0) { //day passed in the calendar
 						calendar->CurrentDayOfTheWeek++;
 						calendar->CurrentDayOfTheWeek %= calendar->DaysOfTheWeek.size();
 					}
@@ -451,21 +452,21 @@ static void GameLogicLoop()
 				for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 					CMapLayer *map_layer = Map.MapLayers[z];
 					
-					int cycles_per_time_of_day = map_layer->GetCyclesPerTimeOfDay();
-					if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !cycles_per_time_of_day) {
+					unsigned hours_per_time_of_day = map_layer->GetHoursPerTimeOfDay();
+					if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !hours_per_time_of_day) {
 						map_layer->TimeOfDay = NoTimeOfDay; //the map layer has no time of day
 						continue;
 					}
-					if (GameCycle % cycles_per_time_of_day == 0) { 
+					if (CDate::CurrentTotalHours % hours_per_time_of_day == 0) { 
 						map_layer->IncrementTimeOfDay();
 					}
 					
-					int cycles_per_season = map_layer->GetCyclesPerSeason();
-					if (!cycles_per_season) {
+					unsigned hours_per_season = map_layer->GetHoursPerSeason();
+					if (!hours_per_season) {
 						map_layer->Season = NoSeason; //the map layer has no seasons
 						continue;
 					}
-					if (GameCycle % cycles_per_season == 0) { 
+					if (CDate::CurrentTotalHours % hours_per_season == 0) { 
 						map_layer->IncrementSeason();
 					}
 				}
@@ -713,6 +714,7 @@ void GameMainLoop()
 	EndReplayLog();
 
 	GameCycle = 0;//????
+	CDate::CurrentTotalHours = 0;
 	CParticleManager::exit();
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;

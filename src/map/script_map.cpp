@@ -1337,14 +1337,7 @@ static int CclDefineTerrainType(lua_State *l)
 	}
 
 	std::string terrain_ident = LuaToString(l, 1);
-	CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
-	if (terrain == NULL) {
-		terrain = new CTerrainType;
-		terrain->Ident = terrain_ident;
-		terrain->ID = CTerrainType::TerrainTypes.size();
-		CTerrainType::TerrainTypes.push_back(terrain);
-		CTerrainType::TerrainTypesByIdent[terrain_ident] = terrain;
-	}
+	CTerrainType *terrain = CTerrainType::GetOrAddTerrainType(terrain_ident);
 	
 	std::string graphics_file;
 	std::string elevation_graphics_file;
@@ -1545,11 +1538,15 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string transition_terrain_name = LuaToString(l, -1, j + 1);
-				CTerrainType *transition_terrain = CTerrainType::GetTerrainType(transition_terrain_name);
-				if (transition_terrain == NULL && transition_terrain_name != "any") {
-					LuaError(l, "Terrain doesn't exist.");
+				CTerrainType *transition_terrain = NULL;
+				if (transition_terrain_name != "any") {
+					transition_terrain = CTerrainType::GetTerrainType(transition_terrain_name);
+					
+					if (transition_terrain == NULL) {
+						LuaError(l, "Terrain doesn't exist.");
+					}
 				}
-				int transition_terrain_id = transition_terrain_name == "any" ? -1 : transition_terrain->ID;
+				int transition_terrain_id = transition_terrain ? transition_terrain->ID : -1;
 				++j;
 				
 				int transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
@@ -1567,11 +1564,15 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string transition_terrain_name = LuaToString(l, -1, j + 1);
-				CTerrainType *transition_terrain = CTerrainType::GetTerrainType(transition_terrain_name);
-				if (transition_terrain == NULL && transition_terrain_name != "any") {
-					LuaError(l, "Terrain doesn't exist.");
+				CTerrainType *transition_terrain = NULL;
+				if (transition_terrain_name != "any") {
+					transition_terrain = CTerrainType::GetTerrainType(transition_terrain_name);
+					
+					if (transition_terrain == NULL) {
+						LuaError(l, "Terrain doesn't exist.");
+					}
 				}
-				int transition_terrain_id = transition_terrain_name == "any" ? -1 : transition_terrain->ID;
+				int transition_terrain_id = transition_terrain ? transition_terrain->ID : -1;
 				++j;
 				
 				int transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));

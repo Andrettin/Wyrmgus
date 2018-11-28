@@ -10,7 +10,7 @@
 //
 /**@name game.cpp - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Andreas Arens,
+//      (c) Copyright 1998-2018 by Lutz Sammer, Andreas Arens,
 //      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -1674,6 +1674,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	}
 	
 	if (CurrentCampaign) {
+		CDate::CurrentTotalHours = CurrentCampaign->StartDate.GetTotalHours(CCalendar::BaseCalendar);
 		CCalendar::BaseCalendar->CurrentDate = CurrentCampaign->StartDate;
 	} else {
 		CCalendar::BaseCalendar->CurrentDate.Clear();
@@ -1681,6 +1682,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		CCalendar::BaseCalendar->CurrentDate.Month = SyncRand(CCalendar::BaseCalendar->Months.size()) + 1;
 		CCalendar::BaseCalendar->CurrentDate.Day = SyncRand(CCalendar::BaseCalendar->Months[CCalendar::BaseCalendar->CurrentDate.Month - 1]->Days) + 1;
 		CCalendar::BaseCalendar->CurrentDate.Hour = SyncRand(CCalendar::BaseCalendar->HoursPerDay);
+		CDate::CurrentTotalHours = CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
 	}
 	
 	for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {

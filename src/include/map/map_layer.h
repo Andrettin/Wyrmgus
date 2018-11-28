@@ -65,9 +65,9 @@ public:
 	~CMapLayer();
 	void IncrementTimeOfDay();
 	void SetTimeOfDay(const int time_of_day);
-	int GetCyclesPerTimeOfDay() const;
+	unsigned GetHoursPerTimeOfDay() const;
 	void IncrementSeason();
-	int GetCyclesPerSeason() const;
+	unsigned GetHoursPerSeason() const;
 	bool IsWinter() const;
 	
 	int ID;

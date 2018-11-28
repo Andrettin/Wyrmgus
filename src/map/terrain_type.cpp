@@ -267,8 +267,15 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			this->PixelTileSize.y = std::stoi(value);
 		} else if (key == "base_terrain_type") {
 			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *base_terrain_type = GetOrAddTerrainType(value);
+			CTerrainType *base_terrain_type = GetTerrainType(value);
 			this->BaseTerrainTypes.push_back(base_terrain_type);
+		} else if (key == "outer_border_terrain_type") {
+			value = FindAndReplaceString(value, "_", "-");
+			CTerrainType *border_terrain_type = GetTerrainType(value);
+			this->OuterBorderTerrains.push_back(border_terrain_type);
+			this->BorderTerrains.push_back(border_terrain_type);
+			border_terrain_type->InnerBorderTerrains.push_back(this);
+			border_terrain_type->BorderTerrains.push_back(this);
 		} else if (key == "solid_tile") {
 			this->SolidTiles.push_back(std::stoi(value));
 		} else if (key == "damaged_tile") {

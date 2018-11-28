@@ -57,6 +57,8 @@ public:
 	
 	static CDate FromString(std::string date_str);
 	
+	static unsigned long long CurrentTotalHours;				/// Current total in-game hours, counting from 1 January 10000 BC 00:00
+	
 	void Clear();
 	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
 	void AddYears(const int years);
@@ -158,8 +160,9 @@ public:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void SetCurrentDate(std::string calendar_ident, std::string date_string);
-extern void SetCurrentDayOfTheWeek(std::string calendar_ident, int day_of_the_week);
+extern void SetCurrentDate(const std::string &calendar_ident, const std::string &date_string);
+extern void SetCurrentDayOfTheWeek(const std::string &calendar_ident, const int day_of_the_week);
+extern void SetCurrentTotalHours(const unsigned long long hours);
 
 //@}
 

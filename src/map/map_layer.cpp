@@ -122,16 +122,15 @@ void CMapLayer::SetTimeOfDay(const int time_of_day)
 }
 
 /**
-**	@brief	Get the quantity of cycles necessary for the passage of a time of day for this map layer
+**	@brief	Get the quantity of in-game hours necessary for the passage of a time of day for this map layer
 **
-**	@return	The quantity of cycles for the passage of a time of day in this map layer
+**	@return	The quantity of in-game hours for the passage of a time of day in this map layer
 */
-int CMapLayer::GetCyclesPerTimeOfDay() const
+unsigned CMapLayer::GetHoursPerTimeOfDay() const
 {
-	int cycles_per_time_of_day = this->HoursPerDay;
-	cycles_per_time_of_day *= CyclesPerInGameHour;
-	cycles_per_time_of_day /= MaxTimesOfDay - 1;
-	return cycles_per_time_of_day;
+	unsigned hours_per_time_of_day = this->HoursPerDay;
+	hours_per_time_of_day /= MaxTimesOfDay - 1;
+	return hours_per_time_of_day;
 }
 
 /**
@@ -146,18 +145,17 @@ void CMapLayer::IncrementSeason()
 }
 
 /**
-**	@brief	Get the quantity of cycles necessary for the passage of a season for this map layer
+**	@brief	Get the quantity of in-game hours necessary for the passage of a season for this map layer
 **
-**	@return	The quantity of cycles for the passage of a season in this map layer
+**	@return	The quantity of in-game hours for the passage of a season in this map layer
 */
-int CMapLayer::GetCyclesPerSeason() const
+unsigned CMapLayer::GetHoursPerSeason() const
 {
-	int cycles_per_season = this->DaysPerYear;
-	cycles_per_season *= CyclesPerInGameHour;
-	cycles_per_season *= this->HoursPerDay;
-	cycles_per_season /= DayMultiplier;
-	cycles_per_season /= MaxSeasons - 1;
-	return cycles_per_season;
+	unsigned hours_per_season = this->DaysPerYear;
+	hours_per_season *= this->HoursPerDay;
+	hours_per_season /= DayMultiplier;
+	hours_per_season /= MaxSeasons - 1;
+	return hours_per_season;
 }
 
 /**

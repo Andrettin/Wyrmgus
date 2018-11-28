@@ -93,5 +93,6 @@ enum GameTypes {
 extern void GenerateHistory();
 extern bool LoadingHistory;
 extern bool DefiningData;
-extern void SetCurrentDate(std::string calendar_ident, std::string date_string);
-extern void SetCurrentDayOfTheWeek(std::string calendar_ident, int day_of_the_week);
+extern void SetCurrentDate(const std::string &calendar_ident, const std::string &date_string);
+extern void SetCurrentDayOfTheWeek(const std::string &calendar_ident, const int day_of_the_week);
+extern void SetCurrentTotalHours(const unsigned long long hours);

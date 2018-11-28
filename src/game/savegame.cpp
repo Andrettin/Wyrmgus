@@ -169,6 +169,7 @@ int SaveGame(const std::string &filename)
 
 	// FIXME: probably not the right place for this
 	file.printf("GameCycle = %lu\n", GameCycle);
+	file.printf("SetCurrentTotalHours(%llu)\n", CDate::CurrentTotalHours);
 	for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
 		const CCalendar *calendar = CCalendar::Calendars[i];
 		if (calendar->CurrentDayOfTheWeek != -1) {

@@ -47,6 +47,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+unsigned long long CDate::CurrentTotalHours = 0;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -340,7 +342,13 @@ int CDate::GetDayOfTheWeek(const CCalendar *calendar) const
 	return -1;
 }
 
-void SetCurrentDate(std::string calendar_ident, std::string date_string)
+/**
+**	@brief	Set the current date for a particular calendar
+**
+**	@param	calendar_ident	The calendar's string identifier
+**	@param	date_string		The date's string representation
+*/
+void SetCurrentDate(const std::string &calendar_ident, const std::string &date_string)
 {
 	CCalendar *calendar = CCalendar::GetCalendar(calendar_ident);
 	
@@ -351,7 +359,13 @@ void SetCurrentDate(std::string calendar_ident, std::string date_string)
 	calendar->CurrentDate = CDate::FromString(date_string);
 }
 
-void SetCurrentDayOfTheWeek(std::string calendar_ident, int day_of_the_week)
+/**
+**	@brief	Set the current day of the week for a particular calendar
+**
+**	@param	calendar_ident	The calendar's string identifier
+**	@param	day_of_the_week	The day of the week's ID
+*/
+void SetCurrentDayOfTheWeek(const std::string &calendar_ident, const int day_of_the_week)
 {
 	CCalendar *calendar = CCalendar::GetCalendar(calendar_ident);
 	
@@ -360,6 +374,16 @@ void SetCurrentDayOfTheWeek(std::string calendar_ident, int day_of_the_week)
 	}
 	
 	calendar->CurrentDayOfTheWeek = day_of_the_week;
+}
+
+/**
+**	@brief	Set the current total in-game hours
+**
+**	@param	hours	The amount of hours
+*/
+void SetCurrentTotalHours(const unsigned long long hours)
+{
+	CDate::CurrentTotalHours = hours;
 }
 
 //@}
