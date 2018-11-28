@@ -110,8 +110,8 @@ void CTerrainType::LoadTerrainTypeGraphics()
 		if ((*it)->Graphics) {
 			(*it)->Graphics->Load();
 		}
-		if ((*it)->WinterGraphics) {
-			(*it)->WinterGraphics->Load();
+		for (std::map<int, CGraphic *>::iterator sub_it = (*it)->SeasonGraphics.begin(); sub_it != (*it)->SeasonGraphics.end(); ++sub_it) {
+			sub_it->second->Load();
 		}
 		if ((*it)->ElevationGraphics) {
 			(*it)->ElevationGraphics->Load();
@@ -144,8 +144,8 @@ CTerrainType::~CTerrainType()
 	if (this->Graphics) {
 		CGraphic::Free(this->Graphics);
 	}
-	if (this->WinterGraphics) {
-		CGraphic::Free(this->WinterGraphics);
+	for (std::map<int, CGraphic *>::iterator iterator = this->SeasonGraphics.begin(); iterator != this->SeasonGraphics.end(); ++iterator) {
+		CGraphic::Free(iterator->second);
 	}
 	if (this->ElevationGraphics) {
 		CGraphic::Free(this->ElevationGraphics);
@@ -163,7 +163,6 @@ CTerrainType::~CTerrainType()
 void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string graphics_file;
-	std::string winter_graphics_file;
 	std::string elevation_graphics_file;
 	std::string player_color_graphics_file;
 	
@@ -246,11 +245,6 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			if (!CanAccessFile(graphics_file.c_str())) {
 				fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
 			}
-		} else if (key == "winter_graphics") {
-			winter_graphics_file = value;
-			if (!CanAccessFile(winter_graphics_file.c_str())) {
-				fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
-			}
 		} else if (key == "elevation_graphics") {
 			elevation_graphics_file = value;
 			if (!CanAccessFile(elevation_graphics_file.c_str())) {
@@ -269,6 +263,13 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			CTerrainType *base_terrain_type = GetTerrainType(value);
 			this->BaseTerrainTypes.push_back(base_terrain_type);
+		} else if (key == "inner_border_terrain_type") {
+			value = FindAndReplaceString(value, "_", "-");
+			CTerrainType *border_terrain_type = GetTerrainType(value);
+			this->InnerBorderTerrains.push_back(border_terrain_type);
+			this->BorderTerrains.push_back(border_terrain_type);
+			border_terrain_type->OuterBorderTerrains.push_back(this);
+			border_terrain_type->BorderTerrains.push_back(this);
 		} else if (key == "outer_border_terrain_type") {
 			value = FindAndReplaceString(value, "_", "-");
 			CTerrainType *border_terrain_type = GetTerrainType(value);
@@ -290,11 +291,46 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
 		CConfigData *child_config_data = config_data->Children[i];
 		
-		if (child_config_data->Tag == "transition_tile" || child_config_data->Tag == "adjacent_transition_tile") {
+		if (child_config_data->Tag == "season_graphics") {
+			std::string season_graphics_file;
+			int season = -1;
+			
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "season") {
+					value = FindAndReplaceString(value, "_", "-");
+					season = GetSeasonIdByName(value);
+				} else if (key == "graphics") {
+					season_graphics_file = value;
+					if (!CanAccessFile(season_graphics_file.c_str())) {
+						fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
+					}
+				} else {
+					fprintf(stderr, "Invalid season graphics property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (season_graphics_file.empty()) {
+				fprintf(stderr, "Season graphics have no file.\n");
+				continue;
+			}
+			
+			if (season == -1) {
+				fprintf(stderr, "Season graphics have no season.\n");
+				continue;
+			}
+			
+			if (CGraphic::Get(season_graphics_file) == nullptr) {
+				CGraphic *graphics = CGraphic::New(season_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
+			}
+			this->SeasonGraphics[season] = CGraphic::Get(season_graphics_file);
+		} else if (child_config_data->Tag == "transition_tile" || child_config_data->Tag == "adjacent_transition_tile") {
 			int transition_terrain_id = -1; //any terrain, by default
 			int transition_type = -1;
 			std::vector<int> tiles;
-				
+			
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
@@ -341,12 +377,6 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 		}
 		this->Graphics = CGraphic::Get(graphics_file);
 	}
-	if (!winter_graphics_file.empty()) {
-		if (CGraphic::Get(winter_graphics_file) == nullptr) {
-			CGraphic *graphics = CGraphic::New(winter_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
-		}
-		this->WinterGraphics = CGraphic::Get(winter_graphics_file);
-	}
 	if (!elevation_graphics_file.empty()) {
 		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
 			CGraphic *graphics = CGraphic::New(elevation_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
@@ -364,14 +394,16 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 /**
 **	@brief	Get the graphics for the terrain type
 **
-**	@param	is_winter	Whether the graphics to be obtained are the winter ones (if available) or not
+**	@param	season	The season for the graphics, if any
 **
 **	@return	The graphics
 */
-CGraphic *CTerrainType::GetGraphics(const bool is_winter) const
+CGraphic *CTerrainType::GetGraphics(const int season) const
 {
-	if (this->WinterGraphics && is_winter) {
-		return this->WinterGraphics;
+	std::map<int, CGraphic *>::const_iterator find_iterator = this->SeasonGraphics.find(season);
+	
+	if (find_iterator != this->SeasonGraphics.end()) {
+		return find_iterator->second;
 	} else {
 		return this->Graphics;
 	}

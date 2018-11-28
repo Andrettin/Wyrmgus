@@ -59,7 +59,7 @@ public:
 		ID(-1), Flags(0), SolidAnimationFrames(0), Resource(-1),
 		Overlay(false), Buildable(false), AllowSingle(false), Hidden(false),
 		PixelTileSize(32, 32),
-		UnitType(NULL), Graphics(NULL), WinterGraphics(NULL), ElevationGraphics(NULL), PlayerColorGraphics(NULL)
+		UnitType(NULL), Graphics(NULL), ElevationGraphics(NULL), PlayerColorGraphics(NULL)
 	{
 		Color.R = 0;
 		Color.G = 0;
@@ -80,7 +80,7 @@ public:
 	static std::map<std::tuple<int, int, int>, CTerrainType *> TerrainTypesByColor;
 
 	void ProcessConfigData(const CConfigData *config_data);
-	CGraphic *GetGraphics(const bool is_winter = false) const;
+	CGraphic *GetGraphics(const int season = 0) const;
 
 	std::string Ident;
 	std::string Name;
@@ -98,7 +98,7 @@ public:
 	CUnitType *UnitType;
 //private:
 	CGraphic *Graphics;
-	CGraphic *WinterGraphics;									/// Graphics to be displayed instead of the normal ones during winter
+	std::map<int, CGraphic *> SeasonGraphics;					/// Graphics to be displayed instead of the normal ones during particular seasons
 public:
 	CGraphic *ElevationGraphics;								/// Semi-transparent elevation graphics, separated so that borders look better
 	CPlayerColorGraphic *PlayerColorGraphics;

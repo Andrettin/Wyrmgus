@@ -825,6 +825,21 @@ int stratagusMain(int argc, char **argv)
 }
 
 //Wyrmgus start
+int GetSeasonIdByName(const std::string &season)
+{
+	if (season == "spring") {
+		return SpringSeason;
+	} else if (season == "summer") {
+		return SummerSeason;
+	} else if (season == "autumn") {
+		return AutumnSeason;
+	} else if (season == "winter") {
+		return WinterSeason;
+	} else {
+		return -1;
+	}
+}
+
 int GetReverseDirection(int direction)
 {
 	if (direction == North) {
@@ -869,7 +884,7 @@ std::string GetDirectionNameById(int direction)
 	return "";
 }
 
-int GetDirectionIdByName(std::string direction)
+int GetDirectionIdByName(const std::string &direction)
 {
 	if (direction == "north") {
 		return North;

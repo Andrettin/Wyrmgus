@@ -159,13 +159,13 @@ unsigned CMapLayer::GetHoursPerSeason() const
 }
 
 /**
-**	@brief	Get whether the map layer is currently in winter
+**	@brief	Get the current season the map layer is in
 **
-**	@return	Whether the map layer is currently in winter
+**	@return	The map layer's current season
 */
-bool CMapLayer::IsWinter() const
+int CMapLayer::GetSeason() const
 {
-	return this->Season == WinterSeason;
+	return this->Season;
 }
 
 //@}

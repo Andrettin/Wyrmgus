@@ -68,7 +68,7 @@ public:
 	unsigned GetHoursPerTimeOfDay() const;
 	void IncrementSeason();
 	unsigned GetHoursPerSeason() const;
-	bool IsWinter() const;
+	int GetSeason() const;
 	
 	int ID;
 	CMapField *Fields;						/// fields on the map layer
