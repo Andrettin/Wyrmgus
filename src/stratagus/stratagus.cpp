@@ -825,6 +825,13 @@ int stratagusMain(int argc, char **argv)
 }
 
 //Wyrmgus start
+/**
+**	@brief	Get a season's enumeration by its string identifier
+**
+**	@param	season	The season's string identifier
+**
+**	@return	The enumeration if found, -1 otherwise
+*/
 int GetSeasonIdByName(const std::string &season)
 {
 	if (season == "spring") {

@@ -36,6 +36,7 @@
 #include "stratagus.h"
 #include "editor.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "ui/ui.h"
@@ -104,21 +105,13 @@ static unsigned QuadFromTile(const Vec2i &pos)
 **  @param tileIndex  Tile type to edit.
 **  @param d     Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-//Wyrmgus start
-//void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 void EditorChangeTile(const Vec2i &pos, int tileIndex)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
-	Assert(Map.Info.IsPointOnMap(pos, CurrentMapLayer));
-	//Wyrmgus end
+	Assert(Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer->ID));
 
 	// Change the flags
-	//Wyrmgus start
-//	CMapField &mf = *Map.Field(pos);
-	CMapField &mf = *Map.Field(pos, CurrentMapLayer);
-	//Wyrmgus end
+	CMapField &mf = *Map.Field(pos, UI.CurrentMapLayer->ID);
+
 	int tile = tileIndex;
 	if (TileToolRandom) {
 		int n = 0;
@@ -145,16 +138,16 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	Map.CalculateTileTransitions(pos, false, CurrentMapLayer);
-	Map.CalculateTileTransitions(pos, true, CurrentMapLayer);
+	Map.CalculateTileTransitions(pos, false, UI.CurrentMapLayer->ID);
+	Map.CalculateTileTransitions(pos, true, UI.CurrentMapLayer->ID);
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
-					Map.CalculateTileTransitions(adjacent_pos, false, CurrentMapLayer);
-					Map.CalculateTileTransitions(adjacent_pos, true, CurrentMapLayer);
+				if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer->ID)) {
+					Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
+					Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
 				}
 			}
 		}
@@ -168,7 +161,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
 		CUnit *unit = *it;
 
-		if (!CanBuildUnitType(unit, *unit->Type, pos, 1, true, CurrentMapLayer)) {
+		if (!CanBuildUnitType(unit, *unit->Type, pos, 1, true, UI.CurrentMapLayer->ID)) {
 			units_to_remove.push_back(unit);
 		}
 	}
@@ -179,15 +172,9 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	//Wyrmgus end
 
 	UI.Minimap.UpdateSeenXY(pos);
-	//Wyrmgus start
-//	UI.Minimap.UpdateXY(pos);
-	UI.Minimap.UpdateXY(pos, CurrentMapLayer);
-	//Wyrmgus end
+	UI.Minimap.UpdateXY(pos, UI.CurrentMapLayer->ID);
 
-	//Wyrmgus start
-//	EditorChangeSurrounding(pos, d);
 	EditorChangeSurrounding(pos, tile);
-	//Wyrmgus end
 }
 
 /**
@@ -202,14 +189,11 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 //Wyrmgus end
 {
 	// Special case 1) Walls.
-	//Wyrmgus start
-//	CMapField &mf = *Map.Field(pos);
-	CMapField &mf = *Map.Field(pos, CurrentMapLayer);
-	//Wyrmgus end
+	CMapField &mf = *Map.Field(pos, UI.CurrentMapLayer->ID);
 	
 	//Wyrmgus start
 	//see if the tile's terrain can be here as is, or if it is needed to change surrounding tiles
-	CTerrainType *terrain = Map.GetTileTopTerrain(pos, false, CurrentMapLayer);
+	CTerrainType *terrain = Map.GetTileTopTerrain(pos, false, UI.CurrentMapLayer->ID);
 	bool overlay = mf.OverlayTerrain ? true : false;
 	if (!terrain->AllowSingle) {
 		std::vector<int> transition_directions;
@@ -218,11 +202,11 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
-						CMapField &adjacent_mf = *Map.Field(adjacent_pos, CurrentMapLayer);
+					if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer->ID)) {
+						CMapField &adjacent_mf = *Map.Field(adjacent_pos, UI.CurrentMapLayer->ID);
 							
-						CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, CurrentMapLayer);
-						if (overlay && adjacent_terrain && Map.Field(adjacent_pos, CurrentMapLayer)->OverlayTerrainDestroyed) {
+						CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
+						if (overlay && adjacent_terrain && Map.Field(adjacent_pos, UI.CurrentMapLayer->ID)->OverlayTerrainDestroyed) {
 							adjacent_terrain = NULL;
 						}
 						if (terrain != adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
@@ -350,18 +334,12 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 	Vec2i ipos = pos - diag;
 	Vec2i apos = pos + diag;
 
-	//Wyrmgus start
-//	Map.FixSelectionArea(ipos, apos);
-	Map.FixSelectionArea(ipos, apos, CurrentMapLayer);
-	//Wyrmgus end
+	Map.FixSelectionArea(ipos, apos, UI.CurrentMapLayer->ID);
 
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {
 		for (itPos.y = ipos.y; itPos.y <= apos.y; ++itPos.y) {
-			//Wyrmgus start
-//			EditorChangeTile(itPos, tile, 15);
 			EditorChangeTile(itPos, tile);
-			//Wyrmgus end
 		}
 	}
 }
@@ -375,10 +353,7 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 */
 static void EditorRandomizeTile(int tile, int count, int max_size)
 {
-	//Wyrmgus start
-//	const Vec2i mpos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
-	const Vec2i mpos(Map.Info.MapWidths[CurrentMapLayer] - 1, Map.Info.MapHeights[CurrentMapLayer] - 1);
-	//Wyrmgus end
+	const Vec2i mpos(Map.Info.MapWidths[UI.CurrentMapLayer->ID] - 1, Map.Info.MapHeights[UI.CurrentMapLayer->ID] - 1);
 
 	for (int i = 0; i < count; ++i) {
 		const Vec2i rpos(rand() % ((1 + mpos.x) / 2), rand() % ((1 + mpos.y) / 2));
@@ -409,10 +384,7 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 */
 static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
-	//Wyrmgus start
-//	const Vec2i mpos(Map.Info.MapWidth, Map.Info.MapHeight);
-	const Vec2i mpos(Map.Info.MapWidths[CurrentMapLayer], Map.Info.MapHeights[CurrentMapLayer]);
-	//Wyrmgus end
+	const Vec2i mpos(Map.Info.MapWidths[UI.CurrentMapLayer->ID], Map.Info.MapHeights[UI.CurrentMapLayer->ID]);
 	CUnitType *typeptr = UnitTypeByIdent(unit_type);
 
 	if (!typeptr) { // Error
@@ -440,10 +412,15 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		TileFill(mirror, tile, z * 2);
 
 		// FIXME: can overlap units
-		//Wyrmgus start
-//		CUnit *unit = MakeUnitAndPlace(rpos, type, &Players[PlayerNumNeutral]);
-		CUnit *unit = MakeUnitAndPlace(rpos, type, &Players[PlayerNumNeutral], CurrentMapLayer);
-		//Wyrmgus end
+		CUnit *unit = MakeUnitAndPlace(rpos, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+		if (unit == NULL) {
+			DebugPrint("Unable to allocate Unit");
+		} else {
+			unit->SetResourcesHeld(value);
+		}
+
+		unit = MakeUnitAndPlace(tmirrorh, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+
 		if (unit == NULL) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
@@ -453,36 +430,16 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 			//Wyrmgus end
 		}
 
-		//Wyrmgus start
-//		unit = MakeUnitAndPlace(tmirrorh, type, &Players[PlayerNumNeutral]);
-		unit = MakeUnitAndPlace(tmirrorh, type, &Players[PlayerNumNeutral], CurrentMapLayer);
-		//Wyrmgus end
+		unit = MakeUnitAndPlace(tmirrorv, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
+
 		if (unit == NULL) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
-			//Wyrmgus start
-//			unit->ResourcesHeld = value;
 			unit->SetResourcesHeld(value);
-			//Wyrmgus end
 		}
 
-		//Wyrmgus start
-//		unit = MakeUnitAndPlace(tmirrorv, type, &Players[PlayerNumNeutral]);
-		unit = MakeUnitAndPlace(tmirrorv, type, &Players[PlayerNumNeutral], CurrentMapLayer);
-		//Wyrmgus end
-		if (unit == NULL) {
-			DebugPrint("Unable to allocate Unit");
-		} else {
-			//Wyrmgus start
-//			unit->ResourcesHeld = value;
-			unit->SetResourcesHeld(value);
-			//Wyrmgus end
-		}
+		unit = MakeUnitAndPlace(tmirror, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
 
-		//Wyrmgus start
-//		unit = MakeUnitAndPlace(tmirror, type, &Players[PlayerNumNeutral]);
-		unit = MakeUnitAndPlace(tmirror, type, &Players[PlayerNumNeutral], CurrentMapLayer);
-		//Wyrmgus end
 		if (unit == NULL) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
@@ -514,10 +471,7 @@ static void EditorDestroyAllUnits()
 */
 void CEditor::CreateRandomMap() const
 {
-	//Wyrmgus start
-//	const int mz = std::max(Map.Info.MapHeight, Map.Info.MapWidth);
-	const int mz = std::max(Map.Info.MapHeights[CurrentMapLayer], Map.Info.MapWidths[CurrentMapLayer]);
-	//Wyrmgus end
+	const int mz = std::max(Map.Info.MapHeights[UI.CurrentMapLayer->ID], Map.Info.MapWidths[UI.CurrentMapLayer->ID]);
 
 	// make water-base
 	const Vec2i zeros(0, 0);

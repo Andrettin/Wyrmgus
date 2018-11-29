@@ -10,7 +10,7 @@
 //
 /**@name ui.h - The user interface header file. */
 //
-//      (c) Copyright 1999-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -57,11 +57,12 @@
 ----------------------------------------------------------------------------*/
 
 class CContentType;
-class CUnit;
 class CFile;
 class CFont;
-class LuaActionListener;
+class CMapLayer;
 class CPopup;
+class CUnit;
+class LuaActionListener;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -302,7 +303,6 @@ private:
 	void DoClicked_UpgradeTo(int button);
 	void DoClicked_Research(int button);
 	void DoClicked_CallbackAction(int button);
-	//Wyrmgus start
 	void DoClicked_LearnAbility(int button);
 	void DoClicked_ExperienceUpgradeTo(int button);
 	void DoClicked_RallyPoint(int button);
@@ -314,7 +314,6 @@ private:
 	void DoClicked_BuyResource(int button);
 	void DoClicked_Salvage();
 	void DoClicked_EnterMapLayer();
-	//Wyrmgus end
 
 
 public:
@@ -455,12 +454,10 @@ public:
 
 	std::vector<CUIButton> TransportingButtons;/// Button info for transporting
 
-	//Wyrmgus start
 	CUIButton *IdleWorkerButton;		/// Button for the idle worker notification
 	CUIButton *LevelUpUnitButton;		/// Button for the level up unit notification
 	std::vector<CUIButton> HeroUnitButtons;	/// Button for the hero units
 	std::vector<CUIButton> InventoryButtons;	/// Button info for inventory items
-	//Wyrmgus end
 	
 	// Completed bar
 	CColor CompletedBarColorRGB;     /// color for completed bar
@@ -482,6 +479,9 @@ public:
 	CMapArea MapArea;                   /// geometry of the whole map area
 	CFont *MessageFont;                 /// Font used for messages
 	int MessageScrollSpeed;             /// Scroll speed in seconds for messages
+	
+	CMapLayer *CurrentMapLayer;
+	CMapLayer *PreviousMapLayer;
 
 	// Menu buttons
 	CUIButton MenuButton;               /// menu button

@@ -376,21 +376,21 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_d
 	if (UseOpenGL) {
 		//Wyrmgus start
 //		DoDrawFrameClip(Textures, frame, x, y);
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			DoDrawFrameClip(Textures, frame, x, y, show_percent);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			if (!TexturesDawn) {
-				MakeTexture(this, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakeTexture(this, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClip(TexturesDawn, frame, x, y, show_percent);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			if (!TexturesDusk) {
-				MakeTexture(this, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakeTexture(this, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClip(TexturesDusk, frame, x, y, show_percent);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			if (!TexturesNight) {
-				MakeTexture(this, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakeTexture(this, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClip(TexturesNight, frame, x, y, show_percent);
 		}
@@ -400,7 +400,7 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_d
 	{
 		//Wyrmgus start
 		if (!ignore_time_of_day && !surface) {
-			surface = SetTimeOfDay(Map.MapLayers[CurrentMapLayer]->TimeOfDay, false);
+			surface = SetTimeOfDay(UI.CurrentMapLayer->TimeOfDay, false);
 		}
 		//Wyrmgus end
 		DrawSubClip(frame_map[frame].x, frame_map[frame].y,
@@ -446,7 +446,7 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool 
 	{
 		//Wyrmgus start
 		if (!ignore_time_of_day && !surface) {
-			surface = SetTimeOfDay(Map.MapLayers[CurrentMapLayer]->TimeOfDay, false);
+			surface = SetTimeOfDay(UI.CurrentMapLayer->TimeOfDay, false);
 		}
 		//Wyrmgus end
 		DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
@@ -657,24 +657,24 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 		}
 		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
 		*/
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player, NoTimeOfDay);
 			}
 			DoDrawFrameClip(PlayerColorTextures[player], frame, x, y, show_percent);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorTexturesDawn[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClip(PlayerColorTexturesDawn[player], frame, x, y, show_percent);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorTexturesDusk[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClip(PlayerColorTexturesDusk[player], frame, x, y, show_percent);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorTexturesNight[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClip(PlayerColorTexturesNight[player], frame, x, y, show_percent);
 		}
@@ -686,24 +686,24 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 //		GraphicPlayerPixels(Players[player], *this);
 
 		SDL_Surface *surface = NULL;
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorSurfaces[player]) {
 				MakePlayerColorSurface(player, false, NoTimeOfDay);
 			}
 			surface = PlayerColorSurfaces[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorSurfacesDawn[player]) {
-				MakePlayerColorSurface(player, false, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesDawn[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorSurfacesDusk[player]) {
-				MakePlayerColorSurface(player, false, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesDusk[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorSurfacesNight[player]) {
-				MakePlayerColorSurface(player, false, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesNight[player];
 		}
@@ -731,21 +731,21 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 			MakePlayerColorTexture(this, player);
 		}
 		*/
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player, NoTimeOfDay);
 			}
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorTexturesDawn[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorTexturesDusk[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorTexturesNight[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
 		}
 		//Wyrmgus end
@@ -753,13 +753,13 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 		glColor4ub(255, 255, 255, alpha);
 		//Wyrmgus start
 //		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			DoDrawFrameClip(PlayerColorTextures[player], frame, x, y, show_percent);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			DoDrawFrameClip(PlayerColorTexturesDawn[player], frame, x, y, show_percent);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			DoDrawFrameClip(PlayerColorTexturesDusk[player], frame, x, y, show_percent);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			DoDrawFrameClip(PlayerColorTexturesNight[player], frame, x, y, show_percent);
 		}
 		//Wyrmgus end
@@ -771,24 +771,24 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 //		GraphicPlayerPixels(Players[player], *this);
 
 		SDL_Surface *surface = NULL;
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorSurfaces[player]) {
 				MakePlayerColorSurface(player, false, NoTimeOfDay);
 			}
 			surface = PlayerColorSurfaces[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorSurfacesDawn[player]) {
-				MakePlayerColorSurface(player, false, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesDawn[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorSurfacesDusk[player]) {
-				MakePlayerColorSurface(player, false, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesDusk[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorSurfacesNight[player]) {
-				MakePlayerColorSurface(player, false, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, false, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesNight[player];
 		}
@@ -820,21 +820,21 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 			MakePlayerColorTexture(this, player);
 		}
 		*/
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player, NoTimeOfDay);
 			}
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorTexturesDawn[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorTexturesDusk[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorTexturesNight[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
 		}
 		//Wyrmgus end
@@ -842,13 +842,13 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 		glColor4ub(255, 255, 255, alpha);
 		//Wyrmgus start
 //		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			DoDrawFrameClipX(PlayerColorTexturesDawn[player], frame, x, y);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			DoDrawFrameClipX(PlayerColorTexturesDusk[player], frame, x, y);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			DoDrawFrameClipX(PlayerColorTexturesNight[player], frame, x, y);
 		}
 		//Wyrmgus end
@@ -860,24 +860,24 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 //		GraphicPlayerPixels(Players[player], *this);
 
 		SDL_Surface *surface = NULL;
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorSurfacesFlip[player]) {
 				MakePlayerColorSurface(player, true, NoTimeOfDay);
 			}
 			surface = PlayerColorSurfacesFlip[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorSurfacesDawnFlip[player]) {
-				MakePlayerColorSurface(player, true, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesDawnFlip[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorSurfacesDuskFlip[player]) {
-				MakePlayerColorSurface(player, true, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesDuskFlip[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorSurfacesNightFlip[player]) {
-				MakePlayerColorSurface(player, true, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesNightFlip[player];
 		}
@@ -955,21 +955,21 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_
 	if (UseOpenGL) {
 		//Wyrmgus start
 		//DoDrawFrameClipX(Textures, frame, x, y);
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			DoDrawFrameClipX(Textures, frame, x, y);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			if (!TexturesDawn) {
-				MakeTexture(this, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakeTexture(this, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClipX(TexturesDawn, frame, x, y);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			if (!TexturesDusk) {
-				MakeTexture(this, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakeTexture(this, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClipX(TexturesDusk, frame, x, y);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			if (!TexturesNight) {
-				MakeTexture(this, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakeTexture(this, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClipX(TexturesNight, frame, x, y);
 		}
@@ -979,7 +979,7 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_
 	{
 		//Wyrmgus start
 		if (!ignore_time_of_day && !surface) {
-			surface = SetTimeOfDay(Map.MapLayers[CurrentMapLayer]->TimeOfDay, true);
+			surface = SetTimeOfDay(UI.CurrentMapLayer->TimeOfDay, true);
 		}
 		//Wyrmgus end
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
@@ -1044,7 +1044,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool
 	{
 		//Wyrmgus start
 		if (!ignore_time_of_day && !surface) {
-			surface = SetTimeOfDay(Map.MapLayers[CurrentMapLayer]->TimeOfDay, true);
+			surface = SetTimeOfDay(UI.CurrentMapLayer->TimeOfDay, true);
 		}
 		//Wyrmgus end
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
@@ -1109,24 +1109,24 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 		}
 		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
 		*/
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player, NoTimeOfDay);
 			}
 			DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorTexturesDawn[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClipX(PlayerColorTexturesDawn[player], frame, x, y);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorTexturesDusk[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClipX(PlayerColorTexturesDusk[player], frame, x, y);
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorTexturesNight[player]) {
-				MakePlayerColorTexture(this, player, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->TimeOfDay);
 			}
 			DoDrawFrameClipX(PlayerColorTexturesNight[player], frame, x, y);
 		}
@@ -1138,24 +1138,24 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 //		GraphicPlayerPixels(Players[player], *this);
 
 		SDL_Surface *surface = NULL;
-		if (ignore_time_of_day || !Map.MapLayers[CurrentMapLayer]->TimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorSurfacesFlip[player]) {
 				MakePlayerColorSurface(player, true, NoTimeOfDay);
 			}
 			surface = PlayerColorSurfacesFlip[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DawnTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorSurfacesDawnFlip[player]) {
-				MakePlayerColorSurface(player, true, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesDawnFlip[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == DuskTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorSurfacesDuskFlip[player]) {
-				MakePlayerColorSurface(player, true, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesDuskFlip[player];
-		} else if (Map.MapLayers[CurrentMapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[CurrentMapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+		} else if (UI.CurrentMapLayer->TimeOfDay == FirstWatchTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MidnightTimeOfDay || UI.CurrentMapLayer->TimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorSurfacesNightFlip[player]) {
-				MakePlayerColorSurface(player, true, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+				MakePlayerColorSurface(player, true, UI.CurrentMapLayer->TimeOfDay);
 			}
 			surface = PlayerColorSurfacesNightFlip[player];
 		}

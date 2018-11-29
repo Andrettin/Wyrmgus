@@ -109,17 +109,14 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 {
 	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);
 
-	//Wyrmgus start
-//	return Map.Info.IsPointOnMap(tilePos);
-	return Map.Info.IsPointOnMap(tilePos, CurrentMapLayer);
-	//Wyrmgus end
+	return Map.Info.IsPointOnMap(tilePos, UI.CurrentMapLayer->ID);
 }
 
 // Convert viewport coordinates into map pixel coordinates
 PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 {
 	const PixelDiff relPos = screenPixelPos - this->TopLeftPos + this->Offset;
-	const PixelPos mapPixelPos = relPos + Map.TilePosToMapPixelPos_TopLeft(this->MapPos, CurrentMapLayer);
+	const PixelPos mapPixelPos = relPos + Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer->ID);
 
 	return mapPixelPos;
 }
@@ -127,7 +124,7 @@ PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 // Convert map pixel coordinates into viewport coordinates
 PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 {
-	const PixelDiff relPos = mapPixelPos - Map.TilePosToMapPixelPos_TopLeft(this->MapPos, CurrentMapLayer);
+	const PixelDiff relPos = mapPixelPos - Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer->ID);
 
 	return this->TopLeftPos + relPos - this->Offset;
 }
@@ -136,7 +133,7 @@ PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 {
 	const PixelPos mapPixelPos = ScreenToMapPixelPos(screenPixelPos);
-	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos, CurrentMapLayer);
+	const Vec2i tilePos = Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID);
 
 	return tilePos;
 }
@@ -144,7 +141,7 @@ Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 /// convert tilepos coordonates into screen (take the top left of the tile)
 PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 {
-	const PixelPos mapPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, CurrentMapLayer);
+	const PixelPos mapPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer->ID);
 
 	return MapToScreenPixelPos(mapPos);
 }
@@ -172,12 +169,9 @@ void CViewport::Set(const PixelPos &mapPos)
 	y = std::max(y, -UI.MapArea.ScrollPaddingTop);
 
 	const PixelSize pixelSize = this->GetPixelSize();
-	//Wyrmgus start
-//	x = std::min(x, Map.Info.MapWidth * Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-//	y = std::min(y, Map.Info.MapHeight * Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
-	x = std::min(x, (Map.Info.MapWidths.size() ? Map.Info.MapWidths[CurrentMapLayer] : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (Map.Info.MapHeights.size() ? Map.Info.MapHeights[CurrentMapLayer] : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
-	//Wyrmgus end
+
+	x = std::min(x, (Map.Info.MapWidths.size() && UI.CurrentMapLayer ? Map.Info.MapWidths[UI.CurrentMapLayer->ID] : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (Map.Info.MapHeights.size() && UI.CurrentMapLayer ? Map.Info.MapHeights[UI.CurrentMapLayer->ID] : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
 	this->MapPos.x = x / Map.GetCurrentPixelTileSize().x;
 	if (x < 0 && x % Map.GetCurrentPixelTileSize().x) {
@@ -207,7 +201,7 @@ void CViewport::Set(const PixelPos &mapPos)
 */
 void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
 {
-	const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, CurrentMapLayer) + offset;
+	const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer ? UI.CurrentMapLayer->ID : -1) + offset;
 
 	this->Set(mapPixelPos);
 }
@@ -255,9 +249,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int dy = this->TopLeftPos.y - this->Offset.y;
 	//Wyrmgus start
 //	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
-	const int map_max = Map.Info.MapWidths[CurrentMapLayer] * Map.Info.MapHeights[CurrentMapLayer];
+	const int map_max = Map.Info.MapWidths[UI.CurrentMapLayer->ID] * Map.Info.MapHeights[UI.CurrentMapLayer->ID];
 	//Wyrmgus end
-	const int season = Map.MapLayers[CurrentMapLayer]->GetSeason();
+	const int season = Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
 
 	while (sy  < 0) {
 		sy++;
@@ -265,7 +259,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 	}
 	//Wyrmgus start
 //	sy *=  Map.Info.MapWidth;
-	sy *=  Map.Info.MapWidths[CurrentMapLayer];
+	sy *=  Map.Info.MapWidths[UI.CurrentMapLayer->ID];
 	//Wyrmgus end
 
 	while (dy <= ey && sy  < map_max) {
@@ -273,7 +267,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 		int dx = this->TopLeftPos.x - this->Offset.x;
 		//Wyrmgus start
 //		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
-		while (dx <= ex && (sx - sy < Map.Info.MapWidths[CurrentMapLayer])) {
+		while (dx <= ex && (sx - sy < Map.Info.MapWidths[UI.CurrentMapLayer->ID])) {
 		//Wyrmgus end
 			if (sx - sy < 0) {
 				++sx;
@@ -282,7 +276,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			//Wyrmgus start
 //			const CMapField &mf = Map.Fields[sx];
-			const CMapField &mf = Map.MapLayers[CurrentMapLayer]->Fields[sx];
+			const CMapField &mf = Map.MapLayers[UI.CurrentMapLayer->ID]->Fields[sx];
 			//Wyrmgus end
 			//Wyrmgus start
 			/*
@@ -395,10 +389,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			++sx;
 			dx += Map.GetCurrentPixelTileSize().x;
 		}
-		//Wyrmgus start
-//		sy += Map.Info.MapWidth;
-		sy += Map.Info.MapWidths[CurrentMapLayer];
-		//Wyrmgus end
+		sy += Map.Info.MapWidths[UI.CurrentMapLayer->ID];
 		dy += Map.GetCurrentPixelTileSize().y;
 	}
 }
@@ -591,7 +582,7 @@ void CViewport::Draw() const
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		//Wyrmgus start
 //		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
-		const bool isMapFieldVisile = Map.Field(tilePos, CurrentMapLayer)->playerInfo.IsTeamVisible(*ThisPlayer);
+		const bool isMapFieldVisile = Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.IsTeamVisible(*ThisPlayer);
 		//Wyrmgus end
 
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor

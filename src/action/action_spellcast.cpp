@@ -30,7 +30,7 @@
 
 /*
 ** This is inherited from action_attack.c, actually spell casting will
-** be considered a `special' case attack action... //Vladi
+** be considered a 'special' case attack action... //Vladi
 */
 
 //@{
@@ -49,6 +49,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -171,30 +172,25 @@
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
-		//Wyrmgus start
-		if (this->GetGoal()->MapLayer != CurrentMapLayer) {
+		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
-		//Wyrmgus end
+
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
-		//Wyrmgus start
-		if (this->MapLayer != CurrentMapLayer) {
+		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
-		//Wyrmgus end
+
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
-	//Wyrmgus start
-//	Video.FillCircleClip(ColorBlue, lastScreenPos, 2);
-//	Video.DrawLineClip(ColorBlue, lastScreenPos, targetPos);
-//	Video.FillCircleClip(ColorBlue, targetPos, 3);
+
 	if (Preference.ShowPathlines) {
 		Video.FillCircleClip(ColorBlue, lastScreenPos, 2);
 		Video.DrawLineClip(ColorBlue, lastScreenPos, targetPos);
 		Video.FillCircleClip(ColorBlue, targetPos, 3);
 	}
-	//Wyrmgus end
+
 	return targetPos;
 }
 

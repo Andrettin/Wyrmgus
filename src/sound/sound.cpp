@@ -42,6 +42,7 @@
 #include "civilization.h"
 #include "config.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "mod.h"
 #include "missile.h"
@@ -440,7 +441,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 		return;
 	}
 	
-	if (unit.MapLayer != CurrentMapLayer) {
+	if (unit.MapLayer != UI.CurrentMapLayer->ID) {
 		return;
 	}
 	//Wyrmgus end
@@ -500,7 +501,7 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 		return;
 	}
 	//Wyrmgus start
-	if (unit.MapLayer != CurrentMapLayer) {
+	if (unit.MapLayer != UI.CurrentMapLayer->ID) {
 		return;
 	}
 	//Wyrmgus end

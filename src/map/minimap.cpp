@@ -376,7 +376,7 @@ void CMinimap::UpdateTerrain(int z)
 //	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
 	
-	const int season = Map.MapLayers[CurrentMapLayer]->GetSeason();
+	const int season = Map.MapLayers[z]->GetSeason();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!UseOpenGL)
@@ -610,7 +610,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 //	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
 
-	const int season = Map.MapLayers[CurrentMapLayer]->GetSeason();
+	const int season = Map.MapLayers[z]->GetSeason();
 
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
@@ -860,16 +860,16 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 //	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];
 //	int my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit.tilePos.y];
 //	int w = Map2MinimapX[type->TileSize.x];
-	int mx = 1 + UI.Minimap.XOffset[CurrentMapLayer] + Map2MinimapX[CurrentMapLayer][unit.tilePos.x];
-	int my = 1 + UI.Minimap.YOffset[CurrentMapLayer] + Map2MinimapY[CurrentMapLayer][unit.tilePos.y];
-	int w = Map2MinimapX[CurrentMapLayer][type->TileSize.x];
+	int mx = 1 + UI.Minimap.XOffset[UI.CurrentMapLayer->ID] + Map2MinimapX[UI.CurrentMapLayer->ID][unit.tilePos.x];
+	int my = 1 + UI.Minimap.YOffset[UI.CurrentMapLayer->ID] + Map2MinimapY[UI.CurrentMapLayer->ID][unit.tilePos.y];
+	int w = Map2MinimapX[UI.CurrentMapLayer->ID][type->TileSize.x];
 	//Wyrmgus end
 	if (mx + w >= UI.Minimap.W) { // clip right side
 		w = UI.Minimap.W - mx;
 	}
 	//Wyrmgus start
 //	int h0 = Map2MinimapY[type->TileSize.y];
-	int h0 = Map2MinimapY[CurrentMapLayer][type->TileSize.y];
+	int h0 = Map2MinimapY[UI.CurrentMapLayer->ID][type->TileSize.y];
 	//Wyrmgus end
 	if (my + h0 >= UI.Minimap.H) { // clip bottom side
 		h0 = UI.Minimap.H - my;
@@ -882,7 +882,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 		SDL_Color c;
 		//Wyrmgus start
 //		bpp = MinimapSurface->format->BytesPerPixel;
-		bpp = MinimapSurface[CurrentMapLayer]->format->BytesPerPixel;
+		bpp = MinimapSurface[UI.CurrentMapLayer->ID]->format->BytesPerPixel;
 		//Wyrmgus end
 		SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
 	}
@@ -893,24 +893,24 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 			if (UseOpenGL) {
 				//Wyrmgus start
 //				*(Uint32 *)&(MinimapSurfaceGL[((mx + w) + (my + h) * MinimapTextureWidth) * 4]) = color;
-				*(Uint32 *)&(MinimapSurfaceGL[CurrentMapLayer][((mx + w) + (my + h) * MinimapTextureWidth[CurrentMapLayer]) * 4]) = color;
+				*(Uint32 *)&(MinimapSurfaceGL[UI.CurrentMapLayer->ID][((mx + w) + (my + h) * MinimapTextureWidth[UI.CurrentMapLayer->ID]) * 4]) = color;
 				//Wyrmgus end
 			} else
 #endif
 			{
 				//Wyrmgus start
 //				const unsigned int index = (mx + w) * bpp + (my + h) * MinimapSurface->pitch;
-				const unsigned int index = (mx + w) * bpp + (my + h) * MinimapSurface[CurrentMapLayer]->pitch;
+				const unsigned int index = (mx + w) * bpp + (my + h) * MinimapSurface[UI.CurrentMapLayer->ID]->pitch;
 				//Wyrmgus end
 				if (bpp == 2) {
 					//Wyrmgus start
 //					*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[index] = color;
-					*(Uint16 *)&((Uint8 *)MinimapSurface[CurrentMapLayer]->pixels)[index] = color;
+					*(Uint16 *)&((Uint8 *)MinimapSurface[UI.CurrentMapLayer->ID]->pixels)[index] = color;
 					//Wyrmgus end
 				} else {
 					//Wyrmgus start
 //					*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[index] = color;
-					*(Uint32 *)&((Uint8 *)MinimapSurface[CurrentMapLayer]->pixels)[index] = color;
+					*(Uint32 *)&((Uint8 *)MinimapSurface[UI.CurrentMapLayer->ID]->pixels)[index] = color;
 					//Wyrmgus end
 				}
 			}
@@ -936,14 +936,14 @@ void CMinimap::Update()
 		if (UseOpenGL) {
 			//Wyrmgus start
 //			memset(MinimapSurfaceGL, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
-			memset(MinimapSurfaceGL[CurrentMapLayer], 0, MinimapTextureWidth[CurrentMapLayer] * MinimapTextureHeight[CurrentMapLayer] * 4);
+			memset(MinimapSurfaceGL[UI.CurrentMapLayer->ID], 0, MinimapTextureWidth[UI.CurrentMapLayer->ID] * MinimapTextureHeight[UI.CurrentMapLayer->ID] * 4);
 			//Wyrmgus end
 		} else
 #endif
 		{
 			//Wyrmgus start
 //			SDL_FillRect(MinimapSurface, NULL, SDL_MapRGB(MinimapSurface->format, 0, 0, 0));
-			SDL_FillRect(MinimapSurface[CurrentMapLayer], NULL, SDL_MapRGB(MinimapSurface[CurrentMapLayer]->format, 0, 0, 0));
+			SDL_FillRect(MinimapSurface[UI.CurrentMapLayer->ID], NULL, SDL_MapRGB(MinimapSurface[UI.CurrentMapLayer->ID]->format, 0, 0, 0));
 			//Wyrmgus end
 		}
 	}
@@ -957,7 +957,7 @@ void CMinimap::Update()
 	{
 		//Wyrmgus start
 //		bpp = MinimapSurface->format->BytesPerPixel;
-		bpp = MinimapSurface[CurrentMapLayer]->format->BytesPerPixel;
+		bpp = MinimapSurface[UI.CurrentMapLayer->ID]->format->BytesPerPixel;
 		//Wyrmgus end
 	}
 
@@ -969,14 +969,14 @@ void CMinimap::Update()
 		if (UseOpenGL) {
 			//Wyrmgus start
 //			memcpy(MinimapSurfaceGL, MinimapTerrainSurfaceGL, MinimapTextureWidth * MinimapTextureHeight * 4);
-			memcpy(MinimapSurfaceGL[CurrentMapLayer], MinimapTerrainSurfaceGL[CurrentMapLayer], MinimapTextureWidth[CurrentMapLayer] * MinimapTextureHeight[CurrentMapLayer] * 4);
+			memcpy(MinimapSurfaceGL[UI.CurrentMapLayer->ID], MinimapTerrainSurfaceGL[UI.CurrentMapLayer->ID], MinimapTextureWidth[UI.CurrentMapLayer->ID] * MinimapTextureHeight[UI.CurrentMapLayer->ID] * 4);
 			//Wyrmgus end
 		} else
 #endif
 		{
 			//Wyrmgus start
 //			SDL_BlitSurface(MinimapTerrainSurface, NULL, MinimapSurface, NULL);
-			SDL_BlitSurface(MinimapTerrainSurface[CurrentMapLayer], NULL, MinimapSurface[CurrentMapLayer], NULL);
+			SDL_BlitSurface(MinimapTerrainSurface[UI.CurrentMapLayer->ID], NULL, MinimapSurface[UI.CurrentMapLayer->ID], NULL);
 			//Wyrmgus end
 		}
 	}
@@ -988,34 +988,34 @@ void CMinimap::Update()
 		//Wyrmgus start
 //		SDL_LockSurface(MinimapSurface);
 //		SDL_LockSurface(MinimapTerrainSurface);
-		SDL_LockSurface(MinimapSurface[CurrentMapLayer]);
-		SDL_LockSurface(MinimapTerrainSurface[CurrentMapLayer]);
+		SDL_LockSurface(MinimapSurface[UI.CurrentMapLayer->ID]);
+		SDL_LockSurface(MinimapTerrainSurface[UI.CurrentMapLayer->ID]);
 		//Wyrmgus end
 	}
 
 	for (int my = 0; my < H; ++my) {
 		for (int mx = 0; mx < W; ++mx) {
 			//Wyrmgus start
-			if (mx < XOffset[CurrentMapLayer] || mx >= W - XOffset[CurrentMapLayer] || my < YOffset[CurrentMapLayer] || my >= H - YOffset[CurrentMapLayer]) {
+			if (mx < XOffset[UI.CurrentMapLayer->ID] || mx >= W - XOffset[UI.CurrentMapLayer->ID] || my < YOffset[UI.CurrentMapLayer->ID] || my >= H - YOffset[UI.CurrentMapLayer->ID]) {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 				if (UseOpenGL) {
-					*(Uint32 *)&(MinimapSurfaceGL[CurrentMapLayer][(mx + my * MinimapTextureWidth[CurrentMapLayer]) * 4]) = Video.MapRGB(0, 0, 0, 0);
+					*(Uint32 *)&(MinimapSurfaceGL[UI.CurrentMapLayer->ID][(mx + my * MinimapTextureWidth[UI.CurrentMapLayer->ID]) * 4]) = Video.MapRGB(0, 0, 0, 0);
 				} else
 #endif
 				{
 					//Wyrmgus start
 //					const int index = mx * bpp + my * MinimapSurface->pitch;
-					const int index = mx * bpp + my * MinimapSurface[CurrentMapLayer]->pitch;
+					const int index = mx * bpp + my * MinimapSurface[UI.CurrentMapLayer->ID]->pitch;
 					//Wyrmgus end
 					if (bpp == 2) {
 						//Wyrmgus start
 //						*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[index] = ColorBlack;
-						*(Uint16 *)&((Uint8 *)MinimapSurface[CurrentMapLayer]->pixels)[index] = ColorBlack;
+						*(Uint16 *)&((Uint8 *)MinimapSurface[UI.CurrentMapLayer->ID]->pixels)[index] = ColorBlack;
 						//Wyrmgus end
 					} else {
 						//Wyrmgus start
 //						*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[index] = ColorBlack;
-						*(Uint32 *)&((Uint8 *)MinimapSurface[CurrentMapLayer]->pixels)[index] = ColorBlack;
+						*(Uint32 *)&((Uint8 *)MinimapSurface[UI.CurrentMapLayer->ID]->pixels)[index] = ColorBlack;
 						//Wyrmgus end
 					}
 				}
@@ -1031,8 +1031,8 @@ void CMinimap::Update()
 				//Wyrmgus start
 //				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
 //				visiontype = Map.Field(tilePos)->playerInfo.TeamVisibilityState(*ThisPlayer);
-				const Vec2i tilePos(Minimap2MapX[CurrentMapLayer][mx], Minimap2MapY[CurrentMapLayer][my] / Map.Info.MapWidths[CurrentMapLayer]);
-				visiontype = Map.Field(tilePos, CurrentMapLayer)->playerInfo.TeamVisibilityState(*ThisPlayer);
+				const Vec2i tilePos(Minimap2MapX[UI.CurrentMapLayer->ID][mx], Minimap2MapY[UI.CurrentMapLayer->ID][my] / Map.Info.MapWidths[UI.CurrentMapLayer->ID]);
+				visiontype = Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*ThisPlayer);
 				//Wyrmgus end
 			}
 
@@ -1041,24 +1041,24 @@ void CMinimap::Update()
 				if (UseOpenGL) {
 					//Wyrmgus start
 //					*(Uint32 *)&(MinimapSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
-					*(Uint32 *)&(MinimapSurfaceGL[CurrentMapLayer][(mx + my * MinimapTextureWidth[CurrentMapLayer]) * 4]) = Video.MapRGB(0, 0, 0, 0);
+					*(Uint32 *)&(MinimapSurfaceGL[UI.CurrentMapLayer->ID][(mx + my * MinimapTextureWidth[UI.CurrentMapLayer->ID]) * 4]) = Video.MapRGB(0, 0, 0, 0);
 					//Wyrmgus end
 				} else
 #endif
 				{
 					//Wyrmgus start
 //					const int index = mx * bpp + my * MinimapSurface->pitch;
-					const int index = mx * bpp + my * MinimapSurface[CurrentMapLayer]->pitch;
+					const int index = mx * bpp + my * MinimapSurface[UI.CurrentMapLayer->ID]->pitch;
 					//Wyrmgus end
 					if (bpp == 2) {
 						//Wyrmgus start
 //						*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[index] = ColorBlack;
-						*(Uint16 *)&((Uint8 *)MinimapSurface[CurrentMapLayer]->pixels)[index] = ColorBlack;
+						*(Uint16 *)&((Uint8 *)MinimapSurface[UI.CurrentMapLayer->ID]->pixels)[index] = ColorBlack;
 						//Wyrmgus end
 					} else {
 						//Wyrmgus start
 //						*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[index] = ColorBlack;
-						*(Uint32 *)&((Uint8 *)MinimapSurface[CurrentMapLayer]->pixels)[index] = ColorBlack;
+						*(Uint32 *)&((Uint8 *)MinimapSurface[UI.CurrentMapLayer->ID]->pixels)[index] = ColorBlack;
 						//Wyrmgus end
 					}
 				}
@@ -1072,7 +1072,7 @@ void CMinimap::Update()
 	{
 		//Wyrmgus start
 //		SDL_UnlockSurface(MinimapTerrainSurface);
-		SDL_UnlockSurface(MinimapTerrainSurface[CurrentMapLayer]);
+		SDL_UnlockSurface(MinimapTerrainSurface[UI.CurrentMapLayer->ID]);
 		//Wyrmgus end
 	}
 
@@ -1091,7 +1091,7 @@ void CMinimap::Update()
 	{
 		//Wyrmgus start
 //		SDL_UnlockSurface(MinimapSurface);
-		SDL_UnlockSurface(MinimapSurface[CurrentMapLayer]);
+		SDL_UnlockSurface(MinimapSurface[UI.CurrentMapLayer->ID]);
 		//Wyrmgus end
 	}
 }
@@ -1124,13 +1124,13 @@ void CMinimap::Draw() const
 	if (UseOpenGL) {
 		//Wyrmgus start
 //		glBindTexture(GL_TEXTURE_2D, MinimapTexture);
-		glBindTexture(GL_TEXTURE_2D, MinimapTexture[CurrentMapLayer]);
+		glBindTexture(GL_TEXTURE_2D, MinimapTexture[UI.CurrentMapLayer->ID]);
 		//Wyrmgus end
 		//Wyrmgus start
 //		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth, MinimapTextureHeight,
 //						GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth[CurrentMapLayer], MinimapTextureHeight[CurrentMapLayer],
-						GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL[CurrentMapLayer]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, MinimapTextureWidth[UI.CurrentMapLayer->ID], MinimapTextureHeight[UI.CurrentMapLayer->ID],
+						GL_RGBA, GL_UNSIGNED_BYTE, MinimapSurfaceGL[UI.CurrentMapLayer->ID]);
 		//Wyrmgus end
 
 #ifdef USE_GLES
@@ -1140,9 +1140,9 @@ void CMinimap::Draw() const
 //			(float)W / MinimapTextureWidth, 0.0f,
 //			0.0f, (float)H / MinimapTextureHeight,
 //			(float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight
-			(float)W / MinimapTextureWidth[CurrentMapLayer], 0.0f,
-			0.0f, (float)H / MinimapTextureHeight[CurrentMapLayer],
-			(float)W / MinimapTextureWidth[CurrentMapLayer], (float)H / MinimapTextureHeight[CurrentMapLayer]
+			(float)W / MinimapTextureWidth[UI.CurrentMapLayer->ID], 0.0f,
+			0.0f, (float)H / MinimapTextureHeight[UI.CurrentMapLayer->ID],
+			(float)W / MinimapTextureWidth[UI.CurrentMapLayer->ID], (float)H / MinimapTextureHeight[UI.CurrentMapLayer->ID]
 			//Wyrmgus end
 		};
 
@@ -1169,17 +1169,17 @@ void CMinimap::Draw() const
 		glVertex2i(X, Y);
 		//Wyrmgus start
 //		glTexCoord2f(0.0f, (float)H / MinimapTextureHeight);
-		glTexCoord2f(0.0f, (float)H / MinimapTextureHeight[CurrentMapLayer]);
+		glTexCoord2f(0.0f, (float)H / MinimapTextureHeight[UI.CurrentMapLayer->ID]);
 		//Wyrmgus end
 		glVertex2i(X, Y + H);
 		//Wyrmgus start
 //		glTexCoord2f((float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight);
-		glTexCoord2f((float)W / MinimapTextureWidth[CurrentMapLayer], (float)H / MinimapTextureHeight[CurrentMapLayer]);
+		glTexCoord2f((float)W / MinimapTextureWidth[UI.CurrentMapLayer->ID], (float)H / MinimapTextureHeight[UI.CurrentMapLayer->ID]);
 		//Wyrmgus end
 		glVertex2i(X + W, Y + H);
 		//Wyrmgus start
 //		glTexCoord2f((float)W / MinimapTextureWidth, 0.0f);
-		glTexCoord2f((float)W / MinimapTextureWidth[CurrentMapLayer], 0.0f);
+		glTexCoord2f((float)W / MinimapTextureWidth[UI.CurrentMapLayer->ID], 0.0f);
 		//Wyrmgus end
 		glVertex2i(X + W, Y);
 		glEnd();
@@ -1190,7 +1190,7 @@ void CMinimap::Draw() const
 		SDL_Rect drect = {Sint16(X), Sint16(Y), 0, 0};
 		//Wyrmgus start
 //		SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
-		SDL_BlitSurface(MinimapSurface[CurrentMapLayer], NULL, TheScreen, &drect);
+		SDL_BlitSurface(MinimapSurface[UI.CurrentMapLayer->ID], NULL, TheScreen, &drect);
 		//Wyrmgus end
 	}
 
@@ -1209,13 +1209,13 @@ Vec2i CMinimap::ScreenToTilePos(const PixelPos &screenPos) const
 	//Wyrmgus start
 //	Vec2i tilePos((((screenPos.x - X - XOffset) * MINIMAP_FAC) / MinimapScaleX),
 //				  (((screenPos.y - Y - YOffset) * MINIMAP_FAC) / MinimapScaleY));
-	Vec2i tilePos((((screenPos.x - X - XOffset[CurrentMapLayer]) * MINIMAP_FAC) / MinimapScaleX[CurrentMapLayer]),
-				  (((screenPos.y - Y - YOffset[CurrentMapLayer]) * MINIMAP_FAC) / MinimapScaleY[CurrentMapLayer]));
+	Vec2i tilePos((((screenPos.x - X - XOffset[UI.CurrentMapLayer->ID]) * MINIMAP_FAC) / MinimapScaleX[UI.CurrentMapLayer->ID]),
+				  (((screenPos.y - Y - YOffset[UI.CurrentMapLayer->ID]) * MINIMAP_FAC) / MinimapScaleY[UI.CurrentMapLayer->ID]));
 	//Wyrmgus end
 
 	//Wyrmgus start
 //	Map.Clamp(tilePos);
-	Map.Clamp(tilePos, CurrentMapLayer);
+	Map.Clamp(tilePos, UI.CurrentMapLayer->ID);
 	//Wyrmgus end
 	return tilePos;
 }
@@ -1232,8 +1232,8 @@ PixelPos CMinimap::TilePosToScreenPos(const Vec2i &tilePos) const
 	//Wyrmgus start
 //	const PixelPos screenPos(X + XOffset + (tilePos.x * MinimapScaleX) / MINIMAP_FAC,
 //							 Y + YOffset + (tilePos.y * MinimapScaleY) / MINIMAP_FAC);
-	const PixelPos screenPos(X + XOffset[CurrentMapLayer] + (tilePos.x * MinimapScaleX[CurrentMapLayer]) / MINIMAP_FAC,
-							 Y + YOffset[CurrentMapLayer] + (tilePos.y * MinimapScaleY[CurrentMapLayer]) / MINIMAP_FAC);
+	const PixelPos screenPos(X + XOffset[UI.CurrentMapLayer->ID] + (tilePos.x * MinimapScaleX[UI.CurrentMapLayer->ID]) / MINIMAP_FAC,
+							 Y + YOffset[UI.CurrentMapLayer->ID] + (tilePos.y * MinimapScaleY[UI.CurrentMapLayer->ID]) / MINIMAP_FAC);
 	//Wyrmgus end
 	return screenPos;
 }
@@ -1341,8 +1341,8 @@ void CMinimap::DrawViewportArea(const CViewport &viewport) const
 	//Wyrmgus start
 //	int w = (viewport.MapWidth * MinimapScaleX) / MINIMAP_FAC;
 //	int h = (viewport.MapHeight * MinimapScaleY) / MINIMAP_FAC;
-	int w = (viewport.MapWidth * MinimapScaleX[CurrentMapLayer]) / MINIMAP_FAC;
-	int h = (viewport.MapHeight * MinimapScaleY[CurrentMapLayer]) / MINIMAP_FAC;
+	int w = (viewport.MapWidth * MinimapScaleX[UI.CurrentMapLayer->ID]) / MINIMAP_FAC;
+	int h = (viewport.MapHeight * MinimapScaleY[UI.CurrentMapLayer->ID]) / MINIMAP_FAC;
 	//Wyrmgus end
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
@@ -1365,7 +1365,7 @@ void CMinimap::AddEvent(const Vec2i &pos, int z, Uint32 color)
 	if (NumMinimapEvents == MAX_MINIMAP_EVENTS) {
 		return;
 	}
-	if (z == CurrentMapLayer) {
+	if (z == UI.CurrentMapLayer->ID) {
 		MinimapEvents[NumMinimapEvents].pos = TilePosToScreenPos(pos);
 		MinimapEvents[NumMinimapEvents].Size = (W < H) ? W / 3 : H / 3;
 		MinimapEvents[NumMinimapEvents].Color = color;

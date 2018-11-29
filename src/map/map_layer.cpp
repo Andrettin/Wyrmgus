@@ -93,7 +93,7 @@ void CMapLayer::SetTimeOfDay(const int time_of_day)
 	this->TimeOfDay = time_of_day;
 	
 #ifdef USE_OAML
-	if (enableOAML && oaml && this->ID == CurrentMapLayer) {
+	if (enableOAML && oaml && this == UI.CurrentMapLayer) {
 		// Time of day can change our main music loop, if the current playing track is set for this
 		SetMusicCondition(OAML_CONDID_MAIN_LOOP, this->TimeOfDay);
 	}

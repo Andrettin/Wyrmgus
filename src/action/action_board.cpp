@@ -41,6 +41,7 @@
 #include "commands.h"
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -125,14 +126,14 @@ enum {
 
 	if (this->HasGoal()) {
 		//Wyrmgus start
-		if (this->GetGoal()->MapLayer != CurrentMapLayer) {
+		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
 		//Wyrmgus end
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
 		//Wyrmgus start
-		if (this->MapLayer != CurrentMapLayer) {
+		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
 		//Wyrmgus end

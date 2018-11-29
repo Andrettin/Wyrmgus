@@ -4349,7 +4349,7 @@ bool CUnit::IsVisible(const CPlayer &player) const
 bool CUnit::IsVisibleOnMinimap() const
 {
 	//Wyrmgus start
-	if (this->MapLayer != CurrentMapLayer) {
+	if (this->MapLayer != UI.CurrentMapLayer->ID) {
 		return false;
 	}
 	//Wyrmgus end
@@ -4401,7 +4401,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	int y = tilePos.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y + IY - (frame_height - Type->TileSize.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + Type->OffsetY;
 	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
-	const PixelPos vpTopLeftMapPos = Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, CurrentMapLayer) + vp.Offset;
+	const PixelPos vpTopLeftMapPos = Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, UI.CurrentMapLayer->ID) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
 	//Wyrmgus start
@@ -5115,7 +5115,7 @@ CUnit *UnitOnScreen(int x, int y)
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
 		//Wyrmgus start
-		if (unit.MapLayer != CurrentMapLayer) {
+		if (unit.MapLayer != UI.CurrentMapLayer->ID) {
 			continue;
 		}
 		//Wyrmgus end
@@ -7322,7 +7322,7 @@ int ViewPointDistanceToUnit(const CUnit &dest)
 
 	//Wyrmgus start
 //	return dest.MapDistanceTo(midPos);
-	return dest.MapDistanceTo(midPos, CurrentMapLayer);
+	return dest.MapDistanceTo(midPos, UI.CurrentMapLayer->ID);
 	//Wyrmgus end
 }
 

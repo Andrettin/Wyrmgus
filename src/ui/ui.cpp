@@ -10,8 +10,8 @@
 //
 /**@name ui.cpp - The user interface globals. */
 //
-//      (c) Copyright 1999-2011 by Lutz Sammer, Andreas Arens,
-//                                 Jimmy Salmon and Pali Rohár
+//      (c) Copyright 1999-2018 by Lutz Sammer, Andreas Arens,
+//                                 Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -151,20 +151,19 @@ CUserInterface::CUserInterface() :
 	MouseScroll(false), KeyScroll(false), KeyScrollSpeed(1),
 	MouseScrollSpeed(1), MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
 	NormalFontColor("yellow"), ReverseFontColor("white"), 
-	SingleSelectedButton(NULL),
-	MaxSelectedFont(NULL), MaxSelectedTextX(0), MaxSelectedTextY(0),
-	SingleTrainingButton(NULL),
-	SingleTrainingFont(NULL), SingleTrainingTextX(0), SingleTrainingTextY(0),
-	TrainingFont(NULL), TrainingTextX(0), TrainingTextY(0),
-	//Wyrmgus start
-	IdleWorkerButton(NULL), LevelUpUnitButton(NULL),
-	//Wyrmgus end
+	SingleSelectedButton(nullptr),
+	MaxSelectedFont(nullptr), MaxSelectedTextX(0), MaxSelectedTextY(0),
+	SingleTrainingButton(nullptr),
+	SingleTrainingFont(nullptr), SingleTrainingTextX(0), SingleTrainingTextY(0),
+	TrainingFont(nullptr), TrainingTextX(0), TrainingTextY(0),
+	IdleWorkerButton(nullptr), LevelUpUnitButton(nullptr),
 	CompletedBarColor(0), CompletedBarShadow(0),
-	ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
-	SelectedViewport(NULL), NumViewports(0),
-	MessageFont(NULL), MessageScrollSpeed(5),
+	ViewportMode(VIEWPORT_SINGLE), MouseViewport(nullptr),
+	SelectedViewport(nullptr), NumViewports(0),
+	MessageFont(nullptr), MessageScrollSpeed(5),
+	CurrentMapLayer(nullptr), PreviousMapLayer(nullptr),
 	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
-	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
+	VictoryBackgroundG(nullptr), DefeatBackgroundG(nullptr)
 {
 	MouseWarpPos.x = MouseWarpPos.y = -1;
 
@@ -478,9 +477,11 @@ void CleanUserInterfaceFillers()
 void UpdateSurfaceLayerButtons()
 {
 	unsigned int last_surface_layer = 0;
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		if (Map.MapLayers[CurrentMapLayer]->Plane == Map.MapLayers[z]->Plane && Map.MapLayers[CurrentMapLayer]->World == Map.MapLayers[z]->World && Map.MapLayers[z]->SurfaceLayer > (int) last_surface_layer) {
-			last_surface_layer = Map.MapLayers[z]->SurfaceLayer;
+	if (UI.CurrentMapLayer) {
+		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+			if (UI.CurrentMapLayer->Plane == Map.MapLayers[z]->Plane && UI.CurrentMapLayer->World == Map.MapLayers[z]->World && Map.MapLayers[z]->SurfaceLayer > (int) last_surface_layer) {
+				last_surface_layer = Map.MapLayers[z]->SurfaceLayer;
+			}
 		}
 	}
 	
@@ -548,7 +549,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 		if (vp) {
 			const PixelDiff relDiff = new_vps[i].GetTopLeftPos() - vp->GetTopLeftPos();
 
-			new_vps[i].Offset = relDiff + Map.TilePosToMapPixelPos_TopLeft(vp->MapPos, CurrentMapLayer) + vp->Offset;
+			new_vps[i].Offset = relDiff + Map.TilePosToMapPixelPos_TopLeft(vp->MapPos, UI.CurrentMapLayer->ID) + vp->Offset;
 		} else {
 			new_vps[i].Offset.x = 0;
 			new_vps[i].Offset.y = 0;
@@ -594,8 +595,8 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	//Wyrmgus start
 //	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * Map.GetCurrentPixelTileSize().x - 1;
 //	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * Map.GetCurrentPixelTileSize().y - 1;
-	vp.BottomRightPos.x = vp.TopLeftPos.x + (Map.Info.MapWidths.size() ? Map.Info.MapWidths[CurrentMapLayer] : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + (Map.Info.MapHeights.size() ? Map.Info.MapHeights[CurrentMapLayer] : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - 1;
+	vp.BottomRightPos.x = vp.TopLeftPos.x + (Map.Info.MapWidths.size() && UI.CurrentMapLayer ? Map.Info.MapWidths[UI.CurrentMapLayer->ID] : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - 1;
+	vp.BottomRightPos.y = vp.TopLeftPos.y + (Map.Info.MapHeights.size() && UI.CurrentMapLayer ? Map.Info.MapHeights[UI.CurrentMapLayer->ID] : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary

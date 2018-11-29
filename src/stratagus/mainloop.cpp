@@ -193,7 +193,7 @@ void DrawMapArea()
 			if (vp->Unit->Destroyed || vp->Unit->CurrentAction() == UnitActionDie) {
 				vp->Unit = NULL;
 			} else {
-				if (CurrentMapLayer != vp->Unit->MapLayer) {
+				if (UI.CurrentMapLayer->ID != vp->Unit->MapLayer) {
 					ChangeCurrentMapLayer(vp->Unit->MapLayer);
 				}
 				vp->Center(vp->Unit->GetMapPixelPosCenter());
@@ -324,7 +324,7 @@ static void GameLogicLoop()
 #ifdef USE_OAML
 	if (enableOAML && oaml) {
 		// Time of day can change our main music loop, if the current playing track is set for this
-		SetMusicCondition(OAML_CONDID_MAIN_LOOP, Map.MapLayers[CurrentMapLayer]->TimeOfDay);
+		SetMusicCondition(OAML_CONDID_MAIN_LOOP, UI.CurrentMapLayer->TimeOfDay);
 	}
 #endif
 

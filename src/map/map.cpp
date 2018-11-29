@@ -95,8 +95,6 @@ std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 //Wyrmgus end
 CMap Map;                   /// The current map
-int CurrentMapLayer = 0;
-int PreviousMapLayer = -1;
 int FlagRevealMap;          /// Flag must reveal the map
 int ReplayRevealMap;        /// Reveal Map is replay
 int ForestRegeneration;     /// Forest regeneration
@@ -719,7 +717,7 @@ bool CMap::IsLayerUnderground(int z) const
 
 void CMap::SetCurrentPlane(CPlane *plane)
 {
-	if (Map.MapLayers[CurrentMapLayer]->Plane == plane) {
+	if (UI.CurrentMapLayer->Plane == plane) {
 		return;
 	}
 	
@@ -748,7 +746,7 @@ void CMap::SetCurrentPlane(CPlane *plane)
 
 void CMap::SetCurrentWorld(CWorld *world)
 {
-	if (Map.MapLayers[CurrentMapLayer]->World == world) {
+	if (UI.CurrentMapLayer->World == world) {
 		return;
 	}
 	
@@ -777,7 +775,7 @@ void CMap::SetCurrentWorld(CWorld *world)
 
 void CMap::SetCurrentSurfaceLayer(int surface_layer)
 {
-	if (Map.MapLayers[CurrentMapLayer]->SurfaceLayer == surface_layer) {
+	if (UI.CurrentMapLayer->SurfaceLayer == surface_layer) {
 		return;
 	}
 	
@@ -797,8 +795,8 @@ void CMap::SetCurrentSurfaceLayer(int surface_layer)
 
 CPlane *CMap::GetCurrentPlane() const
 {
-	if (CurrentMapLayer < (int) Map.MapLayers.size()) {
-		return Map.MapLayers[CurrentMapLayer]->Plane;
+	if (UI.CurrentMapLayer) {
+		return UI.CurrentMapLayer->Plane;
 	} else {
 		return NULL;
 	}
@@ -806,8 +804,8 @@ CPlane *CMap::GetCurrentPlane() const
 
 CWorld *CMap::GetCurrentWorld() const
 {
-	if (CurrentMapLayer < (int) Map.MapLayers.size()) {
-		return Map.MapLayers[CurrentMapLayer]->World;
+	if (UI.CurrentMapLayer) {
+		return UI.CurrentMapLayer->World;
 	} else {
 		return NULL;
 	}
@@ -815,8 +813,8 @@ CWorld *CMap::GetCurrentWorld() const
 
 int CMap::GetCurrentSurfaceLayer() const
 {
-	if (CurrentMapLayer < (int) Map.MapLayers.size()) {
-		return Map.MapLayers[CurrentMapLayer]->SurfaceLayer;
+	if (UI.CurrentMapLayer) {
+		return UI.CurrentMapLayer->SurfaceLayer;
 	} else {
 		return 0;
 	}
@@ -824,7 +822,11 @@ int CMap::GetCurrentSurfaceLayer() const
 
 PixelSize CMap::GetCurrentPixelTileSize() const
 {
-	return GetMapLayerPixelTileSize(CurrentMapLayer);
+	if (UI.CurrentMapLayer) {
+		return UI.CurrentMapLayer->PixelTileSize;
+	} else {
+		return PixelSize(32, 32);
+	}
 }
 
 PixelSize CMap::GetMapLayerPixelTileSize(int map_layer) const
@@ -1031,11 +1033,11 @@ int GetSubtemplateStartY(std::string subtemplate_ident)
 */
 void ChangeToPreviousMapLayer()
 {
-	if (PreviousMapLayer == -1) {
+	if (!UI.PreviousMapLayer) {
 		return;
 	}
 	
-	ChangeCurrentMapLayer(PreviousMapLayer);
+	ChangeCurrentMapLayer(UI.PreviousMapLayer->ID);
 }
 
 /**
@@ -1045,14 +1047,14 @@ void ChangeToPreviousMapLayer()
 */
 void ChangeCurrentMapLayer(const int z)
 {
-	if (z < 0 || z >= (int) Map.MapLayers.size() || CurrentMapLayer == z) {
+	if (z < 0 || z >= (int) Map.MapLayers.size() || UI.CurrentMapLayer->ID == z) {
 		return;
 	}
 	
-	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / Map.Info.MapWidths[CurrentMapLayer], UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / Map.Info.MapHeights[CurrentMapLayer]);
+	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / Map.Info.MapWidths[UI.CurrentMapLayer->ID], UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / Map.Info.MapHeights[UI.CurrentMapLayer->ID]);
 	
-	PreviousMapLayer = CurrentMapLayer;
-	CurrentMapLayer = z;
+	UI.PreviousMapLayer = UI.CurrentMapLayer;
+	UI.CurrentMapLayer = Map.MapLayers[z];
 	UI.Minimap.UpdateCache = true;
 	UI.SelectedViewport->Set(new_viewport_map_pos, Map.GetCurrentPixelTileSize() / 2);
 	UpdateSurfaceLayerButtons();
@@ -1126,7 +1128,6 @@ void CMap::Create()
 {
 	Assert(this->MapLayers.size() == 0);
 
-	//Wyrmgus start
 	CMapLayer *map_layer = new CMapLayer;
 	map_layer->ID = this->MapLayers.size();
 	map_layer->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
@@ -1141,7 +1142,6 @@ void CMap::Create()
 	this->MapLayers.push_back(map_layer);
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
 	this->Info.MapHeights.push_back(this->Info.MapHeight);
-	//Wyrmgus end
 }
 
 /**
@@ -1160,11 +1160,9 @@ void CMap::Init()
 */
 void CMap::Clean()
 {
-	//Wyrmgus start
-	CurrentMapLayer = 0;
-	PreviousMapLayer = -1;
+	UI.CurrentMapLayer = nullptr;
+	UI.PreviousMapLayer = nullptr;
 	this->Landmasses = 0;
-	//Wyrmgus end
 
 	//Wyrmgus start
 	this->ClearMapLayers();

@@ -47,6 +47,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -182,7 +183,7 @@ enum {
 /* virtual */ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	//Wyrmgus start
-	if (this->MapLayer != CurrentMapLayer) {
+	if (this->MapLayer != UI.CurrentMapLayer->ID) {
 		return lastScreenPos;
 	}
 	//Wyrmgus end

@@ -195,10 +195,10 @@ void StartMap(const std::string &filename, bool clean)
 //	SetMessage("%s", _("Do it! Do it now!"));
 	//Wyrmgus end
 	
-	//Wyrmgus start
-	CurrentMapLayer = ThisPlayer->StartMapLayer;
-	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, CurrentMapLayer));
-	//Wyrmgus end
+	if (ThisPlayer->StartMapLayer < (int) Map.MapLayers.size()) {
+		UI.CurrentMapLayer = Map.MapLayers[ThisPlayer->StartMapLayer];
+	}
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer->ID));
 
 	//  Play the game.
 	GameMainLoop();
@@ -353,10 +353,8 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		// Copy GL map surface to pixel array
 		for (int i = 0; i < UI.Minimap.H; ++i) {
 			for (int j = 0; j < UI.Minimap.W; ++j) {
-				//Wyrmgus start
-//				Uint32 c = ((Uint32 *)MinimapSurfaceGL)[j + i * UI.Minimap.W];
-				Uint32 c = ((Uint32 *)MinimapSurfaceGL[CurrentMapLayer])[j + i * UI.Minimap.W];
-				//Wyrmgus end
+				Uint32 c = ((Uint32 *)MinimapSurfaceGL[UI.CurrentMapLayer->ID])[j + i * UI.Minimap.W];
+
 				const int offset = (i * UI.Minimap.W + j) * 3;
 				pixels[offset + 0] = ((c & RMASK) >> RSHIFT);
 				pixels[offset + 1] = ((c & GMASK) >> GSHIFT);
@@ -367,15 +365,15 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			//Wyrmgus start
 //			if (Players[i].Type != PlayerNobody) {
-			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == CurrentMapLayer) {
+			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == UI.CurrentMapLayer->ID) {
 			//Wyrmgus end
 				for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
 					for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
 						//Wyrmgus start
 //						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth;
 //						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight;
-						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidths[CurrentMapLayer];
-						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeights[CurrentMapLayer];
+						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidths[UI.CurrentMapLayer->ID];
+						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeights[UI.CurrentMapLayer->ID];
 						//Wyrmgus end
 						if (miniMapX + j < 0 || miniMapX + j >= UI.Minimap.W) {
 							continue;
@@ -405,13 +403,13 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		unsigned char *row = new unsigned char[UI.Minimap.W * 3];
 		//Wyrmgus start
 //		const SDL_PixelFormat *fmt = MinimapSurface->format;
-		const SDL_PixelFormat *fmt = MinimapSurface[CurrentMapLayer]->format;
+		const SDL_PixelFormat *fmt = MinimapSurface[UI.CurrentMapLayer->ID]->format;
 		//Wyrmgus end
 		SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,
 													UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
 		//Wyrmgus start
 //		SDL_BlitSurface(MinimapSurface, NULL, preview, NULL);
-		SDL_BlitSurface(MinimapSurface[CurrentMapLayer], NULL, preview, NULL);
+		SDL_BlitSurface(MinimapSurface[UI.CurrentMapLayer->ID], NULL, preview, NULL);
 		//Wyrmgus end
 
 		SDL_LockSurface(preview);
@@ -420,13 +418,13 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			//Wyrmgus start
 //			if (Players[i].Type != PlayerNobody) {
-			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == CurrentMapLayer) {
+			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == UI.CurrentMapLayer->ID) {
 			//Wyrmgus end
 				//Wyrmgus start
 //				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth - rectSize / 2;
 //				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight - rectSize / 2;
-				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidths[CurrentMapLayer] - rectSize / 2;
-				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeights[CurrentMapLayer] - rectSize / 2;
+				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidths[UI.CurrentMapLayer->ID] - rectSize / 2;
+				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeights[UI.CurrentMapLayer->ID] - rectSize / 2;
 				//Wyrmgus end
 				rect.w = rect.h = rectSize;
 				SDL_FillRect(preview, &rect, Players[i].Color);
@@ -1896,10 +1894,10 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
-	//Wyrmgus start
-	CurrentMapLayer = ThisPlayer->StartMapLayer;
-	//Wyrmgus end
-	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, CurrentMapLayer));
+	if (ThisPlayer->StartMapLayer < (int) Map.MapLayers.size()) {
+		UI.CurrentMapLayer = Map.MapLayers[ThisPlayer->StartMapLayer];
+	}
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer->ID));
 
 	//
 	// Various hacks which must be done after the map is loaded.

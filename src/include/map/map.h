@@ -102,14 +102,12 @@ class CMapLayer;
 class CMapTemplate;
 class CPlane;
 class CRegion;
+class CSite;
 class CTileset;
 class CUniqueItem;
 class CUnit;
 class CUnitType;
 class CWorld;
-//Wyrmgus start
-class CSite;
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Map
@@ -452,8 +450,6 @@ extern std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 
 extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
-extern int CurrentMapLayer;
-extern int PreviousMapLayer;
 
 /// Contrast of fog of war
 extern int FogOfWarOpacity;

@@ -43,6 +43,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "script.h"
@@ -147,27 +148,20 @@
 
 /* virtual */ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
-	//Wyrmgus start
-	if (this->MapLayer != CurrentMapLayer) {
+	if (this->MapLayer != UI.CurrentMapLayer->ID) {
 		return lastScreenPos;
 	}
-	//Wyrmgus end
 
 	const PixelPos pos1 = vp.TilePosToScreen_Center(this->goalPos);
 	const PixelPos pos2 = vp.TilePosToScreen_Center(this->WayPoint);
 
-	//Wyrmgus start
-//	Video.DrawLineClip(ColorGreen, lastScreenPos, pos1);
-//	Video.FillCircleClip(ColorBlue, pos1, 2);
-//	Video.DrawLineClip(ColorBlue, pos1, pos2);
-//	Video.FillCircleClip(ColorBlue, pos2, 3);
 	if (Preference.ShowPathlines) {
 		Video.DrawLineClip(ColorGreen, lastScreenPos, pos1);
 		Video.FillCircleClip(ColorBlue, pos1, 2);
 		Video.DrawLineClip(ColorBlue, pos1, pos2);
 		Video.FillCircleClip(ColorBlue, pos2, 3);
 	}
-	//Wyrmgus end
+
 	return pos2;
 }
 

@@ -42,6 +42,7 @@
 #include "commands.h"
 #include "iolib.h"
 #include "luacallback.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "network.h"
@@ -138,12 +139,12 @@ enum {
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
-		if (this->GetGoal()->MapLayer != CurrentMapLayer) {
+		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
-		if (this->MapLayer != CurrentMapLayer) {
+		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
@@ -218,7 +219,7 @@ enum {
 					unit.Remove(NULL);
 					DropOutOnSide(unit, unit.Direction, goal->ConnectingDestination);
 					RestoreSelection();
-					if (unit.Player == ThisPlayer && Selected.size() > 0 && &unit == Selected[0] && old_z == CurrentMapLayer) {
+					if (unit.Player == ThisPlayer && Selected.size() > 0 && &unit == Selected[0] && old_z == UI.CurrentMapLayer->ID) {
 						ChangeCurrentMapLayer(unit.MapLayer);
 						UI.SelectedViewport->Center(unit.GetMapPixelPosCenter());
 					}

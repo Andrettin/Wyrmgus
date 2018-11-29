@@ -493,27 +493,40 @@ void CMapField::parse(lua_State *l)
 	this->cost = LuaToNumber(l, -1, 4);
 	*/
 	std::string terrain_ident = LuaToString(l, -1, 1);
-	CTerrainFeature *terrain_feature = GetTerrainFeature(terrain_ident);
-	if (terrain_feature) {
-		this->Terrain = terrain_feature->TerrainType;
-		this->TerrainFeature = terrain_feature;
-	} else {
-		this->Terrain = CTerrainType::GetTerrainType(terrain_ident);
+	if (!terrain_ident.empty()) {
+		CTerrainFeature *terrain_feature = GetTerrainFeature(terrain_ident);
+		if (terrain_feature) {
+			this->Terrain = terrain_feature->TerrainType;
+			this->TerrainFeature = terrain_feature;
+		} else {
+			this->Terrain = CTerrainType::GetTerrainType(terrain_ident);
+		}
 	}
 	
 	std::string overlay_terrain_ident = LuaToString(l, -1, 2);
-	CTerrainFeature *overlay_terrain_feature = GetTerrainFeature(overlay_terrain_ident);
-	if (overlay_terrain_feature) {
-		this->OverlayTerrain = overlay_terrain_feature->TerrainType;
-		this->TerrainFeature = overlay_terrain_feature;
-	} else {
-		this->OverlayTerrain = CTerrainType::GetTerrainType(overlay_terrain_ident);
+	if (!overlay_terrain_ident.empty()) {
+		CTerrainFeature *overlay_terrain_feature = GetTerrainFeature(overlay_terrain_ident);
+		if (overlay_terrain_feature) {
+			this->OverlayTerrain = overlay_terrain_feature->TerrainType;
+			this->TerrainFeature = overlay_terrain_feature;
+		} else {
+			this->OverlayTerrain = CTerrainType::GetTerrainType(overlay_terrain_ident);
+		}
 	}
 	
 	this->SetOverlayTerrainDamaged(LuaToBoolean(l, -1, 3));
 	this->SetOverlayTerrainDestroyed(LuaToBoolean(l, -1, 4));
-	this->playerInfo.SeenTerrain = CTerrainType::GetTerrainType(LuaToString(l, -1, 5));
-	this->playerInfo.SeenOverlayTerrain = CTerrainType::GetTerrainType(LuaToString(l, -1, 6));
+	
+	std::string seen_terrain_ident = LuaToString(l, -1, 5);
+	if (!seen_terrain_ident.empty()) {
+		this->playerInfo.SeenTerrain = CTerrainType::GetTerrainType(seen_terrain_ident);
+	}
+	
+	std::string seen_overlay_terrain_ident = LuaToString(l, -1, 6);
+	if (!seen_overlay_terrain_ident.empty()) {
+		this->playerInfo.SeenOverlayTerrain = CTerrainType::GetTerrainType(seen_overlay_terrain_ident);
+	}
+	
 	this->SolidTile = LuaToNumber(l, -1, 7);
 	this->OverlaySolidTile = LuaToNumber(l, -1, 8);
 	this->playerInfo.SeenSolidTile = LuaToNumber(l, -1, 9);

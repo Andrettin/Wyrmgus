@@ -34,6 +34,7 @@
 #include "particle.h"
 
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "player.h"
 #include "ui/ui.h"
 #include "video.h"
@@ -79,8 +80,8 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int 
 	PixelSize graphicSize(g->Width, g->Height);
 	PixelDiff margin(Map.GetCurrentPixelTileSize().x - 1, Map.GetCurrentPixelTileSize().y - 1);
 	PixelPos position(pos.x, pos.y);
-	Vec2i minPos = Map.MapPixelPosToTilePos(position, CurrentMapLayer);
-	Vec2i maxPos = Map.MapPixelPosToTilePos(position + graphicSize + margin, CurrentMapLayer);
+	Vec2i minPos = Map.MapPixelPosToTilePos(position, UI.CurrentMapLayer->ID);
+	Vec2i maxPos = Map.MapPixelPosToTilePos(position + graphicSize + margin, UI.CurrentMapLayer->ID);
 	//Wyrmgus start
 //	Map.Clamp(minPos);
 //	Map.Clamp(maxPos);

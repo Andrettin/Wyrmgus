@@ -906,7 +906,7 @@ void DrawResources()
 */
 void DrawDayTime() {
 	if (UI.TimePanel.TextX != -1) {
-		if (Map.MapLayers[CurrentMapLayer]->TimeOfDay != NoTimeOfDay && Map.MapLayers[CurrentMapLayer]->TimeOfDay < MaxTimesOfDay) {
+		if (UI.CurrentMapLayer->TimeOfDay != NoTimeOfDay && UI.CurrentMapLayer->TimeOfDay < MaxTimesOfDay) {
 			char timesText[MaxTimesOfDay][16] = {
 				"No Time",
 				"Dawn",
@@ -919,7 +919,7 @@ void DrawDayTime() {
 				"Late Night"
 			};
 			
-			std::string time_of_day_string = _(timesText[Map.MapLayers[CurrentMapLayer]->TimeOfDay]);
+			std::string time_of_day_string = _(timesText[UI.CurrentMapLayer->TimeOfDay]);
 
 			CLabel label(GetGameFont());
 
@@ -929,7 +929,7 @@ void DrawDayTime() {
 	}
 	
 	if (UI.SeasonPanel.TextX != -1) {
-		if (Map.MapLayers[CurrentMapLayer]->Season != NoSeason && Map.MapLayers[CurrentMapLayer]->Season < MaxSeasons) {
+		if (UI.CurrentMapLayer->Season != NoSeason && UI.CurrentMapLayer->Season < MaxSeasons) {
 			char seasonsText[MaxSeasons][16] = {
 				"No Season",
 				"Spring",
@@ -938,7 +938,7 @@ void DrawDayTime() {
 				"Winter"
 			};
 			
-			std::string season_string = _(seasonsText[Map.MapLayers[CurrentMapLayer]->Season]);
+			std::string season_string = _(seasonsText[UI.CurrentMapLayer->Season]);
 
 			CLabel label(GetGameFont());
 
@@ -1031,7 +1031,7 @@ void DrawPopups()
 		CViewport *vp = GetViewport(CursorScreenPos);
 		if (vp) {
 			const Vec2i tilePos = vp->ScreenToTilePos(CursorScreenPos);
-			CMapField &mf = *Map.Field(tilePos, CurrentMapLayer);
+			CMapField &mf = *Map.Field(tilePos, UI.CurrentMapLayer->ID);
 			const bool isMapFieldVisible = mf.playerInfo.IsTeamVisible(*ThisPlayer);
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
@@ -1061,7 +1061,7 @@ void DrawPopups()
 					delete ba;
 					LastDrawnButtonPopup = NULL;
 				} else if (mf.TerrainFeature) {
-					PixelPos tile_center_pos = Map.TilePosToMapPixelPos_TopLeft(tilePos, CurrentMapLayer);
+					PixelPos tile_center_pos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer->ID);
 					tile_center_pos = vp->MapToScreenPixelPos(tile_center_pos);
 					std::string terrain_feature_name = mf.TerrainFeature->Name;
 					if (mf.Owner != -1 && mf.TerrainFeature->CulturalNames.find(Players[mf.Owner].Race) != mf.TerrainFeature->CulturalNames.end()) {
@@ -1840,7 +1840,7 @@ void CenterOnMessage()
 		return;
 	}
 	const Vec2i &pos(MessagesEventPos[MessagesEventIndex]);
-	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(pos, CurrentMapLayer));
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(pos, UI.CurrentMapLayer->ID));
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
 }

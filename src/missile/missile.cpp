@@ -47,6 +47,7 @@
 #include "iolib.h"
 #include "luacallback.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "mod.h"
@@ -1188,7 +1189,7 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 		Missile &missile = *(*i);
 		//Wyrmgus start
 //		if (missile.Delay || missile.Hidden) {
-		if (missile.Delay || missile.Hidden || missile.MapLayer != CurrentMapLayer) {
+		if (missile.Delay || missile.Hidden || missile.MapLayer != UI.CurrentMapLayer->ID) {
 		//Wyrmgus end
 			continue;  // delayed or hidden -> aren't shown
 		}
@@ -1202,7 +1203,7 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 		Missile &missile = *(*i);
 		//Wyrmgus start
 //		if (missile.Delay || missile.Hidden) {
-		if (missile.Delay || missile.Hidden || missile.MapLayer != CurrentMapLayer) {
+		if (missile.Delay || missile.Hidden || missile.MapLayer != UI.CurrentMapLayer->ID) {
 		//Wyrmgus end
 			continue;  // delayed or hidden -> aren't shown
 		}

@@ -44,6 +44,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -159,28 +160,23 @@
 	PixelPos targetPos;
 
 	if (this->ReparableTarget != NULL) {
-		//Wyrmgus start
-		if (this->ReparableTarget->MapLayer != CurrentMapLayer) {
+		if (this->ReparableTarget->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
-		//Wyrmgus end
 		targetPos = vp.MapToScreenPixelPos(this->ReparableTarget->GetMapPixelPosCenter());
 	} else {
-		//Wyrmgus start
-		if (this->MapLayer != CurrentMapLayer) {
+		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
-		//Wyrmgus end
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
-//	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
-//	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
-//	Video.FillCircleClip(ColorYellow, targetPos, 3);
+
 	if (Preference.ShowPathlines) {
 		Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
 		Video.FillCircleClip(ColorYellow, targetPos, 3);
 	}
+
 	return targetPos;
 }
 

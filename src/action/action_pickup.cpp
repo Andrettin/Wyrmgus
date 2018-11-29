@@ -44,6 +44,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "luacallback.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "network.h"
@@ -140,26 +141,23 @@ enum {
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
-		if (this->GetGoal()->MapLayer != CurrentMapLayer) {
+		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
-		if (this->MapLayer != CurrentMapLayer) {
+		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
-	//Wyrmgus start
-//	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
-//	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
-//	Video.FillCircleClip(ColorGreen, targetPos, 3);
+
 	if (Preference.ShowPathlines) {
 		Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
 		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
 		Video.FillCircleClip(ColorGreen, targetPos, 3);
 	}
-	//Wyrmgus end
+
 	return targetPos;
 }
 

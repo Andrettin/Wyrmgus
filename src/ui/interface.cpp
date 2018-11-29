@@ -45,9 +45,8 @@
 #include "game.h"
 //Wyrmgus end
 #include "iolib.h"
-//Wyrmgus start
 #include "map/map.h"
-//Wyrmgus end
+#include "map/map_layer.h"
 #include "network.h"
 #include "player.h"
 #include "replay.h"
@@ -163,7 +162,7 @@ static void UiUnselectAll()
 
 static void SetBestMapLayerForUnitGroup(const std::vector<CUnit *> &unit_group)
 {
-	int best_map_layer = CurrentMapLayer;
+	int best_map_layer = UI.CurrentMapLayer->ID;
 	
 	std::vector<int> map_layer_count;
 	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
@@ -181,7 +180,7 @@ static void SetBestMapLayerForUnitGroup(const std::vector<CUnit *> &unit_group)
 		}
 	}
 	
-	if (best_map_layer != CurrentMapLayer) {
+	if (best_map_layer != UI.CurrentMapLayer->ID) {
 		ChangeCurrentMapLayer(best_map_layer);
 	}
 }
@@ -192,7 +191,7 @@ static PixelPos GetMiddlePositionForUnitGroup(const std::vector<CUnit *> &unit_g
 	
 	int map_layer_units = 0;
 	for (size_t i = 0; i != unit_group.size(); ++i) {
-		if (unit_group[i]->MapLayer != CurrentMapLayer) {
+		if (unit_group[i]->MapLayer != UI.CurrentMapLayer->ID) {
 			continue;
 		}
 		pos += unit_group[i]->GetMapPixelPosCenter();
@@ -540,11 +539,9 @@ void UiFindIdleWorker()
 		CurrentButtonLevel = 0;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
-		//Wyrmgus start
-		if (unit->MapLayer != CurrentMapLayer) {
+		if (unit->MapLayer != UI.CurrentMapLayer->ID) {
 			ChangeCurrentMapLayer(unit->MapLayer);
 		}
-		//Wyrmgus end
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
 }
@@ -579,11 +576,9 @@ void UiFindLevelUpUnit()
 		CurrentButtonLevel = 0;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
-		//Wyrmgus start
-		if (unit->MapLayer != CurrentMapLayer) {
+		if (unit->MapLayer != UI.CurrentMapLayer->ID) {
 			ChangeCurrentMapLayer(unit->MapLayer);
 		}
-		//Wyrmgus end
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
 }
@@ -604,11 +599,9 @@ void UiFindHeroUnit(int hero_index)
 	CurrentButtonLevel = 0;
 	PlayUnitSound(*Selected[0], VoiceSelected);
 	SelectionChanged();
-	//Wyrmgus start
-	if (unit->MapLayer != CurrentMapLayer) {
+	if (unit->MapLayer != UI.CurrentMapLayer->ID) {
 		ChangeCurrentMapLayer(unit->MapLayer);
 	}
-	//Wyrmgus end
 	UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 }
 //Wyrmgus end
@@ -1458,7 +1451,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowNW.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeights[CurrentMapLayer] * Map.GetCurrentPixelTileSize().y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeights[UI.CurrentMapLayer->ID] * Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
@@ -1470,7 +1463,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		}
 	//Wyrmgus start
 //	} else if (mousePos.x > SCROLL_RIGHT) {
-	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (Map.Info.MapWidths[CurrentMapLayer] * Map.GetCurrentPixelTileSize().x) - 1) {
+	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (Map.Info.MapWidths[UI.CurrentMapLayer->ID] * Map.GetCurrentPixelTileSize().x) - 1) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (mousePos.y < SCROLL_UP) {
@@ -1481,7 +1474,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowNE.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeights[CurrentMapLayer] * Map.GetCurrentPixelTileSize().y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeights[UI.CurrentMapLayer->ID] * Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollRightDown;
 			MouseScrollState = ScrollRightDown;
@@ -1501,7 +1494,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowN.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeights[CurrentMapLayer] * Map.GetCurrentPixelTileSize().y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeights[UI.CurrentMapLayer->ID] * Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollDown;
 			MouseScrollState = ScrollDown;

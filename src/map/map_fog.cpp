@@ -39,6 +39,7 @@
 #include "map/map.h"
 
 #include "actions.h"
+#include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/tileset.h"
 #include "player.h"
@@ -1009,7 +1010,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 	//Wyrmgus start
 //	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile);
-	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile, CurrentMapLayer);
+	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile, UI.CurrentMapLayer->ID);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -1017,7 +1018,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	CGraphic *alpha_fog_graphic = AlphaFogGraphics[Map.GetCurrentPixelTileSize()];
 	
 //	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
-	if ((IsMapFieldVisibleTable(sx, CurrentMapLayer) && blackFogTile != 16 && fogTile != 16) || ReplayRevealMap) {
+	if ((IsMapFieldVisibleTable(sx, UI.CurrentMapLayer->ID) && blackFogTile != 16 && fogTile != 16) || ReplayRevealMap) {
 	//Wyrmgus end
 		if (fogTile && fogTile != blackFogTile) {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -1053,12 +1054,12 @@ void CViewport::DrawMapFogOfWar() const
 	int sx = std::max<int>(MapPos.x - 1, 0);
 	//Wyrmgus start
 //	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidth);
-	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidths[CurrentMapLayer]);
+	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidths[UI.CurrentMapLayer->ID]);
 	//Wyrmgus end
 	int my = std::max<int>(MapPos.y - 1, 0);
 	//Wyrmgus start
 //	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeight);
-	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeights[CurrentMapLayer]);
+	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeights[UI.CurrentMapLayer->ID]);
 	//Wyrmgus end
 
 	// Update for visibility all tile in viewport
@@ -1066,24 +1067,24 @@ void CViewport::DrawMapFogOfWar() const
 
 	//Wyrmgus start
 //	unsigned int my_index = my * Map.Info.MapWidth;
-	unsigned int my_index = my * Map.Info.MapWidths[CurrentMapLayer];
+	unsigned int my_index = my * Map.Info.MapWidths[UI.CurrentMapLayer->ID];
 	//Wyrmgus end
 	for (; my < ey; ++my) {
 		for (int mx = sx; mx < ex; ++mx) {
 			//Wyrmgus start
 //			VisibleTable[my_index + mx] = Map.Field(mx + my_index)->playerInfo.TeamVisibilityState(*ThisPlayer);
-			VisibleTable[CurrentMapLayer][my_index + mx] = Map.Field(mx + my_index, CurrentMapLayer)->playerInfo.TeamVisibilityState(*ThisPlayer);
+			VisibleTable[UI.CurrentMapLayer->ID][my_index + mx] = Map.Field(mx + my_index, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*ThisPlayer);
 			//Wyrmgus end
 		}
 		//Wyrmgus start
 //		my_index += Map.Info.MapWidth;
-		my_index += Map.Info.MapWidths[CurrentMapLayer];
+		my_index += Map.Info.MapWidths[UI.CurrentMapLayer->ID];
 		//Wyrmgus end
 	}
 	ex = this->BottomRightPos.x;
 	//Wyrmgus start
 //	int sy = MapPos.y * Map.Info.MapWidth;
-	int sy = MapPos.y * Map.Info.MapWidths[CurrentMapLayer];
+	int sy = MapPos.y * Map.Info.MapWidths[UI.CurrentMapLayer->ID];
 	//Wyrmgus end
 	int dy = this->TopLeftPos.y - Offset.y;
 	ey = this->BottomRightPos.y;
@@ -1094,7 +1095,7 @@ void CViewport::DrawMapFogOfWar() const
 		while (dx <= ex) {
 			//Wyrmgus start
 //			if (VisibleTable[sx]) {
-			if (VisibleTable[CurrentMapLayer][sx]) {
+			if (VisibleTable[UI.CurrentMapLayer->ID][sx]) {
 			//Wyrmgus end
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {
@@ -1105,7 +1106,7 @@ void CViewport::DrawMapFogOfWar() const
 		}
 		//Wyrmgus start
 //		sy += Map.Info.MapWidth;
-		sy += Map.Info.MapWidths[CurrentMapLayer];
+		sy += Map.Info.MapWidths[UI.CurrentMapLayer->ID];
 		//Wyrmgus end
 		dy += Map.GetCurrentPixelTileSize().y;
 	}

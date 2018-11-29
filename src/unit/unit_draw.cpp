@@ -50,6 +50,7 @@
 #include "editor.h"
 #include "font.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "player.h"
 #include "script.h"
@@ -850,7 +851,7 @@ void ShowOrder(const CUnit &unit)
 	
 	//Wyrmgus start
 	//if unit has rally point, show it
-	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer == CurrentMapLayer) {
+	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer == UI.CurrentMapLayer->ID) {
 		Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(unit.RallyPointPos), 3);
 	}
 	//Wyrmgus end
@@ -880,7 +881,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 
 	// For debug draw sight, react and attack range!
 	if (IsOnlySelected(unit)) {
-		const PixelPos center(screenPos + type.GetHalfTilePixelSize(CurrentMapLayer));
+		const PixelPos center(screenPos + type.GetHalfTilePixelSize(UI.CurrentMapLayer->ID));
 
 		if (Preference.ShowSightRange) {
 			//Wyrmgus start
@@ -1313,7 +1314,7 @@ void CUnit::Draw(const CViewport &vp) const
 	//
 	if (state == 1) {
 		if (constructed && cframe) {
-			const PixelPos pos(screenPos + type->GetHalfTilePixelSize(CurrentMapLayer));
+			const PixelPos pos(screenPos + type->GetHalfTilePixelSize(UI.CurrentMapLayer->ID));
 			//Wyrmgus start
 //			DrawConstruction(player, cframe, *type, frame, pos);
 			DrawConstruction(player, cframe, *this, *type, frame, pos);
@@ -1469,7 +1470,7 @@ int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table)
 
 	//Wyrmgus start
 //	Select(minPos, maxPos, table);
-	Select(minPos, maxPos, table, CurrentMapLayer);
+	Select(minPos, maxPos, table, UI.CurrentMapLayer->ID);
 	//Wyrmgus end
 
 	size_t n = table.size();

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_attack.cpp - The attack action. */
+/**@name action_attack.cpp - The attack action source file. */
 //
 //      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -48,6 +48,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -255,17 +256,11 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		if (this->HasGoal()) {
 			return this->GetGoal()->IsAliveOnMap();
 		} else {
-			//Wyrmgus start
-//			return Map.Info.IsPointOnMap(this->goalPos);
 			return Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
-			//Wyrmgus end
 		}
 	} else {
 		Assert(Action == UnitActionAttackGround);
-		//Wyrmgus start
-//		return Map.Info.IsPointOnMap(this->goalPos);
 		return Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
-		//Wyrmgus end
 	}
 }
 
@@ -274,30 +269,21 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
-		//Wyrmgus start
-		if (this->GetGoal()->MapLayer != CurrentMapLayer) {
+		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
-		//Wyrmgus end
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
-		//Wyrmgus start
-		if (this->MapLayer != CurrentMapLayer) {
+		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
-		//Wyrmgus end
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
-	//Wyrmgus start
-//	Video.FillCircleClip(ColorRed, lastScreenPos, 2);
-//	Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
-//	Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
 	if (Preference.ShowPathlines) {
 		Video.FillCircleClip(ColorRed, lastScreenPos, 2);
 		Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
 		Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
 	}
-	//Wyrmgus end
 	return targetPos;
 }
 

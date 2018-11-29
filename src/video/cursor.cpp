@@ -41,6 +41,7 @@
 
 #include "editor.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "translate.h"
 #include "unit.h"
@@ -298,7 +299,7 @@ void DrawBuildingCursor()
 	//Wyrmgus end
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
-		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize(CurrentMapLayer));
+		const PixelPos center(screenPos + CursorBuilding->GetHalfTilePixelSize(UI.CurrentMapLayer->ID));
 		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileSize.x - 1)) * Map.GetCurrentPixelTileSize().x + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
@@ -312,13 +313,13 @@ void DrawBuildingCursor()
 		for (size_t i = 0; f && i < Selected.size(); ++i) {
 			//Wyrmgus start
 //			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != NULL);
-			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos, CurrentMapLayer)) != NULL);
+			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos, UI.CurrentMapLayer->ID)) != NULL);
 			//Wyrmgus end
 			// Assign ontop or NULL
 			ontop = (ontop == Selected[i] ? NULL : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, CurrentMapLayer)) != NULL);
+		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, UI.CurrentMapLayer->ID)) != NULL);
 		if (!Editor.Running || ontop == (CUnit *)1) {
 			ontop = NULL;
 		}
@@ -342,11 +343,11 @@ void DrawBuildingCursor()
 														  mask & ((!Selected.empty() && Selected[0]->tilePos == posIt) ?
 																  //Wyrmgus start
 //																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
-																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), CurrentMapLayer), CurrentMapLayer))
+																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), UI.CurrentMapLayer->ID), UI.CurrentMapLayer->ID))
 																  //Wyrmgus end
 				//Wyrmgus start
 //				&& Map.Field(posIt)->playerInfo.IsExplored(*ThisPlayer)) {
-				&& Map.Field(posIt, CurrentMapLayer)->playerInfo.IsTeamExplored(*ThisPlayer)) {
+				&& Map.Field(posIt, UI.CurrentMapLayer->ID)->playerInfo.IsTeamExplored(*ThisPlayer)) {
 				//Wyrmgus end
 				color = ColorGreen;
 			} else {

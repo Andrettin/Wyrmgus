@@ -41,11 +41,13 @@
 
 #include "stratagus.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/map_template.h"
 //Wyrmgus start
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 //Wyrmgus end
+#include "ui/ui.h"
 #include "video.h"
 #include "iolib.h"
 #include "iocompat.h"
@@ -448,8 +450,8 @@ void SaveMapPNG(const char *name)
 	//Wyrmgus start
 //	const size_t imageWidth = Map.Info.MapWidth * Map.GetCurrentPixelTileSize().x;
 //	const size_t imageHeight = Map.Info.MapHeight * Map.GetCurrentPixelTileSize().y;
-	const size_t imageWidth = Map.Info.MapWidths[CurrentMapLayer] * Map.GetCurrentPixelTileSize().x;
-	const size_t imageHeight = Map.Info.MapHeights[CurrentMapLayer] * Map.GetCurrentPixelTileSize().y;
+	const size_t imageWidth = Map.Info.MapWidths[UI.CurrentMapLayer->ID] * Map.GetCurrentPixelTileSize().x;
+	const size_t imageHeight = Map.Info.MapHeights[UI.CurrentMapLayer->ID] * Map.GetCurrentPixelTileSize().y;
 	//Wyrmgus end
 
 	/* set up the output control if you are using standard C streams */
@@ -466,15 +468,15 @@ void SaveMapPNG(const char *name)
 
 	//Wyrmgus start
 //	for (int i = 0; i < Map.Info.MapHeight; ++i) {
-	for (int i = 0; i < Map.Info.MapHeights[CurrentMapLayer]; ++i) {
+	for (int i = 0; i < Map.Info.MapHeights[UI.CurrentMapLayer->ID]; ++i) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		for (int j = 0; j < Map.Info.MapWidth; ++j) {
-		for (int j = 0; j < Map.Info.MapWidths[CurrentMapLayer]; ++j) {
+		for (int j = 0; j < Map.Info.MapWidths[UI.CurrentMapLayer->ID]; ++j) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			const CMapField &mf = *Map.Field(i, j);
-			const CMapField &mf = *Map.Field(i, j, CurrentMapLayer);
+			const CMapField &mf = *Map.Field(i, j, UI.CurrentMapLayer->ID);
 			//Wyrmgus end
 			SDL_Rect srcRect, dstRect;
 			//Wyrmgus start
