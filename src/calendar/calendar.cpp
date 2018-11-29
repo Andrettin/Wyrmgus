@@ -45,7 +45,7 @@
 
 std::vector<CCalendar *> CCalendar::Calendars;
 std::map<std::string, CCalendar *> CCalendar::CalendarsByIdent;
-CCalendar * CCalendar::BaseCalendar = NULL;
+CCalendar * CCalendar::BaseCalendar = nullptr;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -120,7 +120,7 @@ CCalendar *CCalendar::GetCalendar(const std::string &ident)
 		return CalendarsByIdent.find(ident)->second;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -154,7 +154,7 @@ void CCalendar::ClearCalendars()
 	}
 	Calendars.clear();
 	
-	BaseCalendar = NULL;
+	BaseCalendar = nullptr;
 }
 
 /**
@@ -269,7 +269,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 			this->Months.push_back(month);
 			this->DaysPerYear += month->Days;
 		} else if (child_config_data->Tag == "chronological_intersection") {
-			CCalendar *calendar = NULL;
+			CCalendar *calendar = nullptr;
 			CDate date;
 			CDate intersecting_date;
 				
@@ -344,7 +344,7 @@ CDayOfTheWeek *CCalendar::GetDayOfTheWeekByIdent(const std::string &ident)
 		return this->DaysOfTheWeekByIdent.find(ident)->second;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**

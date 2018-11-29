@@ -51,7 +51,7 @@ class CDeityDomain
 {
 public:
 	CDeityDomain() :
-		Upgrade(NULL)
+		Upgrade(nullptr)
 	{
 	}
 	

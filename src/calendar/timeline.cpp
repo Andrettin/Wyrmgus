@@ -59,7 +59,7 @@ CTimeline *CTimeline::GetTimeline(std::string ident)
 		return TimelinesByIdent.find(ident)->second;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CTimeline *CTimeline::GetOrAddTimeline(std::string ident)

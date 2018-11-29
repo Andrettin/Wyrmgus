@@ -79,7 +79,7 @@ class CQuestObjective
 public:
 	CQuestObjective() :
 		ObjectiveType(-1), Quantity(1), Resource(-1), UnitClass(-1),
-		Quest(NULL), UnitType(NULL), Upgrade(NULL), Character(NULL), Unique(NULL), Settlement(NULL), Faction(NULL)
+		Quest(nullptr), UnitType(nullptr), Upgrade(nullptr), Character(nullptr), Unique(nullptr), Settlement(nullptr), Faction(nullptr)
 	{
 	}
 	
@@ -113,7 +113,7 @@ public:
 	CQuest() :
 		ID(-1), Civilization(-1), PlayerColor(0), HighestCompletedDifficulty(-1),
 		Hidden(false), Completed(false), CurrentCompleted(false), Competitive(false), Unobtainable(false), Uncompleteable(false), Unfailable(false),
-		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), AcceptEffects(NULL), CompletionEffects(NULL), FailEffects(NULL)
+		QuestGiver(nullptr), IntroductionDialogue(nullptr), Conditions(nullptr), AcceptEffects(nullptr), CompletionEffects(nullptr), FailEffects(nullptr)
 	{
 	}
 	~CQuest();
@@ -167,7 +167,7 @@ public:
 	CCampaign() :
 		ID(-1),
 		Hidden(false), Sandbox(false),
-		Faction(NULL), StartEffects(NULL)
+		Faction(nullptr), StartEffects(nullptr)
 	{
 	}
 	~CCampaign();
@@ -193,7 +193,7 @@ public:
 	CAchievement() :
 		PlayerColor(0), CharacterLevel(0), Difficulty(-1),
 		Hidden(false), Obtained(false), Unobtainable(false),
-		Character(NULL), CharacterType(NULL)
+		Character(nullptr), CharacterType(nullptr)
 	{
 	}
 	
@@ -237,7 +237,7 @@ class CDialogueNode
 {
 public:
 	CDialogueNode() :
-		ID(-1), Dialogue(NULL), Conditions(NULL), ImmediateEffects(NULL)
+		ID(-1), Dialogue(nullptr), Conditions(nullptr), ImmediateEffects(nullptr)
 	{
 	}
 	

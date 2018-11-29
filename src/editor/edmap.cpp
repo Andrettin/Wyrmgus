@@ -207,9 +207,9 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 							
 						CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
 						if (overlay && adjacent_terrain && Map.Field(adjacent_pos, UI.CurrentMapLayer->ID)->OverlayTerrainDestroyed) {
-							adjacent_terrain = NULL;
+							adjacent_terrain = nullptr;
 						}
-						if (terrain != adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+						if (terrain != adjacent_terrain) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
 							transition_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
 						}
 					}
@@ -413,7 +413,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 
 		// FIXME: can overlap units
 		CUnit *unit = MakeUnitAndPlace(rpos, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
-		if (unit == NULL) {
+		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->SetResourcesHeld(value);
@@ -421,7 +421,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 
 		unit = MakeUnitAndPlace(tmirrorh, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
 
-		if (unit == NULL) {
+		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			//Wyrmgus start
@@ -432,7 +432,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 
 		unit = MakeUnitAndPlace(tmirrorv, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
 
-		if (unit == NULL) {
+		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->SetResourcesHeld(value);
@@ -440,7 +440,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 
 		unit = MakeUnitAndPlace(tmirror, type, &Players[PlayerNumNeutral], UI.CurrentMapLayer->ID);
 
-		if (unit == NULL) {
+		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			//Wyrmgus start
@@ -459,7 +459,7 @@ static void EditorDestroyAllUnits()
 	while (UnitManager.empty() == false) {
 		CUnit &unit = **UnitManager.begin();
 
-		unit.Remove(NULL);
+		unit.Remove(nullptr);
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		unit.Release();

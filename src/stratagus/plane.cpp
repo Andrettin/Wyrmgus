@@ -57,7 +57,7 @@ CPlane *CPlane::GetPlane(const std::string &plane_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CPlane *CPlane::GetOrAddPlane(const std::string &plane_ident)

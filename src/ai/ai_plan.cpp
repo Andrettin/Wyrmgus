@@ -116,7 +116,7 @@ private:
 static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	CUnit *enemy = NULL;
+	CUnit *enemy = nullptr;
 
 	_EnemyOnMapTile filter(source, pos, &enemy);
 	//Wyrmgus start
@@ -238,15 +238,9 @@ int AiFindWall(AiForce *force)
 //			if (aiunit.Type->CanAttack) {
 			if (aiunit.CanAttack()) {
 			//Wyrmgus end
-				//Wyrmgus start
-//				CommandAttack(aiunit, wallPos, NULL, FlushCommands);
-				CommandAttack(aiunit, wallPos, NULL, FlushCommands, aiunit.MapLayer);
-				//Wyrmgus end
+				CommandAttack(aiunit, wallPos, nullptr, FlushCommands, aiunit.MapLayer);
 			} else {
-				//Wyrmgus start
-//				CommandMove(aiunit, wallPos, FlushCommands);
 				CommandMove(aiunit, wallPos, FlushCommands, aiunit.MapLayer);
-				//Wyrmgus end
 			}
 		}
 		return 1;
@@ -432,7 +426,7 @@ int AiForce::PlanAttack()
 
 	CUnit *transporter = Units.find(IsAFreeTransporter());
 
-	if (transporter != NULL) {
+	if (transporter != nullptr) {
 		DebugPrint("%d: Transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));
 		MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 	} else {
@@ -449,7 +443,7 @@ int AiForce::PlanAttack()
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
 	CUnit *landUnit = Units.find(CUnitTypeFinder(UnitTypeLand));
-	if (landUnit == NULL) {
+	if (landUnit == nullptr) {
 		DebugPrint("%d: No land unit in force\n" _C_ player.Index);
 		return 0;
 	}
@@ -509,7 +503,7 @@ int AiForce::PlanAttack()
 /*
 static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 {
-	Assert(pos != NULL);
+	Assert(pos != nullptr);
 
 	int ray = 3;
 	const int maxTryCount = 8;
@@ -531,11 +525,11 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 	// Choose a target, "near"
 	const Vec2i &center = request.pos;
 	if (ChooseRandomUnexploredPositionNear(center, pos) == false) {
-		return NULL;
+		return nullptr;
 	}
 	// We have an unexplored tile in sight (pos)
 
-	CUnit *bestunit = NULL;
+	CUnit *bestunit = nullptr;
 	// Find an idle unit, responding to the mask
 	bool flyeronly = false;
 	int bestSquareDistance = -1;
@@ -593,7 +587,7 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 //Wyrmgus start
 static CUnit *GetBestScout(int unit_type)
 {
-	CUnit *bestunit = NULL;
+	CUnit *bestunit = nullptr;
 
 	bool flyeronly = (unit_type == UnitTypeFly);
 	
@@ -654,7 +648,7 @@ static CUnit *GetBestScout(int unit_type)
 		score += unit.Variable[SPEED_INDEX].Value - 10;
 		
 		if (
-			bestunit == NULL
+			bestunit == nullptr
 			|| score > best_score
 			|| (bestunit->Type->UnitType != UnitTypeFly && type.UnitType == UnitTypeFly)
 		) {
@@ -688,7 +682,7 @@ void AiSendExplorers()
 
 		Vec2i pos;
 		CUnit *bestunit = GetBestExplorer(request, &pos);
-		if (bestunit != NULL) {
+		if (bestunit != nullptr) {
 			CommandMove(*bestunit, pos, FlushCommands);
 			AiPlayer->LastExplorationGameCycle = GameCycle;
 			break;
@@ -703,7 +697,7 @@ void AiSendExplorers()
 	bool naval_scout = false;
 	bool air_scout = false;
 	for (size_t i = 0; i != AiPlayer->Scouts.size(); ++i) {
-		if (AiPlayer->Scouts[i] == NULL) {
+		if (AiPlayer->Scouts[i] == nullptr) {
 			fprintf(stderr, "AI Player #%d's scout %d is null.\n", AiPlayer->Player->Index, (int) i);
 			return;
 		}
@@ -725,7 +719,7 @@ void AiSendExplorers()
 	//if no scouts are already present for a particular type, then choose a suitable unit to scout
 	if (!air_scout) { 
 		CUnit *bestunit = GetBestScout(UnitTypeFly);
-		if (bestunit != NULL) {
+		if (bestunit != nullptr) {
 			AiPlayer->Scouts.push_back(bestunit);
 			CommandStopUnit(*bestunit);
 			land_scout = true;
@@ -734,7 +728,7 @@ void AiSendExplorers()
 	}
 	if (!land_scout) { 
 		CUnit *bestunit = GetBestScout(UnitTypeLand);
-		if (bestunit != NULL) {
+		if (bestunit != nullptr) {
 			AiPlayer->Scouts.push_back(bestunit);
 			CommandStopUnit(*bestunit);
 			if (bestunit->Type->UnitType == UnitTypeFlyLow) {
@@ -744,7 +738,7 @@ void AiSendExplorers()
 	}
 	if (!naval_scout) { 
 		CUnit *bestunit = GetBestScout(UnitTypeNaval);
-		if (bestunit != NULL) {
+		if (bestunit != nullptr) {
 			AiPlayer->Scouts.push_back(bestunit);
 			CommandStopUnit(*bestunit);
 		}

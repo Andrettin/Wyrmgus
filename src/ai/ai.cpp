@@ -279,7 +279,7 @@ static void AiCheckUnits()
 	//Wyrmgus start
 	if (AiPlayer->Player->NumTownHalls > 0 && !AiPlayer->Player->HasNeutralFactionType()) {
 		//check if can hire any heroes
-		if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && !IsNetworkGame() && CurrentQuest == NULL) {
+		if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && !IsNetworkGame() && CurrentQuest == nullptr) {
 			for (int i = 0; i < AiPlayer->Player->GetUnitCount(); ++i) {
 				CUnit *hero_recruiter = &AiPlayer->Player->GetUnit(i);
 				if (!hero_recruiter || !hero_recruiter->IsAliveOnMap() || !hero_recruiter->Type->BoolFlag[RECRUITHEROES_INDEX].value || hero_recruiter->CurrentAction() == UnitActionBuilt) {
@@ -312,7 +312,7 @@ static void AiCheckUnits()
 					continue;
 				}
 
-				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && mercenary_building->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL) { //check if can hire any heroes at the mercenary camp
+				if (AiPlayer->Player->Heroes.size() < PlayerHeroMax && AiPlayer->Player->HeroCooldownTimer == 0 && mercenary_building->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == nullptr) { //check if can hire any heroes at the mercenary camp
 					for (size_t k = 0; k < mercenary_building->SoldUnits.size(); ++k) {
 						int buy_costs[MaxCosts];
 						memset(buy_costs, 0, sizeof(buy_costs));
@@ -553,7 +553,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 			file.printf("\"landmass\", %d, ", queue.Landmass);
 		}
 		
-		if (queue.Settlement != NULL) {
+		if (queue.Settlement != nullptr) {
 			file.printf("\"settlement\", \"%s\", ", queue.Settlement->Ident.c_str());
 		}
 		//Wyrmgus end
@@ -641,7 +641,7 @@ void AiInit(CPlayer &player)
 		Exit(0);
 	}
 	size_t i;
-	CAiType *ait = NULL;
+	CAiType *ait = nullptr;
 
 	for (i = 0; i < AiTypes.size(); ++i) {
 		ait = AiTypes[i];
@@ -698,7 +698,7 @@ void CleanAi()
 {
 	for (int p = 0; p < PlayerMax; ++p) {
 		delete Players[p].Ai;
-		Players[p].Ai = NULL;
+		Players[p].Ai = nullptr;
 	}
 }
 
@@ -755,7 +755,7 @@ void FreeAi()
 */
 //Wyrmgus start
 //static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
-static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass = 0, const CSite *settlement = NULL)
+static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type, int landmass = 0, const CSite *settlement = nullptr)
 //Wyrmgus end
 {
 	std::vector<AiBuildQueue>::iterator i;
@@ -836,7 +836,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 */
 //Wyrmgus start
 //static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type)
-static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landmass = 0, const CSite *settlement = NULL)
+static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type, int landmass = 0, const CSite *settlement = nullptr)
 //Wyrmgus end
 {
 	std::vector<AiBuildQueue>::iterator i;
@@ -976,7 +976,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 					const CUnit *oldGoal = orderAttack.GetGoal();
 
-					if (oldGoal == NULL || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
+					if (oldGoal == nullptr || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
 											//Wyrmgus start
 //											&& aiunit.MapDistanceTo(defender) <= aiunit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
 											&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
@@ -1001,7 +1001,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 					//Wyrmgus start
 //					if (aiunit.CanStoreOrder(savedOrder) == false) {
 //						delete savedOrder;
-//						savedOrder = NULL;
+//						savedOrder = nullptr;
 //					} else {
 //						aiunit.SavedOrder = savedOrder;
 //					}
@@ -1067,7 +1067,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 						const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 						const CUnit *oldGoal = orderAttack.GetGoal();
 
-						if (oldGoal == NULL || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
+						if (oldGoal == nullptr || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
 												//Wyrmgus start
 	//											&& aiunit.MapDistanceTo(defender) <= aiunit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
 												&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
@@ -1139,7 +1139,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 					const CUnit *oldGoal = orderAttack.GetGoal();
 
-					if (oldGoal == NULL || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
+					if (oldGoal == nullptr || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
 											&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
 						shouldAttack = true;
 					}
@@ -1370,7 +1370,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	// Don't move more than 1 unit.
 	if (movablenb) {
 		const int index = SyncRand() % movablenb;
-		COrder *savedOrder = NULL;
+		COrder *savedOrder = nullptr;
 		if (movableunits[index]->IsIdle() == false) {
 			if (unit.CanStoreOrder(unit.CurrentOrder())) {
 				savedOrder = unit.CurrentOrder()->Clone();
@@ -1380,7 +1380,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 //		CommandMove(*movableunits[index], movablepos[index], FlushCommands);
 		CommandMove(*movableunits[index], movablepos[index], FlushCommands, movableunits[index]->MapLayer);
 		//Wyrmgus end
-		if (savedOrder != NULL) {
+		if (savedOrder != nullptr) {
 			unit.SavedOrder = savedOrder;
 		}
 		AiPlayer->LastCanNotMoveGameCycle = GameCycle;

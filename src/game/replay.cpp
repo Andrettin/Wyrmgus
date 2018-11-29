@@ -80,7 +80,7 @@ public:
 //	LogEntry() : GameCycle(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
 	LogEntry() : GameCycle(0), GameTimeOfDay(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
 	//Wyrmgus end
-		Num(0), SyncRandSeed(0), Next(NULL)
+		Num(0), SyncRandSeed(0), Next(nullptr)
 	{
 		UnitNumber = 0;
 	}
@@ -136,8 +136,8 @@ public:
 		//Wyrmgus end
 		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), Inside(false), RevealMap(0),
 		//Wyrmgus start
-//		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
-		MapRichness(0), GameType(0), Opponents(0), NoRandomness(false), NoTimeOfDay(false), TechLevel(0), MaxTechLevel(0), Commands(NULL)
+//		MapRichness(0), GameType(0), Opponents(0), Commands(nullptr)
+		MapRichness(0), GameType(0), Opponents(0), NoRandomness(false), NoTimeOfDay(false), TechLevel(0), MaxTechLevel(0), Commands(nullptr)
 		//Wyrmgus end
 	{
 		memset(Engine, 0, sizeof(Engine));
@@ -509,7 +509,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 			// don't retry for each command
 			CommandLogDisabled = false;
 			delete LogFile;
-			LogFile = NULL;
+			LogFile = nullptr;
 			return;
 		}
 
@@ -654,7 +654,7 @@ static int CclReplayLog(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	Assert(CurrentReplay == NULL);
+	Assert(CurrentReplay == nullptr);
 
 	replay = new FullReplay;
 
@@ -830,13 +830,13 @@ void EndReplayLog()
 	if (LogFile) {
 		LogFile->close();
 		delete LogFile;
-		LogFile = NULL;
+		LogFile = nullptr;
 	}
 	if (CurrentReplay) {
 		DeleteReplay(CurrentReplay);
-		CurrentReplay = NULL;
+		CurrentReplay = nullptr;
 	}
-	ReplayStep = NULL;
+	ReplayStep = nullptr;
 }
 
 /**
@@ -848,7 +848,7 @@ void CleanReplayLog()
 		DeleteReplay(CurrentReplay);
 		CurrentReplay = 0;
 	}
-	ReplayStep = NULL;
+	ReplayStep = nullptr;
 
 	// if (DisabledLog) {
 	CommandLogDisabled = false;
@@ -878,8 +878,8 @@ static void DoNextReplay()
 	const Vec2i pos(ReplayStep->PosX, ReplayStep->PosY);
 	const int arg1 = ReplayStep->PosX;
 	const int arg2 = ReplayStep->PosY;
-	CUnit *unit = unitSlot != -1 ? &UnitManager.GetSlotUnit(unitSlot) : NULL;
-	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? &UnitManager.GetSlotUnit(ReplayStep->DestUnitNumber) : NULL);
+	CUnit *unit = unitSlot != -1 ? &UnitManager.GetSlotUnit(unitSlot) : nullptr;
+	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? &UnitManager.GetSlotUnit(ReplayStep->DestUnitNumber) : nullptr);
 	const char *val = ReplayStep->Value.c_str();
 	const int num = ReplayStep->Num;
 
@@ -957,7 +957,7 @@ static void DoNextReplay()
 		SendCommandTrainUnit(*unit, *UnitTypeByIdent(val), num, flags);
 		//Wyrmgus end
 	} else if (!strcmp(action, "cancel-train")) {
-		SendCommandCancelTraining(*unit, num, (val && *val) ? UnitTypeByIdent(val) : NULL);
+		SendCommandCancelTraining(*unit, num, (val && *val) ? UnitTypeByIdent(val) : nullptr);
 	} else if (!strcmp(action, "upgrade-to")) {
 		SendCommandUpgradeTo(*unit, *UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "cancel-upgrade-to")) {

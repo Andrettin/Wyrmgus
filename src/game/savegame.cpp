@@ -141,7 +141,7 @@ int SaveGame(const std::string &filename)
 	//Wyrmgus start
 //	file.printf("function SetTile() end\n");
 	file.printf("function SetTileTerrain() end\n");
-	if (CurrentCampaign != NULL) {
+	if (CurrentCampaign != nullptr) {
 		file.printf("SetCurrentCampaign(\"%s\")\n", CurrentCampaign->Ident.c_str());
 	}
 	//Wyrmgus end

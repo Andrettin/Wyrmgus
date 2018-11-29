@@ -68,7 +68,7 @@ CReligion *CReligion::GetReligion(const std::string &ident, const bool should_fi
 		fprintf(stderr, "Invalid religion: \"%s\".\n", ident.c_str());
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**

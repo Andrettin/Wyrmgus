@@ -316,9 +316,9 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 									
 							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, UI.CurrentMapLayer->ID);
 							if (tile_terrain->Overlay && adjacent_terrain && Map.Field(adjacent_pos, UI.CurrentMapLayer->ID)->OverlayTerrainDestroyed) {
-								adjacent_terrain = NULL;
+								adjacent_terrain = nullptr;
 							}
-							if (tile_terrain != adjacent_terrain && std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), adjacent_terrain) == tile_terrain->OuterBorderTerrains.end()) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+							if (tile_terrain != adjacent_terrain && std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), adjacent_terrain) == tile_terrain->OuterBorderTerrains.end()) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
 								solid_tile = false;
 								break;
 							}
@@ -384,9 +384,9 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 											if (Map.Info.IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer->ID)) {
 												CTerrainType *sub_adjacent_terrain = Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
 												if (adjacent_terrain->Overlay && sub_adjacent_terrain && Map.Field(sub_adjacent_pos, UI.CurrentMapLayer->ID)->OverlayTerrainDestroyed) {
-													sub_adjacent_terrain = NULL;
+													sub_adjacent_terrain = nullptr;
 												}
-												if (adjacent_terrain != sub_adjacent_terrain && std::find(adjacent_terrain->OuterBorderTerrains.begin(), adjacent_terrain->OuterBorderTerrains.end(), sub_adjacent_terrain) == adjacent_terrain->OuterBorderTerrains.end()) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+												if (adjacent_terrain != sub_adjacent_terrain && std::find(adjacent_terrain->OuterBorderTerrains.begin(), adjacent_terrain->OuterBorderTerrains.end(), sub_adjacent_terrain) == adjacent_terrain->OuterBorderTerrains.end()) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
 													solid_tile = false;
 													break;
 												}
@@ -498,14 +498,14 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 //	CUnit *unit = MakeUnitAndPlace(pos, type, player);
 	CUnit *unit = MakeUnitAndPlace(pos, type, player, UI.CurrentMapLayer->ID);
 	//Wyrmgus end
-	if (unit == NULL) {
+	if (unit == nullptr) {
 		DebugPrint("Unable to allocate Unit");
 		return;
 	}
 
 	//Wyrmgus start
-//	CBuildRestrictionOnTop *b = OnTopDetails(*unit, NULL);
-	CBuildRestrictionOnTop *b = OnTopDetails(*unit->Type, NULL);
+//	CBuildRestrictionOnTop *b = OnTopDetails(*unit, nullptr);
+	CBuildRestrictionOnTop *b = OnTopDetails(*unit->Type, nullptr);
 	//Wyrmgus end
 	if (b && b->ReplaceOnBuild) {
 		CUnitCache &unitCache = Map.Field(pos, UI.CurrentMapLayer->ID)->UnitCache;
@@ -517,7 +517,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 			unit->ReplaceOnTop(replacedUnit);
 		}
 	}
-	if (unit != NULL) {
+	if (unit != nullptr) {
 		if (type.GivesResource) {
 			//Wyrmgus start
 //			if (type.StartingResources != 0) {
@@ -571,7 +571,7 @@ static void EditorPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *player)
 void EditorActionRemoveUnit(CUnit &unit, bool display)
 //Wyrmgus end
 {
-	unit.Remove(NULL);
+	unit.Remove(nullptr);
 	UnitLost(unit);
 	UnitClearOrders(unit);
 	unit.Release();
@@ -1327,7 +1327,7 @@ static void DrawMapCursor()
 		} else {
 			// If there is an unit under the cursor, it's selection thing
 			//  is drawn somewhere else (Check DrawUnitSelection.)
-			if (UnitUnderCursor != NULL) {
+			if (UnitUnderCursor != nullptr) {
 				PushClipping();
 				UI.MouseViewport->SetClipping();
 				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.GetCurrentPixelTileSize().x, Map.GetCurrentPixelTileSize().y);
@@ -1594,7 +1594,7 @@ static void EditorCallbackButtonUp(unsigned button)
 				if ((1 << button) == LeftButton) {
 					Editor.SelectedUnitIndex = -1;
 					Editor.CursorUnitIndex = -1;
-					CursorBuilding = NULL;
+					CursorBuilding = nullptr;
 					char buf[256];
 					snprintf(buf, sizeof(buf), "if (EditorCreateUnitType() ~= nil) then EditorCreateUnitType() end;");
 					CclCommand(buf);
@@ -1643,7 +1643,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 	// Click on mode area
 	if (CursorOn == CursorOnButton) {
-		CursorBuilding = NULL;
+		CursorBuilding = nullptr;
 		switch (ButtonUnderCursor) {
 			case SelectButton :
 				Editor.State = EditorSelecting;
@@ -1746,7 +1746,7 @@ static void EditorCallbackButtonDown(unsigned button)
 
 	// Right click on a resource
 	if (Editor.State == EditorSelecting) {
-		if ((MouseButtons & RightButton) && UnitUnderCursor != NULL) {
+		if ((MouseButtons & RightButton) && UnitUnderCursor != nullptr) {
 			CclCommand("if (EditUnitProperties ~= nil) then EditUnitProperties() end;");
 			return;
 		}
@@ -1757,11 +1757,11 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (MouseButtons & RightButton) {
 			if (Editor.State == EditorEditUnit && Editor.SelectedUnitIndex != -1) {
 				Editor.SelectedUnitIndex = -1;
-				CursorBuilding = NULL;
+				CursorBuilding = nullptr;
 				return;
 			} else if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
 				Editor.SelectedTileIndex = -1;
-				CursorBuilding = NULL;
+				CursorBuilding = nullptr;
 				return;
 			}
 		}
@@ -1780,7 +1780,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
-					if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
+					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
 						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
 									  MaxSampleVolume);
 						EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
@@ -1801,7 +1801,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			CursorStartScreenPos = CursorScreenPos;
 			GameCursor = UI.Scroll.Cursor;
 			//Wyrmgus start
-			UnitUnderCursor = NULL;
+			UnitUnderCursor = nullptr;
 			//Wyrmgus end
 		}
 	}
@@ -1895,7 +1895,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 		case SDLK_BACKSPACE:
 		case SDLK_DELETE: // Delete
-			if (UnitUnderCursor != NULL) {
+			if (UnitUnderCursor != nullptr) {
 				EditorRemoveUnit(*UnitUnderCursor);
 			}
 			break;
@@ -1917,7 +1917,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			KeyScrollState |= ScrollRight;
 			break;
 		case '0':
-			if (UnitUnderCursor != NULL) {
+			if (UnitUnderCursor != nullptr) {
 				UnitUnderCursor->ChangeOwner(Players[PlayerNumNeutral]);
 				UI.StatusLine.Set(_("Unit owner modified"));
 			}
@@ -1926,7 +1926,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
 		case '9':
-			if (UnitUnderCursor != NULL && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
+			if (UnitUnderCursor != nullptr && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
 				UnitUnderCursor->ChangeOwner(Players[(int) key - '1']);
 				UI.StatusLine.Set(_("Unit owner modified"));
 				UpdateMinimap = true;
@@ -1997,7 +1997,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	Assert(Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation);
 	
 	//Wyrmgus start
-	LastDrawnButtonPopup = NULL;
+	LastDrawnButtonPopup = nullptr;
 	//Wyrmgus end
 
 	// Scrollbar
@@ -2254,7 +2254,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
-				if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
+				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1, true, UI.CurrentMapLayer->ID)) {
 					EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
 					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
@@ -2387,7 +2387,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	// Map
-	UnitUnderCursor = NULL;
+	UnitUnderCursor = nullptr;
 	if (UI.MapArea.Contains(screenPos)) {
 		CViewport *vp = GetViewport(screenPos);
 		Assert(vp);
@@ -2403,7 +2403,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 			UnitUnderCursor = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
 
-			if (UnitUnderCursor != NULL) {
+			if (UnitUnderCursor != nullptr) {
 				ShowUnitInfo(*UnitUnderCursor);
 				return;
 			}
@@ -2565,9 +2565,9 @@ void CEditor::Init()
 	if (!StartUnitName.empty()) {
 		StartUnit = UnitTypeByIdent(StartUnitName);
 	}
-	Select.Icon = NULL;
+	Select.Icon = nullptr;
 	Select.Load();
-	Units.Icon = NULL;
+	Units.Icon = nullptr;
 	Units.Load();
 
 	//Wyrmgus start
@@ -2760,7 +2760,7 @@ void EditorMainLoop()
 
 			WaitEventsOneFrame();
 		}
-		CursorBuilding = NULL;
+		CursorBuilding = nullptr;
 		if (!Editor.MapLoaded) {
 			break;
 		}
@@ -2791,7 +2791,7 @@ void EditorMainLoop()
 /**
 **  Start the editor
 **
-**  @param filename  Map to load, NULL to create a new map
+**  @param filename  Map to load, null to create a new map
 */
 //Wyrmgus start
 //void StartEditor(const char *filename)
@@ -2803,7 +2803,7 @@ void StartEditor(const char *filename, bool is_mod)
 	GetDefaultTextColors(nc, rc);
 	if (filename) {
 		if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename) != 0) {
-			filename = NULL;
+			filename = nullptr;
 		}
 	}
 	if (!filename) {

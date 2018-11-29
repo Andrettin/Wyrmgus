@@ -179,7 +179,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 	// Now, sort them, best first.
 	while (!res.empty()) {
 		float bestscore = 0;
-		CUnitType *besttype = NULL;
+		CUnitType *besttype = nullptr;
 
 		for (std::vector<CUnitType *>::const_iterator i = res.begin(); i != res.end(); ++i) {
 			CUnitType &type = **i;
@@ -529,7 +529,7 @@ static CAiType *GetAiTypesByName(const char *name)
 			return ait;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -621,7 +621,7 @@ static AiRequestType *FindInUnitTypeRequests(const CUnitType *type)
 			return &AiPlayer->UnitTypeRequests[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 //Wyrmgus start
@@ -742,7 +742,7 @@ static int CclAiDebugPlayer(lua_State *l)
 		if (lua_isstring(l, j + 1)) {
 			item = LuaToString(l, j + 1);
 		} else {
-			item = NULL;
+			item = nullptr;
 		}
 		if (item && !strcmp(item, "none")) {
 			for (int i = 0; i != NumPlayers; ++i) {
@@ -1241,7 +1241,7 @@ static int CclAiResearch(lua_State *l)
 		upgrade = CUpgrade::Get(str);
 	} else {
 		LuaError(l, "Upgrade needed");
-		upgrade = NULL;
+		upgrade = nullptr;
 	}
 	//Wyrmgus start
 //	InsertResearchRequests(upgrade);
@@ -1449,7 +1449,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 	//Wyrmgus start
 	int z = -1;
 	int landmass = 0;
-	CSite *settlement = NULL;
+	CSite *settlement = nullptr;
 	//Wyrmgus end
 
 	const int args = lua_rawlen(l, offset);
@@ -1493,7 +1493,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			//Wyrmgus start
 			z = -1;
 			landmass = 0;
-			settlement = NULL;
+			settlement = nullptr;
 			//Wyrmgus end
 		}
 	}
@@ -1525,7 +1525,7 @@ static int CclDefineAiPlayer(lua_State *l)
 		if (!strcmp(value, "ai-type")) {
 			const char *aiName = LuaToString(l, j + 1);
 			CAiType *ait = GetAiTypesByName(aiName);
-			if (ait == NULL) {
+			if (ait == nullptr) {
 				LuaError(l, "ai-type not found: %s" _C_ aiName);
 			}
 			ai->AiType = ait;

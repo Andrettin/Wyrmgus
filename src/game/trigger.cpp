@@ -161,7 +161,7 @@ static CompareFunction GetCompareFunction(const char *op)
 	} else if (op[0] == '!' && op[1] == '=' && op[2] == '\0') {
 		return &CompareNEq;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -558,7 +558,7 @@ static int CclAddTrigger(lua_State *l)
 	trigger->Conditions = new LuaCallback(l, 2);
 	trigger->Effects = new LuaCallback(l, 3);
 	
-	if (trigger->Conditions == NULL || trigger->Effects == NULL) {
+	if (trigger->Conditions == nullptr || trigger->Effects == nullptr) {
 		fprintf(stderr, "Trigger \"%s\" has no conditions or no effects.\n", trigger->Ident.c_str());
 	}
 	//Wyrmgus end
@@ -733,7 +733,7 @@ CTrigger *GetTrigger(std::string trigger_ident)
 		return TriggerIdentToPointer[trigger_ident];
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CTrigger::~CTrigger()
@@ -816,7 +816,7 @@ void SaveTriggers(CFile &file)
 	file.printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
 	file.printf("\n");
 	//Wyrmgus start
-	if (CurrentQuest != NULL) {
+	if (CurrentQuest != nullptr) {
 		file.printf("SetCurrentQuest(\"%s\")\n", CurrentQuest->Ident.c_str());
 	}
 	//Wyrmgus end
@@ -853,7 +853,7 @@ void CleanTriggers()
 	Trigger = 0;
 
 	delete[] ActiveTriggers;
-	ActiveTriggers = NULL;
+	ActiveTriggers = nullptr;
 	
 	//Wyrmgus start
 	for (size_t i = 0; i < Triggers.size(); ++i) {

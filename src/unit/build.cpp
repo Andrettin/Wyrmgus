@@ -105,7 +105,7 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnitType &type, const CUnitType *par
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -162,7 +162,7 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
 	int distance = 0;
-	CPlayer* player = builder != NULL ? builder->Player : ThisPlayer;
+	CPlayer* player = builder != nullptr ? builder->Player : ThisPlayer;
 
 	if (this->DistanceType == LessThanEqual
 		|| this->DistanceType == GreaterThan
@@ -252,7 +252,7 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
-	CPlayer* player = builder != NULL ? builder->Player : ThisPlayer;
+	CPlayer* player = builder != nullptr ? builder->Player : ThisPlayer;
 	int count = 0;
 	if (this->RestrictTypeOwner.size() == 0 || !this->RestrictTypeOwner.compare("self")) {
 		count = player->GetUnitTotalCount(*this->RestrictType);
@@ -403,8 +403,7 @@ bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i
 	}
 	functor f(Parent, pos1);
 	//Wyrmgus start
-//	return (Map.Field(pos1)->UnitCache.find(f) != NULL);
-	return (Map.Field(pos1, z)->UnitCache.find(f) != NULL);
+	return (Map.Field(pos1, z)->UnitCache.find(f) != nullptr);
 	//Wyrmgus end
 }
 
@@ -420,7 +419,7 @@ inline bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
 			ontop = unit;
 		} else {
 			// Something else is built on this already
-			ontop = NULL;
+			ontop = nullptr;
 			return false;
 		}
 	}
@@ -444,16 +443,11 @@ private:
 bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
-	//Wyrmgus end
 
-	ontoptarget = NULL;
-	//Wyrmgus start
-//	CUnitCache &cache = Map.Field(pos)->UnitCache;
+	ontoptarget = nullptr;
+
 	CUnitCache &cache = Map.Field(pos, z)->UnitCache;
-	//Wyrmgus end
 
 	CUnitCache::iterator it = std::find_if(cache.begin(), cache.end(), AliveConstructedAndSameTypeAs(*this->Parent));
 
@@ -527,7 +521,7 @@ bool CBuildRestrictionTerrain::Check(const CUnit *builder, const CUnitType &type
 **  @param type  unit-type to be checked.
 **  @param pos   Map position.
 **
-**  @return      OnTop, parent unit, builder on true or 1 if unit==NULL, NULL false.
+**  @return      OnTop, parent unit, builder on true or 1 if unit==nullptr, null false.
 */
 //Wyrmgus start
 //CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
@@ -536,22 +530,22 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 {
 	//  Can't build outside the map
 	if (!Map.Info.IsPointOnMap(pos, z)) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (pos.x + type.TileSize.x > Map.Info.MapWidths[z]) {
-		return NULL;
+		return nullptr;
 	}
 	if (pos.y + type.TileSize.y > Map.Info.MapHeights[z]) {
-		return NULL;
+		return nullptr;
 	}
 	
 	//Wyrmgus start
-	if (no_bordering_building && !OnTopDetails(type, NULL)) { // if a campaign game is starting, only place buildings with a certain space from other buildings
+	if (no_bordering_building && !OnTopDetails(type, nullptr)) { // if a campaign game is starting, only place buildings with a certain space from other buildings
 		for (int x = pos.x - 1; x < pos.x + type.TileSize.x + 1; ++x) {
 			for (int y = pos.y - 1; y < pos.y + type.TileSize.y + 1; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && (Map.Field(x, y, z)->Flags & MapFieldBuilding)) {
-					return NULL;
+					return nullptr;
 				}
 			}
 		}
@@ -561,7 +555,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 		for (int x = pos.x; x < pos.x + type.TileSize.x; ++x) {
 			for (int y = pos.y; y < pos.y + type.TileSize.y; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->Owner != -1 && Map.Field(x, y, z)->Owner != unit->Player->Index) {
-					return NULL;
+					return nullptr;
 				}
 			}
 		}
@@ -602,7 +596,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 			//Wyrmgus end
 		} while (!success && --h);
 		if (!success) {
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -612,12 +606,12 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 		size_t count = type.AiBuildingRules.size();
 		if (count > 0) {
 			//Wyrmgus start
-//			CUnit *ontoptarget = NULL;
+//			CUnit *ontoptarget = nullptr;
 			//Wyrmgus end
 			for (unsigned int i = 0; i < count; ++i) {
 				CBuildRestriction *rule = type.AiBuildingRules[i];
 				//Wyrmgus start
-				CUnit *ontoptarget = NULL;
+				CUnit *ontoptarget = nullptr;
 				//Wyrmgus end
 				// All checks processed, did we really have success
 				//Wyrmgus start
@@ -633,7 +627,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 			}
 		}
 		if (aiChecked == false) {
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -641,28 +635,28 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	if (count > 0) {
 		for (unsigned int i = 0; i < count; ++i) {
 			CBuildRestriction *rule = type.BuildingRules[i];
-			CUnit *ontoptarget = NULL;
+			CUnit *ontoptarget = nullptr;
 			// All checks processed, did we really have success
 			//Wyrmgus start
 //			if (rule->Check(unit, type, pos, ontoptarget)) {
 			if (rule->Check(unit, type, pos, ontoptarget, z)) {
 			//Wyrmgus end
 				// We passed a full ruleset return
-				if (unit == NULL) {
+				if (unit == nullptr) {
 					return ontoptarget ? ontoptarget : (CUnit *)1;
 				} else {
 					return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
 				}
 			}
 		}
-		return NULL;
+		return nullptr;
 	}
 	
 	if (unit && z != unit->Player->StartMapLayer && (Map.MapLayers[z]->Plane != Map.MapLayers[unit->Player->StartMapLayer]->Plane || Map.MapLayers[z]->World != Map.MapLayers[unit->Player->StartMapLayer]->World)) {
-		return NULL;
+		return nullptr;
 	}
 
-	return (unit == NULL) ? (CUnit *)1 : const_cast<CUnit *>(unit);
+	return (unit == nullptr) ? (CUnit *)1 : const_cast<CUnit *>(unit);
 }
 
 /**
@@ -687,12 +681,12 @@ bool CanBuildOn(const Vec2i &pos, int mask, int z)
 /**
 **  Can build unit-type at this point.
 **
-**  @param unit  Worker that want to build the building or NULL.
+**  @param unit  Worker that want to build the building or null.
 **  @param type  Building unit-type.
 **  @param pos   tile map position.
 **  @param real  Really build, or just placement
 **
-**  @return      OnTop, parent unit, builder on true, NULL false.
+**  @return      OnTop, parent unit, builder on true, null false.
 **
 */
 //Wyrmgus start
@@ -705,8 +699,8 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 //	CUnit *ontop = CanBuildHere(unit, type, pos);
 	CUnit *ontop = CanBuildHere(unit, type, pos, z);
 	//Wyrmgus end
-	if (ontop == NULL) {
-		return NULL;
+	if (ontop == nullptr) {
+		return nullptr;
 	}
 	if (ontop != (CUnit *)1 && ontop != unit) {
 		return ontop;
@@ -717,7 +711,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 		UnmarkUnitFieldFlags(*unit);
 	}
 
-	CPlayer *player = NULL;
+	CPlayer *player = nullptr;
 
 	//Wyrmgus start
 //	if (unit && unit->Player->Type == PlayerPerson) {
@@ -738,7 +732,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h, z)) {
 			//Wyrmgus end
 				h = type.TileSize.y;
-				ontop = NULL;
+				ontop = nullptr;
 				break;
 			}
 			if (player && !real) {
@@ -758,7 +752,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			//Wyrmgus end
 			if (mf.CheckMask(testmask)) {
 				h = type.TileSize.y;
-				ontop = NULL;
+				ontop = nullptr;
 				break;
 			}
 			//Wyrmgus start
@@ -766,7 +760,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			if (player && !ignore_exploration && !mf.playerInfo.IsTeamExplored(*player)) {
 			//Wyrmgus end
 				h = type.TileSize.y;
-				ontop = NULL;
+				ontop = nullptr;
 				break;
 			}
 		}

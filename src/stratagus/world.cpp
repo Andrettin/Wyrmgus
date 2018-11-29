@@ -58,7 +58,7 @@ CWorld *CWorld::GetWorld(std::string world_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CWorld *CWorld::GetOrAddWorld(std::string world_ident)

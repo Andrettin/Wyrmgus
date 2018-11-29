@@ -146,7 +146,7 @@
 **
 **  CUnit::Container
 **
-**  Pointer to the unit containing it, or NULL if the unit is
+**  Pointer to the unit containing it, or null if the unit is
 **  free. This points to the transporter for units on board, or to
 **  the building for peasants inside(when they are mining).
 **
@@ -154,7 +154,7 @@
 **
 **  Pointer to the last unit added inside. Order doesn't really
 **  matter. All units inside are kept in a circular linked list.
-**  This is NULL if there are no units inside. Multiple levels
+**  This is null if there are no units inside. Multiple levels
 **  of inclusion are allowed, though not very useful right now
 **
 **  CUnit::NextContained, CUnit::PrevContained
@@ -346,7 +346,7 @@
 **
 **  CUnit::RescuedFrom
 **
-**  Pointer to the original owner of a unit. It will be NULL if
+**  Pointer to the original owner of a unit. It will be null if
 **  the unit was not rescued.
 **
 **  CUnit::Orders
@@ -434,13 +434,13 @@ void CUnit::Init()
 	PlayerSlot = static_cast<size_t>(-1);
 	InsideCount = 0;
 	BoardCount = 0;
-	UnitInside = NULL;
-	Container = NULL;
-	NextContained = NULL;
-	PrevContained = NULL;
-	NextWorker = NULL;
+	UnitInside = nullptr;
+	Container = nullptr;
+	NextContained = nullptr;
+	PrevContained = nullptr;
+	NextWorker = nullptr;
 
-	Resource.Workers = NULL;
+	Resource.Workers = nullptr;
 	Resource.Assigned = 0;
 	Resource.Active = 0;
 	
@@ -460,29 +460,29 @@ void CUnit::Init()
 	RallyPointMapLayer = 0;
 	//Wyrmgus end
 	Offset = 0;
-	Type = NULL;
-	Player = NULL;
-	Stats = NULL;
+	Type = nullptr;
+	Player = nullptr;
+	Stats = nullptr;
 	//Wyrmgus start
-	Character = NULL;
-	Settlement = NULL;
-	Trait = NULL;
-	Prefix = NULL;
-	Suffix = NULL;
-	Spell = NULL;
-	Work = NULL;
-	Elixir = NULL;
-	Unique = NULL;
+	Character = nullptr;
+	Settlement = nullptr;
+	Trait = nullptr;
+	Prefix = nullptr;
+	Suffix = nullptr;
+	Spell = nullptr;
+	Work = nullptr;
+	Elixir = nullptr;
+	Unique = nullptr;
 	Bound = false;
 	Identified = true;
-	ConnectingDestination = NULL;
+	ConnectingDestination = nullptr;
 	//Wyrmgus end
 	CurrentSightRange = 0;
 
 	pathFinderData = new PathFinderData;
 	pathFinderData->input.SetUnit(*this);
 
-	Colors = NULL;
+	Colors = nullptr;
 	//Wyrmgus start
 	Name.clear();
 	ExtraName.clear();
@@ -504,10 +504,10 @@ void CUnit::Init()
 	Constructed = 0;
 	Active = 0;
 	Boarded = 0;
-	RescuedFrom = NULL;
+	RescuedFrom = nullptr;
 	memset(VisCount, 0, sizeof(VisCount));
 	memset(&Seen, 0, sizeof(Seen));
-	Variable = NULL;
+	Variable = nullptr;
 	TTL = 0;
 	Threshold = 0;
 	GroupId = 0;
@@ -528,15 +528,15 @@ void CUnit::Init()
 	StepCount = 0;
 	Orders.clear();
 	delete SavedOrder;
-	SavedOrder = NULL;
+	SavedOrder = nullptr;
 	delete NewOrder;
-	NewOrder = NULL;
+	NewOrder = nullptr;
 	delete CriticalOrder;
-	CriticalOrder = NULL;
-	AutoCastSpell = NULL;
-	SpellCoolDownTimers = NULL;
+	CriticalOrder = nullptr;
+	AutoCastSpell = nullptr;
+	SpellCoolDownTimers = nullptr;
 	AutoRepair = 0;
-	Goal = NULL;
+	Goal = nullptr;
 	IndividualUpgrades.clear();
 }
 
@@ -547,7 +547,7 @@ void CUnit::Init()
 */
 void CUnit::Release(bool final)
 {
-	if (Type == NULL) {
+	if (Type == nullptr) {
 		DebugPrint("unit already free\n");
 		return;
 	}
@@ -592,23 +592,23 @@ void CUnit::Release(bool final)
 	// memory.
 	//
 
-	Type = NULL;
+	Type = nullptr;
 	//Wyrmgus start
-	Character = NULL;
+	Character = nullptr;
 	if (this->Settlement && this->Settlement->SiteUnit == this) {
-		this->Settlement->SiteUnit = NULL;
+		this->Settlement->SiteUnit = nullptr;
 	}
-	Settlement = NULL;
-	Trait = NULL;
-	Prefix = NULL;
-	Suffix = NULL;
-	Spell = NULL;
-	Work = NULL;
-	Elixir = NULL;
-	Unique = NULL;
+	Settlement = nullptr;
+	Trait = nullptr;
+	Prefix = nullptr;
+	Suffix = nullptr;
+	Spell = nullptr;
+	Work = nullptr;
+	Elixir = nullptr;
+	Unique = nullptr;
 	Bound = false;
 	Identified = true;
-	ConnectingDestination = NULL;
+	ConnectingDestination = nullptr;
 	
 	for (int i = 0; i < MaxItemSlots; ++i) {
 		EquippedItems[i].clear();
@@ -647,20 +647,20 @@ void CUnit::ChangeResourcesHeld(int quantity)
 
 void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 {
-	if (replaced_unit.Unique != NULL) {
+	if (replaced_unit.Unique != nullptr) {
 		this->SetUnique(replaced_unit.Unique);
 	} else {
-		if (replaced_unit.Prefix != NULL) {
+		if (replaced_unit.Prefix != nullptr) {
 			this->SetPrefix(replaced_unit.Prefix);
 		}
-		if (replaced_unit.Suffix != NULL) {
+		if (replaced_unit.Suffix != nullptr) {
 			this->SetSuffix(replaced_unit.Suffix);
 		}
-		if (replaced_unit.Spell != NULL) {
+		if (replaced_unit.Spell != nullptr) {
 			this->SetSpell(replaced_unit.Spell);
 		}
 	}
-	if (replaced_unit.Settlement != NULL) {
+	if (replaced_unit.Settlement != nullptr) {
 		this->Settlement = replaced_unit.Settlement;
 		if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
 			this->Settlement->SiteUnit = this;
@@ -674,7 +674,7 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	this->Variable[GIVERESOURCE_INDEX].Max = replaced_unit.Variable[GIVERESOURCE_INDEX].Max;
 	this->Variable[GIVERESOURCE_INDEX].Enable = replaced_unit.Variable[GIVERESOURCE_INDEX].Enable;
 	
-	replaced_unit.Remove(NULL); // Destroy building beneath
+	replaced_unit.Remove(nullptr); // Destroy building beneath
 	UnitLost(replaced_unit);
 	UnitClearOrders(replaced_unit);
 	replaced_unit.Release();
@@ -738,13 +738,13 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 		if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
 			std::vector<CUnitType *> potential_upgrades;
 			
-			if ((this->Player->AiEnabled || this->Character == NULL) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[Type->Slot].size() > 1) {
+			if ((this->Player->AiEnabled || this->Character == nullptr) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[Type->Slot].size() > 1) {
 				//if is a harvester who is currently gathering, try to upgrade to a unit type which is best for harvesting the current resource
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					CUnitType *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
 					if (CheckDependByType(*this, *experience_upgrade_type, true)) {
-						if (this->Character == NULL || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
+						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
 								continue;
 							}
@@ -759,10 +759,10 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 						}
 					}
 				}
-			} else if (this->Player->AiEnabled || (this->Character == NULL && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
+			} else if (this->Player->AiEnabled || (this->Character == nullptr && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					if (CheckDependByType(*this, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
-						if (this->Character == NULL || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
+						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
 							potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
 						}
 					}
@@ -781,7 +781,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 			}
 		}
 			
-		if ((this->Player->AiEnabled || this->Character == NULL) && this->Variable[LEVELUP_INDEX].Value) {
+		if ((this->Player->AiEnabled || this->Character == nullptr) && this->Variable[LEVELUP_INDEX].Value) {
 			if (((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
 				std::vector<CUpgrade *> potential_abilities;
 				for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
@@ -827,7 +827,7 @@ void CUnit::Retrain()
 	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > 1) {
 		bool found_previous_unit_type = false;
 		for (size_t i = 0; i != UnitTypes.size(); ++i) {
-			if (this->Character != NULL && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), UnitTypes[i]) != this->Character->ForbiddenUpgrades.end()) {
+			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), UnitTypes[i]) != this->Character->ForbiddenUpgrades.end()) {
 				continue;
 			}
 			if (((int) AiHelpers.ExperienceUpgrades.size()) > i) {
@@ -837,7 +837,7 @@ void CUnit::Retrain()
 						this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 						this->Variable[LEVELUP_INDEX].Enable = 1;
 						TransformUnitIntoType(*this, *UnitTypes[i]);
-						if (!IsNetworkGame() && Character != NULL) {	//save the unit-type experience upgrade for persistent characters
+						if (!IsNetworkGame() && Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
 							if (Character->Type->Slot != i) {
 								if (Player->AiEnabled == false) {
 									Character->Type = UnitTypes[i];
@@ -902,13 +902,13 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		return;
 	}
 	
-	if (this->Character != NULL) {
+	if (this->Character != nullptr) {
 		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this), this->Player->Heroes.end());
 		
 		this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 0;
 	}
 	
-	CCharacter *character = NULL;
+	CCharacter *character = nullptr;
 	if (!custom_hero) {
 		character = GetCharacter(character_full_name);
 	} else {
@@ -931,7 +931,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	this->ExtraName = this->Character->ExtraName;
 	this->FamilyName = this->Character->FamilyName;
 	
-	if (this->Character->Type != NULL) {
+	if (this->Character->Type != nullptr) {
 		if (this->Character->Type != this->Type) { //set type to that of the character
 			TransformUnitIntoType(*this, *this->Character->Type);
 		}
@@ -943,7 +943,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	}
 	
 	this->IndividualUpgrades.clear(); //reset the individual upgrades and then apply the character's
-	this->Trait = NULL;
+	this->Trait = nullptr;
 	
 	if (this->Type->Civilization != -1 && !PlayerRaces.CivilizationUpgrades[this->Type->Civilization].empty()) {
 		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Type->Civilization]);
@@ -958,13 +958,13 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 	}
 
-	if (this->Character->Trait != NULL) { //set trait
+	if (this->Character->Trait != nullptr) { //set trait
 		TraitAcquire(*this, this->Character->Trait);
 	} else if (Editor.Running == EditorNotRunning && this->Type->Traits.size() > 0) {
 		TraitAcquire(*this, this->Type->Traits[SyncRand(this->Type->Traits.size())]);
 	}
 	
-	if (this->Character->Deity != NULL && this->Character->Deity->CharacterUpgrade != NULL) {
+	if (this->Character->Deity != nullptr && this->Character->Deity->CharacterUpgrade != nullptr) {
 		IndividualUpgradeAcquire(*this, this->Character->Deity->CharacterUpgrade);
 	}
 	
@@ -1023,19 +1023,19 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	//load items
 	for (size_t i = 0; i < this->Character->Items.size(); ++i) {
 		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, &Players[PlayerNumNeutral], this->MapLayer);
-		if (this->Character->Items[i]->Prefix != NULL) {
+		if (this->Character->Items[i]->Prefix != nullptr) {
 			item->SetPrefix(this->Character->Items[i]->Prefix);
 		}
-		if (this->Character->Items[i]->Suffix != NULL) {
+		if (this->Character->Items[i]->Suffix != nullptr) {
 			item->SetSuffix(this->Character->Items[i]->Suffix);
 		}
-		if (this->Character->Items[i]->Spell != NULL) {
+		if (this->Character->Items[i]->Spell != nullptr) {
 			item->SetSpell(this->Character->Items[i]->Spell);
 		}
-		if (this->Character->Items[i]->Work != NULL) {
+		if (this->Character->Items[i]->Work != nullptr) {
 			item->SetWork(this->Character->Items[i]->Work);
 		}
-		if (this->Character->Items[i]->Elixir != NULL) {
+		if (this->Character->Items[i]->Elixir != nullptr) {
 			item->SetElixir(this->Character->Items[i]->Elixir);
 		}
 		item->Unique = this->Character->Items[i]->Unique;
@@ -1050,7 +1050,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 	}
 	
-	if (this->Character != NULL) {
+	if (this->Character != nullptr) {
 		this->Player->Heroes.push_back(this);
 	}
 
@@ -1058,7 +1058,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	
 	this->ChooseVariation(); //choose a new variation now
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		ChooseVariation(NULL, false, i);
+		ChooseVariation(nullptr, false, i);
 	}
 	this->UpdateButtonIcons();
 	this->UpdateXPRequired();
@@ -1119,13 +1119,13 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 {
 	std::string priority_variation;
 	if (image_layer == -1) {
-		if (this->Character != NULL && !this->Character->HairVariation.empty()) {
+		if (this->Character != nullptr && !this->Character->HairVariation.empty()) {
 			priority_variation = this->Character->HairVariation;
 		} else if (this->Type->VarInfo[this->Variation]) {
 			priority_variation = this->Type->VarInfo[this->Variation]->VariationId;
 		}
 	} else {
-		if (image_layer == HairImageLayer && this->Character != NULL && !this->Character->HairVariation.empty()) {
+		if (image_layer == HairImageLayer && this->Character != nullptr && !this->Character->HairVariation.empty()) {
 			priority_variation = this->Character->HairVariation;
 		} else if (this->LayerVariation[image_layer] != -1 && this->LayerVariation[image_layer] < ((int) this->Type->LayerVarInfo[image_layer].size())) {
 			priority_variation = this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->VariationId;
@@ -1133,10 +1133,10 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 	}
 	
 	std::vector<int> type_variations;
-	int variation_max = image_layer == -1 ? VariationMax : (new_type != NULL ? new_type->LayerVarInfo[image_layer].size() : this->Type->LayerVarInfo[image_layer].size());
+	int variation_max = image_layer == -1 ? VariationMax : (new_type != nullptr ? new_type->LayerVarInfo[image_layer].size() : this->Type->LayerVarInfo[image_layer].size());
 	bool found_similar = false;
 	for (int i = 0; i < variation_max; ++i) {
-		VariationInfo *varinfo = image_layer == -1 ? new_type != NULL ? new_type->VarInfo[i] : this->Type->VarInfo[i] : (new_type != NULL ? new_type->LayerVarInfo[image_layer][i] : this->Type->LayerVarInfo[image_layer][i]);
+		VariationInfo *varinfo = image_layer == -1 ? new_type != nullptr ? new_type->VarInfo[i] : this->Type->VarInfo[i] : (new_type != nullptr ? new_type->LayerVarInfo[image_layer][i] : this->Type->LayerVarInfo[image_layer][i]);
 		if (!varinfo) {
 			continue;
 		}
@@ -1246,8 +1246,8 @@ void CUnit::SetVariation(int new_variation, const CUnitType *new_type, int image
 	if (image_layer == -1) {
 		if (
 			(this->Type->VarInfo[this->Variation] && this->Type->VarInfo[this->Variation]->Animations)
-			|| (new_type == NULL && this->Type->VarInfo[new_variation] && this->Type->VarInfo[new_variation]->Animations)
-			|| (new_type != NULL && new_type->VarInfo[new_variation]->Animations)
+			|| (new_type == nullptr && this->Type->VarInfo[new_variation] && this->Type->VarInfo[new_variation]->Animations)
+			|| (new_type != nullptr && new_type->VarInfo[new_variation]->Animations)
 		) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
 			this->Frame = this->Type->StillFrame;
 		}
@@ -1272,22 +1272,22 @@ void CUnit::UpdateButtonIcons()
 void CUnit::ChooseButtonIcon(int button_action)
 {
 	if (button_action == ButtonAttack) {
-		if (this->EquippedItems[ArrowsItemSlot].size() > 0 && this->EquippedItems[ArrowsItemSlot][0]->GetIcon().Icon != NULL) {
+		if (this->EquippedItems[ArrowsItemSlot].size() > 0 && this->EquippedItems[ArrowsItemSlot][0]->GetIcon().Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->EquippedItems[ArrowsItemSlot][0]->GetIcon().Icon;
 			return;
 		}
 		
-		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon != NULL) {
+		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon;
 			return;
 		}
 	} else if (button_action == ButtonStop) {
-		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->Type->ItemClass == ShieldItemClass && this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon != NULL) {
+		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->Type->ItemClass == ShieldItemClass && this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon;
 			return;
 		}
 	} else if (button_action == ButtonMove) {
-		if (this->EquippedItems[BootsItemSlot].size() > 0 && this->EquippedItems[BootsItemSlot][0]->GetIcon().Icon != NULL) {
+		if (this->EquippedItems[BootsItemSlot].size() > 0 && this->EquippedItems[BootsItemSlot][0]->GetIcon().Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->EquippedItems[BootsItemSlot][0]->GetIcon().Icon;
 			return;
 		}
@@ -1328,7 +1328,7 @@ void CUnit::ChooseButtonIcon(int button_action)
 					|| (button_action == ButtonStop && AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Shield)
 					|| (button_action == ButtonMove && AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Boots)
 				)
-				&& AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->Icon.Icon != NULL
+				&& AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->Icon.Icon != nullptr
 			) {
 				this->ButtonIcons[button_action] = AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->Icon.Icon;
 				return;
@@ -1340,22 +1340,22 @@ void CUnit::ChooseButtonIcon(int button_action)
 	}
 	
 	if (button_action == ButtonAttack) {
-		if (this->Type->DefaultEquipment.find(ArrowsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->Icon.Icon != NULL) {
+		if (this->Type->DefaultEquipment.find(ArrowsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->Icon.Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->Icon.Icon;
 			return;
 		}
 		
-		if (this->Type->DefaultEquipment.find(WeaponItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(WeaponItemSlot)->second->Icon.Icon != NULL) {
+		if (this->Type->DefaultEquipment.find(WeaponItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(WeaponItemSlot)->second->Icon.Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(WeaponItemSlot)->second->Icon.Icon;
 			return;
 		}
 	} else if (button_action == ButtonStop) {
-		if (this->Type->DefaultEquipment.find(ShieldItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->ItemClass == ShieldItemClass && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon != NULL) {
+		if (this->Type->DefaultEquipment.find(ShieldItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->ItemClass == ShieldItemClass && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon;
 			return;
 		}
 	} else if (button_action == ButtonMove) {
-		if (this->Type->DefaultEquipment.find(BootsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(BootsItemSlot)->second->Icon.Icon != NULL) {
+		if (this->Type->DefaultEquipment.find(BootsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(BootsItemSlot)->second->Icon.Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(BootsItemSlot)->second->Icon.Icon;
 			return;
 		}
@@ -1472,7 +1472,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	}
 
 	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
-		if (Character->GetItem(item) != NULL) {
+		if (Character->GetItem(item) != nullptr) {
 			if (!Character->IsItemEquipped(Character->GetItem(item))) {
 				Character->EquippedItems[item_slot].push_back(Character->GetItem(item));
 				SaveHero(Character);
@@ -1496,7 +1496,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
 		if (std::find(varinfo->ItemClassesNotEquipped.begin(), varinfo->ItemClassesNotEquipped.end(), item.Type->ItemClass) != varinfo->ItemClassesNotEquipped.end() || std::find(varinfo->ItemsNotEquipped.begin(), varinfo->ItemsNotEquipped.end(), item.Type) != varinfo->ItemsNotEquipped.end()) {
-			ChooseVariation(NULL, false, i);
+			ChooseVariation(nullptr, false, i);
 		}
 	}
 	
@@ -1590,7 +1590,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	}
 	
 	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
-		if (Character->GetItem(item) != NULL) {
+		if (Character->GetItem(item) != nullptr) {
 			if (Character->IsItemEquipped(Character->GetItem(item))) {
 				Character->EquippedItems[item_slot].erase(std::remove(Character->EquippedItems[item_slot].begin(), Character->EquippedItems[item_slot].end(), Character->GetItem(item)), Character->EquippedItems[item_slot].end());
 				SaveHero(Character);
@@ -1667,7 +1667,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		}
 		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
 		if (std::find(varinfo->ItemClassesEquipped.begin(), varinfo->ItemClassesEquipped.end(), item.Type->ItemClass) != varinfo->ItemClassesEquipped.end() || std::find(varinfo->ItemsEquipped.begin(), varinfo->ItemsEquipped.end(), item.Type) != varinfo->ItemsEquipped.end()) {
-			ChooseVariation(NULL, false, i);
+			ChooseVariation(nullptr, false, i);
 		}
 	}
 	
@@ -1771,19 +1771,19 @@ void CUnit::ApplyAuraEffect(int aura_index)
 
 void CUnit::SetPrefix(CUpgrade *prefix)
 {
-	if (Prefix != NULL) {
+	if (Prefix != nullptr) {
 		for (size_t z = 0; z < Prefix->UpgradeModifiers.size(); ++z) {
 			RemoveIndividualUpgradeModifier(*this, Prefix->UpgradeModifiers[z]);
 		}
 		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->MagicLevel;
 	}
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Prefix = prefix;
 		SaveHero(Container->Character);
 	}
 	Prefix = prefix;
-	if (Prefix != NULL) {
+	if (Prefix != nullptr) {
 		for (size_t z = 0; z < Prefix->UpgradeModifiers.size(); ++z) {
 			ApplyIndividualUpgradeModifier(*this, Prefix->UpgradeModifiers[z]);
 		}
@@ -1796,19 +1796,19 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 
 void CUnit::SetSuffix(CUpgrade *suffix)
 {
-	if (Suffix != NULL) {
+	if (Suffix != nullptr) {
 		for (size_t z = 0; z < Suffix->UpgradeModifiers.size(); ++z) {
 			RemoveIndividualUpgradeModifier(*this, Suffix->UpgradeModifiers[z]);
 		}
 		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->MagicLevel;
 	}
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Suffix = suffix;
 		SaveHero(Container->Character);
 	}
 	Suffix = suffix;
-	if (Suffix != NULL) {
+	if (Suffix != nullptr) {
 		for (size_t z = 0; z < Suffix->UpgradeModifiers.size(); ++z) {
 			ApplyIndividualUpgradeModifier(*this, Suffix->UpgradeModifiers[z]);
 		}
@@ -1821,7 +1821,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 
 void CUnit::SetSpell(SpellType *spell)
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Spell = spell;
 		SaveHero(Container->Character);
 	}
@@ -1832,19 +1832,19 @@ void CUnit::SetSpell(SpellType *spell)
 
 void CUnit::SetWork(CUpgrade *work)
 {
-	if (this->Work != NULL) {
+	if (this->Work != nullptr) {
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Work->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->MagicLevel;
 	}
 	
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Work = work;
 		SaveHero(Container->Character);
 	}
 	
 	Work = work;
 	
-	if (this->Work != NULL) {
+	if (this->Work != nullptr) {
 		this->Variable[MAGICLEVEL_INDEX].Value += this->Work->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max += this->Work->MagicLevel;
 	}
@@ -1854,19 +1854,19 @@ void CUnit::SetWork(CUpgrade *work)
 
 void CUnit::SetElixir(CUpgrade *elixir)
 {
-	if (this->Elixir != NULL) {
+	if (this->Elixir != nullptr) {
 		this->Variable[MAGICLEVEL_INDEX].Value -= this->Elixir->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->MagicLevel;
 	}
 	
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Elixir = elixir;
 		SaveHero(Container->Character);
 	}
 	
 	Elixir = elixir;
 	
-	if (this->Elixir != NULL) {
+	if (this->Elixir != nullptr) {
 		this->Variable[MAGICLEVEL_INDEX].Value += this->Elixir->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max += this->Elixir->MagicLevel;
 	}
@@ -1881,7 +1881,7 @@ void CUnit::SetUnique(CUniqueItem *unique)
 		this->Variable[MAGICLEVEL_INDEX].Max -= this->Unique->Set->MagicLevel;
 	}
 		
-	if (unique != NULL) {
+	if (unique != nullptr) {
 		SetPrefix(unique->Prefix);
 		SetSuffix(unique->Suffix);
 		SetSpell(unique->Spell);
@@ -1901,25 +1901,25 @@ void CUnit::SetUnique(CUniqueItem *unique)
 		Unique = unique;
 	} else {
 		Name.clear();
-		Unique = NULL;
-		SetPrefix(NULL);
-		SetSuffix(NULL);
-		SetSpell(NULL);
-		SetWork(NULL);
-		SetElixir(NULL);
+		Unique = nullptr;
+		SetPrefix(nullptr);
+		SetSuffix(nullptr);
+		SetSpell(nullptr);
+		SetWork(nullptr);
+		SetElixir(nullptr);
 	}
 }
 
 void CUnit::Identify()
 {
-	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Identified != true) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Identified != true) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Identified = true;
 		SaveHero(Container->Character);
 	}
 	
 	this->Identified = true;
 	
-	if (this->Container != NULL && this->Container->Player == ThisPlayer) {
+	if (this->Container != nullptr && this->Container->Player == ThisPlayer) {
 		this->Container->Player->Notify(NotifyGreen, this->Container->tilePos, this->Container->MapLayer, _("%s has identified the %s!"), this->Container->GetMessageName().c_str(), this->GetMessageName().c_str());
 	}
 }
@@ -1988,23 +1988,23 @@ void CUnit::UpdateItemName()
 	}
 	
 	Name.clear();
-	if (Prefix == NULL && Spell == NULL && Work == NULL && Suffix == NULL) { //elixirs use the name of their unit type
+	if (Prefix == nullptr && Spell == nullptr && Work == nullptr && Suffix == nullptr) { //elixirs use the name of their unit type
 		return;
 	}
 	
-	if (Prefix != NULL) {
+	if (Prefix != nullptr) {
 		Name += _(Prefix->Name.c_str());
 		Name += " ";
 	}
-	if (Work != NULL) {
+	if (Work != nullptr) {
 		Name += _(Work->Name.c_str());
 	} else {
 		Name += GetTypeName();
 	}
-	if (Suffix != NULL) {
+	if (Suffix != nullptr) {
 		Name += " ";
 		Name += _(Suffix->Name.c_str());
-	} else if (Spell != NULL) {
+	} else if (Spell != nullptr) {
 		Name += " ";
 		Name += _("of");
 		Name += " ";
@@ -2028,8 +2028,8 @@ void CUnit::GenerateDrop()
 	Vec2i drop_pos = this->tilePos;
 	drop_pos.x += SyncRand(this->Type->TileSize.x);
 	drop_pos.y += SyncRand(this->Type->TileSize.y);
-	CUnit *droppedUnit = NULL;
-	CUnitType *chosen_drop = NULL;
+	CUnit *droppedUnit = nullptr;
+	CUnitType *chosen_drop = nullptr;
 	std::vector<CUnitType *> potential_drops;
 	for (size_t i = 0; i < this->Type->Drops.size(); ++i) {
 		if (CheckDependByType(*this->Player, *this->Type->Drops[i])) {
@@ -2054,8 +2054,8 @@ void CUnit::GenerateDrop()
 		chosen_drop = potential_drops[SyncRand(potential_drops.size())];
 	}
 		
-	if (chosen_drop != NULL) {
-		CBuildRestrictionOnTop *ontop_b = OnTopDetails(*this->Type, NULL);
+	if (chosen_drop != nullptr) {
+		CBuildRestrictionOnTop *ontop_b = OnTopDetails(*this->Type, nullptr);
 		if (((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos, this->MapLayer)->Flags & MapFieldItem)) || (ontop_b && ontop_b->ReplaceOnDie)) { //if the dropped unit is an item (and there's already another item there), or if this building is an ontop one (meaning another will appear under it after it is destroyed), search for another spot
 			Vec2i resPos;
 			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer);
@@ -2064,16 +2064,16 @@ void CUnit::GenerateDrop()
 			droppedUnit = MakeUnitAndPlace(drop_pos, *chosen_drop, &Players[PlayerNumNeutral], this->MapLayer);
 		}
 			
-		if (droppedUnit != NULL) {
+		if (droppedUnit != nullptr) {
 			if (droppedUnit->Type->BoolFlag[FAUNA_INDEX].value) {
-				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(NULL, droppedUnit->Variable[GENDER_INDEX].Value);
+				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(nullptr, droppedUnit->Variable[GENDER_INDEX].Value);
 			}
 			
 			droppedUnit->GenerateSpecialProperties(this, this->Player);
 			
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 				int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
-				if (droppedUnit->Prefix != NULL || droppedUnit->Suffix != NULL || droppedUnit->Spell != NULL || droppedUnit->Work != NULL || droppedUnit->Elixir != NULL) {
+				if (droppedUnit->Prefix != nullptr || droppedUnit->Suffix != nullptr || droppedUnit->Spell != nullptr || droppedUnit->Work != nullptr || droppedUnit->Elixir != nullptr) {
 					ttl_cycles *= 4;
 				}
 				droppedUnit->TTL = GameCycle + ttl_cycles;
@@ -2086,7 +2086,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 {
 	int magic_affix_chance = 10; //10% chance of the unit having a magic prefix or suffix
 	int unique_chance = 5; //0.5% chance of the unit being unique
-	if (dropper != NULL) {
+	if (dropper != nullptr) {
 		if (dropper->Character) { //if the dropper is a character, multiply the chances of the item being magic or unique by the character's level
 			magic_affix_chance *= dropper->Character->Level;
 			unique_chance *= dropper->Character->Level;
@@ -2095,10 +2095,10 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 			if (dropper->Unique) {
 				chance_multiplier += 8;
 			} else {
-				if (dropper->Prefix != NULL) {
+				if (dropper->Prefix != nullptr) {
 					chance_multiplier += 1;
 				}
-				if (dropper->Suffix != NULL) {
+				if (dropper->Suffix != nullptr) {
 					chance_multiplier += 1;
 				}
 			}
@@ -2121,19 +2121,19 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
 		this->GenerateSuffix(dropper, dropper_player);
 	}
-	if (this->Prefix == NULL && this->Suffix == NULL && this->Work == NULL && this->Elixir == NULL && SyncRand(100) >= (100 - magic_affix_chance)) {
+	if (this->Prefix == nullptr && this->Suffix == nullptr && this->Work == nullptr && this->Elixir == nullptr && SyncRand(100) >= (100 - magic_affix_chance)) {
 		this->GenerateSpell(dropper, dropper_player);
 	}
 	if (allow_unique && SyncRand(1000) >= (1000 - unique_chance)) {
 		this->GenerateUnique(dropper, dropper_player);
 	}
 	
-	if (this->Type->BoolFlag[ITEM_INDEX].value && (this->Prefix != NULL || this->Suffix != NULL)) {
+	if (this->Type->BoolFlag[ITEM_INDEX].value && (this->Prefix != nullptr || this->Suffix != nullptr)) {
 		this->Identified = false;
 	}
 	
 	if (
-		this->Prefix == NULL && this->Suffix == NULL && this->Spell == NULL && this->Work == NULL && this->Elixir == NULL
+		this->Prefix == nullptr && this->Suffix == nullptr && this->Spell == nullptr && this->Work == nullptr && this->Elixir == nullptr
 		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == BookItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass || this->Type->ItemClass == HornItemClass || always_magic)
 	) { //scrolls, books, jewelry and horns must always have a property
 		this->GenerateSpecialProperties(dropper, dropper_player, allow_unique, sold_item, always_magic);
@@ -2148,7 +2148,7 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 			potential_prefixes.push_back(this->Type->Affixes[i]);
 		}
 	}
-	if (dropper_player != NULL) {
+	if (dropper_player != nullptr) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependByIdent(*dropper_player, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
 				potential_prefixes.push_back(AllUpgrades[i]);
@@ -2166,15 +2166,15 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 	std::vector<CUpgrade *> potential_suffixes;
 	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
 		if ((this->Type->ItemClass == -1 && this->Type->Affixes[i]->MagicSuffix) || (this->Type->ItemClass != -1 && this->Type->Affixes[i]->ItemSuffix[Type->ItemClass])) {
-			if (Prefix == NULL || !this->Type->Affixes[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+			if (Prefix == nullptr || !this->Type->Affixes[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 				potential_suffixes.push_back(this->Type->Affixes[i]);
 			}
 		}
 	}
-	if (dropper_player != NULL) {
+	if (dropper_player != nullptr) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependByIdent(*dropper_player, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
-				if (Prefix == NULL || !AllUpgrades[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+				if (Prefix == nullptr || !AllUpgrades[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 					potential_suffixes.push_back(AllUpgrades[i]);
 				}
 			}
@@ -2189,7 +2189,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<SpellType *> potential_spells;
-	if (dropper != NULL) {
+	if (dropper != nullptr) {
 		for (size_t i = 0; i < dropper->Type->DropSpells.size(); ++i) {
 			if (this->Type->ItemClass != -1 && dropper->Type->DropSpells[i]->ItemSpell[Type->ItemClass]) {
 				potential_spells.push_back(dropper->Type->DropSpells[i]);
@@ -2210,7 +2210,7 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 			potential_works.push_back(this->Type->Affixes[i]);
 		}
 	}
-	if (dropper_player != NULL) {
+	if (dropper_player != nullptr) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependByIdent(*dropper_player, DependRuleUpgrade, AllUpgrades[i]->Ident) && !AllUpgrades[i]->UniqueOnly) {
 				potential_works.push_back(AllUpgrades[i]);
@@ -2230,32 +2230,32 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 		if (
 			Type == UniqueItems[i]->Type
 			&& ( //the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Prefix == NULL
-				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Prefix->Ident))
+				UniqueItems[i]->Prefix == nullptr
+				|| (dropper_player != nullptr && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Prefix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Prefix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Suffix == NULL
-				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Suffix->Ident))
+				UniqueItems[i]->Suffix == nullptr
+				|| (dropper_player != nullptr && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Suffix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's set to drop the item
-				UniqueItems[i]->Set == NULL
-				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Set->Ident))
+				UniqueItems[i]->Set == nullptr
+				|| (dropper_player != nullptr && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Set->Ident))
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's spell to drop the item
-				UniqueItems[i]->Spell == NULL
-				|| (dropper != NULL && std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), UniqueItems[i]->Spell) != dropper->Type->DropSpells.end())
+				UniqueItems[i]->Spell == nullptr
+				|| (dropper != nullptr && std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), UniqueItems[i]->Spell) != dropper->Type->DropSpells.end())
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Work == NULL
+				UniqueItems[i]->Work == nullptr
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
-				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Work->Ident))
+				|| (dropper_player != nullptr && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Work->Ident))
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit must be capable of generating it on its own
-				UniqueItems[i]->Elixir == NULL
+				UniqueItems[i]->Elixir == nullptr
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Elixir) != this->Type->Affixes.end()
-				|| (dropper_player != NULL && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Elixir->Ident))
+				|| (dropper_player != nullptr && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Elixir->Ident))
 			)
 			&& UniqueItems[i]->CanDrop()
 		) {
@@ -2289,7 +2289,7 @@ void CUnit::UpdateSoldUnits()
 			civilization_id = this->Player->Race;
 		}
 		
-		if (CurrentQuest == NULL) {
+		if (CurrentQuest == nullptr) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 				if (this->Player->CanRecruitHero(iterator->second)) {
 					potential_heroes.push_back(iterator->second);
@@ -2324,7 +2324,7 @@ void CUnit::UpdateSoldUnits()
 	}
 	
 	for (int i = 0; i < sold_unit_max; ++i) {
-		CUnit *new_unit = NULL;
+		CUnit *new_unit = nullptr;
 		if (!potential_heroes.empty()) {
 			CCharacter *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_hero->Type, &Players[PlayerNumNeutral], this->MapLayer);
@@ -2459,7 +2459,7 @@ void CUnit::Scout()
 		for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
 			CUnit *connector = *it;
 
-			if (connector->ConnectingDestination != NULL && this->CanUseItem(connector)) {
+			if (connector->ConnectingDestination != nullptr && this->CanUseItem(connector)) {
 				CommandUse(*this, *connector, FlushCommands);
 				found_connector = true;
 				break;
@@ -2541,7 +2541,7 @@ void CUnit::Init(const CUnitType &type)
 		Variable = new CVariable[size];
 		std::copy(type.MapDefaultStat.Variables, type.MapDefaultStat.Variables + size, Variable);
 	} else {
-		Variable = NULL;
+		Variable = nullptr;
 	}
 
 	IndividualUpgrades.clear();
@@ -2590,12 +2590,12 @@ void CUnit::Init(const CUnitType &type)
 
 	Orders.push_back(COrder::NewActionStill());
 
-	Assert(NewOrder == NULL);
-	NewOrder = NULL;
-	Assert(SavedOrder == NULL);
-	SavedOrder = NULL;
-	Assert(CriticalOrder == NULL);
-	CriticalOrder = NULL;
+	Assert(NewOrder == nullptr);
+	NewOrder = nullptr;
+	Assert(SavedOrder == nullptr);
+	SavedOrder = nullptr;
+	Assert(CriticalOrder == nullptr);
+	CriticalOrder = nullptr;
 }
 
 /**
@@ -2607,13 +2607,13 @@ bool CUnit::RestoreOrder()
 {
 	COrder *savedOrder = this->SavedOrder;
 
-	if (savedOrder == NULL) {
+	if (savedOrder == nullptr) {
 		return false;
 	}
 
 	if (savedOrder->IsValid() == false) {
 		delete savedOrder;
-		this->SavedOrder = NULL;
+		this->SavedOrder = nullptr;
 		return false;
 	}
 
@@ -2624,7 +2624,7 @@ bool CUnit::RestoreOrder()
 	//copy
 	this->Orders.insert(this->Orders.begin() + 1, savedOrder);
 
-	this->SavedOrder = NULL;
+	this->SavedOrder = nullptr;
 	return true;
 }
 
@@ -2640,7 +2640,7 @@ bool CUnit::CanStoreOrder(COrder *order)
 	if ((order && order->Finished == true) || order->IsValid() == false) {
 		return false;
 	}
-	if (this->SavedOrder != NULL) {
+	if (this->SavedOrder != nullptr) {
 		return false;
 	}
 	return true;
@@ -2732,7 +2732,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		}
 		
 		//generate a personal name for the unit, if applicable
-		if (this->Character == NULL) {
+		if (this->Character == nullptr) {
 			this->UpdatePersonalName();
 		}
 		
@@ -2752,8 +2752,8 @@ void CUnit::AssignToPlayer(CPlayer &player)
 CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 {
 	CUnit *unit = UnitManager.AllocUnit();
-	if (unit == NULL) {
-		return NULL;
+	if (unit == nullptr) {
+		return nullptr;
 	}
 	unit->Init(type);
 	// Only Assign if a Player was specified
@@ -2761,9 +2761,9 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		unit->AssignToPlayer(*player);
 
 		//Wyrmgus start
-		unit->ChooseVariation(NULL, true);
+		unit->ChooseVariation(nullptr, true);
 		for (int i = 0; i < MaxImageLayers; ++i) {
-			unit->ChooseVariation(NULL, true, i);
+			unit->ChooseVariation(nullptr, true, i);
 		}
 		unit->UpdateButtonIcons();
 		unit->UpdateXPRequired();
@@ -3122,7 +3122,7 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 */
 void CUnit::AddInContainer(CUnit &host)
 {
-	Assert(Container == NULL);
+	Assert(Container == nullptr);
 	Container = &host;
 	if (host.InsideCount == 0) {
 		NextContained = PrevContained = this;
@@ -3156,13 +3156,13 @@ static void RemoveUnitFromContainer(CUnit &unit)
 	unit.NextContained->PrevContained = unit.PrevContained;
 	unit.PrevContained->NextContained = unit.NextContained;
 	if (host->InsideCount == 0) {
-		host->UnitInside = NULL;
+		host->UnitInside = nullptr;
 	} else {
 		if (host->UnitInside == &unit) {
 			host->UnitInside = unit.NextContained;
 		}
 	}
-	unit.Container = NULL;
+	unit.Container = nullptr;
 	//Wyrmgus start
 	//reset host attack range
 	host->UpdateContainerAttackRange();
@@ -3208,7 +3208,7 @@ void CUnit::UpdateXPRequired()
 
 void CUnit::UpdatePersonalName(bool update_settlement_name)
 {
-	if (this->Character != NULL) {
+	if (this->Character != nullptr) {
 		return;
 	} else if (this->Type->BoolFlag[ITEM_INDEX].value || this->Unique || this->Prefix || this->Suffix) {
 		this->UpdateItemName();
@@ -3217,7 +3217,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	
 	int civilization_id = this->Type->Civilization;
 	
-	CFaction *faction = NULL;
+	CFaction *faction = nullptr;
 	if (this->Player->Faction != -1) {
 		faction = PlayerRaces.Factions[this->Player->Faction];
 		
@@ -3229,7 +3229,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization_id);
 	
 	if (this->Name.empty()) { //this is the first time the unit receives a name
-		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
+		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != nullptr && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
 			this->ExtraName = this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
 		}
 	}
@@ -3251,11 +3251,11 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 
 void CUnit::UpdateExtraName()
 {
-	if (this->Character != NULL || !this->Type->BoolFlag[ORGANIC_INDEX].value || this->Type->BoolFlag[FAUNA_INDEX].value) {
+	if (this->Character != nullptr || !this->Type->BoolFlag[ORGANIC_INDEX].value || this->Type->BoolFlag[FAUNA_INDEX].value) {
 		return;
 	}
 	
-	if (this->Trait == NULL) {
+	if (this->Trait == nullptr) {
 		return;
 	}
 	
@@ -3362,7 +3362,7 @@ void CUnit::XPChanged()
 		this->IncreaseLevel(1);
 	}
 	
-	if (!IsNetworkGame() && this->Character != NULL && this->Player->AiEnabled == false) {
+	if (!IsNetworkGame() && this->Character != nullptr && this->Player->AiEnabled == false) {
 		this->Character->ExperiencePercent = (this->Variable[XP_INDEX].Value * 100) / this->Variable[XPREQUIRED_INDEX].Value;
 		SaveHero(this->Character);
 	}
@@ -3447,7 +3447,7 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 		const CUnitCache &cache = Map.Field(pos, z)->UnitCache;
 		for (size_t i = 0; i != cache.size(); ++i) {
 			if (!cache[i]) {
-				fprintf(stderr, "Error in CUnit::MoveToXY (pos %d, %d): a unit in the tile's unit cache is NULL.\n", pos.x, pos.y);
+				fprintf(stderr, "Error in CUnit::MoveToXY (pos %d, %d): a unit in the tile's unit cache is null.\n", pos.x, pos.y);
 			}
 			CUnit &unit = *cache[i];
 			if (unit.IsAliveOnMap() && unit.Type->BoolFlag[TRAP_INDEX].value) {
@@ -3557,11 +3557,8 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player
 {
 	CUnit *unit = MakeUnit(type, player);
 
-	if (unit != NULL) {
-		//Wyrmgus start
-//		unit->Place(pos);
+	if (unit != nullptr) {
 		unit->Place(pos, z);
-		//Wyrmgus end
 	}
 	return unit;
 }
@@ -3580,13 +3577,13 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 {
 	CUnit *unit = MakeUnit(type, player);
 
-	if (unit != NULL) {
+	if (unit != nullptr) {
 		Vec2i res_pos;
 		const int heading = SyncRand() % 256;
 		FindNearestDrop(type, pos, res_pos, heading, z, no_bordering_building);
 		
 		if (type.BoolFlag[BUILDING_INDEX].value) {
-			CBuildRestrictionOnTop *b = OnTopDetails(type, NULL);
+			CBuildRestrictionOnTop *b = OnTopDetails(type, nullptr);
 			if (b && b->ReplaceOnBuild) {
 				CUnitCache &unitCache = Map.Field(res_pos, z)->UnitCache;
 				CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));
@@ -3607,10 +3604,10 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z, bool allow_unique)
 {
 	CUnit *unit = CreateUnit(pos, type, &Players[PlayerNumNeutral], z, true);
-	unit->GenerateSpecialProperties(NULL, NULL, allow_unique);
+	unit->GenerateSpecialProperties(nullptr, nullptr, allow_unique);
 			
 	// create metal rocks near metal resources
-	CUnitType *metal_rock_type = NULL;
+	CUnitType *metal_rock_type = nullptr;
 	if (type.Ident == "unit-gold-deposit") {
 		metal_rock_type = UnitTypeByIdent("unit-gold-rock");
 	} else if (type.Ident == "unit-silver-deposit") {
@@ -3667,8 +3664,8 @@ startw:
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3680,8 +3677,8 @@ starts:
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3693,8 +3690,8 @@ starte:
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3706,8 +3703,8 @@ startn:
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
 			if (
-				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL) && !ignore_construction_requirements))
-				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(NULL, type, pos, z, no_bordering_building) != NULL)
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, nullptr) && !ignore_construction_requirements))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || ignore_construction_requirements || CanBuildHere(nullptr, type, pos, z, no_bordering_building) != nullptr)
 			) {
 			//Wyrmgus end
 				goto found;
@@ -3776,7 +3773,7 @@ void CUnit::Remove(CUnit *host)
 
 	// Unit is seen as under cursor
 	if (UnitUnderCursor == this) {
-		UnitUnderCursor = NULL;
+		UnitUnderCursor = nullptr;
 	}
 }
 
@@ -3919,10 +3916,10 @@ void UnitLost(CUnit &unit)
 
 	// Destroy resource-platform, must re-make resource patch.
 	//Wyrmgus start
-//	CBuildRestrictionOnTop *b = OnTopDetails(unit, NULL);
-	CBuildRestrictionOnTop *b = OnTopDetails(*unit.Type, NULL);
+//	CBuildRestrictionOnTop *b = OnTopDetails(unit, nullptr);
+	CBuildRestrictionOnTop *b = OnTopDetails(*unit.Type, nullptr);
 	//Wyrmgus end
-	if (b != NULL) {
+	if (b != nullptr) {
 		//Wyrmgus start
 //		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 		if (b->ReplaceOnDie && (!type.GivesResource || unit.ResourcesHeld != 0)) {
@@ -3931,7 +3928,7 @@ void UnitLost(CUnit &unit)
 //			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
 			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral], unit.MapLayer);
 			//Wyrmgus end
-			if (temp == NULL) {
+			if (temp == nullptr) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
 				//Wyrmgus start
@@ -3941,20 +3938,20 @@ void UnitLost(CUnit &unit)
 //				temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
 				//Wyrmgus end
 				//Wyrmgus start
-				if (unit.Unique != NULL) {
+				if (unit.Unique != nullptr) {
 					temp->SetUnique(unit.Unique);
 				} else {
-					if (unit.Prefix != NULL) {
+					if (unit.Prefix != nullptr) {
 						temp->SetPrefix(unit.Prefix);
 					}
-					if (unit.Suffix != NULL) {
+					if (unit.Suffix != nullptr) {
 						temp->SetSuffix(unit.Suffix);
 					}
-					if (unit.Spell != NULL) {
+					if (unit.Spell != nullptr) {
 						temp->SetSpell(unit.Spell);
 					}
 				}
-				if (unit.Settlement != NULL) {
+				if (unit.Settlement != nullptr) {
 					if (unit.Type->BoolFlag[TOWNHALL_INDEX].value) {
 						temp->Settlement = unit.Settlement;
 						temp->Settlement->SiteUnit = temp;
@@ -3972,7 +3969,7 @@ void UnitLost(CUnit &unit)
 			}
 		//Wyrmgus start
 		} else if (unit.Settlement && unit.Settlement->SiteUnit == &unit) {
-			unit.Settlement->SiteUnit = NULL;
+			unit.Settlement->SiteUnit = nullptr;
 		//Wyrmgus end
 		}
 	}
@@ -4123,7 +4120,7 @@ void CorrectWallDirections(CUnit &unit)
 			//Wyrmgus end
 			const CUnit *neighbor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
-			if (neighbor != NULL) {
+			if (neighbor != nullptr) {
 				flags |= dirFlag;
 			}
 		}
@@ -4157,7 +4154,7 @@ void CorrectWallNeighBours(CUnit &unit)
 		//Wyrmgus end
 		CUnit *neighbor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
-		if (neighbor != NULL) {
+		if (neighbor != nullptr) {
 			CorrectWallDirections(*neighbor);
 			UnitUpdateHeading(*neighbor);
 		}
@@ -4581,7 +4578,7 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 	if (IsMineAssignedBy(mine, *this) == true) {
 		return;
 	}
-	Assert(this->NextWorker == NULL);
+	Assert(this->NextWorker == nullptr);
 
 	CUnit *head = mine.Resource.Workers;
 #if 0
@@ -4602,7 +4599,7 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 	if (IsMineAssignedBy(mine, *this) == false) {
 		return ;
 	}
-	CUnit *prev = NULL, *worker = mine.Resource.Workers;
+	CUnit *prev = nullptr, *worker = mine.Resource.Workers;
 #if 0
 	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
 			   _C_ this->Player->Index _C_ this->Slot
@@ -4610,10 +4607,10 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 			   _C_ mine.Slot
 			   _C_ mine.CurrentOrder()->Data.Resource.Assigned);
 #endif
-	for (int i = 0; NULL != worker; worker = worker->NextWorker, ++i) {
+	for (int i = 0; nullptr != worker; worker = worker->NextWorker, ++i) {
 		if (worker == this) {
 			CUnit *next = worker->NextWorker;
-			worker->NextWorker = NULL;
+			worker->NextWorker = nullptr;
 			if (prev) {
 				prev->NextWorker = next;
 			}
@@ -5082,7 +5079,7 @@ void DropOutAll(const CUnit &source)
 	//Wyrmgus start
 	if (unit->Type->BoolFlag[ITEM_INDEX].value && !unit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
-		if (unit->Prefix != NULL || unit->Suffix != NULL || unit->Spell != NULL || unit->Work != NULL || unit->Elixir != NULL) {
+		if (unit->Prefix != nullptr || unit->Suffix != nullptr || unit->Spell != nullptr || unit->Work != nullptr || unit->Elixir != nullptr) {
 			ttl_cycles *= 4;
 		}
 		unit->TTL = GameCycle + ttl_cycles;
@@ -5111,7 +5108,7 @@ void DropOutAll(const CUnit &source)
 */
 CUnit *UnitOnScreen(int x, int y)
 {
-	CUnit *candidate = NULL;
+	CUnit *candidate = nullptr;
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
 		//Wyrmgus start
@@ -5233,7 +5230,7 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	
 	if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-			if (this->Character == NULL || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
+			if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
 				int local_upgrade_value = 1;
 				
 				if (!only_units) {
@@ -5330,12 +5327,12 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 	}
 	
 	int item_slot = GetItemClassSlot(item->Type->ItemClass);
-	if (item->Work == NULL && item->Elixir == NULL && (item_slot == -1 || this->GetItemSlotQuantity(item_slot) == 0 || !this->CanEquipItemClass(item->Type->ItemClass))) {
+	if (item->Work == nullptr && item->Elixir == nullptr && (item_slot == -1 || this->GetItemSlotQuantity(item_slot) == 0 || !this->CanEquipItemClass(item->Type->ItemClass))) {
 		return 0;
 	}
 	
 	int value = 0;
-	if (item->Work != NULL) {
+	if (item->Work != nullptr) {
 		if (this->GetIndividualUpgrade(item->Work) == 0) {
 			for (size_t z = 0; z < item->Work->UpgradeModifiers.size(); ++z) {
 				if (!increase) {
@@ -5345,7 +5342,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 				}
 			}
 		}
-	} else if (item->Elixir != NULL) {
+	} else if (item->Elixir != nullptr) {
 		if (this->GetIndividualUpgrade(item->Elixir) == 0) {
 			for (size_t z = 0; z < item->Elixir->UpgradeModifiers.size(); ++z) {
 				if (!increase) {
@@ -5365,8 +5362,8 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 		if (!item->Identified) { //if the item is unidentified, don't show the effects of its affixes
 			for (int z = 0; z < NumUpgradeModifiers; ++z) {
 				if (
-					(item->Prefix != NULL && UpgradeModifiers[z]->UpgradeId == item->Prefix->ID)
-					|| (item->Suffix != NULL && UpgradeModifiers[z]->UpgradeId == item->Suffix->ID)
+					(item->Prefix != nullptr && UpgradeModifiers[z]->UpgradeId == item->Prefix->ID)
+					|| (item->Suffix != nullptr && UpgradeModifiers[z]->UpgradeId == item->Suffix->ID)
 				) {
 					if (!increase) {
 						value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
@@ -5481,23 +5478,23 @@ int CUnit::GetPrice() const
 {
 	int cost = this->Type->Stats[this->Player->Index].GetPrice();
 	
-	if (this->Prefix != NULL) {
+	if (this->Prefix != nullptr) {
 		cost += this->Prefix->MagicLevel * 1000;
 	}
-	if (this->Suffix != NULL) {
+	if (this->Suffix != nullptr) {
 		cost += this->Suffix->MagicLevel * 1000;
 	}
-	if (this->Spell != NULL) {
+	if (this->Spell != nullptr) {
 		cost += 1000;
 	}
-	if (this->Work != NULL) {
+	if (this->Work != nullptr) {
 		if (this->Type->ItemClass == BookItemClass) {
 			cost += 5000;
 		} else {
 			cost += 1000;
 		}
 	}
-	if (this->Elixir != NULL) {
+	if (this->Elixir != nullptr) {
 		cost += this->Elixir->MagicLevel * 1000;
 	}
 	if (this->Character) {
@@ -5896,7 +5893,7 @@ bool CUnit::CanEquipItemClass(int item_class) const
 
 bool CUnit::CanUseItem(CUnit *item) const
 {
-	if (item->ConnectingDestination != NULL) {
+	if (item->ConnectingDestination != nullptr) {
 		if (item->Type->BoolFlag[ETHEREAL_INDEX].value && !this->Variable[ETHEREALVISION_INDEX].Value) {
 			return false;
 		}
@@ -5918,25 +5915,25 @@ bool CUnit::CanUseItem(CUnit *item) const
 		return false;
 	}
 	
-	if (item->Spell != NULL) {
+	if (item->Spell != nullptr) {
 		if (!this->HasInventory() || !CanCastSpell(*this, *item->Spell, this, this->tilePos, this->MapLayer)) {
 			return false;
 		}
 	}
 	
-	if (item->Work != NULL) {
+	if (item->Work != nullptr) {
 		if (!this->HasInventory() || this->GetIndividualUpgrade(item->Work)) {
 			return false;
 		}
 	}
 	
-	if (item->Elixir != NULL) {
+	if (item->Elixir != nullptr) {
 		if (!this->HasInventory() || this->GetIndividualUpgrade(item->Elixir)) {
 			return false;
 		}
 	}
 	
-	if (item->Elixir == NULL && item->Variable[HITPOINTHEALING_INDEX].Value > 0 && this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableMax)) {
+	if (item->Elixir == nullptr && item->Variable[HITPOINTHEALING_INDEX].Value > 0 && this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableMax)) {
 		return false;
 	}
 	
@@ -6015,7 +6012,7 @@ bool CUnit::HasInventory() const
 	}
 	
 	if (!this->Type->BoolFlag[FAUNA_INDEX].value) {
-		if (this->Character != NULL) {
+		if (this->Character != nullptr) {
 			return true;
 		}
 		
@@ -6207,11 +6204,11 @@ CConstruction *CUnit::GetConstruction() const
 
 IconConfig CUnit::GetIcon() const
 {
-	if (this->Character != NULL && this->Character->Level >= 3 && this->Character->HeroicIcon.Icon) {
+	if (this->Character != nullptr && this->Character->Level >= 3 && this->Character->HeroicIcon.Icon) {
 		return this->Character->HeroicIcon;
-	} else if (this->Character != NULL && this->Character->Icon.Icon) {
+	} else if (this->Character != nullptr && this->Character->Icon.Icon) {
 		return this->Character->Icon;
-	} else if (this->Unique != NULL && this->Unique->Icon.Icon) {
+	} else if (this->Unique != nullptr && this->Unique->Icon.Icon) {
 		return this->Unique->Icon;
 	} else if (Type->VarInfo[Variation] && Type->VarInfo[Variation]->Icon.Icon) {
 		return Type->VarInfo[Variation]->Icon;
@@ -6230,7 +6227,7 @@ CIcon *CUnit::GetButtonIcon(int button_action) const
 		return PlayerRaces.ButtonIcons[ThisPlayer->Race][button_action].Icon;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 MissileConfig CUnit::GetMissile() const
@@ -6252,7 +6249,7 @@ CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 	} else if (Type->LayerSprites[image_layer])  {
 		return Type->LayerSprites[image_layer];
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -6310,7 +6307,7 @@ std::string CUnit::GetMessageName() const
 		return GetTypeName() + " (" + _("Unidentified") + ")";
 	}
 	
-	if (!this->Unique && this->Work == NULL && (this->Prefix != NULL || this->Suffix != NULL || this->Spell != NULL)) {
+	if (!this->Unique && this->Work == nullptr && (this->Prefix != nullptr || this->Suffix != nullptr || this->Spell != nullptr)) {
 		return name;
 	}
 	
@@ -6381,11 +6378,11 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	}
 	// Handle Teleporter Destination Removal
 	if (type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
-		unit.Goal->Remove(NULL);
+		unit.Goal->Remove(nullptr);
 		UnitLost(*unit.Goal);
 		UnitClearOrders(*unit.Goal);
 		unit.Goal->Release();
-		unit.Goal = NULL;
+		unit.Goal = nullptr;
 	}
 	
 	//Wyrmgus start
@@ -6403,7 +6400,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		unit.UnitInside
 		&& (
 			unit.Type->BoolFlag[SAVECARGO_INDEX].value
-			|| (unit.HasInventory() && unit.Character == NULL)
+			|| (unit.HasInventory() && unit.Character == nullptr)
 		)
 	) {
 	//Wyrmgus end
@@ -6424,7 +6421,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 				table[i]->TTL = 0;
 				table[i]->Anim.Unbreakable = 0;
 				PlayUnitSound(*table[i], VoiceDying);
-				table[i]->Remove(NULL);
+				table[i]->Remove(nullptr);
 				UnitLost(*table[i]);
 				UnitClearOrders(*table[i]);
 				table[i]->Release();
@@ -6450,7 +6447,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	}
 	//Wyrmgus end
 
-	unit.Remove(NULL);
+	unit.Remove(nullptr);
 	UnitLost(unit);
 	UnitClearOrders(unit);
 
@@ -6950,7 +6947,7 @@ void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 {
 	const int threshold = 30;
-	COrder *savedOrder = NULL;
+	COrder *savedOrder = nullptr;
 
 	//Wyrmgus start
 //	if (target.Player->AiEnabled == false) {
@@ -7007,7 +7004,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		if (best->IsAgressive()) {
 			target.Threshold = threshold;
 		}
-		if (savedOrder != NULL) {
+		if (savedOrder != nullptr) {
 			target.SavedOrder = savedOrder;
 		}
 	}
@@ -7046,7 +7043,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	//Wyrmgus start
 	if (
-		(attacker != NULL && attacker->Player == ThisPlayer)
+		(attacker != nullptr && attacker->Player == ThisPlayer)
 		&& target.Player != ThisPlayer
 	) {
 		// If player is hitting or being hit add tension to our music
@@ -7683,8 +7680,8 @@ void CleanUnits()
 
 	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
 		//Wyrmgus start
-		if (*it == NULL) {
-			fprintf(stderr, "Error in CleanUnits: unit is NULL.\n");
+		if (*it == nullptr) {
+			fprintf(stderr, "Error in CleanUnits: unit is null.\n");
 			continue;
 		}
 		//Wyrmgus end
@@ -7692,19 +7689,19 @@ void CleanUnits()
 
 		//Wyrmgus start
 		/*
-		if (&unit == NULL) {
+		if (&unit == nullptr) {
 			continue;
 		}
 		*/
 		//Wyrmgus end
 		//Wyrmgus start
-		if (unit.Type == NULL) {
-			fprintf(stderr, "Unit \"%d\"'s type is NULL.\n", UnitNumber(unit));
+		if (unit.Type == nullptr) {
+			fprintf(stderr, "Unit \"%d\"'s type is null.\n", UnitNumber(unit));
 		}
 		//Wyrmgus end
 		if (!unit.Destroyed) {
 			if (!unit.Removed) {
-				unit.Remove(NULL);
+				unit.Remove(nullptr);
 			}
 			UnitClearOrders(unit);
 		}

@@ -146,7 +146,7 @@ static intptr_t GetDependencyKeyForRule(const DependRule &rule)
 		dependency_key = (intptr_t) rule.Kind.Age;
 	} else {
 		fprintf(stderr, "Dependency rule should be unit-type, upgrade or age.\n");
-		return (intptr_t) NULL;
+		return (intptr_t) nullptr;
 	}
 	return dependency_key;
 }
@@ -169,7 +169,7 @@ static DependRule *GetDependencyNodeForRule(const DependRule &rule, const bool i
 		return dependency_map.find(dependency_key)->second;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -212,8 +212,8 @@ void AddDependency(const int rule_type, const std::string &target, const std::st
 
 	if (!node) { //create new entry if not found
 		node = new DependRule;
-		node->Next = NULL;
-		node->Rule = NULL;
+		node->Next = nullptr;
+		node->Rule = nullptr;
 		node->Type = rule.Type;
 		node->Kind = rule.Kind;
 		intptr_t dependency_key = GetDependencyKeyForRule(rule);
@@ -231,8 +231,8 @@ void AddDependency(const int rule_type, const std::string &target, const std::st
 	}
 
 	DependRule *temp = new DependRule;
-	temp->Rule = NULL;
-	temp->Next = NULL;
+	temp->Rule = nullptr;
+	temp->Next = nullptr;
 	temp->Count = count;
 
 	//  Setup structure.

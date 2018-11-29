@@ -315,7 +315,7 @@
 **
 **  CUnitType::ResInfo[::MaxCosts]
 **
-**    Information about resource harvesting. If NULL, it can't
+**    Information about resource harvesting. If null, it can't
 **    harvest it.
 **
 **  CUnitType::NeutralMinimapColorRGB
@@ -563,19 +563,19 @@ CUnitType::CUnitType() :
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TrainQuantity(0), CostModifier(0), ItemClass(-1),
-	Class(-1), Civilization(-1), Faction(-1), Species(NULL), TerrainType(NULL),
+	Class(-1), Civilization(-1), Faction(-1), Species(nullptr), TerrainType(nullptr),
 	//Wyrmgus end
-	Animations(NULL), StillFrame(0),
-	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
-	TeleportCost(0), TeleportEffectIn(NULL), TeleportEffectOut(NULL),
-	CorpseType(NULL), Construction(NULL), RepairHP(0), TileSize(0, 0),
+	Animations(nullptr), StillFrame(0),
+	DeathExplosion(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
+	TeleportCost(0), TeleportEffectIn(nullptr), TeleportEffectOut(nullptr),
+	CorpseType(nullptr), Construction(nullptr), RepairHP(0), TileSize(0, 0),
 	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	//Wyrmgus start
 //	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
 	MinAttackRange(0),
 	//Wyrmgus end
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
-	AutoCastActive(NULL),
+	AutoCastActive(nullptr),
 	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(1), ClicksToExplode(0),
 	//Wyrmgus start
 //	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
@@ -589,9 +589,9 @@ CUnitType::CUnitType() :
 	Neutral(0),
 	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	//Wyrmgus start
-	Elixir(NULL),
-//	Sprite(NULL), ShadowSprite(NULL)
-	Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL)
+	Elixir(nullptr),
+//	Sprite(nullptr), ShadowSprite(nullptr)
+	Sprite(nullptr), ShadowSprite(nullptr), LightSprite(nullptr)
 	//Wyrmgus end
 {
 #ifdef USE_MNG
@@ -741,7 +741,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Icon.Name = value;
-			this->Icon.Icon = NULL;
+			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
 		} else if (key == "tile_width") {
@@ -792,15 +792,15 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "missile") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Missile.Name = value;
-			this->Missile.Missile = NULL;
+			this->Missile.Missile = nullptr;
 		} else if (key == "fire_missile") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->FireMissile.Name = value;
-			this->FireMissile.Missile = NULL;
+			this->FireMissile.Missile = nullptr;
 		} else if (key == "corpse") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->CorpseName = value;
-			this->CorpseType = NULL;
+			this->CorpseType = nullptr;
 		} else if (key == "weapon_class") {
 			value = FindAndReplaceString(value, "_", "-");
 			int weapon_class_id = GetItemClassIdByName(value);
@@ -884,7 +884,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			
 			if (this->Sprite) {
 				CGraphic::Free(this->Sprite);
-				this->Sprite = NULL;
+				this->Sprite = nullptr;
 			}
 		} else if (child_config_data->Tag == "default_equipment") {
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -1231,14 +1231,14 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	this->Construction = parent_type->Construction;
 	this->UnitType = parent_type->UnitType;
 	this->Missile.Name = parent_type->Missile.Name;
-	this->Missile.Missile = NULL;
+	this->Missile.Missile = nullptr;
 	this->FireMissile.Name = parent_type->FireMissile.Name;
-	this->FireMissile.Missile = NULL;
+	this->FireMissile.Missile = nullptr;
 	this->ExplodeWhenKilled = parent_type->ExplodeWhenKilled;
 	this->Explosion.Name = parent_type->Explosion.Name;
-	this->Explosion.Missile = NULL;
+	this->Explosion.Missile = nullptr;
 	this->CorpseName = parent_type->CorpseName;
-	this->CorpseType = NULL;
+	this->CorpseType = nullptr;
 	this->MinAttackRange = parent_type->MinAttackRange;
 	this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
 	this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
@@ -1281,7 +1281,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	this->BuildingRulesString = parent_type->BuildingRulesString;
 	this->Elixir = parent_type->Elixir;
 	this->Icon.Name = parent_type->Icon.Name;
-	this->Icon.Icon = NULL;
+	this->Icon.Icon = nullptr;
 	if (!this->Icon.Name.empty()) {
 		this->Icon.Load();
 	}
@@ -1390,7 +1390,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 			var->ResourceMax = parent_type->VarInfo[var_n]->ResourceMax;
 			var->Weight = parent_type->VarInfo[var_n]->Weight;
 			var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
-			var->Icon.Icon = NULL;
+			var->Icon.Icon = nullptr;
 			if (!var->Icon.Name.empty()) {
 				var->Icon.Load();
 			}
@@ -1423,7 +1423,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 			}
 			for (std::map<int, IconConfig>::iterator iterator = parent_type->VarInfo[var_n]->ButtonIcons.begin(); iterator != parent_type->VarInfo[var_n]->ButtonIcons.end(); ++iterator) {
 				var->ButtonIcons[iterator->first].Name = iterator->second.Name;
-				var->ButtonIcons[iterator->first].Icon = NULL;
+				var->ButtonIcons[iterator->first].Icon = nullptr;
 				var->ButtonIcons[iterator->first].Load();
 				var->ButtonIcons[iterator->first].Icon->Load();
 			}
@@ -1465,7 +1465,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	}
 	for (std::map<int, IconConfig>::iterator iterator = parent_type->ButtonIcons.begin(); iterator != parent_type->ButtonIcons.end(); ++iterator) {
 		this->ButtonIcons[iterator->first].Name = iterator->second.Name;
-		this->ButtonIcons[iterator->first].Icon = NULL;
+		this->ButtonIcons[iterator->first].Icon = nullptr;
 		this->ButtonIcons[iterator->first].Load();
 		this->ButtonIcons[iterator->first].Icon->Load();
 	}
@@ -1599,7 +1599,7 @@ VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player, int image_layer) 
 		}
 		return varinfo;
 	}
-	return NULL;
+	return nullptr;
 }
 
 VariationInfo *CUnitType::GetVariation(std::string variation_name, int image_layer) const
@@ -1614,7 +1614,7 @@ VariationInfo *CUnitType::GetVariation(std::string variation_name, int image_lay
 			return varinfo;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 std::string CUnitType::GetRandomVariationIdent(int image_layer) const
@@ -1656,7 +1656,7 @@ CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(CPlayer &player, int image
 	} else if (this->LayerSprites[image_layer])  {
 		return this->LayerSprites[image_layer];
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -1731,7 +1731,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 			}
 			CCivilization *civilization = CCivilization::Civilizations[civilization_id];
 			if (faction && faction->Civilization != civilization_id) {
-				faction = NULL;
+				faction = nullptr;
 			}
 			if (this->Faction != -1 && !faction) {
 				faction = PlayerRaces.Factions[this->Faction];
@@ -2240,7 +2240,7 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 	//Wyrmgus start
 //	fprintf(stderr, "Unit type \"%s\" does not exist.\n", ident.c_str());
 	//Wyrmgus end
-	return NULL;
+	return nullptr;
 }
 
 //Wyrmgus start
@@ -2331,7 +2331,7 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
 {
 	//Wyrmgus start
-	if (sprite == NULL) {
+	if (sprite == nullptr) {
 		return;
 	}
 	//Wyrmgus end
@@ -2403,7 +2403,7 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 static int GetStillFrame(const CUnitType &type)
 {
 	//Wyrmgus start
-	if (type.Animations == NULL) {
+	if (type.Animations == nullptr) {
 		return 0;
 	}
 	//Wyrmgus end
@@ -2414,11 +2414,11 @@ static int GetStillFrame(const CUnitType &type)
 		if (anim->Type == AnimationFrame) {
 			CAnimation_Frame &a_frame = *static_cast<CAnimation_Frame *>(anim);
 			// Use the frame facing down
-			return a_frame.ParseAnimInt(NULL) + type.NumDirections / 2;
+			return a_frame.ParseAnimInt(nullptr) + type.NumDirections / 2;
 		} else if (anim->Type == AnimationExactFrame) {
 			CAnimation_ExactFrame &a_frame = *static_cast<CAnimation_ExactFrame *>(anim);
 
-			return a_frame.ParseAnimInt(NULL);
+			return a_frame.ParseAnimInt(nullptr);
 		}
 		anim = anim->Next;
 	}
@@ -2434,7 +2434,7 @@ void InitUnitTypes(int reset_player_stats)
 		CUnitType &type = *UnitTypes[i];
 		Assert(type.Slot == (int)i);
 
-		if (type.Animations == NULL) {
+		if (type.Animations == nullptr) {
 			DebugPrint(_("unit-type '%s' without animations, ignored.\n") _C_ type.Ident.c_str());
 			continue;
 		}
@@ -2770,10 +2770,6 @@ void CleanUnitTypes()
 	UnitTypeVar.Clear();
 
 	// Clean hardcoded unit types.
-	//Wyrmgus start
-//	UnitTypeHumanWall = NULL;
-//	UnitTypeOrcWall = NULL;
-	//Wyrmgus end
 	
 	//Wyrmgus start
 	for (size_t i = 0; i < Species.size(); ++i) {
@@ -2891,7 +2887,7 @@ CSpecies *GetSpecies(std::string species_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CSpeciesGenus *GetSpeciesGenus(std::string genus_ident)
@@ -2902,7 +2898,7 @@ CSpeciesGenus *GetSpeciesGenus(std::string genus_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CSpeciesFamily *GetSpeciesFamily(std::string family_ident)
@@ -2913,7 +2909,7 @@ CSpeciesFamily *GetSpeciesFamily(std::string family_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CSpeciesOrder *GetSpeciesOrder(std::string order_ident)
@@ -2924,7 +2920,7 @@ CSpeciesOrder *GetSpeciesOrder(std::string order_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CSpeciesClass *GetSpeciesClass(std::string class_ident)
@@ -2935,7 +2931,7 @@ CSpeciesClass *GetSpeciesClass(std::string class_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CSpeciesPhylum *GetSpeciesPhylum(std::string phylum_ident)
@@ -2946,14 +2942,14 @@ CSpeciesPhylum *GetSpeciesPhylum(std::string phylum_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 bool CSpecies::CanEvolveToAUnitType(CTerrainType *terrain, bool sapient_only)
 {
 	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
 		if (
-			(this->EvolvesTo[i]->Type != NULL && (!terrain || std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end()) && (!sapient_only || this->EvolvesTo[i]->Sapient))
+			(this->EvolvesTo[i]->Type != nullptr && (!terrain || std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end()) && (!sapient_only || this->EvolvesTo[i]->Sapient))
 			|| this->EvolvesTo[i]->CanEvolveToAUnitType(terrain, sapient_only)
 		) {
 			return true;
@@ -2968,7 +2964,7 @@ CSpecies *CSpecies::GetRandomEvolution(CTerrainType *terrain)
 	
 	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
 		if (
-			(this->EvolvesTo[i]->Type != NULL && std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end())
+			(this->EvolvesTo[i]->Type != nullptr && std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end())
 			|| this->EvolvesTo[i]->CanEvolveToAUnitType(terrain)
 		) { //give preference to evolutions that are native to the current terrain
 			potential_evolutions.push_back(this->EvolvesTo[i]);
@@ -2977,7 +2973,7 @@ CSpecies *CSpecies::GetRandomEvolution(CTerrainType *terrain)
 	
 	if (potential_evolutions.size() == 0) {
 		for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
-			if (this->EvolvesTo[i]->Type != NULL || this->EvolvesTo[i]->CanEvolveToAUnitType()) {
+			if (this->EvolvesTo[i]->Type != nullptr || this->EvolvesTo[i]->CanEvolveToAUnitType()) {
 				potential_evolutions.push_back(this->EvolvesTo[i]);
 			}
 		}
@@ -2987,7 +2983,7 @@ CSpecies *CSpecies::GetRandomEvolution(CTerrainType *terrain)
 		return potential_evolutions[SyncRand(potential_evolutions.size())];
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 std::string GetImageLayerNameById(int image_layer)

@@ -59,7 +59,7 @@ CDate CDate::FromString(std::string date_str)
 	
 	std::vector<std::string> date_vector = SplitString(date_str, ".");
 	
-	CCalendar *calendar = NULL;
+	CCalendar *calendar = nullptr;
 	size_t offset = 0;
 	
 	if (date_vector.size() >= 1 && !IsStringNumber(date_vector[0])) {
@@ -110,7 +110,7 @@ void CDate::Clear()
 	Month = 1;
 	Day = 1;
 	Hour = DefaultHoursPerDay / 2;
-	Timeline = NULL;
+	Timeline = nullptr;
 }
 
 bool CDate::ContainsDate(const CDate &date) const

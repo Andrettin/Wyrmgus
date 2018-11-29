@@ -59,18 +59,12 @@
 	Assert(type);
 	Vec2i resPos;
 	DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
-	//Wyrmgus start
-//	FindNearestDrop(*type, pos, resPos, LookingW);
 	FindNearestDrop(*type, pos, resPos, LookingW, unit.MapLayer);
-	//Wyrmgus end
 	if (SquareDistance(pos, resPos) <= square(range)) {
 		CUnit *target = MakeUnit(*type, &player);
-		if (target != NULL) {
+		if (target != nullptr) {
 			target->tilePos = resPos;
-			//Wyrmgus start
-//			target->Place(resPos);
 			target->Place(resPos, unit.MapLayer);
-			//Wyrmgus end
 			if (flags & SU_Summoned) {
 				target->Summoned = 1;
 			}
@@ -82,7 +76,7 @@
 					CommandDefend(*target, unit, FlushCommands);
 				}
 			}
-			//DropOutOnSide(*target, LookingW, NULL);
+			//DropOutOnSide(*target, LookingW, nullptr);
 		} else {
 			DebugPrint("Unable to allocate Unit");
 		}

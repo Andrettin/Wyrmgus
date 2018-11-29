@@ -98,7 +98,7 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 			return unit;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -535,7 +535,7 @@ public:
 		resultMine(resultMine)
 	{
 		bestCost.SetToMax();
-		*resultMine = NULL;
+		*resultMine = nullptr;
 	}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -705,7 +705,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 **  @note This will return an usable resource building that doesn't
 **  belong to the player or one of his allies.
 **
-**  @return            NULL or resource unit
+**  @return            null or resource unit
 */
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
 						//Wyrmgus start
@@ -733,7 +733,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	terrainTraversal.PushUnitPosAndNeighbor(startUnit);
 
-	CUnit *resultMine = NULL;
+	CUnit *resultMine = nullptr;
 
 	//Wyrmgus start
 //	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
@@ -753,7 +753,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 **
 **  @note This will return a reachable allied depot.
 **
-**  @return            NULL or deposit unit
+**  @return            null or deposit unit
 */
 CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 {
@@ -781,7 +781,7 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 **
 **  @note This will return a reachable self-owned market.
 **
-**  @return            NULL or market unit
+**  @return            null or market unit
 */
 CUnit *FindHomeMarket(const CUnit &unit, int range)
 {
@@ -800,12 +800,12 @@ CUnit *FindHomeMarket(const CUnit &unit, int range)
 **  @param player    Player's units to search through
 **  @param last      Previous idle worker selected
 **
-**  @return NULL or next idle worker
+**  @return null or next idle worker
 */
 CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 {
-	CUnit *FirstUnitFound = NULL;
-	int SelectNextUnit = (last == NULL) ? 1 : 0;
+	CUnit *FirstUnitFound = nullptr;
+	int SelectNextUnit = (last == nullptr) ? 1 : 0;
 	const int nunits = player.GetUnitCount();
 
 	for (int i = 0; i < nunits; ++i) {
@@ -815,7 +815,7 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 				if (SelectNextUnit && !IsOnlySelected(unit)) {
 					return &unit;
 				}
-				if (FirstUnitFound == NULL) {
+				if (FirstUnitFound == nullptr) {
 					FirstUnitFound = &unit;
 				}
 			}
@@ -824,10 +824,10 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 			SelectNextUnit = 1;
 		}
 	}
-	if (FirstUnitFound != NULL && !IsOnlySelected(*FirstUnitFound)) {
+	if (FirstUnitFound != nullptr && !IsOnlySelected(*FirstUnitFound)) {
 		return FirstUnitFound;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -932,11 +932,9 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2, in
 {
 	std::vector<CUnit *> table;
 
-	//Wyrmgus start
-//	Select(pos1, pos2, table);
 	Select(pos1, pos2, table, z);
-	//Wyrmgus end
-	CUnit *best = NULL;
+
+	CUnit *best = nullptr;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -966,7 +964,7 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2, in
 **  @param resource  resource type.
 **  @param mine_on_top  return mine or mining area.
 **
-**  @return          Returns the deposit if found, or NULL.
+**  @return          Returns the deposit if found, or null.
 */
 //Wyrmgus start
 //CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
@@ -997,7 +995,7 @@ private:
 **  @param pos       position on map, tile-based.
 **  @param resource  resource type.
 **
-**  @return          Returns the deposit if found, or NULL.
+**  @return          Returns the deposit if found, or null.
 */
 //Wyrmgus start
 //CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource)
@@ -1041,7 +1039,7 @@ private:
 	template <typename Iterator>
 	CUnit *Find(Iterator begin, Iterator end) const
 	{
-		CUnit *enemy = NULL;
+		CUnit *enemy = nullptr;
 		int best_cost = INT_MAX;
 
 		for (Iterator it = begin; it != end; ++it) {
@@ -1618,7 +1616,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 			return BestRangeTargetFinder(unit, range, include_neutral).Find(table);
 			//Wyrmgus end
 		}
-		return NULL;
+		return nullptr;
 	} else {
 		// If unit is removed, use containers x and y
 		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;

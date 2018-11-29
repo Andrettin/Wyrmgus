@@ -726,7 +726,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int var_n = 0; var_n < VariationMax; ++var_n) {
 				if (type->VarInfo[var_n]) {
 					delete type->VarInfo[var_n];
-					type->VarInfo[var_n] = NULL;
+					type->VarInfo[var_n] = nullptr;
 				}
 			}
 			//remove previously defined layer variations, if any
@@ -789,14 +789,14 @@ static int CclDefineUnitType(lua_State *l)
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "icon")) {
 						var->Icon.Name = LuaToString(l, -1, k + 1);
-						var->Icon.Icon = NULL;
+						var->Icon.Icon = nullptr;
 						var->Icon.Load();
 						var->Icon.Icon->Load();
 					} else if (!strcmp(value, "button-icon")) {
 						int button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
 						++k;
 						var->ButtonIcons[button_action].Name = LuaToString(l, -1, k + 1);
-						var->ButtonIcons[button_action].Icon = NULL;
+						var->ButtonIcons[button_action].Icon = nullptr;
 						var->ButtonIcons[button_action].Load();
 						var->ButtonIcons[button_action].Icon->Load();
 					} else if (!strcmp(value, "animations")) {
@@ -904,7 +904,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			if (redefine && type->Sprite) {
 				CGraphic::Free(type->Sprite);
-				type->Sprite = NULL;
+				type->Sprite = nullptr;
 			}
 		} else if (!strcmp(value, "Shadow")) {
 			if (!lua_istable(l, -1)) {
@@ -931,7 +931,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			if (redefine && type->ShadowSprite) {
 				CGraphic::Free(type->ShadowSprite);
-				type->ShadowSprite = NULL;
+				type->ShadowSprite = nullptr;
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "LightImage")) {
@@ -951,7 +951,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			if (redefine && type->LightSprite) {
 				CGraphic::Free(type->LightSprite);
-				type->LightSprite = NULL;
+				type->LightSprite = nullptr;
 			}
 		} else if (!strcmp(value, "LayerImages")) {
 			if (!lua_istable(l, -1)) {
@@ -976,7 +976,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				if (redefine && type->LayerSprites[image_layer]) {
 					CGraphic::Free(type->LayerSprites[image_layer]);
-					type->LayerSprites[image_layer] = NULL;
+					type->LayerSprites[image_layer] = nullptr;
 				}
 				lua_pop(l, 1);
 			}
@@ -993,7 +993,7 @@ static int CclDefineUnitType(lua_State *l)
 					int button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
 					++k;
 					type->ButtonIcons[button_action].Name = LuaToString(l, -1, k + 1);
-					type->ButtonIcons[button_action].Icon = NULL;
+					type->ButtonIcons[button_action].Icon = nullptr;
 					type->ButtonIcons[button_action].Load();
 					type->ButtonIcons[button_action].Icon->Load();
 				}
@@ -1012,7 +1012,7 @@ static int CclDefineUnitType(lua_State *l)
 					int item_slot = GetItemSlotIdByName(LuaToString(l, -1, k + 1));
 					++k;
 					CUnitType *default_equipment = UnitTypeByIdent(LuaToString(l, -1, k + 1));
-					if (default_equipment != NULL) {
+					if (default_equipment != nullptr) {
 						type->DefaultEquipment[item_slot] = default_equipment;
 					} else { // Error
 						LuaError(l, "incorrect default equipment unit-type");
@@ -1032,7 +1032,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
-			type->Icon.Icon = NULL;
+			type->Icon.Icon = nullptr;
 			//Wyrmgus start
 			type->Icon.Load();
 			type->Icon.Icon->Load();
@@ -1155,7 +1155,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				value = LuaToString(l, -1, j + 1);
 				CUnitType *trained_unit = UnitTypeByIdent(value);
-				if (trained_unit != NULL) {
+				if (trained_unit != nullptr) {
 					type->Trains.push_back(trained_unit);
 					trained_unit->TrainedBy.push_back(type);
 				} else {
@@ -1208,11 +1208,11 @@ static int CclDefineUnitType(lua_State *l)
 		//Wyrmgus end
 		} else if (!strcmp(value, "Missile")) {
 			type->Missile.Name = LuaToString(l, -1);
-			type->Missile.Missile = NULL;
+			type->Missile.Missile = nullptr;
 		//Wyrmgus start
 		} else if (!strcmp(value, "FireMissile")) {
 			type->FireMissile.Name = LuaToString(l, -1);
-			type->FireMissile.Missile = NULL;
+			type->FireMissile.Missile = nullptr;
 		//Wyrmgus end
 		} else if (!strcmp(value, "MinAttackRange")) {
 			type->MinAttackRange = LuaToNumber(l, -1);
@@ -1236,7 +1236,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->DecayRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Corpse")) {
 			type->CorpseName = LuaToString(l, -1);
-			type->CorpseType = NULL;
+			type->CorpseType = nullptr;
 		} else if (!strcmp(value, "DamageType")) {
 			value = LuaToString(l, -1);
 			//int check = ExtraDeathIndex(value);
@@ -1244,7 +1244,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "ExplodeWhenKilled")) {
 			type->ExplodeWhenKilled = 1;
 			type->Explosion.Name = LuaToString(l, -1);
-			type->Explosion.Missile = NULL;
+			type->Explosion.Missile = nullptr;
 		} else if (!strcmp(value, "TeleportCost")) {
 			type->TeleportCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TeleportEffectIn")) {
@@ -1316,10 +1316,10 @@ static int CclDefineUnitType(lua_State *l)
 
 				if (!strcmp(dtype, "general")) {
 					type->Impact[ANIMATIONS_DEATHTYPES].Name = LuaToString(l, -1, k + 1);
-					type->Impact[ANIMATIONS_DEATHTYPES].Missile = NULL;
+					type->Impact[ANIMATIONS_DEATHTYPES].Missile = nullptr;
 				} else if (!strcmp(dtype, "shield")) {
 					type->Impact[ANIMATIONS_DEATHTYPES + 1].Name = LuaToString(l, -1, k + 1);
-					type->Impact[ANIMATIONS_DEATHTYPES + 1].Missile = NULL;
+					type->Impact[ANIMATIONS_DEATHTYPES + 1].Missile = nullptr;
 				} else {
 					int num = 0;
 					for (; num < ANIMATIONS_DEATHTYPES; ++num) {
@@ -1331,7 +1331,7 @@ static int CclDefineUnitType(lua_State *l)
 						LuaError(l, "Death type not found: %s" _C_ dtype);
 					} else {
 						type->Impact[num].Name = LuaToString(l, -1, k + 1);
-						type->Impact[num].Missile = NULL;
+						type->Impact[num].Missile = nullptr;
 					}
 				}
 			}
@@ -1597,7 +1597,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
 				SpellType *spell = SpellTypeByIdent(value);
-				if (spell == NULL) {
+				if (spell == nullptr) {
 					LuaError(l, "Unknown spell type: %s" _C_ value);
 				}
 				type->Spells.push_back(spell);
@@ -1617,13 +1617,13 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
 				delete[] type->AutoCastActive;
-				type->AutoCastActive = NULL;
+				type->AutoCastActive = nullptr;
 
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
 				const SpellType *spell = SpellTypeByIdent(value);
-				if (spell == NULL) {
+				if (spell == nullptr) {
 					LuaError(l, "AutoCastActive : Unknown spell type: %s" _C_ value);
 				}
 				if (!spell->AutoCast) {
@@ -1846,7 +1846,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				value = LuaToString(l, -1, j + 1);
 				SpellType *spell = SpellTypeByIdent(value);
-				if (spell != NULL) {
+				if (spell != nullptr) {
 					type->DropSpells.push_back(spell);
 				} else {
 					LuaError(l, "Spell \"%s\" doesn't exist." _C_ value);
@@ -2272,7 +2272,7 @@ CUnitType *CclGetUnitType(lua_State *l)
 {
 	//Wyrmgus start
 	if (lua_isnil(l, -1)) {
-		return NULL;
+		return nullptr;
 	}
 	//Wyrmgus end
 	
@@ -2287,7 +2287,7 @@ CUnitType *CclGetUnitType(lua_State *l)
 		}
 	}
 	LuaError(l, "CclGetUnitType: not a unit-type");
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -2471,7 +2471,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->Height);
 		return 1;
 	} else if (!strcmp(data, "Animations")) {
-		if (type->Animations != NULL) {
+		if (type->Animations != nullptr) {
 			lua_pushstring(l, type->Animations->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -2537,7 +2537,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	*/
 	} else if (!strcmp(data, "Species")) {
-		if (type->Species != NULL) {
+		if (type->Species != nullptr) {
 			lua_pushstring(l, type->Species->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -3156,7 +3156,7 @@ static int CclDefineDecorations(lua_State *l)
 	const int nargs = lua_gettop(l);
 	for (int i = 0; i < nargs; i++) {
 		Assert(lua_istable(l, i + 1));
-		CDecoVar *decovar = NULL;
+		CDecoVar *decovar = nullptr;
 		memset(&tmp, 0, sizeof(tmp));
 		lua_pushnil(l);
 		while (lua_next(l, i + 1)) {
@@ -3443,7 +3443,7 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[TRANSPARENCY_INDEX].Max = 100;
 
 	unit.Variable[LEVEL_INDEX].Max = 100000;
-	if (!IsNetworkGame() && unit.Character != NULL && unit.Player->AiEnabled == false) {
+	if (!IsNetworkGame() && unit.Character != nullptr && unit.Player->AiEnabled == false) {
 		if (unit.Variable[LEVEL_INDEX].Value > unit.Character->Level) { //save level, if unit has a persistent character
 			unit.Character->Level = unit.Variable[LEVEL_INDEX].Value;
 			SaveHero(unit.Character);
@@ -3451,7 +3451,7 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 	}
 	
-	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->Species != NULL && !unit.Type->Species->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
+	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->Species != nullptr && !unit.Type->Species->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
 		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
 		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->Species->ChildUpgrade));
 	}
@@ -3878,7 +3878,7 @@ static int CclDefineSpecies(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
-				if (terrain == NULL) {
+				if (terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
 				species->Terrains.push_back(terrain);
@@ -3951,14 +3951,14 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_pushstring(l, species->Background.c_str());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
-		if (species->Genus != NULL && species->Genus->Family != NULL) {
+		if (species->Genus != nullptr && species->Genus->Family != nullptr) {
 			lua_pushstring(l, species->Genus->Family->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Genus")) {
-		if (species->Genus != NULL) {
+		if (species->Genus != nullptr) {
 			lua_pushstring(l, species->Genus->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -3977,21 +3977,21 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_pushstring(l, species->ChildUpgrade.c_str());
 		return 1;
 	} else if (!strcmp(data, "HomePlane")) {
-		if (species->HomePlane != NULL) {
+		if (species->HomePlane != nullptr) {
 			lua_pushstring(l, species->HomePlane->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Homeworld")) {
-		if (species->Homeworld != NULL) {
+		if (species->Homeworld != nullptr) {
 			lua_pushstring(l, species->Homeworld->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		if (species->Type != NULL) {
+		if (species->Type != nullptr) {
 			lua_pushstring(l, species->Type->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -4338,7 +4338,7 @@ static int CclSetModTrains(lua_State *l)
 	
 	std::string mod_file = LuaToString(l, 1);
 	CUnitType *type = UnitTypeByIdent(LuaToString(l, 2));
-	if (type == NULL) {
+	if (type == nullptr) {
 		LuaError(l, "Unit type doesn't exist.");
 	}
 
@@ -4357,7 +4357,7 @@ static int CclSetModTrains(lua_State *l)
 	for (int i = 0; i < subargs; ++i) {
 		const char *value = LuaToString(l, 3, i + 1);
 		CUnitType *trained_unit = UnitTypeByIdent(value);
-		if (trained_unit != NULL) {
+		if (trained_unit != nullptr) {
 			type->ModTrains[mod_file].push_back(trained_unit);
 			trained_unit->ModTrainedBy[mod_file].push_back(type);
 		} else {
@@ -4397,7 +4397,7 @@ static int CclSetModAiDrops(lua_State *l)
 	
 	std::string mod_file = LuaToString(l, 1);
 	CUnitType *type = UnitTypeByIdent(LuaToString(l, 2));
-	if (type == NULL) {
+	if (type == nullptr) {
 		LuaError(l, "Unit type doesn't exist.");
 	}
 
@@ -4410,7 +4410,7 @@ static int CclSetModAiDrops(lua_State *l)
 	for (int i = 0; i < subargs; ++i) {
 		const char *value = LuaToString(l, 3, i + 1);
 		CUnitType *dropped_unit = UnitTypeByIdent(value);
-		if (dropped_unit != NULL) {
+		if (dropped_unit != nullptr) {
 			type->ModAiDrops[mod_file].push_back(dropped_unit);
 		} else {
 			LuaError(l, "Unit type \"%s\" doesn't exist." _C_ value);

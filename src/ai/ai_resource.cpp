@@ -65,7 +65,7 @@
 
 //Wyrmgus start
 //static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
-static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, CSite *settlement = NULL);
+static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z, int landmass = 0, CSite *settlement = nullptr);
 //Wyrmgus end
 
 /**
@@ -242,7 +242,7 @@ int AiEnemyUnitsInDistance(const CPlayer &player,
 	const Vec2i offset(range, range);
 	std::vector<CUnit *> units;
 
-	if (type == NULL) {
+	if (type == nullptr) {
 		//Wyrmgus start
 //		Select(pos - offset, pos + offset, units, IsAEnemyUnitOf(player));
 		Select(pos - offset, pos + offset, units, z, IsAEnemyUnitOf(player));
@@ -311,7 +311,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 */
 //Wyrmgus start
 //static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
-static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, CSite *settlement = NULL)
+static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z, int landmass = 0, CSite *settlement = nullptr)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -349,7 +349,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	//Wyrmgus start
 	table.resize(num);	
 	
-	CUnit *near_unit = NULL;
+	CUnit *near_unit = nullptr;
 	if (building.TerrainType || building.BoolFlag[TOWNHALL_INDEX].value) { //terrain type units and town halls have a particular place to be built, so we need to find the worker with a terrain traversal
 		TerrainTraversal terrainTraversal;
 
@@ -363,7 +363,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 			maxRange = 9999;
 		}
 		int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
-		if (OnTopDetails(building, NULL)) { //if the building is built on top of something else, make sure the building it is built on top of doesn't block the movemask
+		if (OnTopDetails(building, nullptr)) { //if the building is built on top of something else, make sure the building it is built on top of doesn't block the movemask
 			movemask &= ~(MapFieldBuilding);
 		}
 		UnitFinder unitFinder(*AiPlayer->Player, table, maxRange, movemask, &near_unit, z);
@@ -530,17 +530,14 @@ void AiNewDepotRequest(CUnit &worker)
 	//Wyrmgus end
 	const int range = 15;
 
-	//Wyrmgus start
-//	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, range, resource)) {
-	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, range, resource, z)) {
-	//Wyrmgus end
+	if (pos.x != -1 && nullptr != FindDepositNearLoc(*worker.Player, pos, range, resource, z)) {
 		/*
 		 * New Depot has just be finished and worker just return to old depot
 		 * (far away) from new Deopt.
 		 */
 		return;
 	}
-	CUnitType *best_type = NULL;
+	CUnitType *best_type = nullptr;
 	int best_cost = 0;
 	//int best_mask = 0;
 	// Count the already made build requests.
@@ -569,7 +566,7 @@ void AiNewDepotRequest(CUnit &worker)
 			cost += type_costs[c];
 		}
 
-		if (best_type == NULL || (cost < best_cost)) {
+		if (best_type == nullptr || (cost < best_cost)) {
 			best_type = &type;
 			best_cost = cost;
 			//best_mask = needmask;
@@ -630,7 +627,7 @@ private:
 **  @param oldDepot  Old assigned depot.
 **  @param resUnit   Resource to harvest from, if succeed
 **
-**  @return          new depot if found, NULL otherwise.
+**  @return          new depot if found, null otherwise.
 */
 CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit)
 {
@@ -652,7 +649,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	}
 	// If there aren't any alternatives, exit
 	if (depots.size() < 2) {
-		return NULL;
+		return nullptr;
 	}
 	std::sort(depots.begin(), depots.end(), CompareDepotsByDistance(worker));
 
@@ -676,20 +673,20 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 		}
 		//Wyrmgus start
 //		CUnit *res = UnitFindResource(worker, unit, range, resource, unit.Player->AiEnabled);
-		CUnit *res = UnitFindResource(worker, unit, range, resource, true, NULL, true, false, false, false, true);
+		CUnit *res = UnitFindResource(worker, unit, range, resource, true, nullptr, true, false, false, false, true);
 		//Wyrmgus end
 		if (res) {
 			*resUnit = res;
 			return &unit;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 //Wyrmgus start
 void AiTransportCapacityRequest(int capacity_needed, int landmass)
 {
-	CUnitType *best_type = NULL;
+	CUnitType *best_type = nullptr;
 	int best_cost = 0;
 
 	const int n = AiHelpers.NavalTransporters[0].size();
@@ -709,7 +706,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 		}
 		cost /= type.MaxOnBoard;
 
-		if (best_type == NULL || (cost < best_cost)) {
+		if (best_type == nullptr || (cost < best_cost)) {
 			best_type = &type;
 			best_cost = cost;
 			//best_mask = needmask;
@@ -917,7 +914,7 @@ static bool AiRequestSupply()
 */
 //Wyrmgus start
 //static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
-static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0, CSite *settlement = NULL)
+static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0, CSite *settlement = nullptr)
 //Wyrmgus end
 {
 	std::vector<CUnit *> table;
@@ -1295,7 +1292,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 	// Find a resource to harvest from.
 	//Wyrmgus start
 //	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, NULL, false, false, false, resource == CopperCost);
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, nullptr, false, false, false, resource == CopperCost);
 	//Wyrmgus end
 
 	if (mine) {
@@ -1622,7 +1619,7 @@ static void AiCollectResources()
 			}
 		}
 	}
-	unit = NULL;
+	unit = nullptr;
 
 	// Try to complete each resource in the priority order
 	for (int i = 0; i < MaxCosts; ++i) {
@@ -1704,7 +1701,7 @@ static void AiCollectResources()
 					
 				//Wyrmgus start
 //				for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
-				for (int k = num_units_assigned[src_c] - 1; k >= 0; --k) { // unit may be NULL now, continue instead of breaking loop if so
+				for (int k = num_units_assigned[src_c] - 1; k >= 0; --k) { // unit may be null now, continue instead of breaking loop if so
 				//Wyrmgus end
 					unit = units_assigned[src_c][k];
 					//Wyrmgus start
@@ -1723,14 +1720,14 @@ static void AiCollectResources()
 
 					//Wyrmgus start
 					if (unit->Removed || unit->CurrentAction() == UnitActionBuild) { //if unit is removed or is currently building something, it can't be told to harvest (do this here so that AiAssignHarvester returning false later on is only because of unit type not being able to harvest something)
-						unit = NULL;
+						unit = nullptr;
 						continue;
 					}
 					//Wyrmgus end
 					
 					// unit can't harvest : next one
 					if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
-						unit = NULL;
+						unit = nullptr;
 						continue;
 					}
 
@@ -1909,13 +1906,13 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 
 	const int maxRange = 15;
 	const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
-	CUnit *unit = NULL;
+	CUnit *unit = nullptr;
 	//Wyrmgus start
 //	UnitFinder unitFinder(player, table, maxRange, movemask, &unit);
 	UnitFinder unitFinder(player, table, maxRange, movemask, &unit, building.MapLayer);
 	//Wyrmgus end
 
-	if (terrainTraversal.Run(unitFinder) && unit != NULL) {
+	if (terrainTraversal.Run(unitFinder) && unit != nullptr) {
 		const Vec2i invalidPos(-1, -1);
 		//Wyrmgus start
 //		CommandRepair(*unit, invalidPos, &building, FlushCommands);
@@ -2234,7 +2231,7 @@ static void AiCheckPathwayConstruction()
 						MarkUnitFieldFlags(unit);
 						MarkUnitFieldFlags(*depot);
 						
-						test_worker->Remove(NULL);
+						test_worker->Remove(nullptr);
 						LetUnitDie(*test_worker);
 					}
 				}
@@ -2273,7 +2270,7 @@ static void AiCheckPathwayConstruction()
 							&& (pathway_types[p]->TerrainType->Flags & MapFieldRoad)
 						)
 					) {
-						if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer) || !CanBuildHere(NULL, *pathway_types[p], pathway_pos, unit.MapLayer)) {
+						if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer) || !CanBuildHere(nullptr, *pathway_types[p], pathway_pos, unit.MapLayer)) {
 							continue;
 						}
 							
@@ -2379,7 +2376,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		if (!CanBuildHere(NULL, *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer)) {
+		if (!CanBuildHere(nullptr, *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer)) {
 			continue;
 		}
 		
@@ -2561,7 +2558,7 @@ void AiCheckBuildings()
 		}
 		
 		int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, building_templates[i]->UnitClass);
-		CUnitType *type = NULL;
+		CUnitType *type = nullptr;
 		if (unit_type_id != -1) {
 			type = UnitTypes[unit_type_id];
 		}
@@ -2714,7 +2711,7 @@ static void AiCheckMinecartSalvaging()
 				continue;
 			}
 			
-			if (UnitFindResource(*minecart_unit, *minecart_unit, 1000, res, false, NULL, true, true, false, false, true, false) != NULL) {
+			if (UnitFindResource(*minecart_unit, *minecart_unit, 1000, res, false, nullptr, true, true, false, false, true, false) != nullptr) {
 				has_accessible_mine = true;
 				break;
 			}

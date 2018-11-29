@@ -53,7 +53,7 @@ class CDayOfTheWeek
 {
 public:
 	CDayOfTheWeek() :
-		ID(-1), Calendar(NULL)
+		ID(-1), Calendar(nullptr)
 	{
 	}
 	
@@ -83,7 +83,7 @@ class CCalendar
 {
 public:
 	CCalendar() :
-		Initialized(false), HoursPerDay(DefaultHoursPerDay), DaysPerYear(0), BaseDayOfTheWeek(NULL), CurrentDayOfTheWeek(-1)
+		Initialized(false), HoursPerDay(DefaultHoursPerDay), DaysPerYear(0), BaseDayOfTheWeek(nullptr), CurrentDayOfTheWeek(-1)
 	{
 	}
 	

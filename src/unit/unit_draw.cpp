@@ -74,7 +74,7 @@
 class Decoration
 {
 public:
-	Decoration() : HotPos(0, 0), Width(0), Height(0), Sprite(NULL) {}
+	Decoration() : HotPos(0, 0), Width(0), Height(0), Sprite(nullptr) {}
 
 	std::string File; /// File containing the graphics data
 	PixelPos HotPos;  /// drawing position (relative)
@@ -364,7 +364,7 @@ static int CclDefineSprites(lua_State *l)
 		Decoration deco;
 
 		lua_pushnil(l);
-		const char *name = NULL;// name of the current sprite.
+		const char *name = nullptr;// name of the current sprite.
 		while (lua_next(l, i + 1)) {
 			const char *key = LuaToString(l, -2); // key name
 			if (!strcmp(key, "Name")) {
@@ -380,7 +380,7 @@ static int CclDefineSprites(lua_State *l)
 			}
 			lua_pop(l, 1); // pop the value;
 		}
-		if (name == NULL) {
+		if (name == nullptr) {
 			LuaError(l, "CclDefineSprites requires the Name flag for sprite.");
 		}
 		int index = GetSpriteIndex(name); // Index of the Sprite.
@@ -1158,7 +1158,7 @@ void CUnit::Draw(const CViewport &vp) const
 
 			cframe = &order.GetFrame();
 		} else {
-			cframe = NULL;
+			cframe = nullptr;
 		}
 	} else {
 		screenPos = vp.TilePosToScreen_TopLeft(this->Seen.tilePos);
@@ -1393,7 +1393,7 @@ void CUnit::Draw(const CViewport &vp) const
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
 		)
 	) {
-		if ((this->Direction == LookingS || this->Direction == LookingSE || this->Direction == LookingSW) && this->CurrentAction() != UnitActionDie && this->GetLayerSprite(RightHandImageLayer) != NULL) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
+		if ((this->Direction == LookingS || this->Direction == LookingSE || this->Direction == LookingSW) && this->CurrentAction() != UnitActionDie && this->GetLayerSprite(RightHandImageLayer) != nullptr) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);

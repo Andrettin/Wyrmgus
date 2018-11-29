@@ -309,7 +309,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 static void WriteMapPreview(const char *mapname, CMap &map)
 {
 	FILE *fp = fopen(mapname, "wb");
-	if (fp == NULL) {
+	if (fp == nullptr) {
 		return;
 	}
 
@@ -476,7 +476,7 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_mod)
 //Wyrmgus end
 {
-	FileWriter *f = NULL;
+	FileWriter *f = nullptr;
 
 	const char *type[] = {"", "", "neutral", "nobody",
 						  "computer", "person", "rescue-passive", "rescue-active"
@@ -561,7 +561,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, bool is_m
 int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod)
 //Wyrmgus end
 {
-	FileWriter *f = NULL;
+	FileWriter *f = nullptr;
 
 	try {
 		f = CreateFileWriter(mapSetup);
@@ -631,7 +631,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (!type.Icon.Name.empty() && (!type.Parent || type.Icon.Name != type.Parent->Icon.Name)) {
 				f->printf("\tIcon = \"%s\",\n", type.Icon.Name.c_str());
 			}
-			if (type.Animations != NULL && (!type.Parent || type.Animations != type.Parent->Animations)) {
+			if (type.Animations != nullptr && (!type.Parent || type.Animations != type.Parent->Animations)) {
 				f->printf("\tAnimations = \"%s\",\n", type.Animations->Ident.c_str());
 			}
 			
@@ -1073,7 +1073,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				if (!unit.Active) { //Active is true by default
 					f->printf("SetUnitVariable(unit, \"Active\", false)\n");
 				}
-				if (unit.Character != NULL) {
+				if (unit.Character != nullptr) {
 					if (!unit.Character->Custom) {
 						f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit.Character->Ident.c_str());
 					} else {
@@ -1084,19 +1084,19 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						f->printf("SetUnitVariable(unit, \"Name\", \"%s\")\n", unit.Name.c_str());
 					}
 				}
-				if (unit.Trait != NULL) {
+				if (unit.Trait != nullptr) {
 					f->printf("AcquireTrait(unit, \"%s\")\n", unit.Trait->Ident.c_str());
 				}
-				if (unit.Prefix != NULL) {
+				if (unit.Prefix != nullptr) {
 					f->printf("SetUnitVariable(unit, \"Prefix\", \"%s\")\n", unit.Prefix->Ident.c_str());
 				}
-				if (unit.Suffix != NULL) {
+				if (unit.Suffix != nullptr) {
 					f->printf("SetUnitVariable(unit, \"Suffix\", \"%s\")\n", unit.Suffix->Ident.c_str());
 				}
-				if (unit.Work != NULL) {
+				if (unit.Work != nullptr) {
 					f->printf("SetUnitVariable(unit, \"Work\", \"%s\")\n", unit.Work->Ident.c_str());
 				}
-				if (unit.Elixir != NULL) {
+				if (unit.Elixir != nullptr) {
 					f->printf("SetUnitVariable(unit, \"Elixir\", \"%s\")\n", unit.Elixir->Ident.c_str());
 				}
 				if (unit.Variable[HP_INDEX].Value != unit.GetModifiedVariable(HP_INDEX, VariableMax)) {
@@ -1479,11 +1479,11 @@ static void GameTypeManTeamVsMachine()
 
 static int itemsToLoad;
 static int itemsLoaded;
-static CGraphic *loadingEmpty = NULL;
-static CGraphic *loadingFull = NULL;
+static CGraphic *loadingEmpty = nullptr;
+static CGraphic *loadingFull = nullptr;
 static std::vector<std::string> loadingBackgrounds;
-CGraphic *loadingBackground = NULL;
-static CFont *loadingFont = NULL;
+CGraphic *loadingBackground = nullptr;
+static CFont *loadingFont = nullptr;
 static std::vector<std::string> loadingTips;
 static std::vector<std::string> loadingTip;
 
@@ -1506,7 +1506,7 @@ static int CclLoadingBarSetTips(lua_State *l)
 			loadingTips.push_back(str);
 		}
 		lua_pop(l, 1);
-	} while (str != NULL);
+	} while (str != nullptr);
 
 	return 0;
 }
@@ -1530,7 +1530,7 @@ static int CclLoadingBarSetBackgrounds(lua_State *l)
 			loadingBackgrounds.push_back(str);
 		}
 		lua_pop(l, 1);
-	} while (str != NULL);
+	} while (str != nullptr);
 
 	return 0;
 }
@@ -1595,7 +1595,7 @@ void UpdateLoadingBar()
 {
 	int y = Video.Height/2;
 	
-	if (loadingBackground != NULL) {
+	if (loadingBackground != nullptr) {
 		loadingBackground->DrawClip(0, 0);
 	}
 	
@@ -1608,11 +1608,11 @@ void UpdateLoadingBar()
 		y+= loadingEmpty->Height/2;
 	}
 
-	if (loadingFont == NULL) {
+	if (loadingFont == nullptr) {
 		loadingFont = CFont::Get("game");
 	}
 
-	if (loadingFont != NULL) {
+	if (loadingFont != nullptr) {
 		CLabel label(*loadingFont);
 		for (size_t i = 0; i < loadingTip.size(); ++i) {
 			label.DrawCentered(Video.Width/2, y + 10 + (GetGameFont().Height() * i), loadingTip[i]);
@@ -1633,7 +1633,7 @@ void ResetItemsToLoad()
 	itemsLoaded = 0;
 	itemsToLoad = 0;
 	loadingTip.clear();
-	loadingBackground = NULL;
+	loadingBackground = nullptr;
 }
 
 /*----------------------------------------------------------------------------
@@ -1659,7 +1659,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	if (SaveGameLoading) {
 		SaveGameLoading = false;
 		// Load game, already created game with Init/LoadModules
-		CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
+		CommandLog(nullptr, NoUnitP, FlushCommands, -1, -1, NoUnitP, nullptr, -1);
 		return;
 	}
 
@@ -1920,7 +1920,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 
 	GameResult = GameNoResult;
 
-	CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
+	CommandLog(nullptr, NoUnitP, FlushCommands, -1, -1, NoUnitP, nullptr, -1);
 	Video.ClearScreen();
 	
 	//Wyrmgus start
@@ -1987,8 +1987,8 @@ void CleanGame()
 	Map.Clean();
 	CleanReplayLog();
 	FreePathfinder();
-	CursorBuilding = NULL;
-	UnitUnderCursor = NULL;
+	CursorBuilding = nullptr;
+	UnitUnderCursor = nullptr;
 	GameEstablishing = false;
 }
 

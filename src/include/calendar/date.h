@@ -51,7 +51,7 @@ class CDate
 {
 public:
 	CDate() :
-		Year(0), Month(1), Day(1), Hour(DefaultHoursPerDay / 2), Timeline(NULL)
+		Year(0), Month(1), Day(1), Hour(DefaultHoursPerDay / 2), Timeline(nullptr)
 	{
 	}
 	

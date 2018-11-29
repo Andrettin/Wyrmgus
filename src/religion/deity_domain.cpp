@@ -70,7 +70,7 @@ CDeityDomain *CDeityDomain::GetDeityDomain(const std::string &ident, const bool 
 		fprintf(stderr, "Invalid deity domain: \"%s\".\n", ident.c_str());
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -112,7 +112,7 @@ CDeityDomain *CDeityDomain::GetDeityDomainByUpgrade(const CUpgrade *upgrade, con
 		fprintf(stderr, "No deity domain found for upgrade: \"%s\".\n", upgrade->Ident.c_str());
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**

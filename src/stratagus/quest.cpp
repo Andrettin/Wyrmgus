@@ -56,9 +56,9 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CQuest *> Quests;
-CQuest *CurrentQuest = NULL;
+CQuest *CurrentQuest = nullptr;
 std::vector<CCampaign *> Campaigns;
-CCampaign *CurrentCampaign = NULL;
+CCampaign *CurrentCampaign = nullptr;
 std::vector<CAchievement *> Achievements;
 std::vector<CDialogue *> Dialogues;
 
@@ -211,7 +211,7 @@ CQuest *GetQuest(std::string quest_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CCampaign *GetCampaign(std::string campaign_ident)
@@ -222,7 +222,7 @@ CCampaign *GetCampaign(std::string campaign_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CAchievement *GetAchievement(std::string achievement_ident)
@@ -233,7 +233,7 @@ CAchievement *GetAchievement(std::string achievement_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CDialogue *GetDialogue(std::string dialogue_ident)
@@ -243,7 +243,7 @@ CDialogue *GetDialogue(std::string dialogue_ident)
 			return Dialogues[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 CQuest::~CQuest()
@@ -515,7 +515,7 @@ void CDialogueNode::OptionEffect(int option, int player)
 void SetCurrentQuest(std::string quest_ident)
 {
 	if (quest_ident.empty()) {
-		CurrentQuest = NULL;
+		CurrentQuest = nullptr;
 	} else {
 		CurrentQuest = GetQuest(quest_ident);
 	}
@@ -533,7 +533,7 @@ std::string GetCurrentQuest()
 void SetCurrentCampaign(std::string campaign_ident)
 {
 	if (campaign_ident.empty()) {
-		CurrentCampaign = NULL;
+		CurrentCampaign = nullptr;
 	} else {
 		CurrentCampaign = GetCampaign(campaign_ident);
 	}

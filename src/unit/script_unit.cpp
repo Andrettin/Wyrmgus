@@ -148,13 +148,13 @@ static CUnit *CclGetUnit(lua_State *l)
 		} else if (UnitUnderCursor) {
 			return UnitUnderCursor;
 		}
-		return NULL;
+		return nullptr;
 	//Wyrmgus start
 	} else if (num == -2) {
 		if (UnitUnderCursor) {
 			return UnitUnderCursor;
 		}
-		return NULL;
+		return nullptr;
 	//Wyrmgus end
 	}
 	return &UnitManager.GetSlotUnit(num);
@@ -170,7 +170,7 @@ static CUnit *CclGetUnit(lua_State *l)
 CUnit *CclGetUnitFromRef(lua_State *l)
 {
 	const char *const value = LuaToString(l, -1);
-	unsigned int slot = strtol(value + 1, NULL, 16);
+	unsigned int slot = strtol(value + 1, nullptr, 16);
 	Assert(slot < UnitManager.GetUsedSlotCount());
 	return &UnitManager.GetSlotUnit(slot);
 }
@@ -278,7 +278,7 @@ static void CclParseOrders(lua_State *l, CUnit &unit)
 	for (int j = 0; j < n; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 
-		unit.Orders.push_back(NULL);
+		unit.Orders.push_back(nullptr);
 		COrderPtr *order = &unit.Orders.back();
 
 		CclParseOrder(l, unit, order);
@@ -302,10 +302,10 @@ static int CclUnit(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	CUnit *unit = NULL;
-	CUnitType *type = NULL;
-	CUnitType *seentype = NULL;
-	CPlayer *player = NULL;
+	CUnit *unit = nullptr;
+	CUnitType *type = nullptr;
+	CUnitType *seentype = nullptr;
+	CPlayer *player = nullptr;
 
 	// Parse the list:
 	const int args = lua_rawlen(l, 2);
@@ -366,24 +366,24 @@ static int CclUnit(lua_State *l)
 			CUniqueItem *unique_item = GetUniqueItem(LuaToString(l, 2, j + 1));
 			unit->Unique = unique_item;
 			if (unit->Unique && unique_item->Type->BoolFlag[ITEM_INDEX].value) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
-				if (unique_item == NULL) {
+				if (unique_item == nullptr) {
 					LuaError(l, "Unique item \"%s\" doesn't exist." _C_ unit->Name.c_str());
 				}
 				unit->Type = unique_item->Type;
 				type = unique_item->Type;
-				if (unique_item->Prefix != NULL) {
+				if (unique_item->Prefix != nullptr) {
 					unit->Prefix = unique_item->Prefix;
 				}
-				if (unique_item->Suffix != NULL) {
+				if (unique_item->Suffix != nullptr) {
 					unit->Suffix = unique_item->Suffix;
 				}
-				if (unique_item->Spell != NULL) {
+				if (unique_item->Spell != nullptr) {
 					unit->Spell = unique_item->Spell;
 				}
-				if (unique_item->Work != NULL) {
+				if (unique_item->Work != nullptr) {
 					unit->Work = unique_item->Work;
 				}
-				if (unique_item->Elixir != NULL) {
+				if (unique_item->Elixir != nullptr) {
 					unit->Elixir = unique_item->Elixir;
 				}
 			}
@@ -393,12 +393,12 @@ static int CclUnit(lua_State *l)
 			unit->Identified = LuaToBoolean(l, 2, j + 1);
 		} else if (!strcmp(value, "equipped")) {
 			bool is_equipped = LuaToBoolean(l, 2, j + 1);
-			if (is_equipped && unit->Container != NULL) {
+			if (is_equipped && unit->Container != nullptr) {
 				unit->Container->EquippedItems[GetItemClassSlot(unit->Type->ItemClass)].push_back(unit);
 			}
 		} else if (!strcmp(value, "sold-unit")) {
 			bool is_sold = LuaToBoolean(l, 2, j + 1);
-			if (is_sold && unit->Container != NULL) {
+			if (is_sold && unit->Container != nullptr) {
 				unit->Container->SoldUnits.push_back(unit);
 			}
 		} else if (!strcmp(value, "connecting-destination")) {
@@ -640,8 +640,8 @@ static int CclUnit(lua_State *l)
 				CUnit *u = CclGetUnitFromRef(l);
 				lua_pop(l, 1);
 				//Wyrmgus start
-				Assert(u != NULL);
-				Assert(unit != NULL);
+				Assert(u != nullptr);
+				Assert(unit != nullptr);
 				//Wyrmgus end
 				u->AddInContainer(*unit);
 			}
@@ -652,7 +652,7 @@ static int CclUnit(lua_State *l)
 			CclParseOrders(l, *unit);
 			lua_pop(l, 1);
 			// now we know unit's action so we can assign it to a player
-			Assert(player != NULL);
+			Assert(player != nullptr);
 			unit->AssignToPlayer(*player);
 			if (unit->CurrentAction() == UnitActionBuilt) {
 				DebugPrint("HACK: the building is not ready yet\n");
@@ -806,7 +806,7 @@ static int CclMoveUnit(lua_State *l)
 		const int heading = SyncRand() % 256;
 
 		unit->tilePos = ipos;
-		DropOutOnSide(*unit, heading, NULL);
+		DropOutOnSide(*unit, heading, nullptr);
 	}
 	lua_pushvalue(l, 1);
 	return 1;
@@ -830,7 +830,7 @@ static int CclRemoveUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	unit->Remove(NULL);
+	unit->Remove(nullptr);
 	lua_pushvalue(l, 1);
 	return 1;
 }
@@ -859,7 +859,7 @@ static int CclCreateUnit(lua_State *l)
 
 	lua_pushvalue(l, 1);
 	CUnitType *unittype = CclGetUnitType(l);
-	if (unittype == NULL) {
+	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
@@ -886,7 +886,7 @@ static int CclCreateUnit(lua_State *l)
 		return 0;
 	}
 	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
-	if (unit == NULL) {
+	if (unit == nullptr) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
@@ -895,9 +895,9 @@ static int CclCreateUnit(lua_State *l)
 		if (UnitCanBeAt(*unit, ipos, z)
 		//Wyrmgus end
 			//Wyrmgus start
-//			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
+//			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, ipos, 0))) {
 //			unit->Place(ipos);
-			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(NULL, *unit->Type, ipos, 0, true, z))) {
+			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, ipos, 0, true, z))) {
 			unit->Place(ipos, z);
 			//Wyrmgus end
 		} else {
@@ -932,7 +932,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 
 	lua_pushvalue(l, 1);
 	CUnitType *unittype = CclGetUnitType(l);
-	if (unittype == NULL) {
+	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
@@ -960,19 +960,19 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		return 0;
 	}
 	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
-	if (unit == NULL || !CanTransport(*transporter, *unit)) {
+	if (unit == nullptr || !CanTransport(*transporter, *unit)) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, ipos, transporter->MapLayer)
-			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(NULL, *unit->Type, ipos, 0, true, transporter->MapLayer))) {
+			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, ipos, 0, true, transporter->MapLayer))) {
 			unit->Place(ipos, transporter->MapLayer);
 		} else {
 			const int heading = SyncRand() % 256;
 
 			unit->tilePos = ipos;
 			unit->MapLayer = transporter->MapLayer;
-			DropOutOnSide(*unit, heading, NULL);
+			DropOutOnSide(*unit, heading, nullptr);
 		}
 
 		// Place the unit inside the transporter.
@@ -1005,7 +1005,7 @@ static int CclCreateUnitOnTop(lua_State *l)
 
 	lua_pushvalue(l, 1);
 	CUnitType *unittype = CclGetUnitType(l);
-	if (unittype == NULL) {
+	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
@@ -1034,7 +1034,7 @@ static int CclCreateUnitOnTop(lua_State *l)
 		return 0;
 	}
 	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
-	if (unit == NULL) {
+	if (unit == nullptr) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
@@ -1060,7 +1060,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 
 	lua_pushvalue(l, 1);
 	CUnitType *unittype = CclGetUnitType(l);
-	if (unittype == NULL) {
+	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
@@ -1070,8 +1070,8 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	lua_pushvalue(l, 4);
 	CUnit *worker = CclGetUnit(l);
 	lua_pop(l, 1);
-	if (worker == NULL) {
-		LuaError(l, "Worker unit is NULL");
+	if (worker == nullptr) {
+		LuaError(l, "Worker unit is null");
 		return 0;
 	}
 	
@@ -1097,19 +1097,19 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	
 	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
 	
-	if (unit == NULL) {
+	if (unit == nullptr) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, new_pos, worker->MapLayer)
-			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(NULL, *unit->Type, new_pos, 0, true, worker->MapLayer))) {
+			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, new_pos, 0, true, worker->MapLayer))) {
 			unit->Place(new_pos, worker->MapLayer);
 		} else {
 			const int heading = SyncRand() % 256;
 
 			unit->tilePos = new_pos;
 			unit->MapLayer = worker->MapLayer;
-			DropOutOnSide(*unit, heading, NULL);
+			DropOutOnSide(*unit, heading, nullptr);
 		}
 		UpdateForNewUnit(*unit, 0);
 		//Wyrmgus end
@@ -1152,7 +1152,7 @@ static int CclDamageUnit(lua_State *l)
 	LuaCheckArgs(l, 3);
 
 	const int attacker = LuaToNumber(l, 1);
-	CUnit *attackerUnit = NULL;
+	CUnit *attackerUnit = nullptr;
 	if (attacker != -1) {
 		attackerUnit = &UnitManager.GetSlotUnit(attacker);
 	}
@@ -1300,7 +1300,7 @@ static int CclOrderUnit(lua_State *l)
 				} else if (!strcmp(order, "follow")) {
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1, d_z);
 				} else if (!strcmp(order, "unload")) {
-					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1, d_z);
+					CommandUnload(unit, (dpos1 + dpos2) / 2, nullptr, 1, d_z);
 				} else if (!strcmp(order, "stop")) {					
 					CommandStopUnit(unit);
 				} else {
@@ -1479,7 +1479,7 @@ static int CclConvertUnit(lua_State *l)
 
 	lua_pushvalue(l, 2);
 	CUnitType *unittype = CclGetUnitType(l);
-	if (unittype == NULL) {
+	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
 	CommandTransformIntoType(*unit, *unittype);
@@ -1721,7 +1721,7 @@ static int CclGetUnitVariable(lua_State *l)
 
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
-	if (unit == NULL) {
+	if (unit == nullptr) {
 		return 1;
 	}
 	UpdateUnitVariables(*unit);
@@ -1746,19 +1746,19 @@ static int CclGetUnitVariable(lua_State *l)
 //		lua_pushstring(l, unit->Type->Name.c_str());
 		lua_pushstring(l, unit->GetName().c_str());
 	} else if (!strcmp(value, "Character")) {
-		if (unit->Character != NULL) {
+		if (unit->Character != nullptr) {
 			lua_pushstring(l, unit->Character->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "CustomCharacter")) {
-		if (unit->Character != NULL && unit->Character->Custom) {
+		if (unit->Character != nullptr && unit->Character->Custom) {
 			lua_pushboolean(l, true);
 		} else {
 			lua_pushboolean(l, false);
 		}
 	} else if (!strcmp(value, "Settlement")) {
-		if (unit->Settlement != NULL) {
+		if (unit->Settlement != nullptr) {
 			lua_pushstring(l, unit->Settlement->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -1773,19 +1773,19 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "TypeName")) {
 		lua_pushstring(l, unit->GetTypeName().c_str());
 	} else if (!strcmp(value, "Trait")) {
-		if (unit->Trait != NULL) {
+		if (unit->Trait != nullptr) {
 			lua_pushstring(l, unit->Trait->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "Prefix")) {
-		if (unit->Prefix != NULL) {
+		if (unit->Prefix != nullptr) {
 			lua_pushstring(l, unit->Prefix->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "Suffix")) {
-		if (unit->Suffix != NULL) {
+		if (unit->Suffix != nullptr) {
 			lua_pushstring(l, unit->Suffix->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -1797,13 +1797,13 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "Work")) {
-		if (unit->Work != NULL) {
+		if (unit->Work != nullptr) {
 			lua_pushstring(l, unit->Work->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 	} else if (!strcmp(value, "Elixir")) {
-		if (unit->Elixir != NULL) {
+		if (unit->Elixir != nullptr) {
 			lua_pushstring(l, unit->Elixir->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -1838,7 +1838,7 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushboolean(l, unit->CurrentAction() != UnitActionBuilt);
 		return 1;
 	} else if (!strcmp(value, "Container")) {
-		if (unit->Container != NULL) {
+		if (unit->Container != nullptr) {
 			lua_pushnumber(l, UnitNumber(*unit->Container));
 		} else {
 			lua_pushnumber(l, -1);
@@ -1980,7 +1980,7 @@ static int CclSetUnitVariable(lua_State *l)
 		std::string image_layer_name = LuaToString(l, 3);
 		int image_layer = GetImageLayerIdByName(image_layer_name);
 		if (image_layer != -1) {
-			unit->SetVariation(LuaToNumber(l, 4), NULL, image_layer);
+			unit->SetVariation(LuaToNumber(l, 4), nullptr, image_layer);
 		} else {
 			LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
 		}
@@ -1988,7 +1988,7 @@ static int CclSetUnitVariable(lua_State *l)
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
 		if (upgrade_ident.empty()) {
-			unit->SetPrefix(NULL);
+			unit->SetPrefix(nullptr);
 		} else if (CUpgrade::Get(upgrade_ident)) {
 			unit->SetPrefix(CUpgrade::Get(upgrade_ident));
 		} else {
@@ -1998,7 +1998,7 @@ static int CclSetUnitVariable(lua_State *l)
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
 		if (upgrade_ident.empty()) {
-			unit->SetSuffix(NULL);
+			unit->SetSuffix(nullptr);
 		} else if (CUpgrade::Get(upgrade_ident)) {
 			unit->SetSuffix(CUpgrade::Get(upgrade_ident));
 		} else {
@@ -2008,7 +2008,7 @@ static int CclSetUnitVariable(lua_State *l)
 		LuaCheckArgs(l, 3);
 		std::string spell_ident = LuaToString(l, 3);
 		if (spell_ident.empty()) {
-			unit->SetSpell(NULL);
+			unit->SetSpell(nullptr);
 		} else if (SpellTypeByIdent(spell_ident)) {
 			unit->SetSpell(SpellTypeByIdent(spell_ident));
 		} else {
@@ -2018,7 +2018,7 @@ static int CclSetUnitVariable(lua_State *l)
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
 		if (upgrade_ident.empty()) {
-			unit->SetWork(NULL);
+			unit->SetWork(nullptr);
 		} else if (CUpgrade::Get(upgrade_ident)) {
 			unit->SetWork(CUpgrade::Get(upgrade_ident));
 		} else {
@@ -2028,7 +2028,7 @@ static int CclSetUnitVariable(lua_State *l)
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
 		if (upgrade_ident.empty()) {
-			unit->SetElixir(NULL);
+			unit->SetElixir(nullptr);
 		} else if (CUpgrade::Get(upgrade_ident)) {
 			unit->SetElixir(CUpgrade::Get(upgrade_ident));
 		} else {
@@ -2038,14 +2038,14 @@ static int CclSetUnitVariable(lua_State *l)
 		LuaCheckArgs(l, 3);
 		std::string unique_name = LuaToString(l, 3);
 		if (unique_name.empty()) {
-			unit->SetUnique(NULL);
-		} else if (GetUniqueItem(unique_name) != NULL) {
+			unit->SetUnique(nullptr);
+		} else if (GetUniqueItem(unique_name) != nullptr) {
 			unit->SetUnique(GetUniqueItem(unique_name));
 		} else {
 			LuaError(l, "Unique \"%s\" doesn't exist." _C_ unique_name.c_str());
 		}
 	} else if (!strcmp(name, "GenerateSpecialProperties")) {
-		CPlayer *dropper_player = NULL;
+		CPlayer *dropper_player = nullptr;
 		bool always_magic = false;
 		if (nargs >= 3) {
 			int dropper_player_index = LuaToNumber(l, 3);
@@ -2054,7 +2054,7 @@ static int CclSetUnitVariable(lua_State *l)
 		if (nargs >= 4) {
 			always_magic = LuaToBoolean(l, 4);
 		}
-		unit->GenerateSpecialProperties(NULL, dropper_player, true, false, always_magic);
+		unit->GenerateSpecialProperties(nullptr, dropper_player, true, false, always_magic);
 	} else if (!strcmp(name, "TTL")) {
 		unit->TTL = GameCycle + LuaToNumber(l, 3);
 	} else if (!strcmp(name, "Identified")) {

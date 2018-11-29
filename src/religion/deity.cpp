@@ -78,7 +78,7 @@ CDeity *CDeity::GetDeity(const std::string &ident, const bool should_find)
 		fprintf(stderr, "Invalid deity: \"%s\".\n", ident.c_str());
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -120,7 +120,7 @@ CDeity *CDeity::GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_fin
 		fprintf(stderr, "No deity found for upgrade: \"%s\".\n", upgrade->Ident.c_str());
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -156,7 +156,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
 			CCivilization *civilization = CCivilization::GetCivilization(value);
-			if (civilization != NULL) {
+			if (civilization != nullptr) {
 				this->Civilizations.push_back(civilization);
 				civilization->Deities.push_back(this);
 			}
@@ -183,7 +183,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Icon.Name = value;
-			this->Icon.Icon = NULL;
+			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
 		} else if (key == "home_plane") {

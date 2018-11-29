@@ -74,7 +74,7 @@ std::string UnitReference(const CUnit &unit)
 */
 std::string UnitReference(const CUnitPtr &unit)
 {
-	Assert(unit != NULL);
+	Assert(unit != nullptr);
 
 	std::ostringstream ss;
 	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase
@@ -171,7 +171,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"damage-type\", %d,", unit.DamagedType);
 	file.printf("\"attacked\", %lu,\n ", unit.Attacked);
 	//Wyrmgus start
-	if (unit.Trait != NULL) {
+	if (unit.Trait != nullptr) {
 		file.printf("\"trait\", \"%s\", ", unit.Trait->Ident.c_str());
 	}
 	file.printf("\"personal-name\", \"%s\", ", unit.Name.c_str());
@@ -184,19 +184,19 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Settlement) {
 		file.printf("\"settlement\", \"%s\", ", unit.Settlement->Ident.c_str());
 	}
-	if (unit.Prefix != NULL) {
+	if (unit.Prefix != nullptr) {
 		file.printf("\"prefix\", \"%s\", ", unit.Prefix->Ident.c_str());
 	}
-	if (unit.Suffix != NULL) {
+	if (unit.Suffix != nullptr) {
 		file.printf("\"suffix\", \"%s\", ", unit.Suffix->Ident.c_str());
 	}
-	if (unit.Spell != NULL) {
+	if (unit.Spell != nullptr) {
 		file.printf("\"spell\", \"%s\", ", unit.Spell->Ident.c_str());
 	}
-	if (unit.Work != NULL) {
+	if (unit.Work != nullptr) {
 		file.printf("\"work\", \"%s\", ", unit.Work->Ident.c_str());
 	}
-	if (unit.Elixir != NULL) {
+	if (unit.Elixir != nullptr) {
 		file.printf("\"elixir\", \"%s\", ", unit.Elixir->Ident.c_str());
 	}
 	if (unit.Unique) {
@@ -208,13 +208,13 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (!unit.Identified) {
 		file.printf("\"identified\", false, ");
 	}
-	if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->IsItemEquipped(&unit)) {
+	if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != nullptr && unit.Container->IsItemEquipped(&unit)) {
 		file.printf("\"equipped\", true, ");
 	}
-	if (unit.Container != NULL && std::find(unit.Container->SoldUnits.begin(), unit.Container->SoldUnits.end(), &unit) != unit.Container->SoldUnits.end()) {
+	if (unit.Container != nullptr && std::find(unit.Container->SoldUnits.begin(), unit.Container->SoldUnits.end(), &unit) != unit.Container->SoldUnits.end()) {
 		file.printf("\"sold-unit\", true, ");
 	}
-	if (unit.ConnectingDestination != NULL) {
+	if (unit.ConnectingDestination != nullptr) {
 		file.printf("\"connecting-destination\", %d, ", UnitNumber(*unit.ConnectingDestination));
 	}
 	//Wyrmgus end
@@ -349,7 +349,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"next-worker\", \"%s\",", UnitReference(*unit.NextWorker).c_str());
 	}
 
-	if (unit.Resource.Workers != NULL) {
+	if (unit.Resource.Workers != nullptr) {
 		file.printf(" \"resource-active\", %d,", unit.Resource.Active);
 		file.printf(" \"resource-assigned\", %d,", unit.Resource.Assigned);
 		file.printf(" \"resource-workers\", \"%s\",", UnitReference(*unit.Resource.Workers).c_str());
@@ -444,7 +444,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(",\n  \"rally-point\", %d, %d", unit.RallyPointPos.x, unit.RallyPointPos.y);
 		file.printf(",\n  \"rally-point-map-layer\", %d, ", unit.RallyPointMapLayer);
 	}
-	if (unit.Character != NULL && unit.CurrentAction() != UnitActionDie && !unit.Destroyed) {
+	if (unit.Character != nullptr && unit.CurrentAction() != UnitActionDie && !unit.Destroyed) {
 		if (!unit.Character->Custom) {
 			file.printf(",\n  \"character\", \"%s\"", unit.Character->Ident.c_str());
 		} else {

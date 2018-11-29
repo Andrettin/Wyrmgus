@@ -87,7 +87,7 @@ CRegion *GetRegion(std::string region_ident)
 			return Regions[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 CProvince *GetProvince(std::string province_name)
@@ -97,7 +97,7 @@ CProvince *GetProvince(std::string province_name)
 			return Provinces[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**

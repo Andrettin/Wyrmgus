@@ -156,7 +156,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 			}
 		}
 		char *next = strchr(cur, '.');
-		if (next == NULL) {
+		if (next == nullptr) {
 			fprintf(stderr, "Need also specify the variable '%s' tag \n", cur);
 			ExitFatal(1);
 		} else {
@@ -237,7 +237,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		if (*cur == '(') {
 			++cur;
 			char *end = strchr(cur, ')');
-			if (end == NULL) {
+			if (end == nullptr) {
 				fprintf(stderr, "ParseAnimInt: expected ')'\n");
 				ExitFatal(1);
 			}
@@ -246,20 +246,20 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		} else {
 			next = strchr(cur, '.');
 		}
-		if (next == NULL) {
+		if (next == nullptr) {
 			fprintf(stderr, "Need also specify the %s player's property\n", cur);
 			ExitFatal(1);
 		} else {
 			*next = '\0';
 		}
 		char *arg = strchr(next + 1, '.');
-		if (arg != NULL) {
+		if (arg != nullptr) {
 			*arg = '\0';
 		}
 		return GetPlayerData(ParseAnimPlayer(unit, cur), next + 1, arg + 1);
 	} else if (s[0] == 'r') { //random value
 		char *next = strchr(cur, '.');
-		if (next == NULL) {
+		if (next == nullptr) {
 			return SyncRand(atoi(cur) + 1);
 		} else {
 			*next = '\0';
@@ -395,7 +395,7 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 	if (ret != AnimationMap.end()) {
 		return (*ret).second;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void FreeAnimations()
@@ -543,14 +543,14 @@ void CAnimations::ProcessConfigData(const CConfigData *config_data)
 		) {
 			int res = -1;
 			std::string death_type;
-			CAnimation *first_anim = NULL;
-			CAnimation *prev_anim = NULL;
+			CAnimation *first_anim = nullptr;
+			CAnimation *prev_anim = nullptr;
 			
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
 
-				CAnimation *anim = NULL;
+				CAnimation *anim = nullptr;
 				
 				if (child_config_data->Tag == "death" && key == "death_type") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -605,7 +605,7 @@ void CAnimations::ProcessConfigData(const CConfigData *config_data)
 				}
 				
 				if (anim) {
-					anim->Init(value.c_str(), NULL);
+					anim->Init(value.c_str(), nullptr);
 					
 					if (!first_anim) {
 						first_anim = anim;
@@ -708,7 +708,7 @@ static CAnimation *FindLabel(lua_State *l, const std::string &name)
 		}
 	}
 	LuaError(l, "Label not found: %s" _C_ name.c_str());
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -748,7 +748,7 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 	size_t begin = std::min(len, all.find_first_not_of(' ', end));
 	const std::string extraArg(all, begin);
 
-	CAnimation *anim = NULL;
+	CAnimation *anim = nullptr;
 	if (op1 == "frame") {
 		anim = new CAnimation_Frame;
 	} else if (op1 == "exact-frame") {
@@ -810,7 +810,7 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 	const int args = lua_rawlen(l, idx);
 
 	if (args == 0) {
-		return NULL;
+		return nullptr;
 	}
 	Labels.clear();
 	LabelsLater.clear();

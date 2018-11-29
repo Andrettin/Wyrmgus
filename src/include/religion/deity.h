@@ -58,7 +58,7 @@ class CDeity
 {
 public:
 	CDeity() :
-		Gender(0), Major(false), HomePlane(NULL), DeityUpgrade(NULL), CharacterUpgrade(NULL)
+		Gender(0), Major(false), HomePlane(nullptr), DeityUpgrade(nullptr), CharacterUpgrade(nullptr)
 	{
 	}
 	
