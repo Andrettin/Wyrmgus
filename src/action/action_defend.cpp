@@ -264,7 +264,7 @@ enum {
 		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 		this->MapLayer = goal->MapLayer;
 		this->ClearGoal();
-		goal = NULL;
+		goal = nullptr;
 		if (this->State == State_Defending) {
 			this->Finished = true;
 			return;

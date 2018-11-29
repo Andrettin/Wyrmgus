@@ -444,7 +444,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 
 			if (unit.CanStoreOrder(savedOrder) == false) {
 				delete savedOrder;
-				savedOrder = NULL;
+				savedOrder = nullptr;
 			} else {
 				unit.SavedOrder = savedOrder;
 			}
@@ -469,11 +469,11 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
 
 		if (newTarget && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
-			COrder *savedOrder = NULL;
+			COrder *savedOrder = nullptr;
 			if (unit.CanStoreOrder(this)) {
 				savedOrder = this->Clone();
 			}
-			if (savedOrder != NULL) {
+			if (savedOrder != nullptr) {
 				unit.SavedOrder = savedOrder;
 			}
 			this->SetGoal(newTarget);
@@ -707,7 +707,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 
 		if (unit.CanStoreOrder(savedOrder) == false) {
 			delete savedOrder;
-			savedOrder = NULL;
+			savedOrder = nullptr;
 		} else {
 			unit.SavedOrder = savedOrder;
 		}

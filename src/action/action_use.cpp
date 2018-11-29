@@ -201,7 +201,7 @@ enum {
 			return ;
 		}
 
-		if (goal && (goal->Type->BoolFlag[ITEM_INDEX].value || goal->Type->BoolFlag[POWERUP_INDEX].value || goal->ConnectingDestination != NULL)) {
+		if (goal && (goal->Type->BoolFlag[ITEM_INDEX].value || goal->Type->BoolFlag[POWERUP_INDEX].value || goal->ConnectingDestination != nullptr)) {
 			std::string goal_name = goal->GetMessageName();
 			if (!goal->Unique) {
 				goal_name = "the " + goal_name;
@@ -213,10 +213,10 @@ enum {
 					unit.DeequipItem(*goal);
 				}
 			} else if (unit.CanUseItem(goal)) {
-				if (goal->ConnectingDestination != NULL) {
+				if (goal->ConnectingDestination != nullptr) {
 					int old_z = unit.MapLayer;
 					SaveSelection();
-					unit.Remove(NULL);
+					unit.Remove(nullptr);
 					DropOutOnSide(unit, unit.Direction, goal->ConnectingDestination);
 					RestoreSelection();
 					if (unit.Player == ThisPlayer && Selected.size() > 0 && &unit == Selected[0] && old_z == UI.CurrentMapLayer->ID) {
@@ -224,14 +224,14 @@ enum {
 						UI.SelectedViewport->Center(unit.GetMapPixelPosCenter());
 					}
 					PlayUnitSound(*goal->ConnectingDestination, VoiceUsed);
-				} else if (goal->Spell != NULL) {
-					CommandSpellCast(unit, unit.tilePos, NULL, *SpellTypeTable[goal->Spell->Slot], FlushCommands, unit.MapLayer);
-				} else if (goal->Work != NULL) {
+				} else if (goal->Spell != nullptr) {
+					CommandSpellCast(unit, unit.tilePos, nullptr, *SpellTypeTable[goal->Spell->Slot], FlushCommands, unit.MapLayer);
+				} else if (goal->Work != nullptr) {
 					unit.ReadWork(goal->Work);
 					if (unit.Player == ThisPlayer) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->Ident).c_str());
 					}
-				} else if (goal->Elixir != NULL) {
+				} else if (goal->Elixir != nullptr) {
 					unit.ConsumeElixir(goal->Elixir);
 					if (unit.Player == ThisPlayer) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->Ident).c_str());
@@ -272,8 +272,8 @@ enum {
 			}
 			PlayUnitSound(*goal, VoiceUsed);
 			if (goal->Type->BoolFlag[POWERUP_INDEX].value || IsItemClassConsumable(goal->Type->ItemClass)) { //only destroy item if it is consumable
-				if (goal->Container == NULL) {
-					goal->Remove(NULL);
+				if (goal->Container == nullptr) {
+					goal->Remove(nullptr);
 					LetUnitDie(*goal);
 				} else {
 					if (!IsNetworkGame() && goal->Container->Character && goal->Container->Player->AiEnabled == false && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
@@ -333,7 +333,7 @@ enum {
 					goal->Variable[MANA_INDEX].Value -= goal->Goal->Type->TeleportCost;
 				}
 				// Everything is OK, now teleport the unit
-				unit.Remove(NULL);
+				unit.Remove(nullptr);
 				if (goal->Type->TeleportEffectIn) {
 					goal->Type->TeleportEffectIn->pushPreamble();
 					goal->Type->TeleportEffectIn->pushInteger(UnitNumber(unit));
@@ -344,7 +344,7 @@ enum {
 				}
 				unit.tilePos = goal->Goal->tilePos;
 				unit.MapLayer = goal->Goal->MapLayer;
-				DropOutOnSide(unit, unit.Direction, NULL);
+				DropOutOnSide(unit, unit.Direction, nullptr);
 
 				// FIXME: we must check if the units supports the new order.
 				CUnit &dest = *goal->Goal;
@@ -357,7 +357,7 @@ enum {
 					dest.Type->TeleportEffectOut->run();
 				}
 
-				if (dest.NewOrder == NULL
+				if (dest.NewOrder == nullptr
 					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
 					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack(true))
 					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
@@ -367,7 +367,7 @@ enum {
 					if (dest.NewOrder->HasGoal()) {
 						if (dest.NewOrder->GetGoal()->Destroyed) {
 							delete dest.NewOrder;
-							dest.NewOrder = NULL;
+							dest.NewOrder = nullptr;
 							this->Finished = true;
 							return ;
 						}
@@ -392,7 +392,7 @@ enum {
 		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 		this->MapLayer = goal->MapLayer;
 		this->ClearGoal();
-		goal = NULL;
+		goal = nullptr;
 	}
 
 	if (unit.Anim.Unbreakable) {

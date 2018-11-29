@@ -222,19 +222,19 @@ enum {
 				item->Owner = unit.Character;
 				unit.Character->Items.push_back(item);
 				item->Type = const_cast<CUnitType *>(goal->Type);
-				if (goal->Prefix != NULL) {
+				if (goal->Prefix != nullptr) {
 					item->Prefix = goal->Prefix;
 				}
-				if (goal->Suffix != NULL) {
+				if (goal->Suffix != nullptr) {
 					item->Suffix = goal->Suffix;
 				}
-				if (goal->Spell != NULL) {
+				if (goal->Spell != nullptr) {
 					item->Spell = goal->Spell;
 				}
-				if (goal->Work != NULL) {
+				if (goal->Work != nullptr) {
 					item->Work = goal->Work;
 				}
-				if (goal->Elixir != NULL) {
+				if (goal->Elixir != nullptr) {
 					item->Elixir = goal->Elixir;
 				}
 				if (goal->Unique) {
@@ -309,7 +309,7 @@ enum {
 					goal->Variable[MANA_INDEX].Value -= goal->Goal->Type->TeleportCost;
 				}
 				// Everything is OK, now teleport the unit
-				unit.Remove(NULL);
+				unit.Remove(nullptr);
 				if (goal->Type->TeleportEffectIn) {
 					goal->Type->TeleportEffectIn->pushPreamble();
 					goal->Type->TeleportEffectIn->pushInteger(UnitNumber(unit));
@@ -320,7 +320,7 @@ enum {
 				}
 				unit.tilePos = goal->Goal->tilePos;
 				unit.MapLayer = goal->Goal->MapLayer;
-				DropOutOnSide(unit, unit.Direction, NULL);
+				DropOutOnSide(unit, unit.Direction, nullptr);
 
 				// FIXME: we must check if the units supports the new order.
 				CUnit &dest = *goal->Goal;
@@ -333,7 +333,7 @@ enum {
 					dest.Type->TeleportEffectOut->run();
 				}
 
-				if (dest.NewOrder == NULL
+				if (dest.NewOrder == nullptr
 					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
 					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack(true))
 					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
@@ -343,7 +343,7 @@ enum {
 					if (dest.NewOrder->HasGoal()) {
 						if (dest.NewOrder->GetGoal()->Destroyed) {
 							delete dest.NewOrder;
-							dest.NewOrder = NULL;
+							dest.NewOrder = nullptr;
 							this->Finished = true;
 							return ;
 						}
@@ -370,7 +370,7 @@ enum {
 		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 		this->MapLayer = goal->MapLayer;
 		this->ClearGoal();
-		goal = NULL;
+		goal = nullptr;
 	}
 
 	if (unit.Anim.Unbreakable) {

@@ -454,7 +454,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 										unit.GetMessageName().c_str(), spell.Name.c_str());
 										//Wyrmgus end
 				//Wyrmgus start
-				} else if (spell.Target == TargetUnit && order.GetGoal() == NULL) {
+				} else if (spell.Target == TargetUnit && order.GetGoal() == nullptr) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer,
 										_("%s needs a target to use the %s ability."),
 										unit.GetMessageName().c_str(), spell.Name.c_str());

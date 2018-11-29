@@ -115,9 +115,9 @@ static COrderPtr *GetNextOrder(CUnit &unit, int flush)
 	const unsigned int maxOrderCount = 0x7F;
 
 	if (unit.Orders.size() == maxOrderCount) {
-		return NULL;
+		return nullptr;
 	}
-	unit.Orders.push_back(NULL);
+	unit.Orders.push_back(nullptr);
 	return &unit.Orders.back();
 }
 
@@ -141,7 +141,7 @@ static void RemoveOrder(CUnit &unit, unsigned int order)
 static void ClearNewAction(CUnit &unit)
 {
 	delete unit.NewOrder;
-	unit.NewOrder = NULL;
+	unit.NewOrder = nullptr;
 }
 
 /**
@@ -155,7 +155,7 @@ static void ClearNewAction(CUnit &unit)
 static void ClearSavedAction(CUnit &unit)
 {
 	delete unit.SavedOrder;
-	unit.SavedOrder = NULL;
+	unit.SavedOrder = nullptr;
 }
 
 static bool IsUnitValidForNetwork(const CUnit &unit)
@@ -237,7 +237,7 @@ void CommandStopUnit(CUnit &unit)
 	// Ignore that the unit could be removed.
 	COrderPtr *order = GetNextOrder(unit, FlushCommands); // Flush them.
 	Assert(order);
-	Assert(*order == NULL);
+	Assert(*order == nullptr);
 	*order = COrder::NewActionStill();
 
 	ClearSavedAction(unit);
@@ -259,7 +259,7 @@ void CommandStandGround(CUnit &unit, int flush)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -290,7 +290,7 @@ void CommandDefend(CUnit &unit, CUnit &dest, int flush)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -321,7 +321,7 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -377,7 +377,7 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -429,7 +429,7 @@ void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -535,7 +535,7 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -610,7 +610,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -659,7 +659,7 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -696,7 +696,7 @@ void CommandUse(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -735,7 +735,7 @@ void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -778,7 +778,7 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -816,7 +816,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -829,7 +829,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param pos    map position to unload.
-**  @param what   unit to be unloaded, NULL for all.
+**  @param what   unit to be unloaded, null for all.
 **  @param flush  if true, flush command queue.
 */
 //Wyrmgus start
@@ -847,7 +847,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z,
 	
 	COrderPtr *order = GetNextOrder(unit, flush);
 
-	if (order == NULL) {
+	if (order == nullptr) {
 		return;
 	}
 	//Wyrmgus start
@@ -887,7 +887,7 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -964,7 +964,7 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -1005,7 +1005,7 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -1044,7 +1044,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 		order = &unit.NewOrder;
 	} else {
 		order = GetNextOrder(unit, flush);
-		if (order == NULL) {
+		if (order == nullptr) {
 			return;
 		}
 	}
@@ -1093,7 +1093,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 		if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTrain) {
 			return;
 		}
-		Assert(unit.CriticalOrder == NULL);
+		Assert(unit.CriticalOrder == nullptr);
 		
 		unit.CriticalOrder = COrder::NewActionTrain(unit, type, player);
 		return;
@@ -1109,7 +1109,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 	const int noFlushCommands = 0;
 	COrderPtr *order = GetNextOrder(unit, noFlushCommands);
 
-	if (order == NULL) {
+	if (order == nullptr) {
 		return;
 	}
 	//Wyrmgus start
@@ -1186,7 +1186,7 @@ void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 
 	COrderPtr *order = GetNextOrder(unit, flush);
 
-	if (order == NULL) {
+	if (order == nullptr) {
 		return;
 	}
 	*order = COrder::NewActionUpgradeTo(unit, type);
@@ -1204,7 +1204,7 @@ void CommandTransformIntoType(CUnit &unit, CUnitType &type)
 	if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTransformInto) {
 		return;
 	}
-	Assert(unit.CriticalOrder == NULL);
+	Assert(unit.CriticalOrder == nullptr);
 
 	unit.CriticalOrder = COrder::NewActionTransformInto(type);
 }
@@ -1260,7 +1260,7 @@ void CommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
 		return;
 	}
 	COrderPtr *order = GetNextOrder(unit, flush);
-	if (order == NULL) {
+	if (order == nullptr) {
 		return;
 	}
 	//Wyrmgus start
@@ -1343,7 +1343,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellTyp
 	
 	COrderPtr *order = GetNextOrder(unit, flush);
 
-	if (order == NULL) {
+	if (order == nullptr) {
 		return;
 	}
 

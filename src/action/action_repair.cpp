@@ -111,7 +111,7 @@
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
 	//Wyrmgus end
 
-	if (this->ReparableTarget != NULL) {
+	if (this->ReparableTarget != nullptr) {
 		file.printf(" \"repair-target\", \"%s\",", UnitReference(this->GetReparableTarget()).c_str());
 	}
 
@@ -159,7 +159,7 @@
 {
 	PixelPos targetPos;
 
-	if (this->ReparableTarget != NULL) {
+	if (this->ReparableTarget != nullptr) {
 		if (this->ReparableTarget->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
@@ -185,10 +185,10 @@
 	const CUnit &unit = *input.GetUnit();
 
 	input.SetMinRange(0);
-	input.SetMaxRange(ReparableTarget != NULL ? unit.Type->RepairRange : 0);
+	input.SetMaxRange(ReparableTarget != nullptr ? unit.Type->RepairRange : 0);
 
 	Vec2i tileSize;
-	if (ReparableTarget != NULL) {
+	if (ReparableTarget != nullptr) {
 		tileSize = ReparableTarget->GetTileSize();
 		input.SetGoal(ReparableTarget->tilePos, tileSize, ReparableTarget->MapLayer);
 	} else {
@@ -307,9 +307,9 @@ static void AnimateActionRepair(CUnit &unit)
 						DebugPrint("repair target gone.\n");
 						this->goalPos = goal->tilePos + goal->GetHalfTileSize();
 						this->MapLayer = goal->MapLayer;
-						ReparableTarget = NULL;
+						ReparableTarget = nullptr;
 						this->ClearGoal();
-						goal = NULL;
+						goal = nullptr;
 					}
 				} else if (unit.Player->AiEnabled) {
 					// Ai players workers should stop if target is killed
@@ -369,8 +369,8 @@ static void AnimateActionRepair(CUnit &unit)
 					this->MapLayer = goal->MapLayer;
 					// FIXME: should I clear this here?
 					this->ClearGoal();
-					ReparableTarget = NULL;
-					goal = NULL;
+					ReparableTarget = nullptr;
+					goal = nullptr;
 				} else {
 					const int dist = unit.MapDistanceTo(*goal);
 

@@ -227,12 +227,12 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 
 	// Destination could be killed. NETWORK!
 	if (depot && depot->Destroyed) {
-		depot = NULL;
+		depot = nullptr;
 	}
 	order->CurrentResource = harvester.CurrentResource;
 	order->DoneHarvesting = true;
 
-	if (depot == NULL) {
+	if (depot == nullptr) {
 		depot = FindDeposit(harvester, 1000, harvester.CurrentResource);
 	}
 	if (depot) {
@@ -252,8 +252,8 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 Vec2i COrder_Resource::GetHarvestLocation() const
 {
 	//Wyrmgus start
-//	if (this->Resource.Mine != NULL) {
-	if (this->Resource.Mine != NULL && this->Resource.Mine->Type != NULL) {
+//	if (this->Resource.Mine != nullptr) {
+	if (this->Resource.Mine != nullptr && this->Resource.Mine->Type != nullptr) {
 	//Wyrmgus end
 		return this->Resource.Mine->tilePos;
 	} else {
@@ -265,8 +265,8 @@ Vec2i COrder_Resource::GetHarvestLocation() const
 int COrder_Resource::GetHarvestMapLayer() const
 {
 	//Wyrmgus start
-//	if (this->Resource.Mine != NULL) {
-	if (this->Resource.Mine != NULL && this->Resource.Mine->Type != NULL) {
+//	if (this->Resource.Mine != nullptr) {
+	if (this->Resource.Mine != nullptr && this->Resource.Mine->Type != nullptr) {
 	//Wyrmgus end
 		return this->Resource.Mine->MapLayer;
 	} else {
@@ -323,7 +323,7 @@ COrder_Resource::~COrder_Resource()
 	file.printf(" \"map-layer\", %d,", this->MapLayer);
 	//Wyrmgus end
 
-	Assert(this->worker != NULL && worker->IsAlive());
+	Assert(this->worker != nullptr && worker->IsAlive());
 	file.printf(" \"worker\", \"%s\",", UnitReference(worker).c_str());
 	file.printf(" \"current-res\", %d,", this->CurrentResource);
 
@@ -332,12 +332,12 @@ COrder_Resource::~COrder_Resource()
 	file.printf(" \"res-map-layer\", %d,", this->Resource.MapLayer);
 	//Wyrmgus end
 	//Wyrmgus start
-//	if (this->Resource.Mine != NULL) {
-	if (this->Resource.Mine != NULL && this->Resource.Mine->Type != NULL) {
+//	if (this->Resource.Mine != nullptr) {
+	if (this->Resource.Mine != nullptr && this->Resource.Mine->Type != nullptr) {
 	//Wyrmgus end
 		file.printf(" \"res-mine\", \"%s\",", UnitReference(this->Resource.Mine).c_str());
 	}
-	if (this->Depot != NULL) {
+	if (this->Depot != nullptr) {
 		file.printf(" \"res-depot\", \"%s\",", UnitReference(this->Depot).c_str());
 	}
 	if (this->DoneHarvesting) {
@@ -366,8 +366,8 @@ COrder_Resource::~COrder_Resource()
 		this->Resource.Mine = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
 		//Wyrmgus start
-		if (this->Resource.Mine->Type == NULL) {
-			this->Resource.Mine = NULL;
+		if (this->Resource.Mine->Type == nullptr) {
+			this->Resource.Mine = nullptr;
 		}
 		//Wyrmgus end
 	} else if (!strcmp(value, "res-pos")) {
@@ -709,7 +709,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		this->goalPos.y = -1;
 		//Wyrmgus start
 //		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled))) {
-		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, true, NULL, true, false, false, false, true))) {
+		if ((goal = UnitFindResource(unit, unit, 15, this->CurrentResource, true, nullptr, true, false, false, false, true))) {
 		//Wyrmgus end
 			this->State = SUB_START_RESOURCE;
 			this->SetGoal(goal);
@@ -843,7 +843,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	//Wyrmgus end
 		//Wyrmgus start
 //		CUnit *goal = UnitFindResource(unit, unit, 15, this->CurrentResource, 1);
-		CUnit *goal = UnitFindResource(unit, unit, 15, this->CurrentResource, 1, NULL, true, false, false, false, true);
+		CUnit *goal = UnitFindResource(unit, unit, 15, this->CurrentResource, 1, nullptr, true, false, false, false, true);
 		//Wyrmgus end
 
 		if (goal) {
@@ -884,7 +884,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	//use depot as goal
 	//Wyrmgus start
 //	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, unit.Player->AiEnabled);
-	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, true, NULL, true, false, false, false, true);
+	depot = UnitFindResource(unit, unit, 15, this->CurrentResource, true, nullptr, true, false, false, false, true);
 	//Wyrmgus end
 	if (depot) {
 		DebugPrint("%d: Worker %d report: Resource is exhausted, Found another resource.\n"
@@ -920,7 +920,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	//Wyrmgus end
 		AnimateActionHarvest(unit);
 	} else {
-		unit.Anim.CurrAnim = NULL;
+		unit.Anim.CurrAnim = nullptr;
 	}
 
 	this->TimeToHarvest--;
@@ -1097,7 +1097,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 					LetUnitDie(*source);
 					// FIXME: make the workers inside look for a new resource.
 				}
-				source = NULL;
+				source = nullptr;
 				return 0;
 			}
 		}
@@ -1115,7 +1115,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //			if (resinfo.HarvestFromOutside) {
 			if (harvest_from_outside) {
 			//Wyrmgus end
-				if ((unit.ResourcesHeld == resinfo.ResourceCapacity) || (source == NULL)) {
+				if ((unit.ResourcesHeld == resinfo.ResourceCapacity) || (source == nullptr)) {
 					// Mark as complete.
 					this->DoneHarvesting = true;
 				}
@@ -1133,7 +1133,7 @@ int GetNumWaitingWorkers(const CUnit &mine)
 	int ret = 0;
 	CUnit *worker = mine.Resource.Workers;
 
-	for (int i = 0; NULL != worker; worker = worker->NextWorker, ++i) {
+	for (int i = 0; nullptr != worker; worker = worker->NextWorker, ++i) {
 		Assert(worker->CurrentAction() == UnitActionResource);
 		COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 
@@ -1190,8 +1190,8 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		if (source->Type->MaxOnBoard) {
 			int count = 0;
 			CUnit *worker = source->Resource.Workers;
-			CUnit *next = NULL;
-			for (; NULL != worker; worker = worker->NextWorker) {
+			CUnit *next = nullptr;
+			for (; nullptr != worker; worker = worker->NextWorker) {
 				Assert(worker->CurrentAction() == UnitActionResource);
 				COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 				if (worker != &unit && order.IsGatheringWaiting()) {
@@ -1225,7 +1225,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		//Wyrmgus start
 		this->Resource.MapLayer = unit.MapLayer;
 		//Wyrmgus end
-		Assert(this->Resource.Mine == NULL);
+		Assert(this->Resource.Mine == nullptr);
 	}
 
 #ifdef DEBUG
@@ -1248,7 +1248,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 
 		if (mine) {
 			unit.DeAssignWorkerFromMine(*mine);
-			this->Resource.Mine = NULL;
+			this->Resource.Mine = nullptr;
 		}
 
 		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n"
@@ -1365,7 +1365,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 			SelectionChanged();
 			unit.Removed = 1;
 		}
-		unit.Anim.CurrAnim = NULL;
+		unit.Anim.CurrAnim = nullptr;
 	}
 
 	// Update resource.
@@ -1448,7 +1448,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	// Range hardcoded. don't stray too far though
 	//Wyrmgus start
 //	if (resinfo.TerrainHarvester) {
-	if (!this->Resource.Mine || this->Resource.Mine->Type == NULL) {
+	if (!this->Resource.Mine || this->Resource.Mine->Type == nullptr) {
 	//Wyrmgus end
 		Vec2i pos = this->Resource.Pos;
 		//Wyrmgus start
@@ -1477,8 +1477,8 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		const unsigned int tooManyWorkers = 15;
 		CUnit *mine = this->Resource.Mine;
 		const int range = 15;
-		CUnit *newdepot = NULL;
-		CUnit *goal = NULL;
+		CUnit *newdepot = nullptr;
+		CUnit *goal = nullptr;
 		const bool longWay = unit.pathFinderData->output.Cycles > 500;
 
 		//Wyrmgus start
@@ -1489,17 +1489,17 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			// Use depot's ref counter for that
 			//Wyrmgus start
 //			if (longWay || !mine || (depot->Refs > tooManyWorkers)) {
-			if (longWay || !mine || mine->Type == NULL || (depot->Refs > tooManyWorkers)) {
+			if (longWay || !mine || mine->Type == nullptr || (depot->Refs > tooManyWorkers)) {
 			//Wyrmgus end
 				newdepot = AiGetSuitableDepot(unit, *depot, &goal);
-				if (newdepot == NULL && longWay && unit.Player->NumTownHalls > 0) {
+				if (newdepot == nullptr && longWay && unit.Player->NumTownHalls > 0) {
 					// We need a new depot
 					AiNewDepotRequest(unit);
 				}
 			}
 		}
 
-		// If goal is not NULL, then we got it in AiGetSuitableDepot
+		// If goal is not null, then we got it in AiGetSuitableDepot
 		if (!goal) {
 			//Wyrmgus start
 //			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
@@ -1536,7 +1536,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			}
 			if (mine) {
 				unit.DeAssignWorkerFromMine(*mine);
-				this->Resource.Mine = NULL;
+				this->Resource.Mine = nullptr;
 			}
 			this->Finished = true;
 			return false;
@@ -1560,7 +1560,7 @@ void COrder_Resource::DropResource(CUnit &unit)
 			}
 		}
 		//fast clean both resource data: pos and mine
-		this->Resource.Mine = NULL;
+		this->Resource.Mine = nullptr;
 		unit.CurrentResource = 0;
 		//Wyrmgus start
 //		unit.ResourcesHeld = 0;
@@ -1601,7 +1601,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 			//Wyrmgus end
 				//Wyrmgus start
 //				CUnit *newGoal = UnitFindResource(unit, this->Resource.Mine ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1);
-				CUnit *newGoal = UnitFindResource(unit, (this->Resource.Mine && this->Resource.Mine->Type) ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1, NULL, true, false, false, false, true);
+				CUnit *newGoal = UnitFindResource(unit, (this->Resource.Mine && this->Resource.Mine->Type) ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1, nullptr, true, false, false, false, true);
 				//Wyrmgus end
 
 				if (newGoal) {
@@ -1653,7 +1653,7 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 
 	if (mine) {
 		unit.DeAssignWorkerFromMine(*mine);
-		this->Resource.Mine = NULL;
+		this->Resource.Mine = nullptr;
 	}
 	if (goal && goal->IsAlive() == false) {
 		return false;

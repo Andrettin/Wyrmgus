@@ -111,7 +111,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		MapUnmarkUnitSight(unit);
 	} else {
 		SaveSelection();
-		unit.Remove(NULL);
+		unit.Remove(nullptr);
 		if (!UnitTypeCanBeAt(newtype, pos)) {
 			unit.Place(unit.tilePos);
 			RestoreSelection();
@@ -125,7 +125,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			MapUnmarkUnitSight(unit);
 		} else {
 			SaveSelection();
-			unit.Remove(NULL);
+			unit.Remove(nullptr);
 			//Wyrmgus start
 			/*
 			if (!UnitTypeCanBeAt(newtype, pos)) {
@@ -287,7 +287,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus start
 	//change personal name if new unit type's civilization is different from old unit type's civilization
 	if (
-		unit.Character == NULL
+		unit.Character == nullptr
 		&& (
 			oldtype.PersonalNames != newtype.PersonalNames
 			|| (
@@ -335,7 +335,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		UpdateUnitSightRange(unit);
 		if (!container) {
 			if (!UnitTypeCanBeAt(newtype, pos, unit.MapLayer)) {
-				DropOutNearest(unit, pos, NULL);
+				DropOutNearest(unit, pos, nullptr);
 			} else {
 				unit.Place(pos, unit.MapLayer);
 			}

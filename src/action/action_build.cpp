@@ -132,7 +132,7 @@ enum {
 	}
 	//Wyrmgus end
 
-	if (this->BuildingUnit != NULL) {
+	if (this->BuildingUnit != nullptr) {
 		file.printf(" \"building\", \"%s\",", UnitReference(this->BuildingUnit).c_str());
 	}
 	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());
@@ -224,7 +224,7 @@ void COrder_Build::AiUnitKilled(CUnit &unit)
 	DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_
 			   unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
-	if (this->BuildingUnit == NULL) {
+	if (this->BuildingUnit == nullptr) {
 		//Wyrmgus start
 //		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
 		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type, Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
@@ -352,7 +352,7 @@ private:
 **
 **  @param unit  Unit to check
 **
-**  @return OnTop or NULL
+**  @return OnTop or null
 */
 CUnit *COrder_Build::CheckCanBuild(CUnit &unit) const
 {
@@ -367,10 +367,10 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit) const
 	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1, ignore_exploration, this->MapLayer);
 	//Wyrmgus end
 
-	if (ontop != NULL) {
+	if (ontop != nullptr) {
 		return ontop;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -423,7 +423,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	//Wyrmgus end
 	
 	// If unable to make unit, stop, and report message
-	if (build == NULL) {
+	if (build == nullptr) {
 		// FIXME: Should we retry this?
 		unit.Player->Notify(NotifyYellow, unit.tilePos,
 							//Wyrmgus start
@@ -510,7 +510,7 @@ static void AnimateActionBuild(CUnit &unit)
 	CAnimations *animations = unit.GetAnimations();
 	//Wyrmgus end
 
-	if (animations == NULL) {
+	if (animations == nullptr) {
 		return ;
 	}
 	if (animations->Build) {
@@ -530,7 +530,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 {
 	AnimateActionBuild(unit);
 
-	if (this->BuildingUnit == NULL) {
+	if (this->BuildingUnit == nullptr) {
 		return false;
 	}
 
@@ -585,7 +585,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		//Wyrmgus end
 		CUnit *ontop = this->CheckCanBuild(unit);
 
-		if (ontop != NULL) {
+		if (ontop != nullptr) {
 			//Wyrmgus start
 			if (CheckLimit(unit, type, Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement) == false) {
 				this->Finished = true;
@@ -604,7 +604,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 			CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos, this->MapLayer));
 			//Wyrmgus end
 
-			if (building != NULL) {
+			if (building != nullptr) {
 				this->HelpBuild(unit, *building);
 				// HelpBuild replaces this command so return immediately
 				return ;
@@ -638,7 +638,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 //		if (this->BuildFromOutside(unit)) {
 //			this->Finished = true;
 //		}
-		if (this->BuildingUnit != NULL) {
+		if (this->BuildingUnit != nullptr) {
 			this->HelpBuild(unit, *this->BuildingUnit);
 		} else {
 			this->Finished = true;

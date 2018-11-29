@@ -127,7 +127,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	if (unit.CurrentAction() == UnitActionDie) {
 		unit.Seen.State = 3;
 	}
-	unit.Seen.CFrame = NULL;
+	unit.Seen.CFrame = nullptr;
 }
 
 /* virtual */ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
@@ -167,7 +167,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	}
 	CUnit *goal = AttackUnitsInRange(unit);
 
-	if (goal != NULL) {
+	if (goal != nullptr) {
 		const Vec2i invalidPos(-1, -1);
 
 		//Wyrmgus start
@@ -407,20 +407,20 @@ static bool HandleBurnAndPoison(CUnit &unit)
 	if (hpPercent <= unit.Type->BurnPercent && unit.Type->BurnDamageRate) {
 		//Wyrmgus start
 //		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
-		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate, NULL, false); //a bit too repetitive to show damage every single time the burn effect is applied
+		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate, nullptr, false); //a bit too repetitive to show damage every single time the burn effect is applied
 		//Wyrmgus end
 		return true;
 	}
 	if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
 		//Wyrmgus start
 //		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
-		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain, NULL, false); //a bit too repetitive to show damage every single time the poison effect is applied
+		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain, nullptr, false); //a bit too repetitive to show damage every single time the poison effect is applied
 		//Wyrmgus end
 		return true;
 	}
 	//Wyrmgus start
 	if (unit.Variable[BLEEDING_INDEX].Value || unit.Variable[DEHYDRATION_INDEX].Value) {
-		HitUnit(NoUnitP, unit, 1, NULL, false);
+		HitUnit(NoUnitP, unit, 1, nullptr, false);
 		//don't return true since we don't want to stop regeneration (positive or negative) from happening
 	}
 	//Wyrmgus end
@@ -527,10 +527,10 @@ static void HandleUnitAction(CUnit &unit)
 {
 	// If current action is breakable proceed with next one.
 	if (!unit.Anim.Unbreakable) {
-		if (unit.CriticalOrder != NULL) {
+		if (unit.CriticalOrder != nullptr) {
 			unit.CriticalOrder->Execute(unit);
 			delete unit.CriticalOrder;
-			unit.CriticalOrder = NULL;
+			unit.CriticalOrder = nullptr;
 		}
 
 		if (unit.Orders[0]->Finished && unit.Orders[0]->Action != UnitActionStill
@@ -611,7 +611,7 @@ static void UnitActionsEachFiveSeconds(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 static void DumpUnitInfo(CUnit &unit)
 {
 	// Dump the unit to find the network sync bugs.
-	static FILE *logf = NULL;
+	static FILE *logf = nullptr;
 
 	if (!logf) {
 		time_t now;
@@ -638,7 +638,7 @@ static void DumpUnitInfo(CUnit &unit)
 #if 0
 	SaveUnit(unit, logf);
 #endif
-	fflush(NULL);
+	fflush(nullptr);
 }
 
 template <typename UNITP_ITERATOR>

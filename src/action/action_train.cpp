@@ -175,7 +175,7 @@ void COrder_Train::ConvertUnitType(const CUnit &unit, CUnitType &newType)
 */
 static bool CanHandleOrder(const CUnit &unit, COrder *order)
 {
-	if (order == NULL) {
+	if (order == nullptr) {
 		return false;
 	}
 	if (order->Action == UnitActionResource) {
@@ -311,7 +311,7 @@ static void AnimateActionTrain(CUnit &unit)
 	/*
 	CUnit *newUnit = MakeUnit(nType, &player);
 
-	if (newUnit == NULL) { // No more memory :/
+	if (newUnit == nullptr) { // No more memory :/
 		//Wyrmgus start
 //		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
 		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.GetDefaultName(player).c_str());
@@ -354,7 +354,7 @@ static void AnimateActionTrain(CUnit &unit)
 	if (unit.NewOrder && unit.NewOrder->HasGoal()
 		&& unit.NewOrder->GetGoal()->Destroyed) {
 		delete unit.NewOrder;
-		unit.NewOrder = NULL;
+		unit.NewOrder = nullptr;
 	}
 
 	if (CanHandleOrder(*newUnit, unit.NewOrder) == true) {
@@ -380,7 +380,7 @@ static void AnimateActionTrain(CUnit &unit)
 		CUnit *newUnit = MakeUnit(nType, &Players[owner_player]);
 		//Wyrmgus end
 
-		if (newUnit == NULL) { // No more memory :/
+		if (newUnit == nullptr) { // No more memory :/
 			//Wyrmgus start
 	//		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
 			player.Notify(NotifyYellow, unit.tilePos, unit.MapLayer, _("Unable to train %s"), nType.GetDefaultName(player).c_str());
@@ -430,7 +430,7 @@ static void AnimateActionTrain(CUnit &unit)
 		if (unit.NewOrder && unit.NewOrder->HasGoal()
 			&& unit.NewOrder->GetGoal()->Destroyed) {
 			delete unit.NewOrder;
-			unit.NewOrder = NULL;
+			unit.NewOrder = nullptr;
 		}
 
 		if (CanHandleOrder(*newUnit, unit.NewOrder) == true) {

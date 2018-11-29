@@ -96,7 +96,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landma
 		cframe = cframe->Next;
 		++frame;
 	}
-	if (this->Worker != NULL) {
+	if (this->Worker != nullptr) {
 		file.printf("\"worker\", \"%s\", ", UnitReference(this->Worker).c_str());
 	}
 	file.printf("\"progress\", %d, \"frame\", %d", this->ProgressCounter, frame);
@@ -125,7 +125,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landma
 //		CConstructionFrame *cframe = unit.Type->Construction->Frames;
 		CConstructionFrame *cframe = unit.GetConstruction()->Frames;
 		//Wyrmgus end
-		while (frame-- && cframe->Next != NULL) {
+		while (frame-- && cframe->Next != nullptr) {
 			cframe = cframe->Next;
 		}
 		this->Frame = cframe;
@@ -152,7 +152,7 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 	CUnit *worker = order.GetWorkerPtr();
 
 	// Drop out unit
-	if (worker != NULL) {
+	if (worker != nullptr) {
 		worker->ClearAction();
 
 		DropOutOnSide(*worker, LookingW, &unit);
@@ -231,7 +231,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	int xp_gained = type.Stats[unit.Player->Index].Costs[TimeCost] / 10;
 	//Wyrmgus end
 
-	if (worker != NULL) {
+	if (worker != nullptr) {
 		//Wyrmgus start
 		worker_count += 1;
 		//Wyrmgus end
@@ -239,7 +239,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		if (type.BoolFlag[BUILDERLOST_INDEX].value) {
 			// Bye bye worker.
 			LetUnitDie(*worker);
-			worker = NULL;
+			worker = nullptr;
 		} else { // Drop out the worker.
 			worker->ClearAction();
 
@@ -308,7 +308,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			//Wyrmgus start
 			// why play the under-construction sound if the building has just been completed?
 //			PlayUnitSound(unit, VoiceBuilding);
-			for (size_t i = 0; i != table.size(); ++i) { // see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is NULL
+			for (size_t i = 0; i != table.size(); ++i) { // see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is null
 				if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
 					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitActionBuild) { //don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
 						PlayUnitSound(*table[i], VoiceWorkCompleted);
@@ -321,7 +321,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 
 	if (player.AiEnabled) {
-		/* Worker can be NULL */
+		/* Worker can be null */
 		AiWorkComplete(worker, unit);
 	}
 
@@ -339,7 +339,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		}
 		Map.SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer);
 		//Wyrmgus end
-		unit.Remove(NULL);
+		unit.Remove(nullptr);
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		unit.Release();
@@ -479,7 +479,7 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 	const CConstructionFrame *cframe = FindCFramePercent(*unit.GetConstruction()->Frames, percent);
 	//Wyrmgus end
 
-	Assert(cframe != NULL);
+	Assert(cframe != nullptr);
 
 	if (cframe != this->Frame) {
 		this->Frame = cframe;

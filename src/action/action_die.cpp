@@ -83,7 +83,7 @@ static bool AnimateActionDie(CUnit &unit)
 	const CAnimations *animations = unit.GetAnimations();
 	//Wyrmgus end
 
-	if (animations == NULL) {
+	if (animations == nullptr) {
 		return false;
 	}
 	if (animations->Death[unit.DamagedType]) {
@@ -110,8 +110,8 @@ static bool AnimateActionDie(CUnit &unit)
 	const CUnitType &type = *unit.Type;
 
 	// Die sequence terminated, generate corpse.
-	if (type.CorpseType == NULL) {
-		unit.Remove(NULL);
+	if (type.CorpseType == nullptr) {
+		unit.Remove(nullptr);
 		//Wyrmgus start
 		UnitClearOrders(unit);
 		//Wyrmgus end
@@ -127,7 +127,7 @@ static bool AnimateActionDie(CUnit &unit)
 	// Always do that, since types can have different vision properties.
 
 	//Wyrmgus start
-//	unit.Remove(NULL);
+//	unit.Remove(nullptr);
 	MapUnmarkUnitSight(unit);
 	//Wyrmgus end
 	unit.Type = &corpseType;

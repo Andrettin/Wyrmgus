@@ -167,7 +167,7 @@ private:
 	}
 	
 	CUnit *goal = this->GetGoal();
-	if (goal == NULL) {
+	if (goal == nullptr) {
 		return;
 	}
 	if (IsTargetInRange(unit)(goal) == false) {
@@ -389,7 +389,7 @@ private:
 **  @param unit   unit which can repair.
 **  @param range  range to find a repairable unit.
 **
-**  @return       unit to repair if found, NULL otherwise
+**  @return       unit to repair if found, null otherwise
 **
 **  @todo         FIXME: find the best unit (most damaged, ...).
 */
@@ -420,11 +420,11 @@ bool AutoRepair(CUnit &unit)
 	}
 	CUnit *repairedUnit = UnitToRepairInRange(unit, repairRange);
 
-	if (repairedUnit == NULL) {
+	if (repairedUnit == nullptr) {
 		return false;
 	}
 	const Vec2i invalidPos(-1, -1);
-	COrder *savedOrder = NULL;
+	COrder *savedOrder = nullptr;
 	if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
@@ -434,7 +434,7 @@ bool AutoRepair(CUnit &unit)
 //	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
 	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands, repairedUnit->MapLayer);
 	//Wyrmgus end
-	if (savedOrder != NULL) {
+	if (savedOrder != nullptr) {
 		unit.SavedOrder = savedOrder;
 	}
 	return true;
@@ -455,7 +455,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	CUnit *autoAttackUnit = unit.Container && unit.Container->CurrentAction() == UnitActionAttack && unit.Container->CurrentOrder()->HasGoal() ? unit.Container->CurrentOrder()->GetGoal() : AttackUnitsInRange(unit);
 	//Wyrmgus end
 
-	if (autoAttackUnit == NULL) {
+	if (autoAttackUnit == nullptr) {
 		return false;
 	}
 	// If unit is removed, use container's x and y
@@ -510,10 +510,10 @@ bool AutoAttack(CUnit &unit)
 	// Normal units react in reaction range.
 	CUnit *goal = AttackUnitsInReactRange(unit);
 
-	if (goal == NULL) {
+	if (goal == nullptr) {
 		return false;
 	}
-	COrder *savedOrder = NULL;
+	COrder *savedOrder = nullptr;
 
 	if (unit.CurrentAction() == UnitActionStill) {
 		//Wyrmgus start
@@ -524,12 +524,9 @@ bool AutoAttack(CUnit &unit)
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
 	// Weak goal, can choose other unit, come back after attack
-	//Wyrmgus start
-//	CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
-	CommandAttack(unit, goal->tilePos, NULL, FlushCommands, goal->MapLayer);
-	//Wyrmgus end
+	CommandAttack(unit, goal->tilePos, nullptr, FlushCommands, goal->MapLayer);
 
-	if (savedOrder != NULL) {
+	if (savedOrder != nullptr) {
 		unit.SavedOrder = savedOrder;
 	}
 	return true;
@@ -541,9 +538,9 @@ bool AutoAttack(CUnit &unit)
 	// If unit is not bunkered and removed, wait
 	if (unit.Removed
 		//Wyrmgus start
-//		&& (unit.Container == NULL || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
-		&& (unit.Container == NULL || !unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
-			if (unit.Container != NULL) {
+//		&& (unit.Container == nullptr || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
+		&& (unit.Container == nullptr || !unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
+			if (unit.Container != nullptr) {
 				LeaveShelter(unit); // leave shelter if surrounded
 			}
 		//Wyrmgus end

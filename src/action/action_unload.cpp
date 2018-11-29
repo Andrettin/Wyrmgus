@@ -294,7 +294,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 
 	if (unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Unique) { //destroy items if they have been on the ground for too long
 		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
-		if (unit.Prefix != NULL || unit.Suffix != NULL || unit.Spell != NULL || unit.Work != NULL || unit.Elixir != NULL) {
+		if (unit.Prefix != nullptr || unit.Suffix != nullptr || unit.Spell != nullptr || unit.Work != nullptr || unit.Elixir != nullptr) {
 			ttl_cycles *= 4;
 		}
 		unit.TTL = GameCycle + ttl_cycles;
@@ -318,7 +318,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 */
 //Wyrmgus start
 //static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos)
-static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z, int landmass = 0, CUnit *goal = NULL)
+static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos, int z, int landmass = 0, CUnit *goal = nullptr)
 //Wyrmgus end
 {
 	const int maxUnloadRange = 1;
@@ -453,7 +453,7 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 	if (!isTransporterRemoved) {
 		// Remove transporter to avoid "collision" with itself.
 		//Wyrmgus start
-//		transporter.Remove(NULL);
+//		transporter.Remove(nullptr);
 		UnmarkUnitFieldFlags(transporter);
 		//Wyrmgus end
 	}
@@ -507,7 +507,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 	int stillonboard = 0;
 
 	// Goal is the specific unit unit that you want to unload.
-	// This can be NULL, in case you want to unload everything.
+	// This can be null, in case you want to unload everything.
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
 
