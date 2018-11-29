@@ -441,7 +441,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 		return;
 	}
 	
-	if (unit.MapLayer != UI.CurrentMapLayer->ID) {
+	if (!UI.CurrentMapLayer || unit.MapLayer != UI.CurrentMapLayer->ID) {
 		return;
 	}
 	//Wyrmgus end
