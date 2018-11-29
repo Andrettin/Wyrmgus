@@ -116,7 +116,7 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 {
 	const PixelDiff relPos = screenPixelPos - this->TopLeftPos + this->Offset;
-	const PixelPos mapPixelPos = relPos + Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer->ID);
+	const PixelPos mapPixelPos = relPos + Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
 
 	return mapPixelPos;
 }
@@ -124,7 +124,7 @@ PixelPos CViewport::ScreenToMapPixelPos(const PixelPos &screenPixelPos) const
 // Convert map pixel coordinates into viewport coordinates
 PixelPos CViewport::MapToScreenPixelPos(const PixelPos &mapPixelPos) const
 {
-	const PixelDiff relPos = mapPixelPos - Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer->ID);
+	const PixelDiff relPos = mapPixelPos - Map.TilePosToMapPixelPos_TopLeft(this->MapPos, UI.CurrentMapLayer);
 
 	return this->TopLeftPos + relPos - this->Offset;
 }
@@ -141,7 +141,7 @@ Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 /// convert tilepos coordonates into screen (take the top left of the tile)
 PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 {
-	const PixelPos mapPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer->ID);
+	const PixelPos mapPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
 
 	return MapToScreenPixelPos(mapPos);
 }
@@ -201,7 +201,7 @@ void CViewport::Set(const PixelPos &mapPos)
 */
 void CViewport::Set(const Vec2i &tilePos, const PixelDiff &offset)
 {
-	const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer ? UI.CurrentMapLayer->ID : -1) + offset;
+	const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer) + offset;
 
 	this->Set(mapPixelPos);
 }

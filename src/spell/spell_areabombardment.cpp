@@ -105,7 +105,7 @@
 		} while (!Map.Info.IsPointOnMap(dpos, z));
 		//Wyrmgus end
 
-		const PixelPos dest = Map.TilePosToMapPixelPos_Center(dpos, z);
+		const PixelPos dest = Map.TilePosToMapPixelPos_Center(dpos, Map.MapLayers[z]);
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
 			//Wyrmgus start

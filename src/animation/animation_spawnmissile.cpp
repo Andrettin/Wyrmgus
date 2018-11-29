@@ -89,10 +89,10 @@
 				return;
 			} else if (goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionAttackGround) {
 				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
-				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
+				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), Map.MapLayers[goal->MapLayer]);
 			} else if (goal->CurrentAction() == UnitActionSpellCast) {
 				COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
+				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), Map.MapLayers[goal->MapLayer]);
 			}
 			if (flags & SM_Pixel) {
 				dest.x += destx;

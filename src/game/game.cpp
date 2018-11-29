@@ -198,7 +198,7 @@ void StartMap(const std::string &filename, bool clean)
 	if (ThisPlayer->StartMapLayer < (int) Map.MapLayers.size()) {
 		UI.CurrentMapLayer = Map.MapLayers[ThisPlayer->StartMapLayer];
 	}
-	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer->ID));
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer));
 
 	//  Play the game.
 	GameMainLoop();
@@ -1897,7 +1897,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	if (ThisPlayer->StartMapLayer < (int) Map.MapLayers.size()) {
 		UI.CurrentMapLayer = Map.MapLayers[ThisPlayer->StartMapLayer];
 	}
-	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer->ID));
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer));
 
 	//
 	// Various hacks which must be done after the map is loaded.

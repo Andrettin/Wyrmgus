@@ -1388,7 +1388,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		RestrictCursorToMinimap();
-		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer->ID));
+		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
 		return;
 	}
 
@@ -1590,7 +1590,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			if (CursorOn == CursorOnMinimap && (MouseButtons & RightButton)) {
 				const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 				//  Minimap move viewpoint
-				UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer->ID));
+				UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -1629,7 +1629,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		//  Minimap move viewpoint
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer->ID));
+		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
 		CursorStartScreenPos = CursorScreenPos;
 		return;
 	}
@@ -2297,7 +2297,7 @@ static void UISelectStateButtonDown(unsigned)
 		const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		if (MouseButtons & LeftButton) {
-			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer->ID);
+			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
 
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
@@ -2314,7 +2314,7 @@ static void UISelectStateButtonDown(unsigned)
 			}
 			SendCommand(cursorTilePos);
 		} else {
-			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer->ID));
+			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer));
 		}
 		return;
 	}
@@ -2458,10 +2458,10 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 	const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 	if (MouseButtons & LeftButton) { // enter move mini-mode
-		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer->ID));
+		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer));
 	} else if (MouseButtons & RightButton) {
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
-			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer->ID);
+			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
 			if (!ClickMissile.empty()) {
 				//Wyrmgus start
 //				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);

@@ -1637,7 +1637,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
-			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer->ID));
+			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
 		}
 		return;
 	}
@@ -2269,7 +2269,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		RestrictCursorToMinimap();
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer->ID));
+		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(tilePos, UI.CurrentMapLayer));
 		return;
 	}
 

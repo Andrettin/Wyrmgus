@@ -289,9 +289,9 @@ public:
 	/// convert map pixelpos coordinates into tilepos
 	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos, const int map_layer) const;
 	/// convert tilepos coordinates into map pixel pos (take the top left of the tile)
-	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const int map_layer) const;
+	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const CMapLayer *map_layer) const;
 	/// convert tilepos coordinates into map pixel pos (take the center of the tile)
-	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos, const int map_layer) const;
+	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer *map_layer) const;
 	
 	//Wyrmgus start
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay, int z) const;

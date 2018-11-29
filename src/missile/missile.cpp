@@ -963,10 +963,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	// If Firing from inside a Bunker
 	CUnit *from = GetFirstContainer(unit);
 	const int dir = ((unit.Direction + NextDirection / 2) & 0xFF) / NextDirection;
-	//Wyrmgus start
-//	const PixelPos startPixelPos = Map.TilePosToMapPixelPos_Center(from->tilePos, from->MapLayer)
-	const PixelPos startPixelPos = Map.TilePosToMapPixelPos_TopLeft(from->tilePos, from->MapLayer) + PixelSize(from->Type->GetHalfTilePixelSize(from->MapLayer).x, from->Type->GetHalfTilePixelSize(from->MapLayer).y)
-	//Wyrmgus end
+	const PixelPos startPixelPos = Map.TilePosToMapPixelPos_TopLeft(from->tilePos, Map.MapLayers[from->MapLayer]) + PixelSize(from->Type->GetHalfTilePixelSize(from->MapLayer).x, from->Type->GetHalfTilePixelSize(from->MapLayer).y)
 								   + unit.Type->MissileOffsets[dir][0];
 
 	Vec2i dpos;
@@ -996,7 +993,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		//Wyrmgus end
 	}
 
-	PixelPos destPixelPos = Map.TilePosToMapPixelPos_Center(dpos, z);
+	PixelPos destPixelPos = Map.TilePosToMapPixelPos_Center(dpos, Map.MapLayers[z]);
 	//Wyrmgus start
 //	Missile *missile = MakeMissile(*unit.Type->Missile.Missile, startPixelPos, destPixelPos);
 	Missile *missile = MakeMissile(*unit.GetMissile().Missile, startPixelPos, destPixelPos, z);
@@ -1333,7 +1330,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 							if (missile.TargetUnit) {
 								missile.TargetUnit = &unit;
 								if (unit.Type->TileSize.x == 1 || unit.Type->TileSize.y == 1) {
-									missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos, unit.MapLayer);
+									missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos, Map.MapLayers[unit.MapLayer]);
 								}
 							} else {
 								missile.position = position;
@@ -1355,7 +1352,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 					//Wyrmgus end
 						missile.TargetUnit = &unit;
 						if (unit.Type->TileSize.x == 1 || unit.Type->TileSize.y == 1) {
-							missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos, unit.MapLayer);
+							missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos, Map.MapLayers[unit.MapLayer]);
 						}
 						missile.DestroyMissile = 1;
 						return true;

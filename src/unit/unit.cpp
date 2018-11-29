@@ -4401,7 +4401,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	int y = tilePos.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y + IY - (frame_height - Type->TileSize.y * Map.GetMapLayerPixelTileSize(this->MapLayer).y) / 2 + Type->OffsetY;
 	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
-	const PixelPos vpTopLeftMapPos = Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, UI.CurrentMapLayer->ID) + vp.Offset;
+	const PixelPos vpTopLeftMapPos = Map.TilePosToMapPixelPos_TopLeft(vp.MapPos, UI.CurrentMapLayer) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
 	//Wyrmgus start

@@ -549,7 +549,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 		if (vp) {
 			const PixelDiff relDiff = new_vps[i].GetTopLeftPos() - vp->GetTopLeftPos();
 
-			new_vps[i].Offset = relDiff + Map.TilePosToMapPixelPos_TopLeft(vp->MapPos, UI.CurrentMapLayer->ID) + vp->Offset;
+			new_vps[i].Offset = relDiff + Map.TilePosToMapPixelPos_TopLeft(vp->MapPos, UI.CurrentMapLayer) + vp->Offset;
 		} else {
 			new_vps[i].Offset.x = 0;
 			new_vps[i].Offset.y = 0;

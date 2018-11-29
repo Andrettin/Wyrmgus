@@ -343,16 +343,16 @@ Vec2i CMap::MapPixelPosToTilePos(const PixelPos &mapPos, const int map_layer) co
 	return tilePos;
 }
 
-PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const int map_layer) const
+PixelPos CMap::TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos, const CMapLayer *map_layer) const
 {
-	PixelPos mapPixelPos(tilePos.x * GetMapLayerPixelTileSize(map_layer).x, tilePos.y * GetMapLayerPixelTileSize(map_layer).y);
+	PixelPos mapPixelPos(tilePos.x * GetMapLayerPixelTileSize(map_layer ? map_layer->ID : -1).x, tilePos.y * GetMapLayerPixelTileSize(map_layer ? map_layer->ID : -1).y);
 
 	return mapPixelPos;
 }
 
-PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos, const int map_layer) const
+PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer *map_layer) const
 {
-	return TilePosToMapPixelPos_TopLeft(tilePos, map_layer) + GetMapLayerPixelTileSize(map_layer) / 2;
+	return TilePosToMapPixelPos_TopLeft(tilePos, map_layer) + GetMapLayerPixelTileSize(map_layer ? map_layer->ID : -1) / 2;
 }
 
 //Wyrmgus start
