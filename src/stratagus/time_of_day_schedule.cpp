@@ -147,7 +147,7 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
 				
-				if (key == "scheduled_time_of_day") {
+				if (key == "time_of_day") {
 					value = FindAndReplaceString(value, "_", "-");
 					time_of_day = CTimeOfDay::GetTimeOfDay(value);
 				} else if (key == "hours") {

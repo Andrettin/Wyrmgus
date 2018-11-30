@@ -128,7 +128,7 @@ CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident)
 		return nullptr;
 	}
 	
-	std::map<std::string, CSite *>::const_iterator find_iterator = TerrainFeatureIdentToPointer.find(terrain_feature_ident);
+	std::map<std::string, CTerrainFeature *>::const_iterator find_iterator = TerrainFeatureIdentToPointer.find(terrain_feature_ident);
 	
 	if (find_iterator != TerrainFeatureIdentToPointer.end()) {
 		return find_iterator->second;

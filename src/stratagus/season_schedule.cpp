@@ -147,7 +147,7 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
 				
-				if (key == "scheduled_season") {
+				if (key == "season") {
 					value = FindAndReplaceString(value, "_", "-");
 					season = CSeason::GetSeason(value);
 				} else if (key == "days") {
