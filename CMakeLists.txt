@@ -332,9 +332,13 @@ set(stratagusmain_SRCS
 	src/stratagus/script_province.cpp
 	src/stratagus/script_quest.cpp
 	src/stratagus/script_text.cpp
+	src/stratagus/season.cpp
+	src/stratagus/season_schedule.cpp
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
 	src/stratagus/text.cpp
+	src/stratagus/time_of_day.cpp
+	src/stratagus/time_of_day_schedule.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
 	src/stratagus/util.cpp
@@ -661,6 +665,8 @@ set(stratagus_generic_HDRS
 	src/include/results.h
 	src/include/script.h
 	src/include/script_sound.h
+	src/include/season.h
+	src/include/season_schedule.h
 	src/include/settings.h
 	src/include/shaders.h
 	src/include/sound.h
@@ -668,6 +674,8 @@ set(stratagus_generic_HDRS
 	src/include/spells.h
 	src/include/stratagus.h
 	src/include/text.h
+	src/include/time_of_day.h
+	src/include/time_of_day_schedule.h
 	src/include/title.h
 	src/include/translate.h
 	src/include/trigger.h

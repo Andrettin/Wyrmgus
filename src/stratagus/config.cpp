@@ -48,7 +48,11 @@
 #include "map/terrain_type.h"
 #include "missile.h"
 #include "religion/deity.h"
+#include "season.h"
+#include "season_schedule.h"
 #include "sound.h"
+#include "time_of_day.h"
+#include "time_of_day_schedule.h"
 #include "ui/button_action.h"
 #include "unittype.h"
 #include "util.h"
@@ -218,6 +222,16 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
 			}
+		} else if (config_data->Tag == "season") {
+			CSeason *season = CSeason::GetOrAddSeason(ident);
+			if (!define_only) {
+				season->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "season_schedule") {
+			CSeasonSchedule *season_schedule = CSeasonSchedule::GetOrAddSeasonSchedule(ident);
+			if (!define_only) {
+				season_schedule->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "sound") {
 			if (!define_only) {
 				CSound::ProcessConfigData(config_data);
@@ -231,6 +245,16 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CTimeline *timeline = CTimeline::GetOrAddTimeline(ident);
 			if (!define_only) {
 				timeline->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "time_of_day") {
+			CTimeOfDay *time_of_day = CTimeOfDay::GetOrAddTimeOfDay(ident);
+			if (!define_only) {
+				time_of_day->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "time_of_day_schedule") {
+			CTimeOfDaySchedule *time_of_day_schedule = CTimeOfDaySchedule::GetOrAddTimeOfDaySchedule(ident);
+			if (!define_only) {
+				time_of_day_schedule->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "unit_type") {
 			CUnitType *unit_type = UnitTypeByIdent(ident);
