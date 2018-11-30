@@ -65,9 +65,9 @@ namespace gcn
 {
     Gui::Gui()
     {
-        mTop = NULL;
-        mInput = NULL;
-        mGraphics = NULL;
+        mTop = nullptr;
+        mInput = nullptr;
+        mGraphics = nullptr;
         mFocusHandler = new FocusHandler();
         mTopHasMouse = false;
         mTabbing = true;
@@ -78,7 +78,7 @@ namespace gcn
     {
         if (Widget::widgetExists(mTop))
         {
-            setTop(NULL);
+            setTop(nullptr);
         }
 
         delete mFocusHandler;
@@ -88,7 +88,7 @@ namespace gcn
     {
         if (mTop)
         {
-            mTop->_setFocusHandler(NULL);
+            mTop->_setFocusHandler(nullptr);
         }
         if (top)
         {
@@ -164,7 +164,7 @@ namespace gcn
 
                 // If the focused widget doesn't have the mouse,
                 // send the mouse input to the focused widget.
-                if (f != NULL && !f->hasMouse())
+                if (f != nullptr && !f->hasMouse())
                 {
                     int xOffset, yOffset;
                     f->getAbsolutePosition(xOffset, yOffset);
@@ -178,7 +178,7 @@ namespace gcn
 
                 // If the dragged widget is different from the focused
                 // widget, send the mouse input to the dragged widget.
-                if (d != NULL && d != f && !d->hasMouse())
+                if (d != nullptr && d != f && !d->hasMouse())
                 {
                     int xOffset, yOffset;
                     d->getAbsolutePosition(xOffset, yOffset);

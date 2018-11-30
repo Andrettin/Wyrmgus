@@ -68,7 +68,7 @@
 
 std::map<std::string, CCharacter *> Characters;
 std::map<std::string, CCharacter *> CustomHeroes;
-CCharacter *CurrentCustomHero = NULL;
+CCharacter *CurrentCustomHero = nullptr;
 bool LoadingPersistentHeroes = false;
 
 /*----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			CUnitType *unit_type = UnitTypeByIdent(value);
 			if (unit_type) {
-				if (this->Type == NULL || this->Type == unit_type || this->Type->CanExperienceUpgradeTo(unit_type)) {
+				if (this->Type == nullptr || this->Type == unit_type || this->Type->CanExperienceUpgradeTo(unit_type)) {
 					this->Type = unit_type;
 					if (this->Level < this->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
 						this->Level = this->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
@@ -197,13 +197,13 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Icon.Name = value;
-			this->Icon.Icon = NULL;
+			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
 		} else if (key == "heroic_icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->HeroicIcon.Name = value;
-			this->HeroicIcon.Icon = NULL;
+			this->HeroicIcon.Icon = nullptr;
 			this->HeroicIcon.Load();
 			this->HeroicIcon.Icon->Load();
 		} else if (key == "forbidden_upgrade") {
@@ -254,7 +254,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		
 		if (child_config_data->Tag == "historical_location") {
 			CDate date;
-			CMapTemplate *map_template = NULL;
+			CMapTemplate *map_template = nullptr;
 			Vec2i character_pos(-1, -1);
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
@@ -307,7 +307,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			int title = -1;
 			CDate start_date;
 			CDate end_date;
-			CFaction *title_faction = NULL;
+			CFaction *title_faction = nullptr;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -362,7 +362,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
-	if (this->Type != NULL && this->Type->BoolFlag[FAUNA_INDEX].value) {
+	if (this->Type != nullptr && this->Type->BoolFlag[FAUNA_INDEX].value) {
 		if (name_changed) {
 			this->Type->PersonalNames[this->Gender].push_back(this->Name);
 		}
@@ -375,14 +375,14 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	if (this->Trait == NULL) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
-		if (this->Type != NULL && this->Type->Traits.size() == 1) {
+	if (this->Trait == nullptr) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
+		if (this->Type != nullptr && this->Type->Traits.size() == 1) {
 			this->Trait = this->Type->Traits[0];
 		}
 	}
 		
 	//check if the abilities are correct for this character's unit type
-	if (this->Type != NULL && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->Type->Slot) {
+	if (this->Type != nullptr && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->Type->Slot) {
 		int ability_count = (int) this->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
 			if (std::find(AiHelpers.LearnableAbilities[this->Type->Slot].begin(), AiHelpers.LearnableAbilities[this->Type->Slot].end(), this->Abilities[i]) == AiHelpers.LearnableAbilities[this->Type->Slot].end()) {
@@ -599,7 +599,7 @@ CReligion *CCharacter::GetReligion() const
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CLanguage *CCharacter::GetLanguage() const
@@ -628,7 +628,7 @@ bool CCharacter::IsParentOf(std::string child_ident) const
 
 bool CCharacter::IsChildOf(std::string parent_ident) const
 {
-	if ((this->Father != NULL && this->Father->Ident == parent_ident) || (this->Mother != NULL && this->Mother->Ident == parent_ident)) {
+	if ((this->Father != nullptr && this->Father->Ident == parent_ident) || (this->Mother != nullptr && this->Mother->Ident == parent_ident)) {
 		return true;
 	}
 	return false;
@@ -738,7 +738,7 @@ IconConfig CCharacter::GetIcon() const
 		return this->HeroicIcon;
 	} else if (this->Icon.Icon) {
 		return this->Icon;
-	} else if (!this->HairVariation.empty() && this->Type->GetVariation(this->HairVariation) != NULL && !this->Type->GetVariation(this->HairVariation)->Icon.Name.empty()) {
+	} else if (!this->HairVariation.empty() && this->Type->GetVariation(this->HairVariation) != nullptr && !this->Type->GetVariation(this->HairVariation)->Icon.Name.empty()) {
 		return this->Type->GetVariation(this->HairVariation)->Icon;
 	} else {
 		return this->Type->Icon;
@@ -754,12 +754,12 @@ CPersistentItem *CCharacter::GetItem(CUnit &item) const
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CCharacter::UpdateAttributes()
 {
-	if (this->Type == NULL) {
+	if (this->Type == nullptr) {
 		return;
 	}
 	
@@ -768,7 +768,7 @@ void CCharacter::UpdateAttributes()
 		this->Attributes[i] = this->Type->DefaultStat.Variables[var].Value;
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (
-				(this->Trait != NULL && UpgradeModifiers[z]->UpgradeId == this->Trait->ID)
+				(this->Trait != nullptr && UpgradeModifiers[z]->UpgradeId == this->Trait->ID)
 				|| std::find(this->Abilities.begin(), this->Abilities.end(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]) != this->Abilities.end()
 			) {
 				if (UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
@@ -827,7 +827,7 @@ CCharacter *GetCharacter(std::string character_ident)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 CCharacter *GetCustomHero(std::string hero_ident)
@@ -842,7 +842,7 @@ CCharacter *GetCustomHero(std::string hero_ident)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -926,11 +926,11 @@ void SaveHero(CCharacter *hero)
 			fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[hero->Civilization->ID].c_str());
 		}
 	}
-	if (hero->Type != NULL) {
+	if (hero->Type != nullptr) {
 		fprintf(fd, "\tType = \"%s\",\n", hero->Type->Ident.c_str());
 	}
 	if (hero->Custom) {
-		if (hero->Trait != NULL) {
+		if (hero->Trait != nullptr) {
 			fprintf(fd, "\tTrait = \"%s\",\n", hero->Trait->Ident.c_str());
 		}
 		if (!hero->HairVariation.empty()) {
@@ -988,19 +988,19 @@ void SaveHero(CCharacter *hero)
 		for (size_t j = 0; j < hero->Items.size(); ++j) {
 			fprintf(fd, "\n\t\t{");
 			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", hero->Items[j]->Type->Ident.c_str());
-			if (hero->Items[j]->Prefix != NULL) {
+			if (hero->Items[j]->Prefix != nullptr) {
 				fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", hero->Items[j]->Prefix->Ident.c_str());
 			}
-			if (hero->Items[j]->Suffix != NULL) {
+			if (hero->Items[j]->Suffix != nullptr) {
 				fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", hero->Items[j]->Suffix->Ident.c_str());
 			}
-			if (hero->Items[j]->Spell != NULL) {
+			if (hero->Items[j]->Spell != nullptr) {
 				fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", hero->Items[j]->Spell->Ident.c_str());
 			}
-			if (hero->Items[j]->Work != NULL) {
+			if (hero->Items[j]->Work != nullptr) {
 				fprintf(fd, "\n\t\t\t\"work\", \"%s\",", hero->Items[j]->Work->Ident.c_str());
 			}
-			if (hero->Items[j]->Elixir != NULL) {
+			if (hero->Items[j]->Elixir != nullptr) {
 				fprintf(fd, "\n\t\t\t\"elixir\", \"%s\",", hero->Items[j]->Elixir->Ident.c_str());
 			}
 			if (!hero->Items[j]->Name.empty()) {
@@ -1102,7 +1102,7 @@ void DeleteCustomHero(std::string hero_full_name)
 	}
 	
 	if (CurrentCustomHero == hero) {
-		CurrentCustomHero = NULL;
+		CurrentCustomHero = nullptr;
 	}
 	
 	//delete hero save file
@@ -1136,13 +1136,13 @@ void SetCurrentCustomHero(std::string hero_full_name)
 		
 		CurrentCustomHero = const_cast<CCharacter *>(&(*hero));
 	} else {
-		CurrentCustomHero = NULL;
+		CurrentCustomHero = nullptr;
 	}
 }
 
 std::string GetCurrentCustomHero()
 {
-	if (CurrentCustomHero != NULL) {
+	if (CurrentCustomHero != nullptr) {
 		return CurrentCustomHero->Ident;
 	} else {
 		return "";
@@ -1200,7 +1200,7 @@ bool IsNameValidForCustomHero(std::string hero_name, std::string hero_family_nam
 		hero_full_name += hero_family_name;
 	}
 	
-	if (GetCustomHero(hero_full_name) != NULL) {
+	if (GetCustomHero(hero_full_name) != nullptr) {
 		return false; //name already used
 	}
 	

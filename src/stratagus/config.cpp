@@ -88,7 +88,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 		}
 	}
 	
-	CConfigData *config_data = NULL;
+	CConfigData *config_data = nullptr;
 	std::string key;
 	std::string value;
 	for (size_t i = 0; i < data.size(); ++i) {
@@ -104,9 +104,9 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 			config_data = new_config_data;
 		} else if (str[0] == '[' && str[1] == '/') { //closes a tag
 			if (config_data && FindAndReplaceString(str, "/", "") == ("[" + config_data->Tag + "]")) { //closes current tag
-				if (config_data->Parent == NULL) {
+				if (config_data->Parent == nullptr) {
 					output.push_back(config_data);
-					config_data = NULL;
+					config_data = nullptr;
 				} else {
 					CConfigData *parent_config_data = config_data->Parent;
 					parent_config_data->Children.push_back(config_data);

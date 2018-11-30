@@ -95,7 +95,7 @@ namespace gcn
          *       it is called upon by the Image object when destroying an Image.
          *
          * @param image the image to be freed and removed.
-         * @throws Exception when image points to NULL.
+         * @throws Exception when image points to null.
          */
         virtual void free(Image* image) = 0;
 

@@ -68,8 +68,8 @@ void MissileLandMine::Action()
 	const Vec2i pos = Map.MapPixelPosToTilePos(this->position, this->MapLayer);
 
 	//Wyrmgus start
-//	if (LandMineTargetFinder(this->SourceUnit, this->Type->CanHitOwner).FindOnTile(Map.Field(pos)) != NULL) {
-	if (LandMineTargetFinder(this->SourceUnit, this->Type->CanHitOwner).FindOnTile(Map.Field(pos, this->MapLayer)) != NULL) {
+//	if (LandMineTargetFinder(this->SourceUnit, this->Type->CanHitOwner).FindOnTile(Map.Field(pos)) != nullptr) {
+	if (LandMineTargetFinder(this->SourceUnit, this->Type->CanHitOwner).FindOnTile(Map.Field(pos, this->MapLayer)) != nullptr) {
 	//Wyrmgus end
 		DebugPrint("Landmine explosion at %d,%d.\n" _C_ pos.x _C_ pos.y);
 		this->MissileHit();

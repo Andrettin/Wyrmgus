@@ -234,13 +234,13 @@ CSample *LoadWav(const char *name, int flags)
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		printf("Can't open file '%s'\n", name);
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 	WavHeader wavHeader;
 	if (f->read(&wavHeader, sizeof(wavHeader)) != sizeof(wavHeader)) {
 		f->close();
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 	// Convert to native format
 	swapEndianness(&wavHeader);
@@ -248,14 +248,14 @@ CSample *LoadWav(const char *name, int flags)
 	if (Check(wavHeader) == false) {
 		f->close();
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 
 	WavChunk chunk;
 	if (f->read(&chunk, sizeof(chunk)) != sizeof(chunk)) {
 		f->close();
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 	// Convert to native format
 	swapEndianness(&chunk);
@@ -269,7 +269,7 @@ CSample *LoadWav(const char *name, int flags)
 			|| f->read(&chunk, sizeof(chunk)) != sizeof(chunk)) {
 			f->close();
 			delete f;
-			return NULL;
+			return nullptr;
 		}
 		// Convert to native format
 		swapEndianness(&chunk);
@@ -278,14 +278,14 @@ CSample *LoadWav(const char *name, int flags)
 		printf("Wrong length %d (not %d)\n", chunk.Length, 16);
 		f->close();
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 	WavFMT wavfmt;
 
 	if (f->read(&wavfmt, sizeof(wavfmt)) != sizeof(wavfmt)) {
 		f->close();
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 	// Convert to native format
 	swapEndianness(&wavfmt);
@@ -298,7 +298,7 @@ CSample *LoadWav(const char *name, int flags)
 		if (f->read(&buffer[0], extraSize) != extraSize) {
 			f->close();
 			delete f;
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -306,7 +306,7 @@ CSample *LoadWav(const char *name, int flags)
 	if (IsWavFormatSupported(wavfmt) == false) {
 		f->close();
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 
 	CSample *sample;
@@ -341,7 +341,7 @@ CSample *LoadWav(const char *name, int flags)
 	} else {
 		char sndbuf[SOUND_BUFFER_SIZE];
 
-		sample->Buffer = NULL;
+		sample->Buffer = nullptr;
 		int read = 0;
 		int rem = 0;
 		while (1) {

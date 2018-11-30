@@ -92,8 +92,8 @@
 	}
 	// Now, checking value.
 	//Wyrmgus start
-//	if (this->NewForm == NULL) {
-	if (this->NewForm == NULL && this->Civilization == -1 && this->Faction == -1 && !this->Detachment) {
+//	if (this->NewForm == nullptr) {
+	if (this->NewForm == nullptr && this->Civilization == -1 && this->Faction == -1 && !this->Detachment) {
 	//Wyrmgus end
 		LuaError(l, "Use a unittype for polymorph (with new-form)");
 	}
@@ -116,7 +116,7 @@
 	}
 	CUnitType *type = this->NewForm;
 	//Wyrmgus start
-	if (this->NewForm == NULL) {
+	if (this->NewForm == nullptr) {
 		int new_unit_type = -1;
 		if (this->Civilization != -1 && this->Faction != -1 && this->Civilization == target->Type->Civilization) { //get faction equivalent, if is of the same civilization
 			new_unit_type = PlayerRaces.GetFactionClassUnitType(this->Faction, target->Type->Class);
@@ -134,7 +134,7 @@
 		target->Character->Civilization = CCivilization::Civilizations[this->Civilization];
 		SaveHero(target->Character);
 	}
-	if (type == NULL) {
+	if (type == nullptr) {
 		return 0;
 	}
 //	const Vec2i pos(goalPos - type.GetHalfTileSize());
@@ -167,7 +167,7 @@
 
 	// as said somewhere else -- no corpses :)
 	//Wyrmgus start
-//	target->Remove(NULL);
+//	target->Remove(nullptr);
 //	Vec2i offset;
 	//Wyrmgus end
 	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
@@ -194,12 +194,12 @@
 	//Wyrmgus start
 	if (target->Character && (this->PlayerNeutral == 1 || this->PlayerNeutral == 2)) {
 		target->Player->Heroes.erase(std::remove(target->Player->Heroes.begin(), target->Player->Heroes.end(), target), target->Player->Heroes.end());
-		target->Character = NULL;
+		target->Character = nullptr;
 	}
 //	UnitLost(*target);
 //	UnitClearOrders(*target);
 //	target->Release();
-	if (!IsNetworkGame() && target->Character != NULL && &caster == target) { //save persistent data
+	if (!IsNetworkGame() && target->Character != nullptr && &caster == target) { //save persistent data
 		if (target->Player->AiEnabled == false) {
 			target->Character->Type = type;
 			SaveHero(target->Character);

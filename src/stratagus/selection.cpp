@@ -67,7 +67,7 @@ static std::vector<CUnit *> TeamSelected[PlayerMax];	/// teams currently selecte
 
 static std::vector<CUnit *> _Selected;					/// save of Selected
 static std::vector<CUnit *> _TeamSelected[PlayerMax];	/// save of TeamSelected
-static CUnit *_TrackUnit = NULL;						/// save of the unit being tracked (if any)
+static CUnit *_TrackUnit = nullptr;						/// save of the unit being tracked (if any)
 
 static unsigned GroupId;								/// Unique group # for automatic groups
 
@@ -123,7 +123,7 @@ void UnSelectAll()
 		Selected[i]->Selected = 0;
 	}
 	Selected.clear();
-	UI.SelectedViewport->Unit = NULL;
+	UI.SelectedViewport->Unit = nullptr;
 }
 
 /**
@@ -324,7 +324,7 @@ void UnSelectUnit(CUnit &unit)
 	unit.Selected = 0;
 
 	//Turn track unit mode off
-	UI.SelectedViewport->Unit = NULL;
+	UI.SelectedViewport->Unit = nullptr;
 }
 
 //Wyrmgus start
@@ -1274,7 +1274,7 @@ static int CclSelection(lua_State *l)
 	const int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
 		const char *str = LuaToString(l, 2, j + 1);
-		Selected.push_back(&UnitManager.GetSlotUnit(strtol(str + 1, NULL, 16)));
+		Selected.push_back(&UnitManager.GetSlotUnit(strtol(str + 1, nullptr, 16)));
 	}
 	return 0;
 }

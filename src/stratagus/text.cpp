@@ -67,7 +67,7 @@ CChapter *CText::GetChapter(std::string chapter_name)
 			return this->Chapters[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CleanTexts()
@@ -85,7 +85,7 @@ CText *GetText(std::string text_name)
 			return Texts[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 //@}

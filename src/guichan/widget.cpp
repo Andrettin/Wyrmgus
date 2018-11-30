@@ -79,13 +79,13 @@ int convertKey(const char *key)
 
 namespace gcn
 {
-    Font* Widget::mGlobalFont = NULL;
+    Font* Widget::mGlobalFont = nullptr;
     DefaultFont Widget::mDefaultFont;
     std::list<Widget*> Widget::mWidgets;
 
     Widget::Widget()
     {
-        mParent = NULL;
+        mParent = nullptr;
         mForegroundColor = Color(0x000000);
         mBackgroundColor = Color(0xffffff);
         mBaseColor = Color(0x808090);
@@ -93,7 +93,7 @@ namespace gcn
         //Wyrmgus start
         mTooltip = "";
         //Wyrmgus end
-        mFocusHandler = NULL;
+        mFocusHandler = nullptr;
         mFocusable = false;
         mClickTimeStamp = 0;
         mClickCount = 0;
@@ -105,19 +105,19 @@ namespace gcn
         mClickButton = 0;
         mHotKey = 0;
 
-        mCurrentFont = NULL;
+        mCurrentFont = nullptr;
         mWidgets.push_back(this);
         mDirty = true;
     }
 
     Widget::~Widget()
     {
-        if (getParent() != NULL)
+        if (getParent() != nullptr)
         {
             getParent()->_announceDeath(this);
         }
 
-        _setFocusHandler(NULL);
+        _setFocusHandler(nullptr);
 
         mWidgets.remove(this);
     }
@@ -252,7 +252,7 @@ namespace gcn
 
     void Widget::requestFocus()
     {
-        if (mFocusHandler == NULL)
+        if (mFocusHandler == nullptr)
         {
             //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
             assert(!"No focushandler set (did you add the widget to the gui?).");
@@ -291,7 +291,7 @@ namespace gcn
 
     bool Widget::isVisible() const
     {
-        if (getParent() == NULL)
+        if (getParent() == nullptr)
         {
             return mVisible;
         }
@@ -401,13 +401,13 @@ namespace gcn
 
     void Widget::_mouseInputMessage(const MouseInput& mouseInput)
     {
-        if (mFocusHandler == NULL)
+        if (mFocusHandler == nullptr)
         {
             //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
             assert(!"No focushandler set (did you add the widget to the gui?).");
         }
 
-        if (!mEnabled || (mFocusHandler->getModalFocused() != NULL &&
+        if (!mEnabled || (mFocusHandler->getModalFocused() != nullptr &&
                           !hasModalFocus()))
         {
             return;
@@ -520,13 +520,13 @@ namespace gcn
 
     bool Widget::_keyInputMessage(const KeyInput& keyInput)
     {
-        if (mFocusHandler == NULL)
+        if (mFocusHandler == nullptr)
         {
             //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
             assert(!"No focushandler set (did you add the widget to the gui?).");
         }
 
-        if (!mEnabled || (mFocusHandler->getModalFocused() != NULL &&
+        if (!mEnabled || (mFocusHandler->getModalFocused() != nullptr &&
                           !hasModalFocus()))
         {
             return false;
@@ -592,7 +592,7 @@ namespace gcn
 
     void Widget::getAbsolutePosition(int& x, int& y) const
     {
-        if (getParent() == NULL)
+        if (getParent() == nullptr)
         {
             x = mDimension.x;
             y = mDimension.y;
@@ -619,9 +619,9 @@ namespace gcn
 
     Font* Widget::getFont() const
     {
-        if (mCurrentFont == NULL)
+        if (mCurrentFont == nullptr)
         {
-            if (mGlobalFont == NULL)
+            if (mGlobalFont == nullptr)
             {
                 return &mDefaultFont;
             }
@@ -639,7 +639,7 @@ namespace gcn
         std::list<Widget*>::iterator iter;
         for (iter = mWidgets.begin(); iter != mWidgets.end(); ++iter)
         {
-            if ((*iter)->mCurrentFont == NULL)
+            if ((*iter)->mCurrentFont == nullptr)
             {
                 (*iter)->fontChanged();
             }
@@ -731,7 +731,7 @@ namespace gcn
 
     bool Widget::isDragged() const
     {
-        if (mFocusHandler == NULL)
+        if (mFocusHandler == nullptr)
         {
         	assert(!"No focushandler set (did you add the widget to the gui?).");
             //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
@@ -742,7 +742,7 @@ namespace gcn
 
     void Widget::requestModalFocus()
     {
-        if (mFocusHandler == NULL)
+        if (mFocusHandler == nullptr)
         {
         	assert(!"No focushandler set (did you add the widget to the gui?).");
             //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
@@ -753,7 +753,7 @@ namespace gcn
 
     void Widget::releaseModalFocus()
     {
-        if (mFocusHandler == NULL)
+        if (mFocusHandler == nullptr)
         {
             return;
         }
@@ -763,13 +763,13 @@ namespace gcn
 
     bool Widget::hasModalFocus() const
     {
-        if (mFocusHandler == NULL)
+        if (mFocusHandler == nullptr)
         {
             //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
             assert(!"No focushandler set (did you add the widget to the gui?).");
         }
 
-        if (getParent() != NULL)
+        if (getParent() != nullptr)
         {
             return (mFocusHandler->getModalFocused() == this) || getParent()->hasModalFocus();
         }

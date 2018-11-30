@@ -237,8 +237,8 @@ int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 
 	if (sock != static_cast<Socket>(-1)) {
 		DWORD bytesReturned;
-		int wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
-							   sizeof(INTERFACE_INFO) * maxAddr, &bytesReturned, NULL, NULL);
+		int wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, nullptr, 0, &localAddr,
+							   sizeof(INTERFACE_INFO) * maxAddr, &bytesReturned, nullptr, nullptr);
 		if (wsError == SOCKET_ERROR) {
 			DebugPrint("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n" _C_ WSAGetLastError());
 		}
@@ -482,7 +482,7 @@ int NetSocketReady(Socket sockfd, int timeout)
 		tv.tv_usec = (timeout % 1000) * 1000;
 
 		// Data available?
-		retval = select(sockfd + 1, &mask, NULL, NULL, &tv);
+		retval = select(sockfd + 1, &mask, nullptr, nullptr, &tv);
 #ifdef USE_WINSOCK
 	} while (retval == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
 #else
@@ -518,7 +518,7 @@ int SocketSet::Select(int timeout)
 		tv.tv_usec = (timeout % 1000) * 1000;
 
 		// Data available?
-		retval = select(this->MaxSockFD + 1, &mask, NULL, NULL, &tv);
+		retval = select(this->MaxSockFD + 1, &mask, nullptr, nullptr, &tv);
 #ifdef USE_WINSOCK
 	} while (retval == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
 #else

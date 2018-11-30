@@ -68,7 +68,7 @@ namespace gcn
         mHPolicy = SHOW_AUTO;
         mVPolicy = SHOW_AUTO;
         mScrollbarWidth = 12;
-        mContent = NULL;
+        mContent = nullptr;
         mUpButtonPressed = false;
         mDownButtonPressed = false;
         mLeftButtonPressed = false;
@@ -88,7 +88,7 @@ namespace gcn
         mHPolicy = SHOW_AUTO;
         mVPolicy = SHOW_AUTO;
         mScrollbarWidth = 12;
-        mContent = NULL;
+        mContent = nullptr;
         mUpButtonPressed = false;
         mDownButtonPressed = false;
         mLeftButtonPressed = false;
@@ -109,7 +109,7 @@ namespace gcn
         mHPolicy = hPolicy;
         mVPolicy = vPolicy;
         mScrollbarWidth = 12;
-        mContent = NULL;
+        mContent = nullptr;
         mUpButtonPressed = false;
         mDownButtonPressed = false;
         mLeftButtonPressed = false;
@@ -125,20 +125,20 @@ namespace gcn
 
     ScrollArea::~ScrollArea()
     {
-        setContent(NULL);
+        setContent(nullptr);
     }
 
     void ScrollArea::setContent(Widget* widget)
     {
-        if (mContent != NULL)
+        if (mContent != nullptr)
         {
-            mContent->_setFocusHandler(NULL);
-            mContent->_setParent(NULL);
+            mContent->_setFocusHandler(nullptr);
+            mContent->_setParent(nullptr);
         }
 
         mContent = widget;
 
-        if (mContent != NULL)
+        if (mContent != nullptr)
         {
             mContent->_setFocusHandler(_getFocusHandler());
             mContent->_setParent(this);
@@ -234,7 +234,7 @@ namespace gcn
     {
         checkPolicies();
 
-        if (mContent == NULL)
+        if (mContent == nullptr)
         {
             return 0;
         }
@@ -253,7 +253,7 @@ namespace gcn
     {
         checkPolicies();
 
-        if (mContent == NULL)
+        if (mContent == nullptr)
         {
             return 0;
         }
@@ -304,7 +304,7 @@ namespace gcn
 
         if (getContentDimension().isPointInRect(mouseInput.x, mouseInput.y))
         {
-            if (mContent != NULL)
+            if (mContent != nullptr)
             {
                 if (!mContent->hasMouse())
                 {
@@ -850,7 +850,7 @@ namespace gcn
         setVerticalScrollAmount(getVerticalScrollAmount());
         setHorizontalScrollAmount(getHorizontalScrollAmount());
 
-        if (mContent != NULL)
+        if (mContent != nullptr)
         {
             mContent->setPosition(-mHScroll + getContentDimension().x + mContent->getBorderSize(),
                                   -mVScroll + getContentDimension().y + mContent->getBorderSize());
@@ -895,7 +895,7 @@ namespace gcn
     {
         if (widget == mContent)
         {
-            mContent = NULL;
+            mContent = nullptr;
             checkPolicies();
         }
         else

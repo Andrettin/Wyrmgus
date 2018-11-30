@@ -58,8 +58,8 @@ CMapField::CMapField() :
 	OwnershipBorderTile(-1),
 	AnimationFrame(0),
 	OverlayAnimationFrame(0),
-	Terrain(NULL), OverlayTerrain(NULL),
-	TerrainFeature(NULL),
+	Terrain(nullptr), OverlayTerrain(nullptr),
+	TerrainFeature(nullptr),
 	SolidTile(0), OverlaySolidTile(0),
 	OverlayTerrainDestroyed(false),
 	OverlayTerrainDamaged(false),
@@ -152,7 +152,7 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		if (this->OverlayTerrain && std::find(this->OverlayTerrain->BaseTerrainTypes.begin(), this->OverlayTerrain->BaseTerrainTypes.end(), terrain) == this->OverlayTerrain->BaseTerrainTypes.end()) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->OverlayTerrain->Flags);
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
-			this->OverlayTerrain = NULL;
+			this->OverlayTerrain = nullptr;
 			this->OverlayTransitionTiles.clear();
 		}
 	}
@@ -210,7 +210,7 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	}
 	
 	if (this->TerrainFeature) {
-		this->TerrainFeature = NULL;
+		this->TerrainFeature = nullptr;
 	}
 }
 
@@ -223,7 +223,7 @@ void CMapField::RemoveOverlayTerrain()
 	this->Value = 0;
 	this->Flags &= ~(this->OverlayTerrain->Flags);
 	this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
-	this->OverlayTerrain = NULL;
+	this->OverlayTerrain = nullptr;
 	this->OverlayTransitionTiles.clear();
 	
 	this->Flags |= this->Terrain->Flags;
@@ -252,7 +252,7 @@ void CMapField::RemoveOverlayTerrain()
 	}
 
 	if (this->TerrainFeature) {
-		this->TerrainFeature = NULL;
+		this->TerrainFeature = nullptr;
 	}
 }
 

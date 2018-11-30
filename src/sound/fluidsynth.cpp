@@ -54,7 +54,7 @@ struct FluidSynthData {
 
 class CSynthesizer {
 public:
-	CSynthesizer() : Settings(NULL), Synth(NULL), Player(NULL), State(StateCleaned) {}
+	CSynthesizer() : Settings(nullptr), Synth(nullptr), Player(nullptr), State(StateCleaned) {}
 
 	fluid_settings_t *Settings;
 	fluid_synth_t *Synth;
@@ -196,7 +196,7 @@ int InitFluidSynth()
 	FluidSynthesizer.State = StateInitialized;
 	// Settings
 	FluidSynthesizer.Settings = new_fluid_settings();
-	if (FluidSynthesizer.Settings == NULL) {
+	if (FluidSynthesizer.Settings == nullptr) {
 		fprintf(stderr, "Failed to create the FluidSynth settings\n");
 		CleanFluidSynth();
 		return -1;
@@ -214,7 +214,7 @@ int InitFluidSynth()
 
 	// Synthesizer itself
 	FluidSynthesizer.Synth = new_fluid_synth(FluidSynthesizer.Settings);
-    if (FluidSynthesizer.Synth == NULL) {
+    if (FluidSynthesizer.Synth == nullptr) {
         fprintf(stderr, "Failed to create the SF2 synthesizer\n");
 		CleanFluidSynth();
 		return -1;
@@ -230,7 +230,7 @@ int InitFluidSynth()
     }
 	// Create player
 	FluidSynthesizer.Player = new_fluid_player(FluidSynthesizer.Synth);
-	if (FluidSynthesizer.Player == NULL) {
+	if (FluidSynthesizer.Player == nullptr) {
 		fprintf(stderr, "Failed to create SF2 player\n");
 		CleanFluidSynth();
 		return -1;
@@ -257,7 +257,7 @@ CSample *LoadFluidSynth(const char *name, int flags)
 	if (FluidSynthesizer.State == StateCleaned) {
 		if (InitFluidSynth() != 0) {
 			DebugPrint("Can't init FluidSynth!\n");
-			return NULL;
+			return nullptr;
 		}
 	} else if (FluidSynthesizer.State == StatePlaying) {
 		// Reinit the player
@@ -268,7 +268,7 @@ CSample *LoadFluidSynth(const char *name, int flags)
 	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 	
 	// check if this is a MIDI file
@@ -276,7 +276,7 @@ CSample *LoadFluidSynth(const char *name, int flags)
 		fprintf(stderr, "Not a MIDI file: %s\n", name);
 		f->close();
 		delete f;
-		return NULL;
+		return nullptr;
 	} else {
 		fluid_player_add(FluidSynthesizer.Player, name);
 	}
@@ -309,7 +309,7 @@ CSample *LoadFluidSynth(const char *name, int flags)
 		/* not supported yet*/
 		f->close();
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 
 	return sample;

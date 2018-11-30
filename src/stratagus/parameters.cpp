@@ -72,7 +72,7 @@ void Parameters::SetDefaultUserDirectory()
 
 static std::string GetLocalPlayerNameFromEnv()
 {
-	const char *userName = NULL;
+	const char *userName = nullptr;
 
 #ifdef USE_WIN32
 	userName = getenv("USERNAME");

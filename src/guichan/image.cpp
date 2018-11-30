@@ -62,7 +62,7 @@
 namespace gcn
 {
 
-    ImageLoader* Image::mImageLoader = NULL;
+    ImageLoader* Image::mImageLoader = nullptr;
 
     Image::Image()
     {
@@ -79,7 +79,7 @@ namespace gcn
 
     Image::Image(const std::string& filename)
     {
-        if (mImageLoader == NULL)
+        if (mImageLoader == nullptr)
         {
         	assert(!"I have no ImageLoader!");
             //throw GCN_EXCEPTION("I have no ImageLoader!");

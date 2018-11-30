@@ -49,7 +49,7 @@
 #include "video.h"
 
 
-CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(NULL)
+CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
 {
 	this->TopLeftPos.x = this->TopLeftPos.y = 0;
 	this->BottomRightPos.x = this->BottomRightPos.y = 0;
@@ -593,7 +593,7 @@ void CViewport::Draw() const
 			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
 			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
 			std::string unit_name;
-			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
+			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
 				if (!UnitUnderCursor->Identified) {
 					unit_name = UnitUnderCursor->GetTypeName() + " (" + _("Unidentified") + ")";
 				} else {
@@ -613,11 +613,11 @@ void CViewport::Draw() const
 			ba->Popup = "popup-unit-under-cursor";
 			DrawPopup(*ba, unit_center_pos.x, unit_center_pos.y);
 			delete ba;
-			LastDrawnButtonPopup = NULL;
+			LastDrawnButtonPopup = nullptr;
 			//Wyrmgus end
 		//Wyrmgus start
 //		} else if (!isMapFieldVisile) {
-//			ShowUnitName(*this, CursorScreenPos, NULL, true);
+//			ShowUnitName(*this, CursorScreenPos, nullptr, true);
 		//Wyrmgus end
 		}
 	}

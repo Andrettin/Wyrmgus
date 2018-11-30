@@ -75,7 +75,7 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		CUpgrade *modifier = CUpgrade::Get(LuaToString(l, 3));
-		if (modifier == NULL) {
+		if (modifier == nullptr) {
 			LuaError(l, "Modifier doesn't exist.");
 		}
 		
@@ -93,14 +93,14 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		CUpgrade *modifier = CUpgrade::Get(LuaToString(l, 3));
-		if (modifier == NULL) {
+		if (modifier == nullptr) {
 			LuaError(l, "Modifier doesn't exist.");
 		}
 		
 		lua_pushboolean(l, province->BordersModifier(modifier));
 		return 1;
 	} else if (!strcmp(data, "Governor")) {
-		if (province->Governor != NULL) {
+		if (province->Governor != nullptr) {
 			lua_pushstring(l, province->Governor->GetFullName().c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -151,7 +151,7 @@ static int CclDefineGrandStrategyEvent(lua_State *l)
 			event->HistoricalYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "World")) {
 			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
-			if (world != NULL) {
+			if (world != nullptr) {
 				event->World = world;
 			} else {
 				LuaError(l, "World doesn't exist.");
@@ -216,7 +216,7 @@ static int CclGetGrandStrategyEventData(lua_State *l)
 	}
 	std::string event_name = LuaToString(l, 1);
 	CGrandStrategyEvent *event = GetGrandStrategyEvent(event_name);
-	if (event == NULL) {
+	if (event == nullptr) {
 		LuaError(l, "Event \"%s\" doesn't exist." _C_ event_name.c_str());
 	}
 	const char *data = LuaToString(l, 2);
@@ -225,7 +225,7 @@ static int CclGetGrandStrategyEventData(lua_State *l)
 		lua_pushstring(l, event->Description.c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
-		if (event->World != NULL) {
+		if (event->World != nullptr) {
 			lua_pushstring(l, event->World->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");

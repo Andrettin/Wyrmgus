@@ -66,7 +66,7 @@ namespace gcn
 {
     ImageFont::ImageFont(const std::string& filename, const std::string& glyphs)
     {
-        if (Image::_getImageLoader() == NULL)
+        if (Image::_getImageLoader() == nullptr)
         {
         	assert(!"I have no ImageLoader!");
             //throw GCN_EXCEPTION("I have no ImageLoader!");
@@ -119,7 +119,7 @@ namespace gcn
 
     ImageFont::ImageFont(const std::string& filename, unsigned char glyphsFrom, unsigned char glyphsTo)
     {
-        if (Image::_getImageLoader() == NULL)
+        if (Image::_getImageLoader() == nullptr)
         {
 			assert(!"I have no ImageLoader!");
             //throw GCN_EXCEPTION("I have no ImageLoader!");

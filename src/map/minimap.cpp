@@ -942,8 +942,8 @@ void CMinimap::Update()
 #endif
 		{
 			//Wyrmgus start
-//			SDL_FillRect(MinimapSurface, NULL, SDL_MapRGB(MinimapSurface->format, 0, 0, 0));
-			SDL_FillRect(MinimapSurface[UI.CurrentMapLayer->ID], NULL, SDL_MapRGB(MinimapSurface[UI.CurrentMapLayer->ID]->format, 0, 0, 0));
+//			SDL_FillRect(MinimapSurface, nullptr, SDL_MapRGB(MinimapSurface->format, 0, 0, 0));
+			SDL_FillRect(MinimapSurface[UI.CurrentMapLayer->ID], nullptr, SDL_MapRGB(MinimapSurface[UI.CurrentMapLayer->ID]->format, 0, 0, 0));
 			//Wyrmgus end
 		}
 	}
@@ -975,8 +975,8 @@ void CMinimap::Update()
 #endif
 		{
 			//Wyrmgus start
-//			SDL_BlitSurface(MinimapTerrainSurface, NULL, MinimapSurface, NULL);
-			SDL_BlitSurface(MinimapTerrainSurface[UI.CurrentMapLayer->ID], NULL, MinimapSurface[UI.CurrentMapLayer->ID], NULL);
+//			SDL_BlitSurface(MinimapTerrainSurface, nullptr, MinimapSurface, nullptr);
+			SDL_BlitSurface(MinimapTerrainSurface[UI.CurrentMapLayer->ID], nullptr, MinimapSurface[UI.CurrentMapLayer->ID], nullptr);
 			//Wyrmgus end
 		}
 	}
@@ -1189,8 +1189,8 @@ void CMinimap::Draw() const
 	{
 		SDL_Rect drect = {Sint16(X), Sint16(Y), 0, 0};
 		//Wyrmgus start
-//		SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
-		SDL_BlitSurface(MinimapSurface[UI.CurrentMapLayer->ID], NULL, TheScreen, &drect);
+//		SDL_BlitSurface(MinimapSurface, nullptr, TheScreen, &drect);
+		SDL_BlitSurface(MinimapSurface[UI.CurrentMapLayer->ID], nullptr, TheScreen, &drect);
 		//Wyrmgus end
 	}
 
@@ -1247,15 +1247,15 @@ void CMinimap::Destroy()
 	if (UseOpenGL) {
 		//Wyrmgus start
 //		delete[] MinimapTerrainSurfaceGL;
-//		MinimapTerrainSurfaceGL = NULL;
+//		MinimapTerrainSurfaceGL = nullptr;
 //		if (MinimapSurfaceGL) {
 //			glDeleteTextures(1, &MinimapTexture);
 //			delete[] MinimapSurfaceGL;
-//			MinimapSurfaceGL = NULL;
+//			MinimapSurfaceGL = nullptr;
 //		}
 		for (size_t z = 0; z < MinimapTerrainSurfaceGL.size(); ++z) {
 			delete[] MinimapTerrainSurfaceGL[z];
-			MinimapTerrainSurfaceGL[z] = NULL;
+			MinimapTerrainSurfaceGL[z] = nullptr;
 		}
 		MinimapTerrainSurfaceGL.clear();
 		for (size_t z = 0; z < MinimapSurfaceGL.size(); ++z) {
@@ -1265,7 +1265,7 @@ void CMinimap::Destroy()
 				glDeleteTextures(1, &MinimapTexture[z]);
 				//Wyrmgus end
 				delete[] MinimapSurfaceGL[z];
-				MinimapSurfaceGL[z] = NULL;
+				MinimapSurfaceGL[z] = nullptr;
 			}
 		}
 		MinimapSurfaceGL.clear();
@@ -1277,23 +1277,23 @@ void CMinimap::Destroy()
 		//Wyrmgus start
 //		VideoPaletteListRemove(MinimapTerrainSurface);
 //		SDL_FreeSurface(MinimapTerrainSurface);
-//		MinimapTerrainSurface = NULL;
+//		MinimapTerrainSurface = nullptr;
 //		if (MinimapSurface) {
 //			VideoPaletteListRemove(MinimapSurface);
 //			SDL_FreeSurface(MinimapSurface);
-//			MinimapSurface = NULL;
+//			MinimapSurface = nullptr;
 //		}
 		for (size_t z = 0; z < MinimapTerrainSurface.size(); ++z) {
 			VideoPaletteListRemove(MinimapTerrainSurface[z]);
 			SDL_FreeSurface(MinimapTerrainSurface[z]);
-			MinimapTerrainSurface[z] = NULL;
+			MinimapTerrainSurface[z] = nullptr;
 		}
 		MinimapTerrainSurface.clear();
 		for (size_t z = 0; z < MinimapSurface.size(); ++z) {
 			if (MinimapSurface[z]) {
 				VideoPaletteListRemove(MinimapSurface[z]);
 				SDL_FreeSurface(MinimapSurface[z]);
-				MinimapSurface[z] = NULL;
+				MinimapSurface[z] = nullptr;
 			}
 		}
 		MinimapSurface.clear();
@@ -1301,27 +1301,27 @@ void CMinimap::Destroy()
 	}
 	//Wyrmgus start
 //	delete[] Minimap2MapX;
-//	Minimap2MapX = NULL;
+//	Minimap2MapX = nullptr;
 //	delete[] Minimap2MapY;
-//	Minimap2MapY = NULL;
+//	Minimap2MapY = nullptr;
 	for (size_t z = 0; z < Minimap2MapX.size(); ++z) {
 		delete[] Minimap2MapX[z];
-		Minimap2MapX[z] = NULL;
+		Minimap2MapX[z] = nullptr;
 	}
 	Minimap2MapX.clear();
 	for (size_t z = 0; z < Minimap2MapY.size(); ++z) {
 		delete[] Minimap2MapY[z];
-		Minimap2MapY[z] = NULL;
+		Minimap2MapY[z] = nullptr;
 	}
 	Minimap2MapY.clear();
 	for (size_t z = 0; z < Map2MinimapX.size(); ++z) {
 		delete[] Map2MinimapX[z];
-		Map2MinimapX[z] = NULL;
+		Map2MinimapX[z] = nullptr;
 	}
 	Map2MinimapX.clear();
 	for (size_t z = 0; z < Map2MinimapY.size(); ++z) {
 		delete[] Map2MinimapY[z];
-		Map2MinimapY[z] = NULL;
+		Map2MinimapY[z] = nullptr;
 	}
 	Map2MinimapY.clear();
 	MinimapScaleX.clear();
@@ -1372,10 +1372,10 @@ void CMinimap::AddEvent(const Vec2i &pos, int z, Uint32 color)
 		++NumMinimapEvents;
 	} else {
 		CMapLayer *event_map_layer = Map.MapLayers[z];
-		if (event_map_layer->Plane != NULL && Map.GetCurrentPlane() != event_map_layer->Plane && UI.PlaneButtons[event_map_layer->Plane->ID].X != -1) {
+		if (event_map_layer->Plane != nullptr && Map.GetCurrentPlane() != event_map_layer->Plane && UI.PlaneButtons[event_map_layer->Plane->ID].X != -1) {
 			MinimapEvents[NumMinimapEvents].pos.x = UI.PlaneButtons[event_map_layer->Plane->ID].X + (UI.PlaneButtons[event_map_layer->Plane->ID].Style->Width / 2);
 			MinimapEvents[NumMinimapEvents].pos.y = UI.PlaneButtons[event_map_layer->Plane->ID].Y + (UI.PlaneButtons[event_map_layer->Plane->ID].Style->Height / 2);
-		} else if (event_map_layer->World != NULL && Map.GetCurrentWorld() != event_map_layer->World && UI.WorldButtons[event_map_layer->World->ID].X != -1) {
+		} else if (event_map_layer->World != nullptr && Map.GetCurrentWorld() != event_map_layer->World && UI.WorldButtons[event_map_layer->World->ID].X != -1) {
 			MinimapEvents[NumMinimapEvents].pos.x = UI.WorldButtons[event_map_layer->World->ID].X + (UI.WorldButtons[event_map_layer->World->ID].Style->Width / 2);
 			MinimapEvents[NumMinimapEvents].pos.y = UI.WorldButtons[event_map_layer->World->ID].Y + (UI.WorldButtons[event_map_layer->World->ID].Style->Height / 2);
 		} else if (Map.GetCurrentSurfaceLayer() != event_map_layer->SurfaceLayer && UI.SurfaceLayerButtons[event_map_layer->SurfaceLayer].X != -1) {

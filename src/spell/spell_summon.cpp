@@ -69,7 +69,7 @@
 		}
 	}
 	// Now, checking value.
-	if (this->UnitType == NULL) {
+	if (this->UnitType == nullptr) {
 		LuaError(l, "Use a unittype for summon (with unit-type)");
 	}
 }
@@ -112,12 +112,12 @@ public:
 		//Wyrmgus end
 		cansummon = false;
 
-		if (unit != NULL) { //  Found a corpse. eliminate it and proceed to summoning.
+		if (unit != nullptr) { //  Found a corpse. eliminate it and proceed to summoning.
 			pos = unit->tilePos;
 			//Wyrmgus start
 			z = unit->MapLayer;
 			//Wyrmgus end
-			unit->Remove(NULL);
+			unit->Remove(nullptr);
 			unit->Release();
 			cansummon = true;
 		}
@@ -136,12 +136,12 @@ public:
 		// FIXME: do summoned units count on food?
 		//
 		target = MakeUnit(unittype, caster.Player);
-		if (target != NULL) {
+		if (target != nullptr) {
 			target->tilePos = pos;
 			//Wyrmgus start
 			target->MapLayer = z;
 			//Wyrmgus end
-			DropOutOnSide(*target, LookingW, NULL);
+			DropOutOnSide(*target, LookingW, nullptr);
 			// To avoid defending summoned unit for AI
 			target->Summoned = 1;
 			//

@@ -67,7 +67,7 @@ namespace gcn
     ListBox::ListBox()
     {
         mSelected = -1;
-        mListModel = NULL;
+        mListModel = nullptr;
         setWidth(100);
         setFocusable(true);
 
@@ -88,7 +88,7 @@ namespace gcn
 
     void ListBox::draw(Graphics* graphics)
     {
-        if (mListModel == NULL)
+        if (mListModel == nullptr)
         {
             return;
         }
@@ -155,7 +155,7 @@ namespace gcn
 
     void ListBox::setSelected(int selected)
     {
-        if (mListModel == NULL)
+        if (mListModel == nullptr)
         {
             mSelected = -1;
         }
@@ -175,13 +175,13 @@ namespace gcn
             }
 
             Widget *par = getParent();
-            if (par == NULL)
+            if (par == nullptr)
             {
                 return;
             }
 
             ScrollArea* scrollArea = dynamic_cast<ScrollArea *>(par);
-            if (scrollArea != NULL)
+            if (scrollArea != nullptr)
             {
                 Rectangle scroll;
                 scroll.y = getFont()->getHeight() * mSelected;
@@ -242,7 +242,7 @@ namespace gcn
 
     void ListBox::adjustSize()
     {
-        if (mListModel != NULL)
+        if (mListModel != nullptr)
         {
             setHeight(getFont()->getHeight() * mListModel->getNumberOfElements());
         }

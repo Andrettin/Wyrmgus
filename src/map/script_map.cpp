@@ -400,7 +400,7 @@ static int CclShowMapLocation(lua_State *l)
 		return 0;
 	}
 	CUnit *target = MakeUnit(*unitType, ThisPlayer);
-	if (target != NULL) {
+	if (target != nullptr) {
 		target->Variable[HP_INDEX].Value = 0;
 		target->tilePos.x = LuaToNumber(l, 1);
 		target->tilePos.y = LuaToNumber(l, 2);
@@ -662,7 +662,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 	CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(map_template_ident);
 
 	std::string terrain_ident = LuaToString(l, 2);
-	CTerrainType *terrain = NULL;
+	CTerrainType *terrain = nullptr;
 	if (!terrain_ident.empty()) {
 		terrain = CTerrainType::GetTerrainType(terrain_ident);
 		if (!terrain) {
@@ -709,7 +709,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 	CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(map_template_ident);
 
 	std::string terrain_ident = LuaToString(l, 2);
-	CTerrainType *terrain = NULL;
+	CTerrainType *terrain = nullptr;
 	if (!terrain_ident.empty()) {
 		terrain = CTerrainType::GetTerrainType(terrain_ident);
 		if (!terrain) {
@@ -809,7 +809,7 @@ static int CclSetMapTemplateResource(lua_State *l)
 
 	lua_pushvalue(l, 2);
 	CUnitType *unittype = CclGetUnitType(l);
-	if (unittype == NULL) {
+	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
@@ -817,7 +817,7 @@ static int CclSetMapTemplateResource(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	int resources_held = 0;
-	CUniqueItem *unique = NULL;
+	CUniqueItem *unique = nullptr;
 	
 	const int nargs = lua_gettop(l);
 	if (nargs >= 4) {
@@ -842,7 +842,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 
 	lua_pushvalue(l, 2);
 	CUnitType *unittype = CclGetUnitType(l);
-	if (unittype == NULL) {
+	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
@@ -855,7 +855,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 	CDate start_date;
 	CDate end_date;
 
-	CUniqueItem *unique = NULL;
+	CUniqueItem *unique = nullptr;
 
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
@@ -882,7 +882,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 	CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(map_template_ident);
 
 	CCharacter *hero = GetCharacter(LuaToString(l, 2));
-	if (hero == NULL) {
+	if (hero == nullptr) {
 		LuaError(l, "Hero doesn't exist");
 	}
 
@@ -917,14 +917,14 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 
 	lua_pushvalue(l, 2);
 	CUnitType *unittype = CclGetUnitType(l);
-	if (unittype == NULL) {
+	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
-	CUniqueItem *unique = NULL;
+	CUniqueItem *unique = nullptr;
 	
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
@@ -966,7 +966,7 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 
 	bool overlay = LuaToBoolean(l, 2);
 
-	FileWriter *fw = NULL;
+	FileWriter *fw = nullptr;
 	std::string map_filename = "scripts/map_templates/" + map_template_ident;
 	if (overlay) {
 		map_filename += "_overlay";
@@ -976,7 +976,7 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 	for (int x = 0; x < map_template->Width; ++x) {
 		for (int y = 0; y < map_template->Height; ++y) {
 			unsigned int index = x + y * map_template->Width;
-			CTerrainType *terrain = NULL;
+			CTerrainType *terrain = nullptr;
 			if (!overlay && index < map_template->TileTerrains.size() && map_template->TileTerrains[index] != -1) {
 				terrain = TerrainTypes[map_template->TileTerrains[index]];
 			} else if (overlay && index < map_template->TileOverlayTerrains.size() && map_template->TileOverlayTerrains[index] != -1) {
@@ -1395,7 +1395,7 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CTerrainType *base_terrain = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1, j + 1));
-				if (base_terrain == NULL) {
+				if (base_terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
 				terrain->BaseTerrainTypes.push_back(base_terrain);
@@ -1407,7 +1407,7 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CTerrainType *border_terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
-				if (border_terrain == NULL) {
+				if (border_terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
 				terrain->InnerBorderTerrains.push_back(border_terrain);
@@ -1422,7 +1422,7 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CTerrainType *border_terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
-				if (border_terrain == NULL) {
+				if (border_terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
 				terrain->OuterBorderTerrains.push_back(border_terrain);
@@ -1437,7 +1437,7 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CTerrainType *overlay_terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
-				if (overlay_terrain == NULL) {
+				if (overlay_terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
 				overlay_terrain->BaseTerrainTypes.push_back(terrain);
@@ -1538,11 +1538,11 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string transition_terrain_name = LuaToString(l, -1, j + 1);
-				CTerrainType *transition_terrain = NULL;
+				CTerrainType *transition_terrain = nullptr;
 				if (transition_terrain_name != "any") {
 					transition_terrain = CTerrainType::GetTerrainType(transition_terrain_name);
 					
-					if (transition_terrain == NULL) {
+					if (transition_terrain == nullptr) {
 						LuaError(l, "Terrain doesn't exist.");
 					}
 				}
@@ -1564,11 +1564,11 @@ static int CclDefineTerrainType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string transition_terrain_name = LuaToString(l, -1, j + 1);
-				CTerrainType *transition_terrain = NULL;
+				CTerrainType *transition_terrain = nullptr;
 				if (transition_terrain_name != "any") {
 					transition_terrain = CTerrainType::GetTerrainType(transition_terrain_name);
 					
-					if (transition_terrain == NULL) {
+					if (transition_terrain == nullptr) {
 						LuaError(l, "Terrain doesn't exist.");
 					}
 				}
@@ -1590,19 +1590,19 @@ static int CclDefineTerrainType(lua_State *l)
 	
 	//save the graphics here, so that we can take the pixel tile size into account
 	if (!graphics_file.empty()) {
-		if (CGraphic::Get(graphics_file) == NULL) {
+		if (CGraphic::Get(graphics_file) == nullptr) {
 			CGraphic *graphics = CGraphic::New(graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
 		}
 		terrain->Graphics = CGraphic::Get(graphics_file);
 	}
 	if (!elevation_graphics_file.empty()) {
-		if (CGraphic::Get(elevation_graphics_file) == NULL) {
+		if (CGraphic::Get(elevation_graphics_file) == nullptr) {
 			CGraphic *graphics = CGraphic::New(elevation_graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
 		}
 		terrain->ElevationGraphics = CGraphic::Get(elevation_graphics_file);
 	}
 	if (!player_color_graphics_file.empty()) {
-		if (CPlayerColorGraphic::Get(player_color_graphics_file) == NULL) {
+		if (CPlayerColorGraphic::Get(player_color_graphics_file) == nullptr) {
 			CPlayerColorGraphic *graphics = CPlayerColorGraphic::New(player_color_graphics_file, terrain->PixelTileSize.x, terrain->PixelTileSize.y);
 		}
 		terrain->PlayerColorGraphics = CPlayerColorGraphic::Get(player_color_graphics_file);
@@ -1790,7 +1790,7 @@ static int CclDefineSite(lua_State *l)
 
 	std::string site_ident = LuaToString(l, 1);
 	CSite *site = GetSite(site_ident);
-	if (site == NULL) {
+	if (site == nullptr) {
 		site = new CSite;
 		site->Ident = site_ident;
 		Sites.push_back(site);
@@ -1859,7 +1859,7 @@ static int CclDefineSite(lua_State *l)
 					}
 					site->HistoricalOwners[date] = owner_faction;
 				} else {
-					site->HistoricalOwners[date] = NULL;
+					site->HistoricalOwners[date] = nullptr;
 				}
 			}
 		} else if (!strcmp(value, "HistoricalPopulation")) {
@@ -1901,7 +1901,7 @@ static int CclDefineSite(lua_State *l)
 				int unit_quantity = LuaToNumber(l, -1, j + 1);
 				++j;
 				
-				CFaction *unit_owner = NULL;
+				CFaction *unit_owner = nullptr;
 				lua_rawgeti(l, -1, j + 1);
 				if (lua_isstring(l, -1) && !lua_isnumber(l, -1)) {
 					unit_owner = PlayerRaces.GetFaction(LuaToString(l, -1));
@@ -1937,9 +1937,9 @@ static int CclDefineSite(lua_State *l)
 				}
 				++j;
 				
-				CUniqueItem *unique = NULL;
+				CUniqueItem *unique = nullptr;
 				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && GetUniqueItem(LuaToString(l, -1)) != NULL) {
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && GetUniqueItem(LuaToString(l, -1)) != nullptr) {
 					unique = GetUniqueItem(LuaToString(l, -1));
 				} else {
 					--j;
@@ -1947,7 +1947,7 @@ static int CclDefineSite(lua_State *l)
 				lua_pop(l, 1);
 				++j;
 				
-				CFaction *building_owner = NULL;
+				CFaction *building_owner = nullptr;
 				lua_rawgeti(l, -1, j + 1);
 				if (lua_isstring(l, -1) && !lua_isnumber(l, -1)) {
 					building_owner = PlayerRaces.GetFaction(LuaToString(l, -1));
@@ -1983,9 +1983,9 @@ static int CclDefineSite(lua_State *l)
 				}
 				++j;
 				
-				CUniqueItem *unique = NULL;
+				CUniqueItem *unique = nullptr;
 				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && GetUniqueItem(LuaToString(l, -1)) != NULL) {
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && GetUniqueItem(LuaToString(l, -1)) != nullptr) {
 					unique = GetUniqueItem(LuaToString(l, -1));
 				} else {
 					--j;
@@ -2004,7 +2004,7 @@ static int CclDefineSite(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CRegion *region = GetRegion(LuaToString(l, -1, j + 1));
-				if (region == NULL) {
+				if (region == nullptr) {
 					LuaError(l, "Region doesn't exist.");
 				}
 				site->Regions.push_back(region);
@@ -2083,14 +2083,14 @@ static int CclDefineTerrainFeature(lua_State *l)
 			terrain_feature->TerrainType = terrain;
 		} else if (!strcmp(value, "Plane")) {
 			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
-			if (plane != NULL) {
+			if (plane != nullptr) {
 				terrain_feature->Plane = plane;
 			} else {
 				LuaError(l, "Plane doesn't exist.");
 			}
 		} else if (!strcmp(value, "World")) {
 			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
-			if (world != NULL) {
+			if (world != nullptr) {
 				terrain_feature->World = world;
 				world->TerrainFeatures.push_back(terrain_feature);
 				terrain_feature->Plane = world->Plane;
@@ -2118,7 +2118,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 		}
 	}
 	
-	if (terrain_feature->Plane == NULL && terrain_feature->World == NULL) {
+	if (terrain_feature->Plane == nullptr && terrain_feature->World == nullptr) {
 		LuaError(l, "Terrain feature \"%s\" is not assigned to any world or plane." _C_ terrain_feature->Ident.c_str());
 	}
 	
@@ -2177,7 +2177,7 @@ static int CclGetMapTemplateData(lua_State *l)
 		lua_pushstring(l, map_template->Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
-		if (map_template->World != NULL) {
+		if (map_template->World != nullptr) {
 			lua_pushstring(l, map_template->World->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -2250,7 +2250,7 @@ static int CclGetTerrainFeatureData(lua_State *l)
 		lua_pushstring(l, terrain_feature->Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
-		if (terrain_feature->World != NULL) {
+		if (terrain_feature->World != nullptr) {
 			lua_pushstring(l, terrain_feature->World->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");

@@ -213,7 +213,7 @@ CSample *LoadMikMod(const char *name, int flags)
 	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 	CurrentFile = f;
 
@@ -223,7 +223,7 @@ CSample *LoadMikMod(const char *name, int flags)
 		MikMod_Exit();
 		f->close();
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 
 	if (flags & PlayAudioStream) {

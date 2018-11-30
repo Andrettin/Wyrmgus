@@ -313,16 +313,16 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		return;
 	}
 
-	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (png_ptr == NULL) {
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+	if (png_ptr == nullptr) {
 		fclose(fp);
 		return;
 	}
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == NULL) {
+	if (info_ptr == nullptr) {
 		fclose(fp);
-		png_destroy_write_struct(&png_ptr, NULL);
+		png_destroy_write_struct(&png_ptr, nullptr);
 		return;
 	}
 
@@ -408,8 +408,8 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,
 													UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
 		//Wyrmgus start
-//		SDL_BlitSurface(MinimapSurface, NULL, preview, NULL);
-		SDL_BlitSurface(MinimapSurface[UI.CurrentMapLayer->ID], NULL, preview, NULL);
+//		SDL_BlitSurface(MinimapSurface, nullptr, preview, nullptr);
+		SDL_BlitSurface(MinimapSurface[UI.CurrentMapLayer->ID], nullptr, preview, nullptr);
 		//Wyrmgus end
 
 		SDL_LockSurface(preview);

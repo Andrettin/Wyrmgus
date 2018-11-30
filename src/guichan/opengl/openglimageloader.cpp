@@ -90,7 +90,7 @@ namespace gcn
 
     void OpenGLImageLoader::prepare(const std::string& filename)
     {
-        if(mImageLoader == NULL)
+        if(mImageLoader == nullptr)
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
@@ -100,7 +100,7 @@ namespace gcn
 
     void* OpenGLImageLoader::getRawData()
     {
-        if(mImageLoader == NULL)
+        if(mImageLoader == nullptr)
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
@@ -110,7 +110,7 @@ namespace gcn
 
     void* OpenGLImageLoader::finalize()
     {
-        if(mImageLoader == NULL)
+        if(mImageLoader == nullptr)
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
@@ -214,7 +214,7 @@ namespace gcn
 
     void OpenGLImageLoader::discard()
     {
-        if(mImageLoader == NULL)
+        if(mImageLoader == nullptr)
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
@@ -231,7 +231,7 @@ namespace gcn
 
     int OpenGLImageLoader::getWidth() const
     {
-        if(mImageLoader == NULL)
+        if(mImageLoader == nullptr)
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
@@ -241,7 +241,7 @@ namespace gcn
 
     int OpenGLImageLoader::getHeight() const
     {
-        if(mImageLoader == NULL)
+        if(mImageLoader == nullptr)
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
@@ -251,7 +251,7 @@ namespace gcn
 
     Color OpenGLImageLoader::getPixel(int x, int y)
     {
-        if(mImageLoader == NULL)
+        if(mImageLoader == nullptr)
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }
@@ -261,7 +261,7 @@ namespace gcn
 
     void OpenGLImageLoader::putPixel(int x, int y, const Color& color)
     {
-        if(mImageLoader == NULL)
+        if(mImageLoader == nullptr)
         {
             throw GCN_EXCEPTION("No host ImageLoader present.");
         }

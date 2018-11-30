@@ -151,7 +151,7 @@ void LuaCallback::run(int results)
 	if (status) {
 		const char *msg = lua_tostring(luastate, -1);
 
-		if (msg == NULL) {
+		if (msg == nullptr) {
 			msg = "(error with no message)";
 		}
 		fprintf(stderr, "%s\n", msg);

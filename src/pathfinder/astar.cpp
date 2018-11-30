@@ -350,39 +350,39 @@ void FreeAStar()
 	//Wyrmgus start
 	/*
 	delete[] AStarMatrix;
-	AStarMatrix = NULL;
+	AStarMatrix = nullptr;
 	delete[] CloseSet;
-	CloseSet = NULL;
+	CloseSet = nullptr;
 	CloseSetSize = 0;
 	delete[] OpenSet;
-	OpenSet = NULL;
+	OpenSet = nullptr;
 	OpenSetSize = 0;
 	delete[] CostMoveToCache;
-	CostMoveToCache = NULL;
+	CostMoveToCache = nullptr;
 	*/
 	for (size_t z = 0; z < AStarMatrix.size(); ++z) {
 		delete[] AStarMatrix[z];
-		AStarMatrix[z] = NULL;
+		AStarMatrix[z] = nullptr;
 	}
 	AStarMatrix.clear();
 	AStarMatrixSize.clear();
 	Threshold.clear();
 	for (size_t z = 0; z < CloseSet.size(); ++z) {
 		delete[] CloseSet[z];
-		CloseSet[z] = NULL;
+		CloseSet[z] = nullptr;
 	}
 	CloseSet.clear();
 	CloseSetSize.clear();
 	for (size_t z = 0; z < OpenSet.size(); ++z) {
 		delete[] OpenSet[z];
-		OpenSet[z] = NULL;
+		OpenSet[z] = nullptr;
 	}
 	OpenSet.clear();
 	OpenSetSize.clear();
 	OpenSetMaxSize.clear();
 	for (size_t z = 0; z < CostMoveToCache.size(); ++z) {
 		delete[] CostMoveToCache[z];
-		CostMoveToCache[z] = NULL;
+		CostMoveToCache[z] = nullptr;
 	}
 	CostMoveToCache.clear();
 	
@@ -839,7 +839,7 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit, int z)
 {
 	//Wyrmgus start
 	if (!&unit) {
-		fprintf(stderr, "Error in CostMoveTo(unsigned int index, const CUnit &unit): Unit is NULL.\n");
+		fprintf(stderr, "Error in CostMoveTo(unsigned int index, const CUnit &unit): Unit is null.\n");
 		return -1;
 	}
 	//Wyrmgus end

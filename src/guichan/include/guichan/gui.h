@@ -104,7 +104,7 @@ namespace gcn
         /**
          * Gets the top Widget.
          *
-         * @return the top widget. NULL if no top widget has been set.
+         * @return the top widget. Null if no top widget has been set.
          */
         virtual Widget* getTop() const;
 
@@ -119,7 +119,7 @@ namespace gcn
         /**
          * Gets the Graphics object used for drawing.
          *
-         *  @return the Graphics object used for drawing. NULL if no
+         *  @return the Graphics object used for drawing. Null if no
          *          Graphics object has been set.
          */
         virtual Graphics* getGraphics() const;
@@ -135,7 +135,7 @@ namespace gcn
         /**
          * Gets the Input object being used for input handling.
          *
-         *  @return the Input object used for handling input. NULL if no
+         *  @return the Input object used for handling input. Null if no
          *          Input object has been set.
          */
         virtual Input* getInput() const;

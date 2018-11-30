@@ -218,7 +218,7 @@ void CUnitStats::ChangeUnitStock(CUnitType *unit_type, int quantity)
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Class(-1), Civilization(-1), Faction(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), MaxLimit(1), MagicLevel(0), Year(0), Author(NULL)
+	Ident(ident), ID(0), Class(-1), Civilization(-1), Faction(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(nullptr), Item(nullptr), MaxLimit(1), MagicLevel(0), Year(0), Author(nullptr)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -263,7 +263,7 @@ CUpgrade *CUpgrade::New(const std::string &ident)
 **
 **  @param ident  Upgrade identifier
 **
-**  @return       Upgrade pointer or NULL if not found.
+**  @return       Upgrade pointer or null if not found.
 */
 CUpgrade *CUpgrade::Get(const std::string &ident)
 {
@@ -395,7 +395,7 @@ static int CclDefineUpgrade(lua_State *l)
 		
 		if (!strcmp(value, "Parent")) {
 			CUpgrade *parent_upgrade = CUpgrade::Get(LuaToString(l, -1));
-			if (parent_upgrade != NULL) {
+			if (parent_upgrade != nullptr) {
 				upgrade->Name = parent_upgrade->Name;
 				upgrade->Icon = parent_upgrade->Icon;
 				upgrade->Class = parent_upgrade->Class;
@@ -436,7 +436,7 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			CIcon *icon = CIcon::Get(LuaToString(l, -1));
-			if (icon != NULL) {
+			if (icon != nullptr) {
 				upgrade->Icon = icon;
 			} else {
 				LuaError(l, "Icon doesn't exist.");
@@ -509,7 +509,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 		} else if (!strcmp(value, "Item")) {
 			CUnitType *item = UnitTypeByIdent(LuaToString(l, -1));
-			if (item != NULL) {
+			if (item != nullptr) {
 				upgrade->Item = item;
 			} else {
 				LuaError(l, "Item type doesn't exist.");
@@ -636,7 +636,7 @@ static int CclDefineUpgrade(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CUnitType *scaled_cost_unit = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-				if (scaled_cost_unit == NULL) {
+				if (scaled_cost_unit == nullptr) {
 					LuaError(l, "Unit type doesn't exist.");
 				}
 
@@ -696,7 +696,7 @@ static int CclDefineUpgrade(lua_State *l)
 	}
 	
 	//load icon here
-	if (upgrade->Icon != NULL && !upgrade->Icon->Loaded) {
+	if (upgrade->Icon != nullptr && !upgrade->Icon->Loaded) {
 		upgrade->Icon->Load();
 	}
 	
@@ -841,14 +841,14 @@ static int CclDefineModifier(lua_State *l)
 			std::string faction_ident = LuaToString(l, j + 1, 2);
 			um->ChangeFactionTo = PlayerRaces.GetFaction(faction_ident);
 			
-			if (um->ChangeFactionTo == NULL) {
+			if (um->ChangeFactionTo == nullptr) {
 				LuaError(l, "Faction \"%s\" doesn't exist.'" _C_ faction_ident.c_str());
 			}
 		} else if (!strcmp(key, "change-dynasty-to")) {
 			std::string dynasty_ident = LuaToString(l, j + 1, 2);
 			um->ChangeDynastyTo = PlayerRaces.GetDynasty(dynasty_ident);
 			
-			if (um->ChangeDynastyTo == NULL) {
+			if (um->ChangeDynastyTo == nullptr) {
 				LuaError(l, "Dynasty \"%s\" doesn't exist.'" _C_ dynasty_ident.c_str());
 			}
 		//Wyrmgus end
@@ -993,12 +993,12 @@ static int CclAcquireTrait(lua_State *l)
 	if (!strncmp(ident, "upgrade-", 8)) {
 		TraitAcquire(*unit, CUpgrade::Get(ident));
 	} else if (strlen(ident) == 0) {
-		if (unit->Trait != NULL) { //remove previous trait, if any
+		if (unit->Trait != nullptr) { //remove previous trait, if any
 			if (!GameSettings.NoRandomness) { // if in no randomness setting, don't apply trait modifiers
 				IndividualUpgradeLost(*unit, unit->Trait);
 			}
 		}
-		unit->Trait = NULL;
+		unit->Trait = nullptr;
 	} else {
 		DebugPrint(" wrong ident %s\n" _C_ ident);
 	}
@@ -1332,8 +1332,8 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 		CUnit &unit = player.GetUnit(i);
 
 		//Wyrmgus start
-		if (&unit == NULL) {
-			fprintf(stderr, "Error in ConvertUnitTypeTo: unit %d, of player %d is NULL.\n", i, player.Index);
+		if (&unit == nullptr) {
+			fprintf(stderr, "Error in ConvertUnitTypeTo: unit %d, of player %d is null.\n", i, player.Index);
 			continue;
 		}
 		//Wyrmgus end
@@ -1412,13 +1412,13 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	if (um->ChangeCivilizationTo != -1 && GameRunning && um->ChangeCivilizationTo != player.Race) {
 		player.SetCivilization(um->ChangeCivilizationTo);
 	}
-	if (um->ChangeFactionTo != NULL && GameRunning && (um->ChangeFactionTo->Civilization != player.Race || um->ChangeFactionTo->ID != player.Faction)) {
+	if (um->ChangeFactionTo != nullptr && GameRunning && (um->ChangeFactionTo->Civilization != player.Race || um->ChangeFactionTo->ID != player.Faction)) {
 		if (um->ChangeFactionTo->Civilization != player.Race) {
 			player.SetCivilization(um->ChangeFactionTo->Civilization);
 		}
 		player.SetFaction(um->ChangeFactionTo);
 	}
-	if (um->ChangeDynastyTo != NULL && um->ChangeDynastyTo != player.Dynasty) {
+	if (um->ChangeDynastyTo != nullptr && um->ChangeDynastyTo != player.Dynasty) {
 		player.SetDynasty(um->ChangeDynastyTo);
 	}
 	//Wyrmgus end
@@ -1455,7 +1455,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		// add/remove allowed units
 
 		//Wyrmgus start
-		if (stat.Variables == NULL) { // unit type's stats not initialized
+		if (stat.Variables == nullptr) { // unit type's stats not initialized
 			break;
 		}
 		//Wyrmgus end
@@ -1690,7 +1690,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							}
 						}
 						if (forbidden_upgrade == true) {
-							unit.ChooseVariation(NULL, false, i);
+							unit.ChooseVariation(nullptr, false, i);
 						}
 					}
 				}
@@ -1748,7 +1748,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		// add/remove allowed units
 
 		//Wyrmgus start
-		if (stat.Variables == NULL) { // unit types stats not initialized
+		if (stat.Variables == nullptr) { // unit types stats not initialized
 			break;
 		}
 		//Wyrmgus end
@@ -1799,7 +1799,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					for (int k = 0; k < player.GetUnitCount(); ++k) {
 						//Wyrmgus start
 //						m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
-						if (player.GetUnit(k).Type != NULL) {
+						if (player.GetUnit(k).Type != nullptr) {
 							m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
 						}
 						//Wyrmgus end
@@ -1853,7 +1853,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				int m = DefaultTradeCost;
 
 				for (int k = 0; k < player.GetUnitCount(); ++k) {
-					if (player.GetUnit(k).Type != NULL) {
+					if (player.GetUnit(k).Type != nullptr) {
 						m = std::min(m, player.GetUnit(k).Type->Stats[player.Index].Variables[TRADECOST_INDEX].Value);
 					}
 				}
@@ -1985,7 +1985,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							}
 						}
 						if (required_upgrade == true) {
-							unit.ChooseVariation(NULL, false, i);
+							unit.ChooseVariation(nullptr, false, i);
 						}
 					}
 				}
@@ -2094,7 +2094,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 				}
 			}
 			if (forbidden_upgrade == true) {
-				unit.ChooseVariation(NULL, false, i);
+				unit.ChooseVariation(nullptr, false, i);
 			}
 		}
 	}
@@ -2196,7 +2196,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 				}
 			}
 			if (required_upgrade == true) {
-				unit.ChooseVariation(NULL, false, i);
+				unit.ChooseVariation(nullptr, false, i);
 			}
 		}
 	}
@@ -2344,7 +2344,7 @@ void AbilityAcquire(CUnit &unit, CUpgrade *upgrade, bool save)
 {
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
-	if (!IsNetworkGame() && unit.Character != NULL && save) {
+	if (!IsNetworkGame() && unit.Character != nullptr && save) {
 		if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 			unit.Character->Abilities.push_back(upgrade);
 			SaveHero(unit.Character);
@@ -2365,7 +2365,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 	unit.Variable[LEVELUP_INDEX].Value += 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	unit.Variable[LEVELUP_INDEX].Enable = 1;
-	if (!IsNetworkGame() && unit.Character != NULL) {
+	if (!IsNetworkGame() && unit.Character != nullptr) {
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) != unit.Character->Abilities.end()) {
 			if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 				unit.Character->Abilities.erase(std::remove(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade), unit.Character->Abilities.end());
@@ -2383,7 +2383,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
 
 void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 {
-	if (unit.Trait != NULL) { //remove previous trait, if any
+	if (unit.Trait != nullptr) { //remove previous trait, if any
 		if (!GameSettings.NoRandomness) { // if in no randomness setting, don't change trait modifiers
 			IndividualUpgradeLost(unit, unit.Trait);
 		}

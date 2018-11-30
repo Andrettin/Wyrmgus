@@ -87,7 +87,7 @@ static int CclDefineUniqueItem(lua_State *l)
 			}
 		} else if (!strcmp(value, "Icon")) {
 			item->Icon.Name = LuaToString(l, -1);
-			item->Icon.Icon = NULL;
+			item->Icon.Icon = nullptr;
 			item->Icon.Load();
 			item->Icon.Icon->Load();
 		} else if (!strcmp(value, "Prefix")) {
@@ -118,7 +118,7 @@ static int CclDefineUniqueItem(lua_State *l)
 		} else if (!strcmp(value, "Spell")) {
 			std::string spell_ident = LuaToString(l, -1);
 			SpellType *spell = SpellTypeByIdent(spell_ident);
-			if (spell != NULL) {
+			if (spell != nullptr) {
 				item->Spell = spell;
 			} else {
 				LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
@@ -217,49 +217,49 @@ static int CclGetUniqueItemData(lua_State *l)
 		lua_pushnumber(l, item->ResourcesHeld);
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		if (item->Type != NULL) {
+		if (item->Type != nullptr) {
 			lua_pushstring(l, item->Type->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Prefix")) {
-		if (item->Prefix != NULL) {
+		if (item->Prefix != nullptr) {
 			lua_pushstring(l, item->Prefix->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Suffix")) {
-		if (item->Suffix != NULL) {
+		if (item->Suffix != nullptr) {
 			lua_pushstring(l, item->Suffix->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Set")) {
-		if (item->Set != NULL) {
+		if (item->Set != nullptr) {
 			lua_pushstring(l, item->Set->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Spell")) {
-		if (item->Spell != NULL) {
+		if (item->Spell != nullptr) {
 			lua_pushstring(l, item->Spell->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Work")) {
-		if (item->Work != NULL) {
+		if (item->Work != nullptr) {
 			lua_pushstring(l, item->Work->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Elixir")) {
-		if (item->Elixir != NULL) {
+		if (item->Elixir != nullptr) {
 			lua_pushstring(l, item->Elixir->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");

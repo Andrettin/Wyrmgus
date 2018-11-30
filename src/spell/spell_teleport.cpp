@@ -63,12 +63,12 @@
 	if (Map.Info.IsPointOnMap(goalPos, z)) {
 	//Wyrmgus end
 		unsigned int selected = caster.Selected;
-		caster.Remove(NULL);
+		caster.Remove(nullptr);
 		caster.tilePos = goalPos;
 		//Wyrmgus start
 		caster.MapLayer = z;
 		//Wyrmgus end
-		DropOutNearest(caster, goalPos, NULL);
+		DropOutNearest(caster, goalPos, nullptr);
 		if (selected) {
 			SelectUnit(caster);
 		}

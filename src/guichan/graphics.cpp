@@ -65,7 +65,7 @@ namespace gcn
 
     Graphics::Graphics()
     {
-        mFont = NULL;
+        mFont = nullptr;
     }
 
     bool Graphics::pushClipArea(Rectangle area)
@@ -142,7 +142,7 @@ namespace gcn
                             unsigned int alignment, bool is_normal)
 	//Wyrmgus end
     {
-        if (mFont == NULL)
+        if (mFont == nullptr)
         {
         	assert(!"No font set.");
             //throw GCN_EXCEPTION("No font set.");

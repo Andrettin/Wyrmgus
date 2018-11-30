@@ -131,7 +131,7 @@ namespace gcn
         /**
          * Gets the Widget with focus.
          *
-         * @return the Widget with focus. NULL will be returned if
+         * @return the Widget with focus. Null will be returned if
          *         no Widget has focus.
          */
         virtual Widget* getFocused() const;
@@ -139,7 +139,7 @@ namespace gcn
         /**
          * Gets the widget that is dragged.
          *
-         * @return the widget that is dragged. NULL will be returned
+         * @return the widget that is dragged. Null will be returned
          *         if no Widget is dragged.
          */
         virtual Widget* getDragged() const;
@@ -147,7 +147,7 @@ namespace gcn
         /**
          * Gets the Widget with modal focus.
          *
-         * @return the Widget with modal focus. NULL will be returned
+         * @return the Widget with modal focus. Null will be returned
          *         if no Widget has modal focus.
          */
         virtual Widget* getModalFocused() const;

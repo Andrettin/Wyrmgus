@@ -99,15 +99,15 @@ static CSample *SimpleChooseSample(const CSound &sound)
 */
 static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 {
-	CSample *result = NULL;
+	CSample *result = nullptr;
 
 	if (!sound || !SoundEnabled()) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (sound->Number == TWO_GROUPS) {
 		// handle a special sound (selection)
-		if (SelectionHandler.Sound != NULL && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
+		if (SelectionHandler.Sound != nullptr && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
 			if (SelectionHandler.Sound == sound->Sound.TwoGroups.First) {
 				result = SimpleChooseSample(*SelectionHandler.Sound);
 				SelectionHandler.HowMany++;
@@ -145,7 +145,7 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 		result = SimpleChooseSample(*sound);
 		if (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id) {
 			SelectionHandler.HowMany = 0;
-			SelectionHandler.Sound = NULL;
+			SelectionHandler.Sound = nullptr;
 		}
 		if (selection) {
 			SelectionHandler.Source = source;
@@ -181,7 +181,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				}
 				return CCivilization::Civilizations[civilization]->UnitSounds.Acknowledgement.Sound;
 			} else {
-				return NULL;
+				return nullptr;
 			}
 			//Wyrmgus end
 		case VoiceAttack:
@@ -268,7 +268,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				}
 				return CCivilization::Civilizations[civilization]->UnitSounds.Ready.Sound;
 			} else {
-				return NULL;
+				return nullptr;
 			}
 			//Wyrmgus end
 		case VoiceSelected:
@@ -283,7 +283,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				}
 				return CCivilization::Civilizations[civilization]->UnitSounds.Selected.Sound;
 			} else {
-				return NULL;
+				return nullptr;
 			}
 			//Wyrmgus end
 		case VoiceHelpMe:
@@ -302,7 +302,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 					return CCivilization::Civilizations[civilization]->UnitSounds.Help.Sound;
 				}
 			} else {
-				return NULL;
+				return nullptr;
 			}
 			//Wyrmgus end
 		case VoiceDying:
@@ -484,7 +484,7 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 {
 	//Wyrmgus start
 	if (!&unit) {
-		fprintf(stderr, "Error in PlayUnitSound: unit is NULL.\n");
+		fprintf(stderr, "Error in PlayUnitSound: unit is null.\n");
 		return;
 	}
 	
@@ -529,7 +529,7 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 				  ((UI.SelectedViewport->MapWidth - 1) * Map.GetCurrentPixelTileSize().x)) - 128;
 	clamp(&stereo, -128, 127);
 
-	Origin source = {NULL, 0};
+	Origin source = {nullptr, 0};
 	//Wyrmgus start
 //	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range);
 	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range) * sound->VolumePercent / 100;
@@ -557,7 +557,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 	if (!sound) {
 		return;
 	}
-	Origin source = {NULL, 0};
+	Origin source = {nullptr, 0};
 
 	CSample *sample = ChooseSample(sound, false, source);
 
@@ -583,9 +583,9 @@ static std::map<int, LuaActionListener *> ChannelMap;
 static void PlaySoundFileCallback(int channel)
 {
 	LuaActionListener *listener = ChannelMap[channel];
-	if (listener != NULL) {
+	if (listener != nullptr) {
 		listener->action("");
-		ChannelMap[channel] = NULL;
+		ChannelMap[channel] = nullptr;
 	}
 	delete GetChannelSample(channel);
 }
@@ -793,7 +793,7 @@ CSound::~CSound()
 		for (unsigned int i = 0; i < this->Number; ++i) {
 		//Wyrmgus end
 			delete this->Sound.OneGroup[i];
-			this->Sound.OneGroup[i] = NULL;
+			this->Sound.OneGroup[i] = nullptr;
 		}
 		delete[] this->Sound.OneGroup;
 	}
@@ -829,7 +829,7 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	CSound *sound = NULL;
+	CSound *sound = nullptr;
 	if (group_sounds.size() >= 2) {
 		sound = MakeSoundGroup(ident, group_sounds[0], group_sounds[1]);
 	} else {

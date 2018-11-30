@@ -64,7 +64,7 @@ namespace gcn
 {
     Window::Window()
     {
-        mContent = NULL;
+        mContent = nullptr;
         mMouseDrag = false;
         setBorderSize(1);
         setPadding(2);
@@ -77,7 +77,7 @@ namespace gcn
 
     Window::Window(const std::string& caption)
     {
-        mContent = NULL;
+        mContent = nullptr;
         mMouseDrag = false;
         setCaption(caption);
         setBorderSize(1);
@@ -91,7 +91,7 @@ namespace gcn
 
     Window::Window(Widget* content, const std::string& caption)
     {
-        mContent = NULL;
+        mContent = nullptr;
         mMouseDrag = false;
         setContent(content);
         setCaption(caption);
@@ -106,7 +106,7 @@ namespace gcn
 
     Window::~Window()
     {
-        setContent(NULL);
+        setContent(nullptr);
     }
 
     void Window::setPadding(unsigned int padding)
@@ -133,18 +133,18 @@ namespace gcn
 
     void Window:: _announceDeath(Widget *)
     {
-        mContent = NULL;
+        mContent = nullptr;
     }
 
     void Window::setContent(Widget* widget)
     {
-        if (getContent() != NULL)
+        if (getContent() != nullptr)
         {
-            getContent()->_setParent(NULL);
-            getContent()->_setFocusHandler(NULL);
+            getContent()->_setParent(nullptr);
+            getContent()->_setFocusHandler(nullptr);
         }
 
-        if (widget != NULL)
+        if (widget != nullptr)
         {
             widget->_setParent(this);
             widget->_setFocusHandler(_getFocusHandler());
@@ -299,7 +299,7 @@ namespace gcn
 
     void Window::drawContent(Graphics* graphics)
     {
-        if (getContent() != NULL)
+        if (getContent() != nullptr)
         {
             graphics->pushClipArea(getContentDimension());
             graphics->pushClipArea(Rectangle(0, 0, getContent()->getWidth(),
@@ -312,7 +312,7 @@ namespace gcn
 
     void Window::mousePress(int x, int y, int button)
     {
-        if (getParent() != NULL)
+        if (getParent() != nullptr)
         {
             getParent()->moveToTop(this);
         }
@@ -377,7 +377,7 @@ namespace gcn
 
     void Window::repositionContent()
     {
-        if (getContent() == NULL)
+        if (getContent() == nullptr)
         {
             return;
         }
@@ -406,7 +406,7 @@ namespace gcn
 
     void Window::resizeToContent()
     {
-        if (getContent() != NULL)
+        if (getContent() != nullptr)
         {
             setSize(getContent()->getWidth() + 2*getPadding(),
                     getContent()->getHeight() + getPadding()
@@ -418,7 +418,7 @@ namespace gcn
     {
         BasicContainer::_mouseInputMessage(mouseInput);
 
-        if (getContent() != NULL)
+        if (getContent() != nullptr)
         {
             if (getContentDimension().isPointInRect(mouseInput.x, mouseInput.y) &&
                 getContent()->getDimension().isPointInRect(mouseInput.x, mouseInput.y))
@@ -444,7 +444,7 @@ namespace gcn
     {
         BasicContainer::_mouseOutMessage();
 
-        if (getContent() != NULL && getContent()->hasMouse())
+        if (getContent() != nullptr && getContent()->hasMouse())
         {
             getContent()->_mouseOutMessage();
         }
@@ -452,7 +452,7 @@ namespace gcn
 
     void Window::_setFocusHandler(FocusHandler *focusHandler)
     {
-        if (getContent() != NULL)
+        if (getContent() != nullptr)
         {
             getContent()->_setFocusHandler(focusHandler);
         }
@@ -472,7 +472,7 @@ namespace gcn
 
     void Window::logic()
     {
-        if (getContent() != NULL)
+        if (getContent() != nullptr)
         {
             getContent()->logic();
         }
@@ -480,7 +480,7 @@ namespace gcn
 
 	void Window::setDirty(bool dirty)
 	{
-		if (mContent != NULL)
+		if (mContent != nullptr)
 		{
 			mContent->setDirty(dirty);
 		}
@@ -494,7 +494,7 @@ namespace gcn
 			return true;
 		}
 
-		if (mContent != NULL && mContent->getDirty())
+		if (mContent != nullptr && mContent->getDirty())
 		{
 			return true;
 		}

@@ -67,19 +67,19 @@ namespace gcn
 
     SDLImageLoader::SDLImageLoader()
     {
-        mCurrentImage = NULL;
+        mCurrentImage = nullptr;
     }
 
     void SDLImageLoader::prepare(const std::string& filename)
     {
-        if (mCurrentImage != NULL)
+        if (mCurrentImage != nullptr)
         {
             throw GCN_EXCEPTION("Function called before finalizing or discarding last loaded image.");
         }
 
         SDL_Surface* tmp = IMG_Load(filename.c_str());
 
-        if (tmp == NULL)
+        if (tmp == nullptr)
         {
             throw GCN_EXCEPTION(std::string("Unable to load image file: ")+filename);
         }
@@ -100,7 +100,7 @@ namespace gcn
         mCurrentImage = SDL_CreateRGBSurface(SDL_SWSURFACE, 0, 0, 32,
                                              rmask, gmask, bmask, amask);
 
-        if (mCurrentImage == NULL)
+        if (mCurrentImage == nullptr)
         {
             throw GCN_EXCEPTION(std::string("Not enough memory to load: ")+filename);
         }
@@ -119,7 +119,7 @@ namespace gcn
 
     void* SDLImageLoader::finalize()
     {
-        if (mCurrentImage == NULL)
+        if (mCurrentImage == nullptr)
         {
             throw GCN_EXCEPTION("No image prepared.");
         }
@@ -157,13 +157,13 @@ namespace gcn
         if (hasAlpha)
         {
             temp = mCurrentImage;
-            mCurrentImage = NULL;
+            mCurrentImage = nullptr;
         }
         else
         {
             temp = SDL_DisplayFormat(mCurrentImage);
             SDL_FreeSurface(mCurrentImage);
-            mCurrentImage = NULL;
+            mCurrentImage = nullptr;
         }
 
         if (hasPink)
@@ -181,19 +181,19 @@ namespace gcn
 
     void SDLImageLoader::discard()
     {
-        if (mCurrentImage == NULL)
+        if (mCurrentImage == nullptr)
         {
             throw GCN_EXCEPTION("No image prepared.");
         }
 
         SDL_FreeSurface(mCurrentImage);
 
-        mCurrentImage = NULL;
+        mCurrentImage = nullptr;
     }
 
     void SDLImageLoader::free(Image* image)
     {
-        if (image->_getData() == NULL)
+        if (image->_getData() == nullptr)
         {
             throw GCN_EXCEPTION("Image data points to null.");
         }
@@ -203,7 +203,7 @@ namespace gcn
 
     int SDLImageLoader::getWidth() const
     {
-        if (mCurrentImage == NULL)
+        if (mCurrentImage == nullptr)
         {
             throw GCN_EXCEPTION("No image prepared.");
         }
@@ -213,7 +213,7 @@ namespace gcn
 
     int SDLImageLoader::getHeight() const
     {
-        if (mCurrentImage == NULL)
+        if (mCurrentImage == nullptr)
         {
             throw GCN_EXCEPTION("No image prepared.");
         }
@@ -223,7 +223,7 @@ namespace gcn
 
     Color SDLImageLoader::getPixel(int x, int y)
     {
-        if (mCurrentImage == NULL)
+        if (mCurrentImage == nullptr)
         {
             throw GCN_EXCEPTION("No image prepared.");
         }
@@ -238,7 +238,7 @@ namespace gcn
 
     void SDLImageLoader::putPixel(int x, int y, const Color& color)
     {
-        if (mCurrentImage == NULL)
+        if (mCurrentImage == nullptr)
         {
             throw GCN_EXCEPTION("No image prepared.");
         }

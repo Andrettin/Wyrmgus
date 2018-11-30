@@ -137,7 +137,7 @@ namespace gcn
         /**
          * Gets the Widget parent container.
          *
-         * @return the Widget parent container. Returns NULL if the Widget
+         * @return the Widget parent container. Returns null if the Widget
          *         has no parent.
          */
         virtual BasicContainer* getParent() const;
@@ -583,7 +583,7 @@ namespace gcn
         static void setGlobalFont(Font* font);
 
         /**
-         * Sets the font. If font is NULL, the global font will be used.
+         * Sets the font. If font is null, the global font will be used.
          *
          * @param font the Font.
          */

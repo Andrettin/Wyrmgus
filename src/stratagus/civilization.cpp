@@ -69,7 +69,7 @@ CCivilization *CCivilization::GetCivilization(const std::string &ident, const bo
 		fprintf(stderr, "Invalid civilization: \"%s\".\n", ident.c_str());
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -127,7 +127,7 @@ CCivilization::~CCivilization()
 int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
 {
 	if (!upgrade) {
-		fprintf(stderr, "Error in CCivilization::GetUpgradePriority: the upgrade is NULL.\n");
+		fprintf(stderr, "Error in CCivilization::GetUpgradePriority: the upgrade is null.\n");
 	}
 	
 	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {

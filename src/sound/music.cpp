@@ -60,7 +60,7 @@ bool CallbackMusic;                       /// flag true callback ccl if stops
 #ifdef USE_OAML
 #include <oaml.h>
 
-oamlApi *oaml = NULL;
+oamlApi *oaml = nullptr;
 bool enableOAML = false;
 #endif
 
@@ -121,7 +121,7 @@ static void* oamlOpen(const char *filename) {
 	const std::string name = LibraryFileName(filename);
 	if (f->open(name.c_str(), CL_OPEN_READ) == -1) {
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 	return (void*)f;
 }
@@ -183,7 +183,7 @@ void ShutdownMusicOAML()
 	if (oaml) {
 		oaml->Shutdown();
 		delete oaml;
-		oaml = NULL;
+		oaml = nullptr;
 	}
 	enableOAML = false;
 }

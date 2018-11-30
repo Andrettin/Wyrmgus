@@ -550,13 +550,13 @@ namespace gcn
     void TextBox::scrollToCaret()
     {
         Widget *par = getParent();
-        if (par == NULL)
+        if (par == nullptr)
         {
             return;
         }
 
         ScrollArea* scrollArea = dynamic_cast<ScrollArea *>(par);
-        if (scrollArea != NULL)
+        if (scrollArea != nullptr)
         {
             Rectangle scroll;
             scroll.x = getFont()->getWidth(mTextRows[mCaretRow].substr(0, mCaretColumn));

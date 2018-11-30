@@ -107,14 +107,16 @@ char CurrentMapPath[1024];  /// Path of the current map
 CSite *GetSite(std::string site_ident)
 {
 	if (site_ident.empty()) {
-		return NULL;
+		return nullptr;
 	}
 	
-	if (SiteIdentToPointer.find(site_ident) != SiteIdentToPointer.end()) {
-		return SiteIdentToPointer[site_ident];
+	std::map<std::string, CSite *>::const_iterator find_iterator = SiteIdentToPointer.find(site_ident);
+	
+	if (find_iterator != SiteIdentToPointer.end()) {
+		return find_iterator->second;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -123,14 +125,16 @@ CSite *GetSite(std::string site_ident)
 CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident)
 {
 	if (terrain_feature_ident.empty()) {
-		return NULL;
+		return nullptr;
 	}
 	
-	if (TerrainFeatureIdentToPointer.find(terrain_feature_ident) != TerrainFeatureIdentToPointer.end()) {
-		return TerrainFeatureIdentToPointer[terrain_feature_ident];
+	std::map<std::string, CSite *>::const_iterator find_iterator = TerrainFeatureIdentToPointer.find(terrain_feature_ident);
+	
+	if (find_iterator != TerrainFeatureIdentToPointer.end()) {
+		return find_iterator->second;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 std::string GetDegreeLevelNameById(int degree_level)
@@ -359,7 +363,7 @@ PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer
 CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, bool overlay, int z) const
 {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
-		return NULL;
+		return nullptr;
 	}
 	
 	CMapField &mf = *this->Field(pos, z);
@@ -374,7 +378,7 @@ CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, bool overlay, int z) const
 CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen, int z, bool ignore_destroyed) const
 {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
-		return NULL;
+		return nullptr;
 	}
 	
 	CMapField &mf = *this->Field(pos, z);
@@ -412,7 +416,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 	}
 	
 	CPlayer *player = GetFactionPlayer(faction);
-	if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && player != NULL && player->StartMapLayer == z && player->StartPos.x >= min_pos.x && player->StartPos.x <= max_pos.x && player->StartPos.y >= min_pos.y && player->StartPos.y <= max_pos.y) {
+	if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && player != nullptr && player->StartMapLayer == z && player->StartPos.x >= min_pos.x && player->StartPos.x <= max_pos.x && player->StartPos.y >= min_pos.y && player->StartPos.y <= max_pos.y) {
 		return player->StartPos;
 	}
 	
@@ -450,7 +454,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 		}
 		
 		std::vector<CUnit *> table;
-		if (player != NULL) {
+		if (player != nullptr) {
 			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
 			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeFly)) {
@@ -471,7 +475,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 					}
 				}
 			}
-			if (passable_surroundings && UnitTypeCanBeAt(*unit_type, random_pos, z) && (!unit_type->BoolFlag[BUILDING_INDEX].value || CanBuildUnitType(NULL, *unit_type, random_pos, 0, true, z))) {
+			if (passable_surroundings && UnitTypeCanBeAt(*unit_type, random_pos, z) && (!unit_type->BoolFlag[BUILDING_INDEX].value || CanBuildUnitType(nullptr, *unit_type, random_pos, 0, true, z))) {
 				return random_pos;
 			}
 		}
@@ -507,7 +511,7 @@ bool CMap::WallOnMap(const Vec2i &pos, int z) const
 bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 {
 	CMapField &mf = *this->Field(pos, z);
-	CTerrainType *terrain = NULL;
+	CTerrainType *terrain = nullptr;
 	
 	if (overlay) {
 		terrain = mf.OverlayTerrain;
@@ -534,9 +538,9 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 						
 					CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
-						adjacent_terrain = NULL;
+						adjacent_terrain = nullptr;
 					}
-					if (terrain != adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+					if (terrain != adjacent_terrain) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
 						transition_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
 					}
 				}
@@ -798,7 +802,7 @@ CPlane *CMap::GetCurrentPlane() const
 	if (UI.CurrentMapLayer) {
 		return UI.CurrentMapLayer->Plane;
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -807,7 +811,7 @@ CWorld *CMap::GetCurrentWorld() const
 	if (UI.CurrentMapLayer) {
 		return UI.CurrentMapLayer->World;
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -1083,7 +1087,7 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 }
 
-CMap::CMap() : NoFogOfWar(false), TileGraphic(NULL), Landmasses(0), BorderTerrain(NULL)
+CMap::CMap() : NoFogOfWar(false), TileGraphic(nullptr), Landmasses(0), BorderTerrain(nullptr)
 {
 	Tileset = new CTileset;
 }
@@ -1174,13 +1178,13 @@ void CMap::Clean()
 
 	this->Info.Clear();
 	//Wyrmgus start
-//	this->Fields = NULL;
+//	this->Fields = nullptr;
 	//Wyrmgus end
 	this->NoFogOfWar = false;
 	this->Tileset->clear();
 	this->TileModelsFileName.clear();
 	CGraphic::Free(this->TileGraphic);
-	this->TileGraphic = NULL;
+	this->TileGraphic = nullptr;
 
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
@@ -1768,7 +1772,7 @@ static int GetTransitionType(std::vector<int> &adjacent_directions, bool allow_s
 void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 {
 	CMapField &mf = *this->Field(pos, z);
-	CTerrainType *terrain = NULL;
+	CTerrainType *terrain = nullptr;
 	if (overlay) {
 		terrain = mf.OverlayTerrain;
 		mf.OverlayTransitionTiles.clear();
@@ -1792,7 +1796,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
-						adjacent_terrain = NULL;
+						adjacent_terrain = nullptr;
 					}
 					if (adjacent_terrain && terrain != adjacent_terrain) {
 						if (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), adjacent_terrain) != terrain->InnerBorderTerrains.end()) {
@@ -1807,7 +1811,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 							}
 						}
 					}
-					if (!adjacent_terrain || (overlay && terrain != adjacent_terrain && std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), adjacent_terrain) == terrain->BorderTerrains.end())) { // happens if terrain is NULL or if it is an overlay tile which doesn't have a border with this one, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+					if (!adjacent_terrain || (overlay && terrain != adjacent_terrain && std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), adjacent_terrain) == terrain->BorderTerrains.end())) { // happens if terrain is null or if it is an overlay tile which doesn't have a border with this one, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
 						adjacent_terrain_directions[CTerrainType::TerrainTypes.size()].push_back(GetDirectionFromOffset(x_offset, y_offset));
 					}
 				}
@@ -1817,7 +1821,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 	
 	for (std::map<int, std::vector<int>>::iterator iterator = adjacent_terrain_directions.begin(); iterator != adjacent_terrain_directions.end(); ++iterator) {
 		int adjacent_terrain_id = iterator->first;
-		CTerrainType *adjacent_terrain = adjacent_terrain_id < (int) CTerrainType::TerrainTypes.size() ? CTerrainType::TerrainTypes[adjacent_terrain_id] : NULL;
+		CTerrainType *adjacent_terrain = adjacent_terrain_id < (int) CTerrainType::TerrainTypes.size() ? CTerrainType::TerrainTypes[adjacent_terrain_id] : nullptr;
 		int transition_type = GetTransitionType(iterator->second, terrain->AllowSingle);
 		
 		if (transition_type != -1) {
@@ -2003,7 +2007,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 		for (size_t i = 0; i != cache.size(); ++i) {
 			CUnit *unit = cache[i];
 			if (!unit) {
-				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit in the tile's unit cache is NULL.\n", pos.x, pos.y);
+				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit in the tile's unit cache is null.\n", pos.x, pos.y);
 			}
 			if (unit->IsAliveOnMap() && unit->Type->BoolFlag[BUILDING_INDEX].value) {
 				if (unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value && unit->Player->Index != PlayerNumNeutral) {
@@ -2027,7 +2031,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit *unit = table[i];
 			if (!unit) {
-				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit within the tile's range is NULL.\n", pos.x, pos.y);
+				fprintf(stderr, "Error in CMap::CalculateTileOwnership (pos %d, %d): a unit within the tile's range is null.\n", pos.x, pos.y);
 			}
 			if (unit->IsAliveOnMap() && unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value > 0 && unit->MapDistanceTo(pos, z) <= unit->Variable[OWNERSHIPINFLUENCERANGE_INDEX].Value) {
 				bool obstacle_check = true;
@@ -2035,7 +2039,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 					bool obstacle_subcheck = false;
 					for (int x = 0; x < unit->Type->TileSize.x; ++x) {
 						for (int y = 0; y < unit->Type->TileSize.y; ++y) {
-							if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, NULL, unit->Player->Index)) { //the obstacle must be avoidable from at least one of the unit's tiles
+							if (CheckObstaclesBetweenTiles(unit->tilePos + Vec2i(x, y), pos, obstacle_flags[j], z, 0, nullptr, unit->Player->Index)) { //the obstacle must be avoidable from at least one of the unit's tiles
 								obstacle_subcheck = true;
 								break;
 							}
@@ -2465,7 +2469,7 @@ void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i 
 	
 	for (int i = 0; i < quantity; ++i) {
 		if (i == 0 || !grouped) {
-			unit_pos = GenerateUnitLocation(unit_type, NULL, min_pos, max_pos, z);
+			unit_pos = GenerateUnitLocation(unit_type, nullptr, min_pos, max_pos, z);
 		}
 		if (!this->Info.IsPointOnMap(unit_pos, z)) {
 			continue;

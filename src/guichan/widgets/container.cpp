@@ -71,7 +71,7 @@ namespace gcn
 
 	Container::Container()
 	{
-		mWidgetWithMouse = NULL;
+		mWidgetWithMouse = nullptr;
 		mOpaque = true;
 	}
 
@@ -221,7 +221,7 @@ namespace gcn
 	{
 		if (mWidgetWithMouse == widget)
 		{
-			mWidgetWithMouse = NULL;
+			mWidgetWithMouse = nullptr;
 		}
 
 		WidgetIterator iter;
@@ -313,7 +313,7 @@ namespace gcn
 	{
 		if (mWidgetWithMouse == widget)
 		{
-			mWidgetWithMouse = NULL;
+			mWidgetWithMouse = nullptr;
 		}
 
 		WidgetIterator iter;
@@ -322,8 +322,8 @@ namespace gcn
 			if (*iter == widget)
 			{
 				mWidgets.erase(iter);
-				widget->_setFocusHandler(NULL);
-				widget->_setParent(NULL);
+				widget->_setFocusHandler(nullptr);
+				widget->_setParent(nullptr);
 				return;
 			}
 		}
@@ -333,14 +333,14 @@ namespace gcn
 
 	void Container::clear()
 	{
-		mWidgetWithMouse = NULL;
+		mWidgetWithMouse = nullptr;
 
 		WidgetIterator iter;
 
 		for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
 		{
-			(*iter)->_setFocusHandler(NULL);
-			(*iter)->_setParent(NULL);
+			(*iter)->_setFocusHandler(nullptr);
+			(*iter)->_setParent(nullptr);
 		}
 
 		mWidgets.clear();
@@ -359,7 +359,7 @@ namespace gcn
 
 	void Container::_mouseInputMessage(const MouseInput &mouseInput)
 	{
-		Widget* tempWidgetWithMouse = NULL;
+		Widget* tempWidgetWithMouse = nullptr;
 
 		WidgetIterator iter;
 		for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
@@ -386,7 +386,7 @@ namespace gcn
 			mWidgetWithMouse = tempWidgetWithMouse;
 		}
 
-		if (mWidgetWithMouse != NULL)
+		if (mWidgetWithMouse != nullptr)
 		{
 			MouseInput mi = mouseInput;
 			mi.x -= mWidgetWithMouse->getX();
@@ -394,7 +394,7 @@ namespace gcn
 			mWidgetWithMouse->_mouseInputMessage(mi);
 		}
 
-		if (mWidgetWithMouse == NULL)
+		if (mWidgetWithMouse == nullptr)
 		{
 			BasicContainer::_mouseInputMessage(mouseInput);
 		}
@@ -405,7 +405,7 @@ namespace gcn
 		if (mWidgetWithMouse)
 		{
 			mWidgetWithMouse->_mouseOutMessage();
-			mWidgetWithMouse = NULL;
+			mWidgetWithMouse = nullptr;
 		}
 
 		Widget::_mouseOutMessage();

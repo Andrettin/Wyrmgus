@@ -191,7 +191,7 @@ void DrawMapArea()
 		// Center viewport on tracked unit
 		if (vp->Unit) {
 			if (vp->Unit->Destroyed || vp->Unit->CurrentAction() == UnitActionDie) {
-				vp->Unit = NULL;
+				vp->Unit = nullptr;
 			} else {
 				if (UI.CurrentMapLayer->ID != vp->Unit->MapLayer) {
 					ChangeCurrentMapLayer(vp->Unit->MapLayer);
@@ -605,7 +605,7 @@ void GameMainLoop()
 	
 	//Wyrmgus start
 	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
-		if (CurrentCampaign != NULL) {
+		if (CurrentCampaign != nullptr) {
 			for (int i = 0; i < NumPlayers; ++i) {
 				if (Players[i].Type != PlayerNobody && Players[i].Race != 0 && Players[i].Faction != -1) {
 					if (CurrentCampaign->StartDate.Year) {
@@ -682,14 +682,14 @@ void GameMainLoop()
 			CclCommand(buf);
 		}
 		
-		if (!IsNetworkGame() && ThisPlayer && CurrentCustomHero != NULL) {
+		if (!IsNetworkGame() && ThisPlayer && CurrentCustomHero != nullptr) {
 			Vec2i resPos;
 			FindNearestDrop(*CurrentCustomHero->Type, ThisPlayer->StartPos, resPos, LookingW, ThisPlayer->StartMapLayer);
 			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, ThisPlayer, ThisPlayer->StartMapLayer);
 			custom_hero->SetCharacter(CurrentCustomHero->Ident, true);	
 		}
 		
-		if (CurrentQuest != NULL && CurrentQuest->IntroductionDialogue != NULL) {
+		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
 			CurrentQuest->IntroductionDialogue->Call(ThisPlayer->Index);
 		}
 	}

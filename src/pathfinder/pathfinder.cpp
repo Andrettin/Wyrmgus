@@ -127,10 +127,10 @@ void TerrainTraversal::PushUnitPosAndNeighbor(const CUnit &unit)
 {
 	const CUnit *startUnit = GetFirstContainer(unit);
 	//Wyrmgus start
-	if (startUnit == NULL) {
-		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit is NULL.\n");
-	} else if (startUnit->Type == NULL) {
-		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is NULL.\n", startUnit->Name.c_str(), UnitNumber(*startUnit), startUnit->tilePos.x, startUnit->tilePos.y);
+	if (startUnit == nullptr) {
+		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit is null.\n");
+	} else if (startUnit->Type == nullptr) {
+		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is null.\n", startUnit->Name.c_str(), UnitNumber(*startUnit), startUnit->tilePos.x, startUnit->tilePos.y);
 	}
 	//Wyrmgus end
 	const Vec2i offset(1, 1);
@@ -224,7 +224,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 	if (!src.Container || !from_outside_container) {
 		i = AStarFindPath(src.tilePos, goalPos, w, h,
 						  src.Type->TileSize.x, src.Type->TileSize.y,
-						  minrange, range, NULL, 0, src, max_length, z);
+						  minrange, range, nullptr, 0, src, max_length, z);
 	} else {
 		const Vec2i offset(1, 1);
 		const Vec2i extra_tile_size(src.Container->Type->TileSize - 1);
@@ -240,7 +240,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 				}
 				temp_i = AStarFindPath(it, goalPos, w, h,
 						  src.Type->TileSize.x, src.Type->TileSize.y,
-						  minrange, range, NULL, 0, src, max_length, z);
+						  minrange, range, nullptr, 0, src, max_length, z);
 						  
 				if (temp_i > i && i < PF_REACHED) {
 					i = temp_i;
@@ -305,8 +305,8 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-//PathFinderInput::PathFinderInput() : unit(NULL), minRange(0), maxRange(0),
-PathFinderInput::PathFinderInput() : unit(NULL), minRange(0), maxRange(0), MapLayer(0),
+//PathFinderInput::PathFinderInput() : unit(nullptr), minRange(0), maxRange(0),
+PathFinderInput::PathFinderInput() : unit(nullptr), minRange(0), maxRange(0), MapLayer(0),
 //Wyrmgus end
 	isRecalculatePathNeeded(true)
 {
@@ -429,7 +429,7 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 
 	// Update path if it was requested. Otherwise we may only want
 	// to know if there exists a path.
-	if (path != NULL) {
+	if (path != nullptr) {
 		output.Length = std::min<int>(i, PathFinderOutput::MAX_PATH_LENGTH);
 		if (output.Length == 0) {
 			++output.Length;

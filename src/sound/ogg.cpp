@@ -282,7 +282,7 @@ int OggInit(CFile *f, OggData *data)
 #ifdef USE_THEORA
 	if (num_theora) {
 		theora_decode_init(&data->tstate, &data->tinfo);
-		data->tstate.internal_encode = NULL;  // needed for a bug in libtheora (fixed in next release)
+		data->tstate.internal_encode = nullptr;  // needed for a bug in libtheora (fixed in next release)
 	} else {
 		theora_info_clear(&data->tinfo);
 		theora_comment_clear(&data->tcomment);
@@ -398,7 +398,7 @@ CSample *LoadVorbis(const char *name, int flags)
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file '%s'\n", name);
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 
 	if (flags & PlayAudioStream) {
@@ -416,7 +416,7 @@ CSample *LoadVorbis(const char *name, int flags)
 		delete sample;
 		f->close();
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 
 	info = &data->vinfo;

@@ -89,7 +89,7 @@ class _filter_flags
 public:
 	_filter_flags(const CPlayer &p, int *fogmask) : player(&p), fogmask(fogmask)
 	{
-		Assert(fogmask != NULL);
+		Assert(fogmask != nullptr);
 	}
 
 	void operator()(const CUnit *const unit) const
@@ -157,7 +157,7 @@ public:
 	void operator()(CUnit *const unit) const
 	{
 		//Wyrmgus start
-		if (unit->Type == NULL) {
+		if (unit->Type == nullptr) {
 			fprintf(stderr, "Unit has no type: \"%s\" (%d, %d)\n", unit->Name.c_str(), unit->tilePos.x, unit->tilePos.y);
 			return;
 		}
@@ -1141,7 +1141,7 @@ void CMap::InitFogOfWar(PixelSize pixel_tile_size)
 		SDL_GetRGB(FogOfWarColorSDL, TheScreen->format, &r, &g, &b);
 		Uint32 color = Video.MapRGB(s->format, r, g, b);
 
-		SDL_FillRect(s, NULL, color);
+		SDL_FillRect(s, nullptr, color);
 		SDL_Surface *only_fog_surface = SDL_DisplayFormat(s);
 		SDL_SetAlpha(only_fog_surface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
 		VideoPaletteListRemove(s);
@@ -1231,7 +1231,7 @@ void CMap::CleanFogOfWar()
 
 	for (std::map<PixelSize, CGraphic *>::iterator iterator = this->FogGraphics.begin(); iterator != this->FogGraphics.end(); ++iterator) {
 		CGraphic::Free(iterator->second);
-		iterator->second = NULL;
+		iterator->second = nullptr;
 		
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		if (!UseOpenGL)
@@ -1240,10 +1240,10 @@ void CMap::CleanFogOfWar()
 			if (OnlyFogSurfaces.find(iterator->first) != OnlyFogSurfaces.end()) {
 				VideoPaletteListRemove(OnlyFogSurfaces[iterator->first]);
 				SDL_FreeSurface(OnlyFogSurfaces[iterator->first]);
-				OnlyFogSurfaces[iterator->first] = NULL;
+				OnlyFogSurfaces[iterator->first] = nullptr;
 			}
 			CGraphic::Free(AlphaFogGraphics[iterator->first]);
-			AlphaFogGraphics[iterator->first] = NULL;
+			AlphaFogGraphics[iterator->first] = nullptr;
 		}
 	}
 	

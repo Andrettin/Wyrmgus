@@ -175,7 +175,7 @@ long isqrt(long num)
 #ifndef HAVE_STRCPYS
 errno_t strcpy_s(char *dst, size_t dstsize, const char *src)
 {
-	if (dst == NULL || src == NULL) {
+	if (dst == nullptr || src == nullptr) {
 		return EINVAL;
 	}
 	if (strlen(src) >= dstsize) {
@@ -204,7 +204,7 @@ size_t strnlen(const char *str, size_t strsize)
 #ifndef HAVE_STRNCPYS
 errno_t strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 {
-	if (dst == NULL || src == NULL || dstsize == 0) {
+	if (dst == nullptr || src == nullptr || dstsize == 0) {
 		return EINVAL;
 	}
 
@@ -233,7 +233,7 @@ errno_t strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 #ifndef HAVE_STRCATS
 errno_t strcat_s(char *dst, size_t dstsize, const char *src)
 {
-	if (dst == NULL || src == NULL) {
+	if (dst == nullptr || src == nullptr) {
 		return EINVAL;
 	}
 	char *enddst = dst;
@@ -260,14 +260,14 @@ errno_t strcat_s(char *dst, size_t dstsize, const char *src)
 **  @param a  String to search in
 **  @param b  Substring to search for
 **
-**  @return   Pointer to first occurrence of b or NULL if not found.
+**  @return   Pointer to first occurrence of b or null if not found.
 */
 char *strcasestr(const char *a, const char *b)
 {
 	int x;
 
 	if (!a || !*a || !b || !*b || strlen(a) < strlen(b)) {
-		return NULL;
+		return nullptr;
 	}
 
 	x = 0;
@@ -282,7 +282,7 @@ char *strcasestr(const char *a, const char *b)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 #endif // !HAVE_STRCASESTR
 
@@ -466,7 +466,7 @@ int getopt(int argc, char *const *argv, const char *opts)
 	register int c;
 	register const char *cp;
 
-	optarg = NULL;
+	optarg = nullptr;
 
 	if (sp == 1) {
 		if (optind >= argc || argv[optind][0] != '-' || argv[optind][1] == '\0') {
@@ -477,7 +477,7 @@ int getopt(int argc, char *const *argv, const char *opts)
 		}
 	}
 	optopt = c = argv[optind][sp];
-	if (c == ':' || (cp = strchr(opts, c)) == NULL) {
+	if (c == ':' || (cp = strchr(opts, c)) == nullptr) {
 		getopt_err(argv[0], ": illegal option -", (char)c);
 		cp = "xx"; /* make the next if false */
 		c = '?';
@@ -527,7 +527,7 @@ int GetClipboard(std::string &str)
 #endif
 
 #ifdef USE_WIN32
-	if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL)) {
+	if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(nullptr)) {
 		return -1;
 	}
 	handle = GetClipboardData(CF_TEXT);
@@ -541,7 +541,7 @@ int GetClipboard(std::string &str)
 		return -1;
 	}
 #elif defined(USE_X11)
-	if (!(display = XOpenDisplay(NULL))) {
+	if (!(display = XOpenDisplay(nullptr))) {
 		return -1;
 	}
 
@@ -568,13 +568,13 @@ int GetClipboard(std::string &str)
 	XCloseDisplay(display);
 
 	if (rettype != XA_STRING || retform != 8) {
-		if (clipboard != NULL) {
+		if (clipboard != nullptr) {
 			XFree(clipboard);
 		}
-		clipboard = NULL;
+		clipboard = nullptr;
 	}
 
-	if (clipboard == NULL) {
+	if (clipboard == nullptr) {
 		return -1;
 	}
 #endif
@@ -589,7 +589,7 @@ int GetClipboard(std::string &str)
 	GlobalUnlock(handle);
 	CloseClipboard();
 #elif defined(USE_X11)
-	if (clipboard != NULL) {
+	if (clipboard != nullptr) {
 		XFree(clipboard);
 	}
 #endif
@@ -1263,6 +1263,6 @@ std::string SeparateCapitalizedStringElements(const std::string &text)
 std::string GeneratePersonalName(const std::string &unit_type_ident)
 {
 	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-	return UnitTypes[unit_type_id]->GeneratePersonalName(NULL, UnitTypes[unit_type_id]->DefaultStat.Variables[GENDER_INDEX].Value);
+	return UnitTypes[unit_type_id]->GeneratePersonalName(nullptr, UnitTypes[unit_type_id]->DefaultStat.Variables[GENDER_INDEX].Value);
 }
 //Wyrmgus end

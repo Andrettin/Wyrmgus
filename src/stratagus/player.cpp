@@ -448,26 +448,26 @@ int PlayerRace::GetFactionIndexByName(const std::string faction_name) const
 CFaction *PlayerRace::GetFaction(const std::string faction_name) const
 {
 	if (faction_name.empty()) {
-		return NULL;
+		return nullptr;
 	}
 	
 	if (FactionStringToIndex.find(faction_name) != FactionStringToIndex.end()) {
 		return PlayerRaces.Factions[FactionStringToIndex[faction_name]];
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
 CDynasty *PlayerRace::GetDynasty(const std::string dynasty_ident) const
 {
 	if (dynasty_ident.empty()) {
-		return NULL;
+		return nullptr;
 	}
 	
 	if (DynastyStringToIndex.find(dynasty_ident) != DynastyStringToIndex.end()) {
 		return PlayerRaces.Dynasties[DynastyStringToIndex[dynasty_ident]];
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -476,7 +476,7 @@ CLanguage *PlayerRace::GetLanguage(std::string language_ident) const
 	if (LanguageIdentToPointer.find(language_ident) != LanguageIdentToPointer.end()) {
 		return LanguageIdentToPointer[language_ident];
 	}
-	return NULL;
+	return nullptr;
 }
 
 int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
@@ -550,7 +550,7 @@ int PlayerRace::GetFactionClassUpgrade(int faction, int class_id)
 CLanguage *PlayerRace::GetCivilizationLanguage(int civilization)
 {
 	if (civilization == -1) {
-		return NULL;
+		return nullptr;
 	}
 	
 	if (CCivilization::Civilizations[civilization] && CCivilization::Civilizations[civilization]->Language) {
@@ -561,7 +561,7 @@ CLanguage *PlayerRace::GetCivilizationLanguage(int civilization)
 		return GetCivilizationLanguage(CCivilization::Civilizations[civilization]->ParentCivilization->ID);
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)
@@ -682,7 +682,7 @@ CFaction::~CFaction()
 int CFaction::GetUpgradePriority(const CUpgrade *upgrade) const
 {
 	if (!upgrade) {
-		fprintf(stderr, "Error in CFaction::GetUpgradePriority: the upgrade is NULL.\n");
+		fprintf(stderr, "Error in CFaction::GetUpgradePriority: the upgrade is null.\n");
 	}
 	
 	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {
@@ -806,7 +806,7 @@ void InitPlayers()
 */
 void CleanPlayers()
 {
-	ThisPlayer = NULL;
+	ThisPlayer = nullptr;
 	for (unsigned int i = 0; i < PlayerMax; ++i) {
 		Players[i].Clear();
 	}
@@ -1193,7 +1193,7 @@ void CreatePlayer(int type)
 CPlayer *GetFactionPlayer(CFaction *faction)
 {
 	if (!faction) {
-		return NULL;
+		return nullptr;
 	}
 	
 	for (int i = 0; i < NumPlayers; ++i) {
@@ -1202,7 +1202,7 @@ CPlayer *GetFactionPlayer(CFaction *faction)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 CPlayer *GetOrAddFactionPlayer(CFaction *faction)
@@ -1231,7 +1231,7 @@ CPlayer *GetOrAddFactionPlayer(CFaction *faction)
 	
 	fprintf(stderr, "Cannot add player for faction \"%s\": no player slots available.\n", faction->Ident.c_str());
 	
-	return NULL;
+	return nullptr;
 }
 //Wyrmgus end
 
@@ -1296,10 +1296,10 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Type = type;
 	this->Race = 0;
 	this->Faction = -1;
-	this->Religion = NULL;
-	this->Dynasty = NULL;
-	this->Age = NULL;
-	this->Overlord = NULL;
+	this->Religion = nullptr;
+	this->Dynasty = nullptr;
+	this->Age = nullptr;
+	this->Overlord = nullptr;
 	this->Team = team;
 	this->Enemy = 0;
 	this->Allied = 0;
@@ -1429,7 +1429,7 @@ void CPlayer::SetCivilization(int civilization)
 	int old_faction = this->Faction;
 
 	if (GameRunning) {
-		this->SetFaction(NULL);
+		this->SetFaction(nullptr);
 	} else {
 		this->Faction = -1;
 	}
@@ -1615,7 +1615,7 @@ void CPlayer::SetRandomFaction()
 		CFaction *chosen_faction = local_factions[SyncRand(local_factions.size())];
 		this->SetFaction(chosen_faction);
 	} else {
-		this->SetFaction(NULL);
+		this->SetFaction(nullptr);
 	}
 }
 
@@ -1674,7 +1674,7 @@ void CPlayer::CheckAge()
 		return;
 	}
 	
-	this->SetAge(NULL);
+	this->SetAge(nullptr);
 }
 
 /**
@@ -1696,7 +1696,7 @@ void CPlayer::SetAge(CAge *age)
 			UI.AgePanel.G = this->Age->G;
 		} else {
 			UI.AgePanel.Text.clear();
-			UI.AgePanel.G = NULL;
+			UI.AgePanel.G = nullptr;
 		}
 	}
 }
@@ -1809,7 +1809,7 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	CUnitType *town_hall_type = UnitTypes[town_hall_type_id];
 	
 	int stronghold_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("stronghold"));			
-	CUnitType *stronghold_type = NULL;
+	CUnitType *stronghold_type = nullptr;
 	if (stronghold_type_id != -1) {
 		stronghold_type = UnitTypes[stronghold_type_id];
 	}
@@ -1841,7 +1841,7 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 
 CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const
 {
-	CUnit *best_hall = NULL;
+	CUnit *best_hall = nullptr;
 	int best_distance = -1;
 	
 	for (size_t i = 0; i < Map.SiteUnits.size(); ++i) {
@@ -1862,7 +1862,7 @@ CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size)
 	if (best_hall) {
 		return best_hall->Settlement;
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -1919,7 +1919,7 @@ bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 */
 bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 {
-	if (CurrentQuest != NULL) {
+	if (CurrentQuest != nullptr) {
 		return false;
 	}
 	
@@ -1944,7 +1944,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 	
 	if (!pre) {
 		//check if the required core settlements are owned by the player
-		if (CurrentCampaign != NULL) { //only check for settlements in the Scenario mode
+		if (CurrentCampaign != nullptr) { //only check for settlements in the Scenario mode
 			for (size_t i = 0; i < faction->Cores.size(); ++i) {
 				if (!faction->Cores[i]->SiteUnit || faction->Cores[i]->SiteUnit->Player != this || faction->Cores[i]->SiteUnit->CurrentAction() == UnitActionBuilt) {
 					return false;
@@ -1972,7 +1972,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 */
 bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
 {
-	if (CurrentQuest != NULL) {
+	if (CurrentQuest != nullptr) {
 		return false;
 	}
 	
@@ -2005,7 +2005,7 @@ bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
 */
 bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) const
 {
-	if (character->Deity != NULL) { //character is a deity
+	if (character->Deity != nullptr) { //character is a deity
 		return false;
 	}
 	
@@ -2316,10 +2316,10 @@ void CPlayer::Clear()
 	Type = 0;
 	Race = 0;
 	Faction = -1;
-	Religion = NULL;
-	Dynasty = NULL;
-	Age = NULL;
-	Overlord = NULL;
+	Religion = nullptr;
+	Dynasty = nullptr;
+	Age = nullptr;
+	Overlord = nullptr;
 	Vassals.clear();
 	AiName.clear();
 	Team = 0;
@@ -2429,7 +2429,7 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	//Wyrmgus end
 	Assert(this->Units[unit.PlayerSlot] == &unit);
 
-	//	unit.Player = NULL; // we can remove dying unit...
+	//	unit.Player = nullptr; // we can remove dying unit...
 	CUnit *last = this->Units.back();
 
 	this->Units[unit.PlayerSlot] = last;
@@ -2497,7 +2497,7 @@ void CPlayer::PerformResourceTrade()
 
 CUnit *CPlayer::GetMarketUnit() const
 {
-	CUnit *market_unit = NULL;
+	CUnit *market_unit = nullptr;
 	
 	const int n_m = AiHelpers.SellMarkets[0].size();
 
@@ -2552,7 +2552,7 @@ void CPlayer::UpdateLevelUpUnits()
 
 void CPlayer::UpdateQuestPool()
 {
-	if (CurrentCampaign == NULL) { // in-game quests only while playing the campaign mode
+	if (CurrentCampaign == nullptr) { // in-game quests only while playing the campaign mode
 		return;
 	}
 	
@@ -2828,7 +2828,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		} else if (objective->ObjectiveType == DestroyUnitsObjectiveType || objective->ObjectiveType == DestroyHeroObjectiveType || objective->ObjectiveType == DestroyUniqueObjectiveType) {
 			if (objective->Faction) {
 				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
-				if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
+				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 					return false;
 				}
 			}
@@ -2844,7 +2844,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 			}
 		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
 			CPlayer *faction_player = GetFactionPlayer(objective->Faction);
-			if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
+			if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 				return false;
 			}
 		}
@@ -2969,7 +2969,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 		} else if (objective->ObjectiveType == DestroyUnitsObjectiveType || objective->ObjectiveType == DestroyHeroObjectiveType || objective->ObjectiveType == DestroyUniqueObjectiveType) {
 			if (objective->Faction && objective->Counter < objective->Quantity) {
 				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
-				if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
+				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 					return "The target no longer exists.";
 				}
 			}
@@ -2986,7 +2986,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {
 			if (objective->Counter == 0) {  // if is supposed to destroy a faction, but it is nowhere to be found, fail the quest
 				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
-				if (faction_player == NULL || faction_player->GetUnitCount() == 0) {
+				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
 					return "The target no longer exists.";
 				}
 			}
@@ -3331,8 +3331,8 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 	int count = this->GetUnitTypeCount(&type);
 	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
 		//Wyrmgus start
-		if (*it == NULL) {
-			fprintf(stderr, "Error in CPlayer::GetUnitTotalCount: unit of player %d is NULL.\n", this->Index);
+		if (*it == nullptr) {
+			fprintf(stderr, "Error in CPlayer::GetUnitTotalCount: unit of player %d is null.\n", this->Index);
 			continue;
 		}
 		//Wyrmgus end
@@ -3732,7 +3732,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 	}
 	
 	if (!type_change) {
-		if (unit->Character != NULL) {
+		if (unit->Character != nullptr) {
 			this->Heroes.push_back(unit);
 		}
 	}
@@ -3773,7 +3773,7 @@ void CPlayer::DecreaseCountsForUnit(CUnit *unit, bool type_change)
 	}
 	
 	if (!type_change) {
-		if (unit->Character != NULL) {
+		if (unit->Character != nullptr) {
 			this->Heroes.erase(std::remove(this->Heroes.begin(), this->Heroes.end(), unit), this->Heroes.end());
 		}
 	}
@@ -4159,9 +4159,9 @@ void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
 	
 	// if either player is the overlord of another (indirect or otherwise), break the vassalage bond after the declaration of war
 	if (this->IsOverlordOf(player, true)) {
-		player.SetOverlord(NULL);
+		player.SetOverlord(nullptr);
 	} else if (player.IsOverlordOf(*this, true)) {
-		this->SetOverlord(NULL);
+		this->SetOverlord(nullptr);
 	}
 	//Wyrmgus end
 }
@@ -4424,7 +4424,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, int button_action) const
 	
 	if (
 		player.HasNeutralFactionType()
-		&& (player.Overlord == NULL || this->IsOverlordOf(player, true) || player.Overlord->IsAllied(*this))
+		&& (player.Overlord == nullptr || this->IsOverlordOf(player, true) || player.Overlord->IsAllied(*this))
 	) {
 		if (PlayerRaces.Factions[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonTrain && button_action != ButtonBuy) || std::find(this->Deities.begin(), this->Deities.end(), PlayerRaces.Factions[player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
@@ -4902,7 +4902,7 @@ LanguageWord *CLanguage::GetWord(const std::string word, int word_type, std::vec
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 std::string CLanguage::GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number)

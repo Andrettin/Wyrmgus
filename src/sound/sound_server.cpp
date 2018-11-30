@@ -198,7 +198,7 @@ static void MixMusicToStereo32(int *buffer, int size)
 		if (n < len) { // End reached
 			MusicPlaying = false;
 			delete MusicChannel.Sample;
-			MusicChannel.Sample = NULL;
+			MusicChannel.Sample = nullptr;
 
 			if (MusicChannel.FinishedCallback) {
 				MusicChannel.FinishedCallback();
@@ -444,7 +444,7 @@ static void ChannelFinished(int channel)
 		delete Channels[channel].Unit;
 	}
 	//Wyrmgus end
-	Channels[channel].Unit = NULL;
+	Channels[channel].Unit = nullptr;
 	
 	//Wyrmgus start
 	Channels[channel].Voice = -1;
@@ -472,9 +472,9 @@ static int FillChannel(CSample *sample, unsigned char volume, char stereo, Origi
 	Channels[NextFreeChannel].Playing = true;
 	Channels[NextFreeChannel].Sample = sample;
 	Channels[NextFreeChannel].Stereo = stereo;
-	Channels[NextFreeChannel].FinishedCallback = NULL;
+	Channels[NextFreeChannel].FinishedCallback = nullptr;
 	//Wyrmgus start
-	Channels[NextFreeChannel].Unit = NULL;
+	Channels[NextFreeChannel].Unit = nullptr;
 	//Wyrmgus end
 	if (origin && origin->Base) {
 		Origin *source = new Origin;
@@ -583,7 +583,7 @@ void SetChannelFinishedCallback(int channel, void (*callback)(int channel))
 CSample *GetChannelSample(int channel)
 {
 	if (channel < 0 || channel >= MaxChannels) {
-		return NULL;
+		return nullptr;
 	}
 	return Channels[channel].Sample;
 }
@@ -643,7 +643,7 @@ static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
 		return sampleFluidSynth;
 	}
 #endif
-	return NULL;
+	return nullptr;
 }
 
 
@@ -661,7 +661,7 @@ CSample *LoadSample(const std::string &name)
 	const std::string filename = LibraryFileName(name.c_str());
 	CSample *sample = LoadSample(filename.c_str(), PlayAudioLoadInMemory);
 
-	if (sample == NULL) {
+	if (sample == nullptr) {
 		fprintf(stderr, "Can't load the sound '%s'\n", name.c_str());
 	}
 	return sample;
@@ -802,7 +802,7 @@ void PlayMusicName(const std::string &name) {
 	}
 	
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == NULL)
+	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
@@ -817,7 +817,7 @@ void PlayMusicByGroupRandom(const std::string &group) {
 	}
 	
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == NULL)
+	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
@@ -832,7 +832,7 @@ void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::stri
 	}
 	
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == NULL)
+	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
@@ -849,7 +849,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 	}
 
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == NULL)
+	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
@@ -873,7 +873,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 			}
 		}
 		if (!found_music && oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
-			CCivilization *parent_civilization = NULL;
+			CCivilization *parent_civilization = nullptr;
 			if (civilization) {
 				while (true) {
 					parent_civilization = civilization->ParentCivilization;
@@ -899,7 +899,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 
 void SetMusicCondition(int id, int value) {
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == NULL)
+	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
@@ -910,7 +910,7 @@ void SetMusicCondition(int id, int value) {
 
 void SetMusicLayerGain(const std::string &layer, float gain) {
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == NULL)
+	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
@@ -937,7 +937,7 @@ void StopMusic()
 		if (MusicChannel.Sample) {
 			SDL_LockMutex(Audio.Lock);
 			delete MusicChannel.Sample;
-			MusicChannel.Sample = NULL;
+			MusicChannel.Sample = nullptr;
 			SDL_UnlockMutex(Audio.Lock);
 		}
 	}
@@ -1011,7 +1011,7 @@ bool IsMusicPlaying()
 void AddMusicTension(int value)
 {
 #ifdef USE_OAML
-	if (enableOAML == false || oaml == NULL)
+	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
@@ -1057,7 +1057,7 @@ static int InitSdlSound(int freq, int size)
 	wanted.channels = 2;
 	wanted.samples = 4096;
 	wanted.callback = FillAudio;
-	wanted.userdata = NULL;
+	wanted.userdata = nullptr;
 
 	//  Open the audio device, forcing the desired format
 	if (SDL_OpenAudio(&wanted, &Audio.Format) < 0) {
@@ -1090,8 +1090,8 @@ int InitSound()
 	for (int i = 0; i < MaxChannels; ++i) {
 		Channels[i].Point = i + 1;
 		//Wyrmgus start
-		Channels[i].Sample = NULL;
-		Channels[i].Unit = NULL;
+		Channels[i].Sample = nullptr;
+		Channels[i].Unit = nullptr;
 		Channels[i].Volume = 0;
 		Channels[i].Stereo = 0;
 		Channels[i].Voice = -1;
@@ -1109,7 +1109,7 @@ int InitSound()
 	Audio.Running = true;
 
 	// Create thread to fill sdl audio buffer
-	Audio.Thread = SDL_CreateThread(FillThread, NULL);
+	Audio.Thread = SDL_CreateThread(FillThread, nullptr);
 	return 0;
 }
 
@@ -1122,12 +1122,12 @@ void QuitSound()
 	if (oaml) {
 		oaml->Shutdown();
 		delete oaml;
-		oaml = NULL;
+		oaml = nullptr;
 	}
 #endif
 
 	Audio.Running = false;
-	SDL_WaitThread(Audio.Thread, NULL);
+	SDL_WaitThread(Audio.Thread, nullptr);
 
 	SDL_DestroyCond(Audio.Cond);
 	SDL_DestroyMutex(Audio.Lock);
@@ -1135,9 +1135,9 @@ void QuitSound()
 	// Mustn't call SDL_CloseAudio here, it'll be called again from SDL_Quit
 	SoundInitialized = false;
 	delete[] Audio.MixerBuffer;
-	Audio.MixerBuffer = NULL;
+	Audio.MixerBuffer = nullptr;
 	delete[] Audio.Buffer;
-	Audio.Buffer = NULL;
+	Audio.Buffer = nullptr;
 #ifdef USE_FLUIDSYNTH
 	CleanFluidSynth();
 #endif
