@@ -160,7 +160,7 @@ class CMapFieldPlayerInfo
 public:
 	//Wyrmgus start
 //	CMapFieldPlayerInfo() : SeenTile(0)
-	CMapFieldPlayerInfo() : SeenTerrain(NULL), SeenOverlayTerrain(NULL), SeenSolidTile(0), SeenOverlaySolidTile(0)
+	CMapFieldPlayerInfo() : SeenTerrain(nullptr), SeenOverlayTerrain(nullptr), SeenSolidTile(0), SeenOverlaySolidTile(0)
 	//Wyrmgus end
 	{
 		memset(Visible, 0, sizeof(Visible));

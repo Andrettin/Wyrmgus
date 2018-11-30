@@ -89,7 +89,7 @@ class CTrigger
 {
 public:
 	CTrigger() :
-		Conditions(NULL), Effects(NULL)
+		Conditions(nullptr), Effects(nullptr)
 	{
 	}
 	~CTrigger();

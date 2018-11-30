@@ -73,9 +73,9 @@ class CGraphic : public gcn::Image
 	};
 
 protected:
-	CGraphic() : Surface(NULL), SurfaceFlip(NULL), frame_map(NULL),
+	CGraphic() : Surface(nullptr), SurfaceFlip(nullptr), frame_map(nullptr),
 		//Wyrmgus start
-		DawnSurface(NULL), DawnSurfaceFlip(NULL), DuskSurface(NULL), DuskSurfaceFlip(NULL), NightSurface(NULL), NightSurfaceFlip(NULL),
+		DawnSurface(nullptr), DawnSurfaceFlip(nullptr), DuskSurface(nullptr), DuskSurfaceFlip(nullptr), NightSurface(nullptr), NightSurfaceFlip(nullptr),
 		//Wyrmgus end
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		//Wyrmgus start
@@ -84,12 +84,12 @@ protected:
 		//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		//Wyrmgus start
-//		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0)
-		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), TexturesDawn(NULL), TexturesDusk(NULL), TexturesNight(NULL), NumTextures(0)
+//		, TextureWidth(0.f), TextureHeight(0.f), Textures(nullptr), NumTextures(0)
+		, TextureWidth(0.f), TextureHeight(0.f), Textures(nullptr), TexturesDawn(nullptr), TexturesDusk(nullptr), TexturesNight(nullptr), NumTextures(0)
 		//Wyrmgus end
 #endif
 	{
-		frameFlip_map = NULL;
+		frameFlip_map = nullptr;
 	}
 	~CGraphic() {}
 
@@ -105,12 +105,12 @@ public:
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 						  unsigned char alpha) const;
 	*/
-	void DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = NULL) const;
-	void DrawSubClip(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = NULL) const;
+	void DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = nullptr) const;
+	void DrawSubClip(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = nullptr) const;
 	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
-					  unsigned char alpha, SDL_Surface *surface = NULL) const;
+					  unsigned char alpha, SDL_Surface *surface = nullptr) const;
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
-						  unsigned char alpha, SDL_Surface *surface = NULL) const;
+						  unsigned char alpha, SDL_Surface *surface = nullptr) const;
 	//Wyrmgus end
 
 	// Draw frame
@@ -120,12 +120,12 @@ public:
 #endif
 	//Wyrmgus start
 //	void DrawFrameClip(unsigned frame, int x, int y) const;
-	void DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = NULL, int show_percent = 100);
+	void DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr, int show_percent = 100);
 	//Wyrmgus end
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
 	//Wyrmgus start
 //	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = NULL, int show_percent = 100);
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr, int show_percent = 100);
 	//Wyrmgus end
 
 	// Draw frame flipped horizontally
@@ -135,12 +135,12 @@ public:
 #endif
 	//Wyrmgus start
 //	void DrawFrameClipX(unsigned frame, int x, int y) const;
-	void DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = NULL);
+	void DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr);
 	//Wyrmgus end
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
 	//Wyrmgus start
 //	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = NULL);
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr);
 	//Wyrmgus end
 
 
@@ -161,7 +161,7 @@ public:
 	bool TransparentPixel(int x, int y);
 	void MakeShadow();
 
-	inline bool IsLoaded() const { return Surface != NULL; }
+	inline bool IsLoaded() const { return Surface != nullptr; }
 
 	//guichan
 	//Wyrmgus start
@@ -227,14 +227,14 @@ protected:
 	{
 		//Wyrmgus start
 		for (int i = 0; i < PlayerColorMax; ++i) {
-			PlayerColorSurfaces[i] = NULL;
-			PlayerColorSurfacesFlip[i] = NULL;
-			PlayerColorSurfacesDawn[i] = NULL;
-			PlayerColorSurfacesDawnFlip[i] = NULL;
-			PlayerColorSurfacesDusk[i] = NULL;
-			PlayerColorSurfacesDuskFlip[i] = NULL;
-			PlayerColorSurfacesNight[i] = NULL;
-			PlayerColorSurfacesNightFlip[i] = NULL;
+			PlayerColorSurfaces[i] = nullptr;
+			PlayerColorSurfacesFlip[i] = nullptr;
+			PlayerColorSurfacesDawn[i] = nullptr;
+			PlayerColorSurfacesDawnFlip[i] = nullptr;
+			PlayerColorSurfacesDusk[i] = nullptr;
+			PlayerColorSurfacesDuskFlip[i] = nullptr;
+			PlayerColorSurfacesNight[i] = nullptr;
+			PlayerColorSurfacesNightFlip[i] = nullptr;
 		}
 		//Wyrmgus end
 		
@@ -242,10 +242,10 @@ protected:
 		//Wyrmgus start
 //		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
 		for (int i = 0; i < PlayerColorMax; ++i) {
-			PlayerColorTextures[i] = NULL;
-			PlayerColorTexturesDawn[i] = NULL;
-			PlayerColorTexturesDusk[i] = NULL;
-			PlayerColorTexturesNight[i] = NULL;
+			PlayerColorTextures[i] = nullptr;
+			PlayerColorTexturesDawn[i] = nullptr;
+			PlayerColorTexturesDusk[i] = nullptr;
+			PlayerColorTexturesNight[i] = nullptr;
 		}
 		//Wyrmgus end
 #endif

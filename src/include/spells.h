@@ -150,9 +150,9 @@ class ConditionInfo
 public:
 	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
 		//Wyrmgus start
-		ThrustingWeapon(0), FactionUnit(0), CivilizationEquivalent(-1), FactionEquivalent(NULL),
+		ThrustingWeapon(0), FactionUnit(0), CivilizationEquivalent(-1), FactionEquivalent(nullptr),
 		//Wyrmgus end
-		BoolFlag(NULL), Variable(NULL), CheckFunc(NULL) {};
+		BoolFlag(nullptr), Variable(nullptr), CheckFunc(nullptr) {};
 	~ConditionInfo()
 	{
 		delete[] BoolFlag;
@@ -194,8 +194,8 @@ public:
 	// Special flags for priority sorting
 #define ACP_NOVALUE -1
 #define ACP_DISTANCE -2
-	AutoCastInfo() : Range(0), MinRange(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(NULL),
-		Combat(0), Attacker(0), Corpse(CONDITION_FALSE), PositionAutoCast(NULL) {};
+	AutoCastInfo() : Range(0), MinRange(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(nullptr),
+		Combat(0), Attacker(0), Corpse(CONDITION_FALSE), PositionAutoCast(nullptr) {};
 	~AutoCastInfo()
 	{
 		delete Condition;

@@ -59,7 +59,7 @@ public:
 		ID(-1), Flags(0), SolidAnimationFrames(0), Resource(-1),
 		Overlay(false), Buildable(false), AllowSingle(false), Hidden(false),
 		PixelTileSize(32, 32),
-		UnitType(NULL), Graphics(NULL), ElevationGraphics(NULL), PlayerColorGraphics(NULL)
+		UnitType(nullptr), Graphics(nullptr), ElevationGraphics(nullptr), PlayerColorGraphics(nullptr)
 	{
 		Color.R = 0;
 		Color.G = 0;

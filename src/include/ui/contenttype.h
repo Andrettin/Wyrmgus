@@ -46,7 +46,7 @@ class ConditionPanel;
 class CContentType
 {
 public:
-	CContentType() : Pos(0, 0), Condition(NULL) {}
+	CContentType() : Pos(0, 0), Condition(nullptr) {}
 	virtual ~CContentType();
 
 	/// Tell how show the variable Index.
@@ -56,7 +56,7 @@ public:
 
 public:
 	PixelPos Pos;             /// Coordinate where to display.
-	ConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
+	ConditionPanel *Condition; /// Condition to show the content; if null, no condition.
 //Wyrmgus start
 	std::string TextColor;      /// Color used for plain text in content.
 	std::string HighlightColor; /// Color used for highlighted letters.
@@ -69,7 +69,7 @@ public:
 class CContentTypeText : public CContentType
 {
 public:
-	CContentTypeText() : Text(NULL), Font(NULL), Centered(0), Index(-1),
+	CContentTypeText() : Text(nullptr), Font(nullptr), Centered(0), Index(-1),
 		Component(VariableValue), ShowName(0), Stat(0) {}
 	virtual ~CContentTypeText()
 	{
@@ -96,7 +96,7 @@ private:
 class CContentTypeFormattedText : public CContentType
 {
 public:
-	CContentTypeFormattedText() : Font(NULL), Centered(false),
+	CContentTypeFormattedText() : Font(nullptr), Centered(false),
 		Index(-1), Component(VariableValue) {}
 	virtual ~CContentTypeFormattedText() {}
 
@@ -117,7 +117,7 @@ private:
 class CContentTypeFormattedText2 : public CContentType
 {
 public:
-	CContentTypeFormattedText2() : Font(NULL), Centered(false),
+	CContentTypeFormattedText2() : Font(nullptr), Centered(false),
 		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {}
 	virtual ~CContentTypeFormattedText2() {}
 

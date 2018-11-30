@@ -111,7 +111,7 @@ class CUniqueItem
 {
 public:
 	CUniqueItem() :
-		ResourcesHeld(0), Type(NULL), Prefix(NULL), Suffix(NULL), Set(NULL), Spell(NULL), Work(NULL), Elixir(NULL)
+		ResourcesHeld(0), Type(nullptr), Prefix(nullptr), Suffix(nullptr), Set(nullptr), Spell(nullptr), Work(nullptr), Elixir(nullptr)
 	{
 	}
 	
@@ -140,7 +140,7 @@ class CPersistentItem
 public:
 	CPersistentItem() :
 		Bound(false), Identified(true),
-		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL), Work(NULL), Elixir(NULL), Unique(NULL), Owner(NULL)
+		Type(nullptr), Prefix(nullptr), Suffix(nullptr), Spell(nullptr), Work(nullptr), Elixir(nullptr), Unique(nullptr), Owner(nullptr)
 	{
 	}
 	

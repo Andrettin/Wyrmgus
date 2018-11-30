@@ -76,7 +76,7 @@ class GrandStrategyWorldMapTile : public WorldMapTile
 public:
 	GrandStrategyWorldMapTile() : WorldMapTile(),
 		Port(false),
-		Province(NULL), BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
+		Province(nullptr), BaseTile(nullptr), GraphicTile(nullptr), ResourceBuildingGraphics(nullptr), ResourceBuildingGraphicsPlayerColor(nullptr)
 	{
 		memset(Borders, 0, sizeof(Borders));
 	}
@@ -101,8 +101,8 @@ public:
 		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
 		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
 		Movement(false),
-		Owner(NULL),
-		Governor(NULL)
+		Owner(nullptr),
+		Governor(nullptr)
 	{
 		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
 		memset(Units, 0, sizeof(Units));
@@ -170,7 +170,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), GovernmentType(GovernmentTypeMonarchy), Capital(NULL)
+		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), GovernmentType(GovernmentTypeMonarchy), Capital(nullptr)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Resources, 0, sizeof(Resources));
@@ -222,8 +222,8 @@ class CGrandStrategyHero : public CCharacter
 public:
 	CGrandStrategyHero() : CCharacter(),
 		State(0), Existed(false),
-		Province(NULL), ProvinceOfOrigin(NULL),
-		Father(NULL), Mother(NULL)
+		Province(nullptr), ProvinceOfOrigin(nullptr),
+		Father(nullptr), Mother(nullptr)
 	{
 	}
 	
@@ -234,7 +234,7 @@ public:
 	bool IsGenerated();
 	bool IsEligibleForTitle(int title);
 	int GetTroopCostModifier();
-	int GetTitleScore(int title, CGrandStrategyProvince *province = NULL);
+	int GetTitleScore(int title, CGrandStrategyProvince *province = nullptr);
 	std::string GetMinisterEffectsString(int title);
 	std::string GetBestDisplayTitle();
 	CGrandStrategyFaction *GetFaction();
@@ -257,8 +257,8 @@ public:
 	CGrandStrategyEvent() :
 		Persistent(false),
 		ID(-1), MinYear(0), MaxYear(0), HistoricalYear(0),
-		World(NULL),
-		Conditions(NULL)
+		World(nullptr),
+		Conditions(nullptr)
 	{
 	}
 	~CGrandStrategyEvent();
@@ -290,7 +290,7 @@ class CGrandStrategyGame
 public:
 	CGrandStrategyGame() : 
 		WorldMapWidth(0), WorldMapHeight(0),
-		PlayerFaction(NULL)
+		PlayerFaction(nullptr)
 	{
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}

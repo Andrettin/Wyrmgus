@@ -111,7 +111,7 @@ public:
 	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0),
 		LoseResources(0),
-		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
+		SpriteWhenLoaded(nullptr), SpriteWhenEmpty(nullptr)
 	{}
 
 	std::string FileWhenLoaded;     /// Change the graphic when the unit is loaded.
@@ -135,7 +135,7 @@ class VariationInfo
 public:
 	VariationInfo() : 
 		FrameWidth(0), FrameHeight(0), ResourceMin(0), ResourceMax(0), Weight(1),
-		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL)
+		Animations(nullptr), Construction(nullptr), Sprite(nullptr), ShadowSprite(nullptr), LightSprite(nullptr)
 	{
 		memset(LayerSprites, 0, sizeof(LayerSprites));
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));
@@ -509,7 +509,7 @@ public:
 class CDecoVarText : public CDecoVar
 {
 public:
-	CDecoVarText() : Font(NULL) {};
+	CDecoVarText() : Font(nullptr) {};
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
 
@@ -640,7 +640,7 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 		const Vec2i pos; //functor work position
 	};
 public:
-	CBuildRestrictionAddOn() : Offset(0, 0), Parent(NULL) {}
+	CBuildRestrictionAddOn() : Offset(0, 0), Parent(nullptr) {}
 	virtual ~CBuildRestrictionAddOn() {}
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);}
 	//Wyrmgus start
@@ -666,7 +666,7 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 		const Vec2i pos;  //functor work position
 	};
 public:
-	CBuildRestrictionOnTop() : Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
+	CBuildRestrictionOnTop() : Parent(nullptr), ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
 	//Wyrmgus start
@@ -683,7 +683,7 @@ public:
 class CBuildRestrictionDistance : public CBuildRestriction
 {
 public:
-	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(NULL), RestrictClass(-1), Diagonal(true) {};
+	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(nullptr), RestrictClass(-1), Diagonal(true) {};
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init();
 	//Wyrmgus start
@@ -705,7 +705,7 @@ public:
 class CBuildRestrictionHasUnit : public CBuildRestriction
 {
 public:
-	CBuildRestrictionHasUnit() : Count(0), RestrictType(NULL) {};
+	CBuildRestrictionHasUnit() : Count(0), RestrictType(nullptr) {};
 	virtual ~CBuildRestrictionHasUnit() {};
 	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
 	//Wyrmgus start
@@ -723,7 +723,7 @@ public:
 class CBuildRestrictionSurroundedBy : public CBuildRestriction
 {
 public:
-	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(NULL), CheckBuilder(false) {};
+	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(nullptr), CheckBuilder(false) {};
 	virtual ~CBuildRestrictionSurroundedBy() {};
 	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
 	//Wyrmgus start
@@ -745,7 +745,7 @@ public:
 class CBuildRestrictionTerrain : public CBuildRestriction
 {
 public:
-	CBuildRestrictionTerrain() : RestrictTerrainType(NULL) {};
+	CBuildRestrictionTerrain() : RestrictTerrainType(nullptr) {};
 	virtual ~CBuildRestrictionTerrain() {};
 	virtual void Init();
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
@@ -775,7 +775,7 @@ class CSpeciesClass
 {
 public:
 	CSpeciesClass() :
-		Phylum(NULL)
+		Phylum(nullptr)
 	{
 	}
 	
@@ -791,7 +791,7 @@ class CSpeciesOrder
 {
 public:
 	CSpeciesOrder() :
-		Class(NULL)
+		Class(nullptr)
 	{
 	}
 	
@@ -806,7 +806,7 @@ class CSpeciesFamily
 {
 public:
 	CSpeciesFamily() :
-		Order(NULL)
+		Order(nullptr)
 	{
 	}
 	
@@ -822,7 +822,7 @@ class CSpeciesGenus
 {
 public:
 	CSpeciesGenus() :
-		Family(NULL)
+		Family(nullptr)
 	{
 	}
 	
@@ -840,11 +840,11 @@ public:
 	CSpecies() :
 		Era(-1),
 		Sapient(false), Prehistoric(false),
-		Genus(NULL), HomePlane(NULL), Homeworld(NULL), Type(NULL)
+		Genus(nullptr), HomePlane(nullptr), Homeworld(nullptr), Type(nullptr)
 	{
 	}
 	
-	bool CanEvolveToAUnitType(CTerrainType *terrain = NULL, bool sapient_only = false);
+	bool CanEvolveToAUnitType(CTerrainType *terrain = nullptr, bool sapient_only = false);
 	CSpecies *GetRandomEvolution(CTerrainType *terrain);
 	
 	int Era;						/// Era ID
@@ -1190,7 +1190,7 @@ public:
 					return ((*it).first).c_str();
 				}
 			}
-			return NULL;
+			return nullptr;
 		}
 
 		/**

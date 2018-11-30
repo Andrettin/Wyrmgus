@@ -58,7 +58,7 @@ public:
 		ID(-1), HoursPerDay(DefaultHoursPerDay), DaysPerYear(DefaultDaysPerYear), TimeOfDay(0), Season(0), SurfaceLayer(0),
 		Overland(false),
 		PixelTileSize(32, 32),
-		Fields(NULL), Plane(NULL), World(NULL)
+		Fields(nullptr), Plane(nullptr), World(nullptr)
 	{
 	}
 

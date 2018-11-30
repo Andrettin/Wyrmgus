@@ -120,7 +120,7 @@ public:
 	CProvince() :
 		ID(-1),
 		Water(false), Coastal(false),
-		World(NULL)
+		World(nullptr)
 	{
 	}
 	
@@ -149,7 +149,7 @@ public:
 		Terrain(-1), Resource(-1),
 		Capital(false),
 		Position(-1, -1),
-		World(NULL)
+		World(nullptr)
 	{
 	}
 

@@ -52,7 +52,7 @@ class CWorld
 {
 public:
 	CWorld() :
-		ID(-1), Plane(NULL), HoursPerDay(DefaultHoursPerDay), DaysPerYear(DefaultDaysPerYear)
+		ID(-1), Plane(nullptr), HoursPerDay(DefaultHoursPerDay), DaysPerYear(DefaultDaysPerYear)
 	{
 	}
 	

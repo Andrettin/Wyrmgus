@@ -237,11 +237,11 @@ public:
 	{
 		//Wyrmgus start
 		if (!unit) {
-			fprintf(stderr, "CUnitTypeFinder Error: Unit is NULL.\n");
+			fprintf(stderr, "CUnitTypeFinder Error: Unit is null.\n");
 			return false;
 		}
 		if (!unit->Type) {
-			fprintf(stderr, "CUnitTypeFinder Error: Unit's type is NULL.\n");
+			fprintf(stderr, "CUnitTypeFinder Error: Unit's type is null.\n");
 			return false;
 		}
 		//Wyrmgus end
@@ -414,7 +414,7 @@ CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 template <typename Pred>
@@ -437,8 +437,8 @@ CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 /// Find resource
 extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range,
 								//Wyrmgus Start
-//							   int resource, bool check_usage = false, const CUnit *deposit = NULL);
-							   int resource, bool check_usage = false, const CUnit *deposit = NULL, bool only_harvestable = true, bool ignore_exploration = false, bool only_unsettled_area = false, bool include_luxury = false, bool only_same = false, bool check_reachable = true, bool from_outside_container = false);
+//							   int resource, bool check_usage = false, const CUnit *deposit = nullptr);
+							   int resource, bool check_usage = false, const CUnit *deposit = nullptr, bool only_harvestable = true, bool ignore_exploration = false, bool only_unsettled_area = false, bool include_luxury = false, bool only_same = false, bool check_reachable = true, bool from_outside_container = false);
 								//Wyrmgus end
 
 /// Find nearest deposit
@@ -485,8 +485,8 @@ extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource, int z);
 
 /// Check map for obstacles in a line between 2 tiles
 //Wyrmgus start
-//extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance = NULL);
-extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int z, int max_difference = 0, int *distance = NULL, int player = -1);
+//extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance = nullptr);
+extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int z, int max_difference = 0, int *distance = nullptr, int player = -1);
 //Wyrmgus end
 /// Find best enemy in numeric range to attack
 //Wyrmgus start

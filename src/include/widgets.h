@@ -336,8 +336,8 @@ class ImageTextField : public gcn::TextField
 {
 	
 public:
-	ImageTextField() : TextField(), itemImage(NULL) {}
-	ImageTextField(const std::string& text) : gcn::TextField(text), itemImage(NULL) {}
+	ImageTextField() : TextField(), itemImage(nullptr) {}
+	ImageTextField(const std::string& text) : gcn::TextField(text), itemImage(nullptr) {}
 	virtual void draw(gcn::Graphics *graphics);
 	virtual void drawBorder(gcn::Graphics *graphics);
 	void setItemImage(CGraphic *image) { itemImage = image; }
@@ -475,7 +475,7 @@ public:
 class ImageDropDownWidget : public DropDownWidget
 {
 public:
-	ImageDropDownWidget() : itemImage(NULL) {
+	ImageDropDownWidget() : itemImage(nullptr) {
 		mListBox.addActionListener(this);
 		setListModel(&listmodel);
 		mScrollArea->setContent(&mListBox);

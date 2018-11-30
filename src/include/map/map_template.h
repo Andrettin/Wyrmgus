@@ -65,7 +65,7 @@ public:
 		Width(0), Height(0), Scale(1), SurfaceLayer(0),
 		Overland(false), OutputTerrainImage(false),
 		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0), PixelTileSize(32, 32),
-		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrainType(NULL), BaseOverlayTerrainType(NULL), BorderTerrainType(NULL), SurroundingTerrainType(NULL)
+		MainTemplate(nullptr), Plane(nullptr), World(nullptr), BaseTerrainType(nullptr), BaseOverlayTerrainType(nullptr), BorderTerrainType(nullptr), SurroundingTerrainType(nullptr)
 	{
 	}
 

@@ -166,7 +166,7 @@ extern std::string GetResourceNameById(int resource_id);
 class CUnitStats
 {
 public:
-	CUnitStats() : Variables(NULL)
+	CUnitStats() : Variables(nullptr)
 	{
 		memset(Costs, 0, sizeof(Costs));
 		memset(Storing, 0, sizeof(Storing));
@@ -267,8 +267,8 @@ class CUpgradeModifier
 {
 public:
 	//Wyrmgus start
-//	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL)
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL), ChangeCivilizationTo(-1), ChangeFactionTo(NULL), ChangeDynastyTo(NULL)
+//	CUpgradeModifier() : UpgradeId(0), ModifyPercent(nullptr), SpeedResearch(0), ConvertTo(nullptr)
+	CUpgradeModifier() : UpgradeId(0), ModifyPercent(nullptr), SpeedResearch(0), ConvertTo(nullptr), ChangeCivilizationTo(-1), ChangeFactionTo(nullptr), ChangeDynastyTo(nullptr)
 	//Wyrmgus end
 	{
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));

@@ -59,8 +59,8 @@ class CCivilization
 {
 public:
 	CCivilization() :
-		ID(-1), ParentCivilization(NULL),
-		Language(NULL), Calendar(NULL)
+		ID(-1), ParentCivilization(nullptr),
+		Language(nullptr), Calendar(nullptr)
 	{
 	}
 

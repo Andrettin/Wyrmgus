@@ -44,8 +44,8 @@ class COrder_Build : public COrder
 	//Wyrmgus end
 public:
 	//Wyrmgus start
-//	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0), Range(0)
-	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0), Range(0), MapLayer(0), Settlement(NULL)
+//	COrder_Build() : COrder(UnitActionBuild), Type(nullptr), State(0), Range(0)
+	COrder_Build() : COrder(UnitActionBuild), Type(nullptr), State(0), Range(0), MapLayer(0), Settlement(nullptr)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;

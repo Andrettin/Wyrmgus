@@ -241,7 +241,7 @@ public:
 	bool HasSettlement(CSite *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
 	CSite *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
-	bool HasUnitBuilder(const CUnitType *type, const CSite *settlement = NULL) const;
+	bool HasUnitBuilder(const CUnitType *type, const CSite *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
 	bool CanFoundFaction(CFaction *faction, bool pre = false);
 	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
@@ -613,7 +613,7 @@ public:
 		ID(-1), Civilization(-1), Type(FactionTypeNoFactionType), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1),
 		Playable(true), DefiniteArticle(false),
 		DefaultAI("land-attack"),
-		HolyOrderDeity(NULL), Conditions(NULL)
+		HolyOrderDeity(nullptr), Conditions(nullptr)
 	{
 	}
 	
@@ -677,7 +677,7 @@ class CDynasty
 public:
 	CDynasty() : 
 		ID(-1), Civilization(-1),
-		DynastyUpgrade(NULL), Conditions(NULL)
+		DynastyUpgrade(nullptr), Conditions(nullptr)
 	{
 	}
 	
@@ -701,7 +701,7 @@ class LanguageWord
 public:
 	LanguageWord() : 
 		Type(-1), Gender(-1), GrammaticalNumber(-1),
-		Language(NULL), DerivesFrom(NULL),
+		Language(nullptr), DerivesFrom(nullptr),
 		Archaic(false),
 		Uncountable(false),
 		ArticleType(-1),
@@ -755,7 +755,7 @@ class CLanguage
 public:
 	CLanguage() :
 		UsedByCivilizationOrFaction(false),
-		DialectOf(NULL)
+		DialectOf(nullptr)
 	{
 	}
 

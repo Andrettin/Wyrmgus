@@ -42,8 +42,8 @@ class COrder_SpellCast : public COrder
 	//Wyrmgus end
 public:
 	//Wyrmgus start
-//	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0), isAutocast(autocast)
-	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0), MapLayer(0), isAutocast(autocast)
+//	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(nullptr), State(0), Range(0), isAutocast(autocast)
+	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(nullptr), State(0), Range(0), MapLayer(0), isAutocast(autocast)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;

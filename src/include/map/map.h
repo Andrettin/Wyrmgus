@@ -138,7 +138,7 @@ class CTerrainFeature
 {
 public:
 	CTerrainFeature() :
-		ID(-1), TerrainType(NULL), Plane(NULL), World(NULL)
+		ID(-1), TerrainType(nullptr), Plane(nullptr), World(nullptr)
 	{
 	}
 	
@@ -157,7 +157,7 @@ class CSite
 public:
 	CSite() :
 		Position(-1, -1),
-		MapTemplate(NULL), SiteUnit(NULL),
+		MapTemplate(nullptr), SiteUnit(nullptr),
 		Major(false)
 	{
 	}

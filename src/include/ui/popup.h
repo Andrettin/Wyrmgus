@@ -56,8 +56,8 @@ public:
 		//Wyrmgus start
 		Class(false), Description(false), Quote(false), Encyclopedia(false), SettlementName(false), CanActiveHarvest(false),
 		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Elixir(0), ConsumedElixir(0), Unique(0), UniqueSet(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0), FactionUpgrade(0), FactionCoreSettlements(0), ResearchedUpgrade(0), Ability(0), ChildResources(0), ImproveIncomes(0), LuxuryResource(0), RequirementsString(0), ExperienceRequirementsString(0), BuildingRulesString(0),
-//		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
-		ButtonAction(-1), UnitTypeType(-1), UnitTypeClass(-1), ItemClass(-1), CanStore(-1), ImproveIncome(-1), BoolFlags(NULL), Variables(NULL) {}
+//		ButtonAction(-1), BoolFlags(nullptr), Variables(nullptr) {}
+		ButtonAction(-1), UnitTypeType(-1), UnitTypeClass(-1), ItemClass(-1), CanStore(-1), ImproveIncome(-1), BoolFlags(nullptr), Variables(nullptr) {}
 		//Wyrmgus end
 	~PopupConditionPanel()
 	{
@@ -129,7 +129,7 @@ class CPopupContentType
 public:
 	CPopupContentType() : pos(0, 0),
 		MarginX(MARGIN_X), MarginY(MARGIN_Y), minSize(0, 0),
-		Wrap(true), Condition(NULL) {}
+		Wrap(true), Condition(nullptr) {}
 	virtual ~CPopupContentType() { delete Condition; }
 
 	/// Tell how show the variable Index.
@@ -154,7 +154,7 @@ protected:
 	std::string TextColor;      /// Color used for plain text in content.
 	std::string HighlightColor; /// Color used for highlighted letters.
 public:
-	PopupConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
+	PopupConditionPanel *Condition; /// Condition to show the content; if null, no condition.
 };
 
 enum PopupButtonInfo_Types {
@@ -166,7 +166,7 @@ enum PopupButtonInfo_Types {
 class CPopupContentTypeButtonInfo : public CPopupContentType
 {
 public:
-	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(NULL) {}
+	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(nullptr) {}
 	virtual ~CPopupContentTypeButtonInfo() {}
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
@@ -186,8 +186,8 @@ class CPopupContentTypeText : public CPopupContentType
 {
 public:
 	//Wyrmgus start
-//	CPopupContentTypeText() : MaxWidth(0), Font(NULL) {}
-	CPopupContentTypeText() : Text(NULL), MaxWidth(0), Font(NULL) {}
+//	CPopupContentTypeText() : MaxWidth(0), Font(nullptr) {}
+	CPopupContentTypeText() : Text(nullptr), MaxWidth(0), Font(nullptr) {}
 	//Wyrmgus end
 	//Wyrmgus start
 //	virtual ~CPopupContentTypeText() {}
@@ -216,7 +216,7 @@ private:
 class CPopupContentTypeCosts : public CPopupContentType
 {
 public:
-	CPopupContentTypeCosts() : Font(NULL), Centered(0) {}
+	CPopupContentTypeCosts() : Font(nullptr), Centered(0) {}
 	virtual ~CPopupContentTypeCosts() {}
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
@@ -253,7 +253,7 @@ private:
 class CPopupContentTypeVariable : public CPopupContentType
 {
 public:
-	CPopupContentTypeVariable() : Text(NULL), Font(NULL), Centered(0), Index(-1) {}
+	CPopupContentTypeVariable() : Text(nullptr), Font(nullptr), Centered(0), Index(-1) {}
 	virtual ~CPopupContentTypeVariable()
 	{
 		FreeStringDesc(Text);

@@ -56,7 +56,7 @@
 **  CCursor::Race
 **
 **    Owning Race of this cursor ("human", "orc", "alliance",
-**    "mythical", ...). If NULL, this cursor could be used by any
+**    "mythical", ...). If null, this cursor could be used by any
 **    race.
 **
 **  CCursor::HotPos
@@ -125,7 +125,7 @@ class CCursor
 {
 public:
 	CCursor() : HotPos(0, 0),
-		SpriteFrame(0), FrameRate(0), G(NULL) {}
+		SpriteFrame(0), FrameRate(0), G(nullptr) {}
 
 	std::string Ident;  /// Identifier to reference it
 	std::string Race;   /// Race name
@@ -144,7 +144,7 @@ public:
 class CursorConfig
 {
 public:
-	CursorConfig() : Cursor(NULL) {}
+	CursorConfig() : Cursor(nullptr) {}
 
 	void Load();
 

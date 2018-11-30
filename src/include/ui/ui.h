@@ -78,7 +78,7 @@ enum TextAlignment {
 class ButtonStyleProperties
 {
 public:
-	ButtonStyleProperties() : Sprite(NULL), Frame(0), BorderColor(0),
+	ButtonStyleProperties() : Sprite(nullptr), Frame(0), BorderColor(0),
 		BorderSize(0), TextAlign(TextAlignUndefined),
 		TextPos(0, 0)
 	{}
@@ -97,7 +97,7 @@ public:
 class ButtonStyle
 {
 public:
-	ButtonStyle() : Width(0), Height(0), Font(NULL),
+	ButtonStyle() : Width(0), Height(0), Font(nullptr),
 		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
 
 	int Width;                      /// Button width
@@ -118,8 +118,8 @@ class CUIButton
 {
 public:
 	//Wyrmgus start
-//	CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {}
-	CUIButton() : X(0), Y(0), Clicked(false), HotkeyPressed(false), Style(NULL), Callback(NULL) {}
+//	CUIButton() : X(0), Y(0), Style(nullptr), Callback(nullptr) {}
+	CUIButton() : X(0), Y(0), Clicked(false), HotkeyPressed(false), Style(nullptr), Callback(nullptr) {}
 	//Wyrmgus end
 	~CUIButton() {}
 
@@ -180,11 +180,11 @@ class ConditionPanel
 {
 public:
 	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
-		HideAllied(false), ShowOpponent(false), ShowIfCanCastAnySpell(false), BoolFlags(NULL),
+		HideAllied(false), ShowOpponent(false), ShowIfCanCastAnySpell(false), BoolFlags(nullptr),
 		//Wyrmgus start
 		Affixed(0), Unique(0), Replenishment(0),
 		//Wyrmgus end
-		Variables(NULL) {}
+		Variables(nullptr) {}
 	~ConditionPanel()
 	{
 		delete[] BoolFlags;
@@ -214,7 +214,7 @@ class CUnitInfoPanel
 {
 public:
 	CUnitInfoPanel() : PosX(0), PosY(0), DefaultFont(0),
-		Contents(), Condition(NULL) {}
+		Contents(), Condition(nullptr) {}
 	~CUnitInfoPanel();
 
 public:
@@ -225,14 +225,14 @@ public:
 
 	std::vector<CContentType *>Contents; /// Array of contents to display.
 
-	ConditionPanel *Condition; /// Condition to show the panel; if NULL, no condition.
+	ConditionPanel *Condition; /// Condition to show the panel; if null, no condition.
 };
 
 
 class CFiller
 {
 	struct bits_map {
-		bits_map() : Width(0), Height(0), bstore(NULL) {}
+		bits_map() : Width(0), Height(0), bstore(nullptr) {}
 		~bits_map();
 
 		void Init(CGraphic *g);
@@ -256,7 +256,7 @@ class CFiller
 
 	bits_map map;
 public:
-	CFiller() : G(NULL), X(0), Y(0) {}
+	CFiller() : G(nullptr), X(0), Y(0) {}
 
 	void Load();
 
@@ -277,7 +277,7 @@ public:
 class CButtonPanel
 {
 public:
-	CButtonPanel() : G(NULL), X(0), Y(0), ShowCommandKey(true)
+	CButtonPanel() : G(nullptr), X(0), Y(0), ShowCommandKey(true)
 	{}
 
 	void Draw();
@@ -328,7 +328,7 @@ public:
 class CPieMenu
 {
 public:
-	CPieMenu() : G(NULL), MouseButton(NoButton)
+	CPieMenu() : G(nullptr), MouseButton(NoButton)
 	{
 		memset(this->X, 0, sizeof(this->X));
 		memset(this->Y, 0, sizeof(this->Y));
@@ -353,8 +353,8 @@ public:
 class CResourceInfo
 {
 public:
-	CResourceInfo() : G(NULL), IconFrame(0), IconX(0), IconY(0), IconWidth(-1),
-		Font(NULL), TextX(-1), TextY(-1) {}
+	CResourceInfo() : G(nullptr), IconFrame(0), IconX(0), IconY(0), IconWidth(-1),
+		Font(nullptr), TextX(-1), TextY(-1) {}
 
 	CGraphic *G;	/// icon graphic
 	int IconFrame;	/// icon frame
@@ -371,7 +371,7 @@ public:
 class CInfoPanel
 {
 public:
-	CInfoPanel() : G(NULL), X(0), Y(0) {}
+	CInfoPanel() : G(nullptr), X(0), Y(0) {}
 
 	void Draw();
 

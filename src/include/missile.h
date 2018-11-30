@@ -439,7 +439,7 @@ public:
 
 	void DrawMissile(const CViewport &vp) const;
 	void SaveMissile(CFile &file) const;
-	void MissileHit(CUnit *unit = NULL);
+	void MissileHit(CUnit *unit = nullptr);
 	bool NextMissileFrame(char sign, char longAnimation);
 	void NextMissileFrameCycle();
 	void MissileNewHeadingFromXY(const PixelPos &delta);
@@ -591,7 +591,7 @@ public:
 class BurningBuildingFrame
 {
 public:
-	BurningBuildingFrame() : Percent(0), Missile(NULL) {};
+	BurningBuildingFrame() : Percent(0), Missile(nullptr) {};
 
 	int          Percent;  /// HP percent
 	MissileType *Missile;  /// Missile to draw
@@ -636,7 +636,7 @@ extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &start
 /// Calculates damage done to goal by attacker using formula
 //Wyrmgus start
 //extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula);
-extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula, const Missile *missile = NULL);
+extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula, const Missile *missile = nullptr);
 //Wyrmgus end
 /// fire a missile
 //Wyrmgus start

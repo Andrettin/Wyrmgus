@@ -132,8 +132,8 @@ class CUnit
 {
 public:
 	//Wyrmgus start
-//	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
-	CUnit() : tilePos(-1, -1), RallyPointPos(-1, -1), MapLayer(0), RallyPointMapLayer(0), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+//	CUnit() : tilePos(-1, -1), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr) { Init(); }
+	CUnit() : tilePos(-1, -1), RallyPointPos(-1, -1), MapLayer(0), RallyPointMapLayer(0), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr) { Init(); }
 	//Wyrmgus end
 
 	void Init();
@@ -177,7 +177,7 @@ public:
 	void UpdatePersonalName(bool update_settlement_name = true);
 	void UpdateExtraName();
 	void UpdateSettlement();
-	void UpdateBuildingSettlementAssignment(CSite *old_settlement = NULL); //update the settlement assignment of surrounding buildings for this town hall
+	void UpdateBuildingSettlementAssignment(CSite *old_settlement = nullptr); //update the settlement assignment of surrounding buildings for this town hall
 	void XPChanged();
 	//Wyrmgus end
 	/// Change owner of unit
@@ -205,8 +205,8 @@ public:
 	void HealingItemAutoUse();
 	void SetCharacter(std::string character_full_name, bool custom_hero = false);
 	bool CheckTerrainForVariation(VariationInfo *varinfo);
-	void ChooseVariation(const CUnitType *new_type = NULL, bool ignore_old_variation = false, int image_layer = -1);
-	void SetVariation(int new_variation, const CUnitType *new_type = NULL, int image_layer = -1);
+	void ChooseVariation(const CUnitType *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
+	void SetVariation(int new_variation, const CUnitType *new_type = nullptr, int image_layer = -1);
 	void UpdateButtonIcons();
 	void ChooseButtonIcon(int button_action);
 	void EquipItem(CUnit &item, bool affect_character = true);
@@ -226,7 +226,7 @@ public:
 	void CheckKnowledgeChange(int variable, int change);
 	void UpdateItemName();
 	void GenerateDrop();
-	void GenerateSpecialProperties(CUnit *dropper = NULL, CPlayer *dropper_player = NULL, bool allow_unique = true, bool sold_item = false, bool always_magic = false);
+	void GenerateSpecialProperties(CUnit *dropper = nullptr, CPlayer *dropper_player = nullptr, bool allow_unique = true, bool sold_item = false, bool always_magic = false);
 	void GeneratePrefix(CUnit *dropper, CPlayer *dropper_player);
 	void GenerateSuffix(CUnit *dropper, CPlayer *dropper_player);
 	void GenerateSpell(CUnit *dropper, CPlayer *dropper_player);
@@ -416,7 +416,7 @@ public:
 	void SetUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity);
 	void ChangeUnitStockReplenishmentTimer(CUnitType *unit_type, int quantity);
 	int GetResourceStep(const int resource) const;
-	int GetTotalInsideCount(const CPlayer *player = NULL, const bool ignore_items = true, const bool ignore_saved_cargo = false, const CUnitType *type = NULL) const;
+	int GetTotalInsideCount(const CPlayer *player = nullptr, const bool ignore_items = true, const bool ignore_saved_cargo = false, const CUnitType *type = nullptr) const;
 	bool CanAttack(bool count_inside = true) const;
 	bool IsInCombat() const;
 	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;
@@ -567,11 +567,11 @@ public:
 	
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
-	/// NULL if the unit was not rescued.
+	/// null if the unit was not rescued.
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
 	struct _seen_stuff_ {
-		_seen_stuff_() : CFrame(NULL), Type(NULL), tilePos(-1, -1) {}
+		_seen_stuff_() : CFrame(nullptr), Type(nullptr), tilePos(-1, -1) {}
 		const CConstructionFrame  *CFrame;  /// Seen construction frame
 		int         Frame;                  /// last seen frame/stage of buildings
 		const CUnitType  *Type;             /// Pointer to last seen unit-type
@@ -638,7 +638,7 @@ public:
 		ShowPathlines(false),
 //		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5), HotkeySetup(0),
-		IconFrameG(NULL), PressedIconFrameG(NULL), CommandButtonFrameG(NULL), BarFrameG(NULL), InfoPanelFrameG(NULL), ProgressBarG(NULL) {};
+		IconFrameG(nullptr), PressedIconFrameG(nullptr), CommandButtonFrameG(nullptr), BarFrameG(nullptr), InfoPanelFrameG(nullptr), ProgressBarG(nullptr) {};
 		//Wyrmgus end
 
 	bool ShowSightRange;     /// Show sight range.
@@ -806,8 +806,8 @@ extern void DestroyAllInside(CUnit &source);
 extern int ThreatCalculate(const CUnit &unit, const CUnit &dest);
 /// Hit unit with damage, if destroyed give attacker the points
 //Wyrmgus start
-//extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = NULL);
-extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = NULL, bool show_damage = true);
+//extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = nullptr);
+extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = nullptr, bool show_damage = true);
 extern void HitUnit_NormalHitSpecialDamageEffects(CUnit &attacker, CUnit &target);
 extern void HitUnit_SpecialDamageEffect(CUnit &target, int dmg_var);
 extern void HitUnit_RunAway(CUnit &target, const CUnit &attacker);

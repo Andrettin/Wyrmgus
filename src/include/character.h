@@ -110,11 +110,11 @@ class CCharacter
 {
 public:
 	CCharacter() :
-		Civilization(NULL), Faction(NULL), Gender(0), Level(0), ExperiencePercent(0),
+		Civilization(nullptr), Faction(nullptr), Gender(0), Level(0), ExperiencePercent(0),
 		ViolentDeath(false), Custom(false), Initialized(false),
-		Type(NULL), Trait(NULL), Deity(NULL),
-		Father(NULL), Mother(NULL),
-		Conditions(NULL)
+		Type(nullptr), Trait(nullptr), Deity(nullptr),
+		Father(nullptr), Mother(nullptr),
+		Conditions(nullptr)
 	{
 		memset(Attributes, 0, sizeof(Attributes));
 	}
@@ -193,7 +193,7 @@ public:
 	std::vector<CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
 	std::vector<std::pair<CDate, CFaction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
 	std::vector<std::tuple<CDate, CMapTemplate *, Vec2i>> HistoricalLocations;	/// historical locations of the character; the values are: date, map template, position
-	std::vector<std::tuple<CDate, CDate, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is NULL), and the fourth is the character title itself (from the character title enums)
+	std::vector<std::tuple<CDate, CDate, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 };
 

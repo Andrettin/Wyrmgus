@@ -39,8 +39,8 @@ class COrder_Research : public COrder
 	friend COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player);
 public:
 	//Wyrmgus start
-//	COrder_Research() : COrder(UnitActionResearch), Upgrade(NULL) {}
-	COrder_Research() : COrder(UnitActionResearch), Upgrade(NULL), Player(0) {}
+//	COrder_Research() : COrder(UnitActionResearch), Upgrade(nullptr) {}
+	COrder_Research() : COrder(UnitActionResearch), Upgrade(nullptr), Player(0) {}
 	//Wyrmgus end
 
 	virtual COrder_Research *Clone() const { return new COrder_Research(*this); }

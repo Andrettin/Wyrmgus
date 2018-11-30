@@ -53,7 +53,7 @@ class CAge
 {
 public:
 	CAge() :
-		G(NULL)
+		G(nullptr)
 	{
 	}
 	

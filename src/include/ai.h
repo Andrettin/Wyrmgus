@@ -91,7 +91,7 @@ extern void AiWorkComplete(CUnit *unit, CUnit &what);
 /// Called if AI unit can't build
 //Wyrmgus start
 //extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what);
-extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass = 0, CSite *settlement = NULL);
+extern void AiCanNotBuild(const CUnit &unit, const CUnitType &what, int landmass = 0, CSite *settlement = nullptr);
 //Wyrmgus end
 /// Called if AI unit can't reach building place
 //Wyrmgus start

@@ -131,7 +131,7 @@ extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush,
 /// Prepare command build
 //Wyrmgus start
 //extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush, int z = 0, CSite *settlement = NULL);
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush, int z = 0, CSite *settlement = nullptr);
 //Wyrmgus end
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit, bool salvage = false);

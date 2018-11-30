@@ -53,7 +53,7 @@ class CSample
 {
 public:
 	CSample() : Channels(0), SampleSize(0), Frequency(0), BitsPerSample(0),
-		Buffer(NULL), Pos(0), Len(0) {}
+		Buffer(nullptr), Pos(0), Len(0) {}
 	virtual ~CSample() {}
 
 	virtual int Read(void *buf, int len) = 0;
@@ -126,7 +126,7 @@ extern bool SampleIsPlaying(CSample *sample);
 /// Load a sample
 extern CSample *LoadSample(const std::string &name);
 /// Play a sample
-extern int PlaySample(CSample *sample, Origin *origin = NULL);
+extern int PlaySample(CSample *sample, Origin *origin = nullptr);
 /// Play a sound file
 extern int PlaySoundFile(const std::string &name);
 
