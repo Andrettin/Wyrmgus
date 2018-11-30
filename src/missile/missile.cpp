@@ -91,7 +91,7 @@ const char *MissileType::MissileClassNames[] = {
 	"missile-class-clip-to-target",
 	"missile-class-continious",
 	"missile-class-straight-fly",
-	NULL
+	nullptr
 };
 
 unsigned int Missile::Count = 0;
@@ -297,13 +297,13 @@ void LoadMissileSprites()
 MissileType *MissileTypeByIdent(const std::string &ident)
 {
 	if (ident.empty()) {
-		return NULL;
+		return nullptr;
 	}
 	MissileTypeMap::iterator it = MissileTypes.find(ident);
 	if (it != MissileTypes.end()) {
 		return it->second;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -325,7 +325,7 @@ MissileType *NewMissileTypeSlot(const std::string &ident)
 **  Constructor
 */
 Missile::Missile() :
-	Type(NULL), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
+	Type(nullptr), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
 	Delay(0), SourceUnit(), TargetUnit(), Damage(0), LightningDamage(0),
 	TTL(-1), Hidden(0), DestroyMissile(0),
 	CurrentStep(0), TotalStep(0),
@@ -358,7 +358,7 @@ Missile::Missile() :
 /* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
 //Wyrmgus end
 {
-	Missile *missile = NULL;
+	Missile *missile = nullptr;
 
 	switch (mtype.Class) {
 		case MissileClassNone :
@@ -501,7 +501,7 @@ Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, co
 //Wyrmgus start
 //static int CalculateDamageStats(const CUnitStats &attacker_stats,
 //								const CUnitStats &goal_stats, int bloodlust)
-static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal, const Missile *missile = NULL)
+static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal, const Missile *missile = nullptr)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -564,7 +564,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 			}
 		}
 	}
-	if (goal != NULL) {
+	if (goal != nullptr) {
 		// apply resistances to fire/cold damage
 		fire_damage *= 100 - goal->Variable[FIRERESISTANCE_INDEX].Value;
 		fire_damage /= 100;
@@ -649,7 +649,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	//Wyrmgus start
 //	int damage = std::max<int>(basic_damage - goal_stats.Variables[ARMOR_INDEX].Value, 1);
 	int damage = 0;
-	if (goal != NULL) {
+	if (goal != nullptr) {
 		damage = std::max<int>(basic_damage - goal->Variable[ARMOR_INDEX].Value, 1);
 	} else {
 		damage = std::max<int>(basic_damage - goal_stats.Variables[ARMOR_INDEX].Value, 1);
@@ -665,7 +665,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	
 	if (GameSettings.NoRandomness) {
 		if (accuracy > 0) { //if no randomness setting is used, and the attacker's accuracy and is greater than 0, then apply accuracy as a damage bonus and evasion as a damage malus
-			if (goal != NULL) {
+			if (goal != nullptr) {
 				if (goal->Variable[EVASION_INDEX].Value > 0) {
 					damage += accuracy;
 					if (goal->Variable[STUN_INDEX].Value == 0) { //stunned targets cannot evade
@@ -694,7 +694,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		
 		//Wyrmgus start
 		//apply hack/pierce/blunt resistances
-		if (goal != NULL) {
+		if (goal != nullptr) {
 			if (attacker.Type->BoolFlag[HACKDAMAGE_INDEX].value) {
 				damage *= 100 - goal->Variable[HACKRESISTANCE_INDEX].Value;
 				damage /= 100;
@@ -712,7 +712,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	} else {
 		//Wyrmgus start
 		//apply hack/pierce/blunt resistances
-		if (goal != NULL) {
+		if (goal != nullptr) {
 			if (attacker.Type->BoolFlag[HACKDAMAGE_INDEX].value) {
 				damage *= 100 - goal->Variable[HACKRESISTANCE_INDEX].Value;
 				damage /= 100;
@@ -762,8 +762,8 @@ int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *
 	TriggerData.Attacker = const_cast<CUnit *>(&attacker);
 	TriggerData.Defender = const_cast<CUnit *>(&goal);
 	const int res = EvalNumber(formula);
-	TriggerData.Attacker = NULL;
-	TriggerData.Defender = NULL;
+	TriggerData.Attacker = nullptr;
+	TriggerData.Defender = nullptr;
 	return res;
 }
 
@@ -805,7 +805,7 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 		return false;
 	} else {
 		int evasion = 0;
-		if (goal != NULL) {
+		if (goal != nullptr) {
 			if (goal->Variable[EVASION_INDEX].Value && goal->Variable[STUN_INDEX].Value == 0) { //stunned targets cannot evade
 				evasion = goal->Variable[EVASION_INDEX].Value;
 			}
@@ -880,7 +880,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 				//Wyrmgus start
 				new_z = goal->MapLayer;
 				//Wyrmgus end
-				goal = NULL;
+				goal = nullptr;
 			} else {
 				return;
 			}
@@ -907,11 +907,11 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			//Wyrmgus end
 				//Wyrmgus start
 //				if (Map.HumanWallOnMap(goalPos)) {
-				if (Map.Field(goalPos, z)->OverlayTerrain->UnitType && CalculateHit(unit, *Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, NULL) == true) {
+				if (Map.Field(goalPos, z)->OverlayTerrain->UnitType && CalculateHit(unit, *Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr) == true) {
 				//Wyrmgus end
 					//Wyrmgus start
 					PlayUnitSound(unit, VoiceHit);
-					damage = CalculateDamageStats(unit, *Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, NULL);
+					damage = CalculateDamageStats(unit, *Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr);
 					//Wyrmgus end
 					Map.HitWall(goalPos,
 								//Wyrmgus start
@@ -1377,7 +1377,7 @@ bool PointToPointMissile(Missile &missile)
 	if (missile.TotalStep == 0) {
 		return true;
 	}
-	Assert(missile.Type != NULL);
+	Assert(missile.Type != nullptr);
 	Assert(missile.TotalStep != 0);
 
 	const PixelPos diff = (missile.destination - missile.source);
@@ -1490,7 +1490,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		int damage;
 
 		if (missile.Type->Damage) {   // custom formula
-			Assert(missile.SourceUnit != NULL);
+			Assert(missile.SourceUnit != nullptr);
 			//Wyrmgus start
 //			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage) / splash;
 			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage, &missile) / splash;
@@ -1499,7 +1499,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 			damage = missile.Damage / splash;
 			damage += missile.LightningDamage * (100 - goal.Variable[LIGHTNINGRESISTANCE_INDEX].Value) / 100 / splash;
 		} else {
-			Assert(missile.SourceUnit != NULL);
+			Assert(missile.SourceUnit != nullptr);
 			//Wyrmgus start
 //			damage = CalculateDamage(*missile.SourceUnit, goal, Damage) / splash;
 			damage = CalculateDamage(*missile.SourceUnit, goal, Damage, &missile) / splash;
@@ -1562,10 +1562,10 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 		return;
 	}
 
-	Assert(missile.SourceUnit != NULL);
+	Assert(missile.SourceUnit != nullptr);
 
 	//Wyrmgus start
-	if (!missile.AlwaysHits && CalculateHit(*missile.SourceUnit, *stats, NULL) == false) {
+	if (!missile.AlwaysHits && CalculateHit(*missile.SourceUnit, *stats, nullptr) == false) {
 		if (splash == 1 && missile.Type->SplashFactor <= 0) {
 			return;
 		} else if (splash == 1 && missile.Type->SplashFactor > 0) {
@@ -1576,7 +1576,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 
 	//Wyrmgus start
 //	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit->Stats, *stats, 0) / splash);
-	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats, NULL, &missile) / splash, missile.MapLayer);
+	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats, nullptr, &missile) / splash, missile.MapLayer);
 	//Wyrmgus end
 }
 
@@ -1691,7 +1691,7 @@ void Missile::MissileHit(CUnit *unit)
 				}
 			}
 			if (goal.Destroyed) {
-				this->TargetUnit = NULL;
+				this->TargetUnit = nullptr;
 				return;
 			}
 			int splash = 1;
@@ -1718,7 +1718,7 @@ void Missile::MissileHit(CUnit *unit)
 //		Select(pos - range, pos + range, table);
 		Select(pos - range, pos + range, table, this->MapLayer);
 		//Wyrmgus end
-		Assert(this->SourceUnit != NULL);
+		Assert(this->SourceUnit != nullptr);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &goal = *table[i];
 			//
@@ -1743,7 +1743,7 @@ void Missile::MissileHit(CUnit *unit)
 
 				if (mtype.CorrectSphashDamage == true) {
 					bool isPosition = false;
-					if (this->TargetUnit == NULL) {
+					if (this->TargetUnit == nullptr) {
 						if (this->SourceUnit->CurrentAction() == UnitActionSpellCast) {
 							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
 							if (order.GetSpell().Target == TargetPosition) {
@@ -1758,7 +1758,7 @@ void Missile::MissileHit(CUnit *unit)
 							shouldHit = false;
 						}
 					} else {
-						if (this->TargetUnit == NULL || goal.Type->UnitType != this->TargetUnit->Type->UnitType) {
+						if (this->TargetUnit == nullptr || goal.Type->UnitType != this->TargetUnit->Type->UnitType) {
 							shouldHit = false;
 						}
 					}
@@ -1976,7 +1976,7 @@ MissileType *MissileBurningBuilding(int percent)
 			return (*i)->Missile;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -2005,10 +2005,10 @@ void Missile::SaveMissile(CFile &file) const
 	SavePixelPos(file, this->destination);
 	file.printf(",\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
 				this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
-	if (this->SourceUnit != NULL) {
+	if (this->SourceUnit != nullptr) {
 		file.printf(" \"source\", \"%s\",", UnitReference(this->SourceUnit).c_str());
 	}
-	if (this->TargetUnit != NULL) {
+	if (this->TargetUnit != nullptr) {
 		file.printf(" \"target\", \"%s\",", UnitReference(this->TargetUnit).c_str());
 	}
 	file.printf(" \"damage\", %d,", this->Damage);
@@ -2088,9 +2088,9 @@ MissileType::MissileType(const std::string &ident) :
 //	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
 	Sleep(0), Speed(0), BlizzardSpeed(0), AttackSpeed(10), TTL(-1), ReduceFactor(100), SmokePrecision(0),
 	//Wyrmgus end
-	MissileStopFlags(0), Damage(NULL), Range(0), SplashFactor(100),
-	ImpactParticle(NULL), SmokeParticle(NULL), OnImpact(NULL),
-	G(NULL)
+	MissileStopFlags(0), Damage(nullptr), Range(0), SplashFactor(100),
+	ImpactParticle(nullptr), SmokeParticle(nullptr), OnImpact(nullptr),
+	G(nullptr)
 {
 	size.x = 0;
 	size.y = 0;

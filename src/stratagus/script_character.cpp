@@ -122,7 +122,7 @@ static int CclDefineCharacter(lua_State *l)
 			std::string unit_type_ident = LuaToString(l, -1);
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 			if (unit_type_id != -1) {
-				if (character->Type == NULL || character->Type == UnitTypes[unit_type_id] || character->Type->CanExperienceUpgradeTo(UnitTypes[unit_type_id])) {
+				if (character->Type == nullptr || character->Type == UnitTypes[unit_type_id] || character->Type->CanExperienceUpgradeTo(UnitTypes[unit_type_id])) {
 					character->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
 					if (character->Level < character->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
 						character->Level = character->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
@@ -151,7 +151,7 @@ static int CclDefineCharacter(lua_State *l)
 			character->Civilization = CCivilization::GetCivilization(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
 			CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1));
-			if (faction != NULL) {
+			if (faction != nullptr) {
 				character->Faction = faction;
 			} else {
 				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
@@ -241,12 +241,12 @@ static int CclDefineCharacter(lua_State *l)
 			character->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
 			character->Icon.Name = LuaToString(l, -1);
-			character->Icon.Icon = NULL;
+			character->Icon.Icon = nullptr;
 			character->Icon.Load();
 			character->Icon.Icon->Load();
 		} else if (!strcmp(value, "HeroicIcon")) {
 			character->HeroicIcon.Name = LuaToString(l, -1);
-			character->HeroicIcon.Icon = NULL;
+			character->HeroicIcon.Icon = nullptr;
 			character->HeroicIcon.Load();
 			character->HeroicIcon.Icon->Load();
 		} else if (!strcmp(value, "Level")) {
@@ -259,7 +259,7 @@ static int CclDefineCharacter(lua_State *l)
 				character->Deity = deity;
 				if (character->Icon.Name.empty() && !deity->Icon.Name.empty()) {
 					character->Icon.Name = deity->Icon.Name;
-					character->Icon.Icon = NULL;
+					character->Icon.Icon = nullptr;
 					character->Icon.Load();
 				}
 			}
@@ -382,7 +382,7 @@ static int CclDefineCharacter(lua_State *l)
 					} else if (!strcmp(value, "spell")) {
 						std::string spell_ident = LuaToString(l, -1, k + 1);
 						SpellType *spell = SpellTypeByIdent(spell_ident);
-						if (spell != NULL) {
+						if (spell != nullptr) {
 							item->Spell = const_cast<SpellType *>(&(*spell));
 						} else {
 							fprintf(stderr, "Spell \"%s\" doesn't exist.", spell_ident.c_str());
@@ -409,9 +409,9 @@ static int CclDefineCharacter(lua_State *l)
 						std::string unique_ident = LuaToString(l, -1, k + 1);
 						CUniqueItem *unique_item = GetUniqueItem(unique_ident);
 						item->Unique = unique_item;
-						if (unique_item != NULL) {
+						if (unique_item != nullptr) {
 							item->Name = unique_item->Name;
-							if (unique_item->Type != NULL) {
+							if (unique_item->Type != nullptr) {
 								item->Type = unique_item->Type;
 							} else {
 								fprintf(stderr, "Unique item \"%s\" has no type.\n", unique_item->Ident.c_str());
@@ -555,20 +555,20 @@ static int CclDefineCharacter(lua_State *l)
 		}
 	}
 	
-	if (character->Trait == NULL) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
-		if (character->Type != NULL && character->Type->Traits.size() == 1) {
+	if (character->Trait == nullptr) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
+		if (character->Type != nullptr && character->Type->Traits.size() == 1) {
 			character->Trait = character->Type->Traits[0];
 		}
 	}
 	
 	if (character->Gender == NoGender) { //if no gender was set, have the character be the same gender as the unit type (if the unit type has it predefined)
-		if (character->Type != NULL && character->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
+		if (character->Type != nullptr && character->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
 			character->Gender = character->Type->DefaultStat.Variables[GENDER_INDEX].Value;
 		}
 	}
 	
 	//check if the abilities are correct for this character's unit type
-	if (character->Type != NULL && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
+	if (character->Type != nullptr && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
 		int ability_count = (int) character->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
 			if (std::find(AiHelpers.LearnableAbilities[character->Type->Slot].begin(), AiHelpers.LearnableAbilities[character->Type->Slot].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->Slot].end()) {
@@ -743,7 +743,7 @@ static int CclDefineCustomHero(lua_State *l)
 					} else if (!strcmp(value, "spell")) {
 						std::string spell_ident = LuaToString(l, -1, k + 1);
 						SpellType *spell = SpellTypeByIdent(spell_ident);
-						if (spell != NULL) {
+						if (spell != nullptr) {
 							item->Spell = const_cast<SpellType *>(&(*spell));
 						} else {
 							fprintf(stderr, "Spell \"%s\" doesn't exist.", spell_ident.c_str());
@@ -770,9 +770,9 @@ static int CclDefineCustomHero(lua_State *l)
 						std::string unique_ident = LuaToString(l, -1, k + 1);
 						CUniqueItem *unique_item = GetUniqueItem(unique_ident);
 						item->Unique = unique_item;
-						if (unique_item != NULL) {
+						if (unique_item != nullptr) {
 							item->Name = unique_item->Name;
-							if (unique_item->Type != NULL) {
+							if (unique_item->Type != nullptr) {
 								item->Type = unique_item->Type;
 							} else {
 								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->Name.c_str());
@@ -806,7 +806,7 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_name = LuaToString(l, -1, j + 1);
-				if (GetQuest(quest_name) != NULL) {
+				if (GetQuest(quest_name) != nullptr) {
 					hero->QuestsInProgress.push_back(GetQuest(quest_name));
 				} else {
 					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name.c_str());
@@ -817,7 +817,7 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string quest_name = LuaToString(l, -1, j + 1);
-				if (GetQuest(quest_name) != NULL) {
+				if (GetQuest(quest_name) != nullptr) {
 					hero->QuestsCompleted.push_back(GetQuest(quest_name));
 				} else {
 					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name.c_str());
@@ -837,12 +837,12 @@ static int CclDefineCustomHero(lua_State *l)
 			}
 		} else if (!strcmp(value, "Icon")) {
 			hero->Icon.Name = LuaToString(l, -1);
-			hero->Icon.Icon = NULL;
+			hero->Icon.Icon = nullptr;
 			hero->Icon.Load();
 			hero->Icon.Icon->Load();
 		} else if (!strcmp(value, "HeroicIcon")) {
 			hero->HeroicIcon.Name = LuaToString(l, -1);
-			hero->HeroicIcon.Icon = NULL;
+			hero->HeroicIcon.Icon = nullptr;
 			hero->HeroicIcon.Load();
 			hero->HeroicIcon.Icon->Load();
 		} else {
@@ -851,7 +851,7 @@ static int CclDefineCustomHero(lua_State *l)
 	}
 	
 	if (hero->Gender == NoGender) { //if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
-		if (hero->Type != NULL && hero->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
+		if (hero->Type != nullptr && hero->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
 			hero->Gender = hero->Type->DefaultStat.Variables[GENDER_INDEX].Value;
 		}
 	}
@@ -912,7 +912,7 @@ static int CclGetCharacterData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
-		if (character->Faction != NULL) {
+		if (character->Faction != nullptr) {
 			lua_pushstring(l, character->Faction->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -958,21 +958,21 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushnumber(l, character->Level);
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		if (character->Type != NULL) {
+		if (character->Type != nullptr) {
 			lua_pushstring(l, character->Type->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Trait")) {
-		if (character->Trait != NULL) {
+		if (character->Trait != nullptr) {
 			lua_pushstring(l, character->Trait->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Deity")) {
-		if (character->Deity != NULL) {
+		if (character->Deity != nullptr) {
 			lua_pushstring(l, character->Deity->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -987,14 +987,14 @@ static int CclGetCharacterData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Father")) {
-		if (character->Father != NULL) {
+		if (character->Father != nullptr) {
 			lua_pushstring(l, character->Father->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Mother")) {
-		if (character->Mother != NULL) {
+		if (character->Mother != nullptr) {
 			lua_pushstring(l, character->Mother->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -1083,14 +1083,14 @@ static int CclGetCustomHeroData(lua_State *l)
 		lua_pushnumber(l, character->Level);
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		if (character->Type != NULL) {
+		if (character->Type != nullptr) {
 			lua_pushstring(l, character->Type->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Trait")) {
-		if (character->Trait != NULL) {
+		if (character->Trait != nullptr) {
 			lua_pushstring(l, character->Trait->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");

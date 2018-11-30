@@ -140,7 +140,7 @@ static int CclDefineQuest(lua_State *l)
 			quest->Unfailable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			quest->Icon.Name = LuaToString(l, -1);
-			quest->Icon.Icon = NULL;
+			quest->Icon.Icon = nullptr;
 			quest->Icon.Load();
 			quest->Icon.Icon->Load();
 		} else if (!strcmp(value, "QuestGiver")) {
@@ -639,7 +639,7 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Unobtainable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			achievement->Icon.Name = LuaToString(l, -1);
-			achievement->Icon.Icon = NULL;
+			achievement->Icon.Icon = nullptr;
 			achievement->Icon.Load();
 			achievement->Icon.Icon->Load();
 		} else if (!strcmp(value, "Character")) {

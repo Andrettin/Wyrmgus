@@ -404,7 +404,7 @@ extern bool LoadShaders() {
 	if (fs == 0) {
 		return false;
 	}
-	glShaderSource(fs, 1, (const char**)&(fragment_shaders[ShaderIndex]), NULL);
+	glShaderSource(fs, 1, (const char**)&(fragment_shaders[ShaderIndex]), nullptr);
 	glCompileShader(fs);
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &params);
 	if (params == GL_FALSE) {
@@ -418,7 +418,7 @@ extern bool LoadShaders() {
 		glDeleteShader(fs);
 		return false;
 	}
-	glShaderSource(vs, 1, (const char**)&vertex_shader, NULL);
+	glShaderSource(vs, 1, (const char**)&vertex_shader, nullptr);
 	glCompileShader(vs);
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &params);
 	if (params == GL_FALSE) {

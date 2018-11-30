@@ -854,7 +854,7 @@ static int CclDefineCivilization(lua_State *l)
 				if (button_action != -1) {
 					++j;
 					PlayerRaces.ButtonIcons[civilization_id][button_action].Name = LuaToString(l, -1, j + 1);
-					PlayerRaces.ButtonIcons[civilization_id][button_action].Icon = NULL;
+					PlayerRaces.ButtonIcons[civilization_id][button_action].Icon = nullptr;
 					PlayerRaces.ButtonIcons[civilization_id][button_action].Load();
 				} else {
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
@@ -1248,7 +1248,7 @@ static int CclDefineLanguageWord(lua_State *l)
 	LanguageWord *word = new LanguageWord;
 	word->Word = LuaToString(l, 1);
 	
-	LanguageWord *replaces = NULL;
+	LanguageWord *replaces = nullptr;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1309,7 +1309,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				std::string derives_from_word = LuaToString(l, -1, j + 1);
 				word->DerivesFrom = derives_from_language->GetWord(derives_from_word, derives_from_word_type, word_meanings);
 				
-				if (word->DerivesFrom != NULL) {
+				if (word->DerivesFrom != nullptr) {
 					word->DerivesFrom->DerivesTo.push_back(word);
 				} else {
 					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ derives_from_word.c_str() _C_ derives_from_language->Ident.c_str() _C_ GetWordTypeNameById(derives_from_word_type).c_str());
@@ -1343,7 +1343,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				std::string replaces_word = LuaToString(l, -1, j + 1);
 				replaces = replaces_language->GetWord(replaces_word, replaces_word_type, word_meanings);
 				
-				if (replaces == NULL) {
+				if (replaces == nullptr) {
 					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ replaces_word.c_str() _C_ replaces_language->Ident.c_str() _C_ GetWordTypeNameById(replaces_word_type).c_str());
 				}
 			} else {
@@ -1383,7 +1383,7 @@ static int CclDefineLanguageWord(lua_State *l)
 					std::string affix_word = LuaToString(l, -1, j + 1);
 					word->CompoundElements[affix_type] = affix_language->GetWord(affix_word, affix_word_type, word_meanings);
 					
-					if (word->CompoundElements[affix_type] != NULL) {
+					if (word->CompoundElements[affix_type] != nullptr) {
 						word->CompoundElements[affix_type]->CompoundElementOf[affix_type].push_back(word);
 					} else {
 						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ affix_word.c_str() _C_ affix_language->Ident.c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
@@ -1550,7 +1550,7 @@ static int CclDefineLanguageWord(lua_State *l)
 		LuaError(l, "Word \"%s\" has no type" _C_ word->Word.c_str());
 	}
 	
-	if (replaces != NULL) {
+	if (replaces != nullptr) {
 		word->Language->RemoveWord(replaces);
 	}
 	
@@ -1741,7 +1741,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	std::string class_name = LuaToString(l, 1);
 	int class_id = GetUnitTypeClassIndexByName(class_name);
 	int faction_id = -1;
-	CFaction *faction = NULL;
+	CFaction *faction = nullptr;
 	const int nargs = lua_gettop(l);
 	if (nargs == 2) {
 		faction = PlayerRaces.GetFaction(LuaToString(l, 2));
@@ -1878,7 +1878,7 @@ static int CclDefineFaction(lua_State *l)
 			faction->DefiniteArticle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			faction->Icon.Name = LuaToString(l, -1);
-			faction->Icon.Icon = NULL;
+			faction->Icon.Icon = nullptr;
 			faction->Icon.Load();
 			faction->Icon.Icon->Load();
 		} else if (!strcmp(value, "DevelopsFrom")) {
@@ -1948,7 +1948,7 @@ static int CclDefineFaction(lua_State *l)
 				if (button_action != -1) {
 					++j;
 					faction->ButtonIcons[button_action].Name = LuaToString(l, -1, j + 1);
-					faction->ButtonIcons[button_action].Icon = NULL;
+					faction->ButtonIcons[button_action].Icon = nullptr;
 					faction->ButtonIcons[button_action].Load();
 				} else {
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
@@ -2134,7 +2134,7 @@ static int CclDefineFaction(lua_State *l)
 				
 				std::string diplomacy_state_faction_ident = LuaToString(l, -1, j + 1);
 				CFaction *diplomacy_state_faction = PlayerRaces.GetFaction(diplomacy_state_faction_ident);
-				if (diplomacy_state_faction == NULL) {
+				if (diplomacy_state_faction == nullptr) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ diplomacy_state_faction_ident.c_str());
 				}
 				++j;
@@ -2267,7 +2267,7 @@ static int CclDefineDynasty(lua_State *l)
 			dynasty->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			dynasty->Icon.Name = LuaToString(l, -1);
-			dynasty->Icon.Icon = NULL;
+			dynasty->Icon.Icon = nullptr;
 			dynasty->Icon.Load();
 			dynasty->Icon.Icon->Load();
 		} else if (!strcmp(value, "Factions")) {
@@ -2447,7 +2447,7 @@ static int CclDefineDeity(lua_State *l)
 			deity->CharacterUpgrade = upgrade;
 		} else if (!strcmp(value, "Icon")) {
 			deity->Icon.Name = LuaToString(l, -1);
-			deity->Icon.Icon = NULL;
+			deity->Icon.Icon = nullptr;
 			deity->Icon.Load();
 			deity->Icon.Icon->Load();
 		} else if (!strcmp(value, "Civilizations")) {
@@ -2838,7 +2838,7 @@ static int CclGetFactionData(lua_State *l)
 	LuaCheckArgs(l, 2);
 	std::string faction_name = LuaToString(l, 1);
 	CFaction *faction = PlayerRaces.GetFaction(faction_name);
-	if (faction == NULL) {
+	if (faction == nullptr) {
 		LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
 	}
 	
@@ -2913,7 +2913,7 @@ static int CclGetDynastyData(lua_State *l)
 	LuaCheckArgs(l, 2);
 	std::string dynasty_ident = LuaToString(l, 1);
 	CDynasty *dynasty = PlayerRaces.GetDynasty(dynasty_ident);
-	if (dynasty == NULL) {
+	if (dynasty == nullptr) {
 		LuaError(l, "Dynasty \"%s\" doesn't exist." _C_ dynasty_ident.c_str());
 	}
 	
@@ -3429,7 +3429,7 @@ static int CclSetPlayerData(lua_State *l)
 		p->SetName(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
 		if (GameRunning) {
-			p->SetFaction(NULL);
+			p->SetFaction(nullptr);
 		}
 
 		const char *civilization_ident = LuaToString(l, 3);
@@ -3694,7 +3694,7 @@ static int CclGetLanguageWordData(lua_State *l)
 	std::string word_name = LuaToString(l, 2);
 	std::vector<std::string> word_meanings;
 	const LanguageWord *word = language->GetWord(word_name, -1, word_meanings);
-	if (word == NULL) {
+	if (word == nullptr) {
 		LuaError(l, "Word \"%s\" doesn't exist for the \"%s\" language." _C_ word_name.c_str() _C_ language_name.c_str());
 	}
 	

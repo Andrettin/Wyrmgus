@@ -230,7 +230,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	//Wyrmgus end
 	UnitButtonTable.push_back(ba);
 	// FIXME: check if already initited
-	//Assert(ba->Icon.Icon != NULL);// just checks, that's why at the end
+	//Assert(ba->Icon.Icon != nullptr);// just checks, that's why at the end
 	return 1;
 }
 
@@ -247,7 +247,7 @@ void CleanButtons()
 	UnitButtonTable.clear();
 
 	CurrentButtonLevel = 0;
-	LastDrawnButtonPopup = NULL;
+	LastDrawnButtonPopup = nullptr;
 	CurrentButtons.clear();
 }
 
@@ -492,7 +492,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Quote && type && type->Quote.empty() && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->Quote.empty()) && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Work != NULL && !UnitManager.GetSlotUnit(button.Value).Work->Quote.empty() && UnitManager.GetSlotUnit(button.Value).Elixir != NULL && !UnitManager.GetSlotUnit(button.Value).Elixir->Quote.empty())) {
+	if (condition->Quote && type && type->Quote.empty() && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->Quote.empty()) && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Work != nullptr && !UnitManager.GetSlotUnit(button.Value).Work->Quote.empty() && UnitManager.GetSlotUnit(button.Value).Elixir != nullptr && !UnitManager.GetSlotUnit(button.Value).Elixir->Quote.empty())) {
 		return false;
 	}
 	
@@ -515,12 +515,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CurrentCampaign != NULL && button.Action == ButtonFaction && button.Value != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CurrentCampaign != nullptr && button.Action == ButtonFaction && button.Value != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
 		}
 	}
 	
-	CUpgrade *upgrade = NULL;
+	CUpgrade *upgrade = nullptr;
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		upgrade = AllUpgrades[button.Value];
 	} else if (button.Action == ButtonFaction && !PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
@@ -593,7 +593,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			if (condition->Variables[i] != CONDITION_TRUE) {
 //				if ((condition->Variables[i] == CONDITION_ONLY) ^ UnitManager.GetSlotUnit(button.Value).Variable[i].Enable) {
 				CUnit &unit = UnitManager.GetSlotUnit(button.Value);
-				if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->HasInventory()) {
+				if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != nullptr && unit.Container->HasInventory()) {
 					if (i == BASICDAMAGE_INDEX) {
 						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Container->GetItemVariableChange(&unit, i) != 0 || unit.Container->GetItemVariableChange(&unit, PIERCINGDAMAGE_INDEX) != 0)) {
 							return false;
@@ -632,7 +632,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	//Wyrmgus start
 	if (button.Action == ButtonSpellCast) {
 		if (condition->AutoCast != CONDITION_TRUE) {
-			if ((condition->AutoCast == CONDITION_ONLY) ^ (SpellTypeTable[button.Value]->AutoCast != NULL)) {
+			if ((condition->AutoCast == CONDITION_ONLY) ^ (SpellTypeTable[button.Value]->AutoCast != nullptr)) {
 				return false;
 			}
 		}
@@ -642,12 +642,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		CUnit &unit = UnitManager.GetSlotUnit(button.Value);
 		if (unit.Type->BoolFlag[ITEM_INDEX].value) {
 			if (condition->Equipped != CONDITION_TRUE) {
-				if ((condition->Equipped == CONDITION_ONLY) ^ (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->IsItemEquipped(&unit))) {
+				if ((condition->Equipped == CONDITION_ONLY) ^ (unit.Container != nullptr && unit.Container->HasInventory() && unit.Container->IsItemEquipped(&unit))) {
 					return false;
 				}
 			}
 			if (condition->Equippable != CONDITION_TRUE) {
-				if ((condition->Equippable == CONDITION_ONLY) ^ (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->CanEquipItem(&unit))) {
+				if ((condition->Equippable == CONDITION_ONLY) ^ (unit.Container != nullptr && unit.Container->HasInventory() && unit.Container->CanEquipItem(&unit))) {
 					return false;
 				}
 			}
@@ -657,32 +657,32 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Spell != CONDITION_TRUE) {
-				if ((condition->Spell == CONDITION_ONLY) ^ (unit.Spell != NULL)) {
+				if ((condition->Spell == CONDITION_ONLY) ^ (unit.Spell != nullptr)) {
 					return false;
 				}
 			}
 			if (condition->Work != CONDITION_TRUE) {
-				if ((condition->Work == CONDITION_ONLY) ^ (unit.Work != NULL)) {
+				if ((condition->Work == CONDITION_ONLY) ^ (unit.Work != nullptr)) {
 					return false;
 				}
 			}
 			if (condition->ReadWork != CONDITION_TRUE) {
-				if ((condition->ReadWork == CONDITION_ONLY) ^ (unit.Work != NULL && (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->GetIndividualUpgrade(unit.Work)))) {
+				if ((condition->ReadWork == CONDITION_ONLY) ^ (unit.Work != nullptr && (unit.Container != nullptr && unit.Container->HasInventory() && unit.Container->GetIndividualUpgrade(unit.Work)))) {
 					return false;
 				}
 			}
 			if (condition->Elixir != CONDITION_TRUE) {
-				if ((condition->Elixir == CONDITION_ONLY) ^ (unit.Elixir != NULL)) {
+				if ((condition->Elixir == CONDITION_ONLY) ^ (unit.Elixir != nullptr)) {
 					return false;
 				}
 			}
 			if (condition->ConsumedElixir != CONDITION_TRUE) {
-				if ((condition->ConsumedElixir == CONDITION_ONLY) ^ (unit.Elixir != NULL && (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->GetIndividualUpgrade(unit.Elixir)))) {
+				if ((condition->ConsumedElixir == CONDITION_ONLY) ^ (unit.Elixir != nullptr && (unit.Container != nullptr && unit.Container->HasInventory() && unit.Container->GetIndividualUpgrade(unit.Elixir)))) {
 					return false;
 				}
 			}
 			if (condition->CanUse != CONDITION_TRUE) {
-				if ((condition->CanUse == CONDITION_ONLY) ^ (unit.Container != NULL && unit.Container->HasInventory() && unit.Container->CanUseItem(&unit))) {
+				if ((condition->CanUse == CONDITION_ONLY) ^ (unit.Container != nullptr && unit.Container->HasInventory() && unit.Container->CanUseItem(&unit))) {
 					return false;
 				}
 			}
@@ -722,7 +722,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Regeneration != CONDITION_TRUE) {
-				if (unit.Container != NULL && unit.Container->HasInventory()) {
+				if (unit.Container != nullptr && unit.Container->HasInventory()) {
 					if ((condition->Regeneration == CONDITION_ONLY) ^ (unit.Container->GetItemVariableChange(&unit, HITPOINTBONUS_INDEX, true) != 0)) {
 						return false;
 					}
@@ -744,18 +744,18 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 		if (!(button.Action == ButtonBuy && unit.Character) && condition->Neutral != CONDITION_TRUE) {
-			if ((condition->Neutral == CONDITION_ONLY) ^ (!ThisPlayer->IsEnemy(unit) && !ThisPlayer->IsAllied(unit) && ThisPlayer != unit.Player && (unit.Container == NULL || (!ThisPlayer->IsEnemy(*unit.Container) && !ThisPlayer->IsAllied(*unit.Container) && ThisPlayer != unit.Container->Player)))) {
+			if ((condition->Neutral == CONDITION_ONLY) ^ (!ThisPlayer->IsEnemy(unit) && !ThisPlayer->IsAllied(unit) && ThisPlayer != unit.Player && (unit.Container == nullptr || (!ThisPlayer->IsEnemy(*unit.Container) && !ThisPlayer->IsAllied(*unit.Container) && ThisPlayer != unit.Container->Player)))) {
 				return false;
 			}
 		}
 		
 		if (condition->Affixed != CONDITION_TRUE) {
-			if ((condition->Affixed == CONDITION_ONLY) ^ (unit.Prefix != NULL || unit.Suffix != NULL)) {
+			if ((condition->Affixed == CONDITION_ONLY) ^ (unit.Prefix != nullptr || unit.Suffix != nullptr)) {
 				return false;
 			}
 		}
 		if (condition->Unique != CONDITION_TRUE) {
-			if ((condition->Unique == CONDITION_ONLY) ^ (unit.Unique || unit.Character != NULL)) {
+			if ((condition->Unique == CONDITION_ONLY) ^ (unit.Unique || unit.Character != nullptr)) {
 				return false;
 			}
 		}
@@ -1154,13 +1154,13 @@ void CButtonPanel::Draw()
 		CIcon *button_icon = buttons[i].Icon.Icon;
 			
 		// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
-		if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonAttack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != NULL && Selected[0]->UnitInside->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action) != NULL) {
+		if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonAttack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != nullptr && Selected[0]->UnitInside->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action) != nullptr) {
 			button_icon = Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action);
-		} else if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != NULL) {
+		} else if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != nullptr) {
 			button_icon = Selected[0]->GetButtonIcon(buttons[i].Action);
-		} else if (buttons[i].Action == ButtonExperienceUpgradeTo && Selected[0]->Type->VarInfo[Selected[0]->Variation] && UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->Type->VarInfo[Selected[0]->Variation]->VariationId) != NULL && !UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->Type->VarInfo[Selected[0]->Variation]->VariationId)->Icon.Name.empty()) {
+		} else if (buttons[i].Action == ButtonExperienceUpgradeTo && Selected[0]->Type->VarInfo[Selected[0]->Variation] && UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->Type->VarInfo[Selected[0]->Variation]->VariationId) != nullptr && !UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->Type->VarInfo[Selected[0]->Variation]->VariationId)->Icon.Name.empty()) {
 			button_icon = UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->Type->VarInfo[Selected[0]->Variation]->VariationId)->Icon.Icon;
-		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != NULL && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
+		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != nullptr && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
 			button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Icon;
 		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
 			button_icon = UnitTypes[buttons[i].Value]->Icon.Icon;
@@ -1269,9 +1269,9 @@ void CButtonPanel::Draw()
 			}
 			if (static_cast<size_t>(ButtonUnderCursor) == j) {
 				std::string text_color;
-				if (uins->Unique || uins->Character != NULL) {
+				if (uins->Unique || uins->Character != nullptr) {
 					text_color = "fire";
-				} else if (uins->Prefix != NULL || uins->Suffix != NULL) {
+				} else if (uins->Prefix != nullptr || uins->Suffix != nullptr) {
 					text_color = "light-blue";
 				}
 				DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, text_color);
@@ -1435,7 +1435,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			}
-			if (res && unit.Character != NULL) {
+			if (res && unit.Character != nullptr) {
 				res = std::find(unit.Character->ForbiddenUpgrades.begin(), unit.Character->ForbiddenUpgrades.end(), UnitTypes[buttonaction.Value]) == unit.Character->ForbiddenUpgrades.end();
 			}
 			break;
@@ -1480,7 +1480,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size() && unit.Player->CanAcceptQuest(unit.Player->AvailableQuests[buttonaction.Value]);
 			break;
 		case ButtonBuy:
-			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != NULL);
+			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != nullptr);
 			break;
 		//Wyrmgus end
 	}
@@ -1561,7 +1561,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		case ButtonBuy:
 			res = true;
-			if (UnitManager.GetSlotUnit(buttonaction.Value).Character != NULL) {
+			if (UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				res = ThisPlayer->Heroes.size() < PlayerHeroMax;
 			}
 			break;
@@ -1596,7 +1596,7 @@ int GetButtonCooldown(const CUnit &unit, const ButtonAction &buttonaction)
 	// Check button-specific cases
 	switch (buttonaction.Action) {
 		case ButtonBuy:
-			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != NULL) {
+			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				cooldown = ThisPlayer->HeroCooldownTimer;
 			}
 			break;
@@ -1620,7 +1620,7 @@ int GetButtonCooldownPercent(const CUnit &unit, const ButtonAction &buttonaction
 	// Check button-specific cases
 	switch (buttonaction.Action) {
 		case ButtonBuy:
-			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != NULL) {
+			if (buttonaction.Value != -1 && UnitManager.GetSlotUnit(buttonaction.Value).Character != nullptr) {
 				cooldown = ThisPlayer->HeroCooldownTimer * 100 / HeroCooldownCycles;
 			}
 			break;
@@ -1844,7 +1844,7 @@ void CButtonPanel::Update()
 					UnitButtonTable[i]->Value = -1;
 				} else {
 					UnitButtonTable[i]->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
-					if (unit.SoldUnits[sold_unit_count]->Character != NULL) {
+					if (unit.SoldUnits[sold_unit_count]->Character != nullptr) {
 						UnitButtonTable[i]->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->GetName();
 					} else {
 						if (!unit.SoldUnits[sold_unit_count]->Name.empty()) {
@@ -2008,7 +2008,7 @@ void CButtonPanel::DoClicked_StandGround()
 void CButtonPanel::DoClicked_Button(int button)
 {
 	CurrentButtonLevel = CurrentButtons[button].Value;
-	LastDrawnButtonPopup = NULL;
+	LastDrawnButtonPopup = nullptr;
 	UI.ButtonPanel.Update();
 }
 
@@ -2031,14 +2031,14 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 	CurrentButtonLevel = 0;
 	UI.ButtonPanel.Update();
 	GameCursor = UI.Point.Cursor;
-	CursorBuilding = NULL;
+	CursorBuilding = nullptr;
 	CursorState = CursorStatePoint;
 }
 
 void CButtonPanel::DoClicked_CancelTrain()
 {
 	Assert(Selected[0]->CurrentAction() == UnitActionTrain);
-	SendCommandCancelTraining(*Selected[0], -1, NULL);
+	SendCommandCancelTraining(*Selected[0], -1, nullptr);
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 }
@@ -2183,7 +2183,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 				Selected[i]->Variable[LEVELUP_INDEX].Value -= 1;
 				Selected[i]->Variable[LEVELUP_INDEX].Max = Selected[i]->Variable[LEVELUP_INDEX].Value;
-				if (!IsNetworkGame() && Selected[i]->Character != NULL) {	//save the unit-type experience upgrade for persistent characters
+				if (!IsNetworkGame() && Selected[i]->Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
 					if (Selected[i]->Character->Type->Slot != type.Slot) {
 						if (Selected[i]->Player->AiEnabled == false) {
 							Selected[i]->Character->Type = UnitTypes[CurrentButtons[button].Value];
@@ -2202,7 +2202,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 		}
 	}
 	
-	LastDrawnButtonPopup = NULL;
+	LastDrawnButtonPopup = nullptr;
 	UI.ButtonPanel.Update();
 	
 	if (Selected[0]->Player == ThisPlayer) {
@@ -2228,7 +2228,7 @@ void CButtonPanel::DoClicked_Research(int button)
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		//Wyrmgus start
-		LastDrawnButtonPopup = NULL;
+		LastDrawnButtonPopup = nullptr;
 		ButtonUnderCursor = -1;
 		OldButtonUnderCursor = -1;
 		UI.ButtonPanel.Update();
@@ -2243,7 +2243,7 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 	SendCommandLearnAbility(*Selected[0], *AllUpgrades[index]);
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
-	LastDrawnButtonPopup = NULL;
+	LastDrawnButtonPopup = nullptr;
 	
 	if (Selected[0]->Player == ThisPlayer) {
 		SelectedUnitChanged();
@@ -2256,7 +2256,7 @@ void CButtonPanel::DoClicked_Faction(int button)
 	SendCommandSetFaction(ThisPlayer->Index, PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[index]->ID);
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
-	LastDrawnButtonPopup = NULL;
+	LastDrawnButtonPopup = nullptr;
 	if (Selected[0]->Player == ThisPlayer) {
 		SelectedUnitChanged();
 	}
@@ -2268,7 +2268,7 @@ void CButtonPanel::DoClicked_Quest(int button)
 	SendCommandQuest(*Selected[0], Selected[0]->Player->AvailableQuests[index]);
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
-	LastDrawnButtonPopup = NULL;
+	LastDrawnButtonPopup = nullptr;
 	if (Selected[0]->Player == ThisPlayer) {
 		SelectedUnitChanged();
 	}
@@ -2283,7 +2283,7 @@ void CButtonPanel::DoClicked_Buy(int button)
 		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value), ThisPlayer->Index);
 		ButtonUnderCursor = -1;
 		OldButtonUnderCursor = -1;
-		LastDrawnButtonPopup = NULL;
+		LastDrawnButtonPopup = nullptr;
 		if (IsOnlySelected(*Selected[0])) {
 			SelectedUnitChanged();
 		}
@@ -2346,7 +2346,7 @@ void CButtonPanel::DoClicked_EnterMapLayer()
 {
 	for (size_t i = 0; i < Selected.size(); ++i) {
 		CUnit *connection_destination = Selected[i]->ConnectingDestination;
-		if (connection_destination != NULL) {
+		if (connection_destination != nullptr) {
 			PlayUnitSound(*connection_destination, VoiceUsed);
 			Selected[i]->Blink = 4;
 			connection_destination->Blink = 4;
@@ -2403,7 +2403,7 @@ void CButtonPanel::DoClicked(int button)
 			|| (CurrentButtons[button].Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(CUpgrade::Get(CurrentButtons[button].ValueStr)) == CUpgrade::Get(CurrentButtons[button].ValueStr)->MaxLimit)
 		) {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The upgrade has already been acquired"));
-		} else if (CurrentButtons[button].Action == ButtonBuy && ThisPlayer->Heroes.size() >= PlayerHeroMax && CurrentButtons[button].Value != -1 && UnitManager.GetSlotUnit(CurrentButtons[button].Value).Character != NULL) {
+		} else if (CurrentButtons[button].Action == ButtonBuy && ThisPlayer->Heroes.size() >= PlayerHeroMax && CurrentButtons[button].Value != -1 && UnitManager.GetSlotUnit(CurrentButtons[button].Value).Character != nullptr) {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The hero limit has been reached"));
 		} else {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The requirements have not been fulfilled"));

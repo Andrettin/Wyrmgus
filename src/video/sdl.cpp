@@ -126,7 +126,7 @@ static std::map<std::string, int> Str2Key;
 
 double FrameTicks;     /// Frame length in ms
 
-const EventCallback *Callbacks = NULL;
+const EventCallback *Callbacks = nullptr;
 
 static bool RegenerateScreen = false;
 bool IsSDLWindowVisible = true;
@@ -185,7 +185,7 @@ void SetVideoSync()
 */
 static bool IsExtensionSupported(const char *extension)
 {
-	const GLubyte *extensions = NULL;
+	const GLubyte *extensions = nullptr;
 	const GLubyte *start;
 	GLubyte *ptr, *terminator;
 	int len;
@@ -323,7 +323,7 @@ static void InitOpenGL()
 		// FIXME: try to use GL_PROXY_TEXTURE_2D to get a valid size
 #if 0
 		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, size, size, 0,
-					 GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+					 GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 		glGetTexLevelParameterfv(GL_PROXY_TEXTURE_2D, 0,
 								 GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
 #endif
@@ -512,8 +512,8 @@ void InitVideoSdl()
 		UseOpenGL = false;
 #endif
 
-		SDL_Surface *icon = NULL;
-		CGraphic *g = NULL;
+		SDL_Surface *icon = nullptr;
+		CGraphic *g = nullptr;
 		struct stat st;
 
 		std::string FullGameNameL = FullGameName;
@@ -565,8 +565,8 @@ void InitVideoSdl()
 
 #endif
 #ifdef USE_WIN32
-		HWND hwnd = NULL;
-		HICON hicon = NULL;
+		HWND hwnd = nullptr;
+		HICON hicon = nullptr;
 		SDL_SysWMinfo info;
 		SDL_VERSION(&info.version);
 
@@ -575,7 +575,7 @@ void InitVideoSdl()
 		}
 
 		if (hwnd) {
-			hicon = ExtractIcon(GetModuleHandle(NULL), Parameters::Instance.applicationName.c_str(), 0);
+			hicon = ExtractIcon(GetModuleHandle(nullptr), Parameters::Instance.applicationName.c_str(), 0);
 		}
 
 		if (hicon) {
@@ -635,7 +635,7 @@ void InitVideoSdl()
 		TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, 16, flags);
 #endif
 	}
-	if (TheScreen == NULL) {
+	if (TheScreen == nullptr) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
 		exit(1);
@@ -684,7 +684,7 @@ void InitVideoSdl()
 			exit(1);
 		}
 
-		if (!eglInitialize(eglDisplay, NULL, NULL)) {
+		if (!eglInitialize(eglDisplay, nullptr, nullptr)) {
 			fprintf(stderr, "Couldn't initialize EGL Display\n");
 			exit(1);
 		}
@@ -707,7 +707,7 @@ void InitVideoSdl()
 		// Bind GLES and create the context
 		eglBindAPI(EGL_OPENGL_ES_API);
 		EGLint contextParams[] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};
-		EGLContext eglContext = eglCreateContext(eglDisplay, eglConfig, NULL, NULL);
+		EGLContext eglContext = eglCreateContext(eglDisplay, eglConfig, nullptr, nullptr);
 		if (eglContext == EGL_NO_CONTEXT) {
 			fprintf(stderr, "Unable to create GLES context\n");
 			exit(1);
@@ -929,7 +929,7 @@ int PollEvent()
 
 void PollEvents()
 {
-	if (Callbacks == NULL) return;
+	if (Callbacks == nullptr) return;
 
 	while (PollEvent()) { }
 }
@@ -986,7 +986,7 @@ void WaitEventsOneFrame()
 			break;
 		}
 	}
-	handleInput(NULL);
+	handleInput(nullptr);
 
 	if (!SkipGameCycle--) {
 		SkipGameCycle = SkipFrames;
@@ -1118,8 +1118,8 @@ void ToggleFullScreen()
 	int w;
 	int h;
 	int bpp;
-	unsigned char *pixels = NULL;
-	SDL_Color *palette = NULL;
+	unsigned char *pixels = nullptr;
+	SDL_Color *palette = nullptr;
 	int ncolors = 0;
 
 	if (!TheScreen) { // don't bother if there's no surface.

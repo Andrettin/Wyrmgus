@@ -115,7 +115,7 @@ std::map<std::string, std::string> DLCFileEquivalency;
 static void lstop(lua_State *l, lua_Debug *ar)
 {
 	(void)ar;  // unused arg.
-	lua_sethook(l, NULL, 0, 0);
+	lua_sethook(l, nullptr, 0, 0);
 	luaL_error(l, "interrupted!");
 }
 
@@ -143,7 +143,7 @@ static int report(int status, bool exitOnError)
 {
 	if (status) {
 		const char *msg = lua_tostring(Lua, -1);
-		if (msg == NULL) {
+		if (msg == nullptr) {
 			msg = "(error with no message)";
 		}
 		fprintf(stderr, "%s\n", msg);
@@ -469,7 +469,7 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 
 	Assert(l);
 	Assert(s);
-	res = NULL;
+	res = nullptr;
 	if (!strcmp(s, "Attacker")) {
 		res = &TriggerData.Attacker;
 	} else if (!strcmp(s, "Defender")) {
@@ -499,7 +499,7 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 */
 static CUnitType **Str2TypeRef(lua_State *l, const char *s)
 {
-	CUnitType **res = NULL; // Result.
+	CUnitType **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Type")) {
@@ -524,7 +524,7 @@ static CUnitType **Str2TypeRef(lua_State *l, const char *s)
 */
 static CUpgrade **Str2UpgradeRef(lua_State *l, const char *s)
 {
-	CUpgrade **res = NULL; // Result.
+	CUpgrade **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Upgrade")) {
@@ -548,7 +548,7 @@ static CUpgrade **Str2UpgradeRef(lua_State *l, const char *s)
 */
 static int **Str2ResourceRef(lua_State *l, const char *s)
 {
-	int **res = NULL; // Result.
+	int **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Resource")) {
@@ -572,7 +572,7 @@ static int **Str2ResourceRef(lua_State *l, const char *s)
 */
 static CFaction **Str2FactionRef(lua_State *l, const char *s)
 {
-	CFaction **res = NULL; // Result.
+	CFaction **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Faction")) {
@@ -616,7 +616,7 @@ UnitDesc *CclParseUnitDesc(lua_State *l)
 */
 CUnitType **CclParseTypeDesc(lua_State *l)
 {
-	CUnitType **res = NULL;
+	CUnitType **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2TypeRef(l, LuaToString(l, -1));
@@ -637,7 +637,7 @@ CUnitType **CclParseTypeDesc(lua_State *l)
 */
 CUpgrade **CclParseUpgradeDesc(lua_State *l)
 {
-	CUpgrade **res = NULL;
+	CUpgrade **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2UpgradeRef(l, LuaToString(l, -1));
@@ -657,7 +657,7 @@ CUpgrade **CclParseUpgradeDesc(lua_State *l)
 */
 int **CclParseResourceDesc(lua_State *l)
 {
-	int **res = NULL;
+	int **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2ResourceRef(l, LuaToString(l, -1));
@@ -677,7 +677,7 @@ int **CclParseResourceDesc(lua_State *l)
 */
 CFaction **CclParseFactionDesc(lua_State *l)
 {
-	CFaction **res = NULL;
+	CFaction **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2FactionRef(l, LuaToString(l, -1));
@@ -936,7 +936,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 				res->D.PlayerData.ResType = CclParseStringDesc(l);
 			//Wyrmgus start
 			} else {
-				res->D.PlayerData.ResType = NULL;
+				res->D.PlayerData.ResType = nullptr;
 			//Wyrmgus end
 			}
 			lua_pop(l, 1); // table.
@@ -1132,7 +1132,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 				lua_rawgeti(l, -1, 3); // Length.
 				res->D.Line.MaxLen = CclParseNumberDesc(l);
 			}
-			res->D.Line.Font = NULL;
+			res->D.Line.Font = nullptr;
 			if (lua_rawlen(l, -1) >= 4) {
 				lua_rawgeti(l, -1, 4); // Font.
 				res->D.Line.Font = CFont::Get(LuaToString(l, -1));
@@ -1176,7 +1176,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 		case EUnit_Ref :
 			return *unitdesc->D.AUnit;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -1186,7 +1186,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 **
 **  @return        the result number.
 **
-**  @todo Manage better the error (div/0, unit==NULL, ...).
+**  @todo Manage better the error (div/0, unit==null, ...).
 */
 int EvalNumber(const NumberDesc *number)
 {
@@ -1253,7 +1253,7 @@ int EvalNumber(const NumberDesc *number)
 			return SyncRand() % a;
 		case ENumber_UnitStat : // property of unit.
 			unit = EvalUnit(number->D.UnitStat.Unit);
-			if (unit != NULL) {
+			if (unit != nullptr) {
 				return GetComponent(*unit, number->D.UnitStat.Index,
 									number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
 			} else { // ERROR.
@@ -1261,21 +1261,21 @@ int EvalNumber(const NumberDesc *number)
 			}
 		case ENumber_TypeStat : // property of unit type.
 			type = number->D.TypeStat.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				return GetComponent(**type, number->D.TypeStat.Index,
 									number->D.TypeStat.Component, number->D.TypeStat.Loc).i;
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_VideoTextLength : // VideoTextLength(font, s)
-			if (number->D.VideoTextLength.String != NULL
+			if (number->D.VideoTextLength.String != nullptr
 				&& !(s = EvalString(number->D.VideoTextLength.String)).empty()) {
 				return number->D.VideoTextLength.Font->Width(s);
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_StringFind : // s.find(c)
-			if (number->D.StringFind.String != NULL
+			if (number->D.StringFind.String != nullptr
 				&& !(s = EvalString(number->D.StringFind.String)).empty()) {
 				size_t pos = s.find(number->D.StringFind.C);
 				return pos != std::string::npos ? (int)pos : -1;
@@ -1293,7 +1293,7 @@ int EvalNumber(const NumberDesc *number)
 		//Wyrmgus start
 		case ENumber_TypeTrainQuantity : // name of the unit type's class
 			type = number->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				return (**type).TrainQuantity;
 			} else { // ERROR.
 				return 0;
@@ -1305,7 +1305,7 @@ int EvalNumber(const NumberDesc *number)
 			//Wyrmgus start
 //			std::string res = EvalString(number->D.PlayerData.ResType);
 			std::string res;
-			if (number->D.PlayerData.ResType != NULL) {
+			if (number->D.PlayerData.ResType != nullptr) {
 				res = EvalString(number->D.PlayerData.ResType);
 			}
 			//Wyrmgus end
@@ -1359,7 +1359,7 @@ std::string EvalString(const StringDesc *s)
 			return res;
 		case EString_UnitName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL) {
+			if (unit != nullptr) {
 				//Wyrmgus start
 //				return unit->Type->Name;
 				if (!unit->GetName().empty() && unit->Identified) {
@@ -1376,21 +1376,21 @@ std::string EvalString(const StringDesc *s)
 		//Wyrmgus start
 		case EString_UnitTypeName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL && !unit->GetName().empty() && ((unit->Prefix == NULL && unit->Suffix == NULL && unit->Spell == NULL) || unit->Unique || unit->Work != NULL || unit->Elixir != NULL)) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
+			if (unit != nullptr && !unit->GetName().empty() && ((unit->Prefix == nullptr && unit->Suffix == nullptr && unit->Spell == nullptr) || unit->Unique || unit->Work != nullptr || unit->Elixir != nullptr)) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
 				return unit->GetTypeName();
 			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
 				return std::string("");
 			}
 		case EString_UnitTrait : // name of the unit's trait
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL && unit->Trait != NULL) {
+			if (unit != nullptr && unit->Trait != nullptr) {
 				return _(unit->Trait->Name.c_str());
 			} else {
 				return std::string("");
 			}
 		case EString_UnitSpell : // name of the unit's spell
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL && unit->Spell != NULL) {
+			if (unit != nullptr && unit->Spell != nullptr) {
 				std::string spell_description = unit->Spell->Description;
 				spell_description[0] = tolower(spell_description[0]);
 				return unit->Spell->Name + " (" + spell_description + ")";
@@ -1399,11 +1399,11 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitQuote : // unit's quote
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL) {
+			if (unit != nullptr) {
 				if (!unit->Unique) {
-					if (unit->Work != NULL) {
+					if (unit->Work != nullptr) {
 						return unit->Work->Quote;
-					} else if (unit->Elixir != NULL) {
+					} else if (unit->Elixir != nullptr) {
 						return unit->Elixir->Quote;
 					} else {
 						return unit->Type->Quote;
@@ -1416,7 +1416,7 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitSettlementName : // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL && unit->Settlement != NULL && unit->Settlement->SiteUnit != NULL) {
+			if (unit != nullptr && unit->Settlement != nullptr && unit->Settlement->SiteUnit != nullptr) {
 				int civilization = unit->Settlement->SiteUnit->Type->Civilization;
 				if (civilization != -1 && unit->Settlement->SiteUnit->Player->Faction != -1 && (unit->Settlement->SiteUnit->Player->Race == civilization || unit->Settlement->SiteUnit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->Faction, unit->Settlement->SiteUnit->Type->Class))) {
 					civilization = unit->Settlement->SiteUnit->Player->Race;
@@ -1427,14 +1427,14 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitUniqueSet : // name of the unit's unique item set
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL && unit->Unique && unit->Unique->Set) {
+			if (unit != nullptr && unit->Unique && unit->Unique->Set) {
 				return unit->Unique->Set->Name;
 			} else {
 				return std::string("");
 			}
 		case EString_UnitUniqueSetItems : // names of the unit's unique item set's items
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL && unit->Unique && unit->Unique->Set) {
+			if (unit != nullptr && unit->Unique && unit->Unique->Set) {
 				std::string set_items_string;
 				bool first = true;
 				for (size_t i = 0; i < unit->Unique->Set->UniqueItems.size(); ++i) {
@@ -1458,21 +1458,21 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_TypeName : // name of the unit type
 			type = s->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				return (**type).Name;
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_TypeIdent : // name of the unit type
 			type = s->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				return (**type).Ident;
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_TypeClass : // name of the unit type's class
 			type = s->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				std::string str;
 				if ((**type).BoolFlag[ITEM_INDEX].value) {
 					str = GetItemClassNameById((**type).ItemClass).c_str();
@@ -1491,42 +1491,42 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_TypeDescription : // name of the unit type's description
 			type = s->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				return (**type).Description;
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_TypeQuote : // name of the unit type's quote
 			type = s->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				return (**type).Quote;
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_TypeRequirementsString : // name of the unit type's requirements string
 			type = s->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				return (**type).RequirementsString;
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_TypeExperienceRequirementsString : // name of the unit type's experience requirements string
 			type = s->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				return (**type).ExperienceRequirementsString;
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_TypeBuildingRulesString : // name of the unit type's building rules string
 			type = s->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				return (**type).BuildingRulesString;
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_TypeImproveIncomes : // unit type's processing bonuses
 			type = s->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
 				for (int res = 1; res < MaxCosts; ++res) {
@@ -1548,7 +1548,7 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_TypeLuxuryDemand : // unit type's luxury demand
 			type = s->D.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				std::string luxury_demand;
 				bool first = true;
 				for (int res = 1; res < MaxCosts; ++res) {
@@ -1569,7 +1569,7 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UpgradeCivilization : // name of the upgrade's civilization
 			upgrade = s->D.Upgrade;
-			if (upgrade != NULL) {
+			if (upgrade != nullptr) {
 				if ((**upgrade).Civilization != -1) {
 					return PlayerRaces.Display[(**upgrade).Civilization];
 				} else {
@@ -1580,21 +1580,21 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UpgradeEffectsString : // upgrade's effects string
 			upgrade = s->D.Upgrade;
-			if (upgrade != NULL) {
+			if (upgrade != nullptr) {
 				return (**upgrade).EffectsString;
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_UpgradeRequirementsString : // upgrade's effects string
 			upgrade = s->D.Upgrade;
-			if (upgrade != NULL) {
+			if (upgrade != nullptr) {
 				return (**upgrade).RequirementsString;
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_UpgradeMaxLimit : // upgrade's max limit
 			upgrade = s->D.Upgrade;
-			if (upgrade != NULL) {
+			if (upgrade != nullptr) {
 				return std::to_string((long long) (**upgrade).MaxLimit);
 			} else { // ERROR.
 				return std::string("");
@@ -1602,7 +1602,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_FactionCivilization : // name of the faction's civilization
 			faction = s->D.Faction;
 			
-			if (faction != NULL) {
+			if (faction != nullptr) {
 				return PlayerRaces.Display[(**faction).Civilization];
 			} else {
 				return std::string("");
@@ -1610,7 +1610,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_FactionType : // the faction's type
 			faction = s->D.Faction;
 			
-			if (faction != NULL) {
+			if (faction != nullptr) {
 				return IdentToName(GetFactionTypeNameById((**faction).Type));
 			} else {
 				return std::string("");
@@ -1618,7 +1618,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_FactionCoreSettlements : // the faction's core settlements
 			faction = s->D.Faction;
 			
-			if (faction != NULL) {
+			if (faction != nullptr) {
 				std::string settlements_string;
 				bool first = true;
 				for (size_t i = 0; i < (**faction).Cores.size(); ++i) {
@@ -1642,21 +1642,21 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_ResourceIdent : // resource ident
 			resource = s->D.Resource;
-			if (resource != NULL) {
+			if (resource != nullptr) {
 				return DefaultResourceNames[(**resource)];
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_ResourceName : // resource ident
 			resource = s->D.Resource;
-			if (resource != NULL) {
+			if (resource != nullptr) {
 				return IdentToName(DefaultResourceNames[(**resource)]);
 			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_ResourceConversionRates : // unit type's processing bonuses
 			resource = s->D.Resource;
-			if (resource != NULL) {
+			if (resource != nullptr) {
 				std::string conversion_rates;
 				bool first = true;
 				for (size_t i = 0; i < Resources[(**resource)].ChildResources.size(); ++i) {
@@ -1682,7 +1682,7 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_ResourceImproveIncomes : // unit type's processing bonuses
 			resource = s->D.Resource;
-			if (resource != NULL) {
+			if (resource != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
 				if (ThisPlayer->Incomes[(**resource)] > Resources[(**resource)].DefaultIncome) {
@@ -1723,7 +1723,7 @@ std::string EvalString(const StringDesc *s)
 				return std::string("");
 			}
 		case EString_SubString : // substring(s, begin, end)
-			if (s->D.SubString.String != NULL
+			if (s->D.SubString.String != nullptr
 				&& !(tmp1 = EvalString(s->D.SubString.String)).empty()) {
 				int begin;
 				int end;
@@ -1746,7 +1746,7 @@ std::string EvalString(const StringDesc *s)
 				return std::string("");
 			}
 		case EString_Line : // line n of the string
-			if (s->D.Line.String == NULL || (tmp1 = EvalString(s->D.Line.String)).empty()) {
+			if (s->D.Line.String == nullptr || (tmp1 = EvalString(s->D.Line.String)).empty()) {
 				return std::string(""); // ERROR.
 			} else {
 				int line;
@@ -2033,18 +2033,18 @@ static int AliasTypeVar(lua_State *l, const char *s)
 	if (nargs >= 3) {
 		//  Warning: type is for unit->Stats->Var...
 		//           and Initial is for unit->Type->Var... (no upgrade modification)
-		const char *sloc[] = {"Unit", "Initial", "Type", NULL};
+		const char *sloc[] = {"Unit", "Initial", "Type", nullptr};
 		int i;
 		const char *key;
 		
 		key = LuaToString(l, 3);
-		for (i = 0; sloc[i] != NULL; i++) {
+		for (i = 0; sloc[i] != nullptr; i++) {
 			if (!strcmp(key, sloc[i])) {
 				lua_pushnumber(l, i);
 				break ;
 			}
 		}
-		if (sloc[i] == NULL) {
+		if (sloc[i] == nullptr) {
 			LuaError(l, "Bad loc :'%s'" _C_ key);
 		}
 	} else {
@@ -2095,18 +2095,18 @@ static int AliasUnitVar(lua_State *l, const char *s)
 	if (nargs >= 3) {
 		//  Warning: type is for unit->Stats->Var...
 		//           and Initial is for unit->Type->Var... (no upgrade modification)
-		const char *sloc[] = {"Unit", "Initial", "Type", NULL};
+		const char *sloc[] = {"Unit", "Initial", "Type", nullptr};
 		int i;
 		const char *key;
 
 		key = LuaToString(l, 3);
-		for (i = 0; sloc[i] != NULL; i++) {
+		for (i = 0; sloc[i] != nullptr; i++) {
 			if (!strcmp(key, sloc[i])) {
 				lua_pushnumber(l, i);
 				break ;
 			}
 		}
-		if (sloc[i] == NULL) {
+		if (sloc[i] == nullptr) {
 			LuaError(l, "Bad loc :'%s'" _C_ key);
 		}
 	} else {
@@ -3187,7 +3187,7 @@ void CclGetDate(lua_State *l, CDate *d, const int offset)
 		d->Day = LuaToNumber(l, offset, 3);
 		lua_rawgeti(l, offset, 4);
 		if (lua_isnil(l, -1)) {
-			d->Timeline = NULL;
+			d->Timeline = nullptr;
 		} else {
 			std::string timeline_ident = LuaToString(l, -1);
 			CTimeline *timeline = CTimeline::GetTimeline(timeline_ident);
@@ -3243,7 +3243,7 @@ void InitLua()
 		{LUA_STRLIBNAME, luaopen_string},
 		{LUA_MATHLIBNAME, luaopen_math},
 		{LUA_DBLIBNAME, luaopen_debug},
-		{NULL, NULL}
+		{nullptr, nullptr}
 	};
 
 	Lua = luaL_newstate();

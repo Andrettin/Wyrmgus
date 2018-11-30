@@ -129,7 +129,7 @@ private:
 
 	static void CreateInstanceIfNeeded()
 	{
-		if (s_instance == NULL) {
+		if (s_instance == nullptr) {
 			s_instance = new CColorCycling;
 		}
 	}
@@ -137,7 +137,7 @@ private:
 public:
 	static CColorCycling &GetInstance() { CreateInstanceIfNeeded(); return *s_instance; }
 
-	static void ReleaseInstance() { delete s_instance; s_instance = NULL; }
+	static void ReleaseInstance() { delete s_instance; s_instance = nullptr; }
 public:
 	std::vector<SDL_Surface *> PaletteList;        /// List of all used palettes.
 	std::vector<ColorIndexRange> ColorIndexRanges; /// List of range of color index for cycling.
@@ -164,7 +164,7 @@ extern void SdlUnlockScreen();      /// Do SDL hardware unlock
 ----------------------------------------------------------------------------*/
 
 CVideo Video;
-/*static*/ CColorCycling *CColorCycling::s_instance = NULL;
+/*static*/ CColorCycling *CColorCycling::s_instance = nullptr;
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 char ForceUseOpenGL;
@@ -376,7 +376,7 @@ void VideoCclRegister()
 */
 void VideoPaletteListAdd(SDL_Surface *surface)
 {
-	if (surface == NULL || surface->format == NULL || surface->format->BytesPerPixel != 1) {
+	if (surface == nullptr || surface->format == nullptr || surface->format->BytesPerPixel != 1) {
 		return;
 	}
 

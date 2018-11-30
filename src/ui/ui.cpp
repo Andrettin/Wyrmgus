@@ -103,14 +103,14 @@ void ShowLoadProgress(const char *fmt, ...)
 		}
 		//Wyrmgus start
 //		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
-		if (loadingBackground == NULL) {
+		if (loadingBackground == nullptr) {
 			Video.FillRectangle(ColorBlack, 0, Video.Height - 18, Video.Width, 18);
 		}
 		//Wyrmgus end
 		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
 		//Wyrmgus start
 //		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
-		if (loadingBackground == NULL) {
+		if (loadingBackground == nullptr) {
 			InvalidateArea(0, Video.Height - 18, Video.Width, 18);
 		} else {
 			InvalidateArea(0, 0, Video.Width, Video.Height);
@@ -202,7 +202,7 @@ CPopup *PopupByIdent(const std::string &ident)
 			return *i;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -238,7 +238,7 @@ void CursorConfig::Load()
 {
 	Assert(!Name.empty());
 	Cursor = CursorByIdent(Name);
-	if (Cursor == NULL) {
+	if (Cursor == nullptr) {
 		return ;
 	}
 	Assert(Name == Cursor->Ident);
@@ -461,7 +461,7 @@ void CleanUserInterface()
 			delete TitleScreens[i];
 		}
 		delete[] TitleScreens;
-		TitleScreens = NULL;
+		TitleScreens = nullptr;
 	}
 }
 
@@ -512,7 +512,7 @@ void FreeButtonStyles()
 **
 **  @param screenPos  pixel coordinate with origin at UL corner of screen
 **
-**  @return viewport pointer or NULL if this pixel is not inside
+**  @return viewport pointer or null if this pixel is not inside
 **  any of the viewports.
 **
 **  @note This functions only works with rectangular viewports, when
@@ -525,7 +525,7 @@ CViewport *GetViewport(const PixelPos &screenPos)
 			return vp;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**

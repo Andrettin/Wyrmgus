@@ -155,7 +155,7 @@ void LoadCursors(const std::string civilization_name)
 */
 CCursor *CursorByIdent(const std::string &ident)
 {
-	CCursor *found_cursor = NULL;
+	CCursor *found_cursor = nullptr;
 	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		CCursor &cursor = **i;
 
@@ -221,7 +221,7 @@ void DrawBuildingCursor()
 	const Vec2i mpos = vp.ScreenToTilePos(CursorScreenPos);
 	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(mpos);
 
-	CUnit *ontop = NULL;
+	CUnit *ontop = nullptr;
 
 	//
 	//  Draw building
@@ -275,7 +275,7 @@ void DrawBuildingCursor()
 
 	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ShieldImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	
-	if (CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightHandImageLayer) != NULL) {
+	if (CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightHandImageLayer) != nullptr) {
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingRightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
@@ -312,16 +312,16 @@ void DrawBuildingCursor()
 		f = 1;
 		for (size_t i = 0; f && i < Selected.size(); ++i) {
 			//Wyrmgus start
-//			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != NULL);
-			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos, UI.CurrentMapLayer->ID)) != NULL);
+//			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != nullptr);
+			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos, UI.CurrentMapLayer->ID)) != nullptr);
 			//Wyrmgus end
-			// Assign ontop or NULL
-			ontop = (ontop == Selected[i] ? NULL : ontop);
+			// Assign ontop or null
+			ontop = (ontop == Selected[i] ? nullptr : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, UI.CurrentMapLayer->ID)) != NULL);
+		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, UI.CurrentMapLayer->ID)) != nullptr);
 		if (!Editor.Running || ontop == (CUnit *)1) {
-			ontop = NULL;
+			ontop = nullptr;
 		}
 	}
 
@@ -382,7 +382,7 @@ void DrawCursor()
 
 	//  Cursor may not exist if we are loading a game or something.
 	//  Only draw it if it exists
-	if (GameCursor == NULL) {
+	if (GameCursor == nullptr) {
 		return;
 	}
 	const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
@@ -412,7 +412,7 @@ void DrawCursor()
 		}
 
 		SDL_Rect srcRect = { Sint16(pos.x), Sint16(pos.y), Uint16(GameCursor->G->getWidth()), Uint16(GameCursor->G->getHeight())};
-		SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, NULL);
+		SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, nullptr);
 	}
 
 	//  Last, Normal cursor.
@@ -435,7 +435,7 @@ void HideCursor()
 		!GameRunning && !Editor.Running && GameCursor) {
 		const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
 		SDL_Rect dstRect = {Sint16(pos.x), Sint16(pos.y), 0, 0 };
-		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);
+		SDL_BlitSurface(HiddenSurface, nullptr, TheScreen, &dstRect);
 	}
 }
 
@@ -478,9 +478,9 @@ void CleanCursors()
 	}
 	AllCursors.clear();
 
-	CursorBuilding = NULL;
-	GameCursor = NULL;
-	UnitUnderCursor = NULL;
+	CursorBuilding = nullptr;
+	GameCursor = nullptr;
+	UnitUnderCursor = nullptr;
 }
 
 /**
@@ -532,7 +532,7 @@ static int CclDefineCursor(lua_State *l)
 	//
 	//  Look if this kind of cursor already exists.
 	//
-	CCursor *ct = NULL;
+	CCursor *ct = nullptr;
 	for (size_t i = 0; i < AllCursors.size(); ++i) {
 		//  Race not same, not found.
 		if (AllCursors[i]->Race != race) {

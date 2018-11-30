@@ -166,7 +166,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 	}
 
 	char *pos;
-	if ((pos = strstr(buf, "~|")) != NULL) {
+	if ((pos = strstr(buf, "~|")) != nullptr) {
 		std::string buf2(buf);
 		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
 	} else if (this->Centered) {
@@ -214,7 +214,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 		}
 	}
 	char *pos;
-	if ((pos = strstr(buf, "~|")) != NULL) {
+	if ((pos = strstr(buf, "~|")) != nullptr) {
 		std::string buf2(buf);
 		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
 	} else if (this->Centered) {
@@ -251,14 +251,14 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 
 				return order.GetWorkerPtr();
 			} else {
-				return NULL;
+				return nullptr;
 			}
 		case UnitRefGoal:
 			return unit.Goal;
 		default:
 			Assert(0);
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**

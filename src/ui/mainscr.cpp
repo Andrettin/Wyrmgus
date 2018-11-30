@@ -303,12 +303,12 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	}
 	//Wyrmgus start
 	if (condition->Affixed != CONDITION_TRUE) {
-		if ((condition->Affixed == CONDITION_ONLY) ^ (unit.Prefix != NULL || unit.Suffix != NULL)) {
+		if ((condition->Affixed == CONDITION_ONLY) ^ (unit.Prefix != nullptr || unit.Suffix != nullptr)) {
 			return false;
 		}
 	}
 	if (condition->Unique != CONDITION_TRUE) {
-		if ((condition->Unique == CONDITION_ONLY) ^ (unit.Unique || unit.Character != NULL)) {
+		if ((condition->Unique == CONDITION_ONLY) ^ (unit.Unique || unit.Character != nullptr)) {
 			return false;
 		}
 	}
@@ -1039,7 +1039,7 @@ void DrawPopups()
 					PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, Map.MapLayers[UnitUnderCursor->MapLayer]);
 					unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);
 					std::string unit_name;
-					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
+					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {
 						if (!UnitUnderCursor->Identified) {
 							unit_name = UnitUnderCursor->GetTypeName() + " (" + _("Unidentified") + ")";
 						} else {
@@ -1059,7 +1059,7 @@ void DrawPopups()
 					ba->Popup = "popup-unit-under-cursor";
 					DrawPopup(*ba, unit_center_pos.x, unit_center_pos.y);
 					delete ba;
-					LastDrawnButtonPopup = NULL;
+					LastDrawnButtonPopup = nullptr;
 				} else if (mf.TerrainFeature) {
 					PixelPos tile_center_pos = Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
 					tile_center_pos = vp->MapToScreenPixelPos(tile_center_pos);
@@ -1091,7 +1091,7 @@ void DrawPopups()
 			ba->Popup = "popup-unit";
 			DrawPopup(*ba, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 			delete ba;
-			LastDrawnButtonPopup = NULL;
+			LastDrawnButtonPopup = nullptr;
 		}
 		
 		if (!(Selected[0]->Player != ThisPlayer && !ThisPlayer->IsAllied(*Selected[0]->Player) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == Selected[0]->Type->ButtonLevelForInventory) {
@@ -1137,7 +1137,7 @@ void DrawPopups()
 					ba->Popup = "popup-item-inventory";
 					DrawPopup(*ba, UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
 					delete ba;
-					LastDrawnButtonPopup = NULL;
+					LastDrawnButtonPopup = nullptr;
 				}
 				++j;
 			}
@@ -1208,7 +1208,7 @@ void DrawPopups()
 			ba->Popup = "popup-resource";
 			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 + GameCursor->G->getHeight() / 2, false);
 			delete ba;
-			LastDrawnButtonPopup = NULL;
+			LastDrawnButtonPopup = nullptr;
 		}
 	}
 	
@@ -1997,7 +1997,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		ba->Popup = "popup-unit";
 		DrawPopup(*ba, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		delete ba;
-		LastDrawnButtonPopup = NULL;
+		LastDrawnButtonPopup = nullptr;
 		//Wyrmgus end
 	}
 	*/
@@ -2029,9 +2029,9 @@ static void InfoPanel_draw_multiple_selection()
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
 			//Wyrmgus start
 			std::string text_color;
-			if (Selected[i]->Unique || Selected[i]->Character != NULL) {
+			if (Selected[i]->Unique || Selected[i]->Character != nullptr) {
 				text_color = "fire";
-			} else if (Selected[i]->Prefix != NULL || Selected[i]->Suffix != NULL) {
+			} else if (Selected[i]->Prefix != nullptr || Selected[i]->Suffix != nullptr) {
 				text_color = "light-blue";
 			}
 //			UI.StatusLine.Set(Selected[i]->Type->Name);
@@ -2067,7 +2067,7 @@ void CInfoPanel::Draw()
 	} else {
 		switch (Selected.size()) {
 			case 0: { InfoPanel_draw_no_selection(); break; }
-			case 1: { InfoPanel_draw_single_selection(NULL); break; }
+			case 1: { InfoPanel_draw_single_selection(nullptr); break; }
 			default: { InfoPanel_draw_multiple_selection(); break; }
 		}
 	}

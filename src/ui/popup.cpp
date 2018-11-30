@@ -474,7 +474,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	//Wyrmgus end
 	std::string text = EvalString(this->Text);
 	//Wyrmgus start
-//	TriggerData.Type = NULL;
+//	TriggerData.Type = nullptr;
 	button.CleanTriggerData();
 	//Wyrmgus end
 	return font.getWidth(text);
@@ -506,7 +506,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		//Wyrmgus end
 		text = EvalString(this->Text);
 		//Wyrmgus start
-//		TriggerData.Type = NULL;
+//		TriggerData.Type = nullptr;
 		button.CleanTriggerData();
 		//Wyrmgus end
 		if (this->Centered) {
@@ -542,13 +542,13 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 				UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value
 				&& this->Index != HITPOINTHEALING_INDEX
 				&& UnitManager.GetSlotUnit(button.Value).Container
-				&& (UnitManager.GetSlotUnit(button.Value).Container->CanEquipItem(&UnitManager.GetSlotUnit(button.Value)) || UnitManager.GetSlotUnit(button.Value).Work != NULL || UnitManager.GetSlotUnit(button.Value).Elixir != NULL)
+				&& (UnitManager.GetSlotUnit(button.Value).Container->CanEquipItem(&UnitManager.GetSlotUnit(button.Value)) || UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr)
 			) {
 				value = UnitManager.GetSlotUnit(button.Value).Container->GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
 				if (value >= 0) {
 					x += label.Draw(x, y, "+");
 				}
-			} else if (UnitManager.GetSlotUnit(button.Value).Work != NULL || UnitManager.GetSlotUnit(button.Value).Elixir != NULL) {
+			} else if (UnitManager.GetSlotUnit(button.Value).Work != nullptr || UnitManager.GetSlotUnit(button.Value).Elixir != nullptr) {
 				value = UnitManager.GetSlotUnit(button.Value).GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
 				if (value >= 0) {
 					x += label.Draw(x, y, "+");
@@ -820,8 +820,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	int minHeight = 0;
 	std::string textColor("white");
 	std::string highColor("red");
-	CPopupContentType *content = NULL;
-	PopupConditionPanel *condition = NULL;
+	CPopupContentType *content = nullptr;
+	PopupConditionPanel *condition = nullptr;
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
@@ -876,7 +876,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 
 CPopup::CPopup() :
 	Contents(), MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0),
-	DefaultFont(NULL), BackgroundColor(ColorBlue), BorderColor(ColorWhite)
+	DefaultFont(nullptr), BackgroundColor(ColorBlue), BorderColor(ColorWhite)
 {}
 
 CPopup::~CPopup()

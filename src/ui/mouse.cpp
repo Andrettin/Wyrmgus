@@ -117,7 +117,7 @@ CUnit *GetUnitUnderCursor()
 */
 void CancelBuildingMode()
 {
-	CursorBuilding = NULL;
+	CursorBuilding = nullptr;
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = 0;
@@ -144,7 +144,7 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 {
 	CUnit &unit = *Selected[0];
 
-	if (unit.Player->Index != PlayerNumNeutral || dest == NULL
+	if (unit.Player->Index != PlayerNumNeutral || dest == nullptr
 		|| !(dest->Player == ThisPlayer || dest->IsTeamed(*ThisPlayer))) {
 		return;
 	}
@@ -175,7 +175,7 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &acknowledged)
 {
 	//  Enter transporters ?
-	if (dest == NULL) {
+	if (dest == nullptr) {
 		return false;
 	}
 	// dest is the transporter
@@ -403,7 +403,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	const CUnitType &type = *unit.Type;
 
 	// Go and repair
-	if (type.RepairRange && dest != NULL
+	if (type.RepairRange && dest != nullptr
 		&& dest->Type->RepairHP
 		//Wyrmgus start
 //		&& dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
@@ -423,7 +423,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	// Harvest
 	if (type.BoolFlag[HARVESTER_INDEX].value) {
-		if (dest != NULL) {
+		if (dest != nullptr) {
 			if (DoRightButton_Harvest_Unit(unit, *dest, flush, acknowledged)) {
 				return true;
 			}
@@ -439,7 +439,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	
 	// Pick up an item
-	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit
 		&& CanPickUp(unit, *dest)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
@@ -451,7 +451,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	
 	// Go through a connector
-	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && unit.CanUseItem(dest)) {
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && unit.CanUseItem(dest)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
@@ -463,7 +463,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	
 	//Wyrmgus start
 	//if the clicked unit is a settlement site, build on it
-	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
 		for (size_t z = 0; z < UnitTypes.size(); ++z) {
 			if (UnitTypes[z] && UnitTypes[z]->BoolFlag[TOWNHALL_INDEX].value && CheckDependByType(*unit.Player, *UnitTypes[z]) && CanBuildUnitType(&unit, *UnitTypes[z], dest->tilePos, 1, false, dest->MapLayer)) {
 				if (UnitTypes[z]->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[UnitTypes[z]->Slot].begin(), AiHelpers.Build[UnitTypes[z]->Slot].end(), unit.Type) != AiHelpers.Build[UnitTypes[z]->Slot].end()) {
@@ -480,7 +480,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	//Wyrmgus end
 	// Follow another unit
-	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit
 		//Wyrmgus start
 //		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->Index == PlayerNumNeutral)) {
 		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || (dest->Player->Index == PlayerNumNeutral && !unit.IsEnemy(*dest) && !dest->Type->BoolFlag[OBSTACLE_INDEX].value))) {
@@ -505,7 +505,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	//Wyrmgus start
 	// make workers attack enemy units if those are right-clicked upon
-	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && unit.CurrentAction() != UnitActionBuilt && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
+	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && unit.CurrentAction() != UnitActionBuilt && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAttack);
@@ -621,7 +621,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 
 static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
 {
-	if (dest != NULL && unit.CurrentAction() != UnitActionBuilt) {
+	if (dest != nullptr && unit.CurrentAction() != UnitActionBuilt) {
 		if (DoRightButton_AttackUnit(unit, *dest, pos, flush, acknowledged)) {
 			return;
 		}
@@ -784,7 +784,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 {
 	// Go and harvest from a unit
 	//Wyrmgus start
-//	if (dest != NULL && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
+//	if (dest != nullptr && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
 //		&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
 	if (unit.CanHarvest(dest)) {
 		//Wyrmgus end
@@ -915,14 +915,14 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	}
 
 	// FIXME: attack/follow/board ...
-	if (dest != NULL && (action == MouseActionMove || action == MouseActionSail)) {
+	if (dest != nullptr && (action == MouseActionMove || action == MouseActionSail)) {
 		if (DoRightButton_Follow(unit, *dest, flush, acknowledged)) {
 			return;
 		}
 	}
 
 	// Manage harvester from the destination side.
-	if (dest != NULL && dest->Type->BoolFlag[HARVESTER_INDEX].value) {
+	if (dest != nullptr && dest->Type->BoolFlag[HARVESTER_INDEX].value) {
 		if (DoRightButton_Harvest_Reverse(unit, *dest, flush, acknowledged)) {
 			return;
 		}
@@ -958,10 +958,10 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	const Vec2i pos = Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID);
 	CUnit *dest;            // unit under the cursor if any.
 
-	if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
+	if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 		dest = UnitUnderCursor;
 	} else {
-		dest = NULL;
+		dest = nullptr;
 	}
 
 	//  Unit selected isn't owned by the player.
@@ -972,7 +972,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 		return;
 	}
 
-	if (dest != NULL && dest->Type->CanTransport()) {
+	if (dest != nullptr && dest->Type->CanTransport()) {
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (CanTransport(*dest, *Selected[i])) {
 				// We are clicking on a transporter. We have to:
@@ -1372,7 +1372,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		return;
 	}
 
-	UnitUnderCursor = NULL;
+	UnitUnderCursor = nullptr;
 	GameCursor = UI.Point.Cursor;  // Reset
 	HandleMouseOn(cursorPos);
 
@@ -1431,8 +1431,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
-	if (UI.MouseViewport == NULL) {
-		fprintf(stderr, "Mouse viewport pointer is NULL.\n");
+	if (UI.MouseViewport == nullptr) {
+		fprintf(stderr, "Mouse viewport pointer is null.\n");
 	}
 	
 	if (CursorOn == CursorOnMap && UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
@@ -1549,9 +1549,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	}
 
 	// NOTE: If unit is not selectable as a goal, you can't get a cursor hint
-	if (UnitUnderCursor != NULL && !UnitUnderCursor->IsVisibleAsGoal(*ThisPlayer) &&
+	if (UnitUnderCursor != nullptr && !UnitUnderCursor->IsVisibleAsGoal(*ThisPlayer) &&
 		!ReplayRevealMap) {
-		UnitUnderCursor = NULL;
+		UnitUnderCursor = nullptr;
 	}
 
 	//  Selecting target.
@@ -1562,7 +1562,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			} else {
 				GameCursor = UI.YellowHair.Cursor;
 			}
-			if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
+			if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				if (UnitUnderCursor->Player == ThisPlayer ||
 					ThisPlayer->IsAllied(*UnitUnderCursor)) {
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
@@ -1600,7 +1600,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	//  Cursor pointing.
 	if (CursorOn == CursorOnMap) {
 		//  Map
-		if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value
+		if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value
 			&& (UnitUnderCursor->IsVisible(*ThisPlayer) || ReplayRevealMap)) {
 			//Wyrmgus start
 //			GameCursor = UI.Glass.Cursor;
@@ -1732,10 +1732,10 @@ static int SendMove(const Vec2i &tilePos, int flush)
 				}
 			}
 			if (i == Selected.size()) {
-				goal = NULL;
+				goal = nullptr;
 			}
 		} else {
-			goal = NULL;
+			goal = nullptr;
 		}
 
 		for (size_t i = 0; i != Selected.size(); ++i) {
@@ -1785,7 +1785,7 @@ static int SendAttack(const Vec2i &tilePos, int flush)
 	int ret = 0;
 
 	if (dest && dest->Type->BoolFlag[DECORATION_INDEX].value) {
-		dest = NULL;
+		dest = nullptr;
 	}
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
@@ -2050,10 +2050,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
 			ExitFatal(1);
 		}
-		//Wyrmgus start
-//		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? NULL : dest , CursorValue, flush);
-		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? NULL : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
-		//Wyrmgus end
+		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? nullptr : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
 		ret = 1;
 	}
 	return ret;
@@ -2403,7 +2400,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 	}
 
 	if (MouseButtons & UI.PieMenu.MouseButton) { // enter pie menu
-		UnitUnderCursor = NULL;
+		UnitUnderCursor = nullptr;
 		GameCursor = UI.Point.Cursor;  // Reset
 		CursorStartScreenPos = CursorScreenPos;
 		if (!Selected.empty() && Selected[0]->Player == ThisPlayer && CursorState == CursorStatePoint) {
@@ -2421,8 +2418,8 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 			//Wyrmgus start
-//			if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos, -1))
-			if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos, -1, UI.CurrentMapLayer->ID))
+//			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, -1))
+			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, -1, UI.CurrentMapLayer->ID))
 			//Wyrmgus end
 				&& !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				unit->Blink = 4;                // if right click on building -- blink
@@ -2448,7 +2445,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		CursorStartScreenPos = CursorScreenPos;
 		GameCursor = UI.Scroll.Cursor;
 		//Wyrmgus start
-		UnitUnderCursor = NULL;
+		UnitUnderCursor = nullptr;
 		//Wyrmgus end
 	}
 }
@@ -2626,7 +2623,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && Selected.size() == 1) {
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 			if (UI.SelectedViewport->Unit == Selected[0]) {
-				UI.SelectedViewport->Unit = NULL;
+				UI.SelectedViewport->Unit = nullptr;
 			} else {
 				UI.SelectedViewport->Unit = Selected[0];
 			}
@@ -2656,10 +2653,10 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 				} else if ((1 << button) == RightButton) {
 					std::string encyclopedia_ident = Selected[0]->Type->Ident;
 					std::string encyclopedia_state = "units";
-					if (Selected[0]->Character != NULL && !Selected[0]->Character->Icon.Name.empty() && !Selected[0]->Character->Custom) {
+					if (Selected[0]->Character != nullptr && !Selected[0]->Character->Icon.Name.empty() && !Selected[0]->Character->Custom) {
 						encyclopedia_ident = Selected[0]->Character->Ident;
 						encyclopedia_state = "heroes";
-					} else if (Selected[0]->Unique != NULL) {
+					} else if (Selected[0]->Unique != nullptr) {
 						encyclopedia_ident = Selected[0]->Unique->Ident;
 						encyclopedia_state = "unique_items";
 					}
@@ -2667,7 +2664,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 				} else if ((1 << button) == MiddleButton) {
 					//  clicked on info panel - single unit shown
 					if (UI.SelectedViewport->Unit == Selected[0]) {
-						UI.SelectedViewport->Unit = NULL;
+						UI.SelectedViewport->Unit = nullptr;
 					} else {
 						UI.SelectedViewport->Unit = Selected[0];
 					}
@@ -3148,7 +3145,7 @@ void UIHandleButtonUp(unsigned button)
 			// cade: cannot select unit on invisible space
 			// FIXME: johns: only complete invisibile units
 			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
-			CUnit *unit = NULL;
+			CUnit *unit = nullptr;
 			//Wyrmgus start
 //			if (ReplayRevealMap || Map.Field(cursorTilePos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
 			if (ReplayRevealMap || Map.Field(cursorTilePos, UI.CurrentMapLayer->ID)->playerInfo.IsTeamVisible(*ThisPlayer)) {

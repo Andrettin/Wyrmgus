@@ -118,7 +118,7 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 	}
 #endif
 
@@ -138,7 +138,7 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 
 	mng->surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
 										8 * 3, Rmask, Gmask, Bmask, 0);
-	if (mng->surface == NULL) {
+	if (mng->surface == nullptr) {
 		fprintf(stderr, "Out of memory");
 		exit(1);
 	}
@@ -210,7 +210,7 @@ static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
 
 
 Mng::Mng() :
-	name(NULL), fd(NULL), handle(NULL), surface(NULL), buffer(NULL),
+	name(nullptr), fd(nullptr), handle(nullptr), surface(nullptr), buffer(nullptr),
 	ticks(0), iteration(0)
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -299,7 +299,7 @@ void Mng::Draw(int x, int y)
 #endif
 	{
 		SDL_Rect rect = {(Sint16)x, (Sint16)y, (Uint16)surface->w, (Uint16)surface->h};
-		SDL_BlitSurface(surface, NULL, TheScreen, &rect);
+		SDL_BlitSurface(surface, nullptr, TheScreen, &rect);
 	}
 }
 

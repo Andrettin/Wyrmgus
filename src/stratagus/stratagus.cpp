@@ -692,7 +692,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 {
 	HANDLE hFile = CreateFile("crash.dmp", GENERIC_READ | GENERIC_WRITE,    FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
-		NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,     NULL);
+		NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	MINIDUMP_EXCEPTION_INFORMATION mei;
 	mei.ThreadId = GetCurrentThreadId();
 	mei.ClientPointers = TRUE;
@@ -733,7 +733,7 @@ int stratagusMain(int argc, char **argv)
 	// Look for the specified data set inside the application bundle
 	// This should be a subdir of the Resources directory
 	CFURLRef pluginRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(),
-												 CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
+												 CFSTR(MAC_BUNDLE_DATADIR), nullptr, nullptr);
 	CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef,  kCFURLPOSIXPathStyle);
 	const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
 	Assert(pathPtr);
@@ -789,7 +789,7 @@ int stratagusMain(int argc, char **argv)
 	}
 
 #ifndef DEBUG			// For debug it's better not to have:
-	srand(time(NULL));	// Random counter = random each start
+	srand(time(nullptr));	// Random counter = random each start
 #endif
 
 	//  Show title screens.
@@ -800,7 +800,7 @@ int stratagusMain(int argc, char **argv)
 	ShowTitleScreens();
 
 	// Init player data
-	ThisPlayer = NULL;
+	ThisPlayer = nullptr;
 	//Don't clear the Players structure as it would erase the allowed units.
 	// memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;

@@ -84,7 +84,7 @@ CFont &GetSmallFont()
 
 bool IsGameFontReady()
 {
-	return GameFont != NULL || CFont::Get("game") != NULL;
+	return GameFont != nullptr || CFont::Get("game") != nullptr;
 }
 
 CFont &GetGameFont()
@@ -677,7 +677,7 @@ int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
 **
 **  @param s       original string.
 **  @param c       character to find.
-**  @param maxlen  size limit of the search. (0 means unlimited). (in char if font == NULL else in pixels).
+**  @param maxlen  size limit of the search. (0 means unlimited). (in char if font == null else in pixels).
 **  @param font    if specified use font->Width() instead of strlen.
 **
 **  @return computed value.
@@ -724,7 +724,7 @@ static int strchrlen(const std::string &s, char c, unsigned int maxlen, const CF
 **
 **  @param line    line number.
 **  @param s       multiline string.
-**  @param maxlen  max length of the string (0 : unlimited) (in char if font == NULL else in pixels).
+**  @param maxlen  max length of the string (0 : unlimited) (in char if font == null else in pixels).
 **  @param font    if specified use font->Width() instead of strlen.
 **
 **  @return computed value.
@@ -964,12 +964,12 @@ void ReloadFonts()
 	std::map<std::string, CFont *>::iterator it = Fonts.find(ident);
 	if (it == Fonts.end()) {
 		DebugPrint("font not found: %s\n" _C_ ident.c_str());
-		return NULL;
+		return nullptr;
 	}
 	CFont *font = it->second;
-	if (font == NULL) {
+	if (font == nullptr) {
 		DebugPrint("font not found: %s\n" _C_ ident.c_str());
-		return NULL;
+		return nullptr;
 	}
 	return font;
 }
@@ -994,7 +994,7 @@ CFontColor::~CFontColor()
 {
 	CFontColor *&fc = FontColors[ident];
 
-	if (fc == NULL) {
+	if (fc == nullptr) {
 		fc = new CFontColor(ident);
 	}
 	return fc;
@@ -1060,8 +1060,8 @@ void CleanFonts()
 	}
 	FontColors.clear();
 
-	SmallFont = NULL;
-	GameFont = NULL;
+	SmallFont = nullptr;
+	GameFont = nullptr;
 }
 
 //@}

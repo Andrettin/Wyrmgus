@@ -80,7 +80,7 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 class AutoPng_read_structp
 {
 public:
-	explicit AutoPng_read_structp(png_structp png_ptr) : png_ptr(png_ptr), info_ptr(NULL) {}
+	explicit AutoPng_read_structp(png_structp png_ptr) : png_ptr(png_ptr), info_ptr(nullptr) {}
 	~AutoPng_read_structp() { png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : (png_infopp)0, (png_infopp)0); }
 	void setInfo(png_infop info_ptr) { this->info_ptr = info_ptr; }
 private:
@@ -113,8 +113,8 @@ int LoadGraphicPNG(CGraphic *g)
 	}
 
 	// Create the PNG loading context structure
-	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (png_ptr == NULL) {
+	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+	if (png_ptr == nullptr) {
 		fprintf(stderr, "Couldn't allocate memory for PNG file");
 		return -1;
 	}
@@ -123,7 +123,7 @@ int LoadGraphicPNG(CGraphic *g)
 
 	// Allocate/initialize the memory for image information.  REQUIRED.
 	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == NULL) {
+	if (info_ptr == nullptr) {
 		fprintf(stderr, "Couldn't create image information for PNG file");
 		return -1;
 	}
@@ -150,7 +150,7 @@ int LoadGraphicPNG(CGraphic *g)
 
 	png_read_info(png_ptr, info_ptr);
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth,
-				 &color_type, &interlace_type, NULL, NULL);
+				 &color_type, &interlace_type, nullptr, nullptr);
 
 	/* tell libpng to strip 16 bit/color files down to 8 bits/color */
 	png_set_strip_16(png_ptr) ;
@@ -168,7 +168,7 @@ int LoadGraphicPNG(CGraphic *g)
 	/* For images with a single "transparent colour", set colour key;
 	 if more than one index has transparency, or if partially transparent
 	 entries exist, use full alpha channel */
-	png_color_16 *transv = NULL;
+	png_color_16 *transv = nullptr;
 	volatile int ckey = -1;
 
 	if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) {
@@ -209,7 +209,7 @@ int LoadGraphicPNG(CGraphic *g)
 	png_read_update_info(png_ptr, info_ptr);
 
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth,
-				 &color_type, &interlace_type, NULL, NULL);
+				 &color_type, &interlace_type, nullptr, nullptr);
 
 	/* Allocate the SDL surface to hold the image */
 	Uint32 Rmask = 0;
@@ -234,7 +234,7 @@ int LoadGraphicPNG(CGraphic *g)
 	SDL_Surface *surface =
 		SDL_AllocSurface(SDL_SWSURFACE, width, height,
 						 bit_depth * png_get_channels(png_ptr, info_ptr), Rmask, Gmask, Bmask, Amask);
-	if (surface == NULL) {
+	if (surface == nullptr) {
 		fprintf(stderr, "Out of memory");
 		return -1;
 	}
@@ -302,20 +302,20 @@ int LoadGraphicPNG(CGraphic *g)
 void SaveScreenshotPNG(const char *name)
 {
 	FILE *fp = fopen(name, "wb");
-	if (fp == NULL) {
+	if (fp == nullptr) {
 		return;
 	}
 
-	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (png_ptr == NULL) {
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+	if (png_ptr == nullptr) {
 		fclose(fp);
 		return;
 	}
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == NULL) {
+	if (info_ptr == nullptr) {
 		fclose(fp);
-		png_destroy_write_struct(&png_ptr, NULL);
+		png_destroy_write_struct(&png_ptr, nullptr);
 		return;
 	}
 
@@ -423,20 +423,20 @@ void SaveScreenshotPNG(const char *name)
 void SaveMapPNG(const char *name)
 {
 	FILE *fp = fopen(name, "wb");
-	if (fp == NULL) {
+	if (fp == nullptr) {
 		return;
 	}
 
-	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (png_ptr == NULL) {
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+	if (png_ptr == nullptr) {
 		fclose(fp);
 		return;
 	}
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == NULL) {
+	if (info_ptr == nullptr) {
 		fclose(fp);
-		png_destroy_write_struct(&png_ptr, NULL);
+		png_destroy_write_struct(&png_ptr, nullptr);
 		return;
 	}
 
@@ -547,20 +547,20 @@ void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overl
 	}
 	
 	FILE *fp = fopen(name, "wb");
-	if (fp == NULL) {
+	if (fp == nullptr) {
 		return;
 	}
 
-	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (png_ptr == NULL) {
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+	if (png_ptr == nullptr) {
 		fclose(fp);
 		return;
 	}
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == NULL) {
+	if (info_ptr == nullptr) {
 		fclose(fp);
-		png_destroy_write_struct(&png_ptr, NULL);
+		png_destroy_write_struct(&png_ptr, nullptr);
 		return;
 	}
 
@@ -602,7 +602,7 @@ void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overl
 			
 			for (unsigned int i = 0; i < line_str.length(); ++i) {
 				std::string terrain_character = line_str.substr(i, 1);
-				CTerrainType *terrain = NULL;
+				CTerrainType *terrain = nullptr;
 				if (CTerrainType::TerrainTypesByCharacter.find(terrain_character) != CTerrainType::TerrainTypesByCharacter.end()) {
 					terrain = CTerrainType::TerrainTypesByCharacter.find(terrain_character)->second;
 				}

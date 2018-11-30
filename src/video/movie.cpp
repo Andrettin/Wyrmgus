@@ -221,11 +221,11 @@ int PlayMovie(const std::string &name)
 	}
 #endif
 
-	SDL_FillRect(SDL_GetVideoSurface(), NULL, 0);
+	SDL_FillRect(SDL_GetVideoSurface(), nullptr, 0);
 	Video.ClearScreen();
 	SDL_Overlay *yuv_overlay = SDL_CreateYUVOverlay(data.tinfo.frame_width, data.tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
 
-	if (yuv_overlay == NULL) {
+	if (yuv_overlay == nullptr) {
 		fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
 		OggFree(&data);
 		f.close();

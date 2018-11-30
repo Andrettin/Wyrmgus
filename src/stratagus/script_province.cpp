@@ -71,7 +71,7 @@ static int CclDefineWorldMapTerrainType(lua_State *l)
 
 	std::string terrain_name = LuaToString(l, 1);
 	int terrain_id = GetWorldMapTerrainTypeId(terrain_name);
-	CWorldMapTerrainType *terrain_type = NULL;
+	CWorldMapTerrainType *terrain_type = nullptr;
 	if (terrain_id == -1) {
 		terrain_type = new CWorldMapTerrainType;
 		terrain_type->Name = terrain_name;
@@ -276,7 +276,7 @@ static int CclDefineProvince(lua_State *l)
 		
 		if (!strcmp(value, "World")) {
 			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
-			if (world != NULL) {
+			if (world != nullptr) {
 				province->World = world;
 				world->Provinces.push_back(province);
 			} else {
@@ -342,7 +342,7 @@ static int CclDefineProvince(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CRegion *region = GetRegion(LuaToString(l, -1, j + 1));
-				if (region == NULL) {
+				if (region == nullptr) {
 					LuaError(l, "Region doesn't exist.");
 				}
 				province->Regions.push_back(region);
@@ -365,7 +365,7 @@ static int CclDefineProvince(lua_State *l)
 					}
 					province->HistoricalOwners[year] = PlayerRaces.Factions[owner_faction];
 				} else {
-					province->HistoricalOwners[year] = NULL;
+					province->HistoricalOwners[year] = nullptr;
 				}
 			}
 		} else if (!strcmp(value, "HistoricalClaims")) {
@@ -437,7 +437,7 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				std::string upgrade_ident = LuaToString(l, -1, j + 1);
 				CUpgrade *modifier = CUpgrade::Get(upgrade_ident);
-				if (modifier == NULL) {
+				if (modifier == nullptr) {
 					LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 				}
 				++j;
@@ -448,7 +448,7 @@ static int CclDefineProvince(lua_State *l)
 		}
 	}
 	
-	if (province->World == NULL) {
+	if (province->World == nullptr) {
 		LuaError(l, "Province \"%s\" is not assigned to any world." _C_ province->Name.c_str());
 	}
 	
@@ -480,7 +480,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 		
 		if (!strcmp(value, "World")) {
 			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
-			if (world != NULL) {
+			if (world != nullptr) {
 				tile->World = world;
 			} else {
 				LuaError(l, "World doesn't exist.");
@@ -668,7 +668,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 					}
 					tile->HistoricalOwners[year] = PlayerRaces.Factions[owner_faction];
 				} else {
-					tile->HistoricalOwners[year] = NULL;
+					tile->HistoricalOwners[year] = nullptr;
 				}
 			}
 		} else if (!strcmp(value, "HistoricalClaims")) {
@@ -692,7 +692,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 		}
 	}
 	
-	if (tile->World == NULL) {
+	if (tile->World == nullptr) {
 		LuaError(l, "Tile (%d, %d) is not assigned to any world." _C_ tile->Position.x _C_ tile->Position.y);
 	}
 	
@@ -829,7 +829,7 @@ static int CclGetProvinceData(lua_State *l)
 		lua_pushstring(l, province->Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
-		if (province->World != NULL) {
+		if (province->World != nullptr) {
 			lua_pushstring(l, province->World->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");

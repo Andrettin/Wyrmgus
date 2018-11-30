@@ -144,23 +144,23 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *
 		SDL_UnlockSurface(dst);
 		SDL_BlitSurface(dst, &srect, TheScreen, &drect);
 
-		unsigned char *src_pixels = NULL;
+		unsigned char *src_pixels = nullptr;
 
 		if (src->flags & SDL_PREALLOC) {
 			src_pixels = (unsigned char *)src->pixels;
 		}
 		SDL_FreeSurface(src);
 		delete[] src_pixels;
-		src = NULL;
+		src = nullptr;
 
-		unsigned char *dst_pixels = NULL;
+		unsigned char *dst_pixels = nullptr;
 
 		if (dst->flags & SDL_PREALLOC) {
 			dst_pixels = (unsigned char *)dst->pixels;
 		}
 		SDL_FreeSurface(dst);
 		delete[] dst_pixels;
-		dst = NULL;
+		dst = nullptr;
 		*/
 		//Wyrmgus end
 	}
@@ -465,7 +465,7 @@ void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped,
 		return;
 	}
 #endif
-	SDL_Surface *surface = NULL;
+	SDL_Surface *surface = nullptr;
 	if (time_of_day == 1) {
 		if (flipped) {
 			surface = PlayerColorSurfacesDawnFlip[player_color];
@@ -685,7 +685,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 		//Wyrmgus start
 //		GraphicPlayerPixels(Players[player], *this);
 
-		SDL_Surface *surface = NULL;
+		SDL_Surface *surface = nullptr;
 		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorSurfaces[player]) {
 				MakePlayerColorSurface(player, false, NoTimeOfDay);
@@ -770,7 +770,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 		//Wyrmgus start
 //		GraphicPlayerPixels(Players[player], *this);
 
-		SDL_Surface *surface = NULL;
+		SDL_Surface *surface = nullptr;
 		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorSurfaces[player]) {
 				MakePlayerColorSurface(player, false, NoTimeOfDay);
@@ -859,7 +859,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 		//Wyrmgus start
 //		GraphicPlayerPixels(Players[player], *this);
 
-		SDL_Surface *surface = NULL;
+		SDL_Surface *surface = nullptr;
 		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorSurfacesFlip[player]) {
 				MakePlayerColorSurface(player, true, NoTimeOfDay);
@@ -1137,7 +1137,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 		//Wyrmgus start
 //		GraphicPlayerPixels(Players[player], *this);
 
-		SDL_Surface *surface = NULL;
+		SDL_Surface *surface = nullptr;
 		if (ignore_time_of_day || !UI.CurrentMapLayer->TimeOfDay || UI.CurrentMapLayer->TimeOfDay == MorningTimeOfDay || UI.CurrentMapLayer->TimeOfDay == MiddayTimeOfDay || UI.CurrentMapLayer->TimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorSurfacesFlip[player]) {
 				MakePlayerColorSurface(player, true, NoTimeOfDay);
@@ -1187,7 +1187,7 @@ CGraphic *CGraphic::New(const std::string &filename, int w, int h)
 
 	const std::string file = LibraryFileName(filename.c_str());
 	CGraphic *&g = GraphicHash[file];
-	if (g == NULL) {
+	if (g == nullptr) {
 		g = new CGraphic;
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
@@ -1223,7 +1223,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w
 
 	const std::string file = LibraryFileName(filename.c_str());
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
-	if (g == NULL) {
+	if (g == nullptr) {
 		g = new CPlayerColorGraphic;
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
@@ -1328,7 +1328,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int 
 CGraphic *CGraphic::Get(const std::string &filename)
 {
 	if (filename.empty()) {
-		return NULL;
+		return nullptr;
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
@@ -1347,7 +1347,7 @@ CGraphic *CGraphic::Get(const std::string &filename)
 CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 {
 	if (filename.empty()) {
-		return NULL;
+		return nullptr;
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
@@ -1365,7 +1365,7 @@ void CGraphic::GenFramesMap()
 	} else
 #endif
 	{
-		Assert(Surface != NULL);
+		Assert(Surface != nullptr);
 	}
 	Assert(Width != 0);
 	Assert(Height != 0);
@@ -1509,7 +1509,7 @@ static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
 	}
 	SDL_UnlockSurface(Surface);
 	
-	FileWriter *fw = NULL;
+	FileWriter *fw = nullptr;
 	std::string map_filename = "scripts/map_templates/new.map";
 
 	try {
@@ -1613,7 +1613,7 @@ static void FreeSurface(SDL_Surface **surface)
 	}
 	VideoPaletteListRemove(*surface);
 
-	unsigned char *pixels = NULL;
+	unsigned char *pixels = nullptr;
 
 	if ((*surface)->flags & SDL_PREALLOC) {
 		pixels = (unsigned char *)(*surface)->pixels;
@@ -1621,7 +1621,7 @@ static void FreeSurface(SDL_Surface **surface)
 
 	SDL_FreeSurface(*surface);
 	delete[] pixels;
-	*surface = NULL;
+	*surface = nullptr;
 }
 
 /**
@@ -1699,7 +1699,7 @@ void CGraphic::Free(CGraphic *g)
 
 		FreeSurface(&g->Surface);
 		delete[] g->frame_map;
-		g->frame_map = NULL;
+		g->frame_map = nullptr;
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		if (!UseOpenGL)
@@ -1707,7 +1707,7 @@ void CGraphic::Free(CGraphic *g)
 		{
 			FreeSurface(&g->SurfaceFlip);
 			delete[] g->frameFlip_map;
-			g->frameFlip_map = NULL;
+			g->frameFlip_map = nullptr;
 			
 			//Wyrmgus start
 			if (g->DawnSurface) {
@@ -1830,23 +1830,23 @@ void ReloadGraphics()
 	for (i = Graphics.begin(); i != Graphics.end(); ++i) {
 		if ((*i)->Textures) {
 			delete[](*i)->Textures;
-			(*i)->Textures = NULL;
+			(*i)->Textures = nullptr;
 			MakeTexture(*i);
 		}
 		//Wyrmgus start
 		if ((*i)->TexturesDawn) {
 			delete[](*i)->TexturesDawn;
-			(*i)->TexturesDawn = NULL;
+			(*i)->TexturesDawn = nullptr;
 			MakeTexture(*i, 1);
 		}
 		if ((*i)->TexturesDusk) {
 			delete[](*i)->TexturesDusk;
-			(*i)->TexturesDusk = NULL;
+			(*i)->TexturesDusk = nullptr;
 			MakeTexture(*i, 5);
 		}
 		if ((*i)->TexturesNight) {
 			delete[](*i)->TexturesNight;
-			(*i)->TexturesNight = NULL;
+			(*i)->TexturesNight = nullptr;
 			MakeTexture(*i, 7);
 		}
 		//Wyrmgus end
@@ -1858,22 +1858,22 @@ void ReloadGraphics()
 			//Wyrmgus end
 				if (cg->PlayerColorTextures[j]) {
 					delete[] cg->PlayerColorTextures[j];
-					cg->PlayerColorTextures[j] = NULL;
+					cg->PlayerColorTextures[j] = nullptr;
 					MakePlayerColorTexture(cg, j, NoTimeOfDay);
 				}
 				if (cg->PlayerColorTexturesDawn[j]) {
 					delete[] cg->PlayerColorTexturesDawn[j];
-					cg->PlayerColorTexturesDawn[j] = NULL;
+					cg->PlayerColorTexturesDawn[j] = nullptr;
 					MakePlayerColorTexture(cg, j, 1);
 				}
 				if (cg->PlayerColorTexturesDusk[j]) {
 					delete[] cg->PlayerColorTexturesDusk[j];
-					cg->PlayerColorTexturesDusk[j] = NULL;
+					cg->PlayerColorTexturesDusk[j] = nullptr;
 					MakePlayerColorTexture(cg, j, 5);
 				}
 				if (cg->PlayerColorTexturesNight[j]) {
 					delete[] cg->PlayerColorTexturesNight[j];
-					cg->PlayerColorTexturesNight[j] = NULL;
+					cg->PlayerColorTexturesNight[j] = nullptr;
 					MakePlayerColorTexture(cg, j, 7);
 				}
 				//Wyrmgus end
@@ -1881,7 +1881,7 @@ void ReloadGraphics()
 				/*
 				if (cg->PlayerColorTextures[j]) {
 					delete[] cg->PlayerColorTextures[j];
-					cg->PlayerColorTextures[j] = NULL;
+					cg->PlayerColorTextures[j] = nullptr;
 					MakePlayerColorTexture(cg, j);
 				}
 				*/
@@ -2390,8 +2390,8 @@ void MakeTexture(CGraphic *g, int time_of_day)
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	MakeTextures(g, 0, NULL);
-	MakeTextures(g, 0, NULL, time_of_day);
+//	MakeTextures(g, 0, nullptr);
+	MakeTextures(g, 0, nullptr, time_of_day);
 	//Wyrmgus end
 }
 
@@ -2568,7 +2568,7 @@ void CGraphic::Resize(int w, int h)
 	if (UseOpenGL && Textures) {
 		glDeleteTextures(NumTextures, Textures);
 		delete[] Textures;
-		Textures = NULL;
+		Textures = nullptr;
 		MakeTexture(this);
 	}
 #endif
@@ -2590,32 +2590,32 @@ void CGraphic::SetOriginalSize()
 	
 	if (Surface) {
 		FreeSurface(&Surface);
-		Surface = NULL;
+		Surface = nullptr;
 	}
 	delete[] frame_map;
-	frame_map = NULL;
+	frame_map = nullptr;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!UseOpenGL)
 #endif
 	{
 		if (SurfaceFlip) {
 			FreeSurface(&SurfaceFlip);
-			SurfaceFlip = NULL;
+			SurfaceFlip = nullptr;
 		}
 		delete[] frameFlip_map;
-		frameFlip_map = NULL;
+		frameFlip_map = nullptr;
 	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL && Textures) {
 		glDeleteTextures(NumTextures, Textures);
 		delete[] Textures;
-		Textures = NULL;
+		Textures = nullptr;
 	}
 #endif
 
 	this->Width = this->Height = 0;
-	this->Surface = NULL;
+	this->Surface = nullptr;
 	this->Load();
 
 	Resized = false;
@@ -2675,7 +2675,7 @@ SDL_Surface *CGraphic::SetTimeOfDay(int time, bool flipped)
 		}
 	}
 
-	SDL_Surface *surface = NULL;
+	SDL_Surface *surface = nullptr;
 	SDL_Surface *base_surface = flipped ? SurfaceFlip : Surface;
 	int time_of_day_red = 0;
 	int time_of_day_green = 0;
@@ -2805,7 +2805,7 @@ void CGraphic::MakeShadow()
 		if (Textures) {
 			glDeleteTextures(NumTextures, Textures);
 			delete[] Textures;
-			Textures = NULL;
+			Textures = nullptr;
 		}
 		MakeTexture(this);
 	} else
@@ -2834,7 +2834,7 @@ CFiller::bits_map::~bits_map()
 {
 	if (bstore) {
 		free(bstore);
-		bstore = NULL;
+		bstore = nullptr;
 	}
 	Width = 0;
 	Height = 0;
@@ -2847,7 +2847,7 @@ void CFiller::bits_map::Init(CGraphic *g)
 
 	if (bstore) {
 		free(bstore);
-		bstore = NULL;
+		bstore = nullptr;
 		Width = 0;
 		Height = 0;
 	}

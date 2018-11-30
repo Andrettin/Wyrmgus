@@ -188,11 +188,11 @@ void ButtonAction::SetTriggerData() const
 
 void ButtonAction::CleanTriggerData() const
 {
-	TriggerData.Type = NULL;
-	TriggerData.Unit = NULL;
-	TriggerData.Upgrade = NULL;
-	TriggerData.Resource = NULL;
-	TriggerData.Faction = NULL;
+	TriggerData.Type = nullptr;
+	TriggerData.Unit = nullptr;
+	TriggerData.Upgrade = nullptr;
+	TriggerData.Resource = nullptr;
+	TriggerData.Faction = nullptr;
 }
 
 int ButtonAction::GetKey() const
