@@ -51,6 +51,7 @@
 #include "plane.h"
 #include "player.h"
 #include "quest.h"
+#include "season_schedule.h"
 #include "settings.h"
 #include "translate.h"
 #include "unit.h"
@@ -71,22 +72,36 @@ std::map<std::string, CMapTemplate *> CMapTemplate::MapTemplatesByIdent;
 ----------------------------------------------------------------------------*/
 
 /**
-**  Get a map template
+**	@brief	Get a map template
+**
+**	@param	ident			The map template's string identifier
+**	@param	should_find		Whether it is an error if the map template could not be found; this is true by default
+**
+**	@return	The map template if found, or null otherwise
 */
-CMapTemplate *CMapTemplate::GetMapTemplate(std::string ident)
+CMapTemplate *CMapTemplate::GetMapTemplate(const std::string &ident)
 {
 	if (ident.empty()) {
 		return nullptr;
 	}
 	
-	if (MapTemplatesByIdent.find(ident) != MapTemplatesByIdent.end()) {
-		return MapTemplatesByIdent[ident];
+	std::map<std::string, CMapTemplate *>::const_iterator find_iterator = MapTemplatesByIdent.find(ident);
+	
+	if (find_iterator != MapTemplatesByIdent.end()) {
+		return find_iterator->second;
 	}
 	
 	return nullptr;
 }
 
-CMapTemplate *CMapTemplate::GetOrAddMapTemplate(std::string ident)
+/**
+**	@brief	Get or add a map template
+**
+**	@param	ident	The map template's string identifier
+**
+**	@return	The map template if found, or a newly-created one otherwise
+*/
+CMapTemplate *CMapTemplate::GetOrAddMapTemplate(const std::string &ident)
 {
 	CMapTemplate *map_template = GetMapTemplate(ident);
 	
@@ -100,6 +115,9 @@ CMapTemplate *CMapTemplate::GetOrAddMapTemplate(std::string ident)
 	return map_template;
 }
 
+/**
+**	@brief	Remove the existing map templates
+*/
 void CMapTemplate::ClearMapTemplates()
 {
 	for (size_t i = 0; i < MapTemplates.size(); ++i) {
@@ -108,6 +126,11 @@ void CMapTemplate::ClearMapTemplates()
 	MapTemplates.clear();
 }
 
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
 void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
@@ -403,7 +426,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	
 	if (!this->IsSubtemplateArea()) {
 		Map.MapLayers[z]->TimeOfDay = NoTimeOfDay;
-		Map.MapLayers[z]->Season = NoSeason;
 		if (Editor.Running == EditorNotRunning) {
 			if (
 				this->SurfaceLayer == 0
@@ -420,14 +442,15 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 				}
 			}
 			
-			if (this->World && this->World->DaysPerYear) {
-				Map.MapLayers[z]->DaysPerYear = this->World->DaysPerYear;
-			} else if (!this->World && this->Plane && this->Plane->DaysPerYear) {
-				Map.MapLayers[z]->DaysPerYear = this->Plane->DaysPerYear;
+			if (this->World && this->World->SeasonSchedule) {
+				Map.MapLayers[z]->SeasonSchedule = this->World->SeasonSchedule;
+			} else if (!this->World && this->Plane && this->Plane->SeasonSchedule) {
+				Map.MapLayers[z]->SeasonSchedule = this->Plane->SeasonSchedule;
+			} else {
+				Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
 			}
-			if (Map.MapLayers[z]->DaysPerYear) {
-				Map.MapLayers[z]->Season = CCalendar::GetSeason(CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar) / Map.MapLayers[z]->HoursPerDay, Map.MapLayers[z]->DaysPerYear);
-			}
+			
+			Map.MapLayers[z]->SetSeasonByHours(CDate::CurrentTotalHours);
 		}
 	}
 	

@@ -251,7 +251,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 //	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
 	const int map_max = Map.Info.MapWidths[UI.CurrentMapLayer->ID] * Map.Info.MapHeights[UI.CurrentMapLayer->ID];
 	//Wyrmgus end
-	const int season = Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
+	const CSeason *season = Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
 
 	while (sy  < 0) {
 		sy++;

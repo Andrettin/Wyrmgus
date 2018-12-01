@@ -271,7 +271,6 @@ enum TechLevels {
 
 #include <vec2i.h>
 
-extern int GetSeasonIdByName(const std::string &season);
 extern int GetReverseDirection(int direction);
 extern std::string GetDirectionNameById(int direction);
 extern int GetDirectionIdByName(const std::string &direction);

@@ -46,23 +46,27 @@
 
 class CConfigData;
 class CSeason;
+class CSeasonSchedule;
 
 class CScheduledSeason
 {
 public:
 	CScheduledSeason() :
-		Season(nullptr), Days(0)
+		ID(0), Season(nullptr), Hours(0), Schedule(NULL)
 	{
 	}
 	
-	CSeason *Season;		/// the season that is scheduled
-	int Days;				/// days the scheduled season lasts
+	unsigned ID;				/// the scheduled season's ID within the season schedule
+	CSeason *Season;			/// the season that is scheduled
+	unsigned Hours;				/// the amount of hours the scheduled season lasts
+	CSeasonSchedule *Schedule;	/// the schedule to which this season belongs
 };
 
 class CSeasonSchedule
 {
 public:
-	CSeasonSchedule()
+	CSeasonSchedule() :
+		TotalHours(0), HoursPerDay(DefaultHoursPerDay)
 	{
 	}
 	
@@ -74,11 +78,14 @@ public:
 	
 	static std::vector<CSeasonSchedule *> SeasonSchedules;		/// Season schedules
 	static std::map<std::string, CSeasonSchedule *> SeasonSchedulesByIdent;
+	static CSeasonSchedule *DefaultSeasonSchedule;
 	
 	void ProcessConfigData(const CConfigData *config_data);
 
-	std::string Ident;							/// Ident of the season schedules
-	std::string Name;							/// Name of the season schedules
+	std::string Ident;									/// Ident of the season schedules
+	std::string Name;									/// Name of the season schedules
+	unsigned TotalHours;								/// The total hours this season schedule contains
+	unsigned HoursPerDay;								/// The hours per each day for this season schedule
 	std::vector<CScheduledSeason *> ScheduledSeasons;	/// The seasons that are scheduled
 };
 

@@ -54,6 +54,7 @@
 #include "quest.h"
 //Wyrmgus end
 #include "script.h"
+#include "season_schedule.h"
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
@@ -184,8 +185,11 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"season\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						int season = LuaToNumber(l, -1, 1);
-						Map.MapLayers[z]->Season = season;
+						Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(LuaToString(l, -1, 1));
+						unsigned season = LuaToNumber(l, -1, 2);
+						if (Map.MapLayers[z]->SeasonSchedule && season < Map.MapLayers[z]->SeasonSchedule->ScheduledSeasons.size()) {
+							Map.MapLayers[z]->Season = Map.MapLayers[z]->SeasonSchedule->ScheduledSeasons[season];
+						}
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);

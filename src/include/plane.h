@@ -44,13 +44,14 @@
 ----------------------------------------------------------------------------*/
 
 class CDeityDomain;
+class CSeasonSchedule;
 class CSpecies;
 
 class CPlane
 {
 public:
 	CPlane() :
-		ID(-1), HoursPerDay(DefaultHoursPerDay), DaysPerYear(DefaultDaysPerYear)
+		ID(-1), HoursPerDay(DefaultHoursPerDay), SeasonSchedule(nullptr)
 	{
 	}
 	
@@ -62,12 +63,12 @@ public:
 
 	int ID;																/// ID of this plane
 	int HoursPerDay;													/// How many hours does a day in this plane contain
-	int DaysPerYear;													/// How many days does a year in this plane contain
 	std::string Ident;
 	std::string Name;
 	std::string Description;
 	std::string Background;
 	std::string Quote;
+	CSeasonSchedule *SeasonSchedule;									/// this plane's season schedule
 	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// Deity domains empowered in this plane
 	std::vector<CSpecies *> Species;									/// Species in this plane
 };

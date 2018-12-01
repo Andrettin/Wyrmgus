@@ -45,6 +45,7 @@
 
 class CPlane;
 class CProvince;
+class CSeasonSchedule;
 class CSpecies;
 class CTerrainFeature;
 
@@ -52,7 +53,7 @@ class CWorld
 {
 public:
 	CWorld() :
-		ID(-1), Plane(nullptr), HoursPerDay(DefaultHoursPerDay), DaysPerYear(DefaultDaysPerYear)
+		ID(-1), Plane(nullptr), HoursPerDay(DefaultHoursPerDay), SeasonSchedule(nullptr)
 	{
 	}
 	
@@ -64,13 +65,13 @@ public:
 
 	int ID;																/// ID of this world
 	int HoursPerDay;													/// How many hours does a day in this world contain
-	int DaysPerYear;													/// How many days does a year in this world contain
 	std::string Ident;
 	std::string Name;
 	std::string Description;
 	std::string Background;
 	std::string Quote;
 	CPlane *Plane;
+	CSeasonSchedule *SeasonSchedule;									/// this world's season schedule
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
 	std::vector<CSpecies *> Species;									/// Species in this world

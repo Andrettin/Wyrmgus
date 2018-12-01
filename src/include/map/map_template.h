@@ -65,12 +65,13 @@ public:
 		Width(0), Height(0), Scale(1), SurfaceLayer(0),
 		Overland(false), OutputTerrainImage(false),
 		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0), PixelTileSize(32, 32),
-		MainTemplate(nullptr), Plane(nullptr), World(nullptr), BaseTerrainType(nullptr), BaseOverlayTerrainType(nullptr), BorderTerrainType(nullptr), SurroundingTerrainType(nullptr)
+		MainTemplate(nullptr), Plane(nullptr), World(nullptr),
+		BaseTerrainType(nullptr), BaseOverlayTerrainType(nullptr), BorderTerrainType(nullptr), SurroundingTerrainType(nullptr)
 	{
 	}
 
-	static CMapTemplate *GetMapTemplate(std::string ident);
-	static CMapTemplate *GetOrAddMapTemplate(std::string ident);
+	static CMapTemplate *GetMapTemplate(const std::string &ident);
+	static CMapTemplate *GetOrAddMapTemplate(const std::string &ident);
 	static void ClearMapTemplates();
 	
 	static std::vector<CMapTemplate *> MapTemplates;								/// Map templates

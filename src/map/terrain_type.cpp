@@ -41,6 +41,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/tileset.h"
+#include "season.h"
 #include "upgrade_structs.h"
 #include "video.h"
 
@@ -110,7 +111,7 @@ void CTerrainType::LoadTerrainTypeGraphics()
 		if ((*it)->Graphics) {
 			(*it)->Graphics->Load();
 		}
-		for (std::map<int, CGraphic *>::iterator sub_it = (*it)->SeasonGraphics.begin(); sub_it != (*it)->SeasonGraphics.end(); ++sub_it) {
+		for (std::map<const CSeason *, CGraphic *>::iterator sub_it = (*it)->SeasonGraphics.begin(); sub_it != (*it)->SeasonGraphics.end(); ++sub_it) {
 			sub_it->second->Load();
 		}
 		if ((*it)->ElevationGraphics) {
@@ -144,7 +145,7 @@ CTerrainType::~CTerrainType()
 	if (this->Graphics) {
 		CGraphic::Free(this->Graphics);
 	}
-	for (std::map<int, CGraphic *>::iterator iterator = this->SeasonGraphics.begin(); iterator != this->SeasonGraphics.end(); ++iterator) {
+	for (std::map<const CSeason *, CGraphic *>::iterator iterator = this->SeasonGraphics.begin(); iterator != this->SeasonGraphics.end(); ++iterator) {
 		CGraphic::Free(iterator->second);
 	}
 	if (this->ElevationGraphics) {
@@ -293,7 +294,7 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 		
 		if (child_config_data->Tag == "season_graphics") {
 			std::string season_graphics_file;
-			int season = -1;
+			CSeason *season = nullptr;
 			
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -301,7 +302,7 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "season") {
 					value = FindAndReplaceString(value, "_", "-");
-					season = GetSeasonIdByName(value);
+					season = CSeason::GetSeason(value);
 				} else if (key == "graphics") {
 					season_graphics_file = value;
 					if (!CanAccessFile(season_graphics_file.c_str())) {
@@ -317,7 +318,7 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			if (season == -1) {
+			if (!season) {
 				fprintf(stderr, "Season graphics have no season.\n");
 				continue;
 			}
@@ -398,9 +399,9 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 **
 **	@return	The graphics
 */
-CGraphic *CTerrainType::GetGraphics(const int season) const
+CGraphic *CTerrainType::GetGraphics(const CSeason *season) const
 {
-	std::map<int, CGraphic *>::const_iterator find_iterator = this->SeasonGraphics.find(season);
+	std::map<const CSeason *, CGraphic *>::const_iterator find_iterator = this->SeasonGraphics.find(season);
 	
 	if (find_iterator != this->SeasonGraphics.end()) {
 		return find_iterator->second;

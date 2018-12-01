@@ -50,6 +50,7 @@
 class CConfigData;
 class CGraphic;
 class CPlayerColorGraphic;
+class CSeason;
 class CUnitType;
 
 class CTerrainType
@@ -80,7 +81,7 @@ public:
 	static std::map<std::tuple<int, int, int>, CTerrainType *> TerrainTypesByColor;
 
 	void ProcessConfigData(const CConfigData *config_data);
-	CGraphic *GetGraphics(const int season = 0) const;
+	CGraphic *GetGraphics(const CSeason *season = nullptr) const;
 
 	std::string Ident;
 	std::string Name;
@@ -98,7 +99,7 @@ public:
 	CUnitType *UnitType;
 //private:
 	CGraphic *Graphics;
-	std::map<int, CGraphic *> SeasonGraphics;					/// Graphics to be displayed instead of the normal ones during particular seasons
+	std::map<const CSeason *, CGraphic *> SeasonGraphics;		/// Graphics to be displayed instead of the normal ones during particular seasons
 public:
 	CGraphic *ElevationGraphics;								/// Semi-transparent elevation graphics, separated so that borders look better
 	CPlayerColorGraphic *PlayerColorGraphics;

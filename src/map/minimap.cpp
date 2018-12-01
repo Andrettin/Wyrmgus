@@ -335,7 +335,7 @@ void CMinimap::Reload()
 */
 //Wyrmgus start
 //static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp)
-static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp, int z, CTerrainType *terrain, const int season)
+static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp, int z, CTerrainType *terrain, const CSeason *season)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -376,7 +376,7 @@ void CMinimap::UpdateTerrain(int z)
 //	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
 	
-	const int season = Map.MapLayers[z]->GetSeason();
+	const CSeason *season = Map.MapLayers[z]->GetSeason();
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!UseOpenGL)
@@ -610,7 +610,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 //	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
 
-	const int season = Map.MapLayers[z]->GetSeason();
+	const CSeason *season = Map.MapLayers[z]->GetSeason();
 
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.

@@ -194,33 +194,6 @@ int CCalendar::GetTimeOfDay(const unsigned long long hours, const int hours_per_
 }
 
 /**
-**	@brief	Get the season corresponding to a quantity of days and days per year
-**
-**	@param	days			The quantity of days
-**	@param	days_per_year	The days per year which will be used to process the amount of hours
-**
-**	@return	The index of the season
-*/
-int CCalendar::GetSeason(const int days, const int days_per_year)
-{
-	int standardized_day = days % days_per_year;
-	standardized_day *= DefaultDaysPerYear;
-	standardized_day /= days_per_year;
-	
-	if (standardized_day >= 60 && standardized_day < 151) {
-		return SpringSeason;
-	} else if (standardized_day >= 151 && standardized_day < 242) {
-		return MorningTimeOfDay;
-	} else if (standardized_day >= 242 && standardized_day < 333) {
-		return MiddayTimeOfDay;
-	} else if (standardized_day >= 333 || (standardized_day >= 0 && standardized_day < 60)) {
-		return WinterSeason;
-	}
-	
-	return NoSeason;
-}
-
-/**
 **	@brief	Process data provided by a configuration file
 **
 **	@param	config_data	The configuration data

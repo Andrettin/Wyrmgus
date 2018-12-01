@@ -55,6 +55,7 @@
 #include "province.h"
 #include "quest.h"
 //Wyrmgus end
+#include "season.h"
 #include "sound.h"
 #include "spells.h"
 #include "translate.h"
@@ -929,21 +930,11 @@ void DrawDayTime() {
 	}
 	
 	if (UI.SeasonPanel.TextX != -1) {
-		if (UI.CurrentMapLayer->Season != NoSeason && UI.CurrentMapLayer->Season < MaxSeasons) {
-			char seasonsText[MaxSeasons][16] = {
-				"No Season",
-				"Spring",
-				"Summer",
-				"Autumn",
-				"Winter"
-			};
-			
-			std::string season_string = _(seasonsText[UI.CurrentMapLayer->Season]);
-
+		if (UI.CurrentMapLayer->Season) {
 			CLabel label(GetGameFont());
 
-			// TODO: Instead of a simple text here we could use an icon per time of day
-			label.Draw(UI.SeasonPanel.TextX, UI.SeasonPanel.TextY, season_string);
+			// TODO: Instead of a simple text here we could use an icon per season
+			label.Draw(UI.SeasonPanel.TextX, UI.SeasonPanel.TextY, UI.CurrentMapLayer->GetSeason()->Name);
 		}
 	}
 	

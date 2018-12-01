@@ -133,8 +133,6 @@ static int CclDefinePlane(lua_State *l)
 			plane->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "HoursPerDay")) {
 			plane->HoursPerDay = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "DaysPerYear")) {
-			plane->DaysPerYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "EmpoweredDeityDomains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -191,8 +189,6 @@ static int CclDefineWorld(lua_State *l)
 			world->Plane = plane;
 		} else if (!strcmp(value, "HoursPerDay")) {
 			world->HoursPerDay = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "DaysPerYear")) {
-			world->DaysPerYear = LuaToNumber(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

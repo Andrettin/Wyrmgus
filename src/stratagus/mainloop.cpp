@@ -461,13 +461,11 @@ static void GameLogicLoop()
 						map_layer->IncrementTimeOfDay();
 					}
 					
-					unsigned hours_per_season = map_layer->GetHoursPerSeason();
-					if (!hours_per_season) {
-						map_layer->Season = NoSeason; //the map layer has no seasons
-						continue;
-					}
-					if (CDate::CurrentTotalHours % hours_per_season == 0) { 
-						map_layer->IncrementSeason();
+					if (map_layer->SeasonSchedule) {
+						map_layer->RemainingSeasonHours -= DayMultiplier;
+						if (map_layer->RemainingSeasonHours <= 0) {
+							map_layer->IncrementSeason();
+						}
 					}
 				}
 			}

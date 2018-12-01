@@ -57,6 +57,7 @@
 //Wyrmgus start
 #include "province.h"
 #include "quest.h"
+#include "season_schedule.h"
 #include "settings.h"
 #include "sound_server.h"
 //Wyrmgus end
@@ -1141,7 +1142,8 @@ void CMap::Create()
 		} else {
 			map_layer->TimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 		}
-		map_layer->Season = CCalendar::GetSeason(CDate::CurrentTotalHours / DefaultHoursPerDay, DefaultDaysPerYear);
+		map_layer->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
+		map_layer->SetSeasonByHours(CDate::CurrentTotalHours);
 	}
 	this->MapLayers.push_back(map_layer);
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
@@ -1230,7 +1232,7 @@ void CMap::Save(CFile &file) const
 	file.printf("  },\n");
 	file.printf("  \"season\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {%d},\n", this->MapLayers[z]->Season);
+		file.printf("  {\"%s\", %d},\n", this->MapLayers[z]->SeasonSchedule ? this->MapLayers[z]->SeasonSchedule->Ident.c_str() : "", this->MapLayers[z]->Season ? this->MapLayers[z]->Season->ID : 0);
 	}
 	file.printf("  },\n");
 	file.printf("  \"pixel-tile-size\", {\n");

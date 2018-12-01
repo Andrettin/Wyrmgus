@@ -37,6 +37,8 @@
 
 #include "map/map_layer.h"
 
+#include "season.h"
+#include "season_schedule.h"
 #include "sound_server.h"
 #include "unit.h"
 #include "unit_manager.h"
@@ -138,24 +140,44 @@ unsigned CMapLayer::GetHoursPerTimeOfDay() const
 */
 void CMapLayer::IncrementSeason()
 {
-	this->Season++;
-	if (this->Season == MaxSeasons) {
-		this->Season = 1;
+	unsigned current_season_id = this->Season->ID;
+	current_season_id++;
+	if (current_season_id >= this->SeasonSchedule->ScheduledSeasons.size()) {
+		current_season_id = 0;
 	}
+	
+	this->SetSeason(this->SeasonSchedule->ScheduledSeasons[current_season_id]);
+	this->RemainingSeasonHours += this->Season->Hours;
 }
 
 /**
-**	@brief	Get the quantity of in-game hours necessary for the passage of a season for this map layer
+**	@brief	Set the season corresponding to an amount of hours
 **
-**	@return	The quantity of in-game hours for the passage of a season in this map layer
+**	@param	hours	The quantity of hours
 */
-unsigned CMapLayer::GetHoursPerSeason() const
+void CMapLayer::SetSeasonByHours(const unsigned long long hours)
 {
-	unsigned hours_per_season = this->DaysPerYear;
-	hours_per_season *= this->HoursPerDay;
-	hours_per_season /= DayMultiplier;
-	hours_per_season /= MaxSeasons - 1;
-	return hours_per_season;
+	if (!this->SeasonSchedule) {
+		return;
+	}
+	
+	int remaining_hours = hours % this->SeasonSchedule->TotalHours;
+	this->SetSeason(this->SeasonSchedule->ScheduledSeasons.front());
+	this->RemainingSeasonHours = this->Season->Hours;
+	this->RemainingSeasonHours -= remaining_hours;
+	
+	while (this->RemainingSeasonHours <= 0) {
+		this->IncrementSeason();
+	}
+}
+
+void CMapLayer::SetSeason(CScheduledSeason *season)
+{
+	if (!season) {
+		return;
+	}
+	
+	this->Season = season;
 }
 
 /**
@@ -163,9 +185,9 @@ unsigned CMapLayer::GetHoursPerSeason() const
 **
 **	@return	The map layer's current season
 */
-int CMapLayer::GetSeason() const
+CSeason *CMapLayer::GetSeason() const
 {
-	return this->Season;
+	return this->Season->Season;
 }
 
 //@}
