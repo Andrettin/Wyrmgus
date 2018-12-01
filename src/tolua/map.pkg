@@ -35,7 +35,7 @@ class CMap
 extern CMap Map;
 
 //Wyrmgus start
-extern int GetMapLayer(const std::string &plane_ident = "", const std::string &world_ident = "", const int surface_layer = 0);
+extern int GetMapLayer(const std::string plane_ident = "", const std::string world_ident = "", const int surface_layer = 0);
 extern int GetSubtemplateStartX(std::string subtemplate_ident);
 extern int GetSubtemplateStartY(std::string subtemplate_ident);
 extern void ChangeCurrentMapLayer(const int z);

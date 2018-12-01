@@ -868,6 +868,7 @@ static int CclCreateUnit(lua_State *l)
 
 	//Wyrmgus start
 	if (!Map.Info.IsPointOnMap(ipos, z)) {
+		fprintf(stderr, "Point on map %d, %d (map layer %d) is invalid.\n", ipos.x, ipos.y, z);
 		return 0;
 	}
 	//Wyrmgus end
@@ -887,6 +888,7 @@ static int CclCreateUnit(lua_State *l)
 	}
 	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
 	if (unit == nullptr) {
+		fprintf(stderr, "CreateUnit: Unable to allocate unit.\n");
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {

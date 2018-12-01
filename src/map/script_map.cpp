@@ -753,10 +753,6 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		end_pos.y = site->Position.y;
 	}
 	
-	if (end_pos.x < 0 || end_pos.x >= map_template->Width || end_pos.y < 0 || end_pos.y >= map_template->Height) {
-		LuaError(l, "Invalid map coordinate : (%d, %d)" _C_ end_pos.x _C_ end_pos.y);
-	}
-
 	CDate date;
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
