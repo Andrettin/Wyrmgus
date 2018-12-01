@@ -237,6 +237,36 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 			} else if (child_config_data->Tag == "player_location_generated_neutral_unit") {
 				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
 			}
+		} else if (child_config_data->Tag == "generated_terrain") {
+			CTerrainType *terrain_type = nullptr;
+			int degree_level = -1;
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "terrain_type") {
+					value = FindAndReplaceString(value, "_", "-");
+					terrain_type = CTerrainType::GetTerrainType(value);
+				} else if (key == "degree_level") {
+					value = FindAndReplaceString(value, "_", "-");
+					degree_level = GetDegreeLevelIdByName(value);
+				} else {
+					fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (!terrain_type) {
+				fprintf(stderr, "Generated terrain has no terrain type.\n");
+				continue;
+			}
+			
+			if (degree_level == -1) {
+				fprintf(stderr, "Generated terrain has no degree level.\n");
+				continue;
+			}
+			
+			this->GeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain_type, degree_level));
 		} else {
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
