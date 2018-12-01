@@ -45,6 +45,7 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
+class CSeason;
 class CTimeOfDay;
 class CTimeOfDaySchedule;
 
@@ -56,10 +57,16 @@ public:
 	{
 	}
 	
+	void ProcessConfigData(const CConfigData *config_data);
+	int GetHours(const CSeason *season = nullptr) const;
+	
 	unsigned ID;					/// the scheduled time of day's ID within the time of day schedule
 	CTimeOfDay *TimeOfDay;			/// the time of day that is scheduled
-	int Hours;						/// hours the scheduled time of day lasts
+private:
+	int Hours;						/// the amount of hours the scheduled time of day lasts
+public:
 	CTimeOfDaySchedule *Schedule;	/// the schedule to which this time of day belongs
+	std::map<const CSeason *, int> SeasonHours;	/// the amount of hours the scheduled time of day lasts in a given season
 };
 
 class CTimeOfDaySchedule

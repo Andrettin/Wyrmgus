@@ -38,6 +38,7 @@
 #include "time_of_day_schedule.h"
 
 #include "config.h"
+#include "season.h"
 #include "time_of_day.h"
 
 /*----------------------------------------------------------------------------
@@ -117,7 +118,6 @@ CTimeOfDaySchedule::~CTimeOfDaySchedule()
 	}
 }
 
-
 /**
 **	@brief	Process data provided by a configuration file
 **
@@ -141,49 +141,107 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
 		CConfigData *child_config_data = config_data->Children[i];
 		
 		if (child_config_data->Tag == "scheduled_time_of_day") {
-			CTimeOfDay *time_of_day = nullptr;
-			unsigned hours = 0;
-				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "time_of_day") {
-					value = FindAndReplaceString(value, "_", "-");
-					time_of_day = CTimeOfDay::GetTimeOfDay(value);
-				} else if (key == "hours") {
-					hours = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (!time_of_day) {
-				fprintf(stderr, "Scheduled time of day has no time of day.\n");
-				continue;
-			}
-			
-			if (hours <= 0) {
-				fprintf(stderr, "Scheduled time of day has no hours defined.\n");
-				continue;
-			}
-			
 			CScheduledTimeOfDay *scheduled_time_of_day = new CScheduledTimeOfDay;
-			scheduled_time_of_day->TimeOfDay = time_of_day;
-			scheduled_time_of_day->Hours = hours;
 			scheduled_time_of_day->ID = this->ScheduledTimesOfDay.size();
 			scheduled_time_of_day->Schedule = this;
 			this->ScheduledTimesOfDay.push_back(scheduled_time_of_day);
-			this->TotalHours += scheduled_time_of_day->Hours;
+			
+			scheduled_time_of_day->ProcessConfigData(child_config_data);
 		} else {
 			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "time_of_day") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->TimeOfDay = CTimeOfDay::GetTimeOfDay(value);
+		} else if (key == "hours") {
+			this->Schedule->TotalHours -= this->Hours; //remove old amount of hours from the schedule, if it has already been defined before
+			this->Hours = std::stoi(value);
+			this->Schedule->TotalHours += this->Hours;
+		} else {
+			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		CConfigData *child_config_data = config_data->Children[i];
+		
+		if (child_config_data->Tag == "season_hours") {
+			CSeason *season = nullptr;
+			int season_hours = 0;
+			
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "season") {
+					value = FindAndReplaceString(value, "_", "-");
+					season = CSeason::GetSeason(value);
+				} else if (key == "hours") {
+					season_hours = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid season hours for scheduled time of day property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (!season) {
+				fprintf(stderr, "Season hours for scheduled time of day has no valid season.\n");
+				continue;
+			}
+			
+			if (season_hours <= 0) {
+				fprintf(stderr, "Season hours for scheduled time of day has no valid amount of hours.\n");
+				continue;
+			}
+			
+			this->SeasonHours[season] = season_hours;
+		} else {
+			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+	
+	if (!this->TimeOfDay) {
+		fprintf(stderr, "Scheduled time of day has no valid time of day.\n");
+	}
+	
+	if (this->Hours <= 0) {
+		fprintf(stderr, "Scheduled time of day has no valid amount of hours.\n");
+	}
+}
+
+/**
+**	@brief	Get the amount of hours the scheduled time of day lasts
+**
+**	@param	season	Optional parameter; if given, gets the amount of hours for the given season, if defined
+**
+**	@return	The amount of hours
+*/
+int CScheduledTimeOfDay::GetHours(const CSeason *season) const
+{
+	std::map<const CSeason *, int>::const_iterator find_iterator = this->SeasonHours.find(season);
+	
+	if (find_iterator != this->SeasonHours.end()) {
+		return find_iterator->second;
+	}
+	
+	return this->Hours;
 }
 
 //@}

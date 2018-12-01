@@ -82,7 +82,7 @@ void CMapLayer::IncrementTimeOfDay()
 	}
 	
 	this->SetTimeOfDay(this->TimeOfDaySchedule->ScheduledTimesOfDay[current_time_of_day_id]);
-	this->RemainingTimeOfDayHours += this->TimeOfDay->Hours;
+	this->RemainingTimeOfDayHours += this->TimeOfDay->GetHours(this->GetSeason());
 }
 
 /**
@@ -98,7 +98,7 @@ void CMapLayer::SetTimeOfDayByHours(const unsigned long long hours)
 	
 	int remaining_hours = hours % this->TimeOfDaySchedule->TotalHours;
 	this->SetTimeOfDay(this->TimeOfDaySchedule->ScheduledTimesOfDay.front());
-	this->RemainingTimeOfDayHours = this->TimeOfDay->Hours;
+	this->RemainingTimeOfDayHours = this->TimeOfDay->GetHours(this->GetSeason());
 	this->RemainingTimeOfDayHours -= remaining_hours;
 	
 	while (this->RemainingTimeOfDayHours <= 0) {

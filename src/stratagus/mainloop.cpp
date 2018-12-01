@@ -453,17 +453,17 @@ static void GameLogicLoop()
 				for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 					CMapLayer *map_layer = Map.MapLayers[z];
 					
-					if (map_layer->TimeOfDaySchedule) {
-						map_layer->RemainingTimeOfDayHours -= 1;
-						if (map_layer->RemainingTimeOfDayHours <= 0) {
-							map_layer->IncrementTimeOfDay();
-						}
-					}
-					
 					if (map_layer->SeasonSchedule) {
 						map_layer->RemainingSeasonHours -= DayMultiplier;
 						if (map_layer->RemainingSeasonHours <= 0) {
 							map_layer->IncrementSeason();
+						}
+					}
+					
+					if (map_layer->TimeOfDaySchedule) {
+						map_layer->RemainingTimeOfDayHours -= 1;
+						if (map_layer->RemainingTimeOfDayHours <= 0) {
+							map_layer->IncrementTimeOfDay();
 						}
 					}
 				}

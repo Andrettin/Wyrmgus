@@ -457,6 +457,16 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	
 	if (!this->IsSubtemplateArea()) {
 		if (Editor.Running == EditorNotRunning) {
+			if (this->World && this->World->SeasonSchedule) {
+				Map.MapLayers[z]->SeasonSchedule = this->World->SeasonSchedule;
+			} else if (!this->World && this->Plane && this->Plane->SeasonSchedule) {
+				Map.MapLayers[z]->SeasonSchedule = this->Plane->SeasonSchedule;
+			} else {
+				Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
+			}
+			
+			Map.MapLayers[z]->SetSeasonByHours(CDate::CurrentTotalHours);
+			
 			Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
 			Map.MapLayers[z]->SetTimeOfDay(nullptr);
 			
@@ -475,16 +485,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 				
 				Map.MapLayers[z]->SetTimeOfDayByHours(CDate::CurrentTotalHours);
 			}
-			
-			if (this->World && this->World->SeasonSchedule) {
-				Map.MapLayers[z]->SeasonSchedule = this->World->SeasonSchedule;
-			} else if (!this->World && this->Plane && this->Plane->SeasonSchedule) {
-				Map.MapLayers[z]->SeasonSchedule = this->Plane->SeasonSchedule;
-			} else {
-				Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
-			}
-			
-			Map.MapLayers[z]->SetSeasonByHours(CDate::CurrentTotalHours);
 		}
 	}
 	
