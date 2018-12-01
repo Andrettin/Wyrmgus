@@ -47,6 +47,7 @@
 #include "map/map_template.h"
 #include "map/terrain_type.h"
 #include "missile.h"
+#include "plane.h"
 #include "religion/deity.h"
 #include "season.h"
 #include "season_schedule.h"
@@ -56,6 +57,7 @@
 #include "ui/button_action.h"
 #include "unittype.h"
 #include "util.h"
+#include "world.h"
 
 #include <fstream>
 
@@ -222,6 +224,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
 			}
+		} else if (config_data->Tag == "plane") {
+			CPlane *plane = CPlane::GetOrAddPlane(ident);
+			if (!define_only) {
+				plane->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "season") {
 			CSeason *season = CSeason::GetOrAddSeason(ident);
 			if (!define_only) {
@@ -263,6 +270,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			}
 			if (!define_only) {
 				unit_type->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "world") {
+			CWorld *world = CWorld::GetOrAddWorld(ident);
+			if (!define_only) {
+				world->ProcessConfigData(config_data);
 			}
 		} else {
 			fprintf(stderr, "Invalid data type: \"%s\".\n", config_data->Tag.c_str());

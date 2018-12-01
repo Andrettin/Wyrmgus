@@ -10,7 +10,7 @@
 //
 /**@name script_province.cpp - The province ccl functions. */
 //
-//      (c) Copyright 2016 by Andrettin
+//      (c) Copyright 2016-2018 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -98,103 +98,6 @@ static int CclDefineWorldMapTerrainType(lua_State *l)
 			terrain_type->BaseTile = GetWorldMapTerrainTypeId(LuaToString(l, -1));
 		} else if (!strcmp(value, "Variations")) {
 			terrain_type->Variations = LuaToNumber(l, -1);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	return 0;
-}
-
-/**
-**  Define a plane.
-**
-**  @param l  Lua state.
-*/
-static int CclDefinePlane(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument (expected table)");
-	}
-
-	std::string plane_ident = LuaToString(l, 1);
-	CPlane *plane = CPlane::GetOrAddPlane(plane_ident);
-	
-	//  Parse the list:
-	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		
-		if (!strcmp(value, "Name")) {
-			plane->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Description")) {
-			plane->Description = LuaToString(l, -1);
-		} else if (!strcmp(value, "Background")) {
-			plane->Background = LuaToString(l, -1);
-		} else if (!strcmp(value, "Quote")) {
-			plane->Quote = LuaToString(l, -1);
-		} else if (!strcmp(value, "TimeOfDaySchedule")) {
-			plane->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(LuaToString(l, -1));
-		} else if (!strcmp(value, "SeasonSchedule")) {
-			plane->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(LuaToString(l, -1));
-		} else if (!strcmp(value, "EmpoweredDeityDomains")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				std::string deity_domain_ident = LuaToString(l, -1, j + 1);
-				CDeityDomain *deity_domain = CDeityDomain::GetOrAddDeityDomain(deity_domain_ident);
-				if (!deity_domain) {
-					LuaError(l, "Deity domain \"%s\" doesn't exist." _C_ deity_domain_ident.c_str());
-				}
-				plane->EmpoweredDeityDomains.push_back(deity_domain);
-			}
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	return 0;
-}
-
-/**
-**  Define a world.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineWorld(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument (expected table)");
-	}
-
-	std::string world_ident = LuaToString(l, 1);
-	CWorld *world = CWorld::GetOrAddWorld(world_ident);
-	
-	//  Parse the list:
-	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		
-		if (!strcmp(value, "Name")) {
-			world->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Description")) {
-			world->Description = LuaToString(l, -1);
-		} else if (!strcmp(value, "Background")) {
-			world->Background = LuaToString(l, -1);
-		} else if (!strcmp(value, "Quote")) {
-			world->Quote = LuaToString(l, -1);
-		} else if (!strcmp(value, "Plane")) {
-			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
-			if (!plane) {
-				LuaError(l, "Plane doesn't exist.");
-			}
-			world->Plane = plane;
-		} else if (!strcmp(value, "TimeOfDaySchedule")) {
-			world->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(LuaToString(l, -1));
-		} else if (!strcmp(value, "SeasonSchedule")) {
-			world->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(LuaToString(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -891,8 +794,6 @@ static int CclGetProvinces(lua_State *l)
 void ProvinceCclRegister()
 {
 	lua_register(Lua, "DefineWorldMapTerrainType", CclDefineWorldMapTerrainType);
-	lua_register(Lua, "DefinePlane", CclDefinePlane);
-	lua_register(Lua, "DefineWorld", CclDefineWorld);
 	lua_register(Lua, "DefineRegion", CclDefineRegion);
 	lua_register(Lua, "DefineProvince", CclDefineProvince);
 	lua_register(Lua, "DefineWorldMapTile", CclDefineWorldMapTile);

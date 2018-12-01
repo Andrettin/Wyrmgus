@@ -53,8 +53,8 @@ std::map<std::string, CSeason *> CSeason::SeasonsByIdent;
 /**
 **	@brief	Get a season
 **
-**	@param	ident		The season's string identifier
-**	@param	should_find	Whether it is an error if the season could not be found; this is true by default
+**	@param	ident			The season's string identifier
+**	@param	should_find		Whether it is an error if the season could not be found; this is true by default
 **
 **	@return	The season if found, or null otherwise
 */
@@ -103,6 +103,7 @@ void CSeason::ClearSeasons()
 		delete Seasons[i];
 	}
 	Seasons.clear();
+	SeasonsByIdent.clear();
 }
 
 /**

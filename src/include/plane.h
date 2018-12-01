@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name plane.h - The plane headerfile. */
+/**@name plane.h - The plane header file. */
 //
 //      (c) Copyright 2016-2018 by Andrettin
 //
@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -43,6 +44,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CConfigData;
 class CDeityDomain;
 class CSeasonSchedule;
 class CSpecies;
@@ -56,11 +58,14 @@ public:
 	{
 	}
 	
-	static CPlane *GetPlane(const std::string &plane_ident);
-	static CPlane *GetOrAddPlane(const std::string &plane_ident);
+	static CPlane *GetPlane(const std::string &ident, const bool should_find = true);
+	static CPlane *GetOrAddPlane(const std::string &ident);
 	static void ClearPlanes();
 	
 	static std::vector<CPlane *> Planes;								/// Planes
+	static std::map<std::string, CPlane *> PlanesByIdent;
+
+	void ProcessConfigData(const CConfigData *config_data);
 
 	int ID;																/// ID of this plane
 	std::string Ident;

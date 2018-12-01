@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name world.h - The world headerfile. */
+/**@name world.h - The world header file. */
 //
 //      (c) Copyright 2016-2018 by Andrettin
 //
@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -43,6 +44,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CConfigData;
 class CPlane;
 class CProvince;
 class CSeasonSchedule;
@@ -58,11 +60,14 @@ public:
 	{
 	}
 	
-	static CWorld *GetWorld(std::string world_ident);
-	static CWorld *GetOrAddWorld(std::string world_ident);
+	static CWorld *GetWorld(const std::string &ident, const bool should_find = true);
+	static CWorld *GetOrAddWorld(const std::string &ident);
 	static void ClearWorlds();
 	
 	static std::vector<CWorld *> Worlds;								/// Worlds
+	static std::map<std::string, CWorld *> WorldsByIdent;
+
+	void ProcessConfigData(const CConfigData *config_data);
 
 	int ID;																/// ID of this world
 	std::string Ident;
