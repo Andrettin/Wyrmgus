@@ -1897,6 +1897,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	if (ThisPlayer->StartMapLayer < (int) Map.MapLayers.size()) {
 		UI.CurrentMapLayer = Map.MapLayers[ThisPlayer->StartMapLayer];
 	}
+	UpdateSurfaceLayerButtons();
 	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer));
 
 	//
