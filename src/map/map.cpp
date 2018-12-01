@@ -978,10 +978,10 @@ void PreprocessMap()
 }
 
 //Wyrmgus start
-int GetMapLayer(std::string plane_ident, std::string world_ident, int surface_layer)
+int GetMapLayer(const std::string &plane_ident, const std::string &world_ident, const int surface_layer)
 {
-	CPlane *plane = CPlane::GetPlane(plane_ident);
-	CWorld *world = CWorld::GetWorld(world_ident);
+	CPlane *plane = CPlane::GetPlane(plane_ident, false);
+	CWorld *world = CWorld::GetWorld(world_ident, false);
 
 	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 		if (Map.MapLayers[z]->Plane == plane && Map.MapLayers[z]->World == world && Map.MapLayers[z]->SurfaceLayer == surface_layer) {

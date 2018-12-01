@@ -226,8 +226,8 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"layer-references\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						Map.MapLayers[z]->Plane = CPlane::GetPlane(LuaToString(l, -1, 1));
-						Map.MapLayers[z]->World = CWorld::GetWorld(LuaToString(l, -1, 2));
+						Map.MapLayers[z]->Plane = CPlane::GetPlane(LuaToString(l, -1, 1), false);
+						Map.MapLayers[z]->World = CWorld::GetWorld(LuaToString(l, -1, 2), false);
 						Map.MapLayers[z]->SurfaceLayer = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
 					}
@@ -949,9 +949,9 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 		map_template->SurfaceLayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>(ipos, unittype, layer, unique));
 	} else if (lua_isstring(l, 4)) {
 		std::string realm = LuaToString(l, 4);
-		if (CWorld::GetWorld(realm)) {
+		if (CWorld::GetWorld(realm, false)) {
 			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>(ipos, unittype, CWorld::GetWorld(realm), unique));
-		} else if (CPlane::GetPlane(realm)) {
+		} else if (CPlane::GetPlane(realm, false)) {
 			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>(ipos, unittype, CPlane::GetPlane(realm), unique));
 		} else {
 			LuaError(l, "incorrect argument");
