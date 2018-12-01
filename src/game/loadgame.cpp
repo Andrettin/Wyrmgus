@@ -130,7 +130,6 @@ void CleanModules()
 	CleanTexts();
 	CReligion::ClearReligions();
 	CleanUniqueItems();
-	CTerrainType::ClearTerrainTypes();
 	//Wyrmgus end
 	CTimeline::ClearTimelines();
 	CleanUnits();
@@ -145,6 +144,7 @@ void CleanModules()
 	CleanMissileTypes();
 	Map.Clean();
 	Map.CleanFogOfWar();
+	CTerrainType::ClearTerrainTypes();
 	CParticleManager::exit();
 	CleanReplayLog();
 	CleanSpells();
