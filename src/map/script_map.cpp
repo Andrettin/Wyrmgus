@@ -58,6 +58,7 @@
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
+#include "time_of_day_schedule.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit.h"
@@ -169,8 +170,12 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"time-of-day\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						int time_of_day = LuaToNumber(l, -1, 1);
-						Map.MapLayers[z]->TimeOfDay = time_of_day;
+						Map.MapLayers[z]->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(LuaToString(l, -1, 1));
+						unsigned time_of_day = LuaToNumber(l, -1, 2);
+						if (Map.MapLayers[z]->TimeOfDaySchedule && time_of_day < Map.MapLayers[z]->TimeOfDaySchedule->ScheduledTimesOfDay.size()) {
+							Map.MapLayers[z]->TimeOfDay = Map.MapLayers[z]->TimeOfDaySchedule->ScheduledTimesOfDay[time_of_day];
+						}
+						Map.MapLayers[z]->RemainingTimeOfDayHours = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -190,6 +195,7 @@ static int CclStratagusMap(lua_State *l)
 						if (Map.MapLayers[z]->SeasonSchedule && season < Map.MapLayers[z]->SeasonSchedule->ScheduledSeasons.size()) {
 							Map.MapLayers[z]->Season = Map.MapLayers[z]->SeasonSchedule->ScheduledSeasons[season];
 						}
+						Map.MapLayers[z]->RemainingSeasonHours = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);

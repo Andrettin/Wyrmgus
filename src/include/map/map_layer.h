@@ -49,8 +49,11 @@ class CMapField;
 class CMapTemplate;
 class CPlane;
 class CScheduledSeason;
+class CScheduledTimeOfDay;
 class CSeason;
 class CSeasonSchedule;
+class CTimeOfDay;
+class CTimeOfDaySchedule;
 class CUnit;
 class CWorld;
 
@@ -58,8 +61,10 @@ class CMapLayer
 {
 public:
 	CMapLayer() :
-		ID(-1), HoursPerDay(DefaultHoursPerDay),
-		TimeOfDay(0), Season(nullptr), SeasonSchedule(nullptr), RemainingSeasonHours(0), SurfaceLayer(0),
+		ID(-1),
+		TimeOfDay(nullptr), TimeOfDaySchedule(nullptr), RemainingTimeOfDayHours(0),
+		Season(nullptr), SeasonSchedule(nullptr), RemainingSeasonHours(0),
+		SurfaceLayer(0),
 		Overland(false),
 		PixelTileSize(32, 32),
 		Fields(nullptr), Plane(nullptr), World(nullptr)
@@ -68,8 +73,9 @@ public:
 
 	~CMapLayer();
 	void IncrementTimeOfDay();
-	void SetTimeOfDay(const int time_of_day);
-	unsigned GetHoursPerTimeOfDay() const;
+	void SetTimeOfDayByHours(const unsigned long long hours);
+	void SetTimeOfDay(CScheduledTimeOfDay *time_of_day);
+	CTimeOfDay *GetTimeOfDay() const;
 	void IncrementSeason();
 	void SetSeasonByHours(const unsigned long long hours);
 	void SetSeason(CScheduledSeason *season);
@@ -77,8 +83,9 @@ public:
 	
 	int ID;
 	CMapField *Fields;						/// fields on the map layer
-	int HoursPerDay;						/// how many hours does a day take in this map layer
-	int TimeOfDay;							/// the time of day for the map layer
+	CScheduledTimeOfDay *TimeOfDay;			/// the time of day for the map layer
+	CTimeOfDaySchedule *TimeOfDaySchedule;	/// the time of day schedule for the map layer
+	int RemainingTimeOfDayHours;				/// the quantity of hours remaining for the current time of day to end
 	CScheduledSeason *Season;				/// the current season for the map layer
 	CSeasonSchedule *SeasonSchedule;		/// the season schedule for the map layer
 	int RemainingSeasonHours;				/// the quantity of hours remaining for the current season to end

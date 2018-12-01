@@ -49,7 +49,8 @@ class CConfigData;
 class CTimeOfDay
 {
 public:
-	CTimeOfDay()
+	CTimeOfDay() :
+		ID(-1), Dawn(false), Day(false), Dusk(false), Night(false)
 	{
 	}
 	
@@ -64,6 +65,11 @@ public:
 
 	std::string Ident;							/// Ident of the time of day
 	std::string Name;							/// Name of the time of day
+	int ID;										/// The ID of this time of day
+	bool Dawn;									/// Whether this is a dawn time of day
+	bool Day;									/// Whether this is a day time of day
+	bool Dusk;									/// Whether this is a dusk time of day
+	bool Night;									/// Whether this is a night time of day
 };
 
 //@}

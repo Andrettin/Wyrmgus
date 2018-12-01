@@ -421,7 +421,7 @@ public:
 	CResourceInfo Resources[MaxResourceInfo];	/// Icon+Text of all resources
 
 	CInfoPanel InfoPanel;				/// Info panel
-	CResourceInfo TimePanel;			/// Time panel
+	CResourceInfo TimeOfDayPanel;		/// Time of day panel
 	CResourceInfo SeasonPanel;			/// Season panel
 	CResourceInfo DatePanel;			/// Date panel
 	CResourceInfo AgePanel;				/// Age panel

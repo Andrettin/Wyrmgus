@@ -61,6 +61,7 @@
 #include "settings.h"
 #include "sound_server.h"
 //Wyrmgus end
+#include "time_of_day_schedule.h"
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
@@ -1065,9 +1066,13 @@ void ChangeCurrentMapLayer(const int z)
 	UpdateSurfaceLayerButtons();
 }
 
-void SetTimeOfDay(int time_of_day, int z)
+void SetTimeOfDay(const int time_of_day, int z)
 {
-	Map.MapLayers[z]->TimeOfDay = time_of_day;
+	if (time_of_day == -1) {
+		Map.MapLayers[z]->SetTimeOfDay(nullptr);
+	} else if (time_of_day < (int) Map.MapLayers[z]->TimeOfDaySchedule->ScheduledTimesOfDay.size()) {
+		Map.MapLayers[z]->SetTimeOfDay(Map.MapLayers[z]->TimeOfDaySchedule->ScheduledTimesOfDay[time_of_day]);
+	}
 }
 //Wyrmgus end
 
@@ -1138,10 +1143,13 @@ void CMap::Create()
 	map_layer->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
 	if (Editor.Running == EditorNotRunning) {
 		if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
-			map_layer->TimeOfDay = CCalendar::GetTimeOfDay(CDate::CurrentTotalHours, DefaultHoursPerDay);
+			map_layer->TimeOfDaySchedule = CTimeOfDaySchedule::DefaultTimeOfDaySchedule;
+			map_layer->SetTimeOfDayByHours(CDate::CurrentTotalHours);
 		} else {
-			map_layer->TimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
+			map_layer->TimeOfDaySchedule = nullptr;
+			map_layer->SetTimeOfDay(nullptr); // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 		}
+		
 		map_layer->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
 		map_layer->SetSeasonByHours(CDate::CurrentTotalHours);
 	}
@@ -1227,12 +1235,12 @@ void CMap::Save(CFile &file) const
 	file.printf("  },\n");
 	file.printf("  \"time-of-day\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {%d},\n", this->MapLayers[z]->TimeOfDay);
+		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->TimeOfDaySchedule ? this->MapLayers[z]->TimeOfDaySchedule->Ident.c_str() : "", this->MapLayers[z]->TimeOfDay ? this->MapLayers[z]->TimeOfDay->ID : 0, this->MapLayers[z]->RemainingTimeOfDayHours);
 	}
 	file.printf("  },\n");
 	file.printf("  \"season\", {\n");
 	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		file.printf("  {\"%s\", %d},\n", this->MapLayers[z]->SeasonSchedule ? this->MapLayers[z]->SeasonSchedule->Ident.c_str() : "", this->MapLayers[z]->Season ? this->MapLayers[z]->Season->ID : 0);
+		file.printf("  {\"%s\", %d, %d},\n", this->MapLayers[z]->SeasonSchedule ? this->MapLayers[z]->SeasonSchedule->Ident.c_str() : "", this->MapLayers[z]->Season ? this->MapLayers[z]->Season->ID : 0, this->MapLayers[z]->RemainingSeasonHours);
 	}
 	file.printf("  },\n");
 	file.printf("  \"pixel-tile-size\", {\n");

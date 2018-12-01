@@ -40,6 +40,7 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "settings.h"
+#include "time_of_day.h"
 #include "unit.h"
 #include "unit_find.h"
 
@@ -800,7 +801,14 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				cost += AStarUnknownTerrainCost;
 			}
 			//Wyrmgus start
-			if ((mf->Flags & MapFieldDesert) && mf->Owner != unit.Player->Index && unit.Type->BoolFlag[ORGANIC_INDEX].value && Map.MapLayers[unit.MapLayer]->TimeOfDay >= DawnTimeOfDay && Map.MapLayers[unit.MapLayer]->TimeOfDay <= DuskTimeOfDay && unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0) {
+			if (
+				(mf->Flags & MapFieldDesert)
+				&& mf->Owner != unit.Player->Index
+				&& unit.Type->BoolFlag[ORGANIC_INDEX].value
+				&& Map.MapLayers[unit.MapLayer]->GetTimeOfDay()
+				&& Map.MapLayers[unit.MapLayer]->GetTimeOfDay()->Day
+				&& unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0
+			) {
 				cost += 32; //increase the cost of moving through deserts for units affected by dehydration, as we want the pathfinding to try to avoid that
 			}
 			//Wyrmgus end

@@ -53,6 +53,7 @@
 #include "quest.h"
 #include "season_schedule.h"
 #include "settings.h"
+#include "time_of_day_schedule.h"
 #include "translate.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -425,21 +426,24 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	
 	if (!this->IsSubtemplateArea()) {
-		Map.MapLayers[z]->TimeOfDay = NoTimeOfDay;
 		if (Editor.Running == EditorNotRunning) {
+			Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
+			Map.MapLayers[z]->SetTimeOfDay(nullptr);
+			
 			if (
 				this->SurfaceLayer == 0
 				&& !GameSettings.Inside
 				&& !GameSettings.NoTimeOfDay
 			) {
-				if (this->World && this->World->HoursPerDay) {
-					Map.MapLayers[z]->HoursPerDay = this->World->HoursPerDay;
-				} else if (!this->World && this->Plane && this->Plane->HoursPerDay) {
-					Map.MapLayers[z]->HoursPerDay = this->Plane->HoursPerDay;
+				if (this->World && this->World->TimeOfDaySchedule) {
+					Map.MapLayers[z]->TimeOfDaySchedule = this->World->TimeOfDaySchedule;
+				} else if (!this->World && this->Plane && this->Plane->TimeOfDaySchedule) {
+					Map.MapLayers[z]->TimeOfDaySchedule = this->Plane->TimeOfDaySchedule;
+				} else {
+					Map.MapLayers[z]->TimeOfDaySchedule = CTimeOfDaySchedule::DefaultTimeOfDaySchedule;
 				}
-				if (Map.MapLayers[z]->HoursPerDay) {
-					Map.MapLayers[z]->TimeOfDay = CCalendar::GetTimeOfDay(CDate::CurrentTotalHours, Map.MapLayers[z]->HoursPerDay);
-				}
+				
+				Map.MapLayers[z]->SetTimeOfDayByHours(CDate::CurrentTotalHours);
 			}
 			
 			if (this->World && this->World->SeasonSchedule) {

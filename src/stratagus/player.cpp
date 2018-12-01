@@ -73,6 +73,7 @@
 #include "settings.h"
 //Wyrmgus end
 #include "sound.h"
+#include "time_of_day.h"
 #include "translate.h"
 #include "unitsound.h"
 #include "unittype.h"
@@ -3944,22 +3945,24 @@ void GraphicPlayerPixels(int player, const CGraphic &sprite)
 	int time_of_day_green = 0;
 	int time_of_day_blue = 0;
 	
-	if (sprite.TimeOfDay == DawnTimeOfDay) {
-		time_of_day_red = -20;
-		time_of_day_green = -20;
-		time_of_day_blue = 0;
-	} else if (sprite.TimeOfDay == MorningTimeOfDay || sprite.TimeOfDay == MiddayTimeOfDay || sprite.TimeOfDay == AfternoonTimeOfDay) {
-		time_of_day_red = 0;
-		time_of_day_green = 0;
-		time_of_day_blue = 0;
-	} else if (sprite.TimeOfDay == DuskTimeOfDay) {
-		time_of_day_red = 0;
-		time_of_day_green = -20;
-		time_of_day_blue = -20;
-	} else if (sprite.TimeOfDay == FirstWatchTimeOfDay || sprite.TimeOfDay == MidnightTimeOfDay || sprite.TimeOfDay == SecondWatchTimeOfDay) {
-		time_of_day_red = -45;
-		time_of_day_green = -35;
-		time_of_day_blue = -10;
+	if (sprite.TimeOfDay) {
+		if (sprite.TimeOfDay->Dawn) {
+			time_of_day_red = -20;
+			time_of_day_green = -20;
+			time_of_day_blue = 0;
+		} else if (sprite.TimeOfDay->Day) {
+			time_of_day_red = 0;
+			time_of_day_green = 0;
+			time_of_day_blue = 0;
+		} else if (sprite.TimeOfDay->Dusk) {
+			time_of_day_red = 0;
+			time_of_day_green = -20;
+			time_of_day_blue = -20;
+		} else if (sprite.TimeOfDay->Night) {
+			time_of_day_red = -45;
+			time_of_day_green = -35;
+			time_of_day_blue = -10;
+		}
 	}
 	
 	if (sprite.TimeOfDay && (time_of_day_red != 0 || time_of_day_green != 0 || time_of_day_blue != 0)) {

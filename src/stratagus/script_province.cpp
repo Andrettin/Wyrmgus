@@ -44,6 +44,8 @@
 #include "player.h"
 #include "religion/deity_domain.h"
 #include "script.h"
+#include "season_schedule.h"
+#include "time_of_day_schedule.h"
 #include "unittype.h"
 #include "upgrade.h"
 #include "video.h"
@@ -131,8 +133,10 @@ static int CclDefinePlane(lua_State *l)
 			plane->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			plane->Quote = LuaToString(l, -1);
-		} else if (!strcmp(value, "HoursPerDay")) {
-			plane->HoursPerDay = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "TimeOfDaySchedule")) {
+			plane->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(LuaToString(l, -1));
+		} else if (!strcmp(value, "SeasonSchedule")) {
+			plane->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(LuaToString(l, -1));
 		} else if (!strcmp(value, "EmpoweredDeityDomains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -187,8 +191,10 @@ static int CclDefineWorld(lua_State *l)
 				LuaError(l, "Plane doesn't exist.");
 			}
 			world->Plane = plane;
-		} else if (!strcmp(value, "HoursPerDay")) {
-			world->HoursPerDay = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "TimeOfDaySchedule")) {
+			world->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(LuaToString(l, -1));
+		} else if (!strcmp(value, "SeasonSchedule")) {
+			world->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(LuaToString(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

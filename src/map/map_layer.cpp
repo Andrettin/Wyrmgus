@@ -40,6 +40,8 @@
 #include "season.h"
 #include "season_schedule.h"
 #include "sound_server.h"
+#include "time_of_day.h"
+#include "time_of_day_schedule.h"
 #include "unit.h"
 #include "unit_manager.h"
 
@@ -73,11 +75,35 @@ CMapLayer::~CMapLayer()
 */
 void CMapLayer::IncrementTimeOfDay()
 {
-	int time_of_day = this->TimeOfDay + 1;
-	if (time_of_day == MaxTimesOfDay) {
-		time_of_day = 1;
+	unsigned current_time_of_day_id = this->TimeOfDay->ID;
+	current_time_of_day_id++;
+	if (current_time_of_day_id >= this->TimeOfDaySchedule->ScheduledTimesOfDay.size()) {
+		current_time_of_day_id = 0;
 	}
-	this->SetTimeOfDay(time_of_day);
+	
+	this->SetTimeOfDay(this->TimeOfDaySchedule->ScheduledTimesOfDay[current_time_of_day_id]);
+	this->RemainingTimeOfDayHours += this->TimeOfDay->Hours;
+}
+
+/**
+**	@brief	Set the time of day corresponding to an amount of hours
+**
+**	@param	hours	The quantity of hours
+*/
+void CMapLayer::SetTimeOfDayByHours(const unsigned long long hours)
+{
+	if (!this->TimeOfDaySchedule) {
+		return;
+	}
+	
+	int remaining_hours = hours % this->TimeOfDaySchedule->TotalHours;
+	this->SetTimeOfDay(this->TimeOfDaySchedule->ScheduledTimesOfDay.front());
+	this->RemainingTimeOfDayHours = this->TimeOfDay->Hours;
+	this->RemainingTimeOfDayHours -= remaining_hours;
+	
+	while (this->RemainingTimeOfDayHours <= 0) {
+		this->IncrementTimeOfDay();
+	}
 }
 
 /**
@@ -85,24 +111,24 @@ void CMapLayer::IncrementTimeOfDay()
 **
 **	@param	time_of_day	The time of day
 */
-void CMapLayer::SetTimeOfDay(const int time_of_day)
+void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 {
 	if (this->TimeOfDay == time_of_day) {
 		return;
 	}
 	
-	int old_time_of_day = this->TimeOfDay;
+	CScheduledTimeOfDay *old_time_of_day = this->TimeOfDay;
 	this->TimeOfDay = time_of_day;
 	
 #ifdef USE_OAML
-	if (enableOAML && oaml && this == UI.CurrentMapLayer) {
+	if (enableOAML && oaml && this == UI.CurrentMapLayer && this->GetTimeOfDay()) {
 		// Time of day can change our main music loop, if the current playing track is set for this
-		SetMusicCondition(OAML_CONDID_MAIN_LOOP, this->TimeOfDay);
+		SetMusicCondition(OAML_CONDID_MAIN_LOOP, this->GetTimeOfDay()->ID);
 	}
 #endif
 
-	bool is_day_changed = (this->TimeOfDay == MorningTimeOfDay || this->TimeOfDay == MiddayTimeOfDay || this->TimeOfDay == AfternoonTimeOfDay) != (old_time_of_day == MorningTimeOfDay || old_time_of_day == MiddayTimeOfDay || old_time_of_day == AfternoonTimeOfDay);
-	bool is_night_changed = (this->TimeOfDay == FirstWatchTimeOfDay || this->TimeOfDay == MidnightTimeOfDay || this->TimeOfDay == SecondWatchTimeOfDay) != (old_time_of_day == FirstWatchTimeOfDay || old_time_of_day == MidnightTimeOfDay || old_time_of_day == SecondWatchTimeOfDay);
+	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Day) != (old_time_of_day && old_time_of_day->TimeOfDay->Day);
+	const bool is_night_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Night) != (old_time_of_day && old_time_of_day->TimeOfDay->Night);
 	
 	//update the sight of all units
 	if (is_day_changed || is_night_changed) {
@@ -124,15 +150,17 @@ void CMapLayer::SetTimeOfDay(const int time_of_day)
 }
 
 /**
-**	@brief	Get the quantity of in-game hours necessary for the passage of a time of day for this map layer
+**	@brief	Get the current time of day the map layer is in
 **
-**	@return	The quantity of in-game hours for the passage of a time of day in this map layer
+**	@return	The map layer's current time of day
 */
-unsigned CMapLayer::GetHoursPerTimeOfDay() const
+CTimeOfDay *CMapLayer::GetTimeOfDay() const
 {
-	unsigned hours_per_time_of_day = this->HoursPerDay;
-	hours_per_time_of_day /= MaxTimesOfDay - 1;
-	return hours_per_time_of_day;
+	if (!this->TimeOfDay) {
+		return nullptr;
+	}
+	
+	return this->TimeOfDay->TimeOfDay;
 }
 
 /**
@@ -187,6 +215,10 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 */
 CSeason *CMapLayer::GetSeason() const
 {
+	if (!this->Season) {
+		return nullptr;
+	}
+	
 	return this->Season->Season;
 }
 

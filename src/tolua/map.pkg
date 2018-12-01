@@ -39,7 +39,7 @@ extern int GetMapLayer(std::string plane_ident = "", std::string world_ident = "
 extern int GetSubtemplateStartX(std::string subtemplate_ident);
 extern int GetSubtemplateStartY(std::string subtemplate_ident);
 extern void ChangeCurrentMapLayer(const int z);
-extern void SetTimeOfDay(int time_of_day, int z = 0);
+extern void SetTimeOfDay(const int time_of_day, int z = 0);
 //void SetTile(int tile, int w, int h, int value = 0);
 void SetTile(int tile, int w, int h, int value = 0, int z = 0);
 void SetTileTerrain(std::string terrain_ident, int w, int h, int value = 0, int z = 0);

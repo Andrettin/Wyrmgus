@@ -46,23 +46,27 @@
 
 class CConfigData;
 class CTimeOfDay;
+class CTimeOfDaySchedule;
 
 class CScheduledTimeOfDay
 {
 public:
 	CScheduledTimeOfDay() :
-		TimeOfDay(nullptr), Hours(0)
+		ID(0), TimeOfDay(nullptr), Hours(0), Schedule(nullptr)
 	{
 	}
 	
-	CTimeOfDay *TimeOfDay;	/// the time of day that is scheduled
-	int Hours;				/// hours the scheduled time of day lasts
+	unsigned ID;					/// the scheduled time of day's ID within the time of day schedule
+	CTimeOfDay *TimeOfDay;			/// the time of day that is scheduled
+	int Hours;						/// hours the scheduled time of day lasts
+	CTimeOfDaySchedule *Schedule;	/// the schedule to which this time of day belongs
 };
 
 class CTimeOfDaySchedule
 {
 public:
-	CTimeOfDaySchedule()
+	CTimeOfDaySchedule() :
+		TotalHours(0)
 	{
 	}
 	
@@ -74,11 +78,13 @@ public:
 	
 	static std::vector<CTimeOfDaySchedule *> TimeOfDaySchedules;		/// Time of day schedules
 	static std::map<std::string, CTimeOfDaySchedule *> TimeOfDaySchedulesByIdent;
+	static CTimeOfDaySchedule *DefaultTimeOfDaySchedule;
 	
 	void ProcessConfigData(const CConfigData *config_data);
 
-	std::string Ident;							/// Ident of the time of day schedules
-	std::string Name;							/// Name of the time of day schedules
+	std::string Ident;										/// Ident of the time of day schedules
+	std::string Name;										/// Name of the time of day schedules
+	unsigned TotalHours;									/// The total amount of hours this time of day schedule contains
 	std::vector<CScheduledTimeOfDay *> ScheduledTimesOfDay;	/// The times of day that are scheduled
 };
 

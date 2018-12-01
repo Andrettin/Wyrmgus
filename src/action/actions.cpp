@@ -75,6 +75,7 @@
 #include "player.h"
 #include "script.h"
 #include "spells.h"
+#include "time_of_day.h"
 #include "ui/interface.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -496,7 +497,16 @@ static void HandleBuffsEachSecond(CUnit &unit)
 			}
 		}
 		
-		if (unit.Type->BoolFlag[ORGANIC_INDEX].value && Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer) && (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldDesert) && Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Owner != unit.Player->Index && Map.MapLayers[unit.MapLayer]->TimeOfDay >= DawnTimeOfDay && Map.MapLayers[unit.MapLayer]->TimeOfDay <= DuskTimeOfDay && unit.Variable[HYDRATING_INDEX].Value <= 0 && unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0) { //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
+		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
+			unit.Type->BoolFlag[ORGANIC_INDEX].value
+			&& Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)
+			&& (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldDesert)
+			&& Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Owner != unit.Player->Index
+			&& Map.MapLayers[unit.MapLayer]->GetTimeOfDay()
+			&& Map.MapLayers[unit.MapLayer]->GetTimeOfDay()->Day
+			&& unit.Variable[HYDRATING_INDEX].Value <= 0
+			&& unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0
+		) {
 			unit.Variable[DEHYDRATION_INDEX].Enable = 1;
 			unit.Variable[DEHYDRATION_INDEX].Max = std::max(CYCLES_PER_SECOND + 1, unit.Variable[DEHYDRATION_INDEX].Max);
 			unit.Variable[DEHYDRATION_INDEX].Value = std::max(CYCLES_PER_SECOND + 1, unit.Variable[DEHYDRATION_INDEX].Value);

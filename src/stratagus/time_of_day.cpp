@@ -87,6 +87,7 @@ CTimeOfDay *CTimeOfDay::GetOrAddTimeOfDay(const std::string &ident)
 	if (!time_of_day) {
 		time_of_day = new CTimeOfDay;
 		time_of_day->Ident = ident;
+		time_of_day->ID = TimesOfDay.size();
 		TimesOfDay.push_back(time_of_day);
 		TimesOfDayByIdent[ident] = time_of_day;
 	}
@@ -118,6 +119,14 @@ void CTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "name") {
 			this->Name = value;
+		} else if (key == "dawn") {
+			this->Dawn = StringToBool(value);
+		} else if (key == "day") {
+			this->Day = StringToBool(value);
+		} else if (key == "dusk") {
+			this->Dusk = StringToBool(value);
+		} else if (key == "night") {
+			this->Night = StringToBool(value);
 		} else {
 			fprintf(stderr, "Invalid time of day property: \"%s\".\n", key.c_str());
 		}

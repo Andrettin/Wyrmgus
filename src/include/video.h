@@ -53,9 +53,8 @@
 #include "vec2i.h"
 
 class CFont;
-//Wyrmgus start
 class CMapTemplate;
-//Wyrmgus end
+class CTimeOfDay;
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 extern char ForceUseOpenGL;
@@ -80,7 +79,7 @@ protected:
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		//Wyrmgus start
 //		Refs(1), Resized(false)
-		Refs(1), TimeOfDay(0), Resized(false), Grayscale(false)
+		Refs(1), TimeOfDay(nullptr), Resized(false), Grayscale(false)
 		//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		//Wyrmgus start
@@ -155,9 +154,7 @@ public:
 	void UseDisplayFormat();
 	void Resize(int w, int h);
 	void SetOriginalSize();
-	//Wyrmgus start
-	SDL_Surface *SetTimeOfDay(int time, bool flipped = false);
-	//Wyrmgus end
+	SDL_Surface *SetTimeOfDay(CTimeOfDay *time_of_day, bool flipped = false);
 	bool TransparentPixel(int x, int y);
 	void MakeShadow();
 
@@ -191,16 +188,14 @@ public:
 	frame_pos_t *frame_map;
 	frame_pos_t *frameFlip_map;
 	void GenFramesMap();
-	int Width;                 /// Width of a frame
-	int Height;                /// Height of a frame
-	int NumFrames;             /// Number of frames
-	int GraphicWidth;          /// Original graphic width
-	int GraphicHeight;         /// Original graphic height
-	int Refs;                  /// Uses of this graphic
-	//Wyrmgus start
-	int TimeOfDay;				/// Time of day of this graphic (0 = normal/none, 1 = dawn, 2 = morning, 3 = midday, 4 = afternoon, 5 = dusk, 6 = first watch, 7 = midnight, 8 = second watch)
-	//Wyrmgus end
-	bool Resized;              /// Image has been resized
+	int Width;					/// Width of a frame
+	int Height;					/// Height of a frame
+	int NumFrames;				/// Number of frames
+	int GraphicWidth;			/// Original graphic width
+	int GraphicHeight;			/// Original graphic height
+	int Refs;					/// Uses of this graphic
+	CTimeOfDay *TimeOfDay;		/// Time of day for this graphic
+	bool Resized;				/// Image has been resized
 	//Wyrmgus start
 	bool Grayscale;
 	//Wyrmgus end
@@ -253,7 +248,7 @@ protected:
 
 public:
 	//Wyrmgus start
-	void MakePlayerColorSurface(int player_color, bool flipped = false, int time_of_day = 0);
+	void MakePlayerColorSurface(int player_color, bool flipped = false, CTimeOfDay *time_of_day = nullptr);
 	//Wyrmgus end
 	//Wyrmgus start
 	void DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y);
@@ -279,7 +274,7 @@ public:
 		}
 		
 		if (!PlayerColorSurfaces[player_color]) {
-			MakePlayerColorSurface(player_color, false, NoTimeOfDay);
+			MakePlayerColorSurface(player_color, false, nullptr);
 		}
 		return PlayerColorSurfaces[player_color];
 	}
@@ -571,15 +566,15 @@ extern int LoadGraphicPNG(CGraphic *g);
 /// Make an OpenGL texture
 //Wyrmgus start
 //extern void MakeTexture(CGraphic *graphic);
-extern void MakeTexture(CGraphic *graphic, int time_of_day = 0);
+extern void MakeTexture(CGraphic *graphic, CTimeOfDay *time_of_day = nullptr);
 //Wyrmgus end
 //Wyrmgus start
-extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, int ow, int oh, int time_of_day = 0);
+extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, int ow, int oh, CTimeOfDay *time_of_day = nullptr);
 //Wyrmgus end
 /// Make an OpenGL texture of the player color pixels only.
 //Wyrmgus start
 //extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
-extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player, int time_of_day = 0);
+extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player, CTimeOfDay *time_of_day = nullptr);
 //Wyrmgus end
 
 /// Regenerate Window screen if needed

@@ -228,30 +228,6 @@ enum Directions {
 	MaxDirections
 };
 
-enum TimesOfDay {
-	NoTimeOfDay,
-	DawnTimeOfDay,
-	MorningTimeOfDay,
-	MiddayTimeOfDay,
-	AfternoonTimeOfDay,
-	DuskTimeOfDay,
-	FirstWatchTimeOfDay,
-	MidnightTimeOfDay,
-	SecondWatchTimeOfDay,
-	
-	MaxTimesOfDay
-};
-
-enum Seasons {
-	NoSeason,
-	SpringSeason,
-	SummerSeason,
-	AutumnSeason,
-	WinterSeason,
-	
-	MaxSeasons
-};
-
 enum Difficulties {
 	DifficultyNoDifficulty = 0,
 	DifficultyEasy,

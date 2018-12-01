@@ -629,7 +629,7 @@ extern int GetSubtemplateStartX(std::string subtemplate_ident);
 extern int GetSubtemplateStartY(std::string subtemplate_ident);
 extern void ChangeToPreviousMapLayer();
 extern void ChangeCurrentMapLayer(const int z);
-extern void SetTimeOfDay(int time_of_day, int z = 0);
+extern void SetTimeOfDay(const int time_of_day, int z = 0);
 //Wyrmgus end
 
 // in unit.c

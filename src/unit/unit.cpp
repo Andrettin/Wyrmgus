@@ -81,6 +81,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
+#include "time_of_day.h"
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/interface.h"
@@ -2994,9 +2995,9 @@ void UpdateUnitSightRange(CUnit &unit)
 	// FIXME : these values must be configurable.
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
-	if (Map.MapLayers[unit.MapLayer]->TimeOfDay == MorningTimeOfDay || Map.MapLayers[unit.MapLayer]->TimeOfDay == MiddayTimeOfDay || Map.MapLayers[unit.MapLayer]->TimeOfDay == AfternoonTimeOfDay) {
+	if (Map.MapLayers[unit.MapLayer]->GetTimeOfDay() && Map.MapLayers[unit.MapLayer]->GetTimeOfDay()->Day) {
 		unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
-	} else if (Map.MapLayers[unit.MapLayer]->TimeOfDay == FirstWatchTimeOfDay || Map.MapLayers[unit.MapLayer]->TimeOfDay == MidnightTimeOfDay || Map.MapLayers[unit.MapLayer]->TimeOfDay == SecondWatchTimeOfDay) {
+	} else if (Map.MapLayers[unit.MapLayer]->GetTimeOfDay() && Map.MapLayers[unit.MapLayer]->GetTimeOfDay()->Night) {
 		unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
 	}
 	unit_sight_range = std::max<int>(1, unit_sight_range);

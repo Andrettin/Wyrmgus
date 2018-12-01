@@ -46,6 +46,7 @@
 
 std::vector<CTimeOfDaySchedule *> CTimeOfDaySchedule::TimeOfDaySchedules;
 std::map<std::string, CTimeOfDaySchedule *> CTimeOfDaySchedule::TimeOfDaySchedulesByIdent;
+CTimeOfDaySchedule *CTimeOfDaySchedule::DefaultTimeOfDaySchedule = nullptr;
 	
 /*----------------------------------------------------------------------------
 --  Functions
@@ -54,8 +55,8 @@ std::map<std::string, CTimeOfDaySchedule *> CTimeOfDaySchedule::TimeOfDaySchedul
 /**
 **	@brief	Get a time of day schedule
 **
-**	@param	ident		The time of day schedule's string identifier
-**	@param	should_find	Whether it is an error if the time of day schedule could not be found; this is true by default
+**	@param	ident			The time of day schedule's string identifier
+**	@param	should_find		Whether it is an error if the time of day schedule could not be found; this is true by default
 **
 **	@return	The time of day schedule if found, or null otherwise
 */
@@ -130,6 +131,11 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "name") {
 			this->Name = value;
+		} else if (key == "default_schedule") {
+			const bool is_default_schedule = StringToBool(value);
+			if (is_default_schedule) {
+				CTimeOfDaySchedule::DefaultTimeOfDaySchedule = this;
+			}
 		} else {
 			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", key.c_str());
 		}
@@ -141,7 +147,7 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 		
 		if (child_config_data->Tag == "scheduled_time_of_day") {
 			CTimeOfDay *time_of_day = nullptr;
-			int hours = 0;
+			unsigned hours = 0;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -170,8 +176,10 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 			CScheduledTimeOfDay *scheduled_time_of_day = new CScheduledTimeOfDay;
 			scheduled_time_of_day->TimeOfDay = time_of_day;
 			scheduled_time_of_day->Hours = hours;
-			
+			scheduled_time_of_day->ID = this->ScheduledTimesOfDay.size();
+			scheduled_time_of_day->Schedule = this;
 			this->ScheduledTimesOfDay.push_back(scheduled_time_of_day);
+			this->TotalHours += scheduled_time_of_day->Hours;
 		} else {
 			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", child_config_data->Tag.c_str());
 		}

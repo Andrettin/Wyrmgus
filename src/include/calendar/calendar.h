@@ -92,7 +92,6 @@ public:
 	static CCalendar *GetCalendar(const std::string &ident);
 	static CCalendar *GetOrAddCalendar(const std::string &ident);
 	static void ClearCalendars();
-	static int GetTimeOfDay(const unsigned long long hours, const int hours_per_day);
 	
 	static std::vector<CCalendar *> Calendars;
 	static std::map<std::string, CCalendar *> CalendarsByIdent;

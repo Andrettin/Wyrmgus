@@ -158,42 +158,6 @@ void CCalendar::ClearCalendars()
 }
 
 /**
-**	@brief	Get the time of day corresponding to a quantity of hours and hours per day
-**
-**	@param	hours			The quantity of hours
-**	@param	hours_per_day	The hours per day which will be used to process the amount of hours
-**
-**	@return	The index of the time of day
-*/
-int CCalendar::GetTimeOfDay(const unsigned long long hours, const int hours_per_day)
-{
-	//in order for getting the time of day to work with days containing more hours than the standard 24, we need to "convert" the hour into its equivalent for a 24-hour day; so that, for instance, the 2nd hour of an 48-hour day will be transformed into the 1st hour of a 24-hour day
-	int standardized_hour = hours % hours_per_day;
-	standardized_hour *= DefaultHoursPerDay;
-	standardized_hour /= hours_per_day;
-	
-	if (standardized_hour >= 5 && standardized_hour <= 7) {
-		return DawnTimeOfDay;
-	} else if (standardized_hour >= 8 && standardized_hour <= 10) {
-		return MorningTimeOfDay;
-	} else if (standardized_hour >= 11 && standardized_hour <= 13) {
-		return MiddayTimeOfDay;
-	} else if (standardized_hour >= 14 && standardized_hour <= 16) {
-		return AfternoonTimeOfDay;
-	} else if (standardized_hour >= 17 && standardized_hour <= 19) {
-		return DuskTimeOfDay;
-	} else if (standardized_hour >= 20 && standardized_hour <= 22) {
-		return FirstWatchTimeOfDay;
-	} else if (standardized_hour >= 23 || (standardized_hour >= 0 && standardized_hour <= 1)) {
-		return MidnightTimeOfDay;
-	} else if (standardized_hour >= 2 && standardized_hour <= 4) {
-		return SecondWatchTimeOfDay;
-	}
-	
-	return NoTimeOfDay;
-}
-
-/**
 **	@brief	Process data provided by a configuration file
 **
 **	@param	config_data	The configuration data

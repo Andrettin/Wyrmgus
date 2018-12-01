@@ -58,6 +58,7 @@
 #include "season.h"
 #include "sound.h"
 #include "spells.h"
+#include "time_of_day.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui/button_action.h"
@@ -906,35 +907,21 @@ void DrawResources()
 **	@brief	Draw the time of day
 */
 void DrawDayTime() {
-	if (UI.TimePanel.TextX != -1) {
-		if (UI.CurrentMapLayer->TimeOfDay != NoTimeOfDay && UI.CurrentMapLayer->TimeOfDay < MaxTimesOfDay) {
-			char timesText[MaxTimesOfDay][16] = {
-				"No Time",
-				"Dawn",
-				"Morning",
-				"Midday",
-				"Afternoon",
-				"Dusk",
-				"Early Night",
-				"Midnight",
-				"Late Night"
-			};
-			
-			std::string time_of_day_string = _(timesText[UI.CurrentMapLayer->TimeOfDay]);
-
+	if (UI.TimeOfDayPanel.TextX != -1) {
+		if (UI.CurrentMapLayer->GetTimeOfDay()) {
 			CLabel label(GetGameFont());
 
 			// TODO: Instead of a simple text here we could use an icon per time of day
-			label.Draw(UI.TimePanel.TextX, UI.TimePanel.TextY, time_of_day_string);
+			label.Draw(UI.TimeOfDayPanel.TextX, UI.TimeOfDayPanel.TextY, _(UI.CurrentMapLayer->GetTimeOfDay()->Name.c_str()));
 		}
 	}
 	
 	if (UI.SeasonPanel.TextX != -1) {
-		if (UI.CurrentMapLayer->Season) {
+		if (UI.CurrentMapLayer->GetSeason()) {
 			CLabel label(GetGameFont());
 
 			// TODO: Instead of a simple text here we could use an icon per season
-			label.Draw(UI.SeasonPanel.TextX, UI.SeasonPanel.TextY, UI.CurrentMapLayer->GetSeason()->Name);
+			label.Draw(UI.SeasonPanel.TextX, UI.SeasonPanel.TextY, _(UI.CurrentMapLayer->GetSeason()->Name.c_str()));
 		}
 	}
 	

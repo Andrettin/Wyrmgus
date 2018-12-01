@@ -67,6 +67,7 @@
 //Wyrmgus end
 #include "sound.h"
 #include "sound_server.h"
+#include "time_of_day.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui/interface.h"
@@ -322,9 +323,9 @@ static void GameLogicLoop()
 	SaveGameLoading = false;
 
 #ifdef USE_OAML
-	if (enableOAML && oaml) {
+	if (enableOAML && oaml && UI.CurrentMapLayer->GetTimeOfDay()) {
 		// Time of day can change our main music loop, if the current playing track is set for this
-		SetMusicCondition(OAML_CONDID_MAIN_LOOP, UI.CurrentMapLayer->TimeOfDay);
+		SetMusicCondition(OAML_CONDID_MAIN_LOOP, UI.CurrentMapLayer->GetTimeOfDay()->ID);
 	}
 #endif
 
@@ -452,13 +453,11 @@ static void GameLogicLoop()
 				for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 					CMapLayer *map_layer = Map.MapLayers[z];
 					
-					unsigned hours_per_time_of_day = map_layer->GetHoursPerTimeOfDay();
-					if (GameSettings.Inside || GameSettings.NoTimeOfDay || map_layer->SurfaceLayer > 0 || !hours_per_time_of_day) {
-						map_layer->TimeOfDay = NoTimeOfDay; //the map layer has no time of day
-						continue;
-					}
-					if (CDate::CurrentTotalHours % hours_per_time_of_day == 0) { 
-						map_layer->IncrementTimeOfDay();
+					if (map_layer->TimeOfDaySchedule) {
+						map_layer->RemainingTimeOfDayHours -= 1;
+						if (map_layer->RemainingTimeOfDayHours <= 0) {
+							map_layer->IncrementTimeOfDay();
+						}
 					}
 					
 					if (map_layer->SeasonSchedule) {

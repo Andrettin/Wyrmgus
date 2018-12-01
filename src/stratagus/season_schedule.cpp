@@ -55,8 +55,8 @@ CSeasonSchedule *CSeasonSchedule::DefaultSeasonSchedule = nullptr;
 /**
 **	@brief	Get a season schedule
 **
-**	@param	ident		The season schedule's string identifier
-**	@param	should_find	Whether it is an error if the season schedule could not be found; this is true by default
+**	@param	ident			The season schedule's string identifier
+**	@param	should_find		Whether it is an error if the season schedule could not be found; this is true by default
 **
 **	@return	The season schedule if found, or null otherwise
 */
@@ -159,6 +159,8 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 					season = CSeason::GetSeason(value);
 				} else if (key == "days") {
 					hours = std::stoi(value) * this->HoursPerDay;
+				} else if (key == "hours") {
+					hours = std::stoi(value);
 				} else {
 					fprintf(stderr, "Invalid scheduled season property: \"%s\".\n", key.c_str());
 				}

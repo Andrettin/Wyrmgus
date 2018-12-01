@@ -162,7 +162,7 @@ class CUserInterface
 
 	CResourceInfo Resources[MaxResourceInfo];
 	CInfoPanel InfoPanel;
-	CResourceInfo TimePanel;
+	CResourceInfo TimeOfDayPanel;
 	CResourceInfo SeasonPanel;
 	CResourceInfo DatePanel;
 	CResourceInfo AgePanel;

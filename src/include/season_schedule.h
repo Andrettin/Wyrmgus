@@ -52,7 +52,7 @@ class CScheduledSeason
 {
 public:
 	CScheduledSeason() :
-		ID(0), Season(nullptr), Hours(0), Schedule(NULL)
+		ID(0), Season(nullptr), Hours(0), Schedule(nullptr)
 	{
 	}
 	
@@ -84,7 +84,7 @@ public:
 
 	std::string Ident;									/// Ident of the season schedules
 	std::string Name;									/// Name of the season schedules
-	unsigned TotalHours;								/// The total hours this season schedule contains
+	unsigned TotalHours;								/// The total amount of hours this season schedule contains
 	unsigned HoursPerDay;								/// The hours per each day for this season schedule
 	std::vector<CScheduledSeason *> ScheduledSeasons;	/// The seasons that are scheduled
 };
