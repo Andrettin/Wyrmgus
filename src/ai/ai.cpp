@@ -155,6 +155,7 @@
 #include "luacallback.h"
 //Wyrmgus end
 #include "map/map.h"
+#include "map/map_layer.h"
 //Wyrmgus start
 #include "network.h"
 //Wyrmgus end
@@ -340,7 +341,7 @@ static void AiCheckUnits()
 							if (
 								mercenary_type->Class == queue.Type->Class
 								&& queue.Want > queue.Made
-								&& (!queue.Landmass || queue.Landmass == Map.GetTileLandmass(mercenary_building->tilePos, mercenary_building->MapLayer))
+								&& (!queue.Landmass || queue.Landmass == Map.GetTileLandmass(mercenary_building->tilePos, mercenary_building->MapLayer->ID))
 								&& (!queue.Settlement || queue.Settlement == mercenary_building->Settlement)
 							) {
 								queue.Made++;
@@ -1146,7 +1147,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				}
 
 				if (shouldAttack) {
-					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
+					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer->ID);
 					has_helper = true;
 				}
 			}
@@ -1207,7 +1208,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 	Assert(what.Player->Type != PlayerPerson);
 	//Wyrmgus start
 //	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
-	AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer), what.Settlement);
+	AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 	//Wyrmgus end
 }
 
@@ -1339,20 +1340,14 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			const Vec2i pos = blocker.tilePos + blocker.Type->TileSize * dirs[r];
 
 			// Out of the map => no !
-			//Wyrmgus start
-//			if (!Map.Info.IsPointOnMap(pos)) {
-			if (!Map.Info.IsPointOnMap(pos, unit.MapLayer)) {
-			//Wyrmgus end
+			if (!Map.Info.IsPointOnMap(pos, unit.MapLayer->ID)) {
 				continue;
 			}
 			// move to blocker ? => no !
 			if (pos == u0) {
 				continue;
 			}
-			//Wyrmgus start
-//			if (Map.Field(pos)->UnitCache.size() > 0) {
-			if (Map.Field(pos, unit.MapLayer)->UnitCache.size() > 0) {
-			//Wyrmgus end
+			if (unit.MapLayer->Field(pos)->UnitCache.size() > 0) {
 				continue;
 			}
 
@@ -1376,10 +1371,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 				savedOrder = unit.CurrentOrder()->Clone();
 			}
 		}
-		//Wyrmgus start
-//		CommandMove(*movableunits[index], movablepos[index], FlushCommands);
-		CommandMove(*movableunits[index], movablepos[index], FlushCommands, movableunits[index]->MapLayer);
-		//Wyrmgus end
+		CommandMove(*movableunits[index], movablepos[index], FlushCommands, movableunits[index]->MapLayer->ID);
 		if (savedOrder != nullptr) {
 			unit.SavedOrder = savedOrder;
 		}
@@ -1399,10 +1391,7 @@ void AiCanNotMove(CUnit &unit)
 	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 
 	AiPlayer = unit.Player->Ai;
-	//Wyrmgus start
-//	if (PlaceReachable(unit, goalPos, gw, gh, 0, 255)) {
-	if (PlaceReachable(unit, goalPos, gw, gh, 0, 511, 0, unit.MapLayer)) {
-	//Wyrmgus end
+	if (PlaceReachable(unit, goalPos, gw, gh, 0, 511, 0, unit.MapLayer->ID)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 		//Wyrmgus start
@@ -1444,11 +1433,11 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	//Wyrmgus start
 //	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
 	if (unit.Player == what.Player) {
-		AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer), what.Settlement);
+		AiRemoveFromBuilt(what.Player->Ai, *what.Type, Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 	} else { //remove the request of the unit the mercenary is substituting
 		int requested_unit_type_id = PlayerRaces.GetFactionClassUnitType(what.Player->Faction, what.Type->Class);
 		if (requested_unit_type_id != -1) {
-			AiRemoveFromBuilt(what.Player->Ai, *UnitTypes[requested_unit_type_id], Map.GetTileLandmass(what.tilePos, what.MapLayer), what.Settlement);
+			AiRemoveFromBuilt(what.Player->Ai, *UnitTypes[requested_unit_type_id], Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 		}
 	}
 	//Wyrmgus end
@@ -1459,7 +1448,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	
 	if (what.Player->Ai->Force.GetForce(what) == -1) { // if the unit hasn't been assigned to a force, see if it is a transporter, and assign it accordingly
 		if (what.Type->CanTransport() && what.CanMove() && (what.Type->UnitType == UnitTypeNaval || what.Type->UnitType == UnitTypeFly || what.Type->UnitType == UnitTypeFlyLow)) {
-			int landmass = Map.GetTileLandmass(what.tilePos, what.MapLayer);
+			int landmass = Map.GetTileLandmass(what.tilePos, what.MapLayer->ID);
 			
 			what.Player->Ai->Transporters[landmass].push_back(&what);
 		}
@@ -1617,7 +1606,7 @@ int AiGetUnitTypeCount(const PlayerAi &pai, const CUnitType *type, const int lan
 		for (size_t i = 0; i < table.size(); ++i) {
 			CUnit &unit = *table[i];
 					
-			if (Map.GetTileLandmass(unit.tilePos, unit.MapLayer) == landmass) {
+			if (Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID) == landmass) {
 				count++;
 			}
 		}

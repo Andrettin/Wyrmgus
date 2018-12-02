@@ -805,8 +805,8 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				(mf->Flags & MapFieldDesert)
 				&& mf->Owner != unit.Player->Index
 				&& unit.Type->BoolFlag[ORGANIC_INDEX].value
-				&& Map.MapLayers[unit.MapLayer]->GetTimeOfDay()
-				&& Map.MapLayers[unit.MapLayer]->GetTimeOfDay()->Day
+				&& unit.MapLayer->GetTimeOfDay()
+				&& unit.MapLayer->GetTimeOfDay()->Day
 				&& unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0
 			) {
 				cost += 32; //increase the cost of moving through deserts for units affected by dehydration, as we want the pathfinding to try to avoid that
@@ -1324,7 +1324,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 //	Assert(Map.Info.IsPointOnMap(startPos));
 	Assert(Map.Info.IsPointOnMap(startPos, z));
 	
-	if (unit.MapLayer != z) {
+	if (unit.MapLayer->ID != z) {
 		return PF_UNREACHABLE;
 	}
 	

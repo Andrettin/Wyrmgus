@@ -1022,7 +1022,7 @@ void DrawPopups()
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode
 				if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
-					PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, Map.MapLayers[UnitUnderCursor->MapLayer]);
+					PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos, UnitUnderCursor->MapLayer);
 					unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);
 					std::string unit_name;
 					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != nullptr) {

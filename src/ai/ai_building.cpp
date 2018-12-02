@@ -38,6 +38,7 @@
 #include "ai_local.h"
 
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -348,10 +349,7 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 	const Vec2i maxpos = mine.tilePos + typeSize + offset;
 	std::vector<CUnit *> units;
 
-	//Wyrmgus start
-//	Select(minpos, maxpos, units);
-	Select(minpos, maxpos, units, mine.MapLayer);
-	//Wyrmgus end
+	Select(minpos, maxpos, units, mine.MapLayer->ID);
 
 	const size_t nunits = units.size();
 	int buildings = 0;

@@ -37,12 +37,15 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <string.h>
-
 #include "stratagus.h"
+
+#include "map/map.h"
+#include "map/map_layer.h"
+
 #include "unit.h"
 #include "unittype.h"
-#include "map/map.h"
+
+#include <string.h>
 
 /**
 **  Insert new unit into cache.
@@ -58,24 +61,14 @@ void CMap::Insert(CUnit &unit)
 	int j, i = h;
 
 	do {
-		//Wyrmgus start
-//		CMapField *mf = Field(index);
-		CMapField *mf = Field(index, unit.MapLayer);
-		//Wyrmgus end
+		CMapField *mf = unit.MapLayer->Field(index);
 		j = w;
 		do {
 			mf->UnitCache.Insert(&unit);
 			++mf;
-		//Wyrmgus start
-//		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
-//		index += Info.MapWidth;
-		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidths[unit.MapLayer]);
-		index += Info.MapWidths[unit.MapLayer];
-		//Wyrmgus end
-	//Wyrmgus start
-//	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
-	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeights[unit.MapLayer]);
-	//Wyrmgus end
+		} while (--j && unit.tilePos.x + (j - w) < unit.MapLayer->Width);
+		index += unit.MapLayer->Width;
+	} while (--i && unit.tilePos.y + (i - h) < unit.MapLayer->Height);
 }
 
 /**
@@ -92,24 +85,14 @@ void CMap::Remove(CUnit &unit)
 	int j, i = h;
 
 	do {
-		//Wyrmgus start
-//		CMapField *mf = Field(index);
-		CMapField *mf = Field(index, unit.MapLayer);
-		//Wyrmgus end
+		CMapField *mf = unit.MapLayer->Field(index);
 		j = w;
 		do {
 			mf->UnitCache.Remove(&unit);
 			++mf;
-		//Wyrmgus start
-//		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
-//		index += Info.MapWidth;
-		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidths[unit.MapLayer]);
-		index += Info.MapWidths[unit.MapLayer];
-		//Wyrmgus end
-	//Wyrmgus start
-//	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
-	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeights[unit.MapLayer]);
-	//Wyrmgus end
+		} while (--j && unit.tilePos.x + (j - w) < unit.MapLayer->Width);
+		index += unit.MapLayer->Width;
+	} while (--i && unit.tilePos.y + (i - h) < unit.MapLayer->Height);
 }
 
 //Wyrmgus start

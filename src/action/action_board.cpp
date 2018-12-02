@@ -126,7 +126,7 @@ enum {
 
 	if (this->HasGoal()) {
 		//Wyrmgus start
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		//Wyrmgus end
@@ -161,10 +161,7 @@ enum {
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		//Wyrmgus start
-//		input.SetGoal(goal->tilePos, tileSize);
-		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
-		//Wyrmgus end
+		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -322,14 +319,14 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 					if (pathRet == PF_UNREACHABLE) {
 						//Wyrmgus start
 						//if is unreachable and is on a raft, see if the raft can move closer to the "transporter"
-						if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+						if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 							std::vector<CUnit *> table;
-							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
+							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 							for (size_t i = 0; i != table.size(); ++i) {
 								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 									if (table[i]->CurrentAction() == UnitActionStill) {
 										CommandStopUnit(*table[i]);
-										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer : this->MapLayer);
+										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 									}
 									return;
 								}

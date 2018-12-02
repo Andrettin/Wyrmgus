@@ -38,6 +38,7 @@
 #include "missile.h"
 
 #include "actions.h"
+#include "map/map_layer.h"
 #include "unit.h"
 #include "unit_find.h"
 
@@ -74,8 +75,8 @@ void MissileFlameShield::Action()
 	const int iy = unit->IY;
 	const int uw = unit->Type->TileSize.x;
 	const int uh = unit->Type->TileSize.y;
-	this->position.x = upos.x * Map.GetMapLayerPixelTileSize(unit->MapLayer).x + ix + uw * Map.GetMapLayerPixelTileSize(unit->MapLayer).x / 2 + dx - 16;
-	this->position.y = upos.y * Map.GetMapLayerPixelTileSize(unit->MapLayer).y + iy + uh * Map.GetMapLayerPixelTileSize(unit->MapLayer).y / 2 + dy - 32;
+	this->position.x = upos.x * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x + ix + uw * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).x / 2 + dx - 16;
+	this->position.y = upos.y * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y + iy + uh * Map.GetMapLayerPixelTileSize(unit->MapLayer->ID).y / 2 + dy - 32;
 	if (unit->CurrentAction() == UnitActionDie) {
 		this->TTL = index;
 	}

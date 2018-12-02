@@ -46,6 +46,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "player.h"
 #include "quest.h"
@@ -102,7 +103,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	if (&oldtype == &newtype) { // nothing to do
 		return 1;
 	}
-	const Vec2i pos = unit.tilePos + oldtype.GetHalfTileSize(unit.MapLayer) - newtype.GetHalfTileSize(unit.MapLayer);
+	const Vec2i pos = unit.tilePos + oldtype.GetHalfTileSize(unit.MapLayer->ID) - newtype.GetHalfTileSize(unit.MapLayer->ID);
 	CUnit *container = unit.Container;
 
 	//Wyrmgus start
@@ -334,10 +335,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		//  Update Possible sight range change
 		UpdateUnitSightRange(unit);
 		if (!container) {
-			if (!UnitTypeCanBeAt(newtype, pos, unit.MapLayer)) {
+			if (!UnitTypeCanBeAt(newtype, pos, unit.MapLayer->ID)) {
 				DropOutNearest(unit, pos, nullptr);
 			} else {
-				unit.Place(pos, unit.MapLayer);
+				unit.Place(pos, unit.MapLayer->ID);
 			}
 			RestoreSelection();
 		} else {

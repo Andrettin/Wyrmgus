@@ -41,6 +41,7 @@
 
 #include "actions.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -644,16 +645,16 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 {
 	//Wyrmgus start
 //	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
-	if (!Map.Field(pos, worker.MapLayer)->playerInfo.IsTeamExplored(*worker.Player) && !ignore_exploration) {
+	if (!worker.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*worker.Player) && !ignore_exploration) {
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 
 	//Wyrmgus start
 //	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
-	CUnit *mine = Map.Field(pos, worker.MapLayer)->UnitCache.find(res_finder);
+	CUnit *mine = worker.MapLayer->Field(pos)->UnitCache.find(res_finder);
 	
-	if (Map.Field(pos, worker.MapLayer)->Owner != -1 && Map.Field(pos, worker.MapLayer)->Owner != worker.Player->Index && !Players[Map.Field(pos, worker.MapLayer)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
+	if (worker.MapLayer->Field(pos)->Owner != -1 && worker.MapLayer->Field(pos)->Owner != worker.Player->Index && !Players[worker.MapLayer->Field(pos)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
@@ -662,7 +663,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
 	if (
 		mine && mine != *resultMine && MineIsUsable(*mine)
-		&& (mine->Type->BoolFlag[CANHARVEST_INDEX].value || Map.Field(pos, worker.MapLayer)->Owner == -1 || Map.Field(pos, worker.MapLayer)->Owner == worker.Player->Index) //this is needed to prevent neutral factions from trying to build mines in others' territory
+		&& (mine->Type->BoolFlag[CANHARVEST_INDEX].value || worker.MapLayer->Field(pos)->Owner == -1 || worker.MapLayer->Field(pos)->Owner == worker.Player->Index) //this is needed to prevent neutral factions from trying to build mines in others' territory
 	) {
 	//Wyrmgus end
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
@@ -680,10 +681,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 			bestCost = cost;
 		}
 	}
-	//Wyrmgus start
-//	if (CanMoveToMask(pos, movemask)) { // reachable
-	if (CanMoveToMask(pos, movemask, worker.MapLayer)) { // reachable
-	//Wyrmgus end
+	if (CanMoveToMask(pos, movemask, worker.MapLayer->ID)) { // reachable
 		if (terrainTraversal.Get(pos) < maxRange) {
 			return VisitResult_Ok;
 		} else {
@@ -714,17 +712,14 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
-		//Wyrmgus start
-//		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource);
-		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource, startUnit.MapLayer);
-		//Wyrmgus end
+		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource, startUnit.MapLayer->ID);
 	}
 
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
 //	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[startUnit.MapLayer], Map.Info.MapHeights[startUnit.MapLayer]);
+	terrainTraversal.SetSize(startUnit.MapLayer->Width, startUnit.MapLayer->Height);
 	if (unit.Type->BoolFlag[RAIL_INDEX].value) {
 		terrainTraversal.SetDiagonalAllowed(false);
 	}
@@ -1081,7 +1076,7 @@ private:
 		}
 
 		//Wyrmgus start
-		if (Map.IsLayerUnderground(attacker->MapLayer) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer)) {
+		if (Map.IsLayerUnderground(attacker->MapLayer->ID) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID)) {
 			return INT_MAX;
 		}
 		//Wyrmgus end
@@ -1330,7 +1325,7 @@ public:
 //				if (d <= attackrange ||
 //					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 				if ((d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!Map.IsLayerUnderground(attacker->MapLayer) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer))) {
+					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!Map.IsLayerUnderground(attacker->MapLayer->ID) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID))) {
 				//Wyrmgus end
 					++enemy_count;
 				} else {
@@ -1602,7 +1597,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 		Assert(2 * missile_range + 1 < 32);
 
 		// If unit is removed, use containers x and y
-		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
+		const CUnit *firstContainer = unit.GetFirstContainer();
 		std::vector<CUnit *> table;
 		SelectAroundUnit(*firstContainer, missile_range, table,
 			//Wyrmgus start
@@ -1619,7 +1614,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 		return nullptr;
 	} else {
 		// If unit is removed, use containers x and y
-		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
+		const CUnit *firstContainer = unit.GetFirstContainer();
 		std::vector<CUnit *> table;
 
 		SelectAroundUnit(*firstContainer, range, table,
@@ -1733,7 +1728,7 @@ VisitResult PathwayConnectionFinder::Visit(TerrainTraversal &terrainTraversal, c
 		return VisitResult_Finished;
 	}
 	
-	if (!Map.Field(pos, src_unit.MapLayer)->CheckMask(flags)) {
+	if (!src_unit.MapLayer->Field(pos)->CheckMask(flags)) {
 		return VisitResult_DeadEnd;
 	}
 	
@@ -1744,7 +1739,7 @@ bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsign
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidths[src_unit.MapLayer], Map.Info.MapHeights[src_unit.MapLayer]);
+	terrainTraversal.SetSize(src_unit.MapLayer->Width, src_unit.MapLayer->Height);
 	terrainTraversal.SetDiagonalAllowed(false);
 	terrainTraversal.Init();
 

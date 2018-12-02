@@ -40,6 +40,7 @@
 #include "ai.h"
 #include "animation.h"
 #include "iolib.h"
+#include "map/map_layer.h"
 #include "script.h"
 #include "sound.h"
 #include "player.h"
@@ -163,13 +164,10 @@
 		if (upgrade.Name.empty()) {
 			//Wyrmgus start
 //			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("%s: research complete"), type.GetDefaultName(player).c_str());
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), type.GetDefaultName(player).c_str());
 			//Wyrmgus end
 		} else {
-			//Wyrmgus start
-//			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), upgrade.Name.c_str());
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("%s: research complete"), upgrade.Name.c_str());
-			//Wyrmgus end
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.Name.c_str());
 		}
 		if (&player == ThisPlayer) {
 			//Wyrmgus start

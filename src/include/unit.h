@@ -96,12 +96,7 @@ typedef COrder *COrderPtr;
 extern void SelectedUnitChanged();
 
 /// Returns the map distance between to unittype as locations
-extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1,
-								   //Wyrmgus start
-								   int src_z,
-//								   const CUnitType &dst, const Vec2i &pos2);
-								   const CUnitType &dst, const Vec2i &pos2, int dst_z);
-								   //Wyrmgus end
+extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, int src_z, const CUnitType &dst, const Vec2i &pos2, int dst_z);
 								   
 extern int MapDistance(const Vec2i &src_size, const Vec2i &pos1, int src_z, const Vec2i &dst_size, const Vec2i &pos2, int dst_z);
 
@@ -133,7 +128,7 @@ class CUnit
 public:
 	//Wyrmgus start
 //	CUnit() : tilePos(-1, -1), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr) { Init(); }
-	CUnit() : tilePos(-1, -1), RallyPointPos(-1, -1), MapLayer(0), RallyPointMapLayer(0), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr) { Init(); }
+	CUnit() : tilePos(-1, -1), RallyPointPos(-1, -1), MapLayer(nullptr), RallyPointMapLayer(nullptr), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr) { Init(); }
 	//Wyrmgus end
 
 	void Init();
@@ -349,30 +344,9 @@ public:
 
 	bool IsUnusable(bool ignore_built_state = false) const;
 
-	/**
-	 **  Returns the map distance between this unit and dst units.
-	 **
-	 **  @param dst  Distance to this unit.
-	 **
-	 **  @return     The distance between in tiles.
-	 */
-	int MapDistanceTo(const CUnit &dst) const
-	{
-		//Wyrmgus start
-		if (this->MapLayer != dst.MapLayer) {
-			return 16384;
-		}
-		
-//		return MapDistanceBetweenTypes(*Type, tilePos, *dst.Type, dst.tilePos);
-		const CUnitType *distance_unit_type = Container ? Container->Type : Type;
-		return MapDistanceBetweenTypes(*distance_unit_type, tilePos, MapLayer, *dst.Type, dst.tilePos, dst.MapLayer);
-		//Wyrmgus end
-	}
+	int MapDistanceTo(const CUnit &dst) const;
 
-	//Wyrmgus start
-//	int MapDistanceTo(const Vec2i &pos) const;
 	int MapDistanceTo(const Vec2i &pos, int z) const;
-	//Wyrmgus end
 
 	/**
 	**  Test if unit can move.
@@ -384,10 +358,7 @@ public:
 
 	int GetDrawLevel() const;
 
-	//Wyrmgus start
-//	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos);
 	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z);
-	//Wyrmgus end
 
 	PixelPos GetMapPixelPosTopLeft() const;
 	PixelPos GetMapPixelPosCenter() const;
@@ -399,6 +370,8 @@ public:
 	PixelSize GetHalfTilePixelSize() const;
 	Vec2i GetCenterPos() const;
 	
+	CUnit *GetFirstContainer() const;
+
 	void SetIndividualUpgrade(const CUpgrade *upgrade, int quantity);
 	int GetIndividualUpgrade(const CUpgrade *upgrade) const;
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
@@ -493,9 +466,9 @@ public:
 	
 	Vec2i tilePos; /// Map position X
 	//Wyrmgus start
-	Vec2i RallyPointPos;	/// used for storing the rally point position (where units trained by this unit will be sent to)
-	int MapLayer;			/// in which map layer the unit is
-	int RallyPointMapLayer;	/// in which map layer the unit's rally point is
+	Vec2i RallyPointPos;			/// used for storing the rally point position (where units trained by this unit will be sent to)
+	CMapLayer *MapLayer;			/// in which map layer the unit is
+	CMapLayer *RallyPointMapLayer;	/// in which map layer the unit's rally point is
 	//Wyrmgus end
 
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
@@ -735,8 +708,6 @@ extern void UnitClearOrders(CUnit &unit);
 extern void UpdateForNewUnit(const CUnit &unit, int upgrade);
 /// @todo more docu
 extern void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos);
-
-extern CUnit *GetFirstContainer(const CUnit &unit);
 
 /// Call when an Unit goes under fog.
 extern void UnitGoesUnderFog(CUnit &unit, const CPlayer &player);

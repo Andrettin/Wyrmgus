@@ -41,6 +41,7 @@
 
 #include "commands.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "unit.h"
 
 /* virtual */ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
@@ -59,12 +60,12 @@
 	Assert(type);
 	Vec2i resPos;
 	DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
-	FindNearestDrop(*type, pos, resPos, LookingW, unit.MapLayer);
+	FindNearestDrop(*type, pos, resPos, LookingW, unit.MapLayer->ID);
 	if (SquareDistance(pos, resPos) <= square(range)) {
 		CUnit *target = MakeUnit(*type, &player);
 		if (target != nullptr) {
 			target->tilePos = resPos;
-			target->Place(resPos, unit.MapLayer);
+			target->Place(resPos, unit.MapLayer->ID);
 			if (flags & SU_Summoned) {
 				target->Summoned = 1;
 			}

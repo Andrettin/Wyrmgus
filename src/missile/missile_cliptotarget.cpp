@@ -38,6 +38,7 @@
 #include "missile.h"
 
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "unit.h"
 
 /**
@@ -48,8 +49,8 @@ void MissileClipToTarget::Action()
 	this->Wait = this->Type->Sleep;
 
 	if (this->TargetUnit != nullptr) {
-		this->position.x = this->TargetUnit->tilePos.x * Map.GetMapLayerPixelTileSize(this->TargetUnit->MapLayer).x + this->TargetUnit->IX;
-		this->position.y = this->TargetUnit->tilePos.y * Map.GetMapLayerPixelTileSize(this->TargetUnit->MapLayer).y + this->TargetUnit->IY;
+		this->position.x = this->TargetUnit->tilePos.x * Map.GetMapLayerPixelTileSize(this->TargetUnit->MapLayer->ID).x + this->TargetUnit->IX;
+		this->position.y = this->TargetUnit->tilePos.y * Map.GetMapLayerPixelTileSize(this->TargetUnit->MapLayer->ID).y + this->TargetUnit->IY;
 	}
 
 	if (this->NextMissileFrame(1, 0)) {

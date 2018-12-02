@@ -116,10 +116,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	input.SetMinRange(0);
 	input.SetMaxRange(0);
 	const Vec2i tileSize(0, 0);
-	//Wyrmgus start
-//	input.SetGoal(input.GetUnit()->tilePos, tileSize);
-	input.SetGoal(input.GetUnit()->tilePos, tileSize, input.GetUnit()->MapLayer);
-	//Wyrmgus end
+	input.SetGoal(input.GetUnit()->tilePos, tileSize, input.GetUnit()->MapLayer->ID);
 }
 
 /* virtual */ void COrder::FillSeenValues(CUnit &unit) const
@@ -171,10 +168,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	if (goal != nullptr) {
 		const Vec2i invalidPos(-1, -1);
 
-		//Wyrmgus start
-//		FireMissile(unit, goal, invalidPos);
-		FireMissile(unit, goal, invalidPos, goal->MapLayer);
-		//Wyrmgus end
+		FireMissile(unit, goal, invalidPos, goal->MapLayer->ID);
 		UnHideUnit(unit); // unit is invisible until attacks
 	}
 	unit.StepCount = 0;
@@ -200,7 +194,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 /* virtual */ const int COrder::GetGoalMapLayer() const
 {
 	if (this->HasGoal()) {
-		return this->GetGoal()->MapLayer;
+		return this->GetGoal()->MapLayer->ID;
 	}
 	return 0;
 }
@@ -478,12 +472,12 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		}
 		
 		//apply "-stalk" abilities
-		if ((unit.Variable[DESERTSTALK_INDEX].Value > 0 || unit.Variable[FORESTSTALK_INDEX].Value > 0 || unit.Variable[SWAMPSTALK_INDEX].Value > 0) && Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)) {
+		if ((unit.Variable[DESERTSTALK_INDEX].Value > 0 || unit.Variable[FORESTSTALK_INDEX].Value > 0 || unit.Variable[SWAMPSTALK_INDEX].Value > 0) && Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer->ID)) {
 			if (
 				(
-					(unit.Variable[DESERTSTALK_INDEX].Value > 0 && (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldDesert))
-					|| (unit.Variable[FORESTSTALK_INDEX].Value > 0 && Map.TileBordersFlag(unit.tilePos, unit.MapLayer, MapFieldForest))
-					|| (unit.Variable[SWAMPSTALK_INDEX].Value > 0 && (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldMud))
+					(unit.Variable[DESERTSTALK_INDEX].Value > 0 && (unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Flags & MapFieldDesert))
+					|| (unit.Variable[FORESTSTALK_INDEX].Value > 0 && Map.TileBordersFlag(unit.tilePos, unit.MapLayer->ID, MapFieldForest))
+					|| (unit.Variable[SWAMPSTALK_INDEX].Value > 0 && (unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Flags & MapFieldMud))
 				)
 				&& (unit.Variable[INVISIBLE_INDEX].Value > 0 || !unit.IsInCombat())
 			) {				
@@ -499,11 +493,11 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		
 		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
 			unit.Type->BoolFlag[ORGANIC_INDEX].value
-			&& Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)
-			&& (Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Flags & MapFieldDesert)
-			&& Map.Field(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)->Owner != unit.Player->Index
-			&& Map.MapLayers[unit.MapLayer]->GetTimeOfDay()
-			&& Map.MapLayers[unit.MapLayer]->GetTimeOfDay()->Day
+			&& Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer->ID)
+			&& (unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Flags & MapFieldDesert)
+			&& unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Owner != unit.Player->Index
+			&& unit.MapLayer->GetTimeOfDay()
+			&& unit.MapLayer->GetTimeOfDay()->Day
 			&& unit.Variable[HYDRATING_INDEX].Value <= 0
 			&& unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0
 		) {

@@ -403,7 +403,7 @@ static int CclUnit(lua_State *l)
 			}
 		} else if (!strcmp(value, "connecting-destination")) {
 			unit->ConnectingDestination = &UnitManager.GetSlotUnit(LuaToNumber(l, 2, j + 1));
-			Map.MapLayers[unit->MapLayer]->LayerConnectors.push_back(unit);
+			unit->MapLayer->LayerConnectors.push_back(unit);
 		//Wyrmgus end
 		} else if (!strcmp(value, "current-sight-range")) {
 			unit->CurrentSightRange = LuaToNumber(l, 2, j + 1);
@@ -451,18 +451,13 @@ static int CclUnit(lua_State *l)
 			//Wyrmgus end
 			// Radar(Jammer) not.
 			lua_pop(l, 1);
-		//Wyrmgus start
 		} else if (!strcmp(value, "map-layer")) {
-			unit->MapLayer = LuaToNumber(l, 2, j + 1);
-		//Wyrmgus end
+			unit->MapLayer = Map.MapLayers[LuaToNumber(l, 2, j + 1)];
 		} else if (!strcmp(value, "tile")) {
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->tilePos.x , &unit->tilePos.y, -1);
 			lua_pop(l, 1);
-			//Wyrmgus start
-//			unit->Offset = Map.getIndex(unit->tilePos);
-			unit->Offset = Map.getIndex(unit->tilePos, unit->MapLayer);
-			//Wyrmgus end
+			unit->Offset = Map.getIndex(unit->tilePos, unit->MapLayer->ID);
 		} else if (!strcmp(value, "seen-tile")) {
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->Seen.tilePos.x , &unit->Seen.tilePos.y, -1);
@@ -735,7 +730,7 @@ static int CclUnit(lua_State *l)
 			unit->RallyPointPos.x = rally_point_x;
 			unit->RallyPointPos.y = rally_point_y;
 		} else if (!strcmp(value, "rally-point-map-layer")) {
-			unit->RallyPointMapLayer = LuaToNumber(l, 2, j + 1);
+			unit->RallyPointMapLayer = Map.MapLayers[LuaToNumber(l, 2, j + 1)];
 		//Wyrmgus end
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
@@ -794,14 +789,8 @@ static int CclMoveUnit(lua_State *l)
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 2);
 
-	//Wyrmgus start
-//	if (UnitCanBeAt(*unit, ipos)) {
-	if (UnitCanBeAt(*unit, ipos, unit->MapLayer)) {
-	//Wyrmgus end
-		//Wyrmgus start
-//		unit->Place(ipos);
-		unit->Place(ipos, unit->MapLayer);
-		//Wyrmgus end
+	if (UnitCanBeAt(*unit, ipos, unit->MapLayer->ID)) {
+		unit->Place(ipos, unit->MapLayer->ID);
 	} else {
 		const int heading = SyncRand() % 256;
 
@@ -966,9 +955,9 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		if (UnitCanBeAt(*unit, ipos, transporter->MapLayer)
-			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, ipos, 0, true, transporter->MapLayer))) {
-			unit->Place(ipos, transporter->MapLayer);
+		if (UnitCanBeAt(*unit, ipos, transporter->MapLayer->ID)
+			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, ipos, 0, true, transporter->MapLayer->ID))) {
+			unit->Place(ipos, transporter->MapLayer->ID);
 		} else {
 			const int heading = SyncRand() % 256;
 
@@ -1023,7 +1012,7 @@ static int CclCreateUnitOnTop(lua_State *l)
 	Vec2i ipos;
 	ipos.x = on_top->tilePos.x;
 	ipos.y = on_top->tilePos.y;
-	int z = on_top->MapLayer;
+	int z = on_top->MapLayer->ID;
 
 	if (playerno == -1) {
 		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
@@ -1091,9 +1080,9 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		return 0;
 	}
 	Vec2i new_pos;
-	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true, worker->MapLayer);
+	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true, worker->MapLayer->ID);
 	
-	if (!Map.Info.IsPointOnMap(new_pos, worker->MapLayer)) {
+	if (!Map.Info.IsPointOnMap(new_pos, worker->MapLayer->ID)) {
 		new_pos = Players[playerno].StartPos;
 	}
 	
@@ -1103,9 +1092,9 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		if (UnitCanBeAt(*unit, new_pos, worker->MapLayer)
-			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, new_pos, 0, true, worker->MapLayer))) {
-			unit->Place(new_pos, worker->MapLayer);
+		if (UnitCanBeAt(*unit, new_pos, worker->MapLayer->ID)
+			|| (unit->Type->BoolFlag[BUILDING_INDEX].value && CanBuildUnitType(nullptr, *unit->Type, new_pos, 0, true, worker->MapLayer->ID))) {
+			unit->Place(new_pos, worker->MapLayer->ID);
 		} else {
 			const int heading = SyncRand() % 256;
 
@@ -1847,7 +1836,7 @@ static int CclGetUnitVariable(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(value, "MapLayer")) {
-		lua_pushnumber(l, unit->MapLayer);
+		lua_pushnumber(l, unit->MapLayer->ID);
 	} else if (!strcmp(value, "EffectiveResourceSellPrice")) {
 		LuaCheckArgs(l, 3);
 		std::string resource_ident = LuaToString(l, 3);

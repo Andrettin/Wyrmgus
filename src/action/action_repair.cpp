@@ -69,7 +69,7 @@
 
 	if (target.Destroyed) {
 		order->goalPos = target.tilePos + target.GetHalfTileSize();
-		order->MapLayer = target.MapLayer;
+		order->MapLayer = target.MapLayer->ID;
 	} else {
 		order->SetGoal(&target);
 		order->ReparableTarget = &target;
@@ -160,7 +160,7 @@
 	PixelPos targetPos;
 
 	if (this->ReparableTarget != nullptr) {
-		if (this->ReparableTarget->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->ReparableTarget->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		targetPos = vp.MapToScreenPixelPos(this->ReparableTarget->GetMapPixelPosCenter());
@@ -190,7 +190,7 @@
 	Vec2i tileSize;
 	if (ReparableTarget != nullptr) {
 		tileSize = ReparableTarget->GetTileSize();
-		input.SetGoal(ReparableTarget->tilePos, tileSize, ReparableTarget->MapLayer);
+		input.SetGoal(ReparableTarget->tilePos, tileSize, ReparableTarget->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -211,7 +211,7 @@ bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 		if (!player.CheckResource(i, RepairCosts[i])) {
 			player.Notify(NotifyYellow, unit.tilePos,
 						  //Wyrmgus start
-						  unit.MapLayer,
+						  unit.MapLayer->ID,
 //						  _("We need more %s for repair!"), DefaultResourceNames[i].c_str());
 						  _("We need more %s to repair!"), DefaultResourceNames[i].c_str());
 						  //Wyrmgus end
@@ -306,7 +306,7 @@ static void AnimateActionRepair(CUnit &unit)
 					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair target gone.\n");
 						this->goalPos = goal->tilePos + goal->GetHalfTileSize();
-						this->MapLayer = goal->MapLayer;
+						this->MapLayer = goal->MapLayer->ID;
 						ReparableTarget = nullptr;
 						this->ClearGoal();
 						goal = nullptr;
@@ -326,21 +326,21 @@ static void AnimateActionRepair(CUnit &unit)
 					this->RepairCycle = 0;
 					//Wyrmgus start
 //					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer)) - unit.GetHalfTilePixelSize();
+					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize();
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
 					//Wyrmgus start
 					//if is unreachable and is on a raft, see if the raft can move closer
 					if (err == PF_UNREACHABLE) {
-						if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+						if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 							std::vector<CUnit *> table;
-							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
+							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 							for (size_t i = 0; i != table.size(); ++i) {
 								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 									if (table[i]->CurrentAction() == UnitActionStill) {
 										CommandStopUnit(*table[i]);
-										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer : this->MapLayer);
+										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 									}
 									return;
 								}
@@ -366,7 +366,7 @@ static void AnimateActionRepair(CUnit &unit)
 				if (!goal->IsVisibleAsGoal(*unit.Player)) {
 					DebugPrint("repair goal is gone\n");
 					this->goalPos = goal->tilePos + goal->GetHalfTileSize();
-					this->MapLayer = goal->MapLayer;
+					this->MapLayer = goal->MapLayer->ID;
 					// FIXME: should I clear this here?
 					this->ClearGoal();
 					ReparableTarget = nullptr;

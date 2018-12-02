@@ -37,6 +37,7 @@
 
 #include "map/map.h"
 
+#include "map/map_layer.h"
 #include "player.h"
 #include "unittype.h"
 #include "unit.h"
@@ -83,10 +84,8 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 	unsigned int index = Offset;
 	int j = Type->TileSize.y;
 	do {
-		//Wyrmgus start
-//		const CMapField *mf = Map.Field(index);
-		const CMapField *mf = Map.Field(index, this->MapLayer);
-		//Wyrmgus end
+		const CMapField *mf = this->MapLayer->Field(index);
+
 		int i = x_max;
 		do {
 			if (IsTileRadarVisible(pradar, *Player, mf->playerInfo) != 0) {
@@ -94,10 +93,7 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 			}
 			++mf;
 		} while (--i);
-		//Wyrmgus start
-//		index += Map.Info.MapWidth;
-		index += Map.Info.MapWidths[this->MapLayer];
-		//Wyrmgus end
+		index += this->MapLayer->Width;
 	} while (--j);
 
 	// Can't exit till the end, as we might be be able to see a different tile

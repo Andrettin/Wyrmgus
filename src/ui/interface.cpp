@@ -169,10 +169,7 @@ static void SetBestMapLayerForUnitGroup(const std::vector<CUnit *> &unit_group)
 		map_layer_count.push_back(0);
 	}
 	for (size_t i = 0; i != unit_group.size(); ++i) {
-		if (unit_group[i]->MapLayer < 0 || unit_group[i]->MapLayer >= (int) map_layer_count.size()) {
-			continue;
-		}
-		map_layer_count[unit_group[i]->MapLayer] += 1;
+		map_layer_count[unit_group[i]->MapLayer->ID] += 1;
 	}
 	for (size_t i = 0; i < map_layer_count.size(); ++i) {
 		if (map_layer_count[i] > map_layer_count[best_map_layer]) {
@@ -191,7 +188,7 @@ static PixelPos GetMiddlePositionForUnitGroup(const std::vector<CUnit *> &unit_g
 	
 	int map_layer_units = 0;
 	for (size_t i = 0; i != unit_group.size(); ++i) {
-		if (unit_group[i]->MapLayer != UI.CurrentMapLayer->ID) {
+		if (unit_group[i]->MapLayer != UI.CurrentMapLayer) {
 			continue;
 		}
 		pos += unit_group[i]->GetMapPixelPosCenter();
@@ -539,8 +536,8 @@ void UiFindIdleWorker()
 		CurrentButtonLevel = 0;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
-		if (unit->MapLayer != UI.CurrentMapLayer->ID) {
-			ChangeCurrentMapLayer(unit->MapLayer);
+		if (unit->MapLayer != UI.CurrentMapLayer) {
+			ChangeCurrentMapLayer(unit->MapLayer->ID);
 		}
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
@@ -576,8 +573,8 @@ void UiFindLevelUpUnit()
 		CurrentButtonLevel = 0;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
-		if (unit->MapLayer != UI.CurrentMapLayer->ID) {
-			ChangeCurrentMapLayer(unit->MapLayer);
+		if (unit->MapLayer != UI.CurrentMapLayer) {
+			ChangeCurrentMapLayer(unit->MapLayer->ID);
 		}
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
@@ -599,8 +596,8 @@ void UiFindHeroUnit(int hero_index)
 	CurrentButtonLevel = 0;
 	PlayUnitSound(*Selected[0], VoiceSelected);
 	SelectionChanged();
-	if (unit->MapLayer != UI.CurrentMapLayer->ID) {
-		ChangeCurrentMapLayer(unit->MapLayer);
+	if (unit->MapLayer != UI.CurrentMapLayer) {
+		ChangeCurrentMapLayer(unit->MapLayer->ID);
 	}
 	UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 }

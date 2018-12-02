@@ -801,7 +801,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 						if (!town_hall_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
 							continue;
 						}
-						if (town_hall_unit->MapLayer != z) {
+						if (town_hall_unit->MapLayer->ID != z) {
 							continue;
 						}
 						worker_pos = town_hall_unit->tilePos;
@@ -992,15 +992,15 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 				if (pathway_type) {
 					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileSize.x + 1; ++x) {
 						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->TileSize.y + 1; ++y) {
-							if (!Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
+							if (!Map.Info.IsPointOnMap(x, y, unit->MapLayer->ID)) {
 								continue;
 							}
-							CMapField &mf = *Map.Field(x, y, unit->MapLayer);
+							CMapField &mf = *unit->MapLayer->Field(x, y);
 							if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
 								continue;
 							}
 							Vec2i pathway_pos(x, y);
-							if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit->MapLayer)) {
+							if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit->MapLayer->ID)) {
 								continue;
 							}
 							

@@ -216,7 +216,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	order->SetGoal(&mine);
 	order->Resource.Mine = &mine;
 	order->Resource.Pos = mine.tilePos + mine.GetHalfTileSize();
-	order->Resource.MapLayer = mine.MapLayer;
+	order->Resource.MapLayer = mine.MapLayer->ID;
 	order->CurrentResource = mine.GivesResource;
 	return order;
 }
@@ -241,9 +241,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resource, int rang
 	} else {
 		order->State = SUB_UNREACHABLE_DEPOT;
 		order->goalPos = harvester.tilePos;
-		//Wyrmgus start
-		order->MapLayer = harvester.MapLayer;
-		//Wyrmgus end
+		order->MapLayer = harvester.MapLayer->ID;
 	}
 	return order;
 }
@@ -268,7 +266,7 @@ int COrder_Resource::GetHarvestMapLayer() const
 //	if (this->Resource.Mine != nullptr) {
 	if (this->Resource.Mine != nullptr && this->Resource.Mine->Type != nullptr) {
 	//Wyrmgus end
-		return this->Resource.Mine->MapLayer;
+		return this->Resource.Mine->MapLayer->ID;
 	} else {
 		return this->Resource.MapLayer;
 	}
@@ -418,7 +416,7 @@ COrder_Resource::~COrder_Resource()
 
 	if (this->HasGoal()) {
 		//Wyrmgus start
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		//Wyrmgus end
@@ -453,7 +451,7 @@ COrder_Resource::~COrder_Resource()
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
+		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -510,14 +508,14 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
+				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
 						return 0;
 					}
@@ -573,14 +571,14 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
+				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
 						return 0;
 					}
@@ -726,7 +724,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	// Update the heading of a harvesting unit to looks straight at the resource.
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, goal->tilePos - unit.tilePos + goal->Type->GetHalfTileSize());
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer)) - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer)) + goal->GetHalfTilePixelSize() - unit.GetHalfTilePixelSize());
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(goal->tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 
 	// If resource is still under construction, wait!
@@ -1089,10 +1087,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 					if (Preference.MineNotifications
 						&& unit.Player->Index == ThisPlayer->Index
 						&& source->Variable[GIVERESOURCE_INDEX].Max > (Resources[this->CurrentResource].DefaultIncome * 10)) {
-							//Wyrmgus start
-//							unit.Player->Notify(NotifyYellow, source->tilePos, _("%s has collapsed!"), source->Type->Name.c_str());
-							unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer, _("Our %s has been depleted!"), source->Type->Name.c_str());
-							//Wyrmgus end
+							unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s has been depleted!"), source->Type->Name.c_str());
 					}
 					LetUnitDie(*source);
 					// FIXME: make the workers inside look for a new resource.
@@ -1182,7 +1177,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 			&& source->Variable[GIVERESOURCE_INDEX].Max > (Resources[this->CurrentResource].DefaultIncome * 10)) {
 				//Wyrmgus start
 //				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
-				unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer, _("Our %s is nearing depletion!"), source->Type->Name.c_str());
+				unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s is nearing depletion!"), source->Type->Name.c_str());
 				//Wyrmgus end
 				source->MineLow = 1;
 		}
@@ -1222,9 +1217,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	} else {
 		// Store resource position.
 		this->Resource.Pos = unit.tilePos;
-		//Wyrmgus start
-		this->Resource.MapLayer = unit.MapLayer;
-		//Wyrmgus end
+		this->Resource.MapLayer = unit.MapLayer->ID;
 		Assert(this->Resource.Mine == nullptr);
 	}
 
@@ -1291,14 +1284,14 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer
-			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
+				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
 						return 0;
 					}
@@ -1438,10 +1431,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 bool COrder_Resource::WaitInDepot(CUnit &unit)
 {
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
-	//Wyrmgus start
-//	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo.ResourceId);
-	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo.ResourceId, unit.MapLayer);
-	//Wyrmgus end
+	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo.ResourceId, unit.MapLayer->ID);
 
 	//Assert(depot);
 
@@ -1451,9 +1441,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	if (!this->Resource.Mine || this->Resource.Mine->Type == nullptr) {
 	//Wyrmgus end
 		Vec2i pos = this->Resource.Pos;
-		//Wyrmgus start
-		int z = this->Resource.MapLayer = unit.MapLayer;
-		//Wyrmgus end
+		int z = this->Resource.MapLayer = unit.MapLayer->ID;
 
 		//Wyrmgus start
 //		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, pos, &pos)) {
@@ -1621,12 +1609,10 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 				Vec2i resPos;
 				//Wyrmgus start
 //				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos, &resPos)) {
-				if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer)) {
+				if (FindTerrainType(unit.Type->MovementMask, this->CurrentResource, 8, *unit.Player, unit.tilePos, &resPos, unit.MapLayer->ID)) {
 				//Wyrmgus end
 					this->goalPos = resPos;
-					//Wyrmgus start
-					this->MapLayer = unit.MapLayer;
-					//Wyrmgus end
+					this->MapLayer = unit.MapLayer->ID;
 					this->State = SUB_MOVE_TO_RESOURCE;
 					DebugPrint("Found a better place to harvest %d,%d\n" _C_ resPos.x _C_ resPos.y);
 					return true;

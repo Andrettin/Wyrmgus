@@ -194,8 +194,8 @@ void DrawMapArea()
 			if (vp->Unit->Destroyed || vp->Unit->CurrentAction() == UnitActionDie) {
 				vp->Unit = nullptr;
 			} else {
-				if (UI.CurrentMapLayer->ID != vp->Unit->MapLayer) {
-					ChangeCurrentMapLayer(vp->Unit->MapLayer);
+				if (UI.CurrentMapLayer != vp->Unit->MapLayer) {
+					ChangeCurrentMapLayer(vp->Unit->MapLayer->ID);
 				}
 				vp->Center(vp->Unit->GetMapPixelPosCenter());
 			}
@@ -434,7 +434,6 @@ static void GameLogicLoop()
 		}
 		//Wyrmgus end
 		
-		//Wyrmgus start
 		if (GameCycle > 0) {
 			if (GameCycle % CyclesPerInGameHour == 0) {
 				CDate::CurrentTotalHours++;
@@ -469,12 +468,8 @@ static void GameLogicLoop()
 				}
 			}
 		}
-		//Wyrmgus end
 		
-		//Wyrmgus start
-//		if (Preference.AutosaveMinutes != 0 && !IsNetworkGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_SECOND * 60 * Preference.AutosaveMinutes)) == 0) { // autosave every X minutes, if the option is enabled
 		if (Preference.AutosaveMinutes != 0 && !IsNetworkGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_MINUTE * Preference.AutosaveMinutes)) == 0) { // autosave every X minutes, if the option is enabled
-		//Wyrmgus end
 			UI.StatusLine.Set(_("Autosave"));
 			//Wyrmgus start
 //			SaveGame("autosave.sav");

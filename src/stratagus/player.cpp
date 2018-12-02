@@ -1738,7 +1738,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
 		
 		if (!chosen_upgrade->Name.empty()) {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("%s acquired through contact with %s"), chosen_upgrade->Name.c_str(), this->Name.c_str());
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->Name.c_str(), this->Name.c_str());
 		}
 		if (&player == ThisPlayer) {
 			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
@@ -1826,13 +1826,13 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 			continue;
 		}
 		
-		int settlement_landmass = Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer);
+		int settlement_landmass = Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 		if (std::find(Map.BorderLandmasses[settlement_landmass].begin(), Map.BorderLandmasses[settlement_landmass].end(), water_zone) == Map.BorderLandmasses[settlement_landmass].end()) { //settlement's landmass doesn't even border the water zone, continue
 			continue;
 		}
 		
 		Vec2i pos(0, 0);
-		if (FindTerrainType(0, 0, 8, *this, settlement_unit->tilePos, &pos, settlement_unit->MapLayer, water_zone)) {
+		if (FindTerrainType(0, 0, 8, *this, settlement_unit->tilePos, &pos, settlement_unit->MapLayer->ID, water_zone)) {
 			return true;
 		}
 	}
@@ -1847,13 +1847,13 @@ CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size)
 	
 	for (size_t i = 0; i < Map.SiteUnits.size(); ++i) {
 		CUnit *settlement_unit = Map.SiteUnits[i];
-		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer) {
+		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer->ID) {
 			continue;
 		}
 		if (!this->HasNeutralFactionType() && this != settlement_unit->Player) {
 			continue;
 		}
-		int distance = MapDistance(size, pos, z, settlement_unit->Type->TileSize, settlement_unit->tilePos, settlement_unit->MapLayer);
+		int distance = MapDistance(size, pos, z, settlement_unit->Type->TileSize, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 		if (!best_hall || distance < best_distance) {
 			best_hall = settlement_unit;
 			best_distance = distance;
@@ -2276,7 +2276,7 @@ void CPlayer::GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUn
 			FindPlayerUnitsByType(*this, *AiHelpers.Build[building->Slot][i], worker_table, true);
 
 			for (size_t j = 0; j != worker_table.size(); ++j) {
-				int worker_landmass = Map.GetTileLandmass(worker_table[j]->tilePos, worker_table[j]->MapLayer);
+				int worker_landmass = Map.GetTileLandmass(worker_table[j]->tilePos, worker_table[j]->MapLayer->ID);
 				if (std::find(worker_landmasses.begin(), worker_landmasses.end(), worker_landmass) == worker_landmasses.end()) {
 					worker_landmasses.push_back(worker_landmass);
 				}
@@ -3728,7 +3728,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 		this->ResourceDemand[i] += type->Stats[this->Index].ResourceDemand[i];
 	}
 	
-	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && Map.Info.IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && Map.Info.IsPointOnMap(unit->tilePos, unit->MapLayer->ID) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		this->Ai->Scouts.push_back(unit);
 	}
 	

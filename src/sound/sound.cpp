@@ -166,7 +166,7 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 {
 	//Wyrmgus start
-	const CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
+	const CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
 	//Wyrmgus end
 	switch (voice) {
 		case VoiceAcknowledging:
@@ -435,7 +435,7 @@ static char CalculateStereo(const CUnit &unit)
 */
 void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 {
-	if (!UI.CurrentMapLayer || unit.MapLayer != UI.CurrentMapLayer->ID) {
+	if (!UI.CurrentMapLayer || unit.MapLayer != UI.CurrentMapLayer) {
 		return;
 	}
 	
@@ -492,7 +492,7 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 		return;
 	}
 	//Wyrmgus start
-	if (unit.MapLayer != UI.CurrentMapLayer->ID) {
+	if (unit.MapLayer != UI.CurrentMapLayer) {
 		return;
 	}
 	//Wyrmgus end

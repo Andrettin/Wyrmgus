@@ -48,6 +48,7 @@
 #include "font.h"
 #include "luacallback.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 //Wyrmgus start
@@ -3502,28 +3503,16 @@ void UpdateUnitVariables(CUnit &unit)
 
 	// Position
 	unit.Variable[POSX_INDEX].Value = unit.tilePos.x;
-	//Wyrmgus start
-//	unit.Variable[POSX_INDEX].Max = Map.Info.MapWidth;
-	unit.Variable[POSX_INDEX].Max = Map.Info.MapWidths[unit.MapLayer];
-	//Wyrmgus end
+	unit.Variable[POSX_INDEX].Max = unit.MapLayer->Width;
 	unit.Variable[POSY_INDEX].Value = unit.tilePos.y;
-	//Wyrmgus start
-//	unit.Variable[POSY_INDEX].Max = Map.Info.MapHeight;
-	unit.Variable[POSY_INDEX].Max = Map.Info.MapHeights[unit.MapLayer];
-	//Wyrmgus end
+	unit.Variable[POSY_INDEX].Max = unit.MapLayer->Height;
 
 	// Target Position
 	const Vec2i goalPos = unit.CurrentOrder()->GetGoalPos();
 	unit.Variable[TARGETPOSX_INDEX].Value = goalPos.x;
-	//Wyrmgus start
-//	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidth;
 	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidths[unit.CurrentOrder()->GetGoalMapLayer()];
-	//Wyrmgus end
 	unit.Variable[TARGETPOSY_INDEX].Value = goalPos.y;
-	//Wyrmgus start
-//	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeight;
 	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeights[unit.CurrentOrder()->GetGoalMapLayer()];
-	//Wyrmgus end
 
 	// RadarRange
 	unit.Variable[RADAR_INDEX].Value = unit.Stats->Variables[RADAR_INDEX].Value;

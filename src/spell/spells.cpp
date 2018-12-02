@@ -50,6 +50,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "sound.h"
 #include "unit.h"
@@ -83,10 +84,7 @@ std::vector<SpellType *> SpellTypeTable;
 */
 static Target *NewTargetUnit(CUnit &unit)
 {
-	//Wyrmgus start
-//	return new Target(TargetUnit, &unit, unit.tilePos);
-	return new Target(TargetUnit, &unit, unit.tilePos, unit.MapLayer);
-	//Wyrmgus end
+	return new Target(TargetUnit, &unit, unit.tilePos, unit.MapLayer->ID);
 }
 
 // ****************************************************************************
@@ -307,9 +305,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	}
 	Assert(autocast);
 	const Vec2i &pos = caster.tilePos;
-	//Wyrmgus start
-	int z = caster.MapLayer;
-	//Wyrmgus end
+	int z = caster.MapLayer->ID;
 	int range = autocast->Range;
 	int minRange = autocast->MinRange;
 	//Wyrmgus start
@@ -322,7 +318,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	std::vector<CUnit *> table;
 	//Wyrmgus start
 //	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos));
-	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos, caster.MapLayer));
+	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos, caster.MapLayer->ID));
 	//Wyrmgus end
 
 	// Check generic conditions. FIXME: a better way to do this?
@@ -372,7 +368,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 						}
 					}
 					//Wyrmgus start
-					if (Map.IsLayerUnderground(table[i]->MapLayer) && !CheckObstaclesBetweenTiles(caster.tilePos, table[i]->tilePos, MapFieldAirUnpassable, table[i]->MapLayer)) {
+					if (Map.IsLayerUnderground(table[i]->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.tilePos, table[i]->tilePos, MapFieldAirUnpassable, table[i]->MapLayer->ID)) {
 						continue;
 					}
 
@@ -459,7 +455,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				}
 				//Wyrmgus end
 				//Wyrmgus start
-				if (Map.IsLayerUnderground(table[i]->MapLayer) && !CheckObstaclesBetweenTiles(caster.tilePos, table[i]->tilePos, MapFieldAirUnpassable, table[i]->MapLayer)) {
+				if (Map.IsLayerUnderground(table[i]->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.tilePos, table[i]->tilePos, MapFieldAirUnpassable, table[i]->MapLayer->ID)) {
 					continue;
 				}
 
@@ -631,28 +627,21 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 **
 ** @return          !=0 if spell should/can continue or 0 to stop
 */
-//Wyrmgus start
-//int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
 int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos, int z)
-//Wyrmgus end
 {
 	Vec2i pos = goalPos;
 
 	caster.Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
 		pos = target->tilePos;
-		//Wyrmgus start
-		z = target->MapLayer;
-		//Wyrmgus end
+		z = target->MapLayer->ID;
 	}
 	//
 	// For TargetSelf, you target.... YOURSELF
 	//
 	if (spell.Target == TargetSelf) {
 		pos = caster.tilePos;
-		//Wyrmgus start
-		z = caster.MapLayer;
-		//Wyrmgus end
+		z = caster.MapLayer->ID;
 		target = &caster;
 	}
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.Ident.c_str() _C_

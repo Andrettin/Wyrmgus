@@ -201,9 +201,9 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	//Wyrmgus start
 	int box_width = type.BoxWidth;
 	int box_height = type.BoxHeight;
-	if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand && !unit.Moving) { //if is on a raft, use the raft's box size instead
+	if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand && !unit.Moving) { //if is on a raft, use the raft's box size instead
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
+		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->Type->BoxWidth > box_width && table[i]->Type->BoxHeight > box_height) {
 				box_width = table[i]->Type->BoxWidth;
@@ -851,7 +851,7 @@ void ShowOrder(const CUnit &unit)
 	
 	//Wyrmgus start
 	//if unit has rally point, show it
-	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer == UI.CurrentMapLayer->ID) {
+	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer && unit.RallyPointMapLayer == UI.CurrentMapLayer) {
 		Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(unit.RallyPointPos), 3);
 	}
 	//Wyrmgus end

@@ -40,6 +40,7 @@
 
 #include "actions.h"
 #include "commands.h"
+#include "map/map_layer.h"
 #include "script.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -106,17 +107,12 @@ public:
 		const Vec2i minPos = pos - offset;
 		const Vec2i maxPos = pos + offset;
 
-		//Wyrmgus start
-//		CUnit *unit = FindUnit_If(minPos, maxPos, IsDyingAndNotABuilding());
 		CUnit *unit = FindUnit_If(minPos, maxPos, z, IsDyingAndNotABuilding());
-		//Wyrmgus end
 		cansummon = false;
 
 		if (unit != nullptr) { //  Found a corpse. eliminate it and proceed to summoning.
 			pos = unit->tilePos;
-			//Wyrmgus start
-			z = unit->MapLayer;
-			//Wyrmgus end
+			z = unit->MapLayer->ID;
 			unit->Remove(nullptr);
 			unit->Release();
 			cansummon = true;
@@ -138,9 +134,7 @@ public:
 		target = MakeUnit(unittype, caster.Player);
 		if (target != nullptr) {
 			target->tilePos = pos;
-			//Wyrmgus start
-			target->MapLayer = z;
-			//Wyrmgus end
+			target->MapLayer = Map.MapLayers[z];
 			DropOutOnSide(*target, LookingW, nullptr);
 			// To avoid defending summoned unit for AI
 			target->Summoned = 1;

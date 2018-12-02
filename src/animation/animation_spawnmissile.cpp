@@ -42,6 +42,7 @@
 
 #include "actions.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "missile.h"
 #include "pathfinder.h"
 #include "unit.h"
@@ -70,11 +71,11 @@
 		return;
 	}
 	if ((flags & SM_Pixel)) {
-		start.x = goal->tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer).x + goal->IX + moff.x + startx;
-		start.y = goal->tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer).y + goal->IY + moff.y + starty;
+		start.x = goal->tilePos.x * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + goal->IX + moff.x + startx;
+		start.y = goal->tilePos.y * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + goal->IY + moff.y + starty;
 	} else {
-		start.x = (goal->tilePos.x + startx) * Map.GetMapLayerPixelTileSize(goal->MapLayer).x + Map.GetMapLayerPixelTileSize(goal->MapLayer).x / 2 + moff.x;
-		start.y = (goal->tilePos.y + starty) * Map.GetMapLayerPixelTileSize(goal->MapLayer).y + Map.GetMapLayerPixelTileSize(goal->MapLayer).y / 2 + moff.y;
+		start.x = (goal->tilePos.x + startx) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x + Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x / 2 + moff.x;
+		start.y = (goal->tilePos.y + starty) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y + Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y / 2 + moff.y;
 	}
 	if ((flags & SM_ToTarget)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
@@ -89,24 +90,24 @@
 				return;
 			} else if (goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionAttackGround) {
 				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
-				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), Map.MapLayers[goal->MapLayer]);
+				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
 			} else if (goal->CurrentAction() == UnitActionSpellCast) {
 				COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), Map.MapLayers[goal->MapLayer]);
+				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos(), goal->MapLayer);
 			}
 			if (flags & SM_Pixel) {
 				dest.x += destx;
 				dest.y += desty;
 			} else {
-				dest.x += destx * Map.GetMapLayerPixelTileSize(goal->MapLayer).x;
-				dest.y += desty * Map.GetMapLayerPixelTileSize(goal->MapLayer).y;
+				dest.x += destx * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
+				dest.y += desty * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
 			}
 		} else if (flags & SM_Pixel) {
 			dest.x = target->GetMapPixelPosCenter().x + destx;
 			dest.y = target->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (target->tilePos.x + destx) * Map.GetMapLayerPixelTileSize(target->MapLayer).x;
-			dest.y = (target->tilePos.y + desty) * Map.GetMapLayerPixelTileSize(target->MapLayer).y;
+			dest.x = (target->tilePos.x + destx) * Map.GetMapLayerPixelTileSize(target->MapLayer->ID).x;
+			dest.y = (target->tilePos.y + desty) * Map.GetMapLayerPixelTileSize(target->MapLayer->ID).y;
 			dest += target->GetTilePixelSize() / 2;
 		}
 	} else {
@@ -114,16 +115,13 @@
 			dest.x = goal->GetMapPixelPosCenter().x + destx;
 			dest.y = goal->GetMapPixelPosCenter().y + desty;
 		} else {
-			dest.x = (goal->tilePos.x + destx) * Map.GetMapLayerPixelTileSize(goal->MapLayer).x;
-			dest.y = (goal->tilePos.y + desty) * Map.GetMapLayerPixelTileSize(goal->MapLayer).y;
+			dest.x = (goal->tilePos.x + destx) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).x;
+			dest.y = (goal->tilePos.y + desty) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID).y;
 			dest += goal->GetTilePixelSize() / 2;
 		}
 	}
-	Vec2i destTilePos = Map.MapPixelPosToTilePos(dest, unit.MapLayer);
-	//Wyrmgus start
-//	const int dist = goal->MapDistanceTo(destTilePos);
-	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer);
-	//Wyrmgus end
+	Vec2i destTilePos = Map.MapPixelPosToTilePos(dest, unit.MapLayer->ID);
+	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer->ID);
 	if ((flags & SM_Ranged) && !(flags & SM_Pixel)
 		//Wyrmgus start
 //		&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
@@ -131,10 +129,7 @@
 		//Wyrmgus end
 		&& dist < goal->Type->MinAttackRange) {
 	} else {
-		//Wyrmgus start
-//		Missile *missile = MakeMissile(*mtype, start, dest);
-		Missile *missile = MakeMissile(*mtype, start, dest, unit.MapLayer);
-		//Wyrmgus end
+		Missile *missile = MakeMissile(*mtype, start, dest, unit.MapLayer->ID);
 		if (flags & SM_SetDirection) {
 			PixelPos posd;
 			posd.x = Heading2X[goal->Direction / NextDirection];

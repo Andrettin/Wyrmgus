@@ -40,6 +40,7 @@
 #include "actions.h"
 #include "commands.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -157,14 +158,14 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	}
 #endif
 	*/
-	if (!Map.Field(pos, unit.MapLayer)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
 	// Look if found what was required.
 	//Wyrmgus start
 //	if (Map.WallOnMap(pos)) {
-	if (Map.WallOnMap(pos, unit.MapLayer)) {
+	if (Map.WallOnMap(pos, unit.MapLayer->ID)) {
 	//Wyrmgus end
 		DebugPrint("Wall found %d, %d\n" _C_ pos.x _C_ pos.y);
 		if (resultPos) {
@@ -172,10 +173,7 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 		}
 		return VisitResult_Finished;
 	}
-	//Wyrmgus start
-//	if (Map.Field(pos)->CheckMask(movemask)) { // reachable
-	if (Map.Field(pos, unit.MapLayer)->CheckMask(movemask)) { // reachable
-	//Wyrmgus end
+	if (unit.MapLayer->Field(pos)->CheckMask(movemask)) { // reachable
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult_Ok;
 		} else {
@@ -190,10 +188,7 @@ static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
 {
 	TerrainTraversal terrainTraversal;
 
-	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[unit.MapLayer], Map.Info.MapHeights[unit.MapLayer]);
-	//Wyrmgus end
+	terrainTraversal.SetSize(unit.MapLayer->Width, unit.MapLayer->Height);
 	terrainTraversal.Init();
 
 	terrainTraversal.PushUnitPosAndNeighbor(unit);
@@ -238,9 +233,9 @@ int AiFindWall(AiForce *force)
 //			if (aiunit.Type->CanAttack) {
 			if (aiunit.CanAttack()) {
 			//Wyrmgus end
-				CommandAttack(aiunit, wallPos, nullptr, FlushCommands, aiunit.MapLayer);
+				CommandAttack(aiunit, wallPos, nullptr, FlushCommands, aiunit.MapLayer->ID);
 			} else {
-				CommandMove(aiunit, wallPos, FlushCommands, aiunit.MapLayer);
+				CommandMove(aiunit, wallPos, FlushCommands, aiunit.MapLayer->ID);
 			}
 		}
 		return 1;
@@ -267,22 +262,11 @@ private:
 
 VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	//Wyrmgus start
-	/*
-#if 0
-	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		return VisitResult_DeadEnd;
-	}
-#endif
-	*/
-	if (!Map.Field(pos, unit.MapLayer)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
-	//Wyrmgus start
-//	if (CanMoveToMask(pos, movemask)) { // reachable
-	if (CanMoveToMask(pos, movemask, unit.MapLayer)) { // reachable
-	//Wyrmgus end
+	if (CanMoveToMask(pos, movemask, unit.MapLayer->ID)) { // reachable
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -324,30 +308,17 @@ bool EnemyFinderWithTransporter::IsAccessibleForTransporter(const Vec2i &pos) co
 
 VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	//Wyrmgus start
-	/*
-#if 0
-	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
+	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
 		return VisitResult_DeadEnd;
 	}
-#endif
-	*/
-	if (!Map.Field(pos, unit.MapLayer)->playerInfo.IsTeamExplored(*unit.Player)) {
-		return VisitResult_DeadEnd;
-	}
-	//Wyrmgus end
-	//Wyrmgus start
-//	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask)) {
-	if (EnemyOnMapTile(unit, pos, unit.MapLayer) && CanMoveToMask(from, movemask, unit.MapLayer)) {
-	//Wyrmgus end
+
+	if (EnemyOnMapTile(unit, pos, unit.MapLayer->ID) && CanMoveToMask(from, movemask, unit.MapLayer->ID)) {
 		DebugPrint("Target found %d,%d\n" _C_ pos.x _C_ pos.y);
 		*resultPos = pos;
 		return VisitResult_Finished;
 	}
-	//Wyrmgus start
-//	if (CanMoveToMask(pos, movemask) || IsAccessibleForTransporter(pos)) { // reachable
-	if (CanMoveToMask(pos, movemask, unit.MapLayer) || IsAccessibleForTransporter(pos)) { // reachable
-	//Wyrmgus end
+
+	if (CanMoveToMask(pos, movemask, unit.MapLayer->ID) || IsAccessibleForTransporter(pos)) { // reachable
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -363,7 +334,7 @@ static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTrans
 
 	//Wyrmgus start
 //	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[unit.MapLayer], Map.Info.MapHeights[unit.MapLayer]);
+	terrainTraversal.SetSize(unit.MapLayer->Width, unit.MapLayer->Height);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -768,7 +739,7 @@ void AiCheckTransporters()
 			CUnit *uins = ai_transporter.UnitInside;
 			for (int j = 0; j < ai_transporter.InsideCount; ++j, uins = uins->NextContained) {
 				if (uins->GroupId == 0) { //if the unit no longer is part of a force, then it likely has been reset and the attack through water has been cancelled, so unload it
-					CommandUnload(ai_transporter, ai_transporter.tilePos, uins, 0, ai_transporter.MapLayer);
+					CommandUnload(ai_transporter, ai_transporter.tilePos, uins, 0, ai_transporter.MapLayer->ID);
 				}
 			}
 		}
@@ -798,7 +769,7 @@ void AiCheckTransporters()
 			continue;
 		}
 		
-		int landmass = Map.GetTileLandmass(unit.tilePos, unit.MapLayer);
+		int landmass = Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
 		
 		AiPlayer->Transporters[landmass].push_back(&unit);
 	}

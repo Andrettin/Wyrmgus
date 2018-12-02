@@ -293,11 +293,11 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			//Wyrmgus end
 				for (size_t z = 0; z < UnitTypes.size(); ++z) {
-					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
+					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer->ID)) {
 						if (CheckDependByType(*unit.Player, *UnitTypes[z])) {
 							if (UnitTypes[z]->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[UnitTypes[z]->Slot].begin(), AiHelpers.Build[UnitTypes[z]->Slot].end(), unit.Type) != AiHelpers.Build[UnitTypes[z]->Slot].end()) {
 								dest.Blink = 4;
-								SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush, dest.MapLayer);
+								SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush, dest.MapLayer->ID);
 								if (!acknowledged) {
 									PlayUnitSound(unit, VoiceBuild);
 									acknowledged = 1;
@@ -305,7 +305,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 								break;
 							}
 						} else if (CheckDependByType(*unit.Player, *UnitTypes[z], false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
-							ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer, "%s", _("The requirements have not been fulfilled"));
+							ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 							break;
 						}
 					}
@@ -322,12 +322,12 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					SendCommandReturnGoods(unit, depot, flush);
 					//Wyrmgus start
 					for (size_t z = 0; z < UnitTypes.size(); ++z) {
-						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
+						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer->ID)) {
 							if (CheckDependByType(*unit.Player, *UnitTypes[z])) {
-								SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], 0, dest.MapLayer);
+								SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], 0, dest.MapLayer->ID);
 								break;
 							} else if (CheckDependByType(*unit.Player, *UnitTypes[z], false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
-								ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer, "%s", _("The requirements have not been fulfilled"));
+								ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 								break;
 							}
 						}
@@ -458,10 +458,10 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//if the clicked unit is a settlement site, build on it
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
 		for (size_t z = 0; z < UnitTypes.size(); ++z) {
-			if (UnitTypes[z] && UnitTypes[z]->BoolFlag[TOWNHALL_INDEX].value && CheckDependByType(*unit.Player, *UnitTypes[z]) && CanBuildUnitType(&unit, *UnitTypes[z], dest->tilePos, 1, false, dest->MapLayer)) {
+			if (UnitTypes[z] && UnitTypes[z]->BoolFlag[TOWNHALL_INDEX].value && CheckDependByType(*unit.Player, *UnitTypes[z]) && CanBuildUnitType(&unit, *UnitTypes[z], dest->tilePos, 1, false, dest->MapLayer->ID)) {
 				if (UnitTypes[z]->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[UnitTypes[z]->Slot].begin(), AiHelpers.Build[UnitTypes[z]->Slot].end(), unit.Type) != AiHelpers.Build[UnitTypes[z]->Slot].end()) {
 					dest->Blink = 4;
-					SendCommandBuildBuilding(unit, dest->tilePos, *UnitTypes[z], flush, dest->MapLayer);
+					SendCommandBuildBuilding(unit, dest->tilePos, *UnitTypes[z], flush, dest->MapLayer->ID);
 					if (!acknowledged) {
 						PlayUnitSound(unit, VoiceBuild);
 						acknowledged = 1;
@@ -2623,8 +2623,8 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				if ((1 << button) == LeftButton) {
-					if (Selected[0]->MapLayer != UI.CurrentMapLayer->ID) {
-						ChangeCurrentMapLayer(Selected[0]->MapLayer);
+					if (Selected[0]->MapLayer != UI.CurrentMapLayer) {
+						ChangeCurrentMapLayer(Selected[0]->MapLayer->ID);
 					}
 					UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
 				} else if ((1 << button) == RightButton) {
@@ -2720,10 +2720,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 								Assert(uins->Boarded);
 								const int flush = !(KeyModifiers & ModifierShift);
 								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
-									//Wyrmgus start
-//									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
-									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer);
-									//Wyrmgus end
+									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
 								}
 						}
 						++j;
@@ -2749,14 +2746,14 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
 									if ((1 << button) == LeftButton) {
 										if  (!uins->Bound) {
-											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer);
+											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer->ID);
 										} else {
 											if (Selected[0]->Player == ThisPlayer) {
 												std::string item_name = uins->GetMessageName();
 												if (!uins->Unique) {
 													item_name = "the " + item_name;
 												}
-												Selected[0]->Player->Notify(NotifyRed, Selected[0]->tilePos, Selected[0]->MapLayer, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());
+												Selected[0]->Player->Notify(NotifyRed, Selected[0]->tilePos, Selected[0]->MapLayer->ID, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());
 											}
 										}
 									} else if ((1 << button) == RightButton) {

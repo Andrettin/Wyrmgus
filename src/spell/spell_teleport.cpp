@@ -65,9 +65,7 @@
 		unsigned int selected = caster.Selected;
 		caster.Remove(nullptr);
 		caster.tilePos = goalPos;
-		//Wyrmgus start
-		caster.MapLayer = z;
-		//Wyrmgus end
+		caster.MapLayer = Map.MapLayers[z];
 		DropOutNearest(caster, goalPos, nullptr);
 		if (selected) {
 			SelectUnit(caster);

@@ -253,7 +253,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	Assert(unit.Removed);
 	//Wyrmgus start
 //	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos)) {
-	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos, transporter.MapLayer, landmass)) {
+	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos, transporter.MapLayer->ID, landmass)) {
 	//Wyrmgus end
 		return false;
 	}
@@ -287,10 +287,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 		unit.Boarded = 0;
 		transporter.BoardCount -= unit.Type->BoardSize;
 	}
-	//Wyrmgus start
-//	unit.Place(pos);
-	unit.Place(pos, transporter.MapLayer);
-	//Wyrmgus end
+	unit.Place(pos, transporter.MapLayer->ID);
 
 	if (unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Unique) { //destroy items if they have been on the ground for too long
 		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
@@ -304,7 +301,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	//Wyrmgus start
 	//if transporter has a rally point (useful for towers), send the unloaded unit there
 	if (transporter.RallyPointPos.x != -1 && transporter.RallyPointPos.y != -1 && unit.CanMove()) {
-		CommandMove(unit, transporter.RallyPointPos, FlushCommands, transporter.RallyPointMapLayer);
+		CommandMove(unit, transporter.RallyPointPos, FlushCommands, transporter.RallyPointMapLayer->ID);
 	}
 	//Wyrmgus end
 	return true;

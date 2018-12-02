@@ -44,6 +44,7 @@
 #include "commands.h"
 #include "depend.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
@@ -330,7 +331,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 		}
 		
 		if (landmass) {
-			int worker_landmass = Map.GetTileLandmass(unit.tilePos, unit.MapLayer);
+			int worker_landmass = Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
 			if (worker_landmass != landmass && std::find(Map.BorderLandmasses[landmass].begin(), Map.BorderLandmasses[landmass].end(), worker_landmass) == Map.BorderLandmasses[landmass].end()) { //if the landmass is not the same as the worker's, and the worker isn't in an adjacent landmass, then the worker can't build the building at the appropriate location
 				continue;
 			}
@@ -382,7 +383,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	//Wyrmgus end
 	
 	if (!Map.Info.IsPointOnMap(nearPos, z)) {
-		z = unit.MapLayer;
+		z = unit.MapLayer->ID;
 	}
 	
 	Vec2i pos;
@@ -665,10 +666,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 		if (unit.Refs > tooManyWorkers) {
 			continue;
 		}
-		//Wyrmgus start
-//		if (AiEnemyUnitsInDistance(worker, range)) {
-		if (AiEnemyUnitsInDistance(worker, range, worker.MapLayer)) {
-		//Wyrmgus end
+		if (AiEnemyUnitsInDistance(worker, range, worker.MapLayer->ID)) {
 			continue;
 		}
 		//Wyrmgus start
@@ -733,7 +731,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 				for (size_t j = 0; j != builder_table.size(); ++j) {
 					CUnit &builder_unit = *builder_table[j];
 					
-					if (Map.GetTileLandmass(builder_unit.tilePos, builder_unit.MapLayer) == landmass) {
+					if (Map.GetTileLandmass(builder_unit.tilePos, builder_unit.MapLayer->ID) == landmass) {
 						has_builder = true;
 						break;
 					}
@@ -924,7 +922,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0
 		CUnit &unit = *table[i];
 
 		//Wyrmgus start
-		if (landmass && Map.GetTileLandmass(unit.tilePos, unit.MapLayer) != landmass) {
+		if (landmass && Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID) != landmass) {
 			continue;
 		}
 		
@@ -1254,14 +1252,8 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource, int resource_
 	//Wyrmgus end
 
 	// Code for terrain harvesters. Search for piece of terrain to mine.
-	//Wyrmgus start
-//	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
-	if (FindTerrainType(unit.Type->MovementMask, resource, resource_range, *unit.Player, unit.tilePos, &forestPos, unit.MapLayer)) {
-	//Wyrmgus end
-		//Wyrmgus start
-//		CommandResourceLoc(unit, forestPos, FlushCommands);
-		CommandResourceLoc(unit, forestPos, FlushCommands, unit.MapLayer);
-		//Wyrmgus end
+	if (FindTerrainType(unit.Type->MovementMask, resource, resource_range, *unit.Player, unit.tilePos, &forestPos, unit.MapLayer->ID)) {
+		CommandResourceLoc(unit, forestPos, FlushCommands, unit.MapLayer->ID);
 		return 1;
 	}
 	// Ask the AI to explore...
@@ -1311,9 +1303,9 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 				if (
 					type.Slot < (int) AiHelpers.Build.size()
 					&& std::find(AiHelpers.Build[type.Slot].begin(), AiHelpers.Build[type.Slot].end(), unit.Type) != AiHelpers.Build[type.Slot].end()
-					&& CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer)
+					&& CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer->ID)
 				) {
-					CommandBuildBuilding(unit, mine->tilePos, type, FlushCommands, mine->MapLayer);
+					CommandBuildBuilding(unit, mine->tilePos, type, FlushCommands, mine->MapLayer->ID);
 					return 1;
 				}
 			}
@@ -1896,10 +1888,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	}
 	TerrainTraversal terrainTraversal;
 
-	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[building.MapLayer], Map.Info.MapHeights[building.MapLayer]);
-	//Wyrmgus end
+	terrainTraversal.SetSize(building.MapLayer->Width, building.MapLayer->Height);
 	terrainTraversal.Init();
 
 	terrainTraversal.PushUnitPosAndNeighbor(building);
@@ -1907,17 +1896,11 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	const int maxRange = 15;
 	const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 	CUnit *unit = nullptr;
-	//Wyrmgus start
-//	UnitFinder unitFinder(player, table, maxRange, movemask, &unit);
-	UnitFinder unitFinder(player, table, maxRange, movemask, &unit, building.MapLayer);
-	//Wyrmgus end
+	UnitFinder unitFinder(player, table, maxRange, movemask, &unit, building.MapLayer->ID);
 
 	if (terrainTraversal.Run(unitFinder) && unit != nullptr) {
 		const Vec2i invalidPos(-1, -1);
-		//Wyrmgus start
-//		CommandRepair(*unit, invalidPos, &building, FlushCommands);
-		CommandRepair(*unit, invalidPos, &building, FlushCommands, building.MapLayer);
-		//Wyrmgus end
+		CommandRepair(*unit, invalidPos, &building, FlushCommands, building.MapLayer->ID);
 		return true;
 	}
 	return false;
@@ -2016,10 +1999,7 @@ static void AiCheckRepair()
 			//
 			// FIXME: Repair only units under control
 			//
-			//Wyrmgus start
-//			if (AiEnemyUnitsInDistance(unit, unit.Stats->Variables[SIGHTRANGE_INDEX].Max)) {
-			if (AiEnemyUnitsInDistance(unit, unit.Variable[SIGHTRANGE_INDEX].Max, unit.MapLayer)) {
-			//Wyrmgus end
+			if (AiEnemyUnitsInDistance(unit, unit.Variable[SIGHTRANGE_INDEX].Max, unit.MapLayer->ID)) {
 				continue;
 			}
 			//
@@ -2161,7 +2141,7 @@ static void AiCheckPathwayConstruction()
 			//
 			// FIXME: Construct pathways only for buildings under control
 			//
-			if (AiEnemyUnitsInDistance(unit, 8, unit.MapLayer)) {
+			if (AiEnemyUnitsInDistance(unit, 8, unit.MapLayer->ID)) {
 				continue;
 			}
 			
@@ -2173,7 +2153,7 @@ static void AiCheckPathwayConstruction()
 			}
 
 			if (unit.Type->GivesResource) { //if is a mine, build pathways to the depot as well
-				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), 32, unit.GivesResource, unit.MapLayer);
+				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
 					int worker_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("worker"));
@@ -2183,11 +2163,11 @@ static void AiCheckPathwayConstruction()
 						UnmarkUnitFieldFlags(unit);
 						UnmarkUnitFieldFlags(*depot);
 						
-						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), *test_worker_type, &Players[PlayerNumNeutral], unit.MapLayer);
+						CUnit *test_worker = MakeUnitAndPlace(unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), *test_worker_type, &Players[PlayerNumNeutral], unit.MapLayer->ID);
 						char worker_path[64];
 						
 						//make the first path
-						int worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileSize.x, depot->Type->TileSize.y, test_worker->Type->TileSize.x, test_worker->Type->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer, false);
+						int worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileSize.x, depot->Type->TileSize.y, test_worker->Type->TileSize.x, test_worker->Type->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
 						Vec2i worker_path_pos(test_worker->tilePos);
 						std::vector<Vec2i> first_path_tiles;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
@@ -2204,13 +2184,13 @@ static void AiCheckPathwayConstruction()
 						
 						// mark the tiles of the first path (that aren't the first and last tile) as unpassable, so that the second path has to follow a different way
 						for (size_t z = 1; z < first_path_tiles.size(); ++z) {
-							if (!(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldForest) && !(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldRocks) && !(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldWall)) {
-								Map.Field(first_path_tiles[z], unit.MapLayer)->Flags |= MapFieldUnpassable;
+							if (!(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldForest) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldRocks) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldWall)) {
+								unit.MapLayer->Field(first_path_tiles[z])->Flags |= MapFieldUnpassable;
 							}
 						}
 						
 						//make the second path
-						worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileSize.x, depot->Type->TileSize.y, test_worker->Type->TileSize.x, test_worker->Type->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer, false);
+						worker_path_length = AStarFindPath(test_worker->tilePos, depot->tilePos, depot->Type->TileSize.x, depot->Type->TileSize.y, test_worker->Type->TileSize.x, test_worker->Type->TileSize.y, 0, 1, worker_path, 64, *test_worker, 0, unit.MapLayer->ID, false);
 						worker_path_pos = test_worker->tilePos;
 						while (worker_path_length > 0 && worker_path_length <= 64) {
 							Vec2i pos_change(0, 0);
@@ -2223,8 +2203,8 @@ static void AiCheckPathwayConstruction()
 						
 						//unmark the tiles of the first path
 						for (size_t z = 1; z < first_path_tiles.size(); ++z) {
-							if (!(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldForest) && !(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldRocks) && !(Map.Field(first_path_tiles[z], unit.MapLayer)->Flags & MapFieldWall)) {
-								Map.Field(first_path_tiles[z], unit.MapLayer)->Flags &= ~(MapFieldUnpassable);
+							if (!(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldForest) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldRocks) && !(unit.MapLayer->Field(first_path_tiles[z])->Flags & MapFieldWall)) {
+								unit.MapLayer->Field(first_path_tiles[z])->Flags &= ~(MapFieldUnpassable);
 							}
 						}
 						
@@ -2239,10 +2219,10 @@ static void AiCheckPathwayConstruction()
 			
 			for (size_t z = 0; z != pathway_tiles.size(); ++z) {
 				Vec2i pathway_pos(pathway_tiles[z].x, pathway_tiles[z].y);
-				if (!Map.Info.IsPointOnMap(pathway_pos, unit.MapLayer)) {
+				if (!Map.Info.IsPointOnMap(pathway_pos, unit.MapLayer->ID)) {
 					continue;
 				}
-				CMapField &mf = *Map.Field(pathway_pos, unit.MapLayer);
+				CMapField &mf = *unit.MapLayer->Field(pathway_pos);
 				if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
 					continue;
 				}
@@ -2270,7 +2250,7 @@ static void AiCheckPathwayConstruction()
 							&& (pathway_types[p]->TerrainType->Flags & MapFieldRoad)
 						)
 					) {
-						if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer) || !CanBuildHere(nullptr, *pathway_types[p], pathway_pos, unit.MapLayer)) {
+						if (!UnitTypeCanBeAt(*pathway_types[p], pathway_pos, unit.MapLayer->ID) || !CanBuildHere(nullptr, *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
 							continue;
 						}
 							
@@ -2287,7 +2267,7 @@ static void AiCheckPathwayConstruction()
 							// The type is available
 							//
 							if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[pathway_types[p]->Slot][j])) {
-								if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, unit.MapLayer)) {
+								if (AiBuildBuilding(*tablep[pathway_types[p]->Slot][j], *pathway_types[p], pathway_pos, unit.MapLayer->ID)) {
 									built_pathway = true;
 									built_pathway_for_building = true;
 									break;
@@ -2367,7 +2347,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		int settlement_landmass = Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer);
+		int settlement_landmass = Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 		if (std::find(worker_landmasses.begin(), worker_landmasses.end(), settlement_landmass) == worker_landmasses.end()) {
 			continue;
 		}
@@ -2376,7 +2356,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		if (!CanBuildHere(nullptr, *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer)) {
+		if (!CanBuildHere(nullptr, *town_hall_type, settlement_unit->tilePos, settlement_unit->MapLayer->ID)) {
 			continue;
 		}
 		
@@ -2389,7 +2369,7 @@ void AiCheckSettlementConstruction()
 			// The type is available
 			//
 			if (AiPlayer->Player->GetUnitTypeAiActiveCount(tablep[town_hall_type->Slot][j])) {
-				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->Settlement, settlement_unit->tilePos, settlement_unit->MapLayer);
+				AiAddUnitTypeRequest(*town_hall_type, 1, 0, settlement_unit->Settlement, settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 				requested_settlement = true;
 				break;
 			}
@@ -2458,7 +2438,7 @@ void AiCheckDockConstruction()
 		for (size_t j = 0; j < dock_table.size(); ++j) {
 			CUnit &dock_unit = *dock_table[j];
 					
-			if (Map.GetTileLandmass(dock_unit.tilePos, dock_unit.MapLayer) == water_landmass) {
+			if (Map.GetTileLandmass(dock_unit.tilePos, dock_unit.MapLayer->ID) == water_landmass) {
 				has_dock = true;
 				break;
 			}

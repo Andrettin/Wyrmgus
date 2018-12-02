@@ -41,6 +41,7 @@
 
 #include "actions.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "unittype.h"
 #include "unit.h"
 
@@ -125,7 +126,7 @@ void TerrainTraversal::PushNeighbor(const Vec2i &pos)
 
 void TerrainTraversal::PushUnitPosAndNeighbor(const CUnit &unit)
 {
-	const CUnit *startUnit = GetFirstContainer(unit);
+	const CUnit *startUnit = unit.GetFirstContainer();
 	//Wyrmgus start
 	if (startUnit == nullptr) {
 		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighbor() error: startUnit is null.\n");
@@ -215,7 +216,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 //Wyrmgus end
 {
 	//Wyrmgus start
-	if (src.MapLayer != z) {
+	if (src.MapLayer->ID != z) {
 		return 0;
 	}
 	//Wyrmgus end
@@ -235,7 +236,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 		int temp_i = PF_FAILED;
 		for (Vec2i it = start_pos; it.y <= end_pos.y; it.y += pos_diff.y) {
 			for (it.x = start_pos.x; it.x <= end_pos.x; it.x += pos_diff.x) {
-				if (!Map.Info.IsPointOnMap(it, src.Container->MapLayer)) {
+				if (!Map.Info.IsPointOnMap(it, src.Container->MapLayer->ID)) {
 					continue;
 				}
 				temp_i = AStarFindPath(it, goalPos, w, h,
@@ -292,7 +293,7 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 	const int depth = PlaceReachable(src, dst.tilePos,
 									 //Wyrmgus start
 //									 dst.Type->TileSize.x, dst.Type->TileSize.y, 0, range);
-									 dst.Type->TileSize.x, dst.Type->TileSize.y, 0, range, max_length, dst.MapLayer, from_outside_container);
+									 dst.Type->TileSize.x, dst.Type->TileSize.y, 0, range, max_length, dst.MapLayer->ID, from_outside_container);
 									 //Wyrmgus end
 	if (depth <= 0) {
 		return 0;
@@ -319,9 +320,7 @@ PathFinderInput::PathFinderInput() : unit(nullptr), minRange(0), maxRange(0), Ma
 }
 
 const Vec2i &PathFinderInput::GetUnitPos() const { return unit->tilePos; }
-//Wyrmgus start
-const int PathFinderInput::GetUnitMapLayer() const { return unit->MapLayer; }
-//Wyrmgus end
+const int PathFinderInput::GetUnitMapLayer() const { return unit->MapLayer->ID; }
 Vec2i PathFinderInput::GetUnitSize() const
 {
 	return unit->Type->TileSize;
@@ -477,10 +476,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 	const Vec2i dir(*pxd, *pyd);
 	int result = output.Length;
 	output.Length--;
-	//Wyrmgus start
-//	if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
-	if (!UnitCanBeAt(unit, unit.tilePos + dir, unit.MapLayer)) {
-	//Wyrmgus end
+	if (!UnitCanBeAt(unit, unit.tilePos + dir, unit.MapLayer->ID)) {
 		// If obstructing unit is moving, wait for a bit.
 		if (output.Fast) {
 			output.Fast--;
@@ -497,10 +493,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 			if (result > 0) {
 				*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
 				*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
-				//Wyrmgus start
-//				if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
-				if (!UnitCanBeAt(unit, unit.tilePos + dir, unit.MapLayer)) {
-				//Wyrmgus end
+				if (!UnitCanBeAt(unit, unit.tilePos + dir, unit.MapLayer->ID)) {
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
 					*pxd = 0;

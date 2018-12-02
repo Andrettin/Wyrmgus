@@ -877,9 +877,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 			if (unit.GetMissile().Missile->AlwaysFire) {
 			//Wyrmgus end
 				newgoalPos = goal->tilePos;
-				//Wyrmgus start
-				new_z = goal->MapLayer;
-				//Wyrmgus end
+				new_z = goal->MapLayer->ID;
 				goal = nullptr;
 			} else {
 				return;
@@ -961,9 +959,9 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 	}
 
 	// If Firing from inside a Bunker
-	CUnit *from = GetFirstContainer(unit);
+	CUnit *from = unit.GetFirstContainer();
 	const int dir = ((unit.Direction + NextDirection / 2) & 0xFF) / NextDirection;
-	const PixelPos startPixelPos = Map.TilePosToMapPixelPos_TopLeft(from->tilePos, Map.MapLayers[from->MapLayer]) + PixelSize(from->Type->GetHalfTilePixelSize(from->MapLayer).x, from->Type->GetHalfTilePixelSize(from->MapLayer).y)
+	const PixelPos startPixelPos = Map.TilePosToMapPixelPos_TopLeft(from->tilePos, from->MapLayer) + PixelSize(from->Type->GetHalfTilePixelSize(from->MapLayer->ID).x, from->Type->GetHalfTilePixelSize(from->MapLayer->ID).y)
 								   + unit.Type->MissileOffsets[dir][0];
 
 	Vec2i dpos;
@@ -980,10 +978,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		// Fire to nearest point of the unit!
 		// If Firing from inside a Bunker
 		if (unit.Container) {
-			NearestOfUnit(*goal, GetFirstContainer(unit)->tilePos, &dpos);
+			NearestOfUnit(*goal, unit.GetFirstContainer()->tilePos, &dpos);
 		} else {
 			dpos = goal->tilePos + goal->GetHalfTileSize();
-			z = goal->MapLayer;
+			z = goal->MapLayer->ID;
 		}
 	} else {
 		dpos = newgoalPos;
@@ -1330,7 +1328,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 							if (missile.TargetUnit) {
 								missile.TargetUnit = &unit;
 								if (unit.Type->TileSize.x == 1 || unit.Type->TileSize.y == 1) {
-									missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos, Map.MapLayers[unit.MapLayer]);
+									missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos, unit.MapLayer);
 								}
 							} else {
 								missile.position = position;
@@ -1352,7 +1350,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 					//Wyrmgus end
 						missile.TargetUnit = &unit;
 						if (unit.Type->TileSize.x == 1 || unit.Type->TileSize.y == 1) {
-							missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos, Map.MapLayers[unit.MapLayer]);
+							missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos, unit.MapLayer);
 						}
 						missile.DestroyMissile = 1;
 						return true;

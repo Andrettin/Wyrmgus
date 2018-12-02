@@ -47,6 +47,7 @@
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "player.h"
@@ -175,10 +176,7 @@ private:
 		return;
 	}
 
-	//Wyrmgus start
-//	FireMissile(unit, goal, goal->tilePos);
-	FireMissile(unit, goal, goal->tilePos, goal->MapLayer);
-	//Wyrmgus end
+	FireMissile(unit, goal, goal->tilePos, goal->MapLayer->ID);
 	UnHideUnit(unit);
 	unit.StepCount = 0;
 }
@@ -210,23 +208,17 @@ static bool MoveRandomly(CUnit &unit)
 	pos.y += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
 
 	// restrict to map
-	//Wyrmgus start
-//	Map.Clamp(pos);
-	Map.Clamp(pos, unit.MapLayer);
-	//Wyrmgus end
+	Map.Clamp(pos, unit.MapLayer->ID);
 
 	// move if possible
 	if (pos != unit.tilePos) {
 		UnmarkUnitFieldFlags(unit);
-		//Wyrmgus start
-//		if (UnitCanBeAt(unit, pos)) {
-		if (UnitCanBeAt(unit, pos, unit.MapLayer)) {
-		//Wyrmgus end
+		if (UnitCanBeAt(unit, pos, unit.MapLayer->ID)) {
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer)) != unit.Type->Species->Terrains.end()) {
-				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(pos, false, unit.MapLayer)) == unit.Type->Species->Terrains.end()) {
+			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID)) != unit.Type->Species->Terrains.end()) {
+				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID)) == unit.Type->Species->Terrains.end()) {
 					return false;
 				}
 			}
@@ -243,7 +235,7 @@ static bool MoveRandomly(CUnit &unit)
 					maxpos.x = pos.x + std::max(6, unit.Type->RandomMovementDistance);
 					maxpos.y = pos.y + std::max(6, unit.Type->RandomMovementDistance);
 					std::vector<CUnit *> second_table;
-					Select(minpos, maxpos, second_table, unit.MapLayer, HasNotSamePlayerAs(*unit.Player));
+					Select(minpos, maxpos, second_table, unit.MapLayer->ID, HasNotSamePlayerAs(*unit.Player));
 
 					if (second_table.size() > 0) {
 						return false;
@@ -256,16 +248,14 @@ static bool MoveRandomly(CUnit &unit)
 					maxpos.x = pos.x + 1;
 					maxpos.y = pos.y + 1;
 					std::vector<CUnit *> second_table;
-					Select(minpos, maxpos, second_table, unit.MapLayer, HasNotSamePlayerAs(*unit.Player));
+					Select(minpos, maxpos, second_table, unit.MapLayer->ID, HasNotSamePlayerAs(*unit.Player));
 
 					if (second_table.size() > 0) {
 						return false;
 					}
 				}
 			}
-//			CommandMove(unit, pos, FlushCommands);
-			CommandMove(unit, pos, FlushCommands, unit.MapLayer);
-			//Wyrmgus end
+			CommandMove(unit, pos, FlushCommands, unit.MapLayer->ID);
 			return true;
 		}
 		MarkUnitFieldFlags(unit);
@@ -300,7 +290,7 @@ static bool LeaveShelter(CUnit &unit)
 	}
 
 	if (table.size() > 0) {
-		CommandUnload(*unit.Container, unit.Container->tilePos, &unit, FlushCommands, unit.Container->MapLayer);
+		CommandUnload(*unit.Container, unit.Container->tilePos, &unit, FlushCommands, unit.Container->MapLayer->ID);
 		return true;
 	}
 
@@ -397,10 +387,7 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 {
 	const Vec2i offset(range, range);
 
-	//Wyrmgus start
-//	return FindUnit_If(unit.tilePos - offset, unit.tilePos + offset, IsAReparableUnitBy(unit));
-	return FindUnit_If(unit.tilePos - offset, unit.tilePos + offset, unit.MapLayer, IsAReparableUnitBy(unit));
-	//Wyrmgus end
+	return FindUnit_If(unit.tilePos - offset, unit.tilePos + offset, unit.MapLayer->ID, IsAReparableUnitBy(unit));
 }
 
 /**
@@ -430,10 +417,7 @@ bool AutoRepair(CUnit &unit)
 	}
 
 	//Command* will clear unit.SavedOrder
-	//Wyrmgus start
-//	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
-	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands, repairedUnit->MapLayer);
-	//Wyrmgus end
+	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands, repairedUnit->MapLayer->ID);
 	if (savedOrder != nullptr) {
 		unit.SavedOrder = savedOrder;
 	}
@@ -459,7 +443,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 		return false;
 	}
 	// If unit is removed, use container's x and y
-	const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
+	const CUnit *firstContainer = unit.GetFirstContainer();
 	//Wyrmgus start
 //	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
@@ -468,7 +452,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	}
 	//Wyrmgus start
 //	if (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldRocks | MapFieldForest) == false) {
-	if (Map.IsLayerUnderground(autoAttackUnit->MapLayer) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer) == false) {
+	if (Map.IsLayerUnderground(autoAttackUnit->MapLayer->ID) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
 	//Wyrmgus end
 		return false;
 	}
@@ -476,7 +460,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	this->SetGoal(autoAttackUnit);
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer)) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer)) - unit.GetHalfTilePixelSize());
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 	return true;
 }
@@ -518,13 +502,13 @@ bool AutoAttack(CUnit &unit)
 	if (unit.CurrentAction() == UnitActionStill) {
 		//Wyrmgus start
 //		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
-		savedOrder = COrder::NewActionAttack(unit, unit.tilePos, unit.MapLayer);
+		savedOrder = COrder::NewActionAttack(unit, unit.tilePos, unit.MapLayer->ID);
 		//Wyrmgus end
 	} else if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
 	// Weak goal, can choose other unit, come back after attack
-	CommandAttack(unit, goal->tilePos, nullptr, FlushCommands, goal->MapLayer);
+	CommandAttack(unit, goal->tilePos, nullptr, FlushCommands, goal->MapLayer->ID);
 
 	if (savedOrder != nullptr) {
 		unit.SavedOrder = savedOrder;

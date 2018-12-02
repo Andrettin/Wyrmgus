@@ -51,6 +51,7 @@
 #include "item.h"
 //Wyrmgus end
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/minimap.h"
 #include "map/terrain_type.h"
@@ -238,10 +239,7 @@ static void PlaceUnits()
 		CUnit &unit = **it;
 		if (!unit.Removed) {
 			unit.Removed = 1;
-			//Wyrmgus start
-//			unit.Place(unit.tilePos);
-			unit.Place(unit.tilePos, unit.MapLayer);
-			//Wyrmgus end
+			unit.Place(unit.tilePos, unit.MapLayer->ID);
 		}
 		
 		//Wyrmgus start

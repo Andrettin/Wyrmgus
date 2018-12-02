@@ -174,7 +174,7 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 			CUnit *unit = *it;
 			if (
-				unit && unit->IsAlive() && unit->MapLayer == this->ID &&
+				unit && unit->IsAlive() && unit->MapLayer == this &&
 				(
 					(is_day_changed && unit->Variable[DAYSIGHTRANGEBONUS_INDEX].Value != 0) // if has day sight bonus and is entering or exiting day
 					|| (is_night_changed && unit->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value != 0) // if has night sight bonus and is entering or exiting night

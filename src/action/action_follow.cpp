@@ -76,7 +76,7 @@ enum {
 	// Unit::Refs is used as timeout counter.
 	if (dest.Destroyed) {
 		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
-		order->MapLayer = dest.MapLayer;
+		order->MapLayer = dest.MapLayer->ID;
 	} else {
 		order->SetGoal(&dest);
 		order->Range = 1;
@@ -139,7 +139,7 @@ enum {
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
-		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->GetGoal()->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
@@ -171,7 +171,7 @@ enum {
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
-		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
+		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
@@ -217,7 +217,7 @@ enum {
 
 		//Wyrmgus start
 //		if (goal->tilePos == this->goalPos) {
-		if (goal->tilePos == this->goalPos && goal->MapLayer == this->MapLayer) {
+		if (goal->tilePos == this->goalPos && goal->MapLayer->ID == this->MapLayer) {
 		//Wyrmgus end
 			// Move to the next order
 			if (unit.Orders.size() > 1) {
@@ -240,14 +240,14 @@ enum {
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			//Wyrmgus start
-			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
+				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer : this->MapLayer);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
 						return;
 					}
@@ -328,9 +328,7 @@ enum {
 				}
 			}
 			this->goalPos = goal->tilePos;
-			//Wyrmgus start
-			this->MapLayer = goal->MapLayer;
-			//Wyrmgus end
+			this->MapLayer = goal->MapLayer->ID;
 			this->State = State_TargetReached;
 		}
 		// FALL THROUGH
@@ -342,7 +340,7 @@ enum {
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
-		this->MapLayer = goal->MapLayer;
+		this->MapLayer = goal->MapLayer->ID;
 		this->ClearGoal();
 		goal = nullptr;
 	}
@@ -374,7 +372,7 @@ enum {
 			this->Finished = true;
 			//Wyrmgus start
 //			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos));
-			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos, target->MapLayer));
+			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos, target->MapLayer->ID));
 			//Wyrmgus end
 
 			if (savedOrder != nullptr) {
