@@ -252,7 +252,7 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 	//update map layer tiles affected by the season change
 	for (int x = 0; x < this->Width; x++) {
 		for (int y = 0; y < this->Height; y++) {
-			CMapField &mf = *this->Field(x, y);
+			const CMapField &mf = *this->Field(x, y);
 			
 			//check if the tile's terrain graphics have changed due to the new season and if so, update the minimap
 			if (

@@ -129,10 +129,7 @@ static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
 	for (int j = 0; j < unit.Type->TileSize.y; ++j) {
 		for (int i = 0; i < unit.Type->TileSize.x; ++i) {
 			const Vec2i tempPos(i, j);
-			//Wyrmgus start
-//			if (!Map.Field(pos + tempPos)->playerInfo.IsExplored(*ThisPlayer)) {
-			if (!Map.Field(pos + tempPos, UI.CurrentMapLayer->ID)->playerInfo.IsTeamExplored(*ThisPlayer)) {
-			//Wyrmgus end
+			if (!UI.CurrentMapLayer->Field(pos + tempPos)->playerInfo.IsTeamExplored(*ThisPlayer)) {
 				return false;
 			}
 		}
@@ -346,10 +343,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 
 static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, int &acknowledged)
 {
-	//Wyrmgus start
-//	if (!Map.Field(pos)->playerInfo.IsExplored(*unit.Player)) {
-	if (!Map.Field(pos, UI.CurrentMapLayer->ID)->playerInfo.IsTeamExplored(*unit.Player)) {
-	//Wyrmgus end
+	if (!UI.CurrentMapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
 		return false;
 	}
 	const CUnitType &type = *unit.Type;
@@ -358,8 +352,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 		if (type.ResInfo[res]
 			//Wyrmgus start
 //			&& type.ResInfo[res]->TerrainHarvester
-//			&& Map.Field(pos)->IsTerrainResourceOnMap(res)
-			&& Map.Field(pos, UI.CurrentMapLayer->ID)->IsTerrainResourceOnMap(res)
+			&& UI.CurrentMapLayer->Field(pos)->IsTerrainResourceOnMap(res)
 			//Wyrmgus end
 			//Wyrmgus start
 //			&& ((unit.CurrentResource != res)
@@ -639,8 +632,8 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	*/
-	if (Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (Map.Field(pos, UI.CurrentMapLayer->ID)->Owner == -1 || ThisPlayer->IsEnemy(Players[Map.Field(pos, UI.CurrentMapLayer->ID)->Owner]))) {
-		if (!Map.Field(pos, UI.CurrentMapLayer->ID)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
+	if (Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->Owner == -1 || ThisPlayer->IsEnemy(Players[UI.CurrentMapLayer->Field(pos)->Owner]))) {
+		if (!UI.CurrentMapLayer->Field(pos)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 			SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
 			return;
 		}
@@ -797,12 +790,8 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		return true;
 	}
 	// FIXME: support harvesting more types of terrain.
-	//Wyrmgus start
-//	const CMapField &mf = *Map.Field(pos);
-//	if (mf.playerInfo.IsExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
-	const CMapField &mf = *Map.Field(pos, UI.CurrentMapLayer->ID);
+	const CMapField &mf = *UI.CurrentMapLayer->Field(pos);
 	if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
-	//Wyrmgus end
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
@@ -1490,15 +1479,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 		bool show = ReplayRevealMap ? true : false;
 		if (show == false) {
-			//Wyrmgus start
-//			CMapField &mf = *Map.Field(tilePos);
-			CMapField &mf = *Map.Field(tilePos, UI.CurrentMapLayer->ID);
-			//Wyrmgus end
+			CMapField &mf = *UI.CurrentMapLayer->Field(tilePos);
 			for (int i = 0; i < PlayerMax; ++i) {
-				//Wyrmgus start
-//				if (mf.playerInfo.IsExplored(Players[i])
 				if (mf.playerInfo.IsTeamExplored(Players[i])
-				//Wyrmgus end
 					//Wyrmgus start
 //					&& (i == ThisPlayer->Index || Players[i].IsBothSharedVision(*ThisPlayer))) {
 					&& (i == ThisPlayer->Index || Players[i].IsBothSharedVision(*ThisPlayer) || Players[i].Revealed)) {
@@ -1524,7 +1507,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					//Wyrmgus start
 //					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
 					//Wyrmgus end
-					&& Map.Field(tilePos, UI.CurrentMapLayer->ID)->IsTerrainResourceOnMap(res)
+					&& UI.CurrentMapLayer->Field(tilePos)->IsTerrainResourceOnMap(res)
 				) {
 					has_terrain_resource = true;
 				}
@@ -1537,10 +1520,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	} else if (CursorOn == CursorOnMinimap) {
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
 
-		//Wyrmgus start
-//		if (Map.Field(tilePos)->playerInfo.IsExplored(*ThisPlayer) || ReplayRevealMap) {
-		if (Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.IsTeamExplored(*ThisPlayer) || ReplayRevealMap) {
-		//Wyrmgus end
+		if (UI.CurrentMapLayer->Field(tilePos)->playerInfo.IsTeamExplored(*ThisPlayer) || ReplayRevealMap) {
 			//Wyrmgus start
 //			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
 			UnitUnderCursor = UnitOnMapTile(tilePos, -1, UI.CurrentMapLayer->ID);
@@ -1896,10 +1876,7 @@ static int SendResource(const Vec2i &pos, int flush)
 	//Wyrmgus start
 //	const int flush = !(KeyModifiers & ModifierShift);
 	//Wyrmgus end
-	//Wyrmgus start
-//	const CMapField &mf = *Map.Field(pos);
-	const CMapField &mf = *Map.Field(pos, UI.CurrentMapLayer->ID);
-	//Wyrmgus end
+	const CMapField &mf = *UI.CurrentMapLayer->Field(pos);
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
@@ -3146,10 +3123,7 @@ void UIHandleButtonUp(unsigned button)
 			// FIXME: johns: only complete invisibile units
 			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 			CUnit *unit = nullptr;
-			//Wyrmgus start
-//			if (ReplayRevealMap || Map.Field(cursorTilePos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			if (ReplayRevealMap || Map.Field(cursorTilePos, UI.CurrentMapLayer->ID)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			//Wyrmgus end
+			if (ReplayRevealMap || UI.CurrentMapLayer->Field(cursorTilePos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
 				const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
 				unit = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);

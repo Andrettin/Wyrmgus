@@ -110,7 +110,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	Assert(Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer->ID));
 
 	// Change the flags
-	CMapField &mf = *Map.Field(pos, UI.CurrentMapLayer->ID);
+	CMapField &mf = *UI.CurrentMapLayer->Field(pos);
 
 	int tile = tileIndex;
 	if (TileToolRandom) {
@@ -189,7 +189,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 //Wyrmgus end
 {
 	// Special case 1) Walls.
-	CMapField &mf = *Map.Field(pos, UI.CurrentMapLayer->ID);
+	CMapField &mf = *UI.CurrentMapLayer->Field(pos);
 	
 	//Wyrmgus start
 	//see if the tile's terrain can be here as is, or if it is needed to change surrounding tiles
@@ -203,10 +203,10 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 					if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer->ID)) {
-						CMapField &adjacent_mf = *Map.Field(adjacent_pos, UI.CurrentMapLayer->ID);
+						CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 							
 						CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
-						if (overlay && adjacent_terrain && Map.Field(adjacent_pos, UI.CurrentMapLayer->ID)->OverlayTerrainDestroyed) {
+						if (overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 							adjacent_terrain = nullptr;
 						}
 						if (terrain != adjacent_terrain) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
@@ -353,7 +353,7 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 */
 static void EditorRandomizeTile(int tile, int count, int max_size)
 {
-	const Vec2i mpos(Map.Info.MapWidths[UI.CurrentMapLayer->ID] - 1, Map.Info.MapHeights[UI.CurrentMapLayer->ID] - 1);
+	const Vec2i mpos(UI.CurrentMapLayer->Width - 1, UI.CurrentMapLayer->Height - 1);
 
 	for (int i = 0; i < count; ++i) {
 		const Vec2i rpos(rand() % ((1 + mpos.x) / 2), rand() % ((1 + mpos.y) / 2));
@@ -384,7 +384,7 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 */
 static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
-	const Vec2i mpos(Map.Info.MapWidths[UI.CurrentMapLayer->ID], Map.Info.MapHeights[UI.CurrentMapLayer->ID]);
+	const Vec2i mpos(UI.CurrentMapLayer->Width, UI.CurrentMapLayer->Height);
 	CUnitType *typeptr = UnitTypeByIdent(unit_type);
 
 	if (!typeptr) { // Error
@@ -471,7 +471,7 @@ static void EditorDestroyAllUnits()
 */
 void CEditor::CreateRandomMap() const
 {
-	const int mz = std::max(Map.Info.MapHeights[UI.CurrentMapLayer->ID], Map.Info.MapWidths[UI.CurrentMapLayer->ID]);
+	const int mz = std::max(UI.CurrentMapLayer->Height, UI.CurrentMapLayer->Width);
 
 	// make water-base
 	const Vec2i zeros(0, 0);

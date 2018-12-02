@@ -1017,7 +1017,7 @@ void DrawPopups()
 		CViewport *vp = GetViewport(CursorScreenPos);
 		if (vp) {
 			const Vec2i tilePos = vp->ScreenToTilePos(CursorScreenPos);
-			CMapField &mf = *Map.Field(tilePos, UI.CurrentMapLayer->ID);
+			CMapField &mf = *UI.CurrentMapLayer->Field(tilePos);
 			const bool isMapFieldVisible = mf.playerInfo.IsTeamVisible(*ThisPlayer);
 
 			if (UI.MouseViewport && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap) && !(MouseButtons & MiddleButton)) { //don't display if in move map mode

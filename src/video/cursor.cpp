@@ -345,10 +345,7 @@ void DrawBuildingCursor()
 //																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
 																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), UI.CurrentMapLayer->ID), UI.CurrentMapLayer->ID))
 																  //Wyrmgus end
-				//Wyrmgus start
-//				&& Map.Field(posIt)->playerInfo.IsExplored(*ThisPlayer)) {
-				&& Map.Field(posIt, UI.CurrentMapLayer->ID)->playerInfo.IsTeamExplored(*ThisPlayer)) {
-				//Wyrmgus end
+				&& UI.CurrentMapLayer->Field(posIt)->playerInfo.IsTeamExplored(*ThisPlayer)) {
 				color = ColorGreen;
 			} else {
 				color = ColorRed;

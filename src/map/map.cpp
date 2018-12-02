@@ -1059,7 +1059,7 @@ void ChangeCurrentMapLayer(const int z)
 		return;
 	}
 	
-	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / Map.Info.MapWidths[UI.CurrentMapLayer->ID], UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / Map.Info.MapHeights[UI.CurrentMapLayer->ID]);
+	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / UI.CurrentMapLayer->Width, UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / UI.CurrentMapLayer->Height);
 	
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
 	UI.CurrentMapLayer = Map.MapLayers[z];

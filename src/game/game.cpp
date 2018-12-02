@@ -369,12 +369,8 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 			//Wyrmgus end
 				for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
 					for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
-						//Wyrmgus start
-//						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth;
-//						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight;
-						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidths[UI.CurrentMapLayer->ID];
-						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeights[UI.CurrentMapLayer->ID];
-						//Wyrmgus end
+						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->Width;
+						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->Height;
 						if (miniMapX + j < 0 || miniMapX + j >= UI.Minimap.W) {
 							continue;
 						}
@@ -420,12 +416,8 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 //			if (Players[i].Type != PlayerNobody) {
 			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == UI.CurrentMapLayer->ID) {
 			//Wyrmgus end
-				//Wyrmgus start
-//				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth - rectSize / 2;
-//				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight - rectSize / 2;
-				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidths[UI.CurrentMapLayer->ID] - rectSize / 2;
-				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeights[UI.CurrentMapLayer->ID] - rectSize / 2;
-				//Wyrmgus end
+				rect.x = Players[i].StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->Width - rectSize / 2;
+				rect.y = Players[i].StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->Height - rectSize / 2;
 				rect.w = rect.h = rectSize;
 				SDL_FillRect(preview, &rect, Players[i].Color);
 			}

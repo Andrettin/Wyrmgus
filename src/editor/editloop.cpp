@@ -203,12 +203,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	//Wyrmgus end
 	
 	const CTileset &tileset = *Map.Tileset;
-	//Wyrmgus start
-//	const int baseTileIndex = tileset.findTileIndexByTile(tile);
-//	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
-//	CMapField &mf = *Map.Field(pos);
-	CMapField &mf = *Map.Field(pos, UI.CurrentMapLayer->ID);
-	//Wyrmgus end
+	CMapField &mf = *UI.CurrentMapLayer->Field(pos);
 	
 	//Wyrmgus start
 	int value = 0;
@@ -303,7 +298,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 		Map.CalculateTileTransitions(changed_tiles[i], false, UI.CurrentMapLayer->ID);
 		Map.CalculateTileTransitions(changed_tiles[i], true, UI.CurrentMapLayer->ID);
 
-		bool has_transitions = terrain->Overlay ? (Map.Field(changed_tiles[i], UI.CurrentMapLayer->ID)->OverlayTransitionTiles.size() > 0) : (Map.Field(changed_tiles[i], UI.CurrentMapLayer->ID)->TransitionTiles.size() > 0);
+		bool has_transitions = terrain->Overlay ? (UI.CurrentMapLayer->Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(changed_tiles[i])->TransitionTiles.size() > 0);
 		bool solid_tile = true;
 		
 		if (tile_terrain && !tile_terrain->AllowSingle) {
@@ -312,10 +307,10 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 					if (x_offset != 0 || y_offset != 0) {
 						Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
 						if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer->ID)) {
-							CMapField &adjacent_mf = *Map.Field(adjacent_pos, UI.CurrentMapLayer->ID);
+							CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 									
 							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, UI.CurrentMapLayer->ID);
-							if (tile_terrain->Overlay && adjacent_terrain && Map.Field(adjacent_pos, UI.CurrentMapLayer->ID)->OverlayTerrainDestroyed) {
+							if (tile_terrain->Overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = nullptr;
 							}
 							if (tile_terrain != adjacent_terrain && std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), adjacent_terrain) == tile_terrain->OuterBorderTerrains.end()) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
@@ -364,7 +359,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 								continue;
 							}
 							Map.CalculateTileTransitions(adjacent_pos, overlay == 1, UI.CurrentMapLayer->ID);
-							bool has_transitions = overlay ? (Map.Field(adjacent_pos, UI.CurrentMapLayer->ID)->OverlayTransitionTiles.size() > 0) : (Map.Field(adjacent_pos, UI.CurrentMapLayer->ID)->TransitionTiles.size() > 0);
+							bool has_transitions = overlay ? (UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTransitionTiles.size() > 0) : (UI.CurrentMapLayer->Field(adjacent_pos)->TransitionTiles.size() > 0);
 							bool solid_tile = true;
 							
 							if (!overlay && std::find(adjacent_terrain->BorderTerrains.begin(), adjacent_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false, UI.CurrentMapLayer->ID)) == adjacent_terrain->BorderTerrains.end()) {
@@ -383,7 +378,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
 											if (Map.Info.IsPointOnMap(sub_adjacent_pos, UI.CurrentMapLayer->ID)) {
 												CTerrainType *sub_adjacent_terrain = Map.GetTileTerrain(sub_adjacent_pos, overlay > 0, UI.CurrentMapLayer->ID);
-												if (adjacent_terrain->Overlay && sub_adjacent_terrain && Map.Field(sub_adjacent_pos, UI.CurrentMapLayer->ID)->OverlayTerrainDestroyed) {
+												if (adjacent_terrain->Overlay && sub_adjacent_terrain && UI.CurrentMapLayer->Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = nullptr;
 												}
 												if (adjacent_terrain != sub_adjacent_terrain && std::find(adjacent_terrain->OuterBorderTerrains.begin(), adjacent_terrain->OuterBorderTerrains.end(), sub_adjacent_terrain) == adjacent_terrain->OuterBorderTerrains.end()) { // also happens if terrain is null, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
@@ -457,7 +452,7 @@ static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
 	if (!MirrorEdit) {
 		return;
 	}
-	const Vec2i mpos(Map.Info.MapWidths[UI.CurrentMapLayer->ID] - size, Map.Info.MapHeights[UI.CurrentMapLayer->ID] - size);
+	const Vec2i mpos(UI.CurrentMapLayer->Width - size, UI.CurrentMapLayer->Height - size);
 	const Vec2i mirror = mpos - pos;
 	const Vec2i mirrorv(mirror.x, pos.y);
 
@@ -508,7 +503,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 	CBuildRestrictionOnTop *b = OnTopDetails(*unit->Type, nullptr);
 	//Wyrmgus end
 	if (b && b->ReplaceOnBuild) {
-		CUnitCache &unitCache = Map.Field(pos, UI.CurrentMapLayer->ID)->UnitCache;
+		CUnitCache &unitCache = UI.CurrentMapLayer->Field(pos)->UnitCache;
 
 		CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));
 
@@ -1390,7 +1385,7 @@ static void DrawEditorInfo()
 	char buf[256];
 	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 12, buf);
-	const CMapField &mf = *Map.Field(pos, UI.CurrentMapLayer->ID);
+	const CMapField &mf = *UI.CurrentMapLayer->Field(pos);
 	//
 	// Flags info
 	//

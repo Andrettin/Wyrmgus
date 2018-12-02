@@ -1052,23 +1052,14 @@ void CViewport::DrawMapFogOfWar() const
 	}
 
 	int sx = std::max<int>(MapPos.x - 1, 0);
-	//Wyrmgus start
-//	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidth);
-	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidths[UI.CurrentMapLayer->ID]);
-	//Wyrmgus end
+	int ex = std::min<int>(MapPos.x + MapWidth + 1, UI.CurrentMapLayer->Width);
 	int my = std::max<int>(MapPos.y - 1, 0);
-	//Wyrmgus start
-//	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeight);
-	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeights[UI.CurrentMapLayer->ID]);
-	//Wyrmgus end
+	int ey = std::min<int>(MapPos.y + MapHeight + 1, UI.CurrentMapLayer->Height);
 
 	// Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
 
-	//Wyrmgus start
-//	unsigned int my_index = my * Map.Info.MapWidth;
-	unsigned int my_index = my * Map.Info.MapWidths[UI.CurrentMapLayer->ID];
-	//Wyrmgus end
+	unsigned int my_index = my * UI.CurrentMapLayer->Width;
 	for (; my < ey; ++my) {
 		for (int mx = sx; mx < ex; ++mx) {
 			//Wyrmgus start
@@ -1076,16 +1067,10 @@ void CViewport::DrawMapFogOfWar() const
 			VisibleTable[UI.CurrentMapLayer->ID][my_index + mx] = Map.Field(mx + my_index, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*ThisPlayer);
 			//Wyrmgus end
 		}
-		//Wyrmgus start
-//		my_index += Map.Info.MapWidth;
-		my_index += Map.Info.MapWidths[UI.CurrentMapLayer->ID];
-		//Wyrmgus end
+		my_index += UI.CurrentMapLayer->Width;
 	}
 	ex = this->BottomRightPos.x;
-	//Wyrmgus start
-//	int sy = MapPos.y * Map.Info.MapWidth;
-	int sy = MapPos.y * Map.Info.MapWidths[UI.CurrentMapLayer->ID];
-	//Wyrmgus end
+	int sy = MapPos.y * UI.CurrentMapLayer->Width;
 	int dy = this->TopLeftPos.y - Offset.y;
 	ey = this->BottomRightPos.y;
 
@@ -1104,10 +1089,7 @@ void CViewport::DrawMapFogOfWar() const
 			++sx;
 			dx += Map.GetCurrentPixelTileSize().x;
 		}
-		//Wyrmgus start
-//		sy += Map.Info.MapWidth;
-		sy += Map.Info.MapWidths[UI.CurrentMapLayer->ID];
-		//Wyrmgus end
+		sy += UI.CurrentMapLayer->Width;
 		dy += Map.GetCurrentPixelTileSize().y;
 	}
 }

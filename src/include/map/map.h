@@ -647,15 +647,9 @@ void MapUnmarkUnitSight(CUnit &unit);
 ----------------------------------------------------------------------------*/
 
 /// Can a unit with 'mask' enter the field
-//Wyrmgus start
-//inline bool CanMoveToMask(const Vec2i &pos, int mask)
 inline bool CanMoveToMask(const Vec2i &pos, int mask, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	return !Map.Field(pos)->CheckMask(mask);
 	return !Map.Field(pos, z)->CheckMask(mask);
-	//Wyrmgus end
 }
 
 /// Handle Marking and Unmarking of radar vision
