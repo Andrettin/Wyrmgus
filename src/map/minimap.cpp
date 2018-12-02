@@ -562,14 +562,12 @@ void CMinimap::UpdateTerrain(int z)
 }
 
 /**
-**  Update a single minimap tile after a change
+**	@brief	Update a single minimap tile after a change
 **
-**  @param pos  The map position to update in the minimap
+**	@param	pos	The map position to update in the minimap
+**	@param	z	The map layer of the tile to update
 */
-//Wyrmgus start
-//void CMinimap::UpdateXY(const Vec2i &pos)
 void CMinimap::UpdateXY(const Vec2i &pos, int z)
-//Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {

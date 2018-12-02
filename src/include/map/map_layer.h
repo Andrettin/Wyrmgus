@@ -61,7 +61,7 @@ class CMapLayer
 {
 public:
 	CMapLayer() :
-		ID(-1),
+		ID(-1), Width(0), Height(0),
 		TimeOfDay(nullptr), TimeOfDaySchedule(nullptr), RemainingTimeOfDayHours(0),
 		Season(nullptr), SeasonSchedule(nullptr), RemainingSeasonHours(0),
 		SurfaceLayer(0),
@@ -72,6 +72,10 @@ public:
 	}
 
 	~CMapLayer();
+	
+	CMapField *Field(const unsigned int index) const;
+	CMapField *Field(const int x, const int y) const;
+	CMapField *Field(const Vec2i &pos) const;
 	void IncrementTimeOfDay();
 	void SetTimeOfDayByHours(const unsigned long long hours);
 	void SetTimeOfDay(CScheduledTimeOfDay *time_of_day);
@@ -83,6 +87,8 @@ public:
 	
 	int ID;
 	CMapField *Fields;						/// fields on the map layer
+	int Width;								/// the width in tiles of the map layer
+	int Height;								/// the height in tiles of the map layer
 	CScheduledTimeOfDay *TimeOfDay;			/// the time of day for the map layer
 	CTimeOfDaySchedule *TimeOfDaySchedule;	/// the time of day schedule for the map layer
 	int RemainingTimeOfDayHours;			/// the quantity of hours remaining for the current time of day to end

@@ -1202,22 +1202,44 @@ unsigned int CMap::getIndex(const Vec2i &pos, int z) const
 	return getIndex(pos.x, pos.y, z);
 }
 
-CMapField *CMap::Field(unsigned int index, int z) const
+/**
+**	@brief	Get the map field at a given location
+**
+**	@param	index	The index of the map field
+**	@param	z		The map layer of the map field
+**
+**	@return	The map field
+*/
+CMapField *CMap::Field(const unsigned int index, const int z) const
 {
-	return &this->MapLayers[z]->Fields[index];
+	return this->MapLayers[z]->Field(index);
 }
 
 /**
-**	@brief	Get the MapField at location x, y
+**	@brief	Get the map field at a given location
+**
+**	@param	x	The x coordinate of the map field
+**	@param	y	The y coordinate of the map field
+**	@param	z	The map layer of the map field
+**
+**	@return	The map field
 */
-CMapField *CMap::Field(int x, int y, int z) const
+CMapField *CMap::Field(const int x, const int y, const int z) const
 {
-	return &this->MapLayers[z]->Fields[x + y * this->Info.MapWidths[z]];
+	return this->MapLayers[z]->Field(x, y);
 }
 
-CMapField *CMap::Field(const Vec2i &pos, int z) const
+/**
+**	@brief	Get the map field at a given location
+**
+**	@param	pos	The coordinates of the map field
+**	@param	z	The map layer of the map field
+**
+**	@return	The map field
+*/
+CMapField *CMap::Field(const Vec2i &pos, const int z) const
 {
-	return Field(pos.x, pos.y, z);
+	return this->Field(pos.x, pos.y, z);
 }
 
 /**
@@ -1230,6 +1252,12 @@ void CMap::Create()
 	CMapLayer *map_layer = new CMapLayer;
 	map_layer->ID = this->MapLayers.size();
 	map_layer->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
+	this->MapLayers.push_back(map_layer);
+	map_layer->Width = this->Info.MapWidth;
+	map_layer->Height = this->Info.MapHeight;
+	this->Info.MapWidths.push_back(this->Info.MapWidth);
+	this->Info.MapHeights.push_back(this->Info.MapHeight);
+	
 	if (Editor.Running == EditorNotRunning) {
 		map_layer->SeasonSchedule = CSeasonSchedule::DefaultSeasonSchedule;
 		map_layer->SetSeasonByHours(CDate::CurrentTotalHours);
@@ -1242,9 +1270,6 @@ void CMap::Create()
 			map_layer->SetTimeOfDay(nullptr); // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 		}
 	}
-	this->MapLayers.push_back(map_layer);
-	this->Info.MapWidths.push_back(this->Info.MapWidth);
-	this->Info.MapHeights.push_back(this->Info.MapHeight);
 }
 
 /**

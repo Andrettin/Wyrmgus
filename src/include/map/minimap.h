@@ -49,10 +49,7 @@ class CMinimap
 	void UpdateMapTerrain(void *const mpixels, const int mpitch,
 						  const void *const tpixels, const int tpitch);
 
-	//Wyrmgus start
-//	void UpdateTerrain();
 	void UpdateTerrain(int z);
-	//Wyrmgus end
 
 	template <const int BPP>
 	void UpdateSeen(void *const pixels, const int pitch);
@@ -65,10 +62,7 @@ public:
 		WithTerrain(false), ShowSelected(false),
 		Transparent(false), UpdateCache(false) {}
 
-	//Wyrmgus start
-//	void UpdateXY(const Vec2i &pos);
 	void UpdateXY(const Vec2i &pos, int z);
-	//Wyrmgus end
 	void UpdateSeenXY(const Vec2i &) {}
 	void Update();
 	void Create();

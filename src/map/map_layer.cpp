@@ -37,6 +37,8 @@
 
 #include "map/map_layer.h"
 
+#include "map/terrain_type.h"
+#include "map/tile.h"
 #include "season.h"
 #include "season_schedule.h"
 #include "sound_server.h"
@@ -68,6 +70,43 @@ CMapLayer::~CMapLayer()
 	if (this->Fields) {
 		delete[] this->Fields;
 	}
+}
+
+/**
+**	@brief	Get the map field at a given location
+**
+**	@param	index	The index of the map field
+**
+**	@return	The map field
+*/
+CMapField *CMapLayer::Field(const unsigned int index) const
+{
+	return &this->Fields[index];
+}
+
+/**
+**	@brief	Get the map field at a given location
+**
+**	@param	x	The x coordinate of the map field
+**	@param	y	The y coordinate of the map field
+**
+**	@return	The map field
+*/
+CMapField *CMapLayer::Field(const int x, const int y) const
+{
+	return this->Field(x + y * this->Width);
+}
+
+/**
+**	@brief	Get the map field at a given location
+**
+**	@param	pos	The coordinates of the map field
+**
+**	@return	The map field
+*/
+CMapField *CMapLayer::Field(const Vec2i &pos) const
+{
+	return this->Field(pos.x, pos.y);
 }
 
 /**
@@ -201,11 +240,29 @@ void CMapLayer::SetSeasonByHours(const unsigned long long hours)
 
 void CMapLayer::SetSeason(CScheduledSeason *season)
 {
-	if (!season) {
+	if (season == this->Season) {
 		return;
 	}
 	
+	CSeason *old_season = this->Season ? this->Season->Season : nullptr;
+	CSeason *new_season = season ? season->Season : nullptr;
+	
 	this->Season = season;
+	
+	//update map layer tiles affected by the season change
+	for (int x = 0; x < this->Width; x++) {
+		for (int y = 0; y < this->Height; y++) {
+			CMapField &mf = *this->Field(x, y);
+			
+			//check if the tile's terrain graphics have changed due to the new season and if so, update the minimap
+			if (
+				(mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->GetGraphics(old_season) != mf.playerInfo.SeenTerrain->GetGraphics(new_season))
+				|| (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTerrain->GetGraphics(old_season) != mf.playerInfo.SeenOverlayTerrain->GetGraphics(new_season))
+			) {
+				UI.Minimap.UpdateXY(Vec2i(x, y), this->ID);
+			}
+		}
+	}
 }
 
 /**

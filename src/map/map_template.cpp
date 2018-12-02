@@ -431,9 +431,11 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	if (z >= (int) Map.MapLayers.size()) {
 		CMapLayer *map_layer = new CMapLayer;
 		map_layer->ID = Map.MapLayers.size();
-		Map.Info.MapWidths.push_back(std::min(this->Width * this->Scale, Map.Info.MapWidth));
-		Map.Info.MapHeights.push_back(std::min(this->Height * this->Scale, Map.Info.MapHeight));
-		map_layer->Fields = new CMapField[Map.Info.MapWidths[z] * Map.Info.MapHeights[z]];
+		map_layer->Width = std::min(this->Width * this->Scale, Map.Info.MapWidth);
+		map_layer->Height = std::min(this->Height * this->Scale, Map.Info.MapHeight);
+		Map.Info.MapWidths.push_back(map_layer->Width);
+		Map.Info.MapHeights.push_back(map_layer->Height);
+		map_layer->Fields = new CMapField[map_layer->Width * map_layer->Height];
 		map_layer->Plane = this->Plane;
 		map_layer->World = this->World;
 		map_layer->SurfaceLayer = this->SurfaceLayer;
@@ -453,6 +455,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	if (CurrentCampaign) {
 		Map.Info.MapWidths[z] = CurrentCampaign->MapSizes[z].x;
 		Map.Info.MapHeights[z] = CurrentCampaign->MapSizes[z].y;
+		Map.MapLayers[z]->Width = CurrentCampaign->MapSizes[z].x;
+		Map.MapLayers[z]->Height = CurrentCampaign->MapSizes[z].y;
 	}
 	
 	if (!this->IsSubtemplateArea()) {

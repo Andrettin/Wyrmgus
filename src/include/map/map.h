@@ -243,10 +243,10 @@ public:
 	unsigned int getIndex(int x, int y, int z) const;
 	unsigned int getIndex(const Vec2i &pos, int z) const;
 	
-	CMapField *Field(unsigned int index, int z) const;
-	/// Get the MapField at location x, y
-	CMapField *Field(int x, int y, int z) const;
-	CMapField *Field(const Vec2i &pos, int z) const;
+	CMapField *Field(const unsigned int index, const int z) const;
+	/// Get the map field at location x, y
+	CMapField *Field(const int x, const int y, const int z) const;
+	CMapField *Field(const Vec2i &pos, const int z) const;
 
 	/// Allocate and initialize map table.
 	void Create();

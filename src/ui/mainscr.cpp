@@ -909,19 +909,25 @@ void DrawResources()
 void DrawDayTime() {
 	if (UI.TimeOfDayPanel.TextX != -1) {
 		if (UI.CurrentMapLayer->GetTimeOfDay()) {
-			CLabel label(GetGameFont());
+			UI.TimeOfDayPanel.Text = UI.CurrentMapLayer->GetTimeOfDay()->Name;
+			UI.TimeOfDayPanel.Font = &GetGameFont();
+			
+			CLabel label(*UI.TimeOfDayPanel.Font);
 
 			// TODO: Instead of a simple text here we could use an icon per time of day
-			label.Draw(UI.TimeOfDayPanel.TextX, UI.TimeOfDayPanel.TextY, _(UI.CurrentMapLayer->GetTimeOfDay()->Name.c_str()));
+			label.Draw(UI.TimeOfDayPanel.TextX, UI.TimeOfDayPanel.TextY, _(UI.TimeOfDayPanel.Text.c_str()));
 		}
 	}
 	
 	if (UI.SeasonPanel.TextX != -1) {
 		if (UI.CurrentMapLayer->GetSeason()) {
-			CLabel label(GetGameFont());
+			UI.SeasonPanel.Text = UI.CurrentMapLayer->GetSeason()->Name;
+			UI.SeasonPanel.Font = &GetGameFont();
+			
+			CLabel label(*UI.SeasonPanel.Font);
 
 			// TODO: Instead of a simple text here we could use an icon per season
-			label.Draw(UI.SeasonPanel.TextX, UI.SeasonPanel.TextY, _(UI.CurrentMapLayer->GetSeason()->Name.c_str()));
+			label.Draw(UI.SeasonPanel.TextX, UI.SeasonPanel.TextY, _(UI.SeasonPanel.Text.c_str()));
 		}
 	}
 	
@@ -948,7 +954,9 @@ void DrawAge() {
 	}
 	
 	if (UI.AgePanel.TextX != -1 && !UI.AgePanel.Text.empty()) {
-		CLabel label(GetGameFont());
+		UI.AgePanel.Font = &GetGameFont();
+		
+		CLabel label(*UI.AgePanel.Font);
 		label.Draw(UI.AgePanel.TextX, UI.AgePanel.TextY, UI.AgePanel.Text);
 	}
 }
@@ -1191,12 +1199,48 @@ void DrawPopups()
 	}
 	
 	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].TextX + UI.Resources[FoodCost].Font->Width(UI.Resources[FoodCost].Text)) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
-		DrawGenericPopup("Food", UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_("Food"), UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
 	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].TextX + UI.Resources[ScoreCost].Font->Width(UI.Resources[ScoreCost].Text)) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
-		DrawGenericPopup("Score", UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
 	}
+	
+	//commented out as right now the popups are a bit pointless, as they only show the same text as what's already written in the HUD; the popups should be restored when they are able to show more text, e.g. what is the current month in the season panel popup
+	/*
+	if (
+		UI.TimeOfDayPanel.TextX != -1
+		&& !UI.TimeOfDayPanel.Text.empty()
+		&& CursorScreenPos.x >= UI.TimeOfDayPanel.TextX
+		&& CursorScreenPos.x < (UI.TimeOfDayPanel.TextX + UI.TimeOfDayPanel.Font->Width(UI.TimeOfDayPanel.Text))
+		&& CursorScreenPos.y >= UI.TimeOfDayPanel.TextY
+		&& CursorScreenPos.y < (UI.TimeOfDayPanel.TextY + UI.TimeOfDayPanel.Font->Height())
+	) {
+		DrawGenericPopup(_(UI.TimeOfDayPanel.Text.c_str()), UI.TimeOfDayPanel.TextX, UI.TimeOfDayPanel.TextY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+	}
+	
+	if (
+		UI.SeasonPanel.TextX != -1
+		&& !UI.SeasonPanel.Text.empty()
+		&& CursorScreenPos.x >= UI.SeasonPanel.TextX
+		&& CursorScreenPos.x < (UI.SeasonPanel.TextX + UI.SeasonPanel.Font->Width(UI.SeasonPanel.Text))
+		&& CursorScreenPos.y >= UI.SeasonPanel.TextY
+		&& CursorScreenPos.y < (UI.SeasonPanel.TextY + UI.SeasonPanel.Font->Height())
+	) {
+		DrawGenericPopup(_(UI.SeasonPanel.Text.c_str()), UI.SeasonPanel.TextX, UI.SeasonPanel.TextY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+	}
+	
+	if (
+		UI.AgePanel.TextX != -1
+		&& !UI.AgePanel.Text.empty()
+		&& CursorScreenPos.x >= UI.AgePanel.TextX
+		&& CursorScreenPos.x < (UI.AgePanel.TextX + UI.AgePanel.Font->Width(UI.AgePanel.Text))
+		&& CursorScreenPos.y >= UI.AgePanel.TextY
+		&& CursorScreenPos.y < (UI.AgePanel.TextY + UI.AgePanel.Font->Height())
+	) {
+		DrawGenericPopup(_(UI.AgePanel.Text.c_str()), UI.AgePanel.TextX, UI.AgePanel.TextY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+	}
+	*/
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
 		DrawGenericPopup(CPlane::Planes[ButtonUnderCursor]->Name, UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);

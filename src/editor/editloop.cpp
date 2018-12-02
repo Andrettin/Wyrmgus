@@ -2495,6 +2495,8 @@ void CEditor::Init()
 		map_layer->ID = Map.MapLayers.size();
 		map_layer->Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 		Map.MapLayers.push_back(map_layer);
+		map_layer->Width = Map.Info.MapWidth;
+		map_layer->Height = Map.Info.MapHeight;
 		Map.Info.MapWidths.clear();
 		Map.Info.MapWidths.push_back(Map.Info.MapWidth);
 		Map.Info.MapHeights.clear();

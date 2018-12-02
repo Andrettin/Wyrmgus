@@ -122,6 +122,8 @@ static int CclStratagusMap(lua_State *l)
 					map_layer->ID = Map.MapLayers.size();
 					map_layer->Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 					Map.MapLayers.push_back(map_layer);
+					map_layer->Width = Map.Info.MapWidth;
+					map_layer->Height = Map.Info.MapHeight;
 					Map.Info.MapWidths.clear();
 					Map.Info.MapWidths.push_back(Map.Info.MapWidth);
 					Map.Info.MapHeights.clear();
@@ -148,13 +150,13 @@ static int CclStratagusMap(lua_State *l)
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument");
 						}
-						int map_layer_width = LuaToNumber(l, -1, 1);
-						int map_layer_height = LuaToNumber(l, -1, 2);
-						Map.Info.MapWidths.push_back(map_layer_width);
-						Map.Info.MapHeights.push_back(map_layer_height);
 						CMapLayer *map_layer = new CMapLayer;
+						map_layer->Width = LuaToNumber(l, -1, 1);
+						map_layer->Height = LuaToNumber(l, -1, 2);
+						Map.Info.MapWidths.push_back(map_layer->Width);
+						Map.Info.MapHeights.push_back(map_layer->Height);
 						map_layer->ID = Map.MapLayers.size();
-						map_layer->Fields = new CMapField[map_layer_width * map_layer_height];
+						map_layer->Fields = new CMapField[map_layer->Width * map_layer->Height];
 						Map.MapLayers.push_back(map_layer);
 						lua_pop(l, 1);
 					}
