@@ -85,7 +85,7 @@ public:
 	CMapField *Fields;						/// fields on the map layer
 	CScheduledTimeOfDay *TimeOfDay;			/// the time of day for the map layer
 	CTimeOfDaySchedule *TimeOfDaySchedule;	/// the time of day schedule for the map layer
-	int RemainingTimeOfDayHours;				/// the quantity of hours remaining for the current time of day to end
+	int RemainingTimeOfDayHours;			/// the quantity of hours remaining for the current time of day to end
 	CScheduledSeason *Season;				/// the current season for the map layer
 	CSeasonSchedule *SeasonSchedule;		/// the season schedule for the map layer
 	int RemainingSeasonHours;				/// the quantity of hours remaining for the current season to end

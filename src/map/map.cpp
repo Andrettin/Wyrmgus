@@ -61,6 +61,7 @@
 #include "settings.h"
 #include "sound_server.h"
 //Wyrmgus end
+#include "time_of_day.h"
 #include "time_of_day_schedule.h"
 //Wyrmgus start
 #include "translate.h"
@@ -1066,12 +1067,39 @@ void ChangeCurrentMapLayer(const int z)
 	UpdateSurfaceLayerButtons();
 }
 
-void SetTimeOfDay(const int time_of_day, int z)
+void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 {
-	if (time_of_day == -1) {
+	if (time_of_day_ident.empty()) {
 		Map.MapLayers[z]->SetTimeOfDay(nullptr);
-	} else if (time_of_day < (int) Map.MapLayers[z]->TimeOfDaySchedule->ScheduledTimesOfDay.size()) {
-		Map.MapLayers[z]->SetTimeOfDay(Map.MapLayers[z]->TimeOfDaySchedule->ScheduledTimesOfDay[time_of_day]);
+		Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
+	} else {
+		CTimeOfDaySchedule *schedule = Map.MapLayers[z]->TimeOfDaySchedule;
+		if (schedule) {
+			for (size_t i = 0; i < schedule->ScheduledTimesOfDay.size(); ++i) {
+				CScheduledTimeOfDay *time_of_day = schedule->ScheduledTimesOfDay[i];
+				if (time_of_day->TimeOfDay->Ident == time_of_day_ident)  {
+					Map.MapLayers[z]->SetTimeOfDay(time_of_day);
+					Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->GetHours(Map.MapLayers[z]->GetSeason());
+					break;
+				}
+			}
+		}
+	}
+}
+
+void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, int z)
+{
+	if (time_of_day_schedule_ident.empty()) {
+		Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
+		Map.MapLayers[z]->SetTimeOfDay(nullptr);
+		Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
+	} else {
+		CTimeOfDaySchedule *schedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(time_of_day_schedule_ident);
+		if (schedule) {
+			Map.MapLayers[z]->TimeOfDaySchedule = schedule;
+			Map.MapLayers[z]->SetTimeOfDay(schedule->ScheduledTimesOfDay.front());
+			Map.MapLayers[z]->RemainingTimeOfDayHours = Map.MapLayers[z]->TimeOfDay->GetHours(Map.MapLayers[z]->GetSeason());
+		}
 	}
 }
 //Wyrmgus end

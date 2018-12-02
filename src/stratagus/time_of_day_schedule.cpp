@@ -235,10 +235,12 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 */
 int CScheduledTimeOfDay::GetHours(const CSeason *season) const
 {
-	std::map<const CSeason *, int>::const_iterator find_iterator = this->SeasonHours.find(season);
-	
-	if (find_iterator != this->SeasonHours.end()) {
-		return find_iterator->second;
+	if (season) {
+		std::map<const CSeason *, int>::const_iterator find_iterator = this->SeasonHours.find(season);
+		
+		if (find_iterator != this->SeasonHours.end()) {
+			return find_iterator->second;
+		}
 	}
 	
 	return this->Hours;
