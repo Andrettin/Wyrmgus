@@ -57,6 +57,7 @@
 //Wyrmgus start
 #include "province.h"
 #include "quest.h"
+#include "season.h"
 #include "season_schedule.h"
 #include "settings.h"
 #include "sound_server.h"
@@ -1067,6 +1068,12 @@ void ChangeCurrentMapLayer(const int z)
 	UpdateSurfaceLayerButtons();
 }
 
+/**
+**	@brief	Set the current time of day for a particular map layer
+**
+**	@param	time_of_day_ident	The time of day's string identifier
+**	@param	z					The map layer
+*/
 void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 {
 	if (time_of_day_ident.empty()) {
@@ -1087,6 +1094,12 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 	}
 }
 
+/**
+**	@brief	Set the time of day schedule for a particular map layer
+**
+**	@param	time_of_day_schedule_ident	The time of day schedule's string identifier
+**	@param	z							The map layer
+*/
 void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, int z)
 {
 	if (time_of_day_schedule_ident.empty()) {
@@ -1099,6 +1112,54 @@ void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, int z)
 			Map.MapLayers[z]->TimeOfDaySchedule = schedule;
 			Map.MapLayers[z]->SetTimeOfDay(schedule->ScheduledTimesOfDay.front());
 			Map.MapLayers[z]->RemainingTimeOfDayHours = Map.MapLayers[z]->TimeOfDay->GetHours(Map.MapLayers[z]->GetSeason());
+		}
+	}
+}
+
+/**
+**	@brief	Set the current season for a particular map layer
+**
+**	@param	season_ident		The season's string identifier
+**	@param	z					The map layer
+*/
+void SetSeason(const std::string &season_ident, int z)
+{
+	if (season_ident.empty()) {
+		Map.MapLayers[z]->SetSeason(nullptr);
+		Map.MapLayers[z]->RemainingSeasonHours = 0;
+	} else {
+		CSeasonSchedule *schedule = Map.MapLayers[z]->SeasonSchedule;
+		if (schedule) {
+			for (size_t i = 0; i < schedule->ScheduledSeasons.size(); ++i) {
+				CScheduledSeason *season = schedule->ScheduledSeasons[i];
+				if (season->Season->Ident == season_ident)  {
+					Map.MapLayers[z]->SetSeason(season);
+					Map.MapLayers[z]->RemainingSeasonHours = season->Hours;
+					break;
+				}
+			}
+		}
+	}
+}
+
+/**
+**	@brief	Set the season schedule for a particular map layer
+**
+**	@param	season_schedule_ident		The season schedule's string identifier
+**	@param	z							The map layer
+*/
+void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
+{
+	if (season_schedule_ident.empty()) {
+		Map.MapLayers[z]->SeasonSchedule = nullptr;
+		Map.MapLayers[z]->SetSeason(nullptr);
+		Map.MapLayers[z]->RemainingSeasonHours = 0;
+	} else {
+		CSeasonSchedule *schedule = CSeasonSchedule::GetSeasonSchedule(season_schedule_ident);
+		if (schedule) {
+			Map.MapLayers[z]->SeasonSchedule = schedule;
+			Map.MapLayers[z]->SetSeason(schedule->ScheduledSeasons.front());
+			Map.MapLayers[z]->RemainingSeasonHours = Map.MapLayers[z]->Season->Hours;
 		}
 	}
 }

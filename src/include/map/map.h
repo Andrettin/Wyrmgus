@@ -631,6 +631,8 @@ extern void ChangeToPreviousMapLayer();
 extern void ChangeCurrentMapLayer(const int z);
 extern void SetTimeOfDay(const std::string &time_of_day_ident, int z = 0);
 extern void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, int z = 0);
+extern void SetSeason(const std::string &season_ident, int z = 0);
+extern void SetSeasonSchedule(const std::string &season_schedule_ident, int z = 0);
 //Wyrmgus end
 
 // in unit.c
