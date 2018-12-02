@@ -59,10 +59,7 @@
 static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	if (Map.Info.IsPointOnMap(pos) == false) {
 	if (Map.Info.IsPointOnMap(pos, z) == false) {
-	//Wyrmgus end
 		return false;
 	}
 	//Wyrmgus start
@@ -281,10 +278,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, con
 	if (startUnit != nullptr) {
 		terrainTraversal.PushUnitPosAndNeighbor(*startUnit);
 	} else {
-		//Wyrmgus start
-//		Assert(Map.Info.IsPointOnMap(startPos));
 		Assert(Map.Info.IsPointOnMap(startPos, z));
-		//Wyrmgus end
 		terrainTraversal.PushPos(startPos);
 	}
 
@@ -294,10 +288,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, con
 	//Wyrmgus end
 
 	terrainTraversal.Run(buildingPlaceFinder);
-	//Wyrmgus start
-//	return Map.Info.IsPointOnMap(*resultPos);
 	return Map.Info.IsPointOnMap(*resultPos, z);
-	//Wyrmgus end
 }
 
 class HallPlaceFinder
@@ -479,10 +470,7 @@ static bool AiFindHallPlace(const CUnit &worker,
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(startPos));
 	Assert(Map.Info.IsPointOnMap(startPos, z));
-	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -595,10 +583,7 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, co
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(startPos));
 	Assert(Map.Info.IsPointOnMap(startPos, z));
-	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -660,10 +645,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 	}
 	//Wyrmgus end
 
-	//Wyrmgus start
-//	const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
 	const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos, z) ? nearPos : worker.tilePos;
-	//Wyrmgus end
 	
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {

@@ -594,15 +594,9 @@ static int CclSetBorderTerrain(lua_State *l)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-//Wyrmgus start
-//void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	if (!Map.Info.IsPointOnMap(pos)) {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
-	//Wyrmgus end
 		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}

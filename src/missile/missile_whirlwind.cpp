@@ -76,10 +76,7 @@ void MissileWhirlwind::Action()
 			// find new destination in the map
 			newPos.x = center.x + SyncRand() % 5 - 2;
 			newPos.y = center.y + SyncRand() % 5 - 2;
-		//Wyrmgus start
-//		} while (!Map.Info.IsPointOnMap(newPos));
 		} while (!Map.Info.IsPointOnMap(newPos, this->MapLayer));
-		//Wyrmgus end
 		this->destination = Map.TilePosToMapPixelPos_Center(newPos, Map.MapLayers[this->MapLayer]);
 		this->source = this->position;
 		this->State = 0;

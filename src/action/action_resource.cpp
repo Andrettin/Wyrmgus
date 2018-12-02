@@ -489,10 +489,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	//Wyrmgus end
 
 	// Wood gone, look somewhere else.
-	//Wyrmgus start
-//	if ((Map.Info.IsPointOnMap(pos) == false || Map.Field(pos)->IsTerrainResourceOnMap(CurrentResource) == false)
 	if ((Map.Info.IsPointOnMap(pos, z) == false || Map.Field(pos, z)->IsTerrainResourceOnMap(CurrentResource) == false)
-	//Wyrmgus end
 		&& (!unit.IX) && (!unit.IY)) {
 		//Wyrmgus start
 //		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos, &pos)) {

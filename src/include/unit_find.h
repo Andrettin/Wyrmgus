@@ -296,12 +296,8 @@ template <typename Pred>
 void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, Pred pred, bool circle = false)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(ltPos));
-//	Assert(Map.Info.IsPointOnMap(rbPos));
 	Assert(Map.Info.IsPointOnMap(ltPos, z));
 	Assert(Map.Info.IsPointOnMap(rbPos, z));
-	//Wyrmgus end
 	Assert(units.empty());
 	
 	//Wyrmgus start
@@ -393,12 +389,8 @@ template <typename Pred>
 CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(ltPos));
-//	Assert(Map.Info.IsPointOnMap(rbPos));
 	Assert(Map.Info.IsPointOnMap(ltPos, z));
 	Assert(Map.Info.IsPointOnMap(rbPos, z));
-	//Wyrmgus end
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {

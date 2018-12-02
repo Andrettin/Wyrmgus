@@ -577,10 +577,7 @@ static CUnit *GetBestScout(int unit_type)
 		}
 		if (unit.GroupId != 0) { //don't scout with units that are parts of forces that have a goal
 			int force = AiPlayer->Force.GetForce(unit);
-			//Wyrmgus start
-//			if (force != -1 && Map.Info.IsPointOnMap(AiPlayer->Force[force].GoalPos)) {
 			if (force != -1 && Map.Info.IsPointOnMap(AiPlayer->Force[force].GoalPos, AiPlayer->Force[force].GoalMapLayer)) {
-			//Wyrmgus end
 				continue;
 			}
 		}

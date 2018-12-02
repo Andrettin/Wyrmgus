@@ -100,18 +100,12 @@
 			// find new destination in the map
 			dpos.x = goalPos.x + SyncRand() % 5 - 2;
 			dpos.y = goalPos.y + SyncRand() % 5 - 2;
-		//Wyrmgus start
-//		} while (!Map.Info.IsPointOnMap(dpos));
 		} while (!Map.Info.IsPointOnMap(dpos, z));
-		//Wyrmgus end
 
 		const PixelPos dest = Map.TilePosToMapPixelPos_Center(dpos, Map.MapLayers[z]);
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
-			//Wyrmgus start
-//			::Missile *mis = MakeMissile(*missile, start, dest);
 			::Missile *mis = MakeMissile(*missile, start, dest, z);
-			//Wyrmgus end
 			if (mis->Type->BlizzardSpeed) {
 				mis->Delay = i * mis->Type->Sleep * 2 * Map.GetMapLayerPixelTileSize(mis->MapLayer).x / mis->Type->BlizzardSpeed;
 			} else if (mis->Type->Speed) {

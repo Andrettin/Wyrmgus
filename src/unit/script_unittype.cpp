@@ -3502,10 +3502,12 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[PRIORITY_INDEX].Max = unit.Stats->Variables[PRIORITY_INDEX].Max;
 
 	// Position
-	unit.Variable[POSX_INDEX].Value = unit.tilePos.x;
-	unit.Variable[POSX_INDEX].Max = unit.MapLayer->Width;
-	unit.Variable[POSY_INDEX].Value = unit.tilePos.y;
-	unit.Variable[POSY_INDEX].Max = unit.MapLayer->Height;
+	if (unit.MapLayer) {
+		unit.Variable[POSX_INDEX].Value = unit.tilePos.x;
+		unit.Variable[POSX_INDEX].Max = unit.MapLayer->Width;
+		unit.Variable[POSY_INDEX].Value = unit.tilePos.y;
+		unit.Variable[POSY_INDEX].Max = unit.MapLayer->Height;
+	}
 
 	// Target Position
 	const Vec2i goalPos = unit.CurrentOrder()->GetGoalPos();

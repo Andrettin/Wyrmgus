@@ -401,10 +401,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	/*
 	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
-		//Wyrmgus start
-//		if (Map.Info.IsPointOnMap(nearPos)) {
 		if (Map.Info.IsPointOnMap(nearPos, z)) {
-		//Wyrmgus end
 			//Crush CPU !!!!!
 			for (int i = 0; i < num && table[i] != &unit; ++i) {
 				// Find a place to build.
@@ -2219,7 +2216,7 @@ static void AiCheckPathwayConstruction()
 			
 			for (size_t z = 0; z != pathway_tiles.size(); ++z) {
 				Vec2i pathway_pos(pathway_tiles[z].x, pathway_tiles[z].y);
-				if (!Map.Info.IsPointOnMap(pathway_pos, unit.MapLayer->ID)) {
+				if (!Map.Info.IsPointOnMap(pathway_pos, unit.MapLayer)) {
 					continue;
 				}
 				CMapField &mf = *unit.MapLayer->Field(pathway_pos);

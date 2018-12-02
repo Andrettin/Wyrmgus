@@ -64,12 +64,8 @@
 /* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(currentPos));
-//	Assert(Map.Info.IsPointOnMap(dest));
 	Assert(Map.Info.IsPointOnMap(currentPos, current_z));
 	Assert(Map.Info.IsPointOnMap(dest, dest_z));
-	//Wyrmgus end
 
 	COrder_Patrol *order = new COrder_Patrol();
 

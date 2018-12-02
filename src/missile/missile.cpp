@@ -1272,10 +1272,7 @@ bool MissileInitMove(Missile &missile)
 
 void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 {
-	//Wyrmgus start
-//	if (Map.Info.IsPointOnMap(pos) == false) {
 	if (Map.Info.IsPointOnMap(pos, missile.MapLayer) == false) {
-	//Wyrmgus end
 		return;
 	}
 	std::vector<CUnit *> units;
@@ -1423,17 +1420,11 @@ bool PointToPointMissile(Missile &missile)
 								(int)pos.y + missile.Type->size.y / 2);
 		const Vec2i tilePos(Map.MapPixelPosToTilePos(position, missile.MapLayer));
 
-		//Wyrmgus start
-//		if (Map.Info.IsPointOnMap(tilePos) && MissileHandleBlocking(missile, position)) {
 		if (Map.Info.IsPointOnMap(tilePos, missile.MapLayer) && MissileHandleBlocking(missile, position)) {
-		//Wyrmugs end
 			return true;
 		}
 		if (missile.Type->MissileStopFlags) {
-			//Wyrmgus start
-//			if (!Map.Info.IsPointOnMap(tilePos)) { // gone outside
 			if (!Map.Info.IsPointOnMap(tilePos, missile.MapLayer)) { // gone outside
-			//Wyrmgus end
 				missile.TTL = 0;
 				return false;
 			}
@@ -1639,10 +1630,7 @@ void Missile::MissileHit(CUnit *unit)
 
 	const Vec2i pos = Map.MapPixelPosToTilePos(pixelPos, this->MapLayer);
 
-	//Wyrmgus start
-//	if (!Map.Info.IsPointOnMap(pos)) {
 	if (!Map.Info.IsPointOnMap(pos, this->MapLayer)) {
-	//Wyrmgus end
 		// FIXME: this should handled by caller?
 		DebugPrint("Missile gone outside of map!\n");
 		return;  // outside the map.
@@ -1796,10 +1784,7 @@ void Missile::MissileHit(CUnit *unit)
 		for (int j = mtype.Range * 2; --j;) {
 			const Vec2i posIt(posmin.x + i, posmin.y + j);
 
-			//Wyrmgus start
-//			if (Map.Info.IsPointOnMap(posIt)) {
 			if (Map.Info.IsPointOnMap(posIt, this->MapLayer)) {
-			//Wyrmgus end
 				int d = Distance(pos, posIt);
 				d *= mtype.SplashFactor;
 				if (d == 0) {

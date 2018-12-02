@@ -472,7 +472,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		}
 		
 		//apply "-stalk" abilities
-		if ((unit.Variable[DESERTSTALK_INDEX].Value > 0 || unit.Variable[FORESTSTALK_INDEX].Value > 0 || unit.Variable[SWAMPSTALK_INDEX].Value > 0) && Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer->ID)) {
+		if ((unit.Variable[DESERTSTALK_INDEX].Value > 0 || unit.Variable[FORESTSTALK_INDEX].Value > 0 || unit.Variable[SWAMPSTALK_INDEX].Value > 0) && Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)) {
 			if (
 				(
 					(unit.Variable[DESERTSTALK_INDEX].Value > 0 && (unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Flags & MapFieldDesert))
@@ -493,7 +493,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		
 		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
 			unit.Type->BoolFlag[ORGANIC_INDEX].value
-			&& Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer->ID)
+			&& Map.Info.IsPointOnMap(unit.tilePos.x, unit.tilePos.y, unit.MapLayer)
 			&& (unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Flags & MapFieldDesert)
 			&& unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Owner != unit.Player->Index
 			&& unit.MapLayer->GetTimeOfDay()

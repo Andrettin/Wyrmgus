@@ -158,10 +158,7 @@
 	if (this->HasGoal()) {
 		return this->GetGoal()->IsAliveOnMap();
 	} else {
-		//Wyrmgus start
-//		return Map.Info.IsPointOnMap(this->goalPos);
 		return Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
-		//Wyrmgus end
 	}
 }
 

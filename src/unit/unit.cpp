@@ -1068,13 +1068,13 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 bool CUnit::CheckTerrainForVariation(VariationInfo *varinfo)
 {
 	if (varinfo->Terrains.size() > 0) {
-		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer->ID)) {
+		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
 		}
 		bool terrain_check = true;
 		for (int x = 0; x < this->Type->TileSize.x; ++x) {
 			for (int y = 0; y < this->Type->TileSize.y; ++y) {
-				if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer->ID)) {
+				if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
 					if (std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true)) == varinfo->Terrains.end()) {
 						terrain_check = false;
 						break;
@@ -1091,13 +1091,13 @@ bool CUnit::CheckTerrainForVariation(VariationInfo *varinfo)
 	}
 	
 	if (varinfo->TerrainsForbidden.size() > 0) {
-		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer->ID)) {
+		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
 		}
 		bool terrain_check = true;
 		for (int x = 0; x < this->Type->TileSize.x; ++x) {
 			for (int y = 0; y < this->Type->TileSize.y; ++y) {
-				if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer->ID)) {
+				if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
 					if (std::find(varinfo->TerrainsForbidden.begin(), varinfo->TerrainsForbidden.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true)) == varinfo->TerrainsForbidden.end()) {
 						terrain_check = false;
 						break;
@@ -2272,7 +2272,7 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 
 void CUnit::UpdateSoldUnits()
 {
-	if (this->CurrentAction() == UnitActionBuilt || !Map.Info.IsPointOnMap(this->tilePos, this->MapLayer->ID) || Editor.Running != EditorNotRunning) {
+	if (this->CurrentAction() == UnitActionBuilt || !Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
 		return;
 	}
 	
@@ -2996,10 +2996,13 @@ void UpdateUnitSightRange(CUnit &unit)
 	// FIXME : these values must be configurable.
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
-	if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Day) {
-		unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
-	} else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Night) {
-		unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
+	if (unit.MapLayer) {
+		if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Day) {
+			unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
+		}
+		else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Night) {
+			unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
+		}
 	}
 	unit_sight_range = std::max<int>(1, unit_sight_range);
 	//Wyrmgus end
@@ -3460,10 +3463,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 		UpdateUnitSightRange(*this);
 	}
 	Removed = 0;
-	//Wyrmgus start
-//	UnitInXY(*this, pos);
 	UnitInXY(*this, pos, z);
-	//Wyrmgus end
 	// Pathfinding info.
 	MarkUnitFieldFlags(*this);
 	// Tha cache list.
@@ -3490,7 +3490,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 		if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
 			for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->TileSize.x; ++x) {
 				for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->TileSize.y; ++y) {
-					if (!Map.Info.IsPointOnMap(x, y, this->MapLayer->ID)) {
+					if (!Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
 						continue;
 					}
 					Vec2i building_tile_pos(x, y);
@@ -4065,7 +4065,7 @@ void CorrectWallDirections(CUnit &unit)
 	Assert(unit.Type->NumDirections == 16);
 	Assert(!unit.Type->Flip);
 
-	if (!Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer->ID)) {
+	if (!Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer)) {
 		return;
 	}
 	const struct {
@@ -4080,7 +4080,7 @@ void CorrectWallDirections(CUnit &unit)
 		const Vec2i pos = unit.tilePos + configs[i].offset;
 		const int dirFlag = configs[i].dirFlag;
 
-		if (Map.Info.IsPointOnMap(pos, unit.MapLayer->ID) == false) {
+		if (Map.Info.IsPointOnMap(pos, unit.MapLayer) == false) {
 			flags |= dirFlag;
 		} else {
 			const CUnitCache &unitCache = Map.Field(pos, unit.MapLayer->ID)->UnitCache;
@@ -4108,7 +4108,7 @@ void CorrectWallNeighBours(CUnit &unit)
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		const Vec2i pos = unit.tilePos + offset[i];
 
-		if (Map.Info.IsPointOnMap(pos, unit.MapLayer->ID) == false) {
+		if (Map.Info.IsPointOnMap(pos, unit.MapLayer) == false) {
 			continue;
 		}
 		CUnitCache &unitCache = unit.MapLayer->Field(pos)->UnitCache;
@@ -4318,7 +4318,7 @@ bool CUnit::IsVisibleOnMinimap() const
 //			   && !(Seen.Destroyed & (1 << ThisPlayer->Index));
 			   && !(Seen.Destroyed & (1 << ThisPlayer->Index))
 			   && !Destroyed
-			   && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer->ID)
+			   && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)
 			   && this->MapLayer->Field(this->tilePos)->playerInfo.IsTeamExplored(*ThisPlayer);
 			   //Wyrmgus end
 	}
@@ -5216,7 +5216,7 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 		}
 		std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
 	} else if (index == SPEED_INDEX) {
-		if (this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) {
+		if (this->MapLayer && this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) {
 			value += DefaultTileMovementCost - this->MapLayer->Field(this->Offset)->getCost();
 		}
 	}
@@ -6095,13 +6095,13 @@ bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
 			
 	for (int x = top_left_pos.x; x <= bottom_right_pos.x; ++x) {
 		Vec2i tile_pos(x, top_left_pos.y);
-		if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer->ID) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+		if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 			has_adjacent_rail = true;
 			break;
 		}
 				
 		tile_pos.y = bottom_right_pos.y;
-		if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer->ID) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+		if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 			has_adjacent_rail = true;
 			break;
 		}
@@ -6110,13 +6110,13 @@ bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
 	if (!has_adjacent_rail) {
 		for (int y = top_left_pos.y; y <= bottom_right_pos.y; ++y) {
 			Vec2i tile_pos(top_left_pos.x, y);
-			if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer->ID) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+			if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 				has_adjacent_rail = true;
 				break;
 			}
 					
 			tile_pos.x = bottom_right_pos.x;
-			if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer->ID) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
+			if (Map.Info.IsPointOnMap(tile_pos, this->MapLayer) && UnitTypeCanBeAt(*type, tile_pos, this->MapLayer->ID)) {
 				has_adjacent_rail = true;
 				break;
 			}
@@ -7569,10 +7569,7 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 		return true;
 	}
 	
-	//Wyrmgus start
-//	if (!goal && Map.Info.IsPointOnMap(goalPos) && this->MapDistanceTo(goalPos) > 1) {
 	if (!goal && Map.Info.IsPointOnMap(goalPos, z) && this->MapDistanceTo(goalPos, z) > 1) {
-	//Wyrmgus end
 		return true;
 	}
 	

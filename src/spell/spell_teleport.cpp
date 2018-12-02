@@ -58,10 +58,7 @@
 */
 /* virtual */ int Spell_Teleport::Cast(CUnit &caster, const SpellType &spell, CUnit * /*target*/, const Vec2i &goalPos, int z, int modifier)
 {
-	//Wyrmgus start
-//	if (Map.Info.IsPointOnMap(goalPos)) {
 	if (Map.Info.IsPointOnMap(goalPos, z)) {
-	//Wyrmgus end
 		unsigned int selected = caster.Selected;
 		caster.Remove(nullptr);
 		caster.tilePos = goalPos;

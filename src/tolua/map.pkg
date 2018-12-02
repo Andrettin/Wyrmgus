@@ -12,7 +12,7 @@ class CMapInfo
 	int PlayerType[PlayerMax];
 	
 	//Wyrmgus start
-	bool IsPointOnMap(int x, int y, int z) const;
+	bool IsPointOnMap(const int x, const int y, const int z) const;
 	//Wyrmgus end
 };
 

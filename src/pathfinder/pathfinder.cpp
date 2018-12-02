@@ -236,7 +236,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 		int temp_i = PF_FAILED;
 		for (Vec2i it = start_pos; it.y <= end_pos.y; it.y += pos_diff.y) {
 			for (it.x = start_pos.x; it.x <= end_pos.x; it.x += pos_diff.x) {
-				if (!Map.Info.IsPointOnMap(it, src.Container->MapLayer->ID)) {
+				if (!Map.Info.IsPointOnMap(it, src.Container->MapLayer)) {
 					continue;
 				}
 				temp_i = AStarFindPath(it, goalPos, w, h,
@@ -333,15 +333,9 @@ void PathFinderInput::SetUnit(CUnit &_unit)
 	isRecalculatePathNeeded = true;
 }
 
-//Wyrmgus start
-//void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size)
 void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
-	//Wyrmgus end
 	Assert(unit);
 	Assert(unit->IsAliveOnMap());
 	Vec2i newPos = pos;

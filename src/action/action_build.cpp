@@ -90,10 +90,7 @@ enum {
 /* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
-	//Wyrmgus end
 
 	COrder_Build *order = new COrder_Build;
 

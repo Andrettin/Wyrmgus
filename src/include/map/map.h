@@ -113,12 +113,8 @@ class CWorld;
 --  Map
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-//#define MaxMapWidth  256  /// max map width supported
-//#define MaxMapHeight 256  /// max map height supported
 #define MaxMapWidth  512  /// max map width supported
 #define MaxMapHeight 512  /// max map height supported
-//Wyrmgus end
 
 //Wyrmgus start
 enum DegreeLevels {
@@ -191,27 +187,13 @@ public:
 class CMapInfo
 {
 public:
-	//Wyrmgus start
-//	bool IsPointOnMap(int x, int y) const
-	bool IsPointOnMap(int x, int y, int z) const
-	//Wyrmgus end
-	{
-		//Wyrmgus start
-//		return (x >= 0 && y >= 0 && x < MapWidth && y < MapHeight);
-		return (z >= 0 && z < (int) MapWidths.size() && z < (int) MapHeights.size() && x >= 0 && y >= 0 && x < MapWidths[z] && y < MapHeights[z]);
-		//Wyrmgus end
-	}
+	bool IsPointOnMap(const int x, const int y, const int z) const;
 
-	//Wyrmgus start
-//	bool IsPointOnMap(const Vec2i &pos) const
-	bool IsPointOnMap(const Vec2i &pos, int z) const
-	//Wyrmgus end
-	{
-		//Wyrmgus start
-//		return IsPointOnMap(pos.x, pos.y);
-		return IsPointOnMap(pos.x, pos.y, z);
-		//Wyrmgus end
-	}
+	bool IsPointOnMap(const Vec2i &pos, const int z) const;
+
+	bool IsPointOnMap(const int x, const int y, const CMapLayer *map_layer) const;
+
+	bool IsPointOnMap(const Vec2i &pos, const CMapLayer *map_layer) const;
 
 	void Clear();
 
@@ -276,15 +258,7 @@ public:
 	void GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
 
-	//Wyrmgus start
 	void ClearOverlayTile(const Vec2i &pos, int z);
-	/*
-	/// Remove wood from the map.
-	void ClearWoodTile(const Vec2i &pos);
-	/// Remove rock from the map.
-	void ClearRockTile(const Vec2i &pos);
-	*/
-	//Wyrmgus end
 
 	/// convert map pixelpos coordinates into tilepos
 	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos, const int map_layer) const;
@@ -301,10 +275,7 @@ public:
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
-	//Wyrmgus start
-//	void MarkSeenTile(CMapField &mf);
 	void MarkSeenTile(CMapField &mf, int z);
-	//Wyrmgus end
 
 	/// Regenerate the forest.
 	void RegenerateForest();
@@ -321,31 +292,10 @@ public:
 	//
 	/// Wall is hit.
 	//Wyrmgus start
-//	void HitWall(const Vec2i &pos, unsigned damage);
 	void HitWall(const Vec2i &pos, unsigned damage, int z);
-	//Wyrmgus end
-	/// Set wall on field.
-	//Wyrmgus start
-	/*
-	void RemoveWall(const Vec2i &pos);
-	/// Set wall on field.
-	void SetWall(const Vec2i &pos, bool humanwall);
-	*/
-	//Wyrmgus end
 
-	/// Returns true, if wall on the map tile field
-	//Wyrmgus start
-//	bool WallOnMap(const Vec2i &pos) const;
+	/// Returns true if there is a wall on the map tile field
 	bool WallOnMap(const Vec2i &pos, int z) const;
-	//Wyrmgus end
-	//Wyrmgus start
-	/*
-	/// Returns true, if human wall on the map tile field
-	bool HumanWallOnMap(const Vec2i &pos) const;
-	/// Returns true, if orc wall on the map tile field
-	bool OrcWallOnMap(const Vec2i &pos) const;
-	*/
-	//Wyrmgus end
 	
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
@@ -382,10 +332,7 @@ public:
 	//Wyrmgus end
 
 	//Warning: we expect typical usage as xmin = x - range
-	//Wyrmgus start
-//	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos)
 	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z)
-	//Wyrmgus end
 	{
 		minpos.x = std::max<short>(0, minpos.x);
 		minpos.y = std::max<short>(0, minpos.y);
@@ -411,11 +358,8 @@ private:
 	*/
 	//Wyrmgus end
 
-	/// Regenerate the forest.
-	//Wyrmgus start
-//	void RegenerateForestTile(const Vec2i &pos);
+	/// Regenerate a forest tile
 	void RegenerateForestTile(const Vec2i &pos, int z);
-	//Wyrmgus end
 
 public:
 	bool NoFogOfWar;           /// fog of war disabled
@@ -441,7 +385,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-extern std::vector<CSite *>  Sites;
+extern std::vector<CSite *> Sites;
 extern std::map<std::string, CSite *> SiteIdentToPointer;
 extern std::vector<CTerrainFeature *> TerrainFeatures;
 extern std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
@@ -479,24 +423,14 @@ extern int GetDegreeLevelIdByName(std::string degree_level);
 //
 /// Function to (un)mark the vision table.
 #ifndef MARKER_ON_INDEX
-//Wyrmgus start
-//typedef void MapMarkerFunc(const CPlayer &player, const Vec2i &pos);
 typedef void MapMarkerFunc(const CPlayer &player, const Vec2i &pos, int z);
-//Wyrmgus end
 #else
-//Wyrmgus start
-//typedef void MapMarkerFunc(const CPlayer &player, const unsigned int index);
 typedef void MapMarkerFunc(const CPlayer &player, const unsigned int index, int z);
-//Wyrmgus end
 #endif
 
 /// Filter map flags through fog
-//Wyrmgus start
-//extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask);
-//extern int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask);
 extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z);
 extern int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z);
-//Wyrmgus end
 /// Mark a tile for normal sight
 extern MapMarkerFunc MapMarkTileSight;
 /// Unmark a tile for normal sight
@@ -514,10 +448,7 @@ extern MapMarkerFunc MapUnmarkTileDetectEthereal;
 
 /// Mark sight changes
 extern void MapSight(const CPlayer &player, const Vec2i &pos, int w,
-					 //Wyrmgus start
-//					 int h, int range, MapMarkerFunc *marker);
 					 int h, int range, MapMarkerFunc *marker, int z);
-					 //Wyrmgus end
 /// Update fog of war
 extern void UpdateFogOfWarChange();
 
@@ -563,18 +494,11 @@ extern void MapFixWallTile(const Vec2i &pos);
 // in script_map.cpp
 //
 /// Set a tile
-//Wyrmgus start
-//extern void SetTile(unsigned int tile, const Vec2i &pos, int value = 0);
-//inline void SetTile(unsigned int tile, int x, int y, int value = 0)
 extern void SetTile(unsigned int tile, const Vec2i &pos, int value = 0, int z = 0);
 inline void SetTile(unsigned int tile, int x, int y, int value = 0, int z = 0)
-//Wyrmgus end
 {
 	const Vec2i pos(x, y);
-	//Wyrmgus start
-//	SetTile(tile, pos, value);
 	SetTile(tile, pos, value, z);
-	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -605,20 +529,11 @@ extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTer
 extern void LoadStratagusMapInfo(const std::string &mapname);
 
 /// Returns true, if the unit-type(mask can enter field with bounds check
-//Wyrmgus start
-//extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z);
-//Wyrmgus end
 /// Returns true, if the unit-type can enter the field
-//Wyrmgus start
-//extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos);
 extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z);
-//Wyrmgus end
 /// Returns true, if the unit can enter the field
-//Wyrmgus start
-//extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos);
 extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z);
-//Wyrmgus end
 
 /// Preprocess map, for internal use.
 extern void PreprocessMap();
@@ -653,46 +568,22 @@ inline bool CanMoveToMask(const Vec2i &pos, int mask, int z)
 }
 
 /// Handle Marking and Unmarking of radar vision
-//Wyrmgus start
-//inline void MapMarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range)
 inline void MapMarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	MapSight(player, pos, w, h, range, MapMarkTileRadar);
 	MapSight(player, pos, w, h, range, MapMarkTileRadar, z);
-	//Wyrmgus end
 }
-//Wyrmgus start
-//inline void MapUnmarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range)
 inline void MapUnmarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	MapSight(player, pos, w, h, range, MapUnmarkTileRadar);
 	MapSight(player, pos, w, h, range, MapUnmarkTileRadar, z);
-	//Wyrmgus end
 }
 /// Handle Marking and Unmarking of radar vision
-//Wyrmgus start
-//inline void MapMarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w, int h, int range)
 inline void MapMarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	MapSight(player, pos, w, h, range, MapMarkTileRadarJammer);
 	MapSight(player, pos, w, h, range, MapMarkTileRadarJammer, z);
-	//Wyrmgus end
 }
-//Wyrmgus start
-//inline void MapUnmarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w, int h, int range)
 inline void MapUnmarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w, int h, int range, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	MapSight(player, pos, w, h, range, MapUnmarkTileRadarJammer);
 	MapSight(player, pos, w, h, range, MapUnmarkTileRadarJammer, z);
-	//Wyrmgus end
 }
 
 //Wyrmgus start

@@ -82,10 +82,7 @@
 /* static */ COrder *COrder::NewActionRepair(const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
-	//Wyrmgus end
 
 	COrder_Repair *order = new COrder_Repair;
 

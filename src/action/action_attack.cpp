@@ -148,10 +148,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 /* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(dest));
 	Assert(Map.Info.IsPointOnMap(dest, z));
-	//Wyrmgus end
 
 	COrder_Attack *order = new COrder_Attack(false);
 
@@ -496,10 +493,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	Assert(unit.CurrentOrder() == this);
 	Assert(unit.CanMove());
-	//Wyrmgus start
-//	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
-	//Wyrmgus end
 
 	//Wyrmgus start
 	//if is on a moving raft and target is now within range, stop the raft
@@ -654,10 +648,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 */
 void COrder_Attack::AttackTarget(CUnit &unit)
 {
-	//Wyrmgus start
-//	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
-	//Wyrmgus end
 
 	AnimateActionAttack(unit, *this);
 	if (unit.Anim.Unbreakable) {
@@ -811,10 +802,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 */
 /* virtual */ void COrder_Attack::Execute(CUnit &unit)
 {
-	//Wyrmgus start
-//	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
-	//Wyrmgus end
 
 	if (unit.Wait) {
 		if (!unit.Waiting) {

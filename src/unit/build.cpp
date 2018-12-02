@@ -374,10 +374,7 @@ bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i
 {
 	Vec2i pos1 = pos - this->Offset;
 
-	//Wyrmgus start
-//	if (Map.Info.IsPointOnMap(pos1) == false) {
 	if (Map.Info.IsPointOnMap(pos1, z) == false) {
-	//Wyrmgus end
 		return false;
 	}
 	functor f(Parent, pos1);
@@ -417,10 +414,7 @@ private:
 	const CUnitType *type;
 };
 
-//Wyrmgus start
-//bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget) const
 bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
-//Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(pos, z));
 
@@ -643,15 +637,9 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 **
 **  @return true if we can build on this point.
 */
-//Wyrmgus start
-//bool CanBuildOn(const Vec2i &pos, int mask)
 bool CanBuildOn(const Vec2i &pos, int mask, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	return (Map.Info.IsPointOnMap(pos) && !Map.Field(pos)->CheckMask(mask));
 	return (Map.Info.IsPointOnMap(pos, z) && !Map.Field(pos, z)->CheckMask(mask));
-	//Wyrmgus end
 }
 
 /**
@@ -703,10 +691,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 	for (int h = 0; h < type.TileSize.y; ++h) {
 		for (int w = type.TileSize.x; w--;) {
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			//Wyrmgus start
-//			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h)) {
 			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h, z)) {
-			//Wyrmgus end
 				h = type.TileSize.y;
 				ontop = nullptr;
 				break;

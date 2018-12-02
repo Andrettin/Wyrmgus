@@ -1802,15 +1802,9 @@ void ShiftMessagesEvent()
 **  @note FIXME: vladi: I know this can be just separated func w/o msg but
 **               it is handy to stick all in one call, someone?
 */
-//Wyrmgus start
-//void SetMessageEvent(const Vec2i &pos, const char *fmt, ...)
 void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
-	//Wyrmgus end
 
 	char temp[256];
 	va_list va;

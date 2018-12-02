@@ -587,10 +587,7 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(startPos));
 	Assert(Map.Info.IsPointOnMap(startPos, z));
-	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
@@ -833,10 +830,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			break;
 		}
 	}
-	//Wyrmgus start
-//	if (Map.Info.IsPointOnMap(goalPos) == false) {
 	if (Map.Info.IsPointOnMap(goalPos, z) == false) {
-	//Wyrmgus end
 		//Wyrmgus start
 		bool include_neutral = AiPlayer->Player->AtPeace();
 		//Wyrmgus end
@@ -899,10 +893,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		}
 	}
 	//Wyrmgus end
-	//Wyrmgus start
-//	if (Map.Info.IsPointOnMap(goalPos) == false || isTransporter) {
 	if (Map.Info.IsPointOnMap(goalPos, z) == false || isTransporter) {
-	//Wyrmgus end
 		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
 		if (State == AiForceAttackingState_Waiting && !PlanAttack()) {
 			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
@@ -1006,10 +997,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 
 void AiForce::ReturnToHome()
 {
-	//Wyrmgus start
-//	if (Map.Info.IsPointOnMap(this->HomePos)) {
 	if (Map.Info.IsPointOnMap(this->HomePos, this->HomeMapLayer)) {
-	//Wyrmgus end
 		for (size_t i = 0; i != this->Units.size(); ++i) {
 			CUnit &unit = *this->Units[i];
 			
@@ -1255,10 +1243,7 @@ void AiAttackWithForceAt(unsigned int force, int x, int y, int z)
 		return ;
 	}
 
-	//Wyrmgus start
-//	if (!Map.Info.IsPointOnMap(pos)) {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
-	//Wyrmgus end
 		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ pos.x _C_ pos.y
 				   //Wyrmgus start
 //				   _C_ Map.Info.MapWidth _C_ Map.Info.MapHeight);
@@ -1487,11 +1472,8 @@ void AiForce::Update()
 		}
 	}
 	//Wyrmgus end
-	//Wyrmgus start
 	//if force still has no goal, run its Attack function again to get a target
-//	if (Map.Info.IsPointOnMap(GoalPos) == false) {
 	if (Map.Info.IsPointOnMap(GoalPos, GoalMapLayer) == false) {
-	//Wyrmgus end
 		const Vec2i invalidPos(-1, -1);
 		//Wyrmgus start
 		int z = AiPlayer->Player->StartMapLayer;
@@ -1610,9 +1592,8 @@ void AiForce::Update()
 //	const int thresholdDist = 5; // Hard coded value
 	const int thresholdDist = std::max(5, (int) Units.size() / 8);
 	//Wyrmgus end
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(GoalPos));
 	Assert(Map.Info.IsPointOnMap(GoalPos, GoalMapLayer));
+	//Wyrmgus start
 	bool include_neutral = AiPlayer->Player->AtPeace();
 	//Wyrmgus end
 	if (State == AiForceAttackingState_GoingToRallyPoint) {
@@ -2003,10 +1984,7 @@ void AiForceManager::Update()
 			}
 			const int nearDist = 5;
 
-			//Wyrmgus start
-//			if (Map.Info.IsPointOnMap(force.GoalPos) == false) {
 			if (Map.Info.IsPointOnMap(force.GoalPos, force.GoalMapLayer) == false) {
-			//Wyrmgus end
 				force.ReturnToHome();
 			} else {
 				//  Check if some unit from force reached goal point

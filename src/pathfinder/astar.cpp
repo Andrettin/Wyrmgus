@@ -719,14 +719,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 #ifdef DEBUG
 	{
 		Vec2i pos;
-		//Wyrmgus start
-//		pos.y = index / Map.Info.MapWidth;
-//		pos.x = index - pos.y * Map.Info.MapWidth;
-//		Assert(Map.Info.IsPointOnMap(pos));
 		pos.y = index / Map.Info.MapWidths[z];
 		pos.x = index - pos.y * Map.Info.MapWidths[z];
 		Assert(Map.Info.IsPointOnMap(pos, z));
-		//Wyrmgus end
 	}
 #endif
 	int cost = 0;
@@ -1320,10 +1315,9 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				  char *path, int pathlen, const CUnit &unit, int max_length, int z, bool allow_diagonal)
 				  //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(startPos));
 	Assert(Map.Info.IsPointOnMap(startPos, z));
 	
+	//Wyrmgus start
 	if (unit.MapLayer->ID != z) {
 		return PF_UNREACHABLE;
 	}

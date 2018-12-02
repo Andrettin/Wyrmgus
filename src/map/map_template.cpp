@@ -992,7 +992,7 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 				if (pathway_type) {
 					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileSize.x + 1; ++x) {
 						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->TileSize.y + 1; ++y) {
-							if (!Map.Info.IsPointOnMap(x, y, unit->MapLayer->ID)) {
+							if (!Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
 								continue;
 							}
 							CMapField &mf = *unit->MapLayer->Field(x, y);

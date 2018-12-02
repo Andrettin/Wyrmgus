@@ -127,19 +127,10 @@ int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z
 	return fogMask;
 }
 
-//Wyrmgus start
-//int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask)
 int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	if (Map.Info.IsPointOnMap(pos)) {
 	if (Map.Info.IsPointOnMap(pos, z)) {
-	//Wyrmgus end
-		//Wyrmgus start
-//		return MapFogFilterFlags(player, Map.getIndex(pos), mask);
 		return MapFogFilterFlags(player, Map.getIndex(pos, z), mask, z);
-		//Wyrmgus end
 	}
 	return mask;
 }
@@ -307,12 +298,8 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 void MapMarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
-//	MapMarkTileSight(player, Map.getIndex(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
 	MapMarkTileSight(player, Map.getIndex(pos, z), z);
-	//Wyrmgus end
 }
 
 /**
@@ -362,12 +349,8 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
-//	MapUnmarkTileSight(player, Map.getIndex(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
 	MapUnmarkTileSight(player, Map.getIndex(pos, z), z);
-	//Wyrmgus end
 }
 
 /**

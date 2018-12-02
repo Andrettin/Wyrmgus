@@ -401,14 +401,8 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 					autocast->PositionAutoCast->pushIntegers(array);
 					autocast->PositionAutoCast->run(2);
 					Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
-					//Wyrmgus start
-//					if (Map.Info.IsPointOnMap(resPos)) {
 					if (Map.Info.IsPointOnMap(resPos, z)) {
-					//Wyrmgus end
-						//Wyrmgus start
-//						Target *target = new Target(TargetPosition, nullptr, resPos);
 						Target *target = new Target(TargetPosition, nullptr, resPos, z);
-						//Wyrmgus end
 						return target;
 					}
 				}

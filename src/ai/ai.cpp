@@ -1340,7 +1340,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			const Vec2i pos = blocker.tilePos + blocker.Type->TileSize * dirs[r];
 
 			// Out of the map => no !
-			if (!Map.Info.IsPointOnMap(pos, unit.MapLayer->ID)) {
+			if (!Map.Info.IsPointOnMap(pos, unit.MapLayer)) {
 				continue;
 			}
 			// move to blocker ? => no !

@@ -109,7 +109,7 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 {
 	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);
 
-	return Map.Info.IsPointOnMap(tilePos, UI.CurrentMapLayer->ID);
+	return Map.Info.IsPointOnMap(tilePos, UI.CurrentMapLayer);
 }
 
 // Convert viewport coordinates into map pixel coordinates

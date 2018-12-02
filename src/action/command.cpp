@@ -336,10 +336,7 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 **  @param pos    map position to move to.
 **  @param flush  if true, flush command queue.
 */
-//Wyrmgus start
-//void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
-//Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(pos, z));
 
@@ -569,10 +566,7 @@ void CommandAutoRepair(CUnit &unit, int on)
 **  @param target  or unit to be attacked.
 **  @param flush   if true, flush command queue.
 */
-//Wyrmgus start
-//void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
 void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int z)
-//Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(pos, z));
 
@@ -627,15 +621,9 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 **  @param pos    map position to fire on.
 **  @param flush  if true, flush command queue.
 */
-//Wyrmgus start
-//void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
-	//Wyrmgus end
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -749,15 +737,9 @@ void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 **  @param pos    map position to patrol between.
 **  @param flush  if true, flush command queue.
 */
-//Wyrmgus start
-//void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
-	//Wyrmgus end
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1314,19 +1296,13 @@ void CommandLearnAbility(CUnit &unit, CUpgrade &what)
 **  @param spell  Spell type pointer.
 **  @param flush  If true, flush command queue.
 */
-//Wyrmgus start
-//void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, bool isAutocast)
 void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, int z, bool isAutocast)
-//Wyrmgus end
 {
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
 			   UnitNumber(unit) _C_ spell.Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
 	Assert(std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), &spell) != unit.Type->Spells.end());
 	
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
-	//Wyrmgus end
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;

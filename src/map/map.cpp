@@ -498,17 +498,10 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 **
 **  @return    True if wall, false otherwise.
 */
-//Wyrmgus start
-//bool CMap::WallOnMap(const Vec2i &pos) const
 bool CMap::WallOnMap(const Vec2i &pos, int z) const
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
-//	return Field(pos)->isAWall();
 	Assert(Map.Info.IsPointOnMap(pos, z));
 	return Field(pos, z)->isAWall();
-	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -855,15 +848,9 @@ PixelSize CMap::GetMapLayerPixelTileSize(int map_layer) const
 **
 **  @return      True if could be entered, false otherwise.
 */
-//Wyrmgus start
-//bool CheckedCanMoveToMask(const Vec2i &pos, int mask)
 bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	return Map.Info.IsPointOnMap(pos) && CanMoveToMask(pos, mask);
 	return Map.Info.IsPointOnMap(pos, z) && CanMoveToMask(pos, mask, z);
-	//Wyrmgus end
 }
 
 /**
@@ -887,14 +874,8 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
 
 	for (int addy = 0; addy < type.TileSize.y; ++addy) {
 		for (int addx = 0; addx < type.TileSize.x; ++addx) {
-			//Wyrmgus start
-			/*
-			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy) == false
-				|| Map.Field(pos.x + addx + index)->CheckMask(mask) == true) {
-			*/
 			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false
 				|| Map.Field(pos.x + addx + index, z)->CheckMask(mask) == true) {
-			//Wyrmgus end
 				return false;
 			}
 		}
@@ -1166,7 +1147,61 @@ void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 //Wyrmgus end
 
 /**
-**  Clear CMapInfo.
+**	@brief	Get whether a given coordinate is a valid point on the map
+**
+**	@param	x	The x coordinate
+**	@param	y	The y coordinate
+**	@param	z	The map layer
+**
+**	@return	True if the coordinate is valid, false otherwise
+*/
+bool CMapInfo::IsPointOnMap(const int x, const int y, const int z) const
+{
+	return (z >= 0 && z < (int) MapWidths.size() && z < (int) MapHeights.size() && x >= 0 && y >= 0 && x < MapWidths[z] && y < MapHeights[z]);
+}
+
+/**
+**	@brief	Get whether a given coordinate is a valid point on the map
+**
+**	@param	pos	The coordinate position
+**	@param	z	The map layer
+**
+**	@return	True if the coordinate is valid, false otherwise
+*/
+bool CMapInfo::IsPointOnMap(const Vec2i &pos, const int z) const
+{
+	return IsPointOnMap(pos.x, pos.y, z);
+}
+
+/**
+**	@brief	Get whether a given coordinate is a valid point on the map
+**
+**	@param	x			The x coordinate
+**	@param	y			The y coordinate
+**	@param	map_layer	The map layer
+**
+**	@return	True if the coordinate is valid, false otherwise
+*/
+bool CMapInfo::IsPointOnMap(const int x, const int y, const CMapLayer *map_layer) const
+{
+	return (map_layer && x >= 0 && y >= 0 && x < map_layer->Width && y < map_layer->Height);
+}
+
+/**
+**	@brief	Get whether a given coordinate is a valid point on the map
+**
+**	@param	pos			The coordinate position
+**	@param	map_layer	The map layer
+**
+**	@return	True if the coordinate is valid, false otherwise
+*/
+bool CMapInfo::IsPointOnMap(const Vec2i &pos, const CMapLayer *map_layer) const
+{
+	return IsPointOnMap(pos.x, pos.y, map_layer);
+}
+
+/**
+**	@brief	Clear CMapInfo
 */
 void CMapInfo::Clear()
 {
@@ -2703,12 +2738,8 @@ void CMap::ClearRockTile(const Vec2i &pos)
 void CMap::RegenerateForestTile(const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
-//	CMapField &mf = *this->Field(pos);
 	Assert(Map.Info.IsPointOnMap(pos, z));
 	CMapField &mf = *this->Field(pos, z);
-	//Wyrmgus end
 
 	//Wyrmgus start
 //	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile()) {

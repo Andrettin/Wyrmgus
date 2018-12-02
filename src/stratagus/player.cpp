@@ -3728,7 +3728,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 		this->ResourceDemand[i] += type->Stats[this->Index].ResourceDemand[i];
 	}
 	
-	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && Map.Info.IsPointOnMap(unit->tilePos, unit->MapLayer->ID) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && Map.Info.IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		this->Ai->Scouts.push_back(unit);
 	}
 	
@@ -4042,15 +4042,9 @@ void DebugPlayers()
 **
 **  @todo FIXME: We must also notfiy allied players.
 */
-//Wyrmgus start
-//void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
 void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
-	//Wyrmgus end
 	char temp[128];
 	Uint32 color;
 	va_list va;

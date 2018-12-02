@@ -107,7 +107,7 @@ static unsigned QuadFromTile(const Vec2i &pos)
 */
 void EditorChangeTile(const Vec2i &pos, int tileIndex)
 {
-	Assert(Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer->ID));
+	Assert(Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 
 	// Change the flags
 	CMapField &mf = *UI.CurrentMapLayer->Field(pos);
@@ -145,7 +145,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer->ID)) {
+				if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 					Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
 					Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
 				}
@@ -202,7 +202,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer->ID)) {
+					if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 							
 						CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);

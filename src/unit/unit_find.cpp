@@ -1536,10 +1536,7 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 			pos.y += sign.y;
 		}
 
-		//Wyrmgus start
-//		if (Map.Info.IsPointOnMap(pos) == false) {
 		if (Map.Info.IsPointOnMap(pos, z) == false) {
-		//Wyrmgus end
 			DebugPrint("outside of map\n");
 		//Wyrmgus start
 //		} else if (Map.Field(pos)->Flags & flags) {

@@ -1082,7 +1082,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	Vec2i new_pos;
 	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true, worker->MapLayer->ID);
 	
-	if (!Map.Info.IsPointOnMap(new_pos, worker->MapLayer->ID)) {
+	if (!Map.Info.IsPointOnMap(new_pos, worker->MapLayer)) {
 		new_pos = Players[playerno].StartPos;
 	}
 	
