@@ -135,7 +135,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	file.printf("\"player\", %d,\n  ", unit.Player->Index);
 
-	file.printf("\"map-layer\", %d, ", unit.MapLayer->ID);
+	if (unit.MapLayer) {
+		file.printf("\"map-layer\", %d, ", unit.MapLayer->ID);
+	}
 	file.printf("\"tile\", {%d, %d}, ", unit.tilePos.x, unit.tilePos.y);
 	file.printf("\"seen-tile\", {%d, %d}, ", unit.Seen.tilePos.x, unit.Seen.tilePos.y);
 
