@@ -33,13 +33,14 @@
 
 #include "color.h"
 
+#include "config.h"
 #include "script.h"
 
 #include "SDL.h"
 
 CColor::operator SDL_Color() const
 {
-	SDL_Color c = { R, G, B, A };
+	SDL_Color c = { static_cast<unsigned char>(R), static_cast<unsigned char>(G), static_cast<unsigned char>(B), static_cast<unsigned char>(A) };
 	return c;
 }
 
@@ -62,6 +63,31 @@ CColor CColor::FromString(const std::string &str)
 	}
 	
 	return color;
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CColor::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "red") {
+			this->R = std::stoi(value);
+		} else if (key == "green") {
+			this->G = std::stoi(value);
+		} else if (key == "blue") {
+			this->B = std::stoi(value);
+		} else if (key == "alpha") {
+			this->A = std::stoi(value);
+		} else {
+			fprintf(stderr, "Invalid color property: \"%s\".\n", key.c_str());
+		}
+	}
 }
 
 void CColor::Parse(lua_State *l, const int offset)

@@ -131,6 +131,26 @@ void CTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid time of day property: \"%s\".\n", key.c_str());
 		}
 	}
+	
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		const CConfigData *child_config_data = config_data->Children[i];
+		
+		if (child_config_data->Tag == "color_modification") {
+			this->ColorModification.ProcessConfigData(child_config_data);
+		} else {
+			fprintf(stderr, "Invalid time of day property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+}
+
+/**
+**	@brief	Gets whether the time of day modifies the color of graphics
+**
+**	@return	Whether the time of day modifies the color of graphics
+*/
+bool CTimeOfDay::HasColorModification() const
+{
+	return this->ColorModification.R != 0 || this->ColorModification.G != 0 || this->ColorModification.B != 0;
 }
 
 //@}

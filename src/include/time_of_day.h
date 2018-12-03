@@ -40,6 +40,8 @@
 #include <string>
 #include <vector>
 
+#include "color.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -62,6 +64,7 @@ public:
 	static std::map<std::string, CTimeOfDay *> TimesOfDayByIdent;
 	
 	void ProcessConfigData(const CConfigData *config_data);
+	bool HasColorModification() const;
 
 	std::string Ident;							/// Ident of the time of day
 	std::string Name;							/// Name of the time of day
@@ -70,6 +73,7 @@ public:
 	bool Day;									/// Whether this is a day time of day
 	bool Dusk;									/// Whether this is a dusk time of day
 	bool Night;									/// Whether this is a night time of day
+	CColor ColorModification;					/// The color modification applied to graphics when the time of day is active
 };
 
 //@}

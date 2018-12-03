@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name color.h - The A platform independent color headerfile. */
+/**@name color.h - The platform independent color header file. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012-2018 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -32,10 +32,11 @@
 
 //@{
 
-struct SDL_Color;
+class CConfigData;
 struct lua_State;
+struct SDL_Color;
 
-/// A platform independent color
+/// platform independent color
 class CColor
 {
 public:
@@ -46,16 +47,94 @@ public:
 	
 	static CColor FromString(const std::string &str);
 
+	void ProcessConfigData(const CConfigData *config_data);
 	void Parse(lua_State *l, int index = -1);
 
 	/// Cast to a SDL_Color
 	operator SDL_Color() const;
 
+	bool operator <(const CColor &rhs) const {
+		if (this->R < rhs.R) {
+			return true;
+        } else if (this->R == rhs.R) {
+			if (this->G < rhs.G) {
+				return true;
+			} else if (this->G == rhs.G) {
+				if (this->B < rhs.B) {
+					return true;
+				} else if (this->B == rhs.B) {
+					return this->A < rhs.A;
+				}
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator <=(const CColor &rhs) const {
+		if (this->R < rhs.R) {
+			return true;
+        } else if (this->R == rhs.R) {
+			if (this->G < rhs.G) {
+				return true;
+			} else if (this->G == rhs.G) {
+				if (this->B < rhs.B) {
+					return true;
+				} else if (this->B == rhs.B) {
+					return this->A <= rhs.A;
+				}
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator >(const CColor &rhs) const {
+		if (this->R > rhs.R) {
+			return true;
+        } else if (this->R == rhs.R) {
+			if (this->G > rhs.G) {
+				return true;
+			} else if (this->G == rhs.G) {
+				if (this->B > rhs.B) {
+					return true;
+				} else if (this->B == rhs.B) {
+					return this->A > rhs.A;
+				}
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator >=(const CColor &rhs) const {
+		if (this->R > rhs.R) {
+			return true;
+        } else if (this->R == rhs.R) {
+			if (this->G > rhs.G) {
+				return true;
+			} else if (this->G == rhs.G) {
+				if (this->B > rhs.B) {
+					return true;
+				} else if (this->B == rhs.B) {
+					return this->A >= rhs.A;
+				}
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator ==(const CColor &rhs) const {
+		return this->R == rhs.R && this->G == rhs.G && this->B == rhs.B && this->A == rhs.A;
+	}
+	
 public:
-	unsigned char R;       /// Red
-	unsigned char G;       /// Green
-	unsigned char B;       /// Blue
-	unsigned char A;       /// Alpha
+	//these variables are short integers instead of unsigned chars so that they can be negative, for the case they need to represent a color modification (which can have negative values)
+	short R;			/// Red
+	short G;			/// Green
+	short B;			/// Blue
+	short A;			/// Alpha
 };
 
 

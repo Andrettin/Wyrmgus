@@ -82,10 +82,7 @@ protected:
 		Refs(1), TimeOfDay(nullptr), Resized(false), Grayscale(false)
 		//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		//Wyrmgus start
-//		, TextureWidth(0.f), TextureHeight(0.f), Textures(nullptr), NumTextures(0)
-		, TextureWidth(0.f), TextureHeight(0.f), Textures(nullptr), TexturesDawn(nullptr), TexturesDusk(nullptr), TexturesNight(nullptr), NumTextures(0)
-		//Wyrmgus end
+		, TextureWidth(0.f), TextureHeight(0.f), Textures(nullptr), NumTextures(0)
 #endif
 	{
 		frameFlip_map = nullptr;
@@ -204,11 +201,7 @@ public:
 	GLfloat TextureWidth;      /// Width of the texture
 	GLfloat TextureHeight;     /// Height of the texture
 	GLuint *Textures;          /// Texture names
-	//Wyrmgus start
-	GLuint *TexturesDawn;          /// Texture names (dawn)
-	GLuint *TexturesDusk;          /// Texture names (dusk)
-	GLuint *TexturesNight;          /// Texture names (night)
-	//Wyrmgus end
+	std::map<CColor, GLuint *> TextureColorModifications;	/// Textures with a color modification applied to them
 	int NumTextures;           /// Number of textures
 #endif
 
@@ -238,9 +231,6 @@ protected:
 //		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
 		for (int i = 0; i < PlayerColorMax; ++i) {
 			PlayerColorTextures[i] = nullptr;
-			PlayerColorTexturesDawn[i] = nullptr;
-			PlayerColorTexturesDusk[i] = nullptr;
-			PlayerColorTexturesNight[i] = nullptr;
 		}
 		//Wyrmgus end
 #endif
@@ -292,13 +282,8 @@ public:
 	//Wyrmgus end
 	
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	//Wyrmgus start
-//	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
 	GLuint *PlayerColorTextures[PlayerColorMax];				/// Textures with player colors
-	GLuint *PlayerColorTexturesDawn[PlayerColorMax];			/// Textures with player colors (dawn)
-	GLuint *PlayerColorTexturesDusk[PlayerColorMax];			/// Textures with player colors (dusk)
-	GLuint *PlayerColorTexturesNight[PlayerColorMax];			/// Textures with player colors (night)
-	//Wyrmgus end
+	std::map<int, std::map<CColor, GLuint *>> PlayerColorTextureColorModifications;	/// Player color textures with a color modification applied to them
 #endif
 };
 

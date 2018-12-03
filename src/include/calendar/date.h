@@ -79,7 +79,7 @@ public:
 	char Hour;
 	CTimeline *Timeline;
 	
-	bool operator <(const CDate& rhs) const {
+	bool operator <(const CDate &rhs) const {
 		if (Year < rhs.Year) {
 			return true;
         } else if (Year == rhs.Year) {
@@ -97,7 +97,7 @@ public:
 		return false;
 	}
 	
-	bool operator <=(const CDate& rhs) const {
+	bool operator <=(const CDate &rhs) const {
 		if (Year < rhs.Year) {
 			return true;
         } else if (Year == rhs.Year) {
@@ -115,7 +115,7 @@ public:
 		return false;
 	}
 	
-	bool operator >(const CDate& rhs) const {
+	bool operator >(const CDate &rhs) const {
 		if (Year > rhs.Year) {
 			return true;
         } else if (Year == rhs.Year) {
@@ -133,7 +133,7 @@ public:
 		return false;
 	}
 	
-	bool operator >=(const CDate& rhs) const {
+	bool operator >=(const CDate &rhs) const {
 		if (Year > rhs.Year) {
 			return true;
         } else if (Year == rhs.Year) {
@@ -151,7 +151,7 @@ public:
 		return false;
 	}
 	
-	bool operator ==(const CDate& rhs) const {
+	bool operator ==(const CDate &rhs) const {
 		return Year == rhs.Year && Month == rhs.Month && Day == rhs.Day && Hour == rhs.Hour;
 	}
 };

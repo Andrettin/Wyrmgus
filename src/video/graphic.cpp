@@ -377,23 +377,13 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_d
 	if (UseOpenGL) {
 		//Wyrmgus start
 //		DoDrawFrameClip(Textures, frame, x, y);
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
 			DoDrawFrameClip(Textures, frame, x, y, show_percent);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
-			if (!TexturesDawn) {
+		} else {
+			if (TextureColorModifications.find(UI.CurrentMapLayer->GetTimeOfDay()->ColorModification) == TextureColorModifications.end()) {
 				MakeTexture(this, UI.CurrentMapLayer->GetTimeOfDay());
 			}
-			DoDrawFrameClip(TexturesDawn, frame, x, y, show_percent);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
-			if (!TexturesDusk) {
-				MakeTexture(this, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClip(TexturesDusk, frame, x, y, show_percent);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
-			if (!TexturesNight) {
-				MakeTexture(this, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClip(TexturesNight, frame, x, y, show_percent);
+			DoDrawFrameClip(TextureColorModifications[UI.CurrentMapLayer->GetTimeOfDay()->ColorModification], frame, x, y, show_percent);
 		}
 		//Wyrmgus end
 	} else
@@ -638,26 +628,16 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 		}
 		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
 		*/
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player, nullptr);
 			}
 			DoDrawFrameClip(PlayerColorTextures[player], frame, x, y, show_percent);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
-			if (!PlayerColorTexturesDawn[player]) {
+		} else {
+			if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->ColorModification) == PlayerColorTextureColorModifications[player].end()) {
 				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
 			}
-			DoDrawFrameClip(PlayerColorTexturesDawn[player], frame, x, y, show_percent);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
-			if (!PlayerColorTexturesDusk[player]) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClip(PlayerColorTexturesDusk[player], frame, x, y, show_percent);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
-			if (!PlayerColorTexturesNight[player]) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClip(PlayerColorTexturesNight[player], frame, x, y, show_percent);
+			DoDrawFrameClip(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->ColorModification], frame, x, y, show_percent);
 		}
 		//Wyrmgus end
 	} else
@@ -712,36 +692,25 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 			MakePlayerColorTexture(this, player);
 		}
 		*/
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player, nullptr);
 			}
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
-			if (!PlayerColorTexturesDawn[player]) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
-			if (!PlayerColorTexturesDusk[player]) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
-			if (!PlayerColorTexturesNight[player]) {
+		} else {
+			if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->ColorModification) == PlayerColorTextureColorModifications[player].end()) {
 				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
 			}
 		}
 		//Wyrmgus end
+		
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glColor4ub(255, 255, 255, alpha);
 		//Wyrmgus start
 //		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
 			DoDrawFrameClip(PlayerColorTextures[player], frame, x, y, show_percent);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
-			DoDrawFrameClip(PlayerColorTexturesDawn[player], frame, x, y, show_percent);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
-			DoDrawFrameClip(PlayerColorTexturesDusk[player], frame, x, y, show_percent);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
-			DoDrawFrameClip(PlayerColorTexturesNight[player], frame, x, y, show_percent);
+		} else {
+			DoDrawFrameClip(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->ColorModification], frame, x, y, show_percent);
 		}
 		//Wyrmgus end
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -801,36 +770,25 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 			MakePlayerColorTexture(this, player);
 		}
 		*/
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player, nullptr);
 			}
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
-			if (!PlayerColorTexturesDawn[player]) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
-			if (!PlayerColorTexturesDusk[player]) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
-			if (!PlayerColorTexturesNight[player]) {
+		} else {
+			if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->ColorModification) == PlayerColorTextureColorModifications[player].end()) {
 				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
 			}
 		}
 		//Wyrmgus end
+		
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glColor4ub(255, 255, 255, alpha);
 		//Wyrmgus start
 //		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
 			DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
-			DoDrawFrameClipX(PlayerColorTexturesDawn[player], frame, x, y);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
-			DoDrawFrameClipX(PlayerColorTexturesDusk[player], frame, x, y);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
-			DoDrawFrameClipX(PlayerColorTexturesNight[player], frame, x, y);
+		} else {
+			DoDrawFrameClipX(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->ColorModification], frame, x, y);
 		}
 		//Wyrmgus end
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -936,23 +894,13 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_
 	if (UseOpenGL) {
 		//Wyrmgus start
 		//DoDrawFrameClipX(Textures, frame, x, y);
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
 			DoDrawFrameClipX(Textures, frame, x, y);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
-			if (!TexturesDawn) {
+		} else {
+			if (TextureColorModifications.find(UI.CurrentMapLayer->GetTimeOfDay()->ColorModification) == TextureColorModifications.end()) {
 				MakeTexture(this, UI.CurrentMapLayer->GetTimeOfDay());
 			}
-			DoDrawFrameClipX(TexturesDawn, frame, x, y);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
-			if (!TexturesDusk) {
-				MakeTexture(this, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClipX(TexturesDusk, frame, x, y);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
-			if (!TexturesNight) {
-				MakeTexture(this, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClipX(TexturesNight, frame, x, y);
+			DoDrawFrameClipX(TextureColorModifications[UI.CurrentMapLayer->GetTimeOfDay()->ColorModification], frame, x, y);
 		}
 		//Wyrmgus end
 	} else
@@ -1090,26 +1038,16 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 		}
 		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
 		*/
-		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
+		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || !UI.CurrentMapLayer->GetTimeOfDay()->HasColorModification()) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player, nullptr);
 			}
 			DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dawn) {
-			if (!PlayerColorTexturesDawn[player]) {
+		} else {
+			if (PlayerColorTextureColorModifications.find(player) == PlayerColorTextureColorModifications.end() || PlayerColorTextureColorModifications[player].find(UI.CurrentMapLayer->GetTimeOfDay()->ColorModification) == PlayerColorTextureColorModifications[player].end()) {
 				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
 			}
-			DoDrawFrameClipX(PlayerColorTexturesDawn[player], frame, x, y);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Dusk) {
-			if (!PlayerColorTexturesDusk[player]) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClipX(PlayerColorTexturesDusk[player], frame, x, y);
-		} else if (UI.CurrentMapLayer->GetTimeOfDay()->Night) {
-			if (!PlayerColorTexturesNight[player]) {
-				MakePlayerColorTexture(this, player, UI.CurrentMapLayer->GetTimeOfDay());
-			}
-			DoDrawFrameClipX(PlayerColorTexturesNight[player], frame, x, y);
+			DoDrawFrameClipX(PlayerColorTextureColorModifications[player][UI.CurrentMapLayer->GetTimeOfDay()->ColorModification], frame, x, y);
 		}
 		//Wyrmgus end
 	} else
@@ -1627,52 +1565,30 @@ void CGraphic::Free(CGraphic *g)
 				glDeleteTextures(g->NumTextures, g->Textures);
 				delete[] g->Textures;
 			}
-			//Wyrmgus start
-			if (g->TexturesDawn) {
-				glDeleteTextures(g->NumTextures, g->TexturesDawn);
-				delete[] g->TexturesDawn;
+			
+			for (std::map<CColor, GLuint *>::iterator iterator = g->TextureColorModifications.begin(); iterator != g->TextureColorModifications.end(); ++iterator) {
+				glDeleteTextures(g->NumTextures, iterator->second);
+				delete[] iterator->second;
 			}
-			if (g->TexturesDusk) {
-				glDeleteTextures(g->NumTextures, g->TexturesDusk);
-				delete[] g->TexturesDusk;
-			}
-			if (g->TexturesNight) {
-				glDeleteTextures(g->NumTextures, g->TexturesNight);
-				delete[] g->TexturesNight;
-			}
-			//Wyrmgus end
+			g->TextureColorModifications.clear();
+
 			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 			if (cg) {
-				//Wyrmgus start
-//				for (int i = 0; i < PlayerMax; ++i) {
 				for (int i = 0; i < PlayerColorMax; ++i) {
-				//Wyrmgus end
-					//Wyrmgus start
-					/*
 					if (cg->PlayerColorTextures[i]) {
 						glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
 						delete[] cg->PlayerColorTextures[i];
 					}
-					*/
-
-					if (cg->PlayerColorTextures[i]) {
-						glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
-						delete[] cg->PlayerColorTextures[i];
-					}
-					if (cg->PlayerColorTexturesDawn[i]) {
-						glDeleteTextures(cg->NumTextures, cg->PlayerColorTexturesDawn[i]);
-						delete[] cg->PlayerColorTexturesDawn[i];
-					}
-					if (cg->PlayerColorTexturesDusk[i]) {
-						glDeleteTextures(cg->NumTextures, cg->PlayerColorTexturesDusk[i]);
-						delete[] cg->PlayerColorTexturesDusk[i];
-					}
-					if (cg->PlayerColorTexturesNight[i]) {
-						glDeleteTextures(cg->NumTextures, cg->PlayerColorTexturesNight[i]);
-						delete[] cg->PlayerColorTexturesNight[i];
-					}
-					//Wyrmgus end
 				}
+					
+				for (std::map<int, std::map<CColor, GLuint *>>::iterator iterator = cg->PlayerColorTextureColorModifications.begin(); iterator != cg->PlayerColorTextureColorModifications.end(); ++iterator) {
+					for (std::map<CColor, GLuint *>::iterator sub_iterator = iterator->second.begin(); sub_iterator != iterator->second.end(); ++sub_iterator) {
+						glDeleteTextures(cg->NumTextures, sub_iterator->second);
+						delete[] sub_iterator->second;
+					}
+					iterator->second.clear();
+				}
+				cg->PlayerColorTextureColorModifications.clear();
 			}
 			Graphics.remove(g);
 		}
@@ -1761,49 +1677,34 @@ void FreeOpenGLGraphics()
 		if ((*i)->Textures) {
 			glDeleteTextures((*i)->NumTextures, (*i)->Textures);
 		}
-		//Wyrmgus start
-		if ((*i)->TexturesDawn) {
-			glDeleteTextures((*i)->NumTextures, (*i)->TexturesDawn);
+		
+		for (std::map<CColor, GLuint *>::iterator iterator = (*i)->TextureColorModifications.begin(); iterator != (*i)->TextureColorModifications.end(); ++iterator) {
+			glDeleteTextures((*i)->NumTextures, iterator->second);
 		}
-		if ((*i)->TexturesDusk) {
-			glDeleteTextures((*i)->NumTextures, (*i)->TexturesDusk);
-		}
-		if ((*i)->TexturesNight) {
-			glDeleteTextures((*i)->NumTextures, (*i)->TexturesNight);
-		}
-		//Wyrmgus end
+		(*i)->TextureColorModifications.clear();
+		
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
 		if (cg) {
-			//Wyrmgus start
-//			for (int j = 0; j < PlayerMax; ++j) {
 			for (int j = 0; j < PlayerColorMax; ++j) {
-			//Wyrmgus end
-				//Wyrmgus start
-				/*
 				if (cg->PlayerColorTextures[j]) {
 					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[j]);
 				}
-				*/
-				if (cg->PlayerColorTextures[j]) {
-					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[j]);
-				}
-				if (cg->PlayerColorTexturesDawn[j]) {
-					glDeleteTextures(cg->NumTextures, cg->PlayerColorTexturesDawn[j]);
-				}
-				if (cg->PlayerColorTexturesDusk[j]) {
-					glDeleteTextures(cg->NumTextures, cg->PlayerColorTexturesDusk[j]);
-				}
-				if (cg->PlayerColorTexturesNight[j]) {
-					glDeleteTextures(cg->NumTextures, cg->PlayerColorTexturesNight[j]);
-				}
-				//Wyrmgus end
+				
 			}
+			
+			for (std::map<int, std::map<CColor, GLuint *>>::iterator iterator = cg->PlayerColorTextureColorModifications.begin(); iterator != cg->PlayerColorTextureColorModifications.end(); ++iterator) {
+				for (std::map<CColor, GLuint *>::iterator sub_iterator = iterator->second.begin(); sub_iterator != iterator->second.end(); ++sub_iterator) {
+					glDeleteTextures(cg->NumTextures, sub_iterator->second);
+				}
+				iterator->second.clear();
+			}
+			cg->PlayerColorTextureColorModifications.clear();
 		}
 	}
 }
 
 /**
-**  Reload OpenGL graphics
+**	@brief	Reload OpenGL graphics
 */
 void ReloadGraphics()
 {
@@ -1814,59 +1715,43 @@ void ReloadGraphics()
 			(*i)->Textures = nullptr;
 			MakeTexture(*i);
 		}
-		//Wyrmgus start
-		if ((*i)->TexturesDawn) {
-			delete[](*i)->TexturesDawn;
-			(*i)->TexturesDawn = nullptr;
-			MakeTexture(*i, CTimeOfDay::GetTimeOfDay("dawn")); //FIXME: hardcoded use of ident = bad!
+		
+		std::vector<CColor> color_modifications;
+		for (std::map<CColor, GLuint *>::iterator iterator = (*i)->TextureColorModifications.begin(); iterator != (*i)->TextureColorModifications.end(); ++iterator) {
+			delete[] iterator->second;
+			color_modifications.push_back(iterator->first);
 		}
-		if ((*i)->TexturesDusk) {
-			delete[](*i)->TexturesDusk;
-			(*i)->TexturesDusk = nullptr;
-			MakeTexture(*i, CTimeOfDay::GetTimeOfDay("dusk"));
+		(*i)->TextureColorModifications.clear();
+		
+		/*
+		for (size_t c = 0; c < color_modifications.size(); ++c) {
+			MakeTexture(*i, color_modifications[c]);
 		}
-		if ((*i)->TexturesNight) {
-			delete[](*i)->TexturesNight;
-			(*i)->TexturesNight = nullptr;
-			MakeTexture(*i, CTimeOfDay::GetTimeOfDay("midnight"));
+		*/
+		for (size_t t = 0; t < CTimeOfDay::TimesOfDay.size(); ++t) {
+			MakeTexture(*i, CTimeOfDay::TimesOfDay[t]);
 		}
-		//Wyrmgus end
+		
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
 		if (cg) {
-			//Wyrmgus start
-//			for (int j = 0; j < PlayerMax; ++j) {
+			for (std::map<int, std::map<CColor, GLuint *>>::iterator iterator = cg->PlayerColorTextureColorModifications.begin(); iterator != cg->PlayerColorTextureColorModifications.end(); ++iterator) {
+				for (std::map<CColor, GLuint *>::iterator sub_iterator = iterator->second.begin(); sub_iterator != iterator->second.end(); ++sub_iterator) {
+					delete[] sub_iterator->second;
+				}
+				iterator->second.clear();
+			}
+			cg->PlayerColorTextureColorModifications.clear();				
+			
 			for (int j = 0; j < PlayerColorMax; ++j) {
-			//Wyrmgus end
 				if (cg->PlayerColorTextures[j]) {
 					delete[] cg->PlayerColorTextures[j];
 					cg->PlayerColorTextures[j] = nullptr;
 					MakePlayerColorTexture(cg, j, nullptr);
 				}
-				if (cg->PlayerColorTexturesDawn[j]) {
-					delete[] cg->PlayerColorTexturesDawn[j];
-					cg->PlayerColorTexturesDawn[j] = nullptr;
-					MakePlayerColorTexture(cg, j, CTimeOfDay::GetTimeOfDay("dawn")); //FIXME: hardcoded use of ident = bad!
+				
+				for (size_t t = 0; t < CTimeOfDay::TimesOfDay.size(); ++t) {
+					MakePlayerColorTexture(cg, j, CTimeOfDay::TimesOfDay[t]);
 				}
-				if (cg->PlayerColorTexturesDusk[j]) {
-					delete[] cg->PlayerColorTexturesDusk[j];
-					cg->PlayerColorTexturesDusk[j] = nullptr;
-					MakePlayerColorTexture(cg, j, CTimeOfDay::GetTimeOfDay("dusk"));
-				}
-				if (cg->PlayerColorTexturesNight[j]) {
-					delete[] cg->PlayerColorTexturesNight[j];
-					cg->PlayerColorTexturesNight[j] = nullptr;
-					MakePlayerColorTexture(cg, j, CTimeOfDay::GetTimeOfDay("midnight"));
-				}
-				//Wyrmgus end
-				//Wyrmgus start
-				/*
-				if (cg->PlayerColorTextures[j]) {
-					delete[] cg->PlayerColorTextures[j];
-					cg->PlayerColorTextures[j] = nullptr;
-					MakePlayerColorTexture(cg, j);
-				}
-				*/
-				//Wyrmgus end
 			}
 		}
 	}
@@ -2099,18 +1984,10 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	int time_of_day_blue = 0;
 	
 	if (!g->Grayscale) { // don't alter the colors of grayscale graphics
-		if (time_of_day && time_of_day->Dawn) { // dawn
-			time_of_day_red = -20;
-			time_of_day_green = -20;
-			time_of_day_blue = 0;
-		} else if (time_of_day && time_of_day->Dusk) { // dusk
-			time_of_day_red = 0;
-			time_of_day_green = -20;
-			time_of_day_blue = -20;
-		} else if (time_of_day && time_of_day->Night) { // night
-			time_of_day_red = -45;
-			time_of_day_green = -35;
-			time_of_day_blue = -10;
+		if (time_of_day && time_of_day->HasColorModification()) {
+			time_of_day_red = time_of_day->ColorModification.R;
+			time_of_day_green = time_of_day->ColorModification.G;
+			time_of_day_blue = time_of_day->ColorModification.B;
 		}
 	}
 	//Wyrmgus end
@@ -2274,34 +2151,16 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, CTimeOfDa
 	CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 	GLuint *textures;
 	if (!colors || !cg) {
-		//Wyrmgus start
-//		textures = g->Textures = new GLuint[g->NumTextures];
-//		glGenTextures(g->NumTextures, g->Textures);
-		if (time_of_day && time_of_day->Dawn) {
-			textures = g->TexturesDawn = new GLuint[g->NumTextures];
-			glGenTextures(g->NumTextures, g->TexturesDawn);
-		} else if (time_of_day && time_of_day->Dusk) {
-			textures = g->TexturesDusk = new GLuint[g->NumTextures];
-			glGenTextures(g->NumTextures, g->TexturesDusk);
-		} else if (time_of_day && time_of_day->Night) {
-			textures = g->TexturesNight = new GLuint[g->NumTextures];
-			glGenTextures(g->NumTextures, g->TexturesNight);
+		if (time_of_day && time_of_day->HasColorModification()) {
+			textures = g->TextureColorModifications[time_of_day->ColorModification] = new GLuint[g->NumTextures];
+			glGenTextures(g->NumTextures, g->TextureColorModifications[time_of_day->ColorModification]);
 		} else {
 			textures = g->Textures = new GLuint[g->NumTextures];
 			glGenTextures(g->NumTextures, g->Textures);
 		}
-		//Wyrmgus end
-	//Wyrmgus start
-	} else if (time_of_day && time_of_day->Dawn) {
-		textures = cg->PlayerColorTexturesDawn[player] = new GLuint[cg->NumTextures];
-		glGenTextures(cg->NumTextures, cg->PlayerColorTexturesDawn[player]);
-	} else if (time_of_day && time_of_day->Dusk) {
-		textures = cg->PlayerColorTexturesDusk[player] = new GLuint[cg->NumTextures];
-		glGenTextures(cg->NumTextures, cg->PlayerColorTexturesDusk[player]);
-	} else if (time_of_day && time_of_day->Night) {
-		textures = cg->PlayerColorTexturesNight[player] = new GLuint[cg->NumTextures];
-		glGenTextures(cg->NumTextures, cg->PlayerColorTexturesNight[player]);
-	//Wyrmgus end
+	} else if (time_of_day && time_of_day->HasColorModification()) {
+		textures = cg->PlayerColorTextureColorModifications[player][time_of_day->ColorModification] = new GLuint[cg->NumTextures];
+		glGenTextures(cg->NumTextures, cg->PlayerColorTextureColorModifications[player][time_of_day->ColorModification]);
 	} else {
 		textures = cg->PlayerColorTextures[player] = new GLuint[cg->NumTextures];
 		glGenTextures(cg->NumTextures, cg->PlayerColorTextures[player]);
@@ -2331,16 +2190,8 @@ void MakeTexture(CGraphic *g, CTimeOfDay *time_of_day)
 //	if (g->Textures) {
 //		return;
 //	}
-	if (time_of_day && time_of_day->Dawn) {
-		if (g->TexturesDawn) {
-			return;
-		}
-	} else if (time_of_day && time_of_day->Dusk) {
-		if (g->TexturesDusk) {
-			return;
-		}
-	} else if (time_of_day && time_of_day->Night) {
-		if (g->TexturesNight) {
+	if (time_of_day && time_of_day->HasColorModification()) {
+		if (g->TextureColorModifications.find(time_of_day->ColorModification) != g->TextureColorModifications.end()) {
 			return;
 		}
 	} else {
@@ -2373,16 +2224,8 @@ void MakePlayerColorTexture(CPlayerColorGraphic *g, int player, CTimeOfDay *time
 		return;
 	}
 	*/
-	if (time_of_day && time_of_day->Dawn) {
-		if (g->PlayerColorTexturesDawn[player]) {
-			return;
-		}
-	} else if (time_of_day && time_of_day->Dusk) {
-		if (g->PlayerColorTexturesDusk[player]) {
-			return;
-		}
-	} else if (time_of_day && time_of_day->Night) {
-		if (g->PlayerColorTexturesNight[player]) {
+	if (time_of_day && time_of_day->HasColorModification()) {
+		if (g->PlayerColorTextureColorModifications.find(player) != g->PlayerColorTextureColorModifications.end() && g->PlayerColorTextureColorModifications[player].find(time_of_day->ColorModification) != g->PlayerColorTextureColorModifications[player].end()) {
 			return;
 		}
 	} else {

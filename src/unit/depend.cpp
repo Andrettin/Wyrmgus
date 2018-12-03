@@ -81,7 +81,7 @@ void DependRule::ProcessConfigData(const CConfigData *config_data, const int rul
 	int or_flag = 0;
 	
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		CConfigData *child_config_data = config_data->Children[i];
+		const CConfigData *child_config_data = config_data->Children[i];
 		
 		if (child_config_data->Tag == "rule_group") {
 			if (first_rule_group) {
@@ -91,7 +91,7 @@ void DependRule::ProcessConfigData(const CConfigData *config_data, const int rul
 			}
 			
 			for (size_t j = 0; j < child_config_data->Children.size(); ++j) {
-				CConfigData *grandchild_config_data = child_config_data->Children[j];
+				const CConfigData *grandchild_config_data = child_config_data->Children[j];
 				
 				if (grandchild_config_data->Tag == "rule") {
 					std::string requirement;

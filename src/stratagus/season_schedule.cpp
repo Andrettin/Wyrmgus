@@ -144,7 +144,7 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 	
 	
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		CConfigData *child_config_data = config_data->Children[i];
+		const CConfigData *child_config_data = config_data->Children[i];
 		
 		if (child_config_data->Tag == "scheduled_season") {
 			CSeason *season = nullptr;
