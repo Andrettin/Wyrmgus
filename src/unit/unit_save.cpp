@@ -42,11 +42,10 @@
 
 #include "actions.h"
 #include "animation.h"
-//Wyrmgus start
 #include "character.h"
-//Wyrmgus end
 #include "construct.h"
 #include "iolib.h"
+#include "map/map_layer.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"
@@ -136,9 +135,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	file.printf("\"player\", %d,\n  ", unit.Player->Index);
 
-	//Wyrmgus start
-	file.printf("\"map-layer\", %d, ", unit.MapLayer);
-	//Wyrmgus end
+	file.printf("\"map-layer\", %d, ", unit.MapLayer->ID);
 	file.printf("\"tile\", {%d, %d}, ", unit.tilePos.x, unit.tilePos.y);
 	file.printf("\"seen-tile\", {%d, %d}, ", unit.Seen.tilePos.x, unit.Seen.tilePos.y);
 
