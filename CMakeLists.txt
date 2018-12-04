@@ -55,9 +55,7 @@ include_directories(
 	src/include
 	src/guichan/include
 	src/guichan/include/guichan
-	#Wyrmgus start
 	src/xbrz/include
-	#Wyrmgus end
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -398,12 +396,10 @@ set(video_SRCS
 )
 source_group(video FILES ${video_SRCS})
 
-#Wyrmgus start
 set(xbrz_SRCS
 	src/xbrz/xbrz.cpp
 )
 source_group(xbrz FILES ${xbrz_SRCS})
-#Wyrmgus end
 
 set(win32_SRCS
 	src/win32/SetupConsole_win32.cpp
@@ -460,9 +456,7 @@ set(stratagus_SRCS
 	${ui_SRCS}
 	${unit_SRCS}
 	${video_SRCS}
-	#Wyrmgus start
 	${xbrz_SRCS}
-	#Wyrmgus end
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
 )
 
@@ -610,12 +604,11 @@ set(stratagus_ui_HDRS
 	src/include/ui/uitimer.h
 )
 
-#Wyrmgus start
 set(stratagus_xbrz_HDRS
-	src/xbrz/include/config.h
 	src/xbrz/include/xbrz.h
+	src/xbrz/include/xbrz_config.h
+	src/xbrz/include/xbrz_tools.h
 )
-#Wyrmgus end
 
 set(stratagus_generic_HDRS
 	src/ai/ai_local.h
@@ -708,9 +701,7 @@ source_group(include\\map FILES ${stratagus_map_HDRS})
 source_group(include\\religion FILES ${stratagus_religion_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
 source_group(include\\ui FILES ${stratagus_ui_HDRS})
-#Wyrmgus start
 source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
-#Wyrmgus end
 
 
 set(stratagus_HDRS
@@ -723,9 +714,7 @@ set(stratagus_HDRS
 	${stratagus_religion_HDRS}
 	${stratagus_spell_HDRS}
 	${stratagus_ui_HDRS}
-	#Wyrmgus start
 	${stratagus_xbrz_HDRS}
-	#Wyrmgus end
 )
 
 # Configuration types

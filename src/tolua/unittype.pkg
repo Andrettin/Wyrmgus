@@ -14,11 +14,6 @@ class CUnitType
 
 CUnitType *UnitTypeByIdent(const std::string ident);
 
-//Wyrmgus start
-//extern CUnitType *UnitTypeHumanWall;
-//extern CUnitType *UnitTypeOrcWall;
-//Wyrmgus end
-
-void SetModStat(std::string mod_file, std::string ident, std::string variable_key, int value, std::string variable_type);
-void SetModSound(std::string mod_file, std::string ident, std::string sound, std::string sound_type, std::string sound_subtype = "");
+void SetModStat(const std::string mod_file, const std::string ident, const std::string variable_key, const int value, const std::string variable_type);
+void SetModSound(const std::string mod_file, const std::string ident, const std::string sound, const std::string sound_type, const std::string sound_subtype = "");
 extern std::string GetUnitTypeStatsString(std::string unit_type_ident);
