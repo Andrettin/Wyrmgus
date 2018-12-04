@@ -10,7 +10,7 @@
 //
 /**@name unit_find.cpp - The find/select for units. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -55,6 +55,105 @@
   -- Finding units
   ----------------------------------------------------------------------------*/
 
+bool CUnitFilter::operator()(const CUnit *unit) const
+{
+	return true;
+}
+
+bool NoFilter::operator()(const CUnit *) const
+{
+	return true;
+}
+
+bool HasSameTypeAs::operator()(const CUnit *unit) const
+{
+	return unit->Type == type;
+}	
+
+bool HasSamePlayerAs::operator()(const CUnit *unit) const
+{
+	return unit->Player == player;
+}
+
+bool HasNotSamePlayerAs::operator()(const CUnit *unit) const
+{
+	return unit->Player != player;
+}
+
+bool IsAlliedWith::operator()(const CUnit *unit) const
+{
+	return unit->IsAllied(*player);
+}
+
+bool IsEnemyWith::operator()(const CUnit *unit) const
+{
+	return unit->IsEnemy(*player);
+}
+
+HasSamePlayerAndTypeAs::HasSamePlayerAndTypeAs(const CUnit &unit) :
+	player(unit.Player), type(unit.Type)
+{
+}
+		
+bool HasSamePlayerAndTypeAs::operator()(const CUnit *unit) const
+{
+	return (unit->Player == player && unit->Type == type);
+}
+
+bool IsNotTheSameUnitAs::operator()(const CUnit *unit) const
+{
+	return unit != forbidden;
+}
+
+bool IsBuildingType::operator()(const CUnit *unit) const
+{
+	return unit->Type->BoolFlag[BUILDING_INDEX].value;
+}
+
+bool IsNotBuildingType::operator()(const CUnit *unit) const
+{
+	return !unit->Type->BoolFlag[BUILDING_INDEX].value;
+}
+
+bool IsOrganicType::operator()(const CUnit *unit) const
+{
+	return unit->Type->BoolFlag[ORGANIC_INDEX].value;
+}
+
+bool IsBuiltUnit::operator()(const CUnit *unit) const
+{
+	return unit->CurrentAction() != UnitActionBuilt;
+}
+
+bool IsAggresiveUnit::operator()(const CUnit *unit) const
+{
+	return unit->IsAgressive();
+}
+
+bool OutOfMinRange::operator()(const CUnit *unit) const
+{
+	return unit->MapDistanceTo(pos, z) >= range;
+}
+
+bool CUnitTypeFinder::operator()(const CUnit *const unit) const
+{
+	if (!unit) {
+		fprintf(stderr, "CUnitTypeFinder Error: Unit is null.\n");
+		return false;
+	}
+
+	if (!unit->Type) {
+		fprintf(stderr, "CUnitTypeFinder Error: Unit's type is null.\n");
+		return false;
+	}
+
+	const CUnitType &type = *unit->Type;
+	if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
+		return false;
+	}
+	return true;
+}
+
 //Wyrmgus start
 //void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
 void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle)
@@ -87,10 +186,7 @@ void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 {
-	//Wyrmgus start
-//	CUnitCache &cache = Map.Field(pos)->UnitCache;
 	CUnitCache &cache = Map.Field(pos, z)->UnitCache;
-	//Wyrmgus end
 
 	for (CUnitCache::iterator it = cache.begin(); it != cache.end(); ++it) {
 		CUnit *unit = *it;
@@ -104,10 +200,7 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 
 VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	//Wyrmgus start
-//	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
 	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
-	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
@@ -155,10 +248,7 @@ private:
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	//Wyrmgus start
-//	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
 	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
-	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 	
@@ -178,10 +268,8 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 		}
 		return VisitResult_Finished;
 	}
-	//Wyrmgus start
-//	if (CanMoveToMask(pos, movemask)) { // reachable
+
 	if (CanMoveToMask(pos, movemask, z)) { // reachable
-	//Wyrmgus end
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult_Ok;
 		} else {
@@ -209,10 +297,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 **
 **  @return            True if wood was found.
 */
-//Wyrmgus start
-//bool FindTerrainType(int movemask, int resmask, int range,
 bool FindTerrainType(int movemask, int resource, int range,
-//Wyrmgus end
 					 //Wyrmgus start
 //					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
 					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z, int landmass)
@@ -220,10 +305,7 @@ bool FindTerrainType(int movemask, int resource, int range,
 {
 	TerrainTraversal terrainTraversal;
 
-	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
 	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
-	//Wyrmgus end
 	terrainTraversal.Init();
 
 	terrainTraversal.PushPos(startPos);
@@ -252,10 +334,7 @@ class BestDepotFinder
 			// Unit in range?
 
 			if (NEARLOCATION) {
-				//Wyrmgus start
-//				int d = dest->MapDistanceTo(u_near.loc);
 				int d = dest->MapDistanceTo(u_near.loc, u_near.layer);
-				//Wyrmgus end
 
 				//
 				// Take this depot?
@@ -317,9 +396,7 @@ public:
 		best_dist(INT_MAX), best_depot(0)
 	{
 		u_near.loc = pos;
-		//Wyrmgus start
 		u_near.layer = z;
-		//Wyrmgus end
 	}
 
 	template <typename ITERATOR>
@@ -340,9 +417,7 @@ private:
 	struct {
 		const CUnit *worker;
 		Vec2i loc;
-		//Wyrmgus start
 		int layer;
-		//Wyrmgus end
 	} u_near;
 	const int resource;
 	const int range;
@@ -454,15 +529,9 @@ public:
 };
 //Wyrmgus end
 
-//Wyrmgus start
-//CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
 CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource, int z)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	BestDepotFinder<true> finder(pos, resource, range);
 	BestDepotFinder<true> finder(pos, resource, range, z);
-	//Wyrmgus end
 	std::vector<CUnit *> table;
 	for (std::vector<CUnit *>::iterator it = p.UnitBegin(); it != p.UnitEnd(); ++it) {
 		table.push_back(*it);

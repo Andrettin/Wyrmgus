@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit.h - The unit headerfile. */
+/**@name unit_find.h - The unit find header file. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon, Joris Dauphin
+//      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon, Joris Dauphin
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -33,10 +33,8 @@
 
 //@{
 
-//Wyrmgus start
-#include "actions.h"
-//Wyrmgus end
 #include "map/map.h"
+#include "map/map_layer.h"
 #include "pathfinder.h"
 #include "unit.h"
 #include "unittype.h"
@@ -45,6 +43,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CPlayer;
+class CUnit;
+
 //
 //  Some predicates
 //
@@ -52,20 +53,20 @@
 class CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return true; };
+	bool operator()(const CUnit *unit) const;
 };
 
 class NoFilter : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *) const { return true; }
+	bool operator()(const CUnit *) const;
 };
 
 class HasSameTypeAs : public CUnitFilter
 {
 public:
 	explicit HasSameTypeAs(const CUnitType &_type) : type(&_type) {}
-	bool operator()(const CUnit *unit) const { return unit->Type == type; }
+	bool operator()(const CUnit *unit) const;
 private:
 	const CUnitType *type;
 };
@@ -74,7 +75,7 @@ class HasSamePlayerAs : public CUnitFilter
 {
 public:
 	explicit HasSamePlayerAs(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const { return unit->Player == player; }
+	bool operator()(const CUnit *unit) const;
 private:
 	const CPlayer *player;
 };
@@ -83,7 +84,7 @@ class HasNotSamePlayerAs : public CUnitFilter
 {
 public:
 	explicit HasNotSamePlayerAs(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const { return unit->Player != player; }
+	bool operator()(const CUnit *unit) const;
 private:
 	const CPlayer *player;
 };
@@ -92,7 +93,7 @@ class IsAlliedWith : public CUnitFilter
 {
 public:
 	explicit IsAlliedWith(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const { return unit->IsAllied(*player); }
+	bool operator()(const CUnit *unit) const;
 private:
 	const CPlayer *player;
 };
@@ -101,7 +102,7 @@ class IsEnemyWith : public CUnitFilter
 {
 public:
 	explicit IsEnemyWith(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const { return unit->IsEnemy(*player); }
+	bool operator()(const CUnit *unit) const;
 private:
 	const CPlayer *player;
 };
@@ -109,17 +110,12 @@ private:
 class HasSamePlayerAndTypeAs : public CUnitFilter
 {
 public:
-	explicit HasSamePlayerAndTypeAs(const CUnit &unit) :
-		player(unit.Player), type(unit.Type)
-	{}
+	explicit HasSamePlayerAndTypeAs(const CUnit &unit);
 	HasSamePlayerAndTypeAs(const CPlayer &_player, const CUnitType &_type) :
 		player(&_player), type(&_type)
 	{}
 
-	bool operator()(const CUnit *unit) const
-	{
-		return (unit->Player == player && unit->Type == type);
-	}
+	bool operator()(const CUnit *unit) const;
 
 private:
 	const CPlayer *player;
@@ -130,7 +126,7 @@ class IsNotTheSameUnitAs : public CUnitFilter
 {
 public:
 	explicit IsNotTheSameUnitAs(const CUnit &unit) : forbidden(&unit) {}
-	bool operator()(const CUnit *unit) const { return unit != forbidden; }
+	bool operator()(const CUnit *unit) const;
 private:
 	const CUnit *forbidden;
 };
@@ -138,52 +134,43 @@ private:
 class IsBuildingType : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return unit->Type->BoolFlag[BUILDING_INDEX].value; }
+	bool operator()(const CUnit *unit) const;
 };
 
-//Wyrmgus start
 class IsNotBuildingType : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return !unit->Type->BoolFlag[BUILDING_INDEX].value; }
+	bool operator()(const CUnit *unit) const;
 };
 
 class IsOrganicType : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return unit->Type->BoolFlag[ORGANIC_INDEX].value; }
+	bool operator()(const CUnit *unit) const;
 };
 
 class IsBuiltUnit : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return unit->CurrentAction() != UnitActionBuilt; }
+	bool operator()(const CUnit *unit) const;
 };
-//Wyrmgus end
 
 class IsAggresiveUnit : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return unit->IsAgressive(); }
+	bool operator()(const CUnit *unit) const;
 };
 
 class OutOfMinRange : public CUnitFilter
 {
 public:
-	//Wyrmgus start
-//	explicit OutOfMinRange(const int range, const Vec2i pos) : range(range), pos(pos) {}
-//	bool operator()(const CUnit *unit) const { return unit->MapDistanceTo(pos) >= range; }
 	explicit OutOfMinRange(const int range, const Vec2i pos, int z) : range(range), pos(pos), z(z) {}
-	bool operator()(const CUnit *unit) const { return unit->MapDistanceTo(pos, z) >= range; }
-	//Wyrmgus end
+	bool operator()(const CUnit *unit) const;
 private:
 	int range;
 	Vec2i pos;
-	//Wyrmgus start
 	int z;
-	//Wyrmgus end
 };
-
 
 template <typename Pred>
 class NotPredicate : public CUnitFilter
@@ -233,24 +220,8 @@ class CUnitTypeFinder
 {
 public:
 	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t) {}
-	bool operator()(const CUnit *const unit) const
-	{
-		//Wyrmgus start
-		if (!unit) {
-			fprintf(stderr, "CUnitTypeFinder Error: Unit is null.\n");
-			return false;
-		}
-		if (!unit->Type) {
-			fprintf(stderr, "CUnitTypeFinder Error: Unit's type is null.\n");
-			return false;
-		}
-		//Wyrmgus end
-		const CUnitType &type = *unit->Type;
-		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
-			return false;
-		}
-		return true;
-	}
+	bool operator()(const CUnit *const unit) const;
+
 private:
 	const UnitTypeType unitTypeType;
 };
@@ -259,14 +230,8 @@ private:
 class UnitFinder
 {
 public:
-	//Wyrmgus start
-//	UnitFinder(const CPlayer &player, const std::vector<CUnit *> &units, int maxDist, int movemask, CUnit **unitP) :
 	UnitFinder(const CPlayer &player, const std::vector<CUnit *> &units, int maxDist, int movemask, CUnit **unitP, int z) :
-	//Wyrmgus end
-		//Wyrmgus start
-//		player(player), units(units), maxDist(maxDist), movemask(movemask), unitP(unitP) {}
 		player(player), units(units), maxDist(maxDist), movemask(movemask), unitP(unitP), z(z) {}
-		//Wyrmgus end
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	CUnit *FindUnitAtPos(const Vec2i &pos) const;
@@ -276,9 +241,7 @@ private:
 	int maxDist;
 	int movemask;
 	CUnit **unitP;
-	//Wyrmgus start
 	int z;
-	//Wyrmgus end
 };
 
 //Wyrmgus start
@@ -323,10 +286,8 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 				}
 			}
 			//Wyrmgus end
-			//Wyrmgus start
-//			const CMapField &mf = *Map.Field(posIt);
+
 			const CMapField &mf = *Map.Field(posIt, z);
-			//Wyrmgus end
 			const CUnitCache &cache = mf.UnitCache;
 
 			for (size_t i = 0; i != cache.size(); ++i) {
@@ -384,20 +345,14 @@ void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units,
 }
 
 template <typename Pred>
-//Wyrmgus start
-//CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
 CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
-//Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(ltPos, z));
 	Assert(Map.Info.IsPointOnMap(rbPos, z));
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
-			//Wyrmgus start
-//			const CMapField &mf = *Map.Field(posIt);
 			const CMapField &mf = *Map.Field(posIt, z);
-			//Wyrmgus end
 			const CUnitCache &cache = mf.UnitCache;
 
 			CUnitCache::const_iterator it = std::find_if(cache.begin(), cache.end(), pred);
@@ -410,20 +365,13 @@ CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred
 }
 
 template <typename Pred>
-//Wyrmgus start
-//CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
 CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
-//Wyrmgus end
 {
 	Vec2i minPos = ltPos;
 	Vec2i maxPos = rbPos;
 
-	//Wyrmgus start
-//	Map.FixSelectionArea(minPos, maxPos);
-//	return FindUnit_IfFixed(minPos, maxPos, pred);
 	Map.FixSelectionArea(minPos, maxPos, z);
 	return FindUnit_IfFixed(minPos, maxPos, z, pred);
-	//Wyrmgus end
 }
 
 /// Find resource

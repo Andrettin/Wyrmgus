@@ -10,7 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2016 by Lutz Sammer, Jimmy Salmon and
+//      (c) Copyright 2002-2018 by Lutz Sammer, Jimmy Salmon and
 //		Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -54,6 +54,7 @@
 #include "menus.h"
 #include "network.h"
 #include "parameters.h"
+#include "player.h"
 #include "replay.h"
 #include "script.h"
 #include "settings.h"
@@ -63,6 +64,7 @@
 #include "ui/button_action.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"
 #include "video.h"
