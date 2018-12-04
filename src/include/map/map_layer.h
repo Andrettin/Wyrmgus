@@ -76,11 +76,19 @@ public:
 	CMapField *Field(const unsigned int index) const;
 	CMapField *Field(const int x, const int y) const;
 	CMapField *Field(const Vec2i &pos) const;
+	void DoPerCycleLoop();
+	void DoPerHourLoop();
+private:
+	void DecrementRemainingTimeOfDayHours();
 	void IncrementTimeOfDay();
+public:
 	void SetTimeOfDayByHours(const unsigned long long hours);
 	void SetTimeOfDay(CScheduledTimeOfDay *time_of_day);
 	CTimeOfDay *GetTimeOfDay() const;
+private:
+	void DecrementRemainingSeasonHours();
 	void IncrementSeason();
+public:
 	void SetSeasonByHours(const unsigned long long hours);
 	void SetSeason(CScheduledSeason *season);
 	CSeason *GetSeason() const;

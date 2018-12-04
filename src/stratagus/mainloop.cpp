@@ -343,27 +343,11 @@ static void GameLogicLoop()
 		PlayersEachCycle(); // handle players
 		UpdateTimer();      // update game timer
 
-		//do tile animation
-		if (GameCycle != 0 && GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
-			for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-				for (int i = 0; i < Map.Info.MapWidths[z] * Map.Info.MapHeights[z]; ++i) {
-					CMapField &mf = Map.MapLayers[z]->Fields[i];
-					if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
-						mf.AnimationFrame += 1;
-						if (mf.AnimationFrame >= mf.Terrain->SolidAnimationFrames) {
-							mf.AnimationFrame = 0;
-						}
-					}
-					if (mf.OverlayTerrain && mf.OverlayTerrain->SolidAnimationFrames > 0) {
-						mf.OverlayAnimationFrame += 1;
-						if (mf.OverlayAnimationFrame >= mf.OverlayTerrain->SolidAnimationFrames) {
-							mf.OverlayAnimationFrame = 0;
-						}
-					}
-				}
-			}
+		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+			CMapLayer *map_layer = Map.MapLayers[z];
+			map_layer->DoPerCycleLoop();
 		}
-
+		
 		//
 		// Work todo each second.
 		// Split into different frames, to reduce cpu time.
@@ -451,20 +435,7 @@ static void GameLogicLoop()
 				
 				for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
 					CMapLayer *map_layer = Map.MapLayers[z];
-					
-					if (map_layer->SeasonSchedule) {
-						map_layer->RemainingSeasonHours -= DayMultiplier;
-						if (map_layer->RemainingSeasonHours <= 0) {
-							map_layer->IncrementSeason();
-						}
-					}
-					
-					if (map_layer->TimeOfDaySchedule) {
-						map_layer->RemainingTimeOfDayHours -= 1;
-						if (map_layer->RemainingTimeOfDayHours <= 0) {
-							map_layer->IncrementTimeOfDay();
-						}
-					}
+					map_layer->DoPerHourLoop();
 				}
 			}
 		}

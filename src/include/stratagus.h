@@ -10,7 +10,7 @@
 //
 /**@name stratagus.h - The main header file. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -176,6 +176,7 @@ extern const char NameLine[];
 #define PopulationPerUnit 1000		/// Number of people a unit represents
 
 #define DefaultHoursPerDay 24
+#define DefaultDaysPerMonth 30
 #define DefaultDaysPerYear 365
 //Wyrmgus end
 

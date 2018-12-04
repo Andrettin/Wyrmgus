@@ -110,6 +110,65 @@ CMapField *CMapLayer::Field(const Vec2i &pos) const
 }
 
 /**
+**	@brief	Perform the map layer's per-cycle loop
+*/
+void CMapLayer::DoPerCycleLoop()
+{
+	if (GameCycle > 0) {
+		//do tile animation
+		if (GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
+			for (int i = 0; i < this->Width * this->Height; ++i) {
+				CMapField &mf = this->Fields[i];
+				
+				if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
+					mf.AnimationFrame += 1;
+					if (mf.AnimationFrame >= mf.Terrain->SolidAnimationFrames) {
+						mf.AnimationFrame = 0;
+					}
+				}
+				
+				if (mf.OverlayTerrain && mf.OverlayTerrain->SolidAnimationFrames > 0) {
+					mf.OverlayAnimationFrame += 1;
+					if (mf.OverlayAnimationFrame >= mf.OverlayTerrain->SolidAnimationFrames) {
+						mf.OverlayAnimationFrame = 0;
+					}
+				}
+			}
+		}
+	}
+}
+
+/**
+**	@brief	Perform the map layer's per-hour loop
+*/
+void CMapLayer::DoPerHourLoop()
+{
+	this->DecrementRemainingSeasonHours();
+	this->DecrementRemainingTimeOfDayHours();
+}
+
+/**
+**	@brief	Decrement the current time of day's remaining hours
+*/
+void CMapLayer::DecrementRemainingTimeOfDayHours()
+{
+	if (!this->TimeOfDaySchedule) {
+		return;
+	}
+	
+	//if the total amount of hours for the time of day schedule is equal to or greater than that of a default month, use the day multiplier
+	if (this->TimeOfDaySchedule->TotalHours >= DefaultHoursPerDay * DefaultDaysPerMonth) {
+		this->RemainingTimeOfDayHours -= DayMultiplier;
+	} else {
+		this->RemainingTimeOfDayHours--;
+	}
+	
+	if (this->RemainingTimeOfDayHours <= 0) {
+		this->IncrementTimeOfDay();
+	}
+}
+
+/**
 **	@brief	Increment the current time of day
 */
 void CMapLayer::IncrementTimeOfDay()
@@ -200,6 +259,27 @@ CTimeOfDay *CMapLayer::GetTimeOfDay() const
 	}
 	
 	return this->TimeOfDay->TimeOfDay;
+}
+
+/**
+**	@brief	Decrement the current season's remaining hours
+*/
+void CMapLayer::DecrementRemainingSeasonHours()
+{
+	if (!this->SeasonSchedule) {
+		return;
+	}
+	
+	//if the total amount of hours for the season schedule is equal to or greater than that of a default month, use the day multiplier
+	if (this->SeasonSchedule->TotalHours >= DefaultHoursPerDay * DefaultDaysPerMonth) {
+		this->RemainingSeasonHours -= DayMultiplier;
+	} else {
+		this->RemainingSeasonHours--;
+	}
+	
+	if (this->RemainingSeasonHours <= 0) {
+		this->IncrementSeason();
+	}
 }
 
 /**
