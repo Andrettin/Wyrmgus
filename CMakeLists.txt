@@ -605,9 +605,8 @@ set(stratagus_ui_HDRS
 )
 
 set(stratagus_xbrz_HDRS
+	src/xbrz/include/config.h
 	src/xbrz/include/xbrz.h
-	src/xbrz/include/xbrz_config.h
-	src/xbrz/include/xbrz_tools.h
 )
 
 set(stratagus_generic_HDRS
