@@ -636,7 +636,7 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value, int z)
+void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int value, int z)
 {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
 		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
@@ -1015,7 +1015,7 @@ static int CclCreateMapTemplateTerrainFile(lua_State *l)
 }
 */
 
-void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int template_start_y, int map_start_x, int map_start_y, int z)
+void ApplyMapTemplate(const std::string &map_template_ident, int template_start_x, int template_start_y, int map_start_x, int map_start_y, int z)
 {
 	CMapTemplate *map_template = CMapTemplate::GetMapTemplate(map_template_ident);
 	
@@ -1027,7 +1027,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	map_template->Apply(Vec2i(template_start_x, template_start_y), Vec2i(map_start_x, map_start_y), z);
 }
 
-void ApplyCampaignMap(std::string campaign_ident)
+void ApplyCampaignMap(const std::string &campaign_ident)
 {
 	CCampaign *campaign = GetCampaign(campaign_ident);
 	

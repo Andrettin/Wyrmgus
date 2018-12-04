@@ -2609,7 +2609,7 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 }
 
 //Wyrmgus start
-std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strategy, bool multiline)
+std::string GetUpgradeEffectsString(const std::string &upgrade_ident, bool grand_strategy, bool multiline)
 {
 	const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
 	

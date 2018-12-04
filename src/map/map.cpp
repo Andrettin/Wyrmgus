@@ -108,7 +108,7 @@ char CurrentMapPath[1024];  /// Path of the current map
 /**
 **  Get a site
 */
-CSite *GetSite(std::string site_ident)
+CSite *GetSite(const std::string &site_ident)
 {
 	if (site_ident.empty()) {
 		return nullptr;
@@ -126,7 +126,7 @@ CSite *GetSite(std::string site_ident)
 /**
 **  Get a terrain feature
 */
-CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident)
+CTerrainFeature *GetTerrainFeature(const std::string &terrain_feature_ident)
 {
 	if (terrain_feature_ident.empty()) {
 		return nullptr;
@@ -159,7 +159,7 @@ std::string GetDegreeLevelNameById(int degree_level)
 	return "";
 }
 
-int GetDegreeLevelIdByName(std::string degree_level)
+int GetDegreeLevelIdByName(const std::string &degree_level)
 {
 	if (degree_level == "extremely-high") {
 		return ExtremelyHighDegreeLevel;
@@ -975,7 +975,7 @@ int GetMapLayer(const std::string &plane_ident, const std::string &world_ident, 
 	return -1;
 }
 
-int GetSubtemplateStartX(std::string subtemplate_ident)
+int GetSubtemplateStartX(const std::string &subtemplate_ident)
 {
 	CMapTemplate *subtemplate = CMapTemplate::GetMapTemplate(subtemplate_ident);
 	
@@ -995,7 +995,7 @@ int GetSubtemplateStartX(std::string subtemplate_ident)
 	return -1;
 }
 
-int GetSubtemplateStartY(std::string subtemplate_ident)
+int GetSubtemplateStartY(const std::string &subtemplate_ident)
 {
 	CMapTemplate *subtemplate = CMapTemplate::GetMapTemplate(subtemplate_ident);
 	

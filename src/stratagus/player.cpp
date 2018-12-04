@@ -433,33 +433,33 @@ void PlayerRace::Clean()
 }
 
 //Wyrmgus start
-int PlayerRace::GetFactionIndexByName(const std::string faction_name) const
+int PlayerRace::GetFactionIndexByName(const std::string &faction_ident) const
 {
-	if (faction_name.empty()) {
+	if (faction_ident.empty()) {
 		return -1;
 	}
 	
-	if (FactionStringToIndex.find(faction_name) != FactionStringToIndex.end()) {
-		return FactionStringToIndex[faction_name];
+	if (FactionStringToIndex.find(faction_ident) != FactionStringToIndex.end()) {
+		return FactionStringToIndex[faction_ident];
 	} else {
 		return -1;
 	}
 }
 
-CFaction *PlayerRace::GetFaction(const std::string faction_name) const
+CFaction *PlayerRace::GetFaction(const std::string &faction_ident) const
 {
-	if (faction_name.empty()) {
+	if (faction_ident.empty()) {
 		return nullptr;
 	}
 	
-	if (FactionStringToIndex.find(faction_name) != FactionStringToIndex.end()) {
-		return PlayerRaces.Factions[FactionStringToIndex[faction_name]];
+	if (FactionStringToIndex.find(faction_ident) != FactionStringToIndex.end()) {
+		return PlayerRaces.Factions[FactionStringToIndex[faction_ident]];
 	} else {
 		return nullptr;
 	}
 }
 
-CDynasty *PlayerRace::GetDynasty(const std::string dynasty_ident) const
+CDynasty *PlayerRace::GetDynasty(const std::string &dynasty_ident) const
 {
 	if (dynasty_ident.empty()) {
 		return nullptr;
@@ -472,7 +472,7 @@ CDynasty *PlayerRace::GetDynasty(const std::string dynasty_ident) const
 	}
 }
 
-CLanguage *PlayerRace::GetLanguage(std::string language_ident) const
+CLanguage *PlayerRace::GetLanguage(const std::string &language_ident) const
 {
 	if (LanguageIdentToPointer.find(language_ident) != LanguageIdentToPointer.end()) {
 		return LanguageIdentToPointer[language_ident];
@@ -602,7 +602,7 @@ std::vector<CFiller> PlayerRace::GetFactionUIFillers(int faction)
 /**
 **  "Translate" (that is, adapt) a proper name from one culture (civilization) to another.
 */
-std::string PlayerRace::TranslateName(std::string name, CLanguage *language)
+std::string PlayerRace::TranslateName(const std::string &name, CLanguage *language)
 {
 	std::string new_name;
 	
@@ -4446,18 +4446,18 @@ bool CPlayer::HasHero(const CCharacter *hero) const
 	return false;
 }
 
-void SetFactionStringToIndex(std::string faction_name, int faction_id)
+void SetFactionStringToIndex(const std::string &faction_name, int faction_id)
 {
 	FactionStringToIndex[faction_name] = faction_id;
 }
 
-void NetworkSetFaction(int player, std::string faction_name)
+void NetworkSetFaction(int player, const std::string &faction_name)
 {
 	int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	SendCommandSetFaction(player, faction);
 }
 
-int GetPlayerColorIndexByName(std::string player_color_name)
+int GetPlayerColorIndexByName(const std::string &player_color_name)
 {
 	for (int c = 0; c < PlayerColorMax; ++c) {
 		if (PlayerColorNames[c] == player_color_name) {
@@ -4486,7 +4486,7 @@ std::string GetFactionTypeNameById(int faction_type)
 	return "";
 }
 
-int GetFactionTypeIdByName(std::string faction_type)
+int GetFactionTypeIdByName(const std::string &faction_type)
 {
 	if (faction_type == "no-faction-type") {
 		return FactionTypeNoFactionType;
@@ -4520,7 +4520,7 @@ std::string GetGovernmentTypeNameById(int government_type)
 	return "";
 }
 
-int GetGovernmentTypeIdByName(std::string government_type)
+int GetGovernmentTypeIdByName(const std::string &government_type)
 {
 	if (government_type == "no-government-type") {
 		return GovernmentTypeNoGovernmentType;
@@ -4548,7 +4548,7 @@ std::string GetForceTypeNameById(int force_type)
 	return "";
 }
 
-int GetForceTypeIdByName(std::string force_type)
+int GetForceTypeIdByName(const std::string &force_type)
 {
 	if (force_type == "land-force") {
 		return LandForceType;
@@ -4588,7 +4588,7 @@ std::string GetWordTypeNameById(int word_type)
 	return "";
 }
 
-int GetWordTypeIdByName(std::string word_type)
+int GetWordTypeIdByName(const std::string &word_type)
 {
 	if (word_type == "noun") {
 		return WordTypeNoun;
@@ -4628,7 +4628,7 @@ std::string GetArticleTypeNameById(int article_type)
 	return "";
 }
 
-int GetArticleTypeIdByName(std::string article_type)
+int GetArticleTypeIdByName(const std::string &article_type)
 {
 	if (article_type == "no-article") {
 		return ArticleTypeNoArticle;
@@ -4658,7 +4658,7 @@ std::string GetGrammaticalCaseNameById(int grammatical_case)
 	return "";
 }
 
-int GetGrammaticalCaseIdByName(std::string grammatical_case)
+int GetGrammaticalCaseIdByName(const std::string &grammatical_case)
 {
 	if (grammatical_case == "no-case") {
 		return GrammaticalCaseNoCase;
@@ -4688,7 +4688,7 @@ std::string GetGrammaticalNumberNameById(int grammatical_number)
 	return "";
 }
 
-int GetGrammaticalNumberIdByName(std::string grammatical_number)
+int GetGrammaticalNumberIdByName(const std::string &grammatical_number)
 {
 	if (grammatical_number == "no-number") {
 		return GrammaticalNumberNoNumber;
@@ -4714,7 +4714,7 @@ std::string GetGrammaticalPersonNameById(int grammatical_person)
 	return "";
 }
 
-int GetGrammaticalPersonIdByName(std::string grammatical_person)
+int GetGrammaticalPersonIdByName(const std::string &grammatical_person)
 {
 	if (grammatical_person == "first-person") {
 		return GrammaticalPersonFirstPerson;
@@ -4742,7 +4742,7 @@ std::string GetGrammaticalGenderNameById(int grammatical_gender)
 	return "";
 }
 
-int GetGrammaticalGenderIdByName(std::string grammatical_gender)
+int GetGrammaticalGenderIdByName(const std::string &grammatical_gender)
 {
 	if (grammatical_gender == "no-gender") {
 		return GrammaticalGenderNoGender;
@@ -4772,7 +4772,7 @@ std::string GetGrammaticalTenseNameById(int grammatical_tense)
 	return "";
 }
 
-int GetGrammaticalTenseIdByName(std::string grammatical_tense)
+int GetGrammaticalTenseIdByName(const std::string &grammatical_tense)
 {
 	if (grammatical_tense == "no-tense") {
 		return GrammaticalTenseNoTense;
@@ -4798,7 +4798,7 @@ std::string GetGrammaticalMoodNameById(int grammatical_mood)
 	return "";
 }
 
-int GetGrammaticalMoodIdByName(std::string grammatical_mood)
+int GetGrammaticalMoodIdByName(const std::string &grammatical_mood)
 {
 	if (grammatical_mood == "indicative") {
 		return GrammaticalMoodIndicative;
@@ -4822,7 +4822,7 @@ std::string GetComparisonDegreeNameById(int comparison_degree)
 	return "";
 }
 
-int GetComparisonDegreeIdByName(std::string comparison_degree)
+int GetComparisonDegreeIdByName(const std::string &comparison_degree)
 {
 	if (comparison_degree == "positive") {
 		return ComparisonDegreePositive;
@@ -4848,7 +4848,7 @@ std::string GetAffixTypeNameById(int affix_type)
 	return "";
 }
 
-int GetAffixTypeIdByName(std::string affix_type)
+int GetAffixTypeIdByName(const std::string &affix_type)
 {
 	if (affix_type == "prefix") {
 		return AffixTypePrefix;
@@ -4874,7 +4874,7 @@ std::string GetWordJunctionTypeNameById(int word_junction_type)
 	return "";
 }
 
-int GetWordJunctionTypeIdByName(std::string word_junction_type)
+int GetWordJunctionTypeIdByName(const std::string &word_junction_type)
 {
 	if (word_junction_type == "no-word-junction") {
 		return WordJunctionTypeNoWordJunction;
@@ -4971,7 +4971,7 @@ void CLanguage::RemoveWord(LanguageWord *word)
 	}
 }
 
-bool LanguageWord::HasMeaning(std::string meaning)
+bool LanguageWord::HasMeaning(const std::string &meaning)
 {
 	return std::find(this->Meanings.begin(), this->Meanings.end(), meaning) != this->Meanings.end();
 }
@@ -5039,7 +5039,7 @@ void LanguageWord::RemoveFromVector(std::vector<LanguageWord *>& word_vector)
 	}
 }
 
-bool IsNameValidForWord(std::string word_name)
+bool IsNameValidForWord(const std::string &word_name)
 {
 	if (word_name.empty()) {
 		return false;

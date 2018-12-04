@@ -53,7 +53,7 @@ unsigned long long CDate::CurrentTotalHours = 0;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CDate CDate::FromString(std::string date_str)
+CDate CDate::FromString(const std::string &date_str)
 {
 	CDate date;
 	

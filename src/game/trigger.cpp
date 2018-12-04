@@ -727,7 +727,7 @@ void TriggersEachCycle()
 }
 
 //Wyrmgus start
-CTrigger *GetTrigger(std::string trigger_ident)
+CTrigger *GetTrigger(const std::string &trigger_ident)
 {
 	if (TriggerIdentToPointer.find(trigger_ident) != TriggerIdentToPointer.end()) {
 		return TriggerIdentToPointer[trigger_ident];

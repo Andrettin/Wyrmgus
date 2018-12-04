@@ -198,7 +198,7 @@ public:
 	void IncreaseLevel(int level_quantity, bool automatic_learning = true);
 	void Retrain();
 	void HealingItemAutoUse();
-	void SetCharacter(std::string character_full_name, bool custom_hero = false);
+	void SetCharacter(const std::string &character_full_name, bool custom_hero = false);
 	bool CheckTerrainForVariation(VariationInfo *varinfo);
 	void ChooseVariation(const CUnitType *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
 	void SetVariation(int new_variation, const CUnitType *new_type = nullptr, int image_layer = -1);

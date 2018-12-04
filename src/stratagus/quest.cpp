@@ -168,7 +168,7 @@ std::string GetQuestObjectiveTypeNameById(int objective_type)
 	return "";
 }
 
-int GetQuestObjectiveTypeIdByName(std::string objective_type)
+int GetQuestObjectiveTypeIdByName(const std::string &objective_type)
 {
 	if (objective_type == "gather-resource") {
 		return GatherResourceObjectiveType;
@@ -197,7 +197,7 @@ int GetQuestObjectiveTypeIdByName(std::string objective_type)
 	return -1;
 }
 
-CQuest *GetQuest(std::string quest_ident)
+CQuest *GetQuest(const std::string &quest_ident)
 {
 	for (size_t i = 0; i < Quests.size(); ++i) {
 		if (quest_ident == Quests[i]->Ident) {
@@ -214,7 +214,7 @@ CQuest *GetQuest(std::string quest_ident)
 	return nullptr;
 }
 
-CCampaign *GetCampaign(std::string campaign_ident)
+CCampaign *GetCampaign(const std::string &campaign_ident)
 {
 	for (size_t i = 0; i < Campaigns.size(); ++i) {
 		if (campaign_ident == Campaigns[i]->Ident) {
@@ -225,7 +225,7 @@ CCampaign *GetCampaign(std::string campaign_ident)
 	return nullptr;
 }
 
-CAchievement *GetAchievement(std::string achievement_ident)
+CAchievement *GetAchievement(const std::string &achievement_ident)
 {
 	for (size_t i = 0; i < Achievements.size(); ++i) {
 		if (achievement_ident == Achievements[i]->Ident) {
@@ -236,7 +236,7 @@ CAchievement *GetAchievement(std::string achievement_ident)
 	return nullptr;
 }
 
-CDialogue *GetDialogue(std::string dialogue_ident)
+CDialogue *GetDialogue(const std::string &dialogue_ident)
 {
 	for (size_t i = 0; i < Dialogues.size(); ++i) {
 		if (dialogue_ident == Dialogues[i]->Ident) {
@@ -512,7 +512,7 @@ void CDialogueNode::OptionEffect(int option, int player)
 	}
 }
 
-void SetCurrentQuest(std::string quest_ident)
+void SetCurrentQuest(const std::string &quest_ident)
 {
 	if (quest_ident.empty()) {
 		CurrentQuest = nullptr;
@@ -530,7 +530,7 @@ std::string GetCurrentQuest()
 	}
 }
 
-void SetCurrentCampaign(std::string campaign_ident)
+void SetCurrentCampaign(const std::string &campaign_ident)
 {
 	if (campaign_ident.empty()) {
 		CurrentCampaign = nullptr;
@@ -548,7 +548,7 @@ std::string GetCurrentCampaign()
 	}
 }
 
-void SetQuestCompleted(std::string quest_ident, int difficulty, bool save)
+void SetQuestCompleted(const std::string &quest_ident, int difficulty, bool save)
 {
 	CQuest *quest = GetQuest(quest_ident);
 	if (!quest) {
@@ -565,12 +565,12 @@ void SetQuestCompleted(std::string quest_ident, int difficulty, bool save)
 	CheckAchievements();
 }
 
-void SetQuestCompleted(std::string quest_ident, bool save)
+void SetQuestCompleted(const std::string &quest_ident, bool save)
 {
 	SetQuestCompleted(quest_ident, 2, save);
 }
 
-void SetAchievementObtained(std::string achievement_ident, bool save, bool display)
+void SetAchievementObtained(const std::string &achievement_ident, bool save, bool display)
 {
 	CAchievement *achievement = GetAchievement(achievement_ident);
 	if (!achievement) {
@@ -580,7 +580,7 @@ void SetAchievementObtained(std::string achievement_ident, bool save, bool displ
 	achievement->Obtain(save, display);
 }
 
-void CallDialogue(std::string dialogue_ident, int player)
+void CallDialogue(const std::string &dialogue_ident, int player)
 {
 	CDialogue *dialogue = GetDialogue(dialogue_ident);
 	if (!dialogue) {
@@ -590,7 +590,7 @@ void CallDialogue(std::string dialogue_ident, int player)
 	dialogue->Call(player);
 }
 
-void CallDialogueNode(std::string dialogue_ident, int node, int player)
+void CallDialogueNode(const std::string &dialogue_ident, int node, int player)
 {
 	CDialogue *dialogue = GetDialogue(dialogue_ident);
 	if (!dialogue || node >= (int) dialogue->Nodes.size()) {
@@ -600,7 +600,7 @@ void CallDialogueNode(std::string dialogue_ident, int node, int player)
 	dialogue->Nodes[node]->Call(player);
 }
 
-void CallDialogueNodeOptionEffect(std::string dialogue_ident, int node, int option, int player)
+void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player)
 {
 	CDialogue *dialogue = GetDialogue(dialogue_ident);
 	if (!dialogue || node >= (int) dialogue->Nodes.size()) {

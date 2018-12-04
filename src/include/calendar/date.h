@@ -55,7 +55,7 @@ public:
 	{
 	}
 	
-	static CDate FromString(std::string date_str);
+	static CDate FromString(const std::string &date_str);
 	
 	static unsigned long long CurrentTotalHours;				/// Current total in-game hours, counting from 1 January 10000 BC 00:00
 	

@@ -56,8 +56,8 @@ public:
 	{
 	}
 	
-	static CTimeline *GetTimeline(std::string ident);
-	static CTimeline *GetOrAddTimeline(std::string ident);
+	static CTimeline *GetTimeline(const std::string &ident);
+	static CTimeline *GetOrAddTimeline(const std::string &ident);
 	static void ClearTimelines();
 	
 	static std::vector<CTimeline *> Timelines;

@@ -929,7 +929,7 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 /**
 **  Draw popup
 */
-void DrawGenericPopup(std::string popup_text, int x, int y, std::string text_color, std::string highlight_color, bool above)
+void DrawGenericPopup(const std::string &popup_text, int x, int y, std::string text_color, std::string highlight_color, bool above)
 {
 	const CFont &font = GetGameFont();
 	

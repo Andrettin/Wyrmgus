@@ -4076,7 +4076,7 @@ static int CclSetSettlementSiteUnit(lua_State *l)
 **  @param value			Value to set to
 **  @param variable_type	Type to be modified (i.e. "Value", "Max", etc.); alternatively, resource type if variable_key equals "Costs"
 */
-void SetModStat(std::string mod_file, std::string ident, std::string variable_key, int value, std::string variable_type)
+void SetModStat(const std::string &mod_file, const std::string &ident, const std::string &variable_key, const int value, const std::string &variable_type)
 {
 	CUnitType *type = UnitTypeByIdent(ident.c_str());
 	
@@ -4200,7 +4200,7 @@ void SetModStat(std::string mod_file, std::string ident, std::string variable_ke
 **  @param sound_type		Type of the sound
 **  @param sound			The sound to be set for that type
 */
-void SetModSound(std::string mod_file, std::string ident, std::string sound, std::string sound_type, std::string sound_subtype)
+void SetModSound(const std::string &mod_file, const std::string &ident, const std::string &sound, const std::string &sound_type, const std::string &sound_subtype)
 {
 	if (sound.empty()) {
 		return;

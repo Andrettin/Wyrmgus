@@ -3522,7 +3522,7 @@ void SavePreferences()
 }
 
 //Wyrmgus start
-void DeleteModFaction(std::string faction_name)
+void DeleteModFaction(const std::string &faction_name)
 {
 	int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 	if (faction != -1 && !PlayerRaces.Factions[faction]->Mod.empty()) {
@@ -3532,7 +3532,7 @@ void DeleteModFaction(std::string faction_name)
 	}
 }
 
-void DeleteModUnitType(std::string unit_type_ident)
+void DeleteModUnitType(const std::string &unit_type_ident)
 {
 	CUnitType *unit_type = UnitTypeByIdent(unit_type_ident.c_str());
 	
@@ -3596,7 +3596,7 @@ void DeleteModUnitType(std::string unit_type_ident)
 	UnitTypes.erase(std::remove(UnitTypes.begin(), UnitTypes.end(), unit_type), UnitTypes.end());
 }
 
-void DisableMod(std::string mod_file)
+void DisableMod(const std::string &mod_file)
 {
 	int unit_types_size = UnitTypes.size();
 	for (int i = (unit_types_size - 1); i >= 0; --i) {

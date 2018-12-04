@@ -147,7 +147,7 @@ extern const CUnitType *TriggerGetUnitType(lua_State *l); /// get the unit-type
 extern void TriggersEachCycle();    /// test triggers
 
 //Wyrmgus start
-extern CTrigger *GetTrigger(std::string trigger_ident);
+extern CTrigger *GetTrigger(const std::string &trigger_ident);
 //Wyrmgus end
 
 extern void TriggerCclRegister();   /// Register ccl features

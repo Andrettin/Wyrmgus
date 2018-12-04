@@ -65,7 +65,7 @@ public:
 	}
 	~CText();
 	
-	CChapter *GetChapter(std::string chapter_name);
+	CChapter *GetChapter(const std::string &chapter_name);
 	
 	std::string Name;				/// Name of the text
 	std::string Author;				/// Author of the text
@@ -89,7 +89,7 @@ extern std::vector<CText *> Texts;
 ----------------------------------------------------------------------------*/
 
 extern void CleanTexts();
-extern CText *GetText(std::string text_name);
+extern CText *GetText(const std::string &text_name);
 extern void TextCclRegister();
 
 //@}

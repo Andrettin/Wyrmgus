@@ -1602,7 +1602,7 @@ VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player, int image_layer) 
 	return nullptr;
 }
 
-VariationInfo *CUnitType::GetVariation(std::string variation_name, int image_layer) const
+VariationInfo *CUnitType::GetVariation(const std::string &variation_name, int image_layer) const
 {
 	int variation_max = image_layer == -1 ? VariationMax : this->LayerVarInfo[image_layer].size();
 	for (int i = 0; i < variation_max; ++i) {
@@ -1693,7 +1693,7 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 	return "";
 }
 
-bool CUnitType::IsPersonalNameValid(std::string name, CFaction *faction, int gender) const
+bool CUnitType::IsPersonalNameValid(const std::string &name, CFaction *faction, int gender) const
 {
 	if (name.empty()) {
 		return false;
@@ -2244,7 +2244,7 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 }
 
 //Wyrmgus start
-int GetUnitTypeClassIndexByName(std::string class_name)
+int GetUnitTypeClassIndexByName(const std::string &class_name)
 {
 	if (class_name.empty()) {
 		return -1;
@@ -2256,7 +2256,7 @@ int GetUnitTypeClassIndexByName(std::string class_name)
 	return -1;
 }
 
-int GetOrAddUnitTypeClassIndexByName(std::string class_name)
+int GetOrAddUnitTypeClassIndexByName(const std::string &class_name)
 {
 	int index = GetUnitTypeClassIndexByName(class_name);
 	if (index == -1 && !class_name.empty()) {
@@ -2268,12 +2268,12 @@ int GetOrAddUnitTypeClassIndexByName(std::string class_name)
 	return index;
 }
 
-void SetUnitTypeClassStringToIndex(std::string class_name, int class_id)
+void SetUnitTypeClassStringToIndex(const std::string &class_name, int class_id)
 {
 	UnitTypeClassStringToIndex[class_name] = class_id;
 }
 
-int GetUpgradeClassIndexByName(std::string class_name)
+int GetUpgradeClassIndexByName(const std::string &class_name)
 {
 	if (UpgradeClassStringToIndex.find(class_name) != UpgradeClassStringToIndex.end()) {
 		return UpgradeClassStringToIndex.find(class_name)->second;
@@ -2281,7 +2281,7 @@ int GetUpgradeClassIndexByName(std::string class_name)
 	return -1;
 }
 
-void SetUpgradeClassStringToIndex(std::string class_name, int class_id)
+void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id)
 {
 	UpgradeClassStringToIndex[class_name] = class_id;
 }
@@ -2826,7 +2826,7 @@ VariationInfo::~VariationInfo()
 	}
 }
 
-std::string GetUnitTypeStatsString(std::string unit_type_ident)
+std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 {
 	const CUnitType *unit_type = UnitTypeByIdent(unit_type_ident);
 
@@ -2879,7 +2879,7 @@ std::string GetUnitTypeStatsString(std::string unit_type_ident)
 	return "";
 }
 
-CSpecies *GetSpecies(std::string species_ident)
+CSpecies *GetSpecies(const std::string &species_ident)
 {
 	for (size_t i = 0; i < Species.size(); ++i) {
 		if (species_ident == Species[i]->Ident) {
@@ -2890,7 +2890,7 @@ CSpecies *GetSpecies(std::string species_ident)
 	return nullptr;
 }
 
-CSpeciesGenus *GetSpeciesGenus(std::string genus_ident)
+CSpeciesGenus *GetSpeciesGenus(const std::string &genus_ident)
 {
 	for (size_t i = 0; i < SpeciesGenuses.size(); ++i) {
 		if (genus_ident == SpeciesGenuses[i]->Ident) {
@@ -2901,7 +2901,7 @@ CSpeciesGenus *GetSpeciesGenus(std::string genus_ident)
 	return nullptr;
 }
 
-CSpeciesFamily *GetSpeciesFamily(std::string family_ident)
+CSpeciesFamily *GetSpeciesFamily(const std::string &family_ident)
 {
 	for (size_t i = 0; i < SpeciesFamilies.size(); ++i) {
 		if (family_ident == SpeciesFamilies[i]->Ident) {
@@ -2912,7 +2912,7 @@ CSpeciesFamily *GetSpeciesFamily(std::string family_ident)
 	return nullptr;
 }
 
-CSpeciesOrder *GetSpeciesOrder(std::string order_ident)
+CSpeciesOrder *GetSpeciesOrder(const std::string &order_ident)
 {
 	for (size_t i = 0; i < SpeciesOrders.size(); ++i) {
 		if (order_ident == SpeciesOrders[i]->Ident) {
@@ -2923,7 +2923,7 @@ CSpeciesOrder *GetSpeciesOrder(std::string order_ident)
 	return nullptr;
 }
 
-CSpeciesClass *GetSpeciesClass(std::string class_ident)
+CSpeciesClass *GetSpeciesClass(const std::string &class_ident)
 {
 	for (size_t i = 0; i < SpeciesClasses.size(); ++i) {
 		if (class_ident == SpeciesClasses[i]->Ident) {
@@ -2934,7 +2934,7 @@ CSpeciesClass *GetSpeciesClass(std::string class_ident)
 	return nullptr;
 }
 
-CSpeciesPhylum *GetSpeciesPhylum(std::string phylum_ident)
+CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident)
 {
 	for (size_t i = 0; i < SpeciesPhylums.size(); ++i) {
 		if (phylum_ident == SpeciesPhylums[i]->Ident) {
@@ -3021,7 +3021,7 @@ std::string GetImageLayerNameById(int image_layer)
 	return "";
 }
 
-int GetImageLayerIdByName(std::string image_layer)
+int GetImageLayerIdByName(const std::string &image_layer)
 {
 	if (image_layer == "left-arm") {
 		return LeftArmImageLayer;

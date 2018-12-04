@@ -169,16 +169,16 @@ extern std::vector<CUniqueItem *> UniqueItems;
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern int GetItemSlotIdByName(std::string item_slot);
+extern int GetItemSlotIdByName(const std::string &item_slot);
 extern std::string GetItemSlotNameById(int item_slot);
-extern int GetItemClassIdByName(std::string item_class);
+extern int GetItemClassIdByName(const std::string &item_class);
 extern std::string GetItemClassNameById(int item_class);
 extern int GetItemClassSlot(int item_class);
 extern bool IsItemClassConsumable(int item_class);
 extern void CleanUniqueItems();
-extern CUniqueItem *GetUniqueItem(std::string item_ident);
-extern std::string GetItemEffectsString(std::string item_ident);
-extern std::string GetUniqueItemEffectsString(std::string item_ident);
+extern CUniqueItem *GetUniqueItem(const std::string &item_ident);
+extern std::string GetItemEffectsString(const std::string &item_ident);
+extern std::string GetUniqueItemEffectsString(const std::string &item_ident);
 extern void ItemCclRegister();
 
 //@}

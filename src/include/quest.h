@@ -279,23 +279,23 @@ extern void CleanDialogues();
 extern void SaveQuestCompletion();
 extern void CheckAchievements();
 std::string GetQuestObjectiveTypeNameById(int objective_type);
-extern int GetQuestObjectiveTypeIdByName(std::string objective_type);
-extern CQuest *GetQuest(std::string quest_ident);
-extern CCampaign *GetCampaign(std::string campaign_ident);
-extern CAchievement *GetAchievement(std::string achievement_ident);
-extern CDialogue *GetDialogue(std::string dialogue_ident);
+extern int GetQuestObjectiveTypeIdByName(const std::string &objective_type);
+extern CQuest *GetQuest(const std::string &quest_ident);
+extern CCampaign *GetCampaign(const std::string &campaign_ident);
+extern CAchievement *GetAchievement(const std::string &achievement_ident);
+extern CDialogue *GetDialogue(const std::string &dialogue_ident);
 
-extern void SetCurrentQuest(std::string quest_ident);
+extern void SetCurrentQuest(const std::string &quest_ident);
 extern std::string GetCurrentQuest();
-extern void SetCurrentCampaign(std::string campaign_ident);
+extern void SetCurrentCampaign(const std::string &campaign_ident);
 extern std::string GetCurrentCampaign();
-extern void SetQuestCompleted(std::string quest_ident, int difficulty = 2, bool save = true);
-extern void SetQuestCompleted(std::string quest_ident, bool save);
-extern void SetAchievementObtained(std::string achievement_ident, bool save = true, bool display = true);
+extern void SetQuestCompleted(const std::string &quest_ident, int difficulty = 2, bool save = true);
+extern void SetQuestCompleted(const std::string &quest_ident, bool save);
+extern void SetAchievementObtained(const std::string &achievement_ident, bool save = true, bool display = true);
 
-extern void CallDialogue(std::string dialogue_ident, int player);
-extern void CallDialogueNode(std::string dialogue_ident, int node, int player);
-extern void CallDialogueNodeOptionEffect(std::string dialogue_ident, int node, int option, int player);
+extern void CallDialogue(const std::string &dialogue_ident, int player);
+extern void CallDialogueNode(const std::string &dialogue_ident, int node, int player);
+extern void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player);
 
 extern void QuestCclRegister();
 

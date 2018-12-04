@@ -357,7 +357,7 @@ private:
 extern void ParseTilesetTileFlags(lua_State *l, int *back, int *j);
 //Wyrmgus start
 extern std::string GetTransitionTypeNameById(int transition_type);
-extern int GetTransitionTypeIdByName(std::string transition_type);
+extern int GetTransitionTypeIdByName(const std::string &transition_type);
 //Wyrmgus end
 
 //@}

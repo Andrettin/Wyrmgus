@@ -183,11 +183,11 @@ extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 ----------------------------------------------------------------------------*/
 
 extern void CleanProvinces();
-extern CRegion *GetRegion(std::string region_name);
-extern CProvince *GetProvince(std::string province_name);
-extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
+extern CRegion *GetRegion(const std::string &region_name);
+extern CProvince *GetProvince(const std::string &province_name);
+extern int GetWorldMapTerrainTypeId(const std::string &terrain_type_name);
 extern std::string GetEraNameById(int era);
-extern int GetEraIdByName(std::string era);
+extern int GetEraIdByName(const std::string &era);
 extern void ProvinceCclRegister();
 
 //@}

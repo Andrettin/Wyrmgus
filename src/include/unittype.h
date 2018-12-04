@@ -898,14 +898,14 @@ public:
 	int GetAvailableLevelUpUpgrades() const;
 	int GetResourceStep(const int resource, const int player) const;
 	VariationInfo *GetDefaultVariation(CPlayer &player, int image_layer = -1) const;
-	VariationInfo *GetVariation(std::string variation_name, int image_layer = -1) const;
+	VariationInfo *GetVariation(const std::string &variation_name, int image_layer = -1) const;
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	std::string GetDefaultName(CPlayer &player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
 	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
 	std::string GeneratePersonalName(CFaction *faction, int gender) const;
-	bool IsPersonalNameValid(std::string name, CFaction *faction, int gender) const;
+	bool IsPersonalNameValid(const std::string &name, CFaction *faction, int gender) const;
 	std::vector<std::string> GetPotentialPersonalNames(CFaction *faction, int gender) const;
 	//Wyrmgus end
 
@@ -1290,20 +1290,20 @@ extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Up
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
 //Wyrmgus start
-extern int GetUnitTypeClassIndexByName(std::string class_name);
-extern int GetOrAddUnitTypeClassIndexByName(std::string class_name);
-extern void SetUnitTypeClassStringToIndex(std::string class_name, int class_id);
-extern int GetUpgradeClassIndexByName(std::string class_name);
-extern void SetUpgradeClassStringToIndex(std::string class_name, int class_id);
+extern int GetUnitTypeClassIndexByName(const std::string &class_name);
+extern int GetOrAddUnitTypeClassIndexByName(const std::string &class_name);
+extern void SetUnitTypeClassStringToIndex(const std::string &class_name, int class_id);
+extern int GetUpgradeClassIndexByName(const std::string &class_name);
+extern void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id);
 
-extern std::string GetUnitTypeStatsString(std::string unit_type_ident);
+extern std::string GetUnitTypeStatsString(const std::string &unit_type_ident);
 
-extern CSpecies *GetSpecies(std::string species_ident);
-extern CSpeciesGenus *GetSpeciesGenus(std::string genus_ident);
-extern CSpeciesFamily *GetSpeciesFamily(std::string family_ident);
-extern CSpeciesOrder *GetSpeciesOrder(std::string order_ident);
-extern CSpeciesClass *GetSpeciesClass(std::string class_ident);
-extern CSpeciesPhylum *GetSpeciesPhylum(std::string phylum_ident);
+extern CSpecies *GetSpecies(const std::string &species_ident);
+extern CSpeciesGenus *GetSpeciesGenus(const std::string &genus_ident);
+extern CSpeciesFamily *GetSpeciesFamily(const std::string &family_ident);
+extern CSpeciesOrder *GetSpeciesOrder(const std::string &order_ident);
+extern CSpeciesClass *GetSpeciesClass(const std::string &class_ident);
+extern CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident);
 //Wyrmgus end
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
@@ -1332,12 +1332,12 @@ extern void DefineVariableField(lua_State *l, CVariable *var, int lua_index);
 /// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(CUnit &unit);
 
-extern void SetModStat(std::string mod_file, std::string ident, std::string variable_key, int value, std::string variable_type);
-extern void SetModSound(std::string mod_file, std::string ident, std::string sound, std::string sound_type, std::string sound_subtype = "");
+extern void SetModStat(const std::string &mod_file, const std::string &ident, const std::string &variable_key, const int value, const std::string &variable_type);
+extern void SetModSound(const std::string &mod_file, const std::string &ident, const std::string &sound, const std::string &sound_type, const std::string &sound_subtype = "");
 
 //Wyrmgus start
 extern std::string GetImageLayerNameById(int image_layer);
-extern int GetImageLayerIdByName(std::string image_layer);
+extern int GetImageLayerIdByName(const std::string &image_layer);
 
 extern std::map<std::string, CUnitType *> UnitTypeMap;
 //Wyrmgus end

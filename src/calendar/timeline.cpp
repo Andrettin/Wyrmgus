@@ -53,7 +53,7 @@ std::map<std::string, CTimeline *> CTimeline::TimelinesByIdent;
 /**
 **  Get a timeline
 */
-CTimeline *CTimeline::GetTimeline(std::string ident)
+CTimeline *CTimeline::GetTimeline(const std::string &ident)
 {
 	if (TimelinesByIdent.find(ident) != TimelinesByIdent.end()) {
 		return TimelinesByIdent.find(ident)->second;
@@ -62,7 +62,7 @@ CTimeline *CTimeline::GetTimeline(std::string ident)
 	return nullptr;
 }
 
-CTimeline *CTimeline::GetOrAddTimeline(std::string ident)
+CTimeline *CTimeline::GetOrAddTimeline(const std::string &ident)
 {
 	CTimeline *timeline = GetTimeline(ident);
 	

@@ -709,7 +709,7 @@ public:
 	{
 	}
 	
-	bool HasMeaning(std::string meaning);
+	bool HasMeaning(const std::string &meaning);
 	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
 	std::string GetAdjectiveInflection(int comparison_degree, int article_type = -1, int grammatical_case = -1, int grammatical_number = -1, int grammatical_gender = -1);
@@ -795,10 +795,10 @@ public:
 
 	void Clean();
 	//Wyrmgus start
-	int GetFactionIndexByName(const std::string faction_name) const;
-	CFaction *GetFaction(const std::string faction_name) const;
-	CDynasty *GetDynasty(const std::string dynasty_name) const;
-	CLanguage *GetLanguage(std::string language_ident) const;
+	int GetFactionIndexByName(const std::string &faction_ident) const;
+	CFaction *GetFaction(const std::string &faction_ident) const;
+	CDynasty *GetDynasty(const std::string &dynasty_ident) const;
+	CLanguage *GetLanguage(const std::string &language_ident) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
 	int GetFactionClassUnitType(int faction, int class_id);
@@ -806,7 +806,7 @@ public:
 	CLanguage *GetCivilizationLanguage(int civilization);
 	std::vector<CFiller> GetCivilizationUIFillers(int civilization);
 	std::vector<CFiller> GetFactionUIFillers(int faction);
-	std::string TranslateName(std::string name, CLanguage *language);
+	std::string TranslateName(const std::string &name, CLanguage *language);
 	//Wyrmgus end
 
 public:
@@ -975,38 +975,38 @@ extern void PlayerCclRegister();
 inline bool CanSelectMultipleUnits(const CPlayer &player) { return &player == ThisPlayer || ThisPlayer->IsTeamed(player); }
 
 //Wyrmgus start
-extern void SetFactionStringToIndex(std::string faction_name, int faction_id);
-extern void NetworkSetFaction(int player, std::string faction_name);
-extern int GetPlayerColorIndexByName(std::string player_color_name);
+extern void SetFactionStringToIndex(const std::string &faction_name, int faction_id);
+extern void NetworkSetFaction(int player, const std::string &faction_name);
+extern int GetPlayerColorIndexByName(const std::string &player_color_name);
 extern std::string GetFactionTypeNameById(int faction_type);
-extern int GetFactionTypeIdByName(std::string faction_type);
+extern int GetFactionTypeIdByName(const std::string &faction_type);
 extern std::string GetGovernmentTypeNameById(int government_type);
-extern int GetGovernmentTypeIdByName(std::string government_type);
+extern int GetGovernmentTypeIdByName(const std::string &government_type);
 extern std::string GetForceTypeNameById(int force_type);
-extern int GetForceTypeIdByName(std::string force_type);
+extern int GetForceTypeIdByName(const std::string &force_type);
 extern std::string GetWordTypeNameById(int word_type);
-extern int GetWordTypeIdByName(std::string word_type);
+extern int GetWordTypeIdByName(const std::string &word_type);
 extern std::string GetArticleTypeNameById(int article_type);
-extern int GetArticleTypeIdByName(std::string article_type);
+extern int GetArticleTypeIdByName(const std::string &article_type);
 extern std::string GetGrammaticalCaseNameById(int grammatical_case);
-extern int GetGrammaticalCaseIdByName(std::string grammatical_case);
+extern int GetGrammaticalCaseIdByName(const std::string &grammatical_case);
 extern std::string GetGrammaticalNumberNameById(int grammatical_number);
-extern int GetGrammaticalNumberIdByName(std::string grammatical_number);
+extern int GetGrammaticalNumberIdByName(const std::string &grammatical_number);
 extern std::string GetGrammaticalPersonNameById(int grammatical_person);
-extern int GetGrammaticalPersonIdByName(std::string grammatical_person);
+extern int GetGrammaticalPersonIdByName(const std::string &grammatical_person);
 extern std::string GetGrammaticalGenderNameById(int grammatical_gender);
-extern int GetGrammaticalGenderIdByName(std::string grammatical_gender);
+extern int GetGrammaticalGenderIdByName(const std::string &grammatical_gender);
 extern std::string GetGrammaticalTenseNameById(int grammatical_tense);
-extern int GetGrammaticalTenseIdByName(std::string grammatical_tense);
+extern int GetGrammaticalTenseIdByName(const std::string &grammatical_tense);
 extern std::string GetGrammaticalMoodNameById(int grammatical_mood);
-extern int GetGrammaticalMoodIdByName(std::string grammatical_mood);
+extern int GetGrammaticalMoodIdByName(const std::string &grammatical_mood);
 extern std::string GetComparisonDegreeNameById(int comparison_degree);
-extern int GetComparisonDegreeIdByName(std::string comparison_degree);
+extern int GetComparisonDegreeIdByName(const std::string &comparison_degree);
 extern std::string GetAffixTypeNameById(int affix_type);
-extern int GetAffixTypeIdByName(std::string affix_type);
+extern int GetAffixTypeIdByName(const std::string &affix_type);
 extern std::string GetWordJunctionTypeNameById(int word_junction_type);
-extern int GetWordJunctionTypeIdByName(std::string word_junction_type);
-extern bool IsNameValidForWord(std::string word_name);
+extern int GetWordJunctionTypeIdByName(const std::string &word_junction_type);
+extern bool IsNameValidForWord(const std::string &word_name);
 
 /*----------------------------------------------------------------------------
 --  Variables

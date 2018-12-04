@@ -199,10 +199,7 @@ void CIcon::Load()
 **  @param player  Player pointer used for icon colors
 **  @param pos     display pixel position
 */
-//Wyrmgus start
-//void CIcon::DrawIcon(const PixelPos &pos, const int player) const
 void CIcon::DrawIcon(const PixelPos &pos, const int player) const
-//Wyrmgus end
 {
 	if (player != -1 ) {
 		//Wyrmgus start

@@ -80,7 +80,7 @@ void CleanProvinces()
 	}
 }
 
-CRegion *GetRegion(std::string region_ident)
+CRegion *GetRegion(const std::string &region_ident)
 {
 	for (size_t i = 0; i < Regions.size(); ++i) {
 		if (region_ident == Regions[i]->Ident) {
@@ -90,7 +90,7 @@ CRegion *GetRegion(std::string region_ident)
 	return nullptr;
 }
 
-CProvince *GetProvince(std::string province_name)
+CProvince *GetProvince(const std::string &province_name)
 {
 	for (size_t i = 0; i < Provinces.size(); ++i) {
 		if (province_name == Provinces[i]->Name) {
@@ -103,7 +103,7 @@ CProvince *GetProvince(std::string province_name)
 /**
 **  Get the ID of a world map terrain type
 */
-int GetWorldMapTerrainTypeId(std::string terrain_type_name)
+int GetWorldMapTerrainTypeId(const std::string &terrain_type_name)
 {
 	if (terrain_type_name.empty()) {
 		return -1;
@@ -149,7 +149,7 @@ std::string GetEraNameById(int era)
 	return "";
 }
 
-int GetEraIdByName(std::string era)
+int GetEraIdByName(const std::string &era)
 {
 	if (era == "devonian") {
 		return EraDevonian;

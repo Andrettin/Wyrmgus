@@ -55,9 +55,9 @@
 #include "ui/ui.h"
 //Wyrmgus start
 #include "unit.h" //for using CPreference
+//Wyrmgus end
 #include "video.h"
 #include "xbrz.h"
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -1933,13 +1933,10 @@ static int PowerOf2(int x)
 **  @param ow       Offset width.
 **  @param oh       Offset height.
 */
-//Wyrmgus start
-//static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
-//Wyrmgus end
 						//Wyrmgus start
 //						  int ow, int oh)
-						  int ow, int oh, CTimeOfDay *time_of_day)
+						  const int ow, const int oh, const CTimeOfDay *time_of_day)
 						//Wyrmgus end
 {
 	int useckey = g->Surface->flags & SDL_SRCCOLORKEY;

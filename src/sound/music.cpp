@@ -169,7 +169,7 @@ void InitMusicOAML()
 }
 
 #endif
-void LoadOAMLDefinitionsFile(std::string file_path)
+void LoadOAMLDefinitionsFile(const std::string &file_path)
 {
 #ifdef USE_OAML
 	const std::string filename = LibraryFileName(file_path.c_str());

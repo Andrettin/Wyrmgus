@@ -897,7 +897,7 @@ std::string GetTransitionTypeNameById(int transition_type)
 	return "";
 }
 
-int GetTransitionTypeIdByName(std::string transition_type)
+int GetTransitionTypeIdByName(const std::string &transition_type)
 {
 	if (transition_type == "north") {
 		return NorthTransitionType;

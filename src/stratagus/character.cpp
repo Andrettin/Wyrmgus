@@ -616,7 +616,7 @@ CCalendar *CCharacter::GetCalendar() const
 	return CCalendar::BaseCalendar;
 }
 
-bool CCharacter::IsParentOf(std::string child_ident) const
+bool CCharacter::IsParentOf(const std::string &child_ident) const
 {
 	for (size_t i = 0; i < this->Children.size(); ++i) {
 		if (this->Children[i]->Ident == child_ident) {
@@ -626,7 +626,7 @@ bool CCharacter::IsParentOf(std::string child_ident) const
 	return false;
 }
 
-bool CCharacter::IsChildOf(std::string parent_ident) const
+bool CCharacter::IsChildOf(const std::string &parent_ident) const
 {
 	if ((this->Father != nullptr && this->Father->Ident == parent_ident) || (this->Mother != nullptr && this->Mother->Ident == parent_ident)) {
 		return true;
@@ -634,7 +634,7 @@ bool CCharacter::IsChildOf(std::string parent_ident) const
 	return false;
 }
 
-bool CCharacter::IsSiblingOf(std::string sibling_ident) const
+bool CCharacter::IsSiblingOf(const std::string &sibling_ident) const
 {
 	for (size_t i = 0; i < this->Siblings.size(); ++i) {
 		if (this->Siblings[i]->Ident == sibling_ident) {
@@ -815,7 +815,7 @@ void CleanCharacters()
 	CustomHeroes.clear();
 }
 
-CCharacter *GetCharacter(std::string character_ident)
+CCharacter *GetCharacter(const std::string &character_ident)
 {
 	if (Characters.find(character_ident) != Characters.end()) {
 		return Characters[character_ident];
@@ -830,7 +830,7 @@ CCharacter *GetCharacter(std::string character_ident)
 	return nullptr;
 }
 
-CCharacter *GetCustomHero(std::string hero_ident)
+CCharacter *GetCustomHero(const std::string &hero_ident)
 {
 	if (CustomHeroes.find(hero_ident) != CustomHeroes.end()) {
 		return CustomHeroes[hero_ident];
@@ -1053,7 +1053,7 @@ void SaveHero(CCharacter *hero)
 	fclose(fd);
 }
 
-void HeroAddQuest(std::string hero_full_name, std::string quest_name)
+void HeroAddQuest(const std::string &hero_full_name, const std::string &quest_name)
 {
 	CCharacter *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
@@ -1068,7 +1068,7 @@ void HeroAddQuest(std::string hero_full_name, std::string quest_name)
 	hero->QuestsInProgress.push_back(quest);
 }
 
-void HeroCompleteQuest(std::string hero_full_name, std::string quest_name)
+void HeroCompleteQuest(const std::string &hero_full_name, const std::string &quest_name)
 {
 	CCharacter *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
@@ -1084,7 +1084,7 @@ void HeroCompleteQuest(std::string hero_full_name, std::string quest_name)
 	hero->QuestsCompleted.push_back(quest);
 }
 
-void SaveCustomHero(std::string hero_full_name)
+void SaveCustomHero(const std::string &hero_full_name)
 {
 	CCharacter *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
@@ -1094,7 +1094,7 @@ void SaveCustomHero(std::string hero_full_name)
 	SaveHero(hero);
 }
 
-void DeleteCustomHero(std::string hero_full_name)
+void DeleteCustomHero(const std::string &hero_full_name)
 {
 	CCharacter *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
@@ -1126,7 +1126,7 @@ void DeleteCustomHero(std::string hero_full_name)
 	delete hero;
 }
 
-void SetCurrentCustomHero(std::string hero_full_name)
+void SetCurrentCustomHero(const std::string &hero_full_name)
 {
 	if (!hero_full_name.empty()) {
 		CCharacter *hero = GetCustomHero(hero_full_name);
@@ -1149,7 +1149,7 @@ std::string GetCurrentCustomHero()
 	}
 }
 
-void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civilization_name, std::string new_hero_name, std::string new_hero_family_name)
+void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name)
 {
 	if (!hero_full_name.empty()) {
 		CCharacter *hero = GetCustomHero(hero_full_name);
@@ -1192,7 +1192,7 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 	}
 }
 
-bool IsNameValidForCustomHero(std::string hero_name, std::string hero_family_name)
+bool IsNameValidForCustomHero(const std::string &hero_name, const std::string &hero_family_name)
 {
 	std::string hero_full_name = hero_name;
 	if (!hero_family_name.empty()) {
@@ -1254,7 +1254,7 @@ std::string GetGenderNameById(int gender)
 	return "";
 }
 
-int GetGenderIdByName(std::string gender)
+int GetGenderIdByName(const std::string &gender)
 {
 	if (gender == "no-gender") {
 		return NoGender;
@@ -1298,7 +1298,7 @@ std::string GetCharacterTitleNameById(int title)
 	return "";
 }
 
-int GetCharacterTitleIdByName(std::string title)
+int GetCharacterTitleIdByName(const std::string &title)
 {
 	if (title == "head-of-state") {
 		return CharacterTitleHeadOfState;

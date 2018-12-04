@@ -60,7 +60,7 @@ CText::~CText()
 	this->Chapters.clear();
 }
 	
-CChapter *CText::GetChapter(std::string chapter_name)
+CChapter *CText::GetChapter(const std::string &chapter_name)
 {
 	for (size_t i = 0; i < this->Chapters.size(); ++i) {
 		if (chapter_name == this->Chapters[i]->Name) {
@@ -78,7 +78,7 @@ void CleanTexts()
 	Texts.clear();
 }
 
-CText *GetText(std::string text_name)
+CText *GetText(const std::string &text_name)
 {
 	for (size_t i = 0; i < Texts.size(); ++i) {
 		if (text_name == Texts[i]->Name) {

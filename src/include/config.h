@@ -46,7 +46,7 @@
 class CConfigData
 {
 public:
-	CConfigData(std::string tag) :
+	CConfigData(const std::string &tag) :
 		Tag(tag), Parent(nullptr)
 	{
 	}

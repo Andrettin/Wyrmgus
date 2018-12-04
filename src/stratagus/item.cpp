@@ -64,7 +64,7 @@ std::vector<CUniqueItem *> UniqueItems;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-int GetItemSlotIdByName(std::string item_slot)
+int GetItemSlotIdByName(const std::string &item_slot)
 {
 	if (item_slot == "weapon") {
 		return WeaponItemSlot;
@@ -118,7 +118,7 @@ std::string GetItemSlotNameById(int item_slot)
 	return "";
 }
 
-int GetItemClassIdByName(std::string item_class)
+int GetItemClassIdByName(const std::string &item_class)
 {
 	if (item_class == "dagger") {
 		return DaggerItemClass;
@@ -356,7 +356,7 @@ void CleanUniqueItems()
 	UniqueItems.clear();
 }
 
-CUniqueItem *GetUniqueItem(std::string item_ident)
+CUniqueItem *GetUniqueItem(const std::string &item_ident)
 {
 	for (size_t i = 0; i < UniqueItems.size(); ++i) {
 		if (item_ident == UniqueItems[i]->Ident) {
@@ -469,7 +469,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-std::string GetItemEffectsString(std::string item_ident)
+std::string GetItemEffectsString(const std::string &item_ident)
 {
 	const CUnitType *item = UnitTypeByIdent(item_ident);
 
@@ -586,7 +586,7 @@ std::string GetItemEffectsString(std::string item_ident)
 	return "";
 }
 
-std::string GetUniqueItemEffectsString(std::string item_ident)
+std::string GetUniqueItemEffectsString(const std::string &item_ident)
 {
 	const CUniqueItem *item = GetUniqueItem(item_ident);
 

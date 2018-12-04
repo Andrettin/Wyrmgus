@@ -897,7 +897,7 @@ void CUnit::HealingItemAutoUse()
 	}
 }
 
-void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
+void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 {
 	if (this->CurrentAction() == UnitActionDie) {
 		return;
@@ -911,15 +911,15 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	
 	CCharacter *character = nullptr;
 	if (!custom_hero) {
-		character = GetCharacter(character_full_name);
+		character = GetCharacter(character_ident);
 	} else {
-		character = GetCustomHero(character_full_name);
+		character = GetCustomHero(character_ident);
 	}
 	
 	if (character) {
 		this->Character = character;
 	} else {
-		fprintf(stderr, "Character \"%s\" doesn't exist.\n", character_full_name.c_str());
+		fprintf(stderr, "Character \"%s\" doesn't exist.\n", character_ident.c_str());
 		return;
 	}
 		
@@ -939,7 +939,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		
 		memcpy(Variable, this->Character->Type->Stats[this->Player->Index].Variables, UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
 	} else {
-		fprintf(stderr, "Character \"%s\" has no unit type.\n", character_full_name.c_str());
+		fprintf(stderr, "Character \"%s\" has no unit type.\n", character_ident.c_str());
 		return;
 	}
 	

@@ -411,10 +411,10 @@ extern int ReplayRevealMap;
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-extern CSite *GetSite(std::string site_ident);
-extern CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident);
+extern CSite *GetSite(const std::string &site_ident);
+extern CTerrainFeature *GetTerrainFeature(const std::string &terrain_feature_ident);
 extern std::string GetDegreeLevelNameById(int degree_level);
-extern int GetDegreeLevelIdByName(std::string degree_level);
+extern int GetDegreeLevelIdByName(const std::string &degree_level);
 //Wyrmgus end
 
 #define MARKER_ON_INDEX
@@ -502,14 +502,14 @@ inline void SetTile(unsigned int tile, int x, int y, int value = 0, int z = 0)
 }
 
 //Wyrmgus start
-extern void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value = 0, int z = 0);
-inline void SetTileTerrain(std::string terrain_ident, int x, int y, int value = 0, int z = 0)
+extern void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int value = 0, int z = 0);
+inline void SetTileTerrain(const std::string &terrain_ident, int x, int y, int value = 0, int z = 0)
 {
 	const Vec2i pos(x, y);
 	SetTileTerrain(terrain_ident, pos, value, z);
 }
-extern void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0, int z = 0);
-extern void ApplyCampaignMap(std::string campaign_ident);
+extern void ApplyMapTemplate(const std::string &map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0, int z = 0);
+extern void ApplyCampaignMap(const std::string &campaign_ident);
 //Wyrmgus end
 
 /// register ccl features
@@ -540,8 +540,8 @@ extern void PreprocessMap();
 
 //Wyrmgus start
 extern int GetMapLayer(const std::string &plane_ident = "", const std::string &world_ident = "", const int surface_layer = 0);
-extern int GetSubtemplateStartX(std::string subtemplate_ident);
-extern int GetSubtemplateStartY(std::string subtemplate_ident);
+extern int GetSubtemplateStartX(const std::string &subtemplate_ident);
+extern int GetSubtemplateStartY(const std::string &subtemplate_ident);
 extern void ChangeToPreviousMapLayer();
 extern void ChangeCurrentMapLayer(const int z);
 extern void SetTimeOfDay(const std::string &time_of_day_ident, int z = 0);
