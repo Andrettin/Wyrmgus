@@ -62,10 +62,11 @@ class CConstruction;
 class MissileType;
 class CFile;
 //Wyrmgus start
-class CUniqueItem;
+class CButtonLevel;
 class CPlane;
 class CWorld;
 class CTerrainType;
+class CUniqueItem;
 //Wyrmgus end
 struct lua_State;
 #ifdef USE_MNG
@@ -1033,11 +1034,10 @@ public:
 	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	int BoardSize;                  /// How much "cells" unit occupies inside transporter
-	int ButtonLevelForTransporter;  /// On which button level game will show units inside transporter
+	CButtonLevel *ButtonLevelForTransporter;  /// On which button level game will show units inside transporter
 	//Wyrmgus start
-	int ButtonLevelForInventory;	/// On which button level the game will show items inside inventory
 	int ButtonPos;					/// Position of this unit as a train/build button
-	int ButtonLevel;				/// Level of this unit's button
+	CButtonLevel *ButtonLevel;		/// Level of this unit's button
 	std::string ButtonPopup;		/// Popup of this unit's button
 	std::string ButtonHint;			/// Hint of this unit's button
 	std::string ButtonKey;			/// Hotkey of this unit's button

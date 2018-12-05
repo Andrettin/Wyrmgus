@@ -64,6 +64,7 @@
 #include "sound.h"
 #include "spells.h"
 #include "ui/button_action.h"
+#include "ui/button_level.h"
 #include "ui/ui.h"
 #include "unit.h"
 #include "unitsound.h"
@@ -1129,14 +1130,12 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "BoardSize")) {
 			type->BoardSize = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ButtonLevelForTransporter")) {
-			type->ButtonLevelForTransporter = LuaToNumber(l, -1);
+			type->ButtonLevelForTransporter = CButtonLevel::GetButtonLevel(LuaToString(l, -1));
 		//Wyrmgus start
-		} else if (!strcmp(value, "ButtonLevelForInventory")) {
-			type->ButtonLevelForInventory = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ButtonPos")) {
 			type->ButtonPos = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ButtonLevel")) {
-			type->ButtonLevel = LuaToNumber(l, -1);
+			type->ButtonLevel = CButtonLevel::GetButtonLevel(LuaToString(l, -1));
 		} else if (!strcmp(value, "ButtonPopup")) {
 			type->ButtonPopup = LuaToString(l, -1);
 		} else if (!strcmp(value, "ButtonHint")) {
@@ -2045,7 +2044,9 @@ static int CclDefineUnitType(lua_State *l)
 	for (size_t i = 0; i < type->Trains.size(); ++i) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = " + std::to_string((long long) type->Trains[i]->ButtonPos) + ",\n";
-		button_definition += "\tLevel = " + std::to_string((long long) type->Trains[i]->ButtonLevel) + ",\n";
+		if (type->Trains[i]->ButtonLevel) {
+			button_definition += "\tLevel = " + type->Trains[i]->ButtonLevel->Ident + ",\n";
+		}
 		button_definition += "\tAction = ";
 		if (type->Trains[i]->BoolFlag[BUILDING_INDEX].value) {
 			button_definition += "\"build\"";
@@ -2067,7 +2068,6 @@ static int CclDefineUnitType(lua_State *l)
 	if (type->CanMove()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 1,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"move\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"m\",\n";
@@ -2080,7 +2080,6 @@ static int CclDefineUnitType(lua_State *l)
 	if (type->CanMove()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 2,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"stop\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"s\",\n";
@@ -2093,7 +2092,6 @@ static int CclDefineUnitType(lua_State *l)
 	if (type->CanMove() && type->CanAttack) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 3,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"attack\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"a\",\n";
@@ -2106,7 +2104,6 @@ static int CclDefineUnitType(lua_State *l)
 	if (type->CanMove() && ((!type->BoolFlag[COWARD_INDEX].value && type->CanAttack) || type->UnitType == UnitTypeFly)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"patrol\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"p\",\n";
@@ -2119,7 +2116,6 @@ static int CclDefineUnitType(lua_State *l)
 	if (type->CanMove() && !type->BoolFlag[COWARD_INDEX].value && type->CanAttack && !(type->CanTransport() && type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 5,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"stand-ground\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"t\",\n";
@@ -4359,7 +4355,9 @@ static int CclSetModTrains(lua_State *l)
 	for (size_t i = 0; i < type->ModTrains[mod_file].size(); ++i) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = " + std::to_string((long long) type->ModTrains[mod_file][i]->ButtonPos) + ",\n";
-		button_definition += "\tLevel = " + std::to_string((long long) type->ModTrains[mod_file][i]->ButtonLevel) + ",\n";
+		if (type->ModTrains[mod_file][i]->ButtonLevel) {
+			button_definition += "\tLevel = " + type->ModTrains[mod_file][i]->ButtonLevel->Ident + ",\n";
+		}
 		button_definition += "\tAction = ";
 		if (type->ModTrains[mod_file][i]->BoolFlag[BUILDING_INDEX].value) {
 			button_definition += "\"build\"";

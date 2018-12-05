@@ -533,7 +533,7 @@ void UiFindIdleWorker()
 		SelectSingleUnit(*unit);
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
-		CurrentButtonLevel = 0;
+		CurrentButtonLevel = nullptr;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
 		if (unit->MapLayer != UI.CurrentMapLayer) {
@@ -570,7 +570,7 @@ void UiFindLevelUpUnit()
 		SelectSingleUnit(*unit);
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
-		CurrentButtonLevel = 0;
+		CurrentButtonLevel = nullptr;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
 		if (unit->MapLayer != UI.CurrentMapLayer) {
@@ -593,7 +593,7 @@ void UiFindHeroUnit(int hero_index)
 	SelectSingleUnit(*unit);
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
-	CurrentButtonLevel = 0;
+	CurrentButtonLevel = nullptr;
 	PlayUnitSound(*Selected[0], VoiceSelected);
 	SelectionChanged();
 	if (unit->MapLayer != UI.CurrentMapLayer) {
@@ -878,7 +878,7 @@ static bool CommandKey(int key)
 				
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();
-				CurrentButtonLevel = 0;
+				CurrentButtonLevel = nullptr;
 				SelectionChanged();
 				break;
 			} else {
@@ -938,7 +938,7 @@ static bool CommandKey(int key)
 				
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();
-				CurrentButtonLevel = 0;
+				CurrentButtonLevel = nullptr;
 				SelectionChanged();
 				break;
 			} else {

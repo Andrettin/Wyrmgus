@@ -348,6 +348,7 @@ set(ui_SRCS
 	src/ui/botpanel.cpp
 	src/ui/button_action.cpp
 	src/ui/button_checks.cpp
+	src/ui/button_level.cpp
 	src/ui/contenttype.cpp
 	src/ui/icons.cpp
 	src/ui/interface.cpp
@@ -596,6 +597,7 @@ set(stratagus_spell_HDRS
 
 set(stratagus_ui_HDRS
 	src/include/ui/button_action.h
+	src/include/ui/button_level.h
 	src/include/ui/contenttype.h
 	src/include/ui/interface.h
 	src/include/ui/popup.h

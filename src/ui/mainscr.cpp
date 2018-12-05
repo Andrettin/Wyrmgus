@@ -62,6 +62,7 @@
 #include "translate.h"
 #include "trigger.h"
 #include "ui/button_action.h"
+#include "ui/button_level.h"
 #include "ui/contenttype.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
@@ -820,7 +821,7 @@ static void DrawUnitInfo(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	if (unit.HasInventory() && unit.InsideCount && CurrentButtonLevel == unit.Type->ButtonLevelForInventory) {
+	if (unit.HasInventory() && unit.InsideCount && CurrentButtonLevel == CButtonLevel::InventoryButtonLevel) {
 		DrawUnitInfo_inventory(unit);
 		return;
 	}
@@ -1080,7 +1081,7 @@ void DrawPopups()
 			LastDrawnButtonPopup = nullptr;
 		}
 		
-		if (!(Selected[0]->Player != ThisPlayer && !ThisPlayer->IsAllied(*Selected[0]->Player) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == Selected[0]->Type->ButtonLevelForInventory) {
+		if (!(Selected[0]->Player != ThisPlayer && !ThisPlayer->IsAllied(*Selected[0]->Player) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == CButtonLevel::InventoryButtonLevel) {
 		CUnit *uins = Selected[0]->UnitInside;
 		size_t j = 0;
 
@@ -1117,7 +1118,7 @@ void DrawPopups()
 						}
 					}
 					ba->Pos = j;
-					ba->Level = Selected[0]->Type->ButtonLevelForInventory;
+					ba->Level = CButtonLevel::InventoryButtonLevel;
 					ba->Action = ButtonUnit;
 					ba->Value = UnitNumber(*uins);
 					ba->Popup = "popup-item-inventory";

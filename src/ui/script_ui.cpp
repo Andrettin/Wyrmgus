@@ -10,7 +10,7 @@
 //
 /**@name script_ui.cpp - The ui ccl functions. */
 //
-//      (c) Copyright 1999-2015 by Lutz Sammer, Jimmy Salmon, Martin Renold
+//      (c) Copyright 1999-2018 by Lutz Sammer, Jimmy Salmon, Martin Renold
 //      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -49,6 +49,7 @@
 #include "title.h"
 #include "util.h"
 #include "ui/button_action.h"
+#include "ui/button_level.h"
 #include "ui/contenttype.h"
 #include "ui/interface.h"
 #include "ui/popup.h"
@@ -957,7 +958,7 @@ static int CclDefineButton(lua_State *l)
 		if (!strcmp(value, "Pos")) {
 			ba.Pos = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Level")) {
-			ba.Level = LuaToNumber(l, -1);
+			ba.Level = CButtonLevel::GetButtonLevel(LuaToString(l, -1));
 		} else if (!strcmp(value, "AlwaysShow")) {
 			ba.AlwaysShow = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
@@ -1106,7 +1107,7 @@ void SelectionChanged()
 	// We Changed out selection, anything pending buttonwise must be cleared
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
-	CurrentButtonLevel = 0;
+	CurrentButtonLevel = nullptr;
 	LastDrawnButtonPopup = nullptr;
 
 	UI.ButtonPanel.Update();

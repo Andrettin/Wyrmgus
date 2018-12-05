@@ -10,7 +10,7 @@
 //
 /**@name mouse.cpp - The mouse handling. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -71,6 +71,7 @@
 #include "spells.h"
 #include "translate.h"
 #include "ui/button_action.h"
+#include "ui/button_level.h"
 #include "ui/interface.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -120,7 +121,7 @@ void CancelBuildingMode()
 	CursorBuilding = nullptr;
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
-	CurrentButtonLevel = 0;
+	CurrentButtonLevel = nullptr;
 	UI.ButtonPanel.Update();
 }
 
@@ -1130,7 +1131,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 		//Wyrmgus start
-		if (Selected.size() == 1 && Selected[0]->HasInventory() && CurrentButtonLevel == Selected[0]->Type->ButtonLevelForInventory) {
+		if (Selected.size() == 1 && Selected[0]->HasInventory() && CurrentButtonLevel == CButtonLevel::InventoryButtonLevel) {
 			const size_t size = UI.InventoryButtons.size();
 
 			for (size_t i = std::min<size_t>(Selected[0]->InsideCount, size); i != 0;) {
@@ -2066,7 +2067,7 @@ static void SendCommand(const Vec2i &tilePos)
 {
 	int ret = 0;
 
-	CurrentButtonLevel = 0;
+	CurrentButtonLevel = nullptr;
 	UI.ButtonPanel.Update();
 	
 	//Wyrmgus start
@@ -2218,7 +2219,7 @@ static void DoSelectionButtons(int num, unsigned)
 
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
-	CurrentButtonLevel = 0;
+	CurrentButtonLevel = nullptr;
 	SelectionChanged();
 }
 
@@ -2246,7 +2247,7 @@ static void UISelectStateButtonDown(unsigned)
 		CursorState = CursorStatePoint;
 		GameCursor = UI.Point.Cursor;
 		CustomCursor.clear();
-		CurrentButtonLevel = 0;
+		CurrentButtonLevel = nullptr;
 		UI.ButtonPanel.Update();
 
 		if (MouseButtons & LeftButton) {
@@ -2278,7 +2279,7 @@ static void UISelectStateButtonDown(unsigned)
 			CursorState = CursorStatePoint;
 			GameCursor = UI.Point.Cursor;
 			CustomCursor.clear();
-			CurrentButtonLevel = 0;
+			CurrentButtonLevel = nullptr;
 			UI.ButtonPanel.Update();
 			if (!ClickMissile.empty()) {
 				//Wyrmgus start
@@ -2309,7 +2310,7 @@ static void UISelectStateButtonDown(unsigned)
 	} else {
 		GameCursor = UI.YellowHair.Cursor;
 	}
-	CurrentButtonLevel = 0;
+	CurrentButtonLevel = nullptr;
 	UI.ButtonPanel.Update();
 }
 
@@ -3169,7 +3170,7 @@ void UIHandleButtonUp(unsigned button)
 		if (num) {
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
-			CurrentButtonLevel = 0;
+			CurrentButtonLevel = nullptr;
 			SelectionChanged();
 
 			//

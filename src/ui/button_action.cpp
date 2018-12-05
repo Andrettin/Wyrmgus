@@ -39,6 +39,7 @@
 
 #include "config.h"
 #include "trigger.h"
+#include "ui/button_level.h"
 #include "ui/interface.h"
 #include "unit.h"
 #include "unit_manager.h"
@@ -65,7 +66,8 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 		if (key == "pos") {
 			ba.Pos = std::stoi(value);
 		} else if (key == "level") {
-			ba.Level = std::stoi(value);
+			value = FindAndReplaceString(value, "_", "-");
+			ba.Level = CButtonLevel::GetButtonLevel(value);
 		} else if (key == "always_show") {
 			ba.AlwaysShow = StringToBool(value);
 		} else if (key == "icon") {
@@ -193,6 +195,15 @@ void ButtonAction::CleanTriggerData() const
 	TriggerData.Upgrade = nullptr;
 	TriggerData.Resource = nullptr;
 	TriggerData.Faction = nullptr;
+}
+
+int ButtonAction::GetLevelID() const
+{
+	if (this->Level) {
+		return this->Level->ID;
+	} else {
+		return 0;
+	}
 }
 
 int ButtonAction::GetKey() const

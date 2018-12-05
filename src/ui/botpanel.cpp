@@ -68,6 +68,7 @@
 #include "translate.h"
 #include "trigger.h"
 #include "ui/button_action.h"
+#include "ui/button_level.h"
 #include "ui/interface.h"
 #include "ui/popup.h"
 #include "unit.h"
@@ -93,7 +94,7 @@
 /// Last drawn popup : used to speed up drawing
 ButtonAction *LastDrawnButtonPopup;
 /// for unit buttons sub-menus etc.
-int CurrentButtonLevel;
+CButtonLevel *CurrentButtonLevel = nullptr;
 /// All buttons for units
 std::vector<ButtonAction *> UnitButtonTable;
 /// Pointer to current buttons
@@ -127,7 +128,7 @@ void InitButtons()
 /**
 **  FIXME: docu
 */
-int AddButton(int pos, int level, const std::string &icon_ident,
+int AddButton(int pos, CButtonLevel *level, const std::string &icon_ident,
 			  ButtonCmd action, const std::string &value, void* actionCb, const ButtonCheckFunc func,
 			  const std::string &allow, const int key, const std::string &hint, const std::string &descr,
 			  const std::string &sound, const std::string &cursor, const std::string &umask,
@@ -191,6 +192,13 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 				ba->Value = GetResourceIdByName(value.c_str());
 				break;
 			//Wyrmgus end
+			case ButtonButton:
+				if (CButtonLevel::GetButtonLevel(value)) {
+					ba->Value = CButtonLevel::GetButtonLevel(value)->ID;
+				} else {
+					ba->Value = 0;
+				}
+				break;
 			default:
 				ba->Value = atoi(value.c_str());
 				break;
@@ -247,7 +255,7 @@ void CleanButtons()
 	}
 	UnitButtonTable.clear();
 
-	CurrentButtonLevel = 0;
+	CurrentButtonLevel = nullptr;
 	LastDrawnButtonPopup = nullptr;
 	CurrentButtons.clear();
 }
@@ -1892,7 +1900,7 @@ void CButtonPanel::DoClicked_SelectTarget(int button)
 	}
 	CursorAction = CurrentButtons[button].Action;
 	CursorValue = CurrentButtons[button].Value;
-	CurrentButtonLevel = 9; // level 9 is cancel-only
+	CurrentButtonLevel = CButtonLevel::CancelButtonLevel; // the cancel-only button level
 	UI.ButtonPanel.Update();
 	UI.StatusLine.Set(_("Select Target"));
 }
@@ -1999,7 +2007,7 @@ void CButtonPanel::DoClicked_StandGround()
 
 void CButtonPanel::DoClicked_Button(int button)
 {
-	CurrentButtonLevel = CurrentButtons[button].Value;
+	CurrentButtonLevel = CButtonLevel::GetButtonLevel(CurrentButtons[button].ValueStr);
 	LastDrawnButtonPopup = nullptr;
 	UI.ButtonPanel.Update();
 }
@@ -2020,7 +2028,7 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 	}
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
-	CurrentButtonLevel = 0;
+	CurrentButtonLevel = nullptr;
 	UI.ButtonPanel.Update();
 	GameCursor = UI.Point.Cursor;
 	CursorBuilding = nullptr;
@@ -2054,8 +2062,8 @@ void CButtonPanel::DoClicked_Build(int button)
 		UI.StatusLine.Set(_("Select Location"));
 		UI.StatusLine.ClearCosts();
 		CursorBuilding = &type;
-		// FIXME: check is this =9 necessary?
-		CurrentButtonLevel = 9; // level 9 is cancel-only
+		// FIXME: check is this check necessary?
+		CurrentButtonLevel = CButtonLevel::CancelButtonLevel; // the cancel-only button level
 		UI.ButtonPanel.Update();
 	}
 }

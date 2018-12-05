@@ -497,11 +497,11 @@ bool ButtonCheckHasInventory(const CUnit &unit, const ButtonAction &button)
 bool ButtonCheckHasSubButtons(const CUnit &unit, const ButtonAction &button)
 {
 	for (size_t i = 0; i < UnitButtonTable.size(); ++i) {
-		if (UnitButtonTable[i]->Level != button.Value) {
+		if (UnitButtonTable[i]->GetLevelID() != button.Value) {
 			continue;
 		}
 		
-		if (UnitButtonTable[i]->Action == ButtonButton && (UnitButtonTable[i]->Value == button.Level || UnitButtonTable[i]->Value == 0)) { //don't count buttons to return to the level where this button is, or buttons to return to the default level
+		if (UnitButtonTable[i]->Action == ButtonButton && (UnitButtonTable[i]->Value == button.GetLevelID() || UnitButtonTable[i]->Value == 0)) { //don't count buttons to return to the level where this button is, or buttons to return to the default level
 			continue;
 		}
 

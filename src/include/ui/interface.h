@@ -47,6 +47,7 @@
 ----------------------------------------------------------------------------*/
 
 class ButtonAction;
+class CButtonLevel;
 class CUIButton;
 class CUnit;
 struct EventCallback;
@@ -199,7 +200,7 @@ extern bool LeaveStops;
 extern enum _cursor_on_ CursorOn;
 
 /// vladi: used for unit buttons sub-menus etc
-extern int CurrentButtonLevel;
+extern CButtonLevel *CurrentButtonLevel;
 /// Last drawn popup : used to speed up drawing
 extern ButtonAction *LastDrawnButtonPopup;
 

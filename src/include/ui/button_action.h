@@ -46,6 +46,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CButtonLevel;
 class CUnit;
 
 /*----------------------------------------------------------------------------
@@ -97,23 +98,24 @@ typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction &);
 class ButtonAction
 {
 public:
-	ButtonAction() : Pos(0), Level(0), AlwaysShow(false), Action(ButtonMove), Value(0), Payload(nullptr),
+	ButtonAction() : Pos(0), Level(nullptr), AlwaysShow(false), Action(ButtonMove), Value(0), Payload(nullptr),
 		Allowed(nullptr), Key(0) {}
 	
 	static void ProcessConfigData(const CConfigData *config_data);
 
 	void SetTriggerData() const;
 	void CleanTriggerData() const;
+	int GetLevelID() const;
 	int GetKey() const;
 	std::string GetHint() const;
 
-	int Pos;          /// button position in the grid
-	int Level;        /// requires button level
-	bool AlwaysShow;  /// button is always shown but drawn grayscale if not available
-	ButtonCmd Action; /// command on button press
-	int Value;        /// extra value for command
+	int Pos;					/// button position in the grid
+	CButtonLevel *Level;		/// requires button level
+	bool AlwaysShow;			/// button is always shown but drawn grayscale if not available
+	ButtonCmd Action;			/// command on button press
+	int Value;					/// extra value for command
 	void *Payload;
-	std::string ValueStr;    /// keep original value string
+	std::string ValueStr;		/// keep original value string
 
 	ButtonCheckFunc Allowed;    /// Check if this button is allowed
 	std::string AllowStr;       /// argument for allowed
@@ -146,7 +148,7 @@ extern void InitButtons();
 /// Free memory for buttons
 extern void CleanButtons();
 /// Make a new button
-extern int AddButton(int pos, int level, const std::string &IconIdent,
+extern int AddButton(int pos, CButtonLevel *level, const std::string &IconIdent,
 					 ButtonCmd action, const std::string &value, void* payload, const ButtonCheckFunc func,
 					 const std::string &arg, const int key, const std::string &hint, const std::string &descr,
 					 const std::string &sound, const std::string &cursor, const std::string &umask,

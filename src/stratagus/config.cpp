@@ -55,6 +55,7 @@
 #include "time_of_day.h"
 #include "time_of_day_schedule.h"
 #include "ui/button_action.h"
+#include "ui/button_level.h"
 #include "unittype.h"
 #include "util.h"
 #include "world.h"
@@ -182,6 +183,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		} else if (config_data->Tag == "button") {
 			if (!define_only) {
 				ButtonAction::ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "button_level") {
+			CButtonLevel *button_level = CButtonLevel::GetOrAddButtonLevel(ident);
+			if (!define_only) {
+				button_level->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "calendar") {
 			CCalendar *calendar = CCalendar::GetOrAddCalendar(ident);

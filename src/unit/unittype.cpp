@@ -66,6 +66,7 @@
 #include "unitsound.h"
 #include "util.h"
 #include "video.h"
+#include "ui/button_level.h"
 //Wyrmgus start
 #include "upgrade.h"
 //Wyrmgus end
@@ -579,7 +580,7 @@ CUnitType::CUnitType() :
 	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(1), ClicksToExplode(0),
 	//Wyrmgus start
 //	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
-	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), ButtonLevelForInventory(3), ButtonPos(0), ButtonLevel(0),
+	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(nullptr), ButtonPos(0), ButtonLevel(0),
 	//Wyrmgus end
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
 	MouseAction(0), CanTarget(0),
@@ -1062,7 +1063,9 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	for (size_t i = 0; i < this->Trains.size(); ++i) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = " + std::to_string((long long) this->Trains[i]->ButtonPos) + ",\n";
-		button_definition += "\tLevel = " + std::to_string((long long) this->Trains[i]->ButtonLevel) + ",\n";
+		if (this->Trains[i]->ButtonLevel) {
+			button_definition += "\tLevel = " + this->Trains[i]->ButtonLevel->Ident + ",\n";
+		}
 		button_definition += "\tAction = ";
 		if (this->Trains[i]->BoolFlag[BUILDING_INDEX].value) {
 			button_definition += "\"build\"";
@@ -1084,7 +1087,6 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	if (this->CanMove()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 1,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"move\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"m\",\n";
@@ -1097,7 +1099,6 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	if (this->CanMove()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 2,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"stop\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"s\",\n";
@@ -1110,7 +1111,6 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	if (this->CanMove() && this->CanAttack) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 3,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"attack\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"a\",\n";
@@ -1123,7 +1123,6 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	if (this->CanMove() && ((!this->BoolFlag[COWARD_INDEX].value && this->CanAttack) || this->UnitType == UnitTypeFly)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"patrol\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"p\",\n";
@@ -1136,7 +1135,6 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	if (this->CanMove() && !this->BoolFlag[COWARD_INDEX].value && this->CanAttack && !(this->CanTransport() && this->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 5,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"stand-ground\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"t\",\n";
@@ -1259,7 +1257,6 @@ void CUnitType::SetParent(CUnitType *parent_type)
 	this->AirUnit = parent_type->AirUnit;
 	this->BoardSize = parent_type->BoardSize;
 	this->ButtonLevelForTransporter = parent_type->ButtonLevelForTransporter;
-	this->ButtonLevelForInventory = parent_type->ButtonLevelForInventory;
 	this->ButtonPos = parent_type->ButtonPos;
 	this->ButtonLevel = parent_type->ButtonLevel;
 	this->ButtonPopup = parent_type->ButtonPopup;

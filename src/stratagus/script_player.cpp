@@ -1168,7 +1168,6 @@ static int CclDefineCivilization(lua_State *l)
 	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonMove) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 1,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"move\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"m\",\n";
@@ -1181,7 +1180,6 @@ static int CclDefineCivilization(lua_State *l)
 	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonStop) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 2,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"stop\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"s\",\n";
@@ -1194,7 +1192,6 @@ static int CclDefineCivilization(lua_State *l)
 	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonAttack) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 3,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"attack\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"a\",\n";
@@ -1207,7 +1204,6 @@ static int CclDefineCivilization(lua_State *l)
 	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonPatrol) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"patrol\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"p\",\n";
@@ -1220,7 +1216,6 @@ static int CclDefineCivilization(lua_State *l)
 	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonStandGround) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 5,\n";
-		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"stand-ground\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"t\",\n";

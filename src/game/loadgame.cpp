@@ -66,12 +66,17 @@
 #include "religion/religion.h"
 #include "replay.h"
 #include "script.h"
+#include "season.h"
+#include "season_schedule.h"
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
 #include "text.h"
+#include "time_of_day.h"
+#include "time_of_day_schedule.h"
 #include "trigger.h"
 #include "ui/button_action.h"
+#include "ui/button_level.h"
 #include "ui/ui.h"
 #include "unit.h"
 #include "unit_manager.h"
@@ -142,10 +147,15 @@ void CleanModules()
 	CleanUpgrades();
 	CleanDependencies();
 	CleanButtons();
+	CButtonLevel::ClearButtonLevels();
 	CleanMissileTypes();
 	Map.Clean();
 	Map.CleanFogOfWar();
 	CTerrainType::ClearTerrainTypes();
+	CTimeOfDay::ClearTimesOfDay();
+	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
+	CSeason::ClearSeasons();
+	CSeasonSchedule::ClearSeasonSchedules();
 	CParticleManager::exit();
 	CleanReplayLog();
 	CleanSpells();
