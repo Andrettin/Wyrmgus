@@ -10,7 +10,7 @@
 //
 /**@name stratagus.h - The main header file. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -188,7 +188,9 @@ extern const char NameLine[];
 
 #define CyclesPerInGameHour (CYCLES_PER_SECOND * 10) // every 10 seconds of gameplay = 1 hour for the purposes of in-game date/time
 
-#define DayMultiplier (DefaultDaysPerYear * DefaultHoursPerDay * CyclesPerInGameHour / CYCLES_PER_SECOND / 60 / 60) //the purpose of the day multiplier is so that we can effectively have months only taking e.g. 10 days to pass, so that we can have a day/night cycle, different days of the week and months/years, while still months and years not taking an overly long time to pass; the day multiplier should as such NOT affect the changes in day of the week; here we define the day multiplier to be such that one year equals roughly one hour of gameplay
+#define DefaultDayMultiplierForYear (DefaultDaysPerYear * DefaultHoursPerDay * CyclesPerInGameHour / CYCLES_PER_SECOND / 60 / 60) //the purpose of the day multiplier is so that we can effectively have months only taking e.g. 10 days to pass, so that we can have a day/night cycle, different days of the week and months/years, while still months and years not taking an overly long time to pass; the day multiplier should as such NOT affect the changes in day of the week; here we define the day multiplier to be such that one year equals roughly one hour of gameplay
+
+#define DayMultiplierDivider 4 //for calculating the multipliers for schedules; the maximum duration length will be the DefaultDayMultiplierForYear * the DayMultiplierDivider
 
 #define HeroCooldownCycles CYCLES_PER_MINUTE	/// Cooldown (in cycles) for recruiting a hero
 

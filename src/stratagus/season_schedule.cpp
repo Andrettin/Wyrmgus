@@ -187,6 +187,21 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid season schedule property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
+	
+	this->CalculateHourMultiplier();
+}
+
+void CSeasonSchedule::CalculateHourMultiplier()
+{
+	int multiplier = 1;
+	
+	int standard_days = this->TotalHours / DefaultHoursPerDay;
+	if (standard_days >= DefaultDaysPerYear) {
+		multiplier += DefaultDayMultiplierForYear;
+		multiplier += (standard_days / DefaultDaysPerYear - 1) * DefaultDayMultiplierForYear / DayMultiplierDivider; //this makes duration increases effectively level off after the default number of days per year
+	}
+	
+	this->HourMultiplier = multiplier;
 }
 
 //@}

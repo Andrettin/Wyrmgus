@@ -156,12 +156,7 @@ void CMapLayer::DecrementRemainingTimeOfDayHours()
 		return;
 	}
 	
-	//if the total amount of hours for the time of day schedule is equal to or greater than that of a default month, use the day multiplier
-	if (this->TimeOfDaySchedule->TotalHours >= DefaultHoursPerDay * DefaultDaysPerMonth) {
-		this->RemainingTimeOfDayHours -= DayMultiplier;
-	} else {
-		this->RemainingTimeOfDayHours--;
-	}
+	this->RemainingTimeOfDayHours -= this->TimeOfDaySchedule->HourMultiplier;
 	
 	if (this->RemainingTimeOfDayHours <= 0) {
 		this->IncrementTimeOfDay();
@@ -270,12 +265,7 @@ void CMapLayer::DecrementRemainingSeasonHours()
 		return;
 	}
 	
-	//if the total amount of hours for the season schedule is equal to or greater than that of a default month, use the day multiplier
-	if (this->SeasonSchedule->TotalHours >= DefaultHoursPerDay * DefaultDaysPerMonth) {
-		this->RemainingSeasonHours -= DayMultiplier;
-	} else {
-		this->RemainingSeasonHours--;
-	}
+	this->RemainingSeasonHours -= this->SeasonSchedule->HourMultiplier;
 	
 	if (this->RemainingSeasonHours <= 0) {
 		this->IncrementSeason();

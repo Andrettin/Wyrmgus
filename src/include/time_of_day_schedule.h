@@ -73,7 +73,7 @@ class CTimeOfDaySchedule
 {
 public:
 	CTimeOfDaySchedule() :
-		TotalHours(0)
+		TotalHours(0), HourMultiplier(1)
 	{
 	}
 	
@@ -88,10 +88,12 @@ public:
 	static CTimeOfDaySchedule *DefaultTimeOfDaySchedule;
 	
 	void ProcessConfigData(const CConfigData *config_data);
+	void CalculateHourMultiplier();
 
 	std::string Ident;										/// Ident of the time of day schedules
 	std::string Name;										/// Name of the time of day schedules
 	unsigned TotalHours;									/// The total amount of hours this time of day schedule contains
+	int HourMultiplier;									/// The amount of hours that pass for this schedule for each in-game hour
 	std::vector<CScheduledTimeOfDay *> ScheduledTimesOfDay;	/// The times of day that are scheduled
 };
 
