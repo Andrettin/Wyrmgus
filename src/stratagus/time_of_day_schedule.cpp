@@ -164,9 +164,9 @@ void CTimeOfDaySchedule::CalculateHourMultiplier()
 	int multiplier = 1;
 	
 	int standard_days = this->TotalHours / DefaultHoursPerDay;
-	if (standard_days >= DefaultDaysPerYear) {
+	if (standard_days > DefaultDaysPerWeek) {
 		multiplier += DefaultDayMultiplierForYear;
-		multiplier += (standard_days / DefaultDaysPerYear - 1) * DefaultDayMultiplierForYear / DayMultiplierDivider;
+		multiplier += (standard_days * 100 / DefaultDaysPerYear - 100) * DefaultDayMultiplierForYear / DayMultiplierDivider / 100; //this makes duration increases effectively level off after the default number of days per year; at the same time, this formula also serves to calculate the hour multiplier for duration lengths greater than a week and smaller than a year
 	}
 	
 	this->HourMultiplier = multiplier;

@@ -178,6 +178,7 @@ extern const char NameLine[];
 #define DefaultHoursPerDay 24
 #define DefaultDaysPerMonth 30
 #define DefaultDaysPerYear 365
+#define DefaultDaysPerWeek 7
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)
