@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name timeline.h - The timeline header file. */
+/**@name time_of_day_schedule.h - The time of day schedule header file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TIMELINE_H__
-#define __TIMELINE_H__
+#ifndef __TIME_OF_DAY_SCHEDULE_H__
+#define __TIME_OF_DAY_SCHEDULE_H__
 
 //@{
 
@@ -36,41 +36,65 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "time/time_period_schedule.h"
+
 #include <map>
 #include <string>
 #include <vector>
-
-#include "calendar/date.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
+class CSeason;
+class CTimeOfDay;
+class CTimeOfDaySchedule;
 
-class CTimeline
+class CScheduledTimeOfDay
 {
 public:
-	CTimeline() :
-		ID(-1)
+	CScheduledTimeOfDay() :
+		ID(0), TimeOfDay(nullptr), Hours(0), Schedule(nullptr)
 	{
 	}
 	
-	static CTimeline *GetTimeline(const std::string &ident);
-	static CTimeline *GetOrAddTimeline(const std::string &ident);
-	static void ClearTimelines();
+	void ProcessConfigData(const CConfigData *config_data);
+	int GetHours(const CSeason *season = nullptr) const;
 	
-	static std::vector<CTimeline *> Timelines;
-	static std::map<std::string, CTimeline *> TimelinesByIdent;
+	unsigned ID;					/// the scheduled time of day's ID within the time of day schedule
+	CTimeOfDay *TimeOfDay;			/// the time of day that is scheduled
+private:
+	int Hours;						/// the amount of hours the scheduled time of day lasts
+public:
+	CTimeOfDaySchedule *Schedule;	/// the schedule to which this time of day belongs
+	std::map<const CSeason *, int> SeasonHours;	/// the amount of hours the scheduled time of day lasts in a given season
+};
+
+class CTimeOfDaySchedule : public CTimePeriodSchedule
+{
+public:
+	CTimeOfDaySchedule()
+	{
+	}
+	
+	~CTimeOfDaySchedule();
+	
+	static CTimeOfDaySchedule *GetTimeOfDaySchedule(const std::string &ident, const bool should_find = true);
+	static CTimeOfDaySchedule *GetOrAddTimeOfDaySchedule(const std::string &ident);
+	static void ClearTimeOfDaySchedules();
+	
+	static std::vector<CTimeOfDaySchedule *> TimeOfDaySchedules;		/// Time of day schedules
+	static std::map<std::string, CTimeOfDaySchedule *> TimeOfDaySchedulesByIdent;
+	static CTimeOfDaySchedule *DefaultTimeOfDaySchedule;
 	
 	void ProcessConfigData(const CConfigData *config_data);
-	
-	int ID;
-	std::string Ident;
-	std::string Name;
-	CDate PointOfDivergence;											/// The point of divergence for this timeline
+
+	std::string Ident;										/// Ident of the time of day schedules
+	std::string Name;										/// Name of the time of day schedules
+	std::vector<CScheduledTimeOfDay *> ScheduledTimesOfDay;	/// The times of day that are scheduled
 };
 
 //@}
 
-#endif // !__TIMELINE_H__
+#endif // !__TIME_OF_DAY_SCHEDULE_H__

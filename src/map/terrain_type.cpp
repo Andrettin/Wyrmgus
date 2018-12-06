@@ -41,7 +41,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/tileset.h"
-#include "season.h"
+#include "time/season.h"
 #include "upgrade_structs.h"
 #include "video.h"
 

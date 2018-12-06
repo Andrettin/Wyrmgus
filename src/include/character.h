@@ -39,9 +39,9 @@
 #include <vector>
 #include <tuple>
 
-#include "calendar/date.h"
 #include "icons.h"
 #include "item.h"
+#include "time/date.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

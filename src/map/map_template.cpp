@@ -39,7 +39,6 @@
 
 #include <fstream>
 
-#include "calendar/calendar.h"
 #include "config.h"
 #include "editor.h"
 #include "game.h"
@@ -51,9 +50,10 @@
 #include "plane.h"
 #include "player.h"
 #include "quest.h"
-#include "season_schedule.h"
 #include "settings.h"
-#include "time_of_day_schedule.h"
+#include "time/calendar.h"
+#include "time/season_schedule.h"
+#include "time/time_of_day_schedule.h"
 #include "translate.h"
 #include "unit.h"
 #include "unit_find.h"

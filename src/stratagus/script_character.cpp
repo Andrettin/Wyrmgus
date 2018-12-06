@@ -37,7 +37,6 @@
 
 #include "character.h"
 
-#include "calendar/timeline.h"
 #include "civilization.h"
 #include "grand_strategy.h"
 #include "map/map_template.h"
@@ -47,6 +46,7 @@
 #include "religion/deity.h"
 #include "script.h"
 #include "spells.h"
+#include "time/timeline.h"
 #include "unittype.h"
 #include "upgrade.h"
 

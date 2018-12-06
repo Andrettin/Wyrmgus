@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "calendar/calendar.h"
+#include "time/calendar.h"
 
 #include "config.h"
 

@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "time_of_day.h"
+#include "time/time_of_day.h"
 
 #include "config.h"
 

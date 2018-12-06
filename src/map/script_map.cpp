@@ -37,7 +37,6 @@
 
 #include "map/map.h"
 
-#include "calendar/timeline.h"
 #include "civilization.h"
 //Wyrmgus start
 #include "editor.h"
@@ -54,11 +53,12 @@
 #include "quest.h"
 //Wyrmgus end
 #include "script.h"
-#include "season_schedule.h"
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
-#include "time_of_day_schedule.h"
+#include "time/season_schedule.h"
+#include "time/timeline.h"
+#include "time/time_of_day_schedule.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit.h"

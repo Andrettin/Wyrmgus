@@ -36,7 +36,6 @@
 #include "stratagus.h"
 
 #include "actions.h"
-#include "calendar/calendar.h"
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
@@ -67,7 +66,8 @@
 //Wyrmgus end
 #include "sound.h"
 #include "sound_server.h"
-#include "time_of_day.h"
+#include "time/calendar.h"
+#include "time/time_of_day.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui/interface.h"

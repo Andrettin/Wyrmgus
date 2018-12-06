@@ -43,13 +43,13 @@
 #include <tuple>
 
 //Wyrmgus start
-#include "calendar/date.h"
 #include "character.h" // because of "MaxCharacterTitles"
 #include "color.h"
 //Wyrmgus end
 #include "icons.h"
 //Wyrmgus start
 #include "item.h"
+#include "time/date.h"
 #include "ui/ui.h" // for the UI fillers
 //Wyrmgus end
 #include "upgrade_structs.h"

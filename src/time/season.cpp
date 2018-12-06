@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "season.h"
+#include "time/season.h"
 
 #include "config.h"
 

@@ -75,7 +75,7 @@
 #include "player.h"
 #include "script.h"
 #include "spells.h"
-#include "time_of_day.h"
+#include "time/time_of_day.h"
 #include "ui/interface.h"
 #include "unit.h"
 #include "unit_find.h"

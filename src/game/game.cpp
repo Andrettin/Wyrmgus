@@ -43,7 +43,6 @@
 #include "actions.h"
 #include "ai.h"
 #include "animation.h"
-#include "calendar/calendar.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
@@ -82,6 +81,7 @@
 #include "sound_server.h"
 #include "spells.h"
 #include "text.h"
+#include "time/calendar.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui/button_action.h"

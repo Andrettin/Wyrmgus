@@ -42,7 +42,6 @@
 #include <fstream>
 //Wyrmgus end
 
-#include "calendar/calendar.h"
 //Wyrmgus start
 #include "editor.h"
 #include "game.h" // for the SaveGameLoading variable
@@ -57,13 +56,14 @@
 //Wyrmgus start
 #include "province.h"
 #include "quest.h"
-#include "season.h"
-#include "season_schedule.h"
 #include "settings.h"
 #include "sound_server.h"
 //Wyrmgus end
-#include "time_of_day.h"
-#include "time_of_day_schedule.h"
+#include "time/calendar.h"
+#include "time/season.h"
+#include "time/season_schedule.h"
+#include "time/time_of_day.h"
+#include "time/time_of_day_schedule.h"
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end

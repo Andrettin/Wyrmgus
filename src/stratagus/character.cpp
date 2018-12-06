@@ -42,7 +42,6 @@
 #include <string>
 #include <map>
 
-#include "calendar/calendar.h"
 #include "civilization.h"
 #include "config.h"
 #include "game.h"
@@ -57,6 +56,7 @@
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "spells.h"
+#include "time/calendar.h"
 #include "unit.h"
 #include "upgrade.h"
 

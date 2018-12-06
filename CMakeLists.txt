@@ -129,13 +129,6 @@ set(beos_SRCS
 )
 source_group(beos FILES ${beos_SRCS})
 
-set(calendar_SRCS
-	src/calendar/calendar.cpp
-	src/calendar/date.cpp
-	src/calendar/timeline.cpp
-)
-source_group(calendar FILES ${calendar_SRCS})
-
 set(editor_SRCS
 	src/editor/editloop.cpp
 	src/editor/editor.cpp
@@ -330,19 +323,27 @@ set(stratagusmain_SRCS
 	src/stratagus/script_province.cpp
 	src/stratagus/script_quest.cpp
 	src/stratagus/script_text.cpp
-	src/stratagus/season.cpp
-	src/stratagus/season_schedule.cpp
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
 	src/stratagus/text.cpp
-	src/stratagus/time_of_day.cpp
-	src/stratagus/time_of_day_schedule.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
 	src/stratagus/util.cpp
 	src/stratagus/world.cpp
 )
 source_group(stratagusmain FILES ${stratagus_SRCS})
+
+set(time_SRCS
+	src/time/calendar.cpp
+	src/time/date.cpp
+	src/time/season.cpp
+	src/time/season_schedule.cpp
+	src/time/time_of_day.cpp
+	src/time/time_of_day_schedule.cpp
+	src/time/time_period_schedule.cpp
+	src/time/timeline.cpp
+)
+source_group(time FILES ${time_SRCS})
 
 set(ui_SRCS
 	src/ui/botpanel.cpp
@@ -441,7 +442,6 @@ set(stratagus_SRCS
 	${action_SRCS}
 	${animation_SRCS}
 	${ai_SRCS}
-	${calendar_SRCS}
 	${editor_SRCS}
 	${game_SRCS}
 	${guichan_SRCS}
@@ -454,6 +454,7 @@ set(stratagus_SRCS
 	${sound_SRCS}
 	${spell_SRCS}
 	${stratagusmain_SRCS}
+	${time_SRCS}
 	${ui_SRCS}
 	${unit_SRCS}
 	${video_SRCS}
@@ -557,12 +558,6 @@ set(stratagus_animation_HDRS
 	src/include/animation/animation_wait.h
 )
 
-set(stratagus_calendar_HDRS
-	src/include/calendar/calendar.h
-	src/include/calendar/date.h
-	src/include/calendar/timeline.h
-)
-
 set(stratagus_map_HDRS
 	src/include/map/map.h
 	src/include/map/map_layer.h
@@ -593,6 +588,17 @@ set(stratagus_spell_HDRS
 	src/include/spell/spell_spawnportal.h
 	src/include/spell/spell_summon.h
 	src/include/spell/spell_teleport.h
+)
+
+set(stratagus_time_HDRS
+	src/include/time/calendar.h
+	src/include/time/date.h
+	src/include/time/season.h
+	src/include/time/season_schedule.h
+	src/include/time/time_of_day.h
+	src/include/time/time_of_day_schedule.h
+	src/include/time/time_period_schedule.h
+	src/include/time/timeline.h
 )
 
 set(stratagus_ui_HDRS
@@ -659,8 +665,6 @@ set(stratagus_generic_HDRS
 	src/include/results.h
 	src/include/script.h
 	src/include/script_sound.h
-	src/include/season.h
-	src/include/season_schedule.h
 	src/include/settings.h
 	src/include/shaders.h
 	src/include/sound.h
@@ -668,8 +672,6 @@ set(stratagus_generic_HDRS
 	src/include/spells.h
 	src/include/stratagus.h
 	src/include/text.h
-	src/include/time_of_day.h
-	src/include/time_of_day_schedule.h
 	src/include/title.h
 	src/include/translate.h
 	src/include/trigger.h
@@ -696,11 +698,11 @@ set(stratagus_generic_HDRS
 source_group(include FILES ${stratagus_generic_HDRS})
 source_group(include\\action FILES ${stratagus_action_HDRS})
 source_group(include\\animation FILES ${stratagus_animation_HDRS})
-source_group(include\\calendar FILES ${stratagus_calendar_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
 source_group(include\\map FILES ${stratagus_map_HDRS})
 source_group(include\\religion FILES ${stratagus_religion_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
+source_group(include\\time FILES ${stratagus_time_HDRS})
 source_group(include\\ui FILES ${stratagus_ui_HDRS})
 source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
 
@@ -709,11 +711,11 @@ set(stratagus_HDRS
 	${stratagus_generic_HDRS}
 	${stratagus_action_HDRS}
 	${stratagus_animation_HDRS}
-	${stratagus_calendar_HDRS}
 	${stratagus_guichan_HDRS}
 	${stratagus_map_HDRS}
 	${stratagus_religion_HDRS}
 	${stratagus_spell_HDRS}
+	${stratagus_time_HDRS}
 	${stratagus_ui_HDRS}
 	${stratagus_xbrz_HDRS}
 )

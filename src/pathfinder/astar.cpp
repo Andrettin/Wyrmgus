@@ -40,7 +40,7 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "settings.h"
-#include "time_of_day.h"
+#include "time/time_of_day.h"
 #include "unit.h"
 #include "unit_find.h"
 

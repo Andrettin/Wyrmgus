@@ -81,7 +81,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
-#include "time_of_day.h"
+#include "time/time_of_day.h"
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/interface.h"

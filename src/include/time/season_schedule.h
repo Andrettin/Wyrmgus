@@ -36,6 +36,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "time/time_period_schedule.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -62,11 +64,11 @@ public:
 	CSeasonSchedule *Schedule;	/// the schedule to which this season belongs
 };
 
-class CSeasonSchedule
+class CSeasonSchedule : public CTimePeriodSchedule
 {
 public:
 	CSeasonSchedule() :
-		TotalHours(0), HoursPerDay(DefaultHoursPerDay), HourMultiplier(1)
+		HoursPerDay(DefaultHoursPerDay)
 	{
 	}
 	
@@ -81,13 +83,10 @@ public:
 	static CSeasonSchedule *DefaultSeasonSchedule;
 	
 	void ProcessConfigData(const CConfigData *config_data);
-	void CalculateHourMultiplier();
 
 	std::string Ident;									/// Ident of the season schedules
 	std::string Name;									/// Name of the season schedules
-	unsigned TotalHours;								/// The total amount of hours this season schedule contains
 	unsigned HoursPerDay;								/// The hours per each day for this season schedule
-	int HourMultiplier;									/// The amount of hours that pass for this schedule for each in-game hour
 	std::vector<CScheduledSeason *> ScheduledSeasons;	/// The seasons that are scheduled
 };
 

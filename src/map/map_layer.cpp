@@ -39,11 +39,11 @@
 
 #include "map/terrain_type.h"
 #include "map/tile.h"
-#include "season.h"
-#include "season_schedule.h"
 #include "sound_server.h"
-#include "time_of_day.h"
-#include "time_of_day_schedule.h"
+#include "time/season.h"
+#include "time/season_schedule.h"
+#include "time/time_of_day.h"
+#include "time/time_of_day_schedule.h"
 #include "unit.h"
 #include "unit_manager.h"
 

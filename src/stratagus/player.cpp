@@ -46,7 +46,6 @@
 #include "ai.h"
 //Wyrmgus start
 #include "../ai/ai_local.h" //for using AiHelpers
-#include "calendar/calendar.h"
 #include "civilization.h"
 #include "commands.h" //for faction setting
 #include "depend.h"
@@ -73,7 +72,8 @@
 #include "settings.h"
 //Wyrmgus end
 #include "sound.h"
-#include "time_of_day.h"
+#include "time/calendar.h"
+#include "time/time_of_day.h"
 #include "translate.h"
 #include "unitsound.h"
 #include "unittype.h"

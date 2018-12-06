@@ -51,7 +51,7 @@
 //Wyrmgus start
 #include "results.h"
 //Wyrmgus end
-#include "time_of_day.h"
+#include "time/time_of_day.h"
 #include "ui/ui.h"
 //Wyrmgus start
 #include "unit.h" //for using CPreference

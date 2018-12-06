@@ -40,8 +40,8 @@
 #include <string>
 #include <vector>
 
-#include "calendar/date.h"
 #include "map/tile.h"
+#include "time/date.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------

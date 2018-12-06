@@ -43,7 +43,6 @@
 #include "actions.h"
 //Wyrmgus end
 #include "animation/animation_setplayervar.h"
-#include "calendar/timeline.h"
 #include "config.h"
 //Wyrmgus start
 #include "editor.h"
@@ -64,6 +63,7 @@
 #include "player.h"
 #include "spells.h"
 //Wyrmgus end
+#include "time/timeline.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui/button_action.h"

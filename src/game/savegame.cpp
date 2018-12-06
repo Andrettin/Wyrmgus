@@ -39,7 +39,6 @@
 
 #include "actions.h"
 #include "ai.h"
-#include "calendar/calendar.h"
 #include "character.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -52,6 +51,7 @@
 //Wyrmgus end
 #include "replay.h"
 #include "spells.h"
+#include "time/calendar.h"
 #include "trigger.h"
 #include "ui/ui.h"
 #include "unit.h"

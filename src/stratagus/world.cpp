@@ -40,8 +40,8 @@
 #include "config.h"
 #include "plane.h"
 #include "province.h"
-#include "season_schedule.h"
-#include "time_of_day_schedule.h"
+#include "time/season_schedule.h"
+#include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
 
 /*----------------------------------------------------------------------------

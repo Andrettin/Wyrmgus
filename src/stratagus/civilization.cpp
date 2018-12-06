@@ -37,8 +37,8 @@
 
 #include "civilization.h"
 
-#include "calendar/calendar.h"
 #include "player.h"
+#include "time/calendar.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

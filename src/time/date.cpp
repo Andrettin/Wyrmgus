@@ -35,10 +35,10 @@
 
 #include "stratagus.h"
 
-#include "calendar/date.h"
+#include "time/date.h"
 
-#include "calendar/calendar.h"
-#include "calendar/timeline.h"
+#include "time/calendar.h"
+#include "time/timeline.h"
 #include "civilization.h"
 #include "player.h"
 #include "quest.h"
