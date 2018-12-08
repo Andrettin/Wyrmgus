@@ -711,10 +711,7 @@ static void AStarAddToClose(int node, int z)
 //Wyrmgus end
 
 /* build-in costmoveto code */
-//Wyrmgus start
-//static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int z)
-//Wyrmgus end
 {
 #ifdef DEBUG
 	{
@@ -732,10 +729,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 	int h = unit.Type->TileSize.y;
 	const int w = unit.Type->TileSize.x;
 	do {
-		//Wyrmgus start
-//		const CMapField *mf = Map.Field(index);
 		const CMapField *mf = Map.Field(index, z);
-		//Wyrmgus end
 		int i = w;
 		do {
 			//Wyrmgus start
@@ -747,10 +741,8 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			}
 			const int flag = check_flags & mask;
 			//Wyrmgus end
-			//Wyrmgus start
-//			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsExplored(*unit.Player))) {
+			
 			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsTeamExplored(*unit.Player))) {
-			//Wyrmgus end
 				if (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
 					// we can't cross fixed units and other unpassable things
 					return -1;
@@ -788,13 +780,11 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				}
 			}
 			// Add cost of crossing unknown tiles if required
-			//Wyrmgus start
-//			if (!AStarKnowUnseenTerrain && !mf->playerInfo.IsExplored(*unit.Player)) {
 			if (!AStarKnowUnseenTerrain && !mf->playerInfo.IsTeamExplored(*unit.Player)) {
-			//Wyrmgus end
 				// Tend against unknown tiles.
 				cost += AStarUnknownTerrainCost;
 			}
+			
 			//Wyrmgus start
 			if (
 				(mf->Flags & MapFieldDesert)
@@ -807,6 +797,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 				cost += 32; //increase the cost of moving through deserts for units affected by dehydration, as we want the pathfinding to try to avoid that
 			}
 			//Wyrmgus end
+			
 			// Add tile movement cost
 			if (unit.Type->UnitType == UnitTypeFly || unit.Type->UnitType == UnitTypeFlyLow) {
 				cost += DefaultTileMovementCost;

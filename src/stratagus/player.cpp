@@ -1905,7 +1905,8 @@ bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 {
 	if (upgrade->ID < (int) AiHelpers.Research.size()) {
 		for (size_t j = 0; j < AiHelpers.Research[upgrade->ID].size(); ++j) {
-			if (this->GetUnitTypeCount(AiHelpers.Research[upgrade->ID][j]) > 0) {
+			CUnitType *researcher_type = AiHelpers.Research[upgrade->ID][j];
+			if (this->GetUnitTypeCount(researcher_type) > 0 || HasUnitBuilder(researcher_type)) {
 				return true;
 			}
 		}
