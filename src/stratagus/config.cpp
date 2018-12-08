@@ -250,6 +250,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				CSound::ProcessConfigData(config_data);
 			}
+		} else if (config_data->Tag == "spell") {
+			CSpell *spell = CSpell::GetOrAddSpell(ident);
+			if (!define_only) {
+				spell->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "terrain_type") {
 			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(ident);
 			if (!define_only) {

@@ -91,9 +91,7 @@
 		}
 	} else {
 		order->goalPos = pos;
-		//Wyrmgus start
 		order->MapLayer = z;
-		//Wyrmgus end
 	}
 	order->SetSpell(spell);
 

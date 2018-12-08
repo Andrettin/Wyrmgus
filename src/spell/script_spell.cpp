@@ -346,16 +346,7 @@ static int CclDefineSpell(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int len = lua_rawlen(l, -1);
-			//Wyrmgus start
-			/*
-			if (len != MaxCosts) {
-				LuaError(l, "resource table size isn't correct");
-			}
-			for (int j = 1; j < len; ++j) { // exclude the time
-				spell->Costs[j] = LuaToNumber(l, -1, j + 1);
-			}
-			*/
-			for (int j = 0; j < len; ++j) { // exclude the time
+			for (int j = 0; j < len; ++j) {
 				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
 				if (resource == -1) {
 					LuaError(l, "Resource doesn't exist.");
@@ -363,7 +354,6 @@ static int CclDefineSpell(lua_State *l)
 				++j;
 				spell->Costs[j] = LuaToNumber(l, -1, j + 1);
 			}
-			//Wyrmgus end
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "range")) {
 			if (!lua_isstring(l, i + 1) && !lua_isnumber(l, i + 1)) {
@@ -379,6 +369,8 @@ static int CclDefineSpell(lua_State *l)
 		} else if (!strcmp(value, "repeat-cast")) {
 			spell->RepeatCast = 1;
 			--i;
+		} else if (!strcmp(value, "stackable")) {
+			spell->Stackable = LuaToBoolean(l, i + 1);
 		} else if (!strcmp(value, "force-use-animation")) {
 			spell->ForceUseAnimation = true;
 			--i;
@@ -440,7 +432,7 @@ static int CclDefineSpell(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "item-spell")) {
-			int item_class = GetItemClassIdByName(LuaToString(l, i + 1));
+			const int item_class = GetItemClassIdByName(LuaToString(l, i + 1));
 			if (item_class != -1) {
 				spell->ItemSpell[item_class] = true;
 			}

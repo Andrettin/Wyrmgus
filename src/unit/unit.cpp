@@ -5694,10 +5694,39 @@ bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
 	return true;
 }
 
+/**
+**	@brief	Get whether a unit can cast a given spell
+**
+**	@return	True if the unit can cast the given spell, or false otherwise
+*/
+bool CUnit::CanCastSpell(const CSpell *spell, const bool ignore_mana_and_cooldown) const
+{
+	if (spell->IsAvailableForUnit(*this)) {
+		if (!ignore_mana_and_cooldown) {
+			if (this->Variable[MANA_INDEX].Value < spell->ManaCost) {
+				return false;
+			}
+			
+			if (this->SpellCoolDownTimers[spell->Slot]) {
+				return false;
+			}
+		}
+		
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+**	@brief	Get whether a unit can cast any spell
+**
+**	@return	True if the unit can cast any spell, or false otherwise
+*/
 bool CUnit::CanCastAnySpell() const
 {
 	for (size_t i = 0; i < this->Type->Spells.size(); ++i) {
-		if (this->Type->Spells[i]->IsAvailableForUnit(*this)) {
+		if (this->CanCastSpell(this->Type->Spells[i], true)) {
 			return true;
 		}
 	}
@@ -5718,7 +5747,7 @@ bool CUnit::CanAutoCastSpell(const CSpell *spell) const
 		return false;
 	}
 	
-	if (!spell->IsAvailableForUnit(*this) || this->Variable[MANA_INDEX].Value < spell->ManaCost || this->SpellCoolDownTimers[spell->Slot]) {
+	if (!CanCastSpell(spell, false)) {
 		return false;
 	}
 	
@@ -5880,7 +5909,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 	}
 	
 	if (item->Spell != nullptr) {
-		if (!this->HasInventory() || !CanCastSpell(*this, *item->Spell, this, this->tilePos, this->MapLayer->ID)) {
+		if (!this->HasInventory() || !::CanCastSpell(*this, *item->Spell, this, this->tilePos, this->MapLayer->ID)) {
 			return false;
 		}
 	}

@@ -394,6 +394,7 @@ public:
 	bool IsInCombat() const;
 	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;
 	bool CanReturnGoodsTo(const CUnit *dest, int resource = 0) const;
+	bool CanCastSpell(const CSpell *spell, const bool ignore_mana_and_cooldown) const;
 	bool CanCastAnySpell() const;
 	bool CanAutoCastSpell(const CSpell *spell) const;
 	bool IsItemEquipped(const CUnit *item) const;

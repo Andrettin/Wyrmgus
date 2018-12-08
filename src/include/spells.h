@@ -229,6 +229,7 @@ public:
 	static std::vector<CSpell *> Spells;
 	static std::map<std::string, CSpell *> SpellsByIdent;
 	
+	void ProcessConfigData(const CConfigData *config_data);
 	/// return 1 if spell is available, 0 if not (must upgrade)
 	bool IsAvailableForUnit(const CUnit &unit) const;
 	const AutoCastInfo *GetAutoCastInfo(const bool ai) const;
@@ -250,6 +251,7 @@ public:
 #define INFINITE_RANGE 0xFFFFFFF
 	int ManaCost;               /// Required mana for each cast.
 	int RepeatCast;             /// If the spell will be cast again until out of targets.
+	bool Stackable;				/// Whether the spell has an effect if cast multiple times at the same target
 	int Costs[MaxCosts];        /// Resource costs of spell.
 	int CoolDown;               /// How much time spell needs to be cast again.
 
@@ -272,7 +274,6 @@ public:
 		return !Range && Target == TargetSelf;
 	}
 	bool ForceUseAnimation;
-
 };
 
 /*----------------------------------------------------------------------------

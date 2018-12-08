@@ -2030,14 +2030,8 @@ static int SendUnload(const Vec2i &tilePos, int flush)
 **
 **  @see Selected
 */
-//Wyrmgus start
-//static int SendSpellCast(const Vec2i &tilePos)
 static int SendSpellCast(const Vec2i &tilePos, int flush)
-//Wyrmgus end
 {
-	//Wyrmgus start
-//	const int flush = !(KeyModifiers & ModifierShift);
-	//Wyrmgus end
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
@@ -2065,8 +2059,22 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
 			ExitFatal(1);
 		}
+		
+		if (std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), spell) == unit.Type->Spells.end()) {
+			continue; //the unit's type cannot cast this spell
+		}
+		
+		if (!unit.CanCastSpell(spell, false)) {
+			continue;
+		}
+		
 		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? nullptr : dest , CursorValue, flush, UI.CurrentMapLayer->ID);
 		ret = 1;
+		
+		//if the spell's effects do not stack on the same target, then only one selected unit should cast it
+		if (!spell->Stackable) {
+			break;
+		}
 	}
 	return ret;
 }
@@ -2292,10 +2300,7 @@ static void UISelectStateButtonDown(unsigned)
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(CursorScreenPos);
 
 			if (!ClickMissile.empty()) {
-				//Wyrmgus start
-//				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
-				//Wyrmgus end
 			}
 			SendCommand(Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID));
 		}
@@ -2319,10 +2324,7 @@ static void UISelectStateButtonDown(unsigned)
 			CurrentButtonLevel = nullptr;
 			UI.ButtonPanel.Update();
 			if (!ClickMissile.empty()) {
-				//Wyrmgus start
-//				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
-				//Wyrmgus end
 			}
 			SendCommand(cursorTilePos);
 		} else {
@@ -2432,20 +2434,14 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			// FIXME: Johns: Perhaps we should use a pixel map coordinates
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			//Wyrmgus start
-//			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, -1))
 			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, -1, UI.CurrentMapLayer->ID))
-			//Wyrmgus end
 				&& !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross
 				if (!ClickMissile.empty()) {
 					const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
-					//Wyrmgus start
-//					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
-					//Wyrmgus end
 				}
 			}
 			const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
@@ -2475,10 +2471,7 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
 			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
 			if (!ClickMissile.empty()) {
-				//Wyrmgus start
-//				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
-				//Wyrmgus end
 			}
 			DoRightButton(mapPixelPos);
 		}

@@ -1318,10 +1318,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const CSpell &
 		return;
 	}
 
-	//Wyrmgus start
-//	*order = COrder::NewActionSpellCast(spell, pos, dest, true);
 	*order = COrder::NewActionSpellCast(spell, pos, dest, z, true);
-	//Wyrmgus end
 	ClearSavedAction(unit);
 }
 

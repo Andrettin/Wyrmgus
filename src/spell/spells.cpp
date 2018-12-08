@@ -49,6 +49,7 @@
 #include "actions.h"
 #include "civilization.h"
 #include "commands.h"
+#include "config.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -284,11 +285,11 @@ private:
 };
 
 /**
-**  Spell constructor.
+**	@brief	Spell constructor.
 */
 CSpell::CSpell(int slot, const std::string &ident) :
 	Ident(ident), Slot(slot), Target(), Action(),
-	Range(0), ManaCost(0), RepeatCast(0), CoolDown(0),
+	Range(0), ManaCost(0), RepeatCast(0), Stackable(true), CoolDown(0),
 	DependencyId(-1), Condition(nullptr),
 	AutoCast(nullptr), AICast(nullptr), ForceUseAnimation(false)
 {
@@ -299,7 +300,7 @@ CSpell::CSpell(int slot, const std::string &ident) :
 }
 
 /**
-**  Spell destructor.
+**	@brief	Spell destructor.
 */
 CSpell::~CSpell()
 {
@@ -377,6 +378,114 @@ void CSpell::ClearSpells()
 		delete Spells[i];
 	}
 	Spells.clear();
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CSpell::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "description") {
+			this->Description = value;
+		} else if (key == "mana_cost") {
+			this->ManaCost = std::stoi(value);
+		} else if (key == "cooldown") {
+			this->CoolDown = std::stoi(value);
+		} else if (key == "range") {
+			if (value == "infinite") {
+				this->Range = INFINITE_RANGE;
+			} else {
+				this->Range = std::stoi(value);
+			}
+		} else if (key == "repeat_cast") {
+			this->RepeatCast = StringToBool(value);
+		} else if (key == "stackable") {
+			this->Stackable = StringToBool(value);
+		} else if (key == "force_use_animation") {
+			this->ForceUseAnimation = StringToBool(value);
+		} else if (key == "target") {
+			if (value == "self") {
+				this->Target = TargetSelf;
+			} else if (value == "unit") {
+				this->Target = TargetUnit;
+			} else if (value == "position") {
+				this->Target = TargetPosition;
+			} else {
+				fprintf(stderr, "Invalid spell target type: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "sound_when_cast") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->SoundWhenCast.Name = value;
+			this->SoundWhenCast.MapSound();
+			
+			//check the sound
+			if (!this->SoundWhenCast.Sound) {
+				this->SoundWhenCast.Name.clear();
+			}
+		} else if (key == "depend_upgrade") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->DependencyId = UpgradeIdByIdent(value);
+			if (this->DependencyId == -1) {
+				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "item_spell") {
+			value = FindAndReplaceString(value, "_", "-");
+			const int item_class = GetItemClassIdByName(value);
+			if (item_class != -1) {
+				this->ItemSpell[item_class] = true;
+			}
+		} else {
+			fprintf(stderr, "Invalid spell property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		const CConfigData *child_config_data = config_data->Children[i];
+		
+		if (child_config_data->Tag == "resource_cost") {
+			int resource = -1;
+			int cost = 0;
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "resource") {
+					value = FindAndReplaceString(value, "_", "-");
+					resource = GetResourceIdByName(value.c_str());
+					if (resource == -1) {
+						fprintf(stderr, "Invalid resource: \"%s\".\n", value.c_str());
+					}
+				} else if (key == "cost") {
+					cost = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid resource cost property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (resource == -1) {
+				fprintf(stderr, "Resource cost has no resource.\n");
+				continue;
+			}
+			
+			if (cost == 0) {
+				fprintf(stderr, "Resource cost has no valid cost amount.\n");
+				continue;
+			}
+			
+			this->Costs[resource] = cost;
+		} else {
+			fprintf(stderr, "Invalid spell property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
 }
 
 /**
