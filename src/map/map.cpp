@@ -444,7 +444,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 
 	int while_count = 0;
 	
-	while (while_count < 100) {
+	while (while_count < 1000) {
 		random_pos.x = SyncRand(max_pos.x - (unit_type->TileSize.x - 1) - min_pos.x + 1) + min_pos.x;
 		random_pos.y = SyncRand(max_pos.y - (unit_type->TileSize.y - 1) - min_pos.y + 1) + min_pos.y;
 		
