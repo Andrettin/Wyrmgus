@@ -652,6 +652,14 @@ void GameMainLoop()
 			custom_hero->SetCharacter(CurrentCustomHero->Ident, true);	
 		}
 		
+		//update the sold units of all units before starting, to make sure they fit the current conditions
+		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+			CUnit *unit = *it;
+			if (unit && unit->IsAlive()) {
+				unit->UpdateSoldUnits();
+			}
+		}
+		
 		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
 			CurrentQuest->IntroductionDialogue->Call(ThisPlayer->Index);
 		}
