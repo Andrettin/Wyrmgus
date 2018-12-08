@@ -1596,7 +1596,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
-				SpellType *spell = SpellTypeByIdent(value);
+				CSpell *spell = CSpell::GetSpell(value);
 				if (spell == nullptr) {
 					LuaError(l, "Unknown spell type: %s" _C_ value);
 				}
@@ -1611,8 +1611,8 @@ static int CclDefineUnitType(lua_State *l)
 			// have been defined.
 			//
 			if (!type->AutoCastActive) {
-				type->AutoCastActive = new char[SpellTypeTable.size()];
-				memset(type->AutoCastActive, 0, SpellTypeTable.size() * sizeof(char));
+				type->AutoCastActive = new char[CSpell::Spells.size()];
+				memset(type->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
 			}
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
@@ -1622,7 +1622,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
-				const SpellType *spell = SpellTypeByIdent(value);
+				const CSpell *spell = CSpell::GetSpell(value);
 				if (spell == nullptr) {
 					LuaError(l, "AutoCastActive : Unknown spell type: %s" _C_ value);
 				}
@@ -1845,11 +1845,9 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				value = LuaToString(l, -1, j + 1);
-				SpellType *spell = SpellTypeByIdent(value);
+				CSpell *spell = CSpell::GetSpell(value);
 				if (spell != nullptr) {
 					type->DropSpells.push_back(spell);
-				} else {
-					LuaError(l, "Spell \"%s\" doesn't exist." _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "Affixes")) {

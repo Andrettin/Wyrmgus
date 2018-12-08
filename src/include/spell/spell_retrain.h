@@ -41,7 +41,7 @@
 class Spell_Retrain : public SpellActionType
 {
 public:
-	virtual int Cast(CUnit &caster, const SpellType &spell,
+	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 

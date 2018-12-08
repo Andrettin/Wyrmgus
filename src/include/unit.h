@@ -57,6 +57,7 @@ class CCharacter;
 class CMapField;
 class COrder;
 class CPlayer;
+class CSpell;
 //Wyrmgus start
 class CUniqueItem;
 //Wyrmgus end
@@ -69,7 +70,6 @@ class CUpgrade;
 class CVariable;
 class CViewport;
 class PathFinderData;
-class SpellType;
 struct lua_State;
 
 typedef COrder *COrderPtr;
@@ -212,7 +212,7 @@ public:
 	void ApplyAuraEffect(int aura_index);
 	void SetPrefix(CUpgrade *prefix);
 	void SetSuffix(CUpgrade *suffix);
-	void SetSpell(SpellType *spell);
+	void SetSpell(CSpell *spell);
 	void SetWork(CUpgrade *work);
 	void SetElixir(CUpgrade *elixir);
 	void SetUnique(CUniqueItem *unique);
@@ -395,7 +395,7 @@ public:
 	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;
 	bool CanReturnGoodsTo(const CUnit *dest, int resource = 0) const;
 	bool CanCastAnySpell() const;
-	bool CanAutoCastSpell(const SpellType *spell) const;
+	bool CanAutoCastSpell(const CSpell *spell) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemClassEquipped(int item_class) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
@@ -412,7 +412,7 @@ public:
 	bool CanEat(const CUnit &unit) const;
 	bool LevelCheck(const int level) const;
 	bool IsAbilityEmpowered(const CUpgrade *ability) const;
-	bool IsSpellEmpowered(const SpellType *spell) const;
+	bool IsSpellEmpowered(const CSpell *spell) const;
 	bool IsNameValid() const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade) const;
 	bool HasAdjacentRailForUnitType(const CUnitType *type) const;
@@ -496,7 +496,7 @@ public:
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has
 	CUpgrade *Prefix;	/// Item unit's prefix
 	CUpgrade *Suffix;	/// Item unit's suffix
-	SpellType *Spell;	/// Item unit's spell
+	CSpell *Spell;		/// Item unit's spell
 	CUpgrade *Work;		/// Item unit's literary work
 	CUpgrade *Elixir;	/// Item unit's elixir
 	CUniqueItem *Unique;		/// Whether the item is unique

@@ -64,7 +64,7 @@ void AiCheckMagic()
 				}
 			}
 			for (unsigned int j = 0; j < unit.Type->Spells.size(); ++j) {
-				SpellType *spell = unit.Type->Spells[j];
+				CSpell *spell = unit.Type->Spells[j];
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
 				if (spell->IsAvailableForUnit(unit)
 					&& spell->AICast) {

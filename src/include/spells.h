@@ -8,10 +8,10 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spells.h - The Spells. */
+/**@name spells.h - The spells header file. */
 //
-//      (c) Copyright 1999-2006 by Vladi Belperchinov-Shabanski,
-//                                 Joris DAUPHIN, and Jimmy Salmon
+//      (c) Copyright 1999-2018 by Vladi Belperchinov-Shabanski,
+//                                 Joris Dauphin, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class CUnit;
 class CUnitType;
 class CPlayer;
 struct lua_State;
-class SpellType;
+class CSpell;
 class MissileType;
 //Wyrmgus start
 class CFaction;
@@ -69,7 +69,7 @@ public:
 	SpellActionType(int mod = 0) : ModifyManaCaster(mod) {};
 	virtual ~SpellActionType() {};
 
-	virtual int Cast(CUnit &caster, const SpellType &spell,
+	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
@@ -95,21 +95,13 @@ enum TargetType {
 class Target
 {
 public:
-	//Wyrmgus start
-//	Target(TargetType type, CUnit *unit, const Vec2i &pos) :
 	Target(TargetType type, CUnit *unit, const Vec2i &pos, int z) :
-	//Wyrmgus end
-		//Wyrmgus start
-//		Type(type), Unit(unit), targetPos(pos) {}
 		Type(type), Unit(unit), targetPos(pos), MapLayer(z) {}
-		//Wyrmgus end
 
 	TargetType Type;                  /// type of target.
 	CUnit *Unit;                      /// Unit target.
 	Vec2i targetPos;
-	//Wyrmgus start
 	int MapLayer;
-	//Wyrmgus end
 };
 
 /*
@@ -223,12 +215,20 @@ public:
 /**
 **  Base structure of a spell type.
 */
-class SpellType
+class CSpell
 {
 public:
-	SpellType(int slot, const std::string &ident);
-	~SpellType();
+	CSpell(int slot, const std::string &ident);
+	~CSpell();
 
+	/// return spell type by ident string
+	static CSpell *GetSpell(const std::string &ident, const bool should_find = true);
+	static CSpell *GetOrAddSpell(const std::string &ident);
+	static void ClearSpells();
+
+	static std::vector<CSpell *> Spells;
+	static std::map<std::string, CSpell *> SpellsByIdent;
+	
 	/// return 1 if spell is available, 0 if not (must upgrade)
 	bool IsAvailableForUnit(const CUnit &unit) const;
 	const AutoCastInfo *GetAutoCastInfo(const bool ai) const;
@@ -239,9 +239,7 @@ public:
 	// Identification stuff
 	std::string Ident;    /// Spell unique identifier (spell-holy-vision)
 	std::string Name;     /// Spell name shown by the engine
-	//Wyrmgus start
 	std::string Description;	/// Spell description
-	//Wyrmgus end
 	int Slot;             /// Spell numeric identifier
 
 	// Spell Specifications
@@ -281,12 +279,6 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-/**
-**  Define the names and effects of all available spells.
-*/
-extern std::vector<SpellType *> SpellTypeTable;
-
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -297,28 +289,22 @@ extern void SpellCclRegister();
 /// init spell tables
 extern void InitSpells();
 
-/// done spell tables
-extern void CleanSpells();
-
 /// returns true if spell can be casted (enough mana, valid target)
-extern bool CanCastSpell(const CUnit &caster, const SpellType &spell,
+extern bool CanCastSpell(const CUnit &caster, const CSpell &spell,
 						 //Wyrmgus start
 //						 const CUnit *target, const Vec2i &goalPos);
 						 const CUnit *target, const Vec2i &goalPos, int z);
 						 //Wyrmgus end
 
 /// cast spell on target unit or place at x,y
-extern int SpellCast(CUnit &caster, const SpellType &spell,
+extern int SpellCast(CUnit &caster, const CSpell &spell,
 					 //Wyrmgus start
 //					 CUnit *target, const Vec2i &goalPos);
 					 CUnit *target, const Vec2i &goalPos, int z);
 					 //Wyrmgus end
 
 /// auto cast the spell if possible
-extern int AutoCastSpell(CUnit &caster, const SpellType &spell);
-
-/// return spell type by ident string
-extern SpellType *SpellTypeByIdent(const std::string &ident);
+extern int AutoCastSpell(CUnit &caster, const CSpell &spell);
 
 /// return 0, 1, 2 for true, only, false.
 extern char Ccl2Condition(lua_State *l, const char *value);

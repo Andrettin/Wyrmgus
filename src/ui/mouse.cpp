@@ -249,7 +249,7 @@ static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	
 	if (unit.AutoCastSpell) {
 		for (size_t i = 0; i < unit.Type->Spells.size(); ++i) {
-			SpellType *spell = unit.Type->Spells[i];
+			CSpell *spell = unit.Type->Spells[i];
 			if (unit.CanAutoCastSpell(spell)) {
 				const AutoCastInfo *autocast = spell->GetAutoCastInfo(unit.Player->AiEnabled);
 				
@@ -2060,7 +2060,7 @@ static int SendSpellCast(const Vec2i &tilePos, int flush)
 			continue;
 		}
 		// CursorValue here holds the spell type id
-		const SpellType *spell = SpellTypeTable[CursorValue];
+		const CSpell *spell = CSpell::Spells[CursorValue];
 		if (!spell) {
 			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
 			ExitFatal(1);

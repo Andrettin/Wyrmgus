@@ -1286,9 +1286,9 @@ void CUnitType::SetParent(CUnitType *parent_type)
 		this->Spells.push_back(parent_type->Spells[i]);
 	}
 	if (parent_type->AutoCastActive) {
-		this->AutoCastActive = new char[SpellTypeTable.size()];
-		memset(this->AutoCastActive, 0, SpellTypeTable.size() * sizeof(char));
-		for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
+		this->AutoCastActive = new char[CSpell::Spells.size()];
+		memset(this->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
+		for (unsigned int i = 0; i < CSpell::Spells.size(); ++i) {
 			this->AutoCastActive[i] = parent_type->AutoCastActive[i];
 		}
 	}

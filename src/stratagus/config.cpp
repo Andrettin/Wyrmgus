@@ -48,6 +48,7 @@
 #include "plane.h"
 #include "religion/deity.h"
 #include "sound.h"
+#include "spells.h"
 #include "time/calendar.h"
 #include "time/season.h"
 #include "time/season_schedule.h"

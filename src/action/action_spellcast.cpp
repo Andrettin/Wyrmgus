@@ -70,10 +70,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-///* static */ COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast)
-/* static */ COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
-//Wyrmgus end
+/* static */ COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
 {
 	COrder_SpellCast *order = new COrder_SpellCast(isAutocast);
 
@@ -129,7 +126,7 @@
 {
 	if (!strcmp(value, "spell")) {
 		++j;
-		this->Spell = SpellTypeByIdent(LuaToString(l, -1, j + 1));
+		this->Spell = CSpell::GetSpell(LuaToString(l, -1, j + 1));
 	} else if (!strcmp(value, "range")) {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
@@ -410,7 +407,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		unit.Anim = unit.WaitBackup;
 		unit.Waiting = 0;
 	}
-	const SpellType &spell = order.GetSpell();
+	const CSpell &spell = order.GetSpell();
 	switch (this->State) {
 		case 0:
 			// Check if we can cast the spell.

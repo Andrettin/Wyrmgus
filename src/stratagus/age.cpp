@@ -60,12 +60,14 @@ std::map<std::string, CAge *> CAge::AgesByIdent;
 **
 **	@param	ident	The age's string identifier
 **
-**	@return	The age if found, null otherwise
+**	@return	The age if found, or null otherwise
 */
 CAge *CAge::GetAge(const std::string &ident, const bool should_find)
 {
-	if (AgesByIdent.find(ident) != AgesByIdent.end()) {
-		return AgesByIdent.find(ident)->second;
+	std::map<std::string, CAge *>::const_iterator find_iterator = AgesByIdent.find(ident);
+	
+	if (find_iterator != AgesByIdent.end()) {
+		return find_iterator->second;
 	}
 	
 	if (should_find) {

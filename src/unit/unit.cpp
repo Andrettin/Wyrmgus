@@ -1820,7 +1820,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 	this->UpdateItemName();
 }
 
-void CUnit::SetSpell(SpellType *spell)
+void CUnit::SetSpell(CSpell *spell)
 {
 	if (!IsNetworkGame() && Container && Container->Character && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != nullptr && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Spell = spell;
@@ -2189,7 +2189,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 
 void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
 {
-	std::vector<SpellType *> potential_spells;
+	std::vector<CSpell *> potential_spells;
 	if (dropper != nullptr) {
 		for (size_t i = 0; i < dropper->Type->DropSpells.size(); ++i) {
 			if (this->Type->ItemClass != -1 && dropper->Type->DropSpells[i]->ItemSpell[Type->ItemClass]) {
@@ -2560,13 +2560,13 @@ void CUnit::Init(const CUnitType &type)
 //	if (type.CanCastSpell) {
 	//to avoid crashes with spell items for units who cannot ordinarily cast spells
 	//Wyrmgus end
-		AutoCastSpell = new char[SpellTypeTable.size()];
-		SpellCoolDownTimers = new int[SpellTypeTable.size()];
-		memset(SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
+		AutoCastSpell = new char[CSpell::Spells.size()];
+		SpellCoolDownTimers = new int[CSpell::Spells.size()];
+		memset(SpellCoolDownTimers, 0, CSpell::Spells.size() * sizeof(int));
 		if (Type->AutoCastActive) {
-			memcpy(AutoCastSpell, Type->AutoCastActive, SpellTypeTable.size());
+			memcpy(AutoCastSpell, Type->AutoCastActive, CSpell::Spells.size());
 		} else {
-			memset(AutoCastSpell, 0, SpellTypeTable.size());
+			memset(AutoCastSpell, 0, CSpell::Spells.size());
 		}
 	//Wyrmgus start
 //	}
@@ -5712,7 +5712,7 @@ bool CUnit::CanCastAnySpell() const
 **
 **	@return	True if the unit can autocast the spell, false otherwise
 */
-bool CUnit::CanAutoCastSpell(const SpellType *spell) const
+bool CUnit::CanAutoCastSpell(const CSpell *spell) const
 {
 	if (!this->AutoCastSpell || !spell || !this->AutoCastSpell[spell->Slot] || !spell->AutoCast) {
 		return false;
@@ -6080,7 +6080,7 @@ bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 	return false;
 }
 
-bool CUnit::IsSpellEmpowered(const SpellType *spell) const
+bool CUnit::IsSpellEmpowered(const CSpell *spell) const
 {
 	if (spell->DependencyId != -1) {
 		return this->IsAbilityEmpowered(AllUpgrades[spell->DependencyId]);

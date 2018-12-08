@@ -357,7 +357,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "suffix")) {
 			unit->Suffix = CUpgrade::Get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "spell")) {
-			unit->Spell = SpellTypeByIdent(LuaToString(l, 2, j + 1));
+			unit->Spell = CSpell::GetSpell(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "work")) {
 			unit->Work = CUpgrade::Get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "elixir")) {
@@ -673,22 +673,22 @@ static int CclUnit(lua_State *l)
 			unit->Goal = &UnitManager.GetSlotUnit(LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "auto-cast")) {
 			const char *s = LuaToString(l, 2, j + 1);
-			Assert(SpellTypeByIdent(s));
+			Assert(CSpell::GetSpell(s));
 			if (!unit->AutoCastSpell) {
-				unit->AutoCastSpell = new char[SpellTypeTable.size()];
-				memset(unit->AutoCastSpell, 0, SpellTypeTable.size());
+				unit->AutoCastSpell = new char[CSpell::Spells.size()];
+				memset(unit->AutoCastSpell, 0, CSpell::Spells.size());
 			}
-			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
+			unit->AutoCastSpell[CSpell::GetSpell(s)->Slot] = 1;
 		} else if (!strcmp(value, "spell-cooldown")) {
 			lua_rawgeti(l, 2, j + 1);
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != SpellTypeTable.size()) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != CSpell::Spells.size()) {
 				LuaError(l, "incorrect argument");
 			}
 			if (!unit->SpellCoolDownTimers) {
-				unit->SpellCoolDownTimers = new int[SpellTypeTable.size()];
-				memset(unit->SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
+				unit->SpellCoolDownTimers = new int[CSpell::Spells.size()];
+				memset(unit->SpellCoolDownTimers, 0, CSpell::Spells.size() * sizeof(int));
 			}
-			for (size_t k = 0; k < SpellTypeTable.size(); ++k) {
+			for (size_t k = 0; k < CSpell::Spells.size(); ++k) {
 				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);
 			}
 			lua_pop(l, 1);
@@ -2000,8 +2000,8 @@ static int CclSetUnitVariable(lua_State *l)
 		std::string spell_ident = LuaToString(l, 3);
 		if (spell_ident.empty()) {
 			unit->SetSpell(nullptr);
-		} else if (SpellTypeByIdent(spell_ident)) {
-			unit->SetSpell(SpellTypeByIdent(spell_ident));
+		} else if (CSpell::GetSpell(spell_ident)) {
+			unit->SetSpell(CSpell::GetSpell(spell_ident));
 		} else {
 			LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
 		}

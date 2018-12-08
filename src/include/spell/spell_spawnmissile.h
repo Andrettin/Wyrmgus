@@ -73,7 +73,7 @@ public:
 	AlwaysHits(false), AlwaysCritical(false),
 	//Wyrmgus end
 		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {}
-	virtual int Cast(CUnit &caster, const SpellType &spell,
+	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *lua, int startIndex, int endIndex);
 

@@ -230,7 +230,7 @@ enum {
 					}
 					PlayUnitSound(*goal->ConnectingDestination, VoiceUsed);
 				} else if (goal->Spell != nullptr) {
-					CommandSpellCast(unit, unit.tilePos, nullptr, *SpellTypeTable[goal->Spell->Slot], FlushCommands, unit.MapLayer->ID);
+					CommandSpellCast(unit, unit.tilePos, nullptr, *goal->Spell, FlushCommands, unit.MapLayer->ID);
 				} else if (goal->Work != nullptr) {
 					unit.ReadWork(goal->Work);
 					if (unit.Player == ThisPlayer) {

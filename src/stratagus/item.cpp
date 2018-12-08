@@ -412,7 +412,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "spell") {
 			value = FindAndReplaceString(value, "_", "-");
-			SpellType *spell = SpellTypeByIdent(value);
+			CSpell *spell = CSpell::GetSpell(value);
 			if (spell) {
 				this->Spell = spell;
 			} else {

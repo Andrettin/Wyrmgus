@@ -217,13 +217,13 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 	} else if (s[0] == 's') { //spell type detected
 		Assert(goal->CurrentAction() == UnitActionSpellCast);
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
-		const SpellType &spell = order.GetSpell();
+		const CSpell &spell = order.GetSpell();
 		if (!strcmp(spell.Ident.c_str(), cur)) {
 			return 1;
 		}
 		return 0;
 	} else if (s[0] == 'S') { // check if autocast for this spell available
-		const SpellType *spell = SpellTypeByIdent(cur);
+		const CSpell *spell = CSpell::GetSpell(cur);
 		if (!spell) {
 			fprintf(stderr, "Invalid spell: '%s'\n", cur);
 			ExitFatal(1);

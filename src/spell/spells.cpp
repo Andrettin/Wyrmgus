@@ -62,9 +62,10 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** Define the names and effects of all im play available spells.
+** Define the names and effects of all available spells in the game
 */
-std::vector<SpellType *> SpellTypeTable;
+std::vector<CSpell *> CSpell::Spells;
+std::map<std::string, CSpell *> CSpell::SpellsByIdent;
 
 
 /*----------------------------------------------------------------------------
@@ -102,11 +103,8 @@ static Target *NewTargetUnit(CUnit &unit)
 **
 **  @return            true if passed, false otherwise.
 */
-static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUnit *target,
-						  //Wyrmgus start
-//						  const Vec2i &goalPos, const ConditionInfo *condition)
+static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit *target,
 						  const Vec2i &goalPos, const ConditionInfo *condition, int z)
-						  //Wyrmgus end
 {
 	if (caster.Variable[MANA_INDEX].Value < spell.ManaCost) { // Check caster mana.
 		return false;
@@ -286,13 +284,109 @@ private:
 };
 
 /**
+**  Spell constructor.
+*/
+CSpell::CSpell(int slot, const std::string &ident) :
+	Ident(ident), Slot(slot), Target(), Action(),
+	Range(0), ManaCost(0), RepeatCast(0), CoolDown(0),
+	DependencyId(-1), Condition(nullptr),
+	AutoCast(nullptr), AICast(nullptr), ForceUseAnimation(false)
+{
+	memset(Costs, 0, sizeof(Costs));
+	//Wyrmgus start
+	memset(ItemSpell, 0, sizeof(ItemSpell));
+	//Wyrmgus end
+}
+
+/**
+**  Spell destructor.
+*/
+CSpell::~CSpell()
+{
+	for (std::vector<SpellActionType *>::iterator act = Action.begin(); act != Action.end(); ++act) {
+		delete *act;
+	}
+	Action.clear();
+
+	delete Condition;
+	//
+	// Free Autocast.
+	//
+	delete AutoCast;
+	delete AICast;
+}
+
+/**
+**	@brief	Get a spell
+**
+**	@param	ident	The spell's string identifier
+**
+**	@return	The spell if found, or null otherwise
+*/
+CSpell *CSpell::GetSpell(const std::string &ident, const bool should_find)
+{
+	std::map<std::string, CSpell *>::const_iterator find_iterator = SpellsByIdent.find(ident);
+	
+	if (find_iterator != SpellsByIdent.end()) {
+		return find_iterator->second;
+	}
+	
+	if (should_find) {
+		fprintf(stderr, "Invalid spell: \"%s\".\n", ident.c_str());
+	}
+	
+	return nullptr;
+}
+
+/**
+**	@brief	Get or add a spell
+**
+**	@param	ident	The spell's string identifier
+**
+**	@return	The spell if found, otherwise a new spell is created and returned
+*/
+CSpell *CSpell::GetOrAddSpell(const std::string &ident)
+{
+	CSpell *spell = GetSpell(ident, false);
+	
+	if (!spell) {
+		spell = new CSpell(Spells.size(), ident);
+		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for casters that have already been defined
+			if (UnitTypes[i]->AutoCastActive) {
+				char *newc = new char[(Spells.size() + 1) * sizeof(char)];
+				memcpy(newc, UnitTypes[i]->AutoCastActive, Spells.size() * sizeof(char));
+				delete[] UnitTypes[i]->AutoCastActive;
+				UnitTypes[i]->AutoCastActive = newc;
+				UnitTypes[i]->AutoCastActive[Spells.size()] = 0;
+			}
+		}
+		Spells.push_back(spell);
+		SpellsByIdent[ident] = spell;
+	}
+	
+	return spell;
+}
+
+/**
+**	@brief	Remove the existing spells
+*/
+void CSpell::ClearSpells()
+{
+	DebugPrint("Cleaning spells.\n");
+	for (size_t i = 0; i < Spells.size(); ++i) {
+		delete Spells[i];
+	}
+	Spells.clear();
+}
+
+/**
 **	@brief	Get the autocast info for the spell
 **
 **	@param	ai	Whether the spell would be cast by the AI
 **
 **	@return	The autocast info for the spell if present, or null otherwise
 */
-const AutoCastInfo *SpellType::GetAutoCastInfo(const bool ai) const
+const AutoCastInfo *CSpell::GetAutoCastInfo(const bool ai) const
 {
 	if (ai && this->AICast) {
 		return this->AICast;
@@ -309,7 +403,7 @@ const AutoCastInfo *SpellType::GetAutoCastInfo(const bool ai) const
 **
 **	@return	True if the generic conditions to autocast the spell are fulfilled, or false otherwise
 */
-bool SpellType::CheckAutoCastGenericConditions(const CUnit &caster, const AutoCastInfo *autocast, const bool ignore_combat_status) const
+bool CSpell::CheckAutoCastGenericConditions(const CUnit &caster, const AutoCastInfo *autocast, const bool ignore_combat_status) const
 {
 	if (!autocast) {
 		return false;
@@ -334,7 +428,7 @@ bool SpellType::CheckAutoCastGenericConditions(const CUnit &caster, const AutoCa
 **
 **	@return	True if the generic conditions to autocast the spell are fulfilled, or false otherwise
 */
-bool SpellType::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, const AutoCastInfo *autocast, const int max_path_length) const
+bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, const AutoCastInfo *autocast, const int max_path_length) const
 {
 	if (!target || !autocast) {
 		return false;
@@ -405,7 +499,7 @@ bool SpellType::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &cast
 **
 **	@return	True if the generic conditions to autocast the spell are fulfilled, or false otherwise
 */
-std::vector<CUnit *> SpellType::GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const
+std::vector<CUnit *> CSpell::GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const
 {
 	std::vector<CUnit *> potential_targets;
 	
@@ -446,7 +540,7 @@ std::vector<CUnit *> SpellType::GetPotentialAutoCastTargets(const CUnit &caster,
 **	@todo FIXME: should be global (for AI) ???
 **	@todo FIXME: write for position target.
 */
-static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell)
+static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 {
 	const AutoCastInfo *autocast = spell.GetAutoCastInfo(caster.Player->AiEnabled);
 	Assert(autocast);
@@ -534,23 +628,6 @@ void InitSpells()
 {
 }
 
-/**
-**  Get spell-type struct pointer by string identifier.
-**
-**  @param ident  Spell identifier.
-**
-**  @return       spell-type struct pointer.
-*/
-SpellType *SpellTypeByIdent(const std::string &ident)
-{
-	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {
-		if ((*i)->Ident == ident) {
-			return *i;
-		}
-	}
-	return nullptr;
-}
-
 // ****************************************************************************
 // CanAutoCastSpell, CanCastSpell, AutoCastSpell, CastSpell.
 // ****************************************************************************
@@ -562,7 +639,7 @@ SpellType *SpellTypeByIdent(const std::string &ident)
 **
 **	@return	True if the spell is available for the unit, and false otherwise
 */
-bool SpellType::IsAvailableForUnit(const CUnit &unit) const
+bool CSpell::IsAvailableForUnit(const CUnit &unit) const
 {
 	const int dependencyId = this->DependencyId;
 
@@ -583,7 +660,7 @@ bool SpellType::IsAvailableForUnit(const CUnit &unit) const
 **  @return          =!0 if spell should/can casted, 0 if not
 **  @note caster must know the spell, and spell must be researched.
 */
-bool CanCastSpell(const CUnit &caster, const SpellType &spell,
+bool CanCastSpell(const CUnit &caster, const CSpell &spell,
 				  //Wyrmgus start
 //				  const CUnit *target, const Vec2i &goalPos)
 				  const CUnit *target, const Vec2i &goalPos, int z)
@@ -606,7 +683,7 @@ bool CanCastSpell(const CUnit &caster, const SpellType &spell,
 **
 **	@return	1 if spell is casted, 0 if not.
 */
-int AutoCastSpell(CUnit &caster, const SpellType &spell)
+int AutoCastSpell(CUnit &caster, const CSpell &spell)
 {
 	//  Check for mana and cooldown time, trivial optimization.
 	if (!caster.CanAutoCastSpell(&spell)) {
@@ -641,7 +718,7 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 **
 ** @return          !=0 if spell should/can continue or 0 to stop
 */
-int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos, int z)
+int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z)
 {
 	Vec2i pos = goalPos;
 
@@ -724,53 +801,6 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 	// Can't cast, STOP.
 	//
 	return 0;
-}
-
-
-/**
-**  SpellType constructor.
-*/
-SpellType::SpellType(int slot, const std::string &ident) :
-	Ident(ident), Slot(slot), Target(), Action(),
-	Range(0), ManaCost(0), RepeatCast(0), CoolDown(0),
-	DependencyId(-1), Condition(nullptr),
-	AutoCast(nullptr), AICast(nullptr), ForceUseAnimation(false)
-{
-	memset(Costs, 0, sizeof(Costs));
-	//Wyrmgus start
-	memset(ItemSpell, 0, sizeof(ItemSpell));
-	//Wyrmgus end
-}
-
-/**
-**  SpellType destructor.
-*/
-SpellType::~SpellType()
-{
-	for (std::vector<SpellActionType *>::iterator act = Action.begin(); act != Action.end(); ++act) {
-		delete *act;
-	}
-	Action.clear();
-
-	delete Condition;
-	//
-	// Free Autocast.
-	//
-	delete AutoCast;
-	delete AICast;
-}
-
-
-/**
-** Cleanup the spell subsystem.
-*/
-void CleanSpells()
-{
-	DebugPrint("Cleaning spells.\n");
-	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {
-		delete *i;
-	}
-	SpellTypeTable.clear();
 }
 
 //@}

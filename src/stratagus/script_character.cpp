@@ -381,9 +381,9 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					} else if (!strcmp(value, "spell")) {
 						std::string spell_ident = LuaToString(l, -1, k + 1);
-						SpellType *spell = SpellTypeByIdent(spell_ident);
+						CSpell *spell = CSpell::GetSpell(spell_ident);
 						if (spell != nullptr) {
-							item->Spell = const_cast<SpellType *>(&(*spell));
+							item->Spell = const_cast<CSpell *>(&(*spell));
 						} else {
 							fprintf(stderr, "Spell \"%s\" doesn't exist.", spell_ident.c_str());
 						}
@@ -742,9 +742,9 @@ static int CclDefineCustomHero(lua_State *l)
 						}
 					} else if (!strcmp(value, "spell")) {
 						std::string spell_ident = LuaToString(l, -1, k + 1);
-						SpellType *spell = SpellTypeByIdent(spell_ident);
+						CSpell *spell = CSpell::GetSpell(spell_ident);
 						if (spell != nullptr) {
-							item->Spell = const_cast<SpellType *>(&(*spell));
+							item->Spell = const_cast<CSpell *>(&(*spell));
 						} else {
 							fprintf(stderr, "Spell \"%s\" doesn't exist.", spell_ident.c_str());
 						}

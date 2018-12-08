@@ -47,7 +47,7 @@ public:
 	AirDamage(0), EarthDamage(0), WaterDamage(0), Range(0),
 	HackDamage(true), PierceDamage(true), BluntDamage(true), DamageSelf(true), DamageFriendly(true), DamageTerrain(true) {};
 	//Wyrmgus end
-	virtual int Cast(CUnit &caster, const SpellType &spell,
+	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 

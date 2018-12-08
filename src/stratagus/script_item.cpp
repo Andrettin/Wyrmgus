@@ -117,7 +117,7 @@ static int CclDefineUniqueItem(lua_State *l)
 			}
 		} else if (!strcmp(value, "Spell")) {
 			std::string spell_ident = LuaToString(l, -1);
-			SpellType *spell = SpellTypeByIdent(spell_ident);
+			CSpell *spell = CSpell::GetSpell(spell_ident);
 			if (spell != nullptr) {
 				item->Spell = spell;
 			} else {

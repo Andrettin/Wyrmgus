@@ -84,7 +84,7 @@
 **  @internal: vladi: blizzard differs than original in this way:
 **   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
-/* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z, int modifier)
+/* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const CSpell &, CUnit *, const Vec2i &goalPos, int z, int modifier)
 {
 	int fields = this->Fields;
 	const int shards = this->Shards;

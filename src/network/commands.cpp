@@ -704,17 +704,11 @@ void SendCommandLearnAbility(CUnit &unit, CUpgrade &what)
 ** @param spellid   Spell type id.
 ** @param flush     Flag flush all pending commands.
 */
-//Wyrmgus start
-//void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush)
 void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush, int z)
-//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
 		CommandLog("spell-cast", &unit, flush, pos.x, pos.y, dest, nullptr, spellid);
-		//Wyrmgus start
-//		CommandSpellCast(unit, pos, dest, *SpellTypeTable[spellid], flush);
-		CommandSpellCast(unit, pos, dest, *SpellTypeTable[spellid], flush, z);
-		//Wyrmgus end
+		CommandSpellCast(unit, pos, dest, *CSpell::Spells[spellid], flush, z);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
 						   unit, pos.x, pos.y, dest, nullptr, flush);
@@ -1140,7 +1134,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 					Assert(dest && dest->Type);
 				}
 				CommandLog("spell-cast", &unit, status, pos.x, pos.y, dest, nullptr, id);
-				CommandSpellCast(unit, pos, dest, *SpellTypeTable[id], status);
+				CommandSpellCast(unit, pos, dest, *CSpell::Spells[id], status);
 			} else {
 				CommandLog("auto-spell-cast", &unit, status, arg1, -1, NoUnitP, nullptr, id);
 				CommandAutoSpellCast(unit, id, arg1);

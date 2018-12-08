@@ -158,7 +158,7 @@ void CleanModules()
 	CSeasonSchedule::ClearSeasonSchedules();
 	CParticleManager::exit();
 	CleanReplayLog();
-	CleanSpells();
+	CSpell::ClearSpells();
 	FreePathfinder();
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.

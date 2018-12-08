@@ -325,22 +325,8 @@ static int CclDefineSpell(lua_State *l)
 {
 	const int args = lua_gettop(l);
 	const std::string identname = LuaToString(l, 1);
-	SpellType *spell = SpellTypeByIdent(identname);
-	if (spell != nullptr) {
-		DebugPrint("Redefining spell-type '%s'\n" _C_ identname.c_str());
-	} else {
-		spell = new SpellType(SpellTypeTable.size(), identname);
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for caster already defined
-			if (UnitTypes[i]->AutoCastActive) {
-				char *newc = new char[(SpellTypeTable.size() + 1) * sizeof(char)];
-				memcpy(newc, UnitTypes[i]->AutoCastActive, SpellTypeTable.size() * sizeof(char));
-				delete[] UnitTypes[i]->AutoCastActive;
-				UnitTypes[i]->AutoCastActive = newc;
-				UnitTypes[i]->AutoCastActive[SpellTypeTable.size()] = 0;
-			}
-		}
-		SpellTypeTable.push_back(spell);
-	}
+	CSpell *spell = CSpell::GetOrAddSpell(identname);
+
 	for (int i = 1; i < args; ++i) {
 		const char *value = LuaToString(l, i + 1);
 		++i;

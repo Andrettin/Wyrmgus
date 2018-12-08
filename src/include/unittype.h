@@ -929,12 +929,12 @@ public:
 	std::vector<CUnitType *> SpawnUnits;	/// Units which this unit can spawn.
 	std::vector<CUnitType *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<CUnitType *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
-	std::vector<SpellType *> DropSpells;	/// Spells which can be applied to dropped items
-	std::vector<CUpgrade *> Affixes;	/// Affixes which can be generated for this unit type
-	std::vector<CUpgrade *> Traits;	/// Which traits this unit type can have
+	std::vector<CSpell *> DropSpells;		/// Spells which can be applied to dropped items
+	std::vector<CUpgrade *> Affixes;		/// Affixes which can be generated for this unit type
+	std::vector<CUpgrade *> Traits;			/// Which traits this unit type can have
 	std::vector<CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
-	std::vector<CUnitType *> Trains;	/// Units trained by this unit
-	std::vector<CUnitType *> TrainedBy;	/// Units which can train this unit
+	std::vector<CUnitType *> Trains;		/// Units trained by this unit
+	std::vector<CUnitType *> TrainedBy;		/// Units which can train this unit
 	std::map<std::string, std::vector<CUnitType *>> ModTrains;	/// Units trained by this unit (as set in a mod)
 	std::map<std::string, std::vector<CUnitType *>> ModTrainedBy;	/// Units which can train this unit (as set in a mod)
 	std::map<std::string, std::vector<CUnitType *>> ModAiDrops;	/// Units dropped by this unit, if it is AI-controlled (as set in a mod)
@@ -1026,7 +1026,7 @@ public:
 	int BurnDamageRate;             /// HP burn rate per sec
 	int RepairRange;                /// Units repair range.
 #define InfiniteRepairRange INT_MAX
-	std::vector<SpellType *> Spells;	/// Spells the unit is able to cast.
+	std::vector<CSpell *> Spells;	/// Spells the unit is able to cast.
 	char *AutoCastActive;           /// Default value for autocast.
 	int AutoBuildRate;              /// The rate at which the building builds itself
 	int RandomMovementProbability;  /// Probability to move randomly.

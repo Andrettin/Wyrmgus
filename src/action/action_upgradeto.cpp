@@ -310,10 +310,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 //	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
 	if (!unit.AutoCastSpell) { //to avoid crashes with spell items for units who cannot ordinarily cast spells
 	//Wyrmgus end
-		unit.AutoCastSpell = new char[SpellTypeTable.size()];
-		unit.SpellCoolDownTimers = new int[SpellTypeTable.size()];
-		memset(unit.AutoCastSpell, 0, SpellTypeTable.size() * sizeof(char));
-		memset(unit.SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
+		unit.AutoCastSpell = new char[CSpell::Spells.size()];
+		unit.SpellCoolDownTimers = new int[CSpell::Spells.size()];
+		memset(unit.AutoCastSpell, 0, CSpell::Spells.size() * sizeof(char));
+		memset(unit.SpellCoolDownTimers, 0, CSpell::Spells.size() * sizeof(int));
 	}
 
 	if (!unit.Constructed) {

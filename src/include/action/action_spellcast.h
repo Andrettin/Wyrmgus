@@ -36,15 +36,9 @@
 
 class COrder_SpellCast : public COrder
 {
-	//Wyrmgus start
-//	friend COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast);
-	friend COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
-	//Wyrmgus end
+	friend COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
 public:
-	//Wyrmgus start
-//	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(nullptr), State(0), Range(0), isAutocast(autocast)
 	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(nullptr), State(0), Range(0), MapLayer(0), isAutocast(autocast)
-	//Wyrmgus end
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -67,13 +61,13 @@ public:
 	//Wyrmgus start
 	virtual const int GetGoalMapLayer() const;
 	//Wyrmgus end
-	const SpellType &GetSpell() const { return *Spell; }
-	void SetSpell(const SpellType &spell) { Spell = &spell; }
+	const CSpell &GetSpell() const { return *Spell; }
+	void SetSpell(const CSpell &spell) { Spell = &spell; }
 private:
 	bool CheckForDeadGoal(CUnit &unit);
 	bool SpellMoveToTarget(CUnit &unit);
 private:
-	const SpellType *Spell;
+	const CSpell *Spell;
 	int State;
 	int Range;
 	Vec2i goalPos;

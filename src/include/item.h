@@ -48,7 +48,7 @@ class CCharacter;
 class CConfigData;
 class CUnitType;
 class CUpgrade;
-class SpellType;
+class CSpell;
 class CVariable;
 
 /**
@@ -130,7 +130,7 @@ public:
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;
 	CUpgrade *Set;
-	SpellType *Spell;
+	CSpell *Spell;
 	CUpgrade *Work;
 	CUpgrade *Elixir;
 };
@@ -152,7 +152,7 @@ public:
 	CUnitType *Type;			/// Item type of the item
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;
-	SpellType *Spell;
+	CSpell *Spell;
 	CUpgrade *Work;
 	CUpgrade *Elixir;
 	CUniqueItem *Unique;

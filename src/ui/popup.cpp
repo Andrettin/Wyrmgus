@@ -319,7 +319,7 @@
 	}
 	if (Costs[ManaResCost]) {
 		const CGraphic *G = UI.Resources[ManaResCost].G;
-		const SpellType *spell = SpellTypeTable[button.Value];
+		const CSpell *spell = CSpell::Spells[button.Value];
 
 		if (spell->ManaCost) {
 			popupWidth = 10;
@@ -381,7 +381,7 @@
 		}
 	}
 	if (Costs[ManaResCost]) {
-		const SpellType &spell = *SpellTypeTable[button.Value];
+		const CSpell &spell = *CSpell::Spells[button.Value];
 		//Wyrmgus start
 //		const CGraphic *G = UI.Resources[ManaResCost].G;
 		CGraphic *G = UI.Resources[ManaResCost].G;

@@ -153,7 +153,7 @@ int AddButton(int pos, CButtonLevel *level, const std::string &icon_ident,
 		ba->ValueStr = value;
 		switch (action) {
 			case ButtonSpellCast:
-				ba->Value = SpellTypeByIdent(value)->Slot;
+				ba->Value = CSpell::GetSpell(value)->Slot;
 #ifdef DEBUG
 				if (ba->Value < 0) {
 					DebugPrint("Spell %s does not exist?\n" _C_ value.c_str());
@@ -641,7 +641,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	//Wyrmgus start
 	if (button.Action == ButtonSpellCast) {
 		if (condition->AutoCast != CONDITION_TRUE) {
-			if ((condition->AutoCast == CONDITION_ONLY) ^ (SpellTypeTable[button.Value]->AutoCast != nullptr)) {
+			if ((condition->AutoCast == CONDITION_ONLY) ^ (CSpell::Spells[button.Value]->AutoCast != nullptr)) {
 				return false;
 			}
 		}
@@ -866,8 +866,8 @@ void DrawPopup(const ButtonAction &button, int x, int y, bool above)
 			//Wyrmgus end
 			break;
 		case ButtonSpellCast:
-			memcpy(Costs, SpellTypeTable[button.Value]->Costs, sizeof(SpellTypeTable[button.Value]->Costs));
-			Costs[ManaResCost] = SpellTypeTable[button.Value]->ManaCost;
+			memcpy(Costs, CSpell::Spells[button.Value]->Costs, sizeof(CSpell::Spells[button.Value]->Costs));
+			Costs[ManaResCost] = CSpell::Spells[button.Value]->ManaCost;
 			break;
 		case ButtonBuild:
 		case ButtonTrain:
@@ -1117,10 +1117,10 @@ void CButtonPanel::Draw()
 				gray = true;
 				break;
 			} else if (buttons[i].Action == ButtonSpellCast
-					   && (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]) {
-				Assert(SpellTypeTable[buttons[i].Value]->CoolDown > 0);
+					   && (*Selected[j]).SpellCoolDownTimers[CSpell::Spells[buttons[i].Value]->Slot]) {
+				Assert(CSpell::Spells[buttons[i].Value]->CoolDown > 0);
 				cooldownSpell = true;
-				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]);
+				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[CSpell::Spells[buttons[i].Value]->Slot]);
 			}
 		}
 		//
@@ -1187,7 +1187,7 @@ void CButtonPanel::Draw()
 //			buttons[i].Icon.Icon->DrawCooldownSpellIcon(pos,
 			button_icon->DrawCooldownSpellIcon(pos,
 			//Wyrmgus end
-														maxCooldown * 100 / SpellTypeTable[buttons[i].Value]->CoolDown);
+														maxCooldown * 100 / CSpell::Spells[buttons[i].Value]->CoolDown);
 		} else if (gray) {
 			//Wyrmgus start
 //			buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
@@ -1320,7 +1320,7 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 			UI.StatusLine.SetCosts(0, 0, AllUpgrades[button.Value]->Costs);
 			break;
 		case ButtonSpellCast:
-			UI.StatusLine.SetCosts(SpellTypeTable[button.Value]->ManaCost, 0, SpellTypeTable[button.Value]->Costs);
+			UI.StatusLine.SetCosts(CSpell::Spells[button.Value]->ManaCost, 0, CSpell::Spells[button.Value]->Costs);
 			break;
 		default:
 			UI.StatusLine.ClearCosts();
@@ -1452,7 +1452,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr), true);
 			break;
 		case ButtonSpellCast:
-			res = SpellTypeTable[buttonaction.Value]->IsAvailableForUnit(unit);
+			res = CSpell::Spells[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonUnload:
 			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);
@@ -1560,7 +1560,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr));
 			break;
 		case ButtonSpellCast:
-			res = SpellTypeTable[buttonaction.Value]->IsAvailableForUnit(unit);
+			res = CSpell::Spells[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonFaction:
 			res = ThisPlayer->CanFoundFaction(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttonaction.Value]);
@@ -1925,7 +1925,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 	if (KeyModifiers & ModifierControl) {
 		int autocast = 0;
 
-		if (!SpellTypeTable[spellId]->AutoCast) {
+		if (!CSpell::Spells[spellId]->AutoCast) {
 			PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
 			return;
 		}
@@ -1946,7 +1946,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		}
 		return;
 	}
-	if (SpellTypeTable[spellId]->IsCasterOnly()) {
+	if (CSpell::Spells[spellId]->IsCasterOnly()) {
 		const int flush = !(KeyModifiers & ModifierShift);
 
 		for (size_t i = 0; i != Selected.size(); ++i) {

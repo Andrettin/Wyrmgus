@@ -46,7 +46,7 @@ class CUnit;
 class CFile;
 class CQuest;
 class CSite;
-class SpellType;
+class CSpell;
 class CUnitType;
 class CUpgrade;
 
@@ -169,10 +169,7 @@ extern void CommandCancelResearch(CUnit &unit);
 extern void CommandLearnAbility(CUnit &unit, CUpgrade &what);
 //Wyrmgus end
 /// Prepare command spellcast
-//Wyrmgus start
-//extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, bool isAutocast = false);
-extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, int z = 0, bool isAutocast = false);
-//Wyrmgus end
+extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const CSpell &spell, int flush, int z = 0, bool isAutocast = false);
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Prepare diplomacy command
