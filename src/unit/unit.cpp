@@ -5597,12 +5597,12 @@ bool CUnit::IsInCombat() const
 {
 	// Select all units around the unit
 	std::vector<CUnit *> table;
-	SelectAroundUnit(*this, 6, table, IsEnemyWith(*this->Player));
+	SelectAroundUnit(*this, this->GetReactionRange(), table, IsEnemyWith(*this->Player));
 
 	for (size_t i = 0; i < table.size(); ++i) {
 		const CUnit &target = *table[i];
 
-		if (target.IsVisibleAsGoal(*this->Player)) {
+		if (target.IsVisibleAsGoal(*this->Player) && (CanTarget(*this->Type, *target.Type) || CanTarget(*target.Type, *this->Type))) {
 			return true;
 		}
 	}
@@ -5697,12 +5697,32 @@ bool CUnit::CanReturnGoodsTo(const CUnit *dest, int resource) const
 bool CUnit::CanCastAnySpell() const
 {
 	for (size_t i = 0; i < this->Type->Spells.size(); ++i) {
-		if (SpellIsAvailable(*this, this->Type->Spells[i]->Slot)) {
+		if (this->Type->Spells[i]->IsAvailableForUnit(*this)) {
 			return true;
 		}
 	}
 	
 	return false;
+}
+
+/**
+**	@brief	Get whether the unit can autocast a given spell
+**
+**	@param	spell	The spell
+**
+**	@return	True if the unit can autocast the spell, false otherwise
+*/
+bool CUnit::CanAutoCastSpell(const SpellType *spell) const
+{
+	if (!this->AutoCastSpell || !spell || !this->AutoCastSpell[spell->Slot] || !spell->AutoCast) {
+		return false;
+	}
+	
+	if (!spell->IsAvailableForUnit(*this) || this->Variable[MANA_INDEX].Value < spell->ManaCost || this->SpellCoolDownTimers[spell->Slot]) {
+		return false;
+	}
+	
+	return true;
 }
 
 bool CUnit::IsItemEquipped(const CUnit *item) const

@@ -65,9 +65,8 @@ void AiCheckMagic()
 			}
 			for (unsigned int j = 0; j < unit.Type->Spells.size(); ++j) {
 				SpellType *spell = unit.Type->Spells[j];
-				int spell_id = spell->Slot;
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-				if (SpellIsAvailable(unit, spell_id)
+				if (spell->IsAvailableForUnit(unit)
 					&& spell->AICast) {
 					if (AutoCastSpell(unit, *spell)) {
 						break;

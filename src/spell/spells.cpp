@@ -10,8 +10,8 @@
 //
 /**@name spells.cpp - The spell cast action. */
 //
-//      (c) Copyright 1998-2012 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon, and Joris DAUPHIN
+//      (c) Copyright 1998-2018 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -127,6 +127,11 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 	if (!condition) { // no condition, pass.
 		return true;
 	}
+	
+	if (target && !target->Type->CheckUserBoolFlags(condition->BoolFlag)) {
+		return false;
+	}
+
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) { // for custom variables
 		const CUnit *unit;
 
@@ -192,9 +197,6 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 			<= 100 * unit->Variable[i].Value) {
 			return false;
 		}
-	}
-	if (target && !target->Type->CheckUserBoolFlags(condition->BoolFlag)) {
-		return false;
 	}
 
 	if (condition->CheckFunc) {
@@ -284,211 +286,237 @@ private:
 };
 
 /**
-**  Select the target for the autocast.
+**	@brief	Get the autocast info for the spell
 **
-**  @param caster    Unit who would cast the spell.
-**  @param spell     Spell-type pointer.
+**	@param	ai	Whether the spell would be cast by the AI
 **
-**  @return          Target* chosen target or Null if spell can't be cast.
-**  @todo FIXME: should be global (for AI) ???
-**  @todo FIXME: write for position target.
+**	@return	The autocast info for the spell if present, or null otherwise
+*/
+const AutoCastInfo *SpellType::GetAutoCastInfo(const bool ai) const
+{
+	if (ai && this->AICast) {
+		return this->AICast;
+	} else {
+		return this->AutoCast;
+	}
+}
+
+/**
+**	@brief	Check whether the given caster passes the spell's generic autocast conditions
+**
+**	@param	caster		The caster
+**	@param	autocast	The autocast information for the spell
+**
+**	@return	True if the generic conditions to autocast the spell are fulfilled, or false otherwise
+*/
+bool SpellType::CheckAutoCastGenericConditions(const CUnit &caster, const AutoCastInfo *autocast, const bool ignore_combat_status) const
+{
+	if (!autocast) {
+		return false;
+	}
+	
+	if (!ignore_combat_status && autocast->Combat != CONDITION_TRUE) {
+		if ((autocast->Combat == CONDITION_ONLY) ^ (caster.IsInCombat())) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Get whether the given unit is a valid autocast target
+**
+**	@param	target			The potential target for the spell
+**	@param	caster			The caster for the spell
+**	@param	autocast		The autocast information for the spell
+**	@param	max_path_length	The maximum length the caster may move to the target; 0 by default, which means any length is accepted
+**
+**	@return	True if the generic conditions to autocast the spell are fulfilled, or false otherwise
+*/
+bool SpellType::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, const AutoCastInfo *autocast, const int max_path_length) const
+{
+	if (!target || !autocast) {
+		return false;
+	}
+	
+	// Check if unit is in battle
+	if (this->Target == TargetUnit) {
+		if (autocast->Attacker == CONDITION_ONLY) {
+			const int react_range = target->GetReactionRange();
+			if (
+				(
+					target->CurrentAction() != UnitActionAttack
+					&& target->CurrentAction() != UnitActionAttackGround
+					&& target->CurrentAction() != UnitActionSpellCast
+				)
+				|| target->CurrentOrder()->HasGoal() == false
+				|| target->MapDistanceTo(target->CurrentOrder()->GetGoalPos(), target->CurrentOrder()->GetGoalMapLayer()) > react_range
+			) {
+				return false;
+			}
+		}
+	}
+	
+	// Check for corpse
+	if (autocast->Corpse == CONDITION_ONLY) {
+		if (target->CurrentAction() != UnitActionDie) {
+			return false;
+		}
+	} else if (autocast->Corpse == CONDITION_FALSE) {
+		if (target->CurrentAction() == UnitActionDie || target->IsAlive() == false) {
+			return false;
+		}
+	}
+	
+	//Wyrmgus start
+	if (this->Target == TargetUnit) {
+		//if caster is terrified, don't target enemy units
+		if (caster.Variable[TERROR_INDEX].Value > 0 && caster.IsEnemy(*target)) {
+			return false;
+		}
+	}
+	//Wyrmgus end
+	
+	if (!PassCondition(caster, *this, target, caster.tilePos, this->Condition, target->MapLayer->ID) || !PassCondition(caster, *this, target, caster.tilePos, autocast->Condition, target->MapLayer->ID)) {
+		return false;
+	}
+
+	//Wyrmgus start
+	int range = this->Range;
+	if (Map.IsLayerUnderground(target->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.tilePos, target->tilePos, MapFieldAirUnpassable, target->MapLayer->ID)) {
+		range = 1; //if there are e.g. dungeon walls between the caster and the target, the unit reachable check must see if the target is reachable with a range of 1 instead of the spell's normal range (to make sure the spell can be cast; spells can't be cast through dungeon walls)
+	}
+
+	//pathfinding is expensive performance-wise, so we leave this check for last
+	if (!UnitReachable(caster, *target, range, max_path_length)) {
+		return false;
+	}
+	//Wyrmgus end
+
+	return true;
+}
+
+/**
+**	@brief	Check whether the given caster passes the spell's generic autocast conditions
+**
+**	@param	caster		The caster
+**	@param	autocast	The autocast information for the spell
+**
+**	@return	True if the generic conditions to autocast the spell are fulfilled, or false otherwise
+*/
+std::vector<CUnit *> SpellType::GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const
+{
+	std::vector<CUnit *> potential_targets;
+	
+	if (!autocast) {
+		return potential_targets;
+	}
+	
+	int range = autocast->Range;
+	int min_range = autocast->MinRange;
+
+	if (caster.CurrentAction() == UnitActionStandGround) {
+		range = std::min(range, this->Range);
+	}
+	
+	//select all units around the caster
+	SelectAroundUnit(caster, range, potential_targets, OutOfMinRange(min_range, caster.tilePos, caster.MapLayer->ID));
+	
+	//check each unit to see if it is a possible target
+	int n = 0;
+	for (size_t i = 0; i != potential_targets.size(); ++i) {
+		if (this->IsUnitValidAutoCastTarget(potential_targets[i], caster, autocast, caster.GetReactionRange() * 8)) {
+			potential_targets[n++] = potential_targets[i];
+		}
+	}
+	
+	potential_targets.resize(n);
+
+	return potential_targets;
+}
+
+/**
+**	@brief	Select the target for the autocast.
+**
+**	@param	caster	Unit who would cast the spell.
+**	@param	spell	Spell-type pointer.
+**
+**	@return	Target* chosen target or Null if spell can't be cast.
+**	@todo FIXME: should be global (for AI) ???
+**	@todo FIXME: write for position target.
 */
 static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell)
 {
-	AutoCastInfo *autocast;
-
-	// Ai cast should be a lot better. Use autocast if not found.
-	if (caster.Player->AiEnabled && spell.AICast) {
-		autocast = spell.AICast;
-	} else {
-		autocast = spell.AutoCast;
-	}
+	const AutoCastInfo *autocast = spell.GetAutoCastInfo(caster.Player->AiEnabled);
 	Assert(autocast);
+	
+	if (!spell.CheckAutoCastGenericConditions(caster, autocast)) {
+		return nullptr;
+	}
+	
 	const Vec2i &pos = caster.tilePos;
 	int z = caster.MapLayer->ID;
 	int range = autocast->Range;
 	int minRange = autocast->MinRange;
-	//Wyrmgus start
+
 	if (caster.CurrentAction() == UnitActionStandGround) {
 		range = std::min(range, spell.Range);
 	}
-	//Wyrmgus end
 
-	// Select all units aroung the caster
+	// Select all units around the caster
 	std::vector<CUnit *> table;
-	//Wyrmgus start
-//	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos));
 	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos, caster.MapLayer->ID));
-	//Wyrmgus end
 
-	// Check generic conditions. FIXME: a better way to do this?
-	if (autocast->Combat != CONDITION_TRUE) {
-		// Check each unit if it is hostile.
-		bool inCombat = false;
-		for (size_t i = 0; i < table.size(); ++i) {
-			const CUnit &target = *table[i];
-
-			// Note that CanTarget doesn't take into account (offensive) spells...
-			if (target.IsVisibleAsGoal(*caster.Player) && caster.IsEnemy(target)
-				&& (CanTarget(*caster.Type, *target.Type) || CanTarget(*target.Type, *caster.Type))) {
-				inCombat = true;
-				break;
-			}
+	if (spell.Target == TargetSelf) {
+		if (PassCondition(caster, spell, &caster, caster.tilePos, spell.Condition, z) && PassCondition(caster, spell, &caster, caster.tilePos, autocast->Condition, z)) {
+			return NewTargetUnit(caster);
 		}
-		if ((autocast->Combat == CONDITION_ONLY) ^ (inCombat)) {
+	} else if (spell.Target == TargetPosition) {
+		if (!autocast->PositionAutoCast) {
 			return nullptr;
 		}
+		
+		std::vector<CUnit *> table = spell.GetPotentialAutoCastTargets(caster, autocast);
+		
+		if (!table.empty()) {
+			if (autocast->PriorytyVar != ACP_NOVALUE) {
+				std::sort(table.begin(), table.end(), AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
+			}
+			std::vector<int> array(table.size() + 1);
+			for (size_t i = 1; i < array.size(); ++i) {
+				array[i] = UnitNumber(*table[i - 1]);
+			}
+			array[0] = UnitNumber(caster);
+			autocast->PositionAutoCast->pushPreamble();
+			autocast->PositionAutoCast->pushIntegers(array);
+			autocast->PositionAutoCast->run(2);
+			Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
+			if (Map.Info.IsPointOnMap(resPos, z)) {
+				Target *target = new Target(TargetPosition, nullptr, resPos, z);
+				return target;
+			}
+		}
+	} else if (spell.Target == TargetUnit) {
+		std::vector<CUnit *> table = spell.GetPotentialAutoCastTargets(caster, autocast);
+		//now select the best unit to target.
+		if (!table.empty()) {
+			// For the best target???
+			if (autocast->PriorytyVar != ACP_NOVALUE) {
+				std::sort(table.begin(), table.end(), AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
+				return NewTargetUnit(*table[0]);
+			} else { // Use the old behavior
+				return NewTargetUnit(*table[SyncRand() % table.size()]);
+			}
+		}
+	} else {
+		// Something is wrong
+		DebugPrint("Spell is screwed up, unknown target type\n");
+		Assert(0);
+		return nullptr;
 	}
 
-	switch (spell.Target) {
-		case TargetSelf :
-			//Wyrmgus start
-//			if (PassCondition(caster, spell, &caster, pos, spell.Condition)
-			if (PassCondition(caster, spell, &caster, pos, spell.Condition, z)
-			//Wyrmgus end
-				//Wyrmgus start
-//				&& PassCondition(caster, spell, &caster, pos, autocast->Condition)) {
-				&& PassCondition(caster, spell, &caster, pos, autocast->Condition, z)) {
-				//Wyrmgus end
-				return NewTargetUnit(caster);
-			}
-			return nullptr;
-		case TargetPosition: {
-			if (autocast->PositionAutoCast && table.empty() == false) {
-				size_t count = 0;
-				for (size_t i = 0; i != table.size(); ++i) {
-					// Check for corpse
-					if (autocast->Corpse == CONDITION_ONLY) {
-						if (table[i]->CurrentAction() != UnitActionDie) {
-							continue;
-						}
-					} else if (autocast->Corpse == CONDITION_FALSE) {
-						if (table[i]->CurrentAction() == UnitActionDie || table[i]->IsAlive() == false) {
-							continue;
-						}
-					}
-					//Wyrmgus start
-					if (Map.IsLayerUnderground(table[i]->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.tilePos, table[i]->tilePos, MapFieldAirUnpassable, table[i]->MapLayer->ID)) {
-						continue;
-					}
-
-					if (!UnitReachable(caster, *table[i], spell.Range, caster.GetReactionRange() * 8)) {
-						continue;
-					}
-					//Wyrmgus end
-					//Wyrmgus start
-//					if (PassCondition(caster, spell, table[i], pos, spell.Condition)
-					if (PassCondition(caster, spell, table[i], pos, spell.Condition, z)
-					//Wyrmgus end
-						//Wyrmgus start
-//						&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
-						&& PassCondition(caster, spell, table[i], pos, autocast->Condition, z)) {
-						//Wyrmgus end
-							table[count++] = table[i];
-					}
-				}
-				if (count > 0) {
-					if (autocast->PriorytyVar != ACP_NOVALUE) {
-						std::sort(table.begin(), table.begin() + count,
-							AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
-					}
-					std::vector<int> array(count + 1);
-					for (size_t i = 1; i != count + 1; ++i) {
-						array[i] = UnitNumber(*table[i - 1]);
-					}
-					array[0] = UnitNumber(caster);
-					autocast->PositionAutoCast->pushPreamble();
-					autocast->PositionAutoCast->pushIntegers(array);
-					autocast->PositionAutoCast->run(2);
-					Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
-					if (Map.Info.IsPointOnMap(resPos, z)) {
-						Target *target = new Target(TargetPosition, nullptr, resPos, z);
-						return target;
-					}
-				}
-			}
-			return 0;
-		}
-		case TargetUnit: {
-			// The units are already selected.
-			//  Check every unit if it is a possible target
-
-			int n = 0;
-			for (size_t i = 0; i != table.size(); ++i) {
-				// Check if unit in battle
-				if (autocast->Attacker == CONDITION_ONLY) {
-					//Wyrmgus start
-//					const int range = table[i]->Player->Type == PlayerPerson ? table[i]->Type->ReactRangePerson : table[i]->Type->ReactRangeComputer;
-					const int react_range = table[i]->GetReactionRange();
-					//Wyrmgus end
-					if ((table[i]->CurrentAction() != UnitActionAttack
-						 && table[i]->CurrentAction() != UnitActionAttackGround
-						 && table[i]->CurrentAction() != UnitActionSpellCast)
-						|| table[i]->CurrentOrder()->HasGoal() == false
-						//Wyrmgus start
-//						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos()) > range) {
-						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos(), table[i]->CurrentOrder()->GetGoalMapLayer()) > react_range) {
-						//Wyrmgus end
-						continue;
-					}
-				}
-				// Check for corpse
-				if (autocast->Corpse == CONDITION_ONLY) {
-					if (table[i]->CurrentAction() != UnitActionDie) {
-						continue;
-					}
-				} else if (autocast->Corpse == CONDITION_FALSE) {
-					if (table[i]->CurrentAction() == UnitActionDie) {
-						continue;
-					}
-				}
-				//Wyrmgus start
-				//if caster is terrified, don't target enemy units
-				if (caster.Variable[TERROR_INDEX].Value > 0 && caster.IsEnemy(*table[i])) {
-					continue;
-				}
-				//Wyrmgus end
-				//Wyrmgus start
-				if (Map.IsLayerUnderground(table[i]->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.tilePos, table[i]->tilePos, MapFieldAirUnpassable, table[i]->MapLayer->ID)) {
-					continue;
-				}
-
-				if (!UnitReachable(caster, *table[i], spell.Range, caster.GetReactionRange() * 8)) {
-					continue;
-				}
-				//Wyrmgus end
-				//Wyrmgus start
-//				if (PassCondition(caster, spell, table[i], pos, spell.Condition)
-				if (PassCondition(caster, spell, table[i], pos, spell.Condition, z)
-				//Wyrmgus end
-					//Wyrmgus start
-//					&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
-					&& PassCondition(caster, spell, table[i], pos, autocast->Condition, z)) {
-					//Wyrmgus end
-					table[n++] = table[i];
-				}
-			}
-			// Now select the best unit to target.
-			if (n != 0) {
-				// For the best target???
-				if (autocast->PriorytyVar != ACP_NOVALUE) {
-					std::sort(table.begin(), table.begin() + n,
-							  AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
-					return NewTargetUnit(*table[0]);
-				} else { // Use the old behavior
-					return NewTargetUnit(*table[SyncRand() % n]);
-				}
-			}
-			break;
-		}
-		default:
-			// Something is wrong
-			DebugPrint("Spell is screwed up, unknown target type\n");
-			Assert(0);
-			return nullptr;
-			break;
-	}
-	return nullptr; // Can't spell the auto-cast.
+	return nullptr; // cannot autocast the spell
 }
 
 // ****************************************************************************
@@ -528,18 +556,15 @@ SpellType *SpellTypeByIdent(const std::string &ident)
 // ****************************************************************************
 
 /**
-**  Check if spell is research for player \p player.
-**  @param player    player for who we want to know if he knows the spell.
-**  @param spellid   id of the spell to check.
+**	@brief	Check if a spell is available for a given unit
 **
-**  @return          0 if spell is not available, else no null.
+**	@param	unit	The unit for whom we want to know if have access to the spell
+**
+**	@return	True if the spell is available for the unit, and false otherwise
 */
-//Wyrmgus start
-//bool SpellIsAvailable(const CPlayer &player, int spellid)
-bool SpellIsAvailable(const CUnit &unit, int spellid)
-//Wyrmgus end
+bool SpellType::IsAvailableForUnit(const CUnit &unit) const
 {
-	const int dependencyId = SpellTypeTable[spellid]->DependencyId;
+	const int dependencyId = this->DependencyId;
 
 	//Wyrmgus start
 //	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
@@ -574,22 +599,17 @@ bool CanCastSpell(const CUnit &caster, const SpellType &spell,
 }
 
 /**
-**  Check if the spell can be auto cast and cast it.
+**	@brief	Check if the spell can be auto cast and cast it.
 **
-**  @param caster    Unit who can cast the spell.
-**  @param spell     Spell-type pointer.
+**	@param	caster	Unit who can cast the spell.
+**  @param	spell	Spell-type pointer.
 **
-**  @return          1 if spell is casted, 0 if not.
+**	@return	1 if spell is casted, 0 if not.
 */
 int AutoCastSpell(CUnit &caster, const SpellType &spell)
 {
 	//  Check for mana and cooldown time, trivial optimization.
-	//Wyrmgus start
-//	if (!SpellIsAvailable(*caster.Player, spell.Slot)
-	if (!SpellIsAvailable(caster, spell.Slot)
-	//Wyrmgus end
-		|| caster.Variable[MANA_INDEX].Value < spell.ManaCost
-		|| caster.SpellCoolDownTimers[spell.Slot]) {
+	if (!caster.CanAutoCastSpell(&spell)) {
 		return 0;
 	}
 	Target *target = SelectTargetUnitsOfAutoCast(caster, spell);

@@ -230,6 +230,51 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 	return false;
 }
 
+/**
+**	@brief	Autocast a spell if the target that was right-clicked on fits the autocast conditions for that spell
+**
+**	@param	unit			The potential caster
+**	@param	dest			The target unit that was clicked on
+**	@param	pos				The target position that was clicked on
+**	@param	flush			Whether to flush the current order
+**	@param	acknowledged	Whether the potential caster has already voiced an acknowledgement due to the right-click
+**
+**  @return	True if a spell was autocast, false otherwise
+*/
+static bool DoRightButton_AutoCast(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+{
+	if (dest == nullptr) {
+		return false;
+	}
+	
+	if (unit.AutoCastSpell) {
+		for (size_t i = 0; i < unit.Type->Spells.size(); ++i) {
+			SpellType *spell = unit.Type->Spells[i];
+			if (unit.CanAutoCastSpell(spell)) {
+				const AutoCastInfo *autocast = spell->GetAutoCastInfo(unit.Player->AiEnabled);
+				
+				if (!spell->CheckAutoCastGenericConditions(unit, autocast, true)) {
+					continue;
+				}
+				
+				if (spell->IsUnitValidAutoCastTarget(dest, unit, autocast)) {
+					dest->Blink = 4;
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAttack);
+						acknowledged = 1;
+					}
+					
+					SendCommandSpellCast(unit, pos, dest, spell->Slot, flush, UI.CurrentMapLayer->ID);
+					
+					return true;
+				}
+			}
+		}
+	}
+	
+	return false;
+}
+
 static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
 {
 	// Return a loaded harvester to deposit
@@ -549,21 +594,12 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 			// This is for demolition squads and such
 			Assert(unit.Type->Spells.size() > 0);
 			int spellnum = type.Spells[0]->Slot;
-			//Wyrmgus start
-//			SendCommandSpellCast(unit, pos, &dest, spellnum, flush);
 			SendCommandSpellCast(unit, pos, &dest, spellnum, flush, UI.CurrentMapLayer->ID);
-			//Wyrmgus end
 		} else {
 			if (CanTarget(type, *dest.Type)) {
-				//Wyrmgus start
-//				SendCommandAttack(unit, pos, &dest, flush);
 				SendCommandAttack(unit, pos, &dest, flush, UI.CurrentMapLayer->ID);
-				//Wyrmgus end
 			} else { // No valid target
-				//Wyrmgus start
-//				SendCommandAttack(unit, pos, NoUnitP, flush);
 				SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
-				//Wyrmgus end
 			}
 		}
 		return true;
@@ -601,10 +637,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 //		if (!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
 		if ((!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) || dest.Type->BoolFlag[BRIDGE_INDEX].value) {
 		//Wyrmgus end
-			//Wyrmgus start
-//			SendCommandMove(unit, pos, flush);
 			SendCommandMove(unit, pos, flush, UI.CurrentMapLayer->ID);
-			//Wyrmgus end
 		} else {
 			SendCommandFollow(unit, dest, flush);
 		}
@@ -880,6 +913,10 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	//Wyrmgus end
 	
 	//Wyrmgus start
+	if (DoRightButton_AutoCast(unit, dest, pos, flush, acknowledged)) {
+		return;
+	}
+
 //	if (DoRightButton_Transporter(unit, dest, flush, acknowledged)) {
 //		return;
 //	}

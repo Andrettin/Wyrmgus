@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit.h - The unit headerfile. */
+/**@name unit.h - The unit header file. */
 //
 //      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -395,6 +395,7 @@ public:
 	bool CanHarvest(const CUnit *dest, bool only_harvestable = true) const;
 	bool CanReturnGoodsTo(const CUnit *dest, int resource = 0) const;
 	bool CanCastAnySpell() const;
+	bool CanAutoCastSpell(const SpellType *spell) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemClassEquipped(int item_class) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;

@@ -1452,10 +1452,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr), true);
 			break;
 		case ButtonSpellCast:
-			//Wyrmgus start
-//			res = SpellIsAvailable(*unit.Player, buttonaction.Value);
-			res = SpellIsAvailable(unit, buttonaction.Value);
-			//Wyrmgus end
+			res = SpellTypeTable[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonUnload:
 			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);
@@ -1563,7 +1560,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr));
 			break;
 		case ButtonSpellCast:
-			res = SpellIsAvailable(unit, buttonaction.Value);
+			res = SpellTypeTable[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonFaction:
 			res = ThisPlayer->CanFoundFaction(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[buttonaction.Value]);

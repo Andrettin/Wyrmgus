@@ -336,9 +336,9 @@ static bool PickUpItem(CUnit &unit)
 //Wyrmgus end
 
 /**
-**  Auto cast a spell if possible
+**	@brief	Auto cast a spell if possible
 **
-**  @return  true if a spell was auto cast, false otherwise
+**	@return	True if a spell was auto cast, false otherwise
 */
 bool AutoCast(CUnit &unit)
 {

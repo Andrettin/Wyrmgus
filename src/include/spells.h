@@ -229,6 +229,13 @@ public:
 	SpellType(int slot, const std::string &ident);
 	~SpellType();
 
+	/// return 1 if spell is available, 0 if not (must upgrade)
+	bool IsAvailableForUnit(const CUnit &unit) const;
+	const AutoCastInfo *GetAutoCastInfo(const bool ai) const;
+	bool CheckAutoCastGenericConditions(const CUnit &caster, const AutoCastInfo *autocast, const bool ignore_combat_status = false) const;
+	bool IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster, const AutoCastInfo *autocast, const int max_path_length = 0) const;
+	std::vector<CUnit *> GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const;
+	
 	// Identification stuff
 	std::string Ident;    /// Spell unique identifier (spell-holy-vision)
 	std::string Name;     /// Spell name shown by the engine
@@ -292,12 +299,6 @@ extern void InitSpells();
 
 /// done spell tables
 extern void CleanSpells();
-
-/// return 1 if spell is available, 0 if not (must upgrade)
-//Wyrmgus start
-//extern bool SpellIsAvailable(const CPlayer &player, int SpellId);
-extern bool SpellIsAvailable(const CUnit &unit, int SpellId);
-//Wyrmgus end
 
 /// returns true if spell can be casted (enough mana, valid target)
 extern bool CanCastSpell(const CUnit &caster, const SpellType &spell,
