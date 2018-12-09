@@ -327,7 +327,7 @@ PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer
 }
 
 //Wyrmgus start
-CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, bool overlay, int z) const
+CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const
 {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
@@ -342,7 +342,7 @@ CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, bool overlay, int z) const
 	}
 }
 
-CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen, int z, bool ignore_destroyed) const
+CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed) const
 {
 	if (!Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
@@ -2446,11 +2446,24 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	}
 	
 	CTerrainType *terrain_type = generated_terrain->TerrainType;
-	const int seed_count = generated_terrain->Seeds;
+	const int seed_count = generated_terrain->SeedCount;
 	
 	Vec2i random_pos(0, 0);
-	int count = generated_terrain->Seeds;
+	int count = generated_terrain->SeedCount;
 	int while_count = 0;
+	
+	std::vector<Vec2i> seeds;
+	
+	if (generated_terrain->UseExistingAsSeeds) { //use existing tiles of the given terrains as seeds for the terrain generation
+		for (int x = min_pos.x; x <= max_pos.x; ++x) {
+			for (int y = min_pos.y; y <= max_pos.y; ++y) {
+				Vec2i tile_pos(x, y);
+				if (this->GetTileTopTerrain(tile_pos, false, z) == terrain_type) {
+					seeds.push_back(tile_pos);
+				}
+			}
+		}
+	}
 	
 	// create initial seeds
 	while (count > 0 && while_count < seed_count * 100) {
@@ -2461,7 +2474,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 			continue;
 		}
 		
-		CTerrainType *tile_terrain = GetTileTerrain(random_pos, false, z);
+		CTerrainType *tile_terrain = this->GetTileTerrain(random_pos, false, z);
 		
 		if (
 			(
@@ -2532,6 +2545,10 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->SetTerrain(terrain_type);
 				this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->SetTerrain(terrain_type);
 				count -= 1;
+				seeds.push_back(random_pos);
+				seeds.push_back(adjacent_pos);
+				seeds.push_back(Vec2i(random_pos.x, adjacent_pos.y));
+				seeds.push_back(Vec2i(adjacent_pos.x, random_pos.y));
 			}
 		}
 		
@@ -2539,25 +2556,21 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	}
 	
 	// expand seeds
-	const int expansion_number = generated_terrain->Seeds * 64;
-	count = expansion_number;
-	while_count = 0;
-	
-	while (count > 0 && while_count < expansion_number * 100) {
-		random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
-		random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
+	for (size_t i = 0; i < seeds.size(); ++i) {
+		Vec2i &seed_pos = seeds[i];
 		
-		if (
-			this->Info.IsPointOnMap(random_pos, z)
-			&& GetTileTopTerrain(random_pos, false, z) == terrain_type
-			&& (!terrain_type->Overlay || this->TileBordersOnlySameTerrain(random_pos, terrain_type, z))
-		) {
+		const int random_number = SyncRand(100);
+		if (random_number >= generated_terrain->ExpansionChance) {
+			continue;
+		}
+		
+		if (!terrain_type->Overlay || this->TileBordersOnlySameTerrain(seed_pos, terrain_type, z)) {
 			std::vector<Vec2i> adjacent_positions;
 			for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
 				for (int sub_y = -1; sub_y <= 1; sub_y += 2) {
-					Vec2i diagonal_pos(random_pos.x + sub_x, random_pos.y + sub_y);
-					Vec2i vertical_pos(random_pos.x, random_pos.y + sub_y);
-					Vec2i horizontal_pos(random_pos.x + sub_x, random_pos.y);
+					Vec2i diagonal_pos(seed_pos.x + sub_x, seed_pos.y + sub_y);
+					Vec2i vertical_pos(seed_pos.x, seed_pos.y + sub_y);
+					Vec2i horizontal_pos(seed_pos.x + sub_x, seed_pos.y);
 					if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
 						continue;
 					}
@@ -2598,17 +2611,18 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
 				if (!terrain_type->Overlay) {
 					this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
-					this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->RemoveOverlayTerrain();
-					this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->RemoveOverlayTerrain();
+					this->Field(Vec2i(seed_pos.x, adjacent_pos.y), z)->RemoveOverlayTerrain();
+					this->Field(Vec2i(adjacent_pos.x, seed_pos.y), z)->RemoveOverlayTerrain();
 				}
 				this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
-				this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->SetTerrain(terrain_type);
-				this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->SetTerrain(terrain_type);
+				this->Field(Vec2i(seed_pos.x, adjacent_pos.y), z)->SetTerrain(terrain_type);
+				this->Field(Vec2i(adjacent_pos.x, seed_pos.y), z)->SetTerrain(terrain_type);
 				count -= 1;
+				seeds.push_back(adjacent_pos);
+				seeds.push_back(Vec2i(seed_pos.x, adjacent_pos.y));
+				seeds.push_back(Vec2i(adjacent_pos.x, seed_pos.y));
 			}
 		}
-		
-		while_count += 1;
 	}
 }
 

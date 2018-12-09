@@ -248,9 +248,7 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
 			}
 		} else if (child_config_data->Tag == "generated_terrain") {
-			CTerrainType *terrain_type = nullptr;
-			int seeds = -1;
-			int expansion_chance = -1;
+			CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -258,32 +256,24 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "terrain_type") {
 					value = FindAndReplaceString(value, "_", "-");
-					terrain_type = CTerrainType::GetTerrainType(value);
-				} else if (key == "seeds") {
-					seeds = std::stoi(value);
+					generated_terrain->TerrainType = CTerrainType::GetTerrainType(value);
+				} else if (key == "seed_count") {
+					generated_terrain->SeedCount = std::stoi(value);
 				} else if (key == "expansion_chance") {
-					expansion_chance = std::stoi(value);
+					generated_terrain->ExpansionChance = std::stoi(value);
+				} else if (key == "use_existing_as_seeds") {
+					generated_terrain->UseExistingAsSeeds = StringToBool(value);
 				} else {
 					fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", key.c_str());
 				}
 			}
 			
-			if (!terrain_type) {
+			if (!generated_terrain->TerrainType) {
 				fprintf(stderr, "Generated terrain has no terrain type.\n");
+				delete generated_terrain;
 				continue;
 			}
 			
-			if (seeds == -1) {
-				fprintf(stderr, "Generated terrain has no seed amount.\n");
-				continue;
-			}
-			
-			CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
-			generated_terrain->TerrainType = terrain_type;
-			generated_terrain->Seeds = seeds;
-			if (expansion_chance != -1) {
-				generated_terrain->ExpansionChance = expansion_chance;
-			}
 			this->GeneratedTerrains.push_back(generated_terrain);
 		} else {
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", child_config_data->Tag.c_str());

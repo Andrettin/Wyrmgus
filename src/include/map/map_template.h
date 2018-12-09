@@ -62,8 +62,9 @@ class CGeneratedTerrain
 {
 public:
 	CTerrainType *TerrainType = nullptr;
-	int Seeds = 0;
+	int SeedCount = 0;
 	int ExpansionChance = 50; //50% chance to expand to a tile by default
+	bool UseExistingAsSeeds = false; //whether to use existing tiles of the given terrain in the map layer as seeds for this terrain generation
 };
 
 class CMapTemplate
