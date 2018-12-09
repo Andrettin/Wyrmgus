@@ -525,15 +525,14 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	if (this->BaseTerrainType) {
 		for (int x = map_start_pos.x; x < map_end.x; ++x) {
 			for (int y = map_start_pos.y; y < map_end.y; ++y) {
-				Map.Field(Vec2i(x, y), z)->SetTerrain(this->BaseTerrainType);
-			}
-		}
-	}
-	
-	if (this->BaseOverlayTerrainType) {
-		for (int x = map_start_pos.x; x < map_end.x; ++x) {
-			for (int y = map_start_pos.y; y < map_end.y; ++y) {
-				Map.Field(Vec2i(x, y), z)->SetTerrain(this->BaseOverlayTerrainType);
+				Vec2i tile_pos(x, y);
+				Map.Field(tile_pos, z)->SetTerrain(this->BaseTerrainType);
+				
+				if (this->BaseOverlayTerrainType) {
+					Map.Field(tile_pos, z)->SetTerrain(this->BaseOverlayTerrainType);
+				} else {
+					Map.Field(tile_pos, z)->RemoveOverlayTerrain();
+				}
 			}
 		}
 	}

@@ -293,7 +293,8 @@ public:
 	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
-	bool IsPointInASubtemplateArea(const Vec2i &pos, int z) const;
+	bool IsPointInASubtemplateArea(const Vec2i &pos, const int z) const;
+	bool IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const;
 	bool IsLayerUnderground(int z) const;
 	
 	void SetCurrentPlane(CPlane *plane);

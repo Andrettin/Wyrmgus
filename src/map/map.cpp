@@ -671,7 +671,15 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainT
 	return false;
 }
 
-bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, int z) const
+/**
+**	@brief	Get whether a given tile is in a subtemplate area
+**
+**	@param	pos		The tile's position
+**	@param	z		The tile's map layer
+**
+**	@return	True if the tile is in a subtemplate area, or false otherwise
+*/
+bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, const int z) const
 {
 	for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
 		Vec2i min_pos = std::get<0>(this->MapLayers[z]->SubtemplateAreas[i]);
@@ -681,6 +689,33 @@ bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, int z) const
 		}
 	}
 
+	return false;
+}
+
+/**
+**	@brief	Get whether a given tile is adjacent to non-subtemplate area tiles
+**
+**	@param	pos		The tile's position
+**	@param	z		The tile's map layer
+**
+**	@return	True if the tile is adjacent to a non-subtemplate area tile, or false otherwise
+*/
+bool CMap::IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const
+{
+	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+			if (x_offset == 0 && y_offset == 0) {
+				continue;
+			}
+			
+			Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+			
+			if (Map.Info.IsPointOnMap(adjacent_pos, z) && !this->IsPointInASubtemplateArea(adjacent_pos, z)) {
+				return true;
+			}
+		}
+	}
+	
 	return false;
 }
 
@@ -997,9 +1032,7 @@ int GetSubtemplateStartY(const std::string &subtemplate_ident)
 }
 
 /**
-**	@brief	Change the map layer currently being displayed to the previous
-**
-**	@param	z	The map layer
+**	@brief	Change the map layer currently being displayed to the previous one
 */
 void ChangeToPreviousMapLayer()
 {
@@ -2449,7 +2482,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	const int seed_count = generated_terrain->SeedCount;
 	
 	Vec2i random_pos(0, 0);
-	int count = generated_terrain->SeedCount;
+	int count = seed_count;
 	int while_count = 0;
 	
 	std::vector<Vec2i> seeds;
@@ -2458,15 +2491,22 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 		for (int x = min_pos.x; x <= max_pos.x; ++x) {
 			for (int y = min_pos.y; y <= max_pos.y; ++y) {
 				Vec2i tile_pos(x, y);
-				if (this->GetTileTopTerrain(tile_pos, false, z) == terrain_type) {
-					seeds.push_back(tile_pos);
+				
+				if (this->GetTileTopTerrain(tile_pos, false, z) != terrain_type) {
+					continue;
 				}
+				
+				if (this->IsPointInASubtemplateArea(tile_pos, z) && !IsPointAdjacentToNonSubtemplateArea(tile_pos, z)) {
+					continue;
+				}
+				
+				seeds.push_back(tile_pos);
 			}
 		}
 	}
 	
 	// create initial seeds
-	while (count > 0 && while_count < seed_count * 100) {
+	while (count > 0 && while_count < seed_count * 1000) {
 		random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
 		random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
 		
@@ -2600,7 +2640,9 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 						&& (!preserve_coastline || ((terrain_type->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain_type->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain_type->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
 						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain_type, z) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain_type, z) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain_type, z)
 						&& (!(terrain_type->Flags & MapFieldUnpassable) || (!this->TileBordersUnit(diagonal_pos, z) && !this->TileBordersUnit(vertical_pos, z) && !this->TileBordersUnit(horizontal_pos, z))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
-						&& (!this->IsPointInASubtemplateArea(diagonal_pos, z) || GetTileTerrain(diagonal_pos, terrain_type->Overlay, z) == terrain_type) && (!this->IsPointInASubtemplateArea(vertical_pos, z) || GetTileTerrain(vertical_pos, terrain_type->Overlay, z) == terrain_type) && (!this->IsPointInASubtemplateArea(horizontal_pos, z) || GetTileTerrain(horizontal_pos, terrain_type->Overlay, z) == terrain_type)
+						&& (!this->IsPointInASubtemplateArea(diagonal_pos, z) || GetTileTopTerrain(diagonal_pos, false, z) == terrain_type)
+						&& (!this->IsPointInASubtemplateArea(vertical_pos, z) || GetTileTopTerrain(vertical_pos, false, z) == terrain_type)
+						&& (!this->IsPointInASubtemplateArea(horizontal_pos, z) || GetTileTopTerrain(horizontal_pos, false, z) == terrain_type)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
 					}
