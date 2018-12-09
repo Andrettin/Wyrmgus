@@ -1677,7 +1677,7 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else if (!strcmp(value, "PixelTileSize")) {
 			CclGetPos(l, &map_template->PixelTileSize.x, &map_template->PixelTileSize.y);
 		} else if (!strcmp(value, "MainTemplate")) {
-			CMapTemplate *main_template = CMapTemplate::GetOrAddMapTemplate(LuaToString(l, -1));
+			CMapTemplate *main_template = CMapTemplate::GetMapTemplate(LuaToString(l, -1));
 			map_template->MainTemplate = main_template;
 			main_template->Subtemplates.push_back(map_template);
 			if (main_template->Plane) {
@@ -1686,20 +1686,18 @@ static int CclDefineMapTemplate(lua_State *l)
 			if (main_template->World) {
 				map_template->World = main_template->World;
 			}
-			if (main_template->SurfaceLayer != 0) {
-				map_template->SurfaceLayer = main_template->SurfaceLayer;
-			}
+			map_template->SurfaceLayer = main_template->SurfaceLayer;
 		} else if (!strcmp(value, "BaseTerrainType")) {
-			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1));
+			CTerrainType *terrain_type = CTerrainType::GetTerrainType(LuaToString(l, -1));
 			map_template->BaseTerrainType = terrain_type;
 		} else if (!strcmp(value, "BaseOverlayTerrainType")) {
-			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1));
+			CTerrainType *terrain_type = CTerrainType::GetTerrainType(LuaToString(l, -1));
 			map_template->BaseOverlayTerrainType = terrain_type;
 		} else if (!strcmp(value, "BorderTerrainType")) {
-			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1));
+			CTerrainType *terrain_type = CTerrainType::GetTerrainType(LuaToString(l, -1));
 			map_template->BorderTerrainType = terrain_type;
 		} else if (!strcmp(value, "SurroundingTerrainType")) {
-			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1));
+			CTerrainType *terrain_type = CTerrainType::GetTerrainType(LuaToString(l, -1));
 			map_template->SurroundingTerrainType = terrain_type;
 		} else if (!strcmp(value, "GeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {
@@ -1778,7 +1776,7 @@ static int CclDefineSite(lua_State *l)
 		} else if (!strcmp(value, "Position")) {
 			CclGetPos(l, &site->Position.x, &site->Position.y);
 		} else if (!strcmp(value, "MapTemplate")) {
-			CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(LuaToString(l, -1));
+			CMapTemplate *map_template = CMapTemplate::GetMapTemplate(LuaToString(l, -1));
 			site->MapTemplate = map_template;
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
@@ -1993,11 +1991,15 @@ static int CclDefineSite(lua_State *l)
 		site->Cores.clear();
 	}
 	
-	if (site->MapTemplate && site->Position.x != -1 && site->Position.y != -1) {
-		if (site->MapTemplate->Sites.find(std::pair<int, int>(site->Position.x, site->Position.y)) != site->MapTemplate->Sites.end()) {
-			LuaError(l, "Position (%d, %d) of map template \"%s\" already has a site." _C_ site->Position.x _C_ site->Position.y _C_ site->MapTemplate->Ident.c_str());
+	if (site->MapTemplate) {
+		if (site->Position.x != -1 && site->Position.y != -1) {
+			if (site->MapTemplate->SitesByPosition.find(std::pair<int, int>(site->Position.x, site->Position.y)) != site->MapTemplate->SitesByPosition.end()) {
+				LuaError(l, "Position (%d, %d) of map template \"%s\" already has a site." _C_ site->Position.x _C_ site->Position.y _C_ site->MapTemplate->Ident.c_str());
+			}
+			site->MapTemplate->SitesByPosition[std::pair<int, int>(site->Position.x, site->Position.y)] = site;
 		}
-		site->MapTemplate->Sites[std::pair<int, int>(site->Position.x, site->Position.y)] = site;
+		
+		site->MapTemplate->Sites.push_back(site);
 	}
 	
 	return 0;

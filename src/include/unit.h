@@ -365,10 +365,10 @@ public:
 	
 	//Wyrmgus start
 	Vec2i GetTileSize() const;
-	PixelSize GetTilePixelSize() const;
 	Vec2i GetHalfTileSize() const;
+	PixelSize GetTilePixelSize() const;
 	PixelSize GetHalfTilePixelSize() const;
-	Vec2i GetCenterPos() const;
+	Vec2i GetTileCenterPos() const;
 	
 	CUnit *GetFirstContainer() const;
 

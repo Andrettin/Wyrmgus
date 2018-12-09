@@ -253,9 +253,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		const CConfigData *child_config_data = config_data->Children[i];
 		
 		if (child_config_data->Tag == "historical_location") {
-			CDate date;
-			CMapTemplate *map_template = nullptr;
-			Vec2i character_pos(-1, -1);
+			CHistoricalLocation *historical_location = new CHistoricalLocation;
 				
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
@@ -263,46 +261,50 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "date") {
 					value = FindAndReplaceString(value, "_", "-");
-					date = CDate::FromString(value);
+					historical_location->Date = CDate::FromString(value);
 				} else if (key == "map_template") {
 					value = FindAndReplaceString(value, "_", "-");
-					map_template = CMapTemplate::GetMapTemplate(value);
-					if (!map_template) {
+					historical_location->MapTemplate = CMapTemplate::GetMapTemplate(value);
+					if (!historical_location->MapTemplate) {
 						fprintf(stderr, "Map template \"%s\" does not exist.\n", value.c_str());
 					}
 				} else if (key == "site") {
 					value = FindAndReplaceString(value, "_", "-");
-					CSite *site = GetSite(value);
-					if (site) {
-						character_pos = site->Position;
+					historical_location->Site = GetSite(value);
+					if (historical_location->Site) {
+						historical_location->MapTemplate = historical_location->Site->MapTemplate;
+						historical_location->Position = historical_location->Site->Position;
 					} else {
 						fprintf(stderr, "Site \"%s\" does not exist.\n", value.c_str());
 					}
 				} else if (key == "x") {
-					character_pos.x = std::stoi(value);
+					historical_location->Position.x = std::stoi(value);
 				} else if (key == "y") {
-					character_pos.y = std::stoi(value);
+					historical_location->Position.y = std::stoi(value);
 				} else {
 					fprintf(stderr, "Invalid historical location property: \"%s\".\n", key.c_str());
 				}
 			}
 			
-			if (date.Year == 0) {
+			if (historical_location->Date.Year == 0) {
 				fprintf(stderr, "Historical location has no date.\n");
+				delete historical_location;
 				continue;
 			}
 			
-			if (!map_template) {
+			if (!historical_location->MapTemplate) {
 				fprintf(stderr, "Historical location has no map template.\n");
+				delete historical_location;
 				continue;
 			}
 			
-			if (character_pos.x == -1 || character_pos.y == -1) {
+			if (!historical_location->Site && (historical_location->Position.x == -1 || historical_location->Position.y == -1)) {
 				fprintf(stderr, "Historical location has no position for the character.\n");
+				delete historical_location;
 				continue;
 			}
 			
-			this->HistoricalLocations.push_back(std::tuple<CDate, CMapTemplate *, Vec2i>(date, map_template, character_pos));
+			this->HistoricalLocations.push_back(historical_location);
 		} else if (child_config_data->Tag == "historical_title") {
 			int title = -1;
 			CDate start_date;

@@ -60,6 +60,7 @@ class CPersistentItem;
 class CProvince;
 class CQuest;
 class CReligion;
+class CSite;
 class CUnitType;
 class CUnit;
 class CUpgrade;
@@ -104,6 +105,15 @@ enum CharacterTitles {
 	CharacterTitleMayor,
 
 	MaxCharacterTitles
+};
+
+class CHistoricalLocation
+{
+public:
+	CDate Date;
+	CMapTemplate *MapTemplate = nullptr;
+	Vec2i Position = Vec2i(-1, -1);
+	CSite *Site = nullptr;
 };
 
 class CCharacter
@@ -192,7 +202,7 @@ public:
 	int Attributes[MaxAttributes];
 	std::vector<CUnitType *> ForbiddenUpgrades;	/// which unit types this character is forbidden to upgrade to
 	std::vector<std::pair<CDate, CFaction *>> HistoricalFactions;	/// historical locations of the character; the values are: date, faction
-	std::vector<std::tuple<CDate, CMapTemplate *, Vec2i>> HistoricalLocations;	/// historical locations of the character; the values are: date, map template, position
+	std::vector<CHistoricalLocation *> HistoricalLocations;	/// historical locations of the character
 	std::vector<std::tuple<CDate, CDate, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 };

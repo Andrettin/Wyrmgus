@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unittype.cpp - The unit types. */
+/**@name unittype.cpp - The unit type source file. */
 //
 //      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -1152,21 +1152,26 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 }
 
-Vec2i CUnitType::GetTileSize(const int map_layer) const
+Vec2i CUnitType::GetTileSize() const
 {
 	return this->TileSize;
 }
 
-Vec2i CUnitType::GetHalfTileSize(const int map_layer) const
+Vec2i CUnitType::GetHalfTileSize() const
 {
-	return this->GetTileSize(map_layer) / 2;
+	return this->GetTileSize() / 2;
 }
 
 PixelSize CUnitType::GetTilePixelSize(const int map_layer) const
 {
-	return PixelSize(PixelSize(this->GetTileSize(map_layer)) * Map.GetMapLayerPixelTileSize(map_layer));
+	return PixelSize(PixelSize(this->GetTileSize()) * Map.GetMapLayerPixelTileSize(map_layer));
 }
 
+Vec2i CUnitType::GetTileCenterPosOffset() const
+{
+	return (this->GetTileSize() - 1) / 2;
+}
+	
 bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) { // User defined flags

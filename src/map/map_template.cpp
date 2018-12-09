@@ -190,6 +190,18 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 			this->PixelTileSize.x = std::stoi(value);
 		} else if (key == "pixel_tile_height") {
 			this->PixelTileSize.y = std::stoi(value);
+		} else if (key == "main_template") {
+			value = FindAndReplaceString(value, "_", "-");
+			CMapTemplate *main_template = CMapTemplate::GetMapTemplate(value);
+			this->MainTemplate = main_template;
+			main_template->Subtemplates.push_back(this);
+			if (main_template->Plane) {
+				this->Plane = main_template->Plane;
+			}
+			if (main_template->World) {
+				this->World = main_template->World;
+			}
+			this->SurfaceLayer = main_template->SurfaceLayer;
 		} else if (key == "overland") {
 			this->Overland = StringToBool(value);
 		} else if (key == "base_terrain_type") {
@@ -529,17 +541,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
 	this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
 	
-	if (!has_base_map) {
-		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
-		
-		for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
-			int map_width = (map_end.x - map_start_pos.x);
-			int map_height = (map_end.y - map_start_pos.y);
-			
-			Map.GenerateTerrain(this->GeneratedTerrains[i], map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
-		}
-	}
-	
 	if (this->OutputTerrainImage) {
 		std::string filename = this->Ident;
 		std::string overlay_filename = this->Ident;
@@ -661,6 +662,17 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 	}
 	
+	if (!has_base_map) {
+		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
+		
+		for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
+			int map_width = (map_end.x - map_start_pos.x);
+			int map_height = (map_end.y - map_start_pos.y);
+			
+			Map.GenerateTerrain(this->GeneratedTerrains[i], map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
+		}
+	}
+	
 	if (!this->IsSubtemplateArea()) {
 		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
@@ -731,6 +743,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	if (CurrentCampaign != nullptr) {
 		this->ApplyConnectors(template_start_pos, map_start_pos, z, true);
 	}
+	this->ApplySites(template_start_pos, map_start_pos, z, true);
 	this->ApplyUnits(template_start_pos, map_start_pos, z, true);
 
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -796,48 +809,67 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 }
 
-void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int z)
+/**
+**	@brief	Apply a site to the map
+**
+**	@param	template_start_pos	The start position of the map relative to the map template
+**	@param	map_start_pos		The start position of the map template relative to the map
+**	@param	z					The map layer
+**	@param	random				Whether it is sites with a random position that should be applied, or ones with a fixed one
+*/
+void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random)
 {
 	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
 
-	for (std::map<std::pair<int, int>, CSite *>::iterator site_iterator = this->Sites.begin(); site_iterator != this->Sites.end(); ++site_iterator) {
-		Vec2i site_raw_pos(site_iterator->second->Position);
+	for (size_t site_index = 0; site_index < this->Sites.size(); ++site_index) {
+		CSite *site = this->Sites[site_index];
+		
+		Vec2i site_raw_pos(site->Position);
 		Vec2i site_pos(map_start_pos + ((site_raw_pos - template_start_pos) * this->Scale));
+
+		if (random) {
+			if (site_raw_pos.x != -1 || site_raw_pos.y != -1) {
+				continue;
+			}
+			if (SettlementSiteUnitType) {
+				site_pos = Map.GenerateUnitLocation(SettlementSiteUnitType, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
+			}
+		}
 
 		if (!Map.Info.IsPointOnMap(site_pos, z) || site_pos.x < map_start_pos.x || site_pos.y < map_start_pos.y) {
 			continue;
 		}
 
-		if (site_iterator->second->Major && SettlementSiteUnitType) { //add a settlement site for major sites
+		if (site->Major && SettlementSiteUnitType) { //add a settlement site for major sites
 			Vec2i unit_offset((SettlementSiteUnitType->TileSize - 1) / 2);
 			if (!UnitTypeCanBeAt(*SettlementSiteUnitType, site_pos - unit_offset, z) && Map.Info.IsPointOnMap(site_pos - unit_offset, z) && Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(SettlementSiteUnitType->TileSize - 1), z)) {
-				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site_iterator->second->Ident.c_str(), site_raw_pos.x, site_raw_pos.y);
+				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x, site_raw_pos.y);
 			}
 			CUnit *unit = CreateUnit(site_pos - unit_offset, *SettlementSiteUnitType, &Players[PlayerNumNeutral], z, true);
-			unit->Settlement = site_iterator->second;
+			unit->Settlement = site;
 			unit->Settlement->SiteUnit = unit;
 			Map.SiteUnits.push_back(unit);
 		}
 		
-		for (size_t j = 0; j < site_iterator->second->HistoricalResources.size(); ++j) {
+		for (size_t j = 0; j < site->HistoricalResources.size(); ++j) {
 			if (
-				(!CurrentCampaign && std::get<1>(site_iterator->second->HistoricalResources[j]).Year == 0 && std::get<1>(site_iterator->second->HistoricalResources[j]).Year == 0)
+				(!CurrentCampaign && std::get<1>(site->HistoricalResources[j]).Year == 0 && std::get<1>(site->HistoricalResources[j]).Year == 0)
 				|| (
-					CurrentCampaign && CurrentCampaign->StartDate.ContainsDate(std::get<0>(site_iterator->second->HistoricalResources[j]))
-					&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalResources[j])) || std::get<1>(site_iterator->second->HistoricalResources[j]).Year == 0)
+					CurrentCampaign && CurrentCampaign->StartDate.ContainsDate(std::get<0>(site->HistoricalResources[j]))
+					&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site->HistoricalResources[j])) || std::get<1>(site->HistoricalResources[j]).Year == 0)
 				)
 			) {
-				const CUnitType *type = std::get<2>(site_iterator->second->HistoricalResources[j]);
+				const CUnitType *type = std::get<2>(site->HistoricalResources[j]);
 				if (!type) {
-					fprintf(stderr, "Error in CMap::ApplySites (site ident \"%s\"): historical resource type is null.\n", site_iterator->second->Ident.c_str());
+					fprintf(stderr, "Error in CMap::ApplySites (site ident \"%s\"): historical resource type is null.\n", site->Ident.c_str());
 					continue;
 				}
 				Vec2i unit_offset((type->TileSize - 1) / 2);
 				CUnit *unit = CreateResourceUnit(site_pos - unit_offset, *type, z, false); // don't generate unique resources when setting special properties, since for map templates unique resources are supposed to be explicitly indicated
-				if (std::get<3>(site_iterator->second->HistoricalResources[j])) {
-					unit->SetUnique(std::get<3>(site_iterator->second->HistoricalResources[j]));
+				if (std::get<3>(site->HistoricalResources[j])) {
+					unit->SetUnique(std::get<3>(site->HistoricalResources[j]));
 				}
-				int resource_quantity = std::get<4>(site_iterator->second->HistoricalResources[j]);
+				int resource_quantity = std::get<4>(site->HistoricalResources[j]);
 				if (resource_quantity) { //set the resource_quantity after setting the unique unit, so that unique resources can be decreased in quantity over time
 					unit->SetResourcesHeld(resource_quantity);
 					unit->Variable[GIVERESOURCE_INDEX].Value = resource_quantity;
@@ -852,7 +884,7 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 		}
 		
 		CFaction *site_owner = nullptr;
-		for (std::map<CDate, CFaction *>::reverse_iterator owner_iterator = site_iterator->second->HistoricalOwners.rbegin(); owner_iterator != site_iterator->second->HistoricalOwners.rend(); ++owner_iterator) {
+		for (std::map<CDate, CFaction *>::reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
 			if (CurrentCampaign->StartDate.ContainsDate(owner_iterator->first)) { // set the owner to the latest historical owner given the scenario's start date
 				site_owner = owner_iterator->second;
 				break;
@@ -872,7 +904,7 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 		bool is_capital = false;
 		for (int i = ((int) site_owner->HistoricalCapitals.size() - 1); i >= 0; --i) {
 			if (CurrentCampaign->StartDate.ContainsDate(site_owner->HistoricalCapitals[i].first) || site_owner->HistoricalCapitals[i].first.Year == 0) {
-				if (site_owner->HistoricalCapitals[i].second == site_iterator->second->Ident) {
+				if (site_owner->HistoricalCapitals[i].second == site->Ident) {
 					is_capital = true;
 				}
 				break;
@@ -884,13 +916,13 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 		}
 		
 		CUnitType *pathway_type = nullptr;
-		for (size_t j = 0; j < site_iterator->second->HistoricalBuildings.size(); ++j) {
+		for (size_t j = 0; j < site->HistoricalBuildings.size(); ++j) {
 			if (
-				CurrentCampaign->StartDate.ContainsDate(std::get<0>(site_iterator->second->HistoricalBuildings[j]))
-				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalBuildings[j])) || std::get<1>(site_iterator->second->HistoricalBuildings[j]).Year == 0)
+				CurrentCampaign->StartDate.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
+				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
 			) {
 				int unit_type_id = -1;
-				unit_type_id = PlayerRaces.GetFactionClassUnitType(site_owner->ID, std::get<2>(site_iterator->second->HistoricalBuildings[j]));
+				unit_type_id = PlayerRaces.GetFactionClassUnitType(site_owner->ID, std::get<2>(site->HistoricalBuildings[j]));
 				if (unit_type_id == -1) {
 					continue;
 				}
@@ -904,17 +936,17 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 		}
 		
 		bool first_building = true;
-		for (size_t j = 0; j < site_iterator->second->HistoricalBuildings.size(); ++j) {
+		for (size_t j = 0; j < site->HistoricalBuildings.size(); ++j) {
 			if (
-				CurrentCampaign->StartDate.ContainsDate(std::get<0>(site_iterator->second->HistoricalBuildings[j]))
-				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalBuildings[j])) || std::get<1>(site_iterator->second->HistoricalBuildings[j]).Year == 0)
+				CurrentCampaign->StartDate.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
+				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
 			) {
-				CFaction *building_owner = std::get<4>(site_iterator->second->HistoricalBuildings[j]);
+				CFaction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
 				int unit_type_id = -1;
 				if (building_owner) {
-					unit_type_id = PlayerRaces.GetFactionClassUnitType(building_owner->ID, std::get<2>(site_iterator->second->HistoricalBuildings[j]));
+					unit_type_id = PlayerRaces.GetFactionClassUnitType(building_owner->ID, std::get<2>(site->HistoricalBuildings[j]));
 				} else {
-					unit_type_id = PlayerRaces.GetFactionClassUnitType(site_owner->ID, std::get<2>(site_iterator->second->HistoricalBuildings[j]));
+					unit_type_id = PlayerRaces.GetFactionClassUnitType(site_owner->ID, std::get<2>(site->HistoricalBuildings[j]));
 				}
 				if (unit_type_id == -1) {
 					continue;
@@ -923,14 +955,14 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 				if (type->TerrainType) {
 					continue;
 				}
-				if (type->BoolFlag[TOWNHALL_INDEX].value && !site_iterator->second->Major) {
-					fprintf(stderr, "Error in CMap::ApplySites (site ident \"%s\"): site has a town hall, but isn't set as a major one.\n", site_iterator->second->Ident.c_str());
+				if (type->BoolFlag[TOWNHALL_INDEX].value && !site->Major) {
+					fprintf(stderr, "Error in CMap::ApplySites (site ident \"%s\"): site has a town hall, but isn't set as a major one.\n", site->Ident.c_str());
 					continue;
 				}
 				Vec2i unit_offset((type->TileSize - 1) / 2);
 				if (first_building) {
 					if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, site_pos - unit_offset, z) && Map.Info.IsPointOnMap(site_pos - unit_offset, z) && Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(type->TileSize - 1), z)) {
-						fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", type->Ident.c_str(), site_iterator->second->Ident.c_str(), site_raw_pos.x, site_raw_pos.y);
+						fprintf(stderr, "The \"%s\" representing the minor site of \"%s\" should be placed on (%d, %d), but it cannot be there.\n", type->Ident.c_str(), site->Ident.c_str(), site_raw_pos.x, site_raw_pos.y);
 					}
 				}
 				CUnit *unit = nullptr;
@@ -946,16 +978,16 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 				} else {
 					unit = CreateUnit(site_pos - unit_offset, *type, player, z, true);
 				}
-				if (std::get<3>(site_iterator->second->HistoricalBuildings[j])) {
-					unit->SetUnique(std::get<3>(site_iterator->second->HistoricalBuildings[j]));
+				if (std::get<3>(site->HistoricalBuildings[j])) {
+					unit->SetUnique(std::get<3>(site->HistoricalBuildings[j]));
 				}
 				if (first_building) {
-					if (!type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == site_owner) && site_iterator->second->CulturalNames.find(site_owner->Civilization) != site_iterator->second->CulturalNames.end()) { //if one building is representing a minor site, make it have the site's name
-						unit->Name = site_iterator->second->CulturalNames.find(site_owner->Civilization)->second;
+					if (!type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == site_owner) && site->CulturalNames.find(site_owner->Civilization) != site->CulturalNames.end()) { //if one building is representing a minor site, make it have the site's name
+						unit->Name = site->CulturalNames.find(site_owner->Civilization)->second;
 					}
 					first_building = false;
 				}
-				if (type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == site_owner) && site_iterator->second->CulturalNames.find(site_owner->Civilization) != site_iterator->second->CulturalNames.end()) {
+				if (type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == site_owner) && site->CulturalNames.find(site_owner->Civilization) != site->CulturalNames.end()) {
 					unit->UpdateBuildingSettlementAssignment();
 				}
 				if (pathway_type) {
@@ -980,21 +1012,21 @@ void CMapTemplate::ApplySites(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 		}
 		
-		for (size_t j = 0; j < site_iterator->second->HistoricalUnits.size(); ++j) {
+		for (size_t j = 0; j < site->HistoricalUnits.size(); ++j) {
 			if (
-				CurrentCampaign->StartDate.ContainsDate(std::get<0>(site_iterator->second->HistoricalUnits[j]))
-				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site_iterator->second->HistoricalUnits[j])) || std::get<1>(site_iterator->second->HistoricalUnits[j]).Year == 0)
+				CurrentCampaign->StartDate.ContainsDate(std::get<0>(site->HistoricalUnits[j]))
+				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site->HistoricalUnits[j])) || std::get<1>(site->HistoricalUnits[j]).Year == 0)
 			) {
-				int unit_quantity = std::get<3>(site_iterator->second->HistoricalUnits[j]);
+				int unit_quantity = std::get<3>(site->HistoricalUnits[j]);
 						
 				if (unit_quantity > 0) {
-					const CUnitType *type = std::get<2>(site_iterator->second->HistoricalUnits[j]);
+					const CUnitType *type = std::get<2>(site->HistoricalUnits[j]);
 					if (type->BoolFlag[ORGANIC_INDEX].value) {
 						unit_quantity = std::max(1, unit_quantity / PopulationPerUnit); //each organic unit represents 1,000 people
 					}
 							
 					CPlayer *unit_player = nullptr;
-					CFaction *unit_owner = std::get<4>(site_iterator->second->HistoricalUnits[j]);
+					CFaction *unit_owner = std::get<4>(site->HistoricalUnits[j]);
 					if (unit_owner) {
 						unit_player = GetOrAddFactionPlayer(unit_owner);
 						if (!unit_player) {
@@ -1286,9 +1318,14 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		
 		bool in_another_map_layer = false;
 		for (int i = ((int) hero->HistoricalLocations.size() - 1); i >= 0; --i) {
-			if (CurrentCampaign->StartDate.ContainsDate(std::get<0>(hero->HistoricalLocations[i]))) {
-				if (std::get<1>(hero->HistoricalLocations[i]) == this) {
-					hero_pos = map_start_pos + std::get<2>(hero->HistoricalLocations[i]) - template_start_pos;
+			CHistoricalLocation *historical_location = hero->HistoricalLocations[i];
+			if (CurrentCampaign->StartDate.ContainsDate(historical_location->Date)) {
+				if (historical_location->MapTemplate && historical_location->MapTemplate->GetTopMapTemplate() == this) {
+					if (historical_location->Position.x != -1 && historical_location->Position.y != -1) {
+						hero_pos = map_start_pos + historical_location->Position - template_start_pos;
+					} else if (historical_location->Site != nullptr && historical_location->Site->SiteUnit != nullptr) {
+						hero_pos = historical_location->Site->SiteUnit->GetTileCenterPos();
+					}
 				} else {
 					in_another_map_layer = true;
 				}
@@ -1315,17 +1352,35 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		} else {
 			hero_player = &Players[PlayerNumNeutral];
 		}
-		Vec2i unit_offset((hero->Type->TileSize - 1) / 2);
-		CUnit *unit = CreateUnit(hero_pos - unit_offset, *hero->Type, hero_player, z);
+		CUnit *unit = CreateUnit(hero_pos - hero->Type->GetTileCenterPosOffset(), *hero->Type, hero_player, z);
 		unit->SetCharacter(hero->Ident);
 		unit->Active = 0;
 		hero_player->ChangeUnitTypeAiActiveCount(hero->Type, -1);
 	}
 }
 
-bool CMapTemplate::IsSubtemplateArea()
+/**
+**	@brief	Get whether this map template is a subtemplate area of another one
+**
+**	@return	True if it is a subtemplate area, or false otherwise
+*/
+bool CMapTemplate::IsSubtemplateArea() const
 {
 	return this->MainTemplate != nullptr;
+}
+
+/**
+**	@brief	Get the top map template for this one
+**
+**	@return	The topmost map template for this one (which can be itself if it isn't a subtemplate area)
+*/
+CMapTemplate *CMapTemplate::GetTopMapTemplate()
+{
+	if (this->MainTemplate != nullptr) {
+		return this->MainTemplate->GetTopMapTemplate();
+	} else {
+		return this;
+	}
 }
 
 //@}

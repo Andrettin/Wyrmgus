@@ -478,31 +478,30 @@ static int CclDefineCharacter(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CDate date;
+				CHistoricalLocation *historical_location = new CHistoricalLocation;
 				lua_rawgeti(l, -1, j + 1);
-				CclGetDate(l, &date);
+				CclGetDate(l, &historical_location->Date);
 				lua_pop(l, 1);
 				++j;
 				
-				CMapTemplate *map_template = CMapTemplate::GetOrAddMapTemplate(LuaToString(l, -1, j + 1));
+				historical_location->MapTemplate = CMapTemplate::GetMapTemplate(LuaToString(l, -1, j + 1));
 				++j;
 				
 				lua_rawgeti(l, -1, j + 1);
-				Vec2i character_pos;
 				if (lua_istable(l, -1)) { //coordinates
-					CclGetPos(l, &character_pos.x, &character_pos.y);
+					CclGetPos(l, &historical_location->Position.x, &historical_location->Position.y);
 				} else { //site ident
 					std::string site_ident = LuaToString(l, -1);
-					CSite *site = GetSite(site_ident);
-					if (!site) {
+					historical_location->Site = GetSite(site_ident);
+					if (!historical_location->Site) {
 						LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
 					}
-					character_pos.x = site->Position.x;
-					character_pos.y = site->Position.y;
+					historical_location->MapTemplate = historical_location->Site->MapTemplate;
+					historical_location->Position = historical_location->Site->Position;
 				}
 				lua_pop(l, 1);
 
-				character->HistoricalLocations.push_back(std::tuple<CDate, CMapTemplate *, Vec2i>(date, map_template, character_pos));
+				character->HistoricalLocations.push_back(historical_location);
 			}
 		} else if (!strcmp(value, "HistoricalTitles")) {
 			if (!lua_istable(l, -1)) {

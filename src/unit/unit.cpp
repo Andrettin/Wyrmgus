@@ -5125,7 +5125,7 @@ PixelPos CUnit::GetMapPixelPosCenter() const
 //Wyrmgus start
 Vec2i CUnit::GetTileSize() const
 {
-	return this->Type->GetTileSize(this->MapLayer->ID);
+	return this->Type->GetTileSize();
 }
 
 Vec2i CUnit::GetHalfTileSize() const
@@ -5133,14 +5133,19 @@ Vec2i CUnit::GetHalfTileSize() const
 	return this->GetTileSize() / 2;
 }
 
+PixelSize CUnit::GetTilePixelSize() const
+{
+	return PixelSize(this->GetTileSize()) * Map.GetMapLayerPixelTileSize(this->MapLayer->ID);
+}
+
 PixelSize CUnit::GetHalfTilePixelSize() const
 {
 	return this->GetTilePixelSize() / 2;
 }
 
-PixelSize CUnit::GetTilePixelSize() const
+Vec2i CUnit::GetTileCenterPos() const
 {
-	return PixelSize(this->GetTileSize()) * Map.GetMapLayerPixelTileSize(this->MapLayer->ID);
+	return this->tilePos + this->Type->GetTileCenterPosOffset();
 }
 
 void CUnit::SetIndividualUpgrade(const CUpgrade *upgrade, int quantity)

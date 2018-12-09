@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unittype.h - The unit-types headerfile. */
+/**@name unittype.h - The unit type header file. */
 //
 //      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -878,10 +878,11 @@ public:
 
 	void ProcessConfigData(const CConfigData *config_data);
 	
-	Vec2i GetTileSize(const int map_layer) const;
-	Vec2i GetHalfTileSize(const int map_layer) const;
+	Vec2i GetTileSize() const;
+	Vec2i GetHalfTileSize() const;
 	PixelSize GetHalfTilePixelSize(const int map_layer) const { return GetTilePixelSize(map_layer) / 2; }
 	PixelSize GetTilePixelSize(const int map_layer) const;
+	Vec2i GetTileCenterPosOffset() const;
 
 	bool CheckUserBoolFlags(const char *BoolFlags) const;
 	//Wyrmgus start
