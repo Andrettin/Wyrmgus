@@ -506,6 +506,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		return;
 	}
 	
+	bool has_base_map = !this->TerrainFile.empty() || !this->TerrainImage.empty();
+	
 	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->Name.c_str());
 	
 	if (this->BaseTerrainType) {
@@ -526,6 +528,17 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	
 	this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
 	this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
+	
+	if (!has_base_map) {
+		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
+		
+		for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
+			int map_width = (map_end.x - map_start_pos.x);
+			int map_height = (map_end.y - map_start_pos.y);
+			
+			Map.GenerateTerrain(this->GeneratedTerrains[i], map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
+		}
+	}
 	
 	if (this->OutputTerrainImage) {
 		std::string filename = this->Ident;
@@ -693,35 +706,15 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	this->ApplySites(template_start_pos, map_start_pos, z);
 	this->ApplyUnits(template_start_pos, map_start_pos, z);
 	
-	ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
-	
-	for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
-		int map_width = (map_end.x - map_start_pos.x);
-		int map_height = (map_end.y - map_start_pos.y);
+	if (has_base_map) {
+		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
 		
-		/*
-		if (degree_level == ExtremelyHighDegreeLevel) {
-			expansion_number = map_width * map_height / 2;
-			seed_number = map_width * map_height / 128;
-		} else if (degree_level == VeryHighDegreeLevel) {
-			expansion_number = map_width * map_height / 4;
-			seed_number = map_width * map_height / 256;
-		} else if (degree_level == HighDegreeLevel) {
-			expansion_number = map_width * map_height / 8;
-			seed_number = map_width * map_height / 512;
-		} else if (degree_level == MediumDegreeLevel) {
-			expansion_number = map_width * map_height / 16;
-			seed_number = map_width * map_height / 1024;
-		} else if (degree_level == LowDegreeLevel) {
-			expansion_number = map_width * map_height / 32;
-			seed_number = map_width * map_height / 2048;
-		} else if (degree_level == VeryLowDegreeLevel) {
-			expansion_number = map_width * map_height / 64;
-			seed_number = map_width * map_height / 4096;
+		for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
+			int map_width = (map_end.x - map_start_pos.x);
+			int map_height = (map_end.y - map_start_pos.y);
+			
+			Map.GenerateTerrain(this->GeneratedTerrains[i], map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
 		}
-		*/
-		
-		Map.GenerateTerrain(this->GeneratedTerrains[i], map_start_pos, map_end - Vec2i(1, 1), !this->TerrainFile.empty() || !this->TerrainImage.empty(), z);
 	}
 	
 	if (!this->IsSubtemplateArea()) {

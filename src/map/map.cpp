@@ -2557,7 +2557,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	
 	// expand seeds
 	for (size_t i = 0; i < seeds.size(); ++i) {
-		Vec2i &seed_pos = seeds[i];
+		Vec2i seed_pos = seeds[i];
 		
 		const int random_number = SyncRand(100);
 		if (random_number >= generated_terrain->ExpansionChance) {
@@ -2609,18 +2609,34 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 			
 			if (adjacent_positions.size() > 0) {
 				Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
-				if (!terrain_type->Overlay) {
-					this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
-					this->Field(Vec2i(seed_pos.x, adjacent_pos.y), z)->RemoveOverlayTerrain();
-					this->Field(Vec2i(adjacent_pos.x, seed_pos.y), z)->RemoveOverlayTerrain();
+				Vec2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
+				Vec2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
+				
+				if (GetTileTopTerrain(adjacent_pos, false, z) != terrain_type) {
+					if (!terrain_type->Overlay) {
+						this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
+					}
+					this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
+					seeds.push_back(adjacent_pos);
 				}
-				this->Field(adjacent_pos, z)->SetTerrain(terrain_type);
-				this->Field(Vec2i(seed_pos.x, adjacent_pos.y), z)->SetTerrain(terrain_type);
-				this->Field(Vec2i(adjacent_pos.x, seed_pos.y), z)->SetTerrain(terrain_type);
+				
+				if (GetTileTopTerrain(adjacent_pos_horizontal, false, z) != terrain_type) {
+					if (!terrain_type->Overlay) {
+						this->Field(adjacent_pos_horizontal, z)->RemoveOverlayTerrain();
+					}
+					this->Field(adjacent_pos_horizontal, z)->SetTerrain(terrain_type);
+					seeds.push_back(adjacent_pos_horizontal);
+				}
+				
+				if (GetTileTopTerrain(adjacent_pos_vertical, false, z) != terrain_type) {
+					if (!terrain_type->Overlay) {
+						this->Field(adjacent_pos_vertical, z)->RemoveOverlayTerrain();
+					}
+					this->Field(adjacent_pos_vertical, z)->SetTerrain(terrain_type);
+					seeds.push_back(adjacent_pos_vertical);
+				}
+				
 				count -= 1;
-				seeds.push_back(adjacent_pos);
-				seeds.push_back(Vec2i(seed_pos.x, adjacent_pos.y));
-				seeds.push_back(Vec2i(adjacent_pos.x, seed_pos.y));
 			}
 		}
 	}
