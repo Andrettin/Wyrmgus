@@ -473,7 +473,7 @@ void SaveMapPNG(const char *name)
 			srcRect.x = Map.TileGraphic->frame_map[tile].x;
 			srcRect.y = Map.TileGraphic->frame_map[tile].y;
 			*/
-			CTerrainType *terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
+			const CTerrainType *terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
 			unsigned short int tile = mf.OverlayTerrain ? mf.OverlaySolidTile : mf.SolidTile;
 
 			srcRect.x = terrain->GetGraphics()->frame_map[tile].x;

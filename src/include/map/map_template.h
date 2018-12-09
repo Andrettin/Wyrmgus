@@ -62,7 +62,8 @@ class CGeneratedTerrain
 {
 public:
 	CTerrainType *TerrainType = nullptr;
-	int DegreeLevel = 0;
+	int Seeds = 0;
+	int ExpansionChance = 50; //50% chance to expand to a tile by default
 };
 
 class CMapTemplate
@@ -118,8 +119,7 @@ public:
 	CTerrainType *BorderTerrainType;
 	CTerrainType *SurroundingTerrainType;
 	std::vector<CMapTemplate *> Subtemplates;
-	std::vector<CGeneratedTerrain *> GeneratedTerrains;
-	std::vector<CGeneratedTerrain *> ExternalGeneratedTerrains;
+	std::vector<CGeneratedTerrain *> GeneratedTerrains;				/// terrains generated in the map template
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position

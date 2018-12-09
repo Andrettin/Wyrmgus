@@ -95,6 +95,7 @@
 ----------------------------------------------------------------------------*/
 
 class CFaction;
+class CGeneratedTerrain;
 class CGraphic;
 class CPlayer;
 class CFile;
@@ -115,19 +116,6 @@ class CWorld;
 
 #define MaxMapWidth  512  /// max map width supported
 #define MaxMapHeight 512  /// max map height supported
-
-//Wyrmgus start
-enum DegreeLevels {
-	ExtremelyHighDegreeLevel,
-	VeryHighDegreeLevel,
-	HighDegreeLevel,
-	MediumDegreeLevel,
-	LowDegreeLevel,
-	VeryLowDegreeLevel,
-	
-	MaxDegreeLevels
-};
-//Wyrmgus end
 
 //Wyrmgus start
 class CTerrainFeature
@@ -254,7 +242,7 @@ public:
 	void AdjustMap();
 	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
-	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline, int z);
+	void GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec2i &min_pos, const Vec2i &max_pos, const bool preserve_coastline, const int z);
 	void GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
 
@@ -268,8 +256,8 @@ public:
 	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer *map_layer) const;
 	
 	//Wyrmgus start
-	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay, int z) const;
-	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen, int z, bool ignore_destroyed = false) const;
+	CTerrainType *GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const;
+	CTerrainType *GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed = false) const;
 	int GetTileLandmass(const Vec2i &pos, int z) const;
 	Vec2i GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, Vec2i min_pos, Vec2i max_pos, int z) const;
 	//Wyrmgus end
@@ -299,12 +287,12 @@ public:
 	
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
-	bool TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrain, int z);
+	bool TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_terrain, const int z);
 	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false); // reverse means that it returns true if the tile borders one tile without the flag
 	bool TileBordersBuilding(const Vec2i &pos, int z);
 	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);
-	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain, int z);
+	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
 	bool IsPointInASubtemplateArea(const Vec2i &pos, int z) const;
 	bool IsLayerUnderground(int z) const;
 	
@@ -413,8 +401,6 @@ extern int ReplayRevealMap;
 //Wyrmgus start
 extern CSite *GetSite(const std::string &site_ident);
 extern CTerrainFeature *GetTerrainFeature(const std::string &terrain_feature_ident);
-extern std::string GetDegreeLevelNameById(int degree_level);
-extern int GetDegreeLevelIdByName(const std::string &degree_level);
 //Wyrmgus end
 
 #define MARKER_ON_INDEX

@@ -97,15 +97,20 @@ int CMapField::GetResource() const
 }
 
 //Wyrmgus start
-void CMapField::SetTerrain(CTerrainType *terrain)
+/**
+**	@brief	Set the tile's terrain type
+**
+**	@param	terrain_type	The new terrain type for the tile
+*/
+void CMapField::SetTerrain(CTerrainType *terrain_type)
 {
-	if (!terrain) {
+	if (!terrain_type) {
 		return;
 	}
 	
 	//remove the flags of the old terrain type
-	if (terrain->Overlay) {
-		if (this->OverlayTerrain == terrain) {
+	if (terrain_type->Overlay) {
+		if (this->OverlayTerrain == terrain_type) {
 			return;
 		}
 		if (this->OverlayTerrain) {
@@ -122,7 +127,7 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 			this->Flags &= ~(MapFieldGravel);
 		}
 	} else {
-		if (this->Terrain == terrain) {
+		if (this->Terrain == terrain_type) {
 			return;
 		}
 		if (this->Terrain) {
@@ -130,26 +135,26 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		}
 	}
 	
-	if (terrain->Overlay) {
-		if (!this->Terrain || std::find(terrain->BaseTerrainTypes.begin(), terrain->BaseTerrainTypes.end(), this->Terrain) == terrain->BaseTerrainTypes.end()) {
-			this->SetTerrain(terrain->BaseTerrainTypes[0]);
+	if (terrain_type->Overlay) {
+		if (!this->Terrain || std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), this->Terrain) == terrain_type->BaseTerrainTypes.end()) {
+			this->SetTerrain(terrain_type->BaseTerrainTypes[0]);
 		}
-		if (terrain->Flags & MapFieldWaterAllowed) {
+		if (terrain_type->Flags & MapFieldWaterAllowed) {
 			this->Flags &= ~(this->Terrain->Flags); // if the overlay is water, remove all flags from the base terrain
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 		}
-		this->OverlayTerrain = terrain;
-		if (terrain->SolidTiles.size() > 0) {
-			this->OverlaySolidTile = terrain->SolidTiles[SyncRand(terrain->SolidTiles.size())];
+		this->OverlayTerrain = terrain_type;
+		if (terrain_type->SolidTiles.size() > 0) {
+			this->OverlaySolidTile = terrain_type->SolidTiles[SyncRand(terrain_type->SolidTiles.size())];
 		}
 		this->OverlayTerrainDestroyed = false;
 		this->OverlayTerrainDamaged = false;
 	} else {
-		this->Terrain = terrain;
-		if (terrain->SolidTiles.size() > 0) {
-			this->SolidTile = terrain->SolidTiles[SyncRand(terrain->SolidTiles.size())];
+		this->Terrain = terrain_type;
+		if (terrain_type->SolidTiles.size() > 0) {
+			this->SolidTile = terrain_type->SolidTiles[SyncRand(terrain_type->SolidTiles.size())];
 		}
-		if (this->OverlayTerrain && std::find(this->OverlayTerrain->BaseTerrainTypes.begin(), this->OverlayTerrain->BaseTerrainTypes.end(), terrain) == this->OverlayTerrain->BaseTerrainTypes.end()) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
+		if (this->OverlayTerrain && std::find(this->OverlayTerrain->BaseTerrainTypes.begin(), this->OverlayTerrain->BaseTerrainTypes.end(), terrain_type) == this->OverlayTerrain->BaseTerrainTypes.end()) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->OverlayTerrain->Flags);
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 			this->OverlayTerrain = nullptr;
@@ -157,14 +162,14 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		}
 	}
 	
-	if (Editor.Running == EditorNotRunning && terrain->SolidAnimationFrames > 0) {
-		if (terrain->Overlay) {
-			this->OverlayAnimationFrame = SyncRand(terrain->SolidAnimationFrames);
+	if (Editor.Running == EditorNotRunning && terrain_type->SolidAnimationFrames > 0) {
+		if (terrain_type->Overlay) {
+			this->OverlayAnimationFrame = SyncRand(terrain_type->SolidAnimationFrames);
 		} else {
-			this->AnimationFrame = SyncRand(terrain->SolidAnimationFrames);
+			this->AnimationFrame = SyncRand(terrain_type->SolidAnimationFrames);
 		}
 	} else {
-		if (terrain->Overlay) {
+		if (terrain_type->Overlay) {
 			this->OverlayAnimationFrame = 0;
 		} else {
 			this->AnimationFrame = 0;
@@ -172,7 +177,7 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	}
 	
 	//apply the flags from the new terrain type
-	this->Flags |= terrain->Flags;
+	this->Flags |= terrain_type->Flags;
 	const CUnitCache &cache = this->UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
 		CUnit &unit = *cache[i];
@@ -203,10 +208,10 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	}
 
 	//wood and rock tiles must always begin with the default value for their respective resource types
-	if (terrain->Overlay && terrain->Resource != -1) {
-		this->Value = Resources[terrain->Resource].DefaultAmount;
-	} else if ((terrain->Flags & MapFieldWall) && terrain->UnitType) {
-		this->Value = terrain->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
+	if (terrain_type->Overlay && terrain_type->Resource != -1) {
+		this->Value = Resources[terrain_type->Resource].DefaultAmount;
+	} else if ((terrain_type->Flags & MapFieldWall) && terrain_type->UnitType) {
+		this->Value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}
 	
 	if (this->TerrainFeature) {

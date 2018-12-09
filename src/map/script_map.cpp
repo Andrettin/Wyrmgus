@@ -1701,44 +1701,6 @@ static int CclDefineMapTemplate(lua_State *l)
 		} else if (!strcmp(value, "SurroundingTerrainType")) {
 			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1));
 			map_template->SurroundingTerrainType = terrain_type;
-		} else if (!strcmp(value, "GeneratedTerrains")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1, j + 1));
-				++j;
-				
-				int degree_level = GetDegreeLevelIdByName(LuaToString(l, -1, j + 1));
-				if (degree_level == -1) {
-					LuaError(l, "Degree level doesn't exist.");
-				}
-				
-				CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
-				generated_terrain->TerrainType = terrain_type;
-				generated_terrain->DegreeLevel = degree_level;
-				map_template->GeneratedTerrains.push_back(generated_terrain);
-			}
-		} else if (!strcmp(value, "ExternalGeneratedTerrains")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1, j + 1));
-				++j;
-				
-				int degree_level = GetDegreeLevelIdByName(LuaToString(l, -1, j + 1));
-				if (degree_level == -1) {
-					LuaError(l, "Degree level doesn't exist.");
-				}
-				
-				CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
-				generated_terrain->TerrainType = terrain_type;
-				generated_terrain->DegreeLevel = degree_level;
-				map_template->ExternalGeneratedTerrains.push_back(generated_terrain);
-			}
 		} else if (!strcmp(value, "GeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

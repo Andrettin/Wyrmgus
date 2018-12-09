@@ -216,7 +216,7 @@ public:
 	void parse(lua_State *l);
 
 	//Wyrmgus start
-	void SetTerrain(CTerrainType *terrain);
+	void SetTerrain(CTerrainType *terrain_type);
 	void RemoveOverlayTerrain();
 	void SetOverlayTerrainDestroyed(bool destroyed);
 	void SetOverlayTerrainDamaged(bool damaged);
