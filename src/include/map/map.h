@@ -292,6 +292,7 @@ public:
 	bool TileBordersBuilding(const Vec2i &pos, int z);
 	bool TileBordersPathway(const Vec2i &pos, int z, bool only_railroad);
 	bool TileBordersUnit(const Vec2i &pos, int z);
+	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const CTerrainType *new_terrain, const int z);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
 	bool IsPointInASubtemplateArea(const Vec2i &pos, const int z) const;
 	bool IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const;

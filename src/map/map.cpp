@@ -648,6 +648,46 @@ bool CMap::TileBordersUnit(const Vec2i &pos, int z)
 }
 
 /**
+**	@brief	Get whether a given tile has any inner border terrains incompatible with a given overlay terrain type
+**
+**	@param	pos					The tile's position
+**	@param	new_terrain_type	The terrain type to check
+**	@param	z					The tile's map layer
+**
+**	@return	True if the tile borders only tiles with the same terrain as itself, false otherwise
+*/
+bool CMap::TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z)
+{
+	if (!terrain_type || !terrain_type->Overlay) {
+		return false;
+	}
+	
+	CTerrainType *tile_terrain = this->GetTileTerrain(pos, false, z);
+	
+	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			
+			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
+				continue;
+			}
+			
+			CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, false, z);
+			
+			if (
+				tile_terrain != adjacent_terrain
+				&& std::find(tile_terrain->InnerBorderTerrains.begin(), tile_terrain->InnerBorderTerrains.end(), adjacent_terrain) != tile_terrain->InnerBorderTerrains.end()
+				&& std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), adjacent_terrain) == terrain_type->BaseTerrainTypes.end()
+			) {
+				return false;
+			}
+		}
+	}
+		
+	return true;
+}
+
+/**
 **	@brief	Get whether a tile has units that are incompatible with a given terrain type
 **
 **	@param	pos				The tile's position
@@ -2630,9 +2670,9 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 							)
 							|| (
 								terrain_type->Overlay
-								&& ((std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), diagonal_tile_terrain) != terrain_type->BaseTerrainTypes.end() && this->TileBordersOnlySameTerrain(diagonal_pos, terrain_type, z)) || GetTileTerrain(diagonal_pos, terrain_type->Overlay, z) == terrain_type)
-								&& ((std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), vertical_tile_terrain) != terrain_type->BaseTerrainTypes.end() && this->TileBordersOnlySameTerrain(vertical_pos, terrain_type, z)) || GetTileTerrain(vertical_pos, terrain_type->Overlay, z) == terrain_type)
-								&& ((std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), horizontal_tile_terrain) != terrain_type->BaseTerrainTypes.end() && this->TileBordersOnlySameTerrain(horizontal_pos, terrain_type, z)) || GetTileTerrain(horizontal_pos, terrain_type->Overlay, z) == terrain_type)
+								&& ((std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), diagonal_tile_terrain) != terrain_type->BaseTerrainTypes.end() && this->TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(diagonal_pos, terrain_type, z)) || GetTileTerrain(diagonal_pos, terrain_type->Overlay, z) == terrain_type)
+								&& ((std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), vertical_tile_terrain) != terrain_type->BaseTerrainTypes.end() && this->TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(vertical_pos, terrain_type, z)) || GetTileTerrain(vertical_pos, terrain_type->Overlay, z) == terrain_type)
+								&& ((std::find(terrain_type->BaseTerrainTypes.begin(), terrain_type->BaseTerrainTypes.end(), horizontal_tile_terrain) != terrain_type->BaseTerrainTypes.end() && this->TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(horizontal_pos, terrain_type, z)) || GetTileTerrain(horizontal_pos, terrain_type->Overlay, z) == terrain_type)
 								&& (GetTileTerrain(diagonal_pos, terrain_type->Overlay, z) != terrain_type || GetTileTerrain(vertical_pos, terrain_type->Overlay, z) != terrain_type || GetTileTerrain(horizontal_pos, terrain_type->Overlay, z) != terrain_type)
 								&& (!GetTileTopTerrain(diagonal_pos, false, z)->Overlay || GetTileTopTerrain(diagonal_pos, false, z) == terrain_type) && (!GetTileTopTerrain(vertical_pos, false, z)->Overlay || GetTileTopTerrain(vertical_pos, false, z) == terrain_type) && (!GetTileTopTerrain(horizontal_pos, false, z)->Overlay || GetTileTopTerrain(horizontal_pos, false, z) == terrain_type) // don't expand into tiles with overlays if the terrain is an overlay terrain itself
 							)
