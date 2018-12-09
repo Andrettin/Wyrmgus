@@ -1715,7 +1715,10 @@ static int CclDefineMapTemplate(lua_State *l)
 					LuaError(l, "Degree level doesn't exist.");
 				}
 				
-				map_template->GeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain_type, degree_level));
+				CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
+				generated_terrain->TerrainType = terrain_type;
+				generated_terrain->DegreeLevel = degree_level;
+				map_template->GeneratedTerrains.push_back(generated_terrain);
 			}
 		} else if (!strcmp(value, "ExternalGeneratedTerrains")) {
 			if (!lua_istable(l, -1)) {
@@ -1731,7 +1734,10 @@ static int CclDefineMapTemplate(lua_State *l)
 					LuaError(l, "Degree level doesn't exist.");
 				}
 				
-				map_template->ExternalGeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain_type, degree_level));
+				CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
+				generated_terrain->TerrainType = terrain_type;
+				generated_terrain->DegreeLevel = degree_level;
+				map_template->ExternalGeneratedTerrains.push_back(generated_terrain);
 			}
 		} else if (!strcmp(value, "GeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {

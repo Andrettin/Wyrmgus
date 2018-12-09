@@ -73,6 +73,19 @@ std::map<std::string, CMapTemplate *> CMapTemplate::MapTemplatesByIdent;
 ----------------------------------------------------------------------------*/
 
 /**
+**	@brief	Destructor
+*/
+CMapTemplate::~CMapTemplate()
+{
+	for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
+		delete this->GeneratedTerrains[i];
+	}
+	for (size_t i = 0; i < this->ExternalGeneratedTerrains.size(); ++i) {
+		delete this->ExternalGeneratedTerrains[i];
+	}
+}
+
+/**
 **	@brief	Get a map template
 **
 **	@param	ident			The map template's string identifier
@@ -266,7 +279,10 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			this->GeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain_type, degree_level));
+			CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
+			generated_terrain->TerrainType = terrain_type;
+			generated_terrain->DegreeLevel = degree_level;
+			this->GeneratedTerrains.push_back(generated_terrain);
 		} else {
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
@@ -646,7 +662,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 					int map_height = (external_end.y - external_start_pos.y);
 					int expansion_number = 0;
 						
-					int degree_level = this->Subtemplates[i]->ExternalGeneratedTerrains[j].second;
+					int degree_level = this->Subtemplates[i]->ExternalGeneratedTerrains[j]->DegreeLevel;
 						
 					if (degree_level == ExtremelyHighDegreeLevel) {
 						expansion_number = map_width * map_height / 2;
@@ -662,7 +678,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 						expansion_number = map_width * map_height / 64;
 					}
 						
-					Map.GenerateTerrain(this->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !this->Subtemplates[i]->TerrainFile.empty() || !this->Subtemplates[i]->TerrainImage.empty(), z);
+					Map.GenerateTerrain(this->Subtemplates[i]->ExternalGeneratedTerrains[j]->TerrainType, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !this->Subtemplates[i]->TerrainFile.empty() || !this->Subtemplates[i]->TerrainImage.empty(), z);
 				}
 			}
 		}
@@ -721,7 +737,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		int seed_number = 0;
 		int expansion_number = 0;
 		
-		int degree_level = this->GeneratedTerrains[i].second;
+		int degree_level = this->GeneratedTerrains[i]->DegreeLevel;
 		
 		if (degree_level == ExtremelyHighDegreeLevel) {
 			expansion_number = map_width * map_height / 2;
@@ -745,7 +761,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		
 		seed_number = std::max(1, seed_number);
 		
-		Map.GenerateTerrain(this->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1), !this->TerrainFile.empty() || !this->TerrainImage.empty(), z);
+		Map.GenerateTerrain(this->GeneratedTerrains[i]->TerrainType, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1), !this->TerrainFile.empty() || !this->TerrainImage.empty(), z);
 	}
 	
 	if (!this->IsSubtemplateArea()) {
