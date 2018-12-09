@@ -84,6 +84,13 @@ CUserInterface UI;
 */
 void ShowLoadProgress(const char *fmt, ...)
 {
+	static unsigned int lastProgressUpdate = SDL_GetTicks();
+	if (SDL_GetTicks() < lastProgressUpdate + 16) {
+		// Only show progress updates every c. 1/60th of a second, otherwise we're waiting for the screen too much
+		return;
+	}
+	lastProgressUpdate = SDL_GetTicks();
+
 	UpdateLoadProgress();
 	
 	va_list va;
@@ -126,7 +133,7 @@ void ShowLoadProgress(const char *fmt, ...)
 }
 
 /**
-**  Update load progress.
+**	@brief	Update load progress.
 */
 void UpdateLoadProgress()
 {
