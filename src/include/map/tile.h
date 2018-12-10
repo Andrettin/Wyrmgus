@@ -8,10 +8,10 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name tile.h - The map tile headerfile. */
+/**@name tile.h - The map tile header file. */
 //
-//      (c) Copyright 1998-2008 by Vladi Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon and Rafal Bursig
+//      (c) Copyright 1998-2018 by Vladi Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Rafal Bursig and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -236,6 +236,10 @@ public:
 
 	/// Check if a field flags.
 	bool CheckMask(int mask) const;
+	
+	CTerrainType *GetTerrain(const bool overlay) const;
+
+	CTerrainType *GetTopTerrain(const bool seen = false, const bool ignore_destroyed = false) const;
 
 	/// Returns true, if water on the map tile field
 	bool WaterOnMap() const;

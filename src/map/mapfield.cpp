@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name mapfield.cpp - The map field. */
+/**@name mapfield.cpp - The map field source file. */
 //
 //      (c) Copyright 2013-2018 by Joris Dauphin and Andrettin
 //
@@ -65,6 +65,47 @@ CMapField::CMapField() :
 	OverlayTerrainDamaged(false),
 	UnitCache()
 {
+}
+
+/**
+**	@brief	Get the terrain of the tile
+**
+**	@param	overlay		Whether it is the overlay terrain that should be obtained
+**
+**	@return	The terrain of the tile for the given overlay parameter
+*/
+CTerrainType *CMapField::GetTerrain(const bool overlay) const
+{
+	if (overlay) {
+		return this->OverlayTerrain;
+	} else {
+		return this->Terrain;
+	}
+}
+
+/**
+**	@brief	Get the top terrain of the tile
+**
+**	@param	seen				Whether the seen tile terrain that should be obtained
+**	@param	ignore_destroyed	Whether the tile's overlay terrain should be ignored if destroyed
+**
+**	@return	The topmost terrain of the tile
+*/
+CTerrainType *CMapField::GetTopTerrain(const bool seen, const bool ignore_destroyed) const
+{
+	if (!seen) {
+		if (this->OverlayTerrain && (!ignore_destroyed || !this->OverlayTerrainDestroyed)) {
+			return this->OverlayTerrain;
+		} else {
+			return this->Terrain;
+		}
+	} else {
+		if (this->playerInfo.SeenOverlayTerrain) {
+			return this->playerInfo.SeenOverlayTerrain;
+		} else {
+			return this->playerInfo.SeenTerrain;
+		}
+	}
 }
 
 bool CMapField::IsTerrainResourceOnMap(int resource) const

@@ -46,6 +46,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
+#include "map/tile.h"
 #include "map/tileset.h"
 #include "plane.h"
 #include "player.h"
@@ -275,6 +276,12 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 					generated_terrain->ExpansionChance = std::stoi(value);
 				} else if (key == "use_existing_as_seeds") {
 					generated_terrain->UseExistingAsSeeds = StringToBool(value);
+				} else if (key == "target_terrain_type") {
+					value = FindAndReplaceString(value, "_", "-");
+					const CTerrainType *target_terrain_type = CTerrainType::GetTerrainType(value);
+					if (target_terrain_type) {
+						generated_terrain->TargetTerrainTypes.push_back(target_terrain_type);
+					}
 				} else {
 					fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", key.c_str());
 				}
@@ -1380,6 +1387,107 @@ CMapTemplate *CMapTemplate::GetTopMapTemplate()
 	} else {
 		return this;
 	}
+}
+
+/**
+**	@brief	Get whether the terrain generation can use the given tile as a seed
+**
+**	@param	tile	The tile
+**
+**	@return	True if the tile can be used as a seed, or false otherwise
+*/
+bool CGeneratedTerrain::CanUseTileAsSeed(const CMapField *tile) const
+{
+	const CTerrainType *top_terrain = tile->GetTopTerrain();
+	
+	if (top_terrain == this->TerrainType) { //top terrain is the same as the one for the generation, so the tile can be used as a seed
+		return true;
+	}
+	
+	if (this->TerrainType == tile->Terrain && std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), top_terrain) == this->TargetTerrainTypes.end()) { //the tile's base terrain is the same as the one for the generation, and its overlay terrain is not a target for the generation
+		return true;
+	}
+	
+	return false;
+}
+
+/**
+**	@brief	Get whether the terrain can be generated on the given tile
+**
+**	@param	tile	The tile
+**
+**	@return	True if the terrain can be generated on the tile, or false otherwise
+*/
+bool CGeneratedTerrain::CanGenerateOnTile(const CMapField *tile) const
+{
+	if (this->TerrainType->Overlay) {
+		if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrain()) == this->TargetTerrainTypes.end()) { //disallow generating over terrains that aren't a target for the generation
+			return false;
+		}
+	} else {
+		if (
+			std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->GetTopTerrain()) == this->TargetTerrainTypes.end()
+			&& std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->Terrain) == this->TargetTerrainTypes.end()
+		) {
+			return false;
+		}
+		
+		if ( //don't allow generating the terrain on the tile if it is a base terrain, and putting it there would destroy an overlay terrain that isn't a target of the generation
+			tile->OverlayTerrain
+			&& !this->CanRemoveTileOverlayTerrain(tile)
+			&& std::find(tile->OverlayTerrain->BaseTerrainTypes.begin(), tile->OverlayTerrain->BaseTerrainTypes.end(), this->TerrainType) == tile->OverlayTerrain->BaseTerrainTypes.end()
+		) {
+			return false;
+		}
+		
+		if (std::find(this->TerrainType->BorderTerrains.begin(), this->TerrainType->BorderTerrains.end(), tile->Terrain) == this->TerrainType->BorderTerrains.end()) { //don't allow generating on the tile if it can't be a border terrain to the terrain we want to generate
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Get whether the tile can be a part of an expansion
+**
+**	@param	tile	The tile
+**
+**	@return	True if the tile can be part of an expansion, or false otherwise
+*/
+bool CGeneratedTerrain::CanTileBePartOfExpansion(const CMapField *tile) const
+{
+	if (this->CanGenerateOnTile(tile)) {
+		return true;
+	}
+	
+	if (this->TerrainType == tile->GetTopTerrain()) {
+		return true;
+	}
+	
+	if (!this->TerrainType->Overlay) {
+		if (this->TerrainType == tile->Terrain) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+/**
+**	@brief	Get whether the terrain generation can remove the tile's overlay terrain
+**
+**	@param	tile	The tile
+**
+**	@return	True if the terrain generation can remove the tile's overlay terrain, or false otherwise
+*/
+bool CGeneratedTerrain::CanRemoveTileOverlayTerrain(const CMapField *tile) const
+{
+	if (std::find(this->TargetTerrainTypes.begin(), this->TargetTerrainTypes.end(), tile->OverlayTerrain) == this->TargetTerrainTypes.end()) {
+		return false;
+	}
+	
+	return true;
 }
 
 //@}
