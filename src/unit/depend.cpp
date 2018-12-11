@@ -40,9 +40,11 @@
 
 #include "age.h"
 #include "config.h"
+#include "map/map_layer.h"
 #include "player.h"
 #include "religion/deity.h"
 #include "script.h"
+#include "time/season.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui/button_action.h"
@@ -96,6 +98,7 @@ void DependRule::ProcessConfigData(const CConfigData *config_data, const int rul
 				if (grandchild_config_data->Tag == "rule") {
 					std::string requirement;
 					int count = 1;
+					int requirement_type = -1;
 					
 					for (size_t k = 0; k < grandchild_config_data->Properties.size(); ++k) {
 						std::string key = grandchild_config_data->Properties[k].first;
@@ -104,6 +107,16 @@ void DependRule::ProcessConfigData(const CConfigData *config_data, const int rul
 						if (key == "requirement") {
 							value = FindAndReplaceString(value, "_", "-");
 							requirement = value;
+						} else if (key == "requirement_type") {
+							if (value == "unit_type") {
+								requirement_type = DependRuleUnitType;
+							} else if (value == "upgrade") {
+								requirement_type = DependRuleUpgrade;
+							} else if (value == "age") {
+								requirement_type = DependRuleAge;
+							} else if (value == "season") {
+								requirement_type = DependRuleSeason;
+							}
 						} else if (key == "count") {
 							count = std::stoi(value);
 						} else {
@@ -116,7 +129,12 @@ void DependRule::ProcessConfigData(const CConfigData *config_data, const int rul
 						continue;
 					}
 					
-					AddDependency(rule_type, target, requirement, count, or_flag, is_predependency);
+					if (requirement_type == -1) {
+						fprintf(stderr, "Dependency rule has an invalid \"requirement_type\".\n");
+						continue;
+					}
+					
+					AddDependency(rule_type, target, requirement_type, requirement, count, or_flag, is_predependency);
 					or_flag = 0;
 				} else {
 					fprintf(stderr, "Invalid dependency rule group property: \"%s\".\n", grandchild_config_data->Tag.c_str());
@@ -144,8 +162,10 @@ static intptr_t GetDependencyKeyForRule(const DependRule &rule)
 		dependency_key = (intptr_t) rule.Kind.Upgrade;
 	} else if (rule.Type == DependRuleAge) {
 		dependency_key = (intptr_t) rule.Kind.Age;
+	} else if (rule.Type == DependRuleSeason) {
+		dependency_key = (intptr_t) rule.Kind.Season;
 	} else {
-		fprintf(stderr, "Dependency rule should be unit-type, upgrade or age.\n");
+		fprintf(stderr, "Invalid rule type for dependency rule: %d.\n", rule.Type);
 		return (intptr_t) nullptr;
 	}
 	return dependency_key;
@@ -177,12 +197,13 @@ static DependRule *GetDependencyNodeForRule(const DependRule &rule, const bool i
 **
 **	@param	rule_type			The type of the rule (e.g. unit type or upgrade)
 **	@param	target				Target of the dependency
+**	@param	required_rule_type	The type of the rule of the requirement
 **	@param	required			Requirement of the dependency
 **	@param	count				Amount of the required needed
 **	@param	or_flag				Start of or rule
 **	@param	is_predependency	Whether the dependency is a predependency
 */
-void AddDependency(const int rule_type, const std::string &target, const std::string &required, int count, const int or_flag, const bool is_predependency)
+void AddDependency(const int rule_type, const std::string &target, const int required_rule_type, const std::string &required, int count, const int or_flag, const bool is_predependency)
 {
 	DependRule rule;
 
@@ -202,8 +223,10 @@ void AddDependency(const int rule_type, const std::string &target, const std::st
 		}
 	} else if (rule.Type == DependRuleAge) {
 		rule.Kind.Age = CAge::GetAge(target);
+	} else if (rule.Type == DependRuleSeason) {
+		rule.Kind.Season = CSeason::GetSeason(target);
 	} else {
-		fprintf(stderr, "Dependency target '%s' should be unit-type, upgrade or age.\n", target.c_str());
+		fprintf(stderr, "Invalid rule type for dependency target \"%s\": %d.\n", target.c_str(), rule.Type);
 		return;
 	}
 
@@ -234,25 +257,36 @@ void AddDependency(const int rule_type, const std::string &target, const std::st
 	temp->Rule = nullptr;
 	temp->Next = nullptr;
 	temp->Count = count;
+	temp->Type = required_rule_type;
+	
+	if (temp->Type == -1) {
+		if (!strncmp(required.c_str(), "unit-", 5)) {
+		// required string refers to unit-xxx
+			temp->Type = DependRuleUnitType;
+		} else if (!strncmp(required.c_str(), "upgrade-", 8)) {
+		// required string refers to upgrade-XXX
+			temp->Type = DependRuleUpgrade;
+		}
+	}
 
 	//  Setup structure.
-	if (!strncmp(required.c_str(), "unit-", 5)) {
-		// required string refers to unit-xxx
-		temp->Type = DependRuleUnitType;
+	if (temp->Type == DependRuleUnitType) {
 		temp->Kind.UnitType = UnitTypeByIdent(required);
 		if (!temp->Kind.UnitType) {
 			fprintf(stderr, "Unit type \"%s\" was set as a dependency for \"%s\", but it doesn't exist.\n", required.c_str(), target.c_str());
 			fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", required.c_str());
 		}
-	} else if (!strncmp(required.c_str(), "upgrade-", 8)) {
-		// required string refers to upgrade-XXX
-		temp->Type = DependRuleUpgrade;
+	} else if (temp->Type == DependRuleUpgrade) {
 		temp->Kind.Upgrade = CUpgrade::Get(required);
 		if (!temp->Kind.Upgrade) {
 			fprintf(stderr, "Upgrade \"%s\" was set as a dependency for \"%s\", but it doesn't exist.\n", required.c_str(), target.c_str());
 		}
+	} else if (temp->Type == DependRuleAge) {
+		temp->Kind.Age = CAge::GetAge(required);
+	} else if (temp->Type == DependRuleSeason) {
+		temp->Kind.Season = CSeason::GetSeason(required);
 	} else {
-		DebugPrint("dependency required '%s' should be unit-type or upgrade\n" _C_ required.c_str());
+		fprintf(stderr, "Invalid rule type for dependency requirement \"%s\": %d\n", required.c_str(), temp->Type);
 		delete temp;
 		return;
 	}
@@ -317,6 +351,18 @@ static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool igno
 						goto try_or;
 					}
 					break;
+				case DependRuleAge:
+					i = player.Age == temp->Kind.Age;
+					if (temp->Count ? i : !i) {
+						goto try_or;
+					}
+					break;
+				case DependRuleSeason:
+					i = Map.MapLayers[player.StartMapLayer]->GetSeason() == temp->Kind.Season;
+					if (temp->Count ? i : !i) {
+						goto try_or;
+					}
+					break;
 			}
 			temp = temp->Rule;
 		}
@@ -368,6 +414,18 @@ static bool CheckDependByRule(const CUnit &unit, DependRule &rule, bool ignore_u
 					break;
 				case DependRuleUpgrade:
 					i = UpgradeIdAllowed(*unit.Player, temp->Kind.Upgrade->ID) != 'R' && !unit.GetIndividualUpgrade(temp->Kind.Upgrade);
+					if (temp->Count ? i : !i) {
+						goto try_or;
+					}
+					break;
+				case DependRuleAge:
+					i = unit.Player->Age == temp->Kind.Age;
+					if (temp->Count ? i : !i) {
+						goto try_or;
+					}
+					break;
+				case DependRuleSeason:
+					i = unit.MapLayer->GetSeason() == temp->Kind.Season;
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}
@@ -531,6 +589,12 @@ bool CheckDependByIdent(const CPlayer &player, const int rule_type, const std::s
 		if (!rule.Kind.Age) {
 			return false;
 		}
+	} else if (rule.Type == DependRuleSeason) {
+		rule.Kind.Season = CSeason::GetSeason(target);
+		
+		if (!rule.Kind.Season) {
+			return false;
+		}
 	} else {
 		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return false;
@@ -579,6 +643,18 @@ bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::strin
 			return false;
 		}
 		rule.Type = DependRuleUpgrade;
+	} else if (rule.Type == DependRuleAge) {
+		rule.Kind.Age = CAge::GetAge(target);
+		
+		if (!rule.Kind.Age) {
+			return false;
+		}
+	} else if (rule.Type == DependRuleSeason) {
+		rule.Kind.Season = CSeason::GetSeason(target);
+		
+		if (!rule.Kind.Season) {
+			return false;
+		}
 	} else {
 		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return false;
@@ -727,7 +803,7 @@ static int CclDefineDependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			AddDependency(!strncmp(target, "unit-", 5) ? DependRuleUnitType : DependRuleUpgrade, target, required, count, or_flag, false);
+			AddDependency(!strncmp(target, "unit-", 5) ? DependRuleUnitType : DependRuleUpgrade, target, -1, required, count, or_flag, false);
 			or_flag = 0;
 		}
 		if (j + 1 < args) {
@@ -767,7 +843,7 @@ static int CclDefinePredependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			AddDependency(!strncmp(target, "unit-", 5) ? DependRuleUnitType : DependRuleUpgrade, target, required, count, or_flag, true);
+			AddDependency(!strncmp(target, "unit-", 5) ? DependRuleUnitType : DependRuleUpgrade, target, -1, required, count, or_flag, true);
 			or_flag = 0;
 		}
 		if (j + 1 < args) {

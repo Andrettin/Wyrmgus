@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit.cpp - The units. */
+/**@name unit.cpp - The unit source file. */
 //
 //      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -2033,19 +2033,19 @@ void CUnit::GenerateDrop()
 	CUnitType *chosen_drop = nullptr;
 	std::vector<CUnitType *> potential_drops;
 	for (size_t i = 0; i < this->Type->Drops.size(); ++i) {
-		if (CheckDependByType(*this->Player, *this->Type->Drops[i])) {
+		if (CheckDependByType(*this, *this->Type->Drops[i])) {
 			potential_drops.push_back(this->Type->Drops[i]);
 		}
 	}
 	if (this->Player->AiEnabled) {
 		for (size_t i = 0; i < this->Type->AiDrops.size(); ++i) {
-			if (CheckDependByType(*this->Player, *this->Type->AiDrops[i])) {
+			if (CheckDependByType(*this, *this->Type->AiDrops[i])) {
 				potential_drops.push_back(this->Type->AiDrops[i]);
 			}
 		}
 		for (std::map<std::string, std::vector<CUnitType *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
 			for (size_t i = 0; i < iterator->second.size(); ++i) {
-				if (CheckDependByType(*this->Player, *iterator->second[i])) {
+				if (CheckDependByType(*this, *iterator->second[i])) {
 					potential_drops.push_back(iterator->second[i]);
 				}
 			}
@@ -2151,7 +2151,7 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 	}
 	if (dropper_player != nullptr) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependByIdent(*dropper_player, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependByIdent(*dropper, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
 				potential_prefixes.push_back(AllUpgrades[i]);
 			}
 		}
@@ -2174,7 +2174,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 	}
 	if (dropper_player != nullptr) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependByIdent(*dropper_player, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependByIdent(*dropper, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
 				if (Prefix == nullptr || !AllUpgrades[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 					potential_suffixes.push_back(AllUpgrades[i]);
 				}
@@ -2213,7 +2213,7 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 	}
 	if (dropper_player != nullptr) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependByIdent(*dropper_player, DependRuleUpgrade, AllUpgrades[i]->Ident) && !AllUpgrades[i]->UniqueOnly) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependByIdent(*dropper, DependRuleUpgrade, AllUpgrades[i]->Ident) && !AllUpgrades[i]->UniqueOnly) {
 				potential_works.push_back(AllUpgrades[i]);
 			}
 		}
@@ -2232,17 +2232,17 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 			Type == UniqueItems[i]->Type
 			&& ( //the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Prefix == nullptr
-				|| (dropper_player != nullptr && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Prefix->Ident))
+				|| (dropper_player != nullptr && CheckDependByIdent(*dropper, DependRuleUpgrade, UniqueItems[i]->Prefix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Prefix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Suffix == nullptr
-				|| (dropper_player != nullptr && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Suffix->Ident))
+				|| (dropper_player != nullptr && CheckDependByIdent(*dropper, DependRuleUpgrade, UniqueItems[i]->Suffix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's set to drop the item
 				UniqueItems[i]->Set == nullptr
-				|| (dropper_player != nullptr && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Set->Ident))
+				|| (dropper_player != nullptr && CheckDependByIdent(*dropper, DependRuleUpgrade, UniqueItems[i]->Set->Ident))
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's spell to drop the item
 				UniqueItems[i]->Spell == nullptr
@@ -2251,12 +2251,12 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 			&& ( //the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Work == nullptr
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
-				|| (dropper_player != nullptr && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Work->Ident))
+				|| (dropper_player != nullptr && CheckDependByIdent(*dropper, DependRuleUpgrade, UniqueItems[i]->Work->Ident))
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Elixir == nullptr
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Elixir) != this->Type->Affixes.end()
-				|| (dropper_player != nullptr && CheckDependByIdent(*dropper_player, DependRuleUpgrade, UniqueItems[i]->Elixir->Ident))
+				|| (dropper_player != nullptr && CheckDependByIdent(*dropper, DependRuleUpgrade, UniqueItems[i]->Elixir->Ident))
 			)
 			&& UniqueItems[i]->CanDrop()
 		) {
@@ -2301,7 +2301,7 @@ void CUnit::UpdateSoldUnits()
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
 					(iterator->second->Civilization && iterator->second->Civilization->ID == civilization_id || iterator->second->Type->Slot == PlayerRaces.GetCivilizationClassUnitType(civilization_id, iterator->second->Type->Class))
-					&& CheckDependByType(*this->Player, *iterator->second->Type, true) && iterator->second->CanAppear()
+					&& CheckDependByType(*this, *iterator->second->Type, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
 				}
@@ -2309,7 +2309,7 @@ void CUnit::UpdateSoldUnits()
 		}
 	} else {
 		for (size_t i = 0; i < this->Type->SoldUnits.size(); ++i) {
-			if (CheckDependByType(*this->Player, *this->Type->SoldUnits[i])) {
+			if (CheckDependByType(*this, *this->Type->SoldUnits[i])) {
 				potential_items.push_back(this->Type->SoldUnits[i]);
 			}
 		}

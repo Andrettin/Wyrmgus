@@ -95,6 +95,7 @@
 class CAge;
 class CConfigData;
 class CPlayer;
+class CSeason;
 class CUnitType;
 class CUnit;
 class CUpgrade;
@@ -103,7 +104,8 @@ class ButtonAction;
 enum {
 	DependRuleUnitType,		/// Kind is an unit-type
 	DependRuleUpgrade,		/// Kind is an upgrade
-	DependRuleAge			/// Kind is an age
+	DependRuleAge,			/// Kind is an age
+	DependRuleSeason		/// Kind is a season
 };
 
 /// Dependency rule
@@ -119,6 +121,7 @@ public:
 		const CUnitType *UnitType;	/// unit-type pointer
 		const CUpgrade  *Upgrade;	/// upgrade pointer
 		const CAge *Age;			/// age pointer
+		const CSeason *Season;		/// season pointer
 	} Kind;						/// required object
 	DependRule *Rule;			/// requirements, and rule
 };
@@ -136,7 +139,7 @@ extern void CleanDependencies();
 
 /// Print all unit dependencies into string
 extern std::string PrintDependencies(const CPlayer &player, const ButtonAction &button);
-extern void AddDependency(const int rule_type, const std::string &target, const std::string &required, const int count, const int or_flag, const bool is_predependency);
+extern void AddDependency(const int rule_type, const std::string &target, const int required_rule_type, const std::string &required, const int count, const int or_flag, const bool is_predependency);
 /// Check a dependency by identifier
 extern bool CheckDependByIdent(const CPlayer &player, const int rule_type, const std::string &target, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
 extern bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::string &target, bool ignore_units = false, bool is_predependency = false);

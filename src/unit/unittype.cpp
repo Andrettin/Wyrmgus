@@ -46,6 +46,7 @@
 #include "civilization.h"
 #include "config.h"
 #include "construct.h"
+#include "depend.h"
 //Wyrmgus start
 #include "editor.h" //for personal name generation
 //Wyrmgus end
@@ -1000,6 +1001,10 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					fprintf(stderr, "Invalid sound tag: \"%s\".\n", key.c_str());
 				}
 			}
+		} else if (child_config_data->Tag == "dependency" || child_config_data->Tag == "predependency") {
+			std::string target = config_data->Ident;
+			target = FindAndReplaceString(target, "_", "-");
+			DependRule::ProcessConfigData(child_config_data, DependRuleUnitType, target);
 		} else {
 			fprintf(stderr, "Invalid unit type property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
