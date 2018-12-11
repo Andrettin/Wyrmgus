@@ -804,7 +804,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			this->CorpseType = nullptr;
 		} else if (key == "weapon_class") {
 			value = FindAndReplaceString(value, "_", "-");
-			int weapon_class_id = GetItemClassIdByName(value);
+			const int weapon_class_id = GetItemClassIdByName(value);
 			if (weapon_class_id != -1) {
 				this->WeaponClasses.push_back(weapon_class_id);
 			} else {
@@ -817,6 +817,14 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				this->AiDrops.push_back(drop_type);
 			} else {
 				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "item_class") {
+			value = FindAndReplaceString(value, "_", "-");
+			const int item_class_id = GetItemClassIdByName(value);
+			if (item_class_id != -1) {
+				this->ItemClass = item_class_id;
+			} else {
+				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
 			}
 		} else {
 			key = SnakeCaseToPascalCase(key);
@@ -855,7 +863,21 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	for (size_t i = 0; i < config_data->Children.size(); ++i) {
 		const CConfigData *child_config_data = config_data->Children[i];
 		
-		if (child_config_data->Tag == "image") {
+		if (child_config_data->Tag == "costs") {
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				key = FindAndReplaceString(key, "_", "-");
+				
+				const int resource = GetResourceIdByName(key.c_str());
+				if (resource != -1) {
+					this->DefaultStat.Costs[resource] = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
+				}
+			}
+		} else if (child_config_data->Tag == "image") {
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;
 				std::string value = child_config_data->Properties[j].second;
