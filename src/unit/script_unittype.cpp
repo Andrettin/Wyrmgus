@@ -2392,13 +2392,13 @@ static int CclGetUnitTypeData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	lua_pushvalue(l, 1);
-	//Wyrmgus start
-//	const CUnitType *type = CclGetUnitType(l);
-	CUnitType *type = CclGetUnitType(l);
-	//Wyrmgus end
-	lua_pop(l, 1);
+	std::string ident = LuaToString(l, 1);
+	const CUnitType *type = UnitTypeByIdent(ident.c_str());
 	const char *data = LuaToString(l, 2);
+
+	if (!type) {
+		LuaError(l, "Invalid unit type: \"%s\"" _C_ ident.c_str());
+	}
 
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, type->Name.c_str());
@@ -2540,6 +2540,18 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ItemClass")) {
 		lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
+		return 1;
+	} else if (!strcmp(data, "ItemSlot")) {
+		const int item_slot = GetItemClassSlot(type->ItemClass);
+		if (item_slot != -1) {
+			lua_pushstring(l, GetItemSlotNameById(item_slot).c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "ItemSlotId")) {
+		const int item_slot = GetItemClassSlot(type->ItemClass);
+		lua_pushnumber(l, item_slot);
 		return 1;
 	} else if (!strcmp(data, "WeaponClasses")) {
 		lua_createtable(l, type->WeaponClasses.size(), 0);
@@ -2800,11 +2812,12 @@ static int CclGetUnitTypeData(lua_State *l)
 			mod_file = LuaToString(l, 3);
 		}
 
-		if (is_mod && type->ModAiDrops.find(mod_file) != type->ModAiDrops.end()) {
-			lua_createtable(l, type->ModAiDrops[mod_file].size(), 0);
-			for (size_t i = 1; i <= type->ModAiDrops[mod_file].size(); ++i)
+		std::map<std::string, std::vector<CUnitType *>>::const_iterator mod_find_iterator = type->ModAiDrops.find(mod_file);
+		if (is_mod && mod_find_iterator != type->ModAiDrops.end()) {
+			lua_createtable(l, mod_find_iterator->second.size(), 0);
+			for (size_t i = 1; i <= mod_find_iterator->second.size(); ++i)
 			{
-				lua_pushstring(l, type->ModAiDrops[mod_file][i-1]->Ident.c_str());
+				lua_pushstring(l, mod_find_iterator->second[i-1]->Ident.c_str());
 				lua_rawseti(l, -2, i);
 			}
 			return 1;
@@ -2983,11 +2996,12 @@ static int CclGetUnitTypeData(lua_State *l)
 			mod_file = LuaToString(l, 3);
 		}
 
-		if (is_mod && type->ModTrains.find(mod_file) != type->ModTrains.end()) {
-			lua_createtable(l, type->ModTrains[mod_file].size(), 0);
-			for (size_t i = 1; i <= type->ModTrains[mod_file].size(); ++i)
+		std::map<std::string, std::vector<CUnitType *>>::const_iterator mod_find_iterator = type->ModTrains.find(mod_file);
+		if (is_mod && mod_find_iterator != type->ModTrains.end()) {
+			lua_createtable(l, mod_find_iterator->second.size(), 0);
+			for (size_t i = 1; i <= mod_find_iterator->second.size(); ++i)
 			{
-				lua_pushstring(l, type->ModTrains[mod_file][i-1]->Ident.c_str());
+				lua_pushstring(l, mod_find_iterator->second[i-1]->Ident.c_str());
 				lua_rawseti(l, -2, i);
 			}
 			return 1;
