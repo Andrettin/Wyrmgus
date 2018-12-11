@@ -1231,6 +1231,8 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		AllowUnitId(Players[i], this->Slot, 65536);
 	}
 	
+	this->Initialized = true;
+	
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make unit type data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 }
 
@@ -1287,6 +1289,10 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 
 void CUnitType::SetParent(CUnitType *parent_type)
 {
+	if (!parent_type->Initialized) {
+		fprintf(stderr, "Unit type \"%s\" is inheriting features from a non-initialized parent (\"%s\").\n", this->Ident.c_str(), parent_type->Ident.c_str());
+	}
+	
 	this->Parent = parent_type;
 	
 	if (this->Name.empty()) {

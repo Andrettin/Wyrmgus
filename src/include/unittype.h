@@ -914,6 +914,7 @@ public:
 public:
 	std::string Ident;              /// Identifier
 	std::string Name;               /// Pretty name shown from the engine
+	bool Initialized = false;
 	CUnitType *Parent;				/// Parent unit type
 	//Wyrmgus start
 	int Class;						/// Class identifier (i.e. infantry, archer, etc.)

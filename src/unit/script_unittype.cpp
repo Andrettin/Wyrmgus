@@ -2128,6 +2128,9 @@ static int CclDefineUnitType(lua_State *l)
 		AllowUnitId(Players[i], type->Slot, 65536);
 	}
 	//Wyrmgus end
+	
+	type->Initialized = true;
+	
 	return 0;
 }
 
