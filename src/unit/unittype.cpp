@@ -827,6 +827,61 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
 			}
+		} else if (key == "species") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Species = GetSpecies(value);
+			if (this->Species) {
+				this->Species->Type = this;
+			} else {
+				fprintf(stderr, "Invalid species: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "right_mouse_action") {
+			if (value == "none") {
+				this->MouseAction = MouseActionNone;
+			} else if (value == "attack") {
+				this->MouseAction = MouseActionAttack;
+			} else if (value == "move") {
+				this->MouseAction = MouseActionMove;
+			} else if (value == "harvest") {
+				this->MouseAction = MouseActionHarvest;
+			} else if (value == "spell_cast") {
+				this->MouseAction = MouseActionSpellCast;
+			} else if (value == "sail") {
+				this->MouseAction = MouseActionSail;
+			} else if (value == "rally_point") {
+				this->MouseAction = MouseActionRallyPoint;
+			} else if (value == "trade") {
+				this->MouseAction = MouseActionTrade;
+			} else {
+				fprintf(stderr, "Invalid right mouse action: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "can_attack") {
+			this->CanAttack = StringToBool(value);
+		} else if (key == "can_target_land") {
+			const bool can_target_land = StringToBool(value);
+			if (can_target_land) {
+				this->CanTarget |= CanTargetLand;
+			} else {
+				this->CanTarget &= ~CanTargetLand;
+			}
+		} else if (key == "can_target_sea") {
+			const bool can_target_sea = StringToBool(value);
+			if (can_target_sea) {
+				this->CanTarget |= CanTargetSea;
+			} else {
+				this->CanTarget &= ~CanTargetSea;
+			}
+		} else if (key == "can_target_air") {
+			const bool can_target_air = StringToBool(value);
+			if (can_target_air) {
+				this->CanTarget |= CanTargetAir;
+			} else {
+				this->CanTarget &= ~CanTargetAir;
+			}
+		} else if (key == "random_movement_probability") {
+			this->RandomMovementProbability = std::stoi(value);
+		} else if (key == "random_movement_distance") {
+			this->RandomMovementDistance = std::stoi(value);
 		} else {
 			key = SnakeCaseToPascalCase(key);
 			

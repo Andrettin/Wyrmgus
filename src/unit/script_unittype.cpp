@@ -1349,9 +1349,9 @@ static int CclDefineUnitType(lua_State *l)
 				type->MouseAction = MouseActionSpellCast;
 			} else if (!strcmp(value, "sail")) {
 				type->MouseAction = MouseActionSail;
-			//Wyrmgus start
 			} else if (!strcmp(value, "rally-point")) {
 				type->MouseAction = MouseActionRallyPoint;
+			//Wyrmgus start
 			} else if (!strcmp(value, "trade")) {
 				type->MouseAction = MouseActionTrade;
 			//Wyrmgus end
