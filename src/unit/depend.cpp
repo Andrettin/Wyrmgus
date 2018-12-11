@@ -352,13 +352,13 @@ static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool igno
 					}
 					break;
 				case DependRuleAge:
-					i = player.Age == temp->Kind.Age;
+					i = player.Age != temp->Kind.Age;
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}
 					break;
 				case DependRuleSeason:
-					i = Map.MapLayers[player.StartMapLayer]->GetSeason() == temp->Kind.Season;
+					i = Map.MapLayers[player.StartMapLayer]->GetSeason() != temp->Kind.Season;
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}
@@ -419,13 +419,13 @@ static bool CheckDependByRule(const CUnit &unit, DependRule &rule, bool ignore_u
 					}
 					break;
 				case DependRuleAge:
-					i = unit.Player->Age == temp->Kind.Age;
+					i = unit.Player->Age != temp->Kind.Age;
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}
 					break;
 				case DependRuleSeason:
-					i = unit.MapLayer->GetSeason() == temp->Kind.Season;
+					i = unit.MapLayer->GetSeason() != temp->Kind.Season;
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}
