@@ -259,13 +259,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	// so you can load a unit whose Container hasn't been loaded yet.
 	// SEE unit loading code.
 	if (unit.Container && unit.Removed) {
-		//Wyrmgus start
-//		file.printf(" \"host-info\", {%d, %d, %d, %d}, ",
 		file.printf(" \"host-info\", {%d, %d, %d, %d, %d}, ",
-		//Wyrmgus end
-					//Wyrmgus start
-					unit.Container->MapLayer,
-					//Wyrmgus end
+					unit.Container->MapLayer->ID,
 					unit.Container->tilePos.x, unit.Container->tilePos.y,
 					unit.Container->Type->TileSize.x,
 					unit.Container->Type->TileSize.y);
