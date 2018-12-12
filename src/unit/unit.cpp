@@ -2272,7 +2272,11 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 
 void CUnit::UpdateSoldUnits()
 {
-	if (this->CurrentAction() == UnitActionBuilt || !Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
+	if (!this->Type->BoolFlag[RECRUITHEROES_INDEX].value && this->Type->SoldUnits.empty() && this->SoldUnits.empty()) {
+		return;
+	}
+	
+	if (this->Constructed == 1 || !Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
 		return;
 	}
 	
