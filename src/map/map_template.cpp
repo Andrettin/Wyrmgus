@@ -840,6 +840,10 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 			if (SettlementSiteUnitType) {
 				site_pos = Map.GenerateUnitLocation(SettlementSiteUnitType, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
 			}
+		} else {
+			if (site_raw_pos.x == -1 && site_raw_pos.y == -1) {
+				continue;
+			}
 		}
 
 		if (!Map.Info.IsPointOnMap(site_pos, z) || site_pos.x < map_start_pos.x || site_pos.y < map_start_pos.y) {
