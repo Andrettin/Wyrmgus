@@ -2524,18 +2524,42 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	if (generated_terrain->UseExistingAsSeeds) { //use existing tiles of the given terrain as seeds for the terrain generation
 		for (int x = min_pos.x; x <= max_pos.x; ++x) {
 			for (int y = min_pos.y; y <= max_pos.y; ++y) {
-				Vec2i tile_pos(x, y);
-				CMapField *tile = this->Field(x, y, z);
+				const Vec2i tile_pos(x, y);
+				const CMapField *tile = this->Field(x, y, z);
 				
 				if (!generated_terrain->CanUseTileAsSeed(tile)) {
 					continue;
 				}
 				
-				if (this->IsPointInASubtemplateArea(tile_pos, z) && !IsPointAdjacentToNonSubtemplateArea(tile_pos, z)) {
+				if (this->IsPointInASubtemplateArea(tile_pos, z)) {
 					continue;
 				}
 				
 				seeds.push_back(tile_pos);
+			}
+		}
+	}
+	
+	if (generated_terrain->UseSubtemplateBordersAsSeeds) {
+		for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
+			const Vec2i subtemplate_min_pos = std::get<0>(this->MapLayers[z]->SubtemplateAreas[i]);
+			const Vec2i subtemplate_max_pos = std::get<1>(this->MapLayers[z]->SubtemplateAreas[i]);
+			
+			for (int x = subtemplate_min_pos.x; x <= subtemplate_max_pos.x; ++x) {
+				for (int y = subtemplate_min_pos.y; y <= subtemplate_max_pos.y; ++y) {
+					const Vec2i tile_pos(x, y);
+					const CMapField *tile = this->Field(x, y, z);
+					
+					if (!generated_terrain->CanUseTileAsSeed(tile)) {
+						continue;
+					}
+					
+					if (!IsPointAdjacentToNonSubtemplateArea(tile_pos, z)) {
+						continue;
+					}
+					
+					seeds.push_back(tile_pos);
+				}
 			}
 		}
 	}

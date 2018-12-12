@@ -276,6 +276,8 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 					generated_terrain->ExpansionChance = std::stoi(value);
 				} else if (key == "use_existing_as_seeds") {
 					generated_terrain->UseExistingAsSeeds = StringToBool(value);
+				} else if (key == "use_subtemplate_borders_as_seeds") {
+					generated_terrain->UseSubtemplateBordersAsSeeds = StringToBool(value);
 				} else if (key == "target_terrain_type") {
 					value = FindAndReplaceString(value, "_", "-");
 					const CTerrainType *target_terrain_type = CTerrainType::GetTerrainType(value);
@@ -662,9 +664,9 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		if (found_location) {
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0 && subtemplate_pos.x < Map.Info.MapWidths[z] && subtemplate_pos.y < Map.Info.MapHeights[z]) {
 				this->Subtemplates[i]->Apply(Vec2i(0, 0), subtemplate_pos, z);
-			}
 				
-			Map.MapLayers[z]->SubtemplateAreas.push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), this->Subtemplates[i]));
+				Map.MapLayers[z]->SubtemplateAreas.push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), this->Subtemplates[i]));
+			}
 		}
 	}
 	

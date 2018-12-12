@@ -71,6 +71,7 @@ public:
 	int SeedCount = 0;
 	int ExpansionChance = 50; //50% chance to expand to a tile by default
 	bool UseExistingAsSeeds = false; //whether to use existing tiles of the given terrain in the map layer as seeds for this terrain generation
+	bool UseSubtemplateBordersAsSeeds = false; //whether to use the border tiles of subtemplates that have the given terrain as seeds for this terrain generation
 	std::vector<const CTerrainType *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
 };
 
