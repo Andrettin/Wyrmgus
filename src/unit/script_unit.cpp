@@ -532,11 +532,11 @@ static int CclUnit(lua_State *l)
 					unit->Seen.Destroyed |= (1 << i);
 				}
 			}
-		} else if (!strcmp(value, "constructed")) {
-			unit->Constructed = 1;
+		} else if (!strcmp(value, "under-construction")) {
+			unit->UnderConstruction = 1;
 			--j;
-		} else if (!strcmp(value, "seen-constructed")) {
-			unit->Seen.Constructed = 1;
+		} else if (!strcmp(value, "seen-under-construction")) {
+			unit->Seen.UnderConstruction = 1;
 			--j;
 		} else if (!strcmp(value, "seen-state")) {
 			unit->Seen.State = LuaToNumber(l, 2, j + 1);

@@ -142,7 +142,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus end
 
 	CPlayer &player = *unit.Player;
-	if (!unit.Constructed) {
+	if (!unit.UnderConstruction) {
 		player.DecreaseCountsForUnit(&unit, true);
 		
 		player.Demand += newtype.Stats[player.Index].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.Index].Variables[DEMAND_INDEX].Value;
@@ -316,7 +316,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		memset(unit.SpellCoolDownTimers, 0, CSpell::Spells.size() * sizeof(int));
 	}
 
-	if (!unit.Constructed) {
+	if (!unit.UnderConstruction) {
 		UpdateForNewUnit(unit, 1);
 		player.IncreaseCountsForUnit(&unit, true);
 	}
@@ -378,7 +378,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			SelectedUnitChanged();
 		}
 		
-		if (!unit.Constructed) {
+		if (!unit.UnderConstruction) {
 			for (size_t i = 0; i < player.QuestObjectives.size(); ++i) {
 				if (
 					(player.QuestObjectives[i]->ObjectiveType == BuildUnitsObjectiveType && player.QuestObjectives[i]->UnitType == &newtype)

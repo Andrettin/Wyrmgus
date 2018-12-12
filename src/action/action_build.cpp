@@ -433,7 +433,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		}
 		return false;
 	}
-	build->Constructed = 1;
+	build->UnderConstruction = 1;
 	build->CurrentSightRange = 0;
 
 	// Building on top of something, may remove what is beneath it

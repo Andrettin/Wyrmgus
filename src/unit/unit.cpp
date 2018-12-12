@@ -281,13 +281,13 @@
 **
 **  Unit is selected. (So you can give it orders)
 **
-**  CUnit::Constructed
+**  CUnit::UnderConstruction
 **  Set when a building is under construction, and still using the
 **  generic building animation.
 **
-**  CUnit::SeenConstructed
+**  CUnit::SeenUnderConstruction
 **  Last seen state of construction.  Used to draw correct building
-**  frame. See CUnit::Constructed for more information.
+**  frame. See CUnit::UnderConstruction for more information.
 **
 **  CUnit::SeenState
 **  The Seen State of the building.
@@ -502,7 +502,7 @@ void CUnit::Init()
 	Removed = 0;
 	Selected = 0;
 	TeamSelected = 0;
-	Constructed = 0;
+	UnderConstruction = 0;
 	Active = 0;
 	Boarded = 0;
 	RescuedFrom = nullptr;
@@ -2276,7 +2276,7 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	if (this->Constructed == 1 || !Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
+	if (this->UnderConstruction == 1 || !Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) || Editor.Running != EditorNotRunning) {
 		return;
 	}
 	
@@ -3010,7 +3010,7 @@ void UpdateUnitSightRange(CUnit &unit)
 	}
 	unit_sight_range = std::max<int>(1, unit_sight_range);
 	//Wyrmgus end
-	if (unit.Constructed) { // Units under construction have no sight range.
+	if (unit.UnderConstruction) { // Units under construction have no sight range.
 		unit.CurrentSightRange = 1;
 	} else if (!unit.Container) { // proper value.
 		//Wyrmgus start
@@ -4045,7 +4045,7 @@ static void UnitFillSeenValues(CUnit &unit)
 	unit.Seen.IX = unit.IX;
 	unit.Seen.Frame = unit.Frame;
 	unit.Seen.Type = unit.Type;
-	unit.Seen.Constructed = unit.Constructed;
+	unit.Seen.UnderConstruction = unit.UnderConstruction;
 
 	unit.CurrentOrder()->FillSeenValues(unit);
 }
@@ -7116,7 +7116,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	//Wyrmgus start
 //	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning) {
-	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.Constructed && target.Type->TileSize.x != 1 && target.Type->TileSize.y != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
+	if (type->BoolFlag[BUILDING_INDEX].value && !target.Burning && !target.UnderConstruction && target.Type->TileSize.x != 1 && target.Type->TileSize.y != 1) { //the building shouldn't burn if it's still under construction, or if it's too small
 	//Wyrmgus end
 		HitUnit_Burning(target);
 	}

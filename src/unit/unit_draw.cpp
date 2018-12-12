@@ -1121,7 +1121,7 @@ void CUnit::Draw(const CViewport &vp) const
 {
 	int frame;
 	int state;
-	int constructed;
+	int under_construction;
 	const CConstructionFrame *cframe;
 	const CUnitType *type;
 
@@ -1145,7 +1145,7 @@ void CUnit::Draw(const CViewport &vp) const
 		type = this->Type;
 		frame = this->Frame;
 		state = (action == UnitActionBuilt) | ((action == UnitActionUpgradeTo) << 1);
-		constructed = this->Constructed;
+		under_construction = this->UnderConstruction;
 		// Reset Type to the type being upgraded to
 		if (action == UnitActionUpgradeTo) {
 			const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(this->CurrentOrder());
@@ -1167,7 +1167,7 @@ void CUnit::Draw(const CViewport &vp) const
 		screenPos.y += this->Seen.IY;
 		frame = this->Seen.Frame;
 		type = this->Seen.Type;
-		constructed = this->Seen.Constructed;
+		under_construction = this->Seen.UnderConstruction;
 		state = this->Seen.State;
 		cframe = this->Seen.CFrame;
 	}
@@ -1196,7 +1196,7 @@ void CUnit::Draw(const CViewport &vp) const
 	VariationInfo *varinfo = type->VarInfo[this->Variation];
 	//Wyrmgus end
 
-	if (state == 1 && constructed && cframe) {
+	if (state == 1 && under_construction && cframe) {
 		//Wyrmgus start
 //		DrawConstructionShadow(*type, cframe, frame, screenPos);
 		DrawConstructionShadow(*this, *type, cframe, frame, screenPos);
@@ -1313,7 +1313,7 @@ void CUnit::Draw(const CViewport &vp) const
 	// Buildings under construction/upgrade/ready.
 	//
 	if (state == 1) {
-		if (constructed && cframe) {
+		if (under_construction && cframe) {
 			const PixelPos pos(screenPos + type->GetHalfTilePixelSize(UI.CurrentMapLayer->ID));
 			//Wyrmgus start
 //			DrawConstruction(player, cframe, *type, frame, pos);
