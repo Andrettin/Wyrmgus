@@ -82,7 +82,7 @@ public:
 		Width(0), Height(0), Scale(1), SurfaceLayer(0),
 		Overland(false), OutputTerrainImage(false),
 		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0), PixelTileSize(32, 32),
-		MainTemplate(nullptr), Plane(nullptr), World(nullptr),
+		Plane(nullptr), World(nullptr),
 		BaseTerrainType(nullptr), BaseOverlayTerrainType(nullptr), BorderTerrainType(nullptr), SurroundingTerrainType(nullptr)
 	{
 	}
@@ -100,11 +100,12 @@ public:
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z);
+	void ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false);
 	void ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false);
 	void ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
 	void ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
 	bool IsSubtemplateArea() const;
-	CMapTemplate *GetTopMapTemplate();
+	const CMapTemplate *GetTopMapTemplate() const;
 	
 	std::string Name;
 	std::string Ident;
@@ -121,7 +122,9 @@ public:
 	Vec2i SubtemplatePosition;
 	Vec2i CurrentStartPos;
 	PixelSize PixelTileSize;
-	CMapTemplate *MainTemplate;									/// Main template in which this one is located
+	CMapTemplate *MainTemplate = nullptr;						/// Main template in which this one is located
+	CMapTemplate *UpperTemplate = nullptr;						/// Map template corresponding to this one in the upper layer; only relevant for subtemplates
+	CMapTemplate *LowerTemplate = nullptr;						/// Map template corresponding to this one in the lower layer; only relevant for subtemplates
 	CPlane *Plane;
 	CWorld *World;
 	CTerrainType *BaseTerrainType;

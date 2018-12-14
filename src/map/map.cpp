@@ -144,13 +144,16 @@ CTerrainFeature *GetTerrainFeature(const std::string &terrain_feature_ident)
 /**
 **  Get a site's cultural name.
 */
-std::string CSite::GetCulturalName(int civilization)
+std::string CSite::GetCulturalName(const int civilization) const
 {
-	if (civilization != -1 && this->CulturalNames.find(civilization) != this->CulturalNames.end()) {
-		return this->CulturalNames[civilization];
-	} else {
-		return this->Name;
+	if (civilization != -1) {
+		std::map<int, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
+		if (find_iterator != this->CulturalNames.end()) {
+			return find_iterator->second;
+		}
 	}
+	
+	return this->Name;
 }
 //Wyrmgus end
 
@@ -708,14 +711,19 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainT
 /**
 **	@brief	Get whether a given tile is in a subtemplate area
 **
-**	@param	pos		The tile's position
-**	@param	z		The tile's map layer
+**	@param	pos				The tile's position
+**	@param	z				The tile's map layer
+**	@param	subtemplate		Optional subtemplate argument, if not null then will only return true if the point is in that specific subtemplate area; if it is null, then true will be returned if the point is in any subtemplate area
 **
 **	@return	True if the tile is in a subtemplate area, or false otherwise
 */
-bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, const int z) const
+bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTemplate *subtemplate) const
 {
 	for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
+		if (subtemplate && subtemplate != std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
+			continue;
+		}
+		
 		Vec2i min_pos = std::get<0>(this->MapLayers[z]->SubtemplateAreas[i]);
 		Vec2i max_pos = std::get<1>(this->MapLayers[z]->SubtemplateAreas[i]);
 		if (pos.x >= min_pos.x && pos.y >= min_pos.y && pos.x <= max_pos.x && pos.y <= max_pos.y) {
@@ -724,6 +732,68 @@ bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, const int z) const
 	}
 
 	return false;
+}
+
+/**
+**	@brief	Get the applied map position of a given subtemplate
+**
+**	@param	subtemplate		The subtemplate
+**
+**	@return	The subtemplate's position if found, or (-1, -1) otherwise
+*/
+Vec2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
+{
+	if (!subtemplate) {
+		return Vec2i(-1, -1);
+	}
+	
+	const CMapTemplate *main_template = subtemplate->GetTopMapTemplate();
+	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
+		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
+		if (z != -1) {
+			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
+				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
+					return std::get<0>(Map.MapLayers[z]->SubtemplateAreas[i]);
+				}
+			}
+		}
+	}
+	
+	return Vec2i(-1, -1);
+}
+
+/**
+**	@brief	Get the map layer connectors in a given map template
+**
+**	@param	subtemplate		The subtemplate
+**
+**	@return	A list of the connector units
+*/
+std::vector<CUnit *> CMap::GetMapTemplateLayerConnectors(const CMapTemplate *map_template) const
+{
+	std::vector<CUnit *> layer_connectors;
+	
+	if (!map_template) {
+		return layer_connectors;
+	}
+	
+	const CMapTemplate *main_template = map_template->GetTopMapTemplate();
+	if (main_template && main_template->Plane && main_template->World) {
+		const bool is_main_template = main_template == map_template;
+		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
+		if (z != -1) {
+			for (size_t i = 0; i < this->MapLayers[z]->LayerConnectors.size(); ++i) {
+				CUnit *connector_unit = this->MapLayers[z]->LayerConnectors[i];
+				const Vec2i unit_pos = connector_unit->GetTileCenterPos();
+				
+				if (is_main_template == !this->IsPointInASubtemplateArea(unit_pos, z, map_template)) {
+					layer_connectors.push_back(connector_unit);
+				}
+			}
+		}
+	}
+	
+	return layer_connectors;
 }
 
 /**

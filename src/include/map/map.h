@@ -146,7 +146,7 @@ public:
 	{
 	}
 	
-	std::string GetCulturalName(int civilization);
+	std::string GetCulturalName(const int civilization) const;
 
 	std::string Ident;
 	std::string Name;
@@ -295,7 +295,9 @@ public:
 	bool TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z);
 	bool TileHasInnerBorderTerrainsIncompatibleWithOverlayTerrain(const Vec2i &pos, const CTerrainType *overlay_terrain, const int z);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
-	bool IsPointInASubtemplateArea(const Vec2i &pos, const int z) const;
+	bool IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTemplate *subtemplate = nullptr) const;
+	Vec2i GetSubtemplatePos(const CMapTemplate *subtemplate) const;
+	std::vector<CUnit *> GetMapTemplateLayerConnectors(const CMapTemplate *map_template) const;
 	bool IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const;
 	bool IsLayerUnderground(int z) const;
 	
