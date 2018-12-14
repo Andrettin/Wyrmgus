@@ -721,7 +721,7 @@ set(stratagus_HDRS
 )
 
 # Configuration types
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+set(CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebInfo" CACHE STRING "" FORCE)
 
 # Additional platform checks
 
