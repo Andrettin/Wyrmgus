@@ -40,6 +40,7 @@
 #include "age.h"
 #include "animation.h"
 #include "character.h"
+#include "currency.h"
 #include "game.h"
 #include "icons.h"
 #include "map/map_template.h"
@@ -207,6 +208,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			}
 			if (!define_only) {
 				character->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "currency") {
+			CCurrency *currency = CCurrency::GetOrAddCurrency(ident);
+			if (!define_only) {
+				currency->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "deity") {
 			CDeity *deity = CDeity::GetOrAddDeity(ident);

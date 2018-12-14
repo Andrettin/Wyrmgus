@@ -43,6 +43,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
+#include "currency.h"
 //Wyrmgus start
 #include "editor.h"
 #include "font.h"
@@ -823,8 +824,11 @@ static int CclDefineCivilization(lua_State *l)
 				LuaError(l, "Language not found.");
 			}
 		} else if (!strcmp(value, "Calendar")) {
-			CCalendar *calendar = CCalendar::GetOrAddCalendar(LuaToString(l, -1));
+			CCalendar *calendar = CCalendar::GetCalendar(LuaToString(l, -1));
 			civilization->Calendar = calendar;
+		} else if (!strcmp(value, "Currency")) {
+			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
+			civilization->Currency = currency;
 		} else if (!strcmp(value, "DefaultColor")) {
 			PlayerRaces.DefaultColor[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "CivilizationUpgrade")) {
@@ -1876,6 +1880,9 @@ static int CclDefineFaction(lua_State *l)
 			faction->Icon.Icon = nullptr;
 			faction->Icon.Load();
 			faction->Icon.Icon->Load();
+		} else if (!strcmp(value, "Currency")) {
+			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
+			faction->Currency = currency;
 		} else if (!strcmp(value, "DevelopsFrom")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -3383,7 +3390,7 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "SettlementName")) {
 		LuaCheckArgs(l, 3);
 		std::string site_ident = LuaToString(l, 3);
-		CSite *site = GetSite(site_ident);
+		const CSite *site = GetSite(site_ident);
 		if (site) {
 			lua_pushstring(l, site->GetCulturalName(p->Race).c_str());
 		} else {
@@ -3391,6 +3398,14 @@ static int CclGetPlayerData(lua_State *l)
 		}
 		return 1;
 	//Wyrmgus end
+	} else if (!strcmp(data, "Currency")) {
+		const CCurrency *currency = p->GetCurrency();
+		if (currency) {
+			lua_pushstring(l, currency->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

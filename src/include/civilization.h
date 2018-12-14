@@ -49,6 +49,7 @@
 
 class CAiBuildingTemplate;
 class CCalendar;
+class CCurrency;
 class CDeity;
 class CForceTemplate;
 class CLanguage;
@@ -58,12 +59,6 @@ class CUpgrade;
 class CCivilization
 {
 public:
-	CCivilization() :
-		ID(-1), ParentCivilization(nullptr),
-		Language(nullptr), Calendar(nullptr)
-	{
-	}
-
 	~CCivilization();
 	
 	static CCivilization *GetCivilization(const std::string &ident, const bool should_find = true);
@@ -76,22 +71,24 @@ public:
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
 	CCalendar *GetCalendar() const;
+	CCurrency *GetCurrency() const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	std::map<int, std::vector<std::string>> &GetPersonalNames();
 	std::vector<std::string> &GetUnitClassNames(int class_id);
 	std::vector<std::string> &GetShipNames();
 	
-	int ID;
-	CCivilization *ParentCivilization;
-	std::string Ident;				/// Ident of the civilization
+	int ID = -1;
+	CCivilization *ParentCivilization = nullptr;
+	std::string Ident;				/// ident of the civilization
 	std::string Description;		/// civilization description
 	std::string Quote;				/// civilization quote
 	std::string Background;			/// civilization background
 	std::string Adjective;			/// adjective pertaining to the civilization
-	CUnitSound UnitSounds;			/// Sounds for unit events
-	CLanguage *Language;			/// The language used by the civilization
-	CCalendar *Calendar;			/// the calendar used by the civilization
+	CUnitSound UnitSounds;			/// sounds for unit events
+	CLanguage *Language = nullptr;	/// the language used by the civilization
+	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
+	CCurrency *Currency = nullptr;	/// the currency used by the civilization
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
 	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type

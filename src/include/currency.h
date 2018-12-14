@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name age.h - The age header file. */
+/**@name currency.h - The currency header file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __AGE_H__
-#define __AGE_H__
+#ifndef __CURRENCY_H__
+#define __CURRENCY_H__
 
 //@{
 
@@ -45,34 +45,24 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
-class CGraphic;
-class CUpgrade;
 
-class CAge
+class CCurrency
 {
 public:
-	CAge() :
-		G(nullptr)
-	{
-	}
+	static CCurrency *GetCurrency(const std::string &ident, const bool should_find = true);
+	static CCurrency *GetOrAddCurrency(const std::string &ident);
+	static void ClearCurrencies();
 	
-	~CAge();
-	
-	static CAge *GetAge(const std::string &ident, const bool should_find = true);
-	static CAge *GetOrAddAge(const std::string &ident);
-	static void ClearAges();
-	
-	static std::vector<CAge *> Ages;
-	static std::map<std::string, CAge *> AgesByIdent;
+	static std::vector<CCurrency *> Currencies;
+	static std::map<std::string, CCurrency *> CurrenciesByIdent;
 	
 	void ProcessConfigData(const CConfigData *config_data);
 	
 public:
 	std::string Ident;
 	std::string Name;
-	CGraphic *G;
 };
 
 //@}
 
-#endif // !__CALENDAR_H__
+#endif // !__CURRENCY_H__

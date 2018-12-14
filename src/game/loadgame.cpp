@@ -42,6 +42,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
+#include "currency.h"
 #include "depend.h"
 #include "font.h"
 //Wyrmgus start
@@ -120,6 +121,7 @@ void CleanModules()
 	//Wyrmgus end
 	CCivilization::ClearCivilizations();
 	CleanConstructions();
+	CCurrency::ClearCurrencies();
 	CleanDecorations();
 	CDeity::ClearDeities();
 	//Wyrmgus start

@@ -10,7 +10,7 @@
 //
 /**@name popup.cpp - The popup globals. */
 //
-//      (c) Copyright 2012-2015 by cybermind and Joris Dauphin
+//      (c) Copyright 2012-2018 by cybermind, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -52,9 +52,7 @@
 #include "unit_manager.h"
 //Wyrmgus end
 #include "unittype.h"
-//Wyrmgus start
 #include "upgrade.h"
-//Wyrmgus end
 #include "video.h"
 
 /* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) const
@@ -766,7 +764,11 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "FactionCoreSettlements")) {
 			condition->FactionCoreSettlements = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ResearchedUpgrade")) {
-			condition->ResearchedUpgrade = Ccl2Condition(l, LuaToString(l, -1));
+			condition->ResearchedUpgrade = CUpgrade::Get(LuaToString(l, -1));
+		} else if (!strcmp(key, "ResearchedUpgradeClass")) {
+			condition->ResearchedUpgradeClass = GetUpgradeClassIndexByName(LuaToString(l, -1));
+		} else if (!strcmp(key, "UpgradeResearched")) {
+			condition->UpgradeResearched = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Ability")) {
 			condition->Ability = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ChildResources")) {

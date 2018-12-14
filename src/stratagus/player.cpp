@@ -48,6 +48,7 @@
 #include "../ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
 #include "commands.h" //for faction setting
+#include "currency.h"
 #include "depend.h"
 #include "editor.h"
 #include "font.h"
@@ -716,6 +717,28 @@ int CFaction::GetForceTypeWeight(int force_type) const
 	}
 	
 	return CCivilization::Civilizations[this->Civilization]->GetForceTypeWeight(force_type);
+}
+
+/**
+**	@brief	Get the faction's currency
+**
+**	@return	The faction's currency
+*/
+CCurrency *CFaction::GetCurrency() const
+{
+	if (this->Currency) {
+		return this->Currency;
+	}
+	
+	if (this->ParentFaction != -1) {
+		return PlayerRaces.Factions[this->ParentFaction]->GetCurrency();
+	}
+	
+	if (this->Civilization != -1) {
+		return CCivilization::Civilizations[this->Civilization]->GetCurrency();
+	}
+	
+	return nullptr;
 }
 
 std::vector<CForceTemplate *> CFaction::GetForceTemplates(int force_type) const
@@ -1702,6 +1725,24 @@ void CPlayer::SetAge(CAge *age)
 	}
 }
 
+/**
+**	@brief	Get the player's currency
+**
+**	@return	The player's currency
+*/
+CCurrency *CPlayer::GetCurrency() const
+{
+	if (this->Faction != -1) {
+		return PlayerRaces.Factions[this->Faction]->GetCurrency();
+	}
+	
+	if (this->Race != -1) {
+		return CCivilization::Civilizations[this->Race]->GetCurrency();
+	}
+	
+	return nullptr;
+}
+
 void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 {
 	std::vector<CUpgrade *> upgrade_list = this->GetResearchableUpgrades();
@@ -1765,7 +1806,7 @@ bool CPlayer::IsPlayerColorUsed(int color)
 	return color_used;
 }
 
-bool CPlayer::HasUpgradeClass(int upgrade_class)
+bool CPlayer::HasUpgradeClass(const int upgrade_class) const
 {
 	if (this->Race == -1 || upgrade_class == -1) {
 		return false;
@@ -2648,7 +2689,7 @@ void CPlayer::UpdateCurrentQuests()
 		if (objective->ObjectiveType == HaveResourceObjectiveType) {
 			objective->Counter = std::min(this->GetResource(objective->Resource, STORE_BOTH), objective->Quantity);
 		} else if (objective->ObjectiveType == ResearchUpgradeObjectiveType) {
-			objective->Counter = UpgradeIdentAllowed(*this, objective->Upgrade->Ident) == 'R' ? 1 : 0;
+			objective->Counter = UpgradeIdAllowed(*this, objective->Upgrade->ID) == 'R' ? 1 : 0;
 		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {
 			objective->Counter = this->HasHero(objective->Character) ? 1 : 0;
 		}

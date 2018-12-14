@@ -1192,6 +1192,7 @@ void DrawPopups()
 			ba->Hint = CapitalizeString(DefaultResourceNames[i]);
 			ba->Action = ButtonProduceResource;
 			ba->Value = i;
+			ba->ValueStr = DefaultResourceNames[i];
 			ba->Popup = "popup-resource";
 			DrawPopup(*ba, UI.Resources[i].IconX, UI.Resources[i].IconY + 16 + GameCursor->G->getHeight() / 2, false);
 			delete ba;

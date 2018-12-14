@@ -172,6 +172,24 @@ CCalendar *CCivilization::GetCalendar() const
 	return CCalendar::BaseCalendar;
 }
 
+/**
+**	@brief	Get the civilization's currency
+**
+**	@return	The civilization's currency
+*/
+CCurrency *CCivilization::GetCurrency() const
+{
+	if (this->Currency) {
+		return this->Currency;
+	}
+	
+	if (this->ParentCivilization) {
+		return this->ParentCivilization->GetCurrency();
+	}
+	
+	return nullptr;
+}
+
 std::vector<CForceTemplate *> CCivilization::GetForceTemplates(int force_type) const
 {
 	if (force_type == -1) {

@@ -79,6 +79,7 @@ class CAge;
 class CCalendar;
 class CCharacter;
 class CCivilization;
+class CCurrency;
 class CDeity;
 class CDeityDomain;
 class CLanguage;
@@ -235,9 +236,10 @@ public:
 	void SetDynasty(CDynasty *dynasty);
 	void CheckAge();
 	void SetAge(CAge *age);
+	CCurrency *GetCurrency() const;
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorUsed(int color);
-	bool HasUpgradeClass(int upgrade_class);
+	bool HasUpgradeClass(const int upgrade_class) const;
 	bool HasSettlement(CSite *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
 	CSite *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
@@ -621,6 +623,7 @@ public:
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
+	CCurrency *GetCurrency() const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	std::vector<std::string> &GetShipNames();
@@ -642,6 +645,7 @@ public:
 	bool Playable;														/// faction playability
 	bool DefiniteArticle;												/// whether the faction's name should be preceded by a definite article (i.e. "the Netherlands")
 	IconConfig Icon;													/// Faction's icon
+	CCurrency *Currency = nullptr;										/// The faction's currency
 	CDeity *HolyOrderDeity;												/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions;
 	std::vector<int> Colors;											/// faction colors

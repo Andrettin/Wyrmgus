@@ -302,6 +302,7 @@ set(stratagusmain_SRCS
 	src/stratagus/civilization.cpp
 	src/stratagus/config.cpp
 	src/stratagus/construct.cpp
+	src/stratagus/currency.cpp
 	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
@@ -631,6 +632,7 @@ set(stratagus_generic_HDRS
 	src/include/commands.h
 	src/include/config.h
 	src/include/construct.h
+	src/include/currency.h
 	src/include/cursor.h
 	src/include/depend.h
 	src/include/editor.h

@@ -536,8 +536,20 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
 	}
 	
-	if (condition->ResearchedUpgrade != CONDITION_TRUE) {
-		if ((condition->ResearchedUpgrade == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdentAllowed(*ThisPlayer, upgrade->Ident) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
+	if (condition->UpgradeResearched != CONDITION_TRUE) {
+		if ((condition->UpgradeResearched == CONDITION_ONLY) ^ ((((button.Action == ButtonResearch || button.Action == ButtonFaction) && UpgradeIdAllowed(*ThisPlayer, upgrade->ID) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->GetIndividualUpgrade(upgrade) >= upgrade->MaxLimit)))) {
+			return false;
+		}
+	}
+	
+	if (condition->ResearchedUpgrade) {
+		if (UpgradeIdAllowed(*ThisPlayer, condition->ResearchedUpgrade->ID) != 'R') {
+			return false;
+		}
+	}
+	
+	if (condition->ResearchedUpgradeClass != -1) {
+		if (!ThisPlayer->HasUpgradeClass(condition->ResearchedUpgradeClass)) {
 			return false;
 		}
 	}
