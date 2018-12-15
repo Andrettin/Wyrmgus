@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_repair.h - The actions headerfile. */
+/**@name action_repair.h - The repair action header file. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -37,15 +37,9 @@
 class COrder_Repair : public COrder
 {
 	friend COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target);
-	//Wyrmgus start
-//	friend COrder *COrder::NewActionRepair(const Vec2i &pos);
 	friend COrder *COrder::NewActionRepair(const Vec2i &pos, int z);
-	//Wyrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0)
-	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0), MapLayer(0)
-	//Wyrmgus end
+	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -70,9 +64,7 @@ private:
 	unsigned int State;
 	unsigned int RepairCycle;
 	Vec2i goalPos;
-	//Wyrmgus start
-	int MapLayer;
-	//Wyrmgus end
+	CMapLayer *MapLayer = nullptr;
 };
 
 

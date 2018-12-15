@@ -164,15 +164,21 @@ static bool IsUnitValidForNetwork(const CUnit &unit)
 }
 
 //Wyrmgus start
-static void StopRaft(CUnit &unit)
+/**
+**	@brief	Stop the unit's raft, if it is indeed above a raft
+**
+**	@param	unit	The unit which is on a raft
+*/
+void StopRaft(CUnit &unit)
 {
+	//stop the raft (done if e.g. if a new command is issued)
 	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+				CommandStopUnit(*table[i]);
 			}
 		}
 	}

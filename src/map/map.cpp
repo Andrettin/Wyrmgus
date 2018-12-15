@@ -823,19 +823,6 @@ bool CMap::IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) co
 	return false;
 }
 
-bool CMap::IsLayerUnderground(int z) const
-{
-	if (GameSettings.Inside) {
-		return true;
-	}
-	
-	if (this->MapLayers[z]->SurfaceLayer > 0) {
-		return true;
-	}
-
-	return false;
-}
-
 void CMap::SetCurrentPlane(CPlane *plane)
 {
 	if (UI.CurrentMapLayer->Plane == plane) {

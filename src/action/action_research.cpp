@@ -60,8 +60,8 @@
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-///* static */ COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
-/* static */ COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player)
+//COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade)
+COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player)
 //Wyrmgus end
 {
 	COrder_Research *order = new COrder_Research();

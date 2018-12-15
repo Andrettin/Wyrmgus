@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_patrol.h - The actions headerfile. */
+/**@name action_patrol.h - The patrol action header file. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -41,10 +41,7 @@ class COrder_Patrol : public COrder
 	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z);
 	//Wyrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0)
-	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0), MapLayer(0), WayPointMapLayer(0)
-	//Wyrmgus end
+	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -67,10 +64,8 @@ private:
 	unsigned int WaitingCycle; /// number of cycle pathfinder wait.
 	int Range;
 	Vec2i goalPos;
-	//Wyrmgus start
-	int MapLayer;
-	int WayPointMapLayer;
-	//Wyrmgus end
+	CMapLayer *MapLayer = nullptr;
+	CMapLayer *WayPointMapLayer = nullptr;
 };
 
 //@}

@@ -346,7 +346,7 @@ public:
 
 	int MapDistanceTo(const CUnit &dst) const;
 
-	int MapDistanceTo(const Vec2i &pos, int z) const;
+	int MapDistanceTo(const Vec2i &pos, const int z) const;
 
 	/**
 	**  Test if unit can move.

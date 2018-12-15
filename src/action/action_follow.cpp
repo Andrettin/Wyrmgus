@@ -76,7 +76,7 @@ enum {
 	// Unit::Refs is used as timeout counter.
 	if (dest.Destroyed) {
 		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
-		order->MapLayer = dest.MapLayer->ID;
+		order->MapLayer = dest.MapLayer;
 	} else {
 		order->SetGoal(&dest);
 		order->Range = 1;
@@ -96,9 +96,9 @@ enum {
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
-	//Wyrmgus start
-	file.printf(" \"map-layer\", %d,", this->MapLayer);
-	//Wyrmgus end
+	if (this->MapLayer) {
+		file.printf(" \"map-layer\", %d,", this->MapLayer->ID);
+	}
 
 	file.printf(" \"state\", %d", this->State);
 
@@ -118,11 +118,9 @@ enum {
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
-	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
-		this->MapLayer = LuaToNumber(l, -1, j + 1);
-	//Wyrmgus end
+		this->MapLayer = Map.MapLayers[LuaToNumber(l, -1, j + 1)];
 	} else {
 		return false;
 	}
@@ -144,7 +142,7 @@ enum {
 		}
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
-		if (this->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
@@ -172,10 +170,10 @@ enum {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
-	} else {
+	} else if (Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer->ID);
 	}
 }
 
@@ -215,10 +213,7 @@ enum {
 			return;
 		}
 
-		//Wyrmgus start
-//		if (goal->tilePos == this->goalPos) {
-		if (goal->tilePos == this->goalPos && goal->MapLayer->ID == this->MapLayer) {
-		//Wyrmgus end
+		if (goal->tilePos == this->goalPos && goal->MapLayer == this->MapLayer) {
 			// Move to the next order
 			if (unit.Orders.size() > 1) {
 				this->Finished = true;
@@ -240,16 +235,18 @@ enum {
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			//Wyrmgus start
-			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
-				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-				for (size_t i = 0; i != table.size(); ++i) {
-					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-						if (table[i]->CurrentAction() == UnitActionStill) {
-							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+			if (this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+				if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+					std::vector<CUnit *> table;
+					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+					for (size_t i = 0; i != table.size(); ++i) {
+						if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+							if (table[i]->CurrentAction() == UnitActionStill) {
+								CommandStopUnit(*table[i]);
+								CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer->ID);
+							}
+							return;
 						}
-						return;
 					}
 				}
 			}
@@ -288,9 +285,7 @@ enum {
 					goal->Type->TeleportEffectIn->run();
 				}
 				unit.tilePos = goal->Goal->tilePos;
-				//Wyrmgus start
 				unit.MapLayer = goal->Goal->MapLayer;
-				//Wyrmgus end
 				DropOutOnSide(unit, unit.Direction, nullptr);
 
 				// FIXME: we must check if the units supports the new order.
@@ -328,7 +323,7 @@ enum {
 				}
 			}
 			this->goalPos = goal->tilePos;
-			this->MapLayer = goal->MapLayer->ID;
+			this->MapLayer = goal->MapLayer;
 			this->State = State_TargetReached;
 		}
 		// FALL THROUGH
@@ -340,7 +335,7 @@ enum {
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
-		this->MapLayer = goal->MapLayer->ID;
+		this->MapLayer = goal->MapLayer;
 		this->ClearGoal();
 		goal = nullptr;
 	}
@@ -357,7 +352,7 @@ enum {
 	if (unit.CanAttack()
 	//Wyrmgus end
 		//Wyrmgus start
-		&& unit.MapDistanceTo(this->goalPos, this->MapLayer) <= this->Range //only try to auto-attack if already reached the goal
+		&& Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && unit.MapDistanceTo(this->goalPos, this->MapLayer->ID) <= this->Range //only try to auto-attack if already reached the goal
 //		&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill)) {
 		&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill || goal->CurrentAction() == UnitActionStandGround)) {
 		//Wyrmgus end
@@ -370,10 +365,7 @@ enum {
 			}
 
 			this->Finished = true;
-			//Wyrmgus start
-//			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos));
 			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos, target->MapLayer->ID));
-			//Wyrmgus end
 
 			if (savedOrder != nullptr) {
 				unit.SavedOrder = savedOrder;

@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name actions.h - The actions headerfile. */
+/**@name actions.h - The actions header file. */
 //
-//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -56,9 +56,9 @@ enum UnitAction {
 	UnitActionMove,         /// unit moves to position/unit
 	UnitActionAttack,       /// unit attacks position/unit
 	UnitActionAttackGround, /// unit attacks ground
-	//Wyrmgus start
 	UnitActionPickUp,		/// unit picks up an item
 	UnitActionUse,			/// unit uses another unit (i.e. an item)
+	//Wyrmgus start
 	UnitActionTrade,		/// unit trades with another unit (i.e. a merchant or caravan trades with a market)
 	//Wyrmgus end
 	UnitActionDie,          /// unit dies
@@ -84,6 +84,7 @@ enum UnitAction {
 class CAnimation;
 class CConstructionFrame;
 class CFile;
+class CMapLayer;
 class CSite;
 class CUnit;
 class CUnitType;
@@ -128,19 +129,13 @@ public:
 	void SetGoal(CUnit *const new_goal);
 	void ClearGoal();
 	virtual const Vec2i GetGoalPos() const;
-	//Wyrmgus start
-	virtual const int GetGoalMapLayer() const;
-	//Wyrmgus end
+	virtual const CMapLayer *GetGoalMapLayer() const;
 
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 	static COrder *NewActionAttack(const CUnit &attacker, CUnit &target);
-	//Wyrmgus start
-//	static COrder *NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-//	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
 	static COrder *NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z);
 	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
-	//Wyrmgus end
 	static COrder *NewActionBoard(CUnit &unit);
 	//Wyrmgus start
 //	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
@@ -160,10 +155,7 @@ public:
 	static COrder *NewActionPickUp(CUnit &dest);
 	//Wyrmgus end
 	static COrder *NewActionRepair(CUnit &unit, CUnit &target);
-	//Wyrmgus start
-//	static COrder *NewActionRepair(const Vec2i &pos);
 	static COrder *NewActionRepair(const Vec2i &pos, int z);
-	//Wyrmgus end
 	//Wyrmgus start
 //	static COrder *NewActionResearch(CUnit &unit, CUpgrade &upgrade);
 	static COrder *NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player);
@@ -184,8 +176,8 @@ public:
 	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass);
 	//Wyrmgus end
 	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type);
-	//Wyrmgus start
 	static COrder *NewActionUse(CUnit &dest);
+	//Wyrmgus start
 	static COrder *NewActionTrade(CUnit &dest, CUnit &home_market);
 	//Wyrmgus end
 

@@ -84,14 +84,14 @@
 			// FIXME: target->Type is now set to 0. maybe we shouldn't bother.
 			const Vec2i diag(order->Range, order->Range);
 			order->goalPos = target->tilePos /* + target->GetHalfTileSize() */ - diag;
-			order->MapLayer = target->MapLayer->ID;
+			order->MapLayer = target->MapLayer;
 			order->Range <<= 1;
 		} else {
 			order->SetGoal(target);
 		}
 	} else {
 		order->goalPos = pos;
-		order->MapLayer = z;
+		order->MapLayer = Map.MapLayers[z];
 	}
 	order->SetSpell(spell);
 
@@ -110,9 +110,9 @@
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
-	//Wyrmgus start
-	file.printf(" \"map-layer\", %d,", this->MapLayer);
-	//Wyrmgus end
+	if (this->MapLayer) {
+		file.printf(" \"map-layer\", %d,", this->MapLayer->ID);
+	}
 
 	file.printf("\"state\", %d,", this->State);
 	file.printf(" \"spell\", \"%s\"", this->Spell->Ident.c_str());
@@ -136,11 +136,9 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
-	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
-		this->MapLayer = LuaToNumber(l, -1, j + 1);
-	//Wyrmgus end
+		this->MapLayer = Map.MapLayers[LuaToNumber(l, -1, j + 1)];
 	} else {
 		return false;
 	}
@@ -168,7 +166,7 @@
 
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
-		if (this->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 
@@ -190,8 +188,8 @@
 	//Wyrmgus start
 //	input.SetMaxRange(this->Range);
 	int distance = this->Range;
-	if (Map.IsLayerUnderground(this->MapLayer) && input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
-		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer)) {
+	if (this->MapLayer && this->MapLayer->IsUnderground() && input.GetUnit()->GetModifiedVariable(ATTACKRANGE_INDEX) > 1) {
+		if (!CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer->ID)) {
 			distance = 1;
 		}
 	}
@@ -203,10 +201,10 @@
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
-	} else {
+	} else if (Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer->ID);
 	}
 }
 
@@ -219,11 +217,8 @@
 	CUnit *goal = GetGoal();
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		unit.ReCast = 0;
-	} else {
-		//Wyrmgus start
-//		unit.ReCast = SpellCast(unit, *this->Spell, goal, goalPos);
-		unit.ReCast = SpellCast(unit, *this->Spell, goal, goalPos, MapLayer);
-		//Wyrmgus end
+	} else if (Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+		unit.ReCast = SpellCast(unit, *this->Spell, goal, this->goalPos, this->MapLayer->ID);
 	}
 }
 
@@ -242,22 +237,20 @@
 	return invalidPos;
 }
 
-//Wyrmgus start
 /**
 **  Get goal map layer
 */
-/* virtual */ const int COrder_SpellCast::GetGoalMapLayer() const
+/* virtual */ const CMapLayer *COrder_SpellCast::GetGoalMapLayer() const
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {
-		return MapLayer;
+		return this->MapLayer;
 	}
 	if (this->HasGoal()) {
-		return this->GetGoal()->MapLayer->ID;
+		return this->GetGoal()->MapLayer;
 	}
-	return 0;
+	return nullptr;
 }
-//Wyrmgus end
 
 /**
 **  Animate unit spell cast
@@ -307,7 +300,7 @@ bool COrder_SpellCast::CheckForDeadGoal(CUnit &unit)
 	// Goal could be destroyed or unseen
 	// So, cannot use type.
 	this->goalPos = goal->tilePos;
-	this->MapLayer = goal->MapLayer->ID;
+	this->MapLayer = goal->MapLayer;
 	this->Range = 0;
 	this->ClearGoal();
 
@@ -339,7 +332,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	CUnit *goal = this->GetGoal();
 	
 	//Wyrmgus start
-	bool obstacle_check = !Map.IsLayerUnderground(this->MapLayer) || CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer);
+	bool obstacle_check = !this->MapLayer || !this->MapLayer->IsUnderground() || CheckObstaclesBetweenTiles(unit.tilePos, goal ? goal->tilePos : this->goalPos, MapFieldAirUnpassable, this->MapLayer->ID);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -355,7 +348,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		return false;
 	//Wyrmgus start
 //	} else if (!goal && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= this->Range) {
-	} else if (!goal && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= this->Range && obstacle_check) {
+	} else if (!goal && Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && unit.MapDistanceTo(this->goalPos, this->MapLayer->ID) <= this->Range && obstacle_check) {
 	//Wyrmgus end
 		// there is no goal and target spot is in range
 		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
@@ -364,16 +357,18 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
 		//Wyrmgus start
 		//if is unreachable and is on a raft, see if the raft can move closer to the target
-		if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
-			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-					if (table[i]->CurrentAction() == UnitActionStill) {
-						CommandStopUnit(*table[i]);
-						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+		if (this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+				std::vector<CUnit *> table;
+				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+				for (size_t i = 0; i != table.size(); ++i) {
+					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+						if (table[i]->CurrentAction() == UnitActionStill) {
+							CommandStopUnit(*table[i]);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer->ID);
+						}
+						return false;
 					}
-					return false;
 				}
 			}
 		}
@@ -411,7 +406,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			// Check if we can cast the spell.
 			//Wyrmgus start
 //			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos)) {
-			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos, order.MapLayer)) {
+			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos, order.MapLayer->ID)) {
 			//Wyrmgus end
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
@@ -501,10 +496,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
 					unit.ReCast = 0;
 				} else {
-					//Wyrmgus start
-//					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos);
-					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos, order.MapLayer);
-					//Wyrmgus end
+					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos, order.MapLayer->ID);
 				}
 			}
 
@@ -525,10 +517,10 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (this->isAutocast) {
 					//Wyrmgus start
 //					if (order.GetGoal() && order.GetGoal()->tilePos != order.goalPos) {
-					if (order.GetGoal() && (order.GetGoal()->tilePos != order.goalPos || order.GetGoal()->MapLayer->ID != order.MapLayer)) {
+					if (order.GetGoal() && (order.GetGoal()->tilePos != order.goalPos || order.GetGoal()->MapLayer != order.MapLayer)) {
 					//Wyrmgus end
 						order.goalPos = order.GetGoal()->tilePos;
-						order.MapLayer = order.GetGoal()->MapLayer->ID;
+						order.MapLayer = order.GetGoal()->MapLayer;
 					}
 					if (unit.Player->AiEnabled) {
 						if (!unit.RestoreOrder()) {

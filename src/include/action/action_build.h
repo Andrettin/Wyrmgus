@@ -43,10 +43,7 @@ class COrder_Build : public COrder
 	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement);
 	//Wyrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Build() : COrder(UnitActionBuild), Type(nullptr), State(0), Range(0)
-	COrder_Build() : COrder(UnitActionBuild), Type(nullptr), State(0), Range(0), MapLayer(0), Settlement(nullptr)
-	//Wyrmgus end
+	COrder_Build() : COrder(UnitActionBuild), Type(nullptr), State(0), Range(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -71,9 +68,7 @@ public:
 
 	const CUnitType &GetUnitType() const { return *Type; }
 	virtual const Vec2i GetGoalPos() const { return goalPos; }
-	//Wyrmgus start
-	virtual const int GetGoalMapLayer() const { return MapLayer; }
-	//Wyrmgus end
+	virtual const CMapLayer *GetGoalMapLayer() const { return this->MapLayer; }
 
 private:
 	bool MoveToLocation(CUnit &unit);
@@ -87,9 +82,9 @@ private:
 	int State;
 	int Range;
 	Vec2i goalPos;
+	CMapLayer *MapLayer = nullptr;
 	//Wyrmgus start
-	int MapLayer;
-	CSite *Settlement;
+	CSite *Settlement = nullptr;
 	//Wyrmgus end
 };
 

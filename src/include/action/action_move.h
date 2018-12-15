@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_move.h - The actions headerfile. */
+/**@name action_move.h - The move action header file. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -36,15 +36,9 @@
 
 class COrder_Move : public COrder
 {
-	//Wyrmgus start
-//	friend COrder *COrder::NewActionMove(const Vec2i &pos);
 	friend COrder *COrder::NewActionMove(const Vec2i &pos, int z);
-	//Wyrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Move() : COrder(UnitActionMove), Range(0)
-	COrder_Move() : COrder(UnitActionMove), Range(0), MapLayer(0)
-	//Wyrmgus end
+	COrder_Move() : COrder(UnitActionMove), Range(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -64,9 +58,7 @@ public:
 private:
 	int Range;
 	Vec2i goalPos;
-	//Wyrmgus start
-	int MapLayer;
-	//Wyrmgus end
+	CMapLayer *MapLayer = nullptr;
 };
 
 //@}

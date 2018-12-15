@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_spellcast.h - The actions headerfile. */
+/**@name action_spellcast.h - The spellcast action header file. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -38,7 +38,7 @@ class COrder_SpellCast : public COrder
 {
 	friend COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
 public:
-	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(nullptr), State(0), Range(0), MapLayer(0), isAutocast(autocast)
+	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(nullptr), State(0), Range(0), isAutocast(autocast)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -58,9 +58,7 @@ public:
 	virtual void OnAnimationAttack(CUnit &unit);
 
 	virtual const Vec2i GetGoalPos() const;
-	//Wyrmgus start
-	virtual const int GetGoalMapLayer() const;
-	//Wyrmgus end
+	virtual const CMapLayer *GetGoalMapLayer() const;
 	const CSpell &GetSpell() const { return *Spell; }
 	void SetSpell(const CSpell &spell) { Spell = &spell; }
 private:
@@ -71,9 +69,7 @@ private:
 	int State;
 	int Range;
 	Vec2i goalPos;
-	//Wyrmgus start
-	int MapLayer;
-	//Wyrmgus end
+	CMapLayer *MapLayer = nullptr;
 	bool isAutocast;
 };
 

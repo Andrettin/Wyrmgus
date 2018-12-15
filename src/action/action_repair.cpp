@@ -69,7 +69,7 @@
 
 	if (target.Destroyed) {
 		order->goalPos = target.tilePos + target.GetHalfTileSize();
-		order->MapLayer = target.MapLayer->ID;
+		order->MapLayer = target.MapLayer;
 	} else {
 		order->SetGoal(&target);
 		order->ReparableTarget = &target;
@@ -87,9 +87,7 @@
 	COrder_Repair *order = new COrder_Repair;
 
 	order->goalPos = pos;
-	//Wyrmgus start
-	order->MapLayer = z;
-	//Wyrmgus end
+	order->MapLayer = Map.MapLayers[z];
 	return order;
 }
 
@@ -104,9 +102,9 @@
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
-	//Wyrmgus start
-	file.printf(" \"map-layer\", %d,", this->MapLayer);
-	//Wyrmgus end
+	if (this->MapLayer) {
+		file.printf(" \"map-layer\", %d,", this->MapLayer->ID);
+	}
 
 	if (this->ReparableTarget != nullptr) {
 		file.printf(" \"repair-target\", \"%s\",", UnitReference(this->GetReparableTarget()).c_str());
@@ -136,11 +134,9 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
-	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
-		this->MapLayer = LuaToNumber(l, -1, j + 1);
-	//Wyrmgus end
+		this->MapLayer = Map.MapLayers[LuaToNumber(l, -1, j + 1)];
 	} else {
 		return false;
 	}
@@ -162,7 +158,7 @@
 		}
 		targetPos = vp.MapToScreenPixelPos(this->ReparableTarget->GetMapPixelPosCenter());
 	} else {
-		if (this->MapLayer != UI.CurrentMapLayer->ID) {
+		if (this->MapLayer != UI.CurrentMapLayer) {
 			return lastScreenPos;
 		}
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
@@ -188,10 +184,10 @@
 	if (ReparableTarget != nullptr) {
 		tileSize = ReparableTarget->GetTileSize();
 		input.SetGoal(ReparableTarget->tilePos, tileSize, ReparableTarget->MapLayer->ID);
-	} else {
+	} else if (Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer->ID);
 	}
 }
 
@@ -303,7 +299,7 @@ static void AnimateActionRepair(CUnit &unit)
 					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair target gone.\n");
 						this->goalPos = goal->tilePos + goal->GetHalfTileSize();
-						this->MapLayer = goal->MapLayer->ID;
+						this->MapLayer = goal->MapLayer;
 						ReparableTarget = nullptr;
 						this->ClearGoal();
 						goal = nullptr;
@@ -329,7 +325,7 @@ static void AnimateActionRepair(CUnit &unit)
 				} else if (err < 0) {
 					//Wyrmgus start
 					//if is unreachable and is on a raft, see if the raft can move closer
-					if (err == PF_UNREACHABLE) {
+					if (err == PF_UNREACHABLE && (this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
 						if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 							std::vector<CUnit *> table;
 							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
@@ -337,7 +333,7 @@ static void AnimateActionRepair(CUnit &unit)
 								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 									if (table[i]->CurrentAction() == UnitActionStill) {
 										CommandStopUnit(*table[i]);
-										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
+										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer->ID);
 									}
 									return;
 								}
@@ -363,7 +359,7 @@ static void AnimateActionRepair(CUnit &unit)
 				if (!goal->IsVisibleAsGoal(*unit.Player)) {
 					DebugPrint("repair goal is gone\n");
 					this->goalPos = goal->tilePos + goal->GetHalfTileSize();
-					this->MapLayer = goal->MapLayer->ID;
+					this->MapLayer = goal->MapLayer;
 					// FIXME: should I clear this here?
 					this->ClearGoal();
 					ReparableTarget = nullptr;

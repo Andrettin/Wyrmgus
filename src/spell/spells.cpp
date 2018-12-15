@@ -554,7 +554,8 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 					&& target->CurrentAction() != UnitActionSpellCast
 				)
 				|| target->CurrentOrder()->HasGoal() == false
-				|| target->MapDistanceTo(target->CurrentOrder()->GetGoalPos(), target->CurrentOrder()->GetGoalMapLayer()) > react_range
+				|| !Map.Info.IsPointOnMap(target->CurrentOrder()->GetGoalPos(), target->CurrentOrder()->GetGoalMapLayer())
+				|| target->MapDistanceTo(target->CurrentOrder()->GetGoalPos(), target->CurrentOrder()->GetGoalMapLayer()->ID) > react_range
 			) {
 				return false;
 			}
@@ -587,7 +588,7 @@ bool CSpell::IsUnitValidAutoCastTarget(const CUnit *target, const CUnit &caster,
 
 	//Wyrmgus start
 	int range = this->Range;
-	if (Map.IsLayerUnderground(target->MapLayer->ID) && !CheckObstaclesBetweenTiles(caster.tilePos, target->tilePos, MapFieldAirUnpassable, target->MapLayer->ID)) {
+	if (target->MapLayer->IsUnderground() && !CheckObstaclesBetweenTiles(caster.tilePos, target->tilePos, MapFieldAirUnpassable, target->MapLayer->ID)) {
 		range = 1; //if there are e.g. dungeon walls between the caster and the target, the unit reachable check must see if the target is reachable with a range of 1 instead of the spell's normal range (to make sure the spell can be cast; spells can't be cast through dungeon walls)
 	}
 

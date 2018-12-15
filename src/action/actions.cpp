@@ -187,18 +187,16 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	return invalidPos;
 }
 
-//Wyrmgus start
 /**
 **  Get goal map layer
 */
-/* virtual */ const int COrder::GetGoalMapLayer() const
+/* virtual */ const CMapLayer *COrder::GetGoalMapLayer() const
 {
 	if (this->HasGoal()) {
-		return this->GetGoal()->MapLayer->ID;
+		return this->GetGoal()->MapLayer;
 	}
-	return 0;
+	return nullptr;
 }
-//Wyrmgus end
 
 /**
 **  Parse order

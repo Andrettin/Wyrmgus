@@ -38,10 +38,7 @@ class COrder_Defend : public COrder
 {
 	friend COrder *COrder::NewActionDefend(CUnit &dest);
 public:
-	//Wyrmgus start
-//	COrder_Defend() : COrder(UnitActionDefend), State(0), Range(0)
-	COrder_Defend() : COrder(UnitActionDefend), State(0), Range(0), MapLayer(0)
-	//Wyrmgus end
+	COrder_Defend() : COrder(UnitActionDefend), State(0), Range(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -61,9 +58,7 @@ private:
 	unsigned int State;
 	int Range;
 	Vec2i goalPos;
-	//Wyrmgus start
-	int MapLayer;
-	//Wyrmgus end
+	CMapLayer *MapLayer = nullptr;
 };
 
 //@}
