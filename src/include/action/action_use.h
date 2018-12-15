@@ -10,7 +10,7 @@
 //
 /**@name action_use.h - The use action headerfile. */
 //
-//      (c) Copyright 2015-2018 by Andrettin
+//      (c) Copyright 2015 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class COrder_Use : public COrder
 {
 	friend COrder *COrder::NewActionUse(CUnit &dest);
 public:
-	COrder_Use() : COrder(UnitActionUse), State(0), Range(0)
+	COrder_Use() : COrder(UnitActionUse), State(0), Range(0), MapLayer(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -58,7 +58,7 @@ private:
 	unsigned int State;
 	int Range;
 	Vec2i goalPos;
-	CMapLayer *MapLayer = nullptr;
+	int MapLayer;
 };
 
 //@}

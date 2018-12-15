@@ -38,7 +38,7 @@ class COrder_Trade : public COrder
 {
 	friend COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market);
 public:
-	COrder_Trade() : COrder(UnitActionTrade), State(0), Range(0)
+	COrder_Trade() : COrder(UnitActionTrade), State(0), Range(0), MapLayer(0), HomeMarket(nullptr)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -60,8 +60,8 @@ private:
 	unsigned int State;
 	int Range;
 	Vec2i goalPos;
-	CMapLayer *MapLayer = nullptr;
-	CUnit *HomeMarket = nullptr;
+	int MapLayer;
+	CUnit *HomeMarket;
 	Vec2i HomeMarketPos;
 };
 

@@ -63,8 +63,8 @@
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-//COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
-COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type, int player)
+// /* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
+/* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type, int player)
 //Wyrmgus end
 {
 	COrder_Train *order = new COrder_Train;

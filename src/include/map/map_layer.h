@@ -78,7 +78,6 @@ public:
 	CMapField *Field(const Vec2i &pos) const;
 	void DoPerCycleLoop();
 	void DoPerHourLoop();
-	bool IsUnderground() const;
 private:
 	void DecrementRemainingTimeOfDayHours();
 	void IncrementTimeOfDay();

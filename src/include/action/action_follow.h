@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_follow.h - The follow action header file. */
+/**@name action_follow.h - The actions headerfile. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -38,7 +38,10 @@ class COrder_Follow : public COrder
 {
 	friend COrder *COrder::NewActionFollow(CUnit &dest);
 public:
-	COrder_Follow() : COrder(UnitActionFollow), State(0), Range(0)
+	//Wyrmgus start
+//	COrder_Follow() : COrder(UnitActionFollow), State(0), Range(0)
+	COrder_Follow() : COrder(UnitActionFollow), State(0), Range(0), MapLayer(0)
+	//Wyrmgus end
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -58,7 +61,9 @@ private:
 	unsigned int State;
 	int Range;
 	Vec2i goalPos;
-	CMapLayer *MapLayer = nullptr;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 };
 
 //@}

@@ -73,12 +73,12 @@ enum {
 	SUB_STILL_ATTACK
 };
 
-COrder *COrder::NewActionStandGround()
+/* static */ COrder *COrder::NewActionStandGround()
 {
 	return new COrder_Still(true);
 }
 
-COrder *COrder::NewActionStill()
+/* static */ COrder *COrder::NewActionStill()
 {
 	return new COrder_Still(false);
 }
@@ -452,7 +452,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	}
 	//Wyrmgus start
 //	if (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldRocks | MapFieldForest) == false) {
-	if (autoAttackUnit->MapLayer->IsUnderground() && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
+	if (Map.IsLayerUnderground(autoAttackUnit->MapLayer->ID) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
 	//Wyrmgus end
 		return false;
 	}

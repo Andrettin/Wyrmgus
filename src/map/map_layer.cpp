@@ -39,7 +39,6 @@
 
 #include "map/terrain_type.h"
 #include "map/tile.h"
-#include "settings.h"
 #include "sound_server.h"
 #include "time/season.h"
 #include "time/season_schedule.h"
@@ -146,24 +145,6 @@ void CMapLayer::DoPerHourLoop()
 {
 	this->DecrementRemainingSeasonHours();
 	this->DecrementRemainingTimeOfDayHours();
-}
-
-/**
-**	@brief	Get whether the map layer is underground
-**
-**	@return	True if the map layer is underground, or false otherwise
-*/
-bool CMapLayer::IsUnderground() const
-{
-	if (GameSettings.Inside) {
-		return true;
-	}
-	
-	if (this->SurfaceLayer > 0) {
-		return true;
-	}
-
-	return false;
 }
 
 /**

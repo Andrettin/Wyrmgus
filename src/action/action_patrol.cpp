@@ -59,7 +59,10 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+//Wyrmgus start
+///* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest)
 /* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z)
+//Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(currentPos, current_z));
 	Assert(Map.Info.IsPointOnMap(dest, dest_z));
@@ -68,8 +71,10 @@
 
 	order->goalPos = dest;
 	order->WayPoint = currentPos;
-	order->MapLayer = Map.MapLayers[dest_z];
-	order->WayPointMapLayer = Map.MapLayers[current_z];
+	//Wyrmgus start
+	order->MapLayer = dest_z;
+	order->WayPointMapLayer = current_z;
+	//Wyrmgus end
 	return order;
 }
 
@@ -82,18 +87,19 @@
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
-	if (this->MapLayer) {
-		file.printf(" \"map-layer\", %d,", this->MapLayer->ID);
-	}
+	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
+	//Wyrmgus end
 	file.printf(" \"range\", %d,", this->Range);
 
 	if (this->WaitingCycle != 0) {
 		file.printf(" \"waiting-cycle\", %d,", this->WaitingCycle);
 	}
+	//Wyrmgus start
+//	file.printf(" \"patrol\", {%d, %d}", this->WayPoint.x, this->WayPoint.y);
 	file.printf(" \"patrol\", {%d, %d},", this->WayPoint.x, this->WayPoint.y);
-	if (this->WayPointMapLayer) {
-		file.printf(" \"patrol-map-layer\", %d", this->WayPointMapLayer->ID);
-	}
+	file.printf(" \"patrol-map-layer\", %d", this->WayPointMapLayer);
+	//Wyrmgus end
 	file.printf("}");
 }
 
@@ -104,9 +110,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->WayPoint.x , &this->WayPoint.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
 	} else if (!strcmp(value, "patrol-map-layer")) {
 		++j;
-		this->WayPointMapLayer = Map.MapLayers[LuaToNumber(l, -1, j + 1)];
+		this->WayPointMapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else if (!strcmp(value, "waiting-cycle")) {
 		++j;
 		this->WaitingCycle = LuaToNumber(l, -1, j + 1);
@@ -118,9 +126,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
-		this->MapLayer = Map.MapLayers[LuaToNumber(l, -1, j + 1)];
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -134,7 +144,7 @@
 
 /* virtual */ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
-	if (this->MapLayer != UI.CurrentMapLayer) {
+	if (this->MapLayer != UI.CurrentMapLayer->ID) {
 		return lastScreenPos;
 	}
 
@@ -156,7 +166,7 @@
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
 	const Vec2i tileSize(0, 0);
-	input.SetGoal(this->goalPos, tileSize, this->MapLayer->ID);
+	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 }
 
 
@@ -192,7 +202,7 @@
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer->ID);
+							CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
 						}
 						return;
 					}
@@ -208,7 +218,9 @@
 			this->WaitingCycle = 1;
 			this->Range = 0;
 			std::swap(this->WayPoint, this->goalPos);
+			//Wyrmgus start
 			std::swap(this->WayPointMapLayer, this->MapLayer);
+			//Wyrmgus end
 
 			break;
 		case PF_WAIT:
@@ -218,7 +230,9 @@
 				this->WaitingCycle = 0;
 				this->Range = 0;
 				std::swap(this->WayPoint, this->goalPos);
+				//Wyrmgus start
 				std::swap(this->WayPointMapLayer, this->MapLayer);
+				//Wyrmgus end
 
 				unit.pathFinderData->output.Cycles = 0; //moving counter
 			}

@@ -299,6 +299,7 @@ public:
 	Vec2i GetSubtemplatePos(const CMapTemplate *subtemplate) const;
 	std::vector<CUnit *> GetMapTemplateLayerConnectors(const CMapTemplate *map_template) const;
 	bool IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const;
+	bool IsLayerUnderground(int z) const;
 	
 	void SetCurrentPlane(CPlane *plane);
 	void SetCurrentWorld(CWorld *world);

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name actionresource.h - The gather resource action header file. */
+/**@name actionresource.h - The actions headerfile. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -36,16 +36,25 @@
 
 class COrder_Resource : public COrder
 {
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
 	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
+	//Wyrmgus end
 	friend COrder *COrder::NewActionResource(CUnit &harvester, CUnit &mine);
 	friend COrder *COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
 
 public:
 	COrder_Resource(CUnit &harvester) : COrder(UnitActionResource), worker(&harvester),
-		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false), Range(0)
+		//Wyrmgus start
+//		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false), Range(0)
+		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false), Range(0), MapLayer(0)
+		//Wyrmgus end
 	{
 		Resource.Pos.x = Resource.Pos.y = -1;
 		goalPos.x = goalPos.y = -1;
+		//Wyrmgus start
+		Resource.MapLayer = -1;
+		//Wyrmgus end
 	}
 
 	~COrder_Resource();
@@ -65,7 +74,9 @@ public:
 
 	int GetCurrentResource() const { return CurrentResource; }
 	Vec2i GetHarvestLocation() const;
-	CMapLayer *GetHarvestMapLayer() const;
+	//Wyrmgus start
+	int GetHarvestMapLayer() const;
+	//Wyrmgus end
 	bool IsGatheringStarted() const;
 	bool IsGatheringFinished() const;
 	bool IsGatheringWaiting() const;
@@ -89,7 +100,9 @@ private:
 	unsigned char CurrentResource;
 	struct {
 		Vec2i Pos; /// position for terrain resource.
-		CMapLayer *MapLayer = nullptr;
+		//Wyrmgus start
+		int MapLayer;
+		//Wyrmgus end
 		CUnitPtr Mine;
 	} Resource;
 	CUnitPtr Depot;
@@ -100,7 +113,9 @@ private:
 #if 1
 	// duplicate of Resource.Pos ?
 	Vec2i goalPos;
-	CMapLayer *MapLayer = nullptr;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 #endif
 };
 

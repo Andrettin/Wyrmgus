@@ -10,7 +10,7 @@
 //
 /**@name commands.h - The commands header file. */
 //
-//      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -56,9 +56,6 @@ class CUpgrade;
 /*----------------------------------------------------------------------------
 --  Commands: in command.c
 ----------------------------------------------------------------------------*/
-
-/// Stop the unit's raft
-extern void StopRaft(CUnit &unit);
 
 /**
 **  This function gives a unit a new command. If the command is given

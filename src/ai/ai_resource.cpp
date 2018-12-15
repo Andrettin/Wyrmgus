@@ -521,15 +521,10 @@ void AiNewDepotRequest(CUnit &worker)
 	Assert(worker.CurrentAction() == UnitActionResource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const int resource = order.GetCurrentResource();
-	
-	if (!Map.Info.IsPointOnMap(order.GetHarvestLocation(), order.GetHarvestMapLayer())) {
-		fprintf(stderr, "AiNewDepotRequest error: invalid position or map layer.\n");
-		return;
-	}
 
 	const Vec2i pos = order.GetHarvestLocation();
 	//Wyrmgus start
-	const int z = order.GetHarvestMapLayer()->ID;
+	const int z = order.GetHarvestMapLayer();
 	//Wyrmgus end
 	const int range = 15;
 

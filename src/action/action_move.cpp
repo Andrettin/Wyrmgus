@@ -61,14 +61,19 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+//Wyrmgus start
+///* static */ COrder *COrder::NewActionMove(const Vec2i &pos)
 /* static */ COrder *COrder::NewActionMove(const Vec2i &pos, int z)
+//Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(pos, z));
 
 	COrder_Move *order = new COrder_Move;
 
 	order->goalPos = pos;
-	order->MapLayer = Map.MapLayers[z];
+	//Wyrmgus start
+	order->MapLayer = z;
+	//Wyrmgus end
 	return order;
 }
 
@@ -80,10 +85,11 @@
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"range\", %d,", this->Range);
+	//Wyrmgus start
+//	file.printf(" \"tile\", {%d, %d}", this->goalPos.x, this->goalPos.y);
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
-	if (this->MapLayer) {
-		file.printf(" \"map-layer\", %d", this->MapLayer->ID);
-	}
+	file.printf(" \"map-layer\", %d", this->MapLayer);
+	//Wyrmgus end
 
 	file.printf("}");
 }
@@ -98,9 +104,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
-		this->MapLayer = Map.MapLayers[LuaToNumber(l, -1, j + 1)];
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -114,7 +122,7 @@
 
 /* virtual */ PixelPos COrder_Move::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
-	if (this->MapLayer != UI.CurrentMapLayer) {
+	if (this->MapLayer != UI.CurrentMapLayer->ID) {
 		return lastScreenPos;
 	}
 
@@ -132,7 +140,7 @@
 /* virtual */ void COrder_Move::UpdatePathFinderData(PathFinderInput &input)
 {
 	const Vec2i tileSize(0, 0);
-	input.SetGoal(this->goalPos, tileSize, this->MapLayer->ID);
+	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 
 	int distance = this->Range;
 	//Wyrmgus start
@@ -248,8 +256,12 @@ int DoActionMove(CUnit &unit)
 		}
 		
 		if (unit.Type->UnitType == UnitTypeNaval) { // Boat (un)docking?
+			//Wyrmgus start
+//			const CMapField &mf_cur = *Map.Field(unit.Offset);
+//			const CMapField &mf_next = *Map.Field(unit.tilePos + posd);
 			const CMapField &mf_cur = *unit.MapLayer->Field(unit.Offset);
 			const CMapField &mf_next = *unit.MapLayer->Field(unit.tilePos + posd);
+			//Wyrmgus end
 
 			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {
 				PlayUnitSound(unit, VoiceDocking);
@@ -272,8 +284,9 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 		//Wyrmgus end
-		unit.MoveToXY(pos, unit.MapLayer->ID);
 		//Wyrmgus start
+//		unit.MoveToXY(pos);
+		unit.MoveToXY(pos, unit.MapLayer->ID);
 		unit.StepCount++;
 		unit.StepCount = std::min(unit.StepCount, (unsigned char) 10);
 		//Wyrmgus end
@@ -282,7 +295,10 @@ int DoActionMove(CUnit &unit)
 		//Wyrmgus end
 
 		// Remove unit from the current selection
+		//Wyrmgus start
+//		if (unit.Selected && !Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
 		if (unit.Selected && !unit.MapLayer->Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+		//Wyrmgus end
 			if (IsOnlySelected(unit)) { //  Remove building cursor
 				CancelBuildingMode();
 			}
@@ -393,7 +409,7 @@ int DoActionMove(CUnit &unit)
 						if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 							if (table[i]->CurrentAction() == UnitActionStill) {
 								CommandStopUnit(*table[i]);
-								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer->ID);
+								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
 							}
 							return;
 						}
@@ -405,7 +421,7 @@ int DoActionMove(CUnit &unit)
 						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand && table[i]->CanMove()) {
 							if (table[i]->CurrentAction() == UnitActionStill) {
 								CommandStopUnit(*table[i]);
-								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer->ID);
+								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
 							}
 							return;
 						}

@@ -499,7 +499,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	
 	if (marker == MapMarkTileOwnership || marker == MapUnmarkTileOwnership) {
 	} else {
-		if (Map.MapLayers[z]->IsUnderground()) {
+		if (Map.IsLayerUnderground(z)) {
 			obstacle_flags.push_back(MapFieldAirUnpassable);
 		}
 	}

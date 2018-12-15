@@ -73,7 +73,7 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
+/* static */ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 {
 	COrder_Trade *order = new COrder_Trade;
 
@@ -82,7 +82,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 	// Unit::Refs is used as timeout counter.
 	if (dest.Destroyed) {
 		order->goalPos = dest.tilePos + dest.GetHalfTileSize();
-		order->MapLayer = dest.MapLayer;
+		order->MapLayer = dest.MapLayer->ID;
 	} else {
 		order->SetGoal(&dest);
 		order->Range = 1;
@@ -105,9 +105,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
-	if (this->MapLayer) {
-		file.printf(" \"map-layer\", %d,", this->MapLayer->ID);
-	}
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
 
 	file.printf(" \"state\", %d", this->State);
 
@@ -129,7 +127,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
-		this->MapLayer = Map.MapLayers[LuaToNumber(l, -1, j + 1)];
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
 	} else {
 		return false;
 	}
@@ -151,7 +149,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 		}
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
-		if (this->MapLayer != UI.CurrentMapLayer) {
+		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
@@ -174,10 +172,10 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
-	} else if (Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize, this->MapLayer->ID);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 	}
 }
 
@@ -304,18 +302,16 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			if (this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
-				if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
-					std::vector<CUnit *> table;
-					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-					for (size_t i = 0; i != table.size(); ++i) {
-						if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-							if (table[i]->CurrentAction() == UnitActionStill) {
-								CommandStopUnit(*table[i]);
-								CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer->ID);
-							}
-							return;
+			if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+				std::vector<CUnit *> table;
+				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+				for (size_t i = 0; i != table.size(); ++i) {
+					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+						if (table[i]->CurrentAction() == UnitActionStill) {
+							CommandStopUnit(*table[i]);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 						}
+						return;
 					}
 				}
 			}
@@ -387,7 +383,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 				}
 			}
 			this->goalPos = goal->tilePos;
-			this->MapLayer = goal->MapLayer;
+			this->MapLayer = goal->MapLayer->ID;
 			this->State = State_TargetReached;
 		}
 		// FALL THROUGH
@@ -399,7 +395,7 @@ COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market)
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->tilePos + goal->GetHalfTileSize();
-		this->MapLayer = goal->MapLayer;
+		this->MapLayer = goal->MapLayer->ID;
 		this->ClearGoal();
 		goal = nullptr;
 	}

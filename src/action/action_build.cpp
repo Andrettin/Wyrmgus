@@ -86,8 +86,8 @@ enum {
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-//COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
-COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement)
+///* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
+/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement)
 //Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(pos, z));
@@ -95,8 +95,8 @@ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType
 	COrder_Build *order = new COrder_Build;
 
 	order->goalPos = pos;
-	order->MapLayer = Map.MapLayers[z];
 	//Wyrmgus start
+	order->MapLayer = z;
 	order->Settlement = settlement;
 	//Wyrmgus end
 	if (building.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
@@ -122,10 +122,8 @@ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType
 	}
 	file.printf(" \"range\", %d,", this->Range);
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
-	if (this->MapLayer) {
-		file.printf(" \"map-layer\", %d,", this->MapLayer->ID);
-	}
 	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
 	if (this->Settlement) {
 		file.printf(" \"settlement\", \"%s\",", this->Settlement->Ident.c_str());
 	}
@@ -160,10 +158,10 @@ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType
 	} else if (!strcmp(value, "type")) {
 		++j;
 		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
-		this->MapLayer = Map.MapLayers[LuaToNumber(l, -1, j + 1)];
-	//Wyrmgus start
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "settlement")) {
 		++j;
 		this->Settlement = GetSite(LuaToString(l, -1, j + 1));
@@ -182,13 +180,13 @@ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType
 /* virtual */ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
 	//Wyrmgus start
-	if (this->MapLayer != UI.CurrentMapLayer) {
+	if (this->MapLayer != UI.CurrentMapLayer->ID) {
 		return lastScreenPos;
 	}
 	//Wyrmgus end
 
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
-	targetPos += PixelPos(this->GetUnitType().TileSize - 1) * this->MapLayer->PixelTileSize / 2;
+	targetPos += PixelPos(this->GetUnitType().TileSize - 1) * Map.GetMapLayerPixelTileSize(this->MapLayer) / 2;
 
 	const int w = this->GetUnitType().BoxWidth;
 	const int h = this->GetUnitType().BoxHeight;
@@ -212,7 +210,7 @@ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType
 	input.SetMaxRange(this->Range);
 
 	const Vec2i tileSize(this->Type->TileSize);
-	input.SetGoal(this->goalPos, tileSize, this->MapLayer->ID);
+	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 }
 
 /** Called when unit is killed.
@@ -226,7 +224,7 @@ void COrder_Build::AiUnitKilled(CUnit &unit)
 	if (this->BuildingUnit == nullptr) {
 		//Wyrmgus start
 //		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
-		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type, Map.GetTileLandmass(this->goalPos, this->MapLayer->ID), this->Settlement);
+		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type, Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
 		//Wyrmgus end
 	}
 }
@@ -255,7 +253,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer->ID);
+							CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
 						}
 						return false;
 					}
@@ -277,7 +275,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 			if (unit.Player->AiEnabled) {
 				//Wyrmgus start
 //				AiCanNotReach(unit, this->GetUnitType());
-				AiCanNotReach(unit, this->GetUnitType(), Map.GetTileLandmass(this->goalPos, this->MapLayer->ID), this->Settlement);
+				AiCanNotReach(unit, this->GetUnitType(), Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
 				//Wyrmgus end
 			}
 			return true;
@@ -363,7 +361,7 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit) const
 	//Wyrmgus start
 //	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1);
 	bool ignore_exploration = unit.Player->AiEnabled;
-	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1, ignore_exploration, this->MapLayer->ID);
+	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1, ignore_exploration, this->MapLayer);
 	//Wyrmgus end
 
 	if (ontop != nullptr) {
@@ -431,7 +429,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 							_("Unable to create building %s"), type.GetDefaultName(*unit.Player).c_str());
 							//Wyrmgus end
 		if (unit.Player->AiEnabled) {
-			AiCanNotBuild(unit, type, Map.GetTileLandmass(this->goalPos, this->MapLayer->ID), this->Settlement);
+			AiCanNotBuild(unit, type, Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
 		}
 		return false;
 	}
@@ -458,7 +456,10 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	UpdateUnitSightRange(*build);
 	// Must place after previous for map flags
-	build->Place(this->goalPos, this->MapLayer->ID);
+	//Wyrmgus start
+//	build->Place(this->goalPos);
+	build->Place(this->goalPos, this->MapLayer);
+	//Wyrmgus end
 
 	//Wyrmgus start
 	build->Player->NumBuildingsUnderConstruction++;
@@ -583,7 +584,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 
 		if (ontop != nullptr) {
 			//Wyrmgus start
-			if (CheckLimit(unit, type, Map.GetTileLandmass(this->goalPos, this->MapLayer->ID), this->Settlement) == false) {
+			if (CheckLimit(unit, type, Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement) == false) {
 				this->Finished = true;
 				return ;
 			}
@@ -595,7 +596,10 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 			const Vec2i pos = this->goalPos;
 			const CUnitType &type = this->GetUnitType();
 
-			CUnit *building = AlreadyBuildingFinder(unit, type).Find(this->MapLayer->Field(pos));
+			//Wyrmgus start
+//			CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
+			CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos, this->MapLayer));
+			//Wyrmgus end
 
 			if (building != nullptr) {
 				this->HelpBuild(unit, *building);
@@ -620,7 +624,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		if (unit.Player->AiEnabled) {
 			//Wyrmgus start
 //			AiCanNotBuild(unit, type);
-			AiCanNotBuild(unit, type, Map.GetTileLandmass(this->goalPos, this->MapLayer->ID), this->Settlement);
+			AiCanNotBuild(unit, type, Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
 			//Wyrmgus end
 		}
 		this->Finished = true;

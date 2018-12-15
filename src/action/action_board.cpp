@@ -104,9 +104,11 @@ enum {
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
-		this->MapLayer = Map.MapLayers[LuaToNumber(l, -1, j + 1)];
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -131,7 +133,7 @@ enum {
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
 		//Wyrmgus start
-		if (this->MapLayer != UI.CurrentMapLayer) {
+		if (this->MapLayer != UI.CurrentMapLayer->ID) {
 			return lastScreenPos;
 		}
 		//Wyrmgus end
@@ -160,10 +162,13 @@ enum {
 		CUnit *goal = this->GetGoal();
 		tileSize = goal->GetTileSize();
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer->ID);
-	} else if (Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
+	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize, this->MapLayer->ID);
+		//Wyrmgus start
+//		input.SetGoal(this->goalPos, tileSize);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+		//Wyrmgus end
 	}
 }
 
@@ -314,18 +319,16 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 					if (pathRet == PF_UNREACHABLE) {
 						//Wyrmgus start
 						//if is unreachable and is on a raft, see if the raft can move closer to the "transporter"
-						if (this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
-							if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
-								std::vector<CUnit *> table;
-								Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
-								for (size_t i = 0; i != table.size(); ++i) {
-									if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
-										if (table[i]->CurrentAction() == UnitActionStill) {
-											CommandStopUnit(*table[i]);
-											CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer->ID);
-										}
-										return;
+						if ((unit.MapLayer->Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+							std::vector<CUnit *> table;
+							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
+							for (size_t i = 0; i != table.size(); ++i) {
+								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+									if (table[i]->CurrentAction() == UnitActionStill) {
+										CommandStopUnit(*table[i]);
+										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer->ID : this->MapLayer);
 									}
+									return;
 								}
 							}
 						}

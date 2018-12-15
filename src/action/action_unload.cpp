@@ -61,15 +61,15 @@
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-//COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what)
-COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass)
+///* static */ COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what)
+/* static */ COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landmass)
 //Wyrmgus end
 {
 	COrder_Unload *order = new COrder_Unload;
 
 	order->goalPos = pos;
-	order->MapLayer = Map.MapLayers[z];
 	//Wyrmgus start
+	order->MapLayer = z;
 	order->Landmass = landmass;
 	//Wyrmgus end
 	if (what && !what->Destroyed) {
@@ -89,9 +89,9 @@ COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landma
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d}, ", this->goalPos.x, this->goalPos.y);
-	if (this->MapLayer) {
-		file.printf(" \"map-layer\", %d,", this->MapLayer->ID);
-	}
+	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
+	//Wyrmgus end
 	//Wyrmgus start
 	file.printf(" \"landmass\", %d,", this->Landmass);
 	//Wyrmgus end
@@ -112,10 +112,10 @@ COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landma
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
 	} else if (!strcmp(value, "map-layer")) {
 		++j;
-		this->MapLayer = Map.MapLayers[LuaToNumber(l, -1, j + 1)];
-	//Wyrmgus start
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "landmass")) {
 		++j;
 		this->Landmass = LuaToNumber(l, -1, j + 1);
@@ -133,7 +133,7 @@ COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landma
 
 /* virtual */ PixelPos COrder_Unload::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
-	if (this->MapLayer != UI.CurrentMapLayer) {
+	if (this->MapLayer != UI.CurrentMapLayer->ID) {
 		return lastScreenPos;
 	}
 
@@ -155,7 +155,7 @@ COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z, int landma
 
 	const Vec2i tileSize(0, 0);
 
-	input.SetGoal(this->goalPos, tileSize, this->MapLayer->ID);
+	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 }
 
 
@@ -592,7 +592,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 
 				//Wyrmgus start
 //				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos)) {
-				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos, this->MapLayer->ID, this->Landmass, this->GetGoal())) {
+				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos, this->MapLayer, this->Landmass, this->GetGoal())) {
 				//Wyrmgus end
 					this->Finished = true;
 					return ;

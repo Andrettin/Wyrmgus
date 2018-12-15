@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_board.h - The actions header file. */
+/**@name action_board.h - The actions headerfile. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -38,7 +38,10 @@ class COrder_Board : public COrder
 {
 	friend COrder *COrder::NewActionBoard(CUnit &unit);
 public:
-	COrder_Board() : COrder(UnitActionBoard), State(0), Range(0), goalPos(-1, -1) {}
+	//Wyrmgus start
+//	COrder_Board() : COrder(UnitActionBoard), State(0), Range(0), goalPos(-1, -1) {}
+	COrder_Board() : COrder(UnitActionBoard), State(0), Range(0), goalPos(-1, -1), MapLayer(0) {}
+	//Wyrmgus end
 
 	virtual COrder_Board *Clone() const { return new COrder_Board(*this); }
 
@@ -57,7 +60,9 @@ private:
 	int State;
 	int Range;
 	Vec2i goalPos;
-	CMapLayer *MapLayer = nullptr;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 };
 
 

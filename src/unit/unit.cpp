@@ -7194,14 +7194,13 @@ int CUnit::MapDistanceTo(const CUnit &dst) const
 }
 
 /**
-**	@brief	Returns the map distance to unit
-**
-**	@param	pos	The map tile position
-**	@param	z	The map layer
-**
-**	@return	The distance between in tiles.
-*/
-int CUnit::MapDistanceTo(const Vec2i &pos, const int z) const
+ **  Returns the map distance to unit.
+ **
+ **  @param pos   map tile position.
+ **
+ **  @return      The distance between in tiles.
+ */
+int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 {
 	//Wyrmgus start
 	if (z != this->MapLayer->ID) {
