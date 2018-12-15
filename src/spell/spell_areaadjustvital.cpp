@@ -88,7 +88,7 @@
 		// if (!PassCondition(caster, spell, target, goalPos) {
 		//Wyrmgus start
 //		if (!CanCastSpell(caster, spell, target, goalPos)) {
-		if (!CanCastSpell(caster, spell, target, goalPos, z)) {
+		if (!CanCastSpell(caster, spell, target, goalPos, Map.MapLayers[z])) {
 		//Wyrmgus end
 			continue;
 		}

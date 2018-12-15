@@ -45,15 +45,16 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CUnit;
-class CUnitType;
-class CPlayer;
-struct lua_State;
-class CSpell;
-class MissileType;
 //Wyrmgus start
 class CFaction;
 //Wyrmgus end
+class CMapLayer;
+class CPlayer;
+class CSpell;
+class CUnit;
+class CUnitType;
+struct lua_State;
+class MissileType;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -292,17 +293,11 @@ extern void InitSpells();
 
 /// returns true if spell can be casted (enough mana, valid target)
 extern bool CanCastSpell(const CUnit &caster, const CSpell &spell,
-						 //Wyrmgus start
-//						 const CUnit *target, const Vec2i &goalPos);
-						 const CUnit *target, const Vec2i &goalPos, int z);
-						 //Wyrmgus end
+						 const CUnit *target, const Vec2i &goalPos, const CMapLayer *map_layer);
 
 /// cast spell on target unit or place at x,y
 extern int SpellCast(CUnit &caster, const CSpell &spell,
-					 //Wyrmgus start
-//					 CUnit *target, const Vec2i &goalPos);
-					 CUnit *target, const Vec2i &goalPos, int z);
-					 //Wyrmgus end
+					 CUnit *target, const Vec2i &goalPos, CMapLayer *map_layer);
 
 /// auto cast the spell if possible
 extern int AutoCastSpell(CUnit &caster, const CSpell &spell);

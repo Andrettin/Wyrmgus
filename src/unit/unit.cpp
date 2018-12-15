@@ -5918,7 +5918,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 	}
 	
 	if (item->Spell != nullptr) {
-		if (!this->HasInventory() || !::CanCastSpell(*this, *item->Spell, this, this->tilePos, this->MapLayer->ID)) {
+		if (!this->HasInventory() || !::CanCastSpell(*this, *item->Spell, this, this->tilePos, this->MapLayer)) {
 			return false;
 		}
 	}

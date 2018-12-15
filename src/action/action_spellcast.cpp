@@ -220,10 +220,7 @@
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		unit.ReCast = 0;
 	} else {
-		//Wyrmgus start
-//		unit.ReCast = SpellCast(unit, *this->Spell, goal, goalPos);
-		unit.ReCast = SpellCast(unit, *this->Spell, goal, goalPos, MapLayer);
-		//Wyrmgus end
+		unit.ReCast = SpellCast(unit, *this->Spell, goal, this->goalPos, Map.MapLayers[this->MapLayer]);
 	}
 }
 
@@ -409,10 +406,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	switch (this->State) {
 		case 0:
 			// Check if we can cast the spell.
-			//Wyrmgus start
-//			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos)) {
-			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos, order.MapLayer)) {
-			//Wyrmgus end
+			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos, Map.MapLayers[order.MapLayer])) {
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -501,10 +495,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
 					unit.ReCast = 0;
 				} else {
-					//Wyrmgus start
-//					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos);
-					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos, order.MapLayer);
-					//Wyrmgus end
+					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos, Map.MapLayers[order.MapLayer]);
 				}
 			}
 
