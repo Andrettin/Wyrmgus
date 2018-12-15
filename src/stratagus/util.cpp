@@ -376,7 +376,7 @@ std::string NumberToRomanNumeral(unsigned number)
 }
 
 /**
-**	@brief Format a number using commas
+**	@brief	Format a number using commas
 **
 **	@param	number	Number to be formatted
 **
@@ -386,21 +386,23 @@ std::string FormatNumber(const int number)
 {
 	std::string str;
 	const char sep = ',';
-	char bufs[sizeof(int) * 10 + 2];
-	int s = 0;
-	int d = number < 0 ? 1 : 0;
-	const int sl = snprintf(bufs, sizeof(bufs), "%d", abs(number));
+	int n = abs(number);
+
+	int loop = 0;
+	while (n > 0 || loop == 0) {
+		if (loop > 0 && loop % 3 == 0) {
+			str.insert(0, 1, sep);
+		}
+		const char c = n % 10 + 48;
+		str.insert(0, 1, c);
+		n /= 10;
+		loop++;
+	}
 
 	if (number < 0) {
-		str += '-';
+		str.insert(0, 1, '-');
 	}
-	while (s <= sl) {
-		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
-			str += sep;
-		}
-		str += bufs[s++];
-	}
-
+	
 	return str;
 }
 
