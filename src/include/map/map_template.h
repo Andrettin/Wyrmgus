@@ -51,6 +51,7 @@
 class CCharacter;
 class CConfigData;
 class CFaction;
+class CHistoricalLocation;
 class CMapField;
 class CPlane;
 class CSite;
@@ -103,9 +104,10 @@ public:
 	void ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false);
 	void ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false);
 	void ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
-	void ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
+	void ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false);
 	bool IsSubtemplateArea() const;
 	const CMapTemplate *GetTopMapTemplate() const;
+	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_layer, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random);
 	
 	std::string Name;
 	std::string Ident;

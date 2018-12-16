@@ -1308,7 +1308,7 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 	}
 }
 
-void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random)
+void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random)
 {
 	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
 
@@ -1402,7 +1402,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		}
 	}
 	
-	if (this->IsSubtemplateArea() || random) { //don't perform the dynamic hero/unit application if this is a subtemplate area, to avoid creating multiple copies of the same hero
+	if (this->IsSubtemplateArea()) { //don't perform the dynamic hero/unit application if this is a subtemplate area, to avoid creating multiple copies of the same hero
 		return;
 	}
 	
@@ -1421,31 +1421,20 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 
 		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
 		
-		Vec2i unit_pos(-1, -1);
-		
-		if (unit_player && unit_player->StartMapLayer == z) {
-			unit_pos = unit_player->StartPos;
-		}
-		
 		bool in_another_map_layer = false;
-		for (int i = ((int) historical_unit->HistoricalLocations.size() - 1); i >= 0; --i) {
-			CHistoricalLocation *historical_location = historical_unit->HistoricalLocations[i];
-			if (CurrentCampaign->StartDate.ContainsDate(historical_location->Date)) {
-				if (historical_location->MapTemplate && historical_location->MapTemplate->GetTopMapTemplate() == this) {
-					if (historical_location->Position.x != -1 && historical_location->Position.y != -1) {
-						unit_pos = map_start_pos + historical_location->Position - template_start_pos;
-					} else if (historical_location->Site != nullptr && historical_location->Site->SiteUnit != nullptr) {
-						unit_pos = historical_location->Site->SiteUnit->GetTileCenterPos();
-					}
-				} else {
-					in_another_map_layer = true;
-				}
-				break;
-			}
-		}
+		Vec2i unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_layer, template_start_pos, map_start_pos, random);
 		
 		if (in_another_map_layer) {
 			continue;
+		}
+		
+		if (unit_pos.x == -1 || unit_pos.y == -1) {
+			if (!random) { //apply units whose position is that of a randomly-placed site, or that of their player's start position, together with randomly-placed units
+				continue;
+			}
+			if (unit_player && unit_player->StartMapLayer == z) {
+				unit_pos = unit_player->StartPos;
+			}
 		}
 		
 		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
@@ -1493,31 +1482,20 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 
 		CPlayer *hero_player = hero_faction ? GetFactionPlayer(hero_faction) : nullptr;
 		
-		Vec2i hero_pos(-1, -1);
-		
-		if (hero_player && hero_player->StartMapLayer == z) {
-			hero_pos = hero_player->StartPos;
-		}
-		
 		bool in_another_map_layer = false;
-		for (int i = ((int) hero->HistoricalLocations.size() - 1); i >= 0; --i) {
-			CHistoricalLocation *historical_location = hero->HistoricalLocations[i];
-			if (CurrentCampaign->StartDate.ContainsDate(historical_location->Date)) {
-				if (historical_location->MapTemplate && historical_location->MapTemplate->GetTopMapTemplate() == this) {
-					if (historical_location->Position.x != -1 && historical_location->Position.y != -1) {
-						hero_pos = map_start_pos + historical_location->Position - template_start_pos;
-					} else if (historical_location->Site != nullptr && historical_location->Site->SiteUnit != nullptr) {
-						hero_pos = historical_location->Site->SiteUnit->GetTileCenterPos();
-					}
-				} else {
-					in_another_map_layer = true;
-				}
-				break;
-			}
-		}
+		Vec2i hero_pos = this->GetBestLocationMapPosition(hero->HistoricalLocations, in_another_map_layer, template_start_pos, map_start_pos, random);
 		
 		if (in_another_map_layer) {
 			continue;
+		}
+		
+		if (hero_pos.x == -1 || hero_pos.y == -1) {
+			if (!random) { //apply heroes whose position is that of a randomly-placed site, or that of their player's start position, together with randomly-placed units
+				continue;
+			}
+			if (hero_player && hero_player->StartMapLayer == z) {
+				hero_pos = hero_player->StartPos;
+			}
 		}
 		
 		if (!Map.Info.IsPointOnMap(hero_pos, z) || hero_pos.x < map_start_pos.x || hero_pos.y < map_start_pos.y) { //heroes whose faction hasn't been created already and who don't have a valid historical location set won't be created
@@ -1564,6 +1542,38 @@ const CMapTemplate *CMapTemplate::GetTopMapTemplate() const
 	} else {
 		return this;
 	}
+}
+
+/**
+**	@brief	Gets the best map position from a list of historical locations
+**
+**	@param	historical_location_list	The list of historical locations
+**	@param	in_another_map_layer		This is set to true if there is a valid position, but it is in another map layer
+**
+**	@return	The best position if found, or an invalid one otherwise
+*/
+Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_layer, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random)
+{
+	Vec2i pos(-1, -1);
+	in_another_map_layer = false;
+	
+	for (int i = ((int) historical_location_list.size() - 1); i >= 0; --i) {
+		CHistoricalLocation *historical_location = historical_location_list[i];
+		if (CurrentCampaign->StartDate.ContainsDate(historical_location->Date)) {
+			if (historical_location->MapTemplate && historical_location->MapTemplate->GetTopMapTemplate() == this) {
+				if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
+					pos = map_start_pos + historical_location->Position - template_start_pos;
+				} else if (random && historical_location->Site != nullptr && historical_location->Site->SiteUnit != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
+					pos = historical_location->Site->SiteUnit->GetTileCenterPos();
+				}
+			} else {
+				in_another_map_layer = true;
+			}
+			break;
+		}
+	}
+	
+	return pos;
 }
 
 /**
