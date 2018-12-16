@@ -71,11 +71,11 @@
 #include "ui/button_level.h"
 #include "ui/interface.h"
 #include "ui/popup.h"
-#include "unit.h"
+#include "unit/unit.h"
 //Wyrmgus start
-#include "unit_manager.h"
+#include "unit/unit_manager.h"
 //Wyrmgus end
-#include "unittype.h"
+#include "unit/unittype.h"
 #include "upgrade.h"
 #include "video.h"
 

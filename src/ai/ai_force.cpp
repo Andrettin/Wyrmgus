@@ -46,9 +46,9 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
-#include "unit.h"
-#include "unit_find.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Types

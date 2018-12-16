@@ -61,7 +61,7 @@
 #include "time/time_of_day_schedule.h"
 #include "translate.h"
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
 #include "version.h"
 #include "video.h"
 #include "world.h"

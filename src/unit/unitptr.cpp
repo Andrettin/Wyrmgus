@@ -30,9 +30,9 @@
 //@{
 
 #include "stratagus.h"
-#include "unitptr.h"
+#include "unit/unitptr.h"
 
-#include "unit.h"
+#include "unit/unit.h"
 
 CUnitPtr::CUnitPtr(CUnit *u) : unit(u)
 {

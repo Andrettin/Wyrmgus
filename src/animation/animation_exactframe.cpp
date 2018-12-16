@@ -37,7 +37,7 @@
 
 #include "animation/animation_exactframe.h"
 
-#include "unit.h"
+#include "unit/unit.h"
 
 /* virtual */ void CAnimation_ExactFrame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {

@@ -38,8 +38,8 @@
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
-#include "unit_manager.h"
-#include "unit.h"
+#include "unit/unit_manager.h"
+#include "unit/unit.h"
 #include "iolib.h"
 #include "script.h"
 

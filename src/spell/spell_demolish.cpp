@@ -36,8 +36,8 @@
 
 #include "script.h"
 #include "map/map.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 
 /* virtual */ void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex)
 {

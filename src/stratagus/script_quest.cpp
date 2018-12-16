@@ -43,7 +43,7 @@
 #include "map/map_template.h"
 #include "player.h"
 #include "script.h"
-#include "unittype.h"
+#include "unit/unittype.h"
 #include "upgrade.h"
 
 /*----------------------------------------------------------------------------

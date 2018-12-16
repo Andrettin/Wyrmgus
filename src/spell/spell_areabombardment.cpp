@@ -37,7 +37,7 @@
 #include "map/map.h"
 #include "missile.h"
 #include "script.h"
-#include "unit.h"
+#include "unit/unit.h"
 #include "video.h"
 
 /* virtual */ void Spell_AreaBombardment::Parse(lua_State *l, int startIndex, int endIndex)

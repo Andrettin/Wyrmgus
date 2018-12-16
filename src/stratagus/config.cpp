@@ -58,7 +58,8 @@
 #include "time/timeline.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
-#include "unittype.h"
+#include "unit/historical_unit.h"
+#include "unit/unittype.h"
 #include "util.h"
 #include "world.h"
 
@@ -218,6 +219,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CDeity *deity = CDeity::GetOrAddDeity(ident);
 			if (!define_only) {
 				deity->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "historical_unit") {
+			CHistoricalUnit *historical_unit = CHistoricalUnit::GetOrAddHistoricalUnit(ident);
+			if (!define_only) {
+				historical_unit->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "icon") {
 			CIcon *icon = CIcon::New(ident);

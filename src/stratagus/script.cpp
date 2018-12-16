@@ -68,10 +68,10 @@
 #include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
 //Wyrmgus start
-#include "unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
-#include "unittype.h"
+#include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
+#include "unit/unittype.h"
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------

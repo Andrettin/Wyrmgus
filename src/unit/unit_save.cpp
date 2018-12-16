@@ -38,7 +38,7 @@
 
 #include "stratagus.h"
 
-#include "unit.h"
+#include "unit/unit.h"
 
 #include "actions.h"
 #include "animation.h"
@@ -49,7 +49,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"
-#include "unittype.h"
+#include "unit/unittype.h"
 
 #include <stdio.h>
 

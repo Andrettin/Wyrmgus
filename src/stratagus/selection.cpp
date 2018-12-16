@@ -47,10 +47,10 @@
 #include "player.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "unittype.h"
-#include "unit.h"
-#include "unit_find.h"
-#include "unit_manager.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unit_manager.h"
+#include "unit/unittype.h"
 
 //Wyrmgus start
 #include "../ai/ai_local.h" // for AiHelpers

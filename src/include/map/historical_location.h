@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spell_teleport.cpp - The spell Teleport. */
+/**@name historical_location.h - The historical location header file. */
 //
-//      (c) Copyright 2013 by cybermind
+//      (c) Copyright 2018 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,48 +27,37 @@
 //      02111-1307, USA.
 //
 
+#ifndef __HISTORICAL_LOCATION_H__
+#define __HISTORICAL_LOCATION_H__
+
 //@{
 
-#include "stratagus.h"
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
 
-#include "spell/spell_teleport.h"
+#include "time/date.h"
 
-#include "game.h"
-#include "map/map.h"
-#include "script.h"
-#include "unit/unit.h"
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
-/* virtual */ void Spell_Teleport::Parse(lua_State *l, int startIndex, int endIndex)
+class CConfigData;
+class CMapTemplate;
+class CSite;
+
+class CHistoricalLocation
 {
-	for (int j = startIndex; j < endIndex; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
-		++j;
-		LuaError(l, "Unsupported Teleport tag: %s" _C_ value);
-	}
-}
-
-/**
-**  Cast teleport.
-**
-**  @param caster       Unit that casts the spell
-**  @param spell        Spell-type pointer
-**  @param goalPos      coord of target spot to cast
-**
-**  @return             =!0 if spell should be repeated, 0 if not
-*/
-/* virtual */ int Spell_Teleport::Cast(CUnit &caster, const CSpell &spell, CUnit * /*target*/, const Vec2i &goalPos, int z, int modifier)
-{
-	if (Map.Info.IsPointOnMap(goalPos, z)) {
-		unsigned int selected = caster.Selected;
-		caster.Remove(nullptr);
-		caster.tilePos = goalPos;
-		caster.MapLayer = Map.MapLayers[z];
-		DropOutNearest(caster, goalPos, nullptr);
-		if (selected) {
-			SelectUnit(caster);
-		}
-	}
-	return 0;
-}
+public:
+	void ProcessConfigData(const CConfigData *config_data);
+	
+public:
+	CDate Date; //the historical location's date
+	CMapTemplate *MapTemplate = nullptr; //the historical location's map template (overwritten by the site's map template if the site is given)
+	Vec2i Position = Vec2i(-1, -1); //the historical location's position in its map layer (overwritten by the site position if the site is given and has a valid position)
+	CSite *Site = nullptr; //the historical location's site (if any)
+};
 
 //@}
+
+#endif // !__HISTORICAL_LOCATION_H__

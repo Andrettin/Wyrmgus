@@ -35,7 +35,7 @@
 #include "spell/spell_spawnportal.h"
 
 #include "script.h"
-#include "unit.h"
+#include "unit/unit.h"
 
 /* virtual */ void Spell_SpawnPortal::Parse(lua_State *l, int startIndex, int endIndex)
 {

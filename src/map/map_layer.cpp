@@ -44,8 +44,8 @@
 #include "time/season_schedule.h"
 #include "time/time_of_day.h"
 #include "time/time_of_day_schedule.h"
-#include "unit.h"
-#include "unit_manager.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
 
 #ifdef USE_OAML
 #include <oaml.h>

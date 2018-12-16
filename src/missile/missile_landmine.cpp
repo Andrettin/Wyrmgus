@@ -39,7 +39,7 @@
 
 #include "actions.h"
 #include "map/map.h"
-#include "unit.h"
+#include "unit/unit.h"
 
 struct LandMineTargetFinder {
 	const CUnit *const source;

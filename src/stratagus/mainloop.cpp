@@ -72,9 +72,9 @@
 #include "trigger.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
 //Wyrmgus start
-#include "unit_manager.h"
+#include "unit/unit_manager.h"
 #include "upgrade.h"
 //Wyrmgus end
 #include "video.h"

@@ -38,7 +38,7 @@
 #include "animation/animation_luacallback.h"
 
 #include "script.h"
-#include "unit.h"
+#include "unit/unit.h"
 
 
 /* virtual */ void CAnimation_LuaCallback::Action(CUnit &unit, int &/*move*/, int /*scale*/) const

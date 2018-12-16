@@ -40,7 +40,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "iolib.h"
-#include "unit.h"
+#include "unit/unit.h"
 
 #include <fluidsynth.h>
 

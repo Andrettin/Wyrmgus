@@ -61,9 +61,9 @@
 #include "script.h"
 #include "time/calendar.h"
 #include "ui/button_action.h"
-#include "unittype.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unittype.h"
 #include "video.h"
 #include "upgrade.h"
 //Wyrmgus start

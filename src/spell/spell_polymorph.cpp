@@ -45,9 +45,9 @@
 #include "network.h"
 //Wyrmgus end
 #include "script.h"
-#include "unit.h"
+#include "unit/unit.h"
 //Wyrmgus start
-#include "unit_find.h"
+#include "unit/unit_find.h"
 //Wyrmgus end
 
 /* virtual */ void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex)

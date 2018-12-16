@@ -38,7 +38,7 @@
 #include "missile.h"
 
 #include "actions.h"
-#include "unit.h"
+#include "unit/unit.h"
 
 /**
 **  Missile don't move, than checks the source unit for HP.

@@ -54,8 +54,8 @@
 #include "spells.h"
 #include "translate.h"
 #include "ui/interface.h"
-#include "unit.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 //Wyrmgus start
 #include "upgrade.h"
 //Wyrmgus end

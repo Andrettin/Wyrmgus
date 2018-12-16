@@ -52,9 +52,9 @@
 #include "spells.h"
 #include "translate.h"
 #include "ui/ui.h"
-#include "unit.h"
-#include "unit_find.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unittype.h"
 #include "upgrade.h"
 #include "video.h"
 

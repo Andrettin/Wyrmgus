@@ -36,12 +36,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-#include <tuple>
-
 #include "icons.h"
 #include "item.h"
 #include "time/date.h"
+
+#include <vector>
+#include <tuple>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -54,6 +54,7 @@ class CDeity;
 class CDeityDomain;
 class CFaction;
 class CFile;
+class CHistoricalLocation;
 class CMapTemplate;
 class CLanguage;
 class CPersistentItem;
@@ -105,15 +106,6 @@ enum CharacterTitles {
 	CharacterTitleMayor,
 
 	MaxCharacterTitles
-};
-
-class CHistoricalLocation
-{
-public:
-	CDate Date;
-	CMapTemplate *MapTemplate = nullptr;
-	Vec2i Position = Vec2i(-1, -1);
-	CSite *Site = nullptr;
 };
 
 class CCharacter

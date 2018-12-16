@@ -40,7 +40,7 @@
 #include "player.h"
 #include "script.h"
 #include "spells.h"
-#include "unittype.h"
+#include "unit/unittype.h"
 #include "upgrade.h"
 
 /*----------------------------------------------------------------------------

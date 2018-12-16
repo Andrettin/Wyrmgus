@@ -54,11 +54,11 @@
 #include "script.h"
 #include "translate.h"
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
 //Wyrmgus start
-#include "unit_find.h"
+#include "unit/unit_find.h"
 //Wyrmgus end
-#include "unittype.h"
+#include "unit/unittype.h"
 #include "video.h"
 
 //Wyrmgus start

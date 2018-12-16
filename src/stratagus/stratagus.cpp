@@ -203,7 +203,7 @@ extern void beos_init(int argc, char **argv);
 #include "translate.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "unit_manager.h"
+#include "unit/unit_manager.h"
 #include "version.h"
 #include "video.h"
 #include "widgets.h"

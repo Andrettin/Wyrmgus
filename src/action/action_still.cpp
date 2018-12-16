@@ -60,9 +60,9 @@
 #include "sound.h"
 //Wyrmgus end
 #include "spells.h"
-#include "unit.h"
-#include "unit_find.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unittype.h"
 //Wyrmgus start
 #include "upgrade.h"
 //Wyrmgus end

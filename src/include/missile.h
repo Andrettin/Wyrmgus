@@ -297,7 +297,7 @@
 
 #include "missileconfig.h"
 #include "script.h"
-#include "unitptr.h"
+#include "unit/unitptr.h"
 #include "unitsound.h"
 #include "vec2i.h"
 

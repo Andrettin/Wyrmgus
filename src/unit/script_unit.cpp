@@ -34,7 +34,8 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
-#include "unit.h"
+
+#include "unit/unit.h"
 
 #include "actions.h"
 #include "animation.h"
@@ -58,9 +59,9 @@
 #include "trigger.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "unit_find.h"
-#include "unit_manager.h"
-#include "unittype.h"
+#include "unit/unit_find.h"
+#include "unit/unit_manager.h"
+#include "unit/unittype.h"
 #include "upgrade.h"
 
 //Wyrmgus start

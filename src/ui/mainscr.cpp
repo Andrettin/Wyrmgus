@@ -66,9 +66,9 @@
 #include "ui/contenttype.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 #include "unitsound.h"
-#include "unittype.h"
 //Wyrmgus start
 #include "util.h"
 //Wyrmgus end

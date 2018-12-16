@@ -37,7 +37,7 @@
 
 #include "animation/animation_goto.h"
 
-#include "unit.h"
+#include "unit/unit.h"
 
 /* virtual */ void CAnimation_Goto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {

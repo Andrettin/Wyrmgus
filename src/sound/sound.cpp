@@ -48,7 +48,7 @@
 #include "missile.h"
 #include "sound_server.h"
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
 #include "video.h"
 #include "widgets.h"
 

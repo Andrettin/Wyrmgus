@@ -38,8 +38,8 @@
 
 #include <vector>
 
-#include "unittype.h"
 #include "player.h"
+#include "unit/unittype.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------

@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_move.cpp - The animation Move. */
+/**@name historical_unit.h - The historical unit header file. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2018 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,29 +27,55 @@
 //      02111-1307, USA.
 //
 
+#ifndef __HISTORICAL_UNIT_H__
+#define __HISTORICAL_UNIT_H__
+
 //@{
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
+#include "time/date.h"
 
-#include "animation/animation_move.h"
+#include <map>
+#include <string>
+#include <vector>
 
-#include "unit/unit.h"
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
-/* virtual */ void CAnimation_Move::Action(CUnit &unit, int &move, int /*scale*/) const
+class CConfigData;
+class CFaction;
+class CHistoricalLocation;
+class CUnitType;
+
+class CHistoricalUnit
 {
-	Assert(unit.Anim.Anim == this);
-	Assert(!move);
-
-	move = ParseAnimInt(unit, this->moveStr.c_str());
-}
-
-/* virtual */ void CAnimation_Move::Init(const char *s, lua_State *)
-{
-	this->moveStr = s;
-}
+public:
+	~CHistoricalUnit();
+	
+	static CHistoricalUnit *GetHistoricalUnit(const std::string &ident, const bool should_find = true);
+	static CHistoricalUnit *GetOrAddHistoricalUnit(const std::string &ident);
+	static void ClearHistoricalUnits();
+	
+	static std::vector<CHistoricalUnit *> HistoricalUnits;
+	static std::map<std::string, CHistoricalUnit *> HistoricalUnitsByIdent;
+	
+	void ProcessConfigData(const CConfigData *config_data);
+	
+public:
+	std::string Ident; //the unit's string identifier
+	std::string Name; //the unit's name
+	CUnitType *UnitType = nullptr; //the unit's unit type
+	CFaction *Faction = nullptr; //the unit's faction
+	int Quantity = 1; //how many in-game units does this historical unit result in when applied
+	CDate StartDate; //when the unit starts being active
+	CDate EndDate; //when the unit ends being active (e.g. when it is disbanded)
+	std::vector<CHistoricalLocation *> HistoricalLocations; //historical locations for the unit
+};
 
 //@}
+
+#endif // !__HISTORICAL_UNIT_H__

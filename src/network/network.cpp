@@ -238,9 +238,9 @@
 #include "sound.h"
 #include "translate.h"
 #include "ui/interface.h"
-#include "unit.h"
-#include "unit_manager.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
+#include "unit/unittype.h"
 #include "video.h"
 
 #include <deque>

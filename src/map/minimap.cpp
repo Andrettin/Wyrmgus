@@ -48,9 +48,9 @@
 #include "player.h"
 #include "province.h"
 #include "ui/ui.h"
-#include "unit.h"
-#include "unit_manager.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
+#include "unit/unittype.h"
 #include "video.h"
 #include "world.h"
 

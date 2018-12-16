@@ -58,9 +58,9 @@
 #include "sound.h"
 #include "spells.h"
 #include "ui/ui.h"
-#include "unit.h"
-#include "unit_find.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unittype.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

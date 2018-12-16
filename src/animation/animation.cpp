@@ -68,8 +68,8 @@
 #include "player.h"
 #include "script.h"
 #include "spells.h"
-#include "unit.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 
 #define ANIMATIONS_MAXANIM 4096
 

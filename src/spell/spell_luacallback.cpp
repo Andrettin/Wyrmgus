@@ -34,7 +34,7 @@
 #include "spell/spell_luacallback.h"
 
 #include "script.h"
-#include "unit.h"
+#include "unit/unit.h"
 
 
 /* virtual */ void Spell_LuaCallback::Parse(lua_State *l, int startIndex, int endIndex)

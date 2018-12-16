@@ -41,7 +41,7 @@
 
 #include "luacallback.h"
 #include "map/map.h"
-#include "unit_find.h"
+#include "unit/unit_find.h"
 
 /**
 **  Calculate parabolic trajectories.

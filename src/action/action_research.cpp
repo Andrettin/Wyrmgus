@@ -45,9 +45,9 @@
 #include "sound.h"
 #include "player.h"
 #include "translate.h"
-#include "unit.h"
+#include "unit/unit.h"
 #include "unitsound.h"
-#include "unittype.h"
+#include "unit/unittype.h"
 #include "upgrade_structs.h"
 #include "upgrade.h"
 

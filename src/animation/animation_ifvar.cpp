@@ -37,7 +37,7 @@
 
 #include "animation/animation_ifvar.h"
 
-#include "unit.h"
+#include "unit/unit.h"
 
 //IfVar compare types
 enum EIfVarBinOp {

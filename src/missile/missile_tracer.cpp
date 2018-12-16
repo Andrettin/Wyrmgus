@@ -41,8 +41,8 @@
 
 #include "luacallback.h"
 #include "map/map.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 
 /**
 **  Handle tracer missile.

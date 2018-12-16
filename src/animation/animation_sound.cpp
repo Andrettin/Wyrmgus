@@ -39,7 +39,7 @@
 
 #include "map/map.h"
 #include "sound.h"
-#include "unit.h"
+#include "unit/unit.h"
 
 /* virtual */ void CAnimation_Sound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {

@@ -46,8 +46,8 @@
 #include "map/tileset.h"
 #include "player.h"
 #include "script.h"
-#include "unit.h"
-#include "unit_manager.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
 
 CMapField::CMapField() :
 	Flags(0),

@@ -37,7 +37,7 @@
 
 #include "stratagus.h"
 
-#include "unit_find.h"
+#include "unit/unit_find.h"
 
 #include "actions.h"
 #include "map/map.h"
@@ -47,9 +47,9 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"
-#include "unit.h"
-#include "unit_manager.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
+#include "unit/unittype.h"
 
 /*----------------------------------------------------------------------------
   -- Finding units

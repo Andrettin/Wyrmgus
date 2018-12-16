@@ -42,8 +42,8 @@
 #include "ui/ui.h"
 #include "player.h"
 #include "settings.h"
-#include "unit_find.h"
-#include "unittype.h"
+#include "unit/unit_find.h"
+#include "unit/unittype.h"
 
 /*----------------------------------------------------------------------------
 -- Functions

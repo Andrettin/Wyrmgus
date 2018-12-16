@@ -42,7 +42,7 @@
 //Wyrmgus end
 
 #include "upgrade_structs.h" // MaxCost
-#include "unit_cache.h"
+#include "unit/unit_cache.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------

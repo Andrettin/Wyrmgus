@@ -44,14 +44,14 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "translate.h"
-#include "unit.h"
-#include "unittype.h"
-#include "video.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 //Wyrmgus start
 #include "upgrade.h"
 //Wyrmgus end
+#include "video.h"
 
 #include <vector>
 

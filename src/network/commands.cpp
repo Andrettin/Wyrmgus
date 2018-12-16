@@ -48,9 +48,9 @@
 //Wyrmgus end
 #include "replay.h"
 #include "spells.h"
-#include "unit.h"
-#include "unit_manager.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
+#include "unit/unittype.h"
 
  /*----------------------------------------------------------------------------
 --  Functions

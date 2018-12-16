@@ -59,10 +59,10 @@
 #include "spells.h"
 #include "trigger.h"
 #include "ui/ui.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unittype.h"
 #include "unitsound.h"
-#include "unittype.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

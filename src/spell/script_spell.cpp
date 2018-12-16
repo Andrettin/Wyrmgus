@@ -58,7 +58,7 @@
 #include "spell/spell_spawnportal.h"
 #include "spell/spell_summon.h"
 #include "spell/spell_teleport.h"
-#include "unittype.h"
+#include "unit/unittype.h"
 #include "upgrade.h"
 
 

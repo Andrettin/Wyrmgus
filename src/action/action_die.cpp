@@ -39,8 +39,8 @@
 
 #include "animation.h"
 #include "iolib.h"
-#include "unit.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

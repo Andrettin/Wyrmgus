@@ -48,12 +48,12 @@
 #include "sound.h"
 #include "translate.h"
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
 //Wyrmgus start
-#include "unit_find.h"
+#include "unit/unit_find.h"
 //Wyrmgus end
 #include "unitsound.h"
-#include "unittype.h"
+#include "unit/unittype.h"
 
 /// How many resources the player gets back if canceling training
 #define CancelTrainingCostsFactor  100

@@ -39,8 +39,8 @@
 
 #include "actions.h"
 #include "map/map.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 
 /**
 **  Death-Coil class. Damages organic units and gives to the caster.

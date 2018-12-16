@@ -52,8 +52,8 @@
 #include "player.h"
 #include "script.h"
 #include "ui/ui.h"
-#include "unit.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

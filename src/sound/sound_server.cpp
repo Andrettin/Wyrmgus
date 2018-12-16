@@ -51,9 +51,9 @@
 #include "player.h" //for playing faction music
 #include "ui/interface.h" //for player faction music
 //Wyrmgus end
-#include "unit.h"
+#include "unit/unit.h"
 //Wyrmgus start
-#include "unit_manager.h"
+#include "unit/unit_manager.h"
 //Wyrmgus end
 
 #include "SDL.h"

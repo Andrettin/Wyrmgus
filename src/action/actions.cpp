@@ -77,10 +77,10 @@
 #include "spells.h"
 #include "time/time_of_day.h"
 #include "ui/interface.h"
-#include "unit.h"
-#include "unit_find.h"
-#include "unit_manager.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unit_manager.h"
+#include "unit/unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

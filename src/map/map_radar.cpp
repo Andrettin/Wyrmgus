@@ -39,8 +39,8 @@
 
 #include "map/map_layer.h"
 #include "player.h"
-#include "unittype.h"
-#include "unit.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 
 
 /*----------------------------------------------------------------------------

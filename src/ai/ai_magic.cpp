@@ -34,8 +34,8 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
-#include "unittype.h"
-#include "unit.h"
+#include "unit/unittype.h"
+#include "unit/unit.h"
 #include "spells.h"
 #include "actions.h"
 #include "ai_local.h"

@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "unittype.h"
+#include "unit/unittype.h"
 
 #include "actions.h"
 #include "animation.h"
@@ -66,9 +66,9 @@
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
 #include "unitsound.h"
-#include "unit_manager.h"
 //Wyrmgus start
 #include "upgrade.h"
 //Wyrmgus end

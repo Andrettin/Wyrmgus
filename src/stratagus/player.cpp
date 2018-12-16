@@ -77,10 +77,10 @@
 #include "time/time_of_day.h"
 #include "translate.h"
 #include "unitsound.h"
-#include "unittype.h"
-#include "unit.h"
+#include "unit/unit.h"
 //Wyrmgus start
-#include "unit_find.h"
+#include "unit/unit_find.h"
+#include "unit/unittype.h"
 #include "upgrade.h"
 //Wyrmgus end
 #include "ui/button_action.h"

@@ -38,7 +38,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "script.h"
-#include "unit.h"
+#include "unit/unit.h"
 
 
 /* virtual */ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)

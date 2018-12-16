@@ -52,7 +52,7 @@
 #include "ui/contenttype.h"
 #include "ui/interface.h"
 #include "ui/popup.h"
-#include "unit.h"
+#include "unit/unit.h"
 #include "video.h"
 #include "world.h"
 

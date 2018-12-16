@@ -36,7 +36,7 @@
 
 #include "stratagus.h"
 
-#include "unittype.h"
+#include "unit/unittype.h"
 
 #include "actions.h"
 #include "editor.h"
@@ -46,8 +46,8 @@
 #include "map/tileset.h"
 #include "player.h"
 #include "quest.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 #include "world.h"
 
 /*----------------------------------------------------------------------------

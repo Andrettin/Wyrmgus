@@ -50,12 +50,12 @@
 #include "translate.h"
 #include "upgrade.h"
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
 //Wyrmgus start
-#include "unit_find.h"
+#include "unit/unit_find.h"
 //Wyrmgus end
-#include "unit_manager.h"
-#include "unittype.h"
+#include "unit/unit_manager.h"
+#include "unit/unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

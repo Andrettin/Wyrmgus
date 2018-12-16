@@ -68,11 +68,11 @@
 #include "translate.h"
 //Wyrmgus end
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
 //Wyrmgus start
-#include "unit_find.h"
+#include "unit/unit_find.h"
 //Wyrmgus end
-#include "unit_manager.h"
+#include "unit/unit_manager.h"
 //Wyrmgus start
 #include "upgrade.h"
 //Wyrmgus end

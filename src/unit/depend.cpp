@@ -49,8 +49,8 @@
 #include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/interface.h"
-#include "unit.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 #include "upgrade_structs.h"
 #include "upgrade.h"
 

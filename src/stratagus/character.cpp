@@ -48,6 +48,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "item.h"
+#include "map/historical_location.h"
 #include "map/map_template.h"
 #include "parameters.h"
 #include "player.h"
@@ -57,7 +58,7 @@
 #include "religion/deity_domain.h"
 #include "spells.h"
 #include "time/calendar.h"
-#include "unit.h"
+#include "unit/unit.h"
 #include "upgrade.h"
 
 #include "../ai/ai_local.h" //for using AiHelpers
@@ -79,6 +80,10 @@ CCharacter::~CCharacter()
 {
 	if (this->Conditions) {
 		delete Conditions;
+	}
+	
+	for (size_t i = 0; i < this->HistoricalLocations.size(); ++i) {
+		delete this->HistoricalLocations[i];
 	}
 }
 
@@ -254,52 +259,9 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		
 		if (child_config_data->Tag == "historical_location") {
 			CHistoricalLocation *historical_location = new CHistoricalLocation;
+			historical_location->ProcessConfigData(child_config_data);
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "date") {
-					value = FindAndReplaceString(value, "_", "-");
-					historical_location->Date = CDate::FromString(value);
-				} else if (key == "map_template") {
-					value = FindAndReplaceString(value, "_", "-");
-					historical_location->MapTemplate = CMapTemplate::GetMapTemplate(value);
-					if (!historical_location->MapTemplate) {
-						fprintf(stderr, "Map template \"%s\" does not exist.\n", value.c_str());
-					}
-				} else if (key == "site") {
-					value = FindAndReplaceString(value, "_", "-");
-					historical_location->Site = GetSite(value);
-					if (historical_location->Site) {
-						historical_location->MapTemplate = historical_location->Site->MapTemplate;
-						historical_location->Position = historical_location->Site->Position;
-					} else {
-						fprintf(stderr, "Site \"%s\" does not exist.\n", value.c_str());
-					}
-				} else if (key == "x") {
-					historical_location->Position.x = std::stoi(value);
-				} else if (key == "y") {
-					historical_location->Position.y = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid historical location property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (historical_location->Date.Year == 0) {
-				fprintf(stderr, "Historical location has no date.\n");
-				delete historical_location;
-				continue;
-			}
-			
-			if (!historical_location->MapTemplate) {
-				fprintf(stderr, "Historical location has no map template.\n");
-				delete historical_location;
-				continue;
-			}
-			
-			if (!historical_location->Site && (historical_location->Position.x == -1 || historical_location->Position.y == -1)) {
-				fprintf(stderr, "Historical location has no position for the character.\n");
+			if (historical_location->Date.Year == 0 || !historical_location->MapTemplate || (!historical_location->Site && (historical_location->Position.x == -1 || historical_location->Position.y == -1))) {
 				delete historical_location;
 				continue;
 			}

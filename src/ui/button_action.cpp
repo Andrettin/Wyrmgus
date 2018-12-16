@@ -41,8 +41,8 @@
 #include "trigger.h"
 #include "ui/button_level.h"
 #include "ui/interface.h"
-#include "unit.h"
-#include "unit_manager.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
 #include "video.h"
 #include "widgets.h"
 

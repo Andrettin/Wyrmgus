@@ -187,6 +187,7 @@ set(guichan_SRCS
 source_group(guichan FILES ${guichan_SRCS})
 
 set(map_SRCS
+	src/map/historical_location.cpp
 	src/map/map.cpp
 	src/map/map_draw.cpp
 	src/map/map_fog.cpp
@@ -369,6 +370,7 @@ source_group(ui FILES ${ui_SRCS})
 set(unit_SRCS
 	src/unit/build.cpp
 	src/unit/depend.cpp
+	src/unit/historical_unit.cpp
 	src/unit/script_unit.cpp
 	src/unit/script_unittype.cpp
 	src/unit/unit_cache.cpp
@@ -560,6 +562,7 @@ set(stratagus_animation_HDRS
 )
 
 set(stratagus_map_HDRS
+	src/include/map/historical_location.h
 	src/include/map/map.h
 	src/include/map/map_layer.h
 	src/include/map/map_template.h
@@ -611,6 +614,16 @@ set(stratagus_ui_HDRS
 	src/include/ui/statusline.h
 	src/include/ui/ui.h
 	src/include/ui/uitimer.h
+)
+
+set(stratagus_unit_HDRS
+	src/include/unit/historical_unit.h
+	src/include/unit/unit.h
+	src/include/unit/unit_cache.h
+	src/include/unit/unit_find.h
+	src/include/unit/unit_manager.h
+	src/include/unit/unitptr.h
+	src/include/unit/unittype.h
 )
 
 set(stratagus_xbrz_HDRS
@@ -677,13 +690,7 @@ set(stratagus_generic_HDRS
 	src/include/title.h
 	src/include/translate.h
 	src/include/trigger.h
-	src/include/unit.h
-	src/include/unit_cache.h
-	src/include/unit_find.h
-	src/include/unit_manager.h
-	src/include/unitptr.h
 	src/include/unitsound.h
-	src/include/unittype.h
 	src/include/upgrade.h
 	src/include/upgrade_structs.h
 	src/include/util.h
@@ -706,6 +713,7 @@ source_group(include\\religion FILES ${stratagus_religion_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
 source_group(include\\time FILES ${stratagus_time_HDRS})
 source_group(include\\ui FILES ${stratagus_ui_HDRS})
+source_group(include\\unit FILES ${stratagus_unit_HDRS})
 source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
 
 
@@ -719,6 +727,7 @@ set(stratagus_HDRS
 	${stratagus_spell_HDRS}
 	${stratagus_time_HDRS}
 	${stratagus_ui_HDRS}
+	${stratagus_unit_HDRS}
 	${stratagus_xbrz_HDRS}
 )
 

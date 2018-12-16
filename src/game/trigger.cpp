@@ -49,9 +49,9 @@
 #include "results.h"
 #include "script.h"
 #include "ui/interface.h"
-#include "unit.h"
-#include "unit_find.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
+#include "unit/unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

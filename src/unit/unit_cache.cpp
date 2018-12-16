@@ -42,8 +42,8 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 
-#include "unit.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 
 #include <string.h>
 

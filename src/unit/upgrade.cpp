@@ -75,14 +75,14 @@
 #include "settings.h"
 #include "translate.h"
 //Wyrmgus end
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 //Wyrmgus start
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "unit_manager.h"
+#include "unit/unit_manager.h"
 //Wyrmgus end
-#include "unittype.h"
+#include "unit/unittype.h"
 #include "util.h"
 
 /*----------------------------------------------------------------------------

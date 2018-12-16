@@ -40,8 +40,8 @@
 #include "map/map.h"
 #include "player.h"
 #include "script.h"
-#include "unittype.h"
-#include "unit.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -44,8 +44,8 @@
 #include "player.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "unit.h"
-#include "unittype.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

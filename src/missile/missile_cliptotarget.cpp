@@ -39,7 +39,7 @@
 
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "unit.h"
+#include "unit/unit.h"
 
 /**
 **  Missile remains clipped to target's current goal and plays his animation once

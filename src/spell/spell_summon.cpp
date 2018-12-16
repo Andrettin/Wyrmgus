@@ -42,8 +42,8 @@
 #include "commands.h"
 #include "map/map_layer.h"
 #include "script.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 
 /* virtual */ void Spell_Summon::Parse(lua_State *l, int startIndex, int endIndex)
 {

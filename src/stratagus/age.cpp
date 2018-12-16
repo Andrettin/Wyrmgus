@@ -40,7 +40,7 @@
 #include "config.h"
 #include "depend.h"
 #include "mod.h"
-#include "unittype.h"
+#include "unit/unittype.h"
 #include "upgrade_structs.h"
 #include "video.h"
 

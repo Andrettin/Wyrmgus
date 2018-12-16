@@ -39,8 +39,8 @@
 
 #include "actions.h"
 #include "map/map_layer.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 
 /**
 **  FlameShield controller

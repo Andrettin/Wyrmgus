@@ -54,7 +54,7 @@
 #include "time/time_of_day.h"
 #include "ui/ui.h"
 //Wyrmgus start
-#include "unit.h" //for using CPreference
+#include "unit/unit.h" //for using CPreference
 //Wyrmgus end
 #include "video.h"
 #include "xbrz.h"

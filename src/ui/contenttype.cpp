@@ -42,7 +42,7 @@
 #include "font.h"
 #include "translate.h"
 #include "ui/ui.h"
-#include "unit.h"
+#include "unit/unit.h"
 #include "video.h"
 
 enum UStrIntType {

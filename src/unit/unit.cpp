@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "unit.h"
+#include "unit/unit.h"
 
 #include "action/action_attack.h"
 //Wyrmgus start
@@ -86,10 +86,10 @@
 #include "ui/button_action.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "unit_find.h"
-#include "unit_manager.h"
+#include "unit/unit_find.h"
+#include "unit/unit_manager.h"
+#include "unit/unittype.h"
 #include "unitsound.h"
-#include "unittype.h"
 #include "upgrade.h"
 //Wyrmgus start
 #include "util.h"
@@ -106,7 +106,7 @@
 /**
 **  @class CUnit unit.h
 **
-**  \#include "unit.h"
+**  \#include "unit/unit.h"
 **
 **  Everything belonging to a unit. FIXME: rearrange for less memory.
 **

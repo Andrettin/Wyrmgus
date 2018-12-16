@@ -42,8 +42,8 @@
 #include "actions.h"
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "unittype.h"
-#include "unit.h"
+#include "unit/unit.h"
+#include "unit/unittype.h"
 
 //astar.cpp
 

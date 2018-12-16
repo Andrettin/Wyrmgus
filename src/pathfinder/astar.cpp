@@ -41,8 +41,8 @@
 #include "map/tileset.h"
 #include "settings.h"
 #include "time/time_of_day.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 
 #include "pathfinder.h"
 

@@ -681,7 +681,7 @@ void PrintOnStdOut(const char *format, ...)
 #include "iocompat.h" //for getting a file's last modified date
 #include "iolib.h" //for getting a file's last modified date
 #include "player.h" //for personal name generation
-#include "unittype.h" //for personal name generation
+#include "unit/unittype.h" //for personal name generation
 #include "upgrade.h" //for personal name generation
 
 std::string FindAndReplaceString(const std::string &text, const std::string &find, const std::string &replace)

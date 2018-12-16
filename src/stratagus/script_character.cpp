@@ -39,6 +39,7 @@
 
 #include "civilization.h"
 #include "grand_strategy.h"
+#include "map/historical_location.h"
 #include "map/map_template.h"
 #include "player.h"
 #include "province.h"
@@ -47,7 +48,7 @@
 #include "script.h"
 #include "spells.h"
 #include "time/timeline.h"
-#include "unittype.h"
+#include "unit/unittype.h"
 #include "upgrade.h"
 
 #include "../ai/ai_local.h" //for using AiHelpers

@@ -54,8 +54,8 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "sound.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 #include "upgrade.h"
 
 /*----------------------------------------------------------------------------

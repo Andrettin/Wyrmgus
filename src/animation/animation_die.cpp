@@ -37,7 +37,7 @@
 
 #include "animation/animation_die.h"
 
-#include "unit.h"
+#include "unit/unit.h"
 
 #include <stdio.h>
 

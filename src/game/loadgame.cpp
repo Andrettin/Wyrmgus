@@ -47,8 +47,8 @@
 #include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
-#include "item.h"
 //Wyrmgus end
+#include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
@@ -79,9 +79,10 @@
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
-#include "unit.h"
-#include "unit_manager.h"
-#include "unittype.h"
+#include "unit/historical_unit.h"
+#include "unit/unit.h"
+#include "unit/unit_manager.h"
+#include "unit/unittype.h"
 #include "upgrade.h"
 #include "video.h"
 #include "world.h"
@@ -129,6 +130,7 @@ void CleanModules()
 	CDeityDomain::ClearDeityDomains();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
+	CHistoricalUnit::ClearHistoricalUnits();
 	CMapTemplate::ClearMapTemplates();
 	CleanMissiles();
 	//Wyrmgus start

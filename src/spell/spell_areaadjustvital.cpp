@@ -35,8 +35,8 @@
 #include "spell/spell_areaadjustvital.h"
 
 #include "script.h"
-#include "unit.h"
-#include "unit_find.h"
+#include "unit/unit.h"
+#include "unit/unit_find.h"
 
 /* virtual */ void Spell_AreaAdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
 {
