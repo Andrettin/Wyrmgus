@@ -160,6 +160,26 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 }
 
 /**
+**	@brief	Get the default total hours for a time of day schedule
+**
+**	@return	The default total hours
+*/
+unsigned long CTimeOfDaySchedule::GetDefaultTotalHours() const
+{
+	return DEFAULT_HOURS_PER_DAY;
+}
+
+/**
+**	@brief	Get the default hour multiplier for a time of day schedule
+**
+**	@return	The default hour multiplier
+*/
+int CTimeOfDaySchedule::GetDefaultHourMultiplier() const
+{
+	return 1;
+}
+
+/**
 **	@brief	Process data provided by a configuration file
 **
 **	@param	config_data	The configuration data

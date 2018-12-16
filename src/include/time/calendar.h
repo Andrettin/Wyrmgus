@@ -83,7 +83,7 @@ class CCalendar
 {
 public:
 	CCalendar() :
-		Initialized(false), HoursPerDay(DefaultHoursPerDay), DaysPerYear(0), BaseDayOfTheWeek(nullptr), CurrentDayOfTheWeek(-1)
+		Initialized(false), HoursPerDay(DEFAULT_HOURS_PER_DAY), DaysPerYear(0), BaseDayOfTheWeek(nullptr), CurrentDayOfTheWeek(-1)
 	{
 	}
 	

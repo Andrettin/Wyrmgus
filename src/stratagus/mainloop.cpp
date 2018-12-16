@@ -419,13 +419,13 @@ static void GameLogicLoop()
 		//Wyrmgus end
 		
 		if (GameCycle > 0) {
-			if (GameCycle % CyclesPerInGameHour == 0) {
+			if (GameCycle % CYCLES_PER_IN_GAME_HOUR == 0) {
 				CDate::CurrentTotalHours++;
 				
 				for (size_t i = 0; i < CCalendar::Calendars.size(); ++i) {
 					CCalendar *calendar = CCalendar::Calendars[i];
 
-					calendar->CurrentDate.AddHours(calendar, 1, DefaultDayMultiplierForYear);
+					calendar->CurrentDate.AddHours(calendar, 1, DEFAULT_DAY_MULTIPLIER_PER_YEAR);
 					
 					if (calendar->CurrentDayOfTheWeek != -1 && CDate::CurrentTotalHours % calendar->HoursPerDay == 0) { //day passed in the calendar
 						calendar->CurrentDayOfTheWeek++;

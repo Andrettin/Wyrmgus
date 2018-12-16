@@ -68,7 +68,7 @@ class CSeasonSchedule : public CTimePeriodSchedule
 {
 public:
 	CSeasonSchedule() :
-		HoursPerDay(DefaultHoursPerDay)
+		HoursPerDay(DEFAULT_HOURS_PER_DAY)
 	{
 	}
 	
@@ -83,6 +83,8 @@ public:
 	static CSeasonSchedule *DefaultSeasonSchedule;
 	
 	void ProcessConfigData(const CConfigData *config_data);
+	virtual unsigned long GetDefaultTotalHours() const;
+	virtual int GetDefaultHourMultiplier() const;
 
 	std::string Ident;									/// Ident of the season schedules
 	std::string Name;									/// Name of the season schedules

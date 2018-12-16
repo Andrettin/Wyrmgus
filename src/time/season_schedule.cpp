@@ -191,4 +191,24 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 	this->CalculateHourMultiplier();
 }
 
+/**
+**	@brief	Get the default total hours for a season schedule
+**
+**	@return	The default total hours
+*/
+unsigned long CSeasonSchedule::GetDefaultTotalHours() const
+{
+	return DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY;
+}
+
+/**
+**	@brief	Get the default hour multiplier for a season schedule
+**
+**	@return	The default hour multiplier
+*/
+int CSeasonSchedule::GetDefaultHourMultiplier() const
+{
+	return DEFAULT_DAY_MULTIPLIER_PER_YEAR;
+}
+
 //@}

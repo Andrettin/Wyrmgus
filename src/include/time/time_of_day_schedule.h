@@ -89,6 +89,8 @@ public:
 	static CTimeOfDaySchedule *DefaultTimeOfDaySchedule;
 	
 	void ProcessConfigData(const CConfigData *config_data);
+	virtual unsigned long GetDefaultTotalHours() const;
+	virtual int GetDefaultHourMultiplier() const;
 
 	std::string Ident;										/// Ident of the time of day schedules
 	std::string Name;										/// Name of the time of day schedules

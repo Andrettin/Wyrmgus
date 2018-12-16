@@ -52,9 +52,11 @@ public:
 	{
 	}
 	
+	virtual unsigned long GetDefaultTotalHours() const = 0;
+	virtual int GetDefaultHourMultiplier() const = 0;
 	void CalculateHourMultiplier();
 
-	unsigned TotalHours;								/// The total amount of hours this time period schedule contains
+	unsigned long TotalHours;							/// The total amount of hours this time period schedule contains
 	int HourMultiplier;									/// The amount of hours that pass for this schedule for each in-game hour
 };
 

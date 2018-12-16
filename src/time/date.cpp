@@ -109,7 +109,7 @@ void CDate::Clear()
 	Year = 0;
 	Month = 1;
 	Day = 1;
-	Hour = DefaultHoursPerDay / 2;
+	Hour = DEFAULT_HOURS_PER_DAY / 2;
 	Timeline = nullptr;
 }
 
