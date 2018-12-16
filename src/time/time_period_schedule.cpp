@@ -58,7 +58,7 @@ void CTimePeriodSchedule::CalculateHourMultiplier()
 			multiplier += (this->TotalHours * 100 / this->GetDefaultTotalHours() - 100) * this->GetDefaultHourMultiplier() / HOUR_MULTIPLIER_DIVIDER / 100; //this makes duration increases effectively level off after the default number of days per year; at the same time, this formula also serves to calculate the hour multiplier for duration lengths greater than a week and smaller than a year
 		} else if (this->TotalHours < this->GetDefaultTotalHours()) {
 			multiplier += (this->TotalHours * 100 / this->GetDefaultTotalHours() - 100) * this->GetDefaultHourMultiplier() / 100; //don't use hour multiplier divider here, since we don't need the reduction in the multiplier here to level off
-			multiplier = (multiplier + this->GetDefaultHourMultiplier()) / 2;
+			multiplier += this->GetDefaultHourMultiplier() / HOUR_MULTIPLIER_DIVIDER;
 		}
 	}
 	
