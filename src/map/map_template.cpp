@@ -57,6 +57,7 @@
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "translate.h"
+#include "unit/historical_unit.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
@@ -1401,8 +1402,70 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		}
 	}
 	
-	if (this->IsSubtemplateArea() || random) { //don't perform the dynamic hero application if this is a subtemplate area, to avoid creating multiple copies of the same hero
+	if (this->IsSubtemplateArea() || random) { //don't perform the dynamic hero/unit application if this is a subtemplate area, to avoid creating multiple copies of the same hero
 		return;
+	}
+	
+	for (size_t i = 0; i < CHistoricalUnit::HistoricalUnits.size(); ++i) {
+		CHistoricalUnit *historical_unit = CHistoricalUnit::HistoricalUnits[i];
+		
+		if (historical_unit->Faction == nullptr && !historical_unit->UnitType->BoolFlag[FAUNA_INDEX].value) { //only fauna units may have no faction
+			continue;
+		}
+		
+		if (historical_unit->StartDate.Year == 0 || !CurrentCampaign->StartDate.ContainsDate(historical_unit->StartDate) || CurrentCampaign->StartDate.ContainsDate(historical_unit->EndDate)) { //historical units aren't implemented if their date isn't set
+			continue;
+		}
+		
+		CFaction *unit_faction = historical_unit->Faction;
+
+		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
+		
+		Vec2i unit_pos(-1, -1);
+		
+		if (unit_player && unit_player->StartMapLayer == z) {
+			unit_pos = unit_player->StartPos;
+		}
+		
+		bool in_another_map_layer = false;
+		for (int i = ((int) historical_unit->HistoricalLocations.size() - 1); i >= 0; --i) {
+			CHistoricalLocation *historical_location = historical_unit->HistoricalLocations[i];
+			if (CurrentCampaign->StartDate.ContainsDate(historical_location->Date)) {
+				if (historical_location->MapTemplate && historical_location->MapTemplate->GetTopMapTemplate() == this) {
+					if (historical_location->Position.x != -1 && historical_location->Position.y != -1) {
+						unit_pos = map_start_pos + historical_location->Position - template_start_pos;
+					} else if (historical_location->Site != nullptr && historical_location->Site->SiteUnit != nullptr) {
+						unit_pos = historical_location->Site->SiteUnit->GetTileCenterPos();
+					}
+				} else {
+					in_another_map_layer = true;
+				}
+				break;
+			}
+		}
+		
+		if (in_another_map_layer) {
+			continue;
+		}
+		
+		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) { //units whose faction hasn't been created already and who don't have a valid historical location set won't be created
+			continue;
+		}
+		
+		if (unit_faction) {
+			unit_player = GetOrAddFactionPlayer(unit_faction);
+			if (!unit_player) {
+				continue;
+			}
+			if (unit_player->StartPos.x == 0 && unit_player->StartPos.y == 0) {
+				unit_player->SetStartView(unit_pos, z);
+			}
+		} else {
+			unit_player = &Players[PlayerNumNeutral];
+		}
+		for (int i = 0; i < historical_unit->Quantity; ++i) {
+			CUnit *unit = CreateUnit(unit_pos - historical_unit->UnitType->GetTileCenterPosOffset(), *historical_unit->UnitType, unit_player, z);
+		}
 	}
 	
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
