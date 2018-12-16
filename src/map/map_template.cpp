@@ -825,10 +825,17 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 				}
 				Vec2i min_pos(map_start_pos);
 				Vec2i max_pos(map_end.x - subtemplate->Width, map_end.y - subtemplate->Height);
-				int while_count = 0;
-				while (while_count < 1000) {
-					subtemplate_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
-					subtemplate_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
+				
+				std::vector<Vec2i> potential_positions;
+				for (int x = min_pos.x; x <= max_pos.x; ++x) {
+					for (int y = min_pos.y; y <= max_pos.y; ++y) {
+						potential_positions.push_back(Vec2i(x, y));
+					}
+				}
+				
+				while (!potential_positions.empty()) {
+					subtemplate_pos = potential_positions[SyncRand(potential_positions.size())];
+					potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), subtemplate_pos), potential_positions.end());
 
 					bool on_map = Map.Info.IsPointOnMap(subtemplate_pos, z) && Map.Info.IsPointOnMap(Vec2i(subtemplate_pos.x + subtemplate->Width - 1, subtemplate_pos.y + subtemplate->Height - 1), z);
 
@@ -849,8 +856,6 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 						found_location = true;
 						break;
 					}
-
-					while_count += 1;
 				}
 			}
 			else {

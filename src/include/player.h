@@ -944,7 +944,7 @@ extern void SavePlayers(CFile &file);
 extern void CreatePlayer(int type);
 
 //Wyrmgus start
-extern CPlayer *GetFactionPlayer(CFaction *faction);
+extern CPlayer *GetFactionPlayer(const CFaction *faction);
 extern CPlayer *GetOrAddFactionPlayer(CFaction *faction);
 //Wyrmgus end
 

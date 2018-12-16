@@ -1214,7 +1214,7 @@ void CreatePlayer(int type)
 }
 
 //Wyrmgus start
-CPlayer *GetFactionPlayer(CFaction *faction)
+CPlayer *GetFactionPlayer(const CFaction *faction)
 {
 	if (!faction) {
 		return nullptr;

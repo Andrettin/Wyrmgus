@@ -363,7 +363,7 @@ int CMap::GetTileLandmass(const Vec2i &pos, int z) const
 	return mf.Landmass;
 }
 
-Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, Vec2i min_pos, Vec2i max_pos, int z) const
+Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, const int z) const
 {
 	if (SaveGameLoading) {
 		return Vec2i(-1, -1);
@@ -392,18 +392,22 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 		}
 	}
 
-	int while_count = 0;
+	std::vector<Vec2i> potential_positions;
+	for (int x = min_pos.x; x <= max_pos.x; ++x) {
+		for (int y = min_pos.y; y <= max_pos.y; ++y) {
+			potential_positions.push_back(Vec2i(x, y));
+		}
+	}
 	
-	while (while_count < 1000) {
-		random_pos.x = SyncRand(max_pos.x - (unit_type->TileSize.x - 1) - min_pos.x + 1) + min_pos.x;
-		random_pos.y = SyncRand(max_pos.y - (unit_type->TileSize.y - 1) - min_pos.y + 1) + min_pos.y;
+	while (!potential_positions.empty()) {
+		random_pos = potential_positions[SyncRand(potential_positions.size())];
+		potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), random_pos), potential_positions.end());
 		
 		if (!this->Info.IsPointOnMap(random_pos, z) || (this->IsPointInASubtemplateArea(random_pos, z) && GameCycle == 0)) {
 			continue;
 		}
 		
 		if (allowed_terrains.size() > 0 && std::find(allowed_terrains.begin(), allowed_terrains.end(), GetTileTopTerrain(random_pos, false, z)) == allowed_terrains.end()) { //if the unit is a fauna one, it has to start on terrain it is native to
-			while_count += 1;
 			continue;
 		}
 		
@@ -433,8 +437,6 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 				return random_pos;
 			}
 		}
-		
-		while_count += 1;
 	}
 	
 	return Vec2i(-1, -1);
@@ -2587,7 +2589,6 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	
 	Vec2i random_pos(0, 0);
 	int count = seed_count;
-	int while_count = 0;
 	
 	std::vector<Vec2i> seeds;
 	
@@ -2634,10 +2635,17 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 		}
 	}
 	
+	std::vector<Vec2i> potential_positions;
+	for (int x = min_pos.x; x <= max_pos.x; ++x) {
+		for (int y = min_pos.y; y <= max_pos.y; ++y) {
+			potential_positions.push_back(Vec2i(x, y));
+		}
+	}
+	
 	// create initial seeds
-	while (count > 0 && while_count < seed_count * 1000) {
-		random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
-		random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
+	while (count > 0 && !potential_positions.empty()) {
+		random_pos = potential_positions[SyncRand(potential_positions.size())];
+		potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), random_pos), potential_positions.end());
 		
 		if (!this->Info.IsPointOnMap(random_pos, z) || this->IsPointInASubtemplateArea(random_pos, z)) {
 			continue;
@@ -2732,8 +2740,6 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				seeds.push_back(Vec2i(adjacent_pos.x, random_pos.y));
 			}
 		}
-		
-		while_count += 1;
 	}
 	
 	// expand seeds
