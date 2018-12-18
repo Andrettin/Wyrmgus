@@ -315,8 +315,8 @@ extern void UpdateMessages();
 extern void DrawMessages();
 /// Draw the player resource in resource line
 extern void DrawResources();
-/// Draw the time of day
-extern void DrawDayTime();
+/// Draw the time of day, season and date
+extern void DrawTime();
 /// Draw the age
 extern void DrawAge();
 /// Draw the map layer buttons

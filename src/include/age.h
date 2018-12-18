@@ -51,11 +51,6 @@ class CUpgrade;
 class CAge
 {
 public:
-	CAge() :
-		G(nullptr)
-	{
-	}
-	
 	~CAge();
 	
 	static CAge *GetAge(const std::string &ident, const bool should_find = true);
@@ -70,7 +65,7 @@ public:
 public:
 	std::string Ident;
 	std::string Name;
-	CGraphic *G;
+	CGraphic *G = nullptr;
 };
 
 //@}

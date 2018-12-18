@@ -907,29 +907,29 @@ void DrawResources()
 /**
 **	@brief	Draw the time of day
 */
-void DrawDayTime() {
-	if (UI.TimeOfDayPanel.TextX != -1) {
-		if (UI.CurrentMapLayer->GetTimeOfDay()) {
-			UI.TimeOfDayPanel.Text = UI.CurrentMapLayer->GetTimeOfDay()->Name;
-			UI.TimeOfDayPanel.Font = &GetGameFont();
-			
-			CLabel label(*UI.TimeOfDayPanel.Font);
+void DrawTime() {
+	if (UI.CurrentMapLayer) {
+		const CTimeOfDay *time_of_day = UI.CurrentMapLayer->GetTimeOfDay();
+		if (time_of_day) {
+			UI.TimeOfDayPanel.G = time_of_day->G;
+		} else {
+			UI.TimeOfDayPanel.G = nullptr;
+		}
 
-			// TODO: Instead of a simple text here we could use an icon per time of day
-			label.Draw(UI.TimeOfDayPanel.TextX, UI.TimeOfDayPanel.TextY, _(UI.TimeOfDayPanel.Text.c_str()));
+		const CSeason *season = UI.CurrentMapLayer->GetSeason();
+		if (season) {
+			UI.SeasonPanel.G = season->G;
+		} else {
+			UI.SeasonPanel.G = nullptr;
 		}
 	}
 	
-	if (UI.SeasonPanel.TextX != -1) {
-		if (UI.CurrentMapLayer->GetSeason()) {
-			UI.SeasonPanel.Text = UI.CurrentMapLayer->GetSeason()->Name;
-			UI.SeasonPanel.Font = &GetGameFont();
-			
-			CLabel label(*UI.SeasonPanel.Font);
-
-			// TODO: Instead of a simple text here we could use an icon per season
-			label.Draw(UI.SeasonPanel.TextX, UI.SeasonPanel.TextY, _(UI.SeasonPanel.Text.c_str()));
-		}
+	if (UI.TimeOfDayPanel.G) {
+		UI.TimeOfDayPanel.G->DrawFrameClip(UI.TimeOfDayPanel.IconFrame, UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY);
+	}
+	
+	if (UI.SeasonPanel.G) {
+		UI.SeasonPanel.G->DrawFrameClip(UI.SeasonPanel.IconFrame, UI.SeasonPanel.IconX, UI.SeasonPanel.IconY);
 	}
 	
 	if (ThisPlayer) {
@@ -1208,30 +1208,32 @@ void DrawPopups()
 		DrawGenericPopup(_("Score"), UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
 	}
 	
-	//commented out as right now the popups are a bit pointless, as they only show the same text as what's already written in the HUD; the popups should be restored when they are able to show more text, e.g. what is the current month in the season panel popup
+	if (
+		UI.TimeOfDayPanel.G
+		&& UI.TimeOfDayPanel.IconX != -1
+		&& UI.TimeOfDayPanel.IconY != -1
+		&& CursorScreenPos.x >= UI.TimeOfDayPanel.IconX
+		&& CursorScreenPos.x < (UI.TimeOfDayPanel.IconX + UI.TimeOfDayPanel.G->getWidth())
+		&& CursorScreenPos.y >= UI.TimeOfDayPanel.IconY
+		&& CursorScreenPos.y < (UI.TimeOfDayPanel.IconY + UI.TimeOfDayPanel.G->getHeight())
+	) {
+		DrawGenericPopup(_(UI.CurrentMapLayer->GetTimeOfDay()->Name.c_str()), UI.TimeOfDayPanel.IconX, UI.TimeOfDayPanel.IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+	}
+	
+	if (
+		UI.SeasonPanel.G
+		&& UI.SeasonPanel.IconX != -1
+		&& UI.SeasonPanel.IconY != -1
+		&& CursorScreenPos.x >= UI.SeasonPanel.IconX
+		&& CursorScreenPos.x < (UI.SeasonPanel.IconX + UI.SeasonPanel.G->getWidth())
+		&& CursorScreenPos.y >= UI.SeasonPanel.IconY
+		&& CursorScreenPos.y < (UI.SeasonPanel.IconY + UI.SeasonPanel.G->getHeight())
+	) {
+		DrawGenericPopup(_(UI.CurrentMapLayer->GetSeason()->Name.c_str()), UI.SeasonPanel.IconX, UI.SeasonPanel.IconY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
+	}
+	
+	//commented out as right now the popup is a bit pointless, as it only shows the same text as what's already written in the HUD; the popup should be restored when they are able to show more text
 	/*
-	if (
-		UI.TimeOfDayPanel.TextX != -1
-		&& !UI.TimeOfDayPanel.Text.empty()
-		&& CursorScreenPos.x >= UI.TimeOfDayPanel.TextX
-		&& CursorScreenPos.x < (UI.TimeOfDayPanel.TextX + UI.TimeOfDayPanel.Font->Width(UI.TimeOfDayPanel.Text))
-		&& CursorScreenPos.y >= UI.TimeOfDayPanel.TextY
-		&& CursorScreenPos.y < (UI.TimeOfDayPanel.TextY + UI.TimeOfDayPanel.Font->Height())
-	) {
-		DrawGenericPopup(_(UI.TimeOfDayPanel.Text.c_str()), UI.TimeOfDayPanel.TextX, UI.TimeOfDayPanel.TextY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
-	}
-	
-	if (
-		UI.SeasonPanel.TextX != -1
-		&& !UI.SeasonPanel.Text.empty()
-		&& CursorScreenPos.x >= UI.SeasonPanel.TextX
-		&& CursorScreenPos.x < (UI.SeasonPanel.TextX + UI.SeasonPanel.Font->Width(UI.SeasonPanel.Text))
-		&& CursorScreenPos.y >= UI.SeasonPanel.TextY
-		&& CursorScreenPos.y < (UI.SeasonPanel.TextY + UI.SeasonPanel.Font->Height())
-	) {
-		DrawGenericPopup(_(UI.SeasonPanel.Text.c_str()), UI.SeasonPanel.TextX, UI.SeasonPanel.TextY + 16 + GameCursor->G->getHeight() / 2, "", "", false);
-	}
-	
 	if (
 		UI.AgePanel.TextX != -1
 		&& !UI.AgePanel.Text.empty()

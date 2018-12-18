@@ -47,6 +47,7 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
+class CGraphic;
 
 class CTimeOfDay
 {
@@ -74,6 +75,7 @@ public:
 	bool Dusk;									/// Whether this is a dusk time of day
 	bool Night;									/// Whether this is a night time of day
 	CColor ColorModification;					/// The color modification applied to graphics when the time of day is active
+	CGraphic *G = nullptr;
 };
 
 //@}

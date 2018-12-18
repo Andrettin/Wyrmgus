@@ -251,7 +251,7 @@ void UpdateDisplay()
 
 			UI.InfoPanel.Draw();
 			DrawResources();
-			DrawDayTime();
+			DrawTime();
 			DrawAge();
 			DrawMapLayerButtons();
 			UI.StatusLine.Draw();

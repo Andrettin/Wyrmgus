@@ -45,14 +45,11 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
+class CGraphic;
 
 class CSeason
 {
 public:
-	CSeason()
-	{
-	}
-	
 	static CSeason *GetSeason(const std::string &ident, const bool should_find = true);
 	static CSeason *GetOrAddSeason(const std::string &ident);
 	static void ClearSeasons();
@@ -64,6 +61,7 @@ public:
 
 	std::string Ident;							/// Ident of the season
 	std::string Name;							/// Name of the season
+	CGraphic *G = nullptr;
 };
 
 //@}

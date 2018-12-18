@@ -38,6 +38,8 @@
 #include "time/season.h"
 
 #include "config.h"
+#include "mod.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -121,6 +123,51 @@ void CSeason::ProcessConfigData(const CConfigData *config_data)
 			this->Name = value;
 		} else {
 			fprintf(stderr, "Invalid season property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (size_t i = 0; i < config_data->Children.size(); ++i) {
+		const CConfigData *child_config_data = config_data->Children[i];
+		
+		if (child_config_data->Tag == "image") {
+			std::string file;
+			Vec2i size(0, 0);
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "file") {
+					file = CMod::GetCurrentModPath() + value;
+				} else if (key == "width") {
+					size.x = std::stoi(value);
+				} else if (key == "height") {
+					size.y = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (file.empty()) {
+				fprintf(stderr, "Image has no file.\n");
+				continue;
+			}
+			
+			if (size.x == 0) {
+				fprintf(stderr, "Image has no width.\n");
+				continue;
+			}
+			
+			if (size.y == 0) {
+				fprintf(stderr, "Image has no height.\n");
+				continue;
+			}
+			
+			this->G = CGraphic::New(file, size.x, size.y);
+			this->G->Load();
+			this->G->UseDisplayFormat();
+		} else {
+			fprintf(stderr, "Invalid season property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
 }
