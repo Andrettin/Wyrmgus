@@ -1407,10 +1407,6 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 	}
 	
-	if (this->IsSubtemplateArea()) { //don't perform the dynamic hero/unit application if this is a subtemplate area, to avoid creating multiple copies of the same hero
-		return;
-	}
-	
 	for (size_t i = 0; i < CHistoricalUnit::HistoricalUnits.size(); ++i) {
 		CHistoricalUnit *historical_unit = CHistoricalUnit::HistoricalUnits[i];
 		
@@ -1426,10 +1422,10 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 
 		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
 		
-		bool in_another_map_layer = false;
-		Vec2i unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_layer, template_start_pos, map_start_pos, random);
+		bool in_another_map_template = false;
+		Vec2i unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, random);
 		
-		if (in_another_map_layer) {
+		if (in_another_map_template) {
 			continue;
 		}
 		
@@ -1487,10 +1483,10 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 
 		CPlayer *hero_player = hero_faction ? GetFactionPlayer(hero_faction) : nullptr;
 		
-		bool in_another_map_layer = false;
-		Vec2i hero_pos = this->GetBestLocationMapPosition(hero->HistoricalLocations, in_another_map_layer, template_start_pos, map_start_pos, random);
+		bool in_another_map_template = false;
+		Vec2i hero_pos = this->GetBestLocationMapPosition(hero->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, random);
 		
-		if (in_another_map_layer) {
+		if (in_another_map_template) {
 			continue;
 		}
 		
@@ -1553,26 +1549,26 @@ const CMapTemplate *CMapTemplate::GetTopMapTemplate() const
 **	@brief	Gets the best map position from a list of historical locations
 **
 **	@param	historical_location_list	The list of historical locations
-**	@param	in_another_map_layer		This is set to true if there is a valid position, but it is in another map layer
+**	@param	in_another_map_template		This is set to true if there is a valid position, but it is in another map templa
 **
 **	@return	The best position if found, or an invalid one otherwise
 */
-Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_layer, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random)
+Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random)
 {
 	Vec2i pos(-1, -1);
-	in_another_map_layer = false;
+	in_another_map_template = false;
 	
 	for (int i = ((int) historical_location_list.size() - 1); i >= 0; --i) {
 		CHistoricalLocation *historical_location = historical_location_list[i];
 		if (CurrentCampaign->StartDate.ContainsDate(historical_location->Date)) {
-			if (historical_location->MapTemplate && historical_location->MapTemplate->GetTopMapTemplate() == this) {
+			if (historical_location->MapTemplate == this) {
 				if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
 					pos = map_start_pos + historical_location->Position - template_start_pos;
 				} else if (random && historical_location->Site != nullptr && historical_location->Site->SiteUnit != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
 					pos = historical_location->Site->SiteUnit->GetTileCenterPos();
 				}
 			} else {
-				in_another_map_layer = true;
+				in_another_map_template = true;
 			}
 			break;
 		}
