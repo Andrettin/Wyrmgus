@@ -5,8 +5,8 @@
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
 
 #define StratagusMajorVersion 3
-#define StratagusMinorVersion 4
-#define StratagusPatchLevel 2
+#define StratagusMinorVersion 5
+#define StratagusPatchLevel 0
 #define StratagusPatchLevel2 0
 
 #define _version_stringify_(s) #s
