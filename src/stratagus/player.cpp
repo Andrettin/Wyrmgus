@@ -1685,11 +1685,9 @@ void CPlayer::SetDynasty(CDynasty *dynasty)
 */
 void CPlayer::CheckAge()
 {
-	//pick an age which fits the player, giving priority to the last-defined ones
+	//pick an age which fits the player, giving priority to the first ones (ages are already sorted by priority)
 	
-	for (int i = (CAge::Ages.size() - 1); i >= 0; --i) {
-		CAge *potential_age = CAge::Ages[i];
-		
+	for (CAge *potential_age : CAge::Ages) {
 		if (!CheckDependByIdent(*this, DependRuleAge, potential_age->Ident)) {
 			continue;
 		}
@@ -1723,6 +1721,8 @@ void CPlayer::SetAge(CAge *age)
 			UI.AgePanel.G = nullptr;
 		}
 	}
+	
+	CAge::CheckCurrentAge();
 }
 
 /**

@@ -41,6 +41,7 @@
 #include "game.h"
 
 #include "actions.h"
+#include "age.h"
 #include "ai.h"
 #include "animation.h"
 //Wyrmgus start
@@ -1681,6 +1682,8 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		calendar->CurrentDate = CCalendar::BaseCalendar->CurrentDate.ToCalendar(CCalendar::BaseCalendar, calendar);
 		calendar->CurrentDayOfTheWeek = calendar->CurrentDate.GetDayOfTheWeek(calendar);
 	}
+	
+	CAge::CurrentAge = nullptr;
 	//Wyrmgus end
 
 	if (Map.Info.Filename.empty() && !filename.empty()) {

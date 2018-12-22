@@ -37,7 +37,10 @@
 
 #include "config.h"
 #include "depend.h"
+#include "game.h"
 #include "mod.h"
+#include "player.h"
+#include "time/calendar.h"
 #include "unit/unittype.h"
 #include "upgrade_structs.h"
 #include "video.h"
@@ -48,6 +51,7 @@
 
 std::vector<CAge *> CAge::Ages;
 std::map<std::string, CAge *> CAge::AgesByIdent;
+CAge *CAge::CurrentAge = nullptr;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -132,6 +136,8 @@ void CAge::ProcessConfigData(const CConfigData *config_data)
 			this->Name = value;
 		} else if (key == "priority") {
 			this->Priority = std::stoi(value);
+		} else if (key == "year_boost") {
+			this->YearBoost = std::stoi(value);
 		} else {
 			fprintf(stderr, "Invalid age property: \"%s\".\n", key.c_str());
 		}
@@ -191,3 +197,57 @@ void CAge::ProcessConfigData(const CConfigData *config_data)
 	});
 }
 
+/**
+**	@brief	Set the current age
+*/
+void CAge::SetCurrentAge(CAge *age)
+{
+	if (age == CAge::CurrentAge) {
+		return;
+	}
+	
+	CAge::CurrentAge = age;
+	
+	if (GameCycle > 0 && !SaveGameLoading) {
+		if (CAge::CurrentAge && CAge::CurrentAge->YearBoost > 0) {
+			//boost the current date's year by a certain amount; this is done so that we can both have a slower passage of years in-game (for seasons and character lifetimes to be more sensible), while still not having overly old dates in later ages
+			for (CCalendar *calendar : CCalendar::Calendars) {
+				calendar->CurrentDate.AddHours(calendar, (long long) CAge::CurrentAge->YearBoost * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY);
+			}
+		}
+	}
+}
+
+/**
+**	@brief	Check which age fits the current overall situation best, out of the ages each player is in
+*/
+void CAge::CheckCurrentAge()
+{
+	CAge *best_age = CAge::CurrentAge;
+	
+	for (int p = 0; p < PlayerMax; ++p) {
+		if (Players[p].Age && (!best_age || Players[p].Age->Priority > best_age->Priority)) {
+			best_age = Players[p].Age;
+		}
+	}
+	
+	if (best_age != CAge::CurrentAge) {
+		CAge::SetCurrentAge(best_age);
+	}
+}
+
+/**
+**	@brief	Set the current overall in-game age
+**
+**	@param	age_ident	The age's string identifier
+*/
+void SetCurrentAge(const std::string &age_ident)
+{
+	CAge *age = CAge::GetAge(age_ident);
+	
+	if (!age) {
+		return;
+	}
+	
+	CAge::CurrentAge = age;
+}

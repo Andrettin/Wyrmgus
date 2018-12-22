@@ -1,5 +1,6 @@
 $#include "stratagus.h"
 
+$#include "age.h"
 $#include "ai.h"
 //Wyrmgus start
 $#include "character.h"

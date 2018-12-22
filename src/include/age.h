@@ -54,9 +54,12 @@ public:
 	static CAge *GetAge(const std::string &ident, const bool should_find = true);
 	static CAge *GetOrAddAge(const std::string &ident);
 	static void ClearAges();
+	static void SetCurrentAge(CAge *age);
+	static void CheckCurrentAge();
 	
 	static std::vector<CAge *> Ages;
 	static std::map<std::string, CAge *> AgesByIdent;
+	static CAge *CurrentAge;
 	
 	void ProcessConfigData(const CConfigData *config_data);
 	
@@ -65,7 +68,13 @@ public:
 	std::string Name;
 	CGraphic *G = nullptr;
 	int Priority = 0;
+	int YearBoost = 0;
 };
 
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
+
+extern void SetCurrentAge(const std::string &age_ident);
 
 #endif

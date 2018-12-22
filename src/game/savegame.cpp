@@ -38,6 +38,7 @@
 #include "game.h"
 
 #include "actions.h"
+#include "age.h"
 #include "ai.h"
 #include "character.h"
 #include "iocompat.h"
@@ -178,6 +179,9 @@ int SaveGame(const std::string &filename)
 		if (calendar->CurrentDate.Year != 0) {
 			file.printf("SetCurrentDate(\"%s\", \"%s\")\n", calendar->Ident.c_str(), calendar->CurrentDate.ToString(CCalendar::BaseCalendar).c_str());
 		}
+	}
+	if (CAge::CurrentAge) {
+		file.printf("SetCurrentAge(\"%s\")\n", CAge::CurrentAge->Ident.c_str());
 	}
 
 	file.printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
