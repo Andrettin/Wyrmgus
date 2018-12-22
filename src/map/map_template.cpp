@@ -194,6 +194,14 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 			this->PixelTileSize.x = std::stoi(value);
 		} else if (key == "pixel_tile_height") {
 			this->PixelTileSize.y = std::stoi(value);
+		} else if (key == "min_x") {
+			this->MinPos.x = std::stoi(value);
+		} else if (key == "min_y") {
+			this->MinPos.y = std::stoi(value);
+		} else if (key == "max_x") {
+			this->MaxPos.x = std::stoi(value);
+		} else if (key == "max_y") {
+			this->MaxPos.y = std::stoi(value);
 		} else if (key == "main_template") {
 			value = FindAndReplaceString(value, "_", "-");
 			CMapTemplate *main_template = CMapTemplate::GetMapTemplate(value);
@@ -835,6 +843,16 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 				}
 				Vec2i min_pos(map_start_pos);
 				Vec2i max_pos(map_end.x - subtemplate->Width, map_end.y - subtemplate->Height);
+				
+				if (subtemplate->MinPos.x != -1 && subtemplate->MinPos.y != -1) {
+					min_pos += subtemplate->MinPos;
+					min_pos -= template_start_pos;
+				}
+				
+				if (subtemplate->MaxPos.x != -1 && subtemplate->MaxPos.y != -1) {
+					max_pos += subtemplate->MaxPos;
+					max_pos -= Vec2i(this->Width, this->Height);
+				}
 				
 				//bound the minimum and maximum positions depending on which other templates should be adjacent to this one (if they have already been applied to the map)
 				for (const CMapTemplate *adjacent_template : subtemplate->AdjacentTemplates) {

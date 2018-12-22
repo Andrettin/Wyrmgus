@@ -122,6 +122,8 @@ public:
 	bool Overland;												/// Whether this is an overland map
 	bool OutputTerrainImage;
 	Vec2i SubtemplatePosition;
+	Vec2i MinPos = Vec2i(-1, -1); //the minimum position this (sub)template can be applied to (relative to the main template)
+	Vec2i MaxPos = Vec2i(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
 	Vec2i CurrentStartPos;
 	PixelSize PixelTileSize;
 	CMapTemplate *MainTemplate = nullptr;						/// Main template in which this one is located, if this is a subtemplate
