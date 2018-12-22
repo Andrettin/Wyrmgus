@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -132,6 +130,8 @@ void CAge::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "name") {
 			this->Name = value;
+		} else if (key == "priority") {
+			this->Priority = std::stoi(value);
 		} else {
 			fprintf(stderr, "Invalid age property: \"%s\".\n", key.c_str());
 		}
@@ -185,6 +185,9 @@ void CAge::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid age property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
+	
+	std::sort(CAge::Ages.begin(), CAge::Ages.end(), [](CAge *a, CAge *b) {
+		return a->Priority > b->Priority;
+	});
 }
 
-//@}
