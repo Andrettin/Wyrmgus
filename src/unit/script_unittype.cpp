@@ -63,6 +63,7 @@
 #include "script.h"
 #include "sound.h"
 #include "spells.h"
+#include "time/season.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"
@@ -869,6 +870,18 @@ static int CclDefineUnitType(lua_State *l)
 							var->TerrainsForbidden.push_back(terrain);
 						} else {
 							LuaError(l, "Terrain type \"%s\" doesn't exist." _C_ terrain_ident.c_str());
+						}
+					} else if (!strcmp(value, "season")) {
+						const std::string season_ident = LuaToString(l, -1, k + 1);
+						CSeason *season = CSeason::GetSeason(season_ident);
+						if (season) {
+							var->Seasons.push_back(season);
+						}
+					} else if (!strcmp(value, "forbidden-season")) {
+						const std::string season_ident = LuaToString(l, -1, k + 1);
+						CSeason *season = CSeason::GetSeason(season_ident);
+						if (season) {
+							var->ForbiddenSeasons.push_back(season);
 						}
 					} else if (!strcmp(value, "resource-min")) {
 						var->ResourceMin = LuaToNumber(l, -1, k + 1);

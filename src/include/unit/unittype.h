@@ -64,6 +64,7 @@ class CFile;
 //Wyrmgus start
 class CButtonLevel;
 class CPlane;
+class CSeason;
 class CWorld;
 class CTerrainType;
 class CUniqueItem;
@@ -170,6 +171,8 @@ public:
 	std::vector<CUnitType *> ItemsNotEquipped;
 	std::vector<CTerrainType *> Terrains;
 	std::vector<CTerrainType *> TerrainsForbidden;
+	std::vector<CSeason *> Seasons;
+	std::vector<CSeason *> ForbiddenSeasons;
 
 	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
 	std::string FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.

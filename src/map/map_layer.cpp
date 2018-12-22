@@ -333,6 +333,19 @@ void CMapLayer::SetSeason(CScheduledSeason *season)
 			}
 		}
 	}
+	
+	//update units which may have had their variation become invalid due to the season change
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit *unit = *it;
+		if (
+			unit && unit->IsAlive() && unit->MapLayer == this
+		) {
+			VariationInfo *varinfo = unit->Type->VarInfo[unit->Variation];
+			if (varinfo && !unit->CheckSeasonForVariation(varinfo)) {
+				unit->ChooseVariation(); //choose a new variation, as the old one has become invalid due to the season change
+			}
+		}
+	}
 }
 
 /**

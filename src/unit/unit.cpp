@@ -1065,8 +1065,9 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	this->UpdateXPRequired();
 }
 
-bool CUnit::CheckTerrainForVariation(VariationInfo *varinfo)
+bool CUnit::CheckTerrainForVariation(const VariationInfo *varinfo) const
 {
+	//if the variation has one or more terrain set as a precondition, then all tiles underneath the unit must match at least one of those terrains
 	if (varinfo->Terrains.size() > 0) {
 		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
@@ -1090,6 +1091,7 @@ bool CUnit::CheckTerrainForVariation(VariationInfo *varinfo)
 		}
 	}
 	
+	//if the variation has one or more terrains set as a forbidden precondition, then no tiles underneath the unit may match one of those terrains
 	if (varinfo->TerrainsForbidden.size() > 0) {
 		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
@@ -1111,6 +1113,26 @@ bool CUnit::CheckTerrainForVariation(VariationInfo *varinfo)
 		if (terrain_check) {
 			return false;
 		}
+	}
+	
+	return true;
+}
+
+bool CUnit::CheckSeasonForVariation(const VariationInfo *varinfo) const
+{
+	if (
+		!varinfo->Seasons.empty()
+		&& (!this->MapLayer || std::find(varinfo->Seasons.begin(), varinfo->Seasons.end(), this->MapLayer->GetSeason()) == varinfo->Seasons.end())
+	) {
+		return false;
+	}
+	
+	if (
+		!varinfo->ForbiddenSeasons.empty()
+		&& this->MapLayer
+		&& std::find(varinfo->ForbiddenSeasons.begin(), varinfo->ForbiddenSeasons.end(), this->MapLayer->GetSeason()) != varinfo->ForbiddenSeasons.end()
+	) {
+		return false;
 	}
 	
 	return true;
@@ -1145,6 +1167,10 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 			continue;
 		}
 		if (varinfo->ResourceMax && this->ResourcesHeld > varinfo->ResourceMax) {
+			continue;
+		}
+		
+		if (!this->CheckSeasonForVariation(varinfo)) {
 			continue;
 		}
 		
@@ -3519,8 +3545,11 @@ void CUnit::Place(const Vec2i &pos, int z)
 		}
 		
 		VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
-		if (varinfo && !this->CheckTerrainForVariation(varinfo)) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation
-			this->ChooseVariation();
+		if (varinfo) {
+			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, repick the unit's variation
+			if (!this->CheckTerrainForVariation(varinfo) || !this->CheckSeasonForVariation(varinfo)) {
+				this->ChooseVariation();
+			}
 		}
 	}
 	//Wyrmgus end
