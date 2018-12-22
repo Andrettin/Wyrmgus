@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -158,29 +156,32 @@ void CDate::AddMonths(const CCalendar *calendar, const int months)
 
 void CDate::AddDays(const CCalendar *calendar, const int days, const int day_multiplier)
 {
-	this->Day += days * day_multiplier;
+	int current_day = this->Day;
+	current_day += days * day_multiplier;
 	
-	if (this->Day > 0) {
-		while (this->Day > calendar->DaysPerYear) {
-			this->Day -= calendar->DaysPerYear;
+	if (current_day > 0) {
+		while (current_day > calendar->DaysPerYear) {
+			current_day -= calendar->DaysPerYear;
 			this->AddYears(1);
 		}
 		
-		while (this->Day > calendar->Months[this->Month - 1]->Days) {
-			this->Day -= calendar->Months[this->Month - 1]->Days;
+		while (current_day > calendar->Months[this->Month - 1]->Days) {
+			current_day -= calendar->Months[this->Month - 1]->Days;
 			this->AddMonths(calendar, 1);
 		}
 	} else {
-		while (this->Day <= (-calendar->DaysPerYear + 1)) {
-			this->Day += calendar->DaysPerYear;
+		while (current_day <= (-calendar->DaysPerYear + 1)) {
+			current_day += calendar->DaysPerYear;
 			this->AddYears(-1);
 		}
 		
-		while (this->Day <= 0) {
-			this->Day += calendar->Months[this->Month - 1]->Days;
+		while (current_day <= 0) {
+			current_day += calendar->Months[this->Month - 1]->Days;
 			this->AddMonths(calendar, -1);
 		}
 	}
+
+	this->Day = current_day;
 }
 
 void CDate::AddHours(const CCalendar *calendar, const long long int hours, const int day_multiplier)
@@ -385,5 +386,3 @@ void SetCurrentTotalHours(const unsigned long long hours)
 {
 	CDate::CurrentTotalHours = hours;
 }
-
-//@}
