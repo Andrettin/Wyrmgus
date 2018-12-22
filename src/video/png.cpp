@@ -519,7 +519,7 @@ void SaveMapPNG(const char *name)
 **
 **  @param name  PNG filename to save.
 */
-void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overlay)
+void SaveMapTemplatePNG(const char *name, const CMapTemplate *map_template, const bool overlay)
 {
 	bool use_terrain_file = true;
 	std::string terrain_file;

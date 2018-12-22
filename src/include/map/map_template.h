@@ -98,16 +98,16 @@ public:
 	static std::map<std::string, CMapTemplate *> MapTemplatesByIdent;
 
 	void ProcessConfigData(const CConfigData *config_data);
-	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
-	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
-	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z);
-	void ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false);
-	void ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false);
-	void ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
-	void ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false);
+	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
+	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
+	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
+	void ApplySubtemplates(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
+	void ApplySites(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
+	void ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false) const;
+	void ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_start_pos, const int z, const bool random = false) const;
 	bool IsSubtemplateArea() const;
 	const CMapTemplate *GetTopMapTemplate() const;
-	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random);
+	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 	
 	std::string Name;
 	std::string Ident;
@@ -124,9 +124,10 @@ public:
 	Vec2i SubtemplatePosition;
 	Vec2i CurrentStartPos;
 	PixelSize PixelTileSize;
-	CMapTemplate *MainTemplate = nullptr;						/// Main template in which this one is located
-	CMapTemplate *UpperTemplate = nullptr;						/// Map template corresponding to this one in the upper layer; only relevant for subtemplates
-	CMapTemplate *LowerTemplate = nullptr;						/// Map template corresponding to this one in the lower layer; only relevant for subtemplates
+	CMapTemplate *MainTemplate = nullptr;						/// Main template in which this one is located, if this is a subtemplate
+	CMapTemplate *UpperTemplate = nullptr;						/// Map template corresponding to this one in the upper layer
+	CMapTemplate *LowerTemplate = nullptr;						/// Map template corresponding to this one in the lower layer
+	std::vector<const CMapTemplate *> AdjacentTemplates;		/// Map templates adjacent to this one
 	CPlane *Plane;
 	CWorld *World;
 	CTerrainType *BaseTerrainType;

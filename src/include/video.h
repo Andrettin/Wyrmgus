@@ -602,7 +602,7 @@ extern void SaveMapPNG(const char *name);
 
 //Wyrmgus start
 /// Save a map template's terrain to a PNG file
-extern void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overlay);
+extern void SaveMapTemplatePNG(const char *name, const CMapTemplate *map_template, const bool overlay);
 //Wyrmgus end
 
 /// Set the current callbacks
