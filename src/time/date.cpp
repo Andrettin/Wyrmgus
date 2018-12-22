@@ -255,11 +255,15 @@ std::string CDate::ToString(const CCalendar *calendar) const
 	return date_string;
 }
 
-std::string CDate::ToDisplayString(const CCalendar *calendar) const
+std::string CDate::ToDisplayString(const CCalendar *calendar, const bool year_only) const
 {
 	std::string display_string;
 	
-	display_string += std::to_string((long long) this->Day) + "." + std::to_string((long long) this->Month) + "." + std::to_string((long long) abs(this->Year));
+	if (!year_only) {
+		display_string += std::to_string((long long) this->Day) + "." + std::to_string((long long) this->Month) + ".";
+	}
+	
+	display_string += std::to_string((long long) abs(this->Year));
 	
 	if (!calendar) {
 		fprintf(stderr, "Calendar does not exist.\n");

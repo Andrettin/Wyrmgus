@@ -937,7 +937,7 @@ void DrawTime() {
 		
 		if (calendar) {
 			if (UI.DatePanel.TextX != -1) {
-				std::string date_string = calendar->CurrentDate.ToDisplayString(calendar);
+				std::string date_string = calendar->CurrentDate.ToDisplayString(calendar, true);
 				
 				CLabel label(GetGameFont());
 				label.Draw(UI.DatePanel.TextX, UI.DatePanel.TextY, date_string);

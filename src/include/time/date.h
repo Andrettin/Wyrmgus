@@ -68,7 +68,7 @@ public:
 	CDate ToCalendar(CCalendar *current_calendar, CCalendar *new_calendar) const;
 	CDate ToBaseCalendar(CCalendar *current_calendar) const;
 	std::string ToString(const CCalendar *calendar) const;
-	std::string ToDisplayString(const CCalendar *calendar) const;
+	std::string ToDisplayString(const CCalendar *calendar, const bool year_only = false) const;
 	int GetTotalDays(const CCalendar *calendar) const;
 	unsigned long long GetTotalHours(CCalendar *calendar) const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
 	int GetDayOfTheWeek(const CCalendar *calendar) const;			/// gets the day of the week for this date in a given calendar
