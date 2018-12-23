@@ -138,6 +138,63 @@ void CTerrainType::ClearTerrainTypes()
 }
 
 /**
+**	@brief	Get a terrain flag by name
+**
+**	@param	flag_name	The name of the terrain flag
+**
+**	@return	The terrain flag if it exists, or 0 otherwise
+*/
+unsigned long CTerrainType::GetTerrainFlagByName(const std::string &flag_name)
+{
+	if (flag_name == "land") {
+		return MapFieldLandAllowed;
+	} else if (flag_name == "coast") {
+		return MapFieldCoastAllowed;
+	} else if (flag_name == "water") {
+		return MapFieldWaterAllowed;
+	} else if (flag_name == "no-building") {
+		return MapFieldNoBuilding;
+	} else if (flag_name == "unpassable") {
+		return MapFieldUnpassable;
+	} else if (flag_name == "wall") {
+		return MapFieldWall;
+	} else if (flag_name == "rock") {
+		return MapFieldRocks;
+	} else if (flag_name == "forest") {
+		return MapFieldForest;
+	} else if (flag_name == "air-unpassable") {
+		return MapFieldAirUnpassable;
+	} else if (flag_name == "desert") {
+		return MapFieldDesert;
+	} else if (flag_name == "dirt") {
+		return MapFieldDirt;
+	} else if (flag_name == "grass") {
+		return MapFieldGrass;
+	} else if (flag_name == "gravel") {
+		return MapFieldGravel;
+	} else if (flag_name == "ice") {
+		return MapFieldIce;
+	} else if (flag_name == "mud") {
+		return MapFieldMud;
+	} else if (flag_name == "railroad") {
+		return MapFieldRailroad;
+	} else if (flag_name == "road") {
+		return MapFieldRoad;
+	} else if (flag_name == "no-rail") {
+		return MapFieldNoRail;
+	} else if (flag_name == "snow") {
+		return MapFieldSnow;
+	} else if (flag_name == "stone-floor") {
+		return MapFieldStoneFloor;
+	} else if (flag_name == "stumps") {
+		return MapFieldStumps;
+	} else {
+		fprintf(stderr, "Flag \"%s\" doesn't exist.\n", flag_name.c_str());
+		return 0;
+	}
+}
+
+/**
 **	@brief	Destructor
 */
 CTerrainType::~CTerrainType()
@@ -200,46 +257,9 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			this->Resource = GetResourceIdByName(value.c_str());
 		} else if (key == "flag") {
 			value = FindAndReplaceString(value, "_", "-");
-			if (value == "land") {
-				this->Flags |= MapFieldLandAllowed;
-			} else if (value == "coast") {
-				this->Flags |= MapFieldCoastAllowed;
-			} else if (value == "water") {
-				this->Flags |= MapFieldWaterAllowed;
-			} else if (value == "no-building") {
-				this->Flags |= MapFieldNoBuilding;
-			} else if (value == "unpassable") {
-				this->Flags |= MapFieldUnpassable;
-			} else if (value == "wall") {
-				this->Flags |= MapFieldWall;
-			} else if (value == "rock") {
-				this->Flags |= MapFieldRocks;
-			} else if (value == "forest") {
-				this->Flags |= MapFieldForest;
-			} else if (value == "air-unpassable") {
-				this->Flags |= MapFieldAirUnpassable;
-			} else if (value == "desert") {
-				this->Flags |= MapFieldDesert;
-			} else if (value == "dirt") {
-				this->Flags |= MapFieldDirt;
-			} else if (value == "grass") {
-				this->Flags |= MapFieldGrass;
-			} else if (value == "gravel") {
-				this->Flags |= MapFieldGravel;
-			} else if (value == "mud") {
-				this->Flags |= MapFieldMud;
-			} else if (value == "railroad") {
-				this->Flags |= MapFieldRailroad;
-			} else if (value == "road") {
-				this->Flags |= MapFieldRoad;
-			} else if (value == "no-rail") {
-				this->Flags |= MapFieldNoRail;
-			} else if (value == "stone-floor") {
-				this->Flags |= MapFieldStoneFloor;
-			} else if (value == "stumps") {
-				this->Flags |= MapFieldStumps;
-			} else {
-				fprintf(stderr, "Flag \"%s\" doesn't exist.\n", value.c_str());
+			unsigned long flag = CTerrainType::GetTerrainFlagByName(value);
+			if (flag) {
+				this->Flags |= flag;
 			}
 		} else if (key == "graphics") {
 			graphics_file = value;
@@ -289,9 +309,7 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		const CConfigData *child_config_data = config_data->Children[i];
-		
+	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "season_graphics") {
 			std::string season_graphics_file;
 			CSeason *season = nullptr;

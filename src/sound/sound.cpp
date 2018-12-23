@@ -219,14 +219,14 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceFireMissile:
 			return unit.Type->MapSound.FireMissile.Sound;
 		case VoiceStep:
-			if (unit.Type->MapSound.StepGravel.Sound && mf.getFlag() & MapFieldGravel) {
+			if (unit.Type->MapSound.StepMud.Sound && ((mf.getFlag() & MapFieldMud) || (mf.getFlag() & MapFieldSnow))) {
+				return unit.Type->MapSound.StepMud.Sound;
+			} else if (unit.Type->MapSound.StepDirt.Sound && ((mf.getFlag() & MapFieldDirt) || (mf.getFlag() & MapFieldIce))) {
+				return unit.Type->MapSound.StepDirt.Sound;
+			} else if (unit.Type->MapSound.StepGravel.Sound && mf.getFlag() & MapFieldGravel) {
 				return unit.Type->MapSound.StepGravel.Sound;
 			} else if (unit.Type->MapSound.StepGrass.Sound && ((mf.getFlag() & MapFieldGrass) || (mf.getFlag() & MapFieldStumps))) {
 				return unit.Type->MapSound.StepGrass.Sound;
-			} else if (unit.Type->MapSound.StepDirt.Sound && mf.getFlag() & MapFieldDirt) {
-				return unit.Type->MapSound.StepDirt.Sound;
-			} else if (unit.Type->MapSound.StepMud.Sound && mf.getFlag() & MapFieldMud) {
-				return unit.Type->MapSound.StepMud.Sound;
 			} else if (unit.Type->MapSound.StepStone.Sound && mf.getFlag() & MapFieldStoneFloor) {
 				return unit.Type->MapSound.StepStone.Sound;
 			} else {

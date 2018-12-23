@@ -1290,6 +1290,8 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		flag = MapFieldGrass;
 	} else if (!strcmp(flag_name, "gravel")) {
 		flag = MapFieldGravel;
+	} else if (!strcmp(flag_name, "ice")) {
+		flag = MapFieldIce;
 	} else if (!strcmp(flag_name, "mud")) {
 		flag = MapFieldMud;
 	} else if (!strcmp(flag_name, "railroad")) {
@@ -1298,6 +1300,8 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		flag = MapFieldRoad;
 	} else if (!strcmp(flag_name, "no-rail")) {
 		flag = MapFieldNoRail;
+	} else if (!strcmp(flag_name, "snow")) {
+		flag = MapFieldSnow;
 	} else if (!strcmp(flag_name, "stone-floor")) {
 		flag = MapFieldStoneFloor;
 	} else if (!strcmp(flag_name, "stumps")) {
@@ -1478,6 +1482,8 @@ static int CclDefineTerrainType(lua_State *l)
 					terrain->Flags |= MapFieldGrass;
 				} else if (tile_flag == "gravel") {
 					terrain->Flags |= MapFieldGravel;
+				} else if (tile_flag == "ice") {
+					terrain->Flags |= MapFieldIce;
 				} else if (tile_flag == "mud") {
 					terrain->Flags |= MapFieldMud;
 				} else if (tile_flag == "railroad") {
@@ -1486,6 +1492,8 @@ static int CclDefineTerrainType(lua_State *l)
 					terrain->Flags |= MapFieldRoad;
 				} else if (tile_flag == "no-rail") {
 					terrain->Flags |= MapFieldNoRail;
+				} else if (tile_flag == "snow") {
+					terrain->Flags |= MapFieldSnow;
 				} else if (tile_flag == "stone-floor") {
 					terrain->Flags |= MapFieldStoneFloor;
 				} else if (tile_flag == "stumps") {

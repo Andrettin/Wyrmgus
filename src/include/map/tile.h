@@ -260,7 +260,7 @@ public:
 	int GetResource() const;
 
 	unsigned char getCost() const { return cost; }
-	unsigned int getFlag() const { return Flags; }
+	unsigned long getFlag() const { return Flags; }
 	//Wyrmgus start
 //	void setGraphicTile(unsigned int tile) { this->tile = tile; }
 	//Wyrmgus end

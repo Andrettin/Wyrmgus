@@ -52,60 +52,42 @@ class CPlayerColorGraphic;
 class CUnitType;
 //Wyrmgus end
 
-//Wyrmgus start
-/*
-// Not used until now:
-#define MapFieldSpeedMask 0x0007  /// Move faster on this tile
-
-#define MapFieldLandAllowed  0x0010  /// Land units allowed
-#define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
-#define MapFieldWaterAllowed 0x0040  /// Water units allowed
-#define MapFieldNoBuilding   0x0080  /// No buildings allowed
-
-#define MapFieldUnpassable 0x0100  /// Field is movement blocked
-#define MapFieldWall       0x0200  /// Field contains wall
-#define MapFieldRocks      0x0400  /// Field contains rocks
-#define MapFieldForest     0x0800  /// Field contains forest
-
-#define MapFieldLandUnit 0x1000  /// Land unit on field
-#define MapFieldAirUnit  0x2000  /// Air unit on field
-#define MapFieldSeaUnit  0x4000  /// Water unit on field
-#define MapFieldBuilding 0x8000  /// Building on field
-*/
-#define MapFieldItem 0x00000004		/// Item on field
-
-#define MapFieldSpeedMask 0x00000008  /// Move faster on this tile
-
-#define MapFieldLandAllowed  0x00000010  /// Land units allowed
-#define MapFieldCoastAllowed 0x00000020  /// Coast (transporter) units allowed
-#define MapFieldWaterAllowed 0x00000040  /// Water units allowed
-#define MapFieldNoBuilding   0x00000080  /// No buildings allowed
-
-#define MapFieldUnpassable 0x00000100  /// Field is movement blocked
-#define MapFieldWall       0x00000200  /// Field contains wall
-#define MapFieldRocks      0x00000400  /// Field contains rocks
-#define MapFieldForest     0x00000800  /// Field contains forest
-
-#define MapFieldLandUnit 0x00001000  /// Land unit on field
-#define MapFieldAirUnit  0x00002000  /// Air unit on field
-#define MapFieldSeaUnit  0x00004000  /// Water unit on field
-#define MapFieldBuilding 0x00008000  /// Building on field
-
-#define MapFieldAirUnpassable 0x00010000	/// Field is movement blocked
-#define MapFieldGrass 0x00020000			/// Used for playing grass step sounds
-#define MapFieldMud 0x00040000				/// Used for playing mud step sounds
-#define MapFieldStoneFloor 0x00080000		/// Used for playing stone step sounds
-
-#define MapFieldDirt 0x00100000				/// Used for playing dirt step sounds
-#define MapFieldGravel 0x00200000			/// Used for playing gravel step sounds
-#define MapFieldStumps 0x00400000			/// Used for playing stumps step sounds
-#define MapFieldBridge 0x00800000			/// Bridge or raft
-
-#define MapFieldRoad 0x01000000				/// Road (moves faster)
-#define MapFieldRailroad 0x02000000			/// Railroad (moves faster, even faster than with the road)
-#define MapFieldNoRail 0x04000000			/// Marker that there's no railroad, used for rail movemasks
-#define MapFieldDesert 0x08000000			/// Used for identifying desert tiles for desertstalk
-//Wyrmgus end
+enum MapFieldFlag : unsigned long long {
+	MapFieldSpeedMask = 1 << 0,		/// Move faster on this tile
+	
+	MapFieldLandAllowed = 1 << 1,	/// Land units allowed
+	MapFieldCoastAllowed = 1 << 2,	/// Coast (e.g. transporter) units allowed
+	MapFieldWaterAllowed = 1 << 3,	/// Water units allowed
+	MapFieldNoBuilding = 1 << 4,	/// No buildings allowed
+	
+	MapFieldUnpassable = 1 << 5,	/// Field is movement blocked
+	MapFieldAirUnpassable = 1 << 6,	/// Field is movement blocked for air units and missiles
+	MapFieldWall = 1 << 7,			/// Field contains wall
+	MapFieldRocks = 1 << 8,			/// Field contains rocks
+	MapFieldForest = 1 << 9,		/// Field contains forest
+	
+	MapFieldLandUnit = 1 << 10,		/// Land unit on field
+	MapFieldSeaUnit = 1 << 11,		/// Water unit on field
+	MapFieldAirUnit = 1 << 12,		/// Air unit on field
+	MapFieldBuilding = 1 << 13,		/// Building on field
+	MapFieldItem = 1 << 14,			/// Item on field
+	
+	MapFieldRoad = 1 << 15,			/// Road (moves faster)
+	MapFieldRailroad = 1 << 16,		/// Railroad (moves faster)
+	MapFieldNoRail = 1 << 17,		/// Marker that there's no railroad, used for rail movemasks
+	MapFieldBridge = 1 << 18,		/// Bridge or raft
+	
+	MapFieldGrass = 1 << 19,		/// Used for playing grass step sounds
+	MapFieldMud = 1 << 20,			/// Used for playing mud step sounds
+	MapFieldStoneFloor = 1 << 21,	/// Used for playing stone step sounds
+	MapFieldDirt = 1 << 22,			/// Used for playing dirt step sounds
+	MapFieldDesert = 1 << 23,		/// Used for identifying desert tiles for desertstalk and dehydration
+	MapFieldSnow = 1 << 24,			/// Used for playing snow step sounds
+	MapFieldIce = 1 << 25,			/// Used for playing ice step sounds
+	
+	MapFieldGravel = 1 << 26,		/// Used for playing gravel step sounds
+	MapFieldStumps = 1 << 27,		/// Used for playing stumps step sounds and identifying removed forests
+};
 
 /**
 **  These are used for lookup tiles types

@@ -156,6 +156,7 @@ void CMapField::SetTerrain(CTerrainType *terrain_type)
 		}
 		if (this->OverlayTerrain) {
 			this->Flags &= ~(this->OverlayTerrain->Flags);
+			
 			if (this->OverlayTerrainDestroyed) {
 				if (this->OverlayTerrain->Flags & MapFieldForest) {
 					this->Flags &= ~(MapFieldStumps);
@@ -268,6 +269,7 @@ void CMapField::RemoveOverlayTerrain()
 	
 	this->Value = 0;
 	this->Flags &= ~(this->OverlayTerrain->Flags);
+	
 	this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 	this->OverlayTerrain = nullptr;
 	this->OverlayTransitionTiles.clear();
@@ -464,6 +466,9 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldDirt) {
 		file.printf(", \"dirt\"");
 	}
+	if (Flags & MapFieldIce) {
+		file.printf(", \"ice\"");
+	}
 	if (Flags & MapFieldGrass) {
 		file.printf(", \"grass\"");
 	}
@@ -481,6 +486,9 @@ void CMapField::Save(CFile &file) const
 	}
 	if (Flags & MapFieldNoRail) {
 		file.printf(", \"no-rail\"");
+	}
+	if (Flags & MapFieldSnow) {
+		file.printf(", \"snow\"");
 	}
 	if (Flags & MapFieldStoneFloor) {
 		file.printf(", \"stone-floor\"");
@@ -661,6 +669,8 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldGrass;
 		} else if (!strcmp(value, "gravel")) {
 			this->Flags |= MapFieldGravel;
+		} else if (!strcmp(value, "ice")) {
+			this->Flags |= MapFieldIce;
 		} else if (!strcmp(value, "mud")) {
 			this->Flags |= MapFieldMud;
 		} else if (!strcmp(value, "railroad")) {
@@ -669,6 +679,8 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldRoad;
 		} else if (!strcmp(value, "no-rail")) {
 			this->Flags |= MapFieldNoRail;
+		} else if (!strcmp(value, "snow")) {
+			this->Flags |= MapFieldSnow;
 		} else if (!strcmp(value, "stone-floor")) {
 			this->Flags |= MapFieldStoneFloor;
 		} else if (!strcmp(value, "stumps")) {

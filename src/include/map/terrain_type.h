@@ -74,6 +74,7 @@ public:
 	static CTerrainType *GetOrAddTerrainType(const std::string &ident);
 	static void LoadTerrainTypeGraphics();
 	static void ClearTerrainTypes();
+	static unsigned long GetTerrainFlagByName(const std::string &flag_name);
 	
 	static std::vector<CTerrainType *>  TerrainTypes;
 	static std::map<std::string, CTerrainType *> TerrainTypesByIdent;
@@ -90,7 +91,7 @@ public:
 	int ID;
 	int SolidAnimationFrames;
 	int Resource;
-	unsigned int Flags;
+	unsigned long Flags;
 	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
 	bool Buildable;
 	bool AllowSingle;											/// Whether this terrain type has transitions for single tiles
