@@ -155,7 +155,9 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = PlayerRaces.GetFaction(value);
 			if (faction) {
-				this->Faction = faction;
+				if (!this->Faction) {
+					this->Faction = faction;
+				}
 				this->Factions.push_back(faction);
 			} else {
 				fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
