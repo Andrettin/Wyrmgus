@@ -6,7 +6,7 @@
 
 #define StratagusMajorVersion 3
 #define StratagusMinorVersion 5
-#define StratagusPatchLevel 0
+#define StratagusPatchLevel 1
 #define StratagusPatchLevel2 0
 
 #define _version_stringify_(s) #s
