@@ -2169,6 +2169,22 @@ static int CclGetMapTemplateData(lua_State *l)
 	} else if (!strcmp(data, "CurrentStartPosY")) {
 		lua_pushnumber(l, map_template->CurrentStartPos.y);
 		return 1;
+	} else if (!strcmp(data, "MapStartPosX")) {
+		Vec2i pos = Map.GetSubtemplatePos(map_template);
+		lua_pushnumber(l, pos.x);
+		return 1;
+	} else if (!strcmp(data, "MapStartPosY")) {
+		Vec2i pos = Map.GetSubtemplatePos(map_template);
+		lua_pushnumber(l, pos.y);
+		return 1;
+	} else if (!strcmp(data, "MapEndPosX")) {
+		Vec2i pos = Map.GetSubtemplateEndPos(map_template);
+		lua_pushnumber(l, pos.x);
+		return 1;
+	} else if (!strcmp(data, "MapEndPosY")) {
+		Vec2i pos = Map.GetSubtemplateEndPos(map_template);
+		lua_pushnumber(l, pos.y);
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
@@ -2186,8 +2202,8 @@ static int CclGetSiteData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string site_ident = LuaToString(l, 1);
-	CSite *site = GetSite(site_ident);
+	const std::string site_ident = LuaToString(l, 1);
+	const CSite *site = GetSite(site_ident);
 	if (!site) {
 		LuaError(l, "Site \"%s\" doesn't exist." _C_ site_ident.c_str());
 	}
@@ -2201,6 +2217,41 @@ static int CclGetSiteData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "PosY")) {
 		lua_pushnumber(l, site->Position.y);
+		return 1;
+	} else if (!strcmp(data, "MapPosX")) {
+		if (site->SiteUnit) {
+			lua_pushnumber(l, site->SiteUnit->tilePos.x);
+		} else {
+			lua_pushnumber(l, -1);
+		}
+		return 1;
+	} else if (!strcmp(data, "MapPosY")) {
+		if (site->SiteUnit) {
+			lua_pushnumber(l, site->SiteUnit->tilePos.y);
+		} else {
+			lua_pushnumber(l, -1);
+		}
+		return 1;
+	} else if (!strcmp(data, "MapCenterPosX")) {
+		if (site->SiteUnit) {
+			lua_pushnumber(l, site->SiteUnit->GetTileCenterPos().x);
+		} else {
+			lua_pushnumber(l, -1);
+		}
+		return 1;
+	} else if (!strcmp(data, "MapCenterPosY")) {
+		if (site->SiteUnit) {
+			lua_pushnumber(l, site->SiteUnit->GetTileCenterPos().y);
+		} else {
+			lua_pushnumber(l, -1);
+		}
+		return 1;
+	} else if (!strcmp(data, "MapLayer")) {
+		if (site->SiteUnit && site->SiteUnit->MapLayer) {
+			lua_pushnumber(l, site->SiteUnit->MapLayer->ID);
+		} else {
+			lua_pushnumber(l, -1);
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

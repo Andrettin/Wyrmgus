@@ -297,6 +297,7 @@ public:
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain, const int z);
 	bool IsPointInASubtemplateArea(const Vec2i &pos, const int z, const CMapTemplate *subtemplate = nullptr) const;
 	Vec2i GetSubtemplatePos(const CMapTemplate *subtemplate) const;
+	Vec2i GetSubtemplateEndPos(const CMapTemplate *subtemplate) const;
 	std::vector<CUnit *> GetMapTemplateLayerConnectors(const CMapTemplate *map_template) const;
 	bool IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) const;
 	bool IsLayerUnderground(int z) const;
