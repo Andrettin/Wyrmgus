@@ -111,7 +111,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	std::string value;
 	for (size_t i = 0; i < data.size(); ++i) {
 		std::string str = data[i];
-		if (str[0] == '[' && str[1] != '/') { //opens a tag
+		if (str.size() >= 2 && str[0] == '[' && str[1] != '/') { //opens a tag
 			std::string tag_name = str;
 			tag_name = FindAndReplaceString(tag_name, "[", "");
 			tag_name = FindAndReplaceString(tag_name, "]", "");
@@ -120,7 +120,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 				new_config_data->Parent = config_data;
 			}
 			config_data = new_config_data;
-		} else if (str[0] == '[' && str[1] == '/') { //closes a tag
+		} else if (str.size() >= 2 && str[0] == '[' && str[1] == '/') { //closes a tag
 			std::string tag_name = str;
 			tag_name = FindAndReplaceString(tag_name, "[/", "");
 			tag_name = FindAndReplaceString(tag_name, "]", "");
