@@ -1,0 +1,9 @@
+Coding Style Guidelines for Wyrmgus
+
+1. Class names are prefixed with the letter "C", capitalized.
+
+2. Class, member variable and function names are in PascalCase.
+
+3. Local variable names are in snake_case.
+
+4. Prefer defining functions in headers if they don't require any external includes, so that the compiler is able to inline the functions if it deems optimal to do so, thus providing performance improvements.
