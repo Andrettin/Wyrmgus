@@ -166,6 +166,10 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	
 	if (output.empty()) {
 		fprintf(stderr, "Could not parse output for config file \"%s\".\n", filepath.c_str());
+		fprintf(stderr, "Config file data elements: ");
+		for (size_t i = 0; i < data.size(); ++i) {
+			fprintf(stderr, "[%d] %s ", i, data[i].c_str());
+		}
 		return;
 	}
 	
