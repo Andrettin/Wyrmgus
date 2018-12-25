@@ -42,6 +42,7 @@
 #include "config.h"
 #include "editor.h"
 #include "game.h"
+#include "iocompat.h"
 #include "iolib.h"
 #include "map/historical_location.h"
 #include "map/map.h"

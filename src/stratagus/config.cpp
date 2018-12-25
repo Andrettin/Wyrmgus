@@ -43,6 +43,8 @@
 #include "currency.h"
 #include "game.h"
 #include "icons.h"
+#include "iocompat.h"
+#include "iolib.h"
 #include "map/map_template.h"
 #include "map/terrain_type.h"
 #include "missile.h"
@@ -76,12 +78,17 @@
 /**
 **	@brief	Parse a configuration data file
 **
+**	@param	filepath	The path to the file holding the config data
 **	@param	define_only	Whether the elements in the configuration data should only be defined with their ident, without their properties being processed
 */
 void CConfigData::ParseConfigData(const std::string &filepath, const bool define_only)
 {
 	std::vector<std::string> data;
 	std::vector<CConfigData *> output;
+	
+	if (!CanAccessFile(filepath.c_str())) {
+		fprintf(stderr, "File \"%s\" not found.\n", filepath.c_str());
+	}
 	
 	std::ifstream text_stream(filepath);
 	std::string line;

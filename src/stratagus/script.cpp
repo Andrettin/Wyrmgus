@@ -281,18 +281,27 @@ static int CclLoad(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	const std::string filename = LibraryFileName(LuaToString(l, 1));
-	std::string file_extension;
-	
-	size_t dot_pos = filename.rfind('.');
-	if (dot_pos != std::string::npos) {
-		file_extension = filename.substr(dot_pos + 1, filename.length() - 1 - dot_pos);
-	}
-	
-	if (file_extension == "cfg") {
-		CConfigData::ParseConfigData(filename, DefiningData);
-	} else if (LuaLoadFile(filename) == -1) {
+
+	if (LuaLoadFile(filename) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ filename.c_str());
 	}
+	return 0;
+}
+
+/**
+**	@brief	Load a config file.
+**
+**	@param	l	Lua state.
+**
+**	@return	0 in success, else exit.
+*/
+static int CclLoadConfigFile(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	const std::string filename = LibraryFileName(LuaToString(l, 1));
+	
+	CConfigData::ParseConfigData(filename, DefiningData);
+
 	return 0;
 }
 
@@ -3672,6 +3681,7 @@ void ScriptRegister()
 
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	lua_register(Lua, "Load", CclLoad);
+	lua_register(Lua, "LoadConfigFile", CclLoadConfigFile);
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
 
 	lua_register(Lua, "DebugPrint", CclDebugPrint);
