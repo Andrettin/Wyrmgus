@@ -93,7 +93,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	std::ifstream text_stream(filepath);
 	std::string line;
 	
-	while(std::getline(text_stream, line)) {
+	while (std::getline(text_stream, line)) {
 		std::vector<std::string> line_data = SplitString(line, " \t", "#");
 		
 		for (size_t i = 0; i < line_data.size(); ++i) {
@@ -141,35 +141,43 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 				fprintf(stderr, "Error parsing config file \"%s\": Tried closing a tag (\"%s\") before any tag had been opened.\n", filepath.c_str(), tag_name.c_str());
 			}
 		} else if (key.empty()) { //key
-			if (str.find('=') != std::string::npos) {
-				std::vector<std::string> key_value_strings = SplitString(str, "=");
-				for (size_t j = 0; j < key_value_strings.size(); ++j) {
-					if (key.empty()) {
-						key = key_value_strings[j];
-					} else {
-						std::string value = key_value_strings[j];
-						if (key == "ident") {
-							config_data->Ident = value;
+			if (config_data) {
+				if (str.find('=') != std::string::npos) {
+					std::vector<std::string> key_value_strings = SplitString(str, "=");
+					for (size_t j = 0; j < key_value_strings.size(); ++j) {
+						if (key.empty()) {
+							key = key_value_strings[j];
 						} else {
-							config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
+							std::string value = key_value_strings[j];
+							if (key == "ident") {
+								config_data->Ident = value;
+							} else {
+								config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
+							}
+							key.clear();
 						}
-						key.clear();
 					}
+				} else {
+					key = str;
 				}
 			} else {
-				key = str;
+				fprintf(stderr, "Error parsing config file \"%s\": Tried defining key \"%s\" before any tag had been opened.\n", filepath.c_str(), str.c_str());
 			}
 		} else if (!key.empty() && str.length() == 1 && str[0] == '=') { //operator
 			continue;
 		} else if (!key.empty()) { //value
-			std::string value = str;
-			value = FindAndReplaceString(value, "=", "");
-			if (key == "ident") {
-				config_data->Ident = value;
+			if (config_data) {
+				std::string value = str;
+				value = FindAndReplaceString(value, "=", "");
+				if (key == "ident") {
+					config_data->Ident = value;
+				} else {
+					config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
+				}
+				key.clear();
 			} else {
-				config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
+				fprintf(stderr, "Error parsing config file \"%s\": Tried assigning value \"%s\" to key \"%s\" without any tag being opened.\n", filepath.c_str(), str.c_str(), key.c_str());
 			}
-			key.clear();
 		}
 	}
 	
