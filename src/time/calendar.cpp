@@ -111,13 +111,20 @@ CCalendar::~CCalendar()
 **	@brief	Get a calendar
 **
 **	@param	ident	The calendar's string identifier
+**	@param	should_find	Whether it is an error if the calendar couldn't be found
 **
 **	@return	A pointer to the calendar if found, null otherwise
 */
-CCalendar *CCalendar::GetCalendar(const std::string &ident)
+CCalendar *CCalendar::GetCalendar(const std::string &ident, const bool should_find)
 {
-	if (CalendarsByIdent.find(ident) != CalendarsByIdent.end()) {
-		return CalendarsByIdent.find(ident)->second;
+	std::map<std::string, CCalendar *>::const_iterator find_iterator = CalendarsByIdent.find(ident);
+	
+	if (find_iterator != CalendarsByIdent.end()) {
+		return find_iterator->second;
+	}
+	
+	if (should_find) {
+		fprintf(stderr, "Invalid calendar: \"%s\".\n", ident.c_str());
 	}
 	
 	return nullptr;
@@ -132,7 +139,7 @@ CCalendar *CCalendar::GetCalendar(const std::string &ident)
 */
 CCalendar *CCalendar::GetOrAddCalendar(const std::string &ident)
 {
-	CCalendar *calendar = GetCalendar(ident);
+	CCalendar *calendar = GetCalendar(ident, false);
 	
 	if (!calendar) {
 		calendar = new CCalendar;

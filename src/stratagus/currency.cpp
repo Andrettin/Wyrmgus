@@ -53,7 +53,8 @@ std::map<std::string, CCurrency *> CCurrency::CurrenciesByIdent;
 /**
 **	@brief	Get a currency
 **
-**	@param	ident	The currency's string identifier
+**	@param	ident		The currency's string identifier
+**	@param	should_find	Whether it is an error if the currency couldn't be found
 **
 **	@return	The currency if found, or null otherwise
 */

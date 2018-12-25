@@ -89,7 +89,7 @@ public:
 	
 	~CCalendar();
 	
-	static CCalendar *GetCalendar(const std::string &ident);
+	static CCalendar *GetCalendar(const std::string &ident, const bool should_find = true);
 	static CCalendar *GetOrAddCalendar(const std::string &ident);
 	static void ClearCalendars();
 	
