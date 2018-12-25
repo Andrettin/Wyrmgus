@@ -121,15 +121,24 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 			}
 			config_data = new_config_data;
 		} else if (str[0] == '[' && str[1] == '/') { //closes a tag
-			if (config_data && FindAndReplaceString(str, "/", "") == ("[" + config_data->Tag + "]")) { //closes current tag
-				if (config_data->Parent == nullptr) {
-					output.push_back(config_data);
-					config_data = nullptr;
+			std::string tag_name = str;
+			tag_name = FindAndReplaceString(tag_name, "[/", "");
+			tag_name = FindAndReplaceString(tag_name, "]", "");
+			if (config_data) { //closes current tag
+				if (tag_name == config_data->Tag) {
+					if (config_data->Parent == nullptr) {
+						output.push_back(config_data);
+						config_data = nullptr;
+					} else {
+						CConfigData *parent_config_data = config_data->Parent;
+						parent_config_data->Children.push_back(config_data);
+						config_data = parent_config_data;
+					}
 				} else {
-					CConfigData *parent_config_data = config_data->Parent;
-					parent_config_data->Children.push_back(config_data);
-					config_data = parent_config_data;
+					fprintf(stderr, "Error parsing config file \"%s\": Tried closing tag \"%s\" while the open tag was \"%s\".\n", filepath.c_str(), tag_name.c_str(), config_data->Tag.c_str());
 				}
+			} else {
+				fprintf(stderr, "Error parsing config file \"%s\": Tried closing a tag (\"%s\") before any tag had been opened.\n", filepath.c_str(), tag_name.c_str());
 			}
 		} else if (key.empty()) { //key
 			if (str.find('=') != std::string::npos) {
@@ -166,13 +175,6 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	
 	if (output.empty()) {
 		fprintf(stderr, "Could not parse output for config file \"%s\".\n", filepath.c_str());
-		if (config_data) {
-			fprintf(stderr, "Current config data tag: \"%s\".\n", config_data->Tag.c_str());
-		}
-		fprintf(stderr, "Config file data elements:\n");
-		for (size_t i = 0; i < data.size(); ++i) {
-			fprintf(stderr, "[%u] \"%s\"\n", i, data[i].c_str());
-		}
 		return;
 	}
 	
