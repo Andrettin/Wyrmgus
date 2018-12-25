@@ -101,6 +101,11 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 		}
 	}
 	
+	if (data.empty()) {
+		fprintf(stderr, "Could not get string data for config file \"%s\".\n", filepath.c_str());
+		return;
+	}
+	
 	CConfigData *config_data = nullptr;
 	std::string key;
 	std::string value;
@@ -159,6 +164,11 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 		}
 	}
 	
+	if (output.empty()) {
+		fprintf(stderr, "Could not parse output for config file \"%s\".\n", filepath.c_str());
+		return;
+	}
+	
 	ProcessConfigData(output, define_only);
 }
 
@@ -174,6 +184,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		CConfigData *config_data = config_data_list[i];
 		std::string ident = config_data->Ident;
 		ident = FindAndReplaceString(ident, "_", "-");
+		
+		if (ident.empty() && config_data->Tag != "button") {
+			fprintf(stderr, "String identifier is empty for config data.\n");
+			continue;
+		}
 		
 		if (config_data->Tag == "age") {
 			CAge *age = CAge::GetOrAddAge(ident);
