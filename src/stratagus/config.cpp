@@ -94,7 +94,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	std::string line;
 	
 	while (std::getline(text_stream, line)) {
-		std::vector<std::string> line_data = SplitString(line, " \t", "#");
+		std::vector<std::string> line_data = SplitString(line, " \t\r", "#");
 		
 		for (size_t i = 0; i < line_data.size(); ++i) {
 			data.push_back(line_data[i]);
