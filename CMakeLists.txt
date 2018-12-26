@@ -763,6 +763,8 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
+find_package(Boost 1.69.0 REQUIRED)
+
 find_package(Lua51 REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL REQUIRED)
@@ -873,6 +875,10 @@ set(stratagus_LIBS_DEBUG ${stratagus_LIBS_DEBUG})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
+endif()
+
+if(Boost_FOUND)
+	include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
 if(WITH_BZIP2 AND BZIP2_FOUND)
@@ -1240,6 +1246,7 @@ else()
 	message("NSIS Installer: No (Enable by param -DENABLE_NSIS=ON)")
 endif()
 
+log_package("Boost" "BOOST")
 log_package("Bzip2" "BZIP2")
 log_package("PhysFS" "PHYSFS")
 log_package("FluidSynth" "FLUIDSYNTH")
