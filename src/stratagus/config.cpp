@@ -65,6 +65,8 @@
 #include "util.h"
 #include "world.h"
 
+#include <boost/tokenizer.hpp>
+
 #include <fstream>
 
 /*----------------------------------------------------------------------------
@@ -94,11 +96,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	std::string line;
 	
 	while (std::getline(text_stream, line)) {
-		std::vector<std::string> line_data = SplitString(line, " \t\r", "#");
-		
-		for (size_t i = 0; i < line_data.size(); ++i) {
-			data.push_back(line_data[i]);
-		}
+		CConfigData::ParseLine(line, data);
 	}
 	
 	if (data.empty()) {
@@ -190,6 +188,41 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 }
 
 /**
+**	@brief	Parse a line in a configuration data file
+**
+**	@param	line	The line to be parsed
+**	@param	data	The vector holding the data file's output
+*/
+void CConfigData::ParseLine(std::string &line, std::vector<std::string> &data)
+{
+	size_t comment_pos = 0;
+	while ((comment_pos = line.find('#', comment_pos)) != std::string::npos) {
+		size_t quotation_mark_pos = 0;
+		bool opened_quotation_marks = false;
+		while (((quotation_mark_pos = line.find('\"', quotation_mark_pos)) != std::string::npos) && quotation_mark_pos < comment_pos) {
+			opened_quotation_marks = !opened_quotation_marks;
+			++quotation_mark_pos;
+		}
+		if (!opened_quotation_marks) {
+			line = line.substr(0, comment_pos); //ignore what is written after the comment symbol ('#'), unless the symbol occurs within quotes
+			break;
+		}
+		++comment_pos;
+	}
+	
+	boost::escaped_list_separator<char> separator("\\", " \t\r", "\"");
+	
+	boost::tokenizer<boost::escaped_list_separator<char>> tokens(line, separator);
+	
+	for (boost::tokenizer<boost::escaped_list_separator<char>>::iterator iterator = tokens.begin(); iterator != tokens.end(); ++iterator) {
+		if (iterator->empty()) {
+			continue;
+		}
+		data.push_back(*iterator);
+	}
+}
+
+/**
 **	@brief	Process data provided by a configuration file
 **
 **	@param	config_data_list	The list of configuration data
@@ -203,7 +236,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		ident = FindAndReplaceString(ident, "_", "-");
 		
 		if (ident.empty() && config_data->Tag != "button") {
-			fprintf(stderr, "String identifier is empty for config data.\n");
+			fprintf(stderr, "String identifier is empty for config data belonging to tag \"%s\".\n", config_data->Tag.c_str());
 			continue;
 		}
 		

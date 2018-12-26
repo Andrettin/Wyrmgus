@@ -35,6 +35,8 @@
 #include "network.h"
 //Wyrmgus end
 
+#include <boost/tokenizer.hpp>
+
 #include <ctype.h>
 #include <cctype>
 #include <errno.h>
@@ -286,53 +288,16 @@ char *strcasestr(const char *a, const char *b)
 }
 #endif // !HAVE_STRCASESTR
 
-std::vector<std::string> SplitString(const std::string &str, const std::string &separators, const std::string &comment_chars)
+std::vector<std::string> SplitString(const std::string &str, const char *separators)
 {
 	std::vector<std::string> output;
 	
-	std::string element;
-	bool quotation_marks_opened = false;
-	for (size_t i = 0; i < str.length(); ++i) {
-		char c = str[i];
-		
-		if (!quotation_marks_opened) {
-			if (comment_chars.find(c) != std::string::npos) {
-				break;
-			}
-			
-			if (separators.find(c) != std::string::npos) {
-				if (element.size() > 0) {
-					output.push_back(element);
-					element.clear();
-				}
-				continue;
-			}
-		} else {
-			if (c == '\\' && (i == 0 || str[i - 1] != '\\')) {
-				continue;
-			}
-		}
-		
-		if (c == '\"' && (i == 0 || str[i - 1] != '\\')) {
-			quotation_marks_opened = !quotation_marks_opened;
-			continue;
-		}
-		
-		if (i > 0 && str[i - 1] == '\\') {
-			if (c == 'n') {
-				element += '\n';
-				continue;
-			} else if (c == 't') {
-				element += '\t';
-				continue;
-			}
-		}
-		
-		element += c;
-	}
+	boost::char_separator<char> separator(separators);
 	
-	if (element.size() > 0) { //for the last element before the end of the string / before a comment char
-		output.push_back(element);
+	boost::tokenizer<boost::char_separator<char>> tokens(str, separator);
+	
+	for (boost::tokenizer<boost::char_separator<char>>::iterator iterator = tokens.begin(); iterator != tokens.end(); ++iterator) {
+		output.push_back(*iterator);
 	}
 	
 	return output;
