@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name upgrade_structs.h - The upgrade/allow headerfile. */
+/**@name upgrade_structs.h - The upgrade/allow header file. */
 //
 //      (c) Copyright 1999-2015 by Vladi Belperchinov-Shabanski,
 //		Jimmy Salmon and Andrettin
@@ -55,6 +55,7 @@ class CVariable;
 class CIcon;
 //Wyrmgus start
 class CCharacter;
+class CConfigData;
 class CDeityDomain;
 class CDynasty;
 class CFaction;
@@ -205,6 +206,8 @@ public:
 	static CUpgrade *New(const std::string &ident);
 	static CUpgrade *Get(const std::string &ident);
 
+	void ProcessConfigData(const CConfigData *config_data);
+	
 	void SetIcon(CIcon *icon);
 
 	std::string Ident;                /// identifier

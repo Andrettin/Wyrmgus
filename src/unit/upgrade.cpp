@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name upgrade.cpp - The upgrade/allow functions. */
+/**@name upgrade.cpp - The upgrade/allow source file. */
 //
 //      (c) Copyright 1999-2018 by Vladi Belperchinov-Shabanski, Jimmy Salmon
 //		and Andrettin
@@ -52,6 +52,7 @@
 //Wyrmgus end
 #include "civilization.h"
 #include "commands.h"
+#include "config.h"
 #include "depend.h"
 //Wyrmgus start
 #include "editor.h"
@@ -237,6 +238,27 @@ CUpgrade::~CUpgrade()
 	WeaponClasses.clear();
 	Epithets.clear();
 	//Wyrmgus end
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CUpgrade::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else {
+			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 }
 
 /**

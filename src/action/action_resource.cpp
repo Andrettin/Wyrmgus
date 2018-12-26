@@ -85,12 +85,8 @@
 class NearReachableTerrainFinder
 {
 public:
-	//Wyrmgus start
-//	NearReachableTerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
-//		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
-	NearReachableTerrainFinder(const CPlayer &player, int maxDist, int movemask, int resource, Vec2i *resPos, int z) :
+	NearReachableTerrainFinder(const CPlayer &player, const int maxDist, const int movemask, const int resource, Vec2i *resPos, const int z) :
 		player(player), maxDist(maxDist), movemask(movemask), resource(resource), resPos(resPos), z(z) {}
-	//Wyrmgus end
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CPlayer &player;

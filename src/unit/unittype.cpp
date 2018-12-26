@@ -698,6 +698,11 @@ CUnitType::~CUnitType()
 #endif
 }
 
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
 void CUnitType::ProcessConfigData(const CConfigData *config_data)
 {
 	this->RemoveButtons(ButtonMove);
