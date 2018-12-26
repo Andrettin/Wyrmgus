@@ -334,6 +334,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				unit_type->ProcessConfigData(config_data);
 			}
+		} else if (config_data->Tag == "upgrade") {
+			CUpgrade *upgrade = CUpgrade::New(ident);
+			if (!define_only) {
+				upgrade->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "world") {
 			CWorld *world = CWorld::GetOrAddWorld(ident);
 			if (!define_only) {
