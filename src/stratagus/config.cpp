@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -74,6 +72,9 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+static boost::escaped_list_separator<char> ConfigTokenizerSeparator("\\", " \t\r", "\"");
+static boost::tokenizer<boost::escaped_list_separator<char>> ConfigTokenizer(std::string(), ConfigTokenizerSeparator);
+	
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -211,15 +212,10 @@ void CConfigData::ParseLine(std::string &line, std::vector<std::string> &data)
 		++comment_pos;
 	}
 	
-	boost::escaped_list_separator<char> separator("\\", " \t\r", "\"");
+	ConfigTokenizer.assign(line);
 	
-	boost::tokenizer<boost::escaped_list_separator<char>> tokens(line, separator);
-	
-	for (boost::tokenizer<boost::escaped_list_separator<char>>::iterator iterator = tokens.begin(); iterator != tokens.end(); ++iterator) {
-		if (iterator->empty()) {
-			continue;
-		}
-		data.push_back(*iterator);
+	for (const std::string &token : ConfigTokenizer) {
+		data.push_back(token);
 	}
 }
 
@@ -388,5 +384,3 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		}
 	}
 }
-
-//@}
