@@ -30,8 +30,6 @@
 #ifndef __DEITY_DOMAIN_H__
 #define __DEITY_DOMAIN_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -70,6 +68,4 @@ public:
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this domain
 };
 
-//@}
-
-#endif // !__DEITY_DOMAIN_H__
+#endif

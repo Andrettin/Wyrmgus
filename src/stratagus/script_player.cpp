@@ -2544,16 +2544,16 @@ static int CclDefineDeity(lua_State *l)
 		}
 	}
 	
-	if (deity->Major && deity->Domains.size() > 3) { // major deities can only have up to three domains
-		deity->Domains.resize(3);
-	} else if (!deity->Major && deity->Domains.size() > 1) { // minor deities can only have one domain
-		deity->Domains.resize(1);
+	if (deity->Major && deity->Domains.size() > MAJOR_DEITY_DOMAIN_MAX) {
+		deity->Domains.resize(MAJOR_DEITY_DOMAIN_MAX);
+	} else if (!deity->Major && deity->Domains.size() > MINOR_DEITY_DOMAIN_MAX) {
+		deity->Domains.resize(MINOR_DEITY_DOMAIN_MAX);
 	}
 	
-	for (size_t i = 0; i < deity->Domains.size(); ++i) {
-		for (size_t j = 0; j < deity->Domains[i]->Abilities.size(); ++j) {
-			if (std::find(deity->Abilities.begin(), deity->Abilities.end(), deity->Domains[i]->Abilities[j]) == deity->Abilities.end()) {
-				deity->Abilities.push_back(deity->Domains[i]->Abilities[j]);
+	for (CDeityDomain *domain : deity->Domains) {
+		for (CUpgrade *ability : domain->Abilities) {
+			if (std::find(deity->Abilities.begin(), deity->Abilities.end(), ability) == deity->Abilities.end()) {
+				deity->Abilities.push_back(ability);
 			}
 		}
 	}

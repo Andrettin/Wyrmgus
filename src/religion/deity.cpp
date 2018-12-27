@@ -165,8 +165,6 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			CReligion *religion = CReligion::GetReligion(value.c_str());
 			if (religion) {
 				this->Religions.push_back(religion);
-			} else {
-				fprintf(stderr, "Religion \"%s\" doesn't exist.\n", value.c_str());
 			}
 		} else if (key == "domain") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -191,11 +189,23 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			CPlane *plane = CPlane::GetPlane(value);
 			if (plane) {
 				this->HomePlane = plane;
-			} else {
-				fprintf(stderr, "Plane \"%s\" does not exist.\n", value.c_str());
 			}
 		} else {
 			fprintf(stderr, "Invalid deity property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	if (this->Major && this->Domains.size() > MAJOR_DEITY_DOMAIN_MAX) { // major deities can only have up to three domains
+		this->Domains.resize(MAJOR_DEITY_DOMAIN_MAX);
+	} else if (!this->Major && this->Domains.size() > MINOR_DEITY_DOMAIN_MAX) { // minor deities can only have one domain
+		this->Domains.resize(MINOR_DEITY_DOMAIN_MAX);
+	}
+	
+	for (CDeityDomain *domain : this->Domains) {
+		for (CUpgrade *ability : domain->Abilities) {
+			if (std::find(this->Abilities.begin(), this->Abilities.end(), ability) == this->Abilities.end()) {
+				this->Abilities.push_back(ability);
+			}
 		}
 	}
 }

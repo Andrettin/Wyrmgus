@@ -53,6 +53,9 @@ class CPlane;
 class CReligion;
 class CUpgrade;
 
+#define MAJOR_DEITY_DOMAIN_MAX 3 // major deities can only have up to three domains
+#define MINOR_DEITY_DOMAIN_MAX 1 // minor deities can only have one domain
+
 class CDeity
 {
 public:
