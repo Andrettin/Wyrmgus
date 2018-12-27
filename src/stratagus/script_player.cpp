@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -57,6 +55,7 @@
 #include "quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
+#include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "script.h"
 #include "time/calendar.h"
@@ -2417,7 +2416,7 @@ static int CclDefineDeity(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			deity->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Pantheon")) {
-			deity->Pantheon = LuaToString(l, -1);
+			deity->Pantheon = CPantheon::GetPantheon(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
 			deity->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {
@@ -3866,7 +3865,11 @@ static int CclGetDeityData(lua_State *l)
 		lua_pushstring(l, deity->Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "Pantheon")) {
-		lua_pushstring(l, deity->Pantheon.c_str());
+		if (deity->Pantheon) {
+			lua_pushstring(l, deity->Pantheon->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, deity->Description.c_str());
@@ -4013,5 +4016,3 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetDeityData", CclGetDeityData);
 	//Wyrmgus end
 }
-
-//@}

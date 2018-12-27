@@ -50,6 +50,7 @@
 #include "missile.h"
 #include "plane.h"
 #include "religion/deity.h"
+#include "religion/pantheon.h"
 #include "sound.h"
 #include "spells.h"
 #include "time/calendar.h"
@@ -314,6 +315,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			}
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "pantheon") {
+			CPantheon *pantheon = CPantheon::GetOrAddPantheon(ident);
+			if (!define_only) {
+				pantheon->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "plane") {
 			CPlane *plane = CPlane::GetOrAddPlane(ident);

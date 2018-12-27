@@ -30,8 +30,6 @@
 #ifndef __DEITY_H__
 #define __DEITY_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -50,6 +48,7 @@ class CCivilization;
 class CConfigData;
 class CDeityDomain;
 class CFaction;
+class CPantheon;
 class CPlane;
 class CReligion;
 class CUpgrade;
@@ -77,10 +76,10 @@ public:
 	bool Major;									/// Whether the deity is a major one or not
 	std::string Ident;							/// Ident of the deity
 	std::string Name;							/// Name of the deity
-	std::string Pantheon;						/// Pantheon to which the deity belongs
 	std::string Description;
 	std::string Background;
 	std::string Quote;
+	CPantheon *Pantheon = nullptr;				/// Pantheon to which the deity belongs
 	CPlane *HomePlane;							/// The home plane of the deity
 	CUpgrade *DeityUpgrade;						/// The deity's upgrade applied to a player that worships it
 	CUpgrade *CharacterUpgrade;					/// The deity's upgrade applied to its character as an individual upgrade
@@ -94,6 +93,4 @@ public:
 	std::map<int, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 };
 
-//@}
-
-#endif // !__DEITY_H__
+#endif

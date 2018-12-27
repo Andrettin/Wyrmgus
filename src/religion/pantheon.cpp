@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name religion.cpp - The religion source file. */
+/**@name pantheon.cpp - The pantheon source file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "religion/religion.h"
+#include "religion/pantheon.h"
 
 #include "config.h"
 
@@ -41,62 +41,87 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CReligion *> CReligion::Religions;
-std::map<std::string, CReligion *> CReligion::ReligionsByIdent;
+std::vector<CPantheon *> CPantheon::Pantheons;
+std::map<std::string, CPantheon *> CPantheon::PantheonsByIdent;
 	
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a religion
+**	@brief	Get a pantheon
 **
-**	@param	ident		The religion's string identifier
-**	@param	should_find	Whether it is an error if the religion could not be found; this is true by default
+**	@param	ident		The pantheon's string identifier
+**	@param	should_find	Whether it is an error if the pantheon could not be found; this is true by default
 **
-**	@return	The religion if found, or null otherwise
+**	@return	The pantheon if found, or null otherwise
 */
-CReligion *CReligion::GetReligion(const std::string &ident, const bool should_find)
+CPantheon *CPantheon::GetPantheon(const std::string &ident, const bool should_find)
 {
-	if (ReligionsByIdent.find(ident) != ReligionsByIdent.end()) {
-		return ReligionsByIdent.find(ident)->second;
+	if (PantheonsByIdent.find(ident) != PantheonsByIdent.end()) {
+		return PantheonsByIdent.find(ident)->second;
 	}
 	
 	if (should_find) {
-		fprintf(stderr, "Invalid religion: \"%s\".\n", ident.c_str());
+		fprintf(stderr, "Invalid pantheon: \"%s\".\n", ident.c_str());
 	}
 	
 	return nullptr;
 }
 
 /**
-**	@brief	Get or add a religion
+**	@brief	Get or add a pantheon
 **
-**	@param	ident	The religion's string identifier
+**	@param	ident	The pantheon's string identifier
 **
-**	@return	The religion if found, or a newly-created one otherwise
+**	@return	The pantheon if found, or a newly-created one otherwise
 */
-CReligion *CReligion::GetOrAddReligion(const std::string &ident)
+CPantheon *CPantheon::GetOrAddPantheon(const std::string &ident)
 {
-	CReligion *religion = GetReligion(ident, false);
+	CPantheon *pantheon = GetPantheon(ident, false);
 	
-	if (!religion) {
-		religion = new CReligion;
-		religion->Ident = ident;
-		Religions.push_back(religion);
-		ReligionsByIdent[ident] = religion;
+	if (!pantheon) {
+		pantheon = new CPantheon;
+		pantheon->Ident = ident;
+		Pantheons.push_back(pantheon);
+		PantheonsByIdent[ident] = pantheon;
 	}
 	
-	return religion;
+	return pantheon;
 }
 
 /**
-**	@brief	Remove the existing religions
+**	@brief	Remove the existing pantheons
 */
-void CReligion::ClearReligions()
+void CPantheon::ClearPantheons()
 {
-	for (size_t i = 0; i < Religions.size(); ++i) {
-		delete Religions[i];
+	for (size_t i = 0; i < Pantheons.size(); ++i) {
+		delete Pantheons[i];
 	}
-	Religions.clear();
+	Pantheons.clear();
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CPantheon::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "description") {
+			this->Description = value;
+		} else if (key == "background") {
+			this->Background = value;
+		} else if (key == "quote") {
+			this->Quote = value;
+		} else {
+			fprintf(stderr, "Invalid pantheon property: \"%s\".\n", key.c_str());
+		}
+	}
 }

@@ -32,9 +32,9 @@
 # Stratagus major version
 set(STRATAGUS_MAJOR_VERSION 2)
 # Stratagus minor version (maximum 99)
-set(STRATAGUS_MINOR_VERSION 4)
+set(STRATAGUS_MINOR_VERSION 5)
 # Stratagus patch level (maximum 99)
-set(STRATAGUS_PATCH_LEVEL 0)
+set(STRATAGUS_PATCH_LEVEL 2)
 # Stratagus patch level 2
 set(STRATAGUS_PATCH_LEVEL2 0)
 #########################
@@ -260,6 +260,7 @@ source_group(pathfinder FILES ${pathfinder_SRCS})
 set(religion_SRCS
 	src/religion/deity.cpp
 	src/religion/deity_domain.cpp
+	src/religion/pantheon.cpp
 	src/religion/religion.cpp
 )
 source_group(religion FILES ${religion_SRCS})
@@ -575,6 +576,7 @@ set(stratagus_map_HDRS
 set(stratagus_religion_HDRS
 	src/include/religion/deity.h
 	src/include/religion/deity_domain.h
+	src/include/religion/pantheon.h
 	src/include/religion/religion.h
 )
 

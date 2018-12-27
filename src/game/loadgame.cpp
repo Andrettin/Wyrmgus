@@ -62,6 +62,7 @@
 #include "quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
+#include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "replay.h"
 #include "script.h"
@@ -133,6 +134,7 @@ void CleanModules()
 	CHistoricalUnit::ClearHistoricalUnits();
 	CMapTemplate::ClearMapTemplates();
 	CleanMissiles();
+	CPantheon::ClearPantheons();
 	//Wyrmgus start
 	CPlane::ClearPlanes();
 	CleanProvinces();

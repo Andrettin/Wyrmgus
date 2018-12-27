@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name religion.h - The religion header file. */
+/**@name pantheon.h - The pantheon header file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __RELIGION_H__
-#define __RELIGION_H__
+#ifndef __PANTHEON_H__
+#define __PANTHEON_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -43,25 +43,24 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
-class CDeityDomain;
 
-class CReligion
+class CPantheon
 {
 public:
-	static CReligion *GetReligion(const std::string &ident, const bool should_find = true);
-	static CReligion *GetOrAddReligion(const std::string &ident);
-	static void ClearReligions();
+	static CPantheon *GetPantheon(const std::string &ident, const bool should_find = true);
+	static CPantheon *GetOrAddPantheon(const std::string &ident);
+	static void ClearPantheons();
 	
-	static std::vector<CReligion *> Religions;	/// Religions
-	static std::map<std::string, CReligion *> ReligionsByIdent;
+	static std::vector<CPantheon *> Pantheons;	/// Pantheons
+	static std::map<std::string, CPantheon *> PantheonsByIdent;
 	
-	std::string Ident;							/// Ident of the religion
-	std::string Name;							/// Name of the religion
+	void ProcessConfigData(const CConfigData *config_data);
+	
+	std::string Ident;							/// Ident of the pantheon
+	std::string Name;							/// Name of the pantheon
 	std::string Description;
 	std::string Background;
 	std::string Quote;
-	bool CulturalDeities = false;				/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
-	std::vector<CDeityDomain *> Domains;
 };
 
 #endif

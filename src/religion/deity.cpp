@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -43,6 +41,7 @@
 #include "player.h"
 #include "province.h"
 #include "religion/deity_domain.h"
+#include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "upgrade.h"
 
@@ -148,7 +147,8 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else if (key == "pantheon") {
-			this->Pantheon = value;
+			value = FindAndReplaceString(value, "_", "-");
+			this->Pantheon = CPantheon::GetPantheon(value);
 		} else if (key == "gender") {
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "major") {
@@ -199,5 +199,3 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 }
-
-//@}
