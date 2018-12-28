@@ -2530,14 +2530,14 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
+				const CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
 				++j;
 				if (!civilization) {
 					continue;
 				}
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
-				deity->CulturalNames[civilization->ID] = cultural_name;
+				deity->CulturalNames[civilization] = cultural_name;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -3930,12 +3930,8 @@ static int CclGetDeityData(lua_State *l)
 			LuaError(l, "incorrect argument");
 		}
 		
-		CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, 3));
-		if (civilization && deity->CulturalNames.find(civilization->ID) != deity->CulturalNames.end()) {
-			lua_pushstring(l, deity->CulturalNames.find(civilization->ID)->second.c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
+		const CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, 3));
+		lua_pushstring(l, deity->GetCulturalName(civilization).c_str());
 		
 		return 1;
 	} else if (!strcmp(data, "Gender")) {

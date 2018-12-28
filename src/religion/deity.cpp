@@ -69,8 +69,10 @@ std::map<const CUpgrade *, CDeity *> CDeity::DeitiesByUpgrade;
 */
 CDeity *CDeity::GetDeity(const std::string &ident, const bool should_find)
 {
-	if (DeitiesByIdent.find(ident) != DeitiesByIdent.end()) {
-		return DeitiesByIdent.find(ident)->second;
+	std::map<std::string, CDeity *>::const_iterator find_iterator = DeitiesByIdent.find(ident);
+	
+	if (find_iterator != DeitiesByIdent.end()) {
+		return find_iterator->second;
 	}
 	
 	if (should_find) {
@@ -208,4 +210,41 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			}
 		}
 	}
+	
+	for (const CConfigData *child_config_data : config_data->Children) {
+		if (child_config_data->Tag == "cultural_names") {
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				key = FindAndReplaceString(key, "_", "-");
+				
+				const CCivilization *civilization = CCivilization::GetCivilization(key);
+				
+				if (civilization) {
+					this->CulturalNames[civilization] = value;
+				}
+			}
+		} else {
+			fprintf(stderr, "Invalid deity property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+}
+
+/**
+**	@brief	Get the cultural name for a given civilization
+**
+**	@param	civilization	The civilization
+**
+**	@return	The name if present, or an empty string otherwise
+*/
+std::string CDeity::GetCulturalName(const CCivilization *civilization) const
+{
+	std::map<const CCivilization *, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
+	
+	if (find_iterator != this->CulturalNames.end()) {
+		return find_iterator->second;
+	}
+	
+	return std::string();
 }

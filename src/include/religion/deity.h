@@ -59,11 +59,6 @@ class CUpgrade;
 class CDeity
 {
 public:
-	CDeity() :
-		Gender(0), Major(false), HomePlane(nullptr), DeityUpgrade(nullptr), CharacterUpgrade(nullptr)
-	{
-	}
-	
 	static CDeity *GetDeity(const std::string &ident, const bool should_find = true);
 	static CDeity *GetOrAddDeity(const std::string &ident);
 	static CDeity *GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
@@ -75,17 +70,19 @@ public:
 	
 	void ProcessConfigData(const CConfigData *config_data);
 	
-	int Gender;									/// Deity's gender
-	bool Major;									/// Whether the deity is a major one or not
+	std::string GetCulturalName(const CCivilization *civilization) const;
+	
+	int Gender = 0;								/// Deity's gender
+	bool Major = false;							/// Whether the deity is a major one or not
 	std::string Ident;							/// Ident of the deity
 	std::string Name;							/// Name of the deity
 	std::string Description;
 	std::string Background;
 	std::string Quote;
 	CPantheon *Pantheon = nullptr;				/// Pantheon to which the deity belongs
-	CPlane *HomePlane;							/// The home plane of the deity
-	CUpgrade *DeityUpgrade;						/// The deity's upgrade applied to a player that worships it
-	CUpgrade *CharacterUpgrade;					/// The deity's upgrade applied to its character as an individual upgrade
+	CPlane *HomePlane = nullptr;				/// The home plane of the deity
+	CUpgrade *DeityUpgrade = nullptr;			/// The deity's upgrade applied to a player that worships it
+	CUpgrade *CharacterUpgrade = nullptr;		/// The deity's upgrade applied to its character as an individual upgrade
 	IconConfig Icon;							/// Deity's icon
 	std::vector<CCivilization *> Civilizations;	/// Civilizations which may worship the deity
 	std::vector<CReligion *> Religions;			/// Religions for which this deity is available
@@ -93,7 +90,7 @@ public:
 	std::vector<CDeityDomain *> Domains;
 	std::vector<CFaction *> HolyOrders;			/// Holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			/// Abilities linked to this deity
-	std::map<int, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
+	std::map<const CCivilization *, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 };
 
 #endif

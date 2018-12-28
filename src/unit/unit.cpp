@@ -6287,11 +6287,15 @@ CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 std::string CUnit::GetName() const
 {
 	if (GameRunning && this->Character && this->Character->Deity) {
-		if (this->Character->Deity->CulturalNames.find(ThisPlayer->Race) != this->Character->Deity->CulturalNames.end()) {
-			return this->Character->Deity->CulturalNames.find(ThisPlayer->Race)->second;
-		} else {
-			return this->Character->Deity->Name;
+		if (ThisPlayer->Race >= 0) {
+			std::string cultural_name = this->Character->Deity->GetCulturalName(CCivilization::Civilizations[ThisPlayer->Race]);
+			
+			if (!cultural_name.empty()) {
+				return cultural_name;
+			}
 		}
+		
+		return this->Character->Deity->Name;
 	}
 	
 	std::string name = this->Name;

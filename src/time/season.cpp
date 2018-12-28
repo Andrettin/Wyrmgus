@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -126,9 +124,7 @@ void CSeason::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		const CConfigData *child_config_data = config_data->Children[i];
-		
+	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "image") {
 			std::string file;
 			Vec2i size(0, 0);
@@ -171,5 +167,3 @@ void CSeason::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 }
-
-//@}

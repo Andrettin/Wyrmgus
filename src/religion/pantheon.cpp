@@ -58,8 +58,10 @@ std::map<std::string, CPantheon *> CPantheon::PantheonsByIdent;
 */
 CPantheon *CPantheon::GetPantheon(const std::string &ident, const bool should_find)
 {
-	if (PantheonsByIdent.find(ident) != PantheonsByIdent.end()) {
-		return PantheonsByIdent.find(ident)->second;
+	std::map<std::string, CPantheon *>::const_iterator find_iterator = PantheonsByIdent.find(ident);
+	
+	if (find_iterator != PantheonsByIdent.end()) {
+		return find_iterator->second;
 	}
 	
 	if (should_find) {
