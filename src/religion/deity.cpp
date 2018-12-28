@@ -192,6 +192,24 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			if (plane) {
 				this->HomePlane = plane;
 			}
+		} else if (key == "deity_upgrade") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade) {
+				this->DeityUpgrade = upgrade;
+				CDeity::DeitiesByUpgrade[upgrade] = this;
+			} else {
+				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "holy_order") {
+			value = FindAndReplaceString(value, "_", "-");
+			CFaction *holy_order = PlayerRaces.GetFaction(value);
+			if (holy_order) {
+				this->HolyOrders.push_back(holy_order);
+				holy_order->HolyOrderDeity = this;
+			} else {
+				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
+			}
 		} else {
 			fprintf(stderr, "Invalid deity property: \"%s\".\n", key.c_str());
 		}
