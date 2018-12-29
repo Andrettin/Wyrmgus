@@ -55,7 +55,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 #include "video.h"
 
 enum {

@@ -31,8 +31,6 @@
 #ifndef __UPGRADE_H__
 #define __UPGRADE_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -42,17 +40,6 @@ class CPlayer;
 class CUpgrade;
 class CUnit;
 class CUpgradeModifier;
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/// How many upgrades modifiers supported
-#define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
-
-extern CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
-
-extern int NumUpgradeModifiers;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -126,6 +113,4 @@ extern bool IsPotentiallyNegativeVariable(int var);
 extern std::string GetVariableDisplayName(int var, bool increase = false);
 //Wyrmgus end
 
-//@}
-
-#endif  // !__UPGRADE_H__
+#endif

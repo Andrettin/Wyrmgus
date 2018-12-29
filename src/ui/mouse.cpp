@@ -52,7 +52,6 @@
 //Wyrmgus end
 #include "commands.h"
 #include "cursor.h"
-#include "depend.h"
 #include "font.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -77,6 +76,7 @@
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
 #include "unitsound.h"
+#include "upgrade/depend.h"
 #include "video.h"
 #include "widgets.h"
 #include "world.h"

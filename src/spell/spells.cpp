@@ -56,7 +56,7 @@
 #include "sound.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

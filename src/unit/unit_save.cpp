@@ -45,6 +45,7 @@
 #include "character.h"
 #include "construct.h"
 #include "iolib.h"
+#include "map/map.h"
 #include "map/map_layer.h"
 #include "pathfinder.h"
 #include "player.h"

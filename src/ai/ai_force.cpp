@@ -41,7 +41,6 @@
 #include "action/action_attack.h"
 #include "action/action_board.h"
 #include "commands.h"
-#include "depend.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -49,6 +48,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "upgrade/depend.h"
 
 /*----------------------------------------------------------------------------
 --  Types

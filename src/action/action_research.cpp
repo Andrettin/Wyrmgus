@@ -48,8 +48,8 @@
 #include "unit/unit.h"
 #include "unitsound.h"
 #include "unit/unittype.h"
-#include "upgrade_structs.h"
-#include "upgrade.h"
+#include "upgrade/upgrade_structs.h"
+#include "upgrade/upgrade.h"
 
 /// How many resources the player gets back if canceling research
 #define CancelResearchCostsFactor  100

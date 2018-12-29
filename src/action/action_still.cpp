@@ -64,7 +64,7 @@
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
 //Wyrmgus start
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "video.h"
 

@@ -37,6 +37,7 @@
 
 #include "map/map_layer.h"
 
+#include "map/map.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "sound_server.h"

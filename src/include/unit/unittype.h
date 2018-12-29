@@ -44,12 +44,9 @@
 
 #include "color.h"
 #include "icons.h"
-//Wyrmgus start
-#include "map/map.h"	//required for PixelTileSize
-//Wyrmgus end
 #include "missileconfig.h"
 #include "unitsound.h"
-#include "upgrade_structs.h"
+#include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -63,6 +60,7 @@ class MissileType;
 class CFile;
 //Wyrmgus start
 class CButtonLevel;
+class CFaction;
 class CPlane;
 class CSeason;
 class CWorld;

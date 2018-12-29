@@ -39,6 +39,7 @@
 #include "ai.h"
 #include "ai_local.h"
 
+#include "map/map.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
@@ -47,7 +48,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 
 /**
 **  Insert new unit-type element.

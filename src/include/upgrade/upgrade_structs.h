@@ -10,7 +10,7 @@
 //
 /**@name upgrade_structs.h - The upgrade/allow header file. */
 //
-//      (c) Copyright 1999-2015 by Vladi Belperchinov-Shabanski,
+//      (c) Copyright 1999-2018 by Vladi Belperchinov-Shabanski,
 //		Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -31,8 +31,6 @@
 #ifndef __UPGRADE_STRUCTS_H__
 #define __UPGRADE_STRUCTS_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -50,18 +48,14 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CUnitType;
-class CVariable;
-class CIcon;
-//Wyrmgus start
 class CCharacter;
 class CConfigData;
 class CDeityDomain;
-class CDynasty;
-class CFaction;
+class CIcon;
 class CUniqueItem;
+class CUnitType;
 class CUpgradeModifier;
-//Wyrmgus end
+class CVariable;
 struct lua_State;
 
 /**
@@ -257,62 +251,6 @@ public:
 	CIcon *Icon;                      /// icon to display to the user
 };
 
-/*----------------------------------------------------------------------------
---  upgrades and modifiers
-----------------------------------------------------------------------------*/
-
-/**
-**  This is the modifier of an upgrade.
-**  This do the real action of an upgrade, an upgrade can have multiple
-**  modifiers.
-*/
-class CUpgradeModifier
-{
-public:
-	//Wyrmgus start
-//	CUpgradeModifier() : UpgradeId(0), ModifyPercent(nullptr), SpeedResearch(0), ConvertTo(nullptr)
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(nullptr), SpeedResearch(0), ConvertTo(nullptr), ChangeCivilizationTo(-1), ChangeFactionTo(nullptr), ChangeDynastyTo(nullptr)
-	//Wyrmgus end
-	{
-		memset(ChangeUnits, 0, sizeof(ChangeUnits));
-		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));
-		memset(ApplyTo, 0, sizeof(ApplyTo));
-	}
-	~CUpgradeModifier()
-	{
-		delete [] this->ModifyPercent;
-	}
-	
-	int GetUnitStock(CUnitType *unit_type) const;
-	void SetUnitStock(CUnitType *unit_type, int quantity);
-	void ChangeUnitStock(CUnitType *unit_type, int quantity);
-
-	int UpgradeId;                      /// used to filter required modifier
-
-	CUnitStats Modifier;                /// modifier of unit stats.
-	int *ModifyPercent;					/// use for percent modifiers
-	int SpeedResearch;					/// speed factor for researching
-	int ImproveIncomes[MaxCosts];		/// improve incomes
-	std::map<CUnitType *, int> UnitStock;		/// unit stock
-	// allow/forbid bitmaps -- used as chars for example:
-	// `?' -- leave as is, `F' -- forbid, `A' -- allow
-	// TODO: see below allow more semantics?
-	// TODO: pointers or ids would be faster and less memory use
-	int  ChangeUnits[UnitTypeMax];      /// add/remove allowed units
-	char ChangeUpgrades[UpgradeMax];    /// allow/forbid upgrades
-	char ApplyTo[UnitTypeMax];          /// which unit types are affected
-
-	CUnitType *ConvertTo;               /// convert to this unit-type.
-
-	//Wyrmgus start
-	int ChangeCivilizationTo;			/// changes the player's civilization to this one
-	CFaction *ChangeFactionTo;			/// changes the player's faction to this one
-	CDynasty *ChangeDynastyTo;			/// changes the player's dynasty to this one
-	
-	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
-	//Wyrmgus end
-};
-
 /**
 **  Allow what a player can do. Every #CPlayer has an own allow struct.
 **
@@ -368,6 +306,4 @@ public:
 
 extern std::vector<CUpgrade *> AllUpgrades;  /// the main user usable upgrades
 
-//@}
-
-#endif // !__UPGRADE_STRUCTS_H__
+#endif

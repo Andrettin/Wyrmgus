@@ -62,7 +62,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 
 //Wyrmgus start
 #include "../ai/ai_local.h"

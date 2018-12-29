@@ -40,11 +40,12 @@
 #include "character.h"
 #include "civilization.h"
 #include "luacallback.h"
+#include "map/map.h"
 #include "map/map_template.h"
 #include "player.h"
 #include "script.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

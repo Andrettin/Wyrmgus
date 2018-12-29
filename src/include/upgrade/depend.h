@@ -30,8 +30,6 @@
 #ifndef __DEPEND_H__
 #define __DEPEND_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -39,7 +37,7 @@
 /**
 **  @struct DependRule depend.h
 **
-**  \#include "depend.h"
+**  \#include "upgrade/depend.h"
 **
 **  This structure is used define the requirements of upgrades or
 **  unit-types. The structure is used to define the base (the wanted)
@@ -146,6 +144,5 @@ extern bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std
 /// Check a dependency by unit type
 extern bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore_units = false, bool is_predependency = false);
 extern bool CheckDependByType(const CUnit &unit, const CUnitType &type, bool ignore_units = false, bool is_predependency = false);
-//@}
 
-#endif // !__DEPEND_H__
+#endif

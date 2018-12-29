@@ -48,7 +48,6 @@
 #include "player.h"
 #include "spells.h"
 #include "translate.h"
-#include "upgrade.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 //Wyrmgus start
@@ -56,6 +55,7 @@
 //Wyrmgus end
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
+#include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

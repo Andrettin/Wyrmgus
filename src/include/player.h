@@ -52,7 +52,7 @@
 #include "time/date.h"
 #include "ui/ui.h" // for the UI fillers
 //Wyrmgus end
-#include "upgrade_structs.h"
+#include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -71,10 +71,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CGraphic;
-class CUnit;
-class CUnitType;
-//Wyrmgus start
 class CAge;
 class CCalendar;
 class CCharacter;
@@ -82,6 +78,9 @@ class CCivilization;
 class CCurrency;
 class CDeity;
 class CDeityDomain;
+class CDynasty;
+class CFile;
+class CGraphic;
 class CLanguage;
 class CProvince;
 class CPlane;
@@ -89,9 +88,9 @@ class CPlayerQuestObjective;
 class CQuest;
 class CReligion;
 class CSite;
-//WYrmgus end
+class CUnit;
+class CUnitType;
 class PlayerAi;
-class CFile;
 //Wyrmgus start
 class CFiller;
 class LuaCallback;

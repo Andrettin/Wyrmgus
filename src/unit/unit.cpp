@@ -53,9 +53,6 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
-//Wyrmgus start
-#include "depend.h"	//for using dependency checks
-//Wyrmgus end
 #include "game.h"
 #include "editor.h"
 //Wyrmgus start
@@ -90,7 +87,9 @@
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
 #include "unitsound.h"
-#include "upgrade.h"
+#include "upgrade/depend.h"	//for using dependency checks
+#include "upgrade/upgrade.h"
+#include "upgrade/upgrade_modifier.h"
 //Wyrmgus start
 #include "util.h"
 //Wyrmgus end

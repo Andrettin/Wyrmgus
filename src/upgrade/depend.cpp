@@ -36,10 +36,11 @@
 
 #include "stratagus.h"
 
-#include "depend.h"
+#include "upgrade/depend.h"
 
 #include "age.h"
 #include "config.h"
+#include "map/map.h"
 #include "map/map_layer.h"
 #include "player.h"
 #include "religion/deity.h"
@@ -51,8 +52,9 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
-#include "upgrade_structs.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
+#include "upgrade/upgrade_modifier.h"
+#include "upgrade/upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

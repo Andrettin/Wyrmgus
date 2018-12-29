@@ -49,7 +49,6 @@
 #include "civilization.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
-#include "depend.h"
 #include "editor.h"
 #include "font.h"
 #include "game.h"
@@ -76,15 +75,19 @@
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
-#include "unitsound.h"
+#include "ui/button_action.h"
+#include "ui/ui.h"
 #include "unit/unit.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
 //Wyrmgus end
-#include "ui/button_action.h"
-#include "ui/ui.h"
+#include "unitsound.h"
+#include "upgrade/depend.h"
+//Wyrmgus start
+#include "upgrade/upgrade.h"
+//Wyrmgus end
+#include "upgrade/upgrade_modifier.h"
 #include "video.h"
 #include "world.h"
 

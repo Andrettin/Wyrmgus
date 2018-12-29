@@ -41,7 +41,6 @@
 #include "animation.h"
 #include "civilization.h"
 //Wyrmgus start
-#include "depend.h"
 #include "game.h"
 //Wyrmgus end
 #include "iolib.h"
@@ -56,8 +55,9 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
+#include "upgrade/depend.h"
 //Wyrmgus start
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 //Wyrmgus end
 
 /// How many resources the player gets back if canceling upgrade

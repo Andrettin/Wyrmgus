@@ -49,7 +49,6 @@
 //Wyrmgus end
 #include "commands.h"
 #include "construct.h"
-#include "depend.h"
 #include "editor.h"
 #include "font.h"
 //Wyrmgus start
@@ -91,7 +90,8 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/depend.h"
+#include "upgrade/upgrade.h"
 //Wyrmgus start
 #include "util.h"
 //Wyrmgus end

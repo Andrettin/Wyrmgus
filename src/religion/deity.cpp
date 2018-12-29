@@ -43,7 +43,7 @@
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 
 #include <algorithm>
 

@@ -46,7 +46,6 @@
 #include "character.h"
 //Wyrmgus end
 #include "commands.h"
-#include "depend.h"
 #include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -76,7 +75,8 @@
 #include "unit/unit_manager.h"
 //Wyrmgus end
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/depend.h"
+#include "upgrade/upgrade.h"
 #include "video.h"
 
 #include <ctype.h>

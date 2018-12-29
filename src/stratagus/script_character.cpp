@@ -49,7 +49,7 @@
 #include "spells.h"
 #include "time/timeline.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 
 #include "../ai/ai_local.h" //for using AiHelpers
 

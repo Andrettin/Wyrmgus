@@ -146,7 +146,6 @@
 #include "action/action_attack.h"
 #include "commands.h"
 //Wyrmgus start
-#include "depend.h"
 #include "editor.h"
 //Wyrmgus end
 #include "grand_strategy.h"
@@ -171,7 +170,8 @@
 //Wyrmgus end
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/depend.h"
+#include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

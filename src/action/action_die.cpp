@@ -39,6 +39,7 @@
 
 #include "animation.h"
 #include "iolib.h"
+#include "map/map.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
 

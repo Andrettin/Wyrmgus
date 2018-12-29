@@ -42,14 +42,14 @@
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
 //Wyrmgus end
-#include "depend.h"
 #include "network.h"
 #include "player.h"
 #include "ui/button_action.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/depend.h"
+#include "upgrade/upgrade.h"
 
 #include <stdio.h>
 /*----------------------------------------------------------------------------

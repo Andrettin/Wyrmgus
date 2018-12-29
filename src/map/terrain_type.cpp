@@ -42,7 +42,7 @@
 #include "map/map.h"
 #include "map/tileset.h"
 #include "time/season.h"
-#include "upgrade_structs.h"
+#include "upgrade/upgrade_structs.h"
 #include "video.h"
 
 #include <algorithm>

@@ -34,7 +34,7 @@
 
 #include <string>
 
-#include "upgrade_structs.h"
+#include "upgrade/upgrade_structs.h"
 
 class CFont;
 

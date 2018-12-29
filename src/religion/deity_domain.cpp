@@ -36,7 +36,7 @@
 #include "religion/deity_domain.h"
 
 #include "config.h"
-#include "upgrade_structs.h"
+#include "upgrade/upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

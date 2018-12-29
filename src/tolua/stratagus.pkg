@@ -32,7 +32,7 @@ $#include "unit/unit.h"
 $#include "unit/unit_manager.h"
 $#include "unit/unittype.h"
 //Wyrmgus start
-$#include "upgrade.h"
+$#include "upgrade/upgrade.h"
 $#include "util.h"
 //Wyrmgus end
 $#include "video.h"

@@ -44,7 +44,7 @@
 #include "vec2i.h"
 #include "video.h"
 #include "player.h"
-#include "upgrade_structs.h"
+#include "upgrade/upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

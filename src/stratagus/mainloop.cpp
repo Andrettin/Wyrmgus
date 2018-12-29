@@ -75,7 +75,7 @@
 #include "unit/unit.h"
 //Wyrmgus start
 #include "unit/unit_manager.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "video.h"
 #include "world.h"

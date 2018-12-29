@@ -40,7 +40,7 @@
 
 #include "stratagus.h"
 
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 
 //Wyrmgus start
 #include "action/action_build.h"
@@ -53,7 +53,6 @@
 #include "civilization.h"
 #include "commands.h"
 #include "config.h"
-#include "depend.h"
 //Wyrmgus start
 #include "editor.h"
 #include "game.h"
@@ -84,6 +83,8 @@
 #include "unit/unit_manager.h"
 //Wyrmgus end
 #include "unit/unittype.h"
+#include "upgrade/depend.h"
+#include "upgrade/upgrade_modifier.h"
 #include "util.h"
 
 /*----------------------------------------------------------------------------
@@ -99,11 +100,6 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CUpgrade *> AllUpgrades;           /// The main user useable upgrades
-
-/// Upgrades modifiers
-CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
-/// Number of upgrades modifiers used
-int NumUpgradeModifiers;
 
 std::map<std::string, CUpgrade *> Upgrades;
 
@@ -253,9 +249,115 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "name") {
 			this->Name = value;
+		} else if (key == "icon") {
+			value = FindAndReplaceString(value, "_", "-");
+			CIcon *icon = CIcon::Get(value);
+			if (icon != nullptr) {
+				this->Icon = icon;
+			} else {
+				fprintf(stderr, "Invalid icon: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "class") {
+			value = FindAndReplaceString(value, "_", "-");
+			const std::string &class_name = value;
+			
+			int class_id = GetUpgradeClassIndexByName(class_name);
+			if (class_id == -1) {
+				SetUpgradeClassStringToIndex(class_name, UpgradeClasses.size());
+				class_id = UpgradeClasses.size();
+				UpgradeClasses.push_back(class_name);
+			}
+			
+			this->Class = class_id;
+		} else if (key == "civilization") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CCivilization *civilization = CCivilization::GetCivilization(value);
+			if (civilization) {
+				this->Civilization = civilization->ID;
+			}
+		} else if (key == "faction") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CFaction *faction = PlayerRaces.GetFaction(value);
+			if (faction) {
+				this->Faction = faction->ID;
+			} else {
+				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "description") {
+			this->Description = value;
+		} else if (key == "quote") {
+			this->Quote = value;
+		} else if (key == "background") {
+			this->Background = value;
+		} else if (key == "effects_string") {
+			this->EffectsString = value;
+		} else if (key == "requirements_string") {
+			this->RequirementsString = value;
 		} else {
 			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", key.c_str());
 		}
+	}
+	
+	for (const CConfigData *child_config_data : config_data->Children) {
+		if (child_config_data->Tag == "costs") {
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				key = FindAndReplaceString(key, "_", "-");
+				
+				const int resource = GetResourceIdByName(key.c_str());
+				if (resource != -1) {
+					this->Costs[resource] = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
+				}
+			}
+		} else if (child_config_data->Tag == "dependency" || child_config_data->Tag == "predependency") {
+			std::string target = config_data->Ident;
+			target = FindAndReplaceString(target, "_", "-");
+			DependRule::ProcessConfigData(child_config_data, DependRuleUpgrade, target);
+		} else if (child_config_data->Tag == "modifier") {
+			CUpgradeModifier *modifier = new CUpgradeModifier;
+			modifier->UpgradeId = this->ID;
+			this->UpgradeModifiers.push_back(modifier);
+			
+			modifier->ProcessConfigData(child_config_data);
+			
+			::UpgradeModifiers[NumUpgradeModifiers++] = modifier;
+		} else {
+			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+	
+	//set the upgrade's civilization and class here
+	if (this->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
+		int class_id = this->Class;
+		if (this->Civilization != -1) {
+			int civilization_id = this->Civilization;
+			
+			if (this->Faction != -1) {
+				int faction_id = this->Faction;
+				if (faction_id != -1 && class_id != -1) {
+					PlayerRaces.Factions[faction_id]->ClassUpgrades[class_id] = this->ID;
+				}
+			} else {
+				if (civilization_id != -1 && class_id != -1) {
+					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = this->ID;
+				}
+			}
+		}
+	}
+	
+	for (unsigned int i = 0; i < UpgradeMax; ++i) { //add the upgrade to the incompatible affix's counterpart list here
+		if (this->IncompatibleAffixes[i]) {
+			AllUpgrades[i]->IncompatibleAffixes[this->ID] = true;
+		}
+	}
+	
+	//load icon here
+	if (this->Icon != nullptr && !this->Icon->Loaded) {
+		this->Icon->Load();
 	}
 	
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
@@ -294,35 +396,6 @@ CUpgrade *CUpgrade::Get(const std::string &ident)
 		DebugPrint("upgrade not found: %s\n" _C_ ident.c_str());
 	}
 	return upgrade;
-}
-
-int CUpgradeModifier::GetUnitStock(CUnitType *unit_type) const
-{
-	if (unit_type && this->UnitStock.find(unit_type) != this->UnitStock.end()) {
-		return this->UnitStock.find(unit_type)->second;
-	} else {
-		return 0;
-	}
-}
-
-void CUpgradeModifier::SetUnitStock(CUnitType *unit_type, int quantity)
-{
-	if (!unit_type) {
-		return;
-	}
-	
-	if (quantity == 0) {
-		if (this->UnitStock.find(unit_type) != this->UnitStock.end()) {
-			this->UnitStock.erase(unit_type);
-		}
-	} else {
-		this->UnitStock[unit_type] = quantity;
-	}
-}
-
-void CUpgradeModifier::ChangeUnitStock(CUnitType *unit_type, int quantity)
-{
-	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
 /**
@@ -737,12 +810,6 @@ static int CclDefineModifier(lua_State *l)
 
 	CUpgradeModifier *um = new CUpgradeModifier;
 
-	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
-	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
-	um->Modifier.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
-	um->ModifyPercent = new int[UnitTypeVar.GetNumberVariable()];
-	memset(um->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
-
 	std::string upgrade_ident = LuaToString(l, 1);
 	um->UpgradeId = UpgradeIdByIdent(upgrade_ident);
 	if (um->UpgradeId == -1) {
@@ -758,21 +825,6 @@ static int CclDefineModifier(lua_State *l)
 			LuaError(l, "incorrect argument");
 		}
 		const char *key = LuaToString(l, j + 1, 1);
-#if 0 // To be removed. must modify lua file.
-		if (!strcmp(key, "attack-range")) {
-			key = "AttackRange";
-		} else if (!strcmp(key, "sight-range")) {
-			key = "SightRange";
-		} else if (!strcmp(key, "basic-damage")) {
-			key = "BasicDamage";
-		} else if (!strcmp(key, "piercing-damage")) {
-			key = "PiercingDamage";
-		} else if (!strcmp(key, "armor")) {
-			key = "Armor";
-		} else if (!strcmp(key, "hit-points")) {
-			key = "HitPoints";
-		}
-#endif
 		if (!strcmp(key, "regeneration-rate")) {
 			um->Modifier.Variables[HP_INDEX].Increase = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "cost")) {

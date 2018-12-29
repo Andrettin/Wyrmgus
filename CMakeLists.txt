@@ -370,7 +370,6 @@ source_group(ui FILES ${ui_SRCS})
 
 set(unit_SRCS
 	src/unit/build.cpp
-	src/unit/depend.cpp
 	src/unit/historical_unit.cpp
 	src/unit/script_unit.cpp
 	src/unit/script_unittype.cpp
@@ -382,9 +381,15 @@ set(unit_SRCS
 	src/unit/unit_save.cpp
 	src/unit/unitptr.cpp
 	src/unit/unittype.cpp
-	src/unit/upgrade.cpp
 )
 source_group(unit FILES ${unit_SRCS})
+
+set(upgrade_SRCS
+	src/upgrade/depend.cpp
+	src/upgrade/upgrade.cpp
+	src/upgrade/upgrade_modifier.cpp
+)
+source_group(upgrade FILES ${upgrade_SRCS})
 
 set(video_SRCS
 	src/video/color.cpp
@@ -461,6 +466,7 @@ set(stratagus_SRCS
 	${time_SRCS}
 	${ui_SRCS}
 	${unit_SRCS}
+	${upgrade_SRCS}
 	${video_SRCS}
 	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
@@ -628,6 +634,13 @@ set(stratagus_unit_HDRS
 	src/include/unit/unittype.h
 )
 
+set(stratagus_upgrade_HDRS
+	src/include/upgrade/depend.h
+	src/include/upgrade/upgrade.h
+	src/include/upgrade/upgrade_modifier.h
+	src/include/upgrade/upgrade_structs.h
+)
+
 set(stratagus_xbrz_HDRS
 	src/xbrz/include/config.h
 	src/xbrz/include/xbrz.h
@@ -649,7 +662,6 @@ set(stratagus_generic_HDRS
 	src/include/construct.h
 	src/include/currency.h
 	src/include/cursor.h
-	src/include/depend.h
 	src/include/editor.h
 	src/include/font.h
 	src/include/game.h
@@ -693,8 +705,6 @@ set(stratagus_generic_HDRS
 	src/include/translate.h
 	src/include/trigger.h
 	src/include/unitsound.h
-	src/include/upgrade.h
-	src/include/upgrade_structs.h
 	src/include/util.h
 	src/include/vec2i.h
 	src/include/version.h
@@ -716,6 +726,7 @@ source_group(include\\spell FILES ${stratagus_spell_HDRS})
 source_group(include\\time FILES ${stratagus_time_HDRS})
 source_group(include\\ui FILES ${stratagus_ui_HDRS})
 source_group(include\\unit FILES ${stratagus_unit_HDRS})
+source_group(include\\upgrade FILES ${stratagus_upgrade_HDRS})
 source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
 
 
@@ -730,6 +741,7 @@ set(stratagus_HDRS
 	${stratagus_time_HDRS}
 	${stratagus_ui_HDRS}
 	${stratagus_unit_HDRS}
+	${stratagus_upgrade_HDRS}
 	${stratagus_xbrz_HDRS}
 )
 

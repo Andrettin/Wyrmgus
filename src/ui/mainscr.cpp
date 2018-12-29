@@ -72,7 +72,7 @@
 //Wyrmgus start
 #include "util.h"
 //Wyrmgus end
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 #include "version.h"
 #include "video.h"
 #include "world.h"

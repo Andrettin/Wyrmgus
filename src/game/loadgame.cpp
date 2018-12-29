@@ -43,7 +43,6 @@
 #include "commands.h"
 #include "construct.h"
 #include "currency.h"
-#include "depend.h"
 #include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -84,7 +83,8 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/depend.h"
+#include "upgrade/upgrade.h"
 #include "video.h"
 #include "world.h"
 

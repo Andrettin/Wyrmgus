@@ -59,7 +59,8 @@
 #include "spells.h"
 #include "time/calendar.h"
 #include "unit/unit.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
+#include "upgrade/upgrade_modifier.h"
 
 #include "../ai/ai_local.h" //for using AiHelpers
 

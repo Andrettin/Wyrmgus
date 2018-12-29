@@ -42,7 +42,6 @@
 #include "action/action_repair.h"
 #include "action/action_resource.h"
 #include "commands.h"
-#include "depend.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
@@ -52,7 +51,9 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/depend.h"
+#include "upgrade/upgrade.h"
+#include "upgrade/upgrade_modifier.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

@@ -36,13 +36,13 @@
 #include "age.h"
 
 #include "config.h"
-#include "depend.h"
 #include "game.h"
 #include "mod.h"
 #include "player.h"
 #include "time/calendar.h"
 #include "unit/unittype.h"
-#include "upgrade_structs.h"
+#include "upgrade/depend.h"
+#include "upgrade/upgrade_structs.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

@@ -46,7 +46,6 @@
 #include "civilization.h"
 #include "config.h"
 #include "construct.h"
-#include "depend.h"
 //Wyrmgus start
 #include "editor.h" //for personal name generation
 //Wyrmgus end
@@ -68,8 +67,9 @@
 #include "util.h"
 #include "video.h"
 #include "ui/button_level.h"
+#include "upgrade/depend.h"
 //Wyrmgus start
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 //Wyrmgus end
 
 #include <ctype.h>
@@ -890,7 +890,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		} else {
 			key = SnakeCaseToPascalCase(key);
 			
-			int index = UnitTypeVar.VariableNameLookup[key.c_str()];
+			int index = UnitTypeVar.VariableNameLookup[key.c_str()]; // variable index
 			if (index != -1) { // valid index
 				if (IsStringNumber(value)) {
 					this->DefaultStat.Variables[index].Enable = 1;
@@ -898,32 +898,29 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					this->DefaultStat.Variables[index].Max = std::stoi(value);
 				} else if (IsStringBool(value)) {
 					this->DefaultStat.Variables[index].Enable = StringToBool(value);
-				} else { // Error
+				} else { // error
 					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key.c_str(), this->Ident.c_str());
 				}
-				continue;
-			}
-
-			if (this->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
-				this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
-			}
-
-			index = UnitTypeVar.BoolFlagNameLookup[key.c_str()];
-			if (index != -1) {
-				if (IsStringNumber(value)) {
-					this->BoolFlag[index].value = (std::stoi(value) != 0);
-				} else {
-					this->BoolFlag[index].value = StringToBool(value);
-				}
 			} else {
-				fprintf(stderr, "Invalid unit type property: \"%s\".\n", key.c_str());
+				if (this->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
+					this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
+				}
+
+				index = UnitTypeVar.BoolFlagNameLookup[key.c_str()];
+				if (index != -1) {
+					if (IsStringNumber(value)) {
+						this->BoolFlag[index].value = (std::stoi(value) != 0);
+					} else {
+						this->BoolFlag[index].value = StringToBool(value);
+					}
+				} else {
+					fprintf(stderr, "Invalid unit type property: \"%s\".\n", key.c_str());
+				}
 			}
 		}
 	}
 	
-	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		const CConfigData *child_config_data = config_data->Children[i];
-		
+	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "costs") {
 			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
 				std::string key = child_config_data->Properties[j].first;

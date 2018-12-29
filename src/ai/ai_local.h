@@ -41,8 +41,8 @@
 #include <tuple>
 //Wyrmgus end
 
-#include "upgrade_structs.h" // MaxCost
 #include "unit/unit_cache.h"
+#include "upgrade/upgrade_structs.h" // MaxCost
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------

@@ -59,7 +59,7 @@
 #include "spell/spell_summon.h"
 #include "spell/spell_teleport.h"
 #include "unit/unittype.h"
-#include "upgrade.h"
+#include "upgrade/upgrade.h"
 
 
 // **************************************************************************
