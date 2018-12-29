@@ -1346,20 +1346,22 @@ void CUnit::ChooseButtonIcon(int button_action)
 
 	int all_upgrades_size = AllUpgrades.size();
 	
-	for (int i = (NumUpgradeModifiers - 1); i >= 0; --i) {
-		if (this->Player->Allow.Upgrades[UpgradeModifiers[i]->UpgradeId] == 'R' && UpgradeModifiers[i]->ApplyTo[this->Type->Slot] == 'X') {
+	for (int i = (CUpgradeModifier::UpgradeModifiers.size() - 1); i >= 0; --i) {
+		const CUpgradeModifier *modifier = CUpgradeModifier::UpgradeModifiers[i];
+		const CUpgrade *upgrade = AllUpgrades[modifier->UpgradeId];
+		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->Slot] == 'X') {
 			if (
 				(
-					(button_action == ButtonAttack && (AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Weapon || AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Arrows))
-					|| (button_action == ButtonStop && AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Shield)
-					|| (button_action == ButtonMove && AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Boots)
+					(button_action == ButtonAttack && (upgrade->Weapon || upgrade->Arrows))
+					|| (button_action == ButtonStop && upgrade->Shield)
+					|| (button_action == ButtonMove && upgrade->Boots)
 				)
-				&& AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->Icon.Icon != nullptr
+				&& upgrade->Item->Icon.Icon != nullptr
 			) {
-				this->ButtonIcons[button_action] = AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->Icon.Icon;
+				this->ButtonIcons[button_action] = upgrade->Item->Icon.Icon;
 				return;
-			} else if (button_action == ButtonStandGround && (AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Weapon || AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Arrows) && AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->ButtonIcons.find(button_action) != AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->ButtonIcons.end()) {
-				this->ButtonIcons[button_action] = AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->ButtonIcons.find(button_action)->second.Icon;
+			} else if (button_action == ButtonStandGround && (upgrade->Weapon || upgrade->Arrows) && upgrade->Item->ButtonIcons.find(button_action) != upgrade->Item->ButtonIcons.end()) {
+				this->ButtonIcons[button_action] = upgrade->Item->ButtonIcons.find(button_action)->second.Icon;
 				return;
 			}
 		}
@@ -1440,60 +1442,60 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	
 	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from weapon technologies or from abilities which require the base weapon class but aren't compatible with this weapon's class; and apply upgrade modifiers from abilities which require this weapon's class
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			CUpgrade *modifier_upgrade = AllUpgrades[UpgradeModifiers[z]->UpgradeId];
+		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
 			if (
-				(modifier_upgrade->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X')
+				(modifier_upgrade->Weapon && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X')
 				|| (modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
 			) {
 				if (this->GetIndividualUpgrade(modifier_upgrade)) {
 					for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
-						RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+						RemoveIndividualUpgradeModifier(*this, modifier);
 					}
 				} else {
-					RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+					RemoveIndividualUpgradeModifier(*this, modifier);
 				}
 			} else if (
 				modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) == modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) != modifier_upgrade->WeaponClasses.end()
 			) {
 				if (this->GetIndividualUpgrade(modifier_upgrade)) {
 					for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
-						ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+						ApplyIndividualUpgradeModifier(*this, modifier);
 					}
 				} else {
-					ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+					ApplyIndividualUpgradeModifier(*this, modifier);
 				}
 			}
 		}
 	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from shield technologies
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			CUpgrade *modifier_upgrade = AllUpgrades[UpgradeModifiers[z]->UpgradeId];
-			if (modifier_upgrade->Shield && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
-				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			if (modifier_upgrade->Shield && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	} else if (item_slot == BootsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from boots technologies
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			CUpgrade *modifier_upgrade = AllUpgrades[UpgradeModifiers[z]->UpgradeId];
-			if (modifier_upgrade->Boots && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
-				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			if (modifier_upgrade->Boots && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	} else if (item_slot == ArrowsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from arrows technologies
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			CUpgrade *modifier_upgrade = AllUpgrades[UpgradeModifiers[z]->UpgradeId];
-			if (modifier_upgrade->Arrows && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
-				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			if (modifier_upgrade->Arrows && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				RemoveIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	}
 	
 	if (item.Unique && item.Unique->Set && this->EquippingItemCompletesSet(&item)) {
-		for (size_t z = 0; z < item.Unique->Set->UpgradeModifiers.size(); ++z) {
-			ApplyIndividualUpgradeModifier(*this, item.Unique->Set->UpgradeModifiers[z]);
+		for (const CUpgradeModifier *modifier : item.Unique->Set->UpgradeModifiers) {
+			ApplyIndividualUpgradeModifier(*this, modifier);
 		}
 	}
 
@@ -1602,8 +1604,8 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	}
 	
 	if (item.Unique && item.Unique->Set && this->DeequippingItemBreaksSet(&item)) {
-		for (size_t z = 0; z < item.Unique->Set->UpgradeModifiers.size(); ++z) {
-			RemoveIndividualUpgradeModifier(*this, item.Unique->Set->UpgradeModifiers[z]);
+		for (const CUpgradeModifier *modifier : item.Unique->Set->UpgradeModifiers) {
+			RemoveIndividualUpgradeModifier(*this, modifier);
 		}
 	}
 
@@ -1631,53 +1633,53 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	
 	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from weapon technologies, and apply ability effects that are weapon class-specific accordingly
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			CUpgrade *modifier_upgrade = AllUpgrades[UpgradeModifiers[z]->UpgradeId];
+		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
 			if (
-				(modifier_upgrade->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X')
+				(modifier_upgrade->Weapon && Player->Allow.Upgrades[modifier->UpgradeId] == 'R' && modifier->ApplyTo[Type->Slot] == 'X')
 				|| (modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
 			) {
 				if (this->GetIndividualUpgrade(modifier_upgrade)) {
 					for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
-						ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+						ApplyIndividualUpgradeModifier(*this, modifier);
 					}
 				} else {
-					ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+					ApplyIndividualUpgradeModifier(*this, modifier);
 				}
 			} else if (
 				modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) == modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) != modifier_upgrade->WeaponClasses.end()
 			) {
 				if (this->GetIndividualUpgrade(modifier_upgrade)) {
 					for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
-						RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+						RemoveIndividualUpgradeModifier(*this, modifier);
 					}
 				} else {
-					RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+					RemoveIndividualUpgradeModifier(*this, modifier);
 				}
 			}
 		}
 	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from shield technologies
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			CUpgrade *modifier_upgrade = AllUpgrades[UpgradeModifiers[z]->UpgradeId];
-			if (modifier_upgrade->Shield && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
-				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			if (modifier_upgrade->Shield && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	} else if (item_slot == BootsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from boots technologies
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			CUpgrade *modifier_upgrade = AllUpgrades[UpgradeModifiers[z]->UpgradeId];
-			if (modifier_upgrade->Boots && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
-				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			if (modifier_upgrade->Boots && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	} else if (item_slot == ArrowsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from arrows technologies
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			CUpgrade *modifier_upgrade = AllUpgrades[UpgradeModifiers[z]->UpgradeId];
-			if (modifier_upgrade->Arrows && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
-				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+			if (modifier_upgrade->Arrows && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') {
+				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 		}
 	}
@@ -4511,11 +4513,11 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	//Wyrmgus end
 
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
-	for (int z = 0; z < NumUpgradeModifiers; ++z) {
-		if (oldplayer->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] != 'R' && newplayer.Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade (but the new one does), and the upgrade is applicable to the unit
+	for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
+		if (oldplayer->Allow.Upgrades[modifier_upgrade->ID] != 'R' && newplayer.Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade (but the new one does), and the upgrade is applicable to the unit
 			//Wyrmgus start
-//			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
-			CUpgrade *modifier_upgrade = AllUpgrades[UpgradeModifiers[z]->UpgradeId];
+//			ApplyIndividualUpgradeModifier(*this, modifier);
 			if ( // don't apply equipment-related upgrades if the unit has an item of that equipment type equipped
 				(!modifier_upgrade->Weapon || EquippedItems[WeaponItemSlot].size() == 0)
 				&& (!modifier_upgrade->Shield || EquippedItems[ShieldItemSlot].size() == 0)
@@ -4524,7 +4526,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 				&& !(newplayer.Race != -1 && modifier_upgrade->Ident == PlayerRaces.CivilizationUpgrades[newplayer.Race])
 				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == PlayerRaces.Factions[newplayer.Faction]->FactionUpgrade)
 			) {
-				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
 			//Wyrmgus end
 		}
@@ -5341,15 +5343,15 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 		}
 		
 		if (!item->Identified) { //if the item is unidentified, don't show the effects of its affixes
-			for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				if (
-					(item->Prefix != nullptr && UpgradeModifiers[z]->UpgradeId == item->Prefix->ID)
-					|| (item->Suffix != nullptr && UpgradeModifiers[z]->UpgradeId == item->Suffix->ID)
+					(item->Prefix != nullptr && modifier->UpgradeId == item->Prefix->ID)
+					|| (item->Suffix != nullptr && modifier->UpgradeId == item->Suffix->ID)
 				) {
 					if (!increase) {
-						value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+						value -= modifier->Modifier.Variables[variable_index].Value;
 					} else {
-						value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+						value -= modifier->Modifier.Variables[variable_index].Increase;
 					}
 				}
 			}
@@ -5391,8 +5393,8 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 				}
 			}
 		} else if (EquippedItems[item_slot].size() == 0 && (item_slot == WeaponItemSlot || item_slot == ShieldItemSlot || item_slot == BootsItemSlot || item_slot == ArrowsItemSlot)) {
-			for (int z = 0; z < NumUpgradeModifiers; ++z) {
-				CUpgrade *modifier_upgrade = AllUpgrades[UpgradeModifiers[z]->UpgradeId];
+			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+				const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
 				if (
 					(
 						(
@@ -5401,23 +5403,23 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 							|| (modifier_upgrade->Boots && item_slot == BootsItemSlot)
 							|| (modifier_upgrade->Arrows && item_slot == ArrowsItemSlot)
 						)
-						&& Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X'
+						&& Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X'
 					)
 					|| (item_slot == WeaponItemSlot && modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->GetCurrentWeaponClass()) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item->Type->ItemClass) == modifier_upgrade->WeaponClasses.end())
 				) {
 					if (this->GetIndividualUpgrade(modifier_upgrade)) {
 						for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
 							if (!increase) {
-								value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+								value -= modifier->Modifier.Variables[variable_index].Value;
 							} else {
-								value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+								value -= modifier->Modifier.Variables[variable_index].Increase;
 							}
 						}
 					} else {
 						if (!increase) {
-							value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+							value -= modifier->Modifier.Variables[variable_index].Value;
 						} else {
-							value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+							value -= modifier->Modifier.Variables[variable_index].Increase;
 						}
 					}
 				} else if (
@@ -5426,16 +5428,16 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 					if (this->GetIndividualUpgrade(modifier_upgrade)) {
 						for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
 							if (!increase) {
-								value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+								value += modifier->Modifier.Variables[variable_index].Value;
 							} else {
-								value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+								value += modifier->Modifier.Variables[variable_index].Increase;
 							}
 						}
 					} else {
 						if (!increase) {
-							value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+							value += modifier->Modifier.Variables[variable_index].Value;
 						} else {
-							value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+							value += modifier->Modifier.Variables[variable_index].Increase;
 						}
 					}
 				}

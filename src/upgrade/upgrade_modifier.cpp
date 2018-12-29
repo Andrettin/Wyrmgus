@@ -47,9 +47,7 @@
 ----------------------------------------------------------------------------*/
 
 /// Upgrades modifiers
-CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
-/// Number of upgrades modifiers used
-int NumUpgradeModifiers;
+std::vector<CUpgradeModifier *> CUpgradeModifier::UpgradeModifiers;
 
 /*----------------------------------------------------------------------------
 --  Functions

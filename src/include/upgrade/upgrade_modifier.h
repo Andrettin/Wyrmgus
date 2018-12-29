@@ -66,6 +66,8 @@ public:
 		}
 	}
 	
+	static std::vector<CUpgradeModifier *> UpgradeModifiers;
+	
 	void ProcessConfigData(const CConfigData *config_data);
 	
 	int GetUnitStock(CUnitType *unit_type) const;
@@ -101,12 +103,5 @@ public:
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-
-/// How many upgrades modifiers supported
-#define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
-
-extern CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
-
-extern int NumUpgradeModifiers;
 
 #endif

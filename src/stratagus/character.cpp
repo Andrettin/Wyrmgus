@@ -733,13 +733,13 @@ void CCharacter::UpdateAttributes()
 	for (int i = 0; i < MaxAttributes; ++i) {
 		int var = GetAttributeVariableIndex(i);
 		this->Attributes[i] = this->Type->DefaultStat.Variables[var].Value;
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 			if (
-				(this->Trait != nullptr && UpgradeModifiers[z]->UpgradeId == this->Trait->ID)
-				|| std::find(this->Abilities.begin(), this->Abilities.end(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]) != this->Abilities.end()
+				(this->Trait != nullptr && modifier->UpgradeId == this->Trait->ID)
+				|| std::find(this->Abilities.begin(), this->Abilities.end(), AllUpgrades[modifier->UpgradeId]) != this->Abilities.end()
 			) {
-				if (UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
-					this->Attributes[i] += UpgradeModifiers[z]->Modifier.Variables[var].Value;
+				if (modifier->Modifier.Variables[var].Value != 0) {
+					this->Attributes[i] += modifier->Modifier.Variables[var].Value;
 				}
 			}
 		}

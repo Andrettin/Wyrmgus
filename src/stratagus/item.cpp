@@ -626,15 +626,15 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 				variable_value = item->ResourcesHeld;
 			}
 			
-			for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
 				if (
-					(item->Prefix != nullptr && UpgradeModifiers[z]->UpgradeId == item->Prefix->ID)
-					|| (item->Suffix != nullptr && UpgradeModifiers[z]->UpgradeId == item->Suffix->ID)
-					|| (item->Work != nullptr && UpgradeModifiers[z]->UpgradeId == item->Work->ID)
-					|| (item->Elixir != nullptr && UpgradeModifiers[z]->UpgradeId == item->Elixir->ID)
+					(item->Prefix != nullptr && modifier->UpgradeId == item->Prefix->ID)
+					|| (item->Suffix != nullptr && modifier->UpgradeId == item->Suffix->ID)
+					|| (item->Work != nullptr && modifier->UpgradeId == item->Work->ID)
+					|| (item->Elixir != nullptr && modifier->UpgradeId == item->Elixir->ID)
 				) {
-					variable_value += UpgradeModifiers[z]->Modifier.Variables[var].Value;
-					variable_increase += UpgradeModifiers[z]->Modifier.Variables[var].Increase;
+					variable_value += modifier->Modifier.Variables[var].Value;
+					variable_increase += modifier->Modifier.Variables[var].Increase;
 				}
 			}
 						

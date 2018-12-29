@@ -324,7 +324,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			
 			modifier->ProcessConfigData(child_config_data);
 			
-			::UpgradeModifiers[NumUpgradeModifiers++] = modifier;
+			CUpgradeModifier::UpgradeModifiers.push_back(modifier);
 		} else {
 			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
@@ -421,10 +421,10 @@ void CleanUpgrades()
 	//
 	//  Free the upgrade modifiers.
 	//
-	for (int i = 0; i < NumUpgradeModifiers; ++i) {
-		delete UpgradeModifiers[i];
+	for (size_t i = 0; i < CUpgradeModifier::UpgradeModifiers.size(); ++i) {
+		delete CUpgradeModifier::UpgradeModifiers[i];
 	}
-	NumUpgradeModifiers = 0;
+	CUpgradeModifier::UpgradeModifiers.clear();
 }
 
 /**
@@ -957,7 +957,7 @@ static int CclDefineModifier(lua_State *l)
 		}
 	}
 
-	UpgradeModifiers[NumUpgradeModifiers++] = um;
+	CUpgradeModifier::UpgradeModifiers.push_back(um);
 	
 	return 0;
 }
@@ -2358,15 +2358,8 @@ void UpgradeLost(CPlayer &player, int id)
 		}
 	}
 
-	/*
-	for (int z = 0; z < NumUpgradeModifiers; ++z) {
-		if (UpgradeModifiers[z]->UpgradeId == id) {
-			RemoveUpgradeModifier(player, UpgradeModifiers[z]);
-		}
-	}
-	*/
-	for (size_t z = 0; z < AllUpgrades[id]->UpgradeModifiers.size(); ++z) {
-		RemoveUpgradeModifier(player, AllUpgrades[id]->UpgradeModifiers[z]);
+	for (const CUpgradeModifier *modifier : AllUpgrades[id]->UpgradeModifiers) {
+		RemoveUpgradeModifier(player, modifier);
 	}
 	//Wyrmgus end
 
@@ -2507,9 +2500,9 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 
 	//Wyrmgus start
 	/*
-	for (int z = 0; z < NumUpgradeModifiers; ++z) {
-		if (UpgradeModifiers[z]->UpgradeId == id) {
-			ApplyIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
+	for (const CUpgradeModifier *modifier : CUpgradeModifier::UpgradeModifiers) {
+		if (modifier->UpgradeId == id) {
+			ApplyIndividualUpgradeModifier(unit, modifier);
 		}
 	}
 	*/
