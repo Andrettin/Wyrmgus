@@ -1063,7 +1063,30 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			target = FindAndReplaceString(target, "_", "-");
 			DependRule::ProcessConfigData(child_config_data, DependRuleUnitType, target);
 		} else {
-			fprintf(stderr, "Invalid unit type property: \"%s\".\n", child_config_data->Tag.c_str());
+			std::string tag = SnakeCaseToPascalCase(child_config_data->Tag);
+			
+			const int index = UnitTypeVar.VariableNameLookup[tag.c_str()]; // variable index
+			
+			if (index != -1) { // valid index
+				for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+					std::string key = child_config_data->Properties[j].first;
+					std::string value = child_config_data->Properties[j].second;
+					
+					if (key == "enable") {
+						this->DefaultStat.Variables[index].Enable = StringToBool(value);
+					} else if (key == "value") {
+						this->DefaultStat.Variables[index].Value = std::stoi(value);
+					} else if (key == "max") {
+						this->DefaultStat.Variables[index].Max = std::stoi(value);
+					} else if (key == "increase") {
+						this->DefaultStat.Variables[index].Increase = std::stoi(value);
+					} else {
+						fprintf(stderr, "Invalid variable property: \"%s\".\n", key.c_str());
+					}
+				}
+			} else {
+				fprintf(stderr, "Invalid unit type property: \"%s\".\n", child_config_data->Tag.c_str());
+			}
 		}
 	}
 	
