@@ -76,7 +76,12 @@ typedef void *recvbuftype;
 typedef const void *sendtobuftype;
 typedef const void *sendbuftype;
 #endif
-
+#if defined(__MORPHOS__)
+typedef int socklen_t;
+#undef closesocket
+#define closesocket CloseSocket
+#define ioctl(x,y,z) IoctlSocket(x,y,(char *)z)
+#endif
 //----------------------------------------------------------------------------
 //  Low level functions
 //----------------------------------------------------------------------------
@@ -202,9 +207,17 @@ int NetSetNonBlocking(Socket sockfd)
 unsigned long NetResolveHost(const std::string &host)
 {
 	if (!host.empty()) {
+		#ifdef __MORPHOS__
+		unsigned long addr = inet_addr((UBYTE *)host.c_str()); // try dot notation
+		#else
 		unsigned long addr = inet_addr(host.c_str()); // try dot notation
+		#endif
 		if (addr == INADDR_NONE) {
+			#ifdef __MORPHOS__
+			struct hostent *he = gethostbyname((UBYTE *)host.c_str());
+			#else
 			struct hostent *he = gethostbyname(host.c_str());
+			#endif
 			if (he) {
 				addr = 0;
 				Assert(he->h_length == 4);
@@ -403,7 +416,11 @@ Socket NetOpenTCP(const char *addr, int port)
 		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
 		if (addr) {
+			#ifdef __MORPHOS__
+			sock_addr.sin_addr.s_addr = inet_addr((UBYTE *)addr);
+			#else
 			sock_addr.sin_addr.s_addr = inet_addr(addr);
+			#endif
 		} else {
 			sock_addr.sin_addr.s_addr = INADDR_ANY;
 		}
@@ -565,8 +582,12 @@ int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *
 {
 	struct sockaddr_in sock_addr;
 	socklen_t n = sizeof(struct sockaddr_in);
+	#ifdef __MORPHOS__
+	const int l = recvfrom(sockfd, (UBYTE*)buf, len, 0, (struct sockaddr *)&sock_addr, (LONG*)&n);
+	#else
 	const int l = recvfrom(sockfd, (recvfrombuftype)buf, len, 0, (struct sockaddr *)&sock_addr, &n);
-
+	#endif
+	
 	if (l < 0) {
 		PrintFunction();
 		fprintf(stdout, "Could not read from UDP socket\n");
@@ -593,7 +614,11 @@ int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *
 */
 int NetRecvTCP(Socket sockfd, void *buf, int len)
 {
+	#ifdef __MORPHOS__
+	int ret = recv(sockfd, (UBYTE*)buf, len, 0);
+	#else
 	int ret = recv(sockfd, (recvbuftype)buf, len, 0);
+	#endif
 	if (ret > 0) {
 		return ret;
 	}
@@ -630,8 +655,11 @@ int NetSendUDP(Socket sockfd, unsigned long host, int port,
 	sock_addr.sin_addr.s_addr = host;
 	sock_addr.sin_port = port;
 	sock_addr.sin_family = AF_INET;
-
+	#ifdef __MORPHOS__
+	return sendto(sockfd,  (const UBYTE*)(sendtobuftype)buf, len, 0, (struct sockaddr *)&sock_addr, n);
+	#else
 	return sendto(sockfd, (sendtobuftype)buf, len, 0, (struct sockaddr *)&sock_addr, n);
+	#endif
 }
 
 /**
@@ -645,7 +673,11 @@ int NetSendUDP(Socket sockfd, unsigned long host, int port,
 */
 int NetSendTCP(Socket sockfd, const void *buf, int len)
 {
+	#ifdef __MORPHOS__
+	return send(sockfd, (const UBYTE*)buf, len, 0);
+	#else
 	return send(sockfd, (sendbuftype)buf, len, 0);
+	#endif
 }
 
 /**
@@ -673,8 +705,11 @@ Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *clientPort)
 {
 	struct sockaddr_in sa;
 	socklen_t len = sizeof(struct sockaddr_in);
-
+	#ifdef __MORPHOS__
+	Socket socket = accept(sockfd, (struct sockaddr *)&sa, (LONG*)&len);
+	#else
 	Socket socket = accept(sockfd, (struct sockaddr *)&sa, &len);
+	#endif
 	*clientHost = sa.sin_addr.s_addr;
 	*clientPort = sa.sin_port;
 	return socket;
