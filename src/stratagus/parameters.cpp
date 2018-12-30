@@ -52,6 +52,8 @@ void Parameters::SetDefaultUserDirectory()
 	userDirectory = StratagusLibPath;
 #elif USE_WIN32
 	userDirectory = getenv("APPDATA");
+#elif __MORPHOS__
+	userDirectory = "home";	
 #else
 	userDirectory = getenv("HOME");
 #endif
