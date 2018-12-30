@@ -40,6 +40,10 @@
 
 #include <stdio.h>
 
+#ifdef __MORPHOS__
+#undef socket
+#endif
+
 //
 // CHost
 //
