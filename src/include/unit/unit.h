@@ -182,6 +182,9 @@ public:
 	//Wyrmgus end
 
 	/// Remove unit from map/groups/...
+	#ifdef __MORPHOS__
+	#undef Remove
+	#endif
 	void Remove(CUnit *host);
 
 	void AssignWorkerToMine(CUnit &mine);
