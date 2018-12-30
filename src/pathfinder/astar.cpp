@@ -51,8 +51,11 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-
+#ifdef __MORPHOS__
+struct _Node {
+#else
 struct Node {
+#endif
 	int CostFromStart;  /// Real costs to reach this point
 	short int CostToGoal;     /// Estimated cost to goal
 	char InGoal;        /// is this point in the goal
@@ -95,7 +98,11 @@ const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
 /// cost matrix
 //Wyrmgus start
 //static Node *AStarMatrix;
+#ifdef __MORPHOS__
+static std::vector<_Node *> AStarMatrix;
+#else
 static std::vector<Node *> AStarMatrix;
+#endif
 //Wyrmgus end
 
 /// a list of close nodes, helps to speed up the matrix cleaning
@@ -316,8 +323,13 @@ void InitAStar()
 		AStarMapWidth.push_back(Map.Info.MapWidths[z]);
 		AStarMapHeight.push_back(Map.Info.MapHeights[z]);
 		
+		#ifdef __MORPHOS__
+		AStarMatrixSize.push_back(sizeof(_Node) * AStarMapWidth[z] * AStarMapHeight[z]);
+		AStarMatrix.push_back(new _Node[AStarMapWidth[z] * AStarMapHeight[z]]);
+		#else	
 		AStarMatrixSize.push_back(sizeof(Node) * AStarMapWidth[z] * AStarMapHeight[z]);
 		AStarMatrix.push_back(new Node[AStarMapWidth[z] * AStarMapHeight[z]]);
+		#endif
 		memset(AStarMatrix[z], 0, AStarMatrixSize[z]);
 
 		Threshold.push_back(AStarMapWidth[z] * AStarMapHeight[z] / MAX_CLOSE_SET_RATIO);
@@ -1627,7 +1639,11 @@ StatsNode *AStarGetStats(int z)
 	StatsNode *s = stats;
 	//Wyrmgus start
 //	Node *m = AStarMatrix;
+	#ifdef __MORPHOS__
+	_Node *m = AStarMatrix[z];
+	#else
 	Node *m = AStarMatrix[z];
+	#endif
 	//Wyrmgus end
 
 	//Wyrmgus start
