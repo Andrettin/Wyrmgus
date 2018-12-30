@@ -186,13 +186,13 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	
 	player.IncreaseCountsForUnit(&unit);
 	
-	for (size_t i = 0; i < player.QuestObjectives.size(); ++i) {
+	for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 		if (
-			(player.QuestObjectives[i]->ObjectiveType == BuildUnitsObjectiveType && player.QuestObjectives[i]->UnitType == &type)
-			|| (player.QuestObjectives[i]->ObjectiveType == BuildUnitsOfClassObjectiveType && player.QuestObjectives[i]->UnitClass == type.Class)
+			(objective->ObjectiveType == BuildUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
+			|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == type.Class)
 		) {
-			if (!player.QuestObjectives[i]->Settlement || player.QuestObjectives[i]->Settlement == unit.Settlement) {
-				player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + 1, player.QuestObjectives[i]->Quantity);
+			if (!objective->Settlement || objective->Settlement == unit.Settlement) {
+				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 			}
 		}
 	}

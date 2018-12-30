@@ -77,34 +77,24 @@ enum ObjectiveTypes {
 class CQuestObjective
 {
 public:
-	CQuestObjective() :
-		ObjectiveType(-1), Quantity(1), Resource(-1), UnitClass(-1),
-		Quest(nullptr), UnitType(nullptr), Upgrade(nullptr), Character(nullptr), Unique(nullptr), Settlement(nullptr), Faction(nullptr)
-	{
-	}
-	
-	int ObjectiveType;
-	int Quantity;
-	int Resource;
-	int UnitClass;
+	int ObjectiveType = -1;
+	int Quantity = 1;
+	int Resource = -1;
+	int UnitClass = -1;
 	std::string ObjectiveString;
-	CQuest *Quest;
-	CUnitType *UnitType;
-	CUpgrade *Upgrade;
-	CCharacter *Character;
-	CUniqueItem *Unique;
-	CSite *Settlement;
-	CFaction *Faction;
+	CQuest *Quest = nullptr;
+	std::vector<const CUnitType *> UnitTypes;
+	const CUpgrade *Upgrade = nullptr;
+	const CCharacter *Character = nullptr;
+	const CUniqueItem *Unique = nullptr;
+	const CSite *Settlement = nullptr;
+	const CFaction *Faction = nullptr;
 };
 
 class CPlayerQuestObjective : public CQuestObjective
 {
 public:
-	CPlayerQuestObjective() : CQuestObjective(), Counter(0)
-	{
-	}
-	
-	int Counter;
+	int Counter = 0;
 };
 
 class CQuest

@@ -239,7 +239,7 @@ public:
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(const int upgrade_class) const;
-	bool HasSettlement(CSite *settlement) const;
+	bool HasSettlement(const CSite *settlement) const;
 	bool HasSettlementNearWaterZone(int water_zone) const;
 	CSite *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
 	bool HasUnitBuilder(const CUnitType *type, const CSite *settlement = nullptr) const;

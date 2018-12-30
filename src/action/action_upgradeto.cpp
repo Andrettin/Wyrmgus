@@ -379,13 +379,13 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		}
 		
 		if (!unit.UnderConstruction) {
-			for (size_t i = 0; i < player.QuestObjectives.size(); ++i) {
+			for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 				if (
-					(player.QuestObjectives[i]->ObjectiveType == BuildUnitsObjectiveType && player.QuestObjectives[i]->UnitType == &newtype)
-					|| (player.QuestObjectives[i]->ObjectiveType == BuildUnitsOfClassObjectiveType && player.QuestObjectives[i]->UnitClass == newtype.Class)
+					(objective->ObjectiveType == BuildUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &newtype) != objective->UnitTypes.end())
+					|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == newtype.Class)
 				) {
-					if (!player.QuestObjectives[i]->Settlement || player.QuestObjectives[i]->Settlement == unit.Settlement) {
-						player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + 1, player.QuestObjectives[i]->Quantity);
+					if (!objective->Settlement || objective->Settlement == unit.Settlement) {
+						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 					}
 				}
 			}

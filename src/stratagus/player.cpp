@@ -1130,8 +1130,8 @@ void CPlayer::Save(CFile &file) const
 		if (p.QuestObjectives[j]->UnitClass != -1) {
 			file.printf("\"unit-class\", \"%s\",", UnitTypeClasses[p.QuestObjectives[j]->UnitClass].c_str());
 		}
-		if (p.QuestObjectives[j]->UnitType) {
-			file.printf("\"unit-type\", \"%s\",", p.QuestObjectives[j]->UnitType->Ident.c_str());
+		for (const CUnitType *unit_type : p.QuestObjectives[j]->UnitTypes) {
+			file.printf("\"unit-type\", \"%s\",", unit_type->Ident.c_str());
 		}
 		if (p.QuestObjectives[j]->Upgrade) {
 			file.printf("\"upgrade\", \"%s\",", p.QuestObjectives[j]->Upgrade->Ident.c_str());
@@ -1831,7 +1831,7 @@ bool CPlayer::HasUpgradeClass(const int upgrade_class) const
 	return false;
 }
 
-bool CPlayer::HasSettlement(CSite *settlement) const
+bool CPlayer::HasSettlement(const CSite *settlement) const
 {
 	if (!settlement) {
 		return false;
@@ -2726,7 +2726,7 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		objective->Quantity = quest->Objectives[i]->Quantity;
 		objective->Resource = quest->Objectives[i]->Resource;
 		objective->UnitClass = quest->Objectives[i]->UnitClass;
-		objective->UnitType = quest->Objectives[i]->UnitType;
+		objective->UnitTypes = quest->Objectives[i]->UnitTypes;
 		objective->Upgrade = quest->Objectives[i]->Upgrade;
 		objective->Character = quest->Objectives[i]->Character;
 		objective->Unique = quest->Objectives[i]->Unique;
@@ -2819,45 +2819,62 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 	for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 		CQuestObjective *objective = quest->Objectives[i];
 		if (objective->ObjectiveType == BuildUnitsObjectiveType || objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-			CUnitType *type = objective->UnitType;
+			std::vector<const CUnitType *> unit_types = objective->UnitTypes;
 			if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
 				int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
 				if (unit_type_id == -1) {
 					return false;
 				}
-				type = UnitTypes[unit_type_id];
+				unit_types.clear();
+				unit_types.push_back(UnitTypes[unit_type_id]);
 			}
-			
-			if (objective->Settlement && !this->HasSettlement(objective->Settlement) && !type->BoolFlag[TOWNHALL_INDEX].value) {
-				return false;
+
+			bool validated = false;
+			for (const CUnitType *unit_type : unit_types) {
+				if (objective->Settlement && !this->HasSettlement(objective->Settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+					continue;
+				}
+
+				if (!this->HasUnitBuilder(unit_type, objective->Settlement) || !CheckDependByType(*this, *unit_type)) {
+					continue;
+				}
+
+				validated = true;
 			}
-			
-			if (!this->HasUnitBuilder(type, objective->Settlement) || !CheckDependByType(*this, *type)) {
+
+			if (!validated) {
 				return false;
 			}
 		} else if (objective->ObjectiveType == ResearchUpgradeObjectiveType) {
-			CUpgrade *upgrade = objective->Upgrade;
+			const CUpgrade *upgrade = objective->Upgrade;
 			
 			bool has_researcher = this->HasUpgradeResearcher(upgrade);
 				
 			if (!has_researcher && upgrade->ID < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
-				for (size_t j = 0; j < quest->Objectives.size(); ++j) {
-					CQuestObjective *second_objective = quest->Objectives[j];
+				for (CQuestObjective *second_objective : quest->Objectives) {
 					if (second_objective == objective) {
 						continue;
 					}
 						
 					if (second_objective->ObjectiveType == BuildUnitsObjectiveType || second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-						CUnitType *type = second_objective->UnitType;
+						std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
 						if (second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
 							int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
 							if (unit_type_id == -1) {
 								continue;
 							}
-							type = UnitTypes[unit_type_id];
+							unit_types.clear();
+							unit_types.push_back(UnitTypes[unit_type_id]);
 						}
-						if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
-							has_researcher = true;
+
+						for (const CUnitType *unit_type : unit_types) {
+							if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), unit_type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
+								has_researcher = true;
+								break;
+							}
+						}
+
+						if (has_researcher) {
 							break;
 						}
 					}
@@ -2876,6 +2893,10 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 			if (objective->Faction) {
 				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
+					return false;
+				}
+				
+				if (objective->Settlement && !faction_player->HasSettlement(objective->Settlement)) {
 					return false;
 				}
 			}
@@ -2958,47 +2979,67 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 		}
 		if (objective->ObjectiveType == BuildUnitsObjectiveType || objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
 			if (objective->Counter < objective->Quantity) {
-				CUnitType *type = objective->UnitType;
+				std::vector<const CUnitType *> unit_types = objective->UnitTypes;
 				if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
 					int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
 					if (unit_type_id == -1) {
 						return "You can no longer produce the required unit.";
 					}
-					type = UnitTypes[unit_type_id];
+					unit_types.clear();
+					unit_types.push_back(UnitTypes[unit_type_id]);
 				}
 				
-				if (objective->Settlement && !this->HasSettlement(objective->Settlement) && !type->BoolFlag[TOWNHALL_INDEX].value) {
-					return "You no longer hold the required settlement.";
+				bool validated = false;
+				std::string validation_error;
+				for (const CUnitType *unit_type : unit_types) {
+					if (objective->Settlement && !this->HasSettlement(objective->Settlement) && !unit_type->BoolFlag[TOWNHALL_INDEX].value) {
+						validation_error = "You no longer hold the required settlement.";
+						continue;
+					}
+
+					if (!this->HasUnitBuilder(unit_type, objective->Settlement) || !CheckDependByType(*this, *unit_type)) {
+						validation_error = "You can no longer produce the required unit.";
+						continue;
+					}
+
+					validated = true;
 				}
-				
-				if (!this->HasUnitBuilder(type, objective->Settlement) || !CheckDependByType(*this, *type)) {
-					return "You can no longer produce the required unit.";
+
+				if (!validated) {
+					return validation_error;
 				}
 			}
 		} else if (objective->ObjectiveType == ResearchUpgradeObjectiveType) {
-			CUpgrade *upgrade = objective->Upgrade;
+			const CUpgrade *upgrade = objective->Upgrade;
 			
 			if (this->Allow.Upgrades[upgrade->ID] != 'R') {
 				bool has_researcher = this->HasUpgradeResearcher(upgrade);
 				
 				if (!has_researcher && upgrade->ID < (int) AiHelpers.Research.size()) { //check if the quest includes an objective to build a researcher of the upgrade
-					for (size_t j = 0; j < this->QuestObjectives.size(); ++j) {
-						CPlayerQuestObjective *second_objective = this->QuestObjectives[j];
+					for (CPlayerQuestObjective *second_objective : this->QuestObjectives) {
 						if (second_objective->Quest != quest || second_objective == objective || second_objective->Counter >= second_objective->Quantity) { //if the objective has been fulfilled, then there should be a researcher, if there isn't it is due to i.e. the researcher having been destroyed later on, or upgraded to another type, and then the quest should fail if the upgrade can no longer be researched
 							continue;
 						}
 						
 						if (second_objective->ObjectiveType == BuildUnitsObjectiveType || second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-							CUnitType *type = second_objective->UnitType;
+							std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
 							if (second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
 								int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
 								if (unit_type_id == -1) {
 									continue;
 								}
-								type = UnitTypes[unit_type_id];
+								unit_types.clear();
+								unit_types.push_back(UnitTypes[unit_type_id]);
 							}
-							if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
-								has_researcher = true;
+
+							for (const CUnitType *unit_type : unit_types) {
+								if (std::find(AiHelpers.Research[upgrade->ID].begin(), AiHelpers.Research[upgrade->ID].end(), unit_type) != AiHelpers.Research[upgrade->ID].end()) { //if the unit type of the other objective is a researcher of this upgrade
+									has_researcher = true;
+									break;
+								}
+							}
+
+							if (has_researcher) {
 								break;
 							}
 						}
@@ -3017,6 +3058,10 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			if (objective->Faction && objective->Counter < objective->Quantity) {
 				CPlayer *faction_player = GetFactionPlayer(objective->Faction);
 				if (faction_player == nullptr || faction_player->GetUnitCount() == 0) {
+					return "The target no longer exists.";
+				}
+				
+				if (objective->Settlement && !faction_player->HasSettlement(objective->Settlement)) {
 					return "The target no longer exists.";
 				}
 			}

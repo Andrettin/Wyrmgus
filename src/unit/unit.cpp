@@ -2709,12 +2709,12 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			} else {
 				player.TotalUnits++;
 				
-				for (size_t i = 0; i < player.QuestObjectives.size(); ++i) {
+				for (CPlayerQuestObjective *objective : player.QuestObjectives) {
 					if (
-						(player.QuestObjectives[i]->ObjectiveType == BuildUnitsObjectiveType && player.QuestObjectives[i]->UnitType == &type)
-						|| (player.QuestObjectives[i]->ObjectiveType == BuildUnitsOfClassObjectiveType && player.QuestObjectives[i]->UnitClass == type.Class)
+						(objective->ObjectiveType == BuildUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), &type) != objective->UnitTypes.end())
+						|| (objective->ObjectiveType == BuildUnitsOfClassObjectiveType && objective->UnitClass == type.Class)
 					) {
-						player.QuestObjectives[i]->Counter = std::min(player.QuestObjectives[i]->Counter + 1, player.QuestObjectives[i]->Quantity);
+						objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 					}
 				}
 			}
@@ -6741,7 +6741,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	for (size_t i = 0; i < attacker.Player->QuestObjectives.size(); ++i) {
 		CPlayerQuestObjective *objective = attacker.Player->QuestObjectives[i];
 		if (
-			(objective->ObjectiveType == DestroyUnitsObjectiveType && objective->UnitType == target.Type)
+			(objective->ObjectiveType == DestroyUnitsObjectiveType && std::find(objective->UnitTypes.begin(), objective->UnitTypes.end(), target.Type) != objective->UnitTypes.end() && (!objective->Settlement || objective->Settlement == target.Settlement))
 			|| (objective->ObjectiveType == DestroyHeroObjectiveType && target.Character && objective->Character == target.Character)
 			|| (objective->ObjectiveType == DestroyUniqueObjectiveType && target.Unique && objective->Unique == target.Unique)
 		) {

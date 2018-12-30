@@ -2256,6 +2256,13 @@ static int CclGetSiteData(lua_State *l)
 			lua_pushnumber(l, -1);
 		}
 		return 1;
+	} else if (!strcmp(data, "SiteUnit")) {
+		if (site->SiteUnit) {
+			lua_pushnumber(l, UnitNumber(*site->SiteUnit));
+		} else {
+			lua_pushnumber(l, -1);
+		}
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

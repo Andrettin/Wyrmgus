@@ -225,7 +225,7 @@ static int CclDefineQuest(lua_State *l)
 						if (!unit_type) {
 							LuaError(l, "Unit type doesn't exist.");
 						}
-						objective->UnitType = unit_type;
+						objective->UnitTypes.push_back(unit_type);
 					} else if (!strcmp(value, "upgrade")) {
 						CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1, k + 1));
 						if (!upgrade) {
