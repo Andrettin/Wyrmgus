@@ -45,6 +45,10 @@
 #include "upgrade/upgrade_structs.h" // MaxCost
 #include "vec2i.h"
 
+#ifdef __MORPHOS__
+#undef Wait
+#endif
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
