@@ -919,12 +919,15 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 		Vec2i site_raw_pos(site->Position);
 		Vec2i site_pos(map_start_pos + ((site_raw_pos - template_start_pos) * this->Scale));
 
+		Vec2i unit_offset((SettlementSiteUnitType->TileSize - 1) / 2);
+			
 		if (random) {
 			if (site_raw_pos.x != -1 || site_raw_pos.y != -1) {
 				continue;
 			}
 			if (SettlementSiteUnitType) {
 				site_pos = Map.GenerateUnitLocation(SettlementSiteUnitType, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
+				site_pos += unit_offset;
 			}
 		} else {
 			if (site_raw_pos.x == -1 && site_raw_pos.y == -1) {
@@ -937,7 +940,6 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 
 		if (site->Major && SettlementSiteUnitType) { //add a settlement site for major sites
-			Vec2i unit_offset((SettlementSiteUnitType->TileSize - 1) / 2);
 			if (!UnitTypeCanBeAt(*SettlementSiteUnitType, site_pos - unit_offset, z) && Map.Info.IsPointOnMap(site_pos - unit_offset, z) && Map.Info.IsPointOnMap(site_pos - unit_offset + Vec2i(SettlementSiteUnitType->TileSize - 1), z)) {
 				fprintf(stderr, "The settlement site for \"%s\" should be placed on (%d, %d), but it cannot be there.\n", site->Ident.c_str(), site_raw_pos.x, site_raw_pos.y);
 			}
@@ -1157,18 +1159,18 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		const CUnitType *type = std::get<1>(this->PlaneConnectors[i]);
 		Vec2i unit_raw_pos(std::get<0>(this->PlaneConnectors[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		Vec2i unit_offset((type->TileSize - 1) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
 			unit_pos = Map.GenerateUnitLocation(type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos += unit_offset;
 		}
 		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
 		
-		Vec2i unit_offset((type->TileSize - 1) / 2);
-
 		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->TileSize - 1), z)) {
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
@@ -1200,18 +1202,18 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		const CUnitType *type = std::get<1>(this->WorldConnectors[i]);
 		Vec2i unit_raw_pos(std::get<0>(this->WorldConnectors[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		Vec2i unit_offset((type->TileSize - 1) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
 			unit_pos = Map.GenerateUnitLocation(type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos += unit_offset;
 		}
 		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
 		
-		Vec2i unit_offset((type->TileSize - 1) / 2);
-
 		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->TileSize - 1), z)) {
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
 		}
@@ -1245,11 +1247,13 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		CUniqueItem *unique = std::get<3>(this->SurfaceLayerConnectors[i]);
 		Vec2i unit_raw_pos(std::get<0>(this->SurfaceLayerConnectors[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		Vec2i unit_offset((type->TileSize - 1) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
 			unit_pos = Map.GenerateUnitLocation(type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos += unit_offset;
 		} else {
 			if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) {
 				//if the upper/lower layer has a surface layer connector to this layer that has no connecting destination, and this connector leads to that surface layer, place this connection in the same position as the other one
@@ -1281,8 +1285,6 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
-		
-		Vec2i unit_offset((type->TileSize - 1) / 2);
 		
 		if (!OnTopDetails(*type, nullptr) && !UnitTypeCanBeAt(*type, unit_pos - unit_offset, z) && Map.Info.IsPointOnMap(unit_pos - unit_offset, z) && Map.Info.IsPointOnMap(unit_pos - unit_offset + Vec2i(type->TileSize - 1), z) && unit_raw_pos.x != -1 && unit_raw_pos.y != -1) {
 			fprintf(stderr, "Unit \"%s\" should be placed on (%d, %d) for map template \"%s\", but it cannot be there.\n", type->Ident.c_str(), unit_raw_pos.x, unit_raw_pos.y, this->Ident.c_str());
@@ -1339,11 +1341,13 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		Vec2i unit_raw_pos(std::get<0>(this->Units[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		const CUnitType *type = std::get<1>(this->Units[i]);
+		Vec2i unit_offset((type->TileSize - 1) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
 			unit_pos = Map.GenerateUnitLocation(type, std::get<2>(this->Units[i]), map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos += unit_offset;
 		}
 		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
@@ -1371,7 +1375,6 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			} else {
 				player = &Players[PlayerNumNeutral];
 			}
-			Vec2i unit_offset((type->TileSize - 1) / 2);
 
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z, type->BoolFlag[BUILDING_INDEX].value && type->TileSize.x > 1 && type->TileSize.y > 1);
 			if (!type->BoolFlag[BUILDING_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
@@ -1392,11 +1395,13 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		Vec2i unit_raw_pos(std::get<0>(this->Heroes[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		CCharacter *hero = std::get<1>(this->Heroes[i]);
+		Vec2i unit_offset((hero->Type->TileSize - 1) / 2);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
 			unit_pos = Map.GenerateUnitLocation(hero->Type, std::get<2>(this->Heroes[i]), map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos += unit_offset;
 		}
 		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
@@ -1415,7 +1420,6 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			} else {
 				player = &Players[PlayerNumNeutral];
 			}
-			Vec2i unit_offset((hero->Type->TileSize - 1) / 2);
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->Type, player, z);
 			unit->SetCharacter(hero->Ident);
 			if (!unit->Type->BoolFlag[BUILDING_INDEX].value && !unit->Type->BoolFlag[HARVESTER_INDEX].value) { // make non-building, non-harvester units not have an active AI
