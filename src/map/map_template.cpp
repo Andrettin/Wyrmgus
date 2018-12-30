@@ -1248,36 +1248,47 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 		Vec2i unit_raw_pos(std::get<0>(this->SurfaceLayerConnectors[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		Vec2i unit_offset((type->TileSize - 1) / 2);
+
+		//add the connecting destination
+		const CMapTemplate *other_template = nullptr;
+		if (surface_layer == (this->SurfaceLayer + 1)) {
+			other_template = this->LowerTemplate;
+		}
+		else if (surface_layer == (this->SurfaceLayer - 1)) {
+			other_template = this->UpperTemplate;
+		}
+		if (!other_template) {
+			continue; //surface layer connectors must lead to an adjacent surface layer
+		}
+
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
+			
+			bool already_implemented = false; //the connector could already have been implemented if it inherited its position from the connector in the destination layer (if the destination layer's map template was applied first)
+			std::vector<CUnit *> other_layer_connectors = Map.GetMapTemplateLayerConnectors(other_template);
+			for (const CUnit *connector : other_layer_connectors) {
+				if (connector->Type == type && connector->Unique == unique && connector->ConnectingDestination != nullptr && connector->ConnectingDestination->MapLayer->Plane == this->Plane && connector->ConnectingDestination->MapLayer->World == this->World && connector->ConnectingDestination->MapLayer->SurfaceLayer == this->SurfaceLayer) {
+					already_implemented = true;
+					break;
+				}
+			}
+
+			if (already_implemented) {
+				continue;
+			}
+			
 			unit_pos = Map.GenerateUnitLocation(type, nullptr, map_start_pos, map_end - Vec2i(1, 1), z);
 			unit_pos += unit_offset;
 		} else {
 			if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) {
 				//if the upper/lower layer has a surface layer connector to this layer that has no connecting destination, and this connector leads to that surface layer, place this connection in the same position as the other one
-				if (this->UpperTemplate) {
-					std::vector<CUnit *> upper_layer_connectors = Map.GetMapTemplateLayerConnectors(this->UpperTemplate);
-					for (size_t j = 0; j < upper_layer_connectors.size(); ++j) {
-						CUnit *potential_connector = upper_layer_connectors[j];
-						
-						if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
-							unit_pos = potential_connector->GetTileCenterPos();
-							break;
-						}
-					}
-				}
-				
-				if (this->LowerTemplate) {
-					std::vector<CUnit *> lower_layer_connectors = Map.GetMapTemplateLayerConnectors(this->LowerTemplate);
-					for (size_t j = 0; j < lower_layer_connectors.size(); ++j) {
-						CUnit *potential_connector = lower_layer_connectors[j];
-						
-						if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
-							unit_pos = potential_connector->GetTileCenterPos();
-							break;
-						}
+				std::vector<CUnit *> other_layer_connectors = Map.GetMapTemplateLayerConnectors(other_template);
+				for (const CUnit *potential_connector : other_layer_connectors) {
+					if (potential_connector->Type == type && potential_connector->Unique == unique && potential_connector->ConnectingDestination == nullptr) {
+						unit_pos = potential_connector->GetTileCenterPos();
+						break;
 					}
 				}
 			}
@@ -1295,17 +1306,6 @@ void CMapTemplate::ApplyConnectors(Vec2i template_start_pos, Vec2i map_start_pos
 			unit->SetUnique(unique);
 		}
 		Map.MapLayers[z]->LayerConnectors.push_back(unit);
-		
-		//add the connecting destination
-		CMapTemplate *other_template = nullptr;
-		if (surface_layer == (this->SurfaceLayer + 1)) {
-			other_template = this->LowerTemplate;
-		} else if (surface_layer == (this->SurfaceLayer - 1)) {
-			other_template = this->UpperTemplate;
-		}
-		if (!other_template) {
-			continue; //surface layer connectors must lead to an adjacent surface layer
-		}
 		
 		//get the nearest compatible connector in the target map layer / template
 		std::vector<CUnit *> other_layer_connectors = Map.GetMapTemplateLayerConnectors(other_template);
