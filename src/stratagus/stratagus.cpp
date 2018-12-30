@@ -238,6 +238,11 @@ extern void beos_init(int argc, char **argv);
 #include "SetupConsole_win32.h"
 #endif
 
+#ifdef __MORPHOS__
+unsigned long __stack = 1000000;
+__attribute__ ((section(".text"))) UBYTE VString[] = "$VER: Wyrmsun " VERSION "\r\n";
+#endif
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -354,6 +359,9 @@ static void PrintHeader()
 #endif
 #ifdef USE_BSD
 		"BSD "
+#endif
+#ifdef __MORPHOS__
+		"MORPHOS "
 #endif
 #ifdef USE_BEOS
 		"BEOS "
