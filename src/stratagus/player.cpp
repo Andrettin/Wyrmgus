@@ -1233,7 +1233,7 @@ CPlayer *GetFactionPlayer(const CFaction *faction)
 	return nullptr;
 }
 
-CPlayer *GetOrAddFactionPlayer(CFaction *faction)
+CPlayer *GetOrAddFactionPlayer(const CFaction *faction)
 {
 	CPlayer *faction_player = GetFactionPlayer(faction);
 	if (faction_player) {
@@ -1488,7 +1488,7 @@ void CPlayer::SetCivilization(int civilization)
 **
 **  @param faction    New faction.
 */
-void CPlayer::SetFaction(CFaction *faction)
+void CPlayer::SetFaction(const CFaction *faction)
 {
 	int old_faction_id = this->Faction;
 	

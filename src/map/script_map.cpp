@@ -1810,6 +1810,10 @@ static int CclDefineSite(lua_State *l)
 				
 				site->Cores.push_back(faction);
 				faction->Cores.push_back(site);
+				faction->Sites.push_back(site);
+				if (faction->Civilization) {
+					faction->Civilization->Sites.push_back(site);
+				}
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
 			if (!lua_istable(l, -1)) {

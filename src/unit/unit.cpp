@@ -3303,19 +3303,42 @@ void CUnit::UpdateSettlement()
 	
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
 		if (!this->Settlement) {
-			int civilization = this->Type->Civilization;
-			if (civilization != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization || this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Faction, this->Type->Class))) {
-				civilization = this->Player->Race;
+			int civilization_id = this->Type->Civilization;
+			if (civilization_id != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization_id || this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Faction, this->Type->Class))) {
+				civilization_id = this->Player->Race;
+			}
+			const CCivilization *civilization = nullptr;
+			if (civilization_id != -1) {
+				civilization = CCivilization::Civilizations[civilization_id];
+			}
+			
+			int faction_id = this->Type->Faction;
+			if (this->Player->Race == civilization_id && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Faction, this->Type->Class)) {
+				faction_id = this->Player->Faction;
+			}
+			const CFaction *faction = nullptr;
+			if (faction_id != -1) {
+				PlayerRaces.Factions[faction_id];
 			}
 
 			std::vector<CSite *> potential_settlements;
-			for (CSite *site : CSite::Sites) {
-				if (!site->SiteUnit && site->CulturalNames.find(civilization != -1 ? CCivilization::Civilizations[civilization] : nullptr) != site->CulturalNames.end()) {
-					potential_settlements.push_back(site);
+			if (civilization) {
+				for (CSite *site : civilization->Sites) {
+					if (!site->SiteUnit) {
+						potential_settlements.push_back(site);
+					}
 				}
 			}
 			
-			if (potential_settlements.size() == 0) {
+			if (potential_settlements.empty() && faction) {
+				for (CSite *site : faction->Sites) {
+					if (!site->SiteUnit) {
+						potential_settlements.push_back(site);
+					}
+				}
+			}
+			
+			if (potential_settlements.empty()) {
 				for (CSite *site : CSite::Sites) {
 					if (!site->SiteUnit) {
 						potential_settlements.push_back(site);

@@ -981,8 +981,8 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 			continue;
 		}
 		
-		CFaction *site_owner = nullptr;
-		for (std::map<CDate, CFaction *>::reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
+		const CFaction *site_owner = nullptr;
+		for (std::map<CDate, const CFaction *>::reverse_iterator owner_iterator = site->HistoricalOwners.rbegin(); owner_iterator != site->HistoricalOwners.rend(); ++owner_iterator) {
 			if (CurrentCampaign->StartDate.ContainsDate(owner_iterator->first)) { // set the owner to the latest historical owner given the scenario's start date
 				site_owner = owner_iterator->second;
 				break;
@@ -1039,7 +1039,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				CurrentCampaign->StartDate.ContainsDate(std::get<0>(site->HistoricalBuildings[j]))
 				&& (!CurrentCampaign->StartDate.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
 			) {
-				CFaction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
+				const CFaction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
 				int unit_type_id = -1;
 				if (building_owner) {
 					unit_type_id = PlayerRaces.GetFactionClassUnitType(building_owner->ID, std::get<2>(site->HistoricalBuildings[j]));
@@ -1080,12 +1080,12 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 					unit->SetUnique(std::get<3>(site->HistoricalBuildings[j]));
 				}
 				if (first_building) {
-					if (!type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == site_owner) && site->CulturalNames.find(site_owner->Civilization) != site->CulturalNames.end()) { //if one building is representing a minor site, make it have the site's name
-						unit->Name = site->CulturalNames.find(site_owner->Civilization)->second;
+					if (!type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == site_owner)) { //if one building is representing a minor site, make it have the site's name
+						unit->Name = site->GetCulturalName(site_owner->Civilization);
 					}
 					first_building = false;
 				}
-				if (type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == site_owner) && site->CulturalNames.find(site_owner->Civilization) != site->CulturalNames.end()) {
+				if (type->BoolFlag[TOWNHALL_INDEX].value && (!building_owner || building_owner == site_owner)) {
 					unit->UpdateBuildingSettlementAssignment();
 				}
 				if (pathway_type) {
@@ -1124,7 +1124,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 					}
 							
 					CPlayer *unit_player = nullptr;
-					CFaction *unit_owner = std::get<4>(site->HistoricalUnits[j]);
+					const CFaction *unit_owner = std::get<4>(site->HistoricalUnits[j]);
 					if (unit_owner) {
 						unit_player = GetOrAddFactionPlayer(unit_owner);
 						if (!unit_player) {

@@ -50,11 +50,6 @@ class CTimeline;
 class CDate
 {
 public:
-	CDate() :
-		Year(0), Month(1), Day(1), Hour(DEFAULT_HOURS_PER_DAY / 2), Timeline(nullptr)
-	{
-	}
-	
 	static CDate FromString(const std::string &date_str);
 	
 	static unsigned long long CurrentTotalHours;				/// Current total in-game hours, counting from 1 January 10000 BC 00:00
@@ -73,11 +68,11 @@ public:
 	unsigned long long GetTotalHours(CCalendar *calendar) const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
 	int GetDayOfTheWeek(const CCalendar *calendar) const;			/// gets the day of the week for this date in a given calendar
 	
-	int Year;
-	char Month;
-	char Day;
-	char Hour;
-	CTimeline *Timeline;
+	int Year = 0;
+	char Month = 1;
+	char Day = 1;
+	char Hour = DEFAULT_HOURS_PER_DAY / 2;
+	CTimeline *Timeline = nullptr;
 	
 	bool operator <(const CDate &rhs) const {
 		if (Year < rhs.Year) {

@@ -230,7 +230,7 @@ public:
 	
 	//Wyrmgus start
 	void SetCivilization(int civilization);
-	void SetFaction(CFaction *faction);
+	void SetFaction(const CFaction *faction);
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
 	void CheckAge();
@@ -652,6 +652,7 @@ public:
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction
 	std::vector<CSite *> Cores;											/// Core sites of this faction (required to found it)
+	std::vector<CSite *> Sites;											/// Sites used for this faction if it needs a randomly-generated settlement
 	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
 	std::map<int, int> ForceTypeWeights;								/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;				/// AI building templates
@@ -936,7 +937,7 @@ extern void CreatePlayer(int type);
 
 //Wyrmgus start
 extern CPlayer *GetFactionPlayer(const CFaction *faction);
-extern CPlayer *GetOrAddFactionPlayer(CFaction *faction);
+extern CPlayer *GetOrAddFactionPlayer(const CFaction *faction);
 //Wyrmgus end
 
 /// Initialize the computer opponent AI

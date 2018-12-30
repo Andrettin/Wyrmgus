@@ -74,13 +74,13 @@ public:
 	CMapTemplate *MapTemplate = nullptr;						/// Map template where this site is located
 	CUnit *SiteUnit = nullptr;									/// Unit which represents this site
 	std::vector<CRegion *> Regions;								/// Regions where this site is located
-	std::vector<CFaction *> Cores;								/// Factions which have this site as a core
+	std::vector<CFaction *> Cores;						/// Factions which have this site as a core
 	std::map<const CCivilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
-	std::map<CDate, CFaction *> HistoricalOwners;				/// Historical owners of the site
+	std::map<CDate, const CFaction *> HistoricalOwners;				/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
-	std::vector<std::tuple<CDate, CDate, CUnitType *, int, CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
-	std::vector<std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
-	std::vector<std::tuple<CDate, CDate, CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
+	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
+	std::vector<std::tuple<CDate, CDate, int, CUniqueItem *, const CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
+	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
 };
 
 #endif
