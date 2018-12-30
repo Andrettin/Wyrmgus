@@ -639,11 +639,12 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	}
 		
 	// In global shared directory
+	#ifndef __MORPHOS__
 	snprintf(buffer, PATH_MAX, "%s/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
-
+	#endif
 	// Support for graphics in default graphics dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
@@ -651,10 +652,12 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
+	#ifndef __MORPHOS__	
 	snprintf(buffer, PATH_MAX, "%s/graphics/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
+	#endif
 
 	// Support for sounds in default sounds dir.
 	// They could be anywhere now, but check if they haven't
@@ -663,21 +666,23 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
+	#ifndef __MORPHOS__	
 	snprintf(buffer, PATH_MAX, "%s/sounds/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
-	
+	#endif
 	// Support for scripts in default scripts dir.
 	sprintf(buffer, "scripts/%s", file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
+	#ifndef __MORPHOS__	
 	sprintf(buffer, "%s/scripts/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
-	
+	#endif
 	//Wyrmgus start
 	if (DLCFileEquivalency.find(std::string(file)) != DLCFileEquivalency.end()) { //if the file hasn't been found and it has an equivalent file, try to get that instead
 		LibraryFileName(DLCFileEquivalency[std::string(file)].c_str(), buffer);
