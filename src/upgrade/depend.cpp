@@ -84,9 +84,7 @@ void DependRule::ProcessConfigData(const CConfigData *config_data, const int rul
 	bool first_rule_group = true;
 	int or_flag = 0;
 	
-	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		const CConfigData *child_config_data = config_data->Children[i];
-		
+	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "rule_group") {
 			if (first_rule_group) {
 				first_rule_group = false;

@@ -196,9 +196,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		const CConfigData *child_config_data = config_data->Children[i];
-		
+	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "day_of_the_week") {
 			CDayOfTheWeek *day_of_the_week = new CDayOfTheWeek;
 			day_of_the_week->ID = this->DaysOfTheWeek.size();

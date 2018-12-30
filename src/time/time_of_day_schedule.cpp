@@ -141,9 +141,7 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		const CConfigData *child_config_data = config_data->Children[i];
-		
+	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "scheduled_time_of_day") {
 			CScheduledTimeOfDay *scheduled_time_of_day = new CScheduledTimeOfDay;
 			scheduled_time_of_day->ID = this->ScheduledTimesOfDay.size();
@@ -202,9 +200,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		const CConfigData *child_config_data = config_data->Children[i];
-		
+	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "season_hours") {
 			CSeason *season = nullptr;
 			int season_hours = 0;

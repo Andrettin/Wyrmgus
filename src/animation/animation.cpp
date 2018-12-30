@@ -523,9 +523,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 
 void CAnimations::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		const CConfigData *child_config_data = config_data->Children[i];
-		
+	for (const CConfigData *child_config_data : config_data->Children) {
 		if (
 			child_config_data->Tag == "start"
 			|| child_config_data->Tag == "still"

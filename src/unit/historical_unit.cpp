@@ -149,9 +149,7 @@ void CHistoricalUnit::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		const CConfigData *child_config_data = config_data->Children[i];
-		
+	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "historical_location") {
 			CHistoricalLocation *historical_location = new CHistoricalLocation;
 			historical_location->ProcessConfigData(child_config_data);

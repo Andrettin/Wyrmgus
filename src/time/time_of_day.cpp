@@ -134,9 +134,7 @@ void CTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (size_t i = 0; i < config_data->Children.size(); ++i) {
-		const CConfigData *child_config_data = config_data->Children[i];
-		
+	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "color_modification") {
 			this->ColorModification.ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "image") {
