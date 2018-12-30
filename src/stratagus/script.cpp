@@ -3080,7 +3080,11 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask, int sortmo
 		snprintf(directory, sizeof(directory), "%s", dir.c_str());
 		lua_pop(l, 1);
 	} else {
+		#ifndef __MORPHOS__
 		snprintf(directory, sizeof(directory), "%s/%s", StratagusLibPath.c_str(), userdir);
+		#else
+		snprintf(directory, sizeof(directory), "%s",  userdir);
+		#endif
 	}
 	lua_pop(l, 1);
 	lua_newtable(l);
