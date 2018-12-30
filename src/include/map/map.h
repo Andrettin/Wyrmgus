@@ -285,7 +285,10 @@ public:
 	//Wyrmgus end
 
 	//UnitCache
-
+	#ifdef __MORPHOS__
+	#undef Insert
+	#undef Remove
+	#endif
 	/// Insert new unit into cache
 	void Insert(CUnit &unit);
 
