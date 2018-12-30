@@ -62,6 +62,10 @@
 #include <physfs.h>
 #endif
 
+#ifdef __MORPHOS__
+#undef tell
+#endif
+
 class CFile::PImpl
 {
 public:
