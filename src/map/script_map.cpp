@@ -2180,6 +2180,14 @@ static int CclGetMapTemplateData(lua_State *l)
 		Vec2i pos = Map.GetSubtemplateEndPos(map_template);
 		lua_pushnumber(l, pos.y);
 		return 1;
+	} else if (!strcmp(data, "MapLayer")) {
+		const CMapLayer *map_layer = Map.GetSubtemplateMapLayer(map_template);
+		if (map_layer) {
+			lua_pushnumber(l, map_layer->ID);
+		} else {
+			lua_pushnumber(l, -1);
+		}
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

@@ -759,6 +759,34 @@ Vec2i CMap::GetSubtemplateEndPos(const CMapTemplate *subtemplate) const
 }
 
 /**
+**	@brief	Get the applied map layer of a given subtemplate
+**
+**	@param	subtemplate		The subtemplate
+**
+**	@return	The subtemplate's map layer if found, or null otherwise
+*/
+CMapLayer *CMap::GetSubtemplateMapLayer(const CMapTemplate *subtemplate) const
+{
+	if (!subtemplate) {
+		return nullptr;
+	}
+	
+	const CMapTemplate *main_template = subtemplate->GetTopMapTemplate();
+	if (main_template && subtemplate != main_template && main_template->Plane && main_template->World) {
+		const int z = GetMapLayer(main_template->Plane->Ident, main_template->World->Ident, main_template->SurfaceLayer);
+		if (z != -1) {
+			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
+				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
+					return this->MapLayers[z];
+				}
+			}
+		}
+	}
+	
+	return nullptr;
+}
+
+/**
 **	@brief	Get the map layer connectors in a given map template
 **
 **	@param	subtemplate		The subtemplate
