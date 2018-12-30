@@ -1453,7 +1453,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		CPlayer *unit_player = unit_faction ? GetFactionPlayer(unit_faction) : nullptr;
 		
 		bool in_another_map_template = false;
-		Vec2i unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, random);
+		Vec2i unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, false);
 		
 		if (in_another_map_template) {
 			continue;
@@ -1463,8 +1463,15 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			if (!random) { //apply units whose position is that of a randomly-placed site, or that of their player's start position, together with randomly-placed units
 				continue;
 			}
-			if (unit_player && unit_player->StartMapLayer == z) {
+			
+			unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, true);
+			
+			if ((unit_pos.x == -1 || unit_pos.y == -1) && unit_player && unit_player->StartMapLayer == z) {
 				unit_pos = unit_player->StartPos;
+			}
+		} else {
+			if (random) {
+				continue;
 			}
 		}
 		
@@ -1514,7 +1521,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		CPlayer *hero_player = hero_faction ? GetFactionPlayer(hero_faction) : nullptr;
 		
 		bool in_another_map_template = false;
-		Vec2i hero_pos = this->GetBestLocationMapPosition(hero->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, random);
+		Vec2i hero_pos = this->GetBestLocationMapPosition(hero->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, false);
 		
 		if (in_another_map_template) {
 			continue;
@@ -1524,8 +1531,15 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			if (!random) { //apply heroes whose position is that of a randomly-placed site, or that of their player's start position, together with randomly-placed units
 				continue;
 			}
-			if (hero_player && hero_player->StartMapLayer == z) {
+			
+			hero_pos = this->GetBestLocationMapPosition(hero->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, true);
+			
+			if ((hero_pos.x == -1 || hero_pos.y == -1) && hero_player && hero_player->StartMapLayer == z) {
 				hero_pos = hero_player->StartPos;
+			}
+		} else {
+			if (random) {
+				continue;
 			}
 		}
 		
