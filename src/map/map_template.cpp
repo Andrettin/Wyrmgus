@@ -818,14 +818,22 @@ void CMapTemplate::ApplySubtemplates(const Vec2i &template_start_pos, const Vec2
 				Vec2i min_pos(map_start_pos);
 				Vec2i max_pos(map_end.x - subtemplate->Width, map_end.y - subtemplate->Height);
 				
-				if (subtemplate->MinPos.x != -1 && subtemplate->MinPos.y != -1) {
-					min_pos += subtemplate->MinPos;
-					min_pos -= template_start_pos;
+				if (subtemplate->MinPos.x != -1) {
+					min_pos.x += subtemplate->MinPos.x;
+					min_pos.x -= template_start_pos.x;
+				}
+				if (subtemplate->MinPos.y != -1) {
+					min_pos.y += subtemplate->MinPos.y;
+					min_pos.y -= template_start_pos.y;
 				}
 				
-				if (subtemplate->MaxPos.x != -1 && subtemplate->MaxPos.y != -1) {
-					max_pos += subtemplate->MaxPos;
-					max_pos -= Vec2i(this->Width, this->Height);
+				if (subtemplate->MaxPos.x != -1) {
+					max_pos.x += subtemplate->MaxPos.x;
+					max_pos.x -= this->Width;
+				}
+				if (subtemplate->MaxPos.y != -1) {
+					max_pos.y += subtemplate->MaxPos.y;
+					max_pos.y -= this->Height;
 				}
 				
 				//bound the minimum and maximum positions depending on which other templates should be adjacent to this one (if they have already been applied to the map)
