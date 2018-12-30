@@ -37,6 +37,7 @@
 
 #include <fstream>
 
+#include "civilization.h"
 #include "config.h"
 #include "editor.h"
 #include "game.h"
@@ -45,6 +46,7 @@
 #include "map/historical_location.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
@@ -620,7 +622,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	}
 	
 	if (CurrentCampaign && CurrentCampaign->Faction && !this->IsSubtemplateArea() && ThisPlayer->Faction != CurrentCampaign->Faction->ID) {
-		ThisPlayer->SetCivilization(CurrentCampaign->Faction->Civilization);
+		ThisPlayer->SetCivilization(CurrentCampaign->Faction->Civilization->ID);
 		ThisPlayer->SetFaction(CurrentCampaign->Faction);
 		ThisPlayer->Resources[CopperCost] = 2500; // give the player enough resources to start up
 		ThisPlayer->Resources[WoodCost] = 2500;

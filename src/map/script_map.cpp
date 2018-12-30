@@ -45,6 +45,7 @@
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
+#include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 //Wyrmgus start
@@ -728,7 +729,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		CclGetPos(l, &start_pos.x, &start_pos.y, 3);
 	} else { //site ident
 		std::string site_ident = LuaToString(l, 3);
-		CSite *site = GetSite(site_ident);
+		CSite *site = CSite::GetSite(site_ident);
 		if (!site) {
 			LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
 		}
@@ -741,7 +742,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 		CclGetPos(l, &end_pos.x, &end_pos.y, 4);
 	} else { //site ident
 		std::string site_ident = LuaToString(l, 4);
-		CSite *site = GetSite(site_ident);
+		CSite *site = CSite::GetSite(site_ident);
 		if (!site) {
 			LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
 		}
@@ -1765,13 +1766,7 @@ static int CclDefineSite(lua_State *l)
 	}
 
 	std::string site_ident = LuaToString(l, 1);
-	CSite *site = GetSite(site_ident);
-	if (site == nullptr) {
-		site = new CSite;
-		site->Ident = site_ident;
-		Sites.push_back(site);
-		SiteIdentToPointer[site_ident] = site;
-	}
+	CSite *site = CSite::GetOrAddSite(site_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1800,7 +1795,7 @@ static int CclDefineSite(lua_State *l)
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				site->CulturalNames[civilization->ID] = cultural_name;
+				site->CulturalNames[civilization] = cultural_name;
 			}
 		} else if (!strcmp(value, "Cores")) {
 			if (!lua_istable(l, -1)) {
@@ -2203,7 +2198,7 @@ static int CclGetSiteData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	const std::string site_ident = LuaToString(l, 1);
-	const CSite *site = GetSite(site_ident);
+	const CSite *site = CSite::GetSite(site_ident);
 	if (!site) {
 		LuaError(l, "Site \"%s\" doesn't exist." _C_ site_ident.c_str());
 	}

@@ -64,6 +64,7 @@
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
 #include "map/tileset.h"
 #include "missile.h"
 #include "network.h"
@@ -3245,8 +3246,8 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	if (this->Player->Faction != -1) {
 		faction = PlayerRaces.Factions[this->Player->Faction];
 		
-		if (civilization_id != -1 && civilization_id != faction->Civilization && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization] && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Type->Class)) {
-			civilization_id = faction->Civilization;
+		if (civilization_id != -1 && civilization_id != faction->Civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization->ID] && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Type->Class)) {
+			civilization_id = faction->Civilization->ID;
 		}
 	}
 	
@@ -3308,16 +3309,16 @@ void CUnit::UpdateSettlement()
 			}
 
 			std::vector<CSite *> potential_settlements;
-			for (size_t i = 0; i < Sites.size(); ++i) {
-				if (!Sites[i]->SiteUnit && Sites[i]->CulturalNames.find(civilization) != Sites[i]->CulturalNames.end()) {
-					potential_settlements.push_back(Sites[i]);
+			for (CSite *site : CSite::Sites) {
+				if (!site->SiteUnit && site->CulturalNames.find(civilization != -1 ? CCivilization::Civilizations[civilization] : nullptr) != site->CulturalNames.end()) {
+					potential_settlements.push_back(site);
 				}
 			}
 			
 			if (potential_settlements.size() == 0) {
-				for (size_t i = 0; i < Sites.size(); ++i) {
-					if (!Sites[i]->SiteUnit) {
-						potential_settlements.push_back(Sites[i]);
+				for (CSite *site : CSite::Sites) {
+					if (!site->SiteUnit) {
+						potential_settlements.push_back(site);
 					}
 				}
 			}

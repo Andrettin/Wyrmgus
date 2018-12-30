@@ -42,6 +42,7 @@
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_template.h"
+#include "map/site.h"
 #include "player.h"
 #include "script.h"
 #include "unit/unittype.h"
@@ -244,7 +245,7 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->Unique = unique;
 					} else if (!strcmp(value, "settlement")) {
-						CSite *site = GetSite(LuaToString(l, -1, k + 1));
+						CSite *site = CSite::GetSite(LuaToString(l, -1, k + 1));
 						if (!site) {
 							LuaError(l, "Site doesn't exist.");
 						}

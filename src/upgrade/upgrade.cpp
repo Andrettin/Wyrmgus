@@ -1486,9 +1486,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	if (um->ChangeCivilizationTo != -1 && GameRunning && um->ChangeCivilizationTo != player.Race) {
 		player.SetCivilization(um->ChangeCivilizationTo);
 	}
-	if (um->ChangeFactionTo != nullptr && GameRunning && (um->ChangeFactionTo->Civilization != player.Race || um->ChangeFactionTo->ID != player.Faction)) {
-		if (um->ChangeFactionTo->Civilization != player.Race) {
-			player.SetCivilization(um->ChangeFactionTo->Civilization);
+	if (um->ChangeFactionTo != nullptr && GameRunning && (um->ChangeFactionTo->Civilization->ID != player.Race || um->ChangeFactionTo->ID != player.Faction)) {
+		if (um->ChangeFactionTo->Civilization->ID != player.Race) {
+			player.SetCivilization(um->ChangeFactionTo->Civilization->ID);
 		}
 		player.SetFaction(um->ChangeFactionTo);
 	}

@@ -49,6 +49,7 @@
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
+#include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "plane.h"
@@ -92,8 +93,6 @@ extern bool enableOAML;
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-std::vector<CSite *> Sites;
-std::map<std::string, CSite *> SiteIdentToPointer;
 std::vector<CTerrainFeature *> TerrainFeatures;
 std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
@@ -105,24 +104,6 @@ int ForestRegeneration;     /// Forest regeneration
 char CurrentMapPath[1024];  /// Path of the current map
 
 //Wyrmgus start
-/**
-**  Get a site
-*/
-CSite *GetSite(const std::string &site_ident)
-{
-	if (site_ident.empty()) {
-		return nullptr;
-	}
-	
-	std::map<std::string, CSite *>::const_iterator find_iterator = SiteIdentToPointer.find(site_ident);
-	
-	if (find_iterator != SiteIdentToPointer.end()) {
-		return find_iterator->second;
-	}
-	
-	return nullptr;
-}
-
 /**
 **  Get a terrain feature
 */
@@ -139,21 +120,6 @@ CTerrainFeature *GetTerrainFeature(const std::string &terrain_feature_ident)
 	}
 	
 	return nullptr;
-}
-
-/**
-**  Get a site's cultural name.
-*/
-std::string CSite::GetCulturalName(const int civilization) const
-{
-	if (civilization != -1) {
-		std::map<int, std::string>::const_iterator find_iterator = this->CulturalNames.find(civilization);
-		if (find_iterator != this->CulturalNames.end()) {
-			return find_iterator->second;
-		}
-	}
-	
-	return this->Name;
 }
 //Wyrmgus end
 

@@ -40,6 +40,7 @@
 #include "config.h"
 #include "map/map.h"
 #include "map/map_template.h"
+#include "map/site.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -71,7 +72,7 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "site") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Site = GetSite(value);
+			this->Site = CSite::GetSite(value);
 			if (this->Site) {
 				this->MapTemplate = this->Site->MapTemplate;
 				this->Position = this->Site->Position;

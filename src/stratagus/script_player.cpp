@@ -50,6 +50,7 @@
 #include "luacallback.h"
 //Wyrmgus end
 #include "map/map.h"
+#include "map/site.h"
 #include "plane.h"
 #include "province.h"
 #include "quest.h"
@@ -501,7 +502,7 @@ void CPlayer::Load(lua_State *l)
 						}
 						objective->Unique = unique;
 					} else if (!strcmp(value, "settlement")) {
-						CSite *site = GetSite(LuaToString(l, -1, n + 1));
+						CSite *site = CSite::GetSite(LuaToString(l, -1, n + 1));
 						if (!site) {
 							LuaError(l, "Site doesn't exist.");
 						}
@@ -1651,7 +1652,7 @@ static int CclGetCivilizationData(lua_State *l)
 		std::vector<std::string> factions;
 		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i)
 		{
-			if (PlayerRaces.Factions[i]->Civilization != civilization_id) {
+			if (PlayerRaces.Factions[i]->Civilization != civilization) {
 				continue;
 			}
 			
@@ -1815,7 +1816,7 @@ static int CclDefineFaction(lua_State *l)
 		if (!strcmp(value, "Civilization")) {
 			CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1));
 			if (civilization) {
-				faction->Civilization = civilization->ID;
+				faction->Civilization = civilization;
 			}
 		} else if (!strcmp(value, "Name")) {
 			faction->Name = LuaToString(l, -1);
@@ -2724,12 +2725,9 @@ static int CclGetCivilizations(lua_State *l)
 */
 static int CclGetFactions(lua_State *l)
 {
-	int civilization_id = -1;
+	CCivilization *civilization = nullptr;
 	if (lua_gettop(l) >= 1) {
-		CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, 1));
-		if (civilization) {
-			civilization_id = civilization->ID;
-		}
+		civilization = CCivilization::GetCivilization(LuaToString(l, 1));
 	}
 	
 	int faction_type = -1;
@@ -2738,12 +2736,12 @@ static int CclGetFactions(lua_State *l)
 	}
 	
 	std::vector<std::string> factions;
-	if (civilization_id != -1) {
+	if (civilization != nullptr) {
 		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
 			if (faction_type != -1 && PlayerRaces.Factions[i]->Type != faction_type) {
 				continue;
 			}
-			if (PlayerRaces.Factions[i]->Civilization == civilization_id) {
+			if (PlayerRaces.Factions[i]->Civilization == civilization) {
 				factions.push_back(PlayerRaces.Factions[i]->Ident);
 			}
 		}
@@ -2868,8 +2866,8 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushstring(l, GetFactionTypeNameById(faction->Type).c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (faction->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[faction->Civilization].c_str());
+		if (faction->Civilization != nullptr) {
+			lua_pushstring(l, PlayerRaces.Name[faction->Civilization->ID].c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3383,15 +3381,15 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "HasSettlement")) {
 		LuaCheckArgs(l, 3);
 		std::string site_ident = LuaToString(l, 3);
-		CSite *site = GetSite(site_ident);
+		CSite *site = CSite::GetSite(site_ident);
 		lua_pushboolean(l, p->HasSettlement(site));
 		return 1;
 	} else if (!strcmp(data, "SettlementName")) {
 		LuaCheckArgs(l, 3);
 		std::string site_ident = LuaToString(l, 3);
-		const CSite *site = GetSite(site_ident);
+		const CSite *site = CSite::GetSite(site_ident);
 		if (site) {
-			lua_pushstring(l, site->GetCulturalName(p->Race).c_str());
+			lua_pushstring(l, site->GetCulturalName(p->Race != -1 ? CCivilization::Civilizations[p->Race] : nullptr).c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

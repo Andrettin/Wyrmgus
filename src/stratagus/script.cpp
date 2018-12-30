@@ -43,6 +43,7 @@
 #include "actions.h"
 //Wyrmgus end
 #include "animation/animation_setplayervar.h"
+#include "civilization.h"
 #include "config.h"
 //Wyrmgus start
 #include "editor.h"
@@ -58,6 +59,7 @@
 #include "item.h"
 //Wyrmgus end
 #include "map/map.h"
+#include "map/site.h"
 #include "parameters.h"
 //Wyrmgus start
 #include "player.h"
@@ -1430,7 +1432,7 @@ std::string EvalString(const StringDesc *s)
 				if (civilization != -1 && unit->Settlement->SiteUnit->Player->Faction != -1 && (unit->Settlement->SiteUnit->Player->Race == civilization || unit->Settlement->SiteUnit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->Faction, unit->Settlement->SiteUnit->Type->Class))) {
 					civilization = unit->Settlement->SiteUnit->Player->Race;
 				}
-				return unit->Settlement->GetCulturalName(civilization);
+				return unit->Settlement->GetCulturalName(civilization != -1 ? CCivilization::Civilizations[civilization] : nullptr);
 			} else {
 				return std::string("");
 			}
@@ -1612,7 +1614,7 @@ std::string EvalString(const StringDesc *s)
 			faction = s->D.Faction;
 			
 			if (faction != nullptr) {
-				return PlayerRaces.Display[(**faction).Civilization];
+				return PlayerRaces.Display[(**faction).Civilization->ID];
 			} else {
 				return std::string("");
 			}
@@ -1640,7 +1642,7 @@ std::string EvalString(const StringDesc *s)
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}
-					settlements_string += (**faction).Cores[i]->GetCulturalName(ThisPlayer->Race);
+					settlements_string += (**faction).Cores[i]->GetCulturalName(ThisPlayer->Race != -1 ? CCivilization::Civilizations[ThisPlayer->Race] : nullptr);
 					if (!has_settlement) {
 						settlements_string += "~>";
 					}

@@ -135,34 +135,6 @@ public:
 	CWorld *World;
 	std::map<int, std::string> CulturalNames;							/// Names for the terrain feature for each different culture/civilization
 };
-
-class CSite
-{
-public:
-	CSite() :
-		Position(-1, -1),
-		MapTemplate(nullptr), SiteUnit(nullptr),
-		Major(false)
-	{
-	}
-	
-	std::string GetCulturalName(const int civilization) const;
-
-	std::string Ident;
-	std::string Name;
-	bool Major;													/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
-	Vec2i Position;												/// Position of the site in its map template
-	CMapTemplate *MapTemplate;									/// Map template where this site is located
-	CUnit *SiteUnit;										/// Unit which represents this site
-	std::vector<CRegion *> Regions;								/// Regions where this site is located
-	std::vector<CFaction *> Cores;								/// Factions which have this site as a core
-	std::map<int, std::string> CulturalNames;					/// Names for the site for each different culture/civilization
-	std::map<CDate, CFaction *> HistoricalOwners;				/// Historical owners of the site
-	std::map<CDate, int> HistoricalPopulation;					/// Historical population
-	std::vector<std::tuple<CDate, CDate, CUnitType *, int, CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
-	std::vector<std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
-	std::vector<std::tuple<CDate, CDate, CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
-};
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -379,8 +351,6 @@ public:
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-extern std::vector<CSite *> Sites;
-extern std::map<std::string, CSite *> SiteIdentToPointer;
 extern std::vector<CTerrainFeature *> TerrainFeatures;
 extern std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 extern std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
@@ -405,7 +375,6 @@ extern int ReplayRevealMap;
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-extern CSite *GetSite(const std::string &site_ident);
 extern CTerrainFeature *GetTerrainFeature(const std::string &terrain_feature_ident);
 //Wyrmgus end
 

@@ -48,6 +48,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -164,7 +165,7 @@ enum {
 		this->MapLayer = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "settlement")) {
 		++j;
-		this->Settlement = GetSite(LuaToString(l, -1, j + 1));
+		this->Settlement = CSite::GetSite(LuaToString(l, -1, j + 1));
 	//Wyrmgus end
 	} else {
 		return false;

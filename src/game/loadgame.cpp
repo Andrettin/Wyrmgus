@@ -52,6 +52,7 @@
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/minimap.h"
+#include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "missile.h"
@@ -139,8 +140,9 @@ void CleanModules()
 	CPlane::ClearPlanes();
 	CleanProvinces();
 	CleanQuests();
-	CleanTexts();
 	CReligion::ClearReligions();
+	CSite::ClearSites();
+	CleanTexts();
 	CleanUniqueItems();
 	//Wyrmgus end
 	CTimeline::ClearTimelines();

@@ -46,6 +46,7 @@
 //Wyrmgus end
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
@@ -346,7 +347,7 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "family-name")) {
 			unit->FamilyName = LuaToString(l, 2, j + 1);
 		} else if (!strcmp(value, "settlement")) {
-			unit->Settlement = GetSite(LuaToString(l, 2, j + 1));
+			unit->Settlement = CSite::GetSite(LuaToString(l, 2, j + 1));
 			if (type->BoolFlag[TOWNHALL_INDEX].value || SettlementSiteUnitType == type) {
 				unit->Settlement->SiteUnit = unit;
 				Map.SiteUnits.push_back(unit);

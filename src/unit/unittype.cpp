@@ -1841,11 +1841,11 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 	if (potential_names.size() == 0 && this->Civilization != -1) {
 		int civilization_id = this->Civilization;
 		if (civilization_id != -1) {
-			if (faction && civilization_id != faction->Civilization && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization] && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
-				civilization_id = faction->Civilization;
+			if (faction && civilization_id != faction->Civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization->ID] && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
+				civilization_id = faction->Civilization->ID;
 			}
 			CCivilization *civilization = CCivilization::Civilizations[civilization_id];
-			if (faction && faction->Civilization != civilization_id) {
+			if (faction && faction->Civilization != civilization) {
 				faction = nullptr;
 			}
 			if (this->Faction != -1 && !faction) {

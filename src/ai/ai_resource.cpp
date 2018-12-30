@@ -44,6 +44,7 @@
 #include "commands.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "pathfinder.h"

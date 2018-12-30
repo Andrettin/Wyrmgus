@@ -47,6 +47,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"

@@ -610,14 +610,6 @@ public:
 class CFaction
 {
 public:
-	CFaction() : 
-		ID(-1), Civilization(-1), Type(FactionTypeNoFactionType), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1),
-		Playable(true), DefiniteArticle(false),
-		DefaultAI("land-attack"),
-		HolyOrderDeity(nullptr), Conditions(nullptr)
-	{
-	}
-	
 	~CFaction();
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
@@ -634,19 +626,19 @@ public:
 	std::string Background;												/// faction background
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string Adjective;												/// adjective pertaining to the faction
-	std::string DefaultAI;
-	int ID;																/// faction ID
-	int Civilization;													/// faction civilization
-	int Type;															/// faction type (i.e. tribe or polity)
-	int DefaultTier;													/// default faction tier
-	int DefaultGovernmentType;											/// default government type
-	int ParentFaction;													/// parent faction of this faction
-	bool Playable;														/// faction playability
-	bool DefiniteArticle;												/// whether the faction's name should be preceded by a definite article (i.e. "the Netherlands")
+	std::string DefaultAI = "land-attack";
+	int ID = -1;														/// faction ID
+	CCivilization *Civilization = nullptr;								/// faction civilization
+	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
+	int DefaultTier = FactionTierBarony;								/// default faction tier
+	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
+	int ParentFaction = -1;												/// parent faction of this faction
+	bool Playable = true;												/// faction playability
+	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
 	IconConfig Icon;													/// Faction's icon
 	CCurrency *Currency = nullptr;										/// The faction's currency
-	CDeity *HolyOrderDeity;												/// deity this faction belongs to, if it is a holy order
-	LuaCallback *Conditions;
+	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
+	LuaCallback *Conditions = nullptr;
 	std::vector<int> Colors;											/// faction colors
 	std::vector<CFaction *> DevelopsFrom;								/// from which factions can this faction develop
 	std::vector<CFaction *> DevelopsTo;									/// to which factions this faction can develop

@@ -61,6 +61,7 @@
 //Wyrmgus end
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "map/site.h"
 #include "network.h"
 #include "netconnect.h"
 //Wyrmgus start
@@ -532,7 +533,7 @@ int PlayerRace::GetFactionClassUnitType(int faction, int class_id)
 		return GetFactionClassUnitType(PlayerRaces.Factions[faction]->ParentFaction, class_id);
 	}
 	
-	return GetCivilizationClassUnitType(PlayerRaces.Factions[faction]->Civilization, class_id);
+	return GetCivilizationClassUnitType(PlayerRaces.Factions[faction]->Civilization->ID, class_id);
 }
 
 int PlayerRace::GetFactionClassUpgrade(int faction, int class_id)
@@ -549,7 +550,7 @@ int PlayerRace::GetFactionClassUpgrade(int faction, int class_id)
 		return GetFactionClassUpgrade(PlayerRaces.Factions[faction]->ParentFaction, class_id);
 	}
 	
-	return GetCivilizationClassUpgrade(PlayerRaces.Factions[faction]->Civilization, class_id);
+	return GetCivilizationClassUpgrade(PlayerRaces.Factions[faction]->Civilization->ID, class_id);
 }
 
 CLanguage *PlayerRace::GetCivilizationLanguage(int civilization)
@@ -600,7 +601,7 @@ std::vector<CFiller> PlayerRace::GetFactionUIFillers(int faction)
 		return GetFactionUIFillers(PlayerRaces.Factions[faction]->ParentFaction);
 	}
 	
-	return GetCivilizationUIFillers(PlayerRaces.Factions[faction]->Civilization);
+	return GetCivilizationUIFillers(PlayerRaces.Factions[faction]->Civilization->ID);
 }
 
 /**
@@ -694,11 +695,11 @@ int CFaction::GetUpgradePriority(const CUpgrade *upgrade) const
 		return this->UpgradePriorities.find(upgrade)->second;
 	}
 	
-	if (this->Civilization == -1) {
+	if (this->Civilization == nullptr) {
 		fprintf(stderr, "Error in CFaction::GetUpgradePriority: the faction has no civilization.\n");
 	}
 	
-	return CCivilization::Civilizations[this->Civilization]->GetUpgradePriority(upgrade);
+	return this->Civilization->GetUpgradePriority(upgrade);
 }
 
 int CFaction::GetForceTypeWeight(int force_type) const
@@ -715,11 +716,11 @@ int CFaction::GetForceTypeWeight(int force_type) const
 		return PlayerRaces.Factions[this->ParentFaction]->GetForceTypeWeight(force_type);
 	}
 	
-	if (this->Civilization == -1) {
+	if (this->Civilization == nullptr) {
 		fprintf(stderr, "Error in CFaction::GetForceTypeWeight: the faction has no civilization.\n");
 	}
 	
-	return CCivilization::Civilizations[this->Civilization]->GetForceTypeWeight(force_type);
+	return this->Civilization->GetForceTypeWeight(force_type);
 }
 
 /**
@@ -737,8 +738,8 @@ CCurrency *CFaction::GetCurrency() const
 		return PlayerRaces.Factions[this->ParentFaction]->GetCurrency();
 	}
 	
-	if (this->Civilization != -1) {
-		return CCivilization::Civilizations[this->Civilization]->GetCurrency();
+	if (this->Civilization != nullptr) {
+		return this->Civilization->GetCurrency();
 	}
 	
 	return nullptr;
@@ -758,11 +759,11 @@ std::vector<CForceTemplate *> CFaction::GetForceTemplates(int force_type) const
 		return PlayerRaces.Factions[this->ParentFaction]->GetForceTemplates(force_type);
 	}
 	
-	if (this->Civilization == -1) {
+	if (this->Civilization == nullptr) {
 		fprintf(stderr, "Error in CFaction::GetForceTemplates: the faction has no civilization.\n");
 	}
 	
-	return CCivilization::Civilizations[this->Civilization]->GetForceTemplates(force_type);
+	return this->Civilization->GetForceTemplates(force_type);
 }
 
 std::vector<CAiBuildingTemplate *> CFaction::GetAiBuildingTemplates() const
@@ -775,11 +776,11 @@ std::vector<CAiBuildingTemplate *> CFaction::GetAiBuildingTemplates() const
 		return PlayerRaces.Factions[this->ParentFaction]->GetAiBuildingTemplates();
 	}
 	
-	if (this->Civilization == -1) {
+	if (this->Civilization == nullptr) {
 		fprintf(stderr, "Error in CFaction::GetAiBuildingTemplates: the faction has no civilization.\n");
 	}
 	
-	return CCivilization::Civilizations[this->Civilization]->GetAiBuildingTemplates();
+	return this->Civilization->GetAiBuildingTemplates();
 }
 
 std::vector<std::string> &CFaction::GetShipNames()
@@ -792,7 +793,7 @@ std::vector<std::string> &CFaction::GetShipNames()
 		return PlayerRaces.Factions[this->ParentFaction]->GetShipNames();
 	}
 	
-	return CCivilization::Civilizations[this->Civilization]->GetShipNames();
+	return this->Civilization->GetShipNames();
 }
 
 CDynasty::~CDynasty()
@@ -1224,7 +1225,7 @@ CPlayer *GetFactionPlayer(const CFaction *faction)
 	}
 	
 	for (int i = 0; i < NumPlayers; ++i) {
-		if (Players[i].Race == faction->Civilization && Players[i].Faction == faction->ID) {
+		if (Players[i].Race == faction->Civilization->ID && Players[i].Faction == faction->ID) {
 			return &Players[i];
 		}
 	}
@@ -1244,7 +1245,7 @@ CPlayer *GetOrAddFactionPlayer(CFaction *faction)
 	for (int i = 0; i < NumPlayers; ++i) {
 		if (Players[i].Type == PlayerNobody) {
 			Players[i].Type = PlayerComputer;
-			Players[i].SetCivilization(faction->Civilization);
+			Players[i].SetCivilization(faction->Civilization->ID);
 			Players[i].SetFaction(faction);
 			Players[i].AiEnabled = true;
 			Players[i].AiName = faction->DefaultAI;
@@ -1491,8 +1492,8 @@ void CPlayer::SetFaction(CFaction *faction)
 {
 	int old_faction_id = this->Faction;
 	
-	if (faction && faction->Civilization != this->Race) {
-		this->SetCivilization(faction->Civilization);
+	if (faction && faction->Civilization->ID != this->Race) {
+		this->SetCivilization(faction->Civilization->ID);
 	}
 
 	if (this->Faction != -1) {
@@ -1596,7 +1597,7 @@ void CPlayer::SetFaction(CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->Civilization != -1 && PlayerRaces.Species[unit.Type->Civilization] == PlayerRaces.Species[faction->Civilization] && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->Civilization != -1 && PlayerRaces.Species[unit.Type->Civilization] == PlayerRaces.Species[faction->Civilization->ID] && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();
@@ -1616,7 +1617,7 @@ void CPlayer::SetRandomFaction()
 	
 	for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
 		CFaction *faction = PlayerRaces.Factions[i];
-		if (faction->Civilization != this->Race) {
+		if (faction->Civilization->ID != this->Race) {
 			continue;
 		}
 		if (!faction->Playable) {
@@ -1982,7 +1983,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && Players[i].Type != PlayerNobody && Players[i].Race == faction->Civilization && Players[i].Faction == faction->ID) {
+		if (this->Index != i && Players[i].Type != PlayerNobody && Players[i].Race == faction->Civilization->ID && Players[i].Faction == faction->ID) {
 			// faction is already in use
 			return false;
 		}

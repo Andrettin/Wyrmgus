@@ -44,6 +44,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map_template.h"
+#include "map/site.h"
 #include "map/terrain_type.h"
 #include "missile.h"
 #include "plane.h"
@@ -331,6 +332,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CSeasonSchedule *season_schedule = CSeasonSchedule::GetOrAddSeasonSchedule(ident);
 			if (!define_only) {
 				season_schedule->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "site") {
+			CSite *site = CSite::GetOrAddSite(ident);
+			if (!define_only) {
+				site->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "sound") {
 			if (!define_only) {
