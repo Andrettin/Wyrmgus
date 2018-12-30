@@ -2614,6 +2614,8 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	
 	CTerrainType *terrain_type = generated_terrain->TerrainType;
 	const int seed_count = generated_terrain->SeedCount;
+	const int max_tile_quantity = (max_pos.x + 1 - min_pos.x) * (max_pos.y + 1 - min_pos.y) * generated_terrain->MaxPercent / 100;
+	int tile_quantity = 0;
 	
 	Vec2i random_pos(0, 0);
 	int count = seed_count;
@@ -2625,6 +2627,10 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 			for (int y = min_pos.y; y <= max_pos.y; ++y) {
 				const Vec2i tile_pos(x, y);
 				const CMapField *tile = this->Field(x, y, z);
+				
+				if (max_tile_quantity != 0 && tile->GetTopTerrain() == terrain_type) {
+					tile_quantity++;
+				}
 				
 				if (!generated_terrain->CanUseTileAsSeed(tile)) {
 					continue;
@@ -2672,6 +2678,10 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	
 	// create initial seeds
 	while (count > 0 && !potential_positions.empty()) {
+		if (max_tile_quantity != 0 && tile_quantity >= max_tile_quantity) {
+			break;
+		}
+		
 		random_pos = potential_positions[SyncRand(potential_positions.size())];
 		potential_positions.erase(std::remove(potential_positions.begin(), potential_positions.end(), random_pos), potential_positions.end());
 		
@@ -2766,6 +2776,8 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				seeds.push_back(adjacent_pos);
 				seeds.push_back(Vec2i(random_pos.x, adjacent_pos.y));
 				seeds.push_back(Vec2i(adjacent_pos.x, random_pos.y));
+				
+				tile_quantity += 4;
 			}
 		}
 	}
@@ -2773,6 +2785,10 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 	// expand seeds
 	for (size_t i = 0; i < seeds.size(); ++i) {
 		Vec2i seed_pos = seeds[i];
+		
+		if (max_tile_quantity != 0 && tile_quantity >= max_tile_quantity) {
+			break;
+		}
 		
 		const int random_number = SyncRand(100);
 		if (random_number >= generated_terrain->ExpansionChance) {
@@ -2878,6 +2894,10 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				}
 				
 				seeds.push_back(adjacent_pos);
+				
+				if (this->GetTileTopTerrain(adjacent_pos, false, z) == terrain_type) {
+					tile_quantity++;
+				}
 			}
 			
 			if (this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z)))) {
@@ -2890,6 +2910,10 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				}
 				
 				seeds.push_back(adjacent_pos_horizontal);
+				
+				if (this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) == terrain_type) {
+					tile_quantity++;
+				}
 			}
 			
 			if (this->GetTileTopTerrain(adjacent_pos_vertical, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z)))) {
@@ -2902,9 +2926,11 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				}
 				
 				seeds.push_back(adjacent_pos_vertical);
+				
+				if (this->GetTileTopTerrain(adjacent_pos_vertical, false, z) == terrain_type) {
+					tile_quantity++;
+				}
 			}
-			
-			count -= 1;
 		}
 	}
 }

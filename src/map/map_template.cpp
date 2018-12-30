@@ -1613,6 +1613,8 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 			this->SeedCount = std::stoi(value);
 		} else if (key == "expansion_chance") {
 			this->ExpansionChance = std::stoi(value);
+		} else if (key == "max_percent") {
+			this->MaxPercent = std::stoi(value);
 		} else if (key == "use_existing_as_seeds") {
 			this->UseExistingAsSeeds = StringToBool(value);
 		} else if (key == "use_subtemplate_borders_as_seeds") {
