@@ -471,7 +471,9 @@ void InitVideoSdl()
 //#ifndef USE_WIN32
 //Wyrmgus end
 		// Fix tablet input in full-screen mode
+		#ifndef __MORPHOS__
 		SDL_putenv(strdup("SDL_MOUSE_RELATIVE=0"));
+		#endif
 //Wyrmgus start
 //#endif
 //Wyrmgus end
@@ -512,6 +514,7 @@ void InitVideoSdl()
 		UseOpenGL = false;
 #endif
 
+#ifndef __MORPHOS__	
 		SDL_Surface *icon = nullptr;
 		CGraphic *g = nullptr;
 		struct stat st;
@@ -558,7 +561,8 @@ void InitVideoSdl()
 		if (g) {
 			CGraphic::Free(g);
 		}
-
+#endif
+		
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		UseOpenGL = UseOpenGL_orig;
 #endif
@@ -588,7 +592,11 @@ void InitVideoSdl()
 	// Initialize the display
 
 #if !defined(USE_OPENGL) && !defined(USE_GLES)
+	#ifdef __MORPHOS__
+	flags = SDL_SWSURFACE;
+	#else
 	flags = SDL_HWSURFACE | SDL_HWPALETTE;
+	#endif
 #endif
 
 	// Sam said: better for windows.
