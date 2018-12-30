@@ -810,9 +810,13 @@ std::vector<CUnit *> CMap::GetMapTemplateLayerConnectors(const CMapTemplate *map
 				CUnit *connector_unit = this->MapLayers[z]->LayerConnectors[i];
 				const Vec2i unit_pos = connector_unit->GetTileCenterPos();
 				
-				if (is_main_template == !this->IsPointInASubtemplateArea(unit_pos, z, map_template)) {
-					layer_connectors.push_back(connector_unit);
+				if (is_main_template && this->IsPointInASubtemplateArea(unit_pos, z)) {
+					continue;
+				} else if (!is_main_template && !this->IsPointInASubtemplateArea(unit_pos, z, map_template)) {
+					continue;
 				}
+
+				layer_connectors.push_back(connector_unit);
 			}
 		}
 	}
