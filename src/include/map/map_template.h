@@ -30,8 +30,6 @@
 #ifndef __MAP_TEMPLATE_H__
 #define __MAP_TEMPLATE_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -63,6 +61,8 @@ class CWorld;
 class CGeneratedTerrain
 {
 public:
+	void ProcessConfigData(const CConfigData *config_data);
+	
 	bool CanUseTileAsSeed(const CMapField *tile) const;
 	bool CanGenerateOnTile(const CMapField *tile) const;
 	bool CanTileBePartOfExpansion(const CMapField *tile) const;
@@ -80,11 +80,7 @@ class CMapTemplate
 {
 public:
 	CMapTemplate() :
-		Width(0), Height(0), Scale(1), SurfaceLayer(0),
-		Overland(false), OutputTerrainImage(false),
-		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0), PixelTileSize(32, 32),
-		Plane(nullptr), World(nullptr),
-		BaseTerrainType(nullptr), BaseOverlayTerrainType(nullptr), BorderTerrainType(nullptr), SurroundingTerrainType(nullptr)
+		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0), PixelTileSize(32, 32)
 	{
 	}
 	
@@ -115,12 +111,12 @@ public:
 	std::string OverlayTerrainFile;
 	std::string TerrainImage;
 	std::string OverlayTerrainImage;
-	int Width;
-	int Height;
-	int Scale;													/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
-	int SurfaceLayer;											/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
-	bool Overland;												/// Whether this is an overland map
-	bool OutputTerrainImage;
+	int Width = 0;
+	int Height = 0;
+	int Scale = 1;												/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
+	int SurfaceLayer = 0;										/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
+	bool Overland = false;										/// Whether this is an overland map
+	bool OutputTerrainImage = false;
 	Vec2i SubtemplatePosition;
 	Vec2i MinPos = Vec2i(-1, -1); //the minimum position this (sub)template can be applied to (relative to the main template)
 	Vec2i MaxPos = Vec2i(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
@@ -130,12 +126,12 @@ public:
 	CMapTemplate *UpperTemplate = nullptr;						/// Map template corresponding to this one in the upper layer
 	CMapTemplate *LowerTemplate = nullptr;						/// Map template corresponding to this one in the lower layer
 	std::vector<const CMapTemplate *> AdjacentTemplates;		/// Map templates adjacent to this one
-	CPlane *Plane;
-	CWorld *World;
-	CTerrainType *BaseTerrainType;
-	CTerrainType *BaseOverlayTerrainType;
-	CTerrainType *BorderTerrainType;
-	CTerrainType *SurroundingTerrainType;
+	CPlane *Plane = nullptr;
+	CWorld *World = nullptr;
+	CTerrainType *BaseTerrainType = nullptr;
+	CTerrainType *BaseOverlayTerrainType = nullptr;
+	CTerrainType *BorderTerrainType = nullptr;
+	CTerrainType *SurroundingTerrainType = nullptr;
 	std::vector<CMapTemplate *> Subtemplates;
 	std::vector<CGeneratedTerrain *> GeneratedTerrains;				/// terrains generated in the map template
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
@@ -152,6 +148,4 @@ public:
 	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
 };
 
-//@}
-
-#endif // !__MAP_TEMPLATE_H__
+#endif

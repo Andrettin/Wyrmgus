@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -82,8 +80,8 @@ const int MaxAdjacentTemplateDistance = 16;
 */
 CMapTemplate::~CMapTemplate()
 {
-	for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
-		delete this->GeneratedTerrains[i];
+	for (CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
+		delete generated_terrain;
 	}
 }
 
@@ -297,35 +295,10 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (child_config_data->Tag == "generated_terrain") {
 			CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
-				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-				
-				if (key == "terrain_type") {
-					value = FindAndReplaceString(value, "_", "-");
-					generated_terrain->TerrainType = CTerrainType::GetTerrainType(value);
-				} else if (key == "seed_count") {
-					generated_terrain->SeedCount = std::stoi(value);
-				} else if (key == "expansion_chance") {
-					generated_terrain->ExpansionChance = std::stoi(value);
-				} else if (key == "use_existing_as_seeds") {
-					generated_terrain->UseExistingAsSeeds = StringToBool(value);
-				} else if (key == "use_subtemplate_borders_as_seeds") {
-					generated_terrain->UseSubtemplateBordersAsSeeds = StringToBool(value);
-				} else if (key == "target_terrain_type") {
-					value = FindAndReplaceString(value, "_", "-");
-					const CTerrainType *target_terrain_type = CTerrainType::GetTerrainType(value);
-					if (target_terrain_type) {
-						generated_terrain->TargetTerrainTypes.push_back(target_terrain_type);
-					}
-				} else {
-					fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", key.c_str());
-				}
-			}
 			
+			generated_terrain->ProcessConfigData(child_config_data);
+				
 			if (!generated_terrain->TerrainType) {
-				fprintf(stderr, "Generated terrain has no terrain type.\n");
 				delete generated_terrain;
 				continue;
 			}
@@ -662,11 +635,11 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	if (!has_base_map) {
 		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
 		
-		for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
+		for (const CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
 			int map_width = (map_end.x - map_start_pos.x);
 			int map_height = (map_end.y - map_start_pos.y);
 			
-			Map.GenerateTerrain(this->GeneratedTerrains[i], map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
+			Map.GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
 		}
 	}
 	
@@ -718,11 +691,11 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	if (has_base_map) {
 		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
 		
-		for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
+		for (const CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
 			int map_width = (map_end.x - map_start_pos.x);
 			int map_height = (map_end.y - map_start_pos.y);
 			
-			Map.GenerateTerrain(this->GeneratedTerrains[i], map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
+			Map.GenerateTerrain(generated_terrain, map_start_pos, map_end - Vec2i(1, 1), has_base_map, z);
 		}
 	}
 	
@@ -1623,6 +1596,44 @@ Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<CHistoricalLoca
 }
 
 /**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "terrain_type") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->TerrainType = CTerrainType::GetTerrainType(value);
+		} else if (key == "seed_count") {
+			this->SeedCount = std::stoi(value);
+		} else if (key == "expansion_chance") {
+			this->ExpansionChance = std::stoi(value);
+		} else if (key == "use_existing_as_seeds") {
+			this->UseExistingAsSeeds = StringToBool(value);
+		} else if (key == "use_subtemplate_borders_as_seeds") {
+			this->UseSubtemplateBordersAsSeeds = StringToBool(value);
+		} else if (key == "target_terrain_type") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CTerrainType *target_terrain_type = CTerrainType::GetTerrainType(value);
+			if (target_terrain_type) {
+				this->TargetTerrainTypes.push_back(target_terrain_type);
+			}
+		} else {
+			fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	if (!this->TerrainType) {
+		fprintf(stderr, "Generated terrain has no terrain type.\n");
+	}
+}
+
+/**
 **	@brief	Get whether the terrain generation can use the given tile as a seed
 **
 **	@param	tile	The tile
@@ -1722,5 +1733,3 @@ bool CGeneratedTerrain::CanRemoveTileOverlayTerrain(const CMapField *tile) const
 	
 	return true;
 }
-
-//@}
