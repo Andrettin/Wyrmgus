@@ -518,6 +518,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	int air_damage = attacker.Variable[AIRDAMAGE_INDEX].Value;
 	int earth_damage = attacker.Variable[EARTHDAMAGE_INDEX].Value;
 	int water_damage = attacker.Variable[WATERDAMAGE_INDEX].Value;
+	int acid_damage = attacker.Variable[ACIDDAMAGE_INDEX].Value;
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -582,6 +583,8 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		earth_damage /= 100;
 		water_damage *= 100 - goal->Variable[WATERRESISTANCE_INDEX].Value;
 		water_damage /= 100;
+		acid_damage *= 100 - goal->Variable[ACIDRESISTANCE_INDEX].Value;
+		acid_damage /= 100;
 		
 		// extra backstab damage (only works against units (that are organic and non-building, and that have 8 facing directions) facing opposite to the attacker
 		if (attacker.Variable[BACKSTAB_INDEX].Value > 0 && goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->BoolFlag[BUILDING_INDEX].value && goal->Type->NumDirections == 8) {
@@ -632,6 +635,8 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		earth_damage /= 100;
 		water_damage *= 100 - goal_stats.Variables[WATERRESISTANCE_INDEX].Value;
 		water_damage /= 100;
+		acid_damage *= 100 - goal_stats.Variables[ACIDRESISTANCE_INDEX].Value;
+		acid_damage /= 100;
 	}
 	
 	basic_damage *= damage_modifier;
@@ -644,6 +649,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	piercing_damage += air_damage;
 	piercing_damage += earth_damage;
 	piercing_damage += water_damage;
+	piercing_damage += acid_damage;
 	piercing_damage *= damage_modifier;
 	piercing_damage /= 100;
 	//Wyrmgus end

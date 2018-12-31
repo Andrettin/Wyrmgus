@@ -67,6 +67,8 @@
 			this->EarthDamage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "water-damage")) {
 			this->WaterDamage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "acid-damage")) {
+			this->AcidDamage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "hack-damage")) {
 			this->HackDamage = LuaToBoolean(l, -1, j + 1);
 		} else if (!strcmp(value, "pierce-damage")) {
@@ -164,7 +166,7 @@
 	//
 	//Wyrmgus start
 	//if (this->Damage) {
-	if (this->Damage || this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage || this->ArcaneDamage || this->LightningDamage || this->AirDamage || this->EarthDamage || this->WaterDamage) {
+	if (this->Damage || this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage || this->ArcaneDamage || this->LightningDamage || this->AirDamage || this->EarthDamage || this->WaterDamage || this->AcidDamage) {
 	//Wyrmgus end
 		std::vector<CUnit *> table;
 		//Wyrmgus start
@@ -181,7 +183,7 @@
 				&& unit.MapDistanceTo(caster) <= this->Range && (UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) && (caster.IsEnemy(unit) || this->DamageFriendly)) {
 
 				int damage = 0;
-				if (this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage || this->ArcaneDamage || this->LightningDamage || this->AirDamage || this->EarthDamage || this->WaterDamage) {
+				if (this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage || this->ArcaneDamage || this->LightningDamage || this->AirDamage || this->EarthDamage || this->WaterDamage || this->AcidDamage) {
 					damage = std::max<int>(this->BasicDamage - unit.Variable[ARMOR_INDEX].Value, 1);
 					damage += this->PiercingDamage;
 					//apply resistances
@@ -203,6 +205,7 @@
 					damage += this->AirDamage * (100 - unit.Variable[AIRRESISTANCE_INDEX].Value) / 100;
 					damage += this->EarthDamage * (100 - unit.Variable[EARTHRESISTANCE_INDEX].Value) / 100;
 					damage += this->WaterDamage * (100 - unit.Variable[WATERRESISTANCE_INDEX].Value) / 100;
+					damage += this->AcidDamage * (100 - unit.Variable[ACIDRESISTANCE_INDEX].Value) / 100;
 					damage *= modifier;
 					damage /= 100;
 					damage -= SyncRand() % ((damage + 2) / 2);

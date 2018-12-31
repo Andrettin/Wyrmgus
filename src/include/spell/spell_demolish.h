@@ -30,8 +30,6 @@
 #ifndef SPELL_DEMOLISH_H
 #define SPELL_DEMOLISH_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -41,39 +39,31 @@
 class Spell_Demolish : public SpellActionType
 {
 public:
-	//Wyrmgus start
-//	Spell_Demolish() : Damage(0), Range(0) {};
-	Spell_Demolish() : Damage(0), BasicDamage(0), PiercingDamage(0), FireDamage(0), ColdDamage(0), ArcaneDamage(0), LightningDamage(0),
-	AirDamage(0), EarthDamage(0), WaterDamage(0), Range(0),
-	HackDamage(true), PierceDamage(true), BluntDamage(true), DamageSelf(true), DamageFriendly(true), DamageTerrain(true) {};
-	//Wyrmgus end
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	int Damage; /// Damage for every unit in range.
-	int Range;  /// Range of the explosion.
+	int Damage = 0;			/// Damage for every unit in range.
+	int Range = 0;			/// Range of the explosion.
 	//Wyrmgus start
-	int BasicDamage; /// Basic damage for every unit in range.
-	int PiercingDamage; /// Piercing damage for every unit in range.
-	int FireDamage;
-	int ColdDamage;
-	int ArcaneDamage;
-	int LightningDamage;
-	int AirDamage;
-	int EarthDamage;
-	int WaterDamage;
-	bool HackDamage;
-	bool PierceDamage;
-	bool BluntDamage;
-	bool DamageSelf;   /// If true, damages self when casting spell
-	bool DamageFriendly;   /// If true, damages friendly units when casting spell
-	bool DamageTerrain;   /// If true, damages terrain when casting spell
+	int BasicDamage = 0;	/// Basic damage for every unit in range.
+	int PiercingDamage = 0;	/// Piercing damage for every unit in range.
+	int FireDamage = 0;
+	int ColdDamage = 0;
+	int ArcaneDamage = 0;
+	int LightningDamage = 0;
+	int AirDamage = 0;
+	int EarthDamage = 0;
+	int WaterDamage = 0;
+	int AcidDamage = 0;
+	bool HackDamage = false;
+	bool PierceDamage = false;
+	bool BluntDamage = false;
+	bool DamageSelf = true;		/// If true, damages self when casting spell
+	bool DamageFriendly = true;	/// If true, damages friendly units when casting spell
+	bool DamageTerrain = true;	/// If true, damages terrain when casting spell
 	//Wyrmgus end
 };
 
-
-//@}
-
-#endif // SPELL_DEMOLISH_H
+#endif
