@@ -106,8 +106,8 @@ public:
 	const CMapTemplate *GetTopMapTemplate() const;
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 	
-	std::string Name;
 	std::string Ident;
+	std::string Name;
 	std::string TerrainFile;
 	std::string OverlayTerrainFile;
 	std::string TerrainImage;
