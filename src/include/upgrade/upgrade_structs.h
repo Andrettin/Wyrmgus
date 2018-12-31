@@ -54,6 +54,7 @@ class CCharacter;
 class CConfigData;
 class CDeityDomain;
 class CIcon;
+class CSchoolOfMagic;
 class CUniqueItem;
 class CUnitType;
 class CUpgradeModifier;
@@ -150,6 +151,7 @@ public:
 	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<CUnitType *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
 	std::vector<CDeityDomain *> DeityDomains;	/// Deity domains to which this ability belongs
+	std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic to which this ability belongs
 	std::vector<CCharacter *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons

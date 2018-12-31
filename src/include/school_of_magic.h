@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name plane.h - The plane header file. */
+/**@name school_of_magic.h - The school of magic header file. */
 //
-//      (c) Copyright 2016-2018 by Andrettin
+//      (c) Copyright 2018 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,10 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __PLANE_H__
-#define __PLANE_H__
-
-//@{
+#ifndef __SCHOOL_OF_MAGIC_H__
+#define __SCHOOL_OF_MAGIC_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -45,42 +43,26 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
-class CDeityDomain;
-class CSchoolOfMagic;
-class CSeasonSchedule;
-class CSpecies;
-class CTimeOfDaySchedule;
+class CUpgrade;
 
-class CPlane
+class CSchoolOfMagic
 {
 public:
-	CPlane() :
-		ID(-1), TimeOfDaySchedule(nullptr), SeasonSchedule(nullptr)
-	{
-	}
+	static CSchoolOfMagic *GetSchoolOfMagic(const std::string &ident, bool should_find = true);
+	static CSchoolOfMagic *GetOrAddSchoolOfMagic(const std::string &ident);
+	static CSchoolOfMagic *GetSchoolOfMagicByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
+	static void ClearSchoolsOfMagic();
 	
-	static CPlane *GetPlane(const std::string &ident, const bool should_find = true);
-	static CPlane *GetOrAddPlane(const std::string &ident);
-	static void ClearPlanes();
-	
-	static std::vector<CPlane *> Planes;								/// Planes
-	static std::map<std::string, CPlane *> PlanesByIdent;
+	static std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic
+	static std::map<std::string, CSchoolOfMagic *> SchoolsOfMagicByIdent;
+	static std::map<const CUpgrade *, CSchoolOfMagic *> SchoolsOfMagicByUpgrade;
 
 	void ProcessConfigData(const CConfigData *config_data);
-
-	int ID;																/// ID of this plane
-	std::string Ident;
-	std::string Name;
-	std::string Description;
-	std::string Background;
-	std::string Quote;
-	CTimeOfDaySchedule *TimeOfDaySchedule;								/// this plane's time of day schedule
-	CSeasonSchedule *SeasonSchedule;									/// this plane's season schedule
-	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// Deity domains empowered in this plane
-	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic;				/// Schools of magic empowered in this plane
-	std::vector<CSpecies *> Species;									/// Species in this plane
+	
+	std::string Ident;									/// Ident of the school of magic
+	std::string Name;									/// Name of the school of magic
+	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the school of magic
+	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this school of magic
 };
 
-//@}
-
-#endif // !__PLANE_H__
+#endif

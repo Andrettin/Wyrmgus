@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name deity_domain.cpp - The deity domain source file. */
+/**@name school_of_magic.cpp - The school of magic source file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "religion/deity_domain.h"
+#include "school_of_magic.h"
 
 #include "config.h"
 #include "upgrade/upgrade_structs.h"
@@ -42,90 +42,90 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CDeityDomain *> CDeityDomain::DeityDomains;
-std::map<std::string, CDeityDomain *> CDeityDomain::DeityDomainsByIdent;
-std::map<const CUpgrade *, CDeityDomain *> CDeityDomain::DeityDomainsByUpgrade;
+std::vector<CSchoolOfMagic *> CSchoolOfMagic::SchoolsOfMagic;
+std::map<std::string, CSchoolOfMagic *> CSchoolOfMagic::SchoolsOfMagicByIdent;
+std::map<const CUpgrade *, CSchoolOfMagic *> CSchoolOfMagic::SchoolsOfMagicByUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a deity domain
+**	@brief	Get a school of magic
 **
-**	@param	ident		The deity domain's string identifier
-**	@param	should_find	Whether it is an error if the deity domain could not be found; this is true by default
+**	@param	ident		The school of magic's string identifier
+**	@param	should_find	Whether it is an error if the school of magic could not be found; this is true by default
 **
-**	@return	The deity domain if found, or null otherwise
+**	@return	The school of magic if found, or null otherwise
 */
-CDeityDomain *CDeityDomain::GetDeityDomain(const std::string &ident, const bool should_find)
+CSchoolOfMagic *CSchoolOfMagic::GetSchoolOfMagic(const std::string &ident, const bool should_find)
 {
-	std::map<std::string, CDeityDomain *>::const_iterator find_iterator = DeityDomainsByIdent.find(ident);
+	std::map<std::string, CSchoolOfMagic *>::const_iterator find_iterator = SchoolsOfMagicByIdent.find(ident);
 	
-	if (find_iterator != DeityDomainsByIdent.end()) {
+	if (find_iterator != SchoolsOfMagicByIdent.end()) {
 		return find_iterator->second;
 	}
 	
 	if (should_find) {
-		fprintf(stderr, "Invalid deity domain: \"%s\".\n", ident.c_str());
+		fprintf(stderr, "Invalid school of magic: \"%s\".\n", ident.c_str());
 	}
 	
 	return nullptr;
 }
 
 /**
-**	@brief	Get or add a deity domain
+**	@brief	Get or add a school of magic
 **
-**	@param	ident	The deity domain's string identifier
+**	@param	ident	The school of magic's string identifier
 **
-**	@return	The deity domain if found, or a newly-created one otherwise
+**	@return	The school of magic if found, or a newly-created one otherwise
 */
-CDeityDomain *CDeityDomain::GetOrAddDeityDomain(const std::string &ident)
+CSchoolOfMagic *CSchoolOfMagic::GetOrAddSchoolOfMagic(const std::string &ident)
 {
-	CDeityDomain *deity_domain = GetDeityDomain(ident, false);
+	CSchoolOfMagic *school_of_magic = GetSchoolOfMagic(ident, false);
 	
-	if (!deity_domain) {
-		deity_domain = new CDeityDomain;
-		deity_domain->Ident = ident;
-		DeityDomains.push_back(deity_domain);
-		DeityDomainsByIdent[ident] = deity_domain;
+	if (!school_of_magic) {
+		school_of_magic = new CSchoolOfMagic;
+		school_of_magic->Ident = ident;
+		SchoolsOfMagic.push_back(school_of_magic);
+		SchoolsOfMagicByIdent[ident] = school_of_magic;
 	}
 	
-	return deity_domain;
+	return school_of_magic;
 }
 
 /**
-**	@brief	Get a deity domain by its respective upgrade
+**	@brief	Get a school of magic by its respective upgrade
 **
-**	@param	upgrade	The deity domain's upgrade
-**	@param	should_find	Whether it is an error if the deity domain could not be found; this is true by default
+**	@param	upgrade	The school of magic's upgrade
+**	@param	should_find	Whether it is an error if the school of magic could not be found; this is true by default
 **
-**	@return	The upgrade's deity domain, if any
+**	@return	The upgrade's school of magic, if any
 */
-CDeityDomain *CDeityDomain::GetDeityDomainByUpgrade(const CUpgrade *upgrade, const bool should_find)
+CSchoolOfMagic *CSchoolOfMagic::GetSchoolOfMagicByUpgrade(const CUpgrade *upgrade, const bool should_find)
 {
-	std::map<const CUpgrade *, CDeityDomain *>::const_iterator find_iterator = DeityDomainsByUpgrade.find(upgrade);
+	std::map<const CUpgrade *, CSchoolOfMagic *>::const_iterator find_iterator = SchoolsOfMagicByUpgrade.find(upgrade);
 	
-	if (find_iterator != DeityDomainsByUpgrade.end()) {
+	if (find_iterator != SchoolsOfMagicByUpgrade.end()) {
 		return find_iterator->second;
 	}
 	
 	if (should_find) {
-		fprintf(stderr, "No deity domain found for upgrade: \"%s\".\n", upgrade->Ident.c_str());
+		fprintf(stderr, "No school of magic found for upgrade: \"%s\".\n", upgrade->Ident.c_str());
 	}
 	
 	return nullptr;
 }
 
 /**
-**	@brief	Remove the existing deity domains
+**	@brief	Remove the existing schools of magic
 */
-void CDeityDomain::ClearDeityDomains()
+void CSchoolOfMagic::ClearSchoolsOfMagic()
 {
-	for (size_t i = 0; i < DeityDomains.size(); ++i) {
-		delete DeityDomains[i];
+	for (size_t i = 0; i < SchoolsOfMagic.size(); ++i) {
+		delete SchoolsOfMagic[i];
 	}
-	DeityDomains.clear();
+	SchoolsOfMagic.clear();
 }
 
 /**
@@ -133,7 +133,7 @@ void CDeityDomain::ClearDeityDomains()
 **
 **	@param	config_data	The configuration data
 */
-void CDeityDomain::ProcessConfigData(const CConfigData *config_data)
+void CSchoolOfMagic::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -146,7 +146,7 @@ void CDeityDomain::ProcessConfigData(const CConfigData *config_data)
 			CUpgrade *upgrade = CUpgrade::Get(value);
 			if (upgrade) {
 				this->Upgrade = upgrade;
-				CDeityDomain::DeityDomainsByUpgrade[upgrade] = this;
+				CSchoolOfMagic::SchoolsOfMagicByUpgrade[upgrade] = this;
 			} else {
 				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 			}
@@ -155,7 +155,7 @@ void CDeityDomain::ProcessConfigData(const CConfigData *config_data)
 			CUpgrade *ability = CUpgrade::Get(value);
 			if (ability) {
 				this->Abilities.push_back(ability);
-				ability->DeityDomains.push_back(this);
+				ability->SchoolsOfMagic.push_back(this);
 			} else {
 				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 			}

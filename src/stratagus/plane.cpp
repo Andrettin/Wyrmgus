@@ -39,6 +39,7 @@
 
 #include "config.h"
 #include "religion/deity_domain.h"
+#include "school_of_magic.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
@@ -140,7 +141,16 @@ void CPlane::ProcessConfigData(const CConfigData *config_data)
 			this->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(value);
 		} else if (key == "empowered_deity_domain") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->EmpoweredDeityDomains.push_back(CDeityDomain::GetDeityDomain(value));
+			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
+			if (deity_domain) {
+				this->EmpoweredDeityDomains.push_back(deity_domain);
+			}
+		} else if (key == "empowered_school_of_magic") {
+			value = FindAndReplaceString(value, "_", "-");
+			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetSchoolOfMagic(value);
+			if (school_of_magic) {
+				this->EmpoweredSchoolsOfMagic.push_back(school_of_magic);
+			}
 		} else {
 			fprintf(stderr, "Invalid plane property: \"%s\".\n", key.c_str());
 		}

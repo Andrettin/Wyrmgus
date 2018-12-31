@@ -48,11 +48,6 @@ class CUpgrade;
 class CDeityDomain
 {
 public:
-	CDeityDomain() :
-		Upgrade(nullptr)
-	{
-	}
-	
 	static CDeityDomain *GetDeityDomain(const std::string &ident, bool should_find = true);
 	static CDeityDomain *GetOrAddDeityDomain(const std::string &ident);
 	static CDeityDomain *GetDeityDomainByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
@@ -61,10 +56,12 @@ public:
 	static std::vector<CDeityDomain *> DeityDomains;	/// Deity domains
 	static std::map<std::string, CDeityDomain *> DeityDomainsByIdent;
 	static std::map<const CUpgrade *, CDeityDomain *> DeityDomainsByUpgrade;
+
+	void ProcessConfigData(const CConfigData *config_data);
 	
 	std::string Ident;									/// Ident of the domain
 	std::string Name;									/// Name of the domain
-	CUpgrade *Upgrade;									/// Upgrade corresponding to the domain
+	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the domain
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this domain
 };
 

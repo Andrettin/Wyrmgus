@@ -49,7 +49,9 @@
 #include "missile.h"
 #include "plane.h"
 #include "religion/deity.h"
+#include "religion/deity_domain.h"
 #include "religion/pantheon.h"
+#include "school_of_magic.h"
 #include "sound.h"
 #include "spells.h"
 #include "time/calendar.h"
@@ -290,6 +292,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				deity->ProcessConfigData(config_data);
 			}
+		} else if (config_data->Tag == "deity_domain") {
+			CDeityDomain *deity_domain = CDeityDomain::GetOrAddDeityDomain(ident);
+			if (!define_only) {
+				deity_domain->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "historical_unit") {
 			CHistoricalUnit *historical_unit = CHistoricalUnit::GetOrAddHistoricalUnit(ident);
 			if (!define_only) {
@@ -322,6 +329,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CPlane *plane = CPlane::GetOrAddPlane(ident);
 			if (!define_only) {
 				plane->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "school_of_magic") {
+			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetOrAddSchoolOfMagic(ident);
+			if (!define_only) {
+				school_of_magic->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "season") {
 			CSeason *season = CSeason::GetOrAddSeason(ident);

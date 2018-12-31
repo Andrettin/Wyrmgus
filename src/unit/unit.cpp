@@ -6161,10 +6161,21 @@ bool CUnit::LevelCheck(const int level) const
 
 bool CUnit::IsAbilityEmpowered(const CUpgrade *ability) const
 {
-	if (this->MapLayer->Plane && !this->MapLayer->Plane->EmpoweredDeityDomains.empty()) {
-		for (size_t i = 0; i < ability->DeityDomains.size(); ++i) {
-			if (std::find(this->MapLayer->Plane->EmpoweredDeityDomains.begin(), this->MapLayer->Plane->EmpoweredDeityDomains.end(), ability->DeityDomains[i]) != this->MapLayer->Plane->EmpoweredDeityDomains.end()) {
-				return true;
+	const CPlane *plane = this->MapLayer->Plane;
+	if (plane) {
+		if (!plane->EmpoweredDeityDomains.empty()) {
+			for (const CDeityDomain *deity_domain : ability->DeityDomains) {
+				if (std::find(plane->EmpoweredDeityDomains.begin(), plane->EmpoweredDeityDomains.end(), deity_domain) != plane->EmpoweredDeityDomains.end()) {
+					return true;
+				}
+			}
+		}
+		
+		if (!plane->EmpoweredSchoolsOfMagic.empty()) {
+			for (const CSchoolOfMagic *school_of_magic : ability->SchoolsOfMagic) {
+				if (std::find(plane->EmpoweredSchoolsOfMagic.begin(), plane->EmpoweredSchoolsOfMagic.end(), school_of_magic) != plane->EmpoweredSchoolsOfMagic.end()) {
+					return true;
+				}
 			}
 		}
 	}

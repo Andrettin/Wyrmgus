@@ -320,6 +320,7 @@ set(stratagusmain_SRCS
 	src/stratagus/province.cpp
 	src/stratagus/quest.cpp
 	src/stratagus/resource.cpp
+	src/stratagus/school_of_magic.cpp
 	src/stratagus/script.cpp
 	src/stratagus/script_player.cpp
 	src/stratagus/script_character.cpp
@@ -696,6 +697,7 @@ set(stratagus_generic_HDRS
 	src/include/replay.h
 	src/include/resource.h
 	src/include/results.h
+	src/include/school_of_magic.h
 	src/include/script.h
 	src/include/script_sound.h
 	src/include/settings.h

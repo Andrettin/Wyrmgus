@@ -65,6 +65,7 @@
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "replay.h"
+#include "school_of_magic.h"
 #include "script.h"
 #include "sound.h"
 #include "sound_server.h"
@@ -141,6 +142,7 @@ void CleanModules()
 	CleanProvinces();
 	CleanQuests();
 	CReligion::ClearReligions();
+	CSchoolOfMagic::ClearSchoolsOfMagic();
 	CSite::ClearSites();
 	CleanTexts();
 	CleanUniqueItems();
