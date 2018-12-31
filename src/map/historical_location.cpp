@@ -95,10 +95,6 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 	if (!this->MapTemplate) {
 		fprintf(stderr, "Historical location has no map template.\n");
 	}
-	
-	if (!this->Site && (this->Position.x == -1 || this->Position.y == -1)) {
-		fprintf(stderr, "Historical location has no position.\n");
-	}
 }
 
 //@}

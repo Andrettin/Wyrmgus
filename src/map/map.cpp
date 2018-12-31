@@ -336,9 +336,6 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 	}
 	
 	CPlayer *player = GetFactionPlayer(faction);
-	if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && player != nullptr && player->StartMapLayer == z && player->StartPos.x >= min_pos.x && player->StartPos.x <= max_pos.x && player->StartPos.y >= min_pos.y && player->StartPos.y <= max_pos.y) {
-		return player->StartPos;
-	}
 	
 	Vec2i random_pos(-1, -1);
 	

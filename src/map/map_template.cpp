@@ -1478,8 +1478,9 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 			
 			unit_pos = this->GetBestLocationMapPosition(historical_unit->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, true);
 			
-			if ((unit_pos.x == -1 || unit_pos.y == -1) && unit_player && unit_player->StartMapLayer == z) {
-				unit_pos = unit_player->StartPos;
+			if (unit_pos.x == -1 || unit_pos.y == -1) {
+				unit_pos = Map.GenerateUnitLocation(historical_unit->UnitType, unit_faction, map_start_pos, map_end - Vec2i(1, 1), z);
+				unit_pos += historical_unit->UnitType->GetTileCenterPosOffset();
 			}
 		} else {
 			if (random) {
@@ -1620,8 +1621,10 @@ Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<CHistoricalLoca
 			if (historical_location->MapTemplate == this) {
 				if (historical_location->Position.x != -1 && historical_location->Position.y != -1) { //historical unit position, could also have been inherited from a site with a fixed position
 					pos = map_start_pos + historical_location->Position - template_start_pos;
-				} else if (random && historical_location->Site != nullptr && historical_location->Site->SiteUnit != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
-					pos = historical_location->Site->SiteUnit->GetTileCenterPos();
+				} else if (random) {
+					if (historical_location->Site != nullptr && historical_location->Site->SiteUnit != nullptr) { //sites with random positions will have no valid stored fixed position, but will have had a site unit randomly placed; use that site unit's position instead for this unit then
+						pos = historical_location->Site->SiteUnit->GetTileCenterPos();
+					}
 				}
 			} else {
 				in_another_map_template = true;
