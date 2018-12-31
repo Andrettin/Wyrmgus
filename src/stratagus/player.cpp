@@ -2525,6 +2525,13 @@ void CPlayer::PerformResourceTrade()
 		if ((this->Resources[res] + this->StoredResources[res]) >= 100) { //sell 100 per second, as long as there is enough of the resource stored
 			market_unit->SellResource(res, this->Index);
 		}
+		
+		//increase price due to domestic demand
+		this->StoredResourceDemand[res] += this->GetEffectiveResourceDemand(res);
+		while (this->StoredResourceDemand[res] >= 100) {
+			this->IncreaseResourcePrice(res);
+			this->StoredResourceDemand[res] -= 100;
+		}
 	}
 	
 	for (size_t i = 0; i < LuxuryResources.size(); ++i) {
@@ -2534,6 +2541,7 @@ void CPlayer::PerformResourceTrade()
 			market_unit->SellResource(res, this->Index);
 		}
 		
+		//increase price due to domestic demand
 		this->StoredResourceDemand[res] += this->GetEffectiveResourceDemand(res);
 		while (this->StoredResourceDemand[res] >= 100) {
 			this->IncreaseResourcePrice(res);

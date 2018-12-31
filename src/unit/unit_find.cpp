@@ -686,17 +686,20 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, const CUnit *deposit, const CUnit &worker, bool check_usage)
 //Wyrmgus end
 {
+	const CResource &resource = Resources[mine.GivesResource];
+
 	distance = deposit ? mine.MapDistanceTo(*deposit) : 0;
 	//Wyrmgus start
-	distance = distance * 100 / Resources[mine.GivesResource].FinalResourceConversionRate; // alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
-	if (Resources[mine.GivesResource].LuxuryResource) {
-		int price_modifier = worker.Player->GetResourcePrice(mine.GivesResource);
-		if (Resources[mine.GivesResource].InputResource) {
-			price_modifier -= worker.Player->GetResourcePrice(Resources[mine.GivesResource].InputResource);
-		}
-		price_modifier = std::max(price_modifier, 1);
-		distance = distance * 100 / price_modifier;
+	distance = distance * 100 / resource.FinalResourceConversionRate;
+	
+	//alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
+	int price_modifier = worker.Player->GetResourcePrice(resource.FinalResource) * resource.FinalResourceConversionRate / 100;
+	if (resource.InputResource) {
+		price_modifier -= worker.Player->GetResourcePrice(resource.InputResource);
 	}
+	price_modifier = std::max(price_modifier, 1);
+	distance = distance * 100 / price_modifier;
+
 	if (!mine.Type->BoolFlag[CANHARVEST_INDEX].value) { // if it is a deposit rather than a readily-harvestable resource, multiply the distance score
 		distance *= 8;
 	}
