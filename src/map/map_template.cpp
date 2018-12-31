@@ -258,6 +258,8 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
 			}
+		} else if (key == "output_terrain_image") {
+			this->OutputTerrainImage = StringToBool(value);
 		} else {
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", key.c_str());
 		}
