@@ -191,7 +191,11 @@ void CAge::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	std::sort(CAge::Ages.begin(), CAge::Ages.end(), [](CAge *a, CAge *b) {
-		return a->Priority > b->Priority;
+		if (a->Priority != b->Priority) {
+			return a->Priority > b->Priority;
+		} else {
+			return a->Ident < b->Ident;
+		}
 	});
 }
 

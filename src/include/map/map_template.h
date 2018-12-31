@@ -116,6 +116,7 @@ public:
 	int Height = 0;
 	int Scale = 1;												/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
 	int SurfaceLayer = 0;										/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
+	int Priority = 0; //the priority of this map template, for the order of application of subtemplates
 	bool Overland = false;										/// Whether this is an overland map
 	bool OutputTerrainImage = false;
 	Vec2i SubtemplatePosition;

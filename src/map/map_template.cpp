@@ -191,6 +191,8 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 			this->Height = std::stoi(value);
 		} else if (key == "scale") {
 			this->Scale = std::stoi(value);
+		} else if (key == "priority") {
+			this->Priority = std::stoi(value);
 		} else if (key == "pixel_tile_width") {
 			this->PixelTileSize.x = std::stoi(value);
 		} else if (key == "pixel_tile_height") {
@@ -307,6 +309,16 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 		} else {
 			fprintf(stderr, "Invalid map template property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
+	}
+	
+	if (this->MainTemplate) { //if this is a subtemplate, re-sort the main template's subtemplates according to priority
+		std::sort(this->MainTemplate->Subtemplates.begin(), this->MainTemplate->Subtemplates.end(), [](CMapTemplate *a, CMapTemplate *b) {
+			if (a->Priority != b->Priority) {
+				return a->Priority > b->Priority;
+			} else {
+				return a->Ident < b->Ident;
+			}
+		});
 	}
 }
 
