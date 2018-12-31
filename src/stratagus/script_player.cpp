@@ -2346,56 +2346,6 @@ static int CclDefineReligion(lua_State *l)
 }
 
 /**
-**  Define a deity domain.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineDeityDomain(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument (expected table)");
-	}
-
-	std::string deity_domain_ident = LuaToString(l, 1);
-	CDeityDomain *deity_domain = CDeityDomain::GetOrAddDeityDomain(deity_domain_ident);
-	
-	//  Parse the list:
-	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		
-		if (!strcmp(value, "Name")) {
-			deity_domain->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Upgrade")) {
-			CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1));
-			if (!upgrade) {
-				LuaError(l, "Upgrade doesn't exist.");
-			}
-			deity_domain->Upgrade = upgrade;
-			CDeityDomain::DeityDomainsByUpgrade[upgrade] = deity_domain;
-		} else if (!strcmp(value, "Abilities")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CUpgrade *ability = CUpgrade::Get(LuaToString(l, -1, j + 1));
-				if (!ability || !ability->Ability) {
-					LuaError(l, "Ability doesn't exist.");
-				}
-
-				deity_domain->Abilities.push_back(ability);
-				ability->DeityDomains.push_back(deity_domain);
-			}
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	return 0;
-}
-
-/**
 **  Define a deity.
 **
 **  @param l  Lua state.
@@ -3975,7 +3925,6 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
 	lua_register(Lua, "DefineDynasty", CclDefineDynasty);
 	lua_register(Lua, "DefineReligion", CclDefineReligion);
-	lua_register(Lua, "DefineDeityDomain", CclDefineDeityDomain);
 	lua_register(Lua, "DefineDeity", CclDefineDeity);
 	lua_register(Lua, "DefineLanguage", CclDefineLanguage);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
