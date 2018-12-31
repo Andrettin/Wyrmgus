@@ -61,6 +61,9 @@ public:
 	
 	std::string Ident;									/// Ident of the school of magic
 	std::string Name;									/// Name of the school of magic
+	std::string Description;							/// Description of the school of magic from an in-game universe perspective
+	std::string Background;								/// Description of the school of magic from a perspective outside of the game's universe
+	std::string Quote;									/// A quote relating to the school of magic
 	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the school of magic
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this school of magic
 };

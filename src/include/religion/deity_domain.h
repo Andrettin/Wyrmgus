@@ -61,6 +61,9 @@ public:
 	
 	std::string Ident;									/// Ident of the domain
 	std::string Name;									/// Name of the domain
+	std::string Description;							/// Description of the deity domain from an in-game universe perspective
+	std::string Background;								/// Description of the deity domain from a perspective outside of the game's universe
+	std::string Quote;									/// A quote relating to the deity domain
 	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the domain
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this domain
 };

@@ -159,6 +159,12 @@ void CSchoolOfMagic::ProcessConfigData(const CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 			}
+		} else if (key == "description") {
+			this->Description = value;
+		} else if (key == "background") {
+			this->Background = value;
+		} else if (key == "quote") {
+			this->Quote = value;
 		} else {
 			fprintf(stderr, "Invalid school of magic property: \"%s\".\n", key.c_str());
 		}
