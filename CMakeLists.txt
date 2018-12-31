@@ -319,6 +319,7 @@ set(stratagusmain_SRCS
 	src/stratagus/player.cpp
 	src/stratagus/province.cpp
 	src/stratagus/quest.cpp
+	src/stratagus/resource.cpp
 	src/stratagus/script.cpp
 	src/stratagus/script_player.cpp
 	src/stratagus/script_character.cpp
@@ -693,6 +694,7 @@ set(stratagus_generic_HDRS
 	src/include/province.h
 	src/include/quest.h
 	src/include/replay.h
+	src/include/resource.h
 	src/include/results.h
 	src/include/script.h
 	src/include/script_sound.h

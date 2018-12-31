@@ -602,7 +602,7 @@ int CGrandStrategyProvince::GetResourceDemand(int resource)
 	}
 	
 	if (quantity > 0 && GrandStrategyGame.CommodityPrices[resource] > 0) {
-		quantity *= Resources[resource].BasePrice;
+		quantity *= CResource::Resources[resource]->BasePrice;
 		quantity /= GrandStrategyGame.CommodityPrices[resource];
 	}
 

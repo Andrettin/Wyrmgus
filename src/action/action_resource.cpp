@@ -49,6 +49,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "quest.h"
+#include "resource.h"
 #include "script.h"
 //Wyrmgus start
 #include "settings.h"
@@ -649,10 +650,10 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	Assert(!unit.IY);
 
 	//Wyrmgus start
-	const int input_resource = Resources[this->CurrentResource].InputResource;
+	const int input_resource = CResource::Resources[this->CurrentResource]->InputResource;
 	if (input_resource && (unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource]) == 0) { //if the resource requires an input, but there's none in store, don't gather
 		const char *input_name = DefaultResourceNames[input_resource].c_str();
-		const char *input_actionName = Resources[input_resource].ActionName.c_str();
+		const char *input_actionName = CResource::Resources[input_resource]->ActionName.c_str();
 		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
 		if (unit.Player == ThisPlayer && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
 			PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
@@ -1026,13 +1027,13 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				//Wyrmgus start
 //				unit.ResourcesHeld += addload;
 //				source->ResourcesHeld -= addload;
-				const int input_resource = Resources[this->CurrentResource].InputResource;
+				const int input_resource = CResource::Resources[this->CurrentResource]->InputResource;
 				if (input_resource) {
 					addload = std::min(unit.Player->Resources[input_resource] + unit.Player->StoredResources[input_resource], addload);
 					
 					if (!addload) {
 						const char *input_name = DefaultResourceNames[input_resource].c_str();
-						const char *input_actionName = Resources[input_resource].ActionName.c_str();
+						const char *input_actionName = CResource::Resources[input_resource]->ActionName.c_str();
 						unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
 						if (unit.Player == ThisPlayer && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
 							PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
@@ -1079,7 +1080,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				if (!dead) {
 					if (Preference.MineNotifications
 						&& unit.Player->Index == ThisPlayer->Index
-						&& source->Variable[GIVERESOURCE_INDEX].Max > (Resources[this->CurrentResource].DefaultIncome * 10)) {
+						&& source->Variable[GIVERESOURCE_INDEX].Max > (CResource::Resources[this->CurrentResource]->DefaultIncome * 10)) {
 							unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s has been depleted!"), source->Type->Name.c_str());
 					}
 					LetUnitDie(*source);
@@ -1167,7 +1168,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 			&& source->IsAlive()
 			&& !source->MineLow
 			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
-			&& source->Variable[GIVERESOURCE_INDEX].Max > (Resources[this->CurrentResource].DefaultIncome * 10)) {
+			&& source->Variable[GIVERESOURCE_INDEX].Max > (CResource::Resources[this->CurrentResource]->DefaultIncome * 10)) {
 				//Wyrmgus start
 //				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
 				unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s is nearing depletion!"), source->Type->Name.c_str());
@@ -1355,8 +1356,8 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	// Update resource.
-	const int rindex = Resources[this->CurrentResource].FinalResource;
-	int resource_change = unit.ResourcesHeld * Resources[this->CurrentResource].FinalResourceConversionRate / 100;
+	const int rindex = CResource::Resources[this->CurrentResource]->FinalResource;
+	int resource_change = unit.ResourcesHeld * CResource::Resources[this->CurrentResource]->FinalResourceConversionRate / 100;
 	int processed_resource_change = (resource_change * player.Incomes[this->CurrentResource]) / 100;
 	
 	if (player.AiEnabled) {

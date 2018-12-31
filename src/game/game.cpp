@@ -72,6 +72,7 @@
 #include "quest.h"
 //Wyrmgus end
 #include "replay.h"
+#include "resource.h"
 #include "results.h"
 //Wyrmgus start
 #include "script.h"
@@ -2214,7 +2215,7 @@ static int CclDefineResource(lua_State *l)
 	if (resource_id == -1) {
 		LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 	}
-	CResource *resource = &Resources[resource_id];
+	CResource *resource = CResource::Resources[resource_id];
 	resource->FinalResource = resource_id;
 	
 	//  Parse the list:
@@ -2238,7 +2239,7 @@ static int CclDefineResource(lua_State *l)
 				LuaError(l, "Resource \"%s\" doesn't exist." _C_ final_resource_ident.c_str());
 			}
 			resource->FinalResource = final_resource_id;
-			Resources[final_resource_id].ChildResources.push_back(resource_id);
+			CResource::Resources[final_resource_id]->ChildResources.push_back(resource);
 		} else if (!strcmp(value, "FinalResourceConversionRate")) {
 			resource->FinalResourceConversionRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "LuxuryResource")) {
@@ -2274,11 +2275,15 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 {
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		DefaultResourceNames[i].clear();
-		Resources[i].ID = i;
 	}
+	
+	CResource::ClearResources();
+	
 	const unsigned int args = lua_gettop(l);
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultResourceNames[i] = LuaToString(l, i + 1);
+		
+		CResource::GetOrAddResource(DefaultResourceNames[i]);
 	}
 	
 	return 0;

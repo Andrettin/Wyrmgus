@@ -558,7 +558,7 @@ public:
 		const CUnitType &type = *unit->Type;
 		//Wyrmgus start
 //		return (type.GivesResource == resource
-		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && Resources[unit->GivesResource].FinalResource == resource) || (include_luxury && Resources[unit->GivesResource].LuxuryResource))
+		return ((unit->GivesResource == resource || (!only_same && unit->GivesResource != TradeCost && CResource::Resources[unit->GivesResource]->FinalResource == resource) || (include_luxury && CResource::Resources[unit->GivesResource]->LuxuryResource))
 		//Wyrmgus end
 				&& unit->ResourcesHeld != 0
 				//Wyrmgus start
@@ -686,16 +686,16 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, const CUnit *deposit, const CUnit &worker, bool check_usage)
 //Wyrmgus end
 {
-	const CResource &resource = Resources[mine.GivesResource];
+	const CResource *resource = CResource::Resources[mine.GivesResource];
 
 	distance = deposit ? mine.MapDistanceTo(*deposit) : 0;
 	//Wyrmgus start
-	distance = distance * 100 / resource.FinalResourceConversionRate;
+	distance = distance * 100 / resource->FinalResourceConversionRate;
 	
 	//alter the distance score by the conversion rate, so that the unit will prefer resources with better conversion rates, but without going for ones that are too far away
-	int price_modifier = worker.Player->GetResourcePrice(resource.FinalResource) * resource.FinalResourceConversionRate / 100;
-	if (resource.InputResource) {
-		price_modifier -= worker.Player->GetResourcePrice(resource.InputResource);
+	int price_modifier = worker.Player->GetResourcePrice(resource->FinalResource) * resource->FinalResourceConversionRate / 100;
+	if (resource->InputResource) {
+		price_modifier -= worker.Player->GetResourcePrice(resource->InputResource);
 	}
 	price_modifier = std::max(price_modifier, 1);
 	distance = distance * 100 / price_modifier;

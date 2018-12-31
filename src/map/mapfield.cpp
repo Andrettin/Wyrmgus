@@ -251,7 +251,7 @@ void CMapField::SetTerrain(CTerrainType *terrain_type)
 
 	//wood and rock tiles must always begin with the default value for their respective resource types
 	if (terrain_type->Overlay && terrain_type->Resource != -1) {
-		this->Value = Resources[terrain_type->Resource].DefaultAmount;
+		this->Value = CResource::Resources[terrain_type->Resource]->DefaultAmount;
 	} else if ((terrain_type->Flags & MapFieldWall) && terrain_type->UnitType) {
 		this->Value = terrain_type->UnitType->MapDefaultStat.Variables[HP_INDEX].Max;
 	}

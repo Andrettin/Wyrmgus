@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name currency.cpp - The currency source file. */
+/**@name resource.cpp - The resource source file. */
 //
 //      (c) Copyright 2018 by Andrettin
 //
@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "currency.h"
+#include "resource.h"
 
 #include "config.h"
 
@@ -41,66 +41,66 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CCurrency *> CCurrency::Currencies;
-std::map<std::string, CCurrency *> CCurrency::CurrenciesByIdent;
+std::vector<CResource *> CResource::Resources;
+std::map<std::string, CResource *> CResource::ResourcesByIdent;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a currency
+**	@brief	Get a resource
 **
-**	@param	ident		The currency's string identifier
-**	@param	should_find	Whether it is an error if the currency couldn't be found
+**	@param	ident		The resource's string identifier
+**	@param	should_find	Whether it is an error if the resource couldn't be found
 **
-**	@return	The currency if found, or null otherwise
+**	@return	The resource if found, or null otherwise
 */
-CCurrency *CCurrency::GetCurrency(const std::string &ident, const bool should_find)
+CResource *CResource::GetResource(const std::string &ident, const bool should_find)
 {
-	std::map<std::string, CCurrency *>::const_iterator find_iterator = CurrenciesByIdent.find(ident);
+	std::map<std::string, CResource *>::const_iterator find_iterator = ResourcesByIdent.find(ident);
 	
-	if (find_iterator != CurrenciesByIdent.end()) {
+	if (find_iterator != ResourcesByIdent.end()) {
 		return find_iterator->second;
 	}
 	
 	if (should_find) {
-		fprintf(stderr, "Invalid currency: \"%s\".\n", ident.c_str());
+		fprintf(stderr, "Invalid resource: \"%s\".\n", ident.c_str());
 	}
 	
 	return nullptr;
 }
 
 /**
-**	@brief	Get or add a currency
+**	@brief	Get or add a resource
 **
-**	@param	ident	The currency's string identifier
+**	@param	ident	The resource's string identifier
 **
-**	@return	The currency if found, otherwise a new currency is created and returned
+**	@return	The resource if found, otherwise a new resource is created and returned
 */
-CCurrency *CCurrency::GetOrAddCurrency(const std::string &ident)
+CResource *CResource::GetOrAddResource(const std::string &ident)
 {
-	CCurrency *currency = GetCurrency(ident, false);
+	CResource *resource = GetResource(ident, false);
 	
-	if (!currency) {
-		currency = new CCurrency;
-		currency->Ident = ident;
-		Currencies.push_back(currency);
-		CurrenciesByIdent[ident] = currency;
+	if (!resource) {
+		resource = new CResource;
+		resource->Ident = ident;
+		Resources.push_back(resource);
+		ResourcesByIdent[ident] = resource;
 	}
 	
-	return currency;
+	return resource;
 }
 
 /**
-**	@brief	Remove the existing currencies
+**	@brief	Remove the existing resources
 */
-void CCurrency::ClearCurrencies()
+void CResource::ClearResources()
 {
-	for (size_t i = 0; i < Currencies.size(); ++i) {
-		delete Currencies[i];
+	for (size_t i = 0; i < Resources.size(); ++i) {
+		delete Resources[i];
 	}
-	Currencies.clear();
+	Resources.clear();
 }
 
 /**
@@ -108,7 +108,7 @@ void CCurrency::ClearCurrencies()
 **
 **	@param	config_data	The configuration data
 */
-void CCurrency::ProcessConfigData(const CConfigData *config_data)
+void CResource::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -117,7 +117,7 @@ void CCurrency::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 		} else {
-			fprintf(stderr, "Invalid currency property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid resource property: \"%s\".\n", key.c_str());
 		}
 	}
 }

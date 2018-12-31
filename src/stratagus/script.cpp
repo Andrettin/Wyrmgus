@@ -1541,7 +1541,7 @@ std::string EvalString(const StringDesc *s)
 				std::string improve_incomes;
 				bool first = true;
 				for (int res = 1; res < MaxCosts; ++res) {
-					if ((**type).Stats[ThisPlayer->Index].ImproveIncomes[res] > Resources[res].DefaultIncome) {
+					if ((**type).Stats[ThisPlayer->Index].ImproveIncomes[res] > CResource::Resources[res]->DefaultIncome) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1549,7 +1549,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += IdentToName(DefaultResourceNames[res]);
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((long long) (**type).Stats[ThisPlayer->Index].ImproveIncomes[res] - Resources[res].DefaultIncome);
+						improve_incomes += std::to_string((long long) (**type).Stats[ThisPlayer->Index].ImproveIncomes[res] - CResource::Resources[res]->DefaultIncome);
 						improve_incomes += "%";
 					}
 				}
@@ -1670,9 +1670,8 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string conversion_rates;
 				bool first = true;
-				for (size_t i = 0; i < Resources[(**resource)].ChildResources.size(); ++i) {
-					int r = Resources[(**resource)].ChildResources[i];
-					if (r == TradeCost || Resources[r].Hidden) {
+				for (const CResource *child_resource : CResource::Resources[(**resource)]->ChildResources) {
+					if (child_resource->ID == TradeCost || child_resource->Hidden) {
 						continue;
 					}
 					if (!first) {
@@ -1680,11 +1679,11 @@ std::string EvalString(const StringDesc *s)
 					} else {
 						first = false;
 					}
-					conversion_rates += IdentToName(DefaultResourceNames[r]);
+					conversion_rates += child_resource->Name;
 					conversion_rates += " to ";
-					conversion_rates += IdentToName(DefaultResourceNames[(**resource)]);
+					conversion_rates += CResource::Resources[(**resource)]->Name;
 					conversion_rates += " Conversion Rate: ";
-					conversion_rates += std::to_string((long long) Resources[r].FinalResourceConversionRate);
+					conversion_rates += std::to_string((long long) child_resource->FinalResourceConversionRate);
 					conversion_rates += "%";
 				}
 				return conversion_rates;
@@ -1696,27 +1695,26 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
-				if (ThisPlayer->Incomes[(**resource)] > Resources[(**resource)].DefaultIncome) {
+				if (ThisPlayer->Incomes[(**resource)] > CResource::Resources[(**resource)]->DefaultIncome) {
 					first = false;
-					improve_incomes += IdentToName(DefaultResourceNames[(**resource)]);
+					improve_incomes += CResource::Resources[(**resource)]->Name;
 					improve_incomes += " Processing Bonus: +";
-					improve_incomes += std::to_string((long long) ThisPlayer->Incomes[(**resource)] - Resources[(**resource)].DefaultIncome);
+					improve_incomes += std::to_string((long long) ThisPlayer->Incomes[(**resource)] - CResource::Resources[(**resource)]->DefaultIncome);
 					improve_incomes += "%";
 				}
-				for (size_t i = 0; i < Resources[(**resource)].ChildResources.size(); ++i) {
-					int r = Resources[(**resource)].ChildResources[i];
-					if (r == TradeCost || Resources[r].Hidden) {
+				for (const CResource *child_resource : CResource::Resources[(**resource)]->ChildResources) {
+					if (child_resource->ID == TradeCost || child_resource->Hidden) {
 						continue;
 					}
-					if (ThisPlayer->Incomes[r] > Resources[r].DefaultIncome) {
+					if (ThisPlayer->Incomes[child_resource->ID] > child_resource->DefaultIncome) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
 							first = false;
 						}
-						improve_incomes += IdentToName(DefaultResourceNames[r]);
+						improve_incomes += child_resource->Name;
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((long long) ThisPlayer->Incomes[r] - Resources[r].DefaultIncome);
+						improve_incomes += std::to_string((long long) ThisPlayer->Incomes[child_resource->ID] - child_resource->DefaultIncome);
 						improve_incomes += "%";
 					}
 				}

@@ -1388,14 +1388,14 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	//  Initial default incomes.
 	for (int i = 0; i < MaxCosts; ++i) {
-		this->Incomes[i] = ::Resources[i].DefaultIncome;
+		this->Incomes[i] = CResource::Resources[i]->DefaultIncome;
 	}
 	
 	this->TradeCost = DefaultTradeCost;
 
 	//  Initial max resource amounts.
 	for (int i = 0; i < MaxCosts; ++i) {
-		this->MaxResources[i] = ::Resources[i].DefaultMaxAmount;
+		this->MaxResources[i] = CResource::Resources[i]->DefaultMaxAmount;
 	}
 
 	//Wyrmgus start
@@ -2445,7 +2445,7 @@ void CPlayer::Clear()
 		SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
 		SpeedResourcesReturn[i] = SPEEDUP_FACTOR;
 		//Wyrmgus start
-		Prices[i] = ::Resources[i].BasePrice;
+		Prices[i] = CResource::Resources[i]->BasePrice;
 		//Wyrmgus end
 	}
 	SpeedBuild = SPEEDUP_FACTOR;
@@ -3266,7 +3266,7 @@ bool CPlayer::CheckResource(const int resource, const int value)
 */
 void CPlayer::IncreaseResourcePrice(const int resource)
 {
-	int price_change = ::Resources[resource].BasePrice / std::max(this->Prices[resource], 100);
+	int price_change = CResource::Resources[resource]->BasePrice / std::max(this->Prices[resource], 100);
 	price_change = std::max(1, price_change);
 	this->Prices[resource] += price_change;
 }
@@ -3278,7 +3278,7 @@ void CPlayer::IncreaseResourcePrice(const int resource)
 */
 void CPlayer::DecreaseResourcePrice(const int resource)
 {
-	int price_change = this->Prices[resource] / ::Resources[resource].BasePrice;
+	int price_change = this->Prices[resource] / CResource::Resources[resource]->BasePrice;
 	price_change = std::max(1, price_change);
 	this->Prices[resource] -= price_change;
 	this->Prices[resource] = std::max(1, this->Prices[resource]);
@@ -3296,7 +3296,7 @@ int CPlayer::ConvergePricesWith(CPlayer &player, int max_convergences)
 		converged = false;
 
 		for (int i = 1; i < MaxCosts; ++i) {
-			if (!::Resources[i].BasePrice) {
+			if (!CResource::Resources[i]->BasePrice) {
 				continue;
 			}
 			
@@ -3353,12 +3353,12 @@ int CPlayer::GetEffectiveResourceDemand(const int resource) const
 	int resource_demand = this->ResourceDemand[resource];
 	
 	if (this->Prices[resource]) {
-		resource_demand *= ::Resources[resource].BasePrice;
+		resource_demand *= CResource::Resources[resource]->BasePrice;
 		resource_demand /= this->Prices[resource];
 	}
 	
-	if (::Resources[resource].DemandElasticity != 100) {
-		resource_demand = this->ResourceDemand[resource] + ((resource_demand - this->ResourceDemand[resource]) * ::Resources[resource].DemandElasticity / 100);
+	if (CResource::Resources[resource]->DemandElasticity != 100) {
+		resource_demand = this->ResourceDemand[resource] + ((resource_demand - this->ResourceDemand[resource]) * CResource::Resources[resource]->DemandElasticity / 100);
 	}
 	
 	resource_demand = std::max(resource_demand, 0);
@@ -3397,7 +3397,7 @@ int CPlayer::GetTotalPriceDifferenceWith(const CPlayer &player) const
 {
 	int difference = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (!::Resources[i].BasePrice) {
+		if (!CResource::Resources[i]->BasePrice) {
 			continue;
 		}
 		difference += abs(this->Prices[i] - player.Prices[i]);
@@ -3413,7 +3413,7 @@ int CPlayer::GetTradePotentialWith(const CPlayer &player) const
 {
 	int trade_potential = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
-		if (!::Resources[i].BasePrice) {
+		if (!CResource::Resources[i]->BasePrice) {
 			continue;
 		}
 		int price_difference = abs(this->Prices[i] - player.Prices[i]);
@@ -3510,7 +3510,7 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 		}
 		if (notify) {
 			const char *name = DefaultResourceNames[i].c_str();
-			const char *actionName = ::Resources[i].ActionName.c_str();
+			const char *actionName = CResource::Resources[i]->ActionName.c_str();
 
 			//Wyrmgus start
 //			Notify(_("Not enough %s...%s more %s."), _(name), _(actionName), _(name));

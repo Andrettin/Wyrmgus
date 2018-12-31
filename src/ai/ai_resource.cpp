@@ -1442,17 +1442,17 @@ static void AiProduceResources()
 		for (size_t j = 0; j != AiHelpers.ProducedResources[unit.Type->Slot].size(); ++j) {
 			int resource = AiHelpers.ProducedResources[unit.Type->Slot][j];
 			
-			if (!Resources[resource].LuxuryResource && AiCanSellResource(resource)) {
+			if (!CResource::Resources[resource]->LuxuryResource && AiCanSellResource(resource)) {
 				continue;
 			}
 			
-			if (Resources[resource].LuxuryResource && !market_unit) {
+			if (CResource::Resources[resource]->LuxuryResource && !market_unit) {
 				continue;
 			}
 			
-			int input_resource = Resources[resource].InputResource;
+			int input_resource = CResource::Resources[resource]->InputResource;
 
-			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && Resources[resource].LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
+			if (input_resource && !AiCanSellResource(input_resource) && !(input_resource == CopperCost && CResource::Resources[resource]->LuxuryResource)) { //if the resource is a luxury resource and the input is copper skip this check, the AI should produce it as long as its price is greater than that of copper
 				continue;
 			}
 			
@@ -1520,8 +1520,8 @@ static void AiCollectResources()
 			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 			//Wyrmgus start
 //			const int c = order.GetCurrentResource();
-			int c = Resources[order.GetCurrentResource()].FinalResource;
-			if (Resources[c].LuxuryResource) {
+			int c = CResource::Resources[order.GetCurrentResource()]->FinalResource;
+			if (CResource::Resources[c]->LuxuryResource) {
 				num_units_assigned[c]++;
 				c = CopperCost;
 			}
@@ -1780,7 +1780,7 @@ static void AiCollectResources()
 		) {
 			bool is_luxury_input = false;
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (Resources[i].LuxuryResource && Resources[i].InputResource == c && num_units_assigned[i] > 0) {
+				if (CResource::Resources[i]->LuxuryResource && CResource::Resources[i]->InputResource == c && num_units_assigned[i] > 0) {
 					is_luxury_input = true;
 					break;
 				}
@@ -2234,7 +2234,7 @@ static void AiCheckPathwayConstruction()
 				bool built_pathway = false;
 					
 				for (int p = (pathway_types.size()  - 1); p >= 0; --p) {
-					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && (unit.GivesResource == -1 || !Resources[unit.GivesResource].IsMineResource())) { //build roads around buildings, not railroads (except for mines)
+					if ((pathway_types[p]->TerrainType->Flags & MapFieldRailroad) && (unit.GivesResource == -1 || !CResource::Resources[unit.GivesResource]->IsMineResource())) { //build roads around buildings, not railroads (except for mines)
 						continue;
 					}
 						
