@@ -2842,9 +2842,9 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				}
 				
 				if (
-					(this->IsPointInASubtemplateArea(diagonal_pos, z) && diagonal_tile_top_terrain != terrain_type)
-					|| (this->IsPointInASubtemplateArea(vertical_pos, z) && vertical_tile_top_terrain != terrain_type)
-					|| (this->IsPointInASubtemplateArea(horizontal_pos, z) && horizontal_tile_top_terrain != terrain_type)
+					(this->IsPointInASubtemplateArea(diagonal_pos, z) && diagonal_tile_top_terrain != terrain_type && diagonal_tile_terrain != terrain_type)
+					|| (this->IsPointInASubtemplateArea(vertical_pos, z) && vertical_tile_top_terrain != terrain_type && vertical_tile_terrain != terrain_type)
+					|| (this->IsPointInASubtemplateArea(horizontal_pos, z) && horizontal_tile_top_terrain != terrain_type && horizontal_tile_terrain != terrain_type)
 				) {
 					continue;
 				}
