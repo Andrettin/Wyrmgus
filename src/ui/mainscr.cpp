@@ -1467,6 +1467,24 @@ void MessagesDisplay::DrawMessages()
 			//Wyrmgus start
 			// Draw objectives
 			int z = 0;
+			
+			for (int i = 0; i < ObjectivesCount; ++i, ++z) {
+				if (z == 0) {
+					PushClipping();
+					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
+								Video.Height - 1);
+				}
+				/*
+				 * Due parallel drawing we have to force message copy due temp
+				 * std::string(Objectives[i]) creation because
+				 * char * pointer may change during text drawing.
+				 */
+				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(Objectives[i])));
+				if (z == 0) {
+					PopClipping();
+				}
+			}
+			
 			for (size_t i = 0; i < ThisPlayer->CurrentQuests.size(); ++i) {
 				const CQuest *quest = ThisPlayer->CurrentQuests[i];
 
@@ -1496,22 +1514,6 @@ void MessagesDisplay::DrawMessages()
 				}
 				for (size_t j = 0; j < quest->ObjectiveStrings.size(); ++j, ++z) {
 					label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(quest->ObjectiveStrings[j].c_str())));
-				}
-			}
-			for (int i = 0; i < ObjectivesCount; ++i, ++z) {
-				if (z == 0) {
-					PushClipping();
-					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
-								Video.Height - 1);
-				}
-				/*
-				 * Due parallel drawing we have to force message copy due temp
-				 * std::string(Objectives[i]) creation because
-				 * char * pointer may change during text drawing.
-				 */
-				label.DrawClip(UI.MapArea.X + 8, UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1), std::string(_(Objectives[i])));
-				if (z == 0) {
-					PopClipping();
 				}
 			}
 			//Wyrmgus end
