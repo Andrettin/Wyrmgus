@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name grand_strategy.h - The grand strategy headerfile. */
+/**@name grand_strategy.h - The grand strategy header file. */
 //
-//      (c) Copyright 2015-2016 by Andrettin
+//      (c) Copyright 2015-2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
 
 #ifndef __GRAND_STRATEGY_H__
 #define __GRAND_STRATEGY_H__
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -81,8 +79,6 @@ public:
 		memset(Borders, 0, sizeof(Borders));
 	}
 
-	bool IsWater();
-	
 	bool Port;								/// Whether the tile has a port
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
 	CGrandStrategyProvince *Province;		/// Province to which the tile belongs
@@ -133,8 +129,6 @@ public:
 	bool HasSecondaryBorderThroughWaterWith(CGrandStrategyProvince *province);
 	bool BordersFaction(int faction_civilization, int faction, bool check_through_water = false);
 	int GetPopulation();
-	int GetResourceDemand(int resource);
-	int GetProductionEfficiencyModifier(int resource);
 	int GetClassUnitType(int class_id);
 	int GetDesirabilityRating();
 	std::string GenerateWorkName();
@@ -190,7 +184,6 @@ public:
 	bool HasTechnologyClass(std::string technology_class_name);
 	bool CanHaveSuccession(int title, bool family_inheritance);
 	bool IsConquestDesirable(CGrandStrategyProvince *province);
-	int GetProductionEfficiencyModifier(int resource);
 	int GetTroopCostModifier();
 	int GetDiplomacyState(CGrandStrategyFaction *faction);
 	int GetDiplomacyStateProposal(CGrandStrategyFaction *faction);
@@ -353,7 +346,6 @@ extern void DoGrandStrategyTurn();
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
-extern bool IsGrandStrategyBuilding(const CUnitType &type);
 extern std::string GetProvinceCivilization(std::string province_name);
 extern bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident);
 extern int GetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident);
@@ -375,12 +367,8 @@ extern bool GrandStrategyHeroIsAlive(std::string hero_full_name);
 extern void GrandStrategyWorkCreated(std::string work_ident);
 extern void MakeGrandStrategyEventAvailable(std::string event_name);
 extern bool GetGrandStrategyEventTriggered(std::string event_name);
-extern void SetCommodityPrice(std::string resource_name, int price);
-extern int GetCommodityPrice(std::string resource_name);
 extern void CleanGrandStrategyEvents();
 extern CGrandStrategyEvent *GetGrandStrategyEvent(std::string event_name);
 extern void GrandStrategyCclRegister();
 
-//@}
-
-#endif // !__GRAND_STRATEGY_H__
+#endif

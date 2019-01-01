@@ -40,5 +40,3 @@ extern bool GrandStrategyHeroIsAlive(std::string hero_full_name);
 extern void GrandStrategyWorkCreated(std::string work_ident);
 extern void MakeGrandStrategyEventAvailable(std::string event_name);
 extern bool GetGrandStrategyEventTriggered(std::string event_name);
-extern void SetCommodityPrice(std::string resource_name, int price);
-extern int GetCommodityPrice(std::string resource_name);

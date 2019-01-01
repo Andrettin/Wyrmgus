@@ -10,7 +10,7 @@
 //
 /**@name grand_strategy.cpp - The grand strategy mode. */
 //
-//      (c) Copyright 2015-2016 by Andrettin
+//      (c) Copyright 2015-2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -288,14 +286,6 @@ CGrandStrategyHero *CGrandStrategyGame::GetHero(std::string hero_full_name)
 	} else {
 		return nullptr;
 	}
-}
-
-bool GrandStrategyWorldMapTile::IsWater()
-{
-	if (this->Terrain != -1) {
-		return WorldMapTerrainTypes[this->Terrain]->Water;
-	}
-	return false;
 }
 
 void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
@@ -587,39 +577,6 @@ bool CGrandStrategyProvince::BordersFaction(int faction_civilization, int factio
 int CGrandStrategyProvince::GetPopulation()
 {
 	return (this->TotalWorkers * 10000) * 2;
-}
-
-int CGrandStrategyProvince::GetResourceDemand(int resource)
-{
-	int quantity = 0;
-	if (resource == WoodCost) {
-		quantity = 50;
-		if (this->HasBuildingClass("lumber-mill")) {
-			quantity += 50; // increase the province's lumber demand if it has a lumber mill built
-		}
-	} else if (resource == StoneCost) {
-		quantity = 25;
-	}
-	
-	if (quantity > 0 && GrandStrategyGame.CommodityPrices[resource] > 0) {
-		quantity *= CResource::Resources[resource]->BasePrice;
-		quantity /= GrandStrategyGame.CommodityPrices[resource];
-	}
-
-	return quantity;
-}
-
-int CGrandStrategyProvince::GetProductionEfficiencyModifier(int resource)
-{
-	int modifier = 0;
-	
-	if (this->Owner != nullptr) {
-		modifier += this->Owner->GetProductionEfficiencyModifier(resource);
-	}
-	
-	modifier += this->ProductionEfficiencyModifier[resource];
-
-	return modifier;
 }
 
 int CGrandStrategyProvince::GetClassUnitType(int class_id)
@@ -916,13 +873,6 @@ bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province
 	}
 	
 	return true;
-}
-
-int CGrandStrategyFaction::GetProductionEfficiencyModifier(int resource)
-{
-	int modifier = this->ProductionEfficiencyModifier[resource];
-	
-	return modifier;
 }
 
 int CGrandStrategyFaction::GetTroopCostModifier()
@@ -1440,14 +1390,6 @@ bool ProvinceHasBuildingClass(std::string province_name, std::string building_cl
 	return GrandStrategyGame.Provinces[province_id]->HasBuildingClass(building_class);
 }
 
-bool IsGrandStrategyBuilding(const CUnitType &type)
-{
-	if (type.BoolFlag[BUILDING_INDEX].value && type.Class != -1 && UnitTypeClasses[type.Class] != "farm" && UnitTypeClasses[type.Class] != "watch-tower" && UnitTypeClasses[type.Class] != "guard-tower") {
-		return true;
-	}
-	return false;
-}
-
 std::string GetProvinceCivilization(std::string province_name)
 {
 	int province_id = GetProvinceId(province_name);
@@ -1721,28 +1663,6 @@ bool GetGrandStrategyEventTriggered(std::string event_name)
 	}
 }
 
-void SetCommodityPrice(std::string resource_name, int price)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource == -1) {
-		return;
-	}
-	
-	GrandStrategyGame.CommodityPrices[resource] = price;
-}
-
-int GetCommodityPrice(std::string resource_name)
-{
-	int resource = GetResourceIdByName(resource_name.c_str());
-	
-	if (resource == -1) {
-		return 0;
-	}
-	
-	return GrandStrategyGame.CommodityPrices[resource];
-}
-
 void CleanGrandStrategyEvents()
 {
 	for (size_t i = 0; i < GrandStrategyEvents.size(); ++i) {
@@ -1838,5 +1758,3 @@ int GetFactionTierIdByName(std::string faction_tier)
 
 	return -1;
 }
-
-//@}
