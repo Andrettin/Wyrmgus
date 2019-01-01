@@ -2841,10 +2841,11 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 					continue;
 				}
 				
+				//tiles within a subtemplate area can only be used as seeds, they cannot be modified themselves
 				if (
-					(this->IsPointInASubtemplateArea(diagonal_pos, z) && diagonal_tile_top_terrain != terrain_type && diagonal_tile_terrain != terrain_type)
-					|| (this->IsPointInASubtemplateArea(vertical_pos, z) && vertical_tile_top_terrain != terrain_type && vertical_tile_terrain != terrain_type)
-					|| (this->IsPointInASubtemplateArea(horizontal_pos, z) && horizontal_tile_top_terrain != terrain_type && horizontal_tile_terrain != terrain_type)
+					(this->IsPointInASubtemplateArea(diagonal_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(diagonal_pos, z)))
+					|| (this->IsPointInASubtemplateArea(vertical_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(vertical_pos, z)))
+					|| (this->IsPointInASubtemplateArea(horizontal_pos, z) && !generated_terrain->CanUseTileAsSeed(this->Field(horizontal_pos, z)))
 				) {
 					continue;
 				}
@@ -2879,7 +2880,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 			Vec2i adjacent_pos_horizontal(adjacent_pos.x, seed_pos.y);
 			Vec2i adjacent_pos_vertical(seed_pos.x, adjacent_pos.y);
 			
-			if (this->GetTileTopTerrain(adjacent_pos, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z)))) {
+			if (!this->IsPointInASubtemplateArea(adjacent_pos, z) && this->GetTileTopTerrain(adjacent_pos, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z)))) {
 				if (!terrain_type->Overlay && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos, z))) {
 					this->Field(adjacent_pos, z)->RemoveOverlayTerrain();
 				}
@@ -2895,7 +2896,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				}
 			}
 			
-			if (this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z)))) {
+			if (!this->IsPointInASubtemplateArea(adjacent_pos_horizontal, z) && this->GetTileTopTerrain(adjacent_pos_horizontal, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_horizontal, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z)))) {
 				if (!terrain_type->Overlay && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_horizontal, z))) {
 					this->Field(adjacent_pos_horizontal, z)->RemoveOverlayTerrain();
 				}
@@ -2911,7 +2912,7 @@ void CMap::GenerateTerrain(const CGeneratedTerrain *generated_terrain, const Vec
 				}
 			}
 			
-			if (this->GetTileTopTerrain(adjacent_pos_vertical, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z)))) {
+			if (!this->IsPointInASubtemplateArea(adjacent_pos_vertical, z) && this->GetTileTopTerrain(adjacent_pos_vertical, false, z) != terrain_type && (this->GetTileTerrain(adjacent_pos_vertical, terrain_type->Overlay, z) != terrain_type || generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z)))) {
 				if (!terrain_type->Overlay && generated_terrain->CanRemoveTileOverlayTerrain(this->Field(adjacent_pos_vertical, z))) {
 					this->Field(adjacent_pos_vertical, z)->RemoveOverlayTerrain();
 				}
