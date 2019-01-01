@@ -464,32 +464,32 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	}
 
 	file.printf("  \"reserve\", {");
-	for (int i = 0; i < MaxCosts; ++i) {
-		file.printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai.Reserve[i]);
+	for (const CResource *resource : CResource::Resources) {
+		file.printf("\"%s\", %d, ", resource->Name.c_str(), ai.Reserve[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"used\", {");
-	for (int i = 0; i < MaxCosts; ++i) {
-		file.printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai.Used[i]);
+	for (const CResource *resource : CResource::Resources) {
+		file.printf("\"%s\", %d, ", resource->Name.c_str(), ai.Used[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"needed\", {");
-	for (int i = 0; i < MaxCosts; ++i) {
-		file.printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai.Needed[i]);
+	for (const CResource *resource : CResource::Resources) {
+		file.printf("\"%s\", %d, ", resource->Name.c_str(), ai.Needed[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"collect\", {");
-	for (int i = 0; i < MaxCosts; ++i) {
-		file.printf("\"%s\", %d, ", DefaultResourceNames[i].c_str(), ai.Collect[i]);
+	for (const CResource *resource : CResource::Resources) {
+		file.printf("\"%s\", %d, ", resource->Name.c_str(), ai.Collect[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"need-mask\", {");
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (ai.NeededMask & (1 << i)) {
+	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
+		if (ai.NeededMask & ((long long int) 1 << i)) {
 			file.printf("\"%s\", ", DefaultResourceNames[i].c_str());
 		}
 	}

@@ -187,7 +187,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 			CUnitType &type = **i;
 			unsigned int cost = 0;
 
-			for (unsigned j = 0; j < MaxCosts; ++j) {
+			for (size_t j = 0; j < CResource::Resources.size(); ++j) {
 				cost += type.DefaultStat.Costs[j]; //this cannot be MapDefaultStat because this function is called when the AiHelper is defined, rather than when a game is started
 			}
 			const float score = ((float) type.DefaultStat.Variables[SUPPLY_INDEX].Value) / cost;
@@ -236,7 +236,7 @@ static std::vector<CUnitType *> getMineUnits()
 			float score;
 			unsigned int cost = 0;
 
-			for (unsigned j = 0; j < MaxCosts; ++j) {
+			for (size_t j = 0; j < CResource::Resources.size(); ++j) {
 				cost += type->_Costs[j];
 			}
 			score = ((float) type->MaxOnBoard) / cost;
@@ -1304,11 +1304,11 @@ static int CclAiSetReserve(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	lua_newtable(l);
-	for (int i = 0; i < MaxCosts; ++i) {
+	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
 		lua_pushnumber(l, AiPlayer->Reserve[i]);
 		lua_rawseti(l, -2, i + 1);
 	}
-	for (int i = 0; i < MaxCosts; ++i) {
+	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
 		AiPlayer->Reserve[i] = LuaToNumber(l, 1, i + 1);
 	}
 	return 1;
@@ -1378,7 +1378,7 @@ static int CclAiDump(lua_State *l)
 			//
 
 			printf("------\n");
-			for (int i = 0; i < MaxCosts; ++i) {
+			for (size_t i = 0; i < CResource::Resources.size(); ++i) {
 				printf("%s(%4d, %4d/%4d) ", DefaultResourceNames[i].c_str(),
 					   aip.Resources[i], aip.StoredResources[i], aip.MaxResources[i]);
 			}
@@ -1677,7 +1677,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				const char *type = LuaToString(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
-				ai->NeededMask |= (1 << resId);
+				ai->NeededMask |= ((long long int) 1 << resId);
 			}
 		} else if (!strcmp(value, "need-supply")) {
 			ai->NeedSupply = true;

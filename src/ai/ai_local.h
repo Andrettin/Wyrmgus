@@ -335,16 +335,7 @@ public:
 class PlayerAi
 {
 public:
-	PlayerAi() : Player(nullptr), AiType(nullptr),
-		SleepCycles(0), NeededMask(0), NeedSupply(false),
-		//Wyrmgus start
-		Scouting(false),
-		//Wyrmgus end
-		ScriptDebug(false), BuildDepots(true), LastExplorationGameCycle(0),
-		//Wyrmgus start
-//		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
-		LastCanNotMoveGameCycle(0), LastRepairBuilding(0), LastPathwayConstructionBuilding(0)
-		//Wyrmgus end
+	PlayerAi()
 	{
 		memset(Reserve, 0, sizeof(Reserve));
 		memset(Used, 0, sizeof(Used));
@@ -353,37 +344,37 @@ public:
 	}
 
 public:
-	CPlayer *Player;            /// Engine player structure
-	CAiType *AiType;            /// AI type of this player AI
+	CPlayer *Player = nullptr;		/// Engine player structure
+	CAiType *AiType = nullptr;		/// AI type of this player AI
 	// controller
-	std::string Script;         /// Script executed
-	unsigned long SleepCycles;  /// Cycles to sleep
+	std::string Script;				/// Script executed
+	unsigned long SleepCycles = 0;	/// Cycles to sleep
 
-	AiForceManager Force;  /// Forces controlled by AI
+	AiForceManager Force;			/// Forces controlled by AI
 
 	// resource manager
-	int Reserve[MaxCosts]; /// Resources to keep in reserve
-	int Used[MaxCosts];    /// Used resources
-	int Needed[MaxCosts];  /// Needed resources
-	int Collect[MaxCosts]; /// Collect % of resources
-	int NeededMask;        /// Mask for needed resources
-	bool NeedSupply;       /// Flag need food
-	bool ScriptDebug;      /// Flag script debugging on/off
-	bool BuildDepots;      /// Build new depots if necessary
+	int Reserve[MaxCosts];			/// Resources to keep in reserve
+	int Used[MaxCosts];				/// Used resources
+	int Needed[MaxCosts];			/// Needed resources
+	int Collect[MaxCosts];			/// Collect % of resources
+	long long int NeededMask = 0;	/// Mask for needed resources
+	bool NeedSupply = false;		/// Flag need food
+	bool ScriptDebug = false;		/// Flag script debugging on/off
+	bool BuildDepots = true;		/// Build new depots if necessary
 	//Wyrmgus start
-	bool Scouting;		   /// Whether the AI player is currently scouting (has no enemies it knows the location of)
+	bool Scouting = false;			/// Whether the AI player is currently scouting (has no enemies it knows the location of)
 	//Wyrmgus end
 
-	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
-	unsigned long LastExplorationGameCycle;       /// When did the last explore occur?
-	unsigned long LastCanNotMoveGameCycle;        /// Last can not move cycle
-	std::vector<AiRequestType> UnitTypeRequests;  /// unit-types to build/train request,priority list
-	std::vector<CUnitType *> UpgradeToRequests;   /// Upgrade to unit-type requested and priority list
-	std::vector<CUpgrade *> ResearchRequests;     /// Upgrades requested and priority list
-	std::vector<AiBuildQueue> UnitTypeBuilt;      /// What the resource manager should build
-	int LastRepairBuilding;                       /// Last building checked for repair in this turn
+	std::vector<AiExplorationRequest> FirstExplorationRequest;	/// Requests for exploration
+	unsigned long LastExplorationGameCycle = 0;	/// When did the last explore occur?
+	unsigned long LastCanNotMoveGameCycle = 0;	/// Last can not move cycle
+	std::vector<AiRequestType> UnitTypeRequests;	/// unit-types to build/train request,priority list
+	std::vector<CUnitType *> UpgradeToRequests;		/// Upgrade to unit-type requested and priority list
+	std::vector<CUpgrade *> ResearchRequests;		/// Upgrades requested and priority list
+	std::vector<AiBuildQueue> UnitTypeBuilt;		/// What the resource manager should build
+	int LastRepairBuilding = 0;						/// Last building checked for repair in this turn
 	//Wyrmgus start
-	int LastPathwayConstructionBuilding;		/// Last building checked for pathway construction in this turn
+	int LastPathwayConstructionBuilding = 0;		/// Last building checked for pathway construction in this turn
 	std::vector<CUnit *> Scouts;				/// AI scouting units
 	std::map<int, std::vector<CUnit *>> Transporters;	/// AI transporters, mapped to the sea (water "landmass") they belong to
 	//Wyrmgus end

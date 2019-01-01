@@ -1415,7 +1415,7 @@ static bool AiCanSellResource(int resource)
 		return false;
 	}
 	
-	if ((AiPlayer->NeededMask & (1 << resource))) {
+	if ((AiPlayer->NeededMask & ((long long int) 1 << resource))) {
 		return false;
 	}
 	
@@ -1572,7 +1572,7 @@ static void AiCollectResources()
 	int percent_total = 100;
 	for (int c = 1; c < MaxCosts; ++c) {
 		percent[c] = AiPlayer->Collect[c];
-		if ((AiPlayer->NeededMask & (1 << c))) { // Double percent if needed
+		if ((AiPlayer->NeededMask & ((long long int) 1 << c))) { // Double percent if needed
 			percent_total += percent[c];
 			percent[c] <<= 1;
 		}
@@ -1591,7 +1591,7 @@ static void AiCollectResources()
 	}
 
 	// Initialise priority & mapping
-	for (int c = 0; c < MaxCosts; ++c) {
+	for (size_t c = 0; c < CResource::Resources.size(); ++c) {
 		priority_resource[c] = c;
 		priority_needed[c] = wanted[c] - num_units_assigned[c] - num_units_with_resource[c];
 
@@ -1602,8 +1602,8 @@ static void AiCollectResources()
 	}
 	CUnit *unit;
 	// sort resources by priority
-	for (int i = 0; i < MaxCosts; ++i) {
-		for (int j = i + 1; j < MaxCosts; ++j) {
+	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
+		for (size_t j = i + 1; j < CResource::Resources.size(); ++j) {
 			if (priority_needed[j] > priority_needed[i]) {
 				std::swap(priority_needed[i], priority_needed[j]);
 				std::swap(priority_resource[i], priority_resource[j]);
@@ -1613,7 +1613,7 @@ static void AiCollectResources()
 	unit = nullptr;
 
 	// Try to complete each resource in the priority order
-	for (int i = 0; i < MaxCosts; ++i) {
+	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
 		int c = priority_resource[i];
 			
 		//Wyrmgus start
@@ -1631,7 +1631,7 @@ static void AiCollectResources()
 				unit = unassigned_unit;
 					
 				// remove it from other ressources
-				for (int j = 0; j < MaxCosts; ++j) {
+				for (size_t j = 0; j < CResource::Resources.size(); ++j) {
 					if (j == c || !unit->Type->ResInfo[j]) {
 						continue;
 					}
@@ -1649,7 +1649,7 @@ static void AiCollectResources()
 		// Else : Take from already assigned worker with lower priority.
 		if (!unit) {
 			// Take from lower priority only (i+1).
-			for (int j = i + 1; j < MaxCosts && !unit; ++j) {
+			for (size_t j = i + 1; j < CResource::Resources.size() && !unit; ++j) {
 				// Try to move worker from src_c to c
 				const int src_c = priority_resource[j];
 
@@ -2610,7 +2610,7 @@ static void AiCheckMinecartConstruction()
 	
 	std::vector<CSite *> potential_settlements;
 		
-	for (int res = 0; res < MaxCosts; ++res) {
+	for (size_t res = 0; res < CResource::Resources.size(); ++res) {
 		if (res >= (int) AiHelpers.Mines.size()) {
 			break;
 		}
@@ -2685,7 +2685,7 @@ static void AiCheckMinecartSalvaging()
 		
 		bool has_accessible_mine = false;
 		
-		for (int res = 0; res < MaxCosts; ++res) {
+		for (size_t res = 0; res < CResource::Resources.size(); ++res) {
 			if (!minecart_type->ResInfo[res]) {
 				continue;
 			}
