@@ -10,7 +10,7 @@
 //
 /**@name time_of_day.cpp - The time of day source file. */
 //
-//      (c) Copyright 2018 by Andrettin
+//      (c) Copyright 2018-2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

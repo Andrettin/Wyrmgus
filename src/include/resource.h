@@ -10,7 +10,7 @@
 //
 /**@name resource.h - The resource header file. */
 //
-//      (c) Copyright 1999-2018 by Vladi Belperchinov-Shabanski,
+//      (c) Copyright 1999-2019 by Vladi Belperchinov-Shabanski,
 //		Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

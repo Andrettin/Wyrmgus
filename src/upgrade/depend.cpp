@@ -10,7 +10,7 @@
 //
 /**@name depend.cpp - The dependencies source file */
 //
-//      (c) Copyright 2000-2018 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 2000-2019 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

@@ -10,7 +10,7 @@
 //
 /**@name loadgame.cpp - Load game. */
 //
-//      (c) Copyright 2001-2018 by Lutz Sammer, Andreas Arens and Andrettin
+//      (c) Copyright 2001-2019 by Lutz Sammer, Andreas Arens and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

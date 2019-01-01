@@ -10,7 +10,7 @@
 //
 /**@name popup.cpp - The popup globals. */
 //
-//      (c) Copyright 2012-2018 by cybermind, Joris Dauphin and Andrettin
+//      (c) Copyright 2012-2019 by cybermind, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

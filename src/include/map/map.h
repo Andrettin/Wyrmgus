@@ -10,7 +10,7 @@
 //
 /**@name map.h - The map header file. */
 //
-//      (c) Copyright 1998-2018 by Vladi Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2019 by Vladi Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

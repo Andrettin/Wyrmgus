@@ -10,7 +10,7 @@
 //
 /**@name player.cpp - The player source file. */
 //
-//      (c) Copyright 1998-2018 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
