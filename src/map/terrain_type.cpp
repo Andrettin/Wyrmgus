@@ -232,6 +232,13 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			this->Name = value;
 		} else if (key == "character") {
 			this->Character = value;
+			
+			if (CTerrainType::TerrainTypesByCharacter.find(this->Character) != CTerrainType::TerrainTypesByCharacter.end()) {
+				fprintf(stderr, "Character \"%s\" is already used by another terrain type.\n", this->Character.c_str());
+				continue;
+			} else {
+				CTerrainType::TerrainTypesByCharacter[this->Character] = this;
+			}
 		} else if (key == "color") {
 			this->Color = CColor::FromString(value);
 			

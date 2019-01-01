@@ -573,10 +573,14 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	
 	if (this->OutputTerrainImage) {
 		std::string filename = this->Ident;
-		std::string overlay_filename = this->Ident;
-		overlay_filename += "-overlay";
+		filename = FindAndReplaceString(filename, "-", "_");
 		filename += ".png";
+		
+		std::string overlay_filename = this->Ident;
+		overlay_filename = FindAndReplaceString(overlay_filename, "-", "_");
+		overlay_filename += "_overlay";
 		overlay_filename += ".png";
+		
 		SaveMapTemplatePNG(filename.c_str(), this, false);
 		SaveMapTemplatePNG(overlay_filename.c_str(), this, true);
 	}
