@@ -78,6 +78,9 @@ public:
 	CMapField *Field(const Vec2i &pos) const;
 	void DoPerCycleLoop();
 	void DoPerHourLoop();
+	void RegenerateForest();
+	//regenerate a forest tile	
+	void RegenerateForestTile(const Vec2i &pos);
 private:
 	void DecrementRemainingTimeOfDayHours();
 	void IncrementTimeOfDay();

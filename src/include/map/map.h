@@ -328,9 +328,6 @@ private:
 	*/
 	//Wyrmgus end
 
-	/// Regenerate a forest tile
-	void RegenerateForestTile(const Vec2i &pos, int z);
-
 public:
 	bool NoFogOfWar;           /// fog of war disabled
 

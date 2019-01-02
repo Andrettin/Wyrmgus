@@ -3042,152 +3042,17 @@ void CMap::ClearRockTile(const Vec2i &pos)
 //Wyrmgus end
 
 /**
-**  Regenerate forest.
-**
-**  @param pos  Map tile pos
-*/
-//Wyrmgus start
-//void CMap::RegenerateForestTile(const Vec2i &pos)
-void CMap::RegenerateForestTile(const Vec2i &pos, int z)
-//Wyrmgus end
-{
-	Assert(Map.Info.IsPointOnMap(pos, z));
-	CMapField &mf = *this->Field(pos, z);
-
-	//Wyrmgus start
-//	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile()) {
-	if ((mf.OverlayTerrain && !mf.OverlayTerrainDestroyed) || !(mf.getFlag() & MapFieldStumps)) {
-	//Wyrmgus end
-		return;
-	}
-
-	//  Increment each value of no wood.
-	//  If grown up, place new wood.
-	//  FIXME: a better looking result would be fine
-	//    Allow general updates to any tiletype that regrows
-
-	//Wyrmgus start
-	/*
-	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding);
-	++mf.Value;
-	if (mf.Value < ForestRegeneration) {
-		return;
-	}
-	mf.Value = ForestRegeneration;
-	if ((mf.Flags & occupedFlag) || pos.y == 0) {
-		return;
-	}
-	*/
-	
-	const unsigned int permanent_occupied_flag = (MapFieldWall | MapFieldUnpassable | MapFieldBuilding);
-	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding | MapFieldItem); // don't regrow forests under items
-	
-	if ((mf.Flags & permanent_occupied_flag)) { //if the tree tile is occupied by buildings and the like, reset the regeneration process
-		mf.Value = 0;
-		return;
-	}
-
-	if ((mf.Flags & occupedFlag) || pos.y == 0) {
-		return;
-	}
-	
-	++mf.Value;
-	if (mf.Value < ForestRegeneration) {
-		return;
-	}
-	mf.Value = ForestRegeneration;
-	//Wyrmgus end
-	
-	//Wyrmgus start
-//	const Vec2i offset(0, -1);
-//	CMapField &topMf = *(&mf - this->Info.MapWidth);
-
-	for (int x_offset = -1; x_offset <= 1; x_offset+=2) { //increment by 2 to avoid instances where it is 0
-		for (int y_offset = -1; y_offset <= 1; y_offset+=2) {
-			const Vec2i verticalOffset(0, y_offset);
-			CMapField &verticalMf = *this->Field(pos + verticalOffset, z);
-			const Vec2i horizontalOffset(x_offset, 0);
-			CMapField &horizontalMf = *this->Field(pos + horizontalOffset, z);
-			const Vec2i diagonalOffset(x_offset, y_offset);
-			CMapField &diagonalMf = *this->Field(pos + diagonalOffset, z);
-			
-			if (
-				this->Info.IsPointOnMap(pos + verticalOffset, z)
-				&& ((verticalMf.OverlayTerrain && verticalMf.OverlayTerrainDestroyed && (verticalMf.getFlag() & MapFieldStumps) && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupedFlag)) || (verticalMf.getFlag() & MapFieldForest))
-				&& this->Info.IsPointOnMap(pos + diagonalOffset, z)
-				&& ((diagonalMf.OverlayTerrain && diagonalMf.OverlayTerrainDestroyed && (diagonalMf.getFlag() & MapFieldStumps) && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupedFlag)) || (diagonalMf.getFlag() & MapFieldForest))
-				&& this->Info.IsPointOnMap(pos + horizontalOffset, z)
-				&& ((horizontalMf.OverlayTerrain && horizontalMf.OverlayTerrainDestroyed && (horizontalMf.getFlag() & MapFieldStumps) && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupedFlag)) || (horizontalMf.getFlag() & MapFieldForest))
-			) {
-				DebugPrint("Real place wood\n");
-				this->SetOverlayTerrainDestroyed(pos + verticalOffset, false, z);
-				this->SetOverlayTerrainDestroyed(pos + diagonalOffset, false, z);
-				this->SetOverlayTerrainDestroyed(pos + horizontalOffset, false, z);
-				this->SetOverlayTerrainDestroyed(pos, false, z);
-				
-				return;
-			}
-		}
-	}
-
-	/*
-	if (topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile()
-		&& topMf.Value >= ForestRegeneration
-		&& !(topMf.Flags & occupedFlag)) {
-		DebugPrint("Real place wood\n");
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
-		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
-		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
-		topMf.Value = 0;
-		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
-		UI.Minimap.UpdateSeenXY(pos + offset);
-		UI.Minimap.UpdateXY(pos + offset);
-		
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
-		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
-		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		mf.Value = 0;
-		mf.Flags |= MapFieldForest | MapFieldUnpassable;
-		UI.Minimap.UpdateSeenXY(pos);
-		UI.Minimap.UpdateXY(pos);
-		
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(mf);
-		}
-		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(topMf);
-		}
-		FixNeighbors(MapFieldForest, 0, pos + offset);
-		FixNeighbors(MapFieldForest, 0, pos);
-	}
-	*/
-}
-
-/**
-**  Regenerate forest.
+**	@brief	Regenerate forest.
 */
 void CMap::RegenerateForest()
 {
 	if (!ForestRegeneration) {
 		return;
 	}
-	Vec2i pos;
-	//Wyrmgus start
-	/*
-	for (pos.y = 0; pos.y < Info.MapHeight; ++pos.y) {
-		for (pos.x = 0; pos.x < Info.MapWidth; ++pos.x) {
-			RegenerateForestTile(pos);
-		}
+
+	for (CMapLayer *map_layer : this->MapLayers) {
+		map_layer->RegenerateForest();
 	}
-	*/
-	for (size_t z = 0; z < this->MapLayers.size(); ++z) {
-		for (pos.y = 0; pos.y < Info.MapHeights[z]; ++pos.y) {
-			for (pos.x = 0; pos.x < Info.MapWidths[z]; ++pos.x) {
-				RegenerateForestTile(pos, z);
-			}
-		}
-	}
-	//Wyrmgus end
 }
 
 

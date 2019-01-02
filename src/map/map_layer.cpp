@@ -40,6 +40,7 @@
 #include "map/map.h"
 #include "map/terrain_type.h"
 #include "map/tile.h"
+#include "map/tileset.h"
 #include "sound_server.h"
 #include "time/season.h"
 #include "time/season_schedule.h"
@@ -146,6 +147,122 @@ void CMapLayer::DoPerHourLoop()
 {
 	this->DecrementRemainingSeasonHours();
 	this->DecrementRemainingTimeOfDayHours();
+}
+
+/**
+**	@brief	Regenerate forest tiles in the map layer
+*/
+void CMapLayer::RegenerateForest()
+{
+	Vec2i pos;
+	for (pos.y = 0; pos.y < this->Height; ++pos.y) {
+		for (pos.x = 0; pos.x < this->Width; ++pos.x) {
+			this->RegenerateForestTile(pos);
+		}
+	}
+}
+
+/**
+**	@brief	Regenerate a forest tile.
+**
+**	@param	pos			Map tile pos
+*/
+void CMapLayer::RegenerateForestTile(const Vec2i &pos)
+{
+	Assert(Map.Info.IsPointOnMap(pos, this->ID));
+	
+	CMapField &mf = *this->Field(pos);
+
+	if (!mf.OverlayTerrain || !mf.OverlayTerrainDestroyed || !(mf.getFlag() & MapFieldStumps)) {
+		return;
+	}
+
+	//  Increment each value of no wood.
+	//  If grown up, place new wood.
+	//  FIXME: a better looking result would be fine
+	//    Allow general updates to any tiletype that regrows
+
+	const unsigned int permanent_occupied_flag = (MapFieldWall | MapFieldUnpassable | MapFieldBuilding);
+	const unsigned int occupied_flag = (permanent_occupied_flag | MapFieldLandUnit | MapFieldItem);
+	
+	if ((mf.Flags & permanent_occupied_flag)) { //if the tree tile is permanently occupied by buildings and the like, reset the regeneration process
+		mf.Value = 0;
+		return;
+	}
+
+	if (mf.Flags & occupied_flag) { // if the tree tile is temporarily occupied (e.g. by an item or unit), don't continue the regrowing process while the occupation occurs, but don't reset it either
+		return;
+	}
+	
+	++mf.Value;
+	if (mf.Value < ForestRegeneration) {
+		return;
+	}
+	mf.Value = ForestRegeneration;
+	
+	//Wyrmgus start
+//	const Vec2i offset(0, -1);
+//	CMapField &topMf = *(&mf - this->Info.MapWidth);
+
+	for (int x_offset = -1; x_offset <= 1; x_offset+=2) { //increment by 2 to avoid instances where it is 0
+		for (int y_offset = -1; y_offset <= 1; y_offset+=2) {
+			const Vec2i verticalOffset(0, y_offset);
+			CMapField &verticalMf = *this->Field(pos + verticalOffset);
+			const Vec2i horizontalOffset(x_offset, 0);
+			CMapField &horizontalMf = *this->Field(pos + horizontalOffset);
+			const Vec2i diagonalOffset(x_offset, y_offset);
+			CMapField &diagonalMf = *this->Field(pos + diagonalOffset);
+			
+			if (
+				Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
+				&& Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
+				&& Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
+				&& ((verticalMf.OverlayTerrain && verticalMf.OverlayTerrainDestroyed && (verticalMf.getFlag() & MapFieldStumps) && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupied_flag)) || (verticalMf.getFlag() & MapFieldForest))
+				&& ((diagonalMf.OverlayTerrain && diagonalMf.OverlayTerrainDestroyed && (diagonalMf.getFlag() & MapFieldStumps) && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.getFlag() & MapFieldForest))
+				&& ((horizontalMf.OverlayTerrain && horizontalMf.OverlayTerrainDestroyed && (horizontalMf.getFlag() & MapFieldStumps) && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.getFlag() & MapFieldForest))
+			) {
+				DebugPrint("Real place wood\n");
+				Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
+				Map.SetOverlayTerrainDestroyed(pos + diagonalOffset, false, this->ID);
+				Map.SetOverlayTerrainDestroyed(pos + horizontalOffset, false, this->ID);
+				Map.SetOverlayTerrainDestroyed(pos, false, this->ID);
+				
+				return;
+			}
+		}
+	}
+
+	/*
+	if (topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile()
+		&& topMf.Value >= ForestRegeneration
+		&& !(topMf.Flags & occupied_flag)) {
+		DebugPrint("Real place wood\n");
+		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
+		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
+		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
+		topMf.Value = 0;
+		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
+		UI.Minimap.UpdateSeenXY(pos + offset);
+		UI.Minimap.UpdateXY(pos + offset);
+		
+		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
+		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
+		mf.playerInfo.SeenTile = mf.getGraphicTile();
+		mf.Value = 0;
+		mf.Flags |= MapFieldForest | MapFieldUnpassable;
+		UI.Minimap.UpdateSeenXY(pos);
+		UI.Minimap.UpdateXY(pos);
+		
+		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+			MarkSeenTile(mf);
+		}
+		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			MarkSeenTile(topMf);
+		}
+		FixNeighbors(MapFieldForest, 0, pos + offset);
+		FixNeighbors(MapFieldForest, 0, pos);
+	}
+	*/
 }
 
 /**
