@@ -169,16 +169,22 @@ static int CclStratagusMap(lua_State *l)
 					}
 					const int subsubargs = lua_rawlen(l, -1);
 					for (int z = 0; z < subsubargs; ++z) {
+						CMapLayer *map_layer = Map.MapLayers[z];
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument for \"time-of-day\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						Map.MapLayers[z]->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(LuaToString(l, -1, 1));
-						unsigned time_of_day = LuaToNumber(l, -1, 2);
-						if (Map.MapLayers[z]->TimeOfDaySchedule && time_of_day < Map.MapLayers[z]->TimeOfDaySchedule->ScheduledTimesOfDay.size()) {
-							Map.MapLayers[z]->TimeOfDay = Map.MapLayers[z]->TimeOfDaySchedule->ScheduledTimesOfDay[time_of_day];
+						std::string time_of_day_schedule_ident = LuaToString(l, -1, 1);
+						if (!time_of_day_schedule_ident.empty()) {
+							map_layer->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(time_of_day_schedule_ident);
+						} else {
+							map_layer->TimeOfDaySchedule = nullptr;
 						}
-						Map.MapLayers[z]->RemainingTimeOfDayHours = LuaToNumber(l, -1, 3);
+						unsigned time_of_day = LuaToNumber(l, -1, 2);
+						if (map_layer->TimeOfDaySchedule && time_of_day < map_layer->TimeOfDaySchedule->ScheduledTimesOfDay.size()) {
+							map_layer->TimeOfDay = map_layer->TimeOfDaySchedule->ScheduledTimesOfDay[time_of_day];
+						}
+						map_layer->RemainingTimeOfDayHours = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
