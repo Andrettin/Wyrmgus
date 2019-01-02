@@ -1283,7 +1283,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 	// Find a resource to harvest from.
 	//Wyrmgus start
 //	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, nullptr, false, false, false, resource == CopperCost && AiPlayer->Player->GetMarketUnit() != nullptr);
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, nullptr, false, false, false, resource == CopperCost && AiPlayer->Player->HasMarketUnit());
 	//Wyrmgus end
 
 	if (mine) {

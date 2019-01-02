@@ -270,6 +270,7 @@ public:
 	void UpdateFreeWorkers();
 	//Wyrmgus start
 	void PerformResourceTrade();
+	bool HasMarketUnit() const;
 	CUnit *GetMarketUnit() const;
 	std::vector<int> GetAutosellResources() const;
 	void AutosellResource(const int resource);

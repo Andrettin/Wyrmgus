@@ -2550,6 +2550,31 @@ void CPlayer::PerformResourceTrade()
 	}
 }
 
+/**
+**	@brief	Get whether the player has a market unit
+**
+**	@return	True if the player has a market unit, or false otherwise
+*/
+bool CPlayer::HasMarketUnit() const
+{
+	const int n_m = AiHelpers.SellMarkets[0].size();
+
+	for (int i = 0; i < n_m; ++i) {
+		CUnitType &market_type = *AiHelpers.SellMarkets[0][i];
+
+		if (this->GetUnitTypeCount(&market_type)) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+/**
+**	@brief	Get the player's market unit, if any
+**
+**	@return	The market unit if present, or null otherwise
+*/
 CUnit *CPlayer::GetMarketUnit() const
 {
 	CUnit *market_unit = nullptr;
