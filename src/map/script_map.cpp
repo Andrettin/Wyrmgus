@@ -290,6 +290,8 @@ static int CclStratagusMap(lua_State *l)
 					}
 					const int subsubargs = lua_rawlen(l, -1);
 					for (int z = 0; z < subsubargs; ++z) {
+						CMapLayer *map_layer = Map.MapLayers[z];
+						
 						lua_rawgeti(l, -1, z + 1);
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument");
@@ -303,7 +305,11 @@ static int CclStratagusMap(lua_State *l)
 							if (!lua_istable(l, -1)) {
 								LuaError(l, "incorrect argument");
 							}
-							Map.MapLayers[z]->Fields[i].parse(l);
+							CMapField &mf = map_layer->Fields[i];
+							mf.parse(l);
+							if (mf.OverlayTerrain && mf.OverlayTerrainDestroyed && (mf.getFlag() & MapFieldStumps)) {
+								map_layer->DestroyedForestTiles.push_back(map_layer->GetPosFromIndex(i));
+							}
 							lua_pop(l, 1);
 						}
 						lua_pop(l, 1);

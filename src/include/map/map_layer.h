@@ -76,6 +76,14 @@ public:
 	CMapField *Field(const unsigned int index) const;
 	CMapField *Field(const int x, const int y) const;
 	CMapField *Field(const Vec2i &pos) const;
+	Vec2i GetPosFromIndex(unsigned int index) const
+	{
+		Vec2i pos;
+		pos.x = index % this->Width;
+		pos.y = index / this->Width;
+		return pos;
+	}
+	
 	void DoPerCycleLoop();
 	void DoPerHourLoop();
 	void RegenerateForest();
@@ -113,6 +121,7 @@ public:
 	std::vector<CUnit *> LayerConnectors;	/// connectors in the map layer which lead to other map layers
 	PixelSize PixelTileSize;				/// the pixel tile size for the map layer
 	std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>> SubtemplateAreas;
+	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
 };
 
 //@}

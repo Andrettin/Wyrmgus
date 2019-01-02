@@ -1872,7 +1872,13 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 
 void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 {
-	CMapField &mf = *this->Field(pos, z);
+	CMapLayer *map_layer = this->MapLayers[z];
+	
+	if (!map_layer) {
+		return;
+	}
+	
+	CMapField &mf = *map_layer->Field(pos);
 	
 	if (!mf.OverlayTerrain || mf.OverlayTerrainDestroyed == destroyed) {
 		return;
@@ -1884,6 +1890,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 		if (mf.OverlayTerrain->Flags & MapFieldForest) {
 			mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
 			mf.Flags |= MapFieldStumps;
+			map_layer->DestroyedForestTiles.push_back(pos);
 		} else if (mf.OverlayTerrain->Flags & MapFieldRocks) {
 			mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
 			mf.Flags |= MapFieldGravel;

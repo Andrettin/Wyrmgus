@@ -154,28 +154,30 @@ void CMapLayer::DoPerHourLoop()
 */
 void CMapLayer::RegenerateForest()
 {
-	Vec2i pos;
-	for (pos.y = 0; pos.y < this->Height; ++pos.y) {
-		for (pos.x = 0; pos.x < this->Width; ++pos.x) {
+	for (size_t i = 0; i < this->DestroyedForestTiles.size();) {
+		const Vec2i &pos = this->DestroyedForestTiles[i];
+		CMapField &mf = *this->Field(pos);
+		if (!mf.OverlayTerrain || !mf.OverlayTerrainDestroyed || !(mf.getFlag() & MapFieldStumps)) { //the destroyed forest tile may have become invalid, e.g. because the terrain changed, or because of the regeneration itself; we keep the removal of elements centralized here so that we can loop through the tiles reliably
+			this->DestroyedForestTiles.erase(this->DestroyedForestTiles.begin() + i);
+		} else {
 			this->RegenerateForestTile(pos);
+			++i;
 		}
 	}
 }
 
 /**
-**	@brief	Regenerate a forest tile.
+**	@brief	Regenerate a forest tile
 **
-**	@param	pos			Map tile pos
+**	@param	pos		Map tile pos
+**
+**	@return	True if the forest tile was regenerated, or false otherwise
 */
 void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 {
 	Assert(Map.Info.IsPointOnMap(pos, this->ID));
 	
 	CMapField &mf = *this->Field(pos);
-
-	if (!mf.OverlayTerrain || !mf.OverlayTerrainDestroyed || !(mf.getFlag() & MapFieldStumps)) {
-		return;
-	}
 
 	//  Increment each value of no wood.
 	//  If grown up, place new wood.
