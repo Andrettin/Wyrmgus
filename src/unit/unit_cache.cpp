@@ -66,9 +66,9 @@ void CMap::Insert(CUnit &unit)
 		do {
 			mf->UnitCache.Insert(&unit);
 			++mf;
-		} while (--j && unit.tilePos.x + (j - w) < unit.MapLayer->Width);
-		index += unit.MapLayer->Width;
-	} while (--i && unit.tilePos.y + (i - h) < unit.MapLayer->Height);
+		} while (--j && unit.tilePos.x + (j - w) < unit.MapLayer->GetWidth());
+		index += unit.MapLayer->GetWidth();
+	} while (--i && unit.tilePos.y + (i - h) < unit.MapLayer->GetHeight());
 }
 
 /**
@@ -90,9 +90,9 @@ void CMap::Remove(CUnit &unit)
 		do {
 			mf->UnitCache.Remove(&unit);
 			++mf;
-		} while (--j && unit.tilePos.x + (j - w) < unit.MapLayer->Width);
-		index += unit.MapLayer->Width;
-	} while (--i && unit.tilePos.y + (i - h) < unit.MapLayer->Height);
+		} while (--j && unit.tilePos.x + (j - w) < unit.MapLayer->GetWidth());
+		index += unit.MapLayer->GetWidth();
+	} while (--i && unit.tilePos.y + (i - h) < unit.MapLayer->GetHeight());
 }
 
 //Wyrmgus start

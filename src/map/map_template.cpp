@@ -480,13 +480,18 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	}
 	
 	if (z >= (int) Map.MapLayers.size()) {
-		CMapLayer *map_layer = new CMapLayer;
+		int width = std::min(this->Width * this->Scale, Map.Info.MapWidth);
+		int height = std::min(this->Height * this->Scale, Map.Info.MapHeight);
+		if (CurrentCampaign) {
+			//applies the map size set for the campaign for this map layer; for the first map layer that is already Map.Info.Width/Height, so it isn't necessary here
+			width = CurrentCampaign->MapSizes[z].x;
+			height = CurrentCampaign->MapSizes[z].y;
+		}
+	
+		CMapLayer *map_layer = new CMapLayer(width, height);
 		map_layer->ID = Map.MapLayers.size();
-		map_layer->Width = std::min(this->Width * this->Scale, Map.Info.MapWidth);
-		map_layer->Height = std::min(this->Height * this->Scale, Map.Info.MapHeight);
-		Map.Info.MapWidths.push_back(map_layer->Width);
-		Map.Info.MapHeights.push_back(map_layer->Height);
-		map_layer->Fields = new CMapField[map_layer->Width * map_layer->Height];
+		Map.Info.MapWidths.push_back(map_layer->GetWidth());
+		Map.Info.MapHeights.push_back(map_layer->GetHeight());
 		map_layer->Plane = this->Plane;
 		map_layer->World = this->World;
 		map_layer->SurfaceLayer = this->SurfaceLayer;
@@ -503,13 +508,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		}
 	}
 
-	if (CurrentCampaign) {
-		Map.Info.MapWidths[z] = CurrentCampaign->MapSizes[z].x;
-		Map.Info.MapHeights[z] = CurrentCampaign->MapSizes[z].y;
-		Map.MapLayers[z]->Width = CurrentCampaign->MapSizes[z].x;
-		Map.MapLayers[z]->Height = CurrentCampaign->MapSizes[z].y;
-	}
-	
 	if (!this->IsSubtemplateArea()) {
 		if (Editor.Running == EditorNotRunning) {
 			if (this->World && this->World->SeasonSchedule) {

@@ -1887,7 +1887,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	}
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(building.MapLayer->Width, building.MapLayer->Height);
+	terrainTraversal.SetSize(building.MapLayer->GetWidth(), building.MapLayer->GetHeight());
 	terrainTraversal.Init();
 
 	terrainTraversal.PushUnitPosAndNeighbor(building);

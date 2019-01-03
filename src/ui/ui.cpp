@@ -602,8 +602,8 @@ static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 	//Wyrmgus start
 //	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * Map.GetCurrentPixelTileSize().x - 1;
 //	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * Map.GetCurrentPixelTileSize().y - 1;
-	vp.BottomRightPos.x = vp.TopLeftPos.x + (Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->Width : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + (Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->Height : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - 1;
+	vp.BottomRightPos.x = vp.TopLeftPos.x + (Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetWidth() : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - 1;
+	vp.BottomRightPos.y = vp.TopLeftPos.y + (Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetHeight() : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - 1;
 	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary

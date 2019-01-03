@@ -445,8 +445,8 @@ void SaveMapPNG(const char *name)
 		return;
 	}
 
-	const size_t imageWidth = UI.CurrentMapLayer->Width * Map.GetCurrentPixelTileSize().x;
-	const size_t imageHeight = UI.CurrentMapLayer->Height * Map.GetCurrentPixelTileSize().y;
+	const size_t imageWidth = UI.CurrentMapLayer->GetWidth() * Map.GetCurrentPixelTileSize().x;
+	const size_t imageHeight = UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y;
 
 	/* set up the output control if you are using standard C streams */
 	png_init_io(png_ptr, fp);
@@ -460,8 +460,8 @@ void SaveMapPNG(const char *name)
 	SDL_Surface *mapImage = SDL_CreateRGBSurface(SDL_SWSURFACE,
 		imageWidth, imageHeight, 32, RMASK, GMASK, BMASK, 0);
 
-	for (int i = 0; i < UI.CurrentMapLayer->Height; ++i) {
-		for (int j = 0; j < UI.CurrentMapLayer->Width; ++j) {
+	for (int i = 0; i < UI.CurrentMapLayer->GetHeight(); ++i) {
+		for (int j = 0; j < UI.CurrentMapLayer->GetWidth(); ++j) {
 			const CMapField &mf = *UI.CurrentMapLayer->Field(i, j);
 			SDL_Rect srcRect, dstRect;
 			//Wyrmgus start

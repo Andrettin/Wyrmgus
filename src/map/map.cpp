@@ -160,9 +160,10 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 //	const unsigned int index = &mf - Map.Fields;
 //	const int y = index / Info.MapWidth;
 //	const int x = index - (y * Info.MapWidth);
-	const unsigned int index = &mf - Map.MapLayers[z]->Fields;
-	const int y = index / Info.MapWidths[z];
-	const int x = index - (y * Info.MapWidths[z]);
+	const CMapLayer *map_layer = Map.MapLayers[z];
+	const unsigned int index = &mf - map_layer->Fields;
+	const int y = index / map_layer->GetWidth();
+	const int x = index - (y * map_layer->GetWidth());
 	//Wyrmgus end
 	const Vec2i pos = {x, y}
 #endif
@@ -1183,7 +1184,7 @@ void ChangeCurrentMapLayer(const int z)
 		return;
 	}
 	
-	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / UI.CurrentMapLayer->Width, UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / UI.CurrentMapLayer->Height);
+	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / UI.CurrentMapLayer->GetWidth(), UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / UI.CurrentMapLayer->GetHeight());
 	
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
 	UI.CurrentMapLayer = Map.MapLayers[z];
@@ -1327,7 +1328,7 @@ bool CMapInfo::IsPointOnMap(const Vec2i &pos, const int z) const
 */
 bool CMapInfo::IsPointOnMap(const int x, const int y, const CMapLayer *map_layer) const
 {
-	return (map_layer && x >= 0 && y >= 0 && x < map_layer->Width && y < map_layer->Height);
+	return (map_layer && x >= 0 && y >= 0 && x < map_layer->GetWidth() && y < map_layer->GetHeight());
 }
 
 /**
@@ -1414,12 +1415,9 @@ void CMap::Create()
 {
 	Assert(this->MapLayers.size() == 0);
 
-	CMapLayer *map_layer = new CMapLayer;
+	CMapLayer *map_layer = new CMapLayer(this->Info.MapWidth, this->Info.MapHeight);
 	map_layer->ID = this->MapLayers.size();
-	map_layer->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
 	this->MapLayers.push_back(map_layer);
-	map_layer->Width = this->Info.MapWidth;
-	map_layer->Height = this->Info.MapHeight;
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
 	this->Info.MapHeights.push_back(this->Info.MapHeight);
 	
@@ -1466,9 +1464,6 @@ void CMap::Clean()
 	// Tileset freed by Tileset?
 
 	this->Info.Clear();
-	//Wyrmgus start
-//	this->Fields = nullptr;
-	//Wyrmgus end
 	this->NoFogOfWar = false;
 	this->Tileset->clear();
 	this->TileModelsFileName.clear();

@@ -3530,9 +3530,9 @@ void UpdateUnitVariables(CUnit &unit)
 	// Position
 	if (unit.MapLayer) {
 		unit.Variable[POSX_INDEX].Value = unit.tilePos.x;
-		unit.Variable[POSX_INDEX].Max = unit.MapLayer->Width;
+		unit.Variable[POSX_INDEX].Max = unit.MapLayer->GetWidth();
 		unit.Variable[POSY_INDEX].Value = unit.tilePos.y;
-		unit.Variable[POSY_INDEX].Max = unit.MapLayer->Height;
+		unit.Variable[POSY_INDEX].Max = unit.MapLayer->GetHeight();
 	}
 
 	// Target Position

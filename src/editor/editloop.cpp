@@ -451,7 +451,7 @@ static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
 	if (!MirrorEdit) {
 		return;
 	}
-	const Vec2i mpos(UI.CurrentMapLayer->Width - size, UI.CurrentMapLayer->Height - size);
+	const Vec2i mpos(UI.CurrentMapLayer->GetWidth() - size, UI.CurrentMapLayer->GetHeight() - size);
 	const Vec2i mirror = mpos - pos;
 	const Vec2i mirrorv(mirror.x, pos.y);
 
@@ -2485,12 +2485,9 @@ void CEditor::Init()
 		//Wyrmgus start
 //		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 		Map.ClearMapLayers();
-		CMapLayer *map_layer = new CMapLayer;
+		CMapLayer *map_layer = new CMapLayer(Map.Info.MapWidth, Map.Info.MapHeight);
 		map_layer->ID = Map.MapLayers.size();
-		map_layer->Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 		Map.MapLayers.push_back(map_layer);
-		map_layer->Width = Map.Info.MapWidth;
-		map_layer->Height = Map.Info.MapHeight;
 		Map.Info.MapWidths.clear();
 		Map.Info.MapWidths.push_back(Map.Info.MapWidth);
 		Map.Info.MapHeights.clear();
@@ -2503,19 +2500,12 @@ void CEditor::Init()
 		//Wyrmgus end
 
 		//Wyrmgus start
-		/*
-		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			//Wyrmgus start
-//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
-			Map.Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
-			//Wyrmgus end
-		}
-		*/
-		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-			for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
+		for (CMapLayer *map_layer : Map.MapLayers) {
+			int max_tile_index = map_layer->GetWidth() * map_layer->GetHeight();
+			for (int i = 0; i < max_tile_index; ++i) {
 				//Wyrmgus start
 	//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
-				Map.MapLayers[z]->Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
+				map_layer->Field(i)->setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
 				//Wyrmgus end
 			}
 		}

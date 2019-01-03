@@ -353,7 +353,7 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 */
 static void EditorRandomizeTile(int tile, int count, int max_size)
 {
-	const Vec2i mpos(UI.CurrentMapLayer->Width - 1, UI.CurrentMapLayer->Height - 1);
+	const Vec2i mpos(UI.CurrentMapLayer->GetWidth() - 1, UI.CurrentMapLayer->GetHeight() - 1);
 
 	for (int i = 0; i < count; ++i) {
 		const Vec2i rpos(rand() % ((1 + mpos.x) / 2), rand() % ((1 + mpos.y) / 2));
@@ -384,7 +384,7 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 */
 static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
-	const Vec2i mpos(UI.CurrentMapLayer->Width, UI.CurrentMapLayer->Height);
+	const Vec2i mpos(UI.CurrentMapLayer->GetWidth(), UI.CurrentMapLayer->GetHeight());
 	CUnitType *typeptr = UnitTypeByIdent(unit_type);
 
 	if (!typeptr) { // Error
@@ -471,7 +471,7 @@ static void EditorDestroyAllUnits()
 */
 void CEditor::CreateRandomMap() const
 {
-	const int mz = std::max(UI.CurrentMapLayer->Height, UI.CurrentMapLayer->Width);
+	const int mz = std::max(UI.CurrentMapLayer->GetHeight(), UI.CurrentMapLayer->GetWidth());
 
 	// make water-base
 	const Vec2i zeros(0, 0);

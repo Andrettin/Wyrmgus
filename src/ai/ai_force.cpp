@@ -209,7 +209,7 @@ public:
 		} else {
 			TerrainTraversal terrainTraversal;
 
-			terrainTraversal.SetSize(unit->MapLayer->Width, unit->MapLayer->Height);
+			terrainTraversal.SetSize(unit->MapLayer->GetWidth(), unit->MapLayer->GetHeight());
 			terrainTraversal.Init();
 
 			terrainTraversal.PushUnitPosAndNeighbor(*unit);

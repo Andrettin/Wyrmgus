@@ -1035,14 +1035,14 @@ void CViewport::DrawMapFogOfWar() const
 	}
 
 	int sx = std::max<int>(MapPos.x - 1, 0);
-	int ex = std::min<int>(MapPos.x + MapWidth + 1, UI.CurrentMapLayer->Width);
+	int ex = std::min<int>(MapPos.x + MapWidth + 1, UI.CurrentMapLayer->GetWidth());
 	int my = std::max<int>(MapPos.y - 1, 0);
-	int ey = std::min<int>(MapPos.y + MapHeight + 1, UI.CurrentMapLayer->Height);
+	int ey = std::min<int>(MapPos.y + MapHeight + 1, UI.CurrentMapLayer->GetHeight());
 
 	// Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
 
-	unsigned int my_index = my * UI.CurrentMapLayer->Width;
+	unsigned int my_index = my * UI.CurrentMapLayer->GetWidth();
 	for (; my < ey; ++my) {
 		for (int mx = sx; mx < ex; ++mx) {
 			//Wyrmgus start
@@ -1050,10 +1050,10 @@ void CViewport::DrawMapFogOfWar() const
 			VisibleTable[UI.CurrentMapLayer->ID][my_index + mx] = Map.Field(mx + my_index, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*ThisPlayer);
 			//Wyrmgus end
 		}
-		my_index += UI.CurrentMapLayer->Width;
+		my_index += UI.CurrentMapLayer->GetWidth();
 	}
 	ex = this->BottomRightPos.x;
-	int sy = MapPos.y * UI.CurrentMapLayer->Width;
+	int sy = MapPos.y * UI.CurrentMapLayer->GetWidth();
 	int dy = this->TopLeftPos.y - Offset.y;
 	ey = this->BottomRightPos.y;
 
@@ -1072,7 +1072,7 @@ void CViewport::DrawMapFogOfWar() const
 			++sx;
 			dx += Map.GetCurrentPixelTileSize().x;
 		}
-		sy += UI.CurrentMapLayer->Width;
+		sy += UI.CurrentMapLayer->GetWidth();
 		dy += Map.GetCurrentPixelTileSize().y;
 	}
 }

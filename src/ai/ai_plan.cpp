@@ -188,7 +188,7 @@ static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(unit.MapLayer->Width, unit.MapLayer->Height);
+	terrainTraversal.SetSize(unit.MapLayer->GetWidth(), unit.MapLayer->GetHeight());
 	terrainTraversal.Init();
 
 	terrainTraversal.PushUnitPosAndNeighbor(unit);
@@ -334,7 +334,7 @@ static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTrans
 
 	//Wyrmgus start
 //	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(unit.MapLayer->Width, unit.MapLayer->Height);
+	terrainTraversal.SetSize(unit.MapLayer->GetWidth(), unit.MapLayer->GetHeight());
 	//Wyrmgus end
 	terrainTraversal.Init();
 

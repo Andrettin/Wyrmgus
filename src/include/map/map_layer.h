@@ -58,6 +58,7 @@ class CWorld;
 class CMapLayer
 {
 public:
+	CMapLayer(const int width, const int height);
 	~CMapLayer();
 	
 	/**
@@ -102,6 +103,16 @@ public:
 		return pos;
 	}
 	
+	int GetWidth() const
+	{
+		return this->Width;
+	}
+	
+	int GetHeight() const
+	{
+		return this->Height;
+	}
+	
 	void DoPerCycleLoop();
 	void DoPerHourLoop();
 	void RegenerateForest();
@@ -123,9 +134,11 @@ public:
 	CSeason *GetSeason() const;
 	
 	int ID = -1;
+private:
 	CMapField *Fields = nullptr;				/// fields on the map layer
 	int Width = 0;								/// the width in tiles of the map layer
 	int Height = 0;								/// the height in tiles of the map layer
+public:
 	CScheduledTimeOfDay *TimeOfDay = nullptr;	/// the time of day for the map layer
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// the time of day schedule for the map layer
 	int RemainingTimeOfDayHours = 0;			/// the quantity of hours remaining for the current time of day to end

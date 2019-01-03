@@ -3088,7 +3088,7 @@ void MarkUnitFieldFlags(const CUnit &unit)
 			mf->Flags |= flags;
 			++mf;
 		} while (--w);
-		index += unit.MapLayer->Width;
+		index += unit.MapLayer->GetWidth();
 	} while (--h);
 }
 
@@ -3136,7 +3136,7 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 			mf->UnitCache.for_each(funct);
 			++mf;
 		} while (--w);
-		index += unit.MapLayer->Width;
+		index += unit.MapLayer->GetWidth();
 	} while (--h);
 }
 
@@ -4293,7 +4293,7 @@ void UnitCountSeen(CUnit &unit)
 					}
 					++mf;
 				} while (--x);
-				index += unit.MapLayer->Width;
+				index += unit.MapLayer->GetWidth();
 			} while (--y);
 			unit.VisCount[p] = newv;
 		}

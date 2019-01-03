@@ -170,8 +170,8 @@ void CViewport::Set(const PixelPos &mapPos)
 
 	const PixelSize pixelSize = this->GetPixelSize();
 
-	x = std::min(x, (Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->Width : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, (Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->Height : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (Map.Info.MapWidths.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetWidth() : Map.Info.MapWidth) * Map.GetCurrentPixelTileSize().x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (Map.Info.MapHeights.size() && UI.CurrentMapLayer ? UI.CurrentMapLayer->GetHeight() : Map.Info.MapHeight) * Map.GetCurrentPixelTileSize().y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
 
 	this->MapPos.x = x / Map.GetCurrentPixelTileSize().x;
 	if (x < 0 && x % Map.GetCurrentPixelTileSize().x) {
@@ -247,28 +247,25 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int ey = this->BottomRightPos.y;
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
-	const int map_max = UI.CurrentMapLayer->Width * UI.CurrentMapLayer->Height;
+	const int map_max = UI.CurrentMapLayer->GetWidth() * UI.CurrentMapLayer->GetHeight();
 	const CSeason *season = Map.MapLayers[UI.CurrentMapLayer->ID]->GetSeason();
 
 	while (sy  < 0) {
 		sy++;
 		dy += Map.GetCurrentPixelTileSize().y;
 	}
-	sy *=  UI.CurrentMapLayer->Width;
+	sy *=  UI.CurrentMapLayer->GetWidth();
 
 	while (dy <= ey && sy  < map_max) {
 		int sx = this->MapPos.x + sy;
 		int dx = this->TopLeftPos.x - this->Offset.x;
-		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->Width)) {
+		while (dx <= ex && (sx - sy < UI.CurrentMapLayer->GetWidth())) {
 			if (sx - sy < 0) {
 				++sx;
 				dx += Map.GetCurrentPixelTileSize().x;
 				continue;
 			}
-			//Wyrmgus start
-//			const CMapField &mf = Map.Fields[sx];
-			const CMapField &mf = Map.MapLayers[UI.CurrentMapLayer->ID]->Fields[sx];
-			//Wyrmgus end
+			const CMapField &mf = *UI.CurrentMapLayer->Field(sx);
 			//Wyrmgus start
 			/*
 			unsigned short int tile;
@@ -380,7 +377,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			++sx;
 			dx += Map.GetCurrentPixelTileSize().x;
 		}
-		sy += UI.CurrentMapLayer->Width;
+		sy += UI.CurrentMapLayer->GetWidth();
 		dy += Map.GetCurrentPixelTileSize().y;
 	}
 }

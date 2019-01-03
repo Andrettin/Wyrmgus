@@ -1448,7 +1448,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowNW.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->Height * Map.GetCurrentPixelTileSize().y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
@@ -1460,7 +1460,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		}
 	//Wyrmgus start
 //	} else if (mousePos.x > SCROLL_RIGHT) {
-	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (UI.CurrentMapLayer->Width * Map.GetCurrentPixelTileSize().x) - 1) {
+	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (UI.CurrentMapLayer->GetWidth() * Map.GetCurrentPixelTileSize().x) - 1) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (mousePos.y < SCROLL_UP) {
@@ -1471,7 +1471,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowNE.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->Height * Map.GetCurrentPixelTileSize().y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollRightDown;
 			MouseScrollState = ScrollRightDown;
@@ -1491,7 +1491,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowN.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->Height * Map.GetCurrentPixelTileSize().y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollDown;
 			MouseScrollState = ScrollDown;

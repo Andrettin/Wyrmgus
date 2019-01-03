@@ -415,20 +415,16 @@ void CMinimap::UpdateTerrain(int z)
 		//Wyrmgus end
 	}
 
+	const CMapLayer *map_layer = Map.MapLayers[z];
+	
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
 	//
-	//Wyrmgus start
-//	for (int my = YOffset; my < H - YOffset; ++my) {
 	for (int my = YOffset[z]; my < H - YOffset[z]; ++my) {
-	//Wyrmgus end
-		//Wyrmgus start
-//		for (int mx = XOffset; mx < W - XOffset; ++mx) {
 		for (int mx = XOffset[z]; mx < W - XOffset[z]; ++mx) {
-		//Wyrmgus end
 			//Wyrmgus start
 //			const int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getGraphicTile();
-			const CMapField &mf = Map.MapLayers[z]->Fields[Minimap2MapX[z][mx] + Minimap2MapY[z][my]];
+			const CMapField &mf = *map_layer->Field(Minimap2MapX[z][mx] + Minimap2MapY[z][my]);
 			CTerrainType *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
 			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
 			if (!terrain) {
@@ -674,7 +670,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 				tile = Map.Fields[x + y].getGraphicTile();
 			}
 			*/
-			const CMapField &mf = Map.MapLayers[z]->Fields[x + y];
+			const CMapField &mf = *Map.MapLayers[z]->Field(x + y);
 			CTerrainType *terrain = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlayTerrain : mf.playerInfo.SeenTerrain;
 			int tile = mf.playerInfo.SeenOverlayTerrain ? mf.playerInfo.SeenOverlaySolidTile : mf.playerInfo.SeenSolidTile;
 			if (!terrain) {
@@ -1029,7 +1025,7 @@ void CMinimap::Update()
 				//Wyrmgus start
 //				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
 //				visiontype = Map.Field(tilePos)->playerInfo.TeamVisibilityState(*ThisPlayer);
-				const Vec2i tilePos(Minimap2MapX[UI.CurrentMapLayer->ID][mx], Minimap2MapY[UI.CurrentMapLayer->ID][my] / UI.CurrentMapLayer->Width);
+				const Vec2i tilePos(Minimap2MapX[UI.CurrentMapLayer->ID][mx], Minimap2MapY[UI.CurrentMapLayer->ID][my] / UI.CurrentMapLayer->GetWidth());
 				visiontype = Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*ThisPlayer);
 				//Wyrmgus end
 			}

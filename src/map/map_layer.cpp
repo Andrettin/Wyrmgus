@@ -65,6 +65,16 @@ extern bool enableOAML;
 ----------------------------------------------------------------------------*/
 
 /**
+**	@brief	Constructor
+*/
+CMapLayer::CMapLayer(const int width, const int height) : Width(width), Height(height)
+{
+	const int max_tile_index = this->Width * this->Height;
+
+	this->Fields = new CMapField[max_tile_index];
+}
+
+/**
 **	@brief	Destructor
 */
 CMapLayer::~CMapLayer()
@@ -94,8 +104,9 @@ void CMapLayer::DoPerCycleLoop()
 	if (GameCycle > 0) {
 		//do tile animation
 		if (GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
-			for (int i = 0; i < this->Width * this->Height; ++i) {
-				CMapField &mf = this->Fields[i];
+			const int max_tile_index = this->Width * this->Height;
+			for (int i = 0; i < max_tile_index; ++i) {
+				CMapField &mf = *this->Field(i);
 				
 				if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
 					mf.AnimationFrame += 1;
