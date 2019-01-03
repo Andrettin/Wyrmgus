@@ -1965,7 +1965,7 @@ void CleanGame()
 
 void GenerateHistory()
 {
-	ShowLoadProgress(_("Generating History..."));
+	ShowLoadProgress("%s", _("Generating History..."));
 	CCharacter::GenerateCharacterHistory(); //generate character history, e.g. assigning worshipped deities to the character if any are missing
 }
 
