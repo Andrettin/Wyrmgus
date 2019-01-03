@@ -170,8 +170,8 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 	//  FIXME: a better looking result would be fine
 	//    Allow general updates to any tiletype that regrows
 
-	const unsigned int permanent_occupied_flag = (MapFieldWall | MapFieldUnpassable | MapFieldBuilding);
-	const unsigned int occupied_flag = (permanent_occupied_flag | MapFieldLandUnit | MapFieldItem);
+	const unsigned long permanent_occupied_flag = (MapFieldWall | MapFieldUnpassable | MapFieldBuilding);
+	const unsigned long occupied_flag = (permanent_occupied_flag | MapFieldLandUnit | MapFieldItem);
 	
 	if ((mf.Flags & permanent_occupied_flag)) { //if the tree tile is permanently occupied by buildings and the like, reset the regeneration process
 		mf.Value = 0;

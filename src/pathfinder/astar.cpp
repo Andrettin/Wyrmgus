@@ -735,11 +735,11 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 			//Wyrmgus start
 //			const int flag = mf->Flags & mask;
 			//for purposes of this check, don't count MapFieldWaterAllowed and MapFieldCoastAllowed if there is a bridge present
-			int check_flags = mf->Flags;
+			unsigned long check_flags = mf->Flags;
 			if (check_flags & MapFieldBridge) {
 				check_flags &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
 			}
-			const int flag = check_flags & mask;
+			const unsigned long flag = check_flags & mask;
 			//Wyrmgus end
 			
 			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsTeamExplored(*unit.Player))) {
