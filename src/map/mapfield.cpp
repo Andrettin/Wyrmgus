@@ -137,6 +137,11 @@ int CMapField::GetResource() const
 	return -1;
 }
 
+bool CMapField::IsDestroyedForestTile() const
+{
+	return this->OverlayTerrain && this->OverlayTerrainDestroyed && (this->getFlag() & MapFieldStumps);
+}
+
 //Wyrmgus start
 /**
 **	@brief	Set the tile's terrain type

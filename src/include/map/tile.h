@@ -30,9 +30,6 @@
 #ifndef __MAP_TILE_H__
 #define __MAP_TILE_H__
 
-//@{
-
-
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -154,10 +151,7 @@ struct lua_State;
 class CMapFieldPlayerInfo
 {
 public:
-	//Wyrmgus start
-//	CMapFieldPlayerInfo() : SeenTile(0)
-	CMapFieldPlayerInfo() : SeenTerrain(nullptr), SeenOverlayTerrain(nullptr), SeenSolidTile(0), SeenOverlaySolidTile(0)
-	//Wyrmgus end
+	CMapFieldPlayerInfo()
 	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(VisCloak, 0, sizeof(VisCloak));
@@ -187,11 +181,11 @@ public:
 
 public:
 	//Wyrmgus start
-//	unsigned short SeenTile;              /// last seen tile (FOW)
-	CTerrainType *SeenTerrain;
-	CTerrainType *SeenOverlayTerrain;
-	short SeenSolidTile;
-	short SeenOverlaySolidTile;
+//	unsigned short SeenTile = 0;              /// last seen tile (FOW)
+	CTerrainType *SeenTerrain = nullptr;	/// last seen tile (FOW)
+	CTerrainType *SeenOverlayTerrain = nullptr;
+	short SeenSolidTile = 0;
+	short SeenOverlaySolidTile = 0;
 	std::vector<std::pair<CTerrainType *, short>> SeenTransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
 	std::vector<std::pair<CTerrainType *, short>> SeenOverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
@@ -259,8 +253,11 @@ public:
 	
 	int GetResource() const;
 
+	bool IsDestroyedForestTile() const;
+	
 	unsigned char getCost() const { return cost; }
 	unsigned long getFlag() const { return Flags; }
+	
 	//Wyrmgus start
 //	void setGraphicTile(unsigned int tile) { this->tile = tile; }
 	//Wyrmgus end
@@ -296,7 +293,5 @@ public:
 	CMapFieldPlayerInfo playerInfo;	/// stuff related to player
 };
 
-//@}
-
-#endif // !__MAP_TILE_H__
+#endif
 

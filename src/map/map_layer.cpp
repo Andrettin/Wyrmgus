@@ -132,7 +132,7 @@ void CMapLayer::RegenerateForest()
 	for (size_t i = 0; i < this->DestroyedForestTiles.size();) {
 		const Vec2i &pos = this->DestroyedForestTiles[i];
 		CMapField &mf = *this->Field(pos);
-		if (!mf.OverlayTerrain || !mf.OverlayTerrainDestroyed || !(mf.getFlag() & MapFieldStumps)) { //the destroyed forest tile may have become invalid, e.g. because the terrain changed, or because of the regeneration itself; we keep the removal of elements centralized here so that we can loop through the tiles reliably
+		if (!mf.IsDestroyedForestTile()) { //the destroyed forest tile may have become invalid, e.g. because the terrain changed, or because of the regeneration itself; we keep the removal of elements centralized here so that we can loop through the tiles reliably
 			this->DestroyedForestTiles.erase(this->DestroyedForestTiles.begin() + i);
 		} else {
 			this->RegenerateForestTile(pos);
@@ -194,9 +194,9 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 				Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
 				&& Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
 				&& Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
-				&& ((verticalMf.OverlayTerrain && verticalMf.OverlayTerrainDestroyed && (verticalMf.getFlag() & MapFieldStumps) && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupied_flag)) || (verticalMf.getFlag() & MapFieldForest))
-				&& ((diagonalMf.OverlayTerrain && diagonalMf.OverlayTerrainDestroyed && (diagonalMf.getFlag() & MapFieldStumps) && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.getFlag() & MapFieldForest))
-				&& ((horizontalMf.OverlayTerrain && horizontalMf.OverlayTerrainDestroyed && (horizontalMf.getFlag() & MapFieldStumps) && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.getFlag() & MapFieldForest))
+				&& ((verticalMf.IsDestroyedForestTile() && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupied_flag)) || (verticalMf.getFlag() & MapFieldForest))
+				&& ((diagonalMf.IsDestroyedForestTile() && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.getFlag() & MapFieldForest))
+				&& ((horizontalMf.IsDestroyedForestTile() && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.getFlag() & MapFieldForest))
 			) {
 				DebugPrint("Real place wood\n");
 				Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);

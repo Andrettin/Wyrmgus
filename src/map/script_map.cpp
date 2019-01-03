@@ -307,7 +307,7 @@ static int CclStratagusMap(lua_State *l)
 							}
 							CMapField &mf = map_layer->Fields[i];
 							mf.parse(l);
-							if (mf.OverlayTerrain && mf.OverlayTerrainDestroyed && (mf.getFlag() & MapFieldStumps)) {
+							if (mf.IsDestroyedForestTile()) {
 								map_layer->DestroyedForestTiles.push_back(map_layer->GetPosFromIndex(i));
 							}
 							lua_pop(l, 1);
