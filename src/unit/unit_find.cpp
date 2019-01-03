@@ -55,133 +55,9 @@
   -- Finding units
   ----------------------------------------------------------------------------*/
 
-bool CUnitFilter::operator()(const CUnit *unit) const
-{
-	return true;
-}
-
-bool NoFilter::operator()(const CUnit *) const
-{
-	return true;
-}
-
-bool HasSameTypeAs::operator()(const CUnit *unit) const
-{
-	return unit->Type == type;
-}	
-
-bool HasSamePlayerAs::operator()(const CUnit *unit) const
-{
-	return unit->Player == player;
-}
-
-bool HasNotSamePlayerAs::operator()(const CUnit *unit) const
-{
-	return unit->Player != player;
-}
-
-bool IsAlliedWith::operator()(const CUnit *unit) const
-{
-	return unit->IsAllied(*player);
-}
-
-bool IsEnemyWith::operator()(const CUnit *unit) const
-{
-	return unit->IsEnemy(*player);
-}
-
-HasSamePlayerAndTypeAs::HasSamePlayerAndTypeAs(const CUnit &unit) :
-	player(unit.Player), type(unit.Type)
-{
-}
-		
-bool HasSamePlayerAndTypeAs::operator()(const CUnit *unit) const
-{
-	return (unit->Player == player && unit->Type == type);
-}
-
-bool IsNotTheSameUnitAs::operator()(const CUnit *unit) const
-{
-	return unit != forbidden;
-}
-
-bool IsBuildingType::operator()(const CUnit *unit) const
-{
-	return unit->Type->BoolFlag[BUILDING_INDEX].value;
-}
-
-bool IsNotBuildingType::operator()(const CUnit *unit) const
-{
-	return !unit->Type->BoolFlag[BUILDING_INDEX].value;
-}
-
-bool IsOrganicType::operator()(const CUnit *unit) const
-{
-	return unit->Type->BoolFlag[ORGANIC_INDEX].value;
-}
-
 bool IsBuiltUnit::operator()(const CUnit *unit) const
 {
 	return unit->CurrentAction() != UnitActionBuilt;
-}
-
-bool IsAggresiveUnit::operator()(const CUnit *unit) const
-{
-	return unit->IsAgressive();
-}
-
-bool OutOfMinRange::operator()(const CUnit *unit) const
-{
-	return unit->MapDistanceTo(pos, z) >= range;
-}
-
-bool CUnitTypeFinder::operator()(const CUnit *const unit) const
-{
-	if (!unit) {
-		fprintf(stderr, "CUnitTypeFinder Error: Unit is null.\n");
-		return false;
-	}
-
-	if (!unit->Type) {
-		fprintf(stderr, "CUnitTypeFinder Error: Unit's type is null.\n");
-		return false;
-	}
-
-	const CUnitType &type = *unit->Type;
-	if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
-		return false;
-	}
-	return true;
-}
-
-//Wyrmgus start
-//void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle)
-//Wyrmgus end
-{
-	//Wyrmgus start
-//	Select(ltPos, rbPos, units, NoFilter());
-	Select(ltPos, rbPos, units, z, NoFilter());
-	//Wyrmgus end
-}
-
-//Wyrmgus start
-//void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle)
-//Wyrmgus end
-{
-	//Wyrmgus start
-//	Select(ltPos, rbPos, units, NoFilter());
-	Select(ltPos, rbPos, units, z, NoFilter());
-	//Wyrmgus end
-}
-
-//Wyrmgus start
-//void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around)
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, bool circle)
-//Wyrmgus end
-{
-	SelectAroundUnit(unit, range, around, NoFilter());
 }
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
@@ -1705,10 +1581,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 	}
 }
 
-//Wyrmgus start
-//CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool circle, bool include_neutral)
-//Wyrmgus end
 {
 	//Wyrmgus start
 //	return AttackUnitsInDistance(unit, range, NoFilter());
@@ -1760,10 +1633,7 @@ CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, bool include
 	//Wyrmgus end
 }
 
-//Wyrmgus start
-//CUnit *AttackUnitsInReactRange(const CUnit &unit)
 CUnit *AttackUnitsInReactRange(const CUnit &unit, bool include_neutral)
-//Wyrmgus end
 {
 	//Wyrmgus start
 //	return AttackUnitsInReactRange(unit, NoFilter());

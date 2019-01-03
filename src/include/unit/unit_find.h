@@ -31,8 +31,6 @@
 #ifndef __UNIT_FIND_H__
 #define __UNIT_FIND_H__
 
-//@{
-
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "pathfinder.h"
@@ -53,20 +51,29 @@ class CUnit;
 class CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return true;
+	}
 };
 
 class NoFilter : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *) const;
+	bool operator()(const CUnit *) const
+	{
+		return true;
+	}
 };
 
 class HasSameTypeAs : public CUnitFilter
 {
 public:
 	explicit HasSameTypeAs(const CUnitType &_type) : type(&_type) {}
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return unit->Type == type;
+	}	
 private:
 	const CUnitType *type;
 };
@@ -75,7 +82,10 @@ class HasSamePlayerAs : public CUnitFilter
 {
 public:
 	explicit HasSamePlayerAs(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return unit->Player == player;
+	}
 private:
 	const CPlayer *player;
 };
@@ -84,7 +94,10 @@ class HasNotSamePlayerAs : public CUnitFilter
 {
 public:
 	explicit HasNotSamePlayerAs(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return unit->Player != player;
+	}
 private:
 	const CPlayer *player;
 };
@@ -93,7 +106,10 @@ class IsAlliedWith : public CUnitFilter
 {
 public:
 	explicit IsAlliedWith(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return unit->IsAllied(*player);
+	}
 private:
 	const CPlayer *player;
 };
@@ -102,7 +118,10 @@ class IsEnemyWith : public CUnitFilter
 {
 public:
 	explicit IsEnemyWith(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return unit->IsEnemy(*player);
+	}
 private:
 	const CPlayer *player;
 };
@@ -110,12 +129,18 @@ private:
 class HasSamePlayerAndTypeAs : public CUnitFilter
 {
 public:
-	explicit HasSamePlayerAndTypeAs(const CUnit &unit);
+	explicit HasSamePlayerAndTypeAs(const CUnit &unit) :
+		player(unit.Player), type(unit.Type)
+	{}
+	
 	HasSamePlayerAndTypeAs(const CPlayer &_player, const CUnitType &_type) :
 		player(&_player), type(&_type)
 	{}
 
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return (unit->Player == player && unit->Type == type);
+	}
 
 private:
 	const CPlayer *player;
@@ -126,7 +151,10 @@ class IsNotTheSameUnitAs : public CUnitFilter
 {
 public:
 	explicit IsNotTheSameUnitAs(const CUnit &unit) : forbidden(&unit) {}
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return unit != forbidden;
+	}
 private:
 	const CUnit *forbidden;
 };
@@ -134,19 +162,28 @@ private:
 class IsBuildingType : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return unit->Type->BoolFlag[BUILDING_INDEX].value;
+	}
 };
 
 class IsNotBuildingType : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return !unit->Type->BoolFlag[BUILDING_INDEX].value;
+	}
 };
 
 class IsOrganicType : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return unit->Type->BoolFlag[ORGANIC_INDEX].value;
+	}
 };
 
 class IsBuiltUnit : public CUnitFilter
@@ -158,14 +195,20 @@ public:
 class IsAggresiveUnit : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return unit->IsAgressive();
+	}
 };
 
 class OutOfMinRange : public CUnitFilter
 {
 public:
 	explicit OutOfMinRange(const int range, const Vec2i pos, int z) : range(range), pos(pos), z(z) {}
-	bool operator()(const CUnit *unit) const;
+	bool operator()(const CUnit *unit) const
+	{
+		return unit->MapDistanceTo(pos, z) >= range;
+	}
 private:
 	int range;
 	Vec2i pos;
@@ -220,7 +263,24 @@ class CUnitTypeFinder
 {
 public:
 	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t) {}
-	bool operator()(const CUnit *const unit) const;
+	bool operator()(const CUnit *const unit) const
+	{
+		if (!unit) {
+			fprintf(stderr, "CUnitTypeFinder Error: Unit is null.\n");
+			return false;
+		}
+
+		if (!unit->Type) {
+			fprintf(stderr, "CUnitTypeFinder Error: Unit's type is null.\n");
+			return false;
+		}
+
+		const CUnitType &type = *unit->Type;
+		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
+			return false;
+		}
+		return true;
+	}
 
 private:
 	const UnitTypeType unitTypeType;
@@ -244,15 +304,6 @@ private:
 	int z;
 };
 
-//Wyrmgus start
-//void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
-//void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
-//void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around);
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle = false);
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle = false);
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, bool circle = false);
-//Wyrmgus end
-
 template <typename Pred>
 //Wyrmgus start
 //void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
@@ -262,6 +313,8 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	Assert(Map.Info.IsPointOnMap(ltPos, z));
 	Assert(Map.Info.IsPointOnMap(rbPos, z));
 	Assert(units.empty());
+	
+	const CMapLayer *map_layer = Map.MapLayers[z];
 	
 	//Wyrmgus start
 	double middle_x;
@@ -287,15 +340,13 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 			}
 			//Wyrmgus end
 
-			const CMapField &mf = *Map.Field(posIt, z);
+			const CMapField &mf = *map_layer->Field(posIt);
 			const CUnitCache &cache = mf.UnitCache;
 
-			for (size_t i = 0; i != cache.size(); ++i) {
-				CUnit &unit = *cache[i];
-
-				if (unit.CacheLock == 0 && pred(&unit)) {
-					unit.CacheLock = 1;
-					units.push_back(&unit);
+			for (CUnit *unit : cache) {
+				if (unit->CacheLock == 0 && pred(unit)) {
+					unit->CacheLock = 1;
+					units.push_back(unit);
 				}
 			}
 		}
@@ -342,6 +393,27 @@ void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units,
 	Map.FixSelectionArea(minPos, maxPos, z);
 	SelectFixed(minPos, maxPos, units, z, pred, circle);
 	//Wyrmgus end
+}
+
+inline void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle = false)
+{
+	//Wyrmgus start
+//	Select(ltPos, rbPos, units, NoFilter());
+	Select(ltPos, rbPos, units, z, NoFilter());
+	//Wyrmgus end
+}
+
+inline void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle = false)
+{
+	//Wyrmgus start
+//	Select(ltPos, rbPos, units, NoFilter());
+	Select(ltPos, rbPos, units, z, NoFilter());
+	//Wyrmgus end
+}
+
+inline void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, bool circle = false)
+{
+	SelectAroundUnit(unit, range, around, NoFilter());
 }
 
 template <typename Pred>
@@ -435,20 +507,21 @@ extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPo
 extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, bool circle = false, bool include_neutral = false);
 extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool circle = false, bool include_neutral = false);
 //Wyrmgus end
+
 /// Find best enemy in attack range to attack
 extern CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred);
+
 extern CUnit *AttackUnitsInRange(const CUnit &unit);
+
 /// Find best enemy in reaction range to attack
 //Wyrmgus start
 //extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred);
 //extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
 extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, bool include_neutral = false);
+
 extern CUnit *AttackUnitsInReactRange(const CUnit &unit, bool include_neutral = false);
+
 extern bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsigned int flags);
 //Wyrmgus end
 
-
-
-//@}
-
-#endif // !__UNIT_FIND_H__
+#endif

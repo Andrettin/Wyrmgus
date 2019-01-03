@@ -87,31 +87,6 @@ CMapField *CMapLayer::Field(const unsigned int index) const
 }
 
 /**
-**	@brief	Get the map field at a given location
-**
-**	@param	x	The x coordinate of the map field
-**	@param	y	The y coordinate of the map field
-**
-**	@return	The map field
-*/
-CMapField *CMapLayer::Field(const int x, const int y) const
-{
-	return this->Field(x + y * this->Width);
-}
-
-/**
-**	@brief	Get the map field at a given location
-**
-**	@param	pos	The coordinates of the map field
-**
-**	@return	The map field
-*/
-CMapField *CMapLayer::Field(const Vec2i &pos) const
-{
-	return this->Field(pos.x, pos.y);
-}
-
-/**
 **	@brief	Perform the map layer's per-cycle loop
 */
 void CMapLayer::DoPerCycleLoop()

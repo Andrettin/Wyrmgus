@@ -30,8 +30,6 @@
 #ifndef __MAP_LAYER_H__
 #define __MAP_LAYER_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -60,22 +58,42 @@ class CWorld;
 class CMapLayer
 {
 public:
-	CMapLayer() :
-		ID(-1), Width(0), Height(0),
-		TimeOfDay(nullptr), TimeOfDaySchedule(nullptr), RemainingTimeOfDayHours(0),
-		Season(nullptr), SeasonSchedule(nullptr), RemainingSeasonHours(0),
-		SurfaceLayer(0),
-		Overland(false),
-		PixelTileSize(32, 32),
-		Fields(nullptr), Plane(nullptr), World(nullptr)
-	{
-	}
-
 	~CMapLayer();
 	
+	/**
+	**	@brief	Get the map field at a given location
+	**
+	**	@param	index	The index of the map field
+	**
+	**	@return	The map field
+	*/
 	CMapField *Field(const unsigned int index) const;
-	CMapField *Field(const int x, const int y) const;
-	CMapField *Field(const Vec2i &pos) const;
+	
+	/**
+	**	@brief	Get the map field at a given location
+	**
+	**	@param	x	The x coordinate of the map field
+	**	@param	y	The y coordinate of the map field
+	**
+	**	@return	The map field
+	*/
+	CMapField *Field(const int x, const int y) const
+	{
+		return this->Field(x + y * this->Width);
+	}
+	
+	/**
+	**	@brief	Get the map field at a given location
+	**
+	**	@param	pos	The coordinates of the map field
+	**
+	**	@return	The map field
+	*/
+	CMapField *Field(const Vec2i &pos) const
+	{
+		return this->Field(pos.x, pos.y);
+	}
+	
 	Vec2i GetPosFromIndex(unsigned int index) const
 	{
 		Vec2i pos;
@@ -104,26 +122,24 @@ public:
 	void SetSeason(CScheduledSeason *season);
 	CSeason *GetSeason() const;
 	
-	int ID;
-	CMapField *Fields;						/// fields on the map layer
-	int Width;								/// the width in tiles of the map layer
-	int Height;								/// the height in tiles of the map layer
-	CScheduledTimeOfDay *TimeOfDay;			/// the time of day for the map layer
-	CTimeOfDaySchedule *TimeOfDaySchedule;	/// the time of day schedule for the map layer
-	int RemainingTimeOfDayHours;			/// the quantity of hours remaining for the current time of day to end
-	CScheduledSeason *Season;				/// the current season for the map layer
-	CSeasonSchedule *SeasonSchedule;		/// the season schedule for the map layer
-	int RemainingSeasonHours;				/// the quantity of hours remaining for the current season to end
-	bool Overland;							/// whether the map layer is an overland map
-	CPlane *Plane;							/// the plane pointer (if any) for the map layer
-	CWorld *World;							/// the world pointer (if any) for the map layer
-	int SurfaceLayer;						/// the surface layer for the map layer
-	std::vector<CUnit *> LayerConnectors;	/// connectors in the map layer which lead to other map layers
-	PixelSize PixelTileSize;				/// the pixel tile size for the map layer
+	int ID = -1;
+	CMapField *Fields = nullptr;				/// fields on the map layer
+	int Width = 0;								/// the width in tiles of the map layer
+	int Height = 0;								/// the height in tiles of the map layer
+	CScheduledTimeOfDay *TimeOfDay = nullptr;	/// the time of day for the map layer
+	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;	/// the time of day schedule for the map layer
+	int RemainingTimeOfDayHours = 0;			/// the quantity of hours remaining for the current time of day to end
+	CScheduledSeason *Season = nullptr;			/// the current season for the map layer
+	CSeasonSchedule *SeasonSchedule = nullptr;	/// the season schedule for the map layer
+	int RemainingSeasonHours = 0;				/// the quantity of hours remaining for the current season to end
+	bool Overland = false;						/// whether the map layer is an overland map
+	CPlane *Plane = nullptr;					/// the plane pointer (if any) for the map layer
+	CWorld *World = nullptr;					/// the world pointer (if any) for the map layer
+	int SurfaceLayer = 0;						/// the surface layer for the map layer
+	std::vector<CUnit *> LayerConnectors;		/// connectors in the map layer which lead to other map layers
+	PixelSize PixelTileSize = PixelSize(32, 32);	/// the pixel tile size for the map layer
 	std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>> SubtemplateAreas;
 	std::vector<Vec2i> DestroyedForestTiles;	/// destroyed forest tiles; this list is used for forest regeneration
 };
 
-//@}
-
-#endif // !__MAP_LAYER_H__
+#endif

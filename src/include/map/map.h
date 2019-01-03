@@ -188,7 +188,19 @@ public:
 	CMapField *Field(const unsigned int index, const int z) const;
 	/// Get the map field at location x, y
 	CMapField *Field(const int x, const int y, const int z) const;
-	CMapField *Field(const Vec2i &pos, const int z) const;
+	
+	/**
+	**	@brief	Get the map field at a given location
+	**
+	**	@param	pos	The coordinates of the map field
+	**	@param	z	The map layer of the map field
+	**
+	**	@return	The map field
+	*/
+	CMapField *Field(const Vec2i &pos, const int z) const
+	{
+		return this->Field(pos.x, pos.y, z);
+	}
 
 	/// Allocate and initialize map table.
 	void Create();

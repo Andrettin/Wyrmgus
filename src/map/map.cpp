@@ -1408,19 +1408,6 @@ CMapField *CMap::Field(const int x, const int y, const int z) const
 }
 
 /**
-**	@brief	Get the map field at a given location
-**
-**	@param	pos	The coordinates of the map field
-**	@param	z	The map layer of the map field
-**
-**	@return	The map field
-*/
-CMapField *CMap::Field(const Vec2i &pos, const int z) const
-{
-	return this->Field(pos.x, pos.y, z);
-}
-
-/**
 **	@brief	Allocate and initialize map table
 */
 void CMap::Create()
