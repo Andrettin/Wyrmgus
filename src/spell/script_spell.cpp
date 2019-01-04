@@ -298,7 +298,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 					Exit(1);
 				}
 			}
-			autocast->PriorytyVar = index;
+			autocast->PriorityVar = index;
 			lua_pop(l, 1);
 			autocast->ReverseSort = LuaToBoolean(l, -1, 2);
 

@@ -469,6 +469,16 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 				this->Condition = new ConditionInfo;
 			}
 			this->Condition->ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "autocast") {
+			if (!this->AutoCast) {
+				this->AutoCast = new AutoCastInfo();
+			}
+			this->AutoCast->ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "ai_cast") {
+			if (!this->AICast) {
+				this->AICast = new AutoCastInfo();
+			}
+			this->AICast->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "resource_cost") {
 			int resource = -1;
 			int cost = 0;
@@ -702,8 +712,8 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 		std::vector<CUnit *> table = spell.GetPotentialAutoCastTargets(caster, autocast);
 		
 		if (!table.empty()) {
-			if (autocast->PriorytyVar != ACP_NOVALUE) {
-				std::sort(table.begin(), table.end(), AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
+			if (autocast->PriorityVar != ACP_NOVALUE) {
+				std::sort(table.begin(), table.end(), AutoCastPrioritySort(caster, autocast->PriorityVar, autocast->ReverseSort));
 			}
 			std::vector<int> array(table.size() + 1);
 			for (size_t i = 1; i < array.size(); ++i) {
@@ -724,8 +734,8 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const CSpell &spell)
 		//now select the best unit to target.
 		if (!table.empty()) {
 			// For the best target???
-			if (autocast->PriorytyVar != ACP_NOVALUE) {
-				std::sort(table.begin(), table.end(), AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
+			if (autocast->PriorityVar != ACP_NOVALUE) {
+				std::sort(table.begin(), table.end(), AutoCastPrioritySort(caster, autocast->PriorityVar, autocast->ReverseSort));
 				return NewTargetUnit(*table[0]);
 			} else { // Use the old behavior
 				return NewTargetUnit(*table[SyncRand() % table.size()]);
@@ -1037,6 +1047,69 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else {
 			fprintf(stderr, "Invalid spell condition property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "range") {
+			this->Range = std::stoi(value);
+		} else if (key == "min_range") {
+			this->MinRange = std::stoi(value);
+		} else if (key == "combat") {
+			this->Combat = StringToCondition(value);
+		} else if (key == "attacker") {
+			this->Attacker = StringToCondition(value);
+		} else if (key == "corpse") {
+			this->Corpse = StringToCondition(value);
+		} else {
+			fprintf(stderr, "Invalid autocast property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (const CConfigData *child_config_data : config_data->Children) {
+		if (child_config_data->Tag == "priority") {
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "priority_var") {
+					int index = -1;
+					if (value == "distance") {
+						index = ACP_DISTANCE;
+					} else {
+						value = SnakeCaseToPascalCase(value);
+						index = UnitTypeVar.VariableNameLookup[value.c_str()];
+					}
+					
+					if (index != -1) {
+						this->PriorityVar = index;
+					} else {
+						fprintf(stderr, "Invalid autocast priority variable value: \"%s\".\n", value.c_str());
+					}
+				} else if (key == "reverse_sort") {
+					this->ReverseSort = StringToBool(value);
+				} else {
+					fprintf(stderr, "Invalid autocast priority property: \"%s\".\n", key.c_str());
+				}
+			}
+		} else if (child_config_data->Tag == "condition") {
+			if (!this->Condition) {
+				this->Condition = new ConditionInfo;
+			}
+			this->Condition->ProcessConfigData(child_config_data);
+		} else {
+			fprintf(stderr, "Invalid autocast property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
 }

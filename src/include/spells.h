@@ -194,30 +194,35 @@ public:
 	// Special flags for priority sorting
 #define ACP_NOVALUE -1
 #define ACP_DISTANCE -2
-	AutoCastInfo() : Range(0), MinRange(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(nullptr),
-		Combat(0), Attacker(0), Corpse(CONDITION_FALSE), PositionAutoCast(nullptr) {};
 	~AutoCastInfo()
 	{
-		delete Condition;
-		delete PositionAutoCast;
+		if (this->Condition) {
+			delete Condition;
+		}
+		if (this->PositionAutoCast) {
+			delete PositionAutoCast;
+		}
 	};
+	
+	void ProcessConfigData(const CConfigData *config_data);
+	
 	/// @todo this below is SQUARE!!!
-	int Range;                   /// Max range of the target.
-	int MinRange;                /// Min range of the target.
+	int Range = 0;					/// Max range of the target.
+	int MinRange = 0;				/// Min range of the target.
 
-	int PriorytyVar;             /// Variable to sort autocast targets by priority.
-	bool ReverseSort;            /// If true, small values have the highest priority.
+	int PriorityVar = ACP_NOVALUE;	/// Variable to sort autocast targets by priority.
+	bool ReverseSort = false;		/// If true, small values have the highest priority.
 
-	ConditionInfo *Condition;    /// Conditions to cast the spell.
+	ConditionInfo *Condition = nullptr;	/// Conditions to cast the spell.
 
 	/// Detailed generic conditions (not per-target, where Condition is evaluated.)
 	/// Combat mode is when there are hostile non-coward units around
-	int Combat;                  /// If it should be casted in combat
-	int Attacker;                /// If it should be casted on unit which attacks
-	int Corpse;                  /// If it should be casted on corpses
+	int Combat = 0;					/// If it should be casted in combat
+	int Attacker = 0;				/// If it should be casted on unit which attacks
+	int Corpse = CONDITION_FALSE;	/// If it should be casted on corpses
 
 	// Position autocast callback
-	LuaCallback *PositionAutoCast;
+	LuaCallback *PositionAutoCast = nullptr;
 };
 
 /**
