@@ -86,6 +86,14 @@ void CUpgradeModifier::ProcessConfigData(const CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
 			}
+		} else if (key == "remove_upgrade") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUpgrade *removed_upgrade = CUpgrade::Get(value);
+			if (removed_upgrade) {
+				this->RemoveUpgrades.push_back(removed_upgrade);
+			} else {
+				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			}
 		} else {
 			key = SnakeCaseToPascalCase(key);
 			
