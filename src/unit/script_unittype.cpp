@@ -117,7 +117,7 @@ static const char SAVECARGO_KEY[] = "SaveCargo";
 static const char NONSOLID_KEY[] = "NonSolid";
 static const char WALL_KEY[] = "Wall";
 static const char NORANDOMPLACING_KEY[] = "NoRandomPlacing";
-static const char ORGANIC_KEY[] = "organic";
+static const char ORGANIC_KEY[] = "Organic";
 static const char SIDEATTACK_KEY[] = "SideAttack";
 static const char NOFRIENDLYFIRE_KEY[] = "NoFriendlyFire";
 //Wyrmgus start
