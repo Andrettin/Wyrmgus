@@ -283,6 +283,8 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 			}
+		} else if (key == "ability") {
+			this->Ability = StringToBool(value);
 		} else if (key == "description") {
 			this->Description = value;
 		} else if (key == "quote") {
