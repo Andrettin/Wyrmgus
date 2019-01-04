@@ -464,6 +464,11 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 				spell_action->ProcessConfigData(grandchild_config_data);
 				this->Action.push_back(spell_action);
 			}
+		} else if (child_config_data->Tag == "condition") {
+			if (!this->Condition) {
+				this->Condition = new ConditionInfo;
+			}
+			this->Condition->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "resource_cost") {
 			int resource = -1;
 			int cost = 0;
@@ -914,4 +919,124 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 	// Can't cast, STOP.
 	//
 	return 0;
+}
+
+static char StringToCondition(const std::string &str)
+{
+	if (str == "true") {
+		return CONDITION_TRUE;
+	} else if (str == "false") {
+		return CONDITION_FALSE;
+	} else if (str == "only") {
+		return CONDITION_ONLY;
+	} else {
+		fprintf(stderr, "Bad condition result: \"%s\".\n", str.c_str());
+		return -1;
+	}
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
+{
+	// Flags are defaulted to 0(CONDITION_TRUE)
+	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
+
+	this->BoolFlag = new char[new_bool_size];
+	memset(this->BoolFlag, 0, new_bool_size * sizeof(char));
+
+	this->Variable = new ConditionInfoVariable[UnitTypeVar.GetNumberVariable()];
+	// Initialize min/max stuff to values with no effect.
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
+		this->Variable[i].Check = false;
+		this->Variable[i].ExactValue = -1;
+		this->Variable[i].ExceptValue = -1;
+		this->Variable[i].MinValue = -1;
+		this->Variable[i].MaxValue = -1;
+		this->Variable[i].MinMax = -1;
+		this->Variable[i].MinValuePercent = -8;
+		this->Variable[i].MaxValuePercent = 1024;
+	}
+	
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "alliance") {
+			this->Alliance = StringToCondition(value);
+		} else if (key == "opponent") {
+			this->Opponent = StringToCondition(value);
+		} else if (key == "self") {
+			this->TargetSelf = StringToCondition(value);
+		} else if (key == "thrusting_weapon") {
+			this->ThrustingWeapon = StringToCondition(value);
+		} else if (key == "faction_unit") {
+			this->FactionUnit = StringToCondition(value);
+		} else if (key == "civilization_equivalent") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CCivilization *civilization = CCivilization::GetCivilization(value);
+			if (civilization) {
+				this->CivilizationEquivalent = civilization->ID;
+			}
+		} else if (key == "faction_equivalent") {
+			value = FindAndReplaceString(value, "_", "-");
+			CFaction *faction = PlayerRaces.GetFaction(value);
+			if (faction) {
+				this->FactionEquivalent = faction;
+			} else {
+				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
+			}
+		} else {
+			key = SnakeCaseToPascalCase(key);
+			
+			int index = UnitTypeVar.BoolFlagNameLookup[key.c_str()];
+			if (index != -1) {
+				this->BoolFlag[index] = StringToCondition(value);
+			} else {
+				fprintf(stderr, "Invalid spell condition property: \"%s\".\n", key.c_str());
+			}
+		}
+	}
+	
+	for (const CConfigData *child_config_data : config_data->Children) {
+		std::string tag = child_config_data->Tag;
+		tag = SnakeCaseToPascalCase(tag);
+		
+		int index = UnitTypeVar.VariableNameLookup[tag.c_str()];
+		if (index != -1) {
+			this->Variable[index].Check = true;
+			
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "enable") {
+					this->Variable[index].Enable = StringToCondition(value);
+				} else if (key == "exact_value") {
+					this->Variable[index].ExactValue = std::stoi(value);
+				} else if (key == "except_value") {
+					this->Variable[index].ExceptValue = std::stoi(value);
+				} else if (key == "min_value") {
+					this->Variable[index].MinValue = std::stoi(value);
+				} else if (key == "max_value") {
+					this->Variable[index].MaxValue = std::stoi(value);
+				} else if (key == "min_max") {
+					this->Variable[index].MinMax = std::stoi(value);
+				} else if (key == "min_value_percent") {
+					this->Variable[index].MinValuePercent = std::stoi(value);
+				} else if (key == "max_value_percent") {
+					this->Variable[index].MaxValuePercent = std::stoi(value);
+				} else if (key == "condition_apply_on_caster") {
+					this->Variable[index].ConditionApplyOnCaster = StringToBool(value);
+				} else {
+					fprintf(stderr, "Invalid adjust variable spell action variable property: \"%s\".\n", key.c_str());
+				}
+			}
+		} else {
+			fprintf(stderr, "Invalid spell condition property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
 }

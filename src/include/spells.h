@@ -156,6 +156,9 @@ public:
 		delete[] Variable;
 		delete CheckFunc;
 	};
+	
+	void ProcessConfigData(const CConfigData *config_data);
+	
 	//
 	//  Conditions that check specific flags. Possible values are the defines below.
 	//
