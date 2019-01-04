@@ -366,10 +366,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 	}
 	
-	//Wyrmgus start
-//	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
-	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, BLESSING_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, TERROR_INDEX, WITHER_INDEX, DEHYDRATION_INDEX, HYDRATING_INDEX};
-	//Wyrmgus end
+	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, BLESSING_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, BARKSKIN_INDEX, TERROR_INDEX, WITHER_INDEX, DEHYDRATION_INDEX, HYDRATING_INDEX};
 	//  decrease spells effects time.
 	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
 		unit.Variable[SpellEffects[i]].Increase = -1;
@@ -438,10 +435,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 	// User defined variables
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
-			//Wyrmgus start
-//			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == BLESSING_INDEX || i == INSPIRE_INDEX || i == PRECISION_INDEX || i == REGENERATION_INDEX || i == TERROR_INDEX || i == WITHER_INDEX || i == DEHYDRATION_INDEX || i == HYDRATING_INDEX) {
-			//Wyrmgus end
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == BLESSING_INDEX || i == INSPIRE_INDEX || i == PRECISION_INDEX || i == REGENERATION_INDEX || i == BARKSKIN_INDEX || i == TERROR_INDEX || i == WITHER_INDEX || i == DEHYDRATION_INDEX || i == HYDRATING_INDEX) {
 			continue;
 		}
 		if (i == HP_INDEX && HandleBurnAndPoison(unit)) {

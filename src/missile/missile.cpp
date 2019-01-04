@@ -554,6 +554,17 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		evasion_modifier += 50;
 	}
 	
+	int armor = 0;
+	if (goal != nullptr) {
+		armor = goal->Variable[ARMOR_INDEX].Value;
+		
+		if (goal->Variable[BARKSKIN_INDEX].Value > 0) {
+			armor += 2; //+2 armor bonus from Barkskin
+		}
+	} else {
+		armor = goal_stats.Variables[ARMOR_INDEX].Value;
+	}
+	
 	int critical_strike_chance = attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value;
 	if (missile && missile->AlwaysCritical) {
 		critical_strike_chance = 100;
@@ -654,15 +665,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	piercing_damage /= 100;
 	//Wyrmgus end
 
-	//Wyrmgus start
-//	int damage = std::max<int>(basic_damage - goal_stats.Variables[ARMOR_INDEX].Value, 1);
-	int damage = 0;
-	if (goal != nullptr) {
-		damage = std::max<int>(basic_damage - goal->Variable[ARMOR_INDEX].Value, 1);
-	} else {
-		damage = std::max<int>(basic_damage - goal_stats.Variables[ARMOR_INDEX].Value, 1);
-	}
-	//Wyrmgus end
+	int damage = std::max<int>(basic_damage - armor, 1);
 	damage += piercing_damage;
 	
 	//Wyrmgus start
