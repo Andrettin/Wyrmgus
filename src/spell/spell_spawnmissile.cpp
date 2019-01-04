@@ -10,8 +10,8 @@
 //
 /**@name spell_spawnmissile.cpp - The spell SpawnMissile. */
 //
-//      (c) Copyright 1998-2012 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon, and Joris DAUPHIN
+//      (c) Copyright 1998-2018 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -34,13 +34,12 @@
 
 #include "spell/spell_spawnmissile.h"
 
+#include "config.h"
 #include "map/map.h"
 #include "missile.h"
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-
-
 
 struct CompareUnitDistance {
 	const CUnit *referenceunit;
@@ -97,6 +96,91 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 		} else {
 			LuaError(l, "Unsupported missile location description flag: %s" _C_ value);
 		}
+	}
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void SpellActionMissileLocation::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "base") {
+			if (value == "caster") {
+				this->Base = LocBaseCaster;
+			} else if (value == "target") {
+				this->Base = LocBaseTarget;
+			} else {
+				fprintf(stderr, "Unsupported missile location base flag: \"%s\".\n", value.c_str());
+			}
+			
+		} else if (key == "add_x") {
+			this->AddX = std::stoi(value);
+		} else if (key == "add_y") {
+			this->AddY = std::stoi(value);
+		} else if (key == "add_rand_x") {
+			this->AddRandX = std::stoi(value);
+		} else if (key == "add_rand_y") {
+			this->AddRandY = std::stoi(value);
+		} else {
+			fprintf(stderr, "Invalid spell action missile location property: \"%s\".\n", key.c_str());
+		}
+	}
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "damage") {
+			this->Damage = std::stoi(value);
+		} else if (key == "lightning_damage") {
+			this->LightningDamage = std::stoi(value);
+		} else if (key == "use_unit_var") {
+			this->UseUnitVar = StringToBool(value);
+		} else if (key == "always_hits") {
+			this->AlwaysHits = StringToBool(value);
+		} else if (key == "always_critical") {
+			this->AlwaysCritical = StringToBool(value);
+		} else if (key == "delay") {
+			this->Delay = std::stoi(value);
+		} else if (key == "ttl") {
+			this->TTL = std::stoi(value);
+		} else if (key == "missile") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Missile = MissileTypeByIdent(value.c_str());
+			if (this->Missile == nullptr) {
+				fprintf(stderr, "Invalid missile: \"%s\".\n", value.c_str());
+			}
+		} else {
+			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (const CConfigData *child_config_data : config_data->Children) {
+		if (child_config_data->Tag == "start_point") {
+			this->StartPoint.ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "end_point") {
+			this->EndPoint.ProcessConfigData(child_config_data);
+		} else {
+			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
+	}
+	
+	if (this->Missile == nullptr) {
+		fprintf(stderr, "Use a missile for spawn-missile (with missile).\n");
 	}
 }
 

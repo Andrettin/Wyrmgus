@@ -30,8 +30,6 @@
 #ifndef SPELL_AREAADJUSTVITAL_H
 #define SPELL_AREAADJUSTVITAL_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -42,6 +40,7 @@ class Spell_AreaAdjustVital : public SpellActionType
 {
 public:
 	Spell_AreaAdjustVital() : HP(0), Mana(0), Shield(0), Range(1), UseMana(false) {};
+	virtual void ProcessConfigData(const CConfigData *config_data) {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -54,6 +53,4 @@ private:
 	bool UseMana;   /// If true, use mana for spell cast
 };
 
-//@}
-
-#endif // SPELL_AREAADJUSTVITAL_H
+#endif

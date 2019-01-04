@@ -36,8 +36,6 @@
 ** Don't ever go breaking this spell
 */
 
-//@{
-
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
@@ -54,6 +52,8 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "sound.h"
+#include "spell/spell_adjustvariable.h"
+#include "spell/spell_spawnmissile.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "upgrade/upgrade.h"
@@ -449,7 +449,22 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "resource_cost") {
+		if (child_config_data->Tag == "actions") {
+			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
+				SpellActionType *spell_action = nullptr;
+				
+				if (grandchild_config_data->Tag == "adjust_variable") {
+					spell_action = new Spell_AdjustVariable;
+				} else if (grandchild_config_data->Tag == "spawn_missile") {
+					spell_action = new Spell_SpawnMissile;
+				} else {
+					fprintf(stderr, "Invalid spell action type: \"%s\".\n", grandchild_config_data->Tag.c_str());
+				}
+				
+				spell_action->ProcessConfigData(grandchild_config_data);
+				this->Action.push_back(spell_action);
+			}
+		} else if (child_config_data->Tag == "resource_cost") {
 			int resource = -1;
 			int cost = 0;
 				
@@ -900,5 +915,3 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 	//
 	return 0;
 }
-
-//@}

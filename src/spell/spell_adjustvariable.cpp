@@ -10,8 +10,8 @@
 //
 /**@name spell_adjustvariable.cpp - The spell AdjustVariable. */
 //
-//      (c) Copyright 1998-2012 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon, and Joris DAUPHIN
+//      (c) Copyright 1998-2019 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -37,9 +37,92 @@
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
+#include "config.h"
 #include "script.h"
 #include "unit/unit.h"
 
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
+{
+	this->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.GetNumberVariable()];
+	
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		key = SnakeCaseToPascalCase(key);
+		
+		int index = UnitTypeVar.VariableNameLookup[key.c_str()];
+		if (index != -1) {
+			if (IsStringNumber(value)) {
+				const int number_value = std::stoi(value);
+				this->Var[index].Enable = number_value != 0;
+				this->Var[index].ModifEnable = 1;
+				this->Var[index].Value = number_value;
+				this->Var[index].ModifValue = 1;
+				this->Var[index].Max = number_value;
+				this->Var[index].ModifMax = 1;
+			} else {
+				fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining an adjust variable spell action.\n", value.c_str(), key.c_str());
+			}
+		} else {
+			fprintf(stderr, "Invalid adjust variable spell action property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (const CConfigData *child_config_data : config_data->Children) {
+		std::string tag = child_config_data->Tag;
+		tag = SnakeCaseToPascalCase(tag);
+		
+		int index = UnitTypeVar.VariableNameLookup[tag.c_str()];
+		if (index != -1) {
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "enable") {
+					this->Var[index].Enable = StringToBool(value);
+					this->Var[index].ModifEnable = 1;
+				} else if (key == "value") {
+					this->Var[index].Value = std::stoi(value);
+					this->Var[index].ModifValue = 1;
+				} else if (key == "max") {
+					this->Var[index].Max = std::stoi(value);
+					this->Var[index].ModifMax = 1;
+				} else if (key == "increase") {
+					this->Var[index].Increase = std::stoi(value);
+					this->Var[index].ModifIncrease = 1;
+				} else if (key == "invert_enable") {
+					this->Var[index].InvertEnable = StringToBool(value);
+				} else if (key == "add_value") {
+					this->Var[index].AddValue = std::stoi(value);
+				} else if (key == "add_max") {
+					this->Var[index].AddMax = std::stoi(value);
+				} else if (key == "add_increase") {
+					this->Var[index].AddIncrease = std::stoi(value);
+				} else if (key == "increase_time") {
+					this->Var[index].IncreaseTime = std::stoi(value);
+				} else if (key == "target_is_caster") {
+					if (value == "caster") {
+						this->Var[index].TargetIsCaster = 1;
+					} else if (value == "target") {
+						this->Var[index].TargetIsCaster = 0;
+					} else {
+						fprintf(stderr, "Invalid target_is_caster value: \"%s\".\n", value.c_str());
+					}
+				} else {
+					fprintf(stderr, "Invalid adjust variable spell action variable property: \"%s\".\n", key.c_str());
+				}
+			}
+		} else {
+			fprintf(stderr, "Invalid adjust variable spell action property: \"%s\".\n", tag.c_str());
+		}
+	}
+}
 
 /* virtual */ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
 {

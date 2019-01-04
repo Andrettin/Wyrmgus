@@ -30,8 +30,6 @@
 #ifndef SPELL_AREABOMBARDMENT_H
 #define SPELL_AREABOMBARDMENT_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -43,6 +41,7 @@ class Spell_AreaBombardment : public SpellActionType
 public:
 	Spell_AreaBombardment() : Fields(0), Shards(0), Damage(0),
 		StartOffsetX(0), StartOffsetY(0), Missile(nullptr) {};
+	virtual void ProcessConfigData(const CConfigData *config_data) {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -56,6 +55,4 @@ private:
 	MissileType *Missile;   /// Missile fired on cast
 };
 
-//@}
-
-#endif // SPELL_AREABOMBARDMENT_H
+#endif

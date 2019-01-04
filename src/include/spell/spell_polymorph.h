@@ -30,8 +30,6 @@
 #ifndef SPELL_POLYMORPH_H
 #define SPELL_POLYMORPH_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -45,6 +43,7 @@ public:
 //	Spell_Polymorph() : SpellActionType(1), NewForm(nullptr), PlayerNeutral(0) {};
 	Spell_Polymorph() : SpellActionType(1), NewForm(nullptr), PlayerNeutral(0), Civilization(-1), Faction(-1), Detachment(false) {};
 	//Wyrmgus end
+	virtual void ProcessConfigData(const CConfigData *config_data) {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -60,6 +59,4 @@ private:
 	// TODO: temporary polymorphs would be awesome, but hard to implement
 };
 
-//@}
-
-#endif // SPELL_POLYMORPH_H
+#endif

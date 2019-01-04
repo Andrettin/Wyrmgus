@@ -30,8 +30,6 @@
 #ifndef SPELL_CAPTURE_H
 #define SPELL_CAPTURE_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -42,6 +40,7 @@ class Spell_Capture : public SpellActionType
 {
 public:
 	Spell_Capture() : SacrificeEnable(false), JoinToAIForce(false), Damage(0), DamagePercent(0) {};
+	virtual void ProcessConfigData(const CConfigData *config_data) {};
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -54,6 +53,4 @@ private:
 	/// capture to succeed.
 };
 
-//@}
-
-#endif // SPELL_CAPTURE_H
+#endif

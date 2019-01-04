@@ -30,8 +30,6 @@
 #ifndef SPELL_ADJUSTVARIABLE_H
 #define SPELL_ADJUSTVARIABLE_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -70,6 +68,7 @@ class Spell_AdjustVariable : public SpellActionType
 public:
 	Spell_AdjustVariable() : Var(nullptr) {};
 	~Spell_AdjustVariable() { delete [](this->Var); };
+	virtual void ProcessConfigData(const CConfigData *config_data);
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -78,6 +77,4 @@ private:
 	SpellActionTypeAdjustVariable *Var;
 };
 
-//@}
-
-#endif // SPELL_ADJUSTVARIABLE_H
+#endif

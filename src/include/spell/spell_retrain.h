@@ -30,8 +30,6 @@
 #ifndef SPELL_RETRAIN_H
 #define SPELL_RETRAIN_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -41,6 +39,7 @@
 class Spell_Retrain : public SpellActionType
 {
 public:
+	virtual void ProcessConfigData(const CConfigData *config_data) {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -48,7 +47,4 @@ public:
 private:
 };
 
-
-//@}
-
-#endif // SPELL_RETRAIN_H
+#endif

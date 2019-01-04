@@ -74,8 +74,8 @@ public:
 	SpellActionType(int mod = 0) : ModifyManaCaster(mod) {};
 	virtual ~SpellActionType() {};
 
-	virtual int Cast(CUnit &caster, const CSpell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
+	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
+	virtual int Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
 	const int ModifyManaCaster;

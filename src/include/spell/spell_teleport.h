@@ -29,8 +29,6 @@
 #ifndef SPELL_TELEPORT_H
 #define SPELL_TELEPORT_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -41,12 +39,10 @@ class Spell_Teleport : public SpellActionType
 {
 public:
 	Spell_Teleport() : SpellActionType(0) {}
+	virtual void ProcessConfigData(const CConfigData *config_data) {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 };
 
-
-//@}
-
-#endif // SPELL_TELEPORT_H
+#endif

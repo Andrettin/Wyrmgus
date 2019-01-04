@@ -10,7 +10,7 @@
 //
 /**@name script_spell.cpp - The spell script functions.. */
 //
-//      (c) Copyright 1998-2005 by Joris Dauphin and Crestez Leonard
+//      (c) Copyright 1998-2019 by Joris Dauphin, Crestez Leonard and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -332,10 +332,8 @@ static int CclDefineSpell(lua_State *l)
 		++i;
 		if (!strcmp(value, "showname")) {
 			spell->Name = LuaToString(l, i + 1);
-		//Wyrmgus start
 		} else if (!strcmp(value, "description")) {
 			spell->Description = LuaToString(l, i + 1);
-		//Wyrmgus end
 		} else if (!strcmp(value, "manacost")) {
 			spell->ManaCost = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "cooldown")) {

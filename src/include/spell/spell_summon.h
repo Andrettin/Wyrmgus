@@ -30,8 +30,6 @@
 #ifndef SPELL_SUMMON_H
 #define SPELL_SUMMON_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -43,6 +41,7 @@ class Spell_Summon : public SpellActionType
 public:
 	Spell_Summon() : SpellActionType(1), UnitType(nullptr), TTL(0),
 		RequireCorpse(false), JoinToAiForce(false) {};
+	virtual void ProcessConfigData(const CConfigData *config_data) {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -54,7 +53,4 @@ private:
 	bool JoinToAiForce;     /// if true, captured unit is joined into caster's AI force, if available
 };
 
-
-//@}
-
-#endif // SPELL_SUMMON_H
+#endif

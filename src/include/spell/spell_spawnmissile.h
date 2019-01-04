@@ -30,8 +30,6 @@
 #ifndef SPELL_SPAWNMISSILE_H
 #define SPELL_SPAWNMISSILE_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -55,44 +53,40 @@ enum LocBaseType {
 class SpellActionMissileLocation
 {
 public:
-	SpellActionMissileLocation(LocBaseType base) : Base(base), AddX(0), AddY(0),
-		AddRandX(0), AddRandY(0) {} ;
+	SpellActionMissileLocation(LocBaseType base) : Base(base) {}
 
-	LocBaseType Base;   /// The base for the location (caster/target)
-	int AddX;           /// Add to the X coordinate
-	int AddY;           /// Add to the X coordinate
-	int AddRandX;       /// Random add to the X coordinate
-	int AddRandY;       /// Random add to the X coordinate
+	void ProcessConfigData(const CConfigData *config_data);
+	
+	LocBaseType Base;	/// The base for the location (caster/target)
+	int AddX = 0;		/// Add to the X coordinate
+	int AddY = 0;		/// Add to the X coordinate
+	int AddRandX = 0;	/// Random add to the X coordinate
+	int AddRandY = 0;	/// Random add to the X coordinate
 };
 
 class Spell_SpawnMissile : public SpellActionType
 {
 public:
-	Spell_SpawnMissile() : Damage(0), LightningDamage(0), TTL(-1), Delay(0), UseUnitVar(false),
-	//Wyrmgus start
-	AlwaysHits(false), AlwaysCritical(false),
-	//Wyrmgus end
-		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {}
+	Spell_SpawnMissile() : 
+		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget) {}
+	virtual void ProcessConfigData(const CConfigData *config_data);
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *lua, int startIndex, int endIndex);
 
 private:
-	int Damage;                             /// Missile damage.
-	int LightningDamage;                    /// Missile lightning damage.
-	int TTL;                                /// Missile TTL.
-	int Delay;                              /// Missile original delay.
-	bool UseUnitVar;                        /// Use the caster's damage parameters
+	int Damage = 0;							/// Missile damage.
+	int LightningDamage = 0;				/// Missile lightning damage.
+	int TTL = -1;							/// Missile TTL.
+	int Delay = 0;							/// Missile original delay.
+	bool UseUnitVar = false;				/// Use the caster's damage parameters
 	//Wyrmgus start
-	bool AlwaysHits;						/// The missile spawned from the spell always hits
-	bool AlwaysCritical;					/// The damage from the spell is always a critical hit (double damage)
+	bool AlwaysHits = false;				/// The missile spawned from the spell always hits
+	bool AlwaysCritical = false;			/// The damage from the spell is always a critical hit (double damage)
 	//Wyrmgus end
-	SpellActionMissileLocation StartPoint;  /// Start point description.
-	SpellActionMissileLocation EndPoint;    /// Start point description.
-	MissileType *Missile;                   /// Missile fired on cast
+	SpellActionMissileLocation StartPoint;	/// Start point description.
+	SpellActionMissileLocation EndPoint;	/// Start point description.
+	MissileType *Missile = nullptr;			/// Missile fired on cast
 };
 
-
-//@}
-
-#endif // SPELL_SPAWNMISSILE_H
+#endif

@@ -29,8 +29,6 @@
 #ifndef SPELL_LUACALLBACK_H
 #define SPELL_LUACALLBACK_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -44,6 +42,7 @@ class Spell_LuaCallback : public SpellActionType
 public:
 	Spell_LuaCallback() : Func(nullptr) {};
 	~Spell_LuaCallback() { delete Func; };
+	virtual void ProcessConfigData(const CConfigData *config_data) {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -52,6 +51,4 @@ private:
 	LuaCallback *Func;
 };
 
-//@}
-
-#endif // SPELL_LUACALLBACK_H
+#endif
