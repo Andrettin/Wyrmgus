@@ -887,6 +887,32 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			this->RandomMovementProbability = std::stoi(value);
 		} else if (key == "random_movement_distance") {
 			this->RandomMovementDistance = std::stoi(value);
+		} else if (key == "can_cast_spell") {
+			value = FindAndReplaceString(value, "_", "-");
+			CSpell *spell = CSpell::GetSpell(value);
+			if (spell != nullptr) {
+				this->Spells.push_back(spell);
+			}
+		} else if (key == "autocast_active") {
+			if (!this->AutoCastActive) {
+				this->AutoCastActive = new char[CSpell::Spells.size()];
+				memset(this->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
+			}
+			
+			if (value == "false") {
+				delete[] this->AutoCastActive;
+				this->AutoCastActive = nullptr;
+			} else {
+				value = FindAndReplaceString(value, "_", "-");
+				const CSpell *spell = CSpell::GetSpell(value);
+				if (spell != nullptr) {
+					if (spell->AutoCast) {
+						this->AutoCastActive[spell->Slot] = 1;
+					} else {
+						fprintf(stderr, "AutoCastActive : Define autocast method for \"%s\".\n", value.c_str());
+					}
+				}
+			}
 		} else {
 			key = SnakeCaseToPascalCase(key);
 			

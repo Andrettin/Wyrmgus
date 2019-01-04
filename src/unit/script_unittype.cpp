@@ -1642,9 +1642,6 @@ static int CclDefineUnitType(lua_State *l)
 				if (spell == nullptr) {
 					LuaError(l, "AutoCastActive : Unknown spell type: %s" _C_ value);
 				}
-				if (!spell->AutoCast) {
-					LuaError(l, "AutoCastActive : Define autocast method for %s." _C_ value);
-				}
 				type->AutoCastActive[spell->Slot] = 1;
 			}
 		} else if (!strcmp(value, "CanTargetFlag")) {
