@@ -30,34 +30,24 @@
 #ifndef __TRIGGER_H__
 #define __TRIGGER_H__
 
-//@{
-
-//Wyrmgus start
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
 #include <map>
-//Wyrmgus end
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
 class CFaction;
-//Wyrmgus end
+class CFile;
 class CUnit;
 class CUnitType;
-//Wyrmgus start
 class CUpgrade;
-//Wyrmgus end
-struct lua_State;
-class CFile;
-//Wyrmgus start
 class LuaCallback;
-//Wyrmgus end
+struct lua_State;
 
 /**
 **  Timer structure
@@ -84,21 +74,22 @@ public:
 	unsigned long LastUpdate;   /// GameCycle of last update
 };
 
-//Wyrmgus start
 class CTrigger
 {
 public:
-	CTrigger() :
-		Conditions(nullptr), Effects(nullptr)
-	{
-	}
 	~CTrigger();
 	
+	static CTrigger *GetTrigger(const std::string &ident, const bool should_find = true);
+	static CTrigger *GetOrAddTrigger(const std::string &ident);
+
+	static std::vector<CTrigger *> Triggers;
+	static std::map<std::string, CTrigger *> TriggersByIdent;
+	static std::vector<std::string> DeactivatedTriggers;
+
 	std::string Ident;
-	LuaCallback *Conditions;
-	LuaCallback *Effects;
+	LuaCallback *Conditions = nullptr;
+	LuaCallback *Effects = nullptr;
 };
-//Wyrmgus end
 
 #define ANY_UNIT ((const CUnitType *)0)
 #define ALL_FOODUNITS ((const CUnitType *)-1)
@@ -132,12 +123,6 @@ extern CTimer GameTimer; /// the game timer
 /// Some data accessible for script during the game.
 extern TriggerDataType TriggerData;
 
-//Wyrmgus start
-extern std::vector<CTrigger *> Triggers;
-extern std::vector<std::string> DeactivatedTriggers;
-extern std::map<std::string, CTrigger *> TriggerIdentToPointer;
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -146,15 +131,9 @@ extern int TriggerGetPlayer(lua_State *l);/// get player number.
 extern const CUnitType *TriggerGetUnitType(lua_State *l); /// get the unit-type
 extern void TriggersEachCycle();    /// test triggers
 
-//Wyrmgus start
-extern CTrigger *GetTrigger(const std::string &trigger_ident);
-//Wyrmgus end
-
 extern void TriggerCclRegister();   /// Register ccl features
 extern void SaveTriggers(CFile &file); /// Save the trigger module
 extern void InitTriggers();         /// Setup triggers
 extern void CleanTriggers();        /// Cleanup the trigger module
 
-//@}
-
-#endif // !__TRIGGER_H__
+#endif

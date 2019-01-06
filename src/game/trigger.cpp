@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -59,16 +57,13 @@
 
 CTimer GameTimer;               /// The game timer
 static int Trigger;
-static bool *ActiveTriggers;
 
 /// Some data accessible for script during the game.
 TriggerDataType TriggerData;
 
-//Wyrmgus start
-std::vector<CTrigger *> Triggers;
-std::vector<std::string> DeactivatedTriggers;
-std::map<std::string, CTrigger *> TriggerIdentToPointer;
-//Wyrmgus end
+std::vector<CTrigger *> CTrigger::Triggers;
+std::map<std::string, CTrigger *> CTrigger::TriggersByIdent;
+std::vector<std::string> CTrigger::DeactivatedTriggers;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -543,17 +538,11 @@ static int CclAddTrigger(lua_State *l)
 
 	std::string trigger_ident = LuaToString(l, 1);
 	
-	if (std::find(DeactivatedTriggers.begin(), DeactivatedTriggers.end(), trigger_ident) != DeactivatedTriggers.end()) {
+	if (std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), trigger_ident) != CTrigger::DeactivatedTriggers.end()) {
 		return 0;
 	}
 	
-	CTrigger *trigger = GetTrigger(trigger_ident);
-	if (!trigger) {
-		trigger = new CTrigger;
-		trigger->Ident = trigger_ident;
-		Triggers.push_back(trigger);
-		TriggerIdentToPointer[trigger_ident] = trigger;
-	}
+	CTrigger *trigger = CTrigger::GetOrAddTrigger(trigger_ident);
 	
 	trigger->Conditions = new LuaCallback(l, 2);
 	trigger->Effects = new LuaCallback(l, 3);
@@ -574,20 +563,6 @@ void SetTrigger(int trigger)
 	Trigger = trigger;
 }
 
-/**
-**  Set the active triggers
-*/
-static int CclSetActiveTriggers(lua_State *l)
-{
-	const int args = lua_gettop(l);
-
-	ActiveTriggers = new bool[args];
-	for (int j = 0; j < args; ++j) {
-		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
-	}
-	return 0;
-}
-
 //Wyrmgus start
 /**
 **  Set the deactivated triggers
@@ -597,7 +572,7 @@ static int CclSetDeactivatedTriggers(lua_State *l)
 	const int args = lua_gettop(l);
 
 	for (int j = 0; j < args; ++j) {
-		DeactivatedTriggers.push_back(LuaToString(l, j + 1));
+		CTrigger::DeactivatedTriggers.push_back(LuaToString(l, j + 1));
 	}
 	return 0;
 }
@@ -658,7 +633,7 @@ void TriggersEachCycle()
 	//Wyrmgus start
 //	lua_getglobal(Lua, "_triggers_");
 //	int triggers = lua_rawlen(Lua, -1);
-	int triggers = Triggers.size();
+	int triggers = CTrigger::Triggers.size();
 	//Wyrmgus end
 
 	if (Trigger >= triggers) {
@@ -688,7 +663,7 @@ void TriggersEachCycle()
 	if (Trigger < triggers) {
 		//Wyrmgus start
 //		int currentTrigger = Trigger;
-		CTrigger *current_trigger = Triggers[Trigger];
+		CTrigger *current_trigger = CTrigger::Triggers[Trigger];
 //		Trigger += 2;
 		Trigger += 1;
 		//Wyrmgus end
@@ -712,9 +687,9 @@ void TriggersEachCycle()
 				current_trigger->Effects->pushPreamble();
 				current_trigger->Effects->run(1);
 				if (current_trigger->Effects->popBoolean() == false) {
-					DeactivatedTriggers.push_back(current_trigger->Ident);
-					Triggers.erase(std::remove(Triggers.begin(), Triggers.end(), current_trigger), Triggers.end());
-					TriggerIdentToPointer.erase(current_trigger->Ident);
+					CTrigger::DeactivatedTriggers.push_back(current_trigger->Ident);
+					CTrigger::Triggers.erase(std::remove(CTrigger::Triggers.begin(), CTrigger::Triggers.end(), current_trigger), CTrigger::Triggers.end());
+					CTrigger::TriggersByIdent.erase(current_trigger->Ident);
 					delete current_trigger;
 				}
 			}
@@ -726,22 +701,45 @@ void TriggersEachCycle()
 	//Wyrmgus end
 }
 
-//Wyrmgus start
-CTrigger *GetTrigger(const std::string &trigger_ident)
+CTrigger *CTrigger::GetTrigger(const std::string &ident, const bool should_find)
 {
-	if (TriggerIdentToPointer.find(trigger_ident) != TriggerIdentToPointer.end()) {
-		return TriggerIdentToPointer[trigger_ident];
+	std::map<std::string, CTrigger *>::const_iterator find_iterator = TriggersByIdent.find(ident);
+	
+	if (find_iterator != TriggersByIdent.end()) {
+		return find_iterator->second;
 	}
 	
+	if (should_find) {
+		fprintf(stderr, "Invalid trigger: \"%s\".\n", ident.c_str());
+	}
+
 	return nullptr;
+}
+
+CTrigger *CTrigger::GetOrAddTrigger(const std::string &ident)
+{
+	CTrigger *trigger = GetTrigger(ident, false);
+	
+	if (!trigger) {
+		trigger = new CTrigger;
+		trigger->Ident = ident;
+		Triggers.push_back(trigger);
+		TriggersByIdent[ident] = trigger;
+	}
+	
+	return trigger;
 }
 
 CTrigger::~CTrigger()
 {
-	delete Conditions;
-	delete Effects;
+	if (this->Conditions) {
+		delete this->Conditions;
+	}
+	
+	if (this->Effects) {
+		delete this->Effects;
+	}
 }
-//Wyrmgus end
 
 /**
 **  Register CCL features for triggers.
@@ -749,7 +747,6 @@ CTrigger::~CTrigger()
 void TriggerCclRegister()
 {
 	lua_register(Lua, "AddTrigger", CclAddTrigger);
-	lua_register(Lua, "SetActiveTriggers", CclSetActiveTriggers);
 	//Wyrmgus start
 	lua_register(Lua, "SetDeactivatedTriggers", CclSetDeactivatedTriggers);
 	//Wyrmgus end
@@ -793,11 +790,11 @@ void SaveTriggers(CFile &file)
 	file.printf(")\n");
 	*/
 	file.printf("SetDeactivatedTriggers(");
-	for (size_t i = 0; i < DeactivatedTriggers.size(); ++i) {
+	for (size_t i = 0; i < CTrigger::DeactivatedTriggers.size(); ++i) {
 		if (i) {
 			file.printf(", ");
 		}
-		file.printf("\"%s\"", DeactivatedTriggers[i].c_str());
+		file.printf("\"%s\"", CTrigger::DeactivatedTriggers[i].c_str());
 	}
 	file.printf(")\n");
 	//Wyrmgus end
@@ -852,17 +849,14 @@ void CleanTriggers()
 
 	Trigger = 0;
 
-	delete[] ActiveTriggers;
-	ActiveTriggers = nullptr;
+	for (CTrigger *trigger : CTrigger::Triggers) {
+		delete trigger;
+	}
+	CTrigger::Triggers.clear();
+	CTrigger::TriggersByIdent.clear();
+	CTrigger::DeactivatedTriggers.clear();
 	
 	//Wyrmgus start
-	for (size_t i = 0; i < Triggers.size(); ++i) {
-		delete Triggers[i];
-	}
-	Triggers.clear();
-	TriggerIdentToPointer.clear();
-	DeactivatedTriggers.clear();
-	
 	for (size_t i = 0; i < Quests.size(); ++i) {
 		Quests[i]->CurrentCompleted = false;
 	}
@@ -870,5 +864,3 @@ void CleanTriggers()
 
 	GameTimer.Reset();
 }
-
-//@}
