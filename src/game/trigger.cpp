@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name trigger.cpp - The trigger handling. */
+/**@name trigger.cpp - The trigger source file. */
 //
-//      (c) Copyright 2002-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 2002-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -56,14 +56,15 @@
 ----------------------------------------------------------------------------*/
 
 CTimer GameTimer;               /// The game timer
-static int Trigger;
 
 /// Some data accessible for script during the game.
 TriggerDataType TriggerData;
 
 std::vector<CTrigger *> CTrigger::Triggers;
+std::vector<CTrigger *> CTrigger::ActiveTriggers;
 std::map<std::string, CTrigger *> CTrigger::TriggersByIdent;
 std::vector<std::string> CTrigger::DeactivatedTriggers;
+unsigned int CTrigger::CurrentTriggerId = 0;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -164,13 +165,10 @@ static CompareFunction GetCompareFunction(const char *op)
 */
 static int CclGetNumUnitsAt(lua_State *l)
 {
-	//Wyrmgus start
-//	LuaCheckArgs(l, 4);
 	const int nargs = lua_gettop(l);
 	if (nargs < 4 || nargs > 5) {
 		LuaError(l, "incorrect argument\n");
 	}
-	//Wyrmgus end
 
 	int plynr = LuaToNumber(l, 1);
 	lua_pushvalue(l, 2);
@@ -182,14 +180,11 @@ static int CclGetNumUnitsAt(lua_State *l)
 	CclGetPos(l, &minPos.x, &minPos.y, 3);
 	CclGetPos(l, &maxPos.x, &maxPos.y, 4);
 	
-	//Wyrmgus start
 	minPos.x = std::max<int>(minPos.x, 0);
 	minPos.y = std::max<int>(minPos.y, 0);
-	//Wyrmgus end
 
 	std::vector<CUnit *> units;
 
-	//Wyrmgus start
 	int z = 0;
 	if (nargs >= 5) {
 		z = LuaToNumber(l, 5);
@@ -208,9 +203,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 		return 1;
 	}
 	
-//	Select(minPos, maxPos, units);
 	Select(minPos, maxPos, units, z);
-	//Wyrmgus end
 
 	int s = 0;
 	for (size_t i = 0; i != units.size(); ++i) {
@@ -491,45 +484,6 @@ void ActionStopTimer()
 */
 static int CclAddTrigger(lua_State *l)
 {
-	//Wyrmgus start
-	/*
-	LuaCheckArgs(l, 2);
-	if (!lua_isfunction(l, 1)
-		|| (!lua_isfunction(l, 2) && !lua_istable(l, 2))) {
-		LuaError(l, "incorrect argument");
-	}
-
-	// Make a list of all triggers.
-	// A trigger is a pair of condition and action
-	lua_getglobal(l, "_triggers_");
-
-	if (lua_isnil(l, -1)) {
-		DebugPrint("Trigger not set, defining trigger\n");
-		lua_pop(l, 1);
-		lua_newtable(l);
-		lua_setglobal(l, "_triggers_");
-		lua_getglobal(l, "_triggers_");
-	}
-
-	const int i = lua_rawlen(l, -1);
-	if (ActiveTriggers && !ActiveTriggers[i / 2]) {
-		lua_pushnil(l);
-		lua_rawseti(l, -2, i + 1);
-		lua_pushnil(l);
-		lua_rawseti(l, -2, i + 2);
-	} else {
-		lua_pushvalue(l, 1);
-		lua_rawseti(l, -2, i + 1);
-		lua_newtable(l);
-		lua_pushvalue(l, 2);
-		lua_rawseti(l, -2, 1);
-		lua_rawseti(l, -2, i + 2);
-	}
-	lua_pop(l, 1);
-	*/
-	//Wyrmgus end
-	
-	//Wyrmgus start
 	LuaCheckArgs(l, 3);
 	
 	if (!lua_isfunction(l, 2) || !lua_isfunction(l, 3)) {
@@ -542,7 +496,12 @@ static int CclAddTrigger(lua_State *l)
 		return 0;
 	}
 	
-	CTrigger *trigger = CTrigger::GetOrAddTrigger(trigger_ident);
+	//this function only adds temporary triggers, that is, ones that will only last for the current game
+	
+	CTrigger *trigger = new CTrigger;
+	trigger->Ident = trigger_ident;
+	trigger->Local = true;
+	CTrigger::ActiveTriggers.push_back(trigger);
 	
 	trigger->Conditions = new LuaCallback(l, 2);
 	trigger->Effects = new LuaCallback(l, 3);
@@ -550,7 +509,6 @@ static int CclAddTrigger(lua_State *l)
 	if (trigger->Conditions == nullptr || trigger->Effects == nullptr) {
 		fprintf(stderr, "Trigger \"%s\" has no conditions or no effects.\n", trigger->Ident.c_str());
 	}
-	//Wyrmgus end
 
 	return 0;
 }
@@ -558,12 +516,11 @@ static int CclAddTrigger(lua_State *l)
 /**
 **  Set the trigger values
 */
-void SetTrigger(int trigger)
+void SetCurrentTriggerId(unsigned int trigger_id)
 {
-	Trigger = trigger;
+	CTrigger::CurrentTriggerId = trigger_id;
 }
 
-//Wyrmgus start
 /**
 **  Set the deactivated triggers
 */
@@ -576,7 +533,6 @@ static int CclSetDeactivatedTriggers(lua_State *l)
 	}
 	return 0;
 }
-//Wyrmgus end
 
 /**
 **  Execute a trigger action
@@ -626,59 +582,19 @@ static void TriggerRemoveTrigger(int trig)
 */
 void TriggersEachCycle()
 {
-	//Wyrmgus start
-//	const int base = lua_gettop(Lua);
-	//Wyrmgus end
-
-	//Wyrmgus start
-//	lua_getglobal(Lua, "_triggers_");
-//	int triggers = lua_rawlen(Lua, -1);
-	int triggers = CTrigger::Triggers.size();
-	//Wyrmgus end
-
-	if (Trigger >= triggers) {
-		Trigger = 0;
+	if (CTrigger::CurrentTriggerId >= CTrigger::ActiveTriggers.size()) {
+		CTrigger::CurrentTriggerId = 0;
 	}
 
 	if (GamePaused) {
-		//Wyrmgus start
-//		lua_pop(Lua, 1);
-		//Wyrmgus end
 		return;
 	}
 
-	// Skip to the next trigger
-	//Wyrmgus start
-	/*
-	while (Trigger < triggers) {
-		lua_rawgeti(Lua, -1, Trigger + 1);
-		if (!lua_isnumber(Lua, -1)) {
-			break;
-		}
-		lua_pop(Lua, 1);
-		Trigger += 2;
-	}
-	*/
-	//Wyrmgus end
-	if (Trigger < triggers) {
-		//Wyrmgus start
-//		int currentTrigger = Trigger;
-		CTrigger *current_trigger = CTrigger::Triggers[Trigger];
-//		Trigger += 2;
-		Trigger += 1;
-		//Wyrmgus end
-		//Wyrmgus start
-		/*
-		LuaCall(0, 0);
-		// If condition is true execute action
-		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
-			lua_settop(Lua, base + 1);
-			if (TriggerExecuteAction(currentTrigger + 1)) {
-				TriggerRemoveTrigger(currentTrigger);
-			}
-		}
-		lua_settop(Lua, base + 1);
-		*/
+	// go to the next trigger
+	if (CTrigger::CurrentTriggerId < CTrigger::ActiveTriggers.size()) {
+		CTrigger *current_trigger = CTrigger::ActiveTriggers[CTrigger::CurrentTriggerId];
+
+		bool removed_trigger = false;
 		
 		if (current_trigger->Conditions && current_trigger->Effects) {
 			current_trigger->Conditions->pushPreamble();
@@ -688,17 +604,21 @@ void TriggersEachCycle()
 				current_trigger->Effects->run(1);
 				if (current_trigger->Effects->popBoolean() == false) {
 					CTrigger::DeactivatedTriggers.push_back(current_trigger->Ident);
-					CTrigger::Triggers.erase(std::remove(CTrigger::Triggers.begin(), CTrigger::Triggers.end(), current_trigger), CTrigger::Triggers.end());
-					CTrigger::TriggersByIdent.erase(current_trigger->Ident);
-					delete current_trigger;
+					CTrigger::ActiveTriggers.erase(CTrigger::ActiveTriggers.begin() + CTrigger::CurrentTriggerId);
+					if (current_trigger->Local) {
+						delete current_trigger;
+						removed_trigger = true;
+					}
 				}
 			}
 		}
-		//Wyrmgus end
+		
+		if (!removed_trigger) {
+			CTrigger::CurrentTriggerId++;
+		}
+	} else {
+		CTrigger::CurrentTriggerId = 0;
 	}
-	//Wyrmgus start
-//	lua_pop(Lua, 1);
-	//Wyrmgus end
 }
 
 CTrigger *CTrigger::GetTrigger(const std::string &ident, const bool should_find)
@@ -730,6 +650,49 @@ CTrigger *CTrigger::GetOrAddTrigger(const std::string &ident)
 	return trigger;
 }
 
+/**
+**	Cleanup the trigger module.
+*/
+void CTrigger::ClearTriggers()
+{
+	ClearActiveTriggers();
+
+	for (CTrigger *trigger : CTrigger::Triggers) {
+		delete trigger;
+	}
+	
+	CTrigger::Triggers.clear();
+	CTrigger::TriggersByIdent.clear();
+}
+
+void CTrigger::ClearActiveTriggers()
+{
+	lua_pushnil(Lua);
+	lua_setglobal(Lua, "_triggers_");
+
+	lua_pushnil(Lua);
+	lua_setglobal(Lua, "Triggers");
+
+	CTrigger::CurrentTriggerId = 0;
+
+	for (CTrigger *trigger : CTrigger::ActiveTriggers) {
+		if (trigger->Local) {
+			delete trigger;
+		}
+	}
+	
+	CTrigger::ActiveTriggers.clear();
+	CTrigger::DeactivatedTriggers.clear();
+	
+	//Wyrmgus start
+	for (size_t i = 0; i < Quests.size(); ++i) {
+		Quests[i]->CurrentCompleted = false;
+	}
+	//Wyrmgus end
+	
+	GameTimer.Reset();
+}
+
 CTrigger::~CTrigger()
 {
 	if (this->Conditions) {
@@ -747,9 +710,8 @@ CTrigger::~CTrigger()
 void TriggerCclRegister()
 {
 	lua_register(Lua, "AddTrigger", CclAddTrigger);
-	//Wyrmgus start
 	lua_register(Lua, "SetDeactivatedTriggers", CclSetDeactivatedTriggers);
-	//Wyrmgus end
+
 	// Conditions
 	lua_register(Lua, "GetNumUnitsAt", CclGetNumUnitsAt);
 	lua_register(Lua, "IfNearUnit", CclIfNearUnit);
@@ -767,28 +729,7 @@ void SaveTriggers(CFile &file)
 	file.printf("--- MODULE: triggers\n");
 
 	file.printf("\n");
-	//Wyrmgus start
-//	lua_getglobal(Lua, "_triggers_");
-//	const int triggers = lua_rawlen(Lua, -1);
-	//Wyrmgus end
 
-	//Wyrmgus start
-	/*
-	file.printf("SetActiveTriggers(");
-	for (int i = 0; i < triggers; i += 2) {
-		lua_rawgeti(Lua, -1, i + 1);
-		if (i) {
-			file.printf(", ");
-		}
-		if (!lua_isnil(Lua, -1)) {
-			file.printf("true");
-		} else {
-			file.printf("false");
-		}
-		lua_pop(Lua, 1);
-	}
-	file.printf(")\n");
-	*/
 	file.printf("SetDeactivatedTriggers(");
 	for (size_t i = 0; i < CTrigger::DeactivatedTriggers.size(); ++i) {
 		if (i) {
@@ -797,9 +738,8 @@ void SaveTriggers(CFile &file)
 		file.printf("\"%s\"", CTrigger::DeactivatedTriggers[i].c_str());
 	}
 	file.printf(")\n");
-	//Wyrmgus end
 
-	file.printf("SetTrigger(%d)\n", Trigger);
+	file.printf("SetCurrentTriggerId(%d)\n", CTrigger::CurrentTriggerId);
 
 	if (GameTimer.Init) {
 		file.printf("ActionSetTimer(%ld, %s)\n",
@@ -812,6 +752,7 @@ void SaveTriggers(CFile &file)
 	file.printf("\n");
 	file.printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
 	file.printf("\n");
+	
 	//Wyrmgus start
 	if (CurrentQuest != nullptr) {
 		file.printf("SetCurrentQuest(\"%s\")\n", CurrentQuest->Ident.c_str());
@@ -834,33 +775,4 @@ void InitTriggers()
 		LuaCall(0, 1);
 	}
 	lua_pop(Lua, 1);
-}
-
-/**
-**  Clean up the trigger module.
-*/
-void CleanTriggers()
-{
-	lua_pushnil(Lua);
-	lua_setglobal(Lua, "_triggers_");
-
-	lua_pushnil(Lua);
-	lua_setglobal(Lua, "Triggers");
-
-	Trigger = 0;
-
-	for (CTrigger *trigger : CTrigger::Triggers) {
-		delete trigger;
-	}
-	CTrigger::Triggers.clear();
-	CTrigger::TriggersByIdent.clear();
-	CTrigger::DeactivatedTriggers.clear();
-	
-	//Wyrmgus start
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		Quests[i]->CurrentCompleted = false;
-	}
-	//Wyrmgus end
-
-	GameTimer.Reset();
 }

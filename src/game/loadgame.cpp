@@ -115,7 +115,7 @@ void CleanModules()
 	CleanCursors();
 	CleanUserInterface();
 	CleanFonts();
-	CleanTriggers();
+	CTrigger::ClearTriggers();
 	FreeAi();
 	PlayerRaces.Clean();
 	CAge::ClearAges();

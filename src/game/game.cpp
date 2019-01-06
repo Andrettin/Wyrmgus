@@ -1946,7 +1946,7 @@ void CleanGame()
 
 	RestoreColorCyclingSurface();
 	CleanGame_Lua();
-	CleanTriggers();
+	CTrigger::ClearActiveTriggers();
 	CleanAi();
 	CleanGroups();
 	CleanMissiles();

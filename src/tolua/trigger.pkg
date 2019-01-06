@@ -18,5 +18,5 @@ void ActionStartTimer();
 $void ActionStopTimer();
 void ActionStopTimer();
 
-$void SetTrigger(int trigger);
-void SetTrigger(int trigger);
+$void SetCurrentTriggerId(unsigned int trigger_id);
+void SetCurrentTriggerId(unsigned int trigger_id);
