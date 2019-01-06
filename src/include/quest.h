@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name quest.h - The quest headerfile. */
+/**@name quest.h - The quest header file. */
 //
 //      (c) Copyright 2015-2019 by Andrettin
 //
@@ -29,8 +29,6 @@
 
 #ifndef __QUEST_H__
 #define __QUEST_H__
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -210,11 +208,6 @@ public:
 class CDialogue
 {
 public:
-	CDialogue() :
-		Ident("")
-	{
-	}
-	
 	~CDialogue();
 	
 	void Call(int player);
@@ -226,24 +219,19 @@ public:
 class CDialogueNode
 {
 public:
-	CDialogueNode() :
-		ID(-1), Dialogue(nullptr), Conditions(nullptr), ImmediateEffects(nullptr)
-	{
-	}
-	
 	~CDialogueNode();
 	
 	void Call(int player);
 	void OptionEffect(int option, int player);
 	
-	int ID;
+	int ID = -1;
 	std::string SpeakerType;			/// "character" if the speaker is a character, "unit" if the speaker belongs to a particular unit type, and empty if the Speaker string will be used as the displayed name of the speaker itself
 	std::string SpeakerPlayer;			/// name of the player to whom the speaker belongs
 	std::string Speaker;
 	std::string Text;
-	CDialogue *Dialogue;
-	LuaCallback *Conditions;
-	LuaCallback *ImmediateEffects;
+	CDialogue *Dialogue = nullptr;
+	LuaCallback *Conditions = nullptr;
+	LuaCallback *ImmediateEffects = nullptr;
 	std::vector<std::string> Options;
 	std::vector<LuaCallback *> OptionEffects;
 	std::vector<std::string> OptionTooltips;
@@ -289,6 +277,4 @@ extern void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int 
 
 extern void QuestCclRegister();
 
-//@}
-
-#endif // !__QUEST_H__
+#endif

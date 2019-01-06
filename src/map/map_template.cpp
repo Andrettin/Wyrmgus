@@ -1453,13 +1453,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 	}
 	
-	for (size_t i = 0; i < CHistoricalUnit::HistoricalUnits.size(); ++i) {
-		CHistoricalUnit *historical_unit = CHistoricalUnit::HistoricalUnits[i];
-		
-		if (historical_unit->Faction == nullptr && !historical_unit->UnitType->BoolFlag[FAUNA_INDEX].value) { //only fauna units may have no faction
-			continue;
-		}
-		
+	for (CHistoricalUnit *historical_unit : CHistoricalUnit::HistoricalUnits) {
 		if (historical_unit->StartDate.Year == 0 || !CurrentCampaign->StartDate.ContainsDate(historical_unit->StartDate) || CurrentCampaign->StartDate.ContainsDate(historical_unit->EndDate)) { //historical units aren't implemented if their date isn't set
 			continue;
 		}
