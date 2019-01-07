@@ -559,7 +559,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		armor = goal->Variable[ARMOR_INDEX].Value;
 		
 		if (goal->Variable[BARKSKIN_INDEX].Value > 0) {
-			armor += 2; //+2 armor bonus from Barkskin
+			armor += 4; //+4 armor bonus from Barkskin
 		}
 	} else {
 		armor = goal_stats.Variables[ARMOR_INDEX].Value;
