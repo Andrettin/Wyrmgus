@@ -47,6 +47,7 @@
 //Wyrmgus end
 #include "results.h"
 #include "script.h"
+#include "trigger_effect.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
@@ -875,40 +876,4 @@ void SaveTriggers(CFile &file)
 		file.printf("SetCurrentQuest(\"%s\")\n", CurrentQuest->Ident.c_str());
 	}
 	//Wyrmgus end
-}
-
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "quantity") {
-			this->Quantity = std::stoi(value);
-		} else if (key == "unit_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *unit_type = UnitTypeByIdent(value);
-			if (unit_type) {
-				this->UnitType = unit_type;
-			} else {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
-			}
-		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
-		}
-	}
-	
-	if (!this->UnitType) {
-		fprintf(stderr, "Create unit trigger effect has no unit type.\n");
-	}
-}
-
-void CCreateUnitTriggerEffect::Do(CPlayer *player) const
-{
-	CUnit *unit = MakeUnitAndPlace(player->StartPos, *this->UnitType, player, player->StartMapLayer);
 }

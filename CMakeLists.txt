@@ -34,7 +34,7 @@ set(STRATAGUS_MAJOR_VERSION 2)
 # Stratagus minor version (maximum 99)
 set(STRATAGUS_MINOR_VERSION 5)
 # Stratagus patch level (maximum 99)
-set(STRATAGUS_PATCH_LEVEL 2)
+set(STRATAGUS_PATCH_LEVEL 3)
 # Stratagus patch level 2
 set(STRATAGUS_PATCH_LEVEL2 0)
 #########################
@@ -143,6 +143,7 @@ set(game_SRCS
 	src/game/replay.cpp
 	src/game/savegame.cpp
 	src/game/trigger.cpp
+	src/game/trigger_effect.cpp
 )
 source_group(game FILES ${game_SRCS})
 
@@ -710,6 +711,7 @@ set(stratagus_generic_HDRS
 	src/include/title.h
 	src/include/translate.h
 	src/include/trigger.h
+	src/include/trigger_effect.h
 	src/include/unitsound.h
 	src/include/util.h
 	src/include/vec2i.h

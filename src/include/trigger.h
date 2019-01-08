@@ -44,7 +44,7 @@
 class CConfigData;
 class CFaction;
 class CFile;
-class CPlayer;
+class CTriggerEffect;
 class CUnit;
 class CUnitType;
 class CUpgrade;
@@ -71,25 +71,6 @@ public:
 	bool Increasing = false;		/// increasing or decreasing
 	long Cycles = 0;				/// current value in game cycles
 	unsigned long LastUpdate = 0;	/// GameCycle of last update
-};
-
-/// The effect which occurs after triggering a trigger
-class CTriggerEffect
-{
-public:
-	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
-	virtual void Do(CPlayer *player) const = 0;			/// Performs the trigger effect
-};
-
-/// The create unit trigger effect
-class CCreateUnitTriggerEffect : public CTriggerEffect
-{
-public:
-	virtual void ProcessConfigData(const CConfigData *config_data);
-	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
-	
-	int Quantity = 1;				/// Quantity of units created
-	CUnitType *UnitType = nullptr;	/// Unit type to be created
 };
 
 class CTrigger
