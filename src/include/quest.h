@@ -46,7 +46,6 @@
 
 class CCharacter;
 class CDialogue;
-class CDialogueNode;
 class CFaction;
 class CQuest;
 class CSite;
@@ -98,12 +97,6 @@ public:
 class CQuest
 {
 public:
-	CQuest() :
-		ID(-1), Civilization(-1), PlayerColor(0), HighestCompletedDifficulty(-1),
-		Hidden(false), Completed(false), CurrentCompleted(false), Competitive(false), Unobtainable(false), Uncompleteable(false), Unfailable(false),
-		QuestGiver(nullptr), IntroductionDialogue(nullptr), Conditions(nullptr), AcceptEffects(nullptr), CompletionEffects(nullptr), FailEffects(nullptr)
-	{
-	}
 	~CQuest();
 	
 	std::string Ident;				/// Ident of the quest
@@ -125,24 +118,24 @@ public:
 	std::string CompletionSpeech;	/// Speech given by the quest giver when the quest is completed
 	std::string Rewards;			/// Description of the quest's rewards
 	std::string Hint;				/// Quest hint
-	int ID;
-	int Civilization;				/// Which civilization the quest belongs to
-	int PlayerColor;				/// Player color used for the quest's icon
-	int HighestCompletedDifficulty;
-	bool Hidden;					/// Whether the quest is hidden
-	bool Completed;					/// Whether the quest has been completed
-	bool CurrentCompleted;			/// Whether the quest has been completed in the current game
-	bool Competitive;				/// Whether a player completing the quest causes it to fail for others
-	bool Unobtainable;				/// Whether the quest can be obtained normally (or only through triggers)
-	bool Uncompleteable;			/// Whether the quest can be completed normally (or only through triggers)
-	bool Unfailable;				/// Whether the quest can fail normally
-	IconConfig Icon;				/// Quest's icon
-	CCharacter *QuestGiver;			/// Quest giver
-	CDialogue *IntroductionDialogue;
-	LuaCallback *Conditions;
-	LuaCallback *AcceptEffects;
-	LuaCallback *CompletionEffects;
-	LuaCallback *FailEffects;
+	int ID = -1;
+	int Civilization = -1;				/// Which civilization the quest belongs to
+	int PlayerColor = 0;				/// Player color used for the quest's icon
+	int HighestCompletedDifficulty = -1;
+	bool Hidden = false;				/// Whether the quest is hidden
+	bool Completed = false;				/// Whether the quest has been completed
+	bool CurrentCompleted = false;		/// Whether the quest has been completed in the current game
+	bool Competitive = false;			/// Whether a player completing the quest causes it to fail for others
+	bool Unobtainable = false;			/// Whether the quest can be obtained normally (or only through triggers)
+	bool Uncompleteable = false;		/// Whether the quest can be completed normally (or only through triggers)
+	bool Unfailable = false;			/// Whether the quest can fail normally
+	IconConfig Icon;					/// Quest's icon
+	CCharacter *QuestGiver = nullptr;	/// Quest giver
+	CDialogue *IntroductionDialogue = nullptr;
+	LuaCallback *Conditions = nullptr;
+	LuaCallback *AcceptEffects = nullptr;
+	LuaCallback *CompletionEffects = nullptr;
+	LuaCallback *FailEffects = nullptr;
 	std::vector<CQuestObjective *> Objectives;	/// The objectives of this quest
 	std::vector<std::string> ObjectiveStrings;	/// The objective strings of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
@@ -205,38 +198,6 @@ public:
 	std::vector<CQuest *> RequiredQuests;	/// Quests required for obtaining this achievement
 };
 
-class CDialogue
-{
-public:
-	~CDialogue();
-	
-	void Call(int player);
-	
-	std::string Ident;				/// Ident of the dialogue
-	std::vector<CDialogueNode *> Nodes;	/// The nodes of the dialogue
-};
-
-class CDialogueNode
-{
-public:
-	~CDialogueNode();
-	
-	void Call(int player);
-	void OptionEffect(int option, int player);
-	
-	int ID = -1;
-	std::string SpeakerType;			/// "character" if the speaker is a character, "unit" if the speaker belongs to a particular unit type, and empty if the Speaker string will be used as the displayed name of the speaker itself
-	std::string SpeakerPlayer;			/// name of the player to whom the speaker belongs
-	std::string Speaker;
-	std::string Text;
-	CDialogue *Dialogue = nullptr;
-	LuaCallback *Conditions = nullptr;
-	LuaCallback *ImmediateEffects = nullptr;
-	std::vector<std::string> Options;
-	std::vector<LuaCallback *> OptionEffects;
-	std::vector<std::string> OptionTooltips;
-};
-
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
@@ -246,14 +207,12 @@ extern CQuest *CurrentQuest;
 extern std::vector<CCampaign *> Campaigns;
 extern CCampaign *CurrentCampaign;
 extern std::vector<CAchievement *> Achievements;
-extern std::vector<CDialogue *> Dialogues;
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
 extern void CleanQuests();
-extern void CleanDialogues();
 extern void SaveQuestCompletion();
 extern void CheckAchievements();
 std::string GetQuestObjectiveTypeNameById(int objective_type);
@@ -261,7 +220,6 @@ extern int GetQuestObjectiveTypeIdByName(const std::string &objective_type);
 extern CQuest *GetQuest(const std::string &quest_ident);
 extern CCampaign *GetCampaign(const std::string &campaign_ident);
 extern CAchievement *GetAchievement(const std::string &achievement_ident);
-extern CDialogue *GetDialogue(const std::string &dialogue_ident);
 
 extern void SetCurrentQuest(const std::string &quest_ident);
 extern std::string GetCurrentQuest();
@@ -270,10 +228,6 @@ extern std::string GetCurrentCampaign();
 extern void SetQuestCompleted(const std::string &quest_ident, int difficulty = 2, bool save = true);
 extern void SetQuestCompleted(const std::string &quest_ident, bool save);
 extern void SetAchievementObtained(const std::string &achievement_ident, bool save = true, bool display = true);
-
-extern void CallDialogue(const std::string &dialogue_ident, int player);
-extern void CallDialogueNode(const std::string &dialogue_ident, int node, int player);
-extern void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player);
 
 extern void QuestCclRegister();
 

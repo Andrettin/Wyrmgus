@@ -43,6 +43,7 @@
 #include "commands.h"
 #include "construct.h"
 #include "currency.h"
+#include "dialogue.h"
 #include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -129,7 +130,7 @@ void CleanModules()
 	CleanDecorations();
 	CDeity::ClearDeities();
 	//Wyrmgus start
-	CleanDialogues();
+	CDialogue::ClearDialogues();
 	CDeityDomain::ClearDeityDomains();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end

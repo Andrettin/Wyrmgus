@@ -36,7 +36,7 @@
 #include "trigger_effect.h"
 
 #include "config.h"
-#include "quest.h"
+#include "dialogue.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
 
@@ -57,11 +57,9 @@ void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 		
 		if (key == "dialogue") {
 			value = FindAndReplaceString(value, "_", "-");
-			CDialogue *dialogue = GetDialogue(value);
+			CDialogue *dialogue = CDialogue::GetDialogue(value);
 			if (dialogue) {
 				this->Dialogue = dialogue;
-			} else {
-				fprintf(stderr, "Invalid dialogue: \"%s\".\n", value.c_str());
 			}
 		} else {
 			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());

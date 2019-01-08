@@ -5,6 +5,7 @@ $#include "ai.h"
 //Wyrmgus start
 $#include "character.h"
 //Wyrmgus end
+$#include "dialogue.h"
 $#include "font.h"
 $#include "game.h"
 //Wyrmgus start

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name quest.cpp - The quests. */
+/**@name quest.cpp - The quest source file. */
 //
 //      (c) Copyright 2015-2019 by Andrettin
 //
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -60,7 +58,6 @@ CQuest *CurrentQuest = nullptr;
 std::vector<CCampaign *> Campaigns;
 CCampaign *CurrentCampaign = nullptr;
 std::vector<CAchievement *> Achievements;
-std::vector<CDialogue *> Dialogues;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -82,14 +79,6 @@ void CleanQuests()
 		delete Achievements[i];
 	}
 	Achievements.clear();
-}
-
-void CleanDialogues()
-{
-	for (size_t i = 0; i < Dialogues.size(); ++i) {
-		delete Dialogues[i];
-	}
-	Dialogues.clear();
 }
 
 void SaveQuestCompletion()
@@ -236,16 +225,6 @@ CAchievement *GetAchievement(const std::string &achievement_ident)
 	return nullptr;
 }
 
-CDialogue *GetDialogue(const std::string &dialogue_ident)
-{
-	for (size_t i = 0; i < Dialogues.size(); ++i) {
-		if (dialogue_ident == Dialogues[i]->Ident) {
-			return Dialogues[i];
-		}
-	}
-	return nullptr;
-}
-
 CQuest::~CQuest()
 {
 	if (this->Conditions) {
@@ -372,146 +351,6 @@ int CAchievement::GetProgressMax() const
 	return progress_max;
 }
 
-CDialogue::~CDialogue()
-{
-	for (size_t i = 0; i < this->Nodes.size(); ++i) {
-		delete this->Nodes[i];
-	}
-}
-
-void CDialogue::Call(int player)
-{
-	if (this->Nodes.size() == 0) {
-		return;
-	}
-	
-	this->Nodes[0]->Call(player);
-}
-
-CDialogueNode::~CDialogueNode()
-{
-	if (this->Conditions) {
-		delete Conditions;
-	}
-	
-	if (this->ImmediateEffects) {
-		delete ImmediateEffects;
-	}
-	
-	for (size_t i = 0; i < this->OptionEffects.size(); ++i) {
-		delete this->OptionEffects[i];
-	}
-}
-
-void CDialogueNode::Call(int player)
-{
-	if (this->Conditions) {
-		this->Conditions->pushPreamble();
-		this->Conditions->run(1);
-		if (this->Conditions->popBoolean() == false) {
-			if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
-				this->Dialogue->Nodes[this->ID + 1]->Call(player);
-			}
-			return;
-		}
-	}
-	
-	if (this->ImmediateEffects) {
-		this->ImmediateEffects->pushPreamble();
-		this->ImmediateEffects->run();
-	}
-	
-	std::string lua_command = "Event(";
-	
-	if (this->SpeakerType == "character") {
-		lua_command += "FindHero(\"" + this->Speaker;
-	} else if (this->SpeakerType == "unit") {
-		lua_command += "FindUnit(\"" + this->Speaker;
-	} else {
-		lua_command += "\"" + this->Speaker + "\", ";
-	}
-	
-	if (this->SpeakerType == "character" || this->SpeakerType == "unit") {
-		lua_command += "\"";
-		if (!this->SpeakerPlayer.empty()) {
-			lua_command += ", GetFactionPlayer(\"" + this->SpeakerPlayer + "\")";
-		}
-		lua_command += "), ";
-	}
-	
-	lua_command += "\"" + FindAndReplaceString(FindAndReplaceString(this->Text, "\"", "\\\""), "\n", "\\n") + "\", ";
-	lua_command += std::to_string((long long) player) + ", ";
-	
-	lua_command += "{";
-	if (this->Options.size() > 0) {
-		bool first = true;
-		for (size_t i = 0; i < this->Options.size(); ++i) {
-			if (!first) {
-				lua_command += ", ";
-			} else {
-				first = false;
-			}
-			lua_command += "\"" + this->Options[i] + "\"";
-		}
-	} else {
-		lua_command += "\"~!Continue\"";
-	}
-	lua_command += "}, ";
-	
-	lua_command += "{";
-	if (this->Options.size() > 0) {
-		bool first = true;
-		for (size_t i = 0; i < this->Options.size(); ++i) {
-			if (!first) {
-				lua_command += ", ";
-			} else {
-				first = false;
-			}
-			lua_command += "function(s) ";
-			lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) i) + ", " + std::to_string((long long) player) + ");";
-			lua_command += " end";
-		}
-	} else {
-		lua_command += "function(s) ";
-		lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) 0) + ", " + std::to_string((long long) player) + ");";
-		lua_command += " end";
-	}
-	lua_command += "}, ";
-
-	lua_command += "nil, nil, nil, ";
-	
-	lua_command += "{";
-	if (this->OptionTooltips.size() > 0) {
-		lua_command += "OptionTooltips = {";
-		bool first = true;
-		for (size_t i = 0; i < this->OptionTooltips.size(); ++i) {
-			if (!first) {
-				lua_command += ", ";
-			} else {
-				first = false;
-			}
-			lua_command += "\"" + this->OptionTooltips[i] + "\"";
-		}
-		lua_command += "}";
-	}
-	lua_command += "}";
-	
-	lua_command += ")";
-	
-	CclCommand(lua_command);
-}
-
-void CDialogueNode::OptionEffect(int option, int player)
-{
-	if ((int) this->OptionEffects.size() > option && this->OptionEffects[option]) {
-		this->OptionEffects[option]->pushPreamble();
-		this->OptionEffects[option]->run();
-	}
-	if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
-		this->Dialogue->Nodes[this->ID + 1]->Call(player);
-	}
-}
-
 void SetCurrentQuest(const std::string &quest_ident)
 {
 	if (quest_ident.empty()) {
@@ -579,36 +418,3 @@ void SetAchievementObtained(const std::string &achievement_ident, bool save, boo
 	
 	achievement->Obtain(save, display);
 }
-
-void CallDialogue(const std::string &dialogue_ident, int player)
-{
-	CDialogue *dialogue = GetDialogue(dialogue_ident);
-	if (!dialogue) {
-		return;
-	}
-	
-	dialogue->Call(player);
-}
-
-void CallDialogueNode(const std::string &dialogue_ident, int node, int player)
-{
-	CDialogue *dialogue = GetDialogue(dialogue_ident);
-	if (!dialogue || node >= (int) dialogue->Nodes.size()) {
-		return;
-	}
-	
-	dialogue->Nodes[node]->Call(player);
-}
-
-void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player)
-{
-	CDialogue *dialogue = GetDialogue(dialogue_ident);
-	if (!dialogue || node >= (int) dialogue->Nodes.size()) {
-		return;
-	}
-	
-	CclCommand("trigger_player = " + std::to_string((long long) player) + ";");
-	dialogue->Nodes[node]->OptionEffect(option, player);
-}
-
-//@}

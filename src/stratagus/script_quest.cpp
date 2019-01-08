@@ -39,6 +39,7 @@
 
 #include "character.h"
 #include "civilization.h"
+#include "dialogue.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_template.h"
@@ -155,7 +156,7 @@ static int CclDefineQuest(lua_State *l)
 			}
 		} else if (!strcmp(value, "IntroductionDialogue")) {
 			std::string dialogue_ident = LuaToString(l, -1);
-			CDialogue *dialogue = GetDialogue(dialogue_ident);
+			CDialogue *dialogue = CDialogue::GetDialogue(dialogue_ident);
 			if (dialogue) {
 				quest->IntroductionDialogue = dialogue;
 			} else {
@@ -774,13 +775,8 @@ static int CclDefineDialogue(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string dialogue_name = LuaToString(l, 1);
-	CDialogue *dialogue = GetDialogue(dialogue_name);
-	if (!dialogue) {
-		dialogue = new CDialogue;
-		Dialogues.push_back(dialogue);
-		dialogue->Ident = dialogue_name;
-	}
+	std::string dialogue_ident = LuaToString(l, 1);
+	CDialogue *dialogue = CDialogue::GetOrAddDialogue(dialogue_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
