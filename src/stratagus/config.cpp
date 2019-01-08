@@ -271,14 +271,15 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				calendar->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "character") {
-			CCharacter *character = GetCharacter(ident);
+			CCharacter *character = nullptr;
+			if (LoadingHistory) {
+				//only load the history for characters that are already in the character database
+				character = CCharacter::GetCharacter(ident);
+			} else {
+				character = CCharacter::GetOrAddCharacter(ident);
+			}
 			if (!character) {
-				if (LoadingHistory) {
-					continue; //don't load the history for characters that are no longer in the character database
-				}
-				character = new CCharacter;
-				character->Ident = ident;
-				Characters[ident] = character;
+				continue;
 			}
 			if (!define_only) {
 				character->ProcessConfigData(config_data);

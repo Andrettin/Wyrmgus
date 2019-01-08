@@ -4561,8 +4561,8 @@ bool CPlayer::HasHero(const CCharacter *hero) const
 		return false;
 	}
 	
-	for (size_t i = 0; i < this->Heroes.size(); ++i) {
-		if (this->Heroes[i]->Character == hero) {
+	for (const CUnit *hero_unit : this->Heroes) {
+		if (hero_unit->Character == hero) {
 			return true;
 		}
 	}

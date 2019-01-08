@@ -68,7 +68,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::map<std::string, CCharacter *> Characters;
+std::vector<CCharacter *> CCharacter::Characters;
+std::map<std::string, CCharacter *> CCharacter::CharactersByIdent;
 std::map<std::string, CCharacter *> CustomHeroes;
 CCharacter *CurrentCustomHero = nullptr;
 bool LoadingPersistentHeroes = false;
@@ -76,6 +77,63 @@ bool LoadingPersistentHeroes = false;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+CCharacter *CCharacter::GetCharacter(const std::string &ident, const bool should_find)
+{
+	std::map<std::string, CCharacter *>::const_iterator find_iterator = CCharacter::CharactersByIdent.find(ident);
+	
+	if (find_iterator != CCharacter::CharactersByIdent.end()) {
+		return find_iterator->second;
+	}
+
+	for (CCharacter *character : CCharacter::Characters) { // for backwards compatibility
+		if (character->GetFullName() == ident) {
+			return character;
+		}
+	}
+	
+	if (should_find) {
+		fprintf(stderr, "Invalid character: \"%s\".\n", ident.c_str());
+	}
+
+	return nullptr;
+}
+
+CCharacter *CCharacter::GetOrAddCharacter(const std::string &ident)
+{
+	CCharacter *character = CCharacter::GetCharacter(ident, false);
+	
+	if (!character) {
+		character = new CCharacter;
+		character->Ident = ident;
+		CCharacter::Characters.push_back(character);
+		CCharacter::CharactersByIdent[ident] = character;
+	}
+	
+	return character;
+}
+
+void CCharacter::ClearCharacters()
+{
+	for (CCharacter *character : CCharacter::Characters) {
+		for (CPersistentItem *item : character->Items) {
+			delete item;
+		}
+		character->Items.clear();
+		delete character;
+	}
+	CCharacter::Characters.clear();
+	CCharacter::CharactersByIdent.clear();
+	
+	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+		for (CPersistentItem *item : iterator->second->Items) {
+			delete item;
+		}
+		iterator->second->Items.clear();
+		delete iterator->second;
+	}
+	CustomHeroes.clear();
+}
 
 CCharacter::~CCharacter()
 {
@@ -90,16 +148,14 @@ CCharacter::~CCharacter()
 
 void CCharacter::GenerateCharacterHistory()
 {
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-		CCharacter *character = iterator->second;
+	for (CCharacter *character : CCharacter::Characters) {
 		character->GenerateHistory();
 	}
 }
 
 void CCharacter::ResetCharacterHistory()
 {
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-		CCharacter *character = iterator->second;
+	for (CCharacter *character : CCharacter::Characters) {
 		character->ResetHistory();
 	}
 }
@@ -759,42 +815,6 @@ int GetAttributeVariableIndex(int attribute)
 	}
 }
 
-void CleanCharacters()
-{
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-		for (size_t i = 0; i < iterator->second->Items.size(); ++i) {
-			delete iterator->second->Items[i];
-		}
-		iterator->second->Items.clear();
-		delete iterator->second;
-	}
-	Characters.clear();
-	
-	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-		for (size_t i = 0; i < iterator->second->Items.size(); ++i) {
-			delete iterator->second->Items[i];
-		}
-		iterator->second->Items.clear();
-		delete iterator->second;
-	}
-	CustomHeroes.clear();
-}
-
-CCharacter *GetCharacter(const std::string &character_ident)
-{
-	if (Characters.find(character_ident) != Characters.end()) {
-		return Characters[character_ident];
-	}
-	
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) { // for backwards compatibility
-		if (iterator->second->GetFullName() == character_ident) {
-			return iterator->second;
-		}
-	}
-
-	return nullptr;
-}
-
 CCharacter *GetCustomHero(const std::string &hero_ident)
 {
 	if (CustomHeroes.find(hero_ident) != CustomHeroes.end()) {
@@ -815,8 +835,8 @@ CCharacter *GetCustomHero(const std::string &hero_ident)
 */
 void SaveHeroes()
 {
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) { //save characters
-		SaveHero(iterator->second);
+	for (CCharacter *character : CCharacter::Characters) { //save characters
+		SaveHero(character);
 	}
 
 	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { //save custom heroes

@@ -911,7 +911,7 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	
 	CCharacter *character = nullptr;
 	if (!custom_hero) {
-		character = GetCharacter(character_ident);
+		character = CCharacter::GetCharacter(character_ident);
 	} else {
 		character = GetCustomHero(character_ident);
 	}
@@ -2323,9 +2323,9 @@ void CUnit::UpdateSoldUnits()
 		}
 		
 		if (CurrentQuest == nullptr) {
-			for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-				if (this->Player->CanRecruitHero(iterator->second)) {
-					potential_heroes.push_back(iterator->second);
+			for (CCharacter *character : CCharacter::Characters) {
+				if (this->Player->CanRecruitHero(character)) {
+					potential_heroes.push_back(character);
 				}
 			}
 		}

@@ -994,7 +994,7 @@ bool CGrandStrategyHero::IsVisible()
 
 bool CGrandStrategyHero::IsGenerated()
 {
-	return !this->Custom && GetCharacter(this->GetFullName()) == nullptr;
+	return !this->Custom && CCharacter::GetCharacter(this->GetFullName()) == nullptr;
 }
 
 bool CGrandStrategyHero::IsEligibleForTitle(int title)

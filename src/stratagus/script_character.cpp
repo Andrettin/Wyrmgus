@@ -75,16 +75,14 @@ static int CclDefineCharacter(lua_State *l)
 	}
 
 	std::string character_ident = LuaToString(l, 1);
-	CCharacter *character = GetCharacter(character_ident);
+	CCharacter *character = CCharacter::GetCharacter(character_ident, false);
 	bool redefinition = false;
 	if (!character) {
 		if (LoadingPersistentHeroes) {
 			fprintf(stderr, "Character \"%s\" has persistent data, but doesn't exist.", character_ident.c_str());
 			return 0;
 		}
-		character = new CCharacter;
-		character->Ident = character_ident;
-		Characters[character_ident] = character;
+		character = CCharacter::GetOrAddCharacter(character_ident);
 	} else {
 		redefinition = true;
 		if (!LoadingPersistentHeroes) {
@@ -160,7 +158,7 @@ static int CclDefineCharacter(lua_State *l)
 			}
 		} else if (!strcmp(value, "Father")) {
 			std::string father_ident = LuaToString(l, -1);
-			CCharacter *father = GetCharacter(father_ident);
+			CCharacter *father = CCharacter::GetCharacter(father_ident);
 			if (father) {
 				if (father->Gender == MaleGender) {
 					character->Father = const_cast<CCharacter *>(&(*father));
@@ -186,7 +184,7 @@ static int CclDefineCharacter(lua_State *l)
 			}
 		} else if (!strcmp(value, "Mother")) {
 			std::string mother_ident = LuaToString(l, -1);
-			CCharacter *mother = GetCharacter(mother_ident);
+			CCharacter *mother = CCharacter::GetCharacter(mother_ident);
 			if (mother) {
 				if (mother->Gender == FemaleGender) {
 					character->Mother = const_cast<CCharacter *>(&(*mother));
@@ -214,7 +212,7 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string child_ident = LuaToString(l, -1, j + 1);
-				CCharacter *child = GetCharacter(child_ident);
+				CCharacter *child = CCharacter::GetCharacter(child_ident);
 				if (child) {
 					if (character->Gender == MaleGender) {
 						child->Father = character;
@@ -881,7 +879,7 @@ static int CclGetCharacterData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string character_name = LuaToString(l, 1);
-	CCharacter *character = GetCharacter(character_name);
+	CCharacter *character = CCharacter::GetCharacter(character_name);
 	if (!character) {
 		LuaError(l, "Character \"%s\" doesn't exist." _C_ character_name.c_str());
 	}
@@ -1110,8 +1108,8 @@ static int CclGetCustomHeroData(lua_State *l)
 static int CclGetCharacters(lua_State *l)
 {
 	std::vector<std::string> character_names;
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-		character_names.push_back(iterator->first);
+	for (const CCharacter *character : CCharacter::Characters) {
+		character_names.push_back(character->Ident);
 	}
 	
 	lua_createtable(l, character_names.size(), 0);
@@ -1163,7 +1161,7 @@ static int CclCharacter(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	CCharacter *character = GetCharacter(ident);
+	CCharacter *character = CCharacter::GetCharacter(ident);
 	if (!character) {
 		return 0;
 	}

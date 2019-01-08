@@ -284,17 +284,17 @@ bool CUniqueItem::CanDrop() const
 {
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop
 	if (!IsNetworkGame()) {
-		for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-			for (size_t j = 0; j < iterator->second->Items.size(); ++j) {
-				if (iterator->second->Items[j]->Unique == this && !iterator->second->Items[j]->Bound) {
+		for (CCharacter *character : CCharacter::Characters) {
+			for (CPersistentItem *item : character->Items) {
+				if (item->Unique == this && !item->Bound) {
 					return false;
 				}
 			}
 		}
 		
 		for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-			for (size_t j = 0; j < iterator->second->Items.size(); ++j) {
-				if (iterator->second->Items[j]->Unique == this && !iterator->second->Items[j]->Bound) {
+			for (CPersistentItem *item : iterator->second->Items) {
+				if (item->Unique == this && !item->Bound) {
 					return false;
 				}
 			}

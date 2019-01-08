@@ -91,6 +91,7 @@
 ----------------------------------------------------------------------------*/
 
 class CAge;
+class CCharacter;
 class CConfigData;
 class CPlayer;
 class CSeason;
@@ -104,6 +105,7 @@ enum {
 	DependRuleUnitType,		/// Kind is a unit-type
 	DependRuleUpgrade,		/// Kind is an upgrade
 	DependRuleAge,			/// Kind is an age
+	DependRuleCharacter,	/// Kind is a character
 	DependRuleSeason,		/// Kind is a season
 	DependRuleTrigger		/// Kind is a trigger
 };
@@ -121,6 +123,7 @@ public:
 		const CUnitType *UnitType;	/// unit-type pointer
 		const CUpgrade  *Upgrade;	/// upgrade pointer
 		const CAge *Age;			/// age pointer
+		const CCharacter *Character;	/// character pointer
 		const CSeason *Season;		/// season pointer
 		const CTrigger *Trigger;	/// trigger pointer
 	} Kind;						/// required object

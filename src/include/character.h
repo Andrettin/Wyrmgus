@@ -111,19 +111,21 @@ enum CharacterTitles {
 class CCharacter
 {
 public:
-	CCharacter() :
-		Civilization(nullptr), Faction(nullptr), Gender(0), Level(0), ExperiencePercent(0),
-		ViolentDeath(false), Custom(false), Initialized(false),
-		Type(nullptr), Trait(nullptr), Deity(nullptr),
-		Father(nullptr), Mother(nullptr),
-		Conditions(nullptr)
+	CCharacter()
 	{
 		memset(Attributes, 0, sizeof(Attributes));
 	}
-	~CCharacter();
 	
+	static CCharacter *GetCharacter(const std::string &ident, const bool should_find = true);
+	static CCharacter *GetOrAddCharacter(const std::string &ident);
+	static void ClearCharacters();
 	static void GenerateCharacterHistory();		/// Generates history for characters
 	static void ResetCharacterHistory();		/// Removes generated history data from characters
+	
+	static std::vector<CCharacter *> Characters;
+	static std::map<std::string, CCharacter *> CharactersByIdent;
+	
+	~CCharacter();
 	
 	void ProcessConfigData(const CConfigData *config_data);
 	void GenerateHistory();
@@ -152,14 +154,14 @@ public:
 	CDate BirthDate;			/// Date in which the character was born
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
-	CCivilization *Civilization;	/// Culture to which the character belongs
-	CFaction *Faction;			/// Faction to which the character belongs
-	int Gender;					/// Character's gender
-	int Level;					/// Character's level
-	int ExperiencePercent;		/// Character's experience, as a percentage of the experience required to level up
-	bool ViolentDeath;			/// If historical death was violent
-	bool Custom;				/// Whether this character is a custom hero
-	bool Initialized;			/// Whether the character has already been initialized
+	CCivilization *Civilization = nullptr;	/// Culture to which the character belongs
+	CFaction *Faction = nullptr;	/// Faction to which the character belongs
+	int Gender = 0;				/// Character's gender
+	int Level = 0;				/// Character's level
+	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
+	bool ViolentDeath = false;	/// If historical death was violent
+	bool Custom = false;		/// Whether this character is a custom hero
+	bool Initialized = false;	/// Whether the character has already been initialized
 	std::string Ident;			/// Ident of the character
 	std::string Name;			/// Given name of the character
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
@@ -170,12 +172,12 @@ public:
 	std::string HairVariation;	/// Name of the character's hair variation
 	IconConfig Icon;					/// Character's icon
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
-	CUnitType *Type;
-	CUpgrade *Trait;
-	CDeity *Deity;						/// The deity which the character is (if it is a deity)
-	CCharacter *Father;					/// Character's father
-	CCharacter *Mother;					/// Character's mother
-	LuaCallback *Conditions;
+	CUnitType *Type = nullptr;
+	CUpgrade *Trait = nullptr;
+	CDeity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
+	CCharacter *Father = nullptr;		/// Character's father
+	CCharacter *Mother = nullptr;		/// Character's mother
+	LuaCallback *Conditions = nullptr;
 	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
@@ -203,7 +205,6 @@ public:
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern std::map<std::string, CCharacter *> Characters;
 extern std::map<std::string, CCharacter *> CustomHeroes;
 extern CCharacter *CurrentCustomHero;
 extern bool LoadingPersistentHeroes;
@@ -213,8 +214,6 @@ extern bool LoadingPersistentHeroes;
 ----------------------------------------------------------------------------*/
 
 extern int GetAttributeVariableIndex(int attribute);
-extern void CleanCharacters();
-extern CCharacter *GetCharacter(const std::string &character_ident);
 extern CCharacter *GetCustomHero(const std::string &hero_ident);
 extern void SaveHero(CCharacter *hero);
 extern void SaveHeroes();

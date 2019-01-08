@@ -148,7 +148,7 @@ static int CclDefineQuest(lua_State *l)
 			quest->Icon.Icon->Load();
 		} else if (!strcmp(value, "QuestGiver")) {
 			std::string quest_giver_name = TransliterateText(LuaToString(l, -1));
-			CCharacter *quest_giver = GetCharacter(quest_giver_name);
+			CCharacter *quest_giver = CCharacter::GetCharacter(quest_giver_name);
 			if (quest_giver) {
 				quest->QuestGiver = quest_giver;
 			} else {
@@ -234,7 +234,7 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->Upgrade = upgrade;
 					} else if (!strcmp(value, "character")) {
-						CCharacter *character = GetCharacter(LuaToString(l, -1, k + 1));
+						CCharacter *character = CCharacter::GetCharacter(LuaToString(l, -1, k + 1));
 						if (!character) {
 							LuaError(l, "Character doesn't exist.");
 						}
@@ -268,7 +268,7 @@ static int CclDefineQuest(lua_State *l)
 			quest->HeroesMustSurvive.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				CCharacter *hero = GetCharacter(LuaToString(l, -1, j + 1));
+				CCharacter *hero = CCharacter::GetCharacter(LuaToString(l, -1, j + 1));
 				if (!hero) {
 					LuaError(l, "Hero doesn't exist.");
 				}
@@ -647,7 +647,7 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Icon.Icon->Load();
 		} else if (!strcmp(value, "Character")) {
 			std::string character_name = TransliterateText(LuaToString(l, -1));
-			CCharacter *character = GetCharacter(character_name);
+			CCharacter *character = CCharacter::GetCharacter(character_name);
 			if (character) {
 				achievement->Character = character;
 			} else {

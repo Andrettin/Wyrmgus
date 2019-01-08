@@ -39,6 +39,7 @@
 #include "upgrade/depend.h"
 
 #include "age.h"
+#include "character.h"
 #include "config.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -114,6 +115,8 @@ void DependRule::ProcessConfigData(const CConfigData *config_data, const int rul
 								requirement_type = DependRuleUpgrade;
 							} else if (value == "age") {
 								requirement_type = DependRuleAge;
+							} else if (value == "character") {
+								requirement_type = DependRuleCharacter;
 							} else if (value == "season") {
 								requirement_type = DependRuleSeason;
 							} else if (value == "trigger") {
@@ -164,6 +167,8 @@ static intptr_t GetDependencyKeyForRule(const DependRule &rule)
 		dependency_key = (intptr_t) rule.Kind.Upgrade;
 	} else if (rule.Type == DependRuleAge) {
 		dependency_key = (intptr_t) rule.Kind.Age;
+	} else if (rule.Type == DependRuleCharacter) {
+		dependency_key = (intptr_t) rule.Kind.Character;
 	} else if (rule.Type == DependRuleSeason) {
 		dependency_key = (intptr_t) rule.Kind.Season;
 	} else if (rule.Type == DependRuleTrigger) {
@@ -227,6 +232,8 @@ void AddDependency(const int rule_type, const std::string &target, const int req
 		}
 	} else if (rule.Type == DependRuleAge) {
 		rule.Kind.Age = CAge::GetAge(target);
+	} else if (rule.Type == DependRuleCharacter) {
+		rule.Kind.Character = CCharacter::GetCharacter(target);
 	} else if (rule.Type == DependRuleSeason) {
 		rule.Kind.Season = CSeason::GetSeason(target);
 	} else if (rule.Type == DependRuleTrigger) {
@@ -289,6 +296,8 @@ void AddDependency(const int rule_type, const std::string &target, const int req
 		}
 	} else if (temp->Type == DependRuleAge) {
 		temp->Kind.Age = CAge::GetAge(required);
+	} else if (temp->Type == DependRuleCharacter) {
+		temp->Kind.Character = CCharacter::GetCharacter(required);
 	} else if (temp->Type == DependRuleSeason) {
 		temp->Kind.Season = CSeason::GetSeason(required);
 	} else if (temp->Type == DependRuleTrigger) {
@@ -365,6 +374,12 @@ static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool igno
 						goto try_or;
 					}
 					break;
+				case DependRuleCharacter:
+					i = player.HasHero(temp->Kind.Character);
+					if (temp->Count ? i : !i) {
+						goto try_or;
+					}
+					break;
 				case DependRuleSeason:
 					i = Map.MapLayers[player.StartMapLayer]->GetSeason() != temp->Kind.Season;
 					if (temp->Count ? i : !i) {
@@ -434,6 +449,12 @@ static bool CheckDependByRule(const CUnit &unit, DependRule &rule, bool ignore_u
 					break;
 				case DependRuleAge:
 					i = unit.Player->Age != temp->Kind.Age;
+					if (temp->Count ? i : !i) {
+						goto try_or;
+					}
+					break;
+				case DependRuleCharacter:
+					i = unit.Character == temp->Kind.Character;
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}
@@ -609,6 +630,12 @@ bool CheckDependByIdent(const CPlayer &player, const int rule_type, const std::s
 		if (!rule.Kind.Age) {
 			return false;
 		}
+	} else if (rule.Type == DependRuleCharacter) {
+		rule.Kind.Character = CCharacter::GetCharacter(target);
+		
+		if (!rule.Kind.Character) {
+			return false;
+		}
 	} else if (rule.Type == DependRuleSeason) {
 		rule.Kind.Season = CSeason::GetSeason(target);
 		
@@ -622,7 +649,7 @@ bool CheckDependByIdent(const CPlayer &player, const int rule_type, const std::s
 			return false;
 		}
 	} else {
-		DebugPrint("target '%s' should be unit-type, upgrade, age, season or trigger\n" _C_ target.c_str());
+		DebugPrint("target '%s' should be unit-type, upgrade, age, character, season or trigger\n" _C_ target.c_str());
 		return false;
 	}
 
@@ -675,6 +702,12 @@ bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::strin
 		if (!rule.Kind.Age) {
 			return false;
 		}
+	} else if (rule.Type == DependRuleCharacter) {
+		rule.Kind.Character = CCharacter::GetCharacter(target);
+		
+		if (!rule.Kind.Character) {
+			return false;
+		}
 	} else if (rule.Type == DependRuleSeason) {
 		rule.Kind.Season = CSeason::GetSeason(target);
 		
@@ -688,7 +721,7 @@ bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::strin
 			return false;
 		}
 	} else {
-		DebugPrint("target '%s' should be unit-type, upgrade, age, season or trigger\n" _C_ target.c_str());
+		DebugPrint("target '%s' should be unit-type, upgrade, age, character, season or trigger\n" _C_ target.c_str());
 		return false;
 	}
 	return CheckDependByRule(unit, rule, ignore_units, is_predependency);

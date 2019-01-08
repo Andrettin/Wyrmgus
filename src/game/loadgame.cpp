@@ -121,9 +121,7 @@ void CleanModules()
 	PlayerRaces.Clean();
 	CAge::ClearAges();
 	CCalendar::ClearCalendars();
-	//Wyrmgus start
-	CleanCharacters();
-	//Wyrmgus end
+	CCharacter::ClearCharacters();
 	CCivilization::ClearCivilizations();
 	CleanConstructions();
 	CCurrency::ClearCurrencies();

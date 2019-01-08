@@ -1506,25 +1506,23 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 	}
 	
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-		CCharacter *hero = iterator->second;
-		
-		if (!hero->CanAppear()) {
+	for (CCharacter *character : CCharacter::Characters) {
+		if (!character->CanAppear()) {
 			continue;
 		}
 		
-		if (hero->Faction == nullptr && !hero->Type->BoolFlag[FAUNA_INDEX].value) { //only fauna "heroes" may have no faction
+		if (character->Faction == nullptr && !character->Type->BoolFlag[FAUNA_INDEX].value) { //only fauna "heroes" may have no faction
 			continue;
 		}
 		
-		if (hero->StartDate.Year == 0 || !CurrentCampaign->StartDate.ContainsDate(hero->StartDate) || CurrentCampaign->StartDate.ContainsDate(hero->DeathDate)) { //contrary to other elements, heroes aren't implemented if their date isn't set
+		if (character->StartDate.Year == 0 || !CurrentCampaign->StartDate.ContainsDate(character->StartDate) || CurrentCampaign->StartDate.ContainsDate(character->DeathDate)) { //contrary to other elements, heroes aren't implemented if their date isn't set
 			continue;
 		}
 		
-		CFaction *hero_faction = hero->Faction;
-		for (int i = ((int) hero->HistoricalFactions.size() - 1); i >= 0; --i) {
-			if (CurrentCampaign->StartDate.ContainsDate(hero->HistoricalFactions[i].first)) {
-				hero_faction = hero->HistoricalFactions[i].second;
+		CFaction *hero_faction = character->Faction;
+		for (int i = ((int) character->HistoricalFactions.size() - 1); i >= 0; --i) {
+			if (CurrentCampaign->StartDate.ContainsDate(character->HistoricalFactions[i].first)) {
+				hero_faction = character->HistoricalFactions[i].second;
 				break;
 			}
 		}
@@ -1532,7 +1530,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		CPlayer *hero_player = hero_faction ? GetFactionPlayer(hero_faction) : nullptr;
 		
 		bool in_another_map_template = false;
-		Vec2i hero_pos = this->GetBestLocationMapPosition(hero->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, false);
+		Vec2i hero_pos = this->GetBestLocationMapPosition(character->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, false);
 		
 		if (in_another_map_template) {
 			continue;
@@ -1543,7 +1541,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 				continue;
 			}
 			
-			hero_pos = this->GetBestLocationMapPosition(hero->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, true);
+			hero_pos = this->GetBestLocationMapPosition(character->HistoricalLocations, in_another_map_template, template_start_pos, map_start_pos, true);
 			
 			if ((hero_pos.x == -1 || hero_pos.y == -1) && hero_player && hero_player->StartMapLayer == z) {
 				hero_pos = hero_player->StartPos;
@@ -1569,10 +1567,10 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		} else {
 			hero_player = &Players[PlayerNumNeutral];
 		}
-		CUnit *unit = CreateUnit(hero_pos - hero->Type->GetTileCenterPosOffset(), *hero->Type, hero_player, z);
-		unit->SetCharacter(hero->Ident);
+		CUnit *unit = CreateUnit(hero_pos - character->Type->GetTileCenterPosOffset(), *character->Type, hero_player, z);
+		unit->SetCharacter(character->Ident);
 		unit->Active = 0;
-		hero_player->ChangeUnitTypeAiActiveCount(hero->Type, -1);
+		hero_player->ChangeUnitTypeAiActiveCount(character->Type, -1);
 	}
 }
 
