@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name trigger.h - The game trigger header file. */
+/**@name trigger.h - The trigger header file. */
 //
 //      (c) Copyright 2002-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -41,8 +41,10 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CConfigData;
 class CFaction;
 class CFile;
+class CPlayer;
 class CUnit;
 class CUnitType;
 class CUpgrade;
@@ -55,9 +57,6 @@ struct lua_State;
 class CTimer
 {
 public:
-	CTimer() : Init(false), Running(false), Increasing(false), Cycles(0),
-		LastUpdate(0) {}
-
 	void Reset()
 	{
 		Init = false;
@@ -67,19 +66,45 @@ public:
 		LastUpdate = 0;
 	}
 
-	bool Init;                  /// timer is initialized
-	bool Running;               /// timer is running
-	bool Increasing;            /// increasing or decreasing
-	long Cycles;                /// current value in game cycles
-	unsigned long LastUpdate;   /// GameCycle of last update
+	bool Init = false;				/// timer is initialized
+	bool Running = false;			/// timer is running
+	bool Increasing = false;		/// increasing or decreasing
+	long Cycles = 0;				/// current value in game cycles
+	unsigned long LastUpdate = 0;	/// GameCycle of last update
+};
+
+/// The effect which occurs after triggering a trigger
+class CTriggerEffect
+{
+public:
+	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
+	virtual void Do(CPlayer *player) const = 0;			/// Performs the trigger effect
+};
+
+/// The create unit trigger effect
+class CCreateUnitTriggerEffect : public CTriggerEffect
+{
+public:
+	virtual void ProcessConfigData(const CConfigData *config_data);
+	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
+	
+	int Quantity = 1;				/// Quantity of units created
+	CUnitType *UnitType = nullptr;	/// Unit type to be created
 };
 
 class CTrigger
 {
 public:
+	enum class TriggerType
+	{
+		GlobalTrigger = 0, //checked once
+		PlayerTrigger //checked for each player
+	};
+
 	static CTrigger *GetTrigger(const std::string &ident, const bool should_find = true);
 	static CTrigger *GetOrAddTrigger(const std::string &ident);
 	static void ClearTriggers();		/// Cleanup the trigger module
+	static void InitActiveTriggers();	/// Setup triggers
 	static void ClearActiveTriggers();
 
 	static std::vector<CTrigger *> Triggers;
@@ -90,16 +115,21 @@ public:
 
 	~CTrigger();
 	
+	void ProcessConfigData(const CConfigData *config_data);
+	
 	std::string Ident;
+	TriggerType Type = TriggerType::GlobalTrigger;
 	bool Local = false;
+	bool OnlyOnce = false;				/// Whether the trigger should occur only once in a game
+	bool CampaignOnly = false;			/// Whether the trigger should only occur in the campaign mode
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *Effects = nullptr;
+	std::vector<CTriggerEffect *> TriggerEffects;
 };
 
 #define ANY_UNIT ((const CUnitType *)0)
 #define ALL_FOODUNITS ((const CUnitType *)-1)
 #define ALL_BUILDINGS ((const CUnitType *)-2)
-
 
 /**
 **  Data to referer game info when game running.
@@ -138,6 +168,5 @@ extern void TriggersEachCycle();    /// test triggers
 
 extern void TriggerCclRegister();   /// Register ccl features
 extern void SaveTriggers(CFile &file); /// Save the trigger module
-extern void InitTriggers();         /// Setup triggers
 
 #endif

@@ -2470,7 +2470,7 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	Assert(unit.Player == this);
 	//Wyrmgus start
 	if (unit.PlayerSlot == -1 || this->Units[unit.PlayerSlot] != &unit) {
-		fprintf(stderr, "Error in CPlayer::RemoveUnit: the unit's PlayerSlot doesn't match its position in the player's units array; Unit's PlayerSlot: %lu, Unit Type: \"%s\".\n", unit.PlayerSlot, unit.Type ? unit.Type->Ident.c_str() : "");
+		fprintf(stderr, "Error in CPlayer::RemoveUnit: the unit's PlayerSlot doesn't match its position in the player's units array; Unit's PlayerSlot: %d, Unit Type: \"%s\".\n", unit.PlayerSlot, unit.Type ? unit.Type->Ident.c_str() : "");
 		return;
 	}
 	//Wyrmgus end

@@ -35,6 +35,7 @@
 
 #include "trigger.h"
 
+#include "config.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "luacallback.h"
@@ -50,6 +51,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
+#include "upgrade/depend.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -596,6 +598,7 @@ void TriggersEachCycle()
 
 		bool removed_trigger = false;
 		
+		//old Lua conditions/effects for triggers
 		if (current_trigger->Conditions && current_trigger->Effects) {
 			current_trigger->Conditions->pushPreamble();
 			current_trigger->Conditions->run(1);
@@ -605,10 +608,46 @@ void TriggersEachCycle()
 				if (current_trigger->Effects->popBoolean() == false) {
 					CTrigger::DeactivatedTriggers.push_back(current_trigger->Ident);
 					CTrigger::ActiveTriggers.erase(CTrigger::ActiveTriggers.begin() + CTrigger::CurrentTriggerId);
+					removed_trigger = true;
 					if (current_trigger->Local) {
 						delete current_trigger;
-						removed_trigger = true;
 					}
+				}
+			}
+		}
+		
+		if (!current_trigger->TriggerEffects.empty()) {
+			bool triggered = false;
+			
+			if (current_trigger->Type == CTrigger::TriggerType::GlobalTrigger) {
+				if (CheckDependByIdent(Players[PlayerNumNeutral], DependRuleTrigger, current_trigger->Ident)) {
+					triggered = true;
+					for (CTriggerEffect *trigger_effect : current_trigger->TriggerEffects) {
+						trigger_effect->Do(&Players[PlayerNumNeutral]);
+					}
+				}
+			} else if (current_trigger->Type == CTrigger::TriggerType::PlayerTrigger) {
+				for (int i = 0; i < PlayerNumNeutral; ++i) {
+					CPlayer *player = &Players[i];
+					if (player->Type == PlayerNobody) {
+						continue;
+					}
+					if (!CheckDependByIdent(*player, DependRuleTrigger, current_trigger->Ident)) {
+						continue;
+					}
+					triggered = true;
+					for (CTriggerEffect *trigger_effect : current_trigger->TriggerEffects) {
+						trigger_effect->Do(player);
+					}
+				}
+			}
+			
+			if (triggered && current_trigger->OnlyOnce) {
+				CTrigger::DeactivatedTriggers.push_back(current_trigger->Ident);
+				CTrigger::ActiveTriggers.erase(CTrigger::ActiveTriggers.begin() + CTrigger::CurrentTriggerId);
+				removed_trigger = true;
+				if (current_trigger->Local) {
+					delete current_trigger;
 				}
 			}
 		}
@@ -665,6 +704,32 @@ void CTrigger::ClearTriggers()
 	CTrigger::TriggersByIdent.clear();
 }
 
+/**
+**	Initialize the trigger module.
+*/
+void CTrigger::InitActiveTriggers()
+{
+	// Setup default triggers
+
+	// FIXME: choose the triggers for game type
+
+	lua_getglobal(Lua, "_triggers_");
+	if (lua_isnil(Lua, -1)) {
+		lua_getglobal(Lua, "SinglePlayerTriggers");
+		LuaCall(0, 1);
+	}
+	lua_pop(Lua, 1);
+	
+	for (CTrigger *trigger : CTrigger::Triggers) {
+		if (std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), trigger->Ident) != CTrigger::DeactivatedTriggers.end()) {
+			continue;
+		}
+		if (trigger->CampaignOnly && CurrentCampaign == nullptr) {
+		}
+		CTrigger::ActiveTriggers.push_back(trigger);
+	}
+}
+
 void CTrigger::ClearActiveTriggers()
 {
 	lua_pushnil(Lua);
@@ -701,6 +766,58 @@ CTrigger::~CTrigger()
 	
 	if (this->Effects) {
 		delete this->Effects;
+	}
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CTrigger::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "type") {
+			if (value == "global_trigger") {
+				this->Type = TriggerType::GlobalTrigger;
+			} else if (value == "player_trigger") {
+				this->Type = TriggerType::PlayerTrigger;
+			} else {
+				fprintf(stderr, "Invalid trigger type: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "only_once") {
+			this->OnlyOnce = StringToBool(value);
+		} else if (key == "campaign_only") {
+			this->CampaignOnly = StringToBool(value);
+		} else {
+			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (const CConfigData *child_config_data : config_data->Children) {
+		if (child_config_data->Tag == "effects") {
+			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
+				CTriggerEffect *trigger_effect = nullptr;
+				
+				if (grandchild_config_data->Tag == "create_unit") {
+					trigger_effect = new CCreateUnitTriggerEffect;
+				} else {
+					fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", grandchild_config_data->Tag.c_str());
+				}
+				
+				trigger_effect->ProcessConfigData(grandchild_config_data);
+				this->TriggerEffects.push_back(trigger_effect);
+			}
+		} else if (child_config_data->Tag == "dependency" || child_config_data->Tag == "predependency") {
+			std::string target = config_data->Ident;
+			target = FindAndReplaceString(target, "_", "-");
+			DependRule::ProcessConfigData(child_config_data, DependRuleTrigger, target);
+		} else {
+			fprintf(stderr, "Invalid trigger property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
 	}
 }
 
@@ -761,18 +878,37 @@ void SaveTriggers(CFile &file)
 }
 
 /**
-**  Initialize the trigger module.
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
 */
-void InitTriggers()
+void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 {
-	// Setup default triggers
-
-	// FIXME: choose the triggers for game type
-
-	lua_getglobal(Lua, "_triggers_");
-	if (lua_isnil(Lua, -1)) {
-		lua_getglobal(Lua, "SinglePlayerTriggers");
-		LuaCall(0, 1);
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "quantity") {
+			this->Quantity = std::stoi(value);
+		} else if (key == "unit_type") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUnitType *unit_type = UnitTypeByIdent(value);
+			if (unit_type) {
+				this->UnitType = unit_type;
+			} else {
+				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
+			}
+		} else {
+			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
+		}
 	}
-	lua_pop(Lua, 1);
+	
+	if (!this->UnitType) {
+		fprintf(stderr, "Create unit trigger effect has no unit type.\n");
+	}
+}
+
+void CCreateUnitTriggerEffect::Do(CPlayer *player) const
+{
+	CUnit *unit = MakeUnitAndPlace(player->StartPos, *this->UnitType, player, player->StartMapLayer);
 }

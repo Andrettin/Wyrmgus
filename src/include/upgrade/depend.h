@@ -94,16 +94,18 @@ class CAge;
 class CConfigData;
 class CPlayer;
 class CSeason;
+class CTrigger;
 class CUnitType;
 class CUnit;
 class CUpgrade;
 class ButtonAction;
 
 enum {
-	DependRuleUnitType,		/// Kind is an unit-type
+	DependRuleUnitType,		/// Kind is a unit-type
 	DependRuleUpgrade,		/// Kind is an upgrade
 	DependRuleAge,			/// Kind is an age
-	DependRuleSeason		/// Kind is a season
+	DependRuleSeason,		/// Kind is a season
+	DependRuleTrigger		/// Kind is a trigger
 };
 
 /// Dependency rule
@@ -120,6 +122,7 @@ public:
 		const CUpgrade  *Upgrade;	/// upgrade pointer
 		const CAge *Age;			/// age pointer
 		const CSeason *Season;		/// season pointer
+		const CTrigger *Trigger;	/// trigger pointer
 	} Kind;						/// required object
 	DependRule *Rule;			/// requirements, and rule
 };

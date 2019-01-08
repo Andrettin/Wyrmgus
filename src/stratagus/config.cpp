@@ -60,6 +60,7 @@
 #include "time/time_of_day.h"
 #include "time/time_of_day_schedule.h"
 #include "time/timeline.h"
+#include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "unit/historical_unit.h"
@@ -378,6 +379,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CTimeOfDaySchedule *time_of_day_schedule = CTimeOfDaySchedule::GetOrAddTimeOfDaySchedule(ident);
 			if (!define_only) {
 				time_of_day_schedule->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "trigger") {
+			CTrigger *trigger = CTrigger::GetOrAddTrigger(ident);
+			if (!define_only) {
+				trigger->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "unit_type") {
 			CUnitType *unit_type = UnitTypeByIdent(ident);

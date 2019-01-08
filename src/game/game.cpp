@@ -1855,7 +1855,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//
 	// Triggers
 	//
-	InitTriggers();
+	CTrigger::InitActiveTriggers();
 	
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 

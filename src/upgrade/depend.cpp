@@ -116,6 +116,8 @@ void DependRule::ProcessConfigData(const CConfigData *config_data, const int rul
 								requirement_type = DependRuleAge;
 							} else if (value == "season") {
 								requirement_type = DependRuleSeason;
+							} else if (value == "trigger") {
+								requirement_type = DependRuleTrigger;
 							}
 						} else if (key == "count") {
 							count = std::stoi(value);
@@ -164,6 +166,8 @@ static intptr_t GetDependencyKeyForRule(const DependRule &rule)
 		dependency_key = (intptr_t) rule.Kind.Age;
 	} else if (rule.Type == DependRuleSeason) {
 		dependency_key = (intptr_t) rule.Kind.Season;
+	} else if (rule.Type == DependRuleTrigger) {
+		dependency_key = (intptr_t) rule.Kind.Trigger;
 	} else {
 		fprintf(stderr, "Invalid rule type for dependency rule: %d.\n", rule.Type);
 		return (intptr_t) nullptr;
@@ -225,6 +229,8 @@ void AddDependency(const int rule_type, const std::string &target, const int req
 		rule.Kind.Age = CAge::GetAge(target);
 	} else if (rule.Type == DependRuleSeason) {
 		rule.Kind.Season = CSeason::GetSeason(target);
+	} else if (rule.Type == DependRuleTrigger) {
+		rule.Kind.Trigger = CTrigger::GetTrigger(target);
 	} else {
 		fprintf(stderr, "Invalid rule type for dependency target \"%s\": %d.\n", target.c_str(), rule.Type);
 		return;
@@ -285,6 +291,8 @@ void AddDependency(const int rule_type, const std::string &target, const int req
 		temp->Kind.Age = CAge::GetAge(required);
 	} else if (temp->Type == DependRuleSeason) {
 		temp->Kind.Season = CSeason::GetSeason(required);
+	} else if (temp->Type == DependRuleTrigger) {
+		temp->Kind.Trigger = CTrigger::GetTrigger(required);
 	} else {
 		fprintf(stderr, "Invalid rule type for dependency requirement \"%s\": %d\n", required.c_str(), temp->Type);
 		delete temp;
@@ -363,6 +371,12 @@ static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool igno
 						goto try_or;
 					}
 					break;
+				case DependRuleTrigger:
+					i = std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), temp->Kind.Trigger->Ident) != CTrigger::DeactivatedTriggers.end(); //this works fine for global triggers, but for player triggers perhaps it should check only the player?
+					if (temp->Count ? i : !i) {
+						goto try_or;
+					}
+					break;
 			}
 			temp = temp->Rule;
 		}
@@ -426,6 +440,12 @@ static bool CheckDependByRule(const CUnit &unit, DependRule &rule, bool ignore_u
 					break;
 				case DependRuleSeason:
 					i = unit.MapLayer->GetSeason() != temp->Kind.Season;
+					if (temp->Count ? i : !i) {
+						goto try_or;
+					}
+					break;
+				case DependRuleTrigger:
+					i = std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), temp->Kind.Trigger->Ident) != CTrigger::DeactivatedTriggers.end(); //this works fine for global triggers, but for player triggers perhaps it should check only the unit's player?
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}
@@ -595,8 +615,14 @@ bool CheckDependByIdent(const CPlayer &player, const int rule_type, const std::s
 		if (!rule.Kind.Season) {
 			return false;
 		}
+	} else if (rule.Type == DependRuleTrigger) {
+		rule.Kind.Trigger = CTrigger::GetTrigger(target);
+		
+		if (!rule.Kind.Trigger) {
+			return false;
+		}
 	} else {
-		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
+		DebugPrint("target '%s' should be unit-type, upgrade, age, season or trigger\n" _C_ target.c_str());
 		return false;
 	}
 
@@ -655,8 +681,14 @@ bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::strin
 		if (!rule.Kind.Season) {
 			return false;
 		}
+	} else if (rule.Type == DependRuleTrigger) {
+		rule.Kind.Trigger = CTrigger::GetTrigger(target);
+		
+		if (!rule.Kind.Trigger) {
+			return false;
+		}
 	} else {
-		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
+		DebugPrint("target '%s' should be unit-type, upgrade, age, season or trigger\n" _C_ target.c_str());
 		return false;
 	}
 	return CheckDependByRule(unit, rule, ignore_units, is_predependency);

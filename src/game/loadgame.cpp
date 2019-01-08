@@ -204,7 +204,7 @@ void InitModules()
 	InitDependencies();
 
 	InitButtons();
-	InitTriggers();
+	CTrigger::InitActiveTriggers();
 
 	InitAiModule();
 
