@@ -36,12 +36,47 @@
 #include "trigger_effect.h"
 
 #include "config.h"
+#include "quest.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "dialogue") {
+			value = FindAndReplaceString(value, "_", "-");
+			CDialogue *dialogue = GetDialogue(value);
+			if (dialogue) {
+				this->Dialogue = dialogue;
+			} else {
+				fprintf(stderr, "Invalid dialogue: \"%s\".\n", value.c_str());
+			}
+		} else {
+			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	if (!this->Dialogue) {
+		fprintf(stderr, "Call dialogue trigger effect has no dialogue.\n");
+	}
+}
+
+void CCallDialogueTriggerEffect::Do(CPlayer *player) const
+{
+	this->Dialogue->Call(player->Index);
+}
 
 /**
 **	@brief	Process data provided by a configuration file

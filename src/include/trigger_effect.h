@@ -39,6 +39,7 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
+class CDialogue;
 class CPlayer;
 class CUnitType;
 
@@ -48,6 +49,16 @@ class CTriggerEffect
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
 	virtual void Do(CPlayer *player) const = 0;			/// Performs the trigger effect
+};
+
+/// The call dialogue trigger effect
+class CCallDialogueTriggerEffect : public CTriggerEffect
+{
+public:
+	virtual void ProcessConfigData(const CConfigData *config_data);
+	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
+	
+	CDialogue *Dialogue = nullptr;	/// Dialogue to be called
 };
 
 /// The create unit trigger effect

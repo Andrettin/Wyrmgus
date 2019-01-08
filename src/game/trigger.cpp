@@ -803,7 +803,9 @@ void CTrigger::ProcessConfigData(const CConfigData *config_data)
 			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
 				CTriggerEffect *trigger_effect = nullptr;
 				
-				if (grandchild_config_data->Tag == "create_unit") {
+				if (grandchild_config_data->Tag == "call_dialogue") {
+					trigger_effect = new CCallDialogueTriggerEffect;
+				} else if (grandchild_config_data->Tag == "create_unit") {
 					trigger_effect = new CCreateUnitTriggerEffect;
 				} else {
 					fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", grandchild_config_data->Tag.c_str());
