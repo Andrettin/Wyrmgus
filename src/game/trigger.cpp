@@ -640,6 +640,9 @@ void TriggersEachCycle()
 					for (CTriggerEffect *trigger_effect : current_trigger->TriggerEffects) {
 						trigger_effect->Do(player);
 					}
+					if (current_trigger->OnlyOnce) {
+						break;
+					}
 				}
 			}
 			
