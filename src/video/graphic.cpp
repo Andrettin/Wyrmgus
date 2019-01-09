@@ -1722,16 +1722,7 @@ void ReloadGraphics()
 			color_modifications.push_back(iterator->first);
 		}
 		(*i)->TextureColorModifications.clear();
-		
-		/*
-		for (size_t c = 0; c < color_modifications.size(); ++c) {
-			MakeTexture(*i, color_modifications[c]);
-		}
-		*/
-		for (size_t t = 0; t < CTimeOfDay::TimesOfDay.size(); ++t) {
-			MakeTexture(*i, CTimeOfDay::TimesOfDay[t]);
-		}
-		
+				
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
 		if (cg) {
 			for (std::map<int, std::map<CColor, GLuint *>>::iterator iterator = cg->PlayerColorTextureColorModifications.begin(); iterator != cg->PlayerColorTextureColorModifications.end(); ++iterator) {
@@ -1747,10 +1738,6 @@ void ReloadGraphics()
 					delete[] cg->PlayerColorTextures[j];
 					cg->PlayerColorTextures[j] = nullptr;
 					MakePlayerColorTexture(cg, j, nullptr);
-				}
-				
-				for (size_t t = 0; t < CTimeOfDay::TimesOfDay.size(); ++t) {
-					MakePlayerColorTexture(cg, j, CTimeOfDay::TimesOfDay[t]);
 				}
 			}
 		}
