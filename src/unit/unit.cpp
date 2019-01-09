@@ -1549,6 +1549,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 			|| i == AIRRESISTANCE_INDEX || i == EARTHRESISTANCE_INDEX || i == WATERRESISTANCE_INDEX || i == ACIDRESISTANCE_INDEX
 			|| i == HACKRESISTANCE_INDEX || i == PIERCERESISTANCE_INDEX || i == BLUNTRESISTANCE_INDEX
 			|| i == ACCURACY_INDEX || i == EVASION_INDEX || i == SPEED_INDEX || i == CHARGEBONUS_INDEX || i == BACKSTAB_INDEX
+			|| i == ATTACKRANGE_INDEX
 		) {
 			Variable[i].Value += item.Variable[i].Value;
 			Variable[i].Max += item.Variable[i].Max;
@@ -1585,6 +1586,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 			|| i == AIRRESISTANCE_INDEX || i == EARTHRESISTANCE_INDEX || i == WATERRESISTANCE_INDEX || i == ACIDRESISTANCE_INDEX
 			|| i == HACKRESISTANCE_INDEX || i == PIERCERESISTANCE_INDEX || i == BLUNTRESISTANCE_INDEX
 			|| i == ACCURACY_INDEX || i == EVASION_INDEX || i == SPEED_INDEX || i == CHARGEBONUS_INDEX || i == BACKSTAB_INDEX
+			|| i == ATTACKRANGE_INDEX
 		) {
 			Variable[i].Value -= item.Variable[i].Value;
 			Variable[i].Max -= item.Variable[i].Max;
@@ -6623,10 +6625,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 
 	const int d = unit.MapDistanceTo(dest);
 
-	//Wyrmgus start
-//	if (d <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max && d >= type.MinAttackRange) {
 	if (d <= unit.GetModifiedVariable(ATTACKRANGE_INDEX) && d >= type.MinAttackRange) {
-	//Wyrmgus end
 		cost += d * INRANGE_FACTOR;
 		cost -= INRANGE_BONUS;
 	} else {

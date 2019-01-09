@@ -123,10 +123,7 @@
 	Vec2i destTilePos = Map.MapPixelPosToTilePos(dest, unit.MapLayer->ID);
 	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer->ID);
 	if ((flags & SM_Ranged) && !(flags & SM_Pixel)
-		//Wyrmgus start
-//		&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
 		&& dist > goal->GetModifiedVariable(ATTACKRANGE_INDEX)
-		//Wyrmgus end
 		&& dist < goal->Type->MinAttackRange) {
 	} else {
 		Missile *missile = MakeMissile(*mtype, start, dest, unit.MapLayer->ID);
