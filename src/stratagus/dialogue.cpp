@@ -97,7 +97,7 @@ CDialogue::~CDialogue()
 
 void CDialogue::Call(const int player) const
 {
-	if (!this->Nodes.empty()) {
+	if (this->Nodes.empty()) {
 		return;
 	}
 	
