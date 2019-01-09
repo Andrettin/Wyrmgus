@@ -285,6 +285,22 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "ability") {
 			this->Ability = StringToBool(value);
+		} else if (key == "weapon") {
+			this->Weapon = StringToBool(value);
+		} else if (key == "shield") {
+			this->Shield = StringToBool(value);
+		} else if (key == "boots") {
+			this->Boots = StringToBool(value);
+		} else if (key == "arrows") {
+			this->Arrows = StringToBool(value);
+		} else if (key == "item") {
+			value = FindAndReplaceString(value, "_", "-");
+			CUnitType *item = UnitTypeByIdent(value);
+			if (item != nullptr) {
+				this->Item = item;
+			} else {
+				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+			}
 		} else if (key == "description") {
 			this->Description = value;
 		} else if (key == "quote") {
