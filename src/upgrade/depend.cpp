@@ -375,7 +375,7 @@ static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool igno
 					}
 					break;
 				case DependRuleCharacter:
-					i = player.HasHero(temp->Kind.Character);
+					i = !player.HasHero(temp->Kind.Character);
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}
@@ -454,7 +454,7 @@ static bool CheckDependByRule(const CUnit &unit, DependRule &rule, bool ignore_u
 					}
 					break;
 				case DependRuleCharacter:
-					i = unit.Character == temp->Kind.Character;
+					i = unit.Character != temp->Kind.Character;
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}
