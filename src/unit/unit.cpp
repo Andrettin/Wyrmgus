@@ -1304,7 +1304,7 @@ void CUnit::ChooseButtonIcon(int button_action)
 			return;
 		}
 		
-		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon != nullptr) {
+		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->Type->ItemClass != BowItemClass && this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon;
 			return;
 		}
@@ -1353,7 +1353,7 @@ void CUnit::ChooseButtonIcon(int button_action)
 		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->Slot] == 'X') {
 			if (
 				(
-					(button_action == ButtonAttack && (upgrade->Weapon || upgrade->Arrows))
+					(button_action == ButtonAttack && ((upgrade->Weapon && upgrade->Item->ItemClass != BowItemClass) || upgrade->Arrows))
 					|| (button_action == ButtonStop && upgrade->Shield)
 					|| (button_action == ButtonMove && upgrade->Boots)
 				)
