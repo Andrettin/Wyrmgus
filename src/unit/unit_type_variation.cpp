@@ -35,6 +35,13 @@
 
 #include "unit/unit_type_variation.h"
 
+#include "animation.h"
+#include "config.h"
+#include "construct.h"
+#include "map/terrain_type.h"
+#include "mod.h"
+#include "time/season.h"
+#include "ui/button_action.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -63,6 +70,266 @@ CUnitTypeVariation::~CUnitTypeVariation()
 		}
 		if (this->SpriteWhenEmpty[res]) {
 			CGraphic::Free(this->SpriteWhenEmpty[res]);
+		}
+	}
+}
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "variation_id") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->VariationId = value;
+		} else if (key == "layer") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->ImageLayer = GetImageLayerIdByName(value);
+			if (this->ImageLayer == -1) {
+				fprintf(stderr, "Invalid image layer: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "type_name") {
+			this->TypeName = value;
+		} else if (key == "file") {
+			this->File = CMod::GetCurrentModPath() + value;
+		} else if (key == "shadow_file") {
+			this->ShadowFile = CMod::GetCurrentModPath() + value;
+		} else if (key == "light_file") {
+			this->LightFile = CMod::GetCurrentModPath() + value;
+		} else if (key == "frame_width") {
+			this->FrameWidth = std::stoi(value);
+		} else if (key == "frame_height") {
+			this->FrameHeight = std::stoi(value);
+		} else if (key == "icon") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Icon.Name = value;
+			this->Icon.Icon = nullptr;
+			this->Icon.Load();
+			this->Icon.Icon->Load();
+		} else if (key == "animations") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Animations = AnimationsByIdent(value);
+			if (!this->Animations) {
+				fprintf(stderr, "Invalid animations: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "construction") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Construction = ConstructionByIdent(value);
+			if (!this->Construction) {
+				fprintf(stderr, "Invalid construction: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "required_upgrade") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade != nullptr) {
+				this->UpgradesRequired.push_back(upgrade);
+			} else {
+				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "forbidden_upgrade") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CUpgrade *upgrade = CUpgrade::Get(value);
+			if (upgrade != nullptr) {
+				this->UpgradesForbidden.push_back(upgrade);
+			} else {
+				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "item_class_equipped") {
+			value = FindAndReplaceString(value, "_", "-");
+			const int item_class = GetItemClassIdByName(value);
+			if (item_class != -1) {
+				this->ItemClassesEquipped.push_back(item_class);
+			} else {
+				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "item_class_not_equipped") {
+			value = FindAndReplaceString(value, "_", "-");
+			const int item_class = GetItemClassIdByName(value);
+			if (item_class != -1) {
+				this->ItemClassesNotEquipped.push_back(item_class);
+			} else {
+				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "item_equipped") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CUnitType *unit_type = UnitTypeByIdent(value);
+			if (unit_type != nullptr) {
+				this->ItemsEquipped.push_back(unit_type);
+			} else {
+				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "item_not_equipped") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CUnitType *unit_type = UnitTypeByIdent(value);
+			if (unit_type != nullptr) {
+				this->ItemsNotEquipped.push_back(unit_type);
+			} else {
+				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+			}
+		} else if (key == "terrain") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+			if (terrain_type != nullptr) {
+				this->Terrains.push_back(terrain_type);
+			}
+		} else if (key == "forbidden_terrain") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+			if (terrain_type != nullptr) {
+				this->TerrainsForbidden.push_back(terrain_type);
+			}
+		} else if (key == "season") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CSeason *season = CSeason::GetSeason(value);
+			if (season != nullptr) {
+				this->Seasons.push_back(season);
+			}
+		} else if (key == "forbidden_season") {
+			value = FindAndReplaceString(value, "_", "-");
+			const CSeason *season = CSeason::GetSeason(value);
+			if (season != nullptr) {
+				this->ForbiddenSeasons.push_back(season);
+			}
+		} else if (key == "resource_min") {
+			this->ResourceMin = std::stoi(value);
+		} else if (key == "resource_max") {
+			this->ResourceMax = std::stoi(value);
+		} else if (key == "weight") {
+			this->Weight = std::stoi(value);
+		} else {
+			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	for (const CConfigData *child_config_data : config_data->Children) {
+		if (child_config_data->Tag == "file_when_loaded") {
+			std::string file;
+			int resource = -1;
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "file") {
+					file = CMod::GetCurrentModPath() + value;
+				} else if (key == "resource") {
+					value = FindAndReplaceString(value, "_", "-");
+					resource = GetResourceIdByName(value.c_str());
+				} else {
+					fprintf(stderr, "Invalid unit type variation file when loaded property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (file.empty()) {
+				fprintf(stderr, "Unit type variation file when loaded has no file.\n");
+				continue;
+			}
+			
+			if (resource == -1) {
+				fprintf(stderr, "Unit type variation file when loaded has no resource.\n");
+				continue;
+			}
+			
+			this->FileWhenLoaded[resource] = file;
+		} else if (child_config_data->Tag == "file_when_empty") {
+			std::string file;
+			int resource = -1;
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "file") {
+					file = CMod::GetCurrentModPath() + value;
+				} else if (key == "resource") {
+					value = FindAndReplaceString(value, "_", "-");
+					resource = GetResourceIdByName(value.c_str());
+				} else {
+					fprintf(stderr, "Invalid unit type variation file when empty property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (file.empty()) {
+				fprintf(stderr, "Unit type variation file when empty has no file.\n");
+				continue;
+			}
+			
+			if (resource == -1) {
+				fprintf(stderr, "Unit type variation file when empty has no resource.\n");
+				continue;
+			}
+			
+			this->FileWhenEmpty[resource] = file;
+		} else if (child_config_data->Tag == "layer_file") {
+			std::string file;
+			int image_layer = -1;
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "file") {
+					file = CMod::GetCurrentModPath() + value;
+				} else if (key == "image_layer") {
+					value = FindAndReplaceString(value, "_", "-");
+					image_layer = GetImageLayerIdByName(value);
+				} else {
+					fprintf(stderr, "Invalid unit type variation layer file property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (file.empty()) {
+				fprintf(stderr, "Unit type variation layer file has no file.\n");
+				continue;
+			}
+			
+			if (image_layer == -1) {
+				fprintf(stderr, "Unit type variation layer file has no image layer.\n");
+				continue;
+			}
+			
+			this->LayerFiles[image_layer] = file;
+		} else if (child_config_data->Tag == "button_icon") {
+			std::string icon_ident;
+			int button_action = -1;
+				
+			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
+				std::string key = child_config_data->Properties[j].first;
+				std::string value = child_config_data->Properties[j].second;
+				
+				if (key == "icon") {
+					value = FindAndReplaceString(value, "_", "-");
+					icon_ident = value;
+				} else if (key == "button_action") {
+					value = FindAndReplaceString(value, "_", "-");
+					button_action = GetButtonActionIdByName(value);
+				} else {
+					fprintf(stderr, "Invalid unit type variation button icon property: \"%s\".\n", key.c_str());
+				}
+			}
+			
+			if (icon_ident.empty()) {
+				fprintf(stderr, "Unit type variation button icon has no icon.\n");
+				continue;
+			}
+			
+			if (button_action == -1) {
+				fprintf(stderr, "Unit type variation button icon has no button action.\n");
+				continue;
+			}
+			
+			this->ButtonIcons[button_action].Name = icon_ident;
+			this->ButtonIcons[button_action].Icon = nullptr;
+			this->ButtonIcons[button_action].Load();
+			this->ButtonIcons[button_action].Icon->Load();
+		} else {
+			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
 }

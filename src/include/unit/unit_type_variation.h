@@ -66,7 +66,10 @@ public:
 	
 	~CUnitTypeVariation();
 
+	void ProcessConfigData(const CConfigData *config_data);
+	
 	int ID = -1;					/// The variation's index within the appropriate variation vector of its unit type
+	int ImageLayer = -1;			/// The image layer to which the variation belongs (if any)
 	std::string VariationId;		/// Variation's name.
 	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.

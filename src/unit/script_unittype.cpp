@@ -747,23 +747,22 @@ static int CclDefineUnitType(lua_State *l)
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for variations)");
 				}
-				int image_layer = -1;
 				const int subargs = lua_rawlen(l, -1);
 				for (int k = 0; k < subargs; ++k) {
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "layer")) {
 						std::string image_layer_name = LuaToString(l, -1, k + 1);
-						image_layer = GetImageLayerIdByName(image_layer_name);
-						if (image_layer != -1) {
-							variation->ID = type->LayerVariations[image_layer].size();
-							type->LayerVariations[image_layer].push_back(variation);
+						variation->ImageLayer = GetImageLayerIdByName(image_layer_name);
+						if (variation->ImageLayer != -1) {
+							variation->ID = type->LayerVariations[variation->ImageLayer].size();
+							type->LayerVariations[variation->ImageLayer].push_back(variation);
 						} else {
 							LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
 						}
 					} else if (!strcmp(value, "variation-id")) {
 						variation->VariationId = LuaToString(l, -1, k + 1);
-						if (image_layer == -1) {
+						if (variation->ImageLayer == -1) {
 							variation->ID = type->Variations.size();
 							type->Variations.push_back(variation);
 						}
@@ -844,7 +843,7 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "item-equipped")) {
 						std::string type_ident = LuaToString(l, -1, k + 1);
-						CUnitType *type = UnitTypeByIdent(type_ident);
+						const CUnitType *type = UnitTypeByIdent(type_ident);
 						if (type) {
 							variation->ItemsEquipped.push_back(type);
 						} else {
@@ -852,7 +851,7 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "item-not-equipped")) {
 						std::string type_ident = LuaToString(l, -1, k + 1);
-						CUnitType *type = UnitTypeByIdent(type_ident);
+						const CUnitType *type = UnitTypeByIdent(type_ident);
 						if (type) {
 							variation->ItemsNotEquipped.push_back(type);
 						} else {
@@ -860,7 +859,7 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "terrain")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
-						CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
+						const CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
 						if (terrain) {
 							variation->Terrains.push_back(terrain);
 						} else {
@@ -868,7 +867,7 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "terrain-forbidden")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
-						CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
+						const CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
 						if (terrain) {
 							variation->TerrainsForbidden.push_back(terrain);
 						} else {

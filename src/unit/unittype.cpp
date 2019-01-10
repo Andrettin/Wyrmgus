@@ -1079,7 +1079,6 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			std::string target = config_data->Ident;
 			target = FindAndReplaceString(target, "_", "-");
 			DependRule::ProcessConfigData(child_config_data, DependRuleUnitType, target);
-		/*
 		} else if (child_config_data->Tag == "variation") {
 			this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 			this->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
@@ -1087,11 +1086,15 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			CUnitTypeVariation *variation = new CUnitTypeVariation;
 			variation->ProcessConfigData(child_config_data);
 			
-			variation->ID = this->Variations.size();
-			this->Variations.push_back(variation);
+			if (variation->ImageLayer == -1) {
+				variation->ID = this->Variations.size();
+				this->Variations.push_back(variation);
+			} else {
+				variation->ID = this->LayerVariations[variation->ImageLayer].size();
+				this->LayerVariations[variation->ImageLayer].push_back(variation);
+			}
 			
 			this->DefaultStat.Variables[VARIATION_INDEX].Max = this->Variations.size();
-		*/
 		} else {
 			std::string tag = SnakeCaseToPascalCase(child_config_data->Tag);
 			
