@@ -34,10 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string>
-#include <vector>
-#include <map>
-
 #include "stratagus.h"
 
 #include "upgrade/upgrade.h"
@@ -83,9 +79,14 @@
 #include "unit/unit_manager.h"
 //Wyrmgus end
 #include "unit/unittype.h"
+#include "unit/unit_type_variation.h"
 #include "upgrade/depend.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util.h"
+
+#include <string>
+#include <vector>
+#include <map>
 
 /*----------------------------------------------------------------------------
 --  Declarations

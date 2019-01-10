@@ -30,8 +30,6 @@
 #ifndef __UNITTYPE_H__
 #define __UNITTYPE_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -58,15 +56,15 @@
 ----------------------------------------------------------------------------*/
 
 class CAnimations;
-class CPlayerColorGraphic;
 class CConstruction;
-class MissileType;
 class CFile;
+class CPlayerColorGraphic;
+class CUnitTypeVariation;
+class MissileType;
 //Wyrmgus start
 class CButtonLevel;
 class CFaction;
 class CPlane;
-class CSeason;
 class CWorld;
 class CTerrainType;
 class CUniqueItem;
@@ -131,60 +129,6 @@ public:
 	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
 	CPlayerColorGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
 };
-
-//Wyrmgus start
-//unit variations
-class CUnitTypeVariation
-{
-public:
-	CUnitTypeVariation()
-	{
-		memset(LayerSprites, 0, sizeof(LayerSprites));
-		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));
-		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));
-	}
-	
-	~CUnitTypeVariation();
-
-	int ID = -1;					/// The variation's index within the appropriate variation vector of its unit type
-	std::string VariationId;		/// Variation's name.
-	std::string TypeName;			/// Type name.
-	std::string File;				/// Variation's graphics.
-	std::string ShadowFile;			/// Variation's shadow graphics.
-	std::string LightFile;			/// Variation's light graphics.
-	int FrameWidth = 0;
-	int FrameHeight = 0;
-	int ResourceMin = 0;
-	int ResourceMax = 0;
-	int Weight = 1;							/// The weight for when randomly choosing a variation
-	IconConfig Icon;						/// Icon to display for this unit
-	CPlayerColorGraphic *Sprite = nullptr;	/// The graphic corresponding to File.
-	CGraphic *ShadowSprite = nullptr;		/// The graphic corresponding to ShadowFile.
-	CGraphic *LightSprite = nullptr;		/// The graphic corresponding to LightFile.
-	CAnimations *Animations = nullptr;		/// Animation scripts
-	CConstruction *Construction = nullptr;	/// What is shown in construction phase
-
-	std::vector<const CUpgrade *> UpgradesRequired;		/// Upgrades required by variation
-	std::vector<const CUpgrade *> UpgradesForbidden;	/// If the player has one of these upgrades, the unit can't have this variation
-	std::vector<int> ItemClassesEquipped;
-	std::vector<int> ItemClassesNotEquipped;
-	std::vector<const CUnitType *> ItemsEquipped;
-	std::vector<const CUnitType *> ItemsNotEquipped;
-	std::vector<const CTerrainType *> Terrains;
-	std::vector<const CTerrainType *> TerrainsForbidden;
-	std::vector<const CSeason *> Seasons;
-	std::vector<const CSeason *> ForbiddenSeasons;
-
-	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
-	std::string FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.
-	std::string FileWhenEmpty[MaxCosts];      /// Change the graphic when the unit is empty.
-	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// The graphics corresponding to LayerFiles.
-	CPlayerColorGraphic *SpriteWhenLoaded[MaxCosts]; /// The graphic corresponding to FileWhenLoaded.
-	CPlayerColorGraphic *SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
-	
-	std::map<int, IconConfig> ButtonIcons;				/// icons for button actions
-};
-//Wyrmgus end
 
 /**
 **  User defined variable type.
@@ -1351,6 +1295,4 @@ extern int GetImageLayerIdByName(const std::string &image_layer);
 extern std::map<std::string, CUnitType *> UnitTypeMap;
 //Wyrmgus end
 
-//@}
-
-#endif // !__UNITTYPE_H__
+#endif

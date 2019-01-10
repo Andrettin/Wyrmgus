@@ -384,6 +384,7 @@ set(unit_SRCS
 	src/unit/unit_find.cpp
 	src/unit/unit_manager.cpp
 	src/unit/unit_save.cpp
+	src/unit/unit_type_variation.cpp
 	src/unit/unitptr.cpp
 	src/unit/unittype.cpp
 )
@@ -636,6 +637,7 @@ set(stratagus_unit_HDRS
 	src/include/unit/unit_cache.h
 	src/include/unit/unit_find.h
 	src/include/unit/unit_manager.h
+	src/include/unit/unit_type_variation.h
 	src/include/unit/unitptr.h
 	src/include/unit/unittype.h
 )

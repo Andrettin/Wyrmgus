@@ -59,6 +59,7 @@
 #include "spells.h"
 #include "time/calendar.h"
 #include "unit/unit.h"
+#include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 

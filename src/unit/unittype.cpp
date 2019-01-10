@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -62,15 +60,16 @@
 #include "spells.h"
 #include "translate.h"
 #include "ui/button_action.h"
-#include "ui/ui.h"
-#include "unitsound.h"
-#include "util.h"
-#include "video.h"
 #include "ui/button_level.h"
+#include "ui/ui.h"
+#include "unit/unit_type_variation.h"
+#include "unitsound.h"
 #include "upgrade/depend.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "util.h"
+#include "video.h"
 
 #include <ctype.h>
 
@@ -2923,32 +2922,6 @@ void CleanUnitTypes()
 	//Wyrmgus end
 }
 
-CUnitTypeVariation::~CUnitTypeVariation()
-{
-	if (this->Sprite) {
-		CGraphic::Free(this->Sprite);
-	}
-	if (this->ShadowSprite) {
-		CGraphic::Free(this->ShadowSprite);
-	}
-	if (this->LightSprite) {
-		CGraphic::Free(this->LightSprite);
-	}
-	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (this->LayerSprites[i]) {
-			CGraphic::Free(this->LayerSprites[i]);
-		}
-	}
-	for (int res = 0; res < MaxCosts; ++res) {
-		if (this->SpriteWhenLoaded[res]) {
-			CGraphic::Free(this->SpriteWhenLoaded[res]);
-		}
-		if (this->SpriteWhenEmpty[res]) {
-			CGraphic::Free(this->SpriteWhenEmpty[res]);
-		}
-	}
-}
-
 //Wyrmgus start
 std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 {
@@ -3180,5 +3153,3 @@ int GetImageLayerIdByName(const std::string &image_layer)
 	return -1;
 }
 //Wyrmgus end
-
-//@}

@@ -66,6 +66,7 @@ class CUnitColors;
 class CUnitPtr;
 class CUnitStats;
 class CUnitType;
+class CUnitTypeVariation;
 class CUpgrade;
 class CVariable;
 class CViewport;
