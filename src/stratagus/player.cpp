@@ -1720,6 +1720,10 @@ void CPlayer::SetAge(CAge *age)
 		if (this->Age) {
 			UI.AgePanel.Text = this->Age->Name;
 			UI.AgePanel.G = this->Age->G;
+			
+			if (GameCycle > 0 && !SaveGameLoading) {
+				this->Notify(_("The %s has dawned upon us."), this->Age->Name.c_str());
+			}
 		} else {
 			UI.AgePanel.Text.clear();
 			UI.AgePanel.G = nullptr;
