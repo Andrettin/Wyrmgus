@@ -727,26 +727,22 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Variations")) {
 			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 			type->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
-			type->DefaultStat.Variables[VARIATION_INDEX].Max = VariationMax;
 			//remove previously defined variations, if any
-			for (int var_n = 0; var_n < VariationMax; ++var_n) {
-				if (type->VarInfo[var_n]) {
-					delete type->VarInfo[var_n];
-					type->VarInfo[var_n] = nullptr;
-				}
+			for (CUnitTypeVariation *variation : type->Variations) {
+				delete variation;
 			}
+			type->Variations.clear();
 			//remove previously defined layer variations, if any
 			for (int i = 0; i < MaxImageLayers; ++i) {
-				for (size_t j = 0; j < type->LayerVarInfo[i].size(); ++j) {
-					delete type->LayerVarInfo[i][j];
+				for (CUnitTypeVariation *variation : type->LayerVariations[i]) {
+					delete variation;
 				}
-				type->LayerVarInfo[i].clear();
+				type->LayerVariations[i].clear();
 			}
-			int variation_count = 0;
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				VariationInfo *var = new VariationInfo;
+				CUnitTypeVariation *variation = new CUnitTypeVariation;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for variations)");
 				}
@@ -759,78 +755,81 @@ static int CclDefineUnitType(lua_State *l)
 						std::string image_layer_name = LuaToString(l, -1, k + 1);
 						image_layer = GetImageLayerIdByName(image_layer_name);
 						if (image_layer != -1) {
-							type->LayerVarInfo[image_layer].push_back(var);
+							variation->ID = type->LayerVariations[image_layer].size();
+							type->LayerVariations[image_layer].push_back(variation);
 						} else {
 							LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
 						}
 					} else if (!strcmp(value, "variation-id")) {
-						var->VariationId = LuaToString(l, -1, k + 1);
+						variation->VariationId = LuaToString(l, -1, k + 1);
 						if (image_layer == -1) {
-							type->VarInfo[variation_count] = var;
-							variation_count += 1;
+							variation->ID = type->Variations.size();
+							type->Variations.push_back(variation);
 						}
 					} else if (!strcmp(value, "type-name")) {
-						var->TypeName = LuaToString(l, -1, k + 1);
+						variation->TypeName = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file")) {
-						var->File = LuaToString(l, -1, k + 1);
+						variation->File = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file-when-loaded")) {
 						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
 						++k;
-						var->FileWhenLoaded[res] = LuaToString(l, -1, k + 1);
+						variation->FileWhenLoaded[res] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file-when-empty")) {
 						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
 						++k;
-						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
+						variation->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "shadow-file")) {
-						var->ShadowFile = LuaToString(l, -1, k + 1);
+						variation->ShadowFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "light-file")) {
-						var->LightFile = LuaToString(l, -1, k + 1);
+						variation->LightFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "layer-file")) {
 						int image_layer = GetImageLayerIdByName(LuaToString(l, -1, k + 1));
 						++k;
-						var->LayerFiles[image_layer] = LuaToString(l, -1, k + 1);
+						variation->LayerFiles[image_layer] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "frame-size")) {
 						lua_rawgeti(l, -1, k + 1);
-						CclGetPos(l, &var->FrameWidth, &var->FrameHeight);
+						CclGetPos(l, &variation->FrameWidth, &variation->FrameHeight);
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "icon")) {
-						var->Icon.Name = LuaToString(l, -1, k + 1);
-						var->Icon.Icon = nullptr;
-						var->Icon.Load();
-						var->Icon.Icon->Load();
+						variation->Icon.Name = LuaToString(l, -1, k + 1);
+						variation->Icon.Icon = nullptr;
+						variation->Icon.Load();
+						variation->Icon.Icon->Load();
 					} else if (!strcmp(value, "button-icon")) {
 						int button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
 						++k;
-						var->ButtonIcons[button_action].Name = LuaToString(l, -1, k + 1);
-						var->ButtonIcons[button_action].Icon = nullptr;
-						var->ButtonIcons[button_action].Load();
-						var->ButtonIcons[button_action].Icon->Load();
+						variation->ButtonIcons[button_action].Name = LuaToString(l, -1, k + 1);
+						variation->ButtonIcons[button_action].Icon = nullptr;
+						variation->ButtonIcons[button_action].Load();
+						variation->ButtonIcons[button_action].Icon->Load();
 					} else if (!strcmp(value, "animations")) {
-						var->Animations = AnimationsByIdent(LuaToString(l, -1, k + 1));
-						if (!var->Animations) {
+						variation->Animations = AnimationsByIdent(LuaToString(l, -1, k + 1));
+						if (!variation->Animations) {
 							DebugPrint("Warning animation '%s' not found\n" _C_ LuaToString(l, -1, k + 1));
 						}
 					} else if (!strcmp(value, "construction")) {
-						var->Construction = ConstructionByIdent(LuaToString(l, -1, k + 1));
+						variation->Construction = ConstructionByIdent(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "upgrade-required")) {
-						for (int u = 0; u < VariationMax; ++u) {
-							if (var->UpgradesRequired[u].empty()) {
-								var->UpgradesRequired[u] = LuaToString(l, -1, k + 1);
-								break;
-							}
+						const std::string upgrade_ident = LuaToString(l, -1, k + 1);
+						const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+						if (upgrade != nullptr) {
+							variation->UpgradesRequired.push_back(upgrade);
+						} else {
+							variation->UpgradesRequired.push_back(CUpgrade::New(upgrade_ident)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 						}
 					} else if (!strcmp(value, "upgrade-forbidden")) {
-						for (int u = 0; u < VariationMax; ++u) {
-							if (var->UpgradesForbidden[u].empty()) {
-								var->UpgradesForbidden[u] = LuaToString(l, -1, k + 1);
-								break;
-							}
+						const std::string upgrade_ident = LuaToString(l, -1, k + 1);
+						const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+						if (upgrade != nullptr) {
+							variation->UpgradesForbidden.push_back(upgrade);
+						} else {
+							variation->UpgradesForbidden.push_back(CUpgrade::New(upgrade_ident)); //if this upgrade doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 						}
 					} else if (!strcmp(value, "item-class-equipped")) {
 						std::string item_class_ident = LuaToString(l, -1, k + 1);
 						int item_class = GetItemClassIdByName(item_class_ident);
 						if (item_class != -1) {
-							var->ItemClassesEquipped.push_back(item_class);
+							variation->ItemClassesEquipped.push_back(item_class);
 						} else {
 							LuaError(l, "Item class \"%s\" does not exist." _C_ item_class_ident.c_str());
 						}
@@ -838,7 +837,7 @@ static int CclDefineUnitType(lua_State *l)
 						std::string item_class_ident = LuaToString(l, -1, k + 1);
 						int item_class = GetItemClassIdByName(item_class_ident);
 						if (item_class != -1) {
-							var->ItemClassesNotEquipped.push_back(item_class);
+							variation->ItemClassesNotEquipped.push_back(item_class);
 						} else {
 							LuaError(l, "Item class \"%s\" does not exist." _C_ item_class_ident.c_str());
 						}
@@ -846,7 +845,7 @@ static int CclDefineUnitType(lua_State *l)
 						std::string type_ident = LuaToString(l, -1, k + 1);
 						CUnitType *type = UnitTypeByIdent(type_ident);
 						if (type) {
-							var->ItemsEquipped.push_back(type);
+							variation->ItemsEquipped.push_back(type);
 						} else {
 							LuaError(l, "Unit type %s not defined" _C_ type_ident.c_str());
 						}
@@ -854,7 +853,7 @@ static int CclDefineUnitType(lua_State *l)
 						std::string type_ident = LuaToString(l, -1, k + 1);
 						CUnitType *type = UnitTypeByIdent(type_ident);
 						if (type) {
-							var->ItemsNotEquipped.push_back(type);
+							variation->ItemsNotEquipped.push_back(type);
 						} else {
 							LuaError(l, "Unit type %s not defined" _C_ type_ident.c_str());
 						}
@@ -862,7 +861,7 @@ static int CclDefineUnitType(lua_State *l)
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
 						CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
 						if (terrain) {
-							var->Terrains.push_back(terrain);
+							variation->Terrains.push_back(terrain);
 						} else {
 							LuaError(l, "Terrain type \"%s\" doesn't exist." _C_ terrain_ident.c_str());
 						}
@@ -870,7 +869,7 @@ static int CclDefineUnitType(lua_State *l)
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
 						CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
 						if (terrain) {
-							var->TerrainsForbidden.push_back(terrain);
+							variation->TerrainsForbidden.push_back(terrain);
 						} else {
 							LuaError(l, "Terrain type \"%s\" doesn't exist." _C_ terrain_ident.c_str());
 						}
@@ -878,28 +877,30 @@ static int CclDefineUnitType(lua_State *l)
 						const std::string season_ident = LuaToString(l, -1, k + 1);
 						CSeason *season = CSeason::GetSeason(season_ident);
 						if (season) {
-							var->Seasons.push_back(season);
+							variation->Seasons.push_back(season);
 						}
 					} else if (!strcmp(value, "forbidden-season")) {
 						const std::string season_ident = LuaToString(l, -1, k + 1);
 						CSeason *season = CSeason::GetSeason(season_ident);
 						if (season) {
-							var->ForbiddenSeasons.push_back(season);
+							variation->ForbiddenSeasons.push_back(season);
 						}
 					} else if (!strcmp(value, "resource-min")) {
-						var->ResourceMin = LuaToNumber(l, -1, k + 1);
+						variation->ResourceMin = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "resource-max")) {
-						var->ResourceMax = LuaToNumber(l, -1, k + 1);
+						variation->ResourceMax = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "weight")) {
-						var->Weight = LuaToNumber(l, -1, k + 1);
+						variation->Weight = LuaToNumber(l, -1, k + 1);
 					} else {
 						printf("\n%s\n", type->Name.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
-				// Assert(var->VariationId);
+				// Assert(variation->VariationId);
 				lua_pop(l, 1);
 			}
+			
+			type->DefaultStat.Variables[VARIATION_INDEX].Max = type->Variations.size();
 		//Wyrmgus end
 		} else if (!strcmp(value, "Image")) {
 			if (!lua_istable(l, -1)) {
@@ -2969,9 +2970,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Variations")) {
 		std::vector<std::string> variation_idents;
-		for (int var_n = 0; var_n < VariationMax; ++var_n) {
-			if (type->VarInfo[var_n] && std::find(variation_idents.begin(), variation_idents.end(), type->VarInfo[var_n]->VariationId) == variation_idents.end()) {
-				variation_idents.push_back(type->VarInfo[var_n]->VariationId);
+		for (CUnitTypeVariation *variation : type->Variations) {
+			if (std::find(variation_idents.begin(), variation_idents.end(), variation->VariationId) == variation_idents.end()) {
+				variation_idents.push_back(variation->VariationId);
 			}
 		}
 		
@@ -2988,9 +2989,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		const int image_layer = GetImageLayerIdByName(image_layer_name);
 		
 		std::vector<std::string> variation_idents;
-		for (size_t var_n = 0; var_n < type->LayerVarInfo[image_layer].size(); ++var_n) {
-			if (type->LayerVarInfo[image_layer][var_n] && std::find(variation_idents.begin(), variation_idents.end(), type->LayerVarInfo[image_layer][var_n]->VariationId) == variation_idents.end()) {
-				variation_idents.push_back(type->LayerVarInfo[image_layer][var_n]->VariationId);
+		for (CUnitTypeVariation *layer_variation : type->LayerVariations[image_layer]) {
+			if (std::find(variation_idents.begin(), variation_idents.end(), layer_variation->VariationId) == variation_idents.end()) {
+				variation_idents.push_back(layer_variation->VariationId);
 			}
 		}
 		
@@ -3461,7 +3462,7 @@ void UpdateUnitVariables(CUnit &unit)
 	}
 
 	//Wyrmgus
-	unit.Variable[VARIATION_INDEX].Max = VariationMax;
+	unit.Variable[VARIATION_INDEX].Max = unit.Type->Variations.size();
 	unit.Variable[VARIATION_INDEX].Enable = 1;
 	unit.Variable[VARIATION_INDEX].Value = unit.Variation;
 

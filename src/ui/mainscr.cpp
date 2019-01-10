@@ -517,9 +517,9 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		if (UI.SingleTrainingButton) {
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
 			//Wyrmgus sta
-			VariationInfo *varinfo = order.GetUnitType().GetDefaultVariation(*ThisPlayer);
+			CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(*ThisPlayer);
 //			CIcon &icon = *order.GetUnitType().Icon.Icon;
-			CIcon &icon = (varinfo && varinfo->Icon.Icon) ? *varinfo->Icon.Icon : *order.GetUnitType().Icon.Icon;
+			CIcon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 			//Wyrmgus end
 			//Wyrmgus start
 //			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
@@ -556,8 +556,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					if (j >= UI.TrainingButtons.size()) {
 						break;
 					}
-					VariationInfo *varinfo = order.GetUnitType().GetDefaultVariation(*ThisPlayer);
-					CIcon &icon = (varinfo && varinfo->Icon.Icon) ? *varinfo->Icon.Icon : *order.GetUnitType().Icon.Icon;
+					CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(*ThisPlayer);
+					CIcon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 					//Wyrmgus start
 //					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
 					int flag = (ButtonAreaUnderCursor == ButtonAreaTraining

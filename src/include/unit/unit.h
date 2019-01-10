@@ -202,10 +202,12 @@ public:
 	void Retrain();
 	void HealingItemAutoUse();
 	void SetCharacter(const std::string &character_full_name, bool custom_hero = false);
-	bool CheckTerrainForVariation(const VariationInfo *varinfo) const;
-	bool CheckSeasonForVariation(const VariationInfo *varinfo) const;
+	bool CheckTerrainForVariation(const CUnitTypeVariation *variation) const;
+	bool CheckSeasonForVariation(const CUnitTypeVariation *variation) const;
 	void ChooseVariation(const CUnitType *new_type = nullptr, bool ignore_old_variation = false, int image_layer = -1);
-	void SetVariation(int new_variation, const CUnitType *new_type = nullptr, int image_layer = -1);
+	void SetVariation(CUnitTypeVariation *new_variation, const CUnitType *new_type = nullptr, int image_layer = -1);
+	const CUnitTypeVariation *GetVariation() const;
+	const CUnitTypeVariation *GetLayerVariation(const unsigned int image_layer) const;
 	void UpdateButtonIcons();
 	void ChooseButtonIcon(int button_action);
 	void EquipItem(CUnit &item, bool affect_character = true);
@@ -403,7 +405,7 @@ public:
 	bool CanAutoCastSpell(const CSpell *spell) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemClassEquipped(int item_class) const;
-	bool IsItemTypeEquipped(CUnitType *item_type) const;
+	bool IsItemTypeEquipped(const CUnitType *item_type) const;
 	bool IsUniqueItemEquipped(const CUniqueItem *unique) const;
 	bool CanEquipItem(CUnit *item) const;
 	bool CanEquipItemClass(int item_class) const;

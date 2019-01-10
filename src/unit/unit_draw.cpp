@@ -142,12 +142,12 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	int frame_height = type.Height;
 	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
 	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
-	VariationInfo *varinfo = type.VarInfo[unit.Variation];
-	if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight) {
-		frame_width = varinfo->FrameWidth;
-		frame_height = varinfo->FrameHeight;
-		sprite_width = (varinfo->Sprite ? varinfo->Sprite->Width : 0);
-		sprite_height = (varinfo->Sprite ? varinfo->Sprite->Height : 0);
+	const CUnitTypeVariation *variation = unit.GetVariation();
+	if (variation && variation->FrameWidth && variation->FrameHeight) {
+		frame_width = variation->FrameWidth;
+		frame_height = variation->FrameHeight;
+		sprite_width = (variation->Sprite ? variation->Sprite->Width : 0);
+		sprite_height = (variation->Sprite ? variation->Sprite->Height : 0);
 	}
 	int x = screenPos.x - type.BoxWidth / 2 - (frame_width - sprite_width) / 2;
 	int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
@@ -961,34 +961,18 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 								   int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
-	//Wyrmgus start
-	VariationInfo *varinfo = type.VarInfo[unit.Variation];
-	//Wyrmgus end
+	const CUnitTypeVariation *variation = unit.GetVariation();
 	if (cframe->File == ConstructionFileConstruction) {
-		//Wyrmgus start
-		/*
-		if (type.Construction->ShadowSprite) {
-			pos.x -= (type.Construction->Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
-			pos.x += type.OffsetX;
-			pos.y -= (type.Construction->Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
-			pos.y += type.OffsetY;
-			if (frame < 0) {
-				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-			} else {
-				type.Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
-			}
-		}
-		*/
-		if (varinfo && varinfo->Construction) {
-			if (varinfo->Construction->ShadowSprite) {
-				pos.x -= (varinfo->Construction->Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
+		if (variation && variation->Construction) {
+			if (variation->Construction->ShadowSprite) {
+				pos.x -= (variation->Construction->Width - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
 				pos.x += type.OffsetX;
-				pos.y -= (varinfo->Construction->Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
+				pos.y -= (variation->Construction->Height - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 				pos.y += type.OffsetY;
 				if (frame < 0) {
-					varinfo->Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+					variation->Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 				} else {
-					varinfo->Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+					variation->Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 				}
 			}
 		} else {
@@ -1004,22 +988,18 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 				}
 			}
 		}
-		//Wyrmgus end
 	} else {
-		//Wyrmgus start
-		if (varinfo && varinfo->ShadowSprite) {
+		if (variation && variation->ShadowSprite) {
 			pos.x -= (type.ShadowWidth - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
 			pos.x += type.ShadowOffsetX + type.OffsetX;
 			pos.y -= (type.ShadowHeight - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
 			pos.y += type.ShadowOffsetY + type.OffsetY;
 			if (frame < 0) {
-				varinfo->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				variation->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
-				varinfo->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+				variation->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 			}
-//		if (type.ShadowSprite) {
 		} else if (type.ShadowSprite) {
-		//Wyrmgus end
 			pos.x -= (type.ShadowWidth - type.TileSize.x * Map.GetCurrentPixelTileSize().x) / 2;
 			pos.x += type.ShadowOffsetX + type.OffsetX;
 			pos.y -= (type.ShadowHeight - type.TileSize.y * Map.GetCurrentPixelTileSize().y) / 2;
@@ -1050,20 +1030,9 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 {
 	PixelPos pos = screenPos;
 	if (cframe->File == ConstructionFileConstruction) {
-		//Wyrmgus start
-		/*
-		const CConstruction &construction = *type.Construction;
-		pos.x -= construction.Width / 2;
-		pos.y -= construction.Height / 2;
-		if (frame < 0) {
-			construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
-		} else {
-			construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
-		}
-		*/
-		VariationInfo *varinfo = type.VarInfo[unit.Variation];
-		if (varinfo && varinfo->Construction) {
-			const CConstruction &construction = *varinfo->Construction;
+		const CUnitTypeVariation *variation = unit.GetVariation();
+		if (variation && variation->Construction) {
+			const CConstruction &construction = *variation->Construction;
 			pos.x -= construction.Width / 2;
 			pos.y -= construction.Height / 2;
 			if (frame < 0) {
@@ -1088,10 +1057,10 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 //		pos.y += type.OffsetY - type.Height / 2;
 		int frame_width = type.Width;
 		int frame_height = type.Height;
-		VariationInfo *varinfo = type.VarInfo[unit.Variation];
-		if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight) {
-			frame_width = varinfo->FrameWidth;
-			frame_height = varinfo->FrameHeight;
+		const CUnitTypeVariation *variation = unit.GetVariation();
+		if (variation && variation->FrameWidth && variation->FrameHeight) {
+			frame_width = variation->FrameWidth;
+			frame_height = variation->FrameHeight;
 		}
 		pos.x += type.OffsetX - frame_width / 2;
 		pos.y += type.OffsetY - frame_height / 2;
@@ -1101,8 +1070,8 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		}
 		//Wyrmgus start
 //		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
-		if (varinfo && varinfo->Sprite) {
-			varinfo->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+		if (variation && variation->Sprite) {
+			variation->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
 		} else {
 			type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
 		}
@@ -1192,9 +1161,7 @@ void CUnit::Draw(const CViewport &vp) const
 	DrawUnitSelection(vp, *this);
 	//Wyrmgus end
 
-	//Wyrmgus start
-	VariationInfo *varinfo = type->VarInfo[this->Variation];
-	//Wyrmgus end
+	const CUnitTypeVariation *variation = this->GetVariation();
 
 	if (state == 1 && under_construction && cframe) {
 		//Wyrmgus start
@@ -1207,8 +1174,8 @@ void CUnit::Draw(const CViewport &vp) const
 		//Wyrmgus end
 			//Wyrmgus start
 //			DrawShadow(*type, frame, screenPos);
-			if (varinfo && varinfo->ShadowSprite) {
-				DrawShadow(*type, varinfo->ShadowSprite, frame, screenPos);
+			if (variation && variation->ShadowSprite) {
+				DrawShadow(*type, variation->ShadowSprite, frame, screenPos);
 			} else if (type->ShadowSprite) {
 				DrawShadow(*type, type->ShadowSprite, frame, screenPos);
 			}
@@ -1290,18 +1257,18 @@ void CUnit::Draw(const CViewport &vp) const
 	}
 	//Wyrmgus start
 	// Adjust sprite for variations.
-	if (varinfo) {
-		if (varinfo->Sprite) {
-			sprite = varinfo->Sprite;
+	if (variation) {
+		if (variation->Sprite) {
+			sprite = variation->Sprite;
 		}
 		if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
 			if (this->ResourcesHeld) {
-				if (varinfo->SpriteWhenLoaded[this->CurrentResource]) {
-					sprite = varinfo->SpriteWhenLoaded[this->CurrentResource];
+				if (variation->SpriteWhenLoaded[this->CurrentResource]) {
+					sprite = variation->SpriteWhenLoaded[this->CurrentResource];
 				}
 			} else {
-				if (varinfo->SpriteWhenEmpty[this->CurrentResource]) {
-					sprite = varinfo->SpriteWhenEmpty[this->CurrentResource];
+				if (variation->SpriteWhenEmpty[this->CurrentResource]) {
+					sprite = variation->SpriteWhenEmpty[this->CurrentResource];
 				}
 			}
 		}
@@ -1315,10 +1282,7 @@ void CUnit::Draw(const CViewport &vp) const
 	if (state == 1) {
 		if (under_construction && cframe) {
 			const PixelPos pos(screenPos + type->GetHalfTilePixelSize(UI.CurrentMapLayer->ID));
-			//Wyrmgus start
-//			DrawConstruction(player, cframe, *type, frame, pos);
 			DrawConstruction(player, cframe, *this, *type, frame, pos);
-			//Wyrmgus end
 		} else {
 			DrawUnitType(*type, sprite, player, frame, screenPos);
 		}
@@ -1418,8 +1382,8 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
 	}
 
-	if (varinfo && varinfo->LightSprite) {
-		DrawOverlay(*type, varinfo->LightSprite, player, frame, screenPos);
+	if (variation && variation->LightSprite) {
+		DrawOverlay(*type, variation->LightSprite, player, frame, screenPos);
 	} else if (type->LightSprite) {
 		DrawOverlay(*type, type->LightSprite, player, frame, screenPos);
 	}

@@ -605,9 +605,6 @@ CUnitType::CUnitType() :
 	memset(GrandStrategyProductionEfficiencyModifier, 0, sizeof(GrandStrategyProductionEfficiencyModifier));
 	//Wyrmgus end
 	memset(ResInfo, 0, sizeof(ResInfo));
-	//Wyrmgus start
-	memset(VarInfo, 0, sizeof(VarInfo));
-	//Wyrmgus end
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 	//Wyrmgus start
 	memset(LayerSprites, 0, sizeof(LayerSprites));
@@ -663,20 +660,15 @@ CUnitType::~CUnitType()
 		}
 	}
 
-	//Wyrmgus start
-	for (int var = 0; var < VariationMax; ++var) {
-		if (this->VarInfo[var]) {
-			delete this->VarInfo[var];
-		}
+	for (CUnitTypeVariation *variation : this->Variations) {
+		delete variation;
 	}
 	
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		for (size_t var = 0; var < LayerVarInfo[i].size(); ++var) {
-			delete this->LayerVarInfo[i][var];
+		for (CUnitTypeVariation *layer_variation : this->LayerVariations[i]) {
+			delete layer_variation;
 		}
-		LayerVarInfo[i].clear();
 	}
-	//Wyrmgus end
 
 	CGraphic::Free(Sprite);
 	CGraphic::Free(ShadowSprite);
@@ -1088,6 +1080,19 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			std::string target = config_data->Ident;
 			target = FindAndReplaceString(target, "_", "-");
 			DependRule::ProcessConfigData(child_config_data, DependRuleUnitType, target);
+		/*
+		} else if (child_config_data->Tag == "variation") {
+			this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
+			this->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
+			
+			CUnitTypeVariation *variation = new CUnitTypeVariation;
+			variation->ProcessConfigData(child_config_data);
+			
+			variation->ID = this->Variations.size();
+			this->Variations.push_back(variation);
+			
+			this->DefaultStat.Variables[VARIATION_INDEX].Max = this->Variations.size();
+		*/
 		} else {
 			std::string tag = SnakeCaseToPascalCase(child_config_data->Tag);
 			
@@ -1510,97 +1515,92 @@ void CUnitType::SetParent(CUnitType *parent_type)
 			this->PersonalNames[iterator->first].push_back(iterator->second[i]);				
 		}
 	}
-	for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
-		if (parent_type->VarInfo[var_n]) {
-			VariationInfo *var = new VariationInfo;
-			
-			this->VarInfo[var_n] = var;
-			
-			var->VariationId = parent_type->VarInfo[var_n]->VariationId;
-			var->TypeName = parent_type->VarInfo[var_n]->TypeName;
-			var->File = parent_type->VarInfo[var_n]->File;
-			for (unsigned int i = 0; i < MaxCosts; ++i) {
-				var->FileWhenLoaded[i] = parent_type->VarInfo[var_n]->FileWhenLoaded[i];
-				var->FileWhenEmpty[i] = parent_type->VarInfo[var_n]->FileWhenEmpty[i];
-			}
-			var->ShadowFile = parent_type->VarInfo[var_n]->ShadowFile;
-			var->LightFile = parent_type->VarInfo[var_n]->LightFile;
-			var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
-			var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
-			var->ResourceMin = parent_type->VarInfo[var_n]->ResourceMin;
-			var->ResourceMax = parent_type->VarInfo[var_n]->ResourceMax;
-			var->Weight = parent_type->VarInfo[var_n]->Weight;
-			var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
-			var->Icon.Icon = nullptr;
-			if (!var->Icon.Name.empty()) {
-				var->Icon.Load();
-			}
-			if (parent_type->VarInfo[var_n]->Animations) {
-				var->Animations = parent_type->VarInfo[var_n]->Animations;
-			}
-			var->Construction = parent_type->VarInfo[var_n]->Construction;
-			for (int u = 0; u < VariationMax; ++u) {
-				var->UpgradesRequired[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
-				var->UpgradesForbidden[u] = parent_type->VarInfo[var_n]->UpgradesForbidden[u];
-			}
-			for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemClassesEquipped.size(); ++i) {
-				var->ItemClassesEquipped.push_back(parent_type->VarInfo[var_n]->ItemClassesEquipped[i]);
-			}
-			for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemClassesNotEquipped.size(); ++i) {
-				var->ItemClassesNotEquipped.push_back(parent_type->VarInfo[var_n]->ItemClassesNotEquipped[i]);
-			}
-			for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemsEquipped.size(); ++i) {
-				var->ItemsEquipped.push_back(parent_type->VarInfo[var_n]->ItemsEquipped[i]);
-			}
-			for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemsNotEquipped.size(); ++i) {
-				var->ItemsNotEquipped.push_back(parent_type->VarInfo[var_n]->ItemsNotEquipped[i]);
-			}
-			for (size_t i = 0; i < parent_type->VarInfo[var_n]->Terrains.size(); ++i) {
-				var->Terrains.push_back(parent_type->VarInfo[var_n]->Terrains[i]);
-			}
-			
-			for (int i = 0; i < MaxImageLayers; ++i) {
-				var->LayerFiles[i] = parent_type->VarInfo[var_n]->LayerFiles[i];
-			}
-			for (std::map<int, IconConfig>::iterator iterator = parent_type->VarInfo[var_n]->ButtonIcons.begin(); iterator != parent_type->VarInfo[var_n]->ButtonIcons.end(); ++iterator) {
-				var->ButtonIcons[iterator->first].Name = iterator->second.Name;
-				var->ButtonIcons[iterator->first].Icon = nullptr;
-				var->ButtonIcons[iterator->first].Load();
-				var->ButtonIcons[iterator->first].Icon->Load();
-			}
-		} else {
-			break;
+	for (CUnitTypeVariation *parent_variation : parent_type->Variations) {
+		CUnitTypeVariation *variation = new CUnitTypeVariation;
+		
+		variation->ID = this->Variations.size();
+		this->Variations.push_back(variation);
+		
+		variation->VariationId = parent_variation->VariationId;
+		variation->TypeName = parent_variation->TypeName;
+		variation->File = parent_variation->File;
+		for (unsigned int i = 0; i < MaxCosts; ++i) {
+			variation->FileWhenLoaded[i] = parent_variation->FileWhenLoaded[i];
+			variation->FileWhenEmpty[i] = parent_variation->FileWhenEmpty[i];
+		}
+		variation->ShadowFile = parent_variation->ShadowFile;
+		variation->LightFile = parent_variation->LightFile;
+		variation->FrameWidth = parent_variation->FrameWidth;
+		variation->FrameHeight = parent_variation->FrameHeight;
+		variation->ResourceMin = parent_variation->ResourceMin;
+		variation->ResourceMax = parent_variation->ResourceMax;
+		variation->Weight = parent_variation->Weight;
+		variation->Icon.Name = parent_variation->Icon.Name;
+		variation->Icon.Icon = nullptr;
+		if (!variation->Icon.Name.empty()) {
+			variation->Icon.Load();
+		}
+		if (parent_variation->Animations) {
+			variation->Animations = parent_variation->Animations;
+		}
+		variation->Construction = parent_variation->Construction;
+		variation->UpgradesRequired = parent_variation->UpgradesRequired;
+		variation->UpgradesForbidden = parent_variation->UpgradesForbidden;
+		for (size_t i = 0; i < parent_variation->ItemClassesEquipped.size(); ++i) {
+			variation->ItemClassesEquipped.push_back(parent_variation->ItemClassesEquipped[i]);
+		}
+		for (size_t i = 0; i < parent_variation->ItemClassesNotEquipped.size(); ++i) {
+			variation->ItemClassesNotEquipped.push_back(parent_variation->ItemClassesNotEquipped[i]);
+		}
+		for (size_t i = 0; i < parent_variation->ItemsEquipped.size(); ++i) {
+			variation->ItemsEquipped.push_back(parent_variation->ItemsEquipped[i]);
+		}
+		for (size_t i = 0; i < parent_variation->ItemsNotEquipped.size(); ++i) {
+			variation->ItemsNotEquipped.push_back(parent_variation->ItemsNotEquipped[i]);
+		}
+		for (size_t i = 0; i < parent_variation->Terrains.size(); ++i) {
+			variation->Terrains.push_back(parent_variation->Terrains[i]);
+		}
+		
+		for (int i = 0; i < MaxImageLayers; ++i) {
+			variation->LayerFiles[i] = parent_variation->LayerFiles[i];
+		}
+		for (std::map<int, IconConfig>::iterator iterator = parent_variation->ButtonIcons.begin(); iterator != parent_variation->ButtonIcons.end(); ++iterator) {
+			variation->ButtonIcons[iterator->first].Name = iterator->second.Name;
+			variation->ButtonIcons[iterator->first].Icon = nullptr;
+			variation->ButtonIcons[iterator->first].Load();
+			variation->ButtonIcons[iterator->first].Icon->Load();
 		}
 	}
+	
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		this->LayerFiles[i] = parent_type->LayerFiles[i];
 		
 		//inherit layer variations
-		for (size_t j = 0; j < parent_type->LayerVarInfo[i].size(); ++j) {
-			VariationInfo *var = new VariationInfo;
+		for (CUnitTypeVariation *parent_variation : parent_type->LayerVariations[i]) {
+			CUnitTypeVariation *variation = new CUnitTypeVariation;
+			
+			variation->ID = this->LayerVariations[i].size();
+			this->LayerVariations[i].push_back(variation);
 				
-			this->LayerVarInfo[i].push_back(var);
-				
-			var->VariationId = parent_type->LayerVarInfo[i][j]->VariationId;
-			var->File = parent_type->LayerVarInfo[i][j]->File;
-			for (int u = 0; u < VariationMax; ++u) {
-				var->UpgradesRequired[u] = parent_type->LayerVarInfo[i][j]->UpgradesRequired[u];
-				var->UpgradesForbidden[u] = parent_type->LayerVarInfo[i][j]->UpgradesForbidden[u];
+			variation->VariationId = parent_variation->VariationId;
+			variation->File = parent_variation->File;
+			variation->UpgradesRequired = parent_variation->UpgradesRequired;
+			variation->UpgradesForbidden = parent_variation->UpgradesForbidden;
+			for (size_t u = 0; u < parent_variation->ItemClassesEquipped.size(); ++u) {
+				variation->ItemClassesEquipped.push_back(parent_variation->ItemClassesEquipped[u]);
 			}
-			for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemClassesEquipped.size(); ++u) {
-				var->ItemClassesEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemClassesEquipped[u]);
+			for (size_t u = 0; u < parent_variation->ItemClassesNotEquipped.size(); ++u) {
+				variation->ItemClassesNotEquipped.push_back(parent_variation->ItemClassesNotEquipped[u]);
 			}
-			for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemClassesNotEquipped.size(); ++u) {
-				var->ItemClassesNotEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemClassesNotEquipped[u]);
+			for (size_t u = 0; u < parent_variation->ItemsEquipped.size(); ++u) {
+				variation->ItemsEquipped.push_back(parent_variation->ItemsEquipped[u]);
 			}
-			for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemsEquipped.size(); ++u) {
-				var->ItemsEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemsEquipped[u]);
+			for (size_t u = 0; u < parent_variation->ItemsNotEquipped.size(); ++u) {
+				variation->ItemsNotEquipped.push_back(parent_variation->ItemsNotEquipped[u]);
 			}
-			for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemsNotEquipped.size(); ++u) {
-				var->ItemsNotEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemsNotEquipped[u]);
-			}
-			for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->Terrains.size(); ++u) {
-				var->Terrains.push_back(parent_type->LayerVarInfo[i][j]->Terrains[u]);
+			for (size_t u = 0; u < parent_variation->Terrains.size(); ++u) {
+				variation->Terrains.push_back(parent_variation->Terrains[u]);
 			}
 		}
 	}
@@ -1716,43 +1716,41 @@ int CUnitType::GetResourceStep(const int resource, const int player) const
 	return resource_step;
 }
 
-VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player, int image_layer) const
+CUnitTypeVariation *CUnitType::GetDefaultVariation(CPlayer &player, int image_layer) const
 {
-	int variation_max = image_layer == -1 ? VariationMax : this->LayerVarInfo[image_layer].size();
-	for (int i = 0; i < variation_max; ++i) {
-		VariationInfo *varinfo = image_layer == -1 ? this->VarInfo[i] : this->LayerVarInfo[image_layer][i];
-		if (!varinfo) {
-			break;
-		}
-		bool UpgradesCheck = true;
-		for (int u = 0; u < VariationMax; ++u) {
-			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R') {
-				UpgradesCheck = false;
-				break;
-			}
-			if (!varinfo->UpgradesForbidden[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R') {
-				UpgradesCheck = false;
+	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? this->Variations : this->LayerVariations[image_layer];
+	for (CUnitTypeVariation *variation : variation_list) {
+		bool upgrades_check = true;
+		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
+			if (UpgradeIdentAllowed(player, required_upgrade->Ident.c_str()) != 'R') {
+				upgrades_check = false;
 				break;
 			}
 		}
-		if (UpgradesCheck == false) {
+		
+		if (upgrades_check) {
+			for (const CUpgrade *forbidden_upgrade : variation->UpgradesForbidden) {
+				if (UpgradeIdentAllowed(player, forbidden_upgrade->Ident.c_str()) == 'R') {
+					upgrades_check = false;
+					break;
+				}
+			}
+		}
+		
+		if (upgrades_check == false) {
 			continue;
 		}
-		return varinfo;
+		return variation;
 	}
 	return nullptr;
 }
 
-VariationInfo *CUnitType::GetVariation(const std::string &variation_name, int image_layer) const
+CUnitTypeVariation *CUnitType::GetVariation(const std::string &variation_name, int image_layer) const
 {
-	int variation_max = image_layer == -1 ? VariationMax : this->LayerVarInfo[image_layer].size();
-	for (int i = 0; i < variation_max; ++i) {
-		VariationInfo *varinfo = image_layer == -1 ? this->VarInfo[i] : this->LayerVarInfo[image_layer][i];
-		if (!varinfo) {
-			break;
-		}
-		if (varinfo->VariationId == variation_name) {
-			return varinfo;
+	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? this->Variations : this->LayerVariations[image_layer];
+	for (CUnitTypeVariation *variation : variation_list) {
+		if (variation->VariationId == variation_name) {
+			return variation;
 		}
 	}
 	return nullptr;
@@ -1761,13 +1759,10 @@ VariationInfo *CUnitType::GetVariation(const std::string &variation_name, int im
 std::string CUnitType::GetRandomVariationIdent(int image_layer) const
 {
 	std::vector<std::string> variation_idents;
-	int variation_max = image_layer == -1 ? VariationMax : this->LayerVarInfo[image_layer].size();
-	for (int i = 0; i < variation_max; ++i) {
-		VariationInfo *varinfo = image_layer == -1 ? this->VarInfo[i] : this->LayerVarInfo[image_layer][i];
-		if (!varinfo) {
-			break;
-		}
-		variation_idents.push_back(varinfo->VariationId);
+	
+	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? this->Variations : this->LayerVariations[image_layer];
+	for (const CUnitTypeVariation *variation : variation_list) {
+		variation_idents.push_back(variation->VariationId);
 	}
 	
 	if (variation_idents.size() > 0) {
@@ -1779,9 +1774,9 @@ std::string CUnitType::GetRandomVariationIdent(int image_layer) const
 
 std::string CUnitType::GetDefaultName(CPlayer &player) const
 {
-	VariationInfo *varinfo = this->GetDefaultVariation(player);
-	if (varinfo && !varinfo->TypeName.empty()) {
-		return varinfo->TypeName;
+	CUnitTypeVariation *variation = this->GetDefaultVariation(player);
+	if (variation && !variation->TypeName.empty()) {
+		return variation->TypeName;
 	} else {
 		return this->Name;
 	}
@@ -1789,11 +1784,11 @@ std::string CUnitType::GetDefaultName(CPlayer &player) const
 
 CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(CPlayer &player, int image_layer) const
 {
-	VariationInfo *varinfo = this->GetDefaultVariation(player);
-	if (this->LayerVarInfo[image_layer].size() > 0 && this->GetDefaultVariation(player, image_layer)->Sprite) {
+	CUnitTypeVariation *variation = this->GetDefaultVariation(player);
+	if (this->LayerVariations[image_layer].size() > 0 && this->GetDefaultVariation(player, image_layer)->Sprite) {
 		return this->GetDefaultVariation(player, image_layer)->Sprite;
-	} else if (varinfo && varinfo->LayerSprites[image_layer]) {
-		return varinfo->LayerSprites[image_layer];
+	} else if (variation && variation->LayerSprites[image_layer]) {
+		return variation->LayerSprites[image_layer];
 	} else if (this->LayerSprites[image_layer])  {
 		return this->LayerSprites[image_layer];
 	} else {
@@ -2712,80 +2707,72 @@ void LoadUnitTypeSprite(CUnitType &type)
 	//Wyrmgus end
 
 	//Wyrmgus start
-	for (int i = 0; i < VariationMax; ++i) {
-		VariationInfo *varinfo = type.VarInfo[i];
-		if (!varinfo) {
-			continue;
-		}
+	for (CUnitTypeVariation *variation : type.Variations) {
 		int frame_width = type.Width;
 		int frame_height = type.Height;
-		if (varinfo->FrameWidth && varinfo->FrameHeight) {
-			frame_width = varinfo->FrameWidth;
-			frame_height = varinfo->FrameHeight;
+		if (variation->FrameWidth && variation->FrameHeight) {
+			frame_width = variation->FrameWidth;
+			frame_height = variation->FrameHeight;
 		}
-		if (!varinfo->File.empty()) {
-			varinfo->Sprite = CPlayerColorGraphic::New(varinfo->File,
-																	 frame_width, frame_height);
-			varinfo->Sprite->Load();
+		if (!variation->File.empty()) {
+			variation->Sprite = CPlayerColorGraphic::New(variation->File, frame_width, frame_height);
+			variation->Sprite->Load();
 			if (type.Flip) {
-				varinfo->Sprite->Flip();
+				variation->Sprite->Flip();
 			}
 		}
-		if (!varinfo->ShadowFile.empty()) {
-			varinfo->ShadowSprite = CGraphic::New(varinfo->ShadowFile, type.ShadowWidth, type.ShadowHeight);
-			varinfo->ShadowSprite->Load();
+		if (!variation->ShadowFile.empty()) {
+			variation->ShadowSprite = CGraphic::New(variation->ShadowFile, type.ShadowWidth, type.ShadowHeight);
+			variation->ShadowSprite->Load();
 			if (type.Flip) {
-				varinfo->ShadowSprite->Flip();
+				variation->ShadowSprite->Flip();
 			}
-			if (varinfo->ShadowSprite->Surface->format->BytesPerPixel == 1) {
-//				varinfo->ShadowSprite->MakeShadow();
+			if (variation->ShadowSprite->Surface->format->BytesPerPixel == 1) {
+//				variation->ShadowSprite->MakeShadow();
 			}
 		}
-		if (!varinfo->LightFile.empty()) {
-			varinfo->LightSprite = CGraphic::New(varinfo->LightFile, frame_width, frame_height);
-			varinfo->LightSprite->Load();
+		if (!variation->LightFile.empty()) {
+			variation->LightSprite = CGraphic::New(variation->LightFile, frame_width, frame_height);
+			variation->LightSprite->Load();
 			if (type.Flip) {
-				varinfo->LightSprite->Flip();
+				variation->LightSprite->Flip();
 			}
 		}
 		for (int j = 0; j < MaxImageLayers; ++j) {
-			if (!varinfo->LayerFiles[j].empty()) {
-				varinfo->LayerSprites[j] = CPlayerColorGraphic::New(varinfo->LayerFiles[j], frame_width, frame_height);
-				varinfo->LayerSprites[j]->Load();
+			if (!variation->LayerFiles[j].empty()) {
+				variation->LayerSprites[j] = CPlayerColorGraphic::New(variation->LayerFiles[j], frame_width, frame_height);
+				variation->LayerSprites[j]->Load();
 				if (type.Flip) {
-					varinfo->LayerSprites[j]->Flip();
+					variation->LayerSprites[j]->Flip();
 				}
 			}
 		}
 	
 		for (int j = 0; j < MaxCosts; ++j) {
-			if (!varinfo->FileWhenLoaded[j].empty()) {
-				varinfo->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(varinfo->FileWhenLoaded[j],
-																		 frame_width, frame_height);
-				varinfo->SpriteWhenLoaded[j]->Load();
+			if (!variation->FileWhenLoaded[j].empty()) {
+				variation->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(variation->FileWhenLoaded[j], frame_width, frame_height);
+				variation->SpriteWhenLoaded[j]->Load();
 				if (type.Flip) {
-					varinfo->SpriteWhenLoaded[j]->Flip();
+					variation->SpriteWhenLoaded[j]->Flip();
 				}
 			}
-			if (!varinfo->FileWhenEmpty[j].empty()) {
-				varinfo->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(varinfo->FileWhenEmpty[j],
-																		 frame_width, frame_height);
-				varinfo->SpriteWhenEmpty[j]->Load();
+			if (!variation->FileWhenEmpty[j].empty()) {
+				variation->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(variation->FileWhenEmpty[j], frame_width, frame_height);
+				variation->SpriteWhenEmpty[j]->Load();
 				if (type.Flip) {
-					varinfo->SpriteWhenEmpty[j]->Flip();
+					variation->SpriteWhenEmpty[j]->Flip();
 				}
 			}
 		}
 	}
 	
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		for (size_t j = 0; j < type.LayerVarInfo[i].size(); ++j) {
-			VariationInfo *varinfo = type.LayerVarInfo[i][j];
-			if (!varinfo->File.empty()) {
-				varinfo->Sprite = CPlayerColorGraphic::New(varinfo->File, type.Width, type.Height);
-				varinfo->Sprite->Load();
+		for (CUnitTypeVariation *layer_variation : type.LayerVariations[i]) {
+			if (!layer_variation->File.empty()) {
+				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->File, type.Width, type.Height);
+				layer_variation->Sprite->Load();
 				if (type.Flip) {
-					varinfo->Sprite->Flip();
+					layer_variation->Sprite->Flip();
 				}
 			}
 		}
@@ -2836,13 +2823,9 @@ void LoadUnitType(CUnitType &type)
 		type.Icon.Load();
 	}
 
-	for (int j = 0; j < VariationMax; ++j) {
-		VariationInfo *varinfo = type.VarInfo[j];
-		if (!varinfo) {
-			continue;
-		}
-		if (!varinfo->Icon.Name.empty()) {
-			varinfo->Icon.Load();
+	for (CUnitTypeVariation *variation : type.Variations) {
+		if (!variation->Icon.Name.empty()) {
+			variation->Icon.Load();
 		}
 	}
 
@@ -2940,8 +2923,7 @@ void CleanUnitTypes()
 	//Wyrmgus end
 }
 
-//Wyrmgus start
-VariationInfo::~VariationInfo()
+CUnitTypeVariation::~CUnitTypeVariation()
 {
 	if (this->Sprite) {
 		CGraphic::Free(this->Sprite);
@@ -2967,6 +2949,7 @@ VariationInfo::~VariationInfo()
 	}
 }
 
+//Wyrmgus start
 std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 {
 	const CUnitType *unit_type = UnitTypeByIdent(unit_type_ident);

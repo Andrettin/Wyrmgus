@@ -635,8 +635,14 @@ void CUnit::SetResourcesHeld(int quantity)
 {
 	this->ResourcesHeld = quantity;
 	
-	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
-	if (varinfo && ((varinfo->ResourceMin && this->ResourcesHeld < varinfo->ResourceMin) || (varinfo->ResourceMax && this->ResourcesHeld > varinfo->ResourceMax))) {
+	const CUnitTypeVariation *variation = this->GetVariation();
+	if (
+		variation
+		&& (
+			(variation->ResourceMin && this->ResourcesHeld < variation->ResourceMin)
+			|| (variation->ResourceMax && this->ResourcesHeld > variation->ResourceMax)
+		)
+	) {
 		this->ChooseVariation();
 	}
 }
@@ -1065,10 +1071,10 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	this->UpdateXPRequired();
 }
 
-bool CUnit::CheckTerrainForVariation(const VariationInfo *varinfo) const
+bool CUnit::CheckTerrainForVariation(const CUnitTypeVariation *variation) const
 {
 	//if the variation has one or more terrain set as a precondition, then all tiles underneath the unit must match at least one of those terrains
-	if (varinfo->Terrains.size() > 0) {
+	if (variation->Terrains.size() > 0) {
 		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
 		}
@@ -1076,7 +1082,7 @@ bool CUnit::CheckTerrainForVariation(const VariationInfo *varinfo) const
 		for (int x = 0; x < this->Type->TileSize.x; ++x) {
 			for (int y = 0; y < this->Type->TileSize.y; ++y) {
 				if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-					if (std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true)) == varinfo->Terrains.end()) {
+					if (std::find(variation->Terrains.begin(), variation->Terrains.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true)) == variation->Terrains.end()) {
 						terrain_check = false;
 						break;
 					}
@@ -1092,7 +1098,7 @@ bool CUnit::CheckTerrainForVariation(const VariationInfo *varinfo) const
 	}
 	
 	//if the variation has one or more terrains set as a forbidden precondition, then no tiles underneath the unit may match one of those terrains
-	if (varinfo->TerrainsForbidden.size() > 0) {
+	if (variation->TerrainsForbidden.size() > 0) {
 		if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 			return false;
 		}
@@ -1100,7 +1106,7 @@ bool CUnit::CheckTerrainForVariation(const VariationInfo *varinfo) const
 		for (int x = 0; x < this->Type->TileSize.x; ++x) {
 			for (int y = 0; y < this->Type->TileSize.y; ++y) {
 				if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer)) {
-					if (std::find(varinfo->TerrainsForbidden.begin(), varinfo->TerrainsForbidden.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true)) == varinfo->TerrainsForbidden.end()) {
+					if (std::find(variation->TerrainsForbidden.begin(), variation->TerrainsForbidden.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer->ID, true)) == variation->TerrainsForbidden.end()) {
 						terrain_check = false;
 						break;
 					}
@@ -1118,19 +1124,19 @@ bool CUnit::CheckTerrainForVariation(const VariationInfo *varinfo) const
 	return true;
 }
 
-bool CUnit::CheckSeasonForVariation(const VariationInfo *varinfo) const
+bool CUnit::CheckSeasonForVariation(const CUnitTypeVariation *variation) const
 {
 	if (
-		!varinfo->Seasons.empty()
-		&& (!this->MapLayer || std::find(varinfo->Seasons.begin(), varinfo->Seasons.end(), this->MapLayer->GetSeason()) == varinfo->Seasons.end())
+		!variation->Seasons.empty()
+		&& (!this->MapLayer || std::find(variation->Seasons.begin(), variation->Seasons.end(), this->MapLayer->GetSeason()) == variation->Seasons.end())
 	) {
 		return false;
 	}
 	
 	if (
-		!varinfo->ForbiddenSeasons.empty()
+		!variation->ForbiddenSeasons.empty()
 		&& this->MapLayer
-		&& std::find(varinfo->ForbiddenSeasons.begin(), varinfo->ForbiddenSeasons.end(), this->MapLayer->GetSeason()) != varinfo->ForbiddenSeasons.end()
+		&& std::find(variation->ForbiddenSeasons.begin(), variation->ForbiddenSeasons.end(), this->MapLayer->GetSeason()) != variation->ForbiddenSeasons.end()
 	) {
 		return false;
 	}
@@ -1144,37 +1150,34 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 	if (image_layer == -1) {
 		if (this->Character != nullptr && !this->Character->HairVariation.empty()) {
 			priority_variation = this->Character->HairVariation;
-		} else if (this->Type->VarInfo[this->Variation]) {
-			priority_variation = this->Type->VarInfo[this->Variation]->VariationId;
+		} else if (this->GetVariation() != nullptr) {
+			priority_variation = this->GetVariation()->VariationId;
 		}
 	} else {
 		if (image_layer == HairImageLayer && this->Character != nullptr && !this->Character->HairVariation.empty()) {
 			priority_variation = this->Character->HairVariation;
-		} else if (this->LayerVariation[image_layer] != -1 && this->LayerVariation[image_layer] < ((int) this->Type->LayerVarInfo[image_layer].size())) {
-			priority_variation = this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->VariationId;
+		} else if (this->GetLayerVariation(image_layer)) {
+			priority_variation = this->GetLayerVariation(image_layer)->VariationId;
 		}
 	}
 	
-	std::vector<int> type_variations;
-	int variation_max = image_layer == -1 ? VariationMax : (new_type != nullptr ? new_type->LayerVarInfo[image_layer].size() : this->Type->LayerVarInfo[image_layer].size());
+	std::vector<CUnitTypeVariation *> type_variations;
+	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? (new_type != nullptr ? new_type->Variations : this->Type->Variations) : (new_type != nullptr ? new_type->LayerVariations[image_layer] : this->Type->LayerVariations[image_layer]);
+	
 	bool found_similar = false;
-	for (int i = 0; i < variation_max; ++i) {
-		VariationInfo *varinfo = image_layer == -1 ? new_type != nullptr ? new_type->VarInfo[i] : this->Type->VarInfo[i] : (new_type != nullptr ? new_type->LayerVarInfo[image_layer][i] : this->Type->LayerVarInfo[image_layer][i]);
-		if (!varinfo) {
+	for (CUnitTypeVariation *variation : variation_list) {
+		if (variation->ResourceMin && this->ResourcesHeld < variation->ResourceMin) {
 			continue;
 		}
-		if (varinfo->ResourceMin && this->ResourcesHeld < varinfo->ResourceMin) {
-			continue;
-		}
-		if (varinfo->ResourceMax && this->ResourcesHeld > varinfo->ResourceMax) {
+		if (variation->ResourceMax && this->ResourcesHeld > variation->ResourceMax) {
 			continue;
 		}
 		
-		if (!this->CheckSeasonForVariation(varinfo)) {
+		if (!this->CheckSeasonForVariation(variation)) {
 			continue;
 		}
 		
-		if (!this->CheckTerrainForVariation(varinfo)) {
+		if (!this->CheckTerrainForVariation(variation)) {
 			continue;
 		}
 		
@@ -1183,36 +1186,40 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		bool found_weapon = false;
 		bool requires_shield = false;
 		bool found_shield = false;
-		for (int u = 0; u < VariationMax; ++u) {
-			if (!varinfo->UpgradesRequired[u].empty()) {
-				if (CUpgrade::Get(varinfo->UpgradesRequired[u])->Weapon) {
-					requires_weapon = true;
-					if (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesRequired[u].c_str()) == 'R' || this->GetIndividualUpgrade(CUpgrade::Get(varinfo->UpgradesRequired[u]))) {
-						found_weapon = true;
-					}
-				} else if (CUpgrade::Get(varinfo->UpgradesRequired[u])->Shield) {
-					requires_shield = true;
-					if (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesRequired[u].c_str()) == 'R' || this->GetIndividualUpgrade(CUpgrade::Get(varinfo->UpgradesRequired[u]))) {
-						found_shield = true;
-					}
-				} else if (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && this->GetIndividualUpgrade(CUpgrade::Get(varinfo->UpgradesRequired[u])) == false) {
+		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
+			if (required_upgrade->Weapon) {
+				requires_weapon = true;
+				if (UpgradeIdentAllowed(*this->Player, required_upgrade->Ident.c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
+					found_weapon = true;
+				}
+			} else if (required_upgrade->Shield) {
+				requires_shield = true;
+				if (UpgradeIdentAllowed(*this->Player, required_upgrade->Ident.c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
+					found_shield = true;
+				}
+			} else if (UpgradeIdentAllowed(*this->Player, required_upgrade->Ident.c_str()) != 'R' && this->GetIndividualUpgrade(required_upgrade) == false) {
+				upgrades_check = false;
+				break;
+			}
+		}
+		
+		if (upgrades_check) {
+			for (const CUpgrade *forbidden_upgrade : variation->UpgradesForbidden) {
+				if (UpgradeIdentAllowed(*this->Player, forbidden_upgrade->Ident.c_str()) == 'R' || this->GetIndividualUpgrade(forbidden_upgrade)) {
 					upgrades_check = false;
 					break;
 				}
 			}
-			if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || this->GetIndividualUpgrade(CUpgrade::Get(varinfo->UpgradesForbidden[u])))) {
+		}
+		
+		for (size_t j = 0; j < variation->ItemClassesNotEquipped.size(); ++j) {
+			if (this->IsItemClassEquipped(variation->ItemClassesNotEquipped[j])) {
 				upgrades_check = false;
 				break;
 			}
 		}
-		for (size_t j = 0; j < varinfo->ItemClassesNotEquipped.size(); ++j) {
-			if (IsItemClassEquipped(varinfo->ItemClassesNotEquipped[j])) {
-				upgrades_check = false;
-				break;
-			}
-		}
-		for (size_t j = 0; j < varinfo->ItemsNotEquipped.size(); ++j) {
-			if (IsItemTypeEquipped(varinfo->ItemsNotEquipped[j])) {
+		for (size_t j = 0; j < variation->ItemsNotEquipped.size(); ++j) {
+			if (this->IsItemTypeEquipped(variation->ItemsNotEquipped[j])) {
 				upgrades_check = false;
 				break;
 			}
@@ -1220,28 +1227,28 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		if (upgrades_check == false) {
 			continue;
 		}
-		for (size_t j = 0; j < varinfo->ItemClassesEquipped.size(); ++j) {
-			if (GetItemClassSlot(varinfo->ItemClassesEquipped[j]) == WeaponItemSlot) {
+		for (size_t j = 0; j < variation->ItemClassesEquipped.size(); ++j) {
+			if (GetItemClassSlot(variation->ItemClassesEquipped[j]) == WeaponItemSlot) {
 				requires_weapon = true;
-				if (IsItemClassEquipped(varinfo->ItemClassesEquipped[j])) {
+				if (IsItemClassEquipped(variation->ItemClassesEquipped[j])) {
 					found_weapon = true;
 				}
-			} else if (GetItemClassSlot(varinfo->ItemClassesEquipped[j]) == ShieldItemSlot) {
+			} else if (GetItemClassSlot(variation->ItemClassesEquipped[j]) == ShieldItemSlot) {
 				requires_shield = true;
-				if (IsItemClassEquipped(varinfo->ItemClassesEquipped[j])) {
+				if (IsItemClassEquipped(variation->ItemClassesEquipped[j])) {
 					found_shield = true;
 				}
 			}
 		}
-		for (size_t j = 0; j < varinfo->ItemsEquipped.size(); ++j) {
-			if (GetItemClassSlot(varinfo->ItemsEquipped[j]->ItemClass) == WeaponItemSlot) {
+		for (size_t j = 0; j < variation->ItemsEquipped.size(); ++j) {
+			if (GetItemClassSlot(variation->ItemsEquipped[j]->ItemClass) == WeaponItemSlot) {
 				requires_weapon = true;
-				if (IsItemTypeEquipped(varinfo->ItemsEquipped[j])) {
+				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
 					found_weapon = true;
 				}
-			} else if (GetItemClassSlot(varinfo->ItemsEquipped[j]->ItemClass) == ShieldItemSlot) {
+			} else if (GetItemClassSlot(variation->ItemsEquipped[j]->ItemClass) == ShieldItemSlot) {
 				requires_shield = true;
-				if (IsItemTypeEquipped(varinfo->ItemsEquipped[j])) {
+				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
 					found_shield = true;
 				}
 			}
@@ -1249,7 +1256,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		if ((requires_weapon && !found_weapon) || (requires_shield && !found_shield)) {
 			continue;
 		}
-		if (!ignore_old_variation && !priority_variation.empty() && (varinfo->VariationId.find(priority_variation) != std::string::npos || priority_variation.find(varinfo->VariationId) != std::string::npos)) { // if the priority variation's ident is included in that of a new viable variation (or vice-versa), give priority to the new variation over others
+		if (!ignore_old_variation && !priority_variation.empty() && (variation->VariationId.find(priority_variation) != std::string::npos || priority_variation.find(variation->VariationId) != std::string::npos)) { // if the priority variation's ident is included in that of a new viable variation (or vice-versa), give priority to the new variation over others
 			if (!found_similar) {
 				found_similar = true;
 				type_variations.clear();
@@ -1259,8 +1266,8 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 				continue;
 			}
 		}
-		for (int j = 0; j < varinfo->Weight; ++j) {
-			type_variations.push_back(i);
+		for (int j = 0; j < variation->Weight; ++j) {
+			type_variations.push_back(variation);
 		}
 	}
 	if (type_variations.size() > 0) {
@@ -1268,20 +1275,37 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 	}
 }
 
-void CUnit::SetVariation(int new_variation, const CUnitType *new_type, int image_layer)
+void CUnit::SetVariation(CUnitTypeVariation *new_variation, const CUnitType *new_type, int image_layer)
 {
 	if (image_layer == -1) {
 		if (
-			(this->Type->VarInfo[this->Variation] && this->Type->VarInfo[this->Variation]->Animations)
-			|| (new_type == nullptr && this->Type->VarInfo[new_variation] && this->Type->VarInfo[new_variation]->Animations)
-			|| (new_type != nullptr && new_type->VarInfo[new_variation]->Animations)
+			(this->GetVariation() && this->GetVariation()->Animations)
+			|| (new_variation && new_variation->Animations)
 		) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
 			this->Frame = this->Type->StillFrame;
 		}
-		this->Variation = new_variation;
+		this->Variation = new_variation ? new_variation->ID : 0;
 	} else {
-		this->LayerVariation[image_layer] = new_variation;
+		this->LayerVariation[image_layer] = new_variation ? new_variation->ID : -1;
 	}
+}
+
+const CUnitTypeVariation *CUnit::GetVariation() const
+{
+	if (this->Variation < (int) this->Type->Variations.size()) {
+		return this->Type->Variations[this->Variation];
+	}
+	
+	return nullptr;
+}
+
+const CUnitTypeVariation *CUnit::GetLayerVariation(const unsigned int image_layer) const
+{
+	if (this->LayerVariation[image_layer] >= 0 && this->LayerVariation[image_layer] < (int) this->Type->LayerVariations[image_layer].size()) {
+		return this->Type->LayerVariations[image_layer][this->LayerVariation[image_layer]];
+	}
+	
+	return nullptr;
 }
 
 void CUnit::UpdateButtonIcons()
@@ -1330,17 +1354,15 @@ void CUnit::ChooseButtonIcon(int button_action)
 		}
 	}
 	
-	if (this->Type->VarInfo[this->Variation] && this->Type->VarInfo[this->Variation]->ButtonIcons.find(button_action) != this->Type->VarInfo[this->Variation]->ButtonIcons.end()) {
-		this->ButtonIcons[button_action] = this->Type->VarInfo[this->Variation]->ButtonIcons[button_action].Icon;
+	const CUnitTypeVariation *variation = this->GetVariation();
+	if (variation && variation->ButtonIcons.find(button_action) != variation->ButtonIcons.end()) {
+		this->ButtonIcons[button_action] = variation->ButtonIcons.find(button_action)->second.Icon;
 		return;
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (this->LayerVariation[i] == -1 || this->LayerVariation[i] >= ((int) this->Type->LayerVarInfo[i].size())) {
-			continue;
-		}
-		VariationInfo *varinfo = this->Type->LayerVarInfo[i][this->LayerVariation[i]];
-		if (varinfo && varinfo->ButtonIcons.find(button_action) != varinfo->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = varinfo->ButtonIcons[button_action].Icon;
+		const CUnitTypeVariation *layer_variation = this->GetLayerVariation(i);
+		if (layer_variation && layer_variation->ButtonIcons.find(button_action) != layer_variation->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = layer_variation->ButtonIcons.find(button_action)->second.Icon;
 			return;
 		}
 	}
@@ -1515,16 +1537,25 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	EquippedItems[item_slot].push_back(&item);
 	
 	//change variation, if the current one has become forbidden
-	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (varinfo && (std::find(varinfo->ItemClassesNotEquipped.begin(), varinfo->ItemClassesNotEquipped.end(), item.Type->ItemClass) != varinfo->ItemClassesNotEquipped.end() || std::find(varinfo->ItemsNotEquipped.begin(), varinfo->ItemsNotEquipped.end(), item.Type) != varinfo->ItemsNotEquipped.end())) {
+	const CUnitTypeVariation *variation = this->GetVariation();
+	if (
+		variation
+		&& (
+			std::find(variation->ItemClassesNotEquipped.begin(), variation->ItemClassesNotEquipped.end(), item.Type->ItemClass) != variation->ItemClassesNotEquipped.end()
+			|| std::find(variation->ItemsNotEquipped.begin(), variation->ItemsNotEquipped.end(), item.Type) != variation->ItemsNotEquipped.end()
+		)
+	) {
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (this->LayerVariation[i] == -1 || this->LayerVariation[i] >= ((int) this->Type->LayerVarInfo[i].size())) {
-			continue;
-		}
-		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
-		if (std::find(varinfo->ItemClassesNotEquipped.begin(), varinfo->ItemClassesNotEquipped.end(), item.Type->ItemClass) != varinfo->ItemClassesNotEquipped.end() || std::find(varinfo->ItemsNotEquipped.begin(), varinfo->ItemsNotEquipped.end(), item.Type) != varinfo->ItemsNotEquipped.end()) {
+		const CUnitTypeVariation *layer_variation = this->GetLayerVariation(i);
+		if (
+			layer_variation
+			&& (
+				std::find(layer_variation->ItemClassesNotEquipped.begin(), layer_variation->ItemClassesNotEquipped.end(), item.Type->ItemClass) != layer_variation->ItemClassesNotEquipped.end()
+				|| std::find(layer_variation->ItemsNotEquipped.begin(), layer_variation->ItemsNotEquipped.end(), item.Type) != layer_variation->ItemsNotEquipped.end()
+			)
+		) {
 			ChooseVariation(nullptr, false, i);
 		}
 	}
@@ -1688,16 +1719,26 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	}
 	
 	//change variation, if the current one has become forbidden
-	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (varinfo && (std::find(varinfo->ItemClassesEquipped.begin(), varinfo->ItemClassesEquipped.end(), item.Type->ItemClass) != varinfo->ItemClassesEquipped.end() || std::find(varinfo->ItemsEquipped.begin(), varinfo->ItemsEquipped.end(), item.Type) != varinfo->ItemsEquipped.end())) {
+	const CUnitTypeVariation *variation = this->GetVariation();
+	if (
+		variation
+		&& (
+			std::find(variation->ItemClassesEquipped.begin(), variation->ItemClassesEquipped.end(), item.Type->ItemClass) != variation->ItemClassesEquipped.end() 
+			|| std::find(variation->ItemsEquipped.begin(), variation->ItemsEquipped.end(), item.Type) != variation->ItemsEquipped.end()
+		)
+	) {
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (this->LayerVariation[i] == -1 || this->LayerVariation[i] >= ((int) this->Type->LayerVarInfo[i].size())) {
-			continue;
-		}
-		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
-		if (std::find(varinfo->ItemClassesEquipped.begin(), varinfo->ItemClassesEquipped.end(), item.Type->ItemClass) != varinfo->ItemClassesEquipped.end() || std::find(varinfo->ItemsEquipped.begin(), varinfo->ItemsEquipped.end(), item.Type) != varinfo->ItemsEquipped.end()) {
+		const CUnitTypeVariation *layer_variation = this->GetLayerVariation(i);
+
+		if (
+			layer_variation
+			&& (
+				std::find(layer_variation->ItemClassesEquipped.begin(), layer_variation->ItemClassesEquipped.end(), item.Type->ItemClass) != layer_variation->ItemClassesEquipped.end()
+				|| std::find(layer_variation->ItemsEquipped.begin(), layer_variation->ItemsEquipped.end(), item.Type) != layer_variation->ItemsEquipped.end()
+			)
+		) {
 			ChooseVariation(nullptr, false, i);
 		}
 	}
@@ -3571,10 +3612,10 @@ void CUnit::Place(const Vec2i &pos, int z)
 			}
 		}
 		
-		VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
-		if (varinfo) {
+		const CUnitTypeVariation *variation = this->GetVariation();
+		if (variation) {
 			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, repick the unit's variation
-			if (!this->CheckTerrainForVariation(varinfo) || !this->CheckSeasonForVariation(varinfo)) {
+			if (!this->CheckTerrainForVariation(variation) || !this->CheckSeasonForVariation(variation)) {
 				this->ChooseVariation();
 			}
 		}
@@ -4402,10 +4443,10 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 
 	int frame_width = Type->Width;
 	int frame_height = Type->Height;
-	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight) {
-		frame_width = varinfo->FrameWidth;
-		frame_height = varinfo->FrameHeight;
+	const CUnitTypeVariation *variation = this->GetVariation();
+	if (variation && variation->FrameWidth && variation->FrameHeight) {
+		frame_width = variation->FrameWidth;
+		frame_height = variation->FrameHeight;
 	}
 
 	int x = tilePos.x * Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x + IX - (frame_width - Type->TileSize.x * Map.GetMapLayerPixelTileSize(this->MapLayer->ID).x) / 2 + Type->OffsetX;
@@ -5137,12 +5178,12 @@ CUnit *UnitOnScreen(int x, int y)
 //						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
 //		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
 //						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
-		VariationInfo *varinfo = type.VarInfo[unit.Variation];
-		if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight && !varinfo->File.empty()) {
+		const CUnitTypeVariation *variation = unit.GetVariation();
+		if (variation && variation->FrameWidth && variation->FrameHeight && !variation->File.empty()) {
 			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-							  (varinfo->FrameWidth - varinfo->Sprite->Width) / 2 + type.BoxOffsetX;
+							  (variation->FrameWidth - variation->Sprite->Width) / 2 + type.BoxOffsetX;
 			unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-							  (varinfo->FrameHeight - varinfo->Sprite->Height) / 2 + type.BoxOffsetY;
+							  (variation->FrameHeight - variation->Sprite->Height) / 2 + type.BoxOffsetY;
 		} else {
 			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
 							  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
@@ -5851,7 +5892,7 @@ bool CUnit::IsItemClassEquipped(int item_class) const
 	return false;
 }
 
-bool CUnit::IsItemTypeEquipped(CUnitType *item_type) const
+bool CUnit::IsItemTypeEquipped(const CUnitType *item_type) const
 {
 	int item_slot = GetItemClassSlot(item_type->ItemClass);
 	
@@ -6253,21 +6294,21 @@ bool CUnit::HasAdjacentRailForUnitType(const CUnitType *type) const
 
 CAnimations *CUnit::GetAnimations() const
 {
-	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (varinfo && varinfo->Animations) {
-		return varinfo->Animations;
+	const CUnitTypeVariation *variation = this->GetVariation();
+	if (variation && variation->Animations) {
+		return variation->Animations;
 	} else {
-		return Type->Animations;
+		return this->Type->Animations;
 	}
 }
 
 CConstruction *CUnit::GetConstruction() const
 {
-	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (varinfo && varinfo->Construction) {
-		return varinfo->Construction;
+	const CUnitTypeVariation *variation = this->GetVariation();
+	if (variation && variation->Construction) {
+		return variation->Construction;
 	} else {
-		return Type->Construction;
+		return this->Type->Construction;
 	}
 }
 
@@ -6279,10 +6320,13 @@ IconConfig CUnit::GetIcon() const
 		return this->Character->Icon;
 	} else if (this->Unique != nullptr && this->Unique->Icon.Icon) {
 		return this->Unique->Icon;
-	} else if (Type->VarInfo[Variation] && Type->VarInfo[Variation]->Icon.Icon) {
-		return Type->VarInfo[Variation]->Icon;
+	}
+	
+	const CUnitTypeVariation *variation = this->GetVariation();
+	if (variation && variation->Icon.Icon) {
+		return variation->Icon;
 	} else {
-		return Type->Icon;
+		return this->Type->Icon;
 	}
 }
 
@@ -6310,13 +6354,16 @@ MissileConfig CUnit::GetMissile() const
 
 CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 {
-	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (this->LayerVariation[image_layer] != -1 && this->LayerVariation[image_layer] < ((int) this->Type->LayerVarInfo[image_layer].size()) && this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->Sprite) {
-		return this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->Sprite;
-	} else if (varinfo && varinfo->LayerSprites[image_layer]) {
-		return varinfo->LayerSprites[image_layer];
-	} else if (Type->LayerSprites[image_layer])  {
-		return Type->LayerSprites[image_layer];
+	const CUnitTypeVariation *layer_variation = this->GetLayerVariation(image_layer);
+	if (layer_variation && layer_variation->Sprite) {
+		return layer_variation->Sprite;
+	}
+	
+	const CUnitTypeVariation *variation = this->GetVariation();
+	if (variation && variation->LayerSprites[image_layer]) {
+		return variation->LayerSprites[image_layer];
+	} else if (this->Type->LayerSprites[image_layer])  {
+		return this->Type->LayerSprites[image_layer];
 	} else {
 		return nullptr;
 	}
@@ -6361,11 +6408,11 @@ std::string CUnit::GetTypeName() const
 		return _("Deity");
 	}
 	
-	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (varinfo && !varinfo->TypeName.empty()) {
-		return _(varinfo->TypeName.c_str());
+	const CUnitTypeVariation *variation = this->GetVariation();
+	if (variation && !variation->TypeName.empty()) {
+		return _(variation->TypeName.c_str());
 	} else {
-		return _(Type->Name.c_str());
+		return _(this->Type->Name.c_str());
 	}
 }
 

@@ -164,7 +164,6 @@ extern const char NameLine[];
 #define MAX_RACES 128
 #define FactionMax 128				/// Maximum number of factions a civilization can have
 #define PlayerColorMax 32			/// How many player colors are supported
-#define VariationMax 32				/// Maximum number of variations a unit can have
 
 #define AuraRange 6					/// Range of auras
 #define PlayerHeroMax 4				/// Maximum heroes per player

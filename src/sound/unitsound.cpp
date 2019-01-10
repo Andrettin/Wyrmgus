@@ -135,30 +135,29 @@ static void MapAnimSounds(CUnitType &type)
 		MapAnimSounds2(type.Animations->Harvest[i]);
 	}
 	//Wyrmgus start
-	for (int var_i = 0; var_i < VariationMax; ++var_i) {
-		VariationInfo *varinfo = type.VarInfo[var_i];
-		if (!varinfo) {
+	for (CUnitTypeVariation *variation : type.Variations) {
+		if (!variation) {
 			continue;
 		}
-		if (!varinfo->Animations) {
+		if (!variation->Animations) {
 			continue;
 		}
-		MapAnimSounds2(varinfo->Animations->Start);
-		MapAnimSounds2(varinfo->Animations->Still);
-		MapAnimSounds2(varinfo->Animations->Move);
-		MapAnimSounds2(varinfo->Animations->Attack);
-		MapAnimSounds2(varinfo->Animations->RangedAttack);
-		MapAnimSounds2(varinfo->Animations->SpellCast);
+		MapAnimSounds2(variation->Animations->Start);
+		MapAnimSounds2(variation->Animations->Still);
+		MapAnimSounds2(variation->Animations->Move);
+		MapAnimSounds2(variation->Animations->Attack);
+		MapAnimSounds2(variation->Animations->RangedAttack);
+		MapAnimSounds2(variation->Animations->SpellCast);
 		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
-			MapAnimSounds2(varinfo->Animations->Death[i]);
+			MapAnimSounds2(variation->Animations->Death[i]);
 		}
-		MapAnimSounds2(varinfo->Animations->Repair);
-		MapAnimSounds2(varinfo->Animations->Train);
-		MapAnimSounds2(varinfo->Animations->Research);
-		MapAnimSounds2(varinfo->Animations->Upgrade);
-		MapAnimSounds2(varinfo->Animations->Build);
+		MapAnimSounds2(variation->Animations->Repair);
+		MapAnimSounds2(variation->Animations->Train);
+		MapAnimSounds2(variation->Animations->Research);
+		MapAnimSounds2(variation->Animations->Upgrade);
+		MapAnimSounds2(variation->Animations->Build);
 		for (int i = 0; i < MaxCosts; ++i) {
-			MapAnimSounds2(varinfo->Animations->Harvest[i]);
+			MapAnimSounds2(variation->Animations->Harvest[i]);
 		}
 	}
 	//Wyrmgus end

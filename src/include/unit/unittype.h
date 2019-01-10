@@ -134,47 +134,46 @@ public:
 
 //Wyrmgus start
 //unit variations
-class VariationInfo
+class CUnitTypeVariation
 {
 public:
-	VariationInfo() : 
-		FrameWidth(0), FrameHeight(0), ResourceMin(0), ResourceMax(0), Weight(1),
-		Animations(nullptr), Construction(nullptr), Sprite(nullptr), ShadowSprite(nullptr), LightSprite(nullptr)
+	CUnitTypeVariation()
 	{
 		memset(LayerSprites, 0, sizeof(LayerSprites));
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));
 		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));
 	}
 	
-	~VariationInfo();
+	~CUnitTypeVariation();
 
+	int ID = -1;					/// The variation's index within the appropriate variation vector of its unit type
 	std::string VariationId;		/// Variation's name.
 	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.
 	std::string ShadowFile;			/// Variation's shadow graphics.
 	std::string LightFile;			/// Variation's light graphics.
-	int FrameWidth;
-	int FrameHeight;
-	int ResourceMin;
-	int ResourceMax;
-	int Weight;						/// The weight for when randomly choosing a variation
-	IconConfig Icon;				/// Icon to display for this unit
-	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
-	CGraphic *ShadowSprite;			/// The graphic corresponding to ShadowFile.
-	CGraphic *LightSprite;			/// The graphic corresponding to LightFile.
-	CAnimations *Animations;        /// Animation scripts
-	CConstruction *Construction;    /// What is shown in construction phase
+	int FrameWidth = 0;
+	int FrameHeight = 0;
+	int ResourceMin = 0;
+	int ResourceMax = 0;
+	int Weight = 1;							/// The weight for when randomly choosing a variation
+	IconConfig Icon;						/// Icon to display for this unit
+	CPlayerColorGraphic *Sprite = nullptr;	/// The graphic corresponding to File.
+	CGraphic *ShadowSprite = nullptr;		/// The graphic corresponding to ShadowFile.
+	CGraphic *LightSprite = nullptr;		/// The graphic corresponding to LightFile.
+	CAnimations *Animations = nullptr;		/// Animation scripts
+	CConstruction *Construction = nullptr;	/// What is shown in construction phase
 
-	std::string UpgradesRequired[VariationMax];	/// Upgrades required by variation
-	std::string UpgradesForbidden[VariationMax];	/// If player has one of these upgrades, unit can't have this variation
+	std::vector<const CUpgrade *> UpgradesRequired;		/// Upgrades required by variation
+	std::vector<const CUpgrade *> UpgradesForbidden;	/// If the player has one of these upgrades, the unit can't have this variation
 	std::vector<int> ItemClassesEquipped;
 	std::vector<int> ItemClassesNotEquipped;
-	std::vector<CUnitType *> ItemsEquipped;
-	std::vector<CUnitType *> ItemsNotEquipped;
-	std::vector<CTerrainType *> Terrains;
-	std::vector<CTerrainType *> TerrainsForbidden;
-	std::vector<CSeason *> Seasons;
-	std::vector<CSeason *> ForbiddenSeasons;
+	std::vector<const CUnitType *> ItemsEquipped;
+	std::vector<const CUnitType *> ItemsNotEquipped;
+	std::vector<const CTerrainType *> Terrains;
+	std::vector<const CTerrainType *> TerrainsForbidden;
+	std::vector<const CSeason *> Seasons;
+	std::vector<const CSeason *> ForbiddenSeasons;
 
 	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
 	std::string FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.
@@ -907,8 +906,8 @@ public:
 	void UpdateDefaultBoolFlags();
 	int GetAvailableLevelUpUpgrades() const;
 	int GetResourceStep(const int resource, const int player) const;
-	VariationInfo *GetDefaultVariation(CPlayer &player, int image_layer = -1) const;
-	VariationInfo *GetVariation(const std::string &variation_name, int image_layer = -1) const;
+	CUnitTypeVariation *GetDefaultVariation(CPlayer &player, int image_layer = -1) const;
+	CUnitTypeVariation *GetVariation(const std::string &variation_name, int image_layer = -1) const;
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	std::string GetDefaultName(CPlayer &player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
@@ -1103,9 +1102,9 @@ public:
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode (used for buildings)
 	//Wyrmgus end
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
+	std::vector<CUnitTypeVariation *> Variations;						/// Variation information
 	//Wyrmgus start
-	VariationInfo *VarInfo[VariationMax];						/// Variation information.
-	std::vector<VariationInfo *> LayerVarInfo[MaxImageLayers];	/// Layer variation information.
+	std::vector<CUnitTypeVariation *> LayerVariations[MaxImageLayers];	/// Layer variation information
 	//Wyrmgus end
 	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
 	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.

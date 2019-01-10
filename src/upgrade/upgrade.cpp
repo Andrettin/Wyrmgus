@@ -1758,30 +1758,31 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				}
 				
 				//change variation if current one becomes forbidden
-				VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
-				if (current_varinfo) {
-					bool forbidden_upgrade = false;
-					for (int u = 0; u < VariationMax; ++u) {
-						if (!current_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesForbidden[u])->ID) {
-							forbidden_upgrade = true;
+				const CUnitTypeVariation *current_variation = unit.GetVariation();
+				if (current_variation) {
+					bool upgrade_forbidden = false;
+					for (const CUpgrade *forbidden_upgrade : current_variation->UpgradesForbidden) {
+						if (um->UpgradeId == forbidden_upgrade->ID) {
+							upgrade_forbidden = true;
 							break;
 						}
 					}
-					if (forbidden_upgrade == true) {
+					if (upgrade_forbidden == true) {
 						unit.ChooseVariation();
 					}
 				}
 				for (int i = 0; i < MaxImageLayers; ++i) {
-					if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
-						VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
-						bool forbidden_upgrade = false;
-						for (int u = 0; u < VariationMax; ++u) {
-							if (!current_layer_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesForbidden[u])->ID) {
-								forbidden_upgrade = true;
+					const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+					if (current_layer_variation) {
+						bool upgrade_forbidden = false;
+						for (const CUpgrade *forbidden_upgrade : current_layer_variation->UpgradesForbidden) {
+							if (um->UpgradeId == forbidden_upgrade->ID) {
+								upgrade_forbidden = true;
 								break;
 							}
 						}
-						if (forbidden_upgrade == true) {
+
+						if (upgrade_forbidden == true) {
 							unit.ChooseVariation(nullptr, false, i);
 						}
 					}
@@ -2053,30 +2054,30 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				}
 				
 				//change variation if current one becomes forbidden
-				VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
-				if (current_varinfo) {
-					bool required_upgrade = false;
-					for (int u = 0; u < VariationMax; ++u) {
-						if (!current_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesRequired[u])->ID) {
-							required_upgrade = true;
+				const CUnitTypeVariation *current_variation = unit.GetVariation();
+				if (current_variation) {
+					bool upgrade_required = false;
+					for (const CUpgrade *required_upgrade : current_variation->UpgradesRequired) {
+						if (um->UpgradeId == required_upgrade->ID) {
+							upgrade_required = true;
 							break;
 						}
 					}
-					if (required_upgrade == true) {
+					if (upgrade_required == true) {
 						unit.ChooseVariation();
 					}
 				}
 				for (int i = 0; i < MaxImageLayers; ++i) {
-					if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
-						VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
-						bool required_upgrade = false;
-						for (int u = 0; u < VariationMax; ++u) {
-							if (!current_layer_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesRequired[u])->ID) {
-								required_upgrade = true;
+					const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+					if (current_layer_variation) {
+						bool upgrade_required = false;
+						for (const CUpgrade *required_upgrade : current_layer_variation->UpgradesRequired) {
+							if (um->UpgradeId == required_upgrade->ID) {
+								upgrade_required = true;
 								break;
 							}
 						}
-						if (required_upgrade == true) {
+						if (upgrade_required == true) {
 							unit.ChooseVariation(nullptr, false, i);
 						}
 					}
@@ -2162,30 +2163,30 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
-	VariationInfo *current_varinfo = unit.Type->VarInfo[unit.Variation];
-	if (current_varinfo) {
-		bool forbidden_upgrade = false;
-		for (int u = 0; u < VariationMax; ++u) {
-			if (!current_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesForbidden[u])->ID) {
-				forbidden_upgrade = true;
+	const CUnitTypeVariation *current_variation = unit.GetVariation();
+	if (current_variation) {
+		bool upgrade_forbidden = false;
+		for (const CUpgrade *forbidden_upgrade : current_variation->UpgradesForbidden) {
+			if (um->UpgradeId == forbidden_upgrade->ID) {
+				upgrade_forbidden = true;
 				break;
 			}
 		}
-		if (forbidden_upgrade == true) {
+		if (upgrade_forbidden == true) {
 			unit.ChooseVariation();
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
-			VariationInfo *current_layer_varinfo = unit.Type->LayerVarInfo[i][unit.LayerVariation[i]];
-			bool forbidden_upgrade = false;
-			for (int u = 0; u < VariationMax; ++u) {
-				if (!current_layer_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesForbidden[u])->ID) {
-					forbidden_upgrade = true;
+		const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+		if (current_layer_variation) {
+			bool upgrade_forbidden = false;
+			for (const CUpgrade *forbidden_upgrade : current_layer_variation->UpgradesForbidden) {
+				if (um->UpgradeId == forbidden_upgrade->ID) {
+					upgrade_forbidden = true;
 					break;
 				}
 			}
-			if (forbidden_upgrade == true) {
+			if (upgrade_forbidden == true) {
 				unit.ChooseVariation(nullptr, false, i);
 			}
 		}
@@ -2264,30 +2265,30 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden
-	VariationInfo *current_varinfo = unit.Type->VarInfo[unit.Variation];
-	if (current_varinfo) {
-		bool required_upgrade = false;
-		for (int u = 0; u < VariationMax; ++u) {
-			if (!current_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesRequired[u])->ID) {
-				required_upgrade = true;
+	const CUnitTypeVariation *current_variation = unit.GetVariation();
+	if (current_variation) {
+		bool upgrade_required = false;
+		for (const CUpgrade *required_upgrade : current_variation->UpgradesRequired) {
+			if (um->UpgradeId == required_upgrade->ID) {
+				upgrade_required = true;
 				break;
 			}
 		}
-		if (required_upgrade == true) {
+		if (upgrade_required == true) {
 			unit.ChooseVariation();
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
-			VariationInfo *current_layer_varinfo = unit.Type->LayerVarInfo[i][unit.LayerVariation[i]];
-			bool required_upgrade = false;
-			for (int u = 0; u < VariationMax; ++u) {
-				if (!current_layer_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesRequired[u])->ID) {
-					required_upgrade = true;
+		const CUnitTypeVariation *current_layer_variation = unit.GetLayerVariation(i);
+		if (current_layer_variation) {
+			bool upgrade_required = false;
+			for (const CUpgrade *required_upgrade : current_layer_variation->UpgradesRequired) {
+				if (um->UpgradeId == required_upgrade->ID) {
+					upgrade_required = true;
 					break;
 				}
 			}
-			if (required_upgrade == true) {
+			if (upgrade_required == true) {
 				unit.ChooseVariation(nullptr, false, i);
 			}
 		}
