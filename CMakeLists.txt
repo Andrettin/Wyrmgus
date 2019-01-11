@@ -1367,21 +1367,6 @@ endif()
 
 ########### next target ###############
 
-set(png2stratagus_SRCS
-	tools/png2stratagus.cpp
-)
-source_group(png2stratagus FILES ${png2stratagus_SRCS})
-
-add_executable(png2stratagus ${png2stratagus_SRCS})
-target_link_libraries(png2stratagus ${PNG_LIBRARY} ${ZLIB_LIBRARIES})
-
-if(WIN32 AND MINGW AND ENABLE_STATIC)
-	set_target_properties(png2stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++")
-endif()
-
-
-########### next target ###############
-
 set(gameheaders_HDRS
 	gameheaders/stratagus-game-installer.nsi
 	gameheaders/stratagus-game-launcher.h
@@ -1399,7 +1384,6 @@ set(doxygen_FILES
 	${metaserver_SRCS}
 	${metaserver_HDRS}
 	${gameheaders_HDRS}
-	${png2stratagus_SRCS}
 )
 
 if(ENABLE_DOC AND DOXYGEN_FOUND)
@@ -1431,7 +1415,6 @@ endmacro()
 
 if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
 	self_packer(stratagus)
-	self_packer(png2stratagus)
 	if(ENABLE_METASERVER)
 		self_packer(metaserver)
 	endif()
@@ -1467,7 +1450,6 @@ endif()
 ########### install files ###############
 
 install(TARGETS stratagus DESTINATION ${GAMEDIR})
-install(TARGETS png2stratagus DESTINATION ${BINDIR})
 
 if(ENABLE_METASERVER)
 	install(TARGETS metaserver DESTINATION ${SBINDIR})
