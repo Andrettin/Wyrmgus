@@ -2067,7 +2067,7 @@ void InitMissileTypes()
 **  Constructor.
 */
 MissileType::MissileType(const std::string &ident) :
-	Ident(ident), Transparency(0), DrawLevel(0),
+	Transparency(0), DrawLevel(0),
 	SpriteFrames(0), NumDirections(1), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
 	//Wyrmgus start
 //	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
@@ -2086,6 +2086,7 @@ MissileType::MissileType(const std::string &ident) :
 	ImpactParticle(nullptr), SmokeParticle(nullptr), OnImpact(nullptr),
 	G(nullptr)
 {
+	this->Ident = ident;
 	size.x = 0;
 	size.y = 0;
 }

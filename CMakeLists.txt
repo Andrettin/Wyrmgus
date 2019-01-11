@@ -670,6 +670,7 @@ set(stratagus_generic_HDRS
 	src/include/construct.h
 	src/include/currency.h
 	src/include/cursor.h
+	src/include/data_type.h
 	src/include/dialogue.h
 	src/include/editor.h
 	src/include/font.h

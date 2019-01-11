@@ -30,11 +30,11 @@
 #ifndef __WORLD_H__
 #define __WORLD_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
+
+#include "data_type.h"
 
 #include <map>
 #include <string>
@@ -44,7 +44,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CPlane;
 class CProvince;
 class CSeasonSchedule;
@@ -52,14 +51,9 @@ class CSpecies;
 class CTerrainFeature;
 class CTimeOfDaySchedule;
 
-class CWorld
+class CWorld : public CDataType
 {
 public:
-	CWorld() :
-		ID(-1), Plane(nullptr), TimeOfDaySchedule(nullptr), SeasonSchedule(nullptr)
-	{
-	}
-	
 	static CWorld *GetWorld(const std::string &ident, const bool should_find = true);
 	static CWorld *GetOrAddWorld(const std::string &ident);
 	static void ClearWorlds();
@@ -67,22 +61,19 @@ public:
 	static std::vector<CWorld *> Worlds;								/// Worlds
 	static std::map<std::string, CWorld *> WorldsByIdent;
 
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
-	int ID;																/// ID of this world
-	std::string Ident;
+	int ID = -1;														/// ID of this world
 	std::string Name;
 	std::string Description;
 	std::string Background;
 	std::string Quote;
-	CPlane *Plane;
-	CTimeOfDaySchedule *TimeOfDaySchedule;								/// this world's time of day schedule
-	CSeasonSchedule *SeasonSchedule;									/// this world's season schedule
+	CPlane *Plane = nullptr;
+	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this world's time of day schedule
+	CSeasonSchedule *SeasonSchedule = nullptr;							/// this world's season schedule
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
 	std::vector<CSpecies *> Species;									/// Species in this world
 };
 
-//@}
-
-#endif // !__WORLD_H__
+#endif

@@ -138,25 +138,19 @@ public:
 class CPersistentItem
 {
 public:
-	CPersistentItem() :
-		Bound(false), Identified(true),
-		Type(nullptr), Prefix(nullptr), Suffix(nullptr), Spell(nullptr), Work(nullptr), Elixir(nullptr), Unique(nullptr), Owner(nullptr)
-	{
-	}
-	
 	void ProcessConfigData(const CConfigData *config_data);
 	
 	std::string Name;
-	bool Bound;					/// Whether the item is bound to its owner and can't be dropped
-	bool Identified;			/// Whether the item has been identified
-	CUnitType *Type;			/// Item type of the item
-	CUpgrade *Prefix;
-	CUpgrade *Suffix;
-	CSpell *Spell;
-	CUpgrade *Work;
-	CUpgrade *Elixir;
-	CUniqueItem *Unique;
-	CCharacter *Owner;
+	bool Bound = false;			/// Whether the item is bound to its owner and can't be dropped
+	bool Identified = true;		/// Whether the item has been identified
+	CUnitType *Type = nullptr;	/// Item type of the item
+	CUpgrade *Prefix = nullptr;
+	CUpgrade *Suffix = nullptr;
+	CSpell *Spell = nullptr;
+	CUpgrade *Work = nullptr;
+	CUpgrade *Elixir = nullptr;
+	CUniqueItem *Unique = nullptr;
+	CCharacter *Owner = nullptr;
 };
 
 /*----------------------------------------------------------------------------

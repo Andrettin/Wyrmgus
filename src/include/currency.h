@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -42,9 +44,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
-
-class CCurrency
+class CCurrency : CDataType
 {
 public:
 	static CCurrency *GetCurrency(const std::string &ident, const bool should_find = true);
@@ -54,10 +54,9 @@ public:
 	static std::vector<CCurrency *> Currencies;
 	static std::map<std::string, CCurrency *> CurrenciesByIdent;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 public:
-	std::string Ident;
 	std::string Name;
 };
 

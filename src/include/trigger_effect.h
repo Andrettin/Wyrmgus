@@ -55,7 +55,7 @@ public:
 class CCallDialogueTriggerEffect : public CTriggerEffect
 {
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
 	
 	CDialogue *Dialogue = nullptr;	/// Dialogue to be called
@@ -65,7 +65,7 @@ public:
 class CCreateUnitTriggerEffect : public CTriggerEffect
 {
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void Do(CPlayer *player) const;				/// Performs the trigger effect
 	
 	int Quantity = 1;				/// Quantity of units created

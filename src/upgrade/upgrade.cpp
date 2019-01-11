@@ -213,12 +213,10 @@ void CUnitStats::ChangeUnitStock(CUnitType *unit_type, int quantity)
 	this->SetUnitStock(unit_type, this->GetUnitStock(unit_type) + quantity);
 }
 
-CUpgrade::CUpgrade(const std::string &ident) :
-	//Wyrmgus start
-//	Ident(ident), ID(0)
-	Ident(ident), ID(0), Class(-1), Civilization(-1), Faction(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(nullptr), Item(nullptr), MaxLimit(1), MagicLevel(0), Year(0), Author(nullptr)
-	//Wyrmgus end
+CUpgrade::CUpgrade(const std::string &ident)
 {
+	this->Ident = ident;
+
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
 	memset(this->ScaledCosts, 0, sizeof(this->ScaledCosts));

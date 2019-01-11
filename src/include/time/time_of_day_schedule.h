@@ -30,12 +30,11 @@
 #ifndef __TIME_OF_DAY_SCHEDULE_H__
 #define __TIME_OF_DAY_SCHEDULE_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
 #include "time/time_period_schedule.h"
 
 #include <map>
@@ -54,30 +53,21 @@ class CTimeOfDaySchedule;
 class CScheduledTimeOfDay
 {
 public:
-	CScheduledTimeOfDay() :
-		ID(0), TimeOfDay(nullptr), Hours(0), Schedule(nullptr)
-	{
-	}
-	
 	void ProcessConfigData(const CConfigData *config_data);
 	int GetHours(const CSeason *season = nullptr) const;
 	
-	unsigned ID;					/// the scheduled time of day's ID within the time of day schedule
-	CTimeOfDay *TimeOfDay;			/// the time of day that is scheduled
+	unsigned ID = 0;							/// the scheduled time of day's ID within the time of day schedule
+	CTimeOfDay *TimeOfDay = nullptr;			/// the time of day that is scheduled
 private:
-	int Hours;						/// the amount of hours the scheduled time of day lasts
+	int Hours = 0;								/// the amount of hours the scheduled time of day lasts
 public:
-	CTimeOfDaySchedule *Schedule;	/// the schedule to which this time of day belongs
+	CTimeOfDaySchedule *Schedule = nullptr;		/// the schedule to which this time of day belongs
 	std::map<const CSeason *, int> SeasonHours;	/// the amount of hours the scheduled time of day lasts in a given season
 };
 
 class CTimeOfDaySchedule : public CTimePeriodSchedule
 {
 public:
-	CTimeOfDaySchedule()
-	{
-	}
-	
 	~CTimeOfDaySchedule();
 	
 	static CTimeOfDaySchedule *GetTimeOfDaySchedule(const std::string &ident, const bool should_find = true);
@@ -88,15 +78,12 @@ public:
 	static std::map<std::string, CTimeOfDaySchedule *> TimeOfDaySchedulesByIdent;
 	static CTimeOfDaySchedule *DefaultTimeOfDaySchedule;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual unsigned long GetDefaultTotalHours() const;
 	virtual int GetDefaultHourMultiplier() const;
 
-	std::string Ident;										/// Ident of the time of day schedules
 	std::string Name;										/// Name of the time of day schedules
 	std::vector<CScheduledTimeOfDay *> ScheduledTimesOfDay;	/// The times of day that are scheduled
 };
 
-//@}
-
-#endif // !__TIME_OF_DAY_SCHEDULE_H__
+#endif

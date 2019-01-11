@@ -39,7 +39,7 @@
 class Spell_Demolish : public SpellActionType
 {
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) {};
+	virtual void ProcessConfigData(const CConfigData *config_data) override {};
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);

@@ -46,32 +46,21 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CSeason;
 class CSeasonSchedule;
 
 class CScheduledSeason
 {
 public:
-	CScheduledSeason() :
-		ID(0), Season(nullptr), Hours(0), Schedule(nullptr)
-	{
-	}
-	
-	unsigned ID;				/// the scheduled season's ID within the season schedule
-	CSeason *Season;			/// the season that is scheduled
-	unsigned Hours;				/// the amount of hours the scheduled season lasts
-	CSeasonSchedule *Schedule;	/// the schedule to which this season belongs
+	unsigned ID = 0;						/// the scheduled season's ID within the season schedule
+	CSeason *Season = nullptr;				/// the season that is scheduled
+	unsigned Hours = 0;						/// the amount of hours the scheduled season lasts
+	CSeasonSchedule *Schedule = nullptr;	/// the schedule to which this season belongs
 };
 
 class CSeasonSchedule : public CTimePeriodSchedule
 {
 public:
-	CSeasonSchedule() :
-		HoursPerDay(DEFAULT_HOURS_PER_DAY)
-	{
-	}
-	
 	~CSeasonSchedule();
 	
 	static CSeasonSchedule *GetSeasonSchedule(const std::string &ident, const bool should_find = true);
@@ -82,16 +71,13 @@ public:
 	static std::map<std::string, CSeasonSchedule *> SeasonSchedulesByIdent;
 	static CSeasonSchedule *DefaultSeasonSchedule;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual unsigned long GetDefaultTotalHours() const;
 	virtual int GetDefaultHourMultiplier() const;
 
-	std::string Ident;									/// Ident of the season schedules
-	std::string Name;									/// Name of the season schedules
-	unsigned HoursPerDay;								/// The hours per each day for this season schedule
+	std::string Name;									/// Name of the season schedule
+	unsigned HoursPerDay = DEFAULT_HOURS_PER_DAY;		/// The hours per each day for this season schedule
 	std::vector<CScheduledSeason *> ScheduledSeasons;	/// The seasons that are scheduled
 };
 
-//@}
-
-#endif // !__SEASON_SCHEDULE_H__
+#endif

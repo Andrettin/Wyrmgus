@@ -31,12 +31,11 @@
 #ifndef __SPELLS_H__
 #define __SPELLS_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
 #include "luacallback.h"
 #include "unitsound.h"
 #include "vec2i.h"
@@ -228,7 +227,7 @@ public:
 /**
 **  Base structure of a spell type.
 */
-class CSpell
+class CSpell : public CDataType
 {
 public:
 	CSpell(int slot, const std::string &ident);
@@ -242,7 +241,7 @@ public:
 	static std::vector<CSpell *> Spells;
 	static std::map<std::string, CSpell *> SpellsByIdent;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	/// return 1 if spell is available, 0 if not (must upgrade)
 	bool IsAvailableForUnit(const CUnit &unit) const;
 	const AutoCastInfo *GetAutoCastInfo(const bool ai) const;
@@ -251,7 +250,6 @@ public:
 	std::vector<CUnit *> GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const;
 	
 	// Identification stuff
-	std::string Ident;    /// Spell unique identifier (spell-holy-vision)
 	std::string Name;     /// Spell name shown by the engine
 	std::string Description;	/// Spell description
 	int Slot;             /// Spell numeric identifier
@@ -317,6 +315,4 @@ extern int AutoCastSpell(CUnit &caster, const CSpell &spell);
 /// return 0, 1, 2 for true, only, false.
 extern char Ccl2Condition(lua_State *l, const char *value);
 
-//@}
-
-#endif // !__SPELLS_H__
+#endif

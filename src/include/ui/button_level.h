@@ -36,6 +36,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -44,16 +46,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
-
-class CButtonLevel
+class CButtonLevel : public CDataType
 {
 public:
-	CButtonLevel() :
-		ID(-1)
-	{
-	}
-	
 	static CButtonLevel *GetButtonLevel(const std::string &ident, const bool should_find = true);
 	static CButtonLevel *GetOrAddButtonLevel(const std::string &ident);
 	static void ClearButtonLevels();
@@ -63,12 +58,9 @@ public:
 	static CButtonLevel *CancelButtonLevel;
 	static CButtonLevel *InventoryButtonLevel;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	std::string Ident;									/// Ident of the button level
-	int ID;												/// ID of the button level (starting at 1)
+	int ID = -1;									/// ID of the button level (starting at 1)
 };
 
-//@}
-
-#endif // !__BUTTON_LEVEL_H__
+#endif

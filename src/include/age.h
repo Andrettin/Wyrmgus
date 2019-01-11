@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -42,11 +44,10 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CGraphic;
 class CUpgrade;
 
-class CAge
+class CAge : public CDataType
 {
 public:
 	~CAge();
@@ -61,10 +62,9 @@ public:
 	static std::map<std::string, CAge *> AgesByIdent;
 	static CAge *CurrentAge;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 public:
-	std::string Ident;
 	std::string Name;
 	CGraphic *G = nullptr;
 	int Priority = 0;

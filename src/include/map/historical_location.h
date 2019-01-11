@@ -30,8 +30,6 @@
 #ifndef __HISTORICAL_LOCATION_H__
 #define __HISTORICAL_LOCATION_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -58,6 +56,4 @@ public:
 	CSite *Site = nullptr; //the historical location's site (if any)
 };
 
-//@}
-
-#endif // !__HISTORICAL_LOCATION_H__
+#endif

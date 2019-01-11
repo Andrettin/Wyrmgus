@@ -35,13 +35,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
 #include "resource.h"
 
-
 #include <vector>
+
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -51,7 +52,6 @@
 ----------------------------------------------------------------------------*/
 
 class CCharacter;
-class CConfigData;
 class CDeityDomain;
 class CIcon;
 class CSchoolOfMagic;
@@ -97,7 +97,7 @@ public:
 /**
 **  The main useable upgrades.
 */
-class CUpgrade
+class CUpgrade : public CDataType
 {
 public:
 	CUpgrade(const std::string &ident);
@@ -106,47 +106,46 @@ public:
 	static CUpgrade *New(const std::string &ident);
 	static CUpgrade *Get(const std::string &ident);
 
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 	void SetIcon(CIcon *icon);
 
-	std::string Ident;                /// identifier
 	std::string Name;                 /// upgrade label
 	//Wyrmgus start
-	int Class;						/// upgrade class (i.e. siege weapon projectile I)
-	int Civilization;				/// which civilization this upgrade belongs to, if any
-	int Faction;					/// which faction this upgrade belongs to, if any
+	int Class = -1;					/// upgrade class (i.e. siege weapon projectile I)
+	int Civilization = -1;			/// which civilization this upgrade belongs to, if any
+	int Faction = -1;				/// which faction this upgrade belongs to, if any
 	std::string Description;		/// Description of the upgrade
 	std::string Quote;				/// Quote of the upgrade
 	std::string Background;			/// Encyclopedia entry for the upgrade
 	std::string EffectsString;		/// Effects string of the upgrade
 	std::string RequirementsString;	/// Requirements string of the upgrade
-	bool Ability;
-	bool Weapon;
-	bool Shield;
-	bool Boots;
-	bool Arrows;
-	bool MagicPrefix;
-	bool MagicSuffix;
-	bool RunicAffix;
-	bool UniqueOnly;						/// Whether (if this is a literary work) this should appear only on unique items (used, for instance, if a book has no copies of its text)
+	bool Ability = false;
+	bool Weapon = false;
+	bool Shield = false;
+	bool Boots = false;
+	bool Arrows = false;
+	bool MagicPrefix = false;
+	bool MagicSuffix = false;
+	bool RunicAffix = false;
+	bool UniqueOnly = false;		/// Whether (if this is a literary work) this should appear only on unique items (used, for instance, if a book has no copies of its text)
 	bool ItemPrefix[MaxItemClasses];
 	bool ItemSuffix[MaxItemClasses];
 	bool IncompatibleAffixes[UpgradeMax];
 	std::vector<int> WeaponClasses;		/// If isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
 	std::vector<std::string> Epithets;	/// Epithets when a character has a certain trait
-	CUnitType *Item;
+	CUnitType *Item = nullptr;
 	//Wyrmgus end
-	int   ID;                         /// numerical id
-	int   Costs[MaxCosts];            /// costs for the upgrade
-	int   ScaledCosts[MaxCosts];      /// scaled costs for the upgrade
+	int   ID = 0;						/// numerical id
+	int   Costs[MaxCosts];				/// costs for the upgrade
+	int   ScaledCosts[MaxCosts];		/// scaled costs for the upgrade
 	//Wyrmgus start
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
-	int MaxLimit;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
-	int MagicLevel;					/// Magic level of an affix
-	int Work;						/// Form in which was inscribed (i.e. scroll or book), if is a literary work
-	int Year;						/// Year of publication, if is a literary work
-	CCharacter *Author;				/// Author of this literary work (if it is one)
+	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
+	int MagicLevel = 0;					/// Magic level of an affix
+	int Work = -1;						/// Form in which was inscribed (i.e. scroll or book), if is a literary work
+	int Year = 0;						/// Year of publication, if is a literary work
+	CCharacter *Author = nullptr;		/// Author of this literary work (if it is one)
 	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
 	std::vector<CUniqueItem *> UniqueItems;	/// Unique items who form a part of this set upgrade
 	std::vector<CUnitType *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
@@ -155,7 +154,7 @@ public:
 	std::vector<CCharacter *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons
-	CIcon *Icon;                      /// icon to display to the user
+	CIcon *Icon = nullptr;					/// icon to display to the user
 };
 
 /**

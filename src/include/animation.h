@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation.h - The animations headerfile. */
+/**@name animation.h - The animations header file. */
 //
-//      (c) Copyright 2005-2007 by Jimmy Salmon
+//      (c) Copyright 2005-2019 by Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -30,12 +30,12 @@
 #ifndef __ANIMATIONS_H__
 #define __ANIMATIONS_H__
 
-//@{
+#include "data_type.h"
+#include "upgrade/upgrade_structs.h" // MaxCost
 
 #include <string>
 #include <map>
 
-#include "upgrade/upgrade_structs.h" // MaxCost
 #define ANIMATIONS_DEATHTYPES 40
 
 class CFile;
@@ -104,12 +104,10 @@ public:
 	CAnimation *Next;
 };
 
-class CAnimations
+class CAnimations : public CDataType
 {
 public:
-	CAnimations() : Attack(nullptr), RangedAttack(nullptr), Build(nullptr), Move(nullptr), Repair(nullptr),
-		Research(nullptr), SpellCast(nullptr), Start(nullptr), Still(nullptr),
-		Train(nullptr), Upgrade(nullptr)
+	CAnimations()
 	{
 		memset(Death, 0, sizeof(Death));
 		memset(Harvest, 0, sizeof(Harvest));
@@ -141,23 +139,22 @@ public:
 	static void LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 	static void LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 public:
-	std::string Ident;
-	CAnimation *Attack;
-	CAnimation *RangedAttack;
-	CAnimation *Build;
+	CAnimation *Attack = nullptr;
+	CAnimation *RangedAttack = nullptr;
+	CAnimation *Build = nullptr;
 	CAnimation *Death[ANIMATIONS_DEATHTYPES + 1];
 	CAnimation *Harvest[MaxCosts];
-	CAnimation *Move;
-	CAnimation *Repair;
-	CAnimation *Research;
-	CAnimation *SpellCast;
-	CAnimation *Start;
-	CAnimation *Still;
-	CAnimation *Train;
-	CAnimation *Upgrade;
+	CAnimation *Move = nullptr;
+	CAnimation *Repair = nullptr;
+	CAnimation *Research = nullptr;
+	CAnimation *SpellCast = nullptr;
+	CAnimation *Start = nullptr;
+	CAnimation *Still = nullptr;
+	CAnimation *Train = nullptr;
+	CAnimation *Upgrade = nullptr;
 };
 
 /*----------------------------------------------------------------------------
@@ -186,6 +183,4 @@ extern void FreeAnimations();
 extern std::map<std::string, CAnimations *> AnimationMap;
 //Wyrmgus end
 
-//@}
-
-#endif // !__ANIMATIONS_H__
+#endif

@@ -34,20 +34,20 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <map>
-#include <string>
-#include <vector>
-
+#include "data_type.h"
 #include "map/tile.h"
 #include "time/date.h"
 #include "vec2i.h"
+
+#include <map>
+#include <string>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CCharacter;
-class CConfigData;
 class CFaction;
 class CHistoricalLocation;
 class CMapField;
@@ -77,7 +77,7 @@ public:
 	std::vector<const CTerrainType *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
 };
 
-class CMapTemplate
+class CMapTemplate : public CDataType
 {
 public:
 	CMapTemplate() :
@@ -94,7 +94,7 @@ public:
 	static std::vector<CMapTemplate *> MapTemplates;								/// Map templates
 	static std::map<std::string, CMapTemplate *> MapTemplatesByIdent;
 
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
 	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
@@ -106,7 +106,6 @@ public:
 	const CMapTemplate *GetTopMapTemplate() const;
 	Vec2i GetBestLocationMapPosition(const std::vector<CHistoricalLocation *> &historical_location_list, bool &in_another_map_template, const Vec2i &template_start_pos, const Vec2i &map_start_pos, const bool random) const;
 	
-	std::string Ident;
 	std::string Name;
 	std::string TerrainFile;
 	std::string OverlayTerrainFile;

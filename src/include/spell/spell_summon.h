@@ -41,7 +41,7 @@ class Spell_Summon : public SpellActionType
 public:
 	Spell_Summon() : SpellActionType(1), UnitType(nullptr), TTL(0),
 		RequireCorpse(false), JoinToAiForce(false) {};
-	virtual void ProcessConfigData(const CConfigData *config_data) {}
+	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);

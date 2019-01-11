@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
+/**@name data_type.h - The data type header file. */
 //
-//      (c) Copyright 1999-2012 by Vladi Belperchinov-Shabanski,
-//                                 Joris DAUPHIN, and Jimmy Salmon
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,31 +27,28 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_ADJUSTVITAL_H
-#define SPELL_ADJUSTVITAL_H
+#ifndef __DATA_TYPE_H__
+#define __DATA_TYPE_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "spells.h"
+#include <string>
 
-class Spell_AdjustVital : public SpellActionType
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+class CConfigData;
+
+class CDataType
 {
 public:
-	Spell_AdjustVital() : SpellActionType(1), HP(0), Mana(0), Shield(0), MaxMultiCast(0) {};
-	virtual void ProcessConfigData(const CConfigData *config_data) override {}
-	virtual int Cast(CUnit &caster, const CSpell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
-
-private:
-	int HP;         /// Target HP gain.(can be negative)
-	int Mana;       /// Target Mana gain.(can be negative)
-	int Shield;     /// Target SP gain.(can be negative)
-	/// This spell is designed to be used wit very small amounts. The spell
-	/// can scale up to MaxMultiCast times. Use 0 for infinite.
-	int MaxMultiCast;
+	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
+	
+public:
+	std::string Ident;	/// String identifier of the instance
 };
 
 #endif

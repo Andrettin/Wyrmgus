@@ -34,18 +34,18 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+#include "icons.h"
+
 #include <map>
 #include <string>
 #include <vector>
-
-#include "icons.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CCivilization;
-class CConfigData;
 class CDeityDomain;
 class CFaction;
 class CPantheon;
@@ -56,7 +56,7 @@ class CUpgrade;
 #define MAJOR_DEITY_DOMAIN_MAX 3 // major deities can only have up to three domains
 #define MINOR_DEITY_DOMAIN_MAX 1 // minor deities can only have one domain
 
-class CDeity
+class CDeity : public CDataType
 {
 public:
 	static CDeity *GetDeity(const std::string &ident, const bool should_find = true);
@@ -68,13 +68,12 @@ public:
 	static std::map<std::string, CDeity *> DeitiesByIdent;
 	static std::map<const CUpgrade *, CDeity *> DeitiesByUpgrade;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 	std::string GetCulturalName(const CCivilization *civilization) const;
 	
 	int Gender = 0;								/// Deity's gender
 	bool Major = false;							/// Whether the deity is a major one or not
-	std::string Ident;							/// Ident of the deity
 	std::string Name;							/// Name of the deity
 	std::string Description;
 	std::string Background;

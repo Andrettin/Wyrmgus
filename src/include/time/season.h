@@ -30,11 +30,11 @@
 #ifndef __SEASON_H__
 #define __SEASON_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
+
+#include "data_type.h"
 
 #include <map>
 #include <string>
@@ -44,10 +44,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CGraphic;
 
-class CSeason
+class CSeason : public CDataType
 {
 public:
 	static CSeason *GetSeason(const std::string &ident, const bool should_find = true);
@@ -57,13 +56,10 @@ public:
 	static std::vector<CSeason *> Seasons;		/// Seasons
 	static std::map<std::string, CSeason *> SeasonsByIdent;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
-	std::string Ident;							/// Ident of the season
 	std::string Name;							/// Name of the season
 	CGraphic *G = nullptr;
 };
 
-//@}
-
-#endif // !__SEASON_H__
+#endif

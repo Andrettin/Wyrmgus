@@ -39,22 +39,19 @@
 class Spell_Polymorph : public SpellActionType
 {
 public:
-	//Wyrmgus start
-//	Spell_Polymorph() : SpellActionType(1), NewForm(nullptr), PlayerNeutral(0) {};
-	Spell_Polymorph() : SpellActionType(1), NewForm(nullptr), PlayerNeutral(0), Civilization(-1), Faction(-1), Detachment(false) {};
-	//Wyrmgus end
-	virtual void ProcessConfigData(const CConfigData *config_data) {}
+	Spell_Polymorph() : SpellActionType(1) {};
+	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	CUnitType *NewForm;         /// The new form
-	int PlayerNeutral;          /// Convert the unit to the neutral player, or to the caster's player.
+	CUnitType *NewForm = nullptr;	/// The new form
+	int PlayerNeutral = 0;			/// Convert the unit to the neutral player, or to the caster's player.
 	//Wyrmgus start
-	int Civilization;			/// For using with the Faction value.
-	int Faction;				/// If the unit should be transformed in its faction equivalent.
-	bool Detachment;			/// If the unit should be transformed from its faction-specific type to the generic civilization equivalent.
+	int Civilization = -1;			/// For using with the Faction value.
+	int Faction = -1;				/// If the unit should be transformed in its faction equivalent.
+	bool Detachment = false;		/// If the unit should be transformed from its faction-specific type to the generic civilization equivalent.
 	//Wyrmgus end
 	// TODO: temporary polymorphs would be awesome, but hard to implement
 };

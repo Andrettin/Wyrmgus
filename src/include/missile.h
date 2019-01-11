@@ -30,8 +30,6 @@
 #ifndef __MISSILE_H__
 #define __MISSILE_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -295,6 +293,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
 #include "missileconfig.h"
 #include "script.h"
 #include "unit/unitptr.h"
@@ -340,7 +339,7 @@ enum {
 };
 
 /// Base structure of missile-types
-class MissileType
+class MissileType : public CDataType
 {
 public:
 	explicit MissileType(const std::string &ident);
@@ -348,7 +347,7 @@ public:
 
 	static const char *MissileClassNames[];
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 	/// load the graphics for a missile type
 	void LoadMissileSprite();
@@ -361,7 +360,6 @@ public:
 	int Height() const { return size.y; }
 
 	//private:
-	std::string Ident;         /// missile name
 	int Transparency;          /// missile transparency
 	PixelSize size;            /// missile size in pixels
 	int DrawLevel;             /// Level to draw missile at
@@ -668,6 +666,4 @@ extern void CleanMissiles();
 
 extern void FreeBurningBuildingFrames();
 
-//@}
-
-#endif // !__MISSILE_H__
+#endif

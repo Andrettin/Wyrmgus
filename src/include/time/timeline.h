@@ -36,26 +36,20 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+#include "time/date.h"
+
 #include <map>
 #include <string>
 #include <vector>
-
-#include "time/date.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
-
-class CTimeline
+class CTimeline : public CDataType
 {
 public:
-	CTimeline() :
-		ID(-1)
-	{
-	}
-	
 	static CTimeline *GetTimeline(const std::string &ident);
 	static CTimeline *GetOrAddTimeline(const std::string &ident);
 	static void ClearTimelines();
@@ -63,14 +57,11 @@ public:
 	static std::vector<CTimeline *> Timelines;
 	static std::map<std::string, CTimeline *> TimelinesByIdent;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	int ID;
-	std::string Ident;
+	int ID = -1;
 	std::string Name;
 	CDate PointOfDivergence;											/// The point of divergence for this timeline
 };
 
-//@}
-
-#endif // !__TIMELINE_H__
+#endif

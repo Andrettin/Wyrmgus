@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -42,10 +44,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CUpgrade;
 
-class CDeityDomain
+class CDeityDomain : public CDataType
 {
 public:
 	static CDeityDomain *GetDeityDomain(const std::string &ident, bool should_find = true);
@@ -57,9 +58,8 @@ public:
 	static std::map<std::string, CDeityDomain *> DeityDomainsByIdent;
 	static std::map<const CUpgrade *, CDeityDomain *> DeityDomainsByUpgrade;
 
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	std::string Ident;									/// Ident of the domain
 	std::string Name;									/// Name of the domain
 	std::string Description;							/// Description of the deity domain from an in-game universe perspective
 	std::string Background;								/// Description of the deity domain from a perspective outside of the game's universe

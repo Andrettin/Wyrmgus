@@ -34,19 +34,19 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+#include "time/date.h"
+#include "vec2i.h"
+
 #include <map>
 #include <string>
 #include <vector>
-
-#include "time/date.h"
-#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CCivilization;
-class CConfigData;
 class CFaction;
 class CMapTemplate;
 class CRegion;
@@ -54,7 +54,7 @@ class CUnit;
 class CUnitType;
 class CUniqueItem;
 
-class CSite
+class CSite : public CDataType
 {
 public:
 	static CSite *GetSite(const std::string &ident);
@@ -64,10 +64,9 @@ public:
 	static std::vector<CSite *> Sites;							/// Sites
 	static std::map<std::string, CSite *> SitesByIdent;
 
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	std::string GetCulturalName(const CCivilization *civilization) const;
 
-	std::string Ident;
 	std::string Name;
 	bool Major = false;											/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
 	Vec2i Position = Vec2i(-1, -1);								/// Position of the site in its map template

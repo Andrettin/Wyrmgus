@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -42,10 +44,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CUpgrade;
 
-class CSchoolOfMagic
+class CSchoolOfMagic : public CDataType
 {
 public:
 	static CSchoolOfMagic *GetSchoolOfMagic(const std::string &ident, bool should_find = true);
@@ -57,9 +58,8 @@ public:
 	static std::map<std::string, CSchoolOfMagic *> SchoolsOfMagicByIdent;
 	static std::map<const CUpgrade *, CSchoolOfMagic *> SchoolsOfMagicByUpgrade;
 
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	std::string Ident;									/// Ident of the school of magic
 	std::string Name;									/// Name of the school of magic
 	std::string Description;							/// Description of the school of magic from an in-game universe perspective
 	std::string Background;								/// Description of the school of magic from a perspective outside of the game's universe

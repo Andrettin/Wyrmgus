@@ -34,18 +34,19 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <algorithm>
-#include <climits>
-#include <cstring>
-#include <map>
-#include <vector>
-
 #include "color.h"
+#include "data_type.h"
 #include "icons.h"
 #include "missileconfig.h"
 #include "unitsound.h"
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
+
+#include <algorithm>
+#include <climits>
+#include <cstring>
+#include <map>
+#include <vector>
 
 #ifdef __MORPHOS__
 #undef Enable
@@ -789,30 +790,23 @@ public:
 class CSpecies
 {
 public:
-	CSpecies() :
-		Era(-1),
-		Sapient(false), Prehistoric(false),
-		Genus(nullptr), HomePlane(nullptr), Homeworld(nullptr), Type(nullptr)
-	{
-	}
-	
 	bool CanEvolveToAUnitType(CTerrainType *terrain = nullptr, bool sapient_only = false);
 	CSpecies *GetRandomEvolution(CTerrainType *terrain);
 	
-	int Era;						/// Era ID
-	bool Sapient;					/// Whether the species is sapient
-	bool Prehistoric;				/// Whether the species is prehistoric or not
+	int Era = -1;					/// Era ID
+	bool Sapient = false;			/// Whether the species is sapient
+	bool Prehistoric = false;		/// Whether the species is prehistoric or not
 	std::string Ident;				/// Ident of the species
 	std::string Name;				/// Name of the species
 	std::string Description;		/// Description of the species
 	std::string Quote;				/// Quote pertaining to the species
 	std::string Background;			/// Background of the species
-	CSpeciesGenus *Genus;
+	CSpeciesGenus *Genus = nullptr;
 	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
-	CPlane *HomePlane;
-	CWorld *Homeworld;
-	CUnitType *Type;
+	CPlane *HomePlane = nullptr;
+	CWorld *Homeworld = nullptr;
+	CUnitType *Type = nullptr;
 	std::vector<CTerrainType *> Terrains;	/// in which terrains does this species live
 	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
 	std::vector<CSpecies *> EvolvesTo;		/// to which species this one can evolve
@@ -821,13 +815,13 @@ public:
 
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
-class CUnitType
+class CUnitType : public CDataType
 {
 public:
 	CUnitType();
 	~CUnitType();
 
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 	Vec2i GetTileSize() const;
 	Vec2i GetHalfTileSize() const;
@@ -863,7 +857,6 @@ public:
 	//Wyrmgus end
 
 public:
-	std::string Ident;              /// Identifier
 	std::string Name;               /// Pretty name shown from the engine
 	bool Initialized = false;
 	CUnitType *Parent;				/// Parent unit type

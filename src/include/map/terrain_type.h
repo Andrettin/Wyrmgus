@@ -30,37 +30,31 @@
 #ifndef __TERRAIN_TYPE_H__
 #define __TERRAIN_TYPE_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
+
+#include "color.h"
+#include "data_type.h"
 
 #include <map>
 #include <string>
 #include <tuple>
 #include <vector>
 
-#include "color.h"
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CGraphic;
 class CPlayerColorGraphic;
 class CSeason;
 class CUnitType;
 
-class CTerrainType
+class CTerrainType : public CDataType
 {
 public:
-	CTerrainType() :
-		ID(-1), Flags(0), SolidAnimationFrames(0), Resource(-1),
-		Overlay(false), Buildable(false), AllowSingle(false), Hidden(false),
-		PixelTileSize(32, 32),
-		UnitType(nullptr), Graphics(nullptr), ElevationGraphics(nullptr), PlayerColorGraphics(nullptr)
+	CTerrainType()
 	{
 		Color.R = 0;
 		Color.G = 0;
@@ -81,29 +75,28 @@ public:
 	static std::map<std::string, CTerrainType *> TerrainTypesByCharacter;
 	static std::map<std::tuple<int, int, int>, CTerrainType *> TerrainTypesByColor;
 
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	CGraphic *GetGraphics(const CSeason *season = nullptr) const;
 
-	std::string Ident;
 	std::string Name;
 	std::string Character;
 	CColor Color;
-	int ID;
-	int SolidAnimationFrames;
-	int Resource;
-	unsigned long Flags;
-	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
-	bool Buildable;
-	bool AllowSingle;											/// Whether this terrain type has transitions for single tiles
-	bool Hidden;
-	PixelSize PixelTileSize;
-	CUnitType *UnitType;
+	int ID = -1;
+	int SolidAnimationFrames = 0;
+	int Resource = -1;
+	unsigned long Flags = 0;
+	bool Overlay = false;										/// Whether this terrain type belongs to the overlay layer
+	bool Buildable = false;										/// Whether structures can be built upon this terrain type
+	bool AllowSingle = false;									/// Whether this terrain type has transitions for single tiles
+	bool Hidden = false;
+	PixelSize PixelTileSize = PixelSize(32, 32);
+	CUnitType *UnitType = nullptr;
 //private:
-	CGraphic *Graphics;
+	CGraphic *Graphics = nullptr;
 	std::map<const CSeason *, CGraphic *> SeasonGraphics;		/// Graphics to be displayed instead of the normal ones during particular seasons
 public:
-	CGraphic *ElevationGraphics;								/// Semi-transparent elevation graphics, separated so that borders look better
-	CPlayerColorGraphic *PlayerColorGraphics;
+	CGraphic *ElevationGraphics = nullptr;						/// Semi-transparent elevation graphics, separated so that borders look better
+	CPlayerColorGraphic *PlayerColorGraphics = nullptr;
 	std::vector<CTerrainType *> BaseTerrainTypes;				/// Possible base terrain types for this terrain type (if it is an overlay terrain)
 	std::vector<CTerrainType *> BorderTerrains;					/// Terrain types which this one can border
 	std::vector<CTerrainType *> InnerBorderTerrains;			/// Terrain types which this one can border, and which "enter" this tile type in transitions
@@ -115,6 +108,4 @@ public:
 	std::map<std::tuple<int, int>, std::vector<int>> AdjacentTransitionTiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 };
 
-//@}
-
-#endif // !__TERRAIN_TYPE_H__
+#endif

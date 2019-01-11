@@ -30,11 +30,11 @@
 #ifndef __TIME_PERIOD_SCHEDULE_H__
 #define __TIME_PERIOD_SCHEDULE_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
+
+#include "data_type.h"
 
 #include <map>
 #include <string>
@@ -44,22 +44,15 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CTimePeriodSchedule
+class CTimePeriodSchedule : public CDataType
 {
 public:
-	CTimePeriodSchedule() :
-		TotalHours(0), HourMultiplier(1)
-	{
-	}
-	
 	virtual unsigned long GetDefaultTotalHours() const = 0;
 	virtual int GetDefaultHourMultiplier() const = 0;
 	void CalculateHourMultiplier();
 
-	unsigned long TotalHours;							/// The total amount of hours this time period schedule contains
-	int HourMultiplier;									/// The amount of hours that pass for this schedule for each in-game hour
+	unsigned long TotalHours = 0;						/// The total amount of hours this time period schedule contains
+	int HourMultiplier = 1;								/// The amount of hours that pass for this schedule for each in-game hour
 };
 
-//@}
-
-#endif // !__TIME_PERIOD_SCHEDULE_H__
+#endif

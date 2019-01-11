@@ -30,63 +30,46 @@
 #ifndef __CALENDAR_H__
 #define __CALENDAR_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+#include "time/date.h"
+
 #include <map>
 #include <string>
 #include <vector>
-
-#include "time/date.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CCalendar;
-class CConfigData;
 
 class CDayOfTheWeek
 {
 public:
-	CDayOfTheWeek() :
-		ID(-1), Calendar(nullptr)
-	{
-	}
-	
 	void ProcessConfigData(const CConfigData *config_data);
 
 	std::string Ident;
 	std::string Name;
-	int ID;
-	CCalendar *Calendar;
+	int ID = -1;
+	CCalendar *Calendar = nullptr;
 };
 
 class CMonth
 {
 public:
-	CMonth() :
-		Days(0)
-	{
-	}
-	
 	void ProcessConfigData(const CConfigData *config_data);
 
 	std::string Name;
-	int Days;
+	int Days = 0;
 };
 
-class CCalendar
+class CCalendar : public CDataType
 {
 public:
-	CCalendar() :
-		Initialized(false), HoursPerDay(DEFAULT_HOURS_PER_DAY), DaysPerYear(0), BaseDayOfTheWeek(nullptr), CurrentDayOfTheWeek(-1)
-	{
-	}
-	
 	~CCalendar();
 	
 	static CCalendar *GetCalendar(const std::string &ident, const bool should_find = true);
@@ -97,7 +80,7 @@ public:
 	static std::map<std::string, CCalendar *> CalendarsByIdent;
 	static CCalendar *BaseCalendar;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 private:
 	CDayOfTheWeek *GetDayOfTheWeekByIdent(const std::string &ident);
 	void AddChronologicalIntersection(CCalendar *intersecting_calendar, const CDate &date, const CDate &intersecting_date);
@@ -105,16 +88,15 @@ private:
 public:
 	std::pair<CDate, CDate> GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const;
 	
-	std::string Ident;
 	std::string Name;
-	bool Initialized;
-	int HoursPerDay;
-	int DaysPerYear;
+	bool Initialized = false;
+	int HoursPerDay = DEFAULT_HOURS_PER_DAY;
+	int DaysPerYear = 0;
 	std::string YearLabel;														/// label used for years (e.g. AD)
 	std::string NegativeYearLabel;												/// label used for "negative" years (e.g. BC)
-	CDayOfTheWeek *BaseDayOfTheWeek;											/// the day of the week for the first day of the year in the calendar
+	CDayOfTheWeek *BaseDayOfTheWeek = nullptr;									/// the day of the week for the first day of the year in the calendar
 	CDate CurrentDate;															/// the current date in this calendar within a game
-	int CurrentDayOfTheWeek;													/// the current day of the week in this calendar within a game
+	int CurrentDayOfTheWeek = -1;												/// the current day of the week in this calendar within a game
 	std::vector<CDayOfTheWeek *> DaysOfTheWeek;									/// the days of the week in the calendar
 	std::vector<CMonth *> Months;												/// the months in the calendar
 private:
@@ -122,6 +104,4 @@ private:
 	std::map<CCalendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// chronological intersection points between this calendar and other calendars
 };
 
-//@}
-
-#endif // !__CALENDAR_H__
+#endif

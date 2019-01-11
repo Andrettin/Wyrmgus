@@ -30,33 +30,26 @@
 #ifndef __TIME_OF_DAY_H__
 #define __TIME_OF_DAY_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
+
+#include "data_type.h"
+#include "color.h"
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include "color.h"
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CGraphic;
 
-class CTimeOfDay
+class CTimeOfDay : public CDataType
 {
 public:
-	CTimeOfDay() :
-		ID(-1), Dawn(false), Day(false), Dusk(false), Night(false)
-	{
-	}
-	
 	static CTimeOfDay *GetTimeOfDay(const std::string &ident, const bool should_find = true);
 	static CTimeOfDay *GetOrAddTimeOfDay(const std::string &ident);
 	static void ClearTimesOfDay();
@@ -64,20 +57,17 @@ public:
 	static std::vector<CTimeOfDay *> TimesOfDay;	/// Times of day
 	static std::map<std::string, CTimeOfDay *> TimesOfDayByIdent;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	bool HasColorModification() const;
 
-	std::string Ident;							/// Ident of the time of day
 	std::string Name;							/// Name of the time of day
-	int ID;										/// The ID of this time of day
-	bool Dawn;									/// Whether this is a dawn time of day
-	bool Day;									/// Whether this is a day time of day
-	bool Dusk;									/// Whether this is a dusk time of day
-	bool Night;									/// Whether this is a night time of day
+	int ID = -1;								/// The ID of this time of day
+	bool Dawn = false;							/// Whether this is a dawn time of day
+	bool Day = false;							/// Whether this is a day time of day
+	bool Dusk = false;							/// Whether this is a dusk time of day
+	bool Night = false;							/// Whether this is a night time of day
 	CColor ColorModification;					/// The color modification applied to graphics when the time of day is active
 	CGraphic *G = nullptr;
 };
 
-//@}
-
-#endif // !__TIME_OF_DAY_H__
+#endif

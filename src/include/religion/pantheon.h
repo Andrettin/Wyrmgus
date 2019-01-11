@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -42,9 +44,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
-
-class CPantheon
+class CPantheon : public CDataType
 {
 public:
 	static CPantheon *GetPantheon(const std::string &ident, const bool should_find = true);
@@ -54,9 +54,8 @@ public:
 	static std::vector<CPantheon *> Pantheons;	/// Pantheons
 	static std::map<std::string, CPantheon *> PantheonsByIdent;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	std::string Ident;							/// Ident of the pantheon
 	std::string Name;							/// Name of the pantheon
 	std::string Description;
 	std::string Background;

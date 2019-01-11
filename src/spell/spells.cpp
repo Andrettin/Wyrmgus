@@ -289,11 +289,13 @@ private:
 **	@brief	Spell constructor.
 */
 CSpell::CSpell(int slot, const std::string &ident) :
-	Ident(ident), Slot(slot), Target(), Action(),
+	Slot(slot), Target(), Action(),
 	Range(0), ManaCost(0), RepeatCast(0), Stackable(true), CoolDown(0),
 	DependencyId(-1), Condition(nullptr),
 	AutoCast(nullptr), AICast(nullptr), ForceUseAnimation(false)
 {
+	this->Ident = ident;
+
 	memset(Costs, 0, sizeof(Costs));
 	//Wyrmgus start
 	memset(ItemSpell, 0, sizeof(ItemSpell));

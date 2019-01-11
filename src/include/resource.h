@@ -35,6 +35,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -43,7 +45,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 struct lua_State;
 
 /**
@@ -83,7 +84,7 @@ enum CostType {
 #define ManaResCost (MaxCosts + 2)
 #define FreeWorkersCount (MaxCosts + 3)
 
-class CResource
+class CResource : public CDataType
 {
 public:
 	static CResource *GetResource(const std::string &ident, const bool should_find = true);
@@ -93,10 +94,9 @@ public:
 	static std::vector<CResource *> Resources;
 	static std::map<std::string, CResource *> ResourcesByIdent;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	bool IsMineResource() const;
 
-	std::string Ident;
 	std::string Name;
 	std::string ActionName;
 	int ID = -1;

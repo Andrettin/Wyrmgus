@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+
 #include <map>
 #include <vector>
 
@@ -41,7 +43,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CFaction;
 class CFile;
 class CTriggerEffect;
@@ -73,7 +74,7 @@ public:
 	unsigned long LastUpdate = 0;	/// GameCycle of last update
 };
 
-class CTrigger
+class CTrigger : public CDataType
 {
 public:
 	enum class TriggerType
@@ -96,9 +97,8 @@ public:
 
 	~CTrigger();
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	std::string Ident;
 	TriggerType Type = TriggerType::GlobalTrigger;
 	bool Local = false;
 	bool OnlyOnce = false;				/// Whether the trigger should occur only once in a game

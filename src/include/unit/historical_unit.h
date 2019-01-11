@@ -30,12 +30,11 @@
 #ifndef __HISTORICAL_UNIT_H__
 #define __HISTORICAL_UNIT_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
 #include "time/date.h"
 
 #include <map>
@@ -46,12 +45,11 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CFaction;
 class CHistoricalLocation;
 class CUnitType;
 
-class CHistoricalUnit
+class CHistoricalUnit : public CDataType
 {
 public:
 	~CHistoricalUnit();
@@ -63,10 +61,9 @@ public:
 	static std::vector<CHistoricalUnit *> HistoricalUnits;
 	static std::map<std::string, CHistoricalUnit *> HistoricalUnitsByIdent;
 	
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 public:
-	std::string Ident; //the unit's string identifier
 	std::string Name; //the unit's name
 	CUnitType *UnitType = nullptr; //the unit's unit type
 	CFaction *Faction = nullptr; //the unit's faction
@@ -76,6 +73,4 @@ public:
 	std::vector<CHistoricalLocation *> HistoricalLocations; //historical locations for the unit
 };
 
-//@}
-
-#endif // !__HISTORICAL_UNIT_H__
+#endif

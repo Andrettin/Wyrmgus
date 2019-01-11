@@ -36,6 +36,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -44,14 +46,13 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
 class CDeityDomain;
 class CSchoolOfMagic;
 class CSeasonSchedule;
 class CSpecies;
 class CTimeOfDaySchedule;
 
-class CPlane
+class CPlane : public CDataType
 {
 public:
 	CPlane() :
@@ -66,7 +67,7 @@ public:
 	static std::vector<CPlane *> Planes;								/// Planes
 	static std::map<std::string, CPlane *> PlanesByIdent;
 
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
 	int ID;																/// ID of this plane
 	std::string Ident;
