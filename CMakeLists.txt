@@ -34,7 +34,7 @@ set(STRATAGUS_MAJOR_VERSION 2)
 # Stratagus minor version (maximum 99)
 set(STRATAGUS_MINOR_VERSION 5)
 # Stratagus patch level (maximum 99)
-set(STRATAGUS_PATCH_LEVEL 3)
+set(STRATAGUS_PATCH_LEVEL 4)
 # Stratagus patch level 2
 set(STRATAGUS_PATCH_LEVEL2 0)
 #########################
@@ -1273,7 +1273,6 @@ else()
 	message("NSIS Installer: No (Enable by param -DENABLE_NSIS=ON)")
 endif()
 
-log_package("Boost" "BOOST")
 log_package("Bzip2" "BZIP2")
 log_package("PhysFS" "PHYSFS")
 log_package("FluidSynth" "FLUIDSYNTH")
