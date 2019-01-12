@@ -533,7 +533,7 @@ bool AutoAttack(CUnit &unit)
 			if (unit.Variable[STUN_INDEX].Value == 0) { //only show the idle animation when still if the unit is not stunned
 				UnitShowAnimation(unit, unit.GetAnimations()->Still);
 			}
-			if (SyncRand(10000) == 0) {
+			if (SyncRand(100000) == 0) {
 				PlayUnitSound(unit, VoiceIdle);
 			}
 			unit.StepCount = 0;
