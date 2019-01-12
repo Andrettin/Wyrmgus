@@ -793,10 +793,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
 find_package(Boost 1.69.0 REQUIRED)
 
 find_package(Lua51 REQUIRED)
-find_package(PNG REQUIRED)
 find_package(SDL REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
+
+find_package(Godot REQUIRED)
 
 if(WIN32)
 	find_package(MakeNSIS)
@@ -894,9 +895,9 @@ endif()
 
 # Stratagus definitions
 
-add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
-include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
-set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
+add_definitions(-DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
+include_directories(${LUA_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
+set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
 set(stratagus_LIBS_RELEASE ${stratagus_LIBS_RELEASE})
 set(stratagus_LIBS_DEBUG ${stratagus_LIBS_DEBUG})
 
@@ -906,6 +907,14 @@ endif()
 
 if(Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
+if(GODOT_FOUND)
+	include_directories(${GODOT_DIR})
+	include_directories(${GODOT_DIR}/thirdparty)
+	include_directories(${GODOT_DIR}/thirdparty/libpng)
+	set(stratagus_LIBS_RELEASE ${stratagus_LIBS_RELEASE} ${GODOT_LIBRARIES_STATIC})
+	set(stratagus_LIBS_DEBUG ${stratagus_LIBS_DEBUG} ${GODOT_LIBRARIES_STATIC_DEBUG})
 endif()
 
 if(WITH_BZIP2 AND BZIP2_FOUND)
@@ -1038,6 +1047,14 @@ endif()
 
 if (WIN32 AND MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE=1 -DNOMINMAX)
+	
+	foreach(flag_var
+		CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+		CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+		if(${flag_var} MATCHES "/MD")
+			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+		endif(${flag_var} MATCHES "/MD")
+	endforeach(flag_var)
 endif()
 
 if (WIN32 AND MINGW)
@@ -1305,10 +1322,10 @@ add_custom_command(OUTPUT tolua.cpp
 
 add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
 target_link_libraries(stratagus ${stratagus_LIBS})
-if(stratagus_LIBS_RELEASE)
+if(stratagus_LIBS_RELEASE AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_link_libraries(stratagus optimized ${stratagus_LIBS_RELEASE})
 endif()
-if(stratagus_LIBS_DEBUG)
+if(stratagus_LIBS_DEBUG AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_link_libraries(stratagus debug ${stratagus_LIBS_DEBUG})
 endif()
 
