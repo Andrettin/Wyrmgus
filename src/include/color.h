@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef __COLOR_H
+#define __COLOR_H
 
 //@{
 
