@@ -83,12 +83,10 @@
 
 #include <guichan.h>
 
-#ifdef USE_OAML
 #include <oaml.h>
 
 extern oamlApi *oaml;
 extern bool enableOAML;
-#endif
 
 void DrawGuichanWidgets();
 
@@ -323,12 +321,10 @@ static void GameLogicLoop()
 	// FIXME: We need to find a better place!
 	SaveGameLoading = false;
 
-#ifdef USE_OAML
 	if (enableOAML && oaml && UI.CurrentMapLayer->GetTimeOfDay()) {
 		// Time of day can change our main music loop, if the current playing track is set for this
 		SetMusicCondition(OAML_CONDID_MAIN_LOOP, UI.CurrentMapLayer->GetTimeOfDay()->ID);
 	}
-#endif
 
 	//
 	// Game logic part

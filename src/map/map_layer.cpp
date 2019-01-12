@@ -49,12 +49,10 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 
-#ifdef USE_OAML
 #include <oaml.h>
 
 extern oamlApi *oaml;
 extern bool enableOAML;
-#endif
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -319,12 +317,10 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 	CScheduledTimeOfDay *old_time_of_day = this->TimeOfDay;
 	this->TimeOfDay = time_of_day;
 	
-#ifdef USE_OAML
 	if (enableOAML && oaml && this == UI.CurrentMapLayer && this->GetTimeOfDay()) {
 		// Time of day can change our main music loop, if the current playing track is set for this
 		SetMusicCondition(OAML_CONDID_MAIN_LOOP, this->GetTimeOfDay()->ID);
 	}
-#endif
 
 	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Day) != (old_time_of_day && old_time_of_day->TimeOfDay->Day);
 	const bool is_night_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Night) != (old_time_of_day && old_time_of_day->TimeOfDay->Night);

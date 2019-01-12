@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
@@ -57,12 +55,10 @@ static bool MusicFinished;                /// Music ended and we need a new file
 
 bool CallbackMusic;                       /// flag true callback ccl if stops
 
-#ifdef USE_OAML
 #include <oaml.h>
 
 oamlApi *oaml = nullptr;
 bool enableOAML = false;
-#endif
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -115,7 +111,6 @@ void InitMusic()
 #endif
 }
 
-#ifdef USE_OAML
 static void* oamlOpen(const char *filename) {
 	CFile *f = new CFile;
 	const std::string name = LibraryFileName(filename);
@@ -168,16 +163,12 @@ void InitMusicOAML()
 	SetMusicVolume(GetMusicVolume());
 }
 
-#endif
 void LoadOAMLDefinitionsFile(const std::string &file_path)
 {
-#ifdef USE_OAML
 	const std::string filename = LibraryFileName(file_path.c_str());
 	oaml->ReadDefsFile(filename.c_str());
-#endif
 }
 
-#ifdef USE_OAML
 void ShutdownMusicOAML()
 {
 	if (oaml) {
@@ -187,16 +178,3 @@ void ShutdownMusicOAML()
 	}
 	enableOAML = false;
 }
-#else
-
-void InitMusicOAML()
-{
-}
-
-void ShutdownMusicOAML()
-{
-}
-
-#endif
-
-//@}

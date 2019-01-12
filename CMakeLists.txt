@@ -807,7 +807,6 @@ find_package(FluidSynth)
 find_package(StackTrace)
 find_package(Mikmod)
 find_package(MNG)
-find_package(OggVorbis)
 
 find_package(X11)
 find_package(OpenGL)
@@ -818,7 +817,6 @@ find_package(Sqlite)
 find_package(Doxygen)
 find_package(SelfPackers)
 find_package(PhysFS)
-find_package(OAML)
 
 include(CheckTypeSize)
 include(CheckFunctionExists)
@@ -851,8 +849,6 @@ option(WITH_PHYSFS "Compile Stratagus with PhysFS support" OFF)
 option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" OFF)
 option(WITH_MIKMOD "Compile Stratagus with Mikmod sound library" ON)
 option(WITH_MNG "Compile Stratagus with MNG image library" OFF)
-option(WITH_OAML "Compile Stratagus with OAML library" ON)
-option(OAML_FORCE_STATIC "Link the OAML library statically" OFF)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
@@ -899,6 +895,7 @@ endif()
 
 if(GODOT_FOUND)
 	include_directories(${GODOT_DIR})
+	include_directories(${GODOT_DIR}/modules/oamlGodotModule/oaml/include)
 	include_directories(${GODOT_DIR}/thirdparty)
 	include_directories(${GODOT_DIR}/thirdparty/libpng)
 	include_directories(${GODOT_DIR}/thirdparty/libogg)
@@ -952,41 +949,6 @@ if(WITH_MNG AND MNG_FOUND)
 	if (MSVC)
 		include_directories(${JPEG_INCLUDE_DIR})
 		set(stratagus_LIBS ${stratagus_LIBS} ${JPEG_LIBRARY})
-	endif()
-endif()
-
-if(WITH_OAML)
-	if(NOT OAML_FOUND)
-		# Build embedded copy statically
-		set(OAML_EMBEDDED ON)
-		set(OAML_FORCE_STATIC ON)
-		set(OAML_EMBEDDED_PATH "${CMAKE_SOURCE_DIR}/src/oaml")
-		include(ExternalProject)
-		ExternalProject_Add(oaml
-			SOURCE_DIR ${OAML_EMBEDDED_PATH}
-			PREFIX ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/oaml.dir
-			BUILD_IN_SOURCE 1
-			CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-			CMAKE_ARGS -DENABLE_SHARED=OFF
-			CMAKE_ARGS -DENABLE_UNITYPLUGIN=OFF
-			CMAKE_ARGS -DENABLE_RTAUDIO=OFF
-			INSTALL_COMMAND ""
-		)
-
-		set(OAML_INCLUDE_DIRS "${OAML_EMBEDDED_PATH}/include")
-		set(OAML_LIBRARIES_STATIC "${OAML_EMBEDDED_PATH}/liboaml.a" ${OGG_LIBRARY} ${VORBIS_LIBRARY} ${VORBISFILE_LIBRARIES})
-		# Readd '_d' suffix if added in the OAML build system (GH-85)
-		set(OAML_LIBRARIES_STATIC_DEBUG "${OAML_EMBEDDED_PATH}/liboaml.a" ${OGG_LIBRARY} ${VORBIS_LIBRARY} ${VORBISFILE_LIBRARIES})
-	endif()
-
-	add_definitions(-DUSE_OAML)
-	include_directories(${OAML_INCLUDE_DIRS})
-	if(ENABLE_STATIC OR OAML_FORCE_STATIC)
-		set(stratagus_LIBS_RELEASE ${stratagus_LIBS_RELEASE} ${OAML_LIBRARIES_STATIC})
-		set(stratagus_LIBS_DEBUG ${stratagus_LIBS_DEBUG} ${OAML_LIBRARIES_STATIC_DEBUG})
-	else()
-		set(stratagus_LIBS_RELEASE ${stratagus_LIBS_RELEASE} ${OAML_LIBRARIES_SHARED})
-		set(stratagus_LIBS_DEBUG ${stratagus_LIBS_DEBUG} ${OAML_LIBRARIES_SHARED_DEBUG})
 	endif()
 endif()
 
@@ -1283,9 +1245,7 @@ log_package("PhysFS" "PHYSFS")
 log_package("FluidSynth" "FLUIDSYNTH")
 log_package("MikMod" "MIKMOD")
 log_package("Mng" "MNG")
-log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("StackTrace" "STACKTRACE")
-log_package("OAML" "OAML")
 log_package("X11" "X11")
 
 if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)

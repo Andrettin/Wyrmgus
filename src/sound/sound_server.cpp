@@ -58,9 +58,7 @@
 
 #include "SDL.h"
 
-#ifdef USE_OAML
 #include <oaml.h>
-#endif
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -114,14 +112,12 @@ static struct {
 	bool Running;
 } Audio;
 
-#ifdef USE_OAML
 #ifndef SDL_AUDIO_BITSIZE
 #define SDL_AUDIO_BITSIZE(x) (x&0xFF)
 #endif
 
 extern oamlApi *oaml;
 extern bool enableOAML;
-#endif
 
 /*----------------------------------------------------------------------------
 --  Mixers
@@ -333,12 +329,10 @@ static void MixIntoBuffer(void *buffer, int samples)
 	}
 	ClipMixToStereo16(Audio.MixerBuffer, samples, (short *)buffer);
 
-#ifdef USE_OAML
 	if (enableOAML && oaml) {
 		oaml->SetAudioFormat(Audio.Format.freq, Audio.Format.channels, SDL_AUDIO_BITSIZE(Audio.Format.format) / 8);
 		oaml->MixToBuffer(buffer, samples);
 	}
-#endif
 }
 
 /**
@@ -383,10 +377,9 @@ static int FillThread(void *)
 		}
 		SDL_UnlockMutex(Audio.Lock);
 
-#ifdef USE_OAML
-		if (enableOAML && oaml)
+		if (enableOAML && oaml) {
 			oaml->Update();
-#endif
+		}
 	}
 
 	return 0;
@@ -801,14 +794,12 @@ void PlayMusicName(const std::string &name) {
 		return;
 	}
 	
-#ifdef USE_OAML
 	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
 	oaml->PlayTrack(name.c_str());
 	SDL_UnlockMutex(Audio.Lock);
-#endif
 }
 
 void PlayMusicByGroupRandom(const std::string &group) {
@@ -816,14 +807,12 @@ void PlayMusicByGroupRandom(const std::string &group) {
 		return;
 	}
 	
-#ifdef USE_OAML
 	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
 	oaml->PlayTrackByGroupRandom(group.c_str());
 	SDL_UnlockMutex(Audio.Lock);
-#endif
 }
 
 void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::string &subgroup) {
@@ -831,7 +820,6 @@ void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::stri
 		return;
 	}
 	
-#ifdef USE_OAML
 	if (enableOAML == false || oaml == nullptr)
 		return;
 
@@ -840,7 +828,6 @@ void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::stri
 		oaml->PlayTrackByGroupRandom(group.c_str());
 	}
 	SDL_UnlockMutex(Audio.Lock);
-#endif
 }
 
 void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::string &civilization_name, const std::string &faction_name) {
@@ -848,7 +835,6 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 		return;
 	}
 
-#ifdef USE_OAML
 	if (enableOAML == false || oaml == nullptr)
 		return;
 
@@ -894,29 +880,24 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 		}
 	}
 	SDL_UnlockMutex(Audio.Lock);
-#endif
 }
 
 void SetMusicCondition(int id, int value) {
-#ifdef USE_OAML
 	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
 	oaml->SetCondition(id, value);
 	SDL_UnlockMutex(Audio.Lock);
-#endif
 }
 
 void SetMusicLayerGain(const std::string &layer, float gain) {
-#ifdef USE_OAML
 	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
 	oaml->SetLayerGain(layer.c_str(), gain);
 	SDL_UnlockMutex(Audio.Lock);
-#endif
 }
 
 /**
@@ -924,13 +905,11 @@ void SetMusicLayerGain(const std::string &layer, float gain) {
 */
 void StopMusic()
 {
-#ifdef USE_OAML
 	if (enableOAML && oaml) {
 		SDL_LockMutex(Audio.Lock);
 		oaml->StopPlaying();
 		SDL_UnlockMutex(Audio.Lock);
 	}
-#endif
 
 	if (MusicPlaying) {
 		MusicPlaying = false;
@@ -953,13 +932,11 @@ void SetMusicVolume(int volume)
 	clamp(&volume, 0, MaxVolume);
 	MusicVolume = volume;
 
-#ifdef USE_OAML
 	if (enableOAML && oaml) {
 		SDL_LockMutex(Audio.Lock);
 		oaml->SetVolume(MusicVolume / 255.f);
 		SDL_UnlockMutex(Audio.Lock);
 	}
-#endif
 }
 
 /**
@@ -996,12 +973,11 @@ bool IsMusicEnabled()
 */
 bool IsMusicPlaying()
 {
-#ifdef USE_OAML
 	if (enableOAML && oaml) {
 		if (oaml->IsPlaying())
 			return true;
 	}
-#endif
+
 	return MusicPlaying;
 }
 
@@ -1010,14 +986,12 @@ bool IsMusicPlaying()
 */
 void AddMusicTension(int value)
 {
-#ifdef USE_OAML
 	if (enableOAML == false || oaml == nullptr)
 		return;
 
 	SDL_LockMutex(Audio.Lock);
 	oaml->AddTension(value);
 	SDL_UnlockMutex(Audio.Lock);
-#endif
 }
 
 
@@ -1118,13 +1092,11 @@ int InitSound()
 */
 void QuitSound()
 {
-#ifdef USE_OAML
 	if (oaml) {
 		oaml->Shutdown();
 		delete oaml;
 		oaml = nullptr;
 	}
-#endif
 
 	Audio.Running = false;
 	SDL_WaitThread(Audio.Thread, nullptr);

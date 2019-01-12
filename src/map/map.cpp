@@ -81,12 +81,10 @@
 #include "video.h"
 #include "world.h"
 
-#ifdef USE_OAML
 #include <oaml.h>
 
 extern oamlApi *oaml;
 extern bool enableOAML;
-#endif
 
 /*----------------------------------------------------------------------------
 --  Variables
