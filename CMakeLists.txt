@@ -1034,14 +1034,15 @@ endif()
 
 if (WIN32 AND MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE=1 -DNOMINMAX)
-	
-	foreach(flag_var
-		CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-		CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-		if(${flag_var} MATCHES "/MD")
-			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-		endif(${flag_var} MATCHES "/MD")
-	endforeach(flag_var)
+
+#compile with static CRT	
+#	foreach(flag_var
+#		CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+#		CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+#		if(${flag_var} MATCHES "/MD")
+#			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+#		endif(${flag_var} MATCHES "/MD")
+#	endforeach(flag_var)
 endif()
 
 if (WIN32 AND MINGW)
