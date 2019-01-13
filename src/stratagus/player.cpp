@@ -84,7 +84,7 @@
 #include "unit/unittype.h"
 //Wyrmgus end
 #include "unitsound.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end

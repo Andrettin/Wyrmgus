@@ -89,7 +89,7 @@
 #include "unit/unittype.h"
 #include "unit/unit_type_variation.h"
 #include "unitsound.h"
-#include "upgrade/depend.h"	//for using dependency checks
+#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 //Wyrmgus start

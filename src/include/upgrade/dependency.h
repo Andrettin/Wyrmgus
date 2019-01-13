@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name depend.h - The dependencies header file. */
+/**@name dependency.h - The dependencies header file. */
 //
 //      (c) Copyright 2000-2019 by Vladi Belperchinov-Shabanski and Andrettin
 //
@@ -35,9 +35,9 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @struct DependRule depend.h
+**  @struct DependRule dependency.h
 **
-**  \#include "upgrade/depend.h"
+**  \#include "upgrade/dependency.h"
 **
 **  This structure is used define the requirements of upgrades or
 **  unit-types. The structure is used to define the base (the wanted)

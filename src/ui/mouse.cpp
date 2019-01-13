@@ -76,7 +76,7 @@
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
 #include "unitsound.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 #include "video.h"
 #include "widgets.h"
 #include "world.h"

@@ -76,7 +76,7 @@
 //Wyrmgus end
 #include "unit/unittype.h"
 #include "unit/unit_type_variation.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "video.h"
 

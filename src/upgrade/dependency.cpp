@@ -36,7 +36,7 @@
 
 #include "stratagus.h"
 
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 
 #include "age.h"
 #include "character.h"

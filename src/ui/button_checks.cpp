@@ -48,7 +48,7 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 
 #include <stdio.h>

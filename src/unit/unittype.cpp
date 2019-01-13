@@ -64,7 +64,7 @@
 #include "ui/ui.h"
 #include "unit/unit_type_variation.h"
 #include "unitsound.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end

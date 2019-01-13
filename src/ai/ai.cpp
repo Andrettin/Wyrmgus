@@ -171,7 +171,7 @@
 //Wyrmgus end
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------

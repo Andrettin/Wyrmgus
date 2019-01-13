@@ -55,7 +55,7 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
