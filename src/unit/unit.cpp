@@ -686,6 +686,8 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	UnitLost(replaced_unit);
 	UnitClearOrders(replaced_unit);
 	replaced_unit.Release();
+	
+	this->ChooseVariation();
 }
 
 void CUnit::ChangeExperience(int amount, int around_range)
