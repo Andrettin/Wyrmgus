@@ -391,7 +391,7 @@ set(unit_SRCS
 source_group(unit FILES ${unit_SRCS})
 
 set(upgrade_SRCS
-	src/upgrade/depend.cpp
+	src/upgrade/dependency.cpp
 	src/upgrade/upgrade.cpp
 	src/upgrade/upgrade_modifier.cpp
 )
@@ -643,7 +643,7 @@ set(stratagus_unit_HDRS
 )
 
 set(stratagus_upgrade_HDRS
-	src/include/upgrade/depend.h
+	src/include/upgrade/dependency.h
 	src/include/upgrade/upgrade.h
 	src/include/upgrade/upgrade_modifier.h
 	src/include/upgrade/upgrade_structs.h
