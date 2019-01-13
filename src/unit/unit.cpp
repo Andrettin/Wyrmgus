@@ -686,8 +686,6 @@ void CUnit::ReplaceOnTop(CUnit &replaced_unit)
 	UnitLost(replaced_unit);
 	UnitClearOrders(replaced_unit);
 	replaced_unit.Release();
-	
-	this->ChooseVariation();
 }
 
 void CUnit::ChangeExperience(int amount, int around_range)
@@ -3549,12 +3547,11 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 **
 **  @param pos  map tile position.
 */
-//Wyrmgus start
-//void CUnit::Place(const Vec2i &pos)
 void CUnit::Place(const Vec2i &pos, int z)
-//Wyrmgus end
 {
 	Assert(Removed);
+	
+	const CMapLayer *old_map_layer = this->MapLayer;
 
 	if (Container) {
 		MapUnmarkUnitSight(*this);
@@ -3617,8 +3614,8 @@ void CUnit::Place(const Vec2i &pos, int z)
 		
 		const CUnitTypeVariation *variation = this->GetVariation();
 		if (variation) {
-			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, repick the unit's variation
-			if (!this->CheckTerrainForVariation(variation) || !this->CheckSeasonForVariation(variation)) {
+			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, or if this is the first position the unit is being placed in, repick the unit's variation
+			if (!old_map_layer || !this->CheckTerrainForVariation(variation) || !this->CheckSeasonForVariation(variation)) {
 				this->ChooseVariation();
 			}
 		}
