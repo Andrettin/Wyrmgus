@@ -1109,7 +1109,7 @@ int InitSound()
 	Audio.Running = true;
 
 	// Create thread to fill sdl audio buffer
-	Audio.Thread = SDL_CreateThread(FillThread, nullptr);
+	Audio.Thread = SDL_CreateThread(FillThread, nullptr, nullptr);
 	return 0;
 }
 

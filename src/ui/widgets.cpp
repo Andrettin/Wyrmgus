@@ -857,7 +857,7 @@ void WidgetGraphicTransparency(int alpha, const CGraphic &sprite)
 {
 	SDL_LockSurface(sprite.Surface);
 //	int oldalpha = Surface->format->alpha;
-	SDL_SetAlpha(sprite.Surface, SDL_SRCALPHA, alpha);
+	SDL_SetSurfaceAlphaMod(sprite.Surface, alpha);
 	SDL_UnlockSurface(sprite.Surface);
 }
 //Wyrmgus end

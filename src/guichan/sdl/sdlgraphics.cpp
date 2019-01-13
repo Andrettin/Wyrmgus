@@ -162,13 +162,13 @@ namespace gcn
 //        SDL_Surface* srcImage = (SDL_Surface*)image->_getData();
         SDL_Surface* srcImage = (SDL_Surface*)image->_getData(player);
 
-		int old_alpha;
+		Uint8 old_alpha = 0xff;
 		
 		if (transparency) {
-			unsigned int alpha = 256 - 2.56 * transparency;
+			Uint8 alpha = 256 - 2.56 * transparency;
 			SDL_LockSurface(srcImage);
-			old_alpha = srcImage->format->alpha;
-			SDL_SetAlpha(srcImage, SDL_SRCALPHA, alpha);
+			SDL_GetSurfaceAlphaMod(srcImage, &old_alpha);
+			SDL_SetSurfaceAlphaMod(srcImage, alpha);
 			SDL_UnlockSurface(srcImage);
 		}
 		//Wyrmgus end
@@ -178,7 +178,7 @@ namespace gcn
 		//Wyrmgus start
 		if (transparency) {
 			SDL_LockSurface(srcImage);
-			SDL_SetAlpha(srcImage, SDL_SRCALPHA, old_alpha);
+			SDL_SetSurfaceAlphaMod(srcImage, old_alpha);
 			SDL_UnlockSurface(srcImage);
 		}
 		//Wyrmgus end

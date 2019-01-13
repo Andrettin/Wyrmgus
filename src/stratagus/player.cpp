@@ -4101,9 +4101,9 @@ void GraphicPlayerPixels(int player, const CGraphic &sprite)
 		}
 	}
 	//Wyrmgus end
-	SDL_SetColors(sprite.Surface, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
+	SDL_SetPaletteColors(sprite.Surface->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite.SurfaceFlip) {
-		SDL_SetColors(sprite.SurfaceFlip, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
+		SDL_SetPaletteColors(sprite.SurfaceFlip->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	}
 	SDL_UnlockSurface(sprite.Surface);
 }

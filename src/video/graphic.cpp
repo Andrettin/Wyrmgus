@@ -287,10 +287,11 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 			surface = Surface;
 		}
 		
-		int oldalpha = surface->format->alpha;
-		SDL_SetAlpha(surface, SDL_SRCALPHA, alpha);
+		Uint8 old_alpha = 0xff;
+		SDL_GetSurfaceAlphaMod(surface, &old_alpha);
+		SDL_SetSurfaceAlphaMod(surface, alpha);
 		DrawSub(gx, gy, w, h, x, y, surface);
-		SDL_SetAlpha(surface, SDL_SRCALPHA, oldalpha);
+		SDL_SetSurfaceAlphaMod(surface, old_alpha);
 		//Wyrmgus end
 	}
 }
@@ -584,7 +585,7 @@ void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped,
 				colors[i].g = std::max<int>(0,std::min<int>(255,int(green) + time_of_day_green));
 				colors[i].b = std::max<int>(0,std::min<int>(255,int(blue) + time_of_day_blue));;
 			}
-			SDL_SetColors(surface, &colors[0], 0, 256);
+			SDL_SetPaletteColors(surface->format->palette, &colors[0], 0, 256);
 			break;
 		}
 		case 4: {
@@ -946,11 +947,13 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 	{
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		const int oldalpha = Surface->format->alpha;
 
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
+		Uint8 old_alpha = 0xff;
+		SDL_GetSurfaceAlphaMod(Surface, &old_alpha);
+
+		SDL_SetSurfaceAlphaMod(Surface, alpha);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
+		SDL_SetSurfaceAlphaMod(Surface, old_alpha);
 	}
 }
 
@@ -998,11 +1001,12 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool
 			surface = SurfaceFlip;
 		}
 		
-		const int oldalpha = surface->format->alpha;
+		Uint8 old_alpha = 0xff;
+		SDL_GetSurfaceAlphaMod(surface, &old_alpha);
 
-		SDL_SetAlpha(surface, SDL_SRCALPHA, alpha);
+		SDL_SetSurfaceAlphaMod(surface, alpha);
 		SDL_BlitSurface(surface, &srect, TheScreen, &drect);
-		SDL_SetAlpha(surface, SDL_SRCALPHA, oldalpha);
+		SDL_SetSurfaceAlphaMod(surface, old_alpha);
 		//Wyrmgus end
 	}
 }
@@ -1324,7 +1328,7 @@ static void ApplyGrayScale(SDL_Surface *Surface, int Width, int Height)
 				const int gray = redGray * pal.colors[i].r + greenGray * pal.colors[i].g + blueGray * pal.colors[i].b;
 				colors[i].r = colors[i].g = colors[i].b = gray;
 			}
-			SDL_SetColors(Surface, &colors[0], 0, 256);
+			SDL_SetPaletteColors(Surface->format->palette, &colors[0], 0, 256);
 			break;
 		}
 		case 4: {
@@ -1365,7 +1369,7 @@ static void ApplySepiaScale(SDL_Surface *Surface, int Width, int Height)
 				colors[i].g = std::min<int>(255, (input_red * .349) + (input_green *.686) + (input_blue * .168));
 				colors[i].b = std::min<int>(255, (input_red * .272) + (input_green *.534) + (input_blue * .131));
 			}
-			SDL_SetColors(Surface, &colors[0], 0, 256);
+			SDL_SetPaletteColors(Surface->format->palette, &colors[0], 0, 256);
 			break;
 		}
 		case 4: {
@@ -2509,9 +2513,9 @@ SDL_Surface *CGraphic::SetTimeOfDay(CTimeOfDay *time_of_day, bool flipped)
 				colors[i].g = std::max<int>(0,std::min<int>(255,int(pal.colors[i].g) + time_of_day_green));
 				colors[i].b = std::max<int>(0,std::min<int>(255,int(pal.colors[i].b) + time_of_day_blue));
 			}
-			SDL_SetColors(surface, &colors[0], 0, 256);
+			SDL_SetPaletteColors(surface->format->palette, &colors[0], 0, 256);
 			if (SurfaceFlip) {
-				SDL_SetColors(SurfaceFlip, &colors[0], 0, 256);
+				SDL_SetPaletteColors(SurfaceFlip->format->palette, &colors[0], 0, 256);
 			}
 			SDL_UnlockSurface(surface);
 		} else if (bpp == 4) {
@@ -2582,10 +2586,10 @@ void CGraphic::MakeShadow()
 	// Set all colors in the palette to black and use 50% alpha
 	memset(colors, 0, sizeof(colors));
 
-	SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+	SDL_SetPaletteColors(Surface->format->palette, colors, 0, 256);
 	//Wyrmgus start
-//	SDL_SetAlpha(Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
-	SDL_SetAlpha(Surface, SDL_SRCALPHA | SDL_RLEACCEL, 192);
+//	SDL_SetSurfaceAlphaMod(Surface, 128);
+	SDL_SetSurfaceAlphaMod(Surface, 192);
 	//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -2600,10 +2604,10 @@ void CGraphic::MakeShadow()
 #endif
 	{
 		if (SurfaceFlip) {
-			SDL_SetPalette(SurfaceFlip, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+			SDL_SetPaletteColors(SurfaceFlip->format->palette, colors, 0, 256);
 			//Wyrmgus start
-//			SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
-			SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 192);
+//			SDL_SetSurfaceAlphaMod(SurfaceFlip, 128);
+			SDL_SetSurfaceAlphaMod(SurfaceFlip, 192);
 			//Wyrmgus end
 		}
 	}

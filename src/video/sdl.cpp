@@ -420,8 +420,8 @@ static void InitKey2Str()
 
 	Key2Str[SDLK_DELETE] = "delete";
 
-	for (i = SDLK_KP0; i <= SDLK_KP9; ++i) {
-		snprintf(str, sizeof(str), "kp_%d", i - SDLK_KP0);
+	for (i = SDLK_KP_0; i <= SDLK_KP_9; ++i) {
+		snprintf(str, sizeof(str), "kp_%d", i - SDLK_KP_0);
 		Key2Str[i] = str;
 	}
 
@@ -450,12 +450,12 @@ static void InitKey2Str()
 	}
 
 	Key2Str[SDLK_HELP] = "help";
-	Key2Str[SDLK_PRINT] = "print";
+	Key2Str[SDLK_PRINTSCREEN] = "print";
 	Key2Str[SDLK_SYSREQ] = "sysreq";
-	Key2Str[SDLK_BREAK] = "break";
+	Key2Str[SDLK_PAUSE] = "break";
 	Key2Str[SDLK_MENU] = "menu";
 	Key2Str[SDLK_POWER] = "power";
-	Key2Str[SDLK_EURO] = "euro";
+	Key2Str[SDLK_CURRENCYUNIT] = "currency_unit";
 	Key2Str[SDLK_UNDO] = "undo";
 }
 
@@ -671,9 +671,6 @@ void InitVideoSdl()
 //Wyrmgus start
 //#endif
 //Wyrmgus end
-
-	// Make default character translation easier
-	SDL_EnableUNICODE(1);
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -1095,7 +1092,7 @@ int Str2SdlKey(const char *str)
 */
 bool SdlGetGrabMouse()
 {
-	return SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON;
+	return SDL_GetRelativeMouseMode() == SDL_TRUE;
 }
 
 /**
@@ -1108,9 +1105,9 @@ void ToggleGrabMouse(int mode)
 	bool grabbed = SdlGetGrabMouse();
 
 	if (mode <= 0 && grabbed) {
-		SDL_WM_GrabInput(SDL_GRAB_OFF);
+		SDL_SetRelativeMouseMode(SDL_FALSE);
 	} else if (mode >= 0 && !grabbed) {
-		SDL_WM_GrabInput(SDL_GRAB_ON);
+		SDL_SetRelativeMouseMode(SDL_TRUE);
 	}
 }
 
