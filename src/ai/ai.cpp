@@ -332,7 +332,7 @@ static void AiCheckUnits()
 					if (
 						iterator->second
 						&& !mercenary_type->BoolFlag[ITEM_INDEX].value
-						&& CheckDependByType(Players[i], *mercenary_type)
+						&& CheckDependencies(mercenary_type, &Players[i])
 						&& AiPlayer->Player->CheckLimits(*mercenary_type) >= 1
 						&& !AiPlayer->Player->CheckUnitType(*mercenary_type, true)
 					) {

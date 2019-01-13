@@ -621,7 +621,7 @@ void TriggersEachCycle()
 			bool triggered = false;
 			
 			if (current_trigger->Type == CTrigger::TriggerType::GlobalTrigger) {
-				if (CheckDependByIdent(Players[PlayerNumNeutral], DependRuleTrigger, current_trigger->Ident)) {
+				if (CheckDependencies(current_trigger, &Players[PlayerNumNeutral])) {
 					triggered = true;
 					for (CTriggerEffect *trigger_effect : current_trigger->TriggerEffects) {
 						trigger_effect->Do(&Players[PlayerNumNeutral]);
@@ -633,7 +633,7 @@ void TriggersEachCycle()
 					if (player->Type == PlayerNobody) {
 						continue;
 					}
-					if (!CheckDependByIdent(*player, DependRuleTrigger, current_trigger->Ident)) {
+					if (!CheckDependencies(current_trigger, player)) {
 						continue;
 					}
 					triggered = true;
@@ -817,10 +817,10 @@ void CTrigger::ProcessConfigData(const CConfigData *config_data)
 				trigger_effect->ProcessConfigData(grandchild_config_data);
 				this->TriggerEffects.push_back(trigger_effect);
 			}
-		} else if (child_config_data->Tag == "dependency" || child_config_data->Tag == "predependency") {
-			std::string target = config_data->Ident;
-			target = FindAndReplaceString(target, "_", "-");
-			DependRule::ProcessConfigData(child_config_data, DependRuleTrigger, target);
+		}
+		else if (child_config_data->Tag == "dependencies") {
+			this->Dependency = new CAndDependency;
+			this->Dependency->ProcessConfigData(child_config_data);
 		} else {
 			fprintf(stderr, "Invalid trigger property: \"%s\".\n", child_config_data->Tag.c_str());
 		}

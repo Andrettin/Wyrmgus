@@ -330,10 +330,12 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 					fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
 				}
 			}
-		} else if (child_config_data->Tag == "dependency" || child_config_data->Tag == "predependency") {
-			std::string target = config_data->Ident;
-			target = FindAndReplaceString(target, "_", "-");
-			DependRule::ProcessConfigData(child_config_data, DependRuleUpgrade, target);
+		} else if (child_config_data->Tag == "predependencies") {
+			this->Predependency = new CAndDependency;
+			this->Predependency->ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "dependencies") {
+			this->Dependency = new CAndDependency;
+			this->Dependency->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "modifier") {
 			CUpgradeModifier *modifier = new CUpgradeModifier;
 			modifier->UpgradeId = this->ID;
@@ -1748,11 +1750,11 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				}
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
-				for (size_t i = 0; i < unit.Type->StartingAbilities.size(); ++i) {
-					if (!unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && CheckDependByIdent(unit, DependRuleUpgrade, unit.Type->StartingAbilities[i]->Ident)) {
-						IndividualUpgradeAcquire(unit, unit.Type->StartingAbilities[i]);
-					} else if (unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && !CheckDependByIdent(unit, DependRuleUpgrade, unit.Type->StartingAbilities[i]->Ident)) {
-						IndividualUpgradeLost(unit, unit.Type->StartingAbilities[i]);
+				for (const CUpgrade *ability_upgrade : unit.Type->StartingAbilities) {
+					if (!unit.GetIndividualUpgrade(ability_upgrade) && CheckDependencies(ability_upgrade, &unit)) {
+						IndividualUpgradeAcquire(unit, ability_upgrade);
+					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !CheckDependencies(ability_upgrade, &unit)) {
+						IndividualUpgradeLost(unit, ability_upgrade);
 					}
 				}
 				
@@ -2044,11 +2046,11 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				}
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
-				for (size_t i = 0; i < unit.Type->StartingAbilities.size(); ++i) {
-					if (!unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && CheckDependByIdent(unit, DependRuleUpgrade, unit.Type->StartingAbilities[i]->Ident)) {
-						IndividualUpgradeAcquire(unit, unit.Type->StartingAbilities[i]);
-					} else if (unit.GetIndividualUpgrade(unit.Type->StartingAbilities[i]) && !CheckDependByIdent(unit, DependRuleUpgrade, unit.Type->StartingAbilities[i]->Ident)) {
-						IndividualUpgradeLost(unit, unit.Type->StartingAbilities[i]);
+				for (const CUpgrade *ability_upgrade : unit.Type->StartingAbilities) {
+					if (!unit.GetIndividualUpgrade(ability_upgrade) && CheckDependencies(ability_upgrade, &unit)) {
+						IndividualUpgradeAcquire(unit, ability_upgrade);
+					} else if (unit.GetIndividualUpgrade(ability_upgrade) && !CheckDependencies(ability_upgrade, &unit)) {
+						IndividualUpgradeLost(unit, ability_upgrade);
 					}
 				}
 				

@@ -1075,10 +1075,12 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					fprintf(stderr, "Invalid sound tag: \"%s\".\n", key.c_str());
 				}
 			}
-		} else if (child_config_data->Tag == "dependency" || child_config_data->Tag == "predependency") {
-			std::string target = config_data->Ident;
-			target = FindAndReplaceString(target, "_", "-");
-			DependRule::ProcessConfigData(child_config_data, DependRuleUnitType, target);
+		} else if (child_config_data->Tag == "predependencies") {
+			this->Predependency = new CAndDependency;
+			this->Predependency->ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "dependencies") {
+			this->Dependency = new CAndDependency;
+			this->Dependency->ProcessConfigData(child_config_data);
 		} else if (child_config_data->Tag == "variation") {
 			this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 			this->DefaultStat.Variables[VARIATION_INDEX].Value = 0;

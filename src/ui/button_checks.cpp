@@ -405,7 +405,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button)
 	if (unit.CurrentAction() != UnitActionStill) {
 		return false;
 	}
-	return CheckDependByIdent(*unit.Player, DependRuleUnitType, button.ValueStr, false, true);
+	return CheckDependencies(UnitTypes[button.Value], unit.Player, false, true);
 }
 
 /**
@@ -440,7 +440,7 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button)
 	}
 
 	// check if allowed
-	if (!CheckDependByIdent(*unit.Player, DependRuleUpgrade, button.ValueStr, false, true)) {
+	if (!CheckDependencies(AllUpgrades[button.Value], unit.Player, false, true)) {
 		return false;
 	}
 	if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)

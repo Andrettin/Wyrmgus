@@ -1692,7 +1692,7 @@ void CPlayer::CheckAge()
 	//pick an age which fits the player, giving priority to the first ones (ages are already sorted by priority)
 	
 	for (CAge *potential_age : CAge::Ages) {
-		if (!CheckDependByIdent(*this, DependRuleAge, potential_age->Ident)) {
+		if (!CheckDependencies(potential_age, this)) {
 			continue;
 		}
 		
@@ -1772,7 +1772,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		
 		CUpgrade *upgrade = AllUpgrades[upgrade_id];
 		
-		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(player, DependRuleUpgrade, upgrade->Ident)) {
+		if (player.Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, &player)) {
 			continue;
 		}
 	
@@ -1978,7 +1978,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 		CUpgrade *faction_upgrade = CUpgrade::Get(faction->FactionUpgrade);
 		
 		if (faction_upgrade) {
-			if (!CheckDependByIdent(*this, DependRuleUpgrade, faction->FactionUpgrade, false, pre)) {
+			if (!CheckDependencies(faction_upgrade, this, false, pre)) {
 				return false;
 			}
 		} else {
@@ -2028,7 +2028,7 @@ bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
 	}
 	
 	if (dynasty->DynastyUpgrade) {
-		if (!CheckDependByIdent(*this, DependRuleUpgrade, dynasty->DynastyUpgrade->Ident, false, pre)) {
+		if (!CheckDependencies(dynasty->DynastyUpgrade, this, false, pre)) {
 			return false;
 		}
 	} else {
@@ -2064,7 +2064,7 @@ bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) c
 		return false;
 	}
 	
-	if (!CheckDependByType(*this, *character->Type, true)) {
+	if (!CheckDependencies(character->Type, this, true)) {
 		return false;
 	}
 	
@@ -2872,7 +2872,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 					continue;
 				}
 
-				if (!this->HasUnitBuilder(unit_type, objective->Settlement) || !CheckDependByType(*this, *unit_type)) {
+				if (!this->HasUnitBuilder(unit_type, objective->Settlement) || !CheckDependencies(unit_type, this)) {
 					continue;
 				}
 
@@ -2918,7 +2918,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 				}
 			}
 				
-			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(*this, DependRuleUpgrade, upgrade->Ident)) {
+			if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, this)) {
 				return false;
 			}
 		} else if (objective->ObjectiveType == RecruitHeroObjectiveType) {
@@ -3034,7 +3034,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 						continue;
 					}
 
-					if (!this->HasUnitBuilder(unit_type, objective->Settlement) || !CheckDependByType(*this, *unit_type)) {
+					if (!this->HasUnitBuilder(unit_type, objective->Settlement) || !CheckDependencies(unit_type, this)) {
 						validation_error = "You can no longer produce the required unit.";
 						continue;
 					}
@@ -3083,7 +3083,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 					}
 				}
 				
-				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependByIdent(*this, DependRuleUpgrade, upgrade->Ident)) {
+				if (!has_researcher || this->Allow.Upgrades[upgrade->ID] != 'A' || !CheckDependencies(upgrade, this)) {
 					return "You can no longer research the required upgrade.";
 				}
 			}

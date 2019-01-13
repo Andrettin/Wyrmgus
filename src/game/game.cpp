@@ -1843,11 +1843,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	InitUpgrades();
 
 	//
-	// Dependencies
-	//
-	InitDependencies();
-
-	//
 	// Buttons (botpanel)
 	//
 	InitButtons();

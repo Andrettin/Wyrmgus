@@ -154,7 +154,6 @@ void CleanModules()
 	CleanSelections();
 	CleanGroups();
 	CleanUpgrades();
-	CleanDependencies();
 	CleanButtons();
 	CButtonLevel::ClearButtonLevels();
 	CleanMissileTypes();
@@ -200,7 +199,6 @@ void InitModules()
 	InitUnits();
 	InitSpells();
 	InitUpgrades();
-	InitDependencies();
 
 	InitButtons();
 	CTrigger::InitActiveTriggers();

@@ -43,6 +43,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CDependency;
 class CFaction;
 class CFile;
 class CTriggerEffect;
@@ -105,6 +106,8 @@ public:
 	bool CampaignOnly = false;			/// Whether the trigger should only occur in the campaign mode
 	LuaCallback *Conditions = nullptr;
 	LuaCallback *Effects = nullptr;
+	CDependency *Predependency = nullptr;
+	CDependency *Dependency = nullptr;
 	std::vector<CTriggerEffect *> TriggerEffects;
 };
 

@@ -87,6 +87,12 @@
 */
 
 /*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include <vector>
+
+/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
@@ -101,33 +107,213 @@ class CUnit;
 class CUpgrade;
 class ButtonAction;
 
-enum {
-	DependRuleUnitType,		/// Kind is a unit-type
-	DependRuleUpgrade,		/// Kind is an upgrade
-	DependRuleAge,			/// Kind is an age
-	DependRuleCharacter,	/// Kind is a character
-	DependRuleSeason,		/// Kind is a season
-	DependRuleTrigger		/// Kind is a trigger
-};
-
 /// Dependency rule
-class DependRule
+class CDependency
 {
 public:
-	static void ProcessConfigData(const CConfigData *config_data, const int rule_type, const std::string &target);
+	void ProcessConfigData(const CConfigData *config_data);
+	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property);
+	virtual void ProcessConfigDataSection(const CConfigData *section);
+	virtual bool Check(const CPlayer *player, bool ignore_units = false) const = 0;
+	virtual bool Check(const CUnit *unit, bool ignore_units = false) const;
+	virtual std::string GetString(const std::string &prefix = "") const = 0; //get the dependency as a string
+};
 
-	DependRule *Next;			/// next hash chain, or rules
-	unsigned char Count;		/// how many required
-	char Type;					/// a unit-type, upgrade or etc.
-	union {
-		const CUnitType *UnitType;	/// unit-type pointer
-		const CUpgrade  *Upgrade;	/// upgrade pointer
-		const CAge *Age;			/// age pointer
-		const CCharacter *Character;	/// character pointer
-		const CSeason *Season;		/// season pointer
-		const CTrigger *Trigger;	/// trigger pointer
-	} Kind;						/// required object
-	DependRule *Rule;			/// requirements, and rule
+class CAndDependency : public CDependency
+{
+public:
+	CAndDependency() {}
+	CAndDependency(const std::vector<const CDependency *> &dependencies) : Dependencies(dependencies) {}
+
+	virtual void ProcessConfigDataSection(const CConfigData *section) override;
+	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
+	
+	virtual std::string GetString(const std::string &prefix = "") const override
+	{
+		int element_count = 0;
+		
+		for (const CDependency *dependency : this->Dependencies) {
+			if (!dependency->GetString(prefix + '\t').empty()) {
+				element_count++;
+			}
+		}
+		
+		if (element_count >= 1) {
+			std::string str;
+			if (element_count > 1) {
+				str += prefix + "AND:\n";
+			}
+		
+			for (const CDependency *dependency : this->Dependencies) {
+				str += dependency->GetString((element_count > 1) ? prefix + '\t' : prefix);
+			}
+
+			return str;
+		} else {
+			return std::string();
+		}
+	}
+
+private:
+	std::vector<const CDependency *> Dependencies;	/// The dependencies of which all should be true
+};
+
+class COrDependency : public CDependency
+{
+public:
+	COrDependency() {}
+	COrDependency(const std::vector<const CDependency *> &dependencies) : Dependencies(dependencies) {}
+	
+	virtual void ProcessConfigDataSection(const CConfigData *section) override;
+	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
+	
+	virtual std::string GetString(const std::string &prefix = "") const override
+	{
+		int element_count = 0;
+		
+		for (const CDependency *dependency : this->Dependencies) {
+			if (!dependency->GetString(prefix + '\t').empty()) {
+				element_count++;
+			}
+		}
+		
+		if (element_count >= 1) {
+			std::string str;
+			if (element_count > 1) {
+				str += prefix + "OR:\n";
+			}
+		
+			for (const CDependency *dependency : this->Dependencies) {
+				str += dependency->GetString((element_count > 1) ? prefix + '\t' : prefix);
+			}
+
+			return str;
+		} else {
+			return std::string();
+		}
+	}
+
+private:
+	std::vector<const CDependency *> Dependencies;	/// The dependencies of which one should be true
+};
+
+class CNotDependency : public CDependency
+{
+public:
+	CNotDependency() {}
+	CNotDependency(const std::vector<const CDependency *> &dependencies) : Dependencies(dependencies) {}
+	CNotDependency(const CDependency *dependency)
+	{
+		this->Dependencies.push_back(dependency);
+	}
+	
+	virtual void ProcessConfigDataSection(const CConfigData *section) override;
+	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
+	
+	virtual std::string GetString(const std::string &prefix = "") const override
+	{
+		int element_count = 0;
+		
+		for (const CDependency *dependency : this->Dependencies) {
+			if (!dependency->GetString(prefix + '\t').empty()) {
+				element_count++;
+			}
+		}
+		
+		if (element_count >= 1) {
+			std::string str = prefix + "NOT:\n";
+		
+			for (const CDependency *dependency : this->Dependencies) {
+				str += dependency->GetString(prefix + '\t');
+			}
+
+			return str;
+		} else {
+			return std::string();
+		}
+	}
+
+private:
+	std::vector<const CDependency *> Dependencies;	/// The dependencies of which none should be true
+};
+
+class CUnitTypeDependency : public CDependency
+{
+public:
+	CUnitTypeDependency() {}
+	CUnitTypeDependency(const CUnitType *unit_type, const int count) : UnitType(unit_type), Count(count) {}
+	
+	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual std::string GetString(const std::string &prefix = "") const override;
+
+private:
+	const CUnitType *UnitType = nullptr;
+	int Count = 1;		/// How many of the unit type are required
+};
+
+class CUpgradeDependency : public CDependency
+{
+public:
+	CUpgradeDependency() {}
+	CUpgradeDependency(const CUpgrade *upgrade) : Upgrade(upgrade) {}
+	
+	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual std::string GetString(const std::string &prefix = "") const override;
+
+private:
+	const CUpgrade *Upgrade = nullptr;
+};
+
+class CAgeDependency : public CDependency
+{
+public:
+	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual std::string GetString(const std::string &prefix = "") const override;
+
+private:
+	const CAge *Age = nullptr;
+};
+
+class CCharacterDependency : public CDependency
+{
+public:
+	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual std::string GetString(const std::string &prefix = "") const override;
+
+private:
+	const CCharacter *Character = nullptr;
+};
+
+class CSeasonDependency : public CDependency
+{
+public:
+	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual bool Check(const CUnit *unit, bool ignore_units = false) const override;
+	virtual std::string GetString(const std::string &prefix = "") const override;
+
+private:
+	const CSeason *Season = nullptr;
+};
+
+class CTriggerDependency : public CDependency
+{
+public:
+	virtual void ProcessConfigDataProperty(const std::pair<std::string, std::string> &property) override;
+	virtual bool Check(const CPlayer *player, bool ignore_units = false) const override;
+	virtual std::string GetString(const std::string &prefix = "") const override;
+
+private:
+	const CTrigger *Trigger = nullptr;
 };
 
 /*----------------------------------------------------------------------------
@@ -136,19 +322,45 @@ public:
 
 /// Register CCL features for dependencies
 extern void DependenciesCclRegister();
-/// Init the dependencies
-extern void InitDependencies();
-/// Cleanup dependencies module
-extern void CleanDependencies();
 
 /// Print all unit dependencies into string
 extern std::string PrintDependencies(const CPlayer &player, const ButtonAction &button);
 extern void AddDependency(const int rule_type, const std::string &target, const int required_rule_type, const std::string &required, const int count, const int or_flag, const bool is_predependency);
-/// Check a dependency by identifier
-extern bool CheckDependByIdent(const CPlayer &player, const int rule_type, const std::string &target, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
-extern bool CheckDependByIdent(const CUnit &unit, const int rule_type, const std::string &target, bool ignore_units = false, bool is_predependency = false);
-/// Check a dependency by unit type
-extern bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore_units = false, bool is_predependency = false);
-extern bool CheckDependByType(const CUnit &unit, const CUnitType &type, bool ignore_units = false, bool is_predependency = false);
+
+/// Check dependencies for player
+extern bool CheckDependencies(const CUnitType *target, const CPlayer *player, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
+extern bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false);
+
+template <typename T>
+extern bool CheckDependencies(const T *target, const CPlayer *player, bool ignore_units = false, bool is_predependency = false, bool is_neutral_use = false)
+{
+	if (!is_predependency && !CheckDependencies(target, player, ignore_units, true, is_neutral_use)) {
+		return false;
+	}
+	
+	if (is_predependency) {
+		return !target->Predependency || target->Predependency->Check(player, ignore_units);
+	} else {
+		return !target->Dependency || target->Dependency->Check(player, ignore_units);
+	}
+}
+
+/// Check dependencies for unit
+extern bool CheckDependencies(const CUnitType *target, const CUnit *unit, bool ignore_units = false, bool is_predependency = false);
+extern bool CheckDependencies(const CUpgrade *target, const CUnit *unit, bool ignore_units = false, bool is_predependency = false);
+
+template <typename T>
+extern bool CheckDependencies(const T *target, const CUnit *unit, bool ignore_units = false, bool is_predependency = false)
+{
+	if (!is_predependency && !CheckDependencies(target, unit, ignore_units, true)) {
+		return false;
+	}
+	
+	if (is_predependency) {
+		return !target->Predependency || target->Predependency->Check(unit, ignore_units);
+	} else {
+		return !target->Dependency || target->Dependency->Check(unit, ignore_units);
+	}
+}
 
 #endif
