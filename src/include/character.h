@@ -30,8 +30,6 @@
 #ifndef __CHARACTER_H__
 #define __CHARACTER_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -52,6 +50,7 @@ class CCalendar;
 class CCivilization;
 class CDeity;
 class CDeityDomain;
+class CDependency;
 class CFaction;
 class CFile;
 class CHistoricalLocation;
@@ -177,6 +176,8 @@ public:
 	CCharacter *Father = nullptr;		/// Character's father
 	CCharacter *Mother = nullptr;		/// Character's mother
 	LuaCallback *Conditions = nullptr;
+	CDependency *Predependency = nullptr;
+	CDependency *Dependency = nullptr;
 	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
@@ -231,6 +232,4 @@ extern int GetCharacterTitleIdByName(const std::string &title);
 extern bool IsMinisterialTitle(int title);
 extern void CharacterCclRegister();
 
-//@}
-
-#endif // !__CHARACTER_H__
+#endif

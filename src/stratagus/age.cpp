@@ -41,7 +41,7 @@
 #include "player.h"
 #include "time/calendar.h"
 #include "unit/unittype.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 #include "upgrade/upgrade_structs.h"
 #include "video.h"
 
@@ -181,10 +181,12 @@ void CAge::ProcessConfigData(const CConfigData *config_data)
 			this->G = CGraphic::New(file, size.x, size.y);
 			this->G->Load();
 			this->G->UseDisplayFormat();
-		} else if (child_config_data->Tag == "dependency" || child_config_data->Tag == "predependency") {
-			std::string target = config_data->Ident;
-			target = FindAndReplaceString(target, "_", "-");
-			DependRule::ProcessConfigData(child_config_data, DependRuleAge, target);
+		} else if (child_config_data->Tag == "predependencies") {
+			this->Predependency = new CAndDependency;
+			this->Predependency->ProcessConfigData(child_config_data);
+		} else if (child_config_data->Tag == "dependencies") {
+			this->Dependency = new CAndDependency;
+			this->Dependency->ProcessConfigData(child_config_data);
 		} else {
 			fprintf(stderr, "Invalid age property: \"%s\".\n", child_config_data->Tag.c_str());
 		}

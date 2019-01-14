@@ -76,7 +76,7 @@
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
 #include "unitsound.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 #include "video.h"
 #include "widgets.h"
 #include "world.h"
@@ -338,19 +338,19 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			//Wyrmgus end
-				for (size_t z = 0; z < UnitTypes.size(); ++z) {
-					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer->ID)) {
-						if (CheckDependByType(*unit.Player, *UnitTypes[z])) {
-							if (UnitTypes[z]->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[UnitTypes[z]->Slot].begin(), AiHelpers.Build[UnitTypes[z]->Slot].end(), unit.Type) != AiHelpers.Build[UnitTypes[z]->Slot].end()) {
+				for (CUnitType *unit_type : UnitTypes) {
+					if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
+						if (CheckDependencies(unit_type, unit.Player)) {
+							if (unit_type->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->Slot].begin(), AiHelpers.Build[unit_type->Slot].end(), unit.Type) != AiHelpers.Build[unit_type->Slot].end()) {
 								dest.Blink = 4;
-								SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush, dest.MapLayer->ID);
+								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, flush, dest.MapLayer->ID);
 								if (!acknowledged) {
 									PlayUnitSound(unit, VoiceBuild);
 									acknowledged = 1;
 								}
 								break;
 							}
-						} else if (CheckDependByType(*unit.Player, *UnitTypes[z], false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
+						} else if (CheckDependencies(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
 							ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 							break;
 						}
@@ -367,12 +367,12 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					}
 					SendCommandReturnGoods(unit, depot, flush);
 					//Wyrmgus start
-					for (size_t z = 0; z < UnitTypes.size(); ++z) {
-						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer->ID)) {
-							if (CheckDependByType(*unit.Player, *UnitTypes[z])) {
-								SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], 0, dest.MapLayer->ID);
+					for (CUnitType *unit_type : UnitTypes) {
+						if (unit_type && unit_type->GivesResource == res && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *unit_type, dest.tilePos, 1, false, dest.MapLayer->ID)) {
+							if (CheckDependencies(unit_type, unit.Player)) {
+								SendCommandBuildBuilding(unit, dest.tilePos, *unit_type, 0, dest.MapLayer->ID);
 								break;
-							} else if (CheckDependByType(*unit.Player, *UnitTypes[z], false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
+							} else if (CheckDependencies(unit_type, unit.Player, false, true)) { //passes predependency check, even though didn't pass dependency check before, so give a message about the requirements
 								ThisPlayer->Notify(NotifyYellow, dest.tilePos, dest.MapLayer->ID, "%s", _("The requirements have not been fulfilled"));
 								break;
 							}
@@ -503,11 +503,11 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//Wyrmgus start
 	//if the clicked unit is a settlement site, build on it
 	if (UnitUnderCursor != nullptr && dest != nullptr && dest != &unit && dest->Type == SettlementSiteUnitType && (dest->Player->Index == PlayerNumNeutral || dest->Player->Index == unit.Player->Index)) {
-		for (size_t z = 0; z < UnitTypes.size(); ++z) {
-			if (UnitTypes[z] && UnitTypes[z]->BoolFlag[TOWNHALL_INDEX].value && CheckDependByType(*unit.Player, *UnitTypes[z]) && CanBuildUnitType(&unit, *UnitTypes[z], dest->tilePos, 1, false, dest->MapLayer->ID)) {
-				if (UnitTypes[z]->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[UnitTypes[z]->Slot].begin(), AiHelpers.Build[UnitTypes[z]->Slot].end(), unit.Type) != AiHelpers.Build[UnitTypes[z]->Slot].end()) {
+		for (CUnitType *unit_type : UnitTypes) {
+			if (unit_type && unit_type->BoolFlag[TOWNHALL_INDEX].value && CheckDependencies(unit_type, unit.Player) && CanBuildUnitType(&unit, *unit_type, dest->tilePos, 1, false, dest->MapLayer->ID)) {
+				if (unit_type->Slot < (int) AiHelpers.Build.size() && std::find(AiHelpers.Build[unit_type->Slot].begin(), AiHelpers.Build[unit_type->Slot].end(), unit.Type) != AiHelpers.Build[unit_type->Slot].end()) {
 					dest->Blink = 4;
-					SendCommandBuildBuilding(unit, dest->tilePos, *UnitTypes[z], flush, dest->MapLayer->ID);
+					SendCommandBuildBuilding(unit, dest->tilePos, *unit_type, flush, dest->MapLayer->ID);
 					if (!acknowledged) {
 						PlayUnitSound(unit, VoiceBuild);
 						acknowledged = 1;

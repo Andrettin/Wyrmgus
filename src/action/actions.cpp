@@ -80,7 +80,7 @@
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -361,7 +361,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 			
 		//if the unit still has less stock than its max, re-init the unit stock timer
-		if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock && CheckDependByType(*unit.Player, *unit_type)) {
+		if (unit.GetUnitStockReplenishmentTimer(unit_type) == 0 && unit.GetUnitStock(unit_type) < unit_stock && CheckDependencies(unit_type, unit.Player)) {
 			unit.SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[unit.Player->Index].Costs[TimeCost] * 50);
 		}
 	}

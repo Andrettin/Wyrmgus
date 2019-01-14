@@ -48,7 +48,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 
 /*----------------------------------------------------------------------------
 --  Types
@@ -378,7 +378,7 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType &unittype, int *usableTypes)
 	int usableTypesCount = AiFindUnitTypeEquiv(unittype, usableTypes);
 	// 2 - Remove unavailable unittypes
 	for (int i = 0; i < usableTypesCount;) {
-		if (!CheckDependByIdent(*AiPlayer->Player, DependRuleUnitType, UnitTypes[usableTypes[i]]->Ident)) {
+		if (!CheckDependencies(UnitTypes[usableTypes[i]], AiPlayer->Player)) {
 			// Not available, remove it
 			usableTypes[i] = usableTypes[usableTypesCount - 1];
 			--usableTypesCount;

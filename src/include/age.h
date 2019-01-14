@@ -44,6 +44,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CDependency;
 class CGraphic;
 class CUpgrade;
 
@@ -69,6 +70,8 @@ public:
 	CGraphic *G = nullptr;
 	int Priority = 0;
 	int YearBoost = 0;
+	CDependency *Predependency = nullptr;
+	CDependency *Dependency = nullptr;
 };
 
 /*----------------------------------------------------------------------------

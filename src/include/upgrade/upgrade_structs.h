@@ -53,6 +53,7 @@
 
 class CCharacter;
 class CDeityDomain;
+class CDependency;
 class CIcon;
 class CSchoolOfMagic;
 class CUniqueItem;
@@ -155,6 +156,8 @@ public:
 	//Wyrmgus end
 	// TODO: not used by buttons
 	CIcon *Icon = nullptr;					/// icon to display to the user
+	CDependency *Predependency = nullptr;
+	CDependency *Dependency = nullptr;
 };
 
 /**

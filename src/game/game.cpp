@@ -91,7 +91,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 //Wyrmgus start
 #include "util.h"
@@ -1841,11 +1841,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	// Upgrades
 	//
 	InitUpgrades();
-
-	//
-	// Dependencies
-	//
-	InitDependencies();
 
 	//
 	// Buttons (botpanel)

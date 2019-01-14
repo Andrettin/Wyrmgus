@@ -58,6 +58,7 @@
 
 class CAnimations;
 class CConstruction;
+class CDependency;
 class CFile;
 class CPlayerColorGraphic;
 class CUnitTypeVariation;
@@ -1072,6 +1073,9 @@ public:
 	//Wyrmgus start
 	CGraphic *LightSprite;						/// Light sprite image
 	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// Layer sprite images
+	
+	CDependency *Predependency = nullptr;
+	CDependency *Dependency = nullptr;
 	
 	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end

@@ -30,11 +30,11 @@
 # Version configuration #
 #########################
 # Stratagus major version
-set(STRATAGUS_MAJOR_VERSION 2)
+set(STRATAGUS_MAJOR_VERSION 3)
 # Stratagus minor version (maximum 99)
 set(STRATAGUS_MINOR_VERSION 5)
 # Stratagus patch level (maximum 99)
-set(STRATAGUS_PATCH_LEVEL 4)
+set(STRATAGUS_PATCH_LEVEL 5)
 # Stratagus patch level 2
 set(STRATAGUS_PATCH_LEVEL2 0)
 #########################
@@ -391,7 +391,7 @@ set(unit_SRCS
 source_group(unit FILES ${unit_SRCS})
 
 set(upgrade_SRCS
-	src/upgrade/depend.cpp
+	src/upgrade/dependency.cpp
 	src/upgrade/upgrade.cpp
 	src/upgrade/upgrade_modifier.cpp
 )
@@ -643,7 +643,7 @@ set(stratagus_unit_HDRS
 )
 
 set(stratagus_upgrade_HDRS
-	src/include/upgrade/depend.h
+	src/include/upgrade/dependency.h
 	src/include/upgrade/upgrade.h
 	src/include/upgrade/upgrade_modifier.h
 	src/include/upgrade/upgrade_structs.h
@@ -1272,8 +1272,12 @@ add_custom_command(OUTPUT tolua.cpp
 
 add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
 target_link_libraries(stratagus ${stratagus_LIBS})
-target_link_libraries(stratagus ${stratagus_LIBS_RELEASE})
-target_link_libraries(stratagus ${stratagus_LIBS_DEBUG})
+if(stratagus_LIBS_RELEASE)
+	target_link_libraries(stratagus ${stratagus_LIBS_RELEASE})
+endif()
+if(stratagus_LIBS_DEBUG)
+	target_link_libraries(stratagus ${stratagus_LIBS_DEBUG})
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set_target_properties(stratagus PROPERTIES OUTPUT_NAME stratagus-dbg)

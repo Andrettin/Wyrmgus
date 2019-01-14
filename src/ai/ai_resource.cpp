@@ -52,7 +52,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 
@@ -456,7 +456,7 @@ bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type, bool a
 		//Wyrmgus end
 
 		if ((player.GetUnitTypeAiActiveCount(&builder) > 0 || (allow_can_build_builder && AiRequestedTypeAllowed(player, builder)))
-			&& CheckDependByType(player, type)) {
+			&& CheckDependencies(&type, &player)) {
 			return true;
 		}
 	}
@@ -476,7 +476,7 @@ static bool AiRequestedUpgradeAllowed(const CPlayer &player, const CUpgrade *upg
 	for (size_t i = 0; i < size; ++i) {
 		CUnitType &researcher = *AiHelpers.Research[upgrade->ID][i];
 
-		if ((player.GetUnitTypeAiActiveCount(&researcher) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, researcher))) && CheckDependByIdent(player, DependRuleUpgrade, upgrade->Ident)) {
+		if ((player.GetUnitTypeAiActiveCount(&researcher) > 0 || (allow_can_build_researcher && AiRequestedTypeAllowed(player, researcher))) && CheckDependencies(upgrade, &player)) {
 			return true;
 		}
 	}
@@ -2307,7 +2307,7 @@ void AiCheckSettlementConstruction()
 	
 	CUnitType *town_hall_type = UnitTypes[town_hall_type_id];
 	
-	if (!CheckDependByType(*AiPlayer->Player, *town_hall_type)) {
+	if (!CheckDependencies(town_hall_type, AiPlayer->Player)) {
 		return;
 	}
 

@@ -30,8 +30,6 @@
 #ifndef __COLOR_H
 #define __COLOR_H
 
-//@{
-
 class CConfigData;
 struct lua_State;
 struct SDL_Color;
@@ -153,8 +151,5 @@ public:
 #include <stdint.h>
 
 typedef uint32_t IntColor; // Uint32 in SDL
-
-
-//@}
 
 #endif

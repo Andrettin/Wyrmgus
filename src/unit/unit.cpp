@@ -89,7 +89,7 @@
 #include "unit/unittype.h"
 #include "unit/unit_type_variation.h"
 #include "unitsound.h"
-#include "upgrade/depend.h"	//for using dependency checks
+#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 //Wyrmgus start
@@ -751,7 +751,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				unsigned int best_gathering_rate = 0;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					CUnitType *experience_upgrade_type = AiHelpers.ExperienceUpgrades[Type->Slot][i];
-					if (CheckDependByType(*this, *experience_upgrade_type, true)) {
+					if (CheckDependencies(experience_upgrade_type, this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), experience_upgrade_type) == this->Character->ForbiddenUpgrades.end()) {
 							if (!experience_upgrade_type->ResInfo[this->CurrentResource]) {
 								continue;
@@ -769,7 +769,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				}
 			} else if (this->Player->AiEnabled || (this->Character == nullptr && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-					if (CheckDependByType(*this, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
+					if (CheckDependencies(AiHelpers.ExperienceUpgrades[Type->Slot][i], this, true)) {
 						if (this->Character == nullptr || std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), AiHelpers.ExperienceUpgrades[Type->Slot][i]) == this->Character->ForbiddenUpgrades.end()) {
 							potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
 						}
@@ -984,9 +984,9 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 		}
 	}
 	
-	for (size_t i = 0; i < this->Type->StartingAbilities.size(); ++i) {
-		if (CheckDependByIdent(*this, DependRuleUpgrade, this->Type->StartingAbilities[i]->Ident)) {
-			IndividualUpgradeAcquire(*this, this->Type->StartingAbilities[i]);
+	for (const CUpgrade *ability_upgrade : this->Type->StartingAbilities) {
+		if (CheckDependencies(ability_upgrade, this)) {
+			IndividualUpgradeAcquire(*this, ability_upgrade);
 		}
 	}
 	
@@ -2105,19 +2105,19 @@ void CUnit::GenerateDrop()
 	CUnitType *chosen_drop = nullptr;
 	std::vector<CUnitType *> potential_drops;
 	for (size_t i = 0; i < this->Type->Drops.size(); ++i) {
-		if (CheckDependByType(*this, *this->Type->Drops[i])) {
+		if (CheckDependencies(this->Type->Drops[i], this)) {
 			potential_drops.push_back(this->Type->Drops[i]);
 		}
 	}
 	if (this->Player->AiEnabled) {
 		for (size_t i = 0; i < this->Type->AiDrops.size(); ++i) {
-			if (CheckDependByType(*this, *this->Type->AiDrops[i])) {
+			if (CheckDependencies(this->Type->AiDrops[i], this)) {
 				potential_drops.push_back(this->Type->AiDrops[i]);
 			}
 		}
 		for (std::map<std::string, std::vector<CUnitType *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
 			for (size_t i = 0; i < iterator->second.size(); ++i) {
-				if (CheckDependByType(*this, *iterator->second[i])) {
+				if (CheckDependencies(iterator->second[i], this)) {
 					potential_drops.push_back(iterator->second[i]);
 				}
 			}
@@ -2223,7 +2223,7 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 	}
 	if (dropper_player != nullptr) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependByIdent(*dropper, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependencies(AllUpgrades[i], dropper)) {
 				potential_prefixes.push_back(AllUpgrades[i]);
 			}
 		}
@@ -2246,7 +2246,7 @@ void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 	}
 	if (dropper_player != nullptr) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependByIdent(*dropper, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependencies(AllUpgrades[i], dropper)) {
 				if (Prefix == nullptr || !AllUpgrades[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 					potential_suffixes.push_back(AllUpgrades[i]);
 				}
@@ -2285,7 +2285,7 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 	}
 	if (dropper_player != nullptr) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependByIdent(*dropper, DependRuleUpgrade, AllUpgrades[i]->Ident) && !AllUpgrades[i]->UniqueOnly) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependencies(AllUpgrades[i], dropper) && !AllUpgrades[i]->UniqueOnly) {
 				potential_works.push_back(AllUpgrades[i]);
 			}
 		}
@@ -2304,17 +2304,17 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 			Type == UniqueItems[i]->Type
 			&& ( //the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Prefix == nullptr
-				|| (dropper_player != nullptr && CheckDependByIdent(*dropper, DependRuleUpgrade, UniqueItems[i]->Prefix->Ident))
+				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Prefix, dropper))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Prefix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Suffix == nullptr
-				|| (dropper_player != nullptr && CheckDependByIdent(*dropper, DependRuleUpgrade, UniqueItems[i]->Suffix->Ident))
+				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Suffix, dropper))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's set to drop the item
 				UniqueItems[i]->Set == nullptr
-				|| (dropper_player != nullptr && CheckDependByIdent(*dropper, DependRuleUpgrade, UniqueItems[i]->Set->Ident))
+				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Set, dropper))
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's spell to drop the item
 				UniqueItems[i]->Spell == nullptr
@@ -2323,12 +2323,12 @@ void CUnit::GenerateUnique(CUnit *dropper, CPlayer *dropper_player)
 			&& ( //the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Work == nullptr
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
-				|| (dropper_player != nullptr && CheckDependByIdent(*dropper, DependRuleUpgrade, UniqueItems[i]->Work->Ident))
+				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Work, dropper))
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's elixir to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Elixir == nullptr
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Elixir) != this->Type->Affixes.end()
-				|| (dropper_player != nullptr && CheckDependByIdent(*dropper, DependRuleUpgrade, UniqueItems[i]->Elixir->Ident))
+				|| (dropper_player != nullptr && CheckDependencies(UniqueItems[i]->Elixir, dropper))
 			)
 			&& UniqueItems[i]->CanDrop()
 		) {
@@ -2377,7 +2377,7 @@ void CUnit::UpdateSoldUnits()
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
 					(iterator->second->Civilization && iterator->second->Civilization->ID == civilization_id || iterator->second->Type->Slot == PlayerRaces.GetCivilizationClassUnitType(civilization_id, iterator->second->Type->Class))
-					&& CheckDependByType(*this, *iterator->second->Type, true) && iterator->second->CanAppear()
+					&& CheckDependencies(iterator->second->Type, this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);
 				}
@@ -2385,7 +2385,7 @@ void CUnit::UpdateSoldUnits()
 		}
 	} else {
 		for (size_t i = 0; i < this->Type->SoldUnits.size(); ++i) {
-			if (CheckDependByType(*this, *this->Type->SoldUnits[i])) {
+			if (CheckDependencies(this->Type->SoldUnits[i], this)) {
 				potential_items.push_back(this->Type->SoldUnits[i]);
 			}
 		}
@@ -2868,7 +2868,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	}
 	
 	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
-		if (CheckDependByIdent(*unit, DependRuleUpgrade, unit->Type->StartingAbilities[i]->Ident)) {
+		if (CheckDependencies(unit->Type->StartingAbilities[i], unit)) {
 			IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
 		}
 	}
@@ -3547,12 +3547,11 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 **
 **  @param pos  map tile position.
 */
-//Wyrmgus start
-//void CUnit::Place(const Vec2i &pos)
 void CUnit::Place(const Vec2i &pos, int z)
-//Wyrmgus end
 {
 	Assert(Removed);
+	
+	const CMapLayer *old_map_layer = this->MapLayer;
 
 	if (Container) {
 		MapUnmarkUnitSight(*this);
@@ -3615,8 +3614,8 @@ void CUnit::Place(const Vec2i &pos, int z)
 		
 		const CUnitTypeVariation *variation = this->GetVariation();
 		if (variation) {
-			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, repick the unit's variation
-			if (!this->CheckTerrainForVariation(variation) || !this->CheckSeasonForVariation(variation)) {
+			// if a unit that is on the tile has a terrain-dependent or season-dependent variation that is not compatible with the new tile, or if this is the first position the unit is being placed in, repick the unit's variation
+			if (!old_map_layer || !this->CheckTerrainForVariation(variation) || !this->CheckSeasonForVariation(variation)) {
 				this->ChooseVariation();
 			}
 		}
@@ -6146,7 +6145,7 @@ bool CUnit::CanLearnAbility(CUpgrade *ability, bool pre) const
 		return false;
 	}
 	
-	if (!CheckDependByIdent(*this, DependRuleUpgrade, ability->Ident, false, pre)) {
+	if (!CheckDependencies(ability, this, false, pre)) {
 		return false;
 	}
 	
@@ -6159,7 +6158,7 @@ bool CUnit::CanHireMercenary(CUnitType *type, int civilization_id) const
 		civilization_id = type->Civilization;
 	}
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody && Players[p].Type != PlayerNeutral && civilization_id == Players[p].Race && CheckDependByType(Players[p], *type, true) && Players[p].StartMapLayer == this->MapLayer->ID) {
+		if (Players[p].Type != PlayerNobody && Players[p].Type != PlayerNeutral && civilization_id == Players[p].Race && CheckDependencies(type, &Players[p], true) && Players[p].StartMapLayer == this->MapLayer->ID) {
 			return true;
 		}
 	}

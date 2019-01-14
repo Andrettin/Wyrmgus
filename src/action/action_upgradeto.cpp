@@ -55,7 +55,7 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unittype.h"
-#include "upgrade/depend.h"
+#include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
@@ -164,12 +164,12 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus end
 	
 	//if the old unit type had a starting ability that the new one doesn't have, remove it; and apply it if the reverse happens
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (AllUpgrades[i]->Ability) {
-			if (unit.GetIndividualUpgrade(AllUpgrades[i]) && std::find(oldtype.StartingAbilities.begin(), oldtype.StartingAbilities.end(), AllUpgrades[i]) != oldtype.StartingAbilities.end() && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) == newtype.StartingAbilities.end()) {
-				IndividualUpgradeLost(unit, AllUpgrades[i]);
-			} else if (!unit.GetIndividualUpgrade(AllUpgrades[i]) && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) != newtype.StartingAbilities.end() && CheckDependByIdent(unit, DependRuleUpgrade, AllUpgrades[i]->Ident)) {
-				IndividualUpgradeAcquire(unit, AllUpgrades[i]);
+	for (const CUpgrade *upgrade : AllUpgrades) {
+		if (upgrade->Ability) {
+			if (unit.GetIndividualUpgrade(upgrade) && std::find(oldtype.StartingAbilities.begin(), oldtype.StartingAbilities.end(), upgrade) != oldtype.StartingAbilities.end() && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), upgrade) == newtype.StartingAbilities.end()) {
+				IndividualUpgradeLost(unit, upgrade);
+			} else if (!unit.GetIndividualUpgrade(upgrade) && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), upgrade) != newtype.StartingAbilities.end() && CheckDependencies(upgrade, &unit)) {
+				IndividualUpgradeAcquire(unit, upgrade);
 			}
 		}
 	}	
