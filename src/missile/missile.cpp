@@ -513,7 +513,12 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	int piercing_damage = attacker.Variable[PIERCINGDAMAGE_INDEX].Value;
 	int fire_damage = attacker.Variable[FIREDAMAGE_INDEX].Value;
 	int cold_damage = attacker.Variable[COLDDAMAGE_INDEX].Value;
+	
 	int arcane_damage = attacker.Variable[ARCANEDAMAGE_INDEX].Value;
+	if (attacker.Variable[INFUSION_INDEX].Value > 0) {
+		arcane_damage += 4; //+4 arcane damage bonus from Infusion
+	}
+	
 	int lightning_damage = attacker.Variable[LIGHTNINGDAMAGE_INDEX].Value;
 	int air_damage = attacker.Variable[AIRDAMAGE_INDEX].Value;
 	int earth_damage = attacker.Variable[EARTHDAMAGE_INDEX].Value;

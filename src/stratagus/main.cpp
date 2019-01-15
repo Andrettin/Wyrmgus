@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 #include "SDL.h"
 
@@ -36,5 +34,3 @@ int main(int argc, char **argv)
 {
 	return stratagusMain(argc, argv);
 }
-
-//@}
