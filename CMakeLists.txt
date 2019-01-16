@@ -905,8 +905,6 @@ if(GODOT_FOUND)
 	include_directories(${GODOT_DIR}/thirdparty/libtheora)
 	include_directories(${GODOT_DIR}/thirdparty/libvorbis)
 	include_directories(${GODOT_DIR}/thirdparty/zlib)
-	set(stratagus_LIBS_RELEASE ${stratagus_LIBS_RELEASE} ${GODOT_LIBRARIES_STATIC})
-	set(stratagus_LIBS_DEBUG ${stratagus_LIBS_DEBUG} ${GODOT_LIBRARIES_STATIC_DEBUG})
 endif()
 
 include_directories(${LUA_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR})
@@ -1270,7 +1268,7 @@ add_custom_command(OUTPUT tolua.cpp
 	VERBATIM
 )
 
-add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
+add_library(stratagus STATIC ${stratagus_SRCS} ${stratagus_HDRS})
 target_link_libraries(stratagus ${stratagus_LIBS})
 if(stratagus_LIBS_RELEASE)
 	target_link_libraries(stratagus ${stratagus_LIBS_RELEASE})
