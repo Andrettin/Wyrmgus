@@ -10,8 +10,8 @@
 //
 /**@name stratagus.cpp - The main file. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Francois Beerten,
-//                                 Jimmy Salmon, Pali Rohár and cybermind
+//      (c) Copyright 1998-2019 by Lutz Sammer, Francois Beerten,
+//                                 Jimmy Salmon, Pali Rohár, cybermind and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /**
 ** @mainpage
@@ -938,5 +936,3 @@ Vec2i GetDirectionOffset(int direction)
 	return offset;
 }
 //Wyrmgus end
-
-//@}
