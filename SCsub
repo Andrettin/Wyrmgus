@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+
+Import('env')
+Import('env_modules')
+
+env.Append(LIBS=["SDL"])
+env.Append(LIBS=["SDLmain"])
+env.Append(LIBS=["lua"])
+env.Append(LIBS=["tolua++"])
+env.Append(LIBS=["wyrmgus"])
+env.Append(LIBPATH=['#bin'])
+
+env_wyrmgus = env_modules.Clone()
+
+# Godot source files
+env_wyrmgus.add_source_files(env.modules_sources, "register_types.cpp")
+env_wyrmgus.add_source_files(env.modules_sources, "wyrmgus_module.cpp")
+env_wyrmgus.Append(CPPPATH=['.', 'src/include'])

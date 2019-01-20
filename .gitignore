@@ -37,3 +37,9 @@ Icon
 
 #Ignore Visual Studio project files
 build/
+
+#Build Artifacts
+*.obj
+
+#Cache
+__pycache__/
