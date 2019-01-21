@@ -144,7 +144,7 @@ extern unsigned inline _FetchLE32(unsigned char **pp)
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#if !defined(USE_WIN32)
+#if !defined(_WIN32)
 
 #if defined(USE_BSD)
 #include <sys/types.h>

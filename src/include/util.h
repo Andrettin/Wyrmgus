@@ -30,7 +30,7 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
-#ifdef USE_WIN32
+#ifdef _WIN32
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0400
 #endif

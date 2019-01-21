@@ -30,10 +30,6 @@
 #ifndef __MOVIE_H__
 #define __MOVIE_H__
 
-//@{
-
-#ifdef USE_VORBIS
-
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -44,9 +40,7 @@
 
 #include "ogg/ogg.h"
 #include "vorbis/codec.h"
-#ifdef USE_THEORA
 #include "theora/theora.h"
-#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -68,17 +62,13 @@ struct OggData {
 	vorbis_block vblock;
 	vorbis_dsp_state vdsp;
 
-#ifdef USE_THEORA
 	ogg_stream_state vstream;
 	theora_info tinfo;
 	theora_comment tcomment;
 	theora_state tstate;
-#endif
 
 	int audio : 1;
-#ifdef USE_THEORA
 	int video : 1;
-#endif
 };
 
 /*----------------------------------------------------------------------------
@@ -95,11 +85,7 @@ extern int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CFile *f);
 
 extern int VorbisProcessData(OggData *data, char *buffer);
 
-#endif // USE_VORBIS
-
 /// Play a movie file
 extern int PlayMovie(const std::string &name);
-
-//@}
 
 #endif // !__MOVIE_H__

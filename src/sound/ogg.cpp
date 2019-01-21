@@ -37,13 +37,9 @@
 
 #include "stratagus.h"
 
-#ifdef USE_VORBIS // {
-
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
-#ifdef USE_THEORA
 #include <theora/theora.h>
-#endif
 
 #include "SDL.h"
 #include "SDL_endian.h"
@@ -152,9 +148,7 @@ int OggInit(CFile *f, OggData *data)
 {
 	ogg_packet packet;
 	int num_vorbis;
-#ifdef USE_THEORA
 	int num_theora;
-#endif
 	int stream_start;
 	int ret;
 
@@ -170,14 +164,10 @@ int OggInit(CFile *f, OggData *data)
 	vorbis_info_init(&data->vinfo);
 	vorbis_comment_init(&data->vcomment);
 
-#ifdef USE_THEORA
 	theora_info_init(&data->tinfo);
 	theora_comment_init(&data->tcomment);
-#endif
 
-#ifdef USE_THEORA
 	num_theora = 0;
-#endif
 	num_vorbis = 0;
 	stream_start = 0;
 	while (!stream_start) {
@@ -191,11 +181,9 @@ int OggInit(CFile *f, OggData *data)
 			if (num_vorbis) {
 				ogg_stream_pagein(&data->astream, &data->page);
 			}
-#ifdef USE_THEORA
 			if (num_theora) {
 				ogg_stream_pagein(&data->vstream, &data->page);
 			}
-#endif
 			stream_start = 1;
 			break;
 		}
@@ -205,12 +193,10 @@ int OggInit(CFile *f, OggData *data)
 
 		// initial codec headers
 		while (ogg_stream_packetout(&test, &packet) == 1) {
-#ifdef USE_THEORA
 			if (theora_decode_header(&data->tinfo, &data->tcomment, &packet) >= 0) {
 				memcpy(&data->vstream, &test, sizeof(test));
 				++num_theora;
 			} else
-#endif
 				if (!vorbis_synthesis_headerin(&data->vinfo, &data->vcomment, &packet)) {
 					memcpy(&data->astream, &test, sizeof(test));
 					++num_vorbis;
@@ -221,13 +207,10 @@ int OggInit(CFile *f, OggData *data)
 	}
 
 	data->audio = num_vorbis;
-#ifdef USE_THEORA
 	data->video = num_theora;
-#endif
 
 	// remainint codec headers
 	while ((num_vorbis && num_vorbis < 3)
-#ifdef USE_THEORA
 		   || (num_theora && num_theora < 3)) {
 		// are we in the theora page ?
 		while (num_theora && num_theora < 3 &&
@@ -240,9 +223,6 @@ int OggInit(CFile *f, OggData *data)
 			}
 			++num_theora;
 		}
-#else
-		  ) {
-#endif
 
 		// are we in the vorbis page ?
 		while (num_vorbis && num_vorbis < 3 &&
@@ -264,11 +244,9 @@ int OggInit(CFile *f, OggData *data)
 		if (num_vorbis) {
 			ogg_stream_pagein(&data->astream, &data->page);
 		}
-#ifdef USE_THEORA
 		if (num_theora) {
 			ogg_stream_pagein(&data->vstream, &data->page);
 		}
-#endif
 	}
 
 	if (num_vorbis) {
@@ -279,7 +257,6 @@ int OggInit(CFile *f, OggData *data)
 		vorbis_comment_clear(&data->vcomment);
 	}
 
-#ifdef USE_THEORA
 	if (num_theora) {
 		theora_decode_init(&data->tstate, &data->tinfo);
 		data->tstate.internal_encode = nullptr;  // needed for a bug in libtheora (fixed in next release)
@@ -289,9 +266,6 @@ int OggInit(CFile *f, OggData *data)
 	}
 
 	return !(num_vorbis || num_theora);
-#else
-	return !num_vorbis;
-#endif
 }
 
 void OggFree(OggData *data)
@@ -303,14 +277,12 @@ void OggFree(OggData *data)
 		vorbis_comment_clear(&data->vcomment);
 		vorbis_info_clear(&data->vinfo);
 	}
-#ifdef USE_THEORA
 	if (data->video) {
 		ogg_stream_clear(&data->vstream);
 		theora_comment_clear(&data->tcomment);
 		theora_info_clear(&data->tinfo);
 		theora_clear(&data->tstate);
 	}
-#endif
 	ogg_sync_clear(&data->sync);
 }
 
@@ -474,7 +446,3 @@ CSample *LoadVorbis(const char *name, int flags)
 
 	return sample;
 }
-
-#endif // USE_VORBIS
-
-//@}

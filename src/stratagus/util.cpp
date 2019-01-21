@@ -478,10 +478,10 @@ int getopt(int argc, char *const *argv, const char *opts)
 */
 int GetClipboard(std::string &str)
 {
-#if defined(USE_WIN32) || defined(USE_X11)
+#if defined(_WIN32) || defined(USE_X11)
 	int i;
 	unsigned char *clipboard;
-#ifdef USE_WIN32
+#ifdef _WIN32
 	HGLOBAL handle;
 #elif defined(USE_X11)
 	Display *display;
@@ -493,7 +493,7 @@ int GetClipboard(std::string &str)
 	XEvent event;
 #endif
 
-#ifdef USE_WIN32
+#ifdef _WIN32
 	if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(nullptr)) {
 		return -1;
 	}
@@ -552,7 +552,7 @@ int GetClipboard(std::string &str)
 		}
 	}
 	str = (char *)clipboard;
-#ifdef USE_WIN32
+#ifdef _WIN32
 	GlobalUnlock(handle);
 	CloseClipboard();
 #elif defined(USE_X11)

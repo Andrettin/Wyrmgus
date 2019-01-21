@@ -38,7 +38,7 @@
 #include <vector>
 
 // Include system network headers
-#ifdef USE_WIN32
+#ifdef _WIN32
 
 # define USE_WINSOCK
 

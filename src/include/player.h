@@ -30,8 +30,6 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -1012,6 +1010,4 @@ extern bool IsNameValidForWord(const std::string &word_name);
 extern std::map<std::string, CLanguage *> LanguageIdentToPointer;
 //Wyrmgus end
 
-//@}
-
-#endif // !__PLAYER_H__
+#endif

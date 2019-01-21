@@ -1158,12 +1158,10 @@ static void LoadMap(const std::string &filename, CMap &map, bool is_mod)
 	const char *name = filename.c_str();
 	const char *tmp = strrchr(name, '.');
 	if (tmp) {
-#ifdef USE_ZLIB
 		if (!strcmp(tmp, ".gz")) {
 			while (tmp - 1 > name && *--tmp != '.') {
 			}
 		}
-#endif
 #ifdef USE_BZ2LIB
 		if (!strcmp(tmp, ".bz2")) {
 			while (tmp - 1 > name && *--tmp != '.') {
@@ -1171,9 +1169,7 @@ static void LoadMap(const std::string &filename, CMap &map, bool is_mod)
 		}
 #endif
 		if (!strcmp(tmp, ".smp")
-#ifdef USE_ZLIB
 			|| !strcmp(tmp, ".smp.gz")
-#endif
 #ifdef USE_BZ2LIB
 			|| !strcmp(tmp, ".smp.bz2")
 #endif

@@ -159,7 +159,7 @@ static const int CacheNotSet = -5;
 #ifdef ASTAR_PROFILE
 
 #include <map>
-#ifdef USE_WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 

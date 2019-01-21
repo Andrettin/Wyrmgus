@@ -48,7 +48,7 @@
 #include <limits.h>
 #include <math.h>
 
-#ifndef USE_WIN32
+#ifndef _WIN32
 #include <sys/types.h>
 #include <sys/stat.h>
 #endif
@@ -73,7 +73,7 @@
 #include <sys/socket.h>
 #endif
 
-#ifdef USE_WIN32
+#ifdef _WIN32
 #include <shellapi.h>
 #endif
 
@@ -346,7 +346,7 @@ void ReloadOpenGL()
 
 #endif
 
-#if defined(DEBUG) && !defined(USE_WIN32)
+#if defined(DEBUG) && !defined(_WIN32)
 static void CleanExit(int)
 {
 	// Clean SDL
@@ -468,7 +468,7 @@ void InitVideoSdl()
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
 //Wyrmgus start
-//#ifndef USE_WIN32
+//#ifndef _WIN32
 //Wyrmgus end
 		// Fix tablet input in full-screen mode
 		#ifndef __MORPHOS__
@@ -493,7 +493,7 @@ void InitVideoSdl()
 
 		// If debug is enabled, Stratagus disable SDL Parachute.
 		// So we need gracefully handle segfaults and aborts.
-#if defined(DEBUG) && !defined(USE_WIN32)
+#if defined(DEBUG) && !defined(_WIN32)
 		signal(SIGSEGV, CleanExit);
 		signal(SIGABRT, CleanExit);
 #endif
@@ -506,7 +506,7 @@ void InitVideoSdl()
 			SDL_WM_SetCaption(NAME, NAME);
 		}
 
-#if ! defined(USE_WIN32)
+#if ! defined(_WIN32)
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
@@ -568,7 +568,7 @@ void InitVideoSdl()
 #endif
 
 #endif
-#ifdef USE_WIN32
+#ifdef _WIN32
 		HWND hwnd = nullptr;
 		HICON hicon = nullptr;
 		SDL_SysWMinfo info;
@@ -653,7 +653,7 @@ void InitVideoSdl()
 	Video.Depth = TheScreen->format->BitsPerPixel;
 
 //Wyrmgus start
-//#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+//#if defined(USE_TOUCHSCREEN) && defined(_WIN32)
 //Wyrmgus end
 	// Must not allow SDL to switch to relative mouse coordinates
 	// with touchscreen when going fullscreen. So we don't hide the
@@ -1119,7 +1119,7 @@ void ToggleGrabMouse(int mode)
 */
 void ToggleFullScreen()
 {
-#if defined(USE_WIN32) || defined(__APPLE__)
+#if defined(_WIN32) || defined(__APPLE__)
 	long framesize;
 	SDL_Rect clip;
 	Uint32 flags;
@@ -1220,7 +1220,7 @@ void ToggleFullScreen()
 	SDL_SetClipRect(TheScreen, &clip);
 
 	Invalidate(); // Update display
-#else // !USE_WIN32
+#else // !_WIN32
 	SDL_WM_ToggleFullScreen(TheScreen);
 #endif
 

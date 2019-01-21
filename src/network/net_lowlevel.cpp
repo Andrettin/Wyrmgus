@@ -45,7 +45,7 @@
 //  Declarations
 //----------------------------------------------------------------------------
 
-#ifdef USE_WIN32
+#ifdef _WIN32
 
 #include <windows.h>
 #include <winsock.h>

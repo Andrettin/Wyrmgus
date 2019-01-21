@@ -218,7 +218,7 @@ extern void beos_init(int argc, char **argv);
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef USE_WIN32
+#ifdef _WIN32
 #include <windows.h>
 #include <dbghelp.h>
 #endif
@@ -227,12 +227,12 @@ extern void beos_init(int argc, char **argv);
 #include <physfs.h>
 #endif
 
-#if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
+#if defined(_WIN32) && ! defined(NO_STDIO_REDIRECT)
 #include "windows.h"
 #define REDIRECT_OUTPUT
 #endif
 
-#if defined(USE_WIN32) && ! defined(REDIRECT_OUTPUT)
+#if defined(_WIN32) && ! defined(REDIRECT_OUTPUT)
 #include "SetupConsole_win32.h"
 #endif
 
@@ -322,18 +322,12 @@ static void PrintHeader()
 #ifdef DEBUG
 		"DEBUG "
 #endif
-#ifdef USE_ZLIB
 		"ZLIB "
-#endif
 #ifdef USE_BZ2LIB
 		"BZ2LIB "
 #endif
-#ifdef USE_VORBIS
 		"VORBIS "
-#endif
-#ifdef USE_THEORA
 		"THEORA "
-#endif
 #ifdef USE_FLUIDSYNTH
 	"FLUIDSYNTH "
 #endif
@@ -349,7 +343,7 @@ static void PrintHeader()
 #ifdef USE_GLES
 		"GLES "
 #endif
-#ifdef USE_WIN32
+#ifdef _WIN32
 		"WIN32 "
 #endif
 #ifdef USE_LINUX
@@ -691,7 +685,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 	}
 }
 
-#ifdef USE_WIN32
+#ifdef _WIN32
 static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 {
 	HANDLE hFile = CreateFile("crash.dmp", GENERIC_READ | GENERIC_WRITE,    FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -721,10 +715,10 @@ int stratagusMain(int argc, char **argv)
 	//  Parse arguments for BeOS
 	beos_init(argc, argv);
 #endif
-#ifdef USE_WIN32
+#ifdef _WIN32
 	SetUnhandledExceptionFilter(CreateDumpFile);
 #endif
-#if defined(USE_WIN32) && ! defined(REDIRECT_OUTPUT)
+#if defined(_WIN32) && ! defined(REDIRECT_OUTPUT)
 	SetupConsole();
 #endif
 	//  Setup some defaults.

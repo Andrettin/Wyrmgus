@@ -478,7 +478,7 @@ public:
 	int ViewportHeight;        /// Actual height of the window
 #endif
 //Wyrmgus start
-//#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+//#if defined(USE_TOUCHSCREEN) && defined(_WIN32)
 //Wyrmgus end
 	SDL_Cursor *blankCursor;
 //Wyrmgus start

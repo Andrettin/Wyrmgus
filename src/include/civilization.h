@@ -30,8 +30,6 @@
 #ifndef __CIVILIZATION_H__
 #define __CIVILIZATION_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -105,6 +103,4 @@ public:
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
 };
 
-//@}
-
-#endif // !__CIVILIZATION_H__
+#endif

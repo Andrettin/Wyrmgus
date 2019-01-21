@@ -27,10 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
-#ifdef USE_THEORA
-
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
@@ -307,29 +303,3 @@ int PlayMovie(const std::string &name)
 
 	return 0;
 }
-
-#else
-
-#include <string>
-#include <string.h>
-#include <stdio.h>
-
-/**
-**  Play a video file.
-**
-**  @param name   Filename of movie file.
-**
-**  @return       Non-zero if file isn't a supported movie.
-*/
-int PlayMovie(const std::string &name)
-{
-	if (strstr(name.c_str(), ".ogg") || strstr(name.c_str(), ".ogv")) {
-		fprintf(stderr, "PlayMovie() '%s' is not supported, please recompile stratagus with theora support\n", name.c_str());
-		return 0;
-	}
-	return -1;
-}
-
-#endif
-
-//@}

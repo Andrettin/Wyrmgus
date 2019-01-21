@@ -50,7 +50,7 @@ void Parameters::SetDefaultUserDirectory()
 {
 #ifdef USE_GAME_DIR
 	userDirectory = StratagusLibPath;
-#elif USE_WIN32
+#elif _WIN32
 	userDirectory = getenv("APPDATA");
 #elif __MORPHOS__
 	userDirectory = "home";	
@@ -63,7 +63,7 @@ void Parameters::SetDefaultUserDirectory()
 	}
 
 #ifdef USE_GAME_DIR
-#elif USE_WIN32
+#elif _WIN32
 	userDirectory += "Stratagus";
 #elif defined(USE_MAC)
 	userDirectory += "Library/Stratagus";
@@ -76,7 +76,7 @@ static std::string GetLocalPlayerNameFromEnv()
 {
 	const char *userName = nullptr;
 
-#ifdef USE_WIN32
+#ifdef _WIN32
 	userName = getenv("USERNAME");
 #else
 	userName = getenv("USER");

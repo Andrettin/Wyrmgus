@@ -30,8 +30,6 @@
 #ifndef __IOCOMPAT_H__
 #define __IOCOMPAT_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Platform dependent IO-related Includes and Definitions
 ----------------------------------------------------------------------------*/
@@ -69,12 +67,10 @@
 #define O_BINARY 0
 #endif
 
-#ifdef USE_WIN32
+#ifdef _WIN32
 #define makedir(dir, permissions) mkdir(dir)
 #else
 #define makedir(dir, permissions) mkdir(dir, permissions)
 #endif
 
-//@}
-
-#endif // !__IOCOMPAT_H__
+#endif
