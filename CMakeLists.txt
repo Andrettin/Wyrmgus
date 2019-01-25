@@ -162,9 +162,6 @@ set(guichan_SRCS
 	src/guichan/key.cpp
 	src/guichan/keyinput.cpp
 	src/guichan/mouseinput.cpp
-#	src/guichan/opengl/opengl.cpp
-#	src/guichan/opengl/openglgraphics.cpp
-#	src/guichan/opengl/openglimageloader.cpp
 	src/guichan/rectangle.cpp
 	src/guichan/sdl/gsdl.cpp
 	src/guichan/sdl/sdlgraphics.cpp
