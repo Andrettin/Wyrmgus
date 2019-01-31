@@ -29,8 +29,6 @@
 #ifndef __TITLE_H__
 #define __TITLE_H__
 
-//@{
-
 #include <string>
 
 
@@ -82,8 +80,4 @@ public:
 
 extern TitleScreen **TitleScreens;          /// File for title screen
 
-extern void ShowTitleScreens();
-
-//@}
-
-#endif // !__TITLE_H__
+#endif

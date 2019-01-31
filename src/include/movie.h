@@ -85,7 +85,4 @@ extern int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CFile *f);
 
 extern int VorbisProcessData(OggData *data, char *buffer);
 
-/// Play a movie file
-extern int PlayMovie(const std::string &name);
-
-#endif // !__MOVIE_H__
+#endif

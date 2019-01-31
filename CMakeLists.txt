@@ -398,7 +398,6 @@ set(video_SRCS
 	src/video/font.cpp
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
-	src/video/movie.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
 	src/video/shaders.cpp

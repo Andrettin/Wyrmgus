@@ -27,12 +27,9 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 #include "title.h"
 #include "video.h"
-#include "movie.h"
 #include "font.h"
 #include "sound_server.h"
 #include "editor.h"
@@ -164,38 +161,6 @@ void TitleScreen::ShowTitleImage()
 	CGraphic::Free(g);
 }
 
-/**
-**  Show the title screens
-*/
-void ShowTitleScreens()
-{
-	if (!TitleScreens || !CliMapName.empty()) {
-		return;
-	}
-
-	SetVideoSync();
-
-	for (int i = 0; TitleScreens[i]; ++i) {
-		if ((Editor.Running && !TitleScreens[i]->Editor) || (!Editor.Running && TitleScreens[i]->Editor)) {
-			continue;
-		}
-
-		if (!TitleScreens[i]->Music.empty()) {
-			if (TitleScreens[i]->Music == "none" || PlayMusic(TitleScreens[i]->Music) == -1) {
-				StopMusic();
-			}
-		}
-
-		if (!TitleScreens[i]->File.empty() && PlayMovie(TitleScreens[i]->File)) {
-			TitleScreens[i]->ShowTitleImage();
-		}
-
-		Video.ClearScreen();
-	}
-	Invalidate();
-}
-
-
 void ShowFullImage(const std::string &filename, unsigned int timeOutInSecond)
 {
 	TitleScreen titleScreen;
@@ -205,5 +170,3 @@ void ShowFullImage(const std::string &filename, unsigned int timeOutInSecond)
 
 	titleScreen.ShowTitleImage();
 }
-
-//@}

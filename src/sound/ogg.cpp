@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 //	This file contains code for both the ogg file format, and ogg vorbis.
 
 /*----------------------------------------------------------------------------

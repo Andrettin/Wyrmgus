@@ -785,7 +785,6 @@ int stratagusMain(int argc, char **argv)
 	LoadFonts();
 	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 	Video.ClearScreen();
-	ShowTitleScreens();
 
 	// Init player data
 	ThisPlayer = nullptr;
