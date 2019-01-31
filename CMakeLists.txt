@@ -398,7 +398,6 @@ set(video_SRCS
 	src/video/font.cpp
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
-	src/video/mng.cpp
 	src/video/movie.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
@@ -799,7 +798,6 @@ endif()
 
 find_package(BZip2)
 find_package(StackTrace)
-find_package(MNG)
 
 find_package(X11)
 find_package(OpenGL)
@@ -839,7 +837,6 @@ option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" OFF)
 option(WITH_PHYSFS "Compile Stratagus with PhysFS support" OFF)
-option(WITH_MNG "Compile Stratagus with MNG image library" OFF)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
@@ -916,16 +913,6 @@ if(WITH_PHYSFS AND PHYSFS_FOUND)
 	add_definitions(-DPHYSFS_DATAFILE="data.zip")
 	include_directories(${PHYSFS_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${PHYSFS_LIBRARY})
-endif()
-
-if(WITH_MNG AND MNG_FOUND)
-	add_definitions(-DUSE_MNG)
-	include_directories(${MNG_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${MNG_LIBRARY})
-	if (MSVC)
-		include_directories(${JPEG_INCLUDE_DIR})
-		set(stratagus_LIBS ${stratagus_LIBS} ${JPEG_LIBRARY})
-	endif()
 endif()
 
 if(WITH_STACKTRACE AND STACKTRACE_FOUND)
@@ -1217,7 +1204,6 @@ endif()
 
 log_package("Bzip2" "BZIP2")
 log_package("PhysFS" "PHYSFS")
-log_package("Mng" "MNG")
 log_package("StackTrace" "STACKTRACE")
 log_package("X11" "X11")
 

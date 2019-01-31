@@ -328,9 +328,6 @@ static void PrintHeader()
 #endif
 		"VORBIS "
 		"THEORA "
-#ifdef USE_MNG
-		"MNG "
-#endif
 #ifdef USE_OPENGL
 		"OPENGL "
 #endif

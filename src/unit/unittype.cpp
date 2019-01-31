@@ -595,9 +595,6 @@ CUnitType::CUnitType() :
 	Sprite(nullptr), ShadowSprite(nullptr), LightSprite(nullptr)
 	//Wyrmgus end
 {
-#ifdef USE_MNG
-	memset(&Portrait, 0, sizeof(Portrait));
-#endif
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
 	//Wyrmgus start
@@ -677,16 +674,6 @@ CUnitType::~CUnitType()
 		CGraphic::Free(LayerSprites[i]);
 	}
 	//Wyrmgus end
-#ifdef USE_MNG
-	if (this->Portrait.Num) {
-		for (int j = 0; j < this->Portrait.Num; ++j) {
-			delete this->Portrait.Mngs[j];
-			// delete[] this->Portrait.Files[j];
-		}
-		delete[] this->Portrait.Mngs;
-		delete[] this->Portrait.Files;
-	}
-#endif
 }
 
 /**
@@ -2678,18 +2665,6 @@ void LoadUnitTypeSprite(CUnitType &type)
 			type.Sprite->Flip();
 		}
 	}
-
-#ifdef USE_MNG
-	if (type.Portrait.Num) {
-		for (int i = 0; i < type.Portrait.Num; ++i) {
-			type.Portrait.Mngs[i] = new Mng;
-			type.Portrait.Mngs[i]->Load(type.Portrait.Files[i]);
-		}
-		// FIXME: should be configurable
-		type.Portrait.CurrMng = 0;
-		type.Portrait.NumIterations = SyncRand() % 16 + 1;
-	}
-#endif
 
 	//Wyrmgus start
 	if (!type.LightFile.empty()) {

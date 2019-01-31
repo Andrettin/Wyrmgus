@@ -287,33 +287,6 @@ public:
 #endif
 };
 
-#ifdef USE_MNG
-#include <libmng.h>
-
-class Mng
-{
-public:
-	Mng();
-	~Mng();
-	int Load(const std::string &name);
-	void Reset();
-	void Draw(int x, int y);
-
-	std::string name;
-	FILE *fd;
-	mng_handle handle;
-	SDL_Surface *surface;
-	unsigned char *buffer;
-	unsigned long ticks;
-	int iteration;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	GLfloat texture_width;   /// Width of the texture
-	GLfloat texture_height;  /// Height of the texture
-	GLuint texture_name;     /// Texture name
-#endif
-};
-#endif
-
 /**
 **  Event call back.
 **
