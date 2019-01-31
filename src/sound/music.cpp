@@ -106,9 +106,6 @@ void InitMusic()
 	MusicFinished = false;
 	MusicFinishedMutex = SDL_CreateMutex();
 	SetMusicFinishedCallback(MusicFinishedCallback);
-#ifdef USE_FLUIDSYNTH
-	InitFluidSynth();
-#endif
 }
 
 static void* oamlOpen(const char *filename) {

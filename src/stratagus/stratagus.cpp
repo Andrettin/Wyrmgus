@@ -328,12 +328,6 @@ static void PrintHeader()
 #endif
 		"VORBIS "
 		"THEORA "
-#ifdef USE_FLUIDSYNTH
-	"FLUIDSYNTH "
-#endif
-#ifdef USE_MIKMOD
-		"MIKMOD "
-#endif
 #ifdef USE_MNG
 		"MNG "
 #endif

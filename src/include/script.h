@@ -30,8 +30,6 @@
 #ifndef __SCRIPT_H__
 #define __SCRIPT_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -430,6 +428,4 @@ void FreeNumberDesc(NumberDesc *number);  /// Free number description content. (
 void FreeUnitDesc(UnitDesc *unitdesc);    /// Free unit description content. (no pointer itself).
 void FreeStringDesc(StringDesc *s);       /// Frre string description content. (no pointer itself).
 
-//@}
-
-#endif // !__SCRIPT_H__
+#endif

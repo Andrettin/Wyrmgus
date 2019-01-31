@@ -10,7 +10,7 @@
 //
 /**@name script.cpp - The configuration language. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
+//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon, Joris Dauphin and Andrettin.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -3693,5 +3691,3 @@ void ScriptRegister()
 	lua_register(Lua, "StdOutPrint", CclStdOutPrint);
 	//Wyrmgus end
 }
-
-//@}

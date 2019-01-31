@@ -31,8 +31,6 @@
 #ifndef __SOUND_SERVER_H__
 #define __SOUND_SERVER_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -81,26 +79,12 @@ enum _play_audio_flags_ {
 	PlayAudioLoadOnDemand = 8   /// Load only if needed.
 };
 
-/**
-**  Fluidsynth flags
-*/
-#ifdef USE_FLUIDSYNTH
-enum SynthState
-{
-	StateCleaned = 0,
-	StateInitialized,
-	StatePlaying
-};
-#endif
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 extern CSample *LoadWav(const char *name, int flags);			/// Load a wav file
 extern CSample *LoadVorbis(const char *name, int flags);		/// Load a vorbis file
-extern CSample *LoadMikMod(const char *name, int flags);		/// Load a module file
-extern CSample *LoadFluidSynth(const char *name, int flags);	/// Load a MIDI file
 
 /// Set the channel volume
 extern int SetChannelVolume(int channel, int volume);
@@ -179,15 +163,4 @@ extern int InitSound();
 ///  Cleanup sound.
 extern void QuitSound();
 
-#ifdef USE_FLUIDSYNTH
-/// Gets the state of Fluidsynth player
-SynthState GetFluidSynthState();
-/// Init FluidSynth library
-extern int InitFluidSynth();
-// Cleans all FluidSynth data
-extern void CleanFluidSynth(bool reinit = false);
 #endif
-
-//@}
-
-#endif  // !__SOUND_SERVER_H__

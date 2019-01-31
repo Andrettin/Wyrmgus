@@ -29,8 +29,6 @@
 //
 
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -38,10 +36,6 @@
 #include "stratagus.h"
 
 #include "sound_server.h"
-
-#ifdef USE_FLUIDSYNTH
-#include "fluidsynth.h"
-#endif
 
 #include "civilization.h"
 #include "iocompat.h"
@@ -622,18 +616,6 @@ static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
 	if (sampleVorbis) {
 		return sampleVorbis;
 	}
-#ifdef USE_MIKMOD
-	CSample *sampleMikMod = LoadMikMod(name, flag);
-	if (sampleMikMod) {
-		return sampleMikMod;
-	}
-#endif
-#ifdef USE_FLUIDSYNTH
-	CSample *sampleFluidSynth = LoadFluidSynth(name, flag);
-	if (sampleFluidSynth) {
-		return sampleFluidSynth;
-	}
-#endif
 	return nullptr;
 }
 
@@ -1108,9 +1090,4 @@ void QuitSound()
 	Audio.MixerBuffer = nullptr;
 	delete[] Audio.Buffer;
 	Audio.Buffer = nullptr;
-#ifdef USE_FLUIDSYNTH
-	CleanFluidSynth();
-#endif
 }
-
-//@}
