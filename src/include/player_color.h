@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name time_of_day.h - The time of day header file. */
+/**@name player_color.h - The player color header file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TIME_OF_DAY_H__
-#define __TIME_OF_DAY_H__
+#ifndef __PLAYER_COLOR_H__
+#define __PLAYER_COLOR_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -45,29 +45,20 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CGraphic;
-
-class CTimeOfDay : public CDataType
+class CPlayerColor : public CDataType
 {
 public:
-	static CTimeOfDay *GetTimeOfDay(const std::string &ident, const bool should_find = true);
-	static CTimeOfDay *GetOrAddTimeOfDay(const std::string &ident);
-	static void ClearTimesOfDay();
+	static CPlayerColor *GetPlayerColor(const std::string &ident, bool should_find = true);
+	static CPlayerColor *GetOrAddPlayerColor(const std::string &ident);
+	static void ClearPlayerColors();
 	
-	static std::vector<CTimeOfDay *> TimesOfDay;	/// Times of day
-	static std::map<std::string, CTimeOfDay *> TimesOfDayByIdent;
-	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	bool HasColorModification() const;
+	static std::vector<CPlayerColor *> PlayerColors;	/// Player colors
+	static std::map<std::string, CPlayerColor *> PlayerColorsByIdent;
 
-	std::string Name;							/// Name of the time of day
-	int ID = -1;								/// The ID of this time of day
-	bool Dawn = false;							/// Whether this is a dawn time of day
-	bool Day = false;							/// Whether this is a day time of day
-	bool Dusk = false;							/// Whether this is a dusk time of day
-	bool Night = false;							/// Whether this is a night time of day
-	CColor ColorModification;					/// The color modification applied to graphics when the time of day is active
-	CGraphic *G = nullptr;
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	
+	std::string Name;				/// Name of the player color
+	std::vector<CColor> Colors;		/// The colors of the player color
 };
 
 #endif

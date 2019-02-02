@@ -60,6 +60,7 @@
 #include "particle.h"
 #include "pathfinder.h"
 #include "plane.h"
+#include "player_color.h"
 #include "quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
@@ -170,6 +171,8 @@ void CleanModules()
 	FreePathfinder();
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
+	
+	CPlayerColor::ClearPlayerColors();
 }
 
 /**

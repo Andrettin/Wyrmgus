@@ -171,13 +171,6 @@ public:
 class CAchievement
 {
 public:
-	CAchievement() :
-		PlayerColor(0), CharacterLevel(0), Difficulty(-1),
-		Hidden(false), Obtained(false), Unobtainable(false),
-		Character(nullptr), CharacterType(nullptr)
-	{
-	}
-	
 	void Obtain(bool save = true, bool display = true);
 	bool CanObtain() const;
 	int GetProgress() const;
@@ -186,15 +179,15 @@ public:
 	std::string Ident;				/// Ident of the achievement
 	std::string Name;				/// Name of the achievement
 	std::string Description;		/// Description of the achievement
-	int PlayerColor;				/// Player color used for the achievement's icon
-	int CharacterLevel;				/// Character level required for the achievement
-	int Difficulty;					/// Which difficulty the achievement's requirements need to be done in
-	bool Hidden;					/// Whether the achievement is hidden
-	bool Obtained;					/// Whether the achievement has been obtained
-	bool Unobtainable;				/// Whether this achievement can be obtained by checking for it or not
+	int PlayerColor = 0;			/// Player color used for the achievement's icon
+	int CharacterLevel = 0;			/// Character level required for the achievement
+	int Difficulty = -1;			/// Which difficulty the achievement's requirements need to be done in
+	bool Hidden = false;			/// Whether the achievement is hidden
+	bool Obtained = false;			/// Whether the achievement has been obtained
+	bool Unobtainable = false;		/// Whether this achievement can be obtained by checking for it or not
 	IconConfig Icon;				/// Achievement's icon
-	CCharacter *Character;			/// Character related to the achievement's requirements
-	CUnitType *CharacterType;		/// Unit type required for a character to have for the achievement
+	CCharacter *Character = nullptr;	/// Character related to the achievement's requirements
+	CUnitType *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement
 	std::vector<CQuest *> RequiredQuests;	/// Quests required for obtaining this achievement
 };
 

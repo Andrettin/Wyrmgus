@@ -314,6 +314,7 @@ set(stratagusmain_SRCS
 	src/stratagus/parameters.cpp
 	src/stratagus/plane.cpp
 	src/stratagus/player.cpp
+	src/stratagus/player_color.cpp
 	src/stratagus/province.cpp
 	src/stratagus/quest.cpp
 	src/stratagus/resource.cpp
@@ -691,6 +692,7 @@ set(stratagus_generic_HDRS
 	src/include/pathfinder.h
 	src/include/plane.h
 	src/include/player.h
+	src/include/player_color.h
 	src/include/province.h
 	src/include/quest.h
 	src/include/replay.h
