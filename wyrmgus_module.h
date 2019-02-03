@@ -3,11 +3,13 @@
 
 #include "core/reference.h"
 
-class WyrmgusModule : public Reference {
+class WyrmgusModule : public Reference
+{
 	GDCLASS(WyrmgusModule, Reference)
 
 public:
 	int Run();
+	String GetVersion();
 
 protected:
 	static void _bind_methods();
