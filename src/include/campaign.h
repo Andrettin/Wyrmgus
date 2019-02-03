@@ -38,6 +38,8 @@
 #include "time/date.h"
 #include "vec2i.h"
 
+//#include <core/object.h>
+
 #include <map>
 #include <shared_mutex>
 #include <vector>
@@ -52,8 +54,10 @@ class CQuest;
 class LuaCallback;
 struct lua_State;
 
-class CCampaign : public CDataType
+class CCampaign : public CDataType//, public Object
 {
+	//GDCLASS(CCampaign, Object)
+	
 public:
 	CCampaign(const std::string &ident, const int id) : CDataType(ident), ID(id)
 	{
@@ -61,6 +65,7 @@ public:
 	
 	static CCampaign *GetCampaign(const std::string &ident, const bool should_find = true);
 	static CCampaign *GetOrAddCampaign(const std::string &ident);
+	static const std::vector<CCampaign *> &GetCampaigns();
 	static void ClearCampaigns();
 	static void SetCurrentCampaign(CCampaign *campaign);
 	static CCampaign *GetCurrentCampaign();
@@ -73,6 +78,18 @@ private:
 	
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	
+	/*
+	String GetName() const
+	{
+		return this->Name.c_str();
+	}
+	
+	String GetDescription() const
+	{
+		return this->Description.c_str();
+	}
+	*/
 	
 	const CDate &GetStartDate() const
 	{
@@ -101,6 +118,9 @@ public:
 	friend int CclDefineCampaign(lua_State *l);
 	friend int CclGetCampaignData(lua_State *l);
 	friend int CclGetCampaigns(lua_State *l);
+
+//protected:
+//	static void _bind_methods();
 };
 
 /*----------------------------------------------------------------------------

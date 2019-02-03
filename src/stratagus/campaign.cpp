@@ -98,6 +98,16 @@ CCampaign *CCampaign::GetOrAddCampaign(const std::string &ident)
 }
 
 /**
+**	@brief	Get the existing campaigns
+**
+**	@return	The campaigns
+*/
+const std::vector<CCampaign *> &CCampaign::GetCampaigns()
+{
+	return CCampaign::Campaigns;
+}
+
+/**
 **	@brief	Remove the existing campaigns
 */
 void CCampaign::ClearCampaigns()
@@ -220,6 +230,13 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 }
+
+/*
+void CCampaign::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_name"), &CCampaign::GetName);
+}
+*/
 
 /**
 **	@brief	Set the current campaign

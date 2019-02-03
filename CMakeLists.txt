@@ -421,6 +421,7 @@ source_group(win32 FILES ${win32_SRCS})
 
 set(tolua_FILES
 	src/tolua/ai.pkg
+	src/tolua/campaign.pkg
 	src/tolua/editor.pkg
 	src/tolua/font.pkg
 	src/tolua/game.pkg
@@ -795,10 +796,6 @@ find_package(Tolua++ REQUIRED)
 
 find_package(Godot REQUIRED)
 
-if(WIN32)
-	find_package(MakeNSIS)
-endif()
-
 find_package(BZip2)
 find_package(StackTrace)
 
@@ -829,11 +826,6 @@ if(WIN32)
 endif()
 
 # Options for compiling
-
-if(WIN32)
-	option(ENABLE_STDIO_REDIRECT "Redirect Stratagus console output to files on Windows" OFF)
-	option(ENABLE_NSIS "Create Stratagus Window NSIS Installer" OFF)
-endif()
 
 option(ENABLE_METASERVER "Build Stratagus metaserver (requires Sqlite3)" OFF)
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
@@ -879,10 +871,6 @@ endif()
 # Stratagus definitions
 
 add_definitions(-DPIXMAPS=\"${PIXMAPSDIRABS}\")
-
-if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
-	add_definitions(-DNO_STDIO_REDIRECT)
-endif()
 
 if(GODOT_FOUND)
 	include_directories(${GODOT_DIR})
@@ -1155,14 +1143,6 @@ else()
 	message("Platform: Other/No platform code")
 endif()
 
-if(WIN32 AND ENABLE_STDIO_REDIRECT)
-	message("Redirect stdio: Yes (Disable by param -DENABLE_STDIO_REDIRECT=OFF)")
-elseif(NOT WIN32)
-	message("Redirect stdio: Unsupported on this platform")
-else()
-	message("Redirect stdio: No (Enable by param -DENABLE_STDIO_REDIRECT=ON)")
-endif()
-
 if(ENABLE_TOUCHSCREEN)
 	message("Touchscreen input: Yes (Disable by param -DENABLE_TOUCHSCREEN=OFF)")
 else()
@@ -1195,14 +1175,6 @@ if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
 	message("Upx packer: Yes (Disable by param -DENABLE_UPX=OFF)")
 else()
 	message("Upx packer: No (Enable by param -DENABLE_UPX=ON)")
-endif()
-
-if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
-	message("NSIS Installer: Yes (Disable by param -DENABLE_NSIS=OFF)")
-elseif(NOT WIN32)
-	message("NSIS Installer: Unsupported on this platform")
-else()
-	message("NSIS Installer: No (Enable by param -DENABLE_NSIS=ON)")
 endif()
 
 log_package("Bzip2" "BZIP2")
@@ -1344,28 +1316,6 @@ if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
 	if(ENABLE_METASERVER)
 		self_packer(metaserver)
 	endif()
-endif()
-
-########### next target ###############
-
-if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
-	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/COPYING DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/wyrmsun.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	# also ship lua51.dll
-	find_file(LUA_DLL lua51.dll HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES bin lib)
-	file(COPY ${LUA_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	set(MAKENSIS_FLAGS ${MAKENSIS_FLAGS} -DLUADLL=lua51.dll)
-	# ship SDL.dll
-	find_file(SDL_DLL SDL.dll HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES bin lib)
-	file(COPY ${SDL_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	set(MAKENSIS_FLAGS ${MAKENSIS_FLAGS} -DSDL=SDL.dll)
-	add_custom_command(OUTPUT Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX}
-		COMMAND ${MAKENSIS} ARGS ${MAKENSIS_FLAGS} -DVERSION=${STRATAGUS_VERSION} -DVIVERSION=${STRATAGUS_VERSION_FULL} ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.nsi
-		DEPENDS src/win32/stratagus.nsi stratagus COPYING
-		COMMENT "Generating Stratagus Windows NSIS Installer"
-		VERBATIM
-	)
-	add_custom_target(nsis ALL DEPENDS Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX})
 endif()
 
 ########### install files ###############
