@@ -105,8 +105,8 @@ CAge *CAge::GetOrAddAge(const std::string &ident)
 */
 void CAge::ClearAges()
 {
-	for (size_t i = 0; i < Ages.size(); ++i) {
-		delete Ages[i];
+	for (CAge *age : Ages) {
+		delete age;
 	}
 	Ages.clear();
 }

@@ -44,6 +44,7 @@
 #include "age.h"
 #include "ai.h"
 #include "animation.h"
+#include "campaign.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
@@ -1635,9 +1636,10 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		InitSyncRand();
 	}
 	
-	if (CurrentCampaign) {
-		CDate::CurrentTotalHours = CurrentCampaign->StartDate.GetTotalHours(CCalendar::BaseCalendar);
-		CCalendar::BaseCalendar->CurrentDate = CurrentCampaign->StartDate;
+	const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
+	if (current_campaign) {
+		CCalendar::BaseCalendar->CurrentDate = current_campaign->GetStartDate();
+		CDate::CurrentTotalHours = CCalendar::BaseCalendar->CurrentDate.GetTotalHours(CCalendar::BaseCalendar);
 	} else {
 		CCalendar::BaseCalendar->CurrentDate.Clear();
 		CCalendar::BaseCalendar->CurrentDate.Year = 1;

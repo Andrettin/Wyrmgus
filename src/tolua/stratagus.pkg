@@ -2,6 +2,7 @@ $#include "stratagus.h"
 
 $#include "age.h"
 $#include "ai.h"
+$#include "campaign.h"
 //Wyrmgus start
 $#include "character.h"
 //Wyrmgus end

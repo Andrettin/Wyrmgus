@@ -40,6 +40,7 @@
 #include "actions.h"
 #include "age.h"
 #include "ai.h"
+#include "campaign.h"
 #include "character.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -47,9 +48,6 @@
 #include "missile.h"
 #include "parameters.h"
 #include "player.h"
-//Wyrmgus start
-#include "quest.h" // for saving campaigns
-//Wyrmgus end
 #include "replay.h"
 #include "spells.h"
 #include "time/calendar.h"
@@ -142,8 +140,9 @@ int SaveGame(const std::string &filename)
 	//Wyrmgus start
 //	file.printf("function SetTile() end\n");
 	file.printf("function SetTileTerrain() end\n");
-	if (CurrentCampaign != nullptr) {
-		file.printf("SetCurrentCampaign(\"%s\")\n", CurrentCampaign->Ident.c_str());
+	CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
+	if (current_campaign != nullptr) {
+		file.printf("SetCurrentCampaign(\"%s\")\n", current_campaign->GetIdent().c_str());
 	}
 	//Wyrmgus end
 	file.printf("Load(\"%s\")\n", Map.Info.Filename.c_str());

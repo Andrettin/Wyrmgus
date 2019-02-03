@@ -45,10 +45,22 @@ class CConfigData;
 class CDataType
 {
 public:
+	CDataType()
+	{
+	}
+	
+	CDataType(const std::string &ident) : Ident(ident)
+	{
+	}
+	
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
 	
-public:
-	std::string Ident;	/// String identifier of the instance
+	std::string GetIdent() const
+	{
+		return this->Ident;
+	}
+	
+	std::string Ident;	/// String identifier of the data element
 };
 
 #endif

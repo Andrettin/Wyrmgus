@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -38,6 +36,7 @@
 #include "actions.h"
 #include "age.h"
 #include "ai.h"
+#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
@@ -122,6 +121,7 @@ void CleanModules()
 	PlayerRaces.Clean();
 	CAge::ClearAges();
 	CCalendar::ClearCalendars();
+	CCampaign::ClearCampaigns();
 	CCharacter::ClearCharacters();
 	CCivilization::ClearCivilizations();
 	CleanConstructions();
@@ -323,5 +323,3 @@ void LoadGame(const std::string &filename)
 	SyncHash = synchash;
 	SelectionChanged();
 }
-
-//@}

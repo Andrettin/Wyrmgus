@@ -35,6 +35,7 @@
 
 #include "trigger.h"
 
+#include "campaign.h"
 #include "config.h"
 #include "iolib.h"
 //Wyrmgus start
@@ -728,7 +729,8 @@ void CTrigger::InitActiveTriggers()
 		if (std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), trigger->Ident) != CTrigger::DeactivatedTriggers.end()) {
 			continue;
 		}
-		if (trigger->CampaignOnly && CurrentCampaign == nullptr) {
+		if (trigger->CampaignOnly && CCampaign::GetCurrentCampaign() == nullptr) {
+			continue;
 		}
 		CTrigger::ActiveTriggers.push_back(trigger);
 	}

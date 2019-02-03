@@ -37,6 +37,7 @@
 
 #include "map/map.h"
 
+#include "campaign.h"
 #include "civilization.h"
 //Wyrmgus start
 #include "editor.h"
@@ -1038,10 +1039,9 @@ void ApplyMapTemplate(const std::string &map_template_ident, int template_start_
 
 void ApplyCampaignMap(const std::string &campaign_ident)
 {
-	CCampaign *campaign = GetCampaign(campaign_ident);
+	const CCampaign *campaign = CCampaign::GetCampaign(campaign_ident);
 	
 	if (!campaign) {
-		fprintf(stderr, "Campaign \"%s\" doesn't exist.\n", campaign_ident.c_str());
 		return;
 	}
 	
