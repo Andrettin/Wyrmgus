@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
@@ -106,13 +104,13 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 	for (int i = 0; i != 4; ++i) {
 		const Vec2i newpos = pos + offsets[i];
 
-		if (!Map.Info.IsPointOnMap(newpos)) {
+		if (!CMap::Map.Info.IsPointOnMap(newpos)) {
 			dirFlag |= 1 << i;
 		} else {
-			const CMapField &mf = *Map.Field(newpos);
+			const CMapField &mf = *CMap::Map.Field(newpos);
 			const unsigned int tile = seen ? mf.playerInfo.SeenTile : mf.getGraphicTile();
 
-			if (Map.Tileset->isARaceWallTile(tile, human)) {
+			if (CMap::Map.Tileset->isARaceWallTile(tile, human)) {
 				dirFlag |= 1 << i;
 			}
 		}
@@ -132,11 +130,11 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 void MapFixSeenWallTile(const Vec2i &pos)
 {
 	//  Outside of map or no wall.
-	if (!Map.Info.IsPointOnMap(pos)) {
+	if (!CMap::Map.Info.IsPointOnMap(pos)) {
 		return;
 	}
-	CMapField &mf = *Map.Field(pos);
-	const CTileset &tileset = *Map.Tileset;
+	CMapField &mf = *CMap::Map.Field(pos);
+	const CTileset &tileset = *CMap::Map.Tileset;
 	const unsigned tile = mf.playerInfo.SeenTile;
 	if (!tileset.isAWallTile(tile)) {
 		return;
@@ -184,11 +182,11 @@ void MapFixSeenWallNeighbors(const Vec2i &pos)
 void MapFixWallTile(const Vec2i &pos)
 {
 	//  Outside of map or no wall.
-	if (!Map.Info.IsPointOnMap(pos)) {
+	if (!CMap::Map.Info.IsPointOnMap(pos)) {
 		return;
 	}
-	CMapField &mf = *Map.Field(pos);
-	const CTileset &tileset = *Map.Tileset;
+	CMapField &mf = *CMap::Map.Field(pos);
+	const CTileset &tileset = *CMap::Map.Tileset;
 	const int tile = mf.getGraphicTile();
 	if (!tileset.isAWallTile(tile)) {
 		return;
@@ -203,7 +201,7 @@ void MapFixWallTile(const Vec2i &pos)
 
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 			UI.Minimap.UpdateSeenXY(pos);
-			Map.MarkSeenTile(mf);
+			CMap::Map.MarkSeenTile(mf);
 		}
 	}
 }
@@ -323,5 +321,3 @@ void CMap::HitWall(const Vec2i &pos, unsigned damage, int z)
 		//Wyrmgus end
 	}
 }
-
-//@}

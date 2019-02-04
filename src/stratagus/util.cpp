@@ -255,7 +255,7 @@ errno_t strcat_s(char *dst, size_t dstsize, const char *src)
 }
 #endif
 
-#if !defined(HAVE_STRCASESTR)
+#if !defined(USE_LINUX)
 /**
 **  Case insensitive version of strstr
 **
@@ -396,7 +396,7 @@ std::string SnakeCaseToPascalCase(const std::string &str)
 --  Getopt
 ----------------------------------------------------------------------------*/
 
-#ifndef HAVE_GETOPT
+#ifndef USE_LINUX
 
 /**
 **  Standard implementation of getopt(3).

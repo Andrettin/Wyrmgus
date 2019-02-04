@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -205,7 +203,7 @@ static bool MoveRandomly(CUnit &unit)
 	pos.y += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
 
 	// restrict to map
-	Map.Clamp(pos, unit.MapLayer->ID);
+	CMap::Map.Clamp(pos, unit.MapLayer->ID);
 
 	// move if possible
 	if (pos != unit.tilePos) {
@@ -214,8 +212,8 @@ static bool MoveRandomly(CUnit &unit)
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID)) != unit.Type->Species->Terrains.end()) {
-				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID)) == unit.Type->Species->Terrains.end()) {
+			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID)) != unit.Type->Species->Terrains.end()) {
+				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID)) == unit.Type->Species->Terrains.end()) {
 					return false;
 				}
 			}
@@ -446,7 +444,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	}
 	//Wyrmgus start
 //	if (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldRocks | MapFieldForest) == false) {
-	if (Map.IsLayerUnderground(autoAttackUnit->MapLayer->ID) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
+	if (CMap::Map.IsLayerUnderground(autoAttackUnit->MapLayer->ID) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer->ID) == false) {
 	//Wyrmgus end
 		return false;
 	}
@@ -454,7 +452,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	this->SetGoal(autoAttackUnit);
 	//Wyrmgus start
 //	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
-	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) - unit.GetHalfTilePixelSize());
+	UnitHeadingFromDeltaXY(unit, PixelSize(PixelSize(autoAttackUnit->tilePos) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) + autoAttackUnit->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(autoAttackUnit->MapLayer->ID)) - unit.GetHalfTilePixelSize());
 	//Wyrmgus end
 	return true;
 }
@@ -570,6 +568,3 @@ bool AutoAttack(CUnit &unit)
 		}
 	}
 }
-
-
-//@}

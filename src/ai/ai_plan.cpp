@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -112,18 +110,12 @@ private:
 **
 **  @return        Returns ideal target on map tile.
 */
-//Wyrmgus start
-//static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
-static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos, int z)
-//Wyrmgus end
+static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos, const int z)
 {
 	CUnit *enemy = nullptr;
 
 	_EnemyOnMapTile filter(source, pos, &enemy);
-	//Wyrmgus start
-//	Map.Field(pos)->UnitCache.for_each(filter);
-	Map.Field(pos, z)->UnitCache.for_each(filter);
-	//Wyrmgus end
+	CMap::Map.Field(pos, z)->UnitCache.for_each(filter);
 	return enemy;
 }
 
@@ -150,23 +142,11 @@ private:
 
 VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	//Wyrmgus start
-	/*
-#if 0
-	if (!unit.Player->AiEnabled && !Map.IsFieldExplored(*unit.Player, pos)) {
-		return VisitResult_DeadEnd;
-	}
-#endif
-	*/
 	if (!unit.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
 		return VisitResult_DeadEnd;
 	}
-	//Wyrmgus end
 	// Look if found what was required.
-	//Wyrmgus start
-//	if (Map.WallOnMap(pos)) {
-	if (Map.WallOnMap(pos, unit.MapLayer->ID)) {
-	//Wyrmgus end
+	if (CMap::Map.WallOnMap(pos, unit.MapLayer->ID)) {
 		DebugPrint("Wall found %d, %d\n" _C_ pos.x _C_ pos.y);
 		if (resultPos) {
 			*resultPos = from;
@@ -333,7 +313,7 @@ static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTrans
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+//	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
 	terrainTraversal.SetSize(unit.MapLayer->GetWidth(), unit.MapLayer->GetHeight());
 	//Wyrmgus end
 	terrainTraversal.Init();
@@ -390,8 +370,8 @@ int AiForce::PlanAttack()
 	TerrainTraversal transporterTerrainTraversal;
 
 	//Wyrmgus start
-//	transporterTerrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	transporterTerrainTraversal.SetSize(Map.Info.MapWidths[this->GoalMapLayer], Map.Info.MapHeights[this->GoalMapLayer]);
+//	transporterTerrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
+	transporterTerrainTraversal.SetSize(CMap::Map.Info.MapWidths[this->GoalMapLayer], CMap::Map.Info.MapHeights[this->GoalMapLayer]);
 	//Wyrmgus end
 	transporterTerrainTraversal.Init();
 
@@ -482,8 +462,8 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 		pos->x = center.x + SyncRand() % (2 * ray + 1) - ray;
 		pos->y = center.y + SyncRand() % (2 * ray + 1) - ray;
 
-		if (Map.Info.IsPointOnMap(*pos)
-			&& Map.Field(*pos)->playerInfo.IsTeamExplored(*AiPlayer->Player) == false) {
+		if (CMap::Map.Info.IsPointOnMap(*pos)
+			&& CMap::Map.Field(*pos)->playerInfo.IsTeamExplored(*AiPlayer->Player) == false) {
 			return true;
 		}
 		ray = 3 * ray / 2;
@@ -510,7 +490,7 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 		if (!unit.IsIdle()) {
 			continue;
 		}
-		if (Map.Info.IsPointOnMap(unit.tilePos) == false) {
+		if (CMap::Map.Info.IsPointOnMap(unit.tilePos) == false) {
 			continue;
 		}
 		if (unit.CanMove() == false) {
@@ -577,7 +557,7 @@ static CUnit *GetBestScout(int unit_type)
 		}
 		if (unit.GroupId != 0) { //don't scout with units that are parts of forces that have a goal
 			int force = AiPlayer->Force.GetForce(unit);
-			if (force != -1 && Map.Info.IsPointOnMap(AiPlayer->Force[force].GoalPos, AiPlayer->Force[force].GoalMapLayer)) {
+			if (force != -1 && CMap::Map.Info.IsPointOnMap(AiPlayer->Force[force].GoalPos, AiPlayer->Force[force].GoalMapLayer)) {
 				continue;
 			}
 		}
@@ -766,7 +746,7 @@ void AiCheckTransporters()
 			continue;
 		}
 		
-		int landmass = Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
+		int landmass = CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
 		
 		AiPlayer->Transporters[landmass].push_back(&unit);
 	}
@@ -799,5 +779,3 @@ int AiGetRequestedTransportCapacity(int water_landmass)
 	return transport_capacity;
 }
 //Wyrmgus end
-
-//@}

@@ -26,8 +26,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 //----------------------------------------------------------------------------
 // Includes
 //----------------------------------------------------------------------------
@@ -58,7 +56,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
-#include "version.h"
+#include "include/version.h"
 
 #include <sstream>
 #include <time.h>
@@ -234,8 +232,8 @@ static FullReplay *StartReplay()
 	replay->LocalPlayer = ThisPlayer->Index;
 
 	replay->Date = dateStr;
-	replay->Map = Map.Info.Description;
-	replay->MapId = (signed int)Map.Info.MapUID;
+	replay->Map = CMap::Map.Info.Description;
+	replay->MapId = (signed int)CMap::Map.Info.MapUID;
 	replay->MapPath = CurrentMapPath;
 	replay->Resource = GameSettings.Resources;
 	replay->NumUnits = GameSettings.NumUnits;
@@ -298,7 +296,7 @@ static void ApplyReplaySettings()
 	GameSettings.Resources = CurrentReplay->Resource;
 	GameSettings.NumUnits = CurrentReplay->NumUnits;
 	GameSettings.Difficulty = CurrentReplay->Difficulty;
-	Map.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
+	CMap::Map.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
 	GameSettings.Inside = CurrentReplay->Inside;
 	GameSettings.GameType = CurrentReplay->GameType;
 	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
@@ -1160,5 +1158,3 @@ void ReplayCclRegister()
 	lua_register(Lua, "Log", CclLog);
 	lua_register(Lua, "ReplayLog", CclReplayLog);
 }
-
-//@}

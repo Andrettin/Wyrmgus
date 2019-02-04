@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -65,9 +63,9 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d);
 /*
 void ChangeTile(const Vec2i &pos, int tile)
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(CMap::Map.Info.IsPointOnMap(pos));
 
-	CMapField &mf = *Map.Field(pos);
+	CMapField &mf = *CMap::Map.Field(pos);
 	mf.setGraphicTile(tile);
 	mf.playerInfo.SeenTile = tile;
 	mf.UpdateSeenTile();
@@ -92,8 +90,8 @@ void ChangeTile(const Vec2i &pos, int tile)
 static unsigned QuadFromTile(const Vec2i &pos)
 {
 	// find the abstact tile number
-	const int tile = Map.Field(pos)->getGraphicTile();
-	return Map.Tileset->getQuadFromTile(tile);
+	const int tile = CMap::Map.Field(pos)->getGraphicTile();
+	return CMap::Map.Tileset->getQuadFromTile(tile);
 }
 */
 //Wyrmgus end
@@ -107,7 +105,7 @@ static unsigned QuadFromTile(const Vec2i &pos)
 */
 void EditorChangeTile(const Vec2i &pos, int tileIndex)
 {
-	Assert(Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, UI.CurrentMapLayer));
 
 	// Change the flags
 	CMapField &mf = *UI.CurrentMapLayer->Field(pos);
@@ -116,7 +114,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	if (TileToolRandom) {
 		int n = 0;
 		for (int i = 0; i < 16; ++i) {
-			if (!Map.Tileset->tiles[tile + i].tile) {
+			if (!CMap::Map.Tileset->tiles[tile + i].tile) {
 				break;
 			} else {
 				++n;
@@ -125,29 +123,29 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 		n = MyRand() % n;
 		int i = -1;
 		do {
-			while (++i < 16 && !Map.Tileset->tiles[tile + i].tile) {
+			while (++i < 16 && !CMap::Map.Tileset->tiles[tile + i].tile) {
 			}
 		} while (i < 16 && n--);
 		Assert(i != 16);
 		tile += i;
 	}
 	//Wyrmgus start
-	mf.setTileIndex(*Map.Tileset, tile, 0);
+	mf.setTileIndex(*CMap::Map.Tileset, tile, 0);
 //	mf.playerInfo.SeenTile = mf.getGraphicTile();
 	mf.UpdateSeenTile();
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	Map.CalculateTileTransitions(pos, false, UI.CurrentMapLayer->ID);
-	Map.CalculateTileTransitions(pos, true, UI.CurrentMapLayer->ID);
+	CMap::Map.CalculateTileTransitions(pos, false, UI.CurrentMapLayer->ID);
+	CMap::Map.CalculateTileTransitions(pos, true, UI.CurrentMapLayer->ID);
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
-					Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
-					Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
+				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+					CMap::Map.CalculateTileTransitions(adjacent_pos, false, UI.CurrentMapLayer->ID);
+					CMap::Map.CalculateTileTransitions(adjacent_pos, true, UI.CurrentMapLayer->ID);
 				}
 			}
 		}
@@ -193,7 +191,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 	
 	//Wyrmgus start
 	//see if the tile's terrain can be here as is, or if it is needed to change surrounding tiles
-	CTerrainType *terrain = Map.GetTileTopTerrain(pos, false, UI.CurrentMapLayer->ID);
+	CTerrainType *terrain = CMap::Map.GetTileTopTerrain(pos, false, UI.CurrentMapLayer->ID);
 	bool overlay = mf.OverlayTerrain ? true : false;
 	if (!terrain->AllowSingle) {
 		std::vector<int> transition_directions;
@@ -202,10 +200,10 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
+					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, UI.CurrentMapLayer)) {
 						CMapField &adjacent_mf = *UI.CurrentMapLayer->Field(adjacent_pos);
 							
-						CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
+						CTerrainType *adjacent_terrain = CMap::Map.GetTileTerrain(adjacent_pos, overlay, UI.CurrentMapLayer->ID);
 						if (overlay && adjacent_terrain && UI.CurrentMapLayer->Field(adjacent_pos)->OverlayTerrainDestroyed) {
 							adjacent_terrain = nullptr;
 						}
@@ -231,7 +229,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 	//Wyrmgus start
 	/*
 	if (mf.isAWall()) {
-		Map.SetWall(pos, mf.isHuman());
+		CMap::Map.SetWall(pos, mf.isHuman());
 		return;
 	}
 	*/
@@ -259,17 +257,17 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 		if (u != q2) {
-			int tile = Map.Tileset->tileFromQuad(u & BH_QUAD_M, u);
+			int tile = CMap::Map.Tileset->tileFromQuad(u & BH_QUAD_M, u);
 			EditorChangeTile(pos + offset, tile, d & ~DIR_DOWN);
 		}
 	}
-	if ((d & DIR_DOWN) && pos.y < Map.Info.MapHeight - 1) {
+	if ((d & DIR_DOWN) && pos.y < CMap::Map.Info.MapHeight - 1) {
 		const Vec2i offset(0, 1);
 		// Insert into the top the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 		if (u != q2) {
-			int tile = Map.Tileset->tileFromQuad(u & TH_QUAD_M, u);
+			int tile = CMap::Map.Tileset->tileFromQuad(u & TH_QUAD_M, u);
 			EditorChangeTile(pos + offset, tile, d & ~DIR_UP);
 		}
 	}
@@ -279,17 +277,17 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 		if (u != q2) {
-			int tile = Map.Tileset->tileFromQuad(u & RH_QUAD_M, u);
+			int tile = CMap::Map.Tileset->tileFromQuad(u & RH_QUAD_M, u);
 			EditorChangeTile(pos + offset, tile, d & ~DIR_RIGHT);
 		}
 	}
-	if ((d & DIR_RIGHT) && pos.x < Map.Info.MapWidth - 1) {
+	if ((d & DIR_RIGHT) && pos.x < CMap::Map.Info.MapWidth - 1) {
 		const Vec2i offset(1, 0);
 		// Insert into the right the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 		if (u != q2) {
-			int tile = Map.Tileset->tileFromQuad(u & LH_QUAD_M, u);
+			int tile = CMap::Map.Tileset->tileFromQuad(u & LH_QUAD_M, u);
 			EditorChangeTile(pos + offset, tile, d & ~DIR_LEFT);
 		}
 	}
@@ -334,7 +332,7 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 	Vec2i ipos = pos - diag;
 	Vec2i apos = pos + diag;
 
-	Map.FixSelectionArea(ipos, apos, UI.CurrentMapLayer->ID);
+	CMap::Map.FixSelectionArea(ipos, apos, UI.CurrentMapLayer->ID);
 
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {
@@ -486,5 +484,3 @@ void CEditor::CreateRandomMap() const
 
 	EditorRandomizeUnit("unit-gold-mine", 5, 50000);
 }
-
-//@}

@@ -479,9 +479,9 @@ void ColorCycle()
 
 			ColorCycleSurface(*surface);
 		}
-	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
+	} else if (CMap::Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
 		++colorCycling.cycleCount;
-		ColorCycleSurface(*Map.TileGraphic->Surface);
+		ColorCycleSurface(*CMap::Map.TileGraphic->Surface);
 	}
 }
 
@@ -494,8 +494,8 @@ void RestoreColorCyclingSurface()
 
 			ColorCycleSurface_Reverse(*surface, colorCycling.cycleCount);
 		}
-	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
-		ColorCycleSurface_Reverse(*Map.TileGraphic->Surface, colorCycling.cycleCount);
+	} else if (CMap::Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
+		ColorCycleSurface_Reverse(*CMap::Map.TileGraphic->Surface, colorCycling.cycleCount);
 	}
 	colorCycling.cycleCount = 0;
 }

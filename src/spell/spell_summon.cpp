@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "action/action_defend.h"
@@ -134,7 +132,7 @@ public:
 		target = MakeUnit(unittype, caster.Player);
 		if (target != nullptr) {
 			target->tilePos = pos;
-			target->MapLayer = Map.MapLayers[z];
+			target->MapLayer = CMap::Map.MapLayers[z];
 			DropOutOnSide(*target, LookingW, nullptr);
 			// To avoid defending summoned unit for AI
 			target->Summoned = 1;
@@ -163,5 +161,3 @@ public:
 	}
 	return 0;
 }
-
-//@}

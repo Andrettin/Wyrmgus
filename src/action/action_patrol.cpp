@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -64,8 +62,8 @@
 /* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z)
 //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(currentPos, current_z));
-	Assert(Map.Info.IsPointOnMap(dest, dest_z));
+	Assert(CMap::Map.Info.IsPointOnMap(currentPos, current_z));
+	Assert(CMap::Map.Info.IsPointOnMap(dest, dest_z));
 
 	COrder_Patrol *order = new COrder_Patrol();
 
@@ -248,5 +246,3 @@
 		}
 	}
 }
-
-//@}

@@ -30,10 +30,8 @@
 #ifndef __POPUP_H__
 #define __POPUP_H__
 
-//@{
-
 #include "script.h"
-#include "color.h"
+#include "include/color.h"
 #include "vec2i.h"
 #include <vector>
 #include <string>
@@ -293,7 +291,4 @@ public:
 	IntColor BorderColor;                      /// Color used for popup's borders.
 };
 
-
-//@}
-
-#endif // !__UI_H__
+#endif

@@ -12,6 +12,7 @@ class WyrmgusModule : public Reference
 public:
 	int Run();
 	String GetVersion();
+	CCampaign *GetCampaign(String ident);
 	//Vector<CCampaign *> GetCampaigns();
 
 protected:

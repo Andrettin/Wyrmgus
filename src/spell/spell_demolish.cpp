@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_demolish.h"
@@ -108,10 +106,7 @@
 	Vec2i maxpos = caster.tilePos + Vec2i(caster.Type->TileSize - 1) + offset;
 	//Wyrmgus end
 
-	//Wyrmgus start
-//	Map.FixSelectionArea(minpos, maxpos);
-	Map.FixSelectionArea(minpos, maxpos, z);
-	//Wyrmgus end
+	CMap::Map.FixSelectionArea(minpos, maxpos, z);
 
 	//
 	// Terrain effect of the explosion
@@ -121,16 +116,16 @@
 	Vec2i ipos;
 	for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 		for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
-			const CMapField &mf = *Map.Field(ipos);
+			const CMapField &mf = *CMap::Map.Field(ipos);
 			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
 				// Not in circle range
 				continue;
 			} else if (mf.isAWall()) {
-				Map.RemoveWall(ipos);
+				CMap::Map.RemoveWall(ipos);
 			} else if (mf.RockOnMap()) {
-				Map.ClearRockTile(ipos);
+				CMap::Map.ClearRockTile(ipos);
 			} else if (mf.ForestOnMap()) {
-				Map.ClearWoodTile(ipos);
+				CMap::Map.ClearWoodTile(ipos);
 			}
 		}
 	}
@@ -140,10 +135,7 @@
 		Vec2i ipos;
 		for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 			for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
-				//Wyrmgus start
-//				const CMapField &mf = *Map.Field(ipos);
-				const CMapField &mf = *Map.Field(ipos, z);
-				//Wyrmgus end
+				const CMapField &mf = *CMap::Map.Field(ipos, z);
 				//Wyrmgus start
 //				if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {
 				if (caster.MapDistanceTo(ipos, z) > this->Range) {
@@ -151,10 +143,7 @@
 					// Not in circle range
 					continue;
 				} else if (mf.RockOnMap() || mf.ForestOnMap() || mf.isAWall()) {
-					//Wyrmgus start
-//					Map.ClearOverlayTile(ipos);
-					Map.ClearOverlayTile(ipos, z);
-					//Wyrmgus end
+					CMap::Map.ClearOverlayTile(ipos, z);
 				}
 			}
 		}
@@ -218,7 +207,3 @@
 
 	return 1;
 }
-
-
-
-//@}

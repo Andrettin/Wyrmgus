@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -40,7 +38,7 @@
 #include "civilization.h"
 #include "iolib.h"
 #include "map/tileset.h"
-#include "plane.h"
+#include "include/plane.h"
 #include "player.h"
 #include "religion/deity_domain.h"
 #include "script.h"
@@ -804,5 +802,3 @@ void ProvinceCclRegister()
 	lua_register(Lua, "GetWorlds", CclGetWorlds);
 	lua_register(Lua, "GetProvinces", CclGetProvinces);
 }
-
-//@}

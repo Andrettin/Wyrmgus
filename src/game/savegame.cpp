@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -57,7 +55,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
 #include "upgrade/upgrade.h"
-#include "version.h"
+#include "include/version.h"
 
 #include <time.h>
 
@@ -145,7 +143,7 @@ int SaveGame(const std::string &filename)
 		file.printf("SetCurrentCampaign(\"%s\")\n", current_campaign->GetIdent().c_str());
 	}
 	//Wyrmgus end
-	file.printf("Load(\"%s\")\n", Map.Info.Filename.c_str());
+	file.printf("Load(\"%s\")\n", CMap::Map.Info.Filename.c_str());
 	file.printf("CreateUnit = oldCreateUnit\n");
 	file.printf("SetResourcesHeld = oldSetResourcesHeld\n");
 	file.printf("SetTile = oldSetTile\n");
@@ -157,7 +155,7 @@ int SaveGame(const std::string &filename)
 	file.printf("---  \"comment\", \"Visit " HOMEPAGE " for more information\",\n");
 	file.printf("---  \"type\",    \"%s\",\n", "single-player");
 	file.printf("---  \"date\",    \"%s\",\n", dateStr);
-	file.printf("---  \"map\",     \"%s\",\n", Map.Info.Description.c_str());
+	file.printf("---  \"map\",     \"%s\",\n", CMap::Map.Info.Description.c_str());
 	file.printf("---  \"media-version\", \"%s\"", "Undefined");
 	file.printf("---  \"engine\",  {%d, %d, %d},\n",
 				StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
@@ -188,7 +186,7 @@ int SaveGame(const std::string &filename)
 	SaveUnitTypes(file);
 	SaveUpgrades(file);
 	SavePlayers(file);
-	Map.Save(file);
+	CMap::Map.Save(file);
 	UnitManager.Save(file);
 	SaveUserInterface(file);
 	SaveAi(file);
@@ -237,5 +235,3 @@ void StartSavedGame(const std::string &filename)
 	StartMap(filename, false);
 	//SetDefaultTextColors(nc, rc);
 }
-
-//@}

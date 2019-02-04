@@ -30,9 +30,7 @@
 #ifndef __MINIMAP_H__
 #define __MINIMAP_H__
 
-//@{
-
-#include "color.h"
+#include "include/color.h"
 #include "vec2i.h"
 
 class CViewport;
@@ -123,6 +121,4 @@ extern std::vector<SDL_Surface *> MinimapSurface;
 extern std::vector<SDL_Surface *> MinimapTerrainSurface;
 //Wyrmgus end
 
-//@}
-
-#endif // !__MINIMAP_H__
+#endif

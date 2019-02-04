@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -77,19 +75,14 @@
 	return order;
 }
 
-//Wyrmgus start
-///* static */ COrder *COrder::NewActionRepair(const Vec2i &pos)
 /* static */ COrder *COrder::NewActionRepair(const Vec2i &pos, int z)
-//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	COrder_Repair *order = new COrder_Repair;
 
 	order->goalPos = pos;
-	//Wyrmgus start
 	order->MapLayer = z;
-	//Wyrmgus end
 	return order;
 }
 
@@ -323,7 +316,7 @@ static void AnimateActionRepair(CUnit &unit)
 					this->RepairCycle = 0;
 					//Wyrmgus start
 //					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize();
+					const Vec2i dir = PixelSize(PixelSize(goal->tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) + goal->GetHalfTilePixelSize() - PixelSize(PixelSize(unit.tilePos) * CMap::Map.GetMapLayerPixelTileSize(goal->MapLayer->ID)) - unit.GetHalfTilePixelSize();
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
@@ -395,6 +388,3 @@ static void AnimateActionRepair(CUnit &unit)
 		break;
 	}
 }
-
-
-//@}

@@ -30,8 +30,6 @@
 #ifndef TILESET_H
 #define TILESET_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -42,7 +40,7 @@
 #include <map>
 #include <tuple>
 
-#include "color.h"
+#include "include/color.h"
 //Wyrmgus end
 
 struct lua_State;
@@ -342,6 +340,4 @@ extern std::string GetTransitionTypeNameById(int transition_type);
 extern int GetTransitionTypeIdByName(const std::string &transition_type);
 //Wyrmgus end
 
-//@}
-
-#endif // !TILESET_H
+#endif

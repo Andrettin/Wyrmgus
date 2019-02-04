@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -58,8 +56,8 @@ void MissileWhirlwind::Action()
 
 	// Center of the tornado
 	const PixelPos pixelCenter = this->position + this->Type->size / 2;
-	const PixelPos centerOffset(Map.GetMapLayerPixelTileSize(this->MapLayer).x / 2, Map.GetMapLayerPixelTileSize(this->MapLayer).y);
-	const Vec2i center = Map.MapPixelPosToTilePos(pixelCenter + centerOffset, this->MapLayer);
+	const PixelPos centerOffset(CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).x / 2, CMap::Map.GetMapLayerPixelTileSize(this->MapLayer).y);
+	const Vec2i center = CMap::Map.MapPixelPosToTilePos(pixelCenter + centerOffset, this->MapLayer);
 
 	//Wyrmgus start
 	Assert(this->Type->AttackSpeed);
@@ -76,13 +74,11 @@ void MissileWhirlwind::Action()
 			// find new destination in the map
 			newPos.x = center.x + SyncRand() % 5 - 2;
 			newPos.y = center.y + SyncRand() % 5 - 2;
-		} while (!Map.Info.IsPointOnMap(newPos, this->MapLayer));
-		this->destination = Map.TilePosToMapPixelPos_Center(newPos, Map.MapLayers[this->MapLayer]);
+		} while (!CMap::Map.Info.IsPointOnMap(newPos, this->MapLayer));
+		this->destination = CMap::Map.TilePosToMapPixelPos_Center(newPos, CMap::Map.MapLayers[this->MapLayer]);
 		this->source = this->position;
 		this->State = 0;
 		DebugPrint("Whirlwind new direction: %d, %d, TTL: %d\n" _C_
 				   this->destination.x _C_ this->destination.y _C_ this->TTL);
 	}
 }
-
-//@}

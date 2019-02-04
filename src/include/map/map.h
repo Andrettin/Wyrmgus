@@ -31,8 +31,6 @@
 #ifndef __MAP_H__
 #define __MAP_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -85,7 +83,7 @@
 #include <map>
 #include <string>
 
-#include "color.h"
+#include "include/color.h"
 #include "map/tile.h"
 #include "time/date.h"
 #include "vec2i.h"
@@ -181,6 +179,8 @@ class CMap
 public:
 	CMap();
 	~CMap();
+
+	static CMap Map;	/// The current map
 
 	unsigned int getIndex(int x, int y, int z) const;
 	unsigned int getIndex(const Vec2i &pos, int z) const;
@@ -369,7 +369,6 @@ extern std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 extern std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 //Wyrmgus end
 
-extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
 
 /// Contrast of fog of war
@@ -538,7 +537,7 @@ void MapUnmarkUnitSight(CUnit &unit);
 /// Can a unit with 'mask' enter the field
 inline bool CanMoveToMask(const Vec2i &pos, int mask, int z)
 {
-	return !Map.Field(pos, z)->CheckMask(mask);
+	return !CMap::Map.Field(pos, z)->CheckMask(mask);
 }
 
 /// Handle Marking and Unmarking of radar vision
@@ -571,6 +570,4 @@ inline void MapUnmarkOwnership(const CPlayer &player, const Vec2i &pos, int w, i
 }
 //Wyrmgus end
 
-//@}
-
-#endif // !__MAP_H__
+#endif

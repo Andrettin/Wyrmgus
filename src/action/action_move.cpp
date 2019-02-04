@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -66,7 +64,7 @@
 /* static */ COrder *COrder::NewActionMove(const Vec2i &pos, int z)
 //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	COrder_Move *order = new COrder_Move;
 
@@ -256,12 +254,8 @@ int DoActionMove(CUnit &unit)
 		}
 		
 		if (unit.Type->UnitType == UnitTypeNaval) { // Boat (un)docking?
-			//Wyrmgus start
-//			const CMapField &mf_cur = *Map.Field(unit.Offset);
-//			const CMapField &mf_next = *Map.Field(unit.tilePos + posd);
 			const CMapField &mf_cur = *unit.MapLayer->Field(unit.Offset);
 			const CMapField &mf_next = *unit.MapLayer->Field(unit.tilePos + posd);
-			//Wyrmgus end
 
 			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {
 				PlayUnitSound(unit, VoiceDocking);
@@ -277,8 +271,8 @@ int DoActionMove(CUnit &unit)
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
 					table[i]->MoveToXY(pos, table[i]->MapLayer->ID);
-					table[i]->IX = -posd.x * Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
-					table[i]->IY = -posd.y * Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
+					table[i]->IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
+					table[i]->IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
 					UnitHeadingFromDeltaXY(*table[i], posd);
 				}
 			}
@@ -295,10 +289,7 @@ int DoActionMove(CUnit &unit)
 		//Wyrmgus end
 
 		// Remove unit from the current selection
-		//Wyrmgus start
-//		if (unit.Selected && !Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
 		if (unit.Selected && !unit.MapLayer->Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-		//Wyrmgus end
 			if (IsOnlySelected(unit)) { //  Remove building cursor
 				CancelBuildingMode();
 			}
@@ -308,8 +299,8 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 
-		unit.IX = -posd.x * Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
-		unit.IY = -posd.y * Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
+		unit.IX = -posd.x * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x;
+		unit.IY = -posd.y * CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y;
 		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
@@ -320,7 +311,7 @@ int DoActionMove(CUnit &unit)
 
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
 	//Wyrmgus start
-//	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
+//	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, CMap::Map.Field(unit.Offset)->getCost());
 	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move, DefaultTileMovementCost);
 	//Wyrmgus end
 
@@ -341,7 +332,7 @@ int DoActionMove(CUnit &unit)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (abs(unit.IX) > (Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x * 2) || abs(unit.IY) > (Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y * 2)) {
+	if (abs(unit.IX) > (CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).x * 2) || abs(unit.IY) > (CMap::Map.GetMapLayerPixelTileSize(unit.MapLayer->ID).y * 2)) {
 		unit.IX = 0;
 		unit.IY = 0;
 #ifdef DEBUG
@@ -435,5 +426,3 @@ int DoActionMove(CUnit &unit)
 			break;
 	}
 }
-
-//@}

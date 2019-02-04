@@ -2,7 +2,7 @@
 
 #include "stratagus.h"
 
-//#include "campaign.h"
+#include "campaign.h"
 #include "src/include/version.h"
 
 int WyrmgusModule::Run()
@@ -15,6 +15,11 @@ int WyrmgusModule::Run()
 String WyrmgusModule::GetVersion()
 {
 	return _version_str2;
+}
+
+CCampaign *WyrmgusModule::GetCampaign(String ident)
+{
+	return CCampaign::GetCampaign(ident.utf8().get_data());
 }
 
 /*
@@ -34,5 +39,6 @@ void WyrmgusModule::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("run"), &WyrmgusModule::Run);
 	ClassDB::bind_method(D_METHOD("get_version"), &WyrmgusModule::GetVersion);
+	ClassDB::bind_method(D_METHOD("get_campaign", "ident"), &WyrmgusModule::GetCampaign);
 //	ClassDB::bind_method(D_METHOD("get_campaigns"), &WyrmgusModule::GetCampaigns);
 }

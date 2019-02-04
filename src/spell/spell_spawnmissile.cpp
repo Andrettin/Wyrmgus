@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_spawnmissile.h"
@@ -250,7 +248,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		if (target) {
 			*res = target->GetMapPixelPosCenter();
 		} else {
-			*res = Map.TilePosToMapPixelPos_Center(goalPos, caster.MapLayer);
+			*res = CMap::Map.TilePosToMapPixelPos_Center(goalPos, caster.MapLayer);
 		}
 	}
 	res->x += location.AddX;
@@ -359,6 +357,3 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 
 	return 1;
 }
-
-
-//@}

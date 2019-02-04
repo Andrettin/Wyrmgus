@@ -30,11 +30,11 @@
 #ifndef __DATE_H__
 #define __DATE_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
+
+#include "stratagus.h"
 
 #include <string>
 
@@ -45,7 +45,7 @@
 class CCalendar;
 class CTimeline;
 
-#define BaseCalendarYearOffsetForHours 10000 //essentially the Human Era
+#define BASE_CALENDAR_YEAR_OFFSET_FOR_HOURS 10000 //essentially the Human Era
 
 class CDate
 {
@@ -159,6 +159,4 @@ extern void SetCurrentDate(const std::string &calendar_ident, const std::string 
 extern void SetCurrentDayOfTheWeek(const std::string &calendar_ident, const int day_of_the_week);
 extern void SetCurrentTotalHours(const unsigned long long hours);
 
-//@}
-
-#endif // !__DATE_H__
+#endif

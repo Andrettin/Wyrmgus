@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 //----------------------------------------------------------------------------
 // Includes
 //----------------------------------------------------------------------------
@@ -40,7 +38,7 @@
 #include "net_lowlevel.h"
 #include "netconnect.h"
 #include "network.h"
-#include "version.h"
+#include "include/version.h"
 
 size_t serialize32(unsigned char *buf, uint32_t data)
 {
@@ -803,5 +801,3 @@ size_t CNetworkPacket::Size(int numcommands) const
 	}
 	return size;
 }
-
-//@}

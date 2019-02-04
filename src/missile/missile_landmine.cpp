@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -65,12 +63,9 @@ struct LandMineTargetFinder {
 */
 void MissileLandMine::Action()
 {
-	const Vec2i pos = Map.MapPixelPosToTilePos(this->position, this->MapLayer);
+	const Vec2i pos = CMap::Map.MapPixelPosToTilePos(this->position, this->MapLayer);
 
-	//Wyrmgus start
-//	if (LandMineTargetFinder(this->SourceUnit, this->Type->CanHitOwner).FindOnTile(Map.Field(pos)) != nullptr) {
-	if (LandMineTargetFinder(this->SourceUnit, this->Type->CanHitOwner).FindOnTile(Map.Field(pos, this->MapLayer)) != nullptr) {
-	//Wyrmgus end
+	if (LandMineTargetFinder(this->SourceUnit, this->Type->CanHitOwner).FindOnTile(CMap::Map.Field(pos, this->MapLayer)) != nullptr) {
 		DebugPrint("Landmine explosion at %d,%d.\n" _C_ pos.x _C_ pos.y);
 		this->MissileHit();
 		this->TTL = 0;
@@ -82,5 +77,3 @@ void MissileLandMine::Action()
 	}
 	this->Wait = 1;
 }
-
-//@}

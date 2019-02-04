@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 //----------------------------------------------------------------------------
 //  Includes
 //----------------------------------------------------------------------------
@@ -57,7 +55,7 @@
 #include "missile.h"
 #include "network.h"
 #include "particle.h"
-#include "plane.h"
+#include "include/plane.h"
 //Wyrmgus start
 #include "quest.h"
 //Wyrmgus end
@@ -135,15 +133,15 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 
 	if (fast) {
 		//Wyrmgus start
-//		stepx = (int)(speed * vp->MapWidth / 2 * Map.GetCurrentPixelTileSize().x * FRAMES_PER_SECOND / 4);
-//		stepy = (int)(speed * vp->MapHeight / 2 * Map.GetCurrentPixelTileSize().y * FRAMES_PER_SECOND / 4);
-		stepx = (int)(speed * Map.GetCurrentPixelTileSize().x * FRAMES_PER_SECOND / 4 * 4);
-		stepy = (int)(speed * Map.GetCurrentPixelTileSize().y * FRAMES_PER_SECOND / 4 * 4);
+//		stepx = (int)(speed * vp->MapWidth / 2 * CMap::Map.GetCurrentPixelTileSize().x * FRAMES_PER_SECOND / 4);
+//		stepy = (int)(speed * vp->MapHeight / 2 * CMap::Map.GetCurrentPixelTileSize().y * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * CMap::Map.GetCurrentPixelTileSize().x * FRAMES_PER_SECOND / 4 * 4);
+		stepy = (int)(speed * CMap::Map.GetCurrentPixelTileSize().y * FRAMES_PER_SECOND / 4 * 4);
 		//Wyrmgus end
 	} else {// dynamic: let these variables increase up to fast..
 		// FIXME: pixels per second should be configurable
-		stepx = (int)(speed * Map.GetCurrentPixelTileSize().x * FRAMES_PER_SECOND / 4);
-		stepy = (int)(speed * Map.GetCurrentPixelTileSize().y * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * CMap::Map.GetCurrentPixelTileSize().x * FRAMES_PER_SECOND / 4);
+		stepy = (int)(speed * CMap::Map.GetCurrentPixelTileSize().y * FRAMES_PER_SECOND / 4);
 	}
 	if ((state & (ScrollLeft | ScrollRight)) && (state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
 		stepx = stepx * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
@@ -341,8 +339,7 @@ static void GameLogicLoop()
 		PlayersEachCycle(); // handle players
 		UpdateTimer();      // update game timer
 
-		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-			CMapLayer *map_layer = Map.MapLayers[z];
+		for (CMapLayer *map_layer : CMap::Map.MapLayers) {
 			map_layer->DoPerCycleLoop();
 		}
 		
@@ -374,7 +371,7 @@ static void GameLogicLoop()
 			case 4:
 				break;
 			case 5: // forest grow
-				Map.RegenerateForest();
+				CMap::Map.RegenerateForest();
 				break;
 			case 6: // overtaking units
 				RescueUnits();
@@ -431,8 +428,7 @@ static void GameLogicLoop()
 					}
 				}
 				
-				for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-					CMapLayer *map_layer = Map.MapLayers[z];
+				for (CMapLayer *map_layer : CMap::Map.MapLayers) {
 					map_layer->DoPerHourLoop();
 				}
 			}
@@ -689,5 +685,3 @@ void GameMainLoop()
 
 	SetCallbacks(old_callbacks);
 }
-
-//@}

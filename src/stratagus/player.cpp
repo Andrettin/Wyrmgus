@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
@@ -1876,8 +1874,8 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 			continue;
 		}
 		
-		int settlement_landmass = Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
-		if (std::find(Map.BorderLandmasses[settlement_landmass].begin(), Map.BorderLandmasses[settlement_landmass].end(), water_zone) == Map.BorderLandmasses[settlement_landmass].end()) { //settlement's landmass doesn't even border the water zone, continue
+		int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		if (std::find(CMap::Map.BorderLandmasses[settlement_landmass].begin(), CMap::Map.BorderLandmasses[settlement_landmass].end(), water_zone) == CMap::Map.BorderLandmasses[settlement_landmass].end()) { //settlement's landmass doesn't even border the water zone, continue
 			continue;
 		}
 		
@@ -1895,8 +1893,7 @@ CSite *CPlayer::GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size)
 	CUnit *best_hall = nullptr;
 	int best_distance = -1;
 	
-	for (size_t i = 0; i < Map.SiteUnits.size(); ++i) {
-		CUnit *settlement_unit = Map.SiteUnits[i];
+	for (CUnit *settlement_unit : CMap::Map.SiteUnits) {
 		if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value || z != settlement_unit->MapLayer->ID) {
 			continue;
 		}
@@ -2327,7 +2324,7 @@ void CPlayer::GetWorkerLandmasses(std::vector<int>& worker_landmasses, const CUn
 			FindPlayerUnitsByType(*this, *AiHelpers.Build[building->Slot][i], worker_table, true);
 
 			for (size_t j = 0; j != worker_table.size(); ++j) {
-				int worker_landmass = Map.GetTileLandmass(worker_table[j]->tilePos, worker_table[j]->MapLayer->ID);
+				int worker_landmass = CMap::Map.GetTileLandmass(worker_table[j]->tilePos, worker_table[j]->MapLayer->ID);
 				if (std::find(worker_landmasses.begin(), worker_landmasses.end(), worker_landmass) == worker_landmasses.end()) {
 					worker_landmasses.push_back(worker_landmass);
 				}
@@ -3857,7 +3854,7 @@ void CPlayer::IncreaseCountsForUnit(CUnit *unit, bool type_change)
 		this->ResourceDemand[i] += type->Stats[this->Index].ResourceDemand[i];
 	}
 	
-	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && Map.Info.IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+	if (this->AiEnabled && type->BoolFlag[COWARD_INDEX].value && !type->BoolFlag[HARVESTER_INDEX].value && !type->CanTransport() && type->Spells.size() == 0 && CMap::Map.Info.IsPointOnMap(unit->tilePos, unit->MapLayer) && unit->CanMove() && unit->Active && unit->GroupId != 0 && unit->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		this->Ai->Scouts.push_back(unit);
 	}
 	
@@ -4173,7 +4170,7 @@ void DebugPlayers()
 */
 void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 	char temp[128];
 	Uint32 color;
 	va_list va;
@@ -4516,7 +4513,7 @@ bool CPlayer::IsVassalOf(const CPlayer &player, bool include_indirect) const
 */
 bool CPlayer::HasContactWith(const CPlayer &player) const
 {
-	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) Map.MapLayers.size() && this->StartMapLayer < (int) Map.MapLayers.size() && Map.MapLayers[player.StartMapLayer]->World == Map.MapLayers[this->StartMapLayer]->World && Map.MapLayers[player.StartMapLayer]->Plane == Map.MapLayers[this->StartMapLayer]->Plane);
+	return player.StartMapLayer == this->StartMapLayer || (player.StartMapLayer < (int) CMap::Map.MapLayers.size() && this->StartMapLayer < (int) CMap::Map.MapLayers.size() && CMap::Map.MapLayers[player.StartMapLayer]->World == CMap::Map.MapLayers[this->StartMapLayer]->World && CMap::Map.MapLayers[player.StartMapLayer]->Plane == CMap::Map.MapLayers[this->StartMapLayer]->Plane);
 }
 
 /**
@@ -5201,5 +5198,3 @@ bool IsNameValidForWord(const std::string &word_name)
 	return true;
 }
 //Wyrmgus end
-
-//@}

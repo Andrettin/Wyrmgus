@@ -379,7 +379,7 @@ void CSeasonDependency::ProcessConfigDataProperty(const std::pair<std::string, s
 
 bool CSeasonDependency::Check(const CPlayer *player, bool ignore_units) const
 {
-	return Map.MapLayers[player->StartMapLayer]->GetSeason() == this->Season;
+	return CMap::Map.MapLayers[player->StartMapLayer]->GetSeason() == this->Season;
 }
 
 bool CSeasonDependency::Check(const CUnit *unit, bool ignore_units) const

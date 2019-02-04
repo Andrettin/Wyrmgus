@@ -38,7 +38,7 @@
 #include "time/date.h"
 #include "vec2i.h"
 
-//#include <core/object.h>
+#include <core/object.h>
 
 #include <map>
 #include <shared_mutex>
@@ -54,11 +54,15 @@ class CQuest;
 class LuaCallback;
 struct lua_State;
 
-class CCampaign : public CDataType//, public Object
+class CCampaign : public CDataType, public Object
 {
-	//GDCLASS(CCampaign, Object)
+	GDCLASS(CCampaign, Object)
 	
 public:
+	CCampaign()
+	{
+	}
+	
 	CCampaign(const std::string &ident, const int id) : CDataType(ident), ID(id)
 	{
 	}
@@ -79,7 +83,6 @@ private:
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	/*
 	String GetName() const
 	{
 		return this->Name.c_str();
@@ -89,7 +92,6 @@ public:
 	{
 		return this->Description.c_str();
 	}
-	*/
 	
 	const CDate &GetStartDate() const
 	{
@@ -119,8 +121,8 @@ public:
 	friend int CclGetCampaignData(lua_State *l);
 	friend int CclGetCampaigns(lua_State *l);
 
-//protected:
-//	static void _bind_methods();
+protected:
+	static void _bind_methods();
 };
 
 /*----------------------------------------------------------------------------

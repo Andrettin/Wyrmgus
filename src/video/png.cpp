@@ -445,8 +445,8 @@ void SaveMapPNG(const char *name)
 		return;
 	}
 
-	const size_t imageWidth = UI.CurrentMapLayer->GetWidth() * Map.GetCurrentPixelTileSize().x;
-	const size_t imageHeight = UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y;
+	const size_t imageWidth = UI.CurrentMapLayer->GetWidth() * CMap::Map.GetCurrentPixelTileSize().x;
+	const size_t imageHeight = UI.CurrentMapLayer->GetHeight() * CMap::Map.GetCurrentPixelTileSize().y;
 
 	/* set up the output control if you are using standard C streams */
 	png_init_io(png_ptr, fp);
@@ -468,8 +468,8 @@ void SaveMapPNG(const char *name)
 			/*
 			unsigned short int tile = mf.getGraphicTile();
 
-			srcRect.x = Map.TileGraphic->frame_map[tile].x;
-			srcRect.y = Map.TileGraphic->frame_map[tile].y;
+			srcRect.x = CMap::Map.TileGraphic->frame_map[tile].x;
+			srcRect.y = CMap::Map.TileGraphic->frame_map[tile].y;
 			*/
 			const CTerrainType *terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
 			unsigned short int tile = mf.OverlayTerrain ? mf.OverlaySolidTile : mf.SolidTile;
@@ -477,12 +477,12 @@ void SaveMapPNG(const char *name)
 			srcRect.x = terrain->GetGraphics()->frame_map[tile].x;
 			srcRect.y = terrain->GetGraphics()->frame_map[tile].y;
 			//Wyrmgus end
-			dstRect.x = i * Map.GetCurrentPixelTileSize().x;
-			dstRect.y = j * Map.GetCurrentPixelTileSize().y;
-			srcRect.w = dstRect.w = Map.GetCurrentPixelTileSize().x;
-			srcRect.h = dstRect.h = Map.GetCurrentPixelTileSize().y;
+			dstRect.x = i * CMap::Map.GetCurrentPixelTileSize().x;
+			dstRect.y = j * CMap::Map.GetCurrentPixelTileSize().y;
+			srcRect.w = dstRect.w = CMap::Map.GetCurrentPixelTileSize().x;
+			srcRect.h = dstRect.h = CMap::Map.GetCurrentPixelTileSize().y;
 			//Wyrmgus start
-//			SDL_BlitSurface(Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
+//			SDL_BlitSurface(CMap::Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
 			SDL_BlitSurface(terrain->GetGraphics()->Surface, &srcRect, mapImage, &dstRect);
 			//Wyrmgus end
 		}

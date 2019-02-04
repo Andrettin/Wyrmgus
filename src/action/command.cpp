@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -180,8 +178,8 @@ static void StopRaft(CUnit &unit)
 
 static std::vector<CUnit *> GetLayerConnectorPath(CUnit &unit, int old_z, int new_z, std::vector<CUnit *> &checked_connectors)
 {
-	for (size_t i = 0; i != Map.MapLayers[old_z]->LayerConnectors.size(); ++i) {
-		CUnit *connector = Map.MapLayers[old_z]->LayerConnectors[i];
+	for (size_t i = 0; i != CMap::Map.MapLayers[old_z]->LayerConnectors.size(); ++i) {
+		CUnit *connector = CMap::Map.MapLayers[old_z]->LayerConnectors[i];
 		CUnit *connector_destination = connector->ConnectingDestination;
 		std::vector<CUnit *> connector_path;
 		if (std::find(checked_connectors.begin(), checked_connectors.end(), connector) == checked_connectors.end() && unit.CanUseItem(connector) && connector->IsVisibleAsGoal(*unit.Player)) {
@@ -338,14 +336,14 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 */
 void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
 	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
-	CMapField &new_mf = *Map.Field(pos, z);
+	CMapField &new_mf = *CMap::Map.Field(pos, z);
 	//if the unit is a land unit over a raft, move the raft instead of the unit
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
@@ -391,13 +389,13 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
 */
 void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 	
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	unit.RallyPointPos = pos;
-	unit.RallyPointMapLayer = Map.MapLayers[z];
+	unit.RallyPointMapLayer = CMap::Map.MapLayers[z];
 }
 
 /**
@@ -568,14 +566,14 @@ void CommandAutoRepair(CUnit &unit, int on)
 */
 void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int z)
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
 	CMapField &mf = *unit.MapLayer->Field(unit.tilePos);
-	CMapField &new_mf = *Map.Field(pos, z);
+	CMapField &new_mf = *CMap::Map.Field(pos, z);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer->ID);
@@ -623,7 +621,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int 
 */
 void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -739,7 +737,7 @@ void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 */
 void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1302,7 +1300,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const CSpell &
 			   UnitNumber(unit) _C_ spell.Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
 	Assert(std::find(unit.Type->Spells.begin(), unit.Type->Spells.end(), &spell) != unit.Type->Spells.end());
 	
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -1401,8 +1399,8 @@ void CommandSharedVision(int player, bool state, int opponent)
 
 		//Wyrmgus start
 		/*
-		for (int i = 0; i != Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			CMapField &mf = *Map.Field(i);
+		for (int i = 0; i != CMap::Map.Info.MapWidth * CMap::Map.Info.MapHeight; ++i) {
+			CMapField &mf = *CMap::Map.Field(i);
 			CMapFieldPlayerInfo &mfp = mf.playerInfo;
 
 			//Wyrmgus start
@@ -1411,7 +1409,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 			//Wyrmgus end
 				mfp.Visible[opponent] = 1;
 				if (opponent == ThisPlayer->Index) {
-					Map.MarkSeenTile(mf);
+					CMap::Map.MarkSeenTile(mf);
 				}
 			}
 			//Wyrmgus start
@@ -1420,26 +1418,26 @@ void CommandSharedVision(int player, bool state, int opponent)
 			//Wyrmgus end
 				mfp.Visible[player] = 1;
 				if (player == ThisPlayer->Index) {
-					Map.MarkSeenTile(mf);
+					CMap::Map.MarkSeenTile(mf);
 				}
 			}
 		}
 		*/
-		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-			for (int i = 0; i != Map.Info.MapWidths[z] * Map.Info.MapHeights[z]; ++i) {
-				CMapField &mf = *Map.Field(i, z);
+		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+			for (int i = 0; i != CMap::Map.Info.MapWidths[z] * CMap::Map.Info.MapHeights[z]; ++i) {
+				CMapField &mf = *CMap::Map.Field(i, z);
 				CMapFieldPlayerInfo &mfp = mf.playerInfo;
 
 				if (mfp.Visible[player] && !mfp.Visible[opponent] && !Players[player].Revealed) {
 					mfp.Visible[opponent] = 1;
 					if (opponent == ThisPlayer->Index) {
-						Map.MarkSeenTile(mf, z);
+						CMap::Map.MarkSeenTile(mf, z);
 					}
 				}
 				if (mfp.Visible[opponent] && !mfp.Visible[player] && !Players[opponent].Revealed) {
 					mfp.Visible[player] = 1;
 					if (player == ThisPlayer->Index) {
-						Map.MarkSeenTile(mf, z);
+						CMap::Map.MarkSeenTile(mf, z);
 					}
 				}
 			}
@@ -1486,5 +1484,3 @@ void CommandQuit(int player)
 		SetMessage(_("Player \"%s\" has been killed"), Players[player].Name.c_str());
 	}
 }
-
-//@}

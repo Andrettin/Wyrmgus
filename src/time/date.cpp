@@ -314,7 +314,7 @@ unsigned long long CDate::GetTotalHours(CCalendar *calendar) const
 	unsigned long long hours = date.Hour;
 	
 	unsigned long long days = 0;
-	days += (date.Year - 1 + BaseCalendarYearOffsetForHours) * calendar->DaysPerYear;
+	days += (date.Year - 1 + BASE_CALENDAR_YEAR_OFFSET_FOR_HOURS) * calendar->DaysPerYear;
 	for (int i = 0; i < (date.Month - 1); ++i) {
 		days += calendar->Months[i]->Days;
 	}

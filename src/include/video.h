@@ -31,8 +31,6 @@
 #ifndef __VIDEO_H__
 #define __VIDEO_H__
 
-//@{
-
 #include "SDL.h"
 
 #ifdef USE_GLES
@@ -49,7 +47,7 @@
 
 #include "guichan.h"
 
-#include "color.h"
+#include "include/color.h"
 #include "vec2i.h"
 
 class CFont;
@@ -658,6 +656,4 @@ extern void RestoreColorCyclingSurface();
 /// Does ColorCycling..
 extern void ColorCycle();
 
-//@}
-
-#endif // !__VIDEO_H__
+#endif

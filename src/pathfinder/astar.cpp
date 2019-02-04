@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -309,12 +307,12 @@ void InitAStar()
 	}
 	*/
 
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		// Should only be called once
 		Assert(AStarMatrix.size() <= z);
 	
-		AStarMapWidth.push_back(Map.Info.MapWidths[z]);
-		AStarMapHeight.push_back(Map.Info.MapHeights[z]);
+		AStarMapWidth.push_back(CMap::Map.Info.MapWidths[z]);
+		AStarMapHeight.push_back(CMap::Map.Info.MapHeights[z]);
 		
 		AStarMatrixSize.push_back(sizeof(Node) * AStarMapWidth[z] * AStarMapHeight[z]);
 		AStarMatrix.push_back(new Node[AStarMapWidth[z] * AStarMapHeight[z]]);
@@ -716,9 +714,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 #ifdef DEBUG
 	{
 		Vec2i pos;
-		pos.y = index / Map.Info.MapWidths[z];
-		pos.x = index - pos.y * Map.Info.MapWidths[z];
-		Assert(Map.Info.IsPointOnMap(pos, z));
+		pos.y = index / CMap::Map.Info.MapWidths[z];
+		pos.x = index - pos.y * CMap::Map.Info.MapWidths[z];
+		Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 	}
 #endif
 	int cost = 0;
@@ -729,7 +727,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int
 	int h = unit.Type->TileSize.y;
 	const int w = unit.Type->TileSize.x;
 	do {
-		const CMapField *mf = Map.Field(index, z);
+		const CMapField *mf = CMap::Map.Field(index, z);
 		int i = w;
 		do {
 			//Wyrmgus start
@@ -938,13 +936,13 @@ private:
 			const int offsetx = GetMaxOffsetX(y - goalTopLeft.y, maxrange);
 			const int minx = std::max(0, goalTopLeft.x - offsetx - unitExtraTileSize.x);
 			//Wyrmgus start
-//			const int maxx = std::min(Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
-			const int maxx = std::min(Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
+//			const int maxx = std::min(CMap::Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
+			const int maxx = std::min(CMap::Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
 			//Wyrmgus end
 			Vec2i mpos(minx, y);
 			//Wyrmgus start
-//			const unsigned int offset = mpos.y * Map.Info.MapWidth;
-			const unsigned int offset = mpos.y * Map.Info.MapWidths[z];
+//			const unsigned int offset = mpos.y * CMap::Map.Info.MapWidth;
+			const unsigned int offset = mpos.y * CMap::Map.Info.MapWidths[z];
 			//Wyrmgus end
 
 			for (mpos.x = minx; mpos.x <= maxx; ++mpos.x) {
@@ -960,13 +958,13 @@ private:
 	{
 		const int minx = std::max(0, goalTopLeft.x - offsetmaxx - unitExtraTileSize.x);
 		//Wyrmgus start
-//		const int maxx = std::min(Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetmaxx);
-		const int maxx = std::min(Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetmaxx);
+//		const int maxx = std::min(CMap::Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetmaxx);
+		const int maxx = std::min(CMap::Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetmaxx);
 		//Wyrmgus end
 		Vec2i mpos(minx, y);
 		//Wyrmgus start
-//		const unsigned int offset = mpos.y * Map.Info.MapWidth;
-		const unsigned int offset = mpos.y * Map.Info.MapWidths[z];
+//		const unsigned int offset = mpos.y * CMap::Map.Info.MapWidth;
+		const unsigned int offset = mpos.y * CMap::Map.Info.MapWidths[z];
 		//Wyrmgus end
 
 		for (mpos.x = minx; mpos.x <= goalTopLeft.x - offsetminx - unitExtraTileSize.x; ++mpos.x) {
@@ -999,21 +997,21 @@ private:
 	{
 		const int miny = std::max(0, goalTopLeft.y - unitExtraTileSize.y);
 		//Wyrmgus start
-//		const int maxy = std::min<int>(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y);
-		const int maxy = std::min<int>(Map.Info.MapHeights[z] - 1 - unitExtraTileSize.y, goalBottomRight.y);
+//		const int maxy = std::min<int>(CMap::Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y);
+		const int maxy = std::min<int>(CMap::Map.Info.MapHeights[z] - 1 - unitExtraTileSize.y, goalBottomRight.y);
 		//Wyrmgus end
 		const int minx = std::max(0, goalTopLeft.x - maxrange - unitExtraTileSize.x);
 		//Wyrmgus start
-//		const int maxx = std::min<int>(Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + maxrange);
-		const int maxx = std::min<int>(Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + maxrange);
+//		const int maxx = std::min<int>(CMap::Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + maxrange);
+		const int maxx = std::min<int>(CMap::Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + maxrange);
 		//Wyrmgus end
 
 		if (minrange == 0) {
 			for (int y = miny; y <= maxy; ++y) {
 				Vec2i mpos(minx, y);
 				//Wyrmgus start
-//				const unsigned int offset = mpos.y * Map.Info.MapWidth;
-				const unsigned int offset = mpos.y * Map.Info.MapWidths[z];
+//				const unsigned int offset = mpos.y * CMap::Map.Info.MapWidth;
+				const unsigned int offset = mpos.y * CMap::Map.Info.MapWidths[z];
 				//Wyrmgus end
 
 				for (mpos.x = minx; mpos.x <= maxx; ++mpos.x) {
@@ -1027,8 +1025,8 @@ private:
 			for (int y = miny; y <= maxy; ++y) {
 				Vec2i mpos(minx, y);
 				//Wyrmgus start
-//				const unsigned int offset = mpos.y * Map.Info.MapWidth;
-				const unsigned int offset = mpos.y * Map.Info.MapWidths[z];
+//				const unsigned int offset = mpos.y * CMap::Map.Info.MapWidth;
+				const unsigned int offset = mpos.y * CMap::Map.Info.MapWidths[z];
 				//Wyrmgus end
 
 				for (mpos.x = minx; mpos.x <= goalTopLeft.x - minrange - unitExtraTileSize.x; ++mpos.x) {
@@ -1051,8 +1049,8 @@ private:
 	{
 		const int miny = goalBottomRight.y + 1;
 		//Wyrmgus start
-//		const int maxy = std::min(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y + (minrange - 1));
-		const int maxy = std::min(Map.Info.MapHeights[z] - 1 - unitExtraTileSize.y, goalBottomRight.y + (minrange - 1));
+//		const int maxy = std::min(CMap::Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y + (minrange - 1));
+		const int maxy = std::min(CMap::Map.Info.MapHeights[z] - 1 - unitExtraTileSize.y, goalBottomRight.y + (minrange - 1));
 		//Wyrmgus end
 
 		for (int y = miny; y <= maxy; ++y) {
@@ -1067,20 +1065,20 @@ private:
 	{
 		const int miny = std::max(goalBottomRight.y + minrange, goalBottomRight.y + 1);
 		//Wyrmgus start
-//		const int maxy = std::min(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y + maxrange);
-		const int maxy = std::min(Map.Info.MapHeights[z] - 1 - unitExtraTileSize.y, goalBottomRight.y + maxrange);
+//		const int maxy = std::min(CMap::Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y + maxrange);
+		const int maxy = std::min(CMap::Map.Info.MapHeights[z] - 1 - unitExtraTileSize.y, goalBottomRight.y + maxrange);
 		//Wyrmgus end
 		for (int y = miny; y <= maxy; ++y) {
 			const int offsetx = GetMaxOffsetX(y - goalBottomRight.y, maxrange);
 			const int minx = std::max(0, goalTopLeft.x - offsetx - unitExtraTileSize.x);
 			//Wyrmgus start
-//			const int maxx = std::min(Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
-			const int maxx = std::min(Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
+//			const int maxx = std::min(CMap::Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
+			const int maxx = std::min(CMap::Map.Info.MapWidths[z] - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetx);
 			//WYrmgus end
 			Vec2i mpos(minx, y);
 			//Wyrmgus start
-//			const unsigned int offset = mpos.y * Map.Info.MapWidth;
-			const unsigned int offset = mpos.y * Map.Info.MapWidths[z];
+//			const unsigned int offset = mpos.y * CMap::Map.Info.MapWidth;
+			const unsigned int offset = mpos.y * CMap::Map.Info.MapWidths[z];
 			//Wyrmgus end
 
 			for (mpos.x = minx; mpos.x <= maxx; ++mpos.x) {
@@ -1306,7 +1304,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				  char *path, int pathlen, const CUnit &unit, int max_length, int z, bool allow_diagonal)
 				  //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(startPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(startPos, z));
 	
 	//Wyrmgus start
 	if (unit.MapLayer->ID != z) {
@@ -1485,7 +1483,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				//Wyrmgus start
 //				|| endPos.y < 0 || endPos.y + tilesizey - 1 >= AStarMapHeight) {
 				|| endPos.y < 0 || endPos.y + tilesizey - 1 >= AStarMapHeight[z]
-				|| !Map.Info.IsPointOnMap(endPos, z)) {
+				|| !CMap::Map.Info.IsPointOnMap(endPos, z)) {
 				//Wyrmgus end
 				continue;
 			}
@@ -1705,5 +1703,3 @@ int GetAStarUnknownTerrainCost()
 {
 	return AStarUnknownTerrainCost;
 }
-
-//@}

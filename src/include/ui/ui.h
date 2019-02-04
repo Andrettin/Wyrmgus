@@ -30,8 +30,6 @@
 #ifndef __UI_H__
 #define __UI_H__
 
-//@{
-
 /// @todo this only the start of the new user interface
 /// @todo all user interface variables should go here and be configurable
 
@@ -43,7 +41,7 @@
 #include <string>
 #include <map>
 
-#include "color.h"
+#include "include/color.h"
 #include "cursor.h"
 #include "map/minimap.h"
 #include "script.h"
@@ -644,6 +642,4 @@ extern void UpdateLoadingBar();
 extern void IncItemsLoaded();
 extern void ResetItemsToLoad();
 
-//@}
-
-#endif // !__UI_H__
+#endif

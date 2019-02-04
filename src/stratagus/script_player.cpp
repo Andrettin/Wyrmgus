@@ -51,7 +51,7 @@
 //Wyrmgus end
 #include "map/map.h"
 #include "map/site.h"
-#include "plane.h"
+#include "include/plane.h"
 #include "province.h"
 #include "quest.h"
 #include "religion/deity.h"
@@ -1535,7 +1535,7 @@ static int CclDefineLanguageWord(lua_State *l)
 		} else if (!strcmp(value, "Mod")) {
 			word->Mod = LuaToString(l, -1);
 		} else if (!strcmp(value, "MapWord")) { //to keep backwards compatibility
-			word->Mod = Map.Info.Filename;
+			word->Mod = CMap::Map.Info.Filename;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -159,7 +157,7 @@ void CMapLayer::RegenerateForest()
 */
 void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 {
-	Assert(Map.Info.IsPointOnMap(pos, this->ID));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, this->ID));
 	
 	CMapField &mf = *this->Field(pos);
 
@@ -200,18 +198,18 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 			CMapField &diagonalMf = *this->Field(pos + diagonalOffset);
 			
 			if (
-				Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
-				&& Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
-				&& Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
+				CMap::Map.Info.IsPointOnMap(pos + diagonalOffset, this->ID)
+				&& CMap::Map.Info.IsPointOnMap(pos + verticalOffset, this->ID)
+				&& CMap::Map.Info.IsPointOnMap(pos + horizontalOffset, this->ID)
 				&& ((verticalMf.IsDestroyedForestTile() && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupied_flag)) || (verticalMf.getFlag() & MapFieldForest))
 				&& ((diagonalMf.IsDestroyedForestTile() && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupied_flag)) || (diagonalMf.getFlag() & MapFieldForest))
 				&& ((horizontalMf.IsDestroyedForestTile() && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupied_flag)) || (horizontalMf.getFlag() & MapFieldForest))
 			) {
 				DebugPrint("Real place wood\n");
-				Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
-				Map.SetOverlayTerrainDestroyed(pos + diagonalOffset, false, this->ID);
-				Map.SetOverlayTerrainDestroyed(pos + horizontalOffset, false, this->ID);
-				Map.SetOverlayTerrainDestroyed(pos, false, this->ID);
+				CMap::Map.SetOverlayTerrainDestroyed(pos + verticalOffset, false, this->ID);
+				CMap::Map.SetOverlayTerrainDestroyed(pos + diagonalOffset, false, this->ID);
+				CMap::Map.SetOverlayTerrainDestroyed(pos + horizontalOffset, false, this->ID);
+				CMap::Map.SetOverlayTerrainDestroyed(pos, false, this->ID);
 				
 				return;
 			}
@@ -223,16 +221,16 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 		&& topMf.Value >= ForestRegeneration
 		&& !(topMf.Flags & occupied_flag)) {
 		DebugPrint("Real place wood\n");
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
-		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
+		topMf.setTileIndex(*CMap::Map.Tileset, CMap::Map.Tileset->getTopOneTreeTile(), 0);
+		topMf.setGraphicTile(CMap::Map.Tileset->getTopOneTreeTile());
 		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
 		topMf.Value = 0;
 		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
 		UI.Minimap.UpdateSeenXY(pos + offset);
 		UI.Minimap.UpdateXY(pos + offset);
 		
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
-		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
+		mf.setTileIndex(*CMap::Map.Tileset, CMap::Map.Tileset->getBottomOneTreeTile(), 0);
+		mf.setGraphicTile(CMap::Map.Tileset->getBottomOneTreeTile());
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
 		mf.Value = 0;
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
@@ -242,7 +240,7 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 			MarkSeenTile(mf);
 		}
-		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (CMap::Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
 			MarkSeenTile(topMf);
 		}
 		FixNeighbors(MapFieldForest, 0, pos + offset);
@@ -463,5 +461,3 @@ CSeason *CMapLayer::GetSeason() const
 	
 	return this->Season->Season;
 }
-
-//@}

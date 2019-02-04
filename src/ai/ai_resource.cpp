@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -333,8 +331,8 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 		}
 		
 		if (landmass) {
-			int worker_landmass = Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
-			if (worker_landmass != landmass && std::find(Map.BorderLandmasses[landmass].begin(), Map.BorderLandmasses[landmass].end(), worker_landmass) == Map.BorderLandmasses[landmass].end()) { //if the landmass is not the same as the worker's, and the worker isn't in an adjacent landmass, then the worker can't build the building at the appropriate location
+			int worker_landmass = CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID);
+			if (worker_landmass != landmass && std::find(CMap::Map.BorderLandmasses[landmass].begin(), CMap::Map.BorderLandmasses[landmass].end(), worker_landmass) == CMap::Map.BorderLandmasses[landmass].end()) { //if the landmass is not the same as the worker's, and the worker isn't in an adjacent landmass, then the worker can't build the building at the appropriate location
 				continue;
 			}
 		}
@@ -356,7 +354,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	if (building.TerrainType || building.BoolFlag[TOWNHALL_INDEX].value) { //terrain type units and town halls have a particular place to be built, so we need to find the worker with a terrain traversal
 		TerrainTraversal terrainTraversal;
 
-		terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+		terrainTraversal.SetSize(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
 		terrainTraversal.Init();
 
 		terrainTraversal.PushPos(nearPos);
@@ -384,7 +382,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	CUnit &unit = near_unit ? *near_unit : ((num == 1) ? *table[0] : *table[SyncRand() % num]);
 	//Wyrmgus end
 	
-	if (!Map.Info.IsPointOnMap(nearPos, z)) {
+	if (!CMap::Map.Info.IsPointOnMap(nearPos, z)) {
 		z = unit.MapLayer->ID;
 	}
 	
@@ -403,7 +401,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	/*
 	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
-		if (Map.Info.IsPointOnMap(nearPos, z)) {
+		if (CMap::Map.Info.IsPointOnMap(nearPos, z)) {
 			//Crush CPU !!!!!
 			for (int i = 0; i < num && table[i] != &unit; ++i) {
 				// Find a place to build.
@@ -730,7 +728,7 @@ void AiTransportCapacityRequest(int capacity_needed, int landmass)
 				for (size_t j = 0; j != builder_table.size(); ++j) {
 					CUnit &builder_unit = *builder_table[j];
 					
-					if (Map.GetTileLandmass(builder_unit.tilePos, builder_unit.MapLayer->ID) == landmass) {
+					if (CMap::Map.GetTileLandmass(builder_unit.tilePos, builder_unit.MapLayer->ID) == landmass) {
 						has_builder = true;
 						break;
 					}
@@ -921,7 +919,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what, int landmass = 0
 		CUnit &unit = *table[i];
 
 		//Wyrmgus start
-		if (landmass && Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID) != landmass) {
+		if (landmass && CMap::Map.GetTileLandmass(unit.tilePos, unit.MapLayer->ID) != landmass) {
 			continue;
 		}
 		
@@ -2218,7 +2216,7 @@ static void AiCheckPathwayConstruction()
 			
 			for (size_t z = 0; z != pathway_tiles.size(); ++z) {
 				Vec2i pathway_pos(pathway_tiles[z].x, pathway_tiles[z].y);
-				if (!Map.Info.IsPointOnMap(pathway_pos, unit.MapLayer)) {
+				if (!CMap::Map.Info.IsPointOnMap(pathway_pos, unit.MapLayer)) {
 					continue;
 				}
 				CMapField &mf = *unit.MapLayer->Field(pathway_pos);
@@ -2331,8 +2329,8 @@ void AiCheckSettlementConstruction()
 	AiPlayer->Player->GetWorkerLandmasses(worker_landmasses, town_hall_type);
 						
 	//check settlement units to see if can build in one
-	for (size_t i = 0; i < Map.SiteUnits.size(); ++i) {
-		CUnit *settlement_unit = Map.SiteUnits[i];
+	for (size_t i = 0; i < CMap::Map.SiteUnits.size(); ++i) {
+		CUnit *settlement_unit = CMap::Map.SiteUnits[i];
 		
 		if (!settlement_unit->IsAliveOnMap()) {
 			continue;
@@ -2346,7 +2344,7 @@ void AiCheckSettlementConstruction()
 			continue;
 		}
 		
-		int settlement_landmass = Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
+		int settlement_landmass = CMap::Map.GetTileLandmass(settlement_unit->tilePos, settlement_unit->MapLayer->ID);
 		if (std::find(worker_landmasses.begin(), worker_landmasses.end(), settlement_landmass) == worker_landmasses.end()) {
 			continue;
 		}
@@ -2411,8 +2409,8 @@ void AiCheckDockConstruction()
 	std::vector<int> neighbor_water_landmasses; //water "landmasses" neighboring the landmasses where the player has workers
 	for (size_t i = 0; i < worker_landmasses.size(); ++i) {
 		int worker_landmass = worker_landmasses[i];
-		for (size_t j = 0; j < Map.BorderLandmasses[worker_landmass].size(); ++j) {
-			int border_landmass = Map.BorderLandmasses[worker_landmass][j];
+		for (size_t j = 0; j < CMap::Map.BorderLandmasses[worker_landmass].size(); ++j) {
+			int border_landmass = CMap::Map.BorderLandmasses[worker_landmass][j];
 			if (std::find(neighbor_water_landmasses.begin(), neighbor_water_landmasses.end(), border_landmass) == neighbor_water_landmasses.end()) {
 				neighbor_water_landmasses.push_back(border_landmass);
 			}
@@ -2424,7 +2422,7 @@ void AiCheckDockConstruction()
 	
 	for (size_t i = 0; i < neighbor_water_landmasses.size(); ++i) {
 		int water_landmass = neighbor_water_landmasses[i];
-		if (Map.BorderLandmasses[water_landmass].size() < 2) { //if the water "landmass" only borders one landmass, then there is no need to build a dock on it, as it can lead to no other landmasses
+		if (CMap::Map.BorderLandmasses[water_landmass].size() < 2) { //if the water "landmass" only borders one landmass, then there is no need to build a dock on it, as it can lead to no other landmasses
 			continue;
 		}
 		
@@ -2437,7 +2435,7 @@ void AiCheckDockConstruction()
 		for (size_t j = 0; j < dock_table.size(); ++j) {
 			CUnit &dock_unit = *dock_table[j];
 					
-			if (Map.GetTileLandmass(dock_unit.tilePos, dock_unit.MapLayer->ID) == water_landmass) {
+			if (CMap::Map.GetTileLandmass(dock_unit.tilePos, dock_unit.MapLayer->ID) == water_landmass) {
 				has_dock = true;
 				break;
 			}
@@ -2798,5 +2796,3 @@ void AiResourceManager()
 	AiCheckPathwayConstruction();
 	//Wyrmgus end
 }
-
-//@}

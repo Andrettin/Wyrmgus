@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -38,7 +36,7 @@
 #include "world.h"
 
 #include "config.h"
-#include "plane.h"
+#include "include/plane.h"
 #include "province.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
@@ -153,5 +151,3 @@ void CWorld::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 }
-
-//@}

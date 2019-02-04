@@ -52,6 +52,7 @@ endif()
 # Stratagus sources
 
 include_directories(
+	src
 	src/include
 	src/guichan/include
 	src/guichan/include/guichan
@@ -137,16 +138,6 @@ set(editor_SRCS
 )
 source_group(editor FILES ${editor_SRCS})
 
-set(game_SRCS
-	src/game/game.cpp
-	src/game/loadgame.cpp
-	src/game/replay.cpp
-	src/game/savegame.cpp
-	src/game/trigger.cpp
-	src/game/trigger_effect.cpp
-)
-source_group(game FILES ${game_SRCS})
-
 set(guichan_SRCS
 	src/guichan/cliprectangle.cpp
 	src/guichan/color.cpp
@@ -183,25 +174,6 @@ set(guichan_SRCS
 	src/guichan/widgets/window.cpp
 )
 source_group(guichan FILES ${guichan_SRCS})
-
-set(map_SRCS
-	src/map/historical_location.cpp
-	src/map/map.cpp
-	src/map/map_draw.cpp
-	src/map/map_fog.cpp
-	src/map/map_layer.cpp
-	src/map/map_radar.cpp
-	src/map/map_template.cpp
-	src/map/map_wall.cpp
-	src/map/mapfield.cpp
-	src/map/minimap.cpp
-	src/map/script_map.cpp
-	src/map/script_tileset.cpp
-	src/map/site.cpp
-	src/map/terrain_type.cpp
-	src/map/tileset.cpp
-)
-source_group(map FILES ${map_SRCS})
 
 set(missile_SRCS
 	src/missile/missile.cpp
@@ -297,10 +269,8 @@ source_group(spell FILES ${spell_SRCS})
 
 set(stratagusmain_SRCS
 	src/stratagus/age.cpp
-	src/stratagus/campaign.cpp
 	src/stratagus/character.cpp
 	src/stratagus/civilization.cpp
-	src/stratagus/config.cpp
 	src/stratagus/construct.cpp
 	src/stratagus/currency.cpp
 	src/stratagus/dialogue.cpp
@@ -310,11 +280,9 @@ set(stratagusmain_SRCS
 	src/stratagus/luacallback.cpp
 	src/stratagus/item.cpp
 	src/stratagus/main.cpp
-	src/stratagus/mainloop.cpp
 	src/stratagus/mod.cpp
 	src/stratagus/parameters.cpp
 	src/stratagus/plane.cpp
-	src/stratagus/player.cpp
 	src/stratagus/player_color.cpp
 	src/stratagus/province.cpp
 	src/stratagus/quest.cpp
@@ -326,7 +294,6 @@ set(stratagusmain_SRCS
 	src/stratagus/script_grand_strategy.cpp
 	src/stratagus/script_item.cpp
 	src/stratagus/script_province.cpp
-	src/stratagus/script_quest.cpp
 	src/stratagus/script_text.cpp
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
@@ -349,26 +316,6 @@ set(time_SRCS
 	src/time/timeline.cpp
 )
 source_group(time FILES ${time_SRCS})
-
-set(ui_SRCS
-	src/ui/botpanel.cpp
-	src/ui/button_action.cpp
-	src/ui/button_checks.cpp
-	src/ui/button_level.cpp
-	src/ui/contenttype.cpp
-	src/ui/icons.cpp
-	src/ui/interface.cpp
-	src/ui/mainscr.cpp
-	src/ui/uibuttons_proc.cpp
-	src/ui/mouse.cpp
-	src/ui/popup.cpp
-	src/ui/script_ui.cpp
-	src/ui/statusline.cpp
-	src/ui/ui.cpp
-	src/ui/uitimer.cpp
-	src/ui/widgets.cpp
-)
-source_group(ui FILES ${ui_SRCS})
 
 set(unit_SRCS
 	src/unit/build.cpp
@@ -454,9 +401,7 @@ set(stratagus_SRCS
 	${animation_SRCS}
 	${ai_SRCS}
 	${editor_SRCS}
-	${game_SRCS}
 	${guichan_SRCS}
-	${map_SRCS}
 	${missile_SRCS}
 	${network_SRCS}
 	${particle_SRCS}
@@ -466,7 +411,6 @@ set(stratagus_SRCS
 	${spell_SRCS}
 	${stratagusmain_SRCS}
 	${time_SRCS}
-	${ui_SRCS}
 	${unit_SRCS}
 	${upgrade_SRCS}
 	${video_SRCS}
@@ -570,18 +514,6 @@ set(stratagus_animation_HDRS
 	src/include/animation/animation_wait.h
 )
 
-set(stratagus_map_HDRS
-	src/include/map/historical_location.h
-	src/include/map/map.h
-	src/include/map/map_layer.h
-	src/include/map/map_template.h
-	src/include/map/minimap.h
-	src/include/map/site.h
-	src/include/map/terrain_type.h
-	src/include/map/tile.h
-	src/include/map/tileset.h
-)
-
 set(stratagus_religion_HDRS
 	src/include/religion/deity.h
 	src/include/religion/deity_domain.h
@@ -614,17 +546,6 @@ set(stratagus_time_HDRS
 	src/include/time/time_of_day_schedule.h
 	src/include/time/time_period_schedule.h
 	src/include/time/timeline.h
-)
-
-set(stratagus_ui_HDRS
-	src/include/ui/button_action.h
-	src/include/ui/button_level.h
-	src/include/ui/contenttype.h
-	src/include/ui/interface.h
-	src/include/ui/popup.h
-	src/include/ui/statusline.h
-	src/include/ui/ui.h
-	src/include/ui/uitimer.h
 )
 
 set(stratagus_unit_HDRS
@@ -731,11 +652,9 @@ source_group(include FILES ${stratagus_generic_HDRS})
 source_group(include\\action FILES ${stratagus_action_HDRS})
 source_group(include\\animation FILES ${stratagus_animation_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
-source_group(include\\map FILES ${stratagus_map_HDRS})
 source_group(include\\religion FILES ${stratagus_religion_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
 source_group(include\\time FILES ${stratagus_time_HDRS})
-source_group(include\\ui FILES ${stratagus_ui_HDRS})
 source_group(include\\unit FILES ${stratagus_unit_HDRS})
 source_group(include\\upgrade FILES ${stratagus_upgrade_HDRS})
 source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
@@ -746,11 +665,9 @@ set(stratagus_HDRS
 	${stratagus_action_HDRS}
 	${stratagus_animation_HDRS}
 	${stratagus_guichan_HDRS}
-	${stratagus_map_HDRS}
 	${stratagus_religion_HDRS}
 	${stratagus_spell_HDRS}
 	${stratagus_time_HDRS}
-	${stratagus_ui_HDRS}
 	${stratagus_unit_HDRS}
 	${stratagus_upgrade_HDRS}
 	${stratagus_xbrz_HDRS}
@@ -1017,9 +934,7 @@ set(CMAKE_CXX_FLAGS "${WS_CXX11_FLAGS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX11_STANDARD
 check_type_size(errno_t ERRNOT)
 check_function_exists("strcpy_s" HAVE_STRCPYS)
 check_function_exists("strncpy_s" HAVE_STRNCPYS)
-check_function_exists("strcasestr" HAVE_STRCASESTR)
 check_function_exists("strnlen" HAVE_STRNLEN)
-check_function_exists("getopt" HAVE_GETOPT)
 
 # mingw-w64 does not have strcat_s in any include file, but function symbol in library exists
 # so rather check if we have strcat_s in string.h file
@@ -1041,16 +956,8 @@ if(HAVE_STRCATS)
 	add_definitions(-DHAVE_STRCATS)
 endif()
 
-if(HAVE_STRCASESTR)
-	add_definitions(-DHAVE_STRCASESTR)
-endif()
-
 if(HAVE_STRNLEN)
 	add_definitions(-DHAVE_STRNLEN)
-endif()
-
-if(HAVE_GETOPT)
-	add_definitions(-DHAVE_GETOPT)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

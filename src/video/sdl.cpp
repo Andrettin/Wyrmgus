@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
@@ -92,7 +90,7 @@
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
-#include "version.h"
+#include "include/version.h"
 #include "video.h"
 #include "widgets.h"
 
@@ -1226,5 +1224,3 @@ void ToggleFullScreen()
 
 	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
 }
-
-//@}

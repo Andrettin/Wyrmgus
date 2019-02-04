@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -475,7 +473,7 @@ static void AnimateActionTrain(CUnit &unit)
 			
 			if (!command_found && unit.RallyPointMapLayer->Field(unit.RallyPointPos)->playerInfo.IsTeamExplored(*newUnit->Player)) { // see if can harvest terrain
 				for (size_t res = 0; res < CResource::Resources.size(); ++res) {
-					if (newUnit->Type->ResInfo[res] && Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->IsTerrainResourceOnMap(res)) {
+					if (newUnit->Type->ResInfo[res] && CMap::Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer->ID)->IsTerrainResourceOnMap(res)) {
 						CommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer->ID);
 						command_found = true;
 						break;
@@ -495,5 +493,3 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 
 }
-
-//@}

@@ -106,15 +106,15 @@ extern errno_t strncpy_s(char *dst, size_t dstsize, const char *src, size_t coun
 extern errno_t strcat_s(char *dst, size_t dstsize, const char *src);
 #endif
 
-#ifndef HAVE_STRCASESTR
+#ifndef USE_LINUX
 /// case insensitive strstr
 extern char *strcasestr(const char *str, const char *substr);
-#endif // !HAVE_STRCASESTR
+#endif
 
 #ifndef HAVE_STRNLEN
 /// determine length of a fixed-length string
 extern size_t strnlen(const char *str, size_t strsize);
-#endif // !HAVE_STRNLEN
+#endif
 
 extern std::vector<std::string> SplitString(const std::string &str, const char *separators);
 extern bool StringToBool(const std::string &str);
@@ -128,7 +128,7 @@ extern std::string SnakeCaseToPascalCase(const std::string &str);
 --  Getopt
 ----------------------------------------------------------------------------*/
 
-#ifdef HAVE_GETOPT
+#ifdef USE_LINUX
 #include <unistd.h>
 #else
 extern char *optarg;

@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -165,7 +163,7 @@ static void SetBestMapLayerForUnitGroup(const std::vector<CUnit *> &unit_group)
 	int best_map_layer = UI.CurrentMapLayer->ID;
 	
 	std::vector<int> map_layer_count;
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
 		map_layer_count.push_back(0);
 	}
 	for (size_t i = 0; i != unit_group.size(); ++i) {
@@ -491,7 +489,7 @@ static void UiSaveMapPosition(unsigned position)
 */
 static void UiRecallMapPosition(unsigned position)
 {
-	UI.SelectedViewport->Set(SavedMapPosition[position], Map.GetCurrentPixelTileSize() / 2);
+	UI.SelectedViewport->Set(SavedMapPosition[position], CMap::Map.GetCurrentPixelTileSize() / 2);
 }
 
 /**
@@ -1448,7 +1446,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowNW.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * CMap::Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
@@ -1460,7 +1458,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		}
 	//Wyrmgus start
 //	} else if (mousePos.x > SCROLL_RIGHT) {
-	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (UI.CurrentMapLayer->GetWidth() * Map.GetCurrentPixelTileSize().x) - 1) {
+	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (UI.CurrentMapLayer->GetWidth() * CMap::Map.GetCurrentPixelTileSize().x) - 1) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (mousePos.y < SCROLL_UP) {
@@ -1471,7 +1469,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowNE.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * CMap::Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollRightDown;
 			MouseScrollState = ScrollRightDown;
@@ -1491,7 +1489,7 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowN.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * Map.GetCurrentPixelTileSize().y) - 1) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (UI.CurrentMapLayer->GetHeight() * CMap::Map.GetCurrentPixelTileSize().y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollDown;
 			MouseScrollState = ScrollDown;
@@ -1811,5 +1809,3 @@ void SetHoldClickDelay(int delay)
 {
 	HoldClickDelay = delay;
 }
-
-//@}

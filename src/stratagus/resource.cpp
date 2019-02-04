@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "resource.h"
+#include "include/resource.h"
 
 #include "config.h"
 

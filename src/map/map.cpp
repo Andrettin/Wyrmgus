@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -52,7 +50,7 @@
 #include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
-#include "plane.h"
+#include "include/plane.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -77,7 +75,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
-#include "version.h"
+#include "include/version.h"
 #include "video.h"
 #include "world.h"
 
@@ -95,11 +93,11 @@ std::vector<CTerrainFeature *> TerrainFeatures;
 std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
 std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 //Wyrmgus end
-CMap Map;                   /// The current map
-int FlagRevealMap;          /// Flag must reveal the map
-int ReplayRevealMap;        /// Reveal Map is replay
-int ForestRegeneration;     /// Forest regeneration
-char CurrentMapPath[1024];  /// Path of the current map
+CMap CMap::Map;				/// The current map
+int FlagRevealMap;			/// Flag must reveal the map
+int ReplayRevealMap;		/// Reveal Map is replay
+int ForestRegeneration;		/// Forest regeneration
+char CurrentMapPath[1024];	/// Path of the current map
 
 //Wyrmgus start
 /**
@@ -155,10 +153,10 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 #ifdef MINIMAP_UPDATE
 	//rb - GRRRRRRRRRRRR
 	//Wyrmgus start
-//	const unsigned int index = &mf - Map.Fields;
+//	const unsigned int index = &mf - CMap::Map.Fields;
 //	const int y = index / Info.MapWidth;
 //	const int x = index - (y * Info.MapWidth);
-	const CMapLayer *map_layer = Map.MapLayers[z];
+	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
 	const unsigned int index = &mf - map_layer->Fields;
 	const int y = index / map_layer->GetWidth();
 	const int x = index - (y * map_layer->GetWidth());
@@ -171,7 +169,7 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 	if (this->Tileset->TileTypeTable.empty() == false) {
 #ifndef MINIMAP_UPDATE
 		//rb - GRRRRRRRRRRRR
-		const unsigned int index = &mf - Map.Fields;
+		const unsigned int index = &mf - CMap::Map.Fields;
 		const int y = index / Info.MapWidth;
 		const int x = index - (y * Info.MapWidth);
 		const Vec2i pos(x, y);
@@ -297,7 +295,7 @@ PixelPos CMap::TilePosToMapPixelPos_Center(const Vec2i &tilePos, const CMapLayer
 //Wyrmgus start
 CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, const int z) const
 {
-	if (!Map.Info.IsPointOnMap(pos, z)) {
+	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
 	}
 	
@@ -308,7 +306,7 @@ CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, const bool overlay, const i
 
 CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, const int z, const bool ignore_destroyed) const
 {
-	if (!Map.Info.IsPointOnMap(pos, z)) {
+	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return nullptr;
 	}
 	
@@ -319,7 +317,7 @@ CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, const bool seen, const i
 
 int CMap::GetTileLandmass(const Vec2i &pos, int z) const
 {
-	if (!Map.Info.IsPointOnMap(pos, z)) {
+	if (!CMap::Map.Info.IsPointOnMap(pos, z)) {
 		return 0;
 	}
 	
@@ -390,7 +388,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 			bool passable_surroundings = true; //check if the unit won't be placed next to unpassable terrain
 			for (int x = random_pos.x - 1; x < random_pos.x + unit_type->TileSize.x + 1; ++x) {
 				for (int y = random_pos.y - 1; y < random_pos.y + unit_type->TileSize.y + 1; ++y) {
-					if (Map.Info.IsPointOnMap(x, y, z) && Map.Field(x, y, z)->CheckMask(MapFieldUnpassable)) {
+					if (CMap::Map.Info.IsPointOnMap(x, y, z) && CMap::Map.Field(x, y, z)->CheckMask(MapFieldUnpassable)) {
 						passable_surroundings = false;
 					}
 				}
@@ -414,7 +412,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 */
 bool CMap::WallOnMap(const Vec2i &pos, int z) const
 {
-	Assert(Map.Info.IsPointOnMap(pos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
 	return Field(pos, z)->isAWall();
 }
 
@@ -444,7 +442,7 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						
 					CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
@@ -523,7 +521,7 @@ bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse)
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			CMapField &mf = *Map.Field(adjacent_pos, z);
+			CMapField &mf = *CMap::Map.Field(adjacent_pos, z);
 			
 			if ((!reverse && mf.CheckMask(flag)) || (reverse && !mf.CheckMask(flag))) {
 				return true;
@@ -542,7 +540,7 @@ bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			CMapField &mf = *Map.Field(adjacent_pos, z);
+			CMapField &mf = *CMap::Map.Field(adjacent_pos, z);
 			
 			if (mf.CheckMask(MapFieldBuilding)) {
 				return true;
@@ -561,7 +559,7 @@ bool CMap::TileBordersPathway(const Vec2i &pos, int z, bool only_railroad)
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			CMapField &mf = *Map.Field(adjacent_pos, z);
+			CMapField &mf = *CMap::Map.Field(adjacent_pos, z);
 			
 			if (
 				(!only_railroad && mf.CheckMask(MapFieldRoad))
@@ -583,7 +581,7 @@ bool CMap::TileBordersUnit(const Vec2i &pos, int z)
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			CMapField &mf = *Map.Field(adjacent_pos, z);
+			CMapField &mf = *CMap::Map.Field(adjacent_pos, z);
 			
 			const CUnitCache &cache = mf.UnitCache;
 			for (size_t i = 0; i != cache.size(); ++i) {
@@ -659,7 +657,7 @@ bool CMap::TileBordersTerrainIncompatibleWithTerrain(const Vec2i &pos, const CTe
 */
 bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, const CTerrainType *terrain_type, const int z)
 {
-	CMapField &mf = *Map.Field(pos, z);
+	CMapField &mf = *CMap::Map.Field(pos, z);
 	
 	const CUnitCache &cache = mf.UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
@@ -717,7 +715,7 @@ Vec2i CMap::GetSubtemplatePos(const CMapTemplate *subtemplate) const
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
-					return std::get<0>(Map.MapLayers[z]->SubtemplateAreas[i]);
+					return std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
 				}
 			}
 		}
@@ -745,7 +743,7 @@ Vec2i CMap::GetSubtemplateEndPos(const CMapTemplate *subtemplate) const
 		if (z != -1) {
 			for (size_t i = 0; i < this->MapLayers[z]->SubtemplateAreas.size(); ++i) {
 				if (subtemplate == std::get<2>(this->MapLayers[z]->SubtemplateAreas[i])) {
-					return std::get<1>(Map.MapLayers[z]->SubtemplateAreas[i]);
+					return std::get<1>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
 				}
 			}
 		}
@@ -838,7 +836,7 @@ bool CMap::IsPointAdjacentToNonSubtemplateArea(const Vec2i &pos, const int z) co
 			
 			Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 			
-			if (Map.Info.IsPointOnMap(adjacent_pos, z) && !this->IsPointInASubtemplateArea(adjacent_pos, z)) {
+			if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z) && !this->IsPointInASubtemplateArea(adjacent_pos, z)) {
 				return true;
 			}
 		}
@@ -868,16 +866,16 @@ void CMap::SetCurrentPlane(CPlane *plane)
 	
 	int map_layer = -1;
 	
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		if (Map.MapLayers[z]->Plane == plane && Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		if (CMap::Map.MapLayers[z]->Plane == plane && CMap::Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
 			map_layer = z;
 			break;
 		}
 	}
 	
 	if (map_layer == -1) {
-		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-			if (Map.MapLayers[z]->Plane == plane) {
+		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+			if (CMap::Map.MapLayers[z]->Plane == plane) {
 				map_layer = z;
 				break;
 			}
@@ -897,16 +895,16 @@ void CMap::SetCurrentWorld(CWorld *world)
 	
 	int map_layer = -1;
 	
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		if (Map.MapLayers[z]->World == world && Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		if (CMap::Map.MapLayers[z]->World == world && CMap::Map.MapLayers[z]->SurfaceLayer == this->GetCurrentSurfaceLayer()) {
 			map_layer = z;
 			break;
 		}
 	}
 	
 	if (map_layer == -1) {
-		for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-			if (Map.MapLayers[z]->World == world) {
+		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+			if (CMap::Map.MapLayers[z]->World == world) {
 				map_layer = z;
 				break;
 			}
@@ -926,8 +924,8 @@ void CMap::SetCurrentSurfaceLayer(int surface_layer)
 	
 	int map_layer = -1;
 	
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		if (Map.MapLayers[z]->Plane == this->GetCurrentPlane() && Map.MapLayers[z]->World == this->GetCurrentWorld() && Map.MapLayers[z]->SurfaceLayer == surface_layer) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		if (CMap::Map.MapLayers[z]->Plane == this->GetCurrentPlane() && CMap::Map.MapLayers[z]->World == this->GetCurrentWorld() && CMap::Map.MapLayers[z]->SurfaceLayer == surface_layer) {
 			map_layer = z;
 			break;
 		}
@@ -976,8 +974,8 @@ PixelSize CMap::GetCurrentPixelTileSize() const
 
 PixelSize CMap::GetMapLayerPixelTileSize(int map_layer) const
 {
-	if (map_layer >= 0 && map_layer < (int) Map.MapLayers.size()) {
-		return Map.MapLayers[map_layer]->PixelTileSize;
+	if (map_layer >= 0 && map_layer < (int) CMap::Map.MapLayers.size()) {
+		return CMap::Map.MapLayers[map_layer]->PixelTileSize;
 	} else {
 		return PixelSize(32, 32);
 	}
@@ -994,7 +992,7 @@ PixelSize CMap::GetMapLayerPixelTileSize(int map_layer) const
 */
 bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z)
 {
-	return Map.Info.IsPointOnMap(pos, z) && CanMoveToMask(pos, mask, z);
+	return CMap::Map.Info.IsPointOnMap(pos, z) && CanMoveToMask(pos, mask, z);
 }
 
 /**
@@ -1012,20 +1010,20 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
 {
 	const int mask = type.MovementMask;
 	//Wyrmgus start
-//	unsigned int index = pos.y * Map.Info.MapWidth;
-	unsigned int index = pos.y * Map.Info.MapWidths[z];
+//	unsigned int index = pos.y * CMap::Map.Info.MapWidth;
+	unsigned int index = pos.y * CMap::Map.Info.MapWidths[z];
 	//Wyrmgus end
 
 	for (int addy = 0; addy < type.TileSize.y; ++addy) {
 		for (int addx = 0; addx < type.TileSize.x; ++addx) {
-			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false
-				|| Map.Field(pos.x + addx + index, z)->CheckMask(mask) == true) {
+			if (CMap::Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false
+				|| CMap::Map.Field(pos.x + addx + index, z)->CheckMask(mask) == true) {
 				return false;
 			}
 		}
 		//Wyrmgus start
-//		index += Map.Info.MapWidth;
-		index += Map.Info.MapWidths[z];
+//		index += CMap::Map.Info.MapWidth;
+		index += CMap::Map.Info.MapWidths[z];
 		//Wyrmgus end
 	}
 	return true;
@@ -1063,26 +1061,26 @@ void PreprocessMap()
 		
 	//Wyrmgus start
 	/*
-	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
-		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
-			CMapField &mf = *Map.Field(ix, iy);
+	for (int ix = 0; ix < CMap::Map.Info.MapWidth; ++ix) {
+		for (int iy = 0; iy < CMap::Map.Info.MapHeight; ++iy) {
+			CMapField &mf = *CMap::Map.Field(ix, iy);
 			mf.playerInfo.SeenTile = mf.getGraphicTile();
 		}
 	}
 	*/
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		for (int ix = 0; ix < Map.Info.MapWidths[z]; ++ix) {
-			for (int iy = 0; iy < Map.Info.MapHeights[z]; ++iy) {
-				CMapField &mf = *Map.Field(ix, iy, z);
-				Map.CalculateTileTransitions(Vec2i(ix, iy), false, z);
-				Map.CalculateTileTransitions(Vec2i(ix, iy), true, z);
-				Map.CalculateTileLandmass(Vec2i(ix, iy), z);
-				Map.CalculateTileOwnership(Vec2i(ix, iy), z);
-				Map.CalculateTileTerrainFeature(Vec2i(ix, iy), z);
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		for (int ix = 0; ix < CMap::Map.Info.MapWidths[z]; ++ix) {
+			for (int iy = 0; iy < CMap::Map.Info.MapHeights[z]; ++iy) {
+				CMapField &mf = *CMap::Map.Field(ix, iy, z);
+				CMap::Map.CalculateTileTransitions(Vec2i(ix, iy), false, z);
+				CMap::Map.CalculateTileTransitions(Vec2i(ix, iy), true, z);
+				CMap::Map.CalculateTileLandmass(Vec2i(ix, iy), z);
+				CMap::Map.CalculateTileOwnership(Vec2i(ix, iy), z);
+				CMap::Map.CalculateTileTerrainFeature(Vec2i(ix, iy), z);
 				mf.UpdateSeenTile();
 				UI.Minimap.UpdateXY(Vec2i(ix, iy), z);
 				if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-					Map.MarkSeenTile(mf, z);
+					CMap::Map.MarkSeenTile(mf, z);
 				}
 			}
 		}
@@ -1091,10 +1089,10 @@ void PreprocessMap()
 	//Wyrmgus start
 	/*
 	// it is required for fixing the wood that all tiles are marked as seen!
-	if (Map.Tileset->TileTypeTable.empty() == false) {
+	if (CMap::Map.Tileset->TileTypeTable.empty() == false) {
 		Vec2i pos;
-		for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
-			for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {
+		for (pos.x = 0; pos.x < CMap::Map.Info.MapWidth; ++pos.x) {
+			for (pos.y = 0; pos.y < CMap::Map.Info.MapHeight; ++pos.y) {
 				MapFixWallTile(pos);
 				MapFixSeenWallTile(pos);
 			}
@@ -1110,8 +1108,8 @@ int GetMapLayer(const std::string &plane_ident, const std::string &world_ident, 
 	CPlane *plane = CPlane::GetPlane(plane_ident, false);
 	CWorld *world = CWorld::GetWorld(world_ident, false);
 
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		if (Map.MapLayers[z]->Plane == plane && Map.MapLayers[z]->World == world && Map.MapLayers[z]->SurfaceLayer == surface_layer) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		if (CMap::Map.MapLayers[z]->Plane == plane && CMap::Map.MapLayers[z]->World == world && CMap::Map.MapLayers[z]->SurfaceLayer == surface_layer) {
 			return z;
 		}
 	}
@@ -1127,10 +1125,10 @@ int GetSubtemplateStartX(const std::string &subtemplate_ident)
 		return -1;
 	}
 
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		for (size_t i = 0; i < Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
-			Vec2i min_pos = std::get<0>(Map.MapLayers[z]->SubtemplateAreas[i]);
-			if (subtemplate == std::get<2>(Map.MapLayers[z]->SubtemplateAreas[i])) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		for (size_t i = 0; i < CMap::Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
+			Vec2i min_pos = std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
+			if (subtemplate == std::get<2>(CMap::Map.MapLayers[z]->SubtemplateAreas[i])) {
 				return min_pos.x;
 			}
 		}
@@ -1147,10 +1145,10 @@ int GetSubtemplateStartY(const std::string &subtemplate_ident)
 		return -1;
 	}
 
-	for (size_t z = 0; z < Map.MapLayers.size(); ++z) {
-		for (size_t i = 0; i < Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
-			Vec2i min_pos = std::get<0>(Map.MapLayers[z]->SubtemplateAreas[i]);
-			if (subtemplate == std::get<2>(Map.MapLayers[z]->SubtemplateAreas[i])) {
+	for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
+		for (size_t i = 0; i < CMap::Map.MapLayers[z]->SubtemplateAreas.size(); ++i) {
+			Vec2i min_pos = std::get<0>(CMap::Map.MapLayers[z]->SubtemplateAreas[i]);
+			if (subtemplate == std::get<2>(CMap::Map.MapLayers[z]->SubtemplateAreas[i])) {
 				return min_pos.y;
 			}
 		}
@@ -1178,16 +1176,16 @@ void ChangeToPreviousMapLayer()
 */
 void ChangeCurrentMapLayer(const int z)
 {
-	if (z < 0 || z >= (int) Map.MapLayers.size() || UI.CurrentMapLayer->ID == z) {
+	if (z < 0 || z >= (int) CMap::Map.MapLayers.size() || UI.CurrentMapLayer->ID == z) {
 		return;
 	}
 	
-	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / UI.CurrentMapLayer->GetWidth(), UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / UI.CurrentMapLayer->GetHeight());
+	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * CMap::Map.Info.MapWidths[z] / UI.CurrentMapLayer->GetWidth(), UI.SelectedViewport->MapPos.y * CMap::Map.Info.MapHeights[z] / UI.CurrentMapLayer->GetHeight());
 	
 	UI.PreviousMapLayer = UI.CurrentMapLayer;
-	UI.CurrentMapLayer = Map.MapLayers[z];
+	UI.CurrentMapLayer = CMap::Map.MapLayers[z];
 	UI.Minimap.UpdateCache = true;
-	UI.SelectedViewport->Set(new_viewport_map_pos, Map.GetCurrentPixelTileSize() / 2);
+	UI.SelectedViewport->Set(new_viewport_map_pos, CMap::Map.GetCurrentPixelTileSize() / 2);
 	UpdateSurfaceLayerButtons();
 }
 
@@ -1200,16 +1198,16 @@ void ChangeCurrentMapLayer(const int z)
 void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 {
 	if (time_of_day_ident.empty()) {
-		Map.MapLayers[z]->SetTimeOfDay(nullptr);
-		Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
+		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
+		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
 	} else {
-		CTimeOfDaySchedule *schedule = Map.MapLayers[z]->TimeOfDaySchedule;
+		CTimeOfDaySchedule *schedule = CMap::Map.MapLayers[z]->TimeOfDaySchedule;
 		if (schedule) {
 			for (size_t i = 0; i < schedule->ScheduledTimesOfDay.size(); ++i) {
 				CScheduledTimeOfDay *time_of_day = schedule->ScheduledTimesOfDay[i];
 				if (time_of_day->TimeOfDay->Ident == time_of_day_ident)  {
-					Map.MapLayers[z]->SetTimeOfDay(time_of_day);
-					Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->GetHours(Map.MapLayers[z]->GetSeason());
+					CMap::Map.MapLayers[z]->SetTimeOfDay(time_of_day);
+					CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = time_of_day->GetHours(CMap::Map.MapLayers[z]->GetSeason());
 					break;
 				}
 			}
@@ -1226,15 +1224,15 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, int z)
 {
 	if (time_of_day_schedule_ident.empty()) {
-		Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
-		Map.MapLayers[z]->SetTimeOfDay(nullptr);
-		Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
+		CMap::Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
+		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
+		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
 	} else {
 		CTimeOfDaySchedule *schedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(time_of_day_schedule_ident);
 		if (schedule) {
-			Map.MapLayers[z]->TimeOfDaySchedule = schedule;
-			Map.MapLayers[z]->SetTimeOfDay(schedule->ScheduledTimesOfDay.front());
-			Map.MapLayers[z]->RemainingTimeOfDayHours = Map.MapLayers[z]->TimeOfDay->GetHours(Map.MapLayers[z]->GetSeason());
+			CMap::Map.MapLayers[z]->TimeOfDaySchedule = schedule;
+			CMap::Map.MapLayers[z]->SetTimeOfDay(schedule->ScheduledTimesOfDay.front());
+			CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = CMap::Map.MapLayers[z]->TimeOfDay->GetHours(CMap::Map.MapLayers[z]->GetSeason());
 		}
 	}
 }
@@ -1248,16 +1246,16 @@ void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, int z)
 void SetSeason(const std::string &season_ident, int z)
 {
 	if (season_ident.empty()) {
-		Map.MapLayers[z]->SetSeason(nullptr);
-		Map.MapLayers[z]->RemainingSeasonHours = 0;
+		CMap::Map.MapLayers[z]->SetSeason(nullptr);
+		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
 	} else {
-		CSeasonSchedule *schedule = Map.MapLayers[z]->SeasonSchedule;
+		CSeasonSchedule *schedule = CMap::Map.MapLayers[z]->SeasonSchedule;
 		if (schedule) {
 			for (size_t i = 0; i < schedule->ScheduledSeasons.size(); ++i) {
 				CScheduledSeason *season = schedule->ScheduledSeasons[i];
 				if (season->Season->Ident == season_ident)  {
-					Map.MapLayers[z]->SetSeason(season);
-					Map.MapLayers[z]->RemainingSeasonHours = season->Hours;
+					CMap::Map.MapLayers[z]->SetSeason(season);
+					CMap::Map.MapLayers[z]->RemainingSeasonHours = season->Hours;
 					break;
 				}
 			}
@@ -1274,15 +1272,15 @@ void SetSeason(const std::string &season_ident, int z)
 void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 {
 	if (season_schedule_ident.empty()) {
-		Map.MapLayers[z]->SeasonSchedule = nullptr;
-		Map.MapLayers[z]->SetSeason(nullptr);
-		Map.MapLayers[z]->RemainingSeasonHours = 0;
+		CMap::Map.MapLayers[z]->SeasonSchedule = nullptr;
+		CMap::Map.MapLayers[z]->SetSeason(nullptr);
+		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
 	} else {
 		CSeasonSchedule *schedule = CSeasonSchedule::GetSeasonSchedule(season_schedule_ident);
 		if (schedule) {
-			Map.MapLayers[z]->SeasonSchedule = schedule;
-			Map.MapLayers[z]->SetSeason(schedule->ScheduledSeasons.front());
-			Map.MapLayers[z]->RemainingSeasonHours = Map.MapLayers[z]->Season->Hours;
+			CMap::Map.MapLayers[z]->SeasonSchedule = schedule;
+			CMap::Map.MapLayers[z]->SetSeason(schedule->ScheduledSeasons.front());
+			CMap::Map.MapLayers[z]->RemainingSeasonHours = CMap::Map.MapLayers[z]->Season->Hours;
 		}
 	}
 }
@@ -1756,7 +1754,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 					
 					if (terrain->Overlay && adjacent_mf.OverlayTerrain != terrain && Editor.Running == EditorNotRunning) {
@@ -1777,14 +1775,14 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 	
 	if (terrain->Overlay) {
 		if ((terrain->Flags & MapFieldUnpassable) || (old_terrain && (old_terrain->Flags & MapFieldUnpassable))) {
-			Map.CalculateTileOwnership(pos, z);
+			CMap::Map.CalculateTileOwnership(pos, z);
 			
 			for (int x_offset = -16; x_offset <= 16; ++x_offset) {
 				for (int y_offset = -16; y_offset <= 16; ++y_offset) {
 					if (x_offset != 0 || y_offset != 0) {
 						Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-						if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-							Map.CalculateTileOwnership(adjacent_pos, z);
+						if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
+							CMap::Map.CalculateTileOwnership(adjacent_pos, z);
 						}
 					}
 				}
@@ -1820,7 +1818,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 					
 					this->CalculateTileTransitions(adjacent_pos, true, z);
@@ -1835,14 +1833,14 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	}
 	
 	if (old_terrain->Flags & MapFieldUnpassable) {
-		Map.CalculateTileOwnership(pos, z);
+		CMap::Map.CalculateTileOwnership(pos, z);
 			
 		for (int x_offset = -16; x_offset <= 16; ++x_offset) {
 			for (int y_offset = -16; y_offset <= 16; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-						Map.CalculateTileOwnership(adjacent_pos, z);
+					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
+						CMap::Map.CalculateTileOwnership(adjacent_pos, z);
 					}
 				}
 			}
@@ -1901,7 +1899,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 					
 					if (adjacent_mf.OverlayTerrain != mf.OverlayTerrain) {
@@ -1920,14 +1918,14 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	}
 	
 	if (mf.OverlayTerrain->Flags & MapFieldUnpassable) {
-		Map.CalculateTileOwnership(pos, z);
+		CMap::Map.CalculateTileOwnership(pos, z);
 			
 		for (int x_offset = -16; x_offset <= 16; ++x_offset) {
 			for (int y_offset = -16; y_offset <= 16; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-						Map.CalculateTileOwnership(adjacent_pos, z);
+					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
+						CMap::Map.CalculateTileOwnership(adjacent_pos, z);
 					}
 				}
 			}
@@ -2082,7 +2080,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay, z);
 					if (overlay && adjacent_terrain && this->Field(adjacent_pos, z)->OverlayTerrainDestroyed) {
 						adjacent_terrain = nullptr;
@@ -2267,7 +2265,7 @@ void CMap::CalculateTileTerrainFeature(const Vec2i &pos, int z)
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if ((x_offset != 0 || y_offset != 0) && !(x_offset != 0 && y_offset != 0)) { //only directly adjacent tiles (no diagonal ones, and not the same tile)
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 
 					if (adjacent_mf.TerrainFeature && adjacent_mf.TerrainFeature->TerrainType == GetTileTopTerrain(pos, false, z)) {
@@ -2360,7 +2358,7 @@ void CMap::CalculateTileOwnership(const Vec2i &pos, int z)
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 							
 						this->CalculateTileOwnershipTransition(adjacent_pos, z);
@@ -2395,7 +2393,7 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+				if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 					if (adjacent_mf.Owner != mf.Owner) {
 						adjacent_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
@@ -2408,8 +2406,8 @@ void CMap::CalculateTileOwnershipTransition(const Vec2i &pos, int z)
 	int transition_type = GetTransitionType(adjacent_directions, true);
 	
 	if (transition_type != -1) {
-		if (Map.BorderTerrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-			mf.OwnershipBorderTile = Map.BorderTerrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(Map.BorderTerrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())];
+		if (CMap::Map.BorderTerrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
+			mf.OwnershipBorderTile = CMap::Map.BorderTerrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(CMap::Map.BorderTerrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())];
 		}
 	}
 }
@@ -2972,7 +2970,7 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+					if (CMap::Map.Info.IsPointOnMap(adjacent_pos, z)) {
 						CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						
 						if (adjacent_mf.OverlayTerrain == mf.OverlayTerrain && !adjacent_mf.OverlayTerrainDestroyed && !this->CurrentTerrainCanBeAt(adjacent_pos, true, z)) {
@@ -3053,12 +3051,10 @@ void LoadStratagusMapInfo(const std::string &mapname)
 	// Set the default map setup by replacing .smp with .sms
 	size_t loc = mapname.find(".smp");
 	if (loc != std::string::npos) {
-		Map.Info.Filename = mapname;
-		Map.Info.Filename.replace(loc, 4, ".sms");
+		CMap::Map.Info.Filename = mapname;
+		CMap::Map.Info.Filename.replace(loc, 4, ".sms");
 	}
 
 	const std::string filename = LibraryFileName(mapname.c_str());
 	LuaLoadFile(filename);
 }
-
-//@}

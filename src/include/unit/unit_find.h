@@ -310,11 +310,11 @@ template <typename Pred>
 void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, Pred pred, bool circle = false)
 //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(ltPos, z));
-	Assert(Map.Info.IsPointOnMap(rbPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(ltPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(rbPos, z));
 	Assert(units.empty());
 	
-	const CMapLayer *map_layer = Map.MapLayers[z];
+	const CMapLayer *map_layer = CMap::Map.MapLayers[z];
 	
 	//Wyrmgus start
 	double middle_x;
@@ -388,9 +388,9 @@ void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units,
 	Vec2i maxPos = rbPos;
 
 	//Wyrmgus start
-//	Map.FixSelectionArea(minPos, maxPos);
+//	CMap::Map.FixSelectionArea(minPos, maxPos);
 //	SelectFixed(minPos, maxPos, units, pred);
-	Map.FixSelectionArea(minPos, maxPos, z);
+	CMap::Map.FixSelectionArea(minPos, maxPos, z);
 	SelectFixed(minPos, maxPos, units, z, pred, circle);
 	//Wyrmgus end
 }
@@ -419,12 +419,12 @@ inline void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> 
 template <typename Pred>
 CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 {
-	Assert(Map.Info.IsPointOnMap(ltPos, z));
-	Assert(Map.Info.IsPointOnMap(rbPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(ltPos, z));
+	Assert(CMap::Map.Info.IsPointOnMap(rbPos, z));
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
-			const CMapField &mf = *Map.Field(posIt, z);
+			const CMapField &mf = *CMap::Map.Field(posIt, z);
 			const CUnitCache &cache = mf.UnitCache;
 
 			CUnitCache::const_iterator it = std::find_if(cache.begin(), cache.end(), pred);
@@ -442,7 +442,7 @@ CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, int z, Pred pred)
 	Vec2i minPos = ltPos;
 	Vec2i maxPos = rbPos;
 
-	Map.FixSelectionArea(minPos, maxPos, z);
+	CMap::Map.FixSelectionArea(minPos, maxPos, z);
 	return FindUnit_IfFixed(minPos, maxPos, z, pred);
 }
 

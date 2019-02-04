@@ -39,7 +39,7 @@
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
-#include "resource.h"
+#include "include/resource.h"
 
 #include <vector>
 

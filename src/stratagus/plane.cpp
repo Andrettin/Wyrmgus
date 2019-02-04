@@ -27,15 +27,13 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
 
-#include "plane.h"
+#include "include/plane.h"
 
 #include "config.h"
 #include "religion/deity_domain.h"
@@ -156,5 +154,3 @@ void CPlane::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 }
-
-//@}

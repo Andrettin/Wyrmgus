@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -62,7 +60,7 @@ bool IsBuiltUnit::operator()(const CUnit *unit) const
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 {
-	CUnitCache &cache = Map.Field(pos, z)->UnitCache;
+	CUnitCache &cache = CMap::Map.Field(pos, z)->UnitCache;
 
 	for (CUnitCache::iterator it = cache.begin(); it != cache.end(); ++it) {
 		CUnit *unit = *it;
@@ -76,7 +74,7 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 
 VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
+	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
@@ -124,20 +122,20 @@ private:
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
+	if (!CMap::Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 		return VisitResult_DeadEnd;
 	}
 	
 	//Wyrmgus start
-	if (Map.Field(pos, z)->Owner != -1 && Map.Field(pos, z)->Owner != player.Index && !Players[Map.Field(pos, z)->Owner].HasNeutralFactionType() && !player.HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != player.Index && !Players[CMap::Map.Field(pos, z)->Owner].HasNeutralFactionType() && !player.HasNeutralFactionType()) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
 	
 	// Look if found what was required.
 	//Wyrmgus start
-//	if (Map.Field(pos)->CheckMask(resmask)) {
-	if ((!landmass || Map.GetTileLandmass(pos, z) == landmass) && (!resource || Map.Field(pos, z)->GetResource() == resource)) {
+//	if (CMap::Map.Field(pos)->CheckMask(resmask)) {
+	if ((!landmass || CMap::Map.GetTileLandmass(pos, z) == landmass) && (!resource || CMap::Map.Field(pos, z)->GetResource() == resource)) {
 	//Wyrmgus end
 		if (resPos) {
 			*resPos = pos;
@@ -181,7 +179,7 @@ bool FindTerrainType(int movemask, int resource, int range,
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(CMap::Map.Info.MapWidths[z], CMap::Map.Info.MapHeights[z]);
 	terrainTraversal.Init();
 
 	terrainTraversal.PushPos(startPos);
@@ -592,14 +590,14 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	//Wyrmgus start
-//	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
+//	if (!worker.Player->AiEnabled && !CMap::Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
 	if (!worker.MapLayer->Field(pos)->playerInfo.IsTeamExplored(*worker.Player) && !ignore_exploration) {
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 
 	//Wyrmgus start
-//	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
+//	CUnit *mine = CMap::Map.Field(pos)->UnitCache.find(res_finder);
 	CUnit *mine = worker.MapLayer->Field(pos)->UnitCache.find(res_finder);
 	
 	if (worker.MapLayer->Field(pos)->Owner != -1 && worker.MapLayer->Field(pos)->Owner != worker.Player->Index && !Players[worker.MapLayer->Field(pos)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
@@ -666,7 +664,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
-//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+//	terrainTraversal.SetSize(CMap::Map.Info.MapWidth, CMap::Map.Info.MapHeight);
 	terrainTraversal.SetSize(startUnit.MapLayer->GetWidth(), startUnit.MapLayer->GetHeight());
 	if (unit.Type->BoolFlag[RAIL_INDEX].value) {
 		terrainTraversal.SetDiagonalAllowed(false);
@@ -837,10 +835,7 @@ void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::ve
 CUnit *UnitOnMapTile(const unsigned int index, unsigned int type, int z)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	return Map.Field(index)->UnitCache.find(CUnitTypeFinder((UnitTypeType)type));
-	return Map.Field(index, z)->UnitCache.find(CUnitTypeFinder((UnitTypeType)type));
-	//Wyrmgus end
+	return CMap::Map.Field(index, z)->UnitCache.find(CUnitTypeFinder((UnitTypeType)type));
 }
 
 /**
@@ -856,10 +851,7 @@ CUnit *UnitOnMapTile(const unsigned int index, unsigned int type, int z)
 CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type, int z)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	return UnitOnMapTile(Map.getIndex(pos), type);
-	return UnitOnMapTile(Map.getIndex(pos, z), type, z);
-	//Wyrmgus end
+	return UnitOnMapTile(CMap::Map.getIndex(pos, z), type, z);
 }
 
 /**
@@ -915,8 +907,8 @@ CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool only_harvestabl
 //Wyrmgus end
 {
 	//Wyrmgus start
-//	return Map.Field(pos)->UnitCache.find(CResourceFinder(resource, mine_on_top));
-	return Map.Field(pos, z)->UnitCache.find(CResourceFinder(resource, only_harvestable, false, only_same));
+//	return CMap::Map.Field(pos)->UnitCache.find(CResourceFinder(resource, mine_on_top));
+	return CMap::Map.Field(pos, z)->UnitCache.find(CResourceFinder(resource, only_harvestable, false, only_same));
 	//Wyrmgus end
 }
 
@@ -945,10 +937,7 @@ private:
 CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource, int z)
 //Wyrmgus end
 {
-	//Wyrmgus start
-//	return Map.Field(pos)->UnitCache.find(IsADepositForResource(resource));
-	return Map.Field(pos, z)->UnitCache.find(IsADepositForResource(resource));
-	//Wyrmgus end
+	return CMap::Map.Field(pos, z)->UnitCache.find(IsADepositForResource(resource));
 }
 
 /*----------------------------------------------------------------------------
@@ -1021,7 +1010,7 @@ private:
 		}
 
 		//Wyrmgus start
-		if (Map.IsLayerUnderground(attacker->MapLayer->ID) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID)) {
+		if (CMap::Map.IsLayerUnderground(attacker->MapLayer->ID) && attackrange > 1 && !CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID)) {
 			return INT_MAX;
 		}
 		//Wyrmgus end
@@ -1267,7 +1256,7 @@ public:
 //				if (d <= attackrange ||
 //					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 				if ((d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!Map.IsLayerUnderground(attacker->MapLayer->ID) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID))) {
+					(d <= range && UnitReachable(*attacker, *dest, attackrange, attacker->GetReactionRange() * 8))) && (!CMap::Map.IsLayerUnderground(attacker->MapLayer->ID) || attackrange <= 1 || CheckObstaclesBetweenTiles(attacker->tilePos, dest->tilePos, MapFieldAirUnpassable, attacker->MapLayer->ID))) {
 				//Wyrmgus end
 					++enemy_count;
 				} else {
@@ -1478,12 +1467,12 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 			pos.y += sign.y;
 		}
 
-		if (Map.Info.IsPointOnMap(pos, z) == false) {
+		if (CMap::Map.Info.IsPointOnMap(pos, z) == false) {
 			DebugPrint("outside of map\n");
 		//Wyrmgus start
-//		} else if (Map.Field(pos)->Flags & flags) {
+//		} else if (CMap::Map.Field(pos)->Flags & flags) {
 		} else if (
-			((Map.Field(pos, z)->Flags & flags) || (player != -1 && Map.Field(pos, z)->Owner != player && Map.Field(pos, z)->Owner != -1))
+			((CMap::Map.Field(pos, z)->Flags & flags) || (player != -1 && CMap::Map.Field(pos, z)->Owner != player && CMap::Map.Field(pos, z)->Owner != -1))
 			&& pos != goalPos
 			&& (abs(pos.x - goalPos.x) > max_difference || abs(pos.y - goalPos.y) > max_difference)
 		) { // the goal's tile itself shouldn't be checked for an obstacle
@@ -1682,5 +1671,3 @@ bool CheckPathwayConnection(const CUnit &src_unit, const CUnit &dst_unit, unsign
 	
 	return result;
 }
-
-//@}

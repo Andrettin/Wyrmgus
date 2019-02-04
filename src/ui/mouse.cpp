@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #define ICON_SIZE_X (UI.ButtonPanel.Buttons[0].Style->Width)
 #define ICON_SIZE_Y (UI.ButtonPanel.Buttons[0].Style->Height)
 
@@ -61,7 +59,7 @@
 #include "menus.h"
 #include "missile.h"
 #include "network.h"
-#include "plane.h"
+#include "include/plane.h"
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -655,18 +653,18 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	//Wyrmgus start
 	/*
-	if (Map.WallOnMap(pos)) {
-		if (unit.Player->Race == PlayerRaceHuman && Map.OrcWallOnMap(pos)) {
+	if (CMap::Map.WallOnMap(pos)) {
+		if (unit.Player->Race == PlayerRaceHuman && CMap::Map.OrcWallOnMap(pos)) {
 			SendCommandAttack(unit, pos, NoUnitP, flush);
 			return;
 		}
-		if (unit.Player->Race == PlayerRaceOrc && Map.HumanWallOnMap(pos)) {
+		if (unit.Player->Race == PlayerRaceOrc && CMap::Map.HumanWallOnMap(pos)) {
 			SendCommandAttack(unit, pos, NoUnitP, flush);
 			return;
 		}
 	}
 	*/
-	if (Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->Owner == -1 || ThisPlayer->IsEnemy(Players[UI.CurrentMapLayer->Field(pos)->Owner]))) {
+	if (CMap::Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->Owner == -1 || ThisPlayer->IsEnemy(Players[UI.CurrentMapLayer->Field(pos)->Owner]))) {
 		if (!UI.CurrentMapLayer->Field(pos)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 			SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
 			return;
@@ -982,7 +980,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	if (Selected.empty()) {
 		return;
 	}
-	const Vec2i pos = Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID);
+	const Vec2i pos = CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID);
 	CUnit *dest;            // unit under the cursor if any.
 
 	if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
@@ -1415,7 +1413,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		RestrictCursorToMinimap();
-		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
+		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
 		return;
 	}
 
@@ -1608,7 +1606,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			if (CursorOn == CursorOnMinimap && (MouseButtons & RightButton)) {
 				const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 				//  Minimap move viewpoint
-				UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
+				UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -1647,7 +1645,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		//  Minimap move viewpoint
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
-		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
+		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorPos, UI.CurrentMapLayer));
 		CursorStartScreenPos = CursorScreenPos;
 		return;
 	}
@@ -2302,7 +2300,7 @@ static void UISelectStateButtonDown(unsigned)
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
-			SendCommand(Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID));
+			SendCommand(CMap::Map.MapPixelPosToTilePos(mapPixelPos, UI.CurrentMapLayer->ID));
 		}
 		return;
 	}
@@ -2314,7 +2312,7 @@ static void UISelectStateButtonDown(unsigned)
 		const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		if (MouseButtons & LeftButton) {
-			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
+			const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
 
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
@@ -2328,7 +2326,7 @@ static void UISelectStateButtonDown(unsigned)
 			}
 			SendCommand(cursorTilePos);
 		} else {
-			UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer));
+			UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer));
 		}
 		return;
 	}
@@ -2405,7 +2403,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 					CancelBuildingMode();
 				}
 			} else {
-				if (UI.CurrentMapLayer->ID != ThisPlayer->StartMapLayer && (UI.CurrentMapLayer->Plane != Map.MapLayers[ThisPlayer->StartMapLayer]->Plane || UI.CurrentMapLayer->World != Map.MapLayers[ThisPlayer->StartMapLayer]->World)) {
+				if (UI.CurrentMapLayer->ID != ThisPlayer->StartMapLayer && (UI.CurrentMapLayer->Plane != CMap::Map.MapLayers[ThisPlayer->StartMapLayer]->Plane || UI.CurrentMapLayer->World != CMap::Map.MapLayers[ThisPlayer->StartMapLayer]->World)) {
 					ThisPlayer->Notify("%s", _("Cannot build in another plane or world"));
 				}
 				PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
@@ -2466,10 +2464,10 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 	const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 	if (MouseButtons & LeftButton) { // enter move mini-mode
-		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer));
+		UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer));
 	} else if (MouseButtons & RightButton) {
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
-			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
+			const PixelPos mapPixelPos = CMap::Map.TilePosToMapPixelPos_Center(cursorTilePos, UI.CurrentMapLayer);
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, UI.CurrentMapLayer->ID);
 			}
@@ -3013,7 +3011,7 @@ void UIHandleButtonUp(unsigned button)
 			if (button.Clicked) {
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-					Map.SetCurrentPlane(CPlane::Planes[i]);
+					CMap::Map.SetCurrentPlane(CPlane::Planes[i]);
 					if (button.Callback) {
 						button.Callback->action("");
 					}
@@ -3031,7 +3029,7 @@ void UIHandleButtonUp(unsigned button)
 			if (button.Clicked) {
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-					Map.SetCurrentWorld(CWorld::Worlds[i]);
+					CMap::Map.SetCurrentWorld(CWorld::Worlds[i]);
 					if (button.Callback) {
 						button.Callback->action("");
 					}
@@ -3049,7 +3047,7 @@ void UIHandleButtonUp(unsigned button)
 			if (button.Clicked) {
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
-					Map.SetCurrentSurfaceLayer(i);
+					CMap::Map.SetCurrentSurfaceLayer(i);
 					if (button.Callback) {
 						button.Callback->action("");
 					}
@@ -3384,4 +3382,3 @@ static void HandlePieMenuMouseSelection()
 		UIHandleMouseMove(CursorScreenPos); // recompute CursorOn and company
 	}
 }
-//@}

@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "color.h"
+#include "include/color.h"
 #include "data_type.h"
 #include "icons.h"
 #include "missileconfig.h"

@@ -42,7 +42,7 @@
 
 //Wyrmgus start
 #include "character.h" // because of "MaxCharacterTitles"
-#include "color.h"
+#include "include/color.h"
 //Wyrmgus end
 #include "icons.h"
 //Wyrmgus start

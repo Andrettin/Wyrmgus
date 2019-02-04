@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_areabombardment.h"
@@ -100,16 +98,16 @@
 			// find new destination in the map
 			dpos.x = goalPos.x + SyncRand() % 5 - 2;
 			dpos.y = goalPos.y + SyncRand() % 5 - 2;
-		} while (!Map.Info.IsPointOnMap(dpos, z));
+		} while (!CMap::Map.Info.IsPointOnMap(dpos, z));
 
-		const PixelPos dest = Map.TilePosToMapPixelPos_Center(dpos, Map.MapLayers[z]);
+		const PixelPos dest = CMap::Map.TilePosToMapPixelPos_Center(dpos, CMap::Map.MapLayers[z]);
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
 			::Missile *mis = MakeMissile(*missile, start, dest, z);
 			if (mis->Type->BlizzardSpeed) {
-				mis->Delay = i * mis->Type->Sleep * 2 * Map.GetMapLayerPixelTileSize(mis->MapLayer).x / mis->Type->BlizzardSpeed;
+				mis->Delay = i * mis->Type->Sleep * 2 * CMap::Map.GetMapLayerPixelTileSize(mis->MapLayer).x / mis->Type->BlizzardSpeed;
 			} else if (mis->Type->Speed) {
-				mis->Delay = i * mis->Type->Sleep * 2 * Map.GetMapLayerPixelTileSize(mis->MapLayer).x / mis->Type->Speed;
+				mis->Delay = i * mis->Type->Sleep * 2 * CMap::Map.GetMapLayerPixelTileSize(mis->MapLayer).x / mis->Type->Speed;
 			} else {
 				mis->Delay = i * mis->Type->Sleep * mis->Type->G->NumFrames;
 			}
@@ -121,5 +119,3 @@
 	}
 	return 1;
 }
-
-//@}

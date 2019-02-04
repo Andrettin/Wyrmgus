@@ -37,7 +37,7 @@
 
 #include "civilization.h"
 #include "config.h"
-#include "plane.h"
+#include "include/plane.h"
 #include "player.h"
 #include "province.h"
 #include "religion/deity_domain.h"

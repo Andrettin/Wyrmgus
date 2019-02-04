@@ -231,12 +231,11 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-/*
 void CCampaign::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_name"), &CCampaign::GetName);
+	ClassDB::bind_method(D_METHOD("get_description"), &CCampaign::GetDescription);
 }
-*/
 
 /**
 **	@brief	Set the current campaign

@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_areaadjustvital.h"
@@ -88,7 +86,7 @@
 		// if (!PassCondition(caster, spell, target, goalPos) {
 		//Wyrmgus start
 //		if (!CanCastSpell(caster, spell, target, goalPos)) {
-		if (!CanCastSpell(caster, spell, target, goalPos, Map.MapLayers[z])) {
+		if (!CanCastSpell(caster, spell, target, goalPos, CMap::Map.MapLayers[z])) {
 		//Wyrmgus end
 			continue;
 		}
@@ -114,5 +112,3 @@
 	}
 	return 0;
 }
-
-//@}
