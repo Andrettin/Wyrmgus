@@ -111,6 +111,7 @@ $using std::string;
 $using std::vector;
 
 $pfile "ai.pkg"
+$pfile "campaign.pkg"
 $pfile "editor.pkg"
 $pfile "font.pkg"
 $pfile "game.pkg"

@@ -254,14 +254,17 @@ extern PixelPos CursorScreenPos;
 //  Guichan
 //
 
-class Color
+namespace gcn
 {
-	Color(int r, int g, int b, int a = 255);
-	int r;
-	int g;
-	int b;
-	int a;
-};
+	class Color
+	{
+		Color(int r, int g, int b, int a = 255);
+		int r;
+		int g;
+		int b;
+		int a;
+	};
+}
 
 class Graphics
 {
@@ -291,19 +294,19 @@ class Widget
 	virtual void setVisible(bool visible);
 	virtual bool isVisible() const;
 
-	virtual void setBaseColor(const Color color);
-	virtual const Color &getBaseColor() const;
-	virtual void setForegroundColor(const Color color);
-	virtual const Color &getForegroundColor() const;
-	virtual void setBackgroundColor(const Color color);
-	virtual const Color &getBackgroundColor() const;
-	virtual void setDisabledColor(const Color color);
-	virtual const Color &getDisabledColor() const;
+	virtual void setBaseColor(const gcn::Color color);
+	virtual const gcn::Color &getBaseColor() const;
+	virtual void setForegroundColor(const gcn::Color color);
+	virtual const gcn::Color &getForegroundColor() const;
+	virtual void setBackgroundColor(const gcn::Color color);
+	virtual const gcn::Color &getBackgroundColor() const;
+	virtual void setDisabledColor(const gcn::Color color);
+	virtual const gcn::Color &getDisabledColor() const;
 
 	static void setGlobalFont(CFont *font);
-	virtual void setForegroundColor(const Color color);
-	virtual void setBackgroundColor(const Color color);
-	virtual void setBaseColor(const Color color);
+	virtual void setForegroundColor(const gcn::Color color);
+	virtual void setBackgroundColor(const gcn::Color color);
+	virtual void setBaseColor(const gcn::Color color);
 	virtual void setSize(int width, int height);
 	virtual void setBorderSize(int width);
 	virtual void setFont(CFont *font);
