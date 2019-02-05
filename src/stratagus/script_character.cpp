@@ -161,7 +161,7 @@ static int CclDefineCharacter(lua_State *l)
 			CCharacter *father = CCharacter::GetCharacter(father_ident);
 			if (father) {
 				if (father->Gender == MaleGender || !father->Initialized) {
-					character->Father = const_cast<CCharacter *>(&(*father));
+					character->Father = father;
 					if (!father->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the father
 						father->Children.push_back(character);
 					}
@@ -187,7 +187,7 @@ static int CclDefineCharacter(lua_State *l)
 			CCharacter *mother = CCharacter::GetCharacter(mother_ident);
 			if (mother) {
 				if (mother->Gender == FemaleGender || !mother->Initialized) {
-					character->Mother = const_cast<CCharacter *>(&(*mother));
+					character->Mother = mother;
 					if (!mother->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the mother
 						mother->Children.push_back(character);
 					}

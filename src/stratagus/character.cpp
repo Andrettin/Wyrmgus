@@ -242,6 +242,54 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->DeathDate = CDate::FromString(value);
 		} else if (key == "violent_death") {
 			this->ViolentDeath = StringToBool(value);
+		} else if (key == "father") {
+			value = FindAndReplaceString(value, "_", "-");
+			CCharacter *father = CCharacter::GetCharacter(value);
+			if (father) {
+				if (father->Gender == MaleGender || !father->Initialized) {
+					this->Father = father;
+					if (!father->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the father
+						father->Children.push_back(this);
+					}
+					// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
+					for (CCharacter *sibling : father->Children) {
+						if (sibling != this) {
+							if (!this->IsSiblingOf(sibling->Ident)) {
+								this->Siblings.push_back(sibling);
+							}
+							if (!sibling->IsSiblingOf(this->Ident)) {
+								sibling->Siblings.push_back(this);
+							}
+						}
+					}
+				} else {
+					fprintf(stderr, "Character \"%s\" set to be the biological father of \"%s\", but isn't male.\n", value.c_str(), this->Ident.c_str());
+				}
+			}
+		} else if (key == "mother") {
+			value = FindAndReplaceString(value, "_", "-");
+			CCharacter *mother = CCharacter::GetCharacter(value);
+			if (mother) {
+				if (mother->Gender == FemaleGender || !mother->Initialized) {
+					this->Mother = mother;
+					if (!mother->IsParentOf(this->Ident)) { //check whether the character has already been set as a child of the mother
+						mother->Children.push_back(this);
+					}
+					// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
+					for (CCharacter *sibling : mother->Children) {
+						if (sibling != this) {
+							if (!this->IsSiblingOf(sibling->Ident)) {
+								this->Siblings.push_back(sibling);
+							}
+							if (!sibling->IsSiblingOf(this->Ident)) {
+								sibling->Siblings.push_back(this);
+							}
+						}
+					}
+				} else {
+					fprintf(stderr, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female.\n", value.c_str(), this->Ident.c_str());
+				}
+			}
 		} else if (key == "deity") {
 			value = FindAndReplaceString(value, "_", "-");
 			CDeity *deity = CDeity::GetDeity(value);
