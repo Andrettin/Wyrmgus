@@ -60,83 +60,10 @@ include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
-set(action_SRCS
-	src/action/action_attack.cpp
-	src/action/action_board.cpp
-	src/action/action_build.cpp
-	src/action/action_built.cpp
-	src/action/action_defend.cpp
-	src/action/action_die.cpp
-	src/action/action_follow.cpp
-	src/action/action_move.cpp
-	src/action/action_pickup.cpp
-	src/action/action_patrol.cpp
-	src/action/action_repair.cpp
-	src/action/action_research.cpp
-	src/action/action_resource.cpp
-	src/action/action_spellcast.cpp
-	src/action/action_still.cpp
-	#Wyrmgus start
-	src/action/action_trade.cpp
-	#Wyrmgus end
-	src/action/action_train.cpp
-	src/action/action_unload.cpp
-	src/action/action_upgradeto.cpp
-	src/action/action_use.cpp
-	src/action/actions.cpp
-	src/action/command.cpp
-)
-source_group(action FILES ${action_SRCS})
-
-set(animation_SRCS
-	src/animation/animation.cpp
-	src/animation/animation_attack.cpp
-	src/animation/animation_die.cpp
-	src/animation/animation_exactframe.cpp
-	src/animation/animation_frame.cpp
-	src/animation/animation_goto.cpp
-	src/animation/animation_ifvar.cpp
-	src/animation/animation_label.cpp
-	src/animation/animation_luacallback.cpp
-	src/animation/animation_move.cpp
-	src/animation/animation_randomgoto.cpp
-	src/animation/animation_randomrotate.cpp
-	src/animation/animation_randomsound.cpp
-	src/animation/animation_randomwait.cpp
-	src/animation/animation_rotate.cpp
-	src/animation/animation_setplayervar.cpp
-	src/animation/animation_setvar.cpp
-	src/animation/animation_sound.cpp
-	src/animation/animation_spawnmissile.cpp
-	src/animation/animation_spawnunit.cpp
-	src/animation/animation_unbreakable.cpp
-	src/animation/animation_wait.cpp
-)
-source_group(animation FILES ${animation_SRCS})
-
-set(ai_SRCS
-	src/ai/ai_building.cpp
-	src/ai/ai.cpp
-	src/ai/ai_force.cpp
-	src/ai/ai_magic.cpp
-	src/ai/ai_plan.cpp
-	src/ai/ai_resource.cpp
-	src/ai/script_ai.cpp
-)
-source_group(ai FILES ${ai_SRCS})
-
 set(beos_SRCS
 	src/beos/beos.cpp
 )
 source_group(beos FILES ${beos_SRCS})
-
-set(editor_SRCS
-	src/editor/editloop.cpp
-	src/editor/editor.cpp
-	src/editor/edmap.cpp
-	src/editor/script_editor.cpp
-)
-source_group(editor FILES ${editor_SRCS})
 
 set(guichan_SRCS
 	src/guichan/cliprectangle.cpp
@@ -175,31 +102,6 @@ set(guichan_SRCS
 )
 source_group(guichan FILES ${guichan_SRCS})
 
-set(missile_SRCS
-	src/missile/missile.cpp
-	src/missile/missile_cliptotarget.cpp
-	src/missile/missile_continuous.cpp
-	src/missile/missile_cycleonce.cpp
-	src/missile/missile_deathcoil.cpp
-	src/missile/missile_fire.cpp
-	src/missile/missile_flameshield.cpp
-	src/missile/missile_hit.cpp
-	src/missile/missile_landmine.cpp
-	src/missile/missile_none.cpp
-	src/missile/missile_parabolic.cpp
-	src/missile/missile_pointotpointwithhit.cpp
-	src/missile/missile_pointtopoint.cpp
-	src/missile/missile_pointtopointbounce.cpp
-	src/missile/missile_pointtopointcycleonce.cpp
-	src/missile/missile_stay.cpp
-	src/missile/missile_straightfly.cpp
-	src/missile/missile_tracer.cpp
-	src/missile/missile_whirlwind.cpp
-	src/missile/missileconfig.cpp
-	src/missile/script_missile.cpp
-)
-source_group(missile FILES ${missile_SRCS})
-
 set(network_SRCS
 	src/network/commands.cpp
 	src/network/net_lowlevel.cpp
@@ -221,21 +123,6 @@ set(particle_SRCS
 )
 source_group(particle FILES ${particle_SRCS})
 
-set(pathfinder_SRCS
-	src/pathfinder/astar.cpp
-	src/pathfinder/pathfinder.cpp
-	src/pathfinder/script_pathfinder.cpp
-)
-source_group(pathfinder FILES ${pathfinder_SRCS})
-
-set(religion_SRCS
-	src/religion/deity.cpp
-	src/religion/deity_domain.cpp
-	src/religion/pantheon.cpp
-	src/religion/religion.cpp
-)
-source_group(religion FILES ${religion_SRCS})
-
 set(sound_SRCS
 	src/sound/music.cpp
 	src/sound/ogg.cpp
@@ -248,98 +135,20 @@ set(sound_SRCS
 )
 source_group(sound FILES ${sound_SRCS})
 
-set(spell_SRCS
-	src/spell/script_spell.cpp
-	src/spell/spell_adjustvariable.cpp
-	src/spell/spell_adjustvital.cpp
-	src/spell/spell_areaadjustvital.cpp
-	src/spell/spell_areabombardment.cpp
-	src/spell/spell_capture.cpp
-	src/spell/spell_demolish.cpp
-	src/spell/spell_luacallback.cpp
-	src/spell/spell_polymorph.cpp
-	src/spell/spell_retrain.cpp
-	src/spell/spell_spawnmissile.cpp
-	src/spell/spell_spawnportal.cpp
-	src/spell/spell_summon.cpp
-	src/spell/spell_teleport.cpp
-	src/spell/spells.cpp
-)
-source_group(spell FILES ${spell_SRCS})
-
 set(stratagusmain_SRCS
-	src/stratagus/age.cpp
-	src/stratagus/character.cpp
-	src/stratagus/civilization.cpp
-	src/stratagus/construct.cpp
-	src/stratagus/currency.cpp
-	src/stratagus/dialogue.cpp
-	src/stratagus/grand_strategy.cpp
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
-	src/stratagus/item.cpp
 	src/stratagus/main.cpp
-	src/stratagus/mod.cpp
 	src/stratagus/parameters.cpp
-	src/stratagus/plane.cpp
-	src/stratagus/player_color.cpp
-	src/stratagus/province.cpp
-	src/stratagus/quest.cpp
-	src/stratagus/resource.cpp
-	src/stratagus/school_of_magic.cpp
 	src/stratagus/script.cpp
-	src/stratagus/script_player.cpp
-	src/stratagus/script_character.cpp
-	src/stratagus/script_grand_strategy.cpp
-	src/stratagus/script_item.cpp
-	src/stratagus/script_province.cpp
-	src/stratagus/script_text.cpp
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
-	src/stratagus/text.cpp
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
 	src/stratagus/util.cpp
-	src/stratagus/world.cpp
 )
 source_group(stratagusmain FILES ${stratagus_SRCS})
-
-set(time_SRCS
-	src/time/calendar.cpp
-	src/time/date.cpp
-	src/time/season.cpp
-	src/time/season_schedule.cpp
-	src/time/time_of_day.cpp
-	src/time/time_of_day_schedule.cpp
-	src/time/time_period_schedule.cpp
-	src/time/timeline.cpp
-)
-source_group(time FILES ${time_SRCS})
-
-set(unit_SRCS
-	src/unit/build.cpp
-	src/unit/historical_unit.cpp
-	src/unit/script_unit.cpp
-	src/unit/script_unittype.cpp
-	src/unit/unit_cache.cpp
-	src/unit/unit.cpp
-	src/unit/unit_draw.cpp
-	src/unit/unit_find.cpp
-	src/unit/unit_manager.cpp
-	src/unit/unit_save.cpp
-	src/unit/unit_type_variation.cpp
-	src/unit/unitptr.cpp
-	src/unit/unittype.cpp
-)
-source_group(unit FILES ${unit_SRCS})
-
-set(upgrade_SRCS
-	src/upgrade/dependency.cpp
-	src/upgrade/upgrade.cpp
-	src/upgrade/upgrade_modifier.cpp
-)
-source_group(upgrade FILES ${upgrade_SRCS})
 
 set(video_SRCS
 	src/video/color.cpp
@@ -397,22 +206,11 @@ set(tolua_FILES
 source_group(tolua FILES ${tolua_FILES})
 
 set(stratagus_SRCS
-	${action_SRCS}
-	${animation_SRCS}
-	${ai_SRCS}
-	${editor_SRCS}
 	${guichan_SRCS}
-	${missile_SRCS}
 	${network_SRCS}
 	${particle_SRCS}
-	${pathfinder_SRCS}
-	${religion_SRCS}
 	${sound_SRCS}
-	${spell_SRCS}
 	${stratagusmain_SRCS}
-	${time_SRCS}
-	${unit_SRCS}
-	${upgrade_SRCS}
 	${video_SRCS}
 	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
@@ -465,145 +263,22 @@ set(stratagus_guichan_HDRS
 	src/guichan/include/guichan/x.h
 )
 
-set(stratagus_action_HDRS
-	src/include/action/action_attack.h
-	src/include/action/action_board.h
-	src/include/action/action_build.h
-	src/include/action/action_built.h
-	src/include/action/action_defend.h
-	src/include/action/action_die.h
-	src/include/action/action_follow.h
-	src/include/action/action_move.h
-	src/include/action/action_patrol.h
-	src/include/action/action_pickup.h
-	src/include/action/action_repair.h
-	src/include/action/action_research.h
-	src/include/action/action_resource.h
-	src/include/action/action_spellcast.h
-	src/include/action/action_still.h
-	#Wyrmgus start
-	src/include/action/action_trade.h
-	#Wyrmgus end
-	src/include/action/action_train.h
-	src/include/action/action_unload.h
-	src/include/action/action_upgradeto.h
-	src/include/action/action_use.h
-)
-
-set(stratagus_animation_HDRS
-	src/include/animation/animation_attack.h
-	src/include/animation/animation_die.h
-	src/include/animation/animation_exactframe.h
-	src/include/animation/animation_frame.h
-	src/include/animation/animation_goto.h
-	src/include/animation/animation_ifvar.h
-	src/include/animation/animation_label.h
-	src/include/animation/animation_luacallback.h
-	src/include/animation/animation_move.h
-	src/include/animation/animation_randomgoto.h
-	src/include/animation/animation_randomrotate.h
-	src/include/animation/animation_randomsound.h
-	src/include/animation/animation_randomwait.h
-	src/include/animation/animation_rotate.h
-	src/include/animation/animation_setplayervar.h
-	src/include/animation/animation_setvar.h
-	src/include/animation/animation_sound.h
-	src/include/animation/animation_spawnmissile.h
-	src/include/animation/animation_spawnunit.h
-	src/include/animation/animation_unbreakable.h
-	src/include/animation/animation_wait.h
-)
-
-set(stratagus_religion_HDRS
-	src/include/religion/deity.h
-	src/include/religion/deity_domain.h
-	src/include/religion/pantheon.h
-	src/include/religion/religion.h
-)
-
-set(stratagus_spell_HDRS
-	src/include/spell/spell_adjustvariable.h
-	src/include/spell/spell_adjustvital.h
-	src/include/spell/spell_areaadjustvital.h
-	src/include/spell/spell_areabombardment.h
-	src/include/spell/spell_capture.h
-	src/include/spell/spell_demolish.h
-	src/include/spell/spell_luacallback.h
-	src/include/spell/spell_polymorph.h
-	src/include/spell/spell_retrain.h
-	src/include/spell/spell_spawnmissile.h
-	src/include/spell/spell_spawnportal.h
-	src/include/spell/spell_summon.h
-	src/include/spell/spell_teleport.h
-)
-
-set(stratagus_time_HDRS
-	src/include/time/calendar.h
-	src/include/time/date.h
-	src/include/time/season.h
-	src/include/time/season_schedule.h
-	src/include/time/time_of_day.h
-	src/include/time/time_of_day_schedule.h
-	src/include/time/time_period_schedule.h
-	src/include/time/timeline.h
-)
-
-set(stratagus_unit_HDRS
-	src/include/unit/historical_unit.h
-	src/include/unit/unit.h
-	src/include/unit/unit_cache.h
-	src/include/unit/unit_find.h
-	src/include/unit/unit_manager.h
-	src/include/unit/unit_type_variation.h
-	src/include/unit/unitptr.h
-	src/include/unit/unittype.h
-)
-
-set(stratagus_upgrade_HDRS
-	src/include/upgrade/dependency.h
-	src/include/upgrade/upgrade.h
-	src/include/upgrade/upgrade_modifier.h
-	src/include/upgrade/upgrade_structs.h
-)
-
 set(stratagus_xbrz_HDRS
 	src/xbrz/include/config.h
 	src/xbrz/include/xbrz.h
 )
 
 set(stratagus_generic_HDRS
-	src/ai/ai_local.h
 	src/video/intern_video.h
 	src/video/renderer.h
-	src/include/actions.h
-	src/include/age.h
-	src/include/ai.h
-	src/include/animation.h
-	src/include/campaign.h
-	src/include/character.h
-	src/include/civilization.h
 	src/include/color.h
-	src/include/commands.h
-	src/include/config.h
-	src/include/construct.h
-	src/include/currency.h
 	src/include/cursor.h
-	src/include/data_type.h
-	src/include/dialogue.h
-	src/include/editor.h
 	src/include/font.h
-	src/include/game.h
-	src/include/grand_strategy.h
-	src/include/icons.h
 	src/include/iocompat.h
 	src/include/iolib.h
-	src/include/item.h
 	src/include/luacallback.h
 	src/include/master.h
 	src/include/menus.h
-	src/include/missile.h
-	src/include/missileconfig.h
-	src/include/mod.h
 	src/include/movie.h
 	src/include/myendian.h
 	src/include/net_lowlevel.h
@@ -613,29 +288,17 @@ set(stratagus_generic_HDRS
 	src/include/network/netsockets.h
 	src/include/parameters.h
 	src/include/particle.h
-	src/include/pathfinder.h
-	src/include/plane.h
-	src/include/player.h
-	src/include/player_color.h
-	src/include/province.h
-	src/include/quest.h
 	src/include/replay.h
-	src/include/resource.h
 	src/include/results.h
-	src/include/school_of_magic.h
 	src/include/script.h
 	src/include/script_sound.h
 	src/include/settings.h
 	src/include/shaders.h
 	src/include/sound.h
 	src/include/sound_server.h
-	src/include/spells.h
 	src/include/stratagus.h
-	src/include/text.h
 	src/include/title.h
 	src/include/translate.h
-	src/include/trigger.h
-	src/include/trigger_effect.h
 	src/include/unitsound.h
 	src/include/util.h
 	src/include/vec2i.h
@@ -644,32 +307,17 @@ set(stratagus_generic_HDRS
 	src/include/viewport.h
 	src/include/wav.h
 	src/include/widgets.h
-	src/include/world.h
 	src/include/SetupConsole_win32.h
 )
 
 source_group(include FILES ${stratagus_generic_HDRS})
-source_group(include\\action FILES ${stratagus_action_HDRS})
-source_group(include\\animation FILES ${stratagus_animation_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
-source_group(include\\religion FILES ${stratagus_religion_HDRS})
-source_group(include\\spell FILES ${stratagus_spell_HDRS})
-source_group(include\\time FILES ${stratagus_time_HDRS})
-source_group(include\\unit FILES ${stratagus_unit_HDRS})
-source_group(include\\upgrade FILES ${stratagus_upgrade_HDRS})
 source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
 
 
 set(stratagus_HDRS
 	${stratagus_generic_HDRS}
-	${stratagus_action_HDRS}
-	${stratagus_animation_HDRS}
 	${stratagus_guichan_HDRS}
-	${stratagus_religion_HDRS}
-	${stratagus_spell_HDRS}
-	${stratagus_time_HDRS}
-	${stratagus_unit_HDRS}
-	${stratagus_upgrade_HDRS}
 	${stratagus_xbrz_HDRS}
 )
 
@@ -722,8 +370,6 @@ find_package(OpenGLES)
 find_package(SDL_gles)
 
 find_package(Sqlite)
-find_package(Doxygen)
-find_package(SelfPackers)
 find_package(PhysFS)
 
 include(CheckTypeSize)
@@ -753,9 +399,6 @@ option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
 
-option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" OFF)
-option(ENABLE_DEV "Install Stratagus game development headers files" OFF)
-option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 option(ENABLE_STRIP "Strip all symbols from executables" OFF)
 option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) in game directory(old behavior), otherwise place everything in user directory(new behavior)" ON)
 option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simltaneously in MSVC" ON)
@@ -1066,24 +709,6 @@ else()
 	message("Metaserver: No (Enable by param -DENABLE_METASERVER=ON)")
 endif()
 
-if(ENABLE_DOC AND DOXYGEN_FOUND)
-	message("Doxygen documentation: Yes (Disable by param -DENABLE_DOC=OFF)")
-else()
-	message("Doxygen documentation: No (Enable by param -DENABLE_DOC=ON)")
-endif()
-
-if(ENABLE_DEV)
-	message("Game development files: Yes (Disable by param -DENABLE_DEV=OFF)")
-else()
-	message("Game development files: No (Enable by param -DENABLE_DEV=ON)")
-endif()
-
-if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
-	message("Upx packer: Yes (Disable by param -DENABLE_UPX=OFF)")
-else()
-	message("Upx packer: No (Enable by param -DENABLE_UPX=ON)")
-endif()
-
 log_package("Bzip2" "BZIP2")
 log_package("PhysFS" "PHYSFS")
 log_package("StackTrace" "STACKTRACE")
@@ -1178,81 +803,12 @@ set(gameheaders_HDRS
 )
 source_group(gameheaders FILES ${gameheaders_HDRS})
 
-########### next target ###############
-
-set(doxygen_FILES
-	${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-	doc/Doxyfile-footer.html
-	doc/Doxyfile-header.html
-	${stratagus_SRCS}
-	${stratagus_HDRS}
-	${metaserver_SRCS}
-	${metaserver_HDRS}
-	${gameheaders_HDRS}
-)
-
-if(ENABLE_DOC AND DOXYGEN_FOUND)
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-	add_custom_command(OUTPUT doxygen/index.html
-		COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-		DEPENDS ${doxygen_FILES}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		COMMENT "Generating Stratagus souce code documentation with Doxygen"
-		VERBATIM
-	)
-	add_custom_target(doc ALL DEPENDS doxygen/index.html)
-	list(APPEND CLEAN_FILES doxygen)
-endif()
-
-########### next target ###############
-
-macro(self_packer PACKER_TARGET)
-	get_target_property(PACKER_NAME ${PACKER_TARGET} OUTPUT_NAME)
-	if(NOT PACKER_NAME)
-		set(PACKER_NAME ${PACKER_TARGET})
-	endif()
-	add_custom_command(TARGET ${PACKER_TARGET} POST_BUILD
-		COMMAND ${SELF_PACKER_FOR_EXECUTABLE}
-		ARGS ${SELF_PACKER_FOR_EXECUTABLE_FLAGS} ${PACKER_NAME}${CMAKE_EXECUTABLE_SUFFIX}
-		VERBATIM
-	)
-endmacro()
-
-if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
-	self_packer(stratagus)
-	if(ENABLE_METASERVER)
-		self_packer(metaserver)
-	endif()
-endif()
-
 ########### install files ###############
 
 install(TARGETS stratagus DESTINATION ${GAMEDIR})
 
 if(ENABLE_METASERVER)
 	install(TARGETS metaserver DESTINATION ${SBINDIR})
-endif()
-
-if(ENABLE_DOC AND DOXYGEN_FOUND)
-	install(FILES doc/stratagus.6 DESTINATION ${MANDIR})
-	install(FILES
-		doc/development.html
-		doc/faq.html
-		doc/gpl.html
-		doc/guichan-copyright.txt
-		doc/changelog.html
-		doc/index.html
-		doc/install.html
-		doc/media.html
-		doc/metaserver_protocol.txt
-		doc/README-SDL.txt
-		DESTINATION share/doc/stratagus
-	)
-	install(DIRECTORY doc/graphics doc/scripts ${CMAKE_CURRENT_BINARY_DIR}/doxygen DESTINATION ${DOCDIR})
-endif(ENABLE_DOC AND DOXYGEN_FOUND)
-
-if(ENABLE_DEV)
-	install(FILES ${gameheaders_HDRS} DESTINATION ${STRATAGUS_HEADERS})
 endif()
 
 ########### clean files ###############
