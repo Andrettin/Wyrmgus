@@ -30,12 +30,12 @@
 
 #include "register_types.h"
 
-//#include "campaign.h"
+#include "campaign.h"
 #include "wyrmgus_module.h"
 
 void register_wyrmgus_types()
 {
-	//ClassDB::register_class<CCampaign>();
+	ClassDB::register_class<CCampaign>();
 	ClassDB::register_class<WyrmgusModule>();
 }
 

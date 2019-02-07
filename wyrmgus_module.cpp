@@ -22,10 +22,9 @@ CCampaign *WyrmgusModule::GetCampaign(String ident)
 	return CCampaign::GetCampaign(ident.utf8().get_data());
 }
 
-/*
-Vector<CCampaign *> WyrmgusModule::GetCampaigns()
+Array WyrmgusModule::GetCampaigns()
 {
-	Vector<CCampaign *> campaigns;
+	Array campaigns;
 	
 	for (CCampaign *campaign : CCampaign::GetCampaigns()) {
 		campaigns.push_back(campaign);
@@ -33,12 +32,11 @@ Vector<CCampaign *> WyrmgusModule::GetCampaigns()
 	
 	return campaigns;
 }
-*/
 
 void WyrmgusModule::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("run"), &WyrmgusModule::Run);
 	ClassDB::bind_method(D_METHOD("get_version"), &WyrmgusModule::GetVersion);
 	ClassDB::bind_method(D_METHOD("get_campaign", "ident"), &WyrmgusModule::GetCampaign);
-//	ClassDB::bind_method(D_METHOD("get_campaigns"), &WyrmgusModule::GetCampaigns);
+	ClassDB::bind_method(D_METHOD("get_campaigns"), &WyrmgusModule::GetCampaigns);
 }

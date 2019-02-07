@@ -13,7 +13,7 @@ public:
 	int Run();
 	String GetVersion();
 	CCampaign *GetCampaign(String ident);
-	//Vector<CCampaign *> GetCampaigns();
+	Array GetCampaigns();
 
 protected:
 	static void _bind_methods();
