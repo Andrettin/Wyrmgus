@@ -26,28 +26,8 @@
 #
 #
 
-#########################
-# Version configuration #
-#########################
-# Stratagus major version
-set(STRATAGUS_MAJOR_VERSION 3)
-# Stratagus minor version (maximum 99)
-set(STRATAGUS_MINOR_VERSION 5)
-# Stratagus patch level (maximum 99)
-set(STRATAGUS_PATCH_LEVEL 5)
-# Stratagus patch level 2
-set(STRATAGUS_PATCH_LEVEL2 0)
-#########################
-
 project(stratagus)
 cmake_minimum_required(VERSION 2.6)
-
-set(STRATAGUS_VERSION "${STRATAGUS_MAJOR_VERSION}.${STRATAGUS_MINOR_VERSION}.${STRATAGUS_PATCH_LEVEL}")
-set(STRATAGUS_VERSION_FULL "${STRATAGUS_VERSION}.${STRATAGUS_PATCH_LEVEL2}")
-
-if(${STRATAGUS_PATCH_LEVEL2} GREATER 0)
-	set(STRATAGUS_VERSION "${STRATAGUS_VERSION_FULL}")
-endif()
 
 # Stratagus sources
 
@@ -56,7 +36,6 @@ include_directories(
 	src/include
 	src/guichan/include
 	src/guichan/include/guichan
-	src/xbrz/include
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -64,54 +43,6 @@ set(beos_SRCS
 	src/beos/beos.cpp
 )
 source_group(beos FILES ${beos_SRCS})
-
-set(guichan_SRCS
-	src/guichan/cliprectangle.cpp
-	src/guichan/color.cpp
-	src/guichan/defaultfont.cpp
-	src/guichan/exception.cpp
-	src/guichan/focushandler.cpp
-	src/guichan/gfont.cpp
-	src/guichan/graphics.cpp
-	src/guichan/gui.cpp
-	src/guichan/guichan.cpp
-	src/guichan/image.cpp
-	src/guichan/imagefont.cpp
-	src/guichan/key.cpp
-	src/guichan/keyinput.cpp
-	src/guichan/mouseinput.cpp
-	src/guichan/rectangle.cpp
-	src/guichan/sdl/gsdl.cpp
-	src/guichan/sdl/sdlgraphics.cpp
-	src/guichan/sdl/sdlimageloader.cpp
-	src/guichan/sdl/sdlinput.cpp
-	src/guichan/widget.cpp
-	src/guichan/widgets/button.cpp
-	src/guichan/widgets/container.cpp
-	src/guichan/widgets/dropdown.cpp
-	src/guichan/widgets/checkbox.cpp
-	src/guichan/widgets/icon.cpp
-	src/guichan/widgets/label.cpp
-	src/guichan/widgets/listbox.cpp
-	src/guichan/widgets/radiobutton.cpp
-	src/guichan/widgets/scrollarea.cpp
-	src/guichan/widgets/slider.cpp
-	src/guichan/widgets/textbox.cpp
-	src/guichan/widgets/textfield.cpp
-	src/guichan/widgets/window.cpp
-)
-source_group(guichan FILES ${guichan_SRCS})
-
-set(network_SRCS
-	src/network/commands.cpp
-	src/network/net_lowlevel.cpp
-	src/network/net_message.cpp
-	src/network/master.cpp
-	src/network/netconnect.cpp
-	src/network/network.cpp
-	src/network/netsockets.cpp
-)
-source_group(network FILES ${network_SRCS})
 
 set(particle_SRCS
 	src/particle/graphicanimation.cpp
@@ -123,55 +54,8 @@ set(particle_SRCS
 )
 source_group(particle FILES ${particle_SRCS})
 
-set(sound_SRCS
-	src/sound/music.cpp
-	src/sound/ogg.cpp
-	src/sound/script_sound.cpp
-	src/sound/sound.cpp
-	src/sound/sound_id.cpp
-	src/sound/sound_server.cpp
-	src/sound/unitsound.cpp
-	src/sound/wav.cpp
-)
-source_group(sound FILES ${sound_SRCS})
-
-set(stratagusmain_SRCS
-	src/stratagus/groups.cpp
-	src/stratagus/iolib.cpp
-	src/stratagus/luacallback.cpp
-	src/stratagus/main.cpp
-	src/stratagus/parameters.cpp
-	src/stratagus/script.cpp
-	src/stratagus/selection.cpp
-	src/stratagus/stratagus.cpp
-	src/stratagus/title.cpp
-	src/stratagus/translate.cpp
-	src/stratagus/util.cpp
-)
-source_group(stratagusmain FILES ${stratagus_SRCS})
-
-set(video_SRCS
-	src/video/color.cpp
-	src/video/cursor.cpp
-	src/video/font.cpp
-	src/video/graphic.cpp
-	src/video/linedraw.cpp
-	src/video/png.cpp
-	src/video/sdl.cpp
-	src/video/shaders.cpp
-	src/video/sprite.cpp
-	src/video/video.cpp
-)
-source_group(video FILES ${video_SRCS})
-
-set(xbrz_SRCS
-	src/xbrz/xbrz.cpp
-)
-source_group(xbrz FILES ${xbrz_SRCS})
-
 set(win32_SRCS
 	src/win32/SetupConsole_win32.cpp
-	src/win32/stratagus.rc
 )
 source_group(win32 FILES ${win32_SRCS})
 
@@ -206,120 +90,8 @@ set(tolua_FILES
 source_group(tolua FILES ${tolua_FILES})
 
 set(stratagus_SRCS
-	${guichan_SRCS}
-	${network_SRCS}
 	${particle_SRCS}
-	${sound_SRCS}
-	${stratagusmain_SRCS}
-	${video_SRCS}
-	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
-)
-
-set(stratagus_guichan_HDRS
-	src/guichan/include/guichan/actionlistener.h
-	src/guichan/include/guichan/allegro.h
-	src/guichan/include/guichan/basiccontainer.h
-	src/guichan/include/guichan/cliprectangle.h
-	src/guichan/include/guichan/color.h
-	src/guichan/include/guichan/defaultfont.h
-	src/guichan/include/guichan/exception.h
-	src/guichan/include/guichan/focushandler.h
-	src/guichan/include/guichan/font.h
-	src/guichan/include/guichan/graphics.h
-	src/guichan/include/guichan/gsdl.h
-	src/guichan/include/guichan/gui.h
-	src/guichan/include/guichan.h
-	src/guichan/include/guichan/imagefont.h
-	src/guichan/include/guichan/image.h
-	src/guichan/include/guichan/imageloader.h
-	src/guichan/include/guichan/input.h
-	src/guichan/include/guichan/key.h
-	src/guichan/include/guichan/keyinput.h
-	src/guichan/include/guichan/keylistener.h
-	src/guichan/include/guichan/listmodel.h
-	src/guichan/include/guichan/mouseinput.h
-	src/guichan/include/guichan/mouselistener.h
-	src/guichan/include/guichan/platform.h
-	src/guichan/include/guichan/rectangle.h
-	src/guichan/include/guichan/sdl/sdlgraphics.h
-	src/guichan/include/guichan/sdl/sdlimageloader.h
-	src/guichan/include/guichan/sdl/sdlinput.h
-	src/guichan/include/guichan/sdl/sdlpixel.h
-	src/guichan/include/guichan/widget.h
-	src/guichan/include/guichan/widgets/button.h
-	src/guichan/include/guichan/widgets/container.h
-	src/guichan/include/guichan/widgets/dropdown.h
-	src/guichan/include/guichan/widgets/checkbox.h
-	src/guichan/include/guichan/widgets/icon.h
-	src/guichan/include/guichan/widgets/label.h
-	src/guichan/include/guichan/widgets/listbox.h
-	src/guichan/include/guichan/widgets/radiobutton.h
-	src/guichan/include/guichan/widgets/scrollarea.h
-	src/guichan/include/guichan/widgets/slider.h
-	src/guichan/include/guichan/widgets/textbox.h
-	src/guichan/include/guichan/widgets/textfield.h
-	src/guichan/include/guichan/widgets/window.h
-	src/guichan/include/guichan/x.h
-)
-
-set(stratagus_xbrz_HDRS
-	src/xbrz/include/config.h
-	src/xbrz/include/xbrz.h
-)
-
-set(stratagus_generic_HDRS
-	src/video/intern_video.h
-	src/video/renderer.h
-	src/include/color.h
-	src/include/cursor.h
-	src/include/data_type.h
-	src/include/font.h
-	src/include/iocompat.h
-	src/include/iolib.h
-	src/include/luacallback.h
-	src/include/master.h
-	src/include/menus.h
-	src/include/movie.h
-	src/include/myendian.h
-	src/include/net_lowlevel.h
-	src/include/net_message.h
-	src/include/netconnect.h
-	src/include/network.h
-	src/include/network/netsockets.h
-	src/include/parameters.h
-	src/include/particle.h
-	src/include/replay.h
-	src/include/results.h
-	src/include/script.h
-	src/include/script_sound.h
-	src/include/settings.h
-	src/include/shaders.h
-	src/include/sound.h
-	src/include/sound_server.h
-	src/include/stratagus.h
-	src/include/title.h
-	src/include/translate.h
-	src/include/unitsound.h
-	src/include/util.h
-	src/include/vec2i.h
-	src/include/version.h
-	src/include/video.h
-	src/include/viewport.h
-	src/include/wav.h
-	src/include/widgets.h
-	src/include/SetupConsole_win32.h
-)
-
-source_group(include FILES ${stratagus_generic_HDRS})
-source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
-source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
-
-
-set(stratagus_HDRS
-	${stratagus_generic_HDRS}
-	${stratagus_guichan_HDRS}
-	${stratagus_xbrz_HDRS}
 )
 
 # Configuration types
@@ -551,7 +323,6 @@ endif()
 if(CMAKE_COMPILER_IS_GNUC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char")
 endif()
-# TODO: Add support for other compilers
 
 #Wyrmgus start
 set(WS_CXX11_FLAGS CACHE STRING "Compilation flags to enable C++11 support")
@@ -734,7 +505,7 @@ add_custom_command(OUTPUT tolua.cpp
 	VERBATIM
 )
 
-add_library(stratagus STATIC ${stratagus_SRCS} ${stratagus_HDRS})
+add_library(stratagus STATIC ${stratagus_SRCS})
 target_link_libraries(stratagus ${stratagus_LIBS})
 if(stratagus_LIBS_RELEASE)
 	target_link_libraries(stratagus ${stratagus_LIBS_RELEASE})
