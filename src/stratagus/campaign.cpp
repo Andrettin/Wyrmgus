@@ -35,6 +35,7 @@
 
 #include "campaign.h"
 
+#include "civilization.h"
 #include "config.h"
 #include "map/map_template.h"
 #include "player.h"
@@ -229,6 +230,25 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid campaign property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
+	
+	std::sort(CCampaign::Campaigns.begin(), CCampaign::Campaigns.end(), [](CCampaign *a, CCampaign *b) {
+		if (a->GetSpecies() != b->GetSpecies()) {
+			return a->GetSpecies() < b->GetSpecies();
+		} else if (a->StartDate != b->StartDate) {
+			return a->StartDate < b->StartDate;
+		} else {
+			return a->Ident < b->Ident;
+		}
+	});
+}
+
+std::string CCampaign::GetSpecies() const
+{
+	if (this->Faction && this->Faction->Civilization) {
+		return PlayerRaces.Species[this->Faction->Civilization->ID];
+	}
+	
+	return std::string();
 }
 
 void CCampaign::_bind_methods()
@@ -270,6 +290,6 @@ std::string GetCurrentCampaign()
 	if (!current_campaign) {
 		return "";
 	} else {
-		return current_campaign->GetIdent();
+		return current_campaign->GetIdent().utf8().get_data();
 	}
 }

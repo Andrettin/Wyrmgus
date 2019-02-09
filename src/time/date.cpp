@@ -309,7 +309,7 @@ int CDate::GetTotalDays(const CCalendar *calendar) const
 
 unsigned long long CDate::GetTotalHours(CCalendar *calendar) const
 {
-	CDate date = this->ToBaseCalendar(calendar);
+	CDate date(this->ToBaseCalendar(calendar));
 	
 	unsigned long long hours = date.Hour;
 	

@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -389,5 +387,3 @@ std::pair<CDate, CDate> CCalendar::GetBestChronologicalIntersectionForDate(CCale
 	
 	return chronological_intersection;
 }
-
-//@}

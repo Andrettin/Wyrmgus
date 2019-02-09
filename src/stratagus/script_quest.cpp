@@ -508,7 +508,7 @@ static int CclGetCampaigns(lua_State *l)
 	lua_createtable(l, CCampaign::Campaigns.size(), 0);
 	for (size_t i = 1; i <= CCampaign::Campaigns.size(); ++i)
 	{
-		lua_pushstring(l, CCampaign::Campaigns[i-1]->GetIdent().c_str());
+		lua_pushstring(l, CCampaign::Campaigns[i-1]->GetIdent().utf8().get_data());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

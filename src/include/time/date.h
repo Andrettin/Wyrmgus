@@ -68,13 +68,34 @@ public:
 	unsigned long long GetTotalHours(CCalendar *calendar) const;	/// gets the total amount of hours for the particular calendar in this date, counting from -10,000 in the base calendar
 	int GetDayOfTheWeek(const CCalendar *calendar) const;			/// gets the day of the week for this date in a given calendar
 	
+	int GetYear() const
+	{
+		return this->Year;
+	}
+	
+	int GetMonth() const
+	{
+		return this->Month;
+	}
+	
+	int GetDay() const
+	{
+		return this->Day;
+	}
+	
+	int GetHour() const
+	{
+		return this->Hour;
+	}
+	
 	int Year = 0;
-	char Month = 1;
-	char Day = 1;
-	char Hour = DEFAULT_HOURS_PER_DAY / 2;
+	int Month = 1;
+	int Day = 1;
+	int Hour = DEFAULT_HOURS_PER_DAY / 2;
 	CTimeline *Timeline = nullptr;
 	
-	bool operator <(const CDate &rhs) const {
+	bool operator <(const CDate &rhs) const
+	{
 		if (Year < rhs.Year) {
 			return true;
         } else if (Year == rhs.Year) {
@@ -92,7 +113,8 @@ public:
 		return false;
 	}
 	
-	bool operator <=(const CDate &rhs) const {
+	bool operator <=(const CDate &rhs) const
+	{
 		if (Year < rhs.Year) {
 			return true;
         } else if (Year == rhs.Year) {
@@ -110,7 +132,8 @@ public:
 		return false;
 	}
 	
-	bool operator >(const CDate &rhs) const {
+	bool operator >(const CDate &rhs) const
+	{
 		if (Year > rhs.Year) {
 			return true;
         } else if (Year == rhs.Year) {
@@ -128,7 +151,8 @@ public:
 		return false;
 	}
 	
-	bool operator >=(const CDate &rhs) const {
+	bool operator >=(const CDate &rhs) const
+	{
 		if (Year > rhs.Year) {
 			return true;
         } else if (Year == rhs.Year) {
@@ -146,8 +170,14 @@ public:
 		return false;
 	}
 	
-	bool operator ==(const CDate &rhs) const {
+	bool operator ==(const CDate &rhs) const
+	{
 		return Year == rhs.Year && Month == rhs.Month && Day == rhs.Day && Hour == rhs.Hour;
+	}
+	
+	bool operator !=(const CDate &rhs) const
+	{
+		return !(*this == rhs);
 	}
 };
 

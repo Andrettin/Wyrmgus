@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <core/ustring.h>
+
 #include <string>
 
 /*----------------------------------------------------------------------------
@@ -55,9 +57,9 @@ public:
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
 	
-	std::string GetIdent() const
+	String GetIdent() const
 	{
-		return this->Ident;
+		return this->Ident.c_str();
 	}
 	
 	std::string Ident;	/// String identifier of the data element

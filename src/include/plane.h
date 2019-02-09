@@ -30,8 +30,6 @@
 #ifndef __PLANE_H__
 #define __PLANE_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -55,11 +53,6 @@ class CTimeOfDaySchedule;
 class CPlane : public CDataType
 {
 public:
-	CPlane() :
-		ID(-1), TimeOfDaySchedule(nullptr), SeasonSchedule(nullptr)
-	{
-	}
-	
 	static CPlane *GetPlane(const std::string &ident, const bool should_find = true);
 	static CPlane *GetOrAddPlane(const std::string &ident);
 	static void ClearPlanes();
@@ -69,19 +62,17 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
-	int ID;																/// ID of this plane
+	int ID = -1;																/// ID of this plane
 	std::string Ident;
 	std::string Name;
 	std::string Description;
 	std::string Background;
 	std::string Quote;
-	CTimeOfDaySchedule *TimeOfDaySchedule;								/// this plane's time of day schedule
-	CSeasonSchedule *SeasonSchedule;									/// this plane's season schedule
+	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this plane's time of day schedule
+	CSeasonSchedule *SeasonSchedule = nullptr;							/// this plane's season schedule
 	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// Deity domains empowered in this plane
 	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic;				/// Schools of magic empowered in this plane
 	std::vector<CSpecies *> Species;									/// Species in this plane
 };
 
-//@}
-
-#endif // !__PLANE_H__
+#endif

@@ -273,6 +273,7 @@ set(stratagus_generic_HDRS
 	src/video/renderer.h
 	src/include/color.h
 	src/include/cursor.h
+	src/include/data_type.h
 	src/include/font.h
 	src/include/iocompat.h
 	src/include/iolib.h

@@ -140,7 +140,7 @@ int SaveGame(const std::string &filename)
 	file.printf("function SetTileTerrain() end\n");
 	CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
 	if (current_campaign != nullptr) {
-		file.printf("SetCurrentCampaign(\"%s\")\n", current_campaign->GetIdent().c_str());
+		file.printf("SetCurrentCampaign(\"%s\")\n", current_campaign->GetIdent().utf8().get_data());
 	}
 	//Wyrmgus end
 	file.printf("Load(\"%s\")\n", CMap::Map.Info.Filename.c_str());
