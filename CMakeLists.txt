@@ -44,16 +44,6 @@ set(beos_SRCS
 )
 source_group(beos FILES ${beos_SRCS})
 
-set(particle_SRCS
-	src/particle/graphicanimation.cpp
-	src/particle/chunkparticle.cpp
-	src/particle/particlemanager.cpp
-	src/particle/radialparticle.cpp
-	src/particle/smokeparticle.cpp
-	src/particle/staticparticle.cpp
-)
-source_group(particle FILES ${particle_SRCS})
-
 set(win32_SRCS
 	src/win32/SetupConsole_win32.cpp
 )
@@ -73,7 +63,6 @@ set(tolua_FILES
 	src/tolua/minimap.pkg
 	src/tolua/mod.pkg
 	src/tolua/network.pkg
-	src/tolua/particle.pkg
 	src/tolua/pathfinder.pkg
 	src/tolua/player.pkg
 	src/tolua/sound.pkg
@@ -90,7 +79,6 @@ set(tolua_FILES
 source_group(tolua FILES ${tolua_FILES})
 
 set(stratagus_SRCS
-	${particle_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
 )
 

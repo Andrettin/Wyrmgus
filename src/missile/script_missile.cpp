@@ -147,10 +147,6 @@ void MissileType::Load(lua_State *l)
 			}
 		} else if (!strcmp(value, "SmokeMissile")) {
 			this->Smoke.Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "ImpactParticle")) {
-			this->ImpactParticle = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "SmokeParticle")) {
-			this->SmokeParticle = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "OnImpact")) {
 			this->OnImpact = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "CanHitOwner")) {

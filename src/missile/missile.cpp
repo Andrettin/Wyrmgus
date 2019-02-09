@@ -1399,13 +1399,6 @@ bool PointToPointMissile(Missile &missile)
 			}
 		}
 
-		if (missile.Type->SmokeParticle && (missile.CurrentStep || missile.State > 1)) {
-			missile.Type->SmokeParticle->pushPreamble();
-			missile.Type->SmokeParticle->pushInteger(position.x);
-			missile.Type->SmokeParticle->pushInteger(position.y);
-			missile.Type->SmokeParticle->run();
-		}
-
 		if (missile.Type->Pierce) {
 			const PixelPos posInt((int)pos.x + missile.Type->size.x / 2, (int)pos.y + missile.Type->size.y / 2);
 			MissileHandlePierce(missile, CMap::Map.MapPixelPosToTilePos(posInt, missile.MapLayer));
@@ -1611,12 +1604,6 @@ void Missile::MissileHit(CUnit *unit)
 				impact->SourceUnit = this->SourceUnit;
 			}
 		}
-	}
-	if (mtype.ImpactParticle) {
-		mtype.ImpactParticle->pushPreamble();
-		mtype.ImpactParticle->pushInteger(pixelPos.x);
-		mtype.ImpactParticle->pushInteger(pixelPos.y);
-		mtype.ImpactParticle->run();
 	}
 
 	if (!this->SourceUnit) {  // no owner - green-cross ...
@@ -2067,7 +2054,7 @@ MissileType::MissileType(const std::string &ident) :
 	Sleep(0), Speed(0), BlizzardSpeed(0), AttackSpeed(10), TTL(-1), ReduceFactor(100), SmokePrecision(0),
 	//Wyrmgus end
 	MissileStopFlags(0), Damage(nullptr), Range(0), SplashFactor(100),
-	ImpactParticle(nullptr), SmokeParticle(nullptr), OnImpact(nullptr),
+	OnImpact(nullptr),
 	G(nullptr)
 {
 	this->Ident = ident;
@@ -2082,8 +2069,6 @@ MissileType::~MissileType()
 {
 	CGraphic::Free(this->G);
 	Impact.clear();
-	delete ImpactParticle;
-	delete SmokeParticle;
 	delete OnImpact;
 	FreeNumberDesc(this->Damage);
 }

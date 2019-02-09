@@ -86,13 +86,6 @@ static bool TracerMissile(Missile &missile)
 			}
 		}
 
-		if (missile.Type->SmokeParticle && missile.CurrentStep) {
-			missile.Type->SmokeParticle->pushPreamble();
-			missile.Type->SmokeParticle->pushInteger(position.x);
-			missile.Type->SmokeParticle->pushInteger(position.y);
-			missile.Type->SmokeParticle->run();
-		}
-
 		if (missile.Type->Pierce) {
 			const PixelPos posInt((int)pos.x, (int)pos.y);
 			MissileHandlePierce(missile, CMap::Map.MapPixelPosToTilePos(posInt, missile.MapLayer));

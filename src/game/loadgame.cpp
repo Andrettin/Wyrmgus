@@ -56,7 +56,6 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "missile.h"
-#include "particle.h"
 #include "pathfinder.h"
 #include "include/plane.h"
 #include "player_color.h"
@@ -165,7 +164,6 @@ void CleanModules()
 	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
 	CSeason::ClearSeasons();
 	CSeasonSchedule::ClearSeasonSchedules();
-	CParticleManager::exit();
 	CleanReplayLog();
 	CSpell::ClearSpells();
 	FreePathfinder();

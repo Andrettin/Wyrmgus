@@ -407,8 +407,6 @@ public:
 	int SplashFactor;                      /// missile splash divisor
 	std::vector <MissileConfig *> Impact;  /// missile produces an impact
 	MissileConfig Smoke;                   /// trailing missile
-	LuaCallback *ImpactParticle;           /// impact particle
-	LuaCallback *SmokeParticle;            /// smoke particle
 	LuaCallback *OnImpact;                 /// called when
 
 	// --- FILLED UP ---

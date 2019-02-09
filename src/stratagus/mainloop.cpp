@@ -54,7 +54,6 @@
 #include "map/tileset.h" //for tile animation
 #include "missile.h"
 #include "network.h"
-#include "particle.h"
 #include "include/plane.h"
 //Wyrmgus start
 #include "quest.h"
@@ -444,7 +443,6 @@ static void GameLogicLoop()
 	}
 
 	UpdateMessages();     // update messages
-	ParticleManager.update(); // handle particles
 	CheckMusicFinished(); // Check for next song
 
 	if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
@@ -549,8 +547,6 @@ void GameMainLoop()
 	GameEstablishing = false;
 	//Wyrmgus end
 	GameRunning = true;
-
-	CParticleManager::init();
 
 #ifdef REALVIDEO
 	RealVideoSyncSpeed = VideoSyncSpeed;
@@ -677,7 +673,6 @@ void GameMainLoop()
 
 	GameCycle = 0;//????
 	CDate::CurrentTotalHours = 0;
-	CParticleManager::exit();
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
 	GamePaused = false;
