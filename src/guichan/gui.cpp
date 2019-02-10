@@ -60,6 +60,7 @@
 #include "guichan/focushandler.h"
 #include "guichan/gui.h"
 #include "guichan/key.h"
+#include "script.h"
 
 namespace gcn
 {
@@ -241,6 +242,8 @@ namespace gcn
         } // end if
 
         mTop->logic();
+		
+		ProcessLuaCommandQueue();
     }
 
     void Gui::draw(Widget* top)

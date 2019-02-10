@@ -428,4 +428,7 @@ void FreeNumberDesc(NumberDesc *number);  /// Free number description content. (
 void FreeUnitDesc(UnitDesc *unitdesc);    /// Free unit description content. (no pointer itself).
 void FreeStringDesc(StringDesc *s);       /// Frre string description content. (no pointer itself).
 
+extern void ProcessLuaCommandQueue();
+extern void QueueLuaCommand(const std::string &command);
+
 #endif

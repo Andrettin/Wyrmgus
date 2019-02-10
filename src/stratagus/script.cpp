@@ -74,6 +74,9 @@
 #include "unit/unittype.h"
 //Wyrmgus end
 
+#include <mutex>
+#include <queue>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -104,6 +107,9 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, in
 //Wyrmgus start
 std::map<std::string, std::string> DLCFileEquivalency;
 //Wyrmgus end
+
+static std::queue<std::string> LuaCommandQueue;
+static std::mutex LuaCommandQueueMutex;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -3667,6 +3673,36 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 	LuaLoadFile(name, luaArgStr);
 	CclInConfigFile = 0;
 	LuaGarbageCollect();
+}
+
+static std::string TakeFirstLuaCommandFromQueue()
+{
+	std::lock_guard<std::mutex> lock(LuaCommandQueueMutex);
+	
+	if (LuaCommandQueue.empty()) {
+		return std::string();
+	}
+	
+	std::string command = LuaCommandQueue.front();
+	LuaCommandQueue.pop();
+	
+	return command;
+}
+
+void ProcessLuaCommandQueue()
+{
+	std::string command = TakeFirstLuaCommandFromQueue();
+	
+	if (!command.empty()) {
+		CclCommand(command);
+	}
+}
+
+void QueueLuaCommand(const std::string &command)
+{
+	std::lock_guard<std::mutex> lock(LuaCommandQueueMutex);
+	
+	LuaCommandQueue.push(command);
 }
 
 void ScriptRegister()

@@ -4,6 +4,7 @@
 
 #include "campaign.h"
 #include "src/include/version.h"
+#include "script.h"
 
 int WyrmgusModule::Run()
 {
@@ -15,6 +16,11 @@ int WyrmgusModule::Run()
 String WyrmgusModule::GetVersion()
 {
 	return _version_str2;
+}
+
+void WyrmgusModule::LuaCommand(String command)
+{
+	QueueLuaCommand(command.utf8().get_data());
 }
 
 CCampaign *WyrmgusModule::GetCampaign(String ident)

@@ -12,6 +12,7 @@ class WyrmgusModule : public Node
 public:
 	int Run();
 	String GetVersion();
+	void LuaCommand(String command);
 	CCampaign *GetCampaign(String ident);
 	Array GetCampaigns();
 	void SetCurrentCampaign(String campaign_ident);
