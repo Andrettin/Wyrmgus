@@ -98,6 +98,11 @@ class CQuest
 public:
 	~CQuest();
 	
+	bool IsCompleted() const
+	{
+		return this->Completed;
+	}
+	
 	std::string Ident;				/// Ident of the quest
 	std::string Name;				/// Name of the quest
 	std::string Description;		/// Description of the quest

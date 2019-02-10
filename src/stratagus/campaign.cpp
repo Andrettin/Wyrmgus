@@ -251,10 +251,27 @@ std::string CCampaign::GetSpecies() const
 	return std::string();
 }
 
+bool CCampaign::IsAvailable() const
+{
+	if (this->IsHidden()) {
+		return false;
+	}
+	
+	for (CQuest *quest : this->RequiredQuests) {
+		if (!quest->IsCompleted()) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
 void CCampaign::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_name"), &CCampaign::GetName);
 	ClassDB::bind_method(D_METHOD("get_description"), &CCampaign::GetDescription);
+	ClassDB::bind_method(D_METHOD("is_hidden"), &CCampaign::IsHidden);
+	ClassDB::bind_method(D_METHOD("is_available"), &CCampaign::IsAvailable);
 }
 
 /**
