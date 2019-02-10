@@ -1,19 +1,21 @@
 #ifndef __WYRMGUS_MODULE_H__
 #define __WYRMGUS_MODULE_H__
 
-#include <core/reference.h>
+#include <scene/main/node.h>
 
 class CCampaign;
 
-class WyrmgusModule : public Reference
+class WyrmgusModule : public Node
 {
-	GDCLASS(WyrmgusModule, Reference)
+	GDCLASS(WyrmgusModule, Node)
 
 public:
 	int Run();
 	String GetVersion();
 	CCampaign *GetCampaign(String ident);
 	Array GetCampaigns();
+	void SetCurrentCampaign(String campaign_ident);
+	CCampaign *GetCurrentCampaign();
 
 protected:
 	static void _bind_methods();

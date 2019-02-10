@@ -33,10 +33,23 @@ Array WyrmgusModule::GetCampaigns()
 	return campaigns;
 }
 
+void WyrmgusModule::SetCurrentCampaign(String campaign_ident)
+{
+	CCampaign::SetCurrentCampaign(this->GetCampaign(campaign_ident));
+}
+
+CCampaign *WyrmgusModule::GetCurrentCampaign()
+{
+	return CCampaign::GetCurrentCampaign();
+}
+
 void WyrmgusModule::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("run"), &WyrmgusModule::Run);
 	ClassDB::bind_method(D_METHOD("get_version"), &WyrmgusModule::GetVersion);
+	ClassDB::bind_method(D_METHOD("lua_command", "command"), &WyrmgusModule::LuaCommand);
 	ClassDB::bind_method(D_METHOD("get_campaign", "ident"), &WyrmgusModule::GetCampaign);
 	ClassDB::bind_method(D_METHOD("get_campaigns"), &WyrmgusModule::GetCampaigns);
+	ClassDB::bind_method(D_METHOD("set_current_campaign", "campaign"), &WyrmgusModule::SetCurrentCampaign);
+	ClassDB::bind_method(D_METHOD("get_current_campaign"), &WyrmgusModule::GetCurrentCampaign);
 }
