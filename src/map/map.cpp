@@ -1221,8 +1221,13 @@ void SetTimeOfDay(const std::string &time_of_day_ident, int z)
 **	@param	time_of_day_schedule_ident	The time of day schedule's string identifier
 **	@param	z							The map layer
 */
-void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, int z)
+void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, const unsigned z)
 {
+	if (z >= CMap::Map.MapLayers.size()) {
+		fprintf(stderr, "Error in CMap::SetTimeOfDaySchedule: the given map layer index (%d) is not valid given the map layer quantity (%d).\n", z, CMap::Map.MapLayers.size());
+		return;
+	}
+	
 	if (time_of_day_schedule_ident.empty()) {
 		CMap::Map.MapLayers[z]->TimeOfDaySchedule = nullptr;
 		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
