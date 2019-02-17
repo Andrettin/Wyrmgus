@@ -819,7 +819,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type, int landmass
 			return;
 		}
 	}
-	if (pai->Player == ThisPlayer) {
+	if (pai->Player == CPlayer::GetThisPlayer()) {
 		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
@@ -896,7 +896,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type, int landmass, con
 			return;
 		}
 	}
-	if (pai.Player == ThisPlayer) {
+	if (pai.Player == CPlayer::GetThisPlayer()) {
 		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}

@@ -650,7 +650,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		const char *input_name = DefaultResourceNames[input_resource].c_str();
 		const char *input_actionName = CResource::Resources[input_resource]->ActionName.c_str();
 		unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
-		if (unit.Player == ThisPlayer && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
+		if (unit.Player == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
 			PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
 		}
 		this->Finished = true;
@@ -1030,7 +1030,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 						const char *input_name = DefaultResourceNames[input_resource].c_str();
 						const char *input_actionName = CResource::Resources[input_resource]->ActionName.c_str();
 						unit.Player->Notify(_("Not enough %s... %s more %s."), _(input_name), _(input_actionName), _(input_name)); //added extra space to look better
-						if (unit.Player == ThisPlayer && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
+						if (unit.Player == CPlayer::GetThisPlayer() && GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound) {
 							PlayGameSound(GameSounds.NotEnoughRes[unit.Player->Race][input_resource].Sound, MaxSampleVolume);
 						}
 
@@ -1074,7 +1074,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				// This only happens when it's empty.
 				if (!dead) {
 					if (Preference.MineNotifications
-						&& unit.Player->Index == ThisPlayer->Index
+						&& unit.Player->Index == CPlayer::GetThisPlayer()->Index
 						&& source->Variable[GIVERESOURCE_INDEX].Max > (CResource::Resources[this->CurrentResource]->DefaultIncome * 10)) {
 							unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer->ID, _("Our %s has been depleted!"), source->Type->Name.c_str());
 					}
@@ -1159,7 +1159,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		//Store resource position.
 		this->Resource.Mine = source;
 		
-		if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index 
+		if (Preference.MineNotifications && unit.Player->Index == CPlayer::GetThisPlayer()->Index 
 			&& source->IsAlive()
 			&& !source->MineLow
 			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10

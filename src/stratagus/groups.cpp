@@ -71,7 +71,7 @@ public:
 
 	void add(CUnit &unit, unsigned int num)
 	{
-		if (ThisPlayer->IsTeamed(unit)) {
+		if (CPlayer::GetThisPlayer()->IsTeamed(unit)) {
 			if (!tainted) {
 				tainted = unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value != true;
 			}

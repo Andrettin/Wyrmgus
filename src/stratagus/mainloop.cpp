@@ -260,27 +260,27 @@ void UpdateDisplay()
 		
 		//Wyrmgus start
 		//draw worker icon if there are idle workers
-		if (UI.IdleWorkerButton && !ThisPlayer->FreeWorkers.empty()) {
+		if (UI.IdleWorkerButton && !CPlayer::GetThisPlayer()->FreeWorkers.empty()) {
 			const PixelPos pos(UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 
-			ThisPlayer->FreeWorkers[0]->GetIcon().Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index);
+			CPlayer::GetThisPlayer()->FreeWorkers[0]->GetIcon().Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", CPlayer::GetThisPlayer()->Index);
 		}
 		
 		//draw icon if there are units with available level up upgrades
-		if (UI.LevelUpUnitButton && !ThisPlayer->LevelUpUnits.empty()) {
+		if (UI.LevelUpUnitButton && !CPlayer::GetThisPlayer()->LevelUpUnits.empty()) {
 			const PixelPos pos(UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 								 
-			ThisPlayer->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", ThisPlayer->Index);
+			CPlayer::GetThisPlayer()->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", CPlayer::GetThisPlayer()->Index);
 		}
 		
 		//draw icon if the player has a hero
-		for (size_t i = 0; i < UI.HeroUnitButtons.size() && i < ThisPlayer->Heroes.size(); ++i) {
+		for (size_t i = 0; i < UI.HeroUnitButtons.size() && i < CPlayer::GetThisPlayer()->Heroes.size(); ++i) {
 			const PixelPos pos(UI.HeroUnitButtons[i].X, UI.HeroUnitButtons[i].Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 									 
-			ThisPlayer->Heroes[i]->GetIcon().Icon->DrawUnitIcon(*UI.HeroUnitButtons[i].Style, flag, pos, "", ThisPlayer->Index);
+			CPlayer::GetThisPlayer()->Heroes[i]->GetIcon().Icon->DrawUnitIcon(*UI.HeroUnitButtons[i].Style, flag, pos, "", CPlayer::GetThisPlayer()->Index);
 		}
 		
 		DrawPopups();
@@ -626,16 +626,16 @@ void GameMainLoop()
 		}
 		
 		//if the person player has no faction, bring up the faction choice interface
-		if (ThisPlayer && ThisPlayer->Faction == -1) {
+		if (CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction == -1) {
 			char buf[256];
-			snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", ThisPlayer->Race != -1 ? PlayerRaces.Name[ThisPlayer->Race].c_str() : "", "");
+			snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? PlayerRaces.Name[CPlayer::GetThisPlayer()->Race].c_str() : "", "");
 			CclCommand(buf);
 		}
 		
-		if (!IsNetworkGame() && ThisPlayer && CurrentCustomHero != nullptr) {
+		if (!IsNetworkGame() && CPlayer::GetThisPlayer() && CurrentCustomHero != nullptr) {
 			Vec2i resPos;
-			FindNearestDrop(*CurrentCustomHero->Type, ThisPlayer->StartPos, resPos, LookingW, ThisPlayer->StartMapLayer);
-			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, ThisPlayer, ThisPlayer->StartMapLayer);
+			FindNearestDrop(*CurrentCustomHero->Type, CPlayer::GetThisPlayer()->StartPos, resPos, LookingW, CPlayer::GetThisPlayer()->StartMapLayer);
+			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, CPlayer::GetThisPlayer(), CPlayer::GetThisPlayer()->StartMapLayer);
 			custom_hero->SetCharacter(CurrentCustomHero->Ident, true);	
 		}
 		
@@ -648,7 +648,7 @@ void GameMainLoop()
 		}
 		
 		if (CurrentQuest != nullptr && CurrentQuest->IntroductionDialogue != nullptr) {
-			CurrentQuest->IntroductionDialogue->Call(ThisPlayer->Index);
+			CurrentQuest->IntroductionDialogue->Call(CPlayer::GetThisPlayer()->Index);
 		}
 	}
 	//Wyrmgus end

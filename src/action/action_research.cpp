@@ -169,7 +169,7 @@
 		} else {
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.Name.c_str());
 		}
-		if (&player == ThisPlayer) {
+		if (&player == CPlayer::GetThisPlayer()) {
 			//Wyrmgus start
 //			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
 			CSound *sound = GameSounds.ResearchComplete[unit.Player->Race].Sound;

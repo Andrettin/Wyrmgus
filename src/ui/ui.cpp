@@ -258,11 +258,11 @@ void CUserInterface::Load()
 	// set the correct UI
 	CleanUserInterfaceFillers();
 	std::vector<CFiller> new_ui_fillers;
-	if (ThisPlayer) {
-		if (ThisPlayer->Faction != -1) {
-			new_ui_fillers = PlayerRaces.GetFactionUIFillers(ThisPlayer->Faction);
+	if (CPlayer::GetThisPlayer()) {
+		if (CPlayer::GetThisPlayer()->Faction != -1) {
+			new_ui_fillers = PlayerRaces.GetFactionUIFillers(CPlayer::GetThisPlayer()->Faction);
 		} else {
-			new_ui_fillers = PlayerRaces.GetCivilizationUIFillers(ThisPlayer->Race);
+			new_ui_fillers = PlayerRaces.GetCivilizationUIFillers(CPlayer::GetThisPlayer()->Race);
 		}
 	}
 	for (size_t i = 0; i < new_ui_fillers.size(); ++i) {

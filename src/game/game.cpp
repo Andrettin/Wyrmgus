@@ -196,10 +196,10 @@ void StartMap(const std::string &filename, bool clean)
 //	SetMessage("%s", _("Do it! Do it now!"));
 	//Wyrmgus end
 	
-	if (ThisPlayer->StartMapLayer < (int) CMap::Map.MapLayers.size()) {
-		UI.CurrentMapLayer = CMap::Map.MapLayers[ThisPlayer->StartMapLayer];
+	if (CPlayer::GetThisPlayer()->StartMapLayer < (int) CMap::Map.MapLayers.size()) {
+		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
 	}
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer));
+	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos, UI.CurrentMapLayer));
 
 	//  Play the game.
 	GameMainLoop();
@@ -294,7 +294,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 
 #if 0
 	// Not true if multiplayer levels!
-	if (!ThisPlayer) { /// ARI: bomb if nothing was loaded!
+	if (!CPlayer::GetThisPlayer()) { /// ARI: bomb if nothing was loaded!
 		fprintf(stderr, "%s: invalid map\n", mapname.c_str());
 		ExitFatal(-1);
 	}
@@ -1513,8 +1513,8 @@ void CalculateItemsToLoad()
 	
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
 		itemsToLoad+= GetIconsCount();
-		if (ThisPlayer) {
-			itemsToLoad+= GetCursorsCount(PlayerRaces.Name[ThisPlayer->Race]);
+		if (CPlayer::GetThisPlayer()) {
+			itemsToLoad+= GetCursorsCount(PlayerRaces.Name[CPlayer::GetThisPlayer()->Race]);
 		}
 		itemsToLoad+= GetUnitTypesCount();
 		itemsToLoad+= GetDecorationsCount();
@@ -1711,7 +1711,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		const std::string &localPlayerName = Parameters::Instance.LocalPlayerName;
 
 		if (!localPlayerName.empty() && localPlayerName != "Anonymous") {
-			ThisPlayer->SetName(localPlayerName);
+			CPlayer::GetThisPlayer()->SetName(localPlayerName);
 		}
 	*/
 	//Wyrmgus end
@@ -1776,10 +1776,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	SetPlayersPalette();
 	LoadIcons();
 
-	//Wyrmgus start
-//	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
 	LoadCursors();
-	//Wyrmgus end
 	UnitUnderCursor = NoUnitP;
 
 	//Wyrmgus start
@@ -1855,11 +1852,11 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
-	if (ThisPlayer->StartMapLayer < (int) CMap::Map.MapLayers.size()) {
-		UI.CurrentMapLayer = CMap::Map.MapLayers[ThisPlayer->StartMapLayer];
+	if (CPlayer::GetThisPlayer()->StartMapLayer < (int) CMap::Map.MapLayers.size()) {
+		UI.CurrentMapLayer = CMap::Map.MapLayers[CPlayer::GetThisPlayer()->StartMapLayer];
 	}
 	UpdateSurfaceLayerButtons();
-	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos, UI.CurrentMapLayer));
+	UI.SelectedViewport->Center(CMap::Map.TilePosToMapPixelPos_Center(CPlayer::GetThisPlayer()->StartPos, UI.CurrentMapLayer));
 
 	//
 	// Various hacks which must be done after the map is loaded.

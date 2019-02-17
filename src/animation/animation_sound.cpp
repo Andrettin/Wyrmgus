@@ -44,7 +44,7 @@
 /* virtual */ void CAnimation_Sound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
+	if (unit.IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
 		PlayUnitSound(unit, this->sound.Sound);
 	}
 }

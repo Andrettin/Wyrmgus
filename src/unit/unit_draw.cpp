@@ -166,9 +166,9 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		if (unit.Player->Index == PlayerNumNeutral) {
 			color = ColorYellow;
 		} else if ((unit.Selected || (unit.Blink & 1))
-				   && (unit.Player == ThisPlayer || ThisPlayer->IsTeamed(unit))) {
+				   && (unit.Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
 			color = ColorGreen;
-		} else if (ThisPlayer->IsEnemy(unit)) {
+		} else if (CPlayer::GetThisPlayer()->IsEnemy(unit)) {
 			color = ColorRed;
 		} else {
 			color = unit.Player->Color;
@@ -181,7 +181,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		}
 	} else if (CursorBuilding && unit.Type->BoolFlag[BUILDING_INDEX].value
 			   && unit.CurrentAction() != UnitActionDie
-			   && (unit.Player == ThisPlayer || ThisPlayer->IsTeamed(unit))) {
+			   && (unit.Player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(unit))) {
 		// If building mark all own buildings
 		color = ColorGray;
 	} else {
@@ -631,12 +631,12 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || (var.ShowOnlySelected && !unit.Selected)
 			  || (unit.Player->Type == PlayerNeutral && var.HideNeutral)
 			  //Wyrmgus start
-			  || (unit.Player != ThisPlayer && !ThisPlayer->IsEnemy(unit) && !ThisPlayer->IsAllied(unit) && var.HideNeutral)
+			  || (unit.Player != CPlayer::GetThisPlayer() && !CPlayer::GetThisPlayer()->IsEnemy(unit) && !CPlayer::GetThisPlayer()->IsAllied(unit) && var.HideNeutral)
 			  //Wyrmgus end
-			  || (ThisPlayer->IsEnemy(unit) && !var.ShowOpponent)
-			  || (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var.HideAllied)
+			  || (CPlayer::GetThisPlayer()->IsEnemy(unit) && !var.ShowOpponent)
+			  || (CPlayer::GetThisPlayer()->IsAllied(unit) && (unit.Player != CPlayer::GetThisPlayer()) && var.HideAllied)
 			  //Wyrmgus start
-			  || (unit.Player == ThisPlayer && var.HideSelf)
+			  || (unit.Player == CPlayer::GetThisPlayer() && var.HideSelf)
 			  || unit.Type->BoolFlag[DECORATION_INDEX].value // don't show decorations for decoration units
 //			  || max == 0)) {
 			  || (var.ShowIfCanCastAnySpell && !unit.CanCastAnySpell())
@@ -652,7 +652,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 	// Draw group number
 	if (unit.Selected && unit.GroupId != 0
 #ifndef DEBUG
-		&& unit.Player == ThisPlayer
+		&& unit.Player == CPlayer::GetThisPlayer()
 #endif
 	   ) {
 		int groupId = 0;
@@ -821,7 +821,7 @@ void ShowOrder(const CUnit &unit)
 		return;
 	}
 #ifndef DEBUG
-	if (!ThisPlayer->IsAllied(unit) && unit.Player != ThisPlayer) {
+	if (!CPlayer::GetThisPlayer()->IsAllied(unit) && unit.Player != CPlayer::GetThisPlayer()) {
 		return;
 	}
 #endif
@@ -869,9 +869,9 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 {
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
-	sprintf(buf, "%d%c%c%d", unit.VisCount[ThisPlayer->Index],
-			unit.Seen.ByPlayer & (1 << ThisPlayer->Index) ? 'Y' : 'N',
-			unit.Seen.Destroyed & (1 << ThisPlayer->Index) ? 'Y' : 'N',
+	sprintf(buf, "%d%c%c%d", unit.VisCount[CPlayer::GetThisPlayer()->Index],
+			unit.Seen.ByPlayer & (1 << CPlayer::GetThisPlayer()->Index) ? 'Y' : 'N',
+			unit.Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->Index) ? 'Y' : 'N',
 			unit.Refs);
 	CLabel(GetSmallFont()).Draw(screenPos.x + 10, screenPos.y + 10, buf);
 #endif
@@ -940,7 +940,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 	}
 
 	// FIXME: johns: ugly check here, should be removed!
-	if (unit.CurrentAction() != UnitActionDie && (unit.IsVisible(*ThisPlayer) || ReplayRevealMap)) {
+	if (unit.CurrentAction() != UnitActionDie && (unit.IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap)) {
 		DrawDecoration(unit, type, screenPos);
 	}
 }
@@ -1097,7 +1097,7 @@ void CUnit::Draw(const CViewport &vp) const
 		return;
 	}
 
-	bool IsVisible = this->IsVisible(*ThisPlayer);
+	bool IsVisible = this->IsVisible(*CPlayer::GetThisPlayer());
 
 	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
 	Assert(ReplayRevealMap || this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value || IsVisible);

@@ -779,7 +779,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				this->Variable[LEVELUP_INDEX].Value -= 1;
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 				CUnitType *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
-				if (this->Player == ThisPlayer) {
+				if (this->Player == CPlayer::GetThisPlayer()) {
 					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->Name.c_str());
 				}
 				TransformUnitIntoType(*this, *chosen_unit_type);
@@ -800,7 +800,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 						CUpgrade *chosen_ability = potential_abilities[SyncRand(potential_abilities.size())];
 						AbilityAcquire(*this, chosen_ability);
 						upgrade_found = true;
-						if (this->Player == ThisPlayer) {
+						if (this->Player == CPlayer::GetThisPlayer()) {
 							this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has acquired the %s ability!"), this->GetMessageName().c_str(), chosen_ability->Name.c_str());
 						}
 					}
@@ -866,7 +866,7 @@ void CUnit::Retrain()
 		}
 	}
 	
-	if (this->Player == ThisPlayer) {
+	if (this->Player == CPlayer::GetThisPlayer()) {
 		this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s's level-up choices have been reset."), unit_name.c_str());
 	}
 }
@@ -1990,7 +1990,7 @@ void CUnit::Identify()
 	
 	this->Identified = true;
 	
-	if (this->Container != nullptr && this->Container->Player == ThisPlayer) {
+	if (this->Container != nullptr && this->Container->Player == CPlayer::GetThisPlayer()) {
 		this->Container->Player->Notify(NotifyGreen, this->Container->tilePos, this->Container->MapLayer->ID, _("%s has identified the %s!"), this->Container->GetMessageName().c_str(), this->GetMessageName().c_str());
 	}
 }
@@ -2371,7 +2371,7 @@ void CUnit::UpdateSoldUnits()
 				}
 			}
 		}
-		if (this->Player == ThisPlayer) {
+		if (this->Player == CPlayer::GetThisPlayer()) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
 					(iterator->second->Civilization && iterator->second->Civilization->ID == civilization_id || iterator->second->Type->Slot == PlayerRaces.GetCivilizationClassUnitType(civilization_id, iterator->second->Type->Class))
@@ -2410,7 +2410,7 @@ void CUnit::UpdateSoldUnits()
 			new_unit = MakeUnitAndPlace(this->tilePos, *chosen_unit_type, &Players[PlayerNumNeutral], this->MapLayer->ID);
 			new_unit->GenerateSpecialProperties(this, this->Player, true, true);
 			new_unit->Identified = true;
-			if (new_unit->Unique && this->Player == ThisPlayer) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
+			if (new_unit->Unique && this->Player == CPlayer::GetThisPlayer()) { //send a notification if a unique item is being sold, we don't want the player to have to worry about missing it :)
 				this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, "%s", _("Unique item available for sale"));
 			}
 		}
@@ -3446,7 +3446,7 @@ void CUnit::XPChanged()
 	while (this->Variable[XP_INDEX].Value >= this->Variable[XPREQUIRED_INDEX].Value) {
 		this->Variable[XP_INDEX].Max -= this->Variable[XPREQUIRED_INDEX].Max;
 		this->Variable[XP_INDEX].Value -= this->Variable[XPREQUIRED_INDEX].Value;
-		if (this->Player == ThisPlayer) {
+		if (this->Player == CPlayer::GetThisPlayer()) {
 			this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has leveled up!"), GetMessageName().c_str());
 		}
 		this->IncreaseLevel(1);
@@ -3972,7 +3972,7 @@ void UnitLost(CUnit &unit)
 					lost_town_hall = false;
 				}
 			}
-			if (lost_town_hall && ThisPlayer->HasContactWith(player)) {
+			if (lost_town_hall && CPlayer::GetThisPlayer()->HasContactWith(player)) {
 				player.LostTownHallTimer = GameCycle + (30 * CYCLES_PER_SECOND); //30 seconds until being revealed
 				for (int j = 0; j < NumPlayers; ++j) {
 					if (player.Index != j && Players[j].Type != PlayerNobody) {
@@ -4095,7 +4095,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	}
 	
 	//Wyrmgus start
-	if (player.LostTownHallTimer != 0 && type.BoolFlag[TOWNHALL_INDEX].value && ThisPlayer->HasContactWith(player)) {
+	if (player.LostTownHallTimer != 0 && type.BoolFlag[TOWNHALL_INDEX].value && CPlayer::GetThisPlayer()->HasContactWith(player)) {
 		player.LostTownHallTimer = 0;
 		player.Revealed = false;
 		for (int j = 0; j < NumPlayers; ++j) {
@@ -4248,7 +4248,7 @@ void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 		if (unit.Destroyed) {
 			unit.Seen.Destroyed |= (1 << player.Index);
 		}
-		if (&player == ThisPlayer) {
+		if (&player == CPlayer::GetThisPlayer()) {
 			UnitFillSeenValues(unit);
 		}
 	}
@@ -4405,20 +4405,20 @@ bool CUnit::IsVisibleOnMinimap() const
 	//Wyrmgus end
 
 	// Invisible units.
-	if (IsInvisibile(*ThisPlayer)) {
+	if (IsInvisibile(*CPlayer::GetThisPlayer())) {
 		return false;
 	}
-	if (IsVisible(*ThisPlayer) || ReplayRevealMap || IsVisibleOnRadar(*ThisPlayer)) {
+	if (IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap || IsVisibleOnRadar(*CPlayer::GetThisPlayer())) {
 		return IsAliveOnMap();
 	} else {
 		return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && Seen.State != 3
-			   && (Seen.ByPlayer & (1 << ThisPlayer->Index))
+			   && (Seen.ByPlayer & (1 << CPlayer::GetThisPlayer()->Index))
 			   //Wyrmgus start
-//			   && !(Seen.Destroyed & (1 << ThisPlayer->Index));
-			   && !(Seen.Destroyed & (1 << ThisPlayer->Index))
+//			   && !(Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->Index));
+			   && !(Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->Index))
 			   && !Destroyed
 			   && CMap::Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)
-			   && this->MapLayer->Field(this->tilePos)->playerInfo.IsTeamExplored(*ThisPlayer);
+			   && this->MapLayer->Field(this->tilePos)->playerInfo.IsTeamExplored(*CPlayer::GetThisPlayer());
 			   //Wyrmgus end
 	}
 }
@@ -4463,7 +4463,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 		return false;
 	}
 
-	if (!ThisPlayer) {
+	if (!CPlayer::GetThisPlayer()) {
 		//FIXME: ARI: Added here for early game setup state by
 		// MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
 		// so don't show anything until first real map-draw.
@@ -4472,17 +4472,17 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	}
 
 	// Those are never ever visible.
-	if (IsInvisibile(*ThisPlayer)) {
+	if (IsInvisibile(*CPlayer::GetThisPlayer())) {
 		return false;
 	}
 
-	if (IsVisible(*ThisPlayer) || ReplayRevealMap) {
+	if (IsVisible(*CPlayer::GetThisPlayer()) || ReplayRevealMap) {
 		return !Destroyed;
 	} else {
 		// Unit has to be 'discovered'
 		// Destroyed units ARE visible under fog of war, if we haven't seen them like that.
-		if (!Destroyed || !(Seen.Destroyed & (1 << ThisPlayer->Index))) {
-			return (Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && (Seen.ByPlayer & (1 << ThisPlayer->Index)));
+		if (!Destroyed || !(Seen.Destroyed & (1 << CPlayer::GetThisPlayer()->Index))) {
+			return (Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && (Seen.ByPlayer & (1 << CPlayer::GetThisPlayer()->Index)));
 		} else {
 			return false;
 		}
@@ -4608,7 +4608,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 	MapMarkUnitSight(*this);
 	
 	//Wyrmgus start
-	if (newplayer.Index == ThisPlayer->Index && show_change) {
+	if (newplayer.Index == CPlayer::GetThisPlayer()->Index && show_change) {
 		this->Blink = 5;
 		PlayGameSound(GameSounds.Rescue[newplayer.Race].Sound, MaxSampleVolume);
 	}
@@ -5159,7 +5159,7 @@ CUnit *UnitOnScreen(int x, int y)
 		if (unit.MapLayer != UI.CurrentMapLayer) {
 			continue;
 		}
-		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*ThisPlayer)) {
+		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*CPlayer::GetThisPlayer())) {
 			continue;
 		}
 		const CUnitType &type = *unit.Type;
@@ -5515,7 +5515,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 
 int CUnit::GetDisplayPlayer() const
 {
-	if (this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->Player != ThisPlayer) {
+	if (this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->Player != CPlayer::GetThisPlayer()) {
 		return PlayerNumNeutral;
 	} else {
 		return this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
@@ -6332,10 +6332,10 @@ CIcon *CUnit::GetButtonIcon(int button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;
-	} else if (this->Player == ThisPlayer && ThisPlayer->Faction != -1 && PlayerRaces.Factions[ThisPlayer->Faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[ThisPlayer->Faction]->ButtonIcons.end()) {
-		return PlayerRaces.Factions[ThisPlayer->Faction]->ButtonIcons[button_action].Icon;
-	} else if (this->Player == ThisPlayer && PlayerRaces.ButtonIcons[ThisPlayer->Race].find(button_action) != PlayerRaces.ButtonIcons[ThisPlayer->Race].end()) {
-		return PlayerRaces.ButtonIcons[ThisPlayer->Race][button_action].Icon;
+	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction != -1 && PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.end()) {
+		return PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons[button_action].Icon;
+	} else if (this->Player == CPlayer::GetThisPlayer() && PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].find(button_action) != PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].end()) {
+		return PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race][button_action].Icon;
 	}
 	
 	return nullptr;
@@ -6370,8 +6370,8 @@ CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 std::string CUnit::GetName() const
 {
 	if (GameRunning && this->Character && this->Character->Deity) {
-		if (ThisPlayer->Race >= 0) {
-			std::string cultural_name = this->Character->Deity->GetCulturalName(CCivilization::Civilizations[ThisPlayer->Race]);
+		if (CPlayer::GetThisPlayer()->Race >= 0) {
+			std::string cultural_name = this->Character->Deity->GetCulturalName(CCivilization::Civilizations[CPlayer::GetThisPlayer()->Race]);
 			
 			if (!cultural_name.empty()) {
 				return cultural_name;
@@ -6704,7 +6704,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 		return;
 	}
 	// NOTE: perhaps this should also be moved into the notify?
-	if (target.Player == ThisPlayer) {
+	if (target.Player == CPlayer::GetThisPlayer()) {
 		// FIXME: Problem with load+save.
 
 		//
@@ -6906,7 +6906,7 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 {
 	const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
 
-	if ((target.IsVisibleOnMap(*ThisPlayer) || ReplayRevealMap) && !DamageMissile.empty()) {
+	if ((target.IsVisibleOnMap(*CPlayer::GetThisPlayer()) || ReplayRevealMap) && !DamageMissile.empty()) {
 		const MissileType *mtype = MissileTypeByIdent(DamageMissile);
 		const PixelDiff offset(3, -mtype->Range);
 
@@ -7131,8 +7131,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	//Wyrmgus start
 	if (
-		(attacker != nullptr && attacker->Player == ThisPlayer)
-		&& target.Player != ThisPlayer
+		(attacker != nullptr && attacker->Player == CPlayer::GetThisPlayer())
+		&& target.Player != CPlayer::GetThisPlayer()
 	) {
 		// If player is hitting or being hit add tension to our music
 		AddMusicTension(1);
@@ -7140,10 +7140,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	//Wyrmgus end
 
 	if (GodMode) {
-		if (attacker && attacker->Player == ThisPlayer) {
+		if (attacker && attacker->Player == CPlayer::GetThisPlayer()) {
 			damage = target.Variable[HP_INDEX].Value;
 		}
-		if (target.Player == ThisPlayer) {
+		if (target.Player == CPlayer::GetThisPlayer()) {
 			damage = 0;
 		}
 	}
@@ -7535,7 +7535,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 		return false;
 	}
 	if (picker.HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= ((int) UI.InventoryButtons.size())) { // full
-		if (picker.Player == ThisPlayer) {
+		if (picker.Player == CPlayer::GetThisPlayer()) {
 			std::string picker_name = picker.Name + "'s (" + picker.GetTypeName() + ")";
 			picker.Player->Notify(NotifyRed, picker.tilePos, picker.MapLayer->ID, _("%s inventory is full."), picker_name.c_str());
 		}

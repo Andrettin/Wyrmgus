@@ -181,9 +181,9 @@ void ButtonAction::SetTriggerData() const
 	if (this->Action == ButtonResearch || this->Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[this->Value];
 	} else if (this->Action == ButtonFaction) {
-		TriggerData.Faction = PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value];
-		if (!PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[ThisPlayer->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
+		TriggerData.Faction = PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
+		if (!PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
+			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
 		}
 	}
 }

@@ -287,7 +287,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//we don't need to notify the player for every building constructed
 //	player.Notify(NotifyGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
 	//Wyrmgus end
-	if (&player == ThisPlayer) {
+	if (&player == CPlayer::GetThisPlayer()) {
 		//Wyrmgus start
 		/*
 		if (type.MapSound.Ready.Sound) {
@@ -358,7 +358,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		UnitUpdateHeading(unit);
 	}
 
-	if (IsOnlySelected(unit) || &player == ThisPlayer) {
+	if (IsOnlySelected(unit) || &player == CPlayer::GetThisPlayer()) {
 		SelectedUnitChanged();
 	}
 	MapUnmarkUnitSight(unit);

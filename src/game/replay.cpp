@@ -229,7 +229,7 @@ static FullReplay *StartReplay()
 		replay->Players[i].Type = GameSettings.Presets[i].Type;
 	}
 
-	replay->LocalPlayer = ThisPlayer->Index;
+	replay->LocalPlayer = CPlayer::GetThisPlayer()->Index;
 
 	replay->Date = dateStr;
 	replay->Map = CMap::Map.Info.Description;
@@ -487,7 +487,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 			makedir(path.c_str(), 0777);
 		}
 
-		snprintf(buf, sizeof(buf), "%d", ThisPlayer->Index);
+		snprintf(buf, sizeof(buf), "%d", CPlayer::GetThisPlayer()->Index);
 
 		path += "/log_of_stratagus_";
 		path += buf;
@@ -871,9 +871,9 @@ static void DoNextReplay()
 #ifdef DEBUG
 		if (!ReplayStep->SyncRandSeed) {
 			// Replay without the 'sync info
-			ThisPlayer->Notify("%s", _("No sync info for this replay !"));
+			CPlayer::GetThisPlayer()->Notify("%s", _("No sync info for this replay !"));
 		} else {
-			ThisPlayer->Notify(_("Replay got out of sync (%lu) !"), GameCycle);
+			CPlayer::GetThisPlayer()->Notify(_("Replay got out of sync (%lu) !"), GameCycle);
 			DebugPrint("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
 			DebugPrint("OUT OF SYNC GameCycle %lu \n" _C_ GameCycle);
 			Assert(0);
@@ -882,7 +882,7 @@ static void DoNextReplay()
 			// return;
 		}
 #else
-		ThisPlayer->Notify("%s", _("Replay got out of sync !"));
+		CPlayer::GetThisPlayer()->Notify("%s", _("Replay got out of sync !"));
 		ReplayStep = 0;
 		NextLogCycle = ~0UL;
 		return;
@@ -1103,7 +1103,7 @@ int SaveReplay(const std::string &filename)
 
 	destination = Parameters::Instance.GetUserDirectory() + "/" + GameName + "/logs/" + filename;
 
-	logfile << Parameters::Instance.GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
+	logfile << Parameters::Instance.GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << CPlayer::GetThisPlayer()->Index << ".log";
 
 	if (stat(logfile.str().c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");

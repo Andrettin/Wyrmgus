@@ -395,7 +395,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 	CLabel label(font, "white", "red");
 	int x;
 	int y = std::min<int>(GameCursor->G->Height + pos.y + 10, vp.BottomRightPos.y - 1 - height);
-	const CPlayer *tplayer = ThisPlayer;
+	const CPlayer *tplayer = CPlayer::GetThisPlayer();
 
 	if (unit && unit->IsAliveOnMap()) {
 		int backgroundColor;
@@ -521,8 +521,8 @@ void CViewport::Draw() const
 	//Wyrmgus end
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		//Wyrmgus start
-//		const bool isMapFieldVisile = CMap::Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
-		const bool isMapFieldVisile = CMap::Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.IsTeamVisible(*ThisPlayer);
+//		const bool isMapFieldVisile = CMap::Map.Field(tilePos)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
+		const bool isMapFieldVisile = CMap::Map.Field(tilePos, UI.CurrentMapLayer->ID)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer());
 		//Wyrmgus end
 
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor

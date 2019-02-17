@@ -814,7 +814,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 		}
 		const CUnitType &type = *unit.Type;
 		// Buildings are visible but not selectable
-		if (type.BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*ThisPlayer)) {
+		if (type.BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*CPlayer::GetThisPlayer())) {
 			continue;
 		}
 		if ((type.GivesResource && !unit.Removed)) { // no built resources.
@@ -831,7 +831,7 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 			continue;
 		}
 		// Buildings are visible but not selectable
-		if (unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*ThisPlayer)) {
+		if (unit.Type->BoolFlag[BUILDING_INDEX].value && !unit.IsVisibleOnMap(*CPlayer::GetThisPlayer())) {
 			continue;
 		}
 		if (unit.IsAliveOnMap()) {

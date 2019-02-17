@@ -264,13 +264,10 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 	if (*v == 0 || *v == 1) { // Unexplored or unseen
 		// When there is no fog only unexplored tiles are marked.
 		if (!CMap::Map.NoFogOfWar || *v == 0) {
-			//Wyrmgus start
-//			UnitsOnTileMarkSeen(player, mf, 0);
 			UnitsOnTileMarkSeen(player, mf, 0, 0);
-			//Wyrmgus end
 		}
 		*v = 2;
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			CMap::Map.MarkSeenTile(mf, z);
 		}
 		return;
@@ -309,13 +306,10 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 		case 2:
 			// When there is NoFogOfWar units never get unmarked.
 			if (!CMap::Map.NoFogOfWar) {
-				//Wyrmgus start
-//				UnitsOnTileUnmarkSeen(player, mf, 0);
 				UnitsOnTileUnmarkSeen(player, mf, 0, 0);
-				//Wyrmgus end
 			}
 			// Check visible Tile, then deduct...
-			if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+			if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 				CMap::Map.MarkSeenTile(mf, z);
 			}
 		default:  // seen -> seen
@@ -670,26 +664,15 @@ void UpdateFogOfWarChange()
 	DebugPrint("::UpdateFogOfWarChange\n");
 	//  Mark all explored fields as visible again.
 	if (CMap::Map.NoFogOfWar) {
-		//Wyrmgus start
-		/*
-		const unsigned int w = CMap::Map.Info.MapHeight * CMap::Map.Info.MapWidth;
-		for (unsigned int index = 0; index != w; ++index) {
-			CMapField &mf = *CMap::Map.Field(index);
-			if (mf.playerInfo.IsExplored(*ThisPlayer)) {
-				CMap::Map.MarkSeenTile(mf);
-			}
-		}
-		*/
-		for (size_t z = 0; z < CMap::Map.MapLayers.size(); ++z) {
-			const unsigned int w = CMap::Map.Info.MapHeights[z] * CMap::Map.Info.MapWidths[z];
+		for (const CMapLayer *map_layer : CMap::Map.MapLayers) {
+			const unsigned int w = map_layer->GetHeight() * map_layer->GetWidth();
 			for (unsigned int index = 0; index != w; ++index) {
-				CMapField &mf = *CMap::Map.Field(index, z);
-				if (mf.playerInfo.IsExplored(*ThisPlayer)) {
-					CMap::Map.MarkSeenTile(mf, z);
+				CMapField &mf = *map_layer->Field(index);
+				if (mf.playerInfo.IsExplored(*CPlayer::GetThisPlayer())) {
+					CMap::Map.MarkSeenTile(mf, map_layer->ID);
 				}
 			}
 		}
-		//Wyrmgus end
 	}
 	//  Global seen recount.
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
@@ -1020,8 +1003,8 @@ void CViewport::DrawMapFogOfWar() const
 	for (; my < ey; ++my) {
 		for (int mx = sx; mx < ex; ++mx) {
 			//Wyrmgus start
-//			VisibleTable[my_index + mx] = CMap::Map.Field(mx + my_index)->playerInfo.TeamVisibilityState(*ThisPlayer);
-			VisibleTable[UI.CurrentMapLayer->ID][my_index + mx] = CMap::Map.Field(mx + my_index, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*ThisPlayer);
+//			VisibleTable[my_index + mx] = CMap::Map.Field(mx + my_index)->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
+			VisibleTable[UI.CurrentMapLayer->ID][my_index + mx] = CMap::Map.Field(mx + my_index, UI.CurrentMapLayer->ID)->playerInfo.TeamVisibilityState(*CPlayer::GetThisPlayer());
 			//Wyrmgus end
 		}
 		my_index += UI.CurrentMapLayer->GetWidth();

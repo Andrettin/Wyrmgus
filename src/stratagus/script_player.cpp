@@ -611,8 +611,8 @@ static int CclChangeUnitsOwner(lua_State *l)
 static int CclGetThisPlayer(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	if (ThisPlayer) {
-		lua_pushnumber(l, ThisPlayer - Players);
+	if (CPlayer::GetThisPlayer()) {
+		lua_pushnumber(l, CPlayer::GetThisPlayer() - Players);
 	} else {
 		lua_pushnumber(l, 0);
 	}
@@ -629,7 +629,7 @@ static int CclSetThisPlayer(lua_State *l)
 	LuaCheckArgs(l, 1);
 	int plynr = LuaToNumber(l, 1);
 
-	ThisPlayer = &Players[plynr];
+	CPlayer::SetThisPlayer(&Players[plynr]);
 	
 	//Wyrmgus start
 	UI.Load();
@@ -740,7 +740,7 @@ static int CclSetDiplomacy(lua_State *l)
 */
 static int CclDiplomacy(lua_State *l)
 {
-	lua_pushnumber(l, ThisPlayer->Index);
+	lua_pushnumber(l, CPlayer::GetThisPlayer()->Index);
 	lua_insert(l, 1);
 	return CclSetDiplomacy(l);
 }
@@ -772,7 +772,7 @@ static int CclSetSharedVision(lua_State *l)
 */
 static int CclSharedVision(lua_State *l)
 {
-	lua_pushnumber(l, ThisPlayer->Index);
+	lua_pushnumber(l, CPlayer::GetThisPlayer()->Index);
 	lua_insert(l, 1);
 	return CclSetSharedVision(l);
 }

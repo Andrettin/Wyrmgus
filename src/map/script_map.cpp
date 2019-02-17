@@ -421,7 +421,7 @@ static int CclShowMapLocation(lua_State *l)
 		DebugPrint("Unable to find UnitType '%s'" _C_ unitname);
 		return 0;
 	}
-	CUnit *target = MakeUnit(*unitType, ThisPlayer);
+	CUnit *target = MakeUnit(*unitType, CPlayer::GetThisPlayer());
 	if (target != nullptr) {
 		target->Variable[HP_INDEX].Value = 0;
 		target->tilePos.x = LuaToNumber(l, 1);

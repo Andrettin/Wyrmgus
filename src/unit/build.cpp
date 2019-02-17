@@ -160,7 +160,7 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
 	int distance = 0;
-	CPlayer* player = builder != nullptr ? builder->Player : ThisPlayer;
+	CPlayer* player = builder != nullptr ? builder->Player : CPlayer::GetThisPlayer();
 
 	if (this->DistanceType == LessThanEqual
 		|| this->DistanceType == GreaterThan
@@ -238,7 +238,7 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
-	CPlayer* player = builder != nullptr ? builder->Player : ThisPlayer;
+	CPlayer* player = builder != nullptr ? builder->Player : CPlayer::GetThisPlayer();
 	int count = 0;
 	if (this->RestrictTypeOwner.size() == 0 || !this->RestrictTypeOwner.compare("self")) {
 		count = player->GetUnitTotalCount(*this->RestrictType);

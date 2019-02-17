@@ -237,10 +237,10 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 		UI.Minimap.UpdateSeenXY(pos);
 		UI.Minimap.UpdateXY(pos);
 		
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			MarkSeenTile(mf);
 		}
-		if (CMap::Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (CMap::Map.Field(pos + offset)->playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			MarkSeenTile(topMf);
 		}
 		FixNeighbors(MapFieldForest, 0, pos + offset);

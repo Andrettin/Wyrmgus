@@ -146,7 +146,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	if (mf.playerInfo.SeenTile != wallTile) { // Already there!
 		mf.playerInfo.SeenTile = wallTile;
 		// FIXME: can this only happen if seen?
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			UI.Minimap.UpdateSeenXY(pos);
 		}
 	}
@@ -199,7 +199,7 @@ void MapFixWallTile(const Vec2i &pos)
 		mf.setGraphicTile(wallTile);
 		UI.Minimap.UpdateXY(pos);
 
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 			UI.Minimap.UpdateSeenXY(pos);
 			CMap::Map.MarkSeenTile(mf);
 		}
@@ -247,7 +247,7 @@ void CMap::RemoveWall(const Vec2i &pos)
 
 	UI.Minimap.UpdateXY(pos);
 
-	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		UI.Minimap.UpdateSeenXY(pos);
 		this->MarkSeenTile(mf);
 	}
@@ -281,7 +281,7 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 	MapFixWallTile(pos);
 	MapFixWallNeighbors(pos);
 
-	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamVisible(*CPlayer::GetThisPlayer())) {
 		UI.Minimap.UpdateSeenXY(pos);
 		this->MarkSeenTile(mf);
 	}

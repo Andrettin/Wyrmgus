@@ -310,9 +310,9 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				return unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound;
 			}
 		case VoiceWorkCompleted:
-			return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
+			return GameSounds.WorkComplete[CPlayer::GetThisPlayer()->Race].Sound;
 		case VoiceBuilding:
-			return GameSounds.BuildingConstruction[ThisPlayer->Race].Sound;
+			return GameSounds.BuildingConstruction[CPlayer::GetThisPlayer()->Race].Sound;
 		case VoiceDocking:
 			return GameSounds.Docking.Sound;
 		case VoiceRepairing:

@@ -364,7 +364,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//
 	// Update possible changed buttons.
 	//
-	if (IsOnlySelected(unit) || &player == ThisPlayer) {
+	if (IsOnlySelected(unit) || &player == CPlayer::GetThisPlayer()) {
 		// could affect the buttons of any selected unit
 		SelectedUnitChanged();
 	}
@@ -373,7 +373,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		//
 		// Update possible changed buttons.
 		//
-		if (IsOnlySelected(unit) || &player == ThisPlayer) {
+		if (IsOnlySelected(unit) || &player == CPlayer::GetThisPlayer()) {
 			// could affect the buttons of any selected unit
 			SelectedUnitChanged();
 		}

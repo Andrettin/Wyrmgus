@@ -94,7 +94,7 @@ int TriggerGetPlayer(lua_State *l)
 	if (!strcmp(player, "any")) {
 		return -1;
 	} else if (!strcmp(player, "this")) {
-		return ThisPlayer->Index;
+		return CPlayer::GetThisPlayer()->Index;
 	}
 	LuaError(l, "bad player: %s" _C_ player);
 	return 0;

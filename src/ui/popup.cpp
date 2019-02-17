@@ -70,7 +70,7 @@
 			draw = button.Description;
 			break;
 		case PopupButtonInfo_Dependencies:
-			draw = PrintDependencies(*ThisPlayer, button);
+			draw = PrintDependencies(*CPlayer::GetThisPlayer(), button);
 			break;
 	}
 	int width = 0;
@@ -112,7 +112,7 @@
 			draw = button.Description;
 			break;
 		case PopupButtonInfo_Dependencies:
-			draw = PrintDependencies(*ThisPlayer, button);
+			draw = PrintDependencies(*CPlayer::GetThisPlayer(), button);
 			break;
 	}
 	int height = 0;
@@ -141,7 +141,7 @@
 			draw = button.Description;
 			break;
 		case PopupButtonInfo_Dependencies:
-			draw = PrintDependencies(*ThisPlayer, button);
+			draw = PrintDependencies(*CPlayer::GetThisPlayer(), button);
 			break;
 	}
 	std::string sub(draw);
@@ -519,7 +519,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		/*
 		CUnitType &type = *UnitTypes[button.Value];
 		int value = type.DefaultStat.Variables[this->Index].Value;
-		int diff = type.Stats[ThisPlayer->Index].Variables[this->Index].Value - value;
+		int diff = type.Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value - value;
 
 		if (!diff) {
 			label.Draw(x, y, value);
@@ -531,7 +531,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		*/
 		int value;
 		if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
-			value = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[this->Index].Value;
+			value = UnitTypes[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
 			if (value >= 0 && IsBonusVariable(this->Index)) {
 				x += label.Draw(x, y, "+");
 			}

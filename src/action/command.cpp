@@ -893,8 +893,8 @@ void CommandDismiss(CUnit &unit, bool salvage)
 					&& table[i]->CurrentOrder()->HasGoal()
 					&& table[i]->CurrentOrder()->GetGoal() == &unit
 				) {
-					if (unit.Player->Index == ThisPlayer->Index) {
-						ThisPlayer->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, "%s", _("Cannot salvage if enemies are attacking it."));
+					if (unit.Player->Index == CPlayer::GetThisPlayer()->Index) {
+						CPlayer::GetThisPlayer()->Notify(NotifyRed, unit.tilePos, unit.MapLayer->ID, "%s", _("Cannot salvage if enemies are attacking it."));
 					}
 					return;
 				}
@@ -1054,8 +1054,8 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 	}
 	//Wyrmgus start
 	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0 && unit.GetUnitStock(&type) <= 0) {
-		if (player == ThisPlayer->Index) {
-			ThisPlayer->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
+		if (player == CPlayer::GetThisPlayer()->Index) {
+			CPlayer::GetThisPlayer()->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID, "%s", _("The stock is empty, wait until it is replenished."));
 		}
 		return;
 	}
@@ -1115,7 +1115,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 			unit.CurrentOrder()->Cancel(unit);
 			RemoveOrder(unit, 0);
 		}
-		if (unit.Player == ThisPlayer && unit.Selected) {
+		if (unit.Player == CPlayer::GetThisPlayer() && unit.Selected) {
 			SelectedUnitChanged();
 		}
 	} else if (unit.Orders.size() <= static_cast<size_t>(slot)) {
@@ -1135,7 +1135,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 		RemoveOrder(unit, slot);
 
 		// Update interface.
-		if (unit.Player == ThisPlayer && unit.Selected) {
+		if (unit.Player == CPlayer::GetThisPlayer() && unit.Selected) {
 			SelectedUnitChanged();
 		}
 	}
@@ -1408,7 +1408,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 			if (mfp.Visible[player] && !mfp.Visible[opponent] && !Players[player].Revealed) {
 			//Wyrmgus end
 				mfp.Visible[opponent] = 1;
-				if (opponent == ThisPlayer->Index) {
+				if (opponent == CPlayer::GetThisPlayer()->Index) {
 					CMap::Map.MarkSeenTile(mf);
 				}
 			}
@@ -1417,7 +1417,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 			if (mfp.Visible[opponent] && !mfp.Visible[player] && !Players[opponent].Revealed) {
 			//Wyrmgus end
 				mfp.Visible[player] = 1;
-				if (player == ThisPlayer->Index) {
+				if (player == CPlayer::GetThisPlayer()->Index) {
 					CMap::Map.MarkSeenTile(mf);
 				}
 			}
@@ -1430,13 +1430,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 
 				if (mfp.Visible[player] && !mfp.Visible[opponent] && !Players[player].Revealed) {
 					mfp.Visible[opponent] = 1;
-					if (opponent == ThisPlayer->Index) {
+					if (opponent == CPlayer::GetThisPlayer()->Index) {
 						CMap::Map.MarkSeenTile(mf, z);
 					}
 				}
 				if (mfp.Visible[opponent] && !mfp.Visible[player] && !Players[opponent].Revealed) {
 					mfp.Visible[player] = 1;
-					if (player == ThisPlayer->Index) {
+					if (player == CPlayer::GetThisPlayer()->Index) {
 						CMap::Map.MarkSeenTile(mf, z);
 					}
 				}
