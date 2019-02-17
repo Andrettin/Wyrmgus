@@ -90,10 +90,13 @@
 #include "upgrade/upgrade_modifier.h"
 #include "video.h"
 #include "world.h"
+#include "wyrmgus_module.h"
 
 //Wyrmgus start
 #include "../ai/ai_local.h"
 //Wyrmgus end
+
+#include <mutex>
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -349,8 +352,11 @@
 ----------------------------------------------------------------------------*/
 
 int NumPlayers;							/// How many player slots used
-CPlayer Players[PlayerMax];				/// All players in play
+
 CPlayer *CPlayer::ThisPlayer = nullptr;	/// Player on this computer
+std::vector<CPlayer *> CPlayer::Players;	/// All players in play
+std::shared_mutex CPlayer::PlayerMutex;
+
 PlayerRace PlayerRaces;					/// Player races
 
 bool NoRescueCheck;						/// Disable rescue check
@@ -808,10 +814,10 @@ CDynasty::~CDynasty()
 */
 void InitPlayers()
 {
-	for (int p = 0; p < PlayerMax; ++p) {
-		Players[p].Index = p;
-		if (!Players[p].Type) {
-			Players[p].Type = PlayerNobody;
+	for (size_t p = 0; p < PlayerMax; ++p) {
+		CPlayer::Players[p]->Index = p;
+		if (!CPlayer::Players[p]->Type) {
+			CPlayer::Players[p]->Type = PlayerNobody;
 		}
 		//Wyrmgus start
 //		for (int x = 0; x < PlayerColorIndexCount; ++x) {
@@ -835,7 +841,7 @@ void CleanPlayers()
 {
 	CPlayer::SetThisPlayer(nullptr);
 	for (unsigned int i = 0; i < PlayerMax; ++i) {
-		Players[i].Clear();
+		CPlayer::Players[i]->Clear();
 	}
 	NumPlayers = 0;
 	NoRescueCheck = false;
@@ -844,7 +850,7 @@ void CleanPlayers()
 void FreePlayerColors()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		Players[i].UnitColors.Colors.clear();
+		CPlayer::Players[i]->UnitColors.Colors.clear();
 		//Wyrmgus start
 //		PlayerColorsRGB[i].clear();
 //		PlayerColors[i].clear();
@@ -872,7 +878,7 @@ void SavePlayers(CFile &file)
 
 	//  Dump all players
 	for (int i = 0; i < NumPlayers; ++i) {
-		Players[i].Save(file);
+		CPlayer::Players[i]->Save(file);
 	}
 
 	file.printf("SetThisPlayer(%d)\n\n", CPlayer::GetThisPlayer()->Index);
@@ -880,11 +886,40 @@ void SavePlayers(CFile &file)
 
 void CPlayer::SetThisPlayer(CPlayer *player)
 {
-	CPlayer::ThisPlayer = player;
+	if (CPlayer::ThisPlayer == player) {
+		return;
+	}
+	
+	{
+		std::unique_lock<std::shared_mutex> lock(PlayerMutex);
+		
+		CPlayer::ThisPlayer = player;
+	}
+	
+	WyrmgusModule::GetInstance()->ThisPlayerChanged();
+}
+
+CPlayer *CPlayer::GetPlayer(const int index)
+{
+	std::shared_lock<std::shared_mutex> lock(PlayerMutex);
+	
+	if (index < 0) {
+		fprintf(stderr, "Cannot get player for index %d: the index is negative.\n", index);
+		return nullptr;
+	}
+	
+	if (index >= PlayerMax) {
+		fprintf(stderr, "Cannot get player for index %d: the maximum value is %d.\n", index, PlayerMax);
+		return nullptr;
+	}
+	
+	return CPlayer::Players[index];
 }
 
 CPlayer *CPlayer::GetThisPlayer()
 {
+	std::shared_lock<std::shared_mutex> lock(PlayerMutex);
+	
 	return CPlayer::ThisPlayer;
 }
 
@@ -1219,7 +1254,7 @@ void CreatePlayer(int type)
 	if (NumPlayers == PlayerMax) { // already done for bigmaps!
 		return;
 	}
-	CPlayer &player = Players[NumPlayers];
+	CPlayer &player = *CPlayer::Players[NumPlayers];
 	player.Index = NumPlayers;
 
 	player.Init(type);
@@ -1233,8 +1268,8 @@ CPlayer *GetFactionPlayer(const CFaction *faction)
 	}
 	
 	for (int i = 0; i < NumPlayers; ++i) {
-		if (Players[i].Race == faction->Civilization->ID && Players[i].Faction == faction->ID) {
-			return &Players[i];
+		if (CPlayer::Players[i]->Race == faction->Civilization->ID && CPlayer::Players[i]->Faction == faction->ID) {
+			return CPlayer::Players[i];
 		}
 	}
 	
@@ -1251,17 +1286,17 @@ CPlayer *GetOrAddFactionPlayer(const CFaction *faction)
 	// no player belonging to this faction, so let's make an unused player slot be created for it
 	
 	for (int i = 0; i < NumPlayers; ++i) {
-		if (Players[i].Type == PlayerNobody) {
-			Players[i].Type = PlayerComputer;
-			Players[i].SetCivilization(faction->Civilization->ID);
-			Players[i].SetFaction(faction);
-			Players[i].AiEnabled = true;
-			Players[i].AiName = faction->DefaultAI;
-			Players[i].Team = 1;
-			Players[i].Resources[CopperCost] = 2500; // give the new player enough resources to start up
-			Players[i].Resources[WoodCost] = 2500;
-			Players[i].Resources[StoneCost] = 2500;
-			return &Players[i];
+		if (CPlayer::Players[i]->Type == PlayerNobody) {
+			CPlayer::Players[i]->Type = PlayerComputer;
+			CPlayer::Players[i]->SetCivilization(faction->Civilization->ID);
+			CPlayer::Players[i]->SetFaction(faction);
+			CPlayer::Players[i]->AiEnabled = true;
+			CPlayer::Players[i]->AiName = faction->DefaultAI;
+			CPlayer::Players[i]->Team = 1;
+			CPlayer::Players[i]->Resources[CopperCost] = 2500; // give the new player enough resources to start up
+			CPlayer::Players[i]->Resources[WoodCost] = 2500;
+			CPlayer::Players[i]->Resources[StoneCost] = 2500;
+			return CPlayer::Players[i];
 		}
 	}
 	
@@ -1273,6 +1308,8 @@ CPlayer *GetOrAddFactionPlayer(const CFaction *faction)
 
 void CPlayer::Init(/* PlayerTypes */ int type)
 {
+	std::unique_lock<std::shared_mutex> lock(this->Mutex);
+	
 	std::vector<CUnit *>().swap(this->Units);
 	std::vector<CUnit *>().swap(this->FreeWorkers);
 	//Wyrmgus start
@@ -1289,7 +1326,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 		}
 	}
 	if (NetPlayers && NumPlayers == NetLocalPlayerNumber) {
-		CPlayer::SetThisPlayer(&Players[NetLocalPlayerNumber]);
+		CPlayer::SetThisPlayer(CPlayer::Players[NetLocalPlayerNumber]);
 	}
 
 	if (NumPlayers == PlayerMax) {
@@ -1352,43 +1389,43 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 				// Computer allied with computer and enemy of all persons.
 				//Wyrmgus start
 				/*
-				if (Players[i].Type == PlayerComputer) {
+				if (CPlayer::Players[i]->Type == PlayerComputer) {
 					this->Allied |= (1 << i);
-					Players[i].Allied |= (1 << NumPlayers);
-				} else if (Players[i].Type == PlayerPerson || Players[i].Type == PlayerRescueActive) {
+					CPlayer::Players[i]->Allied |= (1 << NumPlayers);
+				} else if (CPlayer::Players[i]->Type == PlayerPerson || CPlayer::Players[i]->Type == PlayerRescueActive) {
 				*/
 				// make computer players be hostile to each other by default
-				if (Players[i].Type == PlayerComputer || Players[i].Type == PlayerPerson || Players[i].Type == PlayerRescueActive) {
+				if (CPlayer::Players[i]->Type == PlayerComputer || CPlayer::Players[i]->Type == PlayerPerson || CPlayer::Players[i]->Type == PlayerRescueActive) {
 				//Wyrmgus end
 					this->Enemy |= (1 << i);
-					Players[i].Enemy |= (1 << NumPlayers);
+					CPlayer::Players[i]->Enemy |= (1 << NumPlayers);
 				}
 				break;
 			case PlayerPerson:
 				// Humans are enemy of all?
-				if (Players[i].Type == PlayerComputer || Players[i].Type == PlayerPerson) {
+				if (CPlayer::Players[i]->Type == PlayerComputer || CPlayer::Players[i]->Type == PlayerPerson) {
 					this->Enemy |= (1 << i);
-					Players[i].Enemy |= (1 << NumPlayers);
-				} else if (Players[i].Type == PlayerRescueActive || Players[i].Type == PlayerRescuePassive) {
+					CPlayer::Players[i]->Enemy |= (1 << NumPlayers);
+				} else if (CPlayer::Players[i]->Type == PlayerRescueActive || CPlayer::Players[i]->Type == PlayerRescuePassive) {
 					this->Allied |= (1 << i);
-					Players[i].Allied |= (1 << NumPlayers);
+					CPlayer::Players[i]->Allied |= (1 << NumPlayers);
 				}
 				break;
 			case PlayerRescuePassive:
 				// Rescue passive are allied with persons
-				if (Players[i].Type == PlayerPerson) {
+				if (CPlayer::Players[i]->Type == PlayerPerson) {
 					this->Allied |= (1 << i);
-					Players[i].Allied |= (1 << NumPlayers);
+					CPlayer::Players[i]->Allied |= (1 << NumPlayers);
 				}
 				break;
 			case PlayerRescueActive:
 				// Rescue active are allied with persons and enemies of computer
-				if (Players[i].Type == PlayerComputer) {
+				if (CPlayer::Players[i]->Type == PlayerComputer) {
 					this->Enemy |= (1 << i);
-					Players[i].Enemy |= (1 << NumPlayers);
-				} else if (Players[i].Type == PlayerPerson) {
+					CPlayer::Players[i]->Enemy |= (1 << NumPlayers);
+				} else if (CPlayer::Players[i]->Type == PlayerPerson) {
 					this->Allied |= (1 << i);
-					Players[i].Allied |= (1 << NumPlayers);
+					CPlayer::Players[i]->Allied |= (1 << NumPlayers);
 				}
 				break;
 		}
@@ -1431,7 +1468,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	this->Color = PlayerColors[NumPlayers][0];
 
-	if (Players[NumPlayers].Type == PlayerComputer || Players[NumPlayers].Type == PlayerRescueActive) {
+	if (CPlayer::Players[NumPlayers]->Type == PlayerComputer || CPlayer::Players[NumPlayers]->Type == PlayerRescueActive) {
 		this->AiEnabled = true;
 	} else {
 		this->AiEnabled = false;
@@ -1455,6 +1492,8 @@ void CPlayer::SetName(const std::string &name)
 //Wyrmgus start
 void CPlayer::SetCivilization(int civilization)
 {
+	std::unique_lock<std::shared_mutex> lock(this->Mutex);
+	
 	if (this->Race != -1 && (GameRunning || GameEstablishing)) {
 		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID] == 'R') {
 			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID);
@@ -1491,6 +1530,17 @@ void CPlayer::SetCivilization(int civilization)
 	}
 }
 
+CCivilization *CPlayer::GetCivilization() const
+{
+	std::shared_lock<std::shared_mutex> lock(this->Mutex);
+	
+	if (this->Race != -1) {
+		return CCivilization::Civilizations[this->Race];
+	}
+		
+	return nullptr;
+}
+	
 /**
 **  Change player faction.
 **
@@ -1815,7 +1865,7 @@ bool CPlayer::IsPlayerColorUsed(int color)
 {
 	bool color_used = false;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && Players[i].Faction != -1 && Players[i].Type != PlayerNobody && Players[i].Color == PlayerColors[color][0]) {
+		if (this->Index != i && CPlayer::Players[i]->Faction != -1 && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Color == PlayerColors[color][0]) {
 			color_used = true;
 		}		
 	}
@@ -1994,7 +2044,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && Players[i].Type != PlayerNobody && Players[i].Race == faction->Civilization->ID && Players[i].Faction == faction->ID) {
+		if (this->Index != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->Civilization->ID && CPlayer::Players[i]->Faction == faction->ID) {
 			// faction is already in use
 			return false;
 		}
@@ -2369,6 +2419,8 @@ std::vector<CUpgrade *> CPlayer::GetResearchableUpgrades()
 */
 void CPlayer::Clear()
 {
+	std::unique_lock<std::shared_mutex> lock(this->Mutex);
+	
 	Index = 0;
 	Name.clear();
 	Type = 0;
@@ -3164,7 +3216,7 @@ void CPlayer::RemoveModifier(CUpgrade *modifier)
 bool CPlayer::AtPeace() const
 {
 	for (int i = 0; i < PlayerNumNeutral; ++i) {
-		if (this->IsEnemy(Players[i]) && this->HasContactWith(Players[i]) && Players[i].GetUnitCount() > 0) {
+		if (this->IsEnemy(*CPlayer::Players[i]) && this->HasContactWith(*CPlayer::Players[i]) && CPlayer::Players[i]->GetUnitCount() > 0) {
 			return false;
 		}
 	}
@@ -3944,8 +3996,8 @@ int CPlayer::HaveUnitTypeByIdent(const std::string &ident) const
 void PlayersInitAi()
 {
 	for (int player = 0; player < NumPlayers; ++player) {
-		if (Players[player].AiEnabled) {
-			AiInit(Players[player]);
+		if (CPlayer::Players[player]->AiEnabled) {
+			AiInit(*CPlayer::Players[player]);
 		}
 	}
 }
@@ -3956,16 +4008,16 @@ void PlayersInitAi()
 void PlayersEachCycle()
 {
 	for (int player = 0; player < NumPlayers; ++player) {
-		CPlayer &p = Players[player];
+		CPlayer &p = *CPlayer::Players[player];
 		
 		//Wyrmgus start
 		if (p.LostTownHallTimer && !p.Revealed && p.LostTownHallTimer < ((int) GameCycle) && CPlayer::GetThisPlayer()->HasContactWith(p)) {
 			p.Revealed = true;
 			for (int j = 0; j < NumPlayers; ++j) {
-				if (player != j && Players[j].Type != PlayerNobody) {
-					Players[j].Notify(_("%s's units have been revealed!"), p.Name.c_str());
+				if (player != j && CPlayer::Players[j]->Type != PlayerNobody) {
+					CPlayer::Players[j]->Notify(_("%s's units have been revealed!"), p.Name.c_str());
 				} else {
-					Players[j].Notify("%s", _("Your units have been revealed!"));
+					CPlayer::Players[j]->Notify("%s", _("Your units have been revealed!"));
 				}
 			}
 		}
@@ -3996,7 +4048,7 @@ void PlayersEachCycle()
 */
 void PlayersEachSecond(int playerIdx)
 {
-	CPlayer &player = Players[playerIdx];
+	CPlayer &player = *CPlayer::Players[playerIdx];
 
 	if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
 		for (int res = 0; res < MaxCosts; ++res) {
@@ -4023,7 +4075,7 @@ void PlayersEachSecond(int playerIdx)
 */
 void PlayersEachHalfMinute(int playerIdx)
 {
-	CPlayer &player = Players[playerIdx];
+	CPlayer &player = *CPlayer::Players[playerIdx];
 
 	if (player.AiEnabled) {
 		AiEachHalfMinute(player);
@@ -4039,7 +4091,7 @@ void PlayersEachHalfMinute(int playerIdx)
 */
 void PlayersEachMinute(int playerIdx)
 {
-	CPlayer &player = Players[playerIdx];
+	CPlayer &player = *CPlayer::Players[playerIdx];
 
 	if (player.AiEnabled) {
 		AiEachMinute(player);
@@ -4121,9 +4173,9 @@ void SetPlayersPalette()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		//Wyrmgus start
-//		Players[i].UnitColors.Colors = PlayerColorsRGB[i];
-		if (Players[i].Faction == -1) {
-			Players[i].UnitColors.Colors = PlayerColorsRGB[i];
+//		CPlayer::Players[i]->UnitColors.Colors = PlayerColorsRGB[i];
+		if (CPlayer::Players[i]->Faction == -1) {
+			CPlayer::Players[i]->UnitColors.Colors = PlayerColorsRGB[i];
 		}
 		//Wyrmgus end
 	}
@@ -4138,12 +4190,12 @@ void DebugPlayers()
 	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
 	DebugPrint("--  -------- - -------- ------------ ------- -----\n");
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Players[i].Type == PlayerNobody) {
+		if (CPlayer::Players[i]->Type == PlayerNobody) {
 			continue;
 		}
 		const char *playertype;
 
-		switch (Players[i].Type) {
+		switch (CPlayer::Players[i]->Type) {
 			case 0: playertype = "Don't know 0"; break;
 			case 1: playertype = "Don't know 1"; break;
 			case 2: playertype = "neutral     "; break;
@@ -4155,11 +4207,11 @@ void DebugPlayers()
 			default : playertype = "?unknown?   "; break;
 		}
 		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i].c_str() _C_
-				   CPlayer::GetThisPlayer() == &Players[i] ? '*' :
-				   Players[i].AiEnabled ? '+' : ' ' _C_
-				   Players[i].Name.c_str() _C_ playertype _C_
-				   PlayerRaces.Name[Players[i].Race].c_str() _C_
-				   Players[i].AiName.c_str());
+				   CPlayer::GetThisPlayer() == CPlayer::Players[i] ? '*' :
+				   CPlayer::Players[i]->AiEnabled ? '+' : ' ' _C_
+				   CPlayer::Players[i]->Name.c_str() _C_ playertype _C_
+				   PlayerRaces.Name[CPlayer::Players[i]->Race].c_str() _C_
+				   CPlayer::Players[i]->AiName.c_str());
 	}
 #endif
 }
@@ -4567,6 +4619,11 @@ bool CPlayer::HasHero(const CCharacter *hero) const
 	}
 	
 	return false;
+}
+
+void CPlayer::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_civilization"), &CPlayer::GetCivilization);
 }
 
 void SetFactionStringToIndex(const std::string &faction_name, int faction_id)

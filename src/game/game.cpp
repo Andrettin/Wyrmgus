@@ -365,13 +365,13 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		// Add player start spots
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			//Wyrmgus start
-//			if (Players[i].Type != PlayerNobody) {
-			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == UI.CurrentMapLayer->ID) {
+//			if (CPlayer::Players[i]->Type != PlayerNobody) {
+			if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
 			//Wyrmgus end
 				for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
 					for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
-						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->GetWidth();
-						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->GetHeight();
+						const int miniMapX = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->GetWidth();
+						const int miniMapY = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->GetHeight();
 						if (miniMapX + j < 0 || miniMapX + j >= UI.Minimap.W) {
 							continue;
 						}
@@ -379,9 +379,9 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 							continue;
 						}
 						const int offset = ((miniMapY + k) * UI.Minimap.H + miniMapX + j) * 3;
-						pixels[offset + 0] = ((Players[i].Color & RMASK) >> RSHIFT);
-						pixels[offset + 1] = ((Players[i].Color & GMASK) >> GSHIFT);
-						pixels[offset + 2] = ((Players[i].Color & BMASK) >> BSHIFT);
+						pixels[offset + 0] = ((CPlayer::Players[i]->Color & RMASK) >> RSHIFT);
+						pixels[offset + 1] = ((CPlayer::Players[i]->Color & GMASK) >> GSHIFT);
+						pixels[offset + 2] = ((CPlayer::Players[i]->Color & BMASK) >> BSHIFT);
 					}
 				}
 			}
@@ -414,13 +414,13 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		SDL_Rect rect;
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			//Wyrmgus start
-//			if (Players[i].Type != PlayerNobody) {
-			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == UI.CurrentMapLayer->ID) {
+//			if (CPlayer::Players[i]->Type != PlayerNobody) {
+			if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->StartMapLayer == UI.CurrentMapLayer->ID) {
 			//Wyrmgus end
-				rect.x = Players[i].StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->GetWidth() - rectSize / 2;
-				rect.y = Players[i].StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->GetHeight() - rectSize / 2;
+				rect.x = CPlayer::Players[i]->StartPos.x * UI.Minimap.W / UI.CurrentMapLayer->GetWidth() - rectSize / 2;
+				rect.y = CPlayer::Players[i]->StartPos.y * UI.Minimap.H / UI.CurrentMapLayer->GetHeight() - rectSize / 2;
 				rect.w = rect.h = rectSize;
-				SDL_FillRect(preview, &rect, Players[i].Color);
+				SDL_FillRect(preview, &rect, CPlayer::Players[i]->Color);
 			}
 		}
 
@@ -804,20 +804,20 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (CMap::Map.Info.PlayerType[i] == PlayerNobody) {
 				continue;
 			}
-			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartPos.x, Players[i].StartPos.y);
+			f->printf("SetStartView(%d, %d, %d)\n", i, CPlayer::Players[i]->StartPos.x, CPlayer::Players[i]->StartPos.y);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 					  i, DefaultResourceNames[WoodCost].c_str(),
-					  Players[i].Resources[WoodCost]);
+					  CPlayer::Players[i]->Resources[WoodCost]);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 					  i, DefaultResourceNames[GoldCost].c_str(),
-					  Players[i].Resources[GoldCost]);
+					  CPlayer::Players[i]->Resources[GoldCost]);
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 					  i, DefaultResourceNames[OilCost].c_str(),
-					  Players[i].Resources[OilCost]);
+					  CPlayer::Players[i]->Resources[OilCost]);
 			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-					  i, PlayerRaces.Name[Players[i].Race].c_str());
+					  i, PlayerRaces.Name[CPlayer::Players[i]->Race].c_str());
 			f->printf("SetAiType(%d, \"%s\")\n",
-					  i, Players[i].AiName.c_str());
+					  i, CPlayer::Players[i]->AiName.c_str());
 		}
 		f->printf("\n");
 
@@ -830,29 +830,29 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				if (CMap::Map.Info.PlayerType[i] == PlayerNobody) {
 					continue;
 				}
-				f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartPos.x, Players[i].StartPos.y);
+				f->printf("SetStartView(%d, %d, %d)\n", i, CPlayer::Players[i]->StartPos.x, CPlayer::Players[i]->StartPos.y);
 				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 						  i, DefaultResourceNames[WoodCost].c_str(),
-						  Players[i].Resources[WoodCost]);
+						  CPlayer::Players[i]->Resources[WoodCost]);
 				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 						  i, DefaultResourceNames[CopperCost].c_str(),
-						  Players[i].Resources[CopperCost]);
-				if (Players[i].Resources[OilCost]) {
+						  CPlayer::Players[i]->Resources[CopperCost]);
+				if (CPlayer::Players[i]->Resources[OilCost]) {
 					f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 							  i, DefaultResourceNames[OilCost].c_str(),
-							  Players[i].Resources[OilCost]);
+							  CPlayer::Players[i]->Resources[OilCost]);
 				}
 				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 						  i, DefaultResourceNames[StoneCost].c_str(),
-						  Players[i].Resources[StoneCost]);
+						  CPlayer::Players[i]->Resources[StoneCost]);
 				f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-						  i, PlayerRaces.Name[Players[i].Race].c_str());
-				if (Players[i].Faction != -1) {
+						  i, PlayerRaces.Name[CPlayer::Players[i]->Race].c_str());
+				if (CPlayer::Players[i]->Faction != -1) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
-							  i, PlayerRaces.Factions[Players[i].Faction]->Ident.c_str());
+							  i, PlayerRaces.Factions[CPlayer::Players[i]->Faction]->Ident.c_str());
 				}
 				f->printf("SetAiType(%d, \"%s\")\n",
-						  i, Players[i].AiName.c_str());
+						  i, CPlayer::Players[i]->AiName.c_str());
 			}
 			f->printf("\n");
 
@@ -1255,20 +1255,20 @@ int GetGameSpeed()
 static void GameTypeMelee()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->HasNeutralFactionType()) {
 			continue;
 		}
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (Players[j].HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->HasNeutralFactionType()) {
 				continue;
 			}
 
-			if (Players[i].Type == PlayerComputer && Players[j].Type == PlayerComputer) {
+			if (CPlayer::Players[i]->Type == PlayerComputer && CPlayer::Players[j]->Type == PlayerComputer) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
-				Players[i].ShareVisionWith(Players[j]);
+				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				CommandDiplomacy(j, DiplomacyAllied, i);
-				Players[j].ShareVisionWith(Players[i]);
+				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
 				CommandDiplomacy(i, DiplomacyEnemy, j);
 				CommandDiplomacy(j, DiplomacyEnemy, i);
@@ -1284,12 +1284,12 @@ static void GameTypeMelee()
 static void GameTypeFreeForAll()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->HasNeutralFactionType()) {
 			continue;
 		}
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (Players[j].HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->HasNeutralFactionType()) {
 				continue;
 			}
 			
@@ -1307,24 +1307,24 @@ static void GameTypeTopVsBottom()
 	const int middle = CMap::Map.Info.MapHeight / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->HasNeutralFactionType()) {
 			continue;
 		}
 
-		const bool top_i = Players[i].StartPos.y <= middle;
+		const bool top_i = CPlayer::Players[i]->StartPos.y <= middle;
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (Players[j].HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->HasNeutralFactionType()) {
 				continue;
 			}
 
-			const bool top_j = Players[j].StartPos.y <= middle;
+			const bool top_j = CPlayer::Players[j]->StartPos.y <= middle;
 
 			if (top_i == top_j) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
-				Players[i].ShareVisionWith(Players[j]);
+				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				CommandDiplomacy(j, DiplomacyAllied, i);
-				Players[j].ShareVisionWith(Players[i]);
+				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
 				CommandDiplomacy(i, DiplomacyEnemy, j);
 				CommandDiplomacy(j, DiplomacyEnemy, i);
@@ -1341,24 +1341,24 @@ static void GameTypeLeftVsRight()
 	const int middle = CMap::Map.Info.MapWidth / 2;
 
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->HasNeutralFactionType()) {
 			continue;
 		}
 
-		const bool left_i = Players[i].StartPos.x <= middle;
+		const bool left_i = CPlayer::Players[i]->StartPos.x <= middle;
 		
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (Players[j].HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->HasNeutralFactionType()) {
 				continue;
 			}
 		
-			const bool left_j = Players[j].StartPos.x <= middle;
+			const bool left_j = CPlayer::Players[j]->StartPos.x <= middle;
 
 			if (left_i == left_j) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
-				Players[i].ShareVisionWith(Players[j]);
+				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				CommandDiplomacy(j, DiplomacyAllied, i);
-				Players[j].ShareVisionWith(Players[i]);
+				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
 				CommandDiplomacy(i, DiplomacyEnemy, j);
 				CommandDiplomacy(j, DiplomacyEnemy, i);
@@ -1373,26 +1373,26 @@ static void GameTypeLeftVsRight()
 static void GameTypeManVsMachine()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
+		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer) {
 			continue;
 		}
-		if (Players[i].HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->HasNeutralFactionType()) {
 			continue;
 		}
 
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			if (Players[j].Type != PlayerPerson && Players[j].Type != PlayerComputer) {
+			if (CPlayer::Players[j]->Type != PlayerPerson && CPlayer::Players[j]->Type != PlayerComputer) {
 				continue;
 			}
-			if (Players[j].HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->HasNeutralFactionType()) {
 				continue;
 			}
 
-			if (Players[i].Type == Players[j].Type) {
+			if (CPlayer::Players[i]->Type == CPlayer::Players[j]->Type) {
 				CommandDiplomacy(i, DiplomacyAllied, j);
-				Players[i].ShareVisionWith(Players[j]);
+				CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				CommandDiplomacy(j, DiplomacyAllied, i);
-				Players[j].ShareVisionWith(Players[i]);
+				CPlayer::Players[j]->ShareVisionWith(*CPlayer::Players[i]);
 			} else {
 				CommandDiplomacy(i, DiplomacyEnemy, j);
 				CommandDiplomacy(j, DiplomacyEnemy, i);
@@ -1407,31 +1407,31 @@ static void GameTypeManVsMachine()
 static void GameTypeManTeamVsMachine()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
+		if (CPlayer::Players[i]->Type != PlayerPerson && CPlayer::Players[i]->Type != PlayerComputer) {
 			continue;
 		}
-		if (Players[i].HasNeutralFactionType()) {
+		if (CPlayer::Players[i]->HasNeutralFactionType()) {
 			continue;
 		}
 
 		for (int j = 0; j < PlayerMax - 1; ++j) {
-			if (Players[j].HasNeutralFactionType()) {
+			if (CPlayer::Players[j]->HasNeutralFactionType()) {
 				continue;
 			}
 
 			if (i != j) {
-				if (Players[i].Type == Players[j].Type) {
+				if (CPlayer::Players[i]->Type == CPlayer::Players[j]->Type) {
 					CommandDiplomacy(i, DiplomacyAllied, j);
-					Players[i].ShareVisionWith(Players[j]);
+					CPlayer::Players[i]->ShareVisionWith(*CPlayer::Players[j]);
 				} else {
 					CommandDiplomacy(i, DiplomacyEnemy, j);
 				}
 			}
 		}
-		if (Players[i].Type == PlayerPerson) {
-			Players[i].Team = 2;
+		if (CPlayer::Players[i]->Type == PlayerPerson) {
+			CPlayer::Players[i]->Team = 2;
 		} else {
-			Players[i].Team = 1;
+			CPlayer::Players[i]->Team = 1;
 		}
 	}
 }
@@ -2032,7 +2032,7 @@ static int CclSetSpeedResourcesHarvest(lua_State *l)
 	const std::string resource = LuaToString(l, 2);
 	const int resId = GetResourceIdByName(l, resource.c_str());
 
-	Players[player].SpeedResourcesHarvest[resId] = LuaToNumber(l, 3);
+	CPlayer::Players[player]->SpeedResourcesHarvest[resId] = LuaToNumber(l, 3);
 	return 0;
 }
 
@@ -2049,7 +2049,7 @@ static int CclSetSpeedResourcesReturn(lua_State *l)
 	const std::string resource = LuaToString(l, 2);
 	const int resId = GetResourceIdByName(l, resource.c_str());
 
-	Players[player].SpeedResourcesReturn[resId] = LuaToNumber(l, 3);
+	CPlayer::Players[player]->SpeedResourcesReturn[resId] = LuaToNumber(l, 3);
 	return 0;
 }
 
@@ -2062,7 +2062,7 @@ static int CclSetSpeedBuild(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	const int player = LuaToNumber(l, 1);
-	Players[player].SpeedBuild = LuaToNumber(l, 2);
+	CPlayer::Players[player]->SpeedBuild = LuaToNumber(l, 2);
 	return 0;
 }
 
@@ -2077,7 +2077,7 @@ static int CclGetSpeedBuild(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	const int player = LuaToNumber(l, 1);
-	lua_pushnumber(l, Players[player].SpeedBuild);
+	lua_pushnumber(l, CPlayer::Players[player]->SpeedBuild);
 	return 1;
 }
 
@@ -2090,7 +2090,7 @@ static int CclSetSpeedTrain(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	const int player = LuaToNumber(l, 1);
-	Players[player].SpeedTrain = LuaToNumber(l, 2);
+	CPlayer::Players[player]->SpeedTrain = LuaToNumber(l, 2);
 	return 0;
 }
 
@@ -2105,7 +2105,7 @@ static int CclGetSpeedTrain(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	const int player = LuaToNumber(l, 1);
-	lua_pushnumber(l, Players[player].SpeedTrain);
+	lua_pushnumber(l, CPlayer::Players[player]->SpeedTrain);
 	return 1;
 }
 
@@ -2118,9 +2118,9 @@ static int CclSetSpeedUpgrade(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	const int player = LuaToNumber(l, 1);
-	Players[player].SpeedUpgrade = LuaToNumber(l, 2);
+	CPlayer::Players[player]->SpeedUpgrade = LuaToNumber(l, 2);
 
-	lua_pushnumber(l, Players[player].SpeedUpgrade);
+	lua_pushnumber(l, CPlayer::Players[player]->SpeedUpgrade);
 	return 1;
 }
 
@@ -2133,9 +2133,9 @@ static int CclSetSpeedResearch(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	const int player = LuaToNumber(l, 1);
-	Players[player].SpeedResearch = LuaToNumber(l, 2);
+	CPlayer::Players[player]->SpeedResearch = LuaToNumber(l, 2);
 
-	lua_pushnumber(l, Players[player].SpeedResearch);
+	lua_pushnumber(l, CPlayer::Players[player]->SpeedResearch);
 	return 1;
 }
 
@@ -2150,10 +2150,10 @@ static int CclSetSpeeds(lua_State *l)
 	const int speed = LuaToNumber(l, 1);
 	for (int i = 0; i < PlayerMax; ++i) {
 		for (int j = 0; j < MaxCosts; ++j) {
-			Players[i].SpeedResourcesHarvest[j] = speed;
-			Players[i].SpeedResourcesReturn[j] = speed;
+			CPlayer::Players[i]->SpeedResourcesHarvest[j] = speed;
+			CPlayer::Players[i]->SpeedResourcesReturn[j] = speed;
 		}
-		Players[i].SpeedBuild = Players[i].SpeedTrain = Players[i].SpeedUpgrade = Players[i].SpeedResearch = speed;
+		CPlayer::Players[i]->SpeedBuild = CPlayer::Players[i]->SpeedTrain = CPlayer::Players[i]->SpeedUpgrade = CPlayer::Players[i]->SpeedResearch = speed;
 	}
 
 	lua_pushnumber(l, speed);

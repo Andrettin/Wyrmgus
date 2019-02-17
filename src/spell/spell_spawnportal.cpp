@@ -87,10 +87,7 @@
 		//Wyrmgus end
 	} else {
 		portal = MakeUnitAndPlace(goalPos, *this->PortalType,
-								  //Wyrmgus start
-//								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
-								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral], z);
-								  //Wyrmgus end
+								  CurrentPlayer ? caster.Player : CPlayer::Players[PlayerNumNeutral], z);
 		portal->Summoned = 1;
 	}
 	portal->TTL = GameCycle + this->TTL;

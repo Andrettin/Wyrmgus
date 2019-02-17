@@ -468,7 +468,7 @@ void NetworkOnStartGame()
 {
 	CPlayer::GetThisPlayer()->SetName(Parameters::Instance.LocalPlayerName);
 	for (int i = 0; i < HostsCount; ++i) {
-		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
+		CPlayer::Players[Hosts[i].PlyNr]->SetName(Hosts[i].PlyName);
 	}
 	DebugPrint("Updates %d, Lag %d, Hosts %d\n" _C_
 			   CNetworkParameter::Instance.gameCyclesPerUpdate _C_
@@ -602,7 +602,7 @@ void NetworkSendSelection(CUnit **units, int count)
 	// Check if we have any teammates to send to
 	bool hasteammates = false;
 	for (int i = 0; i < HostsCount; ++i) {
-		if (Players[Hosts[i].PlyNr].Team == CPlayer::GetThisPlayer()->Team) {
+		if (CPlayer::Players[Hosts[i].PlyNr]->Team == CPlayer::GetThisPlayer()->Team) {
 			hasteammates = true;
 			break;
 		}
@@ -732,7 +732,7 @@ static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index, con
 	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : nullptr;
 
 	if (unit && (unit->Player->Index == player
-				 || Players[player].IsTeamed(*unit) || unit->Player->Type == PlayerNeutral)) {
+				 || CPlayer::Players[player]->IsTeamed(*unit) || unit->Player->Type == PlayerNeutral)) {
 		return true;
 	} else {
 		return false;
@@ -827,8 +827,8 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 			NetworkIn[packet.Header.Cycle][player][i].Type = packet.Header.Type[i];
 			NetworkIn[packet.Header.Cycle][player][i].Data = packet.Command[i];
 		} else {
-			SetMessage(_("%s sent bad command"), Players[player].Name.c_str());
-			DebugPrint("%s sent bad command: 0x%x\n" _C_ Players[player].Name.c_str()
+			SetMessage(_("%s sent bad command"), CPlayer::Players[player]->Name.c_str());
+			DebugPrint("%s sent bad command: 0x%x\n" _C_ CPlayer::Players[player]->Name.c_str()
 					   _C_ packet.Header.Type[i] & 0x7F);
 		}
 	}
@@ -933,7 +933,7 @@ static void NetworkExecCommand_Selection(const CNetworkCommandQueue &ncq)
 	CNetworkSelection ns;
 
 	ns.Deserialize(&ncq.Data[0]);
-	if (Players[ns.player].Team != CPlayer::GetThisPlayer()->Team) {
+	if (CPlayer::Players[ns.player]->Team != CPlayer::GetThisPlayer()->Team) {
 		return;
 	}
 	std::vector<CUnit *> units;
@@ -941,7 +941,7 @@ static void NetworkExecCommand_Selection(const CNetworkCommandQueue &ncq)
 	for (size_t i = 0; i != ns.Units.size(); ++i) {
 		units.push_back(&UnitManager.GetSlotUnit(ns.Units[i]));
 	}
-	ChangeTeamSelectedUnits(Players[ns.player], units);
+	ChangeTeamSelectedUnits(*CPlayer::Players[ns.player], units);
 }
 
 static void NetworkExecCommand_Chat(const CNetworkCommandQueue &ncq)

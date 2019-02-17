@@ -3,17 +3,28 @@
 #include "stratagus.h"
 
 #include "campaign.h"
-#include "src/include/version.h"
+#include "player.h"
 #include "script.h"
+#include "src/include/version.h"
+
+WyrmgusModule *WyrmgusModule::Instance = nullptr;
+
+WyrmgusModule *WyrmgusModule::GetInstance()
+{
+	return WyrmgusModule::Instance;
+}
 
 int WyrmgusModule::Run()
 {
     int default_argc = 1;
     char *default_argv = "Wyrmsun";
+	
+	WyrmgusModule::Instance = this;
+	
 	return stratagusMain(default_argc, &default_argv);
 }
 
-String WyrmgusModule::GetVersion()
+String WyrmgusModule::GetVersion() const
 {
 	return _version_str2;
 }
@@ -23,12 +34,12 @@ void WyrmgusModule::LuaCommand(String command)
 	QueueLuaCommand(command.utf8().get_data());
 }
 
-CCampaign *WyrmgusModule::GetCampaign(String ident)
+CCampaign *WyrmgusModule::GetCampaign(String ident) const
 {
 	return CCampaign::GetCampaign(ident.utf8().get_data());
 }
 
-Array WyrmgusModule::GetCampaigns()
+Array WyrmgusModule::GetCampaigns() const
 {
 	Array campaigns;
 	
@@ -44,9 +55,19 @@ void WyrmgusModule::SetCurrentCampaign(String campaign_ident)
 	CCampaign::SetCurrentCampaign(this->GetCampaign(campaign_ident));
 }
 
-CCampaign *WyrmgusModule::GetCurrentCampaign()
+CCampaign *WyrmgusModule::GetCurrentCampaign() const
 {
 	return CCampaign::GetCurrentCampaign();
+}
+
+CPlayer *WyrmgusModule::GetThisPlayer() const
+{
+	return CPlayer::GetThisPlayer();
+}
+
+void WyrmgusModule::ThisPlayerChanged()
+{
+	emit_signal("this_player_changed");
 }
 
 void WyrmgusModule::_bind_methods()
@@ -58,4 +79,7 @@ void WyrmgusModule::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_campaigns"), &WyrmgusModule::GetCampaigns);
 	ClassDB::bind_method(D_METHOD("set_current_campaign", "campaign"), &WyrmgusModule::SetCurrentCampaign);
 	ClassDB::bind_method(D_METHOD("get_current_campaign"), &WyrmgusModule::GetCurrentCampaign);
+	ClassDB::bind_method(D_METHOD("get_this_player"), &WyrmgusModule::GetThisPlayer);
+	
+	ADD_SIGNAL(MethodInfo("this_player_changed"));
 }

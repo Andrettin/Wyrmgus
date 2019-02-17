@@ -175,7 +175,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (unit.TeamSelected & (1 << i)) {
-					color = Players[i].Color;
+					color = CPlayer::Players[i]->Color;
 				}
 			}
 		}

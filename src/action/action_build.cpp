@@ -301,7 +301,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type, int landmass, C
 					  //Wyrmgus start
 					  unit.MapLayer->ID,
 //					  _("Not enough resources to build %s"), type.Name.c_str());
-					  _("Not enough resources to build %s"), type.GetDefaultName(Players[player.Index]).c_str());
+					  _("Not enough resources to build %s"), type.GetDefaultName(CPlayer::Players[player.Index]).c_str());
 					  //Wyrmgus end
 		isOk = false;
 	}
@@ -312,7 +312,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type, int landmass, C
 					  //Wyrmgus start
 					  unit.MapLayer->ID,
 //					  _("Can't build more units %s"), type.Name.c_str());
-					  _("Can't build more units %s"), type.GetDefaultName(Players[player.Index]).c_str());
+					  _("Can't build more units %s"), type.GetDefaultName(CPlayer::Players[player.Index]).c_str());
 					  //Wyrmgus end
 		isOk = false;
 	}
@@ -391,7 +391,7 @@ void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
 //		  _C_ building->Type->Name.c_str()
 //		  _C_ building->Slot);
 		  _C_ unit.Player->Index _C_ UnitNumber(unit)
-		  _C_ building.Type->GetDefaultName(*unit.Player).c_str()
+		  _C_ building.Type->GetDefaultName(unit.Player).c_str()
 		  _C_ UnitNumber(building));
 		  //Wyrmgus end
 
@@ -425,7 +425,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 							//Wyrmgus start
 							unit.MapLayer->ID,
 //							_("Unable to create building %s"), type.Name.c_str());
-							_("Unable to create building %s"), type.GetDefaultName(*unit.Player).c_str());
+							_("Unable to create building %s"), type.GetDefaultName(unit.Player).c_str());
 							//Wyrmgus end
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type, CMap::Map.GetTileLandmass(this->goalPos, this->MapLayer), this->Settlement);
@@ -615,7 +615,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 							//Wyrmgus start
 							unit.MapLayer->ID,
 //							_("You cannot build %s here"), type.Name.c_str());
-							_("You cannot build a %s here"), type.GetDefaultName(*unit.Player).c_str());
+							_("You cannot build a %s here"), type.GetDefaultName(unit.Player).c_str());
 							//Wyrmgus end
 		if (unit.Player->AiEnabled) {
 			//Wyrmgus start

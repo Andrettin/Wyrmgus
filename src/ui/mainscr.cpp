@@ -516,7 +516,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		if (UI.SingleTrainingButton) {
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
 			//Wyrmgus sta
-			CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(*CPlayer::GetThisPlayer());
+			CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
 //			CIcon &icon = *order.GetUnitType().Icon.Icon;
 			CIcon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 			//Wyrmgus end
@@ -555,7 +555,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					if (j >= UI.TrainingButtons.size()) {
 						break;
 					}
-					CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(*CPlayer::GetThisPlayer());
+					CUnitTypeVariation *variation = order.GetUnitType().GetDefaultVariation(CPlayer::GetThisPlayer());
 					CIcon &icon = (variation && variation->Icon.Icon) ? *variation->Icon.Icon : *order.GetUnitType().Icon.Icon;
 					//Wyrmgus start
 //					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
@@ -1033,8 +1033,8 @@ void DrawPopups()
 					PixelPos tile_center_pos = CMap::Map.TilePosToMapPixelPos_TopLeft(tilePos, UI.CurrentMapLayer);
 					tile_center_pos = vp->MapToScreenPixelPos(tile_center_pos);
 					std::string terrain_feature_name = mf.TerrainFeature->Name;
-					if (mf.Owner != -1 && mf.TerrainFeature->CulturalNames.find(Players[mf.Owner].Race) != mf.TerrainFeature->CulturalNames.end()) {
-						terrain_feature_name = mf.TerrainFeature->CulturalNames.find(Players[mf.Owner].Race)->second;
+					if (mf.Owner != -1 && mf.TerrainFeature->CulturalNames.find(CPlayer::Players[mf.Owner]->Race) != mf.TerrainFeature->CulturalNames.end()) {
+						terrain_feature_name = mf.TerrainFeature->CulturalNames.find(CPlayer::Players[mf.Owner]->Race)->second;
 					}
 					if (!Preference.NoStatusLineTooltips) {
 						CLabel label(GetGameFont());
@@ -1904,12 +1904,12 @@ static void InfoPanel_draw_no_selection()
 		GetDefaultTextColors(nc, rc);
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			//Wyrmgus start
-//			if (Players[i].Type != PlayerNobody) {
-			if (Players[i].Type != PlayerNobody && !Players[i].HasNeutralFactionType() && CPlayer::GetThisPlayer()->HasContactWith(Players[i]) && Players[i].GetUnitCount() > 0) {
+//			if (CPlayer::Players[i]->Type != PlayerNobody) {
+			if (CPlayer::Players[i]->Type != PlayerNobody && !CPlayer::Players[i]->HasNeutralFactionType() && CPlayer::GetThisPlayer()->HasContactWith(*CPlayer::Players[i]) && CPlayer::Players[i]->GetUnitCount() > 0) {
 			//Wyrmgus end
-				if (CPlayer::GetThisPlayer()->IsAllied(Players[i])) {
+				if (CPlayer::GetThisPlayer()->IsAllied(*CPlayer::Players[i])) {
 					label.SetNormalColor(FontGreen);
-				} else if (CPlayer::GetThisPlayer()->IsEnemy(Players[i])) {
+				} else if (CPlayer::GetThisPlayer()->IsEnemy(*CPlayer::Players[i])) {
 					label.SetNormalColor(FontRed);
 				} else {
 					label.SetNormalColor(nc);
@@ -1919,13 +1919,13 @@ static void InfoPanel_draw_no_selection()
 				//Wyrmgus end
 
 				Video.DrawRectangleClip(ColorWhite, x, y, 12, 12);
-				Video.FillRectangleClip(Players[i].Color, x + 1, y + 1, 10, 10);
+				Video.FillRectangleClip(CPlayer::Players[i]->Color, x + 1, y + 1, 10, 10);
 
 				//Wyrmgus start
-//				label.Draw(x + 27, y, Players[i].Name);
-				label.Draw(x + 15, y, _(Players[i].Name.c_str()));
+//				label.Draw(x + 27, y, CPlayer::Players[i]->Name);
+				label.Draw(x + 15, y, _(CPlayer::Players[i]->Name.c_str()));
 				//the score was appearing on top of the faction name
-//				label.Draw(x + 117, y, Players[i].Score);
+//				label.Draw(x + 117, y, CPlayer::Players[i]->Score);
 				//Wyrmgus end
 				y += 14;
 				

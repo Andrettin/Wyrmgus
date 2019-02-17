@@ -1781,7 +1781,7 @@ std::string EvalString(const StringDesc *s)
 				return res;
 			}
 		case EString_PlayerName : // player name
-			return std::string(Players[EvalNumber(s->D.PlayerName)].Name);
+			return std::string(CPlayer::Players[EvalNumber(s->D.PlayerName)]->Name);
 	}
 	return std::string("");
 }

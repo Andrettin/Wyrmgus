@@ -9,7 +9,7 @@
 //         Stratagus - A free fantasy real time strategy game engine
 /**@name replay.cpp - Replay game. */
 //
-//      (c) Copyright 2000-2008 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
+//      (c) Copyright 2000-2019 by Lutz Sammer, Andreas Arens, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -219,11 +219,11 @@ static FullReplay *StartReplay()
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		replay->Players[i].Name = Players[i].Name;
+		replay->Players[i].Name = CPlayer::Players[i]->Name;
 		replay->Players[i].AIScript = GameSettings.Presets[i].AIScript;
 		replay->Players[i].Race = GameSettings.Presets[i].Race;
 		//Wyrmgus start
-		replay->Players[i].Faction = Players[i].Faction;
+		replay->Players[i].Faction = CPlayer::Players[i]->Faction;
 		//Wyrmgus end
 		replay->Players[i].Team = GameSettings.Presets[i].Team;
 		replay->Players[i].Type = GameSettings.Presets[i].Type;
@@ -282,7 +282,7 @@ static void ApplyReplaySettings()
 		GameSettings.Presets[i].AIScript = CurrentReplay->Players[i].AIScript;
 		GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
 		//Wyrmgus start
-		Players[i].Faction = CurrentReplay->Players[i].Faction; // should use a game settings preset instead
+		CPlayer::Players[i]->Faction = CurrentReplay->Players[i].Faction; // should use a game settings preset instead
 		//Wyrmgus end
 		GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
 		GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
@@ -1032,7 +1032,7 @@ static void ReplayEachCycle()
 	if (InitReplay) {
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (!CurrentReplay->Players[i].Name.empty()) {
-				Players[i].SetName(CurrentReplay->Players[i].Name);
+				CPlayer::Players[i]->SetName(CurrentReplay->Players[i].Name);
 			}
 		}
 		ReplayStep = CurrentReplay->Commands;

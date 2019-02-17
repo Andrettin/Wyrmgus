@@ -1275,7 +1275,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 	
 	// make units allowed by default
 	for (int i = 0; i < PlayerMax; ++i) {
-		AllowUnitId(Players[i], this->Slot, 65536);
+		AllowUnitId(*CPlayer::Players[i], this->Slot, 65536);
 	}
 	
 	this->Initialized = true;
@@ -1707,13 +1707,13 @@ int CUnitType::GetResourceStep(const int resource, const int player) const
 	return resource_step;
 }
 
-CUnitTypeVariation *CUnitType::GetDefaultVariation(CPlayer &player, int image_layer) const
+CUnitTypeVariation *CUnitType::GetDefaultVariation(const CPlayer *player, const int image_layer) const
 {
 	const std::vector<CUnitTypeVariation *> &variation_list = image_layer == -1 ? this->Variations : this->LayerVariations[image_layer];
 	for (CUnitTypeVariation *variation : variation_list) {
 		bool upgrades_check = true;
 		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
-			if (UpgradeIdentAllowed(player, required_upgrade->Ident.c_str()) != 'R') {
+			if (UpgradeIdentAllowed(*player, required_upgrade->Ident.c_str()) != 'R') {
 				upgrades_check = false;
 				break;
 			}
@@ -1721,7 +1721,7 @@ CUnitTypeVariation *CUnitType::GetDefaultVariation(CPlayer &player, int image_la
 		
 		if (upgrades_check) {
 			for (const CUpgrade *forbidden_upgrade : variation->UpgradesForbidden) {
-				if (UpgradeIdentAllowed(player, forbidden_upgrade->Ident.c_str()) == 'R') {
+				if (UpgradeIdentAllowed(*player, forbidden_upgrade->Ident.c_str()) == 'R') {
 					upgrades_check = false;
 					break;
 				}
@@ -1763,7 +1763,7 @@ std::string CUnitType::GetRandomVariationIdent(int image_layer) const
 	return "";
 }
 
-std::string CUnitType::GetDefaultName(CPlayer &player) const
+std::string CUnitType::GetDefaultName(const CPlayer *player) const
 {
 	CUnitTypeVariation *variation = this->GetDefaultVariation(player);
 	if (variation && !variation->TypeName.empty()) {
@@ -1773,7 +1773,7 @@ std::string CUnitType::GetDefaultName(CPlayer &player) const
 	}
 }
 
-CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(CPlayer &player, int image_layer) const
+CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const
 {
 	CUnitTypeVariation *variation = this->GetDefaultVariation(player);
 	if (this->LayerVariations[image_layer].size() > 0 && this->GetDefaultVariation(player, image_layer)->Sprite) {
@@ -2341,7 +2341,7 @@ void SaveUnitTypes(CFile &file)
 		bool somethingSaved = false;
 
 		for (int j = 0; j < PlayerMax; ++j) {
-			if (Players[j].Type != PlayerNobody) {
+			if (CPlayer::Players[j]->Type != PlayerNobody) {
 				somethingSaved |= SaveUnitStats(type.Stats[j], type, j, file);
 			}
 		}

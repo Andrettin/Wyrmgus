@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -71,8 +69,8 @@
 	order->Player = player;
 //	unit.Player->SubCosts(upgrade.Costs);
 	int upgrade_costs[MaxCosts];
-	Players[player].GetUpgradeCosts(&upgrade, upgrade_costs);
-	Players[player].SubCosts(upgrade_costs);
+	CPlayer::Players[player]->GetUpgradeCosts(&upgrade, upgrade_costs);
+	CPlayer::Players[player]->SubCosts(upgrade_costs);
 	//Wyrmgus end
 
 	order->SetUpgrade(upgrade);
@@ -125,7 +123,7 @@
 {
 	//Wyrmgus start
 //	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->ID];
-	unit.Variable[RESEARCH_INDEX].Value = Players[this->Player].UpgradeTimers.Upgrades[this->Upgrade->ID];
+	unit.Variable[RESEARCH_INDEX].Value = CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[this->Upgrade->ID];
 	//Wyrmgus end
 	unit.Variable[RESEARCH_INDEX].Max = this->Upgrade->Costs[TimeCost];
 }
@@ -156,7 +154,7 @@
 #endif
 	//Wyrmgus start
 //	CPlayer &player = *unit.Player;
-	CPlayer &player = Players[this->Player];
+	CPlayer &player = *CPlayer::Players[this->Player];
 //	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
 	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value + unit.Variable[RESEARCHSPEEDBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	//Wyrmgus end
@@ -164,7 +162,7 @@
 		if (upgrade.Name.empty()) {
 			//Wyrmgus start
 //			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), type.GetDefaultName(player).c_str());
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), type.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 		} else {
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.Name.c_str());
@@ -196,10 +194,8 @@
 //	unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
 
 //	unit.Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
-	Players[this->Player].UpgradeTimers.Upgrades[upgrade.ID] = 0;
+	CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[upgrade.ID] = 0;
 
-	Players[this->Player].AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+	CPlayer::Players[this->Player]->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
 	//Wyrmgus end
 }
-
-//@}

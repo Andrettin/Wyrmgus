@@ -38,6 +38,8 @@
 #include <string>
 #include <vector>
 
+#include <core/object.h>
+
 #include "player.h" //for certain enums
 #include "time/date.h"
 
@@ -54,8 +56,10 @@ class CLanguage;
 class CQuest;
 class CUpgrade;
 
-class CCivilization
+class CCivilization : public Object
 {
+	GDCLASS(CCivilization, Object)
+	
 public:
 	~CCivilization();
 	
@@ -68,6 +72,12 @@ public:
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
+	
+	String GetInterface() const
+	{
+		return this->Interface.c_str();
+	}
+	
 	CCalendar *GetCalendar() const;
 	CCurrency *GetCurrency() const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
@@ -83,6 +93,7 @@ public:
 	std::string Quote;				/// civilization quote
 	std::string Background;			/// civilization background
 	std::string Adjective;			/// adjective pertaining to the civilization
+	std::string Interface;			/// the string identifier for the civilization's interface
 	CUnitSound UnitSounds;			/// sounds for unit events
 	CLanguage *Language = nullptr;	/// the language used by the civilization
 	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
@@ -101,6 +112,9 @@ public:
 	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
+
+protected:
+	static void _bind_methods();
 };
 
 #endif

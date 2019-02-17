@@ -612,7 +612,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 {
 	//Wyrmgus start
 	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColors[i][0] == Players[player].Color) {
+		if (PlayerColors[i][0] == CPlayer::Players[player]->Color) {
 			player = i;
 			break;
 		}
@@ -644,7 +644,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 #endif
 	{
 		//Wyrmgus start
-//		GraphicPlayerPixels(Players[player], *this);
+//		GraphicPlayerPixels(*CPlayer::Players[player], *this);
 
 		SDL_Surface *surface = nullptr;
 		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
@@ -679,7 +679,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day, int show_percent)
 {
 	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColors[i][0] == Players[player].Color) {
+		if (PlayerColors[i][0] == CPlayer::Players[player]->Color) {
 			player = i;
 			break;
 		}		
@@ -718,7 +718,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 #endif
 	{
 		//Wyrmgus start
-//		GraphicPlayerPixels(Players[player], *this);
+//		GraphicPlayerPixels(*CPlayer::Players[player], *this);
 
 		SDL_Surface *surface = nullptr;
 		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
@@ -756,7 +756,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 {
 	//Wyrmgus start
 	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColors[i][0] == Players[player].Color) {
+		if (PlayerColors[i][0] == CPlayer::Players[player]->Color) {
 			player = i;
 			break;
 		}		
@@ -796,7 +796,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 #endif
 	{
 		//Wyrmgus start
-//		GraphicPlayerPixels(Players[player], *this);
+//		GraphicPlayerPixels(*CPlayer::Players[player], *this);
 
 		SDL_Surface *surface = nullptr;
 		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
@@ -1023,7 +1023,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 {
 	//Wyrmgus start
 	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColors[i][0] == Players[player].Color) {
+		if (PlayerColors[i][0] == CPlayer::Players[player]->Color) {
 			player = i;
 			break;
 		}		
@@ -1054,7 +1054,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 #endif
 	{
 		//Wyrmgus start
-//		GraphicPlayerPixels(Players[player], *this);
+//		GraphicPlayerPixels(*CPlayer::Players[player], *this);
 
 		SDL_Surface *surface = nullptr;
 		if (ignore_time_of_day || !UI.CurrentMapLayer->GetTimeOfDay() || UI.CurrentMapLayer->GetTimeOfDay()->Day) {
@@ -2220,7 +2220,7 @@ void MakePlayerColorTexture(CPlayerColorGraphic *g, int player, CTimeOfDay *time
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	MakeTextures(g, player, &Players[player].UnitColors);
+//	MakeTextures(g, player, &CPlayer::Players[player]->UnitColors);
 	CUnitColors texture_unit_colors;
 	texture_unit_colors.Colors = PlayerColorsRGB[player];
 	MakeTextures(g, player, &texture_unit_colors, time_of_day);

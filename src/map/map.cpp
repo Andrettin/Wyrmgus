@@ -229,7 +229,7 @@ void CMap::Reveal(bool only_person_players)
 		for (int p = 0; p < PlayerMax; ++p) {
 			//Wyrmgus start
 //			playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
-			if (Players[p].Type == PlayerPerson || !only_person_players) {
+			if (CPlayer::Players[p]->Type == PlayerPerson || !only_person_players) {
 				playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
 			}
 			//Wyrmgus end
@@ -242,7 +242,7 @@ void CMap::Reveal(bool only_person_players)
 			CMapField &mf = *this->Field(i, z);
 			CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
 			for (int p = 0; p < PlayerMax; ++p) {
-				if (Players[p].Type == PlayerPerson || !only_person_players) {
+				if (CPlayer::Players[p]->Type == PlayerPerson || !only_person_players) {
 					playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
 				}
 			}
@@ -257,11 +257,11 @@ void CMap::Reveal(bool only_person_players)
 		if (unit.Player->Type == PlayerNeutral) {
 			for (int p = 0; p < PlayerMax; ++p) {
 				//Wyrmgus start
-//				if (Players[p].Type != PlayerNobody && (!(unit.Seen.ByPlayer & (1 << p)))) {
-				if (Players[p].Type != PlayerNobody && (Players[p].Type == PlayerPerson || !only_person_players) && (!(unit.Seen.ByPlayer & (1 << p)))) {
+//				if (CPlayer::Players[p]->Type != PlayerNobody && (!(unit.Seen.ByPlayer & (1 << p)))) {
+				if (CPlayer::Players[p]->Type != PlayerNobody && (CPlayer::Players[p]->Type == PlayerPerson || !only_person_players) && (!(unit.Seen.ByPlayer & (1 << p)))) {
 				//Wyrmgus end
-					UnitGoesOutOfFog(unit, Players[p]);
-					UnitGoesUnderFog(unit, Players[p]);
+					UnitGoesOutOfFog(unit, *CPlayer::Players[p]);
+					UnitGoesUnderFog(unit, *CPlayer::Players[p]);
 				}
 			}
 		}
@@ -373,15 +373,15 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 		
 		std::vector<CUnit *> table;
 		if (player != nullptr) {
-			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
+			Select(random_pos - Vec2i(32, 32), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(32, 32), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
 			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeFly)) {
-				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
+				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(16, 16), table, z, MakeOrPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), HasSameTypeAs(*SettlementSiteUnitType)));
 			} else {
-				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 			}
 		} else if (unit_type->GivesResource && !unit_type->BoolFlag[BUILDING_INDEX].value) { //for non-building resources (i.e. wood piles), place them within a certain distance of player units, to prevent them from blocking the way
-			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+			Select(random_pos - Vec2i(4, 4), random_pos + Vec2i(unit_type->TileSize.x - 1, unit_type->TileSize.y - 1) + Vec2i(4, 4), table, z, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 		}
 		
 		if (table.size() == 0) {
@@ -2939,7 +2939,7 @@ void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i 
 		if (unit_type->GivesResource) {
 			CUnit *unit = CreateResourceUnit(unit_pos, *unit_type, z);
 		} else {
-			CUnit *unit = CreateUnit(unit_pos, *unit_type, &Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->TileSize.x > 1 && unit_type->TileSize.y > 1);
+			CUnit *unit = CreateUnit(unit_pos, *unit_type, CPlayer::Players[PlayerNumNeutral], z, unit_type->BoolFlag[BUILDING_INDEX].value && unit_type->TileSize.x > 1 && unit_type->TileSize.y > 1);
 		}
 	}
 }

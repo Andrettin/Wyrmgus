@@ -390,13 +390,13 @@ int GetNumOpponents(int player)
 
 	// Check the player opponents
 	for (int i = 0; i < PlayerMax; ++i) {
-		const int unitCount = Players[i].GetUnitCount();
+		const int unitCount = CPlayer::Players[i]->GetUnitCount();
 
 		// This player is our enemy and has units left.
-		if ((Players[player].IsEnemy(Players[i])) || (Players[i].IsEnemy(Players[player]))) {
+		if ((CPlayer::Players[player]->IsEnemy(*CPlayer::Players[i])) || (CPlayer::Players[i]->IsEnemy(*CPlayer::Players[player]))) {
 			// Don't count walls
 			for (int j = 0; j < unitCount; ++j) {
-				if (Players[i].GetUnit(j).Type->BoolFlag[WALL_INDEX].value == false) {
+				if (CPlayer::Players[i]->GetUnit(j).Type->BoolFlag[WALL_INDEX].value == false) {
 					++n;
 					break;
 				}
@@ -622,15 +622,15 @@ void TriggersEachCycle()
 			bool triggered = false;
 			
 			if (current_trigger->Type == CTrigger::TriggerType::GlobalTrigger) {
-				if (CheckDependencies(current_trigger, &Players[PlayerNumNeutral])) {
+				if (CheckDependencies(current_trigger, CPlayer::Players[PlayerNumNeutral])) {
 					triggered = true;
 					for (CTriggerEffect *trigger_effect : current_trigger->TriggerEffects) {
-						trigger_effect->Do(&Players[PlayerNumNeutral]);
+						trigger_effect->Do(CPlayer::Players[PlayerNumNeutral]);
 					}
 				}
 			} else if (current_trigger->Type == CTrigger::TriggerType::PlayerTrigger) {
 				for (int i = 0; i < PlayerNumNeutral; ++i) {
-					CPlayer *player = &Players[i];
+					CPlayer *player = CPlayer::Players[i];
 					if (player->Type == PlayerNobody) {
 						continue;
 					}

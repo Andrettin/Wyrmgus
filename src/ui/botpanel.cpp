@@ -1182,8 +1182,8 @@ void CButtonPanel::Draw()
 			button_icon = Selected[0]->GetButtonIcon(buttons[i].Action);
 		} else if (buttons[i].Action == ButtonExperienceUpgradeTo && Selected[0]->GetVariation() && UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId) != nullptr && !UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Name.empty()) {
 			button_icon = UnitTypes[buttons[i].Value]->GetVariation(Selected[0]->GetVariation()->VariationId)->Icon.Icon;
-		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*CPlayer::GetThisPlayer()) != nullptr && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*CPlayer::GetThisPlayer())->Icon.Name.empty()) {
-			button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*CPlayer::GetThisPlayer())->Icon.Icon;
+		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(CPlayer::GetThisPlayer()) != nullptr && !UnitTypes[buttons[i].Value]->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Name.empty()) {
+			button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(CPlayer::GetThisPlayer())->Icon.Icon;
 		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
 			button_icon = UnitTypes[buttons[i].Value]->Icon.Icon;
 		} else if (buttons[i].Action == ButtonBuy) {
@@ -1214,7 +1214,7 @@ void CButtonPanel::Draw()
 				player = Selected[0]->GetDisplayPlayer();
 
 				//if is accessing a building of another player, set color to that of the person player (i.e. for training buttons)
-				if (CPlayer::GetThisPlayer()->HasBuildingAccess(Players[player], buttons[i].Action)) {
+				if (CPlayer::GetThisPlayer()->HasBuildingAccess(*CPlayer::Players[player], buttons[i].Action)) {
 					player = CPlayer::GetThisPlayer()->Index;
 				}
 				//Wyrmgus end

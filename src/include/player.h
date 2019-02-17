@@ -34,12 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string>
-
-//Wyrmgus start
-#include <map>
-#include <tuple>
-
 //Wyrmgus start
 #include "character.h" // because of "MaxCharacterTitles"
 #include "include/color.h"
@@ -52,6 +46,13 @@
 //Wyrmgus end
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
+
+#include <core/object.h>
+
+#include <map>
+#include <shared_mutex>
+#include <string>
+#include <tuple>
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -111,14 +112,20 @@ enum _diplomacy_ {
 }; /// Diplomacy states for CommandDiplomacy
 
 ///  Player structure
-class CPlayer
+class CPlayer : public Object
 {
+	GDCLASS(CPlayer, Object)
+	
 public:
 	static void SetThisPlayer(CPlayer *player);
 	static CPlayer *GetThisPlayer();
+	static CPlayer *GetPlayer(const int index);
 	
+	static std::vector<CPlayer *> Players;	/// All players
+
 private:
 	static CPlayer *ThisPlayer;		/// Player on local computer
+	static std::shared_mutex PlayerMutex;	/// Mutex for players as a whole
 	
 public:
 	int Index;          /// player as number
@@ -235,6 +242,7 @@ public:
 	
 	//Wyrmgus start
 	void SetCivilization(int civilization);
+	CCivilization *GetCivilization() const;
 	void SetFaction(const CFaction *faction);
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
@@ -444,6 +452,11 @@ private:
 	unsigned int Enemy;         /// enemy bit field for this player
 	unsigned int Allied;        /// allied bit field for this player
 	unsigned int SharedVision;  /// shared vision bit field
+	
+	mutable std::shared_mutex Mutex;	/// mutex for the player
+
+protected:
+	static void _bind_methods();
 };
 
 //Wyrmgus start
@@ -900,9 +913,8 @@ enum NotifyType {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int NumPlayers;				/// How many player slots used
-extern CPlayer Players[PlayerMax];	/// All players
-extern bool NoRescueCheck;			/// Disable rescue check
+extern int NumPlayers;					/// How many player slots used
+extern bool NoRescueCheck;				/// Disable rescue check
 //Wyrmgus start
 //extern std::vector<CColor> PlayerColorsRGB[PlayerMax]; /// Player colors
 //extern std::vector<IntColor> PlayerColors[PlayerMax]; /// Player colors

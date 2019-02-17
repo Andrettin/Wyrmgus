@@ -127,7 +127,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 	}
 	
 	//Wyrmgus start
-	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != player.Index && !Players[CMap::Map.Field(pos, z)->Owner].HasNeutralFactionType() && !player.HasNeutralFactionType()) {
+	if (CMap::Map.Field(pos, z)->Owner != -1 && CMap::Map.Field(pos, z)->Owner != player.Index && !CPlayer::Players[CMap::Map.Field(pos, z)->Owner]->HasNeutralFactionType() && !player.HasNeutralFactionType()) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
@@ -411,8 +411,8 @@ CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource,
 		table.push_back(*it);
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].IsAllied(p) && p.IsAllied(Players[i])) {
-			for (std::vector<CUnit *>::iterator it = Players[i].UnitBegin(); it != Players[i].UnitEnd(); ++it) {
+		if (CPlayer::Players[i]->IsAllied(p) && p.IsAllied(*CPlayer::Players[i])) {
+			for (std::vector<CUnit *>::iterator it = CPlayer::Players[i]->UnitBegin(); it != CPlayer::Players[i]->UnitEnd(); ++it) {
 				table.push_back(*it);
 			}
 		}
@@ -536,7 +536,7 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 	//Wyrmgus start
 	if (only_unsettled_area) {
 		std::vector<CUnit *> table;
-		SelectAroundUnit(mine, 8, table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+		SelectAroundUnit(mine, 8, table, HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]));
 		if (table.size() > 0) {
 			return false;
 		}
@@ -600,7 +600,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	CUnit *mine = CMap::Map.Field(pos)->UnitCache.find(res_finder);
 	CUnit *mine = worker.MapLayer->Field(pos)->UnitCache.find(res_finder);
 	
-	if (worker.MapLayer->Field(pos)->Owner != -1 && worker.MapLayer->Field(pos)->Owner != worker.Player->Index && !Players[worker.MapLayer->Field(pos)->Owner].HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
+	if (worker.MapLayer->Field(pos)->Owner != -1 && worker.MapLayer->Field(pos)->Owner != worker.Player->Index && !CPlayer::Players[worker.MapLayer->Field(pos)->Owner]->HasNeutralFactionType() && !worker.Player->HasNeutralFactionType() && (!mine || mine->Type->GivesResource != TradeCost)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
@@ -704,8 +704,8 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 		table.push_back(*it);
 	}
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].IsAllied(*unit.Player) && unit.Player->IsAllied(Players[i])) {
-			for (std::vector<CUnit *>::iterator it = Players[i].UnitBegin(); it != Players[i].UnitEnd(); ++it) {
+		if (CPlayer::Players[i]->IsAllied(*unit.Player) && unit.Player->IsAllied(*CPlayer::Players[i])) {
+			for (std::vector<CUnit *>::iterator it = CPlayer::Players[i]->UnitBegin(); it != CPlayer::Players[i]->UnitEnd(); ++it) {
 				table.push_back(*it);
 			}
 		}
@@ -1529,7 +1529,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 		std::vector<CUnit *> table;
 		SelectAroundUnit(*firstContainer, missile_range, table,
 			//Wyrmgus start
-//			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
+//			MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), pred));
 			pred, circle);
 			//Wyrmgus end
 
@@ -1547,7 +1547,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, boo
 
 		SelectAroundUnit(*firstContainer, range, table,
 			//Wyrmgus start
-//			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
+//			MakeAndPredicate(HasNotSamePlayerAs(*CPlayer::Players[PlayerNumNeutral]), pred));
 			pred, circle);
 			//Wyrmgus end
 

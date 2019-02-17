@@ -661,7 +661,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	*/
-	if (CMap::Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->Owner == -1 || CPlayer::GetThisPlayer()->IsEnemy(Players[UI.CurrentMapLayer->Field(pos)->Owner]))) {
+	if (CMap::Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->Owner == -1 || CPlayer::GetThisPlayer()->IsEnemy(*CPlayer::Players[UI.CurrentMapLayer->Field(pos)->Owner]))) {
 		if (!UI.CurrentMapLayer->Field(pos)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 			SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
 			return;
@@ -1514,10 +1514,10 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		if (show == false) {
 			CMapField &mf = *UI.CurrentMapLayer->Field(tilePos);
 			for (int i = 0; i < PlayerMax; ++i) {
-				if (mf.playerInfo.IsTeamExplored(Players[i])
+				if (mf.playerInfo.IsTeamExplored(*CPlayer::Players[i])
 					//Wyrmgus start
-//					&& (i == CPlayer::GetThisPlayer()->Index || Players[i].IsBothSharedVision(*CPlayer::GetThisPlayer()))) {
-					&& (i == CPlayer::GetThisPlayer()->Index || Players[i].IsBothSharedVision(*CPlayer::GetThisPlayer()) || Players[i].Revealed)) {
+//					&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->IsBothSharedVision(*CPlayer::GetThisPlayer()))) {
+					&& (i == CPlayer::GetThisPlayer()->Index || CPlayer::Players[i]->IsBothSharedVision(*CPlayer::GetThisPlayer()) || CPlayer::Players[i]->Revealed)) {
 					//Wyrmgus end
 					show = true;
 					break;

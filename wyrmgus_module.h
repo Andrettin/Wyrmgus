@@ -4,19 +4,28 @@
 #include <scene/main/node.h>
 
 class CCampaign;
+class CPlayer;
 
 class WyrmgusModule : public Node
 {
 	GDCLASS(WyrmgusModule, Node)
+	
+public:
+	static WyrmgusModule *GetInstance();
+
+private:
+	static WyrmgusModule *Instance;
 
 public:
 	int Run();
-	String GetVersion();
+	String GetVersion() const;
 	void LuaCommand(String command);
-	CCampaign *GetCampaign(String ident);
-	Array GetCampaigns();
+	CCampaign *GetCampaign(String ident) const;
+	Array GetCampaigns() const;
 	void SetCurrentCampaign(String campaign_ident);
-	CCampaign *GetCurrentCampaign();
+	CCampaign *GetCurrentCampaign() const;
+	CPlayer *GetThisPlayer() const;
+	void ThisPlayerChanged();
 
 protected:
 	static void _bind_methods();

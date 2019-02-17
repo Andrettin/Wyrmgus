@@ -54,7 +54,7 @@
 	const int playerId = ParseAnimInt(unit, this->playerStr.c_str());
 	const SpawnUnit_Flags flags = (SpawnUnit_Flags)(ParseAnimFlags(unit, this->flagsStr.c_str()));
 
-	CPlayer &player = Players[playerId];
+	CPlayer &player = *CPlayer::Players[playerId];
 	const Vec2i pos(unit.tilePos.x + offX, unit.tilePos.y + offY);
 	CUnitType *type = UnitTypeByIdent(this->unitTypeStr.c_str());
 	Assert(type);

@@ -1169,12 +1169,12 @@ static int InputKey(int key)
 				return 1;
 			}
 			for (int i = 0; i < PlayerMax; ++i) {
-				if (Players[i].Type != PlayerPerson) {
+				if (CPlayer::Players[i]->Type != PlayerPerson) {
 					continue;
 				}
-				if (!strncasecmp(namestart, Players[i].Name.c_str(), strlen(namestart))) {
-					InputIndex += strlen(Players[i].Name.c_str()) - strlen(namestart);
-					strcpy_s(namestart, sizeof(Input) - (namestart - Input), Players[i].Name.c_str());
+				if (!strncasecmp(namestart, CPlayer::Players[i]->Name.c_str(), strlen(namestart))) {
+					InputIndex += strlen(CPlayer::Players[i]->Name.c_str()) - strlen(namestart);
+					strcpy_s(namestart, sizeof(Input) - (namestart - Input), CPlayer::Players[i]->Name.c_str());
 					if (namestart == Input) {
 						InputIndex += 2;
 						strcat_s(namestart, sizeof(Input) - (namestart - Input), ": ");

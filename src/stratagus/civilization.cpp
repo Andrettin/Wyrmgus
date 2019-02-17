@@ -256,3 +256,8 @@ std::vector<std::string> &CCivilization::GetShipNames()
 	
 	return this->ShipNames;
 }
+
+void CCivilization::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_interface"), &CCivilization::GetInterface);
+}

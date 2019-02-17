@@ -178,8 +178,8 @@
 	//Wyrmgus end
 	if (this->PlayerNeutral == 1) {
 		//Wyrmgus start
-//		MakeUnitAndPlace(resPos, type, Players + PlayerNumNeutral);
-		target->ChangeOwner(Players[PlayerNumNeutral]);
+//		MakeUnitAndPlace(resPos, type, CPlayer::Players[PlayerNumNeutral]);
+		target->ChangeOwner(*CPlayer::Players[PlayerNumNeutral]);
 		//Wyrmgus end
 	} else if (this->PlayerNeutral == 2) {
 		//Wyrmgus start

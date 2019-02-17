@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -814,9 +812,9 @@ void SendCommandSetFaction(int player, int faction)
 	if (!IsNetworkGame()) {
 		//FIXME: should add log of faction change here
 		if (faction != -1) {
-			Players[player].SetFaction(PlayerRaces.Factions[faction]);
+			CPlayer::Players[player]->SetFaction(PlayerRaces.Factions[faction]);
 		} else {
-			Players[player].SetFaction(nullptr);
+			CPlayer::Players[player]->SetFaction(nullptr);
 		}
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageSetFaction, -1, player, faction, 0, 0);
@@ -833,13 +831,11 @@ void SendCommandSetFaction(int player, int faction)
 void SendCommandAutosellResource(int player, int resource)
 {
 	if (!IsNetworkGame()) {
-		Players[player].AutosellResource(resource);
+		CPlayer::Players[player]->AutosellResource(resource);
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageAutosellResource, -1, player, resource, 0, 0);
 	}
 }
-
-//@}
 
 //----------------------------------------------------------------------------
 // Parse the message, from the network.
@@ -1186,11 +1182,11 @@ void ExecExtendedCommand(unsigned char type, int status,
 		//Wyrmgus start
 		case ExtendedMessageSetFaction: {
 			//FIXME: should add log for faction change here
-			Players[arg2].SetFaction(PlayerRaces.Factions[arg3]);
+			CPlayer::Players[arg2]->SetFaction(PlayerRaces.Factions[arg3]);
 			break;
 		}
 		case ExtendedMessageAutosellResource: {
-			Players[arg2].AutosellResource(arg3);
+			CPlayer::Players[arg2]->AutosellResource(arg3);
 			break;
 		}
 		//Wyrmgus end
@@ -1201,5 +1197,3 @@ void ExecExtendedCommand(unsigned char type, int status,
 			break;
 	}
 }
-
-//@}

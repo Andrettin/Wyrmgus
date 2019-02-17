@@ -2124,7 +2124,7 @@ static int CclDefineUnitType(lua_State *l)
 	
 	// make units allowed by default
 	for (int i = 0; i < PlayerMax; ++i) {
-		AllowUnitId(Players[i], type->Slot, 65536);
+		AllowUnitId(*CPlayer::Players[i], type->Slot, 65536);
 	}
 	//Wyrmgus end
 	

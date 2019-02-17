@@ -562,10 +562,10 @@ void GameMainLoop()
 		if (current_campaign != nullptr) {
 			const CDate start_date(current_campaign->GetStartDate());
 			for (int i = 0; i < NumPlayers; ++i) {
-				if (Players[i].Type != PlayerNobody && Players[i].Race != 0 && Players[i].Faction != -1) {
+				if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race != 0 && CPlayer::Players[i]->Faction != -1) {
 					if (start_date.Year) {
-						CCivilization *civilization = CCivilization::Civilizations[Players[i].Race];
-						CFaction *faction = PlayerRaces.Factions[Players[i].Faction];
+						CCivilization *civilization = CCivilization::Civilizations[CPlayer::Players[i]->Race];
+						CFaction *faction = PlayerRaces.Factions[CPlayer::Players[i]->Faction];
 						
 						for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
 							int upgrade_id = UpgradeIdByIdent(iterator->first);
@@ -575,8 +575,8 @@ void GameMainLoop()
 							}
 							for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
 								if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
-									if (second_iterator->second && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
-										UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
+									if (second_iterator->second && UpgradeIdentAllowed(*CPlayer::Players[i], iterator->first.c_str()) != 'R') {
+										UpgradeAcquire(*CPlayer::Players[i], AllUpgrades[upgrade_id]);
 									} else if (!second_iterator->second) {
 										break;
 									}
@@ -592,8 +592,8 @@ void GameMainLoop()
 							}
 							for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
 								if (second_iterator->first.Year == 0 || start_date.ContainsDate(second_iterator->first)) {
-									if (second_iterator->second && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
-										UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
+									if (second_iterator->second && UpgradeIdentAllowed(*CPlayer::Players[i], iterator->first.c_str()) != 'R') {
+										UpgradeAcquire(*CPlayer::Players[i], AllUpgrades[upgrade_id]);
 									} else if (!second_iterator->second) {
 										break;
 									}
@@ -617,7 +617,7 @@ void GameMainLoop()
 
 						for (std::map<std::pair<CDate, int>, int>::iterator iterator = faction->HistoricalResources.begin(); iterator != faction->HistoricalResources.end(); ++iterator) { //set the appropriate historical resource quantities
 							if (iterator->first.first.Year == 0 || start_date.ContainsDate(iterator->first.first)) {
-								Players[i].SetResource(iterator->first.second, iterator->second);
+								CPlayer::Players[i]->SetResource(iterator->first.second, iterator->second);
 							}
 						}
 					}

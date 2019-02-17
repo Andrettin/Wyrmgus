@@ -746,7 +746,7 @@ bool CCharacter::CanAppear(bool ignore_neutral) const
 		if (ignore_neutral && i == PlayerNumNeutral) {
 			continue;
 		}
-		if (Players[i].HasHero(this)) {
+		if (CPlayer::Players[i]->HasHero(this)) {
 			return false;
 		}
 	}

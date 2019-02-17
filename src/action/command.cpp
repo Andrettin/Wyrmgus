@@ -1047,8 +1047,8 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 	//Wyrmgus start
 //	if (unit.Player->CheckLimits(type) < 0
 //		|| unit.Player->CheckUnitType(type)) {
-	if (Players[player].CheckLimits(type) < 0
-		|| Players[player].CheckUnitType(type, unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0)) {
+	if (CPlayer::Players[player]->CheckLimits(type) < 0
+		|| CPlayer::Players[player]->CheckUnitType(type, unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0)) {
 	//Wyrmgus end
 		return;
 	}
@@ -1061,7 +1061,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 	}
 	
 	if (unit.Player->Index != player) { //if the player "training" the unit isn't the same one that owns the trainer building, then make the former share some technological progress with the latter
-		Players[player].ShareUpgradeProgress(*unit.Player, unit);
+		CPlayer::Players[player]->ShareUpgradeProgress(*unit.Player, unit);
 	}
 
 	if (unit.Type->Stats[unit.Player->Index].GetUnitStock(&type) != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
@@ -1229,8 +1229,8 @@ void CommandResearch(CUnit &unit, CUpgrade &what, int player, int flush)
 	//Wyrmgus start
 //	if (unit.Player->CheckCosts(what.Costs)) {
 	int upgrade_costs[MaxCosts];
-	Players[player].GetUpgradeCosts(&what, upgrade_costs);
-	if (Players[player].CheckCosts(upgrade_costs)) {
+	CPlayer::Players[player]->GetUpgradeCosts(&what, upgrade_costs);
+	if (CPlayer::Players[player]->CheckCosts(upgrade_costs)) {
 	//Wyrmgus end
 		return;
 	}
@@ -1346,24 +1346,24 @@ void CommandDiplomacy(int player, int state, int opponent)
 {
 	switch (state) {
 		case DiplomacyNeutral:
-			Players[player].SetDiplomacyNeutralWith(Players[opponent]);
+			CPlayer::Players[player]->SetDiplomacyNeutralWith(*CPlayer::Players[opponent]);
 			break;
 		case DiplomacyAllied:
-			Players[player].SetDiplomacyAlliedWith(Players[opponent]);
+			CPlayer::Players[player]->SetDiplomacyAlliedWith(*CPlayer::Players[opponent]);
 			break;
 		case DiplomacyEnemy:
-			Players[player].SetDiplomacyEnemyWith(Players[opponent]);
+			CPlayer::Players[player]->SetDiplomacyEnemyWith(*CPlayer::Players[opponent]);
 			break;
 		//Wyrmgus start
 		case DiplomacyOverlord:
-			Players[opponent].SetOverlord(&Players[player]);
+			CPlayer::Players[opponent]->SetOverlord(CPlayer::Players[player]);
 			break;
 		case DiplomacyVassal:
-			Players[player].SetOverlord(&Players[opponent]);
+			CPlayer::Players[player]->SetOverlord(CPlayer::Players[opponent]);
 			break;
 		//Wyrmgus end
 		case DiplomacyCrazy:
-			Players[player].SetDiplomacyCrazyWith(Players[opponent]);
+			CPlayer::Players[player]->SetDiplomacyCrazyWith(*CPlayer::Players[opponent]);
 			break;
 	}
 }
@@ -1386,13 +1386,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 	}
 
 	// Compute Before and after.
-	const int before = Players[player].IsBothSharedVision(Players[opponent]);
+	const int before = CPlayer::Players[player]->IsBothSharedVision(*CPlayer::Players[opponent]);
 	if (state == false) {
-		Players[player].UnshareVisionWith(Players[opponent]);
+		CPlayer::Players[player]->UnshareVisionWith(*CPlayer::Players[opponent]);
 	} else {
-		Players[player].ShareVisionWith(Players[opponent]);
+		CPlayer::Players[player]->ShareVisionWith(*CPlayer::Players[opponent]);
 	}
-	const int after = Players[player].IsBothSharedVision(Players[opponent]);
+	const int after = CPlayer::Players[player]->IsBothSharedVision(*CPlayer::Players[opponent]);
 
 	if (before && !after) {
 		// Don't share vision anymore. Give each other explored terrain for good-bye.
@@ -1405,7 +1405,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 
 			//Wyrmgus start
 //			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
-			if (mfp.Visible[player] && !mfp.Visible[opponent] && !Players[player].Revealed) {
+			if (mfp.Visible[player] && !mfp.Visible[opponent] && !CPlayer::Players[player]->Revealed) {
 			//Wyrmgus end
 				mfp.Visible[opponent] = 1;
 				if (opponent == CPlayer::GetThisPlayer()->Index) {
@@ -1414,7 +1414,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 			}
 			//Wyrmgus start
 //			if (mfp.Visible[opponent] && !mfp.Visible[player]) {
-			if (mfp.Visible[opponent] && !mfp.Visible[player] && !Players[opponent].Revealed) {
+			if (mfp.Visible[opponent] && !mfp.Visible[player] && !CPlayer::Players[opponent]->Revealed) {
 			//Wyrmgus end
 				mfp.Visible[player] = 1;
 				if (player == CPlayer::GetThisPlayer()->Index) {
@@ -1428,13 +1428,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 				CMapField &mf = *CMap::Map.Field(i, z);
 				CMapFieldPlayerInfo &mfp = mf.playerInfo;
 
-				if (mfp.Visible[player] && !mfp.Visible[opponent] && !Players[player].Revealed) {
+				if (mfp.Visible[player] && !mfp.Visible[opponent] && !CPlayer::Players[player]->Revealed) {
 					mfp.Visible[opponent] = 1;
 					if (opponent == CPlayer::GetThisPlayer()->Index) {
 						CMap::Map.MarkSeenTile(mf, z);
 					}
 				}
-				if (mfp.Visible[opponent] && !mfp.Visible[player] && !Players[opponent].Revealed) {
+				if (mfp.Visible[opponent] && !mfp.Visible[player] && !CPlayer::Players[opponent]->Revealed) {
 					mfp.Visible[player] = 1;
 					if (player == CPlayer::GetThisPlayer()->Index) {
 						CMap::Map.MarkSeenTile(mf, z);
@@ -1463,24 +1463,24 @@ void CommandQuit(int player)
 {
 	// Set player to neutral, remove allied/enemy/shared vision status
 	// If the player doesn't have any units then this is pointless?
-	Players[player].Type = PlayerNeutral;
+	CPlayer::Players[player]->Type = PlayerNeutral;
 	for (int i = 0; i < NumPlayers; ++i) {
-		if (i != player && Players[i].Team != Players[player].Team) {
-			Players[i].SetDiplomacyNeutralWith(Players[player]);
-			Players[player].SetDiplomacyNeutralWith(Players[i]);
+		if (i != player && CPlayer::Players[i]->Team != CPlayer::Players[player]->Team) {
+			CPlayer::Players[i]->SetDiplomacyNeutralWith(*CPlayer::Players[player]);
+			CPlayer::Players[player]->SetDiplomacyNeutralWith(*CPlayer::Players[i]);
 			//  We clear Shared vision by sending fake shared vision commands.
 			//  We do this because Shared vision is a bit complex.
 			CommandSharedVision(i, 0, player);
 			CommandSharedVision(player, 0, i);
 			// Remove Selection from Quit Player
 			std::vector<CUnit *> empty;
-			ChangeTeamSelectedUnits(Players[player], empty);
+			ChangeTeamSelectedUnits(*CPlayer::Players[player], empty);
 		}
 	}
 
-	if (Players[player].GetUnitCount() != 0) {
-		SetMessage(_("Player \"%s\" has left the game"), Players[player].Name.c_str());
+	if (CPlayer::Players[player]->GetUnitCount() != 0) {
+		SetMessage(_("Player \"%s\" has left the game"), CPlayer::Players[player]->Name.c_str());
 	} else {
-		SetMessage(_("Player \"%s\" has been killed"), Players[player].Name.c_str());
+		SetMessage(_("Player \"%s\" has been killed"), CPlayer::Players[player]->Name.c_str());
 	}
 }

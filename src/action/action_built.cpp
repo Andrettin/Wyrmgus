@@ -171,7 +171,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	//Wyrmgus start
 //	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.Name.c_str());
-	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.GetDefaultName(player).c_str());
+	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.GetDefaultName(&player).c_str());
 	//Wyrmgus end
 
 	// HACK: the building is ready now
