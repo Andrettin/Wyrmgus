@@ -1492,34 +1492,36 @@ void CPlayer::SetName(const std::string &name)
 //Wyrmgus start
 void CPlayer::SetCivilization(int civilization)
 {
-	std::unique_lock<std::shared_mutex> lock(this->Mutex);
-	
 	if (this->Race != -1 && (GameRunning || GameEstablishing)) {
 		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID] == 'R') {
 			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID);
 		}
 	}
 
-	int old_civilization = this->Race;
-	int old_faction = this->Faction;
-
-	if (GameRunning) {
-		this->SetFaction(nullptr);
-	} else {
-		this->Faction = -1;
-	}
-
-	this->Race = civilization;
-
-	//if the civilization of the person player changed, update the UI
-	if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Index == this->Index) || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
-		//load proper UI
-		char buf[256];
-		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[this->Race].c_str());
-		CclCommand(buf);
+	{
+		std::unique_lock<std::shared_mutex> lock(this->Mutex);
 		
-		UI.Load();
-		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
+		int old_civilization = this->Race;
+		int old_faction = this->Faction;
+
+		if (GameRunning) {
+			this->SetFaction(nullptr);
+		} else {
+			this->Faction = -1;
+		}
+
+		this->Race = civilization;
+
+		//if the civilization of the person player changed, update the UI
+		if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Index == this->Index) || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
+			//load proper UI
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[this->Race].c_str());
+			CclCommand(buf);
+			
+			UI.Load();
+			SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
+		}
 	}
 	
 	if (this->Race != -1) {
