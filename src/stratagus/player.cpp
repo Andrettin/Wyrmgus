@@ -1530,6 +1530,8 @@ void CPlayer::SetCivilization(int civilization)
 			UpgradeAcquire(*this, civilization_upgrade);
 		}
 	}
+	
+	emit_signal("civilization_changed");
 }
 
 CCivilization *CPlayer::GetCivilization() const
@@ -1543,6 +1545,16 @@ CCivilization *CPlayer::GetCivilization() const
 	return nullptr;
 }
 	
+String CPlayer::GetInterface() const
+{
+	CCivilization *civilization = this->GetCivilization();
+	if (civilization) {
+		return civilization->GetInterface();
+	}
+	
+	return "";
+}
+
 /**
 **  Change player faction.
 **
@@ -4626,6 +4638,9 @@ bool CPlayer::HasHero(const CCharacter *hero) const
 void CPlayer::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CPlayer::GetCivilization);
+	ClassDB::bind_method(D_METHOD("get_interface"), &CPlayer::GetInterface);
+	
+	ADD_SIGNAL(MethodInfo("civilization_changed"));
 }
 
 void SetFactionStringToIndex(const std::string &faction_name, int faction_id)

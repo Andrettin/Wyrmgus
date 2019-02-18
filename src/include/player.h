@@ -246,6 +246,7 @@ public:
 	void SetFaction(const CFaction *faction);
 	void SetRandomFaction();
 	void SetDynasty(CDynasty *dynasty);
+	String GetInterface() const;
 	void CheckAge();
 	void SetAge(CAge *age);
 	CCurrency *GetCurrency() const;
