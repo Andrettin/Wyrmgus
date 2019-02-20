@@ -886,23 +886,34 @@ void SavePlayers(CFile &file)
 
 void CPlayer::SetThisPlayer(CPlayer *player)
 {
-	if (CPlayer::ThisPlayer == player) {
-		return;
-	}
-	
-	CPlayer *old_player = CPlayer::ThisPlayer;
-	String old_interface = old_player->GetInterface();
+	CPlayer *old_player = nullptr;
 	
 	{
 		std::unique_lock<std::shared_mutex> lock(PlayerMutex);
 		
+		old_player = CPlayer::ThisPlayer;
+		
+		if (old_player == player) {
+			return;
+		}
+		
 		CPlayer::ThisPlayer = player;
 	}
 	
-	String new_interface = CPlayer::ThisPlayer ? CPlayer::ThisPlayer->GetInterface() : "";
+	WyrmgusModule::GetInstance()->emit_signal("this_player_changed", old_player, player);
+	
+	String old_interface = old_player ? old_player->GetInterface() : "";
+	String new_interface = player ? player->GetInterface() : "";
 	if (new_interface != old_interface) {
 		WyrmgusModule::GetInstance()->emit_signal("interface_changed", old_interface, new_interface);
 	}
+}
+
+CPlayer *CPlayer::GetThisPlayer()
+{
+	std::shared_lock<std::shared_mutex> lock(PlayerMutex);
+	
+	return CPlayer::ThisPlayer;
 }
 
 CPlayer *CPlayer::GetPlayer(const int index)
@@ -920,13 +931,6 @@ CPlayer *CPlayer::GetPlayer(const int index)
 	}
 	
 	return CPlayer::Players[index];
-}
-
-CPlayer *CPlayer::GetThisPlayer()
-{
-	std::shared_lock<std::shared_mutex> lock(PlayerMutex);
-	
-	return CPlayer::ThisPlayer;
 }
 
 void CPlayer::Save(CFile &file) const
@@ -1314,14 +1318,6 @@ CPlayer *GetOrAddFactionPlayer(const CFaction *faction)
 
 void CPlayer::Init(/* PlayerTypes */ int type)
 {
-	std::unique_lock<std::shared_mutex> lock(this->Mutex);
-	
-	std::vector<CUnit *>().swap(this->Units);
-	std::vector<CUnit *>().swap(this->FreeWorkers);
-	//Wyrmgus start
-	std::vector<CUnit *>().swap(this->LevelUpUnits);
-	//Wyrmgus end
-
 	//  Take first slot for person on this computer,
 	//  fill other with computer players.
 	if (type == PlayerPerson && !NetPlayers) {
@@ -1344,6 +1340,14 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 		}
 		return;
 	}
+
+	std::unique_lock<std::shared_mutex> lock(this->Mutex);
+	
+	std::vector<CUnit *>().swap(this->Units);
+	std::vector<CUnit *>().swap(this->FreeWorkers);
+	//Wyrmgus start
+	std::vector<CUnit *>().swap(this->LevelUpUnits);
+	//Wyrmgus end
 
 	//  Make simple teams:
 	//  All person players are enemies.
@@ -1509,27 +1513,27 @@ void CPlayer::SetCivilization(int civilization)
 	CCivilization *old_civilization = this->GetCivilization();
 	CCivilization *new_civilization = civilization != -1 ? CCivilization::Civilizations[civilization] : nullptr;
 
+	if (GameRunning) {
+		this->SetFaction(nullptr);
+	} else {
+		this->Faction = -1;
+	}
+
 	{
 		std::unique_lock<std::shared_mutex> lock(this->Mutex);
 		
-		if (GameRunning) {
-			this->SetFaction(nullptr);
-		} else {
-			this->Faction = -1;
-		}
-
 		this->Race = civilization;
+	}
 
-		//if the civilization of the person player changed, update the UI
-		if ((CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Index == this->Index) || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
-			//load proper UI
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[this->Race].c_str());
-			CclCommand(buf);
-			
-			UI.Load();
-			SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
-		}
+	//if the civilization of the person player changed, update the UI
+	if (CPlayer::GetThisPlayer() == this || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
+		//load proper UI
+		char buf[256];
+		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[this->Race].c_str());
+		CclCommand(buf);
+		
+		UI.Load();
+		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 	}
 	
 	if (this->Race != -1) {
