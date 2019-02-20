@@ -899,7 +899,7 @@ void CPlayer::SetThisPlayer(CPlayer *player)
 		CPlayer::ThisPlayer = player;
 	}
 	
-	String new_interface = CPlayer::ThisPlayer->GetInterface();
+	String new_interface = CPlayer::ThisPlayer ? CPlayer::ThisPlayer->GetInterface() : "";
 	if (new_interface != old_interface) {
 		WyrmgusModule::GetInstance()->emit_signal("interface_changed", old_interface, new_interface);
 	}
