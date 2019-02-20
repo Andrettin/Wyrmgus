@@ -25,7 +25,6 @@ public:
 	void SetCurrentCampaign(String campaign_ident);
 	CCampaign *GetCurrentCampaign() const;
 	CPlayer *GetThisPlayer() const;
-	void ThisPlayerChanged();
 
 protected:
 	static void _bind_methods();

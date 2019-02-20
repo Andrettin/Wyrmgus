@@ -890,13 +890,19 @@ void CPlayer::SetThisPlayer(CPlayer *player)
 		return;
 	}
 	
+	CPlayer *old_player = CPlayer::ThisPlayer;
+	String old_interface = old_player->GetInterface();
+	
 	{
 		std::unique_lock<std::shared_mutex> lock(PlayerMutex);
 		
 		CPlayer::ThisPlayer = player;
 	}
 	
-	WyrmgusModule::GetInstance()->ThisPlayerChanged();
+	String new_interface = CPlayer::ThisPlayer->GetInterface();
+	if (new_interface != old_interface) {
+		WyrmgusModule::GetInstance()->emit_signal("interface_changed", old_interface, new_interface);
+	}
 }
 
 CPlayer *CPlayer::GetPlayer(const int index)
@@ -1492,18 +1498,20 @@ void CPlayer::SetName(const std::string &name)
 //Wyrmgus start
 void CPlayer::SetCivilization(int civilization)
 {
+	String old_interface = this->GetInterface();
+	
 	if (this->Race != -1 && (GameRunning || GameEstablishing)) {
 		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID] == 'R') {
 			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID);
 		}
 	}
+	
+	CCivilization *old_civilization = this->GetCivilization();
+	CCivilization *new_civilization = civilization != -1 ? CCivilization::Civilizations[civilization] : nullptr;
 
 	{
 		std::unique_lock<std::shared_mutex> lock(this->Mutex);
 		
-		int old_civilization = this->Race;
-		int old_faction = this->Faction;
-
 		if (GameRunning) {
 			this->SetFaction(nullptr);
 		} else {
@@ -1531,7 +1539,16 @@ void CPlayer::SetCivilization(int civilization)
 		}
 	}
 	
-	emit_signal("civilization_changed");
+	emit_signal("civilization_changed", old_civilization, new_civilization);
+	
+	String new_interface = this->GetInterface();
+	if (new_interface != old_interface) {
+		emit_signal("interface_changed", old_interface, new_interface);
+		
+		if (CPlayer::GetThisPlayer() == this) {
+			WyrmgusModule::GetInstance()->emit_signal("interface_changed", old_interface, new_interface);
+		}
+	}
 }
 
 CCivilization *CPlayer::GetCivilization() const
@@ -4640,7 +4657,8 @@ void CPlayer::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CPlayer::GetCivilization);
 	ClassDB::bind_method(D_METHOD("get_interface"), &CPlayer::GetInterface);
 	
-	ADD_SIGNAL(MethodInfo("civilization_changed"));
+	ADD_SIGNAL(MethodInfo("civilization_changed", PropertyInfo(Variant::OBJECT, "old_civilization"), PropertyInfo(Variant::OBJECT, "new_civilization")));
+	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
 }
 
 void SetFactionStringToIndex(const std::string &faction_name, int faction_id)

@@ -65,11 +65,6 @@ CPlayer *WyrmgusModule::GetThisPlayer() const
 	return CPlayer::GetThisPlayer();
 }
 
-void WyrmgusModule::ThisPlayerChanged()
-{
-	emit_signal("this_player_changed");
-}
-
 void WyrmgusModule::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("run"), &WyrmgusModule::Run);
@@ -81,5 +76,6 @@ void WyrmgusModule::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_current_campaign"), &WyrmgusModule::GetCurrentCampaign);
 	ClassDB::bind_method(D_METHOD("get_this_player"), &WyrmgusModule::GetThisPlayer);
 	
-	ADD_SIGNAL(MethodInfo("this_player_changed"));
+	ADD_SIGNAL(MethodInfo("this_player_changed", PropertyInfo(Variant::OBJECT, "old_player"), PropertyInfo(Variant::OBJECT, "new_player")));
+	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
 }
