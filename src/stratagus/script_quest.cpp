@@ -729,7 +729,7 @@ static int CclGetAchievementData(lua_State *l)
 		lua_pushboolean(l, achievement->Hidden);
 		return 1;
 	} else if (!strcmp(data, "Obtained")) {
-		lua_pushboolean(l, achievement->Obtained);
+		lua_pushboolean(l, achievement->IsObtained());
 		return 1;
 	} else if (!strcmp(data, "Unobtainable")) {
 		lua_pushboolean(l, achievement->Unobtainable);

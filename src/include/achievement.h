@@ -81,6 +81,21 @@ public:
 		return this->Description.c_str();
 	}
 	
+	CIcon *GetIcon() const
+	{
+		return this->Icon.Icon;
+	}
+	
+	bool IsHidden() const
+	{
+		return this->Hidden;
+	}
+	
+	bool IsObtained() const
+	{
+		return this->Obtained;
+	}
+	
 public:
 	std::string Name;
 	std::string Description;		/// Description of the achievement

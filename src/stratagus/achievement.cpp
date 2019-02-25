@@ -109,7 +109,7 @@ void CAchievement::ClearAchievements()
 void CAchievement::CheckAchievements()
 {
 	for (CAchievement *achievement : CAchievement::Achievements) {
-		if (achievement->Obtained) {
+		if (achievement->IsObtained()) {
 			continue;
 		}
 		
@@ -186,7 +186,7 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 
 void CAchievement::Obtain(const bool save, const bool display)
 {
-	if (this->Obtained) {
+	if (this->IsObtained()) {
 		return;
 	}
 	
@@ -203,7 +203,7 @@ void CAchievement::Obtain(const bool save, const bool display)
 
 bool CAchievement::CanObtain() const
 {
-	if (this->Obtained || this->Unobtainable) {
+	if (this->IsObtained() || this->Unobtainable) {
 		return false;
 	}
 	
@@ -291,6 +291,11 @@ void CAchievement::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_name"), &CAchievement::GetName);
 	ClassDB::bind_method(D_METHOD("get_description"), &CAchievement::GetDescription);
+	ClassDB::bind_method(D_METHOD("get_icon"), &CAchievement::GetIcon);
+	ClassDB::bind_method(D_METHOD("is_hidden"), &CAchievement::IsHidden);
+	ClassDB::bind_method(D_METHOD("is_obtained"), &CAchievement::IsObtained);
+	ClassDB::bind_method(D_METHOD("get_progress"), &CAchievement::GetProgress);
+	ClassDB::bind_method(D_METHOD("get_progress_max"), &CAchievement::GetProgressMax);
 }
 
 void SetAchievementObtained(const std::string &achievement_ident, const bool save, const bool display)

@@ -10,7 +10,7 @@
 //
 /**@name icons.cpp - The icons. */
 //
-//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -62,16 +60,6 @@ IconMap Icons;   /// Map of ident to icon.
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  CIcon constructor
-*/
-//Wyrmgus start
-//CIcon::CIcon(const std::string &ident) : G(nullptr), GScale(nullptr), Frame(0), Ident(ident)
-CIcon::CIcon(const std::string &ident) : G(nullptr), GScale(nullptr), Frame(0), Ident(ident), Loaded(false)
-//Wyrmgus end
-{
-}
 
 /**
 **  CIcon destructor
@@ -164,6 +152,8 @@ void CIcon::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			this->G = CPlayerColorGraphic::New(file, size.x, size.y);
+			this->File = file;
+			this->Size = size;
 		} else {
 			fprintf(stderr, "Invalid icon property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
@@ -393,6 +383,11 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 	}
 }
 
+void CIcon::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_file"), &CIcon::GetFile);
+}
+
 /**
 **  Load the Icon
 */
@@ -454,5 +449,3 @@ void CleanIcons()
 	}
 	Icons.clear();
 }
-
-//@}

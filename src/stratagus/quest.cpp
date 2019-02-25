@@ -87,7 +87,7 @@ void SaveQuestCompletion()
 	}
 
 	for (const CAchievement *achievement : CAchievement::Achievements) {
-		if (achievement->Obtained) {
+		if (achievement->IsObtained()) {
 			fprintf(fd, "SetAchievementObtained(\"%s\", false, false)\n", achievement->Ident.c_str());
 		}
 	}

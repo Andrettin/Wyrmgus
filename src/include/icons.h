@@ -10,7 +10,7 @@
 //
 /**@name icons.h - The icons headerfile. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer
+//      (c) Copyright 1998-2019 by Lutz Sammer and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,14 +29,6 @@
 
 #ifndef __ICONS_H__
 #define __ICONS_H__
-
-//@{
-
-#include "vec2i.h"
-#include <string>
-//Wyrmgus start
-#include <map>
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -101,6 +93,17 @@
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "vec2i.h"
+
+#include <core/object.h>
+
+#include <map>
+#include <string>
+
+/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
@@ -111,10 +114,22 @@ class CPlayer;
 class ButtonStyle;
 
 /// Icon: rectangle image used in menus
-class CIcon
+class CIcon : public Object
 {
+	GDCLASS(CIcon, Object)
+	
 public:
-	CIcon(const std::string &ident);
+	CIcon()
+	{
+	}
+	
+	/**
+	**  CIcon constructor
+	*/
+	CIcon(const std::string &ident) : Ident(ident)
+	{
+	}
+	
 	~CIcon();
 
 	static CIcon *New(const std::string &ident);
@@ -139,15 +154,25 @@ public:
 
 	const std::string &GetIdent() const { return this->Ident; }
 
-public:
-	CPlayerColorGraphic *G;              /// Graphic data
-	CPlayerColorGraphic *GScale;         /// Icon when drawn grayscaled
-	int Frame;                /// Frame number in graphic
-	//Wyrmgus start
-	bool Loaded;
-	//Wyrmgus end
+	String GetFile() const
+	{
+		return this->File.c_str();
+	}
+	
 private:
-	std::string Ident;        /// Icon identifier
+	std::string Ident;						/// Icon identifier
+public:
+	CPlayerColorGraphic *G = nullptr;		/// Graphic data
+	CPlayerColorGraphic *GScale = nullptr;	/// Icon when drawn grayscaled
+	std::string File;						/// The file containing the icon graphics
+	Vec2i Size = Vec2i(0, 0);				/// The size of the icon, in pixels
+	int Frame = 0;							/// Frame number in graphic
+	//Wyrmgus start
+	bool Loaded = false;
+	//Wyrmgus end
+
+protected:
+	static void _bind_methods();
 };
 
 /// Icon reference (used in config tables)
@@ -176,6 +201,4 @@ typedef std::map<std::string, CIcon *> IconMap;
 extern IconMap Icons;
 //Wyrmgus end
 
-//@}
-
-#endif // !__ICONS_H__
+#endif

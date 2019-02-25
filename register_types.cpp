@@ -30,15 +30,19 @@
 
 #include "register_types.h"
 
+#include "achievement.h"
 #include "campaign.h"
 #include "civilization.h"
+#include "icons.h"
 #include "player.h"
 #include "wyrmgus_module.h"
 
 void register_wyrmgus_types()
 {
+	ClassDB::register_class<CAchievement>();
 	ClassDB::register_class<CCampaign>();
 	ClassDB::register_class<CCivilization>();
+	ClassDB::register_class<CIcon>();
 	ClassDB::register_class<CPlayer>();
 	ClassDB::register_class<WyrmgusModule>();
 }
