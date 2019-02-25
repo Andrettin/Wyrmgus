@@ -96,6 +96,16 @@ CAchievement *CAchievement::GetOrAddAchievement(const std::string &ident)
 }
 
 /**
+**	@brief	Get the existing achievements
+**
+**	@return	The achievements
+*/
+const std::vector<CAchievement *> &CAchievement::GetAchievements()
+{
+	return CAchievement::Achievements;
+}
+
+/**
 **	@brief	Remove the existing achievements
 */
 void CAchievement::ClearAchievements()

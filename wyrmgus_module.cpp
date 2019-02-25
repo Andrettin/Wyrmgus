@@ -2,6 +2,7 @@
 
 #include "stratagus.h"
 
+#include "achievement.h"
 #include "campaign.h"
 #include "player.h"
 #include "script.h"
@@ -60,6 +61,17 @@ CCampaign *WyrmgusModule::GetCurrentCampaign() const
 	return CCampaign::GetCurrentCampaign();
 }
 
+Array WyrmgusModule::GetAchievements() const
+{
+	Array achievements;
+	
+	for (CAchievement *achievement : CAchievement::GetAchievements()) {
+		achievements.push_back(achievement);
+	}
+	
+	return achievements;
+}
+
 CPlayer *WyrmgusModule::GetThisPlayer() const
 {
 	return CPlayer::GetThisPlayer();
@@ -74,6 +86,7 @@ void WyrmgusModule::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_campaigns"), &WyrmgusModule::GetCampaigns);
 	ClassDB::bind_method(D_METHOD("set_current_campaign", "campaign"), &WyrmgusModule::SetCurrentCampaign);
 	ClassDB::bind_method(D_METHOD("get_current_campaign"), &WyrmgusModule::GetCurrentCampaign);
+	ClassDB::bind_method(D_METHOD("get_achievements"), &WyrmgusModule::GetAchievements);
 	ClassDB::bind_method(D_METHOD("get_this_player"), &WyrmgusModule::GetThisPlayer);
 	
 	ADD_SIGNAL(MethodInfo("this_player_changed", PropertyInfo(Variant::OBJECT, "old_player"), PropertyInfo(Variant::OBJECT, "new_player")));

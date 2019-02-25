@@ -24,6 +24,7 @@ public:
 	Array GetCampaigns() const;
 	void SetCurrentCampaign(String campaign_ident);
 	CCampaign *GetCurrentCampaign() const;
+	Array GetAchievements() const;
 	CPlayer *GetThisPlayer() const;
 
 protected:

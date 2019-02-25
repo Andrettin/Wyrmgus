@@ -58,6 +58,7 @@ class CAchievement : public CDataType, public Object
 public:
 	static CAchievement *GetAchievement(const std::string &ident, const bool should_find = true);
 	static CAchievement *GetOrAddAchievement(const std::string &ident);
+	static const std::vector<CAchievement *> &GetAchievements();
 	static void ClearAchievements();
 	static void CheckAchievements();
 	
