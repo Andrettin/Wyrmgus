@@ -35,6 +35,7 @@
 
 #include "unit/unittype.h"
 
+#include "achievement.h"
 #include "actions.h"
 #include "animation.h"
 //Wyrmgus start
@@ -3458,7 +3459,7 @@ void UpdateUnitVariables(CUnit &unit)
 		if (unit.Variable[LEVEL_INDEX].Value > unit.Character->Level) { //save level, if unit has a persistent character
 			unit.Character->Level = unit.Variable[LEVEL_INDEX].Value;
 			SaveHero(unit.Character);
-			CheckAchievements(); // check achievements to see if any hero now has a high enough level for a particular achievement to be obtained
+			CAchievement::CheckAchievements(); // check achievements to see if any hero now has a high enough level for a particular achievement to be obtained
 		}
 	}
 	

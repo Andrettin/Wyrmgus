@@ -33,6 +33,7 @@
 
 #include "stratagus.h"
 
+#include "achievement.h"
 #include "actions.h"
 #include "age.h"
 #include "ai.h"
@@ -118,6 +119,7 @@ void CleanModules()
 	CTrigger::ClearTriggers();
 	FreeAi();
 	PlayerRaces.Clean();
+	CAchievement::ClearAchievements();
 	CAge::ClearAges();
 	CCalendar::ClearCalendars();
 	CCampaign::ClearCampaigns();

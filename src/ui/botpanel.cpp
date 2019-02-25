@@ -36,6 +36,7 @@
 
 #include "ui/ui.h"
 
+#include "achievement.h"
 #include "actions.h"
 //Wyrmgus start
 #include "action/action_research.h"
@@ -2203,7 +2204,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 						if (Selected[i]->Player->AiEnabled == false) {
 							Selected[i]->Character->Type = UnitTypes[CurrentButtons[button].Value];
 							SaveHero(Selected[i]->Character);
-							CheckAchievements();
+							CAchievement::CheckAchievements();
 						}
 					}
 				}

@@ -35,12 +35,12 @@
 
 #include "unit/unit.h"
 
+#include "achievement.h"
 #include "action/action_attack.h"
 //Wyrmgus start
 #include "action/action_resource.h"
 #include "action/action_upgradeto.h"
 //Wyrmgus end
-
 #include "actions.h"
 #include "ai.h"
 //Wyrmgus start
@@ -848,7 +848,7 @@ void CUnit::Retrain()
 								if (Player->AiEnabled == false) {
 									Character->Type = UnitTypes[i];
 									SaveHero(Character);
-									CheckAchievements();
+									CAchievement::CheckAchievements();
 								}
 							}
 						}
