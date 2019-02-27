@@ -1223,7 +1223,7 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		if (upgrade->Icon) {
-			lua_pushstring(l, upgrade->Icon->Name.c_str());
+			lua_pushstring(l, upgrade->Icon->GetIdent().c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

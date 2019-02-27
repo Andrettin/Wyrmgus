@@ -1283,7 +1283,7 @@ static int CclDefineIcon(lua_State *l)
 	icon->File = file;
 	icon->Size = size;
 	icon->Frame = frame;
-	icon->G = CPlayerColorGraphic::New(icon->File, icon->Size.x, icon->Size.y)
+	icon->G = CPlayerColorGraphic::New(icon->File, icon->Size.x, icon->Size.y);
 	
 	return 0;
 }
