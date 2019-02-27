@@ -222,7 +222,6 @@ extern CUserInterface UI;
 
 class CIcon
 {
-	static CIcon *New(const std::string ident);
 	static CIcon *Get(const std::string ident);
 
 	tolua_readonly tolua_property__s std::string Ident;
@@ -231,8 +230,6 @@ class CIcon
 	CPlayerColorGraphic *GScale;
 	//Wyrmgus end
 	int Frame;
-	std::string File;			/// The file containing the icon graphics
-	Vec2i Size;					/// The size of the icon, in pixels
 };
 
 extern ButtonStyle *FindButtonStyle(const std::string style);
