@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
-#include "icon.h"
+#include "icon_config.h"
 
 #include <core/object.h>
 
@@ -48,6 +48,7 @@
 ----------------------------------------------------------------------------*/
 
 class CCharacter;
+class CIcon;
 class CQuest;
 class CUnitType;
 

@@ -30,8 +30,6 @@
 #ifndef __EDITOR_H__
 #define __EDITOR_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -39,7 +37,7 @@
 #include <vector>
 #include <string>
 
-#include "icon.h"
+#include "icon_config.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -164,6 +162,4 @@ extern void EditorChangeTile(const Vec2i &pos, int tileIndex);
 extern void RecalculateShownUnits();
 //Wyrmgus end
 
-//@}
-
-#endif // !__EDITOR_H__
+#endif

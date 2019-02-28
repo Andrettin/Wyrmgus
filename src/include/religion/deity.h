@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
-#include "icon.h"
+#include "icon_config.h"
 
 #include <map>
 #include <string>

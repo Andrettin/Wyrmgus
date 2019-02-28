@@ -36,7 +36,7 @@
 
 #include "include/color.h"
 #include "data_type.h"
-#include "icon.h"
+#include "icon_config.h"
 #include "missileconfig.h"
 #include "unitsound.h"
 #include "upgrade/upgrade_structs.h"

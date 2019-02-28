@@ -44,14 +44,11 @@
 #include "unit/unit.h"
 #include "video.h"
 
-#include <map>
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 IconMap Icons;   /// Map of ident to icon.
-
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -386,31 +383,6 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 void CIcon::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_file"), &CIcon::GetFile);
-}
-
-/**
-**  Load the Icon
-*/
-bool IconConfig::LoadNoLog()
-{
-	Assert(!Name.empty());
-
-	Icon = CIcon::Get(Name);
-	return Icon != nullptr;
-}
-
-/**
-**  Load the Icon
-*/
-bool IconConfig::Load()
-{
-	bool res = LoadNoLog();
-	if (res == true) {
-		UpdateLoadProgress();
-	} else {
-		fprintf(stderr, _("Can't find icon %s\n"), this->Name.c_str());
-	}
-	return res;
 }
 
 /**

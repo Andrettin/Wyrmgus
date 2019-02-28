@@ -30,17 +30,15 @@
 #ifndef __BUTTON_ACTION_H__
 #define __BUTTON_ACTION_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "icon_config.h"
+#include "unitsound.h"
+
 #include <string>
 #include <vector>
-
-#include "icon.h"
-#include "unitsound.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -172,6 +170,4 @@ extern std::string GetButtonActionNameById(const int button_action);
 extern int GetButtonActionIdByName(const std::string &button_action);
 extern bool IsNeutralUsableButtonAction(const int button_action);
 
-//@}
-
-#endif // !__BUTTON_ACTION_H__
+#endif

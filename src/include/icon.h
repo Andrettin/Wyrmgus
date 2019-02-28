@@ -60,25 +60,6 @@
 **    Frame number in the graphic to display.
 */
 
-/**
-**  @class IconConfig icon.h
-**
-**  \#include "icon.h"
-**
-**  This structure contains all configuration information about an icon.
-**
-**  IconConfig::Name
-**
-**    Unique identifier of the icon, used to reference icons in config
-**    files and during startup.  The name is resolved during game
-**    start and the pointer placed in the next field.
-**    @see CIcon::Ident
-**
-**  IconConfig::Icon
-**
-**    Pointer to an icon. This pointer is resolved during game start.
-*/
-
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -173,18 +154,6 @@ public:
 
 protected:
 	static void _bind_methods();
-};
-
-/// Icon reference (used in config tables)
-class IconConfig
-{
-public:
-	bool LoadNoLog();
-	bool Load();
-
-public:
-	std::string Name;		/// config icon name
-	CIcon *Icon = nullptr;	/// icon pointer to use to run time
 };
 
 /*----------------------------------------------------------------------------

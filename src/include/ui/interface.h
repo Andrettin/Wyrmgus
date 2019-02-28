@@ -30,17 +30,14 @@
 #ifndef __INTERFACE_H__
 #define __INTERFACE_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-
-#include "icon.h"
 #include "unitsound.h"
 #include "vec2i.h"
+
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -432,6 +429,4 @@ extern void SetGameSpeed(int speed);
 /// Get the game speed
 extern int GetGameSpeed();
 
-//@}
-
-#endif // !__INTERFACE_H__
+#endif

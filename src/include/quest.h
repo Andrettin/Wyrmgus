@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "icon.h"
+#include "icon_config.h"
 
 #include <vector>
 #include <tuple>
