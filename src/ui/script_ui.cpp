@@ -37,9 +37,7 @@
 #include "ui/ui.h"
 
 #include "font.h"
-//Wyrmgus start
-#include "icons.h"
-//Wyrmgus end
+#include "icon.h"
 #include "map/map.h"
 #include "menus.h"
 #include "script.h"

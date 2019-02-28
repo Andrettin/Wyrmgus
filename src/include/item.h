@@ -30,15 +30,13 @@
 #ifndef __ITEM_H__
 #define __ITEM_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
+#include "icon.h"
 
-#include "icons.h"
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -175,6 +173,4 @@ extern std::string GetItemEffectsString(const std::string &item_ident);
 extern std::string GetUniqueItemEffectsString(const std::string &item_ident);
 extern void ItemCclRegister();
 
-//@}
-
-#endif // !__ITEM_H__
+#endif

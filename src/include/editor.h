@@ -39,7 +39,7 @@
 #include <vector>
 #include <string>
 
-#include "icons.h"
+#include "icon.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------

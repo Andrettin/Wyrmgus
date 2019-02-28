@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name icons.cpp - The icons. */
+/**@name icon.cpp - The icon source file. */
 //
 //      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "icons.h"
+#include "icon.h"
 
 #include "config.h"
 #include "menus.h"

@@ -41,7 +41,7 @@
 #include "age.h"
 #include "civilization.h"
 #include "font.h"
-#include "icons.h"
+#include "icon.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "menus.h"

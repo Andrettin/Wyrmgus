@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name icons.h - The icons headerfile. */
+/**@name icon.h - The icon header file. */
 //
 //      (c) Copyright 1998-2019 by Lutz Sammer and Andrettin
 //
@@ -27,17 +27,17 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ICONS_H__
-#define __ICONS_H__
+#ifndef __ICON_H__
+#define __ICON_H__
 
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class CIcon icons.h
+**  @class CIcon icon.h
 **
-**  \#include "icons.h"
+**  \#include "icon.h"
 **
 **  This structure contains all information about an icon.
 **
@@ -61,9 +61,9 @@
 */
 
 /**
-**  @class IconConfig icons.h
+**  @class IconConfig icon.h
 **
-**  \#include "icons.h"
+**  \#include "icon.h"
 **
 **  This structure contains all configuration information about an icon.
 **
@@ -179,13 +179,12 @@ protected:
 class IconConfig
 {
 public:
-	IconConfig() : Icon(nullptr) {}
-
 	bool LoadNoLog();
 	bool Load();
+
 public:
-	std::string Name;    /// config icon name
-	CIcon *Icon;         /// icon pointer to use to run time
+	std::string Name;		/// config icon name
+	CIcon *Icon = nullptr;	/// icon pointer to use to run time
 };
 
 /*----------------------------------------------------------------------------

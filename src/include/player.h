@@ -38,7 +38,7 @@
 #include "character.h" // because of "MaxCharacterTitles"
 #include "include/color.h"
 //Wyrmgus end
-#include "icons.h"
+#include "icon.h"
 //Wyrmgus start
 #include "item.h"
 #include "time/date.h"

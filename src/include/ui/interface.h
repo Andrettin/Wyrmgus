@@ -38,7 +38,7 @@
 
 #include <vector>
 
-#include "icons.h"
+#include "icon.h"
 #include "unitsound.h"
 #include "vec2i.h"
 

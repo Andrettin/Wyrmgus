@@ -41,7 +41,7 @@
 #include "character.h"
 #include "currency.h"
 #include "game.h"
-#include "icons.h"
+#include "icon.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map_template.h"

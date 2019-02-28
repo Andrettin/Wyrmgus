@@ -39,7 +39,7 @@
 #include <string>
 #include <vector>
 
-#include "icons.h"
+#include "icon.h"
 #include "unitsound.h"
 
 /*----------------------------------------------------------------------------
