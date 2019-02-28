@@ -38,6 +38,7 @@
 #include "animation.h"
 #include "config.h"
 #include "construct.h"
+#include "icon.h"
 #include "map/terrain_type.h"
 #include "mod.h"
 #include "time/season.h"

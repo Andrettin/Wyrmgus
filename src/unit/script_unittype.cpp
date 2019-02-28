@@ -45,6 +45,7 @@
 #include "construct.h"
 #include "editor.h"
 #include "font.h"
+#include "icon.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"

@@ -46,6 +46,9 @@
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
+//Wyrmgus end
+#include "icon.h"
+//Wyrmgus start
 #include "luacallback.h"
 //Wyrmgus end
 #include "map/map.h"

@@ -51,6 +51,9 @@
 #include "editor.h"
 #include "font.h"
 #include "game.h"
+//Wyrmgus end
+#include "icon.h"
+//Wyrmgus start
 #include "iocompat.h"
 //Wyrmgus end
 #include "iolib.h"

@@ -42,6 +42,7 @@
 #include "font.h"
 #include "game.h"
 #include "guichan.h"
+#include "icon.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"

@@ -53,6 +53,7 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
+#include "icon.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"

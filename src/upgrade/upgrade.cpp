@@ -52,6 +52,7 @@
 #include "game.h"
 #include "grand_strategy.h"
 //Wyrmgus end
+#include "icon.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "item.h"

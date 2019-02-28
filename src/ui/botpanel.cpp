@@ -54,6 +54,7 @@
 //Wyrmgus end
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
+#include "icon.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"

@@ -36,6 +36,7 @@
 #include "icon_config.h"
 
 #include "icon.h"
+#include "translate.h"
 #include "ui/ui.h"
 
 /*----------------------------------------------------------------------------

@@ -48,6 +48,7 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
+#include "icon.h"
 #include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"

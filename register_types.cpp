@@ -33,7 +33,7 @@
 #include "achievement.h"
 #include "campaign.h"
 #include "civilization.h"
-#include "icons.h"
+#include "icon.h"
 #include "player.h"
 #include "wyrmgus_module.h"
 

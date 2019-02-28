@@ -46,6 +46,9 @@
 #include "editor.h"
 #include "font.h"
 #include "grand_strategy.h"
+//Wyrmgus end
+#include "icon.h"
+//Wyrmgus start
 #include "item.h"
 #include "luacallback.h"
 //Wyrmgus end

@@ -40,6 +40,7 @@
 #include "actions.h"
 #include "action/action_built.h"
 #include "font.h"
+#include "icon.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

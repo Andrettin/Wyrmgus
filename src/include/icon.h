@@ -88,11 +88,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CConfigData;
-class CGraphic;
-class CPlayerColorGraphic;
-class CPlayer;
 class ButtonStyle;
+class CConfigData;
+class CPlayerColorGraphic;
 
 /// Icon: rectangle image used in menus
 class CIcon : public Object

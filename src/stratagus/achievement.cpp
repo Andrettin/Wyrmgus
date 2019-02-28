@@ -37,6 +37,7 @@
 
 #include "character.h"
 #include "config.h"
+#include "icon.h"
 #include "player.h"
 #include "quest.h"
 #include "unit/unittype.h"
