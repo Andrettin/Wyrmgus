@@ -1558,7 +1558,7 @@ CCivilization *CPlayer::GetCivilization() const
 {
 	std::shared_lock<std::shared_mutex> lock(this->Mutex);
 	
-	if (this->Race != -1) {
+	if (this->Race != -1 && this->Race < (int) CCivilization::Civilizations.size()) {
 		return CCivilization::Civilizations[this->Race];
 	}
 		
