@@ -36,6 +36,7 @@
 #include "action/action_resource.h"
 
 #include "ai.h"
+#include "ai/ai_local.h"
 #include "animation.h"
 //Wyrmgus start
 #include "commands.h"
@@ -60,8 +61,6 @@
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
 #include "video.h"
-
-#include "../ai/ai_local.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

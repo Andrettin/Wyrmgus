@@ -35,14 +35,11 @@
 
 #include "character.h"
 
-#include <ctype.h>
-
-#include <string>
-#include <map>
-
+#include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
 #include "config.h"
 #include "game.h"
+#include "icon.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "item.h"
@@ -61,7 +58,9 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 
-#include "../ai/ai_local.h" //for using AiHelpers
+#include <ctype.h>
+#include <map>
+#include <string>
 
 /*----------------------------------------------------------------------------
 --  Variables

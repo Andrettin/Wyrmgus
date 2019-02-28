@@ -34,6 +34,9 @@
 
 #include "stratagus.h"
 
+//Wyrmgus start
+#include "ai/ai_local.h" // for AiHelpers
+//Wyrmgus end
 #include "commands.h"
 //Wyrmgus start
 #include "game.h"
@@ -49,10 +52,6 @@
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unittype.h"
-
-//Wyrmgus start
-#include "../ai/ai_local.h" // for AiHelpers
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -42,7 +42,7 @@
 #include "action/action_train.h"
 //Wyrmgus start
 #include "action/action_upgradeto.h"
-#include "../ai/ai_local.h"
+#include "ai/ai_local.h"
 //Wyrmgus end
 #include "civilization.h"
 #include "commands.h"

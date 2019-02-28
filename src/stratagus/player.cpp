@@ -43,7 +43,7 @@
 #include "age.h"
 #include "ai.h"
 //Wyrmgus start
-#include "../ai/ai_local.h" //for using AiHelpers
+#include "ai/ai_local.h" //for using AiHelpers
 #include "campaign.h"
 #include "civilization.h"
 #include "commands.h" //for faction setting
@@ -91,10 +91,6 @@
 #include "video.h"
 #include "world.h"
 #include "wyrmgus_module.h"
-
-//Wyrmgus start
-#include "../ai/ai_local.h"
-//Wyrmgus end
 
 #include <mutex>
 

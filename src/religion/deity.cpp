@@ -37,6 +37,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "icon.h"
 #include "include/plane.h"
 #include "player.h"
 #include "province.h"

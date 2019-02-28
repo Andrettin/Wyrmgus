@@ -45,7 +45,7 @@
 #include "action/action_train.h"
 #include "actions.h"
 //Wyrmgus start
-#include "../ai/ai_local.h" //for using AiHelpers
+#include "ai/ai_local.h" //for using AiHelpers
 #include "character.h"
 //Wyrmgus end
 #include "commands.h"

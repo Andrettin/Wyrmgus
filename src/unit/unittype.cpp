@@ -36,7 +36,7 @@
 #include "unit/unittype.h"
 
 //Wyrmgus start
-#include "../ai/ai_local.h" //for using AiHelpers
+#include "ai/ai_local.h" //for using AiHelpers
 //Wyrmgus end
 #include "animation.h"
 #include "animation/animation_exactframe.h"

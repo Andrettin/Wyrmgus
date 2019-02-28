@@ -60,6 +60,8 @@ class CAnimations;
 class CConstruction;
 class CDependency;
 class CFile;
+class CGraphic;
+class CPlayer;
 class CPlayerColorGraphic;
 class CUnitTypeVariation;
 class MissileType;

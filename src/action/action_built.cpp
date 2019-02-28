@@ -32,6 +32,9 @@
 #include "action/action_built.h"
 
 #include "ai.h"
+//Wyrmgus start
+#include "ai/ai_local.h"
+//Wyrmgus end
 #include "character.h"
 #include "commands.h"
 #include "construct.h"
@@ -48,10 +51,6 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unittype.h"
-
-//Wyrmgus start
-#include "../ai/ai_local.h"
-//Wyrmgus end
 
 /// How many resources the player gets back if canceling building
 #define CancelBuildingCostsFactor  75

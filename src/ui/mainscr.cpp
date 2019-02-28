@@ -39,6 +39,9 @@
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
 #include "age.h"
+#ifdef DEBUG
+#include "ai/ai_local.h"
+#endif
 #include "civilization.h"
 #include "font.h"
 #include "icon.h"
@@ -75,10 +78,6 @@
 #include "include/version.h"
 #include "video.h"
 #include "world.h"
-
-#ifdef DEBUG
-#include "../ai/ai_local.h"
-#endif
 
 #include <sstream>
 
