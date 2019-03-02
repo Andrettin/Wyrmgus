@@ -61,6 +61,11 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
+	String GetIdent() const
+	{
+		return CDataType::GetIdent();
+	}
+	
 	String GetName() const
 	{
 		return this->Name.c_str();

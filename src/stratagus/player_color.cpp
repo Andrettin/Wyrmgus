@@ -135,6 +135,7 @@ void CPlayerColor::ProcessConfigData(const CConfigData *config_data)
 
 void CPlayerColor::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("get_ident"), &CPlayerColor::GetIdent);
 	ClassDB::bind_method(D_METHOD("get_name"), &CPlayerColor::GetName);
 	ClassDB::bind_method(D_METHOD("get_colors"), &CPlayerColor::GetColors);
 }
