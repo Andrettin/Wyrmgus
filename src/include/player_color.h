@@ -34,8 +34,10 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "include/color.h"
 #include "data_type.h"
+
+#include <core/color.h>
+#include <core/object.h>
 
 #include <map>
 #include <string>
@@ -45,8 +47,10 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CPlayerColor : public CDataType
+class CPlayerColor : public CDataType, public Object
 {
+	GDCLASS(CPlayerColor, Object)
+	
 public:
 	static CPlayerColor *GetPlayerColor(const std::string &ident, bool should_find = true);
 	static CPlayerColor *GetOrAddPlayerColor(const std::string &ident);
@@ -57,8 +61,28 @@ public:
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
+	String GetName() const
+	{
+		return this->Name.c_str();
+	}
+
+	Array GetColors() const
+	{
+		Array colors;
+		
+		for (Color color : this->Colors) {
+			colors.push_back(color);
+		}
+		
+		return colors;
+	}
+
+private:
 	std::string Name;				/// Name of the player color
-	std::vector<CColor> Colors;		/// The colors of the player color
+	std::vector<Color> Colors;		/// The colors of the player color
+
+protected:
+	static void _bind_methods();
 };
 
 #endif

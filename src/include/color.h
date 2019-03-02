@@ -47,6 +47,19 @@ public:
 
 	void ProcessConfigData(const CConfigData *config_data);
 	void Parse(lua_State *l, int index = -1);
+	
+	int To32BitInteger() const
+	{
+		// convert the color to a 32-bit integer, with each byte represent R, G, B and A, respectively
+		int integer = this->R;
+		integer <<= 8;
+		integer += this->G;
+		integer <<= 8;
+		integer += this->B;
+		integer <<= 8;
+		integer += this->A;
+		return integer;
+	}
 
 	/// Cast to a SDL_Color
 	operator SDL_Color() const;

@@ -35,6 +35,7 @@
 
 #include "player_color.h"
 
+#include "include/color.h"
 #include "config.h"
 
 /*----------------------------------------------------------------------------
@@ -125,9 +126,15 @@ void CPlayerColor::ProcessConfigData(const CConfigData *config_data)
 		if (child_config_data->Tag == "color") {
 			CColor color;
 			color.ProcessConfigData(child_config_data);
-			this->Colors.push_back(color);
+			this->Colors.push_back(Color::hex(color.To32BitInteger()));
 		} else {
 			fprintf(stderr, "Invalid player color property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
 	}
+}
+
+void CPlayerColor::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_name"), &CPlayerColor::GetName);
+	ClassDB::bind_method(D_METHOD("get_colors"), &CPlayerColor::GetColors);
 }

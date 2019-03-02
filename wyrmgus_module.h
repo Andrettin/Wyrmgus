@@ -5,6 +5,7 @@
 
 class CCampaign;
 class CPlayer;
+class CPlayerColor;
 
 class WyrmgusModule : public Node
 {
@@ -20,6 +21,7 @@ public:
 	int Run();
 	String GetVersion() const;
 	void LuaCommand(String command);
+	CPlayerColor *GetPlayerColor(String ident) const;
 	CCampaign *GetCampaign(String ident) const;
 	Array GetCampaigns() const;
 	void SetCurrentCampaign(String campaign_ident);

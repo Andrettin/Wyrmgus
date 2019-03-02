@@ -5,6 +5,7 @@
 #include "achievement.h"
 #include "campaign.h"
 #include "player.h"
+#include "player_color.h"
 #include "script.h"
 #include "src/include/version.h"
 
@@ -33,6 +34,11 @@ String WyrmgusModule::GetVersion() const
 void WyrmgusModule::LuaCommand(String command)
 {
 	QueueLuaCommand(command.utf8().get_data());
+}
+
+CPlayerColor *WyrmgusModule::GetPlayerColor(String ident) const
+{
+	return CPlayerColor::GetPlayerColor(ident.utf8().get_data());
 }
 
 CCampaign *WyrmgusModule::GetCampaign(String ident) const
@@ -82,6 +88,7 @@ void WyrmgusModule::_bind_methods()
 	ClassDB::bind_method(D_METHOD("run"), &WyrmgusModule::Run);
 	ClassDB::bind_method(D_METHOD("get_version"), &WyrmgusModule::GetVersion);
 	ClassDB::bind_method(D_METHOD("lua_command", "command"), &WyrmgusModule::LuaCommand);
+	ClassDB::bind_method(D_METHOD("get_player_color", "ident"), &WyrmgusModule::GetPlayerColor);
 	ClassDB::bind_method(D_METHOD("get_campaign", "ident"), &WyrmgusModule::GetCampaign);
 	ClassDB::bind_method(D_METHOD("get_campaigns"), &WyrmgusModule::GetCampaigns);
 	ClassDB::bind_method(D_METHOD("set_current_campaign", "campaign"), &WyrmgusModule::SetCurrentCampaign);
