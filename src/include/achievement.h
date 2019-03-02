@@ -49,6 +49,7 @@
 
 class CCharacter;
 class CIcon;
+class CPlayerColor;
 class CQuest;
 class CUnitType;
 
@@ -67,11 +68,6 @@ public:
 	static std::map<std::string, CAchievement *> AchievementsByIdent;
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-	void Obtain(const bool save = true, const bool display = true);
-	bool CanObtain() const;
-	int GetProgress() const;
-	int GetProgressMax() const;
 	
 	String GetName() const
 	{
@@ -98,10 +94,21 @@ public:
 		return this->Obtained;
 	}
 	
+	void Obtain(const bool save = true, const bool display = true);
+	bool CanObtain() const;
+	
+	CPlayerColor *GetPlayerColor() const
+	{
+		return this->PlayerColor;
+	}
+	
+	int GetProgress() const;
+	int GetProgressMax() const;
+	
 public:
 	std::string Name;
 	std::string Description;		/// Description of the achievement
-	int PlayerColor = 0;			/// Player color used for the achievement's icon
+	CPlayerColor *PlayerColor = nullptr;	/// Player color used for the achievement's icon
 	int CharacterLevel = 0;			/// Character level required for the achievement
 	int Difficulty = -1;			/// Which difficulty the achievement's requirements need to be done in
 	bool Hidden = false;			/// Whether the achievement is hidden

@@ -46,6 +46,7 @@
 #include "map/map_template.h"
 #include "map/site.h"
 #include "player.h"
+#include "player_color.h"
 #include "script.h"
 #include "unit/unittype.h"
 #include "upgrade/upgrade.h"
@@ -614,8 +615,8 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
-			int color = GetPlayerColorIndexByName(color_name);
-			if (color != -1) {
+			CPlayerColor *color = CPlayerColor::GetPlayerColor(color_name);
+			if (color != nullptr) {
 				achievement->PlayerColor = color;
 			} else {
 				LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
@@ -704,7 +705,7 @@ static int CclGetAchievementData(lua_State *l)
 		lua_pushstring(l, achievement->Description.c_str());
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
-		lua_pushstring(l, PlayerColorNames[achievement->PlayerColor].c_str());
+		lua_pushstring(l, achievement->GetPlayerColor()->GetIdent().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Character")) {
 		if (achievement->Character) {

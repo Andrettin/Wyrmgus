@@ -39,6 +39,7 @@
 #include "config.h"
 #include "icon.h"
 #include "player.h"
+#include "player_color.h"
 #include "quest.h"
 #include "unit/unittype.h"
 
@@ -147,8 +148,8 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 			this->Description = value;
 		} else if (key == "player_color") {
 			value = FindAndReplaceString(value, "_", "-");
-			const int color = GetPlayerColorIndexByName(value);
-			if (color != -1) {
+			CPlayerColor *color = CPlayerColor::GetPlayerColor(value);
+			if (color != nullptr) {
 				this->PlayerColor = color;
 			} else {
 				fprintf(stderr, "Invalid player color: \"%s\".\n", value.c_str());
@@ -193,6 +194,10 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid achievement property: \"%s\".\n", key.c_str());
 		}
 	}
+	
+	if (!this->PlayerColor) {
+		fprintf(stderr, "Achievement \"%s\" has no player color.\n", this->Ident.c_str());
+	}
 }
 
 void CAchievement::Obtain(const bool save, const bool display)
@@ -208,7 +213,7 @@ void CAchievement::Obtain(const bool save, const bool display)
 	}
 	
 	if (display) {
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->Name + " achievement.\", nil, \"" + this->Icon.Name + "\", \"" + PlayerColorNames[this->PlayerColor] + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->Name + " achievement.\", nil, \"" + this->Icon.Name + "\", \"" + this->PlayerColor->GetIdent().utf8().get_data() + "\") end;");
 	}
 }
 
@@ -305,6 +310,7 @@ void CAchievement::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_icon"), &CAchievement::GetIcon);
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CAchievement::IsHidden);
 	ClassDB::bind_method(D_METHOD("is_obtained"), &CAchievement::IsObtained);
+	ClassDB::bind_method(D_METHOD("get_player_color"), &CAchievement::GetPlayerColor);
 	ClassDB::bind_method(D_METHOD("get_progress"), &CAchievement::GetProgress);
 	ClassDB::bind_method(D_METHOD("get_progress_max"), &CAchievement::GetProgressMax);
 }
