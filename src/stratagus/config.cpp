@@ -431,9 +431,9 @@ Color CConfigData::ProcessColor() const
 {
 	Color color;
 	
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (size_t i = 0; i < this->Properties.size(); ++i) {
+		std::string key = this->Properties[i].first;
+		std::string value = this->Properties[i].second;
 		
 		if (key == "red") {
 			color.r = std::stoi(value) / 255.0;
