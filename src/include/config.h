@@ -34,8 +34,10 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <core/color.h>
+
 #include <string>
-#include <map>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -45,7 +47,7 @@ class CConfigData
 {
 public:
 	CConfigData(const std::string &tag) :
-		Tag(tag), Parent(nullptr)
+		Tag(tag)
 	{
 	}
 	
@@ -53,9 +55,11 @@ public:
 	static void ParseLine(std::string &line, std::vector<std::string> &data);
 	static void ProcessConfigData(const std::vector<CConfigData *> &config_data_list, const bool define_only);
 	
+	Color ProcessColor() const;
+	
 	std::string Tag;
 	std::string Ident;
-	CConfigData *Parent;
+	CConfigData *Parent = nullptr;
 	std::vector<CConfigData *> Children;
 	std::vector<std::pair<std::string, std::string>> Properties;
 };

@@ -421,3 +421,32 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		}
 	}
 }
+
+/**
+**	@brief	Process color configuration data
+**
+**	@return	The color
+*/
+Color CConfigData::ProcessColor() const
+{
+	Color color;
+	
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "red") {
+			color.r = std::stoi(value) / 255.0;
+		} else if (key == "green") {
+			color.g = std::stoi(value) / 255.0;
+		} else if (key == "blue") {
+			color.b = std::stoi(value) / 255.0;
+		} else if (key == "alpha") {
+			color.a = std::stoi(value) / 255.0;
+		} else {
+			fprintf(stderr, "Invalid color property: \"%s\".\n", key.c_str());
+		}
+	}
+	
+	return color;
+}

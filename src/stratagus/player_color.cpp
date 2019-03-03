@@ -124,9 +124,8 @@ void CPlayerColor::ProcessConfigData(const CConfigData *config_data)
 	
 	for (const CConfigData *child_config_data : config_data->Children) {
 		if (child_config_data->Tag == "color") {
-			CColor color;
-			color.ProcessConfigData(child_config_data);
-			this->Colors.push_back(Color::hex(color.To32BitInteger()));
+			Color color = child_config_data->ProcessColor();
+			this->Colors.push_back(color);
 		} else {
 			fprintf(stderr, "Invalid player color property: \"%s\".\n", child_config_data->Tag.c_str());
 		}
