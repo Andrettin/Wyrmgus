@@ -33,9 +33,12 @@
 #include "achievement.h"
 #include "campaign.h"
 #include "civilization.h"
+#include "conversible_color.h"
+#include "hair_color.h"
 #include "icon.h"
 #include "player.h"
 #include "player_color.h"
+#include "skin_color.h"
 #include "wyrmgus_module.h"
 
 void register_wyrmgus_types()
@@ -43,9 +46,12 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CAchievement>();
 	ClassDB::register_class<CCampaign>();
 	ClassDB::register_class<CCivilization>();
+	ClassDB::register_virtual_class<CConversibleColor>();
+	ClassDB::register_class<CHairColor>();
 	ClassDB::register_class<CIcon>();
 	ClassDB::register_class<CPlayer>();
 	ClassDB::register_class<CPlayerColor>();
+	ClassDB::register_class<CSkinColor>();
 	ClassDB::register_class<WyrmgusModule>();
 }
 

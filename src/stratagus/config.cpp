@@ -41,6 +41,7 @@
 #include "character.h"
 #include "currency.h"
 #include "game.h"
+#include "hair_color.h"
 #include "icon.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -54,6 +55,7 @@
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "school_of_magic.h"
+#include "skin_color.h"
 #include "sound.h"
 #include "spells.h"
 #include "time/calendar.h"
@@ -306,6 +308,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				deity_domain->ProcessConfigData(config_data);
 			}
+		} else if (config_data->Tag == "hair_color") {
+			CHairColor *hair_color = CHairColor::GetOrAddHairColor(ident);
+			if (!define_only) {
+				hair_color->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "historical_unit") {
 			CHistoricalUnit *historical_unit = CHistoricalUnit::GetOrAddHistoricalUnit(ident);
 			if (!define_only) {
@@ -363,6 +370,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CSite *site = CSite::GetOrAddSite(ident);
 			if (!define_only) {
 				site->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "skin_color") {
+			CSkinColor *skin_color = CSkinColor::GetOrAddSkinColor(ident);
+			if (!define_only) {
+				skin_color->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "sound") {
 			if (!define_only) {

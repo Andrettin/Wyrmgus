@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player_color.h - The player color header file. */
+/**@name hair_color.h - The hair color header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __PLAYER_COLOR_H__
-#define __PLAYER_COLOR_H__
+#ifndef __HAIR_COLOR_H__
+#define __HAIR_COLOR_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -40,17 +40,17 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CPlayerColor : public CConversibleColor
+class CHairColor : public CConversibleColor
 {
-	GDCLASS(CPlayerColor, CConversibleColor)
+	GDCLASS(CHairColor, CConversibleColor)
 	
 public:
-	static CPlayerColor *GetPlayerColor(const std::string &ident, bool should_find = true);
-	static CPlayerColor *GetOrAddPlayerColor(const std::string &ident);
-	static void ClearPlayerColors();
+	static CHairColor *GetHairColor(const std::string &ident, bool should_find = true);
+	static CHairColor *GetOrAddHairColor(const std::string &ident);
+	static void ClearHairColors();
 	
-	static std::vector<CPlayerColor *> PlayerColors;	/// Player colors
-	static std::map<std::string, CPlayerColor *> PlayerColorsByIdent;
+	static std::vector<CHairColor *> HairColors;	/// Hair colors
+	static std::map<std::string, CHairColor *> HairColorsByIdent;
 };
 
 #endif

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player_color.h - The player color header file. */
+/**@name skin_color.h - The skin color header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __PLAYER_COLOR_H__
-#define __PLAYER_COLOR_H__
+#ifndef __SKIN_COLOR_H__
+#define __SKIN_COLOR_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -40,17 +40,17 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CPlayerColor : public CConversibleColor
+class CSkinColor : public CConversibleColor
 {
-	GDCLASS(CPlayerColor, CConversibleColor)
+	GDCLASS(CSkinColor, CConversibleColor)
 	
 public:
-	static CPlayerColor *GetPlayerColor(const std::string &ident, bool should_find = true);
-	static CPlayerColor *GetOrAddPlayerColor(const std::string &ident);
-	static void ClearPlayerColors();
+	static CSkinColor *GetSkinColor(const std::string &ident, bool should_find = true);
+	static CSkinColor *GetOrAddSkinColor(const std::string &ident);
+	static void ClearSkinColors();
 	
-	static std::vector<CPlayerColor *> PlayerColors;	/// Player colors
-	static std::map<std::string, CPlayerColor *> PlayerColorsByIdent;
+	static std::vector<CSkinColor *> SkinColors;	/// Skin colors
+	static std::map<std::string, CSkinColor *> SkinColorsByIdent;
 };
 
 #endif

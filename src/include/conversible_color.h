@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player_color.h - The player color header file. */
+/**@name conversible_color.h - The conversible color header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,30 +27,60 @@
 //      02111-1307, USA.
 //
 
-#ifndef __PLAYER_COLOR_H__
-#define __PLAYER_COLOR_H__
+#ifndef __CONVERSIBLE_COLOR_H__
+#define __CONVERSIBLE_COLOR_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "conversible_color.h"
+#include "data_type.h"
+
+#include <core/color.h>
+#include <core/object.h>
+
+#include <map>
+#include <string>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CPlayerColor : public CConversibleColor
+class CConversibleColor : public CDataType, public Object
 {
-	GDCLASS(CPlayerColor, CConversibleColor)
+	GDCLASS(CConversibleColor, Object)
 	
 public:
-	static CPlayerColor *GetPlayerColor(const std::string &ident, bool should_find = true);
-	static CPlayerColor *GetOrAddPlayerColor(const std::string &ident);
-	static void ClearPlayerColors();
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	static std::vector<CPlayerColor *> PlayerColors;	/// Player colors
-	static std::map<std::string, CPlayerColor *> PlayerColorsByIdent;
+	String GetIdent() const
+	{
+		return CDataType::GetIdent();
+	}
+	
+	String GetName() const
+	{
+		return this->Name.c_str();
+	}
+
+	Array GetColors() const
+	{
+		Array colors;
+		
+		for (Color color : this->Colors) {
+			colors.push_back(color);
+		}
+		
+		return colors;
+	}
+
+private:
+	std::string Name;				/// Name of the player color
+	std::vector<Color> Colors;		/// The colors of the player color
+
+protected:
+	static void _bind_methods();
 };
 
 #endif

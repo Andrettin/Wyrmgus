@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player_color.cpp - The player color source file. */
+/**@name conversible_color.cpp - The conversible color source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -33,70 +33,46 @@
 
 #include "stratagus.h"
 
-#include "player_color.h"
+#include "conversible_color.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CPlayerColor *> CPlayerColor::PlayerColors;
-std::map<std::string, CPlayerColor *> CPlayerColor::PlayerColorsByIdent;
+#include "include/color.h"
+#include "config.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a player color
+**	@brief	Process data provided by a configuration file
 **
-**	@param	ident		The player color's string identifier
-**	@param	should_find	Whether it is an error if the player color could not be found; this is true by default
-**
-**	@return	The player color if found, or null otherwise
+**	@param	config_data	The configuration data
 */
-CPlayerColor *CPlayerColor::GetPlayerColor(const std::string &ident, const bool should_find)
+void CConversibleColor::ProcessConfigData(const CConfigData *config_data)
 {
-	std::map<std::string, CPlayerColor *>::const_iterator find_iterator = PlayerColorsByIdent.find(ident);
-	
-	if (find_iterator != PlayerColorsByIdent.end()) {
-		return find_iterator->second;
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else {
+			fprintf(stderr, "Invalid player color property: \"%s\".\n", key.c_str());
+		}
 	}
 	
-	if (should_find) {
-		fprintf(stderr, "Invalid player color: \"%s\".\n", ident.c_str());
+	for (const CConfigData *child_config_data : config_data->Children) {
+		if (child_config_data->Tag == "color") {
+			Color color = child_config_data->ProcessColor();
+			this->Colors.push_back(color);
+		} else {
+			fprintf(stderr, "Invalid player color property: \"%s\".\n", child_config_data->Tag.c_str());
+		}
 	}
-	
-	return nullptr;
 }
 
-/**
-**	@brief	Get or add a player color
-**
-**	@param	ident	The player color's string identifier
-**
-**	@return	The player color if found, or a newly-created one otherwise
-*/
-CPlayerColor *CPlayerColor::GetOrAddPlayerColor(const std::string &ident)
+void CConversibleColor::_bind_methods()
 {
-	CPlayerColor *player_color = GetPlayerColor(ident, false);
-	
-	if (!player_color) {
-		player_color = new CPlayerColor;
-		player_color->Ident = ident;
-		PlayerColors.push_back(player_color);
-		PlayerColorsByIdent[ident] = player_color;
-	}
-	
-	return player_color;
-}
-
-/**
-**	@brief	Remove the existing player colors
-*/
-void CPlayerColor::ClearPlayerColors()
-{
-	for (size_t i = 0; i < PlayerColors.size(); ++i) {
-		delete PlayerColors[i];
-	}
-	PlayerColors.clear();
+	ClassDB::bind_method(D_METHOD("get_ident"), &CConversibleColor::GetIdent);
+	ClassDB::bind_method(D_METHOD("get_name"), &CConversibleColor::GetName);
+	ClassDB::bind_method(D_METHOD("get_colors"), &CConversibleColor::GetColors);
 }

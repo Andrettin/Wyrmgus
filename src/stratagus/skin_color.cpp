@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player_color.cpp - The player color source file. */
+/**@name skin_color.cpp - The skin color source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -33,70 +33,70 @@
 
 #include "stratagus.h"
 
-#include "player_color.h"
+#include "skin_color.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CPlayerColor *> CPlayerColor::PlayerColors;
-std::map<std::string, CPlayerColor *> CPlayerColor::PlayerColorsByIdent;
+std::vector<CSkinColor *> CSkinColor::SkinColors;
+std::map<std::string, CSkinColor *> CSkinColor::SkinColorsByIdent;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a player color
+**	@brief	Get a skin color
 **
-**	@param	ident		The player color's string identifier
-**	@param	should_find	Whether it is an error if the player color could not be found; this is true by default
+**	@param	ident		The skin color's string identifier
+**	@param	should_find	Whether it is an error if the skin color could not be found; this is true by default
 **
-**	@return	The player color if found, or null otherwise
+**	@return	The skin color if found, or null otherwise
 */
-CPlayerColor *CPlayerColor::GetPlayerColor(const std::string &ident, const bool should_find)
+CSkinColor *CSkinColor::GetSkinColor(const std::string &ident, const bool should_find)
 {
-	std::map<std::string, CPlayerColor *>::const_iterator find_iterator = PlayerColorsByIdent.find(ident);
+	std::map<std::string, CSkinColor *>::const_iterator find_iterator = SkinColorsByIdent.find(ident);
 	
-	if (find_iterator != PlayerColorsByIdent.end()) {
+	if (find_iterator != SkinColorsByIdent.end()) {
 		return find_iterator->second;
 	}
 	
 	if (should_find) {
-		fprintf(stderr, "Invalid player color: \"%s\".\n", ident.c_str());
+		fprintf(stderr, "Invalid skin color: \"%s\".\n", ident.c_str());
 	}
 	
 	return nullptr;
 }
 
 /**
-**	@brief	Get or add a player color
+**	@brief	Get or add a skin color
 **
-**	@param	ident	The player color's string identifier
+**	@param	ident	The skin color's string identifier
 **
-**	@return	The player color if found, or a newly-created one otherwise
+**	@return	The skin color if found, or a newly-created one otherwise
 */
-CPlayerColor *CPlayerColor::GetOrAddPlayerColor(const std::string &ident)
+CSkinColor *CSkinColor::GetOrAddSkinColor(const std::string &ident)
 {
-	CPlayerColor *player_color = GetPlayerColor(ident, false);
+	CSkinColor *skin_color = GetSkinColor(ident, false);
 	
-	if (!player_color) {
-		player_color = new CPlayerColor;
-		player_color->Ident = ident;
-		PlayerColors.push_back(player_color);
-		PlayerColorsByIdent[ident] = player_color;
+	if (!skin_color) {
+		skin_color = new CSkinColor;
+		skin_color->Ident = ident;
+		SkinColors.push_back(skin_color);
+		SkinColorsByIdent[ident] = skin_color;
 	}
 	
-	return player_color;
+	return skin_color;
 }
 
 /**
-**	@brief	Remove the existing player colors
+**	@brief	Remove the existing skin colors
 */
-void CPlayerColor::ClearPlayerColors()
+void CSkinColor::ClearSkinColors()
 {
-	for (size_t i = 0; i < PlayerColors.size(); ++i) {
-		delete PlayerColors[i];
+	for (size_t i = 0; i < SkinColors.size(); ++i) {
+		delete SkinColors[i];
 	}
-	PlayerColors.clear();
+	SkinColors.clear();
 }

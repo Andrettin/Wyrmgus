@@ -48,6 +48,7 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
+#include "hair_color.h"
 #include "icon.h"
 #include "item.h"
 #include "map/map.h"
@@ -69,6 +70,7 @@
 #include "replay.h"
 #include "school_of_magic.h"
 #include "script.h"
+#include "skin_color.h"
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
@@ -174,6 +176,8 @@ void CleanModules()
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
 	
 	CPlayerColor::ClearPlayerColors();
+	CHairColor::ClearHairColors();
+	CSkinColor::ClearSkinColors();
 }
 
 /**

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player_color.cpp - The player color source file. */
+/**@name hair_color.cpp - The hair color source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -33,70 +33,70 @@
 
 #include "stratagus.h"
 
-#include "player_color.h"
+#include "hair_color.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CPlayerColor *> CPlayerColor::PlayerColors;
-std::map<std::string, CPlayerColor *> CPlayerColor::PlayerColorsByIdent;
+std::vector<CHairColor *> CHairColor::HairColors;
+std::map<std::string, CHairColor *> CHairColor::HairColorsByIdent;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a player color
+**	@brief	Get a hair color
 **
-**	@param	ident		The player color's string identifier
-**	@param	should_find	Whether it is an error if the player color could not be found; this is true by default
+**	@param	ident		The hair color's string identifier
+**	@param	should_find	Whether it is an error if the hair color could not be found; this is true by default
 **
-**	@return	The player color if found, or null otherwise
+**	@return	The hair color if found, or null otherwise
 */
-CPlayerColor *CPlayerColor::GetPlayerColor(const std::string &ident, const bool should_find)
+CHairColor *CHairColor::GetHairColor(const std::string &ident, const bool should_find)
 {
-	std::map<std::string, CPlayerColor *>::const_iterator find_iterator = PlayerColorsByIdent.find(ident);
+	std::map<std::string, CHairColor *>::const_iterator find_iterator = HairColorsByIdent.find(ident);
 	
-	if (find_iterator != PlayerColorsByIdent.end()) {
+	if (find_iterator != HairColorsByIdent.end()) {
 		return find_iterator->second;
 	}
 	
 	if (should_find) {
-		fprintf(stderr, "Invalid player color: \"%s\".\n", ident.c_str());
+		fprintf(stderr, "Invalid hair color: \"%s\".\n", ident.c_str());
 	}
 	
 	return nullptr;
 }
 
 /**
-**	@brief	Get or add a player color
+**	@brief	Get or add a hair color
 **
-**	@param	ident	The player color's string identifier
+**	@param	ident	The hair color's string identifier
 **
-**	@return	The player color if found, or a newly-created one otherwise
+**	@return	The hair color if found, or a newly-created one otherwise
 */
-CPlayerColor *CPlayerColor::GetOrAddPlayerColor(const std::string &ident)
+CHairColor *CHairColor::GetOrAddHairColor(const std::string &ident)
 {
-	CPlayerColor *player_color = GetPlayerColor(ident, false);
+	CHairColor *hair_color = GetHairColor(ident, false);
 	
-	if (!player_color) {
-		player_color = new CPlayerColor;
-		player_color->Ident = ident;
-		PlayerColors.push_back(player_color);
-		PlayerColorsByIdent[ident] = player_color;
+	if (!hair_color) {
+		hair_color = new CHairColor;
+		hair_color->Ident = ident;
+		HairColors.push_back(hair_color);
+		HairColorsByIdent[ident] = hair_color;
 	}
 	
-	return player_color;
+	return hair_color;
 }
 
 /**
-**	@brief	Remove the existing player colors
+**	@brief	Remove the existing hair colors
 */
-void CPlayerColor::ClearPlayerColors()
+void CHairColor::ClearHairColors()
 {
-	for (size_t i = 0; i < PlayerColors.size(); ++i) {
-		delete PlayerColors[i];
+	for (size_t i = 0; i < HairColors.size(); ++i) {
+		delete HairColors[i];
 	}
-	PlayerColors.clear();
+	HairColors.clear();
 }

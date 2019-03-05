@@ -4,9 +4,11 @@
 
 #include "achievement.h"
 #include "campaign.h"
+#include "hair_color.h"
 #include "player.h"
 #include "player_color.h"
 #include "script.h"
+#include "skin_color.h"
 #include "src/include/version.h"
 
 WyrmgusModule *WyrmgusModule::Instance = nullptr;
@@ -36,9 +38,19 @@ void WyrmgusModule::LuaCommand(String command)
 	QueueLuaCommand(command.utf8().get_data());
 }
 
+CHairColor *WyrmgusModule::GetHairColor(String ident) const
+{
+	return CHairColor::GetHairColor(ident.utf8().get_data());
+}
+
 CPlayerColor *WyrmgusModule::GetPlayerColor(String ident) const
 {
 	return CPlayerColor::GetPlayerColor(ident.utf8().get_data());
+}
+
+CSkinColor *WyrmgusModule::GetSkinColor(String ident) const
+{
+	return CSkinColor::GetSkinColor(ident.utf8().get_data());
 }
 
 CCampaign *WyrmgusModule::GetCampaign(String ident) const
@@ -88,7 +100,9 @@ void WyrmgusModule::_bind_methods()
 	ClassDB::bind_method(D_METHOD("run"), &WyrmgusModule::Run);
 	ClassDB::bind_method(D_METHOD("get_version"), &WyrmgusModule::GetVersion);
 	ClassDB::bind_method(D_METHOD("lua_command", "command"), &WyrmgusModule::LuaCommand);
+	ClassDB::bind_method(D_METHOD("get_hair_color", "ident"), &WyrmgusModule::GetHairColor);
 	ClassDB::bind_method(D_METHOD("get_player_color", "ident"), &WyrmgusModule::GetPlayerColor);
+	ClassDB::bind_method(D_METHOD("get_skin_color", "ident"), &WyrmgusModule::GetSkinColor);
 	ClassDB::bind_method(D_METHOD("get_campaign", "ident"), &WyrmgusModule::GetCampaign);
 	ClassDB::bind_method(D_METHOD("get_campaigns"), &WyrmgusModule::GetCampaigns);
 	ClassDB::bind_method(D_METHOD("set_current_campaign", "campaign"), &WyrmgusModule::SetCurrentCampaign);
