@@ -652,13 +652,6 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 			SelectionChanged();
 		}
 
-		// OnEachCycle callback
-		if (unit.Type->OnEachCycle && unit.IsUnusable(false) == false) {
-			unit.Type->OnEachCycle->pushPreamble();
-			unit.Type->OnEachCycle->pushInteger(UnitNumber(unit));
-			unit.Type->OnEachCycle->run();
-		}
-
 		// Handle each cycle buffs
 		HandleBuffsEachCycle(unit);
 		// Unit could be dead after TTL kill

@@ -7154,18 +7154,6 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
 	}
 
-	// OnHit callback
-	if (type->OnHit) {
-		const int tarSlot = UnitNumber(target);
-		const int atSlot = attacker && attacker->IsAlive() ? UnitNumber(*attacker) : -1;
-
-		type->OnHit->pushPreamble();
-		type->OnHit->pushInteger(tarSlot);
-		type->OnHit->pushInteger(atSlot);
-		type->OnHit->pushInteger(damage);
-		type->OnHit->run();
-	}
-
 	// Increase variables and call OnImpact
 	if (missile && missile->Type) {
 		if (missile->Type->ChangeVariable != -1) {

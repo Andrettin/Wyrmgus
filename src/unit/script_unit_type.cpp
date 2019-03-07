@@ -1251,16 +1251,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->Explosion.Missile = nullptr;
 		} else if (!strcmp(value, "TeleportCost")) {
 			type->TeleportCost = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "TeleportEffectIn")) {
-			type->TeleportEffectIn = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "TeleportEffectOut")) {
-			type->TeleportEffectOut = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "DeathExplosion")) {
 			type->DeathExplosion = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "OnHit")) {
-			type->OnHit = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "OnEachCycle")) {
-			type->OnEachCycle = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "OnEachSecond")) {
 			type->OnEachSecond = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "OnInit")) {

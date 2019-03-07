@@ -579,23 +579,11 @@ CUnitType::~CUnitType()
 	if (this->DeathExplosion) {
 		delete this->DeathExplosion;
 	}
-	if (this->OnHit) {
-		delete this->OnHit;
-	}
-	if (this->OnEachCycle) {
-		delete this->OnEachCycle;
-	}
 	if (this->OnEachSecond) {
 		delete this->OnEachSecond;
 	}
 	if (this->OnInit) {
 		delete this->OnInit;
-	}
-	if (this->TeleportEffectIn) {
-		delete this->TeleportEffectIn;
-	}
-	if (this->TeleportEffectOut) {
-		delete this->TeleportEffectOut;
 	}
 
 	//Wyrmgus start
