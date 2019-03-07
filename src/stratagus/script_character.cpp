@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -51,7 +49,7 @@
 #include "script.h"
 #include "spells.h"
 #include "time/timeline.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------
@@ -1201,5 +1199,3 @@ void CharacterCclRegister()
 	lua_register(Lua, "GetGrandStrategyHeroes", CclGetGrandStrategyHeroes);
 	lua_register(Lua, "Character", CclCharacter);
 }
-
-//@}

@@ -45,7 +45,7 @@
 #include "pathfinder.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 
 /*----------------------------------------------------------------------------
@@ -315,7 +315,7 @@ void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b)
 	int find = UnitTypeEquivs[a.Slot];
 	int replace = UnitTypeEquivs[b.Slot];
 
-	// Always record equivalences with the lowest unittype.
+	//always record equivalencies with the lowest unit type
 	if (find < replace) {
 		std::swap(find, replace);
 	}
@@ -330,16 +330,16 @@ void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b)
 
 
 /**
-**  Find All unittypes equivalent to a given one
+**	Find all unittypes equivalent to a given one
 **
-**  @param unittype  the unittype to find equivalence for
-**  @param result    int array which will hold the result. (Size UnitTypeMax+1)
+**	@param	unit_type	the unit type to find equivalence for
+**	@param	result		int array which will hold the result. (Size UnitTypeMax+1)
 **
-**  @return          the number of unittype found
+**	@return	the number of unittype found
 */
-int AiFindUnitTypeEquiv(const CUnitType &unittype, int *result)
+int AiFindUnitTypeEquiv(const CUnitType &unit_type, int *result)
 {
-	const int search = UnitTypeEquivs[unittype.Slot];
+	const int search = UnitTypeEquivs[unit_type.Slot];
 	int count = 0;
 
 	for (int i = 0; i < UnitTypeMax + 1; ++i) {

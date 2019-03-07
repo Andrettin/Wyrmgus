@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -241,5 +239,3 @@ void TextCclRegister()
 	lua_register(Lua, "GetTexts", CclGetTexts);
 	lua_register(Lua, "GetTextData", CclGetTextData);
 }
-
-//@}

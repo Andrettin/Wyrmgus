@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unittype.cpp - The unit type source file. */
+/**@name unit_type.cpp - The unit type source file. */
 //
 //      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 //Wyrmgus start
 #include "ai/ai_local.h" //for using AiHelpers
@@ -83,9 +83,9 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @class CUnitType unittype.h
+**  @class CUnitType unit_type.h
 **
-**  \#include "unit/unittype.h"
+**  \#include "unit/unit_type.h"
 **
 **  This class contains the information that is shared between all
 **  units of the same type and determins if a unit is a building,
@@ -397,9 +397,9 @@
 */
 /**
 **
-**  @class ResourceInfo unittype.h
+**  @class ResourceInfo unit_type.h
 **
-** \#include "unit/unittype.h"
+** \#include "unit/unit_type.h"
 **
 **    This class contains information about how a unit will harvest a resource.
 **

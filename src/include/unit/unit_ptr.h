@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unitptr.h - The unitptr headerfile. */
+/**@name unit_ptr.h - The unit ptr header file. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -30,10 +30,7 @@
 #ifndef UNIT_PTR_H
 #define UNIT_PTR_H
 
-//@{
-
 class CUnit;
-
 
 /**
 **  Class to ease the ref counting of each CUnit instance.
@@ -63,6 +60,4 @@ private:
 	CUnit *unit;
 };
 
-//@}
-
-#endif // UNIT_PTR_H
+#endif

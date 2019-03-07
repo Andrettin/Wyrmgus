@@ -41,7 +41,7 @@
 #include "player.h"
 #include "settings.h"
 #include "unit/unit_find.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 -- Functions

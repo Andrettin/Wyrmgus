@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name terrain_type.cpp - The terrain types. */
+/**@name terrain_type.cpp - The terrain type source file. */
 //
 //      (c) Copyright 2018-2019 by Andrettin
 //
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -434,5 +432,3 @@ CGraphic *CTerrainType::GetGraphics(const CSeason *season) const
 		return this->Graphics;
 	}
 }
-
-//@}

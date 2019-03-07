@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Include
 ----------------------------------------------------------------------------*/
@@ -45,7 +43,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "video.h"
 
@@ -232,5 +230,3 @@ void MapUnitSounds()
 		}
 	}
 }
-
-//@}

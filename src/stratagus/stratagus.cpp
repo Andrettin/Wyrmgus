@@ -60,7 +60,7 @@
 ** Handles units. Units are ships, flyers, buildings, creatures,
 ** machines.
 **
-** @see unit.h @see unit.cpp @see unittype.h @see unittype.cpp
+** @see unit.h @see unit.cpp @see unit_type.h @see unit_type.cpp
 **
 ** @subsection Missile Missile
 **

@@ -40,7 +40,7 @@
 #include "map/map_template.h"
 #include "player.h" //for factions
 #include "province.h" //for regions
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name text.cpp - The texts. */
+/**@name text.cpp - The text source file. */
 //
 //      (c) Copyright 2016 by Andrettin
 //
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -87,5 +85,3 @@ CText *GetText(const std::string &text_name)
 	}
 	return nullptr;
 }
-
-//@}

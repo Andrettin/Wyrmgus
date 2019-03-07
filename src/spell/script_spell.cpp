@@ -26,7 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//@{
 
 /*----------------------------------------------------------------------------
 -- Includes
@@ -58,7 +57,7 @@
 #include "spell/spell_spawnportal.h"
 #include "spell/spell_summon.h"
 #include "spell/spell_teleport.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 
 
@@ -449,5 +448,3 @@ void SpellCclRegister()
 {
 	lua_register(Lua, "DefineSpell", CclDefineSpell);
 }
-
-//@}

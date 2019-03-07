@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -47,7 +45,7 @@
 #include "ui/button_action.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 
@@ -521,5 +519,3 @@ bool ButtonCheckHasSubButtons(const CUnit &unit, const ButtonAction &button)
 	return false;
 }
 //Wyrmgus end
-
-//@}

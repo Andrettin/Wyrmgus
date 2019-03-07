@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -189,5 +187,3 @@ bool CTimeOfDay::HasColorModification() const
 {
 	return this->ColorModification.R != 0 || this->ColorModification.G != 0 || this->ColorModification.B != 0;
 }
-
-//@}

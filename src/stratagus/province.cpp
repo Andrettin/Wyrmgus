@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name province.cpp - The provinces. */
+/**@name province.cpp - The province source file. */
 //
 //      (c) Copyright 2016-2019 by Andrettin
 //
@@ -26,8 +26,6 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -176,5 +174,3 @@ int GetEraIdByName(const std::string &era)
 
 	return -1;
 }
-
-//@}

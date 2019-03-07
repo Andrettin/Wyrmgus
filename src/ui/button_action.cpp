@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -428,5 +426,3 @@ bool IsNeutralUsableButtonAction(const int button_action)
 {
 	return button_action == ButtonTrain || button_action == ButtonCancelTrain || button_action == ButtonBuy || button_action == ButtonSellResource || button_action == ButtonBuyResource || button_action == ButtonResearch;
 }
-
-//@}

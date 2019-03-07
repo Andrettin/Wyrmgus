@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -48,7 +46,7 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 
 /**
@@ -991,7 +989,7 @@ static int CclAiForce(lua_State *l)
 			continue;
 		}
 
-		// Use the equivalent unittype.
+		//use the equivalent unit type
 		type = UnitTypes[UnitTypeEquivs[type->Slot]];
 
 		if (resetForce) {
@@ -1830,5 +1828,3 @@ void AiCclRegister()
 	lua_register(Lua, "AiAttackWithForces", CclAiAttackWithForces);
 	lua_register(Lua, "AiWaitForces", CclAiWaitForces);
 }
-
-//@}

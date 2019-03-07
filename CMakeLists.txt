@@ -71,7 +71,7 @@ set(tolua_FILES
 	src/tolua/trigger.pkg
 	src/tolua/ui.pkg
 	src/tolua/unit.pkg
-	src/tolua/unittype.pkg
+	src/tolua/unit_type.pkg
 	src/tolua/upgrade.pkg
 	src/tolua/video.pkg
 	src/tolua/stratagus.lua

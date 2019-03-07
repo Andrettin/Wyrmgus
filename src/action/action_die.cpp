@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -41,7 +39,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -147,5 +145,3 @@ static bool AnimateActionDie(CUnit &unit)
 	UnitUpdateHeading(unit);
 	AnimateActionDie(unit); // with new corpse.
 }
-
-//@}

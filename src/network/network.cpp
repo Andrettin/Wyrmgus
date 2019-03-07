@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 //----------------------------------------------------------------------------
 // Documentation
 //----------------------------------------------------------------------------
@@ -240,7 +238,7 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "video.h"
 
 #include <deque>
@@ -1177,5 +1175,3 @@ void NetworkRecover()
 	const unsigned int nextGameNetCycle = GameCycle / CNetworkParameter::Instance.gameCyclesPerUpdate + 1;
 	NetworkInSync = IsNetworkCommandReady(nextGameNetCycle);
 }
-
-//@}

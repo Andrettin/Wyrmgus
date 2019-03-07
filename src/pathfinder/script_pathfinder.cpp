@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -41,7 +39,7 @@
 #include "player.h"
 #include "script.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -108,5 +106,3 @@ void PathfinderCclRegister()
 {
 	lua_register(Lua, "AStar", CclAStar);
 }
-
-//@}

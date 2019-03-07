@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unitptr.cpp - The units ptr. */
+/**@name unit_ptr.cpp - The unit ptr source file. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,10 +27,9 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
-#include "unit/unitptr.h"
+
+#include "unit/unit_ptr.h"
 
 #include "unit/unit.h"
 
@@ -69,5 +68,3 @@ CUnitPtr &CUnitPtr::operator= (CUnit *u)
 	}
 	return *this;
 }
-
-//@}

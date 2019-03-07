@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name text.h - The text headerfile. */
+/**@name text.h - The text header file. */
 //
 //      (c) Copyright 2016 by Andrettin
 //
@@ -29,8 +29,6 @@
 
 #ifndef __TEXT_H__
 #define __TEXT_H__
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -92,6 +90,4 @@ extern void CleanTexts();
 extern CText *GetText(const std::string &text_name);
 extern void TextCclRegister();
 
-//@}
-
-#endif // !__QUEST_H__
+#endif

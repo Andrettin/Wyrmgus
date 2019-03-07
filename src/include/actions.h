@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name actions.h - The actions headerfile. */
+/**@name actions.h - The actions header file. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -30,7 +30,7 @@
 #ifndef __ACTIONS_H__
 #define __ACTIONS_H__
 
-#include "unit/unitptr.h"
+#include "unit/unit_ptr.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------

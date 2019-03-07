@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name script_unittype.cpp - The unit-type ccl functions. */
+/**@name script_unit_type.cpp - The unit type ccl functions. */
 //
 //      (c) Copyright 1999-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 #include "achievement.h"
 #include "actions.h"

@@ -38,7 +38,7 @@
 #include "config.h"
 #include "map/historical_location.h"
 #include "player.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

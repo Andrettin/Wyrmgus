@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -51,7 +49,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 #include <stdio.h>
 
@@ -451,5 +449,3 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	file.printf("})\n");
 }
-
-//@}

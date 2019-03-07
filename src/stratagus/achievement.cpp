@@ -41,7 +41,7 @@
 #include "player.h"
 #include "player_color.h"
 #include "quest.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

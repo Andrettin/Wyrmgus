@@ -35,7 +35,7 @@
 #include "map/map_layer.h"
 #include "pathfinder.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

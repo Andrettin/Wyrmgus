@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unittype.h - The unit type header file. */
+/**@name unit_type.h - The unit type header file. */
 //
 //      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
@@ -1085,7 +1085,7 @@ extern std::vector<CUnitType *> UnitTypes;   /// All unit-types
 //Wyrmgus end
 
 /**
-**  Variable info for unit and unittype.
+**  Variable info for unit and unit type.
 */
 class CUnitTypeVar
 {
@@ -1265,7 +1265,7 @@ extern void LoadUnitType(CUnitType &unittype);	/// Load a unittype
 //Wyrmgus end
 extern void CleanUnitTypes();                    /// Cleanup unit-type module
 
-// in script_unittype.c
+// in script_unit_type.cpp
 
 /// Parse User Variables field.
 extern void DefineVariableField(lua_State *l, CVariable *var, int lua_index);

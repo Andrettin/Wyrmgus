@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -41,7 +39,7 @@
 #include "iolib.h"
 #include "script.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -302,5 +300,3 @@ void GroupCclRegister()
 {
 	lua_register(Lua, "Group", CclGroup);
 }
-
-//@}

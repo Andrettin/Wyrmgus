@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -298,5 +296,3 @@ void GrandStrategyCclRegister()
 	lua_register(Lua, "DefineGrandStrategyEvent", CclDefineGrandStrategyEvent);
 	lua_register(Lua, "GetGrandStrategyEventData", CclGetGrandStrategyEventData);
 }
-
-//@}

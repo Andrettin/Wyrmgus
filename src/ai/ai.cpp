@@ -167,7 +167,7 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 
@@ -1267,9 +1267,9 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		return;
 	}
 
-	const CUnitType &unittype = *unit.Type;
+	const CUnitType &unit_type = *unit.Type;
 	const Vec2i u0 = unit.tilePos;
-	const Vec2i u1(u0 + unittype.TileSize - 1);
+	const Vec2i u1(u0 + unit_type.TileSize - 1);
 
 	movablenb = 0;
 
@@ -1313,7 +1313,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		//Wyrmgus end
 		const CUnitType &blockertype = *blocker.Type;
 
-		if (blockertype.UnitType != unittype.UnitType) {
+		if (blockertype.UnitType != unit_type.UnitType) {
 			continue;
 		}
 

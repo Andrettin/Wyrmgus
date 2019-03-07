@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name province.h - The province headerfile. */
+/**@name province.h - The province header file. */
 //
 //      (c) Copyright 2016-2019 by Andrettin
 //
@@ -29,8 +29,6 @@
 
 #ifndef __PROVINCE_H__
 #define __PROVINCE_H__
-
-//@{
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -190,6 +188,4 @@ extern std::string GetEraNameById(int era);
 extern int GetEraIdByName(const std::string &era);
 extern void ProvinceCclRegister();
 
-//@}
-
-#endif // !__PROVINCE_H__
+#endif

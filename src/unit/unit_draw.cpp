@@ -58,7 +58,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "unitsound.h"
 #include "video.h"

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_trade.h - The trade action headerfile. */
+/**@name action_trade.h - The trade action header file. */
 //
 //      (c) Copyright 2017-2019 by Andrettin
 //
@@ -31,8 +31,6 @@
 #define __ACTION_TRADE_H__
 
 #include "actions.h"
-
-//@{
 
 class COrder_Trade : public COrder
 {
@@ -65,6 +63,4 @@ private:
 	Vec2i HomeMarketPos;
 };
 
-//@}
-
-#endif // !__ACTION_TRADE_H__
+#endif

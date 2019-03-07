@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -69,7 +67,7 @@
 #include "script.h"
 #include "spells.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 
 #define ANIMATIONS_MAXANIM 4096
 
@@ -927,5 +925,3 @@ void AnimationCclRegister()
 {
 	lua_register(Lua, "DefineAnimations", CclDefineAnimations);
 }
-
-//@}

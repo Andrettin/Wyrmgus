@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -41,7 +39,7 @@
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -426,5 +424,3 @@ void MissileCclRegister()
 	lua_register(Lua, "DefineBurningBuilding", CclDefineBurningBuilding);
 	lua_register(Lua, "CreateMissile", CclCreateMissile);
 }
-
-//@}

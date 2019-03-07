@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -54,7 +52,7 @@
 #include "translate.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
@@ -580,4 +578,3 @@ void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, CUnitType &newType)
 
 //Wyrmgus end
 #endif
-//@}

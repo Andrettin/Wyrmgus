@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -51,7 +49,7 @@
 #include "spells.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 
@@ -761,5 +759,3 @@ std::string GetUniqueItemEffectsString(const std::string &item_ident)
 	
 	return "";
 }
-
-//@}

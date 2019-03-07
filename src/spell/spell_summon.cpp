@@ -96,7 +96,7 @@ public:
 {
 	Vec2i pos = goalPos;
 	bool cansummon;
-	CUnitType &unittype = *this->UnitType;
+	CUnitType &unit_type = *this->UnitType;
 	int ttl = this->TTL;
 
 	if (this->RequireCorpse) {
@@ -120,15 +120,15 @@ public:
 
 	if (cansummon) {
 		//Wyrmgus start
-//		DebugPrint("Summoning a %s\n" _C_ unittype.Name.c_str());
-		DebugPrint("Summoning a %s\n" _C_ unittype.GetDefaultName(caster.Player).c_str());
+//		DebugPrint("Summoning a %s\n" _C_ unit_type.Name.c_str());
+		DebugPrint("Summoning a %s\n" _C_ unit_type.GetDefaultName(caster.Player).c_str());
 		//Wyrmgus end
 
 		//
 		// Create units.
 		// FIXME: do summoned units count on food?
 		//
-		target = MakeUnit(unittype, caster.Player);
+		target = MakeUnit(unit_type, caster.Player);
 		if (target != nullptr) {
 			target->tilePos = pos;
 			target->MapLayer = CMap::Map.MapLayers[z];

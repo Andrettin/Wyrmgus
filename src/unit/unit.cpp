@@ -84,7 +84,7 @@
 #include "ui/ui.h"
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "unitsound.h"
 #include "upgrade/dependency.h"

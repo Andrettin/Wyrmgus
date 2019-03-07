@@ -51,7 +51,7 @@
 #include "script.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

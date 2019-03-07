@@ -83,7 +83,7 @@
 #include "unit/unit.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 //Wyrmgus end
 #include "unitsound.h"
 #include "upgrade/dependency.h"

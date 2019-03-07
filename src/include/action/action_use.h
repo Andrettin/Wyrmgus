@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_use.h - The use action headerfile. */
+/**@name action_use.h - The use action header file. */
 //
 //      (c) Copyright 2015 by Andrettin
 //
@@ -31,8 +31,6 @@
 #define __ACTION_USE_H__
 
 #include "actions.h"
-
-//@{
 
 class COrder_Use : public COrder
 {
@@ -61,6 +59,4 @@ private:
 	int MapLayer;
 };
 
-//@}
-
-#endif // !__ACTION_USE_H__
+#endif

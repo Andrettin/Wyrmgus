@@ -61,7 +61,7 @@
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

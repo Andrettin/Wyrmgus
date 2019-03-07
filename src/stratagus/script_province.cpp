@@ -44,7 +44,7 @@
 #include "script.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
-#include "unit/unittype.h"
+#include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "video.h"
 #include "world.h"
