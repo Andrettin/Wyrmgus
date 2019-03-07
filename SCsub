@@ -14,7 +14,7 @@ env_wyrmgus = env_modules.Clone()
 
 # Godot source files
 env_wyrmgus.add_source_files(env.modules_sources, "register_types.cpp")
-env_wyrmgus.add_source_files(env.modules_sources, "wyrmgus_module.cpp")
+env_wyrmgus.add_source_files(env.modules_sources, "wyrmgus.cpp")
 env_wyrmgus.add_source_files(env.modules_sources, "src/action/*.cpp")
 env_wyrmgus.add_source_files(env.modules_sources, "src/ai/*.cpp")
 env_wyrmgus.add_source_files(env.modules_sources, "src/animation/*.cpp")

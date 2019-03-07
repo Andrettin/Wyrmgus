@@ -39,7 +39,7 @@
 #include "player.h"
 #include "player_color.h"
 #include "skin_color.h"
-#include "wyrmgus_module.h"
+#include "wyrmgus.h"
 
 void register_wyrmgus_types()
 {
@@ -52,7 +52,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CPlayer>();
 	ClassDB::register_class<CPlayerColor>();
 	ClassDB::register_class<CSkinColor>();
-	ClassDB::register_class<WyrmgusModule>();
+	ClassDB::register_class<Wyrmgus>();
 }
 
 void unregister_wyrmgus_types()

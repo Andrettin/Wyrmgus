@@ -1,5 +1,5 @@
-#ifndef __WYRMGUS_MODULE_H__
-#define __WYRMGUS_MODULE_H__
+#ifndef __WYRMGUS_H__
+#define __WYRMGUS_H__
 
 #include <scene/main/node.h>
 
@@ -9,15 +9,15 @@ class CPlayer;
 class CPlayerColor;
 class CSkinColor;
 
-class WyrmgusModule : public Node
+class Wyrmgus : public Node
 {
-	GDCLASS(WyrmgusModule, Node)
+	GDCLASS(Wyrmgus, Node)
 	
 public:
-	static WyrmgusModule *GetInstance();
+	static Wyrmgus *GetInstance();
 
 private:
-	static WyrmgusModule *Instance;
+	static Wyrmgus *Instance;
 
 public:
 	int Run();

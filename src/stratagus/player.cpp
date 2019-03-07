@@ -93,7 +93,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "video.h"
 #include "world.h"
-#include "wyrmgus_module.h"
+#include "wyrmgus.h"
 
 #include <mutex>
 
@@ -899,12 +899,12 @@ void CPlayer::SetThisPlayer(CPlayer *player)
 		CPlayer::ThisPlayer = player;
 	}
 	
-	WyrmgusModule::GetInstance()->emit_signal("this_player_changed", old_player, player);
+	Wyrmgus::GetInstance()->emit_signal("this_player_changed", old_player, player);
 	
 	String old_interface = old_player ? old_player->GetInterface() : "";
 	String new_interface = player ? player->GetInterface() : "";
 	if (new_interface != old_interface) {
-		WyrmgusModule::GetInstance()->emit_signal("interface_changed", old_interface, new_interface);
+		Wyrmgus::GetInstance()->emit_signal("interface_changed", old_interface, new_interface);
 	}
 }
 
@@ -1549,7 +1549,7 @@ void CPlayer::SetCivilization(int civilization)
 		emit_signal("interface_changed", old_interface, new_interface);
 		
 		if (CPlayer::GetThisPlayer() == this) {
-			WyrmgusModule::GetInstance()->emit_signal("interface_changed", old_interface, new_interface);
+			Wyrmgus::GetInstance()->emit_signal("interface_changed", old_interface, new_interface);
 		}
 	}
 }
