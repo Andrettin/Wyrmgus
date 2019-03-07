@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_polymorph.h"
@@ -127,7 +125,7 @@
 			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(target->Type->Civilization, target->Type->Class);
 		}
 		if (new_unit_type != -1) {
-			type = UnitTypes[new_unit_type];
+			type = CUnitType::UnitTypes[new_unit_type];
 		}
 	}
 	if (target->Character && target->Character->Custom && target->Character->Civilization && this->Civilization != -1 && this->Civilization != target->Character->Civilization->ID) {
@@ -208,5 +206,3 @@
 	//Wyrmgus end
 	return 1;
 }
-
-//@}

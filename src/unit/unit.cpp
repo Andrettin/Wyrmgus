@@ -832,8 +832,8 @@ void CUnit::Retrain()
 	//now, revert the unit's type to the level 1 one
 	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > 1) {
 		bool found_previous_unit_type = false;
-		for (size_t i = 0; i != UnitTypes.size(); ++i) {
-			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), UnitTypes[i]) != this->Character->ForbiddenUpgrades.end()) {
+		for (size_t i = 0; i != CUnitType::UnitTypes.size(); ++i) {
+			if (this->Character != nullptr && std::find(this->Character->ForbiddenUpgrades.begin(), this->Character->ForbiddenUpgrades.end(), CUnitType::UnitTypes[i]) != this->Character->ForbiddenUpgrades.end()) {
 				continue;
 			}
 			if (((int) AiHelpers.ExperienceUpgrades.size()) > i) {
@@ -842,11 +842,11 @@ void CUnit::Retrain()
 						this->Variable[LEVELUP_INDEX].Value += 1;
 						this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 						this->Variable[LEVELUP_INDEX].Enable = 1;
-						TransformUnitIntoType(*this, *UnitTypes[i]);
+						TransformUnitIntoType(*this, *CUnitType::UnitTypes[i]);
 						if (!IsNetworkGame() && Character != nullptr) {	//save the unit-type experience upgrade for persistent characters
 							if (Character->Type->Slot != i) {
 								if (Player->AiEnabled == false) {
-									Character->Type = UnitTypes[i];
+									Character->Type = CUnitType::UnitTypes[i];
 									SaveHero(Character);
 									CAchievement::CheckAchievements();
 								}

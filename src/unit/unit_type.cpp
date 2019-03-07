@@ -475,7 +475,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CUnitType *> UnitTypes;   /// unit-types definition
+std::vector<CUnitType *> CUnitType::UnitTypes;	/// unit-types definition
 std::map<std::string, CUnitType *> UnitTypeMap;
 
 /**
@@ -643,6 +643,71 @@ CUnitType::~CUnitType()
 		CGraphic::Free(this->LayerSprites[i]);
 	}
 	//Wyrmgus end
+}
+
+/**
+**	@brief	Gets all unit types that represent units in a stricter sense, that is, excluding buildings, items, decorations and etc.
+**
+**	@return	A vector with the unit types
+*/
+std::vector<CUnitType *> CUnitType::GetUnitUnitTypes()
+{
+	std::vector<CUnitType *> unit_types;
+	
+	for (CUnitType *unit_type : CUnitType::UnitTypes) {
+		if (
+			unit_type->BoolFlag[BUILDING_INDEX].value
+			|| unit_type->BoolFlag[ITEM_INDEX].value
+			|| unit_type->BoolFlag[DECORATION_INDEX].value
+			|| unit_type->BoolFlag[VANISHES_INDEX].value
+		) {
+			continue;
+		}
+		
+		unit_types.push_back(unit_type);
+	}
+	
+	return unit_types;
+}
+
+/**
+**	@brief	Gets all building unit types
+**
+**	@return	A vector with the unit types
+*/
+std::vector<CUnitType *> CUnitType::GetBuildingUnitTypes()
+{
+	std::vector<CUnitType *> unit_types;
+	
+	for (CUnitType *unit_type : CUnitType::UnitTypes) {
+		if (!unit_type->BoolFlag[BUILDING_INDEX].value) {
+			continue;
+		}
+		
+		unit_types.push_back(unit_type);
+	}
+	
+	return unit_types;
+}
+
+/**
+**	@brief	Gets all building unit types
+**
+**	@return	A vector with the unit types
+*/
+std::vector<CUnitType *> CUnitType::GetItemUnitTypes()
+{
+	std::vector<CUnitType *> unit_types;
+	
+	for (CUnitType *unit_type : CUnitType::UnitTypes) {
+		if (!unit_type->BoolFlag[ITEM_INDEX].value) {
+			continue;
+		}
+		
+		unit_types.push_back(unit_type);
+	}
+	
+	return unit_types;
 }
 
 /**
@@ -2236,8 +2301,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 void UpdateStats(int reset)
 {
 	// Update players stats
-	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
-		CUnitType &type = *UnitTypes[j];
+	for (std::vector<CUnitType *>::size_type j = 0; j < CUnitType::UnitTypes.size(); ++j) {
+		CUnitType &type = *CUnitType::UnitTypes[j];
 		UpdateUnitStats(type, reset);
 	}
 }
@@ -2295,14 +2360,14 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ResourceDemand[i]);
 	}
 	file.printf("},\n\"unit-stock\", {");
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (stats.GetUnitStock(UnitTypes[i]) == type.DefaultStat.GetUnitStock(UnitTypes[i])) {
+	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+		if (stats.GetUnitStock(CUnitType::UnitTypes[i]) == type.DefaultStat.GetUnitStock(CUnitType::UnitTypes[i])) {
 			continue;
 		}
 		if (i) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", UnitTypes[i]->Ident.c_str(), stats.GetUnitStock(UnitTypes[i]));
+		file.printf("\"%s\", %d,", CUnitType::UnitTypes[i]->Ident.c_str(), stats.GetUnitStock(CUnitType::UnitTypes[i]));
 	}
 	//Wyrmgus end
 	file.printf("}})\n");
@@ -2320,8 +2385,8 @@ void SaveUnitTypes(CFile &file)
 	file.printf("--- MODULE: unittypes\n\n");
 
 	// Save all stats
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		const CUnitType &type = *UnitTypes[i];
+	for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+		const CUnitType &type = *CUnitType::UnitTypes[i];
 		bool somethingSaved = false;
 
 		for (int j = 0; j < PlayerMax; ++j) {
@@ -2414,7 +2479,7 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	type->Slot = UnitTypes.size();
+	type->Slot = CUnitType::UnitTypes.size();
 	type->Ident = ident;
 	type->BoolFlag.resize(new_bool_size);
 
@@ -2422,7 +2487,7 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		type->DefaultStat.Variables[i] = UnitTypeVar.Variable[i];
 	}
-	UnitTypes.push_back(type);
+	CUnitType::UnitTypes.push_back(type);
 	UnitTypeMap[type->Ident] = type;
 	return type;
 }
@@ -2541,8 +2606,8 @@ static int GetStillFrame(const CUnitType &type)
 */
 void InitUnitTypes(int reset_player_stats)
 {
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		CUnitType &type = *UnitTypes[i];
+	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+		CUnitType &type = *CUnitType::UnitTypes[i];
 		Assert(type.Slot == (int)i);
 
 		if (type.Animations == nullptr) {
@@ -2550,7 +2615,7 @@ void InitUnitTypes(int reset_player_stats)
 			continue;
 		}
 		//  Add idents to hash.
-		UnitTypeMap[type.Ident] = UnitTypes[i];
+		UnitTypeMap[type.Ident] = CUnitType::UnitTypes[i];
 		
 		//Wyrmgus start
 		/*
@@ -2750,8 +2815,8 @@ void LoadUnitTypeSprite(CUnitType &type)
 int GetUnitTypesCount()
 {
 	int count = 0;
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		CUnitType &type = *UnitTypes[i];
+	for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+		CUnitType &type = *CUnitType::UnitTypes[i];
 
 		if (type.Missile.IsEmpty() == false) count++;
 		if (type.FireMissile.IsEmpty() == false) count++;
@@ -2770,10 +2835,10 @@ int GetUnitTypesCount()
 */
 void LoadUnitTypes()
 {
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		CUnitType &type = *UnitTypes[i];
+	for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+		CUnitType &type = *CUnitType::UnitTypes[i];
 
-		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (i + 1) * 100 / UnitTypes.size());
+		ShowLoadProgress(_("Loading Unit Types (%d%%)"), (i + 1) * 100 / CUnitType::UnitTypes.size());
 		LoadUnitType(type);
 	}
 }
@@ -2824,8 +2889,8 @@ void CUnitTypeVar::Init()
 	// Variables.
 	Variable.resize(GetNumberVariable());
 	size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-	for (unsigned int i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
-		UnitTypes[i]->BoolFlag.resize(new_size);
+	for (unsigned int i = 0; i < CUnitType::UnitTypes.size(); ++i) { // adjust array for unit already defined
+		CUnitType::UnitTypes[i]->BoolFlag.resize(new_size);
 	}
 }
 
@@ -2849,10 +2914,10 @@ void CleanUnitTypes()
 	FreeAnimations();
 
 	// Clean all unit-types
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		delete UnitTypes[i];
+	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+		delete CUnitType::UnitTypes[i];
 	}
-	UnitTypes.clear();
+	CUnitType::UnitTypes.clear();
 	UnitTypeMap.clear();
 	UnitTypeVar.Clear();
 

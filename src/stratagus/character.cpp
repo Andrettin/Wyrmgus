@@ -1211,7 +1211,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 			hero->Civilization = civilization;
 			int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(hero->Civilization->ID, hero->Type->Class);
 			if (new_unit_type_id != -1) {
-				hero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
+				hero->Type = CUnitType::UnitTypes[new_unit_type_id];
 				hero->Name = new_hero_name;
 				hero->FamilyName = new_hero_family_name;
 				SaveHero(hero);

@@ -403,7 +403,7 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button)
 	if (unit.CurrentAction() != UnitActionStill) {
 		return false;
 	}
-	return CheckDependencies(UnitTypes[button.Value], unit.Player, false, true);
+	return CheckDependencies(CUnitType::UnitTypes[button.Value], unit.Player, false, true);
 }
 
 /**

@@ -3584,18 +3584,18 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 			}
 		}
 	}
-	for (size_t j = 0; j < UnitTypes.size(); ++j) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
-		if (std::find(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), unit_type) != UnitTypes[j]->Trains.end()) {
-			UnitTypes[j]->Trains.erase(std::remove(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), unit_type), UnitTypes[j]->Trains.end());
+	for (CUnitType *other_unit_type : CUnitType::UnitTypes) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
+		if (std::find(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type) != other_unit_type->Trains.end()) {
+			other_unit_type->Trains.erase(std::remove(other_unit_type->Trains.begin(), other_unit_type->Trains.end(), unit_type), other_unit_type->Trains.end());
 		}
-		if (std::find(UnitTypes[j]->TrainedBy.begin(), UnitTypes[j]->TrainedBy.end(), unit_type) != UnitTypes[j]->TrainedBy.end()) {
-			UnitTypes[j]->TrainedBy.erase(std::remove(UnitTypes[j]->TrainedBy.begin(), UnitTypes[j]->TrainedBy.end(), unit_type), UnitTypes[j]->TrainedBy.end());
+		if (std::find(other_unit_type->TrainedBy.begin(), other_unit_type->TrainedBy.end(), unit_type) != other_unit_type->TrainedBy.end()) {
+			other_unit_type->TrainedBy.erase(std::remove(other_unit_type->TrainedBy.begin(), other_unit_type->TrainedBy.end(), unit_type), other_unit_type->TrainedBy.end());
 		}
-		if (std::find(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), unit_type) != UnitTypes[j]->Drops.end()) {
-			UnitTypes[j]->Drops.erase(std::remove(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), unit_type), UnitTypes[j]->Drops.end());
+		if (std::find(other_unit_type->Drops.begin(), other_unit_type->Drops.end(), unit_type) != other_unit_type->Drops.end()) {
+			other_unit_type->Drops.erase(std::remove(other_unit_type->Drops.begin(), other_unit_type->Drops.end(), unit_type), other_unit_type->Drops.end());
 		}
-		if (std::find(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), unit_type) != UnitTypes[j]->AiDrops.end()) {
-			UnitTypes[j]->AiDrops.erase(std::remove(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), unit_type), UnitTypes[j]->AiDrops.end());
+		if (std::find(other_unit_type->AiDrops.begin(), other_unit_type->AiDrops.end(), unit_type) != other_unit_type->AiDrops.end()) {
+			other_unit_type->AiDrops.erase(std::remove(other_unit_type->AiDrops.begin(), other_unit_type->AiDrops.end(), unit_type), other_unit_type->AiDrops.end());
 		}
 	}
 	int buttons_size = UnitButtonTable.size();
@@ -3610,33 +3610,33 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 	}
 	UnitTypeMap.erase(unit_type->Ident);
 	delete unit_type;
-	UnitTypes.erase(std::remove(UnitTypes.begin(), UnitTypes.end(), unit_type), UnitTypes.end());
+	CUnitType::UnitTypes.erase(std::remove(CUnitType::UnitTypes.begin(), CUnitType::UnitTypes.end(), unit_type), CUnitType::UnitTypes.end());
 }
 
 void DisableMod(const std::string &mod_file)
 {
-	int unit_types_size = UnitTypes.size();
+	int unit_types_size = CUnitType::UnitTypes.size();
 	for (int i = (unit_types_size - 1); i >= 0; --i) {
 		
-		if (UnitTypes[i]->Mod == mod_file) {
-			DeleteModUnitType(UnitTypes[i]->Ident);
+		if (CUnitType::UnitTypes[i]->Mod == mod_file) {
+			DeleteModUnitType(CUnitType::UnitTypes[i]->Ident);
 		}
 	}
 		
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (UnitTypes[i]->ModTrains.find(mod_file) != UnitTypes[i]->ModTrains.end()) {
-			UnitTypes[i]->ModTrains.erase(mod_file);
-			UnitTypes[i]->RemoveButtons(-1, mod_file);
+	for (CUnitType *unit_type : CUnitType::UnitTypes) {
+		if (unit_type->ModTrains.find(mod_file) != unit_type->ModTrains.end()) {
+			unit_type->ModTrains.erase(mod_file);
+			unit_type->RemoveButtons(-1, mod_file);
 		}
-		if (UnitTypes[i]->ModTrainedBy.find(mod_file) != UnitTypes[i]->ModTrainedBy.end()) {
-			UnitTypes[i]->ModTrainedBy.erase(mod_file);
-			UnitTypes[i]->RemoveButtons(-1, mod_file);
+		if (unit_type->ModTrainedBy.find(mod_file) != unit_type->ModTrainedBy.end()) {
+			unit_type->ModTrainedBy.erase(mod_file);
+			unit_type->RemoveButtons(-1, mod_file);
 		}
-		if (UnitTypes[i]->ModAiDrops.find(mod_file) != UnitTypes[i]->ModAiDrops.end()) {
-			UnitTypes[i]->ModAiDrops.erase(mod_file);
+		if (unit_type->ModAiDrops.find(mod_file) != unit_type->ModAiDrops.end()) {
+			unit_type->ModAiDrops.erase(mod_file);
 		}
-		if (UnitTypes[i]->ModDefaultStats.find(mod_file) != UnitTypes[i]->ModDefaultStats.end()) {
-			UnitTypes[i]->ModDefaultStats.erase(mod_file);
+		if (unit_type->ModDefaultStats.find(mod_file) != unit_type->ModDefaultStats.end()) {
+			unit_type->ModDefaultStats.erase(mod_file);
 		}
 	}
 	

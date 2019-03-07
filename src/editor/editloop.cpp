@@ -2437,8 +2437,8 @@ void CEditor::Init()
 	//Wyrmgus start
 	if (this->UnitTypes.size() == 0) {
 		//if editor's unit types vector is still empty after loading the editor's lua file, then fill it automatically
-		for (std::vector<CUnitType *>::size_type i = 0; i < ::UnitTypes.size(); ++i) {
-			CUnitType &type = *::UnitTypes[i];
+		for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+			CUnitType &type = *CUnitType::UnitTypes[i];
 			
 			if (type.Icon.Name.empty() || type.BoolFlag[VANISHES_INDEX].value || type.BoolFlag[HIDDENINEDITOR_INDEX].value) {
 				continue;

@@ -304,16 +304,16 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 		this->Owner->OwnedProvinces.erase(std::remove(this->Owner->OwnedProvinces.begin(), this->Owner->OwnedProvinces.end(), this->ID), this->Owner->OwnedProvinces.end());
 	}
 	
-	for (size_t i = 0; i < UnitTypes.size(); ++i) { //change the province's military score to be appropriate for the new faction's technologies
-		if (IsMilitaryUnit(*UnitTypes[i])) {
+	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) { //change the province's military score to be appropriate for the new faction's technologies
+		if (IsMilitaryUnit(*CUnitType::UnitTypes[i])) {
 			int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[i] : 0);
 			int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[i] : 0);
 			if (old_owner_military_score_bonus != new_owner_military_score_bonus) {
 				this->MilitaryScore += this->Units[i] * (new_owner_military_score_bonus - old_owner_military_score_bonus);
 				this->OffensiveMilitaryScore += this->Units[i] * new_owner_military_score_bonus - old_owner_military_score_bonus;
 			}
-		} else if (UnitTypes[i]->Class != -1 && UnitTypeClasses[UnitTypes[i]->Class] == "worker") {
-			int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(UnitTypes[i]->Civilization, GetUnitTypeClassIndexByName("militia"));
+		} else if (CUnitType::UnitTypes[i]->Class != -1 && UnitTypeClasses[CUnitType::UnitTypes[i]->Class] == "worker") {
+			int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(CUnitType::UnitTypes[i]->Civilization, GetUnitTypeClassIndexByName("militia"));
 			if (militia_unit_type != -1) {
 				int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0);
 				int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[militia_unit_type] : 0);
@@ -340,9 +340,9 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	}
 	
 	//if this province has an equivalent building for its civilization/faction, use that instead
-	if (UnitTypes[building_id]->Civilization != -1) {
-		if (this->GetClassUnitType(UnitTypes[building_id]->Class) != building_id && this->GetClassUnitType(UnitTypes[building_id]->Class) != -1) {
-			building_id = this->GetClassUnitType(UnitTypes[building_id]->Class);
+	if (CUnitType::UnitTypes[building_id]->Civilization != -1) {
+		if (this->GetClassUnitType(CUnitType::UnitTypes[building_id]->Class) != building_id && this->GetClassUnitType(CUnitType::UnitTypes[building_id]->Class) != -1) {
+			building_id = this->GetClassUnitType(CUnitType::UnitTypes[building_id]->Class);
 		}
 	}
 				
@@ -354,12 +354,12 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	
 	int change = has_settlement_building ? 1 : -1;
 	for (int i = 0; i < MaxCosts; ++i) {
-		if (UnitTypes[building_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
-			this->ProductionEfficiencyModifier[i] += UnitTypes[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
+		if (CUnitType::UnitTypes[building_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
+			this->ProductionEfficiencyModifier[i] += CUnitType::UnitTypes[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
 		}
 	}
 	
-	if (UnitTypes[building_id]->Class != -1 && UnitTypeClasses[UnitTypes[building_id]->Class] == "stronghold") { //increase the military score of the province, if this building is a stronghold
+	if (CUnitType::UnitTypes[building_id]->Class != -1 && UnitTypeClasses[CUnitType::UnitTypes[building_id]->Class] == "stronghold") { //increase the military score of the province, if this building is a stronghold
 		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
 	}
 }
@@ -391,7 +391,7 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 		return;
 	}
 	
-//	fprintf(stderr, "Setting the quantity of unit type \"%s\" to %d in the %s province.\n", UnitTypes[unit_type_id]->Ident.c_str(), quantity, this->Name.c_str());
+//	fprintf(stderr, "Setting the quantity of unit type \"%s\" to %d in the %s province.\n", CUnitType::UnitTypes[unit_type_id]->Ident.c_str(), quantity, this->Name.c_str());
 	
 	quantity = std::max(0, quantity);
 	
@@ -399,18 +399,18 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 	
 	this->TotalUnits += change;
 	
-	if (IsMilitaryUnit(*UnitTypes[unit_type_id])) {
-		this->MilitaryScore += change * (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
-		this->OffensiveMilitaryScore += change * (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+	if (IsMilitaryUnit(*CUnitType::UnitTypes[unit_type_id])) {
+		this->MilitaryScore += change * (CUnitType::UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+		this->OffensiveMilitaryScore += change * (CUnitType::UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
 	}
 	
-	if (UnitTypes[unit_type_id]->Class != -1 && UnitTypeClasses[UnitTypes[unit_type_id]->Class] == "worker") {
+	if (CUnitType::UnitTypes[unit_type_id]->Class != -1 && UnitTypeClasses[CUnitType::UnitTypes[unit_type_id]->Class] == "worker") {
 		this->TotalWorkers += change;
 		
 		//if this unit's civilization can change workers into militia, add half of the militia's points to the military score (one in every two workers becomes a militia when the province is attacked)
-		int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(UnitTypes[unit_type_id]->Civilization, GetUnitTypeClassIndexByName("militia"));
+		int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(CUnitType::UnitTypes[unit_type_id]->Civilization, GetUnitTypeClassIndexByName("militia"));
 		if (militia_unit_type != -1) {
-			this->MilitaryScore += change * ((UnitTypes[militia_unit_type]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0)) / 2);
+			this->MilitaryScore += change * ((CUnitType::UnitTypes[militia_unit_type]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0)) / 2);
 		}
 	}
 	
@@ -666,7 +666,7 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 		
 	//add military score bonuses
 	for (size_t z = 0; z < AllUpgrades[upgrade_id]->UpgradeModifiers.size(); ++z) {
-		for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
 				
 			Assert(AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == '?' || AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == 'X');
 
@@ -976,7 +976,7 @@ void CGrandStrategyHero::SetType(int unit_type_id)
 {
 	//if the hero's unit type changed
 	if (unit_type_id != this->Type->Slot) {
-		this->Type = UnitTypes[unit_type_id];
+		this->Type = CUnitType::UnitTypes[unit_type_id];
 	}
 	
 	this->UpdateAttributes();

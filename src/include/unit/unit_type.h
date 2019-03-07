@@ -826,6 +826,12 @@ class CUnitType : public CDataType, public Object
 public:
 	CUnitType();
 	~CUnitType();
+	
+	static std::vector<CUnitType *> GetUnitUnitTypes();
+	static std::vector<CUnitType *> GetBuildingUnitTypes();
+	static std::vector<CUnitType *> GetItemUnitTypes();
+
+	static std::vector<CUnitType *> UnitTypes;	/// All unit-types
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
@@ -1076,8 +1082,6 @@ protected:
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-
-extern std::vector<CUnitType *> UnitTypes;   /// All unit-types
 
 /// @todo this hardcoded unit-types must be removed!!
 //Wyrmgus start

@@ -1101,9 +1101,9 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"total-kills\", %d,", p.TotalKills);
 	//Wyrmgus start
 	file.printf("\n  \"unit-type-kills\", {");
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
 		if (p.UnitTypeKills[i] != 0) {
-			file.printf("\"%s\", %d, ", UnitTypes[i]->Ident.c_str(), p.UnitTypeKills[i]);
+			file.printf("\"%s\", %d, ", CUnitType::UnitTypes[i]->Ident.c_str(), p.UnitTypeKills[i]);
 		}
 	}
 	file.printf("},");
@@ -1948,12 +1948,12 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 	if (town_hall_type_id == -1) {
 		return false;
 	}
-	CUnitType *town_hall_type = UnitTypes[town_hall_type_id];
+	CUnitType *town_hall_type = CUnitType::UnitTypes[town_hall_type_id];
 	
 	int stronghold_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("stronghold"));			
 	CUnitType *stronghold_type = nullptr;
 	if (stronghold_type_id != -1) {
-		stronghold_type = UnitTypes[stronghold_type_id];
+		stronghold_type = CUnitType::UnitTypes[stronghold_type_id];
 	}
 	
 	FindPlayerUnitsByType(*this, *town_hall_type, settlement_unit_table, true);
@@ -2956,7 +2956,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 					return false;
 				}
 				unit_types.clear();
-				unit_types.push_back(UnitTypes[unit_type_id]);
+				unit_types.push_back(CUnitType::UnitTypes[unit_type_id]);
 			}
 
 			bool validated = false;
@@ -2994,7 +2994,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 								continue;
 							}
 							unit_types.clear();
-							unit_types.push_back(UnitTypes[unit_type_id]);
+							unit_types.push_back(CUnitType::UnitTypes[unit_type_id]);
 						}
 
 						for (const CUnitType *unit_type : unit_types) {
@@ -3116,7 +3116,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 						return "You can no longer produce the required unit.";
 					}
 					unit_types.clear();
-					unit_types.push_back(UnitTypes[unit_type_id]);
+					unit_types.push_back(CUnitType::UnitTypes[unit_type_id]);
 				}
 				
 				bool validated = false;
@@ -3159,7 +3159,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 									continue;
 								}
 								unit_types.clear();
-								unit_types.push_back(UnitTypes[unit_type_id]);
+								unit_types.push_back(CUnitType::UnitTypes[unit_type_id]);
 							}
 
 							for (const CUnitType *unit_type : unit_types) {

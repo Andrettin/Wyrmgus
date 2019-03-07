@@ -120,8 +120,8 @@ static int CclDefineCharacter(lua_State *l)
 			std::string unit_type_ident = LuaToString(l, -1);
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 			if (unit_type_id != -1) {
-				if (character->Type == nullptr || character->Type == UnitTypes[unit_type_id] || character->Type->CanExperienceUpgradeTo(UnitTypes[unit_type_id])) {
-					character->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+				if (character->Type == nullptr || character->Type == CUnitType::UnitTypes[unit_type_id] || character->Type->CanExperienceUpgradeTo(CUnitType::UnitTypes[unit_type_id])) {
+					character->Type = CUnitType::UnitTypes[unit_type_id];
 					if (character->Level < character->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
 						character->Level = character->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
 					}
@@ -354,7 +354,7 @@ static int CclDefineCharacter(lua_State *l)
 						std::string item_ident = LuaToString(l, -1, k + 1);
 						int item_type_id = UnitTypeIdByIdent(item_ident);
 						if (item_type_id != -1) {
-							item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
+							item->Type = CUnitType::UnitTypes[item_type_id];
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
 							character->Items.erase(std::remove(character->Items.begin(), character->Items.end(), item), character->Items.end());
@@ -445,7 +445,7 @@ static int CclDefineCharacter(lua_State *l)
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
 				int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 				if (unit_type_id != -1) {
-					character->ForbiddenUpgrades.push_back(UnitTypes[unit_type_id]);
+					character->ForbiddenUpgrades.push_back(CUnitType::UnitTypes[unit_type_id]);
 				} else {
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
@@ -627,7 +627,7 @@ static int CclDefineCustomHero(lua_State *l)
 			std::string unit_type_ident = LuaToString(l, -1);
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 			if (unit_type_id != -1) {
-				hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+				hero->Type = CUnitType::UnitTypes[unit_type_id];
 				if (hero->Level < hero->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
 					hero->Level = hero->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
 				}
@@ -714,7 +714,7 @@ static int CclDefineCustomHero(lua_State *l)
 						std::string item_ident = LuaToString(l, -1, k + 1);
 						int item_type_id = UnitTypeIdByIdent(item_ident);
 						if (item_type_id != -1) {
-							item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
+							item->Type = CUnitType::UnitTypes[item_type_id];
 						} else {
 							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
 							hero->Items.erase(std::remove(hero->Items.begin(), hero->Items.end(), item), hero->Items.end());
@@ -827,7 +827,7 @@ static int CclDefineCustomHero(lua_State *l)
 				std::string unit_type_ident = LuaToString(l, -1, j + 1);
 				int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 				if (unit_type_id != -1) {
-					hero->ForbiddenUpgrades.push_back(UnitTypes[unit_type_id]);
+					hero->ForbiddenUpgrades.push_back(CUnitType::UnitTypes[unit_type_id]);
 				} else {
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}

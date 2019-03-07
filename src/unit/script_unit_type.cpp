@@ -1799,7 +1799,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				int sold_unit_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
 				if (sold_unit_type_id != -1) {
-					type->SoldUnits.push_back(UnitTypes[sold_unit_type_id]);
+					type->SoldUnits.push_back(CUnitType::UnitTypes[sold_unit_type_id]);
 				} else { // Error
 					LuaError(l, "incorrect sold unit unit-type");
 				}
@@ -1809,7 +1809,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				int sold_unit_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
 				if (sold_unit_type_id != -1) {
-					type->SpawnUnits.push_back(UnitTypes[sold_unit_type_id]);
+					type->SpawnUnits.push_back(CUnitType::UnitTypes[sold_unit_type_id]);
 				} else { // Error
 					LuaError(l, "incorrect spawn unit unit-type");
 				}
@@ -1819,7 +1819,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				int drop_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
 				if (drop_type_id != -1) {
-					type->Drops.push_back(UnitTypes[drop_type_id]);
+					type->Drops.push_back(CUnitType::UnitTypes[drop_type_id]);
 				} else { // Error
 					LuaError(l, "incorrect drop unit-type");
 				}
@@ -1829,7 +1829,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				int drop_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
 				if (drop_type_id != -1) {
-					type->AiDrops.push_back(UnitTypes[drop_type_id]);
+					type->AiDrops.push_back(CUnitType::UnitTypes[drop_type_id]);
 				} else { // Error
 					LuaError(l, "incorrect drop unit-type");
 				}
@@ -2313,10 +2313,10 @@ static int CclUnitTypeArray(lua_State *l)
 
 	lua_newtable(l);
 
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
 		LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 		data->Type = LuaUnitType;
-		data->Data = UnitTypes[i];
+		data->Data = CUnitType::UnitTypes[i];
 		lua_rawseti(l, 1, i + 1);
 	}
 	return 1;
@@ -2836,12 +2836,12 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Droppers")) { // unit types which can drop this one
 		std::vector<CUnitType *> droppers;
-		for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
 			if (
-				std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), type) != UnitTypes[i]->Drops.end()
-				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), type) != UnitTypes[i]->AiDrops.end()
+				std::find(CUnitType::UnitTypes[i]->Drops.begin(), CUnitType::UnitTypes[i]->Drops.end(), type) != CUnitType::UnitTypes[i]->Drops.end()
+				|| std::find(CUnitType::UnitTypes[i]->AiDrops.begin(), CUnitType::UnitTypes[i]->AiDrops.end(), type) != CUnitType::UnitTypes[i]->AiDrops.end()
 			) {
-				droppers.push_back(UnitTypes[i]);
+				droppers.push_back(CUnitType::UnitTypes[i]);
 			}
 		}
 		
@@ -3116,8 +3116,8 @@ static int CclDefineBoolFlags(lua_State *l)
 
 	if (0 < old && old != UnitTypeVar.GetNumberBoolFlag()) {
 		size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
-			UnitTypes[i]->BoolFlag.resize(new_size);
+		for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) { // adjust array for unit already defined
+			CUnitType::UnitTypes[i]->BoolFlag.resize(new_size);
 		}
 	}
 	return 0;
@@ -3349,9 +3349,9 @@ static int CclGetUnitTypes(lua_State *l)
 	}
 	
 	std::vector<std::string> unit_types;
-	for (size_t i = 0; i != UnitTypes.size(); ++i) {
-		if (mod_file.empty() || UnitTypes[i]->Mod == mod_file) {
-			unit_types.push_back(UnitTypes[i]->Ident);
+	for (size_t i = 0; i != CUnitType::UnitTypes.size(); ++i) {
+		if (mod_file.empty() || CUnitType::UnitTypes[i]->Mod == mod_file) {
+			unit_types.push_back(CUnitType::UnitTypes[i]->Ident);
 		}
 	}
 		

@@ -461,7 +461,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
-//	TriggerData.Type = UnitTypes[button.Value];
+//	TriggerData.Type = CUnitType::UnitTypes[button.Value];
 	button.SetTriggerData();
 	int resource = button.Value;
 	if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
@@ -493,7 +493,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 
 	if (this->Text) {
 		//Wyrmgus start
-//		TriggerData.Type = UnitTypes[button.Value];
+//		TriggerData.Type = CUnitType::UnitTypes[button.Value];
 		button.SetTriggerData();
 		int resource = button.Value;
 		if (button.Action == ButtonProduceResource || button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
@@ -515,7 +515,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	if (this->Index != -1) {
 		//Wyrmgus start
 		/*
-		CUnitType &type = *UnitTypes[button.Value];
+		CUnitType &type = *CUnitType::UnitTypes[button.Value];
 		int value = type.DefaultStat.Variables[this->Index].Value;
 		int diff = type.Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value - value;
 
@@ -529,7 +529,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		*/
 		int value;
 		if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
-			value = UnitTypes[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
+			value = CUnitType::UnitTypes[button.Value]->Stats[CPlayer::GetThisPlayer()->Index].Variables[this->Index].Value;
 			if (value >= 0 && IsBonusVariable(this->Index)) {
 				x += label.Draw(x, y, "+");
 			}

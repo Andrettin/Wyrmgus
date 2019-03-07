@@ -122,7 +122,7 @@ static std::vector<CUnitType *> getUnitTypeFromString(const std::string &list)
 	std::vector<CUnitType *> res;
 
 	if (list == "*") {
-		return UnitTypes;
+		return CUnitType::UnitTypes;
 	}
 	size_t begin = 1;
 	size_t end = list.find(",", begin);
@@ -145,7 +145,7 @@ static std::vector<CUnitType *> getReparableUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
+	for (std::vector<CUnitType *>::const_iterator i = CUnitType::UnitTypes.begin(); i != CUnitType::UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
 
 		if (type.RepairHP > 0) {
@@ -165,7 +165,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 	std::vector<CUnitType *> res;
 	std::vector<CUnitType *> sorted_res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
+	for (std::vector<CUnitType *>::const_iterator i = CUnitType::UnitTypes.begin(); i != CUnitType::UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
 		
 		if (type.BoolFlag[TOWNHALL_INDEX].value) {
@@ -214,7 +214,7 @@ static std::vector<CUnitType *> getMineUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
+	for (std::vector<CUnitType *>::const_iterator i = CUnitType::UnitTypes.begin(); i != CUnitType::UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
 
 		if (type.GivesResource > 0 && type.BoolFlag[CANHARVEST_INDEX].value) {
@@ -266,7 +266,7 @@ static std::vector<CUnitType *> GetMarketUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
+	for (std::vector<CUnitType *>::const_iterator i = CUnitType::UnitTypes.begin(); i != CUnitType::UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
 
 		if (type.BoolFlag[MARKET_INDEX].value) {
@@ -283,7 +283,7 @@ static std::vector<CUnitType *> GetNavalTransporterUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
+	for (std::vector<CUnitType *>::const_iterator i = CUnitType::UnitTypes.begin(); i != CUnitType::UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
 
 		if (type.CanTransport() && (type.UnitType == UnitTypeNaval || type.UnitType == UnitTypeFly || type.UnitType == UnitTypeFlyLow)) { //if the unit is a transporter that can travel through water (not necessarily a ship, can also fly)
@@ -351,7 +351,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				AiHelperInsert(aiHelper.Mines, i, **j);
 			}
 		}
-		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin(); d != UnitTypes.end(); ++d) {
+		for (std::vector<CUnitType *>::const_iterator d = CUnitType::UnitTypes.begin(); d != CUnitType::UnitTypes.end(); ++d) {
 			CUnitType &type = **d;
 
 			if (type.CanStore[i] > 0) {
@@ -990,7 +990,7 @@ static int CclAiForce(lua_State *l)
 		}
 
 		//use the equivalent unit type
-		type = UnitTypes[UnitTypeEquivs[type->Slot]];
+		type = CUnitType::UnitTypes[UnitTypeEquivs[type->Slot]];
 
 		if (resetForce) {
 			// Append it.

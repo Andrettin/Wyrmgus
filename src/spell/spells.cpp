@@ -355,13 +355,13 @@ CSpell *CSpell::GetOrAddSpell(const std::string &ident)
 	
 	if (!spell) {
 		spell = new CSpell(Spells.size(), ident);
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for casters that have already been defined
-			if (UnitTypes[i]->AutoCastActive) {
+		for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) { // adjust array for casters that have already been defined
+			if (CUnitType::UnitTypes[i]->AutoCastActive) {
 				char *newc = new char[(Spells.size() + 1) * sizeof(char)];
-				memcpy(newc, UnitTypes[i]->AutoCastActive, Spells.size() * sizeof(char));
-				delete[] UnitTypes[i]->AutoCastActive;
-				UnitTypes[i]->AutoCastActive = newc;
-				UnitTypes[i]->AutoCastActive[Spells.size()] = 0;
+				memcpy(newc, CUnitType::UnitTypes[i]->AutoCastActive, Spells.size() * sizeof(char));
+				delete[] CUnitType::UnitTypes[i]->AutoCastActive;
+				CUnitType::UnitTypes[i]->AutoCastActive = newc;
+				CUnitType::UnitTypes[i]->AutoCastActive[Spells.size()] = 0;
 			}
 		}
 		Spells.push_back(spell);

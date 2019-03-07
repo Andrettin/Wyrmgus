@@ -1718,7 +1718,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	if (civilization && class_id != -1) {
 		int unit_type_id = PlayerRaces.GetCivilizationClassUnitType(civilization->ID, class_id);
 		if (unit_type_id != -1) {
-			unit_type_ident = UnitTypes[unit_type_id]->Ident;
+			unit_type_ident = CUnitType::UnitTypes[unit_type_id]->Ident;
 		}
 	}
 		
@@ -1770,7 +1770,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	if (class_id != -1) {
 		int unit_type_id = PlayerRaces.GetFactionClassUnitType(faction_id, class_id);
 		if (unit_type_id != -1) {
-			unit_type_ident = UnitTypes[unit_type_id]->Ident;
+			unit_type_ident = CUnitType::UnitTypes[unit_type_id]->Ident;
 		}
 	}
 		

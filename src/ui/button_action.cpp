@@ -171,9 +171,9 @@ void ButtonAction::ProcessConfigData(const CConfigData *config_data)
 void ButtonAction::SetTriggerData() const
 {
 	if (this->Action != ButtonUnit && this->Action != ButtonBuy) {
-		TriggerData.Type = UnitTypes[this->Value];
+		TriggerData.Type = CUnitType::UnitTypes[this->Value];
 	} else {
-		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(this->Value).Type->Slot];
+		TriggerData.Type = CUnitType::UnitTypes[UnitManager.GetSlotUnit(this->Value).Type->Slot];
 		TriggerData.Unit = &UnitManager.GetSlotUnit(this->Value);
 	}
 	if (this->Action == ButtonResearch || this->Action == ButtonLearnAbility) {

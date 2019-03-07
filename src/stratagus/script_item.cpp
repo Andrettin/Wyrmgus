@@ -80,7 +80,7 @@ static int CclDefineUniqueItem(lua_State *l)
 			std::string unit_type_ident = LuaToString(l, -1);
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 			if (unit_type_id != -1) {
-				item->Type = UnitTypes[unit_type_id];
+				item->Type = CUnitType::UnitTypes[unit_type_id];
 			} else {
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}
@@ -157,9 +157,9 @@ static int CclDefineUniqueItem(lua_State *l)
 static int CclGetItems(lua_State *l)
 {
 	std::vector<CUnitType *> items;
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (UnitTypes[i]->BoolFlag[ITEM_INDEX].value) {
-			items.push_back(UnitTypes[i]);
+	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+		if (CUnitType::UnitTypes[i]->BoolFlag[ITEM_INDEX].value) {
+			items.push_back(CUnitType::UnitTypes[i]);
 		}
 	}
 		

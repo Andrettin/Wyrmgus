@@ -193,8 +193,8 @@ void MapUnitSounds()
 	}
 
 	// Parse all units sounds.
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		CUnitType &type = *UnitTypes[i];
+	for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+		CUnitType &type = *CUnitType::UnitTypes[i];
 
 		MapAnimSounds(type);
 

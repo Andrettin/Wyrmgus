@@ -457,9 +457,9 @@ static void AnimateActionTrain(CUnit &unit)
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
 				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
-					for (size_t z = 0; z < UnitTypes.size(); ++z) {
-						if (UnitTypes[z] && UnitTypes[z]->GivesResource == table[j]->Type->GivesResource && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *UnitTypes[z], table[j]->tilePos, 1, false, table[j]->MapLayer->ID)) {
-							CommandBuildBuilding(*newUnit, table[j]->tilePos, *UnitTypes[z], FlushCommands, table[j]->MapLayer->ID);
+					for (CUnitType *unit_type : CUnitType::UnitTypes) {
+						if (unit_type && unit_type->GivesResource == table[j]->Type->GivesResource && unit_type->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *unit_type, table[j]->tilePos, 1, false, table[j]->MapLayer->ID)) {
+							CommandBuildBuilding(*newUnit, table[j]->tilePos, *unit_type, FlushCommands, table[j]->MapLayer->ID);
 							command_found = true;
 							break;
 						}

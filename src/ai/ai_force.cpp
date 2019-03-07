@@ -357,7 +357,7 @@ class UnitTypePrioritySorter_Decreasing
 public:
 	bool operator()(int lhs, int rhs) const
 	{
-		return UnitTypes[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > UnitTypes[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
+		return CUnitType::UnitTypes[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > CUnitType::UnitTypes[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
 	}
 };
 
@@ -376,7 +376,7 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType &unittype, int *usableTypes)
 	int usableTypesCount = AiFindUnitTypeEquiv(unittype, usableTypes);
 	// 2 - Remove unavailable unittypes
 	for (int i = 0; i < usableTypesCount;) {
-		if (!CheckDependencies(UnitTypes[usableTypes[i]], AiPlayer->Player)) {
+		if (!CheckDependencies(CUnitType::UnitTypes[usableTypes[i]], AiPlayer->Player)) {
 			// Not available, remove it
 			usableTypes[i] = usableTypes[usableTypesCount - 1];
 			--usableTypesCount;
@@ -1161,7 +1161,7 @@ void AiForceManager::CheckUnits(int *counter)
 			const unsigned int t = aiut.Type->Slot;
 			const int unit_class = aiut.Type->Class;
 			const int wantedCount = aiut.Want;
-			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(UnitTypes[t]);
+			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(CUnitType::UnitTypes[t]);
 			if (t < AiHelpers.Equiv.size()) {
 				for (unsigned int k = 0; k < AiHelpers.Equiv[t].size(); ++k) {
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][k]);
@@ -1913,7 +1913,7 @@ void AiForceManager::CheckForceRecruitment()
 					int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
 					CUnitType *type = nullptr;
 					if (unit_type_id != -1) {
-						type = UnitTypes[unit_type_id];
+						type = CUnitType::UnitTypes[unit_type_id];
 					}
 					if (!type || !AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
 						valid = false;
@@ -1949,7 +1949,7 @@ void AiForceManager::CheckForceRecruitment()
 					int unit_type_id = PlayerRaces.GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
 					CUnitType *type = nullptr;
 					if (unit_type_id != -1) {
-						type = UnitTypes[unit_type_id];
+						type = CUnitType::UnitTypes[unit_type_id];
 					}
 					int count = force_template->Units[i].second;
 					

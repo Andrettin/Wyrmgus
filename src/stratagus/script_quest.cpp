@@ -646,7 +646,7 @@ static int CclDefineAchievement(lua_State *l)
 			std::string unit_type_ident = LuaToString(l, -1);
 			const int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 			if (unit_type_id != -1) {
-				achievement->CharacterType = UnitTypes[unit_type_id];
+				achievement->CharacterType = CUnitType::UnitTypes[unit_type_id];
 			} else {
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}

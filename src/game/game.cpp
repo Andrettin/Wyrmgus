@@ -596,8 +596,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("})\n\n");
 		}
 		
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-			CUnitType &type = *UnitTypes[i];
+		for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+			CUnitType &type = *CUnitType::UnitTypes[i];
 			
 			if (type.Mod != CMap::Map.Info.Filename) {
 				continue;
@@ -757,8 +757,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}
 		
 		//save the definition of trained unit types separately, to avoid issues like a trained unit being defined after the unit that trains it
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-			CUnitType &type = *UnitTypes[i];
+		for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+			CUnitType &type = *CUnitType::UnitTypes[i];
 			
 			if (type.Mod != CMap::Map.Info.Filename) {
 				continue;
@@ -777,8 +777,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 		}		
 
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-			CUnitType &type = *UnitTypes[i];
+		for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+			CUnitType &type = *CUnitType::UnitTypes[i];
 			
 			if (type.ModTrains.find(CMap::Map.Info.Filename) != type.ModTrains.end()) {
 				f->printf("SetModTrains(\"%s\", \"%s\", {", mod_file.c_str(), type.Ident.c_str());
@@ -888,8 +888,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		}
 			
 		f->printf("\n-- set map default stat and map sound for unit types\n");
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-			CUnitType &type = *UnitTypes[i];
+		for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
+			CUnitType &type = *CUnitType::UnitTypes[i];
 			
 			if (type.ModDefaultStats.find(CMap::Map.Info.Filename) != type.ModDefaultStats.end()) {
 				for (unsigned int j = 0; j < MaxCosts; ++j) {
