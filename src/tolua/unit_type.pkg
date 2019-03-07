@@ -1,18 +1,7 @@
 class CUnitType
 {
-	std::string Ident;
-	std::string Name;
-	tolua_readonly int Slot;
-
-	int MinAttackRange;
-	int ClicksToExplode;
-
 	int GivesResource;
-	
-	Vec2i TileSize;
 };
-
-CUnitType *UnitTypeByIdent(const std::string ident);
 
 void SetModStat(const std::string mod_file, const std::string ident, const std::string variable_key, const int value, const std::string variable_type);
 void SetModSound(const std::string mod_file, const std::string ident, const std::string sound, const std::string sound_type, const std::string sound_subtype = "");

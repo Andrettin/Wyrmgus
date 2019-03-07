@@ -17,7 +17,6 @@ class CUpgrade
 	bool MagicSuffix;
 	bool RunicAffix;
 	bool IncompatibleAffixes[UpgradeMax];
-	CUnitType *Item;
 	int ID;
 	//Wyrmgus end
 	int Costs[MaxCosts];

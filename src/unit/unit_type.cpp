@@ -560,41 +560,7 @@ bool CResource::IsMineResource() const
 }
 //Wyrmgus end
 
-CUnitType::CUnitType() :
-	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
-	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
-	//Wyrmgus start
-	TrainQuantity(0), CostModifier(0), ItemClass(-1),
-	Class(-1), Civilization(-1), Faction(-1), Species(nullptr), TerrainType(nullptr),
-	//Wyrmgus end
-	Animations(nullptr), StillFrame(0),
-	DeathExplosion(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
-	TeleportCost(0), TeleportEffectIn(nullptr), TeleportEffectOut(nullptr),
-	CorpseType(nullptr), Construction(nullptr), RepairHP(0), TileSize(0, 0),
-	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
-	//Wyrmgus start
-//	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
-	MinAttackRange(0),
-	//Wyrmgus end
-	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
-	AutoCastActive(nullptr),
-	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(1), ClicksToExplode(0),
-	//Wyrmgus start
-//	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
-	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(nullptr), ButtonPos(0), ButtonLevel(0),
-	//Wyrmgus end
-	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
-	MouseAction(0), CanTarget(0),
-	Flip(1), LandUnit(0), AirUnit(0), SeaUnit(0),
-	ExplodeWhenKilled(0),
-	CanAttack(0),
-	Neutral(0),
-	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
-	//Wyrmgus start
-	Elixir(nullptr),
-//	Sprite(nullptr), ShadowSprite(nullptr)
-	Sprite(nullptr), ShadowSprite(nullptr), LightSprite(nullptr)
-	//Wyrmgus end
+CUnitType::CUnitType()
 {
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
@@ -610,40 +576,54 @@ CUnitType::CUnitType() :
 
 CUnitType::~CUnitType()
 {
-	delete DeathExplosion;
-	delete OnHit;
-	delete OnEachCycle;
-	delete OnEachSecond;
-	delete OnInit;
-	delete TeleportEffectIn;
-	delete TeleportEffectOut;
+	if (this->DeathExplosion) {
+		delete this->DeathExplosion;
+	}
+	if (this->OnHit) {
+		delete this->OnHit;
+	}
+	if (this->OnEachCycle) {
+		delete this->OnEachCycle;
+	}
+	if (this->OnEachSecond) {
+		delete this->OnEachSecond;
+	}
+	if (this->OnInit) {
+		delete this->OnInit;
+	}
+	if (this->TeleportEffectIn) {
+		delete this->TeleportEffectIn;
+	}
+	if (this->TeleportEffectOut) {
+		delete this->TeleportEffectOut;
+	}
 
 	//Wyrmgus start
-	SoldUnits.clear();
-	SpawnUnits.clear();
-	Drops.clear();
-	AiDrops.clear();
-	DropSpells.clear();
-	Affixes.clear();
-	Traits.clear();
-	StartingAbilities.clear();
+	this->SoldUnits.clear();
+	this->SpawnUnits.clear();
+	this->Drops.clear();
+	this->AiDrops.clear();
+	this->DropSpells.clear();
+	this->Affixes.clear();
+	this->Traits.clear();
+	this->StartingAbilities.clear();
 	//Wyrmgus end
 
-	BoolFlag.clear();
+	this->BoolFlag.clear();
 
 	// Free Building Restrictions if there are any
-	for (std::vector<CBuildRestriction *>::iterator b = BuildingRules.begin();
-		 b != BuildingRules.end(); ++b) {
+	for (std::vector<CBuildRestriction *>::iterator b = this->BuildingRules.begin();
+		 b != this->BuildingRules.end(); ++b) {
 		delete *b;
 	}
-	BuildingRules.clear();
-	for (std::vector<CBuildRestriction *>::iterator b = AiBuildingRules.begin();
-		 b != AiBuildingRules.end(); ++b) {
+	this->BuildingRules.clear();
+	for (std::vector<CBuildRestriction *>::iterator b = this->AiBuildingRules.begin();
+		 b != this->AiBuildingRules.end(); ++b) {
 		delete *b;
 	}
-	AiBuildingRules.clear();
+	this->AiBuildingRules.clear();
 
-	delete[] AutoCastActive;
+	delete[] this->AutoCastActive;
 
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (this->ResInfo[res]) {
@@ -667,12 +647,12 @@ CUnitType::~CUnitType()
 		}
 	}
 
-	CGraphic::Free(Sprite);
-	CGraphic::Free(ShadowSprite);
+	CGraphic::Free(this->Sprite);
+	CGraphic::Free(this->ShadowSprite);
 	//Wyrmgus start
-	CGraphic::Free(LightSprite);
+	CGraphic::Free(this->LightSprite);
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		CGraphic::Free(LayerSprites[i]);
+		CGraphic::Free(this->LayerSprites[i]);
 	}
 	//Wyrmgus end
 }
@@ -1620,6 +1600,15 @@ void CUnitType::UpdateDefaultBoolFlags()
 	this->BoolFlag[CANATTACK_INDEX].value = this->CanAttack;
 }
 
+CCivilization *CUnitType::GetCivilization() const
+{
+	if (this->Civilization != -1 && this->Civilization < (int) CCivilization::Civilizations.size()) {
+		return CCivilization::Civilizations[this->Civilization];
+	}
+		
+	return nullptr;
+}
+
 //Wyrmgus start
 void CUnitType::RemoveButtons(int button_action, std::string mod_file)
 {
@@ -1897,6 +1886,12 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 	return potential_names;
 }
 //Wyrmgus end
+
+
+void CUnitType::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_civilization"), &CUnitType::GetCivilization);
+}
 
 void UpdateUnitStats(CUnitType &type, int reset)
 {

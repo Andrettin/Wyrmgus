@@ -39,6 +39,7 @@
 #include "player.h"
 #include "player_color.h"
 #include "skin_color.h"
+#include "unit/unit_type.h"
 #include "wyrmgus.h"
 
 void register_wyrmgus_types()
@@ -52,6 +53,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CPlayer>();
 	ClassDB::register_class<CPlayerColor>();
 	ClassDB::register_class<CSkinColor>();
+	ClassDB::register_class<CUnitType>();
 	ClassDB::register_class<Wyrmgus>();
 }
 

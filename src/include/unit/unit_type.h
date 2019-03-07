@@ -42,6 +42,8 @@
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 
+#include <core/object.h>
+
 #include <algorithm>
 #include <climits>
 #include <cstring>
@@ -57,6 +59,7 @@
 ----------------------------------------------------------------------------*/
 
 class CAnimations;
+class CCivilization;
 class CConstruction;
 class CDependency;
 class CFile;
@@ -816,8 +819,10 @@ public:
 
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
-class CUnitType : public CDataType
+class CUnitType : public CDataType, public Object
 {
+	GDCLASS(CUnitType, Object)
+	
 public:
 	CUnitType();
 	~CUnitType();
@@ -839,8 +844,11 @@ public:
 
 	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const;
 	
-	//Wyrmgus start
 	void SetParent(CUnitType *parent_type);
+	
+	CCivilization *GetCivilization() const;
+	
+	//Wyrmgus start
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
 	void UpdateDefaultBoolFlags();
 	int GetAvailableLevelUpUpgrades() const;
@@ -860,18 +868,18 @@ public:
 public:
 	std::string Name;               /// Pretty name shown from the engine
 	bool Initialized = false;
-	CUnitType *Parent;				/// Parent unit type
+	CUnitType *Parent = nullptr;	/// Parent unit type
 	//Wyrmgus start
-	int Class;						/// Class identifier (i.e. infantry, archer, etc.)
-	int Civilization;				/// Which civilization this unit belongs to, if any
-	int Faction;					/// Which faction this unit belongs to, if any
+	int Class = -1;					/// Class identifier (i.e. infantry, archer, etc.)
+	int Civilization = -1;			/// Which civilization this unit belongs to, if any
+	int Faction = -1;				/// Which faction this unit belongs to, if any
 	std::string Description;		/// Description of the unit type
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type
 	std::string RequirementsString;	/// Requirements string of the unit type
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type
-	CUpgrade *Elixir;						/// Which elixir does this (item) unit type always have
+	CUpgrade *Elixir = nullptr;				/// Which elixir does this (item) unit type always have
 	std::vector<CUnitType *> SoldUnits;		/// Units which this unit can sell.
 	std::vector<CUnitType *> SpawnUnits;	/// Units which this unit can spawn.
 	std::vector<CUnitType *> Drops;			/// Units which can spawn upon death (i.e. items).
@@ -886,131 +894,125 @@ public:
 	std::map<std::string, std::vector<CUnitType *>> ModTrainedBy;	/// Units which can train this unit (as set in a mod)
 	std::map<std::string, std::vector<CUnitType *>> ModAiDrops;	/// Units dropped by this unit, if it is AI-controlled (as set in a mod)
 	//Wyrmgus end
-	int Slot;                       /// Type as number
-	std::string File;               /// Sprite files
-	std::string ShadowFile;         /// Shadow file
+	int Slot = 0;					/// Type as number
+	std::string File;				/// Sprite files
+	std::string ShadowFile;			/// Shadow file
 	//Wyrmgus start
 	std::string LightFile;			/// Light file
 	std::string LayerFiles[MaxImageLayers];	/// Layer files
-	std::map<int, IconConfig> ButtonIcons;					/// icons for button actions
-	std::map<int, CUnitType *> DefaultEquipment;			/// default equipment for the unit type, mapped to item slots
+	std::map<int, IconConfig> ButtonIcons;				/// icons for button actions
+	std::map<int, CUnitType *> DefaultEquipment;		/// default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
 
-	int Width;                                            /// Sprite width
-	int Height;                                           /// Sprite height
-	int OffsetX;                                          /// Sprite horizontal offset
-	int OffsetY;                                          /// Sprite vertical offset
-	int DrawLevel;                                        /// Level to Draw UnitType at
-	int ShadowWidth;                                      /// Shadow sprite width
-	int ShadowHeight;                                     /// Shadow sprite height
-	int ShadowOffsetX;                                    /// Shadow horizontal offset
-	int ShadowOffsetY;                                    /// Shadow vertical offset
+	int Width = 0;										/// Sprite width
+	int Height = 0;										/// Sprite height
+	int OffsetX = 0;									/// Sprite horizontal offset
+	int OffsetY = 0;									/// Sprite vertical offset
+	int DrawLevel = 0;									/// Level to Draw UnitType at
+	int ShadowWidth = 0;								/// Shadow sprite width
+	int ShadowHeight = 0;								/// Shadow sprite height
+	int ShadowOffsetX = 0;								/// Shadow horizontal offset
+	int ShadowOffsetY = 0;								/// Shadow vertical offset
 	//Wyrmgus start
-	int TrainQuantity;										/// Quantity to be trained
-	int CostModifier;										/// Cost modifier (cost increase for every unit of this type the player has)
-	int ItemClass;											/// Item class (if the unit type is an item)
-	CSpecies *Species;
-	CTerrainType *TerrainType;
-	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
+	int TrainQuantity = 0;								/// Quantity to be trained
+	int CostModifier = 0;								/// Cost modifier (cost increase for every unit of this type the player has)
+	int ItemClass = -1;									/// Item class (if the unit type is an item)
+	CSpecies *Species = nullptr;
+	CTerrainType *TerrainType = nullptr;
+	std::vector<int> WeaponClasses;						/// Weapon classes that the unit type can use (if the unit type uses a weapon)
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
-	CAnimations *Animations;        /// Animation scripts
-	int StillFrame;                 /// Still frame
+	CAnimations *Animations = nullptr;	/// Animation scripts
+	int StillFrame = 0;					/// Still frame
 
-	IconConfig Icon;                /// Icon to display for this unit
-	MissileConfig Missile;                           /// Missile weapon
+	IconConfig Icon;				/// Icon to display for this unit
+	MissileConfig Missile;			/// Missile weapon
 	//Wyrmgus start
-	MissileConfig FireMissile;						 /// Missile weapon if the unit has fire damage
+	MissileConfig FireMissile;		/// Missile weapon if the unit has fire damage
 	//Wyrmgus end
-	MissileConfig Explosion;                         /// Missile for unit explosion
-	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2]; /// Missiles spawned if unit is hit(+shield)
+	MissileConfig Explosion;		/// Missile for unit explosion
+	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2];	/// Missiles spawned if unit is hit(+shield)
 
-	LuaCallback *DeathExplosion;
-	LuaCallback *OnHit;             /// lua function called when unit is hit
-	LuaCallback *OnEachCycle;       /// lua function called every cycle
-	LuaCallback *OnEachSecond;      /// lua function called every second
-	LuaCallback *OnInit;            /// lua function called on unit init
+	LuaCallback *DeathExplosion = nullptr;
+	LuaCallback *OnHit = nullptr;			/// lua function called when unit is hit
+	LuaCallback *OnEachCycle = nullptr;		/// lua function called every cycle
+	LuaCallback *OnEachSecond = nullptr;	/// lua function called every second
+	LuaCallback *OnInit = nullptr;			/// lua function called on unit init
 
-	int TeleportCost;               /// mana used for teleportation
-	LuaCallback *TeleportEffectIn;   /// lua function to create effects before teleportation
-	LuaCallback *TeleportEffectOut;  /// lua function to create effects after teleportation
+	int TeleportCost = 0;						/// mana used for teleportation
+	LuaCallback *TeleportEffectIn = nullptr;	/// lua function to create effects before teleportation
+	LuaCallback *TeleportEffectOut = nullptr;	/// lua function to create effects after teleportation
 
-	mutable std::string DamageType; /// DamageType (used for extra death animations and impacts)
+	mutable std::string DamageType;	/// DamageType (used for extra death animations and impacts)
 
-	std::string CorpseName;         /// Corpse type name
-	CUnitType *CorpseType;          /// Corpse unit-type
+	std::string CorpseName;				/// Corpse type name
+	CUnitType *CorpseType = nullptr;	/// Corpse unit-type
 
-	CConstruction *Construction;    /// What is shown in construction phase
+	CConstruction *Construction = nullptr;	/// What is shown in construction phase
 
-	int RepairHP;                   /// Amount of HP per repair
-	int RepairCosts[MaxCosts];      /// How much it costs to repair
+	int RepairHP = 0;				/// Amount of HP per repair
+	int RepairCosts[MaxCosts];		/// How much it costs to repair
 
-	Vec2i TileSize;					/// Tile size
-	int BoxWidth;                   /// Selected box size width
-	int BoxHeight;                  /// Selected box size height
-	int BoxOffsetX;                 /// Selected box size horizontal offset
-	int BoxOffsetY;                 /// Selected box size vertical offset
-	int NumDirections;              /// Number of directions unit can face
-	int MinAttackRange;             /// Minimal attack range
-	//Wyrmgus start
-	/*
-	int ReactRangeComputer;         /// Reacts on enemy for computer
-	int ReactRangePerson;           /// Reacts on enemy for person player
-	*/
-	//Wyrmgus end
-	int BurnPercent;                /// Burning percent.
-	int BurnDamageRate;             /// HP burn rate per sec
-	int RepairRange;                /// Units repair range.
+	Vec2i TileSize = Vec2i(0, 0);	/// Tile size
+	int BoxWidth = 0;				/// Selected box size width
+	int BoxHeight = 0;				/// Selected box size height
+	int BoxOffsetX = 0;				/// Selected box size horizontal offset
+	int BoxOffsetY = 0;				/// Selected box size vertical offset
+	int NumDirections = 0;			/// Number of directions unit can face
+	int MinAttackRange = 0;			/// Minimal attack range
+	int BurnPercent = 0;			/// Burning percent.
+	int BurnDamageRate = 0;			/// HP burn rate per sec
+	int RepairRange = 0;			/// Units repair range.
 #define InfiniteRepairRange INT_MAX
 	std::vector<CSpell *> Spells;	/// Spells the unit is able to cast.
-	char *AutoCastActive;           /// Default value for autocast.
-	int AutoBuildRate;              /// The rate at which the building builds itself
-	int RandomMovementProbability;  /// Probability to move randomly.
-	int RandomMovementDistance;  	/// Quantity of tiles to move randomly.
-	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
-	int MaxOnBoard;                 /// Number of Transporter slots.
-	int BoardSize;                  /// How much "cells" unit occupies inside transporter
-	CButtonLevel *ButtonLevelForTransporter;  /// On which button level game will show units inside transporter
+	char *AutoCastActive = nullptr;	/// Default value for autocast.
+	int AutoBuildRate = 0;			/// The rate at which the building builds itself
+	int RandomMovementProbability = 0;	/// Probability to move randomly.
+	int RandomMovementDistance = 1;	/// Quantity of tiles to move randomly.
+	int ClicksToExplode = 0;		/// Number of consecutive clicks until unit suicides.
+	int MaxOnBoard = 0;				/// Number of Transporter slots.
+	int BoardSize = 1;				/// How many "cells" the unit occupies inside a transporter
+	CButtonLevel *ButtonLevelForTransporter = nullptr;	/// On which button level game will show units inside transporter
 	//Wyrmgus start
-	int ButtonPos;					/// Position of this unit as a train/build button
-	CButtonLevel *ButtonLevel;		/// Level of this unit's button
+	int ButtonPos = 0;				/// Position of this unit as a train/build button
+	CButtonLevel *ButtonLevel = nullptr;	/// Level of this unit's button
 	std::string ButtonPopup;		/// Popup of this unit's button
 	std::string ButtonHint;			/// Hint of this unit's button
 	std::string ButtonKey;			/// Hotkey of this unit's button
-//	int StartingResources;          /// Amount of Resources on build
-	std::vector<int> StartingResources;          /// Amount of Resources on build
+//	int StartingResources = 0;		/// Amount of Resources on build
+	std::vector<int> StartingResources;	/// Amount of Resources on build
 	//Wyrmgus end
 	/// originally only visual effect, we do more with this!
-	UnitTypeType UnitType;          /// Land / fly / naval
-	int DecayRate;                  /// Decay rate in 1/6 seconds
+	UnitTypeType UnitType = UnitTypeLand;	/// Land / fly / naval
+	int DecayRate = 0;				/// Decay rate in 1/6 seconds
 	// TODO: not used
-	int AnnoyComputerFactor;        /// How much this annoys the computer
-	int AiAdjacentRange;            /// Min radius for AI build surroundings checking
-	int MouseAction;                /// Right click action
-#define MouseActionNone      0      /// Nothing
-#define MouseActionAttack    1      /// Attack
-#define MouseActionMove      2      /// Move
-#define MouseActionHarvest   3      /// Harvest resources
-#define MouseActionSpellCast 5      /// Cast the first spell known
-#define MouseActionSail      6      /// Sail
+	int AnnoyComputerFactor = 0;	/// How much this annoys the computer
+	int AiAdjacentRange = -1;		/// Min radius for AI build surroundings checking
+	int MouseAction = 0;			/// Right click action
+#define MouseActionNone      0		/// Nothing
+#define MouseActionAttack    1		/// Attack
+#define MouseActionMove      2		/// Move
+#define MouseActionHarvest   3		/// Harvest resources
+#define MouseActionSpellCast 5		/// Cast the first spell known
+#define MouseActionSail      6		/// Sail
 //Wyrmgus start
 #define MouseActionRallyPoint 7		/// Rally point
 #define MouseActionTrade      8		/// Trade
 //Wyrmgus end
-	int CanTarget;                  /// Which units can it attack
-#define CanTargetLand 1             /// Can attack land units
-#define CanTargetSea  2             /// Can attack sea units
-#define CanTargetAir  4             /// Can attack air units
+	int CanTarget = 0;				/// Which units can it attack
+#define CanTargetLand 1				/// Can attack land units
+#define CanTargetSea  2				/// Can attack sea units
+#define CanTargetAir  4				/// Can attack air units
 
-	unsigned Flip : 1;              /// Flip image when facing left
-	unsigned LandUnit : 1;          /// Land animated
-	unsigned AirUnit : 1;           /// Air animated
-	unsigned SeaUnit : 1;           /// Sea animated
-	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
-	unsigned CanAttack : 1;         /// Unit can attack.
-	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
+	bool Flip = true;				/// Flip image when facing left
+	bool LandUnit = false;			/// Land animated
+	bool AirUnit = false;			/// Air animated
+	bool SeaUnit = false;			/// Sea animated
+	bool ExplodeWhenKilled = false;	/// Death explosion animated
+	bool CanAttack = false;			/// Unit can attack.
+	bool Neutral = false;			/// Unit is neutral, used by the editor
 
 	CUnitStats DefaultStat;
 	CUnitStats MapDefaultStat;
@@ -1018,26 +1020,26 @@ public:
 	std::map<std::string, CUnitStats> ModDefaultStats;
 	//Wyrmgus end
 	struct BoolFlags {
-		bool value;             /// User defined flag. Used for (dis)allow target.
-		char CanTransport;      /// Can transport units with this flag.
-		char CanTargetFlag;     /// Flag needed to target with missile.
-		char AiPriorityTarget;  /// Attack this units first.
+		bool value;				/// User defined flag. Used for (dis)allow target.
+		char CanTransport;		/// Can transport units with this flag.
+		char CanTargetFlag;		/// Flag needed to target with missile.
+		char AiPriorityTarget;	/// Attack this units first.
 	};
 	std::vector<BoolFlags> BoolFlag;
 
-	int CanStore[MaxCosts];             /// Resources that we can store here.
-	int GivesResource;                  /// The resource this unit gives.
+	int CanStore[MaxCosts];				/// Resources that we can store here.
+	int GivesResource = 0;				/// The resource this unit gives.
 	//Wyrmgus start
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode (used for buildings)
 	//Wyrmgus end
-	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
-	std::vector<CUnitTypeVariation *> Variations;						/// Variation information
+	ResourceInfo *ResInfo[MaxCosts];	/// Resource information.
+	std::vector<CUnitTypeVariation *> Variations;				/// Variation information
 	//Wyrmgus start
 	std::vector<CUnitTypeVariation *> LayerVariations[MaxImageLayers];	/// Layer variation information
 	//Wyrmgus end
-	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
-	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.
-	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
+	std::vector<CBuildRestriction *> BuildingRules;		/// Rules list for building a building.
+	std::vector<CBuildRestriction *> AiBuildingRules;	/// Rules list for for AI to build a building.
+	CColor NeutralMinimapColorRGB;	/// Minimap Color for Neutral Units.
 
 	CUnitSound Sound;				/// Sounds for events
 	CUnitSound MapSound;			/// Sounds for events, map-specific
@@ -1045,31 +1047,34 @@ public:
 	std::map<std::string, CUnitSound> ModSounds;
 	//Wyrmgus end
 
-	int PoisonDrain;                /// How much health is drained every second when poisoned
+	int PoisonDrain = 0;			/// How much health is drained every second when poisoned
 
 	// --- FILLED UP ---
 
 	//Wyrmgus start
-//	unsigned FieldFlags;            /// Unit map field flags
-//	unsigned MovementMask;          /// Unit check this map flags for move
-	unsigned long FieldFlags;            /// Unit map field flags
-	unsigned long MovementMask;          /// Unit check this map flags for move
+//	unsigned FieldFlags = 0;		/// Unit map field flags
+//	unsigned MovementMask = 0;		/// Unit check this map flags for move
+	unsigned long FieldFlags = 0;	/// Unit map field flags
+	unsigned long MovementMask = 0;	/// Unit check this map flags for move
 	//Wyrmgus end
 
 	/// @todo This stats should? be moved into the player struct
-	CUnitStats Stats[PlayerMax];     /// Unit status for each player
+	CUnitStats Stats[PlayerMax];	/// Unit status for each player
 
-	CPlayerColorGraphic *Sprite;     /// Sprite images
-	CGraphic *ShadowSprite;          /// Shadow sprite image
+	CPlayerColorGraphic *Sprite = nullptr;	/// Sprite images
+	CGraphic *ShadowSprite = nullptr;		/// Shadow sprite image
 	//Wyrmgus start
-	CGraphic *LightSprite;						/// Light sprite image
+	CGraphic *LightSprite = nullptr;		/// Light sprite image
 	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// Layer sprite images
 	
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
 	
-	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
+	std::string Mod;				/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end
+
+protected:
+	static void _bind_methods();
 };
 
 /*----------------------------------------------------------------------------
