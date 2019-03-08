@@ -828,18 +828,14 @@ public:
 public:
 	bool Visible[MAX_RACES];        /// race should be visible in pulldown
 	std::string Name[MAX_RACES];    /// race names
-	std::string Display[MAX_RACES]; /// text to display in pulldown
 	//Wyrmgus start
-	bool Playable[MAX_RACES];											/// civilization is playable?
-	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
+	bool Playable[MAX_RACES];											/// whether the civilization is playable
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	std::string CivilizationUpgrades[MAX_RACES];
 	std::map<int, int> CivilizationClassUnitTypes[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
 	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CFaction *> Factions;    								/// factions
-	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
-	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops
 	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	std::vector<CDynasty *> Dynasties;    								/// dynasties

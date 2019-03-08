@@ -242,13 +242,13 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 	});
 }
 
-std::string CCampaign::GetSpecies() const
+CSpecies *CCampaign::GetSpecies() const
 {
 	if (this->Faction && this->Faction->Civilization) {
-		return PlayerRaces.Species[this->Faction->Civilization->ID];
+		return this->Faction->Civilization->GetSpecies();
 	}
 	
-	return std::string();
+	return nullptr;
 }
 
 bool CCampaign::IsAvailable() const

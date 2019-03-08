@@ -415,17 +415,13 @@ void PlayerRace::Clean()
 	//Wyrmgus end
 	for (size_t i = 0; i != CCivilization::Civilizations.size(); ++i) {
 		this->Name[i].clear();
-		this->Display[i].clear();
 		this->Visible[i] = false;
 		//Wyrmgus start
 		this->CivilizationUpgrades[i].clear();
 		this->CivilizationClassUnitTypes[i].clear();
 		this->CivilizationClassUpgrades[i].clear();
 		this->Playable[i] = false;
-		this->Species[i].clear();
 		this->DefaultColor[i].clear();
-		this->DevelopsFrom[i].clear();
-		this->DevelopsTo[i].clear();
 		this->CivilizationUIFillers[i].clear();
 		//Wyrmgus end
 	}
@@ -1689,7 +1685,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && PlayerRaces.Species[unit.Type->GetCivilization()->ID] == PlayerRaces.Species[faction->Civilization->ID] && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->Civilization->GetSpecies() && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();

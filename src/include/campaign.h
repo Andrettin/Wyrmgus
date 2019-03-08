@@ -51,6 +51,7 @@
 class CFaction;
 class CMapTemplate;
 class CQuest;
+class CSpecies;
 class LuaCallback;
 struct lua_State;
 
@@ -108,7 +109,7 @@ public:
 		return this->Faction;
 	}
 	
-	std::string GetSpecies() const;
+	CSpecies *GetSpecies() const;
 	
 	bool IsHidden() const
 	{

@@ -54,6 +54,7 @@ class CDeity;
 class CForceTemplate;
 class CLanguage;
 class CQuest;
+class CSpecies;
 class CUpgrade;
 
 class CCivilization : public Object
@@ -74,6 +75,26 @@ public:
 	int GetForceTypeWeight(const int force_type) const;
 	
 	/**
+	**	@brief	Get the civilization's string identifier
+	**
+	**	@return	The civilization's string identifier
+	*/
+	String GetIdent() const
+	{
+		return this->Ident.c_str();
+	}
+	
+	/**
+	**	@brief	Get the civilization's name
+	**
+	**	@return	The civilization's name
+	*/
+	String GetName() const
+	{
+		return this->Name.c_str();
+	}
+	
+	/**
 	**	@brief	Get the string identifier for the civilization's interface
 	**
 	**	@return	The string identifier for the civilization's interface
@@ -81,6 +102,16 @@ public:
 	String GetInterface() const
 	{
 		return this->Interface.c_str();
+	}
+	
+	/**
+	**	@brief	Get the civilization's species
+	**
+	**	@return	The civilization's species
+	*/
+	CSpecies *GetSpecies() const
+	{
+		return this->Species;
 	}
 	
 	/**
@@ -165,17 +196,27 @@ public:
 	}
 	
 	int ID = -1;
-	CCivilization *ParentCivilization = nullptr;
+private:
 	std::string Ident;				/// ident of the civilization
+	std::string Name;				/// name of the civilization
+public:
+	CCivilization *ParentCivilization = nullptr;
 	std::string Description;		/// civilization description
 	std::string Quote;				/// civilization quote
 	std::string Background;			/// civilization background
 	std::string Adjective;			/// adjective pertaining to the civilization
+private:
 	std::string Interface;			/// the string identifier for the civilization's interface
+public:
 	CUnitSound UnitSounds;			/// sounds for unit events
+private:
+	CSpecies *Species = nullptr;	/// the civilization's species (e.g. human)
+public:
 	CLanguage *Language = nullptr;	/// the language used by the civilization
 	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
 	CCurrency *Currency = nullptr;	/// the currency used by the civilization
+	std::vector<CCivilization *> DevelopsFrom;	/// from which civilizations this civilization develops
+	std::vector<CCivilization *> DevelopsTo;	/// to which civilizations this civilization develops
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<const CUpgrade *, int> UpgradePriorities;		/// Priority for each upgrade
 	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;	/// Force templates, mapped to each force type
@@ -190,6 +231,8 @@ public:
 	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
+	
+	friend int CclDefineCivilization(lua_State *l);
 
 protected:
 	static void _bind_methods();

@@ -67,8 +67,8 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "video.h"
 #include "upgrade/upgrade.h"
+#include "video.h"
 //Wyrmgus start
 #include "ui/ui.h"
 #include "util.h"
@@ -801,7 +801,7 @@ static int CclDefineCivilization(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Display")) {
-			PlayerRaces.Display[civilization_id] = LuaToString(l, -1);
+			civilization->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			civilization->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
@@ -817,7 +817,10 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Playable")) {
 			PlayerRaces.Playable[civilization_id] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Species")) {
-			PlayerRaces.Species[civilization_id] = LuaToString(l, -1);
+			CSpecies *species = GetSpecies(LuaToString(l, -1));
+			if (species != nullptr) {
+				civilization->Species = species;
+			}
 		} else if (!strcmp(value, "ParentCivilization")) {
 			civilization->ParentCivilization = CCivilization::GetCivilization(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {
@@ -845,11 +848,11 @@ static int CclDefineCivilization(lua_State *l)
 			
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				std::string originary_civilization_name = LuaToString(l, -1, j + 1);
-				CCivilization *originary_civilization = CCivilization::GetCivilization(originary_civilization_name);
+				std::string originary_civilization_ident = LuaToString(l, -1, j + 1);
+				CCivilization *originary_civilization = CCivilization::GetCivilization(originary_civilization_ident);
 				if (originary_civilization) {
-					PlayerRaces.DevelopsFrom[civilization_id].push_back(originary_civilization->ID);
-					PlayerRaces.DevelopsTo[originary_civilization->ID].push_back(civilization_id);
+					civilization->DevelopsFrom.push_back(originary_civilization);
+					originary_civilization->DevelopsTo.push_back(civilization);
 				}
 			}
 		} else if (!strcmp(value, "ButtonIcons")) {
@@ -1585,7 +1588,7 @@ static int CclGetCivilizationData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Display")) {
-		lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
+		lua_pushstring(l, civilization->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, civilization->Description.c_str());
@@ -1600,28 +1603,32 @@ static int CclGetCivilizationData(lua_State *l)
 		if (!civilization->Adjective.empty()) {
 			lua_pushstring(l, civilization->Adjective.c_str());
 		} else {
-			lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
+			lua_pushstring(l, civilization->GetName().utf8().get_data());
 		}
 		return 1;
 	} else if (!strcmp(data, "Interface")) {
-		lua_pushstring(l, civilization->Interface.c_str());
+		lua_pushstring(l, civilization->GetInterface().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Playable[civilization_id]);
 		return 1;
 	} else if (!strcmp(data, "Species")) {
-		lua_pushstring(l, PlayerRaces.Species[civilization_id].c_str());
+		if (civilization->GetSpecies() != nullptr) {
+			lua_pushstring(l, civilization->GetSpecies()->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "ParentCivilization")) {
-		if (civilization->ParentCivilization) {
-			lua_pushstring(l, PlayerRaces.Name[civilization->ParentCivilization->ID].c_str());
+		if (civilization->ParentCivilization != nullptr) {
+			lua_pushstring(l, civilization->ParentCivilization->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Language")) {
 		CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization_id);
-		if (language) {
+		if (language != nullptr) {
 			lua_pushstring(l, language->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
@@ -1634,18 +1641,16 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_pushstring(l, PlayerRaces.CivilizationUpgrades[civilization_id].c_str());
 		return 1;
 	} else if (!strcmp(data, "DevelopsFrom")) {
-		lua_createtable(l, PlayerRaces.DevelopsFrom[civilization_id].size(), 0);
-		for (size_t i = 1; i <= PlayerRaces.DevelopsFrom[civilization_id].size(); ++i)
-		{
-			lua_pushstring(l, PlayerRaces.Name[PlayerRaces.DevelopsFrom[civilization_id][i-1]].c_str());
+		lua_createtable(l, civilization->DevelopsFrom.size(), 0);
+		for (size_t i = 1; i <= civilization->DevelopsFrom.size(); ++i) {
+			lua_pushstring(l, civilization->DevelopsFrom[i-1]->GetIdent().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else if (!strcmp(data, "DevelopsTo")) {
-		lua_createtable(l, PlayerRaces.DevelopsTo[civilization_id].size(), 0);
-		for (size_t i = 1; i <= PlayerRaces.DevelopsTo[civilization_id].size(); ++i)
-		{
-			lua_pushstring(l, PlayerRaces.Name[PlayerRaces.DevelopsTo[civilization_id][i-1]].c_str());
+		lua_createtable(l, civilization->DevelopsTo.size(), 0);
+		for (size_t i = 1; i <= civilization->DevelopsTo.size(); ++i) {
+			lua_pushstring(l, civilization->DevelopsTo[i-1]->GetIdent().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

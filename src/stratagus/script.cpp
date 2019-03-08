@@ -1386,7 +1386,7 @@ std::string EvalString(const StringDesc *s)
 				}
 				//Wyrmgus end
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		//Wyrmgus start
 		case EString_UnitTypeName : // name of the UnitType
@@ -1394,14 +1394,14 @@ std::string EvalString(const StringDesc *s)
 			if (unit != nullptr && !unit->GetName().empty() && ((unit->Prefix == nullptr && unit->Suffix == nullptr && unit->Spell == nullptr) || unit->Unique || unit->Work != nullptr || unit->Elixir != nullptr)) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
 				return unit->GetTypeName();
 			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
-				return std::string("");
+				return std::string();
 			}
 		case EString_UnitTrait : // name of the unit's trait
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Trait != nullptr) {
 				return _(unit->Trait->Name.c_str());
 			} else {
-				return std::string("");
+				return std::string();
 			}
 		case EString_UnitSpell : // name of the unit's spell
 			unit = EvalUnit(s->D.Unit);
@@ -1410,7 +1410,7 @@ std::string EvalString(const StringDesc *s)
 				spell_description[0] = tolower(spell_description[0]);
 				return unit->Spell->Name + " (" + spell_description + ")";
 			} else {
-				return std::string("");
+				return std::string();
 			}
 		case EString_UnitQuote : // unit's quote
 			unit = EvalUnit(s->D.Unit);
@@ -1427,7 +1427,7 @@ std::string EvalString(const StringDesc *s)
 					return unit->Unique->Quote;
 				}
 			} else {
-				return std::string("");
+				return std::string();
 			}
 		case EString_UnitSettlementName : // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit);
@@ -1438,14 +1438,14 @@ std::string EvalString(const StringDesc *s)
 				}
 				return unit->Settlement->GetCulturalName(civilization);
 			} else {
-				return std::string("");
+				return std::string();
 			}
 		case EString_UnitUniqueSet : // name of the unit's unique item set
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Unique && unit->Unique->Set) {
 				return unit->Unique->Set->Name;
 			} else {
-				return std::string("");
+				return std::string();
 			}
 		case EString_UnitUniqueSetItems : // names of the unit's unique item set's items
 			unit = EvalUnit(s->D.Unit);
@@ -1469,21 +1469,21 @@ std::string EvalString(const StringDesc *s)
 				}
 				return set_items_string;
 			} else {
-				return std::string("");
+				return std::string();
 			}
 		case EString_TypeName : // name of the unit type
 			type = s->D.Type;
 			if (type != nullptr) {
 				return (**type).Name;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_TypeIdent : // name of the unit type
 			type = s->D.Type;
 			if (type != nullptr) {
 				return (**type).Ident;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_TypeClass : // name of the unit type's class
 			type = s->D.Type;
@@ -1502,42 +1502,42 @@ std::string EvalString(const StringDesc *s)
 				}
 				return _(str.c_str());
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_TypeDescription : // name of the unit type's description
 			type = s->D.Type;
 			if (type != nullptr) {
 				return (**type).Description;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_TypeQuote : // name of the unit type's quote
 			type = s->D.Type;
 			if (type != nullptr) {
 				return (**type).Quote;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_TypeRequirementsString : // name of the unit type's requirements string
 			type = s->D.Type;
 			if (type != nullptr) {
 				return (**type).RequirementsString;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_TypeExperienceRequirementsString : // name of the unit type's experience requirements string
 			type = s->D.Type;
 			if (type != nullptr) {
 				return (**type).ExperienceRequirementsString;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_TypeBuildingRulesString : // name of the unit type's building rules string
 			type = s->D.Type;
 			if (type != nullptr) {
 				return (**type).BuildingRulesString;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_TypeImproveIncomes : // unit type's processing bonuses
 			type = s->D.Type;
@@ -1559,7 +1559,7 @@ std::string EvalString(const StringDesc *s)
 				}
 				return improve_incomes;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_TypeLuxuryDemand : // unit type's luxury demand
 			type = s->D.Type;
@@ -1580,47 +1580,47 @@ std::string EvalString(const StringDesc *s)
 				}
 				return luxury_demand;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_UpgradeCivilization : // name of the upgrade's civilization
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
 				if ((**upgrade).Civilization != -1) {
-					return PlayerRaces.Display[(**upgrade).Civilization];
+					return CCivilization::Civilizations[(**upgrade).Civilization]->GetName().utf8().get_data();
 				} else {
-					return std::string("");
+					return std::string();
 				}
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_UpgradeEffectsString : // upgrade's effects string
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
 				return (**upgrade).EffectsString;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_UpgradeRequirementsString : // upgrade's effects string
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
 				return (**upgrade).RequirementsString;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_UpgradeMaxLimit : // upgrade's max limit
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
 				return std::to_string((long long) (**upgrade).MaxLimit);
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_FactionCivilization : // name of the faction's civilization
 			faction = s->D.Faction;
 			
 			if (faction != nullptr) {
-				return PlayerRaces.Display[(**faction).Civilization->ID];
+				return (**faction).Civilization->GetName().utf8().get_data();
 			} else {
-				return std::string("");
+				return std::string();
 			}
 		case EString_FactionType : // the faction's type
 			faction = s->D.Faction;
@@ -1628,7 +1628,7 @@ std::string EvalString(const StringDesc *s)
 			if (faction != nullptr) {
 				return IdentToName(GetFactionTypeNameById((**faction).Type));
 			} else {
-				return std::string("");
+				return std::string();
 			}
 		case EString_FactionCoreSettlements : // the faction's core settlements
 			faction = s->D.Faction;
@@ -1653,21 +1653,21 @@ std::string EvalString(const StringDesc *s)
 				}
 				return settlements_string;
 			} else {
-				return std::string("");
+				return std::string();
 			}
 		case EString_ResourceIdent : // resource ident
 			resource = s->D.Resource;
 			if (resource != nullptr) {
 				return DefaultResourceNames[(**resource)];
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_ResourceName : // resource ident
 			resource = s->D.Resource;
 			if (resource != nullptr) {
 				return IdentToName(DefaultResourceNames[(**resource)]);
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_ResourceConversionRates : // unit type's processing bonuses
 			resource = s->D.Resource;
@@ -1692,7 +1692,7 @@ std::string EvalString(const StringDesc *s)
 				}
 				return conversion_rates;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_ResourceImproveIncomes : // unit type's processing bonuses
 			resource = s->D.Resource;
@@ -1724,7 +1724,7 @@ std::string EvalString(const StringDesc *s)
 				}
 				return improve_incomes;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		//Wyrmgus end
 		case EString_If : // cond ? True : False;
@@ -1733,7 +1733,7 @@ std::string EvalString(const StringDesc *s)
 			} else if (s->D.If.BFalse) {
 				return EvalString(s->D.If.BFalse);
 			} else {
-				return std::string("");
+				return std::string();
 			}
 		case EString_SubString : // substring(s, begin, end)
 			if (s->D.SubString.String != nullptr
@@ -1743,7 +1743,7 @@ std::string EvalString(const StringDesc *s)
 
 				begin = EvalNumber(s->D.SubString.Begin);
 				if ((unsigned) begin > tmp1.size() && begin > 0) {
-					return std::string("");
+					return std::string();
 				}
 				res = tmp1.c_str() + begin;
 				if (s->D.SubString.End) {
@@ -1756,11 +1756,11 @@ std::string EvalString(const StringDesc *s)
 				}
 				return res;
 			} else { // ERROR.
-				return std::string("");
+				return std::string();
 			}
 		case EString_Line : // line n of the string
 			if (s->D.Line.String == nullptr || (tmp1 = EvalString(s->D.Line.String)).empty()) {
-				return std::string(""); // ERROR.
+				return std::string(); // ERROR.
 			} else {
 				int line;
 				int maxlen;
@@ -1768,7 +1768,7 @@ std::string EvalString(const StringDesc *s)
 
 				line = EvalNumber(s->D.Line.Line);
 				if (line <= 0) {
-					return std::string("");
+					return std::string();
 				}
 				if (s->D.Line.MaxLen) {
 					maxlen = EvalNumber(s->D.Line.MaxLen);
@@ -1783,7 +1783,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_PlayerName : // player name
 			return std::string(CPlayer::Players[EvalNumber(s->D.PlayerName)]->Name);
 	}
-	return std::string("");
+	return std::string();
 }
 
 

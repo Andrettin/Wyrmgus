@@ -3282,18 +3282,18 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		return;
 	}
 	
-	int civilization_id = this->Type->GetCivilization() ? this->Type->GetCivilization()->ID : -1;
+	const CCivilization *civilization = this->Type->GetCivilization();
 	
 	CFaction *faction = nullptr;
 	if (this->Player->Faction != -1) {
 		faction = PlayerRaces.Factions[this->Player->Faction];
 		
-		if (civilization_id != -1 && civilization_id != faction->Civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization->ID] && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Type->Class)) {
-			civilization_id = faction->Civilization->ID;
+		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Type->Class)) {
+			civilization = faction->Civilization;
 		}
 	}
 	
-	CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization_id);
+	CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization ? civilization->ID : -1);
 	
 	if (this->Name.empty()) { //this is the first time the unit receives a name
 		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != nullptr && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
