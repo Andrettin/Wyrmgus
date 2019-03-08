@@ -66,9 +66,9 @@ CAge *CAge::CurrentAge = nullptr;
 */
 CAge *CAge::GetAge(const std::string &ident, const bool should_find)
 {
-	std::map<std::string, CAge *>::const_iterator find_iterator = AgesByIdent.find(ident);
+	std::map<std::string, CAge *>::const_iterator find_iterator = CAge::AgesByIdent.find(ident);
 	
-	if (find_iterator != AgesByIdent.end()) {
+	if (find_iterator != CAge::AgesByIdent.end()) {
 		return find_iterator->second;
 	}
 	

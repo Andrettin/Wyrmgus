@@ -71,20 +71,98 @@ public:
 	static std::map<std::string, CCivilization *> CivilizationsByIdent;
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
-	int GetForceTypeWeight(int force_type) const;
+	int GetForceTypeWeight(const int force_type) const;
 	
+	/**
+	**	@brief	Get the string identifier for the civilization's interface
+	**
+	**	@return	The string identifier for the civilization's interface
+	*/
 	String GetInterface() const
 	{
 		return this->Interface.c_str();
 	}
 	
+	/**
+	**	@brief	Get the calendar for the civilization
+	**
+	**	@return	The civilization's calendar
+	*/
 	CCalendar *GetCalendar() const;
-	CCurrency *GetCurrency() const;
-	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
-	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
-	std::map<int, std::vector<std::string>> &GetPersonalNames();
-	std::vector<std::string> &GetUnitClassNames(int class_id);
-	std::vector<std::string> &GetShipNames();
+	
+	/**
+	**	@brief	Get the civilization's currency
+	**
+	**	@return	The civilization's currency
+	*/
+	CCurrency *GetCurrency() const
+	{
+		if (this->Currency) {
+			return this->Currency;
+		}
+		
+		if (this->ParentCivilization) {
+			return this->ParentCivilization->GetCurrency();
+		}
+		
+		return nullptr;
+	}
+	
+	std::vector<CForceTemplate *> GetForceTemplates(const int force_type) const;
+	
+	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const
+	{
+		if (this->AiBuildingTemplates.size() > 0) {
+			return this->AiBuildingTemplates;
+		}
+		
+		if (this->ParentCivilization) {
+			return this->ParentCivilization->GetAiBuildingTemplates();
+		}
+		
+		return std::vector<CAiBuildingTemplate *>();
+	}
+	
+	const std::map<int, std::vector<std::string>> &GetPersonalNames() const
+	{
+		if (this->PersonalNames.size() > 0) {
+			return this->PersonalNames;
+		}
+		
+		if (this->ParentCivilization) {
+			return this->ParentCivilization->GetPersonalNames();
+		}
+		
+		return this->PersonalNames;
+	}
+
+	std::vector<std::string> GetUnitClassNames(const int class_id) const
+	{
+		std::map<int, std::vector<std::string>>::const_iterator find_iterator = this->UnitClassNames.find(class_id);
+		
+		if (find_iterator != this->UnitClassNames.end() && !find_iterator->second.empty()) {
+			return find_iterator->second;
+		}
+		
+		if (this->ParentCivilization != nullptr) {
+			return this->ParentCivilization->GetUnitClassNames(class_id);
+		}
+		
+		return std::vector<std::string>();
+	}
+	
+	const std::vector<std::string> &GetShipNames() const
+	{
+		if (!this->ShipNames.empty()) {
+			return this->ShipNames;
+		}
+		
+		if (this->ParentCivilization) {
+			return this->ParentCivilization->GetShipNames();
+		}
+		
+		return this->ShipNames;
+	}
 	
 	int ID = -1;
 	CCivilization *ParentCivilization = nullptr;

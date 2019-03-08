@@ -248,28 +248,34 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	
 	//Wyrmgus start
 	//change the civilization/faction upgrade markers for those of the new type
-	if (oldtype.Civilization != -1 && !PlayerRaces.CivilizationUpgrades[oldtype.Civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[oldtype.Civilization]);
-		if (civilization_upgrade) {
-			unit.SetIndividualUpgrade(civilization_upgrade, 0);
+	if (oldtype.GetCivilization() != nullptr) {
+		if (!PlayerRaces.CivilizationUpgrades[oldtype.GetCivilization()->ID].empty()) {
+			CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[oldtype.GetCivilization()->ID]);
+			if (civilization_upgrade) {
+				unit.SetIndividualUpgrade(civilization_upgrade, 0);
+			}
+		}
+		
+		if (oldtype.Faction != -1 && !PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade.empty()) {
+			CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade);
+			if (faction_upgrade) {
+				unit.SetIndividualUpgrade(faction_upgrade, 0);
+			}
 		}
 	}
-	if (oldtype.Civilization != -1 && oldtype.Faction != -1 && !PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade);
-		if (faction_upgrade) {
-			unit.SetIndividualUpgrade(faction_upgrade, 0);
+	
+	if (newtype.GetCivilization() != nullptr) {
+		if (!PlayerRaces.CivilizationUpgrades[newtype.GetCivilization()->ID].empty()) {
+			CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[newtype.GetCivilization()->ID]);
+			if (civilization_upgrade) {
+				unit.SetIndividualUpgrade(civilization_upgrade, 1);
+			}
 		}
-	}
-	if (newtype.Civilization != -1 && !PlayerRaces.CivilizationUpgrades[newtype.Civilization].empty()) {
-		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[newtype.Civilization]);
-		if (civilization_upgrade) {
-			unit.SetIndividualUpgrade(civilization_upgrade, 1);
-		}
-	}
-	if (newtype.Civilization != -1 && newtype.Faction != -1 && !PlayerRaces.Factions[newtype.Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[newtype.Faction]->FactionUpgrade);
-		if (faction_upgrade) {
-			unit.SetIndividualUpgrade(faction_upgrade, 1);
+		if (newtype.Faction != -1 && !PlayerRaces.Factions[newtype.Faction]->FactionUpgrade.empty()) {
+			CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[newtype.Faction]->FactionUpgrade);
+			if (faction_upgrade) {
+				unit.SetIndividualUpgrade(faction_upgrade, 1);
+			}
 		}
 	}
 	
@@ -290,12 +296,12 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		&& (
 			oldtype.PersonalNames != newtype.PersonalNames
 			|| (
-				oldtype.Civilization != -1 && newtype.Civilization != -1 && oldtype.Civilization != newtype.Civilization
+				oldtype.GetCivilization() != nullptr && newtype.GetCivilization() != nullptr && oldtype.GetCivilization() != newtype.GetCivilization()
 				&& (
 					newtype.BoolFlag[ORGANIC_INDEX].value
 					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeNaval)
-					|| (CCivilization::Civilizations[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != CCivilization::Civilizations[newtype.Civilization]->GetUnitClassNames(newtype.Class))
-					|| (CCivilization::Civilizations[oldtype.Civilization]->GetUnitClassNames(oldtype.Class) != CCivilization::Civilizations[player.Race]->GetUnitClassNames(newtype.Class))
+					|| (oldtype.GetCivilization()->GetUnitClassNames(oldtype.Class) != newtype.GetCivilization()->GetUnitClassNames(newtype.Class))
+					|| (oldtype.GetCivilization()->GetUnitClassNames(oldtype.Class) != CCivilization::Civilizations[player.Race]->GetUnitClassNames(newtype.Class))
 				)
 			)
 		)

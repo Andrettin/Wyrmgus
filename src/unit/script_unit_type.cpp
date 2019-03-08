@@ -1756,7 +1756,7 @@ static int CclDefineUnitType(lua_State *l)
 			std::string civilization_name = LuaToString(l, -1);
 			CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
 			if (civilization) {
-				type->Civilization = civilization->ID;
+				type->Civilization = civilization;
 			}
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
@@ -1975,18 +1975,14 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		}
 		
-		if (type->Civilization != -1) {
-			int civilization_id = type->Civilization;
-			
+		if (type->GetCivilization() != nullptr && class_id != -1) {
 			if (type->Faction != -1) {
 				int faction_id = type->Faction;
-				if (faction_id != -1 && class_id != -1) {
+				if (faction_id != -1) {
 					PlayerRaces.Factions[faction_id]->ClassUnitTypes[class_id] = type->Slot;
 				}
 			} else {
-				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = type->Slot;
-				}
+				PlayerRaces.CivilizationClassUnitTypes[type->GetCivilization()->ID][class_id] = type->Slot;
 			}
 		}
 	}
@@ -2416,8 +2412,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (type->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[type->Civilization].c_str());
+		if (type->GetCivilization() != nullptr) {
+			lua_pushstring(l, PlayerRaces.Name[type->GetCivilization()->ID].c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

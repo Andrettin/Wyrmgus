@@ -852,7 +852,10 @@ public:
 	
 	void SetParent(CUnitType *parent_type);
 	
-	CCivilization *GetCivilization() const;
+	CCivilization *GetCivilization() const
+	{
+		return this->Civilization;
+	}
 	
 	//Wyrmgus start
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
@@ -877,7 +880,9 @@ public:
 	CUnitType *Parent = nullptr;	/// Parent unit type
 	//Wyrmgus start
 	int Class = -1;					/// Class identifier (i.e. infantry, archer, etc.)
-	int Civilization = -1;			/// Which civilization this unit belongs to, if any
+private:
+	CCivilization *Civilization = nullptr;	/// Which civilization this unit belongs to, if any
+public:
 	int Faction = -1;				/// Which faction this unit belongs to, if any
 	std::string Description;		/// Description of the unit type
 	std::string Quote;				/// Quote of the unit type
@@ -1074,6 +1079,8 @@ public:
 	
 	std::string Mod;				/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end
+	
+	friend int CclDefineUnitType(lua_State *l);
 
 protected:
 	static void _bind_methods();

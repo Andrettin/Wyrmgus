@@ -116,13 +116,13 @@
 	//Wyrmgus start
 	if (this->NewForm == nullptr) {
 		int new_unit_type = -1;
-		if (this->Civilization != -1 && this->Faction != -1 && this->Civilization == target->Type->Civilization) { //get faction equivalent, if is of the same civilization
+		if (this->Civilization != -1 && this->Faction != -1 && CCivilization::Civilizations[this->Civilization] == target->Type->GetCivilization()) { //get faction equivalent, if is of the same civilization
 			new_unit_type = PlayerRaces.GetFactionClassUnitType(this->Faction, target->Type->Class);
-		} else if (this->Civilization != -1 && this->Civilization != target->Type->Civilization) {
+		} else if (this->Civilization != -1 && CCivilization::Civilizations[this->Civilization] != target->Type->GetCivilization()) {
 			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Civilization, target->Type->Class);
 		}
-		if (this->Detachment && target->Type->Civilization != -1 && target->Type->Faction != -1) {
-			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(target->Type->Civilization, target->Type->Class);
+		if (this->Detachment && target->Type->GetCivilization() != nullptr && target->Type->Faction != -1) {
+			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(target->Type->GetCivilization()->ID, target->Type->Class);
 		}
 		if (new_unit_type != -1) {
 			type = CUnitType::UnitTypes[new_unit_type];

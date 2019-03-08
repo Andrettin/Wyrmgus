@@ -637,7 +637,7 @@ public:
 	CCurrency *GetCurrency() const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
-	std::vector<std::string> &GetShipNames();
+	const std::vector<std::string> &GetShipNames() const;
 
 	std::string Ident;													/// faction name
 	std::string Name;

@@ -1432,11 +1432,11 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitSettlementName : // name of the unit's settlement
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Settlement != nullptr && unit->Settlement->SiteUnit != nullptr) {
-				int civilization = unit->Settlement->SiteUnit->Type->Civilization;
-				if (civilization != -1 && unit->Settlement->SiteUnit->Player->Faction != -1 && (unit->Settlement->SiteUnit->Player->Race == civilization || unit->Settlement->SiteUnit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->Faction, unit->Settlement->SiteUnit->Type->Class))) {
-					civilization = unit->Settlement->SiteUnit->Player->Race;
+				const CCivilization *civilization = unit->Settlement->SiteUnit->Type->GetCivilization();
+				if (civilization != nullptr && unit->Settlement->SiteUnit->Player->Faction != -1 && (CCivilization::Civilizations[unit->Settlement->SiteUnit->Player->Race] == civilization || unit->Settlement->SiteUnit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->Faction, unit->Settlement->SiteUnit->Type->Class))) {
+					civilization = CCivilization::Civilizations[unit->Settlement->SiteUnit->Player->Race];
 				}
-				return unit->Settlement->GetCulturalName(civilization != -1 ? CCivilization::Civilizations[civilization] : nullptr);
+				return unit->Settlement->GetCulturalName(civilization);
 			} else {
 				return std::string("");
 			}

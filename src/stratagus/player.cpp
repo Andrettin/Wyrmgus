@@ -787,7 +787,7 @@ std::vector<CAiBuildingTemplate *> CFaction::GetAiBuildingTemplates() const
 	return this->Civilization->GetAiBuildingTemplates();
 }
 
-std::vector<std::string> &CFaction::GetShipNames()
+const std::vector<std::string> &CFaction::GetShipNames() const
 {
 	if (this->ShipNames.size() > 0) {
 		return this->ShipNames;
@@ -1689,7 +1689,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->Civilization != -1 && PlayerRaces.Species[unit.Type->Civilization] == PlayerRaces.Species[faction->Civilization->ID] && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && PlayerRaces.Species[unit.Type->GetCivilization()->ID] == PlayerRaces.Species[faction->Civilization->ID] && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();

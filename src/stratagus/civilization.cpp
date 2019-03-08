@@ -59,8 +59,10 @@ std::map<std::string, CCivilization *> CCivilization::CivilizationsByIdent;
 */
 CCivilization *CCivilization::GetCivilization(const std::string &ident, const bool should_find)
 {
-	if (CivilizationsByIdent.find(ident) != CivilizationsByIdent.end()) {
-		return CivilizationsByIdent.find(ident)->second;
+	std::map<std::string, CCivilization *>::const_iterator find_iterator = CCivilization::CivilizationsByIdent.find(ident);
+	
+	if (find_iterator != CCivilization::CivilizationsByIdent.end()) {
+		return find_iterator->second;
 	}
 	
 	if (should_find) {
@@ -79,14 +81,14 @@ CCivilization *CCivilization::GetCivilization(const std::string &ident, const bo
 */
 CCivilization *CCivilization::GetOrAddCivilization(const std::string &ident)
 {
-	CCivilization *civilization = GetCivilization(ident, false);
+	CCivilization *civilization = CCivilization::GetCivilization(ident, false);
 	
 	if (!civilization) {
 		civilization = new CCivilization;
 		civilization->Ident = ident;
-		civilization->ID = Civilizations.size();
-		Civilizations.push_back(civilization);
-		CivilizationsByIdent[ident] = civilization;
+		civilization->ID = CCivilization::Civilizations.size();
+		CCivilization::Civilizations.push_back(civilization);
+		CCivilization::CivilizationsByIdent[ident] = civilization;
 		
 		PlayerRaces.Name[civilization->ID] = ident;
 		PlayerRaces.Playable[civilization->ID] = true; //civilizations are playable by default
@@ -100,10 +102,10 @@ CCivilization *CCivilization::GetOrAddCivilization(const std::string &ident)
 */
 void CCivilization::ClearCivilizations()
 {
-	for (size_t i = 0; i < Civilizations.size(); ++i) {
-		delete Civilizations[i];
+	for (CCivilization *civilization : CCivilization::Civilizations) {
+		delete civilization;
 	}
-	Civilizations.clear();
+	CCivilization::Civilizations.clear();
 }
 
 /**
@@ -112,13 +114,13 @@ void CCivilization::ClearCivilizations()
 CCivilization::~CCivilization()
 {
 	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
-		for (size_t i = 0; i < iterator->second.size(); ++i) {
-			delete iterator->second[i];
+		for (CForceTemplate *force_template : iterator->second) {
+			delete force_template;
 		}
 	}
 	
-	for (size_t i = 0; i < this->AiBuildingTemplates.size(); ++i) {
-		delete this->AiBuildingTemplates[i];
+	for (CAiBuildingTemplate *ai_building_template : this->AiBuildingTemplates) {
+		delete ai_building_template;
 	}
 }
 
@@ -128,21 +130,23 @@ int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
 		fprintf(stderr, "Error in CCivilization::GetUpgradePriority: the upgrade is null.\n");
 	}
 	
-	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {
-		return this->UpgradePriorities.find(upgrade)->second;
+	std::map<const CUpgrade *, int>::const_iterator find_iterator = this->UpgradePriorities.find(upgrade);
+	if (find_iterator != this->UpgradePriorities.end()) {
+		return find_iterator->second;
 	}
 	
 	return 100;
 }
 
-int CCivilization::GetForceTypeWeight(int force_type) const
+int CCivilization::GetForceTypeWeight(const int force_type) const
 {
 	if (force_type == -1) {
 		fprintf(stderr, "Error in CCivilization::GetForceTypeWeight: the force_type is -1.\n");
 	}
 	
-	if (this->ForceTypeWeights.find(force_type) != this->ForceTypeWeights.end()) {
-		return this->ForceTypeWeights.find(force_type)->second;
+	std::map<int, int>::const_iterator find_iterator = this->ForceTypeWeights.find(force_type);
+	if (find_iterator != this->ForceTypeWeights.end()) {
+		return find_iterator->second;
 	}
 	
 	if (this->ParentCivilization) {
@@ -170,32 +174,15 @@ CCalendar *CCivilization::GetCalendar() const
 	return CCalendar::BaseCalendar;
 }
 
-/**
-**	@brief	Get the civilization's currency
-**
-**	@return	The civilization's currency
-*/
-CCurrency *CCivilization::GetCurrency() const
-{
-	if (this->Currency) {
-		return this->Currency;
-	}
-	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetCurrency();
-	}
-	
-	return nullptr;
-}
-
-std::vector<CForceTemplate *> CCivilization::GetForceTemplates(int force_type) const
+std::vector<CForceTemplate *> CCivilization::GetForceTemplates(const int force_type) const
 {
 	if (force_type == -1) {
 		fprintf(stderr, "Error in CCivilization::GetForceTemplates: the force_type is -1.\n");
 	}
 	
-	if (this->ForceTemplates.find(force_type) != this->ForceTemplates.end()) {
-		return this->ForceTemplates.find(force_type)->second;
+	std::map<int, std::vector<CForceTemplate *>>::const_iterator find_iterator = this->ForceTemplates.find(force_type);
+	if (find_iterator != this->ForceTemplates.end()) {
+		return find_iterator->second;
 	}
 	
 	if (this->ParentCivilization) {
@@ -203,58 +190,6 @@ std::vector<CForceTemplate *> CCivilization::GetForceTemplates(int force_type) c
 	}
 	
 	return std::vector<CForceTemplate *>();
-}
-
-std::vector<CAiBuildingTemplate *> CCivilization::GetAiBuildingTemplates() const
-{
-	if (this->AiBuildingTemplates.size() > 0) {
-		return this->AiBuildingTemplates;
-	}
-	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetAiBuildingTemplates();
-	}
-	
-	return std::vector<CAiBuildingTemplate *>();
-}
-
-std::map<int, std::vector<std::string>> &CCivilization::GetPersonalNames()
-{
-	if (this->PersonalNames.size() > 0) {
-		return this->PersonalNames;
-	}
-	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetPersonalNames();
-	}
-	
-	return this->PersonalNames;
-}
-
-std::vector<std::string> &CCivilization::GetUnitClassNames(int class_id)
-{
-	if (this->UnitClassNames[class_id].size() > 0) {
-		return this->UnitClassNames[class_id];
-	}
-	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetUnitClassNames(class_id);
-	}
-	
-	return this->UnitClassNames[class_id];
-}
-
-std::vector<std::string> &CCivilization::GetShipNames()
-{
-	if (this->ShipNames.size() > 0) {
-		return this->ShipNames;
-	}
-	
-	if (this->ParentCivilization) {
-		return this->ParentCivilization->GetShipNames();
-	}
-	
-	return this->ShipNames;
 }
 
 void CCivilization::_bind_methods()

@@ -46,6 +46,7 @@
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
+#include "civilization.h"
 #include "commands.h"
 #include "construct.h"
 #include "editor.h"
@@ -610,8 +611,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (!type.Name.empty() && (!type.Parent || type.Name != type.Parent->Name)) {
 				f->printf("\tName = \"%s\",\n", type.Name.c_str());
 			}
-			if (type.Civilization != -1) {
-				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[type.Civilization].c_str());
+			if (type.GetCivilization() != nullptr) {
+				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[type.GetCivilization()->ID].c_str());
 			}
 			if (type.Faction != -1) {
 				f->printf("\tFaction = \"%s\",\n", PlayerRaces.Factions[type.Faction]->Ident.c_str());

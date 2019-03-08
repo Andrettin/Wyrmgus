@@ -172,12 +172,12 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 //			return unit.Type->MapSound.Acknowledgement.Sound;
 			if (unit.Type->MapSound.Acknowledgement.Sound) {
 				return unit.Type->MapSound.Acknowledgement.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
-					civilization = unit.Player->Race;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->GetCivilization() != nullptr) {
+				const CCivilization *civilization = unit.Type->GetCivilization();
+				if (unit.Player->Race != -1 && CCivilization::Civilizations[unit.Player->Race] != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
+					civilization = CCivilization::Civilizations[unit.Player->Race];
 				}
-				return CCivilization::Civilizations[civilization]->UnitSounds.Acknowledgement.Sound;
+				return civilization->UnitSounds.Acknowledgement.Sound;
 			} else {
 				return nullptr;
 			}
@@ -186,13 +186,13 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			if (unit.Type->MapSound.Attack.Sound) {
 				return unit.Type->MapSound.Attack.Sound;
 			//Wyrmgus start
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
-					civilization = unit.Player->Race;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->GetCivilization() != nullptr) {
+				const CCivilization *civilization = unit.Type->GetCivilization();
+				if (unit.Player->Race != -1 && CCivilization::Civilizations[unit.Player->Race] != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
+					civilization = CCivilization::Civilizations[unit.Player->Race];
 				}
-				if (CCivilization::Civilizations[civilization]->UnitSounds.Attack.Sound) {
-					return CCivilization::Civilizations[civilization]->UnitSounds.Attack.Sound;
+				if (civilization->UnitSounds.Attack.Sound) {
+					return civilization->UnitSounds.Attack.Sound;
 				} else {
 					return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
 				}
@@ -239,13 +239,13 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			if (unit.Type->MapSound.Build.Sound) {
 				return unit.Type->MapSound.Build.Sound;
 			//Wyrmgus start
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
-					civilization = unit.Player->Race;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->GetCivilization() != nullptr) {
+				const CCivilization *civilization = unit.Type->GetCivilization();
+				if (unit.Player->Race != -1 && CCivilization::Civilizations[unit.Player->Race] != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
+					civilization = CCivilization::Civilizations[unit.Player->Race];
 				}
-				if (CCivilization::Civilizations[civilization]->UnitSounds.Build.Sound) {
-					return CCivilization::Civilizations[civilization]->UnitSounds.Build.Sound;
+				if (civilization->UnitSounds.Build.Sound) {
+					return civilization->UnitSounds.Build.Sound;
 				} else {
 					return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
 				}
@@ -259,12 +259,12 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 //			return unit.Type->MapSound.Ready.Sound;
 			if (unit.Type->MapSound.Ready.Sound) {
 				return unit.Type->MapSound.Ready.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
-					civilization = unit.Player->Race;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->GetCivilization() != nullptr) {
+				const CCivilization *civilization = unit.Type->GetCivilization();
+				if (unit.Player->Race != -1 && CCivilization::Civilizations[unit.Player->Race] != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
+					civilization = CCivilization::Civilizations[unit.Player->Race];
 				}
-				return CCivilization::Civilizations[civilization]->UnitSounds.Ready.Sound;
+				return civilization->UnitSounds.Ready.Sound;
 			} else {
 				return nullptr;
 			}
@@ -274,12 +274,12 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 //			return unit.Type->MapSound.Selected.Sound;
 			if (unit.Type->MapSound.Selected.Sound) {
 				return unit.Type->MapSound.Selected.Sound;
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
-					civilization = unit.Player->Race;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->GetCivilization() != nullptr) {
+				const CCivilization *civilization = unit.Type->GetCivilization();
+				if (unit.Player->Race != -1 && CCivilization::Civilizations[unit.Player->Race] != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
+					civilization = CCivilization::Civilizations[unit.Player->Race];
 				}
-				return CCivilization::Civilizations[civilization]->UnitSounds.Selected.Sound;
+				return civilization->UnitSounds.Selected.Sound;
 			} else {
 				return nullptr;
 			}
@@ -289,15 +289,15 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 //			return unit.Type->MapSound.Help.Sound;
 			if (unit.Type->MapSound.Help.Sound) {
 				return unit.Type->MapSound.Help.Sound;
-			} else if (unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
-					civilization = unit.Player->Race;
+			} else if (unit.Type->GetCivilization() != nullptr) {
+				const CCivilization *civilization = unit.Type->GetCivilization();
+				if (unit.Player->Race != -1 && CCivilization::Civilizations[unit.Player->Race] != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
+					civilization = CCivilization::Civilizations[unit.Player->Race];
 				}
-				if (unit.Type->BoolFlag[BUILDING_INDEX].value && CCivilization::Civilizations[civilization]->UnitSounds.HelpTown.Sound) {
-					return CCivilization::Civilizations[civilization]->UnitSounds.HelpTown.Sound;
+				if (unit.Type->BoolFlag[BUILDING_INDEX].value && civilization->UnitSounds.HelpTown.Sound) {
+					return civilization->UnitSounds.HelpTown.Sound;
 				} else {
-					return CCivilization::Civilizations[civilization]->UnitSounds.Help.Sound;
+					return civilization->UnitSounds.Help.Sound;
 				}
 			} else {
 				return nullptr;
@@ -319,13 +319,13 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			if (unit.Type->MapSound.Repair.Sound) {
 				return unit.Type->MapSound.Repair.Sound;
 			//Wyrmgus start
-			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-				int civilization = unit.Type->Civilization;
-				if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
-					civilization = unit.Player->Race;
+			} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->GetCivilization() != nullptr) {
+				const CCivilization *civilization = unit.Type->GetCivilization();
+				if (unit.Player->Race != -1 && CCivilization::Civilizations[unit.Player->Race] != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
+					civilization = CCivilization::Civilizations[unit.Player->Race];
 				}
-				if (CCivilization::Civilizations[civilization]->UnitSounds.Repair.Sound) {
-					return CCivilization::Civilizations[civilization]->UnitSounds.Repair.Sound;
+				if (civilization->UnitSounds.Repair.Sound) {
+					return civilization->UnitSounds.Repair.Sound;
 				} else {
 					return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
 				}
@@ -343,13 +343,13 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 					if (unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound) {
 						return unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound;
 					//Wyrmgus start
-					} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->Civilization != -1) {
-						int civilization = unit.Type->Civilization;
-						if (unit.Player->Race != -1 && unit.Player->Race != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
-							civilization = unit.Player->Race;
+					} else if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->GetCivilization() != nullptr) {
+						const CCivilization *civilization = unit.Type->GetCivilization();
+						if (unit.Player->Race != -1 && CCivilization::Civilizations[unit.Player->Race] != civilization && unit.Player->Faction != -1 && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(unit.Player->Faction, unit.Type->Class)) {
+							civilization = CCivilization::Civilizations[unit.Player->Race];
 						}
-						if (CCivilization::Civilizations[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound) {
-							return CCivilization::Civilizations[civilization]->UnitSounds.Harvest[order.GetCurrentResource()].Sound;
+						if (civilization->UnitSounds.Harvest[order.GetCurrentResource()].Sound) {
+							return civilization->UnitSounds.Harvest[order.GetCurrentResource()].Sound;
 						} else {
 							return ChooseUnitVoiceSound(unit, VoiceAcknowledging);
 						}

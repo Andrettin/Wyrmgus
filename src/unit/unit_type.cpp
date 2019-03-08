@@ -741,7 +741,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			CCivilization *civilization = CCivilization::GetCivilization(value);
 			if (civilization) {
-				this->Civilization = civilization->ID;
+				this->Civilization = civilization;
 			}
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -1167,18 +1167,14 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			}
 		}
 		
-		if (this->Civilization != -1) {
-			int civilization_id = this->Civilization;
-			
+		if (this->GetCivilization() != nullptr && class_id != -1) {
 			if (this->Faction != -1) {
 				int faction_id = this->Faction;
-				if (faction_id != -1 && class_id != -1) {
+				if (faction_id != -1) {
 					PlayerRaces.Factions[faction_id]->ClassUnitTypes[class_id] = this->Slot;
 				}
 			} else {
-				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = this->Slot;
-				}
+					PlayerRaces.CivilizationClassUnitTypes[this->GetCivilization()->ID][class_id] = this->Slot;
 			}
 		}
 	}
@@ -1653,15 +1649,6 @@ void CUnitType::UpdateDefaultBoolFlags()
 	this->BoolFlag[CANATTACK_INDEX].value = this->CanAttack;
 }
 
-CCivilization *CUnitType::GetCivilization() const
-{
-	if (this->Civilization != -1 && this->Civilization < (int) CCivilization::Civilizations.size()) {
-		return CCivilization::Civilizations[this->Civilization];
-	}
-		
-	return nullptr;
-}
-
 //Wyrmgus start
 void CUnitType::RemoveButtons(int button_action, std::string mod_file)
 {
@@ -1893,44 +1880,41 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 		}
 	}
 	
-	if (potential_names.size() == 0 && this->Civilization != -1) {
-		int civilization_id = this->Civilization;
-		if (civilization_id != -1) {
-			if (faction && civilization_id != faction->Civilization->ID && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization->ID] && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
-				civilization_id = faction->Civilization->ID;
+	if (potential_names.size() == 0 && this->GetCivilization() != nullptr) {
+		const CCivilization *civilization = this->GetCivilization();
+		if (faction && civilization != faction->Civilization && PlayerRaces.Species[civilization->ID] == PlayerRaces.Species[faction->Civilization->ID] && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
+			civilization = faction->Civilization;
+		}
+		if (faction && faction->Civilization != civilization) {
+			faction = nullptr;
+		}
+		if (this->Faction != -1 && !faction) {
+			faction = PlayerRaces.Factions[this->Faction];
+		}
+		
+		if (this->BoolFlag[ORGANIC_INDEX].value) {
+			if (civilization->GetPersonalNames().find(NoGender) != civilization->GetPersonalNames().end()) {
+				for (size_t i = 0; i < civilization->GetPersonalNames().find(NoGender)->second.size(); ++i) {
+					potential_names.push_back(civilization->GetPersonalNames().find(NoGender)->second[i]);
+				}
 			}
-			CCivilization *civilization = CCivilization::Civilizations[civilization_id];
-			if (faction && faction->Civilization != civilization) {
-				faction = nullptr;
+			if (gender != -1 && gender != NoGender && civilization->GetPersonalNames().find(gender) != civilization->GetPersonalNames().end()) {
+				for (size_t i = 0; i < civilization->GetPersonalNames().find(gender)->second.size(); ++i) {
+					potential_names.push_back(civilization->GetPersonalNames().find(gender)->second[i]);
+				}
 			}
-			if (this->Faction != -1 && !faction) {
-				faction = PlayerRaces.Factions[this->Faction];
+		} else {
+			if (this->Class != -1 && civilization->GetUnitClassNames(this->Class).size() > 0) {
+				return civilization->GetUnitClassNames(this->Class);
 			}
 			
-			if (this->BoolFlag[ORGANIC_INDEX].value) {
-				if (civilization->GetPersonalNames().find(NoGender) != civilization->GetPersonalNames().end()) {
-					for (size_t i = 0; i < civilization->GetPersonalNames().find(NoGender)->second.size(); ++i) {
-						potential_names.push_back(civilization->GetPersonalNames().find(NoGender)->second[i]);
-					}
-				}
-				if (gender != -1 && gender != NoGender && civilization->GetPersonalNames().find(gender) != civilization->GetPersonalNames().end()) {
-					for (size_t i = 0; i < civilization->GetPersonalNames().find(gender)->second.size(); ++i) {
-						potential_names.push_back(civilization->GetPersonalNames().find(gender)->second[i]);
-					}
-				}
-			} else {
-				if (this->Class != -1 && civilization->GetUnitClassNames(this->Class).size() > 0) {
-					return civilization->GetUnitClassNames(this->Class);
+			if (this->UnitType == UnitTypeNaval) { // if is a ship
+				if (faction && faction->GetShipNames().size() > 0) {
+					return faction->GetShipNames();
 				}
 				
-				if (this->UnitType == UnitTypeNaval) { // if is a ship
-					if (faction && faction->GetShipNames().size() > 0) {
-						return faction->GetShipNames();
-					}
-					
-					if (civilization->GetShipNames().size() > 0) {
-						return civilization->GetShipNames();
-					}
+				if (civilization->GetShipNames().size() > 0) {
+					return civilization->GetShipNames();
 				}
 			}
 		}
