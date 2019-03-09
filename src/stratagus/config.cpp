@@ -58,11 +58,8 @@
 #include "skin_color.h"
 #include "sound.h"
 #include "species/species.h"
-#include "species/species_genus.h"
-#include "species/species_family.h"
-#include "species/species_order.h"
-#include "species/species_class.h"
-#include "species/species_phylum.h"
+#include "species/species_category.h"
+#include "species/species_category_rank.h"
 #include "spells.h"
 #include "time/calendar.h"
 #include "time/season.h"
@@ -391,30 +388,15 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				species->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "species_genus") {
-			CSpeciesGenus *genus = CSpeciesGenus::GetOrAdd(ident);
+		} else if (config_data->Tag == "species_category") {
+			CSpeciesCategory *species_category = CSpeciesCategory::GetOrAdd(ident);
 			if (!define_only) {
-				genus->ProcessConfigData(config_data);
+				species_category->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "species_family") {
-			CSpeciesFamily *family = CSpeciesFamily::GetOrAdd(ident);
+		} else if (config_data->Tag == "species_category_rank") {
+			CSpeciesCategoryRank *species_category_rank = CSpeciesCategoryRank::GetOrAdd(ident);
 			if (!define_only) {
-				family->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "species_order") {
-			CSpeciesOrder *order = CSpeciesOrder::GetOrAdd(ident);
-			if (!define_only) {
-				order->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "species_class") {
-			CSpeciesClass *species_class = CSpeciesClass::GetOrAdd(ident);
-			if (!define_only) {
-				species_class->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "species_phylum") {
-			CSpeciesPhylum *phylum = CSpeciesPhylum::GetOrAdd(ident);
-			if (!define_only) {
-				phylum->ProcessConfigData(config_data);
+				species_category_rank->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "spell") {
 			CSpell *spell = CSpell::GetOrAddSpell(ident);

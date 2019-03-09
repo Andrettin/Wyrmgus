@@ -39,7 +39,7 @@
 #include "include/plane.h"
 #include "map/terrain_type.h"
 #include "province.h" //for the era get function
-#include "species/species_genus.h"
+#include "species/species_category.h"
 #include "world.h"
 
 /*----------------------------------------------------------------------------
@@ -77,11 +77,11 @@ void CSpecies::ProcessConfigData(const CConfigData *config_data)
 			this->Sapient = StringToBool(value);
 		} else if (key == "prehistoric") {
 			this->Prehistoric = StringToBool(value);
-		} else if (key == "genus") {
+		} else if (key == "category") {
 			value = FindAndReplaceString(value, "_", "-");
-			CSpeciesGenus *genus = CSpeciesGenus::Get(value);
-			if (genus) {
-				this->Genus = genus;
+			CSpeciesCategory *category = CSpeciesCategory::Get(value);
+			if (category) {
+				this->Category = category;
 			}
 		} else if (key == "species") {
 			this->Species = value;

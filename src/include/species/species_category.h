@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name species_order.cpp - The species order source file. */
+/**@name species_category.h - The species category header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,46 +27,59 @@
 //      02111-1307, USA.
 //
 
+#ifndef __SPECIES_CATEGORY_H__
+#define __SPECIES_CATEGORY_H__
+
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
-#include "species/species_order.h"
-
-#include "config.h"
-#include "species/species_class.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
---  Functions
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CSpeciesOrder::ProcessConfigData(const CConfigData *config_data)
+class CSpeciesCategoryRank;
+
+class CSpeciesCategory : public CDataType
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "class") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSpeciesClass *species_class = CSpeciesClass::Get(value);
-			if (species_class) {
-				this->Class = species_class;
-			}
-		} else if (key == "subclass") {
-			this->Subclass = value;
-		} else if (key == "infraclass") {
-			this->Infraclass = value;
-		} else {
-			fprintf(stderr, "Invalid species order property: \"%s\".\n", key.c_str());
-		}
+	DATA_TYPE_CLASS(CSpeciesCategory)
+	
+public:
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	
+	String GetName() const
+	{
+		return this->Name.c_str();
 	}
-}
+	
+	String GetCommonName() const
+	{
+		return this->CommonName.c_str();
+	}
+	
+	CSpeciesCategoryRank *GetRank() const
+	{
+		return this->Rank;
+	}
+	
+	CSpeciesCategory *GetLowerCategory() const
+	{
+		return this->LowerCategory;
+	}
+	
+	CSpeciesCategory *GetUpperCategory() const
+	{
+		return this->UpperCategory;
+	}
+	
+private:
+	std::string Name;							/// name of the species category
+	std::string CommonName;						/// common name of the species category
+	CSpeciesCategoryRank *Rank = nullptr;		/// the rank of the species category
+	CSpeciesCategory *LowerCategory = nullptr;	/// the category below this one
+	CSpeciesCategory *UpperCategory = nullptr;	/// the category above this one
+};
+
+#endif

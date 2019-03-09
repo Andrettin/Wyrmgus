@@ -41,10 +41,11 @@
 ----------------------------------------------------------------------------*/
 
 class CPlane;
-class CSpeciesGenus;
+class CSpeciesCategory;
 class CTerrainType;
 class CUnitType;
 class CWorld;
+struct lua_State;
 
 class CSpecies : public CDataType
 {
@@ -52,6 +53,16 @@ class CSpecies : public CDataType
 	
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	
+	String GetName() const
+	{
+		return this->Name.c_str();
+	}
+	
+	CSpeciesCategory *GetCategory() const
+	{
+		return this->Category;
+	}
 	
 	bool IsNativeToTerrainType(const CTerrainType *terrain_type) const
 	{
@@ -61,15 +72,18 @@ public:
 	bool CanEvolveToAUnitType(const CTerrainType *terrain = nullptr, const bool sapient_only = false) const;
 	CSpecies *GetRandomEvolution(const CTerrainType *terrain_type) const;
 	
+private:
+	std::string Name;				/// name of the species
 public:
 	int Era = -1;					/// Era ID
 	bool Sapient = false;			/// Whether the species is sapient
 	bool Prehistoric = false;		/// Whether the species is prehistoric or not
-	std::string Name;				/// Name of the species
 	std::string Description;		/// Description of the species
 	std::string Quote;				/// Quote pertaining to the species
 	std::string Background;			/// Background of the species
-	CSpeciesGenus *Genus = nullptr;
+private:
+	CSpeciesCategory *Category = nullptr;
+public:
 	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 	CPlane *HomePlane = nullptr;
@@ -78,6 +92,8 @@ public:
 	std::vector<CTerrainType *> Terrains;	/// in which terrains does this species live
 	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
 	std::vector<CSpecies *> EvolvesTo;		/// to which species this one can evolve
+	
+	friend int CclDefineSpecies(lua_State *l);
 };
 
 #endif

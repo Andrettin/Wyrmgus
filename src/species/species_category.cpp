@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name species_class.h - The species class header file. */
+/**@name species_category.cpp - The species category source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,34 +27,56 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SPECIES_CLASS_H__
-#define __SPECIES_CLASS_H__
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "stratagus.h"
+
+#include "species/species_category.h"
+
+#include "config.h"
+#include "species/species_category_rank.h"
 
 /*----------------------------------------------------------------------------
---  Declarations
+--  Functions
 ----------------------------------------------------------------------------*/
 
-class CSpeciesPhylum;
-
-class CSpeciesClass : public CDataType
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CSpeciesCategory::ProcessConfigData(const CConfigData *config_data)
 {
-	DATA_TYPE_CLASS(CSpeciesClass)
-	
-public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-public:
-	std::string Name;				/// Name of the species class
-	CSpeciesPhylum *Phylum = nullptr;
-	std::string Subphylum;
-	std::string Infraphylum;
-	std::string Superclass;
-};
-
-#endif
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "common_name") {
+			this->CommonName = value;
+		} else if (key == "rank") {
+			value = FindAndReplaceString(value, "_", "-");
+			CSpeciesCategoryRank *rank = CSpeciesCategoryRank::Get(value);
+			if (rank) {
+				this->Rank = rank;
+			}
+		} else if (key == "lower_category") {
+			value = FindAndReplaceString(value, "_", "-");
+			CSpeciesCategory *category = CSpeciesCategory::Get(value);
+			if (category) {
+				this->LowerCategory = category;
+			}
+		} else if (key == "upper_category") {
+			value = FindAndReplaceString(value, "_", "-");
+			CSpeciesCategory *category = CSpeciesCategory::Get(value);
+			if (category) {
+				this->UpperCategory = category;
+			}
+		} else {
+			fprintf(stderr, "Invalid species category property: \"%s\".\n", key.c_str());
+		}
+	}
+}

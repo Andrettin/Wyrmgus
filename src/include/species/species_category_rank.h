@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name species_phylum.h - The species phylum header file. */
+/**@name species_category_rank.h - The species category rank header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SPECIES_PHYLUM_H__
-#define __SPECIES_PHYLUM_H__
+#ifndef __SPECIES_CATEGORY_RANK_H__
+#define __SPECIES_CATEGORY_RANK_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -40,18 +40,32 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CSpeciesPhylum : public CDataType
+class CSpeciesCategoryRank : public CDataType
 {
-	DATA_TYPE_CLASS(CSpeciesPhylum)
+	DATA_TYPE_CLASS(CSpeciesCategoryRank)
 	
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-public:
-	std::string Name;				/// Name of the species phylum
-	std::string Kingdom;
-	std::string Subkingdom;
-	std::string Infrakingdom;
+	String GetName() const
+	{
+		return this->Name.c_str();
+	}
+	
+	CSpeciesCategoryRank *GetLowerRank() const
+	{
+		return this->LowerRank;
+	}
+	
+	CSpeciesCategoryRank *GetUpperRank() const
+	{
+		return this->UpperRank;
+	}
+	
+private:
+	std::string Name;				/// name of the species category rank
+	CSpeciesCategoryRank *LowerRank = nullptr;	/// the rank below this one
+	CSpeciesCategoryRank *UpperRank = nullptr;	/// the rank above this one
 };
 
 #endif

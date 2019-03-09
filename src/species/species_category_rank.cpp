@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name species_family.h - The species family header file. */
+/**@name species_category_rank.cpp - The species category rank source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,34 +27,47 @@
 //      02111-1307, USA.
 //
 
-#ifndef __SPECIES_FAMILY_H__
-#define __SPECIES_FAMILY_H__
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "stratagus.h"
+
+#include "species/species_category_rank.h"
+
+#include "config.h"
 
 /*----------------------------------------------------------------------------
---  Declarations
+--  Functions
 ----------------------------------------------------------------------------*/
 
-class CSpeciesOrder;
-
-class CSpeciesFamily : public CDataType
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CSpeciesCategoryRank::ProcessConfigData(const CConfigData *config_data)
 {
-	DATA_TYPE_CLASS(CSpeciesFamily)
-	
-public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-public:
-	std::string Name;				/// Name of the species family
-	CSpeciesOrder *Order = nullptr;
-	std::string Suborder;
-	std::string Infraorder;
-	std::string Superfamily;
-};
-
-#endif
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "lower_rank") {
+			value = FindAndReplaceString(value, "_", "-");
+			CSpeciesCategoryRank *rank = CSpeciesCategoryRank::Get(value);
+			if (rank) {
+				this->LowerRank = rank;
+			}
+		} else if (key == "upper_rank") {
+			value = FindAndReplaceString(value, "_", "-");
+			CSpeciesCategoryRank *rank = CSpeciesCategoryRank::Get(value);
+			if (rank) {
+				this->UpperRank = rank;
+			}
+		} else {
+			fprintf(stderr, "Invalid species category rank property: \"%s\".\n", key.c_str());
+		}
+	}
+}
