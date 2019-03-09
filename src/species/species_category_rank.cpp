@@ -59,12 +59,14 @@ void CSpeciesCategoryRank::ProcessConfigData(const CConfigData *config_data)
 			CSpeciesCategoryRank *rank = CSpeciesCategoryRank::Get(value);
 			if (rank) {
 				this->LowerRank = rank;
+				rank->UpperRank = this;
 			}
 		} else if (key == "upper_rank") {
 			value = FindAndReplaceString(value, "_", "-");
 			CSpeciesCategoryRank *rank = CSpeciesCategoryRank::Get(value);
 			if (rank) {
 				this->UpperRank = rank;
+				rank->LowerRank = this;
 			}
 		} else {
 			fprintf(stderr, "Invalid species category rank property: \"%s\".\n", key.c_str());

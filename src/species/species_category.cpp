@@ -67,13 +67,15 @@ void CSpeciesCategory::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			CSpeciesCategory *category = CSpeciesCategory::Get(value);
 			if (category) {
-				this->LowerCategory = category;
+				this->LowerCategories.push_back(category);
+				category->UpperCategory = this;
 			}
 		} else if (key == "upper_category") {
 			value = FindAndReplaceString(value, "_", "-");
 			CSpeciesCategory *category = CSpeciesCategory::Get(value);
 			if (category) {
 				this->UpperCategory = category;
+				category->LowerCategories.push_back(this);
 			}
 		} else {
 			fprintf(stderr, "Invalid species category property: \"%s\".\n", key.c_str());

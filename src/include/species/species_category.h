@@ -64,9 +64,9 @@ public:
 		return this->Rank;
 	}
 	
-	CSpeciesCategory *GetLowerCategory() const
+	const std::vector<CSpeciesCategory *> &GetLowerCategory() const
 	{
-		return this->LowerCategory;
+		return this->LowerCategories;
 	}
 	
 	CSpeciesCategory *GetUpperCategory() const
@@ -78,7 +78,7 @@ private:
 	std::string Name;							/// name of the species category
 	std::string CommonName;						/// common name of the species category
 	CSpeciesCategoryRank *Rank = nullptr;		/// the rank of the species category
-	CSpeciesCategory *LowerCategory = nullptr;	/// the category below this one
+	std::vector<CSpeciesCategory *> LowerCategories;	/// the categories below this one
 	CSpeciesCategory *UpperCategory = nullptr;	/// the category above this one
 };
 
