@@ -313,25 +313,25 @@ if(CMAKE_COMPILER_IS_GNUC)
 endif()
 
 #Wyrmgus start
-set(WS_CXX11_FLAGS CACHE STRING "Compilation flags to enable C++11 support")
+set(WS_CXX17_FLAGS CACHE STRING "Compilation flags to enable C++17 support")
 
 if(MSVC)
-    # C++11 compilation flag is activated by default
+    # C++17 compilation flag is activated by default
     # Optimisation flags can be added if deemed useful
 else()
     include(CheckCXXCompilerFlag)
-    if(NOT WS_CXX11_FLAGS)
-        CHECK_CXX_COMPILER_FLAG("-std=c++11" WS_CXX11_FLAG_SUPPORTED)
-        # MinGW supports CXX11 flag but do not compile with it. However, it works with gnu++11
-        if(WS_CXX11_FLAG_SUPPORTED AND NOT MINGW)
-            set(WS_CXX11_FLAGS "-std=c++11" CACHE STRING "Compilation flags to enable C++11 support" FORCE)
+    if(NOT WS_CXX17_FLAGS)
+        CHECK_CXX_COMPILER_FLAG("-std=c++17" WS_CXX17_FLAG_SUPPORTED)
+        # MinGW supports CXX17 flag but do not compile with it. However, it works with gnu++17
+        if(WS_CXX17_FLAG_SUPPORTED AND NOT MINGW)
+            set(WS_CXX17_FLAGS "-std=c++17" CACHE STRING "Compilation flags to enable C++17 support" FORCE)
         else()
-            set(WS_CXX11_FLAGS "-std=gnu++11" CACHE STRING "Compilation flags to enable C++11 support" FORCE)
+            set(WS_CXX17_FLAGS "-std=gnu++17" CACHE STRING "Compilation flags to enable C++17 support" FORCE)
         endif()
     endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "${WS_CXX11_FLAGS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
+set(CMAKE_CXX_FLAGS "${WS_CXX17_FLAGS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX17_STANDARD_COMPILE_OPTION}")
 #Wyrmgus end
 
 check_type_size(errno_t ERRNOT)

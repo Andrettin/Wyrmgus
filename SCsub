@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 Import('env')
 Import('env_modules')
 
@@ -37,6 +38,12 @@ env_wyrmgus.add_source_files(env.modules_sources, "src/unit/*.cpp")
 env_wyrmgus.add_source_files(env.modules_sources, "src/upgrade/*.cpp")
 env_wyrmgus.add_source_files(env.modules_sources, "src/video/*.cpp")
 env_wyrmgus.add_source_files(env.modules_sources, "src/xbrz/*.cpp")
+
+if os.getenv("VCINSTALLDIR"):
+  env_wyrmgus.Append(CPPFLAGS=['/std:c++latest'])
+else:
+  env_wyrmgus.Append(CPPFLAGS=['-std=c++17'])
+  
 env_wyrmgus.Append(CPPPATH=['.', 'src', 'src/include', 'src/guichan/include', 'src/guichan/include/guichan', 'src/xbrz/include'])
 env_wyrmgus.Append(CPPPATH=['#thirdparty/libpng'])
 env_wyrmgus.Append(CPPPATH=['C:\Program Files\CMake\include']) #FIXME: substitute this for having the necessary libraries in the thirdparty folder, or to find them in some other way

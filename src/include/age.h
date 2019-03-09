@@ -50,17 +50,14 @@ class CUpgrade;
 
 class CAge : public CDataType
 {
+	DATA_TYPE_CLASS(CAge)
+	
 public:
 	~CAge();
 	
-	static CAge *GetAge(const std::string &ident, const bool should_find = true);
-	static CAge *GetOrAddAge(const std::string &ident);
-	static void ClearAges();
 	static void SetCurrentAge(CAge *age);
 	static void CheckCurrentAge();
 	
-	static std::vector<CAge *> Ages;
-	static std::map<std::string, CAge *> AgesByIdent;
 	static CAge *CurrentAge;
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;

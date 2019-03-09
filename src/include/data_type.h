@@ -34,9 +34,85 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <core/typedefs.h>
 #include <core/ustring.h>
 
 #include <string>
+
+/*----------------------------------------------------------------------------
+--  Defines
+----------------------------------------------------------------------------*/
+
+//macro for data type classes
+#define DATA_TYPE_CLASS(class_name) \
+public: \
+	/**
+	**	@brief	Get an instance of the class by its string identifier
+	**
+	**	@param	ident	The instance's string identifier
+	**
+	**	@return	The instance if found, or null otherwise
+	*/ \
+	static _FORCE_INLINE_ class_name *Get(const std::string &ident, const bool should_find = true) \
+	{ \
+		std::map<std::string, class_name *>::const_iterator find_iterator = class_name::InstancesByIdent.find(ident); \
+		\
+		if (find_iterator != class_name::InstancesByIdent.end()) { \
+			return find_iterator->second; \
+		} \
+		\
+		if (should_find) { \
+			fprintf(stderr, "Invalid class_name instance: \"%s\".\n", ident.c_str()); \
+		} \
+		\
+		return nullptr; \
+	} \
+	\
+	/**
+	**	@brief	Get or add an instance of the class
+	**
+	**	@param	ident	The instance's string identifier
+	**
+	**	@return	The instance if found, otherwise a new instance is created and returned
+	*/ \
+	static _FORCE_INLINE_ class_name *GetOrAdd(const std::string &ident) \
+	{ \
+		class_name *instance = class_name::Get(ident, false); \
+		\
+		if (!instance) { \
+			instance = new class_name; \
+			instance->Ident = ident; \
+			class_name::Instances.push_back(instance); \
+			InstancesByIdent[ident] = instance; \
+		} \
+		\
+		return instance; \
+	} \
+	\
+	/**
+	**	@brief	Gets all instances of the class
+	**
+	**	@return	All existing instances of the class
+	*/ \
+	static _FORCE_INLINE_ std::vector<class_name *> GetAll() \
+	{ \
+		return class_name::Instances; \
+	} \
+	\
+	/**
+	**	@brief	Remove the existing class instances
+	*/ \
+	static _FORCE_INLINE_ void Clear() \
+	{ \
+		for (class_name *instance : class_name::Instances) { \
+			delete instance; \
+		} \
+		class_name::Instances.clear(); \
+	} \
+	\
+private: \
+	static inline std::vector<class_name *> Instances; \
+	static inline std::map<std::string, class_name *> InstancesByIdent;
 
 /*----------------------------------------------------------------------------
 --  Declarations

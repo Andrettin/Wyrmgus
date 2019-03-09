@@ -246,7 +246,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 		}
 		
 		if (config_data->Tag == "age") {
-			CAge *age = CAge::GetOrAddAge(ident);
+			CAge *age = CAge::GetOrAdd(ident);
 			if (!define_only) {
 				age->ProcessConfigData(config_data);
 			}
