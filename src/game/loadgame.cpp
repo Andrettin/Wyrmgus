@@ -73,6 +73,12 @@
 #include "skin_color.h"
 #include "sound.h"
 #include "sound_server.h"
+#include "species/species.h"
+#include "species/species_genus.h"
+#include "species/species_family.h"
+#include "species/species_order.h"
+#include "species/species_class.h"
+#include "species/species_phylum.h"
 #include "spells.h"
 #include "text.h"
 #include "time/calendar.h"
@@ -148,6 +154,12 @@ void CleanModules()
 	CReligion::ClearReligions();
 	CSchoolOfMagic::ClearSchoolsOfMagic();
 	CSite::ClearSites();
+	CSpecies::Clear();
+	CSpeciesGenus::Clear();
+	CSpeciesFamily::Clear();
+	CSpeciesOrder::Clear();
+	CSpeciesClass::Clear();
+	CSpeciesPhylum::Clear();
 	CleanTexts();
 	CleanUniqueItems();
 	//Wyrmgus end

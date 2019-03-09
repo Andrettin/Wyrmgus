@@ -57,6 +57,7 @@
 //Wyrmgus start
 #include "sound.h"
 //Wyrmgus end
+#include "species/species.h"
 #include "spells.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
@@ -212,8 +213,8 @@ static bool MoveRandomly(CUnit &unit)
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID)) != unit.Type->Species->Terrains.end()) {
-				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID)) == unit.Type->Species->Terrains.end()) {
+			if (unit.Type->Species && unit.Type->Species->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer->ID))) {
+				if (!unit.Type->Species->IsNativeToTerrainType(CMap::Map.GetTileTopTerrain(pos, false, unit.MapLayer->ID))) {
 					return false;
 				}
 			}

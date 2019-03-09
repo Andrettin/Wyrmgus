@@ -72,7 +72,7 @@ public:
 	CSeasonSchedule *SeasonSchedule = nullptr;							/// this plane's season schedule
 	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// Deity domains empowered in this plane
 	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic;				/// Schools of magic empowered in this plane
-	std::vector<CSpecies *> Species;									/// Species in this plane
+	std::vector<CSpecies *> Species;									/// Species native to this plane
 };
 
 #endif

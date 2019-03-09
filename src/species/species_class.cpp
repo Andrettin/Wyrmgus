@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name age.h - The age header file. */
+/**@name species_class.cpp - The species class source file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,50 +27,48 @@
 //      02111-1307, USA.
 //
 
-#ifndef __AGE_H__
-#define __AGE_H__
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "stratagus.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+#include "species/species_class.h"
 
-class CDependency;
-class CGraphic;
-class CUpgrade;
-
-class CAge : public CDataType
-{
-	DATA_TYPE_CLASS(CAge)
-	
-public:
-	~CAge();
-	
-	static void SetCurrentAge(CAge *age);
-	static void CheckCurrentAge();
-	
-	static CAge *CurrentAge;
-	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	
-public:
-	std::string Name;
-	CGraphic *G = nullptr;
-	int Priority = 0;
-	int YearBoost = 0;
-	CDependency *Predependency = nullptr;
-	CDependency *Dependency = nullptr;
-};
+#include "config.h"
+#include "species/species_phylum.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void SetCurrentAge(const std::string &age_ident);
-
-#endif
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CSpeciesClass::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "phylum") {
+			value = FindAndReplaceString(value, "_", "-");
+			CSpeciesPhylum *phylum = CSpeciesPhylum::Get(value);
+			if (phylum) {
+				this->Phylum = phylum;
+			}
+		} else if (key == "subphylum") {
+			this->Subphylum = value;
+		} else if (key == "infraphylum") {
+			this->Infraphylum = value;
+		} else if (key == "superclass") {
+			this->Superclass = value;
+		} else {
+			fprintf(stderr, "Invalid species class property: \"%s\".\n", key.c_str());
+		}
+	}
+}

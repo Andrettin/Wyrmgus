@@ -37,7 +37,9 @@
 #include <core/typedefs.h>
 #include <core/ustring.h>
 
+#include <map>
 #include <string>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -94,7 +96,7 @@ public: \
 	**
 	**	@return	All existing instances of the class
 	*/ \
-	static _FORCE_INLINE_ std::vector<class_name *> GetAll() \
+	static _FORCE_INLINE_ const std::vector<class_name *> &GetAll() \
 	{ \
 		return class_name::Instances; \
 	} \
@@ -138,7 +140,7 @@ public:
 		return this->Ident.c_str();
 	}
 	
-	std::string Ident;	/// String identifier of the data element
+	std::string Ident;	/// String identifier of the data type instance
 };
 
 #endif

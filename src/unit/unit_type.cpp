@@ -58,6 +58,7 @@
 #include "player.h"
 #include "script.h"
 #include "sound.h"
+#include "species/species.h"
 #include "spells.h"
 #include "translate.h"
 #include "ui/button_action.h"
@@ -512,13 +513,6 @@ std::vector<std::vector<CUnitType *>> ClassUnitTypes;
 std::vector<std::string> UpgradeClasses;
 std::map<std::string, int> UpgradeClassStringToIndex;
 CUnitType *SettlementSiteUnitType;
-
-std::vector<CSpecies *> Species;
-std::vector<CSpeciesGenus *> SpeciesGenuses;
-std::vector<CSpeciesFamily *> SpeciesFamilies;
-std::vector<CSpeciesOrder *> SpeciesOrders;
-std::vector<CSpeciesClass *> SpeciesClasses;
-std::vector<CSpeciesPhylum *> SpeciesPhylums;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -846,11 +840,10 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "species") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Species = GetSpecies(value);
-			if (this->Species) {
+			CSpecies *species = CSpecies::Get(value);
+			if (species) {
+				this->Species = species;
 				this->Species->Type = this;
-			} else {
-				fprintf(stderr, "Invalid species: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "right_mouse_action") {
 			if (value == "none") {
@@ -2904,35 +2897,6 @@ void CleanUnitTypes()
 	CUnitType::UnitTypes.clear();
 	UnitTypeMap.clear();
 	UnitTypeVar.Clear();
-
-	// Clean hardcoded unit types.
-	
-	//Wyrmgus start
-	for (size_t i = 0; i < Species.size(); ++i) {
-		delete Species[i];
-	}
-	Species.clear();
-	for (size_t i = 0; i < SpeciesGenuses.size(); ++i) {
-		delete SpeciesGenuses[i];
-	}
-	SpeciesGenuses.clear();
-	for (size_t i = 0; i < SpeciesFamilies.size(); ++i) {
-		delete SpeciesFamilies[i];
-	}
-	SpeciesFamilies.clear();
-	for (size_t i = 0; i < SpeciesOrders.size(); ++i) {
-		delete SpeciesOrders[i];
-	}
-	SpeciesOrders.clear();
-	for (size_t i = 0; i < SpeciesClasses.size(); ++i) {
-		delete SpeciesClasses[i];
-	}
-	SpeciesClasses.clear();
-	for (size_t i = 0; i < SpeciesPhylums.size(); ++i) {
-		delete SpeciesPhylums[i];
-	}
-	SpeciesPhylums.clear();
-	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -2987,113 +2951,6 @@ std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 	}
 	
 	return "";
-}
-
-CSpecies *GetSpecies(const std::string &species_ident)
-{
-	for (size_t i = 0; i < Species.size(); ++i) {
-		if (species_ident == Species[i]->Ident) {
-			return Species[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-CSpeciesGenus *GetSpeciesGenus(const std::string &genus_ident)
-{
-	for (size_t i = 0; i < SpeciesGenuses.size(); ++i) {
-		if (genus_ident == SpeciesGenuses[i]->Ident) {
-			return SpeciesGenuses[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-CSpeciesFamily *GetSpeciesFamily(const std::string &family_ident)
-{
-	for (size_t i = 0; i < SpeciesFamilies.size(); ++i) {
-		if (family_ident == SpeciesFamilies[i]->Ident) {
-			return SpeciesFamilies[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-CSpeciesOrder *GetSpeciesOrder(const std::string &order_ident)
-{
-	for (size_t i = 0; i < SpeciesOrders.size(); ++i) {
-		if (order_ident == SpeciesOrders[i]->Ident) {
-			return SpeciesOrders[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-CSpeciesClass *GetSpeciesClass(const std::string &class_ident)
-{
-	for (size_t i = 0; i < SpeciesClasses.size(); ++i) {
-		if (class_ident == SpeciesClasses[i]->Ident) {
-			return SpeciesClasses[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident)
-{
-	for (size_t i = 0; i < SpeciesPhylums.size(); ++i) {
-		if (phylum_ident == SpeciesPhylums[i]->Ident) {
-			return SpeciesPhylums[i];
-		}
-	}
-	
-	return nullptr;
-}
-
-bool CSpecies::CanEvolveToAUnitType(CTerrainType *terrain, bool sapient_only)
-{
-	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
-		if (
-			(this->EvolvesTo[i]->Type != nullptr && (!terrain || std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end()) && (!sapient_only || this->EvolvesTo[i]->Sapient))
-			|| this->EvolvesTo[i]->CanEvolveToAUnitType(terrain, sapient_only)
-		) {
-			return true;
-		}
-	}
-	return false;
-}
-
-CSpecies *CSpecies::GetRandomEvolution(CTerrainType *terrain)
-{
-	std::vector<CSpecies *> potential_evolutions;
-	
-	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
-		if (
-			(this->EvolvesTo[i]->Type != nullptr && std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end())
-			|| this->EvolvesTo[i]->CanEvolveToAUnitType(terrain)
-		) { //give preference to evolutions that are native to the current terrain
-			potential_evolutions.push_back(this->EvolvesTo[i]);
-		}
-	}
-	
-	if (potential_evolutions.size() == 0) {
-		for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
-			if (this->EvolvesTo[i]->Type != nullptr || this->EvolvesTo[i]->CanEvolveToAUnitType()) {
-				potential_evolutions.push_back(this->EvolvesTo[i]);
-			}
-		}
-	}
-	
-	if (potential_evolutions.size() > 0) {
-		return potential_evolutions[SyncRand(potential_evolutions.size())];
-	}
-	
-	return nullptr;
 }
 
 std::string GetImageLayerNameById(int image_layer)

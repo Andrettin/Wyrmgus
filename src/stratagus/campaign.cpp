@@ -40,6 +40,7 @@
 #include "map/map_template.h"
 #include "player.h"
 #include "quest.h"
+#include "species/species.h"
 
 #include <mutex>
 
@@ -232,8 +233,10 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	std::sort(CCampaign::Campaigns.begin(), CCampaign::Campaigns.end(), [](CCampaign *a, CCampaign *b) {
-		if (a->GetSpecies() != b->GetSpecies()) {
-			return a->GetSpecies() < b->GetSpecies();
+		std::string species_ident_a = a->GetSpecies() ? a->GetSpecies()->GetIdent().utf8().get_data() : "";
+		std::string species_ident_b = b->GetSpecies() ? b->GetSpecies()->GetIdent().utf8().get_data() : "";
+		if (species_ident_a != species_ident_b) {
+			return species_ident_a < species_ident_b;
 		} else if (a->StartDate != b->StartDate) {
 			return a->StartDate < b->StartDate;
 		} else {

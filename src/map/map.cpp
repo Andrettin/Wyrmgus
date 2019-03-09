@@ -58,6 +58,7 @@
 #include "settings.h"
 #include "sound_server.h"
 //Wyrmgus end
+#include "species/species.h"
 #include "time/calendar.h"
 #include "time/season.h"
 #include "time/season_schedule.h"

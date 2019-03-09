@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name age.h - The age header file. */
+/**@name species.h - The species header file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __AGE_H__
-#define __AGE_H__
+#ifndef __SPECIES_H__
+#define __SPECIES_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -40,37 +40,44 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CDependency;
-class CGraphic;
-class CUpgrade;
+class CPlane;
+class CSpeciesGenus;
+class CTerrainType;
+class CUnitType;
+class CWorld;
 
-class CAge : public CDataType
+class CSpecies : public CDataType
 {
-	DATA_TYPE_CLASS(CAge)
+	DATA_TYPE_CLASS(CSpecies)
 	
 public:
-	~CAge();
-	
-	static void SetCurrentAge(CAge *age);
-	static void CheckCurrentAge();
-	
-	static CAge *CurrentAge;
-	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
+	bool IsNativeToTerrainType(const CTerrainType *terrain_type) const
+	{
+		return std::find(this->Terrains.begin(), this->Terrains.end(), terrain_type) != this->Terrains.end();
+	}
+	
+	bool CanEvolveToAUnitType(const CTerrainType *terrain = nullptr, const bool sapient_only = false) const;
+	CSpecies *GetRandomEvolution(const CTerrainType *terrain_type) const;
+	
 public:
-	std::string Name;
-	CGraphic *G = nullptr;
-	int Priority = 0;
-	int YearBoost = 0;
-	CDependency *Predependency = nullptr;
-	CDependency *Dependency = nullptr;
+	int Era = -1;					/// Era ID
+	bool Sapient = false;			/// Whether the species is sapient
+	bool Prehistoric = false;		/// Whether the species is prehistoric or not
+	std::string Name;				/// Name of the species
+	std::string Description;		/// Description of the species
+	std::string Quote;				/// Quote pertaining to the species
+	std::string Background;			/// Background of the species
+	CSpeciesGenus *Genus = nullptr;
+	std::string Species;
+	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
+	CPlane *HomePlane = nullptr;
+	CWorld *Homeworld = nullptr;
+	CUnitType *Type = nullptr;
+	std::vector<CTerrainType *> Terrains;	/// in which terrains does this species live
+	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
+	std::vector<CSpecies *> EvolvesTo;		/// to which species this one can evolve
 };
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-extern void SetCurrentAge(const std::string &age_ident);
 
 #endif

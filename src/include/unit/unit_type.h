@@ -72,9 +72,10 @@ class MissileType;
 class CButtonLevel;
 class CFaction;
 class CPlane;
-class CWorld;
+class CSpecies;
 class CTerrainType;
 class CUniqueItem;
+class CWorld;
 //Wyrmgus end
 struct lua_State;
 class LuaCallback;
@@ -713,110 +714,6 @@ public:
 //Wyrmgus end
 
 //Wyrmgus start
-class CSpeciesPhylum
-{
-public:
-	CSpeciesPhylum() :
-		Ident("")
-	{
-	}
-	
-	std::string Ident;				/// Ident of the species phylum
-	std::string Name;				/// Name of the species phylum
-	std::string Kingdom;
-	std::string Subkingdom;
-	std::string Infrakingdom;
-};	
-
-class CSpeciesClass
-{
-public:
-	CSpeciesClass() :
-		Phylum(nullptr)
-	{
-	}
-	
-	std::string Ident;				/// Ident of the species class
-	std::string Name;				/// Name of the species class
-	CSpeciesPhylum *Phylum;
-	std::string Subphylum;
-	std::string Infraphylum;
-	std::string Superclass;
-};	
-
-class CSpeciesOrder
-{
-public:
-	CSpeciesOrder() :
-		Class(nullptr)
-	{
-	}
-	
-	std::string Ident;				/// Ident of the species order
-	std::string Name;				/// Name of the species order
-	CSpeciesClass *Class;
-	std::string Subclass;
-	std::string Infraclass;
-};	
-
-class CSpeciesFamily
-{
-public:
-	CSpeciesFamily() :
-		Order(nullptr)
-	{
-	}
-	
-	std::string Ident;				/// Ident of the species family
-	std::string Name;				/// Name of the species family
-	CSpeciesOrder *Order;
-	std::string Suborder;
-	std::string Infraorder;
-	std::string Superfamily;
-};	
-
-class CSpeciesGenus
-{
-public:
-	CSpeciesGenus() :
-		Family(nullptr)
-	{
-	}
-	
-	std::string Ident;				/// Ident of the genus
-	std::string Name;				/// Name of the genus
-	std::string CommonName;			/// Common name of the genus
-	CSpeciesFamily *Family;
-	std::string Subfamily;
-	std::string Tribe;
-};	
-
-class CSpecies
-{
-public:
-	bool CanEvolveToAUnitType(CTerrainType *terrain = nullptr, bool sapient_only = false);
-	CSpecies *GetRandomEvolution(CTerrainType *terrain);
-	
-	int Era = -1;					/// Era ID
-	bool Sapient = false;			/// Whether the species is sapient
-	bool Prehistoric = false;		/// Whether the species is prehistoric or not
-	std::string Ident;				/// Ident of the species
-	std::string Name;				/// Name of the species
-	std::string Description;		/// Description of the species
-	std::string Quote;				/// Quote pertaining to the species
-	std::string Background;			/// Background of the species
-	CSpeciesGenus *Genus = nullptr;
-	std::string Species;
-	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
-	CPlane *HomePlane = nullptr;
-	CWorld *Homeworld = nullptr;
-	CUnitType *Type = nullptr;
-	std::vector<CTerrainType *> Terrains;	/// in which terrains does this species live
-	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
-	std::vector<CSpecies *> EvolvesTo;		/// to which species this one can evolve
-};
-//Wyrmgus end
-
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
 class CUnitType : public CDataType, public Object
@@ -1224,13 +1121,6 @@ extern std::vector<std::string> UnitTypeClasses; //list of unit type classes; bu
 extern std::vector<std::vector<CUnitType *>> ClassUnitTypes; //list of unit types belonging to each class
 extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
 extern CUnitType *SettlementSiteUnitType;
-
-extern std::vector<CSpecies *> Species;
-extern std::vector<CSpeciesGenus *> SpeciesGenuses;
-extern std::vector<CSpeciesFamily *> SpeciesFamilies;
-extern std::vector<CSpeciesOrder *> SpeciesOrders;
-extern std::vector<CSpeciesClass *> SpeciesClasses;
-extern std::vector<CSpeciesPhylum *> SpeciesPhylums;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -1250,13 +1140,6 @@ extern int GetUpgradeClassIndexByName(const std::string &class_name);
 extern void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id);
 
 extern std::string GetUnitTypeStatsString(const std::string &unit_type_ident);
-
-extern CSpecies *GetSpecies(const std::string &species_ident);
-extern CSpeciesGenus *GetSpeciesGenus(const std::string &genus_ident);
-extern CSpeciesFamily *GetSpeciesFamily(const std::string &family_ident);
-extern CSpeciesOrder *GetSpeciesOrder(const std::string &order_ident);
-extern CSpeciesClass *GetSpeciesClass(const std::string &class_ident);
-extern CSpeciesPhylum *GetSpeciesPhylum(const std::string &phylum_ident);
 //Wyrmgus end
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table

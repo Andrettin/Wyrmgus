@@ -62,6 +62,12 @@
 //Wyrmgus end
 #include "script.h"
 #include "sound.h"
+#include "species/species.h"
+#include "species/species_genus.h"
+#include "species/species_family.h"
+#include "species/species_order.h"
+#include "species/species_class.h"
+#include "species/species_phylum.h"
 #include "spells.h"
 #include "time/season.h"
 #include "ui/button_action.h"
@@ -1880,11 +1886,11 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "ItemClass")) {
 			type->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Species")) {
-			type->Species = GetSpecies(LuaToString(l, -1));
-			if (!type->Species) {
-				LuaError(l, "Species doesn't exist.");
+			CSpecies *species = CSpecies::Get(LuaToString(l, -1));
+			if (species) {
+				type->Species = species;
+				type->Species->Type = type;
 			}
-			type->Species->Type = type;
 		} else if (!strcmp(value, "TerrainType")) {
 			type->TerrainType = CTerrainType::GetTerrainType(LuaToString(l, -1));
 			if (!type->TerrainType) {
@@ -2525,7 +2531,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	*/
 	} else if (!strcmp(data, "Species")) {
 		if (type->Species != nullptr) {
-			lua_pushstring(l, type->Species->Ident.c_str());
+			lua_pushstring(l, type->Species->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3571,12 +3577,7 @@ static int CclDefineSpeciesPhylum(lua_State *l)
 	}
 
 	std::string phylum_ident = LuaToString(l, 1);
-	CSpeciesPhylum *phylum = GetSpeciesPhylum(phylum_ident);
-	if (!phylum) {
-		phylum = new CSpeciesPhylum;
-		SpeciesPhylums.push_back(phylum);
-		phylum->Ident = phylum_ident;
-	}
+	CSpeciesPhylum *phylum = CSpeciesPhylum::GetOrAdd(phylum_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -3611,12 +3612,7 @@ static int CclDefineSpeciesClass(lua_State *l)
 	}
 
 	std::string class_ident = LuaToString(l, 1);
-	CSpeciesClass *species_class = GetSpeciesClass(class_ident);
-	if (!species_class) {
-		species_class = new CSpeciesClass;
-		SpeciesClasses.push_back(species_class);
-		species_class->Ident = class_ident;
-	}
+	CSpeciesClass *species_class = CSpeciesClass::GetOrAdd(class_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -3626,7 +3622,7 @@ static int CclDefineSpeciesClass(lua_State *l)
 			species_class->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Phylum")) {
 			std::string phylum_ident = LuaToString(l, -1);
-			CSpeciesPhylum *phylum = GetSpeciesPhylum(phylum_ident);
+			CSpeciesPhylum *phylum = CSpeciesPhylum::Get(phylum_ident);
 			if (phylum) {
 				species_class->Phylum = phylum;
 			} else {
@@ -3659,12 +3655,7 @@ static int CclDefineSpeciesOrder(lua_State *l)
 	}
 
 	std::string order_ident = LuaToString(l, 1);
-	CSpeciesOrder *order = GetSpeciesOrder(order_ident);
-	if (!order) {
-		order = new CSpeciesOrder;
-		SpeciesOrders.push_back(order);
-		order->Ident = order_ident;
-	}
+	CSpeciesOrder *order = CSpeciesOrder::GetOrAdd(order_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -3674,7 +3665,7 @@ static int CclDefineSpeciesOrder(lua_State *l)
 			order->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Class")) {
 			std::string class_ident = LuaToString(l, -1);
-			CSpeciesClass *species_class = GetSpeciesClass(class_ident);
+			CSpeciesClass *species_class = CSpeciesClass::Get(class_ident);
 			if (species_class) {
 				order->Class = species_class;
 			} else {
@@ -3705,12 +3696,7 @@ static int CclDefineSpeciesFamily(lua_State *l)
 	}
 
 	std::string family_ident = LuaToString(l, 1);
-	CSpeciesFamily *family = GetSpeciesFamily(family_ident);
-	if (!family) {
-		family = new CSpeciesFamily;
-		SpeciesFamilies.push_back(family);
-		family->Ident = family_ident;
-	}
+	CSpeciesFamily *family = CSpeciesFamily::GetOrAdd(family_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -3720,7 +3706,7 @@ static int CclDefineSpeciesFamily(lua_State *l)
 			family->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Order")) {
 			std::string order_ident = LuaToString(l, -1);
-			CSpeciesOrder *order = GetSpeciesOrder(order_ident);
+			CSpeciesOrder *order = CSpeciesOrder::Get(order_ident);
 			if (order) {
 				family->Order = order;
 			} else {
@@ -3753,12 +3739,7 @@ static int CclDefineSpeciesGenus(lua_State *l)
 	}
 
 	std::string genus_ident = LuaToString(l, 1);
-	CSpeciesGenus *genus = GetSpeciesGenus(genus_ident);
-	if (!genus) {
-		genus = new CSpeciesGenus;
-		SpeciesGenuses.push_back(genus);
-		genus->Ident = genus_ident;
-	}
+	CSpeciesGenus *genus = CSpeciesGenus::GetOrAdd(genus_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -3770,7 +3751,7 @@ static int CclDefineSpeciesGenus(lua_State *l)
 			genus->CommonName = LuaToString(l, -1);
 		} else if (!strcmp(value, "Family")) {
 			std::string family_ident = LuaToString(l, -1);
-			CSpeciesFamily *family = GetSpeciesFamily(family_ident);
+			CSpeciesFamily *family = CSpeciesFamily::Get(family_ident);
 			if (family) {
 				genus->Family = family;
 			} else {
@@ -3801,12 +3782,7 @@ static int CclDefineSpecies(lua_State *l)
 	}
 
 	std::string species_ident = LuaToString(l, 1);
-	CSpecies *species = GetSpecies(species_ident);
-	if (!species) {
-		species = new CSpecies;
-		Species.push_back(species);
-		species->Ident = species_ident;
-	}
+	CSpecies *species = CSpecies::GetOrAdd(species_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -3834,11 +3810,9 @@ static int CclDefineSpecies(lua_State *l)
 			species->Prehistoric = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Genus")) {
 			std::string genus_ident = LuaToString(l, -1);
-			CSpeciesGenus *genus = GetSpeciesGenus(genus_ident);
+			CSpeciesGenus *genus = CSpeciesGenus::Get(genus_ident);
 			if (genus) {
 				species->Genus = genus;
-			} else {
-				LuaError(l, "Species genus \"%s\" doesn't exist." _C_ genus_ident.c_str());
 			}
 		} else if (!strcmp(value, "Species")) {
 			species->Species = LuaToString(l, -1);
@@ -3879,12 +3853,10 @@ static int CclDefineSpecies(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string evolves_from_ident = LuaToString(l, -1, j + 1);
-				CSpecies *evolves_from = GetSpecies(evolves_from_ident);
+				CSpecies *evolves_from = CSpecies::Get(evolves_from_ident);
 				if (evolves_from) {
 					species->EvolvesFrom.push_back(evolves_from);
 					evolves_from->EvolvesTo.push_back(species);
-				} else {
-					LuaError(l, "Species \"%s\" doesn't exist." _C_ evolves_from_ident.c_str());
 				}
 			}
 		} else {
@@ -3901,17 +3873,6 @@ static int CclDefineSpecies(lua_State *l)
 	return 0;
 }
 
-static int CclGetSpecies(lua_State *l)
-{
-	lua_createtable(l, Species.size(), 0);
-	for (size_t i = 1; i <= Species.size(); ++i)
-	{
-		lua_pushstring(l, Species[i-1]->Ident.c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
 /**
 **  Get species data.
 **
@@ -3923,7 +3884,7 @@ static int CclGetSpeciesData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string species_ident = LuaToString(l, 1);
-	const CSpecies *species = GetSpecies(species_ident);
+	const CSpecies *species = CSpecies::Get(species_ident);
 	if (!species) {
 		LuaError(l, "Species \"%s\" doesn't exist." _C_ species_ident.c_str());
 	}
@@ -3950,7 +3911,7 @@ static int CclGetSpeciesData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Genus")) {
 		if (species->Genus != nullptr) {
-			lua_pushstring(l, species->Genus->Ident.c_str());
+			lua_pushstring(l, species->Genus->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -4000,7 +3961,7 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_createtable(l, species->EvolvesFrom.size(), 0);
 		for (size_t i = 1; i <= species->EvolvesFrom.size(); ++i)
 		{
-			lua_pushstring(l, species->EvolvesFrom[i-1]->Ident.c_str());
+			lua_pushstring(l, species->EvolvesFrom[i-1]->GetIdent().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -4008,7 +3969,7 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_createtable(l, species->EvolvesTo.size(), 0);
 		for (size_t i = 1; i <= species->EvolvesTo.size(); ++i)
 		{
-			lua_pushstring(l, species->EvolvesTo[i-1]->Ident.c_str());
+			lua_pushstring(l, species->EvolvesTo[i-1]->GetIdent().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -4030,7 +3991,7 @@ static int CclGetSpeciesGenusData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string genus_ident = LuaToString(l, 1);
-	const CSpeciesGenus *genus = GetSpeciesGenus(genus_ident);
+	const CSpeciesGenus *genus = CSpeciesGenus::Get(genus_ident);
 	if (!genus) {
 		LuaError(l, "Species genus \"%s\" doesn't exist." _C_ genus_ident.c_str());
 	}
@@ -4447,7 +4408,6 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "DefineSpeciesFamily", CclDefineSpeciesFamily);
 	lua_register(Lua, "DefineSpeciesGenus", CclDefineSpeciesGenus);
 	lua_register(Lua, "DefineSpecies", CclDefineSpecies);
-	lua_register(Lua, "GetSpecies", CclGetSpecies);
 	lua_register(Lua, "GetSpeciesData", CclGetSpeciesData);
 	lua_register(Lua, "GetSpeciesGenusData", CclGetSpeciesGenusData);
 	lua_register(Lua, "SetSettlementSiteUnit", CclSetSettlementSiteUnit);

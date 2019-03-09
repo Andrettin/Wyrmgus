@@ -62,6 +62,7 @@
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "script.h"
+#include "species/species.h"
 #include "time/calendar.h"
 #include "ui/button_action.h"
 #include "unit/unit.h"
@@ -817,7 +818,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Playable")) {
 			PlayerRaces.Playable[civilization_id] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Species")) {
-			CSpecies *species = GetSpecies(LuaToString(l, -1));
+			CSpecies *species = CSpecies::Get(LuaToString(l, -1));
 			if (species != nullptr) {
 				civilization->Species = species;
 			}
@@ -1614,7 +1615,7 @@ static int CclGetCivilizationData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Species")) {
 		if (civilization->GetSpecies() != nullptr) {
-			lua_pushstring(l, civilization->GetSpecies()->Ident.c_str());
+			lua_pushstring(l, civilization->GetSpecies()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

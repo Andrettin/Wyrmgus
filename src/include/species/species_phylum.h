@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name age.h - The age header file. */
+/**@name species_phylum.h - The species phylum header file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __AGE_H__
-#define __AGE_H__
+#ifndef __SPECIES_PHYLUM_H__
+#define __SPECIES_PHYLUM_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -40,37 +40,18 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CDependency;
-class CGraphic;
-class CUpgrade;
-
-class CAge : public CDataType
+class CSpeciesPhylum : public CDataType
 {
-	DATA_TYPE_CLASS(CAge)
+	DATA_TYPE_CLASS(CSpeciesPhylum)
 	
 public:
-	~CAge();
-	
-	static void SetCurrentAge(CAge *age);
-	static void CheckCurrentAge();
-	
-	static CAge *CurrentAge;
-	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 public:
-	std::string Name;
-	CGraphic *G = nullptr;
-	int Priority = 0;
-	int YearBoost = 0;
-	CDependency *Predependency = nullptr;
-	CDependency *Dependency = nullptr;
+	std::string Name;				/// Name of the species phylum
+	std::string Kingdom;
+	std::string Subkingdom;
+	std::string Infrakingdom;
 };
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-extern void SetCurrentAge(const std::string &age_ident);
 
 #endif

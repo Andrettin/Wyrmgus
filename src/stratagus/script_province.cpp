@@ -42,6 +42,7 @@
 #include "player.h"
 #include "religion/deity_domain.h"
 #include "script.h"
+#include "species/species.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "unit/unit_type.h"
@@ -638,7 +639,7 @@ static int CclGetPlaneData(lua_State *l)
 		lua_createtable(l, plane->Species.size(), 0);
 		for (size_t i = 1; i <= plane->Species.size(); ++i)
 		{
-			lua_pushstring(l, plane->Species[i-1]->Ident.c_str());
+			lua_pushstring(l, plane->Species[i-1]->GetIdent().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -700,7 +701,7 @@ static int CclGetWorldData(lua_State *l)
 		lua_createtable(l, world->Species.size(), 0);
 		for (size_t i = 1; i <= world->Species.size(); ++i)
 		{
-			lua_pushstring(l, world->Species[i-1]->Ident.c_str());
+			lua_pushstring(l, world->Species[i-1]->GetIdent().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
