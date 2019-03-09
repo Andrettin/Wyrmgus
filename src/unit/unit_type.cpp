@@ -843,7 +843,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			CSpecies *species = CSpecies::Get(value);
 			if (species) {
 				this->Species = species;
-				this->Species->Type = this;
+				this->Species->UnitType = this;
 			}
 		} else if (key == "right_mouse_action") {
 			if (value == "none") {

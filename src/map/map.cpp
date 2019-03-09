@@ -339,16 +339,16 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 	
 	std::vector<CTerrainType *> allowed_terrains;
 	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->Species) { //if the unit is a fauna one, it has to start on terrain it is native to
-		for (size_t i = 0; i < unit_type->Species->Terrains.size(); ++i) {
-			allowed_terrains.push_back(unit_type->Species->Terrains[i]);
+		for (CTerrainType *terrain_type : unit_type->Species->GetNativeTerrainTypes()) {
+			allowed_terrains.push_back(terrain_type);
 		}
 	}
 	
 	for (size_t i = 0; i < unit_type->SpawnUnits.size(); ++i) {
 		CUnitType *spawned_type = unit_type->SpawnUnits[i];
 		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->Species) {
-			for (size_t j = 0; j < spawned_type->Species->Terrains.size(); ++j) {
-				allowed_terrains.push_back(spawned_type->Species->Terrains[j]);
+			for (CTerrainType *terrain_type : spawned_type->Species->GetNativeTerrainTypes()) {
+				allowed_terrains.push_back(terrain_type);
 			}
 		}
 	}

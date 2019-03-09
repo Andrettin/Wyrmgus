@@ -83,8 +83,8 @@ void CSpecies::ProcessConfigData(const CConfigData *config_data)
 			if (category) {
 				this->Category = category;
 			}
-		} else if (key == "species") {
-			this->Species = value;
+		} else if (key == "scientific_name") {
+			this->ScientificName = value;
 		} else if (key == "child_upgrade") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->ChildUpgrade = value;
@@ -106,7 +106,7 @@ void CSpecies::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
 			if (terrain_type) {
-				this->Terrains.push_back(terrain_type);
+				this->NativeTerrainTypes.push_back(terrain_type);
 			}
 		} else if (key == "evolves_from") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -132,7 +132,7 @@ bool CSpecies::CanEvolveToAUnitType(const CTerrainType *terrain_type, const bool
 	for (CSpecies *evolution_species : this->EvolvesTo) {
 		if (
 			(
-				evolution_species->Type != nullptr
+				evolution_species->GetUnitType() != nullptr
 				&& (!terrain_type || evolution_species->IsNativeToTerrainType(terrain_type))
 				&& (!sapient_only || evolution_species->Sapient)
 			)
@@ -151,7 +151,7 @@ CSpecies *CSpecies::GetRandomEvolution(const CTerrainType *terrain_type) const
 	
 	for (CSpecies *evolution_species : this->EvolvesTo) {
 		if (
-			(evolution_species->Type != nullptr && evolution_species->IsNativeToTerrainType(terrain_type))
+			(evolution_species->GetUnitType() != nullptr && evolution_species->IsNativeToTerrainType(terrain_type))
 			|| evolution_species->CanEvolveToAUnitType(terrain_type)
 		) { //give preference to evolutions that are native to the current terrain type
 			potential_evolutions.push_back(evolution_species);
@@ -160,7 +160,7 @@ CSpecies *CSpecies::GetRandomEvolution(const CTerrainType *terrain_type) const
 	
 	if (potential_evolutions.size() == 0) {
 		for (CSpecies *evolution_species : this->EvolvesTo) {
-			if (evolution_species->Type != nullptr || evolution_species->CanEvolveToAUnitType()) {
+			if (evolution_species->GetUnitType() != nullptr || evolution_species->CanEvolveToAUnitType()) {
 				potential_evolutions.push_back(evolution_species);
 			}
 		}

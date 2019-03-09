@@ -1885,7 +1885,7 @@ static int CclDefineUnitType(lua_State *l)
 			CSpecies *species = CSpecies::Get(LuaToString(l, -1));
 			if (species) {
 				type->Species = species;
-				type->Species->Type = type;
+				type->Species->UnitType = type;
 			}
 		} else if (!strcmp(value, "TerrainType")) {
 			type->TerrainType = CTerrainType::GetTerrainType(LuaToString(l, -1));
@@ -3605,8 +3605,8 @@ static int CclDefineSpecies(lua_State *l)
 			if (category) {
 				species->Category = category;
 			}
-		} else if (!strcmp(value, "Species")) {
-			species->Species = LuaToString(l, -1);
+		} else if (!strcmp(value, "ScientificName")) {
+			species->ScientificName = LuaToString(l, -1);
 		} else if (!strcmp(value, "ChildUpgrade")) {
 			species->ChildUpgrade = LuaToString(l, -1);
 		} else if (!strcmp(value, "HomePlane")) {
@@ -3637,7 +3637,7 @@ static int CclDefineSpecies(lua_State *l)
 				if (terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
-				species->Terrains.push_back(terrain);
+				species->NativeTerrainTypes.push_back(terrain);
 			}
 		} else if (!strcmp(value, "EvolvesFrom")) {
 			species->EvolvesFrom.clear();
@@ -3684,15 +3684,6 @@ static int CclGetSpeciesData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, species->GetName().utf8().get_data());
 		return 1;
-	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, species->Description.c_str());
-		return 1;
-	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, species->Quote.c_str());
-		return 1;
-	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, species->Background.c_str());
-		return 1;
 	} else if (!strcmp(data, "Category")) {
 		if (species->GetCategory() != nullptr) {
 			lua_pushstring(l, species->GetCategory()->GetIdent().utf8().get_data());
@@ -3700,60 +3691,34 @@ static int CclGetSpeciesData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
-	} else if (!strcmp(data, "Era")) {
-		lua_pushnumber(l, species->Era);
-		return 1;
 	} else if (!strcmp(data, "Sapient")) {
-		lua_pushboolean(l, species->Sapient);
+		lua_pushboolean(l, species->IsSapient());
 		return 1;
 	} else if (!strcmp(data, "Prehistoric")) {
-		lua_pushboolean(l, species->Prehistoric);
+		lua_pushboolean(l, species->IsPrehistoric());
 		return 1;
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, species->ChildUpgrade.c_str());
 		return 1;
 	} else if (!strcmp(data, "HomePlane")) {
-		if (species->HomePlane != nullptr) {
-			lua_pushstring(l, species->HomePlane->Ident.c_str());
+		if (species->GetHomePlane() != nullptr) {
+			lua_pushstring(l, species->GetHomePlane()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Homeworld")) {
-		if (species->Homeworld != nullptr) {
-			lua_pushstring(l, species->Homeworld->Ident.c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "Type")) {
-		if (species->Type != nullptr) {
-			lua_pushstring(l, species->Type->Ident.c_str());
+		if (species->GetHomeworld() != nullptr) {
+			lua_pushstring(l, species->GetHomeworld()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Terrains")) {
-		lua_createtable(l, species->Terrains.size(), 0);
-		for (size_t i = 1; i <= species->Terrains.size(); ++i)
+		lua_createtable(l, species->GetNativeTerrainTypes().size(), 0);
+		for (size_t i = 1; i <= species->GetNativeTerrainTypes().size(); ++i)
 		{
-			lua_pushstring(l, species->Terrains[i-1]->Ident.c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else if (!strcmp(data, "EvolvesFrom")) {
-		lua_createtable(l, species->EvolvesFrom.size(), 0);
-		for (size_t i = 1; i <= species->EvolvesFrom.size(); ++i)
-		{
-			lua_pushstring(l, species->EvolvesFrom[i-1]->GetIdent().utf8().get_data());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else if (!strcmp(data, "EvolvesTo")) {
-		lua_createtable(l, species->EvolvesTo.size(), 0);
-		for (size_t i = 1; i <= species->EvolvesTo.size(); ++i)
-		{
-			lua_pushstring(l, species->EvolvesTo[i-1]->GetIdent().utf8().get_data());
+			lua_pushstring(l, species->GetNativeTerrainTypes()[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

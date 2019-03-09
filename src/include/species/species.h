@@ -64,9 +64,44 @@ public:
 		return this->Category;
 	}
 	
+	String GetScientificName() const
+	{
+		return this->ScientificName.c_str();
+	}
+	
+	bool IsSapient() const
+	{
+		return this->Sapient;
+	}
+	
+	bool IsPrehistoric() const
+	{
+		return this->Prehistoric;
+	}
+	
+	CPlane *GetHomePlane() const
+	{
+		return this->HomePlane;
+	}
+	
+	CWorld *GetHomeworld() const
+	{
+		return this->Homeworld;
+	}
+	
+	CUnitType *GetUnitType() const
+	{
+		return this->UnitType;
+	}
+	
+	const std::vector<CTerrainType *> &GetNativeTerrainTypes() const
+	{
+		return this->NativeTerrainTypes;
+	}
+	
 	bool IsNativeToTerrainType(const CTerrainType *terrain_type) const
 	{
-		return std::find(this->Terrains.begin(), this->Terrains.end(), terrain_type) != this->Terrains.end();
+		return std::find(this->NativeTerrainTypes.begin(), this->NativeTerrainTypes.end(), terrain_type) != this->NativeTerrainTypes.end();
 	}
 	
 	bool CanEvolveToAUnitType(const CTerrainType *terrain = nullptr, const bool sapient_only = false) const;
@@ -74,26 +109,27 @@ public:
 	
 private:
 	std::string Name;				/// name of the species
-public:
-	int Era = -1;					/// Era ID
-	bool Sapient = false;			/// Whether the species is sapient
-	bool Prehistoric = false;		/// Whether the species is prehistoric or not
+	CSpeciesCategory *Category = nullptr;
+	std::string ScientificName;		/// The scientific name of the species
 	std::string Description;		/// Description of the species
 	std::string Quote;				/// Quote pertaining to the species
 	std::string Background;			/// Background of the species
-private:
-	CSpeciesCategory *Category = nullptr;
+	int Era = -1;					/// Era ID
+	bool Sapient = false;			/// Whether the species is sapient
+	bool Prehistoric = false;		/// Whether the species is prehistoric or not
 public:
-	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
+private:
 	CPlane *HomePlane = nullptr;
 	CWorld *Homeworld = nullptr;
-	CUnitType *Type = nullptr;
-	std::vector<CTerrainType *> Terrains;	/// in which terrains does this species live
+	CUnitType *UnitType = nullptr;
+	std::vector<CTerrainType *> NativeTerrainTypes;	/// in which terrains does this species live
 	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
 	std::vector<CSpecies *> EvolvesTo;		/// to which species this one can evolve
 	
 	friend int CclDefineSpecies(lua_State *l);
+	friend int CclDefineUnitType(lua_State *l);
+	friend class CUnitType;	// necessary so that the unit type may set the species' type to itself
 };
 
 #endif
