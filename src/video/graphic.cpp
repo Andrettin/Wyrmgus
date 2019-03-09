@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -353,7 +351,6 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 	int h = Height;
 
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, skip);
-	UNUSED(skip);
 	DrawTexture(this, textures, frame_map[frame].x + ox,
 				frame_map[frame].y + oy,
 				frame_map[frame].x + ox + (w),
@@ -861,7 +858,6 @@ void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 	int w = Width;
 	int h = Height;
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, skip);
-	UNUSED(skip);
 
 	if (w < Width) {
 		if (ox == 0) {
@@ -2737,5 +2733,3 @@ void CFiller::Load()
 	}
 	//Wyrmgus end
 }
-
-//@}

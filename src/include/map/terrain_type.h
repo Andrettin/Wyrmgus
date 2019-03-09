@@ -36,6 +36,7 @@
 
 #include "include/color.h"
 #include "data_type.h"
+#include "vec2i.h"
 
 #include <map>
 #include <string>

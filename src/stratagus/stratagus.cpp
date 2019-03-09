@@ -251,7 +251,6 @@ std::string StratagusLibPath;		/// Path for data directory
 const char NameLine[] = NAME " v" VERSION ", " COPYRIGHT;
 
 std::string CliMapName;				/// Filename of the map given on the command line
-std::string MenuRace;
 
 bool EnableDebugPrint;				/// if enabled, print the debug messages
 bool EnableAssert;					/// if enabled, halt on assertion failures
@@ -817,74 +816,7 @@ int stratagusMain(int argc, char **argv)
 }
 
 //Wyrmgus start
-int GetReverseDirection(int direction)
-{
-	if (direction == North) {
-		return South;
-	} else if (direction == Northeast) {
-		return Southwest;
-	} else if (direction == East) {
-		return West;
-	} else if (direction == Southeast) {
-		return Northwest;
-	} else if (direction == South) {
-		return North;
-	} else if (direction == Southwest) {
-		return Northeast;
-	} else if (direction == West) {
-		return East;
-	} else if (direction == Northwest) {
-		return Southeast;
-	}
-	return -1;
-}
-
-std::string GetDirectionNameById(int direction)
-{
-	if (direction == North) {
-		return "north";
-	} else if (direction == Northeast) {
-		return "northeast";
-	} else if (direction == East) {
-		return "east";
-	} else if (direction == Southeast) {
-		return "southeast";
-	} else if (direction == South) {
-		return "south";
-	} else if (direction == Southwest) {
-		return "southwest";
-	} else if (direction == West) {
-		return "west";
-	} else if (direction == Northwest) {
-		return "northwest";
-	}
-	return "";
-}
-
-int GetDirectionIdByName(const std::string &direction)
-{
-	if (direction == "north") {
-		return North;
-	} else if (direction == "northeast") {
-		return Northeast;
-	} else if (direction == "east") {
-		return East;
-	} else if (direction == "southeast") {
-		return Southeast;
-	} else if (direction == "south") {
-		return South;
-	} else if (direction == "southwest") {
-		return Southwest;
-	} else if (direction == "west") {
-		return West;
-	} else if (direction == "northwest") {
-		return Northwest;
-	} else {
-		return -1;
-	}
-}
-
-int GetDirectionFromOffset(int x, int y)
+int GetDirectionFromOffset(const int x, const int y)
 {
 	if (x < 0 && y == 0) {
 		return West;
@@ -905,23 +837,5 @@ int GetDirectionFromOffset(int x, int y)
 	}
 
 	return -1;
-}
-
-Vec2i GetDirectionOffset(int direction)
-{
-	Vec2i offset(0, 0);
-			
-	if (direction == North || direction == Northwest || direction == Northeast) {
-		offset.y = -1;
-	} else if (direction == South || direction == Southwest || direction == Southeast) {
-		offset.y = 1;
-	}
-	if (direction == West || direction == Northwest || direction == Southwest) {
-		offset.x = -1;
-	} else if (direction == East || direction == Northeast || direction == Southeast) {
-		offset.x = 1;
-	}
-
-	return offset;
 }
 //Wyrmgus end

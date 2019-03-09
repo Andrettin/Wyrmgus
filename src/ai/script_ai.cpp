@@ -1547,7 +1547,6 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			const int cclforceIdx = LuaToNumber(l, j + 1, 1);
-			UNUSED(cclforceIdx);
 			const int forceIdx = ai->Force.FindFreeForce(AiForceRoleDefault);
 
 			for (int k = 1; k < subargs; ++k) {
@@ -1602,7 +1601,6 @@ static int CclDefineAiPlayer(lua_State *l)
 						++subk;
 #if 0
 						const char *ident = LuaToString(l, -1, subk + 1);
-						UNUSED(ident);
 #endif
 						ai->Force[forceIdx].Units.Insert(&UnitManager.GetSlotUnit(num));
 					}

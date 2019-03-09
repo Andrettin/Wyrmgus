@@ -77,15 +77,8 @@
 
 
 /*============================================================================
-==  Macro
+==  Macros
 ============================================================================*/
-
-// To remove warning for unused variable.
-#ifdef __GNUC__
-#define UNUSED(var) do {__typeof__ (&var) __attribute__ ((unused)) __tmp = &var; } while(0)
-#else
-#define UNUSED(var) (var)
-#endif
 
 #ifdef __GNUC__
 #define PRINTF_VAARG_ATTRIBUTE(a, b) __attribute__((format (printf, a, b)))
@@ -155,15 +148,11 @@ extern const char NameLine[];
 --  Some limits
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-//#define PlayerMax    16                 /// How many players are supported
 #define PlayerMax    32                 /// How many players are supported
-//Wyrmgus end
 #define UnitTypeMax  2048                /// How many unit types supported
 #define UpgradeMax   2048                /// How many upgrades supported
-//Wyrmgus start
-//#define MAX_RACES 8
 #define MAX_RACES 128
+//Wyrmgus start
 #define FactionMax 128				/// Maximum number of factions a civilization can have
 #define PlayerColorMax 32			/// How many player colors are supported
 
@@ -171,7 +160,7 @@ extern const char NameLine[];
 #define PlayerHeroMax 4				/// Maximum heroes per player
 #define PlayerMajorDeityMax 1		/// Maximum major deities per player/character
 //#define PlayerMinorDeityMax 3		/// Maximum minor deities per player/character
-#define PlayerMinorDeityMax 1		/// Maximum minor deities per player/character
+#define PlayerMinorDeityMax 1		/// Maximum minor deities per player/character; make 1 since we don't have enough minor deities right now to make the maximum greater
 #define PlayerDeityMax (PlayerMajorDeityMax + PlayerMinorDeityMax)
 
 #define PopulationPerUnit 1000		/// Number of people a unit represents
@@ -203,7 +192,6 @@ extern const char NameLine[];
 ----------------------------------------------------------------------------*/
 
 extern std::string StratagusLibPath;        /// Location of stratagus data
-extern std::string MenuRace;
 //Wyrmgus start
 extern std::string PlayerFaction;
 //Wyrmgus end
@@ -250,13 +238,7 @@ enum TechLevels {
 	CivilizedGunpowderTechLevel
 };
 
-#include <vec2i.h>
-
-extern int GetReverseDirection(int direction);
-extern std::string GetDirectionNameById(int direction);
-extern int GetDirectionIdByName(const std::string &direction);
-extern int GetDirectionFromOffset(int x, int y);
-extern Vec2i GetDirectionOffset(int direction);
+extern int GetDirectionFromOffset(const int x, const int y);
 //Wyrmgus end
 
 #endif
