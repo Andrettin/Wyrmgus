@@ -3693,14 +3693,7 @@ static int CclGetSpeciesData(lua_State *l)
 	} else if (!strcmp(data, "Background")) {
 		lua_pushstring(l, species->Background.c_str());
 		return 1;
-	} else if (!strcmp(data, "Family")) {
-		if (species->GetCategory() != nullptr && species->GetCategory()->GetUpperCategory() != nullptr) {
-			lua_pushstring(l, species->GetCategory()->GetUpperCategory()->GetIdent().utf8().get_data());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "Genus")) {
+	} else if (!strcmp(data, "Category")) {
 		if (species->GetCategory() != nullptr) {
 			lua_pushstring(l, species->GetCategory()->GetIdent().utf8().get_data());
 		} else {
