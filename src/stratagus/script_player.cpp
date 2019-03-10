@@ -506,7 +506,7 @@ void CPlayer::Load(lua_State *l)
 						}
 						objective->Unique = unique;
 					} else if (!strcmp(value, "settlement")) {
-						CSite *site = CSite::GetSite(LuaToString(l, -1, n + 1));
+						CSite *site = CSite::Get(LuaToString(l, -1, n + 1));
 						if (!site) {
 							LuaError(l, "Site doesn't exist.");
 						}
@@ -3349,13 +3349,13 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "HasSettlement")) {
 		LuaCheckArgs(l, 3);
 		std::string site_ident = LuaToString(l, 3);
-		CSite *site = CSite::GetSite(site_ident);
+		CSite *site = CSite::Get(site_ident);
 		lua_pushboolean(l, p->HasSettlement(site));
 		return 1;
 	} else if (!strcmp(data, "SettlementName")) {
 		LuaCheckArgs(l, 3);
 		std::string site_ident = LuaToString(l, 3);
-		const CSite *site = CSite::GetSite(site_ident);
+		const CSite *site = CSite::Get(site_ident);
 		if (site) {
 			lua_pushstring(l, site->GetCulturalName(p->Race != -1 ? CCivilization::Civilizations[p->Race] : nullptr).c_str());
 		} else {

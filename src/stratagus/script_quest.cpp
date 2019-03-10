@@ -248,7 +248,7 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->Unique = unique;
 					} else if (!strcmp(value, "settlement")) {
-						CSite *site = CSite::GetSite(LuaToString(l, -1, k + 1));
+						CSite *site = CSite::Get(LuaToString(l, -1, k + 1));
 						if (!site) {
 							LuaError(l, "Site doesn't exist.");
 						}

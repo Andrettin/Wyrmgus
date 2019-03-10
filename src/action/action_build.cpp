@@ -162,7 +162,7 @@ enum {
 		this->MapLayer = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "settlement")) {
 		++j;
-		this->Settlement = CSite::GetSite(LuaToString(l, -1, j + 1));
+		this->Settlement = CSite::Get(LuaToString(l, -1, j + 1));
 	//Wyrmgus end
 	} else {
 		return false;

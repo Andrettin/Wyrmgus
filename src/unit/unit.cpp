@@ -3377,7 +3377,7 @@ void CUnit::UpdateSettlement()
 			}
 			
 			if (potential_settlements.empty()) {
-				for (CSite *site : CSite::Sites) {
+				for (CSite *site : CSite::GetAll()) {
 					if (!site->SiteUnit) {
 						potential_settlements.push_back(site);
 					}

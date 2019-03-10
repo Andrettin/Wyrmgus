@@ -70,7 +70,7 @@ void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "site") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Site = CSite::GetSite(value);
+			this->Site = CSite::Get(value);
 			if (this->Site) {
 				this->MapTemplate = this->Site->MapTemplate;
 				this->Position = this->Site->Position;

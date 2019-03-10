@@ -370,7 +370,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				season_schedule->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "site") {
-			CSite *site = CSite::GetOrAddSite(ident);
+			CSite *site = CSite::GetOrAdd(ident);
 			if (!define_only) {
 				site->ProcessConfigData(config_data);
 			}

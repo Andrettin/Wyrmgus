@@ -56,14 +56,9 @@ class CUniqueItem;
 
 class CSite : public CDataType
 {
-public:
-	static CSite *GetSite(const std::string &ident);
-	static CSite *GetOrAddSite(const std::string &ident);
-	static void ClearSites();
+	DATA_TYPE_CLASS(CSite)
 	
-	static std::vector<CSite *> Sites;							/// Sites
-	static std::map<std::string, CSite *> SitesByIdent;
-
+public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	std::string GetCulturalName(const CCivilization *civilization) const;
 

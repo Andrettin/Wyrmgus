@@ -150,7 +150,7 @@ void CleanModules()
 	CleanQuests();
 	CReligion::ClearReligions();
 	CSchoolOfMagic::ClearSchoolsOfMagic();
-	CSite::ClearSites();
+	CSite::Clear();
 	CSpecies::Clear();
 	CSpeciesCategory::Clear();
 	CSpeciesCategoryRank::Clear();

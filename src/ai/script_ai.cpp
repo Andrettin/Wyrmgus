@@ -1467,7 +1467,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 		} else if (!strcmp(value, "landmass")) {
 			landmass = LuaToNumber(l, offset, k + 1);
 		} else if (!strcmp(value, "settlement")) {
-			settlement = CSite::GetSite(LuaToString(l, offset, k + 1));
+			settlement = CSite::Get(LuaToString(l, offset, k + 1));
 		//Wyrmgus end
 		} else {
 			//ident = LuaToString(l, j + 1, k + 1);

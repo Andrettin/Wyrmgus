@@ -490,7 +490,7 @@ static int CclDefineCharacter(lua_State *l)
 					CclGetPos(l, &historical_location->Position.x, &historical_location->Position.y);
 				} else { //site ident
 					std::string site_ident = LuaToString(l, -1);
-					historical_location->Site = CSite::GetSite(site_ident);
+					historical_location->Site = CSite::Get(site_ident);
 					if (!historical_location->Site) {
 						LuaError(l, "Site \"%s\" doesn't exist.\n" _C_ site_ident.c_str());
 					}
