@@ -813,10 +813,10 @@ static int CclDefineCivilization(lua_State *l)
 			civilization->Adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Interface")) {
 			civilization->Interface = LuaToString(l, -1);
-		} else if (!strcmp(value, "Visible")) {
-			PlayerRaces.Visible[civilization_id] = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Hidden")) {
+			civilization->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
-			PlayerRaces.Playable[civilization_id] = LuaToBoolean(l, -1);
+			civilization->Playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Species")) {
 			CSpecies *species = CSpecies::Get(LuaToString(l, -1));
 			if (species != nullptr) {
@@ -839,7 +839,7 @@ static int CclDefineCivilization(lua_State *l)
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
 			civilization->Currency = currency;
 		} else if (!strcmp(value, "DefaultColor")) {
-			PlayerRaces.DefaultColor[civilization_id] = LuaToString(l, -1);
+			civilization->DefaultColor = LuaToString(l, -1);
 		} else if (!strcmp(value, "CivilizationUpgrade")) {
 			PlayerRaces.CivilizationUpgrades[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "DevelopsFrom")) {
@@ -1189,7 +1189,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"m\",\n";
 		button_definition += "\tHint = _(\"~!Move\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + std::string(civilization->GetIdent().utf8().get_data()) + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1201,7 +1201,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"s\",\n";
 		button_definition += "\tHint = _(\"~!Stop\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + std::string(civilization->GetIdent().utf8().get_data()) + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1213,7 +1213,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"a\",\n";
 		button_definition += "\tHint = _(\"~!Attack\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + std::string(civilization->GetIdent().utf8().get_data()) + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1225,7 +1225,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"p\",\n";
 		button_definition += "\tHint = _(\"~!Patrol\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + std::string(civilization->GetIdent().utf8().get_data()) + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1237,7 +1237,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"t\",\n";
 		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + std::string(civilization->GetIdent().utf8().get_data()) + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1611,7 +1611,7 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_pushstring(l, civilization->GetInterface().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
-		lua_pushboolean(l, PlayerRaces.Playable[civilization_id]);
+		lua_pushboolean(l, civilization->IsPlayable());
 		return 1;
 	} else if (!strcmp(data, "Species")) {
 		if (civilization->GetSpecies() != nullptr) {
@@ -1628,7 +1628,7 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Language")) {
-		CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization_id);
+		CLanguage *language = civilization->GetLanguage();
 		if (language != nullptr) {
 			lua_pushstring(l, language->Ident.c_str());
 		} else {
@@ -1636,7 +1636,7 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "DefaultColor")) {
-		lua_pushstring(l, PlayerRaces.DefaultColor[civilization_id].c_str());
+		lua_pushstring(l, civilization->DefaultColor.c_str());
 		return 1;
 	} else if (!strcmp(data, "CivilizationUpgrade")) {
 		lua_pushstring(l, PlayerRaces.CivilizationUpgrades[civilization_id].c_str());
@@ -2664,16 +2664,18 @@ static int CclDefineLanguage(lua_State *l)
 static int CclGetCivilizations(lua_State *l)
 {
 	const int nargs = lua_gettop(l);
-	bool only_visible = false;
+	bool ignore_hidden = false;
 	if (nargs >= 1) {
-		only_visible = LuaToBoolean(l, 1);
+		ignore_hidden = LuaToBoolean(l, 1);
 	}
 
 	std::vector<std::string> civilization_idents;
-	for (int i = 0; i < MAX_RACES; ++i) {
-		if (!PlayerRaces.Name[i].empty() && (!only_visible || PlayerRaces.Visible[i])) {
-			civilization_idents.push_back(PlayerRaces.Name[i]);
+	for (const CCivilization *civilization : CCivilization::Civilizations) {
+		if (ignore_hidden && civilization->IsHidden()) {
+			continue;
 		}
+		
+		civilization_idents.push_back(civilization->GetIdent().utf8().get_data());
 	}
 
 	lua_createtable(l, civilization_idents.size(), 0);
@@ -2835,7 +2837,7 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (faction->Civilization != nullptr) {
-			lua_pushstring(l, PlayerRaces.Name[faction->Civilization->ID].c_str());
+			lua_pushstring(l, faction->Civilization->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3863,7 +3865,7 @@ static int CclGetDeityData(lua_State *l)
 		lua_createtable(l, deity->Civilizations.size(), 0);
 		for (size_t i = 1; i <= deity->Civilizations.size(); ++i)
 		{
-			lua_pushstring(l, PlayerRaces.Name[deity->Civilizations[i-1]->ID].c_str());
+			lua_pushstring(l, deity->Civilizations[i-1]->GetIdent().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

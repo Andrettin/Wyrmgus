@@ -848,7 +848,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 					}
 					civilization = parent_civilization;
 					
-					if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Name[civilization->ID].c_str()) == OAML_OK) {
+					if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization->GetIdent().utf8().get_data()) == OAML_OK) {
 						found_music = true;
 						break;
 					}

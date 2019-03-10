@@ -3293,7 +3293,10 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		}
 	}
 	
-	CLanguage *language = PlayerRaces.GetCivilizationLanguage(civilization ? civilization->ID : -1);
+	CLanguage *language = nullptr;
+	if (civilization) {
+		language = civilization->GetLanguage();
+	}
 	
 	if (this->Name.empty()) { //this is the first time the unit receives a name
 		if (!this->Type->BoolFlag[FAUNA_INDEX].value && this->Trait != nullptr && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait

@@ -115,6 +115,24 @@ public:
 	}
 	
 	/**
+	**	@brief	Get the civilization's language
+	**
+	**	@return	The civilization's language
+	*/
+	CLanguage *GetLanguage() const
+	{
+		if (this->Language) {
+			return this->Language;
+		}
+		
+		if (this->ParentCivilization) {
+			return this->ParentCivilization->GetLanguage();
+		}
+		
+		return nullptr;
+	}
+	
+	/**
 	**	@brief	Get the calendar for the civilization
 	**
 	**	@return	The civilization's calendar
@@ -137,6 +155,16 @@ public:
 		}
 		
 		return nullptr;
+	}
+	
+	bool IsHidden() const
+	{
+		return this->Hidden;
+	}
+	
+	bool IsPlayable() const
+	{
+		return this->Playable;
 	}
 	
 	std::vector<CForceTemplate *> GetForceTemplates(const int force_type) const;
@@ -211,10 +239,14 @@ public:
 	CUnitSound UnitSounds;			/// sounds for unit events
 private:
 	CSpecies *Species = nullptr;	/// the civilization's species (e.g. human)
-public:
 	CLanguage *Language = nullptr;	/// the language used by the civilization
 	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
 	CCurrency *Currency = nullptr;	/// the currency used by the civilization
+private:
+	bool Hidden = false;			/// whether the civilization is hidden
+	bool Playable = true;			/// whether the civilization is playable
+public:
+	std::string DefaultColor;		/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	std::vector<CCivilization *> DevelopsFrom;	/// from which civilizations this civilization develops
 	std::vector<CCivilization *> DevelopsTo;	/// to which civilizations this civilization develops
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization

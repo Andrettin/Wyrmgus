@@ -667,7 +667,7 @@ CReligion *CCharacter::GetReligion() const
 
 CLanguage *CCharacter::GetLanguage() const
 {
-	return PlayerRaces.GetCivilizationLanguage(this->Civilization->ID);
+	return this->Civilization->GetLanguage();
 }
 
 CCalendar *CCharacter::GetCalendar() const
@@ -950,7 +950,7 @@ void SaveHero(CCharacter *hero)
 			fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(hero->Gender).c_str());
 		}
 		if (hero->Civilization) {
-			fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[hero->Civilization->ID].c_str());
+			fprintf(fd, "\tCivilization = \"%s\",\n", hero->Civilization->GetIdent().utf8().get_data());
 		}
 	}
 	if (hero->Type != nullptr) {

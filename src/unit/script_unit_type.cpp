@@ -2415,7 +2415,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (type->GetCivilization() != nullptr) {
-			lua_pushstring(l, PlayerRaces.Name[type->GetCivilization()->ID].c_str());
+			lua_pushstring(l, type->GetCivilization()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

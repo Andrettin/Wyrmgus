@@ -91,7 +91,6 @@ CCivilization *CCivilization::GetOrAddCivilization(const std::string &ident)
 		CCivilization::CivilizationsByIdent[ident] = civilization;
 		
 		PlayerRaces.Name[civilization->ID] = ident;
-		PlayerRaces.Playable[civilization->ID] = true; //civilizations are playable by default
 	}
 	
 	return civilization;

@@ -801,14 +801,6 @@ public:
 class PlayerRace
 {
 public:
-	PlayerRace()
-	{
-		memset(Visible, 0, sizeof(Visible));
-		//Wyrmgus start
-		memset(Playable, 0, sizeof(Playable));
-		//Wyrmgus end
-	}
-
 	void Clean();
 	//Wyrmgus start
 	int GetFactionIndexByName(const std::string &faction_ident) const;
@@ -819,18 +811,14 @@ public:
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
 	int GetFactionClassUnitType(int faction, int class_id);
 	int GetFactionClassUpgrade(int faction, int class_id);
-	CLanguage *GetCivilizationLanguage(int civilization);
 	std::vector<CFiller> GetCivilizationUIFillers(int civilization);
 	std::vector<CFiller> GetFactionUIFillers(int faction);
 	std::string TranslateName(const std::string &name, CLanguage *language);
 	//Wyrmgus end
 
 public:
-	bool Visible[MAX_RACES];        /// race should be visible in pulldown
 	std::string Name[MAX_RACES];    /// race names
 	//Wyrmgus start
-	bool Playable[MAX_RACES];											/// whether the civilization is playable
-	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	std::string CivilizationUpgrades[MAX_RACES];
 	std::map<int, int> CivilizationClassUnitTypes[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
 	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization

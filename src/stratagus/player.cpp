@@ -398,40 +398,36 @@ bool LanguageCacheOutdated = false;
 void PlayerRace::Clean()
 {
 	//Wyrmgus start
-	if (!CCivilization::Civilizations.empty()) { //don't clean the languages if first defining the civilizations
-		for (size_t i = 0; i < this->Languages.size(); ++i) {
-			for (size_t j = 0; j < this->Languages[i]->LanguageWords.size(); ++j) {
-				for (size_t k = 0; k < this->Languages[i]->Dialects.size(); ++k) { //remove word from dialects, so that they don't try to delete it too
-					this->Languages[i]->Dialects[k]->RemoveWord(this->Languages[i]->LanguageWords[j]);
-				}
-				
-				delete this->Languages[i]->LanguageWords[j];
+	for (CLanguage *language : this->Languages) {
+		for (LanguageWord *language_word : language->LanguageWords) {
+			for (CLanguage *dialect : language->Dialects) { //remove word from dialects, so that they don't try to delete it too
+				dialect->RemoveWord(language_word);
 			}
-			this->Languages[i]->LanguageWords.clear();
 			
-			this->Languages[i]->NameTranslations.clear();
+			delete language_word;
 		}
+		language->LanguageWords.clear();
+		
+		language->NameTranslations.clear();
 	}
 	//Wyrmgus end
 	for (size_t i = 0; i != CCivilization::Civilizations.size(); ++i) {
 		this->Name[i].clear();
-		this->Visible[i] = false;
 		//Wyrmgus start
 		this->CivilizationUpgrades[i].clear();
 		this->CivilizationClassUnitTypes[i].clear();
 		this->CivilizationClassUpgrades[i].clear();
-		this->Playable[i] = false;
-		this->DefaultColor[i].clear();
 		this->CivilizationUIFillers[i].clear();
 		//Wyrmgus end
 	}
 	//Wyrmgus start
-	for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
-		delete this->Factions[i];
+	for (CFaction *faction : this->Factions) {
+		delete faction;
 	}
 	this->Factions.clear();
-	for (size_t i = 0; i < PlayerRaces.Dynasties.size(); ++i) {
-		delete this->Dynasties[i];
+	
+	for (CDynasty *dynasty : this->Dynasties) {
+		delete dynasty;
 	}
 	this->Dynasties.clear();
 	//Wyrmgus end
@@ -551,23 +547,6 @@ int PlayerRace::GetFactionClassUpgrade(int faction, int class_id)
 	}
 	
 	return GetCivilizationClassUpgrade(PlayerRaces.Factions[faction]->Civilization->ID, class_id);
-}
-
-CLanguage *PlayerRace::GetCivilizationLanguage(int civilization)
-{
-	if (civilization == -1) {
-		return nullptr;
-	}
-	
-	if (CCivilization::Civilizations[civilization] && CCivilization::Civilizations[civilization]->Language) {
-		return CCivilization::Civilizations[civilization]->Language;
-	}
-	
-	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
-		return GetCivilizationLanguage(CCivilization::Civilizations[civilization]->ParentCivilization->ID);
-	}
-	
-	return nullptr;
 }
 
 std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)

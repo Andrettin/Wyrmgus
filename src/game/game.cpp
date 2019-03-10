@@ -612,7 +612,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tName = \"%s\",\n", type.Name.c_str());
 			}
 			if (type.GetCivilization() != nullptr) {
-				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[type.GetCivilization()->ID].c_str());
+				f->printf("\tCivilization = \"%s\",\n", type.GetCivilization()->GetIdent().utf8().get_data());
 			}
 			if (type.Faction != -1) {
 				f->printf("\tFaction = \"%s\",\n", PlayerRaces.Factions[type.Faction]->Ident.c_str());

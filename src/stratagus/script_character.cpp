@@ -903,7 +903,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (character->Civilization) {
-			lua_pushstring(l, PlayerRaces.Name[character->Civilization->ID].c_str());
+			lua_pushstring(l, character->Civilization->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1068,7 +1068,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (character->Civilization) {
-			lua_pushstring(l, PlayerRaces.Name[character->Civilization->ID].c_str());
+			lua_pushstring(l, character->Civilization->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
