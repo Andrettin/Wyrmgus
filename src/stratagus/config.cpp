@@ -317,7 +317,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				hair_color->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "historical_unit") {
-			CHistoricalUnit *historical_unit = CHistoricalUnit::GetOrAddHistoricalUnit(ident);
+			CHistoricalUnit *historical_unit = CHistoricalUnit::GetOrAdd(ident);
 			if (!define_only) {
 				historical_unit->ProcessConfigData(config_data);
 			}

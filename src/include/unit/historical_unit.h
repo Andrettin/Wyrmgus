@@ -37,10 +37,6 @@
 #include "data_type.h"
 #include "time/date.h"
 
-#include <map>
-#include <string>
-#include <vector>
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -51,15 +47,10 @@ class CUnitType;
 
 class CHistoricalUnit : public CDataType
 {
+	DATA_TYPE_CLASS(CHistoricalUnit)
+	
 public:
 	~CHistoricalUnit();
-	
-	static CHistoricalUnit *GetHistoricalUnit(const std::string &ident, const bool should_find = true);
-	static CHistoricalUnit *GetOrAddHistoricalUnit(const std::string &ident);
-	static void ClearHistoricalUnits();
-	
-	static std::vector<CHistoricalUnit *> HistoricalUnits;
-	static std::map<std::string, CHistoricalUnit *> HistoricalUnitsByIdent;
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	

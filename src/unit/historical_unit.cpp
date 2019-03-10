@@ -41,77 +41,16 @@
 #include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CHistoricalUnit *> CHistoricalUnit::HistoricalUnits;
-std::map<std::string, CHistoricalUnit *> CHistoricalUnit::HistoricalUnitsByIdent;
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a historical unit
-**
-**	@param	ident	The historical unit's string identifier
-**
-**	@return	The historical unit if found, or null otherwise
-*/
-CHistoricalUnit *CHistoricalUnit::GetHistoricalUnit(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CHistoricalUnit *>::const_iterator find_iterator = HistoricalUnitsByIdent.find(ident);
-	
-	if (find_iterator != HistoricalUnitsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid historical unit: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a historical unit
-**
-**	@param	ident	The historical unit's string identifier
-**
-**	@return	The historical unit if found, otherwise a new historical unit is created and returned
-*/
-CHistoricalUnit *CHistoricalUnit::GetOrAddHistoricalUnit(const std::string &ident)
-{
-	CHistoricalUnit *historical_unit = GetHistoricalUnit(ident, false);
-	
-	if (!historical_unit) {
-		historical_unit = new CHistoricalUnit;
-		historical_unit->Ident = ident;
-		HistoricalUnits.push_back(historical_unit);
-		HistoricalUnitsByIdent[ident] = historical_unit;
-	}
-	
-	return historical_unit;
-}
-
-/**
-**	@brief	Remove the existing historical units
-*/
-void CHistoricalUnit::ClearHistoricalUnits()
-{
-	for (size_t i = 0; i < HistoricalUnits.size(); ++i) {
-		delete HistoricalUnits[i];
-	}
-	HistoricalUnits.clear();
-}
 
 /**
 **	@brief	Destructor
 */
 CHistoricalUnit::~CHistoricalUnit()
 {
-	for (size_t i = 0; i < this->HistoricalLocations.size(); ++i) {
-		delete this->HistoricalLocations[i];
+	for (CHistoricalLocation *historical_location : this->HistoricalLocations) {
+		delete historical_location;
 	}
 }
 

@@ -140,7 +140,7 @@ void CleanModules()
 	CDeityDomain::ClearDeityDomains();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
-	CHistoricalUnit::ClearHistoricalUnits();
+	CHistoricalUnit::Clear();
 	CMapTemplate::Clear();
 	CleanMissiles();
 	CPantheon::Clear();
