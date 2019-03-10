@@ -36,12 +36,8 @@ class COrder_Trade : public COrder
 {
 	friend COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market);
 public:
-	COrder_Trade() : COrder(UnitActionTrade), State(0), Range(0), MapLayer(0), HomeMarket(nullptr)
+	COrder_Trade() : COrder(UnitActionTrade)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
-		HomeMarketPos.x = -1;
-		HomeMarketPos.y = -1;
 	}
 
 	virtual COrder_Trade *Clone() const { return new COrder_Trade(*this); }
@@ -54,13 +50,14 @@ public:
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
+	
 private:
-	unsigned int State;
-	int Range;
-	Vec2i goalPos;
-	int MapLayer;
-	CUnit *HomeMarket;
-	Vec2i HomeMarketPos;
+	unsigned int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
+	int MapLayer = 0;
+	CUnit *HomeMarket = nullptr;
+	Vec2i HomeMarketPos = Vec2i(-1, -1);
 };
 
 #endif

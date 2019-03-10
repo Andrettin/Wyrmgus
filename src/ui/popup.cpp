@@ -416,7 +416,7 @@
 	}
 }
 
-CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), Height(1)
+CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite)
 {
 
 }

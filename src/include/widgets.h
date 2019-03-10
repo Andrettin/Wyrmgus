@@ -83,15 +83,12 @@ private:
 class ImageWidget : public gcn::Icon
 {
 public:
-	//Wyrmgus start
-//	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
-	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) { ImageOrigin.x = 0; ImageOrigin.y = 0; }
-	//Wyrmgus end
+	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
 	
 	//Wyrmgus start
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 	
-	Vec2i ImageOrigin;
+	Vec2i ImageOrigin = Vec2i(0, 0);
 	//Wyrmgus end
 };
 
@@ -99,13 +96,13 @@ public:
 class PlayerColorImageWidget : public gcn::Icon
 {
 public:
-	explicit PlayerColorImageWidget(gcn::Image *img, const std::string &playercolor) : gcn::Icon(img), WidgetPlayerColor(playercolor) {ImageOrigin.x = 0; ImageOrigin.y = 0;}
+	explicit PlayerColorImageWidget(gcn::Image *img, const std::string &playercolor) : gcn::Icon(img), WidgetPlayerColor(playercolor) {}
 
 	virtual void draw(gcn::Graphics *graphics);
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
 	std::string WidgetPlayerColor;
-	Vec2i ImageOrigin;
+	Vec2i ImageOrigin = Vec2i(0, 0);
 };
 //Wyrmgus end
 
@@ -336,13 +333,13 @@ class ImageTextField : public gcn::TextField
 {
 	
 public:
-	ImageTextField() : TextField(), itemImage(nullptr) {}
-	ImageTextField(const std::string& text) : gcn::TextField(text), itemImage(nullptr) {}
+	ImageTextField() : TextField() {}
+	ImageTextField(const std::string& text) : gcn::TextField(text) {}
 	virtual void draw(gcn::Graphics *graphics);
 	virtual void drawBorder(gcn::Graphics *graphics);
 	void setItemImage(CGraphic *image) { itemImage = image; }
 private:
-	CGraphic *itemImage;
+	CGraphic *itemImage = nullptr;
 };
 
 class LuaListModel : public gcn::ListModel
@@ -475,15 +472,18 @@ public:
 class ImageDropDownWidget : public DropDownWidget
 {
 public:
-	ImageDropDownWidget() : itemImage(nullptr) {
+	ImageDropDownWidget()
+	{
 		mListBox.addActionListener(this);
 		setListModel(&listmodel);
 		mScrollArea->setContent(&mListBox);
 	}
+	
 	void setItemImage(CGraphic *image) {
 		itemImage = image;
 		mListBox.setItemImage(image);
 	}
+	
 	void setDownNormalImage(CGraphic *image) { DownNormalImage = image; }
 	void setDownPressedImage(CGraphic *image) { DownPressedImage = image; }
 
@@ -501,9 +501,9 @@ public:
 	void setFont(gcn::Font *font);
 	void _mouseInputMessage(const gcn::MouseInput &mouseInput);
 private:
-	CGraphic *itemImage;
-	CGraphic *DownNormalImage;
-	CGraphic *DownPressedImage;
+	CGraphic *itemImage = nullptr;
+	CGraphic *DownNormalImage = nullptr;
+	CGraphic *DownPressedImage = nullptr;
 	ImageListBox mListBox;
 	LuaListModel listmodel;
 };

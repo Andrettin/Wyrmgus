@@ -78,12 +78,12 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 class AutoPng_read_structp
 {
 public:
-	explicit AutoPng_read_structp(png_structp png_ptr) : png_ptr(png_ptr), info_ptr(nullptr) {}
+	explicit AutoPng_read_structp(png_structp png_ptr) : png_ptr(png_ptr) {}
 	~AutoPng_read_structp() { png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : (png_infopp)0, (png_infopp)0); }
 	void setInfo(png_infop info_ptr) { this->info_ptr = info_ptr; }
 private:
 	png_structp png_ptr;
-	png_infop info_ptr;
+	png_infop info_ptr = nullptr;
 };
 
 /**

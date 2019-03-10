@@ -110,21 +110,17 @@ enum ConstructionFileType {
 class CConstructionFrame
 {
 public:
-	CConstructionFrame() : Percent(0), File(ConstructionFileConstruction),
-		Frame(0), Next(nullptr) {}
-
-	int Percent;                    /// Percent complete
-	ConstructionFileType File;      /// Graphic to use
-	int Frame;                      /// Frame number
-	CConstructionFrame *Next;       /// Next pointer
+	int Percent = 0;											/// Percent complete
+	ConstructionFileType File = ConstructionFileConstruction;	/// Graphic to use
+	int Frame = 0;												/// Frame number
+	CConstructionFrame *Next = nullptr;							/// Next pointer
 };
 
 /// Construction shown during construction of a building
 class CConstruction
 {
 public:
-	CConstruction() : Frames(nullptr), Sprite(nullptr), Width(0),
-		Height(0), ShadowSprite(nullptr), ShadowWidth(0), ShadowHeight(0)
+	CConstruction()
 	{
 		File.Width = 0;
 		File.Height = 0;
@@ -136,22 +132,24 @@ public:
 	void Load();
 
 public:
-	std::string Ident;   /// construction identifier
+	std::string Ident;		/// construction identifier
+	
 	struct {
-		std::string File;/// sprite file
-		int Width;       /// sprite width
-		int Height;      /// sprite height
+		std::string File;	/// sprite file
+		int Width;			/// sprite width
+		int Height;			/// sprite height
 	} File, ShadowFile;
-	CConstructionFrame *Frames;  /// construction frames
+	
+	CConstructionFrame *Frames = nullptr;	/// construction frames
 
 	// --- FILLED UP ---
 
-	CPlayerColorGraphic *Sprite;/// construction sprite image
-	int      Width;         /// sprite width
-	int      Height;        /// sprite height
-	CGraphic *ShadowSprite; /// construction shadow sprite image
-	int      ShadowWidth;   /// shadow sprite width
-	int      ShadowHeight;  /// shadow sprite height
+	CPlayerColorGraphic *Sprite = nullptr;	/// construction sprite image
+	int Width = 0;						/// sprite width
+	int Height = 0;						/// sprite height
+	CGraphic *ShadowSprite = nullptr;	/// construction shadow sprite image
+	int ShadowWidth = 0;				/// shadow sprite width
+	int ShadowHeight = 0;				/// shadow sprite height
 };
 
 /*----------------------------------------------------------------------------

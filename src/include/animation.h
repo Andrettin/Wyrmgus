@@ -93,7 +93,7 @@ enum SetVar_ModifyTypes {
 class CAnimation
 {
 public:
-	CAnimation(AnimationType type) : Type(type), Next(nullptr) {}
+	CAnimation(AnimationType type) : Type(type) {}
 
 	virtual ~CAnimation() {}
 
@@ -101,7 +101,7 @@ public:
 	virtual void Init(const char *s, lua_State *l = nullptr) {}
 
 	const AnimationType Type;
-	CAnimation *Next;
+	CAnimation *Next = nullptr;
 };
 
 class CAnimations : public CDataType

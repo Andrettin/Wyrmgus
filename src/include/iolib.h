@@ -80,8 +80,6 @@ FileWriter *CreateFileWriter(const std::string &filename);
 class FileList
 {
 public:
-	FileList() : type(0), sortmode(0) {}
-
 	bool operator < (const FileList &rhs) const
 	{
 		if (type != rhs.type) {
@@ -93,10 +91,10 @@ public:
 		return name < rhs.name;
 	}
 public:
-	std::string name;  /// Name of the file
-	int type;          /// Type of the file
-	int sortmode;      /// Sort by name if 0 or sort by modified time if 1
-	time_t mtime;      /// Modified time
+	std::string name;	/// Name of the file
+	int type = 0;		/// Type of the file
+	int sortmode = 0;	/// Sort by name if 0 or sort by modified time if 1
+	time_t mtime;		/// Modified time
 };
 
 

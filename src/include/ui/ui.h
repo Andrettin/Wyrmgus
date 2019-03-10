@@ -76,63 +76,51 @@ enum TextAlignment {
 class ButtonStyleProperties
 {
 public:
-	ButtonStyleProperties() : Sprite(nullptr), Frame(0), BorderColor(0),
-		BorderSize(0), TextAlign(TextAlignUndefined),
-		TextPos(0, 0)
-	{}
-
-	CGraphic *Sprite;
-	int Frame;
+	CGraphic *Sprite = nullptr;
+	int Frame = 0;
 	CColor BorderColorRGB;
-	IntColor BorderColor;
-	int BorderSize;
-	TextAlignment TextAlign;        /// Text alignment
-	PixelPos TextPos;               /// Text location
-	std::string TextNormalColor;    /// Normal text color
-	std::string TextReverseColor;   /// Reverse text color
+	IntColor BorderColor = 0;
+	int BorderSize = 0;
+	TextAlignment TextAlign = TextAlignUndefined;	/// Text alignment
+	PixelPos TextPos = PixelPos(0, 0);	/// Text location
+	std::string TextNormalColor;	/// Normal text color
+	std::string TextReverseColor;	/// Reverse text color
 };
 
 class ButtonStyle
 {
 public:
-	ButtonStyle() : Width(0), Height(0), Font(nullptr),
-		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
-
-	int Width;                      /// Button width
-	int Height;                     /// Button height
-	CFont *Font;                    /// Font
-	std::string TextNormalColor;    /// Normal text color
-	std::string TextReverseColor;   /// Reverse text color
-	TextAlignment TextAlign;        /// Text alignment
-	int TextX;                      /// Text X location
-	int TextY;                      /// Text Y location
-	ButtonStyleProperties Default;  /// Default button properties
-	ButtonStyleProperties Hover;    /// Hover button properties
-	ButtonStyleProperties Clicked;  /// Clicked button properties
+	int Width = 0;					/// Button width
+	int Height = 0;					/// Button height
+	CFont *Font = nullptr;			/// Font
+	std::string TextNormalColor;	/// Normal text color
+	std::string TextReverseColor;	/// Reverse text color
+	TextAlignment TextAlign = TextAlignUndefined;	/// Text alignment
+	int TextX = 0;					/// Text X location
+	int TextY = 0;					/// Text Y location
+	ButtonStyleProperties Default;	/// Default button properties
+	ButtonStyleProperties Hover;	/// Hover button properties
+	ButtonStyleProperties Clicked;	/// Clicked button properties
 };
 
 /// buttons on screen themselves
 class CUIButton
 {
 public:
-	//Wyrmgus start
-//	CUIButton() : X(0), Y(0), Style(nullptr), Callback(nullptr) {}
-	CUIButton() : X(0), Y(0), Clicked(false), HotkeyPressed(false), Style(nullptr), Callback(nullptr) {}
-	//Wyrmgus end
 	~CUIButton() {}
 
 	bool Contains(const PixelPos &screenPos) const;
 
 public:
-	int X;                          /// x coordinate on the screen
-	int Y;                          /// y coordinate on the screen
+	int X = 0;						/// x coordinate on the screen
+	int Y = 0;						/// y coordinate on the screen
 	//Wyrmgus start
-	bool Clicked;					/// whether the button is currently clicked or not
-	bool HotkeyPressed;				/// whether the button's hotkey is currently pressed or not
+	bool Clicked = false;			/// whether the button is currently clicked or not
+	bool HotkeyPressed = false;		/// whether the button's hotkey is currently pressed or not
 	//Wyrmgus end
-	std::string Text;               /// button text
-	ButtonStyle *Style;             /// button style
-	LuaActionListener *Callback;    /// callback function
+	std::string Text;				/// button text
+	ButtonStyle *Style = nullptr;	/// button style
+	LuaActionListener *Callback = nullptr;	/// callback function
 };
 
 #define MAX_NUM_VIEWPORTS 8         /// Number of supported viewports
@@ -154,21 +142,17 @@ enum ViewportModeType {
 class CMapArea
 {
 public:
-	CMapArea() : X(0), Y(0), EndX(0), EndY(0),
-		ScrollPaddingLeft(0), ScrollPaddingRight(0),
-		ScrollPaddingTop(0), ScrollPaddingBottom(0) {}
-
 	bool Contains(const PixelPos &screenPos) const;
 
 public:
-	int X;                          /// Screen pixel left corner x coordinate
-	int Y;                          /// Screen pixel upper corner y coordinate
-	int EndX;                       /// Screen pixel right x coordinate
-	int EndY;                       /// Screen pixel bottom y coordinate
-	int ScrollPaddingLeft;          /// Scrollable area past the left of map
-	int ScrollPaddingRight;         /// Scrollable area past the right of map
-	int ScrollPaddingTop;           /// Scrollable area past the top of map
-	int ScrollPaddingBottom;        /// Scrollable area past the bottom of map
+	int X = 0;						/// Screen pixel left corner x coordinate
+	int Y = 0;						/// Screen pixel upper corner y coordinate
+	int EndX = 0;					/// Screen pixel right x coordinate
+	int EndY = 0;					/// Screen pixel bottom y coordinate
+	int ScrollPaddingLeft = 0;		/// Scrollable area past the left of map
+	int ScrollPaddingRight = 0;		/// Scrollable area past the right of map
+	int ScrollPaddingTop = 0;		/// Scrollable area past the top of map
+	int ScrollPaddingBottom = 0;	/// Scrollable area past the bottom of map
 };
 
 /**
@@ -177,32 +161,26 @@ public:
 class ConditionPanel
 {
 public:
-	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
-		HideAllied(false), ShowOpponent(false), ShowIfCanCastAnySpell(false), BoolFlags(nullptr),
-		//Wyrmgus start
-		Affixed(0), Unique(0), Replenishment(0),
-		//Wyrmgus end
-		Variables(nullptr) {}
 	~ConditionPanel()
 	{
 		delete[] BoolFlags;
 		delete[] Variables;
 	}
 
-	bool ShowOnlySelected;      /// if true, show only for selected unit.
+	bool ShowOnlySelected = false;	/// if true, show only for selected unit.
 
-	bool HideNeutral;           /// if true, don't show for neutral unit.
-	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
-	bool ShowOpponent;          /// if true, show for opponent unit.
-	bool ShowIfCanCastAnySpell; /// if true, show only if the unit can cast any spell
+	bool HideNeutral = false;	/// if true, don't show for neutral unit.
+	bool HideAllied = false;	/// if true, don't show for allied unit. (but show own units)
+	bool ShowOpponent = false;	/// if true, show for opponent unit.
+	bool ShowIfCanCastAnySpell = false;	/// if true, show only if the unit can cast any spell
 
 	//Wyrmgus start
-	char Affixed;				/// check if the button's unit has an affix
-	char Unique;				/// check if the button's unit is unique
-	char Replenishment;			/// check if the button's unit has resource replenishment
+	char Affixed = 0;			/// check if the button's unit has an affix
+	char Unique = 0;			/// check if the button's unit is unique
+	char Replenishment = 0;		/// check if the button's unit has resource replenishment
 	//Wyrmgus end
-	char *BoolFlags;            /// array of condition about user flags.
-	char *Variables;            /// array of variable to verify (enable and max > 0)
+	char *BoolFlags = nullptr;	/// array of condition about user flags.
+	char *Variables = nullptr;	/// array of variable to verify (enable and max > 0)
 };
 
 /**
@@ -211,19 +189,18 @@ public:
 class CUnitInfoPanel
 {
 public:
-	CUnitInfoPanel() : PosX(0), PosY(0), DefaultFont(0),
-		Contents(), Condition(nullptr) {}
+	CUnitInfoPanel() : Contents() {}
 	~CUnitInfoPanel();
 
 public:
-	std::string Name;      /// Ident of the panel.
-	int PosX;              /// X coordinate of the panel.
-	int PosY;              /// Y coordinate of the panel.
-	CFont *DefaultFont;    /// Default font for content.
+	std::string Name;		/// Ident of the panel.
+	int PosX = 0;			/// X coordinate of the panel.
+	int PosY = 0;			/// Y coordinate of the panel.
+	CFont *DefaultFont = nullptr;	/// Default font for content.
 
-	std::vector<CContentType *>Contents; /// Array of contents to display.
+	std::vector<CContentType *> Contents;	/// Array of contents to display.
 
-	ConditionPanel *Condition; /// Condition to show the panel; if null, no condition.
+	ConditionPanel *Condition = nullptr;	/// Condition to show the panel; if null, no condition.
 };
 
 
@@ -254,8 +231,6 @@ class CFiller
 
 	bits_map map;
 public:
-	CFiller() : G(nullptr), X(0), Y(0) {}
-
 	void Load();
 
 	bool OnGraphic(int x, int y)
@@ -267,17 +242,14 @@ public:
 		}
 		return false;
 	}
-	CGraphic *G;         /// Graphic
-	int X;               /// X coordinate
-	int Y;               /// Y coordinate
+	CGraphic *G = nullptr;	/// Graphic
+	int X = 0;			/// X coordinate
+	int Y = 0;			/// Y coordinate
 };
 
 class CButtonPanel
 {
 public:
-	CButtonPanel() : G(nullptr), X(0), Y(0), ShowCommandKey(true)
-	{}
-
 	void Draw();
 	void Update();
 	void DoClicked(int button);
@@ -315,27 +287,27 @@ private:
 
 
 public:
-	CGraphic *G;
-	int X;
-	int Y;
+	CGraphic *G = nullptr;
+	int X = 0;
+	int Y = 0;
 	std::vector<CUIButton> Buttons;
 	CColor AutoCastBorderColorRGB;
-	bool ShowCommandKey;
+	bool ShowCommandKey = true;
 };
 
 class CPieMenu
 {
 public:
-	CPieMenu() : G(nullptr), MouseButton(NoButton)
+	CPieMenu()
 	{
 		memset(this->X, 0, sizeof(this->X));
 		memset(this->Y, 0, sizeof(this->Y));
 	}
 
-	CGraphic *G;         /// Optional background image
-	int MouseButton;     /// Which mouse button pops up the piemenu, deactivate with NoButton
-	int X[9];            /// X position of the pies
-	int Y[9];            /// Y position of the pies
+	CGraphic *G = nullptr;	/// Optional background image
+	int MouseButton = NoButton;	/// Which mouse button pops up the piemenu, deactivate with NoButton
+	int X[9];			/// X position of the pies
+	int Y[9];			/// Y position of the pies
 
 	void SetRadius(int radius)
 	{
@@ -351,40 +323,33 @@ public:
 class CResourceInfo
 {
 public:
-	CResourceInfo() : G(nullptr), IconFrame(0), IconX(0), IconY(0), IconWidth(-1),
-		Font(nullptr), TextX(-1), TextY(-1) {}
-
-	CGraphic *G;	/// icon graphic
-	int IconFrame;	/// icon frame
-	int IconX;		/// icon X position
-	int IconY;		/// icon Y position
-	int IconWidth;	/// icon W size
-	CFont *Font;	/// Font
+	CGraphic *G = nullptr;	/// icon graphic
+	int IconFrame = 0;	/// icon frame
+	int IconX = 0;	/// icon X position
+	int IconY = 0;	/// icon Y position
+	int IconWidth = -1;	/// icon W size
+	CFont *Font = nullptr;	/// Font
 	std::string Text;	/// text
-	int TextX;	/// text X position
-	int TextY;	/// text Y position
+	int TextX = -1;	/// text X position
+	int TextY = -1;	/// text Y position
 };
 #define MaxResourceInfo  MaxCosts + 4 /// +4 for food and score and mana and free workers count
 
 class CInfoPanel
 {
 public:
-	CInfoPanel() : G(nullptr), X(0), Y(0) {}
-
 	void Draw();
 
-	CGraphic *G;
-	int X;
-	int Y;
+	CGraphic *G = nullptr;
+	int X = 0;
+	int Y = 0;
 };
 
 class CUIUserButton
 {
 public:
-	CUIUserButton() : Clicked(false) {}
-
-	bool Clicked;            // true if button is clicked, false otherwise
-	CUIButton Button;        // User button
+	bool Clicked = false;	/// true if button is clicked, false otherwise
+	CUIButton Button;		/// User button
 };
 
 /**

@@ -42,11 +42,7 @@ class COrder_Attack : public COrder
 	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
 	//Wyrmgus end
 public:
-	explicit COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack),
-		//Wyrmgus start
-//		State(0), MinRange(0), Range(0), goalPos(-1, -1) {}
-		State(0), MinRange(0), Range(0), goalPos(-1, -1), MapLayer(0) {}
-		//Wyrmgus end
+	explicit COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack) {}
 
 	virtual COrder_Attack *Clone() const { return new COrder_Attack(*this); }
 
@@ -73,12 +69,12 @@ private:
 	void AttackTarget(CUnit &unit);
 
 private:
-	int State;
-	int MinRange;
-	int Range;
-	Vec2i goalPos;
+	int State = 0;
+	int MinRange = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
 };
 

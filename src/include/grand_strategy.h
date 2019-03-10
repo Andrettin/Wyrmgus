@@ -72,33 +72,25 @@ enum DiplomacyStates {
 class GrandStrategyWorldMapTile : public WorldMapTile
 {
 public:
-	GrandStrategyWorldMapTile() : WorldMapTile(),
-		Port(false),
-		Province(nullptr), BaseTile(nullptr), GraphicTile(nullptr), ResourceBuildingGraphics(nullptr), ResourceBuildingGraphicsPlayerColor(nullptr)
+	GrandStrategyWorldMapTile() : WorldMapTile()
 	{
 		memset(Borders, 0, sizeof(Borders));
 	}
 
-	bool Port;								/// Whether the tile has a port
+	bool Port = false;						/// Whether the tile has a port
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
-	CGrandStrategyProvince *Province;		/// Province to which the tile belongs
-	CGraphic *BaseTile;
-	CGraphic *GraphicTile;					/// The tile image used by this tile
-	CGraphic *ResourceBuildingGraphics;
-	CPlayerColorGraphic *ResourceBuildingGraphicsPlayerColor;
+	CGrandStrategyProvince *Province = nullptr;	/// Province to which the tile belongs
+	CGraphic *BaseTile = nullptr;
+	CGraphic *GraphicTile = nullptr;		/// The tile image used by this tile
+	CGraphic *ResourceBuildingGraphics = nullptr;
+	CPlayerColorGraphic *ResourceBuildingGraphicsPlayerColor = nullptr;
 	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
 };
 
 class CGrandStrategyProvince : public CProvince
 {
 public:
-	CGrandStrategyProvince() : CProvince(),
-		Civilization(-1),
-		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
-		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
-		Movement(false),
-		Owner(nullptr),
-		Governor(nullptr)
+	CGrandStrategyProvince() : CProvince()
 	{
 		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
 		memset(Units, 0, sizeof(Units));
@@ -133,19 +125,18 @@ public:
 	int GetDesirabilityRating();
 	std::string GenerateWorkName();
 	CGrandStrategyHero *GetRandomAuthor();
-	
-	int Civilization;													/// Civilization of the province (-1 = no one).
-	int TotalUnits;														/// Total quantity of units in the province
-	int TotalWorkers;													/// Total quantity of workers in the province
-	int PopulationGrowthProgress;										/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
-	int FoodConsumption;												/// How much food the people in the province consume
-	int Labor;															/// How much labor available this province has
-	int MilitaryScore;													/// Military score of the forces in the province (including fortifications and militia)
-	int OffensiveMilitaryScore;											/// Military score of the forces in the province which can attack other provinces
-	int AttackingMilitaryScore;											/// Military score of the forces attacking the province
-	bool Movement;														/// Whether a unit or hero is currently moving to the province
-	CGrandStrategyFaction *Owner;										/// Owner of the province
-	CGrandStrategyHero *Governor;										/// Governor of this province
+	int Civilization = -1;												/// Civilization of the province (-1 = no one).
+	int TotalUnits = 0;													/// Total quantity of units in the province
+	int TotalWorkers = 0;												/// Total quantity of workers in the province
+	int PopulationGrowthProgress = 0;									/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
+	int FoodConsumption = 0;											/// How much food the people in the province consume
+	int Labor = 0;														/// How much labor available this province has
+	int MilitaryScore = 0;												/// Military score of the forces in the province (including fortifications and militia)
+	int OffensiveMilitaryScore = 0;										/// Military score of the forces in the province which can attack other provinces
+	int AttackingMilitaryScore = 0;										/// Military score of the forces attacking the province
+	bool Movement = false;												/// Whether a unit or hero is currently moving to the province
+	CGrandStrategyFaction *Owner = nullptr;								/// Owner of the province
+	CGrandStrategyHero *Governor = nullptr;								/// Governor of this province
 	bool SettlementBuildings[UnitTypeMax];								/// Buildings in the province; 0 = not constructed, 1 = under construction, 2 = constructed
 	int Units[UnitTypeMax];												/// Quantity of units of a particular unit type in the province
 	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province
@@ -213,13 +204,6 @@ public:
 class CGrandStrategyHero : public CCharacter
 {
 public:
-	CGrandStrategyHero() : CCharacter(),
-		State(0), Existed(false),
-		Province(nullptr), ProvinceOfOrigin(nullptr),
-		Father(nullptr), Mother(nullptr)
-	{
-	}
-	
 	void Die();
 	void SetType(int unit_type_id);
 	bool IsAlive();
@@ -231,13 +215,12 @@ public:
 	std::string GetMinisterEffectsString(int title);
 	std::string GetBestDisplayTitle();
 	CGrandStrategyFaction *GetFaction();
-	
-	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province, 4 = hero is in the province but not defending it
-	bool Existed;								/// whether the character has existed in this playthrough
-	CGrandStrategyProvince *Province;
-	CGrandStrategyProvince *ProvinceOfOrigin;	/// Province from which the hero originates
-	CGrandStrategyHero *Father;					/// Character's father
-	CGrandStrategyHero *Mother;					/// Character's mother
+	int State = 0;	/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province, 4 = hero is in the province but not defending it
+	bool Existed = false;						/// whether the character has existed in this playthrough
+	CGrandStrategyProvince *Province = nullptr;
+	CGrandStrategyProvince *ProvinceOfOrigin = nullptr;	/// Province from which the hero originates
+	CGrandStrategyHero *Father = nullptr;		/// Character's father
+	CGrandStrategyHero *Mother = nullptr;		/// Character's mother
 	std::vector<CGrandStrategyHero *> Children;	/// Children of the character
 	std::vector<CGrandStrategyHero *> Siblings;	/// Siblings of the character
 	std::vector<std::pair<int, CGrandStrategyFaction *>> Titles;	/// Titles of the character (first value is the title type, and the second one is the faction
@@ -247,13 +230,6 @@ public:
 class CGrandStrategyEvent
 {
 public:
-	CGrandStrategyEvent() :
-		Persistent(false),
-		ID(-1), MinYear(0), MaxYear(0), HistoricalYear(0),
-		World(nullptr),
-		Conditions(nullptr)
-	{
-	}
 	~CGrandStrategyEvent();
 	
 	void Trigger(CGrandStrategyFaction *faction);
@@ -261,13 +237,13 @@ public:
 	
 	std::string Name;
 	std::string Description;
-	bool Persistent;
-	int ID;
-	int MinYear;
-	int MaxYear;
-	int HistoricalYear;
-	CWorld *World;
-	LuaCallback *Conditions;
+	bool Persistent = false;
+	int ID = -1;
+	int MinYear = 0;
+	int MaxYear = 0;
+	int HistoricalYear = 0;
+	CWorld *World = nullptr;
+	LuaCallback *Conditions = nullptr;
 	std::vector<std::string> Options;
 	std::vector<LuaCallback *> OptionConditions;
 	std::vector<LuaCallback *> OptionEffects;
@@ -281,9 +257,7 @@ public:
 class CGrandStrategyGame
 {
 public:
-	CGrandStrategyGame() : 
-		WorldMapWidth(0), WorldMapHeight(0),
-		PlayerFaction(nullptr)
+	CGrandStrategyGame()
 	{
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}
@@ -296,15 +270,15 @@ public:
 	CGrandStrategyHero *GetHero(std::string hero_full_name);
 
 public:
-	int WorldMapWidth;
-	int WorldMapHeight;
+	int WorldMapWidth = 0;
+	int WorldMapHeight = 0;
 	std::vector<CGrandStrategyProvince *> Provinces;
 	std::map<int, std::vector<CGrandStrategyProvince *>> CultureProvinces;	/// provinces belonging to each culture
 	std::vector<CGrandStrategyFaction *> Factions[MAX_RACES];
 	std::vector<CGrandStrategyHero *> Heroes;
 	std::vector<CUpgrade *> UnpublishedWorks;
 	std::vector<CGrandStrategyEvent *> AvailableEvents;
-	CGrandStrategyFaction *PlayerFaction;
+	CGrandStrategyFaction *PlayerFaction = nullptr;
 	int CommodityPrices[MaxCosts];								/// price for every 100 of each commodity
 };
 
@@ -312,11 +286,11 @@ public:
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern bool GrandStrategy;								/// if the game is in grand strategy mode
+extern bool GrandStrategy;						/// if the game is in grand strategy mode
 extern int GrandStrategyYear;
 extern std::string GrandStrategyWorld;
-extern int PopulationGrowthThreshold;					/// How much population growth progress must be accumulated before a new worker unit is created in the province
-extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
+extern int PopulationGrowthThreshold;			/// how much population growth progress must be accumulated before a new worker unit is created in the province
+extern CGrandStrategyGame GrandStrategyGame;	/// grand strategy game
 extern std::map<std::string, int> GrandStrategyHeroStringToIndex;
 extern std::vector<CGrandStrategyEvent *> GrandStrategyEvents;
 extern std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPointer;

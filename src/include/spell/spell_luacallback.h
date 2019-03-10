@@ -40,7 +40,6 @@
 class Spell_LuaCallback : public SpellActionType
 {
 public:
-	Spell_LuaCallback() : Func(nullptr) {};
 	~Spell_LuaCallback() { delete Func; };
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
@@ -48,7 +47,7 @@ public:
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	LuaCallback *Func;
+	LuaCallback *Func = nullptr;
 };
 
 #endif

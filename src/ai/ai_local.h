@@ -77,15 +77,10 @@ public:
 class AiRequestType
 {
 public:
+	unsigned int Count = 0;		/// elements in table
+	CUnitType *Type = nullptr;	/// the type
 	//Wyrmgus start
-//	AiRequestType() : Count(0), Type(nullptr) {}
-	AiRequestType() : Count(0), Type(nullptr), Landmass(0) {}
-	//Wyrmgus end
-
-	unsigned int Count;  /// elements in table
-	CUnitType *Type;     /// the type
-	//Wyrmgus start
-	int Landmass;		 /// in which landmass the unit should be created
+	int Landmass = 0;			/// in which landmass the unit should be created
 	//Wyrmgus end
 };
 
@@ -95,10 +90,8 @@ public:
 class AiUnitType
 {
 public:
-	AiUnitType() : Want(0), Type(nullptr) {}
-
-	unsigned int Want; /// number of this unit-type wanted
-	CUnitType *Type;   /// unit-type self
+	unsigned int Want = 0;		/// number of this unit-type wanted
+	CUnitType *Type = nullptr;	/// unit-type self
 };
 
 /**
@@ -293,24 +286,15 @@ private:
 class AiBuildQueue
 {
 public:
+	unsigned int Want = 0;		/// requested number
+	unsigned int Made = 0;		/// built number
+	CUnitType *Type = nullptr;	/// unit-type
+	unsigned long Wait = 0;		/// wait until this cycle
+	Vec2i Pos = Vec2i(-1, -1);	/// build near pos on map
 	//Wyrmgus start
-//	AiBuildQueue() : Want(0), Made(0), Type(nullptr), Wait(0)
-	AiBuildQueue() : Want(0), Made(0), Type(nullptr), Wait(0), MapLayer(0), Landmass(0), Settlement(nullptr)
-	//Wyrmgus end
-	{
-		Pos.x = Pos.y = -1;
-	}
-
-public:
-	unsigned int Want;  /// requested number
-	unsigned int Made;  /// built number
-	CUnitType *Type;    /// unit-type
-	unsigned long Wait; /// wait until this cycle
-	Vec2i Pos;          /// build near pos on map
-	//Wyrmgus start
-	int MapLayer;
-	int Landmass;
-	CSite *Settlement;
+	int MapLayer = 0;
+	int Landmass = 0;
+	CSite *Settlement = nullptr;
 	//Wyrmgus end
 };
 

@@ -122,32 +122,27 @@ class CUnitType;
 class CCursor
 {
 public:
-	CCursor() : HotPos(0, 0),
-		SpriteFrame(0), FrameRate(0), G(nullptr) {}
+	std::string Ident;		/// Identifier to reference it
+	std::string Race;		/// Race name
 
-	std::string Ident;  /// Identifier to reference it
-	std::string Race;   /// Race name
+	PixelPos HotPos = PixelPos(0, 0);	/// Hot point
 
-	PixelPos HotPos;     /// Hot point
-
-	int SpriteFrame;  /// Current displayed cursor frame
-	int FrameRate;    /// Rate of changing the frames
+	int SpriteFrame = 0;	/// Current displayed cursor frame
+	int FrameRate = 0;		/// Rate of changing the frames
 
 	// --- FILLED UP ---
 
-	CGraphic *G; /// Cursor sprite image
+	CGraphic *G = nullptr;	/// Cursor sprite image
 };
 
 /// Cursor config reference
 class CursorConfig
 {
 public:
-	CursorConfig() : Cursor(nullptr) {}
-
 	void Load();
 
-	std::string Name; /// Config cursor-type name
-	CCursor *Cursor;  /// Cursor-type pointer
+	std::string Name;			/// Config cursor-type name
+	CCursor *Cursor = nullptr;	/// Cursor-type pointer
 };
 
 /// Cursor state

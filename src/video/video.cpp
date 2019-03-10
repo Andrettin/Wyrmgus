@@ -122,9 +122,6 @@ public:
 class CColorCycling
 {
 private:
-	CColorCycling() : ColorCycleAll(false), cycleCount(0)
-	{}
-
 	static void CreateInstanceIfNeeded()
 	{
 		if (s_instance == nullptr) {
@@ -137,16 +134,13 @@ public:
 
 	static void ReleaseInstance() { delete s_instance; s_instance = nullptr; }
 public:
-	std::vector<SDL_Surface *> PaletteList;        /// List of all used palettes.
-	std::vector<ColorIndexRange> ColorIndexRanges; /// List of range of color index for cycling.
-	bool ColorCycleAll;                            /// Flag Color Cycle with all palettes
-	unsigned int cycleCount;
+	std::vector<SDL_Surface *> PaletteList;			/// List of all used palettes.
+	std::vector<ColorIndexRange> ColorIndexRanges;	/// List of range of color index for cycling.
+	bool ColorCycleAll = false;						/// Flag Color Cycle with all palettes
+	unsigned int cycleCount = 0;
 private:
 	static CColorCycling *s_instance;
 };
-
-
-
 
 /*----------------------------------------------------------------------------
 --  Externals

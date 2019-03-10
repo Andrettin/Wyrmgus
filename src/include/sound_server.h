@@ -50,22 +50,20 @@
 class CSample
 {
 public:
-	CSample() : Channels(0), SampleSize(0), Frequency(0), BitsPerSample(0),
-		Buffer(nullptr), Pos(0), Len(0) {}
 	virtual ~CSample() {}
 
 	virtual int Read(void *buf, int len) = 0;
 
-	unsigned char Channels;       /// mono or stereo
-	unsigned char SampleSize;     /// sample size in bits
-	unsigned int Frequency;       /// frequency in hz
-	unsigned short BitsPerSample; /// bits in a sample 8/16/32
+	unsigned char Channels = 0;			/// mono or stereo
+	unsigned char SampleSize = 0;		/// sample size in bits
+	unsigned int Frequency = 0;			/// frequency in hz
+	unsigned short BitsPerSample = 0;	/// bits in a sample 8/16/32
 
-	unsigned char *Buffer;        /// sample buffer
-	int Pos;                      /// buffer position
-	int Len;                      /// length of filled buffer
+	unsigned char *Buffer = nullptr;	/// sample buffer
+	int Pos = 0;						/// buffer position
+	int Len = 0;						/// length of filled buffer
 	//Wyrmgus start
-	std::string File;			  /// for debugging
+	std::string File;			/// for debugging
 	//Wyrmgus end
 };
 

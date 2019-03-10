@@ -1363,7 +1363,7 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 }
 
-CMap::CMap() : NoFogOfWar(false), TileGraphic(nullptr), Landmasses(0), BorderTerrain(nullptr)
+CMap::CMap()
 {
 	Tileset = new CTileset;
 }

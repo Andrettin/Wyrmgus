@@ -77,7 +77,7 @@ public:
 	virtual int Cast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &goalPos, int z, int modifier) = 0;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
-	const int ModifyManaCaster;
+	const int ModifyManaCaster = 0;
 };
 
 
@@ -117,22 +117,18 @@ public:
 class ConditionInfoVariable
 {
 public:
-	ConditionInfoVariable() : Enable(0), Check(false), ExactValue(0), ExceptValue(0),
-		MinValue(0), MaxValue(0), MinMax(0), MinValuePercent(0), MaxValuePercent(0),
-		ConditionApplyOnCaster(0) {};
+	char Enable = 0;			/// Target is 'user defined variable'.
+	bool Check = false;			/// True if need to check that variable.
 
-	char Enable;                /// Target is 'user defined variable'.
-	bool Check;                 /// True if need to check that variable.
+	int ExactValue = 0;			/// Target must have exactly ExactValue of it's value.
+	int ExceptValue = 0;		/// Target mustn't have ExceptValue of it's value.
+	int MinValue = 0;			/// Target must have more Value than that.
+	int MaxValue = 0;			/// Target must have less Value than that.
+	int MinMax = 0;				/// Target must have more Max than that.
+	int MinValuePercent = 0;	/// Target must have more (100 * Value / Max) than that.
+	int MaxValuePercent = 0;	/// Target must have less (100 * Value / Max) than that.
 
-	int ExactValue;             /// Target must have exactly ExactValue of it's value.
-	int ExceptValue;            /// Target mustn't have ExceptValue of it's value.
-	int MinValue;               /// Target must have more Value than that.
-	int MaxValue;               /// Target must have less Value than that.
-	int MinMax;                 /// Target must have more Max than that.
-	int MinValuePercent;        /// Target must have more (100 * Value / Max) than that.
-	int MaxValuePercent;        /// Target must have less (100 * Value / Max) than that.
-
-	char ConditionApplyOnCaster; /// true if these condition are for caster.
+	char ConditionApplyOnCaster = 0;	/// true if these condition are for caster.
 	// FIXME : More (increase, MaxMax) ?
 };
 
@@ -144,11 +140,6 @@ public:
 class ConditionInfo
 {
 public:
-	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
-		//Wyrmgus start
-		ThrustingWeapon(0), FactionUnit(0), CivilizationEquivalent(-1), FactionEquivalent(nullptr),
-		//Wyrmgus end
-		BoolFlag(nullptr), Variable(nullptr), CheckFunc(nullptr) {};
 	~ConditionInfo()
 	{
 		delete[] BoolFlag;
@@ -164,20 +155,20 @@ public:
 #define CONDITION_FALSE 1
 #define CONDITION_TRUE  0
 #define CONDITION_ONLY  2
-	char Alliance;          /// Target is allied. (neutral is neither allied, nor opponent)
-	char Opponent;          /// Target is opponent. (neutral is neither allied, nor opponent)
-	char TargetSelf;        /// Target is the same as the caster.
+	char Alliance = 0;		/// Target is allied. (neutral is neither allied, nor opponent)
+	char Opponent = 0;		/// Target is opponent. (neutral is neither allied, nor opponent)
+	char TargetSelf = 0;	/// Target is the same as the caster.
 	//Wyrmgus start
-	char ThrustingWeapon;	/// Caster has a thrusting weapon as the current weapon.
-	char FactionUnit;		/// Caster is a faction-specific unit.
-	int CivilizationEquivalent;
-	CFaction *FactionEquivalent;	/// Caster is of the same civilization as this faction, and the faction has its own unit of the caster's class.
+	char ThrustingWeapon = 0;	/// Caster has a thrusting weapon as the current weapon.
+	char FactionUnit = 0;		/// Caster is a faction-specific unit.
+	int CivilizationEquivalent = -1;
+	CFaction *FactionEquivalent = nullptr;	/// Caster is of the same civilization as this faction, and the faction has its own unit of the caster's class.
 	//Wyrmgus end
 
-	char *BoolFlag;         /// User defined boolean flag.
+	char *BoolFlag = nullptr;	/// User defined boolean flag.
 
-	ConditionInfoVariable *Variable;
-	LuaCallback *CheckFunc;
+	ConditionInfoVariable *Variable = nullptr;
+	LuaCallback *CheckFunc = nullptr;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells

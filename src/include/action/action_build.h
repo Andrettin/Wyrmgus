@@ -41,13 +41,8 @@ class COrder_Build : public COrder
 	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement);
 	//Wyrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Build() : COrder(UnitActionBuild), Type(nullptr), State(0), Range(0)
-	COrder_Build() : COrder(UnitActionBuild), Type(nullptr), State(0), Range(0), MapLayer(0), Settlement(nullptr)
-	//Wyrmgus end
+	COrder_Build() : COrder(UnitActionBuild)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
 	}
 
 	virtual COrder_Build *Clone() const { return new COrder_Build(*this); }
@@ -80,14 +75,14 @@ private:
 	bool BuildFromOutside(CUnit &unit) const;
 	void HelpBuild(CUnit &unit, CUnit &building);
 private:
-	CUnitType *Type;        /// build a unit of this unit-type
-	CUnitPtr BuildingUnit;  /// unit builded.
-	int State;
-	int Range;
-	Vec2i goalPos;
+	CUnitType *Type = nullptr;	/// build a unit of this unit-type
+	CUnitPtr BuildingUnit;		/// unit builded.
+	int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
-	CSite *Settlement;
+	int MapLayer = 0;
+	CSite *Settlement = nullptr;
 	//Wyrmgus end
 };
 

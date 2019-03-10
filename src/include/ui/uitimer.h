@@ -35,14 +35,12 @@ class CFont;
 class CUITimer
 {
 public:
-	CUITimer() : X(0), Y(0), Font(nullptr) {}
-
 	void Draw(int second) const;
 
 public:
-	int X;
-	int Y;
-	CFont *Font;
+	int X = 0;
+	int Y = 0;
+	CFont *Font = nullptr;
 };
 
 #endif

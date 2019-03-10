@@ -303,20 +303,6 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range, int max_length,
 --  REAL PATH-FINDER
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-//PathFinderInput::PathFinderInput() : unit(nullptr), minRange(0), maxRange(0),
-PathFinderInput::PathFinderInput() : unit(nullptr), minRange(0), maxRange(0), MapLayer(0),
-//Wyrmgus end
-	isRecalculatePathNeeded(true)
-{
-	unitSize.x = 0;
-	unitSize.y = 0;
-	goalPos.x = -1;
-	goalPos.y = -1;
-	goalSize.x = 0;
-	goalSize.y = 0;
-}
-
 const Vec2i &PathFinderInput::GetUnitPos() const { return unit->tilePos; }
 const int PathFinderInput::GetUnitMapLayer() const { return unit->MapLayer->ID; }
 Vec2i PathFinderInput::GetUnitSize() const

@@ -110,29 +110,27 @@ public:
 class CSound
 {
 public:
-	//Wyrmgus start
-//	CSound() : Mapref(0), Range(0), Number(0)
-	CSound() : Mapref(0), Range(0), Number(0), VolumePercent(0)
-	//Wyrmgus end
+	CSound()
 	{
 		memset(&Sound, 0, sizeof(Sound));
 	}
+	
 	~CSound();
 	
 	static void ProcessConfigData(const CConfigData *config_data);
 		
-	unsigned int Mapref;
+	unsigned int Mapref = 0;
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
 	*/
-	unsigned char Range;        /// Range is a multiplier for DistanceSilent
+	unsigned char Range = 0;	/// Range is a multiplier for DistanceSilent
 	//Wyrmgus start
-//	unsigned char Number;       /// single, group, or table of sounds.
-	unsigned int Number;       /// single, group, or table of sounds.
+//	unsigned char Number = 0;	/// single, group, or table of sounds.
+	unsigned int Number = 0;	/// single, group, or table of sounds.
 	//Wyrmgus end
 	//Wyrmgus start
-	int VolumePercent;
+	int VolumePercent = 0;
 	//Wyrmgus end
 	union {
 		CSample *OneSound;       /// if it's only a simple sound

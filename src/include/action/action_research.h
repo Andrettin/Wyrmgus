@@ -36,10 +36,7 @@ class COrder_Research : public COrder
 {
 	friend COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player);
 public:
-	//Wyrmgus start
-//	COrder_Research() : COrder(UnitActionResearch), Upgrade(nullptr) {}
-	COrder_Research() : COrder(UnitActionResearch), Upgrade(nullptr), Player(0) {}
-	//Wyrmgus end
+	COrder_Research() : COrder(UnitActionResearch) {}
 
 	virtual COrder_Research *Clone() const { return new COrder_Research(*this); }
 
@@ -58,9 +55,9 @@ public:
 	const CUpgrade &GetUpgrade() const { return *Upgrade; }
 	void SetUpgrade(CUpgrade &upgrade) { Upgrade = &upgrade; }
 private:
-	CUpgrade *Upgrade;
+	CUpgrade *Upgrade = nullptr;
 	//Wyrmgus start
-	int Player;      /// Player for whom the upgrade will be acquired (needed for researching upgrades in neutral buildings)
+	int Player = 0;	/// Player for whom the upgrade will be acquired (needed for researching upgrades in neutral buildings)
 	//Wyrmgus end
 };
 

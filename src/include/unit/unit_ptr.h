@@ -38,7 +38,7 @@ class CUnit;
 class CUnitPtr
 {
 public:
-	CUnitPtr() : unit(nullptr) {}
+	CUnitPtr() {}
 	CUnitPtr(CUnit *u);
 	CUnitPtr(const CUnitPtr &u);
 	~CUnitPtr() { Reset(); }
@@ -57,7 +57,7 @@ public:
 	bool operator!= (CUnit *u) const { return this->unit != u; }
 
 private:
-	CUnit *unit;
+	CUnit *unit = nullptr;
 };
 
 #endif

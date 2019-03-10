@@ -53,13 +53,6 @@ class CMinimap
 	void UpdateSeen(void *const pixels, const int pitch);
 
 public:
-	//Wyrmgus start
-//	CMinimap() : X(0), Y(0), W(0), H(0), XOffset(0), YOffset(0),
-	CMinimap() : X(0), Y(0), W(0), H(0),
-	//Wyrmgus end
-		WithTerrain(false), ShowSelected(false),
-		Transparent(false), UpdateCache(false) {}
-
 	void UpdateXY(const Vec2i &pos, int z);
 	void UpdateSeenXY(const Vec2i &) {}
 	void Update();
@@ -81,20 +74,20 @@ public:
 
 	bool Contains(const PixelPos &screenPos) const;
 public:
-	int X;
-	int Y;
-	int W;
-	int H;
+	int X = 0;
+	int Y = 0;
+	int W = 0;
+	int H = 0;
 	//Wyrmgus start
-//	int XOffset;
-//	int YOffset;
+//	int XOffset = 0;
+//	int YOffset = 0;
 	std::vector<int> XOffset;
 	std::vector<int> YOffset;
 	//Wyrmgus end
-	bool WithTerrain;
-	bool ShowSelected;
-	bool Transparent;
-	bool UpdateCache;
+	bool WithTerrain = false;
+	bool ShowSelected = false;
+	bool Transparent = false;
+	bool UpdateCache = false;
 };
 
 #if defined(USE_OPENGL) || defined(USE_GLES)

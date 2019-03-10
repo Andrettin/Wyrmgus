@@ -36,7 +36,7 @@ class COrder_TransformInto : public COrder
 {
 	friend COrder *COrder::NewActionTransformInto(CUnitType &type);
 public:
-	COrder_TransformInto() : COrder(UnitActionTransformInto), Type(nullptr) {}
+	COrder_TransformInto() : COrder(UnitActionTransformInto) {}
 
 	virtual COrder_TransformInto *Clone() const { return new COrder_TransformInto(*this); }
 
@@ -55,7 +55,7 @@ public:
 	//Wyrmgus end
 
 private:
-	CUnitType *Type; /// Transform unit into this unit-type
+	CUnitType *Type = nullptr;	/// Transform unit into this unit-type
 };
 
 
@@ -63,7 +63,7 @@ class COrder_UpgradeTo : public COrder
 {
 	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 public:
-	COrder_UpgradeTo() : COrder(UnitActionUpgradeTo), Type(nullptr), Ticks(0) {}
+	COrder_UpgradeTo() : COrder(UnitActionUpgradeTo) {}
 
 	virtual COrder_UpgradeTo *Clone() const { return new COrder_UpgradeTo(*this); }
 
@@ -84,9 +84,10 @@ public:
 	//Wyrmgus end
 	
 	const CUnitType &GetUnitType() const { return *Type; }
+	
 private:
-	CUnitType *Type; /// upgrade to this unit-type
-	int Ticks;       /// Ticks to complete
+	CUnitType *Type = nullptr;	/// upgrade to this unit-type
+	int Ticks = 0;				/// Ticks to complete
 };
 
 //Wyrmgus start

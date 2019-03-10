@@ -691,12 +691,6 @@ public:
 class CDynasty
 {
 public:
-	CDynasty() : 
-		ID(-1), Civilization(-1),
-		DynastyUpgrade(nullptr), Conditions(nullptr)
-	{
-	}
-	
 	~CDynasty();
 	
 	std::string Ident;													/// dynasty name
@@ -704,27 +698,17 @@ public:
 	std::string Description;											/// dynasty description
 	std::string Quote;													/// dynasty quote
 	std::string Background;												/// dynasty background
-	CUpgrade *DynastyUpgrade;											/// dynasty upgrade applied when the dynasty is set
-	int ID;																/// dynasty ID
-	int Civilization;													/// dynasty civilization
-	IconConfig Icon;													/// Dynasty's icon
-	LuaCallback *Conditions;
+	CUpgrade *DynastyUpgrade = nullptr;									/// dynasty upgrade applied when the dynasty is set
+	int ID = -1;														/// dynasty ID
+	int Civilization = -1;												/// dynasty civilization
+	IconConfig Icon;													/// dynasty's icon
+	LuaCallback *Conditions = nullptr;
 	std::vector<CFaction *> Factions;									/// to which factions is this dynasty available
 };
 
 class LanguageWord
 {
 public:
-	LanguageWord() : 
-		Type(-1), Gender(-1), GrammaticalNumber(-1),
-		Language(nullptr), DerivesFrom(nullptr),
-		Archaic(false),
-		Uncountable(false),
-		ArticleType(-1),
-		Number(-1)
-	{
-	}
-	
 	bool HasMeaning(const std::string &meaning);
 	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
@@ -733,23 +717,23 @@ public:
 	void RemoveFromVector(std::vector<LanguageWord *>& word_vector);
 
 	std::string Word;									/// Word name / ID.
-	CLanguage *Language;								/// The language the word belongs to
-	int Type;											/// Word type
-	int Gender;											/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
-	int GrammaticalNumber;								/// Grammatical number (i.e. whether the word is necessarily plural or not)
-	bool Archaic;										/// Whether the word is archaic (whether it is used in current speech)
+	CLanguage *Language = nullptr;						/// The language the word belongs to
+	int Type = -1;										/// Word type
+	int Gender = -1;									/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
+	int GrammaticalNumber = -1;							/// Grammatical number (i.e. whether the word is necessarily plural or not)
+	bool Archaic = false;								/// Whether the word is archaic (whether it is used in current speech)
 	std::map<std::tuple<int, int>, std::string> NumberCaseInflections;	/// For nouns, mapped to grammatical number and grammatical case
 	std::map<std::tuple<int, int, int, int>, std::string> NumberPersonTenseMoodInflections;	/// For verbs, mapped to grammatical number, grammatical person, grammatical tense and grammatical mood
 	std::string ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// For adjectives
 	std::string Participles[MaxGrammaticalTenses];		/// For verbs
 	std::vector<std::string> Meanings;					/// Meanings of the word in English.
-	LanguageWord *DerivesFrom;    						/// From which word does this word derive
+	LanguageWord *DerivesFrom = nullptr;    			/// From which word does this word derive
 	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
 	LanguageWord *CompoundElements[MaxAffixTypes];    	/// From which compound elements is this word formed
 	std::vector<LanguageWord *> CompoundElementOf[MaxAffixTypes];	/// Which words are formed from this word as a compound element
 	
 	// noun-specific variables
-	bool Uncountable;				/// Whether the noun is uncountable or not.
+	bool Uncountable = false;		/// Whether the noun is uncountable or not.
 	
 	//pronoun and article-specific variables
 	std::string Nominative;			/// Nominative case for the pronoun (if any)
@@ -758,10 +742,10 @@ public:
 	std::string Genitive;			/// Genitive case for the pronoun (if any)
 	
 	//article-specific variables
-	int ArticleType;				/// Which article type this article belongs to
+	int ArticleType = -1;			/// Which article type this article belongs to
 	
 	//numeral-specific variables
-	int Number;
+	int Number = -1;
 	
 	std::string Mod;				/// To which mod (or map), if any, this word belongs
 };

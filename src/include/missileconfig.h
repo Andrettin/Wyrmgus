@@ -42,15 +42,13 @@ class MissileType;
 class MissileConfig
 {
 public:
-	MissileConfig() : Missile(nullptr) {}
-
 	bool MapMissileNoLog();
 	bool MapMissile();
 	bool IsEmpty() { return Name.empty(); }
 
 public:
-	std::string Name;        /// Config missile name
-	MissileType *Missile;    /// Identifier to use to run time
+	std::string Name;				/// Config missile name
+	MissileType *Missile = nullptr;	/// Identifier to use to run time
 };
 
 #endif

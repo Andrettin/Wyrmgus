@@ -166,7 +166,7 @@ public:
 class ReceiverTCPJob : public Job
 {
 public:
-	explicit ReceiverTCPJob(ClientTCP& client) : client(&client), check(false) {}
+	explicit ReceiverTCPJob(ClientTCP& client) : client(&client) {}
 
 	bool Check() const { return check; }
 private:
@@ -179,8 +179,8 @@ private:
 		check = foo.Check();
 	}
 private:
-	ClientTCP *client;
-	bool check;
+	ClientTCP *client = nullptr;
+	bool check = false;
 };
 
 class SenderTCPJob : public Job
@@ -200,7 +200,7 @@ private:
 		server->Write(foo);
 	}
 private:
-	ServerTCP *server;
+	ServerTCP *server = nullptr;
 };
 
 TEST_FIXTURE(AutoNetwork, ExchangeTCP)
@@ -270,7 +270,7 @@ private:
 class ReceiverUDPJob : public Job
 {
 public:
-	explicit ReceiverUDPJob(ClientUDP& client) : client(&client), check(false) {}
+	explicit ReceiverUDPJob(ClientUDP& client) : client(&client) {}
 
 	bool Check() const { return check; }
 private:
@@ -283,8 +283,8 @@ private:
 		check = foo.Check();
 	}
 private:
-	ClientUDP *client;
-	bool check;
+	ClientUDP *client = nullptr;
+	bool check = false;
 };
 
 class SenderUDPJob : public Job

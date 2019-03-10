@@ -351,7 +351,6 @@ enum _extended_message_type_ {
 class CNetworkCommand
 {
 public:
-	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0) {}
 	void Clear() { this->Unit = this->X = this->Y = this->Dest = 0; }
 
 	size_t Serialize(unsigned char *buf) const;
@@ -359,10 +358,10 @@ public:
 	static size_t Size() { return 2 + 2 + 2 + 2; }
 
 public:
-	uint16_t Unit;         /// Command for unit
-	uint16_t X;            /// Map position X
-	uint16_t Y;            /// Map position Y
-	uint16_t Dest;         /// Destination unit
+	uint16_t Unit = 0;		/// Command for unit
+	uint16_t X = 0;			/// Map position X
+	uint16_t Y = 0;			/// Map position Y
+	uint16_t Dest = 0;		/// Destination unit
 };
 
 /**
@@ -371,17 +370,15 @@ public:
 class CNetworkExtendedCommand
 {
 public:
-	CNetworkExtendedCommand() : ExtendedType(0), Arg1(0), Arg2(0), Arg3(0), Arg4(0) {}
-
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	static size_t Size() { return 1 + 1 + 2 + 2 + 2; }
 
-	uint8_t  ExtendedType;  /// Extended network command type
-	uint8_t  Arg1;          /// Argument 1
-	uint16_t Arg2;          /// Argument 2
-	uint16_t Arg3;          /// Argument 3
-	uint16_t Arg4;          /// Argument 4
+	uint8_t  ExtendedType = 0;	/// Extended network command type
+	uint8_t  Arg1 = 0;			/// Argument 1
+	uint16_t Arg2 = 0;			/// Argument 2
+	uint16_t Arg3 = 0;			/// Argument 3
+	uint16_t Arg4 = 0;			/// Argument 4
 };
 
 /**
@@ -404,14 +401,13 @@ public:
 class CNetworkCommandSync
 {
 public:
-	CNetworkCommandSync() : syncSeed(0), syncHash(0) {}
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	static size_t Size() { return 4 + 4; };
 
 public:
-	uint32_t syncSeed;
-	uint32_t syncHash;
+	uint32_t syncSeed = 0;
+	uint32_t syncHash = 0;
 };
 
 /**
@@ -420,13 +416,12 @@ public:
 class CNetworkCommandQuit
 {
 public:
-	CNetworkCommandQuit() : player(0) {}
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	static size_t Size() { return 2; };
 
 public:
-	uint16_t player;
+	uint16_t player = 0;
 };
 
 /**
@@ -435,14 +430,12 @@ public:
 class CNetworkSelection
 {
 public:
-	CNetworkSelection() : player(0) {}
-
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	size_t Size() const;
 
 public:
-	uint16_t player;
+	uint16_t player = 0;
 	std::vector<uint16_t> Units;  /// Selection Units
 };
 

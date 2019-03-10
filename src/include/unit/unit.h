@@ -125,10 +125,7 @@ enum _directions_ {
 class CUnit
 {
 public:
-	//Wyrmgus start
-//	CUnit() : tilePos(-1, -1), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr) { Init(); }
-	CUnit() : tilePos(-1, -1), RallyPointPos(-1, -1), MapLayer(nullptr), RallyPointMapLayer(nullptr), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr) { Init(); }
-	//Wyrmgus end
+	CUnit() { Init(); }
 
 	void Init();
 
@@ -471,44 +468,44 @@ public:
 	std::vector<CUnit *> SoldUnits;						/// units available for sale at this unit
 	//Wyrmgus end
 	
-	Vec2i tilePos; /// Map position X
+	Vec2i tilePos = Vec2i(-1, -1);	/// Map position X
 	//Wyrmgus start
-	Vec2i RallyPointPos;			/// used for storing the rally point position (where units trained by this unit will be sent to)
-	CMapLayer *MapLayer;			/// in which map layer the unit is
-	CMapLayer *RallyPointMapLayer;	/// in which map layer the unit's rally point is
+	Vec2i RallyPointPos = Vec2i(-1, -1);	/// used for storing the rally point position (where units trained by this unit will be sent to)
+	CMapLayer *MapLayer = nullptr;			/// in which map layer the unit is
+	CMapLayer *RallyPointMapLayer = nullptr;	/// in which map layer the unit's rally point is
 	//Wyrmgus end
 
-	unsigned int Offset;/// Map position as flat index offset (x + y * w)
+	unsigned int Offset;	/// Map position as flat index offset (x + y * w)
 
-	const CUnitType  *Type;        /// Pointer to unit-type (peon,...)
-	CPlayer    *Player;            /// Owner of this unit
-	const CUnitStats *Stats;       /// Current unit stats
-	int         CurrentSightRange; /// Unit's Current Sight Range
+	const CUnitType *Type = nullptr;	/// Pointer to unit-type (peon,...)
+	CPlayer *Player = nullptr;			/// Owner of this unit
+	const CUnitStats *Stats = nullptr;	/// Current unit stats
+	int CurrentSightRange; /// Unit's Current Sight Range
 
 	// Pathfinding stuff:
-	PathFinderData *pathFinderData;
+	PathFinderData *pathFinderData = nullptr;
 
 	// DISPLAY:
-	int         Frame;      /// Image frame: <0 is mirrored
-	CUnitColors *Colors;    /// Player colors
+	int Frame;				/// Image frame: <0 is mirrored
+	CUnitColors *Colors = nullptr;	/// Player colors
 	//Wyrmgus start
 	std::string Name;		/// Unit's personal/proper name (if any)
 	std::string ExtraName;	/// Unit's "extra" name (i.e. a nickname)
 	std::string FamilyName;	/// Unit's family name
 	CCharacter *Character;	/// Pointer to the character represented by this unit
-	CSite *Settlement;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
-	CUpgrade *Trait;	/// Unit's trait
+	CSite *Settlement = nullptr;	/// Settlement (for if the unit is a town hall or a building associated to a settlement)
+	CUpgrade *Trait = nullptr;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
 	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has
-	CUpgrade *Prefix;	/// Item unit's prefix
-	CUpgrade *Suffix;	/// Item unit's suffix
-	CSpell *Spell;		/// Item unit's spell
-	CUpgrade *Work;		/// Item unit's literary work
-	CUpgrade *Elixir;	/// Item unit's elixir
-	CUniqueItem *Unique;		/// Whether the item is unique
+	CUpgrade *Prefix = nullptr;	/// Item unit's prefix
+	CUpgrade *Suffix = nullptr;	/// Item unit's suffix
+	CSpell *Spell = nullptr;	/// Item unit's spell
+	CUpgrade *Work = nullptr;	/// Item unit's literary work
+	CUpgrade *Elixir = nullptr;	/// Item unit's elixir
+	CUniqueItem *Unique = nullptr;	/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified
-	CUnit *ConnectingDestination;	/// Which connector this unit connects to (if any)
+	CUnit *ConnectingDestination = nullptr;	/// Which connector this unit connects to (if any)
 	std::map<int, CIcon *> ButtonIcons;				/// icons for button actions
 	//Wyrmgus end
 	std::map<int, int> IndividualUpgrades;      /// individual upgrades which the unit has (and how many of it the unit has)
@@ -545,8 +542,8 @@ public:
 	unsigned Waiting : 1;        /// Unit is waiting and playing its still animation
 	unsigned MineLow : 1;        /// This mine got a notification about its resources being low
 	
-	unsigned TeamSelected;  /// unit is selected by a team member.
-	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
+	unsigned TeamSelected;	/// unit is selected by a team member.
+	CPlayer *RescuedFrom = nullptr;	/// The original owner of a rescued unit.
 	/// null if the unit was not rescued.
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
@@ -585,9 +582,9 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 
 
 	std::vector<COrder *> Orders; /// orders to process
-	COrder *SavedOrder;         /// order to continue after current
-	COrder *NewOrder;           /// order for new trained units
-	COrder *CriticalOrder;      /// order to do as possible in breakable animation.
+	COrder *SavedOrder = nullptr;	/// order to continue after current
+	COrder *NewOrder = nullptr;		/// order for new trained units
+	COrder *CriticalOrder = nullptr;	/// order to do as possible in breakable animation.
 
 	char *AutoCastSpell;        /// spells to auto cast
 	int *SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready
@@ -608,53 +605,40 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 class CPreference
 {
 public:
-	CPreference() : ShowSightRange(false), ShowReactionRange(false),
-		ShowAttackRange(false), ShowMessages(true), BigScreen(false),
-		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
-		IconsShift(false), StereoSound(true), MineNotifications(false),
-		DeselectInMine(false), NoStatusLineTooltips(false),
-		//Wyrmgus start
-		PlayerColorCircle(false), SepiaForGrayscale(false),
-		ShowPathlines(false),
-//		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
-		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5), HotkeySetup(0),
-		IconFrameG(nullptr), PressedIconFrameG(nullptr), CommandButtonFrameG(nullptr), BarFrameG(nullptr), InfoPanelFrameG(nullptr), ProgressBarG(nullptr) {};
-		//Wyrmgus end
-
-	bool ShowSightRange;     /// Show sight range.
-	bool ShowReactionRange;  /// Show reaction range.
-	bool ShowAttackRange;    /// Show attack range.
-	bool ShowMessages;		 /// Show messages.
-	bool BigScreen;			 /// If true, shows the big screen(without panels)
-	bool PauseOnLeave;       /// If true, game pauses when cursor is gone
-	bool AiExplores;         /// If true, AI sends explorers to search for resources (almost useless thing)
-	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc
-	bool IconsShift;         /// Shift icons slightly when you press on them
-	bool StereoSound;        /// Enables/disables stereo sound effects	
-	bool MineNotifications;  /// Show mine is running low/depleted messages
-	bool DeselectInMine;     /// Deselect peasants in mines
-	bool NoStatusLineTooltips;	/// Don't show messages on status line
+	bool ShowSightRange = false;	/// Show sight range.
+	bool ShowReactionRange = false;	/// Show reaction range.
+	bool ShowAttackRange = false;	/// Show attack range.
+	bool ShowMessages = true;		/// Show messages.
+	bool BigScreen = false;			/// If true, shows the big screen(without panels)
+	bool PauseOnLeave = true;		/// If true, game pauses when cursor is gone
+	bool AiExplores = true;			/// If true, AI sends explorers to search for resources (almost useless thing)
+	bool GrayscaleIcons = false;	/// Use grayscaled icons for unavailable units, upgrades, etc
+	bool IconsShift = false;		/// Shift icons slightly when you press on them
+	bool StereoSound = true;		/// Enables/disables stereo sound effects	
+	bool MineNotifications = false;	/// Show mine is running low/depleted messages
+	bool DeselectInMine = false;	/// Deselect peasants in mines
+	bool NoStatusLineTooltips = false;	/// Don't show messages on status line
 	//Wyrmgus start
-	bool SepiaForGrayscale;		/// Use a sepia filter for grayscale icons
-	bool PlayerColorCircle;		/// Show a player color circle below each unit
-	bool ShowPathlines;			/// Show order pathlines
+	bool SepiaForGrayscale = false;	/// Use a sepia filter for grayscale icons
+	bool PlayerColorCircle = false;	/// Show a player color circle below each unit
+	bool ShowPathlines = false;		/// Show order pathlines
 	//Wyrmgus end
 
-	int ShowOrders;			/// How many second show orders of unit on map.
-	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.
-	int ShowNameTime;		/// How many cycles need to show unit's name popup.
-	int AutosaveMinutes;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
+	int ShowOrders = 0;			/// How many second show orders of unit on map.
+	int ShowNameDelay = 0;		/// How many cycles need to wait until unit's name popup will appear.
+	int ShowNameTime = 0;		/// How many cycles need to show unit's name popup.
+	int AutosaveMinutes = 5;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
 	//Wyrmgus start
-	int HotkeySetup;			/// Hotkey layout (0 = default, 1 = position-based, 2 = position-based (except commands))
+	int HotkeySetup = 0;		/// Hotkey layout (0 = default, 1 = position-based, 2 = position-based (except commands))
 	//Wyrmgus end
-	std::string SF2Soundfont;/// Path to SF2 soundfont
+	std::string SF2Soundfont;	/// Path to SF2 soundfont
 	//Wyrmgus start
-	CGraphic *IconFrameG;
-	CGraphic *PressedIconFrameG;
-	CGraphic *CommandButtonFrameG;
-	CGraphic *BarFrameG;
-	CGraphic *InfoPanelFrameG;
-	CGraphic *ProgressBarG;
+	CGraphic *IconFrameG = nullptr;
+	CGraphic *PressedIconFrameG = nullptr;
+	CGraphic *CommandButtonFrameG = nullptr;
+	CGraphic *BarFrameG = nullptr;
+	CGraphic *InfoPanelFrameG = nullptr;
+	CGraphic *ProgressBarG = nullptr;
 	//Wyrmgus end
 };
 

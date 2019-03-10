@@ -36,13 +36,8 @@ class COrder_Defend : public COrder
 {
 	friend COrder *COrder::NewActionDefend(CUnit &dest);
 public:
-	//Wyrmgus start
-//	COrder_Defend() : COrder(UnitActionDefend), State(0), Range(0)
-	COrder_Defend() : COrder(UnitActionDefend), State(0), Range(0), MapLayer(0)
-	//Wyrmgus end
+	COrder_Defend() : COrder(UnitActionDefend)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
 	}
 
 	virtual COrder_Defend *Clone() const { return new COrder_Defend(*this); }
@@ -56,11 +51,11 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 private:
-	unsigned int State;
-	int Range;
-	Vec2i goalPos;
+	unsigned int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
 };
 

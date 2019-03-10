@@ -41,19 +41,16 @@ enum {
 class TitleScreenLabel
 {
 public:
-	TitleScreenLabel() : Font(0), Xofs(0), Yofs(0), Flags(0) {}
-
 	std::string Text;
-	CFont *Font;
-	int Xofs;
-	int Yofs;
-	int Flags;
+	CFont *Font = nullptr;
+	int Xofs = 0;
+	int Yofs = 0;
+	int Flags = 0;
 };
 
 class TitleScreen
 {
 public:
-	TitleScreen() : StretchImage(true), Timeout(0), Iterations(0), Editor(0), Labels(nullptr) {}
 	~TitleScreen()
 	{
 		if (this->Labels) {
@@ -71,11 +68,11 @@ private:
 public:
 	std::string File;
 	std::string Music;
-	bool StretchImage;
-	int Timeout;
-	int Iterations;
-	int Editor;
-	TitleScreenLabel **Labels;
+	bool StretchImage = true;
+	int Timeout = 0;
+	int Iterations = 0;
+	int Editor = 0;
+	TitleScreenLabel **Labels = nullptr;
 };
 
 extern TitleScreen **TitleScreens;          /// File for title screen

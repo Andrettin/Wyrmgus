@@ -36,13 +36,13 @@
 class CAnimation_Unbreakable : public CAnimation
 {
 public:
-	CAnimation_Unbreakable() : CAnimation(AnimationUnbreakable), state(0) {}
+	CAnimation_Unbreakable() : CAnimation(AnimationUnbreakable) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	int state;
+	int state = 0;
 };
 
 #endif

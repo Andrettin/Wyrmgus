@@ -39,13 +39,8 @@ class COrder_Patrol : public COrder
 	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z);
 	//Wyrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0)
-	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0), MapLayer(0), WayPointMapLayer(0)
-	//Wyrmgus end
+	COrder_Patrol() : COrder(UnitActionPatrol)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
 	}
 
 	virtual COrder_Patrol *Clone() const { return new COrder_Patrol(*this); }
@@ -61,13 +56,13 @@ public:
 
 	const Vec2i &GetWayPoint() const { return WayPoint; }
 private:
-	Vec2i WayPoint; /// position for patroling.
-	unsigned int WaitingCycle; /// number of cycle pathfinder wait.
-	int Range;
-	Vec2i goalPos;
+	Vec2i WayPoint = Vec2i(-1, -1);	/// position for patroling.
+	unsigned int WaitingCycle = 0;	/// number of cycle pathfinder wait.
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
-	int WayPointMapLayer;
+	int MapLayer = 0;
+	int WayPointMapLayer = 0;
 	//Wyrmgus end
 };
 

@@ -67,8 +67,6 @@ public:
 class Spell_SpawnMissile : public SpellActionType
 {
 public:
-	Spell_SpawnMissile() : 
-		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget) {}
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
@@ -84,8 +82,8 @@ private:
 	bool AlwaysHits = false;				/// The missile spawned from the spell always hits
 	bool AlwaysCritical = false;			/// The damage from the spell is always a critical hit (double damage)
 	//Wyrmgus end
-	SpellActionMissileLocation StartPoint;	/// Start point description.
-	SpellActionMissileLocation EndPoint;	/// Start point description.
+	SpellActionMissileLocation StartPoint = LocBaseCaster;	/// Start point description.
+	SpellActionMissileLocation EndPoint = LocBaseTarget;	/// Start point description.
 	MissileType *Missile = nullptr;			/// Missile fired on cast
 };
 

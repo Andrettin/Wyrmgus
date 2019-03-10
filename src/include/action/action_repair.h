@@ -40,13 +40,8 @@ class COrder_Repair : public COrder
 	friend COrder *COrder::NewActionRepair(const Vec2i &pos, int z);
 	//Wyrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0)
-	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0), MapLayer(0)
-	//Wyrmgus end
+	COrder_Repair() : COrder(UnitActionRepair)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
 	}
 
 	virtual COrder_Repair *Clone() const { return new COrder_Repair(*this); }
@@ -65,11 +60,11 @@ private:
 	bool RepairUnit(const CUnit &unit, CUnit &goal);
 private:
 	CUnitPtr ReparableTarget;
-	unsigned int State;
-	unsigned int RepairCycle;
-	Vec2i goalPos;
+	unsigned int State = 0;
+	unsigned int RepairCycle = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
 };
 

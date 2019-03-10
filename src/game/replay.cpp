@@ -74,24 +74,18 @@ extern void StartMap(const std::string &filename, bool clean);
 class LogEntry
 {
 public:
-	LogEntry() : GameCycle(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
-		Num(0), SyncRandSeed(0), Next(nullptr)
-	{
-		UnitNumber = 0;
-	}
-
-	unsigned long GameCycle;
-	int UnitNumber;
+	unsigned long GameCycle = 0;
+	int UnitNumber = 0;
 	std::string UnitIdent;
 	std::string Action;
-	int Flush;
-	int PosX;
-	int PosY;
-	int DestUnitNumber;
+	int Flush = 0;
+	int PosX = 0;
+	int PosY = 0;
+	int DestUnitNumber = 0;
 	std::string Value;
-	int Num;
-	unsigned SyncRandSeed;
-	LogEntry *Next;
+	int Num = 0;
+	unsigned SyncRandSeed = 0;
+	LogEntry *Next = nullptr;
 };
 
 /**
@@ -100,19 +94,14 @@ public:
 class MPPlayer
 {
 public:
-	//Wyrmgus start
-//	MPPlayer() : Race(0), Team(0), Type(0) {}
-	MPPlayer() : Race(0), Faction(-1), Team(0), Type(0) {}
-	//Wyrmgus end
-
 	std::string Name;
 	std::string AIScript;
-	int Race;
+	int Race = 0;
 	//Wyrmgus start
-	int Faction;
+	int Faction = -1;
 	//Wyrmgus end
-	int Team;
-	int Type;
+	int Team = 0;
+	int Type = 0;
 };
 
 /**

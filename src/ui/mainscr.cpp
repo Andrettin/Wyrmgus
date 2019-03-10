@@ -1260,11 +1260,8 @@ static int MessagesEventIndex;                 /// FIXME: docu
 class MessagesDisplay
 {
 public:
-	MessagesDisplay() : show(true)
+	MessagesDisplay()
 	{
-#ifdef DEBUG
-		showBuilList = false;
-#endif
 		CleanMessages();
 		//Wyrmgus start
 		CleanObjectives();
@@ -1301,9 +1298,9 @@ private:
 	int  ObjectivesCount;                       /// Number of objectives
 	//Wyrmgus end
 	unsigned long MessagesFrameTimeout;       /// Frame to expire message
-	bool show;
+	bool show = true;
 #ifdef DEBUG
-	bool showBuilList;
+	bool showBuilList = false;
 #endif
 };
 

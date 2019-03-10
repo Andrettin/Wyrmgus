@@ -63,13 +63,10 @@ class GameData;
 */
 class ServerStruct {
 public:
-	ServerStruct() : Port(0), MaxConnections(0), IdleTimeout(0),
-		PollingDelay(0) {}
-
-	int Port;
- 	int MaxConnections;
-	int IdleTimeout;
-	int PollingDelay;
+	int Port = 0;
+ 	int MaxConnections = 0;
+	int IdleTimeout = 0;
+	int PollingDelay = 0;
 };
 
 extern ServerStruct Server;
@@ -81,7 +78,7 @@ extern ServerStruct Server;
 */
 class Session {
 public:
-	Session() : Next(NULL), Prev(NULL), Idle(0), Sock(0), Game(NULL)
+	Session()
 	{
 		Buffer[0] = '\0';
 		AddrData.Host = 0;
@@ -92,14 +89,14 @@ public:
 		UserData.Version[0] = '\0';
 		UserData.LoggedIn = 0;
 	}
-
-	Session *Next;
-	Session *Prev;
+	
+	Session *Next = nullptr;
+	Session *Prev = nullptr;
 
 	char Buffer[1024];
-	time_t Idle;
+	time_t Idle = 0;
 
-	Socket Sock;
+	Socket Sock = 0;
 
 	struct {
 		unsigned long Host;
@@ -114,7 +111,7 @@ public:
 		int LoggedIn;
 	} UserData;               /// Specific user data.
 
-	GameData *Game;
+	GameData *Game = nullptr;
 };
 
 /**
@@ -122,13 +119,11 @@ public:
 */
 class SessionPool {
 public:
-	SessionPool() : First(NULL), Last(NULL), Count(0), Sockets(NULL) {}
+	Session *First = nullptr;
+	Session *Last = nullptr;
+	int Count = 0;
 
-	Session *First;
-	Session *Last;
-	int Count;
-
-	SocketSet *Sockets;
+	SocketSet *Sockets = nullptr;
 };
 
 	/// external reference to session tracking.

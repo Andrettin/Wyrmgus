@@ -886,7 +886,7 @@ template <typename T>
 class MinMaxRangeVisitor
 {
 public:
-	explicit MinMaxRangeVisitor(const T &func) : func(func), minrange(0), maxrange(0) {}
+	explicit MinMaxRangeVisitor(const T &func) : func(func) {}
 
 	//Wyrmgus start
 //	void SetGoal(Vec2i goalTopLeft, Vec2i goalBottomRight)
@@ -1095,8 +1095,8 @@ private:
 	Vec2i goalTopLeft;
 	Vec2i goalBottomRight;
 	Vec2i unitExtraTileSize;
-	int minrange;
-	int maxrange;
+	int minrange = 0;
+	int maxrange = 0;
 	//Wyrmgus start
 	int z;
 	//Wyrmgus end
@@ -1604,13 +1604,11 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 }
 
 struct StatsNode {
-	StatsNode() : Direction(0), InGoal(0), CostFromStart(0), Costs(0), CostToGoal(0) {}
-
-	int Direction;
-	int InGoal;
-	int CostFromStart;
-	int Costs;
-	int CostToGoal;
+	int Direction = 0;
+	int InGoal = 0;
+	int CostFromStart = 0;
+	int Costs = 0;
+	int CostToGoal = 0;
 };
 
 //Wyrmgus start

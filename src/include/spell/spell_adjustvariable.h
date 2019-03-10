@@ -39,34 +39,28 @@
 class SpellActionTypeAdjustVariable
 {
 public:
-	SpellActionTypeAdjustVariable() : Enable(0), Value(0), Max(0), Increase(0),
-		ModifEnable(0), ModifValue(0), ModifMax(0), ModifIncrease(0),
-		InvertEnable(0), AddValue(0), AddMax(0), AddIncrease(0), IncreaseTime(0),
-		TargetIsCaster(0) {};
+	int Enable = 0;				/// Value to affect to this field.
+	int Value = 0;				/// Value to affect to this field.
+	int Max = 0;				/// Value to affect to this field.
+	int Increase = 0;			/// Value to affect to this field.
 
-	int Enable;                 /// Value to affect to this field.
-	int Value;                  /// Value to affect to this field.
-	int Max;                    /// Value to affect to this field.
-	int Increase;               /// Value to affect to this field.
+	char ModifEnable = 0;		/// true if we modify this field.
+	char ModifValue = 0;		/// true if we modify this field.
+	char ModifMax = 0;			/// true if we modify this field.
+	char ModifIncrease = 0;		/// true if we modify this field.
 
-	char ModifEnable;           /// true if we modify this field.
-	char ModifValue;            /// true if we modify this field.
-	char ModifMax;              /// true if we modify this field.
-	char ModifIncrease;         /// true if we modify this field.
-
-	char InvertEnable;          /// true if we invert this field.
-	int AddValue;               /// Add this value to this field.
-	int AddMax;                 /// Add this value to this field.
-	int AddIncrease;            /// Add this value to this field.
-	int IncreaseTime;           /// How many time increase the Value field.
-	char TargetIsCaster;        /// true if the target is the caster.
+	char InvertEnable = 0;		/// true if we invert this field.
+	int AddValue = 0;			/// Add this value to this field.
+	int AddMax = 0;				/// Add this value to this field.
+	int AddIncrease = 0;		/// Add this value to this field.
+	int IncreaseTime = 0;		/// How many time increase the Value field.
+	char TargetIsCaster = 0;	/// true if the target is the caster.
 };
 
 
 class Spell_AdjustVariable : public SpellActionType
 {
 public:
-	Spell_AdjustVariable() : Var(nullptr) {};
 	~Spell_AdjustVariable() { delete [](this->Var); };
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual int Cast(CUnit &caster, const CSpell &spell,
@@ -74,7 +68,7 @@ public:
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	SpellActionTypeAdjustVariable *Var;
+	SpellActionTypeAdjustVariable *Var = nullptr;
 };
 
 #endif

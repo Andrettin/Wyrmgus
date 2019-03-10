@@ -97,9 +97,10 @@ struct lua_State;
 class COrder
 {
 public:
-	explicit COrder(int action) : Goal(), Action(action), Finished(false)
+	explicit COrder(int action) : Goal(), Action(action)
 	{
 	}
+	
 	virtual ~COrder();
 
 	virtual COrder *Clone() const = 0;
@@ -193,8 +194,8 @@ protected:
 private:
 	CUnitPtr Goal;
 public:
-	const unsigned char Action;   /// global action
-	bool Finished; /// true when order is finish
+	const unsigned char Action;	/// global action
+	bool Finished = false;		/// true when order is finish
 };
 
 typedef COrder *COrderPtr;

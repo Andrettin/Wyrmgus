@@ -253,7 +253,6 @@
 class CNetworkCommandQueue
 {
 public:
-	CNetworkCommandQueue() : Time(0), Type(0) {}
 	void Clear() { this->Time = this->Type = 0; Data.clear(); }
 
 	bool operator == (const CNetworkCommandQueue &rhs) const
@@ -262,8 +261,8 @@ public:
 	}
 	bool operator != (const CNetworkCommandQueue &rhs) const { return !(*this == rhs); }
 public:
-	unsigned long Time;    /// time to execute
-	unsigned char Type;    /// Command Type
+	unsigned long Time = 0;	/// time to execute
+	unsigned char Type = 0;	/// Command Type
 	std::vector<unsigned char> Data;  /// command content (network format)
 };
 

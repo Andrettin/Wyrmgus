@@ -39,17 +39,16 @@
 class Spell_Capture : public SpellActionType
 {
 public:
-	Spell_Capture() : SacrificeEnable(false), JoinToAIForce(false), Damage(0), DamagePercent(0) {};
 	virtual void ProcessConfigData(const CConfigData *config_data) override {};
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	bool SacrificeEnable; /// true if the caster dies after casting.
-	bool JoinToAIForce;   /// if true, captured unit is joined into caster's AI force, if available
-	int Damage;           /// damage the spell does if unable to caputre
-	int DamagePercent;    /// percent the target must be damaged for a
+	bool SacrificeEnable = false;	/// true if the caster dies after casting.
+	bool JoinToAIForce = false;		/// if true, captured unit is joined into caster's AI force, if available
+	int Damage = 0;					/// damage the spell does if unable to caputre
+	int DamagePercent = 0;			/// percent the target must be damaged for a
 	/// capture to succeed.
 };
 

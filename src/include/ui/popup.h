@@ -50,86 +50,76 @@ class CPopup;
 class PopupConditionPanel
 {
 public:
-	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
-		//Wyrmgus start
-		Class(false), Description(false), Quote(false), Encyclopedia(false), SettlementName(false), CanActiveHarvest(false),
-		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Elixir(0), ConsumedElixir(0), Unique(0), UniqueSet(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0), FactionUpgrade(0), FactionCoreSettlements(0), Ability(0), ChildResources(0), ImproveIncomes(0), LuxuryResource(0), RequirementsString(0), ExperienceRequirementsString(0), BuildingRulesString(0),
-//		ButtonAction(-1), BoolFlags(nullptr), Variables(nullptr) {}
-		ButtonAction(-1), UnitTypeType(-1), UnitTypeClass(-1), ItemClass(-1), CanStore(-1), ImproveIncome(-1), BoolFlags(nullptr), Variables(nullptr) {}
-		//Wyrmgus end
 	~PopupConditionPanel()
 	{
 		delete[] BoolFlags;
 		delete[] Variables;
 	}
 
-	bool HasHint;               /// check if button has hint.
-	bool HasDescription;        /// check if button has description.
-	bool HasDependencies;       /// check if button has dependencies or restrictions.
+	bool HasHint = false;			/// check if button has hint.
+	bool HasDescription = false;	/// check if button has description.
+	bool HasDependencies = false;	/// check if button has dependencies or restrictions.
 	//Wyrmgus start
-	bool Class;					/// check if the button's unit type has a class.
-	bool Description;			/// check if the button's unit type has a description.
-	bool Quote;					/// check if the button's unit type has a quote.
-	bool Encyclopedia;			/// check if the button's unit type has an encyclopedia entry.
-	bool SettlementName;		/// check if the button's unit has a settlement name.
-	bool CanActiveHarvest;			/// check if the active unit can harvest the button's unit.
+	bool Class = false;				/// check if the button's unit type has a class.
+	bool Description = false;		/// check if the button's unit type has a description.
+	bool Quote = false;				/// check if the button's unit type has a quote.
+	bool Encyclopedia = false;		/// check if the button's unit type has an encyclopedia entry.
+	bool SettlementName = false;	/// check if the button's unit has a settlement name.
+	bool CanActiveHarvest = false;	/// check if the active unit can harvest the button's unit.
 	//Wyrmgus end
-	int ButtonAction;           /// action type of button
+	int ButtonAction = -1;			/// action type of button
 	//Wyrmgus start
-	int UnitTypeType;			/// unit type type (i.e. land, fly, etc.) of the button's unit type
-	int UnitTypeClass;			/// unit type class of the button's unit type
-	int ItemClass;				/// item class of the button's item
-	int CanStore;				/// whether the button's unit type can store a particular resource
-	int ImproveIncome;			/// whether the button's unit type improves the processing of a particular resource
+	int UnitTypeType = -1;			/// unit type type (i.e. land, fly, etc.) of the button's unit type
+	int UnitTypeClass = -1;			/// unit type class of the button's unit type
+	int ItemClass = -1;				/// item class of the button's item
+	int CanStore = -1;				/// whether the button's unit type can store a particular resource
+	int ImproveIncome = -1;			/// whether the button's unit type improves the processing of a particular resource
 	CUpgrade *ResearchedUpgrade = nullptr;	/// whether the button's player has researched a particular upgrade
-	int ResearchedUpgradeClass = -1;		/// whether the button's player has researched a particular upgrade class
+	int ResearchedUpgradeClass = -1;	/// whether the button's player has researched a particular upgrade class
 	//Wyrmgus end
-	std::string ButtonValue;    /// value used in ValueStr field of button
+	std::string ButtonValue;	/// value used in ValueStr field of button
 
 	//Wyrmgus start
-	char Opponent;				/// check if button's item is an opponent
-	char Neutral;				/// check if button's item is neutral
-	char AutoCast;				/// check if button's spell can be autocasted
-	char Equipped;				/// check if button's item is equipped
-	char Equippable;			/// check if button's item is equippable by its owner
-	char Consumable;			/// check if button's item is consumable
-	char Affixed;				/// check if button's item has an affix
-	char Spell;					/// check if button's item has a spell
-	char CanUse;				/// check if button's item's can be used
-	char Work;					/// check if button's item is a work
-	char ReadWork;				/// check if button's item is a work that has been read
-	char Elixir;				/// check if button's item is an elixir
-	char ConsumedElixir;		/// check if button's item is an elixir that has been consumed
-	char Unique;				/// check if button's item is unique
-	char UniqueSet;				/// check if button's item is part of a unique item set
-	char Bound;					/// check if button's item is bound to its owner
-	char Identified;			/// check if button's item has been identified
-	char Weapon;				/// check if button's item is a weapon
-	char Shield;				/// check if button's item is a shield
-	char Boots;					/// check if button's item are boots
-	char Arrows;				/// check if button's item are arrows
-	char Regeneration;			/// check if button's item has regeneration
-	char FactionUpgrade;		/// check if the button's upgrade is a faction upgrade
-	char FactionCoreSettlements;	/// check if the button's faction has core settlements
-	char UpgradeResearched = 0;		/// check if the button's upgrade has already been researched
-	char Ability;				/// check if the button's upgrade is an ability
-	char ChildResources;		/// check if the button's resource has child resources
-	char ImproveIncomes;		/// check if the button's unit type has processing bonuses for any resource
-	char LuxuryResource;		/// check if the button's resource is a luxury resource
-	char RequirementsString;	/// check if the button's unit type or upgrade has a requirements string
-	char ExperienceRequirementsString;	/// check if the button's unit type or upgrade has an experience requirements string
-	char BuildingRulesString;	/// check if the button's unit type has a building rules string
+	char Opponent = 0;			/// check if button's item is an opponent
+	char Neutral = 0;			/// check if button's item is neutral
+	char AutoCast = 0;			/// check if button's spell can be autocasted
+	char Equipped = 0;			/// check if button's item is equipped
+	char Equippable = 0;		/// check if button's item is equippable by its owner
+	char Consumable = 0;		/// check if button's item is consumable
+	char Affixed = 0;			/// check if button's item has an affix
+	char Spell = 0;				/// check if button's item has a spell
+	char CanUse = 0;			/// check if button's item's can be used
+	char Work = 0;				/// check if button's item is a work
+	char ReadWork = 0;			/// check if button's item is a work that has been read
+	char Elixir = 0;			/// check if button's item is an elixir
+	char ConsumedElixir = 0;	/// check if button's item is an elixir that has been consumed
+	char Unique = 0;			/// check if button's item is unique
+	char UniqueSet = 0;			/// check if button's item is part of a unique item set
+	char Bound = 0;				/// check if button's item is bound to its owner
+	char Identified = 0;		/// check if button's item has been identified
+	char Weapon = 0;			/// check if button's item is a weapon
+	char Shield = 0;			/// check if button's item is a shield
+	char Boots = 0;				/// check if button's item are boots
+	char Arrows = 0;			/// check if button's item are arrows
+	char Regeneration = 0;		/// check if button's item has regeneration
+	char FactionUpgrade = 0;	/// check if the button's upgrade is a faction upgrade
+	char FactionCoreSettlements = 0;	/// check if the button's faction has core settlements
+	char UpgradeResearched = 0;	/// check if the button's upgrade has already been researched
+	char Ability = 0;			/// check if the button's upgrade is an ability
+	char ChildResources = 0;	/// check if the button's resource has child resources
+	char ImproveIncomes = 0;	/// check if the button's unit type has processing bonuses for any resource
+	char LuxuryResource = 0;	/// check if the button's resource is a luxury resource
+	char RequirementsString = 0;	/// check if the button's unit type or upgrade has a requirements string
+	char ExperienceRequirementsString = 0;	/// check if the button's unit type or upgrade has an experience requirements string
+	char BuildingRulesString = 0;	/// check if the button's unit type has a building rules string
 	//Wyrmgus end
-	char *BoolFlags;            /// array of condition about user flags.
-	char *Variables;            /// array of variable to verify (enable and max > 0)
+	char *BoolFlags = nullptr;	/// array of condition about user flags.
+	char *Variables = nullptr;	/// array of variable to verify (enable and max > 0)
 };
 
 class CPopupContentType
 {
 public:
-	CPopupContentType() : pos(0, 0),
-		MarginX(MARGIN_X), MarginY(MARGIN_Y), minSize(0, 0),
-		Wrap(true), Condition(nullptr) {}
 	virtual ~CPopupContentType() { delete Condition; }
 
 	/// Tell how show the variable Index.
@@ -144,17 +134,17 @@ public:
 	static CPopupContentType *ParsePopupContent(lua_State *l);
 
 public:
-	PixelPos pos;               /// position to draw.
+	PixelPos pos = PixelPos(0, 0);	/// position to draw.
 
-	int MarginX;                /// Left and right margin width.
-	int MarginY;                /// Upper and lower margin height.
-	PixelSize minSize;          /// Minimal size covered by content type.
-	bool Wrap;                  /// If true, the next content will be placed on the next "line".
+	int MarginX = MARGIN_X;		/// Left and right margin width.
+	int MarginY = MARGIN_Y;		/// Upper and lower margin height.
+	PixelSize minSize = PixelSize(0, 0);	/// Minimal size covered by content type.
+	bool Wrap = true;			/// If true, the next content will be placed on the next "line".
 protected:
-	std::string TextColor;      /// Color used for plain text in content.
-	std::string HighlightColor; /// Color used for highlighted letters.
+	std::string TextColor;		/// Color used for plain text in content.
+	std::string HighlightColor;	/// Color used for highlighted letters.
 public:
-	PopupConditionPanel *Condition; /// Condition to show the content; if null, no condition.
+	PopupConditionPanel *Condition = nullptr;	/// Condition to show the content; if null, no condition.
 };
 
 enum PopupButtonInfo_Types {
@@ -166,7 +156,6 @@ enum PopupButtonInfo_Types {
 class CPopupContentTypeButtonInfo : public CPopupContentType
 {
 public:
-	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(nullptr) {}
 	virtual ~CPopupContentTypeButtonInfo() {}
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
@@ -177,18 +166,14 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	int InfoType;                /// Type of information to show.
-	unsigned int MaxWidth;       /// Maximum width of multilined information.
-	CFont *Font;                 /// Font to use.
+	int InfoType = 0;			/// Type of information to show.
+	unsigned int MaxWidth = 0;	/// Maximum width of multilined information.
+	CFont *Font = nullptr;		/// Font to use.
 };
 
 class CPopupContentTypeText : public CPopupContentType
 {
 public:
-	//Wyrmgus start
-//	CPopupContentTypeText() : MaxWidth(0), Font(nullptr) {}
-	CPopupContentTypeText() : Text(nullptr), MaxWidth(0), Font(nullptr) {}
-	//Wyrmgus end
 	//Wyrmgus start
 //	virtual ~CPopupContentTypeText() {}
 	virtual ~CPopupContentTypeText() {
@@ -206,17 +191,16 @@ public:
 
 private:
 	//Wyrmgus start
-//	std::string Text;            /// Text to display
-	StringDesc *Text;            /// Text to display.
+//	std::string Text;			/// Text to display
+	StringDesc *Text = nullptr;	/// Text to display.
 	//Wyrmgus end
-	unsigned int MaxWidth;       /// Maximum width of multilined text.
-	CFont *Font;                 /// Font to use.
+	unsigned int MaxWidth = 0;	/// Maximum width of multilined text.
+	CFont *Font = nullptr;		/// Font to use.
 };
 
 class CPopupContentTypeCosts : public CPopupContentType
 {
 public:
-	CPopupContentTypeCosts() : Font(nullptr), Centered(0) {}
 	virtual ~CPopupContentTypeCosts() {}
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
@@ -227,8 +211,8 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	CFont *Font;                 /// Font to use.
-	char Centered;               /// if true, center the display.
+	CFont *Font = nullptr;		/// Font to use.
+	char Centered = 0;			/// if true, center the display.
 };
 
 class CPopupContentTypeLine : public CPopupContentType
@@ -246,14 +230,13 @@ public:
 
 private:
 	IntColor Color;  /// Color used for line.
-	unsigned int Width;     /// line height
-	unsigned int Height;    /// line height
+	unsigned int Width = 0;		/// line width
+	unsigned int Height = 1;	/// line height
 };
 
 class CPopupContentTypeVariable : public CPopupContentType
 {
 public:
-	CPopupContentTypeVariable() : Text(nullptr), Font(nullptr), Centered(0), Index(-1) {}
 	virtual ~CPopupContentTypeVariable()
 	{
 		FreeStringDesc(Text);
@@ -268,10 +251,10 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	StringDesc *Text;            /// Text to display.
-	CFont *Font;                 /// Font to use.
-	char Centered;               /// if true, center the display.
-	int Index;                   /// Index of the variable to show, -1 if not.
+	StringDesc *Text = nullptr;	/// Text to display.
+	CFont *Font = nullptr;		/// Font to use.
+	char Centered = 0;			/// if true, center the display.
+	int Index = -1;				/// Index of the variable to show, -1 if not.
 };
 
 class CPopup

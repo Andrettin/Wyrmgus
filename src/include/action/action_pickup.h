@@ -36,13 +36,8 @@ class COrder_PickUp : public COrder
 {
 	friend COrder *COrder::NewActionPickUp(CUnit &dest);
 public:
-	//Wyrmgus start
-//	COrder_PickUp() : COrder(UnitActionPickUp), State(0), Range(0)
-	COrder_PickUp() : COrder(UnitActionPickUp), State(0), Range(0), MapLayer(0)
-	//Wyrmgus end
+	COrder_PickUp() : COrder(UnitActionPickUp)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
 	}
 
 	virtual COrder_PickUp *Clone() const { return new COrder_PickUp(*this); }
@@ -56,11 +51,11 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 private:
-	unsigned int State;
-	int Range;
-	Vec2i goalPos;
+	unsigned int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
 };
 

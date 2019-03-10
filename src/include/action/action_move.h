@@ -39,13 +39,8 @@ class COrder_Move : public COrder
 	friend COrder *COrder::NewActionMove(const Vec2i &pos, int z);
 	//Wyrmgus end
 public:
-	//Wyrmgus start
-//	COrder_Move() : COrder(UnitActionMove), Range(0)
-	COrder_Move() : COrder(UnitActionMove), Range(0), MapLayer(0)
-	//Wyrmgus end
+	COrder_Move() : COrder(UnitActionMove)
 	{
-		goalPos.x = -1;
-		goalPos.y = -1;
 	}
 
 	virtual COrder_Move *Clone() const { return new COrder_Move(*this); }
@@ -60,10 +55,10 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 
 private:
-	int Range;
-	Vec2i goalPos;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
 };
 

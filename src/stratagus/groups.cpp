@@ -56,8 +56,6 @@
 class CUnitGroup
 {
 public:
-	CUnitGroup() : tainted(false) {}
-
 	void init()
 	{
 		units.clear();
@@ -107,8 +105,8 @@ private:
 	}
 
 private:
-	std::vector<CUnit *> units;  /// Units in the group
-	bool tainted;    /// Group hold unit which can't be SelectableByRectangle
+	std::vector<CUnit *> units;	/// Units in the group
+	bool tainted = false;		/// Group hold unit which can't be SelectableByRectangle
 };                                       /// group of units
 
 static CUnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined

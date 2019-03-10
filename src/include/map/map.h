@@ -119,18 +119,13 @@ class CWorld;
 class CTerrainFeature
 {
 public:
-	CTerrainFeature() :
-		ID(-1), TerrainType(nullptr), Plane(nullptr), World(nullptr)
-	{
-	}
-	
-	int ID;
+	int ID = -1;
 	std::string Ident;
 	std::string Name;
 	CColor Color;
-	CTerrainType *TerrainType;
-	CPlane *Plane;
-	CWorld *World;
+	CTerrainType *TerrainType = nullptr;
+	CPlane *Plane = nullptr;
+	CWorld *World = nullptr;
 	std::map<int, std::string> CulturalNames;							/// Names for the terrain feature for each different culture/civilization
 };
 //Wyrmgus end
@@ -341,15 +336,15 @@ private:
 	//Wyrmgus end
 
 public:
-	bool NoFogOfWar;           /// fog of war disabled
+	bool NoFogOfWar = false;		/// fog of war disabled
 
-	CTileset *Tileset;          /// tileset data
-	std::string TileModelsFileName; /// lua filename that loads all tilemodels
-	CGraphic *TileGraphic;     /// graphic for all the tiles
+	CTileset *Tileset = nullptr;	/// tileset data
+	std::string TileModelsFileName;	/// lua filename that loads all tilemodels
+	CGraphic *TileGraphic = nullptr;	/// graphic for all the tiles
 	static std::map<PixelSize, CGraphic *> FogGraphics;      /// graphics for fog of war, mapped to their respective pixel sizes
 	//Wyrmgus start
-	CTerrainType *BorderTerrain;      	/// terrain type for borders
-	int Landmasses;						/// how many landmasses are there
+	CTerrainType *BorderTerrain = nullptr;	/// terrain type for borders
+	int Landmasses = 0;						/// how many landmasses are there
 	std::vector<std::vector<int>> BorderLandmasses;	/// "landmasses" which border the one to which each vector belongs
 	std::vector<CUnit *> SiteUnits;	/// the town hall / settlement site units
 	std::vector<CMapLayer *> MapLayers;				/// the map layers composing the map

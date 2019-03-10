@@ -161,8 +161,9 @@ enum TransitionTypes {
 /// Single tile definition
 struct CTileInfo {
 public:
-	CTileInfo() : BaseTerrain(0), MixTerrain(0)
+	CTileInfo()
 	{}
+	
 	CTileInfo(unsigned char base, unsigned char mix) : BaseTerrain(base), MixTerrain(mix)
 	{}
 
@@ -173,8 +174,8 @@ public:
 	bool operator !=(const CTileInfo &rhs) const { return !(*this == rhs); }
 
 public:
-	unsigned char BaseTerrain; /// Basic terrain of the tile
-	unsigned char MixTerrain;  /// Terrain mixed with this
+	unsigned char BaseTerrain = 0;	/// Basic terrain of the tile
+	unsigned char MixTerrain = 0;	/// Terrain mixed with this
 };
 
 /// Definition for a terrain type
@@ -189,15 +190,12 @@ struct SolidTerrainInfo {
 class CTile
 {
 public:
-	CTile() : tile(0), flag(0) {}
-
-public:
-	unsigned short tile;  /// graphical pos
+	unsigned short tile = 0;	/// graphical pos
 	//Wyrmgus start
-//	unsigned short flag;  /// Flag
-	unsigned long flag;  /// Flag
+//	unsigned short flag = 0;	/// Flag
+	unsigned long flag = 0;		/// Flag
 	//Wyrmgus end
-	CTileInfo tileinfo;   /// Tile descriptions
+	CTileInfo tileinfo;			/// Tile descriptions
 };
 
 /// Tileset definition
@@ -324,11 +322,6 @@ private:
 	unsigned orcWallTable[16];    /// Orc wall placement table
 #endif
 };
-
-//Wyrmgus start
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions

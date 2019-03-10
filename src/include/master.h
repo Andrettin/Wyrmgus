@@ -49,7 +49,7 @@ struct CClientLog {
 class CMetaClient
 {
 public:
-	CMetaClient() : metaSocket(), metaPort(-1), lastRecvState(-1) {}
+	CMetaClient() : metaSocket() {}
 	~CMetaClient();
 	void SetMetaServer(const std::string host, const int port);
 	int Init();
@@ -61,11 +61,11 @@ public:
 	CClientLog *GetLastMessage() { return events.back(); }
 
 private:
-	CTCPSocket metaSocket;                     /// This is a TCP socket
-	std::string metaHost;                      /// Address of metaserver
-	int metaPort;                              /// Port of metaserver
-	std::list <CClientLog *> events;           /// All commands received from metaserver
-	int lastRecvState;                         /// Now many bytes have been received in last reply
+	CTCPSocket metaSocket;					/// This is a TCP socket
+	std::string metaHost;					/// Address of metaserver
+	int metaPort = -1;						/// Port of metaserver
+	std::list <CClientLog *> events;		/// All commands received from metaserver
+	int lastRecvState = -1;					/// Now many bytes have been received in last reply
 };
 
 

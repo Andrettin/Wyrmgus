@@ -70,21 +70,6 @@ class CGraphic : public gcn::Image
 	};
 
 protected:
-	CGraphic() : Surface(nullptr), SurfaceFlip(nullptr), frame_map(nullptr),
-		//Wyrmgus start
-		DawnSurface(nullptr), DawnSurfaceFlip(nullptr), DuskSurface(nullptr), DuskSurfaceFlip(nullptr), NightSurface(nullptr), NightSurfaceFlip(nullptr),
-		//Wyrmgus end
-		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
-		//Wyrmgus start
-//		Refs(1), Resized(false)
-		Refs(1), TimeOfDay(nullptr), Resized(false), Grayscale(false)
-		//Wyrmgus end
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		, TextureWidth(0.f), TextureHeight(0.f), Textures(nullptr), NumTextures(0)
-#endif
-	{
-		frameFlip_map = nullptr;
-	}
 	~CGraphic() {}
 
 public:
@@ -137,7 +122,6 @@ public:
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = nullptr);
 	//Wyrmgus end
 
-
 	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
 	static CGraphic *Get(const std::string &file);
@@ -168,39 +152,39 @@ public:
 	virtual int getGraphicHeight() const { return GraphicHeight; }
 	//Wyrmgus end
 
-	std::string File;          /// Filename
-	std::string HashFile;      /// Filename used in hash
-	SDL_Surface *Surface;      /// Surface
-	SDL_Surface *SurfaceFlip;  /// Flipped surface
+	std::string File;			/// Filename
+	std::string HashFile;		/// Filename used in hash
+	SDL_Surface *Surface = nullptr;	/// Surface
+	SDL_Surface *SurfaceFlip = nullptr;	/// Flipped surface
 	//Wyrmgus start
-	SDL_Surface *DawnSurface;      /// Surface
-	SDL_Surface *DawnSurfaceFlip;  /// Flipped surface
-	SDL_Surface *DuskSurface;      /// Surface
-	SDL_Surface *DuskSurfaceFlip;  /// Flipped surface
-	SDL_Surface *NightSurface;      /// Surface
-	SDL_Surface *NightSurfaceFlip;  /// Flipped surface
+	SDL_Surface *DawnSurface = nullptr;	/// Surface
+	SDL_Surface *DawnSurfaceFlip = nullptr;	/// Flipped surface
+	SDL_Surface *DuskSurface = nullptr;	/// Surface
+	SDL_Surface *DuskSurfaceFlip = nullptr;	/// Flipped surface
+	SDL_Surface *NightSurface = nullptr;	/// Surface
+	SDL_Surface *NightSurfaceFlip = nullptr;	/// Flipped surface
 	//Wyrmgus end
-	frame_pos_t *frame_map;
-	frame_pos_t *frameFlip_map;
+	frame_pos_t *frame_map = nullptr;
+	frame_pos_t *frameFlip_map = nullptr;
 	void GenFramesMap();
-	int Width;					/// Width of a frame
-	int Height;					/// Height of a frame
-	int NumFrames;				/// Number of frames
-	int GraphicWidth;			/// Original graphic width
-	int GraphicHeight;			/// Original graphic height
-	int Refs;					/// Uses of this graphic
-	CTimeOfDay *TimeOfDay;		/// Time of day for this graphic
-	bool Resized;				/// Image has been resized
+	int Width = 0;				/// Width of a frame
+	int Height = 0;				/// Height of a frame
+	int NumFrames = 1;			/// Number of frames
+	int GraphicWidth = 0;		/// Original graphic width
+	int GraphicHeight = 0;		/// Original graphic height
+	int Refs = 1;				/// Uses of this graphic
+	CTimeOfDay *TimeOfDay = nullptr;	/// Time of day for this graphic
+	bool Resized = false;		/// Whether the image has been resized
 	//Wyrmgus start
-	bool Grayscale;
+	bool Grayscale = false;
 	//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	GLfloat TextureWidth;      /// Width of the texture
-	GLfloat TextureHeight;     /// Height of the texture
-	GLuint *Textures;          /// Texture names
+	GLfloat TextureWidth = 0.f;		/// Width of the texture
+	GLfloat TextureHeight = 0.f;	/// Height of the texture
+	GLuint *Textures = nullptr;		/// Texture names
 	std::map<CColor, GLuint *> TextureColorModifications;	/// Textures with a color modification applied to them
-	int NumTextures;           /// Number of textures
+	int NumTextures = 0;			/// Number of textures
 #endif
 
 	friend class CFont;
@@ -338,8 +322,6 @@ struct EventCallback {
 class CVideo
 {
 public:
-	CVideo() : Width(0), Height(0), Depth(0), FullScreen(false) {}
-
 	void LockScreen();
 	void UnlockScreen();
 
@@ -442,8 +424,8 @@ public:
 		}
 	}
 
-	int Width;
-	int Height;
+	int Width = 0;
+	int Height = 0;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	int ViewportWidth;         /// Actual width of the window
 	int ViewportHeight;        /// Actual height of the window
@@ -451,12 +433,12 @@ public:
 //Wyrmgus start
 //#if defined(USE_TOUCHSCREEN) && defined(_WIN32)
 //Wyrmgus end
-	SDL_Cursor *blankCursor;
+	SDL_Cursor *blankCursor = nullptr;
 //Wyrmgus start
 //#endif
 //Wyrmgus end
-	int Depth;
-	bool FullScreen;
+	int Depth = 0;
+	bool FullScreen = false;
 };
 
 extern CVideo Video;

@@ -46,18 +46,6 @@
 #include "video.h"
 
 
-CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
-{
-	this->TopLeftPos.x = this->TopLeftPos.y = 0;
-	this->BottomRightPos.x = this->BottomRightPos.y = 0;
-	this->MapPos.x = this->MapPos.y = 0;
-	this->Offset.x = this->Offset.y = 0;
-}
-
-CViewport::~CViewport()
-{
-}
-
 bool CViewport::Contains(const PixelPos &screenPos) const
 {
 	return this->GetTopLeftPos().x <= screenPos.x && screenPos.x <= this->GetBottomRightPos().x

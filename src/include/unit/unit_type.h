@@ -115,24 +115,18 @@ enum ImageLayers {
 class ResourceInfo
 {
 public:
-	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
-		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0),
-		LoseResources(0),
-		SpriteWhenLoaded(nullptr), SpriteWhenEmpty(nullptr)
-	{}
-
-	std::string FileWhenLoaded;     /// Change the graphic when the unit is loaded.
-	std::string FileWhenEmpty;      /// Change the graphic when the unit is empty.
-	unsigned WaitAtResource;        /// Cycles the unit waits while mining.
-	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
-	int      ResourceCapacity;      /// Max amount of resources to carry.
-	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
-	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
-	unsigned char LoseResources;       /// The unit will lose it's resource when distracted.
-	unsigned char RefineryHarvester;   /// Unit have to build Refinery buildings for harvesting.
+	std::string FileWhenLoaded;		/// Change the graphic when the unit is loaded.
+	std::string FileWhenEmpty;		/// Change the graphic when the unit is empty.
+	unsigned WaitAtResource = 0;	/// Cycles the unit waits while mining.
+	unsigned ResourceStep = 0;		/// Resources the unit gains per mining cycle.
+	int ResourceCapacity = 0;		/// Max amount of resources to carry.
+	unsigned WaitAtDepot = 0;		/// Cycles the unit waits while returning.
+	unsigned ResourceId = 0;		/// Id of the resource harvested. Redundant.
+	unsigned char LoseResources = 0;	/// The unit will lose it's resource when distracted.
+	unsigned char RefineryHarvester = 0;	/// Unit have to build Refinery buildings for harvesting.
 	//  Runtime info:
-	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
-	CPlayerColorGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
+	CPlayerColorGraphic *SpriteWhenLoaded = nullptr;	/// The graphic corresponding to FileWhenLoaded.
+	CPlayerColorGraphic *SpriteWhenEmpty = nullptr;	/// The graphic corresponding to FileWhenEmpty
 };
 
 /**
@@ -144,8 +138,6 @@ public:
 class CVariable
 {
 public:
-	CVariable() : Max(0), Value(0), Increase(0), Enable(0) {}
-
 	bool operator ==(const CVariable &rhs) const
 	{
 		return this->Max == rhs.Max
@@ -156,10 +148,10 @@ public:
 	bool operator !=(const CVariable &rhs) const { return !(*this == rhs); }
 
 public:
-	int Max;        /// Maximum for the variable. (Assume min is 0.)
-	int Value;      /// Current (or initial) value of the variable (or initial value).
-	char Increase;  /// Number to increase(decrease) Value by second.
-	char Enable;    /// True if the unit doesn't have this variable. (f.e shield)
+	int Max = 0;	/// Maximum for the variable. (Assume min is 0.)
+	int Value = 0;	/// Current (or initial) value of the variable (or initial value).
+	char Increase = 0;	/// Number to increase(decrease) Value by second.
+	char Enable = 0;	/// True if the unit doesn't have this variable. (f.e shield)
 };
 
 // Index for boolflag already defined
@@ -467,11 +459,10 @@ public:
 class CDecoVarText : public CDecoVar
 {
 public:
-	CDecoVarText() : Font(nullptr) {};
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
 
-	CFont *Font;  /// Font to use to display value.
+	CFont *Font = nullptr;	/// Font to use to display value.
 	// FIXME : Add Color, format
 };
 
@@ -479,12 +470,11 @@ public:
 class CDecoVarSpriteBar : public CDecoVar
 {
 public:
-	CDecoVarSpriteBar() : NSprite(-1) {};
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y,
 					  const CUnitType &type, const CVariable &var) const;
 
-	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
+	char NSprite = -1;	/// Index of number. (@see DefineSprites and @see GetSpriteIndex)
 	// FIXME Sprite info. better way ?
 };
 
@@ -492,14 +482,13 @@ public:
 class CDecoVarStaticSprite : public CDecoVar
 {
 public:
-	CDecoVarStaticSprite() : NSprite(-1), n(0), FadeValue(0) {}
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
 
 	// FIXME Sprite info. and Replace n with more appropriate var.
-	char NSprite;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
-	int n;         /// identifiant in SpellSprite
-	int FadeValue; /// if variable's value is below than FadeValue, it drawn transparent.
+	char NSprite = -1;	/// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
+	int n = 0;			/// identifiant in SpellSprite
+	int FadeValue = 0;	/// if variable's value is below than FadeValue, it drawn transparent.
 };
 
 enum UnitTypeType {
@@ -598,7 +587,6 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 		const Vec2i pos; //functor work position
 	};
 public:
-	CBuildRestrictionAddOn() : Offset(0, 0), Parent(nullptr) {}
 	virtual ~CBuildRestrictionAddOn() {}
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);}
 	//Wyrmgus start
@@ -606,9 +594,9 @@ public:
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 
-	Vec2i Offset;           /// offset from the main building to place this
-	std::string ParentName; /// building that is unit is an addon too.
-	CUnitType *Parent;      /// building that is unit is an addon too.
+	Vec2i Offset = Vec2i(0, 0);	/// offset from the main building to place this
+	std::string ParentName;	/// building that is unit is an addon too.
+	CUnitType *Parent = nullptr;	/// building that is unit is an addon too.
 };
 
 class CBuildRestrictionOnTop : public CBuildRestriction
@@ -624,7 +612,6 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 		const Vec2i pos;  //functor work position
 	};
 public:
-	CBuildRestrictionOnTop() : Parent(nullptr), ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
 	//Wyrmgus start
@@ -632,16 +619,15 @@ public:
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 
-	std::string ParentName;  /// building that is unit is an addon too.
-	CUnitType *Parent;       /// building that is unit is an addon too.
-	int ReplaceOnDie: 1;     /// recreate the parent on destruction
-	int ReplaceOnBuild: 1;   /// remove the parent, or just build over it.
+	std::string ParentName;	/// building that is unit is an addon too.
+	CUnitType *Parent = nullptr;	/// building that is unit is an addon too.
+	int ReplaceOnDie = 0;	/// recreate the parent on destruction
+	int ReplaceOnBuild = 0;	/// remove the parent, or just build over it.
 };
 
 class CBuildRestrictionDistance : public CBuildRestriction
 {
 public:
-	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(nullptr), RestrictClass(-1), Diagonal(true) {};
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init();
 	//Wyrmgus start
@@ -649,21 +635,20 @@ public:
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 
-	int Distance;        /// distance to build (circle)
+	int Distance = 0;	/// distance to build (circle)
 	DistanceTypeType DistanceType;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
-	CUnitType *RestrictType;
+	CUnitType *RestrictType = nullptr;
 	std::string RestrictClassName;
-	int RestrictClass;
-	bool CheckBuilder;
-	bool Diagonal;
+	int RestrictClass = -1;
+	bool CheckBuilder = false;
+	bool Diagonal = true;
 };
 
 class CBuildRestrictionHasUnit : public CBuildRestriction
 {
 public:
-	CBuildRestrictionHasUnit() : Count(0), RestrictType(nullptr) {};
 	virtual ~CBuildRestrictionHasUnit() {};
 	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
 	//Wyrmgus start
@@ -671,45 +656,43 @@ public:
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 	
-	int Count;
+	int Count = 0;
 	DistanceTypeType CountType;
 	std::string RestrictTypeName;
-	CUnitType *RestrictType;
+	CUnitType *RestrictType = nullptr;
 	std::string RestrictTypeOwner;
 };
 
 class CBuildRestrictionSurroundedBy : public CBuildRestriction
 {
 public:
-	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(nullptr), CheckBuilder(false) {};
-	virtual ~CBuildRestrictionSurroundedBy() {};
-	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
+	virtual ~CBuildRestrictionSurroundedBy() {}
+	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); }
 	//Wyrmgus start
 //	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 	//Wyrmgus end
 	
-	int Distance;
-	DistanceTypeType DistanceType;
-	int Count;
-	DistanceTypeType CountType;
+	int Distance = 0;
+	DistanceTypeType DistanceType = Equal;
+	int Count = 0;
+	DistanceTypeType CountType = Equal;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
-	CUnitType *RestrictType;
-	bool CheckBuilder;
+	CUnitType *RestrictType = nullptr;
+	bool CheckBuilder = false;
 };
 
 //Wyrmgus start
 class CBuildRestrictionTerrain : public CBuildRestriction
 {
 public:
-	CBuildRestrictionTerrain() : RestrictTerrainType(nullptr) {};
-	virtual ~CBuildRestrictionTerrain() {};
+	virtual ~CBuildRestrictionTerrain() {}
 	virtual void Init();
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
 
 	std::string RestrictTerrainTypeName;
-	CTerrainType *RestrictTerrainType;
+	CTerrainType *RestrictTerrainType = nullptr;
 };
 //Wyrmgus end
 

@@ -61,9 +61,6 @@ class CUnit;
 class CViewport
 {
 public:
-	CViewport();
-	~CViewport();
-
 	/// Check if pos pixels are within map area
 	bool IsInsideMapArea(const PixelPos &screenPixelPos) const;
 
@@ -109,16 +106,16 @@ private:
 
 public:
 	//private:
-	PixelPos TopLeftPos;      /// Screen pixel top-left corner
-	PixelPos BottomRightPos;  /// Screen pixel bottom-right corner
+	PixelPos TopLeftPos = PixelPos(0, 0);		/// Screen pixel top-left corner
+	PixelPos BottomRightPos = PixelPos(0, 0);	/// Screen pixel bottom-right corner
 
 public:
-	Vec2i MapPos;             /// Map tile left-upper corner
-	PixelDiff Offset;         /// Offset within MapX, MapY
-	int MapWidth;             /// Width in map tiles
-	int MapHeight;            /// Height in map tiles
+	Vec2i MapPos = Vec2i(0, 0);	/// Map tile left-upper corner
+	PixelDiff Offset = PixelDiff(0, 0);	/// Offset within MapX, MapY
+	int MapWidth = 0;		/// Width in map tiles
+	int MapHeight = 0;		/// Height in map tiles
 
-	CUnit *Unit;              /// Bound to this unit
+	CUnit *Unit = nullptr;	/// Bound to this unit
 };
 
 #endif

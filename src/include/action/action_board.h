@@ -36,10 +36,7 @@ class COrder_Board : public COrder
 {
 	friend COrder *COrder::NewActionBoard(CUnit &unit);
 public:
-	//Wyrmgus start
-//	COrder_Board() : COrder(UnitActionBoard), State(0), Range(0), goalPos(-1, -1) {}
-	COrder_Board() : COrder(UnitActionBoard), State(0), Range(0), goalPos(-1, -1), MapLayer(0) {}
-	//Wyrmgus end
+	COrder_Board() : COrder(UnitActionBoard) {}
 
 	virtual COrder_Board *Clone() const { return new COrder_Board(*this); }
 
@@ -55,11 +52,11 @@ private:
 	bool WaitForTransporter(CUnit &unit);
 	int MoveToTransporter(CUnit &unit);
 private:
-	int State;
-	int Range;
-	Vec2i goalPos;
+	int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
 };
 

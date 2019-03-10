@@ -44,7 +44,6 @@ class ConditionPanel;
 class CContentType
 {
 public:
-	CContentType() : Pos(0, 0), Condition(nullptr) {}
 	virtual ~CContentType();
 
 	/// Tell how show the variable Index.
@@ -53,8 +52,8 @@ public:
 	virtual void Parse(lua_State *l) = 0;
 
 public:
-	PixelPos Pos;             /// Coordinate where to display.
-	ConditionPanel *Condition; /// Condition to show the content; if null, no condition.
+	PixelPos Pos = PixelPos(0, 0);	/// Coordinate where to display.
+	ConditionPanel *Condition = nullptr;	/// Condition to show the content; if null, no condition.
 //Wyrmgus start
 	std::string TextColor;      /// Color used for plain text in content.
 	std::string HighlightColor; /// Color used for highlighted letters.
@@ -67,8 +66,6 @@ public:
 class CContentTypeText : public CContentType
 {
 public:
-	CContentTypeText() : Text(nullptr), Font(nullptr), Centered(0), Index(-1),
-		Component(VariableValue), ShowName(0), Stat(0) {}
 	virtual ~CContentTypeText()
 	{
 		FreeStringDesc(Text);
@@ -79,13 +76,13 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	StringDesc *Text;            /// Text to display.
-	CFont *Font;                 /// Font to use.
-	char Centered;               /// if true, center the display.
-	int Index;                   /// Index of the variable to show, -1 if not.
-	EnumVariable Component;      /// Component of the variable.
-	char ShowName;               /// If true, Show name's unit.
-	char Stat;                   /// true to special display.(value or value + diff)
+	StringDesc *Text = nullptr;		/// Text to display.
+	CFont *Font = nullptr;			/// Font to use.
+	char Centered = 0;				/// if true, center the display.
+	int Index = -1;					/// Index of the variable to show, -1 if not.
+	EnumVariable Component = VariableValue;	/// Component of the variable.
+	char ShowName = 0;				/// If true, Show name's unit.
+	char Stat = 0;					/// true to special display.(value or value + diff)
 };
 
 /**
@@ -94,19 +91,17 @@ private:
 class CContentTypeFormattedText : public CContentType
 {
 public:
-	CContentTypeFormattedText() : Font(nullptr), Centered(false),
-		Index(-1), Component(VariableValue) {}
 	virtual ~CContentTypeFormattedText() {}
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 	virtual void Parse(lua_State *l);
 
 private:
-	std::string Format;          /// Text to display
-	CFont *Font;                 /// Font to use.
-	bool Centered;               /// if true, center the display.
-	int Index;                   /// Index of the variable to show.
-	EnumVariable Component;      /// Component of the variable.
+	std::string Format;			/// Text to display
+	CFont *Font = nullptr;		/// Font to use.
+	bool Centered = false;		/// if true, center the display.
+	int Index = -1;				/// Index of the variable to show.
+	EnumVariable Component = VariableValue;	/// Component of the variable.
 };
 
 /**
@@ -115,21 +110,19 @@ private:
 class CContentTypeFormattedText2 : public CContentType
 {
 public:
-	CContentTypeFormattedText2() : Font(nullptr), Centered(false),
-		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {}
 	virtual ~CContentTypeFormattedText2() {}
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 	virtual void Parse(lua_State *l);
 
 private:
-	std::string Format;          /// Text to display
-	CFont *Font;                 /// Font to use.
-	bool Centered;               /// if true, center the display.
-	int Index1;                  /// Index of the variable1 to show.
-	EnumVariable Component1;     /// Component of the variable1.
-	int Index2;                  /// Index of the variable to show.
-	EnumVariable Component2;     /// Component of the variable.
+	std::string Format;			/// Text to display
+	CFont *Font = nullptr;		/// Font to use.
+	bool Centered = false;		/// if true, center the display.
+	int Index1 = -1;			/// Index of the variable1 to show.
+	EnumVariable Component1 = VariableValue;	/// Component of the variable1.
+	int Index2 = -1;			/// Index of the variable to show.
+	EnumVariable Component2 = VariableValue;	/// Component of the variable.
 };
 
 /**
@@ -151,18 +144,16 @@ private:
 class CContentTypeLifeBar : public CContentType
 {
 public:
-	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {}
-
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 	virtual void Parse(lua_State *l);
 
 private:
-	int Index;           /// Index of the variable to show, -1 if not.
-	int Width;           /// Width of the bar.
-	int Height;          /// Height of the bar.
+	int Index = -1;		/// Index of the variable to show, -1 if not.
+	int Width = 0;		/// Width of the bar.
+	int Height = 0;		/// Height of the bar.
 #if 0 // FIXME : something for color and value parametrisation (not implemented)
-	Color *colors;       /// array of color to show (depend of value)
-	int *values;         /// list of percentage to change color.
+	Color *colors;		/// array of color to show (depend of value)
+	int *values;		/// list of percentage to change color.
 #endif
 };
 
@@ -172,17 +163,15 @@ private:
 class CContentTypeCompleteBar : public CContentType
 {
 public:
-	CContentTypeCompleteBar() : varIndex(-1), width(0), height(0), hasBorder(false), colorIndex(-1) {}
-
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 	virtual void Parse(lua_State *l);
 
 private:
-	int varIndex;    /// Index of the variable to show, -1 if not.
-	int width;       /// Width of the bar.
-	int height;      /// Height of the bar.
-	bool hasBorder;  /// True for additional border.
-	int colorIndex;  /// Index of Color to show.
+	int varIndex = -1;		/// Index of the variable to show, -1 if not.
+	int width = 0;			/// Width of the bar.
+	int height = 0;			/// Height of the bar.
+	bool hasBorder = false;	/// True for additional border.
+	int colorIndex = -1;	/// Index of Color to show.
 };
 
 #endif

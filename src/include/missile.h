@@ -587,10 +587,8 @@ public:
 class BurningBuildingFrame
 {
 public:
-	BurningBuildingFrame() : Percent(0), Missile(nullptr) {};
-
-	int          Percent;  /// HP percent
-	MissileType *Missile;  /// Missile to draw
+	int Percent = 0;				/// HP percent
+	MissileType *Missile = nullptr;	/// Missile to draw
 } ;
 
 /*----------------------------------------------------------------------------

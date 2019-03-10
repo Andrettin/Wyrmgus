@@ -82,8 +82,6 @@ typedef int Socket;
 class SocketSet
 {
 public:
-	SocketSet() : MaxSockFD(0) {}
-
 	void AddSocket(Socket socket);
 	void DelSocket(Socket socket);
 
@@ -95,7 +93,7 @@ public:
 private:
 	std::vector<Socket> Sockets;
 	std::vector<int> SocketReady;
-	Socket MaxSockFD;
+	Socket MaxSockFD = 0;
 };
 
 /*----------------------------------------------------------------------------

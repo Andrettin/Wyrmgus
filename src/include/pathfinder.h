@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name pathfinder.h - The path finder headerfile. */
+/**@name pathfinder.h - The path finder header file. */
 //
 //      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith
 //
@@ -65,7 +65,6 @@ enum _move_return_ {
 class PathFinderInput
 {
 public:
-	PathFinderInput();
 	CUnit *GetUnit() const { return unit; }
 	const Vec2i &GetUnitPos() const;
 	//Wyrmgus start
@@ -95,16 +94,16 @@ public:
 	void Load(lua_State *l);
 
 private:
-	CUnit *unit;
-	Vec2i unitSize;
-	Vec2i goalPos;
-	Vec2i goalSize;
-	int minRange;
-	int maxRange;
+	CUnit *unit = nullptr;
+	Vec2i unitSize = Vec2i(0, 0);
+	Vec2i goalPos = Vec2i(-1, -1);
+	Vec2i goalSize = Vec2i(0, 0);
+	int minRange = 0;
+	int maxRange = 0;
 	//Wyrmgus start
-	int MapLayer;
+	int MapLayer = 0;
 	//Wyrmgus end
-	bool isRecalculatePathNeeded;
+	bool isRecalculatePathNeeded = true;
 };
 
 class PathFinderOutput
@@ -146,7 +145,6 @@ class TerrainTraversal
 public:
 	typedef short int dataType;
 public:
-	TerrainTraversal() : allow_diagonal(true) {}
 	void SetSize(unsigned int width, unsigned int height);
 	void SetDiagonalAllowed(const bool allowed);
 	void Init();
@@ -179,7 +177,7 @@ private:
 	std::queue<PosNode> m_queue;
 	unsigned int m_extented_width;
 	unsigned int m_height;
-	bool allow_diagonal;
+	bool allow_diagonal = true;
 };
 
 template <typename T>

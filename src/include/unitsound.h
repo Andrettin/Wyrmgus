@@ -51,15 +51,15 @@ class CSound;
 class SoundConfig
 {
 public:
-	SoundConfig() : Sound(nullptr) {}
-	SoundConfig(std::string name) : Name(name), Sound(nullptr) {}
+	SoundConfig() {}
+	SoundConfig(std::string name) : Name(name) {}
 
 	bool MapSound();
 	void SetSoundRange(unsigned char range);
 
 public:
-	std::string Name;     /// config sound name
-	CSound *Sound;        /// identifier send to sound server
+	std::string Name;			/// config sound name
+	CSound *Sound = nullptr;	/// identifier send to sound server
 };
 
 /**
