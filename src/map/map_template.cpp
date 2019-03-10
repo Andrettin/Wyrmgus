@@ -1412,7 +1412,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 	}
 	
-	for (CHistoricalUnit *historical_unit : CHistoricalUnit::HistoricalUnits) {
+	for (CHistoricalUnit *historical_unit : CHistoricalUnit::GetAll()) {
 		if (historical_unit->StartDate.Year == 0 || !start_date.ContainsDate(historical_unit->StartDate) || start_date.ContainsDate(historical_unit->EndDate)) { //historical units aren't implemented if their date isn't set
 			continue;
 		}
