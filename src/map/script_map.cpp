@@ -2117,7 +2117,7 @@ static int CclDefineTimeline(lua_State *l)
 	}
 
 	std::string timeline_ident = LuaToString(l, 1);
-	CTimeline *timeline = CTimeline::GetOrAddTimeline(timeline_ident);
+	CTimeline *timeline = CTimeline::GetOrAdd(timeline_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {

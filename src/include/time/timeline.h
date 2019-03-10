@@ -47,17 +47,11 @@
 
 class CTimeline : public CDataType
 {
+	DATA_TYPE_CLASS(CTimeline)
+
 public:
-	static CTimeline *GetTimeline(const std::string &ident);
-	static CTimeline *GetOrAddTimeline(const std::string &ident);
-	static void ClearTimelines();
-	
-	static std::vector<CTimeline *> Timelines;
-	static std::map<std::string, CTimeline *> TimelinesByIdent;
-	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
-	int ID = -1;
 	std::string Name;
 	CDate PointOfDivergence;											/// The point of divergence for this timeline
 };

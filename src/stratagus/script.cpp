@@ -3207,7 +3207,7 @@ void CclGetDate(lua_State *l, CDate *d, const int offset)
 			d->Timeline = nullptr;
 		} else {
 			std::string timeline_ident = LuaToString(l, -1);
-			CTimeline *timeline = CTimeline::GetTimeline(timeline_ident);
+			CTimeline *timeline = CTimeline::Get(timeline_ident);
 			if (!timeline) {
 				LuaError(l, "Timeline \"%s\" doesn't exist." _C_ timeline_ident.c_str());
 			}

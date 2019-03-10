@@ -37,52 +37,6 @@
 
 #include "config.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CTimeline *> CTimeline::Timelines;
-std::map<std::string, CTimeline *> CTimeline::TimelinesByIdent;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**  Get a timeline
-*/
-CTimeline *CTimeline::GetTimeline(const std::string &ident)
-{
-	if (TimelinesByIdent.find(ident) != TimelinesByIdent.end()) {
-		return TimelinesByIdent.find(ident)->second;
-	}
-	
-	return nullptr;
-}
-
-CTimeline *CTimeline::GetOrAddTimeline(const std::string &ident)
-{
-	CTimeline *timeline = GetTimeline(ident);
-	
-	if (!timeline) {
-		timeline = new CTimeline;
-		timeline->Ident = ident;
-		timeline->ID = Timelines.size();
-		Timelines.push_back(timeline);
-		TimelinesByIdent[ident] = timeline;
-	}
-	
-	return timeline;
-}
-
-void CTimeline::ClearTimelines()
-{
-	for (size_t i = 0; i < Timelines.size(); ++i) {
-		delete Timelines[i];
-	}
-	Timelines.clear();
-}
-
 void CTimeline::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {

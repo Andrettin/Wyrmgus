@@ -148,16 +148,18 @@ void CleanModules()
 	//Wyrmgus start
 	CleanProvinces();
 	CleanQuests();
+	//Wyrmgus end
 	CReligion::ClearReligions();
 	CSchoolOfMagic::ClearSchoolsOfMagic();
 	CSite::Clear();
 	CSpecies::Clear();
 	CSpeciesCategory::Clear();
 	CSpeciesCategoryRank::Clear();
+	//Wyrmgus start
 	CleanTexts();
 	CleanUniqueItems();
 	//Wyrmgus end
-	CTimeline::ClearTimelines();
+	CTimeline::Clear();
 	CleanUnits();
 	CleanUnitTypes();
 	CWorld::ClearWorlds();

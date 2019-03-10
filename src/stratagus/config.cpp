@@ -409,7 +409,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				terrain_type->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "timeline") {
-			CTimeline *timeline = CTimeline::GetOrAddTimeline(ident);
+			CTimeline *timeline = CTimeline::GetOrAdd(ident);
 			if (!define_only) {
 				timeline->ProcessConfigData(config_data);
 			}

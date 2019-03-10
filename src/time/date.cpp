@@ -64,13 +64,13 @@ CDate CDate::FromString(const std::string &date_str)
 		calendar = CCalendar::GetCalendar(date_vector[0]);
 		if (calendar) {
 			offset += 1;
-		} else if (!CTimeline::GetTimeline(date_vector[0])) { //is neither a calendar nor a timeline
+		} else if (!CTimeline::Get(date_vector[0])) { //is neither a calendar nor a timeline
 			fprintf(stderr, "Calendar \"%s\" does not exist.\n", date_vector[0].c_str());
 		}
 	}
 	
 	if (date_vector.size() >= (1 + offset) && !IsStringNumber(date_vector[0 + offset])) {
-		CTimeline *timeline = CTimeline::GetTimeline(date_vector[0 + offset]);
+		CTimeline *timeline = CTimeline::Get(date_vector[0 + offset]);
 		if (timeline) {
 			date.Timeline = timeline;
 		} else {
