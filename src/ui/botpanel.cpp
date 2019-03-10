@@ -461,13 +461,13 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 
 	if (condition->ImproveIncome != -1) {
-		if (!type || type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[condition->ImproveIncome] <= CResource::Resources[condition->ImproveIncome]->DefaultIncome) {
+		if (!type || type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[condition->ImproveIncome] <= CResource::GetAll()[condition->ImproveIncome]->DefaultIncome) {
 			return false;
 		}
 	}
 
 	if (condition->ChildResources != CONDITION_TRUE) {
-		if ((condition->ChildResources == CONDITION_ONLY) ^ (CResource::Resources[button.Value]->ChildResources.size() > 0)) {
+		if ((condition->ChildResources == CONDITION_ONLY) ^ (CResource::GetAll()[button.Value]->ChildResources.size() > 0)) {
 			return false;
 		}
 	}
@@ -475,10 +475,10 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	if (condition->ImproveIncomes != CONDITION_TRUE) {
 		bool improve_incomes = false;
 		if (button.Action == ButtonProduceResource) {
-			if (CPlayer::GetThisPlayer()->Incomes[button.Value] > CResource::Resources[button.Value]->DefaultIncome) {
+			if (CPlayer::GetThisPlayer()->Incomes[button.Value] > CResource::GetAll()[button.Value]->DefaultIncome) {
 				improve_incomes = true;
 			}
-			for (const CResource *child_resource : CResource::Resources[button.Value]->ChildResources) {
+			for (const CResource *child_resource : CResource::GetAll()[button.Value]->ChildResources) {
 				if (CPlayer::GetThisPlayer()->Incomes[child_resource->ID] > child_resource->DefaultIncome) {
 					improve_incomes = true;
 					break;
@@ -489,7 +489,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				return false;
 			}
 			for (int i = 1; i < MaxCosts; ++i) {
-				if (type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[i] > CResource::Resources[i]->DefaultIncome) {
+				if (type->Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[i] > CResource::GetAll()[i]->DefaultIncome) {
 					improve_incomes = true;
 					break;
 				}
@@ -564,7 +564,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->LuxuryResource != CONDITION_TRUE) {
-		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonProduceResource && CResource::Resources[button.Value]->LuxuryResource)) {
+		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonProduceResource && CResource::GetAll()[button.Value]->LuxuryResource)) {
 			return false;
 		}
 	}

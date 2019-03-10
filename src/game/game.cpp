@@ -2179,7 +2179,7 @@ static int CclDefineResource(lua_State *l)
 	if (resource_id == -1) {
 		LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
 	}
-	CResource *resource = CResource::Resources[resource_id];
+	CResource *resource = CResource::GetAll()[resource_id];
 	resource->FinalResource = resource_id;
 	
 	//  Parse the list:
@@ -2203,7 +2203,7 @@ static int CclDefineResource(lua_State *l)
 				LuaError(l, "Resource \"%s\" doesn't exist." _C_ final_resource_ident.c_str());
 			}
 			resource->FinalResource = final_resource_id;
-			CResource::Resources[final_resource_id]->ChildResources.push_back(resource);
+			CResource::GetAll()[final_resource_id]->ChildResources.push_back(resource);
 		} else if (!strcmp(value, "FinalResourceConversionRate")) {
 			resource->FinalResourceConversionRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "LuxuryResource")) {
@@ -2241,13 +2241,13 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 		DefaultResourceNames[i].clear();
 	}
 	
-	CResource::ClearResources();
+	CResource::Clear();
 	
 	const unsigned int args = lua_gettop(l);
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultResourceNames[i] = LuaToString(l, i + 1);
 		
-		CResource::GetOrAddResource(DefaultResourceNames[i]);
+		CResource::GetOrAdd(DefaultResourceNames[i])->ID = i;
 	}
 	
 	return 0;

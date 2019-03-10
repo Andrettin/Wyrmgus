@@ -1093,7 +1093,7 @@ static int CclDefineUnitType(lua_State *l)
 				const int res = CclGetResourceByName(l);
 				lua_pop(l, 1);
 				++k;
-				type->DefaultStat.ImproveIncomes[res] = CResource::Resources[res]->DefaultIncome + LuaToNumber(l, -1, k + 1);
+				type->DefaultStat.ImproveIncomes[res] = CResource::GetAll()[res]->DefaultIncome + LuaToNumber(l, -1, k + 1);
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "ResourceDemand")) {

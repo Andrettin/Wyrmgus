@@ -340,7 +340,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				missile_type->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "pantheon") {
-			CPantheon *pantheon = CPantheon::GetOrAddPantheon(ident);
+			CPantheon *pantheon = CPantheon::GetOrAdd(ident);
 			if (!define_only) {
 				pantheon->ProcessConfigData(config_data);
 			}

@@ -1545,7 +1545,7 @@ std::string EvalString(const StringDesc *s)
 				std::string improve_incomes;
 				bool first = true;
 				for (int res = 1; res < MaxCosts; ++res) {
-					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] > CResource::Resources[res]->DefaultIncome) {
+					if ((**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] > CResource::GetAll()[res]->DefaultIncome) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1553,7 +1553,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += IdentToName(DefaultResourceNames[res]);
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] - CResource::Resources[res]->DefaultIncome);
+						improve_incomes += std::to_string((long long) (**type).Stats[CPlayer::GetThisPlayer()->Index].ImproveIncomes[res] - CResource::GetAll()[res]->DefaultIncome);
 						improve_incomes += "%";
 					}
 				}
@@ -1674,7 +1674,7 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string conversion_rates;
 				bool first = true;
-				for (const CResource *child_resource : CResource::Resources[(**resource)]->ChildResources) {
+				for (const CResource *child_resource : CResource::GetAll()[(**resource)]->ChildResources) {
 					if (child_resource->ID == TradeCost || child_resource->Hidden) {
 						continue;
 					}
@@ -1685,7 +1685,7 @@ std::string EvalString(const StringDesc *s)
 					}
 					conversion_rates += child_resource->Name;
 					conversion_rates += " to ";
-					conversion_rates += CResource::Resources[(**resource)]->Name;
+					conversion_rates += CResource::GetAll()[(**resource)]->Name;
 					conversion_rates += " Conversion Rate: ";
 					conversion_rates += std::to_string((long long) child_resource->FinalResourceConversionRate);
 					conversion_rates += "%";
@@ -1699,14 +1699,14 @@ std::string EvalString(const StringDesc *s)
 			if (resource != nullptr) {
 				std::string improve_incomes;
 				bool first = true;
-				if (CPlayer::GetThisPlayer()->Incomes[(**resource)] > CResource::Resources[(**resource)]->DefaultIncome) {
+				if (CPlayer::GetThisPlayer()->Incomes[(**resource)] > CResource::GetAll()[(**resource)]->DefaultIncome) {
 					first = false;
-					improve_incomes += CResource::Resources[(**resource)]->Name;
+					improve_incomes += CResource::GetAll()[(**resource)]->Name;
 					improve_incomes += " Processing Bonus: +";
-					improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[(**resource)] - CResource::Resources[(**resource)]->DefaultIncome);
+					improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[(**resource)] - CResource::GetAll()[(**resource)]->DefaultIncome);
 					improve_incomes += "%";
 				}
-				for (const CResource *child_resource : CResource::Resources[(**resource)]->ChildResources) {
+				for (const CResource *child_resource : CResource::GetAll()[(**resource)]->ChildResources) {
 					if (child_resource->ID == TradeCost || child_resource->Hidden) {
 						continue;
 					}

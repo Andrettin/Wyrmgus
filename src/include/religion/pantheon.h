@@ -46,14 +46,9 @@
 
 class CPantheon : public CDataType
 {
+	DATA_TYPE_CLASS(CPantheon)
+	
 public:
-	static CPantheon *GetPantheon(const std::string &ident, const bool should_find = true);
-	static CPantheon *GetOrAddPantheon(const std::string &ident);
-	static void ClearPantheons();
-	
-	static std::vector<CPantheon *> Pantheons;	/// Pantheons
-	static std::map<std::string, CPantheon *> PantheonsByIdent;
-	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 	std::string Name;							/// Name of the pantheon

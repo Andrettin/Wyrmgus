@@ -151,7 +151,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			this->Name = value;
 		} else if (key == "pantheon") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Pantheon = CPantheon::GetPantheon(value);
+			this->Pantheon = CPantheon::Get(value);
 		} else if (key == "gender") {
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "major") {

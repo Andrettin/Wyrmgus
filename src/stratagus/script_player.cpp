@@ -2385,7 +2385,7 @@ static int CclDefineDeity(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			deity->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Pantheon")) {
-			deity->Pantheon = CPantheon::GetPantheon(LuaToString(l, -1));
+			deity->Pantheon = CPantheon::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
 			deity->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {

@@ -461,31 +461,31 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	}
 
 	file.printf("  \"reserve\", {");
-	for (const CResource *resource : CResource::Resources) {
+	for (const CResource *resource : CResource::GetAll()) {
 		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Reserve[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"used\", {");
-	for (const CResource *resource : CResource::Resources) {
+	for (const CResource *resource : CResource::GetAll()) {
 		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Used[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"needed\", {");
-	for (const CResource *resource : CResource::Resources) {
+	for (const CResource *resource : CResource::GetAll()) {
 		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Needed[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"collect\", {");
-	for (const CResource *resource : CResource::Resources) {
+	for (const CResource *resource : CResource::GetAll()) {
 		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Collect[resource->ID]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"need-mask\", {");
-	for (size_t i = 0; i < CResource::Resources.size(); ++i) {
+	for (size_t i = 0; i < CResource::GetAll().size(); ++i) {
 		if (ai.NeededMask & ((long long int) 1 << i)) {
 			file.printf("\"%s\", ", DefaultResourceNames[i].c_str());
 		}

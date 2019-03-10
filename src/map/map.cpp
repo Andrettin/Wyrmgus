@@ -1890,7 +1890,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 		if (mf.Flags & MapFieldStumps) { //if is a cleared tree tile regrowing trees
 			mf.Flags &= ~(MapFieldStumps);
 			mf.Flags |= MapFieldForest | MapFieldUnpassable;
-			mf.Value = CResource::Resources[WoodCost]->DefaultAmount;
+			mf.Value = CResource::GetAll()[WoodCost]->DefaultAmount;
 		}
 	}
 	

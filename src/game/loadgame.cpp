@@ -143,9 +143,9 @@ void CleanModules()
 	CHistoricalUnit::ClearHistoricalUnits();
 	CMapTemplate::Clear();
 	CleanMissiles();
-	CPantheon::ClearPantheons();
-	//Wyrmgus start
+	CPantheon::Clear();
 	CPlane::ClearPlanes();
+	//Wyrmgus start
 	CleanProvinces();
 	CleanQuests();
 	CReligion::ClearReligions();

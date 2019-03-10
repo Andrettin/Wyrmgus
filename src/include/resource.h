@@ -86,14 +86,9 @@ enum CostType {
 
 class CResource : public CDataType
 {
+	DATA_TYPE_CLASS(CResource)
+	
 public:
-	static CResource *GetResource(const std::string &ident, const bool should_find = true);
-	static CResource *GetOrAddResource(const std::string &ident);
-	static void ClearResources();
-	
-	static std::vector<CResource *> Resources;
-	static std::map<std::string, CResource *> ResourcesByIdent;
-	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	bool IsMineResource() const;
 

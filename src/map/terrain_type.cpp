@@ -126,8 +126,8 @@ void CTerrainType::LoadTerrainTypeGraphics()
 */
 void CTerrainType::ClearTerrainTypes()
 {
-	for (size_t i = 0; i < TerrainTypes.size(); ++i) {
-		delete TerrainTypes[i];
+	for (CTerrainType *terrain_type : TerrainTypes) {
+		delete terrain_type;
 	}
 	TerrainTypes.clear();
 	TerrainTypesByIdent.clear();

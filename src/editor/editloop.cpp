@@ -206,7 +206,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	//Wyrmgus start
 	int value = 0;
 	if ((terrain->Flags & MapFieldForest) || (terrain->Flags & MapFieldRocks)) {
-		value = CResource::Resources[terrain->Resource]->DefaultAmount;
+		value = CResource::GetAll()[terrain->Resource]->DefaultAmount;
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	mf.SetTerrain(terrain);
@@ -522,9 +522,9 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 				unit->Variable[GIVERESOURCE_INDEX].Max = unit->ResourcesHeld;
 				//Wyrmgus end
 			} else {
-				unit->SetResourcesHeld(CResource::Resources[type.GivesResource]->DefaultAmount);
-				unit->Variable[GIVERESOURCE_INDEX].Value = CResource::Resources[type.GivesResource]->DefaultAmount;
-				unit->Variable[GIVERESOURCE_INDEX].Max = CResource::Resources[type.GivesResource]->DefaultAmount;
+				unit->SetResourcesHeld(CResource::GetAll()[type.GivesResource]->DefaultAmount);
+				unit->Variable[GIVERESOURCE_INDEX].Value = CResource::GetAll()[type.GivesResource]->DefaultAmount;
+				unit->Variable[GIVERESOURCE_INDEX].Max = CResource::GetAll()[type.GivesResource]->DefaultAmount;
 			}
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
