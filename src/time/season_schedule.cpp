@@ -151,7 +151,7 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "season") {
 					value = FindAndReplaceString(value, "_", "-");
-					season = CSeason::GetSeason(value);
+					season = CSeason::Get(value);
 				} else if (key == "days") {
 					hours = std::stoi(value) * this->HoursPerDay;
 				} else if (key == "hours") {

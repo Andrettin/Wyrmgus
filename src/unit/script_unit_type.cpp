@@ -878,13 +878,13 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "season")) {
 						const std::string season_ident = LuaToString(l, -1, k + 1);
-						CSeason *season = CSeason::GetSeason(season_ident);
+						CSeason *season = CSeason::Get(season_ident);
 						if (season) {
 							variation->Seasons.push_back(season);
 						}
 					} else if (!strcmp(value, "forbidden-season")) {
 						const std::string season_ident = LuaToString(l, -1, k + 1);
-						CSeason *season = CSeason::GetSeason(season_ident);
+						CSeason *season = CSeason::Get(season_ident);
 						if (season) {
 							variation->ForbiddenSeasons.push_back(season);
 						}

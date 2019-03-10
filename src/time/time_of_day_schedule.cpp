@@ -209,7 +209,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "season") {
 					value = FindAndReplaceString(value, "_", "-");
-					season = CSeason::GetSeason(value);
+					season = CSeason::Get(value);
 				} else if (key == "hours") {
 					season_hours = std::stoi(value);
 				} else {

@@ -371,7 +371,7 @@ void CSeasonDependency::ProcessConfigDataProperty(const std::pair<std::string, s
 	std::string value = property.second;
 	if (key == "season") {
 		value = FindAndReplaceString(value, "_", "-");
-		this->Season = CSeason::GetSeason(value);
+		this->Season = CSeason::Get(value);
 	} else {
 		fprintf(stderr, "Invalid season dependency property: \"%s\".\n", key.c_str());
 	}

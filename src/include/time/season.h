@@ -48,14 +48,9 @@ class CGraphic;
 
 class CSeason : public CDataType
 {
+	DATA_TYPE_CLASS(CSeason)
+
 public:
-	static CSeason *GetSeason(const std::string &ident, const bool should_find = true);
-	static CSeason *GetOrAddSeason(const std::string &ident);
-	static void ClearSeasons();
-	
-	static std::vector<CSeason *> Seasons;		/// Seasons
-	static std::map<std::string, CSeason *> SeasonsByIdent;
-	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 
 	std::string Name;							/// Name of the season

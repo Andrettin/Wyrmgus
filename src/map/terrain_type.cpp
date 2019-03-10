@@ -325,7 +325,7 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "season") {
 					value = FindAndReplaceString(value, "_", "-");
-					season = CSeason::GetSeason(value);
+					season = CSeason::Get(value);
 				} else if (key == "graphics") {
 					season_graphics_file = value;
 					if (!CanAccessFile(season_graphics_file.c_str())) {

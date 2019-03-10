@@ -173,7 +173,7 @@ void CleanModules()
 	CTerrainType::ClearTerrainTypes();
 	CTimeOfDay::ClearTimesOfDay();
 	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
-	CSeason::ClearSeasons();
+	CSeason::Clear();
 	CSeasonSchedule::ClearSeasonSchedules();
 	CleanReplayLog();
 	CSpell::ClearSpells();

@@ -360,7 +360,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				school_of_magic->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "season") {
-			CSeason *season = CSeason::GetOrAddSeason(ident);
+			CSeason *season = CSeason::GetOrAdd(ident);
 			if (!define_only) {
 				season->ProcessConfigData(config_data);
 			}

@@ -187,13 +187,13 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "season") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CSeason *season = CSeason::GetSeason(value);
+			const CSeason *season = CSeason::Get(value);
 			if (season != nullptr) {
 				this->Seasons.push_back(season);
 			}
 		} else if (key == "forbidden_season") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CSeason *season = CSeason::GetSeason(value);
+			const CSeason *season = CSeason::Get(value);
 			if (season != nullptr) {
 				this->ForbiddenSeasons.push_back(season);
 			}
