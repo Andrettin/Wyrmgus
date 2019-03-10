@@ -56,14 +56,14 @@ CSkinColor *Wyrmgus::GetSkinColor(String ident) const
 
 CCampaign *Wyrmgus::GetCampaign(String ident) const
 {
-	return CCampaign::GetCampaign(ident.utf8().get_data());
+	return CCampaign::Get(ident.utf8().get_data());
 }
 
 Array Wyrmgus::GetCampaigns() const
 {
 	Array campaigns;
 	
-	for (CCampaign *campaign : CCampaign::GetCampaigns()) {
+	for (CCampaign *campaign : CCampaign::GetAll()) {
 		campaigns.push_back(campaign);
 	}
 	
@@ -84,7 +84,7 @@ Array Wyrmgus::GetAchievements() const
 {
 	Array achievements;
 	
-	for (CAchievement *achievement : CAchievement::GetAchievements()) {
+	for (CAchievement *achievement : CAchievement::GetAll()) {
 		achievements.push_back(achievement);
 	}
 	

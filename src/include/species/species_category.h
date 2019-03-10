@@ -76,10 +76,10 @@ public:
 	
 private:
 	std::string Name;							/// name of the species category
-	std::string CommonName;						/// common name of the species category
+	std::string CommonName;						/// the common name of members of the species category
 	CSpeciesCategoryRank *Rank = nullptr;		/// the rank of the species category
-	std::vector<CSpeciesCategory *> LowerCategories;	/// the categories below this one
-	CSpeciesCategory *UpperCategory = nullptr;	/// the category above this one
+	std::vector<CSpeciesCategory *> LowerCategories;	/// the categories directly below this one
+	CSpeciesCategory *UpperCategory = nullptr;	/// the category directly above this one
 };
 
 #endif

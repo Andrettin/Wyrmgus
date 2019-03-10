@@ -56,16 +56,10 @@ class CUnitType;
 class CAchievement : public CDataType, public Object
 {
 	GDCLASS(CAchievement, Object)
+	DATA_TYPE_CLASS(CAchievement)
 	
 public:
-	static CAchievement *GetAchievement(const std::string &ident, const bool should_find = true);
-	static CAchievement *GetOrAddAchievement(const std::string &ident);
-	static const std::vector<CAchievement *> &GetAchievements();
-	static void ClearAchievements();
 	static void CheckAchievements();
-	
-	static std::vector<CAchievement *> Achievements;
-	static std::map<std::string, CAchievement *> AchievementsByIdent;
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	

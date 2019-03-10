@@ -64,7 +64,7 @@ public: \
 		} \
 		\
 		if (should_find) { \
-			fprintf(stderr, "Invalid class_name instance: \"%s\".\n", ident.c_str()); \
+			fprintf(stderr, "Invalid #class_name instance: \"%s\".\n", ident.c_str()); \
 		} \
 		\
 		return nullptr; \

@@ -58,6 +58,7 @@ struct lua_State;
 class CCampaign : public CDataType, public Object
 {
 	GDCLASS(CCampaign, Object)
+	DATA_TYPE_CLASS(CCampaign)
 	
 public:
 	CCampaign()
@@ -68,16 +69,10 @@ public:
 	{
 	}
 	
-	static CCampaign *GetCampaign(const std::string &ident, const bool should_find = true);
-	static CCampaign *GetOrAddCampaign(const std::string &ident);
-	static const std::vector<CCampaign *> &GetCampaigns();
-	static void ClearCampaigns();
 	static void SetCurrentCampaign(CCampaign *campaign);
 	static CCampaign *GetCurrentCampaign();
 
 private:
-	static std::vector<CCampaign *> Campaigns;
-	static std::map<std::string, CCampaign *> CampaignsByIdent;
 	static CCampaign *CurrentCampaign;
 	static std::shared_mutex CampaignMutex;	/// Mutex for campaigns as a whole
 	

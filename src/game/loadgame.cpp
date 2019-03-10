@@ -125,10 +125,10 @@ void CleanModules()
 	CTrigger::ClearTriggers();
 	FreeAi();
 	PlayerRaces.Clean();
-	CAchievement::ClearAchievements();
+	CAchievement::Clear();
 	CAge::Clear();
 	CCalendar::ClearCalendars();
-	CCampaign::ClearCampaigns();
+	CCampaign::Clear();
 	CCharacter::ClearCharacters();
 	CCivilization::ClearCivilizations();
 	CleanConstructions();

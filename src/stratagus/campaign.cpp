@@ -48,77 +48,12 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CCampaign *> CCampaign::Campaigns;
-std::map<std::string, CCampaign *> CCampaign::CampaignsByIdent;
 CCampaign *CCampaign::CurrentCampaign = nullptr;
 std::shared_mutex CCampaign::CampaignMutex;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a campaign
-**
-**	@param	ident	The campaign's string identifier
-**
-**	@return	The campaign if found, or null otherwise
-*/
-CCampaign *CCampaign::GetCampaign(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CCampaign *>::const_iterator find_iterator = CampaignsByIdent.find(ident);
-	
-	if (find_iterator != CampaignsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid campaign: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a campaign
-**
-**	@param	ident	The campaign's string identifier
-**
-**	@return	The campaign if found, otherwise a new campaign is created and returned
-*/
-CCampaign *CCampaign::GetOrAddCampaign(const std::string &ident)
-{
-	CCampaign *campaign = GetCampaign(ident, false);
-	
-	if (!campaign) {
-		campaign = new CCampaign(ident, Campaigns.size());
-		Campaigns.push_back(campaign);
-		CampaignsByIdent[ident] = campaign;
-	}
-	
-	return campaign;
-}
-
-/**
-**	@brief	Get the existing campaigns
-**
-**	@return	The campaigns
-*/
-const std::vector<CCampaign *> &CCampaign::GetCampaigns()
-{
-	return CCampaign::Campaigns;
-}
-
-/**
-**	@brief	Remove the existing campaigns
-*/
-void CCampaign::ClearCampaigns()
-{
-	for (CCampaign *campaign : Campaigns) {
-		delete campaign;
-	}
-	Campaigns.clear();
-}
 
 /**
 **	@brief	Set the current campaign
@@ -232,7 +167,7 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	std::sort(CCampaign::Campaigns.begin(), CCampaign::Campaigns.end(), [](CCampaign *a, CCampaign *b) {
+	std::sort(CCampaign::Instances.begin(), CCampaign::Instances.end(), [](CCampaign *a, CCampaign *b) {
 		std::string species_ident_a = a->GetSpecies() ? a->GetSpecies()->GetIdent().utf8().get_data() : "";
 		std::string species_ident_b = b->GetSpecies() ? b->GetSpecies()->GetIdent().utf8().get_data() : "";
 		if (species_ident_a != species_ident_b) {
@@ -290,7 +225,7 @@ void SetCurrentCampaign(const std::string &campaign_ident)
 		return;
 	}
 	
-	CCampaign *campaign = CCampaign::GetCampaign(campaign_ident);
+	CCampaign *campaign = CCampaign::Get(campaign_ident);
 	
 	if (!campaign) {
 		return;

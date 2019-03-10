@@ -44,83 +44,12 @@
 #include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CAchievement *> CAchievement::Achievements;
-std::map<std::string, CAchievement *> CAchievement::AchievementsByIdent;
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**	@brief	Get an achievement
-**
-**	@param	ident	The achievement's string identifier
-**
-**	@return	The achievement if found, or null otherwise
-*/
-CAchievement *CAchievement::GetAchievement(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CAchievement *>::const_iterator find_iterator = CAchievement::AchievementsByIdent.find(ident);
-	
-	if (find_iterator != CAchievement::AchievementsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid achievement: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add an achievement
-**
-**	@param	ident	The achievement's string identifier
-**
-**	@return	The achievement if found, otherwise a new achievement is created and returned
-*/
-CAchievement *CAchievement::GetOrAddAchievement(const std::string &ident)
-{
-	CAchievement *achievement = CAchievement::GetAchievement(ident, false);
-	
-	if (!achievement) {
-		achievement = new CAchievement;
-		achievement->Ident = ident;
-		CAchievement::Achievements.push_back(achievement);
-		CAchievement::AchievementsByIdent[ident] = achievement;
-	}
-	
-	return achievement;
-}
-
-/**
-**	@brief	Get the existing achievements
-**
-**	@return	The achievements
-*/
-const std::vector<CAchievement *> &CAchievement::GetAchievements()
-{
-	return CAchievement::Achievements;
-}
-
-/**
-**	@brief	Remove the existing achievements
-*/
-void CAchievement::ClearAchievements()
-{
-	for (CAchievement *achievement : CAchievement::Achievements) {
-		delete achievement;
-	}
-	CAchievement::Achievements.clear();
-}
-
 void CAchievement::CheckAchievements()
 {
-	for (CAchievement *achievement : CAchievement::Achievements) {
+	for (CAchievement *achievement : CAchievement::GetAll()) {
 		if (achievement->IsObtained()) {
 			continue;
 		}
@@ -317,7 +246,7 @@ void CAchievement::_bind_methods()
 
 void SetAchievementObtained(const std::string &achievement_ident, const bool save, const bool display)
 {
-	CAchievement *achievement = CAchievement::GetAchievement(achievement_ident);
+	CAchievement *achievement = CAchievement::Get(achievement_ident);
 	if (!achievement) {
 		return;
 	}

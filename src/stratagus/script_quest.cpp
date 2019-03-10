@@ -430,7 +430,7 @@ static int CclDefineCampaign(lua_State *l)
 	}
 
 	std::string campaign_ident = LuaToString(l, 1);
-	CCampaign *campaign = CCampaign::GetOrAddCampaign(campaign_ident);
+	CCampaign *campaign = CCampaign::GetOrAdd(campaign_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -508,10 +508,10 @@ static int CclDefineCampaign(lua_State *l)
 
 static int CclGetCampaigns(lua_State *l)
 {
-	lua_createtable(l, CCampaign::Campaigns.size(), 0);
-	for (size_t i = 1; i <= CCampaign::Campaigns.size(); ++i)
+	lua_createtable(l, CCampaign::GetAll().size(), 0);
+	for (size_t i = 1; i <= CCampaign::GetAll().size(); ++i)
 	{
-		lua_pushstring(l, CCampaign::Campaigns[i-1]->GetIdent().utf8().get_data());
+		lua_pushstring(l, CCampaign::GetAll()[i-1]->GetIdent().utf8().get_data());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -528,7 +528,7 @@ static int CclGetCampaignData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string campaign_ident = LuaToString(l, 1);
-	const CCampaign *campaign = CCampaign::GetCampaign(campaign_ident);
+	const CCampaign *campaign = CCampaign::Get(campaign_ident);
 	if (!campaign) {
 		LuaError(l, "Campaign \"%s\" doesn't exist." _C_ campaign_ident.c_str());
 	}
@@ -603,7 +603,7 @@ static int CclDefineAchievement(lua_State *l)
 	}
 
 	std::string achievement_ident = LuaToString(l, 1);
-	CAchievement *achievement = CAchievement::GetOrAddAchievement(achievement_ident);
+	CAchievement *achievement = CAchievement::GetOrAdd(achievement_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -670,17 +670,6 @@ static int CclDefineAchievement(lua_State *l)
 	return 0;
 }
 
-static int CclGetAchievements(lua_State *l)
-{
-	lua_createtable(l, CAchievement::Achievements.size(), 0);
-	for (size_t i = 1; i <= CAchievement::Achievements.size(); ++i)
-	{
-		lua_pushstring(l, CAchievement::Achievements[i-1]->Ident.c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
 /**
 **  Get achievement data.
 **
@@ -692,7 +681,7 @@ static int CclGetAchievementData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string achievement_ident = LuaToString(l, 1);
-	const CAchievement *achievement = CAchievement::GetAchievement(achievement_ident);
+	const CAchievement *achievement = CAchievement::Get(achievement_ident);
 	if (!achievement) {
 		LuaError(l, "Achievement \"%s\" doesn't exist." _C_ achievement_ident.c_str());
 	}
@@ -854,7 +843,6 @@ void QuestCclRegister()
 	lua_register(Lua, "GetCampaigns", CclGetCampaigns);
 	lua_register(Lua, "GetCampaignData", CclGetCampaignData);
 	lua_register(Lua, "DefineAchievement", CclDefineAchievement);
-	lua_register(Lua, "GetAchievements", CclGetAchievements);
 	lua_register(Lua, "GetAchievementData", CclGetAchievementData);
 	lua_register(Lua, "DefineDialogue", CclDefineDialogue);
 }

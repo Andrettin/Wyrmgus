@@ -1036,7 +1036,7 @@ void ApplyMapTemplate(const std::string &map_template_ident, int template_start_
 
 void ApplyCampaignMap(const std::string &campaign_ident)
 {
-	const CCampaign *campaign = CCampaign::GetCampaign(campaign_ident);
+	const CCampaign *campaign = CCampaign::Get(campaign_ident);
 	
 	if (!campaign) {
 		return;

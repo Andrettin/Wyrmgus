@@ -64,8 +64,8 @@ public:
 	
 private:
 	std::string Name;				/// name of the species category rank
-	CSpeciesCategoryRank *LowerRank = nullptr;	/// the rank below this one
-	CSpeciesCategoryRank *UpperRank = nullptr;	/// the rank above this one
+	CSpeciesCategoryRank *LowerRank = nullptr;	/// the rank directly below this one
+	CSpeciesCategoryRank *UpperRank = nullptr;	/// the rank directly above this one
 };
 
 #endif

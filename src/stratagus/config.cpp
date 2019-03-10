@@ -278,7 +278,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				calendar->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "campaign") {
-			CCampaign *campaign = CCampaign::GetOrAddCampaign(ident);
+			CCampaign *campaign = CCampaign::GetOrAdd(ident);
 			if (!define_only) {
 				campaign->ProcessConfigData(config_data);
 			}
