@@ -114,20 +114,12 @@ CCharacter *CCharacter::GetOrAddCharacter(const std::string &ident)
 void CCharacter::ClearCharacters()
 {
 	for (CCharacter *character : CCharacter::Characters) {
-		for (CPersistentItem *item : character->Items) {
-			delete item;
-		}
-		character->Items.clear();
 		delete character;
 	}
 	CCharacter::Characters.clear();
 	CCharacter::CharactersByIdent.clear();
 	
 	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-		for (CPersistentItem *item : iterator->second->Items) {
-			delete item;
-		}
-		iterator->second->Items.clear();
 		delete iterator->second;
 	}
 	CustomHeroes.clear();
@@ -139,8 +131,12 @@ CCharacter::~CCharacter()
 		delete Conditions;
 	}
 	
-	for (size_t i = 0; i < this->HistoricalLocations.size(); ++i) {
-		delete this->HistoricalLocations[i];
+	for (CHistoricalLocation *historical_location : this->HistoricalLocations) {
+		delete historical_location;
+	}
+	
+	for (CPersistentItem *item : this->Items) {
+		delete item;
 	}
 }
 

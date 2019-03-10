@@ -129,7 +129,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 			this->Position.y = std::stoi(value);
 		} else if (key == "map_template") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->MapTemplate = CMapTemplate::GetMapTemplate(value);
+			this->MapTemplate = CMapTemplate::Get(value);
 		} else if (key == "core") {
 			value = FindAndReplaceString(value, "_", "-");
 			

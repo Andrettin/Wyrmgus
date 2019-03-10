@@ -79,20 +79,10 @@ public:
 
 class CMapTemplate : public CDataType
 {
+	DATA_TYPE_CLASS(CMapTemplate)
+	
 public:
-	CMapTemplate() :
-		SubtemplatePosition(-1, -1), CurrentStartPos(0, 0), PixelTileSize(32, 32)
-	{
-	}
-	
 	~CMapTemplate();
-
-	static CMapTemplate *GetMapTemplate(const std::string &ident);
-	static CMapTemplate *GetOrAddMapTemplate(const std::string &ident);
-	static void ClearMapTemplates();
-	
-	static std::vector<CMapTemplate *> MapTemplates;								/// Map templates
-	static std::map<std::string, CMapTemplate *> MapTemplatesByIdent;
 
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z) const;
@@ -118,11 +108,11 @@ public:
 	int Priority = 0; //the priority of this map template, for the order of application of subtemplates
 	bool Overland = false;										/// Whether this is an overland map
 	bool OutputTerrainImage = false;
-	Vec2i SubtemplatePosition;
+	Vec2i SubtemplatePosition = Vec2i(-1, -1);
 	Vec2i MinPos = Vec2i(-1, -1); //the minimum position this (sub)template can be applied to (relative to the main template)
 	Vec2i MaxPos = Vec2i(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
-	Vec2i CurrentStartPos;
-	PixelSize PixelTileSize;
+	Vec2i CurrentStartPos = Vec2i(0, 0);
+	PixelSize PixelTileSize = Vec2i(32, 32);
 	CMapTemplate *MainTemplate = nullptr;						/// Main template in which this one is located, if this is a subtemplate
 	CMapTemplate *UpperTemplate = nullptr;						/// Map template corresponding to this one in the upper layer
 	CMapTemplate *LowerTemplate = nullptr;						/// Map template corresponding to this one in the lower layer

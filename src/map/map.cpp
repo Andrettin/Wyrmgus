@@ -1120,7 +1120,7 @@ int GetMapLayer(const std::string &plane_ident, const std::string &world_ident, 
 
 int GetSubtemplateStartX(const std::string &subtemplate_ident)
 {
-	CMapTemplate *subtemplate = CMapTemplate::GetMapTemplate(subtemplate_ident);
+	CMapTemplate *subtemplate = CMapTemplate::Get(subtemplate_ident);
 	
 	if (!subtemplate) {
 		return -1;
@@ -1140,7 +1140,7 @@ int GetSubtemplateStartX(const std::string &subtemplate_ident)
 
 int GetSubtemplateStartY(const std::string &subtemplate_ident)
 {
-	CMapTemplate *subtemplate = CMapTemplate::GetMapTemplate(subtemplate_ident);
+	CMapTemplate *subtemplate = CMapTemplate::Get(subtemplate_ident);
 	
 	if (!subtemplate) {
 		return -1;

@@ -64,7 +64,7 @@ public: \
 		} \
 		\
 		if (should_find) { \
-			fprintf(stderr, "Invalid #class_name instance: \"%s\".\n", ident.c_str()); \
+			fprintf(stderr, "Invalid %s instance: \"%s\".\n", #class_name, ident.c_str()); \
 		} \
 		\
 		return nullptr; \
@@ -110,6 +110,7 @@ public: \
 			delete instance; \
 		} \
 		class_name::Instances.clear(); \
+		class_name::InstancesByIdent.clear(); \
 	} \
 	\
 private: \

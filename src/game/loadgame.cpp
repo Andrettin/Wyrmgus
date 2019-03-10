@@ -141,7 +141,7 @@ void CleanModules()
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
 	CHistoricalUnit::ClearHistoricalUnits();
-	CMapTemplate::ClearMapTemplates();
+	CMapTemplate::Clear();
 	CleanMissiles();
 	CPantheon::ClearPantheons();
 	//Wyrmgus start

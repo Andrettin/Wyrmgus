@@ -134,7 +134,7 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 				
 				if (key == "map_template") {
 					value = FindAndReplaceString(value, "_", "-");
-					map_template = CMapTemplate::GetMapTemplate(value);
+					map_template = CMapTemplate::Get(value);
 					if (map_size.x == 0) {
 						map_size.x = map_template->Width;
 					}
