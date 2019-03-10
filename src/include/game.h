@@ -62,5 +62,5 @@ extern bool LoadingHistory;
 extern bool DefiningData;
 //Wyrmgus end
 
-#endif // GAME_H
+#endif
 

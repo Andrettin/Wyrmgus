@@ -30,8 +30,6 @@
 #ifndef __SOUND_H__
 #define __SOUND_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -271,7 +269,4 @@ extern void FreeSounds();
 /// register ccl features
 extern void SoundCclRegister();
 
-
-//@}
-
-#endif  // !__SOUND_H__
+#endif

@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "ui/uitimer.h"
@@ -50,5 +48,3 @@ void CUITimer::Draw(int second) const
 	}
 	CLabel(*this->Font).Draw(this->X, this->Y, buf);
 }
-
-//@}

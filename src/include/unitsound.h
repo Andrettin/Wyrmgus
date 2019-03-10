@@ -31,8 +31,6 @@
 #ifndef __UNITSOUND_H__
 #define __UNITSOUND_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -119,6 +117,4 @@ extern void LoadUnitSounds();
 */
 extern void MapUnitSounds();
 
-//@}
-
-#endif // !__UNITSOUND_H__
+#endif

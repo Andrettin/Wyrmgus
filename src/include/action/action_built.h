@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Built : public COrder
 {
 	friend COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
@@ -74,6 +72,4 @@ private:
 	const CConstructionFrame *Frame;  /// Construction frame
 };
 
-//@}
-
-#endif // !__ACTION_BUILT_H__
+#endif

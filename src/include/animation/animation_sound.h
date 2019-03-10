@@ -30,11 +30,8 @@
 #ifndef ANIMATION_SOUND_H
 #define ANIMATION_SOUND_H
 
-//@{
-
 #include "animation.h"
 #include "unitsound.h"
-
 
 class CAnimation_Sound : public CAnimation
 {
@@ -50,6 +47,4 @@ private:
 	SoundConfig sound;
 };
 
-//@}
-
-#endif // ANIMATION_SOUND_H
+#endif

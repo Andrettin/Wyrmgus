@@ -166,4 +166,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_SDLGRAPHICS_HPP
+#endif

@@ -31,8 +31,6 @@
 
 #include <string>
 
-//@{
-
 class CHost
 {
 public:
@@ -116,6 +114,4 @@ private:
 	CTCPSocket_Impl *m_impl;
 };
 
-//@}
-
-#endif // !NETSOCKETS_H
+#endif

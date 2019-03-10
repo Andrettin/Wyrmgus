@@ -30,8 +30,6 @@
 #ifndef ANIMATION_EXACTFRAME_H
 #define ANIMATION_EXACTFRAME_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -49,6 +47,4 @@ private:
 	std::string frame;
 };
 
-//@}
-
-#endif // ANIMATION_EXACTFRAME_H
+#endif

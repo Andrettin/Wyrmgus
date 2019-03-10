@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_SpellCast : public COrder
 {
 	friend COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
@@ -77,6 +75,4 @@ private:
 	bool isAutocast;
 };
 
-//@}
-
-#endif // !__ACTION_SPELLCAST_H__
+#endif

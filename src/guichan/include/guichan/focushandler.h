@@ -241,4 +241,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_FOCUSHANDLER_HPP
+#endif

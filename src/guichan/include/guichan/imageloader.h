@@ -161,4 +161,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_IMAGELOADER_HPP
+#endif

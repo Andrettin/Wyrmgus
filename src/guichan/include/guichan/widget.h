@@ -737,18 +737,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_WIDGET_HPP
-
-/*
- * yakslem  - "I have a really great idea! Why not have an
- *             interesting and funny quote or story at the
- *             end of every source file."
- * finalman - "Yeah - good idea! .... do you know any funny
- *             quotes?"
- * yakslem  - "Well.. I guess not. I just thought it would be
- *             fun to tell funny quotes."
- * finalman - "That's not a very funny quote. But i believe
- *             pointless quotes are funny in their own pointless
- *             way."
- * yakslem  - "...eh...ok..."
- */
+#endif

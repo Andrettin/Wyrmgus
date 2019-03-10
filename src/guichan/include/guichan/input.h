@@ -115,4 +115,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_INPUT_HPP
+#endif

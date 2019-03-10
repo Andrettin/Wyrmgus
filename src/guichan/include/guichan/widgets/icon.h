@@ -88,4 +88,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_ICON_HPP
+#endif

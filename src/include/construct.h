@@ -30,8 +30,6 @@
 #ifndef __CONSTRUCT_H__
 #define __CONSTRUCT_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -182,6 +180,4 @@ extern CConstruction *ConstructionByIdent(const std::string &ident);
 /// Register ccl features
 extern void ConstructionCclRegister();
 
-//@}
-
-#endif // !__CONSTRUCT_H__
+#endif

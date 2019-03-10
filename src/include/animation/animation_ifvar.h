@@ -30,8 +30,6 @@
 #ifndef ANIMATION_IFVAR_H
 #define ANIMATION_IFVAR_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -53,6 +51,4 @@ private:
 	CAnimation *gotoLabel;
 };
 
-//@}
-
-#endif // ANIMATION_IFVAR_H
+#endif

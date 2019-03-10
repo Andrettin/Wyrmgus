@@ -89,4 +89,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_ACTIONLISTENER_HPP
+#endif

@@ -278,11 +278,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_GRAPHICS_HPP
-
-/*
- * yakslem - "little cake on cake, but that's the fall"
- * finalman - "skall jag skriva det?"
- * yakslem - "ja, varfor inte?"
- */
-
+#endif

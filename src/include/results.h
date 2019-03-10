@@ -30,8 +30,6 @@
 #ifndef __RESULTS_H__
 #define __RESULTS_H__
 
-//@{
-
 /**
 **  Possible outcomes of the game.
 */
@@ -49,7 +47,5 @@ enum GameResults {
 extern GameResults GameResult;   /// Outcome of the game
 
 extern void StopGame(GameResults result);
-
-//@}
 
 #endif

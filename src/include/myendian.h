@@ -30,8 +30,6 @@
 #ifndef __ENDIAN_H__
 #define __ENDIAN_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -150,7 +148,7 @@ extern unsigned inline _FetchLE32(unsigned char **pp)
 #include <sys/types.h>
 #else
 #include <endian.h>
-#endif // USE_BSD
+#endif
 
 #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 #include <byteswap.h>
@@ -236,6 +234,4 @@ extern unsigned inline _FetchLE32(unsigned char **pp)
 */
 #define FetchByte(p) (*((unsigned char *)(p))++)
 
-//@}
-
-#endif // !__ENDIAN_H__
+#endif

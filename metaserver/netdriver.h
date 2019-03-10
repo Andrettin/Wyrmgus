@@ -30,8 +30,6 @@
 #ifndef __NETDRIVER_H__
 #define __NETDRIVER_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -146,6 +144,4 @@ extern int ServerInit(int port);
 extern void ServerQuit(void);
 extern int UpdateSessions(void);
 
-//@}
-
-#endif // __NETDRIVER_H__
+#endif

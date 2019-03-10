@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_adjustvariable.h"
@@ -257,6 +255,3 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 	}
 	return 1;
 }
-
-
-//@}

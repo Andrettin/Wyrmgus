@@ -105,4 +105,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_CLIPRECTANGLE_HPP
+#endif

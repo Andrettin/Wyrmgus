@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_PickUp : public COrder
 {
 	friend COrder *COrder::NewActionPickUp(CUnit &dest);
@@ -66,6 +64,4 @@ private:
 	//Wyrmgus end
 };
 
-//@}
-
-#endif // !__ACTION_PICKUP_H__
+#endif

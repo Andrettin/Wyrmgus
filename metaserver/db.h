@@ -30,8 +30,6 @@
 #ifndef __DB_H__
 #define __DB_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -42,6 +40,4 @@ extern int DBFindUser(char *username, char *password);
 extern int DBAddUser(char *username, char *password);
 extern int DBUpdateLoginDate(char *username);
 
-//@}
-
-#endif // __DB_H__
+#endif

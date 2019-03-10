@@ -258,4 +258,4 @@ namespace gcn
     }
 }
 
-#endif // end GCN_SDLPIXEL_HPP
+#endif

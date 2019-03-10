@@ -30,8 +30,6 @@
 #ifndef __MENUS_H__
 #define __MENUS_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Defines/Declarations
 ----------------------------------------------------------------------------*/
@@ -55,6 +53,4 @@ extern void DrawUIButton(ButtonStyle *style, unsigned flags,
 /// Pre menu setup
 extern void PreMenuSetup();
 
-//@}
-
-#endif // !__MENUS_H__
+#endif

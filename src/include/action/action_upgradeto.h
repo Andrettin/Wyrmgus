@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_TransformInto : public COrder
 {
 	friend COrder *COrder::NewActionTransformInto(CUnitType &type);
@@ -95,4 +93,4 @@ private:
 extern int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype);
 //Wyrmgus end
 
-#endif // !__ACTIONS_H__
+#endif

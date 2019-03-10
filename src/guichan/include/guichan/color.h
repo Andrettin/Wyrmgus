@@ -160,4 +160,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_COLOR_HPP
+#endif

@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -796,7 +794,6 @@ unsigned CTileset::getOrcWallTileIndex_destroyed(int dirFlag) const
 	tileIndex = NextSection(*this, tileIndex);
 	return tileIndex;
 }
-//@}
 
 //Wyrmgus start
 std::string GetTransitionTypeNameById(int transition_type)

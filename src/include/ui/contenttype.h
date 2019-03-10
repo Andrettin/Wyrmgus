@@ -30,8 +30,6 @@
 #ifndef __CONTENT_TYPE_H__
 #define __CONTENT_TYPE_H__
 
-//@{
-
 #include "script.h"
 #include "vec2i.h"
 #include <vector>
@@ -187,7 +185,4 @@ private:
 	int colorIndex;  /// Index of Color to show.
 };
 
-
-//@}
-
-#endif // __CONTENT_TYPE_H__
+#endif

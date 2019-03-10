@@ -206,4 +206,4 @@ pqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"); @endcode
     };
 }
 
-#endif // end GCN_IMAGEFONT_HPP
+#endif

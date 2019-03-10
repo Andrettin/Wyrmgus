@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Defend : public COrder
 {
 	friend COrder *COrder::NewActionDefend(CUnit &dest);
@@ -66,6 +64,4 @@ private:
 	//Wyrmgus end
 };
 
-//@}
-
-#endif // !__ACTION_DEFEND_H__
+#endif

@@ -120,4 +120,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_RECTANGEL_HPP
+#endif

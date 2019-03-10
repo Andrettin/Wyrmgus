@@ -30,8 +30,6 @@
 #ifndef ANIMATION_WAIT_H
 #define ANIMATION_WAIT_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -47,6 +45,4 @@ private:
 	std::string wait;
 };
 
-//@}
-
-#endif // ANIMATION_WAIT_H
+#endif

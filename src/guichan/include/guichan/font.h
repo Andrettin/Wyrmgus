@@ -120,4 +120,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_FONT_HPP
+#endif

@@ -30,8 +30,6 @@
 #ifndef ANIMATION_LABEL_H
 #define ANIMATION_LABEL_H
 
-//@{
-
 #include "animation.h"
 
 class CAnimation_Label : public CAnimation
@@ -43,6 +41,4 @@ public:
 	virtual void Init(const char *s, lua_State *l);
 };
 
-//@}
-
-#endif // ANIMATION_LABEL_H
+#endif

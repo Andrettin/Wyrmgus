@@ -103,4 +103,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_SDLIMAGELOADER_HPP
+#endif

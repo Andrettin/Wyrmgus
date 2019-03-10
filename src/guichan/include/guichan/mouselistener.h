@@ -177,4 +177,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_MOUSELISTENER_HPP
+#endif

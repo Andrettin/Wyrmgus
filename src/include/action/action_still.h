@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Still : public COrder
 {
 public:
@@ -57,6 +55,4 @@ private:
 	int State;
 };
 
-//@}
-
-#endif // !__ACTION_STILL_H__
+#endif

@@ -30,8 +30,6 @@
 #ifndef ANIMATION_UNBREAKABLE_H
 #define ANIMATION_UNBREAKABLE_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -47,6 +45,4 @@ private:
 	int state;
 };
 
-//@}
-
-#endif // ANIMATION_UNBREAKABLE_H
+#endif

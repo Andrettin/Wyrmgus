@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Move : public COrder
 {
 	//Wyrmgus start
@@ -69,6 +67,4 @@ private:
 	//Wyrmgus end
 };
 
-//@}
-
-#endif // !__ACTION_MOVE_H__
+#endif

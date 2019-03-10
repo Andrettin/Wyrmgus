@@ -29,8 +29,6 @@
 #ifndef __NETWORK_H__
 #define __NETWORK_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -94,6 +92,4 @@ extern void NetworkSendSelection(CUnit **units, int count);
 
 extern void NetworkCclRegister();
 
-//@}
-
-#endif // !__NETWORK_H__
+#endif

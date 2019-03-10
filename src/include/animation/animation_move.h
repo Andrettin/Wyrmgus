@@ -30,8 +30,6 @@
 #ifndef ANIMATION_MOVE_H
 #define ANIMATION_MOVE_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -47,6 +45,4 @@ private:
 	std::string moveStr;
 };
 
-//@}
-
-#endif // ANIMATION_MOVE_H
+#endif

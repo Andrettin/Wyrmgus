@@ -104,4 +104,4 @@ extern "C"
     GCN_CORE_DECLSPEC extern const char* gcnGuichanVersion();
 }
 
-#endif // end GCN_GUICHAN_HPP
+#endif

@@ -286,7 +286,7 @@ char *strcasestr(const char *a, const char *b)
 
 	return nullptr;
 }
-#endif // !HAVE_STRCASESTR
+#endif
 
 std::vector<std::string> SplitString(const std::string &str, const char *separators)
 {

@@ -441,4 +441,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_SCROLLAREA_HPP
+#endif

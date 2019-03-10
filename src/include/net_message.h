@@ -29,8 +29,6 @@
 #ifndef NET_MESSAGE_H
 #define NET_MESSAGE_H
 
-//@{
-
 #include <stdint.h>
 #include <vector>
 
@@ -488,6 +486,4 @@ public:
 	std::vector<unsigned char> Command[MaxNetworkCommands];
 };
 
-//@}
-
-#endif // !NET_MESSAGE_H
+#endif

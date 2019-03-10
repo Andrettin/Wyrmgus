@@ -30,8 +30,6 @@
 #ifndef __AI_H__
 #define __AI_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -107,6 +105,4 @@ extern void AiUpgradeToComplete(CUnit &unit, const CUnitType &what);
 /// Called if AI unit has completed research
 extern void AiResearchComplete(CUnit &unit, const CUpgrade *what);
 
-//@}
-
-#endif // !__AI_H__
+#endif

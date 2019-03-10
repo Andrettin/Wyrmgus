@@ -29,8 +29,6 @@
 #ifndef __UNITMANAGER_H__
 #define __UNITMANAGER_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -86,6 +84,4 @@ private:
 
 extern CUnitManager UnitManager;   /// Unit manager
 
-//@}
-
-#endif // !__UNITMANAGER_H__
+#endif

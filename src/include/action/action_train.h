@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Train : public COrder
 {
 	//Wyrmgus start
@@ -70,6 +68,4 @@ private:
 	int Ticks;       /// Ticks to complete
 };
 
-//@}
-
-#endif // !__ACTION_TRAIN_H__
+#endif

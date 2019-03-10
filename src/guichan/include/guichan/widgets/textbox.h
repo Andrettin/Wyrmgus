@@ -256,4 +256,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_TEXTBOX_HPP
+#endif

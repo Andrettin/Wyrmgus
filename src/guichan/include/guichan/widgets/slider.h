@@ -260,4 +260,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_SLIDER_HPP
+#endif

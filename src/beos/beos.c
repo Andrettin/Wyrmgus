@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 // NOTE: setup/make use beos.c and BeIDE use beos.cpp
 
 /*----------------------------------------------------------------------------
@@ -53,5 +51,3 @@ void beos_init(int argc, char** argv)
 }
 
 #endif
-
-//@}

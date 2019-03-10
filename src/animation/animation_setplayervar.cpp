@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -346,5 +344,3 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 	end = std::min(len, str.find(' ', begin));
 	this->argStr.assign(str, begin, end - begin);
 }
-
-//@}

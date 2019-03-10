@@ -270,4 +270,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_WINDOW_HPP
+#endif

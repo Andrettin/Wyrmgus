@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
@@ -402,5 +400,3 @@ void SoundCclRegister()
 	lua_register(Lua, "MakeSoundGroup", CclMakeSoundGroup);
 	lua_register(Lua, "PlaySound", CclPlaySound);
 }
-
-//@}

@@ -30,8 +30,6 @@
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
 
-//@{
-
 #include <string>
 #include <vector>
 
@@ -140,6 +138,4 @@ extern void CreateGame(const std::string &filename, CMap *map, bool is_mod = fal
 /// Init Setting to default values
 extern void InitSettings();
 
-//@}
-
-#endif // !__SETTINGS_H__
+#endif

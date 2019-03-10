@@ -30,8 +30,6 @@
 #ifndef __CURSOR_H__
 #define __CURSOR_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -209,6 +207,4 @@ extern void CleanCursors();
 
 extern void CursorCclRegister();
 
-//@}
-
-#endif // !__CURSOR_H__
+#endif

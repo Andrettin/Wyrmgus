@@ -30,8 +30,6 @@
 #ifndef VEC2I_H
 #define VEC2I_H
 
-//@{
-
 template <typename T>
 class Vec2T
 {
@@ -213,6 +211,4 @@ typedef Vec2T<int> PixelDiff;
 typedef Vec2T<int> PixelSize;
 typedef Vec2T<double> PixelPrecise;
 
-//@}
-
-#endif // !VEC2I_H
+#endif

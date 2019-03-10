@@ -30,8 +30,6 @@
 #ifndef ANIMATION_SETVAR_H
 #define ANIMATION_SETVAR_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -50,6 +48,4 @@ private:
 	std::string unitSlotStr;
 };
 
-//@}
-
-#endif // ANIMATION_SETVAR_H
+#endif

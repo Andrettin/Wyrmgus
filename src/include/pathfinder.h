@@ -30,8 +30,6 @@
 #ifndef __PATH_FINDER_H__
 #define __PATH_FINDER_H__
 
-//@{
-
 #if defined(DEBUG_ASTAR)
 #define AstarDebugPrint(x) DebugPrint(x)
 #else
@@ -270,6 +268,4 @@ extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, in
 
 extern void PathfinderCclRegister();
 
-//@}
-
-#endif // !__PATH_FINDER_H__
+#endif

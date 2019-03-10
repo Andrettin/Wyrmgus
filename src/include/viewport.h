@@ -30,8 +30,6 @@
 #ifndef VIEWPORT_H
 #define VIEWPORT_H
 
-//@{
-
 #include "vec2i.h"
 class CUnit;
 
@@ -123,6 +121,4 @@ public:
 	CUnit *Unit;              /// Bound to this unit
 };
 
-//@}
-
-#endif // VIEWPORT_H
+#endif

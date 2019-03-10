@@ -30,8 +30,6 @@
 #ifndef ANIMATION_RANDOMWAIT_H
 #define ANIMATION_RANDOMWAIT_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -48,6 +46,4 @@ private:
 	std::string maxWait;
 };
 
-//@}
-
-#endif // ANIMATION_RANDOMWAIT_H
+#endif

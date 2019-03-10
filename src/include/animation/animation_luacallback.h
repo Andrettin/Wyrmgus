@@ -30,8 +30,6 @@
 #ifndef ANIMATION_LUACALLBACK_H
 #define ANIMATION_LUACALLBACK_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -52,6 +50,4 @@ private:
 	std::vector<std::string> cbArgs;
 };
 
-//@}
-
-#endif // ANIMATION_LUACALLBACK_H
+#endif

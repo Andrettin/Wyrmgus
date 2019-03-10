@@ -29,8 +29,6 @@
 #ifndef __NETCONNECT_H__
 #define __NETCONNECT_H__
 
-//@{
-
 #include "net_message.h"
 
 class CHost;
@@ -119,6 +117,4 @@ extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server reque
 extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients state to send stateinfo message
 extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach
 
-//@}
-
-#endif // !__NETCONNECT_H__
+#endif

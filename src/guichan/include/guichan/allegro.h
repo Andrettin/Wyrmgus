@@ -69,4 +69,4 @@ extern "C"
     extern void gcnAllegro();
 }
 
-#endif // end GCN_ALLEGRO_HPP
+#endif

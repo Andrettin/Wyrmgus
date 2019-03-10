@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Research : public COrder
 {
 	friend COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player);
@@ -66,6 +64,4 @@ private:
 	//Wyrmgus end
 };
 
-//@}
-
-#endif // !__ACTION_RESEARCH_H__
+#endif

@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Patrol : public COrder
 {
 	//Wyrmgus start
@@ -73,6 +71,4 @@ private:
 	//Wyrmgus end
 };
 
-//@}
-
-#endif // !__ACTION_PATROL_H__
+#endif

@@ -30,8 +30,6 @@
 #ifndef ANIMATION_RANDOMSOUND_H
 #define ANIMATION_RANDOMSOUND_H
 
-//@{
-
 #include <vector>
 
 #include "animation.h"
@@ -50,6 +48,4 @@ private:
 	std::vector<SoundConfig> sounds;
 };
 
-//@}
-
-#endif // ANIMATION_RANDOMSOUND_H
+#endif

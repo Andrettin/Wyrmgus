@@ -30,8 +30,6 @@
 #ifndef __STATUS_LINE_H__
 #define __STATUS_LINE_H__
 
-//@{
-
 #include <string>
 
 #include "upgrade/upgrade_structs.h"
@@ -64,6 +62,4 @@ private:
 	std::string StatusLine;
 };
 
-//@}
-
-#endif // __STATUS_LINE_H__
+#endif

@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Board : public COrder
 {
 	friend COrder *COrder::NewActionBoard(CUnit &unit);
@@ -65,7 +63,4 @@ private:
 	//Wyrmgus end
 };
 
-
-//@}
-
-#endif // !__ACTION_BOARD_H__
+#endif

@@ -252,4 +252,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_KEY_HPP
+#endif

@@ -28,8 +28,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 #include "stratagus.h"
 
 #include "spell/spell_spawnportal.h"
@@ -96,7 +94,3 @@
 	//FIXME: setting destination circle of power should use mana
 	return 0;
 }
-
-
-
-//@}

@@ -127,4 +127,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_LABEL_HPP
+#endif

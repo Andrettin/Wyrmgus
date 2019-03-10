@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Attack : public COrder
 {
 	friend COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
@@ -83,6 +81,5 @@ private:
 	int MapLayer;
 	//Wyrmgus end
 };
-//@}
 
-#endif // !__ACTION_ATTACK_H__
+#endif

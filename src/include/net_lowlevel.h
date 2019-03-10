@@ -29,8 +29,6 @@
 #ifndef __NET_LOWLEVEL_H
 #define __NET_LOWLEVEL_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -145,6 +143,4 @@ extern int NetSetNonBlocking(Socket sockfd);
 /// Wait for socket ready.
 extern int NetSocketReady(Socket sockfd, int timeout);
 
-//@}
-
-#endif // !__NET_LOWLEVEL_H
+#endif

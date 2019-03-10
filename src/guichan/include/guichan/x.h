@@ -58,4 +58,4 @@
 #include <guichan/x/xgraphics.h>
 #include <guichan/x/ximage.h>
 
-#endif // end GCN_X_HPP
+#endif

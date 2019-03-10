@@ -158,10 +158,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_EXCEPTION_HPP
-
-/*
- * "Final Fantasy XI is the BEST!... It's even better then water!"
- *  - Astrolite
- * I believe it's WoW now days.
- */
+#endif

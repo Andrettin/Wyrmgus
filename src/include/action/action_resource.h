@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Resource : public COrder
 {
 	//Wyrmgus start
@@ -119,6 +117,4 @@ private:
 #endif
 };
 
-//@}
-
-#endif // !__ACTION_RESOURCE_H__
+#endif

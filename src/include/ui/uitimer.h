@@ -30,8 +30,6 @@
 #ifndef __UITIMER_H__
 #define __UITIMER_H__
 
-//@{
-
 class CFont;
 
 class CUITimer
@@ -47,6 +45,4 @@ public:
 	CFont *Font;
 };
 
-//@}
-
-#endif // __UITIMER_H__
+#endif

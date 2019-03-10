@@ -30,8 +30,6 @@
 #ifndef ANIMATION_RANDOMROTATE_H
 #define ANIMATION_RANDOMROTATE_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -47,6 +45,4 @@ private:
 	std::string rotateStr;
 };
 
-//@}
-
-#endif // ANIMATION_RANDOMROTATE_H
+#endif

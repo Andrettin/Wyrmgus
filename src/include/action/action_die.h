@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Die : public COrder
 {
 public:
@@ -51,6 +49,4 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 };
 
-//@}
-
-#endif // !__ACTION_DIE_H__
+#endif

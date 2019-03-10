@@ -135,4 +135,4 @@ namespace gcn
 	};
 }
 
-#endif // end GCN_SDLINPUT_HPP
+#endif

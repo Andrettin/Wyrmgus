@@ -32,8 +32,6 @@
 
 #include "actions.h"
 
-//@{
-
 class COrder_Repair : public COrder
 {
 	friend COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target);
@@ -75,7 +73,4 @@ private:
 	//Wyrmgus end
 };
 
-
-//@}
-
-#endif // !__ACTION_REPAIR_H__
+#endif

@@ -30,8 +30,6 @@
 #ifndef ANIMATION_GOTO_H
 #define ANIMATION_GOTO_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -47,6 +45,4 @@ private:
 	CAnimation *gotoLabel;
 };
 
-//@}
-
-#endif // ANIMATION_GOTO_H
+#endif

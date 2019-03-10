@@ -30,8 +30,6 @@
 #ifndef SPELL_SPAWNPORTAL_H
 #define SPELL_SPAWNPORTAL_H
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -53,7 +51,4 @@ private:
 	bool CurrentPlayer;      /// If true, summon portal for caster's player rather than neutral
 };
 
-
-//@}
-
-#endif // SPELL_SPAWNPORTAL_H
+#endif

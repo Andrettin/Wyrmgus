@@ -30,8 +30,6 @@
 #ifndef ANIMATION_RANDOMGOTO_H
 #define ANIMATION_RANDOMGOTO_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -48,6 +46,4 @@ private:
 	CAnimation *gotoLabel;
 };
 
-//@}
-
-#endif // ANIMATION_RANDOMGOTO_H
+#endif

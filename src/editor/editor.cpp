@@ -27,8 +27,6 @@
 //      02111-1307, USA.
 //
 
-//@{
-
 //----------------------------------------------------------------------------
 //  Documentation
 //----------------------------------------------------------------------------
@@ -81,5 +79,3 @@ CEditor::CEditor() :
 	CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
 	MapLoaded(false), WriteCompressedMaps(true), PopUpX(-1), PopUpY(-1)
 {}
-
-//@}

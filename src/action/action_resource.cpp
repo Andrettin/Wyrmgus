@@ -1506,7 +1506,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 					   _C_ unit.Player->Index _C_ UnitNumber(unit)
 					   _C_ unit.tilePos.x _C_ unit.tilePos.y
 					   _C_ pos.x _C_ pos.y _C_ range);
-#endif // DEBUG
+#endif
 			if (depot) {
 				DropOutOnSide(unit, LookingW, depot);
 			}

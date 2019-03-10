@@ -842,7 +842,6 @@ void SendCommandAutosellResource(int player, int resource)
 //----------------------------------------------------------------------------
 
 /**@name parse */
-//@{
 
 /**
 ** Execute a command (from network).

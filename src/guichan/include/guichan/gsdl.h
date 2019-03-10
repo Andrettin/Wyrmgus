@@ -71,4 +71,4 @@ extern "C"
     GCN_EXTENSION_DECLSPEC extern void gcnSDL();
 }
 
-#endif // end GCN_SDL_HPP
+#endif

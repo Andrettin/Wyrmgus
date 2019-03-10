@@ -90,4 +90,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_LISTMODEL_HPP
+#endif

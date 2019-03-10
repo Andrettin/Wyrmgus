@@ -30,8 +30,6 @@
 #ifndef __IOLIB_H__
 #define __IOLIB_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
@@ -154,6 +152,4 @@ extern bool CanAccessFile(const char *filename);
 /// Read the contents of a directory
 extern int ReadDataDirectory(const char *dirname, std::vector<FileList> &flp, int sortmode = 0);
 
-//@}
-
-#endif // !__IOLIB_H__
+#endif

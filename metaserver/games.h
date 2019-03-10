@@ -30,8 +30,6 @@
 #ifndef __GAMES_H__
 #define __GAMES_H__
 
-//@{
-
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -83,6 +81,4 @@ extern int JoinGame(Session *session, int id, char *password);
 extern int PartGame(Session *session);
 extern void ListGames(Session *session);
 
-//@}
-
-#endif // __GAMES_H__
+#endif

@@ -34,8 +34,6 @@
 
 class CSite;
 
-//@{
-
 class COrder_Build : public COrder
 {
 	//Wyrmgus start
@@ -93,6 +91,4 @@ private:
 	//Wyrmgus end
 };
 
-//@}
-
-#endif // !__ACTION_BUILD_H__
+#endif

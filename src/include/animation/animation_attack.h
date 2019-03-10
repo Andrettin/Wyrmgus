@@ -30,8 +30,6 @@
 #ifndef ANIMATION_ATTACK_H
 #define ANIMATION_ATTACK_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -45,6 +43,4 @@ public:
 
 };
 
-//@}
-
-#endif // ANIMATION_ATTACK_H
+#endif

@@ -30,8 +30,6 @@
 #ifndef ANIMATION_FRAME_H
 #define ANIMATION_FRAME_H
 
-//@{
-
 #include <string>
 #include "animation.h"
 
@@ -48,6 +46,4 @@ private:
 	std::string frame;
 };
 
-//@}
-
-#endif // ANIMATION_FRAME_H
+#endif

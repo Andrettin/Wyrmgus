@@ -151,4 +151,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_MOUSEINPUT_HPP
+#endif

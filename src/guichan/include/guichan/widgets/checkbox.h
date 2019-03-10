@@ -161,4 +161,4 @@ namespace gcn
     };
 }
 
-#endif // end GCN_CHECKBOX_HPP
+#endif
