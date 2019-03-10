@@ -45,11 +45,27 @@ class CSpeciesCategoryRank : public CDataType
 	DATA_TYPE_CLASS(CSpeciesCategoryRank)
 	
 public:
+	static _FORCE_INLINE_ bool AreAllInitialized()
+	{
+		for (CSpeciesCategoryRank *rank : CSpeciesCategoryRank::GetAll()) {
+			if (!rank->IsInitialized()) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 	String GetName() const
 	{
 		return this->Name.c_str();
+	}
+	
+	bool IsInitialized() const
+	{
+		return this->Initialized;
 	}
 	
 	CSpeciesCategoryRank *GetLowerRank() const
@@ -64,6 +80,7 @@ public:
 	
 private:
 	std::string Name;				/// name of the species category rank
+	bool Initialized = false;		/// whether the rank has been initialized
 	CSpeciesCategoryRank *LowerRank = nullptr;	/// the rank directly below this one
 	CSpeciesCategoryRank *UpperRank = nullptr;	/// the rank directly above this one
 };

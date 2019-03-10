@@ -72,4 +72,31 @@ void CSpeciesCategoryRank::ProcessConfigData(const CConfigData *config_data)
 			fprintf(stderr, "Invalid species category rank property: \"%s\".\n", key.c_str());
 		}
 	}
+	
+	this->Initialized = true;
+	
+	//check if the rank is linked properly to other ones, if all other ones have already been initialized
+	if (CSpeciesCategoryRank::AreAllInitialized()) {
+		//count of ranks linked to this one, plus itself
+		size_t linked_rank_count = 1;
+		
+		CSpeciesCategoryRank *rank = this;
+		while ((rank = rank->GetUpperRank())) {
+			if (rank == this) {
+				fprintf(stderr, "Species category rank \"%s\" is in a circular rank list.\n", this->Ident.c_str());
+				break;
+			}
+			
+			linked_rank_count++;
+		}
+		
+		rank = this;
+		while ((rank = rank->GetLowerRank())) {
+			linked_rank_count++;
+		}
+		
+		if (linked_rank_count != CSpeciesCategoryRank::GetAll().size()) {
+			fprintf(stderr, "Species category rank \"%s\" is only linked to %d ranks, while %d exist.\n", this->Ident.c_str(), linked_rank_count, CSpeciesCategoryRank::GetAll().size());
+		}
+	}
 }
