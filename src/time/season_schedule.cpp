@@ -42,8 +42,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CSeasonSchedule *> CSeasonSchedule::SeasonSchedules;
-std::map<std::string, CSeasonSchedule *> CSeasonSchedule::SeasonSchedulesByIdent;
 CSeasonSchedule *CSeasonSchedule::DefaultSeasonSchedule = nullptr;
 	
 /*----------------------------------------------------------------------------
@@ -51,67 +49,12 @@ CSeasonSchedule *CSeasonSchedule::DefaultSeasonSchedule = nullptr;
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a season schedule
-**
-**	@param	ident			The season schedule's string identifier
-**	@param	should_find		Whether it is an error if the season schedule could not be found; this is true by default
-**
-**	@return	The season schedule if found, or null otherwise
-*/
-CSeasonSchedule *CSeasonSchedule::GetSeasonSchedule(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CSeasonSchedule *>::const_iterator find_iterator = SeasonSchedulesByIdent.find(ident);
-	
-	if (find_iterator != SeasonSchedulesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid season schedule: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a season schedule
-**
-**	@param	ident	The season schedule's string identifier
-**
-**	@return	The season schedule if found, or a newly-created one otherwise
-*/
-CSeasonSchedule *CSeasonSchedule::GetOrAddSeasonSchedule(const std::string &ident)
-{
-	CSeasonSchedule *season_schedule = GetSeasonSchedule(ident, false);
-	
-	if (!season_schedule) {
-		season_schedule = new CSeasonSchedule;
-		season_schedule->Ident = ident;
-		SeasonSchedules.push_back(season_schedule);
-		SeasonSchedulesByIdent[ident] = season_schedule;
-	}
-	
-	return season_schedule;
-}
-
-/**
-**	@brief	Remove the existing season schedules
-*/
-void CSeasonSchedule::ClearSeasonSchedules()
-{
-	for (size_t i = 0; i < SeasonSchedules.size(); ++i) {
-		delete SeasonSchedules[i];
-	}
-	SeasonSchedules.clear();
-}
-
-/**
 **	@brief	Destructor
 */
 CSeasonSchedule::~CSeasonSchedule()
 {
-	for (size_t i = 0; i < this->ScheduledSeasons.size(); ++i) {
-		delete this->ScheduledSeasons[i];
+	for (CScheduledSeason *scheduled_season : this->ScheduledSeasons) {
+		delete scheduled_season;
 	}
 }
 

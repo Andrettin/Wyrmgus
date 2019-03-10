@@ -133,10 +133,10 @@ void CPlane::ProcessConfigData(const CConfigData *config_data)
 			this->Quote = value;
 		} else if (key == "time_of_day_schedule") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(value);
+			this->TimeOfDaySchedule = CTimeOfDaySchedule::Get(value);
 		} else if (key == "season_schedule") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(value);
+			this->SeasonSchedule = CSeasonSchedule::Get(value);
 		} else if (key == "empowered_deity_domain") {
 			value = FindAndReplaceString(value, "_", "-");
 			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);

@@ -142,10 +142,10 @@ void CWorld::ProcessConfigData(const CConfigData *config_data)
 			this->Plane = CPlane::GetPlane(value);
 		} else if (key == "time_of_day_schedule") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(value);
+			this->TimeOfDaySchedule = CTimeOfDaySchedule::Get(value);
 		} else if (key == "season_schedule") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(value);
+			this->SeasonSchedule = CSeasonSchedule::Get(value);
 		} else {
 			fprintf(stderr, "Invalid world property: \"%s\".\n", key.c_str());
 		}

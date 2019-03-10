@@ -43,8 +43,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CTimeOfDaySchedule *> CTimeOfDaySchedule::TimeOfDaySchedules;
-std::map<std::string, CTimeOfDaySchedule *> CTimeOfDaySchedule::TimeOfDaySchedulesByIdent;
 CTimeOfDaySchedule *CTimeOfDaySchedule::DefaultTimeOfDaySchedule = nullptr;
 	
 /*----------------------------------------------------------------------------
@@ -52,67 +50,12 @@ CTimeOfDaySchedule *CTimeOfDaySchedule::DefaultTimeOfDaySchedule = nullptr;
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a time of day schedule
-**
-**	@param	ident			The time of day schedule's string identifier
-**	@param	should_find		Whether it is an error if the time of day schedule could not be found; this is true by default
-**
-**	@return	The time of day schedule if found, or null otherwise
-*/
-CTimeOfDaySchedule *CTimeOfDaySchedule::GetTimeOfDaySchedule(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CTimeOfDaySchedule *>::const_iterator find_iterator = TimeOfDaySchedulesByIdent.find(ident);
-	
-	if (find_iterator != TimeOfDaySchedulesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid time of day schedule: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a time of day schedule
-**
-**	@param	ident	The time of day schedule's string identifier
-**
-**	@return	The time of day schedule if found, or a newly-created one otherwise
-*/
-CTimeOfDaySchedule *CTimeOfDaySchedule::GetOrAddTimeOfDaySchedule(const std::string &ident)
-{
-	CTimeOfDaySchedule *time_of_day_schedule = GetTimeOfDaySchedule(ident, false);
-	
-	if (!time_of_day_schedule) {
-		time_of_day_schedule = new CTimeOfDaySchedule;
-		time_of_day_schedule->Ident = ident;
-		TimeOfDaySchedules.push_back(time_of_day_schedule);
-		TimeOfDaySchedulesByIdent[ident] = time_of_day_schedule;
-	}
-	
-	return time_of_day_schedule;
-}
-
-/**
-**	@brief	Remove the existing time of day schedules
-*/
-void CTimeOfDaySchedule::ClearTimeOfDaySchedules()
-{
-	for (size_t i = 0; i < TimeOfDaySchedules.size(); ++i) {
-		delete TimeOfDaySchedules[i];
-	}
-	TimeOfDaySchedules.clear();
-}
-
-/**
 **	@brief	Destructor
 */
 CTimeOfDaySchedule::~CTimeOfDaySchedule()
 {
-	for (size_t i = 0; i < this->ScheduledTimesOfDay.size(); ++i) {
-		delete this->ScheduledTimesOfDay[i];
+	for (CScheduledTimeOfDay *scheduled_time_of_day : this->ScheduledTimesOfDay) {
+		delete scheduled_time_of_day;
 	}
 }
 
@@ -153,26 +96,6 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 	}
 	
 	this->CalculateHourMultiplier();
-}
-
-/**
-**	@brief	Get the default total hours for a time of day schedule
-**
-**	@return	The default total hours
-*/
-unsigned long CTimeOfDaySchedule::GetDefaultTotalHours() const
-{
-	return DEFAULT_HOURS_PER_DAY;
-}
-
-/**
-**	@brief	Get the default hour multiplier for a time of day schedule
-**
-**	@return	The default hour multiplier
-*/
-int CTimeOfDaySchedule::GetDefaultHourMultiplier() const
-{
-	return 1;
 }
 
 /**

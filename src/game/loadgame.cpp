@@ -174,9 +174,9 @@ void CleanModules()
 	CMap::Map.CleanFogOfWar();
 	CTerrainType::ClearTerrainTypes();
 	CTimeOfDay::ClearTimesOfDay();
-	CTimeOfDaySchedule::ClearTimeOfDaySchedules();
+	CTimeOfDaySchedule::Clear();
 	CSeason::Clear();
-	CSeasonSchedule::ClearSeasonSchedules();
+	CSeasonSchedule::Clear();
 	CleanReplayLog();
 	CSpell::ClearSpells();
 	FreePathfinder();

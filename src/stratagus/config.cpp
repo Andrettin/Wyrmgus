@@ -365,7 +365,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				season->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "season_schedule") {
-			CSeasonSchedule *season_schedule = CSeasonSchedule::GetOrAddSeasonSchedule(ident);
+			CSeasonSchedule *season_schedule = CSeasonSchedule::GetOrAdd(ident);
 			if (!define_only) {
 				season_schedule->ProcessConfigData(config_data);
 			}
@@ -419,7 +419,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				time_of_day->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "time_of_day_schedule") {
-			CTimeOfDaySchedule *time_of_day_schedule = CTimeOfDaySchedule::GetOrAddTimeOfDaySchedule(ident);
+			CTimeOfDaySchedule *time_of_day_schedule = CTimeOfDaySchedule::GetOrAdd(ident);
 			if (!define_only) {
 				time_of_day_schedule->ProcessConfigData(config_data);
 			}

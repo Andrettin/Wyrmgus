@@ -67,20 +67,34 @@ public:
 
 class CTimeOfDaySchedule : public CTimePeriodSchedule
 {
+	DATA_TYPE_CLASS(CTimeOfDaySchedule)
+	
 public:
 	~CTimeOfDaySchedule();
 	
-	static CTimeOfDaySchedule *GetTimeOfDaySchedule(const std::string &ident, const bool should_find = true);
-	static CTimeOfDaySchedule *GetOrAddTimeOfDaySchedule(const std::string &ident);
-	static void ClearTimeOfDaySchedules();
-	
-	static std::vector<CTimeOfDaySchedule *> TimeOfDaySchedules;		/// Time of day schedules
-	static std::map<std::string, CTimeOfDaySchedule *> TimeOfDaySchedulesByIdent;
 	static CTimeOfDaySchedule *DefaultTimeOfDaySchedule;
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	virtual unsigned long GetDefaultTotalHours() const;
-	virtual int GetDefaultHourMultiplier() const;
+	
+	/**
+	**	@brief	Get the default total hours for a time of day schedule
+	**
+	**	@return	The default total hours
+	*/
+	virtual unsigned long GetDefaultTotalHours() const
+	{
+		return DEFAULT_HOURS_PER_DAY;
+	}
+	
+	/**
+	**	@brief	Get the default hour multiplier for a time of day schedule
+	**
+	**	@return	The default hour multiplier
+	*/
+	virtual int GetDefaultHourMultiplier() const
+	{
+		return 1;
+	}
 
 	std::string Name;										/// Name of the time of day schedules
 	std::vector<CScheduledTimeOfDay *> ScheduledTimesOfDay;	/// The times of day that are scheduled

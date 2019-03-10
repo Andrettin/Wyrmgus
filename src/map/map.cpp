@@ -1234,7 +1234,7 @@ void SetTimeOfDaySchedule(const std::string &time_of_day_schedule_ident, const u
 		CMap::Map.MapLayers[z]->SetTimeOfDay(nullptr);
 		CMap::Map.MapLayers[z]->RemainingTimeOfDayHours = 0;
 	} else {
-		CTimeOfDaySchedule *schedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(time_of_day_schedule_ident);
+		CTimeOfDaySchedule *schedule = CTimeOfDaySchedule::Get(time_of_day_schedule_ident);
 		if (schedule) {
 			CMap::Map.MapLayers[z]->TimeOfDaySchedule = schedule;
 			CMap::Map.MapLayers[z]->SetTimeOfDay(schedule->ScheduledTimesOfDay.front());
@@ -1282,7 +1282,7 @@ void SetSeasonSchedule(const std::string &season_schedule_ident, int z)
 		CMap::Map.MapLayers[z]->SetSeason(nullptr);
 		CMap::Map.MapLayers[z]->RemainingSeasonHours = 0;
 	} else {
-		CSeasonSchedule *schedule = CSeasonSchedule::GetSeasonSchedule(season_schedule_ident);
+		CSeasonSchedule *schedule = CSeasonSchedule::Get(season_schedule_ident);
 		if (schedule) {
 			CMap::Map.MapLayers[z]->SeasonSchedule = schedule;
 			CMap::Map.MapLayers[z]->SetSeason(schedule->ScheduledSeasons.front());

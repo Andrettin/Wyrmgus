@@ -171,7 +171,7 @@ static int CclStratagusMap(lua_State *l)
 						lua_rawgeti(l, -1, z + 1);
 						std::string time_of_day_schedule_ident = LuaToString(l, -1, 1);
 						if (!time_of_day_schedule_ident.empty()) {
-							map_layer->TimeOfDaySchedule = CTimeOfDaySchedule::GetTimeOfDaySchedule(time_of_day_schedule_ident);
+							map_layer->TimeOfDaySchedule = CTimeOfDaySchedule::Get(time_of_day_schedule_ident);
 						} else {
 							map_layer->TimeOfDaySchedule = nullptr;
 						}
@@ -194,7 +194,7 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"season\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						CMap::Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::GetSeasonSchedule(LuaToString(l, -1, 1));
+						CMap::Map.MapLayers[z]->SeasonSchedule = CSeasonSchedule::Get(LuaToString(l, -1, 1));
 						unsigned season = LuaToNumber(l, -1, 2);
 						if (CMap::Map.MapLayers[z]->SeasonSchedule && season < CMap::Map.MapLayers[z]->SeasonSchedule->ScheduledSeasons.size()) {
 							CMap::Map.MapLayers[z]->Season = CMap::Map.MapLayers[z]->SeasonSchedule->ScheduledSeasons[season];

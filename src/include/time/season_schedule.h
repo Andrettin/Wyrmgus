@@ -58,15 +58,11 @@ public:
 
 class CSeasonSchedule : public CTimePeriodSchedule
 {
+	DATA_TYPE_CLASS(CSeasonSchedule)
+	
 public:
 	~CSeasonSchedule();
 	
-	static CSeasonSchedule *GetSeasonSchedule(const std::string &ident, const bool should_find = true);
-	static CSeasonSchedule *GetOrAddSeasonSchedule(const std::string &ident);
-	static void ClearSeasonSchedules();
-	
-	static std::vector<CSeasonSchedule *> SeasonSchedules;		/// Season schedules
-	static std::map<std::string, CSeasonSchedule *> SeasonSchedulesByIdent;
 	static CSeasonSchedule *DefaultSeasonSchedule;
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
