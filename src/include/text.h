@@ -43,24 +43,15 @@
 class CChapter
 {
 public:
-	CChapter() :
-		ID(0), Introduction(false)
-	{
-	}
-	
 	std::string Name;				/// Name of the chapter
-	int ID;
-	bool Introduction;				/// Whether this is an introductory chapter
+	int ID = 0;
+	bool Introduction = false;		/// Whether this is an introductory chapter
 	std::vector<std::string> Pages;	/// Pages of text
 };
 
 class CText
 {
 public:
-	CText() :
-		Year(0), InitialPage(1)
-	{
-	}
 	~CText();
 	
 	CChapter *GetChapter(const std::string &chapter_name);
@@ -71,8 +62,8 @@ public:
 	std::string Publisher;			/// Publisher of the text
 	std::string CopyrightNotice;	/// Copyright notice explaining that this text is in the public domain, or is licensed under an open-source license
 	std::string Notes;				/// Notes to appear on the cover of the text
-	int Year;						/// Year of publication
-	int InitialPage;				/// Page in which the text begins
+	int Year = 0;					/// Year of publication
+	int InitialPage = 1;			/// Page in which the text begins
 	std::vector<CChapter *> Chapters;	/// The chapters of the text
 };
 

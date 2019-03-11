@@ -7,3 +7,5 @@ Coding Style Guidelines for Wyrmgus
 3. Local variable names are in snake_case.
 
 4. Prefer defining functions in headers if they don't require any external includes, so that the compiler is able to inline the functions if it deems optimal to do so, thus providing performance improvements.
+
+5. Braces are always used for "if" statements.

@@ -263,32 +263,32 @@ public:
 	//Wyrmgus end
 public:
 	//Wyrmgus start
-//	unsigned short Flags;      /// field flags
-	unsigned long Flags;      /// field flags
-	unsigned char AnimationFrame;		/// current frame of the tile's animation
-	unsigned char OverlayAnimationFrame;		/// current frame of the overlay tile's animation
-	CTerrainType *Terrain;
-	CTerrainType *OverlayTerrain;
-	CTerrainFeature *TerrainFeature;
-	short SolidTile;
-	short OverlaySolidTile;
-	bool OverlayTerrainDestroyed;
-	bool OverlayTerrainDamaged;
+//	unsigned short Flags = 0;	/// field flags
+	unsigned long Flags = 0;	/// field flags
+	unsigned char AnimationFrame = 0;	/// current frame of the tile's animation
+	unsigned char OverlayAnimationFrame = 0;	/// current frame of the overlay tile's animation
+	CTerrainType *Terrain = nullptr;
+	CTerrainType *OverlayTerrain = nullptr;
+	CTerrainFeature *TerrainFeature = nullptr;
+	short SolidTile = 0;
+	short OverlaySolidTile = 0;
+	bool OverlayTerrainDestroyed = false;
+	bool OverlayTerrainDamaged = false;
 	std::vector<std::pair<CTerrainType *, short>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
 	std::vector<std::pair<CTerrainType *, short>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 private:
-	unsigned char cost;        /// unit cost to move in this tile
+	unsigned char cost = 0;		/// unit cost to move in this tile
 public:
 	// FIXME: Value should be removed, walls and regeneration can be handled differently.
 	//Wyrmgus start
-//	unsigned char Value;       /// HP for walls / wood regeneration
-	short Value;       /// HP for walls/ Wood Regeneration
-	int Landmass;			   /// To which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
-	short Owner;			   /// To which player (if any) this tile belongs to
-	short OwnershipBorderTile;	/// The transition type of the border between this tile's owner, and other players' tiles, if applicable)
+//	unsigned char Value = 0;	/// HP for walls / wood regeneration
+	short Value = 0;	/// HP for walls / wood Regeneration
+	int Landmass = 0;	/// To which "landmass" (can also be water) does this map field belong (if any); a "landmass" is a collection of adjacent land tiles, or a collection of adjacent water tiles; 0 means none has been set yet
+	short Owner = -1;	/// To which player (if any) this tile belongs to
+	short OwnershipBorderTile = -1;	/// The transition type of the border between this tile's owner, and other players' tiles, if applicable)
 	//Wyrmgus end
-	CUnitCache UnitCache;      /// A unit on the map field.
+	CUnitCache UnitCache;	/// A unit on the map field.
 
 	CMapFieldPlayerInfo playerInfo;	/// stuff related to player
 };

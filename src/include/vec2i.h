@@ -34,14 +34,14 @@ template <typename T>
 class Vec2T
 {
 public:
-	Vec2T() : x(0), y(0) {}
+	Vec2T() {}
 	Vec2T(T x, T y) : x(x), y(y) {}
 
 	template <typename T2>
 	Vec2T(Vec2T<T2> v) : x(v.x), y(v.y) {}
 public:
-	T x;
-	T y;
+	T x = 0;
+	T y = 0;
 };
 
 

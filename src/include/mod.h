@@ -43,11 +43,6 @@
 class CMod
 {
 public:
-	CMod() :
-		Ident("")
-	{
-	}
-public:
 	static void SetCurrentModPath(const std::string &path);
 	static std::string GetCurrentModPath();
 	

@@ -48,19 +48,6 @@
 #include "unit/unit_manager.h"
 
 CMapField::CMapField() :
-	Flags(0),
-	cost(0),
-	Value(0),
-	Landmass(0),
-	Owner(-1),
-	OwnershipBorderTile(-1),
-	AnimationFrame(0),
-	OverlayAnimationFrame(0),
-	Terrain(nullptr), OverlayTerrain(nullptr),
-	TerrainFeature(nullptr),
-	SolidTile(0), OverlaySolidTile(0),
-	OverlayTerrainDestroyed(false),
-	OverlayTerrainDamaged(false),
 	UnitCache()
 {
 }

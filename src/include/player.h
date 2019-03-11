@@ -602,29 +602,18 @@ enum WordJunctionTypes {
 class CForceTemplate
 {
 public:
-	CForceTemplate() :
-		ForceType(-1), Priority(100), Weight(1)
-	{
-	}
-	
-	int ForceType;
-	int Priority;
-	int Weight;
+	int ForceType = -1;
+	int Priority = 100;
+	int Weight = 1;
 	std::vector<std::pair<int, int>> Units;	/// Vector containing each unit class belonging to the force template, and the respective quantity
 };
 
 class CAiBuildingTemplate
 {
 public:
-	CAiBuildingTemplate() :
-		UnitClass(-1), Priority(100),
-		PerSettlement(false)
-	{
-	}
-	
-	int UnitClass;		/// Building's unit class
-	int Priority;
-	bool PerSettlement;	/// Whether the building should be constructed for each settlement
+	int UnitClass = -1;			/// Building's unit class
+	int Priority = 100;
+	bool PerSettlement = false;	/// Whether the building should be constructed for each settlement
 };
 
 class CFaction
@@ -753,12 +742,6 @@ public:
 class CLanguage
 {
 public:
-	CLanguage() :
-		UsedByCivilizationOrFaction(false),
-		DialectOf(nullptr)
-	{
-	}
-
 	LanguageWord *GetWord(const std::string word, int word_type, std::vector<std::string>& word_meanings) const;
 	std::string GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number);
 	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
@@ -770,8 +753,8 @@ public:
 	std::string Family;											/// Family of the language
 	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
 	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
-	bool UsedByCivilizationOrFaction;
-	CLanguage *DialectOf;										/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
+	bool UsedByCivilizationOrFaction = false;
+	CLanguage *DialectOf = nullptr;	/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 	std::vector<CLanguage *> Dialects;							/// Dialects of this language
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
 	std::map<std::string, std::vector<std::string>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated

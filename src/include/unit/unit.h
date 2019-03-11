@@ -435,12 +435,10 @@ public:
 	{
 		friend class CUnitManager;
 	public:
-		CUnitManagerData() : slot(-1), unitSlot(-1) {}
-
 		int GetUnitId() const { return slot; }
 	private:
-		int slot;           /// index in UnitManager::unitSlots
-		int unitSlot;       /// index in UnitManager::units
+		int slot = -1;		/// index in UnitManager::unitSlots
+		int unitSlot = -1;	/// index in UnitManager::units
 	};
 public:
 	// @note int is faster than shorts
@@ -548,17 +546,16 @@ public:
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
 	struct _seen_stuff_ {
-		_seen_stuff_() : CFrame(nullptr), Type(nullptr), tilePos(-1, -1) {}
-		const CConstructionFrame  *CFrame;  /// Seen construction frame
-		int         Frame;                  /// last seen frame/stage of buildings
-		const CUnitType  *Type;             /// Pointer to last seen unit-type
-		Vec2i       tilePos;                /// Last unit->tilePos Seen
-		signed char IX;                     /// Seen X image displacement to map position
-		signed char IY;                     /// seen Y image displacement to map position
-		unsigned    UnderConstruction : 1;        /// Unit seen construction
-		unsigned    State : 3;              /// Unit seen build/upgrade state
-unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
-unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
+		const CConstructionFrame *CFrame = nullptr;	/// Seen construction frame
+		int Frame;							/// last seen frame/stage of buildings
+		const CUnitType *Type = nullptr;	/// Pointer to last seen unit-type
+		Vec2i tilePos = Vec2i(-1, -1);		/// Last unit->tilePos Seen
+		signed char IX;						/// Seen X image displacement to map position
+		signed char IY;						/// seen Y image displacement to map position
+		unsigned UnderConstruction : 1;		/// Unit seen construction
+		unsigned State : 3;					/// Unit seen build/upgrade state
+		unsigned Destroyed : PlayerMax;		/// Unit seen destroyed or not
+		unsigned ByPlayer : PlayerMax;		/// Track unit seen by player
 	} Seen;
 
 	CVariable *Variable; /// array of User Defined variables.

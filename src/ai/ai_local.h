@@ -126,18 +126,6 @@ class AiForce
 {
 	friend class AiForceManager;
 public:
-	AiForce() :
-		Completed(false), Defending(false), Attacking(false),
-		//Wyrmgus start
-		HomeMapLayer(0),
-		GoalMapLayer(0),
-		//Wyrmgus end
-		Role(AiForceRoleDefault), FormerForce(-1), State(AiForceAttackingState_Free),
-		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
-	{
-		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
-	}
-
 	void Remove(CUnit &unit)
 	{
 		if (Units.Remove(&unit)) {
@@ -202,24 +190,24 @@ private:
 	static void InternalRemoveUnit(CUnit *unit);
 
 public:
-	bool Completed;    /// Flag saying force is complete build
-	bool Defending;    /// Flag saying force is defending
-	bool Attacking;    /// Flag saying force is attacking
-	AiForceRole Role;  /// Role of the force
+	bool Completed = false;	/// Flag saying force is complete build
+	bool Defending = false;	/// Flag saying force is defending
+	bool Attacking = false;	/// Flag saying force is attacking
+	AiForceRole Role = AiForceRoleDefault;	/// Role of the force
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
 	CUnitCache Units;  /// Units in the force
 
 	// If attacking
-	int FormerForce;             /// Original force number
-	AiForceAttackingState State; /// Attack state
-	Vec2i GoalPos; /// Attack point tile map position
-	Vec2i HomePos; /// Return after attack tile map position
+	int FormerForce = -1;	/// Original force number
+	AiForceAttackingState State = AiForceAttackingState_Free;	/// Attack state
+	Vec2i GoalPos = Vec2i(-1, -1);	/// Attack point tile map position
+	Vec2i HomePos = Vec2i(-1, -1);	/// Return after attack tile map position
 	//Wyrmgus start
-	int GoalMapLayer;
-	int HomeMapLayer;
+	int GoalMapLayer = 0;
+	int HomeMapLayer = 0;
 	//Wyrmgus end
-	int WaitOnRallyPoint; /// Counter for waiting on rally point
+	int WaitOnRallyPoint = AI_WAIT_ON_RALLY_POINT;	/// Counter for waiting on rally point
 };
 
 // forces

@@ -108,29 +108,24 @@ enum ItemClasses {
 class CUniqueItem
 {
 public:
-	CUniqueItem() :
-		ResourcesHeld(0), Type(nullptr), Prefix(nullptr), Suffix(nullptr), Set(nullptr), Spell(nullptr), Work(nullptr), Elixir(nullptr)
-	{
-	}
-	
 	bool CanDrop() const;				/// Check whether this unique item can drop
 	int GetMagicLevel() const;			/// Get this unique item's magic level
 	IconConfig GetIcon() const;
 
-	int ResourcesHeld;
+	int ResourcesHeld = 0;
 	std::string Ident;
 	std::string Name;
 	std::string Description;
 	std::string Background;
 	std::string Quote;
 	IconConfig Icon;			/// Unique item's icon (if it differs from that of its type)
-	CUnitType *Type;			/// Item type of the item
-	CUpgrade *Prefix;
-	CUpgrade *Suffix;
-	CUpgrade *Set;
-	CSpell *Spell;
-	CUpgrade *Work;
-	CUpgrade *Elixir;
+	CUnitType *Type = nullptr;	/// Item type of the item
+	CUpgrade *Prefix = nullptr;
+	CUpgrade *Suffix = nullptr;
+	CUpgrade *Set = nullptr;
+	CSpell *Spell = nullptr;
+	CUpgrade *Work = nullptr;
+	CUpgrade *Elixir = nullptr;
 };
 
 class CPersistentItem

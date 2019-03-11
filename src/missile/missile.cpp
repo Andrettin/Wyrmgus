@@ -325,22 +325,9 @@ MissileType *NewMissileTypeSlot(const std::string &ident)
 **  Constructor
 */
 Missile::Missile() :
-	Type(nullptr), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
-	Delay(0), SourceUnit(), TargetUnit(), Damage(0), LightningDamage(0),
-	TTL(-1), Hidden(0), DestroyMissile(0),
-	CurrentStep(0), TotalStep(0),
-	//Wyrmgus start
-//	Local(0)
-	Local(0),
-	AlwaysHits(false), AlwaysCritical(false)
-	//Wyrmgus end
+	SourceUnit(), TargetUnit(),
+	Local(0)
 {
-	position.x = 0;
-	position.y = 0;
-	destination.x = 0;
-	destination.y = 0;
-	source.x = 0;
-	source.y = 0;
 	this->Slot = Missile::Count++;
 }
 
@@ -2038,28 +2025,8 @@ void InitMissileTypes()
 **  Constructor.
 */
 MissileType::MissileType(const std::string &ident) :
-	Transparency(0), DrawLevel(0),
-	SpriteFrames(0), NumDirections(1), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
-	//Wyrmgus start
-//	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
-	CorrectSphashDamage(false), Flip(true), CanHitOwner(false), FriendlyFire(true),
-	//Wyrmgus end
-	AlwaysFire(false), Pierce(false), PierceOnce(false), PierceIgnoreBeforeGoal(false), IgnoreWalls(true), KillFirstUnit(false),
-	//Wyrmgus start
-	AlwaysHits(false),
-	//Wyrmgus end
-	Class(), NumBounces(0),	MaxBounceSize(0), ParabolCoefficient(2048), StartDelay(0),
-	//Wyrmgus start
-//	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
-	Sleep(0), Speed(0), BlizzardSpeed(0), AttackSpeed(10), TTL(-1), ReduceFactor(100), SmokePrecision(0),
-	//Wyrmgus end
-	MissileStopFlags(0), Damage(nullptr), Range(0), SplashFactor(100),
-	OnImpact(nullptr),
-	G(nullptr)
+	CDataType(ident), Class()
 {
-	this->Ident = ident;
-	size.x = 0;
-	size.y = 0;
 }
 
 /**

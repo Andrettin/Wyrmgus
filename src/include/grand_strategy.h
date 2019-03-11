@@ -154,8 +154,7 @@ public:
 class CGrandStrategyFaction
 {
 public:
-	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), GovernmentType(GovernmentTypeMonarchy), Capital(nullptr)
+	CGrandStrategyFaction()
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Resources, 0, sizeof(Resources));
@@ -181,11 +180,11 @@ public:
 	std::string GetFullName();
 	CGrandStrategyProvince *GetRandomProvinceWeightedByPopulation();
 	
-	int Faction;														/// The faction's ID (-1 = none).
-	int Civilization;													/// Civilization of the faction (-1 = none).
-	int GovernmentType;													/// Government type of the faction (-1 = none).
-	int FactionTier;													/// What is the tier of this faction (barony, etc.).
-	CGrandStrategyProvince *Capital;									/// Capital province of this faction
+	int Faction = -1;													/// The faction's ID (-1 = none).
+	int Civilization = -1;												/// Civilization of the faction (-1 = none).
+	int GovernmentType = GovernmentTypeMonarchy;						/// Government type of the faction (-1 = none).
+	int FactionTier = FactionTierBarony;								/// What is the tier of this faction (barony, etc.).
+	CGrandStrategyProvince *Capital = nullptr;							/// Capital province of this faction
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
 	std::vector<int> OwnedProvinces;									/// Provinces owned by this faction
 	int Resources[MaxCosts];											/// Amount of each resource stored by the faction.

@@ -360,57 +360,57 @@ public:
 	int Height() const { return size.y; }
 
 	//private:
-	int Transparency;          /// missile transparency
-	PixelSize size;            /// missile size in pixels
-	int DrawLevel;             /// Level to draw missile at
-	int SpriteFrames;          /// number of sprite frames in graphic
-	int NumDirections;         /// number of directions missile can face
-	int ChangeVariable;        /// variable to change
-	int ChangeAmount;          /// how many to change
-	bool ChangeMax;            /// modify the max, if value will exceed it
+	int Transparency = 0;		/// missile transparency
+	PixelSize size = PixelSize(0, 0);	/// missile size in pixels
+	int DrawLevel = 0;			/// Level to draw missile at
+	int SpriteFrames = 0;		/// number of sprite frames in graphic
+	int NumDirections = 1;		/// number of directions missile can face
+	int ChangeVariable = -1;		/// variable to change
+	int ChangeAmount = 0;		/// how many to change
+	bool ChangeMax = false;		/// modify the max, if value will exceed it
 
-	SoundConfig FiredSound;    /// fired sound
-	SoundConfig ImpactSound;   /// impact sound for this missile-type
+	SoundConfig FiredSound;	/// fired sound
+	SoundConfig ImpactSound;	/// impact sound for this missile-type
 
-	bool CorrectSphashDamage;  /// restricts the radius damage depending on land, air, naval
-	bool Flip;                 /// flip image when facing left
-	bool CanHitOwner;          /// missile can hit the owner
-	bool FriendlyFire;         /// missile can't hit own units
-	bool AlwaysFire;           /// missile will always fire (even if target is dead)
-	bool Pierce;               /// missile will hit every unit on his way
-	bool PierceOnce;           /// pierce every target only once
-	bool PierceIgnoreBeforeGoal;	/// only pierce targets after the goal
-	bool IgnoreWalls;          /// missile ignores Wall units on it's way
-	bool KillFirstUnit;        /// missile kills first unit blocking it's way
+	bool CorrectSphashDamage = false;	/// restricts the radius damage depending on land, air, naval
+	bool Flip = true;			/// flip image when facing left
+	bool CanHitOwner = false;	/// missile can hit the owner
+	bool FriendlyFire = true;	/// missile can't hit own units
+	bool AlwaysFire = false;	/// missile will always fire (even if target is dead)
+	bool Pierce = false;		/// missile will hit every unit on his way
+	bool PierceOnce = false;	/// pierce every target only once
+	bool PierceIgnoreBeforeGoal = false;	/// only pierce targets after the goal
+	bool IgnoreWalls = true;	/// missile ignores Wall units on it's way
+	bool KillFirstUnit = false;	/// missile kills first unit blocking it's way
 	//Wyrmgus start
-	bool AlwaysHits;		   /// missile never misses
+	bool AlwaysHits = false;	/// missile never misses
 	//Wyrmgus end
 
-	int Class;                 /// missile class
-	int NumBounces;            /// number of bounces
-	int MaxBounceSize;		   /// if the unit has a size greater than this, the missile won't bounce further
-	int ParabolCoefficient;    /// parabol coefficient in parabolic missile
-	int StartDelay;            /// missile start delay
-	int Sleep;                 /// missile sleep
-	int Speed;                 /// missile speed
-	int BlizzardSpeed;         /// speed for blizzard shards
+	int Class;					/// missile class
+	int NumBounces = 0;			/// number of bounces
+	int MaxBounceSize = 0;		/// if the unit has a size greater than this, the missile won't bounce further
+	int ParabolCoefficient = 2048;	/// parabol coefficient in parabolic missile
+	int StartDelay = 0;			/// missile start delay
+	int Sleep = 0;				/// missile sleep
+	int Speed = 0;				/// missile speed
+	int BlizzardSpeed = 0;		/// speed for blizzard shards
 	//Wyrmgus start
-	int AttackSpeed;		   /// attack speed; used by whirlwind missiles
+	int AttackSpeed = 10;		/// attack speed; used by whirlwind missiles
 	//Wyrmgus end
-	int TTL;                   /// missile time-to-live
-	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
-	int SmokePrecision;        /// How frequently the smoke missile will generate itself
-	int MissileStopFlags;      /// On which terrain types missile won't fly
-	NumberDesc *Damage;        /// missile damage (used for non-direct missiles, e.g. impacts)
+	int TTL = -1;				/// missile time-to-live
+	int ReduceFactor = 100;		/// Multiplier for reduce or increase damage dealt to the next unit
+	int SmokePrecision = 0;		/// How frequently the smoke missile will generate itself
+	int MissileStopFlags = 0;	/// On which terrain types missile won't fly
+	NumberDesc *Damage = nullptr;	/// missile damage (used for non-direct missiles, e.g. impacts)
 
-	int Range;                             /// missile damage range
-	int SplashFactor;                      /// missile splash divisor
-	std::vector <MissileConfig *> Impact;  /// missile produces an impact
-	MissileConfig Smoke;                   /// trailing missile
-	LuaCallback *OnImpact;                 /// called when
+	int Range = 0;				/// missile damage range
+	int SplashFactor = 100;		/// missile splash divisor
+	std::vector <MissileConfig *> Impact;	/// missile produces an impact
+	MissileConfig Smoke;		/// trailing missile
+	LuaCallback *OnImpact = nullptr;	/// called when
 
 	// --- FILLED UP ---
-	CGraphic *G;         /// missile graphic
+	CGraphic *G = nullptr;		/// missile graphic
 };
 
 /*----------------------------------------------------------------------------
@@ -442,44 +442,44 @@ public:
 
 
 	//private:
-	PixelPos source; /// Missile source position
-	PixelPos position;   /// missile pixel position
-	PixelPos destination;  /// missile pixel destination
-	const MissileType *Type;  /// missile-type pointer
-	int SpriteFrame;  /// sprite frame counter
-	int State;        /// state
-	int AnimWait;     /// Animation wait.
-	int Wait;         /// delay between frames
-	int Delay;        /// delay to show up
+	PixelPos source = PixelPos(0, 0); 	/// Missile source position
+	PixelPos position = PixelPos(0, 0);	/// missile pixel position
+	PixelPos destination = PixelPos(0, 0);	/// missile pixel destination
+	const MissileType *Type = nullptr;	/// missile-type pointer
+	int SpriteFrame = 0;	/// sprite frame counter
+	int State = 0;			/// state
+	int AnimWait = 0;		/// Animation wait.
+	int Wait = 0;			/// delay between frames
+	int Delay = 0;			/// delay to show up
 	//Wyrmgus start
-	int MapLayer;	  /// map layer the missile is in
+	int MapLayer;		/// map layer the missile is in
 	//Wyrmgus end
 
-	CUnitPtr SourceUnit;  /// unit that fires (could be killed)
-	CUnitPtr TargetUnit;  /// target unit, used for spells
+	CUnitPtr SourceUnit;	/// unit that fires (could be killed)
+	CUnitPtr TargetUnit;	/// target unit, used for spells
 
 	std::vector<CUnit *> PiercedUnits;	/// Units which are already pierced by this missile
 
-	int Damage;				/// direct damage that the missile applies
-	int LightningDamage;	/// direct lightning damage that the missile applies
+	int Damage = 0;				/// direct damage that the missile applies
+	int LightningDamage = 0;	/// direct lightning damage that the missile applies
 
-	int TTL;             /// time to live (ticks) used for spells
-	int Hidden;          /// If this is 1 then the missile is invisible
-	int DestroyMissile;  /// this tells missile-class-straight-fly, that it's time to die
+	int TTL = -1;		/// time to live (ticks) used for spells
+	int Hidden = 0;		/// If this is 1 then the missile is invisible
+	int DestroyMissile = 0;	/// this tells missile-class-straight-fly, that it's time to die
 
 	// Internal use:
-	int CurrentStep;  /// Current step (0 <= x < TotalStep).
-	int TotalStep;    /// Total step.
+	int CurrentStep = 0;	/// Current step (0 <= x < TotalStep).
+	int TotalStep = 0;		/// Total step.
 	
 	//Wyrmgus start
-	bool AlwaysHits;		/// Missile always hits
-	bool AlwaysCritical;	/// Whether the missile always results in a critical hit
+	bool AlwaysHits = false;		/// Missile always hits
+	bool AlwaysCritical = false;	/// Whether the missile always results in a critical hit
 	//Wyrmgus end
 
-	unsigned  Local: 1;     /// missile is a local missile
-	unsigned int Slot;      /// unique number for draw level.
+	unsigned Local : 1;		/// missile is a local missile
+	unsigned int Slot;		/// unique number for draw level.
 
-	static unsigned int Count; /// slot number generator.
+	static unsigned int Count;	/// slot number generator.
 };
 
 extern bool MissileInitMove(Missile &missile);

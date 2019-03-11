@@ -82,31 +82,21 @@ enum Eras {
 class CWorldMapTerrainType
 {
 public:
-	CWorldMapTerrainType() :
-		HasTransitions(false), Water(false), ID(-1), BaseTile(-1), Variations(0)
-	{
-	}
-
 	std::string Name;
 	std::string Tag;				/// used to locate graphic files
-	bool HasTransitions;
-	bool Water;
-	int ID;
-	int BaseTile;
-	int Variations;					/// quantity of variations
+	bool HasTransitions = false;
+	bool Water = false;
+	int ID = -1;
+	int BaseTile = -1;
+	int Variations = 0;				/// quantity of variations
 };
 
 class CRegion
 {
 public:
-	CRegion() :
-		ID(-1)
-	{
-	}
-	
 	std::string Ident;
 	std::string Name;
-	int ID;																/// ID of this province
+	int ID = -1;														/// ID of this region
 	std::vector<CProvince *> Provinces;									/// Provinces which belong to this region
 	std::vector<CSite *> Sites;											/// Sites which belong to this region
 	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
@@ -115,18 +105,11 @@ public:
 class CProvince
 {
 public:
-	CProvince() :
-		ID(-1),
-		Water(false), Coastal(false),
-		World(nullptr)
-	{
-	}
-	
 	std::string Name;
-	CWorld *World;
-	int ID;																/// ID of this province
-	bool Water;															/// Whether the province is a water province or not
-	bool Coastal;														/// Whether the province is a coastal province or not
+	CWorld *World = nullptr;
+	int ID = -1;														/// ID of this province
+	bool Water = false;													/// Whether the province is a water province or not
+	bool Coastal = false;												/// Whether the province is a coastal province or not
 	std::map<int, std::string> CulturalNames;							/// Names for the province for each different culture/civilization
 	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
 	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this province
@@ -143,22 +126,14 @@ public:
 class WorldMapTile
 {
 public:
-	WorldMapTile() :
-		Terrain(-1), Resource(-1),
-		Capital(false),
-		Position(-1, -1),
-		World(nullptr)
-	{
-	}
-
-	int Terrain;								/// Tile terrain (i.e. plains)
-	int Resource;								/// The tile's resource, if any
-	bool Capital;								/// Whether the tile is its province's capital
-	Vec2i Position;								/// Position of the tile
-	CWorld *World;
-	std::map<std::pair<int,int>, std::vector<std::string>> CulturalTerrainNames;			/// Names for the tile (if it has a certain terrain) for each culture/civilization
+	int Terrain = -1;							/// Tile terrain (i.e. plains)
+	int Resource = -1;							/// The tile's resource, if any
+	bool Capital = false;						/// Whether the tile is its province's capital
+	Vec2i Position = Vec2i(-1, -1);				/// Position of the tile
+	CWorld *World = nullptr;
+	std::map<std::pair<int,int>, std::vector<std::string>> CulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each culture/civilization
 	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
-	std::map<std::pair<int,int>, std::vector<std::string>> CulturalResourceNames;		/// Names for the tile (if it has a certain resource) for each culture/civilization
+	std::map<std::pair<int,int>, std::vector<std::string>> CulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each culture/civilization
 	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
 	std::map<int, std::vector<std::string>> CulturalSettlementNames;	/// Names for the tile's settlement for each faction
 	std::map<CFaction *, std::vector<std::string>> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction

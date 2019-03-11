@@ -207,7 +207,6 @@ public:
 class CFiller
 {
 	struct bits_map {
-		bits_map() : Width(0), Height(0), bstore(nullptr) {}
 		~bits_map();
 
 		void Init(CGraphic *g);
@@ -224,9 +223,9 @@ class CFiller
 			return false;
 		};
 
-		int Width;
-		int Height;
-		unsigned int *bstore;
+		int Width = 0;
+		int Height = 0;
+		unsigned int *bstore = nullptr;
 	};
 
 	bits_map map;

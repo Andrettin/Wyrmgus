@@ -71,10 +71,7 @@ class CFontColor;
 class CFont : public gcn::Font
 {
 private:
-	explicit CFont(const std::string &ident) :
-		Ident(ident),
-		CharWidth(nullptr),
-		G(nullptr)
+	explicit CFont(const std::string &ident) : Ident(ident)
 	{}
 
 public:
@@ -116,9 +113,9 @@ private:
 	void MeasureWidths();
 
 private:
-	std::string Ident;    /// Ident of the font.
-	char *CharWidth;      /// Real font width (starting with ' ')
-	CGraphic *G;          /// Graphic object used to draw
+	std::string Ident;			/// Ident of the font.
+	char *CharWidth = nullptr;	/// Real font width (starting with ' ')
+	CGraphic *G = nullptr;		/// Graphic object used to draw
 };
 
 #define MaxFontColors 9

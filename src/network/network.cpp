@@ -305,17 +305,13 @@ static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input
 class CNetworkStat
 {
 public:
-	CNetworkStat() :
-		resentPacketCount(0)
-	{}
-
 	void print() const
 	{
 		DebugPrint("resent: %d packets\n" _C_ resentPacketCount);
 	}
 
 public:
-	unsigned int resentPacketCount;
+	unsigned int resentPacketCount = 0;
 };
 
 static void printStatistic(const CUDPSocket::CStatistic &statistic)
