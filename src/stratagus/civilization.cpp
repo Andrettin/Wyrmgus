@@ -193,6 +193,7 @@ std::vector<CForceTemplate *> CCivilization::GetForceTemplates(const int force_t
 
 void CCivilization::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("get_ident"), &CCivilization::GetIdent);
 	ClassDB::bind_method(D_METHOD("get_name"), &CCivilization::GetName);
 	ClassDB::bind_method(D_METHOD("get_interface"), &CCivilization::GetInterface);
 }
