@@ -114,7 +114,7 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
-find_package(Boost 1.69.0 REQUIRED)
+find_package(Boost 1.66.0 REQUIRED)
 
 find_package(Lua51 REQUIRED)
 find_package(SDL REQUIRED)
@@ -495,12 +495,6 @@ add_custom_command(OUTPUT tolua.cpp
 
 add_library(stratagus STATIC ${stratagus_SRCS})
 target_link_libraries(stratagus ${stratagus_LIBS})
-if(stratagus_LIBS_RELEASE)
-	target_link_libraries(stratagus ${stratagus_LIBS_RELEASE})
-endif()
-if(stratagus_LIBS_DEBUG)
-	target_link_libraries(stratagus ${stratagus_LIBS_DEBUG})
-endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set_target_properties(stratagus PROPERTIES OUTPUT_NAME stratagus-dbg)
