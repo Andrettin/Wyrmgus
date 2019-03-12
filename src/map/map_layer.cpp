@@ -46,15 +46,9 @@
 #include "time/time_of_day_schedule.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "wyrmgus.h"
 
-#include <oaml.h>
-
-extern oamlApi *oaml;
-extern bool enableOAML;
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+#include <oamlGodotModule/oamlGodotModule.h>
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -315,9 +309,9 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 	CScheduledTimeOfDay *old_time_of_day = this->TimeOfDay;
 	this->TimeOfDay = time_of_day;
 	
-	if (enableOAML && oaml && this == UI.CurrentMapLayer && this->GetTimeOfDay()) {
-		// Time of day can change our main music loop, if the current playing track is set for this
-		SetMusicCondition(OAML_CONDID_MAIN_LOOP, this->GetTimeOfDay()->ID);
+	if (Wyrmgus::GetInstance()->GetOamlModule().is_valid() && this == UI.CurrentMapLayer && this->GetTimeOfDay()) {
+		// the time of day can change our main music loop, if the current playing track is set for this
+		Wyrmgus::GetInstance()->GetOamlModule()->SetMainLoopCondition(this->GetTimeOfDay()->ID);
 	}
 
 	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Day) != (old_time_of_day && old_time_of_day->TimeOfDay->Day);

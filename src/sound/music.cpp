@@ -33,12 +33,14 @@
 
 #include "stratagus.h"
 
-
 #include "SDL.h"
 
 #include "sound_server.h"
 #include "script.h"
 #include "iolib.h"
+#include "wyrmgus.h"
+
+#include <oamlGodotModule/oamlGodotModule.h>
 
 /*----------------------------------------------------------------------------
 -- Declaration
@@ -54,11 +56,6 @@ static SDL_mutex *MusicFinishedMutex;     /// Mutex for MusicFinished
 static bool MusicFinished;                /// Music ended and we need a new file
 
 bool CallbackMusic;                       /// flag true callback ccl if stops
-
-#include <oaml.h>
-
-oamlApi *oaml = nullptr;
-bool enableOAML = false;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -108,70 +105,16 @@ void InitMusic()
 	SetMusicFinishedCallback(MusicFinishedCallback);
 }
 
-static void* oamlOpen(const char *filename) {
-	CFile *f = new CFile;
-	const std::string name = LibraryFileName(filename);
-	if (f->open(name.c_str(), CL_OPEN_READ) == -1) {
-		delete f;
-		return nullptr;
-	}
-	return (void*)f;
-}
-
-static size_t oamlRead(void *ptr, size_t size, size_t nitems, void *fd) {
-	CFile *f = (CFile*)fd;
-	return f->read(ptr, size*nitems);
-}
-
-static int oamlSeek(void *fd, long offset, int whence) {
-	CFile *f = (CFile*)fd;
-	return f->seek(offset, whence);
-}
-
-static long oamlTell(void *fd) {
-	CFile *f = (CFile*)fd;
-	return f->tell();
-}
-
-static int oamlClose(void *fd) {
-	CFile *f = (CFile*)fd;
-	int ret = f->close();
-	delete f;
-	return ret;
-}
-
-
-static oamlFileCallbacks fileCbs = {
-	&oamlOpen,
-	&oamlRead,
-	&oamlSeek,
-	&oamlTell,
-	&oamlClose
-};
-
 void InitMusicOAML()
 {
 	const std::string filename = LibraryFileName("oaml.defs");
-	oaml = new oamlApi();
-	oaml->SetFileCallbacks(&fileCbs);
-	oaml->Init(filename.c_str());
+	Wyrmgus::GetInstance()->GetOamlModule()->Init(filename.c_str());
 
-	enableOAML = true;
 	SetMusicVolume(GetMusicVolume());
 }
 
 void LoadOAMLDefinitionsFile(const std::string &file_path)
 {
 	const std::string filename = LibraryFileName(file_path.c_str());
-	oaml->ReadDefsFile(filename.c_str());
-}
-
-void ShutdownMusicOAML()
-{
-	if (oaml) {
-		oaml->Shutdown();
-		delete oaml;
-		oaml = nullptr;
-	}
-	enableOAML = false;
+	Wyrmgus::GetInstance()->GetOamlModule()->ReadDefsFile(filename.c_str());
 }

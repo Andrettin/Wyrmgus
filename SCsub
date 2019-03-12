@@ -46,6 +46,7 @@ else:
   env_wyrmgus.Append(CPPFLAGS=['-std=c++17'])
   
 env_wyrmgus.Append(CPPPATH=['.', 'src', 'src/include', 'src/guichan/include', 'src/guichan/include/guichan', 'src/xbrz/include'])
+env_wyrmgus.Append(CPPPATH=['#modules'])
 env_wyrmgus.Append(CPPPATH=['#thirdparty/libpng'])
 env_wyrmgus.Append(CPPPATH=['C:\Program Files\CMake\include']) #FIXME: substitute this for having the necessary libraries in the thirdparty folder, or to find them in some other way
 env_wyrmgus.Append(CPPDEFINES=['USE_OPENGL'])

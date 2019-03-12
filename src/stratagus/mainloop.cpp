@@ -81,13 +81,11 @@
 //Wyrmgus end
 #include "video.h"
 #include "world.h"
+#include "wyrmgus.h"
 
 #include <guichan.h>
 
-#include <oaml.h>
-
-extern oamlApi *oaml;
-extern bool enableOAML;
+#include <oamlGodotModule/oamlGodotModule.h>
 
 void DrawGuichanWidgets();
 
@@ -322,9 +320,9 @@ static void GameLogicLoop()
 	// FIXME: We need to find a better place!
 	SaveGameLoading = false;
 
-	if (enableOAML && oaml && UI.CurrentMapLayer->GetTimeOfDay()) {
-		// Time of day can change our main music loop, if the current playing track is set for this
-		SetMusicCondition(OAML_CONDID_MAIN_LOOP, UI.CurrentMapLayer->GetTimeOfDay()->ID);
+	if (Wyrmgus::GetInstance()->GetOamlModule().is_valid() && UI.CurrentMapLayer->GetTimeOfDay()) {
+		// the time of day can change our main music loop, if the current playing track is set for this
+		Wyrmgus::GetInstance()->GetOamlModule()->SetMainLoopCondition(UI.CurrentMapLayer->GetTimeOfDay()->ID);
 	}
 
 	//

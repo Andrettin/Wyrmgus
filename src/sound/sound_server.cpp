@@ -49,10 +49,11 @@
 //Wyrmgus start
 #include "unit/unit_manager.h"
 //Wyrmgus end
+#include "wyrmgus.h"
 
 #include "SDL.h"
 
-#include <oaml.h>
+#include <oamlGodotModule/oamlGodotModule.h>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -109,9 +110,6 @@ static struct {
 #ifndef SDL_AUDIO_BITSIZE
 #define SDL_AUDIO_BITSIZE(x) (x&0xFF)
 #endif
-
-extern oamlApi *oaml;
-extern bool enableOAML;
 
 /*----------------------------------------------------------------------------
 --  Mixers
@@ -322,11 +320,6 @@ static void MixIntoBuffer(void *buffer, int samples)
 		MixMusicToStereo32(Audio.MixerBuffer, samples);
 	}
 	ClipMixToStereo16(Audio.MixerBuffer, samples, (short *)buffer);
-
-	if (enableOAML && oaml) {
-		oaml->SetAudioFormat(Audio.Format.freq, Audio.Format.channels, SDL_AUDIO_BITSIZE(Audio.Format.format) / 8);
-		oaml->MixToBuffer(buffer, samples);
-	}
 }
 
 /**
@@ -370,10 +363,6 @@ static int FillThread(void *)
 			MixIntoBuffer(Audio.Buffer, Audio.Format.samples * Audio.Format.channels);
 		}
 		SDL_UnlockMutex(Audio.Lock);
-
-		if (enableOAML && oaml) {
-			oaml->Update();
-		}
 	}
 
 	return 0;
@@ -774,12 +763,11 @@ void PlayMusicName(const std::string &name) {
 		return;
 	}
 	
-	if (enableOAML == false || oaml == nullptr)
+	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
 		return;
+	}
 
-	SDL_LockMutex(Audio.Lock);
-	oaml->PlayTrack(name.c_str());
-	SDL_UnlockMutex(Audio.Lock);
+	Wyrmgus::GetInstance()->GetOamlModule()->PlayTrack(name.c_str());
 }
 
 void PlayMusicByGroupRandom(const std::string &group) {
@@ -787,12 +775,11 @@ void PlayMusicByGroupRandom(const std::string &group) {
 		return;
 	}
 	
-	if (enableOAML == false || oaml == nullptr)
+	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
 		return;
+	}
 
-	SDL_LockMutex(Audio.Lock);
-	oaml->PlayTrackByGroupRandom(group.c_str());
-	SDL_UnlockMutex(Audio.Lock);
+	Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupRandom(group.c_str());
 }
 
 void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::string &subgroup) {
@@ -800,14 +787,13 @@ void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::stri
 		return;
 	}
 	
-	if (enableOAML == false || oaml == nullptr)
+	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
 		return;
-
-	SDL_LockMutex(Audio.Lock);
-	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), subgroup.c_str()) != OAML_OK) {
-		oaml->PlayTrackByGroupRandom(group.c_str());
 	}
-	SDL_UnlockMutex(Audio.Lock);
+
+	if (!Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), subgroup.c_str())) {
+		Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupRandom(group.c_str());
+	}
 }
 
 void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::string &civilization_name, const std::string &faction_name) {
@@ -815,11 +801,11 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 		return;
 	}
 
-	if (enableOAML == false || oaml == nullptr)
+	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
 		return;
+	}
 
-	SDL_LockMutex(Audio.Lock);
-	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
+	if (!Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str())) {
 		CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
 		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		int parent_faction = -1;
@@ -832,13 +818,13 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 				}
 				faction = parent_faction;
 				
-				if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[faction]->Ident.c_str()) == OAML_OK) {
+				if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[faction]->Ident.c_str())) {
 					found_music = true;
 					break;
 				}
 			}
 		}
-		if (!found_music && oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
+		if (!found_music && !Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str())) {
 			CCivilization *parent_civilization = nullptr;
 			if (civilization) {
 				while (true) {
@@ -848,36 +834,33 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 					}
 					civilization = parent_civilization;
 					
-					if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization->GetIdent().utf8().get_data()) == OAML_OK) {
+					if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization->GetIdent().utf8().get_data())) {
 						found_music = true;
 						break;
 					}
 				}
 			}
 			if (!found_music) {
-				oaml->PlayTrackByGroupRandom(group.c_str());
+				Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupRandom(group.c_str());
 			}
 		}
 	}
-	SDL_UnlockMutex(Audio.Lock);
 }
 
 void SetMusicCondition(int id, int value) {
-	if (enableOAML == false || oaml == nullptr)
+	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
 		return;
+	}
 
-	SDL_LockMutex(Audio.Lock);
-	oaml->SetCondition(id, value);
-	SDL_UnlockMutex(Audio.Lock);
+	Wyrmgus::GetInstance()->GetOamlModule()->SetCondition(id, value);
 }
 
 void SetMusicLayerGain(const std::string &layer, float gain) {
-	if (enableOAML == false || oaml == nullptr)
+	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
 		return;
+	}
 
-	SDL_LockMutex(Audio.Lock);
-	oaml->SetLayerGain(layer.c_str(), gain);
-	SDL_UnlockMutex(Audio.Lock);
+	Wyrmgus::GetInstance()->GetOamlModule()->SetLayerGain(layer.c_str(), gain);
 }
 
 /**
@@ -885,10 +868,8 @@ void SetMusicLayerGain(const std::string &layer, float gain) {
 */
 void StopMusic()
 {
-	if (enableOAML && oaml) {
-		SDL_LockMutex(Audio.Lock);
-		oaml->StopPlaying();
-		SDL_UnlockMutex(Audio.Lock);
+	if (Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+		Wyrmgus::GetInstance()->GetOamlModule()->StopPlaying();
 	}
 
 	if (MusicPlaying) {
@@ -912,10 +893,8 @@ void SetMusicVolume(int volume)
 	clamp(&volume, 0, MaxVolume);
 	MusicVolume = volume;
 
-	if (enableOAML && oaml) {
-		SDL_LockMutex(Audio.Lock);
-		oaml->SetVolume(MusicVolume / 255.f);
-		SDL_UnlockMutex(Audio.Lock);
+	if (Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+		Wyrmgus::GetInstance()->GetOamlModule()->SetVolume(MusicVolume / 255.f);
 	}
 }
 
@@ -953,9 +932,10 @@ bool IsMusicEnabled()
 */
 bool IsMusicPlaying()
 {
-	if (enableOAML && oaml) {
-		if (oaml->IsPlaying())
+	if (Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+		if (Wyrmgus::GetInstance()->GetOamlModule()->IsPlaying()) {
 			return true;
+		}
 	}
 
 	return MusicPlaying;
@@ -966,12 +946,11 @@ bool IsMusicPlaying()
 */
 void AddMusicTension(int value)
 {
-	if (enableOAML == false || oaml == nullptr)
+	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
 		return;
+	}
 
-	SDL_LockMutex(Audio.Lock);
-	oaml->AddTension(value);
-	SDL_UnlockMutex(Audio.Lock);
+	Wyrmgus::GetInstance()->GetOamlModule()->AddTension(value);
 }
 
 
@@ -1072,12 +1051,6 @@ int InitSound()
 */
 void QuitSound()
 {
-	if (oaml) {
-		oaml->Shutdown();
-		delete oaml;
-		oaml = nullptr;
-	}
-
 	Audio.Running = false;
 	SDL_WaitThread(Audio.Thread, nullptr);
 

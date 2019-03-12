@@ -80,11 +80,6 @@
 #include "video.h"
 #include "world.h"
 
-#include <oaml.h>
-
-extern oamlApi *oaml;
-extern bool enableOAML;
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/

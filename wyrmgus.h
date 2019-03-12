@@ -1,6 +1,7 @@
 #ifndef __WYRMGUS_H__
 #define __WYRMGUS_H__
 
+#include <oamlGodotModule/oamlGodotModule.h>
 #include <scene/main/node.h>
 
 class CCampaign;
@@ -8,6 +9,7 @@ class CHairColor;
 class CPlayer;
 class CPlayerColor;
 class CSkinColor;
+class oamlGodotModule;
 
 class Wyrmgus : public Node
 {
@@ -23,6 +25,16 @@ public:
 	int Run();
 	String GetVersion() const;
 	void LuaCommand(String command);
+	
+	void SetOamlModule(Ref<oamlGodotModule> oaml_module)
+	{
+		this->OamlModule = oaml_module;
+	}
+	
+	Ref<oamlGodotModule> GetOamlModule() const
+	{
+		return this->OamlModule;
+	}
 	
 	CHairColor *GetHairColor(String ident) const;
 	CPlayerColor *GetPlayerColor(String ident) const;
@@ -41,6 +53,9 @@ public:
 	
 	CPlayer *GetThisPlayer() const;
 
+private:
+	Ref<oamlGodotModule> OamlModule;
+	
 protected:
 	static void _bind_methods();
 };

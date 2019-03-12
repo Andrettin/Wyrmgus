@@ -238,9 +238,6 @@ extern void InitMusicOAML();
 /// Load adaptive music definitions file
 extern void LoadOAMLDefinitionsFile(const std::string &file_path);
 
-/// Shutdown adaptive music
-extern void ShutdownMusicOAML();
-
 /// Turn music stopped callback on
 #define CallbackMusicOn() \
 	CallbackMusic = true;

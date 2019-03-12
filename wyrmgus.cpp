@@ -12,6 +12,8 @@
 #include "unit/unit_type.h"
 #include "src/include/version.h"
 
+#include <oamlGodotModule/oamlGodotModule.h>
+
 Wyrmgus *Wyrmgus::Instance = nullptr;
 
 Wyrmgus *Wyrmgus::GetInstance()
@@ -134,6 +136,8 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("run"), &Wyrmgus::Run);
 	ClassDB::bind_method(D_METHOD("get_version"), &Wyrmgus::GetVersion);
 	ClassDB::bind_method(D_METHOD("lua_command", "command"), &Wyrmgus::LuaCommand);
+	
+	ClassDB::bind_method(D_METHOD("set_oaml_module", "oaml_module"), &Wyrmgus::SetOamlModule);
 	
 	ClassDB::bind_method(D_METHOD("get_hair_color", "ident"), &Wyrmgus::GetHairColor);
 	ClassDB::bind_method(D_METHOD("get_player_color", "ident"), &Wyrmgus::GetPlayerColor);
