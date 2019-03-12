@@ -196,4 +196,5 @@ void CCivilization::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_ident"), &CCivilization::GetIdent);
 	ClassDB::bind_method(D_METHOD("get_name"), &CCivilization::GetName);
 	ClassDB::bind_method(D_METHOD("get_interface"), &CCivilization::GetInterface);
+	ClassDB::bind_method(D_METHOD("is_hidden"), &CCivilization::IsHidden);
 }

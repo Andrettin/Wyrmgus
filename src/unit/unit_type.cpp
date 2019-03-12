@@ -1921,6 +1921,10 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 void CUnitType::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CUnitType::GetCivilization);
+	ClassDB::bind_method(D_METHOD("get_description"), &CUnitType::GetDescription);
+	ClassDB::bind_method(D_METHOD("get_quote"), &CUnitType::GetQuote);
+	ClassDB::bind_method(D_METHOD("get_background"), &CUnitType::GetBackground);
+	ClassDB::bind_method(D_METHOD("is_hidden"), &CUnitType::IsHidden);
 }
 
 void UpdateUnitStats(CUnitType &type, int reset)

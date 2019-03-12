@@ -163,7 +163,7 @@ static const char PIERCEDAMAGE_KEY[] = "PierceDamage";
 static const char BLUNTDAMAGE_KEY[] = "BluntDamage";
 static const char ETHEREAL_KEY[] = "Ethereal";
 static const char HIDDENOWNERSHIP_KEY[] = "HiddenOwnership";
-static const char HIDDENINEDITOR_KEY[] = "HiddenInEditor";
+static const char HIDDEN_KEY[] = "Hidden";
 static const char INVERTEDSOUTHEASTARMS_KEY[] = "InvertedSoutheastArms";
 static const char INVERTEDEASTARMS_KEY[] = "InvertedEastArms";
 //Wyrmgus end
@@ -336,7 +336,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
 							   HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY, GRAVEL_KEY,
 							   HACKDAMAGE_KEY, PIERCEDAMAGE_KEY, BLUNTDAMAGE_KEY,
-							   ETHEREAL_KEY, HIDDENOWNERSHIP_KEY, HIDDENINEDITOR_KEY, INVERTEDSOUTHEASTARMS_KEY, INVERTEDEASTARMS_KEY
+							   ETHEREAL_KEY, HIDDENOWNERSHIP_KEY, HIDDEN_KEY, INVERTEDSOUTHEASTARMS_KEY, INVERTEDEASTARMS_KEY
 							   //Wyrmgus end
 							  };
 

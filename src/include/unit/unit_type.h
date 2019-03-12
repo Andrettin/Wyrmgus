@@ -235,7 +235,7 @@ enum {
 	BLUNTDAMAGE_INDEX,
 	ETHEREAL_INDEX,					/// is only visible by units with ethereal vision.
 	HIDDENOWNERSHIP_INDEX,
-	HIDDENINEDITOR_INDEX,
+	HIDDEN_INDEX,
 	INVERTEDSOUTHEASTARMS_INDEX,
 	INVERTEDEASTARMS_INDEX,
 	//Wyrmgus end
@@ -735,6 +735,26 @@ public:
 	CCivilization *GetCivilization() const
 	{
 		return this->Civilization;
+	}
+	
+	String GetDescription() const
+	{
+		return this->Description.c_str();
+	}
+	
+	String GetQuote() const
+	{
+		return this->Quote.c_str();
+	}
+	
+	String GetBackground() const
+	{
+		return this->Background.c_str();
+	}
+	
+	bool IsHidden() const
+	{
+		return this->BoolFlag[HIDDEN_INDEX].value;
 	}
 	
 	//Wyrmgus start
