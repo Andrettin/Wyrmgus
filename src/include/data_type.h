@@ -55,7 +55,7 @@ public: \
 	**
 	**	@return	The instance if found, or null otherwise
 	*/ \
-	static _FORCE_INLINE_ class_name *Get(const std::string &ident, const bool should_find = true) \
+	static inline class_name *Get(const std::string &ident, const bool should_find = true) \
 	{ \
 		std::map<std::string, class_name *>::const_iterator find_iterator = class_name::InstancesByIdent.find(ident); \
 		\
@@ -77,7 +77,7 @@ public: \
 	**
 	**	@return	The instance if found, otherwise a new instance is created and returned
 	*/ \
-	static _FORCE_INLINE_ class_name *GetOrAdd(const std::string &ident) \
+	static inline class_name *GetOrAdd(const std::string &ident) \
 	{ \
 		class_name *instance = class_name::Get(ident, false); \
 		\
@@ -96,7 +96,7 @@ public: \
 	**
 	**	@return	All existing instances of the class
 	*/ \
-	static _FORCE_INLINE_ const std::vector<class_name *> &GetAll() \
+	static inline const std::vector<class_name *> &GetAll() \
 	{ \
 		return class_name::Instances; \
 	} \
@@ -104,7 +104,7 @@ public: \
 	/**
 	**	@brief	Remove the existing class instances
 	*/ \
-	static _FORCE_INLINE_ void Clear() \
+	static inline void Clear() \
 	{ \
 		for (class_name *instance : class_name::Instances) { \
 			delete instance; \
