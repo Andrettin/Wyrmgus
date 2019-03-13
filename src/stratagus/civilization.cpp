@@ -36,6 +36,7 @@
 #include "civilization.h"
 
 #include "player.h"
+#include "player_color.h"
 #include "time/calendar.h"
 
 /*----------------------------------------------------------------------------
