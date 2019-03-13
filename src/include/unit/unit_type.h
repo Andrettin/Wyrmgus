@@ -757,6 +757,11 @@ public:
 		return this->BoolFlag[HIDDEN_INDEX].value;
 	}
 	
+	CIcon *GetIcon() const
+	{
+		return this->Icon.Icon;
+	}
+	
 	//Wyrmgus start
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
 	void UpdateDefaultBoolFlags();

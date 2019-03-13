@@ -197,4 +197,5 @@ void CCivilization::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_name"), &CCivilization::GetName);
 	ClassDB::bind_method(D_METHOD("get_interface"), &CCivilization::GetInterface);
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CCivilization::IsHidden);
+	ClassDB::bind_method(D_METHOD("get_default_player_color"), &CCivilization::GetDefaultPlayerColor);
 }

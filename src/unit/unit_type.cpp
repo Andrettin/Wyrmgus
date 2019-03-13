@@ -1925,6 +1925,7 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_quote"), &CUnitType::GetQuote);
 	ClassDB::bind_method(D_METHOD("get_background"), &CUnitType::GetBackground);
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CUnitType::IsHidden);
+	ClassDB::bind_method(D_METHOD("get_icon"), &CUnitType::GetIcon);
 }
 
 void UpdateUnitStats(CUnitType &type, int reset)

@@ -53,6 +53,7 @@ class CCurrency;
 class CDeity;
 class CForceTemplate;
 class CLanguage;
+class CPlayerColor;
 class CQuest;
 class CSpecies;
 class CUpgrade;
@@ -167,6 +168,11 @@ public:
 		return this->Playable;
 	}
 	
+	CPlayerColor *GetDefaultPlayerColor() const
+	{
+		return this->DefaultPlayerColor;
+	}
+	
 	std::vector<CForceTemplate *> GetForceTemplates(const int force_type) const;
 	
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const
@@ -246,7 +252,7 @@ private:
 	bool Hidden = false;			/// whether the civilization is hidden
 	bool Playable = true;			/// whether the civilization is playable
 public:
-	std::string DefaultColor;		/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
+	CPlayerColor *DefaultPlayerColor = nullptr;	/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	std::vector<CCivilization *> DevelopsFrom;	/// from which civilizations this civilization develops
 	std::vector<CCivilization *> DevelopsTo;	/// to which civilizations this civilization develops
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
