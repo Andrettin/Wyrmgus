@@ -312,7 +312,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				deity_domain->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "hair_color") {
-			CHairColor *hair_color = CHairColor::GetOrAddHairColor(ident);
+			CHairColor *hair_color = CHairColor::GetOrAdd(ident);
 			if (!define_only) {
 				hair_color->ProcessConfigData(config_data);
 			}
@@ -350,7 +350,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				plane->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "player_color") {
-			CPlayerColor *player_color = CPlayerColor::GetOrAddPlayerColor(ident);
+			CPlayerColor *player_color = CPlayerColor::GetOrAdd(ident);
 			if (!define_only) {
 				player_color->ProcessConfigData(config_data);
 			}
@@ -375,7 +375,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				site->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "skin_color") {
-			CSkinColor *skin_color = CSkinColor::GetOrAddSkinColor(ident);
+			CSkinColor *skin_color = CSkinColor::GetOrAdd(ident);
 			if (!define_only) {
 				skin_color->ProcessConfigData(config_data);
 			}

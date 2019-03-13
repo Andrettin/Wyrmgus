@@ -43,14 +43,7 @@
 class CSkinColor : public CConversibleColor
 {
 	GDCLASS(CSkinColor, CConversibleColor)
-	
-public:
-	static CSkinColor *GetSkinColor(const std::string &ident, bool should_find = true);
-	static CSkinColor *GetOrAddSkinColor(const std::string &ident);
-	static void ClearSkinColors();
-	
-	static std::vector<CSkinColor *> SkinColors;	/// Skin colors
-	static std::map<std::string, CSkinColor *> SkinColorsByIdent;
+	DATA_TYPE_CLASS(CSkinColor)
 };
 
 #endif

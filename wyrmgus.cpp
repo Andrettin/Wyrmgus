@@ -43,17 +43,17 @@ void Wyrmgus::LuaCommand(String command)
 
 CHairColor *Wyrmgus::GetHairColor(String ident) const
 {
-	return CHairColor::GetHairColor(ident.utf8().get_data());
+	return CHairColor::Get(ident.utf8().get_data());
 }
 
 CPlayerColor *Wyrmgus::GetPlayerColor(String ident) const
 {
-	return CPlayerColor::GetPlayerColor(ident.utf8().get_data());
+	return CPlayerColor::Get(ident.utf8().get_data());
 }
 
 CSkinColor *Wyrmgus::GetSkinColor(String ident) const
 {
-	return CSkinColor::GetSkinColor(ident.utf8().get_data());
+	return CSkinColor::Get(ident.utf8().get_data());
 }
 
 CCampaign *Wyrmgus::GetCampaign(String ident) const

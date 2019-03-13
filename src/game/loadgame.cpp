@@ -183,9 +183,9 @@ void CleanModules()
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
 	
-	CPlayerColor::ClearPlayerColors();
-	CHairColor::ClearHairColors();
-	CSkinColor::ClearSkinColors();
+	CPlayerColor::Clear();
+	CHairColor::Clear();
+	CSkinColor::Clear();
 }
 
 /**

@@ -43,14 +43,7 @@
 class CPlayerColor : public CConversibleColor
 {
 	GDCLASS(CPlayerColor, CConversibleColor)
-	
-public:
-	static CPlayerColor *GetPlayerColor(const std::string &ident, bool should_find = true);
-	static CPlayerColor *GetOrAddPlayerColor(const std::string &ident);
-	static void ClearPlayerColors();
-	
-	static std::vector<CPlayerColor *> PlayerColors;	/// Player colors
-	static std::map<std::string, CPlayerColor *> PlayerColorsByIdent;
+	DATA_TYPE_CLASS(CPlayerColor)
 };
 
 #endif

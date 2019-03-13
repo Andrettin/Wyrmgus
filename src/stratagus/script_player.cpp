@@ -55,6 +55,7 @@
 #include "map/map.h"
 #include "map/site.h"
 #include "include/plane.h"
+#include "player_color.h"
 #include "province.h"
 #include "quest.h"
 #include "religion/deity.h"
@@ -838,8 +839,11 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Currency")) {
 			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
 			civilization->Currency = currency;
-		} else if (!strcmp(value, "DefaultColor")) {
-			civilization->DefaultColor = LuaToString(l, -1);
+		} else if (!strcmp(value, "DefaultPlayerColor")) {
+			CPlayerColor *player_color = CPlayerColor::Get(LuaToString(l, -1));
+			if (player_color != nullptr) {
+				civilization->DefaultPlayerColor = player_color;
+			}
 		} else if (!strcmp(value, "CivilizationUpgrade")) {
 			PlayerRaces.CivilizationUpgrades[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "DevelopsFrom")) {
@@ -1635,8 +1639,12 @@ static int CclGetCivilizationData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
-	} else if (!strcmp(data, "DefaultColor")) {
-		lua_pushstring(l, civilization->DefaultColor.c_str());
+	} else if (!strcmp(data, "DefaultPlayerColor")) {
+		if (civilization->DefaultPlayerColor) {
+			lua_pushstring(l, civilization->DefaultPlayerColor->GetIdent().utf8().get_data());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "CivilizationUpgrade")) {
 		lua_pushstring(l, PlayerRaces.CivilizationUpgrades[civilization_id].c_str());

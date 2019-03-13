@@ -43,14 +43,7 @@
 class CHairColor : public CConversibleColor
 {
 	GDCLASS(CHairColor, CConversibleColor)
-	
-public:
-	static CHairColor *GetHairColor(const std::string &ident, bool should_find = true);
-	static CHairColor *GetOrAddHairColor(const std::string &ident);
-	static void ClearHairColors();
-	
-	static std::vector<CHairColor *> HairColors;	/// Hair colors
-	static std::map<std::string, CHairColor *> HairColorsByIdent;
+	DATA_TYPE_CLASS(CHairColor)
 };
 
 #endif

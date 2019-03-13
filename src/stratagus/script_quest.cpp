@@ -615,11 +615,9 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
-			CPlayerColor *color = CPlayerColor::GetPlayerColor(color_name);
-			if (color != nullptr) {
-				achievement->PlayerColor = color;
-			} else {
-				LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
+			CPlayerColor *player_color = CPlayerColor::Get(color_name);
+			if (player_color != nullptr) {
+				achievement->PlayerColor = player_color;
 			}
 		} else if (!strcmp(value, "CharacterLevel")) {
 			achievement->CharacterLevel = LuaToNumber(l, -1);

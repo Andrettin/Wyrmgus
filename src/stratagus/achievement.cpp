@@ -77,11 +77,9 @@ void CAchievement::ProcessConfigData(const CConfigData *config_data)
 			this->Description = value;
 		} else if (key == "player_color") {
 			value = FindAndReplaceString(value, "_", "-");
-			CPlayerColor *color = CPlayerColor::GetPlayerColor(value);
-			if (color != nullptr) {
-				this->PlayerColor = color;
-			} else {
-				fprintf(stderr, "Invalid player color: \"%s\".\n", value.c_str());
+			CPlayerColor *player_color = CPlayerColor::Get(value);
+			if (player_color != nullptr) {
+				this->PlayerColor = player_color;
 			}
 		} else if (key == "character_level") {
 			this->CharacterLevel = std::stoi(value);
