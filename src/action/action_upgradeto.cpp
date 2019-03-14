@@ -38,6 +38,7 @@
 #include "ai.h"
 #include "animation.h"
 #include "civilization.h"
+#include "faction.h"
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end
@@ -256,8 +257,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			}
 		}
 		
-		if (oldtype.Faction != -1 && !PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[oldtype.Faction]->FactionUpgrade);
+		if (oldtype.Faction != -1 && !CFaction::Factions[oldtype.Faction]->FactionUpgrade.empty()) {
+			CUpgrade *faction_upgrade = CUpgrade::Get(CFaction::Factions[oldtype.Faction]->FactionUpgrade);
 			if (faction_upgrade) {
 				unit.SetIndividualUpgrade(faction_upgrade, 0);
 			}
@@ -271,8 +272,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 				unit.SetIndividualUpgrade(civilization_upgrade, 1);
 			}
 		}
-		if (newtype.Faction != -1 && !PlayerRaces.Factions[newtype.Faction]->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[newtype.Faction]->FactionUpgrade);
+		if (newtype.Faction != -1 && !CFaction::Factions[newtype.Faction]->FactionUpgrade.empty()) {
+			CUpgrade *faction_upgrade = CUpgrade::Get(CFaction::Factions[newtype.Faction]->FactionUpgrade);
 			if (faction_upgrade) {
 				unit.SetIndividualUpgrade(faction_upgrade, 1);
 			}

@@ -36,6 +36,7 @@
 
 #include "ui/ui.h"
 
+#include "faction.h"
 #include "font.h"
 //Wyrmgus start
 #include "game.h"
@@ -260,7 +261,7 @@ void CUserInterface::Load()
 	std::vector<CFiller> new_ui_fillers;
 	if (CPlayer::GetThisPlayer()) {
 		if (CPlayer::GetThisPlayer()->Faction != -1) {
-			new_ui_fillers = PlayerRaces.GetFactionUIFillers(CPlayer::GetThisPlayer()->Faction);
+			new_ui_fillers = CFaction::GetFactionUIFillers(CPlayer::GetThisPlayer()->Faction);
 		} else {
 			new_ui_fillers = PlayerRaces.GetCivilizationUIFillers(CPlayer::GetThisPlayer()->Race);
 		}

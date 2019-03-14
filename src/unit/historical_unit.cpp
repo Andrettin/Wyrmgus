@@ -36,6 +36,7 @@
 #include "unit/historical_unit.h"
 
 #include "config.h"
+#include "faction.h"
 #include "map/historical_location.h"
 #include "player.h"
 #include "unit/unit_type.h"
@@ -74,7 +75,7 @@ void CHistoricalUnit::ProcessConfigData(const CConfigData *config_data)
 			this->UnitType = UnitTypeByIdent(value);
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Faction = PlayerRaces.GetFaction(value);
+			this->Faction = CFaction::GetFaction(value);
 		} else if (key == "start_date") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->StartDate = CDate::FromString(value);

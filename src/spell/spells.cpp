@@ -48,6 +48,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "config.h"
+#include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -250,7 +251,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->FactionEquivalent != nullptr) {
-		if (caster.Type->GetCivilization() == nullptr || caster.Type->GetCivilization() != condition->FactionEquivalent->Civilization || PlayerRaces.GetFactionClassUnitType(condition->FactionEquivalent->ID, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->GetCivilization() == nullptr || caster.Type->GetCivilization() != condition->FactionEquivalent->Civilization || CFaction::GetFactionClassUnitType(condition->FactionEquivalent->ID, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
@@ -995,7 +996,7 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "faction_equivalent") {
 			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = PlayerRaces.GetFaction(value);
+			CFaction *faction = CFaction::GetFaction(value);
 			if (faction) {
 				this->FactionEquivalent = faction;
 			} else {

@@ -49,6 +49,7 @@
 //Wyrmgus end
 #include "commands.h"
 #include "font.h"
+#include "faction.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -527,7 +528,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	if (condition->FactionCoreSettlements != CONDITION_TRUE) {
-		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CCampaign::GetCurrentCampaign() != nullptr && button.Action == ButtonFaction && button.Value != -1 && PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
+		if ((condition->FactionCoreSettlements == CONDITION_ONLY) ^ (CCampaign::GetCurrentCampaign() != nullptr && button.Action == ButtonFaction && button.Value != -1 && CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->Cores.size() > 0)) {
 			return false;
 		}
 	}
@@ -535,8 +536,8 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	CUpgrade *upgrade = nullptr;
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		upgrade = AllUpgrades[button.Value];
-	} else if (button.Action == ButtonFaction && !PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
-		upgrade = CUpgrade::Get(PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
+	} else if (button.Action == ButtonFaction && !CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->FactionUpgrade.empty()) {
+		upgrade = CUpgrade::Get(CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[button.Value]->FactionUpgrade);
 	}
 	
 	if (condition->UpgradeResearched != CONDITION_TRUE) {
@@ -1192,8 +1193,8 @@ void CButtonPanel::Draw()
 			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon().Icon;
 		} else if (buttons[i].Action == ButtonResearch && buttons[i].Icon.Name.empty() && AllUpgrades[buttons[i].Value]->Icon) {
 			button_icon = AllUpgrades[buttons[i].Value]->Icon;
-		} else if (buttons[i].Action == ButtonFaction && buttons[i].Icon.Name.empty() && !PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttons[i].Value]->Icon.Name.empty()) {
-			button_icon = PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttons[i].Value]->Icon.Icon;
+		} else if (buttons[i].Action == ButtonFaction && buttons[i].Icon.Name.empty() && !CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttons[i].Value]->Icon.Name.empty()) {
+			button_icon = CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttons[i].Value]->Icon.Icon;
 		}
 		//Wyrmgus end
 		
@@ -1496,7 +1497,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		//Wyrmgus start
 		case ButtonFaction:
-			res = CPlayer::GetThisPlayer()->Faction != -1 && buttonaction.Value != -1 && buttonaction.Value < (int) PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo.size() && CPlayer::GetThisPlayer()->CanFoundFaction(PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value], true);
+			res = CPlayer::GetThisPlayer()->Faction != -1 && buttonaction.Value != -1 && buttonaction.Value < (int) CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo.size() && CPlayer::GetThisPlayer()->CanFoundFaction(CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value], true);
 			break;
 		case ButtonQuest:
 			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size() && unit.Player->CanAcceptQuest(unit.Player->AvailableQuests[buttonaction.Value]);
@@ -1583,7 +1584,7 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 			res = CSpell::Spells[buttonaction.Value]->IsAvailableForUnit(unit);
 			break;
 		case ButtonFaction:
-			res = CPlayer::GetThisPlayer()->CanFoundFaction(PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value]);
+			res = CPlayer::GetThisPlayer()->CanFoundFaction(CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[buttonaction.Value]);
 			break;
 		case ButtonBuy:
 			res = true;
@@ -1849,20 +1850,20 @@ void CButtonPanel::Update()
 			}
 
 			if (UnitButtonTable[i]->Action == ButtonFaction) {
-				if (CPlayer::GetThisPlayer()->Faction == -1 || potential_faction_count >= PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo.size()) {
+				if (CPlayer::GetThisPlayer()->Faction == -1 || potential_faction_count >= CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo.size()) {
 					UnitButtonTable[i]->Value = -1;
 				} else {
 					UnitButtonTable[i]->Value = potential_faction_count;
 					UnitButtonTable[i]->Hint = "Found ";
-					if (PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->DefiniteArticle) {
+					if (CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->DefiniteArticle) {
 						UnitButtonTable[i]->Hint += "the ";
 					}
-					UnitButtonTable[i]->Hint += PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->Name;
+					UnitButtonTable[i]->Hint += CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->Name;
 					UnitButtonTable[i]->Description = "Changes your faction to ";
-					if (PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->DefiniteArticle) {
+					if (CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->DefiniteArticle) {
 						UnitButtonTable[i]->Description += "the ";
 					}
-					UnitButtonTable[i]->Description += PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->Name;
+					UnitButtonTable[i]->Description += CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[potential_faction_count]->Name;
 				}
 				potential_faction_count += 1;
 			} else if (UnitButtonTable[i]->Action == ButtonBuy) {
@@ -2270,7 +2271,7 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 void CButtonPanel::DoClicked_Faction(int button)
 {
 	const int index = CurrentButtons[button].Value;
-	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[index]->ID);
+	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[index]->ID);
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;

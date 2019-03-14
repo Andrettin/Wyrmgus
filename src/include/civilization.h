@@ -34,14 +34,15 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <map>
-#include <string>
-#include <vector>
+#include "character.h" // because of "MaxCharacterTitles"
+#include "faction.h" //for certain enums
+#include "time/date.h"
 
 #include <core/object.h>
 
-#include "player.h" //for certain enums
-#include "time/date.h"
+#include <map>
+#include <string>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations

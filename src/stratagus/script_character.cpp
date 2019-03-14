@@ -37,6 +37,7 @@
 
 #include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
+#include "faction.h"
 #include "grand_strategy.h"
 #include "icon.h"
 #include "map/historical_location.h"
@@ -148,7 +149,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			character->Civilization = CCivilization::GetCivilization(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
-			CFaction *faction = PlayerRaces.GetFaction(LuaToString(l, -1));
+			CFaction *faction = CFaction::GetFaction(LuaToString(l, -1));
 			if (faction != nullptr) {
 				character->Faction = faction;
 			} else {
@@ -463,7 +464,7 @@ static int CclDefineCharacter(lua_State *l)
 				++j;
 				
 				std::string historical_faction_name = LuaToString(l, -1, j + 1);
-				CFaction *historical_faction = PlayerRaces.GetFaction(historical_faction_name);
+				CFaction *historical_faction = CFaction::GetFaction(historical_faction_name);
 				if (!historical_faction) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ historical_faction_name.c_str());
 				}
@@ -524,7 +525,7 @@ static int CclDefineCharacter(lua_State *l)
 				++j;
 				
 				std::string title_faction_name = LuaToString(l, -1, j + 1);
-				CFaction *title_faction = PlayerRaces.GetFaction(title_faction_name);
+				CFaction *title_faction = CFaction::GetFaction(title_faction_name);
 				if (!title_faction) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ title_faction_name.c_str());
 				}

@@ -37,6 +37,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "faction.h"
 #include "map/map_template.h"
 #include "player.h"
 #include "quest.h"
@@ -96,7 +97,7 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 			this->Description = value;
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = PlayerRaces.GetFaction(value);
+			CFaction *faction = CFaction::GetFaction(value);
 			if (faction) {
 				this->Faction = faction;
 			} else {

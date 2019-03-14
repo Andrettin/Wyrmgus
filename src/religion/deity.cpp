@@ -37,6 +37,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "faction.h"
 #include "icon.h"
 #include "include/plane.h"
 #include "player.h"
@@ -212,7 +213,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "holy_order") {
 			value = FindAndReplaceString(value, "_", "-");
-			CFaction *holy_order = PlayerRaces.GetFaction(value);
+			CFaction *holy_order = CFaction::GetFaction(value);
 			if (holy_order) {
 				this->HolyOrders.push_back(holy_order);
 				holy_order->HolyOrderDeity = this;

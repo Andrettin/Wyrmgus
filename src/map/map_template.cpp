@@ -41,6 +41,7 @@
 #include "civilization.h"
 #include "config.h"
 #include "editor.h"
+#include "faction.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -696,7 +697,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		}
 		// add five workers at the player's starting location
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
-			int worker_type_id = PlayerRaces.GetFactionClassUnitType(CPlayer::Players[i]->Faction, GetUnitTypeClassIndexByName("worker"));
+			int worker_type_id = CFaction::GetFactionClassUnitType(CPlayer::Players[i]->Faction, GetUnitTypeClassIndexByName("worker"));
 			if (worker_type_id != -1 && CPlayer::Players[i]->GetUnitTypeCount(CUnitType::UnitTypes[worker_type_id]) == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((CUnitType::UnitTypes[worker_type_id]->TileSize - 1) / 2);
 				
@@ -998,7 +999,7 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				&& (!start_date.ContainsDate(std::get<1>(site->HistoricalBuildings[j])) || std::get<1>(site->HistoricalBuildings[j]).Year == 0)
 			) {
 				int unit_type_id = -1;
-				unit_type_id = PlayerRaces.GetFactionClassUnitType(site_owner->ID, std::get<2>(site->HistoricalBuildings[j]));
+				unit_type_id = CFaction::GetFactionClassUnitType(site_owner->ID, std::get<2>(site->HistoricalBuildings[j]));
 				if (unit_type_id == -1) {
 					continue;
 				}
@@ -1020,9 +1021,9 @@ void CMapTemplate::ApplySites(const Vec2i &template_start_pos, const Vec2i &map_
 				const CFaction *building_owner = std::get<4>(site->HistoricalBuildings[j]);
 				int unit_type_id = -1;
 				if (building_owner) {
-					unit_type_id = PlayerRaces.GetFactionClassUnitType(building_owner->ID, std::get<2>(site->HistoricalBuildings[j]));
+					unit_type_id = CFaction::GetFactionClassUnitType(building_owner->ID, std::get<2>(site->HistoricalBuildings[j]));
 				} else {
-					unit_type_id = PlayerRaces.GetFactionClassUnitType(site_owner->ID, std::get<2>(site->HistoricalBuildings[j]));
+					unit_type_id = CFaction::GetFactionClassUnitType(site_owner->ID, std::get<2>(site->HistoricalBuildings[j]));
 				}
 				if (unit_type_id == -1) {
 					continue;

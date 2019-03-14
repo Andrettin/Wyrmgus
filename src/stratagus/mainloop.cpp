@@ -40,6 +40,7 @@
 #include "commands.h"
 #include "dialogue.h"
 #include "editor.h"
+#include "faction.h"
 //Wyrmgus start
 #include "font.h"
 //Wyrmgus end
@@ -566,7 +567,7 @@ void GameMainLoop()
 				if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race != 0 && CPlayer::Players[i]->Faction != -1) {
 					if (start_date.Year) {
 						CCivilization *civilization = CCivilization::Civilizations[CPlayer::Players[i]->Race];
-						CFaction *faction = PlayerRaces.Factions[CPlayer::Players[i]->Faction];
+						CFaction *faction = CFaction::Factions[CPlayer::Players[i]->Faction];
 						
 						for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
 							int upgrade_id = UpgradeIdByIdent(iterator->first);

@@ -38,6 +38,7 @@
 #include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
 #include "config.h"
+#include "faction.h"
 #include "game.h"
 #include "icon.h"
 #include "iocompat.h"
@@ -204,7 +205,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->Civilization = CCivilization::GetCivilization(value);
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = PlayerRaces.GetFaction(value);
+			CFaction *faction = CFaction::GetFaction(value);
 			if (faction) {
 				if (!this->Faction) {
 					this->Faction = faction;
@@ -390,7 +391,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 					end_date = CDate::FromString(value);
 				} else if (key == "faction") {
 					value = FindAndReplaceString(value, "_", "-");
-					title_faction = PlayerRaces.GetFaction(value);
+					title_faction = CFaction::GetFaction(value);
 					if (!title_faction) {
 						fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
 					}

@@ -49,6 +49,7 @@
 #include "commands.h" //for faction setting
 #include "currency.h"
 #include "editor.h"
+#include "faction.h"
 #include "font.h"
 #include "game.h"
 //Wyrmgus end
@@ -68,6 +69,7 @@
 #include "netconnect.h"
 //Wyrmgus start
 #include "parameters.h"
+#include "player_color.h"
 #include "quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
@@ -421,10 +423,10 @@ void PlayerRace::Clean()
 		//Wyrmgus end
 	}
 	//Wyrmgus start
-	for (CFaction *faction : this->Factions) {
+	for (CFaction *faction : CFaction::Factions) {
 		delete faction;
 	}
-	this->Factions.clear();
+	CFaction::Factions.clear();
 	
 	for (CDynasty *dynasty : this->Dynasties) {
 		delete dynasty;
@@ -434,32 +436,6 @@ void PlayerRace::Clean()
 }
 
 //Wyrmgus start
-int PlayerRace::GetFactionIndexByName(const std::string &faction_ident) const
-{
-	if (faction_ident.empty()) {
-		return -1;
-	}
-	
-	if (FactionStringToIndex.find(faction_ident) != FactionStringToIndex.end()) {
-		return FactionStringToIndex[faction_ident];
-	} else {
-		return -1;
-	}
-}
-
-CFaction *PlayerRace::GetFaction(const std::string &faction_ident) const
-{
-	if (faction_ident.empty()) {
-		return nullptr;
-	}
-	
-	if (FactionStringToIndex.find(faction_ident) != FactionStringToIndex.end()) {
-		return PlayerRaces.Factions[FactionStringToIndex[faction_ident]];
-	} else {
-		return nullptr;
-	}
-}
-
 CDynasty *PlayerRace::GetDynasty(const std::string &dynasty_ident) const
 {
 	if (dynasty_ident.empty()) {
@@ -515,40 +491,6 @@ int PlayerRace::GetCivilizationClassUpgrade(int civilization, int class_id)
 	return -1;
 }
 
-int PlayerRace::GetFactionClassUnitType(int faction, int class_id)
-{
-	if (faction == -1 || class_id == -1) {
-		return -1;
-	}
-	
-	if (PlayerRaces.Factions[faction]->ClassUnitTypes.find(class_id) != PlayerRaces.Factions[faction]->ClassUnitTypes.end()) {
-		return PlayerRaces.Factions[faction]->ClassUnitTypes[class_id];
-	}
-	
-	if (PlayerRaces.Factions[faction]->ParentFaction != -1) {
-		return GetFactionClassUnitType(PlayerRaces.Factions[faction]->ParentFaction, class_id);
-	}
-	
-	return GetCivilizationClassUnitType(PlayerRaces.Factions[faction]->Civilization->ID, class_id);
-}
-
-int PlayerRace::GetFactionClassUpgrade(int faction, int class_id)
-{
-	if (faction == -1 || class_id == -1) {
-		return -1;
-	}
-	
-	if (PlayerRaces.Factions[faction]->ClassUpgrades.find(class_id) != PlayerRaces.Factions[faction]->ClassUpgrades.end()) {
-		return PlayerRaces.Factions[faction]->ClassUpgrades[class_id];
-	}
-		
-	if (PlayerRaces.Factions[faction]->ParentFaction != -1) {
-		return GetFactionClassUpgrade(PlayerRaces.Factions[faction]->ParentFaction, class_id);
-	}
-	
-	return GetCivilizationClassUpgrade(PlayerRaces.Factions[faction]->Civilization->ID, class_id);
-}
-
 std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)
 {
 	if (civilization == -1) {
@@ -564,23 +506,6 @@ std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)
 	}
 	
 	return std::vector<CFiller>();
-}
-
-std::vector<CFiller> PlayerRace::GetFactionUIFillers(int faction)
-{
-	if (faction == -1) {
-		return std::vector<CFiller>();
-	}
-	
-	if (Factions[faction]->UIFillers.size() > 0) {
-		return Factions[faction]->UIFillers;
-	}
-		
-	if (PlayerRaces.Factions[faction]->ParentFaction != -1) {
-		return GetFactionUIFillers(PlayerRaces.Factions[faction]->ParentFaction);
-	}
-	
-	return GetCivilizationUIFillers(PlayerRaces.Factions[faction]->Civilization->ID);
 }
 
 /**
@@ -643,136 +568,6 @@ std::string PlayerRace::TranslateName(const std::string &name, CLanguage *langua
 	}
 	
 	return new_name;
-}
-
-CFaction::~CFaction()
-{
-	for (std::map<int, std::vector<CForceTemplate *>>::iterator iterator = this->ForceTemplates.begin(); iterator != this->ForceTemplates.end(); ++iterator) {
-		for (size_t i = 0; i < iterator->second.size(); ++i) {
-			delete iterator->second[i];
-		}
-	}
-	
-	for (size_t i = 0; i < this->AiBuildingTemplates.size(); ++i) {
-		delete this->AiBuildingTemplates[i];
-	}
-
-	if (this->Conditions) {
-		delete Conditions;
-	}
-
-	this->UIFillers.clear();
-}
-
-int CFaction::GetUpgradePriority(const CUpgrade *upgrade) const
-{
-	if (!upgrade) {
-		fprintf(stderr, "Error in CFaction::GetUpgradePriority: the upgrade is null.\n");
-	}
-	
-	if (this->UpgradePriorities.find(upgrade) != this->UpgradePriorities.end()) {
-		return this->UpgradePriorities.find(upgrade)->second;
-	}
-	
-	if (this->Civilization == nullptr) {
-		fprintf(stderr, "Error in CFaction::GetUpgradePriority: the faction has no civilization.\n");
-	}
-	
-	return this->Civilization->GetUpgradePriority(upgrade);
-}
-
-int CFaction::GetForceTypeWeight(int force_type) const
-{
-	if (force_type == -1) {
-		fprintf(stderr, "Error in CFaction::GetForceTypeWeight: the force_type is -1.\n");
-	}
-	
-	if (this->ForceTypeWeights.find(force_type) != this->ForceTypeWeights.end()) {
-		return this->ForceTypeWeights.find(force_type)->second;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return PlayerRaces.Factions[this->ParentFaction]->GetForceTypeWeight(force_type);
-	}
-	
-	if (this->Civilization == nullptr) {
-		fprintf(stderr, "Error in CFaction::GetForceTypeWeight: the faction has no civilization.\n");
-	}
-	
-	return this->Civilization->GetForceTypeWeight(force_type);
-}
-
-/**
-**	@brief	Get the faction's currency
-**
-**	@return	The faction's currency
-*/
-CCurrency *CFaction::GetCurrency() const
-{
-	if (this->Currency) {
-		return this->Currency;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return PlayerRaces.Factions[this->ParentFaction]->GetCurrency();
-	}
-	
-	if (this->Civilization != nullptr) {
-		return this->Civilization->GetCurrency();
-	}
-	
-	return nullptr;
-}
-
-std::vector<CForceTemplate *> CFaction::GetForceTemplates(int force_type) const
-{
-	if (force_type == -1) {
-		fprintf(stderr, "Error in CFaction::GetForceTemplates: the force_type is -1.\n");
-	}
-	
-	if (this->ForceTemplates.find(force_type) != this->ForceTemplates.end()) {
-		return this->ForceTemplates.find(force_type)->second;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return PlayerRaces.Factions[this->ParentFaction]->GetForceTemplates(force_type);
-	}
-	
-	if (this->Civilization == nullptr) {
-		fprintf(stderr, "Error in CFaction::GetForceTemplates: the faction has no civilization.\n");
-	}
-	
-	return this->Civilization->GetForceTemplates(force_type);
-}
-
-std::vector<CAiBuildingTemplate *> CFaction::GetAiBuildingTemplates() const
-{
-	if (this->AiBuildingTemplates.size() > 0) {
-		return this->AiBuildingTemplates;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return PlayerRaces.Factions[this->ParentFaction]->GetAiBuildingTemplates();
-	}
-	
-	if (this->Civilization == nullptr) {
-		fprintf(stderr, "Error in CFaction::GetAiBuildingTemplates: the faction has no civilization.\n");
-	}
-	
-	return this->Civilization->GetAiBuildingTemplates();
-}
-
-const std::vector<std::string> &CFaction::GetShipNames() const
-{
-	if (this->ShipNames.size() > 0) {
-		return this->ShipNames;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return PlayerRaces.Factions[this->ParentFaction]->GetShipNames();
-	}
-	
-	return this->Civilization->GetShipNames();
 }
 
 CDynasty::~CDynasty()
@@ -1564,11 +1359,11 @@ void CPlayer::SetFaction(const CFaction *faction)
 	}
 
 	if (this->Faction != -1) {
-		if (!PlayerRaces.Factions[this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.Factions[this->Faction]->FactionUpgrade)->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.Factions[this->Faction]->FactionUpgrade)->ID);
+		if (!CFaction::Factions[this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(CFaction::Factions[this->Faction]->FactionUpgrade)->ID] == 'R') {
+			UpgradeLost(*this, CUpgrade::Get(CFaction::Factions[this->Faction]->FactionUpgrade)->ID);
 		}
 
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(PlayerRaces.Factions[this->Faction]->Type));
+		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(CFaction::Factions[this->Faction]->Type));
 		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] == 'R') {
 			UpgradeLost(*this, faction_type_upgrade_id);
 		}
@@ -1578,12 +1373,12 @@ void CPlayer::SetFaction(const CFaction *faction)
 	
 	if (old_faction_id != -1 && faction_id != -1) {
 		for (size_t i = 0; i < UpgradeClasses.size(); ++i) {
-			if (PlayerRaces.GetFactionClassUpgrade(old_faction_id, i) != PlayerRaces.GetFactionClassUpgrade(faction_id, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
-				if (PlayerRaces.GetFactionClassUpgrade(old_faction_id, i) != -1 && this->Allow.Upgrades[PlayerRaces.GetFactionClassUpgrade(old_faction_id, i)] == 'R') {
-					UpgradeLost(*this, PlayerRaces.GetFactionClassUpgrade(old_faction_id, i));
+			if (CFaction::GetFactionClassUpgrade(old_faction_id, i) != CFaction::GetFactionClassUpgrade(faction_id, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
+				if (CFaction::GetFactionClassUpgrade(old_faction_id, i) != -1 && this->Allow.Upgrades[CFaction::GetFactionClassUpgrade(old_faction_id, i)] == 'R') {
+					UpgradeLost(*this, CFaction::GetFactionClassUpgrade(old_faction_id, i));
 
-					if (PlayerRaces.GetFactionClassUpgrade(faction_id, i) != -1) {
-						UpgradeAcquire(*this, AllUpgrades[PlayerRaces.GetFactionClassUpgrade(faction_id, i)]);
+					if (CFaction::GetFactionClassUpgrade(faction_id, i) != -1) {
+						UpgradeAcquire(*this, AllUpgrades[CFaction::GetFactionClassUpgrade(faction_id, i)]);
 					}
 				}
 			}
@@ -1593,7 +1388,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 	bool personal_names_changed = true;
 	bool ship_names_changed = true;
 	if (this->Faction != -1 && faction_id != -1) {
-		ship_names_changed = PlayerRaces.Factions[this->Faction]->GetShipNames() != PlayerRaces.Factions[faction_id]->GetShipNames();
+		ship_names_changed = CFaction::Factions[this->Faction]->GetShipNames() != CFaction::Factions[faction_id]->GetShipNames();
 		personal_names_changed = false; // setting to a faction of the same civilization
 	}
 	
@@ -1608,13 +1403,14 @@ void CPlayer::SetFaction(const CFaction *faction)
 	}
 	
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
-		this->SetName(PlayerRaces.Factions[this->Faction]->Name);
+		this->SetName(CFaction::Factions[this->Faction]->Name);
 	}
 	if (this->Faction != -1) {
 		int color = -1;
-		for (size_t i = 0; i < PlayerRaces.Factions[faction_id]->Colors.size(); ++i) {
-			if (!IsPlayerColorUsed(PlayerRaces.Factions[faction_id]->Colors[i])) {
-				color = PlayerRaces.Factions[faction_id]->Colors[i];
+		for (CPlayerColor *player_color : CFaction::Factions[faction_id]->GetPrimaryColors()) {
+			int primary_color = GetPlayerColorIndexByName(player_color->GetIdent().utf8().get_data());
+			if (!IsPlayerColorUsed(primary_color)) {
+				color = primary_color;
 				break;
 			}
 		}
@@ -1634,8 +1430,8 @@ void CPlayer::SetFaction(const CFaction *faction)
 			}
 		}
 	
-		if (!PlayerRaces.Factions[this->Faction]->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[this->Faction]->FactionUpgrade);
+		if (!CFaction::Factions[this->Faction]->FactionUpgrade.empty()) {
+			CUpgrade *faction_upgrade = CUpgrade::Get(CFaction::Factions[this->Faction]->FactionUpgrade);
 			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
 				if (GameEstablishing) {
 					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
@@ -1645,7 +1441,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 			}
 		}
 		
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(PlayerRaces.Factions[this->Faction]->Type));
+		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(CFaction::Factions[this->Faction]->Type));
 		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] != 'R') {
 			if (GameEstablishing) {
 				AllowUpgradeId(*this, faction_type_upgrade_id, 'R');
@@ -1664,7 +1460,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->Civilization->GetSpecies() && unit.Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->Civilization->GetSpecies() && unit.Type->Slot == CFaction::GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();
@@ -1682,8 +1478,8 @@ void CPlayer::SetRandomFaction()
 	// set random one from the civilization's factions
 	std::vector<CFaction *> local_factions;
 	
-	for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
-		CFaction *faction = PlayerRaces.Factions[i];
+	for (size_t i = 0; i < CFaction::Factions.size(); ++i) {
+		CFaction *faction = CFaction::Factions[i];
 		if (faction->Civilization->ID != this->Race) {
 			continue;
 		}
@@ -1808,7 +1604,7 @@ void CPlayer::SetAge(CAge *age)
 CCurrency *CPlayer::GetCurrency() const
 {
 	if (this->Faction != -1) {
-		return PlayerRaces.Factions[this->Faction]->GetCurrency();
+		return CFaction::Factions[this->Faction]->GetCurrency();
 	}
 	
 	if (this->Race != -1) {
@@ -1832,7 +1628,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			continue;
 		}
 		
-		int upgrade_id = PlayerRaces.GetFactionClassUpgrade(player.Faction, upgrade_list[i]->Class);
+		int upgrade_id = CFaction::GetFactionClassUpgrade(player.Faction, upgrade_list[i]->Class);
 		if (upgrade_id == -1) {
 			continue;
 		}
@@ -1890,7 +1686,7 @@ bool CPlayer::HasUpgradeClass(const int upgrade_class) const
 	int upgrade_id = -1;
 	
 	if (this->Faction != -1) {
-		upgrade_id = PlayerRaces.GetFactionClassUpgrade(this->Faction, upgrade_class);
+		upgrade_id = CFaction::GetFactionClassUpgrade(this->Faction, upgrade_class);
 	} else {
 		upgrade_id = PlayerRaces.GetCivilizationClassUpgrade(this->Race, upgrade_class);
 	}
@@ -1919,13 +1715,13 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 {
 	std::vector<CUnit *> settlement_unit_table;
 	
-	int town_hall_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("town-hall"));			
+	int town_hall_type_id = CFaction::GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("town-hall"));			
 	if (town_hall_type_id == -1) {
 		return false;
 	}
 	CUnitType *town_hall_type = CUnitType::UnitTypes[town_hall_type_id];
 	
-	int stronghold_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("stronghold"));			
+	int stronghold_type_id = CFaction::GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("stronghold"));			
 	CUnitType *stronghold_type = nullptr;
 	if (stronghold_type_id != -1) {
 		stronghold_type = CUnitType::UnitTypes[stronghold_type_id];
@@ -2134,7 +1930,7 @@ bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) c
 		return false;
 	}
 	
-	if (!character->Factions.empty() && (this->Faction == -1 || std::find(character->Factions.begin(), character->Factions.end(), PlayerRaces.Factions[this->Faction]) == character->Factions.end())) {
+	if (!character->Factions.empty() && (this->Faction == -1 || std::find(character->Factions.begin(), character->Factions.end(), CFaction::Factions[this->Faction]) == character->Factions.end())) {
 		return false;
 	}
 	
@@ -2166,7 +1962,7 @@ bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore
 			const CUpgrade *removed_upgrade = upgrade->UpgradeModifiers[z]->RemoveUpgrades[j];
 			bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->ID) == 'R');
 			if (has_upgrade) {
-				if (ignore_lower_priority && this->Faction != -1 && PlayerRaces.Factions[this->Faction]->GetUpgradePriority(removed_upgrade) < PlayerRaces.Factions[this->Faction]->GetUpgradePriority(upgrade)) {
+				if (ignore_lower_priority && this->Faction != -1 && CFaction::Factions[this->Faction]->GetUpgradePriority(removed_upgrade) < CFaction::Factions[this->Faction]->GetUpgradePriority(upgrade)) {
 					continue;
 				}
 				return true;
@@ -2183,7 +1979,7 @@ std::string CPlayer::GetFactionTitleName() const
 		return "";
 	}
 	
-	CFaction *faction = PlayerRaces.Factions[this->Faction];
+	CFaction *faction = CFaction::Factions[this->Faction];
 	int faction_tier = faction->DefaultTier;
 	int government_type = faction->DefaultGovernmentType;
 	
@@ -2223,7 +2019,7 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 	}
 	
 	CCivilization *civilization = CCivilization::Civilizations[this->Race];
-	CFaction *faction = PlayerRaces.Factions[this->Faction];
+	CFaction *faction = CFaction::Factions[this->Faction];
 	int faction_tier = faction->DefaultTier;
 	int government_type = faction->DefaultGovernmentType;
 	
@@ -2926,7 +2722,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		if (objective->ObjectiveType == BuildUnitsObjectiveType || objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
 			std::vector<const CUnitType *> unit_types = objective->UnitTypes;
 			if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-				int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
+				int unit_type_id = CFaction::GetFactionClassUnitType(this->Faction, objective->UnitClass);
 				if (unit_type_id == -1) {
 					return false;
 				}
@@ -2964,7 +2760,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 					if (second_objective->ObjectiveType == BuildUnitsObjectiveType || second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
 						std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
 						if (second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-							int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
+							int unit_type_id = CFaction::GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
 							if (unit_type_id == -1) {
 								continue;
 							}
@@ -3086,7 +2882,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			if (objective->Counter < objective->Quantity) {
 				std::vector<const CUnitType *> unit_types = objective->UnitTypes;
 				if (objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-					int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, objective->UnitClass);
+					int unit_type_id = CFaction::GetFactionClassUnitType(this->Faction, objective->UnitClass);
 					if (unit_type_id == -1) {
 						return "You can no longer produce the required unit.";
 					}
@@ -3129,7 +2925,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 						if (second_objective->ObjectiveType == BuildUnitsObjectiveType || second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
 							std::vector<const CUnitType *> unit_types = second_objective->UnitTypes;
 							if (second_objective->ObjectiveType == BuildUnitsOfClassObjectiveType) {
-								int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
+								int unit_type_id = CFaction::GetFactionClassUnitType(this->Faction, second_objective->UnitClass);
 								if (unit_type_id == -1) {
 									continue;
 								}
@@ -4582,7 +4378,7 @@ bool CPlayer::HasNeutralFactionType() const
 	if (
 		this->Race != -1
 		&& this->Faction != -1
-		&& (PlayerRaces.Factions[this->Faction]->Type == FactionTypeMercenaryCompany || PlayerRaces.Factions[this->Faction]->Type == FactionTypeHolyOrder || PlayerRaces.Factions[this->Faction]->Type == FactionTypeTradingCompany)
+		&& (CFaction::Factions[this->Faction]->Type == FactionTypeMercenaryCompany || CFaction::Factions[this->Faction]->Type == FactionTypeHolyOrder || CFaction::Factions[this->Faction]->Type == FactionTypeTradingCompany)
 	) {
 		return true;
 	}
@@ -4607,7 +4403,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, int button_action) const
 		player.HasNeutralFactionType()
 		&& (player.Overlord == nullptr || this->IsOverlordOf(player, true) || player.Overlord->IsAllied(*this))
 	) {
-		if (PlayerRaces.Factions[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonTrain && button_action != ButtonBuy) || std::find(this->Deities.begin(), this->Deities.end(), PlayerRaces.Factions[player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
+		if (CFaction::Factions[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonTrain && button_action != ButtonBuy) || std::find(this->Deities.begin(), this->Deities.end(), CFaction::Factions[player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
 		}
 	}
@@ -4646,7 +4442,7 @@ void SetFactionStringToIndex(const std::string &faction_name, int faction_id)
 
 void NetworkSetFaction(int player, const std::string &faction_name)
 {
-	int faction = PlayerRaces.GetFactionIndexByName(faction_name);
+	int faction = CFaction::GetFactionIndexByName(faction_name);
 	SendCommandSetFaction(player, faction);
 }
 

@@ -51,6 +51,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
+#include "faction.h"
 #include "game.h"
 #include "editor.h"
 //Wyrmgus start
@@ -957,8 +958,8 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 			this->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (this->Type->GetCivilization() != nullptr && this->Type->Faction != -1 && !PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[this->Type->Faction]->FactionUpgrade);
+	if (this->Type->GetCivilization() != nullptr && this->Type->Faction != -1 && !CFaction::Factions[this->Type->Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(CFaction::Factions[this->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			this->SetIndividualUpgrade(faction_upgrade, 1);
 		}
@@ -1434,8 +1435,8 @@ void CUnit::ChooseButtonIcon(int button_action)
 			faction = this->Player->Faction;
 		}
 		
-		if (faction != -1 && PlayerRaces.Factions[faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[faction]->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = PlayerRaces.Factions[faction]->ButtonIcons[button_action].Icon;
+		if (faction != -1 && CFaction::Factions[faction]->ButtonIcons.find(button_action) != CFaction::Factions[faction]->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = CFaction::Factions[faction]->ButtonIcons[button_action].Icon;
 			return;
 		} else if (PlayerRaces.ButtonIcons[civilization_id].find(button_action) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 			this->ButtonIcons[button_action] = PlayerRaces.ButtonIcons[civilization_id][button_action].Icon;
@@ -2360,7 +2361,7 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		int civilization_id = this->Type->GetCivilization() ? this->Type->GetCivilization()->ID : -1;
-		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Faction, this->Type->Class)) {
+		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->Faction, this->Type->Class)) {
 			civilization_id = this->Player->Race;
 		}
 		
@@ -2853,8 +2854,8 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (unit->Type->GetCivilization() != nullptr && unit->Type->Faction != -1 && !PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[unit->Type->Faction]->FactionUpgrade);
+	if (unit->Type->GetCivilization() != nullptr && unit->Type->Faction != -1 && !CFaction::Factions[unit->Type->Faction]->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(CFaction::Factions[unit->Type->Faction]->FactionUpgrade);
 		if (faction_upgrade) {
 			unit->SetIndividualUpgrade(faction_upgrade, 1);
 		}
@@ -3286,9 +3287,9 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	
 	CFaction *faction = nullptr;
 	if (this->Player->Faction != -1) {
-		faction = PlayerRaces.Factions[this->Player->Faction];
+		faction = CFaction::Factions[this->Player->Faction];
 		
-		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Type->Class)) {
+		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->Slot == CFaction::GetFactionClassUnitType(faction->ID, this->Type->Class)) {
 			civilization = faction->Civilization;
 		}
 	}
@@ -3349,17 +3350,17 @@ void CUnit::UpdateSettlement()
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
 		if (!this->Settlement) {
 			const CCivilization *civilization = this->Type->GetCivilization();
-			if (civilization != nullptr && this->Player->Faction != -1 && (CCivilization::Civilizations[this->Player->Race] == civilization || this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Faction, this->Type->Class))) {
+			if (civilization != nullptr && this->Player->Faction != -1 && (CCivilization::Civilizations[this->Player->Race] == civilization || this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->Faction, this->Type->Class))) {
 				civilization = CCivilization::Civilizations[this->Player->Race];
 			}
 			
 			int faction_id = this->Type->Faction;
-			if (CCivilization::Civilizations[this->Player->Race] == civilization && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Faction, this->Type->Class)) {
+			if (CCivilization::Civilizations[this->Player->Race] == civilization && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->Faction, this->Type->Class)) {
 				faction_id = this->Player->Faction;
 			}
 			const CFaction *faction = nullptr;
 			if (faction_id != -1) {
-				PlayerRaces.Factions[faction_id];
+				CFaction::Factions[faction_id];
 			}
 
 			std::vector<CSite *> potential_settlements;
@@ -4585,7 +4586,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 				&& (!modifier_upgrade->Boots || EquippedItems[BootsItemSlot].size() == 0)
 				&& (!modifier_upgrade->Arrows || EquippedItems[ArrowsItemSlot].size() == 0)
 				&& !(newplayer.Race != -1 && modifier_upgrade->Ident == PlayerRaces.CivilizationUpgrades[newplayer.Race])
-				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == PlayerRaces.Factions[newplayer.Faction]->FactionUpgrade)
+				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == CFaction::Factions[newplayer.Faction]->FactionUpgrade)
 			) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
@@ -6328,8 +6329,8 @@ CIcon *CUnit::GetButtonIcon(int button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;
-	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction != -1 && PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.end()) {
-		return PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons[button_action].Icon;
+	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction != -1 && CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.find(button_action) != CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.end()) {
+		return CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons[button_action].Icon;
 	} else if (this->Player == CPlayer::GetThisPlayer() && PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].find(button_action) != PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].end()) {
 		return PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race][button_action].Icon;
 	}

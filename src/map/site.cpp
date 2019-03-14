@@ -37,6 +37,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "faction.h"
 #include "map/map_template.h"
 #include "player.h" //for factions
 #include "province.h" //for regions
@@ -71,7 +72,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "core") {
 			value = FindAndReplaceString(value, "_", "-");
 			
-			CFaction *faction = PlayerRaces.GetFaction(value);
+			CFaction *faction = CFaction::GetFaction(value);
 			if (faction != nullptr) {
 				this->Cores.push_back(faction);
 				faction->Cores.push_back(this);
@@ -124,7 +125,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 					date = CDate::FromString(value);
 				} else if (key == "faction") {
 					value = FindAndReplaceString(value, "_", "-");
-					owner_faction = PlayerRaces.GetFaction(value);
+					owner_faction = CFaction::GetFaction(value);
 					if (!owner_faction) {
 						fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 					}
@@ -165,7 +166,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 					}
 				} else if (key == "faction") {
 					value = FindAndReplaceString(value, "_", "-");
-					building_owner_faction = PlayerRaces.GetFaction(value);
+					building_owner_faction = CFaction::GetFaction(value);
 					if (!building_owner_faction) {
 						fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 					}

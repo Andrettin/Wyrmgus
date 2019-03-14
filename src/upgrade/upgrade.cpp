@@ -49,6 +49,7 @@
 #include "config.h"
 //Wyrmgus start
 #include "editor.h"
+#include "faction.h"
 #include "game.h"
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -275,7 +276,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CFaction *faction = PlayerRaces.GetFaction(value);
+			const CFaction *faction = CFaction::GetFaction(value);
 			if (faction) {
 				this->Faction = faction->ID;
 			} else {
@@ -357,7 +358,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			if (this->Faction != -1) {
 				int faction_id = this->Faction;
 				if (faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[faction_id]->ClassUpgrades[class_id] = this->ID;
+					CFaction::Factions[faction_id]->ClassUpgrades[class_id] = this->ID;
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
@@ -573,7 +574,7 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
-			CFaction *faction = PlayerRaces.GetFaction(faction_name);
+			CFaction *faction = CFaction::GetFaction(faction_name);
 			if (faction) {
 				upgrade->Faction = faction->ID;
 			} else {
@@ -693,7 +694,7 @@ static int CclDefineUpgrade(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string faction_ident = LuaToString(l, -1, j + 1);
-				CFaction *priority_faction = PlayerRaces.GetFaction(faction_ident);
+				CFaction *priority_faction = CFaction::GetFaction(faction_ident);
 				if (!priority_faction) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
 				}
@@ -792,7 +793,7 @@ static int CclDefineUpgrade(lua_State *l)
 			if (upgrade->Faction != -1) {
 				int faction_id = upgrade->Faction;
 				if (faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[faction_id]->ClassUpgrades[class_id] = upgrade->ID;
+					CFaction::Factions[faction_id]->ClassUpgrades[class_id] = upgrade->ID;
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
@@ -931,7 +932,7 @@ static int CclDefineModifier(lua_State *l)
 			}
 		} else if (!strcmp(key, "change-faction-to")) {
 			std::string faction_ident = LuaToString(l, j + 1, 2);
-			um->ChangeFactionTo = PlayerRaces.GetFaction(faction_ident);
+			um->ChangeFactionTo = CFaction::GetFaction(faction_ident);
 			
 			if (um->ChangeFactionTo == nullptr) {
 				LuaError(l, "Faction \"%s\" doesn't exist.'" _C_ faction_ident.c_str());
@@ -1217,7 +1218,7 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (upgrade->Faction != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[upgrade->Faction]->Ident.c_str());
+			lua_pushstring(l, CFaction::Factions[upgrade->Faction]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

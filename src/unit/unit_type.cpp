@@ -47,6 +47,7 @@
 //Wyrmgus start
 #include "editor.h" //for personal name generation
 //Wyrmgus end
+#include "faction.h"
 #include "icon.h"
 #include "iolib.h"
 #include "luacallback.h"
@@ -739,7 +740,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = PlayerRaces.GetFaction(value);
+			CFaction *faction = CFaction::GetFaction(value);
 			if (faction) {
 				this->Faction = faction->ID;
 			} else {
@@ -1151,10 +1152,10 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		}
-		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
-			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[i]->ClassUnitTypes.rend(); ++iterator) {
+		for (size_t i = 0; i < CFaction::Factions.size(); ++i) {
+			for (std::map<int, int>::reverse_iterator iterator = CFaction::Factions[i]->ClassUnitTypes.rbegin(); iterator != CFaction::Factions[i]->ClassUnitTypes.rend(); ++iterator) {
 				if (iterator->second == this->Slot) {
-					PlayerRaces.Factions[i]->ClassUnitTypes.erase(iterator->first);
+					CFaction::Factions[i]->ClassUnitTypes.erase(iterator->first);
 					break;
 				}
 			}
@@ -1164,7 +1165,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			if (this->Faction != -1) {
 				int faction_id = this->Faction;
 				if (faction_id != -1) {
-					PlayerRaces.Factions[faction_id]->ClassUnitTypes[class_id] = this->Slot;
+					CFaction::Factions[faction_id]->ClassUnitTypes[class_id] = this->Slot;
 				}
 			} else {
 					PlayerRaces.CivilizationClassUnitTypes[this->GetCivilization()->ID][class_id] = this->Slot;
@@ -1875,14 +1876,14 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 	
 	if (potential_names.size() == 0 && this->GetCivilization() != nullptr) {
 		const CCivilization *civilization = this->GetCivilization();
-		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Slot == PlayerRaces.GetFactionClassUnitType(faction->ID, this->Class)) {
+		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Slot == CFaction::GetFactionClassUnitType(faction->ID, this->Class)) {
 			civilization = faction->Civilization;
 		}
 		if (faction && faction->Civilization != civilization) {
 			faction = nullptr;
 		}
 		if (this->Faction != -1 && !faction) {
-			faction = PlayerRaces.Factions[this->Faction];
+			faction = CFaction::Factions[this->Faction];
 		}
 		
 		if (this->BoolFlag[ORGANIC_INDEX].value) {

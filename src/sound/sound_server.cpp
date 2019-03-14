@@ -38,6 +38,7 @@
 #include "sound_server.h"
 
 #include "civilization.h"
+#include "faction.h"
 #include "iocompat.h"
 #include "iolib.h"
 //Wyrmgus start
@@ -807,18 +808,18 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 
 	if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
 		CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
-		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
+		int faction = CFaction::GetFactionIndexByName(faction_name);
 		int parent_faction = -1;
 		bool found_music = false;
 		if (faction != -1) {
 			while (true) {
-				parent_faction = PlayerRaces.Factions[faction]->ParentFaction;
+				parent_faction = CFaction::Factions[faction]->ParentFaction;
 				if (parent_faction == -1) {
 					break;
 				}
 				faction = parent_faction;
 				
-				if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[faction]->Ident.c_str()) == OAML_OK) {
+				if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), CFaction::Factions[faction]->Ident.c_str()) == OAML_OK) {
 					found_music = true;
 					break;
 				}

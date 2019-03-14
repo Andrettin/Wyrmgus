@@ -36,6 +36,7 @@
 #include "commands.h"
 
 #include "actions.h"
+#include "faction.h"
 //Wyrmgus start
 #include "map/map.h" //it contains map width and height
 //Wyrmgus end
@@ -812,7 +813,7 @@ void SendCommandSetFaction(int player, int faction)
 	if (!IsNetworkGame()) {
 		//FIXME: should add log of faction change here
 		if (faction != -1) {
-			CPlayer::Players[player]->SetFaction(PlayerRaces.Factions[faction]);
+			CPlayer::Players[player]->SetFaction(CFaction::Factions[faction]);
 		} else {
 			CPlayer::Players[player]->SetFaction(nullptr);
 		}
@@ -1181,7 +1182,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 		//Wyrmgus start
 		case ExtendedMessageSetFaction: {
 			//FIXME: should add log for faction change here
-			CPlayer::Players[arg2]->SetFaction(PlayerRaces.Factions[arg3]);
+			CPlayer::Players[arg2]->SetFaction(CFaction::Factions[arg3]);
 			break;
 		}
 		case ExtendedMessageAutosellResource: {

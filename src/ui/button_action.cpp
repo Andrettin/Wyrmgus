@@ -36,6 +36,7 @@
 #include "ui/button_action.h"
 
 #include "config.h"
+#include "faction.h"
 #include "trigger.h"
 #include "ui/button_level.h"
 #include "ui/interface.h"
@@ -179,9 +180,9 @@ void ButtonAction::SetTriggerData() const
 	if (this->Action == ButtonResearch || this->Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[this->Value];
 	} else if (this->Action == ButtonFaction) {
-		TriggerData.Faction = PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
-		if (!PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::Get(PlayerRaces.Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
+		TriggerData.Faction = CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
+		if (!CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
+			TriggerData.Upgrade = CUpgrade::Get(CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
 		}
 	}
 }

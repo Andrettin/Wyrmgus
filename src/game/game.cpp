@@ -50,6 +50,7 @@
 #include "commands.h"
 #include "construct.h"
 #include "editor.h"
+#include "faction.h"
 #include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -68,6 +69,7 @@
 #include "parameters.h"
 #include "pathfinder.h"
 #include "player.h"
+#include "player_color.h"
 //Wyrmgus start
 #include "province.h"
 #include "quest.h"
@@ -569,29 +571,29 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		std::string mod_file(mapSetup);
 		mod_file = FindAndReplaceStringBeginning(mod_file, StratagusLibPath + "/", "");
 		
-		for (size_t i = 0; i < PlayerRaces.Factions.size(); ++i) {
-			if (PlayerRaces.Factions[i]->Mod != CMap::Map.Info.Filename) {
+		for (size_t i = 0; i < CFaction::Factions.size(); ++i) {
+			if (CFaction::Factions[i]->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
 				
-			f->printf("DefineFaction(\"%s\", {\n", PlayerRaces.Factions[i]->Ident.c_str());
-			f->printf("\tName = \"%s\",\n", PlayerRaces.Factions[i]->Name.c_str());
+			f->printf("DefineFaction(\"%s\", {\n", CFaction::Factions[i]->Ident.c_str());
+			f->printf("\tName = \"%s\",\n", CFaction::Factions[i]->Name.c_str());
 			f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[i].c_str());
-			if (PlayerRaces.Factions[i]->Type != FactionTypeNoFactionType) {
-				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(PlayerRaces.Factions[i]->Type).c_str());
+			if (CFaction::Factions[i]->Type != FactionTypeNoFactionType) {
+				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(CFaction::Factions[i]->Type).c_str());
 			}
-			if (PlayerRaces.Factions[i]->ParentFaction != -1) {
-				f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[PlayerRaces.Factions[i]->ParentFaction]->Ident.c_str());
+			if (CFaction::Factions[i]->ParentFaction != -1) {
+				f->printf("\tParentFaction = \"%s\",\n", CFaction::Factions[CFaction::Factions[i]->ParentFaction]->Ident.c_str());
 			}
-			if (PlayerRaces.Factions[i]->Colors.size() > 0) {
+			if (CFaction::Factions[i]->GetPrimaryColors().size() > 0) {
 				f->printf("\tColors = {");
-				for (size_t k = 0; k < PlayerRaces.Factions[i]->Colors.size(); ++k) {
-					f->printf("\"%s\", ", PlayerColorNames[PlayerRaces.Factions[i]->Colors[k]].c_str());
+				for (CPlayerColor *player_color : CFaction::Factions[i]->GetPrimaryColors()) {
+					f->printf("\"%s\", ", player_color->GetIdent().utf8().get_data());
 				}
 				f->printf("},\n");
 			}
-			if (!PlayerRaces.Factions[i]->FactionUpgrade.empty()) {
-				f->printf("\tFactionUpgrade = \"%s\",\n", PlayerRaces.Factions[i]->FactionUpgrade.c_str());
+			if (!CFaction::Factions[i]->FactionUpgrade.empty()) {
+				f->printf("\tFactionUpgrade = \"%s\",\n", CFaction::Factions[i]->FactionUpgrade.c_str());
 			}
 			f->printf("\tMod = \"%s\"\n", mod_file.c_str());
 			f->printf("})\n\n");
@@ -615,7 +617,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tCivilization = \"%s\",\n", type.GetCivilization()->GetIdent().utf8().get_data());
 			}
 			if (type.Faction != -1) {
-				f->printf("\tFaction = \"%s\",\n", PlayerRaces.Factions[type.Faction]->Ident.c_str());
+				f->printf("\tFaction = \"%s\",\n", CFaction::Factions[type.Faction]->Ident.c_str());
 			}
 			if (type.Class != -1) {
 				f->printf("\tClass = \"%s\",\n", UnitTypeClasses[type.Class].c_str());
@@ -851,7 +853,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, PlayerRaces.Name[CPlayer::Players[i]->Race].c_str());
 				if (CPlayer::Players[i]->Faction != -1) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
-							  i, PlayerRaces.Factions[CPlayer::Players[i]->Faction]->Ident.c_str());
+							  i, CFaction::Factions[CPlayer::Players[i]->Faction]->Ident.c_str());
 				}
 				f->printf("SetAiType(%d, \"%s\")\n",
 						  i, CPlayer::Players[i]->AiName.c_str());

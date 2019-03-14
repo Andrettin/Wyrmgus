@@ -46,6 +46,7 @@
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
+#include "faction.h"
 #include "font.h"
 #include "game.h"
 //Wyrmgus start
@@ -1433,7 +1434,7 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Settlement != nullptr && unit->Settlement->SiteUnit != nullptr) {
 				const CCivilization *civilization = unit->Settlement->SiteUnit->Type->GetCivilization();
-				if (civilization != nullptr && unit->Settlement->SiteUnit->Player->Faction != -1 && (CCivilization::Civilizations[unit->Settlement->SiteUnit->Player->Race] == civilization || unit->Settlement->SiteUnit->Type->Slot == PlayerRaces.GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->Faction, unit->Settlement->SiteUnit->Type->Class))) {
+				if (civilization != nullptr && unit->Settlement->SiteUnit->Player->Faction != -1 && (CCivilization::Civilizations[unit->Settlement->SiteUnit->Player->Race] == civilization || unit->Settlement->SiteUnit->Type->Slot == CFaction::GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->Faction, unit->Settlement->SiteUnit->Type->Class))) {
 					civilization = CCivilization::Civilizations[unit->Settlement->SiteUnit->Player->Race];
 				}
 				return unit->Settlement->GetCulturalName(civilization);
@@ -3541,11 +3542,11 @@ void SavePreferences()
 //Wyrmgus start
 void DeleteModFaction(const std::string &faction_name)
 {
-	int faction = PlayerRaces.GetFactionIndexByName(faction_name);
-	if (faction != -1 && !PlayerRaces.Factions[faction]->Mod.empty()) {
-		FactionStringToIndex.erase(PlayerRaces.Factions[faction]->Ident);
-		delete PlayerRaces.Factions[faction];
-		PlayerRaces.Factions.erase(std::remove(PlayerRaces.Factions.begin(), PlayerRaces.Factions.end(), PlayerRaces.Factions[faction]), PlayerRaces.Factions.end());
+	int faction = CFaction::GetFactionIndexByName(faction_name);
+	if (faction != -1 && !CFaction::Factions[faction]->Mod.empty()) {
+		FactionStringToIndex.erase(CFaction::Factions[faction]->Ident);
+		delete CFaction::Factions[faction];
+		CFaction::Factions.erase(std::remove(CFaction::Factions.begin(), CFaction::Factions.end(), CFaction::Factions[faction]), CFaction::Factions.end());
 	}
 }
 
@@ -3577,10 +3578,10 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 			}
 		}
 	}
-	for (size_t j = 0; j < PlayerRaces.Factions.size(); ++j) {
-		for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[j]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[j]->ClassUnitTypes.rend(); ++iterator) {
+	for (size_t j = 0; j < CFaction::Factions.size(); ++j) {
+		for (std::map<int, int>::reverse_iterator iterator = CFaction::Factions[j]->ClassUnitTypes.rbegin(); iterator != CFaction::Factions[j]->ClassUnitTypes.rend(); ++iterator) {
 			if (iterator->second == unit_type->Slot) {
-				PlayerRaces.Factions[j]->ClassUnitTypes.erase(iterator->first);
+				CFaction::Factions[j]->ClassUnitTypes.erase(iterator->first);
 			}
 		}
 	}
@@ -3640,12 +3641,12 @@ void DisableMod(const std::string &mod_file)
 		}
 	}
 	
-	int factions_size = PlayerRaces.Factions.size();
+	int factions_size = CFaction::Factions.size();
 	for (int i = (factions_size - 1); i >= 0; --i) {
-		if (PlayerRaces.Factions[i]->Mod == mod_file) {
-			FactionStringToIndex.erase(PlayerRaces.Factions[i]->Ident);
-			PlayerRaces.Factions.erase(std::remove(PlayerRaces.Factions.begin(), PlayerRaces.Factions.end(), PlayerRaces.Factions[i]), PlayerRaces.Factions.end());
-			delete PlayerRaces.Factions[i];
+		if (CFaction::Factions[i]->Mod == mod_file) {
+			FactionStringToIndex.erase(CFaction::Factions[i]->Ident);
+			CFaction::Factions.erase(std::remove(CFaction::Factions.begin(), CFaction::Factions.end(), CFaction::Factions[i]), CFaction::Factions.end());
+			delete CFaction::Factions[i];
 		}
 	}
 }

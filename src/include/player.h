@@ -35,7 +35,6 @@
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-#include "character.h" // because of "MaxCharacterTitles"
 #include "include/color.h"
 //Wyrmgus end
 #include "icon_config.h"
@@ -78,6 +77,7 @@ class CCurrency;
 class CDeity;
 class CDeityDomain;
 class CDynasty;
+class CFaction;
 class CFile;
 class CGraphic;
 class CLanguage;
@@ -461,38 +461,6 @@ protected:
 };
 
 //Wyrmgus start
-enum GovernmentTypes {
-	GovernmentTypeNoGovernmentType,
-	GovernmentTypeMonarchy,
-	GovernmentTypeRepublic,
-	GovernmentTypeTheocracy,
-	
-	MaxGovernmentTypes
-};
-
-enum FactionTypes {
-	FactionTypeNoFactionType,
-	FactionTypeTribe,
-	FactionTypePolity,
-	FactionTypeMercenaryCompany,
-	FactionTypeHolyOrder,
-	FactionTypeTradingCompany,
-	
-	MaxFactionTypes
-};
-
-enum FactionTiers {
-	FactionTierNoFactionTier,
-	FactionTierBarony,
-	FactionTierCounty,
-	FactionTierDuchy,
-	FactionTierGrandDuchy,
-	FactionTierKingdom,
-	FactionTierEmpire,
-	
-	MaxFactionTiers
-};
-
 enum ForceTypes {
 	LandForceType,
 	NavalForceType,
@@ -616,67 +584,6 @@ public:
 	bool PerSettlement = false;	/// Whether the building should be constructed for each settlement
 };
 
-class CFaction
-{
-public:
-	~CFaction();
-	
-	int GetUpgradePriority(const CUpgrade *upgrade) const;
-	int GetForceTypeWeight(int force_type) const;
-	CCurrency *GetCurrency() const;
-	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
-	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
-	const std::vector<std::string> &GetShipNames() const;
-
-	std::string Ident;													/// faction name
-	std::string Name;
-	std::string Description;											/// faction description
-	std::string Quote;													/// faction quote
-	std::string Background;												/// faction background
-	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
-	std::string Adjective;												/// adjective pertaining to the faction
-	std::string DefaultAI = "land-attack";
-	int ID = -1;														/// faction ID
-	CCivilization *Civilization = nullptr;								/// faction civilization
-	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
-	int DefaultTier = FactionTierBarony;								/// default faction tier
-	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
-	int ParentFaction = -1;												/// parent faction of this faction
-	bool Playable = true;												/// faction playability
-	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
-	IconConfig Icon;													/// Faction's icon
-	CCurrency *Currency = nullptr;										/// The faction's currency
-	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
-	LuaCallback *Conditions = nullptr;
-	std::vector<int> Colors;											/// faction colors
-	std::vector<CFaction *> DevelopsFrom;								/// from which factions can this faction develop
-	std::vector<CFaction *> DevelopsTo;									/// to which factions this faction can develop
-	std::vector<CDynasty *> Dynasties;									/// which dynasties are available to this faction
-	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
-	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
-	std::map<const CUpgrade *, int> UpgradePriorities;					/// Priority for each upgrade
-	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
-	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
-	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
-	std::vector<std::string> ProvinceNames;								/// Province names for the faction
-	std::vector<std::string> ShipNames;									/// Ship names for the faction
-	std::vector<CSite *> Cores;											/// Core sites of this faction (required to found it)
-	std::vector<CSite *> Sites;											/// Sites used for this faction if it needs a randomly-generated settlement
-	std::map<int, std::vector<CForceTemplate *>> ForceTemplates;		/// Force templates, mapped to each force type
-	std::map<int, int> ForceTypeWeights;								/// Weights for each force type
-	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;				/// AI building templates
-	std::map<std::tuple<CDate, CDate, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
-	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
-	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year
-	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
-	std::map<std::pair<CDate, CFaction *>, int> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
-	std::map<std::pair<CDate, int>, int> HistoricalResources;	/// dates in which this faction's storage of a particular resource changed; resource quantities mapped to date and resource
-	std::vector<std::pair<CDate, std::string>> HistoricalCapitals;		/// historical capitals of the faction; the values are: date and settlement ident
-	std::vector<CFiller> UIFillers;
-	
-	std::string Mod;													/// To which mod (or map), if any, this faction belongs
-};
-
 class CDynasty
 {
 public:
@@ -770,16 +677,11 @@ class PlayerRace
 public:
 	void Clean();
 	//Wyrmgus start
-	int GetFactionIndexByName(const std::string &faction_ident) const;
-	CFaction *GetFaction(const std::string &faction_ident) const;
 	CDynasty *GetDynasty(const std::string &dynasty_ident) const;
 	CLanguage *GetLanguage(const std::string &language_ident) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
-	int GetFactionClassUnitType(int faction, int class_id);
-	int GetFactionClassUpgrade(int faction, int class_id);
 	std::vector<CFiller> GetCivilizationUIFillers(int civilization);
-	std::vector<CFiller> GetFactionUIFillers(int faction);
 	std::string TranslateName(const std::string &name, CLanguage *language);
 	//Wyrmgus end
 
@@ -790,7 +692,6 @@ public:
 	std::map<int, int> CivilizationClassUnitTypes[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
 	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
-	std::vector<CFaction *> Factions;    								/// factions
 	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	std::vector<CDynasty *> Dynasties;    								/// dynasties

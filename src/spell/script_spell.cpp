@@ -36,6 +36,7 @@
 #include "spells.h"
 
 #include "civilization.h"
+#include "faction.h"
 #include "luacallback.h"
 //Wyrmgus start
 #include "player.h" // for making user of PlayerRaces
@@ -198,7 +199,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			}
 		} else if (!strcmp(value, "faction-equivalent")) {
 			value = LuaToString(l, -1, j + 1);
-			CFaction *faction = PlayerRaces.GetFaction(value);
+			CFaction *faction = CFaction::GetFaction(value);
 			if (faction) {
 				condition->FactionEquivalent = faction;
 			} else {

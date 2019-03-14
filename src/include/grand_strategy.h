@@ -36,12 +36,13 @@
 
 #include <vector>
 
-#include "map/map.h"
-#include "province.h"
 #include "character.h"
+#include "faction.h"
+#include "map/map.h"
+#include "player.h"
+#include "province.h"
 #include "vec2i.h"
 #include "video.h"
-#include "player.h"
 #include "upgrade/upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
