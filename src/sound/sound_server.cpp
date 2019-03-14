@@ -791,7 +791,7 @@ void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::stri
 		return;
 	}
 
-	if (!Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), subgroup.c_str())) {
+	if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), subgroup.c_str()) != OAML_OK) {
 		Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupRandom(group.c_str());
 	}
 }
@@ -805,7 +805,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 		return;
 	}
 
-	if (!Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str())) {
+	if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
 		CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
 		int faction = PlayerRaces.GetFactionIndexByName(faction_name);
 		int parent_faction = -1;
@@ -818,13 +818,13 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 				}
 				faction = parent_faction;
 				
-				if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[faction]->Ident.c_str())) {
+				if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[faction]->Ident.c_str()) == OAML_OK) {
 					found_music = true;
 					break;
 				}
 			}
 		}
-		if (!found_music && !Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str())) {
+		if (!found_music && Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
 			CCivilization *parent_civilization = nullptr;
 			if (civilization) {
 				while (true) {
@@ -834,7 +834,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 					}
 					civilization = parent_civilization;
 					
-					if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization->GetIdent().utf8().get_data())) {
+					if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization->GetIdent().utf8().get_data()) == OAML_OK) {
 						found_music = true;
 						break;
 					}
