@@ -72,12 +72,12 @@ bool EnableUnitDebug;            /// if enabled, a unit info dump will be create
 
 void PrintLocation(const char *file, int line, const char *funcName)
 {
-	fprintf(stdout, "%s:%d: %s: ", file, line, funcName);
+	fprintf(stdout, "%s:%i: %s: ", file, line, funcName);
 }
 
 void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
 {
-	fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", file, line, funcName, conditionStr);
+	fprintf(stderr, "Assertion failed at %s:%i: %s: %s\n", file, line, funcName, conditionStr);
 	abort();
 }
 

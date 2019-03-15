@@ -50,7 +50,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct Node {
+struct AStarNode {
 	int CostFromStart;  /// Real costs to reach this point
 	short int CostToGoal;     /// Estimated cost to goal
 	char InGoal;        /// is this point in the goal
@@ -92,8 +92,8 @@ const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
 
 /// cost matrix
 //Wyrmgus start
-//static Node *AStarMatrix;
-static std::vector<Node *> AStarMatrix;
+//static AStarNode *AStarMatrix;
+static std::vector<AStarNode *> AStarMatrix;
 //Wyrmgus end
 
 /// a list of close nodes, helps to speed up the matrix cleaning
@@ -290,8 +290,8 @@ void InitAStar()
 	AStarMapWidth = mapWidth;
 	AStarMapHeight = mapHeight;
 
-	AStarMatrixSize = sizeof(Node) * AStarMapWidth * AStarMapHeight;
-	AStarMatrix = new Node[AStarMapWidth * AStarMapHeight];
+	AStarMatrixSize = sizeof(AStarNode) * AStarMapWidth * AStarMapHeight;
+	AStarMatrix = new AStarNode[AStarMapWidth * AStarMapHeight];
 	memset(AStarMatrix, 0, AStarMatrixSize);
 
 	Threshold = AStarMapWidth * AStarMapHeight / MAX_CLOSE_SET_RATIO;
@@ -314,8 +314,8 @@ void InitAStar()
 		AStarMapWidth.push_back(CMap::Map.Info.MapWidths[z]);
 		AStarMapHeight.push_back(CMap::Map.Info.MapHeights[z]);
 		
-		AStarMatrixSize.push_back(sizeof(Node) * AStarMapWidth[z] * AStarMapHeight[z]);
-		AStarMatrix.push_back(new Node[AStarMapWidth[z] * AStarMapHeight[z]]);
+		AStarMatrixSize.push_back(sizeof(AStarNode) * AStarMapWidth[z] * AStarMapHeight[z]);
+		AStarMatrix.push_back(new AStarNode[AStarMapWidth[z] * AStarMapHeight[z]]);
 		memset(AStarMatrix[z], 0, AStarMatrixSize[z]);
 
 		Threshold.push_back(AStarMapWidth[z] * AStarMapHeight[z] / MAX_CLOSE_SET_RATIO);
@@ -1622,8 +1622,8 @@ StatsNode *AStarGetStats(int z)
 	//Wyrmgus end
 	StatsNode *s = stats;
 	//Wyrmgus start
-//	Node *m = AStarMatrix;
-	Node *m = AStarMatrix[z];
+//	AStarNode *m = AStarMatrix;
+	AStarNode *m = AStarMatrix[z];
 	//Wyrmgus end
 
 	//Wyrmgus start

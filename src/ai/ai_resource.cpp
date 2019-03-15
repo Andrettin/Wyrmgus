@@ -2152,7 +2152,7 @@ static void AiCheckPathwayConstruction()
 				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
-					int worker_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("worker"));
+					int worker_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), GetUnitTypeClassIndexByName("worker"));
 					if (worker_type_id != -1) {
 						CUnitType *test_worker_type = CUnitType::UnitTypes[worker_type_id];
 						
@@ -2297,7 +2297,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
-	int town_hall_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("town-hall"));			
+	int town_hall_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), GetUnitTypeClassIndexByName("town-hall"));			
 	if (town_hall_type_id == -1) {
 		return;
 	}
@@ -2390,7 +2390,7 @@ void AiCheckDockConstruction()
 		return;
 	}
 
-	int dock_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("dock"));			
+	int dock_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), GetUnitTypeClassIndexByName("dock"));			
 	if (dock_type_id == -1) {
 		return;
 	}
@@ -2504,7 +2504,7 @@ void AiCheckUpgrades()
 
 void AiCheckBuildings()
 {
-	if (AiPlayer->Player->Race == -1 || AiPlayer->Player->Faction == -1) {
+	if (AiPlayer->Player->Race == -1 || AiPlayer->Player->GetFaction() == nullptr) {
 		return;
 	}
 
@@ -2516,7 +2516,7 @@ void AiCheckBuildings()
 		return;
 	}
 
-	std::vector<CAiBuildingTemplate *> building_templates = CFaction::Factions[AiPlayer->Player->Faction]->GetAiBuildingTemplates();
+	std::vector<CAiBuildingTemplate *> building_templates = AiPlayer->Player->GetFaction()->GetAiBuildingTemplates();
 	std::vector<CAiBuildingTemplate *> potential_building_templates;
 	
 	int priority = 0;
@@ -2533,7 +2533,7 @@ void AiCheckBuildings()
 			break; //building templates are ordered by priority, so there is no need to go further
 		}
 		
-		int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->Faction, building_templates[i]->UnitClass);
+		int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), building_templates[i]->UnitClass);
 		CUnitType *type = nullptr;
 		if (unit_type_id != -1) {
 			type = CUnitType::UnitTypes[unit_type_id];
@@ -2573,7 +2573,7 @@ void AiCheckBuildings()
 	
 	CAiBuildingTemplate *building_template = potential_building_templates[SyncRand(potential_building_templates.size())];
 	
-	int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->Faction, building_template->UnitClass);
+	int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), building_template->UnitClass);
 	CUnitType *type = CUnitType::UnitTypes[unit_type_id];
 	
 	if (type->Slot < (int) AiHelpers.Build.size() && !AiHelpers.Build[type->Slot].empty()) { //constructed by worker
@@ -2587,7 +2587,7 @@ void AiCheckBuildings()
 
 static void AiCheckMinecartConstruction()
 {
-	int minecart_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("minecart"));
+	int minecart_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), GetUnitTypeClassIndexByName("minecart"));
 	if (minecart_type_id == -1) {
 		return;
 	}
@@ -2660,7 +2660,7 @@ static void AiCheckMinecartConstruction()
 
 static void AiCheckMinecartSalvaging()
 {
-	int minecart_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->Faction, GetUnitTypeClassIndexByName("minecart"));
+	int minecart_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), GetUnitTypeClassIndexByName("minecart"));
 	if (minecart_type_id == -1) {
 		return;
 	}
@@ -2702,7 +2702,7 @@ static void AiCheckMinecartSalvaging()
 	
 void AiCheckWorkers()
 {
-	if (AiPlayer->Player->Race == -1 || AiPlayer->Player->Faction == -1) {
+	if (AiPlayer->Player->Race == -1 || AiPlayer->Player->GetFaction() == nullptr) {
 		return;
 	}
 

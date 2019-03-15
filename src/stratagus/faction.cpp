@@ -94,55 +94,55 @@ CFaction *CFaction::GetFaction(const std::string &faction_ident)
 	}
 }
 
-int CFaction::GetFactionClassUnitType(int faction, int class_id)
+int CFaction::GetFactionClassUnitType(const CFaction *faction, int class_id)
 {
-	if (faction == -1 || class_id == -1) {
+	if (faction == nullptr || class_id == -1) {
 		return -1;
 	}
 	
-	if (CFaction::Factions[faction]->ClassUnitTypes.find(class_id) != CFaction::Factions[faction]->ClassUnitTypes.end()) {
-		return CFaction::Factions[faction]->ClassUnitTypes[class_id];
+	if (faction->ClassUnitTypes.find(class_id) != faction->ClassUnitTypes.end()) {
+		return faction->ClassUnitTypes.find(class_id)->second;
 	}
 	
-	if (CFaction::Factions[faction]->ParentFaction != -1) {
-		return CFaction::GetFactionClassUnitType(CFaction::Factions[faction]->ParentFaction, class_id);
+	if (faction->ParentFaction != -1) {
+		return CFaction::GetFactionClassUnitType(CFaction::Factions[faction->ParentFaction], class_id);
 	}
 	
-	return PlayerRaces.GetCivilizationClassUnitType(CFaction::Factions[faction]->Civilization->ID, class_id);
+	return PlayerRaces.GetCivilizationClassUnitType(faction->Civilization->ID, class_id);
 }
 
-int CFaction::GetFactionClassUpgrade(int faction, int class_id)
+int CFaction::GetFactionClassUpgrade(const CFaction *faction, int class_id)
 {
-	if (faction == -1 || class_id == -1) {
+	if (faction == nullptr || class_id == -1) {
 		return -1;
 	}
 	
-	if (CFaction::Factions[faction]->ClassUpgrades.find(class_id) != CFaction::Factions[faction]->ClassUpgrades.end()) {
-		return CFaction::Factions[faction]->ClassUpgrades[class_id];
+	if (faction->ClassUpgrades.find(class_id) != faction->ClassUpgrades.end()) {
+		return faction->ClassUpgrades.find(class_id)->second;
 	}
 		
-	if (CFaction::Factions[faction]->ParentFaction != -1) {
-		return CFaction::GetFactionClassUpgrade(CFaction::Factions[faction]->ParentFaction, class_id);
+	if (faction->ParentFaction != -1) {
+		return CFaction::GetFactionClassUpgrade(CFaction::Factions[faction->ParentFaction], class_id);
 	}
 	
-	return PlayerRaces.GetCivilizationClassUpgrade(CFaction::Factions[faction]->Civilization->ID, class_id);
+	return PlayerRaces.GetCivilizationClassUpgrade(faction->Civilization->ID, class_id);
 }
 
-std::vector<CFiller> CFaction::GetFactionUIFillers(int faction)
+std::vector<CFiller> CFaction::GetFactionUIFillers(const CFaction *faction)
 {
-	if (faction == -1) {
+	if (faction == nullptr) {
 		return std::vector<CFiller>();
 	}
 	
-	if (CFaction::Factions[faction]->UIFillers.size() > 0) {
-		return CFaction::Factions[faction]->UIFillers;
+	if (faction->UIFillers.size() > 0) {
+		return faction->UIFillers;
 	}
 		
-	if (CFaction::Factions[faction]->ParentFaction != -1) {
-		return CFaction::GetFactionUIFillers(CFaction::Factions[faction]->ParentFaction);
+	if (faction->ParentFaction != -1) {
+		return CFaction::GetFactionUIFillers(CFaction::Factions[faction->ParentFaction]);
 	}
 	
-	return PlayerRaces.GetCivilizationUIFillers(CFaction::Factions[faction]->Civilization->ID);
+	return PlayerRaces.GetCivilizationUIFillers(faction->Civilization->ID);
 }
 
 int CFaction::GetUpgradePriority(const CUpgrade *upgrade) const

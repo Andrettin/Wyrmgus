@@ -422,7 +422,7 @@ static void ParseJoinGame(Session *session, char *buf)
 		return;
 	}
 
-	DebugPrint("%s joined game %d\n" _C_ session->UserData.Name _C_ atoi(id));
+	DebugPrint("%s joined game %i\n" _C_ session->UserData.Name _C_ atoi(id));
 	Send(session, "JOINGAME_OK\n");
 }
 

@@ -361,11 +361,9 @@ static void AiCheckUnits()
 	
 	//Wyrmgus start
 	//check if any factions can be founded, and if so, pick one randomly
-	if (AiPlayer->Player->Faction != -1 && AiPlayer->Player->NumTownHalls > 0) {
+	if (AiPlayer->Player->GetFaction() != nullptr && AiPlayer->Player->NumTownHalls > 0) {
 		std::vector<CFaction *> potential_factions;
-		for (size_t i = 0; i < CFaction::Factions[AiPlayer->Player->Faction]->DevelopsTo.size(); ++i) {
-			CFaction *possible_faction = CFaction::Factions[AiPlayer->Player->Faction]->DevelopsTo[i];
-			
+		for (CFaction *possible_faction : AiPlayer->Player->GetFaction()->DevelopsTo) {
 			if (!AiPlayer->Player->CanFoundFaction(possible_faction)) {
 				continue;
 			}
@@ -379,9 +377,7 @@ static void AiCheckUnits()
 		
 		if (!AiPlayer->Player->Dynasty) { //if the AI player has no dynasty, pick one if available
 			std::vector<CDynasty *> potential_dynasties;
-			for (size_t i = 0; i < CFaction::Factions[AiPlayer->Player->Faction]->Dynasties.size(); ++i) {
-				CDynasty *possible_dynasty = CFaction::Factions[AiPlayer->Player->Faction]->Dynasties[i];
-				
+			for (CDynasty *possible_dynasty : AiPlayer->Player->GetFaction()->Dynasties) {
 				if (!AiPlayer->Player->CanChooseDynasty(possible_dynasty)) {
 					continue;
 				}
@@ -1434,7 +1430,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	if (unit.Player == what.Player) {
 		AiRemoveFromBuilt(what.Player->Ai, *what.Type, CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 	} else { //remove the request of the unit the mercenary is substituting
-		int requested_unit_type_id = CFaction::GetFactionClassUnitType(what.Player->Faction, what.Type->Class);
+		int requested_unit_type_id = CFaction::GetFactionClassUnitType(what.Player->GetFaction(), what.Type->Class);
 		if (requested_unit_type_id != -1) {
 			AiRemoveFromBuilt(what.Player->Ai, *CUnitType::UnitTypes[requested_unit_type_id], CMap::Map.GetTileLandmass(what.tilePos, what.MapLayer->ID), what.Settlement);
 		}
@@ -1513,7 +1509,7 @@ void AiEachSecond(CPlayer &player)
 
 	//Wyrmgus start
 	//if doesn't have a faction, set a random one for the AI
-	if (player.Faction == -1) {
+	if (player.GetFaction() == nullptr) {
 		player.SetRandomFaction();
 	}
 	//Wyrmgus end

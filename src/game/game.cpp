@@ -851,9 +851,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  CPlayer::Players[i]->Resources[StoneCost]);
 				f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
 						  i, PlayerRaces.Name[CPlayer::Players[i]->Race].c_str());
-				if (CPlayer::Players[i]->Faction != -1) {
+				if (CPlayer::Players[i]->GetFaction() != nullptr) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
-							  i, CFaction::Factions[CPlayer::Players[i]->Faction]->Ident.c_str());
+							  i, CPlayer::Players[i]->GetFaction()->Ident.c_str());
 				}
 				f->printf("SetAiType(%d, \"%s\")\n",
 						  i, CPlayer::Players[i]->AiName.c_str());

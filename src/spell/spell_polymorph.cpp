@@ -118,7 +118,7 @@
 	if (this->NewForm == nullptr) {
 		int new_unit_type = -1;
 		if (this->Civilization != -1 && this->Faction != -1 && CCivilization::Civilizations[this->Civilization] == target->Type->GetCivilization()) { //get faction equivalent, if is of the same civilization
-			new_unit_type = CFaction::GetFactionClassUnitType(this->Faction, target->Type->Class);
+			new_unit_type = CFaction::GetFactionClassUnitType(CFaction::Factions[this->Faction], target->Type->Class);
 		} else if (this->Civilization != -1 && CCivilization::Civilizations[this->Civilization] != target->Type->GetCivilization()) {
 			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Civilization, target->Type->Class);
 		}

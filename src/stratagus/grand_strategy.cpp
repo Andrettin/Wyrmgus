@@ -853,7 +853,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 		return false;
 	}
 	
-	int technology_id = CFaction::GetFactionClassUpgrade(this->Faction, GetUpgradeClassIndexByName(technology_class_name));
+	int technology_id = CFaction::GetFactionClassUpgrade(this->Faction != -1 ? CFaction::Factions[this->Faction] : nullptr, GetUpgradeClassIndexByName(technology_class_name));
 	
 	if (technology_id != -1 && this->Technologies[technology_id] == true) {
 		return true;

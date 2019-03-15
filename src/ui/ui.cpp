@@ -260,8 +260,8 @@ void CUserInterface::Load()
 	CleanUserInterfaceFillers();
 	std::vector<CFiller> new_ui_fillers;
 	if (CPlayer::GetThisPlayer()) {
-		if (CPlayer::GetThisPlayer()->Faction != -1) {
-			new_ui_fillers = CFaction::GetFactionUIFillers(CPlayer::GetThisPlayer()->Faction);
+		if (CPlayer::GetThisPlayer()->GetFaction() != nullptr) {
+			new_ui_fillers = CFaction::GetFactionUIFillers(CPlayer::GetThisPlayer()->GetFaction());
 		} else {
 			new_ui_fillers = PlayerRaces.GetCivilizationUIFillers(CPlayer::GetThisPlayer()->Race);
 		}

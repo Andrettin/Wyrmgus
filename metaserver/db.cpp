@@ -224,7 +224,7 @@ int DBAddUser(char *username, char *password)
 	char *errmsg;
 
 	t = (int)time(0);
-	sprintf(buf, "INSERT INTO players VALUES('%s', '%s', %d, %d);",
+	sprintf(buf, "INSERT INTO players VALUES('%s', '%s', %i, %i);",
 		username, password, t, t);
 	if (sqlite3_exec(DB, buf, NULL, NULL, &errmsg) != SQLITE_OK) {
 		fprintf(stderr, "SQL error: %s\n", errmsg);
@@ -248,7 +248,7 @@ int DBUpdateLoginDate(char *username)
 	char *errmsg;
 
 	t = (int)time(0);
-	sprintf(buf, "UPDATE players SET last_login_date = %d WHERE username = '%s'",
+	sprintf(buf, "UPDATE players SET last_login_date = %i WHERE username = '%s'",
 		t, username);
 	if (sqlite3_exec(DB, buf, NULL, NULL, &errmsg) != SQLITE_OK) {
 		fprintf(stderr, "SQL error: %s\n", errmsg);

@@ -143,7 +143,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 		case UnitActionMove:
 			break;
 		default:
-			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
+			DebugPrint("FIXME: %i: %d(%s) killed, with order %d!\n" _C_
 					   unit.Player->Index _C_ UnitNumber(unit) _C_
 					   unit.Type->Ident.c_str() _C_ Action);
 			break;
@@ -614,7 +614,7 @@ static void DumpUnitInfo(CUnit &unit)
 		char buf[256];
 
 		//TODO should the filename be changed to reflect the new engine name?
-		snprintf(buf, sizeof(buf), "log_of_stratagus_%d.log", CPlayer::GetThisPlayer()->Index);
+		snprintf(buf, sizeof(buf), "log_of_stratagus_%i.log", CPlayer::GetThisPlayer()->Index);
 		logf = fopen(buf, "wb");
 		if (!logf) {
 			return ;
@@ -626,7 +626,7 @@ static void DumpUnitInfo(CUnit &unit)
 	}
 
 	fprintf(logf, "%lu: ", GameCycle);
-	fprintf(logf, "%d %s %d P%d Refs %d: %X %d,%d %d,%d\n",
+	fprintf(logf, "%d %s %d P%i Refs %d: %X %d,%d %d,%d\n",
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
 			!unit.Orders.empty() ? unit.CurrentAction() : -1,
 			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,

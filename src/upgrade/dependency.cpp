@@ -486,9 +486,9 @@ bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignor
 		return false;
 	}
 
-	if (player->Faction != -1 && CFaction::Factions[player->Faction]->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
-		if (CFaction::Factions[player->Faction]->HolyOrderDeity) {
-			CUpgrade *deity_upgrade = CFaction::Factions[player->Faction]->HolyOrderDeity->DeityUpgrade;
+	if (player->GetFaction() != nullptr && player->GetFaction()->Type == FactionTypeHolyOrder) { // if the player is a holy order, and the upgrade is incompatible with its deity, don't allow it
+		if (player->GetFaction()->HolyOrderDeity) {
+			CUpgrade *deity_upgrade = player->GetFaction()->HolyOrderDeity->DeityUpgrade;
 			if (deity_upgrade) {
 				for (CUpgradeModifier *upgrade_modifier : target->UpgradeModifiers) {
 					if (std::find(upgrade_modifier->RemoveUpgrades.begin(), upgrade_modifier->RemoveUpgrades.end(), deity_upgrade) != upgrade_modifier->RemoveUpgrades.end()) {

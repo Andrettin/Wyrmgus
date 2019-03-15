@@ -650,7 +650,7 @@ void SavePlayers(CFile &file)
 		CPlayer::Players[i]->Save(file);
 	}
 
-	file.printf("SetThisPlayer(%d)\n\n", CPlayer::GetThisPlayer()->Index);
+	file.printf("SetThisPlayer(%i)\n\n", CPlayer::GetThisPlayer()->Index);
 }
 
 void CPlayer::SetThisPlayer(CPlayer *player)
@@ -690,12 +690,12 @@ CPlayer *CPlayer::GetPlayer(const int index)
 	std::shared_lock<std::shared_mutex> lock(PlayerMutex);
 	
 	if (index < 0) {
-		fprintf(stderr, "Cannot get player for index %d: the index is negative.\n", index);
+		fprintf(stderr, "Cannot get player for index %i: the index is negative.\n", index);
 		return nullptr;
 	}
 	
 	if (index >= PlayerMax) {
-		fprintf(stderr, "Cannot get player for index %d: the maximum value is %d.\n", index, PlayerMax);
+		fprintf(stderr, "Cannot get player for index %i: the maximum value is %i.\n", index, PlayerMax);
 		return nullptr;
 	}
 	
@@ -704,60 +704,59 @@ CPlayer *CPlayer::GetPlayer(const int index)
 
 void CPlayer::Save(CFile &file) const
 {
-	const CPlayer &p = *this;
-	file.printf("Player(%d,\n", this->Index);
+	file.printf("Player(%i,\n", this->Index);
 	//Wyrmgus start
-	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
-	if (p.Faction != -1) {
-		file.printf(" \"faction\", %d,", p.Faction);
+	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[this->Race].c_str());
+	if (this->Faction != nullptr) {
+		file.printf(" \"faction\", %i,", this->Faction->ID);
 	}
-	if (p.Dynasty) {
-		file.printf(" \"dynasty\", \"%s\",", p.Dynasty->Ident.c_str());
+	if (this->Dynasty != nullptr) {
+		file.printf(" \"dynasty\", \"%s\",", this->Dynasty->Ident.c_str());
 	}
-	if (p.Age) {
-		file.printf(" \"age\", \"%s\",", p.Age->Ident.c_str());
+	if (this->Age != nullptr) {
+		file.printf(" \"age\", \"%s\",", this->Age->Ident.c_str());
 	}
 	for (int i = 0; i < PlayerColorMax; ++i) {
 		if (PlayerColors[i][0] == this->Color) {
-			file.printf(" \"color\", %d,", i);
+			file.printf(" \"color\", %u,", i);
 			break;
 		}
 	}
 	//Wyrmgus end
-	file.printf("  \"name\", \"%s\",\n", p.Name.c_str());
+	file.printf("  \"name\", \"%s\",\n", this->Name.c_str());
 	file.printf("  \"type\", ");
-	switch (p.Type) {
+	switch (this->Type) {
 		case PlayerNeutral:       file.printf("\"neutral\",");         break;
 		case PlayerNobody:        file.printf("\"nobody\",");          break;
 		case PlayerComputer:      file.printf("\"computer\",");        break;
 		case PlayerPerson:        file.printf("\"person\",");          break;
 		case PlayerRescuePassive: file.printf("\"rescue-passive\","); break;
 		case PlayerRescueActive:  file.printf("\"rescue-active\","); break;
-		default:                  file.printf("%d,", p.Type); break;
+		default:                  file.printf("%i,", this->Type); break;
 	}
 	//Wyrmgus start
-//	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
+//	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[this->Race].c_str());
 	//Wyrmgus end
-	file.printf(" \"ai-name\", \"%s\",\n", p.AiName.c_str());
-	file.printf("  \"team\", %d,", p.Team);
+	file.printf(" \"ai-name\", \"%s\",\n", this->AiName.c_str());
+	file.printf("  \"team\", %i,", this->Team);
 
 	file.printf(" \"enemy\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
-		file.printf("%c", (p.Enemy & (1 << j)) ? 'X' : '_');
+		file.printf("%c", (this->Enemy & (1 << j)) ? 'X' : '_');
 	}
 	file.printf("\", \"allied\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
-		file.printf("%c", (p.Allied & (1 << j)) ? 'X' : '_');
+		file.printf("%c", (this->Allied & (1 << j)) ? 'X' : '_');
 	}
 	file.printf("\", \"shared-vision\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
-		file.printf("%c", (p.SharedVision & (1 << j)) ? 'X' : '_');
+		file.printf("%c", (this->SharedVision & (1 << j)) ? 'X' : '_');
 	}
-	file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
+	file.printf("\",\n  \"start\", {%hi, %hi},\n", this->StartPos.x, this->StartPos.y);
 	//Wyrmgus start
-	file.printf("  \"start-map-layer\", %d,\n", p.StartMapLayer);
-	if (p.Overlord) {
-		file.printf("  \"overlord\", %d,\n", p.Overlord->Index);
+	file.printf("  \"start-map-layer\", %i,\n", this->StartMapLayer);
+	if (this->Overlord) {
+		file.printf("  \"overlord\", %i,\n", this->Overlord->Index);
 	}
 	//Wyrmgus end
 
@@ -765,36 +764,36 @@ void CPlayer::Save(CFile &file) const
 	file.printf("  \"resources\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
 		//Wyrmgus start
-		if (!p.Resources[j]) {
+		if (!this->Resources[j]) {
 			continue;
 		}
 		//Wyrmgus end
-		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Resources[j]);
+		file.printf("\"%s\", %i, ", DefaultResourceNames[j].c_str(), this->Resources[j]);
 	}
 	// Stored Resources
 	file.printf("},\n  \"stored-resources\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
 		//Wyrmgus start
-		if (!p.StoredResources[j]) {
+		if (!this->StoredResources[j]) {
 			continue;
 		}
 		//Wyrmgus end
-		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.StoredResources[j]);
+		file.printf("\"%s\", %i, ", DefaultResourceNames[j].c_str(), this->StoredResources[j]);
 	}
 	// Max Resources
 	file.printf("},\n  \"max-resources\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
-		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.MaxResources[j]);
+		file.printf("\"%s\", %i, ", DefaultResourceNames[j].c_str(), this->MaxResources[j]);
 	}
 	// Last Resources
 	file.printf("},\n  \"last-resources\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
 		//Wyrmgus start
-		if (!p.LastResources[j]) {
+		if (!this->LastResources[j]) {
 			continue;
 		}
 		//Wyrmgus end
-		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.LastResources[j]);
+		file.printf("\"%s\", %i, ", DefaultResourceNames[j].c_str(), this->LastResources[j]);
 	}
 	// Incomes
 	file.printf("},\n  \"incomes\", {");
@@ -806,7 +805,7 @@ void CPlayer::Save(CFile &file) const
 				file.printf(" ");
 			}
 		}
-		file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Incomes[j]);
+		file.printf("\"%s\", %i,", DefaultResourceNames[j].c_str(), this->Incomes[j]);
 	}
 	// Revenue
 	file.printf("},\n  \"revenue\", {");
@@ -819,9 +818,9 @@ void CPlayer::Save(CFile &file) const
 //				file.printf(" ");
 //			}
 //		}
-//		file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Revenue[j]);
-		if (p.Revenue[j]) {
-			file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Revenue[j]);
+//		file.printf("\"%s\", %i,", DefaultResourceNames[j].c_str(), this->Revenue[j]);
+		if (this->Revenue[j]) {
+			file.printf("\"%s\", %i, ", DefaultResourceNames[j].c_str(), this->Revenue[j]);
 		}
 		//Wyrmgus end
 	}
@@ -829,15 +828,15 @@ void CPlayer::Save(CFile &file) const
 	//Wyrmgus start
 	file.printf("},\n  \"prices\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
-		if (p.Prices[j]) {
-			file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Prices[j]);
+		if (this->Prices[j]) {
+			file.printf("\"%s\", %i, ", DefaultResourceNames[j].c_str(), this->Prices[j]);
 		}
 	}
 	//Wyrmgus end
 
 	// UnitTypesCount done by load units.
 
-	file.printf("},\n  \"%s\",\n", p.AiEnabled ? "ai-enabled" : "ai-disabled");
+	file.printf("},\n  \"%s\",\n", this->AiEnabled ? "ai-enabled" : "ai-disabled");
 
 	// Ai done by load ais.
 	// Units done by load units.
@@ -845,44 +844,44 @@ void CPlayer::Save(CFile &file) const
 	// NumBuildings done by load units.
 	
 	//Wyrmgus start
-	if (p.Revealed) {
+	if (this->Revealed) {
 		file.printf(" \"revealed\",");
 	}
 	//Wyrmgus end
 	
-	file.printf(" \"supply\", %d,", p.Supply);
-	file.printf(" \"trade-cost\", %d,", p.TradeCost);
-	file.printf(" \"unit-limit\", %d,", p.UnitLimit);
-	file.printf(" \"building-limit\", %d,", p.BuildingLimit);
-	file.printf(" \"total-unit-limit\", %d,", p.TotalUnitLimit);
+	file.printf(" \"supply\", %i,", this->Supply);
+	file.printf(" \"trade-cost\", %i,", this->TradeCost);
+	file.printf(" \"unit-limit\", %i,", this->UnitLimit);
+	file.printf(" \"building-limit\", %i,", this->BuildingLimit);
+	file.printf(" \"total-unit-limit\", %i,", this->TotalUnitLimit);
 
-	file.printf("\n  \"score\", %d,", p.Score);
-	file.printf("\n  \"total-units\", %d,", p.TotalUnits);
-	file.printf("\n  \"total-buildings\", %d,", p.TotalBuildings);
+	file.printf("\n  \"score\", %i,", this->Score);
+	file.printf("\n  \"total-units\", %i,", this->TotalUnits);
+	file.printf("\n  \"total-buildings\", %i,", this->TotalBuildings);
 	file.printf("\n  \"total-resources\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("%d,", p.TotalResources[j]);
+		file.printf("%i,", this->TotalResources[j]);
 	}
 	file.printf("},");
-	file.printf("\n  \"total-razings\", %d,", p.TotalRazings);
-	file.printf("\n  \"total-kills\", %d,", p.TotalKills);
+	file.printf("\n  \"total-razings\", %i,", this->TotalRazings);
+	file.printf("\n  \"total-kills\", %i,", this->TotalKills);
 	//Wyrmgus start
 	file.printf("\n  \"unit-type-kills\", {");
 	for (size_t i = 0; i < CUnitType::UnitTypes.size(); ++i) {
-		if (p.UnitTypeKills[i] != 0) {
-			file.printf("\"%s\", %d, ", CUnitType::UnitTypes[i]->Ident.c_str(), p.UnitTypeKills[i]);
+		if (this->UnitTypeKills[i] != 0) {
+			file.printf("\"%s\", %i, ", CUnitType::UnitTypes[i]->Ident.c_str(), this->UnitTypeKills[i]);
 		}
 	}
 	file.printf("},");
 	//Wyrmgus end
-	if (p.LostTownHallTimer != 0) {
-		file.printf("\n  \"lost-town-hall-timer\", %d,", p.LostTownHallTimer);
+	if (this->LostTownHallTimer != 0) {
+		file.printf("\n  \"lost-town-hall-timer\", %i,", this->LostTownHallTimer);
 	}
-	if (p.HeroCooldownTimer != 0) {
-		file.printf("\n  \"hero-cooldown-timer\", %d,", p.HeroCooldownTimer);
+	if (this->HeroCooldownTimer != 0) {
+		file.printf("\n  \"hero-cooldown-timer\", %i,", this->HeroCooldownTimer);
 	}
 	//Wyrmgus end
 
@@ -891,7 +890,7 @@ void CPlayer::Save(CFile &file) const
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("%d,", p.SpeedResourcesHarvest[j]);
+		file.printf("%i,", this->SpeedResourcesHarvest[j]);
 	}
 	file.printf("},");
 	file.printf("\n  \"speed-resource-return\", {");
@@ -899,97 +898,97 @@ void CPlayer::Save(CFile &file) const
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("%d,", p.SpeedResourcesReturn[j]);
+		file.printf("%i,", this->SpeedResourcesReturn[j]);
 	}
 	file.printf("},");
-	file.printf("\n  \"speed-build\", %d,", p.SpeedBuild);
-	file.printf("\n  \"speed-train\", %d,", p.SpeedTrain);
-	file.printf("\n  \"speed-upgrade\", %d,", p.SpeedUpgrade);
-	file.printf("\n  \"speed-research\", %d,", p.SpeedResearch);
+	file.printf("\n  \"speed-build\", %i,", this->SpeedBuild);
+	file.printf("\n  \"speed-train\", %i,", this->SpeedTrain);
+	file.printf("\n  \"speed-upgrade\", %i,", this->SpeedUpgrade);
+	file.printf("\n  \"speed-research\", %i,", this->SpeedResearch);
 	
 	//Wyrmgus start
 	/*
 	Uint8 r, g, b;
 
-	SDL_GetRGB(p.Color, TheScreen->format, &r, &g, &b);
-	file.printf("\n  \"color\", { %d, %d, %d },", r, g, b);
+	SDL_GetRGB(this->Color, TheScreen->format, &r, &g, &b);
+	file.printf("\n  \"color\", { %hhu, %hhu, %hhu },", r, g, b);
 	*/
 	//Wyrmgus end
 
 	//Wyrmgus start
 	file.printf("\n  \"current-quests\", {");
-	for (size_t j = 0; j < p.CurrentQuests.size(); ++j) {
+	for (size_t j = 0; j < this->CurrentQuests.size(); ++j) {
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\",", p.CurrentQuests[j]->Ident.c_str());
+		file.printf("\"%s\",", this->CurrentQuests[j]->Ident.c_str());
 	}
 	file.printf("},");
 	
 	file.printf("\n  \"completed-quests\", {");
-	for (size_t j = 0; j < p.CompletedQuests.size(); ++j) {
+	for (size_t j = 0; j < this->CompletedQuests.size(); ++j) {
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\",", p.CompletedQuests[j]->Ident.c_str());
+		file.printf("\"%s\",", this->CompletedQuests[j]->Ident.c_str());
 	}
 	file.printf("},");
 	
 	file.printf("\n  \"quest-objectives\", {");
-	for (size_t j = 0; j < p.QuestObjectives.size(); ++j) {
+	for (size_t j = 0; j < this->QuestObjectives.size(); ++j) {
 		if (j) {
 			file.printf(" ");
 		}
 		file.printf("{");
-		file.printf("\"quest\", \"%s\",", p.QuestObjectives[j]->Quest->Ident.c_str());
-		file.printf("\"objective-type\", \"%s\",", GetQuestObjectiveTypeNameById(p.QuestObjectives[j]->ObjectiveType).c_str());
-		file.printf("\"objective-string\", \"%s\",", p.QuestObjectives[j]->ObjectiveString.c_str());
-		file.printf("\"quantity\", %d,", p.QuestObjectives[j]->Quantity);
-		file.printf("\"counter\", %d,", p.QuestObjectives[j]->Counter);
-		if (p.QuestObjectives[j]->Resource != -1) {
-			file.printf("\"resource\", \"%s\",", DefaultResourceNames[p.QuestObjectives[j]->Resource].c_str());
+		file.printf("\"quest\", \"%s\",", this->QuestObjectives[j]->Quest->Ident.c_str());
+		file.printf("\"objective-type\", \"%s\",", GetQuestObjectiveTypeNameById(this->QuestObjectives[j]->ObjectiveType).c_str());
+		file.printf("\"objective-string\", \"%s\",", this->QuestObjectives[j]->ObjectiveString.c_str());
+		file.printf("\"quantity\", %i,", this->QuestObjectives[j]->Quantity);
+		file.printf("\"counter\", %i,", this->QuestObjectives[j]->Counter);
+		if (this->QuestObjectives[j]->Resource != -1) {
+			file.printf("\"resource\", \"%s\",", DefaultResourceNames[this->QuestObjectives[j]->Resource].c_str());
 		}
-		if (p.QuestObjectives[j]->UnitClass != -1) {
-			file.printf("\"unit-class\", \"%s\",", UnitTypeClasses[p.QuestObjectives[j]->UnitClass].c_str());
+		if (this->QuestObjectives[j]->UnitClass != -1) {
+			file.printf("\"unit-class\", \"%s\",", UnitTypeClasses[this->QuestObjectives[j]->UnitClass].c_str());
 		}
-		for (const CUnitType *unit_type : p.QuestObjectives[j]->UnitTypes) {
+		for (const CUnitType *unit_type : this->QuestObjectives[j]->UnitTypes) {
 			file.printf("\"unit-type\", \"%s\",", unit_type->Ident.c_str());
 		}
-		if (p.QuestObjectives[j]->Upgrade) {
-			file.printf("\"upgrade\", \"%s\",", p.QuestObjectives[j]->Upgrade->Ident.c_str());
+		if (this->QuestObjectives[j]->Upgrade) {
+			file.printf("\"upgrade\", \"%s\",", this->QuestObjectives[j]->Upgrade->Ident.c_str());
 		}
-		if (p.QuestObjectives[j]->Character) {
-			file.printf("\"character\", \"%s\",", p.QuestObjectives[j]->Character->Ident.c_str());
+		if (this->QuestObjectives[j]->Character) {
+			file.printf("\"character\", \"%s\",", this->QuestObjectives[j]->Character->Ident.c_str());
 		}
-		if (p.QuestObjectives[j]->Unique) {
-			file.printf("\"unique\", \"%s\",", p.QuestObjectives[j]->Unique->Ident.c_str());
+		if (this->QuestObjectives[j]->Unique) {
+			file.printf("\"unique\", \"%s\",", this->QuestObjectives[j]->Unique->Ident.c_str());
 		}
-		if (p.QuestObjectives[j]->Settlement) {
-			file.printf("\"settlement\", \"%s\",", p.QuestObjectives[j]->Settlement->Ident.c_str());
+		if (this->QuestObjectives[j]->Settlement) {
+			file.printf("\"settlement\", \"%s\",", this->QuestObjectives[j]->Settlement->Ident.c_str());
 		}
-		if (p.QuestObjectives[j]->Faction) {
-			file.printf("\"faction\", \"%s\",", p.QuestObjectives[j]->Faction->Ident.c_str());
+		if (this->QuestObjectives[j]->Faction) {
+			file.printf("\"faction\", \"%s\",", this->QuestObjectives[j]->Faction->Ident.c_str());
 		}
 		file.printf("},");
 	}
 	file.printf("},");
 	
 	file.printf("\n  \"modifiers\", {");
-	for (size_t j = 0; j < p.Modifiers.size(); ++j) {
+	for (size_t j = 0; j < this->Modifiers.size(); ++j) {
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\", %d,", p.Modifiers[j].first->Ident.c_str(), p.Modifiers[j].second);
+		file.printf("\"%s\", %i,", this->Modifiers[j].first->Ident.c_str(), this->Modifiers[j].second);
 	}
 	file.printf("},");
 	//Wyrmgus end
 
 	file.printf("\n  \"autosell-resources\", {");
-	for (size_t j = 0; j < p.AutosellResources.size(); ++j) {
+	for (size_t j = 0; j < this->AutosellResources.size(); ++j) {
 		if (j) {
 			file.printf(" ");
 		}
-		file.printf("\"%s\",", DefaultResourceNames[p.AutosellResources[j]].c_str());
+		file.printf("\"%s\",", DefaultResourceNames[this->AutosellResources[j]].c_str());
 	}
 	file.printf("},");
 	
@@ -1005,14 +1004,14 @@ void CPlayer::Save(CFile &file) const
 //		if (j) {
 //			file.printf(" ,");
 //		}
-//		file.printf("%d", p.UpgradeTimers.Upgrades[j]);
-		if (p.UpgradeTimers.Upgrades[j]) {
+//		file.printf("%i", this->UpgradeTimers.Upgrades[j]);
+		if (this->UpgradeTimers.Upgrades[j]) {
 			if (first) {
 				first = false;
 			} else {
 				file.printf(", ");
 			}
-			file.printf("\"%s\", %d", AllUpgrades[j]->Ident.c_str(), p.UpgradeTimers.Upgrades[j]);
+			file.printf("\"%s\", %i", AllUpgrades[j]->Ident.c_str(), this->UpgradeTimers.Upgrades[j]);
 		}
 		//Wyrmgus end
 	}
@@ -1047,7 +1046,7 @@ CPlayer *GetFactionPlayer(const CFaction *faction)
 	}
 	
 	for (int i = 0; i < NumPlayers; ++i) {
-		if (CPlayer::Players[i]->Race == faction->Civilization->ID && CPlayer::Players[i]->Faction == faction->ID) {
+		if (CPlayer::Players[i]->Race == faction->Civilization->ID && CPlayer::Players[i]->GetFaction() == faction) {
 			return CPlayer::Players[i];
 		}
 	}
@@ -1147,7 +1146,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	this->Type = type;
 	this->Race = 0;
-	this->Faction = -1;
+	this->Faction = nullptr;
 	this->Religion = nullptr;
 	this->Dynasty = nullptr;
 	this->Age = nullptr;
@@ -1285,7 +1284,7 @@ void CPlayer::SetCivilization(int civilization)
 	if (GameRunning) {
 		this->SetFaction(nullptr);
 	} else {
-		this->Faction = -1;
+		this->Faction = nullptr;
 	}
 
 	{
@@ -1352,33 +1351,31 @@ String CPlayer::GetInterface() const
 */
 void CPlayer::SetFaction(const CFaction *faction)
 {
-	int old_faction_id = this->Faction;
+	const CFaction *old_faction = this->Faction;
 	
 	if (faction && faction->Civilization->ID != this->Race) {
 		this->SetCivilization(faction->Civilization->ID);
 	}
 
-	if (this->Faction != -1) {
-		if (!CFaction::Factions[this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(CFaction::Factions[this->Faction]->FactionUpgrade)->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::Get(CFaction::Factions[this->Faction]->FactionUpgrade)->ID);
+	if (this->Faction != nullptr) {
+		if (!this->Faction->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(this->Faction->FactionUpgrade)->ID] == 'R') {
+			UpgradeLost(*this, CUpgrade::Get(this->Faction->FactionUpgrade)->ID);
 		}
 
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(CFaction::Factions[this->Faction]->Type));
+		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(this->Faction->Type));
 		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] == 'R') {
 			UpgradeLost(*this, faction_type_upgrade_id);
 		}
 	}
 
-	int faction_id = faction ? faction->ID : -1;
-	
-	if (old_faction_id != -1 && faction_id != -1) {
+	if (old_faction != nullptr && faction != nullptr) {
 		for (size_t i = 0; i < UpgradeClasses.size(); ++i) {
-			if (CFaction::GetFactionClassUpgrade(old_faction_id, i) != CFaction::GetFactionClassUpgrade(faction_id, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
-				if (CFaction::GetFactionClassUpgrade(old_faction_id, i) != -1 && this->Allow.Upgrades[CFaction::GetFactionClassUpgrade(old_faction_id, i)] == 'R') {
-					UpgradeLost(*this, CFaction::GetFactionClassUpgrade(old_faction_id, i));
+			if (CFaction::GetFactionClassUpgrade(old_faction, i) != CFaction::GetFactionClassUpgrade(faction, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
+				if (CFaction::GetFactionClassUpgrade(old_faction, i) != -1 && this->Allow.Upgrades[CFaction::GetFactionClassUpgrade(old_faction, i)] == 'R') {
+					UpgradeLost(*this, CFaction::GetFactionClassUpgrade(old_faction, i));
 
-					if (CFaction::GetFactionClassUpgrade(faction_id, i) != -1) {
-						UpgradeAcquire(*this, AllUpgrades[CFaction::GetFactionClassUpgrade(faction_id, i)]);
+					if (CFaction::GetFactionClassUpgrade(faction, i) != -1) {
+						UpgradeAcquire(*this, AllUpgrades[CFaction::GetFactionClassUpgrade(faction, i)]);
 					}
 				}
 			}
@@ -1387,27 +1384,27 @@ void CPlayer::SetFaction(const CFaction *faction)
 	
 	bool personal_names_changed = true;
 	bool ship_names_changed = true;
-	if (this->Faction != -1 && faction_id != -1) {
-		ship_names_changed = CFaction::Factions[this->Faction]->GetShipNames() != CFaction::Factions[faction_id]->GetShipNames();
+	if (old_faction != nullptr && faction != nullptr) {
+		ship_names_changed = old_faction->GetShipNames() != faction->GetShipNames();
 		personal_names_changed = false; // setting to a faction of the same civilization
 	}
 	
-	this->Faction = faction_id;
+	this->Faction = faction;
 
 	if (this->Index == CPlayer::GetThisPlayer()->Index) {
 		UI.Load();
 	}
 	
-	if (this->Faction == -1) {
+	if (this->Faction == nullptr) {
 		return;
 	}
 	
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
-		this->SetName(CFaction::Factions[this->Faction]->Name);
+		this->SetName(this->Faction->Name);
 	}
-	if (this->Faction != -1) {
+	if (this->Faction != nullptr) {
 		int color = -1;
-		for (CPlayerColor *player_color : CFaction::Factions[faction_id]->GetPrimaryColors()) {
+		for (CPlayerColor *player_color : faction->GetPrimaryColors()) {
 			int primary_color = GetPlayerColorIndexByName(player_color->GetIdent().utf8().get_data());
 			if (!IsPlayerColorUsed(primary_color)) {
 				color = primary_color;
@@ -1430,8 +1427,8 @@ void CPlayer::SetFaction(const CFaction *faction)
 			}
 		}
 	
-		if (!CFaction::Factions[this->Faction]->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::Get(CFaction::Factions[this->Faction]->FactionUpgrade);
+		if (!this->Faction->FactionUpgrade.empty()) {
+			CUpgrade *faction_upgrade = CUpgrade::Get(this->Faction->FactionUpgrade);
 			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
 				if (GameEstablishing) {
 					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
@@ -1441,7 +1438,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 			}
 		}
 		
-		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(CFaction::Factions[this->Faction]->Type));
+		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(this->Faction->Type));
 		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] != 'R') {
 			if (GameEstablishing) {
 				AllowUpgradeId(*this, faction_type_upgrade_id, 'R');
@@ -1450,7 +1447,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 			}
 		}
 	} else {
-		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->Name.c_str(), this->Index, PlayerRaces.Name[this->Race].c_str());
+		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %i of civilization \"%s\".\n", faction->Name.c_str(), this->Index, PlayerRaces.Name[this->Race].c_str());
 	}
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
@@ -1460,7 +1457,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->Civilization->GetSpecies() && unit.Type->Slot == CFaction::GetFactionClassUnitType(faction->ID, unit.Type->Class)) {
+		if (personal_names_changed && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Character && unit.Type->GetCivilization() != nullptr && unit.Type->GetCivilization()->GetSpecies() == faction->Civilization->GetSpecies() && unit.Type->Slot == CFaction::GetFactionClassUnitType(faction, unit.Type->Class)) {
 			unit.UpdatePersonalName();
 		}
 		unit.UpdateSoldUnits();
@@ -1603,8 +1600,8 @@ void CPlayer::SetAge(CAge *age)
 */
 CCurrency *CPlayer::GetCurrency() const
 {
-	if (this->Faction != -1) {
-		return CFaction::Factions[this->Faction]->GetCurrency();
+	if (this->Faction != nullptr) {
+		return this->Faction->GetCurrency();
 	}
 	
 	if (this->Race != -1) {
@@ -1628,7 +1625,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 			continue;
 		}
 		
-		int upgrade_id = CFaction::GetFactionClassUpgrade(player.Faction, upgrade_list[i]->Class);
+		int upgrade_id = CFaction::GetFactionClassUpgrade(player.GetFaction(), upgrade_list[i]->Class);
 		if (upgrade_id == -1) {
 			continue;
 		}
@@ -1670,7 +1667,7 @@ bool CPlayer::IsPlayerColorUsed(int color)
 {
 	bool color_used = false;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && CPlayer::Players[i]->Faction != -1 && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Color == PlayerColors[color][0]) {
+		if (this->Index != i && CPlayer::Players[i]->GetFaction() != nullptr && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Color == PlayerColors[color][0]) {
 			color_used = true;
 		}		
 	}
@@ -1685,7 +1682,7 @@ bool CPlayer::HasUpgradeClass(const int upgrade_class) const
 	
 	int upgrade_id = -1;
 	
-	if (this->Faction != -1) {
+	if (this->Faction != nullptr) {
 		upgrade_id = CFaction::GetFactionClassUpgrade(this->Faction, upgrade_class);
 	} else {
 		upgrade_id = PlayerRaces.GetCivilizationClassUpgrade(this->Race, upgrade_class);
@@ -1849,7 +1846,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->Civilization->ID && CPlayer::Players[i]->Faction == faction->ID) {
+		if (this->Index != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->Civilization->ID && CPlayer::Players[i]->GetFaction() == faction) {
 			// faction is already in use
 			return false;
 		}
@@ -1930,7 +1927,7 @@ bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) c
 		return false;
 	}
 	
-	if (!character->Factions.empty() && (this->Faction == -1 || std::find(character->Factions.begin(), character->Factions.end(), CFaction::Factions[this->Faction]) == character->Factions.end())) {
+	if (!character->Factions.empty() && (this->Faction == nullptr || std::find(character->Factions.begin(), character->Factions.end(), this->Faction) == character->Factions.end())) {
 		return false;
 	}
 	
@@ -1962,7 +1959,7 @@ bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore
 			const CUpgrade *removed_upgrade = upgrade->UpgradeModifiers[z]->RemoveUpgrades[j];
 			bool has_upgrade = this->AiEnabled ? AiHasUpgrade(*this->Ai, removed_upgrade, true) : (UpgradeIdAllowed(*this, removed_upgrade->ID) == 'R');
 			if (has_upgrade) {
-				if (ignore_lower_priority && this->Faction != -1 && CFaction::Factions[this->Faction]->GetUpgradePriority(removed_upgrade) < CFaction::Factions[this->Faction]->GetUpgradePriority(upgrade)) {
+				if (ignore_lower_priority && this->Faction != nullptr && this->Faction->GetUpgradePriority(removed_upgrade) < this->Faction->GetUpgradePriority(upgrade)) {
 					continue;
 				}
 				return true;
@@ -1975,11 +1972,11 @@ bool CPlayer::UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore
 
 std::string CPlayer::GetFactionTitleName() const
 {
-	if (this->Race == -1 || this->Faction == -1) {
+	if (this->Race == -1 || this->Faction == nullptr) {
 		return "";
 	}
 	
-	CFaction *faction = CFaction::Factions[this->Faction];
+	const CFaction *faction = this->Faction;
 	int faction_tier = faction->DefaultTier;
 	int government_type = faction->DefaultGovernmentType;
 	
@@ -2014,12 +2011,12 @@ std::string CPlayer::GetFactionTitleName() const
 
 std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 {
-	if (this->Race == -1 || this->Faction == -1 || title_type == -1 || gender == -1) {
+	if (this->Race == -1 || this->Faction == nullptr || title_type == -1 || gender == -1) {
 		return "";
 	}
 	
 	CCivilization *civilization = CCivilization::Civilizations[this->Race];
-	CFaction *faction = CFaction::Factions[this->Faction];
+	const CFaction *faction = this->Faction;
 	int faction_tier = faction->DefaultTier;
 	int government_type = faction->DefaultGovernmentType;
 	
@@ -2230,7 +2227,7 @@ void CPlayer::Clear()
 	this->Name.clear();
 	this->Type = 0;
 	this->Race = 0;
-	this->Faction = -1;
+	this->Faction = nullptr;
 	this->Religion = nullptr;
 	this->Dynasty = nullptr;
 	this->Age = nullptr;
@@ -2338,7 +2335,7 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	Assert(unit.Player == this);
 	//Wyrmgus start
 	if (unit.PlayerSlot == -1 || this->Units[unit.PlayerSlot] != &unit) {
-		fprintf(stderr, "Error in CPlayer::RemoveUnit: the unit's PlayerSlot doesn't match its position in the player's units array; Unit's PlayerSlot: %d, Unit Type: \"%s\".\n", unit.PlayerSlot, unit.Type ? unit.Type->Ident.c_str() : "");
+		fprintf(stderr, "Error in CPlayer::RemoveUnit: the unit's PlayerSlot doesn't match its position in the player's units array; Unit's PlayerSlot: %zu, Unit Type: \"%s\".\n", unit.PlayerSlot, unit.Type ? unit.Type->Ident.c_str() : "");
 		return;
 	}
 	//Wyrmgus end
@@ -3325,7 +3322,7 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
 		//Wyrmgus start
 		if (*it == nullptr) {
-			fprintf(stderr, "Error in CPlayer::GetUnitTotalCount: unit of player %d is null.\n", this->Index);
+			fprintf(stderr, "Error in CPlayer::GetUnitTotalCount: unit of player %i is null.\n", this->Index);
 			continue;
 		}
 		//Wyrmgus end
@@ -3376,7 +3373,7 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 		return -4;
 	}
 	if (GetUnitTotalCount(type) >= Allow.Units[type.Slot]) {
-		Notify(_("Limit of %d reached for this unit type"), Allow.Units[type.Slot]);
+		Notify(_("Limit of %i reached for this unit type"), Allow.Units[type.Slot]);
 		return -6;
 	}
 	return 1;
@@ -3979,7 +3976,7 @@ void SetPlayersPalette()
 	for (int i = 0; i < PlayerMax; ++i) {
 		//Wyrmgus start
 //		CPlayer::Players[i]->UnitColors.Colors = PlayerColorsRGB[i];
-		if (CPlayer::Players[i]->Faction == -1) {
+		if (CPlayer::Players[i]->GetFaction() == nullptr) {
 			CPlayer::Players[i]->UnitColors.Colors = PlayerColorsRGB[i];
 		}
 		//Wyrmgus end
@@ -4377,8 +4374,8 @@ bool CPlayer::HasNeutralFactionType() const
 {
 	if (
 		this->Race != -1
-		&& this->Faction != -1
-		&& (CFaction::Factions[this->Faction]->Type == FactionTypeMercenaryCompany || CFaction::Factions[this->Faction]->Type == FactionTypeHolyOrder || CFaction::Factions[this->Faction]->Type == FactionTypeTradingCompany)
+		&& this->Faction != nullptr
+		&& (this->Faction->Type == FactionTypeMercenaryCompany || this->Faction->Type == FactionTypeHolyOrder || this->Faction->Type == FactionTypeTradingCompany)
 	) {
 		return true;
 	}
@@ -4403,7 +4400,7 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player, int button_action) const
 		player.HasNeutralFactionType()
 		&& (player.Overlord == nullptr || this->IsOverlordOf(player, true) || player.Overlord->IsAllied(*this))
 	) {
-		if (CFaction::Factions[player.Faction]->Type != FactionTypeHolyOrder || (button_action != ButtonTrain && button_action != ButtonBuy) || std::find(this->Deities.begin(), this->Deities.end(), CFaction::Factions[player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
+		if (player.GetFaction()->Type != FactionTypeHolyOrder || (button_action != ButtonTrain && button_action != ButtonBuy) || std::find(this->Deities.begin(), this->Deities.end(), player.GetFaction()->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
 			return true;
 		}
 	}
@@ -4429,6 +4426,7 @@ bool CPlayer::HasHero(const CCharacter *hero) const
 void CPlayer::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CPlayer::GetCivilization);
+	ClassDB::bind_method(D_METHOD("get_faction"), &CPlayer::GetFaction);
 	ClassDB::bind_method(D_METHOD("get_interface"), &CPlayer::GetInterface);
 	
 	ADD_SIGNAL(MethodInfo("civilization_changed", PropertyInfo(Variant::OBJECT, "old_civilization"), PropertyInfo(Variant::OBJECT, "new_civilization")));

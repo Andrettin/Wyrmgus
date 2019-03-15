@@ -163,7 +163,8 @@ void CPlayer::Load(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
-			this->Faction = LuaToNumber(l, j + 1);
+			const int faction_id = LuaToNumber(l, j + 1);
+			this->Faction = faction_id != -1 ? CFaction::Factions[faction_id] : nullptr;
 		} else if (!strcmp(value, "dynasty")) {
 			this->Dynasty = PlayerRaces.GetDynasty(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "age")) {
@@ -1768,24 +1769,17 @@ static int CclGetFactionClassUnitType(lua_State *l)
 {
 	std::string class_name = LuaToString(l, 1);
 	int class_id = GetUnitTypeClassIndexByName(class_name);
-	int faction_id = -1;
 	CFaction *faction = nullptr;
 	const int nargs = lua_gettop(l);
 	if (nargs == 2) {
 		faction = CFaction::GetFaction(LuaToString(l, 2));
-		if (faction) {
-			faction_id = faction->ID;
-		}
 	} else if (nargs == 3) {
 		//the civilization was the second argument, but it isn't needed anymore
 		faction = CFaction::GetFaction(LuaToString(l, 3));
-		if (faction) {
-			faction_id = faction->ID;
-		}
 	}
 	std::string unit_type_ident;
 	if (class_id != -1) {
-		int unit_type_id = CFaction::GetFactionClassUnitType(faction_id, class_id);
+		int unit_type_id = CFaction::GetFactionClassUnitType(faction, class_id);
 		if (unit_type_id != -1) {
 			unit_type_ident = CUnitType::UnitTypes[unit_type_id]->Ident;
 		}
@@ -1794,7 +1788,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
 		class_id = GetUpgradeClassIndexByName(class_name);
 		if (class_id != -1) {
-			int upgrade_id = CFaction::GetFactionClassUpgrade(faction_id, class_id);
+			int upgrade_id = CFaction::GetFactionClassUpgrade(faction, class_id);
 			if (upgrade_id != -1) {
 				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
 			}
@@ -3059,8 +3053,8 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
-		if (p->Race != -1 && p->Faction != -1) {
-			lua_pushstring(l, CFaction::Factions[p->Faction]->Ident.c_str());
+		if (p->Race != -1 && p->GetFaction() != nullptr) {
+			lua_pushstring(l, p->GetFaction()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

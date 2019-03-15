@@ -195,7 +195,10 @@ public:
 class CUpgradeTimers
 {
 public:
-	CUpgradeTimers() { this->Clear(); }
+	CUpgradeTimers()
+	{
+		this->Clear();
+	}
 
 	void Clear()
 	{

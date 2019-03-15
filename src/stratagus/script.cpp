@@ -1434,7 +1434,7 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Settlement != nullptr && unit->Settlement->SiteUnit != nullptr) {
 				const CCivilization *civilization = unit->Settlement->SiteUnit->Type->GetCivilization();
-				if (civilization != nullptr && unit->Settlement->SiteUnit->Player->Faction != -1 && (CCivilization::Civilizations[unit->Settlement->SiteUnit->Player->Race] == civilization || unit->Settlement->SiteUnit->Type->Slot == CFaction::GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->Faction, unit->Settlement->SiteUnit->Type->Class))) {
+				if (civilization != nullptr && unit->Settlement->SiteUnit->Player->GetFaction() != nullptr && (CCivilization::Civilizations[unit->Settlement->SiteUnit->Player->Race] == civilization || unit->Settlement->SiteUnit->Type->Slot == CFaction::GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->GetFaction(), unit->Settlement->SiteUnit->Type->Class))) {
 					civilization = CCivilization::Civilizations[unit->Settlement->SiteUnit->Player->Race];
 				}
 				return unit->Settlement->GetCulturalName(civilization);

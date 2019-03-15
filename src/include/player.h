@@ -128,12 +128,26 @@ private:
 	static std::shared_mutex PlayerMutex;	/// Mutex for players as a whole
 	
 public:
+	void SetCivilization(int civilization);
+	CCivilization *GetCivilization() const;
+	void SetFaction(const CFaction *faction);
+	void SetRandomFaction();
+	void SetDynasty(CDynasty *dynasty);
+	String GetInterface() const;
+	
+	CFaction *GetFaction() const
+	{
+		return const_cast<CFaction *>(this->Faction);
+	}
+
 	int Index = 0;		/// player as number
 	std::string Name;   /// name of non computer
 
 	int Type = 0;		/// type of player (human,computer,...)
 	int Race = 0;		/// race of player (orc,human,...)
-	int Faction = -1;	/// faction of the player
+private:
+	const CFaction *Faction = nullptr;	/// the player's faction
+public:
 	CReligion *Religion = nullptr;	/// religion of the player
 	CDynasty *Dynasty = nullptr;	/// ruling dynasty of the player
 	CAge *Age = nullptr;			/// The current age the player/faction is in
@@ -241,12 +255,6 @@ public:
 	void SetName(const std::string &name);
 	
 	//Wyrmgus start
-	void SetCivilization(int civilization);
-	CCivilization *GetCivilization() const;
-	void SetFaction(const CFaction *faction);
-	void SetRandomFaction();
-	void SetDynasty(CDynasty *dynasty);
-	String GetInterface() const;
 	void CheckAge();
 	void SetAge(CAge *age);
 	CCurrency *GetCurrency() const;
@@ -456,6 +464,8 @@ private:
 	
 	mutable std::shared_mutex Mutex;	/// mutex for the player
 
+	friend void ApplyReplaySettings();
+	
 protected:
 	static void _bind_methods();
 };

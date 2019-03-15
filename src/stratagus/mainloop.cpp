@@ -564,10 +564,10 @@ void GameMainLoop()
 		if (current_campaign != nullptr) {
 			const CDate start_date(current_campaign->GetStartDate());
 			for (int i = 0; i < NumPlayers; ++i) {
-				if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race != 0 && CPlayer::Players[i]->Faction != -1) {
+				if (CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race != 0 && CPlayer::Players[i]->GetFaction() != nullptr) {
 					if (start_date.Year) {
 						CCivilization *civilization = CCivilization::Civilizations[CPlayer::Players[i]->Race];
-						CFaction *faction = CFaction::Factions[CPlayer::Players[i]->Faction];
+						CFaction *faction = CPlayer::Players[i]->GetFaction();
 						
 						for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
 							int upgrade_id = UpgradeIdByIdent(iterator->first);
@@ -628,7 +628,7 @@ void GameMainLoop()
 		}
 		
 		//if the person player has no faction, bring up the faction choice interface
-		if (CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction == -1) {
+		if (CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->GetFaction() == nullptr) {
 			char buf[256];
 			snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", CPlayer::GetThisPlayer()->Race != -1 ? PlayerRaces.Name[CPlayer::GetThisPlayer()->Race].c_str() : "", "");
 			CclCommand(buf);

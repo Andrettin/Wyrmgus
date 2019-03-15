@@ -36,6 +36,7 @@
 
 #include "actions.h"
 #include "commands.h"
+#include "faction.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -98,7 +99,7 @@ public:
 	std::string AIScript;
 	int Race = 0;
 	//Wyrmgus start
-	int Faction = -1;
+	CFaction *Faction = nullptr;
 	//Wyrmgus end
 	int Team = 0;
 	int Type = 0;
@@ -110,16 +111,7 @@ public:
 class FullReplay
 {
 public:
-	FullReplay() :
-		//Wyrmgus start
-//		MapId(0), Type(0), Race(0), LocalPlayer(0),
-		MapId(0), Type(0), Race(0), Faction(-1), LocalPlayer(0),
-		//Wyrmgus end
-		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), Inside(false), RevealMap(0),
-		//Wyrmgus start
-//		MapRichness(0), GameType(0), Opponents(0), Commands(nullptr)
-		MapRichness(0), GameType(0), Opponents(0), NoRandomness(false), NoTimeOfDay(false), TechLevel(0), MaxTechLevel(0), Commands(nullptr)
-		//Wyrmgus end
+	FullReplay()
 	{
 		memset(Engine, 0, sizeof(Engine));
 		memset(Network, 0, sizeof(Network));
@@ -130,40 +122,39 @@ public:
 	std::string Date;
 	std::string Map;
 	std::string MapPath;
-	unsigned MapId;
+	unsigned MapId = 0;
 
-	int Type;
-	int Race;
+	int Type = 0;
+	int Race = 0;
 	//Wyrmgus start
-	int Faction;
+	CFaction *Faction = nullptr;
 	//Wyrmgus end
-	int LocalPlayer;
+	int LocalPlayer = 0;
 	MPPlayer Players[PlayerMax];
 
-	int Resource;
-	int NumUnits;
-	int Difficulty;
-	bool NoFow;
-	bool Inside;
-	int RevealMap;
-	int MapRichness;
-	int GameType;
-	int Opponents;
+	int Resource = 0;
+	int NumUnits = 0;
+	int Difficulty = 0;
+	bool NoFow = false;
+	bool Inside = false;
+	int RevealMap = 0;
+	int MapRichness = 0;
+	int GameType = 0;
+	int Opponents = 0;
 	//Wyrmgus start
-	bool NoRandomness;
-	bool NoTimeOfDay;
+	bool NoRandomness = false;
+	bool NoTimeOfDay = false;
 	//Wyrmgus end
-	int TechLevel;
-	int MaxTechLevel;
+	int TechLevel = 0;
+	int MaxTechLevel = 0;
 	int Engine[3];
 	int Network[3];
-	LogEntry *Commands;
+	LogEntry *Commands = nullptr;
 };
 
 //----------------------------------------------------------------------------
 // Constants
 //----------------------------------------------------------------------------
-
 
 //----------------------------------------------------------------------------
 // Variables
@@ -212,7 +203,7 @@ static FullReplay *StartReplay()
 		replay->Players[i].AIScript = GameSettings.Presets[i].AIScript;
 		replay->Players[i].Race = GameSettings.Presets[i].Race;
 		//Wyrmgus start
-		replay->Players[i].Faction = CPlayer::Players[i]->Faction;
+		replay->Players[i].Faction = CPlayer::Players[i]->GetFaction();
 		//Wyrmgus end
 		replay->Players[i].Team = GameSettings.Presets[i].Team;
 		replay->Players[i].Type = GameSettings.Presets[i].Type;
@@ -368,7 +359,7 @@ static void SaveFullLog(CFile &file)
 	file.printf("  Type = %d,\n", CurrentReplay->Type);
 	file.printf("  Race = %d,\n", CurrentReplay->Race);
 	//Wyrmgus start
-	file.printf("  Faction = %d,\n", CurrentReplay->Faction);
+	file.printf("  Faction = %i,\n", CurrentReplay->Faction != nullptr ? CurrentReplay->Faction->ID : -1);
 	//Wyrmgus end
 	file.printf("  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
 	file.printf("  Players = {\n");
@@ -381,7 +372,7 @@ static void SaveFullLog(CFile &file)
 		file.printf(" AIScript = \"%s\",", CurrentReplay->Players[i].AIScript.c_str());
 		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
 		//Wyrmgus start
-		file.printf(" Faction = %d,", CurrentReplay->Players[i].Faction);
+		file.printf(" Faction = %i,", CurrentReplay->Players[i].Faction != nullptr ? CurrentReplay->Players[i].Faction->ID : -1);
 		//Wyrmgus end
 		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
 		file.printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
@@ -652,7 +643,10 @@ static int CclReplayLog(lua_State *l)
 			replay->Race = LuaToNumber(l, -1);
 		//Wyrmgus start
 		} else if (!strcmp(value, "Faction")) {
-			replay->Faction = LuaToNumber(l, -1);
+			const int faction_id = LuaToNumber(l, -1);
+			if (faction_id != -1) {
+				replay->Faction = CFaction::Factions[faction_id];
+			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "LocalPlayer")) {
 			replay->LocalPlayer = LuaToNumber(l, -1);
@@ -679,7 +673,10 @@ static int CclReplayLog(lua_State *l)
 						replay->Players[j].Race = LuaToNumber(l, -1);
 					//Wyrmgus start
 					} else if (!strcmp(value, "Faction")) {
-						replay->Players[j].Faction = LuaToNumber(l, -1);
+						const int faction_id = LuaToNumber(l, -1);
+						if (faction_id != -1) {
+							replay->Players[j].Faction = CFaction::Factions[faction_id];
+						}
 					//Wyrmgus end
 					} else if (!strcmp(value, "Team")) {
 						replay->Players[j].Team = LuaToNumber(l, -1);

@@ -1884,10 +1884,10 @@ void AiForceManager::CheckForceRecruitment()
 		}
 	}
 	
-	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->Faction != -1 && completed_forces < AI_MAX_COMPLETED_FORCES && completed_force_pop < AI_MAX_COMPLETED_FORCE_POP) { //all current forces completed and not too many forces are in existence, create a new one
+	if (all_forces_completed && AiPlayer->Player->Race != -1 && AiPlayer->Player->GetFaction() != nullptr && completed_forces < AI_MAX_COMPLETED_FORCES && completed_force_pop < AI_MAX_COMPLETED_FORCE_POP) { //all current forces completed and not too many forces are in existence, create a new one
 		int force_type_weights[MaxForceTypes];
 		for (int i = 0; i < MaxForceTypes; ++i) {
-			force_type_weights[i] = CFaction::Factions[AiPlayer->Player->Faction]->GetForceTypeWeight(i);
+			force_type_weights[i] = AiPlayer->Player->GetFaction()->GetForceTypeWeight(i);
 		}
 		
 		std::vector<int> force_types;
@@ -1901,7 +1901,7 @@ void AiForceManager::CheckForceRecruitment()
 		}
 
 		for (size_t k = 0; k < force_types.size(); ++k) {
-			std::vector<CForceTemplate *> faction_force_templates = CFaction::Factions[AiPlayer->Player->Faction]->GetForceTemplates(force_types[k]);
+			std::vector<CForceTemplate *> faction_force_templates = AiPlayer->Player->GetFaction()->GetForceTemplates(force_types[k]);
 			std::vector<CForceTemplate *> potential_force_templates;
 			int priority = 0;
 			for (size_t i = 0; i < faction_force_templates.size(); ++i) {
@@ -1911,7 +1911,7 @@ void AiForceManager::CheckForceRecruitment()
 				bool valid = true;
 				for (size_t j = 0; j < faction_force_templates[i]->Units.size(); ++j) {
 					int class_id = faction_force_templates[i]->Units[j].first;
-					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
+					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), class_id);
 					CUnitType *type = nullptr;
 					if (unit_type_id != -1) {
 						type = CUnitType::UnitTypes[unit_type_id];
@@ -1947,7 +1947,7 @@ void AiForceManager::CheckForceRecruitment()
 				new_force.Role = AiForceRoleDefault;
 				for (size_t i = 0; i < force_template->Units.size(); ++i) {
 					int class_id = force_template->Units[i].first;
-					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->Faction, class_id);
+					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), class_id);
 					CUnitType *type = nullptr;
 					if (unit_type_id != -1) {
 						type = CUnitType::UnitTypes[unit_type_id];

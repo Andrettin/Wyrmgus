@@ -180,9 +180,9 @@ void ButtonAction::SetTriggerData() const
 	if (this->Action == ButtonResearch || this->Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[this->Value];
 	} else if (this->Action == ButtonFaction) {
-		TriggerData.Faction = CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value];
-		if (!CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
-			TriggerData.Upgrade = CUpgrade::Get(CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->DevelopsTo[this->Value]->FactionUpgrade);
+		TriggerData.Faction = CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[this->Value];
+		if (!CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[this->Value]->FactionUpgrade.empty()) {
+			TriggerData.Upgrade = CUpgrade::Get(CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[this->Value]->FactionUpgrade);
 		}
 	}
 }

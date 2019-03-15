@@ -34,6 +34,7 @@
 #include "campaign.h"
 #include "civilization.h"
 #include "conversible_color.h"
+#include "faction.h"
 #include "hair_color.h"
 #include "icon.h"
 #include "player.h"
@@ -48,6 +49,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CCampaign>();
 	ClassDB::register_class<CCivilization>();
 	ClassDB::register_virtual_class<CConversibleColor>();
+	ClassDB::register_class<CFaction>();
 	ClassDB::register_class<CHairColor>();
 	ClassDB::register_class<CIcon>();
 	ClassDB::register_class<CPlayer>();

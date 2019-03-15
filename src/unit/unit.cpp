@@ -1429,14 +1429,14 @@ void CUnit::ChooseButtonIcon(int button_action)
 	
 	if (this->Type->GetCivilization() != nullptr) {
 		const int civilization_id = this->Type->GetCivilization()->ID;
-		int faction = this->Type->Faction;
+		CFaction *faction = this->Type->Faction != -1 ? CFaction::Factions[this->Type->Faction] : nullptr;
 		
-		if (faction == -1 && this->Player->Race == civilization_id) {
-			faction = this->Player->Faction;
+		if (faction == nullptr && this->Player->Race == civilization_id) {
+			faction = this->Player->GetFaction();
 		}
 		
-		if (faction != -1 && CFaction::Factions[faction]->ButtonIcons.find(button_action) != CFaction::Factions[faction]->ButtonIcons.end()) {
-			this->ButtonIcons[button_action] = CFaction::Factions[faction]->ButtonIcons[button_action].Icon;
+		if (faction != nullptr && faction->ButtonIcons.find(button_action) != faction->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = faction->ButtonIcons[button_action].Icon;
 			return;
 		} else if (PlayerRaces.ButtonIcons[civilization_id].find(button_action) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 			this->ButtonIcons[button_action] = PlayerRaces.ButtonIcons[civilization_id][button_action].Icon;
@@ -2361,7 +2361,7 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
 		int civilization_id = this->Type->GetCivilization() ? this->Type->GetCivilization()->ID : -1;
-		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->Faction, this->Type->Class)) {
+		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->GetFaction() != nullptr && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
 			civilization_id = this->Player->Race;
 		}
 		
@@ -3286,10 +3286,10 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	const CCivilization *civilization = this->Type->GetCivilization();
 	
 	CFaction *faction = nullptr;
-	if (this->Player->Faction != -1) {
-		faction = CFaction::Factions[this->Player->Faction];
+	if (this->Player->GetFaction() != nullptr) {
+		faction = this->Player->GetFaction();
 		
-		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->Slot == CFaction::GetFactionClassUnitType(faction->ID, this->Type->Class)) {
+		if (civilization != nullptr && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Type->Slot == CFaction::GetFactionClassUnitType(faction, this->Type->Class)) {
 			civilization = faction->Civilization;
 		}
 	}
@@ -3350,17 +3350,13 @@ void CUnit::UpdateSettlement()
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || this->Type == SettlementSiteUnitType) {
 		if (!this->Settlement) {
 			const CCivilization *civilization = this->Type->GetCivilization();
-			if (civilization != nullptr && this->Player->Faction != -1 && (CCivilization::Civilizations[this->Player->Race] == civilization || this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->Faction, this->Type->Class))) {
+			if (civilization != nullptr && this->Player->GetFaction() != nullptr && (CCivilization::Civilizations[this->Player->Race] == civilization || this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class))) {
 				civilization = CCivilization::Civilizations[this->Player->Race];
 			}
 			
-			int faction_id = this->Type->Faction;
-			if (CCivilization::Civilizations[this->Player->Race] == civilization && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->Faction, this->Type->Class)) {
-				faction_id = this->Player->Faction;
-			}
-			const CFaction *faction = nullptr;
-			if (faction_id != -1) {
-				CFaction::Factions[faction_id];
+			const CFaction *faction = this->Type->Faction != -1 ? CFaction::Factions[this->Type->Faction] : nullptr;
+			if (CCivilization::Civilizations[this->Player->Race] == civilization && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
+				faction = this->Player->GetFaction();
 			}
 
 			std::vector<CSite *> potential_settlements;
@@ -3372,7 +3368,7 @@ void CUnit::UpdateSettlement()
 				}
 			}
 			
-			if (potential_settlements.empty() && faction) {
+			if (potential_settlements.empty() && faction != nullptr) {
 				for (CSite *site : faction->Sites) {
 					if (!site->SiteUnit) {
 						potential_settlements.push_back(site);
@@ -4586,7 +4582,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 				&& (!modifier_upgrade->Boots || EquippedItems[BootsItemSlot].size() == 0)
 				&& (!modifier_upgrade->Arrows || EquippedItems[ArrowsItemSlot].size() == 0)
 				&& !(newplayer.Race != -1 && modifier_upgrade->Ident == PlayerRaces.CivilizationUpgrades[newplayer.Race])
-				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && modifier_upgrade->Ident == CFaction::Factions[newplayer.Faction]->FactionUpgrade)
+				&& !(newplayer.Race != -1 && newplayer.GetFaction() != nullptr && modifier_upgrade->Ident == newplayer.GetFaction()->FactionUpgrade)
 			) {
 				ApplyIndividualUpgradeModifier(*this, modifier);
 			}
@@ -5315,7 +5311,7 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 		if (this->Container && this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Enable) {
 			value += this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Value; //treat the container's attack range as a bonus to the unit's attack range
 		}
-		std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
+		value = std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
 	} else if (index == SPEED_INDEX) {
 		if (this->MapLayer && this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) {
 			value += DefaultTileMovementCost - this->MapLayer->Field(this->Offset)->getCost();
@@ -6329,8 +6325,8 @@ CIcon *CUnit::GetButtonIcon(int button_action) const
 {
 	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
 		return this->ButtonIcons.find(button_action)->second;
-	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->Faction != -1 && CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.find(button_action) != CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons.end()) {
-		return CFaction::Factions[CPlayer::GetThisPlayer()->Faction]->ButtonIcons[button_action].Icon;
+	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->GetFaction() != nullptr && CPlayer::GetThisPlayer()->GetFaction()->ButtonIcons.find(button_action) != CPlayer::GetThisPlayer()->GetFaction()->ButtonIcons.end()) {
+		return CPlayer::GetThisPlayer()->GetFaction()->ButtonIcons[button_action].Icon;
 	} else if (this->Player == CPlayer::GetThisPlayer() && PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].find(button_action) != PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].end()) {
 		return PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race][button_action].Icon;
 	}
@@ -6820,7 +6816,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 			|| (objective->ObjectiveType == DestroyHeroObjectiveType && target.Character && objective->Character == target.Character)
 			|| (objective->ObjectiveType == DestroyUniqueObjectiveType && target.Unique && objective->Unique == target.Unique)
 		) {
-			if (!objective->Faction || objective->Faction->ID == target.Player->Faction) {
+			if (!objective->Faction || objective->Faction == target.Player->GetFaction()) {
 				objective->Counter = std::min(objective->Counter + 1, objective->Quantity);
 			}
 		} else if (objective->ObjectiveType == DestroyFactionObjectiveType) {

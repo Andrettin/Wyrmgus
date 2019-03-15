@@ -1876,7 +1876,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 	
 	if (potential_names.size() == 0 && this->GetCivilization() != nullptr) {
 		const CCivilization *civilization = this->GetCivilization();
-		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Slot == CFaction::GetFactionClassUnitType(faction->ID, this->Class)) {
+		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Slot == CFaction::GetFactionClassUnitType(faction, this->Class)) {
 			civilization = faction->Civilization;
 		}
 		if (faction && faction->Civilization != civilization) {
