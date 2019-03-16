@@ -958,8 +958,8 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 			this->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (this->Type->GetCivilization() != nullptr && this->Type->Faction != -1 && !CFaction::Factions[this->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(CFaction::Factions[this->Type->Faction]->FactionUpgrade);
+	if (this->Type->GetCivilization() != nullptr && this->Type->GetFaction() != nullptr && !this->Type->GetFaction()->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(this->Type->GetFaction()->FactionUpgrade);
 		if (faction_upgrade) {
 			this->SetIndividualUpgrade(faction_upgrade, 1);
 		}
@@ -1429,7 +1429,7 @@ void CUnit::ChooseButtonIcon(int button_action)
 	
 	if (this->Type->GetCivilization() != nullptr) {
 		const int civilization_id = this->Type->GetCivilization()->ID;
-		CFaction *faction = this->Type->Faction != -1 ? CFaction::Factions[this->Type->Faction] : nullptr;
+		CFaction *faction = this->Type->GetFaction();
 		
 		if (faction == nullptr && this->Player->Race == civilization_id) {
 			faction = this->Player->GetFaction();
@@ -2854,8 +2854,8 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 			unit->SetIndividualUpgrade(civilization_upgrade, 1);
 		}
 	}
-	if (unit->Type->GetCivilization() != nullptr && unit->Type->Faction != -1 && !CFaction::Factions[unit->Type->Faction]->FactionUpgrade.empty()) {
-		CUpgrade *faction_upgrade = CUpgrade::Get(CFaction::Factions[unit->Type->Faction]->FactionUpgrade);
+	if (unit->Type->GetCivilization() != nullptr && unit->Type->GetFaction() != nullptr && !unit->Type->GetFaction()->FactionUpgrade.empty()) {
+		CUpgrade *faction_upgrade = CUpgrade::Get(unit->Type->GetFaction()->FactionUpgrade);
 		if (faction_upgrade) {
 			unit->SetIndividualUpgrade(faction_upgrade, 1);
 		}
@@ -3354,7 +3354,7 @@ void CUnit::UpdateSettlement()
 				civilization = CCivilization::Civilizations[this->Player->Race];
 			}
 			
-			const CFaction *faction = this->Type->Faction != -1 ? CFaction::Factions[this->Type->Faction] : nullptr;
+			const CFaction *faction = this->Type->GetFaction();
 			if (CCivilization::Civilizations[this->Player->Race] == civilization && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
 				faction = this->Player->GetFaction();
 			}

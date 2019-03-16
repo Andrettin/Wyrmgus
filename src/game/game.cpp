@@ -616,8 +616,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (type.GetCivilization() != nullptr) {
 				f->printf("\tCivilization = \"%s\",\n", type.GetCivilization()->GetIdent().utf8().get_data());
 			}
-			if (type.Faction != -1) {
-				f->printf("\tFaction = \"%s\",\n", CFaction::Factions[type.Faction]->Ident.c_str());
+			if (type.GetFaction() != nullptr) {
+				f->printf("\tFaction = \"%s\",\n", type.GetFaction()->Ident.c_str());
 			}
 			if (type.Class != -1) {
 				f->printf("\tClass = \"%s\",\n", UnitTypeClasses[type.Class].c_str());

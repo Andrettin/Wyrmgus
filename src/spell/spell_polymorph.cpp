@@ -122,7 +122,7 @@
 		} else if (this->Civilization != -1 && CCivilization::Civilizations[this->Civilization] != target->Type->GetCivilization()) {
 			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Civilization, target->Type->Class);
 		}
-		if (this->Detachment && target->Type->GetCivilization() != nullptr && target->Type->Faction != -1) {
+		if (this->Detachment && target->Type->GetCivilization() != nullptr && target->Type->GetFaction() != nullptr) {
 			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(target->Type->GetCivilization()->ID, target->Type->Class);
 		}
 		if (new_unit_type != -1) {

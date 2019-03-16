@@ -742,6 +742,11 @@ public:
 		return this->Civilization;
 	}
 	
+	CFaction *GetFaction() const
+	{
+		return this->Faction;
+	}
+
 	String GetDescription() const
 	{
 		return this->Description.c_str();
@@ -792,8 +797,8 @@ public:
 	int Class = -1;					/// Class identifier (i.e. infantry, archer, etc.)
 private:
 	CCivilization *Civilization = nullptr;	/// Which civilization this unit belongs to, if any
+	CFaction *Faction = nullptr;	/// Which faction this unit belongs to, if any
 public:
-	int Faction = -1;				/// Which faction this unit belongs to, if any
 	std::string Description;		/// Description of the unit type
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type

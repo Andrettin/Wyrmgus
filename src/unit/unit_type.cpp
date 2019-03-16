@@ -742,7 +742,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = CFaction::GetFaction(value);
 			if (faction) {
-				this->Faction = faction->ID;
+				this->Faction = faction;
 			} else {
 				fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
 			}
@@ -1162,11 +1162,8 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		}
 		
 		if (this->GetCivilization() != nullptr && class_id != -1) {
-			if (this->Faction != -1) {
-				int faction_id = this->Faction;
-				if (faction_id != -1) {
-					CFaction::Factions[faction_id]->ClassUnitTypes[class_id] = this->Slot;
-				}
+			if (this->Faction != nullptr) {
+				this->Faction->ClassUnitTypes[class_id] = this->Slot;
 			} else {
 					PlayerRaces.CivilizationClassUnitTypes[this->GetCivilization()->ID][class_id] = this->Slot;
 			}
@@ -1882,8 +1879,8 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 		if (faction && faction->Civilization != civilization) {
 			faction = nullptr;
 		}
-		if (this->Faction != -1 && !faction) {
-			faction = CFaction::Factions[this->Faction];
+		if (this->Faction != nullptr && !faction) {
+			faction = this->Faction;
 		}
 		
 		if (this->BoolFlag[ORGANIC_INDEX].value) {
@@ -1923,6 +1920,7 @@ void CUnitType::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_name"), &CUnitType::GetName);
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CUnitType::GetCivilization);
+	ClassDB::bind_method(D_METHOD("get_faction"), &CUnitType::GetFaction);
 	ClassDB::bind_method(D_METHOD("get_description"), &CUnitType::GetDescription);
 	ClassDB::bind_method(D_METHOD("get_quote"), &CUnitType::GetQuote);
 	ClassDB::bind_method(D_METHOD("get_background"), &CUnitType::GetBackground);

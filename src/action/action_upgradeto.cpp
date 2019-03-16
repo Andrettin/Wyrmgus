@@ -257,8 +257,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			}
 		}
 		
-		if (oldtype.Faction != -1 && !CFaction::Factions[oldtype.Faction]->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::Get(CFaction::Factions[oldtype.Faction]->FactionUpgrade);
+		if (oldtype.GetFaction() != nullptr && !oldtype.GetFaction()->FactionUpgrade.empty()) {
+			CUpgrade *faction_upgrade = CUpgrade::Get(oldtype.GetFaction()->FactionUpgrade);
 			if (faction_upgrade) {
 				unit.SetIndividualUpgrade(faction_upgrade, 0);
 			}
@@ -272,8 +272,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 				unit.SetIndividualUpgrade(civilization_upgrade, 1);
 			}
 		}
-		if (newtype.Faction != -1 && !CFaction::Factions[newtype.Faction]->FactionUpgrade.empty()) {
-			CUpgrade *faction_upgrade = CUpgrade::Get(CFaction::Factions[newtype.Faction]->FactionUpgrade);
+		if (newtype.GetFaction() != nullptr && !newtype.GetFaction()->FactionUpgrade.empty()) {
+			CUpgrade *faction_upgrade = CUpgrade::Get(newtype.GetFaction()->FactionUpgrade);
 			if (faction_upgrade) {
 				unit.SetIndividualUpgrade(faction_upgrade, 1);
 			}

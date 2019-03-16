@@ -1765,7 +1765,7 @@ static int CclDefineUnitType(lua_State *l)
 			std::string faction_name = LuaToString(l, -1);
 			CFaction *faction = CFaction::GetFaction(faction_name);
 			if (faction) {
-				type->Faction = faction->ID;
+				type->Faction = faction;
 			} else {
 				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
 			}
@@ -1979,11 +1979,8 @@ static int CclDefineUnitType(lua_State *l)
 		}
 		
 		if (type->GetCivilization() != nullptr && class_id != -1) {
-			if (type->Faction != -1) {
-				int faction_id = type->Faction;
-				if (faction_id != -1) {
-					CFaction::Factions[faction_id]->ClassUnitTypes[class_id] = type->Slot;
-				}
+			if (type->GetFaction() != nullptr) {
+				type->GetFaction()->ClassUnitTypes[class_id] = type->Slot;
 			} else {
 				PlayerRaces.CivilizationClassUnitTypes[type->GetCivilization()->ID][class_id] = type->Slot;
 			}
@@ -2422,8 +2419,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
-		if (type->Faction != -1) {
-			lua_pushstring(l, CFaction::Factions[type->Faction]->Ident.c_str());
+		if (type->GetFaction() != nullptr) {
+			lua_pushstring(l, type->GetFaction()->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

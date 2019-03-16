@@ -241,7 +241,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->FactionUnit != CONDITION_TRUE) {
-		if ((condition->FactionUnit == CONDITION_ONLY) ^ (caster.Type->Faction != -1)) {
+		if ((condition->FactionUnit == CONDITION_ONLY) ^ (caster.Type->GetFaction() != nullptr)) {
 			return false;
 		}
 	}

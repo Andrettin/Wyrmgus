@@ -430,8 +430,8 @@ static void getopt_err(const char *argv0, const char *str, char opt)
 int getopt(int argc, char *const *argv, const char *opts)
 {
 	static int sp = 1;
-	register int c;
-	register const char *cp;
+	int c;
+	const char *cp;
 
 	optarg = nullptr;
 
