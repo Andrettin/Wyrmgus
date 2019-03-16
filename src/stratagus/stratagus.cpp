@@ -699,7 +699,7 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-int stratagusMain(int argc, char **argv)
+void stratagusMain(int argc, char **argv)
 {
 #ifdef USE_BEOS
 	//  Parse arguments for BeOS
@@ -812,7 +812,6 @@ int stratagusMain(int argc, char **argv)
 		exit(1);
 	}
 #endif
-	return 0;
 }
 
 //Wyrmgus start

@@ -21,14 +21,14 @@ Wyrmgus *Wyrmgus::GetInstance()
 	return Wyrmgus::Instance;
 }
 
-int Wyrmgus::Run()
+void Wyrmgus::Run()
 {
     int default_argc = 1;
     char *default_argv = "Wyrmsun";
 	
 	Wyrmgus::Instance = this;
 	
-	return stratagusMain(default_argc, &default_argv);
+	stratagusMain(default_argc, &default_argv);
 }
 
 String Wyrmgus::GetVersion() const

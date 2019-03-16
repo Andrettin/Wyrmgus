@@ -22,7 +22,7 @@ private:
 	static Wyrmgus *Instance;
 
 public:
-	int Run();
+	void Run();
 	String GetVersion() const;
 	void LuaCommand(String command);
 	
