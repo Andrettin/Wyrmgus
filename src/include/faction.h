@@ -107,6 +107,31 @@ public:
 	
 	static std::vector<CFaction *> Factions;    		/// factions
 	
+	/**
+	**	@brief	Get the faction's string identifier
+	**
+	**	@return	The faction's string identifier
+	*/
+	String GetIdent() const
+	{
+		return this->Ident.c_str();
+	}
+	
+	/**
+	**	@brief	Get the faction's name
+	**
+	**	@return	The faction's name
+	*/
+	String GetName() const
+	{
+		return this->Name.c_str();
+	}
+	
+	/**
+	**	@brief	Get the faction's primary color with highest priority
+	**
+	**	@return	The faction's primary color
+	*/
 	CPlayerColor *GetPrimaryColor() const
 	{
 		if (!this->PrimaryColors.empty()) {
@@ -116,11 +141,21 @@ public:
 		}
 	}
 	
+	/**
+	**	@brief	Get the faction's primary colors
+	**
+	**	@return	The faction's primary colors
+	*/
 	const std::vector<CPlayerColor *> &GetPrimaryColors() const
 	{
 		return this->PrimaryColors;
 	}
 	
+	/**
+	**	@brief	Get the faction's secondary color
+	**
+	**	@return	The faction's secondary color
+	*/
 	CPlayerColor *GetSecondaryColor() const
 	{
 		return this->SecondaryColor;

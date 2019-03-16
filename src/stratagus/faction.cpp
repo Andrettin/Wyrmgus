@@ -258,5 +258,8 @@ const std::vector<std::string> &CFaction::GetShipNames() const
 
 void CFaction::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("get_ident"), &CFaction::GetIdent);
+	ClassDB::bind_method(D_METHOD("get_name"), &CFaction::GetName);
 	ClassDB::bind_method(D_METHOD("get_primary_color"), &CFaction::GetPrimaryColor);
+	ClassDB::bind_method(D_METHOD("get_secondary_color"), &CFaction::GetSecondaryColor);
 }
