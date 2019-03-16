@@ -34,7 +34,7 @@
 
 #include "spell/spell_summon.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "ai/ai_local.h"
 #include "commands.h"
 #include "map/map_layer.h"

@@ -41,7 +41,7 @@
 #include "action/action_resource.h"
 #include "action/action_upgradeto.h"
 //Wyrmgus end
-#include "actions.h"
+#include "action/actions.h"
 #include "ai.h"
 //Wyrmgus start
 #include "ai/ai_local.h" //for using AiHelpers

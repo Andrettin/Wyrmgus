@@ -36,7 +36,7 @@
 
 #include "unit/unit_type.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "editor.h"
 #include "map/map.h"
 #include "map/map_layer.h"

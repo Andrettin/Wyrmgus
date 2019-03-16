@@ -30,7 +30,7 @@
 #ifndef __ACTION_RESOURCE_H__
 #define __ACTION_RESOURCE_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
 class COrder_Resource : public COrder
 {

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_train.h - The actions headerfile. */
+/**@name action_still.h - The actions headerfile. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -27,21 +27,17 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_TRAIN_H__
-#define __ACTION_TRAIN_H__
+#ifndef __ACTION_STILL_H__
+#define __ACTION_STILL_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Train : public COrder
+class COrder_Still : public COrder
 {
-	//Wyrmgus start
-//	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
-	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type, int player);
-	//Wyrmgus end
 public:
-	COrder_Train() : COrder(UnitActionTrain) {}
+	explicit COrder_Still(bool stand) : COrder(stand ? UnitActionStandGround : UnitActionStill) {}
 
-	virtual COrder_Train *Clone() const { return new COrder_Train(*this); }
+	virtual COrder_Still *Clone() const { return new COrder_Still(*this); }
 
 	virtual bool IsValid() const;
 
@@ -49,21 +45,16 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual void Cancel(CUnit &unit);
+	virtual void OnAnimationAttack(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
-	virtual void UpdateUnitVariables(CUnit &unit) const;
-
-	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
-
-	const CUnitType &GetUnitType() const { return *Type; }
 	
 private:
-	CUnitType *Type = nullptr;	/// train a unit of this unit-type
-	//Wyrmgus start
-	int Player = 0;				/// Player doing the training (needed for neutral building training)
-	//Wyrmgus end
-	int Ticks = 0;				/// Ticks to complete
+	bool AutoAttackStand(CUnit &unit);
+	bool AutoCastStand(CUnit &unit);
+	
+private:
+	int State = 0;
 };
 
 #endif

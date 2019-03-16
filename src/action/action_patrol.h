@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_move.h - The actions headerfile. */
+/**@name action_patrol.h - The actions headerfile. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -27,23 +27,23 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_MOVE_H__
-#define __ACTION_MOVE_H__
+#ifndef __ACTION_PATROL_H__
+#define __ACTION_PATROL_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Move : public COrder
+class COrder_Patrol : public COrder
 {
 	//Wyrmgus start
-//	friend COrder *COrder::NewActionMove(const Vec2i &pos);
-	friend COrder *COrder::NewActionMove(const Vec2i &pos, int z);
+//	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
+	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z);
 	//Wyrmgus end
 public:
-	COrder_Move() : COrder(UnitActionMove)
+	COrder_Patrol() : COrder(UnitActionPatrol)
 	{
 	}
 
-	virtual COrder_Move *Clone() const { return new COrder_Move(*this); }
+	virtual COrder_Patrol *Clone() const { return new COrder_Patrol(*this); }
 
 	virtual bool IsValid() const;
 
@@ -54,11 +54,15 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 
+	const Vec2i &GetWayPoint() const { return WayPoint; }
 private:
+	Vec2i WayPoint = Vec2i(-1, -1);	/// position for patroling.
+	unsigned int WaitingCycle = 0;	/// number of cycle pathfinder wait.
 	int Range = 0;
 	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
+	int WayPointMapLayer = 0;
 	//Wyrmgus end
 };
 

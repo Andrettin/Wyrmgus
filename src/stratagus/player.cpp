@@ -39,7 +39,7 @@
 #include "player.h"
 
 #include "action/action_upgradeto.h"
-#include "actions.h"
+#include "action/actions.h"
 #include "age.h"
 #include "ai.h"
 //Wyrmgus start

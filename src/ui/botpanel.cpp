@@ -37,7 +37,7 @@
 #include "ui/ui.h"
 
 #include "achievement.h"
-#include "actions.h"
+#include "action/actions.h"
 //Wyrmgus start
 #include "action/action_research.h"
 #include "action/action_train.h"

@@ -38,7 +38,7 @@
 #include "action/action_attack.h"
 #include "action/action_spellcast.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "missile.h"

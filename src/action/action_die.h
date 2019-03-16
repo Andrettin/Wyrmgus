@@ -30,7 +30,7 @@
 #ifndef __ACTION_DIE_H__
 #define __ACTION_DIE_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
 class COrder_Die : public COrder
 {

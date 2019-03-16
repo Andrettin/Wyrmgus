@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_still.h - The actions headerfile. */
+/**@name action_use.h - The use action header file. */
 //
-//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2015 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,17 +27,20 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_STILL_H__
-#define __ACTION_STILL_H__
+#ifndef __ACTION_USE_H__
+#define __ACTION_USE_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Still : public COrder
+class COrder_Use : public COrder
 {
+	friend COrder *COrder::NewActionUse(CUnit &dest);
 public:
-	explicit COrder_Still(bool stand) : COrder(stand ? UnitActionStandGround : UnitActionStill) {}
+	COrder_Use() : COrder(UnitActionUse)
+	{
+	}
 
-	virtual COrder_Still *Clone() const { return new COrder_Still(*this); }
+	virtual COrder_Use *Clone() const { return new COrder_Use(*this); }
 
 	virtual bool IsValid() const;
 
@@ -45,16 +48,13 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual void OnAnimationAttack(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
-	
+	virtual void UpdatePathFinderData(PathFinderInput &input);
 private:
-	bool AutoAttackStand(CUnit &unit);
-	bool AutoCastStand(CUnit &unit);
-	
-private:
-	int State = 0;
+	unsigned int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
+	int MapLayer = 0;
 };
 
 #endif

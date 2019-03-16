@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name actions_built.h - The actions headerfile. */
+/**@name action_follow.h - The actions headerfile. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -27,18 +27,20 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_BUILT_H__
-#define __ACTION_BUILT_H__
+#ifndef __ACTION_FOLLOW_H__
+#define __ACTION_FOLLOW_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Built : public COrder
+class COrder_Follow : public COrder
 {
-	friend COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
+	friend COrder *COrder::NewActionFollow(CUnit &dest);
 public:
-	COrder_Built() : COrder(UnitActionBuilt) {}
+	COrder_Follow() : COrder(UnitActionFollow)
+	{
+	}
 
-	virtual COrder_Built *Clone() const { return new COrder_Built(*this); }
+	virtual COrder_Follow *Clone() const { return new COrder_Follow(*this); }
 
 	virtual bool IsValid() const;
 
@@ -46,30 +48,15 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual void Cancel(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
-
-	virtual void UpdateUnitVariables(CUnit &unit) const;
-	virtual void FillSeenValues(CUnit &unit) const;
-	virtual void AiUnitKilled(CUnit &unit);
-
-	void Progress(CUnit &unit, int amount);
-	void ProgressHp(CUnit &unit, int amount);
-
-	const CConstructionFrame &GetFrame() const { return *Frame; }
-	const CUnitPtr &GetWorker() const { return Worker; }
-	CUnit *GetWorkerPtr() { return Worker; }
-
+	virtual void UpdatePathFinderData(PathFinderInput &input);
 private:
-	void Boost(CUnit &building, int amount, int varIndex) const;
-	void UpdateConstructionFrame(CUnit &unit);
-
-private:
-	CUnitPtr Worker;							/// Worker building this unit
-	int ProgressCounter = 0;					/// Progress counter, in 1/100 cycles.
-	bool IsCancelled = false;					/// Cancel construction
-	const CConstructionFrame *Frame = nullptr;	/// Construction frame
+	unsigned int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
+	//Wyrmgus start
+	int MapLayer = 0;
+	//Wyrmgus end
 };
 
 #endif

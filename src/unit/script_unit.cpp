@@ -35,7 +35,7 @@
 
 #include "unit/unit.h"
 
-#include "actions.h"
+#include "action/actions.h"
 //Wyrmgus start
 #include "ai/ai_local.h"
 //Wyrmgus end

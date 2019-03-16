@@ -38,7 +38,7 @@
 
 #include "game.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "age.h"
 #include "ai.h"
 #include "animation.h"

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_attack.h - The actions headerfile. */
+/**@name action_research.h - The actions headerfile. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -27,54 +27,37 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_ATTACK_H__
-#define __ACTION_ATTACK_H__
+#ifndef __ACTION_RESEARCH_H__
+#define __ACTION_RESEARCH_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Attack : public COrder
+class COrder_Research : public COrder
 {
-	friend COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
-	//Wyrmgus start
-//	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-//	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
-	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z);
-	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
-	//Wyrmgus end
+	friend COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player);
 public:
-	explicit COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack) {}
+	COrder_Research() : COrder(UnitActionResearch) {}
 
-	virtual COrder_Attack *Clone() const { return new COrder_Attack(*this); }
+	virtual COrder_Research *Clone() const { return new COrder_Research(*this); }
 
 	virtual bool IsValid() const;
+
 	virtual void Save(CFile &file, const CUnit &unit) const;
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual void OnAnimationAttack(CUnit &unit);
+	virtual void Cancel(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
-	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
+	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
-	virtual const Vec2i GetGoalPos() const { return goalPos; }
-	//Wyrmgus start
-	virtual const int GetGoalMapLayer() const { return MapLayer; }
-	//Wyrmgus end
-	bool IsWeakTargetSelected() const;
+	virtual void UpdateUnitVariables(CUnit &unit) const;
 
+	const CUpgrade &GetUpgrade() const { return *Upgrade; }
+	void SetUpgrade(CUpgrade &upgrade) { Upgrade = &upgrade; }
 private:
-	bool CheckForDeadGoal(CUnit &unit);
-	bool CheckForTargetInRange(CUnit &unit);
-	void MoveToTarget(CUnit &unit);
-	void AttackTarget(CUnit &unit);
-
-private:
-	int State = 0;
-	int MinRange = 0;
-	int Range = 0;
-	Vec2i goalPos = Vec2i(-1, -1);
+	CUpgrade *Upgrade = nullptr;
 	//Wyrmgus start
-	int MapLayer = 0;
+	int Player = 0;	/// Player for whom the upgrade will be acquired (needed for researching upgrades in neutral buildings)
 	//Wyrmgus end
 };
 

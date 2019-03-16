@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_repair.h - The actions headerfile. */
+/**@name action_pickup.h - The pick up action headerfile. */
 //
-//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2015 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,24 +27,20 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_REPAIR_H__
-#define __ACTION_REPAIR_H__
+#ifndef __ACTION_PICKUP_H__
+#define __ACTION_PICKUP_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Repair : public COrder
+class COrder_PickUp : public COrder
 {
-	friend COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target);
-	//Wyrmgus start
-//	friend COrder *COrder::NewActionRepair(const Vec2i &pos);
-	friend COrder *COrder::NewActionRepair(const Vec2i &pos, int z);
-	//Wyrmgus end
+	friend COrder *COrder::NewActionPickUp(CUnit &dest);
 public:
-	COrder_Repair() : COrder(UnitActionRepair)
+	COrder_PickUp() : COrder(UnitActionPickUp)
 	{
 	}
 
-	virtual COrder_Repair *Clone() const { return new COrder_Repair(*this); }
+	virtual COrder_PickUp *Clone() const { return new COrder_PickUp(*this); }
 
 	virtual bool IsValid() const;
 
@@ -54,14 +50,9 @@ public:
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
-
-	const CUnitPtr &GetReparableTarget() const { return ReparableTarget; }
 private:
-	bool RepairUnit(const CUnit &unit, CUnit &goal);
-private:
-	CUnitPtr ReparableTarget;
 	unsigned int State = 0;
-	unsigned int RepairCycle = 0;
+	int Range = 0;
 	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;

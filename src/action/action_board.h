@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_follow.h - The actions headerfile. */
+/**@name action_board.h - The actions headerfile. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -27,20 +27,18 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_FOLLOW_H__
-#define __ACTION_FOLLOW_H__
+#ifndef __ACTION_BOARD_H__
+#define __ACTION_BOARD_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Follow : public COrder
+class COrder_Board : public COrder
 {
-	friend COrder *COrder::NewActionFollow(CUnit &dest);
+	friend COrder *COrder::NewActionBoard(CUnit &unit);
 public:
-	COrder_Follow() : COrder(UnitActionFollow)
-	{
-	}
+	COrder_Board() : COrder(UnitActionBoard) {}
 
-	virtual COrder_Follow *Clone() const { return new COrder_Follow(*this); }
+	virtual COrder_Board *Clone() const { return new COrder_Board(*this); }
 
 	virtual bool IsValid() const;
 
@@ -51,7 +49,10 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 private:
-	unsigned int State = 0;
+	bool WaitForTransporter(CUnit &unit);
+	int MoveToTransporter(CUnit &unit);
+private:
+	int State = 0;
 	int Range = 0;
 	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start

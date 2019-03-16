@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_use.h - The use action header file. */
+/**@name action_train.h - The actions headerfile. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,20 +27,21 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_USE_H__
-#define __ACTION_USE_H__
+#ifndef __ACTION_TRAIN_H__
+#define __ACTION_TRAIN_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Use : public COrder
+class COrder_Train : public COrder
 {
-	friend COrder *COrder::NewActionUse(CUnit &dest);
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
+	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type, int player);
+	//Wyrmgus end
 public:
-	COrder_Use() : COrder(UnitActionUse)
-	{
-	}
+	COrder_Train() : COrder(UnitActionTrain) {}
 
-	virtual COrder_Use *Clone() const { return new COrder_Use(*this); }
+	virtual COrder_Train *Clone() const { return new COrder_Train(*this); }
 
 	virtual bool IsValid() const;
 
@@ -48,13 +49,21 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual void Cancel(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
+	virtual void UpdateUnitVariables(CUnit &unit) const;
+
+	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
+
+	const CUnitType &GetUnitType() const { return *Type; }
+	
 private:
-	unsigned int State = 0;
-	int Range = 0;
-	Vec2i goalPos = Vec2i(-1, -1);
-	int MapLayer = 0;
+	CUnitType *Type = nullptr;	/// train a unit of this unit-type
+	//Wyrmgus start
+	int Player = 0;				/// Player doing the training (needed for neutral building training)
+	//Wyrmgus end
+	int Ticks = 0;				/// Ticks to complete
 };
 
 #endif

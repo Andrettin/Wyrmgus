@@ -30,7 +30,7 @@
 #ifndef __ACTION_UPGRADETO_H__
 #define __ACTION_UPGRADETO_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
 class COrder_TransformInto : public COrder
 {

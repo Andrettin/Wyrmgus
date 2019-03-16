@@ -34,7 +34,7 @@
 #include "stratagus.h"
 
 #include "achievement.h"
-#include "actions.h"
+#include "action/actions.h"
 #include "age.h"
 #include "ai.h"
 #include "campaign.h"

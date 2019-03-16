@@ -59,7 +59,7 @@
 #include "animation/animation_unbreakable.h"
 #include "animation/animation_wait.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "config.h"
 #include "iolib.h"
 #include "player.h"

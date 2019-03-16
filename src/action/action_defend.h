@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_spellcast.h - The actions headerfile. */
+/**@name action_defend.h - The actions headerfile. */
 //
-//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2012 by cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,20 +27,20 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_SPELLCAST_H__
-#define __ACTION_SPELLCAST_H__
+#ifndef __ACTION_DEFEND_H__
+#define __ACTION_DEFEND_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_SpellCast : public COrder
+class COrder_Defend : public COrder
 {
-	friend COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
+	friend COrder *COrder::NewActionDefend(CUnit &dest);
 public:
-	COrder_SpellCast(const bool autocast = false) : COrder(UnitActionSpellCast), isAutocast(autocast)
+	COrder_Defend() : COrder(UnitActionDefend)
 	{
 	}
 
-	virtual COrder_SpellCast *Clone() const { return new COrder_SpellCast(*this); }
+	virtual COrder_Defend *Clone() const { return new COrder_Defend(*this); }
 
 	virtual bool IsValid() const;
 
@@ -50,29 +50,13 @@ public:
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
-
-	virtual void OnAnimationAttack(CUnit &unit);
-
-	virtual const Vec2i GetGoalPos() const;
-	//Wyrmgus start
-	virtual const int GetGoalMapLayer() const;
-	//Wyrmgus end
-	const CSpell &GetSpell() const { return *Spell; }
-	void SetSpell(const CSpell &spell) { Spell = &spell; }
-	
 private:
-	bool CheckForDeadGoal(CUnit &unit);
-	bool SpellMoveToTarget(CUnit &unit);
-	
-private:
-	const CSpell *Spell = nullptr;
-	int State = 0;
+	unsigned int State = 0;
 	int Range = 0;
 	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start
 	int MapLayer = 0;
 	//Wyrmgus end
-	bool isAutocast = false;
 };
 
 #endif

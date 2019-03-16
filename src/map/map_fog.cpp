@@ -36,7 +36,7 @@
 
 #include "map/map.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
 #include "map/tileset.h"

@@ -36,7 +36,7 @@
 
 #include "stratagus.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "action/action_build.h"
 #include "action/action_built.h"
 #include "action/action_upgradeto.h"

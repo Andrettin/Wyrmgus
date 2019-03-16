@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_research.h - The actions headerfile. */
+/**@name action_spellcast.h - The actions headerfile. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -27,18 +27,20 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_RESEARCH_H__
-#define __ACTION_RESEARCH_H__
+#ifndef __ACTION_SPELLCAST_H__
+#define __ACTION_SPELLCAST_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Research : public COrder
+class COrder_SpellCast : public COrder
 {
-	friend COrder *COrder::NewActionResearch(CUnit &unit, CUpgrade &upgrade, int player);
+	friend COrder *COrder::NewActionSpellCast(const CSpell &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
 public:
-	COrder_Research() : COrder(UnitActionResearch) {}
+	COrder_SpellCast(const bool autocast = false) : COrder(UnitActionSpellCast), isAutocast(autocast)
+	{
+	}
 
-	virtual COrder_Research *Clone() const { return new COrder_Research(*this); }
+	virtual COrder_SpellCast *Clone() const { return new COrder_SpellCast(*this); }
 
 	virtual bool IsValid() const;
 
@@ -46,19 +48,31 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
-	virtual void Cancel(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
+	virtual void UpdatePathFinderData(PathFinderInput &input);
 
-	virtual void UpdateUnitVariables(CUnit &unit) const;
+	virtual void OnAnimationAttack(CUnit &unit);
 
-	const CUpgrade &GetUpgrade() const { return *Upgrade; }
-	void SetUpgrade(CUpgrade &upgrade) { Upgrade = &upgrade; }
-private:
-	CUpgrade *Upgrade = nullptr;
+	virtual const Vec2i GetGoalPos() const;
 	//Wyrmgus start
-	int Player = 0;	/// Player for whom the upgrade will be acquired (needed for researching upgrades in neutral buildings)
+	virtual const int GetGoalMapLayer() const;
 	//Wyrmgus end
+	const CSpell &GetSpell() const { return *Spell; }
+	void SetSpell(const CSpell &spell) { Spell = &spell; }
+	
+private:
+	bool CheckForDeadGoal(CUnit &unit);
+	bool SpellMoveToTarget(CUnit &unit);
+	
+private:
+	const CSpell *Spell = nullptr;
+	int State = 0;
+	int Range = 0;
+	Vec2i goalPos = Vec2i(-1, -1);
+	//Wyrmgus start
+	int MapLayer = 0;
+	//Wyrmgus end
+	bool isAutocast = false;
 };
 
 #endif

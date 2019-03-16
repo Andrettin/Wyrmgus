@@ -44,7 +44,7 @@
 
 #include "spells.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "civilization.h"
 #include "commands.h"
 #include "config.h"

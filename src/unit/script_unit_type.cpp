@@ -36,7 +36,7 @@
 #include "unit/unit_type.h"
 
 #include "achievement.h"
-#include "actions.h"
+#include "action/actions.h"
 #include "animation.h"
 //Wyrmgus start
 #include "character.h" //for updating levels

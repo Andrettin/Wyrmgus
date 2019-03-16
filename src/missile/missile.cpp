@@ -38,7 +38,7 @@
 #include "missile.h"
 
 #include "action/action_spellcast.h"
-#include "actions.h"
+#include "action/actions.h"
 #include "animation.h"
 #include "config.h"
 #include "font.h"

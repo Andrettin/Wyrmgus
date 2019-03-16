@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_build.h - The actions headerfile. */
+/**@name action_trade.h - The trade action header file. */
 //
-//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2017-2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,25 +27,20 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_BUILD_H__
-#define __ACTION_BUILD_H__
+#ifndef __ACTION_TRADE_H__
+#define __ACTION_TRADE_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class CSite;
-
-class COrder_Build : public COrder
+class COrder_Trade : public COrder
 {
-	//Wyrmgus start
-//	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z, CSite *settlement);
-	//Wyrmgus end
+	friend COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market);
 public:
-	COrder_Build() : COrder(UnitActionBuild)
+	COrder_Trade() : COrder(UnitActionTrade)
 	{
 	}
 
-	virtual COrder_Build *Clone() const { return new COrder_Build(*this); }
+	virtual COrder_Trade *Clone() const { return new COrder_Trade(*this); }
 
 	virtual bool IsValid() const;
 
@@ -56,34 +51,13 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 	
-	//Wyrmgus start
-	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
-	//Wyrmgus end
-
-	virtual void AiUnitKilled(CUnit &unit);
-
-	const CUnitType &GetUnitType() const { return *Type; }
-	virtual const Vec2i GetGoalPos() const { return goalPos; }
-	//Wyrmgus start
-	virtual const int GetGoalMapLayer() const { return MapLayer; }
-	//Wyrmgus end
-
 private:
-	bool MoveToLocation(CUnit &unit);
-	CUnit *CheckCanBuild(CUnit &unit) const;
-	bool StartBuilding(CUnit &unit, CUnit &ontop);
-	bool BuildFromOutside(CUnit &unit) const;
-	void HelpBuild(CUnit &unit, CUnit &building);
-private:
-	CUnitType *Type = nullptr;	/// build a unit of this unit-type
-	CUnitPtr BuildingUnit;		/// unit builded.
-	int State = 0;
+	unsigned int State = 0;
 	int Range = 0;
 	Vec2i goalPos = Vec2i(-1, -1);
-	//Wyrmgus start
 	int MapLayer = 0;
-	CSite *Settlement = nullptr;
-	//Wyrmgus end
+	CUnit *HomeMarket = nullptr;
+	Vec2i HomeMarketPos = Vec2i(-1, -1);
 };
 
 #endif

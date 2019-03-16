@@ -35,7 +35,7 @@
 #include "unit/unit_type.h"
 #include "unit/unit.h"
 #include "spells.h"
-#include "actions.h"
+#include "action/actions.h"
 #include "ai_local.h"
 
 /*----------------------------------------------------------------------------

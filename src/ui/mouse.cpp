@@ -43,7 +43,7 @@
 
 #include "action/action_build.h"
 #include "action/action_train.h"
-#include "actions.h"
+#include "action/actions.h"
 //Wyrmgus start
 #include "ai/ai_local.h" //for using AiHelpers
 #include "character.h"

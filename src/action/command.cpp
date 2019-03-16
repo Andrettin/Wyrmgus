@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "action/action_built.h"
 #include "action/action_research.h"
 #include "action/action_train.h"

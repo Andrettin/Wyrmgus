@@ -35,7 +35,7 @@
 
 #include "animation/animation_setvar.h"
 
-#include "actions.h"
+#include "action/actions.h"
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end

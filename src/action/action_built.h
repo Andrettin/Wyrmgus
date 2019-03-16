@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_trade.h - The trade action header file. */
+/**@name actions_built.h - The actions headerfile. */
 //
-//      (c) Copyright 2017-2019 by Andrettin
+//      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,20 +27,18 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_TRADE_H__
-#define __ACTION_TRADE_H__
+#ifndef __ACTION_BUILT_H__
+#define __ACTION_BUILT_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Trade : public COrder
+class COrder_Built : public COrder
 {
-	friend COrder *COrder::NewActionTrade(CUnit &dest, CUnit &home_market);
+	friend COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
 public:
-	COrder_Trade() : COrder(UnitActionTrade)
-	{
-	}
+	COrder_Built() : COrder(UnitActionBuilt) {}
 
-	virtual COrder_Trade *Clone() const { return new COrder_Trade(*this); }
+	virtual COrder_Built *Clone() const { return new COrder_Built(*this); }
 
 	virtual bool IsValid() const;
 
@@ -48,16 +46,30 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual void Cancel(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
-	
+	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
+
+	virtual void UpdateUnitVariables(CUnit &unit) const;
+	virtual void FillSeenValues(CUnit &unit) const;
+	virtual void AiUnitKilled(CUnit &unit);
+
+	void Progress(CUnit &unit, int amount);
+	void ProgressHp(CUnit &unit, int amount);
+
+	const CConstructionFrame &GetFrame() const { return *Frame; }
+	const CUnitPtr &GetWorker() const { return Worker; }
+	CUnit *GetWorkerPtr() { return Worker; }
+
 private:
-	unsigned int State = 0;
-	int Range = 0;
-	Vec2i goalPos = Vec2i(-1, -1);
-	int MapLayer = 0;
-	CUnit *HomeMarket = nullptr;
-	Vec2i HomeMarketPos = Vec2i(-1, -1);
+	void Boost(CUnit &building, int amount, int varIndex) const;
+	void UpdateConstructionFrame(CUnit &unit);
+
+private:
+	CUnitPtr Worker;							/// Worker building this unit
+	int ProgressCounter = 0;					/// Progress counter, in 1/100 cycles.
+	bool IsCancelled = false;					/// Cancel construction
+	const CConstructionFrame *Frame = nullptr;	/// Construction frame
 };
 
 #endif

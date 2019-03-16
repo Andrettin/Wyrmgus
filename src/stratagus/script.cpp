@@ -38,7 +38,7 @@
 #include "script.h"
 
 //Wyrmgus start
-#include "actions.h"
+#include "action/actions.h"
 //Wyrmgus end
 #include "animation/animation_setplayervar.h"
 #include "civilization.h"

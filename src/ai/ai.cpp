@@ -139,7 +139,7 @@
 #include "ai.h"
 #include "ai_local.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "action/action_attack.h"
 #include "commands.h"
 //Wyrmgus start

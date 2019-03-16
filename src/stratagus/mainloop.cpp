@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "campaign.h"
 #include "character.h"
 #include "civilization.h"

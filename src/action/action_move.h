@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_board.h - The actions headerfile. */
+/**@name action_move.h - The actions headerfile. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //
@@ -27,18 +27,23 @@
 //      02111-1307, USA.
 //
 
-#ifndef __ACTION_BOARD_H__
-#define __ACTION_BOARD_H__
+#ifndef __ACTION_MOVE_H__
+#define __ACTION_MOVE_H__
 
-#include "actions.h"
+#include "action/actions.h"
 
-class COrder_Board : public COrder
+class COrder_Move : public COrder
 {
-	friend COrder *COrder::NewActionBoard(CUnit &unit);
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionMove(const Vec2i &pos);
+	friend COrder *COrder::NewActionMove(const Vec2i &pos, int z);
+	//Wyrmgus end
 public:
-	COrder_Board() : COrder(UnitActionBoard) {}
+	COrder_Move() : COrder(UnitActionMove)
+	{
+	}
 
-	virtual COrder_Board *Clone() const { return new COrder_Board(*this); }
+	virtual COrder_Move *Clone() const { return new COrder_Move(*this); }
 
 	virtual bool IsValid() const;
 
@@ -48,11 +53,8 @@ public:
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
+
 private:
-	bool WaitForTransporter(CUnit &unit);
-	int MoveToTransporter(CUnit &unit);
-private:
-	int State = 0;
 	int Range = 0;
 	Vec2i goalPos = Vec2i(-1, -1);
 	//Wyrmgus start

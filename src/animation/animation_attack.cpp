@@ -35,7 +35,7 @@
 
 #include "animation/animation_attack.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "unit/unit.h"
 
 /* virtual */ void CAnimation_Attack::Action(CUnit &unit, int &/*move*/, int /*scale*/) const

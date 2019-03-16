@@ -34,7 +34,7 @@
 
 #include "replay.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "commands.h"
 #include "faction.h"
 #include "game.h"

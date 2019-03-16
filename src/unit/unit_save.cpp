@@ -38,7 +38,7 @@
 
 #include "unit/unit.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "animation.h"
 #include "character.h"
 #include "construct.h"

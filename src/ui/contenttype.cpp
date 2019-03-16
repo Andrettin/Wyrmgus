@@ -35,7 +35,7 @@
 
 #include "ui/contenttype.h"
 
-#include "actions.h"
+#include "action/actions.h"
 #include "action/action_built.h"
 #include "font.h"
 #include "icon.h"
