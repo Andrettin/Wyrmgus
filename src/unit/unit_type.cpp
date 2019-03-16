@@ -38,7 +38,7 @@
 //Wyrmgus start
 #include "ai/ai_local.h" //for using AiHelpers
 //Wyrmgus end
-#include "animation.h"
+#include "animation/animation.h"
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
 #include "civilization.h"

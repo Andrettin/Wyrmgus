@@ -39,7 +39,7 @@
 
 #include "action/action_spellcast.h"
 #include "action/actions.h"
-#include "animation.h"
+#include "animation/animation.h"
 #include "config.h"
 #include "font.h"
 #include "iolib.h"

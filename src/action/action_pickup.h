@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_pickup.h - The pick up action headerfile. */
+/**@name action_pickup.h - The pick up action header file. */
 //
 //      (c) Copyright 2015 by Andrettin
 //

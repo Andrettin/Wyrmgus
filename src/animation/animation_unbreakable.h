@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_goto.h - The animation Goto headerfile. */
+/**@name animation_unbreakable.h - The animation Unbreakable headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,22 +27,21 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_GOTO_H
-#define ANIMATION_GOTO_H
+#ifndef ANIMATION_UNBREAKABLE_H
+#define ANIMATION_UNBREAKABLE_H
 
-#include <string>
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_Goto : public CAnimation
+class CAnimation_Unbreakable : public CAnimation
 {
 public:
-	CAnimation_Goto() : CAnimation(AnimationGoto) {}
+	CAnimation_Unbreakable() : CAnimation(AnimationUnbreakable) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	CAnimation *gotoLabel = nullptr;
+	int state = 0;
 };
 
 #endif

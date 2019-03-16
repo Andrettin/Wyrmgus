@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_frame.h - The animation Frame headerfile. */
+/**@name animation_attack.h - The animation  headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,23 +27,18 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_FRAME_H
-#define ANIMATION_FRAME_H
+#ifndef ANIMATION_ATTACK_H
+#define ANIMATION_ATTACK_H
 
-#include <string>
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_Frame : public CAnimation
+class CAnimation_Attack : public CAnimation
 {
 public:
-	CAnimation_Frame() : CAnimation(AnimationFrame) {}
+	CAnimation_Attack() : CAnimation(AnimationAttack) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
-
-	int ParseAnimInt(const CUnit *unit) const;
-private:
-	std::string frame;
 };
 
 #endif

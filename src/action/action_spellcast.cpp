@@ -41,7 +41,7 @@
 
 #include "action/action_spellcast.h"
 
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end

@@ -30,8 +30,9 @@
 #ifndef ANIMATION_ROTATE_H
 #define ANIMATION_ROTATE_H
 
+#include "animation/animation.h"
+
 #include <string>
-#include "animation.h"
 
 class CAnimation_Rotate : public CAnimation
 {

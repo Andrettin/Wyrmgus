@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_exactframe.h - The animation  headerfile. */
+/**@name animation_move.h - The animation Move headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,24 +27,23 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_EXACTFRAME_H
-#define ANIMATION_EXACTFRAME_H
+#ifndef ANIMATION_MOVE_H
+#define ANIMATION_MOVE_H
+
+#include "animation/animation.h"
 
 #include <string>
-#include "animation.h"
 
-class CAnimation_ExactFrame : public CAnimation
+class CAnimation_Move : public CAnimation
 {
 public:
-	CAnimation_ExactFrame() : CAnimation(AnimationExactFrame) {}
+	CAnimation_Move() : CAnimation(AnimationMove) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
-	int ParseAnimInt(const CUnit *unit) const;
-
 private:
-	std::string frame;
+	std::string moveStr;
 };
 
 #endif

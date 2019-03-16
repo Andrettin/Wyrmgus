@@ -37,7 +37,7 @@
 
 #include "achievement.h"
 #include "action/actions.h"
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus start
 #include "character.h" //for updating levels
 //Wyrmgus end

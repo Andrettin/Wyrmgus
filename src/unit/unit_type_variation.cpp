@@ -35,7 +35,7 @@
 
 #include "unit/unit_type_variation.h"
 
-#include "animation.h"
+#include "animation/animation.h"
 #include "config.h"
 #include "construct.h"
 #include "icon.h"

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_defend.h - The actions headerfile. */
+/**@name action_defend.h - The defend action header file. */
 //
 //      (c) Copyright 2012 by cybermind
 //

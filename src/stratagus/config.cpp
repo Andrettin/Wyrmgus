@@ -36,7 +36,7 @@
 #include "config.h"
 
 #include "age.h"
-#include "animation.h"
+#include "animation/animation.h"
 #include "campaign.h"
 #include "character.h"
 #include "currency.h"

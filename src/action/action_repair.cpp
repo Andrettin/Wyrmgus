@@ -36,7 +36,7 @@
 #include "action/action_repair.h"
 
 #include "action/action_built.h"
-#include "animation.h"
+#include "animation/animation.h"
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end

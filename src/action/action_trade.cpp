@@ -35,7 +35,7 @@
 
 #include "action/action_trade.h"
 
-#include "animation.h"
+#include "animation/animation.h"
 #include "character.h"
 #include "commands.h"
 #include "iolib.h"

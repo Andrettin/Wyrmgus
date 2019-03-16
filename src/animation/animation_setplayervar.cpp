@@ -35,7 +35,6 @@
 
 #include "animation/animation_setplayervar.h"
 
-#include "animation.h"
 #include "unit/unit.h"
 
 #include <stdio.h>

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name actions_built.h - The actions headerfile. */
+/**@name actions_built.h - The built action header file. */
 //
 //      (c) Copyright 1998-2012 by Lutz Sammer and Jimmy Salmon
 //

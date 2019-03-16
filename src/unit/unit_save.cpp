@@ -39,7 +39,7 @@
 #include "unit/unit.h"
 
 #include "action/actions.h"
-#include "animation.h"
+#include "animation/animation.h"
 #include "character.h"
 #include "construct.h"
 #include "iolib.h"

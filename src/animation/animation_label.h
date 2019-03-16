@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_ifvar.h - The animation IfVar headerfile. */
+/**@name animation_label.h - The animation Label headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,28 +27,18 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_IFVAR_H
-#define ANIMATION_IFVAR_H
+#ifndef ANIMATION_LABEL_H
+#define ANIMATION_LABEL_H
 
-#include <string>
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_IfVar : public CAnimation
+class CAnimation_Label : public CAnimation
 {
 public:
-	CAnimation_IfVar() : CAnimation(AnimationIfVar) {}
+	CAnimation_Label() : CAnimation(AnimationLabel) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
-
-private:
-	typedef bool BinOpFunc(int lhs, int rhs);
-
-private:
-	std::string leftVar;
-	std::string rightVar;
-	BinOpFunc *binOpFunc = nullptr;
-	CAnimation *gotoLabel = nullptr;
 };
 
 #endif

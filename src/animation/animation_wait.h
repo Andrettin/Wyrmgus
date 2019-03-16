@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_randomwait.h - The animation RandomWait headerfile. */
+/**@name animation_wait.h - The animation Wait headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,23 +27,23 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_RANDOMWAIT_H
-#define ANIMATION_RANDOMWAIT_H
+#ifndef ANIMATION_WAIT_H
+#define ANIMATION_WAIT_H
+
+#include "animation/animation.h"
 
 #include <string>
-#include "animation.h"
 
-class CAnimation_RandomWait : public CAnimation
+class CAnimation_Wait : public CAnimation
 {
 public:
-	CAnimation_RandomWait() : CAnimation(AnimationRandomWait) {}
+	CAnimation_Wait() : CAnimation(AnimationWait) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	std::string minWait;
-	std::string maxWait;
+	std::string wait;
 };
 
 #endif

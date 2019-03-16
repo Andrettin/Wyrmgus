@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_RandomSound.h - The animation RandomSound headerfile. */
+/**@name animation_randomgoto.h - The animation RandomGoto headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,25 +27,24 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_RANDOMSOUND_H
-#define ANIMATION_RANDOMSOUND_H
+#ifndef ANIMATION_RANDOMGOTO_H
+#define ANIMATION_RANDOMGOTO_H
 
-#include <vector>
+#include "animation/animation.h"
 
-#include "animation.h"
-#include "unitsound.h"
+#include <string>
 
-class CAnimation_RandomSound : public CAnimation
+class CAnimation_RandomGoto : public CAnimation
 {
 public:
-	CAnimation_RandomSound() : CAnimation(AnimationRandomSound) {}
+	CAnimation_RandomGoto() : CAnimation(AnimationRandomGoto) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
-	void MapSound();
 private:
-	std::vector<SoundConfig> sounds;
+	std::string randomStr;
+	CAnimation *gotoLabel = nullptr;
 };
 
 #endif

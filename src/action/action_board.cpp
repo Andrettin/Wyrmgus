@@ -35,7 +35,7 @@
 
 #include "action/action_board.h"
 
-#include "animation.h"
+#include "animation/animation.h"
 #include "commands.h"
 #include "iolib.h"
 #include "map/map.h"

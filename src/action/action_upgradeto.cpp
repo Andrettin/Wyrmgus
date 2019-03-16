@@ -36,7 +36,7 @@
 #include "action/action_upgradeto.h"
 
 #include "ai.h"
-#include "animation.h"
+#include "animation/animation.h"
 #include "civilization.h"
 #include "faction.h"
 //Wyrmgus start

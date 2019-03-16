@@ -41,7 +41,7 @@
 #include "action/actions.h"
 #include "age.h"
 #include "ai.h"
-#include "animation.h"
+#include "animation/animation.h"
 #include "campaign.h"
 //Wyrmgus start
 #include "character.h"

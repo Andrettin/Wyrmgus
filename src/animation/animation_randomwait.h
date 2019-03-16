@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_unbreakable.h - The animation Unbreakable headerfile. */
+/**@name animation_randomwait.h - The animation RandomWait headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,22 +27,24 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_UNBREAKABLE_H
-#define ANIMATION_UNBREAKABLE_H
+#ifndef ANIMATION_RANDOMWAIT_H
+#define ANIMATION_RANDOMWAIT_H
+
+#include "animation/animation.h"
 
 #include <string>
-#include "animation.h"
 
-class CAnimation_Unbreakable : public CAnimation
+class CAnimation_RandomWait : public CAnimation
 {
 public:
-	CAnimation_Unbreakable() : CAnimation(AnimationUnbreakable) {}
+	CAnimation_RandomWait() : CAnimation(AnimationRandomWait) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	int state = 0;
+	std::string minWait;
+	std::string maxWait;
 };
 
 #endif

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_randomrotate.h - The animation RandomRotate headerfile. */
+/**@name animation_exactframe.h - The animation  headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,22 +27,25 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_RANDOMROTATE_H
-#define ANIMATION_RANDOMROTATE_H
+#ifndef ANIMATION_EXACTFRAME_H
+#define ANIMATION_EXACTFRAME_H
+
+#include "animation/animation.h"
 
 #include <string>
-#include "animation.h"
 
-class CAnimation_RandomRotate : public CAnimation
+class CAnimation_ExactFrame : public CAnimation
 {
 public:
-	CAnimation_RandomRotate() : CAnimation(AnimationRandomRotate) {}
+	CAnimation_ExactFrame() : CAnimation(AnimationExactFrame) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
+	int ParseAnimInt(const CUnit *unit) const;
+
 private:
-	std::string rotateStr;
+	std::string frame;
 };
 
 #endif

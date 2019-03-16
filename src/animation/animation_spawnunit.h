@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_move.h - The animation Move headerfile. */
+/**@name animation_spawnunit.h - The animation SpawnUnit headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,22 +27,35 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_MOVE_H
-#define ANIMATION_MOVE_H
+#ifndef ANIMATION_SPAWNUNIT_H
+#define ANIMATION_SPAWNUNIT_H
+
+#include "animation/animation.h"
 
 #include <string>
-#include "animation.h"
 
-class CAnimation_Move : public CAnimation
+//SpawnUnit flags
+enum SpawnUnit_Flags {
+	SU_None = 0,           /// Clears all flags
+	SU_Summoned = 1,       /// Unit is marked as "summoned"
+	SU_JoinToAIForce = 2   /// Unit is included into spawner's AI force, if available
+};
+
+class CAnimation_SpawnUnit : public CAnimation
 {
 public:
-	CAnimation_Move() : CAnimation(AnimationMove) {}
+	CAnimation_SpawnUnit() : CAnimation(AnimationSpawnUnit) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	std::string moveStr;
+	std::string unitTypeStr;
+	std::string offXStr;
+	std::string offYStr;
+	std::string rangeStr;
+	std::string playerStr;
+	std::string flagsStr;
 };
 
 #endif

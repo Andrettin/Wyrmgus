@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_sound.h - The animation Sound headerfile. */
+/**@name animation_spawnmissile.h - The animation SpawnMissile headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,24 +27,41 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SOUND_H
-#define ANIMATION_SOUND_H
+#ifndef ANIMATION_SPAWNMISSILE_H
+#define ANIMATION_SPAWNMISSILE_H
 
-#include "animation.h"
-#include "unitsound.h"
+#include "animation/animation.h"
 
-class CAnimation_Sound : public CAnimation
+#include <string>
+
+//SpawnMissile flags
+enum SpawnMissile_Flags {
+	SM_None = 0,           /// Clears all flags
+	SM_Damage = 1,         /// Missile deals damage to units
+	SM_ToTarget = 2,       /// Missile is directed to unit's target
+	SM_Pixel = 4,          /// Missile's offsets are calculated in pixels rather than tiles
+	SM_RelTarget = 8,      /// All calculations are relative to unit's target
+	SM_Ranged = 16,        /// Missile can't be shot if current range between unit and it's target
+	                       /// is bigger than unit's attack range
+	SM_SetDirection = 32   /// Missile takes the same direction as spawner
+};
+
+class CAnimation_SpawnMissile : public CAnimation
 {
 public:
-	CAnimation_Sound() : CAnimation(AnimationSound) {}
+	CAnimation_SpawnMissile() : CAnimation(AnimationSpawnMissile) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
-	void MapSound();
-
 private:
-	SoundConfig sound;
+	std::string missileTypeStr;
+	std::string startXStr;
+	std::string startYStr;
+	std::string destXStr;
+	std::string destYStr;
+	std::string flagsStr;
+	std::string offsetNumStr;
 };
 
 #endif

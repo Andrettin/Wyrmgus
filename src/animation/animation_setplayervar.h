@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_label.h - The animation Label headerfile. */
+/**@name animation_setplayervar.h - The animation SetPlayerVar headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,18 +27,29 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_LABEL_H
-#define ANIMATION_LABEL_H
+#ifndef ANIMATION_SETPLAYERVAR_H
+#define ANIMATION_SETPLAYERVAR_H
 
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_Label : public CAnimation
+#include <string>
+
+class CAnimation_SetPlayerVar : public CAnimation
 {
 public:
-	CAnimation_Label() : CAnimation(AnimationLabel) {}
+	CAnimation_SetPlayerVar() : CAnimation(AnimationSetPlayerVar) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
+
+private:
+	SetVar_ModifyTypes mod;
+	std::string playerStr;
+	std::string varStr;
+	std::string argStr;
+	std::string valueStr;
 };
+
+extern int GetPlayerData(const int player, const char *prop, const char *arg);
 
 #endif

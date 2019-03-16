@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_spawnunit.h - The animation SpawnUnit headerfile. */
+/**@name animation_die.h - The animation die headerfile. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2005-2007 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,34 +27,29 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SPAWNUNIT_H
-#define ANIMATION_SPAWNUNIT_H
+#ifndef __ANIMATION_DIE_H__
+#define __ANIMATION_DIE_H__
+
+#include "animation/animation.h"
 
 #include <string>
-#include "animation.h"
 
-//SpawnUnit flags
-enum SpawnUnit_Flags {
-	SU_None = 0,           /// Clears all flags
-	SU_Summoned = 1,       /// Unit is marked as "summoned"
-	SU_JoinToAIForce = 2   /// Unit is included into spawner's AI force, if available
-};
-
-class CAnimation_SpawnUnit : public CAnimation
+class CAnimation_Die : public CAnimation
 {
 public:
-	CAnimation_SpawnUnit() : CAnimation(AnimationSpawnUnit) {}
+	CAnimation_Die() : CAnimation(AnimationDie) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	std::string unitTypeStr;
-	std::string offXStr;
-	std::string offYStr;
-	std::string rangeStr;
-	std::string playerStr;
-	std::string flagsStr;
+	std::string DeathType;
 };
+
+class AnimationDie_Exception
+{
+};
+
+extern void AnimationDie_OnCatch(CUnit &unit);
 
 #endif

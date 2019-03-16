@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_setplayervar.h - The animation SetPlayerVar headerfile. */
+/**@name animation_ifvar.h - The animation IfVar headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,28 +27,29 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SETPLAYERVAR_H
-#define ANIMATION_SETPLAYERVAR_H
+#ifndef ANIMATION_IFVAR_H
+#define ANIMATION_IFVAR_H
+
+#include "animation/animation.h"
 
 #include <string>
-#include "animation.h"
 
-class CAnimation_SetPlayerVar : public CAnimation
+class CAnimation_IfVar : public CAnimation
 {
 public:
-	CAnimation_SetPlayerVar() : CAnimation(AnimationSetPlayerVar) {}
+	CAnimation_IfVar() : CAnimation(AnimationIfVar) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	SetVar_ModifyTypes mod;
-	std::string playerStr;
-	std::string varStr;
-	std::string argStr;
-	std::string valueStr;
-};
+	typedef bool BinOpFunc(int lhs, int rhs);
 
-extern int GetPlayerData(const int player, const char *prop, const char *arg);
+private:
+	std::string leftVar;
+	std::string rightVar;
+	BinOpFunc *binOpFunc = nullptr;
+	CAnimation *gotoLabel = nullptr;
+};
 
 #endif

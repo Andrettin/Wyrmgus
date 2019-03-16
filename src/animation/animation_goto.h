@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_setvar.h - The animation SetVar headerfile. */
+/**@name animation_goto.h - The animation Goto headerfile. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -27,25 +27,21 @@
 //      02111-1307, USA.
 //
 
-#ifndef ANIMATION_SETVAR_H
-#define ANIMATION_SETVAR_H
+#ifndef ANIMATION_GOTO_H
+#define ANIMATION_GOTO_H
 
-#include <string>
-#include "animation.h"
+#include "animation/animation.h"
 
-class CAnimation_SetVar : public CAnimation
+class CAnimation_Goto : public CAnimation
 {
 public:
-	CAnimation_SetVar() : CAnimation(AnimationSetVar) {}
+	CAnimation_Goto() : CAnimation(AnimationGoto) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	SetVar_ModifyTypes mod;
-	std::string varStr;
-	std::string valueStr;
-	std::string unitSlotStr;
+	CAnimation *gotoLabel = nullptr;
 };
 
 #endif
