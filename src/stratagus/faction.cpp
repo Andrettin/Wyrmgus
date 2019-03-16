@@ -38,6 +38,7 @@
 #include "faction.h"
 #include "luacallback.h"
 #include "player.h"
+#include "player_color.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
