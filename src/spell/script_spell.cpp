@@ -49,7 +49,6 @@
 #include "spell/spell_areabombardment.h"
 #include "spell/spell_capture.h"
 #include "spell/spell_demolish.h"
-#include "spell/spell_luacallback.h"
 #include "spell/spell_polymorph.h"
 //Wyrmgus start
 #include "spell/spell_retrain.h"
@@ -93,8 +92,6 @@ static SpellActionType *CclSpellAction(lua_State *l)
 		spellaction = new Spell_Capture;
 	} else if (!strcmp(value, "demolish")) {
 		spellaction = new Spell_Demolish;
-	} else if (!strcmp(value, "lua-callback")) {
-		spellaction = new Spell_LuaCallback;
 	} else if (!strcmp(value, "polymorph")) {
 		spellaction = new Spell_Polymorph;
 	//Wyrmgus start

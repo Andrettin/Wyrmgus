@@ -85,8 +85,7 @@ enum ButtonCmd {
 	ButtonCancel,         /// cancel
 	ButtonCancelUpgrade,  /// cancel upgrade
 	ButtonCancelTrain,    /// cancel training
-	ButtonCancelBuild,    /// cancel building
-	ButtonCallbackAction
+	ButtonCancelBuild    /// cancel building
 };
 
 class ButtonAction;
@@ -109,7 +108,6 @@ public:
 	bool AlwaysShow = false;		/// button is always shown but drawn grayscale if not available
 	ButtonCmd Action = ButtonMove;	/// command on button press
 	int Value = 0;					/// extra value for command
-	void *Payload = nullptr;
 	std::string ValueStr;			/// keep original value string
 
 	ButtonCheckFunc Allowed = nullptr;	/// Check if this button is allowed
@@ -144,7 +142,7 @@ extern void InitButtons();
 extern void CleanButtons();
 /// Make a new button
 extern int AddButton(int pos, CButtonLevel *level, const std::string &IconIdent,
-					 ButtonCmd action, const std::string &value, void* payload, const ButtonCheckFunc func,
+					 ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
 					 const std::string &arg, const int key, const std::string &hint, const std::string &descr,
 					 const std::string &sound, const std::string &cursor, const std::string &umask,
 					 //Wyrmgus start

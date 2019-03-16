@@ -972,20 +972,16 @@ static int CclDefineButton(lua_State *l)
 			if (!lua_isnumber(l, -1) && !lua_isstring(l, -1) && !lua_isfunction(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			if (lua_isfunction(l, -1)) {
-				ba.Payload = new LuaCallback(l, -1);
-			} else {
-				char buf[64];
-				const char *s2;
+			char buf[64];
+			const char *s2;
 
-				if (lua_isnumber(l, -1)) {
-					snprintf(buf, sizeof(buf), "%ld", (long int)lua_tonumber(l, -1));
-					s2 = buf;
-				} else {
-					s2 = lua_tostring(l, -1);
-				}
-				ba.ValueStr = s2;
+			if (lua_isnumber(l, -1)) {
+				snprintf(buf, sizeof(buf), "%ld", (long int)lua_tonumber(l, -1));
+				s2 = buf;
+			} else {
+				s2 = lua_tostring(l, -1);
 			}
+			ba.ValueStr = s2;
 		} else if (!strcmp(value, "Allowed")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "check-true")) {
@@ -1086,7 +1082,7 @@ static int CclDefineButton(lua_State *l)
 		}
 		lua_pop(l, 1);
 	}
-	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr, ba.Payload,
+	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
 			  ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.Description, ba.CommentSound.Name,
 			  //Wyrmgus start
 //			  ba.ButtonCursor, ba.UnitMask, ba.Popup, ba.AlwaysShow);
