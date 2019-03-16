@@ -2440,7 +2440,7 @@ void CEditor::Init()
 		for (std::vector<CUnitType *>::size_type i = 0; i < CUnitType::UnitTypes.size(); ++i) {
 			CUnitType &type = *CUnitType::UnitTypes[i];
 			
-			if (type.Icon.Name.empty() || type.BoolFlag[VANISHES_INDEX].value || type.BoolFlag[HIDDEN_INDEX].value) {
+			if (type.IsHiddenInEditor()) {
 				continue;
 			}
 			
