@@ -571,29 +571,29 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		std::string mod_file(mapSetup);
 		mod_file = FindAndReplaceStringBeginning(mod_file, StratagusLibPath + "/", "");
 		
-		for (size_t i = 0; i < CFaction::Factions.size(); ++i) {
-			if (CFaction::Factions[i]->Mod != CMap::Map.Info.Filename) {
+		for (const CFaction *faction : CFaction::Factions) {
+			if (faction->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
 				
-			f->printf("DefineFaction(\"%s\", {\n", CFaction::Factions[i]->Ident.c_str());
-			f->printf("\tName = \"%s\",\n", CFaction::Factions[i]->Name.c_str());
-			f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[i].c_str());
-			if (CFaction::Factions[i]->Type != FactionTypeNoFactionType) {
-				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(CFaction::Factions[i]->Type).c_str());
+			f->printf("DefineFaction(\"%s\", {\n", faction->Ident.c_str());
+			f->printf("\tName = \"%s\",\n", faction->Name.c_str());
+			f->printf("\tCivilization = \"%s\",\n", faction->Civilization->GetIdent().utf8().get_data());
+			if (faction->Type != FactionTypeNoFactionType) {
+				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(faction->Type).c_str());
 			}
-			if (CFaction::Factions[i]->ParentFaction != -1) {
-				f->printf("\tParentFaction = \"%s\",\n", CFaction::Factions[CFaction::Factions[i]->ParentFaction]->Ident.c_str());
+			if (faction->ParentFaction != nullptr) {
+				f->printf("\tParentFaction = \"%s\",\n", faction->ParentFaction->Ident.c_str());
 			}
-			if (CFaction::Factions[i]->GetPrimaryColors().size() > 0) {
+			if (faction->GetPrimaryColors().size() > 0) {
 				f->printf("\tColors = {");
-				for (CPlayerColor *player_color : CFaction::Factions[i]->GetPrimaryColors()) {
+				for (CPlayerColor *player_color : faction->GetPrimaryColors()) {
 					f->printf("\"%s\", ", player_color->GetIdent().utf8().get_data());
 				}
 				f->printf("},\n");
 			}
-			if (!CFaction::Factions[i]->FactionUpgrade.empty()) {
-				f->printf("\tFactionUpgrade = \"%s\",\n", CFaction::Factions[i]->FactionUpgrade.c_str());
+			if (!faction->FactionUpgrade.empty()) {
+				f->printf("\tFactionUpgrade = \"%s\",\n", faction->FactionUpgrade.c_str());
 			}
 			f->printf("\tMod = \"%s\"\n", mod_file.c_str());
 			f->printf("})\n\n");

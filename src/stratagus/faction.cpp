@@ -104,8 +104,8 @@ int CFaction::GetFactionClassUnitType(const CFaction *faction, int class_id)
 		return faction->ClassUnitTypes.find(class_id)->second;
 	}
 	
-	if (faction->ParentFaction != -1) {
-		return CFaction::GetFactionClassUnitType(CFaction::Factions[faction->ParentFaction], class_id);
+	if (faction->ParentFaction != nullptr) {
+		return CFaction::GetFactionClassUnitType(faction->ParentFaction, class_id);
 	}
 	
 	return PlayerRaces.GetCivilizationClassUnitType(faction->Civilization->ID, class_id);
@@ -121,8 +121,8 @@ int CFaction::GetFactionClassUpgrade(const CFaction *faction, int class_id)
 		return faction->ClassUpgrades.find(class_id)->second;
 	}
 		
-	if (faction->ParentFaction != -1) {
-		return CFaction::GetFactionClassUpgrade(CFaction::Factions[faction->ParentFaction], class_id);
+	if (faction->ParentFaction != nullptr) {
+		return CFaction::GetFactionClassUpgrade(faction->ParentFaction, class_id);
 	}
 	
 	return PlayerRaces.GetCivilizationClassUpgrade(faction->Civilization->ID, class_id);
@@ -138,8 +138,8 @@ std::vector<CFiller> CFaction::GetFactionUIFillers(const CFaction *faction)
 		return faction->UIFillers;
 	}
 		
-	if (faction->ParentFaction != -1) {
-		return CFaction::GetFactionUIFillers(CFaction::Factions[faction->ParentFaction]);
+	if (faction->ParentFaction != nullptr) {
+		return CFaction::GetFactionUIFillers(faction->ParentFaction);
 	}
 	
 	return PlayerRaces.GetCivilizationUIFillers(faction->Civilization->ID);
@@ -172,8 +172,8 @@ int CFaction::GetForceTypeWeight(int force_type) const
 		return this->ForceTypeWeights.find(force_type)->second;
 	}
 	
-	if (this->ParentFaction != -1) {
-		return CFaction::Factions[this->ParentFaction]->GetForceTypeWeight(force_type);
+	if (this->ParentFaction != nullptr) {
+		return this->ParentFaction->GetForceTypeWeight(force_type);
 	}
 	
 	if (this->Civilization == nullptr) {
@@ -194,8 +194,8 @@ CCurrency *CFaction::GetCurrency() const
 		return this->Currency;
 	}
 	
-	if (this->ParentFaction != -1) {
-		return CFaction::Factions[this->ParentFaction]->GetCurrency();
+	if (this->ParentFaction != nullptr) {
+		return this->ParentFaction->GetCurrency();
 	}
 	
 	if (this->Civilization != nullptr) {
@@ -215,8 +215,8 @@ std::vector<CForceTemplate *> CFaction::GetForceTemplates(int force_type) const
 		return this->ForceTemplates.find(force_type)->second;
 	}
 	
-	if (this->ParentFaction != -1) {
-		return CFaction::Factions[this->ParentFaction]->GetForceTemplates(force_type);
+	if (this->ParentFaction != nullptr) {
+		return this->ParentFaction->GetForceTemplates(force_type);
 	}
 	
 	if (this->Civilization == nullptr) {
@@ -232,8 +232,8 @@ std::vector<CAiBuildingTemplate *> CFaction::GetAiBuildingTemplates() const
 		return this->AiBuildingTemplates;
 	}
 	
-	if (this->ParentFaction != -1) {
-		return CFaction::Factions[this->ParentFaction]->GetAiBuildingTemplates();
+	if (this->ParentFaction != nullptr) {
+		return this->ParentFaction->GetAiBuildingTemplates();
 	}
 	
 	if (this->Civilization == nullptr) {
@@ -249,8 +249,8 @@ const std::vector<std::string> &CFaction::GetShipNames() const
 		return this->ShipNames;
 	}
 	
-	if (this->ParentFaction != -1) {
-		return CFaction::Factions[this->ParentFaction]->GetShipNames();
+	if (this->ParentFaction != nullptr) {
+		return this->ParentFaction->GetShipNames();
 	}
 	
 	return this->Civilization->GetShipNames();

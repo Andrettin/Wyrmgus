@@ -163,8 +163,9 @@ void CPlayer::Load(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
-			const int faction_id = LuaToNumber(l, j + 1);
-			this->Faction = faction_id != -1 ? CFaction::Factions[faction_id] : nullptr;
+			const std::string faction_ident = LuaToString(l, j + 1);
+			const CFaction *faction = CFaction::GetFaction(faction_ident);
+			this->Faction = faction;
 		} else if (!strcmp(value, "dynasty")) {
 			this->Dynasty = PlayerRaces.GetDynasty(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "age")) {
@@ -1680,36 +1681,32 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		
 		std::vector<std::string> factions;
-		for (size_t i = 0; i < CFaction::Factions.size(); ++i)
-		{
-			if (CFaction::Factions[i]->Civilization != civilization) {
+		for (const CFaction *faction : CFaction::Factions) {
+			if (faction->Civilization != civilization) {
 				continue;
 			}
 			
-			if (!is_mod || CFaction::Factions[i]->Mod == mod_file) {
-				factions.push_back(CFaction::Factions[i]->Ident);
+			if (!is_mod || faction->Mod == mod_file) {
+				factions.push_back(faction->Ident);
 			}
 		}
 		
 		lua_createtable(l, factions.size(), 0);
-		for (size_t i = 1; i <= factions.size(); ++i)
-		{
+		for (size_t i = 1; i <= factions.size(); ++i) {
 			lua_pushstring(l, factions[i-1].c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else if (!strcmp(data, "Quests")) {
 		lua_createtable(l, civilization->Quests.size(), 0);
-		for (size_t i = 1; i <= civilization->Quests.size(); ++i)
-		{
+		for (size_t i = 1; i <= civilization->Quests.size(); ++i) {
 			lua_pushstring(l, civilization->Quests[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else if (!strcmp(data, "ShipNames")) {
 		lua_createtable(l, civilization->ShipNames.size(), 0);
-		for (size_t i = 1; i <= civilization->ShipNames.size(); ++i)
-		{
+		for (size_t i = 1; i <= civilization->ShipNames.size(); ++i) {
 			lua_pushstring(l, civilization->ShipNames[i-1].c_str());
 			lua_rawseti(l, -2, i);
 		}
@@ -1821,8 +1818,8 @@ static int CclDefineFaction(lua_State *l)
 	
 	CFaction *faction = CFaction::GetFaction(faction_name);
 	if (faction) { // redefinition
-		if (faction->ParentFaction != -1) {
-			parent_faction = CFaction::Factions[faction->ParentFaction]->Ident;
+		if (faction->ParentFaction != nullptr) {
+			parent_faction = faction->ParentFaction->Ident;
 		}
 	} else {
 		faction = new CFaction;
@@ -2223,31 +2220,31 @@ static int CclDefineFaction(lua_State *l)
 	}
 	
 	if (!parent_faction.empty()) { //process this here
-		faction->ParentFaction = CFaction::GetFactionIndexByName(parent_faction);
+		faction->ParentFaction = CFaction::GetFaction(parent_faction);
 		
-		if (faction->ParentFaction == -1) { //if a parent faction was set but wasn't found, give an error
+		if (faction->ParentFaction == nullptr) { //if a parent faction was set but wasn't found, give an error
 			LuaError(l, "Faction %s doesn't exist" _C_ parent_faction.c_str());
 		}
 		
-		if (faction->ParentFaction != -1 && faction->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
-			faction->FactionUpgrade = CFaction::Factions[faction->ParentFaction]->FactionUpgrade;
+		if (faction->ParentFaction != nullptr && faction->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
+			faction->FactionUpgrade = faction->ParentFaction->FactionUpgrade;
 		}
 		
-		if (faction->ParentFaction != -1) { //inherit button icons from parent civilization, for button actions which none are specified
-			for (std::map<int, IconConfig>::iterator iterator = CFaction::Factions[faction->ParentFaction]->ButtonIcons.begin(); iterator != CFaction::Factions[faction->ParentFaction]->ButtonIcons.end(); ++iterator) {
+		if (faction->ParentFaction != nullptr) { //inherit button icons from parent civilization, for button actions which none are specified
+			for (std::map<int, IconConfig>::const_iterator iterator = faction->ParentFaction->ButtonIcons.begin(); iterator != faction->ParentFaction->ButtonIcons.end(); ++iterator) {
 				if (faction->ButtonIcons.find(iterator->first) == faction->ButtonIcons.end()) {
 					faction->ButtonIcons[iterator->first] = iterator->second;
 				}
 			}
 			
-			for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = CFaction::Factions[faction->ParentFaction]->HistoricalUpgrades.begin(); iterator != CFaction::Factions[faction->ParentFaction]->HistoricalUpgrades.end(); ++iterator) {
+			for (std::map<std::string, std::map<CDate, bool>>::const_iterator iterator = faction->ParentFaction->HistoricalUpgrades.begin(); iterator != faction->ParentFaction->HistoricalUpgrades.end(); ++iterator) {
 				if (faction->HistoricalUpgrades.find(iterator->first) == faction->HistoricalUpgrades.end()) {
 					faction->HistoricalUpgrades[iterator->first] = iterator->second;
 				}
 			}
 		}
 	} else if (parent_faction.empty()) {
-		faction->ParentFaction = -1; // to allow redefinitions to remove the parent faction setting
+		faction->ParentFaction = nullptr; // to allow redefinitions to remove the parent faction setting
 	}
 	
 	return 0;
@@ -2714,21 +2711,12 @@ static int CclGetFactions(lua_State *l)
 	}
 	
 	std::vector<std::string> factions;
-	if (civilization != nullptr) {
-		for (size_t i = 0; i < CFaction::Factions.size(); ++i) {
-			if (faction_type != -1 && CFaction::Factions[i]->Type != faction_type) {
-				continue;
-			}
-			if (CFaction::Factions[i]->Civilization == civilization) {
-				factions.push_back(CFaction::Factions[i]->Ident);
-			}
+	for (const CFaction *faction : CFaction::Factions) {
+		if (faction_type != -1 && faction->Type != faction_type) {
+			continue;
 		}
-	} else {
-		for (size_t i = 0; i < CFaction::Factions.size(); ++i) {
-			if (faction_type != -1 && CFaction::Factions[i]->Type != faction_type) {
-				continue;
-			}
-			factions.push_back(CFaction::Factions[i]->Ident);
+		if (civilization == nullptr || faction->Civilization == civilization) {
+			factions.push_back(faction->Ident);
 		}
 	}
 		
@@ -2864,8 +2852,8 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushstring(l, faction->FactionUpgrade.c_str());
 		return 1;
 	} else if (!strcmp(data, "ParentFaction")) {
-		if (faction->ParentFaction != -1) {
-			lua_pushstring(l, CFaction::Factions[faction->ParentFaction]->Ident.c_str());
+		if (faction->ParentFaction != nullptr) {
+			lua_pushstring(l, faction->ParentFaction->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

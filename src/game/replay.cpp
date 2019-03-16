@@ -359,7 +359,7 @@ static void SaveFullLog(CFile &file)
 	file.printf("  Type = %d,\n", CurrentReplay->Type);
 	file.printf("  Race = %d,\n", CurrentReplay->Race);
 	//Wyrmgus start
-	file.printf("  Faction = %i,\n", CurrentReplay->Faction != nullptr ? CurrentReplay->Faction->ID : -1);
+	file.printf("  Faction = \"%s\",\n", CurrentReplay->Faction != nullptr ? CurrentReplay->Faction->Ident.c_str() : "");
 	//Wyrmgus end
 	file.printf("  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
 	file.printf("  Players = {\n");
@@ -372,7 +372,7 @@ static void SaveFullLog(CFile &file)
 		file.printf(" AIScript = \"%s\",", CurrentReplay->Players[i].AIScript.c_str());
 		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
 		//Wyrmgus start
-		file.printf(" Faction = %i,", CurrentReplay->Players[i].Faction != nullptr ? CurrentReplay->Players[i].Faction->ID : -1);
+		file.printf(" Faction = \"%s\",", CurrentReplay->Players[i].Faction != nullptr ? CurrentReplay->Players[i].Faction->Ident.c_str() : "");
 		//Wyrmgus end
 		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
 		file.printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
@@ -643,9 +643,10 @@ static int CclReplayLog(lua_State *l)
 			replay->Race = LuaToNumber(l, -1);
 		//Wyrmgus start
 		} else if (!strcmp(value, "Faction")) {
-			const int faction_id = LuaToNumber(l, -1);
-			if (faction_id != -1) {
-				replay->Faction = CFaction::Factions[faction_id];
+			const std::string faction_ident = LuaToString(l, -1);
+			CFaction *faction = CFaction::GetFaction(faction_ident);
+			if (faction != nullptr) {
+				replay->Faction = faction;
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "LocalPlayer")) {
@@ -673,9 +674,10 @@ static int CclReplayLog(lua_State *l)
 						replay->Players[j].Race = LuaToNumber(l, -1);
 					//Wyrmgus start
 					} else if (!strcmp(value, "Faction")) {
-						const int faction_id = LuaToNumber(l, -1);
-						if (faction_id != -1) {
-							replay->Players[j].Faction = CFaction::Factions[faction_id];
+						const std::string faction_ident = LuaToString(l, -1);
+						CFaction *faction = CFaction::GetFaction(faction_ident);
+						if (faction != nullptr) {
+							replay->Players[j].Faction = faction;
 						}
 					//Wyrmgus end
 					} else if (!strcmp(value, "Team")) {

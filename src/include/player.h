@@ -266,8 +266,8 @@ public:
 	CSite *GetNearestSettlement(const Vec2i &pos, int z, const Vec2i &size) const;
 	bool HasUnitBuilder(const CUnitType *type, const CSite *settlement = nullptr) const;
 	bool HasUpgradeResearcher(const CUpgrade *upgrade) const;
-	bool CanFoundFaction(CFaction *faction, bool pre = false);
-	bool CanChooseDynasty(CDynasty *dynasty, bool pre = false);
+	bool CanFoundFaction(const CFaction *faction, bool pre = false);
+	bool CanChooseDynasty(const CDynasty *dynasty, bool pre = false);
 	bool CanRecruitHero(const CCharacter *character, bool ignore_neutral = false) const;
 	bool UpgradeRemovesExistingUpgrade(const CUpgrade *upgrade, bool ignore_lower_priority = false) const;
 	std::string GetFactionTitleName() const;

@@ -3542,11 +3542,11 @@ void SavePreferences()
 //Wyrmgus start
 void DeleteModFaction(const std::string &faction_name)
 {
-	int faction = CFaction::GetFactionIndexByName(faction_name);
-	if (faction != -1 && !CFaction::Factions[faction]->Mod.empty()) {
-		FactionStringToIndex.erase(CFaction::Factions[faction]->Ident);
-		delete CFaction::Factions[faction];
-		CFaction::Factions.erase(std::remove(CFaction::Factions.begin(), CFaction::Factions.end(), CFaction::Factions[faction]), CFaction::Factions.end());
+	CFaction *faction = CFaction::GetFaction(faction_name);
+	if (faction != nullptr && !faction->Mod.empty()) {
+		FactionStringToIndex.erase(faction->Ident);
+		delete faction;
+		CFaction::Factions.erase(std::remove(CFaction::Factions.begin(), CFaction::Factions.end(), faction), CFaction::Factions.end());
 	}
 }
 
@@ -3578,10 +3578,10 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 			}
 		}
 	}
-	for (size_t j = 0; j < CFaction::Factions.size(); ++j) {
-		for (std::map<int, int>::reverse_iterator iterator = CFaction::Factions[j]->ClassUnitTypes.rbegin(); iterator != CFaction::Factions[j]->ClassUnitTypes.rend(); ++iterator) {
+	for (CFaction *faction : CFaction::Factions) {
+		for (std::map<int, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
 			if (iterator->second == unit_type->Slot) {
-				CFaction::Factions[j]->ClassUnitTypes.erase(iterator->first);
+				faction->ClassUnitTypes.erase(iterator->first);
 			}
 		}
 	}

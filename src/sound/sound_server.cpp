@@ -797,7 +797,8 @@ void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::stri
 	}
 }
 
-void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::string &civilization_name, const std::string &faction_name) {
+void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::string &civilization_ident, const std::string &faction_ident)
+{
 	if (!IsMusicEnabled()) {
 		return;
 	}
@@ -806,26 +807,26 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 		return;
 	}
 
-	if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
-		CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
-		int faction = CFaction::GetFactionIndexByName(faction_name);
-		int parent_faction = -1;
+	if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_ident.c_str()) != OAML_OK) {
+		CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
+		const CFaction *faction = CFaction::GetFaction(faction_ident);
+		const CFaction *parent_faction = nullptr;
 		bool found_music = false;
-		if (faction != -1) {
+		if (faction != nullptr) {
 			while (true) {
-				parent_faction = CFaction::Factions[faction]->ParentFaction;
-				if (parent_faction == -1) {
+				parent_faction = faction->ParentFaction;
+				if (parent_faction == nullptr) {
 					break;
 				}
 				faction = parent_faction;
 				
-				if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), CFaction::Factions[faction]->Ident.c_str()) == OAML_OK) {
+				if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction->Ident.c_str()) == OAML_OK) {
 					found_music = true;
 					break;
 				}
 			}
 		}
-		if (!found_music && Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
+		if (!found_music && Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_ident.c_str()) != OAML_OK) {
 			CCivilization *parent_civilization = nullptr;
 			if (civilization) {
 				while (true) {

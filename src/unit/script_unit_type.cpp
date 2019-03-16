@@ -1969,10 +1969,10 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		}
-		for (size_t i = 0; i < CFaction::Factions.size(); ++i) {
-			for (std::map<int, int>::reverse_iterator iterator = CFaction::Factions[i]->ClassUnitTypes.rbegin(); iterator != CFaction::Factions[i]->ClassUnitTypes.rend(); ++iterator) {
+		for (CFaction *faction : CFaction::Factions) {
+			for (std::map<int, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
 				if (iterator->second == type->Slot) {
-					CFaction::Factions[i]->ClassUnitTypes.erase(iterator->first);
+					faction->ClassUnitTypes.erase(iterator->first);
 					break;
 				}
 			}

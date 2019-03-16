@@ -1473,10 +1473,9 @@ void CPlayer::SetFaction(const CFaction *faction)
 void CPlayer::SetRandomFaction()
 {
 	// set random one from the civilization's factions
-	std::vector<CFaction *> local_factions;
+	std::vector<const CFaction *> local_factions;
 	
-	for (size_t i = 0; i < CFaction::Factions.size(); ++i) {
-		CFaction *faction = CFaction::Factions[i];
+	for (const CFaction *faction : CFaction::Factions) {
 		if (faction->Civilization->ID != this->Race) {
 			continue;
 		}
@@ -1500,7 +1499,7 @@ void CPlayer::SetRandomFaction()
 	}
 	
 	if (local_factions.size() > 0) {
-		CFaction *chosen_faction = local_factions[SyncRand(local_factions.size())];
+		const CFaction *chosen_faction = local_factions[SyncRand(local_factions.size())];
 		this->SetFaction(chosen_faction);
 	} else {
 		this->SetFaction(nullptr);
@@ -1827,7 +1826,7 @@ bool CPlayer::HasUpgradeResearcher(const CUpgrade *upgrade) const
 **
 **  @param faction    New faction.
 */
-bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
+bool CPlayer::CanFoundFaction(const CFaction *faction, bool pre)
 {
 	if (CurrentQuest != nullptr) {
 		return false;
@@ -1880,7 +1879,7 @@ bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 **
 **  @param dynasty    New dynasty.
 */
-bool CPlayer::CanChooseDynasty(CDynasty *dynasty, bool pre)
+bool CPlayer::CanChooseDynasty(const CDynasty *dynasty, bool pre)
 {
 	if (CurrentQuest != nullptr) {
 		return false;

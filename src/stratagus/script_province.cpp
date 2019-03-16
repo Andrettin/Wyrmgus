@@ -215,15 +215,15 @@ static int CclDefineProvince(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 
-				int faction = CFaction::GetFactionIndexByName(LuaToString(l, -1, j + 1));
-				if (faction == -1) {
+				const CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
 				++j;
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				province->FactionCulturalNames[CFaction::Factions[faction]] = TransliterateText(cultural_name);
+				province->FactionCulturalNames[faction] = TransliterateText(cultural_name);
 			}
 		} else if (!strcmp(value, "Claims")) {
 			if (!lua_istable(l, -1)) {
@@ -233,12 +233,12 @@ static int CclDefineProvince(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 				
-				int faction = CFaction::GetFactionIndexByName(LuaToString(l, -1, j + 1));
-				if (faction == -1) {
+				CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
 				
-				province->FactionClaims.push_back(CFaction::Factions[faction]);
+				province->FactionClaims.push_back(faction);
 			}
 		} else if (!strcmp(value, "Regions")) {
 			if (!lua_istable(l, -1)) {
@@ -264,11 +264,11 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				std::string owner_faction_name = LuaToString(l, -1, j + 1);
 				if (!owner_faction_name.empty()) {
-					int owner_faction = CFaction::GetFactionIndexByName(owner_faction_name);
-					if (owner_faction == -1) {
+					CFaction *owner_faction = CFaction::GetFaction(owner_faction_name);
+					if (owner_faction == nullptr) {
 						LuaError(l, "Faction \"%s\" doesn't exist." _C_ owner_faction_name.c_str());
 					}
-					province->HistoricalOwners[year] = CFaction::Factions[owner_faction];
+					province->HistoricalOwners[year] = owner_faction;
 				} else {
 					province->HistoricalOwners[year] = nullptr;
 				}
@@ -283,11 +283,11 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				++j;
 				std::string claimant_faction_name = LuaToString(l, -1, j + 1);
-				int claimant_faction = CFaction::GetFactionIndexByName(claimant_faction_name);
-				if (claimant_faction == -1) {
+				CFaction *claimant_faction = CFaction::GetFaction(claimant_faction_name);
+				if (claimant_faction == nullptr) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ claimant_faction_name.c_str());
 				}
-				province->HistoricalClaims[year] = CFaction::Factions[claimant_faction];
+				province->HistoricalClaims[year] = claimant_faction;
 			}
 		} else if (!strcmp(value, "HistoricalCultures")) {
 			if (!lua_istable(l, -1)) {
@@ -446,15 +446,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 
 				++j;
 
-				int faction = CFaction::GetFactionIndexByName(LuaToString(l, -1, j + 1));
-				if (faction == -1) {
+				const CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
 				++j;
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->FactionCulturalTerrainNames[std::pair<int,CFaction *>(terrain, CFaction::Factions[faction])].push_back(TransliterateText(cultural_name));
+				tile->FactionCulturalTerrainNames[std::pair<int, const CFaction *>(terrain, faction)].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "CulturalResourceNames")) {
 			if (!lua_istable(l, -1)) {
@@ -496,15 +496,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 
 				++j;
 				
-				int faction = CFaction::GetFactionIndexByName(LuaToString(l, -1, j + 1));
-				if (faction == -1) {
+				const CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
 				++j;
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->FactionCulturalResourceNames[std::pair<int,CFaction *>(resource, CFaction::Factions[faction])].push_back(TransliterateText(cultural_name));
+				tile->FactionCulturalResourceNames[std::pair<int, const CFaction *>(resource, faction)].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "CulturalSettlementNames")) {
 			if (!lua_istable(l, -1)) {
@@ -531,15 +531,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 				
-				int faction = CFaction::GetFactionIndexByName(LuaToString(l, -1, j + 1));
-				if (faction == -1) {
+				const CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
 				++j;
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->FactionCulturalSettlementNames[CFaction::Factions[faction]].push_back(TransliterateText(cultural_name));
+				tile->FactionCulturalSettlementNames[faction].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "Claims")) {
 			if (!lua_istable(l, -1)) {
@@ -549,12 +549,12 @@ static int CclDefineWorldMapTile(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 				
-				int faction = CFaction::GetFactionIndexByName(LuaToString(l, -1, j + 1));
-				if (faction == -1) {
+				CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
 				
-				tile->FactionClaims.push_back(CFaction::Factions[faction]);
+				tile->FactionClaims.push_back(faction);
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
 			if (!lua_istable(l, -1)) {
@@ -567,11 +567,11 @@ static int CclDefineWorldMapTile(lua_State *l)
 				++j;
 				std::string owner_faction_name = LuaToString(l, -1, j + 1);
 				if (!owner_faction_name.empty()) {
-					int owner_faction = CFaction::GetFactionIndexByName(owner_faction_name);
-					if (owner_faction == -1) {
+					CFaction *owner_faction = CFaction::GetFaction(owner_faction_name);
+					if (owner_faction == nullptr) {
 						LuaError(l, "Faction \"%s\" doesn't exist." _C_ owner_faction_name.c_str());
 					}
-					tile->HistoricalOwners[year] = CFaction::Factions[owner_faction];
+					tile->HistoricalOwners[year] = owner_faction;
 				} else {
 					tile->HistoricalOwners[year] = nullptr;
 				}
@@ -586,11 +586,11 @@ static int CclDefineWorldMapTile(lua_State *l)
 				++j;
 				++j;
 				std::string claimant_faction_name = LuaToString(l, -1, j + 1);
-				int claimant_faction = CFaction::GetFactionIndexByName(claimant_faction_name);
-				if (claimant_faction == -1) {
+				CFaction *claimant_faction = CFaction::GetFaction(claimant_faction_name);
+				if (claimant_faction == nullptr) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ claimant_faction_name.c_str());
 				}
-				tile->HistoricalClaims[year] = CFaction::Factions[claimant_faction];
+				tile->HistoricalClaims[year] = claimant_faction;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

@@ -111,7 +111,7 @@ public:
 	bool Water = false;													/// Whether the province is a water province or not
 	bool Coastal = false;												/// Whether the province is a coastal province or not
 	std::map<int, std::string> CulturalNames;							/// Names for the province for each different culture/civilization
-	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
+	std::map<const CFaction *, std::string> FactionCulturalNames;		/// Names for the province for each different faction
 	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this province
 	std::vector<CRegion *> Regions;										/// Regions to which this province belongs
 	std::map<int, CFaction *> HistoricalOwners;							/// Historical owners of the province, mapped to the year
@@ -132,11 +132,11 @@ public:
 	Vec2i Position = Vec2i(-1, -1);				/// Position of the tile
 	CWorld *World = nullptr;
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each culture/civilization
-	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
+	std::map<std::pair<int,const CFaction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each culture/civilization
-	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
+	std::map<std::pair<int,const CFaction *>, std::vector<std::string>> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
 	std::map<int, std::vector<std::string>> CulturalSettlementNames;	/// Names for the tile's settlement for each faction
-	std::map<CFaction *, std::vector<std::string>> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
+	std::map<const CFaction *, std::vector<std::string>> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
 	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this tile
 	std::map<int, CFaction *> HistoricalOwners;							/// Historical owners of the tile, mapped to the year
 	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the tile, mapped to the year

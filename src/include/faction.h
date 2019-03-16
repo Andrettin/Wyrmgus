@@ -146,7 +146,7 @@ public:
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 	int DefaultTier = FactionTierBarony;								/// default faction tier
 	int DefaultGovernmentType = GovernmentTypeMonarchy;					/// default government type
-	int ParentFaction = -1;												/// parent faction of this faction
+	const CFaction *ParentFaction = nullptr;							/// the parent faction of this faction
 	bool Playable = true;												/// faction playability
 	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
 	IconConfig Icon;													/// Faction's icon
