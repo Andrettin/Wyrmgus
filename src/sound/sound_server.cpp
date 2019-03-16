@@ -764,7 +764,7 @@ void PlayMusicName(const std::string &name) {
 		return;
 	}
 	
-	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() == nullptr) {
 		return;
 	}
 
@@ -776,7 +776,7 @@ void PlayMusicByGroupRandom(const std::string &group) {
 		return;
 	}
 	
-	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() == nullptr) {
 		return;
 	}
 
@@ -788,7 +788,7 @@ void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::stri
 		return;
 	}
 	
-	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() == nullptr) {
 		return;
 	}
 
@@ -803,7 +803,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 		return;
 	}
 
-	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() == nullptr) {
 		return;
 	}
 
@@ -850,7 +850,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 }
 
 void SetMusicCondition(int id, int value) {
-	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() == nullptr) {
 		return;
 	}
 
@@ -858,7 +858,7 @@ void SetMusicCondition(int id, int value) {
 }
 
 void SetMusicLayerGain(const std::string &layer, float gain) {
-	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() == nullptr) {
 		return;
 	}
 
@@ -870,7 +870,7 @@ void SetMusicLayerGain(const std::string &layer, float gain) {
 */
 void StopMusic()
 {
-	if (Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() != nullptr) {
 		Wyrmgus::GetInstance()->GetOamlModule()->StopPlaying();
 	}
 
@@ -895,7 +895,7 @@ void SetMusicVolume(int volume)
 	clamp(&volume, 0, MaxVolume);
 	MusicVolume = volume;
 
-	if (Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() != nullptr) {
 		Wyrmgus::GetInstance()->GetOamlModule()->SetVolume(MusicVolume / 255.f);
 	}
 }
@@ -934,7 +934,7 @@ bool IsMusicEnabled()
 */
 bool IsMusicPlaying()
 {
-	if (Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() != nullptr) {
 		if (Wyrmgus::GetInstance()->GetOamlModule()->IsPlaying()) {
 			return true;
 		}
@@ -948,7 +948,7 @@ bool IsMusicPlaying()
 */
 void AddMusicTension(int value)
 {
-	if (!Wyrmgus::GetInstance()->GetOamlModule().is_valid()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() == nullptr) {
 		return;
 	}
 

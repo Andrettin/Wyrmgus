@@ -309,7 +309,7 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 	CScheduledTimeOfDay *old_time_of_day = this->TimeOfDay;
 	this->TimeOfDay = time_of_day;
 	
-	if (Wyrmgus::GetInstance()->GetOamlModule().is_valid() && this == UI.CurrentMapLayer && this->GetTimeOfDay()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() != nullptr && this == UI.CurrentMapLayer && this->GetTimeOfDay()) {
 		// the time of day can change our main music loop, if the current playing track is set for this
 		Wyrmgus::GetInstance()->GetOamlModule()->SetMainLoopCondition(this->GetTimeOfDay()->ID);
 	}

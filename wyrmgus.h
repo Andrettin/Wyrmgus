@@ -1,7 +1,6 @@
 #ifndef __WYRMGUS_H__
 #define __WYRMGUS_H__
 
-#include <oamlGodotModule/oamlGodotModule.h>
 #include <scene/main/node.h>
 
 class CCampaign;
@@ -26,12 +25,9 @@ public:
 	String GetVersion() const;
 	void LuaCommand(String command);
 	
-	void SetOamlModule(Ref<oamlGodotModule> oaml_module)
-	{
-		this->OamlModule = oaml_module;
-	}
+	void SetOamlModule(Node *oaml_module);
 	
-	Ref<oamlGodotModule> GetOamlModule() const
+	oamlGodotModule *GetOamlModule() const
 	{
 		return this->OamlModule;
 	}
@@ -54,7 +50,7 @@ public:
 	CPlayer *GetThisPlayer() const;
 
 private:
-	Ref<oamlGodotModule> OamlModule;
+	oamlGodotModule *OamlModule = nullptr;
 	
 protected:
 	static void _bind_methods();

@@ -41,6 +41,11 @@ void Wyrmgus::LuaCommand(String command)
 	QueueLuaCommand(command.utf8().get_data());
 }
 
+void Wyrmgus::SetOamlModule(Node *oaml_module)
+{
+	this->OamlModule = static_cast<oamlGodotModule *>(oaml_module);
+}
+
 CHairColor *Wyrmgus::GetHairColor(String ident) const
 {
 	return CHairColor::Get(ident.utf8().get_data());

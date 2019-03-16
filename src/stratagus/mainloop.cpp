@@ -321,7 +321,7 @@ static void GameLogicLoop()
 	// FIXME: We need to find a better place!
 	SaveGameLoading = false;
 
-	if (Wyrmgus::GetInstance()->GetOamlModule().is_valid() && UI.CurrentMapLayer->GetTimeOfDay()) {
+	if (Wyrmgus::GetInstance()->GetOamlModule() != nullptr && UI.CurrentMapLayer->GetTimeOfDay()) {
 		// the time of day can change our main music loop, if the current playing track is set for this
 		Wyrmgus::GetInstance()->GetOamlModule()->SetMainLoopCondition(UI.CurrentMapLayer->GetTimeOfDay()->ID);
 	}
