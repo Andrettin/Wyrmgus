@@ -40,6 +40,7 @@
 #include "action/action_board.h"
 #include "commands.h"
 #include "faction.h"
+#include "force_template.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"

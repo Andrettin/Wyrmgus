@@ -39,7 +39,6 @@
 #include "config.h"
 #include "faction.h"
 #include "map/map_template.h"
-#include "player.h"
 #include "quest.h"
 #include "species/species.h"
 

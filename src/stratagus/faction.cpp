@@ -34,10 +34,11 @@
 #include "stratagus.h"
 
 #include "ai.h"
+#include "ai_building_template.h"
 #include "civilization.h"
 #include "faction.h"
+#include "force_template.h"
 #include "luacallback.h"
-#include "player.h"
 #include "player_color.h"
 
 /*----------------------------------------------------------------------------
@@ -45,6 +46,7 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CFaction *> CFaction::Factions;
+std::map<std::string, int> CFaction::FactionStringToIndex;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -95,7 +97,12 @@ CFaction *CFaction::GetFaction(const std::string &faction_ident)
 	}
 }
 
-int CFaction::GetFactionClassUnitType(const CFaction *faction, int class_id)
+void CFaction::SetFactionStringToIndex(const std::string &faction_name, const int faction_id)
+{
+	CFaction::FactionStringToIndex[faction_name] = faction_id;
+}
+
+int CFaction::GetFactionClassUnitType(const CFaction *faction, const int class_id)
 {
 	if (faction == nullptr || class_id == -1) {
 		return -1;
@@ -109,10 +116,10 @@ int CFaction::GetFactionClassUnitType(const CFaction *faction, int class_id)
 		return CFaction::GetFactionClassUnitType(faction->ParentFaction, class_id);
 	}
 	
-	return PlayerRaces.GetCivilizationClassUnitType(faction->Civilization->ID, class_id);
+	return CCivilization::GetCivilizationClassUnitType(faction->Civilization, class_id);
 }
 
-int CFaction::GetFactionClassUpgrade(const CFaction *faction, int class_id)
+int CFaction::GetFactionClassUpgrade(const CFaction *faction, const int class_id)
 {
 	if (faction == nullptr || class_id == -1) {
 		return -1;
@@ -126,7 +133,7 @@ int CFaction::GetFactionClassUpgrade(const CFaction *faction, int class_id)
 		return CFaction::GetFactionClassUpgrade(faction->ParentFaction, class_id);
 	}
 	
-	return PlayerRaces.GetCivilizationClassUpgrade(faction->Civilization->ID, class_id);
+	return CCivilization::GetCivilizationClassUpgrade(faction->Civilization, class_id);
 }
 
 std::vector<CFiller> CFaction::GetFactionUIFillers(const CFaction *faction)
@@ -143,7 +150,7 @@ std::vector<CFiller> CFaction::GetFactionUIFillers(const CFaction *faction)
 		return CFaction::GetFactionUIFillers(faction->ParentFaction);
 	}
 	
-	return PlayerRaces.GetCivilizationUIFillers(faction->Civilization->ID);
+	return CCivilization::GetCivilizationUIFillers(faction->Civilization);
 }
 
 int CFaction::GetUpgradePriority(const CUpgrade *upgrade) const

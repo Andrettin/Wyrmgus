@@ -38,9 +38,9 @@
 #include "character.h"
 #include "config.h"
 #include "icon.h"
-#include "player.h"
 #include "player_color.h"
 #include "quest.h"
+#include "script.h"
 #include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------

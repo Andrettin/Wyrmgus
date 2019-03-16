@@ -42,7 +42,6 @@
 #include "iolib.h"
 #include "luacallback.h"
 #include "parameters.h"
-#include "player.h"
 #include "script.h"
 
 #include <ctype.h>

@@ -38,6 +38,7 @@
 #include "actions.h"
 #include "age.h"
 #include "ai.h"
+#include "ai_building_template.h"
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
@@ -48,6 +49,9 @@
 #include "faction.h"
 //Wyrmgus start
 #include "font.h"
+//Wyrmgus end
+#include "force_template.h"
+//Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "icon.h"
@@ -969,7 +973,7 @@ static int CclDefineCivilization(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			
-			PlayerRaces.CivilizationUIFillers[civilization_id].clear();
+			civilization->UIFillers.clear();
 			
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
@@ -983,7 +987,7 @@ static int CclDefineCivilization(lua_State *l)
 				filler.X = LuaToNumber(l, -1, j + 1);
 				++j;
 				filler.Y = LuaToNumber(l, -1, j + 1);
-				PlayerRaces.CivilizationUIFillers[civilization_id].push_back(filler);
+				civilization->UIFillers.push_back(filler);
 			}
 		} else if (!strcmp(value, "UnitSounds")) {
 			if (!lua_istable(l, -1)) {
@@ -1731,7 +1735,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, 2));
 	std::string unit_type_ident;
 	if (civilization && class_id != -1) {
-		int unit_type_id = PlayerRaces.GetCivilizationClassUnitType(civilization->ID, class_id);
+		int unit_type_id = CCivilization::GetCivilizationClassUnitType(civilization, class_id);
 		if (unit_type_id != -1) {
 			unit_type_ident = CUnitType::UnitTypes[unit_type_id]->Ident;
 		}
@@ -1740,7 +1744,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
 		class_id = GetUpgradeClassIndexByName(class_name);
 		if (civilization && class_id != -1) {
-			int upgrade_id = PlayerRaces.GetCivilizationClassUpgrade(civilization->ID, class_id);
+			int upgrade_id = CCivilization::GetCivilizationClassUpgrade(civilization, class_id);
 			if (upgrade_id != -1) {
 				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
 			}
@@ -1826,7 +1830,7 @@ static int CclDefineFaction(lua_State *l)
 		faction->Ident = faction_name;
 		faction->ID = CFaction::Factions.size();
 		CFaction::Factions.push_back(faction);
-		SetFactionStringToIndex(faction->Ident, faction->ID);
+		CFaction::SetFactionStringToIndex(faction->Ident, faction->ID);
 	}
 	
 	//  Parse the list:

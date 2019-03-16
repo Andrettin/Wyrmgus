@@ -38,7 +38,6 @@
 #include "time/calendar.h"
 #include "time/timeline.h"
 #include "civilization.h"
-#include "player.h"
 #include "quest.h"
 
 /*----------------------------------------------------------------------------

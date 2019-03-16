@@ -39,8 +39,10 @@
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
+#include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
+#include "util.h"
 
 #include <stdio.h>
 

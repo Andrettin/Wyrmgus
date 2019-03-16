@@ -36,6 +36,7 @@
 
 #include "ui/ui.h"
 
+#include "civilization.h"
 #include "faction.h"
 #include "font.h"
 //Wyrmgus start
@@ -263,7 +264,7 @@ void CUserInterface::Load()
 		if (CPlayer::GetThisPlayer()->GetFaction() != nullptr) {
 			new_ui_fillers = CFaction::GetFactionUIFillers(CPlayer::GetThisPlayer()->GetFaction());
 		} else {
-			new_ui_fillers = PlayerRaces.GetCivilizationUIFillers(CPlayer::GetThisPlayer()->Race);
+			new_ui_fillers = CCivilization::GetCivilizationUIFillers(CPlayer::GetThisPlayer()->Race != -1 ? CCivilization::Civilizations[CPlayer::GetThisPlayer()->Race] : nullptr);
 		}
 	}
 	for (size_t i = 0; i < new_ui_fillers.size(); ++i) {

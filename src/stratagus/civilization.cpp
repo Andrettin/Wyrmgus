@@ -35,6 +35,8 @@
 
 #include "civilization.h"
 
+#include "ai_building_template.h"
+#include "force_template.h"
 #include "player.h"
 #include "player_color.h"
 #include "time/calendar.h"
@@ -106,6 +108,57 @@ void CCivilization::ClearCivilizations()
 		delete civilization;
 	}
 	CCivilization::Civilizations.clear();
+}
+
+int CCivilization::GetCivilizationClassUnitType(const CCivilization *civilization, const int class_id)
+{
+	if (civilization == nullptr || class_id == -1) {
+		return -1;
+	}
+	
+	if (civilization->ClassUnitTypes.find(class_id) != civilization->ClassUnitTypes.end()) {
+		return civilization->ClassUnitTypes.find(class_id)->second;
+	}
+	
+	if (civilization->ParentCivilization) {
+		return CCivilization::GetCivilizationClassUnitType(civilization->ParentCivilization, class_id);
+	}
+	
+	return -1;
+}
+
+int CCivilization::GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id)
+{
+	if (civilization == nullptr || class_id == -1) {
+		return -1;
+	}
+	
+	if (civilization->ClassUpgrades.find(class_id) != civilization->ClassUpgrades.end()) {
+		return civilization->ClassUpgrades.find(class_id)->second;
+	}
+	
+	if (civilization->ParentCivilization) {
+		return CCivilization::GetCivilizationClassUpgrade(civilization->ParentCivilization, class_id);
+	}
+	
+	return -1;
+}
+
+std::vector<CFiller> CCivilization::GetCivilizationUIFillers(const CCivilization *civilization)
+{
+	if (civilization == nullptr) {
+		return std::vector<CFiller>();
+	}
+	
+	if (civilization->UIFillers.size() > 0) {
+		return civilization->UIFillers;
+	}
+	
+	if (civilization->ParentCivilization) {
+		return CCivilization::GetCivilizationUIFillers(civilization->ParentCivilization);
+	}
+	
+	return std::vector<CFiller>();
 }
 
 /**

@@ -2360,9 +2360,9 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CUnitType *> potential_items;
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame()) { // allow heroes to be recruited at town halls
-		int civilization_id = this->Type->GetCivilization() ? this->Type->GetCivilization()->ID : -1;
-		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->GetFaction() != nullptr && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
-			civilization_id = this->Player->Race;
+		const CCivilization *civilization = this->Type->GetCivilization();
+		if (civilization != nullptr && civilization->ID != this->Player->Race && this->Player->Race != -1 && this->Player->GetFaction() != nullptr && this->Type->Slot == CFaction::GetFactionClassUnitType(this->Player->GetFaction(), this->Type->Class)) {
+			civilization = CCivilization::Civilizations[this->Player->Race];
 		}
 		
 		if (CurrentQuest == nullptr) {
@@ -2375,7 +2375,7 @@ void CUnit::UpdateSoldUnits()
 		if (this->Player == CPlayer::GetThisPlayer()) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 				if (
-					(iterator->second->Civilization && iterator->second->Civilization->ID == civilization_id || iterator->second->Type->Slot == PlayerRaces.GetCivilizationClassUnitType(civilization_id, iterator->second->Type->Class))
+					(iterator->second->Civilization && iterator->second->Civilization == civilization || iterator->second->Type->Slot == CCivilization::GetCivilizationClassUnitType(civilization, iterator->second->Type->Class))
 					&& CheckDependencies(iterator->second->Type, this, true) && iterator->second->CanAppear()
 				) {
 					potential_heroes.push_back(iterator->second);

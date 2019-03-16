@@ -40,7 +40,6 @@
 #include "iolib.h"
 #include "map/tileset.h"
 #include "include/plane.h"
-#include "player.h"
 #include "religion/deity_domain.h"
 #include "script.h"
 #include "species/species.h"

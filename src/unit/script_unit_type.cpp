@@ -1961,10 +1961,10 @@ static int CclDefineUnitType(lua_State *l)
 		int class_id = type->Class;
 
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
-		for (int i = 0; i < MAX_RACES; ++i) {
-			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[i].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[i].rend(); ++iterator) {
+		for (CCivilization *civilization : CCivilization::Civilizations) {
+			for (std::map<int, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
 				if (iterator->second == type->Slot) {
-					PlayerRaces.CivilizationClassUnitTypes[i].erase(iterator->first);
+					civilization->ClassUnitTypes.erase(iterator->first);
 					break;
 				}
 			}
@@ -1982,7 +1982,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (type->GetFaction() != nullptr) {
 				type->GetFaction()->ClassUnitTypes[class_id] = type->Slot;
 			} else {
-				PlayerRaces.CivilizationClassUnitTypes[type->GetCivilization()->ID][class_id] = type->Slot;
+				type->GetCivilization()->ClassUnitTypes[class_id] = type->Slot;
 			}
 		}
 	}

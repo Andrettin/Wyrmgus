@@ -38,7 +38,6 @@
 #include "config.h"
 #include "faction.h"
 #include "map/historical_location.h"
-#include "player.h"
 #include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------

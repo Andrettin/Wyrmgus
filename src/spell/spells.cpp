@@ -246,7 +246,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->CivilizationEquivalent != -1) {
-		if (caster.Type->GetCivilization() == nullptr || (caster.Type->GetCivilization()->ID == condition->CivilizationEquivalent && (!caster.Character || (caster.Character->Civilization && caster.Character->Civilization->ID == condition->CivilizationEquivalent))) || caster.Type->GetCivilization()->GetSpecies() != CCivilization::Civilizations[condition->CivilizationEquivalent]->GetSpecies() || PlayerRaces.GetCivilizationClassUnitType(condition->CivilizationEquivalent, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->GetCivilization() == nullptr || (caster.Type->GetCivilization()->ID == condition->CivilizationEquivalent && (!caster.Character || (caster.Character->Civilization && caster.Character->Civilization->ID == condition->CivilizationEquivalent))) || caster.Type->GetCivilization()->GetSpecies() != CCivilization::Civilizations[condition->CivilizationEquivalent]->GetSpecies() || CCivilization::GetCivilizationClassUnitType(CCivilization::Civilizations[condition->CivilizationEquivalent], caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}

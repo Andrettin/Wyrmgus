@@ -45,8 +45,8 @@
 #include "game.h"
 #include "network.h"
 #include "parameters.h"
-#include "player.h"
 #include "spells.h"
+#include "ui/interface.h" //for the GameRunning variable
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"

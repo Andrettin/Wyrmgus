@@ -383,7 +383,6 @@ int PlayerColorIndexStart;
 int PlayerColorIndexCount;
 
 //Wyrmgus start
-std::map<std::string, int> FactionStringToIndex;
 std::map<std::string, int> DynastyStringToIndex;
 std::map<std::string, CLanguage *> LanguageIdentToPointer;
 
@@ -417,9 +416,6 @@ void PlayerRace::Clean()
 		this->Name[i].clear();
 		//Wyrmgus start
 		this->CivilizationUpgrades[i].clear();
-		this->CivilizationClassUnitTypes[i].clear();
-		this->CivilizationClassUpgrades[i].clear();
-		this->CivilizationUIFillers[i].clear();
 		//Wyrmgus end
 	}
 	//Wyrmgus start
@@ -455,57 +451,6 @@ CLanguage *PlayerRace::GetLanguage(const std::string &language_ident) const
 		return LanguageIdentToPointer[language_ident];
 	}
 	return nullptr;
-}
-
-int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
-{
-	if (civilization == -1 || class_id == -1) {
-		return -1;
-	}
-	
-	if (CivilizationClassUnitTypes[civilization].find(class_id) != CivilizationClassUnitTypes[civilization].end()) {
-		return CivilizationClassUnitTypes[civilization][class_id];
-	}
-	
-	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
-		return GetCivilizationClassUnitType(CCivilization::Civilizations[civilization]->ParentCivilization->ID, class_id);
-	}
-	
-	return -1;
-}
-
-int PlayerRace::GetCivilizationClassUpgrade(int civilization, int class_id)
-{
-	if (civilization == -1 || class_id == -1) {
-		return -1;
-	}
-	
-	if (CivilizationClassUpgrades[civilization].find(class_id) != CivilizationClassUpgrades[civilization].end()) {
-		return CivilizationClassUpgrades[civilization][class_id];
-	}
-	
-	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
-		return GetCivilizationClassUpgrade(CCivilization::Civilizations[civilization]->ParentCivilization->ID, class_id);
-	}
-	
-	return -1;
-}
-
-std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)
-{
-	if (civilization == -1) {
-		return std::vector<CFiller>();
-	}
-	
-	if (CivilizationUIFillers[civilization].size() > 0) {
-		return CivilizationUIFillers[civilization];
-	}
-	
-	if (CCivilization::Civilizations[civilization]->ParentCivilization) {
-		return GetCivilizationUIFillers(CCivilization::Civilizations[civilization]->ParentCivilization->ID);
-	}
-	
-	return std::vector<CFiller>();
 }
 
 /**
@@ -1684,7 +1629,7 @@ bool CPlayer::HasUpgradeClass(const int upgrade_class) const
 	if (this->Faction != nullptr) {
 		upgrade_id = CFaction::GetFactionClassUpgrade(this->Faction, upgrade_class);
 	} else {
-		upgrade_id = PlayerRaces.GetCivilizationClassUpgrade(this->Race, upgrade_class);
+		upgrade_id = CCivilization::GetCivilizationClassUpgrade(CCivilization::Civilizations[this->Race], upgrade_class);
 	}
 	
 	if (upgrade_id != -1 && this->Allow.Upgrades[upgrade_id] == 'R') {
@@ -4430,11 +4375,6 @@ void CPlayer::_bind_methods()
 	
 	ADD_SIGNAL(MethodInfo("civilization_changed", PropertyInfo(Variant::OBJECT, "old_civilization"), PropertyInfo(Variant::OBJECT, "new_civilization")));
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
-}
-
-void SetFactionStringToIndex(const std::string &faction_name, int faction_id)
-{
-	FactionStringToIndex[faction_name] = faction_id;
 }
 
 void NetworkSetFaction(int player, const std::string &faction_name)

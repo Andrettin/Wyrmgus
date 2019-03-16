@@ -41,7 +41,6 @@
 //Wyrmgus start
 #include "item.h"
 #include "time/date.h"
-#include "ui/ui.h" // for the UI fillers
 //Wyrmgus end
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
@@ -132,14 +131,15 @@ public:
 	CCivilization *GetCivilization() const;
 	void SetFaction(const CFaction *faction);
 	void SetRandomFaction();
-	void SetDynasty(CDynasty *dynasty);
-	String GetInterface() const;
 	
 	CFaction *GetFaction() const
 	{
 		return const_cast<CFaction *>(this->Faction);
 	}
 
+	void SetDynasty(CDynasty *dynasty);
+	String GetInterface() const;
+	
 	int Index = 0;		/// player as number
 	std::string Name;   /// name of non computer
 
@@ -577,23 +577,6 @@ enum WordJunctionTypes {
 	MaxWordJunctionTypes
 };
 
-class CForceTemplate
-{
-public:
-	int ForceType = -1;
-	int Priority = 100;
-	int Weight = 1;
-	std::vector<std::pair<int, int>> Units;	/// Vector containing each unit class belonging to the force template, and the respective quantity
-};
-
-class CAiBuildingTemplate
-{
-public:
-	int UnitClass = -1;			/// Building's unit class
-	int Priority = 100;
-	bool PerSettlement = false;	/// Whether the building should be constructed for each settlement
-};
-
 class CDynasty
 {
 public:
@@ -689,9 +672,6 @@ public:
 	//Wyrmgus start
 	CDynasty *GetDynasty(const std::string &dynasty_ident) const;
 	CLanguage *GetLanguage(const std::string &language_ident) const;
-	int GetCivilizationClassUnitType(int civilization, int class_id);
-	int GetCivilizationClassUpgrade(int civilization, int class_id);
-	std::vector<CFiller> GetCivilizationUIFillers(int civilization);
 	std::string TranslateName(const std::string &name, CLanguage *language);
 	//Wyrmgus end
 
@@ -699,10 +679,7 @@ public:
 	std::string Name[MAX_RACES];    /// race names
 	//Wyrmgus start
 	std::string CivilizationUpgrades[MAX_RACES];
-	std::map<int, int> CivilizationClassUnitTypes[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
-	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
-	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	std::vector<CDynasty *> Dynasties;    								/// dynasties
 	//Wyrmgus end
@@ -787,7 +764,6 @@ extern std::vector<IntColor> PlayerColors[PlayerColorMax]; /// Player colors
 extern std::string PlayerColorNames[PlayerColorMax];  /// Player color names
 extern std::vector<int> ConversiblePlayerColors; 			/// Conversible player colors
 
-extern std::map<std::string, int> FactionStringToIndex;
 extern std::map<std::string, int> DynastyStringToIndex;
 
 extern bool LanguageCacheOutdated;
@@ -851,7 +827,6 @@ extern void PlayerCclRegister();
 inline bool CanSelectMultipleUnits(const CPlayer &player) { return &player == CPlayer::GetThisPlayer() || CPlayer::GetThisPlayer()->IsTeamed(player); }
 
 //Wyrmgus start
-extern void SetFactionStringToIndex(const std::string &faction_name, int faction_id);
 extern void NetworkSetFaction(int player, const std::string &faction_name);
 extern int GetPlayerColorIndexByName(const std::string &player_color_name);
 extern std::string GetFactionTypeNameById(int faction_type);

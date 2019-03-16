@@ -39,7 +39,6 @@
 #include "animation/animation_sound.h"
 #include "civilization.h"
 #include "map/map.h"
-#include "player.h"
 #include "sound.h"
 #include "sound_server.h"
 #include "unit/unit.h"

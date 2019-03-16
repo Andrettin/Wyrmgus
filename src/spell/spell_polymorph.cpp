@@ -10,8 +10,8 @@
 //
 /**@name spell_polymorph.cpp - The spell Polymorph. */
 //
-//      (c) Copyright 1998-2012 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                                 Jimmy Salmon, and Joris DAUPHIN
+//      (c) Copyright 1998-2019 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon, Joris DAUPHIN and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@
 			value = LuaToString(l, -1, j + 1);
 			this->NewForm = UnitTypeByIdent(value);
 			if (!this->NewForm) {
-				this->NewForm = 0;
+				this->NewForm = nullptr;
 				DebugPrint("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
 			}
 			// FIXME: temp polymorphs? hard to do.
@@ -73,12 +73,14 @@
 			value = LuaToString(l, -1, j + 1);
 			CCivilization *civilization = CCivilization::GetCivilization(value);
 			if (civilization) {
-				this->Civilization = civilization->ID;
+				this->Civilization = civilization;
 			}
 		} else if (!strcmp(value, "faction")) {
 			value = LuaToString(l, -1, j + 1);
-			this->Faction = CFaction::GetFactionIndexByName(value);
-			if (this->Faction == -1) {
+			const CFaction *faction = CFaction::GetFaction(value);
+			if (faction != nullptr) {
+				this->Faction = faction;
+			} else {
 				fprintf(stderr, "Faction %s doesn't exist.\n", value);
 			}
 		} else if (!strcmp(value, "detachment")) {
@@ -92,7 +94,7 @@
 	// Now, checking value.
 	//Wyrmgus start
 //	if (this->NewForm == nullptr) {
-	if (this->NewForm == nullptr && this->Civilization == -1 && this->Faction == -1 && !this->Detachment) {
+	if (this->NewForm == nullptr && this->Civilization == nullptr && this->Faction == nullptr && !this->Detachment) {
 	//Wyrmgus end
 		LuaError(l, "Use a unittype for polymorph (with new-form)");
 	}
@@ -117,20 +119,20 @@
 	//Wyrmgus start
 	if (this->NewForm == nullptr) {
 		int new_unit_type = -1;
-		if (this->Civilization != -1 && this->Faction != -1 && CCivilization::Civilizations[this->Civilization] == target->Type->GetCivilization()) { //get faction equivalent, if is of the same civilization
-			new_unit_type = CFaction::GetFactionClassUnitType(CFaction::Factions[this->Faction], target->Type->Class);
-		} else if (this->Civilization != -1 && CCivilization::Civilizations[this->Civilization] != target->Type->GetCivilization()) {
-			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Civilization, target->Type->Class);
+		if (this->Civilization != nullptr && this->Faction != nullptr && this->Civilization == target->Type->GetCivilization()) { //get faction equivalent, if is of the same civilization
+			new_unit_type = CFaction::GetFactionClassUnitType(this->Faction, target->Type->Class);
+		} else if (this->Civilization != nullptr && this->Civilization != target->Type->GetCivilization()) {
+			new_unit_type = CCivilization::GetCivilizationClassUnitType(this->Civilization, target->Type->Class);
 		}
 		if (this->Detachment && target->Type->GetCivilization() != nullptr && target->Type->GetFaction() != nullptr) {
-			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(target->Type->GetCivilization()->ID, target->Type->Class);
+			new_unit_type = CCivilization::GetCivilizationClassUnitType(target->Type->GetCivilization(), target->Type->Class);
 		}
 		if (new_unit_type != -1) {
 			type = CUnitType::UnitTypes[new_unit_type];
 		}
 	}
-	if (target->Character && target->Character->Custom && target->Character->Civilization && this->Civilization != -1 && this->Civilization != target->Character->Civilization->ID) {
-		target->Character->Civilization = CCivilization::Civilizations[this->Civilization];
+	if (target->Character && target->Character->Custom && target->Character->Civilization && this->Civilization != nullptr && this->Civilization != target->Character->Civilization) {
+		target->Character->Civilization = this->Civilization;
 		SaveHero(target->Character);
 	}
 	if (type == nullptr) {

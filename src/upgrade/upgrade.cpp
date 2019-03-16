@@ -353,17 +353,13 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 	if (this->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		int class_id = this->Class;
 		if (this->Civilization != -1) {
-			int civilization_id = this->Civilization;
+			CCivilization *civilization = CCivilization::Civilizations[this->Civilization];
 			
 			if (this->Faction != -1) {
-				int faction_id = this->Faction;
-				if (faction_id != -1 && class_id != -1) {
-					CFaction::Factions[faction_id]->ClassUpgrades[class_id] = this->ID;
-				}
+				CFaction *faction = CFaction::Factions[this->Faction];
+				faction->ClassUpgrades[class_id] = this->ID;
 			} else {
-				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = this->ID;
-				}
+				civilization->ClassUpgrades[class_id] = this->ID;
 			}
 		}
 	}
@@ -788,17 +784,13 @@ static int CclDefineUpgrade(lua_State *l)
 	if (upgrade->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		int class_id = upgrade->Class;
 		if (upgrade->Civilization != -1) {
-			int civilization_id = upgrade->Civilization;
+			CCivilization *civilization = CCivilization::Civilizations[upgrade->Civilization];
 			
 			if (upgrade->Faction != -1) {
-				int faction_id = upgrade->Faction;
-				if (faction_id != -1 && class_id != -1) {
-					CFaction::Factions[faction_id]->ClassUpgrades[class_id] = upgrade->ID;
-				}
+				CFaction *faction = CFaction::Factions[upgrade->Faction];
+				faction->ClassUpgrades[class_id] = upgrade->ID;
 			} else {
-				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = upgrade->ID;
-				}
+				civilization->ClassUpgrades[class_id] = upgrade->ID;
 			}
 		}
 	}

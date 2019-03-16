@@ -38,7 +38,6 @@
 #include "config.h"
 #include "menus.h"
 #include "mod.h"
-#include "player.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

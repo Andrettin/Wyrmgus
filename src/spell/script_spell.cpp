@@ -38,9 +38,6 @@
 #include "civilization.h"
 #include "faction.h"
 #include "luacallback.h"
-//Wyrmgus start
-#include "player.h" // for making user of PlayerRaces
-//Wyrmgus end
 #include "script.h"
 #include "script_sound.h"
 #include "spell/spell_adjustvariable.h"

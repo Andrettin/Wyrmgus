@@ -155,7 +155,7 @@ public:
 	CDate StartDate;			/// Date in which the character historically starts being active
 	CDate DeathDate;			/// Date in which the character historically died
 	CCivilization *Civilization = nullptr;	/// Culture to which the character belongs
-	CFaction *Faction = nullptr;	/// Faction to which the character belongs
+	const CFaction *Faction = nullptr;	/// Faction to which the character belongs
 	int Gender = 0;				/// Character's gender
 	int Level = 0;				/// Character's level
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
@@ -172,7 +172,7 @@ public:
 	IconConfig Icon;					/// Character's icon
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
 	CUnitType *Type = nullptr;
-	CUpgrade *Trait = nullptr;
+	const CUpgrade *Trait = nullptr;
 	CDeity *Deity = nullptr;			/// The deity which the character is (if it is a deity)
 	CCharacter *Father = nullptr;		/// Character's father
 	CCharacter *Mother = nullptr;		/// Character's mother

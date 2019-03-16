@@ -316,7 +316,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 		} else if (unit_type->Class != -1 && UnitTypeClasses[unit_type->Class] == "worker") {
 			int militia_unit_type = -1;
 			if (unit_type->GetCivilization() != nullptr) {
-				militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(unit_type->GetCivilization()->ID, GetUnitTypeClassIndexByName("militia"));
+				militia_unit_type = CCivilization::GetCivilizationClassUnitType(unit_type->GetCivilization(), GetUnitTypeClassIndexByName("militia"));
 			}
 			if (militia_unit_type != -1) {
 				int old_owner_military_score_bonus = (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0);
@@ -414,7 +414,7 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 		//if this unit's civilization can change workers into militia, add half of the militia's points to the military score (one in every two workers becomes a militia when the province is attacked)
 		int militia_unit_type = -1;
 		if (CUnitType::UnitTypes[unit_type_id]->GetCivilization() != nullptr) {
-			militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(CUnitType::UnitTypes[unit_type_id]->GetCivilization()->ID, GetUnitTypeClassIndexByName("militia"));
+			militia_unit_type = CCivilization::GetCivilizationClassUnitType(CUnitType::UnitTypes[unit_type_id]->GetCivilization(), GetUnitTypeClassIndexByName("militia"));
 		}
 		if (militia_unit_type != -1) {
 			this->MilitaryScore += change * ((CUnitType::UnitTypes[militia_unit_type]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != nullptr ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0)) / 2);
@@ -588,7 +588,11 @@ int CGrandStrategyProvince::GetPopulation()
 
 int CGrandStrategyProvince::GetClassUnitType(int class_id)
 {
-	return PlayerRaces.GetCivilizationClassUnitType(this->Civilization, class_id);
+	if (this->Civilization != -1) {
+		return CCivilization::GetCivilizationClassUnitType(CCivilization::Civilizations[this->Civilization], class_id);
+	} else {
+		return -1;
+	}
 }
 
 int CGrandStrategyProvince::GetDesirabilityRating()

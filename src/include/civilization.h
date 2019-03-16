@@ -37,6 +37,7 @@
 #include "character.h" // because of "MaxCharacterTitles"
 #include "faction.h" //for certain enums
 #include "time/date.h"
+#include "ui/ui.h" // for the UI fillers
 
 #include <core/object.h>
 
@@ -69,6 +70,9 @@ public:
 	static CCivilization *GetCivilization(const std::string &ident, const bool should_find = true);
 	static CCivilization *GetOrAddCivilization(const std::string &ident);
 	static void ClearCivilizations();
+	static int GetCivilizationClassUnitType(const CCivilization *civilization, const int class_id);
+	static int GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id);
+	static std::vector<CFiller> GetCivilizationUIFillers(const CCivilization *civilization);
 	
 	static std::vector<CCivilization *> Civilizations;    					/// civilizations
 	static std::map<std::string, CCivilization *> CivilizationsByIdent;
@@ -270,6 +274,9 @@ public:
 	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
+	std::map<int, int> ClassUnitTypes;			/// the unit type slot of a particular class for the civilization
+	std::map<int, int> ClassUpgrades;			/// the upgrade slot of a particular class for the civilization
+	std::vector<CFiller> UIFillers;
 	
 	friend int CclDefineCivilization(lua_State *l);
 

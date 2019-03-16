@@ -43,7 +43,6 @@
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "map/site.h"
-#include "player.h"
 #include "province.h"
 #include "quest.h"
 #include "religion/deity.h"

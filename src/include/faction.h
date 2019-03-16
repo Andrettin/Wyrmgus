@@ -101,11 +101,13 @@ public:
 	
 	static int GetFactionIndexByName(const std::string &faction_ident);
 	static CFaction *GetFaction(const std::string &faction_ident);
-	static int GetFactionClassUnitType(const CFaction *faction, int class_id);
-	static int GetFactionClassUpgrade(const CFaction *faction, int class_id);
+	static void SetFactionStringToIndex(const std::string &faction_name, const int faction_id);
+	static int GetFactionClassUnitType(const CFaction *faction, const int class_id);
+	static int GetFactionClassUpgrade(const CFaction *faction, const int class_id);
 	static std::vector<CFiller> GetFactionUIFillers(const CFaction *faction);
 	
 	static std::vector<CFaction *> Factions;    		/// factions
+	static std::map<std::string, int> FactionStringToIndex;
 	
 	/**
 	**	@brief	Get the faction's string identifier

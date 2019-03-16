@@ -369,7 +369,7 @@ static int CclGetQuestData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (quest->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[quest->Civilization].c_str());
+			lua_pushstring(l, CCivilization::Civilizations[quest->Civilization]->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

@@ -53,6 +53,7 @@ class Missile;
 class CCharacter;
 //Wyrmgus end
 class CMapField;
+class CMapLayer;
 class COrder;
 class CPlayer;
 class CSpell;

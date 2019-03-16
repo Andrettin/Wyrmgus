@@ -3544,7 +3544,7 @@ void DeleteModFaction(const std::string &faction_name)
 {
 	CFaction *faction = CFaction::GetFaction(faction_name);
 	if (faction != nullptr && !faction->Mod.empty()) {
-		FactionStringToIndex.erase(faction->Ident);
+		CFaction::FactionStringToIndex.erase(faction->Ident);
 		delete faction;
 		CFaction::Factions.erase(std::remove(CFaction::Factions.begin(), CFaction::Factions.end(), faction), CFaction::Factions.end());
 	}
@@ -3571,10 +3571,10 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 		Editor.UnitTypes.erase(std::remove(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), unit_type->Ident), Editor.UnitTypes.end());
 		RecalculateShownUnits();
 	}
-	for (int j = 0; j < MAX_RACES; ++j) {
-		for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[j].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[j].rend(); ++iterator) {
+	for (CCivilization *civilization : CCivilization::Civilizations) {
+		for (std::map<int, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
 			if (iterator->second == unit_type->Slot) {
-				PlayerRaces.CivilizationClassUnitTypes[j].erase(iterator->first);
+				civilization->ClassUnitTypes.erase(iterator->first);
 			}
 		}
 	}
@@ -3644,7 +3644,7 @@ void DisableMod(const std::string &mod_file)
 	int factions_size = CFaction::Factions.size();
 	for (int i = (factions_size - 1); i >= 0; --i) {
 		if (CFaction::Factions[i]->Mod == mod_file) {
-			FactionStringToIndex.erase(CFaction::Factions[i]->Ident);
+			CFaction::FactionStringToIndex.erase(CFaction::Factions[i]->Ident);
 			CFaction::Factions.erase(std::remove(CFaction::Factions.begin(), CFaction::Factions.end(), CFaction::Factions[i]), CFaction::Factions.end());
 			delete CFaction::Factions[i];
 		}

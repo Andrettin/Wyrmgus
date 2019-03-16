@@ -36,7 +36,6 @@
 #include "sound.h"
 
 #include "civilization.h"
-#include "player.h"
 #include "script.h"
 #include "sound_server.h"
 

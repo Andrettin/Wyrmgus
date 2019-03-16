@@ -43,7 +43,6 @@
 #include "iolib.h"
 //Wyrmgus start
 #include "grand_strategy.h" //for playing faction music
-#include "player.h" //for playing faction music
 #include "ui/interface.h" //for player faction music
 //Wyrmgus end
 #include "unit/unit.h"

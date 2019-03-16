@@ -40,7 +40,6 @@
 #include "faction.h"
 #include "icon.h"
 #include "include/plane.h"
-#include "player.h"
 #include "province.h"
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"

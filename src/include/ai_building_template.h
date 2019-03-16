@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
+/**@name ai_building_template.h - The AI building template header file. */
 //
-//      (c) Copyright 1999-2019 by Vladi Belperchinov-Shabanski,
-//                                 Joris DAUPHIN, Jimmy Salmon and Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,36 +27,15 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_POLYMORPH_H
-#define SPELL_POLYMORPH_H
+#ifndef __AI_BUILDING_TEMPLATE_H__
+#define __AI_BUILDING_TEMPLATE_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "spells.h"
-
-class CCivilization;
-class CFaction;
-
-class Spell_Polymorph : public SpellActionType
+class CAiBuildingTemplate
 {
 public:
-	Spell_Polymorph() : SpellActionType(1) {};
-	virtual void ProcessConfigData(const CConfigData *config_data) override {}
-	virtual int Cast(CUnit &caster, const CSpell &spell,
-					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
-
-private:
-	CUnitType *NewForm = nullptr;	/// The new form
-	int PlayerNeutral = 0;			/// Convert the unit to the neutral player, or to the caster's player.
-	//Wyrmgus start
-	CCivilization *Civilization = nullptr;	/// For using with the Faction value.
-	const CFaction *Faction = nullptr;	/// If the unit should be transformed in its faction equivalent.
-	bool Detachment = false;		/// If the unit should be transformed from its faction-specific type to the generic civilization equivalent.
-	//Wyrmgus end
-	// TODO: temporary polymorphs would be awesome, but hard to implement
+	int UnitClass = -1;			/// Building's unit class
+	int Priority = 100;
+	bool PerSettlement = false;	/// Whether the building should be constructed for each settlement
 };
 
 #endif

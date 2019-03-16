@@ -1144,10 +1144,10 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		int class_id = this->Class;
 
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
-		for (int i = 0; i < MAX_RACES; ++i) {
-			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[i].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[i].rend(); ++iterator) {
+		for (CCivilization *civilization : CCivilization::Civilizations) {
+			for (std::map<int, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
 				if (iterator->second == this->Slot) {
-					PlayerRaces.CivilizationClassUnitTypes[i].erase(iterator->first);
+					civilization->ClassUnitTypes.erase(iterator->first);
 					break;
 				}
 			}
@@ -1165,7 +1165,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			if (this->Faction != nullptr) {
 				this->Faction->ClassUnitTypes[class_id] = this->Slot;
 			} else {
-					PlayerRaces.CivilizationClassUnitTypes[this->GetCivilization()->ID][class_id] = this->Slot;
+				this->GetCivilization()->ClassUnitTypes[class_id] = this->Slot;
 			}
 		}
 	}
