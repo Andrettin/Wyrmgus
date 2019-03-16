@@ -40,9 +40,7 @@
 
 #include <core/object.h>
 
-#include <map>
 #include <shared_mutex>
-#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -52,7 +50,6 @@ class CFaction;
 class CMapTemplate;
 class CQuest;
 class CSpecies;
-class LuaCallback;
 struct lua_State;
 
 class CCampaign : public CDataType, public Object
@@ -65,7 +62,7 @@ public:
 	{
 	}
 	
-	CCampaign(const std::string &ident, const int id) : CDataType(ident), ID(id)
+	CCampaign(const std::string &ident) : CDataType(ident)
 	{
 	}
 	
@@ -116,11 +113,10 @@ public:
 private:
 	std::string Name;				/// Name of the campaign
 	std::string Description;		/// Description of the campaign
-	int ID = -1;
 	CDate StartDate;				/// The starting date of the campaign
 	bool Hidden = false;			/// Whether the campaign is hidden
 	bool Sandbox = false;			/// Whether the campaign is a sandbox one
-	std::vector<CQuest *> RequiredQuests;		/// Quests required by the campaign
+	std::vector<CQuest *> RequiredQuests;	/// Quests required by the campaign
 	CFaction *Faction = nullptr;	/// Which faction the player plays as in the campaign
 public:
 	std::vector<CMapTemplate *> MapTemplates;	/// Map templates used by the campaign
