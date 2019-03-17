@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "trigger_effect.h"
+#include "game/trigger_effect.h"
 
 #include "config.h"
 #include "dialogue.h"

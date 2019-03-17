@@ -41,7 +41,9 @@
 #include "dialogue.h"
 #include "editor/editor.h"
 #include "faction.h"
-#include "game.h"
+#include "game/game.h"
+#include "game/replay.h"
+#include "game/trigger.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -59,7 +61,6 @@
 //Wyrmgus start
 #include "quest.h"
 //Wyrmgus end
-#include "replay.h"
 #include "results.h"
 //Wyrmgus start
 #include "settings.h"
@@ -69,7 +70,6 @@
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
-#include "trigger.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

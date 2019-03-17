@@ -43,6 +43,7 @@
 #include "ai/ai_local.h"
 #endif
 #include "civilization.h"
+#include "game/trigger.h"
 #include "icon.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -61,7 +62,6 @@
 #include "time/season.h"
 #include "time/time_of_day.h"
 #include "translate.h"
-#include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/contenttype.h"

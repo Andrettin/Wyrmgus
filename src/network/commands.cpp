@@ -37,6 +37,7 @@
 
 #include "action/actions.h"
 #include "faction.h"
+#include "game/replay.h"
 //Wyrmgus start
 #include "map/map.h" //it contains map width and height
 //Wyrmgus end
@@ -45,7 +46,6 @@
 //Wyrmgus start
 #include "quest.h"
 //Wyrmgus end
-#include "replay.h"
 #include "spell/spells.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"

@@ -37,7 +37,7 @@
 
 #include "achievement.h"
 #include "character.h"
-#include "game.h"
+#include "game/game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "luacallback.h"

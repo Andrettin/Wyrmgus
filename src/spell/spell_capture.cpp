@@ -34,7 +34,7 @@
 
 #include "ai/ai_local.h"
 #include "commands.h"
-#include "game.h"
+#include "game/game.h"
 #include "script.h"
 #include "unit/unit.h"
 //Wyrmgus start

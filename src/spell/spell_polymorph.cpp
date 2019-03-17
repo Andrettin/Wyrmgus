@@ -38,7 +38,7 @@
 //Wyrmgus end
 #include "civilization.h"
 #include "faction.h"
-#include "game.h"
+#include "game/game.h"
 #include "map/map.h"
 //Wyrmgus start
 #include "network/network.h"

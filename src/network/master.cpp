@@ -35,7 +35,7 @@
 
 #include "network/master.h"
 
-#include "game.h"
+#include "game/game.h"
 #include "network/netsockets.h"
 #include "network/network.h"
 #include "network/net_lowlevel.h"

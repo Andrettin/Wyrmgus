@@ -42,7 +42,7 @@
 
 #include "character.h"
 #include "config.h"
-#include "game.h"
+#include "game/game.h"
 #include "network/network.h"
 #include "parameters.h"
 #include "spell/spells.h"

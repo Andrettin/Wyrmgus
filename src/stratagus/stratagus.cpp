@@ -182,7 +182,8 @@ extern void beos_init(int argc, char **argv);
 #include "character.h"
 //Wyrmgus end
 #include "editor/editor.h"
-#include "game.h"
+#include "game/game.h"
+#include "game/replay.h"
 #include "guichan.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -191,7 +192,6 @@ extern void beos_init(int argc, char **argv);
 #include "network/network.h"
 #include "parameters.h"
 #include "player.h"
-#include "replay.h"
 #include "results.h"
 #include "settings.h"
 #include "sound/sound_server.h"

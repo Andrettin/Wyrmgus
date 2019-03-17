@@ -32,12 +32,12 @@
 
 #include "stratagus.h"
 
-#include "replay.h"
+#include "game/replay.h"
 
 #include "action/actions.h"
 #include "commands.h"
 #include "faction.h"
-#include "game.h"
+#include "game/game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"

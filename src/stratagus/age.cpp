@@ -36,7 +36,7 @@
 #include "age.h"
 
 #include "config.h"
-#include "game.h"
+#include "game/game.h"
 #include "mod.h"
 #include "player.h"
 #include "time/calendar.h"

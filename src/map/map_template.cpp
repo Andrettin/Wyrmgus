@@ -40,7 +40,7 @@
 #include "config.h"
 #include "editor/editor.h"
 #include "faction.h"
-#include "game.h"
+#include "game/game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/historical_location.h"

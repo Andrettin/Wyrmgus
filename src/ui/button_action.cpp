@@ -37,7 +37,7 @@
 
 #include "config.h"
 #include "faction.h"
-#include "trigger.h"
+#include "game/trigger.h"
 #include "ui/button_level.h"
 #include "ui/interface.h"
 #include "unit/unit.h"

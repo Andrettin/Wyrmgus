@@ -36,7 +36,7 @@
 
 #include "iolib.h"
 
-#include "game.h"
+#include "game/game.h"
 #include "iocompat.h"
 #include "map/map.h"
 #include "parameters.h"

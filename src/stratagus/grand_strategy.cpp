@@ -38,7 +38,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "faction.h"
-#include "game.h"	// for loading screen elements
+#include "game/game.h"	// for loading screen elements
 #include "iolib.h"
 #include "luacallback.h"
 #include "menus.h"

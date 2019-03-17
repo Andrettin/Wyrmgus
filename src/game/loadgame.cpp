@@ -44,6 +44,8 @@
 #include "construct.h"
 #include "currency.h"
 #include "dialogue.h"
+#include "game/replay.h"
+#include "game/trigger.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -66,7 +68,6 @@
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"
-#include "replay.h"
 #include "script.h"
 #include "skin_color.h"
 #include "sound/sound.h"
@@ -83,7 +84,6 @@
 #include "time/time_of_day.h"
 #include "time/time_of_day_schedule.h"
 #include "time/timeline.h"
-#include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/ui.h"

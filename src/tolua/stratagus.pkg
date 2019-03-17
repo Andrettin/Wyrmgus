@@ -7,7 +7,7 @@ $#include "ai/ai.h"
 $#include "character.h"
 //Wyrmgus end
 $#include "dialogue.h"
-$#include "game.h"
+$#include "game/game.h"
 //Wyrmgus start
 $#include "grand_strategy.h"
 //Wyrmgus end

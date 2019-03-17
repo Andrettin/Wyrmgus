@@ -38,14 +38,14 @@
 #include "ai/ai.h"
 #include "commands.h"
 //Wyrmgus start
-#include "game.h"
+#include "game/game.h"
 //Wyrmgus end
+#include "game/replay.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "network/network.h"
 #include "player.h"
-#include "replay.h"
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "translate.h"

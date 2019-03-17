@@ -39,7 +39,7 @@
 #include "civilization.h"
 #include "faction.h"
 //Wyrmgus start
-#include "game.h"
+#include "game/game.h"
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "iolib.h"

@@ -39,7 +39,8 @@
 #include "editor/editor.h"
 
 #include "commands.h"
-#include "game.h"
+#include "game/game.h"
+#include "game/replay.h"
 #include "guichan.h"
 #include "icon.h"
 #include "iocompat.h"
@@ -53,7 +54,6 @@
 #include "network/network.h"
 #include "parameters.h"
 #include "player.h"
-#include "replay.h"
 #include "script.h"
 #include "settings.h"
 #include "sound/sound.h"

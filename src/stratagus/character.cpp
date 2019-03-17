@@ -39,7 +39,7 @@
 #include "civilization.h"
 #include "config.h"
 #include "faction.h"
-#include "game.h"
+#include "game/game.h"
 #include "icon.h"
 #include "iocompat.h"
 #include "iolib.h"

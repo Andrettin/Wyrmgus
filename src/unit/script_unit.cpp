@@ -42,6 +42,7 @@
 #include "animation/animation.h"
 #include "commands.h"
 #include "construct.h"
+#include "game/trigger.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -58,7 +59,6 @@
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
-#include "trigger.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit_find.h"

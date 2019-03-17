@@ -52,7 +52,7 @@
 #include "commands.h"
 #include "construct.h"
 #include "faction.h"
-#include "game.h"
+#include "game/game.h"
 #include "editor/editor.h"
 //Wyrmgus start
 #include "grand_strategy.h"

@@ -76,7 +76,7 @@
 #endif
 
 #include "editor/editor.h"
-#include "game.h"
+#include "game/game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end

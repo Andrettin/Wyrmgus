@@ -50,7 +50,7 @@
 #include "currency.h"
 #include "editor/editor.h"
 #include "faction.h"
-#include "game.h"
+#include "game/game.h"
 //Wyrmgus end
 #include "icon.h"
 //Wyrmgus start

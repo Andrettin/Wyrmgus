@@ -50,7 +50,7 @@
 //Wyrmgus start
 #include "editor/editor.h"
 #include "faction.h"
-#include "game.h"
+#include "game/game.h"
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "icon.h"

@@ -35,12 +35,12 @@
 
 #include "ui/popup.h"
 
+#include "game/trigger.h"
 #include "player.h"
 #include "spell/spells.h"
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end
-#include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/ui.h"
 //Wyrmgus start

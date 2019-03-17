@@ -34,7 +34,7 @@
 
 #include "stratagus.h"
 
-#include "game.h"
+#include "game/game.h"
 
 #include "action/actions.h"
 #include "age.h"
@@ -49,6 +49,8 @@
 #include "construct.h"
 #include "editor/editor.h"
 #include "faction.h"
+#include "game/replay.h"
+#include "game/trigger.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -71,7 +73,6 @@
 #include "province.h"
 #include "quest.h"
 //Wyrmgus end
-#include "replay.h"
 #include "include/resource.h"
 #include "results.h"
 //Wyrmgus start
@@ -84,7 +85,6 @@
 #include "text.h"
 #include "time/calendar.h"
 #include "translate.h"
-#include "trigger.h"
 #include "ui/button_action.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
