@@ -677,7 +677,6 @@ public:
 
 public:
 	//Wyrmgus start
-	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CLanguage *> Languages;									/// languages
 	std::vector<CDynasty *> Dynasties;    								/// dynasties
 	//Wyrmgus end

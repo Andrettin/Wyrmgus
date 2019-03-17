@@ -1427,18 +1427,18 @@ void CUnit::ChooseButtonIcon(int button_action)
 	}
 	
 	if (this->Type->GetCivilization() != nullptr) {
-		const int civilization_id = this->Type->GetCivilization()->GetIndex();
+		CCivilization *civilization = this->Type->GetCivilization();
 		CFaction *faction = this->Type->GetFaction();
 		
-		if (faction == nullptr && this->Player->Race == civilization_id) {
+		if (faction == nullptr && this->Player->Race == civilization->GetIndex()) {
 			faction = this->Player->GetFaction();
 		}
 		
 		if (faction != nullptr && faction->ButtonIcons.find(button_action) != faction->ButtonIcons.end()) {
 			this->ButtonIcons[button_action] = faction->ButtonIcons[button_action].Icon;
 			return;
-		} else if (PlayerRaces.ButtonIcons[civilization_id].find(button_action) != PlayerRaces.ButtonIcons[civilization_id].end()) {
-			this->ButtonIcons[button_action] = PlayerRaces.ButtonIcons[civilization_id][button_action].Icon;
+		} else if (civilization->ButtonIcons.find(button_action) != civilization->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = civilization->ButtonIcons[button_action].Icon;
 			return;
 		}
 	}
@@ -6326,8 +6326,8 @@ CIcon *CUnit::GetButtonIcon(int button_action) const
 		return this->ButtonIcons.find(button_action)->second;
 	} else if (this->Player == CPlayer::GetThisPlayer() && CPlayer::GetThisPlayer()->GetFaction() != nullptr && CPlayer::GetThisPlayer()->GetFaction()->ButtonIcons.find(button_action) != CPlayer::GetThisPlayer()->GetFaction()->ButtonIcons.end()) {
 		return CPlayer::GetThisPlayer()->GetFaction()->ButtonIcons[button_action].Icon;
-	} else if (this->Player == CPlayer::GetThisPlayer() && PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].find(button_action) != PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race].end()) {
-		return PlayerRaces.ButtonIcons[CPlayer::GetThisPlayer()->Race][button_action].Icon;
+	} else if (this->Player == CPlayer::GetThisPlayer() && CCivilization::Get(CPlayer::GetThisPlayer()->Race)->ButtonIcons.find(button_action) != CCivilization::Get(CPlayer::GetThisPlayer()->Race)->ButtonIcons.end()) {
+		return CCivilization::Get(CPlayer::GetThisPlayer()->Race)->ButtonIcons[button_action].Icon;
 	}
 	
 	return nullptr;

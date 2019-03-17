@@ -37,6 +37,7 @@
 #include "character.h" // because of "MaxCharacterTitles"
 #include "faction.h" //for certain enums
 #include "time/date.h"
+#include "ui/icon_config.h"
 #include "ui/ui.h" // for the UI fillers
 
 #include <core/object.h>
@@ -289,6 +290,7 @@ public:
 	std::map<int, int> ClassUnitTypes;			/// the unit type slot of a particular class for the civilization
 	std::map<int, int> ClassUpgrades;			/// the upgrade slot of a particular class for the civilization
 	std::vector<CFiller> UIFillers;
+	std::map<int, IconConfig> ButtonIcons;		/// icons for button actions
 	
 	friend int CclDefineCivilization(lua_State *l);
 

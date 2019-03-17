@@ -805,7 +805,6 @@ static int CclDefineCivilization(lua_State *l)
 
 	std::string civilization_name = LuaToString(l, 1);
 	CCivilization *civilization = CCivilization::GetOrAdd(civilization_name);
-	const int civilization_id = civilization->GetIndex();
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -878,9 +877,9 @@ static int CclDefineCivilization(lua_State *l)
 				int button_action = GetButtonActionIdByName(button_action_name);
 				if (button_action != -1) {
 					++j;
-					PlayerRaces.ButtonIcons[civilization_id][button_action].Name = LuaToString(l, -1, j + 1);
-					PlayerRaces.ButtonIcons[civilization_id][button_action].Icon = nullptr;
-					PlayerRaces.ButtonIcons[civilization_id][button_action].Load();
+					civilization->ButtonIcons[button_action].Name = LuaToString(l, -1, j + 1);
+					civilization->ButtonIcons[button_action].Icon = nullptr;
+					civilization->ButtonIcons[button_action].Load();
 				} else {
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
 				}
@@ -1116,9 +1115,9 @@ static int CclDefineCivilization(lua_State *l)
 		}
 		
 		//inherit button icons from the parent civilization, for button actions which none are specified
-		for (std::map<int, IconConfig>::iterator iterator = PlayerRaces.ButtonIcons[parent_civilization_id].begin(); iterator != PlayerRaces.ButtonIcons[parent_civilization_id].end(); ++iterator) {
-			if (PlayerRaces.ButtonIcons[civilization_id].find(iterator->first) == PlayerRaces.ButtonIcons[civilization_id].end()) {
-				PlayerRaces.ButtonIcons[civilization_id][iterator->first] = iterator->second;
+		for (std::map<int, IconConfig>::const_iterator iterator = parent_civilization->ButtonIcons.begin(); iterator != parent_civilization->ButtonIcons.end(); ++iterator) {
+			if (civilization->ButtonIcons.find(iterator->first) == civilization->ButtonIcons.end()) {
+				civilization->ButtonIcons[iterator->first] = iterator->second;
 			}
 		}
 		
@@ -1194,7 +1193,7 @@ static int CclDefineCivilization(lua_State *l)
 		}
 	}
 	
-	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonMove) != PlayerRaces.ButtonIcons[civilization_id].end()) {
+	if (civilization->ButtonIcons.find(ButtonMove) != civilization->ButtonIcons.end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 1,\n";
 		button_definition += "\tAction = \"move\",\n";
@@ -1206,7 +1205,7 @@ static int CclDefineCivilization(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonStop) != PlayerRaces.ButtonIcons[civilization_id].end()) {
+	if (civilization->ButtonIcons.find(ButtonStop) != civilization->ButtonIcons.end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 2,\n";
 		button_definition += "\tAction = \"stop\",\n";
@@ -1218,7 +1217,7 @@ static int CclDefineCivilization(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonAttack) != PlayerRaces.ButtonIcons[civilization_id].end()) {
+	if (civilization->ButtonIcons.find(ButtonAttack) != civilization->ButtonIcons.end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 3,\n";
 		button_definition += "\tAction = \"attack\",\n";
@@ -1230,7 +1229,7 @@ static int CclDefineCivilization(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonPatrol) != PlayerRaces.ButtonIcons[civilization_id].end()) {
+	if (civilization->ButtonIcons.find(ButtonPatrol) != civilization->ButtonIcons.end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
 		button_definition += "\tAction = \"patrol\",\n";
@@ -1242,7 +1241,7 @@ static int CclDefineCivilization(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonStandGround) != PlayerRaces.ButtonIcons[civilization_id].end()) {
+	if (civilization->ButtonIcons.find(ButtonStandGround) != civilization->ButtonIcons.end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 5,\n";
 		button_definition += "\tAction = \"stand-ground\",\n";
