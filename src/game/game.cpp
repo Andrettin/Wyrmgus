@@ -47,6 +47,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
+#include "economy/resource.h"
 #include "editor/editor.h"
 #include "faction.h"
 #include "game/replay.h"
@@ -72,7 +73,6 @@
 #include "province.h"
 #include "quest.h"
 //Wyrmgus end
-#include "include/resource.h"
 #include "results.h"
 //Wyrmgus start
 #include "script.h"

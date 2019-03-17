@@ -36,12 +36,10 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
+#include "economy/resource.h"
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
-#include "include/resource.h"
-
-#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Defines

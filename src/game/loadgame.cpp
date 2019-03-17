@@ -42,8 +42,8 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
-#include "currency.h"
 #include "dialogue.h"
+#include "economy/currency.h"
 #include "game/replay.h"
 #include "game/trigger.h"
 //Wyrmgus start

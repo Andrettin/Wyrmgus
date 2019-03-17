@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "include/resource.h"
+#include "economy/resource.h"
 
 #include "config.h"
 

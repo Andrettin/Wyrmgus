@@ -39,7 +39,7 @@
 #include "animation/animation.h"
 #include "campaign.h"
 #include "character.h"
-#include "currency.h"
+#include "economy/currency.h"
 #include "game/game.h"
 #include "game/trigger.h"
 #include "hair_color.h"

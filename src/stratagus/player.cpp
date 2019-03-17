@@ -47,7 +47,7 @@
 #include "campaign.h"
 #include "civilization.h"
 #include "commands.h" //for faction setting
-#include "currency.h"
+#include "economy/currency.h"
 #include "editor/editor.h"
 #include "faction.h"
 #include "game/game.h"

@@ -43,7 +43,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
-#include "currency.h"
+#include "economy/currency.h"
 //Wyrmgus start
 #include "editor/editor.h"
 //Wyrmgus end

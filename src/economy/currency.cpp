@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "currency.h"
+#include "economy/currency.h"
 
 #include "config.h"
 

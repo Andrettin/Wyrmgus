@@ -41,6 +41,7 @@
 //Wyrmgus start
 #include "commands.h"
 //Wyrmgus end
+#include "economy/resource.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -48,7 +49,6 @@
 #include "pathfinder/pathfinder.h"
 #include "player.h"
 #include "quest.h"
-#include "include/resource.h"
 #include "script.h"
 //Wyrmgus start
 #include "settings.h"
