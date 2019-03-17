@@ -45,7 +45,7 @@
 #include "config.h"
 #include "construct.h"
 //Wyrmgus start
-#include "editor.h" //for personal name generation
+#include "editor/editor.h" //for personal name generation
 //Wyrmgus end
 #include "faction.h"
 #include "icon.h"

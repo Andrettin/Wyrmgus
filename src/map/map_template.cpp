@@ -35,12 +35,10 @@
 
 #include "map/map_template.h"
 
-#include <fstream>
-
 #include "campaign.h"
 #include "civilization.h"
 #include "config.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "faction.h"
 #include "game.h"
 #include "iocompat.h"
@@ -66,6 +64,8 @@
 #include "unit/unit_type.h"
 #include "video.h"
 #include "world.h"
+
+#include <fstream>
 
 /*----------------------------------------------------------------------------
 --  Variables

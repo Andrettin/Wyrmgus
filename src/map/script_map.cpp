@@ -38,7 +38,7 @@
 #include "campaign.h"
 #include "civilization.h"
 //Wyrmgus start
-#include "editor.h"
+#include "editor/editor.h"
 //Wyrmgus end
 #include "faction.h"
 //Wyrmgus start

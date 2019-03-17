@@ -181,7 +181,7 @@ extern void beos_init(int argc, char **argv);
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
-#include "editor.h"
+#include "editor/editor.h"
 #include "game.h"
 #include "guichan.h"
 #include "iocompat.h"

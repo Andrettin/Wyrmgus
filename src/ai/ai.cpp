@@ -143,7 +143,7 @@
 #include "action/action_attack.h"
 #include "commands.h"
 //Wyrmgus start
-#include "editor.h"
+#include "editor/editor.h"
 //Wyrmgus end
 #include "faction.h"
 #include "grand_strategy.h"

@@ -37,7 +37,7 @@
 #include "cursor.h"
 #include "intern_video.h"
 
-#include "editor.h"
+#include "editor/editor.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"

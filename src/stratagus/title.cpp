@@ -28,11 +28,13 @@
 //
 
 #include "stratagus.h"
+
 #include "title.h"
+
 #include "video.h"
 #include "font.h"
 #include "sound/sound_server.h"
-#include "editor.h"
+#include "editor/editor.h"
 
 
 TitleScreen **TitleScreens;			/// Title screens to show at startup

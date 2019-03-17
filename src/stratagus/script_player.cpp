@@ -45,7 +45,7 @@
 #include "commands.h"
 #include "currency.h"
 //Wyrmgus start
-#include "editor.h"
+#include "editor/editor.h"
 //Wyrmgus end
 #include "faction.h"
 //Wyrmgus start

@@ -43,7 +43,7 @@
 //Wyrmgus end
 #include "civilization.h"
 #include "construct.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "faction.h"
 #include "font.h"
 #include "icon.h"

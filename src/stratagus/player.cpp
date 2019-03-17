@@ -48,7 +48,7 @@
 #include "civilization.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "faction.h"
 #include "font.h"
 #include "game.h"

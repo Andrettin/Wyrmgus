@@ -31,13 +31,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string.h>
-
 #include "stratagus.h"
 
 #include "map/minimap.h"
 
-#include "editor.h"
+#include "editor/editor.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
@@ -51,6 +49,8 @@
 #include "unit/unit_type.h"
 #include "video.h"
 #include "world.h"
+
+#include <string.h>
 
 /*----------------------------------------------------------------------------
 --  Defines

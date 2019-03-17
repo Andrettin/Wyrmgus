@@ -36,7 +36,7 @@
 #include "map/tile.h"
 
 //Wyrmgus start
-#include "editor.h"
+#include "editor/editor.h"
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"

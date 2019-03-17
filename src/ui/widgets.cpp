@@ -32,24 +32,26 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
-#include "video.h"
+
+#include "widgets.h"
+
+#include "cursor.h"
+#include "editor/editor.h"
 #include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "cursor.h"
-#include "ui/ui.h"
-#include "widgets.h"
 #include "network/network.h"
 #include "network/netconnect.h"
-#include "editor.h"
-#include "sound/sound.h"
 //Wyrmgus start
 #include "player.h"
 //Wyrmgus end
 //Wyrmgus start
 #include "results.h"
 //Wyrmgus end
+#include "sound/sound.h"
+#include "ui/ui.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

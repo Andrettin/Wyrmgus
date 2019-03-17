@@ -44,7 +44,7 @@
 #include "civilization.h"
 #include "config.h"
 //Wyrmgus start
-#include "editor.h"
+#include "editor/editor.h"
 //Wyrmgus end
 #include "faction.h"
 #include "font.h"

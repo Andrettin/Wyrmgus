@@ -75,7 +75,7 @@
 #include <shellapi.h>
 #endif
 
-#include "editor.h"
+#include "editor/editor.h"
 #include "font.h"
 #include "game.h"
 //Wyrmgus start

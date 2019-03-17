@@ -36,7 +36,7 @@
 
 #include "stratagus.h"
 
-#include "editor.h"
+#include "editor/editor.h"
 
 #include "commands.h"
 #include "font.h"

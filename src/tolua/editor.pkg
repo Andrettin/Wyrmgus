@@ -1,4 +1,4 @@
-$#include "editor.h"
+$#include "editor/editor.h"
 
 enum EditorRunningType {
 	EditorNotRunning = 0,	/// Not Running

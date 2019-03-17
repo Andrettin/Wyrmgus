@@ -39,7 +39,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "dialogue.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "faction.h"
 //Wyrmgus start
 #include "font.h"

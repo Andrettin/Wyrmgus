@@ -37,7 +37,7 @@
 #include "unit/unit_type.h"
 
 #include "action/actions.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"

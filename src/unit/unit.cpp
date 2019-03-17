@@ -53,7 +53,7 @@
 #include "construct.h"
 #include "faction.h"
 #include "game.h"
-#include "editor.h"
+#include "editor/editor.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end

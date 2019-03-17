@@ -32,13 +32,15 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
-#include "editor.h"
+
+#include "editor/editor.h"
+
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
-#include "ui/ui.h"
 #include "player.h"
+#include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"

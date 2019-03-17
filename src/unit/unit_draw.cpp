@@ -45,7 +45,7 @@
 //Wyrmgus end
 #include "construct.h"
 #include "cursor.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "font.h"
 #include "map/map.h"
 #include "map/map_layer.h"
