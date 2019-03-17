@@ -255,7 +255,7 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->Settlement = site;
 					} else if (!strcmp(value, "faction")) {
-						CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, k + 1));
+						CFaction *faction = CFaction::Get(LuaToString(l, -1, k + 1));
 						if (!faction) {
 							LuaError(l, "Faction doesn't exist.");
 						}
@@ -442,7 +442,7 @@ static int CclDefineCampaign(lua_State *l)
 		} else if (!strcmp(value, "Description")) {
 			campaign->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Faction")) {
-			campaign->Faction = CFaction::GetFaction(LuaToString(l, -1));
+			campaign->Faction = CFaction::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
 			campaign->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sandbox")) {
@@ -546,7 +546,7 @@ static int CclGetCampaignData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (campaign->Faction) {
-			lua_pushstring(l, campaign->Faction->Ident.c_str());
+			lua_pushstring(l, campaign->Faction->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

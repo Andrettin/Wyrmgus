@@ -77,11 +77,9 @@
 			}
 		} else if (!strcmp(value, "faction")) {
 			value = LuaToString(l, -1, j + 1);
-			const CFaction *faction = CFaction::GetFaction(value);
+			const CFaction *faction = CFaction::Get(value);
 			if (faction != nullptr) {
 				this->Faction = faction;
-			} else {
-				fprintf(stderr, "Faction %s doesn't exist.\n", value);
 			}
 		} else if (!strcmp(value, "detachment")) {
 			this->Detachment = true;

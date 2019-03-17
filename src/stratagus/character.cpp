@@ -205,14 +205,12 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->Civilization = CCivilization::GetCivilization(value);
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = CFaction::GetFaction(value);
+			CFaction *faction = CFaction::Get(value);
 			if (faction) {
 				if (!this->Faction) {
 					this->Faction = faction;
 				}
 				this->Factions.push_back(faction);
-			} else {
-				fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "hair_variation") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -391,10 +389,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 					end_date = CDate::FromString(value);
 				} else if (key == "faction") {
 					value = FindAndReplaceString(value, "_", "-");
-					title_faction = CFaction::GetFaction(value);
-					if (!title_faction) {
-						fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
-					}
+					title_faction = CFaction::Get(value);
 				} else {
 					fprintf(stderr, "Invalid historical title property: \"%s\".\n", key.c_str());
 				}

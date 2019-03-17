@@ -212,12 +212,10 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "holy_order") {
 			value = FindAndReplaceString(value, "_", "-");
-			CFaction *holy_order = CFaction::GetFaction(value);
+			CFaction *holy_order = CFaction::Get(value);
 			if (holy_order) {
 				this->HolyOrders.push_back(holy_order);
 				holy_order->HolyOrderDeity = this;
-			} else {
-				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 			}
 		} else {
 			fprintf(stderr, "Invalid deity property: \"%s\".\n", key.c_str());

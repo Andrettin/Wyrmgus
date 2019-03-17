@@ -71,7 +71,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "core") {
 			value = FindAndReplaceString(value, "_", "-");
 			
-			CFaction *faction = CFaction::GetFaction(value);
+			CFaction *faction = CFaction::Get(value);
 			if (faction != nullptr) {
 				this->Cores.push_back(faction);
 				faction->Cores.push_back(this);
@@ -79,8 +79,6 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 				if (faction->Civilization) {
 					faction->Civilization->Sites.push_back(this);
 				}
-			} else {
-				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "region") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -124,10 +122,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 					date = CDate::FromString(value);
 				} else if (key == "faction") {
 					value = FindAndReplaceString(value, "_", "-");
-					owner_faction = CFaction::GetFaction(value);
-					if (!owner_faction) {
-						fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
-					}
+					owner_faction = CFaction::Get(value);
 				} else {
 					fprintf(stderr, "Invalid historical owner property: \"%s\".\n", key.c_str());
 				}
@@ -165,10 +160,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 					}
 				} else if (key == "faction") {
 					value = FindAndReplaceString(value, "_", "-");
-					building_owner_faction = CFaction::GetFaction(value);
-					if (!building_owner_faction) {
-						fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
-					}
+					building_owner_faction = CFaction::Get(value);
 				} else {
 					fprintf(stderr, "Invalid historical building property: \"%s\".\n", key.c_str());
 				}

@@ -808,7 +808,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 
 	if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_ident.c_str()) != OAML_OK) {
 		CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
-		const CFaction *faction = CFaction::GetFaction(faction_ident);
+		const CFaction *faction = CFaction::Get(faction_ident);
 		const CFaction *parent_faction = nullptr;
 		bool found_music = false;
 		if (faction != nullptr) {
@@ -819,7 +819,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 				}
 				faction = parent_faction;
 				
-				if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction->Ident.c_str()) == OAML_OK) {
+				if (Wyrmgus::GetInstance()->GetOamlModule()->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction->GetIdent().utf8().get_data()) == OAML_OK) {
 					found_music = true;
 					break;
 				}

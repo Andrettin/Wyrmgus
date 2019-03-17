@@ -803,22 +803,22 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 
 //Wyrmgus start
 /**
-** Send command: Faction changed.
+**	@brief	Send command: Faction changed.
 **
-** @param player     Player which changes his faction.
-** @param faction    New faction.
+**	@param player     Player which changes his faction.
+**	@param faction    The index of the new faction.
 */
-void SendCommandSetFaction(int player, int faction)
+void SendCommandSetFaction(const int player, const int faction_index)
 {
 	if (!IsNetworkGame()) {
 		//FIXME: should add log of faction change here
-		if (faction != -1) {
-			CPlayer::Players[player]->SetFaction(CFaction::Factions[faction]);
+		if (faction_index != -1) {
+			CPlayer::Players[player]->SetFaction(CFaction::Get(faction_index));
 		} else {
 			CPlayer::Players[player]->SetFaction(nullptr);
 		}
 	} else {
-		NetworkSendExtendedCommand(ExtendedMessageSetFaction, -1, player, faction, 0, 0);
+		NetworkSendExtendedCommand(ExtendedMessageSetFaction, -1, player, faction_index, 0, 0);
 	}
 }
 //Wyrmgus end
@@ -1182,7 +1182,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 		//Wyrmgus start
 		case ExtendedMessageSetFaction: {
 			//FIXME: should add log for faction change here
-			CPlayer::Players[arg2]->SetFaction(CFaction::Factions[arg3]);
+			CPlayer::Players[arg2]->SetFaction(CFaction::Get(arg3));
 			break;
 		}
 		case ExtendedMessageAutosellResource: {

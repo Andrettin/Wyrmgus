@@ -42,13 +42,6 @@
 #include "player_color.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CFaction *> CFaction::Factions;
-std::map<std::string, int> CFaction::FactionStringToIndex;
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -71,35 +64,19 @@ CFaction::~CFaction()
 	this->UIFillers.clear();
 }
 
-int CFaction::GetFactionIndexByName(const std::string &faction_ident)
+int CFaction::GetIndex(const std::string &faction_ident)
 {
 	if (faction_ident.empty()) {
 		return -1;
 	}
 	
-	if (FactionStringToIndex.find(faction_ident) != FactionStringToIndex.end()) {
-		return FactionStringToIndex[faction_ident];
+	const CFaction *faction = CFaction::Get(faction_ident);
+	
+	if (faction != nullptr) {
+		return faction->GetIndex();
 	} else {
 		return -1;
 	}
-}
-
-CFaction *CFaction::GetFaction(const std::string &faction_ident)
-{
-	if (faction_ident.empty()) {
-		return nullptr;
-	}
-	
-	if (FactionStringToIndex.find(faction_ident) != FactionStringToIndex.end()) {
-		return CFaction::Factions[FactionStringToIndex[faction_ident]];
-	} else {
-		return nullptr;
-	}
-}
-
-void CFaction::SetFactionStringToIndex(const std::string &faction_name, const int faction_id)
-{
-	CFaction::FactionStringToIndex[faction_name] = faction_id;
 }
 
 int CFaction::GetFactionClassUnitType(const CFaction *faction, const int class_id)

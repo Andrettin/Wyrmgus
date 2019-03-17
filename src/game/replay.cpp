@@ -359,7 +359,7 @@ static void SaveFullLog(CFile &file)
 	file.printf("  Type = %d,\n", CurrentReplay->Type);
 	file.printf("  Race = %d,\n", CurrentReplay->Race);
 	//Wyrmgus start
-	file.printf("  Faction = \"%s\",\n", CurrentReplay->Faction != nullptr ? CurrentReplay->Faction->Ident.c_str() : "");
+	file.printf("  Faction = \"%s\",\n", CurrentReplay->Faction != nullptr ? CurrentReplay->Faction->GetIdent().utf8().get_data() : "");
 	//Wyrmgus end
 	file.printf("  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
 	file.printf("  Players = {\n");
@@ -372,7 +372,7 @@ static void SaveFullLog(CFile &file)
 		file.printf(" AIScript = \"%s\",", CurrentReplay->Players[i].AIScript.c_str());
 		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
 		//Wyrmgus start
-		file.printf(" Faction = \"%s\",", CurrentReplay->Players[i].Faction != nullptr ? CurrentReplay->Players[i].Faction->Ident.c_str() : "");
+		file.printf(" Faction = \"%s\",", CurrentReplay->Players[i].Faction != nullptr ? CurrentReplay->Players[i].Faction->GetIdent().utf8().get_data() : "");
 		//Wyrmgus end
 		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
 		file.printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
@@ -644,7 +644,7 @@ static int CclReplayLog(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "Faction")) {
 			const std::string faction_ident = LuaToString(l, -1);
-			CFaction *faction = CFaction::GetFaction(faction_ident);
+			CFaction *faction = CFaction::Get(faction_ident);
 			if (faction != nullptr) {
 				replay->Faction = faction;
 			}
@@ -675,7 +675,7 @@ static int CclReplayLog(lua_State *l)
 					//Wyrmgus start
 					} else if (!strcmp(value, "Faction")) {
 						const std::string faction_ident = LuaToString(l, -1);
-						CFaction *faction = CFaction::GetFaction(faction_ident);
+						CFaction *faction = CFaction::Get(faction_ident);
 						if (faction != nullptr) {
 							replay->Players[j].Faction = faction;
 						}

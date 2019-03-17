@@ -168,7 +168,7 @@ void CPlayer::Load(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
 			const std::string faction_ident = LuaToString(l, j + 1);
-			const CFaction *faction = CFaction::GetFaction(faction_ident);
+			const CFaction *faction = CFaction::Get(faction_ident);
 			this->Faction = faction;
 		} else if (!strcmp(value, "dynasty")) {
 			this->Dynasty = PlayerRaces.GetDynasty(LuaToString(l, j + 1));
@@ -522,11 +522,10 @@ void CPlayer::Load(lua_State *l)
 						}
 						objective->Settlement = site;
 					} else if (!strcmp(value, "faction")) {
-						CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, n + 1));
-						if (!faction) {
-							LuaError(l, "Faction doesn't exist.");
+						CFaction *faction = CFaction::Get(LuaToString(l, -1, n + 1));
+						if (faction) {
+							objective->Faction = faction;
 						}
-						objective->Faction = faction;
 					} else {
 						LuaError(l, "Invalid quest objective property.");
 					}
@@ -1685,13 +1684,13 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		
 		std::vector<std::string> factions;
-		for (const CFaction *faction : CFaction::Factions) {
+		for (const CFaction *faction : CFaction::GetAll()) {
 			if (faction->Civilization != civilization) {
 				continue;
 			}
 			
 			if (!is_mod || faction->Mod == mod_file) {
-				factions.push_back(faction->Ident);
+				factions.push_back(faction->GetIdent().utf8().get_data());
 			}
 		}
 		
@@ -1773,10 +1772,10 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	CFaction *faction = nullptr;
 	const int nargs = lua_gettop(l);
 	if (nargs == 2) {
-		faction = CFaction::GetFaction(LuaToString(l, 2));
+		faction = CFaction::Get(LuaToString(l, 2));
 	} else if (nargs == 3) {
 		//the civilization was the second argument, but it isn't needed anymore
-		faction = CFaction::GetFaction(LuaToString(l, 3));
+		faction = CFaction::Get(LuaToString(l, 3));
 	}
 	std::string unit_type_ident;
 	if (class_id != -1) {
@@ -1820,17 +1819,11 @@ static int CclDefineFaction(lua_State *l)
 	std::string faction_name = LuaToString(l, 1);
 	std::string parent_faction;
 	
-	CFaction *faction = CFaction::GetFaction(faction_name);
-	if (faction) { // redefinition
+	CFaction *faction = CFaction::GetOrAdd(faction_name);
+	if (faction->GetIndex() < ((int) CFaction::GetAll().size() - 1)) { // redefinition
 		if (faction->ParentFaction != nullptr) {
-			parent_faction = faction->ParentFaction->Ident;
+			parent_faction = faction->ParentFaction->GetIdent().utf8().get_data();
 		}
-	} else {
-		faction = new CFaction;
-		faction->Ident = faction_name;
-		faction->ID = CFaction::Factions.size();
-		CFaction::Factions.push_back(faction);
-		CFaction::SetFactionStringToIndex(faction->Ident, faction->ID);
 	}
 	
 	//  Parse the list:
@@ -1916,7 +1909,7 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				CFaction *second_faction = CFaction::GetFaction(LuaToString(l, -1, k + 1));
+				CFaction *second_faction = CFaction::Get(LuaToString(l, -1, k + 1));
 				if (!second_faction) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -1929,7 +1922,7 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				CFaction *second_faction = CFaction::GetFaction(LuaToString(l, -1, k + 1));
+				CFaction *second_faction = CFaction::Get(LuaToString(l, -1, k + 1));
 				if (!second_faction) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -2024,7 +2017,7 @@ static int CclDefineFaction(lua_State *l)
 						int unit_quantity = LuaToNumber(l, -1, k + 1);
 						force->Units.push_back(std::pair<int, int>(unit_class, unit_quantity));
 					} else {
-						printf("\n%s\n", faction->Ident.c_str());
+						printf("\n%s\n", faction->GetIdent().utf8().get_data());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -2056,7 +2049,7 @@ static int CclDefineFaction(lua_State *l)
 					} else if (!strcmp(value, "per-settlement")) {
 						building_template->PerSettlement = LuaToBoolean(l, -1, k + 1);
 					} else {
-						printf("\n%s\n", faction->Ident.c_str());
+						printf("\n%s\n", faction->GetIdent().utf8().get_data());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -2162,7 +2155,7 @@ static int CclDefineFaction(lua_State *l)
 				++j;
 				
 				std::string diplomacy_state_faction_ident = LuaToString(l, -1, j + 1);
-				CFaction *diplomacy_state_faction = CFaction::GetFaction(diplomacy_state_faction_ident);
+				CFaction *diplomacy_state_faction = CFaction::Get(diplomacy_state_faction_ident);
 				if (diplomacy_state_faction == nullptr) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ diplomacy_state_faction_ident.c_str());
 				}
@@ -2224,7 +2217,7 @@ static int CclDefineFaction(lua_State *l)
 	}
 	
 	if (!parent_faction.empty()) { //process this here
-		faction->ParentFaction = CFaction::GetFaction(parent_faction);
+		faction->ParentFaction = CFaction::Get(parent_faction);
 		
 		if (faction->ParentFaction == nullptr) { //if a parent faction was set but wasn't found, give an error
 			LuaError(l, "Faction %s doesn't exist" _C_ parent_faction.c_str());
@@ -2305,7 +2298,7 @@ static int CclDefineDynasty(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, k + 1));
+				CFaction *faction = CFaction::Get(LuaToString(l, -1, k + 1));
 				if (!faction) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -2469,7 +2462,7 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CFaction *holy_order = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				CFaction *holy_order = CFaction::Get(LuaToString(l, -1, j + 1));
 				if (!holy_order) {
 					LuaError(l, "Holy order doesn't exist.");
 				}
@@ -2715,12 +2708,12 @@ static int CclGetFactions(lua_State *l)
 	}
 	
 	std::vector<std::string> factions;
-	for (const CFaction *faction : CFaction::Factions) {
+	for (const CFaction *faction : CFaction::GetAll()) {
 		if (faction_type != -1 && faction->Type != faction_type) {
 			continue;
 		}
 		if (civilization == nullptr || faction->Civilization == civilization) {
-			factions.push_back(faction->Ident);
+			factions.push_back(faction->GetIdent().utf8().get_data());
 		}
 	}
 		
@@ -2806,7 +2799,7 @@ static int CclGetFactionData(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	std::string faction_name = LuaToString(l, 1);
-	CFaction *faction = CFaction::GetFaction(faction_name);
+	CFaction *faction = CFaction::Get(faction_name);
 	if (faction == nullptr) {
 		LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
 	}
@@ -2857,7 +2850,7 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ParentFaction")) {
 		if (faction->ParentFaction != nullptr) {
-			lua_pushstring(l, faction->ParentFaction->Ident.c_str());
+			lua_pushstring(l, faction->ParentFaction->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2918,7 +2911,7 @@ static int CclGetDynastyData(lua_State *l)
 		lua_createtable(l, dynasty->Factions.size(), 0);
 		for (size_t i = 1; i <= dynasty->Factions.size(); ++i)
 		{
-			lua_pushstring(l, dynasty->Factions[i-1]->Ident.c_str());
+			lua_pushstring(l, dynasty->Factions[i-1]->GetIdent().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3046,7 +3039,7 @@ static int CclGetPlayerData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		if (p->Race != -1 && p->GetFaction() != nullptr) {
-			lua_pushstring(l, p->GetFaction()->Ident.c_str());
+			lua_pushstring(l, p->GetFaction()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3420,7 +3413,7 @@ static int CclSetPlayerData(lua_State *l)
 		if (faction_name == "random") {
 			p->SetRandomFaction();
 		} else {
-			p->SetFaction(CFaction::GetFaction(faction_name));
+			p->SetFaction(CFaction::Get(faction_name));
 		}
 	} else if (!strcmp(data, "Dynasty")) {
 		std::string dynasty_ident = LuaToString(l, 3);

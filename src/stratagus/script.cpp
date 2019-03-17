@@ -3541,11 +3541,9 @@ void SavePreferences()
 //Wyrmgus start
 void DeleteModFaction(const std::string &faction_name)
 {
-	CFaction *faction = CFaction::GetFaction(faction_name);
+	CFaction *faction = CFaction::Get(faction_name);
 	if (faction != nullptr && !faction->Mod.empty()) {
-		CFaction::FactionStringToIndex.erase(faction->Ident);
-		delete faction;
-		CFaction::Factions.erase(std::remove(CFaction::Factions.begin(), CFaction::Factions.end(), faction), CFaction::Factions.end());
+		CFaction::Remove(faction);
 	}
 }
 
@@ -3577,7 +3575,7 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 			}
 		}
 	}
-	for (CFaction *faction : CFaction::Factions) {
+	for (CFaction *faction : CFaction::GetAll()) {
 		for (std::map<int, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
 			if (iterator->second == unit_type->Slot) {
 				faction->ClassUnitTypes.erase(iterator->first);
@@ -3640,12 +3638,11 @@ void DisableMod(const std::string &mod_file)
 		}
 	}
 	
-	int factions_size = CFaction::Factions.size();
+	int factions_size = CFaction::GetAll().size();
 	for (int i = (factions_size - 1); i >= 0; --i) {
-		if (CFaction::Factions[i]->Mod == mod_file) {
-			CFaction::FactionStringToIndex.erase(CFaction::Factions[i]->Ident);
-			CFaction::Factions.erase(std::remove(CFaction::Factions.begin(), CFaction::Factions.end(), CFaction::Factions[i]), CFaction::Factions.end());
-			delete CFaction::Factions[i];
+		CFaction *faction = CFaction::Get(i);
+		if (faction->Mod == mod_file) {
+			CFaction::Remove(faction);
 		}
 	}
 }

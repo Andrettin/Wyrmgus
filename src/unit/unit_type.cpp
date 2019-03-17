@@ -739,11 +739,9 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = CFaction::GetFaction(value);
+			CFaction *faction = CFaction::Get(value);
 			if (faction) {
 				this->Faction = faction;
-			} else {
-				fprintf(stderr, "Faction \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "animations") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -1151,7 +1149,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		}
-		for (CFaction *faction : CFaction::Factions) {
+		for (CFaction *faction : CFaction::GetAll()) {
 			for (std::map<int, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
 				if (iterator->second == this->Slot) {
 					faction->ClassUnitTypes.erase(iterator->first);

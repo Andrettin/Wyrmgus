@@ -1765,11 +1765,9 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
-			CFaction *faction = CFaction::GetFaction(faction_name);
+			CFaction *faction = CFaction::Get(faction_name);
 			if (faction) {
 				type->Faction = faction;
-			} else {
-				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
 			}
 		} else if (!strcmp(value, "Description")) {
 			type->Description = LuaToString(l, -1);
@@ -1971,7 +1969,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		}
-		for (CFaction *faction : CFaction::Factions) {
+		for (CFaction *faction : CFaction::GetAll()) {
 			for (std::map<int, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
 				if (iterator->second == type->Slot) {
 					faction->ClassUnitTypes.erase(iterator->first);
@@ -2422,7 +2420,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (type->GetFaction() != nullptr) {
-			lua_pushstring(l, type->GetFaction()->Ident.c_str());
+			lua_pushstring(l, type->GetFaction()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

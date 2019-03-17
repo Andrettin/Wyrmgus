@@ -96,11 +96,9 @@ void CCampaign::ProcessConfigData(const CConfigData *config_data)
 			this->Description = value;
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = CFaction::GetFaction(value);
+			CFaction *faction = CFaction::Get(value);
 			if (faction) {
 				this->Faction = faction;
-			} else {
-				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "hidden") {
 			this->Hidden = StringToBool(value);

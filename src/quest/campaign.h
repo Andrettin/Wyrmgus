@@ -58,14 +58,6 @@ class CCampaign : public CDataType, public Object
 	DATA_TYPE_CLASS(CCampaign)
 	
 public:
-	CCampaign()
-	{
-	}
-	
-	CCampaign(const std::string &ident) : CDataType(ident)
-	{
-	}
-	
 	static void SetCurrentCampaign(CCampaign *campaign);
 	static CCampaign *GetCurrentCampaign();
 

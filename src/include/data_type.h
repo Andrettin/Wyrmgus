@@ -34,7 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <core/typedefs.h>
 #include <core/ustring.h>
 
 #include <map>
@@ -71,6 +70,30 @@ public: \
 	} \
 	\
 	/**
+	**	@brief	Get an instance of the class by its index
+	**
+	**	@param	index	The instance's index
+	**
+	**	@return	The instance if found, or null otherwise
+	*/ \
+	static inline class_name *Get(const int index, const bool should_find = true) \
+	{ \
+		if (index == -1) { \
+			return nullptr; \
+		} \
+		\
+		if (index < static_cast<int>(class_name::Instances.size())) { \
+			return class_name::Instances[index]; \
+		} \
+		\
+		if (should_find) { \
+			fprintf(stderr, "Invalid %s instance index: %i.\n", #class_name, index); \
+		} \
+		\
+		return nullptr; \
+	} \
+	\
+	/**
 	**	@brief	Get or add an instance of the class
 	**
 	**	@param	ident	The instance's string identifier
@@ -84,8 +107,9 @@ public: \
 		if (!instance) { \
 			instance = new class_name; \
 			instance->Ident = ident; \
+			instance->Index = class_name::Instances.size(); \
 			class_name::Instances.push_back(instance); \
-			InstancesByIdent[ident] = instance; \
+			class_name::InstancesByIdent[ident] = instance; \
 		} \
 		\
 		return instance; \
@@ -99,6 +123,18 @@ public: \
 	static inline const std::vector<class_name *> &GetAll() \
 	{ \
 		return class_name::Instances; \
+	} \
+	\
+	/**
+	**	@brief	Remove an instance of the class
+	**
+	**	@param	instance	The instance
+	*/ \
+	static inline void Remove(const class_name *instance) \
+	{ \
+		class_name::InstancesByIdent.erase(instance->Ident); \
+		class_name::Instances.erase(std::remove(class_name::Instances.begin(), class_name::Instances.end(), instance), class_name::Instances.end()); \
+		delete instance; \
 	} \
 	\
 	/**
@@ -126,22 +162,34 @@ class CConfigData;
 class CDataType
 {
 public:
-	CDataType()
-	{
-	}
-	
-	CDataType(const std::string &ident) : Ident(ident)
+	CDataType(const std::string &ident = "", const int index = -1) : Ident(ident), Index(index)
 	{
 	}
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
 	
+	/**
+	**	@brief	Get the data type instance's string identifier
+	**
+	**	@return	The data type instance's string identifier
+	*/
 	String GetIdent() const
 	{
 		return this->Ident.c_str();
 	}
 	
-	std::string Ident;	/// String identifier of the data type instance
+	/**
+	**	@brief	Get the data type instance's index
+	**
+	**	@return	The data type instance's index
+	*/
+	int GetIndex() const
+	{
+		return this->Index;
+	}
+	
+	std::string Ident;	/// string identifier of the data type instance
+	int Index = -1;		/// index of the data type instance
 };
 
 #endif

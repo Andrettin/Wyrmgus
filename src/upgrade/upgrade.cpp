@@ -276,11 +276,9 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CFaction *faction = CFaction::GetFaction(value);
+			const CFaction *faction = CFaction::Get(value);
 			if (faction) {
-				this->Faction = faction->ID;
-			} else {
-				fprintf(stderr, "Invalid faction: \"%s\".\n", value.c_str());
+				this->Faction = faction->GetIndex();
 			}
 		} else if (key == "ability") {
 			this->Ability = StringToBool(value);
@@ -356,7 +354,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			CCivilization *civilization = CCivilization::Civilizations[this->Civilization];
 			
 			if (this->Faction != -1) {
-				CFaction *faction = CFaction::Factions[this->Faction];
+				CFaction *faction = CFaction::Get(this->Faction);
 				faction->ClassUpgrades[class_id] = this->ID;
 			} else {
 				civilization->ClassUpgrades[class_id] = this->ID;
@@ -570,11 +568,9 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
-			CFaction *faction = CFaction::GetFaction(faction_name);
+			CFaction *faction = CFaction::Get(faction_name);
 			if (faction) {
-				upgrade->Faction = faction->ID;
-			} else {
-				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
+				upgrade->Faction = faction->GetIndex();
 			}
 		} else if (!strcmp(value, "Description")) {
 			upgrade->Description = LuaToString(l, -1);
@@ -690,7 +686,7 @@ static int CclDefineUpgrade(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string faction_ident = LuaToString(l, -1, j + 1);
-				CFaction *priority_faction = CFaction::GetFaction(faction_ident);
+				CFaction *priority_faction = CFaction::Get(faction_ident);
 				if (!priority_faction) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
 				}
@@ -787,7 +783,7 @@ static int CclDefineUpgrade(lua_State *l)
 			CCivilization *civilization = CCivilization::Civilizations[upgrade->Civilization];
 			
 			if (upgrade->Faction != -1) {
-				CFaction *faction = CFaction::Factions[upgrade->Faction];
+				CFaction *faction = CFaction::Get(upgrade->Faction);
 				faction->ClassUpgrades[class_id] = upgrade->ID;
 			} else {
 				civilization->ClassUpgrades[class_id] = upgrade->ID;
@@ -924,7 +920,7 @@ static int CclDefineModifier(lua_State *l)
 			}
 		} else if (!strcmp(key, "change-faction-to")) {
 			std::string faction_ident = LuaToString(l, j + 1, 2);
-			um->ChangeFactionTo = CFaction::GetFaction(faction_ident);
+			um->ChangeFactionTo = CFaction::Get(faction_ident);
 			
 			if (um->ChangeFactionTo == nullptr) {
 				LuaError(l, "Faction \"%s\" doesn't exist.'" _C_ faction_ident.c_str());
@@ -1210,7 +1206,7 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (upgrade->Faction != -1) {
-			lua_pushstring(l, CFaction::Factions[upgrade->Faction]->Ident.c_str());
+			lua_pushstring(l, CFaction::Get(upgrade->Faction)->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

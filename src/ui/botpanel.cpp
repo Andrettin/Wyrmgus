@@ -2268,7 +2268,7 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 void CButtonPanel::DoClicked_Faction(int button)
 {
 	const int index = CurrentButtons[button].Value;
-	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[index]->ID);
+	SendCommandSetFaction(CPlayer::GetThisPlayer()->Index, CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[index]->GetIndex());
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 	LastDrawnButtonPopup = nullptr;

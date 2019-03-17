@@ -193,11 +193,9 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			}
 		} else if (!strcmp(value, "faction-equivalent")) {
 			value = LuaToString(l, -1, j + 1);
-			CFaction *faction = CFaction::GetFaction(value);
+			CFaction *faction = CFaction::Get(value);
 			if (faction) {
 				condition->FactionEquivalent = faction;
-			} else {
-				fprintf(stderr, "Faction \"%s\" doesn't exist.\n", value);
 			}
 		//Wyrmgus end
 		} else {

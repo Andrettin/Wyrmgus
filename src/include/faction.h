@@ -35,15 +35,12 @@
 ----------------------------------------------------------------------------*/
 
 #include "character.h" // because of "MaxCharacterTitles"
+#include "data_type.h"
 #include "time/date.h"
 #include "ui/icon_config.h"
 #include "ui/ui.h" // for the UI fillers
 
 #include <core/object.h>
-
-#include <map>
-#include <string>
-#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -95,19 +92,15 @@ enum FactionTiers {
 class CFaction : public Object
 {
 	GDCLASS(CFaction, Object)
+	DATA_TYPE_CLASS(CFaction)
 	
 public:
 	~CFaction();
 	
-	static int GetFactionIndexByName(const std::string &faction_ident);
-	static CFaction *GetFaction(const std::string &faction_ident);
-	static void SetFactionStringToIndex(const std::string &faction_name, const int faction_id);
+	static int GetIndex(const std::string &faction_ident);
 	static int GetFactionClassUnitType(const CFaction *faction, const int class_id);
 	static int GetFactionClassUpgrade(const CFaction *faction, const int class_id);
 	static std::vector<CFiller> GetFactionUIFillers(const CFaction *faction);
-	
-	static std::vector<CFaction *> Factions;    		/// factions
-	static std::map<std::string, int> FactionStringToIndex;
 	
 	/**
 	**	@brief	Get the faction's string identifier
@@ -117,6 +110,16 @@ public:
 	String GetIdent() const
 	{
 		return this->Ident.c_str();
+	}
+	
+	/**
+	**	@brief	Get the faction's index
+	**
+	**	@return	The faction's index
+	*/
+	int GetIndex() const
+	{
+		return this->Index;
 	}
 	
 	/**
@@ -170,15 +173,17 @@ public:
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::vector<std::string> &GetShipNames() const;
 
-	std::string Ident;													/// faction name
-	std::string Name;
+private:
+	std::string Ident;													/// faction string identifier
+	int Index = -1;														/// faction index
+public:
+	std::string Name;													/// faction name
 	std::string Description;											/// faction description
 	std::string Quote;													/// faction quote
 	std::string Background;												/// faction background
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
-	int ID = -1;														/// faction ID
 	CCivilization *Civilization = nullptr;								/// faction civilization
 	int Type = FactionTypeNoFactionType;								/// faction type (i.e. tribe or polity)
 	int DefaultTier = FactionTierBarony;								/// default faction tier

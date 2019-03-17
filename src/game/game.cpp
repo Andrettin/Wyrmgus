@@ -572,19 +572,19 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		std::string mod_file(mapSetup);
 		mod_file = FindAndReplaceStringBeginning(mod_file, StratagusLibPath + "/", "");
 		
-		for (const CFaction *faction : CFaction::Factions) {
+		for (const CFaction *faction : CFaction::GetAll()) {
 			if (faction->Mod != CMap::Map.Info.Filename) {
 				continue;
 			}
 				
-			f->printf("DefineFaction(\"%s\", {\n", faction->Ident.c_str());
+			f->printf("DefineFaction(\"%s\", {\n", faction->GetIdent().utf8().get_data());
 			f->printf("\tName = \"%s\",\n", faction->Name.c_str());
 			f->printf("\tCivilization = \"%s\",\n", faction->Civilization->GetIdent().utf8().get_data());
 			if (faction->Type != FactionTypeNoFactionType) {
 				f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(faction->Type).c_str());
 			}
 			if (faction->ParentFaction != nullptr) {
-				f->printf("\tParentFaction = \"%s\",\n", faction->ParentFaction->Ident.c_str());
+				f->printf("\tParentFaction = \"%s\",\n", faction->ParentFaction->GetIdent().utf8().get_data());
 			}
 			if (faction->GetPrimaryColors().size() > 0) {
 				f->printf("\tColors = {");
@@ -618,7 +618,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tCivilization = \"%s\",\n", type.GetCivilization()->GetIdent().utf8().get_data());
 			}
 			if (type.GetFaction() != nullptr) {
-				f->printf("\tFaction = \"%s\",\n", type.GetFaction()->Ident.c_str());
+				f->printf("\tFaction = \"%s\",\n", type.GetFaction()->GetIdent().utf8().get_data());
 			}
 			if (type.Class != -1) {
 				f->printf("\tClass = \"%s\",\n", UnitTypeClasses[type.Class].c_str());
@@ -854,7 +854,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, PlayerRaces.Name[CPlayer::Players[i]->Race].c_str());
 				if (CPlayer::Players[i]->GetFaction() != nullptr) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
-							  i, CPlayer::Players[i]->GetFaction()->Ident.c_str());
+							  i, CPlayer::Players[i]->GetFaction()->GetIdent().utf8().get_data());
 				}
 				f->printf("SetAiType(%d, \"%s\")\n",
 						  i, CPlayer::Players[i]->AiName.c_str());

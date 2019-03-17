@@ -419,11 +419,6 @@ void PlayerRace::Clean()
 		//Wyrmgus end
 	}
 	//Wyrmgus start
-	for (CFaction *faction : CFaction::Factions) {
-		delete faction;
-	}
-	CFaction::Factions.clear();
-	
 	for (CDynasty *dynasty : this->Dynasties) {
 		delete dynasty;
 	}
@@ -653,7 +648,7 @@ void CPlayer::Save(CFile &file) const
 	//Wyrmgus start
 	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[this->Race].c_str());
 	if (this->Faction != nullptr) {
-		file.printf(" \"faction\", %i,", this->Faction->ID);
+		file.printf(" \"faction\", \"%s\",", this->Faction->GetIdent().utf8().get_data());
 	}
 	if (this->Dynasty != nullptr) {
 		file.printf(" \"dynasty\", \"%s\",", this->Dynasty->Ident.c_str());
@@ -912,7 +907,7 @@ void CPlayer::Save(CFile &file) const
 			file.printf("\"settlement\", \"%s\",", this->QuestObjectives[j]->Settlement->Ident.c_str());
 		}
 		if (this->QuestObjectives[j]->Faction) {
-			file.printf("\"faction\", \"%s\",", this->QuestObjectives[j]->Faction->Ident.c_str());
+			file.printf("\"faction\", \"%s\",", this->QuestObjectives[j]->Faction->GetIdent().utf8().get_data());
 		}
 		file.printf("},");
 	}
@@ -1023,7 +1018,7 @@ CPlayer *GetOrAddFactionPlayer(const CFaction *faction)
 		}
 	}
 	
-	fprintf(stderr, "Cannot add player for faction \"%s\": no player slots available.\n", faction->Ident.c_str());
+	fprintf(stderr, "Cannot add player for faction \"%s\": no player slots available.\n", faction->GetIdent().utf8().get_data());
 	
 	return nullptr;
 }
@@ -1420,7 +1415,7 @@ void CPlayer::SetRandomFaction()
 	// set random one from the civilization's factions
 	std::vector<const CFaction *> local_factions;
 	
-	for (const CFaction *faction : CFaction::Factions) {
+	for (const CFaction *faction : CFaction::GetAll()) {
 		if (faction->Civilization->ID != this->Race) {
 			continue;
 		}
@@ -4379,7 +4374,7 @@ void CPlayer::_bind_methods()
 
 void NetworkSetFaction(int player, const std::string &faction_name)
 {
-	int faction = CFaction::GetFactionIndexByName(faction_name);
+	const int faction = CFaction::GetIndex(faction_name);
 	SendCommandSetFaction(player, faction);
 }
 

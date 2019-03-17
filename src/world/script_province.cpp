@@ -214,7 +214,7 @@ static int CclDefineProvince(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 
-				const CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				const CFaction *faction = CFaction::Get(LuaToString(l, -1, j + 1));
 				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -232,7 +232,7 @@ static int CclDefineProvince(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 				
-				CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				CFaction *faction = CFaction::Get(LuaToString(l, -1, j + 1));
 				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -263,7 +263,7 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				std::string owner_faction_name = LuaToString(l, -1, j + 1);
 				if (!owner_faction_name.empty()) {
-					CFaction *owner_faction = CFaction::GetFaction(owner_faction_name);
+					CFaction *owner_faction = CFaction::Get(owner_faction_name);
 					if (owner_faction == nullptr) {
 						LuaError(l, "Faction \"%s\" doesn't exist." _C_ owner_faction_name.c_str());
 					}
@@ -282,7 +282,7 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				++j;
 				std::string claimant_faction_name = LuaToString(l, -1, j + 1);
-				CFaction *claimant_faction = CFaction::GetFaction(claimant_faction_name);
+				CFaction *claimant_faction = CFaction::Get(claimant_faction_name);
 				if (claimant_faction == nullptr) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ claimant_faction_name.c_str());
 				}
@@ -445,7 +445,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 
 				++j;
 
-				const CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				const CFaction *faction = CFaction::Get(LuaToString(l, -1, j + 1));
 				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -495,7 +495,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 
 				++j;
 				
-				const CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				const CFaction *faction = CFaction::Get(LuaToString(l, -1, j + 1));
 				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -530,7 +530,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 				
-				const CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				const CFaction *faction = CFaction::Get(LuaToString(l, -1, j + 1));
 				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -548,7 +548,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				++j;
 				
-				CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				CFaction *faction = CFaction::Get(LuaToString(l, -1, j + 1));
 				if (faction == nullptr) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -566,7 +566,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				++j;
 				std::string owner_faction_name = LuaToString(l, -1, j + 1);
 				if (!owner_faction_name.empty()) {
-					CFaction *owner_faction = CFaction::GetFaction(owner_faction_name);
+					CFaction *owner_faction = CFaction::Get(owner_faction_name);
 					if (owner_faction == nullptr) {
 						LuaError(l, "Faction \"%s\" doesn't exist." _C_ owner_faction_name.c_str());
 					}
@@ -585,7 +585,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				++j;
 				++j;
 				std::string claimant_faction_name = LuaToString(l, -1, j + 1);
-				CFaction *claimant_faction = CFaction::GetFaction(claimant_faction_name);
+				CFaction *claimant_faction = CFaction::Get(claimant_faction_name);
 				if (claimant_faction == nullptr) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ claimant_faction_name.c_str());
 				}

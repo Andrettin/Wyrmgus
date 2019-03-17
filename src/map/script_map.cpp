@@ -862,7 +862,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 4);
 
 	std::string faction_name = LuaToString(l, 3);
-	CFaction *faction = CFaction::GetFaction(faction_name);
+	CFaction *faction = CFaction::Get(faction_name);
 
 	CDate start_date;
 	CDate end_date;
@@ -902,7 +902,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 4);
 
 	std::string faction_name = LuaToString(l, 3);
-	CFaction *faction = CFaction::GetFaction(faction_name);
+	CFaction *faction = CFaction::Get(faction_name);
 	if (!faction_name.empty() && !faction) {
 		LuaError(l, "Faction \"%s\" doesn't exist.\n" _C_ faction_name.c_str());
 	}
@@ -1808,7 +1808,7 @@ static int CclDefineSite(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CFaction *faction = CFaction::GetFaction(LuaToString(l, -1, j + 1));
+				CFaction *faction = CFaction::Get(LuaToString(l, -1, j + 1));
 				if (!faction) {
 					LuaError(l, "Faction doesn't exist.");
 				}
@@ -1833,7 +1833,7 @@ static int CclDefineSite(lua_State *l)
 				++j;
 				std::string owner_ident = LuaToString(l, -1, j + 1);
 				if (!owner_ident.empty()) {
-					CFaction *owner_faction = CFaction::GetFaction(owner_ident);
+					CFaction *owner_faction = CFaction::Get(owner_ident);
 					if (!owner_faction) {
 						LuaError(l, "Faction \"%s\" doesn't exist." _C_ owner_ident.c_str());
 					}
@@ -1884,7 +1884,7 @@ static int CclDefineSite(lua_State *l)
 				CFaction *unit_owner = nullptr;
 				lua_rawgeti(l, -1, j + 1);
 				if (lua_isstring(l, -1) && !lua_isnumber(l, -1)) {
-					unit_owner = CFaction::GetFaction(LuaToString(l, -1));
+					unit_owner = CFaction::Get(LuaToString(l, -1));
 					if (!unit_owner) {
 						LuaError(l, "Unit owner faction doesn't exist.\n");
 					}
@@ -1930,7 +1930,7 @@ static int CclDefineSite(lua_State *l)
 				CFaction *building_owner = nullptr;
 				lua_rawgeti(l, -1, j + 1);
 				if (lua_isstring(l, -1) && !lua_isnumber(l, -1)) {
-					building_owner = CFaction::GetFaction(LuaToString(l, -1));
+					building_owner = CFaction::Get(LuaToString(l, -1));
 					if (!building_owner) {
 						LuaError(l, "Building owner faction doesn't exist.\n");
 					}

@@ -148,11 +148,9 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			character->Civilization = CCivilization::GetCivilization(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
-			CFaction *faction = CFaction::GetFaction(LuaToString(l, -1));
+			CFaction *faction = CFaction::Get(LuaToString(l, -1));
 			if (faction != nullptr) {
 				character->Faction = faction;
-			} else {
-				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
 			}
 		} else if (!strcmp(value, "Father")) {
 			std::string father_ident = LuaToString(l, -1);
@@ -463,9 +461,9 @@ static int CclDefineCharacter(lua_State *l)
 				++j;
 				
 				std::string historical_faction_name = LuaToString(l, -1, j + 1);
-				CFaction *historical_faction = CFaction::GetFaction(historical_faction_name);
+				CFaction *historical_faction = CFaction::Get(historical_faction_name);
 				if (!historical_faction) {
-					LuaError(l, "Faction \"%s\" doesn't exist." _C_ historical_faction_name.c_str());
+					continue;
 				}
 				
 				character->HistoricalFactions.push_back(std::pair<CDate, CFaction *>(date, historical_faction));
@@ -524,9 +522,9 @@ static int CclDefineCharacter(lua_State *l)
 				++j;
 				
 				std::string title_faction_name = LuaToString(l, -1, j + 1);
-				CFaction *title_faction = CFaction::GetFaction(title_faction_name);
+				CFaction *title_faction = CFaction::Get(title_faction_name);
 				if (!title_faction) {
-					LuaError(l, "Faction \"%s\" doesn't exist." _C_ title_faction_name.c_str());
+					continue;
 				}
 				if (start_date.Year != 0 && end_date.Year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
 					title_faction->HistoricalMinisters[std::tuple<CDate, CDate, int>(start_date, end_date, title)] = character;
@@ -910,7 +908,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (character->Faction != nullptr) {
-			lua_pushstring(l, character->Faction->Ident.c_str());
+			lua_pushstring(l, character->Faction->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
