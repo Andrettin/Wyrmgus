@@ -121,12 +121,6 @@ extern void SetEffectsEnabled(bool enabled);
 /// Check if effects are enabled
 extern bool IsEffectsEnabled();
 
-/// Set the music finished callback
-void SetMusicFinishedCallback(void (*callback)());
-/// Play a music file
-extern int PlayMusic(CSample *sample);
-/// Play a music file
-extern int PlayMusic(const std::string &file);
 /// Play a music track
 extern void PlayMusicName(const std::string &name);
 /// Play a music track
@@ -157,7 +151,7 @@ extern bool IsMusicPlaying();
 /// Check if sound is enabled
 extern bool SoundEnabled();
 /// Initialize the sound card.
-extern int InitSound();
+extern bool InitSound();
 ///  Cleanup sound.
 extern void QuitSound();
 

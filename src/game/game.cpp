@@ -1722,8 +1722,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	//Wyrmgus end
 	}
 
-	CallbackMusicOn();
-
 #if 0
 	GamePaused = true;
 #endif

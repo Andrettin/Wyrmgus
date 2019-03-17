@@ -774,9 +774,7 @@ void stratagusMain(int argc, char **argv)
 	InitVideo();
 
 	// Setup sound card
-	if (!InitSound()) {
-		InitMusic();
-	}
+	InitSound();
 
 #ifndef DEBUG			// For debug it's better not to have:
 	srand(time(nullptr));	// Random counter = random each start

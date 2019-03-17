@@ -445,7 +445,6 @@ static void GameLogicLoop()
 	}
 
 	UpdateMessages();     // update messages
-	CheckMusicFinished(); // Check for next song
 
 	if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
 		WaitEventsOneFrame();

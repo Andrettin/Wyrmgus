@@ -33,77 +33,16 @@
 
 #include "stratagus.h"
 
-#include "iolib.h"
-#include "script.h"
 #include "sound/sound_server.h"
+
+#include "iolib.h"
 #include "wyrmgus.h"
 
 #include <oamlGodotModule/oamlGodotModule.h>
 
-#include "SDL.h"
-
-/*----------------------------------------------------------------------------
--- Declaration
-----------------------------------------------------------------------------*/
-
-#define SoundFrequency 44100 // sample rate of dsp
-
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
-
-static SDL_mutex *MusicFinishedMutex;     /// Mutex for MusicFinished
-static bool MusicFinished;                /// Music ended and we need a new file
-
-bool CallbackMusic;                       /// flag true callback ccl if stops
-
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Callback for when music has finished
-**  Note: we are in the sdl audio thread
-*/
-static void MusicFinishedCallback()
-{
-	SDL_LockMutex(MusicFinishedMutex);
-	MusicFinished = true;
-	SDL_UnlockMutex(MusicFinishedMutex);
-}
-
-/**
-**  Check if music is finished and play the next song
-*/
-void CheckMusicFinished(bool force)
-{
-	bool proceed;
-
-	SDL_LockMutex(MusicFinishedMutex);
-	proceed = MusicFinished;
-	MusicFinished = false;
-	SDL_UnlockMutex(MusicFinishedMutex);
-
-	if ((proceed || force) && SoundEnabled() && IsMusicEnabled() && CallbackMusic) {
-		lua_getglobal(Lua, "MusicStopped");
-		if (!lua_isfunction(Lua, -1)) {
-			fprintf(stderr, "No MusicStopped function in Lua\n");
-			StopMusic();
-		} else {
-			LuaCall(0, 1);
-		}
-	}
-}
-
-/**
-**  Init music
-*/
-void InitMusic()
-{
-	MusicFinished = false;
-	MusicFinishedMutex = SDL_CreateMutex();
-	SetMusicFinishedCallback(MusicFinishedCallback);
-}
 
 void InitMusicOAML()
 {

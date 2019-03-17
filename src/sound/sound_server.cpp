@@ -41,10 +41,6 @@
 #include "faction.h"
 #include "iocompat.h"
 #include "iolib.h"
-//Wyrmgus start
-#include "grand_strategy.h" //for playing faction music
-#include "ui/interface.h" //for player faction music
-//Wyrmgus end
 #include "unit/unit.h"
 //Wyrmgus start
 #include "unit/unit_manager.h"
@@ -88,11 +84,6 @@ struct SoundChannel {
 
 static SoundChannel Channels[MaxChannels];
 static int NextFreeChannel;
-
-static struct {
-	CSample *Sample;       /// Music sample
-	void (*FinishedCallback)(); /// Callback for when music finishes playing
-} MusicChannel;
 
 static void ChannelFinished(int channel);
 
@@ -147,52 +138,6 @@ static int ConvertToStereo32(const char *src, char *dest, int frequency,
 	SDL_ConvertAudio(&acvt);
 
 	return acvt.len_mult * bytes;
-}
-
-/**
-**  Mix music to stereo 32 bit.
-**
-**  @param buffer  Buffer for mixed samples.
-**  @param size    Number of samples that fits into buffer.
-**
-**  @todo this functions can be called from inside the SDL audio callback,
-**  which is bad, the buffer should be precalculated.
-*/
-static void MixMusicToStereo32(int *buffer, int size)
-{
-	if (MusicPlaying) {
-		Assert(MusicChannel.Sample);
-
-		short *buf = new short[size];
-		int len = size * sizeof(short);
-		char *tmp = new char[len];
-
-		int div = 176400 / (MusicChannel.Sample->Frequency * (MusicChannel.Sample->SampleSize / 8) * MusicChannel.Sample->Channels);
-
-		size = MusicChannel.Sample->Read(tmp, len / div);
-
-		int n = ConvertToStereo32(tmp, (char *)buf, MusicChannel.Sample->Frequency,
-								  MusicChannel.Sample->SampleSize / 8, MusicChannel.Sample->Channels, size);
-
-		for (int i = 0; i < n / (int)sizeof(*buf); ++i) {
-			// Add to our samples
-			// FIXME: why taking out '/ 2' leads to distortion
-			buffer[i] += buf[i] * MusicVolume / MaxVolume / 2;
-		}
-
-		delete[] tmp;
-		delete[] buf;
-
-		if (n < len) { // End reached
-			MusicPlaying = false;
-			delete MusicChannel.Sample;
-			MusicChannel.Sample = nullptr;
-
-			if (MusicChannel.FinishedCallback) {
-				MusicChannel.FinishedCallback();
-			}
-		}
-	}
 }
 
 /**
@@ -314,10 +259,6 @@ static void MixIntoBuffer(void *buffer, int samples)
 	if (EffectsEnabled) {
 		// Add channels to mixer buffer
 		MixChannelsToStereo32(Audio.MixerBuffer, samples);
-	}
-	if (MusicEnabled) {
-		// Add music to mixer buffer
-		MixMusicToStereo32(Audio.MixerBuffer, samples);
 	}
 	ClipMixToStereo16(Audio.MixerBuffer, samples, (short *)buffer);
 }
@@ -703,61 +644,6 @@ bool IsEffectsEnabled()
 --  Music
 ----------------------------------------------------------------------------*/
 
-/**
-**  Set the music finished callback
-*/
-void SetMusicFinishedCallback(void (*callback)())
-{
-	MusicChannel.FinishedCallback = callback;
-}
-
-/**
-**  Play a music file.
-**
-**  @param sample  Music sample.
-**
-**  @return        0 if music is playing, -1 if not.
-*/
-int PlayMusic(CSample *sample)
-{
-	if (sample) {
-		StopMusic();
-		MusicChannel.Sample = sample;
-		MusicPlaying = true;
-		return 0;
-	} else {
-		DebugPrint("Could not play sample\n");
-		return -1;
-	}
-}
-
-/**
-**  Play a music file.
-**
-**  @param file  Name of music file, format is automatically detected.
-**
-**  @return      0 if music is playing, -1 if not.
-*/
-int PlayMusic(const std::string &file)
-{
-	if (!SoundEnabled() || !IsMusicEnabled()) {
-		return -1;
-	}
-	const std::string name = LibraryFileName(file.c_str());
-	DebugPrint("play music %s\n" _C_ name.c_str());
-	CSample *sample = LoadSample(name.c_str(), PlayAudioStream);
-
-	if (sample) {
-		StopMusic();
-		MusicChannel.Sample = sample;
-		MusicPlaying = true;
-		return 0;
-	} else {
-		DebugPrint("Could not play %s\n" _C_ file.c_str());
-		return -1;
-	}
-}
-
 void PlayMusicName(const std::string &name) {
 	if (!IsMusicEnabled()) {
 		return;
@@ -871,16 +757,6 @@ void StopMusic()
 {
 	if (Wyrmgus::GetInstance()->GetOamlModule() != nullptr) {
 		Wyrmgus::GetInstance()->GetOamlModule()->StopPlaying();
-	}
-
-	if (MusicPlaying) {
-		MusicPlaying = false;
-		if (MusicChannel.Sample) {
-			SDL_LockMutex(Audio.Lock);
-			delete MusicChannel.Sample;
-			MusicChannel.Sample = nullptr;
-			SDL_UnlockMutex(Audio.Lock);
-		}
 	}
 }
 
@@ -1007,14 +883,14 @@ static int InitSdlSound(int freq, int size)
 **
 **  @return  True if failure, false if everything ok.
 */
-int InitSound()
+bool InitSound()
 {
 	//
 	// Open sound device, 8bit samples, stereo.
 	//
 	if (InitSdlSound(44100, 16)) {
 		SoundInitialized = false;
-		return 1;
+		return true;
 	}
 	SoundInitialized = true;
 
@@ -1044,7 +920,7 @@ int InitSound()
 
 	// Create thread to fill sdl audio buffer
 	Audio.Thread = SDL_CreateThread(FillThread, nullptr);
-	return 0;
+	return false;
 }
 
 /**
