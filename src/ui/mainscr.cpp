@@ -916,7 +916,7 @@ void DrawTime() {
 	}
 	
 	if (CPlayer::GetThisPlayer()) {
-		CCalendar *calendar = CCivilization::Civilizations[CPlayer::GetThisPlayer()->Race]->GetCalendar();
+		CCalendar *calendar = CCivilization::Get(CPlayer::GetThisPlayer()->Race)->GetCalendar();
 		
 		if (calendar) {
 			if (UI.DatePanel.TextX != -1) {

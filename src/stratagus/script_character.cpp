@@ -146,7 +146,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "ViolentDeath")) {
 			character->ViolentDeath = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
-			character->Civilization = CCivilization::GetCivilization(LuaToString(l, -1));
+			character->Civilization = CCivilization::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
 			CFaction *faction = CFaction::Get(LuaToString(l, -1));
 			if (faction != nullptr) {
@@ -641,7 +641,7 @@ static int CclDefineCustomHero(lua_State *l)
 				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
 			}
 		} else if (!strcmp(value, "Civilization")) {
-			hero->Civilization = CCivilization::GetCivilization(LuaToString(l, -1));
+			hero->Civilization = CCivilization::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Gender")) {
 			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {

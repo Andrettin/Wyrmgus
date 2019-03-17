@@ -45,6 +45,7 @@
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
+#include "civilization.h"
 #include "commands.h"
 #include "faction.h"
 #include "game/trigger.h"
@@ -1673,7 +1674,7 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 	char individual_unit_ident[200][128]; // the 200 there is the max selectable quantity; not nice to hardcode it like this, should be changed in the future
 	//Wyrmgus end
 
-	sprintf(unit_ident, ",%s-group,", PlayerRaces.Name[CPlayer::GetThisPlayer()->Race].c_str());
+	sprintf(unit_ident, ",%s-group,", CCivilization::Get(CPlayer::GetThisPlayer()->Race)->GetIdent().utf8().get_data());
 	
 	//Wyrmgus start
 	for (size_t i = 0; i != Selected.size(); ++i) {

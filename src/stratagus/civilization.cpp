@@ -42,73 +42,8 @@
 #include "time/calendar.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CCivilization *> CCivilization::Civilizations;
-std::map<std::string, CCivilization *> CCivilization::CivilizationsByIdent;
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a civilization
-**
-**	@param	ident		The civilization's string identifier
-**	@param	should_find	Whether it is an error if the civilization could not be found; this is true by default
-**
-**	@return	The civilization if found, or null otherwise
-*/
-CCivilization *CCivilization::GetCivilization(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CCivilization *>::const_iterator find_iterator = CCivilization::CivilizationsByIdent.find(ident);
-	
-	if (find_iterator != CCivilization::CivilizationsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid civilization: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a civilization
-**
-**	@param	ident	The civilization's string identifier
-**
-**	@return	The civilization if found, or a newly-created one otherwise
-*/
-CCivilization *CCivilization::GetOrAddCivilization(const std::string &ident)
-{
-	CCivilization *civilization = CCivilization::GetCivilization(ident, false);
-	
-	if (!civilization) {
-		civilization = new CCivilization;
-		civilization->Ident = ident;
-		civilization->ID = CCivilization::Civilizations.size();
-		CCivilization::Civilizations.push_back(civilization);
-		CCivilization::CivilizationsByIdent[ident] = civilization;
-		
-		PlayerRaces.Name[civilization->ID] = ident;
-	}
-	
-	return civilization;
-}
-
-/**
-**	@brief	Remove the existing civilizations
-*/
-void CCivilization::ClearCivilizations()
-{
-	for (CCivilization *civilization : CCivilization::Civilizations) {
-		delete civilization;
-	}
-	CCivilization::Civilizations.clear();
-}
 
 int CCivilization::GetCivilizationClassUnitType(const CCivilization *civilization, const int class_id)
 {
@@ -177,6 +112,20 @@ CCivilization::~CCivilization()
 	}
 }
 
+/**
+**	@brief	Get the civilization's upgrade
+**
+**	@return	The civilization's upgrade
+*/
+const CUpgrade *CCivilization::GetUpgrade() const
+{
+	if (!this->Upgrade.empty()) {
+		return CUpgrade::Get(this->Upgrade);
+	} else {
+		return nullptr;
+	}
+}
+	
 int CCivilization::GetUpgradePriority(const CUpgrade *upgrade) const
 {
 	if (!upgrade) {

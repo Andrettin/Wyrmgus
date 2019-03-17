@@ -587,7 +587,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	if (current_campaign) {
 		CFaction *current_faction = current_campaign->GetFaction();
 		if (current_faction && !this->IsSubtemplateArea() && CPlayer::GetThisPlayer()->GetFaction() != current_faction) {
-			CPlayer::GetThisPlayer()->SetCivilization(current_faction->Civilization->ID);
+			CPlayer::GetThisPlayer()->SetCivilization(current_faction->Civilization->GetIndex());
 			CPlayer::GetThisPlayer()->SetFaction(current_faction);
 			CPlayer::GetThisPlayer()->Resources[CopperCost] = 2500; // give the player enough resources to start up
 			CPlayer::GetThisPlayer()->Resources[WoodCost] = 2500;

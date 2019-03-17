@@ -103,7 +103,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 				
 				key = FindAndReplaceString(key, "_", "-");
 				
-				const CCivilization *civilization = CCivilization::GetCivilization(key);
+				const CCivilization *civilization = CCivilization::Get(key);
 				
 				if (civilization) {
 					this->CulturalNames[civilization] = value;

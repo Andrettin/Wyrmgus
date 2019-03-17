@@ -250,11 +250,9 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus start
 	//change the civilization/faction upgrade markers for those of the new type
 	if (oldtype.GetCivilization() != nullptr) {
-		if (!PlayerRaces.CivilizationUpgrades[oldtype.GetCivilization()->ID].empty()) {
-			CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[oldtype.GetCivilization()->ID]);
-			if (civilization_upgrade) {
-				unit.SetIndividualUpgrade(civilization_upgrade, 0);
-			}
+		const CUpgrade *civilization_upgrade = oldtype.GetCivilization()->GetUpgrade();
+		if (civilization_upgrade != nullptr) {
+			unit.SetIndividualUpgrade(civilization_upgrade, 0);
 		}
 		
 		if (oldtype.GetFaction() != nullptr && !oldtype.GetFaction()->FactionUpgrade.empty()) {
@@ -266,12 +264,11 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 	
 	if (newtype.GetCivilization() != nullptr) {
-		if (!PlayerRaces.CivilizationUpgrades[newtype.GetCivilization()->ID].empty()) {
-			CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[newtype.GetCivilization()->ID]);
-			if (civilization_upgrade) {
-				unit.SetIndividualUpgrade(civilization_upgrade, 1);
-			}
+		const CUpgrade *civilization_upgrade = newtype.GetCivilization()->GetUpgrade();
+		if (civilization_upgrade != nullptr) {
+			unit.SetIndividualUpgrade(civilization_upgrade, 1);
 		}
+
 		if (newtype.GetFaction() != nullptr && !newtype.GetFaction()->FactionUpgrade.empty()) {
 			CUpgrade *faction_upgrade = CUpgrade::Get(newtype.GetFaction()->FactionUpgrade);
 			if (faction_upgrade) {
@@ -302,7 +299,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 					newtype.BoolFlag[ORGANIC_INDEX].value
 					|| (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeNaval)
 					|| (oldtype.GetCivilization()->GetUnitClassNames(oldtype.Class) != newtype.GetCivilization()->GetUnitClassNames(newtype.Class))
-					|| (oldtype.GetCivilization()->GetUnitClassNames(oldtype.Class) != CCivilization::Civilizations[player.Race]->GetUnitClassNames(newtype.Class))
+					|| (oldtype.GetCivilization()->GetUnitClassNames(oldtype.Class) != CCivilization::Get(player.Race)->GetUnitClassNames(newtype.Class))
 				)
 			)
 		)

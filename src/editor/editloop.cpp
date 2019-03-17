@@ -38,6 +38,7 @@
 
 #include "editor/editor.h"
 
+#include "civilization.h"
 #include "commands.h"
 #include "game/game.h"
 #include "game/replay.h"
@@ -775,8 +776,8 @@ static void DrawPlayers()
 	if (Editor.SelectedPlayer != -1) {
 		//Wyrmgus start
 //		snprintf(buf, sizeof(buf), "Plyr %d %s ", Editor.SelectedPlayer,
-//				 PlayerRaces.Name[CPlayer::Players[Editor.SelectedPlayer]->Race].c_str());
-		std::string civ_str = PlayerRaces.Name[CPlayer::Players[Editor.SelectedPlayer]->Race].c_str();
+//				 CCivilization::Get(CPlayer::Players[Editor.SelectedPlayer]->Race)->GetIdent().utf8().get_data());
+		std::string civ_str = CCivilization::Get(CPlayer::Players[Editor.SelectedPlayer]->Race)->GetIdent().utf8().get_data();
 		civ_str[0] = toupper(civ_str[0]);
 		snprintf(buf, sizeof(buf), "Player %d %s ", (Editor.SelectedPlayer == PlayerNumNeutral) ? 16 : Editor.SelectedPlayer + 1, civ_str.c_str());
 		//Wyrmgus end

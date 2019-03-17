@@ -1433,8 +1433,8 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Settlement != nullptr && unit->Settlement->SiteUnit != nullptr) {
 				const CCivilization *civilization = unit->Settlement->SiteUnit->Type->GetCivilization();
-				if (civilization != nullptr && unit->Settlement->SiteUnit->Player->GetFaction() != nullptr && (CCivilization::Civilizations[unit->Settlement->SiteUnit->Player->Race] == civilization || unit->Settlement->SiteUnit->Type->Slot == CFaction::GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->GetFaction(), unit->Settlement->SiteUnit->Type->Class))) {
-					civilization = CCivilization::Civilizations[unit->Settlement->SiteUnit->Player->Race];
+				if (civilization != nullptr && unit->Settlement->SiteUnit->Player->GetFaction() != nullptr && (CCivilization::Get(unit->Settlement->SiteUnit->Player->Race) == civilization || unit->Settlement->SiteUnit->Type->Slot == CFaction::GetFactionClassUnitType(unit->Settlement->SiteUnit->Player->GetFaction(), unit->Settlement->SiteUnit->Type->Class))) {
+					civilization = CCivilization::Get(unit->Settlement->SiteUnit->Player->Race);
 				}
 				return unit->Settlement->GetCulturalName(civilization);
 			} else {
@@ -1586,7 +1586,7 @@ std::string EvalString(const StringDesc *s)
 			upgrade = s->D.Upgrade;
 			if (upgrade != nullptr) {
 				if ((**upgrade).Civilization != -1) {
-					return CCivilization::Civilizations[(**upgrade).Civilization]->GetName().utf8().get_data();
+					return CCivilization::Get((**upgrade).Civilization)->GetName().utf8().get_data();
 				} else {
 					return std::string();
 				}
@@ -1646,7 +1646,7 @@ std::string EvalString(const StringDesc *s)
 					if (!has_settlement) {
 						settlements_string += "~<";
 					}
-					settlements_string += (**faction).Cores[i]->GetCulturalName(CPlayer::GetThisPlayer()->Race != -1 ? CCivilization::Civilizations[CPlayer::GetThisPlayer()->Race] : nullptr);
+					settlements_string += (**faction).Cores[i]->GetCulturalName(CCivilization::Get(CPlayer::GetThisPlayer()->Race));
 					if (!has_settlement) {
 						settlements_string += "~>";
 					}
@@ -3568,7 +3568,7 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 		Editor.UnitTypes.erase(std::remove(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), unit_type->Ident), Editor.UnitTypes.end());
 		RecalculateShownUnits();
 	}
-	for (CCivilization *civilization : CCivilization::Civilizations) {
+	for (CCivilization *civilization : CCivilization::GetAll()) {
 		for (std::map<int, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
 			if (iterator->second == unit_type->Slot) {
 				civilization->ClassUnitTypes.erase(iterator->first);

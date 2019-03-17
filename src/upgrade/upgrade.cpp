@@ -270,9 +270,9 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 			this->Class = class_id;
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CCivilization *civilization = CCivilization::GetCivilization(value);
+			const CCivilization *civilization = CCivilization::Get(value);
 			if (civilization) {
-				this->Civilization = civilization->ID;
+				this->Civilization = civilization->GetIndex();
 			}
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -351,7 +351,7 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 	if (this->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		int class_id = this->Class;
 		if (this->Civilization != -1) {
-			CCivilization *civilization = CCivilization::Civilizations[this->Civilization];
+			CCivilization *civilization = CCivilization::Get(this->Civilization);
 			
 			if (this->Faction != -1) {
 				CFaction *faction = CFaction::Get(this->Faction);
@@ -562,9 +562,9 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->Class = class_id;
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
-			CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
+			CCivilization *civilization = CCivilization::Get(civilization_name);
 			if (civilization) {
-				upgrade->Civilization = civilization->ID;
+				upgrade->Civilization = civilization->GetIndex();
 			}
 		} else if (!strcmp(value, "Faction")) {
 			std::string faction_name = LuaToString(l, -1);
@@ -669,7 +669,7 @@ static int CclDefineUpgrade(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string civilization_ident = LuaToString(l, -1, j + 1);
-				CCivilization *priority_civilization = CCivilization::GetCivilization(civilization_ident);
+				CCivilization *priority_civilization = CCivilization::Get(civilization_ident);
 				++j;
 				if (!priority_civilization) {
 					continue;
@@ -780,7 +780,7 @@ static int CclDefineUpgrade(lua_State *l)
 	if (upgrade->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		int class_id = upgrade->Class;
 		if (upgrade->Civilization != -1) {
-			CCivilization *civilization = CCivilization::Civilizations[upgrade->Civilization];
+			CCivilization *civilization = CCivilization::Get(upgrade->Civilization);
 			
 			if (upgrade->Faction != -1) {
 				CFaction *faction = CFaction::Get(upgrade->Faction);
@@ -914,9 +914,9 @@ static int CclDefineModifier(lua_State *l)
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "change-civilization-to")) {
 			const char *civilization_ident = LuaToString(l, j + 1, 2);
-			CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
+			CCivilization *civilization = CCivilization::Get(civilization_ident);
 			if (civilization) {
-				um->ChangeCivilizationTo = civilization->ID;
+				um->ChangeCivilizationTo = civilization->GetIndex();
 			}
 		} else if (!strcmp(key, "change-faction-to")) {
 			std::string faction_ident = LuaToString(l, j + 1, 2);
@@ -1199,7 +1199,7 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (upgrade->Civilization != -1) {
-			lua_pushstring(l, PlayerRaces.Name[upgrade->Civilization].c_str());
+			lua_pushstring(l, CCivilization::Get(upgrade->Civilization)->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1500,9 +1500,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	if (um->ChangeCivilizationTo != -1 && GameRunning && um->ChangeCivilizationTo != player.Race) {
 		player.SetCivilization(um->ChangeCivilizationTo);
 	}
-	if (um->ChangeFactionTo != nullptr && GameRunning && (um->ChangeFactionTo->Civilization->ID != player.Race || um->ChangeFactionTo != player.GetFaction())) {
-		if (um->ChangeFactionTo->Civilization->ID != player.Race) {
-			player.SetCivilization(um->ChangeFactionTo->Civilization->ID);
+	if (um->ChangeFactionTo != nullptr && GameRunning && (um->ChangeFactionTo->Civilization->GetIndex() != player.Race || um->ChangeFactionTo != player.GetFaction())) {
+		if (um->ChangeFactionTo->Civilization->GetIndex() != player.Race) {
+			player.SetCivilization(um->ChangeFactionTo->Civilization->GetIndex());
 		}
 		player.SetFaction(um->ChangeFactionTo);
 	}

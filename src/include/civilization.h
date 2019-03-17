@@ -63,19 +63,14 @@ class CUpgrade;
 class CCivilization : public Object
 {
 	GDCLASS(CCivilization, Object)
+	DATA_TYPE_CLASS(CCivilization)
 	
 public:
 	~CCivilization();
 	
-	static CCivilization *GetCivilization(const std::string &ident, const bool should_find = true);
-	static CCivilization *GetOrAddCivilization(const std::string &ident);
-	static void ClearCivilizations();
 	static int GetCivilizationClassUnitType(const CCivilization *civilization, const int class_id);
 	static int GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id);
 	static std::vector<CFiller> GetCivilizationUIFillers(const CCivilization *civilization);
-	
-	static std::vector<CCivilization *> Civilizations;    					/// civilizations
-	static std::map<std::string, CCivilization *> CivilizationsByIdent;
 	
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(const int force_type) const;
@@ -88,6 +83,16 @@ public:
 	String GetIdent() const
 	{
 		return this->Ident.c_str();
+	}
+	
+	/**
+	**	@brief	Get the civilization's index
+	**
+	**	@return	The civilization's index
+	*/
+	int GetIndex() const
+	{
+		return this->Index;
 	}
 	
 	/**
@@ -163,6 +168,13 @@ public:
 		return nullptr;
 	}
 	
+	/**
+	**	@brief	Get the civilization's upgrade
+	**
+	**	@return	The civilization's upgrade
+	*/
+	const CUpgrade *GetUpgrade() const;
+	
 	bool IsHidden() const
 	{
 		return this->Hidden;
@@ -234,9 +246,9 @@ public:
 		return this->ShipNames;
 	}
 	
-	int ID = -1;
 private:
 	std::string Ident;				/// ident of the civilization
+	int Index = -1;
 	std::string Name;				/// name of the civilization
 public:
 	CCivilization *ParentCivilization = nullptr;
@@ -253,7 +265,7 @@ private:
 	CLanguage *Language = nullptr;	/// the language used by the civilization
 	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
 	CCurrency *Currency = nullptr;	/// the currency used by the civilization
-private:
+	std::string Upgrade;			/// the string identifier for the civilization's upgrade
 	bool Hidden = false;			/// whether the civilization is hidden
 	bool Playable = true;			/// whether the civilization is playable
 public:

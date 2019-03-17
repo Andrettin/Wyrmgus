@@ -172,8 +172,7 @@ void MapUnitSounds()
 		return;
 	}
 
-	for (size_t i = 0; i < CCivilization::Civilizations.size(); ++i) {
-		CCivilization *civilization = CCivilization::Civilizations[i];
+	for (CCivilization *civilization : CCivilization::GetAll()) {
 		civilization->UnitSounds.Selected.MapSound();
 		civilization->UnitSounds.Acknowledgement.MapSound();
 		civilization->UnitSounds.Attack.MapSound();

@@ -1792,7 +1792,7 @@ static int CclDefineSite(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
+				CCivilization *civilization = CCivilization::Get(LuaToString(l, -1, j + 1));
 				++j;
 				if (!civilization) {
 					continue;
@@ -2087,7 +2087,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
+				CCivilization *civilization = CCivilization::Get(LuaToString(l, -1, j + 1));
 				++j;
 				if (!civilization) {
 					continue;
@@ -2095,7 +2095,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				terrain_feature->CulturalNames[civilization->ID] = cultural_name;
+				terrain_feature->CulturalNames[civilization->GetIndex()] = cultural_name;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

@@ -36,6 +36,7 @@
 
 #include "video/cursor.h"
 
+#include "civilization.h"
 #include "editor/editor.h"
 #include "intern_video.h"
 #include "map/map.h"
@@ -162,11 +163,11 @@ CCursor *CursorByIdent(const std::string &ident)
 			continue;
 		}
 
-		if (!CPlayer::GetThisPlayer() && cursor.Race != PlayerRaces.Name[CPlayer::Players[0]->Race] && !cursor.Race.empty()) {
+		if (!CPlayer::GetThisPlayer() && cursor.Race != CCivilization::Get(CPlayer::Players[0]->Race)->GetIdent().utf8().get_data() && !cursor.Race.empty()) {
 			continue;
 		}
 		
-		if (cursor.Race.empty() || !CPlayer::GetThisPlayer() || cursor.Race == PlayerRaces.Name[CPlayer::GetThisPlayer()->Race]) {
+		if (cursor.Race.empty() || !CPlayer::GetThisPlayer() || cursor.Race == CCivilization::Get(CPlayer::GetThisPlayer()->Race)->GetIdent().utf8().get_data()) {
 			found_cursor = &cursor;
 			if (!cursor.Race.empty()) { //if this is a generic cursor, keep searching for a civilization-specific one; stop searching otherwise
 				break;

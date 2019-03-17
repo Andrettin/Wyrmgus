@@ -412,12 +412,7 @@ void PlayerRace::Clean()
 		language->NameTranslations.clear();
 	}
 	//Wyrmgus end
-	for (size_t i = 0; i != CCivilization::Civilizations.size(); ++i) {
-		this->Name[i].clear();
-		//Wyrmgus start
-		this->CivilizationUpgrades[i].clear();
-		//Wyrmgus end
-	}
+
 	//Wyrmgus start
 	for (CDynasty *dynasty : this->Dynasties) {
 		delete dynasty;
@@ -646,7 +641,7 @@ void CPlayer::Save(CFile &file) const
 {
 	file.printf("Player(%i,\n", this->Index);
 	//Wyrmgus start
-	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[this->Race].c_str());
+	file.printf(" \"race\", \"%s\",", CCivilization::Get(this->Race)->GetIdent().utf8().get_data());
 	if (this->Faction != nullptr) {
 		file.printf(" \"faction\", \"%s\",", this->Faction->GetIdent().utf8().get_data());
 	}
@@ -675,7 +670,7 @@ void CPlayer::Save(CFile &file) const
 		default:                  file.printf("%i,", this->Type); break;
 	}
 	//Wyrmgus start
-//	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[this->Race].c_str());
+//	file.printf(" \"race\", \"%s\",", CCivilization::Get(this->Race)->GetIdent().utf8().get_data());
 	//Wyrmgus end
 	file.printf(" \"ai-name\", \"%s\",\n", this->AiName.c_str());
 	file.printf("  \"team\", %i,", this->Team);
@@ -986,7 +981,7 @@ CPlayer *GetFactionPlayer(const CFaction *faction)
 	}
 	
 	for (int i = 0; i < NumPlayers; ++i) {
-		if (CPlayer::Players[i]->Race == faction->Civilization->ID && CPlayer::Players[i]->GetFaction() == faction) {
+		if (CPlayer::Players[i]->Race == faction->Civilization->GetIndex() && CPlayer::Players[i]->GetFaction() == faction) {
 			return CPlayer::Players[i];
 		}
 	}
@@ -1006,7 +1001,7 @@ CPlayer *GetOrAddFactionPlayer(const CFaction *faction)
 	for (int i = 0; i < NumPlayers; ++i) {
 		if (CPlayer::Players[i]->Type == PlayerNobody) {
 			CPlayer::Players[i]->Type = PlayerComputer;
-			CPlayer::Players[i]->SetCivilization(faction->Civilization->ID);
+			CPlayer::Players[i]->SetCivilization(faction->Civilization->GetIndex());
 			CPlayer::Players[i]->SetFaction(faction);
 			CPlayer::Players[i]->AiEnabled = true;
 			CPlayer::Players[i]->AiName = faction->DefaultAI;
@@ -1213,13 +1208,13 @@ void CPlayer::SetCivilization(int civilization)
 	String old_interface = this->GetInterface();
 	
 	if (this->Race != -1 && (GameRunning || GameEstablishing)) {
-		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID] == 'R') {
-			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID);
+		if (CCivilization::Get(this->Race)->GetUpgrade() != nullptr && this->Allow.Upgrades[CCivilization::Get(this->Race)->GetUpgrade()->ID] == 'R') {
+			UpgradeLost(*this, CCivilization::Get(this->Race)->GetUpgrade()->ID);
 		}
 	}
 	
 	CCivilization *old_civilization = this->GetCivilization();
-	CCivilization *new_civilization = civilization != -1 ? CCivilization::Civilizations[civilization] : nullptr;
+	CCivilization *new_civilization = CCivilization::CCivilization::Get(civilization);
 
 	if (GameRunning) {
 		this->SetFaction(nullptr);
@@ -1237,7 +1232,7 @@ void CPlayer::SetCivilization(int civilization)
 	if (CPlayer::GetThisPlayer() == this || (!CPlayer::GetThisPlayer() && this->Index == 0)) {
 		//load proper UI
 		char buf[256];
-		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[this->Race].c_str());
+		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", CCivilization::Get(this->Race)->GetIdent().utf8().get_data());
 		CclCommand(buf);
 		
 		UI.Load();
@@ -1245,8 +1240,8 @@ void CPlayer::SetCivilization(int civilization)
 	}
 	
 	if (this->Race != -1) {
-		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race]);
-		if (civilization_upgrade && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
+		const CUpgrade *civilization_upgrade = CCivilization::Get(this->Race)->GetUpgrade();
+		if (civilization_upgrade != nullptr && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
 			UpgradeAcquire(*this, civilization_upgrade);
 		}
 	}
@@ -1267,11 +1262,7 @@ CCivilization *CPlayer::GetCivilization() const
 {
 	std::shared_lock<std::shared_mutex> lock(this->Mutex);
 	
-	if (this->Race != -1 && this->Race < (int) CCivilization::Civilizations.size()) {
-		return CCivilization::Civilizations[this->Race];
-	}
-		
-	return nullptr;
+	return CCivilization::Get(this->Race);
 }
 	
 String CPlayer::GetInterface() const
@@ -1293,8 +1284,8 @@ void CPlayer::SetFaction(const CFaction *faction)
 {
 	const CFaction *old_faction = this->Faction;
 	
-	if (faction && faction->Civilization->ID != this->Race) {
-		this->SetCivilization(faction->Civilization->ID);
+	if (faction && faction->Civilization->GetIndex() != this->Race) {
+		this->SetCivilization(faction->Civilization->GetIndex());
 	}
 
 	if (this->Faction != nullptr) {
@@ -1387,7 +1378,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 			}
 		}
 	} else {
-		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %i of civilization \"%s\".\n", faction->Name.c_str(), this->Index, PlayerRaces.Name[this->Race].c_str());
+		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %i of civilization \"%s\".\n", faction->Name.c_str(), this->Index, CCivilization::Get(this->Race)->GetIdent().utf8().get_data());
 	}
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
@@ -1416,7 +1407,7 @@ void CPlayer::SetRandomFaction()
 	std::vector<const CFaction *> local_factions;
 	
 	for (const CFaction *faction : CFaction::GetAll()) {
-		if (faction->Civilization->ID != this->Race) {
+		if (faction->Civilization->GetIndex() != this->Race) {
 			continue;
 		}
 		if (!faction->Playable) {
@@ -1544,7 +1535,7 @@ CCurrency *CPlayer::GetCurrency() const
 	}
 	
 	if (this->Race != -1) {
-		return CCivilization::Civilizations[this->Race]->GetCurrency();
+		return CCivilization::Get(this->Race)->GetCurrency();
 	}
 	
 	return nullptr;
@@ -1624,7 +1615,7 @@ bool CPlayer::HasUpgradeClass(const int upgrade_class) const
 	if (this->Faction != nullptr) {
 		upgrade_id = CFaction::GetFactionClassUpgrade(this->Faction, upgrade_class);
 	} else {
-		upgrade_id = CCivilization::GetCivilizationClassUpgrade(CCivilization::Civilizations[this->Race], upgrade_class);
+		upgrade_id = CCivilization::GetCivilizationClassUpgrade(CCivilization::Get(this->Race), upgrade_class);
 	}
 	
 	if (upgrade_id != -1 && this->Allow.Upgrades[upgrade_id] == 'R') {
@@ -1785,7 +1776,7 @@ bool CPlayer::CanFoundFaction(const CFaction *faction, bool pre)
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->Civilization->ID && CPlayer::Players[i]->GetFaction() == faction) {
+		if (this->Index != i && CPlayer::Players[i]->Type != PlayerNobody && CPlayer::Players[i]->Race == faction->Civilization->GetIndex() && CPlayer::Players[i]->GetFaction() == faction) {
 			// faction is already in use
 			return false;
 		}
@@ -1858,7 +1849,7 @@ bool CPlayer::CanRecruitHero(const CCharacter *character, bool ignore_neutral) c
 		return false;
 	}
 	
-	if (!character->Civilization || character->Civilization->ID != this->Race) {
+	if (!character->Civilization || character->Civilization->GetIndex() != this->Race) {
 		return false;
 	}
 	
@@ -1954,7 +1945,7 @@ std::string CPlayer::GetCharacterTitleName(int title_type, int gender) const
 		return "";
 	}
 	
-	CCivilization *civilization = CCivilization::Civilizations[this->Race];
+	const CCivilization *civilization = CCivilization::Get(this->Race);
 	const CFaction *faction = this->Faction;
 	int faction_tier = faction->DefaultTier;
 	int government_type = faction->DefaultGovernmentType;
@@ -3951,7 +3942,7 @@ void DebugPlayers()
 				   CPlayer::GetThisPlayer() == CPlayer::Players[i] ? '*' :
 				   CPlayer::Players[i]->AiEnabled ? '+' : ' ' _C_
 				   CPlayer::Players[i]->Name.c_str() _C_ playertype _C_
-				   PlayerRaces.Name[CPlayer::Players[i]->Race].c_str() _C_
+				   CCivilization::Get(CPlayer::Players[i]->Race)->GetIdent().utf8().get_data() _C_
 				   CPlayer::Players[i]->AiName.c_str());
 	}
 #endif

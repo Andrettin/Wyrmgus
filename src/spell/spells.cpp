@@ -246,7 +246,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 		}
 	}
 	if (condition->CivilizationEquivalent != -1) {
-		if (caster.Type->GetCivilization() == nullptr || (caster.Type->GetCivilization()->ID == condition->CivilizationEquivalent && (!caster.Character || (caster.Character->Civilization && caster.Character->Civilization->ID == condition->CivilizationEquivalent))) || caster.Type->GetCivilization()->GetSpecies() != CCivilization::Civilizations[condition->CivilizationEquivalent]->GetSpecies() || CCivilization::GetCivilizationClassUnitType(CCivilization::Civilizations[condition->CivilizationEquivalent], caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->GetCivilization() == nullptr || (caster.Type->GetCivilization()->GetIndex() == condition->CivilizationEquivalent && (!caster.Character || (caster.Character->Civilization && caster.Character->Civilization->GetIndex() == condition->CivilizationEquivalent))) || caster.Type->GetCivilization()->GetSpecies() != CCivilization::Get(condition->CivilizationEquivalent)->GetSpecies() || CCivilization::GetCivilizationClassUnitType(CCivilization::Get(condition->CivilizationEquivalent), caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}
@@ -990,9 +990,9 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 			this->FactionUnit = StringToCondition(value);
 		} else if (key == "civilization_equivalent") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CCivilization *civilization = CCivilization::GetCivilization(value);
+			const CCivilization *civilization = CCivilization::Get(value);
 			if (civilization) {
-				this->CivilizationEquivalent = civilization->ID;
+				this->CivilizationEquivalent = civilization->GetIndex();
 			}
 		} else if (key == "faction_equivalent") {
 			value = FindAndReplaceString(value, "_", "-");

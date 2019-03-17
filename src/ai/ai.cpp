@@ -141,6 +141,7 @@
 
 #include "action/actions.h"
 #include "action/action_attack.h"
+#include "civilization.h"
 #include "commands.h"
 //Wyrmgus start
 #include "editor/editor.h"
@@ -641,7 +642,7 @@ void AiInit(CPlayer &player)
 
 	for (i = 0; i < AiTypes.size(); ++i) {
 		ait = AiTypes[i];
-		if (!ait->Race.empty() && ait->Race != PlayerRaces.Name[player.Race]) {
+		if (!ait->Race.empty() && ait->Race != (player.Race != -1 ? CCivilization::Get(player.Race)->GetIdent().utf8().get_data() : "")) {
 			continue;
 		}
 		if (!player.AiName.empty() && ait->Name != player.AiName) {
@@ -658,7 +659,7 @@ void AiInit(CPlayer &player)
 		DebugPrint("AI: not found!!!!!!!!!!\n");
 		DebugPrint("AI: Using fallback:\n");
 	}
-	DebugPrint("AI: %s:%s with %s:%s\n" _C_ PlayerRaces.Name[player.Race].c_str() _C_
+	DebugPrint("AI: %s:%s with %s:%s\n" _C_ (player.Race != -1 ? CCivilization::Get(player.Race)->GetIdent().utf8().get_data() : "") _C_
 			   !ait->Race.empty() ? ait->Race.c_str() : "All" _C_ player.AiName.c_str() _C_ ait->Class.c_str());
 
 	pai->AiType = ait;

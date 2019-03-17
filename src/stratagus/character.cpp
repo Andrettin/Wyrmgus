@@ -202,7 +202,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->Gender = GetGenderIdByName(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Civilization = CCivilization::GetCivilization(value);
+			this->Civilization = CCivilization::Get(value);
 		} else if (key == "faction") {
 			value = FindAndReplaceString(value, "_", "-");
 			CFaction *faction = CFaction::Get(value);
@@ -1180,7 +1180,7 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 			fprintf(stderr, "Custom hero \"%s\" does not exist.\n", hero_full_name.c_str());
 		}
 		
-		CCivilization *civilization = CCivilization::GetCivilization(civilization_name);
+		CCivilization *civilization = CCivilization::Get(civilization_name);
 		if (civilization) {
 			//delete old hero save file
 			std::string path = Parameters::Instance.GetUserDirectory();

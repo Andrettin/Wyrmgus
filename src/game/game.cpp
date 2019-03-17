@@ -820,7 +820,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 					  i, DefaultResourceNames[OilCost].c_str(),
 					  CPlayer::Players[i]->Resources[OilCost]);
 			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-					  i, PlayerRaces.Name[CPlayer::Players[i]->Race].c_str());
+					  i, CCivilization::Get(CPlayer::Players[i]->Race)->GetIdent().utf8().get_data());
 			f->printf("SetAiType(%d, \"%s\")\n",
 					  i, CPlayer::Players[i]->AiName.c_str());
 		}
@@ -851,7 +851,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, DefaultResourceNames[StoneCost].c_str(),
 						  CPlayer::Players[i]->Resources[StoneCost]);
 				f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
-						  i, PlayerRaces.Name[CPlayer::Players[i]->Race].c_str());
+						  i, CCivilization::Get(CPlayer::Players[i]->Race)->GetIdent().utf8().get_data());
 				if (CPlayer::Players[i]->GetFaction() != nullptr) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
 							  i, CPlayer::Players[i]->GetFaction()->GetIdent().utf8().get_data());
@@ -1519,7 +1519,7 @@ void CalculateItemsToLoad()
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
 		itemsToLoad+= GetIconsCount();
 		if (CPlayer::GetThisPlayer()) {
-			itemsToLoad+= GetCursorsCount(PlayerRaces.Name[CPlayer::GetThisPlayer()->Race]);
+			itemsToLoad+= GetCursorsCount(CCivilization::Get(CPlayer::GetThisPlayer()->Race)->GetIdent().utf8().get_data());
 		}
 		itemsToLoad+= GetUnitTypesCount();
 		itemsToLoad+= GetDecorationsCount();

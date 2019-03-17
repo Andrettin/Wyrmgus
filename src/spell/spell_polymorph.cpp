@@ -71,7 +71,7 @@
 		//Wyrmgus start
 		} else if (!strcmp(value, "civilization")) {
 			value = LuaToString(l, -1, j + 1);
-			CCivilization *civilization = CCivilization::GetCivilization(value);
+			CCivilization *civilization = CCivilization::Get(value);
 			if (civilization) {
 				this->Civilization = civilization;
 			}

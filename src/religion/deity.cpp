@@ -158,7 +158,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			this->Major = StringToBool(value);
 		} else if (key == "civilization") {
 			value = FindAndReplaceString(value, "_", "-");
-			CCivilization *civilization = CCivilization::GetCivilization(value);
+			CCivilization *civilization = CCivilization::Get(value);
 			if (civilization != nullptr) {
 				this->Civilizations.push_back(civilization);
 				civilization->Deities.push_back(this);
@@ -230,7 +230,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 				
 				key = FindAndReplaceString(key, "_", "-");
 				
-				const CCivilization *civilization = CCivilization::GetCivilization(key);
+				const CCivilization *civilization = CCivilization::Get(key);
 				
 				if (civilization) {
 					this->CulturalNames[civilization] = value;

@@ -264,7 +264,7 @@ void CUserInterface::Load()
 		if (CPlayer::GetThisPlayer()->GetFaction() != nullptr) {
 			new_ui_fillers = CFaction::GetFactionUIFillers(CPlayer::GetThisPlayer()->GetFaction());
 		} else {
-			new_ui_fillers = CCivilization::GetCivilizationUIFillers(CPlayer::GetThisPlayer()->Race != -1 ? CCivilization::Civilizations[CPlayer::GetThisPlayer()->Race] : nullptr);
+			new_ui_fillers = CCivilization::GetCivilizationUIFillers(CCivilization::Get(CPlayer::GetThisPlayer()->Race));
 		}
 	}
 	for (size_t i = 0; i < new_ui_fillers.size(); ++i) {

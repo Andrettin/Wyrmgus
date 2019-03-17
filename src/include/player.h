@@ -676,9 +676,7 @@ public:
 	//Wyrmgus end
 
 public:
-	std::string Name[MAX_RACES];    /// race names
 	//Wyrmgus start
-	std::string CivilizationUpgrades[MAX_RACES];
 	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CLanguage *> Languages;									/// languages
 	std::vector<CDynasty *> Dynasties;    								/// dynasties

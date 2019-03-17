@@ -196,7 +196,7 @@ static int CclDefineProvince(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
+				CCivilization *civilization = CCivilization::Get(LuaToString(l, -1, j + 1));
 				++j;
 				if (!civilization) {
 					continue;
@@ -204,7 +204,7 @@ static int CclDefineProvince(lua_State *l)
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				province->CulturalNames[civilization->ID] = TransliterateText(cultural_name);
+				province->CulturalNames[civilization->GetIndex()] = TransliterateText(cultural_name);
 			}
 		} else if (!strcmp(value, "FactionCulturalNames")) {
 			if (!lua_istable(l, -1)) {
@@ -298,9 +298,9 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				std::string historical_civilization_name = LuaToString(l, -1, j + 1);
 				if (!historical_civilization_name.empty()) {
-					CCivilization *historical_civilization = CCivilization::GetCivilization(historical_civilization_name);
+					CCivilization *historical_civilization = CCivilization::Get(historical_civilization_name);
 					if (historical_civilization) {
-						province->HistoricalCultures[year] = historical_civilization->ID;
+						province->HistoricalCultures[year] = historical_civilization->GetIndex();
 					}
 				}
 			}
@@ -419,7 +419,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string name_type = "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name);
 
-				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
+				CCivilization *civilization = CCivilization::Get(LuaToString(l, -1, j + 1));
 				++j;
 				if (!civilization) {
 					continue;
@@ -427,7 +427,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->CulturalTerrainNames[std::pair<int,int>(terrain, civilization->ID)].push_back(TransliterateText(cultural_name));
+				tile->CulturalTerrainNames[std::pair<int,int>(terrain, civilization->GetIndex())].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "FactionCulturalTerrainNames")) {
 			if (!lua_istable(l, -1)) {
@@ -469,7 +469,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string name_type = "resource-tile-" + DefaultResourceNames[resource];
 
-				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
+				CCivilization *civilization = CCivilization::Get(LuaToString(l, -1, j + 1));
 				++j;
 				if (!civilization) {
 					continue;
@@ -477,7 +477,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->CulturalResourceNames[std::pair<int,int>(resource, civilization->ID)].push_back(TransliterateText(cultural_name));
+				tile->CulturalResourceNames[std::pair<int,int>(resource, civilization->GetIndex())].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "FactionCulturalResourceNames")) {
 			if (!lua_istable(l, -1)) {
@@ -512,7 +512,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 
-				CCivilization *civilization = CCivilization::GetCivilization(LuaToString(l, -1, j + 1));
+				CCivilization *civilization = CCivilization::Get(LuaToString(l, -1, j + 1));
 				++j;
 				if (!civilization) {
 					continue;
@@ -520,7 +520,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->CulturalSettlementNames[civilization->ID].push_back(TransliterateText(cultural_name));
+				tile->CulturalSettlementNames[civilization->GetIndex()].push_back(TransliterateText(cultural_name));
 			}
 		} else if (!strcmp(value, "FactionCulturalSettlementNames")) {
 			if (!lua_istable(l, -1)) {

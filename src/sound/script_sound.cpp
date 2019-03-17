@@ -218,7 +218,7 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 		LuaError(l, "incorrect argument");
 	}
 	const char *civilization_ident = LuaToString(l, j + 1, 1);
-	const CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
+	const CCivilization *civilization = CCivilization::Get(civilization_ident);
 	if (!civilization) {
 		return;
 	}
@@ -229,7 +229,7 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 		LuaError(l, "Sound id expected");
 	}
 	lua_pop(l, 1);
-	soundConfigs[civilization->ID].Sound = (CSound *)data->Data;
+	soundConfigs[civilization->GetIndex()].Sound = (CSound *)data->Data;
 }
 
 /**
@@ -277,7 +277,7 @@ static int CclDefineGameSounds(lua_State *l)
 			const char *resName = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, resName);
 			const char *civilization_ident = LuaToString(l, j + 1, 2);
-			const CCivilization *civilization = CCivilization::GetCivilization(civilization_ident);
+			const CCivilization *civilization = CCivilization::Get(civilization_ident);
 			if (!civilization) {
 				continue;
 			}
@@ -287,7 +287,7 @@ static int CclDefineGameSounds(lua_State *l)
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
-			GameSounds.NotEnoughRes[civilization->ID][resId].Sound = (CSound *)data->Data;
+			GameSounds.NotEnoughRes[civilization->GetIndex()][resId].Sound = (CSound *)data->Data;
 		} else if (!strcmp(value, "not-enough-food")) {
 			SetSoundConfigRace(l, j, GameSounds.NotEnoughFood);
 		} else if (!strcmp(value, "rescue")) {
