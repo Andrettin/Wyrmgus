@@ -67,7 +67,7 @@
 #include "quest.h"
 //Wyrmgus end
 #include "sound.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui/button_action.h"

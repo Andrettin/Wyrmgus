@@ -27,64 +27,29 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_SPAWNMISSILE_H
-#define SPELL_SPAWNMISSILE_H
+#ifndef SPELL_CAPTURE_H
+#define SPELL_CAPTURE_H
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "spells.h"
+#include "spell/spells.h"
 
-/**
-**  Different targets.
-*/
-enum LocBaseType {
-	LocBaseCaster,
-	LocBaseTarget
-};
-
-/**
-**  This struct is used for defining a missile start/stop location.
-**
-**  It's evaluated like this, and should be more or less flexible.:
-**  base coordinates(caster or target) + (AddX,AddY) + (rand()%AddRandX,rand()%AddRandY)
-*/
-class SpellActionMissileLocation
+class Spell_Capture : public SpellActionType
 {
 public:
-	SpellActionMissileLocation(LocBaseType base) : Base(base) {}
-
-	void ProcessConfigData(const CConfigData *config_data);
-	
-	LocBaseType Base;	/// The base for the location (caster/target)
-	int AddX = 0;		/// Add to the X coordinate
-	int AddY = 0;		/// Add to the X coordinate
-	int AddRandX = 0;	/// Random add to the X coordinate
-	int AddRandY = 0;	/// Random add to the X coordinate
-};
-
-class Spell_SpawnMissile : public SpellActionType
-{
-public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual void ProcessConfigData(const CConfigData *config_data) override {};
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
-	virtual void Parse(lua_State *lua, int startIndex, int endIndex);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	int Damage = 0;							/// Missile damage.
-	int LightningDamage = 0;				/// Missile lightning damage.
-	int TTL = -1;							/// Missile TTL.
-	int Delay = 0;							/// Missile original delay.
-	bool UseUnitVar = false;				/// Use the caster's damage parameters
-	//Wyrmgus start
-	bool AlwaysHits = false;				/// The missile spawned from the spell always hits
-	bool AlwaysCritical = false;			/// The damage from the spell is always a critical hit (double damage)
-	//Wyrmgus end
-	SpellActionMissileLocation StartPoint = LocBaseCaster;	/// Start point description.
-	SpellActionMissileLocation EndPoint = LocBaseTarget;	/// Start point description.
-	MissileType *Missile = nullptr;			/// Missile fired on cast
+	bool SacrificeEnable = false;	/// true if the caster dies after casting.
+	bool JoinToAIForce = false;		/// if true, captured unit is joined into caster's AI force, if available
+	int Damage = 0;					/// damage the spell does if unable to caputre
+	int DamagePercent = 0;			/// percent the target must be damaged for a
+	/// capture to succeed.
 };
 
 #endif

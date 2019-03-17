@@ -77,7 +77,7 @@
 #include "script.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "time/time_of_day.h"
 #include "translate.h"
 #include "ui/button_action.h"

@@ -27,29 +27,30 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_CAPTURE_H
-#define SPELL_CAPTURE_H
+#ifndef SPELL_AREABOMBARDMENT_H
+#define SPELL_AREABOMBARDMENT_H
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "spells.h"
+#include "spell/spells.h"
 
-class Spell_Capture : public SpellActionType
+class Spell_AreaBombardment : public SpellActionType
 {
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override {};
+	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	bool SacrificeEnable = false;	/// true if the caster dies after casting.
-	bool JoinToAIForce = false;		/// if true, captured unit is joined into caster's AI force, if available
-	int Damage = 0;					/// damage the spell does if unable to caputre
-	int DamagePercent = 0;			/// percent the target must be damaged for a
-	/// capture to succeed.
+	int Fields = 0;				/// The size of the affected square.
+	int Shards = 0;				/// Number of shards thrown.
+	int Damage = 0;				/// Damage for every shard.
+	int StartOffsetX = 0;		/// The offset of the missile start point to the hit location.
+	int StartOffsetY = 0;		/// The offset of the missile start point to the hit location.
+	MissileType *Missile = nullptr;	/// Missile fired on cast
 };
 
 #endif

@@ -32,8 +32,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <png.h>
-
 #include "stratagus.h"
 
 #include "game.h"
@@ -83,7 +81,7 @@
 #include "settings.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "text.h"
 #include "time/calendar.h"
 #include "translate.h"
@@ -102,6 +100,7 @@
 #include "include/version.h"
 #include "video.h"
 
+#include <png.h>
 
 extern void CleanGame();
 

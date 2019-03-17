@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "spells.h"
+#include "spell/spells.h"
 
 #include "civilization.h"
 #include "faction.h"

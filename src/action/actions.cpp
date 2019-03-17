@@ -71,7 +71,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "time/time_of_day.h"
 #include "ui/interface.h"
 #include "unit/unit.h"

@@ -27,16 +27,16 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_AREABOMBARDMENT_H
-#define SPELL_AREABOMBARDMENT_H
+#ifndef SPELL_AREAADJUSTVITAL_H
+#define SPELL_AREAADJUSTVITAL_H
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "spells.h"
+#include "spell/spells.h"
 
-class Spell_AreaBombardment : public SpellActionType
+class Spell_AreaAdjustVital : public SpellActionType
 {
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
@@ -45,12 +45,11 @@ public:
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	int Fields = 0;				/// The size of the affected square.
-	int Shards = 0;				/// Number of shards thrown.
-	int Damage = 0;				/// Damage for every shard.
-	int StartOffsetX = 0;		/// The offset of the missile start point to the hit location.
-	int StartOffsetY = 0;		/// The offset of the missile start point to the hit location.
-	MissileType *Missile = nullptr;	/// Missile fired on cast
+	int HP = 0;				/// Target HP gain.(can be negative)
+	int Mana = 0;			/// Target Mana gain.(can be negative)
+	int Shield = 0;			/// Target SP gain.(can be negative)
+	int Range = 1;			/// Range of spell
+	bool UseMana = false;	/// If true, use mana for spell cast
 };
 
 #endif

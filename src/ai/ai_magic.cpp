@@ -32,11 +32,13 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
+
+#include "ai_local.h"
+
+#include "action/actions.h"
+#include "spell/spells.h"
 #include "unit/unit_type.h"
 #include "unit/unit.h"
-#include "spells.h"
-#include "action/actions.h"
-#include "ai_local.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

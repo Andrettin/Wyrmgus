@@ -9,8 +9,8 @@
 //         Stratagus - A free fantasy real time strategy game engine
 //
 //
-//      (c) Copyright 1999-2012 by Vladi Belperchinov-Shabanski,
-//                                 Joris DAUPHIN, and Jimmy Salmon
+//      (c) Copyright 1999-2019 by Vladi Belperchinov-Shabanski,
+//                                 Joris DAUPHIN, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,29 +27,36 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_AREAADJUSTVITAL_H
-#define SPELL_AREAADJUSTVITAL_H
+#ifndef SPELL_POLYMORPH_H
+#define SPELL_POLYMORPH_H
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "spells.h"
+#include "spell/spells.h"
 
-class Spell_AreaAdjustVital : public SpellActionType
+class CCivilization;
+class CFaction;
+
+class Spell_Polymorph : public SpellActionType
 {
 public:
+	Spell_Polymorph() : SpellActionType(1) {};
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	int HP = 0;				/// Target HP gain.(can be negative)
-	int Mana = 0;			/// Target Mana gain.(can be negative)
-	int Shield = 0;			/// Target SP gain.(can be negative)
-	int Range = 1;			/// Range of spell
-	bool UseMana = false;	/// If true, use mana for spell cast
+	CUnitType *NewForm = nullptr;	/// The new form
+	int PlayerNeutral = 0;			/// Convert the unit to the neutral player, or to the caster's player.
+	//Wyrmgus start
+	CCivilization *Civilization = nullptr;	/// For using with the Faction value.
+	const CFaction *Faction = nullptr;	/// If the unit should be transformed in its faction equivalent.
+	bool Detachment = false;		/// If the unit should be transformed from its faction-specific type to the generic civilization equivalent.
+	//Wyrmgus end
+	// TODO: temporary polymorphs would be awesome, but hard to implement
 };
 
 #endif

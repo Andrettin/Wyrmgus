@@ -65,7 +65,7 @@
 #include "sound.h"
 #include "species/species.h"
 #include "species/species_category.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "time/season.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"

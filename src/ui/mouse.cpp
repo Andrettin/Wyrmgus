@@ -66,7 +66,7 @@
 #include "province.h"
 //Wyrmgus end
 #include "sound.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"

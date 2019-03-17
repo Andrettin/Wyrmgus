@@ -33,18 +33,19 @@
 
 #include "stratagus.h"
 
+#include "commands.h"
+
 #include "action/actions.h"
 #include "action/action_built.h"
 #include "action/action_research.h"
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
-#include "commands.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

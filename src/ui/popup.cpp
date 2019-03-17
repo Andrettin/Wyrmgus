@@ -37,7 +37,7 @@
 
 #include "font.h"
 #include "player.h"
-#include "spells.h"
+#include "spell/spells.h"
 //Wyrmgus start
 #include "translate.h"
 //Wyrmgus end

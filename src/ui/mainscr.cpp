@@ -56,7 +56,7 @@
 #include "quest.h"
 //Wyrmgus end
 #include "sound.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "time/calendar.h"
 #include "time/season.h"
 #include "time/time_of_day.h"

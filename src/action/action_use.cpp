@@ -47,7 +47,7 @@
 #include "pathfinder.h"
 #include "script.h"
 #include "sound.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

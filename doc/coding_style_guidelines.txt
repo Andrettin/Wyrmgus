@@ -9,3 +9,5 @@ Coding Style Guidelines for Wyrmgus
 4. Prefer defining functions in headers if they don't require any external includes, so that the compiler is able to inline the functions if it deems optimal to do so, thus providing performance improvements.
 
 5. Braces are always used for "if" statements.
+
+6. Header files are included in the following order: first the "stratagus.h" header, then the header corresponding to the current source file, then the other Wyrmgus headers, then headers for other Godot modules, then Godot headers, then library headers, and finally standard library headers.

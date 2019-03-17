@@ -62,7 +62,7 @@
 #include "parameters.h"
 //Wyrmgus start
 #include "player.h"
-#include "spells.h"
+#include "spell/spells.h"
 //Wyrmgus end
 #include "time/timeline.h"
 #include "translate.h"

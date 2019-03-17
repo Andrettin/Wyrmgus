@@ -42,7 +42,7 @@
 
 #include "stratagus.h"
 
-#include "spells.h"
+#include "spell/spells.h"
 
 #include "action/actions.h"
 #include "civilization.h"

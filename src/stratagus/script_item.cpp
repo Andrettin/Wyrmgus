@@ -37,7 +37,7 @@
 
 #include "icon.h"
 #include "script.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 

@@ -27,31 +27,29 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_ADJUSTVITAL_H
-#define SPELL_ADJUSTVITAL_H
+#ifndef SPELL_SUMMON_H
+#define SPELL_SUMMON_H
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "spells.h"
+#include "spell/spells.h"
 
-class Spell_AdjustVital : public SpellActionType
+class Spell_Summon : public SpellActionType
 {
 public:
-	Spell_AdjustVital() : SpellActionType(1) {};
+	Spell_Summon() : SpellActionType(1) {};
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	int HP = 0;		/// Target HP gain.(can be negative)
-	int Mana = 0;	/// Target Mana gain.(can be negative)
-	int Shield = 0;	/// Target SP gain.(can be negative)
-	/// This spell is designed to be used wit very small amounts. The spell
-	/// can scale up to MaxMultiCast times. Use 0 for infinite.
-	int MaxMultiCast = 0;
+	CUnitType *UnitType = nullptr;	/// Type of unit to be summoned.
+	int TTL = 0;					/// Time to live for summoned unit. 0 means infinite
+	int RequireCorpse = false;		/// Corpse consumed while summoning.
+	bool JoinToAiForce = false;		/// if true, captured unit is joined into caster's AI force, if available
 };
 
 #endif

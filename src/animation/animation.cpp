@@ -34,8 +34,6 @@
 
 #include "stratagus.h"
 
-#include "action/action_spellcast.h"
-
 #include "animation/animation.h"
 
 #include "animation/animation_attack.h"
@@ -60,11 +58,12 @@
 #include "animation/animation_wait.h"
 
 #include "action/actions.h"
+#include "action/action_spellcast.h"
 #include "config.h"
 #include "iolib.h"
 #include "player.h"
 #include "script.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 

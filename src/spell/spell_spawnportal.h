@@ -27,44 +27,27 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_DEMOLISH_H
-#define SPELL_DEMOLISH_H
+#ifndef SPELL_SPAWNPORTAL_H
+#define SPELL_SPAWNPORTAL_H
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "spells.h"
+#include "spell/spells.h"
 
-class Spell_Demolish : public SpellActionType
+class Spell_SpawnPortal : public SpellActionType
 {
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override {};
+	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	int Damage = 0;			/// Damage for every unit in range.
-	int Range = 0;			/// Range of the explosion.
-	//Wyrmgus start
-	int BasicDamage = 0;	/// Basic damage for every unit in range.
-	int PiercingDamage = 0;	/// Piercing damage for every unit in range.
-	int FireDamage = 0;
-	int ColdDamage = 0;
-	int ArcaneDamage = 0;
-	int LightningDamage = 0;
-	int AirDamage = 0;
-	int EarthDamage = 0;
-	int WaterDamage = 0;
-	int AcidDamage = 0;
-	bool HackDamage = false;
-	bool PierceDamage = false;
-	bool BluntDamage = false;
-	bool DamageSelf = true;		/// If true, damages self when casting spell
-	bool DamageFriendly = true;	/// If true, damages friendly units when casting spell
-	bool DamageTerrain = true;	/// If true, damages terrain when casting spell
-	//Wyrmgus end
+	CUnitType *PortalType = nullptr;	/// The unit type spawned
+	int TTL = 0;						/// Time to live for summoned portal. 0 means infinite
+	bool CurrentPlayer = false;			/// If true, summon portal for caster's player rather than neutral
 };
 
 #endif

@@ -60,7 +60,7 @@
 #include "script.h"
 #include "sound.h"
 #include "species/species.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
@@ -74,11 +74,10 @@
 #include "util.h"
 #include "video.h"
 
-#include <ctype.h>
-
-#include <string>
-#include <map>
 #include <cstring>
+#include <ctype.h>
+#include <map>
+#include <string>
 
 /*----------------------------------------------------------------------------
 -- Documentation

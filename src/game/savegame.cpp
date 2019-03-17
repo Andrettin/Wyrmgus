@@ -47,7 +47,7 @@
 #include "parameters.h"
 #include "player.h"
 #include "replay.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "time/calendar.h"
 #include "trigger.h"
 #include "ui/ui.h"

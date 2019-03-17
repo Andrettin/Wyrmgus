@@ -27,29 +27,24 @@
 //      02111-1307, USA.
 //
 
-#ifndef SPELL_SUMMON_H
-#define SPELL_SUMMON_H
+#ifndef SPELL_RETRAIN_H
+#define SPELL_RETRAIN_H
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "spells.h"
+#include "spell/spells.h"
 
-class Spell_Summon : public SpellActionType
+class Spell_Retrain : public SpellActionType
 {
 public:
-	Spell_Summon() : SpellActionType(1) {};
 	virtual void ProcessConfigData(const CConfigData *config_data) override {}
 	virtual int Cast(CUnit &caster, const CSpell &spell,
 					 CUnit *target, const Vec2i &goalPos, int z, int modifier);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
-	CUnitType *UnitType = nullptr;	/// Type of unit to be summoned.
-	int TTL = 0;					/// Time to live for summoned unit. 0 means infinite
-	int RequireCorpse = false;		/// Corpse consumed while summoning.
-	bool JoinToAiForce = false;		/// if true, captured unit is joined into caster's AI force, if available
 };
 
 #endif

@@ -45,7 +45,7 @@
 #include "game.h"
 #include "network/network.h"
 #include "parameters.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "ui/interface.h" //for the GameRunning variable
 #include "unit/unit.h"
 #include "unit/unit_manager.h"

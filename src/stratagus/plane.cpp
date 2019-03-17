@@ -37,7 +37,7 @@
 
 #include "config.h"
 #include "religion/deity_domain.h"
-#include "school_of_magic.h"
+#include "spell/school_of_magic.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/ui.h"

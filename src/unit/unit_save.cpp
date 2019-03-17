@@ -31,9 +31,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <sstream>
-#include <iomanip>
-
 #include "stratagus.h"
 
 #include "unit/unit.h"
@@ -48,9 +45,11 @@
 #include "map/site.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "spells.h"
+#include "spell/spells.h"
 #include "unit/unit_type.h"
 
+#include <iomanip>
+#include <sstream>
 #include <stdio.h>
 
 /*----------------------------------------------------------------------------
