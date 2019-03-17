@@ -43,6 +43,7 @@
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
+#include "dynasty.h"
 #include "economy/currency.h"
 //Wyrmgus start
 #include "editor/editor.h"
@@ -175,7 +176,7 @@ void CPlayer::Load(lua_State *l)
 			const CFaction *faction = CFaction::Get(faction_ident);
 			this->Faction = faction;
 		} else if (!strcmp(value, "dynasty")) {
-			this->Dynasty = PlayerRaces.GetDynasty(LuaToString(l, j + 1));
+			this->Dynasty = CDynasty::Get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "age")) {
 			this->Age = CAge::Get(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "color")) {
@@ -2267,14 +2268,7 @@ static int CclDefineDynasty(lua_State *l)
 
 	std::string dynasty_ident = LuaToString(l, 1);
 	
-	CDynasty *dynasty = PlayerRaces.GetDynasty(dynasty_ident);
-	if (!dynasty) { // new definition
-		dynasty = new CDynasty;
-		dynasty->Ident = dynasty_ident;
-		dynasty->ID = PlayerRaces.Dynasties.size();
-		PlayerRaces.Dynasties.push_back(dynasty);
-		DynastyStringToIndex[dynasty->Ident] = dynasty->ID;
-	}
+	CDynasty *dynasty = CDynasty::GetOrAdd(dynasty_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -2282,8 +2276,8 @@ static int CclDefineDynasty(lua_State *l)
 		
 		if (!strcmp(value, "Civilization")) {
 			CCivilization *civilization = CCivilization::Get(LuaToString(l, -1));
-			if (civilization) {
-				dynasty->Civilization = civilization->GetIndex();
+			if (civilization != nullptr) {
+				dynasty->Civilization = civilization;
 			}
 		} else if (!strcmp(value, "Name")) {
 			dynasty->Name = LuaToString(l, -1);
@@ -2733,24 +2727,21 @@ static int CclGetFactions(lua_State *l)
 */
 static int CclGetDynasties(lua_State *l)
 {
-	int civilization_id = -1;
+	CCivilization *civilization = nullptr;
 	if (lua_gettop(l) >= 1) {
-		CCivilization *civilization = CCivilization::Get(LuaToString(l, 1));
-		if (civilization) {
-			civilization_id = civilization->GetIndex();
-		}
+		civilization = CCivilization::Get(LuaToString(l, 1));
 	}
 	
 	std::vector<std::string> dynasties;
-	if (civilization_id != -1) {
-		for (size_t i = 0; i < PlayerRaces.Dynasties.size(); ++i) {
-			if (PlayerRaces.Dynasties[i]->Civilization == civilization_id) {
-				dynasties.push_back(PlayerRaces.Dynasties[i]->Ident);
+	if (civilization != nullptr) {
+		for (const CDynasty *dynasty : CDynasty::GetAll()) {
+			if (dynasty->Civilization == civilization) {
+				dynasties.push_back(dynasty->Ident);
 			}
 		}
 	} else {
-		for (size_t i = 0; i < PlayerRaces.Dynasties.size(); ++i) {
-			dynasties.push_back(PlayerRaces.Dynasties[i]->Ident);
+		for (const CDynasty *dynasty : CDynasty::GetAll()) {
+			dynasties.push_back(dynasty->Ident);
 		}
 	}
 		
@@ -2873,7 +2864,7 @@ static int CclGetDynastyData(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	std::string dynasty_ident = LuaToString(l, 1);
-	CDynasty *dynasty = PlayerRaces.GetDynasty(dynasty_ident);
+	CDynasty *dynasty = CDynasty::Get(dynasty_ident);
 	if (dynasty == nullptr) {
 		LuaError(l, "Dynasty \"%s\" doesn't exist." _C_ dynasty_ident.c_str());
 	}
@@ -2893,8 +2884,8 @@ static int CclGetDynastyData(lua_State *l)
 		lua_pushstring(l, dynasty->Background.c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		if (dynasty->Civilization != -1) {
-			lua_pushstring(l, CCivilization::Get(dynasty->Civilization)->GetIdent().utf8().get_data());
+		if (dynasty->Civilization != nullptr) {
+			lua_pushstring(l, dynasty->Civilization->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3045,7 +3036,7 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Dynasty")) {
 		if (p->Dynasty) {
-			lua_pushstring(l, p->Dynasty->Ident.c_str());
+			lua_pushstring(l, p->Dynasty->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3416,7 +3407,7 @@ static int CclSetPlayerData(lua_State *l)
 		}
 	} else if (!strcmp(data, "Dynasty")) {
 		std::string dynasty_ident = LuaToString(l, 3);
-		p->SetDynasty(PlayerRaces.GetDynasty(dynasty_ident));
+		p->SetDynasty(CDynasty::Get(dynasty_ident));
 	//Wyrmgus end
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 4);

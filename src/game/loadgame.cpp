@@ -40,6 +40,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
+#include "dynasty.h"
 #include "economy/currency.h"
 #include "game/replay.h"
 #include "game/trigger.h"
@@ -125,7 +126,6 @@ void CleanModules()
 	CleanFonts();
 	CTrigger::ClearTriggers();
 	FreeAi();
-	PlayerRaces.Clean();
 	CAchievement::Clear();
 	CAge::Clear();
 	CCalendar::ClearCalendars();
@@ -139,6 +139,7 @@ void CleanModules()
 	//Wyrmgus start
 	CDialogue::ClearDialogues();
 	CDeityDomain::ClearDeityDomains();
+	CDynasty::Clear();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
 	CFaction::Clear();

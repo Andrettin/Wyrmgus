@@ -47,6 +47,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "config.h"
+#include "dynasty.h"
 //Wyrmgus start
 #include "editor/editor.h"
 #include "faction.h"
@@ -927,7 +928,7 @@ static int CclDefineModifier(lua_State *l)
 			}
 		} else if (!strcmp(key, "change-dynasty-to")) {
 			std::string dynasty_ident = LuaToString(l, j + 1, 2);
-			um->ChangeDynastyTo = PlayerRaces.GetDynasty(dynasty_ident);
+			um->ChangeDynastyTo = CDynasty::Get(dynasty_ident);
 			
 			if (um->ChangeDynastyTo == nullptr) {
 				LuaError(l, "Dynasty \"%s\" doesn't exist.'" _C_ dynasty_ident.c_str());

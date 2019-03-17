@@ -376,7 +376,7 @@ static void AiCheckUnits()
 			AiPlayer->Player->SetFaction(potential_factions[SyncRand(potential_factions.size())]);
 		}
 		
-		if (!AiPlayer->Player->Dynasty) { //if the AI player has no dynasty, pick one if available
+		if (AiPlayer->Player->Dynasty == nullptr) { //if the AI player has no dynasty, pick one if available
 			std::vector<CDynasty *> potential_dynasties;
 			for (CDynasty *possible_dynasty : AiPlayer->Player->GetFaction()->Dynasties) {
 				if (!AiPlayer->Player->CanChooseDynasty(possible_dynasty)) {

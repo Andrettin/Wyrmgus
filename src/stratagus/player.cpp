@@ -46,7 +46,10 @@
 #include "ai/ai_local.h" //for using AiHelpers
 #include "civilization.h"
 #include "commands.h" //for faction setting
+//Wyrmgus end
+#include "dynasty.h"
 #include "economy/currency.h"
+//Wyrmgus start
 #include "editor/editor.h"
 #include "faction.h"
 #include "game/game.h"
@@ -151,8 +154,7 @@
 **  CPlayer::Race
 **
 **    Race number of the player. This field is setup from the level
-**    map. This number is mapped with #PlayerRaces to the symbolic
-**    name CPlayer::RaceName.
+**    map. This number is the index of the player's civilization.
 **
 **  CPlayer::AiName
 **
@@ -361,8 +363,6 @@ CPlayer *CPlayer::ThisPlayer = nullptr;	/// Player on this computer
 std::vector<CPlayer *> CPlayer::Players;	/// All players in play
 std::shared_mutex CPlayer::PlayerMutex;
 
-PlayerRace PlayerRaces;					/// Player races
-
 bool NoRescueCheck;						/// Disable rescue check
 
 /**
@@ -385,48 +385,9 @@ std::vector<int> ConversiblePlayerColors;
 int PlayerColorIndexStart;
 int PlayerColorIndexCount;
 
-//Wyrmgus start
-std::map<std::string, int> DynastyStringToIndex;
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Clean up the PlayerRaces names.
-*/
-void PlayerRace::Clean()
-{
-	//Wyrmgus start
-	for (CDynasty *dynasty : this->Dynasties) {
-		delete dynasty;
-	}
-	this->Dynasties.clear();
-	//Wyrmgus end
-}
-
-//Wyrmgus start
-CDynasty *PlayerRace::GetDynasty(const std::string &dynasty_ident) const
-{
-	if (dynasty_ident.empty()) {
-		return nullptr;
-	}
-	
-	if (DynastyStringToIndex.find(dynasty_ident) != DynastyStringToIndex.end()) {
-		return PlayerRaces.Dynasties[DynastyStringToIndex[dynasty_ident]];
-	} else {
-		return nullptr;
-	}
-}
-
-CDynasty::~CDynasty()
-{
-	if (this->Conditions) {
-		delete Conditions;
-	}
-}
-//Wyrmgus end
 
 /**
 **  Init players.
@@ -561,7 +522,7 @@ void CPlayer::Save(CFile &file) const
 		file.printf(" \"faction\", \"%s\",", this->Faction->GetIdent().utf8().get_data());
 	}
 	if (this->Dynasty != nullptr) {
-		file.printf(" \"dynasty\", \"%s\",", this->Dynasty->Ident.c_str());
+		file.printf(" \"dynasty\", \"%s\",", this->Dynasty->GetIdent().utf8().get_data());
 	}
 	if (this->Age != nullptr) {
 		file.printf(" \"age\", \"%s\",", this->Age->Ident.c_str());
@@ -1361,19 +1322,19 @@ void CPlayer::SetDynasty(CDynasty *dynasty)
 {
 	CDynasty *old_dynasty = this->Dynasty;
 	
-	if (this->Dynasty) {
-		if (this->Dynasty->DynastyUpgrade && this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->ID] == 'R') {
+	if (this->Dynasty != nullptr) {
+		if (this->Dynasty->DynastyUpgrade != nullptr && this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->ID] == 'R') {
 			UpgradeLost(*this, this->Dynasty->DynastyUpgrade->ID);
 		}
 	}
 
 	this->Dynasty = dynasty;
 
-	if (!this->Dynasty) {
+	if (this->Dynasty == nullptr) {
 		return;
 	}
 	
-	if (this->Dynasty->DynastyUpgrade) {
+	if (this->Dynasty->DynastyUpgrade != nullptr) {
 		if (this->Allow.Upgrades[this->Dynasty->DynastyUpgrade->ID] != 'R') {
 			if (GameEstablishing) {
 				AllowUpgradeId(*this, this->Dynasty->DynastyUpgrade->ID, 'R');

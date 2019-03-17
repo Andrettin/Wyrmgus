@@ -477,49 +477,7 @@ enum ForceTypes {
 	
 	MaxForceTypes
 };
-
-class CDynasty
-{
-public:
-	~CDynasty();
-	
-	std::string Ident;													/// dynasty name
-	std::string Name;
-	std::string Description;											/// dynasty description
-	std::string Quote;													/// dynasty quote
-	std::string Background;												/// dynasty background
-	CUpgrade *DynastyUpgrade = nullptr;									/// dynasty upgrade applied when the dynasty is set
-	int ID = -1;														/// dynasty ID
-	int Civilization = -1;												/// dynasty civilization
-	IconConfig Icon;													/// dynasty's icon
-	LuaCallback *Conditions = nullptr;
-	std::vector<CFaction *> Factions;									/// to which factions is this dynasty available
-};
 //Wyrmgus end
-
-/**
-**  Races for the player
-**  Mapped with #PlayerRaces to a symbolic name.
-*/
-class PlayerRace
-{
-public:
-	void Clean();
-	//Wyrmgus start
-	CDynasty *GetDynasty(const std::string &dynasty_ident) const;
-	//Wyrmgus end
-
-public:
-	//Wyrmgus start
-	std::vector<CDynasty *> Dynasties;    								/// dynasties
-	//Wyrmgus end
-};
-
-
-enum PlayerRacesOld {
-	PlayerRaceHuman = 0,  /// belongs to human
-	PlayerRaceOrc  = 1    /// belongs to orc
-};
 
 /**
 **  Types for the player
@@ -593,11 +551,7 @@ extern std::vector<CColor> PlayerColorsRGB[PlayerColorMax]; /// Player colors
 extern std::vector<IntColor> PlayerColors[PlayerColorMax]; /// Player colors
 extern std::string PlayerColorNames[PlayerColorMax];  /// Player color names
 extern std::vector<int> ConversiblePlayerColors; 			/// Conversible player colors
-
-extern std::map<std::string, int> DynastyStringToIndex;
 //Wyrmgus end
-
-extern PlayerRace PlayerRaces;  /// Player races
 
 /**
 **  Which indexes to replace with player color

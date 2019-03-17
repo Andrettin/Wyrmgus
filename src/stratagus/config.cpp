@@ -38,6 +38,7 @@
 #include "age.h"
 #include "animation/animation.h"
 #include "character.h"
+#include "dynasty.h"
 #include "economy/currency.h"
 #include "game/game.h"
 #include "game/trigger.h"
@@ -312,6 +313,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CDeityDomain *deity_domain = CDeityDomain::GetOrAddDeityDomain(ident);
 			if (!define_only) {
 				deity_domain->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "dynasty") {
+			CDynasty *dynasty = CDynasty::GetOrAdd(ident);
+			if (!define_only) {
+				dynasty->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "hair_color") {
 			CHairColor *hair_color = CHairColor::GetOrAdd(ident);
