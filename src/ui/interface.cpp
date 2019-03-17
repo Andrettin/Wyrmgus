@@ -35,7 +35,7 @@
 
 #include "ui/interface.h"
 
-#include "ai.h"
+#include "ai/ai.h"
 #include "commands.h"
 #include "cursor.h"
 #include "font.h"

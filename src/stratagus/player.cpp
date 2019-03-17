@@ -41,7 +41,7 @@
 #include "action/action_upgradeto.h"
 #include "action/actions.h"
 #include "age.h"
-#include "ai.h"
+#include "ai/ai.h"
 //Wyrmgus start
 #include "ai/ai_local.h" //for using AiHelpers
 #include "campaign.h"

@@ -37,7 +37,7 @@
 #include "action/action_build.h"
 
 #include "action/action_built.h"
-#include "ai.h"
+#include "ai/ai.h"
 //Wyrmgus start
 #include "ai/ai_local.h"
 //Wyrmgus end

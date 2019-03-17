@@ -42,7 +42,7 @@
 #include "action/action_upgradeto.h"
 //Wyrmgus end
 #include "action/actions.h"
-#include "ai.h"
+#include "ai/ai.h"
 //Wyrmgus start
 #include "ai/ai_local.h" //for using AiHelpers
 //Wyrmgus end

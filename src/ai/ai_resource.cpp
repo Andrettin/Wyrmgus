@@ -39,7 +39,7 @@
 #include "action/action_build.h"
 #include "action/action_repair.h"
 #include "action/action_resource.h"
-#include "ai_building_template.h"
+#include "ai/ai_building_template.h"
 #include "commands.h"
 #include "faction.h"
 #include "map/map.h"

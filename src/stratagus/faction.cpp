@@ -33,11 +33,11 @@
 
 #include "stratagus.h"
 
-#include "ai.h"
-#include "ai_building_template.h"
+#include "ai/ai.h"
+#include "ai/ai_building_template.h"
 #include "civilization.h"
 #include "faction.h"
-#include "force_template.h"
+#include "ai/force_template.h"
 #include "luacallback.h"
 #include "player_color.h"
 

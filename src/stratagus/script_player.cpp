@@ -37,8 +37,8 @@
 
 #include "action/actions.h"
 #include "age.h"
-#include "ai.h"
-#include "ai_building_template.h"
+#include "ai/ai.h"
+#include "ai/ai_building_template.h"
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
@@ -50,7 +50,7 @@
 //Wyrmgus start
 #include "font.h"
 //Wyrmgus end
-#include "force_template.h"
+#include "ai/force_template.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end

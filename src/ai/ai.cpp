@@ -136,7 +136,7 @@
 
 #include "stratagus.h"
 
-#include "ai.h"
+#include "ai/ai.h"
 #include "ai_local.h"
 
 #include "action/actions.h"

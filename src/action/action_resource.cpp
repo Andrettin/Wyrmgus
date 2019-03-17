@@ -35,7 +35,7 @@
 
 #include "action/action_resource.h"
 
-#include "ai.h"
+#include "ai/ai.h"
 #include "ai/ai_local.h"
 #include "animation/animation.h"
 //Wyrmgus start

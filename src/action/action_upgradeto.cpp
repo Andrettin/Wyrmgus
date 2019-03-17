@@ -35,7 +35,7 @@
 
 #include "action/action_upgradeto.h"
 
-#include "ai.h"
+#include "ai/ai.h"
 #include "animation/animation.h"
 #include "civilization.h"
 #include "faction.h"

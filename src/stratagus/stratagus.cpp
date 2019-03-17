@@ -177,7 +177,7 @@ extern void beos_init(int argc, char **argv);
 
 #include "stratagus.h"
 
-#include "ai.h"
+#include "ai/ai.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end

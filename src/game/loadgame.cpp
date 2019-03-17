@@ -36,7 +36,7 @@
 #include "achievement.h"
 #include "action/actions.h"
 #include "age.h"
-#include "ai.h"
+#include "ai/ai.h"
 #include "campaign.h"
 #include "character.h"
 #include "civilization.h"

@@ -35,8 +35,8 @@
 
 #include "civilization.h"
 
-#include "ai_building_template.h"
-#include "force_template.h"
+#include "ai/ai_building_template.h"
+#include "ai/force_template.h"
 #include "player.h"
 #include "player_color.h"
 #include "time/calendar.h"
