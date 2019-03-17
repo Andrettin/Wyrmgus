@@ -35,7 +35,7 @@
 
 #include "world/province.h"
 
-#include "map/tileset.h" // for the terrain features, which are cleaned here
+#include "map/map.h" // for the terrain features, which are cleaned here
 
 #include <ctype.h>
 #include <string>
