@@ -11,7 +11,6 @@ $#include "game/game.h"
 //Wyrmgus start
 $#include "grand_strategy.h"
 //Wyrmgus end
-$#include "icon.h"
 $#include "iolib.h"
 //Wyrmgus start
 $#include "item.h"
@@ -28,7 +27,9 @@ $#include "script.h"
 //Wyrmgus end
 $#include "sound/sound.h"
 $#include "sound/sound_server.h"
+$#include "ui/icon.h"
 $#include "ui/ui.h"
+$#include "ui/widgets.h"
 $#include "unit/unit.h"
 $#include "unit/unit_manager.h"
 $#include "unit/unit_type.h"
@@ -38,7 +39,6 @@ $#include "util.h"
 //Wyrmgus end
 $#include "video/font.h"
 $#include "video/video.h"
-$#include "widgets.h"
 
 $#ifdef _MSC_VER
 $#pragma warning(disable:4800)

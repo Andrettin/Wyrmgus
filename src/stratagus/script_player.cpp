@@ -51,7 +51,6 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "icon.h"
 //Wyrmgus start
 #include "item.h"
 #include "luacallback.h"
@@ -70,16 +69,17 @@
 #include "species/species.h"
 #include "time/calendar.h"
 #include "ui/button_action.h"
+#include "ui/icon.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 //Wyrmgus start
-#include "video/font.h"
-//Wyrmgus end
-//Wyrmgus start
 #include "ui/ui.h"
 #include "util.h"
+//Wyrmgus end
+//Wyrmgus start
+#include "video/font.h"
 //Wyrmgus end
 #include "video/video.h"
 

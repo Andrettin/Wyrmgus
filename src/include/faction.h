@@ -35,8 +35,8 @@
 ----------------------------------------------------------------------------*/
 
 #include "character.h" // because of "MaxCharacterTitles"
-#include "icon_config.h"
 #include "time/date.h"
+#include "ui/icon_config.h"
 #include "ui/ui.h" // for the UI fillers
 
 #include <core/object.h>

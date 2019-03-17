@@ -51,13 +51,13 @@
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/ui.h"
+#include "ui/widgets.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "video/cursor.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

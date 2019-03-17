@@ -38,12 +38,12 @@
 #include "civilization.h"
 #include "config.h"
 #include "faction.h"
-#include "icon.h"
 #include "include/plane.h"
 #include "province.h"
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "religion/religion.h"
+#include "ui/icon.h"
 #include "upgrade/upgrade.h"
 
 #include <algorithm>

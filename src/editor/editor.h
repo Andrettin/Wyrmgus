@@ -34,11 +34,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-#include <string>
-
-#include "icon_config.h"
+#include "ui/icon_config.h"
 #include "vec2i.h"
+
+#include <string>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations

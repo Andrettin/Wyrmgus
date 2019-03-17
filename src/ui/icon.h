@@ -37,7 +37,7 @@
 /**
 **  @class CIcon icon.h
 **
-**  \#include "icon.h"
+**  \#include "ui/icon.h"
 **
 **  This structure contains all information about an icon.
 **

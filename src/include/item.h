@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "icon_config.h"
+#include "ui/icon_config.h"
 
 #include <vector>
 

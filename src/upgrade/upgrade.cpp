@@ -53,7 +53,6 @@
 #include "game/game.h"
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "icon.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "item.h"
@@ -71,6 +70,7 @@
 #include "settings.h"
 #include "translate.h"
 //Wyrmgus end
+#include "ui/icon.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 //Wyrmgus start

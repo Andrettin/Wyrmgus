@@ -35,9 +35,9 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
-#include "icon_config.h"
 #include "missileconfig.h"
 #include "sound/unit_sound.h"
+#include "ui/icon_config.h"
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 #include "video/color.h"

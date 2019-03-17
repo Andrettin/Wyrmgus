@@ -48,7 +48,6 @@
 #include "editor/editor.h" //for personal name generation
 //Wyrmgus end
 #include "faction.h"
-#include "icon.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -65,6 +64,7 @@
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
+#include "ui/icon.h"
 #include "ui/ui.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/dependency.h"

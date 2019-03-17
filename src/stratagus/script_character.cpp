@@ -39,7 +39,6 @@
 #include "civilization.h"
 #include "faction.h"
 #include "grand_strategy.h"
-#include "icon.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "map/site.h"
@@ -49,6 +48,7 @@
 #include "script.h"
 #include "spell/spells.h"
 #include "time/timeline.h"
+#include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 

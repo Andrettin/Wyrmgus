@@ -34,11 +34,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "icon_config.h"
 //Wyrmgus start
 #include "item.h"
 #include "time/date.h"
 //Wyrmgus end
+#include "ui/icon_config.h"
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 //Wyrmgus start

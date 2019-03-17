@@ -201,10 +201,10 @@ extern void beos_init(int argc, char **argv);
 #include "translate.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "ui/widgets.h"
 #include "unit/unit_manager.h"
 #include "include/version.h"
 #include "video/video.h"
-#include "widgets.h"
 #include "util.h"
 
 #include "missile.h" //for FreeBurningBuildingFrames

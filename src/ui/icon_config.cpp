@@ -33,10 +33,10 @@
 
 #include "stratagus.h"
 
-#include "icon_config.h"
+#include "ui/icon_config.h"
 
-#include "icon.h"
 #include "translate.h"
+#include "ui/icon.h"
 #include "ui/ui.h"
 
 /*----------------------------------------------------------------------------

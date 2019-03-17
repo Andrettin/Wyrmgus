@@ -35,9 +35,9 @@
 
 #include "item.h"
 
-#include "icon.h"
 #include "script.h"
 #include "spell/spells.h"
+#include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 

@@ -50,7 +50,6 @@
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "hair_color.h"
-#include "icon.h"
 #include "item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -86,6 +85,7 @@
 #include "time/timeline.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
+#include "ui/icon.h"
 #include "ui/ui.h"
 #include "unit/historical_unit.h"
 #include "unit/unit.h"

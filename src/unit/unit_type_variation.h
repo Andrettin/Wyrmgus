@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "icon_config.h"
+#include "ui/icon_config.h"
 #include "unit/unit_type.h" //for the image layers enum
 #include "upgrade/upgrade_structs.h" //for the costs enum
 

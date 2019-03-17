@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "icon_config.h"
 #include "sound/unit_sound.h"
+#include "ui/icon_config.h"
 
 #include <string>
 #include <vector>

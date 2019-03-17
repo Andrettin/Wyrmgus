@@ -35,13 +35,11 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
-#include "icon_config.h"
 #include "item.h"
 #include "time/date.h"
+#include "ui/icon_config.h"
 
 #include <tuple>
-#include <map>
-#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations

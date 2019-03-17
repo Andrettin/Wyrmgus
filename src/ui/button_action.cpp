@@ -40,10 +40,10 @@
 #include "game/trigger.h"
 #include "ui/button_level.h"
 #include "ui/interface.h"
+#include "ui/widgets.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "video/video.h"
-#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

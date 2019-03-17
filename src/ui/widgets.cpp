@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "widgets.h"
+#include "ui/widgets.h"
 
 #include "editor/editor.h"
 //Wyrmgus start

@@ -55,7 +55,6 @@
 //Wyrmgus end
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
-#include "icon.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -71,6 +70,7 @@
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
+#include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/popup.h"
 #include "unit/unit.h"

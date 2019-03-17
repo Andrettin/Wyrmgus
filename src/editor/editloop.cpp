@@ -42,7 +42,6 @@
 #include "game/game.h"
 #include "game/replay.h"
 #include "guichan.h"
-#include "icon.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"
@@ -60,14 +59,15 @@
 #include "sound/sound_server.h"
 #include "translate.h"
 #include "ui/button_action.h"
+#include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "ui/widgets.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "widgets.h"
 
 
 extern void DoScrollArea(int state, bool fast, bool isKeyboard);

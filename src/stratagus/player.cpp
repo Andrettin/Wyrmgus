@@ -52,7 +52,6 @@
 #include "faction.h"
 #include "game/game.h"
 //Wyrmgus end
-#include "icon.h"
 //Wyrmgus start
 #include "iocompat.h"
 //Wyrmgus end
@@ -81,6 +80,7 @@
 #include "time/time_of_day.h"
 #include "translate.h"
 #include "ui/button_action.h"
+#include "ui/icon.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 //Wyrmgus start

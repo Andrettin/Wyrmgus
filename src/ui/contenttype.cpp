@@ -37,8 +37,8 @@
 
 #include "action/actions.h"
 #include "action/action_built.h"
-#include "icon.h"
 #include "translate.h"
+#include "ui/icon.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "video/font.h"

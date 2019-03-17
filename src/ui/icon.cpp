@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "icon.h"
+#include "ui/icon.h"
 
 #include "config.h"
 #include "menus.h"

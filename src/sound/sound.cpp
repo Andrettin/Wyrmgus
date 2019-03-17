@@ -47,9 +47,9 @@
 #include "missile.h"
 #include "sound/sound_server.h"
 #include "ui/ui.h"
+#include "ui/widgets.h"
 #include "unit/unit.h"
 #include "video/video.h"
-#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -88,11 +88,11 @@
 #include "translate.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
+#include "ui/widgets.h"
 #include "unit/unit.h"
 #include "include/version.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

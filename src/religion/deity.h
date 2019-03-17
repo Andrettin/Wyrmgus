@@ -35,11 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
-#include "icon_config.h"
-
-#include <map>
-#include <string>
-#include <vector>
+#include "ui/icon_config.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

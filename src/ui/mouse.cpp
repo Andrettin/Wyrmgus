@@ -49,7 +49,6 @@
 #include "character.h"
 //Wyrmgus end
 #include "commands.h"
-#include "icon.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -69,7 +68,9 @@
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
+#include "ui/icon.h"
 #include "ui/interface.h"
+#include "ui/widgets.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
@@ -77,7 +78,6 @@
 #include "video/cursor.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "widgets.h"
 #include "world.h"
 
 /*----------------------------------------------------------------------------

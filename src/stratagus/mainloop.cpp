@@ -47,7 +47,6 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "icon.h"
 //Wyrmgus start
 #include "luacallback.h"
 //Wyrmgus end
@@ -70,6 +69,7 @@
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
+#include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

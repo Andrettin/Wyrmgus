@@ -37,7 +37,7 @@
 /**
 **  @class IconConfig icon_config.h
 **
-**  \#include "icon_config.h"
+**  \#include "ui/icon_config.h"
 **
 **  This structure contains all configuration information about an icon.
 **

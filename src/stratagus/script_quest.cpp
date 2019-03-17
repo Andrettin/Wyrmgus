@@ -40,7 +40,6 @@
 #include "character.h"
 #include "civilization.h"
 #include "dialogue.h"
-#include "icon.h"
 #include "faction.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -49,6 +48,7 @@
 #include "player.h"
 #include "player_color.h"
 #include "script.h"
+#include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 

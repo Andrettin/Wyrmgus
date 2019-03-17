@@ -38,11 +38,11 @@
 #include "animation/animation.h"
 #include "config.h"
 #include "construct.h"
-#include "icon.h"
 #include "map/terrain_type.h"
 #include "mod.h"
 #include "time/season.h"
 #include "ui/button_action.h"
+#include "ui/icon.h"
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------

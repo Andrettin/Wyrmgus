@@ -54,7 +54,6 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-#include "icon.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"
@@ -86,6 +85,7 @@
 #include "time/calendar.h"
 #include "translate.h"
 #include "ui/button_action.h"
+#include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
