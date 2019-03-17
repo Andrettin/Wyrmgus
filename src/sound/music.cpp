@@ -33,14 +33,14 @@
 
 #include "stratagus.h"
 
-#include "SDL.h"
-
-#include "sound_server.h"
-#include "script.h"
 #include "iolib.h"
+#include "script.h"
+#include "sound/sound_server.h"
 #include "wyrmgus.h"
 
 #include <oamlGodotModule/oamlGodotModule.h>
+
+#include "SDL.h"
 
 /*----------------------------------------------------------------------------
 -- Declaration

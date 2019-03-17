@@ -33,12 +33,12 @@
 
 #include "stratagus.h"
 
+#include "sound/sound.h"
+#include "sound/sound_server.h"
+#include "util.h"
+
 #include <string>
 #include <map>
-
-#include "sound.h"
-#include "sound_server.h"
-#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

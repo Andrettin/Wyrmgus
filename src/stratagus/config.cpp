@@ -55,7 +55,7 @@
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
 #include "skin_color.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "species/species.h"
 #include "species/species_category.h"
 #include "species/species_category_rank.h"

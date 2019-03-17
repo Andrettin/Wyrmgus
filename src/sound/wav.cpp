@@ -33,12 +33,12 @@
 
 #include "stratagus.h"
 
+#include "iolib.h"
+#include "sound/sound_server.h"
+#include "sound/wav.h"
+
 #include "SDL.h"
 #include "SDL_endian.h"
-
-#include "iolib.h"
-#include "sound_server.h"
-#include "wav.h"
 
 /*----------------------------------------------------------------------------
 --  Declaration

@@ -36,7 +36,7 @@
 #include "animation/animation_sound.h"
 
 #include "map/map.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "unit/unit.h"
 
 /* virtual */ void CAnimation_Sound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const

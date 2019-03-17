@@ -53,7 +53,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "spell/spells.h"
 #include "translate.h"
 #include "ui/ui.h"

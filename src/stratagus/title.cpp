@@ -31,7 +31,7 @@
 #include "title.h"
 #include "video.h"
 #include "font.h"
-#include "sound_server.h"
+#include "sound/sound_server.h"
 #include "editor.h"
 
 

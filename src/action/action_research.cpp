@@ -40,7 +40,7 @@
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "script.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "player.h"
 #include "translate.h"
 #include "unit/unit.h"

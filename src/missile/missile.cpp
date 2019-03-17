@@ -53,7 +53,7 @@
 //Wyrmgus start
 #include "settings.h"
 //Wyrmgus end
-#include "sound.h"
+#include "sound/sound.h"
 #include "spell/spells.h"
 #include "trigger.h"
 #include "ui/ui.h"

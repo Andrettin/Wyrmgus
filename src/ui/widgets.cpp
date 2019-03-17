@@ -43,7 +43,7 @@
 #include "network/network.h"
 #include "network/netconnect.h"
 #include "editor.h"
-#include "sound.h"
+#include "sound/sound.h"
 //Wyrmgus start
 #include "player.h"
 //Wyrmgus end

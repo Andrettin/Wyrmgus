@@ -58,7 +58,7 @@
 #include "mod.h"
 #include "player.h"
 #include "script.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "species/species.h"
 #include "spell/spells.h"
 #include "translate.h"

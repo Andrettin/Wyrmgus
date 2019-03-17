@@ -39,7 +39,7 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
-#include "sound_server.h"
+#include "sound/sound_server.h"
 #include "time/season.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day.h"

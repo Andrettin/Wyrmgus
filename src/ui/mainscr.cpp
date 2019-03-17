@@ -55,7 +55,7 @@
 #include "province.h"
 #include "quest.h"
 //Wyrmgus end
-#include "sound.h"
+#include "sound/sound.h"
 #include "spell/spells.h"
 #include "time/calendar.h"
 #include "time/season.h"

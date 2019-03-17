@@ -62,7 +62,7 @@
 #include "quest.h" //for updating levels
 //Wyrmgus end
 #include "script.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "species/species.h"
 #include "species/species_category.h"
 #include "spell/spells.h"

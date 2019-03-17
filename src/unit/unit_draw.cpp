@@ -52,7 +52,7 @@
 #include "map/tileset.h"
 #include "player.h"
 #include "script.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "translate.h"
 #include "ui/interface.h"
 #include "ui/ui.h"

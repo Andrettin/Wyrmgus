@@ -43,7 +43,7 @@
 #include "iolib.h"
 #include "map/map_layer.h"
 #include "player.h"
-#include "sound.h"
+#include "sound/sound.h"
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

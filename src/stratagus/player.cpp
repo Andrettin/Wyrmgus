@@ -76,7 +76,7 @@
 #include "religion/religion.h"
 #include "settings.h"
 //Wyrmgus end
-#include "sound.h"
+#include "sound/sound.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
