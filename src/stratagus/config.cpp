@@ -44,6 +44,8 @@
 #include "hair_color.h"
 #include "iocompat.h"
 #include "iolib.h"
+#include "language/language.h"
+#include "language/word.h"
 #include "map/map_template.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
@@ -326,6 +328,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				icon->ProcessConfigData(config_data);
 			}
+		} else if (config_data->Tag == "language") {
+			CLanguage *language = CLanguage::GetOrAdd(ident);
+			if (!define_only) {
+				language->ProcessConfigData(config_data);
+			}
 		} else if (config_data->Tag == "map_template") {
 			CMapTemplate *map_template = CMapTemplate::GetOrAdd(ident);
 			if (!define_only) {
@@ -440,6 +447,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CUpgrade *upgrade = CUpgrade::New(ident);
 			if (!define_only) {
 				upgrade->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "word") {
+			CWord *word = CWord::GetOrAdd(ident);
+			if (!define_only) {
+				word->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "world") {
 			CWorld *world = CWorld::GetOrAddWorld(ident);

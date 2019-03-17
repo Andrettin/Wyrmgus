@@ -59,6 +59,7 @@
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
+#include "language/language.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -3306,7 +3307,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	
 	if (!this->Type->IsPersonalNameValid(this->Name, faction, this->Variable[GENDER_INDEX].Value)) {
 		// first see if can translate the current personal name
-		std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
+		std::string new_personal_name = language != nullptr ? language->TranslateName(this->Name) : this->Name;
 		if (!new_personal_name.empty()) {
 			this->Name = new_personal_name;
 		} else {

@@ -57,6 +57,9 @@
 #include "iolib.h"
 //Wyrmgus start
 #include "grand_strategy.h"
+//Wyrmgus end
+#include "language/word.h"
+//Wyrmgus start
 #include "luacallback.h"
 //Wyrmgus end
 #include "map/map.h"
@@ -384,9 +387,6 @@ int PlayerColorIndexCount;
 
 //Wyrmgus start
 std::map<std::string, int> DynastyStringToIndex;
-std::map<std::string, CLanguage *> LanguageIdentToPointer;
-
-bool LanguageCacheOutdated = false;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -398,21 +398,6 @@ bool LanguageCacheOutdated = false;
 */
 void PlayerRace::Clean()
 {
-	//Wyrmgus start
-	for (CLanguage *language : this->Languages) {
-		for (LanguageWord *language_word : language->LanguageWords) {
-			for (CLanguage *dialect : language->Dialects) { //remove word from dialects, so that they don't try to delete it too
-				dialect->RemoveWord(language_word);
-			}
-			
-			delete language_word;
-		}
-		language->LanguageWords.clear();
-		
-		language->NameTranslations.clear();
-	}
-	//Wyrmgus end
-
 	//Wyrmgus start
 	for (CDynasty *dynasty : this->Dynasties) {
 		delete dynasty;
@@ -433,76 +418,6 @@ CDynasty *PlayerRace::GetDynasty(const std::string &dynasty_ident) const
 	} else {
 		return nullptr;
 	}
-}
-
-CLanguage *PlayerRace::GetLanguage(const std::string &language_ident) const
-{
-	if (LanguageIdentToPointer.find(language_ident) != LanguageIdentToPointer.end()) {
-		return LanguageIdentToPointer[language_ident];
-	}
-	return nullptr;
-}
-
-/**
-**  "Translate" (that is, adapt) a proper name from one culture (civilization) to another.
-*/
-std::string PlayerRace::TranslateName(const std::string &name, CLanguage *language)
-{
-	std::string new_name;
-	
-	if (!language || name.empty()) {
-		return new_name;
-	}
-
-	// try to translate the entire name, as a particular translation for it may exist
-	if (language->NameTranslations.find(name) != language->NameTranslations.end()) {
-		return language->NameTranslations[name][SyncRand(language->NameTranslations[name].size())];
-	}
-	
-	//if adapting the entire name failed, try to match prefixes and suffixes
-	if (name.size() > 1) {
-		if (name.find(" ") == std::string::npos) {
-			for (size_t i = 0; i < name.size(); ++i) {
-				std::string name_prefix = name.substr(0, i + 1);
-				std::string name_suffix = CapitalizeString(name.substr(i + 1, name.size() - (i + 1)));
-			
-	//			fprintf(stdout, "Trying to match prefix \"%s\" and suffix \"%s\" for translating name \"%s\" to the \"%s\" language.\n", name_prefix.c_str(), name_suffix.c_str(), name.c_str(), language->Ident.c_str());
-			
-				if (language->NameTranslations.find(name_prefix) != language->NameTranslations.end() && language->NameTranslations.find(name_suffix) != language->NameTranslations.end()) { // if both a prefix and suffix have been matched
-					name_prefix = language->NameTranslations[name_prefix][SyncRand(language->NameTranslations[name_prefix].size())];
-					name_suffix = language->NameTranslations[name_suffix][SyncRand(language->NameTranslations[name_suffix].size())];
-					name_suffix = DecapitalizeString(name_suffix);
-					if (name_prefix.substr(name_prefix.size() - 2, 2) == "gs" && name_suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
-						name_prefix = FindAndReplaceStringEnding(name_prefix, "gs", "g");
-					}
-					if (name_prefix.substr(name_prefix.size() - 1, 1) == "s" && name_suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
-						name_prefix = FindAndReplaceStringEnding(name_prefix, "s", "");
-					}
-
-					return name_prefix + name_suffix;
-				}
-			}
-		} else { // if the name contains a space, try to translate each of its elements separately
-			size_t previous_pos = 0;
-			new_name = name;
-			for (size_t i = 0; i < name.size(); ++i) {
-				if ((i + 1) == name.size() || name[i + 1] == ' ') {
-					std::string name_element = TranslateName(name.substr(previous_pos, i + 1 - previous_pos), language);
-				
-					if (name_element.empty()) {
-						new_name = "";
-						break;
-					}
-				
-					new_name = FindAndReplaceString(new_name, name.substr(previous_pos, i + 1 - previous_pos), name_element);
-				
-					previous_pos = i + 2;
-				}
-			}
-		}
-	}
-	
-	return new_name;
 }
 
 CDynasty::~CDynasty()
@@ -4797,158 +4712,6 @@ int GetWordJunctionTypeIdByName(const std::string &word_junction_type)
 	}
 
 	return -1;
-}
-
-LanguageWord *CLanguage::GetWord(const std::string word, int word_type, std::vector<std::string>& word_meanings) const
-{
-	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
-		if (
-			this->LanguageWords[i]->Word == word
-			&& (word_type == -1 || this->LanguageWords[i]->Type == word_type)
-			&& (word_meanings.size() == 0 || this->LanguageWords[i]->Meanings == word_meanings)
-		) {
-			return this->LanguageWords[i];
-		}
-	}
-
-	return nullptr;
-}
-
-std::string CLanguage::GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number)
-{
-	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
-		if (this->LanguageWords[i]->Type != WordTypeArticle || this->LanguageWords[i]->ArticleType != article_type) {
-			continue;
-		}
-		
-		if (grammatical_number != -1 && this->LanguageWords[i]->GrammaticalNumber != -1 && this->LanguageWords[i]->GrammaticalNumber != grammatical_number) {
-			continue;
-		}
-		
-		if (gender == -1 || this->LanguageWords[i]->Gender == -1 || gender == this->LanguageWords[i]->Gender) {
-			if (grammatical_case == GrammaticalCaseNominative && !this->LanguageWords[i]->Nominative.empty()) {
-				return this->LanguageWords[i]->Nominative;
-			} else if (grammatical_case == GrammaticalCaseAccusative && !this->LanguageWords[i]->Accusative.empty()) {
-				return this->LanguageWords[i]->Accusative;
-			} else if (grammatical_case == GrammaticalCaseDative && !this->LanguageWords[i]->Dative.empty()) {
-				return this->LanguageWords[i]->Dative;
-			} else if (grammatical_case == GrammaticalCaseGenitive && !this->LanguageWords[i]->Genitive.empty()) {
-				return this->LanguageWords[i]->Genitive;
-			}
-		}
-	}
-	return "";
-}
-
-std::string CLanguage::GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type)
-{
-	if (word_junction_type == -1) {
-		word_junction_type = WordJunctionTypeNoWordJunction;
-	}
-	
-	if (!this->NounEndings[grammatical_number][grammatical_case][word_junction_type].empty()) {
-		return this->NounEndings[grammatical_number][grammatical_case][word_junction_type];
-	} else if (!this->NounEndings[grammatical_number][grammatical_case][WordJunctionTypeNoWordJunction].empty()) {
-		return this->NounEndings[grammatical_number][grammatical_case][WordJunctionTypeNoWordJunction];
-	}
-	
-	return "";
-}
-
-std::string CLanguage::GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender)
-{
-	if (grammatical_number == -1) {
-		grammatical_number = GrammaticalNumberNoNumber;
-	}
-	
-	if (grammatical_gender == -1) {
-		grammatical_gender = GrammaticalGenderNoGender;
-	}
-	
-	if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender];
-	} else if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender];
-	} else if (!this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender];
-	}
-	
-	return "";
-}
-
-void CLanguage::RemoveWord(LanguageWord *word)
-{
-	if (std::find(this->LanguageWords.begin(), this->LanguageWords.end(), word) != this->LanguageWords.end()) {
-		this->LanguageWords.erase(std::remove(this->LanguageWords.begin(), this->LanguageWords.end(), word), this->LanguageWords.end());
-	}
-}
-
-bool LanguageWord::HasMeaning(const std::string &meaning)
-{
-	return std::find(this->Meanings.begin(), this->Meanings.end(), meaning) != this->Meanings.end();
-}
-
-std::string LanguageWord::GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type)
-{
-	if (this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case)) != this->NumberCaseInflections.end()) {
-		return this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case))->second;
-	}
-	
-	return this->Word + this->Language->GetNounEnding(grammatical_number, grammatical_case, word_junction_type);
-}
-
-std::string LanguageWord::GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood)
-{
-	if (this->NumberPersonTenseMoodInflections.find(std::tuple<int, int, int, int>(grammatical_number, grammatical_person, grammatical_tense, grammatical_mood)) != this->NumberPersonTenseMoodInflections.end()) {
-		return this->NumberPersonTenseMoodInflections.find(std::tuple<int, int, int, int>(grammatical_number, grammatical_person, grammatical_tense, grammatical_mood))->second;
-	}
-
-	return this->Word;
-}
-
-std::string LanguageWord::GetAdjectiveInflection(int comparison_degree, int article_type, int grammatical_case, int grammatical_number, int grammatical_gender)
-{
-	std::string inflected_word;
-	
-	if (grammatical_case == -1) {
-		grammatical_case = GrammaticalCaseNoCase;
-	}
-	
-	if (!this->ComparisonDegreeCaseInflections[comparison_degree][grammatical_case].empty()) {
-		inflected_word = this->ComparisonDegreeCaseInflections[comparison_degree][grammatical_case];
-	} else if (!this->ComparisonDegreeCaseInflections[comparison_degree][GrammaticalCaseNoCase].empty()) {
-		inflected_word = this->ComparisonDegreeCaseInflections[comparison_degree][GrammaticalCaseNoCase];
-	} else {
-		inflected_word = this->Word;
-	}
-	
-	if (article_type != -1 && grammatical_case != GrammaticalCaseNoCase && this->ComparisonDegreeCaseInflections[comparison_degree][grammatical_case].empty()) {
-		inflected_word += this->Language->GetAdjectiveEnding(article_type, grammatical_case, grammatical_number, grammatical_gender);
-	}
-	
-	return inflected_word;
-}
-
-std::string LanguageWord::GetParticiple(int grammatical_tense)
-{
-	if (!this->Participles[grammatical_tense].empty()) {
-		return this->Participles[grammatical_tense];
-	}
-	
-	return this->Word;
-}
-
-void LanguageWord::RemoveFromVector(std::vector<LanguageWord *>& word_vector)
-{
-	std::vector<LanguageWord *> word_vector_copy = word_vector;
-	
-	if (std::find(word_vector.begin(), word_vector.end(), this) != word_vector.end()) {
-		word_vector.erase(std::remove(word_vector.begin(), word_vector.end(), this), word_vector.end());
-	}
-	
-	if (word_vector.size() == 0) { // if removing the word from the vector left it empty, undo the removal
-		word_vector = word_vector_copy;
-	}
 }
 
 bool IsNameValidForWord(const std::string &word_name)

@@ -48,6 +48,7 @@
 //Wyrmgus end
 #include "hair_color.h"
 #include "item.h"
+#include "language/language.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
@@ -142,6 +143,7 @@ void CleanModules()
 	//Wyrmgus end
 	CFaction::Clear();
 	CHistoricalUnit::Clear();
+	CLanguage::Clear();
 	CMapTemplate::Clear();
 	CleanMissiles();
 	CPantheon::Clear();
@@ -163,6 +165,7 @@ void CleanModules()
 	CTimeline::Clear();
 	CleanUnits();
 	CleanUnitTypes();
+	CWord::Clear();
 	CWorld::ClearWorlds();
 	CleanPlayers();
 	CleanSelections();
