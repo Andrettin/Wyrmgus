@@ -57,11 +57,7 @@
 #include "menus.h"
 #include "missile/missile.h"
 #include "network/network.h"
-#include "include/plane.h"
 #include "player.h"
-//Wyrmgus start
-#include "province.h"
-//Wyrmgus end
 #include "sound/sound.h"
 #include "sound/unit_sound.h"
 #include "spell/spells.h"
@@ -78,7 +74,11 @@
 #include "video/cursor.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/plane.h"
+//Wyrmgus start
+#include "world/province.h"
+//Wyrmgus end
+#include "world/world.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

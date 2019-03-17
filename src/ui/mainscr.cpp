@@ -48,10 +48,8 @@
 #include "map/map_layer.h"
 #include "menus.h"
 #include "network/network.h"
-#include "include/plane.h"
 #include "player.h"
 //Wyrmgus start
-#include "province.h"
 #include "quest/quest.h"
 //Wyrmgus end
 #include "sound/sound.h"
@@ -77,7 +75,11 @@
 #include "include/version.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/plane.h"
+//Wyrmgus start
+#include "world/province.h"
+//Wyrmgus end
+#include "world/world.h"
 
 #include <sstream>
 

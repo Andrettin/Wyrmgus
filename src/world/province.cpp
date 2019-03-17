@@ -33,15 +33,13 @@
 
 #include "stratagus.h"
 
-#include "province.h"
+#include "world/province.h"
+
+#include "map/tileset.h" // for the terrain features, which are cleaned here
 
 #include <ctype.h>
-
 #include <string>
 #include <map>
-
-#include "map/map.h" // for the sites, which are cleaned here
-#include "map/tileset.h" // for the terrain types, which are cleaned here
 
 /*----------------------------------------------------------------------------
 --  Variables

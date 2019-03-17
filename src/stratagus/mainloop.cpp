@@ -54,7 +54,6 @@
 #include "map/tileset.h" //for tile animation
 #include "missile/missile.h"
 #include "network/network.h"
-#include "include/plane.h"
 #include "quest/campaign.h"
 #include "quest/dialogue.h"
 //Wyrmgus start
@@ -81,7 +80,8 @@
 #include "video/font.h"
 //Wyrmgus end
 #include "video/video.h"
-#include "world.h"
+#include "world/plane.h"
+#include "world/world.h"
 #include "wyrmgus.h"
 
 #include <guichan.h>

@@ -40,10 +40,10 @@
 #include "faction.h"
 #include "map/map.h"
 #include "player.h"
-#include "province.h"
 #include "vec2i.h"
 #include "video/video.h"
 #include "upgrade/upgrade_structs.h"
+#include "world/province.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

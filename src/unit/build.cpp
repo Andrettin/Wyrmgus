@@ -46,7 +46,7 @@
 #include "quest/quest.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
-#include "world.h"
+#include "world/world.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

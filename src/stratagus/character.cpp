@@ -47,7 +47,6 @@
 #include "map/map_template.h"
 #include "parameters.h"
 #include "player.h"
-#include "province.h"
 #include "quest/quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
@@ -58,6 +57,7 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+#include "world/province.h"
 
 #include <ctype.h>
 #include <map>

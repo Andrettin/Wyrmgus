@@ -68,9 +68,6 @@
 #include "pathfinder/pathfinder.h"
 #include "player.h"
 #include "player_color.h"
-//Wyrmgus start
-#include "province.h"
-//Wyrmgus end
 #include "quest/campaign.h"
 //Wyrmgus start
 #include "quest/quest.h"
@@ -101,6 +98,9 @@
 #include "include/version.h"
 #include "video/font.h"
 #include "video/video.h"
+//Wyrmgus start
+#include "world/province.h"
+//Wyrmgus end
 
 #include <png.h>
 

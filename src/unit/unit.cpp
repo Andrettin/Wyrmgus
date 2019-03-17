@@ -67,7 +67,6 @@
 #include "missile/missile.h"
 #include "network/network.h"
 #include "pathfinder/pathfinder.h"
-#include "include/plane.h"
 #include "player.h"
 #include "quest/achievement.h"
 //Wyrmgus start
@@ -95,9 +94,9 @@
 #include "util.h"
 //Wyrmgus end
 #include "video/video.h"
+#include "world/plane.h"
 
 #include <math.h>
-
 
 /*----------------------------------------------------------------------------
 -- Documentation

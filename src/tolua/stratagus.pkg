@@ -19,7 +19,6 @@ $#include "mod.h"
 $#include "network/netconnect.h"
 $#include "player.h"
 //Wyrmgus start
-$#include "province.h"
 $#include "quest/achievement.h"
 $#include "quest/dialogue.h"
 $#include "quest/quest.h"
@@ -39,6 +38,7 @@ $#include "util.h"
 //Wyrmgus end
 $#include "video/font.h"
 $#include "video/video.h"
+$#include "world/province.h"
 
 $#ifdef _MSC_VER
 $#pragma warning(disable:4800)

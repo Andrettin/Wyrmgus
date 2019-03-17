@@ -49,10 +49,6 @@
 #include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
-//Wyrmgus start
-#include "include/plane.h"
-#include "province.h"
-//Wyrmgus end
 #include "quest/campaign.h"
 //Wyrmgus start
 #include "quest/quest.h"
@@ -69,7 +65,11 @@
 #include "unit/unit.h"
 #include "include/version.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/plane.h"
+//Wyrmgus start
+#include "world/province.h"
+//Wyrmgus end
+#include "world/world.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

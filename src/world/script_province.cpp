@@ -33,13 +33,12 @@
 
 #include "stratagus.h"
 
-#include "province.h"
+#include "world/province.h"
 
 #include "civilization.h"
 #include "faction.h"
 #include "iolib.h"
 #include "map/tileset.h"
-#include "include/plane.h"
 #include "religion/deity_domain.h"
 #include "script.h"
 #include "species/species.h"
@@ -48,7 +47,8 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/plane.h"
+#include "world/world.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

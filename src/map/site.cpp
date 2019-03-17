@@ -39,8 +39,8 @@
 #include "config.h"
 #include "faction.h"
 #include "map/map_template.h"
-#include "province.h" //for regions
 #include "unit/unit_type.h"
+#include "world/province.h" //for regions
 
 /*----------------------------------------------------------------------------
 --  Functions

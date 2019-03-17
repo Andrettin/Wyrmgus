@@ -54,7 +54,7 @@
 #include "unit/unit.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/world.h"
 
 #include <stdarg.h>
 

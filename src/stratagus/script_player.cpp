@@ -57,9 +57,7 @@
 //Wyrmgus end
 #include "map/map.h"
 #include "map/site.h"
-#include "include/plane.h"
 #include "player_color.h"
-#include "province.h"
 #include "quest/quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
@@ -82,6 +80,8 @@
 #include "video/font.h"
 //Wyrmgus end
 #include "video/video.h"
+#include "world/plane.h"
+#include "world/province.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

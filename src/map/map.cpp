@@ -46,10 +46,8 @@
 #include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
-#include "include/plane.h"
 #include "player.h"
 //Wyrmgus start
-#include "province.h"
 #include "quest/quest.h"
 #include "settings.h"
 #include "sound/sound_server.h"
@@ -74,7 +72,11 @@
 //Wyrmgus end
 #include "include/version.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/plane.h"
+//Wyrmgus start
+#include "world/province.h"
+//Wyrmgus end
+#include "world/world.h"
 #include "wyrmgus.h"
 
 #include <oamlGodotModule/oamlGodotModule.h>

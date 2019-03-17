@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name plane.cpp - The plane source file. */
+/**@name world.cpp - The world source file. */
 //
 //      (c) Copyright 2016-2019 by Andrettin
 //
@@ -33,83 +33,89 @@
 
 #include "stratagus.h"
 
-#include "include/plane.h"
+#include "world/world.h"
 
 #include "config.h"
-#include "religion/deity_domain.h"
-#include "school_of_magic.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
+#include "world/plane.h"
+#include "world/province.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CPlane *> CPlane::Planes;
-std::map<std::string, CPlane *> CPlane::PlanesByIdent;
+std::vector<CWorld *> CWorld::Worlds;
+std::map<std::string, CWorld *> CWorld::WorldsByIdent;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a plane
+**	@brief	Get a world
 **
-**	@param	ident			The plane's string identifier
-**	@param	should_find		Whether it is an error if the plane could not be found; this is true by default
+**	@param	ident			The world's string identifier
+**	@param	should_find		Whether it is an error if the world could not be found; this is true by default
 **
-**	@return	The plane if found, or null otherwise
+**	@return	The world if found, or null otherwise
 */
-CPlane *CPlane::GetPlane(const std::string &ident, const bool should_find)
+CWorld *CWorld::GetWorld(const std::string &ident, const bool should_find)
 {
-	std::map<std::string, CPlane *>::const_iterator find_iterator = PlanesByIdent.find(ident);
+	std::map<std::string, CWorld *>::const_iterator find_iterator = WorldsByIdent.find(ident);
 	
-	if (find_iterator != PlanesByIdent.end()) {
+	if (find_iterator != WorldsByIdent.end()) {
 		return find_iterator->second;
 	}
 	
 	if (should_find) {
-		fprintf(stderr, "Invalid plane: \"%s\".\n", ident.c_str());
+		fprintf(stderr, "Invalid world: \"%s\".\n", ident.c_str());
 	}
 	
 	return nullptr;
 }
 
 /**
-**	@brief	Get or add a plane
+**	@brief	Get or add a world
 **
-**	@param	ident	The plane's string identifier
+**	@param	ident	The world's string identifier
 **
-**	@return	The plane if found, or a newly-created one otherwise
+**	@return	The world if found, or a newly-created one otherwise
 */
-CPlane *CPlane::GetOrAddPlane(const std::string &ident)
+CWorld *CWorld::GetOrAddWorld(const std::string &ident)
 {
-	CPlane *plane = GetPlane(ident, false);
+	CWorld *world = GetWorld(ident, false);
 	
-	if (!plane) {
-		plane = new CPlane;
-		plane->Ident = ident;
-		plane->ID = Planes.size();
-		Planes.push_back(plane);
-		PlanesByIdent[ident] = plane;
-		UI.PlaneButtons.resize(Planes.size());
-		UI.PlaneButtons[plane->ID].X = -1;
-		UI.PlaneButtons[plane->ID].Y = -1;
+	if (!world) {
+		world = new CWorld;
+		world->Ident = ident;
+		world->ID = Worlds.size();
+		Worlds.push_back(world);
+		WorldsByIdent[ident] = world;
+		UI.WorldButtons.resize(Worlds.size());
+		UI.WorldButtons[world->ID].X = -1;
+		UI.WorldButtons[world->ID].Y = -1;
 	}
 	
-	return plane;
+	return world;
 }
 
 /**
-**	@brief	Remove the existing planes
+**	@brief	Remove the existing worlds
 */
-void CPlane::ClearPlanes()
+void CWorld::ClearWorlds()
 {
-	for (size_t i = 0; i < Planes.size(); ++i) {
-		delete Planes[i];
+	for (size_t i = 0; i < Worlds.size(); ++i) {
+		for (size_t j = 0; j < Worlds[i]->Provinces.size(); ++j) {
+			delete Worlds[i]->Provinces[j];
+		}
+		Worlds[i]->Provinces.clear();
+		
+		delete Worlds[i];
 	}
-	Planes.clear();
+	Worlds.clear();
+	WorldsByIdent.clear();
 }
 
 /**
@@ -117,7 +123,7 @@ void CPlane::ClearPlanes()
 **
 **	@param	config_data	The configuration data
 */
-void CPlane::ProcessConfigData(const CConfigData *config_data)
+void CWorld::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
@@ -131,26 +137,17 @@ void CPlane::ProcessConfigData(const CConfigData *config_data)
 			this->Background = value;
 		} else if (key == "quote") {
 			this->Quote = value;
+		} else if (key == "plane") {
+			value = FindAndReplaceString(value, "_", "-");
+			this->Plane = CPlane::GetPlane(value);
 		} else if (key == "time_of_day_schedule") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->TimeOfDaySchedule = CTimeOfDaySchedule::Get(value);
 		} else if (key == "season_schedule") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->SeasonSchedule = CSeasonSchedule::Get(value);
-		} else if (key == "empowered_deity_domain") {
-			value = FindAndReplaceString(value, "_", "-");
-			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
-			if (deity_domain) {
-				this->EmpoweredDeityDomains.push_back(deity_domain);
-			}
-		} else if (key == "empowered_school_of_magic") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetSchoolOfMagic(value);
-			if (school_of_magic) {
-				this->EmpoweredSchoolsOfMagic.push_back(school_of_magic);
-			}
 		} else {
-			fprintf(stderr, "Invalid plane property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid world property: \"%s\".\n", key.c_str());
 		}
 	}
 }

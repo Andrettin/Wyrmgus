@@ -52,11 +52,7 @@
 //Wyrmgus start
 #include "network/network.h" //for updating levels
 //Wyrmgus end
-#include "include/plane.h"
 #include "player.h"
-//Wyrmgus start
-#include "province.h"
-//Wyrmgus end
 #include "quest/achievement.h"
 //Wyrmgus start
 #include "quest/quest.h" //for updating levels
@@ -80,7 +76,11 @@
 //Wyrmgus end
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/plane.h"
+//Wyrmgus start
+#include "world/province.h"
+//Wyrmgus end
+#include "world/world.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -40,15 +40,15 @@
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
-#include "include/plane.h"
 #include "player.h"
-#include "province.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/plane.h"
+#include "world/province.h"
+#include "world/world.h"
 
 #include <string.h>
 

@@ -42,7 +42,6 @@
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "map/site.h"
-#include "province.h"
 #include "quest/quest.h"
 #include "religion/deity.h"
 #include "script.h"
@@ -51,6 +50,7 @@
 #include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "world/province.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

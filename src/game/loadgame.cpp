@@ -57,7 +57,6 @@
 #include "map/tileset.h"
 #include "missile/missile.h"
 #include "pathfinder/pathfinder.h"
-#include "include/plane.h"
 #include "player_color.h"
 #include "quest/achievement.h"
 #include "quest/campaign.h"
@@ -95,7 +94,8 @@
 #include "upgrade/upgrade.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/plane.h"
+#include "world/world.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

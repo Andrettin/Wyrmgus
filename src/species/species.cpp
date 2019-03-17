@@ -36,11 +36,11 @@
 #include "species/species.h"
 
 #include "config.h"
-#include "include/plane.h"
 #include "map/terrain_type.h"
-#include "province.h" //for the era get function
 #include "species/species_category.h"
-#include "world.h"
+#include "world/plane.h"
+#include "world/province.h" //for the era get function
+#include "world/world.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

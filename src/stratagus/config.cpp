@@ -48,7 +48,6 @@
 #include "map/site.h"
 #include "map/terrain_type.h"
 #include "missile/missile.h"
-#include "include/plane.h"
 #include "player_color.h"
 #include "quest/campaign.h"
 #include "religion/deity.h"
@@ -73,7 +72,8 @@
 #include "unit/historical_unit.h"
 #include "unit/unit_type.h"
 #include "util.h"
-#include "world.h"
+#include "world/plane.h"
+#include "world/world.h"
 
 #include <boost/tokenizer.hpp>
 

@@ -94,7 +94,7 @@
 #include "upgrade/upgrade_modifier.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/world.h"
 #include "wyrmgus.h"
 
 #include <mutex>

@@ -49,7 +49,6 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
-#include "include/plane.h"
 #include "player.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"
@@ -63,7 +62,8 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "video/video.h"
-#include "world.h"
+#include "world/plane.h"
+#include "world/world.h"
 
 #include <fstream>
 
