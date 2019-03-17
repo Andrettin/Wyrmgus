@@ -34,7 +34,7 @@
 #include <guichan/gsdl.h>
 #include "luacallback.h"
 #include "video/font.h"
-
+#include "video/video.h"
 
 extern bool GuichanActive;
 
