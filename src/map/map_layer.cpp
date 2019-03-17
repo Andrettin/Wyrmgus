@@ -49,8 +49,6 @@
 #include "unit/unit_manager.h"
 #include "wyrmgus.h"
 
-#include <oamlGodotModule/oamlGodotModule.h>
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -324,13 +322,12 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 	CScheduledTimeOfDay *old_time_of_day = this->TimeOfDay;
 	this->TimeOfDay = time_of_day;
 	
-	if (Wyrmgus::GetInstance()->GetOamlModule() != nullptr && this == UI.CurrentMapLayer && this->GetTimeOfDay()) {
-		// the time of day can change our main music loop, if the current playing track is set for this
-		Wyrmgus::GetInstance()->GetOamlModule()->SetMainLoopCondition(this->GetTimeOfDay()->ID);
+	if (GameRunning && this == UI.CurrentMapLayer) {
+		Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", old_time_of_day ? old_time_of_day->TimeOfDay : nullptr, this->TimeOfDay ? this->TimeOfDay->TimeOfDay : nullptr);
 	}
 
-	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Day) != (old_time_of_day && old_time_of_day->TimeOfDay->Day);
-	const bool is_night_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Night) != (old_time_of_day && old_time_of_day->TimeOfDay->Night);
+	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->IsDay()) != (old_time_of_day && old_time_of_day->TimeOfDay->IsDay());
+	const bool is_night_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->IsNight()) != (old_time_of_day && old_time_of_day->TimeOfDay->IsNight());
 	
 	//update the sight of all units
 	if (is_day_changed || is_night_changed) {
@@ -358,7 +355,7 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 */
 CTimeOfDay *CMapLayer::GetTimeOfDay() const
 {
-	if (!this->TimeOfDay) {
+	if (this->TimeOfDay == nullptr) {
 		return nullptr;
 	}
 	

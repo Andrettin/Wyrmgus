@@ -163,4 +163,10 @@ void Wyrmgus::_bind_methods()
 	
 	ADD_SIGNAL(MethodInfo("this_player_changed", PropertyInfo(Variant::OBJECT, "old_player"), PropertyInfo(Variant::OBJECT, "new_player")));
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
+	
+	// this signal occurs when the time of day of the map layer being currently seen by the player has changed
+	ADD_SIGNAL(MethodInfo("time_of_day_changed", PropertyInfo(Variant::OBJECT, "old_time_of_day"), PropertyInfo(Variant::OBJECT, "new_time_of_day")));
+	
+	// this signal occurs when a unit owned by the player has been hit
+	ADD_SIGNAL(MethodInfo("unit_hit"));
 }

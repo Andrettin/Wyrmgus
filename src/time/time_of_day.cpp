@@ -40,71 +40,8 @@
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CTimeOfDay *> CTimeOfDay::TimesOfDay;
-std::map<std::string, CTimeOfDay *> CTimeOfDay::TimesOfDayByIdent;
-	
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a time of day
-**
-**	@param	ident		The time of day's string identifier
-**	@param	should_find	Whether it is an error if the time of day could not be found; this is true by default
-**
-**	@return	The time of day if found, or null otherwise
-*/
-CTimeOfDay *CTimeOfDay::GetTimeOfDay(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CTimeOfDay *>::const_iterator find_iterator = TimesOfDayByIdent.find(ident);
-	
-	if (find_iterator != TimesOfDayByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid time of day: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a time of day
-**
-**	@param	ident	The time of day's string identifier
-**
-**	@return	The time of day if found, or a newly-created one otherwise
-*/
-CTimeOfDay *CTimeOfDay::GetOrAddTimeOfDay(const std::string &ident)
-{
-	CTimeOfDay *time_of_day = GetTimeOfDay(ident, false);
-	
-	if (!time_of_day) {
-		time_of_day = new CTimeOfDay;
-		time_of_day->Ident = ident;
-		time_of_day->ID = TimesOfDay.size();
-		TimesOfDay.push_back(time_of_day);
-		TimesOfDayByIdent[ident] = time_of_day;
-	}
-	
-	return time_of_day;
-}
-
-/**
-**	@brief	Remove the existing times of day
-*/
-void CTimeOfDay::ClearTimesOfDay()
-{
-	for (size_t i = 0; i < TimesOfDay.size(); ++i) {
-		delete TimesOfDay[i];
-	}
-	TimesOfDay.clear();
-}
 
 /**
 **	@brief	Process data provided by a configuration file
@@ -178,12 +115,12 @@ void CTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 	}
 }
 
-/**
-**	@brief	Gets whether the time of day modifies the color of graphics
-**
-**	@return	Whether the time of day modifies the color of graphics
-*/
-bool CTimeOfDay::HasColorModification() const
+void CTimeOfDay::_bind_methods()
 {
-	return this->ColorModification.R != 0 || this->ColorModification.G != 0 || this->ColorModification.B != 0;
+	ClassDB::bind_method(D_METHOD("get_ident"), &CTimeOfDay::GetIdent);
+	ClassDB::bind_method(D_METHOD("get_name"), &CTimeOfDay::GetName);
+	ClassDB::bind_method(D_METHOD("is_dawn"), &CTimeOfDay::IsDawn);
+	ClassDB::bind_method(D_METHOD("is_day"), &CTimeOfDay::IsDay);
+	ClassDB::bind_method(D_METHOD("is_dusk"), &CTimeOfDay::IsDusk);
+	ClassDB::bind_method(D_METHOD("is_night"), &CTimeOfDay::IsNight);
 }

@@ -37,33 +37,83 @@
 #include "data_type.h"
 #include "video/color.h"
 
+#include <core/object.h>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CGraphic;
 
-class CTimeOfDay : public CDataType
+class CTimeOfDay : public CDataType, public Object
 {
+	GDCLASS(CTimeOfDay, Object)
+	DATA_TYPE_CLASS(CTimeOfDay)
+	
 public:
-	static CTimeOfDay *GetTimeOfDay(const std::string &ident, const bool should_find = true);
-	static CTimeOfDay *GetOrAddTimeOfDay(const std::string &ident);
-	static void ClearTimesOfDay();
-	
-	static std::vector<CTimeOfDay *> TimesOfDay;	/// Times of day
-	static std::map<std::string, CTimeOfDay *> TimesOfDayByIdent;
-	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
-	bool HasColorModification() const;
 
+	String GetIdent() const
+	{
+		return CDataType::GetIdent();
+	}
+	
+	String GetName() const
+	{
+		return this->Name.c_str();
+	}
+	
+	bool IsDawn() const
+	{
+		return this->Dawn;
+	}
+	
+	bool IsDay() const
+	{
+		return this->Day;
+	}
+	
+	bool IsDusk() const
+	{
+		return this->Dusk;
+	}
+	
+	bool IsNight() const
+	{
+		return this->Night;
+	}
+	
+	CGraphic *GetGraphic() const
+	{
+		return this->G;
+	}
+	
+	/**
+	**	@brief	Gets whether the time of day modifies the color of graphics
+	**
+	**	@return	Whether the time of day modifies the color of graphics
+	*/
+	bool HasColorModification() const
+	{
+		return this->ColorModification.R != 0 || this->ColorModification.G != 0 || this->ColorModification.B != 0;
+	}
+	
+	const CColor &GetColorModification() const
+	{
+		return this->ColorModification;
+	}
+	
+private:
 	std::string Name;							/// Name of the time of day
-	int ID = -1;								/// The ID of this time of day
 	bool Dawn = false;							/// Whether this is a dawn time of day
 	bool Day = false;							/// Whether this is a day time of day
 	bool Dusk = false;							/// Whether this is a dusk time of day
 	bool Night = false;							/// Whether this is a night time of day
 	CColor ColorModification;					/// The color modification applied to graphics when the time of day is active
 	CGraphic *G = nullptr;
+
+protected:
+	static void _bind_methods();
 };
 
 #endif

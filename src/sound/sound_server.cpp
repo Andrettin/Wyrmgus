@@ -734,22 +734,6 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 	}
 }
 
-void SetMusicCondition(int id, int value) {
-	if (Wyrmgus::GetInstance()->GetOamlModule() == nullptr) {
-		return;
-	}
-
-	Wyrmgus::GetInstance()->GetOamlModule()->SetCondition(id, value);
-}
-
-void SetMusicLayerGain(const std::string &layer, float gain) {
-	if (Wyrmgus::GetInstance()->GetOamlModule() == nullptr) {
-		return;
-	}
-
-	Wyrmgus::GetInstance()->GetOamlModule()->SetLayerGain(layer.c_str(), gain);
-}
-
 /**
 **  Stop the current playing music.
 */
@@ -817,19 +801,6 @@ bool IsMusicPlaying()
 
 	return MusicPlaying;
 }
-
-/**
-**  Add tension to music
-*/
-void AddMusicTension(int value)
-{
-	if (Wyrmgus::GetInstance()->GetOamlModule() == nullptr) {
-		return;
-	}
-
-	Wyrmgus::GetInstance()->GetOamlModule()->AddTension(value);
-}
-
 
 /*----------------------------------------------------------------------------
 --  Init

@@ -46,9 +46,6 @@
 
 void InitMusicOAML()
 {
-	const std::string filename = LibraryFileName("oaml.defs");
-	Wyrmgus::GetInstance()->GetOamlModule()->Init(filename.c_str());
-
 	SetMusicVolume(GetMusicVolume());
 }
 

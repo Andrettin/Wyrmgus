@@ -111,7 +111,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 		
 		if (key == "time_of_day") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->TimeOfDay = CTimeOfDay::GetTimeOfDay(value);
+			this->TimeOfDay = CTimeOfDay::Get(value);
 		} else if (key == "hours") {
 			this->Schedule->TotalHours -= this->Hours; //remove old amount of hours from the schedule, if it has already been defined before
 			this->Hours = std::stoi(value);

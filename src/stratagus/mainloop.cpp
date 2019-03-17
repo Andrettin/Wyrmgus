@@ -86,8 +86,6 @@
 
 #include <guichan.h>
 
-#include <oamlGodotModule/oamlGodotModule.h>
-
 void DrawGuichanWidgets();
 
 //----------------------------------------------------------------------------
@@ -321,11 +319,6 @@ static void GameLogicLoop()
 	// FIXME: We need to find a better place!
 	SaveGameLoading = false;
 
-	if (Wyrmgus::GetInstance()->GetOamlModule() != nullptr && UI.CurrentMapLayer->GetTimeOfDay()) {
-		// the time of day can change our main music loop, if the current playing track is set for this
-		Wyrmgus::GetInstance()->GetOamlModule()->SetMainLoopCondition(UI.CurrentMapLayer->GetTimeOfDay()->ID);
-	}
-
 	//
 	// Game logic part
 	//
@@ -557,6 +550,8 @@ void GameMainLoop()
 
 	MultiPlayerReplayEachCycle();
 	
+	Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", static_cast<CTimeOfDay *>(nullptr), UI.CurrentMapLayer->GetTimeOfDay());
+
 	//Wyrmgus start
 	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
 		const CCampaign *current_campaign = CCampaign::GetCurrentCampaign();
@@ -655,6 +650,8 @@ void GameMainLoop()
 	//Wyrmgus end
 
 	SingleGameLoop();
+	
+	Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", UI.CurrentMapLayer->GetTimeOfDay(), static_cast<CTimeOfDay *>(nullptr));
 
 	//
 	// Game over

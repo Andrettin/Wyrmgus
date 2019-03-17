@@ -19,8 +19,6 @@ extern void PlayMusicName(const std::string name);
 extern void PlayMusicByGroupRandom(const std::string group);
 extern void PlayMusicByGroupAndSubgroupRandom(const std::string group, const std::string subgroup);
 extern void PlayMusicByGroupAndFactionRandom(const std::string group, const std::string civilization_ident, const std::string faction_ident);
-extern void SetMusicCondition(int id, int value);
-extern void SetMusicLayerGain(const std::string layer, float gain);
 extern void StopMusic(void);
 extern bool IsMusicPlaying();
 extern void InitMusicOAML();

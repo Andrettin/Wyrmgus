@@ -427,7 +427,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				timeline->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "time_of_day") {
-			CTimeOfDay *time_of_day = CTimeOfDay::GetOrAddTimeOfDay(ident);
+			CTimeOfDay *time_of_day = CTimeOfDay::GetOrAdd(ident);
 			if (!define_only) {
 				time_of_day->ProcessConfigData(config_data);
 			}

@@ -96,6 +96,7 @@
 //Wyrmgus end
 #include "video/video.h"
 #include "world/plane.h"
+#include "wyrmgus.h"
 
 #include <math.h>
 
@@ -3072,10 +3073,10 @@ void UpdateUnitSightRange(CUnit &unit)
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
 	if (unit.MapLayer) {
-		if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Day) {
+		if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->IsDay()) {
 			unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
 		}
-		else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Night) {
+		else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->IsNight()) {
 			unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
 		}
 	}
@@ -7127,8 +7128,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		(attacker != nullptr && attacker->Player == CPlayer::GetThisPlayer())
 		&& target.Player != CPlayer::GetThisPlayer()
 	) {
-		// If player is hitting or being hit add tension to our music
-		AddMusicTension(1);
+		Wyrmgus::GetInstance()->emit_signal("unit_hit");
 	}
 	//Wyrmgus end
 

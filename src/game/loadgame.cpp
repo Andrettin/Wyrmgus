@@ -178,7 +178,7 @@ void CleanModules()
 	CMap::Map.Clean();
 	CMap::Map.CleanFogOfWar();
 	CTerrainType::ClearTerrainTypes();
-	CTimeOfDay::ClearTimesOfDay();
+	CTimeOfDay::Clear();
 	CTimeOfDaySchedule::Clear();
 	CSeason::Clear();
 	CSeasonSchedule::Clear();

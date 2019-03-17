@@ -79,8 +79,6 @@
 #include "world/world.h"
 #include "wyrmgus.h"
 
-#include <oamlGodotModule/oamlGodotModule.h>
-
 //Wyrmgus start
 #include <fstream>
 //Wyrmgus end
@@ -1176,9 +1174,8 @@ void ChangeCurrentMapLayer(const int z)
 	UI.SelectedViewport->Set(new_viewport_map_pos, CMap::Map.GetCurrentPixelTileSize() / 2);
 	UpdateSurfaceLayerButtons();
 	
-	if (Wyrmgus::GetInstance()->GetOamlModule() != nullptr && UI.CurrentMapLayer->GetTimeOfDay() && (!UI.PreviousMapLayer || UI.PreviousMapLayer->GetTimeOfDay() != UI.CurrentMapLayer->GetTimeOfDay())) {
-		// the time of day can change our main music loop, if the current playing track is set for this
-		Wyrmgus::GetInstance()->GetOamlModule()->SetMainLoopCondition(UI.CurrentMapLayer->GetTimeOfDay()->ID);
+	if (GameRunning && (!UI.PreviousMapLayer || UI.PreviousMapLayer->GetTimeOfDay() != UI.CurrentMapLayer->GetTimeOfDay())) {
+		Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", UI.PreviousMapLayer->GetTimeOfDay(), UI.CurrentMapLayer->GetTimeOfDay());
 	}
 }
 

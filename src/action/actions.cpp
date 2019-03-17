@@ -489,7 +489,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 			&& (unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Flags & MapFieldDesert)
 			&& unit.MapLayer->Field(unit.tilePos.x, unit.tilePos.y)->Owner != unit.Player->Index
 			&& unit.MapLayer->GetTimeOfDay()
-			&& unit.MapLayer->GetTimeOfDay()->Day
+			&& unit.MapLayer->GetTimeOfDay()->IsDay()
 			&& unit.Variable[HYDRATING_INDEX].Value <= 0
 			&& unit.Variable[DEHYDRATIONIMMUNITY_INDEX].Value <= 0
 		) {
