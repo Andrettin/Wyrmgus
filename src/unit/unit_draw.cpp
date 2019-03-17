@@ -53,6 +53,7 @@
 #include "player.h"
 #include "script.h"
 #include "sound/sound.h"
+#include "sound/unit_sound.h"
 #include "translate.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
@@ -60,7 +61,6 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
-#include "unitsound.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------

@@ -59,6 +59,7 @@
 #include "player.h"
 #include "script.h"
 #include "sound/sound.h"
+#include "sound/unit_sound.h"
 #include "species/species.h"
 #include "spell/spells.h"
 #include "translate.h"
@@ -66,7 +67,6 @@
 #include "ui/button_level.h"
 #include "ui/ui.h"
 #include "unit/unit_type_variation.h"
-#include "unitsound.h"
 #include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"

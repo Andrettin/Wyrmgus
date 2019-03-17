@@ -31,7 +31,8 @@
 #define ANIMATION_SOUND_H
 
 #include "animation/animation.h"
-#include "unitsound.h"
+
+#include "sound/unit_sound.h"
 
 class CAnimation_Sound : public CAnimation
 {

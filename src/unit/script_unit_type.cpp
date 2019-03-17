@@ -63,6 +63,7 @@
 //Wyrmgus end
 #include "script.h"
 #include "sound/sound.h"
+#include "sound/unit_sound.h"
 #include "species/species.h"
 #include "species/species_category.h"
 #include "spell/spells.h"
@@ -73,7 +74,6 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type_variation.h"
-#include "unitsound.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end

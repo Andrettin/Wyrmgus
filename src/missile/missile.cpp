@@ -54,13 +54,13 @@
 #include "settings.h"
 //Wyrmgus end
 #include "sound/sound.h"
+#include "sound/unit_sound.h"
 #include "spell/spells.h"
 #include "trigger.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "unitsound.h"
 #include "video.h"
 
 #ifdef __MORPHOS__

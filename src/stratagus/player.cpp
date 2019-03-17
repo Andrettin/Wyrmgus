@@ -77,6 +77,7 @@
 #include "settings.h"
 //Wyrmgus end
 #include "sound/sound.h"
+#include "sound/unit_sound.h"
 #include "time/calendar.h"
 #include "time/time_of_day.h"
 #include "translate.h"
@@ -87,7 +88,6 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 //Wyrmgus end
-#include "unitsound.h"
 #include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"

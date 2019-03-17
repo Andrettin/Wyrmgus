@@ -31,7 +31,8 @@
 #define ANIMATION_RANDOMSOUND_H
 
 #include "animation/animation.h"
-#include "unitsound.h"
+
+#include "sound/unit_sound.h"
 
 #include <vector>
 

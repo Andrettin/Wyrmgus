@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "unitsound.h"
+#include "sound/unit_sound.h"
 #include "vec2i.h"
 
 #include <vector>

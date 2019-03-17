@@ -56,6 +56,7 @@
 #include "quest.h"
 //Wyrmgus end
 #include "sound/sound.h"
+#include "sound/unit_sound.h"
 #include "spell/spells.h"
 #include "time/calendar.h"
 #include "time/season.h"
@@ -70,7 +71,6 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
-#include "unitsound.h"
 //Wyrmgus start
 #include "util.h"
 //Wyrmgus end

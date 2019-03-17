@@ -39,7 +39,7 @@
 #include "faction.h"
 #include "luacallback.h"
 #include "script.h"
-#include "script_sound.h"
+#include "sound/script_sound.h"
 #include "spell/spell_adjustvariable.h"
 #include "spell/spell_adjustvital.h"
 #include "spell/spell_areaadjustvital.h"

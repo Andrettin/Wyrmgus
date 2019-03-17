@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "unitsound.h"
+#include "sound/unit_sound.h"
 
 #include "animation/animation_randomsound.h"
 #include "animation/animation_sound.h"

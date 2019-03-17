@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "icon_config.h"
-#include "unitsound.h"
+#include "sound/unit_sound.h"
 
 #include <string>
 #include <vector>
