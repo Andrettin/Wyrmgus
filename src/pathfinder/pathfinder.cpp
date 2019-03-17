@@ -35,7 +35,7 @@
 
 #include "stratagus.h"
 
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 
 #include "action/actions.h"
 #include "map/map.h"

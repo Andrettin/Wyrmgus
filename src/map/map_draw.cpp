@@ -36,7 +36,7 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "missile/missile.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player.h"
 #include "translate.h"
 #include "ui/ui.h"

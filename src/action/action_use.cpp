@@ -44,7 +44,7 @@
 #include "map/tileset.h"
 #include "missile/missile.h"
 #include "network/network.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "script.h"
 #include "sound/sound.h"
 #include "spell/spells.h"

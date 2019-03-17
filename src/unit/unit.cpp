@@ -67,7 +67,7 @@
 #include "map/tileset.h"
 #include "missile/missile.h"
 #include "network/network.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "include/plane.h"
 #include "player.h"
 //Wyrmgus start

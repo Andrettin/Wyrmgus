@@ -42,7 +42,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "missile/missile.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "unit/unit.h"
 
 /* virtual */ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) const

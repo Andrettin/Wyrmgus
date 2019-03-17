@@ -42,7 +42,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 
 #include <stdio.h>
 

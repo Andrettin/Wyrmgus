@@ -39,7 +39,7 @@
 
 #include "map/map.h"
 #include "map/site.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player.h"
 #include "script.h"
 #include "ui/button_action.h"

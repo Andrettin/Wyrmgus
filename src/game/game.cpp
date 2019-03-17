@@ -65,7 +65,7 @@
 #include "network/netconnect.h"
 #include "network/network.h"
 #include "parameters.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player.h"
 #include "player_color.h"
 //Wyrmgus start

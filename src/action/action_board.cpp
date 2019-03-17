@@ -41,7 +41,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player.h"
 #include "script.h"
 #include "ui/ui.h"

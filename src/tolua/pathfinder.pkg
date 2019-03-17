@@ -1,4 +1,4 @@
-$#include "pathfinder.h"
+$#include "pathfinder/pathfinder.h"
 
 extern tolua_property__s int AStarFixedUnitCrossingCost;
 extern tolua_property__s int AStarMovingUnitCrossingCost;

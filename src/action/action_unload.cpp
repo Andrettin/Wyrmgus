@@ -46,7 +46,7 @@
 //Wyrmgus start
 #include "network/network.h"
 //Wyrmgus end
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player.h"
 #include "script.h"
 #include "ui/ui.h"

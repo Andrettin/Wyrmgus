@@ -47,7 +47,7 @@
 #include "map/site.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

@@ -157,7 +157,7 @@
 //Wyrmgus start
 #include "network/network.h"
 //Wyrmgus end
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "player.h"
 //Wyrmgus start
 #include "quest.h"

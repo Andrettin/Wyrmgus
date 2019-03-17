@@ -46,7 +46,7 @@
 #include "map/tileset.h"
 #include "missile/missile.h"
 #include "network/network.h"
-#include "pathfinder.h"
+#include "pathfinder/pathfinder.h"
 #include "script.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
