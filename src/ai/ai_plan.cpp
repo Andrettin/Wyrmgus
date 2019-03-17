@@ -146,7 +146,7 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
-	if (CMap::Map.WallOnMap(pos, unit.MapLayer->ID)) {
+	if (unit.MapLayer->WallOnMap(pos)) {
 		DebugPrint("Wall found %d, %d\n" _C_ pos.x _C_ pos.y);
 		if (resultPos) {
 			*resultPos = from;

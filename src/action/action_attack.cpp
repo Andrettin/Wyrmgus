@@ -147,7 +147,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 	COrder_Attack *order = new COrder_Attack(false);
 
-	if (CMap::Map.WallOnMap(dest, z) && CMap::Map.Field(dest, z)->playerInfo.IsTeamExplored(*attacker.Player)) {
+	if (CMap::Map.MapLayers[z]->WallOnMap(dest) && CMap::Map.MapLayers[z]->Field(dest)->playerInfo.IsTeamExplored(*attacker.Player)) {
 		// FIXME: look into action_attack.cpp about this ugly problem
 		order->goalPos = dest;
 		order->MapLayer = z;
@@ -410,7 +410,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 	// No goal: if meeting enemy attack it.
 	if (!this->HasGoal()
 		&& this->Action != UnitActionAttackGround
-		&& !CMap::Map.WallOnMap(this->goalPos, this->MapLayer)) {
+		&& !CMap::Map.MapLayers[this->MapLayer]->WallOnMap(this->goalPos)) {
 		CUnit *goal = AttackUnitsInReactRange(unit);
 
 		if (goal) {
@@ -550,10 +550,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		}
 		// Attacking wall or ground.
 		if (((goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
-			//Wyrmgus start
-//			 || (!goal && (CMap::Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
-			 || (!goal && (this->Action == UnitActionAttackGround || CMap::Map.WallOnMap(this->goalPos, this->MapLayer))))
-			//Wyrmgus end
+			 || (!goal && (this->Action == UnitActionAttackGround || CMap::Map.MapLayers[this->MapLayer]->WallOnMap(this->goalPos))))
 			&& unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 			//Wyrmgus start
 //			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
@@ -627,7 +624,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		return;
 	}
 
-	if (!this->HasGoal() && (this->Action == UnitActionAttackGround || CMap::Map.WallOnMap(this->goalPos, this->MapLayer))) {
+	if (!this->HasGoal() && (this->Action == UnitActionAttackGround || CMap::Map.MapLayers[this->MapLayer]->WallOnMap(this->goalPos))) {
 		return;
 	}
 

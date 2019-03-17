@@ -118,6 +118,10 @@ public:
 	void RegenerateForest();
 	//regenerate a forest tile	
 	void RegenerateForestTile(const Vec2i &pos);
+	
+	/// Returns true if there is a wall on the map tile field
+	bool WallOnMap(const Vec2i &pos) const;
+	
 private:
 	void DecrementRemainingTimeOfDayHours();
 	void IncrementTimeOfDay();

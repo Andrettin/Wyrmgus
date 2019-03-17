@@ -649,26 +649,14 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			return;
 		}
 	}
-	//Wyrmgus start
-	/*
-	if (CMap::Map.WallOnMap(pos)) {
-		if (unit.Player->Race == PlayerRaceHuman && CMap::Map.OrcWallOnMap(pos)) {
-			SendCommandAttack(unit, pos, NoUnitP, flush);
-			return;
-		}
-		if (unit.Player->Race == PlayerRaceOrc && CMap::Map.HumanWallOnMap(pos)) {
-			SendCommandAttack(unit, pos, NoUnitP, flush);
-			return;
-		}
-	}
-	*/
-	if (CMap::Map.WallOnMap(pos, UI.CurrentMapLayer->ID) && (UI.CurrentMapLayer->Field(pos)->Owner == -1 || CPlayer::GetThisPlayer()->IsEnemy(*CPlayer::Players[UI.CurrentMapLayer->Field(pos)->Owner]))) {
+
+	if (UI.CurrentMapLayer->WallOnMap(pos) && (UI.CurrentMapLayer->Field(pos)->Owner == -1 || CPlayer::GetThisPlayer()->IsEnemy(*CPlayer::Players[UI.CurrentMapLayer->Field(pos)->Owner]))) {
 		if (!UI.CurrentMapLayer->Field(pos)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 			SendCommandAttack(unit, pos, NoUnitP, flush, UI.CurrentMapLayer->ID);
 			return;
 		}
 	}
-	//Wyrmgus end
+
 	// empty space
 	if ((KeyModifiers & ModifierControl)) {
 		if (RightButtonAttacks) {

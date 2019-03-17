@@ -146,7 +146,7 @@ void CMapLayer::RegenerateForest()
 /**
 **	@brief	Regenerate a forest tile
 **
-**	@param	pos		Map tile pos
+**	@param	pos		Map tile position
 **
 **	@return	True if the forest tile was regenerated, or false otherwise
 */
@@ -242,6 +242,20 @@ void CMapLayer::RegenerateForestTile(const Vec2i &pos)
 		FixNeighbors(MapFieldForest, 0, pos);
 	}
 	*/
+}
+
+
+/**
+**	@brief	Get whether a map tile is a wall.
+**
+**	@param	pos		Map tile position.
+**
+**	@return	True if the tile is a wall, or false otherwise.
+*/
+bool CMapLayer::WallOnMap(const Vec2i &pos) const
+{
+	Assert(CMap::Map.Info.IsPointOnMap(pos, this->ID));
+	return this->Field(pos)->isAWall();
 }
 
 /**

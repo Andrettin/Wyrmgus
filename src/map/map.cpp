@@ -404,19 +404,6 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 }
 //Wyrmgus end
 
-/**
-**  Wall on map tile.
-**
-**  @param pos  map tile position.
-**
-**  @return    True if wall, false otherwise.
-*/
-bool CMap::WallOnMap(const Vec2i &pos, int z) const
-{
-	Assert(CMap::Map.Info.IsPointOnMap(pos, z));
-	return Field(pos, z)->isAWall();
-}
-
 //Wyrmgus start
 bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z)
 {

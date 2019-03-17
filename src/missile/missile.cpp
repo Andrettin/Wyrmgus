@@ -900,14 +900,14 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		//Wyrmgus end
 		// No goal, take target coordinates
 		if (!goal) {
-			if (CMap::Map.WallOnMap(goalPos, z)) {
+			if (CMap::Map.MapLayers[z]->WallOnMap(goalPos)) {
 				//Wyrmgus start
 //				if (CMap::Map.HumanWallOnMap(goalPos)) {
-				if (CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType && CalculateHit(unit, *CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr) == true) {
+				if (CMap::Map.MapLayers[z]->Field(goalPos)->OverlayTerrain->UnitType && CalculateHit(unit, *CMap::Map.MapLayers[z]->Field(goalPos)->OverlayTerrain->UnitType->Stats, nullptr) == true) {
 				//Wyrmgus end
 					//Wyrmgus start
 					PlayUnitSound(unit, VoiceHit);
-					damage = CalculateDamageStats(unit, *CMap::Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, nullptr);
+					damage = CalculateDamageStats(unit, *CMap::Map.MapLayers[z]->Field(goalPos)->OverlayTerrain->UnitType->Stats, nullptr);
 					//Wyrmgus end
 					CMap::Map.HitWall(goalPos,
 								//Wyrmgus start
@@ -1513,7 +1513,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 {
 	CUnitStats *stats; // stat of the wall.
 
-	if (!CMap::Map.WallOnMap(tilePos, missile.MapLayer)) {
+	if (!CMap::Map.MapLayers[missile.MapLayer]->WallOnMap(tilePos)) {
 		return;
 	}
 	

@@ -261,9 +261,6 @@ public:
 	//Wyrmgus start
 	void HitWall(const Vec2i &pos, unsigned damage, int z);
 
-	/// Returns true if there is a wall on the map tile field
-	bool WallOnMap(const Vec2i &pos, int z) const;
-	
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, const CTerrainType *new_terrain, const int z);
