@@ -57,7 +57,7 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h" //for tile animation
 #include "missile.h"
-#include "network.h"
+#include "network/network.h"
 #include "include/plane.h"
 //Wyrmgus start
 #include "quest.h"

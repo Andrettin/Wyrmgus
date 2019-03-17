@@ -45,7 +45,7 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "network.h"
+#include "network/network.h"
 #include "player.h"
 #include "replay.h"
 #include "sound.h"

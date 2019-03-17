@@ -27,10 +27,12 @@
 //      02111-1307, USA.
 //
 
+#include "stratagus.h"
+
+#include "network/net_lowlevel.h"
+
 #include <UnitTest++.h>
 
-#include "stratagus.h"
-#include "net_lowlevel.h"
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>

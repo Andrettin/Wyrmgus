@@ -40,8 +40,8 @@
 #include "cursor.h"
 #include "ui/ui.h"
 #include "widgets.h"
-#include "network.h"
-#include "netconnect.h"
+#include "network/network.h"
+#include "network/netconnect.h"
 #include "editor.h"
 #include "sound.h"
 //Wyrmgus start

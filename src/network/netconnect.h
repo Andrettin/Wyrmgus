@@ -29,7 +29,7 @@
 #ifndef __NETCONNECT_H__
 #define __NETCONNECT_H__
 
-#include "net_message.h"
+#include "network/net_message.h"
 
 class CHost;
 

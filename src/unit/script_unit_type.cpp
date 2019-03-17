@@ -53,7 +53,7 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 //Wyrmgus start
-#include "network.h" //for updating levels
+#include "network/network.h" //for updating levels
 //Wyrmgus end
 #include "include/plane.h"
 #include "player.h"

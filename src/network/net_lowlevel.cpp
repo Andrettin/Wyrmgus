@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name lowlevel.cpp - The network lowlevel. */
+/**@name lowlevel.cpp - The network low-level source file. */
 //
 //      (c) Copyright 2000-2007 by Lutz Sammer and Jimmy Salmon
 //
@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "net_lowlevel.h"
+#include "network/net_lowlevel.h"
 
 #include <stdio.h>
 #include <fcntl.h>

@@ -40,8 +40,8 @@
 //Wyrmgus start
 #include "map/map.h" //it contains map width and height
 //Wyrmgus end
-#include "net_message.h"
-#include "network.h"
+#include "network/net_message.h"
+#include "network/network.h"
 //Wyrmgus start
 #include "quest.h"
 //Wyrmgus end

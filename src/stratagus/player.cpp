@@ -65,8 +65,8 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"
-#include "network.h"
-#include "netconnect.h"
+#include "network/network.h"
+#include "network/netconnect.h"
 //Wyrmgus start
 #include "parameters.h"
 #include "player_color.h"

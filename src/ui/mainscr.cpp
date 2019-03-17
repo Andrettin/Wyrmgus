@@ -48,7 +48,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "menus.h"
-#include "network.h"
+#include "network/network.h"
 #include "include/plane.h"
 #include "player.h"
 //Wyrmgus start

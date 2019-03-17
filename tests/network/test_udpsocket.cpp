@@ -33,7 +33,7 @@
 
 #include "network/udpsocket.h"
 
-#include "net_lowlevel.h"
+#include "network/net_lowlevel.h"
 
 
 class AutoNetwork

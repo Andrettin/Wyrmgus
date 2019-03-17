@@ -33,11 +33,11 @@
 
 #include "stratagus.h"
 
-#include "net_message.h"
+#include "network/net_message.h"
 
-#include "net_lowlevel.h"
-#include "netconnect.h"
-#include "network.h"
+#include "network/net_lowlevel.h"
+#include "network/netconnect.h"
+#include "network/network.h"
 #include "include/version.h"
 
 size_t serialize32(unsigned char *buf, uint32_t data)

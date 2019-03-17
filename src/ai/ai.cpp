@@ -155,7 +155,7 @@
 #include "map/map_layer.h"
 #include "map/site.h"
 //Wyrmgus start
-#include "network.h"
+#include "network/network.h"
 //Wyrmgus end
 #include "pathfinder.h"
 #include "player.h"

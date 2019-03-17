@@ -8,7 +8,7 @@
 //   T H E   W A R   B E G I N S
 //    Stratagus - A free fantasy real time strategy game engine
 //
-//*@file intern_video.h @brief The video headerfile for video sources only. */
+//*@file intern_video.h @brief The video header file for video sources only. */
 //
 // (c) Copyright 1999-2002 by Stephan Rasenbergver.
 //

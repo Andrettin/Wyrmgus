@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_unbreakable.h - The animation Unbreakable headerfile. */
+/**@name animation_unbreakable.h - The unbreakable animation header file. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //

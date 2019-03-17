@@ -82,7 +82,7 @@
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "map/minimap.h"
-#include "network.h"
+#include "network/network.h"
 #include "parameters.h"
 #include "sound.h"
 #include "sound_server.h"

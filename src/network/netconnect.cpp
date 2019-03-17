@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name netconnect.cpp - The network high level connection code. */
+/**@name netconnect.cpp - The network high level connection source file. */
 //
 //      (c) Copyright 2001-2013 by Lutz Sammer, Andreas Arens, and Jimmy Salmon
 //
@@ -33,11 +33,11 @@
 
 #include "stratagus.h"
 
-#include "netconnect.h"
+#include "network/netconnect.h"
 
 #include "map/map.h"
-#include "master.h"
-#include "network.h"
+#include "network/master.h"
+#include "network/network.h"
 #include "parameters.h"
 #include "player.h"
 #include "script.h"

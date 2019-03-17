@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name netsockets.cpp - TCP and UDP sockets. */
+/**@name netsockets.cpp - TCP and UDP sockets source file. */
 //
 //      (c) Copyright 2013 by Joris Dauphin and cybermind
 //
@@ -34,7 +34,8 @@
 #include "stratagus.h"
 
 #include "network/netsockets.h"
-#include "net_lowlevel.h"
+
+#include "network/net_lowlevel.h"
 
 #include <stdio.h>
 

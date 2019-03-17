@@ -61,7 +61,7 @@
 #include "map/map.h"
 #include "map/tileset.h"
 //Wyrmgus start
-#include "network.h"
+#include "network/network.h"
 //Wyrmgus end
 #include "player.h"
 #include "religion/deity.h"

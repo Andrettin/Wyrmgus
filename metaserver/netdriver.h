@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name netdriver.h - Net driver header. */
+/**@name netdriver.h - Net driver header file. */
 //
 //      (c) Copyright 2005 by Edward Haase and Jimmy Salmon
 //
@@ -34,8 +34,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "network/net_lowlevel.h"
+
 #include <time.h>
-#include "net_lowlevel.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

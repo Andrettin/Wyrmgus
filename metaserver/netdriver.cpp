@@ -31,6 +31,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "stratagus.h"
+
+#include "netdriver.h"
+
+#include "network/net_lowlevel.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -38,10 +44,6 @@
 #ifndef _MSC_VER
 #include <errno.h>
 #endif
-
-#include "stratagus.h"
-#include "netdriver.h"
-#include "net_lowlevel.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

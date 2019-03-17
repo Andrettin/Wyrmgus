@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name widgets.h - The widgets headerfile. */
+/**@name widgets.h - The widgets header file. */
 //
-//      (c) Copyright 2005-2006 by Fran�ois Beerten and Jimmy Salmon
+//      (c) Copyright 2005-2006 by Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

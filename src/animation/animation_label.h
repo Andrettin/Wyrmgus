@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_label.h - The animation Label headerfile. */
+/**@name animation_label.h - The label animation header file. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //

@@ -60,7 +60,7 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 //Wyrmgus start
-#include "network.h"
+#include "network/network.h"
 //Wyrmgus end
 #include "player.h"
 //Wyrmgus start

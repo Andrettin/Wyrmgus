@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name terrain_type.h - The terrain type headerfile. */
+/**@name terrain_type.h - The terrain type header file. */
 //
 //      (c) Copyright 2018-2019 by Andrettin
 //

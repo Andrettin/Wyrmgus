@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name myendian.h - The endian-specific headerfile. */
+/**@name myendian.h - The endian-specific header file. */
 //
 //      (c) Copyright 2000-2011 by Lutz Sammer and Pali Rohár
 //

@@ -1,4 +1,4 @@
-$#include "master.h"
+$#include "network/master.h"
 
 struct CClientLog
 {

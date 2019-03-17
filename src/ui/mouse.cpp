@@ -59,7 +59,7 @@
 #include "map/tileset.h"
 #include "menus.h"
 #include "missile.h"
-#include "network.h"
+#include "network/network.h"
 #include "include/plane.h"
 #include "player.h"
 //Wyrmgus start

@@ -42,8 +42,8 @@
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "netconnect.h"
-#include "network.h"
+#include "network/netconnect.h"
+#include "network/network.h"
 #include "parameters.h"
 #include "player.h"
 //Wyrmgus start

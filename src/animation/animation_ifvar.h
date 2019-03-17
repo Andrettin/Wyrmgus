@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_ifvar.h - The animation IfVar headerfile. */
+/**@name animation_ifvar.h - The if var animation header file. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //

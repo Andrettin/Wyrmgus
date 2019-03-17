@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name vec2i.h - Vec2i headerfile. */
+/**@name vec2i.h - Vec2i header file. */
 //
 //      (c) Copyright 2010-2019 by Joris Dauphin and Andrettin
 //

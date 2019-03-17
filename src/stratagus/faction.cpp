@@ -35,9 +35,9 @@
 
 #include "ai/ai.h"
 #include "ai/ai_building_template.h"
+#include "ai/force_template.h"
 #include "civilization.h"
 #include "faction.h"
-#include "ai/force_template.h"
 #include "luacallback.h"
 #include "player_color.h"
 

@@ -41,7 +41,7 @@
 #include "game.h"
 #include "map/map.h"
 //Wyrmgus start
-#include "network.h"
+#include "network/network.h"
 //Wyrmgus end
 #include "script.h"
 #include "unit/unit.h"

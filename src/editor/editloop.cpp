@@ -51,7 +51,7 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "menus.h"
-#include "network.h"
+#include "network/network.h"
 #include "parameters.h"
 #include "player.h"
 #include "replay.h"

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name master.cpp - The master server. */
+/**@name master.cpp - The master server source file. */
 //
 //      (c) Copyright 2003-2007 by Tom Zickel and Jimmy Salmon
 //
@@ -31,22 +31,22 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "stratagus.h"
+
+#include "network/master.h"
+
+#include "game.h"
+#include "network/netsockets.h"
+#include "network/network.h"
+#include "network/net_lowlevel.h"
+#include "parameters.h"
+#include "script.h"
+#include "include/version.h"
+
 #include <errno.h>
 #include <stdarg.h>
 #include <ctype.h>
 #include <limits.h>
-
-#include "stratagus.h"
-
-#include "master.h"
-
-#include "game.h"
-#include "network/netsockets.h"
-#include "network.h"
-#include "net_lowlevel.h"
-#include "parameters.h"
-#include "script.h"
-#include "include/version.h"
 
 
 /*----------------------------------------------------------------------------

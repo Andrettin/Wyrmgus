@@ -66,7 +66,7 @@
 #include "map/site.h"
 #include "map/tileset.h"
 #include "missile.h"
-#include "network.h"
+#include "network/network.h"
 #include "pathfinder.h"
 #include "include/plane.h"
 #include "player.h"

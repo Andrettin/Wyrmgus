@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name menus.h - The menu headerfile. */
+/**@name menus.h - The menu header file. */
 //
 //      (c) Copyright 1999-2006 by Andreas Arens and Jimmy Salmon
 //

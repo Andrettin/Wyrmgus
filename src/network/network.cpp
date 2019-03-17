@@ -219,17 +219,14 @@
 
 #include "stratagus.h"
 
-#include <stddef.h>
-#include <list>
-
-#include "network.h"
+#include "network/network.h"
 
 #include "action/actions.h"
 #include "commands.h"
 #include "map/map.h"
-#include "net_lowlevel.h"
-#include "net_message.h"
-#include "netconnect.h"
+#include "network/net_lowlevel.h"
+#include "network/net_message.h"
+#include "network/netconnect.h"
 #include "parameters.h"
 #include "player.h"
 #include "replay.h"
@@ -242,6 +239,8 @@
 #include "video.h"
 
 #include <deque>
+#include <list>
+#include <stddef.h>
 
 //----------------------------------------------------------------------------
 //  Declaration

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name script.h - The clone configuration language headerfile. */
+/**@name script.h - The clone configuration language header file. */
 //
 //      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
 //

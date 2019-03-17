@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_cache.h - The unit cache headerfile. */
+/**@name unit_cache.h - The unit cache header file. */
 //
 //      (c) Copyright 2008 by Rafal Bursig
 //

@@ -27,11 +27,12 @@
 //      02111-1307, USA.
 //
 
-#include <UnitTest++.h>
-
 #include "stratagus.h"
-#include "network.h"
-#include "net_message.h"
+
+#include "network/network.h"
+#include "network/net_message.h"
+
+#include <UnitTest++.h>
 
 void FillCustomValue(CNetworkCommand *obj)
 {

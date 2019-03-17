@@ -32,7 +32,7 @@
 #include "util.h"
 
 //Wyrmgus start
-#include "network.h"
+#include "network/network.h"
 //Wyrmgus end
 
 #include <boost/tokenizer.hpp>

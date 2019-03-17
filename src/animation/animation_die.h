@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name animation_die.h - The animation die headerfile. */
+/**@name animation_die.h - The death animation header file. */
 //
 //      (c) Copyright 2005-2007 by Jimmy Salmon
 //

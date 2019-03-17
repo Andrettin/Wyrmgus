@@ -43,7 +43,7 @@
 #include "character.h"
 #include "config.h"
 #include "game.h"
-#include "network.h"
+#include "network/network.h"
 #include "parameters.h"
 #include "spells.h"
 #include "ui/interface.h" //for the GameRunning variable
