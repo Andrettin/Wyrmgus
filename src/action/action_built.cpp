@@ -44,7 +44,7 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "player.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "script.h"
 #include "sound/sound.h"
 #include "translate.h"

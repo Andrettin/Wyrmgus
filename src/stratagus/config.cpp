@@ -37,7 +37,6 @@
 
 #include "age.h"
 #include "animation/animation.h"
-#include "campaign.h"
 #include "character.h"
 #include "economy/currency.h"
 #include "game/game.h"
@@ -51,6 +50,7 @@
 #include "missile/missile.h"
 #include "include/plane.h"
 #include "player_color.h"
+#include "quest/campaign.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"

@@ -33,15 +33,15 @@
 
 #include "stratagus.h"
 
-#include "quest.h"
+#include "quest/quest.h"
 
-#include "achievement.h"
 #include "character.h"
 #include "game/game.h"
 #include "iocompat.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "parameters.h"
+#include "quest/achievement.h"
 #include "script.h"
 
 #include <ctype.h>

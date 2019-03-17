@@ -44,7 +44,6 @@
 #include "ai/ai.h"
 //Wyrmgus start
 #include "ai/ai_local.h" //for using AiHelpers
-#include "campaign.h"
 #include "civilization.h"
 #include "commands.h" //for faction setting
 #include "economy/currency.h"
@@ -68,7 +67,8 @@
 //Wyrmgus start
 #include "parameters.h"
 #include "player_color.h"
-#include "quest.h"
+#include "quest/campaign.h"
+#include "quest/quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "religion/religion.h"

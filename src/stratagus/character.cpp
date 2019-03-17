@@ -48,7 +48,7 @@
 #include "parameters.h"
 #include "player.h"
 #include "province.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "spell/spells.h"

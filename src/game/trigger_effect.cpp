@@ -36,7 +36,7 @@
 #include "game/trigger_effect.h"
 
 #include "config.h"
-#include "dialogue.h"
+#include "quest/dialogue.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 

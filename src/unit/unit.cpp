@@ -35,7 +35,6 @@
 
 #include "unit/unit.h"
 
-#include "achievement.h"
 #include "action/action_attack.h"
 //Wyrmgus start
 #include "action/action_resource.h"
@@ -70,8 +69,9 @@
 #include "pathfinder/pathfinder.h"
 #include "include/plane.h"
 #include "player.h"
+#include "quest/achievement.h"
 //Wyrmgus start
-#include "quest.h"
+#include "quest/quest.h"
 //Wyrmgus end
 #include "religion/deity.h"
 #include "script.h"

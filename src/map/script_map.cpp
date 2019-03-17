@@ -35,7 +35,6 @@
 
 #include "map/map.h"
 
-#include "campaign.h"
 #include "civilization.h"
 //Wyrmgus start
 #include "editor/editor.h"
@@ -53,7 +52,10 @@
 //Wyrmgus start
 #include "include/plane.h"
 #include "province.h"
-#include "quest.h"
+//Wyrmgus end
+#include "quest/campaign.h"
+//Wyrmgus start
+#include "quest/quest.h"
 //Wyrmgus end
 #include "script.h"
 //Wyrmgus start

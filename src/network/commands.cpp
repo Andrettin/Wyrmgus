@@ -44,7 +44,7 @@
 #include "network/net_message.h"
 #include "network/network.h"
 //Wyrmgus start
-#include "quest.h"
+#include "quest/quest.h"
 //Wyrmgus end
 #include "spell/spells.h"
 #include "unit/unit.h"

@@ -50,7 +50,7 @@
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "settings.h"
 #include "sound/sound_server.h"
 //Wyrmgus end

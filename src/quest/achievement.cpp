@@ -33,12 +33,12 @@
 
 #include "stratagus.h"
 
-#include "achievement.h"
+#include "quest/achievement.h"
 
 #include "character.h"
 #include "config.h"
 #include "player_color.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "script.h"
 #include "ui/icon.h"
 #include "unit/unit_type.h"

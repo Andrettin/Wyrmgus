@@ -34,11 +34,9 @@
 #include "stratagus.h"
 
 #include "action/actions.h"
-#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
 #include "commands.h"
-#include "dialogue.h"
 #include "editor/editor.h"
 #include "faction.h"
 #include "game/game.h"
@@ -57,8 +55,10 @@
 #include "missile/missile.h"
 #include "network/network.h"
 #include "include/plane.h"
+#include "quest/campaign.h"
+#include "quest/dialogue.h"
 //Wyrmgus start
-#include "quest.h"
+#include "quest/quest.h"
 //Wyrmgus end
 #include "results.h"
 //Wyrmgus start

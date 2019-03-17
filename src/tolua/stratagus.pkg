@@ -1,12 +1,10 @@
 $#include "stratagus.h"
 
-$#include "achievement.h"
 $#include "age.h"
 $#include "ai/ai.h"
 //Wyrmgus start
 $#include "character.h"
 //Wyrmgus end
-$#include "dialogue.h"
 $#include "game/game.h"
 //Wyrmgus start
 $#include "grand_strategy.h"
@@ -22,7 +20,9 @@ $#include "network/netconnect.h"
 $#include "player.h"
 //Wyrmgus start
 $#include "province.h"
-$#include "quest.h"
+$#include "quest/achievement.h"
+$#include "quest/dialogue.h"
+$#include "quest/quest.h"
 $#include "script.h"
 //Wyrmgus end
 $#include "sound/sound.h"

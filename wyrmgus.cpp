@@ -2,11 +2,11 @@
 
 #include "stratagus.h"
 
-#include "achievement.h"
-#include "campaign.h"
 #include "hair_color.h"
 #include "player.h"
 #include "player_color.h"
+#include "quest/achievement.h"
+#include "quest/campaign.h"
 #include "script.h"
 #include "skin_color.h"
 #include "unit/unit_type.h"

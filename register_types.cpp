@@ -30,16 +30,16 @@
 
 #include "register_types.h"
 
-#include "achievement.h"
-#include "campaign.h"
 #include "civilization.h"
 #include "conversible_color.h"
 #include "faction.h"
 #include "hair_color.h"
-#include "icon.h"
 #include "player.h"
 #include "player_color.h"
+#include "quest/achievement.h"
+#include "quest/campaign.h"
 #include "skin_color.h"
+#include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "wyrmgus.h"
 

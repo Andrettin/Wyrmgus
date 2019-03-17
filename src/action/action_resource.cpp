@@ -48,7 +48,7 @@
 #include "map/tileset.h"
 #include "pathfinder/pathfinder.h"
 #include "player.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "script.h"
 //Wyrmgus start
 #include "settings.h"

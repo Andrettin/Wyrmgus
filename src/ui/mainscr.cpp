@@ -52,7 +52,7 @@
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
-#include "quest.h"
+#include "quest/quest.h"
 //Wyrmgus end
 #include "sound/sound.h"
 #include "sound/unit_sound.h"

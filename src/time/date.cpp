@@ -38,7 +38,7 @@
 #include "time/calendar.h"
 #include "time/timeline.h"
 #include "civilization.h"
-#include "quest.h"
+#include "quest/quest.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

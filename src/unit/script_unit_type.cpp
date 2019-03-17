@@ -35,7 +35,6 @@
 
 #include "unit/unit_type.h"
 
-#include "achievement.h"
 #include "action/actions.h"
 #include "animation/animation.h"
 //Wyrmgus start
@@ -57,7 +56,10 @@
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
-#include "quest.h" //for updating levels
+//Wyrmgus end
+#include "quest/achievement.h"
+//Wyrmgus start
+#include "quest/quest.h" //for updating levels
 //Wyrmgus end
 #include "script.h"
 #include "sound/sound.h"

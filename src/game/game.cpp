@@ -40,7 +40,6 @@
 #include "age.h"
 #include "ai/ai.h"
 #include "animation/animation.h"
-#include "campaign.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
@@ -71,7 +70,10 @@
 #include "player_color.h"
 //Wyrmgus start
 #include "province.h"
-#include "quest.h"
+//Wyrmgus end
+#include "quest/campaign.h"
+//Wyrmgus start
+#include "quest/quest.h"
 //Wyrmgus end
 #include "results.h"
 //Wyrmgus start

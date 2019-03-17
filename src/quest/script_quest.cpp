@@ -33,13 +33,10 @@
 
 #include "stratagus.h"
 
-#include "quest.h"
+#include "quest/quest.h"
 
-#include "achievement.h"
-#include "campaign.h"
 #include "character.h"
 #include "civilization.h"
-#include "dialogue.h"
 #include "faction.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -47,6 +44,9 @@
 #include "map/site.h"
 #include "player.h"
 #include "player_color.h"
+#include "quest/achievement.h"
+#include "quest/campaign.h"
+#include "quest/dialogue.h"
 #include "script.h"
 #include "ui/icon.h"
 #include "unit/unit_type.h"

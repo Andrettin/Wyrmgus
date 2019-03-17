@@ -33,13 +33,13 @@
 
 #include "stratagus.h"
 
-#include "campaign.h"
+#include "quest/campaign.h"
 
 #include "civilization.h"
 #include "config.h"
 #include "faction.h"
 #include "map/map_template.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "species/species.h"
 
 #include <mutex>

@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "dialogue.h"
+#include "quest/dialogue.h"
 
 #include "luacallback.h"
 #include "script.h"

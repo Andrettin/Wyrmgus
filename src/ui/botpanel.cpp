@@ -36,14 +36,12 @@
 
 #include "ui/ui.h"
 
-#include "achievement.h"
 #include "action/actions.h"
 //Wyrmgus start
 #include "action/action_research.h"
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
 //Wyrmgus end
-#include "campaign.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
@@ -62,8 +60,10 @@
 #include "network/network.h"
 //Wyrmgus end
 #include "player.h"
+#include "quest/achievement.h"
+#include "quest/campaign.h"
 //Wyrmgus start
-#include "quest.h"
+#include "quest/quest.h"
 //Wyrmgus end
 #include "sound/sound.h"
 #include "spell/spells.h"

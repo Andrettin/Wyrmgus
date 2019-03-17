@@ -47,7 +47,7 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "player.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "script.h"
 #include "spell/spells.h"
 #include "translate.h"

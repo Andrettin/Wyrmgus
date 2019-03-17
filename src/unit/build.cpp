@@ -43,7 +43,7 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "player.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "world.h"

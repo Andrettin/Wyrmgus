@@ -160,7 +160,7 @@
 #include "pathfinder/pathfinder.h"
 #include "player.h"
 //Wyrmgus start
-#include "quest.h"
+#include "quest/quest.h"
 //Wyrmgus end
 #include "script.h"
 #include "unit/unit.h"

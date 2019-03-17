@@ -60,7 +60,7 @@
 #include "include/plane.h"
 #include "player_color.h"
 #include "province.h"
-#include "quest.h"
+#include "quest/quest.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
