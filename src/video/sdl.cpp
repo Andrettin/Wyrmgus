@@ -64,7 +64,7 @@
 
 #ifdef USE_OPENGL
 #include "SDL_opengl.h"
-#include "shaders.h"
+#include "video/shaders.h"
 #endif
 
 #ifdef USE_BEOS

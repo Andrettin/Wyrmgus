@@ -42,7 +42,7 @@
 #define GL_GLEXT_PROTOTYPES 1
 #endif
 #include "SDL_opengl.h"
-#include "shaders.h"
+#include "video/shaders.h"
 #endif
 
 #include "guichan.h"
