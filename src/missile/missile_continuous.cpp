@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "missile.h"
+#include "missile/missile.h"
 
 /**
 **  Missile don't move, than disappears when TTL is 0

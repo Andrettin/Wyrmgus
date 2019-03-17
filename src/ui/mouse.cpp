@@ -55,7 +55,7 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "menus.h"
-#include "missile.h"
+#include "missile/missile.h"
 #include "network/network.h"
 #include "include/plane.h"
 #include "player.h"

@@ -31,11 +31,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <math.h>
-
 #include "stratagus.h"
 
-#include "missile.h"
+#include "missile/missile.h"
 
 #include "action/action_spellcast.h"
 #include "action/actions.h"
@@ -62,6 +60,8 @@
 #include "unit/unit_type.h"
 #include "video/font.h"
 #include "video/video.h"
+
+#include <math.h>
 
 #ifdef __MORPHOS__
 #undef Wait

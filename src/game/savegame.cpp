@@ -45,7 +45,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"
-#include "missile.h"
+#include "missile/missile.h"
 #include "parameters.h"
 #include "player.h"
 #include "spell/spells.h"

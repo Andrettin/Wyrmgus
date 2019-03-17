@@ -42,7 +42,7 @@
 #include "luacallback.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
-#include "missile.h"
+#include "missile/missile.h"
 #include "network/network.h"
 #include "pathfinder.h"
 #include "script.h"

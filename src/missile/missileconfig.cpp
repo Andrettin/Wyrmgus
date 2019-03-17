@@ -29,9 +29,9 @@
 
 #include "stratagus.h"
 
-#include "missileconfig.h"
+#include "missile/missile_config.h"
 
-#include "missile.h"
+#include "missile/missile.h"
 #include "translate.h"
 #include "ui/ui.h"
 

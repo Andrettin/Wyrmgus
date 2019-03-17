@@ -37,7 +37,7 @@
 /**
 **  @class MissileType missile.h
 **
-**  \#include "missile.h"
+**  \#include "missile/missile.h"
 **
 **  This structure defines the base type information of all missiles. It
 **  contains all information that all missiles of the same type shares.
@@ -179,7 +179,7 @@
 /**
 **  @class Missile missile.h
 **
-**  \#include "missile.h"
+**  \#include "missile/missile.h"
 **
 **  This structure contains all information about a missile in game.
 **  A missile could have different effects, based on its missile-type.
@@ -294,7 +294,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
-#include "missileconfig.h"
+#include "missile/missile_config.h"
 #include "script.h"
 #include "sound/unit_sound.h"
 #include "unit/unit_ptr.h"

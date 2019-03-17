@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
-#include "missileconfig.h"
+#include "missile/missile_config.h"
 #include "sound/unit_sound.h"
 #include "ui/icon_config.h"
 #include "upgrade/upgrade_structs.h"
@@ -47,8 +47,6 @@
 #include <algorithm>
 #include <climits>
 #include <cstring>
-#include <map>
-#include <vector>
 
 #ifdef __MORPHOS__
 #undef Enable

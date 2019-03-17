@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "missile.h"
+#include "missile/missile.h"
 
 /**
 **  Missile flies from x,y to x1,y1 and stays there for a moment

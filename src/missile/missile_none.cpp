@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "missile.h"
+#include "missile/missile.h"
 
 /**
 **  Missile does nothing

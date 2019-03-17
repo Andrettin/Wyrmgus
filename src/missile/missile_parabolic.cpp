@@ -31,15 +31,15 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-
 #include "stratagus.h"
 
-#include "missile.h"
+#include "missile/missile.h"
 
 #include "luacallback.h"
 #include "map/map.h"
 #include "unit/unit_find.h"
+
+#include <stdio.h>
 
 /**
 **  Calculate parabolic trajectories.

@@ -41,7 +41,7 @@
 #include "action/actions.h"
 #include "map/map.h"
 #include "map/map_layer.h"
-#include "missile.h"
+#include "missile/missile.h"
 #include "pathfinder.h"
 #include "unit/unit.h"
 

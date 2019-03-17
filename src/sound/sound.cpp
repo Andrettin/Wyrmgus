@@ -44,7 +44,7 @@
 #include "map/map_layer.h"
 #include "map/tileset.h"
 #include "mod.h"
-#include "missile.h"
+#include "missile/missile.h"
 #include "sound/sound_server.h"
 #include "ui/ui.h"
 #include "ui/widgets.h"

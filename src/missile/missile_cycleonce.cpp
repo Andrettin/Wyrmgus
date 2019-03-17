@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "missile.h"
+#include "missile/missile.h"
 
 /**
 **  Missile doesn't move, it will just cycle once and vanish.

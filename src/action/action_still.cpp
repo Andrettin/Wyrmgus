@@ -47,7 +47,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
-#include "missile.h"
+#include "missile/missile.h"
 #include "player.h"
 //Wyrmgus start
 #include "quest.h"

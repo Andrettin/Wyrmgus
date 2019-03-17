@@ -48,7 +48,7 @@
 #include "map/map_template.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
-#include "missile.h"
+#include "missile/missile.h"
 #include "include/plane.h"
 #include "player_color.h"
 #include "religion/deity.h"
