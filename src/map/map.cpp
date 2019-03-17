@@ -73,7 +73,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "include/version.h"
-#include "video.h"
+#include "video/video.h"
 #include "world.h"
 #include "wyrmgus.h"
 

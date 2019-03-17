@@ -31,8 +31,9 @@
 #define __POPUP_H__
 
 #include "script.h"
-#include "include/color.h"
 #include "vec2i.h"
+#include "video/color.h"
+
 #include <vector>
 #include <string>
 

@@ -48,7 +48,6 @@
 #include "character.h"
 //Wyrmgus end
 #include "commands.h"
-#include "font.h"
 #include "faction.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -82,7 +81,8 @@
 #include "unit/unit_type_variation.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 #include <ctype.h>
 #include <vector>

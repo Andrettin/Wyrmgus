@@ -47,8 +47,8 @@
 
 #include "guichan.h"
 
-#include "include/color.h"
 #include "vec2i.h"
+#include "video/color.h"
 
 class CFont;
 class CMapTemplate;

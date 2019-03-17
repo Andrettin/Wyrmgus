@@ -29,7 +29,7 @@
 
 #include "stratagus.h"
 
-#include "include/color.h"
+#include "video/color.h"
 
 #include "config.h"
 #include "script.h"

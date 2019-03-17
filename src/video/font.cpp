@@ -33,11 +33,11 @@
 
 #include "stratagus.h"
 
-#include "font.h"
+#include "video/font.h"
 
 #include "intern_video.h"
 #include "util.h"
-#include "video.h"
+#include "video/video.h"
 
 #include <vector>
 #include <map>

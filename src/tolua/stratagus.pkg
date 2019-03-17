@@ -7,7 +7,6 @@ $#include "ai/ai.h"
 $#include "character.h"
 //Wyrmgus end
 $#include "dialogue.h"
-$#include "font.h"
 $#include "game.h"
 //Wyrmgus start
 $#include "grand_strategy.h"
@@ -37,7 +36,8 @@ $#include "unit/unit_type.h"
 $#include "upgrade/upgrade.h"
 $#include "util.h"
 //Wyrmgus end
-$#include "video.h"
+$#include "video/font.h"
+$#include "video/video.h"
 $#include "widgets.h"
 
 $#ifdef _MSC_VER

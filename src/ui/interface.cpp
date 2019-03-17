@@ -37,8 +37,6 @@
 
 #include "ai/ai.h"
 #include "commands.h"
-#include "cursor.h"
-#include "font.h"
 //Wyrmgus start
 #include "game.h"
 //Wyrmgus end
@@ -56,7 +54,9 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "video.h"
+#include "video/cursor.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "widgets.h"
 
 /*----------------------------------------------------------------------------

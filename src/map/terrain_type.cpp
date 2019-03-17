@@ -41,7 +41,7 @@
 #include "map/tileset.h"
 #include "time/season.h"
 #include "upgrade/upgrade_structs.h"
-#include "video.h"
+#include "video/video.h"
 
 #include <algorithm>
 

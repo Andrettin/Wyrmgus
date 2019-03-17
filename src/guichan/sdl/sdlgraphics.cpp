@@ -62,7 +62,7 @@
 #include "guichan/sdl/sdlpixel.h"
 
 #include "stratagus.h"
-#include "video.h"
+#include "video/video.h"
 
 // For some reason an old version of MSVC did not like std::abs,
 // so we added this macro.

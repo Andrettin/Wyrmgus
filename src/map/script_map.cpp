@@ -66,7 +66,7 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "include/version.h"
-#include "video.h"
+#include "video/video.h"
 #include "world.h"
 
 /*----------------------------------------------------------------------------

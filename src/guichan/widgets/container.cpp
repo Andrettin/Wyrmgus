@@ -60,10 +60,10 @@
 #include "guichan/widgets/container.h"
 //Wyrmgus start
 #include "stratagus.h"
-#include "font.h"
 #include "ui/interface.h"
 #include "unit/unit.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 //Wyrmgus end
 
 namespace gcn

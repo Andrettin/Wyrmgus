@@ -94,7 +94,7 @@
 //Wyrmgus start
 #include "util.h"
 //Wyrmgus end
-#include "video.h"
+#include "video/video.h"
 
 #include <math.h>
 

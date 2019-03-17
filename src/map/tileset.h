@@ -35,13 +35,15 @@
 ----------------------------------------------------------------------------*/
 
 #include "vec2i.h"
-#include <vector>
+//Wyrmgus start
+#include "video/color.h"
+//Wyrmgus end
+
 //Wyrmgus start
 #include <map>
 #include <tuple>
-
-#include "include/color.h"
 //Wyrmgus end
+#include <vector>
 
 struct lua_State;
 //Wyrmgus start

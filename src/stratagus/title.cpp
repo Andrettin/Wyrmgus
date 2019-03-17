@@ -31,10 +31,10 @@
 
 #include "title.h"
 
-#include "video.h"
-#include "font.h"
-#include "sound/sound_server.h"
 #include "editor/editor.h"
+#include "sound/sound_server.h"
+#include "video/font.h"
+#include "video/video.h"
 
 
 TitleScreen **TitleScreens;			/// Title screens to show at startup

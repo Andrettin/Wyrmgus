@@ -35,8 +35,8 @@
 
 #include "conversible_color.h"
 
-#include "include/color.h"
 #include "config.h"
+#include "video/color.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

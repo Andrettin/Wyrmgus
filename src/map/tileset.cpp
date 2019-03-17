@@ -183,9 +183,9 @@
 
 #include "map/tileset.h"
 
-#include <limits.h>
+#include "video/video.h"
 
-#include "video.h"
+#include <limits.h>
 
 /*----------------------------------------------------------------------------
 -- Variables

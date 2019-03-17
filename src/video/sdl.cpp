@@ -76,7 +76,6 @@
 #endif
 
 #include "editor/editor.h"
-#include "font.h"
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -91,7 +90,8 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "include/version.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "widgets.h"
 
 /*----------------------------------------------------------------------------

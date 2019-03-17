@@ -35,10 +35,10 @@
 
 #include "ui/statusline.h"
 
-#include "font.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 /**
 **  Draw status line.

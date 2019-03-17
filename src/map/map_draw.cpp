@@ -31,7 +31,6 @@
 
 #include "viewport.h"
 
-#include "font.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/terrain_type.h"
@@ -43,7 +42,8 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 
 bool CViewport::Contains(const PixelPos &screenPos) const

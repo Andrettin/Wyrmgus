@@ -42,7 +42,7 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "video.h"
+#include "video/video.h"
 #include "widgets.h"
 
 /*----------------------------------------------------------------------------

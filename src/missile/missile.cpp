@@ -41,7 +41,6 @@
 #include "action/actions.h"
 #include "animation/animation.h"
 #include "config.h"
-#include "font.h"
 #include "iolib.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -61,7 +60,8 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 #ifdef __MORPHOS__
 #undef Wait

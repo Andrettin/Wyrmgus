@@ -49,7 +49,6 @@
 #include "construct.h"
 #include "editor/editor.h"
 #include "faction.h"
-#include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -98,7 +97,8 @@
 #include "util.h"
 //Wyrmgus end
 #include "include/version.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 #include <png.h>
 

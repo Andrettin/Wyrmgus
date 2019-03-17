@@ -47,8 +47,8 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_manager.h"
-#include "video.h"
-#include "../video/intern_video.h"
+#include "video/video.h"
+#include "video/intern_video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

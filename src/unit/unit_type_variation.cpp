@@ -43,7 +43,7 @@
 #include "mod.h"
 #include "time/season.h"
 #include "ui/button_action.h"
-#include "video.h"
+#include "video/video.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -42,7 +42,7 @@
 #include "player.h"
 #include "province.h"
 #include "vec2i.h"
-#include "video.h"
+#include "video/video.h"
 #include "upgrade/upgrade_structs.h"
 
 /*----------------------------------------------------------------------------

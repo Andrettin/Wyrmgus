@@ -41,9 +41,6 @@
 #include "dialogue.h"
 #include "editor/editor.h"
 #include "faction.h"
-//Wyrmgus start
-#include "font.h"
-//Wyrmgus end
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -80,7 +77,10 @@
 #include "unit/unit_manager.h"
 #include "upgrade/upgrade.h"
 //Wyrmgus end
-#include "video.h"
+//Wyrmgus start
+#include "video/font.h"
+//Wyrmgus end
+#include "video/video.h"
 #include "world.h"
 #include "wyrmgus.h"
 

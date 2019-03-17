@@ -35,9 +35,7 @@
 
 #include "widgets.h"
 
-#include "cursor.h"
 #include "editor/editor.h"
-#include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
@@ -51,7 +49,9 @@
 //Wyrmgus end
 #include "sound/sound.h"
 #include "ui/ui.h"
-#include "video.h"
+#include "video/cursor.h"
+#include "video/font.h"
+#include "video/video.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

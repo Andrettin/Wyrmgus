@@ -32,9 +32,8 @@
 
 #include <guichan.h>
 #include <guichan/gsdl.h>
-#include "font.h"
-
 #include "luacallback.h"
+#include "video/font.h"
 
 
 extern bool GuichanActive;

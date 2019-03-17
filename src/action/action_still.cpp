@@ -65,7 +65,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
-#include "video.h"
+#include "video/video.h"
 
 enum {
 	SUB_STILL_STANDBY = 0,

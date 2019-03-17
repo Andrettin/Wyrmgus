@@ -50,7 +50,6 @@
 #include "currency.h"
 #include "editor/editor.h"
 #include "faction.h"
-#include "font.h"
 #include "game.h"
 //Wyrmgus end
 #include "icon.h"
@@ -93,7 +92,8 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "upgrade/upgrade_modifier.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "world.h"
 #include "wyrmgus.h"
 

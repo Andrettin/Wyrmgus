@@ -61,7 +61,7 @@
 #include "unit/unit_find.h"
 //Wyrmgus end
 #include "unit/unit_type.h"
-#include "video.h"
+#include "video/video.h"
 
 //Wyrmgus start
 //extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);

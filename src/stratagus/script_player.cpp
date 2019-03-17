@@ -49,9 +49,6 @@
 //Wyrmgus end
 #include "faction.h"
 //Wyrmgus start
-#include "font.h"
-//Wyrmgus end
-//Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "icon.h"
@@ -77,11 +74,14 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
-#include "video.h"
+//Wyrmgus start
+#include "video/font.h"
+//Wyrmgus end
 //Wyrmgus start
 #include "ui/ui.h"
 #include "util.h"
 //Wyrmgus end
+#include "video/video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -31,8 +31,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <signal.h>
-
 #include "stratagus.h"
 
 #include "script.h"
@@ -47,7 +45,6 @@
 #include "editor/editor.h"
 //Wyrmgus end
 #include "faction.h"
-#include "font.h"
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
@@ -74,9 +71,11 @@
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
 //Wyrmgus end
+#include "video/font.h"
 
 #include <mutex>
 #include <queue>
+#include <signal.h>
 
 /*----------------------------------------------------------------------------
 --  Variables

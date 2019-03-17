@@ -37,7 +37,7 @@
 
 #include "config.h"
 #include "mod.h"
-#include "video.h"
+#include "video/video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

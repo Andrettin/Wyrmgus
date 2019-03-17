@@ -45,7 +45,6 @@
 #include "construct.h"
 #include "editor/editor.h"
 #include "faction.h"
-#include "font.h"
 #include "icon.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -77,7 +76,8 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "world.h"
 
 /*----------------------------------------------------------------------------

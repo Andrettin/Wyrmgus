@@ -34,12 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "include/color.h"
 #include "data_type.h"
-
-#include <map>
-#include <string>
-#include <vector>
+#include "video/color.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

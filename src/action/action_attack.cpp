@@ -59,7 +59,7 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "video.h"
+#include "video/video.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

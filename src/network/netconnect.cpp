@@ -44,7 +44,7 @@
 #include "settings.h"
 #include "ui/interface.h"
 #include "include/version.h"
-#include "video.h"
+#include "video/video.h"
 
 //----------------------------------------------------------------------------
 // Declaration

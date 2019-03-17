@@ -35,12 +35,12 @@
 
 #include "construct.h"
 
-#include <vector>
-
 #include "script.h"
 #include "translate.h"
 #include "ui/ui.h"
-#include "video.h"
+#include "video/video.h"
+
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -54,7 +54,7 @@
 //Wyrmgus start
 #include "unit/unit.h" //for using CPreference
 //Wyrmgus end
-#include "video.h"
+#include "video/video.h"
 #include "xbrz.h"
 
 /*----------------------------------------------------------------------------

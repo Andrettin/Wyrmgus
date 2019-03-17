@@ -30,8 +30,8 @@
 #ifndef __MINIMAP_H__
 #define __MINIMAP_H__
 
-#include "include/color.h"
 #include "vec2i.h"
+#include "video/color.h"
 
 class CViewport;
 

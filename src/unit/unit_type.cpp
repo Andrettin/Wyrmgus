@@ -72,7 +72,7 @@
 #include "upgrade/upgrade.h"
 //Wyrmgus end
 #include "util.h"
-#include "video.h"
+#include "video/video.h"
 
 #include <cstring>
 #include <ctype.h>

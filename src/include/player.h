@@ -34,9 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
-#include "include/color.h"
-//Wyrmgus end
 #include "icon_config.h"
 //Wyrmgus start
 #include "item.h"
@@ -44,6 +41,9 @@
 //Wyrmgus end
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
+//Wyrmgus start
+#include "video/color.h"
+//Wyrmgus end
 
 #include <core/object.h>
 

@@ -38,7 +38,6 @@
 
 #include "civilization.h"
 #include "faction.h"
-#include "font.h"
 //Wyrmgus start
 #include "game.h"
 #include "grand_strategy.h"
@@ -53,7 +52,8 @@
 #include "ui/interface.h"
 #include "ui/popup.h"
 #include "unit/unit.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "world.h"
 
 #include <stdarg.h>

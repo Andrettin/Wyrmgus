@@ -37,7 +37,7 @@
 /**
 **  @class CCursor cursor.h
 **
-**  \#include "cursor.h"
+**  \#include "video/cursor.h"
 **
 **  This structure contains all information about a cursor.
 **  The cursor changes depending of the current user input state.
@@ -85,7 +85,7 @@
 /**
 **  @class CursorConfig cursor.h
 **
-**  \#include "cursor.h"
+**  \#include "video/cursor.h"
 **
 **  This structure contains all information to reference/use a cursor.
 **  It is normally used in other config structures.

@@ -47,7 +47,7 @@
 #include "time/time_of_day_schedule.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
-#include "video.h"
+#include "video/video.h"
 #include "world.h"
 
 /*----------------------------------------------------------------------------

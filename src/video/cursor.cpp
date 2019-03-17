@@ -34,10 +34,10 @@
 
 #include "stratagus.h"
 
-#include "cursor.h"
-#include "intern_video.h"
+#include "video/cursor.h"
 
 #include "editor/editor.h"
+#include "intern_video.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -50,7 +50,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
-#include "video.h"
+#include "video/video.h"
 
 #include <vector>
 

@@ -46,7 +46,7 @@
 #include "map/tileset.h"
 //Wyrmgus end
 #include "ui/ui.h"
-#include "video.h"
+#include "video/video.h"
 #include "iolib.h"
 #include "iocompat.h"
 

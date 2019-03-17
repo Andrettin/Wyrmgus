@@ -39,7 +39,6 @@
 #include "civilization.h"
 #include "faction.h"
 #include "game.h"	// for loading screen elements
-#include "font.h"	// for grand strategy mode tooltip drawing
 #include "iolib.h"
 #include "luacallback.h"
 #include "menus.h"
@@ -53,12 +52,12 @@
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util.h"
-#include "video.h"
+#include "video/font.h"	// for grand strategy mode tooltip drawing
+#include "video/video.h"
 
 #include <ctype.h>
-
-#include <string>
 #include <map>
+#include <string>
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -35,7 +35,6 @@
 
 #include "ui/popup.h"
 
-#include "font.h"
 #include "player.h"
 #include "spell/spells.h"
 //Wyrmgus start
@@ -51,7 +50,8 @@
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 /* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) const
 {

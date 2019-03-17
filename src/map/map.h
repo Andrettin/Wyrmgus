@@ -80,13 +80,13 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <map>
-#include <string>
-
-#include "include/color.h"
 #include "map/tile.h"
 #include "time/date.h"
 #include "vec2i.h"
+#include "video/color.h"
+
+#include <map>
+#include <string>
 
 /*----------------------------------------------------------------------------
 --  Declarations

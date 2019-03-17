@@ -37,18 +37,18 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-#include <string>
-#include <map>
-
-#include "include/color.h"
-#include "cursor.h"
 #include "map/minimap.h"
 #include "script.h"
+#include "video/color.h"
+#include "video/cursor.h"
 #include "viewport.h"
 #include "ui/interface.h"
 #include "ui/statusline.h"
 #include "ui/uitimer.h"
+
+#include <vector>
+#include <string>
+#include <map>
 
 /*----------------------------------------------------------------------------
 --  Declarations

@@ -37,7 +37,7 @@
 /**
 **  @class CFont font.h
 **
-**  \#include "font.h"
+**  \#include "video/font.h"
 **
 **  Defines the fonts used in the Stratagus engine. We support
 **  proportional multicolor fonts of 9 colors.
@@ -57,9 +57,10 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string>
-#include "include/color.h"
 #include "guichan/font.h"
+#include "video/color.h"
+
+#include <string>
 
 /*----------------------------------------------------------------------------
 --  Declarations

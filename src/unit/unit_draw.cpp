@@ -44,9 +44,7 @@
 #include "animation/animation.h"
 //Wyrmgus end
 #include "construct.h"
-#include "cursor.h"
 #include "editor/editor.h"
-#include "font.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -61,7 +59,9 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
-#include "video.h"
+#include "video/cursor.h"
+#include "video/font.h"
+#include "video/video.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

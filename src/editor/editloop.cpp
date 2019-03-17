@@ -39,7 +39,6 @@
 #include "editor/editor.h"
 
 #include "commands.h"
-#include "font.h"
 #include "game.h"
 #include "guichan.h"
 #include "icon.h"
@@ -66,7 +65,8 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "widgets.h"
 
 

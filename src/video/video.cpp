@@ -80,19 +80,18 @@
 
 #include "stratagus.h"
 
-#include <vector>
-
-#include "video.h"
+#include "video/video.h"
 #include "intern_video.h"
 
-#include "cursor.h"
-#include "font.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "ui/ui.h"
-
+#include "video/cursor.h"
+#include "video/font.h"
 
 #include "SDL.h"
+
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations

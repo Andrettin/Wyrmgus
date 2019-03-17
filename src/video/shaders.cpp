@@ -1,5 +1,7 @@
 #include "stratagus.h"
-#include "video.h"
+
+#include "video/video.h"
+
 #ifdef USE_OPENGL
 const char* vertex_shader = "#version 130\n\
 \n\

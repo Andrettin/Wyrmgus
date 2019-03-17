@@ -35,10 +35,10 @@
 
 #include "ui/ui.h"
 
-#include "font.h"
 #include "menus.h"
 #include "player.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 
 /*----------------------------------------------------------------------------
 -- Variables

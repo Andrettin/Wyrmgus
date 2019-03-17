@@ -43,7 +43,7 @@
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade_structs.h"
-#include "video.h"
+#include "video/video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

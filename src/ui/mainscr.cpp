@@ -43,7 +43,6 @@
 #include "ai/ai_local.h"
 #endif
 #include "civilization.h"
-#include "font.h"
 #include "icon.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -76,7 +75,8 @@
 //Wyrmgus end
 #include "upgrade/upgrade.h"
 #include "include/version.h"
-#include "video.h"
+#include "video/font.h"
+#include "video/video.h"
 #include "world.h"
 
 #include <sstream>
