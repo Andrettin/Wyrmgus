@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name season.cpp - The season source file. */
+/**@name data_type.cpp - The data type source file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,80 +27,33 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
-#include "time/season.h"
+#include "data_type.h"
 
 #include "config.h"
-#include "mod.h"
-#include "video/video.h"
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
 
 /**
 **	@brief	Process data provided by a configuration file
 **
 **	@param	config_data	The configuration data
 */
-void CSeason::ProcessConfigData(const CConfigData *config_data)
+void CDataType::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		if (key == "name") {
-			this->Name = value;
-		} else {
-			fprintf(stderr, "Invalid season property: \"%s\".\n", key.c_str());
+		if (!this->ProcessConfigDataProperty(key, value)) {
+			fprintf(stderr, "Invalid %s property: \"%s\".\n", config_data->Tag.c_str(), key.c_str());
 		}
 	}
 	
 	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "image") {
-			std::string file;
-			Vec2i size(0, 0);
-				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
-				} else if (key == "width") {
-					size.x = std::stoi(value);
-				} else if (key == "height") {
-					size.y = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (file.empty()) {
-				fprintf(stderr, "Image has no file.\n");
-				continue;
-			}
-			
-			if (size.x == 0) {
-				fprintf(stderr, "Image has no width.\n");
-				continue;
-			}
-			
-			if (size.y == 0) {
-				fprintf(stderr, "Image has no height.\n");
-				continue;
-			}
-			
-			this->G = CGraphic::New(file, size.x, size.y);
-			this->G->Load();
-			this->G->UseDisplayFormat();
-		} else {
-			fprintf(stderr, "Invalid season property: \"%s\".\n", section->Tag.c_str());
+		if (!this->ProcessConfigDataSection(section)) {
+			fprintf(stderr, "Invalid %s section: \"%s\".\n", config_data->Tag.c_str(), section->Tag.c_str());
 		}
 	}
+	
+	this->Initialize();
 }

@@ -354,10 +354,10 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "historical_location") {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "historical_location") {
 			CHistoricalLocation *historical_location = new CHistoricalLocation;
-			historical_location->ProcessConfigData(child_config_data);
+			historical_location->ProcessConfigData(section);
 				
 			if (historical_location->Date.Year == 0 || !historical_location->MapTemplate) {
 				delete historical_location;
@@ -365,15 +365,15 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			this->HistoricalLocations.push_back(historical_location);
-		} else if (child_config_data->Tag == "historical_title") {
+		} else if (section->Tag == "historical_title") {
 			int title = -1;
 			CDate start_date;
 			CDate end_date;
 			CFaction *title_faction = nullptr;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "title") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -410,13 +410,13 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 				
 			this->HistoricalTitles.push_back(std::tuple<CDate, CDate, CFaction *, int>(start_date, end_date, title_faction, title));
-		} else if (child_config_data->Tag == "item") {
+		} else if (section->Tag == "item") {
 			CPersistentItem *item = new CPersistentItem;
 			item->Owner = this;
 			this->Items.push_back(item);
-			item->ProcessConfigData(child_config_data);
+			item->ProcessConfigData(section);
 		} else {
-			fprintf(stderr, "Invalid character property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid character property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 	

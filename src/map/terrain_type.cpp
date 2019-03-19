@@ -314,14 +314,14 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "season_graphics") {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "season_graphics") {
 			std::string season_graphics_file;
 			CSeason *season = nullptr;
 			
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "season") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -350,14 +350,14 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 				CGraphic *graphics = CGraphic::New(season_graphics_file, this->PixelTileSize.x, this->PixelTileSize.y);
 			}
 			this->SeasonGraphics[season] = CGraphic::Get(season_graphics_file);
-		} else if (child_config_data->Tag == "transition_tile" || child_config_data->Tag == "adjacent_transition_tile") {
+		} else if (section->Tag == "transition_tile" || section->Tag == "adjacent_transition_tile") {
 			int transition_terrain_id = -1; //any terrain, by default
 			int transition_type = -1;
 			std::vector<int> tiles;
 			
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "terrain_type") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -383,14 +383,14 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			for (size_t j = 0; j < tiles.size(); ++j) {
-				if (child_config_data->Tag == "transition_tile") {
+				if (section->Tag == "transition_tile") {
 					this->TransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tiles[j]);
-				} else if (child_config_data->Tag == "adjacent_transition_tile") {
+				} else if (section->Tag == "adjacent_transition_tile") {
 					this->AdjacentTransitionTiles[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(tiles[j]);
 				}
 			}
 		} else {
-			fprintf(stderr, "Invalid terrain type property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid terrain type property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 	

@@ -451,44 +451,44 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "actions") {
-			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "actions") {
+			for (const CConfigData *subsection : section->Sections) {
 				SpellActionType *spell_action = nullptr;
 				
-				if (grandchild_config_data->Tag == "adjust_variable") {
+				if (subsection->Tag == "adjust_variable") {
 					spell_action = new Spell_AdjustVariable;
-				} else if (grandchild_config_data->Tag == "spawn_missile") {
+				} else if (subsection->Tag == "spawn_missile") {
 					spell_action = new Spell_SpawnMissile;
 				} else {
-					fprintf(stderr, "Invalid spell action type: \"%s\".\n", grandchild_config_data->Tag.c_str());
+					fprintf(stderr, "Invalid spell action type: \"%s\".\n", subsection->Tag.c_str());
 				}
 				
-				spell_action->ProcessConfigData(grandchild_config_data);
+				spell_action->ProcessConfigData(subsection);
 				this->Action.push_back(spell_action);
 			}
-		} else if (child_config_data->Tag == "condition") {
+		} else if (section->Tag == "condition") {
 			if (!this->Condition) {
 				this->Condition = new ConditionInfo;
 			}
-			this->Condition->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "autocast") {
+			this->Condition->ProcessConfigData(section);
+		} else if (section->Tag == "autocast") {
 			if (!this->AutoCast) {
 				this->AutoCast = new AutoCastInfo();
 			}
-			this->AutoCast->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "ai_cast") {
+			this->AutoCast->ProcessConfigData(section);
+		} else if (section->Tag == "ai_cast") {
 			if (!this->AICast) {
 				this->AICast = new AutoCastInfo();
 			}
-			this->AICast->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "resource_cost") {
+			this->AICast->ProcessConfigData(section);
+		} else if (section->Tag == "resource_cost") {
 			int resource = -1;
 			int cost = 0;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "resource") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -515,7 +515,7 @@ void CSpell::ProcessConfigData(const CConfigData *config_data)
 			
 			this->Costs[resource] = cost;
 		} else {
-			fprintf(stderr, "Invalid spell property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid spell property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 }
@@ -1012,17 +1012,17 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		std::string tag = child_config_data->Tag;
+	for (const CConfigData *section : config_data->Sections) {
+		std::string tag = section->Tag;
 		tag = SnakeCaseToPascalCase(tag);
 		
 		int index = UnitTypeVar.VariableNameLookup[tag.c_str()];
 		if (index != -1) {
 			this->Variable[index].Check = true;
 			
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "enable") {
 					this->Variable[index].Enable = StringToCondition(value);
@@ -1047,7 +1047,7 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 				}
 			}
 		} else {
-			fprintf(stderr, "Invalid spell condition property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid spell condition property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 }
@@ -1078,11 +1078,11 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "priority") {
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "priority") {
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "priority_var") {
 					int index = -1;
@@ -1104,13 +1104,13 @@ void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 					fprintf(stderr, "Invalid autocast priority property: \"%s\".\n", key.c_str());
 				}
 			}
-		} else if (child_config_data->Tag == "condition") {
+		} else if (section->Tag == "condition") {
 			if (!this->Condition) {
 				this->Condition = new ConditionInfo;
 			}
-			this->Condition->ProcessConfigData(child_config_data);
+			this->Condition->ProcessConfigData(section);
 		} else {
-			fprintf(stderr, "Invalid autocast property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid autocast property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 }

@@ -11,3 +11,5 @@ Coding Style Guidelines for Wyrmgus
 5. Braces are always used for "if" statements.
 
 6. Header files are included in the following order: first the "stratagus.h" header, then the header corresponding to the current source file, then the other Wyrmgus headers, then headers for other Godot modules, then Godot headers, then library headers, and finally standard library headers.
+
+7. Documentation headers for functions are located where the function definition is, regardless of whether that is in a header or source file.

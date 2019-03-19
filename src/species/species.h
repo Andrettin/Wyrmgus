@@ -52,7 +52,8 @@ class CSpecies : public CDataType
 	DATA_TYPE_CLASS(CSpecies)
 	
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual void Initialize() override;
 	
 	String GetName() const
 	{

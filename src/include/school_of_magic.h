@@ -58,7 +58,7 @@ public:
 	static std::map<std::string, CSchoolOfMagic *> SchoolsOfMagicByIdent;
 	static std::map<const CUpgrade *, CSchoolOfMagic *> SchoolsOfMagicByUpgrade;
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	std::string Name;									/// Name of the school of magic
 	std::string Description;							/// Description of the school of magic from an in-game universe perspective

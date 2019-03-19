@@ -47,6 +47,7 @@
 #include "iolib.h"
 #include "language/language.h"
 #include "language/word.h"
+#include "literary_text.h"
 #include "map/map_template.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
@@ -145,7 +146,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 						config_data = nullptr;
 					} else {
 						CConfigData *parent_config_data = config_data->Parent;
-						parent_config_data->Children.push_back(config_data);
+						parent_config_data->Sections.push_back(config_data);
 						config_data = parent_config_data;
 					}
 				} else {
@@ -338,6 +339,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CLanguage *language = CLanguage::GetOrAdd(ident);
 			if (!define_only) {
 				language->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "literary_text") {
+			CLiteraryText *literary_text = CLiteraryText::GetOrAdd(ident);
+			if (!define_only) {
+				literary_text->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "map_template") {
 			CMapTemplate *map_template = CMapTemplate::GetOrAdd(ident);

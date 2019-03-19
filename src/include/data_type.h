@@ -149,6 +149,17 @@ public: \
 		class_name::InstancesByIdent.clear(); \
 	} \
 	\
+	static inline bool AreAllInitialized() \
+	{ \
+		for (class_name *instance : class_name::Instances) { \
+			if (!instance->IsInitialized()) { \
+				return false; \
+			} \
+		} \
+		\
+		return true; \
+	} \
+	\
 private: \
 	static inline std::vector<class_name *> Instances; \
 	static inline std::map<std::string, class_name *> InstancesByIdent;
@@ -166,7 +177,17 @@ public:
 	{
 	}
 	
-	virtual void ProcessConfigData(const CConfigData *config_data) = 0;
+	virtual void ProcessConfigData(const CConfigData *config_data);
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) { return false; }
+	virtual bool ProcessConfigDataSection(const CConfigData *section) { return false; }
+	
+	/**
+	**	@brief	Initialize the data type instance
+	*/
+	virtual void Initialize()
+	{
+		this->Initialized = true;
+	}
 	
 	/**
 	**	@brief	Get the data type instance's string identifier
@@ -188,8 +209,19 @@ public:
 		return this->Index;
 	}
 	
+	/**
+	**	@brief	Get whether the data type instance has been initialized
+	**
+	**	@return	True if the data type instance has been initialized, or false otherwise
+	*/
+	bool IsInitialized() const
+	{
+		return this->Initialized;
+	}
+	
 	std::string Ident;	/// string identifier of the data type instance
 	int Index = -1;		/// index of the data type instance
+	bool Initialized = false;	/// whether the data type instance has been initialized
 };
 
 #endif

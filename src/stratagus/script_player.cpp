@@ -1258,6 +1258,8 @@ static int CclDefineCivilization(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
+	civilization->Initialized = true;
+	
 	return 0;
 }
 
@@ -2250,6 +2252,8 @@ static int CclDefineFaction(lua_State *l)
 	} else if (parent_faction.empty()) {
 		faction->ParentFaction = nullptr; // to allow redefinitions to remove the parent faction setting
 	}
+	
+	faction->Initialized = true;
 	
 	return 0;
 }

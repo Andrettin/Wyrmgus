@@ -82,16 +82,16 @@ void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "scheduled_time_of_day") {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "scheduled_time_of_day") {
 			CScheduledTimeOfDay *scheduled_time_of_day = new CScheduledTimeOfDay;
 			scheduled_time_of_day->ID = this->ScheduledTimesOfDay.size();
 			scheduled_time_of_day->Schedule = this;
 			this->ScheduledTimesOfDay.push_back(scheduled_time_of_day);
 			
-			scheduled_time_of_day->ProcessConfigData(child_config_data);
+			scheduled_time_of_day->ProcessConfigData(section);
 		} else {
-			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 	
@@ -121,14 +121,14 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "season_hours") {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "season_hours") {
 			CSeason *season = nullptr;
 			int season_hours = 0;
 			
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "season") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -152,7 +152,7 @@ void CScheduledTimeOfDay::ProcessConfigData(const CConfigData *config_data)
 			
 			this->SeasonHours[season] = season_hours;
 		} else {
-			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid scheduled time of day property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 	

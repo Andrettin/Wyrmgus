@@ -43,31 +43,41 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CConversibleColor::ProcessConfigData(const CConfigData *config_data)
+bool CConversibleColor::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else {
-			fprintf(stderr, "Invalid player color property: \"%s\".\n", key.c_str());
-		}
+	if (key == "name") {
+		this->Name = value;
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "color") {
-			Color color = child_config_data->ProcessColor();
-			this->Colors.push_back(color);
-		} else {
-			fprintf(stderr, "Invalid player color property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
+	return true;
+}
+	
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CConversibleColor::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "color") {
+		Color color = section->ProcessColor();
+		this->Colors.push_back(color);
+	} else {
+		return false;
 	}
+	
+	return true;
 }
 
 void CConversibleColor::_bind_methods()

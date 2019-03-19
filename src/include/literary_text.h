@@ -53,7 +53,7 @@ class CLiteraryText : public CDataType, public Object
 public:
 	~CLiteraryText();
 	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	String GetName() const
 	{

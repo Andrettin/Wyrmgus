@@ -40,7 +40,7 @@ class CLanguage : public CDataType
 	DATA_TYPE_CLASS(CLanguage)
 
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	CWord *GetWord(const std::string &name, int word_type, std::vector<std::string>& word_meanings) const;
 	std::string GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number);

@@ -50,36 +50,36 @@ CLiteraryText::~CLiteraryText()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CLiteraryText::ProcessConfigData(const CConfigData *config_data)
+bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "author") {
-			this->Author = value;
-		} else if (key == "translator") {
-			this->Translator = value;
-		} else if (key == "publisher") {
-			this->Publisher = value;
-		} else if (key == "copyright_notice") {
-			this->CopyrightNotice = value;
-		} else if (key == "notes") {
-			this->Notes = value;
-		} else if (key == "year") {
-			this->Year = std::stoi(value);
-		} else if (key == "initial_page") {
-			this->InitialPage = std::stoi(value);
-		} else {
-			fprintf(stderr, "Invalid literary text property: \"%s\".\n", key.c_str());
-		}
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "author") {
+		this->Author = value;
+	} else if (key == "translator") {
+		this->Translator = value;
+	} else if (key == "publisher") {
+		this->Publisher = value;
+	} else if (key == "copyright_notice") {
+		this->CopyrightNotice = value;
+	} else if (key == "notes") {
+		this->Notes = value;
+	} else if (key == "year") {
+		this->Year = std::stoi(value);
+	} else if (key == "initial_page") {
+		this->InitialPage = std::stoi(value);
+	} else {
+		return false;
 	}
+	
+	return true;
 }
 
 CLiteraryTextChapter *CLiteraryText::GetChapter(const std::string &chapter_name) const

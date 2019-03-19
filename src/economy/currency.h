@@ -44,7 +44,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CCurrency : CDataType
+class CCurrency : public CDataType
 {
 public:
 	static CCurrency *GetCurrency(const std::string &ident, const bool should_find = true);
@@ -54,7 +54,7 @@ public:
 	static std::vector<CCurrency *> Currencies;
 	static std::map<std::string, CCurrency *> CurrenciesByIdent;
 	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 public:
 	std::string Name;

@@ -776,57 +776,66 @@ CTrigger::~CTrigger()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CTrigger::ProcessConfigData(const CConfigData *config_data)
+bool CTrigger::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "type") {
-			if (value == "global_trigger") {
-				this->Type = TriggerType::GlobalTrigger;
-			} else if (value == "player_trigger") {
-				this->Type = TriggerType::PlayerTrigger;
-			} else {
-				fprintf(stderr, "Invalid trigger type: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "only_once") {
-			this->OnlyOnce = StringToBool(value);
-		} else if (key == "campaign_only") {
-			this->CampaignOnly = StringToBool(value);
+	if (key == "type") {
+		if (value == "global_trigger") {
+			this->Type = TriggerType::GlobalTrigger;
+		} else if (value == "player_trigger") {
+			this->Type = TriggerType::PlayerTrigger;
 		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid trigger type: \"%s\".\n", value.c_str());
 		}
+	} else if (key == "only_once") {
+		this->OnlyOnce = StringToBool(value);
+	} else if (key == "campaign_only") {
+		this->CampaignOnly = StringToBool(value);
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "effects") {
-			for (const CConfigData *grandchild_config_data : child_config_data->Children) {
-				CTriggerEffect *trigger_effect = nullptr;
-				
-				if (grandchild_config_data->Tag == "call_dialogue") {
-					trigger_effect = new CCallDialogueTriggerEffect;
-				} else if (grandchild_config_data->Tag == "create_unit") {
-					trigger_effect = new CCreateUnitTriggerEffect;
-				} else {
-					fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", grandchild_config_data->Tag.c_str());
-				}
-				
-				trigger_effect->ProcessConfigData(grandchild_config_data);
-				this->TriggerEffects.push_back(trigger_effect);
+	return true;
+}
+	
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CTrigger::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "effects") {
+		for (const CConfigData *subsection : section->Sections) {
+			CTriggerEffect *trigger_effect = nullptr;
+			
+			if (subsection->Tag == "call_dialogue") {
+				trigger_effect = new CCallDialogueTriggerEffect;
+			} else if (subsection->Tag == "create_unit") {
+				trigger_effect = new CCreateUnitTriggerEffect;
+			} else {
+				fprintf(stderr, "Invalid trigger effect type: \"%s\".\n", subsection->Tag.c_str());
 			}
+			
+			trigger_effect->ProcessConfigData(subsection);
+			this->TriggerEffects.push_back(trigger_effect);
 		}
-		else if (child_config_data->Tag == "dependencies") {
-			this->Dependency = new CAndDependency;
-			this->Dependency->ProcessConfigData(child_config_data);
-		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", child_config_data->Tag.c_str());
-		}
+	} else if (section->Tag == "dependencies") {
+		this->Dependency = new CAndDependency;
+		this->Dependency->ProcessConfigData(section);
+	} else {
+		return false;
 	}
+	
+	return true;
 }
 
 /**

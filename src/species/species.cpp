@@ -47,82 +47,96 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CSpecies::ProcessConfigData(const CConfigData *config_data)
+bool CSpecies::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "quote") {
-			this->Quote = value;
-		} else if (key == "background") {
-			this->Background = value;
-		} else if (key == "era") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int era_id = GetEraIdByName(value);
-			if (era_id != -1) {
-				this->Era = era_id;
-			} else {
-				fprintf(stderr, "Invalid era: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "sapient") {
-			this->Sapient = StringToBool(value);
-		} else if (key == "prehistoric") {
-			this->Prehistoric = StringToBool(value);
-		} else if (key == "category") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSpeciesCategory *category = CSpeciesCategory::Get(value);
-			if (category) {
-				this->Category = category;
-			}
-		} else if (key == "scientific_name") {
-			this->ScientificName = value;
-		} else if (key == "child_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->ChildUpgrade = value;
-		} else if (key == "home_plane") {
-			value = FindAndReplaceString(value, "_", "-");
-			CPlane *plane = CPlane::GetPlane(value);
-			if (plane) {
-				this->HomePlane = plane;
-				plane->Species.push_back(this);
-			}
-		} else if (key == "homeworld") {
-			value = FindAndReplaceString(value, "_", "-");
-			CWorld *world = CWorld::GetWorld(value);
-			if (world) {
-				this->Homeworld = world;
-				world->Species.push_back(this);
-			}
-		} else if (key == "terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
-			if (terrain_type) {
-				this->NativeTerrainTypes.push_back(terrain_type);
-			}
-		} else if (key == "evolves_from") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSpecies *evolves_from = CSpecies::Get(value);
-			if (evolves_from) {
-				this->EvolvesFrom.push_back(evolves_from);
-				evolves_from->EvolvesTo.push_back(this);
-			}
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "quote") {
+		this->Quote = value;
+	} else if (key == "background") {
+		this->Background = value;
+	} else if (key == "era") {
+		value = FindAndReplaceString(value, "_", "-");
+		const int era_id = GetEraIdByName(value);
+		if (era_id != -1) {
+			this->Era = era_id;
 		} else {
-			fprintf(stderr, "Invalid species property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid era: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "sapient") {
+		this->Sapient = StringToBool(value);
+	} else if (key == "prehistoric") {
+		this->Prehistoric = StringToBool(value);
+	} else if (key == "category") {
+		value = FindAndReplaceString(value, "_", "-");
+		CSpeciesCategory *category = CSpeciesCategory::Get(value);
+		if (category) {
+			this->Category = category;
+		}
+	} else if (key == "scientific_name") {
+		this->ScientificName = value;
+	} else if (key == "child_upgrade") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->ChildUpgrade = value;
+	} else if (key == "home_plane") {
+		value = FindAndReplaceString(value, "_", "-");
+		CPlane *plane = CPlane::GetPlane(value);
+		if (plane) {
+			this->HomePlane = plane;
+			plane->Species.push_back(this);
+		}
+	} else if (key == "homeworld") {
+		value = FindAndReplaceString(value, "_", "-");
+		CWorld *world = CWorld::GetWorld(value);
+		if (world) {
+			this->Homeworld = world;
+			world->Species.push_back(this);
+		}
+	} else if (key == "terrain_type") {
+		value = FindAndReplaceString(value, "_", "-");
+		CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+		if (terrain_type) {
+			this->NativeTerrainTypes.push_back(terrain_type);
+		}
+	} else if (key == "evolves_from") {
+		value = FindAndReplaceString(value, "_", "-");
+		CSpecies *evolves_from = CSpecies::Get(value);
+		if (evolves_from) {
+			this->EvolvesFrom.push_back(evolves_from);
+			evolves_from->EvolvesTo.push_back(this);
+		}
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+	
+/**
+**	@brief	Initialize the species
+*/
+void CSpecies::Initialize()
+{
+	this->Initialized = true;
+	
+	for (const CSpecies *evolves_from : this->EvolvesFrom) {
+		if (evolves_from->IsInitialized() && this->Era != -1 && evolves_from->Era != -1 && this->Era <= evolves_from->Era) {
+			fprintf(stderr, "Species \"%s\" is set to evolve from \"%s\", but is from the same or an earlier era than the latter.\n", this->GetIdent().utf8().get_data(), evolves_from->GetIdent().utf8().get_data());
 		}
 	}
 	
-	for (const CSpecies *evolves_from : this->EvolvesFrom) {
-		if (this->Era != -1 && evolves_from->Era != -1 && this->Era <= evolves_from->Era) {
-			fprintf(stderr, "Species \"%s\" is set to evolve from \"%s\", but is from the same or an earlier era than the latter.\n", this->GetIdent().utf8().get_data(), evolves_from->GetIdent().utf8().get_data());
+	for (const CSpecies *evolves_to : this->EvolvesTo) {
+		if (evolves_to->IsInitialized() && this->Era != -1 && evolves_to->Era != -1 && this->Era >= evolves_to->Era) {
+			fprintf(stderr, "Species \"%s\" is set to evolve to \"%s\", but is from the same or a later era than the latter.\n", this->GetIdent().utf8().get_data(), evolves_to->GetIdent().utf8().get_data());
 		}
 	}
 }

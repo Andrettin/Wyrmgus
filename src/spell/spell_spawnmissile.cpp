@@ -167,13 +167,13 @@ void Spell_SpawnMissile::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "start_point") {
-			this->StartPoint.ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "end_point") {
-			this->EndPoint.ProcessConfigData(child_config_data);
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "start_point") {
+			this->StartPoint.ProcessConfigData(section);
+		} else if (section->Tag == "end_point") {
+			this->EndPoint.ProcessConfigData(section);
 		} else {
-			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid spawn missile spell action property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 	

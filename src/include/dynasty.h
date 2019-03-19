@@ -45,7 +45,7 @@ class CDynasty : public CDataType
 public:
 	~CDynasty();
 	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	std::string Name;													/// dynasty name
 	std::string Description;											/// dynasty description

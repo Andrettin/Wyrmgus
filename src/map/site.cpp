@@ -95,11 +95,11 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "cultural_names") {
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "cultural_names") {
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				key = FindAndReplaceString(key, "_", "-");
 				
@@ -109,13 +109,13 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 					this->CulturalNames[civilization] = value;
 				}
 			}
-		} else if (child_config_data->Tag == "historical_owner") {
+		} else if (section->Tag == "historical_owner") {
 			CDate date;
 			CFaction *owner_faction = nullptr;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "date") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -129,16 +129,16 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			this->HistoricalOwners[date] = owner_faction;
-		} else if (child_config_data->Tag == "historical_building") {
+		} else if (section->Tag == "historical_building") {
 			CDate start_date;
 			CDate end_date;
 			int building_class_id = -1;
 			CUniqueItem *unique = nullptr;
 			CFaction *building_owner_faction = nullptr;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "start_date") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -173,7 +173,7 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 			
 			this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>(start_date, end_date, building_class_id, unique, building_owner_faction));
 		} else {
-			fprintf(stderr, "Invalid site property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid site property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 	

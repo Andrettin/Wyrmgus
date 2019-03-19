@@ -210,14 +210,14 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "generated_neutral_unit" || child_config_data->Tag == "player_location_generated_neutral_unit") {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "generated_neutral_unit" || section->Tag == "player_location_generated_neutral_unit") {
 			CUnitType *unit_type = nullptr;
 			int quantity = 1;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "unit_type") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -237,15 +237,15 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			
-			if (child_config_data->Tag == "generated_neutral_unit") {
+			if (section->Tag == "generated_neutral_unit") {
 				this->GeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
-			} else if (child_config_data->Tag == "player_location_generated_neutral_unit") {
+			} else if (section->Tag == "player_location_generated_neutral_unit") {
 				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
 			}
-		} else if (child_config_data->Tag == "generated_terrain") {
+		} else if (section->Tag == "generated_terrain") {
 			CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
 			
-			generated_terrain->ProcessConfigData(child_config_data);
+			generated_terrain->ProcessConfigData(section);
 				
 			if (!generated_terrain->TerrainType) {
 				delete generated_terrain;
@@ -254,7 +254,7 @@ void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
 			
 			this->GeneratedTerrains.push_back(generated_terrain);
 		} else {
-			fprintf(stderr, "Invalid map template property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid map template property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 	

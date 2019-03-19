@@ -96,6 +96,11 @@ public:
 		return this->Index;
 	}
 	
+	bool IsInitialized() const
+	{
+		return this->Initialized;
+	}
+
 	/**
 	**	@brief	Get the civilization's name
 	**
@@ -250,6 +255,7 @@ public:
 private:
 	std::string Ident;				/// ident of the civilization
 	int Index = -1;
+	bool Initialized = false;
 	std::string Name;				/// name of the civilization
 public:
 	CCivilization *ParentCivilization = nullptr;

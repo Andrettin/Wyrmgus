@@ -137,7 +137,7 @@ class CWord : public CDataType
 	DATA_TYPE_CLASS(CWord)
 	
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	bool HasMeaning(const std::string &meaning);
 	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);

@@ -43,42 +43,42 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CSpeciesCategory::ProcessConfigData(const CConfigData *config_data)
+bool CSpeciesCategory::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "common_name") {
-			this->CommonName = value;
-		} else if (key == "rank") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSpeciesCategoryRank *rank = CSpeciesCategoryRank::Get(value);
-			if (rank) {
-				this->Rank = rank;
-			}
-		} else if (key == "lower_category") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSpeciesCategory *category = CSpeciesCategory::Get(value);
-			if (category) {
-				this->LowerCategories.push_back(category);
-				category->UpperCategory = this;
-			}
-		} else if (key == "upper_category") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSpeciesCategory *category = CSpeciesCategory::Get(value);
-			if (category) {
-				this->UpperCategory = category;
-				category->LowerCategories.push_back(this);
-			}
-		} else {
-			fprintf(stderr, "Invalid species category property: \"%s\".\n", key.c_str());
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "common_name") {
+		this->CommonName = value;
+	} else if (key == "rank") {
+		value = FindAndReplaceString(value, "_", "-");
+		CSpeciesCategoryRank *rank = CSpeciesCategoryRank::Get(value);
+		if (rank) {
+			this->Rank = rank;
 		}
+	} else if (key == "lower_category") {
+		value = FindAndReplaceString(value, "_", "-");
+		CSpeciesCategory *category = CSpeciesCategory::Get(value);
+		if (category) {
+			this->LowerCategories.push_back(category);
+			category->UpperCategory = this;
+		}
+	} else if (key == "upper_category") {
+		value = FindAndReplaceString(value, "_", "-");
+		CSpeciesCategory *category = CSpeciesCategory::Get(value);
+		if (category) {
+			this->UpperCategory = category;
+			category->LowerCategories.push_back(this);
+		}
+	} else {
+		return false;
 	}
+	
+	return true;
 }

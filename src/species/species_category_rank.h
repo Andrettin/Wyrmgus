@@ -45,18 +45,8 @@ class CSpeciesCategoryRank : public CDataType
 	DATA_TYPE_CLASS(CSpeciesCategoryRank)
 	
 public:
-	static _FORCE_INLINE_ bool AreAllInitialized()
-	{
-		for (CSpeciesCategoryRank *rank : CSpeciesCategoryRank::GetAll()) {
-			if (!rank->IsInitialized()) {
-				return false;
-			}
-		}
-		
-		return true;
-	}
-
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual void Initialize() override;
 	
 	String GetName() const
 	{

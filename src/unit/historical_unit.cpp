@@ -86,10 +86,10 @@ void CHistoricalUnit::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "historical_location") {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "historical_location") {
 			CHistoricalLocation *historical_location = new CHistoricalLocation;
-			historical_location->ProcessConfigData(child_config_data);
+			historical_location->ProcessConfigData(section);
 				
 			if (historical_location->Date.Year == 0 || !historical_location->MapTemplate) {
 				delete historical_location;
@@ -98,7 +98,7 @@ void CHistoricalUnit::ProcessConfigData(const CConfigData *config_data)
 			
 			this->HistoricalLocations.push_back(historical_location);
 		} else {
-			fprintf(stderr, "Invalid historical unit property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid historical unit property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 }

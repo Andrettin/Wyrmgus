@@ -71,8 +71,8 @@ void CDependency::ProcessConfigData(const CConfigData *config_data)
 		this->ProcessConfigDataProperty(config_data->Properties[i]);
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		this->ProcessConfigDataSection(child_config_data);
+	for (const CConfigData *section : config_data->Sections) {
+		this->ProcessConfigDataSection(section);
 	}
 }
 

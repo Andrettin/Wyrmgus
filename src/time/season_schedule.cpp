@@ -83,14 +83,14 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "scheduled_season") {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "scheduled_season") {
 			CSeason *season = nullptr;
 			unsigned hours = 0;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "season") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -122,7 +122,7 @@ void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
 			this->ScheduledSeasons.push_back(scheduled_season);
 			this->TotalHours += scheduled_season->Hours;
 		} else {
-			fprintf(stderr, "Invalid season schedule property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid season schedule property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 	

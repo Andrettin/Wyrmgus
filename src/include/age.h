@@ -56,7 +56,9 @@ public:
 	
 	static CAge *CurrentAge;
 	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void Initialize() override;
 	
 public:
 	std::string Name;

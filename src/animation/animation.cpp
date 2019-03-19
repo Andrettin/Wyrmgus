@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name actions.cpp - The actions. */
+/**@name animation.cpp - The animation source file. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Russell Smith, Jimmy Salmon
+//      (c) Copyright 1998-2019 by Lutz Sammer, Russell Smith, Jimmy Salmon
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -517,166 +517,180 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	}
 }
 
-void CAnimations::ProcessConfigData(const CConfigData *config_data)
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CAnimations::ProcessConfigDataSection(const CConfigData *section)
 {
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (
-			child_config_data->Tag == "start"
-			|| child_config_data->Tag == "still"
-			|| child_config_data->Tag == "death"
-			|| child_config_data->Tag == "attack"
-			|| child_config_data->Tag == "ranged_attack"
-			|| child_config_data->Tag == "spell_cast"
-			|| child_config_data->Tag == "move"
-			|| child_config_data->Tag == "repair"
-			|| child_config_data->Tag == "train"
-			|| child_config_data->Tag == "research"
-			|| child_config_data->Tag == "upgrade"
-			|| child_config_data->Tag == "build"
-			|| child_config_data->Tag == "harvest"
-		) {
-			int res = -1;
-			std::string death_type;
-			CAnimation *first_anim = nullptr;
-			CAnimation *prev_anim = nullptr;
-			
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
-
+	if (
+		section->Tag == "start"
+		|| section->Tag == "still"
+		|| section->Tag == "death"
+		|| section->Tag == "attack"
+		|| section->Tag == "ranged_attack"
+		|| section->Tag == "spell_cast"
+		|| section->Tag == "move"
+		|| section->Tag == "repair"
+		|| section->Tag == "train"
+		|| section->Tag == "research"
+		|| section->Tag == "upgrade"
+		|| section->Tag == "build"
+		|| section->Tag == "harvest"
+	) {
+		int res = -1;
+		std::string death_type;
+		CAnimation *first_anim = nullptr;
+		CAnimation *prev_anim = nullptr;
+		
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
 				CAnimation *anim = nullptr;
-				
-				if (child_config_data->Tag == "death" && key == "death_type") {
-					value = FindAndReplaceString(value, "_", "-");
-					death_type = value.c_str();
-				} else if (child_config_data->Tag == "harvest" && key == "resource") {
-					value = FindAndReplaceString(value, "_", "-");
-					res = GetResourceIdByName(value.c_str());
-					if (res == -1) {
-						fprintf(stderr, "Invalid resource for harvest animation: \"%s\".\n", value.c_str());
-					}
-				} else if (key == "frame") {
-					anim = new CAnimation_Frame;
-				} else if (key == "exact-frame") {
-					anim = new CAnimation_ExactFrame;
-				} else if (key == "wait") {
-					anim = new CAnimation_Wait;
-				} else if (key == "random-wait") {
-					anim = new CAnimation_RandomWait;
-				} else if (key == "sound") {
-					anim = new CAnimation_Sound;
-				} else if (key == "random-sound") {
-					anim = new CAnimation_RandomSound;
-				} else if (key == "attack") {
-					anim = new CAnimation_Attack;
-				} else if (key == "spawn-missile") {
-					anim = new CAnimation_SpawnMissile;
-				} else if (key == "spawn-unit") {
-					anim = new CAnimation_SpawnUnit;
-				} else if (key == "if-var") {
-					anim = new CAnimation_IfVar;
-				} else if (key == "set-var") {
-					anim = new CAnimation_SetVar;
-				} else if (key == "set-player-var") {
-					anim = new CAnimation_SetPlayerVar;
-				} else if (key == "die") {
-					anim = new CAnimation_Die();
-				} else if (key == "rotate") {
-					anim = new CAnimation_Rotate;
-				} else if (key == "random-rotate") {
-					anim = new CAnimation_RandomRotate;
-				} else if (key == "move") {
-					anim = new CAnimation_Move;
-				} else if (key == "unbreakable") {
-					anim = new CAnimation_Unbreakable;
-				} else if (key == "goto") {
-					anim = new CAnimation_Goto;
-				} else if (key == "random-goto") {
-					anim = new CAnimation_RandomGoto;
-				} else {
-					fprintf(stderr, "Invalid animation property: \"%s\".\n", key.c_str());
-					continue;
-				}
-				
-				if (anim) {
-					anim->Init(value.c_str(), nullptr);
-					
-					if (!first_anim) {
-						first_anim = anim;
-					}
-					
-					if (prev_anim) {
-						prev_anim->Next = anim;
-					}
-					
-					prev_anim = anim;
-				}
-			}
 			
-			if (first_anim && prev_anim) {
-				prev_anim->Next = first_anim;
-			}
-			
-			if (child_config_data->Tag == "start") {
-				this->Start = first_anim;
-			} else if (child_config_data->Tag == "still") {
-				this->Still = first_anim;
-			} else if (child_config_data->Tag == "death") {
-				if (!death_type.empty()) {
-					const int death_index = ExtraDeathIndex(death_type.c_str());
-					if (death_index == ANIMATIONS_DEATHTYPES) {
-						this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
-					} else {
-						this->Death[death_index] = first_anim;
-					}
-				} else {
-					this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
-				}
-			} else if (child_config_data->Tag == "attack") {
-				this->Attack = first_anim;
-			} else if (child_config_data->Tag == "ranged_attack") {
-				this->RangedAttack = first_anim;
-			} else if (child_config_data->Tag == "spell_cast") {
-				this->SpellCast = first_anim;
-			} else if (child_config_data->Tag == "move") {
-				this->Move = first_anim;
-			} else if (child_config_data->Tag == "repair") {
-				this->Repair = first_anim;
-			} else if (child_config_data->Tag == "train") {
-				this->Train = first_anim;
-			} else if (child_config_data->Tag == "research") {
-				this->Research = first_anim;
-			} else if (child_config_data->Tag == "upgrade") {
-				this->Upgrade = first_anim;
-			} else if (child_config_data->Tag == "build") {
-				this->Build = first_anim;
-			} else if (child_config_data->Tag == "harvest") {
+			if (section->Tag == "death" && key == "death_type") {
+				value = FindAndReplaceString(value, "_", "-");
+				death_type = value.c_str();
+			} else if (section->Tag == "harvest" && key == "resource") {
+				value = FindAndReplaceString(value, "_", "-");
+				res = GetResourceIdByName(value.c_str());
 				if (res == -1) {
-					fprintf(stderr, "Invalid resource for harvest animation.\n");
-					continue;
+					fprintf(stderr, "Invalid resource for harvest animation: \"%s\".\n", value.c_str());
 				}
-				this->Harvest[res] = first_anim;
+			} else if (key == "frame") {
+				anim = new CAnimation_Frame;
+			} else if (key == "exact-frame") {
+				anim = new CAnimation_ExactFrame;
+			} else if (key == "wait") {
+				anim = new CAnimation_Wait;
+			} else if (key == "random-wait") {
+				anim = new CAnimation_RandomWait;
+			} else if (key == "sound") {
+				anim = new CAnimation_Sound;
+			} else if (key == "random-sound") {
+				anim = new CAnimation_RandomSound;
+			} else if (key == "attack") {
+				anim = new CAnimation_Attack;
+			} else if (key == "spawn-missile") {
+				anim = new CAnimation_SpawnMissile;
+			} else if (key == "spawn-unit") {
+				anim = new CAnimation_SpawnUnit;
+			} else if (key == "if-var") {
+				anim = new CAnimation_IfVar;
+			} else if (key == "set-var") {
+				anim = new CAnimation_SetVar;
+			} else if (key == "set-player-var") {
+				anim = new CAnimation_SetPlayerVar;
+			} else if (key == "die") {
+				anim = new CAnimation_Die();
+			} else if (key == "rotate") {
+				anim = new CAnimation_Rotate;
+			} else if (key == "random-rotate") {
+				anim = new CAnimation_RandomRotate;
+			} else if (key == "move") {
+				anim = new CAnimation_Move;
+			} else if (key == "unbreakable") {
+				anim = new CAnimation_Unbreakable;
+			} else if (key == "goto") {
+				anim = new CAnimation_Goto;
+			} else if (key == "random-goto") {
+				anim = new CAnimation_RandomGoto;
+			} else {
+				fprintf(stderr, "Invalid animation property: \"%s\".\n", key.c_str());
+				continue;
 			}
-		} else {
-			fprintf(stderr, "Invalid animations property: \"%s\".\n", child_config_data->Tag.c_str());
+			
+			if (anim) {
+				anim->Init(value.c_str(), nullptr);
+				
+				if (!first_anim) {
+					first_anim = anim;
+				}
+				
+				if (prev_anim) {
+					prev_anim->Next = anim;
+				}
+				
+				prev_anim = anim;
+			}
 		}
+		
+		if (first_anim && prev_anim) {
+			prev_anim->Next = first_anim;
+		}
+		
+		if (section->Tag == "start") {
+			this->Start = first_anim;
+		} else if (section->Tag == "still") {
+			this->Still = first_anim;
+		} else if (section->Tag == "death") {
+			if (!death_type.empty()) {
+				const int death_index = ExtraDeathIndex(death_type.c_str());
+				if (death_index == ANIMATIONS_DEATHTYPES) {
+					this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
+				} else {
+					this->Death[death_index] = first_anim;
+				}
+			} else {
+				this->Death[ANIMATIONS_DEATHTYPES] = first_anim;
+			}
+		} else if (section->Tag == "attack") {
+			this->Attack = first_anim;
+		} else if (section->Tag == "ranged_attack") {
+			this->RangedAttack = first_anim;
+		} else if (section->Tag == "spell_cast") {
+			this->SpellCast = first_anim;
+		} else if (section->Tag == "move") {
+			this->Move = first_anim;
+		} else if (section->Tag == "repair") {
+			this->Repair = first_anim;
+		} else if (section->Tag == "train") {
+			this->Train = first_anim;
+		} else if (section->Tag == "research") {
+			this->Research = first_anim;
+		} else if (section->Tag == "upgrade") {
+			this->Upgrade = first_anim;
+		} else if (section->Tag == "build") {
+			this->Build = first_anim;
+		} else if (section->Tag == "harvest") {
+			if (res != -1) {
+				this->Harvest[res] = first_anim;
+			} else {
+				fprintf(stderr, "Invalid resource for harvest animation.\n");
+			}
+		}
+	} else {
+		return false;
 	}
 	
+	return true;
+}
+
+/**
+**	@brief	Initialize the animation
+*/
+void CAnimations::Initialize()
+{
 	// Must add to array in a fixed order for save games
-	AddAnimationToArray(this->Start);
-	AddAnimationToArray(this->Still);
+	CAnimations::AddAnimationToArray(this->Start);
+	CAnimations::AddAnimationToArray(this->Still);
 	for (int i = 0; i != ANIMATIONS_DEATHTYPES + 1; ++i) {
-		AddAnimationToArray(this->Death[i]);
+		CAnimations::AddAnimationToArray(this->Death[i]);
 	}
-	AddAnimationToArray(this->Attack);
-	AddAnimationToArray(this->RangedAttack);
-	AddAnimationToArray(this->SpellCast);
-	AddAnimationToArray(this->Move);
-	AddAnimationToArray(this->Repair);
-	AddAnimationToArray(this->Train);
+	CAnimations::AddAnimationToArray(this->Attack);
+	CAnimations::AddAnimationToArray(this->RangedAttack);
+	CAnimations::AddAnimationToArray(this->SpellCast);
+	CAnimations::AddAnimationToArray(this->Move);
+	CAnimations::AddAnimationToArray(this->Repair);
+	CAnimations::AddAnimationToArray(this->Train);
 	for (int i = 0; i != MaxCosts; ++i) {
-		AddAnimationToArray(this->Harvest[i]);
+		CAnimations::AddAnimationToArray(this->Harvest[i]);
 	}
+	
+	this->Initialized = true;
 }
 
 /**
@@ -899,21 +913,9 @@ static int CclDefineAnimations(lua_State *l)
 		}
 		lua_pop(l, 1);
 	}
-	// Must add to array in a fixed order for save games
-	CAnimations::AddAnimationToArray(anims->Start);
-	CAnimations::AddAnimationToArray(anims->Still);
-	for (int i = 0; i != ANIMATIONS_DEATHTYPES + 1; ++i) {
-		CAnimations::AddAnimationToArray(anims->Death[i]);
-	}
-	CAnimations::AddAnimationToArray(anims->Attack);
-	CAnimations::AddAnimationToArray(anims->RangedAttack);
-	CAnimations::AddAnimationToArray(anims->SpellCast);
-	CAnimations::AddAnimationToArray(anims->Move);
-	CAnimations::AddAnimationToArray(anims->Repair);
-	CAnimations::AddAnimationToArray(anims->Train);
-	for (int i = 0; i != MaxCosts; ++i) {
-		CAnimations::AddAnimationToArray(anims->Harvest[i]);
-	}
+	
+	anims->Initialize();
+
 	return 0;
 }
 

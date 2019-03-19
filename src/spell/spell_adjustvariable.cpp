@@ -72,15 +72,15 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		std::string tag = child_config_data->Tag;
+	for (const CConfigData *section : config_data->Sections) {
+		std::string tag = section->Tag;
 		tag = SnakeCaseToPascalCase(tag);
 		
 		int index = UnitTypeVar.VariableNameLookup[tag.c_str()];
 		if (index != -1) {
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "enable") {
 					this->Var[index].Enable = StringToBool(value);

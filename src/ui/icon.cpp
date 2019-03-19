@@ -112,14 +112,14 @@ void CIcon::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "image") {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "image") {
 			std::string file;
 			Vec2i size(0, 0);
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "file") {
 					file = CMod::GetCurrentModPath() + value;
@@ -151,7 +151,7 @@ void CIcon::ProcessConfigData(const CConfigData *config_data)
 			this->File = file;
 			this->Size = size;
 		} else {
-			fprintf(stderr, "Invalid icon property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid icon property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 }

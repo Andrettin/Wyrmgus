@@ -949,11 +949,11 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "costs") {
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "costs") {
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				key = FindAndReplaceString(key, "_", "-");
 				
@@ -964,10 +964,10 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
 				}
 			}
-		} else if (child_config_data->Tag == "image") {
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+		} else if (section->Tag == "image") {
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "file") {
 					this->File = CMod::GetCurrentModPath() + value;
@@ -996,10 +996,10 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				CGraphic::Free(this->Sprite);
 				this->Sprite = nullptr;
 			}
-		} else if (child_config_data->Tag == "default_equipment") {
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+		} else if (section->Tag == "default_equipment") {
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				key = FindAndReplaceString(key, "_", "-");
 				value = FindAndReplaceString(value, "_", "-");
 				
@@ -1017,10 +1017,10 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 				
 				this->DefaultEquipment[item_slot] = item;
 			}
-		} else if (child_config_data->Tag == "sounds") {
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+		} else if (section->Tag == "sounds") {
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				value = FindAndReplaceString(value, "_", "-");
 				
 				if (key == "selected") {
@@ -1087,18 +1087,18 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					fprintf(stderr, "Invalid sound tag: \"%s\".\n", key.c_str());
 				}
 			}
-		} else if (child_config_data->Tag == "predependencies") {
+		} else if (section->Tag == "predependencies") {
 			this->Predependency = new CAndDependency;
-			this->Predependency->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "dependencies") {
+			this->Predependency->ProcessConfigData(section);
+		} else if (section->Tag == "dependencies") {
 			this->Dependency = new CAndDependency;
-			this->Dependency->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "variation") {
+			this->Dependency->ProcessConfigData(section);
+		} else if (section->Tag == "variation") {
 			this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 			this->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
 			
 			CUnitTypeVariation *variation = new CUnitTypeVariation;
-			variation->ProcessConfigData(child_config_data);
+			variation->ProcessConfigData(section);
 			
 			if (variation->ImageLayer == -1) {
 				variation->ID = this->Variations.size();
@@ -1110,14 +1110,14 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 			
 			this->DefaultStat.Variables[VARIATION_INDEX].Max = this->Variations.size();
 		} else {
-			std::string tag = SnakeCaseToPascalCase(child_config_data->Tag);
+			std::string tag = SnakeCaseToPascalCase(section->Tag);
 			
 			const int index = UnitTypeVar.VariableNameLookup[tag.c_str()]; // variable index
 			
 			if (index != -1) { // valid index
-				for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-					std::string key = child_config_data->Properties[j].first;
-					std::string value = child_config_data->Properties[j].second;
+				for (size_t j = 0; j < section->Properties.size(); ++j) {
+					std::string key = section->Properties[j].first;
+					std::string value = section->Properties[j].second;
 					
 					if (key == "enable") {
 						this->DefaultStat.Variables[index].Enable = StringToBool(value);
@@ -1132,7 +1132,7 @@ void CUnitType::ProcessConfigData(const CConfigData *config_data)
 					}
 				}
 			} else {
-				fprintf(stderr, "Invalid unit type property: \"%s\".\n", child_config_data->Tag.c_str());
+				fprintf(stderr, "Invalid unit type property: \"%s\".\n", section->Tag.c_str());
 			}
 		}
 	}

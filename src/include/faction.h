@@ -122,6 +122,11 @@ public:
 		return this->Index;
 	}
 	
+	bool IsInitialized() const
+	{
+		return this->Initialized;
+	}
+
 	/**
 	**	@brief	Get the faction's name
 	**
@@ -176,6 +181,7 @@ public:
 private:
 	std::string Ident;													/// faction string identifier
 	int Index = -1;														/// faction index
+	bool Initialized = false;
 public:
 	std::string Name;													/// faction name
 	std::string Description;											/// faction description

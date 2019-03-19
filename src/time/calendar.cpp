@@ -194,28 +194,28 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "day_of_the_week") {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "day_of_the_week") {
 			CDayOfTheWeek *day_of_the_week = new CDayOfTheWeek;
 			day_of_the_week->ID = this->DaysOfTheWeek.size();
 			this->DaysOfTheWeek.push_back(day_of_the_week);
 			day_of_the_week->Calendar = this;
-			day_of_the_week->Ident = child_config_data->Ident;
+			day_of_the_week->Ident = section->Ident;
 			this->DaysOfTheWeekByIdent[day_of_the_week->Ident] = day_of_the_week;
-			day_of_the_week->ProcessConfigData(child_config_data);
-		} else if (child_config_data->Tag == "month") {
+			day_of_the_week->ProcessConfigData(section);
+		} else if (section->Tag == "month") {
 			CMonth *month = new CMonth;
-			month->ProcessConfigData(child_config_data);
+			month->ProcessConfigData(section);
 			this->Months.push_back(month);
 			this->DaysPerYear += month->Days;
-		} else if (child_config_data->Tag == "chronological_intersection") {
+		} else if (section->Tag == "chronological_intersection") {
 			CCalendar *calendar = nullptr;
 			CDate date;
 			CDate intersecting_date;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "calendar") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -249,7 +249,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 			
 			this->AddChronologicalIntersection(calendar, date, intersecting_date);
 		} else {
-			fprintf(stderr, "Invalid calendar property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid calendar property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 	

@@ -129,44 +129,44 @@ void CSchoolOfMagic::ClearSchoolsOfMagic()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CSchoolOfMagic::ProcessConfigData(const CConfigData *config_data)
+bool CSchoolOfMagic::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
-			if (upgrade) {
-				this->Upgrade = upgrade;
-				CSchoolOfMagic::SchoolsOfMagicByUpgrade[upgrade] = this;
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "ability") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *ability = CUpgrade::Get(value);
-			if (ability) {
-				this->Abilities.push_back(ability);
-				ability->SchoolsOfMagic.push_back(this);
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "background") {
-			this->Background = value;
-		} else if (key == "quote") {
-			this->Quote = value;
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "upgrade") {
+		value = FindAndReplaceString(value, "_", "-");
+		CUpgrade *upgrade = CUpgrade::Get(value);
+		if (upgrade) {
+			this->Upgrade = upgrade;
+			CSchoolOfMagic::SchoolsOfMagicByUpgrade[upgrade] = this;
 		} else {
-			fprintf(stderr, "Invalid school of magic property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 		}
+	} else if (key == "ability") {
+		value = FindAndReplaceString(value, "_", "-");
+		CUpgrade *ability = CUpgrade::Get(value);
+		if (ability) {
+			this->Abilities.push_back(ability);
+			ability->SchoolsOfMagic.push_back(this);
+		} else {
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "background") {
+		this->Background = value;
+	} else if (key == "quote") {
+		this->Quote = value;
+	} else {
+		return false;
 	}
+	
+	return true;
 }

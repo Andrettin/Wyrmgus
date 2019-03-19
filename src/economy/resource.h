@@ -85,7 +85,8 @@ class CResource : public CDataType
 	DATA_TYPE_CLASS(CResource)
 	
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	
 	bool IsMineResource() const;
 
 	std::string Name;

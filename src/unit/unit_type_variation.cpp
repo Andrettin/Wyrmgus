@@ -208,14 +208,14 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	for (const CConfigData *child_config_data : config_data->Children) {
-		if (child_config_data->Tag == "file_when_loaded") {
+	for (const CConfigData *section : config_data->Sections) {
+		if (section->Tag == "file_when_loaded") {
 			std::string file;
 			int resource = -1;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "file") {
 					file = CMod::GetCurrentModPath() + value;
@@ -238,13 +238,13 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			this->FileWhenLoaded[resource] = file;
-		} else if (child_config_data->Tag == "file_when_empty") {
+		} else if (section->Tag == "file_when_empty") {
 			std::string file;
 			int resource = -1;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "file") {
 					file = CMod::GetCurrentModPath() + value;
@@ -267,13 +267,13 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			this->FileWhenEmpty[resource] = file;
-		} else if (child_config_data->Tag == "layer_file") {
+		} else if (section->Tag == "layer_file") {
 			std::string file;
 			int image_layer = -1;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "file") {
 					file = CMod::GetCurrentModPath() + value;
@@ -296,13 +296,13 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			this->LayerFiles[image_layer] = file;
-		} else if (child_config_data->Tag == "button_icon") {
+		} else if (section->Tag == "button_icon") {
 			std::string icon_ident;
 			int button_action = -1;
 				
-			for (size_t j = 0; j < child_config_data->Properties.size(); ++j) {
-				std::string key = child_config_data->Properties[j].first;
-				std::string value = child_config_data->Properties[j].second;
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
 				
 				if (key == "icon") {
 					value = FindAndReplaceString(value, "_", "-");
@@ -330,7 +330,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			this->ButtonIcons[button_action].Load();
 			this->ButtonIcons[button_action].Icon->Load();
 		} else {
-			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", child_config_data->Tag.c_str());
+			fprintf(stderr, "Invalid unit type variation property: \"%s\".\n", section->Tag.c_str());
 		}
 	}
 }

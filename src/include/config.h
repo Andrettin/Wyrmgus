@@ -30,24 +30,15 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include <core/color.h>
 
 #include <string>
 #include <vector>
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
 class CConfigData
 {
 public:
-	CConfigData(const std::string &tag) :
-		Tag(tag)
+	CConfigData(const std::string &tag) : Tag(tag)
 	{
 	}
 	
@@ -60,16 +51,8 @@ public:
 	std::string Tag;
 	std::string Ident;
 	CConfigData *Parent = nullptr;
-	std::vector<CConfigData *> Children;
 	std::vector<std::pair<std::string, std::string>> Properties;
+	std::vector<CConfigData *> Sections;
 };
-
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
 
 #endif
