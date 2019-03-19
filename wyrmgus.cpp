@@ -9,6 +9,7 @@
 #include "quest/campaign.h"
 #include "script.h"
 #include "skin_color.h"
+#include "text.h"
 #include "unit/unit_type.h"
 #include "src/include/version.h"
 
@@ -136,6 +137,11 @@ CPlayer *Wyrmgus::GetThisPlayer() const
 	return CPlayer::GetThisPlayer();
 }
 
+CLiteraryText *Wyrmgus::GetLiteraryText(String ident) const
+{
+	return CLiteraryText::Get(ident.utf8().get_data());
+}
+
 void Wyrmgus::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("run"), &Wyrmgus::Run);
@@ -161,6 +167,8 @@ void Wyrmgus::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("get_this_player"), &Wyrmgus::GetThisPlayer);
 	
+	ClassDB::bind_method(D_METHOD("get_literary_text", "ident"), &Wyrmgus::GetLiteraryText);
+
 	ADD_SIGNAL(MethodInfo("this_player_changed", PropertyInfo(Variant::OBJECT, "old_player"), PropertyInfo(Variant::OBJECT, "new_player")));
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
 	

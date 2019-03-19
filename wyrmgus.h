@@ -5,6 +5,7 @@
 
 class CCampaign;
 class CHairColor;
+class CLiteraryText;
 class CPlayer;
 class CPlayerColor;
 class CSkinColor;
@@ -48,6 +49,8 @@ public:
 	Array GetItemUnitTypes() const;
 	
 	CPlayer *GetThisPlayer() const;
+	
+	CLiteraryText *GetLiteraryText(String ident) const;
 
 private:
 	oamlGodotModule *OamlModule = nullptr;

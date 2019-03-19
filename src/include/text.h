@@ -10,7 +10,7 @@
 //
 /**@name text.h - The text header file. */
 //
-//      (c) Copyright 2016 by Andrettin
+//      (c) Copyright 2016-2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -34,28 +34,70 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
+#include "data_type.h"
+
+#include <core/object.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CChapter
-{
-public:
-	std::string Name;				/// Name of the chapter
-	int ID = 0;
-	bool Introduction = false;		/// Whether this is an introductory chapter
-	std::vector<std::string> Pages;	/// Pages of text
-};
+class CLiteraryTextChapter;
+struct lua_State;
 
-class CText
+class CLiteraryText : public CDataType, public Object
 {
+	GDCLASS(CLiteraryText, Object)
+	DATA_TYPE_CLASS(CLiteraryText)
+	
 public:
-	~CText();
+	~CLiteraryText();
 	
-	CChapter *GetChapter(const std::string &chapter_name);
+	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
+	String GetName() const
+	{
+		return this->Name.c_str();
+	}
+	
+	String GetAuthor() const
+	{
+		return this->Author.c_str();
+	}
+	
+	String GetTranslator() const
+	{
+		return this->Translator.c_str();
+	}
+	
+	String GetPublisher() const
+	{
+		return this->Publisher.c_str();
+	}
+	
+	String GetCopyrightNotice() const
+	{
+		return this->CopyrightNotice.c_str();
+	}
+	
+	String GetNotes() const
+	{
+		return this->Notes.c_str();
+	}
+	
+	int GetYear() const
+	{
+		return this->Year;
+	}
+	
+	int GetInitialPage() const
+	{
+		return this->InitialPage;
+	}
+	
+	CLiteraryTextChapter *GetChapter(const std::string &chapter_name) const;
+	
+private:
 	std::string Name;				/// Name of the text
 	std::string Author;				/// Author of the text
 	std::string Translator;			/// Translator of the text
@@ -64,21 +106,19 @@ public:
 	std::string Notes;				/// Notes to appear on the cover of the text
 	int Year = 0;					/// Year of publication
 	int InitialPage = 1;			/// Page in which the text begins
-	std::vector<CChapter *> Chapters;	/// The chapters of the text
+public:
+	std::vector<CLiteraryTextChapter *> Chapters;	/// The chapters of the text
+	
+	friend int CclDefineText(lua_State *l);
+	
+protected:
+	static void _bind_methods();
 };
-
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
-
-extern std::vector<CText *> Texts;
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern void CleanTexts();
-extern CText *GetText(const std::string &text_name);
 extern void TextCclRegister();
 
 #endif

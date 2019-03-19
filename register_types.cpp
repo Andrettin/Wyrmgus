@@ -39,6 +39,7 @@
 #include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "skin_color.h"
+#include "text.h"
 #include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "wyrmgus.h"
@@ -52,6 +53,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CFaction>();
 	ClassDB::register_class<CHairColor>();
 	ClassDB::register_class<CIcon>();
+	ClassDB::register_class<CLiteraryText>();
 	ClassDB::register_class<CPlayer>();
 	ClassDB::register_class<CPlayerColor>();
 	ClassDB::register_class<CSkinColor>();

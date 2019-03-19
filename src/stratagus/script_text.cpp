@@ -10,7 +10,7 @@
 //
 /**@name script_text.cpp - The text ccl functions. */
 //
-//      (c) Copyright 2016 by Andrettin
+//      (c) Copyright 2016-2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -36,10 +36,7 @@
 #include "text.h"
 
 #include "script.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+#include "text_chapter.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -57,19 +54,16 @@ static int CclDefineText(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string text_name = LuaToString(l, 1);
-	CText *text = GetText(text_name);
-	if (!text) {
-		text = new CText;
-		Texts.push_back(text);
-		text->Name = text_name;
-	}
+	std::string text_ident = LuaToString(l, 1);
+	CLiteraryText *text = CLiteraryText::GetOrAdd(text_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Author")) {
+		if (!strcmp(value, "Name")) {
+			text->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Author")) {
 			text->Author = LuaToString(l, -1);
 		} else if (!strcmp(value, "Translator")) {
 			text->Translator = LuaToString(l, -1);
@@ -87,7 +81,8 @@ static int CclDefineText(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CChapter *chapter = new CChapter;
+				CLiteraryTextChapter *chapter = new CLiteraryTextChapter;
+				chapter->Index = static_cast<int>(text->Chapters.size());
 				text->Chapters.push_back(chapter);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for variations)");
@@ -123,10 +118,10 @@ static int CclDefineText(lua_State *l)
 
 static int CclGetTexts(lua_State *l)
 {
-	lua_createtable(l, Texts.size(), 0);
-	for (size_t i = 1; i <= Texts.size(); ++i)
+	lua_createtable(l, CLiteraryText::GetAll().size(), 0);
+	for (size_t i = 1; i <= CLiteraryText::GetAll().size(); ++i)
 	{
-		lua_pushstring(l, Texts[i-1]->Name.c_str());
+		lua_pushstring(l, CLiteraryText::GetAll()[i-1]->GetIdent().utf8().get_data());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -142,34 +137,36 @@ static int CclGetTextData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string text_name = LuaToString(l, 1);
-//	const CText *text = GetText(text_name);
-	CText *text = GetText(text_name);
+	std::string text_ident = LuaToString(l, 1);
+	const CLiteraryText *text = CLiteraryText::Get(text_ident);
 	if (!text) {
-		LuaError(l, "Text \"%s\" doesn't exist." _C_ text_name.c_str());
+		LuaError(l, "Text \"%s\" doesn't exist." _C_ text_ident.c_str());
 	}
 	const char *data = LuaToString(l, 2);
 
-	if (!strcmp(data, "Author")) {
-		lua_pushstring(l, text->Author.c_str());
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, text->GetName().utf8().get_data());
+		return 1;
+	} else if (!strcmp(data, "Author")) {
+		lua_pushstring(l, text->GetAuthor().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Translator")) {
-		lua_pushstring(l, text->Translator.c_str());
+		lua_pushstring(l, text->GetTranslator().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Publisher")) {
-		lua_pushstring(l, text->Publisher.c_str());
+		lua_pushstring(l, text->GetPublisher().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "CopyrightNotice")) {
-		lua_pushstring(l, text->CopyrightNotice.c_str());
+		lua_pushstring(l, text->GetCopyrightNotice().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Notes")) {
-		lua_pushstring(l, text->Notes.c_str());
+		lua_pushstring(l, text->GetNotes().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Year")) {
-		lua_pushnumber(l, text->Year);
+		lua_pushnumber(l, text->GetYear());
 		return 1;
 	} else if (!strcmp(data, "InitialPage")) {
-		lua_pushnumber(l, text->InitialPage);
+		lua_pushnumber(l, text->GetInitialPage());
 		return 1;
 	} else if (!strcmp(data, "Chapters")) {
 		lua_createtable(l, text->Chapters.size(), 0);
@@ -186,9 +183,9 @@ static int CclGetTextData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		std::string chapter_name = LuaToString(l, 3);
 		if (text->GetChapter(chapter_name) != nullptr) {
-			lua_pushnumber(l, text->GetChapter(chapter_name)->ID);
+			lua_pushnumber(l, text->GetChapter(chapter_name)->Index);
 		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->Name.c_str());
+			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->GetIdent().utf8().get_data());
 		}
 		return 1;
 	} else if (!strcmp(data, "ChapterIntroduction")) {
@@ -197,7 +194,7 @@ static int CclGetTextData(lua_State *l)
 		if (text->GetChapter(chapter_name) != nullptr) {
 			lua_pushboolean(l, text->GetChapter(chapter_name)->Introduction);
 		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->Name.c_str());
+			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->GetIdent().utf8().get_data());
 		}
 		return 1;
 	} else if (!strcmp(data, "ChapterPage")) {
@@ -209,7 +206,7 @@ static int CclGetTextData(lua_State *l)
 			
 			lua_pushstring(l, text->GetChapter(chapter_name)->Pages[page].c_str());
 		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->Name.c_str());
+			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->GetIdent().utf8().get_data());
 		}
 		return 1;
 	} else if (!strcmp(data, "ChapterPageQuantity")) {
@@ -218,7 +215,7 @@ static int CclGetTextData(lua_State *l)
 		if (text->GetChapter(chapter_name) != nullptr) {
 			lua_pushnumber(l, text->GetChapter(chapter_name)->Pages.size());
 		} else {
-			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->Name.c_str());
+			LuaError(l, "Chapter \"%s\" doesn't exist for text \"%s\"" _C_ chapter_name.c_str() _C_ text->GetIdent().utf8().get_data());
 		}
 		return 1;
 	} else {

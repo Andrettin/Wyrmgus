@@ -10,7 +10,7 @@
 //
 /**@name text.cpp - The text source file. */
 //
-//      (c) Copyright 2016 by Andrettin
+//      (c) Copyright 2016-2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,53 +35,72 @@
 
 #include "text.h"
 
-#include <ctype.h>
-
-#include <string>
-#include <map>
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CText *> Texts;
+#include "config.h"
+#include "text_chapter.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CText::~CText()
+CLiteraryText::~CLiteraryText()
 {
-	for (size_t i = 0; i < this->Chapters.size(); ++i) {
-		delete this->Chapters[i];
+	for (CLiteraryTextChapter *chapter : this->Chapters) {
+		delete chapter;
 	}
-	this->Chapters.clear();
 }
+
+/**
+**	@brief	Process data provided by a configuration file
+**
+**	@param	config_data	The configuration data
+*/
+void CLiteraryText::ProcessConfigData(const CConfigData *config_data)
+{
+	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
+		std::string key = config_data->Properties[i].first;
+		std::string value = config_data->Properties[i].second;
+		
+		if (key == "name") {
+			this->Name = value;
+		} else if (key == "author") {
+			this->Author = value;
+		} else if (key == "translator") {
+			this->Translator = value;
+		} else if (key == "publisher") {
+			this->Publisher = value;
+		} else if (key == "copyright_notice") {
+			this->CopyrightNotice = value;
+		} else if (key == "notes") {
+			this->Notes = value;
+		} else if (key == "year") {
+			this->Year = std::stoi(value);
+		} else if (key == "initial_page") {
+			this->InitialPage = std::stoi(value);
+		} else {
+			fprintf(stderr, "Invalid literary text property: \"%s\".\n", key.c_str());
+		}
+	}
+}
+
+CLiteraryTextChapter *CLiteraryText::GetChapter(const std::string &chapter_name) const
+{
+	for (CLiteraryTextChapter *chapter : this->Chapters) {
+		if (chapter_name == chapter->Name) {
+			return chapter;
+		}
+	}
 	
-CChapter *CText::GetChapter(const std::string &chapter_name)
-{
-	for (size_t i = 0; i < this->Chapters.size(); ++i) {
-		if (chapter_name == this->Chapters[i]->Name) {
-			return this->Chapters[i];
-		}
-	}
 	return nullptr;
 }
 
-void CleanTexts()
+void CLiteraryText::_bind_methods()
 {
-	for (size_t i = 0; i < Texts.size(); ++i) {
-		delete Texts[i];
-	}
-	Texts.clear();
-}
-
-CText *GetText(const std::string &text_name)
-{
-	for (size_t i = 0; i < Texts.size(); ++i) {
-		if (text_name == Texts[i]->Name) {
-			return Texts[i];
-		}
-	}
-	return nullptr;
+	ClassDB::bind_method(D_METHOD("get_name"), &CLiteraryText::GetName);
+	ClassDB::bind_method(D_METHOD("get_author"), &CLiteraryText::GetAuthor);
+	ClassDB::bind_method(D_METHOD("get_translator"), &CLiteraryText::GetTranslator);
+	ClassDB::bind_method(D_METHOD("get_publisher"), &CLiteraryText::GetPublisher);
+	ClassDB::bind_method(D_METHOD("get_copyright_notice"), &CLiteraryText::GetCopyrightNotice);
+	ClassDB::bind_method(D_METHOD("get_notes"), &CLiteraryText::GetNotes);
+	ClassDB::bind_method(D_METHOD("get_year"), &CLiteraryText::GetYear);
+	ClassDB::bind_method(D_METHOD("get_initial_page"), &CLiteraryText::GetInitialPage);
 }

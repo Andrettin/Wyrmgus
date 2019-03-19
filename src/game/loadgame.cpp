@@ -78,6 +78,7 @@
 #include "species/species_category_rank.h"
 #include "spell/spells.h"
 #include "text.h"
+#include "text_chapter.h"
 #include "time/calendar.h"
 #include "time/season.h"
 #include "time/season_schedule.h"
@@ -160,7 +161,7 @@ void CleanModules()
 	CSpeciesCategory::Clear();
 	CSpeciesCategoryRank::Clear();
 	//Wyrmgus start
-	CleanTexts();
+	CLiteraryText::Clear();
 	CleanUniqueItems();
 	//Wyrmgus end
 	CTimeline::Clear();
