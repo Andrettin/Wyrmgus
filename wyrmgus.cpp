@@ -3,13 +3,13 @@
 #include "stratagus.h"
 
 #include "hair_color.h"
+#include "literary_text.h"
 #include "player.h"
 #include "player_color.h"
 #include "quest/achievement.h"
 #include "quest/campaign.h"
 #include "script.h"
 #include "skin_color.h"
-#include "text.h"
 #include "unit/unit_type.h"
 #include "src/include/version.h"
 

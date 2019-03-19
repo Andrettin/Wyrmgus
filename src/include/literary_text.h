@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name text.h - The text header file. */
+/**@name literary_text.h - The literary text header file. */
 //
 //      (c) Copyright 2016-2019 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __TEXT_H__
-#define __TEXT_H__
+#ifndef __LITERARY_TEXT_H__
+#define __LITERARY_TEXT_H__
 
 /*----------------------------------------------------------------------------
 --  Includes

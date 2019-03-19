@@ -56,6 +56,7 @@
 //Wyrmgus end
 #include "iocompat.h"
 #include "iolib.h"
+#include "literary_text.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/minimap.h"
@@ -80,7 +81,6 @@
 #include "sound/sound.h"
 #include "sound/sound_server.h"
 #include "spell/spells.h"
-#include "text.h"
 #include "time/calendar.h"
 #include "translate.h"
 #include "ui/button_action.h"

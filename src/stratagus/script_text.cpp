@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "text.h"
+#include "literary_text.h"
 
 #include "script.h"
 #include "text_chapter.h"

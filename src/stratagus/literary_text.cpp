@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name text.cpp - The text source file. */
+/**@name literary_text.cpp - The literary text source file. */
 //
 //      (c) Copyright 2016-2019 by Andrettin
 //
@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "text.h"
+#include "literary_text.h"
 
 #include "config.h"
 #include "text_chapter.h"
