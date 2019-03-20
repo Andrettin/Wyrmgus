@@ -30,18 +30,9 @@
 #ifndef __LITERARY_TEXT_H__
 #define __LITERARY_TEXT_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
 
-#include <core/object.h>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
+class CIcon;
 class CLiteraryTextChapter;
 struct lua_State;
 
@@ -95,17 +86,23 @@ public:
 		return this->InitialPage;
 	}
 	
+	CIcon *GetIcon() const
+	{
+		return this->Icon;
+	}
+	
 	CLiteraryTextChapter *GetChapter(const std::string &chapter_name) const;
 	
 private:
-	std::string Name;				/// Name of the text
-	std::string Author;				/// Author of the text
-	std::string Translator;			/// Translator of the text
-	std::string Publisher;			/// Publisher of the text
-	std::string CopyrightNotice;	/// Copyright notice explaining that this text is in the public domain, or is licensed under an open-source license
-	std::string Notes;				/// Notes to appear on the cover of the text
-	int Year = 0;					/// Year of publication
-	int InitialPage = 1;			/// Page in which the text begins
+	std::string Name;				/// name of the text
+	std::string Author;				/// author of the text
+	std::string Translator;			/// translator of the text
+	std::string Publisher;			/// publisher of the text
+	std::string CopyrightNotice;	/// copyright notice explaining that this text is in the public domain, or is licensed under an open-source license
+	std::string Notes;				/// notes to appear on the cover of the text
+	int Year = 0;					/// year of publication
+	int InitialPage = 1;			/// page in which the text begins
+	CIcon *Icon = nullptr;			/// the text's icon
 public:
 	std::vector<CLiteraryTextChapter *> Chapters;	/// The chapters of the text
 	

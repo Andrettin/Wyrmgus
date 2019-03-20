@@ -37,6 +37,7 @@
 
 #include "config.h"
 #include "text_chapter.h"
+#include "ui/icon.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -75,6 +76,9 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 		this->Year = std::stoi(value);
 	} else if (key == "initial_page") {
 		this->InitialPage = std::stoi(value);
+	} else if (key == "icon") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Icon = CIcon::Get(value);
 	} else {
 		return false;
 	}
@@ -103,4 +107,5 @@ void CLiteraryText::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_notes"), &CLiteraryText::GetNotes);
 	ClassDB::bind_method(D_METHOD("get_year"), &CLiteraryText::GetYear);
 	ClassDB::bind_method(D_METHOD("get_initial_page"), &CLiteraryText::GetInitialPage);
+	ClassDB::bind_method(D_METHOD("get_icon"), &CLiteraryText::GetIcon);
 }
