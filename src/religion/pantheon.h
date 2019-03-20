@@ -30,26 +30,14 @@
 #ifndef __PANTHEON_H__
 #define __PANTHEON_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
-
-#include <map>
-#include <string>
-#include <vector>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CPantheon : public CDataType
 {
 	DATA_TYPE_CLASS(CPantheon)
 	
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	std::string Name;							/// Name of the pantheon
 	std::string Description;

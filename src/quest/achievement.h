@@ -57,7 +57,8 @@ class CAchievement : public CDataType, public Object
 public:
 	static void CheckAchievements();
 	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual void Initialize() override;
 	
 	String GetName() const
 	{

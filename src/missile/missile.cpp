@@ -113,140 +113,163 @@ extern NumberDesc *Damage;                   /// Damage calculation for missile.
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void MissileType::ProcessConfigData(const CConfigData *config_data)
+/**
+**	@brief	Process a property in the data provided by a configuration file
+**
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
+*/
+bool MissileType::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "frames") {
-			this->SpriteFrames = std::stoi(value);
-		} else if (key == "flip") {
-			this->Flip = StringToBool(value);
-		} else if (key == "num_directions") {
-			this->NumDirections = std::stoi(value);
-		} else if (key == "transparency") {
-			this->Transparency = std::stoi(value);
-		} else if (key == "fired_sound") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->FiredSound = value;
-		} else if (key == "impact_sound") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->ImpactSound = value;
-		} else if (key == "class") {
-			value = FindAndReplaceString(value, "_", "-");
-			const char *class_name = value.c_str();
-			unsigned int i = 0;
-			for (; MissileClassNames[i]; ++i) {
-				if (!strcmp(class_name, MissileClassNames[i])) {
-					this->Class = i;
-					break;
-				}
+	if (key == "frames") {
+		this->SpriteFrames = std::stoi(value);
+	} else if (key == "flip") {
+		this->Flip = StringToBool(value);
+	} else if (key == "num_directions") {
+		this->NumDirections = std::stoi(value);
+	} else if (key == "transparency") {
+		this->Transparency = std::stoi(value);
+	} else if (key == "fired_sound") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->FiredSound = value;
+	} else if (key == "impact_sound") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->ImpactSound = value;
+	} else if (key == "class") {
+		value = FindAndReplaceString(value, "_", "-");
+		const char *class_name = value.c_str();
+		unsigned int i = 0;
+		for (; MissileClassNames[i]; ++i) {
+			if (!strcmp(class_name, MissileClassNames[i])) {
+				this->Class = i;
+				break;
 			}
-			if (!MissileClassNames[i]) {
-				fprintf(stderr, "Invalid missile class: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "num_bounces") {
-			this->NumBounces = std::stoi(value);
-		} else if (key == "max_bounce_size") {
-			this->MaxBounceSize = std::stoi(value);
-		} else if (key == "parabol_coefficient") {
-			this->ParabolCoefficient = std::stoi(value);
-		} else if (key == "delay") {
-			this->StartDelay = std::stoi(value);
-		} else if (key == "sleep") {
-			this->Sleep = std::stoi(value);
-		} else if (key == "speed") {
-			this->Speed = std::stoi(value);
-		} else if (key == "blizzard_speed") {
-			this->BlizzardSpeed = std::stoi(value);
-		} else if (key == "attack_speed") {
-			this->AttackSpeed = std::stoi(value);
-		} else if (key == "ttl") {
-			this->TTL = std::stoi(value);
-		} else if (key == "reduce_factor") {
-			this->ReduceFactor = std::stoi(value);
-		} else if (key == "smoke_precision") {
-			this->SmokePrecision = std::stoi(value);
-		} else if (key == "missile_stop_flags") {
-			this->MissileStopFlags = std::stoi(value);
-		} else if (key == "draw_level") {
-			this->DrawLevel = std::stoi(value);
-		} else if (key == "range") {
-			this->Range = std::stoi(value);
-		} else if (key == "smoke_missile") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Smoke.Name = value;
-		} else if (key == "can_hit_owner") {
-			this->CanHitOwner = StringToBool(value);
-		} else if (key == "always_fire") {
-			this->AlwaysFire = StringToBool(value);
-		} else if (key == "pierce") {
-			this->Pierce = StringToBool(value);
-		} else if (key == "pierce_once") {
-			this->PierceOnce = StringToBool(value);
-		} else if (key == "pierce_ignore_before_goal") {
-			this->PierceIgnoreBeforeGoal = StringToBool(value);
-		} else if (key == "ignore_walls") {
-			this->IgnoreWalls = StringToBool(value);
-		} else if (key == "kill_first_unit") {
-			this->KillFirstUnit = StringToBool(value);
-		} else if (key == "friendly_fire") {
-			this->FriendlyFire = StringToBool(value);
-		} else if (key == "always_hits") {
-			this->AlwaysHits = StringToBool(value);
-		} else if (key == "splash_factor") {
-			this->SplashFactor = std::stoi(value);
-		} else if (key == "correct_sphash_damage") {
-			this->CorrectSphashDamage = StringToBool(value);
-		} else {
-			fprintf(stderr, "Invalid missile type property: \"%s\".\n", key.c_str());
 		}
+		if (!MissileClassNames[i]) {
+			fprintf(stderr, "Invalid missile class: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "num_bounces") {
+		this->NumBounces = std::stoi(value);
+	} else if (key == "max_bounce_size") {
+		this->MaxBounceSize = std::stoi(value);
+	} else if (key == "parabol_coefficient") {
+		this->ParabolCoefficient = std::stoi(value);
+	} else if (key == "delay") {
+		this->StartDelay = std::stoi(value);
+	} else if (key == "sleep") {
+		this->Sleep = std::stoi(value);
+	} else if (key == "speed") {
+		this->Speed = std::stoi(value);
+	} else if (key == "blizzard_speed") {
+		this->BlizzardSpeed = std::stoi(value);
+	} else if (key == "attack_speed") {
+		this->AttackSpeed = std::stoi(value);
+	} else if (key == "ttl") {
+		this->TTL = std::stoi(value);
+	} else if (key == "reduce_factor") {
+		this->ReduceFactor = std::stoi(value);
+	} else if (key == "smoke_precision") {
+		this->SmokePrecision = std::stoi(value);
+	} else if (key == "missile_stop_flags") {
+		this->MissileStopFlags = std::stoi(value);
+	} else if (key == "draw_level") {
+		this->DrawLevel = std::stoi(value);
+	} else if (key == "range") {
+		this->Range = std::stoi(value);
+	} else if (key == "smoke_missile") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Smoke.Name = value;
+	} else if (key == "can_hit_owner") {
+		this->CanHitOwner = StringToBool(value);
+	} else if (key == "always_fire") {
+		this->AlwaysFire = StringToBool(value);
+	} else if (key == "pierce") {
+		this->Pierce = StringToBool(value);
+	} else if (key == "pierce_once") {
+		this->PierceOnce = StringToBool(value);
+	} else if (key == "pierce_ignore_before_goal") {
+		this->PierceIgnoreBeforeGoal = StringToBool(value);
+	} else if (key == "ignore_walls") {
+		this->IgnoreWalls = StringToBool(value);
+	} else if (key == "kill_first_unit") {
+		this->KillFirstUnit = StringToBool(value);
+	} else if (key == "friendly_fire") {
+		this->FriendlyFire = StringToBool(value);
+	} else if (key == "always_hits") {
+		this->AlwaysHits = StringToBool(value);
+	} else if (key == "splash_factor") {
+		this->SplashFactor = std::stoi(value);
+	} else if (key == "correct_sphash_damage") {
+		this->CorrectSphashDamage = StringToBool(value);
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "image") {
-			std::string file;
-				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
-				} else if (key == "width") {
-					this->size.x = std::stoi(value);
+	return true;
+}
+	
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool MissileType::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "image") {
+		std::string file;
+			
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			if (key == "file") {
+				file = CMod::GetCurrentModPath() + value;
+			} else if (key == "width") {
+				this->size.x = std::stoi(value);
 				} else if (key == "height") {
-					this->size.y = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
-				}
+				this->size.y = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
 			}
-			
-			if (file.empty()) {
-				fprintf(stderr, "Image has no file.\n");
-				continue;
-			}
-			
-			if (this->size.x == 0) {
-				fprintf(stderr, "Image has no width.\n");
-				continue;
-			}
-			
-			if (this->size.y == 0) {
-				fprintf(stderr, "Image has no height.\n");
-				continue;
-			}
-			
-			this->G = CGraphic::New(file, this->Width(), this->Height());
-		} else {
-			fprintf(stderr, "Invalid missile type property: \"%s\".\n", section->Tag.c_str());
 		}
+		
+		if (file.empty()) {
+			fprintf(stderr, "Image has no file.\n");
+			return true;
+		}
+		
+		if (this->size.x == 0) {
+			fprintf(stderr, "Image has no width.\n");
+			return true;
+		}
+		
+		if (this->size.y == 0) {
+			fprintf(stderr, "Image has no height.\n");
+			return true;
+		}
+		
+		this->G = CGraphic::New(file, this->Width(), this->Height());
+	} else {
+		return false;
 	}
 	
+	return true;
+}
+	
+/**
+**	@brief	Initialize the missile type
+*/
+void MissileType::Initialize()
+{
 	if (!this->SmokePrecision) {
 		this->SmokePrecision = this->Speed;
 	}
+	
+	this->Initialized = true;
 }
 
 /**

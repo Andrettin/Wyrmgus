@@ -196,7 +196,7 @@ void ButtonAction::CleanTriggerData() const
 	TriggerData.Faction = nullptr;
 }
 
-int ButtonAction::GetLevelID() const
+int ButtonAction::GetLevelIndex() const
 {
 	if (this->Level) {
 		return this->Level->ID;

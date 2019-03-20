@@ -80,102 +80,122 @@ CCampaign *CCampaign::GetCurrentCampaign()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CCampaign::ProcessConfigData(const CConfigData *config_data)
+bool CCampaign::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "faction") {
-			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = CFaction::Get(value);
-			if (faction) {
-				this->Faction = faction;
-			}
-		} else if (key == "hidden") {
-			this->Hidden = StringToBool(value);
-		} else if (key == "sandbox") {
-			this->Sandbox = StringToBool(value);
-		} else if (key == "start_date") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->StartDate = CDate::FromString(value);
-		} else if (key == "required_quest") {
-			value = FindAndReplaceString(value, "_", "-");
-			CQuest *quest = GetQuest(value);
-			if (quest) {
-				this->RequiredQuests.push_back(quest);
-			} else {
-				fprintf(stderr, "Invalid quest: \"%s\".\n", value.c_str());
-			}
-		} else {
-			fprintf(stderr, "Invalid campaign property: \"%s\".\n", key.c_str());
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "faction") {
+		value = FindAndReplaceString(value, "_", "-");
+		CFaction *faction = CFaction::Get(value);
+		if (faction) {
+			this->Faction = faction;
 		}
+	} else if (key == "hidden") {
+		this->Hidden = StringToBool(value);
+	} else if (key == "sandbox") {
+		this->Sandbox = StringToBool(value);
+	} else if (key == "start_date") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->StartDate = CDate::FromString(value);
+	} else if (key == "required_quest") {
+		value = FindAndReplaceString(value, "_", "-");
+		CQuest *quest = GetQuest(value);
+		if (quest) {
+			this->RequiredQuests.push_back(quest);
+		} else {
+			fprintf(stderr, "Invalid quest: \"%s\".\n", value.c_str());
+		}
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "map_template") {
-			CMapTemplate *map_template = nullptr;
-			Vec2i start_pos(0, 0);
-			Vec2i map_size(0, 0);
-				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "map_template") {
-					value = FindAndReplaceString(value, "_", "-");
-					map_template = CMapTemplate::Get(value);
-					if (map_size.x == 0) {
-						map_size.x = map_template->Width;
-					}
-					if (map_size.y == 0) {
-						map_size.y = map_template->Height;
-					}
-				} else if (key == "start_x") {
-					start_pos.x = std::stoi(value);
-				} else if (key == "start_y") {
-					start_pos.y = std::stoi(value);
-				} else if (key == "width") {
-					map_size.x = std::stoi(value);
-				} else if (key == "height") {
-					map_size.y = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CCampaign::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "map_template") {
+		CMapTemplate *map_template = nullptr;
+		Vec2i start_pos(0, 0);
+		Vec2i map_size(0, 0);
+			
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			if (key == "map_template") {
+				value = FindAndReplaceString(value, "_", "-");
+				map_template = CMapTemplate::Get(value);
+				if (map_size.x == 0) {
+					map_size.x = map_template->Width;
 				}
+				if (map_size.y == 0) {
+					map_size.y = map_template->Height;
+				}
+			} else if (key == "start_x") {
+				start_pos.x = std::stoi(value);
+			} else if (key == "start_y") {
+				start_pos.y = std::stoi(value);
+			} else if (key == "width") {
+				map_size.x = std::stoi(value);
+			} else if (key == "height") {
+				map_size.y = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
 			}
-			
-			if (!map_template) {
-				fprintf(stderr, "Campaign map template has no map template.\n");
-				continue;
-			}
-			
-			this->MapTemplates.push_back(map_template);
-			this->MapTemplateStartPos.push_back(start_pos);
-			this->MapSizes.push_back(map_size);
-		} else {
-			fprintf(stderr, "Invalid campaign property: \"%s\".\n", section->Tag.c_str());
 		}
+		
+		if (!map_template) {
+			fprintf(stderr, "Campaign map template has no map template.\n");
+			return true;
+		}
+		
+		this->MapTemplates.push_back(map_template);
+		this->MapTemplateStartPos.push_back(start_pos);
+		this->MapSizes.push_back(map_size);
+	} else {
+		return false;
 	}
 	
-	std::sort(CCampaign::Instances.begin(), CCampaign::Instances.end(), [](CCampaign *a, CCampaign *b) {
-		std::string species_ident_a = a->GetSpecies() ? a->GetSpecies()->GetIdent().utf8().get_data() : "";
-		std::string species_ident_b = b->GetSpecies() ? b->GetSpecies()->GetIdent().utf8().get_data() : "";
-		if (species_ident_a != species_ident_b) {
-			return species_ident_a < species_ident_b;
-		} else if (a->StartDate != b->StartDate) {
-			return a->StartDate < b->StartDate;
-		} else {
-			return a->Ident < b->Ident;
-		}
-	});
+	return true;
+}
+	
+/**
+**	@brief	Initialize the campaign
+*/
+void CCampaign::Initialize()
+{
+	this->Initialized = true;
+	
+	if (CCampaign::AreAllInitialized()) {
+		std::sort(CCampaign::Instances.begin(), CCampaign::Instances.end(), [](CCampaign *a, CCampaign *b) {
+			std::string species_ident_a = a->GetSpecies() ? a->GetSpecies()->GetIdent().utf8().get_data() : "";
+			std::string species_ident_b = b->GetSpecies() ? b->GetSpecies()->GetIdent().utf8().get_data() : "";
+			if (species_ident_a != species_ident_b) {
+				return species_ident_a < species_ident_b;
+			} else if (a->StartDate != b->StartDate) {
+				return a->StartDate < b->StartDate;
+			} else {
+				return a->Ident < b->Ident;
+			}
+		});
+	}
 }
 
 CSpecies *CCampaign::GetSpecies() const

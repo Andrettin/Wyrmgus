@@ -36,67 +36,37 @@
 #include "religion/religion.h"
 
 #include "config.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CReligion *> CReligion::Religions;
-std::map<std::string, CReligion *> CReligion::ReligionsByIdent;
-	
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+#include "religion/deity_domain.h"
 
 /**
-**	@brief	Get a religion
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	ident		The religion's string identifier
-**	@param	should_find	Whether it is an error if the religion could not be found; this is true by default
+**	@param	key		The property's key
+**	@param	value	The property's value
 **
-**	@return	The religion if found, or null otherwise
+**	@return	True if the property can be processed, or false otherwise
 */
-CReligion *CReligion::GetReligion(const std::string &ident, const bool should_find)
+bool CReligion::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (ReligionsByIdent.find(ident) != ReligionsByIdent.end()) {
-		return ReligionsByIdent.find(ident)->second;
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "background") {
+		this->Background = value;
+	} else if (key == "quote") {
+		this->Quote = value;
+	} else if (key == "cultural_deities") {
+		this->CulturalDeities = StringToBool(value);
+	} else if (key == "domain") {
+		value = FindAndReplaceString(value, "_", "-");
+		CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value.c_str());
+		if (deity_domain) {
+			this->Domains.push_back(deity_domain);
+		}
+	} else {
+		return false;
 	}
 	
-	if (should_find) {
-		fprintf(stderr, "Invalid religion: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a religion
-**
-**	@param	ident	The religion's string identifier
-**
-**	@return	The religion if found, or a newly-created one otherwise
-*/
-CReligion *CReligion::GetOrAddReligion(const std::string &ident)
-{
-	CReligion *religion = GetReligion(ident, false);
-	
-	if (!religion) {
-		religion = new CReligion;
-		religion->Ident = ident;
-		Religions.push_back(religion);
-		ReligionsByIdent[ident] = religion;
-	}
-	
-	return religion;
-}
-
-/**
-**	@brief	Remove the existing religions
-*/
-void CReligion::ClearReligions()
-{
-	for (size_t i = 0; i < Religions.size(); ++i) {
-		delete Religions[i];
-	}
-	Religions.clear();
+	return true;
 }

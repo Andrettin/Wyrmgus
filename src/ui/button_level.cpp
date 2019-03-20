@@ -111,28 +111,28 @@ void CButtonLevel::ClearButtonLevels()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CButtonLevel::ProcessConfigData(const CConfigData *config_data)
+bool CButtonLevel::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "cancel_button_level") {
-			const bool is_cancel_button_level = StringToBool(value);
-			if (is_cancel_button_level) {
-				CButtonLevel::CancelButtonLevel = this;
-			}
-		} else if (key == "inventory_button_level") {
-			const bool is_inventory_button_level = StringToBool(value);
-			if (is_inventory_button_level) {
-				CButtonLevel::InventoryButtonLevel = this;
-			}
-		} else {
-			fprintf(stderr, "Invalid button level property: \"%s\".\n", key.c_str());
+	if (key == "cancel_button_level") {
+		const bool is_cancel_button_level = StringToBool(value);
+		if (is_cancel_button_level) {
+			CButtonLevel::CancelButtonLevel = this;
 		}
+	} else if (key == "inventory_button_level") {
+		const bool is_inventory_button_level = StringToBool(value);
+		if (is_inventory_button_level) {
+			CButtonLevel::InventoryButtonLevel = this;
+		}
+	} else {
+		return false;
 	}
+	
+	return true;
 }

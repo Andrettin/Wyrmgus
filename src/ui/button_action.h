@@ -99,7 +99,7 @@ public:
 
 	void SetTriggerData() const;
 	void CleanTriggerData() const;
-	int GetLevelID() const;
+	int GetLevelIndex() const;
 	int GetKey() const;
 	std::string GetHint() const;
 

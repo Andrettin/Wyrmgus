@@ -2334,7 +2334,7 @@ static int CclDefineReligion(lua_State *l)
 	}
 
 	std::string religion_ident = LuaToString(l, 1);
-	CReligion *religion = CReligion::GetOrAddReligion(religion_ident);
+	CReligion *religion = CReligion::GetOrAdd(religion_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -2444,7 +2444,7 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CReligion *religion = CReligion::GetReligion(LuaToString(l, -1, j + 1));
+				CReligion *religion = CReligion::Get(LuaToString(l, -1, j + 1));
 				if (religion) {
 					deity->Religions.push_back(religion);
 				}
@@ -3694,10 +3694,10 @@ static int CclGetLanguageWordData(lua_State *l)
 
 static int CclGetReligions(lua_State *l)
 {
-	lua_createtable(l, CReligion::Religions.size(), 0);
-	for (size_t i = 1; i <= CReligion::Religions.size(); ++i)
+	lua_createtable(l, CReligion::GetAll().size(), 0);
+	for (size_t i = 1; i <= CReligion::GetAll().size(); ++i)
 	{
-		lua_pushstring(l, CReligion::Religions[i-1]->Ident.c_str());
+		lua_pushstring(l, CReligion::GetAll()[i-1]->GetIdent().utf8().get_data());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3736,7 +3736,7 @@ static int CclGetReligionData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string religion_ident = LuaToString(l, 1);
-	const CReligion *religion = CReligion::GetReligion(religion_ident);
+	const CReligion *religion = CReligion::Get(religion_ident);
 	if (!religion) {
 		return 0;
 	}

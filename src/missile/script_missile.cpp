@@ -176,13 +176,11 @@ void MissileType::Load(lua_State *l)
 		}
 	}
 
-	if (!this->SmokePrecision) {
-		this->SmokePrecision = this->Speed;
-	}
 	if (!file.empty()) {
 		this->G = CGraphic::New(file, this->Width(), this->Height());
 	}
 
+	this->Initialize();
 }
 
 /**

@@ -30,32 +30,18 @@
 #ifndef __RELIGION_H__
 #define __RELIGION_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include <map>
-#include <string>
-#include <vector>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
+#include "data_type.h"
 
 class CConfigData;
 class CDeityDomain;
 
-class CReligion
+class CReligion : public CDataType
 {
+	DATA_TYPE_CLASS(CReligion)
+
 public:
-	static CReligion *GetReligion(const std::string &ident, const bool should_find = true);
-	static CReligion *GetOrAddReligion(const std::string &ident);
-	static void ClearReligions();
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	static std::vector<CReligion *> Religions;	/// Religions
-	static std::map<std::string, CReligion *> ReligionsByIdent;
-	
-	std::string Ident;							/// Ident of the religion
 	std::string Name;							/// Name of the religion
 	std::string Description;
 	std::string Background;

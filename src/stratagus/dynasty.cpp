@@ -36,6 +36,7 @@
 #include "dynasty.h"
 
 #include "config.h"
+#include "luacallback.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

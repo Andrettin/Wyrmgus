@@ -30,16 +30,8 @@
 #ifndef __HISTORICAL_UNIT_H__
 #define __HISTORICAL_UNIT_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
 #include "time/date.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CFaction;
 class CHistoricalLocation;
@@ -52,7 +44,8 @@ class CHistoricalUnit : public CDataType
 public:
 	~CHistoricalUnit();
 	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
 public:
 	std::string Name; //the unit's name
@@ -60,7 +53,7 @@ public:
 	CFaction *Faction = nullptr; //the unit's faction
 	int Quantity = 1; //how many in-game units does this historical unit result in when applied
 	CDate StartDate; //when the unit starts being active
-	CDate EndDate; //when the unit ends being active (e.g. when it is disbanded)
+	CDate EndDate; //when the unit ceases being active (e.g. when it is disbanded)
 	std::vector<CHistoricalLocation *> HistoricalLocations; //historical locations for the unit
 };
 

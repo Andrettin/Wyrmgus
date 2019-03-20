@@ -70,7 +70,7 @@ std::map<const CUpgrade *, CDeity *> CDeity::DeitiesByUpgrade;
 */
 CDeity *CDeity::GetDeity(const std::string &ident, const bool should_find)
 {
-	std::map<std::string, CDeity *>::const_iterator find_iterator = DeitiesByIdent.find(ident);
+	std::map<std::string, CDeity *>::const_iterator find_iterator = CDeity::DeitiesByIdent.find(ident);
 	
 	if (find_iterator != DeitiesByIdent.end()) {
 		return find_iterator->second;
@@ -165,7 +165,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "religion") {
 			value = FindAndReplaceString(value, "_", "-");
-			CReligion *religion = CReligion::GetReligion(value.c_str());
+			CReligion *religion = CReligion::Get(value.c_str());
 			if (religion) {
 				this->Religions.push_back(religion);
 			}

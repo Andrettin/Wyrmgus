@@ -60,9 +60,9 @@ std::map<const CUpgrade *, CDeityDomain *> CDeityDomain::DeityDomainsByUpgrade;
 */
 CDeityDomain *CDeityDomain::GetDeityDomain(const std::string &ident, const bool should_find)
 {
-	std::map<std::string, CDeityDomain *>::const_iterator find_iterator = DeityDomainsByIdent.find(ident);
+	std::map<std::string, CDeityDomain *>::const_iterator find_iterator = CDeityDomain::DeityDomainsByIdent.find(ident);
 	
-	if (find_iterator != DeityDomainsByIdent.end()) {
+	if (find_iterator != CDeityDomain::DeityDomainsByIdent.end()) {
 		return find_iterator->second;
 	}
 	
@@ -82,13 +82,13 @@ CDeityDomain *CDeityDomain::GetDeityDomain(const std::string &ident, const bool 
 */
 CDeityDomain *CDeityDomain::GetOrAddDeityDomain(const std::string &ident)
 {
-	CDeityDomain *deity_domain = GetDeityDomain(ident, false);
+	CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(ident, false);
 	
 	if (!deity_domain) {
 		deity_domain = new CDeityDomain;
 		deity_domain->Ident = ident;
-		DeityDomains.push_back(deity_domain);
-		DeityDomainsByIdent[ident] = deity_domain;
+		CDeityDomain::DeityDomains.push_back(deity_domain);
+		CDeityDomain::DeityDomainsByIdent[ident] = deity_domain;
 	}
 	
 	return deity_domain;
@@ -104,9 +104,9 @@ CDeityDomain *CDeityDomain::GetOrAddDeityDomain(const std::string &ident)
 */
 CDeityDomain *CDeityDomain::GetDeityDomainByUpgrade(const CUpgrade *upgrade, const bool should_find)
 {
-	std::map<const CUpgrade *, CDeityDomain *>::const_iterator find_iterator = DeityDomainsByUpgrade.find(upgrade);
+	std::map<const CUpgrade *, CDeityDomain *>::const_iterator find_iterator = CDeityDomain::DeityDomainsByUpgrade.find(upgrade);
 	
-	if (find_iterator != DeityDomainsByUpgrade.end()) {
+	if (find_iterator != CDeityDomain::DeityDomainsByUpgrade.end()) {
 		return find_iterator->second;
 	}
 	
@@ -122,51 +122,53 @@ CDeityDomain *CDeityDomain::GetDeityDomainByUpgrade(const CUpgrade *upgrade, con
 */
 void CDeityDomain::ClearDeityDomains()
 {
-	for (size_t i = 0; i < DeityDomains.size(); ++i) {
+	for (size_t i = 0; i < CDeityDomain::DeityDomains.size(); ++i) {
 		delete DeityDomains[i];
 	}
-	DeityDomains.clear();
+	CDeityDomain::DeityDomains.clear();
+	CDeityDomain::DeityDomainsByIdent.clear();
+	CDeityDomain::DeityDomainsByUpgrade.clear();
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CDeityDomain::ProcessConfigData(const CConfigData *config_data)
+bool CDeityDomain::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
-			if (upgrade) {
-				this->Upgrade = upgrade;
-				CDeityDomain::DeityDomainsByUpgrade[upgrade] = this;
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "ability") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *ability = CUpgrade::Get(value);
-			if (ability) {
-				this->Abilities.push_back(ability);
-				ability->DeityDomains.push_back(this);
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "background") {
-			this->Background = value;
-		} else if (key == "quote") {
-			this->Quote = value;
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "upgrade") {
+		value = FindAndReplaceString(value, "_", "-");
+		CUpgrade *upgrade = CUpgrade::Get(value);
+		if (upgrade) {
+			this->Upgrade = upgrade;
+			CDeityDomain::DeityDomainsByUpgrade[upgrade] = this;
 		} else {
-			fprintf(stderr, "Invalid school of magic property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 		}
+	} else if (key == "ability") {
+		value = FindAndReplaceString(value, "_", "-");
+		CUpgrade *ability = CUpgrade::Get(value);
+		if (ability) {
+			this->Abilities.push_back(ability);
+			ability->DeityDomains.push_back(this);
+		} else {
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "background") {
+		this->Background = value;
+	} else if (key == "quote") {
+		this->Quote = value;
+	} else {
+		return false;
 	}
+	
+	return true;
 }

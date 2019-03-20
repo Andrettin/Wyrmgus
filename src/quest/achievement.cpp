@@ -61,70 +61,78 @@ void CAchievement::CheckAchievements()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CAchievement::ProcessConfigData(const CConfigData *config_data)
+bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "player_color") {
-			value = FindAndReplaceString(value, "_", "-");
-			CPlayerColor *player_color = CPlayerColor::Get(value);
-			if (player_color != nullptr) {
-				this->PlayerColor = player_color;
-			}
-		} else if (key == "character_level") {
-			this->CharacterLevel = std::stoi(value);
-		} else if (key == "difficulty") {
-			this->Difficulty = std::stoi(value);
-		} else if (key == "hidden") {
-			this->Hidden = StringToBool(value);
-		} else if (key == "unobtainable") {
-			this->Unobtainable = StringToBool(value);
-		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Icon.Name = value;
-			this->Icon.Icon = nullptr;
-			this->Icon.Load();
-			this->Icon.Icon->Load();
-		} else if (key == "character") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CCharacter *character = CCharacter::GetCharacter(value);
-			if (character) {
-				this->Character = character;
-			}
-		} else if (key == "character_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CUnitType *unit_type = UnitTypeByIdent(value);
-			if (unit_type) {
-				this->CharacterType = unit_type;
-			} else {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
-			}
-		} else if (key == "required_quest") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CQuest *required_quest = GetQuest(value);
-			if (required_quest) {
-				this->RequiredQuests.push_back(required_quest);
-			} else {
-				fprintf(stderr, "Quest \"%s\" does not exist.\n", value.c_str());
-			}
-		} else {
-			fprintf(stderr, "Invalid achievement property: \"%s\".\n", key.c_str());
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "player_color") {
+		value = FindAndReplaceString(value, "_", "-");
+		CPlayerColor *player_color = CPlayerColor::Get(value);
+		if (player_color != nullptr) {
+			this->PlayerColor = player_color;
 		}
+	} else if (key == "character_level") {
+		this->CharacterLevel = std::stoi(value);
+	} else if (key == "difficulty") {
+		this->Difficulty = std::stoi(value);
+	} else if (key == "hidden") {
+		this->Hidden = StringToBool(value);
+	} else if (key == "unobtainable") {
+		this->Unobtainable = StringToBool(value);
+	} else if (key == "icon") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Icon.Name = value;
+		this->Icon.Icon = nullptr;
+		this->Icon.Load();
+		this->Icon.Icon->Load();
+	} else if (key == "character") {
+		value = FindAndReplaceString(value, "_", "-");
+		const CCharacter *character = CCharacter::GetCharacter(value);
+		if (character) {
+			this->Character = character;
+		}
+	} else if (key == "character_type") {
+		value = FindAndReplaceString(value, "_", "-");
+		const CUnitType *unit_type = UnitTypeByIdent(value);
+		if (unit_type) {
+			this->CharacterType = unit_type;
+		} else {
+			fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
+		}
+	} else if (key == "required_quest") {
+		value = FindAndReplaceString(value, "_", "-");
+		const CQuest *required_quest = GetQuest(value);
+		if (required_quest) {
+			this->RequiredQuests.push_back(required_quest);
+		} else {
+			fprintf(stderr, "Quest \"%s\" does not exist.\n", value.c_str());
+		}
+	} else {
+		return false;
 	}
 	
+	return true;
+}
+	
+/**
+**	@brief	Initialize the achievement
+*/
+void CAchievement::Initialize()
+{
 	if (!this->PlayerColor) {
 		fprintf(stderr, "Achievement \"%s\" has no player color.\n", this->Ident.c_str());
 	}
+	
+	this->Initialized = true;
 }
 
 void CAchievement::Obtain(const bool save, const bool display)

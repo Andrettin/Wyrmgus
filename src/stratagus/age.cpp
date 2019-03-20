@@ -87,7 +87,7 @@ bool CAge::ProcessConfigDataProperty(const std::string &key, std::string value)
 	
 	return true;
 }
-	
+
 /**
 **	@brief	Process a section in the data provided by a configuration file
 **

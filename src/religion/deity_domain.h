@@ -30,19 +30,7 @@
 #ifndef __DEITY_DOMAIN_H__
 #define __DEITY_DOMAIN_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
-
-#include <map>
-#include <string>
-#include <vector>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CUpgrade;
 
@@ -58,7 +46,7 @@ public:
 	static std::map<std::string, CDeityDomain *> DeityDomainsByIdent;
 	static std::map<const CUpgrade *, CDeityDomain *> DeityDomainsByUpgrade;
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	std::string Name;									/// Name of the domain
 	std::string Description;							/// Description of the deity domain from an in-game universe perspective

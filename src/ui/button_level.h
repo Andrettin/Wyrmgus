@@ -52,7 +52,7 @@ public:
 	static CButtonLevel *CancelButtonLevel;
 	static CButtonLevel *InventoryButtonLevel;
 	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	int ID = -1;									/// ID of the button level (starting at 1)
 };

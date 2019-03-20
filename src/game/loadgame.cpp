@@ -154,7 +154,7 @@ void CleanModules()
 	CleanProvinces();
 	CleanQuests();
 	//Wyrmgus end
-	CReligion::ClearReligions();
+	CReligion::Clear();
 	CSchoolOfMagic::ClearSchoolsOfMagic();
 	CSite::Clear();
 	CSpecies::Clear();

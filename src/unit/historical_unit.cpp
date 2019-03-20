@@ -55,50 +55,60 @@ CHistoricalUnit::~CHistoricalUnit()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CHistoricalUnit::ProcessConfigData(const CConfigData *config_data)
+bool CHistoricalUnit::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "quantity") {
-			this->Quantity = std::stoi(value);
-		} else if (key == "unit_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->UnitType = UnitTypeByIdent(value);
-		} else if (key == "faction") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Faction = CFaction::Get(value);
-		} else if (key == "start_date") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->StartDate = CDate::FromString(value);
-		} else if (key == "end_date") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->EndDate = CDate::FromString(value);
-		} else {
-			fprintf(stderr, "Invalid historical unit property: \"%s\".\n", key.c_str());
-		}
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "quantity") {
+		this->Quantity = std::stoi(value);
+	} else if (key == "unit_type") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->UnitType = UnitTypeByIdent(value);
+	} else if (key == "faction") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Faction = CFaction::Get(value);
+	} else if (key == "start_date") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->StartDate = CDate::FromString(value);
+	} else if (key == "end_date") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->EndDate = CDate::FromString(value);
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "historical_location") {
-			CHistoricalLocation *historical_location = new CHistoricalLocation;
-			historical_location->ProcessConfigData(section);
-				
-			if (historical_location->Date.Year == 0 || !historical_location->MapTemplate) {
-				delete historical_location;
-				continue;
-			}
+	return true;
+}
+	
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CHistoricalUnit::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "historical_location") {
+		CHistoricalLocation *historical_location = new CHistoricalLocation;
+		historical_location->ProcessConfigData(section);
 			
-			this->HistoricalLocations.push_back(historical_location);
-		} else {
-			fprintf(stderr, "Invalid historical unit property: \"%s\".\n", section->Tag.c_str());
+		if (historical_location->Date.Year == 0 || !historical_location->MapTemplate) {
+			delete historical_location;
+			return true;
 		}
+		
+		this->HistoricalLocations.push_back(historical_location);
+	} else {
+		return false;
 	}
+	
+	return true;
 }
