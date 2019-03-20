@@ -35,6 +35,7 @@
 
 class CTimeline : public CDataType
 {
+	GDCLASS(CTimeline, CDataType)
 	DATA_TYPE_CLASS(CTimeline)
 
 public:
@@ -42,6 +43,9 @@ public:
 	
 	std::string Name;
 	CDate PointOfDivergence;											/// The point of divergence for this timeline
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

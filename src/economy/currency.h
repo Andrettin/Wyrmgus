@@ -34,12 +34,17 @@
 
 class CCurrency : public CDataType
 {
+	GDCLASS(CCurrency, CDataType)
 	DATA_TYPE_CLASS(CCurrency)
 	
+public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 public:
 	std::string Name;
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

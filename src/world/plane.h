@@ -40,6 +40,8 @@ class CTimeOfDaySchedule;
 
 class CPlane : public CDataType
 {
+	GDCLASS(CPlane, CDataType)
+
 public:
 	static CPlane *GetPlane(const std::string &ident, const bool should_find = true);
 	static CPlane *GetOrAddPlane(const std::string &ident);
@@ -59,6 +61,9 @@ public:
 	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// Deity domains empowered in this plane
 	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic;				/// Schools of magic empowered in this plane
 	std::vector<CSpecies *> Species;									/// Species native to this plane
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

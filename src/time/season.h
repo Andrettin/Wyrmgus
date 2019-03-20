@@ -36,6 +36,7 @@ class CGraphic;
 
 class CSeason : public CDataType
 {
+	GDCLASS(CSeason, CDataType)
 	DATA_TYPE_CLASS(CSeason)
 
 public:
@@ -44,6 +45,9 @@ public:
 
 	std::string Name;							/// Name of the season
 	CGraphic *G = nullptr;
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

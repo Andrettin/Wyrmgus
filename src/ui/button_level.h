@@ -34,6 +34,8 @@
 
 class CButtonLevel : public CDataType
 {
+	GDCLASS(CButtonLevel, CDataType)
+	
 public:
 	static CButtonLevel *GetButtonLevel(const std::string &ident, const bool should_find = true);
 	static CButtonLevel *GetOrAddButtonLevel(const std::string &ident);
@@ -46,6 +48,8 @@ public:
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

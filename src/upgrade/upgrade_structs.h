@@ -45,6 +45,15 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
+//temporary defines, to make the file compile properly for Godot's register_types.cpp
+#ifndef UnitTypeMax
+#define UnitTypeMax  2048                /// How many unit types supported
+#endif
+
+#ifndef UpgradeMax
+#define UpgradeMax   2048                /// How many upgrades supported
+#endif
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -98,7 +107,14 @@ public:
 */
 class CUpgrade : public CDataType
 {
+	GDCLASS(CUpgrade, CDataType)
+	
 public:
+	// so that the class can be exposed to Godot
+	CUpgrade()
+	{
+	}
+	
 	CUpgrade(const std::string &ident);
 	~CUpgrade();
 
@@ -158,6 +174,9 @@ public:
 	CIcon *Icon = nullptr;					/// icon to display to the user
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 /**

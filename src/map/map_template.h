@@ -79,6 +79,7 @@ public:
 
 class CMapTemplate : public CDataType
 {
+	GDCLASS(CMapTemplate, CDataType)
 	DATA_TYPE_CLASS(CMapTemplate)
 	
 public:
@@ -140,6 +141,9 @@ public:
 	std::vector<CSite *> Sites;
 	std::map<std::pair<int, int>, CSite *> SitesByPosition;
 	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

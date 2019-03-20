@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <core/object.h>
 #include <core/ustring.h>
 
 #include <algorithm>
@@ -171,7 +172,7 @@ private: \
 
 class CConfigData;
 
-class CDataType
+class CDataType : public Object
 {
 public:
 	CDataType(const std::string &ident = "", const int index = -1) : Ident(ident), Index(index)

@@ -41,6 +41,8 @@ class CTimeOfDaySchedule;
 
 class CWorld : public CDataType
 {
+	GDCLASS(CWorld, CDataType)
+
 public:
 	static CWorld *GetWorld(const std::string &ident, const bool should_find = true);
 	static CWorld *GetOrAddWorld(const std::string &ident);
@@ -61,6 +63,9 @@ public:
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
 	std::vector<CSpecies *> Species;									/// Species in this world
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

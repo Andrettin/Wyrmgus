@@ -51,6 +51,8 @@ class CUnitType;
 
 class CTerrainType : public CDataType
 {
+	GDCLASS(CTerrainType, CDataType)
+
 public:
 	CTerrainType()
 	{
@@ -104,6 +106,9 @@ public:
 	std::vector<int> DestroyedTiles;
 	std::map<std::tuple<int, int>, std::vector<int>> TransitionTiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 	std::map<std::tuple<int, int>, std::vector<int>> AdjacentTransitionTiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

@@ -63,6 +63,7 @@ public:
 
 class CTimeOfDaySchedule : public CTimePeriodSchedule
 {
+	GDCLASS(CTimeOfDaySchedule, CTimePeriodSchedule)
 	DATA_TYPE_CLASS(CTimeOfDaySchedule)
 	
 public:
@@ -96,6 +97,9 @@ public:
 
 	std::string Name;										/// Name of the time of day schedules
 	std::vector<CScheduledTimeOfDay *> ScheduledTimesOfDay;	/// The times of day that are scheduled
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

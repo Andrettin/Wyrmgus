@@ -54,6 +54,7 @@ public:
 
 class CSeasonSchedule : public CTimePeriodSchedule
 {
+	GDCLASS(CSeasonSchedule, CTimePeriodSchedule)
 	DATA_TYPE_CLASS(CSeasonSchedule)
 	
 public:
@@ -71,6 +72,9 @@ public:
 	std::string Name;									/// Name of the season schedule
 	unsigned HoursPerDay = DEFAULT_HOURS_PER_DAY;		/// The hours per each day for this season schedule
 	std::vector<CScheduledSeason *> ScheduledSeasons;	/// The seasons that are scheduled
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

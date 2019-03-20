@@ -30,20 +30,13 @@
 #ifndef __SPECIES_CATEGORY_H__
 #define __SPECIES_CATEGORY_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CSpeciesCategoryRank;
 
 class CSpeciesCategory : public CDataType
 {
+	GDCLASS(CSpeciesCategory, CDataType)
 	DATA_TYPE_CLASS(CSpeciesCategory)
 	
 public:
@@ -80,6 +73,9 @@ private:
 	CSpeciesCategoryRank *Rank = nullptr;		/// the rank of the species category
 	std::vector<CSpeciesCategory *> LowerCategories;	/// the categories directly below this one
 	CSpeciesCategory *UpperCategory = nullptr;	/// the category directly above this one
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

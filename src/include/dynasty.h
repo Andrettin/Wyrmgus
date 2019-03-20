@@ -40,6 +40,7 @@ class LuaCallback;
 
 class CDynasty : public CDataType
 {
+	GDCLASS(CDynasty, CDataType)
 	DATA_TYPE_CLASS(CDynasty)
 
 public:
@@ -56,6 +57,9 @@ public:
 	IconConfig Icon;													/// dynasty's icon
 	LuaCallback *Conditions = nullptr;
 	std::vector<CFaction *> Factions;									/// to which factions is this dynasty available
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

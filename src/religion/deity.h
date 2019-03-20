@@ -54,6 +54,8 @@ class CUpgrade;
 
 class CDeity : public CDataType
 {
+	GDCLASS(CDeity, CDataType)
+
 public:
 	static CDeity *GetDeity(const std::string &ident, const bool should_find = true);
 	static CDeity *GetOrAddDeity(const std::string &ident);
@@ -86,6 +88,9 @@ public:
 	std::vector<CFaction *> HolyOrders;			/// Holy orders of this deity
 	std::vector<CUpgrade *> Abilities;			/// Abilities linked to this deity
 	std::map<const CCivilization *, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

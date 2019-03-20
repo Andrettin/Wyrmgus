@@ -38,6 +38,7 @@ class CUpgrade;
 
 class CAge : public CDataType
 {
+	GDCLASS(CAge, CDataType)
 	DATA_TYPE_CLASS(CAge)
 	
 public:
@@ -59,6 +60,9 @@ public:
 	int YearBoost = 0;
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 /*----------------------------------------------------------------------------

@@ -697,9 +697,9 @@ public:
 //Wyrmgus start
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
-class CUnitType : public CDataType, public Object
+class CUnitType : public CDataType
 {
-	GDCLASS(CUnitType, Object)
+	GDCLASS(CUnitType, CDataType)
 	
 public:
 	CUnitType();

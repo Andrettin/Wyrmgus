@@ -49,6 +49,7 @@ struct lua_State;
 
 class CSpecies : public CDataType
 {
+	GDCLASS(CSpecies, CDataType)
 	DATA_TYPE_CLASS(CSpecies)
 	
 public:
@@ -131,6 +132,9 @@ private:
 	friend int CclDefineSpecies(lua_State *l);
 	friend int CclDefineUnitType(lua_State *l);
 	friend class CUnitType;	// necessary so that the unit type may set the species' type to itself
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

@@ -44,6 +44,8 @@ class CUpgrade;
 
 class CSchoolOfMagic : public CDataType
 {
+	GDCLASS(CSchoolOfMagic, CDataType)
+
 public:
 	static CSchoolOfMagic *GetSchoolOfMagic(const std::string &ident, bool should_find = true);
 	static CSchoolOfMagic *GetOrAddSchoolOfMagic(const std::string &ident);
@@ -62,6 +64,9 @@ public:
 	std::string Quote;									/// A quote relating to the school of magic
 	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the school of magic
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this school of magic
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

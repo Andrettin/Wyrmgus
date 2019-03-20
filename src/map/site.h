@@ -52,6 +52,7 @@ class CUniqueItem;
 
 class CSite : public CDataType
 {
+	GDCLASS(CSite, CDataType)
 	DATA_TYPE_CLASS(CSite)
 	
 public:
@@ -74,6 +75,9 @@ public:
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
 	std::vector<std::tuple<CDate, CDate, int, CUniqueItem *, const CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

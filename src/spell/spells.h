@@ -220,7 +220,14 @@ public:
 */
 class CSpell : public CDataType
 {
+	GDCLASS(CSpell, CDataType)
+	
 public:
+	// so that the class can be exposed to Godot
+	CSpell()
+	{
+	}
+	
 	CSpell(int slot, const std::string &ident);
 	~CSpell();
 
@@ -278,6 +285,9 @@ public:
 		return !Range && Target == TargetSelf;
 	}
 	bool ForceUseAnimation = false;
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 /*----------------------------------------------------------------------------

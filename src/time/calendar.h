@@ -69,6 +69,8 @@ public:
 
 class CCalendar : public CDataType
 {
+	GDCLASS(CCalendar, CDataType)
+	
 public:
 	~CCalendar();
 	
@@ -101,6 +103,9 @@ public:
 private:
 	std::map<std::string, CDayOfTheWeek *> DaysOfTheWeekByIdent;
 	std::map<CCalendar *, std::map<CDate, CDate>> ChronologicalIntersections;	/// chronological intersection points between this calendar and other calendars
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

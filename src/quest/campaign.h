@@ -52,9 +52,9 @@ class CQuest;
 class CSpecies;
 struct lua_State;
 
-class CCampaign : public CDataType, public Object
+class CCampaign : public CDataType
 {
-	GDCLASS(CCampaign, Object)
+	GDCLASS(CCampaign, CDataType)
 	DATA_TYPE_CLASS(CCampaign)
 	
 public:

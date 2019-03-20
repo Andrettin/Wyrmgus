@@ -42,6 +42,7 @@
 
 class CSpeciesCategoryRank : public CDataType
 {
+	GDCLASS(CSpeciesCategoryRank, CDataType)
 	DATA_TYPE_CLASS(CSpeciesCategoryRank)
 	
 public:
@@ -67,6 +68,9 @@ private:
 	std::string Name;				/// name of the species category rank
 	CSpeciesCategoryRank *LowerRank = nullptr;	/// the rank directly below this one
 	CSpeciesCategoryRank *UpperRank = nullptr;	/// the rank directly above this one
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

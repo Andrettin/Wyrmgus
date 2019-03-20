@@ -220,7 +220,14 @@ enum {
 /// Base structure of missile-types
 class MissileType : public CDataType
 {
+	GDCLASS(MissileType, CDataType)
+
 public:
+	// so that the class can be exposed to Godot
+	MissileType()
+	{
+	}
+	
 	explicit MissileType(const std::string &ident);
 	~MissileType();
 
@@ -292,6 +299,9 @@ public:
 
 	// --- FILLED UP ---
 	CGraphic *G = nullptr;		/// missile graphic
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 /*----------------------------------------------------------------------------

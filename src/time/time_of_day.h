@@ -45,9 +45,9 @@
 
 class CGraphic;
 
-class CTimeOfDay : public CDataType, public Object
+class CTimeOfDay : public CDataType
 {
-	GDCLASS(CTimeOfDay, Object)
+	GDCLASS(CTimeOfDay, CDataType)
 	DATA_TYPE_CLASS(CTimeOfDay)
 	
 public:

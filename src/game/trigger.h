@@ -77,6 +77,8 @@ public:
 
 class CTrigger : public CDataType
 {
+	GDCLASS(CTrigger, CDataType)
+	
 public:
 	enum class TriggerType
 	{
@@ -110,6 +112,9 @@ public:
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
 	std::vector<CTriggerEffect *> TriggerEffects;
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #define ANY_UNIT ((const CUnitType *)0)

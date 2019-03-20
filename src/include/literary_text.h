@@ -45,9 +45,9 @@
 class CLiteraryTextChapter;
 struct lua_State;
 
-class CLiteraryText : public CDataType, public Object
+class CLiteraryText : public CDataType
 {
-	GDCLASS(CLiteraryText, Object)
+	GDCLASS(CLiteraryText, CDataType)
 	DATA_TYPE_CLASS(CLiteraryText)
 	
 public:

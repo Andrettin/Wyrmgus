@@ -34,6 +34,8 @@
 
 class CTimePeriodSchedule : public CDataType
 {
+	GDCLASS(CTimePeriodSchedule, CDataType)
+	
 public:
 	virtual unsigned long GetDefaultTotalHours() const = 0;
 	virtual int GetDefaultHourMultiplier() const = 0;
@@ -41,6 +43,9 @@ public:
 
 	unsigned long TotalHours = 0;						/// The total amount of hours this time period schedule contains
 	int HourMultiplier = 1;								/// The amount of hours that pass for this schedule for each in-game hour
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

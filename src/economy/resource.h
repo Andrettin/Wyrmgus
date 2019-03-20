@@ -82,6 +82,7 @@ enum CostType {
 
 class CResource : public CDataType
 {
+	GDCLASS(CResource, CDataType)
 	DATA_TYPE_CLASS(CResource)
 	
 public:
@@ -103,6 +104,9 @@ public:
 	bool LuxuryResource = false;
 	bool Hidden = false;
 	std::vector<CResource *> ChildResources; //resources (other than this one) that have this resource as their final resource
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 /**

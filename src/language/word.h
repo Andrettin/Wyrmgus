@@ -134,6 +134,7 @@ enum WordJunctionTypes {
 
 class CWord : public CDataType
 {
+	GDCLASS(CWord, CDataType)
 	DATA_TYPE_CLASS(CWord)
 	
 public:
@@ -178,6 +179,9 @@ public:
 	int Number = -1;
 	
 	std::string Mod;				/// To which mod (or map), if any, this word belongs
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

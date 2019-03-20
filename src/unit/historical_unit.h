@@ -39,6 +39,7 @@ class CUnitType;
 
 class CHistoricalUnit : public CDataType
 {
+	GDCLASS(CHistoricalUnit, CDataType)
 	DATA_TYPE_CLASS(CHistoricalUnit)
 	
 public:
@@ -55,6 +56,9 @@ public:
 	CDate StartDate; //when the unit starts being active
 	CDate EndDate; //when the unit ceases being active (e.g. when it is disbanded)
 	std::vector<CHistoricalLocation *> HistoricalLocations; //historical locations for the unit
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

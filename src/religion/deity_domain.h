@@ -36,6 +36,8 @@ class CUpgrade;
 
 class CDeityDomain : public CDataType
 {
+	GDCLASS(CDeityDomain, CDataType)
+
 public:
 	static CDeityDomain *GetDeityDomain(const std::string &ident, bool should_find = true);
 	static CDeityDomain *GetOrAddDeityDomain(const std::string &ident);
@@ -54,6 +56,9 @@ public:
 	std::string Quote;									/// A quote relating to the deity domain
 	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the domain
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this domain
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

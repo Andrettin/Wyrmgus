@@ -49,9 +49,9 @@ class CPlayerColor;
 class CQuest;
 class CUnitType;
 
-class CAchievement : public CDataType, public Object
+class CAchievement : public CDataType
 {
-	GDCLASS(CAchievement, Object)
+	GDCLASS(CAchievement, CDataType)
 	DATA_TYPE_CLASS(CAchievement)
 	
 public:

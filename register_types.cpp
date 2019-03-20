@@ -30,35 +30,107 @@
 
 #include "register_types.h"
 
+#include "age.h"
+#include "animation/animation.h"
+#include "character.h"
 #include "civilization.h"
 #include "conversible_color.h"
+#include "dynasty.h"
+#include "economy/currency.h"
+#include "economy/resource.h"
 #include "faction.h"
+#include "game/trigger.h"
 #include "hair_color.h"
+#include "language/language.h"
+#include "language/word.h"
 #include "literary_text.h"
+#include "map/map_template.h"
+#include "map/site.h"
+#include "map/terrain_type.h"
+#include "missile/missile_type.h"
 #include "player.h"
 #include "player_color.h"
 #include "quest/achievement.h"
 #include "quest/campaign.h"
+#include "religion/deity.h"
+#include "religion/deity_domain.h"
+#include "religion/pantheon.h"
+#include "religion/religion.h"
+#include "school_of_magic.h"
 #include "skin_color.h"
+#include "species/species.h"
+#include "species/species_category.h"
+#include "species/species_category_rank.h"
+#include "spell/spells.h"
+#include "time/calendar.h"
+#include "time/season.h"
+#include "time/season_schedule.h"
+#include "time/timeline.h"
+#include "time/time_of_day.h"
+#include "time/time_of_day_schedule.h"
+#include "time/time_period_schedule.h"
+#include "ui/button_level.h"
 #include "ui/icon.h"
+#include "unit/historical_unit.h"
 #include "unit/unit_type.h"
+#include "upgrade/upgrade_structs.h"
+#include "world/plane.h"
+#include "world/world.h"
 #include "wyrmgus.h"
 
 void register_wyrmgus_types()
 {
+	ClassDB::register_virtual_class<CDataType>();
+	
 	ClassDB::register_class<CAchievement>();
+	ClassDB::register_class<CAge>();
+	ClassDB::register_class<CAnimations>();
+	ClassDB::register_class<CButtonLevel>();
+	ClassDB::register_class<CCalendar>();
 	ClassDB::register_class<CCampaign>();
+	ClassDB::register_class<CCharacter>();
 	ClassDB::register_class<CCivilization>();
-	ClassDB::register_virtual_class<CConversibleColor>();
+	ClassDB::register_class<CCurrency>();
+	ClassDB::register_class<CDeity>();
+	ClassDB::register_class<CDeityDomain>();
+	ClassDB::register_class<CDynasty>();
 	ClassDB::register_class<CFaction>();
-	ClassDB::register_class<CHairColor>();
+	ClassDB::register_class<CHistoricalUnit>();
 	ClassDB::register_class<CIcon>();
+	ClassDB::register_class<CLanguage>();
 	ClassDB::register_class<CLiteraryText>();
+	ClassDB::register_class<CMapTemplate>();
+	ClassDB::register_class<CPantheon>();
+	ClassDB::register_class<CPlane>();
 	ClassDB::register_class<CPlayer>();
+	ClassDB::register_class<CReligion>();
+	ClassDB::register_class<CResource>();
+	ClassDB::register_class<CSchoolOfMagic>();
+	ClassDB::register_class<CSeason>();
+	ClassDB::register_class<CSite>();
+	ClassDB::register_class<CSpecies>();
+	ClassDB::register_class<CSpeciesCategory>();
+	ClassDB::register_class<CSpeciesCategoryRank>();
+	ClassDB::register_class<CSpell>();
+	ClassDB::register_class<CTerrainType>();
+	ClassDB::register_class<CTimeline>();
+	ClassDB::register_class<CTimeOfDay>();
+	ClassDB::register_class<CTrigger>();
+	ClassDB::register_class<CUnitType>();
+	ClassDB::register_class<CUpgrade>();
+	ClassDB::register_class<CWord>();
+	ClassDB::register_class<CWorld>();
+	ClassDB::register_class<MissileType>();
+	ClassDB::register_class<Wyrmgus>();
+	
+	ClassDB::register_virtual_class<CConversibleColor>();
+	ClassDB::register_class<CHairColor>();
 	ClassDB::register_class<CPlayerColor>();
 	ClassDB::register_class<CSkinColor>();
-	ClassDB::register_class<CUnitType>();
-	ClassDB::register_class<Wyrmgus>();
+	
+	ClassDB::register_virtual_class<CTimePeriodSchedule>();
+	ClassDB::register_class<CSeasonSchedule>();
+	ClassDB::register_class<CTimeOfDaySchedule>();
 }
 
 void unregister_wyrmgus_types()

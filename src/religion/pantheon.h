@@ -34,6 +34,7 @@
 
 class CPantheon : public CDataType
 {
+	GDCLASS(CPantheon, CDataType)
 	DATA_TYPE_CLASS(CPantheon)
 	
 public:
@@ -43,6 +44,9 @@ public:
 	std::string Description;
 	std::string Background;
 	std::string Quote;
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

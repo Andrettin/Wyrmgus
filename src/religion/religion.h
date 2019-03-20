@@ -37,6 +37,7 @@ class CDeityDomain;
 
 class CReligion : public CDataType
 {
+	GDCLASS(CReligion, CDataType)
 	DATA_TYPE_CLASS(CReligion)
 
 public:
@@ -48,6 +49,9 @@ public:
 	std::string Quote;
 	bool CulturalDeities = false;				/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
 	std::vector<CDeityDomain *> Domains;
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

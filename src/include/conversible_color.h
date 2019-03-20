@@ -33,12 +33,10 @@
 #include "data_type.h"
 
 #include <core/color.h>
-#include <core/object.h>
 
-
-class CConversibleColor : public CDataType, public Object
+class CConversibleColor : public CDataType
 {
-	GDCLASS(CConversibleColor, Object)
+	GDCLASS(CConversibleColor, CDataType)
 	
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;

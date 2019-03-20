@@ -37,6 +37,7 @@ class CWord;
 
 class CLanguage : public CDataType
 {
+	GDCLASS(CLanguage, CDataType)
 	DATA_TYPE_CLASS(CLanguage)
 
 public:
@@ -59,6 +60,9 @@ public:
 	std::vector<CLanguage *> Dialects;							/// Dialects of this language
 	std::vector<CWord *> Words;									/// Words of the language
 	std::map<std::string, std::vector<std::string>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

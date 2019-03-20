@@ -106,6 +106,8 @@ public:
 
 class CAnimations : public CDataType
 {
+	GDCLASS(CAnimations, CDataType)
+	
 public:
 	CAnimations()
 	{
@@ -156,6 +158,9 @@ public:
 	CAnimation *Still = nullptr;
 	CAnimation *Train = nullptr;
 	CAnimation *Upgrade = nullptr;
+
+protected:
+	static inline void _bind_methods() {}
 };
 
 /*----------------------------------------------------------------------------
