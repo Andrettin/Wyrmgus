@@ -243,31 +243,31 @@ public:
 	std::vector<CUnit *> GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const;
 	
 	// Identification stuff
-	std::string Name;     /// Spell name shown by the engine
+	std::string Name;		/// Spell name shown by the engine
 	std::string Description;	/// Spell description
-	int Slot;             /// Spell numeric identifier
+	int Slot;				/// Spell numeric identifier
 
 	// Spell Specifications
-	TargetType Target;          /// Targeting information. See TargetType.
+	TargetType Target;			/// Targeting information. See TargetType.
 	std::vector<SpellActionType *> Action; /// More arguments for spell (damage, delay, additional sounds...).
 
-	int Range;                  /// Max range of the target.
+	int Range = 0;				/// Max range of the target.
 #define INFINITE_RANGE 0xFFFFFFF
-	int ManaCost;               /// Required mana for each cast.
-	int RepeatCast;             /// If the spell will be cast again until out of targets.
-	bool Stackable;				/// Whether the spell has an effect if cast multiple times at the same target
-	int Costs[MaxCosts];        /// Resource costs of spell.
-	int CoolDown;               /// How much time spell needs to be cast again.
+	int ManaCost = 0;			/// Required mana for each cast.
+	int RepeatCast = 0;			/// If the spell will be cast again until out of targets.
+	bool Stackable = true;		/// Whether the spell has an effect if cast multiple times at the same target
+	int Costs[MaxCosts];		/// Resource costs of spell.
+	int CoolDown = 0;			/// How much time spell needs to be cast again.
 
-	int DependencyId;           /// Id of upgrade, -1 if no upgrade needed for cast the spell.
-	ConditionInfo *Condition;   /// Conditions to cast the spell. (generic (no test for each target))
+	int DependencyId = -1;		/// Id of upgrade, -1 if no upgrade needed for cast the spell.
+	ConditionInfo *Condition = nullptr;	/// Conditions to cast the spell. (generic (no test for each target))
 
 	// Autocast information. No AICast means the AI use AutoCast.
-	AutoCastInfo *AutoCast;     /// AutoCast information for your own units
-	AutoCastInfo *AICast;       /// AutoCast information for ai. More detalied.
+	AutoCastInfo *AutoCast = nullptr;	/// AutoCast information for your own units
+	AutoCastInfo *AICast = nullptr;		/// AutoCast information for ai. More detalied.
 
 	// Graphics and sounds. Add something else here?
-	SoundConfig SoundWhenCast;  /// Sound played if cast
+	SoundConfig SoundWhenCast;	/// Sound played if cast
 	
 	//Wyrmgus start
 	bool ItemSpell[MaxItemClasses];
@@ -277,7 +277,7 @@ public:
 	{
 		return !Range && Target == TargetSelf;
 	}
-	bool ForceUseAnimation;
+	bool ForceUseAnimation = false;
 };
 
 /*----------------------------------------------------------------------------

@@ -290,10 +290,7 @@ private:
 **	@brief	Spell constructor.
 */
 CSpell::CSpell(int slot, const std::string &ident) :
-	Slot(slot), Target(), Action(),
-	Range(0), ManaCost(0), RepeatCast(0), Stackable(true), CoolDown(0),
-	DependencyId(-1), Condition(nullptr),
-	AutoCast(nullptr), AICast(nullptr), ForceUseAnimation(false)
+	Slot(slot), Target(), Action()
 {
 	this->Ident = ident;
 
