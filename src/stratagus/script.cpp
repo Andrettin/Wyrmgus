@@ -1675,7 +1675,7 @@ std::string EvalString(const StringDesc *s)
 				std::string conversion_rates;
 				bool first = true;
 				for (const CResource *child_resource : CResource::GetAll()[(**resource)]->ChildResources) {
-					if (child_resource->ID == TradeCost || child_resource->Hidden) {
+					if (child_resource->GetIndex() == TradeCost || child_resource->Hidden) {
 						continue;
 					}
 					if (!first) {
@@ -1707,10 +1707,10 @@ std::string EvalString(const StringDesc *s)
 					improve_incomes += "%";
 				}
 				for (const CResource *child_resource : CResource::GetAll()[(**resource)]->ChildResources) {
-					if (child_resource->ID == TradeCost || child_resource->Hidden) {
+					if (child_resource->GetIndex() == TradeCost || child_resource->Hidden) {
 						continue;
 					}
-					if (CPlayer::GetThisPlayer()->Incomes[child_resource->ID] > child_resource->DefaultIncome) {
+					if (CPlayer::GetThisPlayer()->Incomes[child_resource->GetIndex()] > child_resource->DefaultIncome) {
 						if (!first) {
 							improve_incomes += "\n";
 						} else {
@@ -1718,7 +1718,7 @@ std::string EvalString(const StringDesc *s)
 						}
 						improve_incomes += child_resource->Name;
 						improve_incomes += " Processing Bonus: +";
-						improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[child_resource->ID] - child_resource->DefaultIncome);
+						improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[child_resource->GetIndex()] - child_resource->DefaultIncome);
 						improve_incomes += "%";
 					}
 				}

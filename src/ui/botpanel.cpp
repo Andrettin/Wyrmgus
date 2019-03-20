@@ -480,7 +480,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				improve_incomes = true;
 			}
 			for (const CResource *child_resource : CResource::GetAll()[button.Value]->ChildResources) {
-				if (CPlayer::GetThisPlayer()->Incomes[child_resource->ID] > child_resource->DefaultIncome) {
+				if (CPlayer::GetThisPlayer()->Incomes[child_resource->GetIndex()] > child_resource->DefaultIncome) {
 					improve_incomes = true;
 					break;
 				}

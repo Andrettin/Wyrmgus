@@ -88,11 +88,13 @@ class CResource : public CDataType
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	bool IsMineResource() const;
+	bool IsMineResource() const
+	{
+		return this->Index == CopperCost || this->Index == SilverCost || this->Index == GoldCost || this->Index == IronCost || this->Index == MithrilCost || this->Index == CoalCost || this->Index == DiamondsCost || this->Index == EmeraldsCost;
+	}
 
 	std::string Name;
 	std::string ActionName;
-	int ID = -1;
 	int DefaultIncome = 100;
 	int DefaultAmount = 1000;
 	int DefaultMaxAmount = -1;

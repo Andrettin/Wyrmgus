@@ -460,25 +460,25 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 
 	file.printf("  \"reserve\", {");
 	for (const CResource *resource : CResource::GetAll()) {
-		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Reserve[resource->ID]);
+		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Reserve[resource->GetIndex()]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"used\", {");
 	for (const CResource *resource : CResource::GetAll()) {
-		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Used[resource->ID]);
+		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Used[resource->GetIndex()]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"needed\", {");
 	for (const CResource *resource : CResource::GetAll()) {
-		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Needed[resource->ID]);
+		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Needed[resource->GetIndex()]);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"collect\", {");
 	for (const CResource *resource : CResource::GetAll()) {
-		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Collect[resource->ID]);
+		file.printf("\"%s\", %d, ", resource->Ident.c_str(), ai.Collect[resource->GetIndex()]);
 	}
 	file.printf("},\n");
 

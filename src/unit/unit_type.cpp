@@ -76,8 +76,6 @@
 
 #include <cstring>
 #include <ctype.h>
-#include <map>
-#include <string>
 
 /*----------------------------------------------------------------------------
 -- Documentation
@@ -490,11 +488,6 @@ std::map<std::string, CUnitType *> UnitTypeMap;
 //Wyrmgus end
 
 /**
-**  Resource objects.
-*/
-CResource Resources[MaxCosts];
-
-/**
 **  Default names for the resources.
 */
 std::string DefaultResourceNames[MaxCosts];
@@ -546,11 +539,6 @@ std::string GetResourceNameById(int resource_id)
 	} else {
 		return "";
 	}
-}
-
-bool CResource::IsMineResource() const
-{
-	return this->ID == CopperCost || this->ID == SilverCost || this->ID == GoldCost || this->ID == IronCost || this->ID == MithrilCost || this->ID == CoalCost || this->ID == DiamondsCost || this->ID == EmeraldsCost;
 }
 //Wyrmgus end
 

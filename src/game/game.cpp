@@ -2249,7 +2249,7 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultResourceNames[i] = LuaToString(l, i + 1);
 		
-		CResource::GetOrAdd(DefaultResourceNames[i])->ID = i;
+		CResource::GetOrAdd(DefaultResourceNames[i]);
 	}
 	
 	return 0;
