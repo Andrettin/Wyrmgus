@@ -70,11 +70,6 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
-	String GetIdent() const
-	{
-		return CDataType::GetIdent();
-	}
-	
 	String GetName() const
 	{
 		return this->Name.c_str();

@@ -42,11 +42,6 @@ public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
-	String GetIdent() const
-	{
-		return CDataType::GetIdent();
-	}
-	
 	String GetName() const
 	{
 		return this->Name.c_str();

@@ -88,3 +88,8 @@ void CDataType::ProcessConfigData(const CConfigData *config_data)
 	
 	this->Initialize();
 }
+
+void CDataType::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_ident"), &CDataType::GetIdent);
+}

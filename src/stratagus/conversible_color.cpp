@@ -82,7 +82,6 @@ bool CConversibleColor::ProcessConfigDataSection(const CConfigData *section)
 
 void CConversibleColor::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_ident"), &CConversibleColor::GetIdent);
 	ClassDB::bind_method(D_METHOD("get_name"), &CConversibleColor::GetName);
 	ClassDB::bind_method(D_METHOD("get_colors"), &CConversibleColor::GetColors);
 }

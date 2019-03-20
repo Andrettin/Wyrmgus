@@ -224,7 +224,6 @@ bool CCampaign::IsAvailable() const
 
 void CCampaign::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_ident"), &CCampaign::GetIdent);
 	ClassDB::bind_method(D_METHOD("get_name"), &CCampaign::GetName);
 	ClassDB::bind_method(D_METHOD("get_description"), &CCampaign::GetDescription);
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CCampaign::IsHidden);

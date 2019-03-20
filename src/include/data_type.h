@@ -174,6 +174,8 @@ class CConfigData;
 
 class CDataType : public Object
 {
+	GDCLASS(CDataType, Object)
+	
 public:
 	CDataType(const std::string &ident = "", const int index = -1) : Ident(ident), Index(index)
 	{
@@ -224,6 +226,9 @@ public:
 	std::string Ident;	/// string identifier of the data type instance
 	int Index = -1;		/// index of the data type instance
 	bool Initialized = false;	/// whether the data type instance has been initialized
+
+protected:
+	static void _bind_methods();
 };
 
 #endif

@@ -127,7 +127,6 @@ bool CTimeOfDay::ProcessConfigDataSection(const CConfigData *section)
 
 void CTimeOfDay::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_ident"), &CTimeOfDay::GetIdent);
 	ClassDB::bind_method(D_METHOD("get_name"), &CTimeOfDay::GetName);
 	ClassDB::bind_method(D_METHOD("is_dawn"), &CTimeOfDay::IsDawn);
 	ClassDB::bind_method(D_METHOD("is_day"), &CTimeOfDay::IsDay);
