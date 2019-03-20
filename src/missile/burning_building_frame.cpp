@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name missile_fire.cpp - The fire missile source file. */
+/**@name burning_building_frame.cpp - The burning building frame source file. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,48 +27,35 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
-#include "missile/missile.h"
-
-#include "action/actions.h"
 #include "missile/burning_building_frame.h"
-#include "missile/missile_type.h"
-#include "unit/unit.h"
+
+std::vector<BurningBuildingFrame *> BurningBuildingFrames; /// Burning building frames
 
 /**
-**  Missile don't move, than checks the source unit for HP.
+**  Get the burning building missile based on hp percent.
+**
+**  @param percent  HP percent
+**
+**  @return  the missile used for burning.
 */
-void MissileFire::Action()
+MissileType *MissileBurningBuilding(int percent)
 {
-	CUnit &unit = *this->SourceUnit;
-
-	this->Wait = this->Type->Sleep;
-	if (unit.IsAlive() == false) {
-		this->TTL = 0;
-		return;
-	}
-	if (this->NextMissileFrame(1, 0)) {
-		this->SpriteFrame = 0;
-		//Wyrmgus start
-//		const int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
-		const int f = (100 * unit.Variable[HP_INDEX].Value) / unit.GetModifiedVariable(HP_INDEX, VariableMax);
-		//Wyrmgus end
-		MissileType *fire = MissileBurningBuilding(f);
-
-		if (!fire) {
-			this->TTL = 0;
-			unit.Burning = 0;
-		} else {
-			if (this->Type != fire) {
-				this->position += this->Type->size / 2;
-				this->Type = fire;
-				this->position -= this->Type->size / 2;
-			}
+	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
+		 i != BurningBuildingFrames.end(); ++i) {
+		if (percent >= (*i)->Percent) {
+			return (*i)->Missile;
 		}
 	}
+	return nullptr;
+}
+
+void FreeBurningBuildingFrames()
+{
+	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
+		 i != BurningBuildingFrames.end(); ++i) {
+		delete *i;
+	}
+	BurningBuildingFrames.clear();
 }

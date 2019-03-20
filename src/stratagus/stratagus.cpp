@@ -188,7 +188,7 @@ extern void beos_init(int argc, char **argv);
 #include "iocompat.h"
 #include "iolib.h"
 #include "map/map.h"
-#include "missile/missile.h" //for FreeBurningBuildingFrames
+#include "missile/burning_building_frame.h" //for FreeBurningBuildingFrames
 #include "network/netconnect.h"
 #include "network/network.h"
 #include "parameters.h"

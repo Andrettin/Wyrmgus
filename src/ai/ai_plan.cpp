@@ -40,7 +40,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
-#include "missile/missile.h"
+#include "missile/missile_type.h"
 #include "pathfinder/pathfinder.h"
 #include "unit/unit.h"
 #include "unit/unit_find.h"

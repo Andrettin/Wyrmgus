@@ -34,6 +34,7 @@
 
 #include "map/map.h"
 #include "missile/missile.h"
+#include "missile/missile_type.h"
 #include "script.h"
 #include "unit/unit.h"
 #include "video/video.h"

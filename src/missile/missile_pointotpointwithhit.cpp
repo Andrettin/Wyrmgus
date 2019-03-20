@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name missile_pointtopointwithhit.cpp - The missile PointToPointWithHit. */
+/**@name missile_pointtopointwithhit.cpp - The point-to-point with hit missile source file. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -34,6 +34,8 @@
 #include "stratagus.h"
 
 #include "missile/missile.h"
+
+#include "missile/missile_type.h"
 
 /**
 **  Missile flies from x,y to x1,y1 showing the first frame

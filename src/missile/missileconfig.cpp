@@ -31,7 +31,7 @@
 
 #include "missile/missile_config.h"
 
-#include "missile/missile.h"
+#include "missile/missile_type.h"
 #include "translate.h"
 #include "ui/ui.h"
 

@@ -53,7 +53,7 @@
 #include "map/map.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
-#include "missile/missile.h"
+#include "missile/missile_type.h"
 #include "mod.h"
 #include "player.h"
 #include "script.h"

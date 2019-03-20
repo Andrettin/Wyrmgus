@@ -51,7 +51,7 @@
 #include "map/map_template.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
-#include "missile/missile.h"
+#include "missile/missile_type.h"
 #include "player_color.h"
 #include "quest/campaign.h"
 #include "religion/deity.h"

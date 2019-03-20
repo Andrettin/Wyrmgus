@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name missile_straightfly.cpp - The missile StraightFly. */
+/**@name missile_straightfly.cpp - The straight fly missile source file. */
 //
 //      (c) Copyright 2013 by cybermind
 //
@@ -36,6 +36,7 @@
 #include "missile/missile.h"
 
 #include "map/map.h"
+#include "missile/missile_type.h"
 
 /**
 **  Missile flies from x,y to x1,y1 then continues to fly, until incompatible terrain is detected

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name missile_pointtopointbounce.cpp - The missile PointToPointBounce. */
+/**@name missile_pointtopointbounce.cpp - The point-to-point bounce missile source file. */
 //
 //      (c) Copyright 2012 by Joris Dauphin
 //
@@ -36,6 +36,7 @@
 #include "missile/missile.h"
 
 #include "map/map.h"
+#include "missile/missile_type.h"
 
 /**
 **  Missile flies from x,y to x1,y1 than bounces NumBounces times

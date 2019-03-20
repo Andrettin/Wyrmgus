@@ -63,6 +63,7 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "missile/missile.h"
+#include "missile/missile_type.h"
 #include "network/netconnect.h"
 #include "network/network.h"
 #include "parameters.h"

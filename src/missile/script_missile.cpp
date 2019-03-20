@@ -36,15 +36,13 @@
 #include "missile/missile.h"
 
 #include "luacallback.h"
+#include "missile/burning_building_frame.h"
+#include "missile/missile_type.h"
 #include "script.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "video/video.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Functions

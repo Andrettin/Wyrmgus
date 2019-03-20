@@ -35,6 +35,8 @@
 
 #include "missile/missile.h"
 
+#include "missile/missile_type.h"
+
 /**
 **  Missile don't move, than disappears when TTL is 0
 */

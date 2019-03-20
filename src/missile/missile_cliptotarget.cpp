@@ -37,6 +37,7 @@
 
 #include "map/map.h"
 #include "map/map_layer.h"
+#include "missile/missile_type.h"
 #include "unit/unit.h"
 
 /**

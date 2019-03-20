@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name missile_fire.cpp - The fire missile source file. */
+/**@name burning_building_frame.h - The burning building frame header file. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 1998-2019 by Lutz Sammer and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,48 +27,25 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
+#ifndef __BURNING_BUILDING_FRAME_H__
+#define __BURNING_BUILDING_FRAME_H__
 
-#include "stratagus.h"
+#include <vector>
 
-#include "missile/missile.h"
+class MissileType;
 
-#include "action/actions.h"
-#include "missile/burning_building_frame.h"
-#include "missile/missile_type.h"
-#include "unit/unit.h"
-
-/**
-**  Missile don't move, than checks the source unit for HP.
-*/
-void MissileFire::Action()
+class BurningBuildingFrame
 {
-	CUnit &unit = *this->SourceUnit;
+public:
+	int Percent = 0;				/// HP percent
+	MissileType *Missile = nullptr;	/// Missile to draw
+};
 
-	this->Wait = this->Type->Sleep;
-	if (unit.IsAlive() == false) {
-		this->TTL = 0;
-		return;
-	}
-	if (this->NextMissileFrame(1, 0)) {
-		this->SpriteFrame = 0;
-		//Wyrmgus start
-//		const int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
-		const int f = (100 * unit.Variable[HP_INDEX].Value) / unit.GetModifiedVariable(HP_INDEX, VariableMax);
-		//Wyrmgus end
-		MissileType *fire = MissileBurningBuilding(f);
+extern std::vector<BurningBuildingFrame *> BurningBuildingFrames;  /// Burning building frames
 
-		if (!fire) {
-			this->TTL = 0;
-			unit.Burning = 0;
-		} else {
-			if (this->Type != fire) {
-				this->position += this->Type->size / 2;
-				this->Type = fire;
-				this->position -= this->Type->size / 2;
-			}
-		}
-	}
-}
+/// Get the burning building missile based on hp percent
+extern MissileType *MissileBurningBuilding(int percent);
+
+extern void FreeBurningBuildingFrames();
+
+#endif

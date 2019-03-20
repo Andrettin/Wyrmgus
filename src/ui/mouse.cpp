@@ -56,6 +56,7 @@
 #include "map/tileset.h"
 #include "menus.h"
 #include "missile/missile.h"
+#include "missile/missile_type.h"
 #include "network/network.h"
 #include "player.h"
 #include "sound/sound.h"
