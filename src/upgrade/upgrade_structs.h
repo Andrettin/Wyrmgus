@@ -105,7 +105,9 @@ public:
 	static CUpgrade *New(const std::string &ident);
 	static CUpgrade *Get(const std::string &ident);
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void Initialize() override;
 	
 	void SetIcon(CIcon *icon);
 

@@ -27,28 +27,29 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "time/timeline.h"
 
 #include "config.h"
 
-void CTimeline::ProcessConfigData(const CConfigData *config_data)
+/**
+**	@brief	Process a property in the data provided by a configuration file
+**
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
+*/
+bool CTimeline::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "point_of_divergence") {
-			this->PointOfDivergence = CDate::FromString(value);
-		} else {
-			fprintf(stderr, "Invalid timeline property: \"%s\".\n", key.c_str());
-		}
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "point_of_divergence") {
+		this->PointOfDivergence = CDate::FromString(value);
+	} else {
+		return false;
 	}
+	
+	return true;
 }

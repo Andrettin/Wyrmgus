@@ -60,42 +60,60 @@ CTimeOfDaySchedule::~CTimeOfDaySchedule()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CTimeOfDaySchedule::ProcessConfigData(const CConfigData *config_data)
+bool CTimeOfDaySchedule::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "default_schedule") {
+		const bool is_default_schedule = StringToBool(value);
+		if (is_default_schedule) {
+			CTimeOfDaySchedule::DefaultTimeOfDaySchedule = this;
+		}
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CTimeOfDaySchedule::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "scheduled_time_of_day") {
+		CScheduledTimeOfDay *scheduled_time_of_day = new CScheduledTimeOfDay;
+		scheduled_time_of_day->ID = this->ScheduledTimesOfDay.size();
+		scheduled_time_of_day->Schedule = this;
+		this->ScheduledTimesOfDay.push_back(scheduled_time_of_day);
 		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "default_schedule") {
-			const bool is_default_schedule = StringToBool(value);
-			if (is_default_schedule) {
-				CTimeOfDaySchedule::DefaultTimeOfDaySchedule = this;
-			}
-		} else {
-			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", key.c_str());
-		}
+		scheduled_time_of_day->ProcessConfigData(section);
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "scheduled_time_of_day") {
-			CScheduledTimeOfDay *scheduled_time_of_day = new CScheduledTimeOfDay;
-			scheduled_time_of_day->ID = this->ScheduledTimesOfDay.size();
-			scheduled_time_of_day->Schedule = this;
-			this->ScheduledTimesOfDay.push_back(scheduled_time_of_day);
-			
-			scheduled_time_of_day->ProcessConfigData(section);
-		} else {
-			fprintf(stderr, "Invalid time of day schedule property: \"%s\".\n", section->Tag.c_str());
-		}
-	}
-	
+	return true;
+}
+
+/**
+**	@brief	Initialize the time of day schedule
+*/
+void CTimeOfDaySchedule::Initialize()
+{
 	this->CalculateHourMultiplier();
+	
+	this->Initialized = true;
 }
 
 /**

@@ -385,139 +385,149 @@ void CSpell::ClearSpells()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CSpell::ProcessConfigData(const CConfigData *config_data)
+bool CSpell::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "mana_cost") {
-			this->ManaCost = std::stoi(value);
-		} else if (key == "cooldown") {
-			this->CoolDown = std::stoi(value);
-		} else if (key == "range") {
-			if (value == "infinite") {
-				this->Range = INFINITE_RANGE;
-			} else {
-				this->Range = std::stoi(value);
-			}
-		} else if (key == "repeat_cast") {
-			this->RepeatCast = StringToBool(value);
-		} else if (key == "stackable") {
-			this->Stackable = StringToBool(value);
-		} else if (key == "force_use_animation") {
-			this->ForceUseAnimation = StringToBool(value);
-		} else if (key == "target") {
-			if (value == "self") {
-				this->Target = TargetSelf;
-			} else if (value == "unit") {
-				this->Target = TargetUnit;
-			} else if (value == "position") {
-				this->Target = TargetPosition;
-			} else {
-				fprintf(stderr, "Invalid spell target type: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "sound_when_cast") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->SoundWhenCast.Name = value;
-			this->SoundWhenCast.MapSound();
-			
-			//check the sound
-			if (!this->SoundWhenCast.Sound) {
-				this->SoundWhenCast.Name.clear();
-			}
-		} else if (key == "depend_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->DependencyId = UpgradeIdByIdent(value);
-			if (this->DependencyId == -1) {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "item_spell") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int item_class = GetItemClassIdByName(value);
-			if (item_class != -1) {
-				this->ItemSpell[item_class] = true;
-			}
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "mana_cost") {
+		this->ManaCost = std::stoi(value);
+	} else if (key == "cooldown") {
+		this->CoolDown = std::stoi(value);
+	} else if (key == "range") {
+		if (value == "infinite") {
+			this->Range = INFINITE_RANGE;
 		} else {
-			fprintf(stderr, "Invalid spell property: \"%s\".\n", key.c_str());
+			this->Range = std::stoi(value);
 		}
+	} else if (key == "repeat_cast") {
+		this->RepeatCast = StringToBool(value);
+	} else if (key == "stackable") {
+		this->Stackable = StringToBool(value);
+	} else if (key == "force_use_animation") {
+		this->ForceUseAnimation = StringToBool(value);
+	} else if (key == "target") {
+		if (value == "self") {
+			this->Target = TargetSelf;
+		} else if (value == "unit") {
+			this->Target = TargetUnit;
+		} else if (value == "position") {
+			this->Target = TargetPosition;
+		} else {
+			fprintf(stderr, "Invalid spell target type: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "sound_when_cast") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->SoundWhenCast.Name = value;
+		this->SoundWhenCast.MapSound();
+		
+		//check the sound
+		if (!this->SoundWhenCast.Sound) {
+			this->SoundWhenCast.Name.clear();
+		}
+	} else if (key == "depend_upgrade") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->DependencyId = UpgradeIdByIdent(value);
+		if (this->DependencyId == -1) {
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "item_spell") {
+		value = FindAndReplaceString(value, "_", "-");
+		const int item_class = GetItemClassIdByName(value);
+		if (item_class != -1) {
+			this->ItemSpell[item_class] = true;
+		}
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "actions") {
-			for (const CConfigData *subsection : section->Sections) {
-				SpellActionType *spell_action = nullptr;
-				
-				if (subsection->Tag == "adjust_variable") {
-					spell_action = new Spell_AdjustVariable;
-				} else if (subsection->Tag == "spawn_missile") {
-					spell_action = new Spell_SpawnMissile;
-				} else {
-					fprintf(stderr, "Invalid spell action type: \"%s\".\n", subsection->Tag.c_str());
-				}
-				
-				spell_action->ProcessConfigData(subsection);
-				this->Action.push_back(spell_action);
-			}
-		} else if (section->Tag == "condition") {
-			if (!this->Condition) {
-				this->Condition = new ConditionInfo;
-			}
-			this->Condition->ProcessConfigData(section);
-		} else if (section->Tag == "autocast") {
-			if (!this->AutoCast) {
-				this->AutoCast = new AutoCastInfo();
-			}
-			this->AutoCast->ProcessConfigData(section);
-		} else if (section->Tag == "ai_cast") {
-			if (!this->AICast) {
-				this->AICast = new AutoCastInfo();
-			}
-			this->AICast->ProcessConfigData(section);
-		} else if (section->Tag == "resource_cost") {
-			int resource = -1;
-			int cost = 0;
-				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "resource") {
-					value = FindAndReplaceString(value, "_", "-");
-					resource = GetResourceIdByName(value.c_str());
-					if (resource == -1) {
-						fprintf(stderr, "Invalid resource: \"%s\".\n", value.c_str());
-					}
-				} else if (key == "cost") {
-					cost = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid resource cost property: \"%s\".\n", key.c_str());
-				}
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CSpell::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "actions") {
+		for (const CConfigData *subsection : section->Sections) {
+			SpellActionType *spell_action = nullptr;
+			
+			if (subsection->Tag == "adjust_variable") {
+				spell_action = new Spell_AdjustVariable;
+			} else if (subsection->Tag == "spawn_missile") {
+				spell_action = new Spell_SpawnMissile;
+			} else {
+				fprintf(stderr, "Invalid spell action type: \"%s\".\n", subsection->Tag.c_str());
 			}
 			
-			if (resource == -1) {
-				fprintf(stderr, "Resource cost has no resource.\n");
-				continue;
-			}
-			
-			if (cost == 0) {
-				fprintf(stderr, "Resource cost has no valid cost amount.\n");
-				continue;
-			}
-			
-			this->Costs[resource] = cost;
-		} else {
-			fprintf(stderr, "Invalid spell property: \"%s\".\n", section->Tag.c_str());
+			spell_action->ProcessConfigData(subsection);
+			this->Action.push_back(spell_action);
 		}
+	} else if (section->Tag == "condition") {
+		if (!this->Condition) {
+			this->Condition = new ConditionInfo;
+		}
+		this->Condition->ProcessConfigData(section);
+	} else if (section->Tag == "autocast") {
+		if (!this->AutoCast) {
+			this->AutoCast = new AutoCastInfo();
+		}
+		this->AutoCast->ProcessConfigData(section);
+	} else if (section->Tag == "ai_cast") {
+		if (!this->AICast) {
+			this->AICast = new AutoCastInfo();
+		}
+		this->AICast->ProcessConfigData(section);
+	} else if (section->Tag == "resource_cost") {
+		int resource = -1;
+		int cost = 0;
+			
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			if (key == "resource") {
+				value = FindAndReplaceString(value, "_", "-");
+				resource = GetResourceIdByName(value.c_str());
+				if (resource == -1) {
+					fprintf(stderr, "Invalid resource: \"%s\".\n", value.c_str());
+				}
+			} else if (key == "cost") {
+				cost = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid resource cost property: \"%s\".\n", key.c_str());
+			}
+		}
+		
+		if (resource == -1) {
+			fprintf(stderr, "Resource cost has no resource.\n");
+			return true;
+		}
+		
+		if (cost == 0) {
+			fprintf(stderr, "Resource cost has no valid cost amount.\n");
+			return true;
+		}
+		
+		this->Costs[resource] = cost;
+	} else {
+		return false;
 	}
+	
+	return true;
 }
 
 /**

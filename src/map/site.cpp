@@ -47,136 +47,152 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CSite::ProcessConfigData(const CConfigData *config_data)
+bool CSite::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "major") {
+		this->Major = StringToBool(value);
+	} else if (key == "position_x") {
+		this->Position.x = std::stoi(value);
+	} else if (key == "position_y") {
+		this->Position.y = std::stoi(value);
+	} else if (key == "map_template") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->MapTemplate = CMapTemplate::Get(value);
+	} else if (key == "core") {
+		value = FindAndReplaceString(value, "_", "-");
 		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "major") {
-			this->Major = StringToBool(value);
-		} else if (key == "position_x") {
-			this->Position.x = std::stoi(value);
-		} else if (key == "position_y") {
-			this->Position.y = std::stoi(value);
-		} else if (key == "map_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->MapTemplate = CMapTemplate::Get(value);
-		} else if (key == "core") {
-			value = FindAndReplaceString(value, "_", "-");
-			
-			CFaction *faction = CFaction::Get(value);
-			if (faction != nullptr) {
-				this->Cores.push_back(faction);
-				faction->Cores.push_back(this);
-				faction->Sites.push_back(this);
-				if (faction->Civilization) {
-					faction->Civilization->Sites.push_back(this);
-				}
+		CFaction *faction = CFaction::Get(value);
+		if (faction != nullptr) {
+			this->Cores.push_back(faction);
+			faction->Cores.push_back(this);
+			faction->Sites.push_back(this);
+			if (faction->Civilization) {
+				faction->Civilization->Sites.push_back(this);
 			}
-		} else if (key == "region") {
-			value = FindAndReplaceString(value, "_", "-");
+		}
+	} else if (key == "region") {
+		value = FindAndReplaceString(value, "_", "-");
+		
+		CRegion *region = GetRegion(value);
+		if (region != nullptr) {
+			this->Regions.push_back(region);
+			region->Sites.push_back(this);
+		} else {
+			fprintf(stderr, "Invalid region: \"%s\".\n", value.c_str());
+		}
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+	
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CSite::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "cultural_names") {
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
 			
-			CRegion *region = GetRegion(value);
-			if (region != nullptr) {
-				this->Regions.push_back(region);
-				region->Sites.push_back(this);
+			key = FindAndReplaceString(key, "_", "-");
+			
+			const CCivilization *civilization = CCivilization::Get(key);
+			
+			if (civilization) {
+				this->CulturalNames[civilization] = value;
+			}
+		}
+	} else if (section->Tag == "historical_owner") {
+		CDate date;
+		CFaction *owner_faction = nullptr;
+			
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			if (key == "date") {
+				value = FindAndReplaceString(value, "_", "-");
+				date = CDate::FromString(value);
+			} else if (key == "faction") {
+				value = FindAndReplaceString(value, "_", "-");
+				owner_faction = CFaction::Get(value);
 			} else {
-				fprintf(stderr, "Invalid region: \"%s\".\n", value.c_str());
+				fprintf(stderr, "Invalid historical owner property: \"%s\".\n", key.c_str());
 			}
-		} else {
-			fprintf(stderr, "Invalid site property: \"%s\".\n", key.c_str());
 		}
+		
+		this->HistoricalOwners[date] = owner_faction;
+	} else if (section->Tag == "historical_building") {
+		CDate start_date;
+		CDate end_date;
+		int building_class_id = -1;
+		CUniqueItem *unique = nullptr;
+		CFaction *building_owner_faction = nullptr;
+			
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			if (key == "start_date") {
+				value = FindAndReplaceString(value, "_", "-");
+				start_date = CDate::FromString(value);
+			} else if (key == "end_date") {
+				value = FindAndReplaceString(value, "_", "-");
+				end_date = CDate::FromString(value);
+			} else if (key == "building_class") {
+				value = FindAndReplaceString(value, "_", "-");
+				building_class_id = GetUnitTypeClassIndexByName(value);
+				if (building_class_id == -1) {
+					fprintf(stderr, "Invalid unit class: \"%s\".\n", value.c_str());
+				}
+			} else if (key == "unique") {
+				value = FindAndReplaceString(value, "_", "-");
+				unique = GetUniqueItem(value);
+				if (!unique) {
+					fprintf(stderr, "Invalid unique: \"%s\".\n", value.c_str());
+				}
+			} else if (key == "faction") {
+				value = FindAndReplaceString(value, "_", "-");
+				building_owner_faction = CFaction::Get(value);
+			} else {
+				fprintf(stderr, "Invalid historical building property: \"%s\".\n", key.c_str());
+			}
+		}
+		
+		if (building_class_id == -1) {
+			fprintf(stderr, "Historical building has no building class.\n");
+			return true;
+		}
+		
+		this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>(start_date, end_date, building_class_id, unique, building_owner_faction));
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "cultural_names") {
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				key = FindAndReplaceString(key, "_", "-");
-				
-				const CCivilization *civilization = CCivilization::Get(key);
-				
-				if (civilization) {
-					this->CulturalNames[civilization] = value;
-				}
-			}
-		} else if (section->Tag == "historical_owner") {
-			CDate date;
-			CFaction *owner_faction = nullptr;
-				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "date") {
-					value = FindAndReplaceString(value, "_", "-");
-					date = CDate::FromString(value);
-				} else if (key == "faction") {
-					value = FindAndReplaceString(value, "_", "-");
-					owner_faction = CFaction::Get(value);
-				} else {
-					fprintf(stderr, "Invalid historical owner property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			this->HistoricalOwners[date] = owner_faction;
-		} else if (section->Tag == "historical_building") {
-			CDate start_date;
-			CDate end_date;
-			int building_class_id = -1;
-			CUniqueItem *unique = nullptr;
-			CFaction *building_owner_faction = nullptr;
-				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "start_date") {
-					value = FindAndReplaceString(value, "_", "-");
-					start_date = CDate::FromString(value);
-				} else if (key == "end_date") {
-					value = FindAndReplaceString(value, "_", "-");
-					end_date = CDate::FromString(value);
-				} else if (key == "building_class") {
-					value = FindAndReplaceString(value, "_", "-");
-					building_class_id = GetUnitTypeClassIndexByName(value);
-					if (building_class_id == -1) {
-						fprintf(stderr, "Invalid unit class: \"%s\".\n", value.c_str());
-					}
-				} else if (key == "unique") {
-					value = FindAndReplaceString(value, "_", "-");
-					unique = GetUniqueItem(value);
-					if (!unique) {
-						fprintf(stderr, "Invalid unique: \"%s\".\n", value.c_str());
-					}
-				} else if (key == "faction") {
-					value = FindAndReplaceString(value, "_", "-");
-					building_owner_faction = CFaction::Get(value);
-				} else {
-					fprintf(stderr, "Invalid historical building property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (building_class_id == -1) {
-				fprintf(stderr, "Historical building has no building class.\n");
-				continue;
-			}
-			
-			this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>(start_date, end_date, building_class_id, unique, building_owner_faction));
-		} else {
-			fprintf(stderr, "Invalid site property: \"%s\".\n", section->Tag.c_str());
-		}
-	}
-	
+	return true;
+}
+
+/**
+**	@brief	Initialize the site
+*/
+void CSite::Initialize()
+{
 	if (!this->Major && !this->Cores.empty()) { //if the site is a minor one, but has faction cores, remove them
 		for (CFaction *core_faction : this->Cores) {
 			core_faction->Cores.erase(std::remove(core_faction->Cores.begin(), core_faction->Cores.end(), this), core_faction->Cores.end());
@@ -195,6 +211,8 @@ void CSite::ProcessConfigData(const CConfigData *config_data)
 		
 		this->MapTemplate->Sites.push_back(this);
 	}
+	
+	this->Initialized = true;
 }
 
 /**

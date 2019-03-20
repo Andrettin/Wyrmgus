@@ -90,12 +90,12 @@ CPlane *CPlane::GetOrAddPlane(const std::string &ident)
 	if (!plane) {
 		plane = new CPlane;
 		plane->Ident = ident;
-		plane->ID = Planes.size();
+		plane->Index = Planes.size();
 		Planes.push_back(plane);
 		PlanesByIdent[ident] = plane;
 		UI.PlaneButtons.resize(Planes.size());
-		UI.PlaneButtons[plane->ID].X = -1;
-		UI.PlaneButtons[plane->ID].Y = -1;
+		UI.PlaneButtons[plane->Index].X = -1;
+		UI.PlaneButtons[plane->Index].Y = -1;
 	}
 	
 	return plane;
@@ -113,44 +113,44 @@ void CPlane::ClearPlanes()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CPlane::ProcessConfigData(const CConfigData *config_data)
+bool CPlane::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "background") {
-			this->Background = value;
-		} else if (key == "quote") {
-			this->Quote = value;
-		} else if (key == "time_of_day_schedule") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->TimeOfDaySchedule = CTimeOfDaySchedule::Get(value);
-		} else if (key == "season_schedule") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->SeasonSchedule = CSeasonSchedule::Get(value);
-		} else if (key == "empowered_deity_domain") {
-			value = FindAndReplaceString(value, "_", "-");
-			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
-			if (deity_domain) {
-				this->EmpoweredDeityDomains.push_back(deity_domain);
-			}
-		} else if (key == "empowered_school_of_magic") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetSchoolOfMagic(value);
-			if (school_of_magic) {
-				this->EmpoweredSchoolsOfMagic.push_back(school_of_magic);
-			}
-		} else {
-			fprintf(stderr, "Invalid plane property: \"%s\".\n", key.c_str());
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "background") {
+		this->Background = value;
+	} else if (key == "quote") {
+		this->Quote = value;
+	} else if (key == "time_of_day_schedule") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->TimeOfDaySchedule = CTimeOfDaySchedule::Get(value);
+	} else if (key == "season_schedule") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->SeasonSchedule = CSeasonSchedule::Get(value);
+	} else if (key == "empowered_deity_domain") {
+		value = FindAndReplaceString(value, "_", "-");
+		CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
+		if (deity_domain) {
+			this->EmpoweredDeityDomains.push_back(deity_domain);
 		}
+	} else if (key == "empowered_school_of_magic") {
+		value = FindAndReplaceString(value, "_", "-");
+		CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetSchoolOfMagic(value);
+		if (school_of_magic) {
+			this->EmpoweredSchoolsOfMagic.push_back(school_of_magic);
+		}
+	} else {
+		return false;
 	}
+	
+	return true;
 }

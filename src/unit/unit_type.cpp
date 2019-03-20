@@ -705,437 +705,453 @@ std::vector<CUnitType *> CUnitType::GetItemUnitTypes()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CUnitType::ProcessConfigData(const CConfigData *config_data)
+bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "parent") {
+		value = FindAndReplaceString(value, "_", "-");
+		CUnitType *parent_type = UnitTypeByIdent(value);
+		if (!parent_type) {
+			fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
+		}
+		this->SetParent(parent_type);
+	} else if (key == "civilization") {
+		value = FindAndReplaceString(value, "_", "-");
+		CCivilization *civilization = CCivilization::Get(value);
+		if (civilization) {
+			this->Civilization = civilization;
+		}
+	} else if (key == "faction") {
+		value = FindAndReplaceString(value, "_", "-");
+		CFaction *faction = CFaction::Get(value);
+		if (faction) {
+			this->Faction = faction;
+		}
+	} else if (key == "animations") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Animations = AnimationsByIdent(value);
+		if (!this->Animations) {
+			fprintf(stderr, "Animations \"%s\" do not exist.\n", value.c_str());
+		}
+	} else if (key == "icon") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Icon.Name = value;
+		this->Icon.Icon = nullptr;
+		this->Icon.Load();
+		this->Icon.Icon->Load();
+	} else if (key == "tile_width") {
+		this->TileSize.x = std::stoi(value);
+	} else if (key == "tile_height") {
+		this->TileSize.y = std::stoi(value);
+	} else if (key == "box_width") {
+		this->BoxWidth = std::stoi(value);
+	} else if (key == "box_height") {
+		this->BoxHeight = std::stoi(value);
+	} else if (key == "draw_level") {
+		this->DrawLevel = std::stoi(value);
+	} else if (key == "type") {
+		if (value == "land") {
+			this->UnitType = UnitTypeLand;
+			this->LandUnit = true;
+		} else if (value == "fly") {
+			this->UnitType = UnitTypeFly;
+			this->AirUnit = true;
+		} else if (value == "fly_low") {
+			this->UnitType = UnitTypeFlyLow;
+			this->AirUnit = true;
+		} else if (value == "naval") {
+			this->UnitType = UnitTypeNaval;
+			this->SeaUnit = true;
+		} else {
+			fprintf(stderr, "Invalid unit type type: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "priority") {
+		this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
+		this->DefaultStat.Variables[PRIORITY_INDEX].Max  = std::stoi(value);
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "background") {
+		this->Background = value;
+	} else if (key == "quote") {
+		this->Quote = value;
+	} else if (key == "requirements_string") {
+		this->RequirementsString = value;
+	} else if (key == "experience_requirements_string") {
+		this->ExperienceRequirementsString = value;
+	} else if (key == "building_rules_string") {
+		this->BuildingRulesString = value;
+	} else if (key == "max_attack_range") {
+		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = std::stoi(value);
+		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = std::stoi(value);
+		this->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable = 1;
+	} else if (key == "missile") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Missile.Name = value;
+		this->Missile.Missile = nullptr;
+	} else if (key == "fire_missile") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->FireMissile.Name = value;
+		this->FireMissile.Missile = nullptr;
+	} else if (key == "corpse") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->CorpseName = value;
+		this->CorpseType = nullptr;
+	} else if (key == "weapon_class") {
+		value = FindAndReplaceString(value, "_", "-");
+		const int weapon_class_id = GetItemClassIdByName(value);
+		if (weapon_class_id != -1) {
+			this->WeaponClasses.push_back(weapon_class_id);
+		} else {
+			fprintf(stderr, "Invalid weapon class: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "ai_drop") {
+		value = FindAndReplaceString(value, "_", "-");
+		CUnitType *drop_type = UnitTypeByIdent(value);
+		if (drop_type) {
+			this->AiDrops.push_back(drop_type);
+		} else {
+			fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "item_class") {
+		value = FindAndReplaceString(value, "_", "-");
+		const int item_class_id = GetItemClassIdByName(value);
+		if (item_class_id != -1) {
+			this->ItemClass = item_class_id;
+		} else {
+			fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "species") {
+		value = FindAndReplaceString(value, "_", "-");
+		CSpecies *species = CSpecies::Get(value);
+		if (species) {
+			this->Species = species;
+			this->Species->UnitType = this;
+		}
+	} else if (key == "right_mouse_action") {
+		if (value == "none") {
+			this->MouseAction = MouseActionNone;
+		} else if (value == "attack") {
+			this->MouseAction = MouseActionAttack;
+		} else if (value == "move") {
+			this->MouseAction = MouseActionMove;
+		} else if (value == "harvest") {
+			this->MouseAction = MouseActionHarvest;
+		} else if (value == "spell_cast") {
+			this->MouseAction = MouseActionSpellCast;
+		} else if (value == "sail") {
+			this->MouseAction = MouseActionSail;
+		} else if (value == "rally_point") {
+			this->MouseAction = MouseActionRallyPoint;
+		} else if (value == "trade") {
+			this->MouseAction = MouseActionTrade;
+		} else {
+			fprintf(stderr, "Invalid right mouse action: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "can_attack") {
+		this->CanAttack = StringToBool(value);
+	} else if (key == "can_target_land") {
+		const bool can_target_land = StringToBool(value);
+		if (can_target_land) {
+			this->CanTarget |= CanTargetLand;
+		} else {
+			this->CanTarget &= ~CanTargetLand;
+		}
+	} else if (key == "can_target_sea") {
+		const bool can_target_sea = StringToBool(value);
+		if (can_target_sea) {
+			this->CanTarget |= CanTargetSea;
+		} else {
+			this->CanTarget &= ~CanTargetSea;
+		}
+	} else if (key == "can_target_air") {
+		const bool can_target_air = StringToBool(value);
+		if (can_target_air) {
+			this->CanTarget |= CanTargetAir;
+		} else {
+			this->CanTarget &= ~CanTargetAir;
+		}
+	} else if (key == "random_movement_probability") {
+		this->RandomMovementProbability = std::stoi(value);
+	} else if (key == "random_movement_distance") {
+		this->RandomMovementDistance = std::stoi(value);
+	} else if (key == "can_cast_spell") {
+		value = FindAndReplaceString(value, "_", "-");
+		CSpell *spell = CSpell::GetSpell(value);
+		if (spell != nullptr) {
+			this->Spells.push_back(spell);
+		}
+	} else if (key == "autocast_active") {
+		if (!this->AutoCastActive) {
+			this->AutoCastActive = new char[CSpell::Spells.size()];
+			memset(this->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
+		}
+		
+		if (value == "false") {
+			delete[] this->AutoCastActive;
+			this->AutoCastActive = nullptr;
+		} else {
+			value = FindAndReplaceString(value, "_", "-");
+			const CSpell *spell = CSpell::GetSpell(value);
+			if (spell != nullptr) {
+				if (spell->AutoCast) {
+					this->AutoCastActive[spell->Slot] = 1;
+				} else {
+					fprintf(stderr, "AutoCastActive : Define autocast method for \"%s\".\n", value.c_str());
+				}
+			}
+		}
+	} else {
+		std::string key_pascal_case = SnakeCaseToPascalCase(key);
+		
+		int index = UnitTypeVar.VariableNameLookup[key_pascal_case.c_str()]; // variable index
+		if (index != -1) { // valid index
+			if (IsStringNumber(value)) {
+				this->DefaultStat.Variables[index].Enable = 1;
+				this->DefaultStat.Variables[index].Value = std::stoi(value);
+				this->DefaultStat.Variables[index].Max = std::stoi(value);
+			} else if (IsStringBool(value)) {
+				this->DefaultStat.Variables[index].Enable = StringToBool(value);
+			} else { // error
+				fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key_pascal_case.c_str(), this->Ident.c_str());
+			}
+		} else {
+			if (this->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
+				this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
+			}
+
+			index = UnitTypeVar.BoolFlagNameLookup[key_pascal_case.c_str()];
+			if (index != -1) {
+				if (IsStringNumber(value)) {
+					this->BoolFlag[index].value = (std::stoi(value) != 0);
+				} else {
+					this->BoolFlag[index].value = StringToBool(value);
+				}
+			} else {
+				return false;
+			}
+		}
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "costs") {
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			key = FindAndReplaceString(key, "_", "-");
+			
+			const int resource = GetResourceIdByName(key.c_str());
+			if (resource != -1) {
+				this->DefaultStat.Costs[resource] = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
+			}
+		}
+	} else if (section->Tag == "image") {
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			if (key == "file") {
+				this->File = CMod::GetCurrentModPath() + value;
+			} else if (key == "width") {
+				this->Width = std::stoi(value);
+			} else if (key == "height") {
+				this->Height = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+			}
+		}
+		
+		if (this->File.empty()) {
+			fprintf(stderr, "Image has no file.\n");
+		}
+		
+		if (this->Width == 0) {
+			fprintf(stderr, "Image has no width.\n");
+		}
+		
+		if (this->Height == 0) {
+			fprintf(stderr, "Image has no height.\n");
+		}
+		
+		if (this->Sprite) {
+			CGraphic::Free(this->Sprite);
+			this->Sprite = nullptr;
+		}
+	} else if (section->Tag == "default_equipment") {
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			key = FindAndReplaceString(key, "_", "-");
+			value = FindAndReplaceString(value, "_", "-");
+			
+			int item_slot = GetItemSlotIdByName(key);
+			if (item_slot == -1) {
+				fprintf(stderr, "Invalid item slot for default equipment: \"%s\".\n", key.c_str());
+				return true;
+			}
+			
+			CUnitType *item = UnitTypeByIdent(value);
+			if (!item) {
+				fprintf(stderr, "Invalid item for default equipment: \"%s\".\n", value.c_str());
+				return true;
+			}
+			
+			this->DefaultEquipment[item_slot] = item;
+		}
+	} else if (section->Tag == "sounds") {
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			value = FindAndReplaceString(value, "_", "-");
+			
+			if (key == "selected") {
+				this->Sound.Selected.Name = value;
+			} else if (key == "acknowledge") {
+				this->Sound.Acknowledgement.Name = value;
+			} else if (key == "attack") {
+				this->Sound.Attack.Name = value;
+			} else if (key == "idle") {
+				this->Sound.Idle.Name = value;
+			} else if (key == "hit") {
+				this->Sound.Hit.Name = value;
+			} else if (key == "miss") {
+				this->Sound.Miss.Name = value;
+			} else if (key == "fire_missile") {
+				this->Sound.FireMissile.Name = value;
+			} else if (key == "step") {
+				this->Sound.Step.Name = value;
+			} else if (key == "step_dirt") {
+				this->Sound.StepDirt.Name = value;
+			} else if (key == "step_grass") {
+				this->Sound.StepGrass.Name = value;
+			} else if (key == "step_gravel") {
+				this->Sound.StepGravel.Name = value;
+			} else if (key == "step_mud") {
+				this->Sound.StepMud.Name = value;
+			} else if (key == "step_stone") {
+				this->Sound.StepStone.Name = value;
+			} else if (key == "used") {
+				this->Sound.Used.Name = value;
+			} else if (key == "build") {
+				this->Sound.Build.Name = value;
+			} else if (key == "ready") {
+				this->Sound.Ready.Name = value;
+			} else if (key == "repair") {
+				this->Sound.Repair.Name = value;
+			} else if (key.find("harvest_") != std::string::npos) {
+				std::string resource_ident = FindAndReplaceString(key, "harvest_", "");
+				resource_ident = FindAndReplaceString(resource_ident, "_", "-");
+				const int res = GetResourceIdByName(resource_ident.c_str());
+				if (res != -1) {
+					this->Sound.Harvest[res].Name = value;
+				} else {
+					fprintf(stderr, "Invalid resource: \"%s\".\n", resource_ident.c_str());
+				}
+			} else if (key == "help") {
+				this->Sound.Help.Name = value;
+			} else if (key == "dead") {
+				this->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = value;
+			} else if (key.find("dead_") != std::string::npos) {
+				std::string death_type_ident = FindAndReplaceString(key, "dead_", "");
+				death_type_ident = FindAndReplaceString(death_type_ident, "_", "-");
+				int death;
+				for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+					if (death_type_ident == ExtraDeathTypes[death]) {
+						this->Sound.Dead[death].Name = value;
+						break;
+					}
+				}
+				if (death == ANIMATIONS_DEATHTYPES) {
+					fprintf(stderr, "Invalid death type: \"%s\".\n", death_type_ident.c_str());
+				}
+			} else {
+				fprintf(stderr, "Invalid sound tag: \"%s\".\n", key.c_str());
+			}
+		}
+	} else if (section->Tag == "predependencies") {
+		this->Predependency = new CAndDependency;
+		this->Predependency->ProcessConfigData(section);
+	} else if (section->Tag == "dependencies") {
+		this->Dependency = new CAndDependency;
+		this->Dependency->ProcessConfigData(section);
+	} else if (section->Tag == "variation") {
+		this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
+		this->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
+		
+		CUnitTypeVariation *variation = new CUnitTypeVariation;
+		variation->ProcessConfigData(section);
+		
+		if (variation->ImageLayer == -1) {
+			variation->ID = this->Variations.size();
+			this->Variations.push_back(variation);
+		} else {
+			variation->ID = this->LayerVariations[variation->ImageLayer].size();
+			this->LayerVariations[variation->ImageLayer].push_back(variation);
+		}
+		
+		this->DefaultStat.Variables[VARIATION_INDEX].Max = this->Variations.size();
+	} else {
+		std::string tag = SnakeCaseToPascalCase(section->Tag);
+		
+		const int index = UnitTypeVar.VariableNameLookup[tag.c_str()]; // variable index
+		
+		if (index != -1) { // valid index
+			for (size_t j = 0; j < section->Properties.size(); ++j) {
+				std::string key = section->Properties[j].first;
+				std::string value = section->Properties[j].second;
+				
+				if (key == "enable") {
+					this->DefaultStat.Variables[index].Enable = StringToBool(value);
+				} else if (key == "value") {
+					this->DefaultStat.Variables[index].Value = std::stoi(value);
+				} else if (key == "max") {
+					this->DefaultStat.Variables[index].Max = std::stoi(value);
+				} else if (key == "increase") {
+					this->DefaultStat.Variables[index].Increase = std::stoi(value);
+				} else {
+					fprintf(stderr, "Invalid variable property: \"%s\".\n", key.c_str());
+				}
+			}
+		} else {
+			return false;
+		}
+	}
+	
+	return true;
+}
+	
+/**
+**	@brief	Initialize the unit type
+*/
+void CUnitType::Initialize()
+{	
 	this->RemoveButtons(ButtonMove);
 	this->RemoveButtons(ButtonStop);
 	this->RemoveButtons(ButtonAttack);
 	this->RemoveButtons(ButtonPatrol);
 	this->RemoveButtons(ButtonStandGround);
 	this->RemoveButtons(ButtonReturn);
-		
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "parent") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *parent_type = UnitTypeByIdent(value);
-			if (!parent_type) {
-				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
-			}
-			this->SetParent(parent_type);
-		} else if (key == "civilization") {
-			value = FindAndReplaceString(value, "_", "-");
-			CCivilization *civilization = CCivilization::Get(value);
-			if (civilization) {
-				this->Civilization = civilization;
-			}
-		} else if (key == "faction") {
-			value = FindAndReplaceString(value, "_", "-");
-			CFaction *faction = CFaction::Get(value);
-			if (faction) {
-				this->Faction = faction;
-			}
-		} else if (key == "animations") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Animations = AnimationsByIdent(value);
-			if (!this->Animations) {
-				fprintf(stderr, "Animations \"%s\" do not exist.\n", value.c_str());
-			}
-		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Icon.Name = value;
-			this->Icon.Icon = nullptr;
-			this->Icon.Load();
-			this->Icon.Icon->Load();
-		} else if (key == "tile_width") {
-			this->TileSize.x = std::stoi(value);
-		} else if (key == "tile_height") {
-			this->TileSize.y = std::stoi(value);
-		} else if (key == "box_width") {
-			this->BoxWidth = std::stoi(value);
-		} else if (key == "box_height") {
-			this->BoxHeight = std::stoi(value);
-		} else if (key == "draw_level") {
-			this->DrawLevel = std::stoi(value);
-		} else if (key == "type") {
-			if (value == "land") {
-				this->UnitType = UnitTypeLand;
-				this->LandUnit = true;
-			} else if (value == "fly") {
-				this->UnitType = UnitTypeFly;
-				this->AirUnit = true;
-			} else if (value == "fly_low") {
-				this->UnitType = UnitTypeFlyLow;
-				this->AirUnit = true;
-			} else if (value == "naval") {
-				this->UnitType = UnitTypeNaval;
-				this->SeaUnit = true;
-			} else {
-				fprintf(stderr, "Invalid unit type type: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "priority") {
-			this->DefaultStat.Variables[PRIORITY_INDEX].Value = std::stoi(value);
-			this->DefaultStat.Variables[PRIORITY_INDEX].Max  = std::stoi(value);
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "background") {
-			this->Background = value;
-		} else if (key == "quote") {
-			this->Quote = value;
-		} else if (key == "requirements_string") {
-			this->RequirementsString = value;
-		} else if (key == "experience_requirements_string") {
-			this->ExperienceRequirementsString = value;
-		} else if (key == "building_rules_string") {
-			this->BuildingRulesString = value;
-		} else if (key == "max_attack_range") {
-			this->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = std::stoi(value);
-			this->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = std::stoi(value);
-			this->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable = 1;
-		} else if (key == "missile") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Missile.Name = value;
-			this->Missile.Missile = nullptr;
-		} else if (key == "fire_missile") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->FireMissile.Name = value;
-			this->FireMissile.Missile = nullptr;
-		} else if (key == "corpse") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->CorpseName = value;
-			this->CorpseType = nullptr;
-		} else if (key == "weapon_class") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int weapon_class_id = GetItemClassIdByName(value);
-			if (weapon_class_id != -1) {
-				this->WeaponClasses.push_back(weapon_class_id);
-			} else {
-				fprintf(stderr, "Invalid weapon class: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "ai_drop") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *drop_type = UnitTypeByIdent(value);
-			if (drop_type) {
-				this->AiDrops.push_back(drop_type);
-			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "item_class") {
-			value = FindAndReplaceString(value, "_", "-");
-			const int item_class_id = GetItemClassIdByName(value);
-			if (item_class_id != -1) {
-				this->ItemClass = item_class_id;
-			} else {
-				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "species") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSpecies *species = CSpecies::Get(value);
-			if (species) {
-				this->Species = species;
-				this->Species->UnitType = this;
-			}
-		} else if (key == "right_mouse_action") {
-			if (value == "none") {
-				this->MouseAction = MouseActionNone;
-			} else if (value == "attack") {
-				this->MouseAction = MouseActionAttack;
-			} else if (value == "move") {
-				this->MouseAction = MouseActionMove;
-			} else if (value == "harvest") {
-				this->MouseAction = MouseActionHarvest;
-			} else if (value == "spell_cast") {
-				this->MouseAction = MouseActionSpellCast;
-			} else if (value == "sail") {
-				this->MouseAction = MouseActionSail;
-			} else if (value == "rally_point") {
-				this->MouseAction = MouseActionRallyPoint;
-			} else if (value == "trade") {
-				this->MouseAction = MouseActionTrade;
-			} else {
-				fprintf(stderr, "Invalid right mouse action: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "can_attack") {
-			this->CanAttack = StringToBool(value);
-		} else if (key == "can_target_land") {
-			const bool can_target_land = StringToBool(value);
-			if (can_target_land) {
-				this->CanTarget |= CanTargetLand;
-			} else {
-				this->CanTarget &= ~CanTargetLand;
-			}
-		} else if (key == "can_target_sea") {
-			const bool can_target_sea = StringToBool(value);
-			if (can_target_sea) {
-				this->CanTarget |= CanTargetSea;
-			} else {
-				this->CanTarget &= ~CanTargetSea;
-			}
-		} else if (key == "can_target_air") {
-			const bool can_target_air = StringToBool(value);
-			if (can_target_air) {
-				this->CanTarget |= CanTargetAir;
-			} else {
-				this->CanTarget &= ~CanTargetAir;
-			}
-		} else if (key == "random_movement_probability") {
-			this->RandomMovementProbability = std::stoi(value);
-		} else if (key == "random_movement_distance") {
-			this->RandomMovementDistance = std::stoi(value);
-		} else if (key == "can_cast_spell") {
-			value = FindAndReplaceString(value, "_", "-");
-			CSpell *spell = CSpell::GetSpell(value);
-			if (spell != nullptr) {
-				this->Spells.push_back(spell);
-			}
-		} else if (key == "autocast_active") {
-			if (!this->AutoCastActive) {
-				this->AutoCastActive = new char[CSpell::Spells.size()];
-				memset(this->AutoCastActive, 0, CSpell::Spells.size() * sizeof(char));
-			}
-			
-			if (value == "false") {
-				delete[] this->AutoCastActive;
-				this->AutoCastActive = nullptr;
-			} else {
-				value = FindAndReplaceString(value, "_", "-");
-				const CSpell *spell = CSpell::GetSpell(value);
-				if (spell != nullptr) {
-					if (spell->AutoCast) {
-						this->AutoCastActive[spell->Slot] = 1;
-					} else {
-						fprintf(stderr, "AutoCastActive : Define autocast method for \"%s\".\n", value.c_str());
-					}
-				}
-			}
-		} else {
-			key = SnakeCaseToPascalCase(key);
-			
-			int index = UnitTypeVar.VariableNameLookup[key.c_str()]; // variable index
-			if (index != -1) { // valid index
-				if (IsStringNumber(value)) {
-					this->DefaultStat.Variables[index].Enable = 1;
-					this->DefaultStat.Variables[index].Value = std::stoi(value);
-					this->DefaultStat.Variables[index].Max = std::stoi(value);
-				} else if (IsStringBool(value)) {
-					this->DefaultStat.Variables[index].Enable = StringToBool(value);
-				} else { // error
-					fprintf(stderr, "Invalid value (\"%s\") for variable \"%s\" when defining unit type \"%s\".\n", value.c_str(), key.c_str(), this->Ident.c_str());
-				}
-			} else {
-				if (this->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {
-					this->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
-				}
-
-				index = UnitTypeVar.BoolFlagNameLookup[key.c_str()];
-				if (index != -1) {
-					if (IsStringNumber(value)) {
-						this->BoolFlag[index].value = (std::stoi(value) != 0);
-					} else {
-						this->BoolFlag[index].value = StringToBool(value);
-					}
-				} else {
-					fprintf(stderr, "Invalid unit type property: \"%s\".\n", key.c_str());
-				}
-			}
-		}
-	}
-	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "costs") {
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				key = FindAndReplaceString(key, "_", "-");
-				
-				const int resource = GetResourceIdByName(key.c_str());
-				if (resource != -1) {
-					this->DefaultStat.Costs[resource] = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
-				}
-			}
-		} else if (section->Tag == "image") {
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "file") {
-					this->File = CMod::GetCurrentModPath() + value;
-				} else if (key == "width") {
-					this->Width = std::stoi(value);
-				} else if (key == "height") {
-					this->Height = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (this->File.empty()) {
-				fprintf(stderr, "Image has no file.\n");
-			}
-			
-			if (this->Width == 0) {
-				fprintf(stderr, "Image has no width.\n");
-			}
-			
-			if (this->Height == 0) {
-				fprintf(stderr, "Image has no height.\n");
-			}
-			
-			if (this->Sprite) {
-				CGraphic::Free(this->Sprite);
-				this->Sprite = nullptr;
-			}
-		} else if (section->Tag == "default_equipment") {
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				key = FindAndReplaceString(key, "_", "-");
-				value = FindAndReplaceString(value, "_", "-");
-				
-				int item_slot = GetItemSlotIdByName(key);
-				if (item_slot == -1) {
-					fprintf(stderr, "Invalid item slot for default equipment: \"%s\".\n", key.c_str());
-					continue;
-				}
-				
-				CUnitType *item = UnitTypeByIdent(value);
-				if (!item) {
-					fprintf(stderr, "Invalid item for default equipment: \"%s\".\n", value.c_str());
-					continue;
-				}
-				
-				this->DefaultEquipment[item_slot] = item;
-			}
-		} else if (section->Tag == "sounds") {
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				value = FindAndReplaceString(value, "_", "-");
-				
-				if (key == "selected") {
-					this->Sound.Selected.Name = value;
-				} else if (key == "acknowledge") {
-					this->Sound.Acknowledgement.Name = value;
-				} else if (key == "attack") {
-					this->Sound.Attack.Name = value;
-				} else if (key == "idle") {
-					this->Sound.Idle.Name = value;
-				} else if (key == "hit") {
-					this->Sound.Hit.Name = value;
-				} else if (key == "miss") {
-					this->Sound.Miss.Name = value;
-				} else if (key == "fire_missile") {
-					this->Sound.FireMissile.Name = value;
-				} else if (key == "step") {
-					this->Sound.Step.Name = value;
-				} else if (key == "step_dirt") {
-					this->Sound.StepDirt.Name = value;
-				} else if (key == "step_grass") {
-					this->Sound.StepGrass.Name = value;
-				} else if (key == "step_gravel") {
-					this->Sound.StepGravel.Name = value;
-				} else if (key == "step_mud") {
-					this->Sound.StepMud.Name = value;
-				} else if (key == "step_stone") {
-					this->Sound.StepStone.Name = value;
-				} else if (key == "used") {
-					this->Sound.Used.Name = value;
-				} else if (key == "build") {
-					this->Sound.Build.Name = value;
-				} else if (key == "ready") {
-					this->Sound.Ready.Name = value;
-				} else if (key == "repair") {
-					this->Sound.Repair.Name = value;
-				} else if (key.find("harvest_") != std::string::npos) {
-					std::string resource_ident = FindAndReplaceString(key, "harvest_", "");
-					resource_ident = FindAndReplaceString(resource_ident, "_", "-");
-					const int res = GetResourceIdByName(resource_ident.c_str());
-					if (res != -1) {
-						this->Sound.Harvest[res].Name = value;
-					} else {
-						fprintf(stderr, "Invalid resource: \"%s\".\n", resource_ident.c_str());
-					}
-				} else if (key == "help") {
-					this->Sound.Help.Name = value;
-				} else if (key == "dead") {
-					this->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = value;
-				} else if (key.find("dead_") != std::string::npos) {
-					std::string death_type_ident = FindAndReplaceString(key, "dead_", "");
-					death_type_ident = FindAndReplaceString(death_type_ident, "_", "-");
-					int death;
-					for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-						if (death_type_ident == ExtraDeathTypes[death]) {
-							this->Sound.Dead[death].Name = value;
-							break;
-						}
-					}
-					if (death == ANIMATIONS_DEATHTYPES) {
-						fprintf(stderr, "Invalid death type: \"%s\".\n", death_type_ident.c_str());
-					}
-				} else {
-					fprintf(stderr, "Invalid sound tag: \"%s\".\n", key.c_str());
-				}
-			}
-		} else if (section->Tag == "predependencies") {
-			this->Predependency = new CAndDependency;
-			this->Predependency->ProcessConfigData(section);
-		} else if (section->Tag == "dependencies") {
-			this->Dependency = new CAndDependency;
-			this->Dependency->ProcessConfigData(section);
-		} else if (section->Tag == "variation") {
-			this->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
-			this->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
-			
-			CUnitTypeVariation *variation = new CUnitTypeVariation;
-			variation->ProcessConfigData(section);
-			
-			if (variation->ImageLayer == -1) {
-				variation->ID = this->Variations.size();
-				this->Variations.push_back(variation);
-			} else {
-				variation->ID = this->LayerVariations[variation->ImageLayer].size();
-				this->LayerVariations[variation->ImageLayer].push_back(variation);
-			}
-			
-			this->DefaultStat.Variables[VARIATION_INDEX].Max = this->Variations.size();
-		} else {
-			std::string tag = SnakeCaseToPascalCase(section->Tag);
-			
-			const int index = UnitTypeVar.VariableNameLookup[tag.c_str()]; // variable index
-			
-			if (index != -1) { // valid index
-				for (size_t j = 0; j < section->Properties.size(); ++j) {
-					std::string key = section->Properties[j].first;
-					std::string value = section->Properties[j].second;
-					
-					if (key == "enable") {
-						this->DefaultStat.Variables[index].Enable = StringToBool(value);
-					} else if (key == "value") {
-						this->DefaultStat.Variables[index].Value = std::stoi(value);
-					} else if (key == "max") {
-						this->DefaultStat.Variables[index].Max = std::stoi(value);
-					} else if (key == "increase") {
-						this->DefaultStat.Variables[index].Increase = std::stoi(value);
-					} else {
-						fprintf(stderr, "Invalid variable property: \"%s\".\n", key.c_str());
-					}
-				}
-			} else {
-				fprintf(stderr, "Invalid unit type property: \"%s\".\n", section->Tag.c_str());
-			}
-		}
-	}
 	
 	if (this->Class != -1) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
 		int class_id = this->Class;

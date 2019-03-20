@@ -59,74 +59,92 @@ CSeasonSchedule::~CSeasonSchedule()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CSeasonSchedule::ProcessConfigData(const CConfigData *config_data)
+bool CSeasonSchedule::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "default_schedule") {
+		const bool is_default_schedule = StringToBool(value);
+		if (is_default_schedule) {
+			CSeasonSchedule::DefaultSeasonSchedule = this;
+		}
+	} else if (key == "hours_per_day") {
+		this->HoursPerDay = std::stoi(value);
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CSeasonSchedule::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "scheduled_season") {
+		CSeason *season = nullptr;
+		unsigned hours = 0;
+			
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			if (key == "season") {
+				value = FindAndReplaceString(value, "_", "-");
+				season = CSeason::Get(value);
+			} else if (key == "days") {
+				hours = std::stoi(value) * this->HoursPerDay;
+			} else if (key == "hours") {
+				hours = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid scheduled season property: \"%s\".\n", key.c_str());
+			}
+		}
 		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "default_schedule") {
-			const bool is_default_schedule = StringToBool(value);
-			if (is_default_schedule) {
-				CSeasonSchedule::DefaultSeasonSchedule = this;
-			}
-		} else if (key == "hours_per_day") {
-			this->HoursPerDay = std::stoi(value);
-		} else {
-			fprintf(stderr, "Invalid season schedule property: \"%s\".\n", key.c_str());
+		if (!season) {
+			fprintf(stderr, "Scheduled season has no season.\n");
+			return true;
 		}
+		
+		if (hours <= 0) {
+			fprintf(stderr, "Scheduled season has no amount of time defined.\n");
+			return true;
+		}
+		
+		CScheduledSeason *scheduled_season = new CScheduledSeason;
+		scheduled_season->Season = season;
+		scheduled_season->Hours = hours;
+		scheduled_season->ID = this->ScheduledSeasons.size();
+		scheduled_season->Schedule = this;
+		this->ScheduledSeasons.push_back(scheduled_season);
+		this->TotalHours += scheduled_season->Hours;
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "scheduled_season") {
-			CSeason *season = nullptr;
-			unsigned hours = 0;
-				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "season") {
-					value = FindAndReplaceString(value, "_", "-");
-					season = CSeason::Get(value);
-				} else if (key == "days") {
-					hours = std::stoi(value) * this->HoursPerDay;
-				} else if (key == "hours") {
-					hours = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid scheduled season property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (!season) {
-				fprintf(stderr, "Scheduled season has no season.\n");
-				continue;
-			}
-			
-			if (hours <= 0) {
-				fprintf(stderr, "Scheduled season has no amount of time defined.\n");
-				continue;
-			}
-			
-			CScheduledSeason *scheduled_season = new CScheduledSeason;
-			scheduled_season->Season = season;
-			scheduled_season->Hours = hours;
-			scheduled_season->ID = this->ScheduledSeasons.size();
-			scheduled_season->Schedule = this;
-			this->ScheduledSeasons.push_back(scheduled_season);
-			this->TotalHours += scheduled_season->Hours;
-		} else {
-			fprintf(stderr, "Invalid season schedule property: \"%s\".\n", section->Tag.c_str());
-		}
-	}
+	return true;
+}
 	
+/**
+**	@brief	Initialize the season schedule
+*/
+void CSeasonSchedule::Initialize()
+{
 	this->CalculateHourMultiplier();
+	
+	this->Initialized = true;
 }
 
 /**

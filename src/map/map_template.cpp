@@ -88,175 +88,193 @@ CMapTemplate::~CMapTemplate()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CMapTemplate::ProcessConfigData(const CConfigData *config_data)
+bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "plane") {
-			value = FindAndReplaceString(value, "_", "-");
-			CPlane *plane = CPlane::GetPlane(value);
-			if (plane) {
-				this->Plane = plane;
-			} else {
-				fprintf(stderr, "Plane \"%s\" does not exist.\n", value.c_str());
-			}
-		} else if (key == "world") {
-			value = FindAndReplaceString(value, "_", "-");
-			CWorld *world = CWorld::GetWorld(value);
-			if (world) {
-				this->World = world;
-				this->Plane = this->World->Plane;
-			} else {
-				fprintf(stderr, "World \"%s\" does not exist.\n", value.c_str());
-			}
-		} else if (key == "surface_layer") {
-			this->SurfaceLayer = std::stoi(value);
-			if (this->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
-				UI.SurfaceLayerButtons.resize(this->SurfaceLayer + 1);
-			}
-		} else if (key == "terrain_file") {
-			this->TerrainFile = value;
-		} else if (key == "overlay_terrain_file") {
-			this->OverlayTerrainFile = value;
-		} else if (key == "terrain_image") {
-			this->TerrainImage = value;
-		} else if (key == "overlay_terrain_image") {
-			this->OverlayTerrainImage = value;
-		} else if (key == "width") {
-			this->Width = std::stoi(value);
-		} else if (key == "height") {
-			this->Height = std::stoi(value);
-		} else if (key == "scale") {
-			this->Scale = std::stoi(value);
-		} else if (key == "priority") {
-			this->Priority = std::stoi(value);
-		} else if (key == "pixel_tile_width") {
-			this->PixelTileSize.x = std::stoi(value);
-		} else if (key == "pixel_tile_height") {
-			this->PixelTileSize.y = std::stoi(value);
-		} else if (key == "min_x") {
-			this->MinPos.x = std::stoi(value);
-		} else if (key == "min_y") {
-			this->MinPos.y = std::stoi(value);
-		} else if (key == "max_x") {
-			this->MaxPos.x = std::stoi(value);
-		} else if (key == "max_y") {
-			this->MaxPos.y = std::stoi(value);
-		} else if (key == "main_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			CMapTemplate *main_template = CMapTemplate::Get(value);
-			this->MainTemplate = main_template;
-			main_template->Subtemplates.push_back(this);
-			if (main_template->Plane) {
-				this->Plane = main_template->Plane;
-			}
-			if (main_template->World) {
-				this->World = main_template->World;
-			}
-			this->SurfaceLayer = main_template->SurfaceLayer;
-		} else if (key == "upper_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			CMapTemplate *upper_template = CMapTemplate::Get(value);
-			if (upper_template) {
-				this->UpperTemplate = upper_template;
-				upper_template->LowerTemplate = this;
-			}
-		} else if (key == "lower_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			CMapTemplate *lower_template = CMapTemplate::Get(value);
-			if (lower_template) {
-				this->LowerTemplate = lower_template;
-				lower_template->UpperTemplate = this;
-			}
-		} else if (key == "adjacent_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			CMapTemplate *adjacent_template = CMapTemplate::Get(value);
-			if (adjacent_template) {
-				this->AdjacentTemplates.push_back(adjacent_template);
-				if (std::find(adjacent_template->AdjacentTemplates.begin(), adjacent_template->AdjacentTemplates.end(), this) == adjacent_template->AdjacentTemplates.end()) {
-					adjacent_template->AdjacentTemplates.push_back(this);
-				}
-			}
-		} else if (key == "overland") {
-			this->Overland = StringToBool(value);
-		} else if (key == "base_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
-			if (terrain_type) {
-				this->BaseTerrainType = terrain_type;
-			} else {
-				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
-			}
-		} else if (key == "base_overlay_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
-			if (terrain_type) {
-				this->BaseOverlayTerrainType = terrain_type;
-			} else {
-				fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
-			}
-		} else if (key == "output_terrain_image") {
-			this->OutputTerrainImage = StringToBool(value);
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "plane") {
+		value = FindAndReplaceString(value, "_", "-");
+		CPlane *plane = CPlane::GetPlane(value);
+		if (plane) {
+			this->Plane = plane;
 		} else {
-			fprintf(stderr, "Invalid map template property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Plane \"%s\" does not exist.\n", value.c_str());
 		}
+	} else if (key == "world") {
+		value = FindAndReplaceString(value, "_", "-");
+		CWorld *world = CWorld::GetWorld(value);
+		if (world) {
+			this->World = world;
+			this->Plane = this->World->Plane;
+		} else {
+			fprintf(stderr, "World \"%s\" does not exist.\n", value.c_str());
+		}
+	} else if (key == "surface_layer") {
+		this->SurfaceLayer = std::stoi(value);
+		if (this->SurfaceLayer >= (int) UI.SurfaceLayerButtons.size()) {
+			UI.SurfaceLayerButtons.resize(this->SurfaceLayer + 1);
+		}
+	} else if (key == "terrain_file") {
+		this->TerrainFile = value;
+	} else if (key == "overlay_terrain_file") {
+		this->OverlayTerrainFile = value;
+	} else if (key == "terrain_image") {
+		this->TerrainImage = value;
+	} else if (key == "overlay_terrain_image") {
+		this->OverlayTerrainImage = value;
+	} else if (key == "width") {
+		this->Width = std::stoi(value);
+	} else if (key == "height") {
+		this->Height = std::stoi(value);
+	} else if (key == "scale") {
+		this->Scale = std::stoi(value);
+	} else if (key == "priority") {
+		this->Priority = std::stoi(value);
+	} else if (key == "pixel_tile_width") {
+		this->PixelTileSize.x = std::stoi(value);
+	} else if (key == "pixel_tile_height") {
+		this->PixelTileSize.y = std::stoi(value);
+	} else if (key == "min_x") {
+		this->MinPos.x = std::stoi(value);
+	} else if (key == "min_y") {
+		this->MinPos.y = std::stoi(value);
+	} else if (key == "max_x") {
+		this->MaxPos.x = std::stoi(value);
+	} else if (key == "max_y") {
+		this->MaxPos.y = std::stoi(value);
+	} else if (key == "main_template") {
+		value = FindAndReplaceString(value, "_", "-");
+		CMapTemplate *main_template = CMapTemplate::Get(value);
+		this->MainTemplate = main_template;
+		main_template->Subtemplates.push_back(this);
+		if (main_template->Plane) {
+			this->Plane = main_template->Plane;
+		}
+		if (main_template->World) {
+			this->World = main_template->World;
+		}
+		this->SurfaceLayer = main_template->SurfaceLayer;
+	} else if (key == "upper_template") {
+		value = FindAndReplaceString(value, "_", "-");
+		CMapTemplate *upper_template = CMapTemplate::Get(value);
+		if (upper_template) {
+			this->UpperTemplate = upper_template;
+			upper_template->LowerTemplate = this;
+		}
+	} else if (key == "lower_template") {
+		value = FindAndReplaceString(value, "_", "-");
+		CMapTemplate *lower_template = CMapTemplate::Get(value);
+		if (lower_template) {
+			this->LowerTemplate = lower_template;
+			lower_template->UpperTemplate = this;
+		}
+	} else if (key == "adjacent_template") {
+		value = FindAndReplaceString(value, "_", "-");
+		CMapTemplate *adjacent_template = CMapTemplate::Get(value);
+		if (adjacent_template) {
+			this->AdjacentTemplates.push_back(adjacent_template);
+			if (std::find(adjacent_template->AdjacentTemplates.begin(), adjacent_template->AdjacentTemplates.end(), this) == adjacent_template->AdjacentTemplates.end()) {
+				adjacent_template->AdjacentTemplates.push_back(this);
+			}
+		}
+	} else if (key == "overland") {
+		this->Overland = StringToBool(value);
+	} else if (key == "base_terrain_type") {
+		value = FindAndReplaceString(value, "_", "-");
+		CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+		if (terrain_type) {
+			this->BaseTerrainType = terrain_type;
+		} else {
+			fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
+		}
+	} else if (key == "base_overlay_terrain_type") {
+		value = FindAndReplaceString(value, "_", "-");
+		CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+		if (terrain_type) {
+			this->BaseOverlayTerrainType = terrain_type;
+		} else {
+			fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
+		}
+	} else if (key == "output_terrain_image") {
+		this->OutputTerrainImage = StringToBool(value);
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "generated_neutral_unit" || section->Tag == "player_location_generated_neutral_unit") {
-			CUnitType *unit_type = nullptr;
-			int quantity = 1;
-				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "unit_type") {
-					value = FindAndReplaceString(value, "_", "-");
-					unit_type = UnitTypeByIdent(value);
-					if (!unit_type) {
-						fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
-					}
-				} else if (key == "quantity") {
-					quantity = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid generated neutral unit property: \"%s\".\n", key.c_str());
+	return true;
+}
+	
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CMapTemplate::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "generated_neutral_unit" || section->Tag == "player_location_generated_neutral_unit") {
+		CUnitType *unit_type = nullptr;
+		int quantity = 1;
+			
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			if (key == "unit_type") {
+				value = FindAndReplaceString(value, "_", "-");
+				unit_type = UnitTypeByIdent(value);
+				if (!unit_type) {
+					fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", value.c_str());
 				}
+			} else if (key == "quantity") {
+				quantity = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid generated neutral unit property: \"%s\".\n", key.c_str());
 			}
-			
-			if (!unit_type) {
-				fprintf(stderr, "Generated neutral unit has no unit type.\n");
-				continue;
-			}
-			
-			if (section->Tag == "generated_neutral_unit") {
-				this->GeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
-			} else if (section->Tag == "player_location_generated_neutral_unit") {
-				this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
-			}
-		} else if (section->Tag == "generated_terrain") {
-			CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
-			
-			generated_terrain->ProcessConfigData(section);
-				
-			if (!generated_terrain->TerrainType) {
-				delete generated_terrain;
-				continue;
-			}
-			
-			this->GeneratedTerrains.push_back(generated_terrain);
-		} else {
-			fprintf(stderr, "Invalid map template property: \"%s\".\n", section->Tag.c_str());
 		}
+		
+		if (!unit_type) {
+			fprintf(stderr, "Generated neutral unit has no unit type.\n");
+			return true;
+		}
+		
+		if (section->Tag == "generated_neutral_unit") {
+			this->GeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+		} else if (section->Tag == "player_location_generated_neutral_unit") {
+			this->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+		}
+	} else if (section->Tag == "generated_terrain") {
+		CGeneratedTerrain *generated_terrain = new CGeneratedTerrain;
+		
+		generated_terrain->ProcessConfigData(section);
+			
+		if (!generated_terrain->TerrainType) {
+			delete generated_terrain;
+			return true;
+		}
+		
+		this->GeneratedTerrains.push_back(generated_terrain);
+	} else {
+		return false;
 	}
+	
+	return true;
+}
+
+/**
+**	@brief	Initialize the map template
+*/
+void CMapTemplate::Initialize()
+{
+	this->Initialized = true;
 	
 	if (this->MainTemplate) { //if this is a subtemplate, re-sort the main template's subtemplates according to priority
 		std::sort(this->MainTemplate->Subtemplates.begin(), this->MainTemplate->Subtemplates.end(), [](CMapTemplate *a, CMapTemplate *b) {

@@ -30,19 +30,7 @@
 #ifndef __WORLD_H__
 #define __WORLD_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
-
-#include <map>
-#include <string>
-#include <vector>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CPlane;
 class CProvince;
@@ -61,9 +49,8 @@ public:
 	static std::vector<CWorld *> Worlds;								/// Worlds
 	static std::map<std::string, CWorld *> WorldsByIdent;
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 
-	int ID = -1;														/// ID of this world
 	std::string Name;
 	std::string Description;
 	std::string Background;

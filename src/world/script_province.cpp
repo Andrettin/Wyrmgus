@@ -623,8 +623,8 @@ static int CclGetPlaneData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, plane->Name.c_str());
 		return 1;
-	} else if (!strcmp(data, "ID")) {
-		lua_pushnumber(l, plane->ID);
+	} else if (!strcmp(data, "Index")) {
+		lua_pushnumber(l, plane->GetIndex());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, plane->Description.c_str());
@@ -670,8 +670,8 @@ static int CclGetWorldData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, world->Name.c_str());
 		return 1;
-	} else if (!strcmp(data, "ID")) {
-		lua_pushnumber(l, world->ID);
+	} else if (!strcmp(data, "Index")) {
+		lua_pushnumber(l, world->GetIndex());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, world->Description.c_str());

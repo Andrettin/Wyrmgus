@@ -59,7 +59,10 @@ class CSite : public CDataType
 	DATA_TYPE_CLASS(CSite)
 	
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void Initialize() override;
+
 	std::string GetCulturalName(const CCivilization *civilization) const;
 
 	std::string Name;

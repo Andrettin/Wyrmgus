@@ -711,7 +711,9 @@ public:
 
 	static std::vector<CUnitType *> UnitTypes;	/// All unit-types
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void Initialize() override;
 	
 	String GetName() const
 	{
@@ -794,7 +796,6 @@ public:
 
 public:
 	std::string Name;               /// Pretty name shown from the engine
-	bool Initialized = false;
 	CUnitType *Parent = nullptr;	/// Parent unit type
 	//Wyrmgus start
 	int Class = -1;					/// Class identifier (i.e. infantry, archer, etc.)

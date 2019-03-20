@@ -44,63 +44,73 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CSeason::ProcessConfigData(const CConfigData *config_data)
+bool CSeason::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else {
-			fprintf(stderr, "Invalid season property: \"%s\".\n", key.c_str());
-		}
+	if (key == "name") {
+		this->Name = value;
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "image") {
-			std::string file;
-			Vec2i size(0, 0);
-				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
-				} else if (key == "width") {
-					size.x = std::stoi(value);
-				} else if (key == "height") {
-					size.y = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
-				}
-			}
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CSeason::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "image") {
+		std::string file;
+		Vec2i size(0, 0);
 			
-			if (file.empty()) {
-				fprintf(stderr, "Image has no file.\n");
-				continue;
-			}
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
 			
-			if (size.x == 0) {
-				fprintf(stderr, "Image has no width.\n");
-				continue;
+			if (key == "file") {
+				file = CMod::GetCurrentModPath() + value;
+			} else if (key == "width") {
+				size.x = std::stoi(value);
+			} else if (key == "height") {
+				size.y = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
 			}
-			
-			if (size.y == 0) {
-				fprintf(stderr, "Image has no height.\n");
-				continue;
-			}
-			
-			this->G = CGraphic::New(file, size.x, size.y);
-			this->G->Load();
-			this->G->UseDisplayFormat();
-		} else {
-			fprintf(stderr, "Invalid season property: \"%s\".\n", section->Tag.c_str());
 		}
+		
+		if (file.empty()) {
+			fprintf(stderr, "Image has no file.\n");
+			return true;
+		}
+		
+		if (size.x == 0) {
+			fprintf(stderr, "Image has no width.\n");
+			return true;
+		}
+		
+		if (size.y == 0) {
+			fprintf(stderr, "Image has no height.\n");
+			return true;
+		}
+		
+		this->G = CGraphic::New(file, size.x, size.y);
+		this->G->Load();
+		this->G->UseDisplayFormat();
+	} else {
+		return false;
 	}
+	
+	return true;
 }

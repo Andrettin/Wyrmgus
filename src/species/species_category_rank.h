@@ -53,11 +53,6 @@ public:
 		return this->Name.c_str();
 	}
 	
-	bool IsInitialized() const
-	{
-		return this->Initialized;
-	}
-	
 	CSpeciesCategoryRank *GetLowerRank() const
 	{
 		return this->LowerRank;
@@ -70,7 +65,6 @@ public:
 	
 private:
 	std::string Name;				/// name of the species category rank
-	bool Initialized = false;		/// whether the rank has been initialized
 	CSpeciesCategoryRank *LowerRank = nullptr;	/// the rank directly below this one
 	CSpeciesCategoryRank *UpperRank = nullptr;	/// the rank directly above this one
 };

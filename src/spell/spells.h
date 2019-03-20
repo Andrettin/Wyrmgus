@@ -232,7 +232,9 @@ public:
 	static std::vector<CSpell *> Spells;
 	static std::map<std::string, CSpell *> SpellsByIdent;
 	
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+
 	/// return 1 if spell is available, 0 if not (must upgrade)
 	bool IsAvailableForUnit(const CUnit &unit) const;
 	const AutoCastInfo *GetAutoCastInfo(const bool ai) const;

@@ -90,12 +90,12 @@ CWorld *CWorld::GetOrAddWorld(const std::string &ident)
 	if (!world) {
 		world = new CWorld;
 		world->Ident = ident;
-		world->ID = Worlds.size();
+		world->Index = Worlds.size();
 		Worlds.push_back(world);
 		WorldsByIdent[ident] = world;
 		UI.WorldButtons.resize(Worlds.size());
-		UI.WorldButtons[world->ID].X = -1;
-		UI.WorldButtons[world->ID].Y = -1;
+		UI.WorldButtons[world->Index].X = -1;
+		UI.WorldButtons[world->Index].Y = -1;
 	}
 	
 	return world;
@@ -119,35 +119,35 @@ void CWorld::ClearWorlds()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CWorld::ProcessConfigData(const CConfigData *config_data)
+bool CWorld::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "background") {
-			this->Background = value;
-		} else if (key == "quote") {
-			this->Quote = value;
-		} else if (key == "plane") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Plane = CPlane::GetPlane(value);
-		} else if (key == "time_of_day_schedule") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->TimeOfDaySchedule = CTimeOfDaySchedule::Get(value);
-		} else if (key == "season_schedule") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->SeasonSchedule = CSeasonSchedule::Get(value);
-		} else {
-			fprintf(stderr, "Invalid world property: \"%s\".\n", key.c_str());
-		}
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "background") {
+		this->Background = value;
+	} else if (key == "quote") {
+		this->Quote = value;
+	} else if (key == "plane") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Plane = CPlane::GetPlane(value);
+	} else if (key == "time_of_day_schedule") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->TimeOfDaySchedule = CTimeOfDaySchedule::Get(value);
+	} else if (key == "season_schedule") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->SeasonSchedule = CSeasonSchedule::Get(value);
+	} else {
+		return false;
 	}
+
+	return true;
 }

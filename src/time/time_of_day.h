@@ -51,7 +51,8 @@ class CTimeOfDay : public CDataType, public Object
 	DATA_TYPE_CLASS(CTimeOfDay)
 	
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 
 	String GetIdent() const
 	{

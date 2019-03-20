@@ -30,19 +30,7 @@
 #ifndef __PLANE_H__
 #define __PLANE_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
-
-#include <map>
-#include <string>
-#include <vector>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CDeityDomain;
 class CSchoolOfMagic;
@@ -60,10 +48,8 @@ public:
 	static std::vector<CPlane *> Planes;								/// Planes
 	static std::map<std::string, CPlane *> PlanesByIdent;
 
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 
-	int ID = -1;																/// ID of this plane
-	std::string Ident;
 	std::string Name;
 	std::string Description;
 	std::string Background;

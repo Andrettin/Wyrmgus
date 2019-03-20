@@ -237,117 +237,133 @@ CUpgrade::~CUpgrade()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CUpgrade::ProcessConfigData(const CConfigData *config_data)
+bool CUpgrade::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	if (key == "name") {
+		this->Name = value;
+	} else if (key == "icon") {
+		value = FindAndReplaceString(value, "_", "-");
+		CIcon *icon = CIcon::Get(value);
+		if (icon != nullptr) {
+			this->Icon = icon;
+		} else {
+			fprintf(stderr, "Invalid icon: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "class") {
+		value = FindAndReplaceString(value, "_", "-");
+		const std::string &class_name = value;
 		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
-			CIcon *icon = CIcon::Get(value);
-			if (icon != nullptr) {
-				this->Icon = icon;
-			} else {
-				fprintf(stderr, "Invalid icon: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "class") {
-			value = FindAndReplaceString(value, "_", "-");
-			const std::string &class_name = value;
-			
-			int class_id = GetUpgradeClassIndexByName(class_name);
-			if (class_id == -1) {
-				SetUpgradeClassStringToIndex(class_name, UpgradeClasses.size());
-				class_id = UpgradeClasses.size();
-				UpgradeClasses.push_back(class_name);
-			}
-			
-			this->Class = class_id;
-		} else if (key == "civilization") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CCivilization *civilization = CCivilization::Get(value);
-			if (civilization) {
-				this->Civilization = civilization->GetIndex();
-			}
-		} else if (key == "faction") {
-			value = FindAndReplaceString(value, "_", "-");
-			const CFaction *faction = CFaction::Get(value);
-			if (faction) {
-				this->Faction = faction->GetIndex();
-			}
-		} else if (key == "ability") {
-			this->Ability = StringToBool(value);
-		} else if (key == "weapon") {
-			this->Weapon = StringToBool(value);
-		} else if (key == "shield") {
-			this->Shield = StringToBool(value);
-		} else if (key == "boots") {
-			this->Boots = StringToBool(value);
-		} else if (key == "arrows") {
-			this->Arrows = StringToBool(value);
-		} else if (key == "item") {
-			value = FindAndReplaceString(value, "_", "-");
-			CUnitType *item = UnitTypeByIdent(value);
-			if (item != nullptr) {
-				this->Item = item;
-			} else {
-				fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
-			}
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "quote") {
-			this->Quote = value;
-		} else if (key == "background") {
-			this->Background = value;
-		} else if (key == "effects_string") {
-			this->EffectsString = value;
-		} else if (key == "requirements_string") {
-			this->RequirementsString = value;
-		} else {
-			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", key.c_str());
+		int class_id = GetUpgradeClassIndexByName(class_name);
+		if (class_id == -1) {
+			SetUpgradeClassStringToIndex(class_name, UpgradeClasses.size());
+			class_id = UpgradeClasses.size();
+			UpgradeClasses.push_back(class_name);
 		}
+		
+		this->Class = class_id;
+	} else if (key == "civilization") {
+		value = FindAndReplaceString(value, "_", "-");
+		const CCivilization *civilization = CCivilization::Get(value);
+		if (civilization) {
+			this->Civilization = civilization->GetIndex();
+		}
+	} else if (key == "faction") {
+		value = FindAndReplaceString(value, "_", "-");
+		const CFaction *faction = CFaction::Get(value);
+		if (faction) {
+			this->Faction = faction->GetIndex();
+		}
+	} else if (key == "ability") {
+		this->Ability = StringToBool(value);
+	} else if (key == "weapon") {
+		this->Weapon = StringToBool(value);
+	} else if (key == "shield") {
+		this->Shield = StringToBool(value);
+	} else if (key == "boots") {
+		this->Boots = StringToBool(value);
+	} else if (key == "arrows") {
+		this->Arrows = StringToBool(value);
+	} else if (key == "item") {
+		value = FindAndReplaceString(value, "_", "-");
+		CUnitType *item = UnitTypeByIdent(value);
+		if (item != nullptr) {
+			this->Item = item;
+		} else {
+			fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "quote") {
+		this->Quote = value;
+	} else if (key == "background") {
+		this->Background = value;
+	} else if (key == "effects_string") {
+		this->EffectsString = value;
+	} else if (key == "requirements_string") {
+		this->RequirementsString = value;
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "costs") {
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				key = FindAndReplaceString(key, "_", "-");
-				
-				const int resource = GetResourceIdByName(key.c_str());
-				if (resource != -1) {
-					this->Costs[resource] = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
-				}
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CUpgrade::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "costs") {
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			key = FindAndReplaceString(key, "_", "-");
+			
+			const int resource = GetResourceIdByName(key.c_str());
+			if (resource != -1) {
+				this->Costs[resource] = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid resource: \"%s\".\n", key.c_str());
 			}
-		} else if (section->Tag == "predependencies") {
-			this->Predependency = new CAndDependency;
-			this->Predependency->ProcessConfigData(section);
-		} else if (section->Tag == "dependencies") {
-			this->Dependency = new CAndDependency;
-			this->Dependency->ProcessConfigData(section);
-		} else if (section->Tag == "modifier") {
-			CUpgradeModifier *modifier = new CUpgradeModifier;
-			modifier->UpgradeId = this->ID;
-			this->UpgradeModifiers.push_back(modifier);
-			
-			modifier->ProcessConfigData(section);
-			
-			CUpgradeModifier::UpgradeModifiers.push_back(modifier);
-		} else {
-			fprintf(stderr, "Invalid upgrade property: \"%s\".\n", section->Tag.c_str());
 		}
+	} else if (section->Tag == "predependencies") {
+		this->Predependency = new CAndDependency;
+		this->Predependency->ProcessConfigData(section);
+	} else if (section->Tag == "dependencies") {
+		this->Dependency = new CAndDependency;
+		this->Dependency->ProcessConfigData(section);
+	} else if (section->Tag == "modifier") {
+		CUpgradeModifier *modifier = new CUpgradeModifier;
+		modifier->UpgradeId = this->ID;
+		this->UpgradeModifiers.push_back(modifier);
+		
+		modifier->ProcessConfigData(section);
+		
+		CUpgradeModifier::UpgradeModifiers.push_back(modifier);
+	} else {
+		return false;
 	}
 	
+	return true;
+}
+
+/**
+**	@brief	Initialize the upgrade
+*/
+void CUpgrade::Initialize()
+{
 	//set the upgrade's civilization and class here
 	if (this->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
 		int class_id = this->Class;
@@ -373,6 +389,8 @@ void CUpgrade::ProcessConfigData(const CConfigData *config_data)
 	if (this->Icon != nullptr && !this->Icon->Loaded) {
 		this->Icon->Load();
 	}
+	
+	this->Initialized = true;
 	
 	CclCommand("if not (GetArrayIncludes(Units, \"" + this->Ident + "\")) then table.insert(Units, \"" + this->Ident + "\") end"); //FIXME: needed at present to make upgrade data files work without scripting being necessary, but it isn't optimal to interact with a scripting table like "Units" in this manner (that table should probably be replaced with getting a list of unit types from the engine)
 }

@@ -159,7 +159,6 @@ public:
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
 	bool ViolentDeath = false;	/// If historical death was violent
 	bool Custom = false;		/// Whether this character is a custom hero
-	bool Initialized = false;	/// Whether the character has already been initialized
 	std::string Name;			/// Given name of the character
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
 	std::string FamilyName;		/// Name of the character's family

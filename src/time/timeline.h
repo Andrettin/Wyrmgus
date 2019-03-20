@@ -50,7 +50,7 @@ class CTimeline : public CDataType
 	DATA_TYPE_CLASS(CTimeline)
 
 public:
-	virtual void ProcessConfigData(const CConfigData *config_data) override;
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	std::string Name;
 	CDate PointOfDivergence;											/// The point of divergence for this timeline
