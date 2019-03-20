@@ -51,6 +51,7 @@ public:
 	CPlayer *GetThisPlayer() const;
 	
 	CLiteraryText *GetLiteraryText(String ident) const;
+	Array GetLiteraryTexts() const;
 
 private:
 	oamlGodotModule *OamlModule = nullptr;

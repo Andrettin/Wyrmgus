@@ -142,6 +142,17 @@ CLiteraryText *Wyrmgus::GetLiteraryText(String ident) const
 	return CLiteraryText::Get(ident.utf8().get_data());
 }
 
+Array Wyrmgus::GetLiteraryTexts() const
+{
+	Array literary_texts;
+	
+	for (CLiteraryText *literary_text : CLiteraryText::GetAll()) {
+		literary_texts.push_back(literary_text);
+	}
+	
+	return literary_texts;
+}
+
 void Wyrmgus::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("run"), &Wyrmgus::Run);
@@ -168,6 +179,7 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_this_player"), &Wyrmgus::GetThisPlayer);
 	
 	ClassDB::bind_method(D_METHOD("get_literary_text", "ident"), &Wyrmgus::GetLiteraryText);
+	ClassDB::bind_method(D_METHOD("get_literary_texts"), &Wyrmgus::GetLiteraryTexts);
 
 	ADD_SIGNAL(MethodInfo("this_player_changed", PropertyInfo(Variant::OBJECT, "old_player"), PropertyInfo(Variant::OBJECT, "new_player")));
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
