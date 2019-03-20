@@ -198,7 +198,6 @@ extern void beos_init(int argc, char **argv);
 #include "sound/sound_server.h"
 #include "time/calendar.h"
 #include "time/timeline.h"
-#include "title.h"
 #include "translate.h"
 #include "ui/interface.h"
 #include "ui/ui.h"

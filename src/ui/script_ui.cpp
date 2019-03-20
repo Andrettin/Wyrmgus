@@ -40,8 +40,6 @@
 #include "menus.h"
 #include "script.h"
 #include "spell/spells.h"
-#include "title.h"
-#include "util.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
 #include "ui/contenttype.h"
@@ -51,6 +49,7 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
+#include "util.h"
 #include "video/font.h"
 #include "video/video.h"
 
@@ -314,95 +313,6 @@ static int CclGetVideoFullScreen(lua_State *l)
 	LuaCheckArgs(l, 0);
 	lua_pushboolean(l, Video.FullScreen);
 	return 1;
-}
-
-/**
-**  Default title screens.
-**
-**  @param l  Lua state.
-*/
-static int CclSetTitleScreens(lua_State *l)
-{
-	if (TitleScreens) {
-		for (int i = 0; TitleScreens[i]; ++i) {
-			delete TitleScreens[i];
-		}
-		delete[] TitleScreens;
-		TitleScreens = nullptr;
-	}
-
-	const int args = lua_gettop(l);
-	TitleScreens = new TitleScreen *[args + 1];
-	memset(TitleScreens, 0, (args + 1) * sizeof(TitleScreen *));
-
-	for (int j = 0; j < args; ++j) {
-		if (!lua_istable(l, j + 1)) {
-			LuaError(l, "incorrect argument");
-		}
-		TitleScreens[j] = new TitleScreen;
-		TitleScreens[j]->Iterations = 1;
-		lua_pushnil(l);
-		while (lua_next(l, j + 1)) {
-			const char *value = LuaToString(l, -2);
-			if (!strcmp(value, "Image")) {
-				TitleScreens[j]->File = LuaToString(l, -1);
-			} else if (!strcmp(value, "Music")) {
-				TitleScreens[j]->Music = LuaToString(l, -1);
-			} else if (!strcmp(value, "Timeout")) {
-				TitleScreens[j]->Timeout = LuaToNumber(l, -1);
-			} else if (!strcmp(value, "Iterations")) {
-				TitleScreens[j]->Iterations = LuaToNumber(l, -1);
-			} else if (!strcmp(value, "Editor")) {
-				TitleScreens[j]->Editor = LuaToNumber(l, -1);
-			} else if (!strcmp(value, "Labels")) {
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
-				const int subargs = lua_rawlen(l, -1);
-				TitleScreens[j]->Labels = new TitleScreenLabel *[subargs + 1];
-				memset(TitleScreens[j]->Labels, 0, (subargs + 1) * sizeof(TitleScreenLabel *));
-				for (int k = 0; k < subargs; ++k) {
-					lua_rawgeti(l, -1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					TitleScreens[j]->Labels[k] = new TitleScreenLabel;
-					lua_pushnil(l);
-					while (lua_next(l, -2)) {
-						const char *value = LuaToString(l, -2);
-						if (!strcmp(value, "Text")) {
-							TitleScreens[j]->Labels[k]->Text = LuaToString(l, -1);
-						} else if (!strcmp(value, "Font")) {
-							TitleScreens[j]->Labels[k]->Font = CFont::Get(LuaToString(l, -1));
-						} else if (!strcmp(value, "Pos")) {
-							CclGetPos(l, &TitleScreens[j]->Labels[k]->Xofs, &TitleScreens[j]->Labels[k]->Yofs);
-						} else if (!strcmp(value, "Flags")) {
-							if (!lua_istable(l, -1)) {
-								LuaError(l, "incorrect argument");
-							}
-							const int subsubargs = lua_rawlen(l, -1);
-							for (int subk = 0; subk < subsubargs; ++subk) {
-								const char *value = LuaToString(l, -1, subk + 1);
-								if (!strcmp(value, "center")) {
-									TitleScreens[j]->Labels[k]->Flags |= TitleFlagCenter;
-								} else {
-									LuaError(l, "incorrect flag");
-								}
-							}
-						} else {
-							LuaError(l, "Unsupported key: %s" _C_ value);
-						}
-						lua_pop(l, 1);
-					}
-					lua_pop(l, 1);
-				}
-			} else {
-				LuaError(l, "Unsupported key: %s" _C_ value);
-			}
-			lua_pop(l, 1);
-		}
-	}
-	return 0;
 }
 
 /**
@@ -1361,8 +1271,6 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "GetVideoResolution", CclGetVideoResolution);
 	lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);
 	lua_register(Lua, "GetVideoFullScreen", CclGetVideoFullScreen);
-
-	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
 
 	lua_register(Lua, "DefinePanelContents", CclDefinePanelContents);
 	lua_register(Lua, "DefinePopup", CclDefinePopup);

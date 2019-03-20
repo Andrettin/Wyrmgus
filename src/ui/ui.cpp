@@ -46,7 +46,6 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "menus.h"
-#include "title.h"
 #include "translate.h"
 #include "ui/contenttype.h"
 #include "ui/interface.h"
@@ -461,15 +460,6 @@ void CleanUserInterface()
 	// Backgrounds
 	CGraphic::Free(UI.VictoryBackgroundG);
 	CGraphic::Free(UI.DefeatBackgroundG);
-
-	// Title Screens
-	if (TitleScreens) {
-		for (int i = 0; TitleScreens[i]; ++i) {
-			delete TitleScreens[i];
-		}
-		delete[] TitleScreens;
-		TitleScreens = nullptr;
-	}
 }
 
 //Wyrmgus start
