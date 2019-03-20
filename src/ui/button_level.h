@@ -30,15 +30,7 @@
 #ifndef __BUTTON_LEVEL_H__
 #define __BUTTON_LEVEL_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CButtonLevel : public CDataType
 {
@@ -54,7 +46,6 @@ public:
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	int ID = -1;									/// ID of the button level (starting at 1)
 };
 
 #endif

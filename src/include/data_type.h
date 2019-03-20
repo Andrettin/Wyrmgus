@@ -36,6 +36,7 @@
 
 #include <core/ustring.h>
 
+#include <algorithm>
 #include <map>
 #include <string>
 #include <vector>

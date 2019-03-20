@@ -92,7 +92,7 @@ CButtonLevel *CButtonLevel::GetOrAddButtonLevel(const std::string &ident)
 		button_level = new CButtonLevel;
 		button_level->Ident = ident;
 		ButtonLevels.push_back(button_level);
-		button_level->ID = ButtonLevels.size(); //index starts at 1, so that buttons with a null button level have a value of 0
+		button_level->Index = ButtonLevels.size(); //index starts at 1, so that buttons with a null button level have a value of 0
 		ButtonLevelsByIdent[ident] = button_level;
 	}
 	

@@ -30,22 +30,11 @@
 #ifndef __CONVERSIBLE_COLOR_H__
 #define __CONVERSIBLE_COLOR_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
 
 #include <core/color.h>
 #include <core/object.h>
 
-#include <map>
-#include <string>
-#include <vector>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CConversibleColor : public CDataType, public Object
 {

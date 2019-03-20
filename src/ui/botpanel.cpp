@@ -199,7 +199,7 @@ int AddButton(int pos, CButtonLevel *level, const std::string &icon_ident,
 			//Wyrmgus end
 			case ButtonButton:
 				if (CButtonLevel::GetButtonLevel(value)) {
-					ba->Value = CButtonLevel::GetButtonLevel(value)->ID;
+					ba->Value = CButtonLevel::GetButtonLevel(value)->GetIndex();
 				} else {
 					ba->Value = 0;
 				}

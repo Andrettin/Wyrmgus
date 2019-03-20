@@ -199,7 +199,7 @@ void ButtonAction::CleanTriggerData() const
 int ButtonAction::GetLevelIndex() const
 {
 	if (this->Level) {
-		return this->Level->ID;
+		return this->Level->Index;
 	} else {
 		return 0;
 	}
