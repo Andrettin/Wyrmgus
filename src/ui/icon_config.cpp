@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name icon.cpp - The icon source file. */
+/**@name icon_config.cpp - The icon config source file. */
 //
 //      (c) Copyright 1998-2019 by Lutz Sammer, Jimmy Salmon and Andrettin
 //

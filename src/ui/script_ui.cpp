@@ -1183,7 +1183,7 @@ static int CclDefineIcon(lua_State *l)
 		}
 	}
 	
-	CIcon *icon = CIcon::New(ident);
+	CIcon *icon = CIcon::GetOrAdd(ident);
 	icon->File = file;
 	icon->Size = size;
 	icon->Frame = frame;
@@ -1226,8 +1226,8 @@ static int CclGetIconData(lua_State *l)
 static int CclGetIcons(lua_State *l)
 {
 	std::vector<std::string> icons;
-	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
-		icons.push_back(it->first);
+	for (const CIcon *icon : CIcon::GetAll()) {
+		icons.push_back(icon->GetIdent().utf8().get_data());
 	}
 		
 	lua_createtable(l, icons.size(), 0);

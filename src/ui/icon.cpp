@@ -44,12 +44,6 @@
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-IconMap Icons;   /// Map of ident to icon.
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -63,97 +57,75 @@ CIcon::~CIcon()
 }
 
 /**
-**  Create a new icon
+**	@brief	Process a property in the data provided by a configuration file
 **
-**  @param ident  Icon identifier
+**	@param	key		The property's key
+**	@param	value	The property's value
 **
-**  @return       New icon
+**	@return	True if the property can be processed, or false otherwise
 */
-CIcon *CIcon::New(const std::string &ident)
+bool CIcon::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	CIcon *icon = CIcon::Get(ident);
-
-	if (icon == nullptr) {
-		icon = new CIcon(ident);
-		Icons[ident] = icon;
+	if (key == "frame") {
+		this->Frame = std::stoi(value);
+	} else {
+		return false;
 	}
 	
-	return icon;
+	return true;
 }
 
 /**
-**  Get an icon
+**	@brief	Process a section in the data provided by a configuration file
 **
-**  @param ident  Icon identifier
+**	@param	section		The section
 **
-**  @return       The icon
+**	@return	True if the section can be processed, or false otherwise
 */
-CIcon *CIcon::Get(const std::string &ident)
+bool CIcon::ProcessConfigDataSection(const CConfigData *section)
 {
-	IconMap::iterator it = Icons.find(ident);
-	if (it != Icons.end()) {
-		return it->second;
-	} else {
-		DebugPrint("icon not found: %s\n" _C_ ident.c_str());
-		return nullptr;
-	}
-}
-
-void CIcon::ProcessConfigData(const CConfigData *config_data)
-{
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		if (key == "frame") {
-			this->Frame = std::stoi(value);
-		} else {
-			fprintf(stderr, "Invalid icon property: \"%s\".\n", key.c_str());
+	if (section->Tag == "image") {
+		std::string file;
+		Vec2i size(0, 0);
+			
+		for (size_t j = 0; j < section->Properties.size(); ++j) {
+			std::string key = section->Properties[j].first;
+			std::string value = section->Properties[j].second;
+			
+			if (key == "file") {
+				file = CMod::GetCurrentModPath() + value;
+			} else if (key == "width") {
+				size.x = std::stoi(value);
+			} else if (key == "height") {
+				size.y = std::stoi(value);
+			} else {
+				fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
+			}
 		}
+		
+		if (file.empty()) {
+			fprintf(stderr, "Image has no file.\n");
+			return true;
+		}
+		
+		if (size.x == 0) {
+			fprintf(stderr, "Image has no width.\n");
+			return true;
+		}
+		
+		if (size.y == 0) {
+			fprintf(stderr, "Image has no height.\n");
+			return true;
+		}
+		
+		this->G = CPlayerColorGraphic::New(file, size.x, size.y);
+		this->File = file;
+		this->Size = size;
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "image") {
-			std::string file;
-			Vec2i size(0, 0);
-				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
-				
-				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
-				} else if (key == "width") {
-					size.x = std::stoi(value);
-				} else if (key == "height") {
-					size.y = std::stoi(value);
-				} else {
-					fprintf(stderr, "Invalid image property: \"%s\".\n", key.c_str());
-				}
-			}
-			
-			if (file.empty()) {
-				fprintf(stderr, "Image has no file.\n");
-				continue;
-			}
-			
-			if (size.x == 0) {
-				fprintf(stderr, "Image has no width.\n");
-				continue;
-			}
-			
-			if (size.y == 0) {
-				fprintf(stderr, "Image has no height.\n");
-				continue;
-			}
-			
-			this->G = CPlayerColorGraphic::New(file, size.x, size.y);
-			this->File = file;
-			this->Size = size;
-		} else {
-			fprintf(stderr, "Invalid icon property: \"%s\".\n", section->Tag.c_str());
-		}
-	}
+	return true;
 }
 
 void CIcon::Load()
@@ -163,6 +135,7 @@ void CIcon::Load()
 		return;
 	}
 	//Wyrmgus end
+	
 	Assert(G);
 	G->Load();
 	if (Preference.GrayscaleIcons) {
@@ -389,7 +362,7 @@ void CIcon::_bind_methods()
 */
 int GetIconsCount()
 {
-	return Icons.size();
+	return CIcon::GetAll().size();
 }
 
 /**
@@ -399,24 +372,10 @@ void LoadIcons()
 {
 	ShowLoadProgress("%s", _("Loading Icons"));
 		
-	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
-		CIcon *icon = (*it).second;
-
+	for (CIcon *icon : CIcon::GetAll()) {
 		UpdateLoadProgress();
 		icon->Load();
 
 		IncItemsLoaded();
 	}
-}
-
-/**
-**  Clean up memory used by the icons.
-*/
-void CleanIcons()
-{
-	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
-		CIcon *icon = (*it).second;
-		delete icon;
-	}
-	Icons.clear();
 }

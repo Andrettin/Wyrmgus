@@ -122,7 +122,7 @@ void CleanModules()
 	EndReplayLog();
 	CleanMessages();
 
-	CleanIcons();
+	CIcon::Clear();
 	CleanCursors();
 	CleanUserInterface();
 	CleanFonts();

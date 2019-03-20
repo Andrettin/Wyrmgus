@@ -331,7 +331,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				historical_unit->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "icon") {
-			CIcon *icon = CIcon::New(ident);
+			CIcon *icon = CIcon::GetOrAdd(ident);
 			if (!define_only) {
 				icon->ProcessConfigData(config_data);
 			}

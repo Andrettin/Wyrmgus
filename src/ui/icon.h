@@ -77,25 +77,21 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
 #include "vec2i.h"
-
-#include <core/object.h>
-
-#include <map>
-#include <string>
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class ButtonStyle;
-class CConfigData;
 class CPlayerColorGraphic;
 
 /// Icon: rectangle image used in menus
-class CIcon : public Object
+class CIcon : public CDataType
 {
-	GDCLASS(CIcon, Object)
+	GDCLASS(CIcon, CDataType)
+	DATA_TYPE_CLASS(CIcon)
 	
 public:
 	CIcon()
@@ -105,16 +101,14 @@ public:
 	/**
 	**  CIcon constructor
 	*/
-	CIcon(const std::string &ident) : Ident(ident)
+	CIcon(const std::string &ident) : CDataType(ident)
 	{
 	}
 	
 	~CIcon();
 
-	static CIcon *New(const std::string &ident);
-	static CIcon *Get(const std::string &ident);
-
-	void ProcessConfigData(const CConfigData *config_data);
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
 	void Load();
 
@@ -131,15 +125,11 @@ public:
 					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 					  //Wyrmgus end
 
-	const std::string &GetIdent() const { return this->Ident; }
-
 	String GetFile() const
 	{
 		return this->File.c_str();
 	}
 	
-private:
-	std::string Ident;						/// Icon identifier
 public:
 	CPlayerColorGraphic *G = nullptr;		/// Graphic data
 	CPlayerColorGraphic *GScale = nullptr;	/// Icon when drawn grayscaled
@@ -159,10 +149,6 @@ protected:
 ----------------------------------------------------------------------------*/
 
 extern void LoadIcons();   /// Load icons
-extern int  GetIconsCount();
-extern void CleanIcons();  /// Cleanup icons
-
-typedef std::map<std::string, CIcon *> IconMap;
-extern IconMap Icons;
+extern int GetIconsCount();
 
 #endif
