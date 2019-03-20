@@ -30,29 +30,11 @@
 #ifndef __CURRENCY_H__
 #define __CURRENCY_H__
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "data_type.h"
-
-#include <map>
-#include <string>
-#include <vector>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 
 class CCurrency : public CDataType
 {
-public:
-	static CCurrency *GetCurrency(const std::string &ident, const bool should_find = true);
-	static CCurrency *GetOrAddCurrency(const std::string &ident);
-	static void ClearCurrencies();
-	
-	static std::vector<CCurrency *> Currencies;
-	static std::map<std::string, CCurrency *> CurrenciesByIdent;
+	DATA_TYPE_CLASS(CCurrency)
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	

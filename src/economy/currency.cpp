@@ -27,81 +27,11 @@
 //      02111-1307, USA.
 //
 
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 #include "stratagus.h"
 
 #include "economy/currency.h"
 
 #include "config.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CCurrency *> CCurrency::Currencies;
-std::map<std::string, CCurrency *> CCurrency::CurrenciesByIdent;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a currency
-**
-**	@param	ident		The currency's string identifier
-**	@param	should_find	Whether it is an error if the currency couldn't be found
-**
-**	@return	The currency if found, or null otherwise
-*/
-CCurrency *CCurrency::GetCurrency(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CCurrency *>::const_iterator find_iterator = CurrenciesByIdent.find(ident);
-	
-	if (find_iterator != CurrenciesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid currency: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a currency
-**
-**	@param	ident	The currency's string identifier
-**
-**	@return	The currency if found, otherwise a new currency is created and returned
-*/
-CCurrency *CCurrency::GetOrAddCurrency(const std::string &ident)
-{
-	CCurrency *currency = GetCurrency(ident, false);
-	
-	if (!currency) {
-		currency = new CCurrency;
-		currency->Ident = ident;
-		Currencies.push_back(currency);
-		CurrenciesByIdent[ident] = currency;
-	}
-	
-	return currency;
-}
-
-/**
-**	@brief	Remove the existing currencies
-*/
-void CCurrency::ClearCurrencies()
-{
-	for (size_t i = 0; i < Currencies.size(); ++i) {
-		delete Currencies[i];
-	}
-	Currencies.clear();
-}
 
 /**
 **	@brief	Process a property in the data provided by a configuration file

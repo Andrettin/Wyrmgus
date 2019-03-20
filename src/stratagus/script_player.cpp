@@ -849,7 +849,7 @@ static int CclDefineCivilization(lua_State *l)
 			CCalendar *calendar = CCalendar::GetCalendar(LuaToString(l, -1));
 			civilization->Calendar = calendar;
 		} else if (!strcmp(value, "Currency")) {
-			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
+			CCurrency *currency = CCurrency::Get(LuaToString(l, -1));
 			civilization->Currency = currency;
 		} else if (!strcmp(value, "DefaultPlayerColor")) {
 			CPlayerColor *player_color = CPlayerColor::Get(LuaToString(l, -1));
@@ -1910,7 +1910,7 @@ static int CclDefineFaction(lua_State *l)
 			faction->Icon.Load();
 			faction->Icon.Icon->Load();
 		} else if (!strcmp(value, "Currency")) {
-			CCurrency *currency = CCurrency::GetCurrency(LuaToString(l, -1));
+			CCurrency *currency = CCurrency::Get(LuaToString(l, -1));
 			faction->Currency = currency;
 		} else if (!strcmp(value, "DevelopsFrom")) {
 			if (!lua_istable(l, -1)) {
