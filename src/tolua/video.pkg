@@ -1,8 +1,6 @@
 $extern void InitVideo();
-$extern void ShowFullImage(const std::string& name, unsigned int timeOutInSecond);
 
 void InitVideo();
-extern void ShowFullImage(const std::string name, unsigned int timeOutInSecond);
 extern void SaveMapPNG(const char *name);
 
 class CVideo
