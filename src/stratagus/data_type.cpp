@@ -42,22 +42,18 @@ void CDataType::ProcessConfigData(const CConfigData *config_data)
 {
 	List<PropertyInfo> property_list;
 	this->get_property_list(&property_list);
+	Map<StringName, PropertyInfo> properties_by_name;
+	for (List<PropertyInfo>::Element *element = property_list.front(); element != nullptr; element = element->next()) {
+		const PropertyInfo &property_info = element->get();
+		properties_by_name[property_info.name] = property_info;
+	}
 	
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		bool property_found = false;
-
-		for (List<PropertyInfo>::Element *element = property_list.front(); element != nullptr; element = element->next()) {
-			const PropertyInfo &property_info = element->get();
-			
-			if (property_info.name.utf8().get_data() != key.c_str()) {
-				continue;
-			}
-			
-			property_found = true;
-			
+		if (properties_by_name.has(key.c_str())) {
+			const PropertyInfo &property_info = properties_by_name.find(key.c_str())->get();
 			bool ok;
 			Variant property_value;
 			if (property_info.type == Variant::STRING) {
@@ -69,13 +65,10 @@ void CDataType::ProcessConfigData(const CConfigData *config_data)
 			}
 			
 			this->set(property_info.name, property_value, &ok);
-
 			if (!ok) {
 				fprintf(stderr, "Failed to set %s property \"%s\" to \"%s\".\n", config_data->Tag.c_str(), key.c_str(), value.c_str());
 			}
-		}
-		
-		if (!property_found && !this->ProcessConfigDataProperty(key, value)) {
+		} else if (!this->ProcessConfigDataProperty(key, value)) {
 			fprintf(stderr, "Invalid %s property: \"%s\".\n", config_data->Tag.c_str(), key.c_str());
 		}
 	}
