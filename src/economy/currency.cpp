@@ -31,8 +31,6 @@
 
 #include "economy/currency.h"
 
-#include "config.h"
-
 /**
 **	@brief	Process a property in the data provided by a configuration file
 **
@@ -44,10 +42,15 @@
 bool CCurrency::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "name") {
-		this->Name = value;
+		this->Name = value.c_str();
 	} else {
 		return false;
 	}
 	
 	return true;
+}
+
+void CCurrency::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_name"), &CCurrency::GetName);
 }

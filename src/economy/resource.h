@@ -88,12 +88,20 @@ class CResource : public CDataType
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
+	const String &GetName() const
+	{
+		return this->Name;
+	}
+	
 	bool IsMineResource() const
 	{
 		return this->Index == CopperCost || this->Index == SilverCost || this->Index == GoldCost || this->Index == IronCost || this->Index == MithrilCost || this->Index == CoalCost || this->Index == DiamondsCost || this->Index == EmeraldsCost;
 	}
 
-	std::string Name;
+private:
+	String Name;
+
+public:
 	std::string ActionName;
 	int DefaultIncome = 100;
 	int DefaultAmount = 1000;
@@ -106,9 +114,11 @@ public:
 	bool LuxuryResource = false;
 	bool Hidden = false;
 	std::vector<CResource *> ChildResources; //resources (other than this one) that have this resource as their final resource
-
+	
+	friend int CclDefineResource(lua_State *l);
+	
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 /**

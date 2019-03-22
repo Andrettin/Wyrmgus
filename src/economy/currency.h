@@ -40,11 +40,16 @@ class CCurrency : public CDataType
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-public:
-	std::string Name;
+	const String &GetName() const
+	{
+		return this->Name;
+	}
+	
+private:
+	String Name;
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

@@ -46,7 +46,7 @@ public:
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	String GetName() const
+	const String &GetName() const
 	{
 		return this->Name;
 	}
@@ -56,27 +56,27 @@ public:
 		return this->Hidden;
 	}
 	
-	String GetAuthor() const
+	const String &GetAuthor() const
 	{
 		return this->Author;
 	}
 	
-	String GetTranslator() const
+	const String &GetTranslator() const
 	{
 		return this->Translator;
 	}
 	
-	String GetPublisher() const
+	const String &GetPublisher() const
 	{
 		return this->Publisher;
 	}
 	
-	String GetCopyrightNotice() const
+	const String &GetCopyrightNotice() const
 	{
 		return this->CopyrightNotice;
 	}
 	
-	String GetNotes() const
+	const String &GetNotes() const
 	{
 		return this->Notes;
 	}
@@ -99,51 +99,6 @@ public:
 	CLiteraryTextChapter *GetChapter(const std::string &chapter_name) const;
 	
 private:
-	void SetName(const String name)
-	{
-		this->Name = name;
-	}
-
-	void SetHidden(const bool hidden)
-	{
-		this->Hidden = hidden;
-	}
-
-	void SetAuthor(const String author)
-	{
-		this->Author = author;
-	}
-
-	void SetTranslator(const String translator)
-	{
-		this->Translator = translator;
-	}
-
-	void SetPublisher(const String publisher)
-	{
-		this->Publisher = publisher;
-	}
-
-	void SetCopyrightNotice(const String copyright_notice)
-	{
-		this->CopyrightNotice = copyright_notice;
-	}
-
-	void SetNotes(const String notes)
-	{
-		this->Notes = notes;
-	}
-
-	void SetYear(const int year)
-	{
-		this->Year = year;
-	}
-
-	void SetInitialPage(const int initial_page)
-	{
-		this->InitialPage = initial_page;
-	}
-
 	String Name;					/// name of the text
 	bool Hidden = false;			/// whether the literary text is hidden
 	String Author;					/// author of the text
@@ -154,6 +109,7 @@ private:
 	int Year = 0;					/// year of publication
 	int InitialPage = 1;			/// page in which the text begins
 	CIcon *Icon = nullptr;			/// the text's icon
+	
 public:
 	std::vector<CLiteraryTextChapter *> Chapters;	/// The chapters of the text
 	

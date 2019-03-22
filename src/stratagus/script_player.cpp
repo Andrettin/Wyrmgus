@@ -1323,7 +1323,7 @@ static int CclDefineLanguageWord(lua_State *l)
 			int derives_from_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
 			++j;
 			
-			std::vector<std::string> word_meanings;
+			std::vector<String> word_meanings;
 			lua_rawgeti(l, -1, j + 1);
 			if (lua_istable(l, -1)) {
 				const int subargs = lua_rawlen(l, -1);
@@ -1336,16 +1336,16 @@ static int CclDefineLanguageWord(lua_State *l)
 			lua_pop(l, 1);
 			
 			if (derives_from_language && derives_from_word_type != -1) {
-				std::string derives_from_word = LuaToString(l, -1, j + 1);
+				String derives_from_word = LuaToString(l, -1, j + 1);
 				word->DerivesFrom = derives_from_language->GetWord(derives_from_word, derives_from_word_type, word_meanings);
 				
 				if (word->DerivesFrom != nullptr) {
 					word->DerivesFrom->DerivesTo.push_back(word);
 				} else {
-					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Name.c_str() _C_ derives_from_word.c_str() _C_ derives_from_language->Ident.c_str() _C_ GetWordTypeNameById(derives_from_word_type).c_str());
+					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->GetIdent().utf8().get_data() _C_ derives_from_word.utf8().get_data() _C_ derives_from_language->GetIdent().utf8().get_data() _C_ GetWordTypeNameById(derives_from_word_type).c_str());
 				}
 			} else {
-				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->Name.c_str());
+				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->GetIdent().utf8().get_data());
 			}
 		} else if (!strcmp(value, "Replaces")) {
 			if (!lua_istable(l, -1)) {
@@ -1357,7 +1357,7 @@ static int CclDefineLanguageWord(lua_State *l)
 			int replaces_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
 			++j;
 			
-			std::vector<std::string> word_meanings;
+			std::vector<String> word_meanings;
 			lua_rawgeti(l, -1, j + 1);
 			if (lua_istable(l, -1)) {
 				const int subargs = lua_rawlen(l, -1);
@@ -1370,14 +1370,14 @@ static int CclDefineLanguageWord(lua_State *l)
 			lua_pop(l, 1);
 			
 			if (replaces_language && replaces_word_type != -1) {
-				std::string replaces_word = LuaToString(l, -1, j + 1);
+				String replaces_word = LuaToString(l, -1, j + 1);
 				replaces = replaces_language->GetWord(replaces_word, replaces_word_type, word_meanings);
 				
 				if (replaces == nullptr) {
-					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Name.c_str() _C_ replaces_word.c_str() _C_ replaces_language->Ident.c_str() _C_ GetWordTypeNameById(replaces_word_type).c_str());
+					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->GetIdent().utf8().get_data() _C_ replaces_word.utf8().get_data() _C_ replaces_language->GetIdent().utf8().get_data() _C_ GetWordTypeNameById(replaces_word_type).c_str());
 				}
 			} else {
-				LuaError(l, "Word \"%s\"'s replace is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->Name.c_str());
+				LuaError(l, "Word \"%s\"'s replace is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->GetIdent().utf8().get_data());
 			}
 		} else if (!strcmp(value, "CompoundElements")) {
 			if (!lua_istable(l, -1)) {
@@ -1397,7 +1397,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				int affix_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
 				++j;
 				
-				std::vector<std::string> word_meanings;
+				std::vector<String> word_meanings;
 				lua_rawgeti(l, -1, j + 1);
 				if (lua_istable(l, -1)) {
 					const int subargs = lua_rawlen(l, -1);
@@ -1410,16 +1410,16 @@ static int CclDefineLanguageWord(lua_State *l)
 				lua_pop(l, 1);
 
 				if (affix_language && affix_word_type != -1) {
-					std::string affix_word = LuaToString(l, -1, j + 1);
+					String affix_word = LuaToString(l, -1, j + 1);
 					word->CompoundElements[affix_type] = affix_language->GetWord(affix_word, affix_word_type, word_meanings);
 					
 					if (word->CompoundElements[affix_type] != nullptr) {
 						word->CompoundElements[affix_type]->CompoundElementOf[affix_type].push_back(word);
 					} else {
-						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Name.c_str() _C_ affix_word.c_str() _C_ affix_language->Ident.c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
+						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->GetIdent().utf8().get_data() _C_ affix_word.utf8().get_data() _C_ affix_language->GetIdent().utf8().get_data() _C_ GetWordTypeNameById(affix_word_type).c_str());
 					}
 				} else {
-					LuaError(l, "Word \"%s\"'s compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ word->Name.c_str());
+					LuaError(l, "Word \"%s\"'s compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ word->GetIdent().utf8().get_data());
 				}
 			}
 		} else if (!strcmp(value, "Gender")) {
@@ -1566,18 +1566,18 @@ static int CclDefineLanguageWord(lua_State *l)
 		} else if (!strcmp(value, "Mod")) {
 			word->Mod = LuaToString(l, -1);
 		} else if (!strcmp(value, "MapWord")) { //to keep backwards compatibility
-			word->Mod = CMap::Map.Info.Filename;
+			word->Mod = CMap::Map.Info.Filename.c_str();
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	
 	if (!word->Language) {
-		LuaError(l, "Word \"%s\" has not been assigned to any language" _C_ word->Name.c_str());
+		LuaError(l, "Word \"%s\" has not been assigned to any language" _C_ word->GetIdent().utf8().get_data());
 	}
 	
 	if (word->Type == -1) {
-		LuaError(l, "Word \"%s\" has no type" _C_ word->Name.c_str());
+		LuaError(l, "Word \"%s\" has no type" _C_ word->GetIdent().utf8().get_data());
 	}
 	
 	if (replaces != nullptr) {
@@ -2641,9 +2641,9 @@ static int CclDefineLanguage(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				std::string translation_from = LuaToString(l, -1, k + 1); //name to be translated
+				String translation_from = LuaToString(l, -1, k + 1); //name to be translated
 				++k;
-				std::string translation_to = LuaToString(l, -1, k + 1); //name translation
+				String translation_to = LuaToString(l, -1, k + 1); //name translation
 				language->NameTranslations[translation_from].push_back(translation_to);
 			}
 		} else {
@@ -3355,7 +3355,7 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "Currency")) {
 		const CCurrency *currency = p->GetCurrency();
 		if (currency) {
-			lua_pushstring(l, currency->Name.c_str());
+			lua_pushstring(l, currency->GetName().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3619,16 +3619,16 @@ static int CclGetLanguageData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, language->Name.c_str());
+		lua_pushstring(l, language->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
-		lua_pushstring(l, language->Family.c_str());
+		lua_pushstring(l, language->Family.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Words")) {
 		lua_createtable(l, language->Words.size(), 0);
 		for (size_t i = 1; i <= language->Words.size(); ++i)
 		{
-			lua_pushstring(l, language->Words[i-1]->Name.c_str());
+			lua_pushstring(l, language->Words[i-1]->GetName().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3655,11 +3655,11 @@ static int CclGetLanguageWordData(lua_State *l)
 		LuaError(l, "Language \"%s\" doesn't exist." _C_ language_name.c_str());
 	}
 	
-	std::string word_name = LuaToString(l, 2);
-	std::vector<std::string> word_meanings;
+	String word_name = LuaToString(l, 2);
+	std::vector<String> word_meanings;
 	const CWord *word = language->GetWord(word_name, -1, word_meanings);
 	if (word == nullptr) {
-		LuaError(l, "Word \"%s\" doesn't exist for the \"%s\" language." _C_ word_name.c_str() _C_ language_name.c_str());
+		LuaError(l, "Word \"%s\" doesn't exist for the \"%s\" language." _C_ word_name.utf8().get_data() _C_ language_name.c_str());
 	}
 	
 	const char *data = LuaToString(l, 3);
@@ -3673,7 +3673,7 @@ static int CclGetLanguageWordData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Meaning")) {
 		for (size_t i = 0; i < word->Meanings.size(); ++i) {
-			lua_pushstring(l, word->Meanings[i].c_str());
+			lua_pushstring(l, word->Meanings[i].utf8().get_data());
 			return 1;
 		}
 		lua_pushstring(l, "");

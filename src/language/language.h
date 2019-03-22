@@ -42,27 +42,37 @@ class CLanguage : public CDataType
 
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+
+	const String &GetName() const
+	{
+		return this->Name;
+	}
 	
-	CWord *GetWord(const std::string &name, int word_type, std::vector<std::string>& word_meanings) const;
-	std::string GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number);
-	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
-	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
+	CWord *GetWord(const String &name, const int word_type, const std::vector<String> &word_meanings) const;
+	String GetArticle(const int gender, const int grammatical_case, const int article_type, const int grammatical_number);
+	String GetNounEnding(const int grammatical_number, const int grammatical_case, int word_junction_type = -1);
+	String GetAdjectiveEnding(const int article_type, const int grammatical_case, int grammatical_number, int grammatical_gender);
 	void RemoveWord(CWord *word);
 	
-	std::string TranslateName(const std::string &name) const;
+	String TranslateName(const String &name) const;
 	
-	std::string Name;											/// Name of the language
-	std::string Family;											/// Family of the language
-	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
-	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
+private:
+	String Name;									/// Name of the language
+	
+public:
+	String Family;									/// Family of the language
+	String NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
+	String AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
 	bool UsedByCivilizationOrFaction = false;
 	CLanguage *DialectOf = nullptr;	/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
-	std::vector<CLanguage *> Dialects;							/// Dialects of this language
-	std::vector<CWord *> Words;									/// Words of the language
-	std::map<std::string, std::vector<std::string>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
+	std::vector<CLanguage *> Dialects;				/// Dialects of this language
+	std::vector<CWord *> Words;						/// Words of the language
+	std::map<String, std::vector<String>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
 
+	friend int CclDefineLanguage(lua_State *l);
+	
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

@@ -35,7 +35,6 @@
 
 #include "language/language.h"
 
-#include "config.h"
 #include "language/word.h"
 
 /*----------------------------------------------------------------------------
@@ -53,7 +52,7 @@
 bool CLanguage::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "name") {
-		this->Name = value;
+		this->Name = value.c_str();
 	} else {
 		return false;
 	}
@@ -61,11 +60,11 @@ bool CLanguage::ProcessConfigDataProperty(const std::string &key, std::string va
 	return true;
 }
 
-CWord *CLanguage::GetWord(const std::string &name, int word_type, std::vector<std::string>& word_meanings) const
+CWord *CLanguage::GetWord(const String &name, const int word_type, const std::vector<String> &word_meanings) const
 {
 	for (CWord *word : this->Words) {
 		if (
-			word->Name == name
+			word->GetName() == name
 			&& (word_type == -1 || word->Type == word_type)
 			&& (word_meanings.size() == 0 || word->Meanings == word_meanings)
 		) {
@@ -76,7 +75,7 @@ CWord *CLanguage::GetWord(const std::string &name, int word_type, std::vector<st
 	return nullptr;
 }
 
-std::string CLanguage::GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number)
+String CLanguage::GetArticle(const int gender, const int grammatical_case, const int article_type, const int grammatical_number)
 {
 	for (const CWord *word : this->Words) {
 		if (word->Type != WordTypeArticle || word->ArticleType != article_type) {
@@ -102,7 +101,7 @@ std::string CLanguage::GetArticle(int gender, int grammatical_case, int article_
 	return "";
 }
 
-std::string CLanguage::GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type)
+String CLanguage::GetNounEnding(const int grammatical_number, const int grammatical_case, int word_junction_type)
 {
 	if (word_junction_type == -1) {
 		word_junction_type = WordJunctionTypeNoWordJunction;
@@ -117,7 +116,7 @@ std::string CLanguage::GetNounEnding(int grammatical_number, int grammatical_cas
 	return "";
 }
 
-std::string CLanguage::GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender)
+String CLanguage::GetAdjectiveEnding(const int article_type, const int grammatical_case, int grammatical_number, int grammatical_gender)
 {
 	if (grammatical_number == -1) {
 		grammatical_number = GrammaticalNumberNoNumber;
@@ -148,9 +147,9 @@ void CLanguage::RemoveWord(CWord *word)
 /**
 **  "Translate" (that is, adapt) a proper name from one culture (civilization) to another.
 */
-std::string CLanguage::TranslateName(const std::string &name) const
+String CLanguage::TranslateName(const String &name) const
 {
-	std::string new_name;
+	String new_name;
 	
 	if (name.empty()) {
 		return new_name;
@@ -163,22 +162,22 @@ std::string CLanguage::TranslateName(const std::string &name) const
 	
 	//if adapting the entire name failed, try to match prefixes and suffixes
 	if (name.size() > 1) {
-		if (name.find(" ") == std::string::npos) {
+		if (name.find(" ") == -1) {
 			for (size_t i = 0; i < name.size(); ++i) {
-				std::string name_prefix = name.substr(0, i + 1);
-				std::string name_suffix = CapitalizeString(name.substr(i + 1, name.size() - (i + 1)));
+				String name_prefix = name.substr(0, i + 1);
+				String name_suffix = CapitalizeString(name.substr(i + 1, name.size() - (i + 1)).utf8().get_data()).c_str();
 			
 	//			fprintf(stdout, "Trying to match prefix \"%s\" and suffix \"%s\" for translating name \"%s\" to the \"%s\" language.\n", name_prefix.c_str(), name_suffix.c_str(), name.c_str(), this->Ident.c_str());
 			
 				if (this->NameTranslations.find(name_prefix) != this->NameTranslations.end() && this->NameTranslations.find(name_suffix) != this->NameTranslations.end()) { // if both a prefix and suffix have been matched
 					name_prefix = this->NameTranslations.find(name_prefix)->second[SyncRand(this->NameTranslations.find(name_prefix)->second.size())];
 					name_suffix = this->NameTranslations.find(name_suffix)->second[SyncRand(this->NameTranslations.find(name_suffix)->second.size())];
-					name_suffix = DecapitalizeString(name_suffix);
+					name_suffix = DecapitalizeString(name_suffix.utf8().get_data()).c_str();
 					if (name_prefix.substr(name_prefix.size() - 2, 2) == "gs" && name_suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
-						name_prefix = FindAndReplaceStringEnding(name_prefix, "gs", "g");
+						name_prefix = FindAndReplaceStringEnding(name_prefix.utf8().get_data(), "gs", "g").c_str();
 					}
 					if (name_prefix.substr(name_prefix.size() - 1, 1) == "s" && name_suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
-						name_prefix = FindAndReplaceStringEnding(name_prefix, "s", "");
+						name_prefix = FindAndReplaceStringEnding(name_prefix.utf8().get_data(), "s", "").c_str();
 					}
 
 					return name_prefix + name_suffix;
@@ -189,14 +188,14 @@ std::string CLanguage::TranslateName(const std::string &name) const
 			new_name = name;
 			for (size_t i = 0; i < name.size(); ++i) {
 				if ((i + 1) == name.size() || name[i + 1] == ' ') {
-					std::string name_element = this->TranslateName(name.substr(previous_pos, i + 1 - previous_pos));
+					String name_element = this->TranslateName(name.substr(previous_pos, i + 1 - previous_pos));
 				
 					if (name_element.empty()) {
 						new_name = "";
 						break;
 					}
 				
-					new_name = FindAndReplaceString(new_name, name.substr(previous_pos, i + 1 - previous_pos), name_element);
+					new_name = FindAndReplaceString(new_name.utf8().get_data(), name.substr(previous_pos, i + 1 - previous_pos).utf8().get_data(), name_element.utf8().get_data()).c_str();
 				
 					previous_pos = i + 2;
 				}
@@ -205,4 +204,9 @@ std::string CLanguage::TranslateName(const std::string &name) const
 	}
 	
 	return new_name;
+}
+
+void CLanguage::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_name"), &CLanguage::GetName);
 }

@@ -33,6 +33,7 @@
 #include "data_type.h"
 
 class CLanguage;
+struct lua_State;
 
 enum WordTypes {
 	WordTypeNoun,
@@ -140,24 +141,37 @@ class CWord : public CDataType
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	bool HasMeaning(const std::string &meaning);
-	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
-	std::string GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
-	std::string GetAdjectiveInflection(int comparison_degree, int article_type = -1, int grammatical_case = -1, int grammatical_number = -1, int grammatical_gender = -1);
-	std::string GetParticiple(int grammatical_tense);
-	void RemoveFromVector(std::vector<CWord *>& word_vector);
+	const String &GetName() const
+	{
+		return this->Name;
+	}
+	
+	CLanguage *GetLanguage() const
+	{
+		return this->Language;
+	}
+	
+	bool HasMeaning(const String &meaning);
+	String GetNounInflection(const int grammatical_number, const int grammatical_case, const int word_junction_type = -1);
+	String GetVerbInflection(const int grammatical_number, const int grammatical_person, const int grammatical_tense, const int grammatical_mood);
+	String GetAdjectiveInflection(const int comparison_degree, const int article_type = -1, int grammatical_case = -1, const int grammatical_number = -1, const int grammatical_gender = -1);
+	String GetParticiple(int grammatical_tense);
+	void RemoveFromVector(std::vector<CWord *> &word_vector);
 
-	std::string Name;									/// the name of the word
+private:
+	String Name;										/// the name of the word
 	CLanguage *Language = nullptr;						/// The language the word belongs to
+	
+public:
 	int Type = -1;										/// Word type
 	int Gender = -1;									/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
 	int GrammaticalNumber = -1;							/// Grammatical number (i.e. whether the word is necessarily plural or not)
 	bool Archaic = false;								/// Whether the word is archaic (whether it is used in current speech)
-	std::map<std::tuple<int, int>, std::string> NumberCaseInflections;	/// For nouns, mapped to grammatical number and grammatical case
-	std::map<std::tuple<int, int, int, int>, std::string> NumberPersonTenseMoodInflections;	/// For verbs, mapped to grammatical number, grammatical person, grammatical tense and grammatical mood
-	std::string ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// For adjectives
-	std::string Participles[MaxGrammaticalTenses];		/// For verbs
-	std::vector<std::string> Meanings;					/// Meanings of the word in English.
+	std::map<std::tuple<int, int>, String> NumberCaseInflections;	/// For nouns, mapped to grammatical number and grammatical case
+	std::map<std::tuple<int, int, int, int>, String> NumberPersonTenseMoodInflections;	/// For verbs, mapped to grammatical number, grammatical person, grammatical tense and grammatical mood
+	String ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// For adjectives
+	String Participles[MaxGrammaticalTenses];	/// For verbs
+	std::vector<String> Meanings;				/// Meanings of the word in English.
 	CWord *DerivesFrom = nullptr;    			/// From which word does this word derive
 	std::vector<CWord *> DerivesTo;				/// Which words derive from this word
 	CWord *CompoundElements[MaxAffixTypes];    	/// From which compound elements is this word formed
@@ -167,10 +181,10 @@ public:
 	bool Uncountable = false;		/// Whether the noun is uncountable or not.
 	
 	//pronoun and article-specific variables
-	std::string Nominative;			/// Nominative case for the pronoun (if any)
-	std::string Accusative;			/// Accusative case for the pronoun (if any)
-	std::string Dative;				/// Dative case for the pronoun (if any)
-	std::string Genitive;			/// Genitive case for the pronoun (if any)
+	String Nominative;				/// Nominative case for the pronoun (if any)
+	String Accusative;				/// Accusative case for the pronoun (if any)
+	String Dative;					/// Dative case for the pronoun (if any)
+	String Genitive;				/// Genitive case for the pronoun (if any)
 	
 	//article-specific variables
 	int ArticleType = -1;			/// Which article type this article belongs to
@@ -178,10 +192,12 @@ public:
 	//numeral-specific variables
 	int Number = -1;
 	
-	std::string Mod;				/// To which mod (or map), if any, this word belongs
+	String Mod;						/// To which mod (or map), if any, this word belongs
+	
+	friend int CclDefineLanguageWord(lua_State *l);
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

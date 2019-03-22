@@ -52,8 +52,13 @@ void CDataType::ProcessConfigData(const CConfigData *config_data)
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		if (properties_by_name.has(key.c_str())) {
-			const PropertyInfo &property_info = properties_by_name.find(key.c_str())->get();
+		Map<StringName, PropertyInfo>::Element *element = properties_by_name.find(key.c_str());
+		if (element == nullptr) {
+			element = properties_by_name.find(("_" + key).c_str());
+		}
+		
+		if (element != nullptr) {
+			const PropertyInfo &property_info = element->get();
 			bool ok;
 			Variant property_value;
 			if (property_info.type == Variant::STRING) {
@@ -62,6 +67,9 @@ void CDataType::ProcessConfigData(const CConfigData *config_data)
 				property_value = Variant(std::stoi(value));
 			} else if (property_info.type == Variant::BOOL) {
 				property_value = Variant(StringToBool(value));
+			} else {
+				fprintf(stderr, "Failed to set %s property \"%s\", as the variant type of the property is neither string, nor integer, nor boolean.\n", config_data->Tag.c_str(), key.c_str(), value.c_str());
+				continue;
 			}
 			
 			this->set(property_info.name, property_value, &ok);

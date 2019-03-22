@@ -1683,9 +1683,9 @@ std::string EvalString(const StringDesc *s)
 					} else {
 						first = false;
 					}
-					conversion_rates += child_resource->Name;
+					conversion_rates += child_resource->GetName().utf8().get_data();
 					conversion_rates += " to ";
-					conversion_rates += CResource::GetAll()[(**resource)]->Name;
+					conversion_rates += CResource::GetAll()[(**resource)]->GetName().utf8().get_data();
 					conversion_rates += " Conversion Rate: ";
 					conversion_rates += std::to_string((long long) child_resource->FinalResourceConversionRate);
 					conversion_rates += "%";
@@ -1701,7 +1701,7 @@ std::string EvalString(const StringDesc *s)
 				bool first = true;
 				if (CPlayer::GetThisPlayer()->Incomes[(**resource)] > CResource::GetAll()[(**resource)]->DefaultIncome) {
 					first = false;
-					improve_incomes += CResource::GetAll()[(**resource)]->Name;
+					improve_incomes += CResource::GetAll()[(**resource)]->GetName().utf8().get_data();
 					improve_incomes += " Processing Bonus: +";
 					improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[(**resource)] - CResource::GetAll()[(**resource)]->DefaultIncome);
 					improve_incomes += "%";
@@ -1716,7 +1716,7 @@ std::string EvalString(const StringDesc *s)
 						} else {
 							first = false;
 						}
-						improve_incomes += child_resource->Name;
+						improve_incomes += child_resource->GetName().utf8().get_data();
 						improve_incomes += " Processing Bonus: +";
 						improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[child_resource->GetIndex()] - child_resource->DefaultIncome);
 						improve_incomes += "%";

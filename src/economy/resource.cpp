@@ -35,8 +35,6 @@
 
 #include "economy/resource.h"
 
-#include "config.h"
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -52,10 +50,15 @@
 bool CResource::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "name") {
-		this->Name = value;
+		this->Name = value.c_str();
 	} else {
 		return false;
 	}
 	
 	return true;
+}
+
+void CResource::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_name"), &CResource::GetName);
 }

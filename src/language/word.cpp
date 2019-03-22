@@ -35,7 +35,6 @@
 
 #include "language/word.h"
 
-#include "config.h"
 #include "language/language.h"
 
 /*----------------------------------------------------------------------------
@@ -53,7 +52,7 @@
 bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
 	if (key == "name") {
-		this->Name = value;
+		this->Name = value.c_str();
 	} else if (key == "language") {
 		value = FindAndReplaceString(value, "_", "-");
 		CLanguage *language = CLanguage::Get(value);
@@ -67,12 +66,12 @@ bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 	return true;
 }
 
-bool CWord::HasMeaning(const std::string &meaning)
+bool CWord::HasMeaning(const String &meaning)
 {
 	return std::find(this->Meanings.begin(), this->Meanings.end(), meaning) != this->Meanings.end();
 }
 
-std::string CWord::GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type)
+String CWord::GetNounInflection(const int grammatical_number, const int grammatical_case, const int word_junction_type)
 {
 	if (this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case)) != this->NumberCaseInflections.end()) {
 		return this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case))->second;
@@ -81,7 +80,7 @@ std::string CWord::GetNounInflection(int grammatical_number, int grammatical_cas
 	return this->Name + this->Language->GetNounEnding(grammatical_number, grammatical_case, word_junction_type);
 }
 
-std::string CWord::GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood)
+String CWord::GetVerbInflection(const int grammatical_number, const int grammatical_person, const int grammatical_tense, const int grammatical_mood)
 {
 	if (this->NumberPersonTenseMoodInflections.find(std::tuple<int, int, int, int>(grammatical_number, grammatical_person, grammatical_tense, grammatical_mood)) != this->NumberPersonTenseMoodInflections.end()) {
 		return this->NumberPersonTenseMoodInflections.find(std::tuple<int, int, int, int>(grammatical_number, grammatical_person, grammatical_tense, grammatical_mood))->second;
@@ -90,9 +89,9 @@ std::string CWord::GetVerbInflection(int grammatical_number, int grammatical_per
 	return this->Name;
 }
 
-std::string CWord::GetAdjectiveInflection(int comparison_degree, int article_type, int grammatical_case, int grammatical_number, int grammatical_gender)
+String CWord::GetAdjectiveInflection(const int comparison_degree, const int article_type, int grammatical_case, const int grammatical_number, const int grammatical_gender)
 {
-	std::string inflected_word;
+	String inflected_word;
 	
 	if (grammatical_case == -1) {
 		grammatical_case = GrammaticalCaseNoCase;
@@ -113,7 +112,7 @@ std::string CWord::GetAdjectiveInflection(int comparison_degree, int article_typ
 	return inflected_word;
 }
 
-std::string CWord::GetParticiple(int grammatical_tense)
+String CWord::GetParticiple(const int grammatical_tense)
 {
 	if (!this->Participles[grammatical_tense].empty()) {
 		return this->Participles[grammatical_tense];
@@ -122,7 +121,7 @@ std::string CWord::GetParticiple(int grammatical_tense)
 	return this->Name;
 }
 
-void CWord::RemoveFromVector(std::vector<CWord *>& word_vector)
+void CWord::RemoveFromVector(std::vector<CWord *> &word_vector)
 {
 	std::vector<CWord *> word_vector_copy = word_vector;
 	
@@ -133,4 +132,10 @@ void CWord::RemoveFromVector(std::vector<CWord *>& word_vector)
 	if (word_vector.size() == 0) { // if removing the word from the vector left it empty, undo the removal
 		word_vector = word_vector_copy;
 	}
+}
+
+void CWord::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_name"), &CWord::GetName);
+	ClassDB::bind_method(D_METHOD("get_language"), &CWord::GetLanguage);
 }

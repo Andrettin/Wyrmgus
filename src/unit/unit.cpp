@@ -3310,7 +3310,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	
 	if (!this->Type->IsPersonalNameValid(this->Name, faction, this->Variable[GENDER_INDEX].Value)) {
 		// first see if can translate the current personal name
-		std::string new_personal_name = language != nullptr ? language->TranslateName(this->Name) : this->Name;
+		std::string new_personal_name = language != nullptr ? language->TranslateName(this->Name.c_str()).utf8().get_data() : this->Name;
 		if (!new_personal_name.empty()) {
 			this->Name = new_personal_name;
 		} else {
