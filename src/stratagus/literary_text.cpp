@@ -98,7 +98,7 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 bool CLiteraryText::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "page") {
-		const int page_number = static_cast<int>(this->GetPages().size());
+		const int page_number = static_cast<int>(this->GetPages().size()) + 1;
 		
 		CLiteraryTextPage *previous_page = nullptr;
 		if (!this->GetPages().empty()) {
