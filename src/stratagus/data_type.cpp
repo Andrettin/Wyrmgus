@@ -68,7 +68,7 @@ void CDataType::ProcessConfigData(const CConfigData *config_data)
 			} else if (property_info.type == Variant::BOOL) {
 				property_value = Variant(StringToBool(value));
 			} else {
-				fprintf(stderr, "Failed to set %s property \"%s\", as the variant type of the property is neither string, nor integer, nor boolean.\n", config_data->Tag.c_str(), key.c_str(), value.c_str());
+				fprintf(stderr, "Failed to set %s property \"%s\", as the variant type of the property is neither string, nor integer, nor boolean.\n", config_data->Tag.c_str(), key.c_str());
 				continue;
 			}
 			

@@ -64,6 +64,7 @@ class CUnitType;
 class CUnit;
 class CUpgrade;
 class LuaCallback;
+struct lua_State;
 
 /**
 **  Indexes into gender array.
@@ -199,6 +200,8 @@ public:
 	std::vector<CHistoricalLocation *> HistoricalLocations;	/// historical locations of the character
 	std::vector<std::tuple<CDate, CDate, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning date of the term, the second one the end date, the third the faction it pertains to (if any, if not then it is null), and the fourth is the character title itself (from the character title enums)
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
+	
+	friend int CclDefineCharacter(lua_State *l);
 
 protected:
 	static inline void _bind_methods() {}
