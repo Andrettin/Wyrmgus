@@ -98,7 +98,7 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 bool CLiteraryText::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "page") {
-		const int page_number = this->GetInitialPage() + this->GetPages().size();
+		const int page_number = static_cast<int>(this->GetPages().size());
 		
 		CLiteraryTextPage *previous_page = nullptr;
 		if (!this->GetPages().empty()) {
@@ -107,6 +107,7 @@ bool CLiteraryText::ProcessConfigDataSection(const CConfigData *section)
 		
 		CLiteraryTextPage *page = new CLiteraryTextPage(page_number, previous_page);
 		page->ProcessConfigData(section);
+		this->Pages.push_back(page);
 	} else {
 		return false;
 	}
@@ -159,6 +160,9 @@ void CLiteraryText::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_year"), &CLiteraryText::GetYear);
 	ClassDB::bind_method(D_METHOD("get_initial_page"), &CLiteraryText::GetInitialPage);
 	ClassDB::bind_method(D_METHOD("get_icon"), &CLiteraryText::GetIcon);
+	ClassDB::bind_method(D_METHOD("get_main_text"), &CLiteraryText::GetMainText);
 	ClassDB::bind_method(D_METHOD("get_previous_section"), &CLiteraryText::GetPreviousSection);
 	ClassDB::bind_method(D_METHOD("get_next_section"), &CLiteraryText::GetNextSection);
+	ClassDB::bind_method(D_METHOD("get_first_page"), &CLiteraryText::GetFirstPage);
+	ClassDB::bind_method(D_METHOD("get_last_page"), &CLiteraryText::GetLastPage);
 }

@@ -113,6 +113,11 @@ public:
 		return this->Sections;
 	}
 	
+	CLiteraryText *GetMainText() const
+	{
+		return this->MainText;
+	}
+	
 	int GetSectionIndex() const
 	{
 		return this->SectionIndex;
@@ -131,6 +136,24 @@ public:
 	const std::vector<CLiteraryTextPage *> &GetPages() const
 	{
 		return this->Pages;
+	}
+	
+	CLiteraryTextPage *GetFirstPage() const
+	{
+		if (!this->GetPages().empty()) {
+			return this->GetPages().front();
+		} else {
+			return nullptr;
+		}
+	}
+	
+	CLiteraryTextPage *GetLastPage() const
+	{
+		if (!this->GetPages().empty()) {
+			return this->GetPages().back();
+		} else {
+			return nullptr;
+		}
 	}
 	
 	CLiteraryText *GetSection(const std::string &section_name) const;

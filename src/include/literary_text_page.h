@@ -52,7 +52,7 @@ class CLiteraryTextPage : public Object
 	GDCLASS(CLiteraryTextPage, Object)
 	
 public:
-	CLiteraryTextPage(const int number, CLiteraryTextPage *previous_page) : Number(number), PreviousPage(previous_page)
+	CLiteraryTextPage(const int number = -1, CLiteraryTextPage *previous_page = nullptr) : Number(number), PreviousPage(previous_page)
 	{
 		if (previous_page != nullptr) {
 			previous_page->NextPage = this;

@@ -44,6 +44,7 @@
 #include "language/language.h"
 #include "language/word.h"
 #include "literary_text.h"
+#include "literary_text_page.h"
 #include "map/map_template.h"
 #include "map/site.h"
 #include "map/terrain_type.h"
@@ -99,6 +100,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CIcon>();
 	ClassDB::register_class<CLanguage>();
 	ClassDB::register_class<CLiteraryText>();
+	ClassDB::register_class<CLiteraryTextPage>();
 	ClassDB::register_class<CMapTemplate>();
 	ClassDB::register_class<CPantheon>();
 	ClassDB::register_class<CPlane>();
