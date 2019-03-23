@@ -37,6 +37,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "config_operator.h"
 #include "faction.h"
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
@@ -143,58 +144,60 @@ void CDeity::ClearDeities()
 */
 void CDeity::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "pantheon") {
-			value = FindAndReplaceString(value, "_", "-");
+		if (property.Key == "name") {
+			this->Name = property.Value;
+		} else if (property.Key == "pantheon") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			this->Pantheon = CPantheon::Get(value);
-		} else if (key == "gender") {
-			this->Gender = GetGenderIdByName(value);
-		} else if (key == "major") {
-			this->Major = StringToBool(value);
-		} else if (key == "civilization") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "gender") {
+			this->Gender = GetGenderIdByName(property.Value);
+		} else if (property.Key == "major") {
+			this->Major = StringToBool(property.Value);
+		} else if (property.Key == "civilization") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CCivilization *civilization = CCivilization::Get(value);
 			if (civilization != nullptr) {
 				this->Civilizations.push_back(civilization);
 				civilization->Deities.push_back(this);
 			}
-		} else if (key == "religion") {
-			value = FindAndReplaceString(value, "_", "-");
-			CReligion *religion = CReligion::Get(value.c_str());
+		} else if (property.Key == "religion") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
+			CReligion *religion = CReligion::Get(value);
 			if (religion) {
 				this->Religions.push_back(religion);
 			}
-		} else if (key == "domain") {
-			value = FindAndReplaceString(value, "_", "-");
-			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value.c_str());
+		} else if (property.Key == "domain") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
+			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
 			if (deity_domain) {
 				this->Domains.push_back(deity_domain);
 			}
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "background") {
-			this->Background = value;
-		} else if (key == "quote") {
-			this->Quote = value;
-		} else if (key == "icon") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "description") {
+			this->Description = property.Value;
+		} else if (property.Key == "background") {
+			this->Background = property.Value;
+		} else if (property.Key == "quote") {
+			this->Quote = property.Value;
+		} else if (property.Key == "icon") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			this->Icon.Name = value;
 			this->Icon.Icon = nullptr;
 			this->Icon.Load();
 			this->Icon.Icon->Load();
-		} else if (key == "home_plane") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "home_plane") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CPlane *plane = CPlane::GetPlane(value);
 			if (plane) {
 				this->HomePlane = plane;
 			}
-		} else if (key == "deity_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "deity_upgrade") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::Get(value);
 			if (upgrade) {
 				this->DeityUpgrade = upgrade;
@@ -202,38 +205,41 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			} else {
 				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 			}
-		} else if (key == "character_upgrade") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "character_upgrade") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CUpgrade *upgrade = CUpgrade::Get(value);
 			if (upgrade) {
 				this->CharacterUpgrade = upgrade;
 			} else {
 				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 			}
-		} else if (key == "holy_order") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "holy_order") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CFaction *holy_order = CFaction::Get(value);
 			if (holy_order) {
 				this->HolyOrders.push_back(holy_order);
 				holy_order->HolyOrderDeity = this;
 			}
 		} else {
-			fprintf(stderr, "Invalid deity property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid deity property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 	
 	for (const CConfigData *section : config_data->Sections) {
 		if (section->Tag == "cultural_names") {
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
 				
+				std::string key = property.Key;
 				key = FindAndReplaceString(key, "_", "-");
 				
 				const CCivilization *civilization = CCivilization::Get(key);
 				
 				if (civilization) {
-					this->CulturalNames[civilization] = value;
+					this->CulturalNames[civilization] = property.Value;
 				}
 			}
 		} else {

@@ -39,6 +39,7 @@
 #include "age.h"
 #include "character.h"
 #include "config.h"
+#include "config_operator.h"
 #include "faction.h"
 #include "game/trigger.h"
 #include "map/map.h"
@@ -67,8 +68,13 @@
 */
 void CDependency::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		this->ProcessConfigDataProperty(config_data->Properties[i]);
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		this->ProcessConfigDataProperty(std::pair<std::string, std::string>(property.Key, property.Value));
 	}
 	
 	for (const CConfigData *section : config_data->Sections) {

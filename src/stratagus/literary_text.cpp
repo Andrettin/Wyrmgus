@@ -67,8 +67,8 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 		this->CopyrightNotice = value.c_str();
 	} else if (key == "notes") {
 		this->Notes = value.c_str();
-	} else if (key == "year") {
-		this->Year = std::stoi(value);
+	} else if (key == "publication_year") {
+		this->PublicationYear = std::stoi(value);
 	} else if (key == "initial_page") {
 		this->InitialPage = std::stoi(value);
 	} else if (key == "icon") {
@@ -157,7 +157,7 @@ void CLiteraryText::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_publisher"), &CLiteraryText::GetPublisher);
 	ClassDB::bind_method(D_METHOD("get_copyright_notice"), &CLiteraryText::GetCopyrightNotice);
 	ClassDB::bind_method(D_METHOD("get_notes"), &CLiteraryText::GetNotes);
-	ClassDB::bind_method(D_METHOD("get_year"), &CLiteraryText::GetYear);
+	ClassDB::bind_method(D_METHOD("get_publication_year"), &CLiteraryText::GetPublicationYear);
 	ClassDB::bind_method(D_METHOD("get_initial_page"), &CLiteraryText::GetInitialPage);
 	ClassDB::bind_method(D_METHOD("get_icon"), &CLiteraryText::GetIcon);
 	ClassDB::bind_method(D_METHOD("get_main_text"), &CLiteraryText::GetMainText);

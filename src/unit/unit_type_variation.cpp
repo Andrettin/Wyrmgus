@@ -37,6 +37,7 @@
 
 #include "animation/animation.h"
 #include "config.h"
+#include "config_operator.h"
 #include "construct.h"
 #include "map/terrain_type.h"
 #include "mod.h"
@@ -82,9 +83,14 @@ CUnitTypeVariation::~CUnitTypeVariation()
 */
 void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		std::string key = property.Key;
+		std::string value = property.Value;
 		
 		if (key == "variation_id") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -213,9 +219,14 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			std::string file;
 			int resource = -1;
 				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
+				
+				std::string key = property.Key;
+				std::string value = property.Value;
 				
 				if (key == "file") {
 					file = CMod::GetCurrentModPath() + value;
@@ -242,9 +253,14 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			std::string file;
 			int resource = -1;
 				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
+				
+				std::string key = property.Key;
+				std::string value = property.Value;
 				
 				if (key == "file") {
 					file = CMod::GetCurrentModPath() + value;
@@ -270,10 +286,15 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 		} else if (section->Tag == "layer_file") {
 			std::string file;
 			int image_layer = -1;
+			
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
 				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+				std::string key = property.Key;
+				std::string value = property.Value;
 				
 				if (key == "file") {
 					file = CMod::GetCurrentModPath() + value;
@@ -300,9 +321,14 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			std::string icon_ident;
 			int button_action = -1;
 				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
+				
+				std::string key = property.Key;
+				std::string value = property.Value;
 				
 				if (key == "icon") {
 					value = FindAndReplaceString(value, "_", "-");

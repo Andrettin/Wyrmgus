@@ -36,6 +36,7 @@
 #include "missile/missile_type.h"
 
 #include "config.h"
+#include "config_operator.h"
 #include "luacallback.h"
 #include "mod.h"
 #include "sound/sound.h"
@@ -205,10 +206,15 @@ bool MissileType::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "image") {
 		std::string file;
+		
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
 			
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+			std::string key = property.Key;
+			std::string value = property.Value;
 			
 			if (key == "file") {
 				file = CMod::GetCurrentModPath() + value;

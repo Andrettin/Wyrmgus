@@ -93,9 +93,9 @@ public:
 		return this->Notes;
 	}
 	
-	int GetYear() const
+	int GetPublicationYear() const
 	{
-		return this->Year;
+		return this->PublicationYear;
 	}
 	
 	int GetInitialPage() const
@@ -171,7 +171,7 @@ private:
 	String Publisher;				/// publisher of the text
 	String CopyrightNotice;			/// copyright notice explaining that this text is in the public domain, or is licensed under an open-source license
 	String Notes;					/// notes to appear on the cover of the text
-	int Year = 0;					/// year of publication
+	int PublicationYear = 0;		/// year of publication
 	int InitialPage = 1;			/// page in which the text begins
 	CIcon *Icon = nullptr;			/// the text's icon
 	CLiteraryText *MainText = nullptr;	/// the main text to which this one belongs, if it is a section

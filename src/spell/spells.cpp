@@ -48,6 +48,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "config.h"
+#include "config_operator.h"
 #include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -492,9 +493,14 @@ bool CSpell::ProcessConfigDataSection(const CConfigData *section)
 		int resource = -1;
 		int cost = 0;
 			
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
 			
 			if (key == "resource") {
 				value = FindAndReplaceString(value, "_", "-");
@@ -981,38 +987,40 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 		this->Variable[i].MaxValuePercent = 1024;
 	}
 	
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "alliance") {
-			this->Alliance = StringToCondition(value);
-		} else if (key == "opponent") {
-			this->Opponent = StringToCondition(value);
-		} else if (key == "self") {
-			this->TargetSelf = StringToCondition(value);
-		} else if (key == "thrusting_weapon") {
-			this->ThrustingWeapon = StringToCondition(value);
-		} else if (key == "faction_unit") {
-			this->FactionUnit = StringToCondition(value);
-		} else if (key == "civilization_equivalent") {
-			value = FindAndReplaceString(value, "_", "-");
+		if (property.Key == "alliance") {
+			this->Alliance = StringToCondition(property.Value);
+		} else if (property.Key == "opponent") {
+			this->Opponent = StringToCondition(property.Value);
+		} else if (property.Key == "self") {
+			this->TargetSelf = StringToCondition(property.Value);
+		} else if (property.Key == "thrusting_weapon") {
+			this->ThrustingWeapon = StringToCondition(property.Value);
+		} else if (property.Key == "faction_unit") {
+			this->FactionUnit = StringToCondition(property.Value);
+		} else if (property.Key == "civilization_equivalent") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			const CCivilization *civilization = CCivilization::Get(value);
 			if (civilization) {
 				this->CivilizationEquivalent = civilization->GetIndex();
 			}
-		} else if (key == "faction_equivalent") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "faction_equivalent") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CFaction *faction = CFaction::Get(value);
 			if (faction) {
 				this->FactionEquivalent = faction;
 			}
 		} else {
-			key = SnakeCaseToPascalCase(key);
+			std::string key = SnakeCaseToPascalCase(property.Key);
 			
 			int index = UnitTypeVar.BoolFlagNameLookup[key.c_str()];
 			if (index != -1) {
-				this->BoolFlag[index] = StringToCondition(value);
+				this->BoolFlag[index] = StringToCondition(property.Value);
 			} else {
 				fprintf(stderr, "Invalid spell condition property: \"%s\".\n", key.c_str());
 			}
@@ -1027,30 +1035,32 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 		if (index != -1) {
 			this->Variable[index].Check = true;
 			
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
 				
-				if (key == "enable") {
-					this->Variable[index].Enable = StringToCondition(value);
-				} else if (key == "exact_value") {
-					this->Variable[index].ExactValue = std::stoi(value);
-				} else if (key == "except_value") {
-					this->Variable[index].ExceptValue = std::stoi(value);
-				} else if (key == "min_value") {
-					this->Variable[index].MinValue = std::stoi(value);
-				} else if (key == "max_value") {
-					this->Variable[index].MaxValue = std::stoi(value);
-				} else if (key == "min_max") {
-					this->Variable[index].MinMax = std::stoi(value);
-				} else if (key == "min_value_percent") {
-					this->Variable[index].MinValuePercent = std::stoi(value);
-				} else if (key == "max_value_percent") {
-					this->Variable[index].MaxValuePercent = std::stoi(value);
-				} else if (key == "condition_apply_on_caster") {
-					this->Variable[index].ConditionApplyOnCaster = StringToBool(value);
+				if (property.Key == "enable") {
+					this->Variable[index].Enable = StringToCondition(property.Value);
+				} else if (property.Key == "exact_value") {
+					this->Variable[index].ExactValue = std::stoi(property.Value);
+				} else if (property.Key == "except_value") {
+					this->Variable[index].ExceptValue = std::stoi(property.Value);
+				} else if (property.Key == "min_value") {
+					this->Variable[index].MinValue = std::stoi(property.Value);
+				} else if (property.Key == "max_value") {
+					this->Variable[index].MaxValue = std::stoi(property.Value);
+				} else if (property.Key == "min_max") {
+					this->Variable[index].MinMax = std::stoi(property.Value);
+				} else if (property.Key == "min_value_percent") {
+					this->Variable[index].MinValuePercent = std::stoi(property.Value);
+				} else if (property.Key == "max_value_percent") {
+					this->Variable[index].MaxValuePercent = std::stoi(property.Value);
+				} else if (property.Key == "condition_apply_on_caster") {
+					this->Variable[index].ConditionApplyOnCaster = StringToBool(property.Value);
 				} else {
-					fprintf(stderr, "Invalid adjust variable spell action variable property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid adjust variable spell action variable property: \"%s\".\n", property.Key.c_str());
 				}
 			}
 		} else {
@@ -1066,49 +1076,53 @@ void ConditionInfo::ProcessConfigData(const CConfigData *config_data)
 */
 void AutoCastInfo::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "range") {
-			this->Range = std::stoi(value);
-		} else if (key == "min_range") {
-			this->MinRange = std::stoi(value);
-		} else if (key == "combat") {
-			this->Combat = StringToCondition(value);
-		} else if (key == "attacker") {
-			this->Attacker = StringToCondition(value);
-		} else if (key == "corpse") {
-			this->Corpse = StringToCondition(value);
+		if (property.Key == "range") {
+			this->Range = std::stoi(property.Value);
+		} else if (property.Key == "min_range") {
+			this->MinRange = std::stoi(property.Value);
+		} else if (property.Key == "combat") {
+			this->Combat = StringToCondition(property.Value);
+		} else if (property.Key == "attacker") {
+			this->Attacker = StringToCondition(property.Value);
+		} else if (property.Key == "corpse") {
+			this->Corpse = StringToCondition(property.Value);
 		} else {
-			fprintf(stderr, "Invalid autocast property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid autocast property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 	
 	for (const CConfigData *section : config_data->Sections) {
 		if (section->Tag == "priority") {
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
 				
-				if (key == "priority_var") {
+				if (property.Key == "priority_var") {
 					int index = -1;
-					if (value == "distance") {
+					if (property.Value == "distance") {
 						index = ACP_DISTANCE;
 					} else {
-						value = SnakeCaseToPascalCase(value);
+						std::string value = SnakeCaseToPascalCase(property.Value);
 						index = UnitTypeVar.VariableNameLookup[value.c_str()];
 					}
 					
 					if (index != -1) {
 						this->PriorityVar = index;
 					} else {
-						fprintf(stderr, "Invalid autocast priority variable value: \"%s\".\n", value.c_str());
+						fprintf(stderr, "Invalid autocast priority variable value: \"%s\".\n", property.Value.c_str());
 					}
-				} else if (key == "reverse_sort") {
-					this->ReverseSort = StringToBool(value);
+				} else if (property.Key == "reverse_sort") {
+					this->ReverseSort = StringToBool(property.Value);
 				} else {
-					fprintf(stderr, "Invalid autocast priority property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid autocast priority property: \"%s\".\n", property.Key.c_str());
 				}
 			}
 		} else if (section->Tag == "condition") {

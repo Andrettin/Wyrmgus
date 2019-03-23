@@ -36,6 +36,7 @@
 #include "ui/icon.h"
 
 #include "config.h"
+#include "config_operator.h"
 #include "menus.h"
 #include "mod.h"
 #include "translate.h"
@@ -87,10 +88,15 @@ bool CIcon::ProcessConfigDataSection(const CConfigData *section)
 	if (section->Tag == "image") {
 		std::string file;
 		Vec2i size(0, 0);
+		
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
 			
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+			std::string key = property.Key;
+			std::string value = property.Value;
 			
 			if (key == "file") {
 				file = CMod::GetCurrentModPath() + value;

@@ -37,6 +37,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "config_operator.h"
 #include "faction.h"
 #include "map/map_template.h"
 #include "quest/quest.h"
@@ -134,10 +135,15 @@ bool CCampaign::ProcessConfigDataSection(const CConfigData *section)
 		CMapTemplate *map_template = nullptr;
 		Vec2i start_pos(0, 0);
 		Vec2i map_size(0, 0);
+		
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
 			
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+			std::string key = property.Key;
+			std::string value = property.Value;
 			
 			if (key == "map_template") {
 				value = FindAndReplaceString(value, "_", "-");

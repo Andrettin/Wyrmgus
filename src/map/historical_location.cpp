@@ -36,6 +36,7 @@
 #include "map/historical_location.h"
 
 #include "config.h"
+#include "config_operator.h"
 #include "map/map.h"
 #include "map/map_template.h"
 #include "map/site.h"
@@ -51,34 +52,31 @@
 */
 void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "date") {
-			value = FindAndReplaceString(value, "_", "-");
+		if (property.Key == "date") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			this->Date = CDate::FromString(value);
-		} else if (key == "map_template") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "map_template") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			this->MapTemplate = CMapTemplate::Get(value);
-			if (!this->MapTemplate) {
-				fprintf(stderr, "Map template \"%s\" does not exist.\n", value.c_str());
-			}
-		} else if (key == "site") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "site") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			this->Site = CSite::Get(value);
 			if (this->Site) {
 				this->MapTemplate = this->Site->MapTemplate;
 				this->Position = this->Site->Position;
-			} else {
-				fprintf(stderr, "Site \"%s\" does not exist.\n", value.c_str());
 			}
-		} else if (key == "x") {
-			this->Position.x = std::stoi(value);
-		} else if (key == "y") {
-			this->Position.y = std::stoi(value);
+		} else if (property.Key == "x") {
+			this->Position.x = std::stoi(property.Value);
+		} else if (property.Key == "y") {
+			this->Position.y = std::stoi(property.Value);
 		} else {
-			fprintf(stderr, "Invalid historical location property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid historical location property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 	

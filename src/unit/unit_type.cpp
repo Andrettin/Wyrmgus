@@ -43,6 +43,7 @@
 #include "animation/animation_frame.h"
 #include "civilization.h"
 #include "config.h"
+#include "config_operator.h"
 #include "construct.h"
 //Wyrmgus start
 #include "editor/editor.h" //for personal name generation
@@ -941,9 +942,14 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "costs") {
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
 			
 			key = FindAndReplaceString(key, "_", "-");
 			
@@ -955,9 +961,14 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 			}
 		}
 	} else if (section->Tag == "image") {
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
 			
 			if (key == "file") {
 				this->File = CMod::GetCurrentModPath() + value;
@@ -987,9 +998,15 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 			this->Sprite = nullptr;
 		}
 	} else if (section->Tag == "default_equipment") {
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
+			
 			key = FindAndReplaceString(key, "_", "-");
 			value = FindAndReplaceString(value, "_", "-");
 			
@@ -1008,9 +1025,15 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 			this->DefaultEquipment[item_slot] = item;
 		}
 	} else if (section->Tag == "sounds") {
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
+			
 			value = FindAndReplaceString(value, "_", "-");
 			
 			if (key == "selected") {
@@ -1105,9 +1128,14 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 		const int index = UnitTypeVar.VariableNameLookup[tag.c_str()]; // variable index
 		
 		if (index != -1) { // valid index
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
+				
+				std::string key = property.Key;
+				std::string value = property.Value;
 				
 				if (key == "enable") {
 					this->DefaultStat.Variables[index].Enable = StringToBool(value);

@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name config.h - The config header file. */
+/**@name config_property.h - The config property header file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,42 +27,35 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CONFIG_H__
-#define __CONFIG_H__
+#ifndef __CONFIG_PROPERTY_H__
+#define __CONFIG_PROPERTY_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "config_property.h"
-
-#include <core/color.h>
-
 #include <string>
-#include <vector>
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+enum class CConfigOperator : int;
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CConfigData
+class CConfigProperty
 {
 public:
-	CConfigData(const std::string &tag) : Tag(tag)
+	CConfigProperty(const std::string &key, CConfigOperator property_operator, const std::string &value) : Key(key), Operator(property_operator), Value(value)
 	{
 	}
 	
-	static void ParseConfigData(const std::string &filepath, const bool define_only);
-	static void ParseLine(std::string &line, std::vector<std::string> &data);
-	static void ProcessConfigData(const std::vector<CConfigData *> &config_data_list, const bool define_only);
-	
-	Color ProcessColor() const;
-	
-	std::string Tag;
-	std::string Ident;
-	CConfigData *Parent = nullptr;
-	std::vector<CConfigProperty> Properties;
-	std::vector<CConfigData *> Sections;
+	std::string Key;
+	CConfigOperator Operator;
+	std::string Value;
 };
 
 #endif

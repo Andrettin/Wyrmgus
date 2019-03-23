@@ -37,6 +37,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "config_operator.h"
 #include "faction.h"
 #include "map/map_template.h"
 #include "unit/unit_type.h"
@@ -106,34 +107,38 @@ bool CSite::ProcessConfigDataProperty(const std::string &key, std::string value)
 bool CSite::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "cultural_names") {
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
 			
-			key = FindAndReplaceString(key, "_", "-");
+			std::string key = FindAndReplaceString(property.Key, "_", "-");
 			
 			const CCivilization *civilization = CCivilization::Get(key);
 			
 			if (civilization) {
-				this->CulturalNames[civilization] = value;
+				this->CulturalNames[civilization] = property.Value;
 			}
 		}
 	} else if (section->Tag == "historical_owner") {
 		CDate date;
 		CFaction *owner_faction = nullptr;
+		
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
 			
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
-			
-			if (key == "date") {
-				value = FindAndReplaceString(value, "_", "-");
+			if (property.Key == "date") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				date = CDate::FromString(value);
-			} else if (key == "faction") {
-				value = FindAndReplaceString(value, "_", "-");
+			} else if (property.Key == "faction") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				owner_faction = CFaction::Get(value);
 			} else {
-				fprintf(stderr, "Invalid historical owner property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid historical owner property: \"%s\".\n", property.Key.c_str());
 			}
 		}
 		
@@ -145,33 +150,35 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 		CUniqueItem *unique = nullptr;
 		CFaction *building_owner_faction = nullptr;
 			
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
 			
-			if (key == "start_date") {
-				value = FindAndReplaceString(value, "_", "-");
+			if (property.Key == "start_date") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				start_date = CDate::FromString(value);
-			} else if (key == "end_date") {
-				value = FindAndReplaceString(value, "_", "-");
+			} else if (property.Key == "end_date") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				end_date = CDate::FromString(value);
-			} else if (key == "building_class") {
-				value = FindAndReplaceString(value, "_", "-");
+			} else if (property.Key == "building_class") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				building_class_id = GetUnitTypeClassIndexByName(value);
 				if (building_class_id == -1) {
 					fprintf(stderr, "Invalid unit class: \"%s\".\n", value.c_str());
 				}
-			} else if (key == "unique") {
-				value = FindAndReplaceString(value, "_", "-");
+			} else if (property.Key == "unique") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				unique = GetUniqueItem(value);
 				if (!unique) {
 					fprintf(stderr, "Invalid unique: \"%s\".\n", value.c_str());
 				}
-			} else if (key == "faction") {
-				value = FindAndReplaceString(value, "_", "-");
+			} else if (property.Key == "faction") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				building_owner_faction = CFaction::Get(value);
 			} else {
-				fprintf(stderr, "Invalid historical building property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid historical building property: \"%s\".\n", property.Key.c_str());
 			}
 		}
 		

@@ -36,6 +36,7 @@
 #include "game/trigger_effect.h"
 
 #include "config.h"
+#include "config_operator.h"
 #include "quest/dialogue.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
@@ -51,18 +52,20 @@
 */
 void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "dialogue") {
-			value = FindAndReplaceString(value, "_", "-");
+		if (property.Key == "dialogue") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CDialogue *dialogue = CDialogue::GetDialogue(value);
 			if (dialogue) {
 				this->Dialogue = dialogue;
 			}
 		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid trigger property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 	
@@ -83,14 +86,16 @@ void CCallDialogueTriggerEffect::Do(CPlayer *player) const
 */
 void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "quantity") {
-			this->Quantity = std::stoi(value);
-		} else if (key == "unit_type") {
-			value = FindAndReplaceString(value, "_", "-");
+		if (property.Key == "quantity") {
+			this->Quantity = std::stoi(property.Value);
+		} else if (property.Key == "unit_type") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CUnitType *unit_type = UnitTypeByIdent(value);
 			if (unit_type) {
 				this->UnitType = unit_type;
@@ -98,7 +103,7 @@ void CCreateUnitTriggerEffect::ProcessConfigData(const CConfigData *config_data)
 				fprintf(stderr, "Unit type \"%s\" does not exist.\n", value.c_str());
 			}
 		} else {
-			fprintf(stderr, "Invalid trigger property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid trigger property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 	

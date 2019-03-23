@@ -36,6 +36,7 @@
 #include "map/terrain_type.h"
 
 #include "config.h"
+#include "config_operator.h"
 #include "iolib.h"
 #include "map/map.h"
 #include "map/tileset.h"
@@ -222,14 +223,16 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 	std::string elevation_graphics_file;
 	std::string player_color_graphics_file;
 	
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "character") {
-			this->Character = value;
+		if (property.Key == "name") {
+			this->Name = property.Value;
+		} else if (property.Key == "character") {
+			this->Character = property.Value;
 			
 			if (CTerrainType::TerrainTypesByCharacter.find(this->Character) != CTerrainType::TerrainTypesByCharacter.end()) {
 				fprintf(stderr, "Character \"%s\" is already used by another terrain type.\n", this->Character.c_str());
@@ -237,8 +240,8 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			} else {
 				CTerrainType::TerrainTypesByCharacter[this->Character] = this;
 			}
-		} else if (key == "color") {
-			this->Color = CColor::FromString(value);
+		} else if (property.Key == "color") {
+			this->Color = CColor::FromString(property.Value);
 			
 			if (CTerrainType::TerrainTypesByColor.find(std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)) != CTerrainType::TerrainTypesByColor.end()) {
 				fprintf(stderr, "Color is already used by another terrain type.\n");
@@ -249,68 +252,68 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 				continue;
 			}
 			CTerrainType::TerrainTypesByColor[std::tuple<int, int, int>(this->Color.R, this->Color.G, this->Color.B)] = this;
-		} else if (key == "overlay") {
-			this->Overlay = StringToBool(value);
-		} else if (key == "buildable") {
-			this->Buildable = StringToBool(value);
-		} else if (key == "allow_single") {
-			this->AllowSingle = StringToBool(value);
-		} else if (key == "hidden") {
-			this->Hidden = StringToBool(value);
-		} else if (key == "resource") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "overlay") {
+			this->Overlay = StringToBool(property.Value);
+		} else if (property.Key == "buildable") {
+			this->Buildable = StringToBool(property.Value);
+		} else if (property.Key == "allow_single") {
+			this->AllowSingle = StringToBool(property.Value);
+		} else if (property.Key == "hidden") {
+			this->Hidden = StringToBool(property.Value);
+		} else if (property.Key == "resource") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			this->Resource = GetResourceIdByName(value.c_str());
-		} else if (key == "flag") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "flag") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			unsigned long flag = CTerrainType::GetTerrainFlagByName(value);
 			if (flag) {
 				this->Flags |= flag;
 			}
-		} else if (key == "graphics") {
-			graphics_file = value;
+		} else if (property.Key == "graphics") {
+			graphics_file = property.Value;
 			if (!CanAccessFile(graphics_file.c_str())) {
-				fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "File \"%s\" doesn't exist.\n", property.Value.c_str());
 			}
-		} else if (key == "elevation_graphics") {
-			elevation_graphics_file = value;
+		} else if (property.Key == "elevation_graphics") {
+			elevation_graphics_file = property.Value;
 			if (!CanAccessFile(elevation_graphics_file.c_str())) {
-				fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "File \"%s\" doesn't exist.\n", property.Value.c_str());
 			}
-		} else if (key == "player_color_graphics") {
-			player_color_graphics_file = value;
+		} else if (property.Key == "player_color_graphics") {
+			player_color_graphics_file = property.Value;
 			if (!CanAccessFile(player_color_graphics_file.c_str())) {
-				fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
+				fprintf(stderr, "File \"%s\" doesn't exist.\n", property.Value.c_str());
 			}
-		} else if (key == "pixel_width") {
-			this->PixelTileSize.x = std::stoi(value);
-		} else if (key == "pixel_height") {
-			this->PixelTileSize.y = std::stoi(value);
-		} else if (key == "base_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "pixel_width") {
+			this->PixelTileSize.x = std::stoi(property.Value);
+		} else if (property.Key == "pixel_height") {
+			this->PixelTileSize.y = std::stoi(property.Value);
+		} else if (property.Key == "base_terrain_type") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CTerrainType *base_terrain_type = GetTerrainType(value);
 			this->BaseTerrainTypes.push_back(base_terrain_type);
-		} else if (key == "inner_border_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "inner_border_terrain_type") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CTerrainType *border_terrain_type = GetTerrainType(value);
 			this->InnerBorderTerrains.push_back(border_terrain_type);
 			this->BorderTerrains.push_back(border_terrain_type);
 			border_terrain_type->OuterBorderTerrains.push_back(this);
 			border_terrain_type->BorderTerrains.push_back(this);
-		} else if (key == "outer_border_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "outer_border_terrain_type") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CTerrainType *border_terrain_type = GetTerrainType(value);
 			this->OuterBorderTerrains.push_back(border_terrain_type);
 			this->BorderTerrains.push_back(border_terrain_type);
 			border_terrain_type->InnerBorderTerrains.push_back(this);
 			border_terrain_type->BorderTerrains.push_back(this);
-		} else if (key == "solid_tile") {
-			this->SolidTiles.push_back(std::stoi(value));
-		} else if (key == "damaged_tile") {
-			this->DamagedTiles.push_back(std::stoi(value));
-		} else if (key == "destroyed_tile") {
-			this->DestroyedTiles.push_back(std::stoi(value));
+		} else if (property.Key == "solid_tile") {
+			this->SolidTiles.push_back(std::stoi(property.Value));
+		} else if (property.Key == "damaged_tile") {
+			this->DamagedTiles.push_back(std::stoi(property.Value));
+		} else if (property.Key == "destroyed_tile") {
+			this->DestroyedTiles.push_back(std::stoi(property.Value));
 		} else {
-			fprintf(stderr, "Invalid terrain type property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid terrain type property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 	
@@ -319,20 +322,22 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			std::string season_graphics_file;
 			CSeason *season = nullptr;
 			
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
 				
-				if (key == "season") {
-					value = FindAndReplaceString(value, "_", "-");
+				if (property.Key == "season") {
+					std::string value = FindAndReplaceString(property.Value, "_", "-");
 					season = CSeason::Get(value);
-				} else if (key == "graphics") {
-					season_graphics_file = value;
+				} else if (property.Key == "graphics") {
+					season_graphics_file = property.Value;
 					if (!CanAccessFile(season_graphics_file.c_str())) {
-						fprintf(stderr, "File \"%s\" doesn't exist.\n", value.c_str());
+						fprintf(stderr, "File \"%s\" doesn't exist.\n", season_graphics_file.c_str());
 					}
 				} else {
-					fprintf(stderr, "Invalid season graphics property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid season graphics property: \"%s\".\n", property.Key.c_str());
 				}
 			}
 			
@@ -355,25 +360,27 @@ void CTerrainType::ProcessConfigData(const CConfigData *config_data)
 			int transition_type = -1;
 			std::vector<int> tiles;
 			
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
 				
-				if (key == "terrain_type") {
-					value = FindAndReplaceString(value, "_", "-");
+				if (property.Key == "terrain_type") {
+					std::string value = FindAndReplaceString(property.Value, "_", "-");
 					CTerrainType *transition_terrain = CTerrainType::GetTerrainType(value);
 					if (!transition_terrain) {
 						fprintf(stderr, "Terrain type \"%s\" doesn't exist.\n", value.c_str());
 					} else {
 						transition_terrain_id = transition_terrain->ID;
 					}
-				} else if (key == "transition_type") {
-					value = FindAndReplaceString(value, "_", "-");
+				} else if (property.Key == "transition_type") {
+					std::string value = FindAndReplaceString(property.Value, "_", "-");
 					transition_type = GetTransitionTypeIdByName(value);
-				} else if (key == "tile") {
-					tiles.push_back(std::stoi(value));
+				} else if (property.Key == "tile") {
+					tiles.push_back(std::stoi(property.Value));
 				} else {
-					fprintf(stderr, "Invalid transition tile property: \"%s\".\n", key.c_str());
+					fprintf(stderr, "Invalid transition tile property: \"%s\".\n", property.Key.c_str());
 				}
 			}
 			

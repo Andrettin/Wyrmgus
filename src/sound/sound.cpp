@@ -39,6 +39,7 @@
 #include "action/action_resource.h"
 #include "civilization.h"
 #include "config.h"
+#include "config_operator.h"
 #include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -807,25 +808,27 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 	std::vector<CSound *> group_sounds; //sounds for sound group
 	unsigned char range = 0;
 	
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "file") {
-			std::string file = CMod::GetCurrentModPath() + value;
+		if (property.Key == "file") {
+			std::string file = CMod::GetCurrentModPath() + property.Value;
 			files.push_back(file);
-		} else if (key == "group_sound") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "group_sound") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			CSound *group_sound = SoundForName(value);
 			if (group_sound) {
 				group_sounds.push_back(group_sound);
 			} else {
 				fprintf(stderr, "Invalid sound: \"%s\".\n", value.c_str());
 			}
-		} else if (key == "range") {
-			range = std::stoi(value);
+		} else if (property.Key == "range") {
+			range = std::stoi(property.Value);
 		} else {
-			fprintf(stderr, "Invalid sound property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid sound property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 	

@@ -37,6 +37,7 @@
 
 #include "civilization.h"
 #include "config.h"
+#include "config_operator.h"
 #include "editor/editor.h"
 #include "faction.h"
 #include "game/game.h"
@@ -224,9 +225,14 @@ bool CMapTemplate::ProcessConfigDataSection(const CConfigData *section)
 		CUnitType *unit_type = nullptr;
 		int quantity = 1;
 			
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
 			
 			if (key == "unit_type") {
 				value = FindAndReplaceString(value, "_", "-");
@@ -1622,31 +1628,33 @@ Vec2i CMapTemplate::GetBestLocationMapPosition(const std::vector<CHistoricalLoca
 */
 void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
+		if (property.Key == "terrain_type") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			this->TerrainType = CTerrainType::GetTerrainType(value);
-		} else if (key == "seed_count") {
-			this->SeedCount = std::stoi(value);
-		} else if (key == "expansion_chance") {
-			this->ExpansionChance = std::stoi(value);
-		} else if (key == "max_percent") {
-			this->MaxPercent = std::stoi(value);
-		} else if (key == "use_existing_as_seeds") {
-			this->UseExistingAsSeeds = StringToBool(value);
-		} else if (key == "use_subtemplate_borders_as_seeds") {
-			this->UseSubtemplateBordersAsSeeds = StringToBool(value);
-		} else if (key == "target_terrain_type") {
-			value = FindAndReplaceString(value, "_", "-");
+		} else if (property.Key == "seed_count") {
+			this->SeedCount = std::stoi(property.Value);
+		} else if (property.Key == "expansion_chance") {
+			this->ExpansionChance = std::stoi(property.Value);
+		} else if (property.Key == "max_percent") {
+			this->MaxPercent = std::stoi(property.Value);
+		} else if (property.Key == "use_existing_as_seeds") {
+			this->UseExistingAsSeeds = StringToBool(property.Value);
+		} else if (property.Key == "use_subtemplate_borders_as_seeds") {
+			this->UseSubtemplateBordersAsSeeds = StringToBool(property.Value);
+		} else if (property.Key == "target_terrain_type") {
+			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			const CTerrainType *target_terrain_type = CTerrainType::GetTerrainType(value);
 			if (target_terrain_type) {
 				this->TargetTerrainTypes.push_back(target_terrain_type);
 			}
 		} else {
-			fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid generated terrain property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 	

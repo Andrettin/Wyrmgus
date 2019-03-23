@@ -36,6 +36,7 @@
 #include "time/season_schedule.h"
 
 #include "config.h"
+#include "config_operator.h"
 #include "time/season.h"
 
 /*----------------------------------------------------------------------------
@@ -96,10 +97,15 @@ bool CSeasonSchedule::ProcessConfigDataSection(const CConfigData *section)
 	if (section->Tag == "scheduled_season") {
 		CSeason *season = nullptr;
 		unsigned hours = 0;
+		
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
 			
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+			std::string key = property.Key;
+			std::string value = property.Value;
 			
 			if (key == "season") {
 				value = FindAndReplaceString(value, "_", "-");

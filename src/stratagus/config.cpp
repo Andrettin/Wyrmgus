@@ -38,6 +38,8 @@
 #include "age.h"
 #include "animation/animation.h"
 #include "character.h"
+#include "config_operator.h"
+#include "config_property.h"
 #include "dynasty.h"
 #include "economy/currency.h"
 #include "game/game.h"
@@ -123,10 +125,11 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	
 	CConfigData *config_data = nullptr;
 	std::string key;
+	CConfigOperator property_operator = CConfigOperator::None;
 	std::string value;
 	for (size_t i = 0; i < data.size(); ++i) {
 		std::string str = data[i];
-		if (str.size() >= 2 && str[0] == '[' && str[1] != '/') { //opens a tag
+		if (str.size() >= 3 && str.front() == '[' && str[1] != '/' && str.back() == ']' && str.find(' ') == std::string::npos) { //opens a tag; exclude whitespace for the unlikely case when a text string (e.g. encyclopedia description) starts with '[' and ends with ']' due to BBCode
 			std::string tag_name = str;
 			tag_name = FindAndReplaceString(tag_name, "[", "");
 			tag_name = FindAndReplaceString(tag_name, "]", "");
@@ -135,7 +138,7 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 				new_config_data->Parent = config_data;
 			}
 			config_data = new_config_data;
-		} else if (str.size() >= 2 && str[0] == '[' && str[1] == '/') { //closes a tag
+		} else if (str.size() >= 3 && str.front() == '[' && str[1] == '/' && str.back() == ']' && str.find(' ') == std::string::npos) { //closes a tag
 			std::string tag_name = str;
 			tag_name = FindAndReplaceString(tag_name, "[/", "");
 			tag_name = FindAndReplaceString(tag_name, "]", "");
@@ -157,39 +160,34 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 			}
 		} else if (key.empty()) { //key
 			if (config_data) {
-				if (str.find('=') != std::string::npos) {
-					std::vector<std::string> key_value_strings = SplitString(str, "=");
-					for (size_t j = 0; j < key_value_strings.size(); ++j) {
-						if (key.empty()) {
-							key = key_value_strings[j];
-						} else {
-							std::string value = key_value_strings[j];
-							if (key == "ident") {
-								config_data->Ident = value;
-							} else {
-								config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
-							}
-							key.clear();
-						}
-					}
-				} else {
-					key = str;
-				}
+				key = str;
 			} else {
 				fprintf(stderr, "Error parsing config file \"%s\": Tried defining key \"%s\" before any tag had been opened.\n", filepath.c_str(), str.c_str());
 			}
-		} else if (!key.empty() && str.length() == 1 && str[0] == '=') { //operator
-			continue;
-		} else if (!key.empty()) { //value
+		} else if (!key.empty() && property_operator == CConfigOperator::None) { //operator
+			if (config_data) {
+				if (str == "=") {
+					property_operator = CConfigOperator::Assignment;
+				} else if (str == "+=") {
+					property_operator = CConfigOperator::Addition;
+				} else if (str == "-=") {
+					property_operator = CConfigOperator::Subtraction;
+				} else {
+					fprintf(stderr, "Error parsing config file \"%s\": Tried using operator \"%s\" for key \"%s\", but it is not a valid operator.\n", filepath.c_str(), str.c_str(), key.c_str());
+				}
+			} else {
+				fprintf(stderr, "Error parsing config file \"%s\": Tried using operator \"%s\" for key \"%s\" without any tag being opened.\n", filepath.c_str(), str.c_str(), key.c_str());
+			}
+		} else if (property_operator != CConfigOperator::None) { //value
 			if (config_data) {
 				std::string value = str;
-				value = FindAndReplaceString(value, "=", "");
 				if (key == "ident") {
 					config_data->Ident = value;
 				} else {
-					config_data->Properties.push_back(std::pair<std::string, std::string>(key, value));
+					config_data->Properties.push_back(CConfigProperty(key, property_operator, value));
 				}
 				key.clear();
+				property_operator = CConfigOperator::None;
 			} else {
 				fprintf(stderr, "Error parsing config file \"%s\": Tried assigning value \"%s\" to key \"%s\" without any tag being opened.\n", filepath.c_str(), str.c_str(), key.c_str());
 			}
@@ -485,20 +483,22 @@ Color CConfigData::ProcessColor() const
 {
 	Color color;
 	
-	for (size_t i = 0; i < this->Properties.size(); ++i) {
-		std::string key = this->Properties[i].first;
-		std::string value = this->Properties[i].second;
+	for (const CConfigProperty &property : this->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "red") {
-			color.r = std::stoi(value) / 255.0;
-		} else if (key == "green") {
-			color.g = std::stoi(value) / 255.0;
-		} else if (key == "blue") {
-			color.b = std::stoi(value) / 255.0;
-		} else if (key == "alpha") {
-			color.a = std::stoi(value) / 255.0;
+		if (property.Key == "red") {
+			color.r = std::stoi(property.Value) / 255.0;
+		} else if (property.Key == "green") {
+			color.g = std::stoi(property.Value) / 255.0;
+		} else if (property.Key == "blue") {
+			color.b = std::stoi(property.Value) / 255.0;
+		} else if (property.Key == "alpha") {
+			color.a = std::stoi(property.Value) / 255.0;
 		} else {
-			fprintf(stderr, "Invalid color property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid color property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 	

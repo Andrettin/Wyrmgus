@@ -47,6 +47,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "config.h"
+#include "config_operator.h"
 #include "dynasty.h"
 //Wyrmgus start
 #include "editor/editor.h"
@@ -325,9 +326,14 @@ bool CUpgrade::ProcessConfigDataProperty(const std::string &key, std::string val
 bool CUpgrade::ProcessConfigDataSection(const CConfigData *section)
 {
 	if (section->Tag == "costs") {
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = property.Key;
+			std::string value = property.Value;
 			
 			key = FindAndReplaceString(key, "_", "-");
 			

@@ -32,6 +32,7 @@
 #include "data_type.h"
 
 #include "config.h"
+#include "config_operator.h"
 
 /**
 **	@brief	Process data provided by a configuration file
@@ -48,13 +49,10 @@ void CDataType::ProcessConfigData(const CConfigData *config_data)
 		properties_by_name[property_info.name] = property_info;
 	}
 	
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
-		
-		Map<StringName, PropertyInfo>::Element *element = properties_by_name.find(key.c_str());
+	for (const CConfigProperty &config_property : config_data->Properties) {
+		Map<StringName, PropertyInfo>::Element *element = properties_by_name.find(config_property.Key.c_str());
 		if (element == nullptr) {
-			element = properties_by_name.find(("_" + key).c_str());
+			element = properties_by_name.find(("_" + config_property.Key).c_str());
 		}
 		
 		if (element != nullptr) {
@@ -62,22 +60,38 @@ void CDataType::ProcessConfigData(const CConfigData *config_data)
 			bool ok;
 			Variant property_value;
 			if (property_info.type == Variant::STRING) {
-				property_value = Variant(String(value.c_str()));
+				if (config_property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for string property \"%s\": %i.\n", config_property.Key.c_str(), config_property.Operator);
+					continue;
+				}
+				
+				property_value = Variant(String(config_property.Value.c_str()));
 			} else if (property_info.type == Variant::INT) {
-				property_value = Variant(std::stoi(value));
+				if (config_property.Operator == CConfigOperator::Assignment) {
+					property_value = Variant(std::stoi(config_property.Value));
+				} else if (config_property.Operator == CConfigOperator::Addition) {
+					property_value = Variant(int(this->get(property_info.name)) + std::stoi(config_property.Value));
+				} else if (config_property.Operator == CConfigOperator::Subtraction) {
+					property_value = Variant(int(this->get(property_info.name)) - std::stoi(config_property.Value));
+				}
 			} else if (property_info.type == Variant::BOOL) {
-				property_value = Variant(StringToBool(value));
+				if (config_property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for boolean property \"%s\": %i.\n", config_property.Key.c_str(), config_property.Operator);
+					continue;
+				}
+				
+				property_value = Variant(StringToBool(config_property.Value));
 			} else {
-				fprintf(stderr, "Failed to set %s property \"%s\", as the variant type of the property is neither string, nor integer, nor boolean.\n", config_data->Tag.c_str(), key.c_str());
+				fprintf(stderr, "Failed to set %s property \"%s\", as the variant type of the property is neither string, nor integer, nor boolean.\n", config_data->Tag.c_str(), config_property.Key.c_str());
 				continue;
 			}
 			
 			this->set(property_info.name, property_value, &ok);
 			if (!ok) {
-				fprintf(stderr, "Failed to set %s property \"%s\" to \"%s\".\n", config_data->Tag.c_str(), key.c_str(), value.c_str());
+				fprintf(stderr, "Failed to set %s property \"%s\" to \"%s\".\n", config_data->Tag.c_str(), config_property.Key.c_str(), config_property.Value.c_str());
 			}
-		} else if (!this->ProcessConfigDataProperty(key, value)) {
-			fprintf(stderr, "Invalid %s property: \"%s\".\n", config_data->Tag.c_str(), key.c_str());
+		} else if (!this->ProcessConfigDataProperty(config_property.Key, config_property.Value)) {
+			fprintf(stderr, "Invalid %s property: \"%s\".\n", config_data->Tag.c_str(), config_property.Key.c_str());
 		}
 	}
 	

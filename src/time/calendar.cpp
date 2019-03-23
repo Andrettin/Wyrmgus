@@ -36,6 +36,7 @@
 #include "time/calendar.h"
 
 #include "config.h"
+#include "config_operator.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -56,9 +57,14 @@ CCalendar * CCalendar::BaseCalendar = nullptr;
 */
 void CDayOfTheWeek::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		std::string key = property.Key;
+		std::string value = property.Value;
 		
 		if (key == "name") {
 			this->Name = value;
@@ -75,9 +81,14 @@ void CDayOfTheWeek::ProcessConfigData(const CConfigData *config_data)
 */
 void CMonth::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		std::string key = property.Key;
+		std::string value = property.Value;
 		
 		if (key == "name") {
 			this->Name = value;
@@ -171,9 +182,14 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 {
 	std::string base_day_of_the_week;
 	
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		std::string key = property.Key;
+		std::string value = property.Value;
 		
 		if (key == "name") {
 			this->Name = value;
@@ -213,9 +229,14 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 			CDate date;
 			CDate intersecting_date;
 				
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
+				
+				std::string key = property.Key;
+				std::string value = property.Value;
 				
 				if (key == "calendar") {
 					value = FindAndReplaceString(value, "_", "-");

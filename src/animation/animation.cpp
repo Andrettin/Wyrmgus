@@ -60,6 +60,7 @@
 #include "action/actions.h"
 #include "action/action_spellcast.h"
 #include "config.h"
+#include "config_operator.h"
 #include "iolib.h"
 #include "player.h"
 #include "script.h"
@@ -546,65 +547,68 @@ bool CAnimations::ProcessConfigDataSection(const CConfigData *section)
 		CAnimation *first_anim = nullptr;
 		CAnimation *prev_anim = nullptr;
 		
-		for (size_t j = 0; j < section->Properties.size(); ++j) {
-			std::string key = section->Properties[j].first;
-			std::string value = section->Properties[j].second;
-				CAnimation *anim = nullptr;
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
 			
-			if (section->Tag == "death" && key == "death_type") {
-				value = FindAndReplaceString(value, "_", "-");
+			CAnimation *anim = nullptr;
+			
+			if (section->Tag == "death" && property.Key == "death_type") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				death_type = value.c_str();
-			} else if (section->Tag == "harvest" && key == "resource") {
-				value = FindAndReplaceString(value, "_", "-");
+			} else if (section->Tag == "harvest" && property.Key == "resource") {
+				std::string value = FindAndReplaceString(property.Value, "_", "-");
 				res = GetResourceIdByName(value.c_str());
 				if (res == -1) {
 					fprintf(stderr, "Invalid resource for harvest animation: \"%s\".\n", value.c_str());
 				}
-			} else if (key == "frame") {
+			} else if (property.Key == "frame") {
 				anim = new CAnimation_Frame;
-			} else if (key == "exact-frame") {
+			} else if (property.Key == "exact-frame") {
 				anim = new CAnimation_ExactFrame;
-			} else if (key == "wait") {
+			} else if (property.Key == "wait") {
 				anim = new CAnimation_Wait;
-			} else if (key == "random-wait") {
+			} else if (property.Key == "random-wait") {
 				anim = new CAnimation_RandomWait;
-			} else if (key == "sound") {
+			} else if (property.Key == "sound") {
 				anim = new CAnimation_Sound;
-			} else if (key == "random-sound") {
+			} else if (property.Key == "random-sound") {
 				anim = new CAnimation_RandomSound;
-			} else if (key == "attack") {
+			} else if (property.Key == "attack") {
 				anim = new CAnimation_Attack;
-			} else if (key == "spawn-missile") {
+			} else if (property.Key == "spawn-missile") {
 				anim = new CAnimation_SpawnMissile;
-			} else if (key == "spawn-unit") {
+			} else if (property.Key == "spawn-unit") {
 				anim = new CAnimation_SpawnUnit;
-			} else if (key == "if-var") {
+			} else if (property.Key == "if-var") {
 				anim = new CAnimation_IfVar;
-			} else if (key == "set-var") {
+			} else if (property.Key == "set-var") {
 				anim = new CAnimation_SetVar;
-			} else if (key == "set-player-var") {
+			} else if (property.Key == "set-player-var") {
 				anim = new CAnimation_SetPlayerVar;
-			} else if (key == "die") {
+			} else if (property.Key == "die") {
 				anim = new CAnimation_Die();
-			} else if (key == "rotate") {
+			} else if (property.Key == "rotate") {
 				anim = new CAnimation_Rotate;
-			} else if (key == "random-rotate") {
+			} else if (property.Key == "random-rotate") {
 				anim = new CAnimation_RandomRotate;
-			} else if (key == "move") {
+			} else if (property.Key == "move") {
 				anim = new CAnimation_Move;
-			} else if (key == "unbreakable") {
+			} else if (property.Key == "unbreakable") {
 				anim = new CAnimation_Unbreakable;
-			} else if (key == "goto") {
+			} else if (property.Key == "goto") {
 				anim = new CAnimation_Goto;
-			} else if (key == "random-goto") {
+			} else if (property.Key == "random-goto") {
 				anim = new CAnimation_RandomGoto;
 			} else {
-				fprintf(stderr, "Invalid animation property: \"%s\".\n", key.c_str());
+				fprintf(stderr, "Invalid animation property: \"%s\".\n", property.Key.c_str());
 				continue;
 			}
 			
 			if (anim) {
-				anim->Init(value.c_str(), nullptr);
+				anim->Init(property.Value.c_str(), nullptr);
 				
 				if (!first_anim) {
 					first_anim = anim;

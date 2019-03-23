@@ -74,7 +74,7 @@ static int CclDefineText(lua_State *l)
 		} else if (!strcmp(value, "Notes")) {
 			text->Notes = LuaToString(l, -1);
 		} else if (!strcmp(value, "Year")) {
-			text->Year = LuaToNumber(l, -1);
+			text->PublicationYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "InitialPage")) {
 			text->InitialPage = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Chapters")) {
@@ -169,7 +169,7 @@ static int CclGetTextData(lua_State *l)
 		lua_pushstring(l, text->GetNotes().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Year")) {
-		lua_pushnumber(l, text->GetYear());
+		lua_pushnumber(l, text->GetPublicationYear());
 		return 1;
 	} else if (!strcmp(data, "InitialPage")) {
 		lua_pushnumber(l, text->GetInitialPage());

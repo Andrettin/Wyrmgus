@@ -36,6 +36,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "config.h"
+#include "config_operator.h"
 #include "script.h"
 #include "unit/unit.h"
 
@@ -48,9 +49,14 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 {
 	this->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.GetNumberVariable()];
 	
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
+		
+		std::string key = property.Key;
+		std::string value = property.Value;
 		
 		key = SnakeCaseToPascalCase(key);
 		
@@ -78,9 +84,14 @@ void Spell_AdjustVariable::ProcessConfigData(const CConfigData *config_data)
 		
 		int index = UnitTypeVar.VariableNameLookup[tag.c_str()];
 		if (index != -1) {
-			for (size_t j = 0; j < section->Properties.size(); ++j) {
-				std::string key = section->Properties[j].first;
-				std::string value = section->Properties[j].second;
+			for (const CConfigProperty &property : section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
+				
+				std::string key = property.Key;
+				std::string value = property.Value;
 				
 				if (key == "enable") {
 					this->Var[index].Enable = StringToBool(value);

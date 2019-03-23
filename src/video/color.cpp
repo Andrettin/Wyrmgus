@@ -32,6 +32,7 @@
 #include "video/color.h"
 
 #include "config.h"
+#include "config_operator.h"
 #include "script.h"
 
 #include "SDL.h"
@@ -78,20 +79,22 @@ CColor CColor::FromString(const std::string &str)
 */
 void CColor::ProcessConfigData(const CConfigData *config_data)
 {
-	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
-		std::string key = config_data->Properties[i].first;
-		std::string value = config_data->Properties[i].second;
+	for (const CConfigProperty &property : config_data->Properties) {
+		if (property.Operator != CConfigOperator::Assignment) {
+			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+			continue;
+		}
 		
-		if (key == "red") {
-			this->R = std::stoi(value);
-		} else if (key == "green") {
-			this->G = std::stoi(value);
-		} else if (key == "blue") {
-			this->B = std::stoi(value);
-		} else if (key == "alpha") {
-			this->A = std::stoi(value);
+		if (property.Key == "red") {
+			this->R = std::stoi(property.Value);
+		} else if (property.Key == "green") {
+			this->G = std::stoi(property.Value);
+		} else if (property.Key == "blue") {
+			this->B = std::stoi(property.Value);
+		} else if (property.Key == "alpha") {
+			this->A = std::stoi(property.Value);
 		} else {
-			fprintf(stderr, "Invalid color property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid color property: \"%s\".\n", property.Key.c_str());
 		}
 	}
 }
