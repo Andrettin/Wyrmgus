@@ -35,19 +35,13 @@
 
 #include "literary_text.h"
 
-#include "text_chapter.h"
+#include "config.h"
+#include "literary_text_page.h"
 #include "ui/icon.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-CLiteraryText::~CLiteraryText()
-{
-	for (CLiteraryTextChapter *chapter : this->Chapters) {
-		delete chapter;
-	}
-}
 
 /**
 **	@brief	Process a property in the data provided by a configuration file
@@ -80,6 +74,13 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 	} else if (key == "icon") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->Icon = CIcon::Get(value);
+	} else if (key == "section") {
+		value = FindAndReplaceString(value, "_", "-");
+		CLiteraryText *section = CLiteraryText::Get(value);
+		if (section != nullptr) {
+			this->Sections.push_back(section);
+			section->MainText = this;
+		}
 	} else {
 		return false;
 	}
@@ -87,11 +88,59 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 	return true;
 }
 
-CLiteraryTextChapter *CLiteraryText::GetChapter(const std::string &chapter_name) const
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CLiteraryText::ProcessConfigDataSection(const CConfigData *section)
 {
-	for (CLiteraryTextChapter *chapter : this->Chapters) {
-		if (chapter_name == chapter->Name) {
-			return chapter;
+	if (section->Tag == "page") {
+		const int page_number = this->GetInitialPage() + this->GetPages().size();
+		
+		CLiteraryTextPage *previous_page = nullptr;
+		if (!this->GetPages().empty()) {
+			previous_page = this->GetPages().back();
+		}
+		
+		CLiteraryTextPage *page = new CLiteraryTextPage(page_number, previous_page);
+		page->ProcessConfigData(section);
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Initialize the literary text
+*/
+void CLiteraryText::Initialize()
+{
+	if (!this->GetPages().empty() && !this->GetSections().empty()) {
+		fprintf(stderr, "The literary text \"%s\" has both pages and sections, but if it has sections then it should have no pages directly.\n", this->GetIdent().utf8().get_data());
+	}
+	
+	CLiteraryText *previous_section = nullptr;
+	for (CLiteraryText *section : this->GetSections()) {
+		if (previous_section != nullptr) {
+			previous_section->NextSection = section;
+			section->PreviousSection = previous_section;
+		}
+		
+		previous_section = section;
+	}
+	
+	this->Initialized = true;
+}
+
+CLiteraryText *CLiteraryText::GetSection(const std::string &section_name) const
+{
+	for (CLiteraryText *section : this->GetSections()) {
+		if (String(section_name.c_str()) == section->GetName()) {
+			return section;
 		}
 	}
 	
@@ -110,4 +159,6 @@ void CLiteraryText::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_year"), &CLiteraryText::GetYear);
 	ClassDB::bind_method(D_METHOD("get_initial_page"), &CLiteraryText::GetInitialPage);
 	ClassDB::bind_method(D_METHOD("get_icon"), &CLiteraryText::GetIcon);
+	ClassDB::bind_method(D_METHOD("get_previous_section"), &CLiteraryText::GetPreviousSection);
+	ClassDB::bind_method(D_METHOD("get_next_section"), &CLiteraryText::GetNextSection);
 }

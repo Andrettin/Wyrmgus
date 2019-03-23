@@ -172,6 +172,10 @@ private: \
 
 class CConfigData;
 
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
 class CDataType : public Object
 {
 	GDCLASS(CDataType, Object)

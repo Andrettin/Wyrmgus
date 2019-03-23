@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name text_chapter.cpp - The text chapter source file. */
+/**@name literary_text_page.h - The literary text page header file. */
 //
-//      (c) Copyright 2016-2019 by Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,14 +27,70 @@
 //      02111-1307, USA.
 //
 
+#ifndef __LITERARY_TEXT_PAGE_H__
+#define __LITERARY_TEXT_PAGE_H__
+
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
-#include "text_chapter.h"
+#include <core/object.h>
+#include <core/ustring.h>
 
 /*----------------------------------------------------------------------------
---  Functions
+--  Declarations
 ----------------------------------------------------------------------------*/
+
+struct lua_State;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CLiteraryTextPage : public Object
+{
+	GDCLASS(CLiteraryTextPage, Object)
+	
+public:
+	CLiteraryTextPage(const int number, CLiteraryTextPage *previous_page) : Number(number), PreviousPage(previous_page)
+	{
+		if (previous_page != nullptr) {
+			previous_page->NextPage = this;
+		}
+	}
+
+	void ProcessConfigData(const CConfigData *config_data);
+	
+	const String &GetText() const
+	{
+		return this->Text;
+	}
+	
+	int GetNumber() const
+	{
+		return this->Number;
+	}
+	
+	CLiteraryTextPage *GetPreviousPage() const
+	{
+		return this->PreviousPage;
+	}
+	
+	CLiteraryTextPage *GetNextPage() const
+	{
+		return this->NextPage;
+	}
+	
+private:
+	String Text;					/// the text of the page
+	int Number = -1;				/// the number of the page
+	CLiteraryTextPage *PreviousPage = nullptr;	/// the previous page
+	CLiteraryTextPage *NextPage = nullptr;	/// the next page
+	
+	friend int CclDefineText(lua_State *l);
+	
+protected:
+	static void _bind_methods();
+};
+
+#endif

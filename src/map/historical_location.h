@@ -45,6 +45,10 @@ class CConfigData;
 class CMapTemplate;
 class CSite;
 
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
 class CHistoricalLocation
 {
 public:

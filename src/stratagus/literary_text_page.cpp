@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name historical_location.cpp - The historical location source file. */
+/**@name literary_text_page.cpp - The literary text page source file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2016-2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,12 +33,8 @@
 
 #include "stratagus.h"
 
-#include "map/historical_location.h"
-
 #include "config.h"
-#include "map/map.h"
-#include "map/map_template.h"
-#include "map/site.h"
+#include "literary_text_page.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -49,44 +45,27 @@
 **
 **	@param	config_data	The configuration data
 */
-void CHistoricalLocation::ProcessConfigData(const CConfigData *config_data)
+void CLiteraryTextPage::ProcessConfigData(const CConfigData *config_data)
 {
 	for (size_t i = 0; i < config_data->Properties.size(); ++i) {
 		std::string key = config_data->Properties[i].first;
 		std::string value = config_data->Properties[i].second;
 		
-		if (key == "date") {
+		if (key == "text") {
 			value = FindAndReplaceString(value, "_", "-");
-			this->Date = CDate::FromString(value);
-		} else if (key == "map_template") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->MapTemplate = CMapTemplate::Get(value);
-			if (!this->MapTemplate) {
-				fprintf(stderr, "Map template \"%s\" does not exist.\n", value.c_str());
-			}
-		} else if (key == "site") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Site = CSite::Get(value);
-			if (this->Site) {
-				this->MapTemplate = this->Site->MapTemplate;
-				this->Position = this->Site->Position;
-			} else {
-				fprintf(stderr, "Site \"%s\" does not exist.\n", value.c_str());
-			}
-		} else if (key == "x") {
-			this->Position.x = std::stoi(value);
-		} else if (key == "y") {
-			this->Position.y = std::stoi(value);
+			this->Text = value.c_str();
+		} else if (key == "number") { // override the number given in the constructor
+			this->Number = std::stoi(value);
 		} else {
-			fprintf(stderr, "Invalid historical location property: \"%s\".\n", key.c_str());
+			fprintf(stderr, "Invalid literary text property: \"%s\".\n", key.c_str());
 		}
 	}
-	
-	if (this->Date.Year == 0) {
-		fprintf(stderr, "Historical location has no date.\n");
-	}
-	
-	if (!this->MapTemplate) {
-		fprintf(stderr, "Historical location has no map template.\n");
-	}
+}
+
+void CLiteraryTextPage::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_text"), &CLiteraryTextPage::GetText);
+	ClassDB::bind_method(D_METHOD("get_number"), &CLiteraryTextPage::GetNumber);
+	ClassDB::bind_method(D_METHOD("get_previous_page"), &CLiteraryTextPage::GetPreviousPage);
+	ClassDB::bind_method(D_METHOD("get_next_page"), &CLiteraryTextPage::GetNextPage);
 }

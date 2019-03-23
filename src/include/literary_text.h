@@ -30,11 +30,23 @@
 #ifndef __LITERARY_TEXT_H__
 #define __LITERARY_TEXT_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "data_type.h"
 
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
 class CIcon;
-class CLiteraryTextChapter;
+class CLiteraryTextPage;
 struct lua_State;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
 
 class CLiteraryText : public CDataType
 {
@@ -42,9 +54,9 @@ class CLiteraryText : public CDataType
 	DATA_TYPE_CLASS(CLiteraryText)
 	
 public:
-	~CLiteraryText();
-	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	virtual void Initialize() override;
 	
 	const String &GetName() const
 	{
@@ -96,7 +108,37 @@ public:
 		return this->Icon;
 	}
 	
-	CLiteraryTextChapter *GetChapter(const std::string &chapter_name) const;
+	const std::vector<CLiteraryText *> &GetSections() const
+	{
+		return this->Sections;
+	}
+	
+	int GetSectionIndex() const
+	{
+		return this->SectionIndex;
+	}
+	
+	CLiteraryText *GetPreviousSection() const
+	{
+		return this->PreviousSection;
+	}
+	
+	CLiteraryText *GetNextSection() const
+	{
+		return this->NextSection;
+	}
+	
+	const std::vector<CLiteraryTextPage *> &GetPages() const
+	{
+		return this->Pages;
+	}
+	
+	CLiteraryText *GetSection(const std::string &section_name) const;
+	
+	bool IsIntroduction() const
+	{
+		return this->Introduction;
+	}
 	
 private:
 	String Name;					/// name of the text
@@ -109,10 +151,15 @@ private:
 	int Year = 0;					/// year of publication
 	int InitialPage = 1;			/// page in which the text begins
 	CIcon *Icon = nullptr;			/// the text's icon
+	CLiteraryText *MainText = nullptr;	/// the main text to which this one belongs, if it is a section
+	std::vector<CLiteraryText *> Sections;	/// the sections of the literary text, e.g. different chapters, or volumes
+	int SectionIndex = -1;						/// the section index of this literary text, if it is a section
+	CLiteraryText *PreviousSection = nullptr;	/// the previous section to this one, if this is a section
+	CLiteraryText *NextSection = nullptr;	/// the next section to this one, if this is a section
+	bool Introduction = false;		/// whether this is an introductory chapter
+	std::vector<CLiteraryTextPage *> Pages;	/// pages of the literary text
 	
 public:
-	std::vector<CLiteraryTextChapter *> Chapters;	/// The chapters of the text
-	
 	friend int CclDefineText(lua_State *l);
 	
 protected:

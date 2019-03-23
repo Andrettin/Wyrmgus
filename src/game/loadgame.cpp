@@ -79,7 +79,6 @@
 #include "species/species_category.h"
 #include "species/species_category_rank.h"
 #include "spell/spells.h"
-#include "text_chapter.h"
 #include "time/calendar.h"
 #include "time/season.h"
 #include "time/season_schedule.h"
