@@ -5375,7 +5375,9 @@ int CUnit::GetModifiedVariable(const int index, const int variable_type) const
 		if (this->Container && this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Enable) {
 			value += this->Container->Variable[GARRISONEDRANGEBONUS_INDEX].Value; //treat the container's attack range as a bonus to the unit's attack range
 		}
-		value = std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
+		if (this->CurrentSightRange > 0) {
+			value = std::min<int>(this->CurrentSightRange, value); //if the unit's current sight range is smaller than its attack range, use it instead
+		}
 	} else if (index == SPEED_INDEX) {
 		if (this->MapLayer && this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) {
 			value += DefaultTileMovementCost - this->MapLayer->Field(this->Offset)->getCost();
