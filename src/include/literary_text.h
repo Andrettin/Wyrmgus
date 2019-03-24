@@ -83,9 +83,9 @@ public:
 		return this->Publisher;
 	}
 	
-	const String &GetCopyrightNotice() const
+	const String &GetLicense() const
 	{
-		return this->CopyrightNotice;
+		return this->License;
 	}
 	
 	const String &GetNotes() const
@@ -111,6 +111,17 @@ public:
 	const std::vector<CLiteraryText *> &GetSections() const
 	{
 		return this->Sections;
+	}
+	
+	Array GetSectionsArray() const
+	{
+		Array sections;
+		
+		for (CLiteraryText *section : this->GetSections()) {
+			sections.push_back(section);
+		}
+		
+		return sections;
 	}
 	
 	CLiteraryText *GetMainText() const
@@ -169,7 +180,7 @@ private:
 	String Author;					/// author of the text
 	String Translator;				/// translator of the text
 	String Publisher;				/// publisher of the text
-	String CopyrightNotice;			/// copyright notice explaining that this text is in the public domain, or is licensed under an open-source license
+	String License;					/// the open-source license the text is under, or public domain if that's the case
 	String Notes;					/// notes to appear on the cover of the text
 	int PublicationYear = 0;		/// year of publication
 	int InitialPage = 1;			/// page in which the text begins

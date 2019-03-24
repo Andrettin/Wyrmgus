@@ -70,7 +70,7 @@ static int CclDefineText(lua_State *l)
 		} else if (!strcmp(value, "Publisher")) {
 			text->Publisher = LuaToString(l, -1);
 		} else if (!strcmp(value, "CopyrightNotice")) {
-			text->CopyrightNotice = LuaToString(l, -1);
+			text->License = LuaToString(l, -1);
 		} else if (!strcmp(value, "Notes")) {
 			text->Notes = LuaToString(l, -1);
 		} else if (!strcmp(value, "Year")) {
@@ -163,7 +163,7 @@ static int CclGetTextData(lua_State *l)
 		lua_pushstring(l, text->GetPublisher().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "CopyrightNotice")) {
-		lua_pushstring(l, text->GetCopyrightNotice().utf8().get_data());
+		lua_pushstring(l, text->GetLicense().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Notes")) {
 		lua_pushstring(l, text->GetNotes().utf8().get_data());

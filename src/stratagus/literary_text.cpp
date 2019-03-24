@@ -63,8 +63,8 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 		this->Translator = value.c_str();
 	} else if (key == "publisher") {
 		this->Publisher = value.c_str();
-	} else if (key == "copyright_notice") {
-		this->CopyrightNotice = value.c_str();
+	} else if (key == "license") {
+		this->License = value.c_str();
 	} else if (key == "notes") {
 		this->Notes = value.c_str();
 	} else if (key == "publication_year") {
@@ -155,11 +155,12 @@ void CLiteraryText::_bind_methods()
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CLiteraryText::IsHidden);
 	ClassDB::bind_method(D_METHOD("get_translator"), &CLiteraryText::GetTranslator);
 	ClassDB::bind_method(D_METHOD("get_publisher"), &CLiteraryText::GetPublisher);
-	ClassDB::bind_method(D_METHOD("get_copyright_notice"), &CLiteraryText::GetCopyrightNotice);
+	ClassDB::bind_method(D_METHOD("get_license"), &CLiteraryText::GetLicense);
 	ClassDB::bind_method(D_METHOD("get_notes"), &CLiteraryText::GetNotes);
 	ClassDB::bind_method(D_METHOD("get_publication_year"), &CLiteraryText::GetPublicationYear);
 	ClassDB::bind_method(D_METHOD("get_initial_page"), &CLiteraryText::GetInitialPage);
 	ClassDB::bind_method(D_METHOD("get_icon"), &CLiteraryText::GetIcon);
+	ClassDB::bind_method(D_METHOD("get_sections"), &CLiteraryText::GetSectionsArray);
 	ClassDB::bind_method(D_METHOD("get_main_text"), &CLiteraryText::GetMainText);
 	ClassDB::bind_method(D_METHOD("get_previous_section"), &CLiteraryText::GetPreviousSection);
 	ClassDB::bind_method(D_METHOD("get_next_section"), &CLiteraryText::GetNextSection);
