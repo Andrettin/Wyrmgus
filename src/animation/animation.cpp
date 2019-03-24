@@ -49,11 +49,9 @@
 #include "animation/animation_randomsound.h"
 #include "animation/animation_randomwait.h"
 #include "animation/animation_rotate.h"
-#include "animation/animation_setplayervar.h"
 #include "animation/animation_setvar.h"
 #include "animation/animation_sound.h"
 #include "animation/animation_spawnmissile.h"
-#include "animation/animation_spawnunit.h"
 #include "animation/animation_unbreakable.h"
 #include "animation/animation_wait.h"
 
@@ -229,31 +227,6 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 			return 1;
 		}
 		return 0;
-	} else if (s[0] == 'p') { //player variable detected
-		char *next;
-		if (*cur == '(') {
-			++cur;
-			char *end = strchr(cur, ')');
-			if (end == nullptr) {
-				fprintf(stderr, "ParseAnimInt: expected ')'\n");
-				ExitFatal(1);
-			}
-			*end = '\0';
-			next = end + 1;
-		} else {
-			next = strchr(cur, '.');
-		}
-		if (next == nullptr) {
-			fprintf(stderr, "Need also specify the %s player's property\n", cur);
-			ExitFatal(1);
-		} else {
-			*next = '\0';
-		}
-		char *arg = strchr(next + 1, '.');
-		if (arg != nullptr) {
-			*arg = '\0';
-		}
-		return GetPlayerData(ParseAnimPlayer(unit, cur), next + 1, arg + 1);
 	} else if (s[0] == 'r') { //random value
 		char *next = strchr(cur, '.');
 		if (next == nullptr) {
@@ -263,9 +236,6 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 			const int min = atoi(cur);
 			return min + SyncRand(atoi(next + 1) - min + 1);
 		}
-	} else if (s[0] == 'l') { //player number
-		return ParseAnimPlayer(unit, cur);
-
 	}
 	// Check if we trying to parse a number
 	Assert(isdigit(s[0]) || s[0] == '-');
@@ -310,18 +280,6 @@ int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 				flags |= SM_Ranged;
 			}  else if (!strcmp(cur, "setdirection")) {
 				flags |= SM_SetDirection;
-			} else {
-				fprintf(stderr, "Unknown animation flag: %s\n", cur);
-				ExitFatal(1);
-			}
-		} else if (unit.Anim.Anim->Type == AnimationSpawnUnit) {
-			if (!strcmp(cur, "none")) {
-				flags = SU_None;
-				return flags;
-			} else if (!strcmp(cur, "summoned")) {
-				flags |= SU_Summoned;
-			} else if (!strcmp(cur, "jointoai")) {
-				flags |= SU_JoinToAIForce;
 			} else {
 				fprintf(stderr, "Unknown animation flag: %s\n", cur);
 				ExitFatal(1);
@@ -566,33 +524,29 @@ bool CAnimations::ProcessConfigDataSection(const CConfigData *section)
 				}
 			} else if (property.Key == "frame") {
 				anim = new CAnimation_Frame;
-			} else if (property.Key == "exact-frame") {
+			} else if (property.Key == "exact_frame") {
 				anim = new CAnimation_ExactFrame;
 			} else if (property.Key == "wait") {
 				anim = new CAnimation_Wait;
-			} else if (property.Key == "random-wait") {
+			} else if (property.Key == "random_wait") {
 				anim = new CAnimation_RandomWait;
 			} else if (property.Key == "sound") {
 				anim = new CAnimation_Sound;
-			} else if (property.Key == "random-sound") {
+			} else if (property.Key == "random_sound") {
 				anim = new CAnimation_RandomSound;
 			} else if (property.Key == "attack") {
 				anim = new CAnimation_Attack;
-			} else if (property.Key == "spawn-missile") {
+			} else if (property.Key == "spawn_missile") {
 				anim = new CAnimation_SpawnMissile;
-			} else if (property.Key == "spawn-unit") {
-				anim = new CAnimation_SpawnUnit;
-			} else if (property.Key == "if-var") {
+			} else if (property.Key == "if_var") {
 				anim = new CAnimation_IfVar;
-			} else if (property.Key == "set-var") {
+			} else if (property.Key == "set_var") {
 				anim = new CAnimation_SetVar;
-			} else if (property.Key == "set-player-var") {
-				anim = new CAnimation_SetPlayerVar;
 			} else if (property.Key == "die") {
 				anim = new CAnimation_Die();
 			} else if (property.Key == "rotate") {
 				anim = new CAnimation_Rotate;
-			} else if (property.Key == "random-rotate") {
+			} else if (property.Key == "random_rotate") {
 				anim = new CAnimation_RandomRotate;
 			} else if (property.Key == "move") {
 				anim = new CAnimation_Move;
@@ -600,7 +554,7 @@ bool CAnimations::ProcessConfigDataSection(const CConfigData *section)
 				anim = new CAnimation_Unbreakable;
 			} else if (property.Key == "goto") {
 				anim = new CAnimation_Goto;
-			} else if (property.Key == "random-goto") {
+			} else if (property.Key == "random_goto") {
 				anim = new CAnimation_RandomGoto;
 			} else {
 				fprintf(stderr, "Invalid animation property: \"%s\".\n", property.Key.c_str());
@@ -777,14 +731,10 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 		anim = new CAnimation_Attack;
 	} else if (op1 == "spawn-missile") {
 		anim = new CAnimation_SpawnMissile;
-	} else if (op1 == "spawn-unit") {
-		anim = new CAnimation_SpawnUnit;
 	} else if (op1 == "if-var") {
 		anim = new CAnimation_IfVar;
 	} else if (op1 == "set-var") {
 		anim = new CAnimation_SetVar;
-	} else if (op1 == "set-player-var") {
-		anim = new CAnimation_SetPlayerVar;
 	} else if (op1 == "die") {
 		anim = new CAnimation_Die();
 	} else if (op1 == "rotate") {

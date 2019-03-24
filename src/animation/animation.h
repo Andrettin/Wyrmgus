@@ -33,18 +33,15 @@
 #include "data_type.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
 
-#include <string>
-#include <map>
-
 #define ANIMATIONS_DEATHTYPES 40
-
-class CFile;
-class CUnit;
-struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+class CFile;
+class CUnit;
+struct lua_State;
 
 /**
 **  Default names for the extra death types.
@@ -68,12 +65,9 @@ enum AnimationType {
 	AnimationGoto,
 	AnimationRandomGoto,
 	AnimationSpawnMissile,
-	AnimationSpawnUnit,
 	AnimationIfVar,
 	AnimationSetVar,
-	AnimationSetPlayerVar,
-	AnimationDie,
-	AnimationLuaCallback
+	AnimationDie
 };
 
 //Modify types
@@ -89,6 +83,10 @@ enum SetVar_ModifyTypes {
 	modXor,          /// Bitwise XOR
 	modNot,          /// Bitwise NOT
 };
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
 
 class CAnimation
 {

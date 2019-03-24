@@ -38,7 +38,6 @@
 //Wyrmgus start
 #include "action/actions.h"
 //Wyrmgus end
-#include "animation/animation_setplayervar.h"
 #include "civilization.h"
 #include "config.h"
 //Wyrmgus start
@@ -1192,6 +1191,152 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 			return *unitdesc->D.AUnit;
 	}
 	return nullptr;
+}
+
+/**
+**  Gets the player data.
+**
+**  @param player  Player number.
+**  @param prop    Player's property.
+**  @param arg     Additional argument (for resource and unit).
+**
+**  @return  Returning value (only integer).
+*/
+static int GetPlayerData(const int player, const char *prop, const char *arg)
+{
+	if (!strcmp(prop, "RaceName")) {
+		return CPlayer::Players[player]->Race;
+	} else if (!strcmp(prop, "Resources")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->Resources[resId] + CPlayer::Players[player]->StoredResources[resId];
+	} else if (!strcmp(prop, "StoredResources")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->StoredResources[resId];
+	} else if (!strcmp(prop, "MaxResources")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->MaxResources[resId];
+	} else if (!strcmp(prop, "Incomes")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->Incomes[resId];
+	//Wyrmgus start
+	} else if (!strcmp(prop, "Prices")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->GetResourcePrice(resId);
+	} else if (!strcmp(prop, "ResourceDemand")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->ResourceDemand[resId];
+	} else if (!strcmp(prop, "StoredResourceDemand")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->StoredResourceDemand[resId];
+	} else if (!strcmp(prop, "EffectiveResourceDemand")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->GetEffectiveResourceDemand(resId);
+	} else if (!strcmp(prop, "EffectiveResourceBuyPrice")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->GetEffectiveResourceBuyPrice(resId);
+	} else if (!strcmp(prop, "EffectiveResourceSellPrice")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->GetEffectiveResourceSellPrice(resId);
+	} else if (!strcmp(prop, "TradeCost")) {
+		return CPlayer::Players[player]->TradeCost;
+	//Wyrmgus end
+	} else if (!strcmp(prop, "UnitTypesCount")) {
+		const std::string unit(arg);
+		CUnitType *type = UnitTypeByIdent(unit);
+		Assert(type);
+		return CPlayer::Players[player]->GetUnitTypeCount(type);
+	} else if (!strcmp(prop, "UnitTypesUnderConstructionCount")) {
+		const std::string unit(arg);
+		CUnitType *type = UnitTypeByIdent(unit);
+		Assert(type);
+		return CPlayer::Players[player]->GetUnitTypeUnderConstructionCount(type);
+	} else if (!strcmp(prop, "UnitTypesAiActiveCount")) {
+		const std::string unit(arg);
+		CUnitType *type = UnitTypeByIdent(unit);
+		Assert(type);
+		return CPlayer::Players[player]->GetUnitTypeAiActiveCount(type);
+	} else if (!strcmp(prop, "AiEnabled")) {
+		return CPlayer::Players[player]->AiEnabled;
+	} else if (!strcmp(prop, "TotalNumUnits")) {
+		return CPlayer::Players[player]->GetUnitCount();
+	} else if (!strcmp(prop, "NumBuildings")) {
+		return CPlayer::Players[player]->NumBuildings;
+	//Wyrmgus start
+	} else if (!strcmp(prop, "NumBuildingsUnderConstruction")) {
+		return CPlayer::Players[player]->NumBuildingsUnderConstruction;
+	//Wyrmgus end
+	} else if (!strcmp(prop, "Supply")) {
+		return CPlayer::Players[player]->Supply;
+	} else if (!strcmp(prop, "Demand")) {
+		return CPlayer::Players[player]->Demand;
+	} else if (!strcmp(prop, "UnitLimit")) {
+		return CPlayer::Players[player]->UnitLimit;
+	} else if (!strcmp(prop, "BuildingLimit")) {
+		return CPlayer::Players[player]->BuildingLimit;
+	} else if (!strcmp(prop, "TotalUnitLimit")) {
+		return CPlayer::Players[player]->TotalUnitLimit;
+	} else if (!strcmp(prop, "Score")) {
+		return CPlayer::Players[player]->Score;
+	} else if (!strcmp(prop, "TotalUnits")) {
+		return CPlayer::Players[player]->TotalUnits;
+	} else if (!strcmp(prop, "TotalBuildings")) {
+		return CPlayer::Players[player]->TotalBuildings;
+	} else if (!strcmp(prop, "TotalResources")) {
+		const int resId = GetResourceIdByName(arg);
+		if (resId == -1) {
+			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			Exit(1);
+		}
+		return CPlayer::Players[player]->TotalResources[resId];
+	} else if (!strcmp(prop, "TotalRazings")) {
+		return CPlayer::Players[player]->TotalRazings;
+	} else if (!strcmp(prop, "TotalKills")) {
+		return CPlayer::Players[player]->TotalKills;
+	} else {
+		fprintf(stderr, "Invalid field: %s" _C_ prop);
+		Exit(1);
+	}
+	return 0;
 }
 
 /**
