@@ -81,17 +81,8 @@
 #include "world/plane.h"
 #include "world/world.h"
 
-#include <boost/tokenizer.hpp>
-
 #include <fstream>
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-static boost::escaped_list_separator<char> ConfigTokenizerSeparator("\\", " \t\r", "\"");
-static boost::tokenizer<boost::escaped_list_separator<char>> ConfigTokenizer(std::string(), ConfigTokenizerSeparator);
-	
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -208,27 +199,66 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 **	@param	line	The line to be parsed
 **	@param	data	The vector holding the data file's output
 */
-void CConfigData::ParseLine(std::string &line, std::vector<std::string> &data)
+void CConfigData::ParseLine(const std::string &line, std::vector<std::string> &data)
 {
-	size_t comment_pos = 0;
-	while ((comment_pos = line.find('#', comment_pos)) != std::string::npos) {
-		size_t quotation_mark_pos = 0;
-		bool opened_quotation_marks = false;
-		while (((quotation_mark_pos = line.find('\"', quotation_mark_pos)) != std::string::npos) && quotation_mark_pos < comment_pos) {
-			opened_quotation_marks = !opened_quotation_marks;
-			++quotation_mark_pos;
+	bool opened_quotation_marks = false;
+	bool escaped = false;
+	std::string current_string;
+	
+	for (const char &character : line) {
+		if (!escaped) {
+			if (character == '\"') {
+				opened_quotation_marks = !opened_quotation_marks;
+				continue;
+			} else if (character == '\\') {
+				escaped = true; //escape character, so that e.g. newlines can be properly added to text
+				continue;
+			}
 		}
+		
 		if (!opened_quotation_marks) {
-			line = line.substr(0, comment_pos); //ignore what is written after the comment symbol ('#'), unless the symbol occurs within quotes
-			break;
+			if (character == '#') {
+				break; //ignore what is written after the comment symbol ('#'), as well as the symbol itself, unless it occurs within quotes
+			}
+			
+			//whitespace, carriage returns and etc. separate tokens, if they occur outside of quotes
+			if (character == ' ' || character == '\t' || character == '\r' || character == '\n') {
+				if (!current_string.empty()) {
+					data.push_back(current_string);
+					current_string.clear();
+				}
+				
+				continue;
+			}
 		}
-		++comment_pos;
+		
+	
+		if (escaped) {
+			escaped = false;
+			
+			if (character == 'n') {
+				current_string += '\n';
+				continue;
+			} else if (character == 't') {
+				current_string += '\t';
+				continue;
+			} else if (character == 'r') {
+				current_string += '\r';
+				continue;
+			} else if (character == '\"') {
+				current_string += '\"';
+				continue;
+			} else if (character == '\\') {
+				current_string += '\\';
+				continue;
+			}
+		}
+		
+		current_string += character;
 	}
 	
-	ConfigTokenizer.assign(line);
-	
-	for (const std::string &token : ConfigTokenizer) {
-		data.push_back(token);
+	if (!current_string.empty()) {
+		data.push_back(current_string);
 	}
 }
 

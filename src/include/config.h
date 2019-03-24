@@ -53,7 +53,7 @@ public:
 	}
 	
 	static void ParseConfigData(const std::string &filepath, const bool define_only);
-	static void ParseLine(std::string &line, std::vector<std::string> &data);
+	static void ParseLine(const std::string &line, std::vector<std::string> &data);
 	static void ProcessConfigData(const std::vector<CConfigData *> &config_data_list, const bool define_only);
 	
 	Color ProcessColor() const;
