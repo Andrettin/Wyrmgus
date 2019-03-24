@@ -38,6 +38,7 @@
 #include "missile/missile_config.h"
 #include "sound/unit_sound.h"
 #include "ui/icon_config.h"
+#include "unit/variable.h"
 #include "upgrade/upgrade_structs.h"
 #include "vec2i.h"
 #include "video/color.h"
@@ -73,6 +74,7 @@ class CPlane;
 class CSpecies;
 class CTerrainType;
 class CUniqueItem;
+class CVariable;
 class CWorld;
 //Wyrmgus end
 struct lua_State;
@@ -125,31 +127,6 @@ public:
 	//  Runtime info:
 	CPlayerColorGraphic *SpriteWhenLoaded = nullptr;	/// The graphic corresponding to FileWhenLoaded.
 	CPlayerColorGraphic *SpriteWhenEmpty = nullptr;	/// The graphic corresponding to FileWhenEmpty
-};
-
-/**
-**  User defined variable type.
-**
-**  It is used to define variables and use it after
-**  to manage magic, energy, shield or other stuff.
-*/
-class CVariable
-{
-public:
-	bool operator ==(const CVariable &rhs) const
-	{
-		return this->Max == rhs.Max
-			   && this->Value == rhs.Value
-			   && this->Increase == rhs.Increase
-			   && this->Enable == rhs.Enable;
-	}
-	bool operator !=(const CVariable &rhs) const { return !(*this == rhs); }
-
-public:
-	int Max = 0;	/// Maximum for the variable. (Assume min is 0.)
-	int Value = 0;	/// Current (or initial) value of the variable (or initial value).
-	char Increase = 0;	/// Number to increase(decrease) Value by second.
-	char Enable = 0;	/// True if the unit doesn't have this variable. (f.e shield)
 };
 
 // Index for boolflag already defined

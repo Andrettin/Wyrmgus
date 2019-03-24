@@ -90,6 +90,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
+#include "unit/variable.h"
 #include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
@@ -5311,7 +5312,7 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	return value;
 }
 
-int CUnit::GetModifiedVariable(int index, int variable_type) const
+int CUnit::GetModifiedVariable(const int index, const int variable_type) const
 {
 	int value = 0;
 	if (variable_type == VariableValue) {

@@ -34,11 +34,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-
 #include "player.h"
 #include "unit/unit_type.h"
 #include "vec2i.h"
+
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -378,7 +378,7 @@ public:
 	void SetIndividualUpgrade(const CUpgrade *upgrade, int quantity);
 	int GetIndividualUpgrade(const CUpgrade *upgrade) const;
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
-	int GetModifiedVariable(int index, int variable_type = 0) const;
+	int GetModifiedVariable(const int index, const int variable_type = 0) const;
 	int GetReactionRange() const;
 	int GetItemSlotQuantity(int item_slot) const;
 	int GetCurrentWeaponClass() const;
