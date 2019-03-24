@@ -369,11 +369,11 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 	}
 }
 
-#define WATER_TILE  0x10
-#define COAST_TILE  0x30
-#define GRASS_TILE  0x50
-#define WOOD_TILE   0x70
-#define ROCK_TILE   0x80
+constexpr int WATER_TILE = 0x10;
+constexpr int COAST_TILE = 0x30;
+constexpr int GRASS_TILE = 0x50;
+constexpr int WOOD_TILE = 0x70;
+constexpr int ROCK_TILE = 0x80;
 
 /**
 **  Add a unit to random locations on the map, unit will be neutral

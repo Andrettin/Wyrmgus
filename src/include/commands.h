@@ -316,6 +316,6 @@ extern void ExecExtendedCommand(unsigned char type, int status, unsigned char ar
 								unsigned short arg2, unsigned short arg3,
 								unsigned short arg4);
 
-#define FlushCommands 1          /// Flush commands in queue
+constexpr int FlushCommands = 1;		/// Flush commands in queue
 
 #endif

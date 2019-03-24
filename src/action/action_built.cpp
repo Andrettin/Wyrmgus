@@ -53,7 +53,7 @@
 #include "unit/unit_type.h"
 
 /// How many resources the player gets back if canceling building
-#define CancelBuildingCostsFactor  75
+constexpr int CANCEL_BUILDING_COSTS_FACTOR = 75;
 
 //Wyrmgus start
 //extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
@@ -158,7 +158,7 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 	// Player gets back 75% of the original cost for a building.
 	int type_costs[MaxCosts];
 	unit.Player->GetUnitTypeCosts(unit.Type, type_costs, false, true);
-	unit.Player->AddCostsFactor(type_costs, CancelBuildingCostsFactor);
+	unit.Player->AddCostsFactor(type_costs, CANCEL_BUILDING_COSTS_FACTOR);
 	// Cancel building
 	LetUnitDie(unit);
 }

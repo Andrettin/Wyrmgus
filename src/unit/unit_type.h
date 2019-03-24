@@ -80,8 +80,8 @@ class CWorld;
 struct lua_State;
 class LuaCallback;
 
-#define UnitSides 8
-#define MaxAttackPos 5
+constexpr int UnitSides = 8;
+constexpr int MaxAttackPos = 5;
 
 CUnitType *UnitTypeByIdent(const std::string &ident);
 

@@ -65,23 +65,23 @@
 
 /// Scrolling area (<= 15 y)
 //Wyrmgus start
-//#define SCROLL_UP     15
-#define SCROLL_UP     7
+//constexpr int SCROLL_UP = 15;
+constexpr int SCROLL_UP = 7;
 //Wyrmgus end
 /// Scrolling area (>= VideoHeight - 16 y)
 //Wyrmgus start
-//#define SCROLL_DOWN   (Video.Height - 16)
-#define SCROLL_DOWN   (Video.Height - 8)
+//#define SCROLL_DOWN (Video.Height - 16)
+#define SCROLL_DOWN (Video.Height - 8)
 //Wyrmgus end
 /// Scrolling area (<= 15 y)
 //Wyrmgus start
-//#define SCROLL_LEFT   15
-#define SCROLL_LEFT   7
+//constexpr int SCROLL_LEFT = 15;
+constexpr int SCROLL_LEFT = 7;
 //Wyrmgus end
 /// Scrolling area (>= VideoWidth - 16 x)
 //Wyrmgus start
-//#define SCROLL_RIGHT  (Video.Width - 16)
-#define SCROLL_RIGHT  (Video.Width - 7)
+//#define SCROLL_RIGHT (Video.Width - 16)
+#define SCROLL_RIGHT (Video.Width - 7)
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------

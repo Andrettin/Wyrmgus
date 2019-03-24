@@ -123,7 +123,7 @@ public:
 	LuaActionListener *Callback = nullptr;	/// callback function
 };
 
-#define MAX_NUM_VIEWPORTS 8         /// Number of supported viewports
+constexpr int MAX_NUM_VIEWPORTS = 8;	/// Number of supported viewports
 
 /**
 **  Enumeration of the different predefined viewport configurations.
@@ -331,7 +331,8 @@ public:
 	int TextX = -1;	/// text X position
 	int TextY = -1;	/// text Y position
 };
-#define MaxResourceInfo  MaxCosts + 4 /// +4 for food and score and mana and free workers count
+
+constexpr int MaxResourceInfo = MaxCosts + 4;	/// +4 for food and score and mana and free workers count
 
 class CInfoPanel
 {

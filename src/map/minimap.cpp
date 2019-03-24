@@ -56,15 +56,14 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define MINIMAP_FAC (16 * 3)  /// integer scale factor
+constexpr int MINIMAP_FAC = (16 * 3);  /// integer scale factor
 
 /// unit attacked are shown red for at least this amount of cycles
-#define ATTACK_RED_DURATION (1 * CYCLES_PER_SECOND)
+constexpr int ATTACK_RED_DURATION = (1 * CYCLES_PER_SECOND);
 /// unit attacked are shown blinking for this amount of cycles
-#define ATTACK_BLINK_DURATION (7 * CYCLES_PER_SECOND)
+constexpr int ATTACK_BLINK_DURATION = (7 * CYCLES_PER_SECOND);
 
-#define SCALE_PRECISION 100
-
+constexpr int SCALE_PRECISION = 100;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -116,7 +115,7 @@ static std::vector<int> MinimapScaleX;                  /// Minimap scale to fit
 static std::vector<int> MinimapScaleY;                  /// Minimap scale to fit into window
 //Wyrmgus end
 
-#define MAX_MINIMAP_EVENTS 8
+constexpr int MAX_MINIMAP_EVENTS = 8;
 
 struct MinimapEvent {
 	PixelPos pos;

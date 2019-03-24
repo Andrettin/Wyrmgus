@@ -50,7 +50,7 @@
 #include "upgrade/upgrade.h"
 
 /// How many resources the player gets back if canceling research
-#define CancelResearchCostsFactor  100
+constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 
 
 /*----------------------------------------------------------------------------
@@ -193,9 +193,9 @@
 	//Wyrmgus start
 //	unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;
 
-//	unit.Player->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+//	unit.Player->AddCostsFactor(upgrade.Costs, CANCEL_RESEARCH_COSTS_FACTOR);
 	CPlayer::Players[this->Player]->UpgradeTimers.Upgrades[upgrade.ID] = 0;
 
-	CPlayer::Players[this->Player]->AddCostsFactor(upgrade.Costs, CancelResearchCostsFactor);
+	CPlayer::Players[this->Player]->AddCostsFactor(upgrade.Costs, CANCEL_RESEARCH_COSTS_FACTOR);
 	//Wyrmgus end
 }

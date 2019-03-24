@@ -92,28 +92,28 @@ enum _key_state_ {
 };                        /// current keyboard state
 
 /// Key modifier
-#define ModifierShift 1        /// any shift key pressed
-#define ModifierControl 2      /// any control key pressed
-#define ModifierAlt 4          /// any alt key pressed
-#define ModifierSuper 8        /// super key (reserved for WM)
-#define ModifierDoublePress 16 /// key double pressed
+constexpr int ModifierShift = 1;	/// any shift key pressed
+constexpr int ModifierControl = 2;	/// any control key pressed
+constexpr int ModifierAlt = 4;		/// any alt key pressed
+constexpr int ModifierSuper = 8;	/// super key (reserved for WM)
+constexpr int ModifierDoublePress = 16;	/// key double pressed
 
-#define MouseDoubleShift 8   /// shift for double click button
-#define MouseDragShift   16  /// shift for drag button
-#define MouseHoldShift   24  /// shift for hold button
+constexpr int MouseDoubleShift = 8;	/// shift for double click button
+constexpr int MouseDragShift = 16;	/// shift for drag button
+constexpr int MouseHoldShift = 24;	/// shift for hold button
 
 /// pressed mouse button flags
-#define NoButton 0      /// No button
-#define LeftButton 2    /// Left button on mouse
-#define MiddleButton 4  /// Middle button on mouse
-#define RightButton 8   /// Right button on mouse
+constexpr int NoButton = 0;		/// No button
+constexpr int LeftButton = 2;	/// Left button on mouse
+constexpr int MiddleButton = 4;	/// Middle button on mouse
+constexpr int RightButton = 8;	/// Right button on mouse
 
-#define UpButton 16    /// Scroll up button on mouse
-#define DownButton 32  /// Scroll down button on mouse
+constexpr int UpButton = 16;	/// Scroll up button on mouse
+constexpr int DownButton = 32;	/// Scroll down button on mouse
 
-#define LeftAndMiddleButton  (LeftButton | MiddleButton)  /// Left + Middle button on mouse
-#define LeftAndRightButton   (LeftButton | RightButton)   /// Left + Right button on mouse
-#define MiddleAndRightButton (MiddleButton | RightButton) /// Middle + Right button on mouse
+constexpr int LeftAndMiddleButton = (LeftButton | MiddleButton);	/// Left + Middle button on mouse
+constexpr int LeftAndRightButton = (LeftButton | RightButton);		/// Left + Right button on mouse
+constexpr int MiddleAndRightButton = (MiddleButton | RightButton);	/// Middle + Right button on mouse
 
 /// Where is our cursor ?
 enum _cursor_on_ {
@@ -132,15 +132,15 @@ enum _cursor_on_ {
 };
 
 /// Are We Scrolling With the Keyboard ?
-#define ScrollNone 0        /// not scrolling
-#define ScrollUp 1          /// scroll up only
-#define ScrollDown 2        /// scroll down only
-#define ScrollLeft 4        /// scroll left only
-#define ScrollRight 8       /// scroll right only
-#define ScrollLeftUp 5      /// scroll left + up
-#define ScrollLeftDown 6    /// scroll left + down
-#define ScrollRightUp 9     /// scroll right + up
-#define ScrollRightDown 10  /// scroll right + down
+constexpr int ScrollNone = 0;		/// not scrolling
+constexpr int ScrollUp = 1;			/// scroll up only
+constexpr int ScrollDown = 2;		/// scroll down only
+constexpr int ScrollLeft = 4;		/// scroll left only
+constexpr int ScrollRight = 8;		/// scroll right only
+constexpr int ScrollLeftUp = 5;		/// scroll left + up
+constexpr int ScrollLeftDown = 6;	/// scroll left + down
+constexpr int ScrollRightUp = 9;	/// scroll right + up
+constexpr int ScrollRightDown = 10;	/// scroll right + down
 
 /*----------------------------------------------------------------------------
 --  Variables

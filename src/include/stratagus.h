@@ -148,44 +148,44 @@ extern const char NameLine[];
 --  Some limits
 ----------------------------------------------------------------------------*/
 
-#define PlayerMax    32                 /// How many players are supported
-#define UnitTypeMax  2048                /// How many unit types supported
-#define UpgradeMax   2048                /// How many upgrades supported
-#define MAX_RACES 128
+constexpr int PlayerMax = 32;			/// How many players are supported
+#define UnitTypeMax 2048				/// How many unit types supported
+#define UpgradeMax 2048					/// How many upgrades supported
+constexpr int MAX_RACES = 128;
 //Wyrmgus start
-#define FactionMax 128				/// Maximum number of factions a civilization can have
-#define PlayerColorMax 32			/// How many player colors are supported
+constexpr int FactionMax = 128;			/// Maximum number of factions a civilization can have
+constexpr int PlayerColorMax = 32;		/// How many player colors are supported
 
-#define AuraRange 6					/// Range of auras
-#define PlayerHeroMax 4				/// Maximum heroes per player
-#define PlayerMajorDeityMax 1		/// Maximum major deities per player/character
-//#define PlayerMinorDeityMax 3		/// Maximum minor deities per player/character
-#define PlayerMinorDeityMax 1		/// Maximum minor deities per player/character; make 1 since we don't have enough minor deities right now to make the maximum greater
-#define PlayerDeityMax (PlayerMajorDeityMax + PlayerMinorDeityMax)
+constexpr int AuraRange = 6;			/// Range of auras
+constexpr int PlayerHeroMax = 4;		/// Maximum heroes per player
+constexpr int PlayerMajorDeityMax = 1;	/// Maximum major deities per player/character
+//constexpr int PlayerMinorDeityMax = 3;	/// Maximum minor deities per player/character
+constexpr int PlayerMinorDeityMax = 1;	/// Maximum minor deities per player/character; make 1 since we don't have enough minor deities right now to make the maximum greater
+constexpr int PlayerDeityMax = (PlayerMajorDeityMax + PlayerMinorDeityMax);
 
-#define PopulationPerUnit 1000		/// Number of people a unit represents
+constexpr int PopulationPerUnit = 1000;	/// Number of people a unit represents
 
-#define DEFAULT_HOURS_PER_DAY 24
-#define DEFAULT_DAYS_PER_MONTH 30
-#define DEFAULT_DAYS_PER_YEAR 365
-#define DEFAULT_DAYS_PER_WEEK 7
+constexpr int DEFAULT_HOURS_PER_DAY = 24;
+constexpr int DEFAULT_DAYS_PER_MONTH = 30;
+constexpr int DEFAULT_DAYS_PER_YEAR = 365;
+constexpr int DEFAULT_DAYS_PER_WEEK = 7;
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)
-#define FRAMES_PER_SECOND  30  // 1/30s
+constexpr int FRAMES_PER_SECOND = 30;  // 1/30s
 /// Game cycles per second to simulate (original 30-40)
-#define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
-#define CYCLES_PER_MINUTE  (CYCLES_PER_SECOND * 60)
+constexpr int CYCLES_PER_SECOND = 30;  // 1/30s 0.33ms
+constexpr int CYCLES_PER_MINUTE = (CYCLES_PER_SECOND * 60);
 
-#define CYCLES_PER_IN_GAME_HOUR (CYCLES_PER_SECOND * 10) // every 10 seconds of gameplay = 1 hour for the purposes of in-game date/time
+constexpr int CYCLES_PER_IN_GAME_HOUR = (CYCLES_PER_SECOND * 10); // every 10 seconds of gameplay = 1 hour for the purposes of in-game date/time
 
-#define DEFAULT_DAY_MULTIPLIER_PER_YEAR (DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY * CYCLES_PER_IN_GAME_HOUR / CYCLES_PER_SECOND / 60 / 60) //the purpose of the day multiplier is so that we can effectively have months only taking e.g. 10 days to pass, so that we can have a day/night cycle, different days of the week and months/years, while still months and years not taking an overly long time to pass; the day multiplier should as such NOT affect the changes in day of the week; here we define the day multiplier to be such that one year equals roughly one hour of gameplay
+constexpr int DEFAULT_DAY_MULTIPLIER_PER_YEAR = (DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY * CYCLES_PER_IN_GAME_HOUR / CYCLES_PER_SECOND / 60 / 60); //the purpose of the day multiplier is so that we can effectively have months only taking e.g. 10 days to pass, so that we can have a day/night cycle, different days of the week and months/years, while still months and years not taking an overly long time to pass; the day multiplier should as such NOT affect the changes in day of the week; here we define the day multiplier to be such that one year equals roughly one hour of gameplay
 
-#define HOUR_MULTIPLIER_DIVIDER 4 //for calculating the multipliers for schedules; the maximum duration length will be the default multiplier * the HOUR_MULTIPLIER_DIVIDER
+constexpr int HOUR_MULTIPLIER_DIVIDER = 4; //for calculating the multipliers for schedules; the maximum duration length will be the default multiplier * the HOUR_MULTIPLIER_DIVIDER
 
-#define HeroCooldownCycles CYCLES_PER_MINUTE	/// Cooldown (in cycles) for recruiting a hero
+constexpr int HeroCooldownCycles = CYCLES_PER_MINUTE;	/// Cooldown (in cycles) for recruiting a hero
 
-#define DefaultTileMovementCost 8
+constexpr int DefaultTileMovementCost = 8;
 
 /*----------------------------------------------------------------------------
 --  stratagus.cpp

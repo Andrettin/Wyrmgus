@@ -3966,7 +3966,7 @@ void UnitLost(CUnit &unit)
 		}
 		
 		if (type.Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {
-			int m = DefaultTradeCost;
+			int m = DEFAULT_TRADE_COST;
 
 			for (int j = 0; j < player.GetUnitCount(); ++j) {
 				if (player.GetUnit(j).Type->Stats[player.Index].Variables[TRADECOST_INDEX].Enable) {

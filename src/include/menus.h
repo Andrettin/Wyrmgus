@@ -34,8 +34,8 @@
 --  Defines/Declarations
 ----------------------------------------------------------------------------*/
 
-#define MI_FLAGS_ACTIVE     1  /// cursor on item
-#define MI_FLAGS_CLICKED    2  /// mouse button pressed down on item
+constexpr int MI_FLAGS_ACTIVE = 1;	/// cursor on item
+constexpr int MI_FLAGS_CLICKED = 2;	/// mouse button pressed down on item
 
 class ButtonStyle;
 

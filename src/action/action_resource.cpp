@@ -66,15 +66,15 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-#define SUB_START_RESOURCE 0
-#define SUB_MOVE_TO_RESOURCE 5
-#define SUB_UNREACHABLE_RESOURCE 31
-#define SUB_START_GATHERING 55
-#define SUB_GATHER_RESOURCE 60
-#define SUB_STOP_GATHERING 65
-#define SUB_MOVE_TO_DEPOT 70
-#define SUB_UNREACHABLE_DEPOT 100
-#define SUB_RETURN_RESOURCE 120
+constexpr int SUB_START_RESOURCE = 0;
+constexpr int SUB_MOVE_TO_RESOURCE = 5;
+constexpr int SUB_UNREACHABLE_RESOURCE = 31;
+constexpr int SUB_START_GATHERING = 55;
+constexpr int SUB_GATHER_RESOURCE = 60;
+constexpr int SUB_STOP_GATHERING = 65;
+constexpr int SUB_MOVE_TO_DEPOT = 70;
+constexpr int SUB_UNREACHABLE_DEPOT = 100;
+constexpr int SUB_RETURN_RESOURCE = 120;
 
 /*----------------------------------------------------------------------------
 --  Functions

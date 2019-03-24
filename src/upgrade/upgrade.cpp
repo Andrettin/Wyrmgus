@@ -1961,7 +1961,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			}
 			
 			if (um->Modifier.Variables[TRADECOST_INDEX].Value && (stat.Variables[TRADECOST_INDEX].Value + um->Modifier.Variables[TRADECOST_INDEX].Value) == player.TradeCost) {
-				int m = DefaultTradeCost;
+				int m = DEFAULT_TRADE_COST;
 
 				for (int k = 0; k < player.GetUnitCount(); ++k) {
 					if (player.GetUnit(k).Type != nullptr) {

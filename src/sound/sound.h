@@ -55,8 +55,8 @@ class Missile;
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-#define MaxSampleVolume 255  /// Maximum sample volume
-#define NO_SOUND 0           /// No valid sound ID
+constexpr int MaxSampleVolume = 255;	/// Maximum sample volume
+constexpr int NO_SOUND = 0;				/// No valid sound ID
 
 /**
 **  Voice groups for a unit
@@ -145,21 +145,21 @@ public:
 /**
 ** A possible value for Number in the Sound struct: means a simple sound
 */
-#define ONE_SOUND 0
+constexpr int ONE_SOUND = 0;
 /**
 ** A possible value for Number in the Sound struct: means a double group (for
 ** selection/annoyed sounds)
 */
-#define TWO_GROUPS 1
+constexpr int TWO_GROUPS = 1;
 
 /**
 ** the range value that makes a sound volume distance independent
 */
-#define INFINITE_SOUND_RANGE 255
+constexpr int INFINITE_SOUND_RANGE = 255;
 /**
 ** the maximum range value
 */
-#define MAX_SOUND_RANGE 254
+constexpr int MAX_SOUND_RANGE = 254;
 
 /**
 **  Origin of a sound

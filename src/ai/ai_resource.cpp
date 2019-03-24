@@ -60,7 +60,7 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define COLLECT_RESOURCES_INTERVAL 4
+constexpr int COLLECT_RESOURCES_INTERVAL = 4;
 
 /*----------------------------------------------------------------------------
 --  Functions

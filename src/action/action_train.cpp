@@ -54,7 +54,7 @@
 #include "unit/unit_type.h"
 
 /// How many resources the player gets back if canceling training
-#define CancelTrainingCostsFactor  100
+constexpr int CANCEL_TRAINING_COSTS_FACTOR = 100;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -131,10 +131,10 @@
 	//Wyrmgus end
 
 	//Wyrmgus start
-//	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelTrainingCostsFactor);
+//	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CANCEL_TRAINING_COSTS_FACTOR);
 	int type_costs[MaxCosts];
 	player.GetUnitTypeCosts(this->Type, type_costs);
-	player.AddCostsFactor(type_costs, CancelTrainingCostsFactor);
+	player.AddCostsFactor(type_costs, CANCEL_TRAINING_COSTS_FACTOR);
 	//Wyrmgus end
 }
 

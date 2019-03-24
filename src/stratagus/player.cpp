@@ -1025,7 +1025,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 		this->Incomes[i] = CResource::GetAll()[i]->DefaultIncome;
 	}
 	
-	this->TradeCost = DefaultTradeCost;
+	this->TradeCost = DEFAULT_TRADE_COST;
 
 	//  Initial max resource amounts.
 	for (int i = 0; i < MaxCosts; ++i) {

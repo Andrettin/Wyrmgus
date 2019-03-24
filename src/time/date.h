@@ -45,7 +45,7 @@
 class CCalendar;
 class CTimeline;
 
-#define BASE_CALENDAR_YEAR_OFFSET_FOR_HOURS 10000 //essentially the Human Era
+constexpr int BASE_CALENDAR_YEAR_OFFSET_FOR_HOURS = 10000; //essentially the Human Era
 
 class CDate
 {

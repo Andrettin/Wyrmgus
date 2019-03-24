@@ -112,8 +112,8 @@ class CWorld;
 --  Map
 ----------------------------------------------------------------------------*/
 
-#define MaxMapWidth  512  /// max map width supported
-#define MaxMapHeight 512  /// max map height supported
+constexpr int MaxMapWidth = 512;	/// max map width supported
+constexpr int MaxMapHeight = 512;	/// max map height supported
 
 //Wyrmgus start
 class CTerrainFeature

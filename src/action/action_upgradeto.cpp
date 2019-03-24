@@ -60,7 +60,7 @@
 //Wyrmgus end
 
 /// How many resources the player gets back if canceling upgrade
-#define CancelUpgradeCostsFactor   100
+constexpr int CANCEL_UPGRADE_COSTS_FACTOR = 100;
 
 
 /*----------------------------------------------------------------------------
@@ -557,7 +557,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	int type_costs[MaxCosts];
 	player.GetUnitTypeCosts(this->Type, type_costs);
 
-	player.AddCostsFactor(type_costs, CancelUpgradeCostsFactor);
+	player.AddCostsFactor(type_costs, CANCEL_UPGRADE_COSTS_FACTOR);
 }
 
 /* virtual */ void COrder_UpgradeTo::UpdateUnitVariables(CUnit &unit) const

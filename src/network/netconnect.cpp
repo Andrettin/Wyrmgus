@@ -51,8 +51,8 @@
 //----------------------------------------------------------------------------
 
 // received nothing from client for xx frames?
-#define CLIENT_LIVE_BEAT 60
-#define CLIENT_IS_DEAD 300
+constexpr int CLIENT_LIVE_BEAT = 60;
+constexpr int CLIENT_IS_DEAD = 300;
 
 /**
 **  Connect state information of network systems active in current game.

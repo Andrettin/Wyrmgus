@@ -41,8 +41,8 @@
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-#define MaxVolume 255
-#define SOUND_BUFFER_SIZE 65536
+constexpr int MaxVolume = 255;
+constexpr int SOUND_BUFFER_SIZE = 65536;
 
 /**
 **  RAW samples.

@@ -56,13 +56,13 @@
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-#define STORE_OVERALL 0
-#define STORE_BUILDING 1
-#define STORE_BOTH 2
+constexpr int STORE_OVERALL = 0;
+constexpr int STORE_BUILDING = 1;
+constexpr int STORE_BOTH = 2;
 
-#define SPEEDUP_FACTOR 100
+constexpr int SPEEDUP_FACTOR = 100;
 
-#define DefaultTradeCost 30
+constexpr int DEFAULT_TRADE_COST = 30;
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -526,7 +526,7 @@ enum PlayerTypes {
 	PlayerRescueActive = 7    /// rescued  active
 };
 
-#define PlayerNumNeutral (PlayerMax - 1)  /// this is the neutral player slot
+constexpr int PlayerNumNeutral = (PlayerMax - 1);	/// this is the neutral player slot
 
 /**
 **  Notify types. Noties are send to the player.

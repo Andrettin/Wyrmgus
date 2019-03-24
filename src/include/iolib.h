@@ -133,10 +133,10 @@ enum {
 	CLF_TYPE_PHYSFS    /// physfs file handle
 };
 
-#define CL_OPEN_READ 0x1
-#define CL_OPEN_WRITE 0x2
-#define CL_WRITE_GZ 0x4
-#define CL_WRITE_BZ2 0x8
+constexpr int CL_OPEN_READ = 0x1;
+constexpr int CL_OPEN_WRITE = 0x2;
+constexpr int CL_WRITE_GZ = 0x4;
+constexpr int CL_WRITE_BZ2 = 0x8;
 
 /*----------------------------------------------------------------------------
 --  Functions

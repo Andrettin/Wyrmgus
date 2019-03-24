@@ -53,10 +53,10 @@
 /*----------------------------------------------------------------------------
 --  Types
 ----------------------------------------------------------------------------*/
-#define AIATTACK_RANGE 0
-#define AIATTACK_ALLMAP 1
-#define AIATTACK_BUILDING 2
-#define AIATTACK_AGRESSIVE 3
+constexpr int AIATTACK_RANGE = 0;
+constexpr int AIATTACK_ALLMAP = 1;
+constexpr int AIATTACK_BUILDING = 2;
+constexpr int AIATTACK_AGRESSIVE = 3;
 
 //Wyrmgus start
 class EnemyUnitFinder

@@ -66,7 +66,7 @@
 #include "unit/unit.h"
 #include "unit/unit_type.h"
 
-#define ANIMATIONS_MAXANIM 4096
+constexpr int ANIMATIONS_MAXANIM = 4096;
 
 struct LabelsStruct {
 	CAnimation *Anim;

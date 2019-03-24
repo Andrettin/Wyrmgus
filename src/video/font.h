@@ -119,7 +119,7 @@ private:
 	CGraphic *G = nullptr;		/// Graphic object used to draw
 };
 
-#define MaxFontColors 9
+constexpr int MaxFontColors = 9;
 
 /// Font color definition
 class CFontColor
@@ -142,11 +142,11 @@ public:
 /**
 **  FIXME: should be moved to lua
 */
-#define FontRed "red"
-#define FontGreen "green"
-#define FontYellow "yellow"
-#define FontWhite "white"
-#define FontGrey "grey"
+constexpr const char *FontRed = "red";
+constexpr const char *FontGreen = "green";
+constexpr const char *FontYellow = "yellow";
+constexpr const char *FontWhite = "white";
+constexpr const char *FontGrey = "grey";
 
 /*----------------------------------------------------------------------------
 --  Functions

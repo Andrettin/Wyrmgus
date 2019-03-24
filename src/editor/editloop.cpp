@@ -79,12 +79,12 @@ extern void CleanGame();
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define UNIT_ICON_X (IconWidth + 7)       /// Unit mode icon
-#define UNIT_ICON_Y (0)                   /// Unit mode icon
-#define TILE_ICON_X (IconWidth * 2 + 16)  /// Tile mode icon
-#define TILE_ICON_Y (2)                   /// Tile mode icon
-#define START_ICON_X (IconWidth * 3 + 16)  /// Start mode icon
-#define START_ICON_Y (2)                   /// Start mode icon
+#define UNIT_ICON_X (IconWidth + 7)			/// Unit mode icon
+constexpr int UNIT_ICON_Y = (0);			/// Unit mode icon
+#define TILE_ICON_X (IconWidth * 2 + 16)	/// Tile mode icon
+constexpr int TILE_ICON_Y = (2);			/// Tile mode icon
+#define START_ICON_X (IconWidth * 3 + 16)	/// Start mode icon
+constexpr int START_ICON_Y = (2);			/// Start mode icon
 
 /*----------------------------------------------------------------------------
 --  Variables

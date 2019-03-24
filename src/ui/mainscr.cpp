@@ -1249,9 +1249,9 @@ void DrawPopups()
 --  MESSAGE
 ----------------------------------------------------------------------------*/
 
-#define MESSAGES_MAX  10                       /// How many can be displayed
+constexpr int MESSAGES_MAX = 10;			/// How many can be displayed
 //Wyrmgus start
-#define OBJECTIVES_MAX  32					   /// How many objectives be displayed
+constexpr int OBJECTIVES_MAX = 32;			/// How many objectives be displayed
 //Wyrmgus end
 
 static char MessagesEvent[MESSAGES_MAX][256];  /// Array of event messages

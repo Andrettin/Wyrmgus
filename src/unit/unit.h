@@ -88,7 +88,7 @@ typedef COrder *COrderPtr;
 
 
 //the range in which experience is distributed
-#define ExperienceRange 6
+constexpr int ExperienceRange = 6;
 
 
 
@@ -119,8 +119,8 @@ enum _directions_ {
 	LookingNW = 7 * 32       /// Unit looking north west
 };
 
-#define NextDirection 32        /// Next direction N->NE->E...
-#define UnitNotSeen 0x7fffffff  /// Unit not seen, used by CUnit::SeenFrame
+constexpr int NextDirection = 32;	/// Next direction N->NE->E...
+#define UnitNotSeen 0x7fffffff		/// Unit not seen, used by CUnit::SeenFrame
 
 /// The big unit structure
 class CUnit
@@ -600,7 +600,7 @@ public:
 	CUnit *Goal; /// Generic/Teleporter goal pointer
 };
 
-#define NoUnitP (CUnit *)0        /// return value: for no unit found
+constexpr CUnit *NoUnitP = (CUnit *) 0;		/// return value: for no unit found
 
 /**
 **  Returns unit number (unique to this unit)

@@ -40,9 +40,9 @@
  * Number of bytes in the name of a network player,
  * including the terminating null character.
  */
-#define NetPlayerNameSize 16
+constexpr int NetPlayerNameSize = 16;
 
-#define MaxNetworkCommands 9  /// Max Commands In A Packet
+constexpr int MaxNetworkCommands = 9;	/// Max Commands In A Packet
 
 /**
 **  Network systems active in current game.
