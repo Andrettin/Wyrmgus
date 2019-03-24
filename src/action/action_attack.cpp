@@ -121,7 +121,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	order->SetGoal(&target);
 	order->Range = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
 	order->MinRange = attacker.Type->MinAttackRange;
-	if (attacker.Player->AiEnabled && attacker.Variable[SPEED_INDEX].Value > target.Variable[SPEED_INDEX].Value && attacker.GetModifiedVariable(ATTACKRANGE_INDEX) > target.GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
+	if (attacker.Player->AiEnabled && attacker.GetVariableValue(SPEED_INDEX) > target.GetVariableValue(SPEED_INDEX) && attacker.GetModifiedVariable(ATTACKRANGE_INDEX) > target.GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
 		order->MinRange = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
 	}
 
@@ -427,7 +427,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			}
 			this->SetGoal(goal);
 			this->MinRange = unit.Type->MinAttackRange;
-			if (unit.Player->AiEnabled && unit.Variable[SPEED_INDEX].Value > goal->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
+			if (unit.Player->AiEnabled && unit.GetVariableValue(SPEED_INDEX) > goal->GetVariableValue(SPEED_INDEX) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
 				this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 			}
 			this->Range = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
@@ -454,7 +454,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			
 			//set the MinRange here as well, so that hit-and-run attacks will be conducted properly
 			this->MinRange = unit.Type->MinAttackRange;
-			if (unit.Player->AiEnabled && unit.Variable[SPEED_INDEX].Value > newTarget->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > newTarget->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
+			if (unit.Player->AiEnabled && unit.GetVariableValue(SPEED_INDEX) > newTarget->GetVariableValue(SPEED_INDEX) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > newTarget->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
 				this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 			}
 		}
@@ -664,7 +664,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		this->goalPos = goal->tilePos;
 		this->MapLayer = goal->MapLayer->ID;
 		this->MinRange = unit.Type->MinAttackRange;
-		if (unit.Player->AiEnabled && unit.Variable[SPEED_INDEX].Value > goal->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
+		if (unit.Player->AiEnabled && unit.GetVariableValue(SPEED_INDEX) > goal->GetVariableValue(SPEED_INDEX) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
 			this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 		}
 		this->Range = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
@@ -684,7 +684,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				this->goalPos = newTarget->tilePos;
 				this->MapLayer = newTarget->MapLayer->ID;
 				this->MinRange = unit.Type->MinAttackRange;
-				if (unit.Player->AiEnabled && unit.Variable[SPEED_INDEX].Value > newTarget->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > newTarget->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
+				if (unit.Player->AiEnabled && unit.GetVariableValue(SPEED_INDEX) > newTarget->GetVariableValue(SPEED_INDEX) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > newTarget->GetModifiedVariable(ATTACKRANGE_INDEX)) { //makes fast AI ranged units move away from slower targets that have smaller range
 					this->MinRange = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 				}
 				this->State = MOVE_TO_TARGET;
@@ -722,7 +722,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	}
 	if (
 		dist < unit.Type->MinAttackRange
-		|| (unit.Player->AiEnabled && dist < unit.GetModifiedVariable(ATTACKRANGE_INDEX) && unit.Variable[SPEED_INDEX].Value > goal->Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) //makes fast AI ranged units move away from slower targets that have smaller range
+		|| (unit.Player->AiEnabled && dist < unit.GetModifiedVariable(ATTACKRANGE_INDEX) && unit.GetVariableValue(SPEED_INDEX) > goal->GetVariableValue(SPEED_INDEX) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal->GetModifiedVariable(ATTACKRANGE_INDEX)) //makes fast AI ranged units move away from slower targets that have smaller range
 	) {
 		this->State = MOVE_TO_TARGET;
 	}
@@ -802,7 +802,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				if (unit.Type->MinAttackRange < dist &&
 					dist <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)
 					//Wyrmgus start
-					&& !(unit.Player->AiEnabled && dist < unit.GetModifiedVariable(ATTACKRANGE_INDEX) && unit.Variable[SPEED_INDEX].Value > goal.Variable[SPEED_INDEX].Value && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal.GetModifiedVariable(ATTACKRANGE_INDEX)) //makes fast AI ranged units move away from slower targets that have smaller range
+					&& !(unit.Player->AiEnabled && dist < unit.GetModifiedVariable(ATTACKRANGE_INDEX) && unit.GetVariableValue(SPEED_INDEX) > goal.GetVariableValue(SPEED_INDEX) && unit.GetModifiedVariable(ATTACKRANGE_INDEX) > goal.GetModifiedVariable(ATTACKRANGE_INDEX)) //makes fast AI ranged units move away from slower targets that have smaller range
 				) {
 					//Wyrmgus end
 					//Wyrmgus start

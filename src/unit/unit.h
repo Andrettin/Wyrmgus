@@ -378,6 +378,10 @@ public:
 	void SetIndividualUpgrade(const CUpgrade *upgrade, int quantity);
 	int GetIndividualUpgrade(const CUpgrade *upgrade) const;
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
+	int GetVariableValue(const int index) const;
+	int GetVariableMax(const int index) const;
+	char GetVariableIncrease(const int index) const;
+	bool IsVariableEnabled(const int index) const;
 	int GetModifiedVariable(const int index, const int variable_type = 0) const;
 	int GetReactionRange() const;
 	int GetItemSlotQuantity(int item_slot) const;
@@ -430,6 +434,12 @@ public:
 	std::string GetTypeName() const;
 	std::string GetMessageName() const;
 	//Wyrmgus end
+	
+	void IncreaseVariable(const int index);
+	void HandleBuffsEachCycle();
+	void HandleBuffsEachSecond();
+	bool HandleBurnAndPoison();
+	void HandleUnitAction();
 
 public:
 	class CUnitManagerData
@@ -560,7 +570,7 @@ public:
 	} Seen;
 
 	CVariable *Variable; /// array of User Defined variables.
-
+	
 	unsigned long TTL;  /// time to live
 
 	unsigned int GroupId;       /// unit belongs to this group id

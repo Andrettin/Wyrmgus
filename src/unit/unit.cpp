@@ -5312,6 +5312,54 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	return value;
 }
 
+/**
+**	@brief	Get the value for a given variable for the unit.
+**
+**	@param	index	The variable's index.
+**
+**	@return	The variable's value.
+*/
+int CUnit::GetVariableValue(const int index) const
+{
+	return this->Variable[index].Value;
+}
+
+/**
+**	@brief	Get the maximum value for a given variable for the unit.
+**
+**	@param	index	The variable's index.
+**
+**	@return	The variable's maximum value.
+*/
+int CUnit::GetVariableMax(const int index) const
+{
+	return this->Variable[index].Max;
+}
+
+/**
+**	@brief	Get the per-cycle increase value for a given variable for the unit.
+**
+**	@param	index	The variable's index.
+**
+**	@return	The variable's per-cycle increase value.
+*/
+char CUnit::GetVariableIncrease(const int index) const
+{
+	return this->Variable[index].Increase;
+}
+
+/**
+**	@brief	Get whether a given variable is enabled for the unit.
+**
+**	@param	index	The variable's index.
+**
+**	@return	True if the variable is enabled, or false otherwise.
+*/
+bool CUnit::IsVariableEnabled(const int index) const
+{
+	return this->Variable[index].Enable != 0;
+}
+
 int CUnit::GetModifiedVariable(const int index, const int variable_type) const
 {
 	int value = 0;
@@ -7741,6 +7789,284 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
 	}
 	
 	return false;
+}
+
+void CUnit::IncreaseVariable(const int index)
+{
+	this->Variable[index].Value += this->Variable[index].Increase;
+	//Wyrmgus start
+//	clamp(&this->Variable[index].Value, 0, this->Variable[index].Max);
+	clamp(&this->Variable[index].Value, 0, this->GetModifiedVariable(index, VariableMax));
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (index == HP_INDEX && this->GetVariableIncrease(index) < 0 && this->HasInventory()) {
+		this->HealingItemAutoUse();
+	} else if (index == GIVERESOURCE_INDEX && !this->Type->BoolFlag[INEXHAUSTIBLE_INDEX].value) {
+		this->ChangeResourcesHeld(this->GetVariableIncrease(index));
+		clamp(&this->ResourcesHeld, 0, this->GetModifiedVariable(index, VariableMax));
+	}
+	//Wyrmgus end
+
+	//if variable is HP and increase is negative, unit dies if HP reached 0
+	if (index == HP_INDEX && this->GetVariableValue(HP_INDEX) <= 0) {
+		LetUnitDie(*this);
+	}
+	
+	//Wyrmgus start
+	//if variable is resources held and increase is negative, unit dies if resources held reached 0 (only for units which cannot be harvested, as the ones that can be harvested need more complex code for dying)
+	if (index == GIVERESOURCE_INDEX && this->GetVariableIncrease(GIVERESOURCE_INDEX) < 0 && this->GetVariableValue(GIVERESOURCE_INDEX) <= 0 && this->GivesResource && !this->Type->BoolFlag[CANHARVEST_INDEX].value) {
+		LetUnitDie(*this);
+	}
+	//Wyrmgus end
+}
+
+/**
+**	@brief	Handle things about the unit that decay over time each cycle
+*/
+void CUnit::HandleBuffsEachCycle()
+{
+	// Look if the time to live is over.
+	if (this->TTL && this->IsAlive() && this->TTL < GameCycle) {
+		DebugPrint("Unit must die %lu %lu!\n" _C_ this->TTL _C_ GameCycle);
+
+		// Hit unit does some funky stuff...
+		--this->Variable[HP_INDEX].Value;
+		if (this->GetVariableValue(HP_INDEX) <= 0) {
+			LetUnitDie(*this);
+			return;
+		}
+	}
+
+	if (--this->Threshold < 0) {
+		this->Threshold = 0;
+	}
+
+	// decrease spell countdown timers
+	for (size_t i = 0; i < this->Type->Spells.size(); ++i) {
+		int spell_id = this->Type->Spells[i]->Slot;
+		if (this->SpellCoolDownTimers[spell_id] > 0) {
+			--this->SpellCoolDownTimers[spell_id];
+		}
+	}
+
+	for (std::map<CUnitType *, int>::const_iterator iterator = this->Type->Stats[this->Player->Index].UnitStock.begin(); iterator != this->Type->Stats[this->Player->Index].UnitStock.end(); ++iterator) {
+		CUnitType *unit_type = iterator->first;
+		int unit_stock = iterator->second;
+		
+		if (unit_stock <= 0) {
+			continue;
+		}
+		
+		if (this->GetUnitStockReplenishmentTimer(unit_type) > 0) {
+			this->ChangeUnitStockReplenishmentTimer(unit_type, -1);
+			if (this->GetUnitStockReplenishmentTimer(unit_type) == 0 && this->GetUnitStock(unit_type) < unit_stock) { //if timer reached 0, replenish 1 of the stock
+				this->ChangeUnitStock(unit_type, 1);
+			}
+		}
+			
+		//if the unit still has less stock than its max, re-init the unit stock timer
+		if (this->GetUnitStockReplenishmentTimer(unit_type) == 0 && this->GetUnitStock(unit_type) < unit_stock && CheckDependencies(unit_type, this->Player)) {
+			this->SetUnitStockReplenishmentTimer(unit_type, unit_type->Stats[this->Player->Index].Costs[TimeCost] * 50);
+		}
+	}
+	
+	const bool last_status_is_hidden = this->GetVariableValue(INVISIBLE_INDEX) > 0;
+	
+	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, BLESSING_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, BARKSKIN_INDEX, INFUSION_INDEX, TERROR_INDEX, WITHER_INDEX, DEHYDRATION_INDEX, HYDRATING_INDEX};
+	//  decrease spells effects time.
+	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
+		this->Variable[SpellEffects[i]].Increase = -1;
+		this->IncreaseVariable(SpellEffects[i]);
+	}
+	
+	if (last_status_is_hidden && this->GetVariableValue(INVISIBLE_INDEX) == 0) {
+		UnHideUnit(*this);
+	}
+}
+
+/**
+**	@brief	Handle things about the unit that decay over time each second
+*/
+void CUnit::HandleBuffsEachSecond()
+{
+	//Wyrmgus start
+	if (this->Type->BoolFlag[DECORATION_INDEX].value) {
+		return;
+	}
+	//Wyrmgus end
+	
+	// User defined variables
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
+		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == BLESSING_INDEX || i == INSPIRE_INDEX || i == PRECISION_INDEX || i == REGENERATION_INDEX || i == BARKSKIN_INDEX || i == INFUSION_INDEX || i == TERROR_INDEX || i == WITHER_INDEX || i == DEHYDRATION_INDEX || i == HYDRATING_INDEX) {
+			continue;
+		}
+		if (i == HP_INDEX && this->HandleBurnAndPoison()) {
+			continue;
+		}
+		//Wyrmgus start
+		if (i == HP_INDEX && this->GetVariableValue(REGENERATION_INDEX) > 0) {
+			this->Variable[i].Value += 1;
+			clamp(&this->Variable[i].Value, 0, this->GetModifiedVariable(i, VariableMax));
+		}
+		//Wyrmgus end
+		if (this->IsVariableEnabled(i) && this->GetVariableIncrease(i) != 0) {
+			this->IncreaseVariable(i);
+		}
+	}
+	
+	//Wyrmgus start
+	if (this->IsAlive() && this->CurrentAction() != UnitActionBuilt) {
+		//apply auras
+		if (this->GetVariableValue(LEADERSHIPAURA_INDEX) > 0) {
+			this->ApplyAura(LEADERSHIPAURA_INDEX);
+		}
+		if (this->GetVariableValue(REGENERATIONAURA_INDEX) > 0) {
+			this->ApplyAura(REGENERATIONAURA_INDEX);
+		}
+		if (this->GetVariableValue(HYDRATINGAURA_INDEX) > 0) {
+			this->ApplyAura(HYDRATINGAURA_INDEX);
+		}
+		
+		//apply "-stalk" abilities
+		if ((this->GetVariableValue(DESERTSTALK_INDEX) > 0 || this->GetVariableValue(FORESTSTALK_INDEX) > 0 || this->GetVariableValue(SWAMPSTALK_INDEX) > 0) && CMap::Map.Info.IsPointOnMap(this->tilePos.x, this->tilePos.y, this->MapLayer)) {
+			if (
+				(
+					(this->GetVariableValue(DESERTSTALK_INDEX) > 0 && (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Flags & MapFieldDesert))
+					|| (this->GetVariableValue(FORESTSTALK_INDEX) > 0 && CMap::Map.TileBordersFlag(this->tilePos, this->MapLayer->ID, MapFieldForest))
+					|| (this->GetVariableValue(SWAMPSTALK_INDEX) > 0 && (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Flags & MapFieldMud))
+				)
+				&& (this->GetVariableValue(INVISIBLE_INDEX) > 0 || !this->IsInCombat())
+			) {				
+				std::vector<CUnit *> table;
+				SelectAroundUnit(*this, 1, table, IsEnemyWith(*this->Player));
+				if (table.size() == 0) { //only apply the -stalk invisibility if the unit is not adjacent to an enemy unit
+					this->Variable[INVISIBLE_INDEX].Enable = 1;
+					this->Variable[INVISIBLE_INDEX].Max = std::max(CYCLES_PER_SECOND + 1, this->Variable[INVISIBLE_INDEX].Max);
+					this->Variable[INVISIBLE_INDEX].Value = std::max(CYCLES_PER_SECOND + 1, this->Variable[INVISIBLE_INDEX].Value);
+				}
+			}
+		}
+		
+		if ( //apply dehydration to an organic unit on a desert tile; only apply dehydration during day-time
+			this->Type->BoolFlag[ORGANIC_INDEX].value
+			&& CMap::Map.Info.IsPointOnMap(this->tilePos.x, this->tilePos.y, this->MapLayer)
+			&& (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Flags & MapFieldDesert)
+			&& this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Owner != this->Player->Index
+			&& this->MapLayer->GetTimeOfDay()
+			&& this->MapLayer->GetTimeOfDay()->IsDay()
+			&& this->GetVariableValue(HYDRATING_INDEX) <= 0
+			&& this->GetVariableValue(DEHYDRATIONIMMUNITY_INDEX) <= 0
+		) {
+			this->Variable[DEHYDRATION_INDEX].Enable = 1;
+			this->Variable[DEHYDRATION_INDEX].Max = std::max(CYCLES_PER_SECOND + 1, this->Variable[DEHYDRATION_INDEX].Max);
+			this->Variable[DEHYDRATION_INDEX].Value = std::max(CYCLES_PER_SECOND + 1, this->Variable[DEHYDRATION_INDEX].Value);
+		}
+	}
+	//Wyrmgus end
+
+	//Wyrmgus start
+	if (this->GetVariableValue(TERROR_INDEX) > 0) { // if unit is terrified, flee at the sight of enemies
+		std::vector<CUnit *> table;
+		SelectAroundUnit(*this, this->CurrentSightRange, table, IsAggresiveUnit(), true);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (this->IsEnemy(*table[i])) {
+				HitUnit_RunAway(*this, *table[i]);
+				break;
+			}
+		}
+	}
+	//Wyrmgus end
+}
+
+/**
+**	@brief	Modify the unit's health according to burn and poison.
+*/
+bool CUnit::HandleBurnAndPoison()
+{
+	if (
+		this->Removed || this->Destroyed || this->GetVariableMax(HP_INDEX) == 0
+		|| this->CurrentAction() == UnitActionBuilt
+		|| this->CurrentAction() == UnitActionDie
+	) {
+		return false;
+	}
+	
+	// Burn and poison
+	//Wyrmgus start
+//	const int hp_percent = (100 * this->GetVariableValue(HP_INDEX)) / this->GetVariableMax(HP_INDEX);
+	const int hp_percent = (100 * this->GetVariableValue(HP_INDEX)) / this->GetModifiedVariable(HP_INDEX, VariableMax);
+	//Wyrmgus end
+	if (hp_percent <= this->Type->BurnPercent && this->Type->BurnDamageRate) {
+		//Wyrmgus start
+//		HitUnit(NoUnitP, *this, this->Type->BurnDamageRate);
+		HitUnit(NoUnitP, *this, this->Type->BurnDamageRate, nullptr, false); //a bit too repetitive to show damage every single time the burn effect is applied
+		//Wyrmgus end
+		return true;
+	}
+	if (this->GetVariableValue(POISON_INDEX) > 0 && this->Type->PoisonDrain) {
+		//Wyrmgus start
+//		HitUnit(NoUnitP, *this, this->Type->PoisonDrain);
+		HitUnit(NoUnitP, *this, this->Type->PoisonDrain, nullptr, false); //a bit too repetitive to show damage every single time the poison effect is applied
+		//Wyrmgus end
+		return true;
+	}
+	//Wyrmgus start
+	if (this->GetVariableValue(BLEEDING_INDEX) > 0 || this->GetVariableValue(DEHYDRATION_INDEX) > 0) {
+		HitUnit(NoUnitP, *this, 1, nullptr, false);
+		//don't return true since we don't want to stop regeneration (positive or negative) from happening
+	}
+	//Wyrmgus end
+	return false;
+}
+
+/**
+**  Handle the action of a unit.
+**
+**  @param unit  Pointer to handled unit.
+*/
+void CUnit::HandleUnitAction()
+{
+	// If current action is breakable proceed with next one.
+	if (!this->Anim.Unbreakable) {
+		if (this->CriticalOrder != nullptr) {
+			this->CriticalOrder->Execute(*this);
+			delete this->CriticalOrder;
+			this->CriticalOrder = nullptr;
+		}
+
+		if (this->Orders[0]->Finished && this->Orders[0]->Action != UnitActionStill && this->Orders.size() == 1) {
+
+			delete this->Orders[0];
+			this->Orders[0] = COrder::NewActionStill();
+			if (IsOnlySelected(*this)) { // update display for new action
+				SelectedUnitChanged();
+			}
+		}
+
+		// o Look if we have a new order and old finished.
+		// o Or the order queue should be flushed.
+		if (
+			(this->Orders[0]->Action == UnitActionStandGround || this->Orders[0]->Finished)
+			&& this->Orders.size() > 1
+		) {
+			if (this->Removed && this->Orders[0]->Action != UnitActionBoard) { // FIXME: johns I see this as an error
+				DebugPrint("Flushing removed unit\n");
+				// This happens, if building with ALT+SHIFT.
+				return;
+			}
+
+			delete this->Orders[0];
+			this->Orders.erase(this->Orders.begin());
+
+			this->Wait = 0;
+			if (IsOnlySelected(*this)) { // update display for new action
+				SelectedUnitChanged();
+			}
+		}
+	}
+	this->Orders[0]->Execute(*this);
 }
 
 /*----------------------------------------------------------------------------
