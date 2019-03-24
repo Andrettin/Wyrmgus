@@ -795,7 +795,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 			if (((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
 				std::vector<CUpgrade *> potential_abilities;
 				for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-					if (CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
+					if (this->CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
 						potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
 					}
 				}
@@ -979,8 +979,8 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	}
 	
 	//load worshipped deities
-	for (size_t i = 0; i < this->Character->Deities.size(); ++i) {
-		CUpgrade *deity_upgrade = this->Character->Deities[i]->DeityUpgrade;
+	for (const CDeity *deity : this->Character->Deities) {
+		const CUpgrade *deity_upgrade = deity->DeityUpgrade;
 		if (deity_upgrade) {
 			IndividualUpgradeAcquire(*this, deity_upgrade);
 		}
@@ -1006,17 +1006,17 @@ void CUnit::SetCharacter(const std::string &character_ident, bool custom_hero)
 	}
 			
 	//load learned abilities
-	std::vector<CUpgrade *> abilities_to_remove;
-	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
-		if (CanLearnAbility(this->Character->Abilities[i])) {
-			AbilityAcquire(*this, this->Character->Abilities[i], false);
+	std::vector<const CUpgrade *> abilities_to_remove;
+	for (const CUpgrade *ability_upgrade : this->Character->Abilities) {
+		if (this->CanLearnAbility(ability_upgrade)) {
+			AbilityAcquire(*this, ability_upgrade, false);
 		} else { //can't learn the ability? something changed in the game's code, remove it from persistent data and allow the hero to repick the ability
-			abilities_to_remove.push_back(this->Character->Abilities[i]);
+			abilities_to_remove.push_back(ability_upgrade);
 		}
 	}
 	
-	for (size_t i = 0; i < abilities_to_remove.size(); ++i) {
-		this->Character->Abilities.erase(std::remove(this->Character->Abilities.begin(), this->Character->Abilities.end(), abilities_to_remove[i]), this->Character->Abilities.end());
+	for (const CUpgrade *ability_upgrade : abilities_to_remove) {
+		this->Character->Abilities.erase(std::remove(this->Character->Abilities.begin(), this->Character->Abilities.end(), ability_upgrade), this->Character->Abilities.end());
 		SaveHero(this->Character);
 	}
 	
@@ -1757,25 +1757,37 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	this->ChooseButtonIcon(ButtonPatrol);
 }
 
-void CUnit::ReadWork(CUpgrade *work, bool affect_character)
+/**
+**	@brief	Read a literary work.
+**
+**	@param	work				The literary work.
+**	@param	affect_character	Whether the reading of the work should be saved persistently for the unit's character, if any.
+*/
+void CUnit::ReadWork(const CUpgrade *work, const bool affect_character)
 {
 	IndividualUpgradeAcquire(*this, work);
 	
-	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
-		if (std::find(Character->ReadWorks.begin(), Character->ReadWorks.end(), work) == Character->ReadWorks.end()) {
-			Character->ReadWorks.push_back(work);
+	if (!IsNetworkGame() && this->Character && this->Player->AiEnabled == false && affect_character) {
+		if (std::find(this->Character->ReadWorks.begin(), this->Character->ReadWorks.end(), work) == this->Character->ReadWorks.end()) {
+			this->Character->ReadWorks.push_back(work);
 			SaveHero(Character);
 		}
 	}
 }
 
-void CUnit::ConsumeElixir(CUpgrade *elixir, bool affect_character)
+/**
+**	@brief	Consume an elixir.
+**
+**	@param	elixir				The elixir.
+**	@param	affect_character	Whether the consuming of the elixir should be saved persistently for the unit's character, if any.
+*/
+void CUnit::ConsumeElixir(const CUpgrade *elixir, const bool affect_character)
 {
 	IndividualUpgradeAcquire(*this, elixir);
 	
-	if (!IsNetworkGame() && Character && this->Player->AiEnabled == false && affect_character) {
-		if (std::find(Character->ConsumedElixirs.begin(), Character->ConsumedElixirs.end(), elixir) == Character->ConsumedElixirs.end()) {
-			Character->ConsumedElixirs.push_back(elixir);
+	if (!IsNetworkGame() && this->Character && this->Player->AiEnabled == false && affect_character) {
+		if (std::find(this->Character->ConsumedElixirs.begin(), this->Character->ConsumedElixirs.end(), elixir) == this->Character->ConsumedElixirs.end()) {
+			this->Character->ConsumedElixirs.push_back(elixir);
 			SaveHero(Character);
 		}
 	}
@@ -6117,7 +6129,7 @@ bool CUnit::HasInventory() const
 	return false;
 }
 
-bool CUnit::CanLearnAbility(CUpgrade *ability, bool pre) const
+bool CUnit::CanLearnAbility(const CUpgrade *ability, const bool pre) const
 {
 	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14)) { //if is a deity choice "ability", only allow for custom heroes (but display the icon for already-acquired deities for all heroes)
 		if (!this->Character) {

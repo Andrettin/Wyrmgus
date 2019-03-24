@@ -186,9 +186,9 @@ public:
 	std::vector<CDeity *> Deities;		/// Deities chosen by this character to worship
 	std::vector<CDeity *> GeneratedDeities;		/// Deities picked during history generation for this character to worship
 	std::vector<CDeityDomain *> PreferredDeityDomains;	/// Preferred deity domains for the character, used to generate deities for it if any are lacking
-	std::vector<CUpgrade *> Abilities;
-	std::vector<CUpgrade *> ReadWorks;
-	std::vector<CUpgrade *> ConsumedElixirs;
+	std::vector<const CUpgrade *> Abilities;
+	std::vector<const CUpgrade *> ReadWorks;
+	std::vector<const CUpgrade *> ConsumedElixirs;
 	std::vector<CUpgrade *> AuthoredWorks;	/// Literary works of which this character is the author
 	std::vector<CUpgrade *> LiteraryAppearances;	/// Literary works in which this character appears
 	std::vector<CQuest *> QuestsInProgress;	/// Quests in progress, only for playable, custom characters

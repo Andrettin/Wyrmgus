@@ -2442,12 +2442,13 @@ void ApplyUpgrades()
 
 //Wyrmgus start
 /**
-**  Handle that an ability was acquired.
+**	@brief	Handle that an ability was acquired.
 **
-**  @param unit     Unit learning the upgrade.
-**  @param upgrade  Upgrade learned.
+**	@param	unit	The unit that is learning the ability upgrade.
+**	@param	upgrade	The ability upgrade being learned.
+**	@param	save	Whether to save that the ability was learned, if the unit is a character.
 */
-void AbilityAcquire(CUnit &unit, CUpgrade *upgrade, bool save)
+void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade, const bool save)
 {
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
@@ -2462,12 +2463,13 @@ void AbilityAcquire(CUnit &unit, CUpgrade *upgrade, bool save)
 }
 
 /**
-**  Handle that an ability was lost.
+**	@brief	Handle that an ability was lost.
 **
-**  @param unit     Unit losing the upgrade.
-**  @param upgrade  Upgrade lost.
+**	@param	unit		The unit that is losing the ability upgrade.
+**	@param	upgrade		The ability upgrade being lost.
+**	@param	lose_all	Whether all of instances of the ability should be lost for the unit, rather than only one of them
 */
-void AbilityLost(CUnit &unit, CUpgrade *upgrade, bool lose_all)
+void AbilityLost(CUnit &unit, const CUpgrade *upgrade, const bool lose_all)
 {
 	unit.Variable[LEVELUP_INDEX].Value += 1;
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;

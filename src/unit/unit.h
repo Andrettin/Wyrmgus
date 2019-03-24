@@ -209,8 +209,8 @@ public:
 	void ChooseButtonIcon(int button_action);
 	void EquipItem(CUnit &item, bool affect_character = true);
 	void DeequipItem(CUnit &item, bool affect_character = true);
-	void ReadWork(CUpgrade *work, bool affect_character = true);
-	void ConsumeElixir(CUpgrade *elixir, bool affect_character = true);
+	void ReadWork(const CUpgrade *work, const bool affect_character = true);
+	void ConsumeElixir(const CUpgrade *elixir, const bool affect_character = true);
 	void ApplyAura(int aura_index);
 	void ApplyAuraEffect(int aura_index);
 	void SetPrefix(CUpgrade *prefix);
@@ -411,7 +411,7 @@ public:
 	bool EquippingItemCompletesSet(const CUnit *item) const;
 	bool DeequippingItemBreaksSet(const CUnit *item) const;
 	bool HasInventory() const;
-	bool CanLearnAbility(CUpgrade *ability, bool pre = false) const;
+	bool CanLearnAbility(const CUpgrade *ability, const bool pre = false) const;
 	bool CanHireMercenary(CUnitType *type, int civilization_id = -1) const;
 	bool CanEat(const CUnit &unit) const;
 	bool LevelCheck(const int level) const;

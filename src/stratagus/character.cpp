@@ -327,15 +327,15 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "ability") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *ability_upgrade = CUpgrade::Get(value);
-			if (ability_upgrade) {
+			const CUpgrade *ability_upgrade = CUpgrade::Get(value);
+			if (ability_upgrade != nullptr) {
 				this->Abilities.push_back(ability_upgrade);
 			} else {
 				fprintf(stderr, "Upgrade \"%s\" does not exist.\n", value.c_str());
 			}
 		} else if (key == "read_work") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			const CUpgrade *upgrade = CUpgrade::Get(value);
 			if (upgrade) {
 				this->ReadWorks.push_back(upgrade);
 			} else {
@@ -343,7 +343,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "consumed_elixir") {
 			value = FindAndReplaceString(value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
+			const CUpgrade *upgrade = CUpgrade::Get(value);
 			if (upgrade) {
 				this->ConsumedElixirs.push_back(upgrade);
 			} else {
@@ -455,8 +455,9 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	if (this->Type != nullptr && this->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > this->Type->Slot) {
 		int ability_count = (int) this->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (std::find(AiHelpers.LearnableAbilities[this->Type->Slot].begin(), AiHelpers.LearnableAbilities[this->Type->Slot].end(), this->Abilities[i]) == AiHelpers.LearnableAbilities[this->Type->Slot].end()) {
-				this->Abilities.erase(std::remove(this->Abilities.begin(), this->Abilities.end(), this->Abilities[i]), this->Abilities.end());
+			const CUpgrade *ability_upgrade = this->Abilities[i];
+			if (std::find(AiHelpers.LearnableAbilities[this->Type->Slot].begin(), AiHelpers.LearnableAbilities[this->Type->Slot].end(), ability_upgrade) == AiHelpers.LearnableAbilities[this->Type->Slot].end()) {
+				this->Abilities.erase(std::remove(this->Abilities.begin(), this->Abilities.end(), ability_upgrade), this->Abilities.end());
 			}
 		}
 	}
