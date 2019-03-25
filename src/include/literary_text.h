@@ -105,7 +105,13 @@ public:
 	
 	CIcon *GetIcon() const
 	{
-		return this->Icon;
+		if (this->Icon != nullptr) {
+			return this->Icon;		
+		} else if (this->GetMainText() != nullptr) {
+			return this->GetMainText()->GetIcon();		
+		} else {
+			return nullptr;
+		}
 	}
 	
 	const std::vector<CLiteraryText *> &GetSections() const
