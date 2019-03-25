@@ -120,10 +120,6 @@ bool CLiteraryText::ProcessConfigDataSection(const CConfigData *section)
 */
 void CLiteraryText::Initialize()
 {
-	if (!this->GetPages().empty() && !this->GetSections().empty()) {
-		fprintf(stderr, "The literary text \"%s\" has both pages and sections, but if it has sections then it should have no pages directly.\n", this->GetIdent().utf8().get_data());
-	}
-	
 	CLiteraryText *previous_section = nullptr;
 	for (CLiteraryText *section : this->GetSections()) {
 		if (previous_section != nullptr) {
