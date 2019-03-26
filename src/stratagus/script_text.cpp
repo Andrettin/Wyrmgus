@@ -42,86 +42,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**  Define a text.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineText(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument (expected table)");
-	}
-
-	std::string text_ident = LuaToString(l, 1);
-	CLiteraryText *text = CLiteraryText::GetOrAdd(text_ident);
-	
-	//  Parse the list:
-	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		
-		if (!strcmp(value, "Name")) {
-			text->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Author")) {
-			text->Author = LuaToString(l, -1);
-		} else if (!strcmp(value, "Translator")) {
-			text->Translator = LuaToString(l, -1);
-		} else if (!strcmp(value, "Publisher")) {
-			text->Publisher = LuaToString(l, -1);
-		} else if (!strcmp(value, "CopyrightNotice")) {
-			text->License = LuaToString(l, -1);
-		} else if (!strcmp(value, "Notes")) {
-			text->Notes = LuaToString(l, -1);
-		} else if (!strcmp(value, "Year")) {
-			text->PublicationYear = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "InitialPage")) {
-			text->InitialPage = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Chapters")) {
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				lua_rawgeti(l, -1, j + 1);
-				CLiteraryText *chapter = new CLiteraryText;
-				chapter->Index = static_cast<int>(text->GetSections().size());
-				text->Sections.push_back(chapter);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument (expected table for variations)");
-				}
-				const int subargs = lua_rawlen(l, -1);
-				for (int k = 0; k < subargs; ++k) {
-					value = LuaToString(l, -1, k + 1);
-					++k;
-					lua_rawgeti(l, -1, k + 1);
-					if (!strcmp(value, "name")) {
-						chapter->Name = LuaToString(l, -1);
-					} else if (!strcmp(value, "introduction")) {
-						chapter->Introduction = LuaToBoolean(l, -1);
-					} else if (!strcmp(value, "text")) {
-						CLiteraryTextPage *previous_page = nullptr;
-						
-						const int subsubargs = lua_rawlen(l, -1);
-						for (int n = 0; n < subsubargs; ++n) {
-							CLiteraryTextPage *page = new CLiteraryTextPage(chapter->Pages.size(), previous_page);
-							page->Text = LuaToString(l, -1, n + 1);
-							chapter->Pages.push_back(page);
-							
-							previous_page = page;
-						}
-					} else {
-						LuaError(l, "Unsupported tag: %s" _C_ value);
-					}
-					lua_pop(l, 1);
-				}
-				lua_pop(l, 1);
-			}
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	return 0;
-}
-
 static int CclGetTexts(lua_State *l)
 {
 	lua_createtable(l, CLiteraryText::GetAll().size(), 0);
@@ -172,7 +92,7 @@ static int CclGetTextData(lua_State *l)
 		lua_pushnumber(l, text->GetPublicationYear());
 		return 1;
 	} else if (!strcmp(data, "InitialPage")) {
-		lua_pushnumber(l, text->GetInitialPage());
+		lua_pushnumber(l, text->GetInitialPageNumber());
 		return 1;
 	} else if (!strcmp(data, "Chapters")) {
 		lua_createtable(l, text->GetSections().size(), 0);
@@ -238,7 +158,6 @@ static int CclGetTextData(lua_State *l)
 */
 void TextCclRegister()
 {
-	lua_register(Lua, "DefineText", CclDefineText);
 	lua_register(Lua, "GetTexts", CclGetTexts);
 	lua_register(Lua, "GetTextData", CclGetTextData);
 }

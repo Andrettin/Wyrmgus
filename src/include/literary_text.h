@@ -98,9 +98,9 @@ public:
 		return this->PublicationYear;
 	}
 	
-	int GetInitialPage() const
+	int GetInitialPageNumber() const
 	{
-		return this->InitialPage;
+		return this->InitialPageNumber;
 	}
 	
 	CIcon *GetIcon() const
@@ -173,6 +173,26 @@ public:
 		}
 	}
 	
+	/**
+	**	@brief	Get the total page count of the literary text, including that of its sections, but ignoring the count of sections with disabled page numbering
+	**
+	**	@return The page count
+	*/
+	int GetTotalPageCount() const
+	{
+		int page_count = 0;
+		
+		if (this->IsPageNumberingEnabled()) {
+			page_count += static_cast<int>(this->GetPages().size());
+		}
+		
+		for (const CLiteraryText *section : this->GetSections()) {
+			page_count += section->GetTotalPageCount();
+		}
+
+		return page_count;
+	}
+	
 	CLiteraryText *GetSection(const std::string &section_name) const;
 	
 	bool IsIntroduction() const
@@ -180,7 +200,14 @@ public:
 		return this->Introduction;
 	}
 	
+	bool IsPageNumberingEnabled() const
+	{
+		return this->PageNumberingEnabled;
+	}
+	
 private:
+	void UpdateSectionPageNumbers();
+
 	String Name;					/// name of the text
 	bool Hidden = false;			/// whether the literary text is hidden
 	String Author;					/// author of the text
@@ -189,7 +216,8 @@ private:
 	String License;					/// the open-source license the text is under, or public domain if that's the case
 	String Notes;					/// notes to appear on the cover of the text
 	int PublicationYear = 0;		/// year of publication
-	int InitialPage = 1;			/// page in which the text begins
+	int InitialPageNumber = 0;		/// page number in which the text begins
+	bool PageNumberingEnabled = true;	/// whether page numbering is enabled for the literary text
 	CIcon *Icon = nullptr;			/// the text's icon
 	CLiteraryText *MainText = nullptr;	/// the main text to which this one belongs, if it is a section
 	std::vector<CLiteraryText *> Sections;	/// the sections of the literary text, e.g. different chapters, or volumes

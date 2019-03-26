@@ -69,8 +69,8 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 		this->Notes = value.c_str();
 	} else if (key == "publication_year") {
 		this->PublicationYear = std::stoi(value);
-	} else if (key == "initial_page") {
-		this->InitialPage = std::stoi(value);
+	} else if (key == "initial_page_number") {
+		this->InitialPageNumber = std::stoi(value);
 	} else if (key == "icon") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->Icon = CIcon::Get(value);
@@ -81,6 +81,8 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 			this->Sections.push_back(section);
 			section->MainText = this;
 		}
+	} else if (key == "page_numbering_enabled") {
+		this->PageNumberingEnabled = StringToBool(value);
 	} else {
 		return false;
 	}
@@ -120,6 +122,10 @@ bool CLiteraryText::ProcessConfigDataSection(const CConfigData *section)
 */
 void CLiteraryText::Initialize()
 {
+	if (this->InitialPageNumber == 0 && this->GetMainText() == nullptr) {
+		this->InitialPageNumber = 1;
+	}
+	
 	CLiteraryText *previous_section = nullptr;
 	for (CLiteraryText *section : this->GetSections()) {
 		if (previous_section != nullptr) {
@@ -131,6 +137,17 @@ void CLiteraryText::Initialize()
 	}
 	
 	this->Initialized = true;
+	
+	//update the initial page numbers of each literary text section, according to the quantity of pages before
+	if (CLiteraryText::AreAllInitialized()) {
+		for (CLiteraryText *literary_text : CLiteraryText::GetAll()) {
+			if (literary_text->GetMainText() != nullptr) {
+				continue;
+			}
+			
+			literary_text->UpdateSectionPageNumbers();
+		}
+	}
 }
 
 CLiteraryText *CLiteraryText::GetSection(const std::string &section_name) const
@@ -144,6 +161,24 @@ CLiteraryText *CLiteraryText::GetSection(const std::string &section_name) const
 	return nullptr;
 }
 
+void CLiteraryText::UpdateSectionPageNumbers()
+{
+	int page_offset = this->GetInitialPageNumber();
+	if (this->IsPageNumberingEnabled()) {
+		page_offset += static_cast<int>(this->GetPages().size());
+	}
+	
+	for (CLiteraryText *section : this->GetSections()) {
+		if (section->InitialPageNumber == 0) {
+			section->InitialPageNumber = page_offset;
+		}
+		
+		section->UpdateSectionPageNumbers();
+		
+		page_offset = section->GetInitialPageNumber() + section->GetTotalPageCount();
+	}
+}
+
 void CLiteraryText::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_name"), &CLiteraryText::GetName);
@@ -154,7 +189,7 @@ void CLiteraryText::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_license"), &CLiteraryText::GetLicense);
 	ClassDB::bind_method(D_METHOD("get_notes"), &CLiteraryText::GetNotes);
 	ClassDB::bind_method(D_METHOD("get_publication_year"), &CLiteraryText::GetPublicationYear);
-	ClassDB::bind_method(D_METHOD("get_initial_page"), &CLiteraryText::GetInitialPage);
+	ClassDB::bind_method(D_METHOD("get_initial_page_number"), &CLiteraryText::GetInitialPageNumber);
 	ClassDB::bind_method(D_METHOD("get_icon"), &CLiteraryText::GetIcon);
 	ClassDB::bind_method(D_METHOD("get_sections"), &CLiteraryText::GetSectionsArray);
 	ClassDB::bind_method(D_METHOD("get_main_text"), &CLiteraryText::GetMainText);
@@ -162,4 +197,5 @@ void CLiteraryText::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_next_section"), &CLiteraryText::GetNextSection);
 	ClassDB::bind_method(D_METHOD("get_first_page"), &CLiteraryText::GetFirstPage);
 	ClassDB::bind_method(D_METHOD("get_last_page"), &CLiteraryText::GetLastPage);
+	ClassDB::bind_method(D_METHOD("is_page_numbering_enabled"), &CLiteraryText::IsPageNumberingEnabled);
 }
