@@ -135,11 +135,6 @@ public:
 		return this->MainText;
 	}
 	
-	int GetSectionIndex() const
-	{
-		return this->SectionIndex;
-	}
-	
 	CLiteraryText *GetPreviousSection() const
 	{
 		return this->PreviousSection;
@@ -195,11 +190,6 @@ public:
 	
 	CLiteraryText *GetSection(const std::string &section_name) const;
 	
-	bool IsIntroduction() const
-	{
-		return this->Introduction;
-	}
-	
 	bool IsPageNumberingEnabled() const
 	{
 		return this->PageNumberingEnabled;
@@ -227,10 +217,8 @@ private:
 	CIcon *Icon = nullptr;			/// the text's icon
 	CLiteraryText *MainText = nullptr;	/// the main text to which this one belongs, if it is a section
 	std::vector<CLiteraryText *> Sections;	/// the sections of the literary text, e.g. different chapters, or volumes
-	int SectionIndex = -1;						/// the section index of this literary text, if it is a section
 	CLiteraryText *PreviousSection = nullptr;	/// the previous section to this one, if this is a section
 	CLiteraryText *NextSection = nullptr;	/// the next section to this one, if this is a section
-	bool Introduction = false;		/// whether this is an introductory chapter
 	std::vector<CLiteraryTextPage *> Pages;	/// pages of the literary text
 	
 public:
@@ -239,11 +227,5 @@ public:
 protected:
 	static void _bind_methods();
 };
-
-/*----------------------------------------------------------------------------
--- Functions
-----------------------------------------------------------------------------*/
-
-extern void TextCclRegister();
 
 #endif

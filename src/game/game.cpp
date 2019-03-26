@@ -2414,9 +2414,6 @@ void LuaRegisterModules()
 	SelectionCclRegister();
 	SoundCclRegister();
 	SpellCclRegister();
-	//Wyrmgus start
-	TextCclRegister();
-	//Wyrmgus end
 	TriggerCclRegister();
 	UnitCclRegister();
 	UnitTypeCclRegister();
