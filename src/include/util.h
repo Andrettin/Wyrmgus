@@ -116,11 +116,13 @@ extern char *strcasestr(const char *str, const char *substr);
 extern size_t strnlen(const char *str, size_t strsize);
 #endif
 
+#include <core/ustring.h>
+
 extern std::vector<std::string> SplitString(const std::string &str, const char *separators);
 extern bool StringToBool(const std::string &str);
 extern bool IsStringNumber(const std::string &str);
 extern bool IsStringBool(const std::string &str);
-extern std::string NumberToRomanNumeral(unsigned number);
+extern String NumberToRomanNumeral(unsigned number);
 extern std::string FormatNumber(const int number);
 extern std::string SnakeCaseToPascalCase(const std::string &str);
 

@@ -205,6 +205,11 @@ public:
 		return this->PageNumberingEnabled;
 	}
 	
+	bool HasLowercaseRomanNumeralPageNumbering() const
+	{
+		return this->LowercaseRomanNumeralPageNumbering;
+	}
+	
 private:
 	void UpdateSectionPageNumbers();
 
@@ -218,6 +223,7 @@ private:
 	int PublicationYear = 0;		/// year of publication
 	int InitialPageNumber = 0;		/// page number in which the text begins
 	bool PageNumberingEnabled = true;	/// whether page numbering is enabled for the literary text
+	bool LowercaseRomanNumeralPageNumbering = false;	/// whether page numbering should be depicted by lowercase Roman numerals
 	CIcon *Icon = nullptr;			/// the text's icon
 	CLiteraryText *MainText = nullptr;	/// the main text to which this one belongs, if it is a section
 	std::vector<CLiteraryText *> Sections;	/// the sections of the literary text, e.g. different chapters, or volumes

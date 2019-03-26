@@ -83,6 +83,8 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 		}
 	} else if (key == "page_numbering_enabled") {
 		this->PageNumberingEnabled = StringToBool(value);
+	} else if (key == "lowercase_roman_numeral_page_numbering") {
+		this->LowercaseRomanNumeralPageNumbering = StringToBool(value);
 	} else {
 		return false;
 	}
@@ -122,10 +124,6 @@ bool CLiteraryText::ProcessConfigDataSection(const CConfigData *section)
 */
 void CLiteraryText::Initialize()
 {
-	if (this->InitialPageNumber == 0 && this->GetMainText() == nullptr) {
-		this->InitialPageNumber = 1;
-	}
-	
 	CLiteraryText *previous_section = nullptr;
 	for (CLiteraryText *section : this->GetSections()) {
 		if (previous_section != nullptr) {
@@ -143,6 +141,10 @@ void CLiteraryText::Initialize()
 		for (CLiteraryText *literary_text : CLiteraryText::GetAll()) {
 			if (literary_text->GetMainText() != nullptr) {
 				continue;
+			}
+			
+			if (literary_text->InitialPageNumber == 0) {
+				literary_text->InitialPageNumber = 1;
 			}
 			
 			literary_text->UpdateSectionPageNumbers();
@@ -165,7 +167,7 @@ void CLiteraryText::UpdateSectionPageNumbers()
 {
 	int page_offset = this->GetInitialPageNumber();
 	if (this->IsPageNumberingEnabled()) {
-		page_offset += static_cast<int>(this->GetPages().size());
+		page_offset += std::max(static_cast<int>(this->GetPages().size()), 1);
 	}
 	
 	for (CLiteraryText *section : this->GetSections()) {
@@ -198,4 +200,5 @@ void CLiteraryText::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_first_page"), &CLiteraryText::GetFirstPage);
 	ClassDB::bind_method(D_METHOD("get_last_page"), &CLiteraryText::GetLastPage);
 	ClassDB::bind_method(D_METHOD("is_page_numbering_enabled"), &CLiteraryText::IsPageNumberingEnabled);
+	ClassDB::bind_method(D_METHOD("has_lowercase_roman_numeral_page_numbering"), &CLiteraryText::HasLowercaseRomanNumeralPageNumbering);
 }

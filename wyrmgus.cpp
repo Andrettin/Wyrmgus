@@ -11,6 +11,7 @@
 #include "script.h"
 #include "skin_color.h"
 #include "unit/unit_type.h"
+#include "util.h"
 #include "src/include/version.h"
 
 #include <oamlGodotModule/oamlGodotModule.h>
@@ -153,6 +154,11 @@ Array Wyrmgus::GetLiteraryTexts() const
 	return literary_texts;
 }
 
+String Wyrmgus::NumberToRomanNumeral(unsigned number) const
+{
+	return ::NumberToRomanNumeral(number);
+}
+
 void Wyrmgus::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("run"), &Wyrmgus::Run);
@@ -181,6 +187,8 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_literary_text", "ident"), &Wyrmgus::GetLiteraryText);
 	ClassDB::bind_method(D_METHOD("get_literary_texts"), &Wyrmgus::GetLiteraryTexts);
 
+	ClassDB::bind_method(D_METHOD("number_to_roman_numeral", "number"), &Wyrmgus::NumberToRomanNumeral);
+	
 	ADD_SIGNAL(MethodInfo("this_player_changed", PropertyInfo(Variant::OBJECT, "old_player"), PropertyInfo(Variant::OBJECT, "new_player")));
 	ADD_SIGNAL(MethodInfo("interface_changed", PropertyInfo(Variant::STRING, "old_interface"), PropertyInfo(Variant::STRING, "new_interface")));
 	

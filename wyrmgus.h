@@ -52,6 +52,8 @@ public:
 	
 	CLiteraryText *GetLiteraryText(String ident) const;
 	Array GetLiteraryTexts() const;
+	
+	String NumberToRomanNumeral(unsigned number) const;
 
 private:
 	oamlGodotModule *OamlModule = nullptr;
