@@ -82,6 +82,7 @@
 #include "world/world.h"
 
 #include <fstream>
+#include <stdexcept>
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -96,7 +97,7 @@
 void CConfigData::ParseConfigData(const std::string &filepath, const bool define_only)
 {
 	std::vector<std::string> data;
-	std::vector<CConfigData *> output;
+	std::vector<CConfigData *> config_data_elements;
 	
 	if (!CanAccessFile(filepath.c_str())) {
 		fprintf(stderr, "File \"%s\" not found.\n", filepath.c_str());
@@ -105,102 +106,37 @@ void CConfigData::ParseConfigData(const std::string &filepath, const bool define
 	std::ifstream text_stream(filepath);
 	std::string line;
 	
+	CConfigData *current_config_data = nullptr;
+	int line_index = 1;
 	while (std::getline(text_stream, line)) {
-		CConfigData::ParseLine(line, data);
-	}
-	
-	if (data.empty()) {
-		fprintf(stderr, "Could not get string data for config file \"%s\".\n", filepath.c_str());
-		return;
-	}
-	
-	CConfigData *config_data = nullptr;
-	std::string key;
-	CConfigOperator property_operator = CConfigOperator::None;
-	std::string value;
-	for (size_t i = 0; i < data.size(); ++i) {
-		std::string str = data[i];
-		if (str.size() >= 3 && str.front() == '[' && str[1] != '/' && str.back() == ']' && str.find(' ') == std::string::npos) { //opens a tag; exclude whitespace for the unlikely case when a text string (e.g. encyclopedia description) starts with '[' and ends with ']' due to BBCode
-			std::string tag_name = str;
-			tag_name = FindAndReplaceString(tag_name, "[", "");
-			tag_name = FindAndReplaceString(tag_name, "]", "");
-			CConfigData *new_config_data = new CConfigData(tag_name);
-			if (config_data) {
-				new_config_data->Parent = config_data;
-			}
-			config_data = new_config_data;
-		} else if (str.size() >= 3 && str.front() == '[' && str[1] == '/' && str.back() == ']' && str.find(' ') == std::string::npos) { //closes a tag
-			std::string tag_name = str;
-			tag_name = FindAndReplaceString(tag_name, "[/", "");
-			tag_name = FindAndReplaceString(tag_name, "]", "");
-			if (config_data) { //closes current tag
-				if (tag_name == config_data->Tag) {
-					if (config_data->Parent == nullptr) {
-						output.push_back(config_data);
-						config_data = nullptr;
-					} else {
-						CConfigData *parent_config_data = config_data->Parent;
-						parent_config_data->Sections.push_back(config_data);
-						config_data = parent_config_data;
-					}
-				} else {
-					fprintf(stderr, "Error parsing config file \"%s\": Tried closing tag \"%s\" while the open tag was \"%s\".\n", filepath.c_str(), tag_name.c_str(), config_data->Tag.c_str());
-				}
-			} else {
-				fprintf(stderr, "Error parsing config file \"%s\": Tried closing a tag (\"%s\") before any tag had been opened.\n", filepath.c_str(), tag_name.c_str());
-			}
-		} else if (key.empty()) { //key
-			if (config_data) {
-				key = str;
-			} else {
-				fprintf(stderr, "Error parsing config file \"%s\": Tried defining key \"%s\" before any tag had been opened.\n", filepath.c_str(), str.c_str());
-			}
-		} else if (!key.empty() && property_operator == CConfigOperator::None) { //operator
-			if (config_data) {
-				if (str == "=") {
-					property_operator = CConfigOperator::Assignment;
-				} else if (str == "+=") {
-					property_operator = CConfigOperator::Addition;
-				} else if (str == "-=") {
-					property_operator = CConfigOperator::Subtraction;
-				} else {
-					fprintf(stderr, "Error parsing config file \"%s\": Tried using operator \"%s\" for key \"%s\", but it is not a valid operator.\n", filepath.c_str(), str.c_str(), key.c_str());
-				}
-			} else {
-				fprintf(stderr, "Error parsing config file \"%s\": Tried using operator \"%s\" for key \"%s\" without any tag being opened.\n", filepath.c_str(), str.c_str(), key.c_str());
-			}
-		} else if (property_operator != CConfigOperator::None) { //value
-			if (config_data) {
-				std::string value = str;
-				if (key == "ident") {
-					config_data->Ident = value;
-				} else {
-					config_data->Properties.push_back(CConfigProperty(key, property_operator, value));
-				}
-				key.clear();
-				property_operator = CConfigOperator::None;
-			} else {
-				fprintf(stderr, "Error parsing config file \"%s\": Tried assigning value \"%s\" to key \"%s\" without any tag being opened.\n", filepath.c_str(), str.c_str(), key.c_str());
-			}
+		try {
+			std::vector<std::string> tokens = CConfigData::ParseLine(line);
+			CConfigData::ParseTokens(tokens, &current_config_data, config_data_elements);
+		} catch (std::exception &exception) {
+			fprintf(stderr, "Error parsing config file \"%s\", line %i: %s.\n", filepath.c_str(), line_index, exception.what());
 		}
+		++line_index;
 	}
 	
-	if (output.empty()) {
+	if (config_data_elements.empty()) {
 		fprintf(stderr, "Could not parse output for config file \"%s\".\n", filepath.c_str());
 		return;
 	}
 	
-	ProcessConfigData(output, define_only);
+	ProcessConfigData(config_data_elements, define_only);
 }
 
 /**
 **	@brief	Parse a line in a configuration data file
 **
 **	@param	line	The line to be parsed
-**	@param	data	The vector holding the data file's output
+**
+**	@return	A vector holding the line's tokens
 */
-void CConfigData::ParseLine(const std::string &line, std::vector<std::string> &data)
+std::vector<std::string> CConfigData::ParseLine(const std::string &line)
 {
+	std::vector<std::string> tokens;
+	
 	bool opened_quotation_marks = false;
 	bool escaped = false;
 	std::string current_string;
@@ -224,7 +160,7 @@ void CConfigData::ParseLine(const std::string &line, std::vector<std::string> &d
 			//whitespace, carriage returns and etc. separate tokens, if they occur outside of quotes
 			if (character == ' ' || character == '\t' || character == '\r' || character == '\n') {
 				if (!current_string.empty()) {
-					data.push_back(current_string);
+					tokens.push_back(current_string);
 					current_string.clear();
 				}
 				
@@ -232,24 +168,10 @@ void CConfigData::ParseLine(const std::string &line, std::vector<std::string> &d
 			}
 		}
 		
-	
 		if (escaped) {
 			escaped = false;
 			
-			if (character == 'n') {
-				current_string += '\n';
-				continue;
-			} else if (character == 't') {
-				current_string += '\t';
-				continue;
-			} else if (character == 'r') {
-				current_string += '\r';
-				continue;
-			} else if (character == '\"') {
-				current_string += '\"';
-				continue;
-			} else if (character == '\\') {
-				current_string += '\\';
+			if (CConfigData::ParseEscapedCharacter(current_string, character)) {
 				continue;
 			}
 		}
@@ -258,7 +180,115 @@ void CConfigData::ParseLine(const std::string &line, std::vector<std::string> &d
 	}
 	
 	if (!current_string.empty()) {
-		data.push_back(current_string);
+		tokens.push_back(current_string);
+	}
+	
+	return tokens;
+}
+
+/**
+**	@brief	Parse an escaped character in a configuration data file line
+**
+**	@param	current_string	The string currently being built from the parsing
+**	@param	character		The character
+**
+**	@return	True if an escaped character was added to the string, or false otherwise
+*/
+bool CConfigData::ParseEscapedCharacter(std::string &current_string, const char character)
+{
+	if (character == 'n') {
+		current_string += '\n';
+	} else if (character == 't') {
+		current_string += '\t';
+	} else if (character == 'r') {
+		current_string += '\r';
+	} else if (character == '\"') {
+		current_string += '\"';
+	} else if (character == '\\') {
+		current_string += '\\';
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Parse the tokens from a configuration data file line
+**
+**	@param	tokens					The tokens to be parsed
+**	@param	current_config_data		The current config data in the processing
+**	@param	config_data_elements	The config data elements added so far for this file
+*/
+void CConfigData::ParseTokens(const std::vector<std::string> &tokens, CConfigData **current_config_data, std::vector<CConfigData *> &config_data_elements)
+{
+	std::string key;
+	CConfigOperator property_operator = CConfigOperator::None;
+	std::string value;
+	for (const std::string &token : tokens) {
+		if (key.empty()) {
+			if (token.size() >= 3 && token.front() == '[' && token[1] != '/' && token.back() == ']') { //opens a tag
+				std::string tag_name = token;
+				tag_name = FindAndReplaceString(tag_name, "[", "");
+				tag_name = FindAndReplaceString(tag_name, "]", "");
+				CConfigData *new_config_data = new CConfigData(tag_name);
+				if ((*current_config_data) != nullptr) {
+					new_config_data->Parent = (*current_config_data);
+				}
+				(*current_config_data) = new_config_data;
+			} else if (token.size() >= 3 && token.front() == '[' && token[1] == '/' && token.back() == ']') { //closes a tag
+				std::string tag_name = token;
+				tag_name = FindAndReplaceString(tag_name, "[/", "");
+				tag_name = FindAndReplaceString(tag_name, "]", "");
+				if ((*current_config_data) != nullptr) { //closes current tag
+					if (tag_name == (*current_config_data)->Tag) {
+						if ((*current_config_data)->Parent == nullptr) {
+							config_data_elements.push_back((*current_config_data));
+							(*current_config_data) = nullptr;
+						} else {
+							CConfigData *parent_config_data = (*current_config_data)->Parent;
+							parent_config_data->Sections.push_back((*current_config_data));
+							(*current_config_data) = parent_config_data;
+						}
+					} else {
+						throw std::runtime_error("Tried closing atag \"" + tag_name + "\" while the open tag was \"%s\".");
+					}
+				} else {
+					throw std::runtime_error("Tried closing tag \"" + tag_name + "\" before any tag had been opened.");
+				}
+			} else { //key
+				if ((*current_config_data) != nullptr) {
+					key = token;
+				} else {
+					throw std::runtime_error("Tried defining key \"" + token + "\" before any tag had been opened.");
+				}
+			}
+			
+			continue;
+		}
+		
+		if (property_operator == CConfigOperator::None) { //operator
+			if (token == "=") {
+				property_operator = CConfigOperator::Assignment;
+			} else if (token == "+=") {
+				property_operator = CConfigOperator::Addition;
+			} else if (token == "-=") {
+				property_operator = CConfigOperator::Subtraction;
+			} else {
+				throw std::runtime_error("Tried using operator \"" + token + "\" for key \"" + key + "\", but it is not a valid operator.");
+			}
+			
+			continue;
+		}
+		
+		//value
+		if (key == "ident") {
+			(*current_config_data)->Ident = token;
+		} else {
+			(*current_config_data)->Properties.push_back(CConfigProperty(key, property_operator, token));
+		}
+		key.clear();
+		property_operator = CConfigOperator::None;
 	}
 }
 

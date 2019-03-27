@@ -53,7 +53,13 @@ public:
 	}
 	
 	static void ParseConfigData(const std::string &filepath, const bool define_only);
-	static void ParseLine(const std::string &line, std::vector<std::string> &data);
+	
+private:
+	static std::vector<std::string> ParseLine(const std::string &line);
+	static bool ParseEscapedCharacter(std::string &current_string, const char character);
+	static void ParseTokens(const std::vector<std::string> &tokens, CConfigData **current_config_data, std::vector<CConfigData *> &config_data_elements);
+	
+public:
 	static void ProcessConfigData(const std::vector<CConfigData *> &config_data_list, const bool define_only);
 	
 	Color ProcessColor() const;
