@@ -30,17 +30,34 @@
 #ifndef __RELIGION_H__
 #define __RELIGION_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
 class CConfigData;
 class CDeityDomain;
 
-class CReligion : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CReligion : public CDataType, public Database<CReligion>
 {
 	GDCLASS(CReligion, CDataType)
-	DATA_TYPE_CLASS(CReligion)
 
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "religion";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	std::string Name;							/// Name of the religion

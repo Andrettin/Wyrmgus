@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "time/time_period_schedule.h"
 
 /*----------------------------------------------------------------------------
@@ -42,6 +43,10 @@
 
 class CSeason;
 class CSeasonSchedule;
+
+/*----------------------------------------------------------------------------
+--  Definitions
+----------------------------------------------------------------------------*/
 
 class CScheduledSeason
 {
@@ -52,13 +57,17 @@ public:
 	CSeasonSchedule *Schedule = nullptr;	/// the schedule to which this season belongs
 };
 
-class CSeasonSchedule : public CTimePeriodSchedule
+class CSeasonSchedule : public CTimePeriodSchedule, public Database<CSeasonSchedule>
 {
 	GDCLASS(CSeasonSchedule, CTimePeriodSchedule)
-	DATA_TYPE_CLASS(CSeasonSchedule)
 	
 public:
 	~CSeasonSchedule();
+	
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "season_schedule";
+	}
 	
 	static CSeasonSchedule *DefaultSeasonSchedule;
 	

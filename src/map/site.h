@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
 #include "time/date.h"
 #include "vec2i.h"
@@ -50,12 +51,20 @@ class CUnit;
 class CUnitType;
 class CUniqueItem;
 
-class CSite : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CSite : public CDataType, public Database<CSite>
 {
 	GDCLASS(CSite, CDataType)
-	DATA_TYPE_CLASS(CSite)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "site";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;

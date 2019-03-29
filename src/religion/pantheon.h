@@ -30,14 +30,27 @@
 #ifndef __PANTHEON_H__
 #define __PANTHEON_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
 
-class CPantheon : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CPantheon : public CDataType, public Database<CPantheon>
 {
 	GDCLASS(CPantheon, CDataType)
-	DATA_TYPE_CLASS(CPantheon)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "pantheon";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	std::string Name;							/// Name of the pantheon

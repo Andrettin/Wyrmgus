@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
 
 /*----------------------------------------------------------------------------
@@ -47,12 +48,20 @@ class CUnitType;
 class CWorld;
 struct lua_State;
 
-class CSpecies : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CSpecies : public CDataType, public Database<CSpecies>
 {
 	GDCLASS(CSpecies, CDataType)
-	DATA_TYPE_CLASS(CSpecies)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "species";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;
 	

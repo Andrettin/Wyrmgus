@@ -30,10 +30,23 @@
 #ifndef __WORD_H__
 #define __WORD_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
 class CLanguage;
 struct lua_State;
+
+/*----------------------------------------------------------------------------
+--  Enumerations
+----------------------------------------------------------------------------*/
 
 enum WordTypes {
 	WordTypeNoun,
@@ -133,12 +146,20 @@ enum WordJunctionTypes {
 	MaxWordJunctionTypes
 };
 
-class CWord : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CWord : public CDataType, public Database<CWord>
 {
 	GDCLASS(CWord, CDataType)
-	DATA_TYPE_CLASS(CWord)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "word";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	const String &GetName() const

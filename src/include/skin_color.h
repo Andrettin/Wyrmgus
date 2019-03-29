@@ -30,12 +30,26 @@
 #ifndef __SKIN_COLOR_H__
 #define __SKIN_COLOR_H__
 
-#include "conversible_color.h"
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
 
-class CSkinColor : public CConversibleColor
+#include "conversible_color.h"
+#include "database.h"
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CSkinColor : public CConversibleColor, public Database<CSkinColor>
 {
 	GDCLASS(CSkinColor, CConversibleColor)
-	DATA_TYPE_CLASS(CSkinColor)
+	
+public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "skin_color";
+	}
 };
 
 #endif

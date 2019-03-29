@@ -38,6 +38,7 @@
 #include "vec2i.h"
 #include "video/color.h"
 
+#include <map>
 #include <tuple>
 
 /*----------------------------------------------------------------------------
@@ -48,6 +49,10 @@ class CGraphic;
 class CPlayerColorGraphic;
 class CSeason;
 class CUnitType;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
 
 class CTerrainType : public CDataType
 {

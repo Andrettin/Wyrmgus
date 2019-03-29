@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
 #include "ui/icon_config.h"
 
@@ -49,12 +50,20 @@ class CPlayerColor;
 class CQuest;
 class CUnitType;
 
-class CAchievement : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CAchievement : public CDataType, public Database<CAchievement>
 {
 	GDCLASS(CAchievement, CDataType)
-	DATA_TYPE_CLASS(CAchievement)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "achievement";
+	}
+	
 	static void CheckAchievements();
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;

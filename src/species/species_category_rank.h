@@ -34,18 +34,23 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
 
 /*----------------------------------------------------------------------------
---  Declarations
+--  Definition
 ----------------------------------------------------------------------------*/
 
-class CSpeciesCategoryRank : public CDataType
+class CSpeciesCategoryRank : public CDataType, public Database<CSpeciesCategoryRank>
 {
 	GDCLASS(CSpeciesCategoryRank, CDataType)
-	DATA_TYPE_CLASS(CSpeciesCategoryRank)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "species_category_rank";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;
 	

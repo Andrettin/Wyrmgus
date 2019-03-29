@@ -30,16 +30,33 @@
 #ifndef __SPECIES_CATEGORY_H__
 #define __SPECIES_CATEGORY_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
 class CSpeciesCategoryRank;
 
-class CSpeciesCategory : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CSpeciesCategory : public CDataType, public Database<CSpeciesCategory>
 {
 	GDCLASS(CSpeciesCategory, CDataType)
-	DATA_TYPE_CLASS(CSpeciesCategory)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "species_category";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	String GetName() const

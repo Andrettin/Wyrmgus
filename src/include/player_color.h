@@ -30,12 +30,26 @@
 #ifndef __PLAYER_COLOR_H__
 #define __PLAYER_COLOR_H__
 
-#include "conversible_color.h"
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
 
-class CPlayerColor : public CConversibleColor
+#include "conversible_color.h"
+#include "database.h"
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CPlayerColor : public CConversibleColor, public Database<CPlayerColor>
 {
 	GDCLASS(CPlayerColor, CConversibleColor)
-	DATA_TYPE_CLASS(CPlayerColor)
+	
+public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "player_color";
+	}
 };
 
 #endif

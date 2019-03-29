@@ -37,6 +37,8 @@
 #include "data_type.h"
 #include "ui/icon_config.h"
 
+#include <map>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -48,6 +50,10 @@ class CPantheon;
 class CPlane;
 class CReligion;
 class CUpgrade;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
 
 constexpr int MAJOR_DEITY_DOMAIN_MAX = 3; /// major deities can only have up to three domains
 constexpr int MINOR_DEITY_DOMAIN_MAX = 1; /// minor deities can only have one domain

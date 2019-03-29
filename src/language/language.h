@@ -30,17 +30,34 @@
 #ifndef __LANGUAGE_H__
 #define __LANGUAGE_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
 #include "word.h" // for certain enums
 
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
 class CWord;
 
-class CLanguage : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CLanguage : public CDataType, public Database<CLanguage>
 {
 	GDCLASS(CLanguage, CDataType)
-	DATA_TYPE_CLASS(CLanguage)
 
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "language";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 
 	const String &GetName() const

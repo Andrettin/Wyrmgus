@@ -39,6 +39,7 @@
 #include "time/date.h"
 #include "ui/icon_config.h"
 
+#include <map>
 #include <tuple>
 
 /*----------------------------------------------------------------------------

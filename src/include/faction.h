@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "character.h" // because of "MaxCharacterTitles"
-#include "data_type.h"
+#include "database.h"
 #include "time/date.h"
 #include "ui/icon_config.h"
 #include "ui/ui.h" // for the UI fillers
@@ -56,6 +56,10 @@ class CPlayerColor;
 class CUpgrade;
 class CSite;
 class LuaCallback;
+
+/*----------------------------------------------------------------------------
+--  Enumerations
+----------------------------------------------------------------------------*/
 
 enum GovernmentTypes {
 	GovernmentTypeNoGovernmentType,
@@ -89,13 +93,21 @@ enum FactionTiers {
 	MaxFactionTiers
 };
 
-class CFaction : public Object
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CFaction : public Object, public Database<CFaction>
 {
 	GDCLASS(CFaction, Object)
-	DATA_TYPE_CLASS(CFaction)
 	
 public:
 	~CFaction();
+	
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "faction";
+	}
 	
 	static int GetIndex(const std::string &faction_ident);
 	static int GetFactionClassUnitType(const CFaction *faction, const int class_id);
@@ -232,6 +244,7 @@ public:
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
 
+	friend Database;
 	friend int CclDefineFaction(lua_State *l);
 	
 protected:

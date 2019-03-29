@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
 
 /*----------------------------------------------------------------------------
@@ -48,12 +49,16 @@ struct lua_State;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CLiteraryText : public CDataType
+class CLiteraryText : public CDataType, public Database<CLiteraryText>
 {
 	GDCLASS(CLiteraryText, CDataType)
-	DATA_TYPE_CLASS(CLiteraryText)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "literary_text";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;

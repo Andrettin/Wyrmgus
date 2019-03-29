@@ -30,12 +30,26 @@
 #ifndef __HAIR_COLOR_H__
 #define __HAIR_COLOR_H__
 
-#include "conversible_color.h"
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
 
-class CHairColor : public CConversibleColor
+#include "conversible_color.h"
+#include "database.h"
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CHairColor : public CConversibleColor, public Database<CHairColor>
 {
 	GDCLASS(CHairColor, CConversibleColor)
-	DATA_TYPE_CLASS(CHairColor)
+
+public:	
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "hair_color";
+	}
 };
 
 #endif

@@ -35,6 +35,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
 
 /*----------------------------------------------------------------------------
@@ -80,12 +81,16 @@ constexpr int ScoreCost = (MaxCosts + 1);
 constexpr int ManaResCost (MaxCosts + 2);
 constexpr int FreeWorkersCount (MaxCosts + 3);
 
-class CResource : public CDataType
+class CResource : public CDataType, public Database<CResource>
 {
 	GDCLASS(CResource, CDataType)
-	DATA_TYPE_CLASS(CResource)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "resource";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	const String &GetName() const

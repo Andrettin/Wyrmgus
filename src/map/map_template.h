@@ -34,14 +34,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
 #include "map/tile.h"
 #include "time/date.h"
 #include "vec2i.h"
-
-#include <map>
-#include <string>
-#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -57,6 +54,10 @@ class CTerrainType;
 class CUniqueItem;
 class CUnitType;
 class CWorld;
+
+/*----------------------------------------------------------------------------
+--  Definitions
+----------------------------------------------------------------------------*/
 
 class CGeneratedTerrain
 {
@@ -77,14 +78,18 @@ public:
 	std::vector<const CTerrainType *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
 };
 
-class CMapTemplate : public CDataType
+class CMapTemplate : public CDataType, public Database<CMapTemplate>
 {
 	GDCLASS(CMapTemplate, CDataType)
-	DATA_TYPE_CLASS(CMapTemplate)
 	
 public:
 	~CMapTemplate();
 
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "map_template";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;

@@ -30,16 +30,33 @@
 #ifndef __SEASON_H__
 #define __SEASON_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
 class CGraphic;
 
-class CSeason : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CSeason : public CDataType, public Database<CSeason>
 {
 	GDCLASS(CSeason, CDataType)
-	DATA_TYPE_CLASS(CSeason)
 
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "season";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 

@@ -30,21 +30,38 @@
 #ifndef __DYNASTY_H__
 #define __DYNASTY_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
 #include "ui/icon_config.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
 class CCivilization;
 class CFaction;
 class CUpgrade;
 class LuaCallback;
 
-class CDynasty : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CDynasty : public CDataType, public Database<CDynasty>
 {
 	GDCLASS(CDynasty, CDataType)
-	DATA_TYPE_CLASS(CDynasty)
 
 public:
 	~CDynasty();
+	
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "dynasty";
+	}
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	

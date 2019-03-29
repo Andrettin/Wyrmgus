@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
 #include "time/date.h"
 #include "vec2i.h"
@@ -52,12 +53,20 @@ class CQuest;
 class CSpecies;
 struct lua_State;
 
-class CCampaign : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CCampaign : public CDataType, public Database<CCampaign>
 {
 	GDCLASS(CCampaign, CDataType)
-	DATA_TYPE_CLASS(CCampaign)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "campaign";
+	}
+	
 	static void SetCurrentCampaign(CCampaign *campaign);
 	static CCampaign *GetCurrentCampaign();
 

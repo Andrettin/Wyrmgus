@@ -30,14 +30,27 @@
 #ifndef __CURRENCY_H__
 #define __CURRENCY_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
 
-class CCurrency : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CCurrency : public CDataType, public Database<CCurrency>
 {
 	GDCLASS(CCurrency, CDataType)
-	DATA_TYPE_CLASS(CCurrency)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "currency";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	const String &GetName() const

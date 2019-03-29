@@ -30,19 +30,36 @@
 #ifndef __AGE_H__
 #define __AGE_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
 class CDependency;
 class CGraphic;
 class CUpgrade;
 
-class CAge : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CAge : public CDataType, public Database<CAge>
 {
 	GDCLASS(CAge, CDataType)
-	DATA_TYPE_CLASS(CAge)
 	
 public:
 	~CAge();
+	
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "age";
+	}
 	
 	static void SetCurrentAge(CAge *age);
 	static void CheckCurrentAge();

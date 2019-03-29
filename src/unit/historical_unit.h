@@ -30,20 +30,37 @@
 #ifndef __HISTORICAL_UNIT_H__
 #define __HISTORICAL_UNIT_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
 #include "time/date.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
 
 class CFaction;
 class CHistoricalLocation;
 class CUnitType;
 
-class CHistoricalUnit : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CHistoricalUnit : public CDataType, public Database<CHistoricalUnit>
 {
 	GDCLASS(CHistoricalUnit, CDataType)
-	DATA_TYPE_CLASS(CHistoricalUnit)
 	
 public:
 	~CHistoricalUnit();
+	
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "historical_unit";
+	}
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;

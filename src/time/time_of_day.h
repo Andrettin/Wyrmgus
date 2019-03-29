@@ -34,10 +34,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
 #include "video/color.h"
-
-#include <core/object.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -45,12 +44,20 @@
 
 class CGraphic;
 
-class CTimeOfDay : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CTimeOfDay : public CDataType, public Database<CTimeOfDay>
 {
 	GDCLASS(CTimeOfDay, CDataType)
-	DATA_TYPE_CLASS(CTimeOfDay)
 	
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "time_of_day";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 

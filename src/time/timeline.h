@@ -30,15 +30,28 @@
 #ifndef __TIMELINE_H__
 #define __TIMELINE_H__
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "database.h"
 #include "data_type.h"
 #include "time/date.h"
 
-class CTimeline : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CTimeline : public CDataType, public Database<CTimeline>
 {
 	GDCLASS(CTimeline, CDataType)
-	DATA_TYPE_CLASS(CTimeline)
 
 public:
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "timeline";
+	}
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	std::string Name;

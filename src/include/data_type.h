@@ -38,139 +38,16 @@
 #include <core/ustring.h>
 
 #include <algorithm>
-#include <map>
 #include <string>
-#include <vector>
-
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
-//macro for data type classes
-#define DATA_TYPE_CLASS(class_name) \
-public: \
-	/**
-	**	@brief	Get an instance of the class by its string identifier
-	**
-	**	@param	ident	The instance's string identifier
-	**
-	**	@return	The instance if found, or null otherwise
-	*/ \
-	static inline class_name *Get(const std::string &ident, const bool should_find = true) \
-	{ \
-		std::map<std::string, class_name *>::const_iterator find_iterator = class_name::InstancesByIdent.find(ident); \
-		\
-		if (find_iterator != class_name::InstancesByIdent.end()) { \
-			return find_iterator->second; \
-		} \
-		\
-		if (should_find) { \
-			fprintf(stderr, "Invalid %s instance: \"%s\".\n", #class_name, ident.c_str()); \
-		} \
-		\
-		return nullptr; \
-	} \
-	\
-	/**
-	**	@brief	Get an instance of the class by its index
-	**
-	**	@param	index	The instance's index
-	**
-	**	@return	The instance if found, or null otherwise
-	*/ \
-	static inline class_name *Get(const int index, const bool should_find = true) \
-	{ \
-		if (index == -1) { \
-			return nullptr; \
-		} \
-		\
-		if (index < static_cast<int>(class_name::Instances.size())) { \
-			return class_name::Instances[index]; \
-		} \
-		\
-		if (should_find) { \
-			fprintf(stderr, "Invalid %s instance index: %i.\n", #class_name, index); \
-		} \
-		\
-		return nullptr; \
-	} \
-	\
-	/**
-	**	@brief	Get or add an instance of the class
-	**
-	**	@param	ident	The instance's string identifier
-	**
-	**	@return	The instance if found, otherwise a new instance is created and returned
-	*/ \
-	static inline class_name *GetOrAdd(const std::string &ident) \
-	{ \
-		class_name *instance = class_name::Get(ident, false); \
-		\
-		if (!instance) { \
-			instance = new class_name; \
-			instance->Ident = ident; \
-			instance->Index = class_name::Instances.size(); \
-			class_name::Instances.push_back(instance); \
-			class_name::InstancesByIdent[ident] = instance; \
-		} \
-		\
-		return instance; \
-	} \
-	\
-	/**
-	**	@brief	Gets all instances of the class
-	**
-	**	@return	All existing instances of the class
-	*/ \
-	static inline const std::vector<class_name *> &GetAll() \
-	{ \
-		return class_name::Instances; \
-	} \
-	\
-	/**
-	**	@brief	Remove an instance of the class
-	**
-	**	@param	instance	The instance
-	*/ \
-	static inline void Remove(const class_name *instance) \
-	{ \
-		class_name::InstancesByIdent.erase(instance->Ident); \
-		class_name::Instances.erase(std::remove(class_name::Instances.begin(), class_name::Instances.end(), instance), class_name::Instances.end()); \
-		delete instance; \
-	} \
-	\
-	/**
-	**	@brief	Remove the existing class instances
-	*/ \
-	static inline void Clear() \
-	{ \
-		for (class_name *instance : class_name::Instances) { \
-			delete instance; \
-		} \
-		class_name::Instances.clear(); \
-		class_name::InstancesByIdent.clear(); \
-	} \
-	\
-	static inline bool AreAllInitialized() \
-	{ \
-		for (class_name *instance : class_name::Instances) { \
-			if (!instance->IsInitialized()) { \
-				return false; \
-			} \
-		} \
-		\
-		return true; \
-	} \
-	\
-private: \
-	static inline std::vector<class_name *> Instances; \
-	static inline std::map<std::string, class_name *> InstancesByIdent;
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
+
+template<typename T>
+class Database;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -231,6 +108,8 @@ public:
 protected:
 	int Index = -1;		/// index of the data type instance
 	bool Initialized = false;	/// whether the data type instance has been initialized
+	
+	friend Database;
 
 protected:
 	static void _bind_methods();

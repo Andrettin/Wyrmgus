@@ -35,6 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "character.h" // because of "MaxCharacterTitles"
+#include "database.h"
 #include "faction.h" //for certain enums
 #include "time/date.h"
 #include "ui/icon_config.h"
@@ -61,13 +62,21 @@ class CQuest;
 class CSpecies;
 class CUpgrade;
 
-class CCivilization : public Object
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CCivilization : public Object, public Database<CCivilization>
 {
 	GDCLASS(CCivilization, Object)
-	DATA_TYPE_CLASS(CCivilization)
 	
 public:
 	~CCivilization();
+	
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "civilization";
+	}
 	
 	static int GetCivilizationClassUnitType(const CCivilization *civilization, const int class_id);
 	static int GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id);
@@ -298,6 +307,7 @@ public:
 	std::vector<CFiller> UIFillers;
 	std::map<int, IconConfig> ButtonIcons;		/// icons for button actions
 	
+	friend Database;
 	friend int CclDefineCivilization(lua_State *l);
 
 protected:
