@@ -34,10 +34,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
 #include "ui/icon_config.h"
-
-#include <map>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -50,6 +49,7 @@ class CPantheon;
 class CPlane;
 class CReligion;
 class CUpgrade;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -58,20 +58,24 @@ class CUpgrade;
 constexpr int MAJOR_DEITY_DOMAIN_MAX = 3; /// major deities can only have up to three domains
 constexpr int MINOR_DEITY_DOMAIN_MAX = 1; /// minor deities can only have one domain
 
-class CDeity : public CDataType
+class CDeity : public CDataType, public Database<CDeity>
 {
 	GDCLASS(CDeity, CDataType)
 
 public:
-	static CDeity *GetDeity(const std::string &ident, const bool should_find = true);
-	static CDeity *GetOrAddDeity(const std::string &ident);
-	static CDeity *GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
-	static void ClearDeities();
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "deity";
+	}
 	
-	static std::vector<CDeity *> Deities;		/// Deities
-	static std::map<std::string, CDeity *> DeitiesByIdent;
+	static CDeity *GetByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
+	static void Remove(CDeity *deity);
+	static void Clear();
+	
+private:
 	static std::map<const CUpgrade *, CDeity *> DeitiesByUpgrade;
 	
+public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	
 	std::string GetCulturalName(const CCivilization *civilization) const;
@@ -95,6 +99,8 @@ public:
 	std::vector<CUpgrade *> Abilities;			/// Abilities linked to this deity
 	std::map<const CCivilization *, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 
+	friend int CclDefineDeity(lua_State *l);
+	
 protected:
 	static inline void _bind_methods() {}
 };

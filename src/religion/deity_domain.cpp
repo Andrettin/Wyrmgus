@@ -42,57 +42,11 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CDeityDomain *> CDeityDomain::DeityDomains;
-std::map<std::string, CDeityDomain *> CDeityDomain::DeityDomainsByIdent;
 std::map<const CUpgrade *, CDeityDomain *> CDeityDomain::DeityDomainsByUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a deity domain
-**
-**	@param	ident		The deity domain's string identifier
-**	@param	should_find	Whether it is an error if the deity domain could not be found; this is true by default
-**
-**	@return	The deity domain if found, or null otherwise
-*/
-CDeityDomain *CDeityDomain::GetDeityDomain(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CDeityDomain *>::const_iterator find_iterator = CDeityDomain::DeityDomainsByIdent.find(ident);
-	
-	if (find_iterator != CDeityDomain::DeityDomainsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid deity domain: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a deity domain
-**
-**	@param	ident	The deity domain's string identifier
-**
-**	@return	The deity domain if found, or a newly-created one otherwise
-*/
-CDeityDomain *CDeityDomain::GetOrAddDeityDomain(const std::string &ident)
-{
-	CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(ident, false);
-	
-	if (!deity_domain) {
-		deity_domain = new CDeityDomain;
-		deity_domain->Ident = ident;
-		CDeityDomain::DeityDomains.push_back(deity_domain);
-		CDeityDomain::DeityDomainsByIdent[ident] = deity_domain;
-	}
-	
-	return deity_domain;
-}
 
 /**
 **	@brief	Get a deity domain by its respective upgrade
@@ -102,7 +56,7 @@ CDeityDomain *CDeityDomain::GetOrAddDeityDomain(const std::string &ident)
 **
 **	@return	The upgrade's deity domain, if any
 */
-CDeityDomain *CDeityDomain::GetDeityDomainByUpgrade(const CUpgrade *upgrade, const bool should_find)
+CDeityDomain *CDeityDomain::GetByUpgrade(const CUpgrade *upgrade, const bool should_find)
 {
 	std::map<const CUpgrade *, CDeityDomain *>::const_iterator find_iterator = CDeityDomain::DeityDomainsByUpgrade.find(upgrade);
 	
@@ -118,16 +72,30 @@ CDeityDomain *CDeityDomain::GetDeityDomainByUpgrade(const CUpgrade *upgrade, con
 }
 
 /**
+**	@brief	Remove a deity domain
+**
+**	@param	deity_domain	The deity domain
+*/
+void CDeityDomain::Remove(CDeityDomain *deity_domain)
+{
+	for (std::map<const CUpgrade *, CDeityDomain *>::iterator iterator = CDeityDomain::DeityDomainsByUpgrade.begin(); iterator != CDeityDomain::DeityDomainsByUpgrade.end(); ++iterator) {
+		if (iterator->second == deity_domain) {
+			CDeityDomain::DeityDomainsByUpgrade.erase(iterator);
+			break;
+		}
+	}
+	
+	Database<CDeityDomain>::Remove(deity_domain);
+}
+
+/**
 **	@brief	Remove the existing deity domains
 */
-void CDeityDomain::ClearDeityDomains()
+void CDeityDomain::Clear()
 {
-	for (size_t i = 0; i < CDeityDomain::DeityDomains.size(); ++i) {
-		delete DeityDomains[i];
-	}
-	CDeityDomain::DeityDomains.clear();
-	CDeityDomain::DeityDomainsByIdent.clear();
 	CDeityDomain::DeityDomainsByUpgrade.clear();
+	
+	Database<CDeityDomain>::Clear();
 }
 
 /**

@@ -62,7 +62,7 @@ public:
 		}
 		
 		if (should_find) {
-			fprintf(stderr, "Invalid %s instance: \"%s\".\n", T::GetClassIdentifier(), ident.c_str());
+			fprintf(stderr, "Invalid \"%s\" instance: \"%s\".\n", T::GetClassIdentifier(), ident.c_str());
 		}
 		
 		return nullptr;
@@ -86,7 +86,7 @@ public:
 		}
 		
 		if (should_find) {
-			fprintf(stderr, "Invalid %s instance index: %i.\n", T::GetClassIdentifier(), index);
+			fprintf(stderr, "Invalid \"%s\" instance index: %i.\n", T::GetClassIdentifier(), index);
 		}
 		
 		return nullptr;
@@ -101,14 +101,10 @@ public:
 	*/
 	static inline T *GetOrAdd(const std::string &ident)
 	{
-		T *instance = Database<T>::Get(ident, false);
+		T *instance = T::Get(ident, false);
 		
 		if (!instance) {
-			instance = new T;
-			instance->Ident = ident;
-			instance->Index = Database<T>::Instances.size();
-			Database<T>::Instances.push_back(instance);
-			Database<T>::InstancesByIdent[ident] = instance;
+			instance = T::Add(ident);
 		}
 		
 		return instance;
@@ -124,12 +120,31 @@ public:
 		return Database<T>::Instances;
 	}
 	
+	
+	/**
+	**	@brief	Add a new instance of the class
+	**
+	**	@param	ident	The instance's string identifier
+	**
+	**	@return	The new instance
+	*/
+	static inline T *Add(const std::string &ident)
+	{
+		T *instance = new T;
+		instance->Ident = ident;
+		instance->Index = Database<T>::Instances.size();
+		Database<T>::Instances.push_back(instance);
+		Database<T>::InstancesByIdent[ident] = instance;
+		
+		return instance;
+	}
+	
 	/**
 	**	@brief	Remove an instance of the class
 	**
 	**	@param	instance	The instance
 	*/
-	static inline void Remove(const T *instance)
+	static inline void Remove(T *instance)
 	{
 		Database<T>::InstancesByIdent.erase(instance->Ident);
 		Database<T>::Instances.erase(std::remove(Database<T>::Instances.begin(), Database<T>::Instances.end(), instance), Database<T>::Instances.end());

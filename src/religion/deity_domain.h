@@ -34,9 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
-
-#include <map>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -48,20 +47,24 @@ class CUpgrade;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CDeityDomain : public CDataType
+class CDeityDomain : public CDataType, public Database<CDeityDomain>
 {
 	GDCLASS(CDeityDomain, CDataType)
 
 public:
-	static CDeityDomain *GetDeityDomain(const std::string &ident, bool should_find = true);
-	static CDeityDomain *GetOrAddDeityDomain(const std::string &ident);
-	static CDeityDomain *GetDeityDomainByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
-	static void ClearDeityDomains();
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "deity_domain";
+	}
 	
-	static std::vector<CDeityDomain *> DeityDomains;	/// Deity domains
-	static std::map<std::string, CDeityDomain *> DeityDomainsByIdent;
+	static CDeityDomain *GetByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
+	static void Remove(CDeityDomain *deity_domain);
+	static void Clear();
+	
+private:
 	static std::map<const CUpgrade *, CDeityDomain *> DeityDomainsByUpgrade;
 
+public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	std::string Name;									/// Name of the domain

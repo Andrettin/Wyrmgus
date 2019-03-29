@@ -2356,7 +2356,7 @@ static int CclDefineReligion(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(LuaToString(l, -1, j + 1));
+				CDeityDomain *deity_domain = CDeityDomain::Get(LuaToString(l, -1, j + 1));
 				if (deity_domain) {
 					religion->Domains.push_back(deity_domain);
 				}
@@ -2382,7 +2382,7 @@ static int CclDefineDeity(lua_State *l)
 	}
 
 	std::string deity_ident = LuaToString(l, 1);
-	CDeity *deity = CDeity::GetOrAddDeity(deity_ident);
+	CDeity *deity = CDeity::GetOrAdd(deity_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -2455,7 +2455,7 @@ static int CclDefineDeity(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(LuaToString(l, -1, j + 1));
+				CDeityDomain *deity_domain = CDeityDomain::Get(LuaToString(l, -1, j + 1));
 				if (deity_domain) {
 					deity->Domains.push_back(deity_domain);
 				}
@@ -3705,10 +3705,10 @@ static int CclGetReligions(lua_State *l)
 
 static int CclGetDeityDomains(lua_State *l)
 {
-	lua_createtable(l, CDeityDomain::DeityDomains.size(), 0);
-	for (size_t i = 1; i <= CDeityDomain::DeityDomains.size(); ++i)
+	lua_createtable(l, CDeityDomain::GetAll().size(), 0);
+	for (size_t i = 1; i <= CDeityDomain::GetAll().size(); ++i)
 	{
-		lua_pushstring(l, CDeityDomain::DeityDomains[i-1]->Ident.c_str());
+		lua_pushstring(l, CDeityDomain::GetAll()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3716,10 +3716,10 @@ static int CclGetDeityDomains(lua_State *l)
 
 static int CclGetDeities(lua_State *l)
 {
-	lua_createtable(l, CDeity::Deities.size(), 0);
-	for (size_t i = 1; i <= CDeity::Deities.size(); ++i)
+	lua_createtable(l, CDeity::GetAll().size(), 0);
+	for (size_t i = 1; i <= CDeity::GetAll().size(); ++i)
 	{
-		lua_pushstring(l, CDeity::Deities[i-1]->Ident.c_str());
+		lua_pushstring(l, CDeity::GetAll()[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -3775,7 +3775,7 @@ static int CclGetDeityDomainData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string deity_domain_ident = LuaToString(l, 1);
-	const CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(deity_domain_ident);
+	const CDeityDomain *deity_domain = CDeityDomain::Get(deity_domain_ident);
 	if (!deity_domain) {
 		return 0;
 	}
@@ -3810,7 +3810,7 @@ static int CclGetDeityData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string deity_ident = LuaToString(l, 1);
-	const CDeity *deity = CDeity::GetDeity(deity_ident);
+	const CDeity *deity = CDeity::Get(deity_ident);
 	if (!deity) {
 		return 0;
 	}

@@ -42,57 +42,11 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CSchoolOfMagic *> CSchoolOfMagic::SchoolsOfMagic;
-std::map<std::string, CSchoolOfMagic *> CSchoolOfMagic::SchoolsOfMagicByIdent;
 std::map<const CUpgrade *, CSchoolOfMagic *> CSchoolOfMagic::SchoolsOfMagicByUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a school of magic
-**
-**	@param	ident		The school of magic's string identifier
-**	@param	should_find	Whether it is an error if the school of magic could not be found; this is true by default
-**
-**	@return	The school of magic if found, or null otherwise
-*/
-CSchoolOfMagic *CSchoolOfMagic::GetSchoolOfMagic(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CSchoolOfMagic *>::const_iterator find_iterator = SchoolsOfMagicByIdent.find(ident);
-	
-	if (find_iterator != SchoolsOfMagicByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid school of magic: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a school of magic
-**
-**	@param	ident	The school of magic's string identifier
-**
-**	@return	The school of magic if found, or a newly-created one otherwise
-*/
-CSchoolOfMagic *CSchoolOfMagic::GetOrAddSchoolOfMagic(const std::string &ident)
-{
-	CSchoolOfMagic *school_of_magic = GetSchoolOfMagic(ident, false);
-	
-	if (!school_of_magic) {
-		school_of_magic = new CSchoolOfMagic;
-		school_of_magic->Ident = ident;
-		SchoolsOfMagic.push_back(school_of_magic);
-		SchoolsOfMagicByIdent[ident] = school_of_magic;
-	}
-	
-	return school_of_magic;
-}
 
 /**
 **	@brief	Get a school of magic by its respective upgrade
@@ -102,11 +56,11 @@ CSchoolOfMagic *CSchoolOfMagic::GetOrAddSchoolOfMagic(const std::string &ident)
 **
 **	@return	The upgrade's school of magic, if any
 */
-CSchoolOfMagic *CSchoolOfMagic::GetSchoolOfMagicByUpgrade(const CUpgrade *upgrade, const bool should_find)
+CSchoolOfMagic *CSchoolOfMagic::GetByUpgrade(const CUpgrade *upgrade, const bool should_find)
 {
-	std::map<const CUpgrade *, CSchoolOfMagic *>::const_iterator find_iterator = SchoolsOfMagicByUpgrade.find(upgrade);
+	std::map<const CUpgrade *, CSchoolOfMagic *>::const_iterator find_iterator = CSchoolOfMagic::SchoolsOfMagicByUpgrade.find(upgrade);
 	
-	if (find_iterator != SchoolsOfMagicByUpgrade.end()) {
+	if (find_iterator != CSchoolOfMagic::SchoolsOfMagicByUpgrade.end()) {
 		return find_iterator->second;
 	}
 	
@@ -118,14 +72,30 @@ CSchoolOfMagic *CSchoolOfMagic::GetSchoolOfMagicByUpgrade(const CUpgrade *upgrad
 }
 
 /**
+**	@brief	Remove a school of magic
+**
+**	@param	school_of_magic	The school of magic
+*/
+void CSchoolOfMagic::Remove(CSchoolOfMagic *school_of_magic)
+{
+	for (std::map<const CUpgrade *, CSchoolOfMagic *>::iterator iterator = CSchoolOfMagic::SchoolsOfMagicByUpgrade.begin(); iterator != CSchoolOfMagic::SchoolsOfMagicByUpgrade.end(); ++iterator) {
+		if (iterator->second == school_of_magic) {
+			CSchoolOfMagic::SchoolsOfMagicByUpgrade.erase(iterator);
+			break;
+		}
+	}
+	
+	Database<CSchoolOfMagic>::Remove(school_of_magic);
+}
+
+/**
 **	@brief	Remove the existing schools of magic
 */
-void CSchoolOfMagic::ClearSchoolsOfMagic()
+void CSchoolOfMagic::Clear()
 {
-	for (size_t i = 0; i < SchoolsOfMagic.size(); ++i) {
-		delete SchoolsOfMagic[i];
-	}
-	SchoolsOfMagic.clear();
+	CSchoolOfMagic::SchoolsOfMagicByUpgrade.clear();
+	
+	Database<CSchoolOfMagic>::Clear();
 }
 
 /**

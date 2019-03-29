@@ -138,13 +138,13 @@ bool CPlane::ProcessConfigDataProperty(const std::string &key, std::string value
 		this->SeasonSchedule = CSeasonSchedule::Get(value);
 	} else if (key == "empowered_deity_domain") {
 		value = FindAndReplaceString(value, "_", "-");
-		CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
+		CDeityDomain *deity_domain = CDeityDomain::Get(value);
 		if (deity_domain) {
 			this->EmpoweredDeityDomains.push_back(deity_domain);
 		}
 	} else if (key == "empowered_school_of_magic") {
 		value = FindAndReplaceString(value, "_", "-");
-		CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetSchoolOfMagic(value);
+		CSchoolOfMagic *school_of_magic = CSchoolOfMagic::Get(value);
 		if (school_of_magic) {
 			this->EmpoweredSchoolsOfMagic.push_back(school_of_magic);
 		}

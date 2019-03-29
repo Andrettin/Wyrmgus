@@ -136,10 +136,10 @@ void CleanModules()
 	CleanConstructions();
 	CCurrency::Clear();
 	CleanDecorations();
-	CDeity::ClearDeities();
+	CDeity::Clear();
 	//Wyrmgus start
 	CDialogue::ClearDialogues();
-	CDeityDomain::ClearDeityDomains();
+	CDeityDomain::Clear();
 	CDynasty::Clear();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
@@ -155,7 +155,7 @@ void CleanModules()
 	CleanQuests();
 	//Wyrmgus end
 	CReligion::Clear();
-	CSchoolOfMagic::ClearSchoolsOfMagic();
+	CSchoolOfMagic::Clear();
 	CSite::Clear();
 	CSpecies::Clear();
 	CSpeciesCategory::Clear();

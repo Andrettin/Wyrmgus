@@ -292,7 +292,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "deity") {
 			value = FindAndReplaceString(value, "_", "-");
-			CDeity *deity = CDeity::GetDeity(value);
+			CDeity *deity = CDeity::Get(value);
 			if (deity) {
 				this->Deities.push_back(deity);
 				if (LoadingHistory) {
@@ -351,7 +351,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "preferred_deity_domain") {
 			value = FindAndReplaceString(value, "_", "-");
-			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
+			CDeityDomain *deity_domain = CDeityDomain::Get(value);
 			if (deity_domain) {
 				this->PreferredDeityDomains.push_back(deity_domain);
 			}
@@ -485,9 +485,7 @@ void CCharacter::GenerateHistory()
 			int best_score = 0;
 			const bool has_major_deity = this->HasMajorDeity();
 			
-			for (size_t j = 0; j < CDeity::Deities.size(); ++j) {
-				CDeity *deity = CDeity::Deities[j];
-				
+			for (CDeity *deity : CDeity::GetAll()) {
 				if (!deity->DeityUpgrade) {
 					continue; //don't use deities that have no corresponding deity upgrade for the character
 				}

@@ -34,9 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "database.h"
 #include "data_type.h"
-
-#include <map>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -48,20 +47,24 @@ class CUpgrade;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSchoolOfMagic : public CDataType
+class CSchoolOfMagic : public CDataType, public Database<CSchoolOfMagic>
 {
 	GDCLASS(CSchoolOfMagic, CDataType)
 
 public:
-	static CSchoolOfMagic *GetSchoolOfMagic(const std::string &ident, bool should_find = true);
-	static CSchoolOfMagic *GetOrAddSchoolOfMagic(const std::string &ident);
-	static CSchoolOfMagic *GetSchoolOfMagicByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
-	static void ClearSchoolsOfMagic();
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "school_of_magic";
+	}
 	
-	static std::vector<CSchoolOfMagic *> SchoolsOfMagic;	/// Schools of magic
-	static std::map<std::string, CSchoolOfMagic *> SchoolsOfMagicByIdent;
+	static CSchoolOfMagic *GetByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
+	static void Remove(CSchoolOfMagic *school_of_magic);
+	static void Clear();
+	
+private:
 	static std::map<const CUpgrade *, CSchoolOfMagic *> SchoolsOfMagicByUpgrade;
 
+public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
 	std::string Name;									/// Name of the school of magic

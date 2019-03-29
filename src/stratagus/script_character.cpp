@@ -250,7 +250,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "ExperiencePercent")) {
 			character->ExperiencePercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Deity")) {
-			CDeity *deity = CDeity::GetDeity(LuaToString(l, -1));
+			CDeity *deity = CDeity::Get(LuaToString(l, -1));
 			if (deity) {
 				character->Deity = deity;
 				if (character->Icon.Name.empty() && !deity->Icon.Name.empty()) {
@@ -278,7 +278,7 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string deity_ident = LuaToString(l, -1, j + 1);
-				CDeity *deity = CDeity::GetDeity(deity_ident);
+				CDeity *deity = CDeity::Get(deity_ident);
 				if (deity) {
 					character->Deities.push_back(deity);
 				}
@@ -665,7 +665,7 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				std::string deity_ident = LuaToString(l, -1, j + 1);
-				CDeity *deity = CDeity::GetDeity(deity_ident);
+				CDeity *deity = CDeity::Get(deity_ident);
 				if (deity) {
 					hero->Deities.push_back(deity);
 				}
@@ -1169,7 +1169,7 @@ static int CclCharacter(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "deity")) {
-			CDeity *deity = CDeity::GetDeity(LuaToString(l, 2, j + 1));
+			CDeity *deity = CDeity::Get(LuaToString(l, 2, j + 1));
 			if (deity) {
 				character->Deities.push_back(deity);
 			}

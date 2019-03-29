@@ -53,57 +53,11 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CDeity *> CDeity::Deities;
-std::map<std::string, CDeity *> CDeity::DeitiesByIdent;
 std::map<const CUpgrade *, CDeity *> CDeity::DeitiesByUpgrade;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**	@brief	Get a deity
-**
-**	@param	ident		The deity's string identifier
-**	@param	should_find	Whether it is an error if the deity could not be found; this is true by default
-**
-**	@return	The deity if found, or null otherwise
-*/
-CDeity *CDeity::GetDeity(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CDeity *>::const_iterator find_iterator = CDeity::DeitiesByIdent.find(ident);
-	
-	if (find_iterator != DeitiesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid deity: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a deity
-**
-**	@param	ident	The deity's string identifier
-**
-**	@return	The deity if found, or a newly-created one otherwise
-*/
-CDeity *CDeity::GetOrAddDeity(const std::string &ident)
-{
-	CDeity *deity = GetDeity(ident, false);
-	
-	if (!deity) {
-		deity = new CDeity;
-		deity->Ident = ident;
-		Deities.push_back(deity);
-		DeitiesByIdent[ident] = deity;
-	}
-	
-	return deity;
-}
 
 /**
 **	@brief	Get a deity by its respective upgrade
@@ -113,7 +67,7 @@ CDeity *CDeity::GetOrAddDeity(const std::string &ident)
 **
 **	@return	The upgrade's deity, if any
 */
-CDeity *CDeity::GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_find)
+CDeity *CDeity::GetByUpgrade(const CUpgrade *upgrade, const bool should_find)
 {
 	if (DeitiesByUpgrade.find(upgrade) != DeitiesByUpgrade.end()) {
 		return DeitiesByUpgrade.find(upgrade)->second;
@@ -127,14 +81,30 @@ CDeity *CDeity::GetDeityByUpgrade(const CUpgrade *upgrade, const bool should_fin
 }
 
 /**
+**	@brief	Remove a deity
+**
+**	@param	deity	The deity
+*/
+void CDeity::Remove(CDeity *deity)
+{
+	for (std::map<const CUpgrade *, CDeity *>::iterator iterator = CDeity::DeitiesByUpgrade.begin(); iterator != CDeity::DeitiesByUpgrade.end(); ++iterator) {
+		if (iterator->second == deity) {
+			CDeity::DeitiesByUpgrade.erase(iterator);
+			break;
+		}
+	}
+	
+	Database<CDeity>::Remove(deity);
+}
+
+/**
 **	@brief	Remove the existing deities
 */
-void CDeity::ClearDeities()
+void CDeity::Clear()
 {
-	for (size_t i = 0; i < Deities.size(); ++i) {
-		delete Deities[i];
-	}
-	Deities.clear();
+	CDeity::DeitiesByUpgrade.clear();
+	
+	Database<CDeity>::Clear();
 }
 
 /**
@@ -174,7 +144,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (property.Key == "domain") {
 			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CDeityDomain *deity_domain = CDeityDomain::GetDeityDomain(value);
+			CDeityDomain *deity_domain = CDeityDomain::Get(value);
 			if (deity_domain) {
 				this->Domains.push_back(deity_domain);
 			}

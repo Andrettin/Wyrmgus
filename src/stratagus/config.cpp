@@ -364,12 +364,12 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				currency->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "deity") {
-			CDeity *deity = CDeity::GetOrAddDeity(ident);
+			CDeity *deity = CDeity::GetOrAdd(ident);
 			if (!define_only) {
 				deity->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "deity_domain") {
-			CDeityDomain *deity_domain = CDeityDomain::GetOrAddDeityDomain(ident);
+			CDeityDomain *deity_domain = CDeityDomain::GetOrAdd(ident);
 			if (!define_only) {
 				deity_domain->ProcessConfigData(config_data);
 			}
@@ -432,7 +432,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				player_color->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "school_of_magic") {
-			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetOrAddSchoolOfMagic(ident);
+			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetOrAdd(ident);
 			if (!define_only) {
 				school_of_magic->ProcessConfigData(config_data);
 			}
