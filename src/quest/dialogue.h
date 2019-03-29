@@ -36,7 +36,6 @@
 
 #include "database.h"
 #include "data_type.h"
-#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
