@@ -159,7 +159,7 @@ static int CclDefineQuest(lua_State *l)
 			}
 		} else if (!strcmp(value, "IntroductionDialogue")) {
 			std::string dialogue_ident = LuaToString(l, -1);
-			CDialogue *dialogue = CDialogue::GetDialogue(dialogue_ident);
+			CDialogue *dialogue = CDialogue::Get(dialogue_ident);
 			if (dialogue) {
 				quest->IntroductionDialogue = dialogue;
 			} else {
@@ -753,7 +753,7 @@ static int CclDefineDialogue(lua_State *l)
 	}
 
 	std::string dialogue_ident = LuaToString(l, 1);
-	CDialogue *dialogue = CDialogue::GetOrAddDialogue(dialogue_ident);
+	CDialogue *dialogue = CDialogue::GetOrAdd(dialogue_ident);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {

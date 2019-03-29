@@ -60,7 +60,7 @@ void CCallDialogueTriggerEffect::ProcessConfigData(const CConfigData *config_dat
 		
 		if (property.Key == "dialogue") {
 			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CDialogue *dialogue = CDialogue::GetDialogue(value);
+			CDialogue *dialogue = CDialogue::Get(value);
 			if (dialogue) {
 				this->Dialogue = dialogue;
 			}

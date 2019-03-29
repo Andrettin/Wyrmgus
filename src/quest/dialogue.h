@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <map>
-#include <string>
+#include "database.h"
+#include "data_type.h"
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -45,21 +45,18 @@
 class CDialogueNode;
 class LuaCallback;
 
-class CDialogue
+class CDialogue : public CDataType, public Database<CDialogue>
 {
 public:
-	static CDialogue *GetDialogue(const std::string &ident, const bool should_find = true);
-	static CDialogue *GetOrAddDialogue(const std::string &ident);
-	static void ClearDialogues();
-	
-	static std::vector<CDialogue *> Dialogues;
-	static std::map<std::string, CDialogue *> DialoguesByIdent;
-	
 	~CDialogue();
+	
+	static constexpr const char *GetClassIdentifier()
+	{
+		return "dialogue";
+	}
 	
 	void Call(const int player) const;
 	
-	std::string Ident;				/// Ident of the dialogue
 	std::vector<CDialogueNode *> Nodes;	/// The nodes of the dialogue
 };
 
@@ -83,10 +80,6 @@ public:
 	std::vector<LuaCallback *> OptionEffects;
 	std::vector<std::string> OptionTooltips;
 };
-
-/*----------------------------------------------------------------------------
--- Variables
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 -- Functions

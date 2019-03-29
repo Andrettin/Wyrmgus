@@ -28,6 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "register_types.h"
 
 #include "age.h"
@@ -53,6 +57,7 @@
 #include "player_color.h"
 #include "quest/achievement.h"
 #include "quest/campaign.h"
+#include "quest/dialogue.h"
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
@@ -79,8 +84,14 @@
 #include "world/world.h"
 #include "wyrmgus.h"
 
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
+
 void register_wyrmgus_types()
 {
+	ClassDB::register_class<Wyrmgus>();
+	
 	ClassDB::register_virtual_class<CDataType>();
 	
 	ClassDB::register_class<CAchievement>();
@@ -94,6 +105,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CCurrency>();
 	ClassDB::register_class<CDeity>();
 	ClassDB::register_class<CDeityDomain>();
+	ClassDB::register_class<CDialogue>();
 	ClassDB::register_class<CDynasty>();
 	ClassDB::register_class<CFaction>();
 	ClassDB::register_class<CHistoricalUnit>();
@@ -123,7 +135,6 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CWord>();
 	ClassDB::register_class<CWorld>();
 	ClassDB::register_class<MissileType>();
-	ClassDB::register_class<Wyrmgus>();
 	
 	ClassDB::register_virtual_class<CConversibleColor>();
 	ClassDB::register_class<CHairColor>();

@@ -39,54 +39,8 @@
 #include "script.h"
 
 /*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CDialogue *> CDialogue::Dialogues;
-std::map<std::string, CDialogue *> CDialogue::DialoguesByIdent;
-
-/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-CDialogue *CDialogue::GetDialogue(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CDialogue *>::const_iterator find_iterator = CDialogue::DialoguesByIdent.find(ident);
-	
-	if (find_iterator != CDialogue::DialoguesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid dialogue: \"%s\".\n", ident.c_str());
-	}
-
-	return nullptr;
-}
-
-CDialogue *CDialogue::GetOrAddDialogue(const std::string &ident)
-{
-	CDialogue *dialogue = CDialogue::GetDialogue(ident, false);
-	
-	if (!dialogue) {
-		dialogue = new CDialogue;
-		dialogue->Ident = ident;
-		CDialogue::Dialogues.push_back(dialogue);
-		CDialogue::DialoguesByIdent[ident] = dialogue;
-	}
-	
-	return dialogue;
-}
-
-void CDialogue::ClearDialogues()
-{
-	for (CDialogue *dialogue : CDialogue::Dialogues) {
-		delete dialogue;
-	}
-	
-	CDialogue::Dialogues.clear();
-	CDialogue::DialoguesByIdent.clear();
-}
 
 CDialogue::~CDialogue()
 {
@@ -230,7 +184,7 @@ void CDialogueNode::OptionEffect(const int option, const int player) const
 
 void CallDialogue(const std::string &dialogue_ident, int player)
 {
-	CDialogue *dialogue = CDialogue::GetDialogue(dialogue_ident);
+	CDialogue *dialogue = CDialogue::Get(dialogue_ident);
 	if (!dialogue) {
 		return;
 	}
@@ -240,7 +194,7 @@ void CallDialogue(const std::string &dialogue_ident, int player)
 
 void CallDialogueNode(const std::string &dialogue_ident, int node, int player)
 {
-	CDialogue *dialogue = CDialogue::GetDialogue(dialogue_ident);
+	CDialogue *dialogue = CDialogue::Get(dialogue_ident);
 	if (!dialogue || node >= (int) dialogue->Nodes.size()) {
 		return;
 	}
@@ -250,7 +204,7 @@ void CallDialogueNode(const std::string &dialogue_ident, int node, int player)
 
 void CallDialogueNodeOptionEffect(const std::string &dialogue_ident, int node, int option, int player)
 {
-	CDialogue *dialogue = CDialogue::GetDialogue(dialogue_ident);
+	CDialogue *dialogue = CDialogue::Get(dialogue_ident);
 	if (!dialogue || node >= (int) dialogue->Nodes.size()) {
 		return;
 	}

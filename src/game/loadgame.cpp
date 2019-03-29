@@ -138,7 +138,7 @@ void CleanModules()
 	CleanDecorations();
 	CDeity::Clear();
 	//Wyrmgus start
-	CDialogue::ClearDialogues();
+	CDialogue::Clear();
 	CDeityDomain::Clear();
 	CDynasty::Clear();
 	CleanGrandStrategyEvents();
