@@ -30,13 +30,21 @@
 #ifndef __CONVERSIBLE_COLOR_H__
 #define __CONVERSIBLE_COLOR_H__
 
-#include "data_type.h"
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include "data_element.h"
 
 #include <core/color.h>
 
-class CConversibleColor : public CDataType
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CConversibleColor : public DataElement
 {
-	GDCLASS(CConversibleColor, CDataType)
+	GDCLASS(CConversibleColor, DataElement)
 	
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;

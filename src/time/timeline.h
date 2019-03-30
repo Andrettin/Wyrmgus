@@ -35,16 +35,16 @@
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 #include "time/date.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CTimeline : public CDataType, public Database<CTimeline>
+class CTimeline : public DataElement, public Database<CTimeline>
 {
-	GDCLASS(CTimeline, CDataType)
+	GDCLASS(CTimeline, DataElement)
 
 public:
 	static constexpr const char *GetClassIdentifier()

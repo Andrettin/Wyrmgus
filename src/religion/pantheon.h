@@ -35,15 +35,15 @@
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CPantheon : public CDataType, public Database<CPantheon>
+class CPantheon : public DataElement, public Database<CPantheon>
 {
-	GDCLASS(CPantheon, CDataType)
+	GDCLASS(CPantheon, DataElement)
 	
 public:
 	static constexpr const char *GetClassIdentifier()

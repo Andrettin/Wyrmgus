@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 #include "vec2i.h"
 #include "video/color.h"
 
@@ -54,9 +54,9 @@ class CUnitType;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CTerrainType : public CDataType
+class CTerrainType : public DataElement
 {
-	GDCLASS(CTerrainType, CDataType)
+	GDCLASS(CTerrainType, DataElement)
 
 public:
 	CTerrainType()

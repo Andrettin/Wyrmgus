@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 #include "upgrade/upgrade_structs.h" // MaxCost
 
 /*----------------------------------------------------------------------------
@@ -110,9 +110,9 @@ public:
 	CAnimation *Next = nullptr;
 };
 
-class CAnimations : public CDataType
+class CAnimations : public DataElement
 {
-	GDCLASS(CAnimations, CDataType)
+	GDCLASS(CAnimations, DataElement)
 	
 public:
 	CAnimations()

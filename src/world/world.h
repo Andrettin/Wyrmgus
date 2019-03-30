@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 
 #include <map>
 
@@ -53,9 +53,9 @@ class CTimeOfDaySchedule;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CWorld : public CDataType
+class CWorld : public DataElement
 {
-	GDCLASS(CWorld, CDataType)
+	GDCLASS(CWorld, DataElement)
 
 public:
 	static CWorld *GetWorld(const std::string &ident, const bool should_find = true);

@@ -36,7 +36,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -81,9 +81,9 @@ constexpr int ScoreCost = (MaxCosts + 1);
 constexpr int ManaResCost (MaxCosts + 2);
 constexpr int FreeWorkersCount (MaxCosts + 3);
 
-class CResource : public CDataType, public Database<CResource>
+class CResource : public DataElement, public Database<CResource>
 {
-	GDCLASS(CResource, CDataType)
+	GDCLASS(CResource, DataElement)
 	
 public:
 	static constexpr const char *GetClassIdentifier()

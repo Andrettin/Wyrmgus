@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -47,9 +47,9 @@ class CUpgrade;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSchoolOfMagic : public CDataType, public Database<CSchoolOfMagic>
+class CSchoolOfMagic : public DataElement, public Database<CSchoolOfMagic>
 {
-	GDCLASS(CSchoolOfMagic, CDataType)
+	GDCLASS(CSchoolOfMagic, DataElement)
 
 public:
 	static constexpr const char *GetClassIdentifier()

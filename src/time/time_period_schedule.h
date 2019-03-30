@@ -30,11 +30,19 @@
 #ifndef __TIME_PERIOD_SCHEDULE_H__
 #define __TIME_PERIOD_SCHEDULE_H__
 
-#include "data_type.h"
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
 
-class CTimePeriodSchedule : public CDataType
+#include "data_element.h"
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
+class CTimePeriodSchedule : public DataElement
 {
-	GDCLASS(CTimePeriodSchedule, CDataType)
+	GDCLASS(CTimePeriodSchedule, DataElement)
 	
 public:
 	virtual unsigned long GetDefaultTotalHours() const = 0;

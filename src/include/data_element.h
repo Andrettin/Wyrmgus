@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name data_type.h - The data type header file. */
+/**@name data_element.h - The data element header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __DATA_TYPE_H__
-#define __DATA_TYPE_H__
+#ifndef __DATA_ELEMENT_H__
+#define __DATA_ELEMENT_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -55,12 +55,12 @@ class Database;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CDataType : public Object
+class DataElement : public Object
 {
-	GDCLASS(CDataType, Object)
+	GDCLASS(DataElement, Object)
 	
 public:
-	CDataType(const std::string &ident = "", const int index = -1) : Ident(ident), Index(index)
+	DataElement(const std::string &ident = "", const int index = -1) : Ident(ident), Index(index)
 	{
 	}
 	
@@ -69,7 +69,7 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) { return false; }
 	
 	/**
-	**	@brief	Initialize the data type instance
+	**	@brief	Initialize the data element instance
 	*/
 	virtual void Initialize()
 	{
@@ -77,9 +77,9 @@ public:
 	}
 	
 	/**
-	**	@brief	Get the data type instance's string identifier
+	**	@brief	Get the data element instance's string identifier
 	**
-	**	@return	The data type instance's string identifier
+	**	@return	The data element instance's string identifier
 	*/
 	String GetIdent() const
 	{
@@ -87,9 +87,9 @@ public:
 	}
 	
 	/**
-	**	@brief	Get the data type instance's index
+	**	@brief	Get the data element instance's index
 	**
-	**	@return	The data type instance's index
+	**	@return	The data element instance's index
 	*/
 	int GetIndex() const
 	{
@@ -97,19 +97,19 @@ public:
 	}
 	
 	/**
-	**	@brief	Get whether the data type instance has been initialized
+	**	@brief	Get whether the data element instance has been initialized
 	**
-	**	@return	True if the data type instance has been initialized, or false otherwise
+	**	@return	True if the data element instance has been initialized, or false otherwise
 	*/
 	bool IsInitialized() const
 	{
 		return this->Initialized;
 	}
 	
-	std::string Ident;	/// string identifier of the data type instance
+	std::string Ident;	/// string identifier of the data element instance
 protected:
-	int Index = -1;		/// index of the data type instance
-	bool Initialized = false;	/// whether the data type instance has been initialized
+	int Index = -1;		/// index of the data element instance
+	bool Initialized = false;	/// whether the data element instance has been initialized
 	std::map<std::string, PropertyCommonBase &> Properties;
 	
 	friend Database;

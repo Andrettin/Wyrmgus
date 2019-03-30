@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 
 #include <map>
 #include <vector>
@@ -75,9 +75,9 @@ public:
 	unsigned long LastUpdate = 0;	/// GameCycle of last update
 };
 
-class CTrigger : public CDataType
+class CTrigger : public DataElement
 {
-	GDCLASS(CTrigger, CDataType)
+	GDCLASS(CTrigger, DataElement)
 	
 public:
 	enum class TriggerType

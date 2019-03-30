@@ -92,7 +92,7 @@ void register_wyrmgus_types()
 {
 	ClassDB::register_class<Wyrmgus>();
 	
-	ClassDB::register_virtual_class<CDataType>();
+	ClassDB::register_virtual_class<DataElement>();
 	
 	ClassDB::register_class<CAchievement>();
 	ClassDB::register_class<CAge>();

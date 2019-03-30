@@ -35,15 +35,15 @@
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSpeciesCategoryRank : public CDataType, public Database<CSpeciesCategoryRank>
+class CSpeciesCategoryRank : public DataElement, public Database<CSpeciesCategoryRank>
 {
-	GDCLASS(CSpeciesCategoryRank, CDataType)
+	GDCLASS(CSpeciesCategoryRank, DataElement)
 	
 public:
 	static constexpr const char *GetClassIdentifier()

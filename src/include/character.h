@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 #include "item.h"
 #include "time/date.h"
 #include "ui/icon_config.h"
@@ -108,9 +108,9 @@ enum CharacterTitles {
 	MaxCharacterTitles
 };
 
-class CCharacter : public CDataType
+class CCharacter : public DataElement
 {
-	GDCLASS(CCharacter, CDataType)
+	GDCLASS(CCharacter, DataElement)
 	
 public:
 	CCharacter()

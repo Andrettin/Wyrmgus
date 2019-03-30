@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 
 #include <map>
 
@@ -52,9 +52,9 @@ class CTimeOfDaySchedule;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CPlane : public CDataType
+class CPlane : public DataElement
 {
-	GDCLASS(CPlane, CDataType)
+	GDCLASS(CPlane, DataElement)
 
 public:
 	static CPlane *GetPlane(const std::string &ident, const bool should_find = true);

@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 #include "map/tile.h"
 #include "time/date.h"
 #include "vec2i.h"
@@ -78,9 +78,9 @@ public:
 	std::vector<const CTerrainType *> TargetTerrainTypes; //the terrain types over which the terrain is to be generated
 };
 
-class CMapTemplate : public CDataType, public Database<CMapTemplate>
+class CMapTemplate : public DataElement, public Database<CMapTemplate>
 {
-	GDCLASS(CMapTemplate, CDataType)
+	GDCLASS(CMapTemplate, DataElement)
 	
 public:
 	~CMapTemplate();

@@ -78,7 +78,7 @@ constexpr int IconCommandButton = 32;	/// is the icon a command button
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -93,9 +93,9 @@ class CPlayerColorGraphic;
 ----------------------------------------------------------------------------*/
 
 /// Icon: rectangle image used in menus
-class CIcon : public CDataType, public Database<CIcon>
+class CIcon : public DataElement, public Database<CIcon>
 {
-	GDCLASS(CIcon, CDataType)
+	GDCLASS(CIcon, DataElement)
 	
 public:
 	CIcon()
@@ -105,7 +105,7 @@ public:
 	/**
 	**  CIcon constructor
 	*/
-	CIcon(const std::string &ident) : CDataType(ident)
+	CIcon(const std::string &ident) : DataElement(ident)
 	{
 	}
 	

@@ -83,7 +83,7 @@ static MissileTypeMap MissileTypes;
 **  Constructor.
 */
 MissileType::MissileType(const std::string &ident) :
-	CDataType(ident), Class()
+	DataElement(ident), Class()
 {
 }
 

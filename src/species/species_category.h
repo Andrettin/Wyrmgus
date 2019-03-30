@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -47,9 +47,9 @@ class CSpeciesCategoryRank;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSpeciesCategory : public CDataType, public Database<CSpeciesCategory>
+class CSpeciesCategory : public DataElement, public Database<CSpeciesCategory>
 {
-	GDCLASS(CSpeciesCategory, CDataType)
+	GDCLASS(CSpeciesCategory, DataElement)
 	
 public:
 	static constexpr const char *GetClassIdentifier()

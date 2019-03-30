@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 #include "time/date.h"
 
 #include <map>
@@ -67,9 +67,9 @@ public:
 	int Days = 0;
 };
 
-class CCalendar : public CDataType
+class CCalendar : public DataElement
 {
-	GDCLASS(CCalendar, CDataType)
+	GDCLASS(CCalendar, DataElement)
 	
 public:
 	~CCalendar();

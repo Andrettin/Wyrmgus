@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 
 #include <map>
 
@@ -42,9 +42,9 @@
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CButtonLevel : public CDataType
+class CButtonLevel : public DataElement
 {
-	GDCLASS(CButtonLevel, CDataType)
+	GDCLASS(CButtonLevel, DataElement)
 	
 public:
 	static CButtonLevel *GetButtonLevel(const std::string &ident, const bool should_find = true);

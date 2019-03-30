@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -47,9 +47,9 @@ class CUpgrade;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CDeityDomain : public CDataType, public Database<CDeityDomain>
+class CDeityDomain : public DataElement, public Database<CDeityDomain>
 {
-	GDCLASS(CDeityDomain, CDataType)
+	GDCLASS(CDeityDomain, DataElement)
 
 public:
 	static constexpr const char *GetClassIdentifier()

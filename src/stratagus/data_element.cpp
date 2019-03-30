@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name data_type.cpp - The data type source file. */
+/**@name data_element.h.cpp - The data element source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "data_type.h"
+#include "data_element.h"
 
 #include "config.h"
 #include "config_operator.h"
@@ -48,7 +48,7 @@
 **
 **	@param	config_data	The configuration data
 */
-void CDataType::ProcessConfigData(const CConfigData *config_data)
+void DataElement::ProcessConfigData(const CConfigData *config_data)
 {
 	List<PropertyInfo> property_list;
 	this->get_property_list(&property_list);
@@ -133,7 +133,7 @@ void CDataType::ProcessConfigData(const CConfigData *config_data)
 	this->Initialize();
 }
 
-void CDataType::_bind_methods()
+void DataElement::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_ident"), &CDataType::GetIdent);
+	ClassDB::bind_method(D_METHOD("get_ident"), &DataElement::GetIdent);
 }

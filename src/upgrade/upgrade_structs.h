@@ -35,7 +35,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 #include "economy/resource.h"
 //Wyrmgus start
 #include "item.h"
@@ -105,9 +105,9 @@ public:
 /**
 **  The main useable upgrades.
 */
-class CUpgrade : public CDataType
+class CUpgrade : public DataElement
 {
-	GDCLASS(CUpgrade, CDataType)
+	GDCLASS(CUpgrade, DataElement)
 	
 public:
 	// so that the class can be exposed to Godot

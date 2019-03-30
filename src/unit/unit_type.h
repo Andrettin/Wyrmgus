@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 #include "missile/missile_config.h"
 #include "sound/unit_sound.h"
 #include "ui/icon_config.h"
@@ -674,9 +674,9 @@ public:
 //Wyrmgus start
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
-class CUnitType : public CDataType
+class CUnitType : public DataElement
 {
-	GDCLASS(CUnitType, CDataType)
+	GDCLASS(CUnitType, DataElement)
 	
 public:
 	CUnitType();

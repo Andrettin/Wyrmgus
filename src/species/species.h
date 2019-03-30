@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -52,9 +52,9 @@ struct lua_State;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSpecies : public CDataType, public Database<CSpecies>
+class CSpecies : public DataElement, public Database<CSpecies>
 {
-	GDCLASS(CSpecies, CDataType)
+	GDCLASS(CSpecies, DataElement)
 	
 public:
 	static constexpr const char *GetClassIdentifier()

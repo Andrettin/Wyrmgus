@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "database.h"
-#include "data_type.h"
+#include "data_element.h"
 #include "ui/icon_config.h"
 
 #include <core/object.h>
@@ -54,9 +54,9 @@ class CUnitType;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CAchievement : public CDataType, public Database<CAchievement>
+class CAchievement : public DataElement, public Database<CAchievement>
 {
-	GDCLASS(CAchievement, CDataType)
+	GDCLASS(CAchievement, DataElement)
 	
 public:
 	static constexpr const char *GetClassIdentifier()

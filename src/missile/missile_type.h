@@ -180,7 +180,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 #include "missile/missile_config.h"
 #include "script.h"
 #include "sound/unit_sound.h"
@@ -218,9 +218,9 @@ enum {
 };
 
 /// Base structure of missile-types
-class MissileType : public CDataType
+class MissileType : public DataElement
 {
-	GDCLASS(MissileType, CDataType)
+	GDCLASS(MissileType, DataElement)
 
 public:
 	// so that the class can be exposed to Godot

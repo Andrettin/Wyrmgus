@@ -35,7 +35,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_type.h"
+#include "data_element.h"
 #include "luacallback.h"
 #include "sound/unit_sound.h"
 #include "vec2i.h"
@@ -218,9 +218,9 @@ public:
 /**
 **  Base structure of a spell type.
 */
-class CSpell : public CDataType
+class CSpell : public DataElement
 {
-	GDCLASS(CSpell, CDataType)
+	GDCLASS(CSpell, DataElement)
 	
 public:
 	// so that the class can be exposed to Godot

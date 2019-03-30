@@ -44,7 +44,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class CDataType;
+class DataElement;
 
 extern bool StringToBool(const std::string &str);
 
@@ -64,7 +64,7 @@ protected:
 	virtual const PropertyCommonBase &operator *=(const std::string &rhs) = 0;
 	virtual const PropertyCommonBase &operator /=(const std::string &rhs) = 0;
 	
-	friend CDataType;
+	friend DataElement;
 };
 
 template <typename T>
