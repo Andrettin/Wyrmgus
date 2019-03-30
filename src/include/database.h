@@ -39,12 +39,22 @@
 #include <vector>
 
 /*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+template <typename T, typename O>
+class Property;
+
+/*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
 template <typename T>
 class Database
 {
+	template <typename T2>
+	using Property = Property<T2, T>;	
+	
 public:
 	/**
 	**	@brief	Get an instance of the class by its string identifier

@@ -37,6 +37,7 @@
 
 #include "config.h"
 #include "config_operator.h"
+#include "property.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -98,7 +99,27 @@ void CDataType::ProcessConfigData(const CConfigData *config_data)
 			if (!ok) {
 				fprintf(stderr, "Failed to set %s property \"%s\" to \"%s\".\n", config_data->Tag.c_str(), config_property.Key.c_str(), config_property.Value.c_str());
 			}
-		} else if (!this->ProcessConfigDataProperty(config_property.Key, config_property.Value)) {
+			
+			continue;
+		}
+		
+		std::map<std::string, PropertyCommonBase &>::iterator find_iterator = this->Properties.find(config_property.Key);
+		if (find_iterator != this->Properties.end()) {
+			PropertyCommonBase &property = find_iterator->second;
+			if (config_property.Operator == CConfigOperator::Assignment) {
+				property = config_property.Value;
+			} else if (config_property.Operator == CConfigOperator::Addition) {
+				property += config_property.Value;
+			} else if (config_property.Operator == CConfigOperator::Subtraction) {
+				property -= config_property.Value;
+			} else {
+				fprintf(stderr, "Invalid operator enumeration index for property \"%s\": %i.\n", config_property.Key.c_str(), config_property.Operator);
+			}
+			
+			continue;
+		}
+		
+		if (!this->ProcessConfigDataProperty(config_property.Key, config_property.Value)) {
 			fprintf(stderr, "Invalid %s property: \"%s\".\n", config_data->Tag.c_str(), config_property.Key.c_str());
 		}
 	}

@@ -36,6 +36,7 @@
 
 #include "database.h"
 #include "data_type.h"
+#include "property.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -54,6 +55,23 @@ class CLiteraryText : public CDataType, public Database<CLiteraryText>
 	GDCLASS(CLiteraryText, CDataType)
 	
 public:
+	CLiteraryText()
+	{
+		this->Properties = {
+			{"name", this->Name},
+			{"hidden", this->Hidden},
+			{"author", this->Author},
+			{"translator", this->Translator},
+			{"publisher", this->Publisher},
+			{"license", this->License},
+			{"notes", this->Notes},
+			{"publication_year", this->PublicationYear},
+			{"initial_page_number", this->InitialPageNumber},
+			{"page_numbering_enabled", this->PageNumberingEnabled},
+			{"lowercase_roman_numeral_page_numbering", this->LowercaseRomanNumeralPageNumbering}
+		};
+	}
+
 	static constexpr const char *GetClassIdentifier()
 	{
 		return "literary_text";
@@ -63,51 +81,53 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
+private:
 	const String &GetName() const
 	{
-		return this->Name;
+		return this->Name.Get();
 	}
 	
 	bool IsHidden() const
 	{
-		return this->Hidden;
+		return this->Hidden.Get();
 	}
 	
 	const String &GetAuthor() const
 	{
-		return this->Author;
+		return this->Author.Get();
 	}
 	
 	const String &GetTranslator() const
 	{
-		return this->Translator;
+		return this->Translator.Get();
 	}
 	
 	const String &GetPublisher() const
 	{
-		return this->Publisher;
+		return this->Publisher.Get();
 	}
 	
 	const String &GetLicense() const
 	{
-		return this->License;
+		return this->License.Get();
 	}
 	
 	const String &GetNotes() const
 	{
-		return this->Notes;
+		return this->Notes.Get();
 	}
 	
 	int GetPublicationYear() const
 	{
-		return this->PublicationYear;
+		return this->PublicationYear.Get();
 	}
 	
 	int GetInitialPageNumber() const
 	{
-		return this->InitialPageNumber;
+		return this->InitialPageNumber.Get();
 	}
 	
+public:
 	CIcon *GetIcon() const
 	{
 		if (this->Icon != nullptr) {
@@ -206,19 +226,19 @@ public:
 	}
 	
 private:
-	void UpdateSectionPageNumbers();
+	void UpdateSectionPageNumbers() const;
 
-	String Name;					/// name of the text
-	bool Hidden = false;			/// whether the literary text is hidden
-	String Author;					/// author of the text
-	String Translator;				/// translator of the text
-	String Publisher;				/// publisher of the text
-	String License;					/// the open-source license the text is under, or public domain if that's the case
-	String Notes;					/// notes to appear on the cover of the text
-	int PublicationYear = 0;		/// year of publication
-	int InitialPageNumber = 0;		/// page number in which the text begins
-	bool PageNumberingEnabled = true;	/// whether page numbering is enabled for the literary text
-	bool LowercaseRomanNumeralPageNumbering = false;	/// whether page numbering should be depicted by lowercase Roman numerals
+	Property<String> Name;			/// name of the text
+	Property<bool> Hidden = false;	/// whether the literary text is hidden
+	Property<String> Author;		/// author of the text
+	Property<String> Translator;	/// translator of the text
+	Property<String> Publisher;		/// publisher of the text
+	Property<String> License;		/// the open-source license the text is under, or public domain if that's the case
+	Property<String> Notes;			/// notes to appear on the cover of the text
+	Property<int> PublicationYear = 0;	/// year of publication
+	Property<int> InitialPageNumber = 0;	/// page number in which the text begins
+	Property<bool> PageNumberingEnabled = true;	/// whether page numbering is enabled for the literary text
+	Property<bool> LowercaseRomanNumeralPageNumbering = false;	/// whether page numbering should be depicted by lowercase Roman numerals
 	CIcon *Icon = nullptr;			/// the text's icon
 	CLiteraryText *MainText = nullptr;	/// the main text to which this one belongs, if it is a section
 	std::vector<CLiteraryText *> Sections;	/// the sections of the literary text, e.g. different chapters, or volumes

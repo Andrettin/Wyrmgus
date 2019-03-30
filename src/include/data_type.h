@@ -38,6 +38,7 @@
 #include <core/ustring.h>
 
 #include <algorithm>
+#include <map>
 #include <string>
 
 /*----------------------------------------------------------------------------
@@ -45,6 +46,7 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
+class PropertyCommonBase;
 
 template<typename T>
 class Database;
@@ -108,6 +110,7 @@ public:
 protected:
 	int Index = -1;		/// index of the data type instance
 	bool Initialized = false;	/// whether the data type instance has been initialized
+	std::map<std::string, PropertyCommonBase &> Properties;
 	
 	friend Database;
 

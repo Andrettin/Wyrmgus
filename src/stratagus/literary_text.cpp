@@ -53,25 +53,7 @@
 */
 bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value.c_str();
-	} else if (key == "hidden") {
-		this->Hidden = StringToBool(value);
-	} else if (key == "author") {
-		this->Author = value.c_str();
-	} else if (key == "translator") {
-		this->Translator = value.c_str();
-	} else if (key == "publisher") {
-		this->Publisher = value.c_str();
-	} else if (key == "license") {
-		this->License = value.c_str();
-	} else if (key == "notes") {
-		this->Notes = value.c_str();
-	} else if (key == "publication_year") {
-		this->PublicationYear = std::stoi(value);
-	} else if (key == "initial_page_number") {
-		this->InitialPageNumber = std::stoi(value);
-	} else if (key == "icon") {
+	if (key == "icon") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->Icon = CIcon::Get(value);
 	} else if (key == "section") {
@@ -81,10 +63,6 @@ bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::strin
 			this->Sections.push_back(section);
 			section->MainText = this;
 		}
-	} else if (key == "page_numbering_enabled") {
-		this->PageNumberingEnabled = StringToBool(value);
-	} else if (key == "lowercase_roman_numeral_page_numbering") {
-		this->LowercaseRomanNumeralPageNumbering = StringToBool(value);
 	} else {
 		return false;
 	}
@@ -163,9 +141,9 @@ CLiteraryText *CLiteraryText::GetSection(const std::string &section_name) const
 	return nullptr;
 }
 
-void CLiteraryText::UpdateSectionPageNumbers()
+void CLiteraryText::UpdateSectionPageNumbers() const
 {
-	int page_offset = this->GetInitialPageNumber();
+	int page_offset = this->InitialPageNumber;
 	if (this->IsPageNumberingEnabled()) {
 		page_offset += std::max(static_cast<int>(this->GetPages().size()), 1);
 	}
@@ -177,7 +155,7 @@ void CLiteraryText::UpdateSectionPageNumbers()
 		
 		section->UpdateSectionPageNumbers();
 		
-		page_offset = section->GetInitialPageNumber() + section->GetTotalPageCount();
+		page_offset = section->InitialPageNumber + section->GetTotalPageCount();
 	}
 }
 
