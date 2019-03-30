@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name data_element.h.cpp - The data element source file. */
+/**@name data_element.cpp - The data element source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //

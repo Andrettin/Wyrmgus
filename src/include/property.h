@@ -46,6 +46,10 @@
 
 class DataElement;
 
+template <typename T>
+class DataType;
+
+extern std::string FindAndReplaceString(const std::string &text, const std::string &find, const std::string &replace);
 extern bool StringToBool(const std::string &str);
 
 /*----------------------------------------------------------------------------
@@ -135,19 +139,7 @@ protected:
 		return *this = rhs.Get();
 	}
 	
-	virtual const PropertyBase<T> &operator =(const std::string &rhs) override
-	{
-		if constexpr(std::is_same_v<T, int>) {
-			return *this = std::stoi(rhs);
-		} else if constexpr(std::is_same_v<T, bool>) {
-			return *this = StringToBool(rhs);
-		} else if constexpr(std::is_same_v<T, String>) {
-			return *this = String(rhs.c_str());
-		} else {
-			fprintf(stderr, "The operator = is not valid for this type.");
-			return *this;
-		}
-	}
+	virtual const PropertyBase<T> &operator =(const std::string &rhs) override;
 	
 	const PropertyBase<T> &operator +=(const T &rhs)
 	{
@@ -270,7 +262,7 @@ private:
 		//set the underlying value
 		if (this->Setter) {
 			this->Setter(value);
-		} else {
+		} else if (this->Value != nullptr && *this->Value != value) {
 			*this->Value = value;
 		}
 	}

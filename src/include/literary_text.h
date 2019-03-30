@@ -68,7 +68,8 @@ public:
 			{"publication_year", this->PublicationYear},
 			{"initial_page_number", this->InitialPageNumber},
 			{"page_numbering_enabled", this->PageNumberingEnabled},
-			{"lowercase_roman_numeral_page_numbering", this->LowercaseRomanNumeralPageNumbering}
+			{"lowercase_roman_numeral_page_numbering", this->LowercaseRomanNumeralPageNumbering},
+			{"icon", this->Icon}
 		};
 	}
 
@@ -228,19 +229,19 @@ public:
 private:
 	void UpdateSectionPageNumbers() const;
 
-	Property<String> Name;			/// name of the text
+	Property<String> Name;			/// name of the literary text
 	Property<bool> Hidden = false;	/// whether the literary text is hidden
-	Property<String> Author;		/// author of the text
-	Property<String> Translator;	/// translator of the text
-	Property<String> Publisher;		/// publisher of the text
-	Property<String> License;		/// the open-source license the text is under, or public domain if that's the case
-	Property<String> Notes;			/// notes to appear on the cover of the text
+	Property<String> Author;		/// author of the literary text
+	Property<String> Translator;	/// translator of the literary text
+	Property<String> Publisher;		/// publisher of the literary text
+	Property<String> License;		/// the open-source license the literary text is under, or public domain if that's the case
+	Property<String> Notes;			/// notes to appear on the cover of the literary text
 	Property<int> PublicationYear = 0;	/// year of publication
-	Property<int> InitialPageNumber = 0;	/// page number in which the text begins
+	Property<int> InitialPageNumber = 0;	/// page number in which the literary text begins
 	Property<bool> PageNumberingEnabled = true;	/// whether page numbering is enabled for the literary text
 	Property<bool> LowercaseRomanNumeralPageNumbering = false;	/// whether page numbering should be depicted by lowercase Roman numerals
-	CIcon *Icon = nullptr;			/// the text's icon
-	CLiteraryText *MainText = nullptr;	/// the main text to which this one belongs, if it is a section
+	Property<CIcon *> Icon = nullptr;	/// the literary text's icon
+	CLiteraryText *MainText = nullptr;	/// the main literary text to which this one belongs, if it is a section
 	std::vector<CLiteraryText *> Sections;	/// the sections of the literary text, e.g. different chapters, or volumes
 	CLiteraryText *PreviousSection = nullptr;	/// the previous section to this one, if this is a section
 	CLiteraryText *NextSection = nullptr;	/// the next section to this one, if this is a section

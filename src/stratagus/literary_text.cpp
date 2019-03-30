@@ -53,10 +53,7 @@
 */
 bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "icon") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Icon = CIcon::Get(value);
-	} else if (key == "section") {
+	if (key == "section") {
 		value = FindAndReplaceString(value, "_", "-");
 		CLiteraryText *section = CLiteraryText::Get(value);
 		if (section != nullptr) {
