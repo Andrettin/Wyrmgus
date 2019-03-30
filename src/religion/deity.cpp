@@ -94,7 +94,7 @@ void CDeity::Remove(CDeity *deity)
 		}
 	}
 	
-	Database<CDeity>::Remove(deity);
+	DataType<CDeity>::Remove(deity);
 }
 
 /**
@@ -104,7 +104,7 @@ void CDeity::Clear()
 {
 	CDeity::DeitiesByUpgrade.clear();
 	
-	Database<CDeity>::Clear();
+	DataType<CDeity>::Clear();
 }
 
 /**

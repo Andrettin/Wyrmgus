@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 #include "ui/icon_config.h"
 
 /*----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ class LuaCallback;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CDynasty : public DataElement, public Database<CDynasty>
+class CDynasty : public DataElement, public DataType<CDynasty>
 {
 	GDCLASS(CDynasty, DataElement)
 

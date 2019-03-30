@@ -34,15 +34,15 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 #include "time/date.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CTimeline : public DataElement, public Database<CTimeline>
+class CTimeline : public DataElement, public DataType<CTimeline>
 {
 	GDCLASS(CTimeline, DataElement)
 

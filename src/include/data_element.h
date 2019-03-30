@@ -49,7 +49,7 @@ class CConfigData;
 class PropertyCommonBase;
 
 template<typename T>
-class Database;
+class DataType;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -112,7 +112,7 @@ protected:
 	bool Initialized = false;	/// whether the data element instance has been initialized
 	std::map<std::string, PropertyCommonBase &> Properties;
 	
-	friend Database;
+	friend DataType;
 
 protected:
 	static void _bind_methods();

@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -48,7 +48,7 @@ class CDeityDomain;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CReligion : public DataElement, public Database<CReligion>
+class CReligion : public DataElement, public DataType<CReligion>
 {
 	GDCLASS(CReligion, DataElement)
 

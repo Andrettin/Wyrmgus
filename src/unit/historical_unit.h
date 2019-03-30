@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 #include "time/date.h"
 
 /*----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ class CUnitType;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CHistoricalUnit : public DataElement, public Database<CHistoricalUnit>
+class CHistoricalUnit : public DataElement, public DataType<CHistoricalUnit>
 {
 	GDCLASS(CHistoricalUnit, DataElement)
 	

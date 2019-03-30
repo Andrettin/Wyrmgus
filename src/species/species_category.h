@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -47,7 +47,7 @@ class CSpeciesCategoryRank;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSpeciesCategory : public DataElement, public Database<CSpeciesCategory>
+class CSpeciesCategory : public DataElement, public DataType<CSpeciesCategory>
 {
 	GDCLASS(CSpeciesCategory, DataElement)
 	

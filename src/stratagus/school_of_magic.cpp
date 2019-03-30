@@ -85,7 +85,7 @@ void CSchoolOfMagic::Remove(CSchoolOfMagic *school_of_magic)
 		}
 	}
 	
-	Database<CSchoolOfMagic>::Remove(school_of_magic);
+	DataType<CSchoolOfMagic>::Remove(school_of_magic);
 }
 
 /**
@@ -95,7 +95,7 @@ void CSchoolOfMagic::Clear()
 {
 	CSchoolOfMagic::SchoolsOfMagicByUpgrade.clear();
 	
-	Database<CSchoolOfMagic>::Clear();
+	DataType<CSchoolOfMagic>::Clear();
 }
 
 /**

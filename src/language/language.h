@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 #include "word.h" // for certain enums
 
 /*----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ class CWord;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CLanguage : public DataElement, public Database<CLanguage>
+class CLanguage : public DataElement, public DataType<CLanguage>
 {
 	GDCLASS(CLanguage, DataElement)
 

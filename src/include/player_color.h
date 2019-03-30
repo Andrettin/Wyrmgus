@@ -35,13 +35,13 @@
 ----------------------------------------------------------------------------*/
 
 #include "conversible_color.h"
-#include "database.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CPlayerColor : public CConversibleColor, public Database<CPlayerColor>
+class CPlayerColor : public CConversibleColor, public DataType<CPlayerColor>
 {
 	GDCLASS(CPlayerColor, CConversibleColor)
 	

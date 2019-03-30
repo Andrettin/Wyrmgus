@@ -34,14 +34,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSpeciesCategoryRank : public DataElement, public Database<CSpeciesCategoryRank>
+class CSpeciesCategoryRank : public DataElement, public DataType<CSpeciesCategoryRank>
 {
 	GDCLASS(CSpeciesCategoryRank, DataElement)
 	

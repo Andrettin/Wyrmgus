@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name database.h - The database header file. */
+/**@name data_type.h - The data_type header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __DATABASE_H__
-#define __DATABASE_H__
+#ifndef __DATA_TYPE_H__
+#define __DATA_TYPE_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -50,10 +50,10 @@ class Property;
 ----------------------------------------------------------------------------*/
 
 template <typename T>
-class Database
+class DataType
 {
 	template <typename T2>
-	using Property = Property<T2, T>;	
+	using Property = Property<T2, T>; //to reduce redundancy from the property declarations
 	
 public:
 	/**
@@ -65,9 +65,9 @@ public:
 	*/
 	static inline T *Get(const std::string &ident, const bool should_find = true)
 	{
-		std::map<std::string, T *>::const_iterator find_iterator = Database<T>::InstancesByIdent.find(ident);
+		std::map<std::string, T *>::const_iterator find_iterator = DataType<T>::InstancesByIdent.find(ident);
 		
-		if (find_iterator != Database<T>::InstancesByIdent.end()) {
+		if (find_iterator != DataType<T>::InstancesByIdent.end()) {
 			return find_iterator->second;
 		}
 		
@@ -91,8 +91,8 @@ public:
 			return nullptr;
 		}
 		
-		if (index < static_cast<int>(Database<T>::Instances.size())) {
-			return Database<T>::Instances[index];
+		if (index < static_cast<int>(DataType<T>::Instances.size())) {
+			return DataType<T>::Instances[index];
 		}
 		
 		if (should_find) {
@@ -127,7 +127,7 @@ public:
 	*/
 	static inline const std::vector<T *> &GetAll()
 	{
-		return Database<T>::Instances;
+		return DataType<T>::Instances;
 	}
 	
 	
@@ -142,9 +142,9 @@ public:
 	{
 		T *instance = new T;
 		instance->Ident = ident;
-		instance->Index = Database<T>::Instances.size();
-		Database<T>::Instances.push_back(instance);
-		Database<T>::InstancesByIdent[ident] = instance;
+		instance->Index = DataType<T>::Instances.size();
+		DataType<T>::Instances.push_back(instance);
+		DataType<T>::InstancesByIdent[ident] = instance;
 		
 		return instance;
 	}
@@ -156,8 +156,8 @@ public:
 	*/
 	static inline void Remove(T *instance)
 	{
-		Database<T>::InstancesByIdent.erase(instance->Ident);
-		Database<T>::Instances.erase(std::remove(Database<T>::Instances.begin(), Database<T>::Instances.end(), instance), Database<T>::Instances.end());
+		DataType<T>::InstancesByIdent.erase(instance->Ident);
+		DataType<T>::Instances.erase(std::remove(DataType<T>::Instances.begin(), DataType<T>::Instances.end(), instance), DataType<T>::Instances.end());
 		delete instance;
 	}
 	
@@ -166,16 +166,16 @@ public:
 	*/
 	static inline void Clear()
 	{
-		for (T *instance : Database<T>::Instances) {
+		for (T *instance : DataType<T>::Instances) {
 			delete instance;
 		}
-		Database<T>::Instances.clear();
-		Database<T>::InstancesByIdent.clear();
+		DataType<T>::Instances.clear();
+		DataType<T>::InstancesByIdent.clear();
 	}
 	
 	static inline bool AreAllInitialized()
 	{
-		for (T *instance : Database<T>::Instances) {
+		for (T *instance : DataType<T>::Instances) {
 			if (!instance->IsInitialized()) {
 				return false;
 			}

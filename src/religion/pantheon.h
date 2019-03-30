@@ -34,14 +34,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CPantheon : public DataElement, public Database<CPantheon>
+class CPantheon : public DataElement, public DataType<CPantheon>
 {
 	GDCLASS(CPantheon, DataElement)
 	

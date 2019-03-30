@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -47,7 +47,7 @@ class CGraphic;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSeason : public DataElement, public Database<CSeason>
+class CSeason : public DataElement, public DataType<CSeason>
 {
 	GDCLASS(CSeason, DataElement)
 

@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -49,7 +49,7 @@ class CUpgrade;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CAge : public DataElement, public Database<CAge>
+class CAge : public DataElement, public DataType<CAge>
 {
 	GDCLASS(CAge, DataElement)
 	

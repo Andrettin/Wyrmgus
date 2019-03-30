@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -150,7 +150,7 @@ enum WordJunctionTypes {
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CWord : public DataElement, public Database<CWord>
+class CWord : public DataElement, public DataType<CWord>
 {
 	GDCLASS(CWord, DataElement)
 	

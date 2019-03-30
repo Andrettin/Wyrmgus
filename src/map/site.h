@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 #include "time/date.h"
 #include "vec2i.h"
 
@@ -55,7 +55,7 @@ class CUniqueItem;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSite : public DataElement, public Database<CSite>
+class CSite : public DataElement, public DataType<CSite>
 {
 	GDCLASS(CSite, DataElement)
 	

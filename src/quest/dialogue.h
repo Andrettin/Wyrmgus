@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -44,7 +44,7 @@
 class CDialogueNode;
 class LuaCallback;
 
-class CDialogue : public DataElement, public Database<CDialogue>
+class CDialogue : public DataElement, public DataType<CDialogue>
 {
 public:
 	~CDialogue();

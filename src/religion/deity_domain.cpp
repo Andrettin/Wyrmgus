@@ -85,7 +85,7 @@ void CDeityDomain::Remove(CDeityDomain *deity_domain)
 		}
 	}
 	
-	Database<CDeityDomain>::Remove(deity_domain);
+	DataType<CDeityDomain>::Remove(deity_domain);
 }
 
 /**
@@ -95,7 +95,7 @@ void CDeityDomain::Clear()
 {
 	CDeityDomain::DeityDomainsByUpgrade.clear();
 	
-	Database<CDeityDomain>::Clear();
+	DataType<CDeityDomain>::Clear();
 }
 
 /**

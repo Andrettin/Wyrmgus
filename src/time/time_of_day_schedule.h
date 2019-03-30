@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 #include "time/time_period_schedule.h"
 
 /*----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ public:
 	std::map<const CSeason *, int> SeasonHours;	/// the amount of hours the scheduled time of day lasts in a given season
 };
 
-class CTimeOfDaySchedule : public CTimePeriodSchedule, public Database<CTimeOfDaySchedule>
+class CTimeOfDaySchedule : public CTimePeriodSchedule, public DataType<CTimeOfDaySchedule>
 {
 	GDCLASS(CTimeOfDaySchedule, CTimePeriodSchedule)
 	

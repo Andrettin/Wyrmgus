@@ -35,7 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "character.h" // because of "MaxCharacterTitles"
-#include "database.h"
+#include "data_type.h"
 #include "time/date.h"
 #include "ui/icon_config.h"
 #include "ui/ui.h" // for the UI fillers
@@ -97,7 +97,7 @@ enum FactionTiers {
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CFaction : public Object, public Database<CFaction>
+class CFaction : public Object, public DataType<CFaction>
 {
 	GDCLASS(CFaction, Object)
 	
@@ -244,7 +244,7 @@ public:
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
 
-	friend Database;
+	friend DataType;
 	friend int CclDefineFaction(lua_State *l);
 	
 protected:

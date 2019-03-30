@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 #include "property.h"
 
 /*----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ struct lua_State;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CLiteraryText : public DataElement, public Database<CLiteraryText>
+class CLiteraryText : public DataElement, public DataType<CLiteraryText>
 {
 	GDCLASS(CLiteraryText, DataElement)
 	

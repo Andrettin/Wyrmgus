@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
+#include "data_type.h"
 #include "time/time_period_schedule.h"
 
 /*----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ public:
 	CSeasonSchedule *Schedule = nullptr;	/// the schedule to which this season belongs
 };
 
-class CSeasonSchedule : public CTimePeriodSchedule, public Database<CSeasonSchedule>
+class CSeasonSchedule : public CTimePeriodSchedule, public DataType<CSeasonSchedule>
 {
 	GDCLASS(CSeasonSchedule, CTimePeriodSchedule)
 	

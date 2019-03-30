@@ -34,14 +34,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CCurrency : public DataElement, public Database<CCurrency>
+class CCurrency : public DataElement, public DataType<CCurrency>
 {
 	GDCLASS(CCurrency, DataElement)
 	

@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 #include "time/date.h"
 #include "vec2i.h"
 
@@ -57,7 +57,7 @@ struct lua_State;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CCampaign : public DataElement, public Database<CCampaign>
+class CCampaign : public DataElement, public DataType<CCampaign>
 {
 	GDCLASS(CCampaign, DataElement)
 	

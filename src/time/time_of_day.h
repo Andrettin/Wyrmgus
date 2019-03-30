@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 #include "video/color.h"
 
 /*----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ class CGraphic;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CTimeOfDay : public DataElement, public Database<CTimeOfDay>
+class CTimeOfDay : public DataElement, public DataType<CTimeOfDay>
 {
 	GDCLASS(CTimeOfDay, DataElement)
 	

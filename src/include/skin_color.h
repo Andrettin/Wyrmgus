@@ -35,13 +35,13 @@
 ----------------------------------------------------------------------------*/
 
 #include "conversible_color.h"
-#include "database.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSkinColor : public CConversibleColor, public Database<CSkinColor>
+class CSkinColor : public CConversibleColor, public DataType<CSkinColor>
 {
 	GDCLASS(CSkinColor, CConversibleColor)
 	

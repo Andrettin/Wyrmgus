@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "database.h"
 #include "data_element.h"
+#include "data_type.h"
 #include "ui/icon_config.h"
 
 /*----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ struct lua_State;
 constexpr int MAJOR_DEITY_DOMAIN_MAX = 3; /// major deities can only have up to three domains
 constexpr int MINOR_DEITY_DOMAIN_MAX = 1; /// minor deities can only have one domain
 
-class CDeity : public DataElement, public Database<CDeity>
+class CDeity : public DataElement, public DataType<CDeity>
 {
 	GDCLASS(CDeity, DataElement)
 
