@@ -4,10 +4,10 @@
 /// Description
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
 
-constexpr int StratagusMajorVersion = 4;
-constexpr int StratagusMinorVersion = 0;
-constexpr int StratagusPatchLevel = 0;
-constexpr int StratagusPatchLevel2 = 0;
+#define StratagusMajorVersion 4
+#define StratagusMinorVersion 0
+#define StratagusPatchLevel 0
+#define StratagusPatchLevel2 0
 
 #define _version_stringify_(s) #s
 #define _version_stringify(s) _version_stringify_(s)
