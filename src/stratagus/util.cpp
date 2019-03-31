@@ -305,7 +305,15 @@ std::vector<std::string> SplitString(const std::string &str, const char *separat
 
 bool StringToBool(const std::string &str)
 {
-	return str == "true" || str == "1";
+	if (str == "true" || str == "yes" || str == "1") {
+		return true;
+	} else if (str == "false" || str == "no" || str == "0") {
+		return false;
+	}
+	
+	fprintf(stderr, "Invalid string used for conversion to boolean: \"%s\".\n", str.c_str());
+	
+	return false;
 }
 
 bool IsStringNumber(const std::string &str)
@@ -321,7 +329,7 @@ bool IsStringNumber(const std::string &str)
 
 bool IsStringBool(const std::string &str)
 {
-	return str == "true" || str == "false";
+	return str == "true" || str == "yes" || str == "false" || str == "no";
 }
 
 constexpr std::pair<int, const char *> RomanConversionTable[] = {{1000, "M"}, {900, "CM"}, {500, "D"}, {400, "CD"}, {100, "C"}, {90, "XC"}, {50, "L"}, {40, "XL"}, {10, "X"}, {9, "IX"}, {5, "V"}, {4, "IV"}, {1, "I"}};
