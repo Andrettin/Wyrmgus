@@ -731,83 +731,81 @@ void stratagusMain(int argc, char **argv)
 	}
 #endif
 
-#ifdef USE_STACKTRACE
 	try {
-#endif
-	Parameters &parameters = Parameters::Instance;
-	parameters.SetDefaultValues();
-	parameters.SetLocalPlayerNameFromEnv();
+		Parameters &parameters = Parameters::Instance;
+		parameters.SetDefaultValues();
+		parameters.SetLocalPlayerNameFromEnv();
 
 #ifdef REDIRECT_OUTPUT
-	RedirectOutput();
+		RedirectOutput();
 #endif
 
-	if (argc > 0) {
-		parameters.applicationName = argv[0];
-	}
+		if (argc > 0) {
+			parameters.applicationName = argv[0];
+		}
 
-	// FIXME: Parse options before or after scripts?
-	ParseCommandLine(argc, argv, parameters);
-	// Init the random number generator.
-	InitSyncRand();
+		// FIXME: Parse options before or after scripts?
+		ParseCommandLine(argc, argv, parameters);
+		// Init the random number generator.
+		InitSyncRand();
 
-	makedir(parameters.GetUserDirectory().c_str(), 0777);
+		makedir(parameters.GetUserDirectory().c_str(), 0777);
 
-	// Init Lua and register lua functions!
-	InitLua();
-	LuaRegisterModules();
+		// Init Lua and register lua functions!
+		InitLua();
+		LuaRegisterModules();
 
-	for (size_t p = CPlayer::Players.size(); p < PlayerMax; ++p) {
-		CPlayer::Players.push_back(new CPlayer);
-	}
+		for (size_t p = CPlayer::Players.size(); p < PlayerMax; ++p) {
+			CPlayer::Players.push_back(new CPlayer);
+		}
 
-	// Initialise AI module
-	InitAiModule();
+		// Initialise AI module
+		InitAiModule();
 
-	LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
+		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 
-	PrintHeader();
-	PrintLicense();
+		PrintHeader();
+		PrintLicense();
 
-	// Setup video display
-	InitVideo();
+		// Setup video display
+		InitVideo();
 
-	// Setup sound card
-	InitSound();
+		// Setup sound card
+		InitSound();
 
-#ifndef DEBUG			// For debug it's better not to have:
-	srand(time(nullptr));	// Random counter = random each start
+#ifndef DEBUG				// For debug it's better not to have:
+		srand(time(nullptr));	// Random counter = random each start
 #endif
 
-	//  Show title screens.
-	SetDefaultTextColors(FontYellow, FontWhite);
-	LoadFonts();
-	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-	Video.ClearScreen();
+		//  Show title screens.
+		SetDefaultTextColors(FontYellow, FontWhite);
+		LoadFonts();
+		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+		Video.ClearScreen();
 
-	// Init player data
-	CPlayer::SetThisPlayer(nullptr);
-	//Don't clear the Players structure as it would erase the allowed units.
-	// memset(Players, 0, sizeof(Players));
-	
-	NumPlayers = 0;
+		// Init player data
+		CPlayer::SetThisPlayer(nullptr);
+		//Don't clear the Players structure as it would erase the allowed units.
+		// memset(Players, 0, sizeof(Players));
+		
+		NumPlayers = 0;
 
-	UnitManager.Init();	// Units memory management
-	PreMenuSetup();		// Load everything needed for menus
+		UnitManager.Init();	// Units memory management
+		PreMenuSetup();		// Load everything needed for menus
 
-	MenuLoop();
+		MenuLoop();
 
-	Exit(0);
-#ifdef USE_STACKTRACE
+		Exit(0);
 	} catch (const std::exception &e) {
 		fprintf(stderr, "" NAME " crashed!\n");
+#ifdef USE_STACKTRACE
 		fprintf(stderr, "Please send this call stack to our bug tracker: " HOMEPAGE "/issues\n");
 		fprintf(stderr, "and tell us what caused this bug to occur.\n");
 		fprintf(stderr, " === exception state traceback === \n");
+#endif
 		fprintf(stderr, "%s", e.what());
 		exit(1);
 	}
-#endif
 }
 
 //Wyrmgus start
