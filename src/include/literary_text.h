@@ -82,64 +82,7 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
-private:
-	const String &GetName() const
-	{
-		return this->Name.Get();
-	}
-	
-	bool IsHidden() const
-	{
-		return this->Hidden.Get();
-	}
-	
-	const String &GetAuthor() const
-	{
-		return this->Author.Get();
-	}
-	
-	const String &GetTranslator() const
-	{
-		return this->Translator.Get();
-	}
-	
-	const String &GetPublisher() const
-	{
-		return this->Publisher.Get();
-	}
-	
-	const String &GetLicense() const
-	{
-		return this->License.Get();
-	}
-	
-	const String &GetNotes() const
-	{
-		return this->Notes.Get();
-	}
-	
-	int GetPublicationYear() const
-	{
-		return this->PublicationYear.Get();
-	}
-	
-	int GetInitialPageNumber() const
-	{
-		return this->InitialPageNumber.Get();
-	}
-	
 public:
-	CIcon *GetIcon() const
-	{
-		if (this->Icon != nullptr) {
-			return this->Icon;		
-		} else if (this->GetMainText() != nullptr) {
-			return this->GetMainText()->GetIcon();		
-		} else {
-			return nullptr;
-		}
-	}
-	
 	const std::vector<CLiteraryText *> &GetSections() const
 	{
 		return this->Sections;
@@ -229,6 +172,59 @@ public:
 private:
 	void UpdateSectionPageNumbers() const;
 
+	// getters for Godot
+
+	const String &GetName() const
+	{
+		return this->Name.Get();
+	}
+	
+	bool IsHidden() const
+	{
+		return this->Hidden.Get();
+	}
+	
+	const String &GetAuthor() const
+	{
+		return this->Author.Get();
+	}
+	
+	const String &GetTranslator() const
+	{
+		return this->Translator.Get();
+	}
+	
+	const String &GetPublisher() const
+	{
+		return this->Publisher.Get();
+	}
+	
+	const String &GetLicense() const
+	{
+		return this->License.Get();
+	}
+	
+	const String &GetNotes() const
+	{
+		return this->Notes.Get();
+	}
+	
+	int GetPublicationYear() const
+	{
+		return this->PublicationYear.Get();
+	}
+	
+	int GetInitialPageNumber() const
+	{
+		return this->InitialPageNumber.Get();
+	}
+	
+	CIcon *GetIcon() const
+	{
+		return this->Icon.Get();
+	}
+	
+public:
 	Property<String> Name;			/// name of the literary text
 	Property<bool> Hidden = false;	/// whether the literary text is hidden
 	Property<String> Author;		/// author of the literary text
@@ -240,7 +236,20 @@ private:
 	Property<int> InitialPageNumber = 0;	/// page number in which the literary text begins
 	Property<bool> PageNumberingEnabled = true;	/// whether page numbering is enabled for the literary text
 	Property<bool> LowercaseRomanNumeralPageNumbering = false;	/// whether page numbering should be depicted by lowercase Roman numerals
-	Property<CIcon *> Icon = nullptr;	/// the literary text's icon
+	Property<CIcon *> Icon {		/// the literary text's icon
+		Property<CIcon *>::ValueType(nullptr),
+		Property<CIcon *>::GetterType([&]() -> Property<CIcon *>::GetterReturnType {
+			if (*this->Icon != nullptr) {
+				return *this->Icon;		
+			} else if (this->GetMainText() != nullptr) {
+				return this->GetMainText()->Icon;		
+			} else {
+				return *this->Icon;
+			}
+		})
+	};
+	
+private:
 	CLiteraryText *MainText = nullptr;	/// the main literary text to which this one belongs, if it is a section
 	std::vector<CLiteraryText *> Sections;	/// the sections of the literary text, e.g. different chapters, or volumes
 	CLiteraryText *PreviousSection = nullptr;	/// the previous section to this one, if this is a section

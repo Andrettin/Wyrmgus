@@ -35,6 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <core/ustring.h>
+#include <core/variant.h>
 
 #include <functional>
 #include <stdexcept>
@@ -68,24 +69,28 @@ protected:
 	virtual const PropertyCommonBase &operator *=(const std::string &rhs) = 0;
 	virtual const PropertyCommonBase &operator /=(const std::string &rhs) = 0;
 	
+	virtual operator Variant() const = 0;
+	
 	friend DataElement;
 };
 
 template <typename T>
 class PropertyBase : public PropertyCommonBase
 {
+public:
+	using ValueType = T;
+	using GetterReturnType = const T&;
+	using GetterType = std::function<const T&()>;
+	using SetterType = std::function<void(const T&)>;
+	
 protected:
-	PropertyBase(const T &value, const std::function<void(const T&)> &setter) : Setter(setter)
+	PropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : Setter(setter)
 	{
 		this->Value = new T;
 		*(this->Value) = value;
 	}
 	
-	PropertyBase(const std::function<const T&()> &getter, const std::function<void(const T&)> &setter) : Getter(getter), Setter(setter)
-	{
-	}
-	
-	PropertyBase(const std::function<void(const T&)> &setter) : PropertyBase(T(), setter)
+	PropertyBase(const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
 	{
 	}
 	
@@ -235,21 +240,28 @@ protected:
 
 	T &operator *()
 	{
+		if (this->Value == nullptr) {
+			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
+		}
+		
 		//get the underlying value
-		return this->Get();
+		return *this->Value;
 	}
 
 public:
 	const T &operator *() const
 	{
+		if (this->Value == nullptr) {
+			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
+		}
+		
 		//get the underlying value
-		return this->Get();
+		return *this->Value;
 	}
 	
 private:
 	T &Get()
 	{
-		//get the underlying value
 		if (this->Getter) {
 			return const_cast<T &>(this->Getter());
 		} else {
@@ -259,7 +271,6 @@ private:
 	
 	void Set(const T &value)
 	{
-		//set the underlying value
 		if (this->Setter) {
 			this->Setter(value);
 		} else if (this->Value != nullptr && *this->Value != value) {
@@ -282,26 +293,35 @@ public:
 	{
 		return this->Get();
 	}
+	
+	virtual operator Variant() const override
+	{
+		return Variant(this->Get());
+	}
 
 private:
 	T *Value = nullptr;
-	std::function<const T&()> Getter;
-	std::function<void(const T&)> Setter;
+	GetterType Getter;
+	SetterType Setter;
 };
 
 template <typename T, typename O>
 class Property : public PropertyBase<T>
 {
 private:
-	Property(const T &value, const std::function<void(const T&)> &setter = nullptr) : PropertyBase(value, setter)
+	Property(const T &value, const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(value, getter, setter)
 	{
 	}
 	
-	Property(const std::function<const T&()> &getter, const std::function<void(const T&)> &setter = nullptr) : PropertyBase(getter, setter)
+	Property(const T &value, const SetterType &setter = nullptr) : Property(value, nullptr, setter)
 	{
 	}
 	
-	Property(const std::function<void(const T&)> &setter = nullptr) : PropertyBase(setter)
+	Property(const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(getter, setter)
+	{
+	}
+	
+	Property(const SetterType &setter = nullptr) : Property(T(), nullptr, setter)
 	{
 	}
 	
