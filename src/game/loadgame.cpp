@@ -42,6 +42,7 @@
 #include "construct.h"
 #include "dynasty.h"
 #include "economy/currency.h"
+#include "economy/resource.h"
 #include "game/replay.h"
 #include "game/trigger.h"
 //Wyrmgus start
@@ -192,6 +193,7 @@ void CleanModules()
 	CPlayerColor::Clear();
 	CHairColor::Clear();
 	CSkinColor::Clear();
+	CResource::Clear();
 }
 
 /**
