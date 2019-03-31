@@ -111,10 +111,7 @@ public:
 	
 	~CIcon();
 
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "icon";
-	}
+	static constexpr const char *ClassIdentifier = "icon";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;

@@ -63,10 +63,7 @@ class CDeity : public DataElement, public DataType<CDeity>
 	GDCLASS(CDeity, DataElement)
 
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "deity";
-	}
+	static constexpr const char *ClassIdentifier = "deity";
 	
 	static CDeity *GetByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
 	static void Remove(CDeity *deity);

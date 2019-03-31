@@ -104,10 +104,7 @@ class CFaction : public Object, public DataType<CFaction>
 public:
 	~CFaction();
 	
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "faction";
-	}
+	static constexpr const char *ClassIdentifier = "faction";
 	
 	static int GetIndex(const std::string &faction_ident);
 	static int GetFactionClassUnitType(const CFaction *faction, const int class_id);

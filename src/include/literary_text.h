@@ -73,10 +73,7 @@ public:
 		};
 	}
 
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "literary_text";
-	}
+	static constexpr const char *ClassIdentifier = "literary_text";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;

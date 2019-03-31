@@ -52,10 +52,7 @@ class CSchoolOfMagic : public DataElement, public DataType<CSchoolOfMagic>
 	GDCLASS(CSchoolOfMagic, DataElement)
 
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "school_of_magic";
-	}
+	static constexpr const char *ClassIdentifier = "school_of_magic";
 	
 	static CSchoolOfMagic *GetByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
 	static void Remove(CSchoolOfMagic *school_of_magic);

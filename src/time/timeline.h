@@ -47,10 +47,7 @@ class CTimeline : public DataElement, public DataType<CTimeline>
 	GDCLASS(CTimeline, DataElement)
 
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "timeline";
-	}
+	static constexpr const char *ClassIdentifier = "timeline";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	

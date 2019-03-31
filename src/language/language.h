@@ -53,10 +53,7 @@ class CLanguage : public DataElement, public DataType<CLanguage>
 	GDCLASS(CLanguage, DataElement)
 
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "language";
-	}
+	static constexpr const char *ClassIdentifier = "language";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 

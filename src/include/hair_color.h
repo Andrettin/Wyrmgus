@@ -46,10 +46,7 @@ class CHairColor : public CConversibleColor, public DataType<CHairColor>
 	GDCLASS(CHairColor, CConversibleColor)
 
 public:	
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "hair_color";
-	}
+	static constexpr const char *ClassIdentifier = "hair_color";
 };
 
 #endif

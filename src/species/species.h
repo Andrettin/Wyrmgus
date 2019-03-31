@@ -57,10 +57,7 @@ class CSpecies : public DataElement, public DataType<CSpecies>
 	GDCLASS(CSpecies, DataElement)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "species";
-	}
+	static constexpr const char *ClassIdentifier = "species";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;

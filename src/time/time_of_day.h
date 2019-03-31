@@ -53,10 +53,7 @@ class CTimeOfDay : public DataElement, public DataType<CTimeOfDay>
 	GDCLASS(CTimeOfDay, DataElement)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "time_of_day";
-	}
+	static constexpr const char *ClassIdentifier = "time_of_day";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;

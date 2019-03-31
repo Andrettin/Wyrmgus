@@ -62,10 +62,7 @@ class CCampaign : public DataElement, public DataType<CCampaign>
 	GDCLASS(CCampaign, DataElement)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "campaign";
-	}
+	static constexpr const char *ClassIdentifier = "campaign";
 	
 	static void SetCurrentCampaign(CCampaign *campaign);
 	static CCampaign *GetCurrentCampaign();

@@ -46,10 +46,7 @@ class CCurrency : public DataElement, public DataType<CCurrency>
 	GDCLASS(CCurrency, DataElement)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "currency";
-	}
+	static constexpr const char *ClassIdentifier = "currency";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	

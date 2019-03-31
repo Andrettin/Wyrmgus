@@ -59,10 +59,7 @@ class CAchievement : public DataElement, public DataType<CAchievement>
 	GDCLASS(CAchievement, DataElement)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "achievement";
-	}
+	static constexpr const char *ClassIdentifier = "achievement";
 	
 	static void CheckAchievements();
 	

@@ -52,10 +52,7 @@ class CSeason : public DataElement, public DataType<CSeason>
 	GDCLASS(CSeason, DataElement)
 
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "season";
-	}
+	static constexpr const char *ClassIdentifier = "season";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;

@@ -46,10 +46,7 @@ class CSkinColor : public CConversibleColor, public DataType<CSkinColor>
 	GDCLASS(CSkinColor, CConversibleColor)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "skin_color";
-	}
+	static constexpr const char *ClassIdentifier = "skin_color";
 };
 
 #endif

@@ -58,10 +58,7 @@ class CDynasty : public DataElement, public DataType<CDynasty>
 public:
 	~CDynasty();
 	
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "dynasty";
-	}
+	static constexpr const char *ClassIdentifier = "dynasty";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	

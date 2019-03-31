@@ -46,10 +46,7 @@ class CPantheon : public DataElement, public DataType<CPantheon>
 	GDCLASS(CPantheon, DataElement)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "pantheon";
-	}
+	static constexpr const char *ClassIdentifier = "pantheon";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	

@@ -60,10 +60,7 @@ class CSite : public DataElement, public DataType<CSite>
 	GDCLASS(CSite, DataElement)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "site";
-	}
+	static constexpr const char *ClassIdentifier = "site";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;

@@ -52,10 +52,7 @@ class CDeityDomain : public DataElement, public DataType<CDeityDomain>
 	GDCLASS(CDeityDomain, DataElement)
 
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "deity_domain";
-	}
+	static constexpr const char *ClassIdentifier = "deity_domain";
 	
 	static CDeityDomain *GetByUpgrade(const CUpgrade *upgrade, const bool should_find = true);
 	static void Remove(CDeityDomain *deity_domain);

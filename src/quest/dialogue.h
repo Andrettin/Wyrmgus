@@ -49,10 +49,7 @@ class CDialogue : public DataElement, public DataType<CDialogue>
 public:
 	~CDialogue();
 	
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "dialogue";
-	}
+	static constexpr const char *ClassIdentifier = "dialogue";
 	
 	void Call(const int player) const;
 	

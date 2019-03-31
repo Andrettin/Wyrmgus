@@ -73,10 +73,7 @@ class CTimeOfDaySchedule : public CTimePeriodSchedule, public DataType<CTimeOfDa
 public:
 	~CTimeOfDaySchedule();
 	
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "time_of_day_schedule";
-	}
+	static constexpr const char *ClassIdentifier = "time_of_day_schedule";
 	
 	static CTimeOfDaySchedule *DefaultTimeOfDaySchedule;
 	

@@ -85,10 +85,7 @@ class CMapTemplate : public DataElement, public DataType<CMapTemplate>
 public:
 	~CMapTemplate();
 
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "map_template";
-	}
+	static constexpr const char *ClassIdentifier = "map_template";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;

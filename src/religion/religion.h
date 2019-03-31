@@ -53,10 +53,7 @@ class CReligion : public DataElement, public DataType<CReligion>
 	GDCLASS(CReligion, DataElement)
 
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "religion";
-	}
+	static constexpr const char *ClassIdentifier = "religion";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	

@@ -64,10 +64,7 @@ class CSeasonSchedule : public CTimePeriodSchedule, public DataType<CSeasonSched
 public:
 	~CSeasonSchedule();
 	
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "season_schedule";
-	}
+	static constexpr const char *ClassIdentifier = "season_schedule";
 	
 	static CSeasonSchedule *DefaultSeasonSchedule;
 	

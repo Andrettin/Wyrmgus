@@ -46,10 +46,7 @@ class CSpeciesCategoryRank : public DataElement, public DataType<CSpeciesCategor
 	GDCLASS(CSpeciesCategoryRank, DataElement)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "species_category_rank";
-	}
+	static constexpr const char *ClassIdentifier = "species_category_rank";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;

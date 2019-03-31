@@ -155,10 +155,7 @@ class CWord : public DataElement, public DataType<CWord>
 	GDCLASS(CWord, DataElement)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "word";
-	}
+	static constexpr const char *ClassIdentifier = "word";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	

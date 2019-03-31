@@ -56,10 +56,7 @@ class CAge : public DataElement, public DataType<CAge>
 public:
 	~CAge();
 	
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "age";
-	}
+	static constexpr const char *ClassIdentifier = "age";
 	
 	static void SetCurrentAge(CAge *age);
 	static void CheckCurrentAge();

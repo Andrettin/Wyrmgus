@@ -86,10 +86,7 @@ class CResource : public DataElement, public DataType<CResource>
 	GDCLASS(CResource, DataElement)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "resource";
-	}
+	static constexpr const char *ClassIdentifier = "resource";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	

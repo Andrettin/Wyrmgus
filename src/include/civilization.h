@@ -73,10 +73,7 @@ class CCivilization : public Object, public DataType<CCivilization>
 public:
 	~CCivilization();
 	
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "civilization";
-	}
+	static constexpr const char *ClassIdentifier = "civilization";
 	
 	static int GetCivilizationClassUnitType(const CCivilization *civilization, const int class_id);
 	static int GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id);

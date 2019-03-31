@@ -46,10 +46,7 @@ class CPlayerColor : public CConversibleColor, public DataType<CPlayerColor>
 	GDCLASS(CPlayerColor, CConversibleColor)
 	
 public:
-	static constexpr const char *GetClassIdentifier()
-	{
-		return "player_color";
-	}
+	static constexpr const char *ClassIdentifier = "player_color";
 };
 
 #endif

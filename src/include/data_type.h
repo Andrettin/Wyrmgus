@@ -72,7 +72,7 @@ public:
 		}
 		
 		if (should_find) {
-			fprintf(stderr, "Invalid \"%s\" instance: \"%s\".\n", T::GetClassIdentifier(), ident.c_str());
+			fprintf(stderr, "Invalid \"%s\" instance: \"%s\".\n", T::ClassIdentifier, ident.c_str());
 		}
 		
 		return nullptr;
@@ -96,7 +96,7 @@ public:
 		}
 		
 		if (should_find) {
-			fprintf(stderr, "Invalid \"%s\" instance index: %i.\n", T::GetClassIdentifier(), index);
+			fprintf(stderr, "Invalid \"%s\" instance index: %i.\n", T::ClassIdentifier, index);
 		}
 		
 		return nullptr;
