@@ -52,11 +52,7 @@
 */
 bool CSpeciesCategory::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "common_name") {
-		this->CommonName = value;
-	} else if (key == "rank") {
+	if (key == "rank") {
 		value = FindAndReplaceString(value, "_", "-");
 		CSpeciesCategoryRank *rank = CSpeciesCategoryRank::Get(value);
 		if (rank) {

@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name currency.cpp - The currency source file. */
+/**@name detailed_data_element.cpp - The detailed data element source file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,30 +27,19 @@
 //      02111-1307, USA.
 //
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "stratagus.h"
 
-#include "economy/currency.h"
+#include "detailed_data_element.h"
 
-/**
-**	@brief	Process a property in the data provided by a configuration file
-**
-**	@param	key		The property's key
-**	@param	value	The property's value
-**
-**	@return	True if the property can be processed, or false otherwise
-*/
-bool CCurrency::ProcessConfigDataProperty(const std::string &key, std::string value)
-{
-	if (key == "name") {
-		this->Name = value.c_str();
-	} else {
-		return false;
-	}
-	
-	return true;
-}
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
 
-void CCurrency::_bind_methods()
+void DetailedDataElement::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &CCurrency::GetName);
+	ClassDB::bind_method(D_METHOD("get_name"), &DetailedDataElement::GetName);
 }

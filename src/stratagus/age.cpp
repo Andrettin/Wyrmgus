@@ -67,29 +67,6 @@ CAge::~CAge()
 }
 
 /**
-**	@brief	Process a property in the data provided by a configuration file
-**
-**	@param	key		The property's key
-**	@param	value	The property's value
-**
-**	@return	True if the property can be processed, or false otherwise
-*/
-bool CAge::ProcessConfigDataProperty(const std::string &key, std::string value)
-{
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "priority") {
-		this->Priority = std::stoi(value);
-	} else if (key == "year_boost") {
-		this->YearBoost = std::stoi(value);
-	} else {
-		return false;
-	}
-	
-	return true;
-}
-
-/**
 **	@brief	Process a section in the data provided by a configuration file
 **
 **	@param	section		The section

@@ -359,7 +359,7 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 				character->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "currency") {
-			CCurrency *currency = CCurrency::GetOrAdd(ident);
+			Currency *currency = Currency::GetOrAdd(ident);
 			if (!define_only) {
 				currency->ProcessConfigData(config_data);
 			}

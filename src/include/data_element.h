@@ -69,7 +69,7 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) { return false; }
 	
 	/**
-	**	@brief	Initialize the data element instance
+	**	@brief	Initialize the data element
 	*/
 	virtual void Initialize()
 	{
@@ -77,9 +77,9 @@ public:
 	}
 	
 	/**
-	**	@brief	Get the data element instance's string identifier
+	**	@brief	Get the data element's string identifier
 	**
-	**	@return	The data element instance's string identifier
+	**	@return	The data element's string identifier
 	*/
 	String GetIdent() const
 	{
@@ -87,9 +87,9 @@ public:
 	}
 	
 	/**
-	**	@brief	Get the data element instance's index
+	**	@brief	Get the data element's index
 	**
-	**	@return	The data element instance's index
+	**	@return	The data element's index
 	*/
 	int GetIndex() const
 	{
@@ -97,19 +97,21 @@ public:
 	}
 	
 	/**
-	**	@brief	Get whether the data element instance has been initialized
+	**	@brief	Get whether the data element has been initialized
 	**
-	**	@return	True if the data element instance has been initialized, or false otherwise
+	**	@return	True if the data element has been initialized, or false otherwise
 	*/
 	bool IsInitialized() const
 	{
 		return this->Initialized;
 	}
 	
-	std::string Ident;	/// string identifier of the data element instance
+	Variant GetPropertyVariantValue(const std::string &property_name) const;
+	
+	std::string Ident;	/// string identifier of the data element
 protected:
-	int Index = -1;		/// index of the data element instance
-	bool Initialized = false;	/// whether the data element instance has been initialized
+	int Index = -1;		/// index of the data element
+	bool Initialized = false;	/// whether the data element has been initialized
 	std::map<std::string, PropertyCommonBase &> Properties;
 	
 	friend DataType;

@@ -34,27 +34,20 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
 #include "data_type.h"
+#include "detailed_data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CPantheon : public DataElement, public DataType<CPantheon>
+class CPantheon : public DetailedDataElement, public DataType<CPantheon>
 {
-	GDCLASS(CPantheon, DataElement)
+	GDCLASS(CPantheon, DetailedDataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "pantheon";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
-	
-	std::string Name;							/// Name of the pantheon
-	std::string Description;
-	std::string Background;
-	std::string Quote;
-
 protected:
 	static inline void _bind_methods() {}
 };

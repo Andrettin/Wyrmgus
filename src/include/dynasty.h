@@ -34,9 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
 #include "data_type.h"
-#include "ui/icon_config.h"
+#include "detailed_data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -45,31 +44,20 @@
 class CCivilization;
 class CFaction;
 class CUpgrade;
-class LuaCallback;
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CDynasty : public DataElement, public DataType<CDynasty>
+class CDynasty : public DetailedDataElement, public DataType<CDynasty>
 {
-	GDCLASS(CDynasty, DataElement)
+	GDCLASS(CDynasty, DetailedDataElement)
 
 public:
-	~CDynasty();
-	
 	static constexpr const char *ClassIdentifier = "dynasty";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
-	
-	std::string Name;													/// dynasty name
-	std::string Description;											/// dynasty description
-	std::string Quote;													/// dynasty quote
-	std::string Background;												/// dynasty background
 	CUpgrade *DynastyUpgrade = nullptr;									/// dynasty upgrade applied when the dynasty is set
 	CCivilization *Civilization = nullptr;								/// dynasty civilization
-	IconConfig Icon;													/// dynasty's icon
-	LuaCallback *Conditions = nullptr;
 	std::vector<CFaction *> Factions;									/// to which factions is this dynasty available
 
 protected:

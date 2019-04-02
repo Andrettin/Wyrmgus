@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
 #include "data_type.h"
+#include "detailed_data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -48,20 +48,21 @@ class CDeityDomain;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CReligion : public DataElement, public DataType<CReligion>
+class CReligion : public DetailedDataElement, public DataType<CReligion>
 {
-	GDCLASS(CReligion, DataElement)
+	GDCLASS(CReligion, DetailedDataElement)
 
 public:
+	CReligion(const std::string &ident = "", const int index = -1) : DetailedDataElement(ident, index)
+	{
+		this->Properties.insert({"cultural_deities", this->CulturalDeities});
+	}
+	
 	static constexpr const char *ClassIdentifier = "religion";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	std::string Name;							/// Name of the religion
-	std::string Description;
-	std::string Background;
-	std::string Quote;
-	bool CulturalDeities = false;				/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
+	Property<bool> CulturalDeities = false;	/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
 	std::vector<CDeityDomain *> Domains;
 
 protected:

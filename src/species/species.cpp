@@ -56,15 +56,7 @@
 */
 bool CSpecies::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "description") {
-		this->Description = value;
-	} else if (key == "quote") {
-		this->Quote = value;
-	} else if (key == "background") {
-		this->Background = value;
-	} else if (key == "era") {
+	if (key == "era") {
 		value = FindAndReplaceString(value, "_", "-");
 		const int era_id = GetEraIdByName(value);
 		if (era_id != -1) {

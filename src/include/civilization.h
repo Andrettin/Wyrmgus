@@ -53,7 +53,7 @@
 
 class CAiBuildingTemplate;
 class CCalendar;
-class CCurrency;
+class Currency;
 class CDeity;
 class CForceTemplate;
 class CLanguage;
@@ -167,7 +167,7 @@ public:
 	**
 	**	@return	The civilization's currency
 	*/
-	CCurrency *GetCurrency() const
+	Currency *GetCurrency() const
 	{
 		if (this->Currency) {
 			return this->Currency;
@@ -277,7 +277,7 @@ private:
 	CSpecies *Species = nullptr;	/// the civilization's species (e.g. human)
 	CLanguage *Language = nullptr;	/// the language used by the civilization
 	CCalendar *Calendar = nullptr;	/// the calendar used by the civilization
-	CCurrency *Currency = nullptr;	/// the currency used by the civilization
+	Currency *Currency = nullptr;	/// the currency used by the civilization
 	std::string Upgrade;			/// the string identifier for the civilization's upgrade
 	bool Hidden = false;			/// whether the civilization is hidden
 	bool Playable = true;			/// whether the civilization is playable

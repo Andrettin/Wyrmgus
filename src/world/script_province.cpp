@@ -621,19 +621,19 @@ static int CclGetPlaneData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, plane->Name.c_str());
+		lua_pushstring(l, plane->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Index")) {
 		lua_pushnumber(l, plane->GetIndex());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, plane->Description.c_str());
+		lua_pushstring(l, plane->Description.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, plane->Background.c_str());
+		lua_pushstring(l, plane->Background.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, plane->Quote.c_str());
+		lua_pushstring(l, plane->Quote.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Species")) {
 		lua_createtable(l, plane->Species.size(), 0);
@@ -668,19 +668,19 @@ static int CclGetWorldData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, world->Name.c_str());
+		lua_pushstring(l, world->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Index")) {
 		lua_pushnumber(l, world->GetIndex());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, world->Description.c_str());
+		lua_pushstring(l, world->Description.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, world->Background.c_str());
+		lua_pushstring(l, world->Background.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, world->Quote.c_str());
+		lua_pushstring(l, world->Quote.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Plane")) {
 		if (world->Plane) {

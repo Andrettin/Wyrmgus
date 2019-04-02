@@ -72,7 +72,7 @@ class CAge;
 class CCalendar;
 class CCharacter;
 class CCivilization;
-class CCurrency;
+class Currency;
 class CDeity;
 class CDeityDomain;
 class CDynasty;
@@ -256,7 +256,7 @@ public:
 	//Wyrmgus start
 	void CheckAge();
 	void SetAge(CAge *age);
-	CCurrency *GetCurrency() const;
+	Currency *GetCurrency() const;
 	void ShareUpgradeProgress(CPlayer &player, CUnit &unit);
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(const int upgrade_class) const;

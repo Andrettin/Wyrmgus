@@ -36,6 +36,7 @@
 
 #include "data_element.h"
 #include "data_type.h"
+#include "property.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -52,19 +53,15 @@ class CSpeciesCategory : public DataElement, public DataType<CSpeciesCategory>
 	GDCLASS(CSpeciesCategory, DataElement)
 	
 public:
+	CSpeciesCategory(const std::string &ident = "", const int index = -1) : DataElement(ident, index)
+	{
+		this->Properties.insert({"name", this->Name});
+		this->Properties.insert({"common_name", this->CommonName});
+	}
+	
 	static constexpr const char *ClassIdentifier = "species_category";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
-	
-	String GetName() const
-	{
-		return this->Name.c_str();
-	}
-	
-	String GetCommonName() const
-	{
-		return this->CommonName.c_str();
-	}
 	
 	CSpeciesCategoryRank *GetRank() const
 	{
@@ -81,9 +78,10 @@ public:
 		return this->UpperCategory;
 	}
 	
+	Property<String> Name;			/// name of the species category
+	Property<String> CommonName;	/// the common name of members of the species category
+	
 private:
-	std::string Name;							/// name of the species category
-	std::string CommonName;						/// the common name of members of the species category
 	CSpeciesCategoryRank *Rank = nullptr;		/// the rank of the species category
 	std::vector<CSpeciesCategory *> LowerCategories;	/// the categories directly below this one
 	CSpeciesCategory *UpperCategory = nullptr;	/// the category directly above this one

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name dynasty.cpp - The dynasty source file. */
+/**@name detailed_data_element.h - The detailed data element header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,52 +27,60 @@
 //      02111-1307, USA.
 //
 
+#ifndef __DETAILED_DATA_ELEMENT_H__
+#define __DETAILED_DATA_ELEMENT_H__
+
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
-#include "dynasty.h"
-
-#include "config.h"
-#include "luacallback.h"
+#include "data_element.h"
+#include "property.h"
 
 /*----------------------------------------------------------------------------
---  Functions
+--  Declarations
+----------------------------------------------------------------------------*/
+
+class CIcon;
+
+/*----------------------------------------------------------------------------
+--  Definition
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Destructor
+**	@brief	A more detailed data element, containing properties which e.g. most encyclopedia entries would need to have.
 */
-CDynasty::~CDynasty()
+class DetailedDataElement : public DataElement
 {
-	if (this->Conditions) {
-		delete Conditions;
-	}
-}
+	GDCLASS(DetailedDataElement, DataElement)
 
-/**
-**	@brief	Process a property in the data provided by a configuration file
-**
-**	@param	key		The property's key
-**	@param	value	The property's value
-**
-**	@return	True if the property can be processed, or false otherwise
-*/
-bool CDynasty::ProcessConfigDataProperty(const std::string &key, std::string value)
-{
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "description") {
-		this->Description = value;
-	} else if (key == "quote") {
-		this->Quote = value;
-	} else if (key == "background") {
-		this->Background = value;
-	} else {
-		return false;
+public:
+	DetailedDataElement(const std::string &ident = "", const int index = -1) : DataElement(ident, index)
+	{
+		this->Properties.insert({"name", this->Name});
+		this->Properties.insert({"description", this->Description});
+		this->Properties.insert({"quote", this->Quote});
+		this->Properties.insert({"background", this->Background});
+		this->Properties.insert({"icon", this->Icon});
 	}
 	
-	return true;
-}
+private:
+	//getters for Godot
+
+	const String &GetName() const
+	{
+		return this->Name;
+	}
+	
+public:
+	ExposedProperty<String, DetailedDataElement> Name;				/// the name of the data element
+	ExposedProperty<String, DetailedDataElement> Description;		/// the description of the data element from an in-game universe perspective
+	ExposedProperty<String, DetailedDataElement> Quote;				/// a quote relating to the data element
+	ExposedProperty<String, DetailedDataElement> Background;		/// the background of the data element, a description from a perspective outside of the game's universe
+	Property<CIcon *, DetailedDataElement> Icon = nullptr;	/// the icon of the data element
+	
+protected:
+	static void _bind_methods();
+};
+
+#endif

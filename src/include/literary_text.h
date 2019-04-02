@@ -57,20 +57,18 @@ class CLiteraryText : public DataElement, public DataType<CLiteraryText>
 public:
 	CLiteraryText()
 	{
-		this->Properties = {
-			{"name", this->Name},
-			{"hidden", this->Hidden},
-			{"author", this->Author},
-			{"translator", this->Translator},
-			{"publisher", this->Publisher},
-			{"license", this->License},
-			{"notes", this->Notes},
-			{"publication_year", this->PublicationYear},
-			{"initial_page_number", this->InitialPageNumber},
-			{"page_numbering_enabled", this->PageNumberingEnabled},
-			{"lowercase_roman_numeral_page_numbering", this->LowercaseRomanNumeralPageNumbering},
-			{"icon", this->Icon}
-		};
+		this->Properties.insert({"name", this->Name});
+		this->Properties.insert({"hidden", this->Hidden});
+		this->Properties.insert({"author", this->Author});
+		this->Properties.insert({"translator", this->Translator});
+		this->Properties.insert({"publisher", this->Publisher});
+		this->Properties.insert({"license", this->License});
+		this->Properties.insert({"notes", this->Notes});
+		this->Properties.insert({"publication_year", this->PublicationYear});
+		this->Properties.insert({"initial_page_number", this->InitialPageNumber});
+		this->Properties.insert({"page_numbering_enabled", this->PageNumberingEnabled});
+		this->Properties.insert({"lowercase_roman_numeral_page_numbering", this->LowercaseRomanNumeralPageNumbering});
+		this->Properties.insert({"icon", this->Icon});
 	}
 
 	static constexpr const char *ClassIdentifier = "literary_text";
@@ -235,7 +233,7 @@ public:
 	Property<bool> LowercaseRomanNumeralPageNumbering = false;	/// whether page numbering should be depicted by lowercase Roman numerals
 	Property<CIcon *> Icon {		/// the literary text's icon
 		Property<CIcon *>::ValueType(nullptr),
-		Property<CIcon *>::GetterType([&]() -> Property<CIcon *>::GetterReturnType {
+		Property<CIcon *>::GetterType([&]() -> Property<CIcon *>::ReturnType {
 			if (*this->Icon != nullptr) {
 				return *this->Icon;		
 			} else if (this->GetMainText() != nullptr) {

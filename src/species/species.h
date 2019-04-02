@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
 #include "data_type.h"
+#include "detailed_data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -52,20 +52,15 @@ struct lua_State;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSpecies : public DataElement, public DataType<CSpecies>
+class CSpecies : public DetailedDataElement, public DataType<CSpecies>
 {
-	GDCLASS(CSpecies, DataElement)
+	GDCLASS(CSpecies, DetailedDataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "species";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;
-	
-	String GetName() const
-	{
-		return this->Name.c_str();
-	}
 	
 	CSpeciesCategory *GetCategory() const
 	{
@@ -116,12 +111,8 @@ public:
 	CSpecies *GetRandomEvolution(const CTerrainType *terrain_type) const;
 	
 private:
-	std::string Name;				/// name of the species
 	CSpeciesCategory *Category = nullptr;
 	std::string ScientificName;		/// The scientific name of the species
-	std::string Description;		/// Description of the species
-	std::string Quote;				/// Quote pertaining to the species
-	std::string Background;			/// Background of the species
 	int Era = -1;					/// Era ID
 	bool Sapient = false;			/// Whether the species is sapient
 	bool Prehistoric = false;		/// Whether the species is prehistoric or not

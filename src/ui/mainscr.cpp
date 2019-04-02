@@ -10,7 +10,7 @@
 //
 /**@name mainscr.cpp - The main screen. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Valery Shchedrin,
+//      (c) Copyright 1998-2019 by Lutz Sammer, Valery Shchedrin,
 //      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -1230,9 +1230,9 @@ void DrawPopups()
 	*/
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-		DrawGenericPopup(CPlane::Planes[ButtonUnderCursor]->Name, UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);
+		DrawGenericPopup(CPlane::Planes[ButtonUnderCursor]->Name.utf8().get_data(), UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);
 	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-		DrawGenericPopup(CWorld::Worlds[ButtonUnderCursor]->Name, UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
+		DrawGenericPopup(CWorld::Worlds[ButtonUnderCursor]->Name.utf8().get_data(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
 	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
 		std::string surface_layer_string;
 		if (ButtonUnderCursor == 0) {

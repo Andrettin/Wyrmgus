@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
 #include "data_type.h"
+#include "detailed_data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -47,9 +47,9 @@ class CUpgrade;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CSchoolOfMagic : public DataElement, public DataType<CSchoolOfMagic>
+class CSchoolOfMagic : public DetailedDataElement, public DataType<CSchoolOfMagic>
 {
-	GDCLASS(CSchoolOfMagic, DataElement)
+	GDCLASS(CSchoolOfMagic, DetailedDataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "school_of_magic";
@@ -64,10 +64,6 @@ private:
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	std::string Name;									/// Name of the school of magic
-	std::string Description;							/// Description of the school of magic from an in-game universe perspective
-	std::string Background;								/// Description of the school of magic from a perspective outside of the game's universe
-	std::string Quote;									/// A quote relating to the school of magic
 	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the school of magic
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this school of magic
 

@@ -135,7 +135,7 @@ void CleanModules()
 	CCharacter::ClearCharacters();
 	CCivilization::Clear();
 	CleanConstructions();
-	CCurrency::Clear();
+	Currency::Clear();
 	CleanDecorations();
 	CDeity::Clear();
 	//Wyrmgus start

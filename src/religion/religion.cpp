@@ -48,17 +48,7 @@
 */
 bool CReligion::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "description") {
-		this->Description = value;
-	} else if (key == "background") {
-		this->Background = value;
-	} else if (key == "quote") {
-		this->Quote = value;
-	} else if (key == "cultural_deities") {
-		this->CulturalDeities = StringToBool(value);
-	} else if (key == "domain") {
+	if (key == "domain") {
 		value = FindAndReplaceString(value, "_", "-");
 		CDeityDomain *deity_domain = CDeityDomain::Get(value.c_str());
 		if (deity_domain) {

@@ -3674,7 +3674,7 @@ static int CclGetSpeciesData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, species->GetName().utf8().get_data());
+		lua_pushstring(l, species->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Category")) {
 		if (species->GetCategory() != nullptr) {
@@ -3739,10 +3739,10 @@ static int CclGetSpeciesCategoryData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, category->GetName().utf8().get_data());
+		lua_pushstring(l, category->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "CommonName")) {
-		lua_pushstring(l, category->GetCommonName().utf8().get_data());
+		lua_pushstring(l, category->CommonName.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "UpperCategory")) {
 		if (category->GetUpperCategory()) {

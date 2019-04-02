@@ -43,6 +43,9 @@
 ----------------------------------------------------------------------------*/
 
 template <typename T, typename O>
+class ExposedProperty;
+
+template <typename T, typename O>
 class Property;
 
 /*----------------------------------------------------------------------------
@@ -54,6 +57,9 @@ class DataType
 {
 	template <typename T2>
 	using Property = Property<T2, T>; //to reduce redundancy from the property declarations
+	
+	template <typename T2>
+	using ExposedProperty = ExposedProperty<T2, T>;
 	
 public:
 	/**

@@ -1384,11 +1384,11 @@ void CPlayer::SetAge(CAge *age)
 	
 	if (this == CPlayer::GetThisPlayer()) {
 		if (this->Age) {
-			UI.AgePanel.Text = this->Age->Name;
+			UI.AgePanel.Text = this->Age->Name.utf8().get_data();
 			UI.AgePanel.G = this->Age->G;
 			
 			if (GameCycle > 0 && !SaveGameLoading) {
-				this->Notify(_("The %s has dawned upon us."), this->Age->Name.c_str());
+				this->Notify(_("The %s has dawned upon us."), this->Age->Name.utf8().get_data());
 			}
 		} else {
 			UI.AgePanel.Text.clear();
@@ -1404,7 +1404,7 @@ void CPlayer::SetAge(CAge *age)
 **
 **	@return	The player's currency
 */
-CCurrency *CPlayer::GetCurrency() const
+Currency *CPlayer::GetCurrency() const
 {
 	if (this->Faction != nullptr) {
 		return this->Faction->GetCurrency();
@@ -1700,17 +1700,6 @@ bool CPlayer::CanChooseDynasty(const CDynasty *dynasty, bool pre)
 		return false;
 	}
 
-	if (!pre) {
-		if (dynasty->Conditions) {
-			CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
-			dynasty->Conditions->pushPreamble();
-			dynasty->Conditions->run(1);
-			if (dynasty->Conditions->popBoolean() == false) {
-				return false;
-			}
-		}
-	}
-	
 	return true;
 }
 
@@ -2478,7 +2467,13 @@ void CPlayer::CompleteQuest(CQuest *quest)
 		if (!quest->Rewards.empty()) {
 			rewards_string = "Rewards: " + quest->Rewards;
 		}
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", " + std::to_string((long long) (quest->Icon.Icon ? quest->Icon.Icon->Frame : 0)) + ") end;");
+		
+		int icon_frame = 0;
+		if (quest->Icon.Icon != nullptr) {
+			icon_frame = quest->Icon.Icon->Frame;
+		}
+		
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", " + std::to_string((long long) icon_frame) + ") end;");
 	}
 }
 

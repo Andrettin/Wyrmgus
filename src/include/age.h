@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
 #include "data_type.h"
+#include "detailed_data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -49,11 +49,17 @@ class CUpgrade;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CAge : public DataElement, public DataType<CAge>
+class CAge : public DetailedDataElement, public DataType<CAge>
 {
-	GDCLASS(CAge, DataElement)
+	GDCLASS(CAge, DetailedDataElement)
 	
 public:
+	CAge(const std::string &ident = "", const int index = -1) : DetailedDataElement(ident, index)
+	{
+		this->Properties.insert({"priority", this->Priority});
+		this->Properties.insert({"year_boost", this->YearBoost});
+	}
+	
 	~CAge();
 	
 	static constexpr const char *ClassIdentifier = "age";
@@ -63,15 +69,13 @@ public:
 	
 	static CAge *CurrentAge;
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
 public:
-	std::string Name;
 	CGraphic *G = nullptr;
-	int Priority = 0;
-	int YearBoost = 0;
+	Property<int> Priority = 0;
+	Property<int> YearBoost = 0;
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
 

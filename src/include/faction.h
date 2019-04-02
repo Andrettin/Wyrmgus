@@ -48,7 +48,7 @@
 
 class CAiBuildingTemplate;
 class CCivilization;
-class CCurrency;
+class Currency;
 class CDeity;
 class CDynasty;
 class CForceTemplate;
@@ -180,7 +180,7 @@ public:
 		return this->SecondaryColor;
 	}
 	
-	CCurrency *GetCurrency() const;
+	Currency *GetCurrency() const;
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
 	std::vector<CForceTemplate *> GetForceTemplates(int force_type) const;
@@ -207,7 +207,7 @@ public:
 	bool Playable = true;												/// faction playability
 	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
 	IconConfig Icon;													/// Faction's icon
-	CCurrency *Currency = nullptr;										/// The faction's currency
+	Currency *Currency = nullptr;										/// The faction's currency
 	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions = nullptr;
 private:

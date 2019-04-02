@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
+#include "detailed_data_element.h"
 
 #include <map>
 
@@ -53,9 +53,9 @@ class CTimeOfDaySchedule;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CWorld : public DataElement
+class CWorld : public DetailedDataElement
 {
-	GDCLASS(CWorld, DataElement)
+	GDCLASS(CWorld, DetailedDataElement)
 
 public:
 	static CWorld *GetWorld(const std::string &ident, const bool should_find = true);
@@ -67,10 +67,6 @@ public:
 
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 
-	std::string Name;
-	std::string Description;
-	std::string Background;
-	std::string Quote;
 	CPlane *Plane = nullptr;
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this world's time of day schedule
 	CSeasonSchedule *SeasonSchedule = nullptr;							/// this world's season schedule

@@ -133,6 +133,23 @@ void DataElement::ProcessConfigData(const CConfigData *config_data)
 	this->Initialize();
 }
 
+/**
+**	@brief	Get the value of a property as a variant
+**
+**	@param	property_name	The name of the property
+**
+**	@return	True if the data element has been initialized, or false otherwise
+*/
+Variant DataElement::GetPropertyVariantValue(const std::string &property_name) const
+{
+	std::map<std::string, PropertyCommonBase &>::const_iterator find_iterator = this->Properties.find(property_name);
+	if (find_iterator != this->Properties.end()) {
+		return Variant(find_iterator->second);
+	} else {
+		return Variant();
+	}
+}
+
 void DataElement::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_ident"), &DataElement::GetIdent);

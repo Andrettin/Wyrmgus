@@ -849,7 +849,7 @@ static int CclDefineCivilization(lua_State *l)
 			CCalendar *calendar = CCalendar::GetCalendar(LuaToString(l, -1));
 			civilization->Calendar = calendar;
 		} else if (!strcmp(value, "Currency")) {
-			CCurrency *currency = CCurrency::Get(LuaToString(l, -1));
+			Currency *currency = Currency::Get(LuaToString(l, -1));
 			civilization->Currency = currency;
 		} else if (!strcmp(value, "DefaultPlayerColor")) {
 			CPlayerColor *player_color = CPlayerColor::Get(LuaToString(l, -1));
@@ -1910,7 +1910,7 @@ static int CclDefineFaction(lua_State *l)
 			faction->Icon.Load();
 			faction->Icon.Icon->Load();
 		} else if (!strcmp(value, "Currency")) {
-			CCurrency *currency = CCurrency::Get(LuaToString(l, -1));
+			Currency *currency = Currency::Get(LuaToString(l, -1));
 			faction->Currency = currency;
 		} else if (!strcmp(value, "DevelopsFrom")) {
 			if (!lua_istable(l, -1)) {
@@ -2283,19 +2283,6 @@ static int CclDefineDynasty(lua_State *l)
 			if (civilization != nullptr) {
 				dynasty->Civilization = civilization;
 			}
-		} else if (!strcmp(value, "Name")) {
-			dynasty->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Description")) {
-			dynasty->Description = LuaToString(l, -1);
-		} else if (!strcmp(value, "Quote")) {
-			dynasty->Quote = LuaToString(l, -1);
-		} else if (!strcmp(value, "Background")) {
-			dynasty->Background = LuaToString(l, -1);
-		} else if (!strcmp(value, "Icon")) {
-			dynasty->Icon.Name = LuaToString(l, -1);
-			dynasty->Icon.Icon = nullptr;
-			dynasty->Icon.Load();
-			dynasty->Icon.Icon->Load();
 		} else if (!strcmp(value, "Factions")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2311,56 +2298,6 @@ static int CclDefineDynasty(lua_State *l)
 			}
 		} else if (!strcmp(value, "DynastyUpgrade")) {
 			dynasty->DynastyUpgrade = CUpgrade::Get(LuaToString(l, -1));
-		} else if (!strcmp(value, "Conditions")) {
-			dynasty->Conditions = new LuaCallback(l, -1);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	return 0;
-}
-
-/**
-**  Define a religion.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineReligion(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument (expected table)");
-	}
-
-	std::string religion_ident = LuaToString(l, 1);
-	CReligion *religion = CReligion::GetOrAdd(religion_ident);
-	
-	//  Parse the list:
-	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		
-		if (!strcmp(value, "Name")) {
-			religion->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Description")) {
-			religion->Description = LuaToString(l, -1);
-		} else if (!strcmp(value, "Background")) {
-			religion->Background = LuaToString(l, -1);
-		} else if (!strcmp(value, "Quote")) {
-			religion->Quote = LuaToString(l, -1);
-		} else if (!strcmp(value, "CulturalDeities")) {
-			religion->CulturalDeities = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Domains")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				CDeityDomain *deity_domain = CDeityDomain::Get(LuaToString(l, -1, j + 1));
-				if (deity_domain) {
-					religion->Domains.push_back(deity_domain);
-				}
-			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -2725,41 +2662,6 @@ static int CclGetFactions(lua_State *l)
 }
 
 /**
-**  Get the dynasties.
-**
-**  @param l  Lua state.
-*/
-static int CclGetDynasties(lua_State *l)
-{
-	CCivilization *civilization = nullptr;
-	if (lua_gettop(l) >= 1) {
-		civilization = CCivilization::Get(LuaToString(l, 1));
-	}
-	
-	std::vector<std::string> dynasties;
-	if (civilization != nullptr) {
-		for (const CDynasty *dynasty : CDynasty::GetAll()) {
-			if (dynasty->Civilization == civilization) {
-				dynasties.push_back(dynasty->Ident);
-			}
-		}
-	} else {
-		for (const CDynasty *dynasty : CDynasty::GetAll()) {
-			dynasties.push_back(dynasty->Ident);
-		}
-	}
-		
-	lua_createtable(l, dynasties.size(), 0);
-	for (size_t i = 1; i <= dynasties.size(); ++i)
-	{
-		lua_pushstring(l, dynasties[i-1].c_str());
-		lua_rawseti(l, -2, i);
-	}
-	
-	return 1;
-}
-
-/**
 **  Get the player colors.
 **
 **  @param l  Lua state.
@@ -2851,63 +2753,6 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "DefaultAI")) {
 		lua_pushstring(l, faction->DefaultAI.c_str());
-		return 1;
-	} else {
-		LuaError(l, "Invalid field: %s" _C_ data);
-	}
-
-	return 0;
-}
-
-/**
-**  Get dynasty data.
-**
-**  @param l  Lua state.
-*/
-static int CclGetDynastyData(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	std::string dynasty_ident = LuaToString(l, 1);
-	CDynasty *dynasty = CDynasty::Get(dynasty_ident);
-	if (dynasty == nullptr) {
-		LuaError(l, "Dynasty \"%s\" doesn't exist." _C_ dynasty_ident.c_str());
-	}
-	
-	const char *data = LuaToString(l, 2);
-
-	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, dynasty->Name.c_str());
-		return 1;
-	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, dynasty->Description.c_str());
-		return 1;
-	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, dynasty->Quote.c_str());
-		return 1;
-	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, dynasty->Background.c_str());
-		return 1;
-	} else if (!strcmp(data, "Civilization")) {
-		if (dynasty->Civilization != nullptr) {
-			lua_pushstring(l, dynasty->Civilization->GetIdent().utf8().get_data());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "DynastyUpgrade")) {
-		if (dynasty->DynastyUpgrade) {
-			lua_pushstring(l, dynasty->DynastyUpgrade->Ident.c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "Factions")) {
-		lua_createtable(l, dynasty->Factions.size(), 0);
-		for (size_t i = 1; i <= dynasty->Factions.size(); ++i)
-		{
-			lua_pushstring(l, dynasty->Factions[i-1]->GetIdent().utf8().get_data());
-			lua_rawseti(l, -2, i);
-		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -3353,9 +3198,9 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Currency")) {
-		const CCurrency *currency = p->GetCurrency();
+		const Currency *currency = p->GetCurrency();
 		if (currency) {
-			lua_pushstring(l, currency->GetName().utf8().get_data());
+			lua_pushstring(l, currency->Name.utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3692,17 +3537,6 @@ static int CclGetLanguageWordData(lua_State *l)
 	return 0;
 }
 
-static int CclGetReligions(lua_State *l)
-{
-	lua_createtable(l, CReligion::GetAll().size(), 0);
-	for (size_t i = 1; i <= CReligion::GetAll().size(); ++i)
-	{
-		lua_pushstring(l, CReligion::GetAll()[i-1]->GetIdent().utf8().get_data());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
 static int CclGetDeityDomains(lua_State *l)
 {
 	lua_createtable(l, CDeityDomain::GetAll().size(), 0);
@@ -3723,45 +3557,6 @@ static int CclGetDeities(lua_State *l)
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
-}
-
-/**
-**  Get religion data.
-**
-**  @param l  Lua state.
-*/
-static int CclGetReligionData(lua_State *l)
-{
-	if (lua_gettop(l) < 2) {
-		LuaError(l, "incorrect argument");
-	}
-	std::string religion_ident = LuaToString(l, 1);
-	const CReligion *religion = CReligion::Get(religion_ident);
-	if (!religion) {
-		return 0;
-	}
-	const char *data = LuaToString(l, 2);
-
-	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, religion->Name.c_str());
-		return 1;
-	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, religion->Description.c_str());
-		return 1;
-	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, religion->Background.c_str());
-		return 1;
-	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, religion->Quote.c_str());
-		return 1;
-	} else if (!strcmp(data, "CulturalDeities")) {
-		lua_pushboolean(l, religion->CulturalDeities);
-		return 1;
-	} else {
-		LuaError(l, "Invalid field: %s" _C_ data);
-	}
-
-	return 0;
 }
 
 /**
@@ -3821,7 +3616,7 @@ static int CclGetDeityData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Pantheon")) {
 		if (deity->Pantheon) {
-			lua_pushstring(l, deity->Pantheon->Name.c_str());
+			lua_pushstring(l, deity->Pantheon->Name.utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3931,15 +3726,12 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetFactionClassUnitType", CclGetFactionClassUnitType);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
 	lua_register(Lua, "DefineDynasty", CclDefineDynasty);
-	lua_register(Lua, "DefineReligion", CclDefineReligion);
 	lua_register(Lua, "DefineDeity", CclDefineDeity);
 	lua_register(Lua, "DefineLanguage", CclDefineLanguage);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
 	lua_register(Lua, "GetFactions", CclGetFactions);
-	lua_register(Lua, "GetDynasties", CclGetDynasties);
 	lua_register(Lua, "GetPlayerColors", CclGetPlayerColors);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);
-	lua_register(Lua, "GetDynastyData", CclGetDynastyData);
 	//Wyrmgus end
 	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
 	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);
@@ -3958,10 +3750,8 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetLanguageData", CclGetLanguageData);
 	lua_register(Lua, "GetLanguageWordData", CclGetLanguageWordData);
 	
-	lua_register(Lua, "GetReligions", CclGetReligions);
 	lua_register(Lua, "GetDeityDomains", CclGetDeityDomains);
 	lua_register(Lua, "GetDeities", CclGetDeities);
-	lua_register(Lua, "GetReligionData", CclGetReligionData);
 	lua_register(Lua, "GetDeityDomainData", CclGetDeityDomainData);
 	lua_register(Lua, "GetDeityData", CclGetDeityData);
 	//Wyrmgus end

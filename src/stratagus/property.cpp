@@ -67,7 +67,36 @@ const PropertyBase<T> &PropertyBase<T>::operator =(const std::string &rhs)
 	}
 }
 
+/**
+**	@brief	The operator for assignment from a string for a property
+**
+**	@param	rhs	The string which has to be converted to the property
+**
+**	@return	The property
+*/
+template <typename T>
+const ExposedPropertyBase<T> &ExposedPropertyBase<T>::operator =(const std::string &rhs)
+{
+	if constexpr(std::is_same_v<T, int>) {
+		return *this = std::stoi(rhs);
+	} else if constexpr(std::is_same_v<T, bool>) {
+		return *this = StringToBool(rhs);
+	} else if constexpr(std::is_same_v<T, String>) {
+		return *this = String(rhs.c_str());
+	} else if constexpr(std::is_pointer_v<T> && std::is_base_of_v<DataType<std::remove_pointer_t<T>>, std::remove_pointer_t<T>>) {
+		std::string ident = FindAndReplaceString(rhs, "_", "-");
+		return *this = std::remove_pointer_t<T>::Get(ident);
+	} else {
+		fprintf(stderr, "The operator = is not valid for this type.");
+		return *this;
+	}
+}
+
 template const PropertyBase<int> &PropertyBase<int>::operator =(const std::string &rhs);
 template const PropertyBase<bool> &PropertyBase<bool>::operator =(const std::string &rhs);
 template const PropertyBase<String> &PropertyBase<String>::operator =(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator =(const std::string &rhs);
+
+template const ExposedPropertyBase<int> &ExposedPropertyBase<int>::operator =(const std::string &rhs);
+template const ExposedPropertyBase<bool> &ExposedPropertyBase<bool>::operator =(const std::string &rhs);
+template const ExposedPropertyBase<String> &ExposedPropertyBase<String>::operator =(const std::string &rhs);

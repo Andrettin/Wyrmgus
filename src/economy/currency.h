@@ -34,32 +34,19 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
 #include "data_type.h"
+#include "detailed_data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CCurrency : public DataElement, public DataType<CCurrency>
+class Currency : public DetailedDataElement, public DataType<Currency>
 {
-	GDCLASS(CCurrency, DataElement)
+	GDCLASS(Currency, DetailedDataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "currency";
-	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
-	
-	const String &GetName() const
-	{
-		return this->Name;
-	}
-	
-private:
-	String Name;
-
-protected:
-	static void _bind_methods();
 };
 
 #endif

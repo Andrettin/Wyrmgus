@@ -173,7 +173,7 @@ int CFaction::GetForceTypeWeight(int force_type) const
 **
 **	@return	The faction's currency
 */
-CCurrency *CFaction::GetCurrency() const
+Currency *CFaction::GetCurrency() const
 {
 	if (this->Currency) {
 		return this->Currency;

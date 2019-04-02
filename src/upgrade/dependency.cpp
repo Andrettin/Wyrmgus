@@ -340,7 +340,7 @@ bool CAgeDependency::Check(const CPlayer *player, bool ignore_units) const
 
 std::string CAgeDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->Age->Name + '\n';
+	std::string str = prefix + this->Age->Name.utf8().get_data() + '\n';
 	return str;
 }
 

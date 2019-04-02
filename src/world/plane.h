@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
+#include "detailed_data_element.h"
 
 #include <map>
 
@@ -52,9 +52,9 @@ class CTimeOfDaySchedule;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CPlane : public DataElement
+class CPlane : public DetailedDataElement
 {
-	GDCLASS(CPlane, DataElement)
+	GDCLASS(CPlane, DetailedDataElement)
 
 public:
 	static CPlane *GetPlane(const std::string &ident, const bool should_find = true);
@@ -66,10 +66,6 @@ public:
 
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 
-	std::string Name;
-	std::string Description;
-	std::string Background;
-	std::string Quote;
 	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this plane's time of day schedule
 	CSeasonSchedule *SeasonSchedule = nullptr;							/// this plane's season schedule
 	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// Deity domains empowered in this plane

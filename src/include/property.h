@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
+
 #include <core/ustring.h>
 #include <core/variant.h>
 
@@ -79,12 +81,12 @@ class PropertyBase : public PropertyCommonBase
 {
 public:
 	using ValueType = T;
-	using GetterReturnType = const T&;
-	using GetterType = std::function<const T&()>;
-	using SetterType = std::function<void(const T&)>;
+	using ReturnType = std::conditional_t<std::is_same_v<T, String>, const T &, T>;
+	using GetterType = std::function<ReturnType()>;
+	using SetterType = std::function<void(const T &)>;
 	
 protected:
-	PropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : Setter(setter)
+	PropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
 	{
 		this->Value = new T;
 		*(this->Value) = value;
@@ -100,6 +102,41 @@ public:
 		if (this->Value) {
 			delete this->Value;
 		}
+	}
+
+	const T &operator *() const
+	{
+		if (this->Value == nullptr) {
+			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
+		}
+		
+		//get the underlying value
+		return *this->Value;
+	}
+	
+	ReturnType Get() const
+	{
+		//get the underlying value
+		if (this->Getter) {
+			return this->Getter();
+		} else {
+			return *this->Value;
+		}
+	}
+	
+	ReturnType operator ->()
+	{
+		return this->Get();
+	}
+	
+	operator ReturnType() const
+	{
+		return this->Get();
+	}
+	
+	virtual operator Variant() const override
+	{
+		return Variant(this->Get());
 	}
 
 	bool operator ==(const T &rhs) const
@@ -133,6 +170,16 @@ public:
 	}
 	
 protected:
+	T &operator *()
+	{
+		if (this->Value == nullptr) {
+			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
+		}
+		
+		//get the underlying value
+		return *this->Value;
+	}
+
 	const PropertyBase<T> &operator =(const T &rhs)
 	{
 		this->Set(rhs);
@@ -144,6 +191,13 @@ protected:
 		return *this = rhs.Get();
 	}
 	
+	/**
+	**	@brief	The operator for assignment from a string for a property
+	**
+	**	@param	rhs	The string which has to be converted to the property
+	**
+	**	@return	The property
+	*/
 	virtual const PropertyBase<T> &operator =(const std::string &rhs) override;
 	
 	const PropertyBase<T> &operator +=(const T &rhs)
@@ -238,37 +292,20 @@ protected:
 		}
 	}
 
-	T &operator *()
-	{
-		if (this->Value == nullptr) {
-			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
-		}
-		
-		//get the underlying value
-		return *this->Value;
-	}
-
-public:
-	const T &operator *() const
-	{
-		if (this->Value == nullptr) {
-			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
-		}
-		
-		//get the underlying value
-		return *this->Value;
-	}
-	
 private:
-	T &Get()
+	std::remove_const_t<ReturnType> Get()
 	{
 		if (this->Getter) {
-			return const_cast<T &>(this->Getter());
+			if constexpr(std::is_const_v<ReturnType>) {
+				return const_cast<std::remove_const_t<ReturnType>>(this->Getter());
+			} else {
+				return this->Getter();
+			}
 		} else {
 			return *this->Value;
 		}
 	}
-	
+
 	void Set(const T &value)
 	{
 		if (this->Setter) {
@@ -278,27 +315,6 @@ private:
 		}
 	}
 	
-public:
-	const T &Get() const
-	{
-		//get the underlying value
-		if (this->Getter) {
-			return this->Getter();
-		} else {
-			return *this->Value;
-		}
-	}
-	
-	operator const T&() const
-	{
-		return this->Get();
-	}
-	
-	virtual operator Variant() const override
-	{
-		return Variant(this->Get());
-	}
-
 private:
 	T *Value = nullptr;
 	GetterType Getter;
@@ -323,6 +339,327 @@ private:
 	
 	Property(const SetterType &setter = nullptr) : Property(T(), nullptr, setter)
 	{
+	}
+	
+	friend O;
+};
+
+template <typename O>
+class Property<String, O> : public PropertyBase<String>
+{
+private:
+	Property(const String &value, const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(value, getter, setter)
+	{
+	}
+	
+	Property(const String &value, const SetterType &setter = nullptr) : Property(value, nullptr, setter)
+	{
+	}
+	
+	Property(const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(getter, setter)
+	{
+	}
+	
+	Property(const SetterType &setter = nullptr) : Property(String(), nullptr, setter)
+	{
+	}
+	
+public:
+	CharString utf8() const
+	{
+		return this->Get().utf8();
+	}
+	
+	friend O;
+};
+
+template <typename T>
+class ExposedPropertyBase : public PropertyCommonBase
+{
+public:
+	using ValueType = T;
+	using ReturnType = std::conditional_t<std::is_same_v<T, String>, T &, T>;
+	using GetterType = std::function<ReturnType()>;
+	using SetterType = std::function<void(const T &)>;
+	
+protected:
+	ExposedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
+	{
+		this->Value = new T;
+		*(this->Value) = value;
+	}
+	
+	ExposedPropertyBase(const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
+	{
+	}
+	
+public:
+	virtual ~ExposedPropertyBase()
+	{
+		if (this->Value) {
+			delete this->Value;
+		}
+	}
+
+	const T &operator *() const
+	{
+		if (this->Value == nullptr) {
+			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
+		}
+		
+		//get the underlying value
+		return *this->Value;
+	}
+	
+	ReturnType Get() const
+	{
+		//get the underlying value
+		if (this->Getter) {
+			return this->Getter();
+		} else {
+			return *this->Value;
+		}
+	}
+	
+	ReturnType operator ->()
+	{
+		return this->Get();
+	}
+	
+	operator ReturnType() const
+	{
+		return this->Get();
+	}
+	
+	virtual operator Variant() const override
+	{
+		return Variant(this->Get());
+	}
+
+	bool operator ==(const T &rhs) const
+	{
+		return this->Get() == rhs;
+	}
+	
+	bool operator ==(const ExposedPropertyBase<T> &rhs) const
+	{
+		return *this == rhs.Get();
+	}
+	
+	bool operator !=(const T &rhs) const
+	{
+		return !(*this == rhs);
+	}
+	
+	bool operator !=(const ExposedPropertyBase<T> &rhs) const
+	{
+		return *this != rhs.Get();
+	}
+	
+	bool operator <(const T &rhs) const
+	{
+		return this->Get() < rhs;
+	}
+	
+	bool operator <(const ExposedPropertyBase<T> &rhs) const
+	{
+		return *this < rhs.Get();
+	}
+	
+	T &operator *()
+	{
+		if (this->Value == nullptr) {
+			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
+		}
+		
+		//get the underlying value
+		return *this->Value;
+	}
+
+	const ExposedPropertyBase<T> &operator =(const T &rhs)
+	{
+		this->Set(rhs);
+		return *this;
+	}
+	
+	const ExposedPropertyBase<T> &operator =(const ExposedPropertyBase<T> &rhs)
+	{
+		return *this = rhs.Get();
+	}
+	
+	virtual const ExposedPropertyBase<T> &operator =(const std::string &rhs) override;
+	
+	const ExposedPropertyBase<T> &operator +=(const T &rhs)
+	{
+		this->Set(this->Get() + rhs);
+		return *this;
+	}
+	
+	const ExposedPropertyBase<T> &operator +=(const ExposedPropertyBase<T> &rhs)
+	{
+		return *this += rhs.Get();
+	}
+	
+	virtual const ExposedPropertyBase<T> &operator +=(const std::string &rhs) override
+	{
+		if constexpr(std::is_same_v<T, int>) {
+			return *this += std::stoi(rhs);
+		} else if constexpr(std::is_same_v<T, bool>) {
+			return *this += StringToBool(rhs);
+		} else if constexpr(std::is_same_v<T, String>) {
+			return *this += String(rhs.c_str());
+		} else {
+			fprintf(stderr, "The operator += is not valid for this type.");
+			return *this;
+		}
+	}
+
+	const ExposedPropertyBase<T> &operator -=(const T &rhs)
+	{
+		this->Set(this->Get() - rhs);
+		return *this;
+	}
+	
+	const ExposedPropertyBase<T> &operator -=(const ExposedPropertyBase<T> &rhs)
+	{
+		return *this -= rhs.Get();
+	}
+	
+	virtual const ExposedPropertyBase<T> &operator -=(const std::string &rhs) override
+	{
+		if constexpr(std::is_same_v<T, int>) {
+			return *this -= std::stoi(rhs);
+		} else if constexpr(std::is_same_v<T, bool>) {
+			return *this -= StringToBool(rhs);
+		} else {
+			fprintf(stderr, "The operator -= is not valid for this type.");
+			return *this;
+		}
+	}
+
+	const ExposedPropertyBase<T> &operator *=(const T &rhs)
+	{
+		this->Set(this->Get() * rhs);
+		return *this;
+	}
+	
+	const ExposedPropertyBase<T> &operator *=(const ExposedPropertyBase<T> &rhs)
+	{
+		return *this *= rhs.Get();
+	}
+	
+	virtual const ExposedPropertyBase<T> &operator *=(const std::string &rhs) override
+	{
+		if constexpr(std::is_same_v<T, int>) {
+			return *this *= std::stoi(rhs);
+		} else if constexpr(std::is_same_v<T, bool>) {
+			return *this *= StringToBool(rhs);
+		} else {
+			fprintf(stderr, "The operator *= is not valid for this type.");
+			return *this;
+		}
+	}
+
+	const ExposedPropertyBase<T> &operator /=(const T &rhs)
+	{
+		this->Set(this->Get() / rhs);
+		return *this;
+	}
+	
+	const ExposedPropertyBase<T> &operator /=(const ExposedPropertyBase<T> &rhs)
+	{
+		return *this /= rhs.Get();
+	}
+	
+	virtual const ExposedPropertyBase<T> &operator /=(const std::string &rhs) override
+	{
+		if constexpr(std::is_same_v<T, int>) {
+			return *this /= std::stoi(rhs);
+		} else {
+			fprintf(stderr, "The operator /= is not valid for this type.");
+			return *this;
+		}
+	}
+
+protected:
+	void Set(const T &value)
+	{
+		if (this->Setter) {
+			this->Setter(value);
+		} else if (this->Value != nullptr && *this->Value != value) {
+			*this->Value = value;
+		}
+	}
+	
+private:
+	T *Value = nullptr;
+	GetterType Getter;
+	SetterType Setter;
+};
+
+/**
+**	@brief	A property which can be written to publicly
+*/
+template <typename T, typename O>
+class ExposedProperty : public ExposedPropertyBase<T>
+{
+private:
+	ExposedProperty(const T &value, const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(value, getter, setter)
+	{
+	}
+	
+	ExposedProperty(const T &value, const SetterType &setter = nullptr) : ExposedProperty(value, nullptr, setter)
+	{
+	}
+	
+	ExposedProperty(const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(getter, setter)
+	{
+	}
+	
+	ExposedProperty(const SetterType &setter = nullptr) : ExposedProperty(T(), nullptr, setter)
+	{
+	}
+	
+public:
+	const ExposedPropertyBase<T> &operator =(const T &rhs)
+	{
+		this->Set(rhs);
+		return *this;
+	}
+	
+	friend O;
+};
+
+template <typename O>
+class ExposedProperty<String, O> : public ExposedPropertyBase<String>
+{
+private:
+	ExposedProperty(const String &value, const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(value, getter, setter)
+	{
+	}
+	
+	ExposedProperty(const String &value, const SetterType &setter = nullptr) : ExposedProperty(value, nullptr, setter)
+	{
+	}
+	
+	ExposedProperty(const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(getter, setter)
+	{
+	}
+	
+	ExposedProperty(const SetterType &setter = nullptr) : ExposedProperty(String(), nullptr, setter)
+	{
+	}
+	
+public:
+	const ExposedPropertyBase<String> &operator =(const String &rhs)
+	{
+		this->Set(rhs);
+		return *this;
+	}
+	
+	CharString utf8() const
+	{
+		return this->Get().utf8();
 	}
 	
 	friend O;

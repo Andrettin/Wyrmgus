@@ -79,6 +79,7 @@ constexpr int IconCommandButton = 32;	/// is the icon a command button
 
 #include "data_element.h"
 #include "data_type.h"
+#include "property.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -98,22 +99,18 @@ class CIcon : public DataElement, public DataType<CIcon>
 	GDCLASS(CIcon, DataElement)
 	
 public:
-	CIcon()
-	{
-	}
-	
 	/**
 	**  CIcon constructor
 	*/
-	CIcon(const std::string &ident) : DataElement(ident)
+	CIcon(const std::string &ident = "") : DataElement(ident)
 	{
+		this->Properties.insert({"frame", this->Frame});
 	}
 	
 	~CIcon();
 
 	static constexpr const char *ClassIdentifier = "icon";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
 	void Load();
@@ -137,11 +134,11 @@ public:
 	}
 	
 public:
-	CPlayerColorGraphic *G = nullptr;		/// Graphic data
-	CPlayerColorGraphic *GScale = nullptr;	/// Icon when drawn grayscaled
-	std::string File;						/// The file containing the icon graphics
-	Vec2i Size = Vec2i(0, 0);				/// The size of the icon, in pixels
-	int Frame = 0;							/// Frame number in graphic
+	CPlayerColorGraphic *G = nullptr;		/// graphic data
+	CPlayerColorGraphic *GScale = nullptr;	/// icon when drawn grayscaled
+	std::string File;						/// the file containing the icon graphics
+	Vec2i Size = Vec2i(0, 0);				/// the size of the icon, in pixels
+	ExposedProperty<int> Frame = 0;			/// frame number in graphic
 	//Wyrmgus start
 	bool Loaded = false;
 	//Wyrmgus end

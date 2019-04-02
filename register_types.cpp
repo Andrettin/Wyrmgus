@@ -93,6 +93,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<Wyrmgus>();
 	
 	ClassDB::register_virtual_class<DataElement>();
+	ClassDB::register_virtual_class<DetailedDataElement>();
 	
 	ClassDB::register_class<CAchievement>();
 	ClassDB::register_class<CAge>();
@@ -102,7 +103,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CCampaign>();
 	ClassDB::register_class<CCharacter>();
 	ClassDB::register_class<CCivilization>();
-	ClassDB::register_class<CCurrency>();
+	ClassDB::register_class<Currency>();
 	ClassDB::register_class<CDeity>();
 	ClassDB::register_class<CDeityDomain>();
 	ClassDB::register_class<CDialogue>();

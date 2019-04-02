@@ -128,15 +128,7 @@ void CWorld::ClearWorlds()
 */
 bool CWorld::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "description") {
-		this->Description = value;
-	} else if (key == "background") {
-		this->Background = value;
-	} else if (key == "quote") {
-		this->Quote = value;
-	} else if (key == "plane") {
+	if (key == "plane") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->Plane = CPlane::GetPlane(value);
 	} else if (key == "time_of_day_schedule") {
