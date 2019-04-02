@@ -59,6 +59,7 @@
 #include "religion/deity.h"
 #include "religion/deity_domain.h"
 #include "religion/pantheon.h"
+#include "religion/religion.h"
 #include "school_of_magic.h"
 #include "skin_color.h"
 #include "sound/sound.h"
@@ -430,6 +431,11 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CPlayerColor *player_color = CPlayerColor::GetOrAdd(ident);
 			if (!define_only) {
 				player_color->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "religion") {
+			CReligion *religion = CReligion::GetOrAdd(ident);
+			if (!define_only) {
+				religion->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "school_of_magic") {
 			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetOrAdd(ident);
