@@ -130,7 +130,7 @@ void CLiteraryText::Initialize()
 CLiteraryText *CLiteraryText::GetSection(const std::string &section_name) const
 {
 	for (CLiteraryText *section : this->GetSections()) {
-		if (String(section_name.c_str()) == section->GetName()) {
+		if (String(section_name.c_str()) == section->Name) {
 			return section;
 		}
 	}
@@ -158,16 +158,16 @@ void CLiteraryText::UpdateSectionPageNumbers() const
 
 void CLiteraryText::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &CLiteraryText::GetName);
-	ClassDB::bind_method(D_METHOD("get_author"), &CLiteraryText::GetAuthor);
-	ClassDB::bind_method(D_METHOD("is_hidden"), &CLiteraryText::IsHidden);
-	ClassDB::bind_method(D_METHOD("get_translator"), &CLiteraryText::GetTranslator);
-	ClassDB::bind_method(D_METHOD("get_publisher"), &CLiteraryText::GetPublisher);
-	ClassDB::bind_method(D_METHOD("get_license"), &CLiteraryText::GetLicense);
-	ClassDB::bind_method(D_METHOD("get_notes"), &CLiteraryText::GetNotes);
-	ClassDB::bind_method(D_METHOD("get_publication_year"), &CLiteraryText::GetPublicationYear);
-	ClassDB::bind_method(D_METHOD("get_initial_page_number"), &CLiteraryText::GetInitialPageNumber);
-	ClassDB::bind_method(D_METHOD("get_icon"), &CLiteraryText::GetIcon);
+	ClassDB::bind_method(D_METHOD("get_name"), [](const CLiteraryText *literary_text){ return literary_text->Name.Get(); });
+	ClassDB::bind_method(D_METHOD("get_author"), [](const CLiteraryText *literary_text){ return literary_text->Author.Get(); });
+	ClassDB::bind_method(D_METHOD("is_hidden"), [](const CLiteraryText *literary_text){ return literary_text->Hidden.Get(); });
+	ClassDB::bind_method(D_METHOD("get_translator"), [](const CLiteraryText *literary_text){ return literary_text->Translator.Get(); });
+	ClassDB::bind_method(D_METHOD("get_publisher"), [](const CLiteraryText *literary_text){ return literary_text->Publisher.Get(); });
+	ClassDB::bind_method(D_METHOD("get_license"), [](const CLiteraryText *literary_text){ return literary_text->License.Get(); });
+	ClassDB::bind_method(D_METHOD("get_notes"), [](const CLiteraryText *literary_text){ return literary_text->Notes.Get(); });
+	ClassDB::bind_method(D_METHOD("get_publication_year"), [](const CLiteraryText *literary_text){ return literary_text->PublicationYear.Get(); });
+	ClassDB::bind_method(D_METHOD("get_initial_page_number"), [](const CLiteraryText *literary_text){ return literary_text->InitialPageNumber.Get(); });
+	ClassDB::bind_method(D_METHOD("get_icon"), [](const CLiteraryText *literary_text){ return literary_text->Icon.Get(); });
 	ClassDB::bind_method(D_METHOD("get_sections"), &CLiteraryText::GetSectionsArray);
 	ClassDB::bind_method(D_METHOD("get_main_text"), &CLiteraryText::GetMainText);
 	ClassDB::bind_method(D_METHOD("get_previous_section"), &CLiteraryText::GetPreviousSection);

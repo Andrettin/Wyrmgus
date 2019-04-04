@@ -167,58 +167,6 @@ public:
 private:
 	void UpdateSectionPageNumbers() const;
 
-	// getters for Godot
-
-	const String &GetName() const
-	{
-		return this->Name.Get();
-	}
-	
-	bool IsHidden() const
-	{
-		return this->Hidden.Get();
-	}
-	
-	const String &GetAuthor() const
-	{
-		return this->Author.Get();
-	}
-	
-	const String &GetTranslator() const
-	{
-		return this->Translator.Get();
-	}
-	
-	const String &GetPublisher() const
-	{
-		return this->Publisher.Get();
-	}
-	
-	const String &GetLicense() const
-	{
-		return this->License.Get();
-	}
-	
-	const String &GetNotes() const
-	{
-		return this->Notes.Get();
-	}
-	
-	int GetPublicationYear() const
-	{
-		return this->PublicationYear.Get();
-	}
-	
-	int GetInitialPageNumber() const
-	{
-		return this->InitialPageNumber.Get();
-	}
-	
-	CIcon *GetIcon() const
-	{
-		return this->Icon.Get();
-	}
-	
 public:
 	Property<String> Name;			/// name of the literary text
 	Property<bool> Hidden = false;	/// whether the literary text is hidden
@@ -233,13 +181,13 @@ public:
 	Property<bool> LowercaseRomanNumeralPageNumbering = false;	/// whether page numbering should be depicted by lowercase Roman numerals
 	Property<CIcon *> Icon {		/// the literary text's icon
 		Property<CIcon *>::ValueType(nullptr),
-		Property<CIcon *>::GetterType([&]() -> Property<CIcon *>::ReturnType {
+		Property<CIcon *>::GetterType([this]() -> Property<CIcon *>::ReturnType {
 			if (*this->Icon != nullptr) {
 				return *this->Icon;		
 			} else if (this->GetMainText() != nullptr) {
 				return this->GetMainText()->Icon;		
 			} else {
-				return *this->Icon;
+				return nullptr;
 			}
 		})
 	};

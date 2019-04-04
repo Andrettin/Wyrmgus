@@ -64,20 +64,12 @@ public:
 		this->Properties.insert({"icon", this->Icon});
 	}
 	
-private:
-	//getters for Godot
-
-	const String &GetName() const
-	{
-		return this->Name;
-	}
-	
 public:
-	ExposedProperty<String, DetailedDataElement> Name;				/// the name of the data element
-	ExposedProperty<String, DetailedDataElement> Description;		/// the description of the data element from an in-game universe perspective
-	ExposedProperty<String, DetailedDataElement> Quote;				/// a quote relating to the data element
-	ExposedProperty<String, DetailedDataElement> Background;		/// the background of the data element, a description from a perspective outside of the game's universe
-	Property<CIcon *, DetailedDataElement> Icon = nullptr;	/// the icon of the data element
+	ExposedProperty<String, DetailedDataElement> Name;			/// the name of the data element
+	ExposedProperty<String, DetailedDataElement> Description;	/// the description of the data element from an in-game universe perspective
+	ExposedProperty<String, DetailedDataElement> Quote;			/// a quote relating to the data element
+	ExposedProperty<String, DetailedDataElement> Background;	/// the background of the data element, a description from a perspective outside of the game's universe
+	Property<CIcon *, DetailedDataElement> Icon = nullptr;		/// the icon of the data element
 	
 protected:
 	static void _bind_methods();

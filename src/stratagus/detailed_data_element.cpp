@@ -41,5 +41,5 @@
 
 void DetailedDataElement::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &DetailedDataElement::GetName);
+	ClassDB::bind_method(D_METHOD("get_name"), [](const DetailedDataElement *detailed_data_element){ return detailed_data_element->Name.Get(); });
 }
