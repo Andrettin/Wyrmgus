@@ -63,7 +63,6 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
 public:
-	std::string Name; //the unit's name
 	CUnitType *UnitType = nullptr; //the unit's unit type
 	CFaction *Faction = nullptr; //the unit's faction
 	int Quantity = 1; //how many in-game units does this historical unit result in when applied

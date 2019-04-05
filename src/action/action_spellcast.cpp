@@ -413,7 +413,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 //										_("%s: not enough mana for spell: %s"),
 										_("%s does not have enough mana to use the %s ability."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
-										unit.GetMessageName().c_str(), spell.Name.c_str());
+										unit.GetMessageName().c_str(), spell.Name.utf8().get_data());
 										//Wyrmgus end
 				} else if (unit.SpellCoolDownTimers[spell.Slot]) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -422,7 +422,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 //										_("%s: spell is not ready yet: %s"),
 										_("%s's ability %s is not ready yet."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
-										unit.GetMessageName().c_str(), spell.Name.c_str());
+										unit.GetMessageName().c_str(), spell.Name.utf8().get_data());
 										//Wyrmgus end
 				} else if (unit.Player->CheckCosts(spell.Costs, false)) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -431,13 +431,13 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 //										_("%s: not enough resources to cast spell: %s"),
 										_("You do not have enough resources for %s to use the %s ability."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
-										unit.GetMessageName().c_str(), spell.Name.c_str());
+										unit.GetMessageName().c_str(), spell.Name.utf8().get_data());
 										//Wyrmgus end
 				//Wyrmgus start
 				} else if (spell.Target == TargetUnit && order.GetGoal() == nullptr) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer->ID,
 										_("%s needs a target to use the %s ability."),
-										unit.GetMessageName().c_str(), spell.Name.c_str());
+										unit.GetMessageName().c_str(), spell.Name.utf8().get_data());
 				//Wyrmgus end
 				} else {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -446,7 +446,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 //										_("%s: can't cast spell: %s"),
 										_("%s cannot use the %s ability."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
-										unit.GetMessageName().c_str(), spell.Name.c_str());
+										unit.GetMessageName().c_str(), spell.Name.utf8().get_data());
 										//Wyrmgus end
 				}
 

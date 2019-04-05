@@ -66,11 +66,6 @@ public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;
 	
-	String GetName() const
-	{
-		return this->Name.c_str();
-	}
-	
 	String GetDescription() const
 	{
 		return this->Description.c_str();
@@ -103,7 +98,6 @@ public:
 	int GetProgressMax() const;
 	
 public:
-	std::string Name;
 	std::string Description;		/// Description of the achievement
 	CPlayerColor *PlayerColor = nullptr;	/// Player color used for the achievement's icon
 	int CharacterLevel = 0;			/// Character level required for the achievement

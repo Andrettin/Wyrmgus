@@ -250,7 +250,6 @@ public:
 	std::vector<CUnit *> GetPotentialAutoCastTargets(const CUnit &caster, const AutoCastInfo *autocast) const;
 	
 	// Identification stuff
-	std::string Name;		/// Spell name shown by the engine
 	std::string Description;	/// Spell description
 	int Slot;				/// Spell numeric identifier
 

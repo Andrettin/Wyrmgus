@@ -536,7 +536,7 @@ static int CclGetCampaignData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, campaign->Name.c_str());
+		lua_pushstring(l, campaign->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, campaign->Description.c_str());
@@ -687,7 +687,7 @@ static int CclGetAchievementData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, achievement->Name.c_str());
+		lua_pushstring(l, achievement->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, achievement->Description.c_str());

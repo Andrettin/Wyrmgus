@@ -1453,7 +1453,7 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 		CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
 		
 		if (!chosen_upgrade->Name.empty()) {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->Name.c_str(), this->Name.c_str());
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->Name.utf8().get_data(), this->Name.c_str());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;

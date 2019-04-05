@@ -158,7 +158,6 @@ void CLiteraryText::UpdateSectionPageNumbers() const
 
 void CLiteraryText::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), [](const CLiteraryText *literary_text){ return literary_text->Name.Get(); });
 	ClassDB::bind_method(D_METHOD("get_author"), [](const CLiteraryText *literary_text){ return literary_text->Author.Get(); });
 	ClassDB::bind_method(D_METHOD("is_hidden"), [](const CLiteraryText *literary_text){ return literary_text->Hidden.Get(); });
 	ClassDB::bind_method(D_METHOD("get_translator"), [](const CLiteraryText *literary_text){ return literary_text->Translator.Get(); });

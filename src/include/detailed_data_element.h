@@ -35,7 +35,6 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_element.h"
-#include "property.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -57,7 +56,6 @@ class DetailedDataElement : public DataElement
 public:
 	DetailedDataElement(const std::string &ident = "", const int index = -1) : DataElement(ident, index)
 	{
-		this->Properties.insert({"name", this->Name});
 		this->Properties.insert({"description", this->Description});
 		this->Properties.insert({"quote", this->Quote});
 		this->Properties.insert({"background", this->Background});
@@ -65,7 +63,6 @@ public:
 	}
 	
 public:
-	ExposedProperty<String, DetailedDataElement> Name;			/// the name of the data element
 	ExposedProperty<String, DetailedDataElement> Description;	/// the description of the data element from an in-game universe perspective
 	ExposedProperty<String, DetailedDataElement> Quote;			/// a quote relating to the data element
 	ExposedProperty<String, DetailedDataElement> Background;	/// the background of the data element, a description from a perspective outside of the game's universe

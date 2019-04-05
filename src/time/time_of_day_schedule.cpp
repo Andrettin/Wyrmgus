@@ -70,9 +70,7 @@ CTimeOfDaySchedule::~CTimeOfDaySchedule()
 */
 bool CTimeOfDaySchedule::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "default_schedule") {
+	if (key == "default_schedule") {
 		const bool is_default_schedule = StringToBool(value);
 		if (is_default_schedule) {
 			CTimeOfDaySchedule::DefaultTimeOfDaySchedule = this;

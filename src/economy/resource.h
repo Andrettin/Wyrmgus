@@ -88,20 +88,10 @@ class CResource : public DataElement, public DataType<CResource>
 public:
 	static constexpr const char *ClassIdentifier = "resource";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
-	
-	const String &GetName() const
-	{
-		return this->Name;
-	}
-	
 	bool IsMineResource() const
 	{
 		return this->Index == CopperCost || this->Index == SilverCost || this->Index == GoldCost || this->Index == IronCost || this->Index == MithrilCost || this->Index == CoalCost || this->Index == DiamondsCost || this->Index == EmeraldsCost;
 	}
-
-private:
-	String Name;
 
 public:
 	std::string ActionName;

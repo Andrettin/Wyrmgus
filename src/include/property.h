@@ -169,6 +169,46 @@ public:
 		return *this < rhs.Get();
 	}
 	
+	T operator +(const T &rhs)
+	{
+		return this->Get() + rhs;
+	}
+	
+	T operator +(const PropertyBase<T> &rhs)
+	{
+		return *this + rhs.Get();
+	}
+	
+	T operator -(const T &rhs)
+	{
+		return this->Get() - rhs;
+	}
+	
+	T operator -(const PropertyBase<T> &rhs)
+	{
+		return *this - rhs.Get();
+	}
+	
+	T operator *(const T &rhs)
+	{
+		return this->Get() * rhs;
+	}
+	
+	T operator *(const PropertyBase<T> &rhs)
+	{
+		return *this * rhs.Get();
+	}
+	
+	T operator /(const T &rhs)
+	{
+		return this->Get() / rhs;
+	}
+	
+	T operator /(const PropertyBase<T> &rhs)
+	{
+		return *this / rhs.Get();
+	}
+	
 protected:
 	T &operator *()
 	{
@@ -365,6 +405,11 @@ private:
 	}
 	
 public:
+	bool empty() const
+	{
+		return this->Get().empty();
+	}
+	
 	CharString utf8() const
 	{
 		return this->Get().utf8();
@@ -464,6 +509,46 @@ public:
 	bool operator <(const ExposedPropertyBase<T> &rhs) const
 	{
 		return *this < rhs.Get();
+	}
+	
+	T operator +(const T &rhs)
+	{
+		return this->Get() + rhs;
+	}
+	
+	T operator +(const PropertyBase<T> &rhs)
+	{
+		return *this + rhs.Get();
+	}
+	
+	T operator -(const T &rhs)
+	{
+		return this->Get() - rhs;
+	}
+	
+	T operator -(const PropertyBase<T> &rhs)
+	{
+		return *this - rhs.Get();
+	}
+	
+	T operator *(const T &rhs)
+	{
+		return this->Get() * rhs;
+	}
+	
+	T operator *(const PropertyBase<T> &rhs)
+	{
+		return *this * rhs.Get();
+	}
+	
+	T operator /(const T &rhs)
+	{
+		return this->Get() / rhs;
+	}
+	
+	T operator /(const PropertyBase<T> &rhs)
+	{
+		return *this / rhs.Get();
 	}
 	
 	T &operator *()
@@ -657,6 +742,21 @@ public:
 		return *this;
 	}
 	
+	const ExposedPropertyBase<String> &operator =(const char *rhs)
+	{
+		return *this = String(rhs);
+	}
+	
+	const ExposedPropertyBase<String> &operator =(const std::string &rhs)
+	{
+		return *this = rhs.c_str();
+	}
+	
+	bool empty() const
+	{
+		return this->Get().empty();
+	}
+	
 	CharString utf8() const
 	{
 		return this->Get().utf8();
@@ -664,5 +764,17 @@ public:
 	
 	friend O;
 };
+
+template <typename T>
+inline T operator + (const T &lhs, const PropertyBase<T> &rhs)
+{
+	return lhs + rhs.Get();
+}
+
+template <typename T>
+inline T operator + (const T &lhs, const ExposedPropertyBase<T> &rhs)
+{
+	return lhs + rhs.Get();
+}
 
 #endif

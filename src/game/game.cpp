@@ -613,7 +613,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tParent = \"%s\",\n", type.Parent->Ident.c_str());
 			}
 			if (!type.Name.empty() && (!type.Parent || type.Name != type.Parent->Name)) {
-				f->printf("\tName = \"%s\",\n", type.Name.c_str());
+				f->printf("\tName = \"%s\",\n", type.Name.utf8().get_data());
 			}
 			if (type.GetCivilization() != nullptr) {
 				f->printf("\tCivilization = \"%s\",\n", type.GetCivilization()->GetIdent().utf8().get_data());

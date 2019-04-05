@@ -98,9 +98,7 @@ CMapTemplate::~CMapTemplate()
 */
 bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "plane") {
+	if (key == "plane") {
 		value = FindAndReplaceString(value, "_", "-");
 		CPlane *plane = CPlane::GetPlane(value);
 		if (plane) {
@@ -520,7 +518,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	
 	bool has_base_map = !this->TerrainFile.empty() || !this->TerrainImage.empty();
 	
-	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->Name.c_str());
+	ShowLoadProgress(_("Applying \"%s\" Map Template Terrain"), this->Name.utf8().get_data());
 	
 	if (this->BaseTerrainType) {
 		for (int x = map_start_pos.x; x < map_end.x; ++x) {
@@ -623,7 +621,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	this->ApplySubtemplates(template_start_pos, map_start_pos, z, true);
 	
 	if (!has_base_map) {
-		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
+		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.utf8().get_data());
 		
 		for (const CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
 			int map_width = (map_end.x - map_start_pos.x);
@@ -641,7 +639,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		CMap::Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 	
-	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->Name.c_str());
+	ShowLoadProgress(_("Applying \"%s\" Map Template Units"), this->Name.utf8().get_data());
 
 	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::const_iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
 		Vec2i unit_raw_pos(iterator->first.first, iterator->first.second);
@@ -679,7 +677,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 	this->ApplyUnits(template_start_pos, map_start_pos, z);
 	
 	if (has_base_map) {
-		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.c_str());
+		ShowLoadProgress(_("Generating \"%s\" Map Template Random Terrain"), this->Name.utf8().get_data());
 		
 		for (const CGeneratedTerrain *generated_terrain : this->GeneratedTerrains) {
 			int map_width = (map_end.x - map_start_pos.x);
@@ -697,7 +695,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		CMap::Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	}
 	
-	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->Name.c_str());
+	ShowLoadProgress(_("Generating \"%s\" Map Template Random Units"), this->Name.utf8().get_data());
 
 	// now, generate the units and heroes that were set to be generated at a random position (by having their position set to {-1, -1})
 	if (current_campaign != nullptr) {

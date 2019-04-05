@@ -55,13 +55,6 @@ class CLanguage : public DataElement, public DataType<CLanguage>
 public:
 	static constexpr const char *ClassIdentifier = "language";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
-
-	const String &GetName() const
-	{
-		return this->Name;
-	}
-	
 	CWord *GetWord(const String &name, const int word_type, const std::vector<String> &word_meanings) const;
 	String GetArticle(const int gender, const int grammatical_case, const int article_type, const int grammatical_number);
 	String GetNounEnding(const int grammatical_number, const int grammatical_case, int word_junction_type = -1);
@@ -69,9 +62,6 @@ public:
 	void RemoveWord(CWord *word);
 	
 	String TranslateName(const String &name) const;
-	
-private:
-	String Name;									/// Name of the language
 	
 public:
 	String Family;									/// Family of the language

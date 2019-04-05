@@ -898,7 +898,7 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "weight")) {
 						variation->Weight = LuaToNumber(l, -1, k + 1);
 					} else {
-						printf("\n%s\n", type->Name.c_str());
+						printf("\n%s\n", type->Name.utf8().get_data());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -1551,7 +1551,7 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "file-when-loaded")) {
 						res->FileWhenLoaded = LuaToString(l, -1, k + 1);
 					} else {
-						printf("\n%s\n", type->Name.c_str());
+						printf("\n%s\n", type->Name.utf8().get_data());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -1950,7 +1950,7 @@ static int CclDefineUnitType(lua_State *l)
 					type->BoolFlag[index].value = LuaToBoolean(l, -1);
 				}
 			} else {
-				printf("\n%s\n", type->Name.c_str());
+				printf("\n%s\n", type->Name.utf8().get_data());
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		}
@@ -2007,7 +2007,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	// FIXME: try to simplify/combine the flags instead
 	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
-		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->Name.c_str());
+		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->Name.utf8().get_data());
 	}
 	type->UpdateDefaultBoolFlags();
 	//Wyrmgus start
@@ -2350,7 +2350,7 @@ static int CclGetUnitTypeName(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	const CUnitType *type = CclGetUnitType(l);
-	lua_pushstring(l, type->Name.c_str());
+	lua_pushstring(l, type->Name.utf8().get_data());
 	return 1;
 }
 
@@ -2393,7 +2393,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	}
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, type->Name.c_str());
+		lua_pushstring(l, type->Name.utf8().get_data());
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "NamePlural")) {

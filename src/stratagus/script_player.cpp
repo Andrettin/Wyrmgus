@@ -3464,7 +3464,7 @@ static int CclGetLanguageData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, language->GetName().utf8().get_data());
+		lua_pushstring(l, language->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
 		lua_pushstring(l, language->Family.utf8().get_data());
@@ -3473,7 +3473,7 @@ static int CclGetLanguageData(lua_State *l)
 		lua_createtable(l, language->Words.size(), 0);
 		for (size_t i = 1; i <= language->Words.size(); ++i)
 		{
-			lua_pushstring(l, language->Words[i-1]->GetName().utf8().get_data());
+			lua_pushstring(l, language->Words[i-1]->Name.utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3577,7 +3577,7 @@ static int CclGetDeityDomainData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, deity_domain->Name.c_str());
+		lua_pushstring(l, deity_domain->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Abilities")) {
 		lua_createtable(l, deity_domain->Abilities.size(), 0);
@@ -3612,7 +3612,7 @@ static int CclGetDeityData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, deity->Name.c_str());
+		lua_pushstring(l, deity->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Pantheon")) {
 		if (deity->Pantheon) {

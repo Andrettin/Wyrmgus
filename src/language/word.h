@@ -159,11 +159,6 @@ public:
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	const String &GetName() const
-	{
-		return this->Name;
-	}
-	
 	CLanguage *GetLanguage() const
 	{
 		return this->Language;
@@ -177,7 +172,6 @@ public:
 	void RemoveFromVector(std::vector<CWord *> &word_vector);
 
 private:
-	String Name;										/// the name of the word
 	CLanguage *Language = nullptr;						/// The language the word belongs to
 	
 public:

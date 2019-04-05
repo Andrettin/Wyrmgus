@@ -127,7 +127,6 @@ public:
 	
 	void SetIcon(CIcon *icon);
 
-	std::string Name;                 /// upgrade label
 	//Wyrmgus start
 	int Class = -1;					/// upgrade class (i.e. siege weapon projectile I)
 	int Civilization = -1;			/// which civilization this upgrade belongs to, if any

@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "property.h"
+
 #include <core/object.h>
 #include <core/ustring.h>
 
@@ -62,6 +64,7 @@ class DataElement : public Object
 public:
 	DataElement(const std::string &ident = "", const int index = -1) : Ident(ident), Index(index)
 	{
+		this->Properties.insert({"name", this->Name});
 	}
 	
 	virtual void ProcessConfigData(const CConfigData *config_data);
@@ -106,7 +109,8 @@ public:
 		return this->Initialized;
 	}
 	
-	Variant GetPropertyVariantValue(const std::string &property_name) const;
+public:
+	ExposedProperty<String, DataElement> Name;	/// the name of the data element
 	
 	std::string Ident;	/// string identifier of the data element
 protected:

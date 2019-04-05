@@ -2058,7 +2058,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 				ButtonAction &ba = *(new ButtonAction);
 				CurrentButtons.push_back(ba);
 			}
-			CurrentButtons[j].Hint = Editor.ShownUnitTypes[i]->Name;
+			CurrentButtons[j].Hint = Editor.ShownUnitTypes[i]->Name.utf8().get_data();
 			CurrentButtons[j].Pos = j;
 			CurrentButtons[j].Level = 0;
 			CurrentButtons[j].Action = ButtonEditorUnit;
@@ -2084,7 +2084,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 				} else {
 					snprintf(buf, sizeof(buf), "%s \"%s\"",
 							 Editor.ShownUnitTypes[i]->Ident.c_str(),
-							 Editor.ShownUnitTypes[i]->Name.c_str());
+							 Editor.ShownUnitTypes[i]->Name.utf8().get_data());
 				}
 				UI.StatusLine.Set(buf);
 			}

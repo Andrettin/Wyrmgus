@@ -43,25 +43,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Process a property in the data provided by a configuration file
-**
-**	@param	key		The property's key
-**	@param	value	The property's value
-**
-**	@return	True if the property can be processed, or false otherwise
-*/
-bool CConversibleColor::ProcessConfigDataProperty(const std::string &key, std::string value)
-{
-	if (key == "name") {
-		this->Name = value;
-	} else {
-		return false;
-	}
-	
-	return true;
-}
-	
-/**
 **	@brief	Process a section in the data provided by a configuration file
 **
 **	@param	section		The section
@@ -82,6 +63,5 @@ bool CConversibleColor::ProcessConfigDataSection(const CConfigData *section)
 
 void CConversibleColor::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &CConversibleColor::GetName);
 	ClassDB::bind_method(D_METHOD("get_colors"), &CConversibleColor::GetColors);
 }

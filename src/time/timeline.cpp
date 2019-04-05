@@ -43,9 +43,7 @@
 */
 bool CTimeline::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "point_of_divergence") {
+	if (key == "point_of_divergence") {
 		this->PointOfDivergence = CDate::FromString(value);
 	} else {
 		return false;

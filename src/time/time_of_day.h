@@ -58,11 +58,6 @@ public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 
-	String GetName() const
-	{
-		return this->Name.c_str();
-	}
-	
 	bool IsDawn() const
 	{
 		return this->Dawn;
@@ -104,7 +99,6 @@ public:
 	}
 	
 private:
-	std::string Name;							/// Name of the time of day
 	bool Dawn = false;							/// Whether this is a dawn time of day
 	bool Day = false;							/// Whether this is a day time of day
 	bool Dusk = false;							/// Whether this is a dusk time of day

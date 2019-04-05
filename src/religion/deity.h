@@ -79,7 +79,6 @@ public:
 	
 	int Gender = 0;								/// Deity's gender
 	bool Major = false;							/// Whether the deity is a major one or not
-	std::string Name;							/// Name of the deity
 	std::string Description;
 	std::string Background;
 	std::string Quote;

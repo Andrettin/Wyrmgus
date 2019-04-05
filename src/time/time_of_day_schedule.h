@@ -101,7 +101,6 @@ public:
 		return 1;
 	}
 
-	std::string Name;										/// Name of the time of day schedules
 	std::vector<CScheduledTimeOfDay *> ScheduledTimesOfDay;	/// The times of day that are scheduled
 
 protected:

@@ -108,9 +108,7 @@ void CDeityDomain::Clear()
 */
 bool CDeityDomain::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "upgrade") {
+	if (key == "upgrade") {
 		value = FindAndReplaceString(value, "_", "-");
 		CUpgrade *upgrade = CUpgrade::Get(value);
 		if (upgrade) {
@@ -128,12 +126,6 @@ bool CDeityDomain::ProcessConfigDataProperty(const std::string &key, std::string
 		} else {
 			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 		}
-	} else if (key == "description") {
-		this->Description = value;
-	} else if (key == "background") {
-		this->Background = value;
-	} else if (key == "quote") {
-		this->Quote = value;
 	} else {
 		return false;
 	}

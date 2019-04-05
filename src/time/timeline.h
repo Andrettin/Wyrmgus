@@ -51,7 +51,6 @@ public:
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	std::string Name;
 	CDate PointOfDivergence;											/// The point of divergence for this timeline
 
 protected:

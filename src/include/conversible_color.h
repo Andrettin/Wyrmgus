@@ -47,14 +47,8 @@ class CConversibleColor : public DataElement
 	GDCLASS(CConversibleColor, DataElement)
 	
 public:
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
-	String GetName() const
-	{
-		return this->Name.c_str();
-	}
-
 	Array GetColors() const
 	{
 		Array colors;
@@ -67,7 +61,6 @@ public:
 	}
 
 private:
-	std::string Name;				/// Name of the player color
 	std::vector<Color> Colors;		/// The colors of the player color
 
 protected:

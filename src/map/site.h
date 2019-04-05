@@ -68,7 +68,6 @@ public:
 
 	std::string GetCulturalName(const CCivilization *civilization) const;
 
-	std::string Name;
 	bool Major = false;											/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
 	Vec2i Position = Vec2i(-1, -1);								/// Position of the site in its map template
 	CMapTemplate *MapTemplate = nullptr;						/// Map template where this site is located

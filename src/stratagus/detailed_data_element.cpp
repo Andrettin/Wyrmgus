@@ -41,5 +41,7 @@
 
 void DetailedDataElement::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), [](const DetailedDataElement *detailed_data_element){ return detailed_data_element->Name.Get(); });
+	ClassDB::bind_method(D_METHOD("get_description"), [](const DetailedDataElement *detailed_data_element){ return detailed_data_element->Description.Get(); });
+	ClassDB::bind_method(D_METHOD("get_quote"), [](const DetailedDataElement *detailed_data_element){ return detailed_data_element->Quote.Get(); });
+	ClassDB::bind_method(D_METHOD("get_background"), [](const DetailedDataElement *detailed_data_element){ return detailed_data_element->Background.Get(); });
 }

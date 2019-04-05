@@ -703,9 +703,7 @@ std::vector<CUnitType *> CUnitType::GetItemUnitTypes()
 */
 bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "parent") {
+	if (key == "parent") {
 		value = FindAndReplaceString(value, "_", "-");
 		CUnitType *parent_type = UnitTypeByIdent(value);
 		if (!parent_type) {
@@ -1218,7 +1216,7 @@ void CUnitType::Initialize()
 
 	// FIXME: try to simplify/combine the flags instead
 	if (this->MouseAction == MouseActionAttack && !this->CanAttack) {
-		fprintf(stderr, "Unit-type '%s': right-attack is set, but can-attack is not.\n", this->Name.c_str());
+		fprintf(stderr, "Unit-type '%s': right-attack is set, but can-attack is not.\n", this->Name.utf8().get_data());
 	}
 	this->UpdateDefaultBoolFlags();
 	//Wyrmgus start
@@ -1819,7 +1817,7 @@ std::string CUnitType::GetDefaultName(const CPlayer *player) const
 	if (variation && !variation->TypeName.empty()) {
 		return variation->TypeName;
 	} else {
-		return this->Name;
+		return this->Name.utf8().get_data();
 	}
 }
 
@@ -1852,7 +1850,7 @@ bool CUnitType::CanExperienceUpgradeTo(CUnitType *type) const
 
 std::string CUnitType::GetNamePlural() const
 {
-	return GetPluralForm(this->Name);
+	return GetPluralForm(this->Name.utf8().get_data());
 }
 
 std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
@@ -1947,7 +1945,6 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction,
 
 void CUnitType::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &CUnitType::GetName);
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CUnitType::GetCivilization);
 	ClassDB::bind_method(D_METHOD("get_faction"), &CUnitType::GetFaction);
 	ClassDB::bind_method(D_METHOD("get_description"), &CUnitType::GetDescription);

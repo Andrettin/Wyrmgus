@@ -392,9 +392,7 @@ void CSpell::ClearSpells()
 */
 bool CSpell::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "description") {
+	if (key == "description") {
 		this->Description = value;
 	} else if (key == "mana_cost") {
 		this->ManaCost = std::stoi(value);
@@ -886,7 +884,7 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 		target = &caster;
 	}
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.Ident.c_str() _C_
-			   caster.Type->Name.c_str() _C_ target ? target->Type->Name.c_str() : "none" _C_ pos.x _C_ pos.y);
+			   caster.Type->Name.utf8().get_data() _C_ target ? target->Type->Name.utf8().get_data() : "none" _C_ pos.x _C_ pos.y);
 	if (CanCastSpell(caster, spell, target, pos, map_layer)) {
 		int cont = 1; // Should we recast the spell.
 		bool mustSubtractMana = true; // false if action which have their own calculation is present.

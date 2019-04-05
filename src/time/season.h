@@ -54,10 +54,8 @@ class CSeason : public DataElement, public DataType<CSeason>
 public:
 	static constexpr const char *ClassIdentifier = "season";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 
-	std::string Name;							/// Name of the season
 	CGraphic *G = nullptr;
 
 protected:

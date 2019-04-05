@@ -51,11 +51,6 @@ public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;
 	
-	String GetName() const
-	{
-		return this->Name.c_str();
-	}
-	
 	CSpeciesCategoryRank *GetLowerRank() const
 	{
 		return this->LowerRank;
@@ -67,7 +62,6 @@ public:
 	}
 	
 private:
-	std::string Name;				/// name of the species category rank
 	CSpeciesCategoryRank *LowerRank = nullptr;	/// the rank directly below this one
 	CSpeciesCategoryRank *UpperRank = nullptr;	/// the rank directly above this one
 

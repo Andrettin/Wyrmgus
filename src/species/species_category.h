@@ -55,7 +55,6 @@ class CSpeciesCategory : public DataElement, public DataType<CSpeciesCategory>
 public:
 	CSpeciesCategory(const std::string &ident = "", const int index = -1) : DataElement(ident, index)
 	{
-		this->Properties.insert({"name", this->Name});
 		this->Properties.insert({"common_name", this->CommonName});
 	}
 	
@@ -78,7 +77,6 @@ public:
 		return this->UpperCategory;
 	}
 	
-	Property<String> Name;			/// name of the species category
 	Property<String> CommonName;	/// the common name of members of the species category
 	
 private:

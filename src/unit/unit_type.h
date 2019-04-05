@@ -692,11 +692,6 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
-	String GetName() const
-	{
-		return this->Name.c_str();
-	}
-	
 	Vec2i GetTileSize() const;
 	Vec2i GetHalfTileSize() const;
 	PixelSize GetHalfTilePixelSize(const int map_layer) const { return GetTilePixelSize(map_layer) / 2; }
@@ -772,7 +767,6 @@ public:
 	//Wyrmgus end
 
 public:
-	std::string Name;               /// Pretty name shown from the engine
 	CUnitType *Parent = nullptr;	/// Parent unit type
 	//Wyrmgus start
 	int Class = -1;					/// Class identifier (i.e. infantry, archer, etc.)

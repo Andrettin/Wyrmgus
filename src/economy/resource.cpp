@@ -39,26 +39,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**	@brief	Process a property in the data provided by a configuration file
-**
-**	@param	key		The property's key
-**	@param	value	The property's value
-**
-**	@return	True if the property can be processed, or false otherwise
-*/
-bool CResource::ProcessConfigDataProperty(const std::string &key, std::string value)
-{
-	if (key == "name") {
-		this->Name = value.c_str();
-	} else {
-		return false;
-	}
-	
-	return true;
-}
-
 void CResource::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &CResource::GetName);
 }

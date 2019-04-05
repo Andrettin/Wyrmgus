@@ -41,30 +41,11 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**	@brief	Process a property in the data provided by a configuration file
-**
-**	@param	key		The property's key
-**	@param	value	The property's value
-**
-**	@return	True if the property can be processed, or false otherwise
-*/
-bool CLanguage::ProcessConfigDataProperty(const std::string &key, std::string value)
-{
-	if (key == "name") {
-		this->Name = value.c_str();
-	} else {
-		return false;
-	}
-	
-	return true;
-}
-
 CWord *CLanguage::GetWord(const String &name, const int word_type, const std::vector<String> &word_meanings) const
 {
 	for (CWord *word : this->Words) {
 		if (
-			word->GetName() == name
+			word->Name == name
 			&& (word_type == -1 || word->Type == word_type)
 			&& (word_meanings.size() == 0 || word->Meanings == word_meanings)
 		) {
@@ -208,5 +189,4 @@ String CLanguage::TranslateName(const String &name) const
 
 void CLanguage::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &CLanguage::GetName);
 }

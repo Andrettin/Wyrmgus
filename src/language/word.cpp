@@ -51,9 +51,7 @@
 */
 bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value.c_str();
-	} else if (key == "language") {
+	if (key == "language") {
 		value = FindAndReplaceString(value, "_", "-");
 		CLanguage *language = CLanguage::Get(value);
 		if (language != nullptr) {
@@ -136,6 +134,5 @@ void CWord::RemoveFromVector(std::vector<CWord *> &word_vector)
 
 void CWord::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &CWord::GetName);
 	ClassDB::bind_method(D_METHOD("get_language"), &CWord::GetLanguage);
 }

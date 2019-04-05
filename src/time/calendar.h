@@ -90,7 +90,6 @@ private:
 public:
 	std::pair<CDate, CDate> GetBestChronologicalIntersectionForDate(CCalendar *calendar, const CDate &date) const;
 	
-	std::string Name;
 	int HoursPerDay = DEFAULT_HOURS_PER_DAY;
 	int DaysPerYear = 0;
 	std::string YearLabel;														/// label used for years (e.g. AD)

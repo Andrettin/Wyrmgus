@@ -57,9 +57,7 @@
 */
 bool CSite::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "major") {
+	if (key == "major") {
 		this->Major = StringToBool(value);
 	} else if (key == "position_x") {
 		this->Position.x = std::stoi(value);
@@ -241,5 +239,5 @@ std::string CSite::GetCulturalName(const CCivilization *civilization) const
 		}
 	}
 	
-	return this->Name;
+	return this->Name.utf8().get_data();
 }

@@ -54,9 +54,7 @@
 */
 bool CTimeOfDay::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "dawn") {
+	if (key == "dawn") {
 		this->Dawn = StringToBool(value);
 	} else if (key == "day") {
 		this->Day = StringToBool(value);
@@ -133,7 +131,6 @@ bool CTimeOfDay::ProcessConfigDataSection(const CConfigData *section)
 
 void CTimeOfDay::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &CTimeOfDay::GetName);
 	ClassDB::bind_method(D_METHOD("is_dawn"), &CTimeOfDay::IsDawn);
 	ClassDB::bind_method(D_METHOD("is_day"), &CTimeOfDay::IsDay);
 	ClassDB::bind_method(D_METHOD("is_dusk"), &CTimeOfDay::IsDusk);

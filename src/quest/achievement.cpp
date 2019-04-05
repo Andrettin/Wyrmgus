@@ -70,9 +70,7 @@ void CAchievement::CheckAchievements()
 */
 bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "description") {
+	if (key == "description") {
 		this->Description = value;
 	} else if (key == "player_color") {
 		value = FindAndReplaceString(value, "_", "-");
@@ -148,7 +146,14 @@ void CAchievement::Obtain(const bool save, const bool display)
 	}
 	
 	if (display) {
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->Name + " achievement.\", nil, \"" + this->Icon.Name + "\", \"" + this->PlayerColor->GetIdent().utf8().get_data() + "\") end;");
+		std::string lua_command = "if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the ";
+		lua_command += this->Name.utf8().get_data();
+		lua_command += " achievement.\", nil, \"";
+		lua_command += this->Icon.Name;
+		lua_command += "\", \"";
+		lua_command += this->PlayerColor->GetIdent().utf8().get_data();
+		lua_command += "\") end;";
+		CclCommand(lua_command);
 	}
 }
 
@@ -240,7 +245,6 @@ int CAchievement::GetProgressMax() const
 
 void CAchievement::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &CAchievement::GetName);
 	ClassDB::bind_method(D_METHOD("get_description"), &CAchievement::GetDescription);
 	ClassDB::bind_method(D_METHOD("get_icon"), &CAchievement::GetIcon);
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CAchievement::IsHidden);

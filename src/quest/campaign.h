@@ -76,11 +76,6 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
-	String GetName() const
-	{
-		return this->Name.c_str();
-	}
-	
 	String GetDescription() const
 	{
 		return this->Description.c_str();
@@ -106,7 +101,6 @@ public:
 	bool IsAvailable() const;
 
 private:
-	std::string Name;				/// Name of the campaign
 	std::string Description;		/// Description of the campaign
 	CDate StartDate;				/// The starting date of the campaign
 	bool Hidden = false;			/// Whether the campaign is hidden

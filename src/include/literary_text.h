@@ -57,7 +57,6 @@ class CLiteraryText : public DataElement, public DataType<CLiteraryText>
 public:
 	CLiteraryText()
 	{
-		this->Properties.insert({"name", this->Name});
 		this->Properties.insert({"hidden", this->Hidden});
 		this->Properties.insert({"author", this->Author});
 		this->Properties.insert({"translator", this->Translator});
@@ -168,7 +167,6 @@ private:
 	void UpdateSectionPageNumbers() const;
 
 public:
-	Property<String> Name;			/// name of the literary text
 	Property<bool> Hidden = false;	/// whether the literary text is hidden
 	Property<String> Author;		/// author of the literary text
 	Property<String> Translator;	/// translator of the literary text

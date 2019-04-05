@@ -785,7 +785,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 				CUnitType *chosen_unit_type = potential_upgrades[SyncRand(potential_upgrades.size())];
 				if (this->Player == CPlayer::GetThisPlayer()) {
-					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->Name.c_str());
+					this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has upgraded to %s!"), this->GetMessageName().c_str(), chosen_unit_type->Name.utf8().get_data());
 				}
 				TransformUnitIntoType(*this, *chosen_unit_type);
 				upgrade_found = true;
@@ -806,7 +806,7 @@ void CUnit::IncreaseLevel(int level_quantity, bool automatic_learning)
 						AbilityAcquire(*this, chosen_ability);
 						upgrade_found = true;
 						if (this->Player == CPlayer::GetThisPlayer()) {
-							this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has acquired the %s ability!"), this->GetMessageName().c_str(), chosen_ability->Name.c_str());
+							this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer->ID, _("%s has acquired the %s ability!"), this->GetMessageName().c_str(), chosen_ability->Name.utf8().get_data());
 						}
 					}
 				}
@@ -2081,22 +2081,22 @@ void CUnit::UpdateItemName()
 	}
 	
 	if (Prefix != nullptr) {
-		Name += _(Prefix->Name.c_str());
+		Name += _(Prefix->Name.utf8().get_data());
 		Name += " ";
 	}
 	if (Work != nullptr) {
-		Name += _(Work->Name.c_str());
+		Name += _(Work->Name.utf8().get_data());
 	} else {
 		Name += GetTypeName();
 	}
 	if (Suffix != nullptr) {
 		Name += " ";
-		Name += _(Suffix->Name.c_str());
+		Name += _(Suffix->Name.utf8().get_data());
 	} else if (Spell != nullptr) {
 		Name += " ";
 		Name += _("of");
 		Name += " ";
-		Name += _(Spell->Name.c_str());
+		Name += _(Spell->Name.utf8().get_data());
 	}
 }
 
@@ -6437,7 +6437,7 @@ std::string CUnit::GetName() const
 			}
 		}
 		
-		return this->Character->Deity->Name;
+		return this->Character->Deity->Name.utf8().get_data();
 	}
 	
 	std::string name = this->Name;
@@ -6469,7 +6469,7 @@ std::string CUnit::GetTypeName() const
 	if (variation && !variation->TypeName.empty()) {
 		return _(variation->TypeName.c_str());
 	} else {
-		return _(this->Type->Name.c_str());
+		return _(this->Type->Name.utf8().get_data());
 	}
 }
 

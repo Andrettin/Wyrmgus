@@ -1544,7 +1544,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitTrait : // name of the unit's trait
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Trait != nullptr) {
-				return _(unit->Trait->Name.c_str());
+				return _(unit->Trait->Name.utf8().get_data());
 			} else {
 				return std::string();
 			}
@@ -1553,7 +1553,7 @@ std::string EvalString(const StringDesc *s)
 			if (unit != nullptr && unit->Spell != nullptr) {
 				std::string spell_description = unit->Spell->Description;
 				spell_description[0] = tolower(spell_description[0]);
-				return unit->Spell->Name + " (" + spell_description + ")";
+				return std::string(unit->Spell->Name.utf8().get_data()) + " (" + spell_description + ")";
 			} else {
 				return std::string();
 			}
@@ -1588,7 +1588,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitUniqueSet : // name of the unit's unique item set
 			unit = EvalUnit(s->D.Unit);
 			if (unit != nullptr && unit->Unique && unit->Unique->Set) {
-				return unit->Unique->Set->Name;
+				return unit->Unique->Set->Name.utf8().get_data();
 			} else {
 				return std::string();
 			}
@@ -1619,7 +1619,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_TypeName : // name of the unit type
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).Name;
+				return (**type).Name.utf8().get_data();
 			} else { // ERROR.
 				return std::string();
 			}
@@ -1828,9 +1828,9 @@ std::string EvalString(const StringDesc *s)
 					} else {
 						first = false;
 					}
-					conversion_rates += child_resource->GetName().utf8().get_data();
+					conversion_rates += child_resource->Name.utf8().get_data();
 					conversion_rates += " to ";
-					conversion_rates += CResource::GetAll()[(**resource)]->GetName().utf8().get_data();
+					conversion_rates += CResource::GetAll()[(**resource)]->Name.utf8().get_data();
 					conversion_rates += " Conversion Rate: ";
 					conversion_rates += std::to_string((long long) child_resource->FinalResourceConversionRate);
 					conversion_rates += "%";
@@ -1846,7 +1846,7 @@ std::string EvalString(const StringDesc *s)
 				bool first = true;
 				if (CPlayer::GetThisPlayer()->Incomes[(**resource)] > CResource::GetAll()[(**resource)]->DefaultIncome) {
 					first = false;
-					improve_incomes += CResource::GetAll()[(**resource)]->GetName().utf8().get_data();
+					improve_incomes += CResource::GetAll()[(**resource)]->Name.utf8().get_data();
 					improve_incomes += " Processing Bonus: +";
 					improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[(**resource)] - CResource::GetAll()[(**resource)]->DefaultIncome);
 					improve_incomes += "%";
@@ -1861,7 +1861,7 @@ std::string EvalString(const StringDesc *s)
 						} else {
 							first = false;
 						}
-						improve_incomes += child_resource->GetName().utf8().get_data();
+						improve_incomes += child_resource->Name.utf8().get_data();
 						improve_incomes += " Processing Bonus: +";
 						improve_incomes += std::to_string((long long) CPlayer::GetThisPlayer()->Incomes[child_resource->GetIndex()] - child_resource->DefaultIncome);
 						improve_incomes += "%";

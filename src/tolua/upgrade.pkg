@@ -3,7 +3,6 @@ class CUpgrade
 	static CUpgrade *New(const std::string ident);
 	static CUpgrade *Get(const std::string ident);
 
-	std::string Name;
 	//Wyrmgus start
 	std::string Description;
 	std::string Quote;

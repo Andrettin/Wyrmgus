@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
 #include "data_type.h"
+#include "detailed_data_element.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -47,9 +47,9 @@ class CUpgrade;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CDeityDomain : public DataElement, public DataType<CDeityDomain>
+class CDeityDomain : public DetailedDataElement, public DataType<CDeityDomain>
 {
-	GDCLASS(CDeityDomain, DataElement)
+	GDCLASS(CDeityDomain, DetailedDataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "deity_domain";
@@ -64,10 +64,6 @@ private:
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	
-	std::string Name;									/// Name of the domain
-	std::string Description;							/// Description of the deity domain from an in-game universe perspective
-	std::string Background;								/// Description of the deity domain from a perspective outside of the game's universe
-	std::string Quote;									/// A quote relating to the deity domain
 	CUpgrade *Upgrade = nullptr;						/// Upgrade corresponding to the domain
 	std::vector<CUpgrade *> Abilities;					/// Abilities linked to this domain
 

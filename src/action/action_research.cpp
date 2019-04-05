@@ -165,7 +165,7 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), type.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 		} else {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.Name.c_str());
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.Name.utf8().get_data());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			//Wyrmgus start

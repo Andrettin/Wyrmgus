@@ -90,9 +90,7 @@ CCampaign *CCampaign::GetCurrentCampaign()
 */
 bool CCampaign::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "name") {
-		this->Name = value;
-	} else if (key == "description") {
+	if (key == "description") {
 		this->Description = value;
 	} else if (key == "faction") {
 		value = FindAndReplaceString(value, "_", "-");
@@ -230,7 +228,6 @@ bool CCampaign::IsAvailable() const
 
 void CCampaign::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_name"), &CCampaign::GetName);
 	ClassDB::bind_method(D_METHOD("get_description"), &CCampaign::GetDescription);
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CCampaign::IsHidden);
 	ClassDB::bind_method(D_METHOD("is_available"), &CCampaign::IsAvailable);

@@ -75,7 +75,6 @@ public:
 	virtual unsigned long GetDefaultTotalHours() const;
 	virtual int GetDefaultHourMultiplier() const;
 
-	std::string Name;									/// Name of the season schedule
 	unsigned HoursPerDay = DEFAULT_HOURS_PER_DAY;		/// The hours per each day for this season schedule
 	std::vector<CScheduledSeason *> ScheduledSeasons;	/// The seasons that are scheduled
 

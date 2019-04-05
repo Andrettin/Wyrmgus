@@ -2158,7 +2158,7 @@ static int CclGetMapTemplateData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, map_template->Name.c_str());
+		lua_pushstring(l, map_template->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "World")) {
 		if (map_template->World != nullptr) {
@@ -2222,7 +2222,7 @@ static int CclGetSiteData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, site->Name.c_str());
+		lua_pushstring(l, site->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "PosX")) {
 		lua_pushnumber(l, site->Position.x);
