@@ -84,7 +84,6 @@ public:
 	using GetterType = std::function<ReturnType()>;
 	using SetterType = std::function<void(ArgumentType)>;
 	
-protected:
 	PropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
 	{
 		this->Value = new T;
@@ -95,7 +94,6 @@ protected:
 	{
 	}
 	
-public:
 	virtual ~PropertyBase()
 	{
 		if (this->Value) {
@@ -103,107 +101,6 @@ public:
 		}
 	}
 
-	const T &operator *() const
-	{
-		if (this->Value == nullptr) {
-			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
-		}
-		
-		//get the underlying value
-		return *this->Value;
-	}
-	
-	ReturnType Get() const
-	{
-		//get the underlying value
-		if (this->Getter) {
-			return this->Getter();
-		} else {
-			return *this->Value;
-		}
-	}
-	
-	ReturnType operator ->()
-	{
-		return this->Get();
-	}
-	
-	operator ReturnType() const
-	{
-		return this->Get();
-	}
-	
-	bool operator ==(const T &rhs) const
-	{
-		return this->Get() == rhs;
-	}
-	
-	bool operator ==(const PropertyBase<T> &rhs) const
-	{
-		return *this == rhs.Get();
-	}
-	
-	bool operator !=(const T &rhs) const
-	{
-		return !(*this == rhs);
-	}
-	
-	bool operator !=(const PropertyBase<T> &rhs) const
-	{
-		return *this != rhs.Get();
-	}
-	
-	bool operator <(const T &rhs) const
-	{
-		return this->Get() < rhs;
-	}
-	
-	bool operator <(const PropertyBase<T> &rhs) const
-	{
-		return *this < rhs.Get();
-	}
-	
-	T operator +(const T &rhs)
-	{
-		return this->Get() + rhs;
-	}
-	
-	T operator +(const PropertyBase<T> &rhs)
-	{
-		return *this + rhs.Get();
-	}
-	
-	T operator -(const T &rhs)
-	{
-		return this->Get() - rhs;
-	}
-	
-	T operator -(const PropertyBase<T> &rhs)
-	{
-		return *this - rhs.Get();
-	}
-	
-	T operator *(const T &rhs)
-	{
-		return this->Get() * rhs;
-	}
-	
-	T operator *(const PropertyBase<T> &rhs)
-	{
-		return *this * rhs.Get();
-	}
-	
-	T operator /(const T &rhs)
-	{
-		return this->Get() / rhs;
-	}
-	
-	T operator /(const PropertyBase<T> &rhs)
-	{
-		return *this / rhs.Get();
-	}
-	
-protected:
 	T &operator *()
 	{
 		if (this->Value == nullptr) {
@@ -304,11 +201,16 @@ protected:
 		}
 	}
 
-	ModifiableReturnType GetModifiable()
+	ReturnType Get() const
 	{
-		return const_cast<ModifiableReturnType>(this->Get());
+		//get the underlying value
+		if (this->Getter) {
+			return this->Getter();
+		} else {
+			return *this->Value;
+		}
 	}
-
+	
 	void Set(const T &value)
 	{
 		if (this->Setter) {
@@ -318,154 +220,34 @@ protected:
 		}
 	}
 	
-private:
+protected:
+	ModifiableReturnType GetModifiable() const
+	{
+		if constexpr(std::is_reference_v<ReturnType>) {
+			return const_cast<ModifiableReturnType>(this->Get());
+		} else {
+			return this->Get();
+		}
+	}
+	
 	T *Value = nullptr;
 	GetterType Getter;
 	SetterType Setter;
 };
 
-template <typename T, typename O>
-class Property : public PropertyBase<T>
-{
-private:
-	Property(const T &value, const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(value, getter, setter)
-	{
-	}
-	
-	Property(const T &value, const SetterType &setter = nullptr) : Property(value, nullptr, setter)
-	{
-	}
-	
-	Property(const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(getter, setter)
-	{
-	}
-	
-	Property(const SetterType &setter = nullptr) : Property(T(), nullptr, setter)
-	{
-	}
-	
-	friend O;
-};
-
-template <typename O>
-class Property<String, O> : public PropertyBase<String>
-{
-private:
-	Property(const String &value, const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(value, getter, setter)
-	{
-	}
-	
-	Property(const String &value, const SetterType &setter = nullptr) : Property(value, nullptr, setter)
-	{
-	}
-	
-	Property(const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(getter, setter)
-	{
-	}
-	
-	Property(const SetterType &setter = nullptr) : Property(String(), nullptr, setter)
-	{
-	}
-	
-public:
-	bool empty() const
-	{
-		return this->Get().empty();
-	}
-	
-	CharString utf8() const
-	{
-		return this->Get().utf8();
-	}
-	
-	friend O;
-};
-
-template <typename T, typename O>
-class Property<std::vector<T>, O> : public PropertyBase<std::vector<T>>
-{
-	using ValueType = std::vector<T>;
-	using ReturnType = const std::vector<T> &;
-	using ArgumentType = const std::vector<T> &;
-	using GetterType = std::function<ReturnType()>;
-	using SetterType = std::function<void(ArgumentType)>;
-	
-private:
-	Property(const std::vector<T> &value, const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(value, getter, setter)
-	{
-	}
-	
-	Property(const std::vector<T> &value, const SetterType &setter = nullptr) : Property(value, nullptr, setter)
-	{
-	}
-	
-	Property(const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(getter, setter)
-	{
-	}
-	
-	Property(const SetterType &setter = nullptr) : Property(std::vector<T>(), nullptr, setter)
-	{
-	}
-	
-public:
-	bool empty() const
-	{
-		return this->Get().empty();
-	}
-	
-	typename std::vector<T>::const_iterator begin() const
-	{
-		return this->Get().begin();
-	}
-	
-	typename std::vector<T>::const_iterator end() const
-	{
-		return this->Get().end();
-	}
-	
-private:
-	typename std::vector<T>::iterator begin()
-	{
-		return this->GetModifiable().begin();
-	}
-	
-	typename std::vector<T>::iterator end()
-	{
-		return this->GetModifiable().end();
-	}
-	
-	friend O;
-};
-
 template <typename T>
-class ExposedPropertyBase : public PropertyCommonBase
+class ProtectedPropertyBase : protected PropertyBase<T>
 {
-public:
-	using ValueType = T;
-	using ReturnType = std::conditional_t<std::disjunction_v<std::is_same<T, String>, is_specialization_of<T, std::vector>>, T &, T>;
-	using ArgumentType = const T &;
-	using GetterType = std::function<ReturnType()>;
-	using SetterType = std::function<void(ArgumentType)>;
-	
 protected:
-	ExposedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
+	ProtectedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : PropertyBase(value, getter, setter)
 	{
-		this->Value = new T;
-		*(this->Value) = value;
 	}
 	
-	ExposedPropertyBase(const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
+	ProtectedPropertyBase(const GetterType &getter, const SetterType &setter) : PropertyBase(getter, setter)
 	{
 	}
 	
 public:
-	virtual ~ExposedPropertyBase()
-	{
-		if (this->Value) {
-			delete this->Value;
-		}
-	}
-
 	const T &operator *() const
 	{
 		if (this->Value == nullptr) {
@@ -479,11 +261,7 @@ public:
 	ReturnType Get() const
 	{
 		//get the underlying value
-		if (this->Getter) {
-			return this->Getter();
-		} else {
-			return *this->Value;
-		}
+		return PropertyBase<T>::Get();
 	}
 	
 	ReturnType operator ->()
@@ -501,7 +279,7 @@ public:
 		return this->Get() == rhs;
 	}
 	
-	bool operator ==(const ExposedPropertyBase<T> &rhs) const
+	bool operator ==(const PropertyBase<T> &rhs) const
 	{
 		return *this == rhs.Get();
 	}
@@ -511,7 +289,7 @@ public:
 		return !(*this == rhs);
 	}
 	
-	bool operator !=(const ExposedPropertyBase<T> &rhs) const
+	bool operator !=(const PropertyBase<T> &rhs) const
 	{
 		return *this != rhs.Get();
 	}
@@ -521,7 +299,7 @@ public:
 		return this->Get() < rhs;
 	}
 	
-	bool operator <(const ExposedPropertyBase<T> &rhs) const
+	bool operator <(const PropertyBase<T> &rhs) const
 	{
 		return *this < rhs.Get();
 	}
@@ -565,8 +343,137 @@ public:
 	{
 		return *this / rhs.Get();
 	}
+};
+
+template <typename T, typename O>
+class Property : public ProtectedPropertyBase<T>
+{
+private:
+	Property(const T &value, const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(value, getter, setter)
+	{
+	}
 	
-	T &operator *()
+	Property(const T &value, const SetterType &setter = nullptr) : Property(value, nullptr, setter)
+	{
+	}
+	
+	Property(const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(getter, setter)
+	{
+	}
+	
+	Property(const SetterType &setter = nullptr) : Property(T(), nullptr, setter)
+	{
+	}
+	
+	friend O;
+};
+
+template <typename O>
+class Property<String, O> : public ProtectedPropertyBase<String>
+{
+private:
+	Property(const String &value, const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(value, getter, setter)
+	{
+	}
+	
+	Property(const String &value, const SetterType &setter = nullptr) : Property(value, nullptr, setter)
+	{
+	}
+	
+	Property(const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(getter, setter)
+	{
+	}
+	
+	Property(const SetterType &setter = nullptr) : Property(String(), nullptr, setter)
+	{
+	}
+	
+public:
+	bool empty() const
+	{
+		return this->Get().empty();
+	}
+	
+	CharString utf8() const
+	{
+		return this->Get().utf8();
+	}
+	
+	friend O;
+};
+
+template <typename T, typename O>
+class Property<std::vector<T>, O> : public ProtectedPropertyBase<std::vector<T>>
+{
+	using ValueType = std::vector<T>;
+	using ReturnType = const std::vector<T> &;
+	using ArgumentType = const std::vector<T> &;
+	using GetterType = std::function<ReturnType()>;
+	using SetterType = std::function<void(ArgumentType)>;
+	
+private:
+	Property(const std::vector<T> &value, const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(value, getter, setter)
+	{
+	}
+	
+	Property(const std::vector<T> &value, const SetterType &setter = nullptr) : Property(value, nullptr, setter)
+	{
+	}
+	
+	Property(const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(getter, setter)
+	{
+	}
+	
+	Property(const SetterType &setter = nullptr) : Property(std::vector<T>(), nullptr, setter)
+	{
+	}
+	
+public:
+	bool empty() const
+	{
+		return this->Get().empty();
+	}
+	
+	typename std::vector<T>::const_iterator begin() const
+	{
+		return this->Get().begin();
+	}
+	
+	typename std::vector<T>::const_iterator end() const
+	{
+		return this->Get().end();
+	}
+	
+private:
+	typename std::vector<T>::iterator begin()
+	{
+		return this->GetModifiable().begin();
+	}
+	
+	typename std::vector<T>::iterator end()
+	{
+		return this->GetModifiable().end();
+	}
+	
+	friend O;
+};
+
+template <typename T>
+class ExposedPropertyBase : public PropertyBase<T>
+{
+protected:
+	ExposedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : PropertyBase(getter, setter)
+	{
+		this->Value = new T;
+		*(this->Value) = value;
+	}
+	
+	ExposedPropertyBase(const GetterType &getter, const SetterType &setter) : PropertyBase(getter, setter)
+	{
+	}
+	
+public:
+	const T &operator *() const
 	{
 		if (this->Value == nullptr) {
 			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
@@ -575,104 +482,92 @@ public:
 		//get the underlying value
 		return *this->Value;
 	}
-
-	const ExposedPropertyBase<T> &operator =(const T &rhs)
+	
+	ModifiableReturnType Get() const
 	{
-		this->Set(rhs);
-		return *this;
+		//get the underlying value
+		return PropertyBase<T>::GetModifiable();
 	}
 	
-	const ExposedPropertyBase<T> &operator =(const ExposedPropertyBase<T> &rhs)
+	ModifiableReturnType operator ->()
 	{
-		return *this = rhs.Get();
+		return this->Get();
 	}
 	
-	virtual const ExposedPropertyBase<T> &operator =(const std::string &rhs) override;
-	
-	const ExposedPropertyBase<T> &operator +=(const T &rhs)
+	operator ModifiableReturnType() const
 	{
-		this->Set(this->Get() + rhs);
-		return *this;
+		return this->Get();
 	}
 	
-	const ExposedPropertyBase<T> &operator +=(const ExposedPropertyBase<T> &rhs)
+	bool operator ==(const T &rhs) const
 	{
-		return *this += rhs.Get();
+		return this->Get() == rhs;
 	}
 	
-	virtual const ExposedPropertyBase<T> &operator +=(const std::string &rhs) override;
-
-	const ExposedPropertyBase<T> &operator -=(const T &rhs)
+	bool operator ==(const PropertyBase<T> &rhs) const
 	{
-		this->Set(this->Get() - rhs);
-		return *this;
+		return *this == rhs.Get();
 	}
 	
-	const ExposedPropertyBase<T> &operator -=(const ExposedPropertyBase<T> &rhs)
+	bool operator !=(const T &rhs) const
 	{
-		return *this -= rhs.Get();
+		return !(*this == rhs);
 	}
 	
-	virtual const ExposedPropertyBase<T> &operator -=(const std::string &rhs) override;
-
-	const ExposedPropertyBase<T> &operator *=(const T &rhs)
+	bool operator !=(const PropertyBase<T> &rhs) const
 	{
-		this->Set(this->Get() * rhs);
-		return *this;
+		return *this != rhs.Get();
 	}
 	
-	const ExposedPropertyBase<T> &operator *=(const ExposedPropertyBase<T> &rhs)
+	bool operator <(const T &rhs) const
 	{
-		return *this *= rhs.Get();
+		return this->Get() < rhs;
 	}
 	
-	virtual const ExposedPropertyBase<T> &operator *=(const std::string &rhs) override
+	bool operator <(const PropertyBase<T> &rhs) const
 	{
-		if constexpr(std::is_same_v<T, int>) {
-			return *this *= std::stoi(rhs);
-		} else if constexpr(std::is_same_v<T, bool>) {
-			return *this *= StringToBool(rhs);
-		} else {
-			fprintf(stderr, "The operator *= is not valid for this type.");
-			return *this;
-		}
-	}
-
-	const ExposedPropertyBase<T> &operator /=(const T &rhs)
-	{
-		this->Set(this->Get() / rhs);
-		return *this;
+		return *this < rhs.Get();
 	}
 	
-	const ExposedPropertyBase<T> &operator /=(const ExposedPropertyBase<T> &rhs)
+	T operator +(const T &rhs)
 	{
-		return *this /= rhs.Get();
+		return this->Get() + rhs;
 	}
 	
-	virtual const ExposedPropertyBase<T> &operator /=(const std::string &rhs) override
+	T operator +(const PropertyBase<T> &rhs)
 	{
-		if constexpr(std::is_same_v<T, int>) {
-			return *this /= std::stoi(rhs);
-		} else {
-			fprintf(stderr, "The operator /= is not valid for this type.");
-			return *this;
-		}
-	}
-
-protected:
-	void Set(const T &value)
-	{
-		if (this->Setter) {
-			this->Setter(value);
-		} else if (this->Value != nullptr && *this->Value != value) {
-			*this->Value = value;
-		}
+		return *this + rhs.Get();
 	}
 	
-private:
-	T *Value = nullptr;
-	GetterType Getter;
-	SetterType Setter;
+	T operator -(const T &rhs)
+	{
+		return this->Get() - rhs;
+	}
+	
+	T operator -(const PropertyBase<T> &rhs)
+	{
+		return *this - rhs.Get();
+	}
+	
+	T operator *(const T &rhs)
+	{
+		return this->Get() * rhs;
+	}
+	
+	T operator *(const PropertyBase<T> &rhs)
+	{
+		return *this * rhs.Get();
+	}
+	
+	T operator /(const T &rhs)
+	{
+		return this->Get() / rhs;
+	}
+	
+	T operator /(const PropertyBase<T> &rhs)
+	{
+		return *this / rhs.Get();
+	}
 };
 
 /**
@@ -819,12 +714,6 @@ inline T operator + (const T &lhs, const PropertyBase<T> &rhs)
 	return lhs + rhs.Get();
 }
 
-template <typename T>
-inline T operator + (const T &lhs, const ExposedPropertyBase<T> &rhs)
-{
-	return lhs + rhs.Get();
-}
-
 //overload std::min and std::max so that they work as expected with the properties
 namespace std {
 	//std::min
@@ -846,24 +735,6 @@ namespace std {
 		return min(a.Get(), b.Get());
 	}
 	
-	template<class T>
-	constexpr const T &min(const ExposedPropertyBase<T> &a, const T &b)
-	{
-		return min(a.Get(), b);
-	}
-	
-	template<class T>
-	constexpr const T &min(const T &a, const ExposedPropertyBase<T> &b)
-	{
-		return min(a, b.Get());
-	}
-	
-	template<class T>
-	constexpr const T &min(const ExposedPropertyBase<T> &a, const ExposedPropertyBase<T> &b)
-	{
-		return min(a.Get(), b.Get());
-	}
-	
 	//std::max
 	template<class T>
 	constexpr const T &max(const PropertyBase<T> &a, const T &b)
@@ -879,24 +750,6 @@ namespace std {
 	
 	template<class T>
 	constexpr const T &max(const PropertyBase<T> &a, const PropertyBase<T> &b)
-	{
-		return max(a.Get(), b.Get());
-	}
-	
-	template<class T>
-	constexpr const T &max(const ExposedPropertyBase<T> &a, const T &b)
-	{
-		return max(a.Get(), b);
-	}
-	
-	template<class T>
-	constexpr const T &max(const T &a, const ExposedPropertyBase<T> &b)
-	{
-		return max(a, b.Get());
-	}
-	
-	template<class T>
-	constexpr const T &max(const ExposedPropertyBase<T> &a, const ExposedPropertyBase<T> &b)
 	{
 		return max(a.Get(), b.Get());
 	}

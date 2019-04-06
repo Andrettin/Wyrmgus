@@ -142,80 +142,6 @@ const PropertyBase<T> &PropertyBase<T>::operator -=(const std::string &rhs)
 	}
 }
 
-/**
-**	@brief	The operator for assignment of a string for a property
-**
-**	@param	rhs	The string which has to be converted to the property
-**
-**	@return	The property
-*/
-template <typename T>
-const ExposedPropertyBase<T> &ExposedPropertyBase<T>::operator =(const std::string &rhs)
-{
-	if constexpr(
-		std::is_same_v<T, int>
-		|| std::is_same_v<T, bool>
-		|| std::is_same_v<T, String>
-		|| (std::is_pointer_v<T> && std::is_base_of_v<DataType<std::remove_pointer_t<T>>, std::remove_pointer_t<T>>)
-	) {
-		return *this = ConvertFromString<T>(rhs);
-	} else {
-		fprintf(stderr, "The operator = is not valid for this type.");
-		return *this;
-	}
-}
-
-/**
-**	@brief	The operator for addition of a string for a property
-**
-**	@param	rhs	The string which has to be converted for the property
-**
-**	@return	The property
-*/
-template <typename T>
-const ExposedPropertyBase<T> &ExposedPropertyBase<T>::operator +=(const std::string &rhs)
-{
-	if constexpr(
-		std::is_same_v<T, int>
-		|| std::is_same_v<T, bool>
-		|| std::is_same_v<T, String>
-	) {
-		return *this += ConvertFromString<T>(rhs);
-	} else if constexpr(is_specialization_of<T, std::vector>::value) {
-		typename T::value_type new_value = ConvertFromString<typename T::value_type>(rhs);
-		this->Get().push_back(new_value);
-		return *this;
-	} else {
-		fprintf(stderr, "The operator += is not valid for this type.");
-		return *this;
-	}
-}
-
-/**
-**	@brief	The operator for subtraction of a string for a property
-**
-**	@param	rhs	The string which has to be converted for the property
-**
-**	@return	The property
-*/
-template <typename T>
-const ExposedPropertyBase<T> &ExposedPropertyBase<T>::operator -=(const std::string &rhs)
-{
-	if constexpr(
-		std::is_same_v<T, int>
-		|| std::is_same_v<T, bool>
-	) {
-		return *this -= ConvertFromString<T>(rhs);
-	} else if constexpr(is_specialization_of<T, std::vector>::value) {
-		typename T::value_type new_value = ConvertFromString<typename T::value_type>(rhs);
-		this->Get().erase(std::remove(this->Get().begin(), this->Get().end(), new_value), this->Get().end());
-		return *this;
-	} else {
-		fprintf(stderr, "The operator -= is not valid for this type.");
-		return *this;
-	}
-}
-
 template const PropertyBase<int> &PropertyBase<int>::operator =(const std::string &rhs);
 template const PropertyBase<bool> &PropertyBase<bool>::operator =(const std::string &rhs);
 template const PropertyBase<String> &PropertyBase<String>::operator =(const std::string &rhs);
@@ -231,13 +157,3 @@ template const PropertyBase<bool> &PropertyBase<bool>::operator -=(const std::st
 template const PropertyBase<String> &PropertyBase<String>::operator -=(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator -=(const std::string &rhs);
 template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator -=(const std::string &rhs);
-
-template const ExposedPropertyBase<int> &ExposedPropertyBase<int>::operator =(const std::string &rhs);
-template const ExposedPropertyBase<bool> &ExposedPropertyBase<bool>::operator =(const std::string &rhs);
-template const ExposedPropertyBase<String> &ExposedPropertyBase<String>::operator =(const std::string &rhs);
-template const ExposedPropertyBase<int> &ExposedPropertyBase<int>::operator +=(const std::string &rhs);
-template const ExposedPropertyBase<bool> &ExposedPropertyBase<bool>::operator +=(const std::string &rhs);
-template const ExposedPropertyBase<String> &ExposedPropertyBase<String>::operator +=(const std::string &rhs);
-template const ExposedPropertyBase<int> &ExposedPropertyBase<int>::operator -=(const std::string &rhs);
-template const ExposedPropertyBase<bool> &ExposedPropertyBase<bool>::operator -=(const std::string &rhs);
-template const ExposedPropertyBase<String> &ExposedPropertyBase<String>::operator -=(const std::string &rhs);
