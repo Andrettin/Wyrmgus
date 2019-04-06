@@ -103,15 +103,14 @@ void DataElement::ProcessConfigData(const CConfigData *config_data)
 			continue;
 		}
 		
-		std::map<std::string, PropertyCommonBase &>::iterator find_iterator = this->Properties.find(config_property.Key);
-		if (find_iterator != this->Properties.end()) {
-			PropertyCommonBase &property = find_iterator->second;
+		PropertyCommonBase *property = this->GetProperty(config_property.Key);
+		if (property != nullptr) {
 			if (config_property.Operator == CConfigOperator::Assignment) {
-				property = config_property.Value;
+				*property = config_property.Value;
 			} else if (config_property.Operator == CConfigOperator::Addition) {
-				property += config_property.Value;
+				*property += config_property.Value;
 			} else if (config_property.Operator == CConfigOperator::Subtraction) {
-				property -= config_property.Value;
+				*property -= config_property.Value;
 			} else {
 				fprintf(stderr, "Invalid operator enumeration index for property \"%s\": %i.\n", config_property.Key.c_str(), config_property.Operator);
 			}

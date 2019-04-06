@@ -49,9 +49,6 @@
 
 class DataElement;
 
-template <typename T>
-class DataType;
-
 extern std::string FindAndReplaceString(const std::string &text, const std::string &find, const std::string &replace);
 extern bool StringToBool(const std::string &str);
 

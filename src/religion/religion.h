@@ -50,14 +50,27 @@ class CDeityDomain;
 
 class CReligion : public DetailedDataElement, public DataType<CReligion>
 {
-	GDCLASS(CReligion, DetailedDataElement)
+	DATA_TYPE(CReligion, DetailedDataElement)
 
 public:
 	CReligion(const std::string &ident = "", const int index = -1) : DetailedDataElement(ident, index)
 	{
-		this->Properties.insert({"cultural_deities", this->CulturalDeities});
 	}
 	
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("cultural_deities", CulturalDeities);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = CReligion::InitializeClass();
+	
+public:
 	static constexpr const char *ClassIdentifier = "religion";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;

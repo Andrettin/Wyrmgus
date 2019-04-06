@@ -96,7 +96,7 @@ class CPlayerColorGraphic;
 /// Icon: rectangle image used in menus
 class CIcon : public DataElement, public DataType<CIcon>
 {
-	GDCLASS(CIcon, DataElement)
+	DATA_TYPE(CIcon, DataElement)
 	
 public:
 	/**
@@ -104,11 +104,24 @@ public:
 	*/
 	CIcon(const std::string &ident = "") : DataElement(ident)
 	{
-		this->Properties.insert({"frame", this->Frame});
 	}
 	
 	~CIcon();
 
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("frame", Frame);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = CIcon::InitializeClass();
+	
+public:
 	static constexpr const char *ClassIdentifier = "icon";
 	
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;

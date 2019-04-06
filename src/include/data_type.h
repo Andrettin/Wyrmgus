@@ -39,6 +39,39 @@
 #include <vector>
 
 /*----------------------------------------------------------------------------
+--  Macros
+----------------------------------------------------------------------------*/
+
+#define DATA_TYPE(class_name, base_class_name) \
+	typedef class_name ThisClass; \
+	\
+	GDCLASS(class_name, base_class_name) \
+	\
+protected: \
+	/**
+	**	@brief	Get a property of the data type by its key
+	**
+	**	@param	property_key	The key of the property
+	**
+	**	@return	The property if it exists, or null otherwise
+	*/ \
+	virtual PropertyCommonBase *GetProperty(const std::string &property_key) override \
+	{ \
+		std::map<std::string, std::function<PropertyCommonBase *(class_name *)>>::iterator find_iterator = class_name::Properties.find(property_key); \
+		if (find_iterator != class_name::Properties.end()) { \
+			return find_iterator->second(this); \
+		} else { \
+			return base_class_name::GetProperty(property_key); \
+		} \
+	} \
+	\
+private: \
+	static inline std::map<std::string, std::function<PropertyCommonBase *(class_name *)>> Properties;
+	
+#define PROPERTY_KEY(property_key, property_variable) \
+	ThisClass::Properties.insert({property_key, std::function<PropertyCommonBase *(ThisClass *)>([](ThisClass *class_instance) -> PropertyCommonBase* { return &class_instance->property_variable; })});
+
+/*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
@@ -47,6 +80,8 @@ class ExposedProperty;
 
 template <typename T, typename O>
 class Property;
+
+class PropertyCommonBase;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -60,6 +95,8 @@ class DataType
 	
 	template <typename T2>
 	using ExposedProperty = ExposedProperty<T2, T>;
+	
+	using PropertyMap = std::map<std::string, PropertyCommonBase *T::*>;
 	
 public:
 	/**
@@ -179,6 +216,11 @@ public:
 		DataType<T>::InstancesByIdent.clear();
 	}
 	
+	/**
+	**	@brief	Get whether all instances of the data type have been initialized
+	**
+	**	@return	True if all instances have been initialized, or false otherwise
+	*/
 	static inline bool AreAllInitialized()
 	{
 		for (T *instance : DataType<T>::Instances) {

@@ -51,16 +51,28 @@ class CIcon;
 */
 class DetailedDataElement : public DataElement
 {
-	GDCLASS(DetailedDataElement, DataElement)
+	DATA_TYPE(DetailedDataElement, DataElement)
 
 public:
 	DetailedDataElement(const std::string &ident = "", const int index = -1) : DataElement(ident, index)
 	{
-		this->Properties.insert({"description", this->Description});
-		this->Properties.insert({"quote", this->Quote});
-		this->Properties.insert({"background", this->Background});
-		this->Properties.insert({"icon", this->Icon});
 	}
+	
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("description", Description);
+		PROPERTY_KEY("quote", Quote);
+		PROPERTY_KEY("background", Background);
+		PROPERTY_KEY("icon", Icon);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = DetailedDataElement::InitializeClass();
 	
 public:
 	ExposedProperty<String, DetailedDataElement> Description;	/// the description of the data element from an in-game universe perspective

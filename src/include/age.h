@@ -51,17 +51,30 @@ class CUpgrade;
 
 class CAge : public DetailedDataElement, public DataType<CAge>
 {
-	GDCLASS(CAge, DetailedDataElement)
+	DATA_TYPE(CAge, DetailedDataElement)
 	
 public:
 	CAge(const std::string &ident = "", const int index = -1) : DetailedDataElement(ident, index)
 	{
-		this->Properties.insert({"priority", this->Priority});
-		this->Properties.insert({"year_boost", this->YearBoost});
 	}
 	
 	~CAge();
 	
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("priority", Priority);
+		PROPERTY_KEY("year_boost", YearBoost);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = CAge::InitializeClass();
+	
+public:
 	static constexpr const char *ClassIdentifier = "age";
 	
 	static void SetCurrentAge(CAge *age);

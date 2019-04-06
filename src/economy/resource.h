@@ -81,6 +81,10 @@ constexpr int ScoreCost = (MaxCosts + 1);
 constexpr int ManaResCost (MaxCosts + 2);
 constexpr int FreeWorkersCount (MaxCosts + 3);
 
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
 class CResource : public DataElement, public DataType<CResource>
 {
 	GDCLASS(CResource, DataElement)

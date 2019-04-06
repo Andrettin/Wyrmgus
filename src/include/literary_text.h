@@ -52,24 +52,37 @@ struct lua_State;
 
 class CLiteraryText : public DataElement, public DataType<CLiteraryText>
 {
-	GDCLASS(CLiteraryText, DataElement)
+	DATA_TYPE(CLiteraryText, DataElement)
 	
 public:
 	CLiteraryText()
 	{
-		this->Properties.insert({"hidden", this->Hidden});
-		this->Properties.insert({"author", this->Author});
-		this->Properties.insert({"translator", this->Translator});
-		this->Properties.insert({"publisher", this->Publisher});
-		this->Properties.insert({"license", this->License});
-		this->Properties.insert({"notes", this->Notes});
-		this->Properties.insert({"publication_year", this->PublicationYear});
-		this->Properties.insert({"initial_page_number", this->InitialPageNumber});
-		this->Properties.insert({"page_numbering_enabled", this->PageNumberingEnabled});
-		this->Properties.insert({"lowercase_roman_numeral_page_numbering", this->LowercaseRomanNumeralPageNumbering});
-		this->Properties.insert({"icon", this->Icon});
 	}
 
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("hidden", Hidden);
+		PROPERTY_KEY("author", Author);
+		PROPERTY_KEY("translator", Translator);
+		PROPERTY_KEY("publisher", Publisher);
+		PROPERTY_KEY("license", License);
+		PROPERTY_KEY("notes", Notes);
+		PROPERTY_KEY("publication_year", PublicationYear);
+		PROPERTY_KEY("initial_page_number", InitialPageNumber);
+		PROPERTY_KEY("page_numbering_enabled", PageNumberingEnabled);
+		PROPERTY_KEY("lowercase_roman_numeral_page_numbering", LowercaseRomanNumeralPageNumbering);
+		PROPERTY_KEY("icon", Icon);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = CLiteraryText::InitializeClass();
+	
+public:
 	static constexpr const char *ClassIdentifier = "literary_text";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
@@ -163,7 +176,7 @@ public:
 		return this->LowercaseRomanNumeralPageNumbering;
 	}
 	
-private:
+private:	
 	void UpdateSectionPageNumbers() const;
 
 public:

@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
 #include "property.h"
 
 #include <core/object.h>
@@ -48,10 +49,6 @@
 ----------------------------------------------------------------------------*/
 
 class CConfigData;
-class PropertyCommonBase;
-
-template<typename T>
-class DataType;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -59,14 +56,30 @@ class DataType;
 
 class DataElement : public Object
 {
+	typedef DataElement ThisClass;
+	
 	GDCLASS(DataElement, Object)
 	
 public:
 	DataElement(const std::string &ident = "", const int index = -1) : Ident(ident), Index(index)
 	{
-		this->Properties.insert({"name", this->Name});
 	}
 	
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("name", Name);
+		
+		return true;
+	}
+
+	static inline std::map<std::string, std::function<PropertyCommonBase *(DataElement *)>> Properties;
+	static inline bool ClassInitialized = DataElement::InitializeClass();
+	
+public:
 	virtual void ProcessConfigData(const CConfigData *config_data);
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) { return false; }
 	virtual bool ProcessConfigDataSection(const CConfigData *section) { return false; }
@@ -109,6 +122,17 @@ public:
 		return this->Initialized;
 	}
 	
+protected:
+	virtual PropertyCommonBase *GetProperty(const std::string &property_key)
+	{
+		std::map<std::string, std::function<PropertyCommonBase *(DataElement *)>>::iterator find_iterator = DataElement::Properties.find(property_key);
+		if (find_iterator != DataElement::Properties.end()) {
+			return find_iterator->second(this);
+		} else {
+			return nullptr;
+		}
+	}
+	
 public:
 	ExposedProperty<String, DataElement> Name;	/// the name of the data element
 	
@@ -116,7 +140,6 @@ public:
 protected:
 	int Index = -1;		/// index of the data element
 	bool Initialized = false;	/// whether the data element has been initialized
-	std::map<std::string, PropertyCommonBase &> Properties;
 	
 	friend DataType;
 

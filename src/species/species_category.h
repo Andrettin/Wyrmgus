@@ -50,14 +50,27 @@ class CSpeciesCategoryRank;
 
 class CSpeciesCategory : public DataElement, public DataType<CSpeciesCategory>
 {
-	GDCLASS(CSpeciesCategory, DataElement)
+	DATA_TYPE(CSpeciesCategory, DataElement)
 	
 public:
 	CSpeciesCategory(const std::string &ident = "", const int index = -1) : DataElement(ident, index)
 	{
-		this->Properties.insert({"common_name", this->CommonName});
 	}
 	
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("common_name", CommonName);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = CSpeciesCategory::InitializeClass();
+	
+public:
 	static constexpr const char *ClassIdentifier = "species_category";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
