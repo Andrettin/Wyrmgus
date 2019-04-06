@@ -44,30 +44,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Process a property in the data provided by a configuration file
-**
-**	@param	key		The property's key
-**	@param	value	The property's value
-**
-**	@return	True if the property can be processed, or false otherwise
-*/
-bool CLiteraryText::ProcessConfigDataProperty(const std::string &key, std::string value)
-{
-	if (key == "section") {
-		value = FindAndReplaceString(value, "_", "-");
-		CLiteraryText *section = CLiteraryText::Get(value);
-		if (section != nullptr) {
-			this->Sections.push_back(section);
-			section->MainText = this;
-		}
-	} else {
-		return false;
-	}
-	
-	return true;
-}
-
-/**
 **	@brief	Process a section in the data provided by a configuration file
 **
 **	@param	section		The section
@@ -99,8 +75,12 @@ bool CLiteraryText::ProcessConfigDataSection(const CConfigData *section)
 */
 void CLiteraryText::Initialize()
 {
+	for (CLiteraryText *section : this->Sections) {
+		section->MainText = this;
+	}
+	
 	CLiteraryText *previous_section = nullptr;
-	for (CLiteraryText *section : this->GetSections()) {
+	for (CLiteraryText *section : this->Sections) {
 		if (previous_section != nullptr) {
 			previous_section->NextSection = section;
 			section->PreviousSection = previous_section;
@@ -129,7 +109,7 @@ void CLiteraryText::Initialize()
 
 CLiteraryText *CLiteraryText::GetSection(const std::string &section_name) const
 {
-	for (CLiteraryText *section : this->GetSections()) {
+	for (CLiteraryText *section : this->Sections) {
 		if (String(section_name.c_str()) == section->Name) {
 			return section;
 		}
@@ -145,7 +125,7 @@ void CLiteraryText::UpdateSectionPageNumbers() const
 		page_offset += std::max(static_cast<int>(this->GetPages().size()), 1);
 	}
 	
-	for (CLiteraryText *section : this->GetSections()) {
+	for (CLiteraryText *section : this->Sections) {
 		if (section->InitialPageNumber == 0) {
 			section->InitialPageNumber = page_offset;
 		}
@@ -167,7 +147,7 @@ void CLiteraryText::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_publication_year"), [](const CLiteraryText *literary_text){ return literary_text->PublicationYear.Get(); });
 	ClassDB::bind_method(D_METHOD("get_initial_page_number"), [](const CLiteraryText *literary_text){ return literary_text->InitialPageNumber.Get(); });
 	ClassDB::bind_method(D_METHOD("get_icon"), [](const CLiteraryText *literary_text){ return literary_text->Icon.Get(); });
-	ClassDB::bind_method(D_METHOD("get_sections"), &CLiteraryText::GetSectionsArray);
+	ClassDB::bind_method(D_METHOD("get_sections"), [](const CLiteraryText *literary_text){ return VectorToGodotArray(literary_text->Sections.Get()); });
 	ClassDB::bind_method(D_METHOD("get_main_text"), &CLiteraryText::GetMainText);
 	ClassDB::bind_method(D_METHOD("get_previous_section"), &CLiteraryText::GetPreviousSection);
 	ClassDB::bind_method(D_METHOD("get_next_section"), &CLiteraryText::GetNextSection);

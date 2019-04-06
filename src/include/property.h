@@ -35,6 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_type.h"
+#include "type_traits.h"
 
 #include <core/ustring.h>
 #include <core/variant.h>
@@ -42,6 +43,7 @@
 #include <functional>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -68,8 +70,6 @@ protected:
 	virtual const PropertyCommonBase &operator *=(const std::string &rhs) = 0;
 	virtual const PropertyCommonBase &operator /=(const std::string &rhs) = 0;
 	
-	virtual operator Variant() const = 0;
-	
 	friend DataElement;
 };
 
@@ -78,9 +78,11 @@ class PropertyBase : public PropertyCommonBase
 {
 public:
 	using ValueType = T;
-	using ReturnType = std::conditional_t<std::is_same_v<T, String>, const T &, T>;
+	using ReturnType = std::conditional_t<std::disjunction_v<std::is_same<T, String>, is_specialization_of<T, std::vector>>, const T &, const T>;
+	using ModifiableReturnType = std::conditional_t<std::disjunction_v<std::is_same<T, String>, is_specialization_of<T, std::vector>>, T &, T>;
+	using ArgumentType = const T &;
 	using GetterType = std::function<ReturnType()>;
-	using SetterType = std::function<void(const T &)>;
+	using SetterType = std::function<void(ArgumentType)>;
 	
 protected:
 	PropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
@@ -131,11 +133,6 @@ public:
 		return this->Get();
 	}
 	
-	virtual operator Variant() const override
-	{
-		return Variant(this->Get());
-	}
-
 	bool operator ==(const T &rhs) const
 	{
 		return this->Get() == rhs;
@@ -248,19 +245,7 @@ protected:
 		return *this += rhs.Get();
 	}
 	
-	virtual const PropertyBase<T> &operator +=(const std::string &rhs) override
-	{
-		if constexpr(std::is_same_v<T, int>) {
-			return *this += std::stoi(rhs);
-		} else if constexpr(std::is_same_v<T, bool>) {
-			return *this += StringToBool(rhs);
-		} else if constexpr(std::is_same_v<T, String>) {
-			return *this += String(rhs.c_str());
-		} else {
-			fprintf(stderr, "The operator += is not valid for this type.");
-			return *this;
-		}
-	}
+	virtual const PropertyBase<T> &operator +=(const std::string &rhs) override;
 
 	const PropertyBase<T> &operator -=(const T &rhs)
 	{
@@ -273,18 +258,8 @@ protected:
 		return *this -= rhs.Get();
 	}
 	
-	virtual const PropertyBase<T> &operator -=(const std::string &rhs) override
-	{
-		if constexpr(std::is_same_v<T, int>) {
-			return *this -= std::stoi(rhs);
-		} else if constexpr(std::is_same_v<T, bool>) {
-			return *this -= StringToBool(rhs);
-		} else {
-			fprintf(stderr, "The operator -= is not valid for this type.");
-			return *this;
-		}
-	}
-
+	virtual const PropertyBase<T> &operator -=(const std::string &rhs) override;
+	
 	const PropertyBase<T> &operator *=(const T &rhs)
 	{
 		this->Set(this->Get() * rhs);
@@ -329,18 +304,9 @@ protected:
 		}
 	}
 
-private:
-	std::remove_const_t<ReturnType> Get()
+	ModifiableReturnType GetModifiable()
 	{
-		if (this->Getter) {
-			if constexpr(std::is_const_v<ReturnType>) {
-				return const_cast<std::remove_const_t<ReturnType>>(this->Getter());
-			} else {
-				return this->Getter();
-			}
-		} else {
-			return *this->Value;
-		}
+		return const_cast<ModifiableReturnType>(this->Get());
 	}
 
 	void Set(const T &value)
@@ -415,14 +381,71 @@ public:
 	friend O;
 };
 
+template <typename T, typename O>
+class Property<std::vector<T>, O> : public PropertyBase<std::vector<T>>
+{
+	using ValueType = std::vector<T>;
+	using ReturnType = const std::vector<T> &;
+	using ArgumentType = const std::vector<T> &;
+	using GetterType = std::function<ReturnType()>;
+	using SetterType = std::function<void(ArgumentType)>;
+	
+private:
+	Property(const std::vector<T> &value, const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(value, getter, setter)
+	{
+	}
+	
+	Property(const std::vector<T> &value, const SetterType &setter = nullptr) : Property(value, nullptr, setter)
+	{
+	}
+	
+	Property(const GetterType &getter, const SetterType &setter = nullptr) : PropertyBase(getter, setter)
+	{
+	}
+	
+	Property(const SetterType &setter = nullptr) : Property(std::vector<T>(), nullptr, setter)
+	{
+	}
+	
+public:
+	bool empty() const
+	{
+		return this->Get().empty();
+	}
+	
+	typename std::vector<T>::const_iterator begin() const
+	{
+		return this->Get().begin();
+	}
+	
+	typename std::vector<T>::const_iterator end() const
+	{
+		return this->Get().end();
+	}
+	
+private:
+	typename std::vector<T>::iterator begin()
+	{
+		return this->GetModifiable().begin();
+	}
+	
+	typename std::vector<T>::iterator end()
+	{
+		return this->GetModifiable().end();
+	}
+	
+	friend O;
+};
+
 template <typename T>
 class ExposedPropertyBase : public PropertyCommonBase
 {
 public:
 	using ValueType = T;
-	using ReturnType = std::conditional_t<std::is_same_v<T, String>, T &, T>;
+	using ReturnType = std::conditional_t<std::disjunction_v<std::is_same<T, String>, is_specialization_of<T, std::vector>>, T &, T>;
+	using ArgumentType = const T &;
 	using GetterType = std::function<ReturnType()>;
-	using SetterType = std::function<void(const T &)>;
+	using SetterType = std::function<void(ArgumentType)>;
 	
 protected:
 	ExposedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
@@ -473,11 +496,6 @@ public:
 		return this->Get();
 	}
 	
-	virtual operator Variant() const override
-	{
-		return Variant(this->Get());
-	}
-
 	bool operator ==(const T &rhs) const
 	{
 		return this->Get() == rhs;
@@ -582,19 +600,7 @@ public:
 		return *this += rhs.Get();
 	}
 	
-	virtual const ExposedPropertyBase<T> &operator +=(const std::string &rhs) override
-	{
-		if constexpr(std::is_same_v<T, int>) {
-			return *this += std::stoi(rhs);
-		} else if constexpr(std::is_same_v<T, bool>) {
-			return *this += StringToBool(rhs);
-		} else if constexpr(std::is_same_v<T, String>) {
-			return *this += String(rhs.c_str());
-		} else {
-			fprintf(stderr, "The operator += is not valid for this type.");
-			return *this;
-		}
-	}
+	virtual const ExposedPropertyBase<T> &operator +=(const std::string &rhs) override;
 
 	const ExposedPropertyBase<T> &operator -=(const T &rhs)
 	{
@@ -607,17 +613,7 @@ public:
 		return *this -= rhs.Get();
 	}
 	
-	virtual const ExposedPropertyBase<T> &operator -=(const std::string &rhs) override
-	{
-		if constexpr(std::is_same_v<T, int>) {
-			return *this -= std::stoi(rhs);
-		} else if constexpr(std::is_same_v<T, bool>) {
-			return *this -= StringToBool(rhs);
-		} else {
-			fprintf(stderr, "The operator -= is not valid for this type.");
-			return *this;
-		}
-	}
+	virtual const ExposedPropertyBase<T> &operator -=(const std::string &rhs) override;
 
 	const ExposedPropertyBase<T> &operator *=(const T &rhs)
 	{
@@ -757,6 +753,61 @@ public:
 	CharString utf8() const
 	{
 		return this->Get().utf8();
+	}
+	
+	friend O;
+};
+
+template <typename T, typename O>
+class ExposedProperty<std::vector<T>, O> : public ExposedPropertyBase<std::vector<T>>
+{
+	using ValueType = std::vector<T>;
+	using ReturnType = const std::vector<T> &;
+	using ArgumentType = const T &;
+	using GetterType = std::function<ReturnType()>;
+	using SetterType = std::function<void(ArgumentType)>;
+	
+private:
+	ExposedProperty(const std::vector<T> &value, const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(value, getter, setter)
+	{
+	}
+	
+	ExposedProperty(const std::vector<T> &value, const SetterType &setter = nullptr) : ExposedProperty(value, nullptr, setter)
+	{
+	}
+	
+	ExposedProperty(const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(getter, setter)
+	{
+	}
+	
+	ExposedProperty(const SetterType &setter = nullptr) : ExposedProperty(std::vector<T>(), nullptr, setter)
+	{
+	}
+	
+public:
+	bool empty() const
+	{
+		return this->Get().empty();
+	}
+	
+	typename std::vector<T>::const_iterator begin() const
+	{
+		return this->Get().begin();
+	}
+	
+	typename std::vector<T>::const_iterator end() const
+	{
+		return this->Get().end();
+	}
+	
+	typename std::vector<T>::iterator begin()
+	{
+		return this->Get().begin();
+	}
+	
+	typename std::vector<T>::iterator end()
+	{
+		return this->Get().end();
 	}
 	
 	friend O;

@@ -76,6 +76,7 @@ private:
 		PROPERTY_KEY("page_numbering_enabled", PageNumberingEnabled);
 		PROPERTY_KEY("lowercase_roman_numeral_page_numbering", LowercaseRomanNumeralPageNumbering);
 		PROPERTY_KEY("icon", Icon);
+		PROPERTY_KEY("sections", Sections);
 		
 		return true;
 	}
@@ -85,27 +86,10 @@ private:
 public:
 	static constexpr const char *ClassIdentifier = "literary_text";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
 public:
-	const std::vector<CLiteraryText *> &GetSections() const
-	{
-		return this->Sections;
-	}
-	
-	Array GetSectionsArray() const
-	{
-		Array sections;
-		
-		for (CLiteraryText *section : this->GetSections()) {
-			sections.push_back(section);
-		}
-		
-		return sections;
-	}
-	
 	CLiteraryText *GetMainText() const
 	{
 		return this->MainText;
@@ -157,7 +141,7 @@ public:
 			page_count += static_cast<int>(this->GetPages().size());
 		}
 		
-		for (const CLiteraryText *section : this->GetSections()) {
+		for (const CLiteraryText *section : this->Sections) {
 			page_count += section->GetTotalPageCount();
 		}
 
@@ -202,10 +186,10 @@ public:
 			}
 		})
 	};
+	Property<std::vector<CLiteraryText *>> Sections;
 	
 private:
 	CLiteraryText *MainText = nullptr;	/// the main literary text to which this one belongs, if it is a section
-	std::vector<CLiteraryText *> Sections;	/// the sections of the literary text, e.g. different chapters, or volumes
 	CLiteraryText *PreviousSection = nullptr;	/// the previous section to this one, if this is a section
 	CLiteraryText *NextSection = nullptr;	/// the next section to this one, if this is a section
 	std::vector<CLiteraryTextPage *> Pages;	/// pages of the literary text
