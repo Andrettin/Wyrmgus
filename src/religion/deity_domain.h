@@ -49,7 +49,7 @@ class CUpgrade;
 
 class CDeityDomain : public DetailedDataElement, public DataType<CDeityDomain>
 {
-	GDCLASS(CDeityDomain, DetailedDataElement)
+	DATA_TYPE(CDeityDomain, DetailedDataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "deity_domain";

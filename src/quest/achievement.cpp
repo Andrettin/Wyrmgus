@@ -70,22 +70,12 @@ void CAchievement::CheckAchievements()
 */
 bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "description") {
-		this->Description = value;
-	} else if (key == "player_color") {
+	if (key == "player_color") {
 		value = FindAndReplaceString(value, "_", "-");
 		CPlayerColor *player_color = CPlayerColor::Get(value);
 		if (player_color != nullptr) {
 			this->PlayerColor = player_color;
 		}
-	} else if (key == "character_level") {
-		this->CharacterLevel = std::stoi(value);
-	} else if (key == "difficulty") {
-		this->Difficulty = std::stoi(value);
-	} else if (key == "hidden") {
-		this->Hidden = StringToBool(value);
-	} else if (key == "unobtainable") {
-		this->Unobtainable = StringToBool(value);
 	} else if (key == "icon") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->Icon.Name = value;
@@ -245,9 +235,9 @@ int CAchievement::GetProgressMax() const
 
 void CAchievement::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_description"), &CAchievement::GetDescription);
+	ClassDB::bind_method(D_METHOD("get_description"), [](const CAchievement *achievement){ return achievement->Description.Get(); });
 	ClassDB::bind_method(D_METHOD("get_icon"), &CAchievement::GetIcon);
-	ClassDB::bind_method(D_METHOD("is_hidden"), &CAchievement::IsHidden);
+	ClassDB::bind_method(D_METHOD("is_hidden"), [](const CAchievement *achievement){ return achievement->Hidden.Get(); });
 	ClassDB::bind_method(D_METHOD("is_obtained"), &CAchievement::IsObtained);
 	ClassDB::bind_method(D_METHOD("get_player_color"), &CAchievement::GetPlayerColor);
 	ClassDB::bind_method(D_METHOD("get_progress"), &CAchievement::GetProgress);

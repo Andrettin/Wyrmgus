@@ -54,7 +54,7 @@ struct lua_State;
 
 class CSpecies : public DetailedDataElement, public DataType<CSpecies>
 {
-	GDCLASS(CSpecies, DetailedDataElement)
+	DATA_TYPE(CSpecies, DetailedDataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "species";

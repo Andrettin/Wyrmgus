@@ -80,11 +80,30 @@ public:
 
 class CMapTemplate : public DataElement, public DataType<CMapTemplate>
 {
-	GDCLASS(CMapTemplate, DataElement)
+	DATA_TYPE(CMapTemplate, DataElement)
 	
 public:
 	~CMapTemplate();
 
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("width", Width);
+		PROPERTY_KEY("height", Height);
+		PROPERTY_KEY("scale", Scale);
+		PROPERTY_KEY("priority", Priority);
+		PROPERTY_KEY("overland", Overland);
+		PROPERTY_KEY("output_terrain_image", OutputTerrainImage);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
+
+public:	
 	static constexpr const char *ClassIdentifier = "map_template";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
@@ -106,16 +125,16 @@ public:
 	std::string OverlayTerrainFile;
 	std::string TerrainImage;
 	std::string OverlayTerrainImage;
-	int Width = 0;
-	int Height = 0;
-	int Scale = 1;												/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
-	int SurfaceLayer = 0;										/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
-	int Priority = 0; //the priority of this map template, for the order of application of subtemplates
-	bool Overland = false;										/// Whether this is an overland map
-	bool OutputTerrainImage = false;
+	ExposedProperty<int> Width = 0;
+	ExposedProperty<int> Height = 0;
+	ExposedProperty<int> Scale = 1;						/// 1 means a map template tile will be applied as one in-game tile, 2 means a 2x2 in-game tile
+	int SurfaceLayer = 0;							/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
+	Property<int> Priority = 0;						/// the priority of this map template, for the order of application of subtemplates
+	Property<bool> Overland = false;				/// Whether this is an overland map
+	ExposedProperty<bool> OutputTerrainImage = false;
 	Vec2i SubtemplatePosition = Vec2i(-1, -1);
-	Vec2i MinPos = Vec2i(-1, -1); //the minimum position this (sub)template can be applied to (relative to the main template)
-	Vec2i MaxPos = Vec2i(-1, -1); //the maximum position this (sub)template can be applied to (relative to the main template)
+	Vec2i MinPos = Vec2i(-1, -1);	/// the minimum position this (sub)template can be applied to (relative to the main template)
+	Vec2i MaxPos = Vec2i(-1, -1);	/// the maximum position this (sub)template can be applied to (relative to the main template)
 	Vec2i CurrentStartPos = Vec2i(0, 0);
 	PixelSize PixelTileSize = Vec2i(32, 32);
 	CMapTemplate *MainTemplate = nullptr;						/// Main template in which this one is located, if this is a subtemplate

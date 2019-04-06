@@ -59,7 +59,22 @@ struct lua_State;
 
 class CCampaign : public DataElement, public DataType<CCampaign>
 {
-	GDCLASS(CCampaign, DataElement)
+	DATA_TYPE(CCampaign, DataElement)
+	
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("description", Description);
+		PROPERTY_KEY("hidden", Hidden);
+		PROPERTY_KEY("sandbox", Sandbox);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
 	
 public:
 	static constexpr const char *ClassIdentifier = "campaign";
@@ -76,11 +91,6 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
-	String GetDescription() const
-	{
-		return this->Description.c_str();
-	}
-	
 	const CDate &GetStartDate() const
 	{
 		return this->StartDate;
@@ -93,18 +103,15 @@ public:
 	
 	CSpecies *GetSpecies() const;
 	
-	bool IsHidden() const
-	{
-		return this->Hidden;
-	}
-	
 	bool IsAvailable() const;
 
+	ExposedProperty<String> Description;	/// Description of the campaign
 private:
-	std::string Description;		/// Description of the campaign
 	CDate StartDate;				/// The starting date of the campaign
-	bool Hidden = false;			/// Whether the campaign is hidden
-	bool Sandbox = false;			/// Whether the campaign is a sandbox one
+public:
+	ExposedProperty<bool> Hidden = false;	/// Whether the campaign is hidden
+	ExposedProperty<bool> Sandbox = false;	/// Whether the campaign is a sandbox one
+private:
 	std::vector<CQuest *> RequiredQuests;	/// Quests required by the campaign
 	CFaction *Faction = nullptr;	/// Which faction the player plays as in the campaign
 public:

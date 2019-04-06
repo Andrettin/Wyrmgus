@@ -59,7 +59,7 @@ public:
 
 class CSeasonSchedule : public CTimePeriodSchedule, public DataType<CSeasonSchedule>
 {
-	GDCLASS(CSeasonSchedule, CTimePeriodSchedule)
+	DATA_TYPE(CSeasonSchedule, CTimePeriodSchedule)
 	
 public:
 	~CSeasonSchedule();

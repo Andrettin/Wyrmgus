@@ -49,7 +49,7 @@ class CUpgrade;
 
 class CSchoolOfMagic : public DetailedDataElement, public DataType<CSchoolOfMagic>
 {
-	GDCLASS(CSchoolOfMagic, DetailedDataElement)
+	DATA_TYPE(CSchoolOfMagic, DetailedDataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "school_of_magic";

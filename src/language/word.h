@@ -152,7 +152,7 @@ enum WordJunctionTypes {
 
 class CWord : public DataElement, public DataType<CWord>
 {
-	GDCLASS(CWord, DataElement)
+	DATA_TYPE(CWord, DataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "word";

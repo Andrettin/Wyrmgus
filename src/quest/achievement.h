@@ -56,7 +56,24 @@ class CUnitType;
 
 class CAchievement : public DataElement, public DataType<CAchievement>
 {
-	GDCLASS(CAchievement, DataElement)
+	DATA_TYPE(CAchievement, DataElement)
+	
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("description", Description);
+		PROPERTY_KEY("character_level", CharacterLevel);
+		PROPERTY_KEY("difficulty", Difficulty);
+		PROPERTY_KEY("hidden", Hidden);
+		PROPERTY_KEY("unobtainable", Unobtainable);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
 	
 public:
 	static constexpr const char *ClassIdentifier = "achievement";
@@ -66,19 +83,9 @@ public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;
 	
-	String GetDescription() const
-	{
-		return this->Description.c_str();
-	}
-	
 	CIcon *GetIcon() const
 	{
 		return this->Icon.Icon;
-	}
-	
-	bool IsHidden() const
-	{
-		return this->Hidden;
 	}
 	
 	bool IsObtained() const
@@ -98,13 +105,13 @@ public:
 	int GetProgressMax() const;
 	
 public:
-	std::string Description;		/// Description of the achievement
-	CPlayerColor *PlayerColor = nullptr;	/// Player color used for the achievement's icon
-	int CharacterLevel = 0;			/// Character level required for the achievement
-	int Difficulty = -1;			/// Which difficulty the achievement's requirements need to be done in
-	bool Hidden = false;			/// Whether the achievement is hidden
-	bool Obtained = false;			/// Whether the achievement has been obtained
-	bool Unobtainable = false;		/// Whether this achievement can be obtained by checking for it or not
+	ExposedProperty<String> Description;		/// Description of the achievement
+	CPlayerColor *PlayerColor = nullptr;		/// Player color used for the achievement's icon
+	ExposedProperty<int> CharacterLevel = 0;	/// Character level required for the achievement
+	ExposedProperty<int> Difficulty = -1;		/// Which difficulty the achievement's requirements need to be done in
+	ExposedProperty<bool> Hidden = false;		/// Whether the achievement is hidden
+	bool Obtained = false;						/// Whether the achievement has been obtained
+	ExposedProperty<bool> Unobtainable = false;	/// Whether this achievement can be obtained by checking for it or not
 	IconConfig Icon;				/// Achievement's icon
 	const CCharacter *Character = nullptr;	/// Character related to the achievement's requirements
 	const CUnitType *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement

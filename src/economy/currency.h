@@ -43,7 +43,7 @@
 
 class Currency : public DetailedDataElement, public DataType<Currency>
 {
-	GDCLASS(Currency, DetailedDataElement)
+	DATA_TYPE(Currency, DetailedDataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "currency";

@@ -64,9 +64,7 @@ CHistoricalUnit::~CHistoricalUnit()
 */
 bool CHistoricalUnit::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "quantity") {
-		this->Quantity = std::stoi(value);
-	} else if (key == "unit_type") {
+	if (key == "unit_type") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->UnitType = UnitTypeByIdent(value);
 	} else if (key == "faction") {

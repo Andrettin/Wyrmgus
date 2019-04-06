@@ -72,7 +72,7 @@ private:
 		return true;
 	}
 	
-	static inline bool ClassInitialized = CAge::InitializeClass();
+	static inline bool ClassInitialized = InitializeClass();
 	
 public:
 	static constexpr const char *ClassIdentifier = "age";

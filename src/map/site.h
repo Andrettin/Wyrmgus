@@ -57,9 +57,22 @@ class CUniqueItem;
 
 class CSite : public DataElement, public DataType<CSite>
 {
-	GDCLASS(CSite, DataElement)
+	DATA_TYPE(CSite, DataElement)
 	
-public:
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("major", Major);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
+
+public:	
 	static constexpr const char *ClassIdentifier = "site";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
@@ -68,18 +81,18 @@ public:
 
 	std::string GetCulturalName(const CCivilization *civilization) const;
 
-	bool Major = false;											/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
-	Vec2i Position = Vec2i(-1, -1);								/// Position of the site in its map template
-	CMapTemplate *MapTemplate = nullptr;						/// Map template where this site is located
-	CUnit *SiteUnit = nullptr;									/// Unit which represents this site
-	std::vector<CRegion *> Regions;								/// Regions where this site is located
+	ExposedProperty<bool> Major = false;				/// Whether the site is a major one; major sites have settlement sites, and as such can have town halls
+	Vec2i Position = Vec2i(-1, -1);						/// Position of the site in its map template
+	CMapTemplate *MapTemplate = nullptr;				/// Map template where this site is located
+	CUnit *SiteUnit = nullptr;							/// Unit which represents this site
+	std::vector<CRegion *> Regions;						/// Regions where this site is located
 	std::vector<CFaction *> Cores;						/// Factions which have this site as a core
 	std::map<const CCivilization *, std::string> CulturalNames;	/// Names for the site for each different culture/civilization
-	std::map<CDate, const CFaction *> HistoricalOwners;				/// Historical owners of the site
+	std::map<CDate, const CFaction *> HistoricalOwners;			/// Historical owners of the site
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
-	std::vector<std::tuple<CDate, CDate, int, CUniqueItem *, const CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
-	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources; /// Historical resources, with start and end date; the integer at the end is the resource quantity
+	std::vector<std::tuple<CDate, CDate, int, CUniqueItem *, const CFaction *>> HistoricalBuildings;	/// Historical buildings, with start and end date
+	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources;	/// Historical resources, with start and end date; the integer at the end is the resource quantity
 
 protected:
 	static inline void _bind_methods() {}

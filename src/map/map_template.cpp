@@ -128,14 +128,6 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 		this->TerrainImage = value;
 	} else if (key == "overlay_terrain_image") {
 		this->OverlayTerrainImage = value;
-	} else if (key == "width") {
-		this->Width = std::stoi(value);
-	} else if (key == "height") {
-		this->Height = std::stoi(value);
-	} else if (key == "scale") {
-		this->Scale = std::stoi(value);
-	} else if (key == "priority") {
-		this->Priority = std::stoi(value);
 	} else if (key == "pixel_tile_width") {
 		this->PixelTileSize.x = std::stoi(value);
 	} else if (key == "pixel_tile_height") {
@@ -183,8 +175,6 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 				adjacent_template->AdjacentTemplates.push_back(this);
 			}
 		}
-	} else if (key == "overland") {
-		this->Overland = StringToBool(value);
 	} else if (key == "base_terrain_type") {
 		value = FindAndReplaceString(value, "_", "-");
 		CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
@@ -201,8 +191,6 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 		} else {
 			fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
 		}
-	} else if (key == "output_terrain_image") {
-		this->OutputTerrainImage = StringToBool(value);
 	} else {
 		return false;
 	}

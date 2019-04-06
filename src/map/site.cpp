@@ -57,9 +57,7 @@
 */
 bool CSite::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "major") {
-		this->Major = StringToBool(value);
-	} else if (key == "position_x") {
+	if (key == "position_x") {
 		this->Position.x = std::stoi(value);
 	} else if (key == "position_y") {
 		this->Position.y = std::stoi(value);

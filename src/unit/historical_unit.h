@@ -52,23 +52,37 @@ class CUnitType;
 
 class CHistoricalUnit : public DataElement, public DataType<CHistoricalUnit>
 {
-	GDCLASS(CHistoricalUnit, DataElement)
+	DATA_TYPE(CHistoricalUnit, DataElement)
 	
 public:
 	~CHistoricalUnit();
 	
+private:
+	/**
+	**	@brief	Initialize the class
+	*/
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("quantity", Quantity);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
+
+public:	
 	static constexpr const char *ClassIdentifier = "historical_unit";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	
 public:
-	CUnitType *UnitType = nullptr; //the unit's unit type
-	CFaction *Faction = nullptr; //the unit's faction
-	int Quantity = 1; //how many in-game units does this historical unit result in when applied
-	CDate StartDate; //when the unit starts being active
-	CDate EndDate; //when the unit ceases being active (e.g. when it is disbanded)
-	std::vector<CHistoricalLocation *> HistoricalLocations; //historical locations for the unit
+	CUnitType *UnitType = nullptr;	/// the unit's unit type
+	CFaction *Faction = nullptr;	/// the unit's faction
+	Property<int> Quantity = 1;	/// how many in-game units does this historical unit result in when applied
+	CDate StartDate;	/// when the unit starts being active
+	CDate EndDate;		/// when the unit ceases being active (e.g. when it is disbanded)
+	std::vector<CHistoricalLocation *> HistoricalLocations;	/// historical locations for the unit
 
 protected:
 	static inline void _bind_methods() {}

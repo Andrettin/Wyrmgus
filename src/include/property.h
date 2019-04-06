@@ -825,4 +825,81 @@ inline T operator + (const T &lhs, const ExposedPropertyBase<T> &rhs)
 	return lhs + rhs.Get();
 }
 
+//overload std::min and std::max so that they work as expected with the properties
+namespace std {
+	//std::min
+	template<class T>
+	constexpr const T &min(const PropertyBase<T> &a, const T &b)
+	{
+		return min(a.Get(), b);
+	}
+	
+	template<class T>
+	constexpr const T &min(const T &a, const PropertyBase<T> &b)
+	{
+		return min(a, b.Get());
+	}
+	
+	template<class T>
+	constexpr const T &min(const PropertyBase<T> &a, const PropertyBase<T> &b)
+	{
+		return min(a.Get(), b.Get());
+	}
+	
+	template<class T>
+	constexpr const T &min(const ExposedPropertyBase<T> &a, const T &b)
+	{
+		return min(a.Get(), b);
+	}
+	
+	template<class T>
+	constexpr const T &min(const T &a, const ExposedPropertyBase<T> &b)
+	{
+		return min(a, b.Get());
+	}
+	
+	template<class T>
+	constexpr const T &min(const ExposedPropertyBase<T> &a, const ExposedPropertyBase<T> &b)
+	{
+		return min(a.Get(), b.Get());
+	}
+	
+	//std::max
+	template<class T>
+	constexpr const T &max(const PropertyBase<T> &a, const T &b)
+	{
+		return max(a.Get(), b);
+	}
+	
+	template<class T>
+	constexpr const T &max(const T &a, const PropertyBase<T> &b)
+	{
+		return max(a, b.Get());
+	}
+	
+	template<class T>
+	constexpr const T &max(const PropertyBase<T> &a, const PropertyBase<T> &b)
+	{
+		return max(a.Get(), b.Get());
+	}
+	
+	template<class T>
+	constexpr const T &max(const ExposedPropertyBase<T> &a, const T &b)
+	{
+		return max(a.Get(), b);
+	}
+	
+	template<class T>
+	constexpr const T &max(const T &a, const ExposedPropertyBase<T> &b)
+	{
+		return max(a, b.Get());
+	}
+	
+	template<class T>
+	constexpr const T &max(const ExposedPropertyBase<T> &a, const ExposedPropertyBase<T> &b)
+	{
+		return max(a.Get(), b.Get());
+	}
+}
+
 #endif

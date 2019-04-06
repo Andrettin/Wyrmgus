@@ -539,7 +539,7 @@ static int CclGetCampaignData(lua_State *l)
 		lua_pushstring(l, campaign->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, campaign->Description.c_str());
+		lua_pushstring(l, campaign->Description.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "StartYear")) {
 		lua_pushnumber(l, campaign->StartDate.Year);
@@ -690,7 +690,7 @@ static int CclGetAchievementData(lua_State *l)
 		lua_pushstring(l, achievement->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, achievement->Description.c_str());
+		lua_pushstring(l, achievement->Description.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
 		lua_pushstring(l, achievement->GetPlayerColor()->GetIdent().utf8().get_data());

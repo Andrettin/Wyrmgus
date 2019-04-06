@@ -50,7 +50,7 @@ class CWord;
 
 class CLanguage : public DataElement, public DataType<CLanguage>
 {
-	GDCLASS(CLanguage, DataElement)
+	DATA_TYPE(CLanguage, DataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "language";

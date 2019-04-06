@@ -68,7 +68,7 @@ private:
 		return true;
 	}
 	
-	static inline bool ClassInitialized = CSpeciesCategory::InitializeClass();
+	static inline bool ClassInitialized = InitializeClass();
 	
 public:
 	static constexpr const char *ClassIdentifier = "species_category";

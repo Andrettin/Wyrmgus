@@ -43,7 +43,7 @@
 
 class CPantheon : public DetailedDataElement, public DataType<CPantheon>
 {
-	GDCLASS(CPantheon, DetailedDataElement)
+	DATA_TYPE(CPantheon, DetailedDataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "pantheon";

@@ -90,18 +90,12 @@ CCampaign *CCampaign::GetCurrentCampaign()
 */
 bool CCampaign::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "description") {
-		this->Description = value;
-	} else if (key == "faction") {
+	if (key == "faction") {
 		value = FindAndReplaceString(value, "_", "-");
 		CFaction *faction = CFaction::Get(value);
 		if (faction) {
 			this->Faction = faction;
 		}
-	} else if (key == "hidden") {
-		this->Hidden = StringToBool(value);
-	} else if (key == "sandbox") {
-		this->Sandbox = StringToBool(value);
 	} else if (key == "start_date") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->StartDate = CDate::FromString(value);
@@ -213,7 +207,7 @@ CSpecies *CCampaign::GetSpecies() const
 
 bool CCampaign::IsAvailable() const
 {
-	if (this->IsHidden()) {
+	if (this->Hidden) {
 		return false;
 	}
 	
@@ -228,8 +222,8 @@ bool CCampaign::IsAvailable() const
 
 void CCampaign::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_description"), &CCampaign::GetDescription);
-	ClassDB::bind_method(D_METHOD("is_hidden"), &CCampaign::IsHidden);
+	ClassDB::bind_method(D_METHOD("get_description"), [](const CCampaign *campaign){ return campaign->Description.Get(); });
+	ClassDB::bind_method(D_METHOD("is_hidden"), [](const CCampaign *campaign){ return campaign->Hidden.Get(); });
 	ClassDB::bind_method(D_METHOD("is_available"), &CCampaign::IsAvailable);
 }
 

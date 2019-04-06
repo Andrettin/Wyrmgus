@@ -87,7 +87,7 @@ constexpr int FreeWorkersCount (MaxCosts + 3);
 
 class CResource : public DataElement, public DataType<CResource>
 {
-	GDCLASS(CResource, DataElement)
+	DATA_TYPE(CResource, DataElement)
 	
 public:
 	static constexpr const char *ClassIdentifier = "resource";

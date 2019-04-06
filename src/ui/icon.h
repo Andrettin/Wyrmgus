@@ -119,7 +119,7 @@ private:
 		return true;
 	}
 	
-	static inline bool ClassInitialized = CIcon::InitializeClass();
+	static inline bool ClassInitialized = InitializeClass();
 	
 public:
 	static constexpr const char *ClassIdentifier = "icon";

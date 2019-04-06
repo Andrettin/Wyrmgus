@@ -60,7 +60,7 @@ constexpr int MINOR_DEITY_DOMAIN_MAX = 1; /// minor deities can only have one do
 
 class CDeity : public DataElement, public DataType<CDeity>
 {
-	GDCLASS(CDeity, DataElement)
+	DATA_TYPE(CDeity, DataElement)
 
 public:
 	static constexpr const char *ClassIdentifier = "deity";

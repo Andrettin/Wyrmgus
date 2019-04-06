@@ -77,7 +77,7 @@ private:
 	}
 
 	static inline std::map<std::string, std::function<PropertyCommonBase *(DataElement *)>> Properties;
-	static inline bool ClassInitialized = DataElement::InitializeClass();
+	static inline bool ClassInitialized = InitializeClass();
 	
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data);

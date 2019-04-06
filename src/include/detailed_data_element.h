@@ -72,7 +72,7 @@ private:
 		return true;
 	}
 	
-	static inline bool ClassInitialized = DetailedDataElement::InitializeClass();
+	static inline bool ClassInitialized = InitializeClass();
 	
 public:
 	ExposedProperty<String, DetailedDataElement> Description;	/// the description of the data element from an in-game universe perspective
