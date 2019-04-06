@@ -122,6 +122,19 @@ extern std::vector<std::string> SplitString(const std::string &str, const char *
 extern bool StringToBool(const std::string &str);
 extern bool IsStringNumber(const std::string &str);
 extern bool IsStringBool(const std::string &str);
+
+template <typename T>
+inline Array VectorToGodotArray(const std::vector<T> &vector)
+{
+	Array array;
+	
+	for (const T &element : vector) {
+		array.push_back(element);
+	}
+	
+	return array;
+}
+
 extern String NumberToRomanNumeral(unsigned number);
 extern std::string FormatNumber(const int number);
 extern std::string SnakeCaseToPascalCase(const std::string &str);
