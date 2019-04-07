@@ -311,7 +311,14 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			continue;
 		}
 		
-		if (config_data->Tag == "age") {
+		std::map<std::string, std::function<DataElement *(const std::string &)>>::iterator find_iterator = CConfigData::DataTypeGetOrAddFunctions.find(config_data->Tag);
+		
+		if (find_iterator != CConfigData::DataTypeGetOrAddFunctions.end()) {
+			DataElement *data_element = find_iterator->second(ident);
+			if (!define_only) {
+				data_element->ProcessConfigData(config_data);
+			}
+		} else if (config_data->Tag == "age") {
 			CAge *age = CAge::GetOrAdd(ident);
 			if (!define_only) {
 				age->ProcessConfigData(config_data);

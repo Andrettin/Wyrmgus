@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name config.h - The config header file. */
+/**@name unit_class.h - The unit class header file. */
 //
-//      (c) Copyright 2018-2019 by Andrettin
+//      (c) Copyright 2019 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,58 +27,38 @@
 //      02111-1307, USA.
 //
 
-#ifndef __CONFIG_H__
-#define __CONFIG_H__
+#ifndef __UNIT_CLASS_H__
+#define __UNIT_CLASS_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "config_property.h"
-
-#include <core/color.h>
-
-#include <functional>
-#include <map>
-#include <string>
-#include <vector>
-
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class DataElement;
+#include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CConfigData
+class UnitClass : public DataElement, public DataType<UnitClass>
 {
 public:
-	CConfigData(const std::string &tag) : Tag(tag)
-	{
-	}
-	
-	static void ParseConfigData(const std::string &filepath, const bool define_only);
+	DATA_TYPE(UnitClass, DataElement)
+
+public:
+	static constexpr const char *ClassIdentifier = "unit_class";
 	
 private:
-	static std::vector<std::string> ParseLine(const std::string &line);
-	static bool ParseEscapedCharacter(std::string &current_string, const char character);
-	static void ParseTokens(const std::vector<std::string> &tokens, CConfigData **current_config_data, std::vector<CConfigData *> &config_data_elements);
+	/**
+	**	@brief	Initialize the class
+	*/
+	static bool InitializeClass();
 	
-public:
-	static void ProcessConfigData(const std::vector<CConfigData *> &config_data_list, const bool define_only);
+	static inline bool ClassInitialized = InitializeClass();
 	
-	static inline std::map<std::string, std::function<DataElement *(const std::string &)>> DataTypeGetOrAddFunctions;	/// functions for getting or adding data type instances, mapped to the string identifier of their respective class
-	
-	Color ProcessColor() const;
-	
-	std::string Tag;
-	std::string Ident;
-	CConfigData *Parent = nullptr;
-	std::vector<CConfigProperty> Properties;
-	std::vector<CConfigData *> Sections;
+protected:
+	static inline void _bind_methods() {}
 };
 
 #endif

@@ -34,9 +34,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "economy/resource.h" //for the costs enum
 #include "ui/icon_config.h"
 #include "unit/unit_type.h" //for the image layers enum
-#include "upgrade/upgrade_structs.h" //for the costs enum
 
 #include <map>
 #include <string>
@@ -53,6 +53,10 @@ class CPlayerColorGraphic;
 class CSeason;
 class CTerrainType;
 class CUnitType;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
 
 class CUnitTypeVariation
 {
