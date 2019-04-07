@@ -260,6 +260,8 @@ public:
 private:
 	static inline std::vector<T *> Instances;
 	static inline std::map<std::string, T *> InstancesByIdent;
+	
+	friend T;
 };
 
 #endif
