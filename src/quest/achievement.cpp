@@ -235,9 +235,9 @@ int CAchievement::GetProgressMax() const
 
 void CAchievement::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_description"), [](const CAchievement *achievement){ return achievement->Description.Get(); });
+	BIND_PROPERTIES();
+	
 	ClassDB::bind_method(D_METHOD("get_icon"), &CAchievement::GetIcon);
-	ClassDB::bind_method(D_METHOD("is_hidden"), [](const CAchievement *achievement){ return achievement->Hidden.Get(); });
 	ClassDB::bind_method(D_METHOD("is_obtained"), &CAchievement::IsObtained);
 	ClassDB::bind_method(D_METHOD("get_player_color"), &CAchievement::GetPlayerColor);
 	ClassDB::bind_method(D_METHOD("get_progress"), &CAchievement::GetProgress);

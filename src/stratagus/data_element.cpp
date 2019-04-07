@@ -134,6 +134,7 @@ void DataElement::ProcessConfigData(const CConfigData *config_data)
 
 void DataElement::_bind_methods()
 {
+	BIND_PROPERTIES();
+	
 	ClassDB::bind_method(D_METHOD("get_ident"), &DataElement::GetIdent);
-	ClassDB::bind_method(D_METHOD("get_name"), [](const DataElement *data_element){ return data_element->Name.Get(); });
 }

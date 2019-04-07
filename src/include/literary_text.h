@@ -78,6 +78,8 @@ private:
 		PROPERTY_KEY("icon", Icon);
 		PROPERTY_KEY("sections", Sections);
 		
+		PropertyGetterPrefixes["lowercase_roman_numeral_page_numbering"] = "has";
+		
 		return true;
 	}
 	
@@ -137,7 +139,7 @@ public:
 	{
 		int page_count = 0;
 		
-		if (this->IsPageNumberingEnabled()) {
+		if (this->PageNumberingEnabled) {
 			page_count += static_cast<int>(this->GetPages().size());
 		}
 		
@@ -149,16 +151,6 @@ public:
 	}
 	
 	CLiteraryText *GetSection(const std::string &section_name) const;
-	
-	bool IsPageNumberingEnabled() const
-	{
-		return this->PageNumberingEnabled;
-	}
-	
-	bool HasLowercaseRomanNumeralPageNumbering() const
-	{
-		return this->LowercaseRomanNumeralPageNumbering;
-	}
 	
 private:	
 	void UpdateSectionPageNumbers() const;

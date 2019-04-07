@@ -121,7 +121,7 @@ CLiteraryText *CLiteraryText::GetSection(const std::string &section_name) const
 void CLiteraryText::UpdateSectionPageNumbers() const
 {
 	int page_offset = this->InitialPageNumber;
-	if (this->IsPageNumberingEnabled()) {
+	if (this->PageNumberingEnabled) {
 		page_offset += std::max(static_cast<int>(this->GetPages().size()), 1);
 	}
 	
@@ -138,21 +138,11 @@ void CLiteraryText::UpdateSectionPageNumbers() const
 
 void CLiteraryText::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_author"), [](const CLiteraryText *literary_text){ return literary_text->Author.Get(); });
-	ClassDB::bind_method(D_METHOD("is_hidden"), [](const CLiteraryText *literary_text){ return literary_text->Hidden.Get(); });
-	ClassDB::bind_method(D_METHOD("get_translator"), [](const CLiteraryText *literary_text){ return literary_text->Translator.Get(); });
-	ClassDB::bind_method(D_METHOD("get_publisher"), [](const CLiteraryText *literary_text){ return literary_text->Publisher.Get(); });
-	ClassDB::bind_method(D_METHOD("get_license"), [](const CLiteraryText *literary_text){ return literary_text->License.Get(); });
-	ClassDB::bind_method(D_METHOD("get_notes"), [](const CLiteraryText *literary_text){ return literary_text->Notes.Get(); });
-	ClassDB::bind_method(D_METHOD("get_publication_year"), [](const CLiteraryText *literary_text){ return literary_text->PublicationYear.Get(); });
-	ClassDB::bind_method(D_METHOD("get_initial_page_number"), [](const CLiteraryText *literary_text){ return literary_text->InitialPageNumber.Get(); });
-	ClassDB::bind_method(D_METHOD("get_icon"), [](const CLiteraryText *literary_text){ return literary_text->Icon.Get(); });
-	ClassDB::bind_method(D_METHOD("get_sections"), [](const CLiteraryText *literary_text){ return VectorToGodotArray(literary_text->Sections.Get()); });
+	BIND_PROPERTIES();
+	
 	ClassDB::bind_method(D_METHOD("get_main_text"), &CLiteraryText::GetMainText);
 	ClassDB::bind_method(D_METHOD("get_previous_section"), &CLiteraryText::GetPreviousSection);
 	ClassDB::bind_method(D_METHOD("get_next_section"), &CLiteraryText::GetNextSection);
 	ClassDB::bind_method(D_METHOD("get_first_page"), &CLiteraryText::GetFirstPage);
 	ClassDB::bind_method(D_METHOD("get_last_page"), &CLiteraryText::GetLastPage);
-	ClassDB::bind_method(D_METHOD("is_page_numbering_enabled"), &CLiteraryText::IsPageNumberingEnabled);
-	ClassDB::bind_method(D_METHOD("has_lowercase_roman_numeral_page_numbering"), &CLiteraryText::HasLowercaseRomanNumeralPageNumbering);
 }

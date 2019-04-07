@@ -54,6 +54,9 @@ class DataElement;
 extern std::string FindAndReplaceString(const std::string &text, const std::string &find, const std::string &replace);
 extern bool StringToBool(const std::string &str);
 
+template <typename T>
+Array VectorToGodotArray(const std::vector<T> &vector);
+
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
@@ -62,6 +65,8 @@ class PropertyCommonBase
 {
 public:
 	virtual ~PropertyCommonBase() {}
+	
+	virtual Variant ToVariant() const = 0;
 	
 protected:
 	virtual const PropertyCommonBase &operator =(const std::string &rhs) = 0;
@@ -84,6 +89,7 @@ public:
 	using GetterType = std::function<ReturnType()>;
 	using SetterType = std::function<void(ArgumentType)>;
 	
+protected:
 	PropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
 	{
 		this->Value = new T;
@@ -101,6 +107,17 @@ public:
 		}
 	}
 
+public:
+	virtual Variant ToVariant() const override
+	{
+		if constexpr(is_specialization_of<T, std::vector>::value) {
+			return VectorToGodotArray(this->Get());
+		} else {
+			return Variant(this->Get());
+		}
+	}
+
+public:	
 	T &operator *()
 	{
 		if (this->Value == nullptr) {

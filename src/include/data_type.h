@@ -66,10 +66,35 @@ protected: \
 	} \
 	\
 private: \
-	static inline std::map<std::string, std::function<PropertyCommonBase *(class_name *)>> Properties;
+	static inline std::map<std::string, std::function<PropertyCommonBase *(class_name *)>> Properties; \
+	static inline std::map<std::string, String> PropertyGetterPrefixes;
 	
 #define PROPERTY_KEY(property_key, property_variable) \
 	ThisClass::Properties.insert({property_key, std::function<PropertyCommonBase *(ThisClass *)>([](ThisClass *class_instance) -> PropertyCommonBase* { return &class_instance->property_variable; })});
+	
+#define BIND_PROPERTIES() \
+	for (std::map<std::string, std::function<PropertyCommonBase *(ThisClass *)>>::iterator iterator = ThisClass::Properties.begin(); iterator != ThisClass::Properties.end(); ++iterator) { \
+		const std::string &property_key = iterator->first; \
+		std::function<PropertyCommonBase *(ThisClass *)> property_function = iterator->second; \
+		/* temporary instance used to check the contained value in the property */ \
+		ThisClass temp_instance; \
+		PropertyCommonBase *property = property_function(&temp_instance); \
+		String method_name; \
+		\
+		std::map<std::string, String>::iterator getter_prefix_find_iterator = ThisClass::PropertyGetterPrefixes.find(property_key); \
+		if (getter_prefix_find_iterator != ThisClass::PropertyGetterPrefixes.end()) { \
+			method_name += getter_prefix_find_iterator->second + "_"; \
+		} else { \
+			if (dynamic_cast<PropertyBase<bool> *>(property)) { \
+				method_name += "is_"; \
+			} else { \
+				method_name += "get_"; \
+			} \
+		} \
+		\
+		method_name += property_key.c_str(); \
+		ClassDB::bind_method(MethodDefinition(method_name), [property_function](ThisClass *instance){ return property_function(instance)->ToVariant(); }); \
+	}
 
 /*----------------------------------------------------------------------------
 --  Declarations

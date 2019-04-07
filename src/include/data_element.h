@@ -77,6 +77,7 @@ private:
 	}
 
 	static inline std::map<std::string, std::function<PropertyCommonBase *(DataElement *)>> Properties;
+	static inline std::map<std::string, String> PropertyGetterPrefixes;
 	static inline bool ClassInitialized = InitializeClass();
 	
 public:

@@ -222,8 +222,8 @@ bool CCampaign::IsAvailable() const
 
 void CCampaign::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_description"), [](const CCampaign *campaign){ return campaign->Description.Get(); });
-	ClassDB::bind_method(D_METHOD("is_hidden"), [](const CCampaign *campaign){ return campaign->Hidden.Get(); });
+	BIND_PROPERTIES();
+	
 	ClassDB::bind_method(D_METHOD("is_available"), &CCampaign::IsAvailable);
 }
 
