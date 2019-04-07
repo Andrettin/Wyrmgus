@@ -45,31 +45,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Process a property in the data provided by a configuration file
-**
-**	@param	key		The property's key
-**	@param	value	The property's value
-**
-**	@return	True if the property can be processed, or false otherwise
-*/
-bool CTimeOfDay::ProcessConfigDataProperty(const std::string &key, std::string value)
-{
-	if (key == "dawn") {
-		this->Dawn = StringToBool(value);
-	} else if (key == "day") {
-		this->Day = StringToBool(value);
-	} else if (key == "dusk") {
-		this->Dusk = StringToBool(value);
-	} else if (key == "night") {
-		this->Night = StringToBool(value);
-	} else {
-		return false;
-	}
-	
-	return true;
-}
-
-/**
 **	@brief	Process a section in the data provided by a configuration file
 **
 **	@param	section		The section
@@ -131,8 +106,5 @@ bool CTimeOfDay::ProcessConfigDataSection(const CConfigData *section)
 
 void CTimeOfDay::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("is_dawn"), &CTimeOfDay::IsDawn);
-	ClassDB::bind_method(D_METHOD("is_day"), &CTimeOfDay::IsDay);
-	ClassDB::bind_method(D_METHOD("is_dusk"), &CTimeOfDay::IsDusk);
-	ClassDB::bind_method(D_METHOD("is_night"), &CTimeOfDay::IsNight);
+	BIND_PROPERTIES();
 }

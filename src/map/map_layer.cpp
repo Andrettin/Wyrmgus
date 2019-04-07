@@ -326,8 +326,8 @@ void CMapLayer::SetTimeOfDay(CScheduledTimeOfDay *time_of_day)
 		Wyrmgus::GetInstance()->emit_signal("time_of_day_changed", old_time_of_day ? old_time_of_day->TimeOfDay : nullptr, this->TimeOfDay ? this->TimeOfDay->TimeOfDay : nullptr);
 	}
 
-	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->IsDay()) != (old_time_of_day && old_time_of_day->TimeOfDay->IsDay());
-	const bool is_night_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->IsNight()) != (old_time_of_day && old_time_of_day->TimeOfDay->IsNight());
+	const bool is_day_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Day) != (old_time_of_day && old_time_of_day->TimeOfDay->Day);
+	const bool is_night_changed = (this->TimeOfDay && this->TimeOfDay->TimeOfDay->Night) != (old_time_of_day && old_time_of_day->TimeOfDay->Night);
 	
 	//update the sight of all units
 	if (is_day_changed || is_night_changed) {

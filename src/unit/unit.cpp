@@ -3088,10 +3088,10 @@ void UpdateUnitSightRange(CUnit &unit)
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
 	if (unit.MapLayer) {
-		if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->IsDay()) {
+		if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Day) {
 			unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
 		}
-		else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->IsNight()) {
+		else if (unit.MapLayer->GetTimeOfDay() && unit.MapLayer->GetTimeOfDay()->Night) {
 			unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
 		}
 	}
@@ -7957,7 +7957,7 @@ void CUnit::HandleBuffsEachSecond()
 			&& (this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Flags & MapFieldDesert)
 			&& this->MapLayer->Field(this->tilePos.x, this->tilePos.y)->Owner != this->Player->Index
 			&& this->MapLayer->GetTimeOfDay()
-			&& this->MapLayer->GetTimeOfDay()->IsDay()
+			&& this->MapLayer->GetTimeOfDay()->Day
 			&& this->GetVariableValue(HYDRATING_INDEX) <= 0
 			&& this->GetVariableValue(DEHYDRATIONIMMUNITY_INDEX) <= 0
 		) {
