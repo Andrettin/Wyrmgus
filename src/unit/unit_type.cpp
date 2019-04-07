@@ -1948,6 +1948,7 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("is_hidden"), &CUnitType::IsHidden);
 	ClassDB::bind_method(D_METHOD("is_hidden_in_editor"), &CUnitType::IsHiddenInEditor);
 	ClassDB::bind_method(D_METHOD("get_icon"), &CUnitType::GetIcon);
+	ClassDB::bind_method(D_METHOD("get_terrain_type"), [](const CUnitType *unit_type){ return unit_type->TerrainType; });
 	
 	ClassDB::bind_method(D_METHOD("get_copper_cost"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Costs[CopperCost]; });
 	ClassDB::bind_method(D_METHOD("get_lumber_cost"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Costs[WoodCost]; });
