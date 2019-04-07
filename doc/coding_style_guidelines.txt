@@ -4,12 +4,15 @@ Coding Style Guidelines for Wyrmgus
 
 2. Class, member variable and function names are in PascalCase.
 
-3. Local variable names are in snake_case.
+3. Function names generally begin with a verb in the imperative, for example: DoSomething().
 
-4. Prefer defining functions in headers if they don't require any external includes, so that the compiler is able to inline the functions if it deems optimal to do so, thus providing performance improvements.
+4. Local variable names are in snake_case.
 
-5. Braces are always used for "if" statements.
+5. Prefer defining functions in headers if they don't require any external includes, so that the compiler is able to inline the functions if it deems optimal to do so, thus providing performance improvements.
 
-6. Header files are included in the following order: first the "stratagus.h" header, then the header corresponding to the current source file, then the other Wyrmgus headers, then headers for other Godot modules, then Godot headers, then library headers, and finally standard library headers.
+6. Braces are always used for "if" statements.
 
-7. Documentation headers for functions are located where the function definition is, regardless of whether that is in a header or source file.
+7. Header files are included in the following order: first the "stratagus.h" header, then the header corresponding to the current source file, then the other Wyrmgus headers, then headers for other Godot modules, then Godot headers, then library headers, and finally standard library headers.
+
+8. Documentation headers for functions are located where the function definition is, regardless of whether that is in a header or source file.
+
