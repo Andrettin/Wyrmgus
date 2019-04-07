@@ -749,6 +749,11 @@ public:
 		return this->Icon.Icon;
 	}
 	
+	bool IsUnitUnitType() const
+	{
+		return !this->BoolFlag[BUILDING_INDEX].value && !this->BoolFlag[ITEM_INDEX].value && !this->BoolFlag[DECORATION_INDEX].value && !this->BoolFlag[VANISHES_INDEX].value;
+	}
+	
 	//Wyrmgus start
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
 	void UpdateDefaultBoolFlags();

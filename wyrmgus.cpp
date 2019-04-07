@@ -82,13 +82,7 @@ CCampaign *Wyrmgus::GetCampaign(String ident) const
 
 Array Wyrmgus::GetCampaigns() const
 {
-	Array campaigns;
-	
-	for (CCampaign *campaign : CCampaign::GetAll()) {
-		campaigns.push_back(campaign);
-	}
-	
-	return campaigns;
+	return VectorToGodotArray(CCampaign::GetAll());
 }
 
 void Wyrmgus::SetCurrentCampaign(String campaign_ident)
@@ -103,46 +97,22 @@ CCampaign *Wyrmgus::GetCurrentCampaign() const
 
 Array Wyrmgus::GetAchievements() const
 {
-	Array achievements;
-	
-	for (CAchievement *achievement : CAchievement::GetAll()) {
-		achievements.push_back(achievement);
-	}
-	
-	return achievements;
+	return VectorToGodotArray(CAchievement::GetAll());
 }
 
 Array Wyrmgus::GetUnitUnitTypes() const
 {
-	Array unit_types;
-	
-	for (CUnitType *unit_type : CUnitType::GetUnitUnitTypes()) {
-		unit_types.push_back(unit_type);
-	}
-	
-	return unit_types;
+	return VectorToGodotArray(CUnitType::GetUnitUnitTypes());
 }
 
 Array Wyrmgus::GetBuildingUnitTypes() const
 {
-	Array unit_types;
-	
-	for (CUnitType *unit_type : CUnitType::GetBuildingUnitTypes()) {
-		unit_types.push_back(unit_type);
-	}
-	
-	return unit_types;
+	return VectorToGodotArray(CUnitType::GetBuildingUnitTypes());
 }
 
 Array Wyrmgus::GetItemUnitTypes() const
 {
-	Array unit_types;
-	
-	for (CUnitType *unit_type : CUnitType::GetItemUnitTypes()) {
-		unit_types.push_back(unit_type);
-	}
-	
-	return unit_types;
+	return VectorToGodotArray(CUnitType::GetItemUnitTypes());
 }
 
 CPlayer *Wyrmgus::GetThisPlayer() const
@@ -157,13 +127,7 @@ CLiteraryText *Wyrmgus::GetLiteraryText(String ident) const
 
 Array Wyrmgus::GetLiteraryTexts() const
 {
-	Array literary_texts;
-	
-	for (CLiteraryText *literary_text : CLiteraryText::GetAll()) {
-		literary_texts.push_back(literary_text);
-	}
-	
-	return literary_texts;
+	return VectorToGodotArray(CLiteraryText::GetAll());
 }
 
 String Wyrmgus::NumberToRomanNumeral(unsigned number) const
