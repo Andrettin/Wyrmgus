@@ -49,14 +49,6 @@ public:
 public:
 	static constexpr const char *ClassIdentifier = "unit_class";
 	
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static bool InitializeClass();
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
 protected:
 	static inline void _bind_methods() {}
 };
