@@ -4226,8 +4226,9 @@ bool CPlayer::HasHero(const CCharacter *hero) const
 
 void CPlayer::_bind_methods()
 {
+	
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CPlayer::GetCivilization);
-	ClassDB::bind_method(D_METHOD("get_faction"), &CPlayer::GetFaction);
+	ClassDB::bind_method(D_METHOD("get_faction"), [](const CPlayer *player){ return const_cast<CFaction *>(player->GetFaction()); });
 	ClassDB::bind_method(D_METHOD("get_interface"), &CPlayer::GetInterface);
 	
 	ADD_SIGNAL(MethodInfo("civilization_changed", PropertyInfo(Variant::OBJECT, "old_civilization"), PropertyInfo(Variant::OBJECT, "new_civilization")));

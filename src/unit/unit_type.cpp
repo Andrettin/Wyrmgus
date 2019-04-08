@@ -1848,7 +1848,7 @@ std::string CUnitType::GetNamePlural() const
 	return GetPluralForm(this->Name.utf8().get_data());
 }
 
-std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
+std::string CUnitType::GeneratePersonalName(const CFaction *faction, const int gender) const
 {
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		return "";
@@ -1863,7 +1863,7 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 	return "";
 }
 
-bool CUnitType::IsPersonalNameValid(const std::string &name, CFaction *faction, int gender) const
+bool CUnitType::IsPersonalNameValid(const std::string &name, const CFaction *faction, const int gender) const
 {
 	if (name.empty()) {
 		return false;
@@ -1878,7 +1878,7 @@ bool CUnitType::IsPersonalNameValid(const std::string &name, CFaction *faction, 
 	return false;
 }
 
-std::vector<std::string> CUnitType::GetPotentialPersonalNames(CFaction *faction, int gender) const
+std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *faction, const int gender) const
 {
 	std::vector<std::string> potential_names;
 	

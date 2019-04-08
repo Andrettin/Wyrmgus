@@ -99,7 +99,7 @@ public:
 	std::string AIScript;
 	int Race = 0;
 	//Wyrmgus start
-	CFaction *Faction = nullptr;
+	const CFaction *Faction = nullptr;
 	//Wyrmgus end
 	int Team = 0;
 	int Type = 0;
@@ -127,7 +127,7 @@ public:
 	int Type = 0;
 	int Race = 0;
 	//Wyrmgus start
-	CFaction *Faction = nullptr;
+	const CFaction *Faction = nullptr;
 	//Wyrmgus end
 	int LocalPlayer = 0;
 	MPPlayer Players[PlayerMax];
@@ -644,7 +644,7 @@ static int CclReplayLog(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "Faction")) {
 			const std::string faction_ident = LuaToString(l, -1);
-			CFaction *faction = CFaction::Get(faction_ident);
+			const CFaction *faction = CFaction::Get(faction_ident);
 			if (faction != nullptr) {
 				replay->Faction = faction;
 			}
@@ -675,7 +675,7 @@ static int CclReplayLog(lua_State *l)
 					//Wyrmgus start
 					} else if (!strcmp(value, "Faction")) {
 						const std::string faction_ident = LuaToString(l, -1);
-						CFaction *faction = CFaction::Get(faction_ident);
+						const CFaction *faction = CFaction::Get(faction_ident);
 						if (faction != nullptr) {
 							replay->Players[j].Faction = faction;
 						}

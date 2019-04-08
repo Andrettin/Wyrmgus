@@ -131,9 +131,9 @@ public:
 	void SetFaction(const CFaction *faction);
 	void SetRandomFaction();
 	
-	CFaction *GetFaction() const
+	const CFaction *GetFaction() const
 	{
-		return const_cast<CFaction *>(this->Faction);
+		return this->Faction;
 	}
 
 	void SetDynasty(CDynasty *dynasty);

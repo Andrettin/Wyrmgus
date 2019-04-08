@@ -766,9 +766,9 @@ public:
 	CPlayerColorGraphic *GetDefaultLayerSprite(const CPlayer *player, const int image_layer) const;
 	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
-	std::string GeneratePersonalName(CFaction *faction, int gender) const;
-	bool IsPersonalNameValid(const std::string &name, CFaction *faction, int gender) const;
-	std::vector<std::string> GetPotentialPersonalNames(CFaction *faction, int gender) const;
+	std::string GeneratePersonalName(const CFaction *faction, const int gender) const;
+	bool IsPersonalNameValid(const std::string &name, const CFaction *faction, const int gender) const;
+	std::vector<std::string> GetPotentialPersonalNames(const CFaction *faction, const int gender) const;
 	//Wyrmgus end
 
 public:
