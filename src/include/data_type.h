@@ -34,6 +34,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "config.h"
+
+#include <functional>
 #include <map>
 #include <string>
 #include <vector>
@@ -99,6 +102,10 @@ private: \
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+class CCivilization;
+class CFaction;
+class DataElement;
 
 template <typename T, typename O>
 class ExposedProperty;
@@ -258,8 +265,22 @@ public:
 	}
 	
 private:
+	/**
+	**	@brief	Initialize the factory function for the class
+	*/
+	static inline bool InitializeClassFactoryFunction()
+	{
+		if constexpr(!std::is_same_v<T, CCivilization> && !std::is_same_v<T, CFaction>) {
+			//FIXME: this conditional is only temporarily needed while the civilization and faction classes don't inherit from DataElement
+			CConfigData::DataTypeGetOrAddFunctions[T::ClassIdentifier] = std::function<DataElement *(const std::string &)>(DataType<T>::GetOrAdd);
+		}
+		
+		return true;
+	}
+	
 	static inline std::vector<T *> Instances;
 	static inline std::map<std::string, T *> InstancesByIdent;
+	static inline bool ClassFactoryFunctionInitialized = DataType<T>::InitializeClassFactoryFunction();
 	
 	friend T;
 };

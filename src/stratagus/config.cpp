@@ -35,48 +35,21 @@
 
 #include "config.h"
 
-#include "age.h"
 #include "animation/animation.h"
 #include "character.h"
 #include "config_operator.h"
 #include "config_property.h"
-#include "dynasty.h"
-#include "economy/currency.h"
 #include "game/game.h"
 #include "game/trigger.h"
-#include "hair_color.h"
 #include "iocompat.h"
 #include "iolib.h"
-#include "language/language.h"
-#include "language/word.h"
-#include "literary_text.h"
-#include "map/map_template.h"
-#include "map/site.h"
 #include "map/terrain_type.h"
 #include "missile/missile_type.h"
-#include "player_color.h"
-#include "quest/campaign.h"
-#include "religion/deity.h"
-#include "religion/deity_domain.h"
-#include "religion/pantheon.h"
-#include "religion/religion.h"
-#include "school_of_magic.h"
-#include "skin_color.h"
 #include "sound/sound.h"
-#include "species/species.h"
-#include "species/species_category.h"
-#include "species/species_category_rank.h"
 #include "spell/spells.h"
 #include "time/calendar.h"
-#include "time/season.h"
-#include "time/season_schedule.h"
-#include "time/time_of_day.h"
-#include "time/time_of_day_schedule.h"
-#include "time/timeline.h"
 #include "ui/button_action.h"
 #include "ui/button_level.h"
-#include "ui/icon.h"
-#include "unit/historical_unit.h"
 #include "unit/unit_type.h"
 #include "util.h"
 #include "world/plane.h"
@@ -318,11 +291,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				data_element->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "age") {
-			CAge *age = CAge::GetOrAdd(ident);
-			if (!define_only) {
-				age->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "animations") {
 			CAnimations *animations = AnimationsByIdent(ident);
 			if (!animations) {
@@ -347,11 +315,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				calendar->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "campaign") {
-			CCampaign *campaign = CCampaign::GetOrAdd(ident);
-			if (!define_only) {
-				campaign->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "character") {
 			CCharacter *character = nullptr;
 			if (LoadingHistory) {
@@ -366,56 +329,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				character->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "currency") {
-			Currency *currency = Currency::GetOrAdd(ident);
-			if (!define_only) {
-				currency->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "deity") {
-			CDeity *deity = CDeity::GetOrAdd(ident);
-			if (!define_only) {
-				deity->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "deity_domain") {
-			CDeityDomain *deity_domain = CDeityDomain::GetOrAdd(ident);
-			if (!define_only) {
-				deity_domain->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "dynasty") {
-			CDynasty *dynasty = CDynasty::GetOrAdd(ident);
-			if (!define_only) {
-				dynasty->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "hair_color") {
-			CHairColor *hair_color = CHairColor::GetOrAdd(ident);
-			if (!define_only) {
-				hair_color->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "historical_unit") {
-			CHistoricalUnit *historical_unit = CHistoricalUnit::GetOrAdd(ident);
-			if (!define_only) {
-				historical_unit->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "icon") {
-			CIcon *icon = CIcon::GetOrAdd(ident);
-			if (!define_only) {
-				icon->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "language") {
-			CLanguage *language = CLanguage::GetOrAdd(ident);
-			if (!define_only) {
-				language->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "literary_text") {
-			CLiteraryText *literary_text = CLiteraryText::GetOrAdd(ident);
-			if (!define_only) {
-				literary_text->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "map_template") {
-			CMapTemplate *map_template = CMapTemplate::GetOrAdd(ident);
-			if (!define_only) {
-				map_template->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "missile_type") {
 			MissileType *missile_type = MissileTypeByIdent(ident);
 			if (!missile_type) {
@@ -424,69 +337,14 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "pantheon") {
-			CPantheon *pantheon = CPantheon::GetOrAdd(ident);
-			if (!define_only) {
-				pantheon->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "plane") {
 			CPlane *plane = CPlane::GetOrAddPlane(ident);
 			if (!define_only) {
 				plane->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "player_color") {
-			CPlayerColor *player_color = CPlayerColor::GetOrAdd(ident);
-			if (!define_only) {
-				player_color->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "religion") {
-			CReligion *religion = CReligion::GetOrAdd(ident);
-			if (!define_only) {
-				religion->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "school_of_magic") {
-			CSchoolOfMagic *school_of_magic = CSchoolOfMagic::GetOrAdd(ident);
-			if (!define_only) {
-				school_of_magic->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "season") {
-			CSeason *season = CSeason::GetOrAdd(ident);
-			if (!define_only) {
-				season->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "season_schedule") {
-			CSeasonSchedule *season_schedule = CSeasonSchedule::GetOrAdd(ident);
-			if (!define_only) {
-				season_schedule->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "site") {
-			CSite *site = CSite::GetOrAdd(ident);
-			if (!define_only) {
-				site->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "skin_color") {
-			CSkinColor *skin_color = CSkinColor::GetOrAdd(ident);
-			if (!define_only) {
-				skin_color->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "sound") {
 			if (!define_only) {
 				CSound::ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "species") {
-			CSpecies *species = CSpecies::GetOrAdd(ident);
-			if (!define_only) {
-				species->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "species_category") {
-			CSpeciesCategory *species_category = CSpeciesCategory::GetOrAdd(ident);
-			if (!define_only) {
-				species_category->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "species_category_rank") {
-			CSpeciesCategoryRank *species_category_rank = CSpeciesCategoryRank::GetOrAdd(ident);
-			if (!define_only) {
-				species_category_rank->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "spell") {
 			CSpell *spell = CSpell::GetOrAddSpell(ident);
@@ -497,21 +355,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(ident);
 			if (!define_only) {
 				terrain_type->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "timeline") {
-			CTimeline *timeline = CTimeline::GetOrAdd(ident);
-			if (!define_only) {
-				timeline->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "time_of_day") {
-			CTimeOfDay *time_of_day = CTimeOfDay::GetOrAdd(ident);
-			if (!define_only) {
-				time_of_day->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "time_of_day_schedule") {
-			CTimeOfDaySchedule *time_of_day_schedule = CTimeOfDaySchedule::GetOrAdd(ident);
-			if (!define_only) {
-				time_of_day_schedule->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "trigger") {
 			CTrigger *trigger = CTrigger::GetOrAddTrigger(ident);
@@ -530,11 +373,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CUpgrade *upgrade = CUpgrade::New(ident);
 			if (!define_only) {
 				upgrade->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "word") {
-			CWord *word = CWord::GetOrAdd(ident);
-			if (!define_only) {
-				word->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "world") {
 			CWorld *world = CWorld::GetOrAddWorld(ident);
