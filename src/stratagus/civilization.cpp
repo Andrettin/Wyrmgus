@@ -40,23 +40,24 @@
 #include "player.h"
 #include "player_color.h"
 #include "time/calendar.h"
+#include "unit/unit_class.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-int CCivilization::GetCivilizationClassUnitType(const CCivilization *civilization, const int class_id)
+int CCivilization::GetCivilizationClassUnitType(const CCivilization *civilization, const UnitClass *unit_class)
 {
-	if (civilization == nullptr || class_id == -1) {
+	if (civilization == nullptr || unit_class == nullptr) {
 		return -1;
 	}
 	
-	if (civilization->ClassUnitTypes.find(class_id) != civilization->ClassUnitTypes.end()) {
-		return civilization->ClassUnitTypes.find(class_id)->second;
+	if (civilization->ClassUnitTypes.find(unit_class) != civilization->ClassUnitTypes.end()) {
+		return civilization->ClassUnitTypes.find(unit_class)->second;
 	}
 	
 	if (civilization->ParentCivilization) {
-		return CCivilization::GetCivilizationClassUnitType(civilization->ParentCivilization, class_id);
+		return CCivilization::GetCivilizationClassUnitType(civilization->ParentCivilization, unit_class);
 	}
 	
 	return -1;

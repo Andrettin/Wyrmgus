@@ -165,6 +165,7 @@
 //Wyrmgus end
 #include "script.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
 //Wyrmgus end
@@ -217,7 +218,7 @@ static void AiCheckUnits()
 	for (int i = 0; i < n; ++i) {
 		const unsigned int t = AiPlayer->UnitTypeRequests[i].Type->Slot;
 		const int x = AiPlayer->UnitTypeRequests[i].Count;
-		const int unit_class = AiPlayer->UnitTypeRequests[i].Type->Class;
+		const UnitClass *unit_class = AiPlayer->UnitTypeRequests[i].Type->Class;
 
 		// Add equivalent units
 		int e = AiPlayer->Player->GetUnitTypeAiActiveCount(AiPlayer->UnitTypeRequests[i].Type);
@@ -226,9 +227,8 @@ static void AiCheckUnits()
 				e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][j]);
 			}
 		}
-		if (unit_class != -1) {
-			for (size_t j = 0; j < ClassUnitTypes[unit_class].size(); ++j) {
-				const CUnitType *class_unit_type = ClassUnitTypes[unit_class][j];
+		if (unit_class != nullptr) {
+			for (const CUnitType *class_unit_type : unit_class->UnitTypes) {
 				if (class_unit_type != AiPlayer->UnitTypeRequests[i].Type) {
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 				}

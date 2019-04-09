@@ -67,6 +67,7 @@
 #include "ui/button_level.h"
 #include "ui/icon.h"
 #include "ui/ui.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/dependency.h"
 //Wyrmgus start
@@ -501,9 +502,6 @@ std::vector<int> LuxuryResources;
 std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 //Wyrmgus start
-std::vector<std::string> UnitTypeClasses;
-std::map<std::string, int> UnitTypeClassStringToIndex;
-std::vector<std::vector<CUnitType *>> ClassUnitTypes;
 std::vector<std::string> UpgradeClasses;
 std::map<std::string, int> UpgradeClassStringToIndex;
 CUnitType *SettlementSiteUnitType;
@@ -1162,12 +1160,12 @@ void CUnitType::Initialize()
 	this->RemoveButtons(ButtonStandGround);
 	this->RemoveButtons(ButtonReturn);
 	
-	if (this->Class != -1) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
-		int class_id = this->Class;
+	if (this->Class != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
+		const UnitClass *unit_class = this->Class;
 
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (CCivilization *civilization : CCivilization::GetAll()) {
-			for (std::map<int, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
+			for (std::map<const UnitClass *, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
 				if (iterator->second == this->Slot) {
 					civilization->ClassUnitTypes.erase(iterator->first);
 					break;
@@ -1175,7 +1173,7 @@ void CUnitType::Initialize()
 			}
 		}
 		for (CFaction *faction : CFaction::GetAll()) {
-			for (std::map<int, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
+			for (std::map<const UnitClass *, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
 				if (iterator->second == this->Slot) {
 					faction->ClassUnitTypes.erase(iterator->first);
 					break;
@@ -1183,11 +1181,11 @@ void CUnitType::Initialize()
 			}
 		}
 		
-		if (this->GetCivilization() != nullptr && class_id != -1) {
+		if (this->GetCivilization() != nullptr && unit_class != nullptr) {
 			if (this->Faction != nullptr) {
-				this->Faction->ClassUnitTypes[class_id] = this->Slot;
+				this->Faction->ClassUnitTypes[unit_class] = this->Slot;
 			} else {
-				this->GetCivilization()->ClassUnitTypes[class_id] = this->Slot;
+				this->GetCivilization()->ClassUnitTypes[unit_class] = this->Slot;
 			}
 		}
 	}
@@ -1389,8 +1387,8 @@ void CUnitType::SetParent(CUnitType *parent_type)
 		this->Name = parent_type->Name;
 	}
 	this->Class = parent_type->Class;
-	if (this->Class != -1 && std::find(ClassUnitTypes[this->Class].begin(), ClassUnitTypes[this->Class].end(), this) == ClassUnitTypes[this->Class].end()) {
-		ClassUnitTypes[this->Class].push_back(this);
+	if (this->Class != nullptr && std::find(this->Class->UnitTypes.begin(), this->Class->UnitTypes.end(), this) == this->Class->UnitTypes.end()) {
+		this->Class->UnitTypes.push_back(this);
 	}
 	this->DrawLevel = parent_type->DrawLevel;
 	this->File = parent_type->File;
@@ -1917,7 +1915,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 				}
 			}
 		} else {
-			if (this->Class != -1 && civilization->GetUnitClassNames(this->Class).size() > 0) {
+			if (this->Class != nullptr && civilization->GetUnitClassNames(this->Class).size() > 0) {
 				return civilization->GetUnitClassNames(this->Class);
 			}
 			
@@ -2450,35 +2448,6 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 }
 
 //Wyrmgus start
-int GetUnitTypeClassIndexByName(const std::string &class_name)
-{
-	if (class_name.empty()) {
-		return -1;
-	}
-	
-	if (UnitTypeClassStringToIndex.find(class_name) != UnitTypeClassStringToIndex.end()) {
-		return UnitTypeClassStringToIndex.find(class_name)->second;
-	}
-	return -1;
-}
-
-int GetOrAddUnitTypeClassIndexByName(const std::string &class_name)
-{
-	int index = GetUnitTypeClassIndexByName(class_name);
-	if (index == -1 && !class_name.empty()) {
-		SetUnitTypeClassStringToIndex(class_name, UnitTypeClasses.size());
-		index = UnitTypeClasses.size();
-		UnitTypeClasses.push_back(class_name);
-		ClassUnitTypes.resize(UnitTypeClasses.size());
-	}
-	return index;
-}
-
-void SetUnitTypeClassStringToIndex(const std::string &class_name, int class_id)
-{
-	UnitTypeClassStringToIndex[class_name] = class_id;
-}
-
 int GetUpgradeClassIndexByName(const std::string &class_name)
 {
 	if (UpgradeClassStringToIndex.find(class_name) != UpgradeClassStringToIndex.end()) {

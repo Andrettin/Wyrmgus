@@ -38,6 +38,7 @@
 #include "data_type.h"
 #include "literary_text.h"
 #include "ui/icon.h"
+#include "unit/unit_type.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -147,13 +148,16 @@ template const PropertyBase<bool> &PropertyBase<bool>::operator =(const std::str
 template const PropertyBase<String> &PropertyBase<String>::operator =(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator =(const std::string &rhs);
 template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator =(const std::string &rhs);
+template const PropertyBase<std::vector<CUnitType *>> &PropertyBase<std::vector<CUnitType *>>::operator =(const std::string &rhs);
 template const PropertyBase<int> &PropertyBase<int>::operator +=(const std::string &rhs);
 template const PropertyBase<bool> &PropertyBase<bool>::operator +=(const std::string &rhs);
 template const PropertyBase<String> &PropertyBase<String>::operator +=(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator +=(const std::string &rhs);
 template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator +=(const std::string &rhs);
+template const PropertyBase<std::vector<CUnitType *>> &PropertyBase<std::vector<CUnitType *>>::operator +=(const std::string &rhs);
 template const PropertyBase<int> &PropertyBase<int>::operator -=(const std::string &rhs);
 template const PropertyBase<bool> &PropertyBase<bool>::operator -=(const std::string &rhs);
 template const PropertyBase<String> &PropertyBase<String>::operator -=(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator -=(const std::string &rhs);
 template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator -=(const std::string &rhs);
+template const PropertyBase<std::vector<CUnitType *>> &PropertyBase<std::vector<CUnitType *>>::operator -=(const std::string &rhs);

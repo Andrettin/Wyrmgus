@@ -55,6 +55,7 @@
 #include "time/calendar.h"
 #include "ui/icon.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type_variation.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
@@ -641,7 +642,7 @@ void CCharacter::GenerateMissingDates()
 
 int CCharacter::GetMartialAttribute() const
 {
-	if ((this->Type->Class != -1 && UnitTypeClasses[this->Type->Class] == "thief") || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
+	if ((this->Type->Class != nullptr && this->Type->Class->Ident == "thief") || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
 		return DexterityAttribute;
 	} else {
 		return StrengthAttribute;

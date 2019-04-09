@@ -89,6 +89,7 @@
 #include "ui/icon.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 //Wyrmgus start
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
@@ -728,57 +729,66 @@ void CPlayer::Save(CFile &file) const
 
 	//Wyrmgus start
 	file.printf("\n  \"current-quests\", {");
-	for (size_t j = 0; j < this->CurrentQuests.size(); ++j) {
-		if (j) {
+	bool first = true;
+	for (const CQuest *current_quest : this->CurrentQuests) {
+		if (first) {
+			first = false;
+		} else {
 			file.printf(" ");
 		}
-		file.printf("\"%s\",", this->CurrentQuests[j]->Ident.c_str());
+		file.printf("\"%s\",", current_quest->Ident.c_str());
 	}
 	file.printf("},");
 	
 	file.printf("\n  \"completed-quests\", {");
-	for (size_t j = 0; j < this->CompletedQuests.size(); ++j) {
-		if (j) {
+	first = true;
+	for (const CQuest *completed_quest : this->CompletedQuests) {
+		if (first) {
+			first = false;
+		} else {
 			file.printf(" ");
 		}
-		file.printf("\"%s\",", this->CompletedQuests[j]->Ident.c_str());
+		file.printf("\"%s\",", completed_quest->Ident.c_str());
 	}
 	file.printf("},");
 	
 	file.printf("\n  \"quest-objectives\", {");
-	for (size_t j = 0; j < this->QuestObjectives.size(); ++j) {
-		if (j) {
+	first = true;
+	for (const CPlayerQuestObjective *objective : this->QuestObjectives) {
+		if (first) {
+			first = false;
+		} else {
 			file.printf(" ");
 		}
 		file.printf("{");
-		file.printf("\"quest\", \"%s\",", this->QuestObjectives[j]->Quest->Ident.c_str());
-		file.printf("\"objective-type\", \"%s\",", GetQuestObjectiveTypeNameById(this->QuestObjectives[j]->ObjectiveType).c_str());
-		file.printf("\"objective-string\", \"%s\",", this->QuestObjectives[j]->ObjectiveString.c_str());
-		file.printf("\"quantity\", %i,", this->QuestObjectives[j]->Quantity);
-		file.printf("\"counter\", %i,", this->QuestObjectives[j]->Counter);
-		if (this->QuestObjectives[j]->Resource != -1) {
-			file.printf("\"resource\", \"%s\",", DefaultResourceNames[this->QuestObjectives[j]->Resource].c_str());
+		file.printf("\"quest\", \"%s\",", objective->Quest->Ident.c_str());
+		file.printf("\"objective-type\", \"%s\",", GetQuestObjectiveTypeNameById(objective->ObjectiveType).c_str());
+		file.printf("\"objective-string\", \"%s\",", objective->ObjectiveString.c_str());
+		file.printf("\"quantity\", %i,", objective->Quantity);
+		file.printf("\"counter\", %i,", objective->Counter);
+		if (objective->Resource != -1) {
+			file.printf("\"resource\", \"%s\",", DefaultResourceNames[objective->Resource].c_str());
 		}
-		if (this->QuestObjectives[j]->UnitClass != -1) {
-			file.printf("\"unit-class\", \"%s\",", UnitTypeClasses[this->QuestObjectives[j]->UnitClass].c_str());
+		if (objective->UnitClass != nullptr) {
+			file.printf("\"unit-class\", \"%s\",", objective->UnitClass->Ident.c_str());
 		}
-		for (const CUnitType *unit_type : this->QuestObjectives[j]->UnitTypes) {
+		for (const CUnitType *unit_type : objective->UnitTypes) {
 			file.printf("\"unit-type\", \"%s\",", unit_type->Ident.c_str());
 		}
-		if (this->QuestObjectives[j]->Upgrade) {
-			file.printf("\"upgrade\", \"%s\",", this->QuestObjectives[j]->Upgrade->Ident.c_str());
+		if (objective->Upgrade) {
+			file.printf("\"upgrade\", \"%s\",", objective->Upgrade->Ident.c_str());
 		}
-		if (this->QuestObjectives[j]->Character) {
-			file.printf("\"character\", \"%s\",", this->QuestObjectives[j]->Character->Ident.c_str());
+		if (objective->Character) {
+			file.printf("\"character\", \"%s\",", objective->Character->Ident.c_str());
 		}
-		if (this->QuestObjectives[j]->Unique) {
-			file.printf("\"unique\", \"%s\",", this->QuestObjectives[j]->Unique->Ident.c_str());
+		if (objective->Unique) {
+			file.printf("\"unique\", \"%s\",", objective->Unique->Ident.c_str());
 		}
-		if (this->QuestObjectives[j]->Settlement) {
-			file.printf("\"settlement\", \"%s\",", this->QuestObjectives[j]->Settlement->Ident.c_str());
+		if (objective->Settlement) {
+			file.printf("\"settlement\", \"%s\",", objective->Settlement->Ident.c_str());
 		}
-		if (this->QuestObjectives[j]->Faction) {
-			file.printf("\"faction\", \"%s\",", this->QuestObjectives[j]->Faction->GetIdent().utf8().get_data());
+		if (objective->Faction) {
+			file.printf("\"faction\", \"%s\",", objective->Faction->GetIdent().utf8().get_data());
 		}
 		file.printf("},");
 	}
@@ -808,7 +818,7 @@ void CPlayer::Save(CFile &file) const
 
 	file.printf("\n  \"timers\", {");
 	//Wyrmgus start
-	bool first = true;
+	first = true;
 	//Wyrmgus end
 	for (int j = 0; j < UpgradeMax; ++j) {
 		//Wyrmgus start
@@ -1518,13 +1528,13 @@ bool CPlayer::HasSettlementNearWaterZone(int water_zone) const
 {
 	std::vector<CUnit *> settlement_unit_table;
 	
-	int town_hall_type_id = CFaction::GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("town-hall"));			
+	int town_hall_type_id = CFaction::GetFactionClassUnitType(this->Faction, UnitClass::Get("town-hall"));			
 	if (town_hall_type_id == -1) {
 		return false;
 	}
 	CUnitType *town_hall_type = CUnitType::UnitTypes[town_hall_type_id];
 	
-	int stronghold_type_id = CFaction::GetFactionClassUnitType(this->Faction, GetUnitTypeClassIndexByName("stronghold"));			
+	int stronghold_type_id = CFaction::GetFactionClassUnitType(this->Faction, UnitClass::Get("stronghold"));			
 	CUnitType *stronghold_type = nullptr;
 	if (stronghold_type_id != -1) {
 		stronghold_type = CUnitType::UnitTypes[stronghold_type_id];
@@ -2411,21 +2421,21 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	this->AvailableQuests.erase(std::remove(this->AvailableQuests.begin(), this->AvailableQuests.end(), quest), this->AvailableQuests.end());
 	this->CurrentQuests.push_back(quest);
 	
-	for (size_t i = 0; i < quest->Objectives.size(); ++i) {
-		CPlayerQuestObjective *objective = new CPlayerQuestObjective;
-		objective->ObjectiveType = quest->Objectives[i]->ObjectiveType;
-		objective->Quest = quest->Objectives[i]->Quest;
-		objective->ObjectiveString = quest->Objectives[i]->ObjectiveString;
-		objective->Quantity = quest->Objectives[i]->Quantity;
-		objective->Resource = quest->Objectives[i]->Resource;
-		objective->UnitClass = quest->Objectives[i]->UnitClass;
-		objective->UnitTypes = quest->Objectives[i]->UnitTypes;
-		objective->Upgrade = quest->Objectives[i]->Upgrade;
-		objective->Character = quest->Objectives[i]->Character;
-		objective->Unique = quest->Objectives[i]->Unique;
-		objective->Settlement = quest->Objectives[i]->Settlement;
-		objective->Faction = quest->Objectives[i]->Faction;
-		this->QuestObjectives.push_back(objective);
+	for (const CQuestObjective *quest_objective : quest->Objectives) {
+		CPlayerQuestObjective *player_objective = new CPlayerQuestObjective;
+		player_objective->ObjectiveType = quest_objective->ObjectiveType;
+		player_objective->Quest = quest_objective->Quest;
+		player_objective->ObjectiveString = quest_objective->ObjectiveString;
+		player_objective->Quantity = quest_objective->Quantity;
+		player_objective->Resource = quest_objective->Resource;
+		player_objective->UnitClass = quest_objective->UnitClass;
+		player_objective->UnitTypes = quest_objective->UnitTypes;
+		player_objective->Upgrade = quest_objective->Upgrade;
+		player_objective->Character = quest_objective->Character;
+		player_objective->Unique = quest_objective->Unique;
+		player_objective->Settlement = quest_objective->Settlement;
+		player_objective->Faction = quest_objective->Faction;
+		this->QuestObjectives.push_back(player_objective);
 	}
 	
 	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");

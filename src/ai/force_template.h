@@ -30,13 +30,23 @@
 #ifndef __FORCE_TEMPLATE_H__
 #define __FORCE_TEMPLATE_H__
 
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+class UnitClass;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
 class CForceTemplate
 {
 public:
 	int ForceType = -1;
 	int Priority = 100;
 	int Weight = 1;
-	std::vector<std::pair<int, int>> Units;	/// Vector containing each unit class belonging to the force template, and the respective quantity
+	std::vector<std::pair<const UnitClass *, int>> Units;	/// vector containing each unit class belonging to the force template, and the respective quantity
 };
 
 #endif

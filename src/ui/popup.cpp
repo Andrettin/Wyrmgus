@@ -45,6 +45,9 @@
 #include "ui/ui.h"
 //Wyrmgus start
 #include "unit/unit.h"
+//Wyrmgus end
+#include "unit/unit_class.h"
+//Wyrmgus start
 #include "unit/unit_manager.h"
 //Wyrmgus end
 #include "unit/unit_type.h"
@@ -727,7 +730,6 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Identified = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "UnitTypeType")) {
 			const char *unit_type_type = LuaToString(l, -1);
-			condition->UnitTypeType = GetUnitTypeClassIndexByName(LuaToString(l, -1));
 			if (!strcmp(unit_type_type, "land")) {
 				condition->UnitTypeType = UnitTypeLand;
 			} else if (!strcmp(unit_type_type, "fly")) {
@@ -740,7 +742,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				LuaError(l, "Unsupported Type: %s" _C_ unit_type_type);
 			}
 		} else if (!strcmp(key, "UnitTypeClass")) {
-			condition->UnitTypeClass = GetUnitTypeClassIndexByName(LuaToString(l, -1));
+			condition->UnitClass = UnitClass::Get(LuaToString(l, -1));
 		} else if (!strcmp(key, "ItemClass")) {
 			condition->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
 		} else if (!strcmp(key, "CanStore")) {

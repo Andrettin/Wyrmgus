@@ -40,6 +40,7 @@
 #include "faction.h"
 #include "luacallback.h"
 #include "player_color.h"
+#include "unit/unit_class.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -79,21 +80,21 @@ int CFaction::GetIndex(const std::string &faction_ident)
 	}
 }
 
-int CFaction::GetFactionClassUnitType(const CFaction *faction, const int class_id)
+int CFaction::GetFactionClassUnitType(const CFaction *faction, const UnitClass *unit_class)
 {
-	if (faction == nullptr || class_id == -1) {
+	if (faction == nullptr || unit_class == nullptr) {
 		return -1;
 	}
 	
-	if (faction->ClassUnitTypes.find(class_id) != faction->ClassUnitTypes.end()) {
-		return faction->ClassUnitTypes.find(class_id)->second;
+	if (faction->ClassUnitTypes.find(unit_class) != faction->ClassUnitTypes.end()) {
+		return faction->ClassUnitTypes.find(unit_class)->second;
 	}
 	
 	if (faction->ParentFaction != nullptr) {
-		return CFaction::GetFactionClassUnitType(faction->ParentFaction, class_id);
+		return CFaction::GetFactionClassUnitType(faction->ParentFaction, unit_class);
 	}
 	
-	return CCivilization::GetCivilizationClassUnitType(faction->Civilization, class_id);
+	return CCivilization::GetCivilizationClassUnitType(faction->Civilization, unit_class);
 }
 
 int CFaction::GetFactionClassUpgrade(const CFaction *faction, const int class_id)

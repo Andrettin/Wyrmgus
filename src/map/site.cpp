@@ -40,6 +40,7 @@
 #include "config_operator.h"
 #include "faction.h"
 #include "map/map_template.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "world/province.h" //for regions
 
@@ -142,7 +143,7 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 	} else if (section->Tag == "historical_building") {
 		CDate start_date;
 		CDate end_date;
-		int building_class_id = -1;
+		const UnitClass *building_class = nullptr;
 		CUniqueItem *unique = nullptr;
 		CFaction *building_owner_faction = nullptr;
 			
@@ -160,8 +161,8 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 				end_date = CDate::FromString(value);
 			} else if (property.Key == "building_class") {
 				std::string value = FindAndReplaceString(property.Value, "_", "-");
-				building_class_id = GetUnitTypeClassIndexByName(value);
-				if (building_class_id == -1) {
+				building_class = UnitClass::Get(value);
+				if (building_class == nullptr) {
 					fprintf(stderr, "Invalid unit class: \"%s\".\n", value.c_str());
 				}
 			} else if (property.Key == "unique") {
@@ -178,12 +179,12 @@ bool CSite::ProcessConfigDataSection(const CConfigData *section)
 			}
 		}
 		
-		if (building_class_id == -1) {
+		if (building_class == nullptr) {
 			fprintf(stderr, "Historical building has no building class.\n");
 			return true;
 		}
 		
-		this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>(start_date, end_date, building_class_id, unique, building_owner_faction));
+		this->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const UnitClass *, CUniqueItem *, CFaction *>(start_date, end_date, building_class, unique, building_owner_faction));
 	} else {
 		return false;
 	}

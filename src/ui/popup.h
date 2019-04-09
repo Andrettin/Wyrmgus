@@ -10,7 +10,7 @@
 //
 /**@name popup.h - The Popup header file. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012-2019 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@
 class ButtonAction;
 class CFont;
 class CPopup;
+class UnitClass;
 
 constexpr int MARGIN_X = 4;
 constexpr int MARGIN_Y = 2;
@@ -71,7 +72,7 @@ public:
 	int ButtonAction = -1;			/// action type of button
 	//Wyrmgus start
 	int UnitTypeType = -1;			/// unit type type (i.e. land, fly, etc.) of the button's unit type
-	int UnitTypeClass = -1;			/// unit type class of the button's unit type
+	const UnitClass *UnitClass = nullptr;	/// unit type class of the button's unit type
 	int ItemClass = -1;				/// item class of the button's item
 	int CanStore = -1;				/// whether the button's unit type can store a particular resource
 	int ImproveIncome = -1;			/// whether the button's unit type improves the processing of a particular resource

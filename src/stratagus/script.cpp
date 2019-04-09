@@ -66,6 +66,7 @@
 #include "ui/button_action.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 //Wyrmgus start
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
@@ -1636,8 +1637,8 @@ std::string EvalString(const StringDesc *s)
 				std::string str;
 				if ((**type).BoolFlag[ITEM_INDEX].value) {
 					str = GetItemClassNameById((**type).ItemClass).c_str();
-				} else if ((**type).Class != -1) {
-					str = UnitTypeClasses[(**type).Class].c_str();
+				} else if ((**type).Class != nullptr) {
+					str = (**type).Class->Ident.c_str();
 				}
 				str[0] = toupper(str[0]);
 				size_t loc;
@@ -3714,14 +3715,14 @@ void DeleteModUnitType(const std::string &unit_type_ident)
 		RecalculateShownUnits();
 	}
 	for (CCivilization *civilization : CCivilization::GetAll()) {
-		for (std::map<int, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
+		for (std::map<const UnitClass *, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
 			if (iterator->second == unit_type->Slot) {
 				civilization->ClassUnitTypes.erase(iterator->first);
 			}
 		}
 	}
 	for (CFaction *faction : CFaction::GetAll()) {
-		for (std::map<int, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
+		for (std::map<const UnitClass *, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
 			if (iterator->second == unit_type->Slot) {
 				faction->ClassUnitTypes.erase(iterator->first);
 			}

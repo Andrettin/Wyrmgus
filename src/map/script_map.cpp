@@ -63,6 +63,7 @@
 #include "translate.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "include/version.h"
 #include "video/video.h"
 #include "world/plane.h"
@@ -1911,8 +1912,8 @@ static int CclDefineSite(lua_State *l)
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
 				++j;
-				int building_class_id = GetUnitTypeClassIndexByName(LuaToString(l, -1, j + 1));
-				if (building_class_id == -1) {
+				const UnitClass *building_class = UnitClass::Get(LuaToString(l, -1, j + 1));
+				if (building_class == nullptr) {
 					LuaError(l, "Building class doesn't exist.");
 				}
 				++j;
@@ -1939,7 +1940,7 @@ static int CclDefineSite(lua_State *l)
 				}
 				lua_pop(l, 1);
 
-				site->HistoricalBuildings.push_back(std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>(start_date, end_date, building_class_id, unique, building_owner));
+				site->HistoricalBuildings.push_back(std::tuple<CDate, CDate, const UnitClass *, CUniqueItem *, CFaction *>(start_date, end_date, building_class, unique, building_owner));
 			}
 		} else if (!strcmp(value, "HistoricalResources")) {
 			if (!lua_istable(l, -1)) {

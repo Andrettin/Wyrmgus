@@ -60,6 +60,7 @@
 #include "translate.h"
 #include "unit/historical_unit.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "video/video.h"
@@ -707,7 +708,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z) c
 		}
 		// add five workers at the player's starting location
 		if (CPlayer::Players[i]->NumTownHalls > 0) {
-			int worker_type_id = CFaction::GetFactionClassUnitType(CPlayer::Players[i]->GetFaction(), GetUnitTypeClassIndexByName("worker"));
+			int worker_type_id = CFaction::GetFactionClassUnitType(CPlayer::Players[i]->GetFaction(), UnitClass::Get("worker"));
 			if (worker_type_id != -1 && CPlayer::Players[i]->GetUnitTypeCount(CUnitType::UnitTypes[worker_type_id]) == 0) { //only create if the player doesn't have any workers created in another manner
 				Vec2i worker_unit_offset((CUnitType::UnitTypes[worker_type_id]->TileSize - 1) / 2);
 				

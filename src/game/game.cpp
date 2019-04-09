@@ -89,6 +89,7 @@
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
@@ -621,8 +622,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (type.GetFaction() != nullptr) {
 				f->printf("\tFaction = \"%s\",\n", type.GetFaction()->GetIdent().utf8().get_data());
 			}
-			if (type.Class != -1) {
-				f->printf("\tClass = \"%s\",\n", UnitTypeClasses[type.Class].c_str());
+			if (type.Class != nullptr) {
+				f->printf("\tClass = \"%s\",\n", type.Class->Ident.c_str());
 			}
 			if (!type.File.empty() && (!type.Parent || type.File != type.Parent->File)) {
 				f->printf("\tImage = {\"file\", \"%s\", \"size\", {%d, %d}},\n", type.File.c_str(), type.Width, type.Height);

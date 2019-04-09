@@ -34,8 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
-
 #include "character.h"
 #include "faction.h"
 #include "map/map.h"
@@ -44,6 +42,8 @@
 #include "video/video.h"
 #include "upgrade/upgrade_structs.h"
 #include "world/province.h"
+
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -57,6 +57,10 @@ class CGrandStrategyFaction;
 class CGrandStrategyHero;
 class LuaCallback;
 
+/*----------------------------------------------------------------------------
+--  Enumerations
+----------------------------------------------------------------------------*/
+
 /**
 **  Indexes into diplomacy state array.
 */
@@ -69,6 +73,10 @@ enum DiplomacyStates {
 	
 	MaxDiplomacyStates
 };
+
+/*----------------------------------------------------------------------------
+--  Definitions
+----------------------------------------------------------------------------*/
 
 class GrandStrategyWorldMapTile : public WorldMapTile
 {
@@ -122,7 +130,7 @@ public:
 	bool HasSecondaryBorderThroughWaterWith(CGrandStrategyProvince *province);
 	bool BordersFaction(int faction_civilization, int faction, bool check_through_water = false);
 	int GetPopulation();
-	int GetClassUnitType(int class_id);
+	int GetClassUnitType(const UnitClass *unit_class);
 	int GetDesirabilityRating();
 	std::string GenerateWorkName();
 	CGrandStrategyHero *GetRandomAuthor();

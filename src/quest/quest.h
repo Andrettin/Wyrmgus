@@ -46,13 +46,18 @@
 class CCharacter;
 class CDialogue;
 class CFaction;
+class CMapTemplate;
 class CQuest;
 class CSite;
 class CUniqueItem;
 class CUnitType;
 class CUpgrade;
 class LuaCallback;
-class CMapTemplate;
+class UnitClass;
+
+/*----------------------------------------------------------------------------
+--  Enumerations
+----------------------------------------------------------------------------*/
 
 enum ObjectiveTypes {
 	GatherResourceObjectiveType,
@@ -70,13 +75,17 @@ enum ObjectiveTypes {
 	MaxObjectiveTypes
 };
 
+/*----------------------------------------------------------------------------
+--  Definitions
+----------------------------------------------------------------------------*/
+
 class CQuestObjective
 {
 public:
 	int ObjectiveType = -1;
 	int Quantity = 1;
 	int Resource = -1;
-	int UnitClass = -1;
+	const UnitClass *UnitClass = nullptr;
 	std::string ObjectiveString;
 	CQuest *Quest = nullptr;
 	std::vector<const CUnitType *> UnitTypes;

@@ -74,6 +74,7 @@
 #include "ui/button_action.h"
 #include "ui/icon.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
@@ -491,8 +492,8 @@ void CPlayer::Load(lua_State *l)
 						}
 						objective->Resource = resource;
 					} else if (!strcmp(value, "unit-class")) {
-						int unit_class = GetUnitTypeClassIndexByName(LuaToString(l, -1, n + 1));
-						if (unit_class == -1) {
+						const UnitClass *unit_class = UnitClass::Get(LuaToString(l, -1, n + 1));
+						if (unit_class == nullptr) {
 							LuaError(l, "Unit class doesn't exist.");
 						}
 						objective->UnitClass = unit_class;
@@ -925,10 +926,10 @@ static int CclDefineCivilization(lua_State *l)
 					} else if (!strcmp(value, "weight")) {
 						force->Weight = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "unit-class")) {
-						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
+						const UnitClass *unit_class = UnitClass::Get(LuaToString(l, -1, k + 1));
 						++k;
 						int unit_quantity = LuaToNumber(l, -1, k + 1);
-						force->Units.push_back(std::pair<int, int>(unit_class, unit_quantity));
+						force->Units.push_back(std::pair<const UnitClass *, int>(unit_class, unit_quantity));
 					} else {
 						printf("\n%s\n", civilization->GetIdent().utf8().get_data());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -954,7 +955,7 @@ static int CclDefineCivilization(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "unit-class")) {
-						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
+						const UnitClass *unit_class = UnitClass::Get(LuaToString(l, -1, k + 1));
 						building_template->UnitClass = unit_class;
 						civilization->AiBuildingTemplates.push_back(building_template);
 					} else if (!strcmp(value, "priority")) {
@@ -1047,10 +1048,10 @@ static int CclDefineCivilization(lua_State *l)
 				if (class_name.empty()) {
 					LuaError(l, "Class is given as a blank string.");
 				}
-				int class_id = GetOrAddUnitTypeClassIndexByName(class_name);
+				const UnitClass *unit_class = UnitClass::Get(class_name);
 				++j;
 				
-				civilization->UnitClassNames[class_id].push_back(LuaToString(l, -1, j + 1));
+				civilization->UnitClassNames[unit_class].push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "FamilyNames")) {
 			const int args = lua_rawlen(l, -1);
@@ -1739,18 +1740,18 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	std::string class_name = LuaToString(l, 1);
-	int class_id = GetUnitTypeClassIndexByName(class_name);
+	const UnitClass *unit_class = UnitClass::Get(class_name);
 	CCivilization *civilization = CCivilization::Get(LuaToString(l, 2));
 	std::string unit_type_ident;
-	if (civilization && class_id != -1) {
-		int unit_type_id = CCivilization::GetCivilizationClassUnitType(civilization, class_id);
+	if (civilization && unit_class != nullptr) {
+		int unit_type_id = CCivilization::GetCivilizationClassUnitType(civilization, unit_class);
 		if (unit_type_id != -1) {
 			unit_type_ident = CUnitType::UnitTypes[unit_type_id]->Ident;
 		}
 	}
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		class_id = GetUpgradeClassIndexByName(class_name);
+		const int class_id = GetUpgradeClassIndexByName(class_name);
 		if (civilization && class_id != -1) {
 			int upgrade_id = CCivilization::GetCivilizationClassUpgrade(civilization, class_id);
 			if (upgrade_id != -1) {
@@ -1777,7 +1778,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 static int CclGetFactionClassUnitType(lua_State *l)
 {
 	std::string class_name = LuaToString(l, 1);
-	int class_id = GetUnitTypeClassIndexByName(class_name);
+	const UnitClass *unit_class = UnitClass::Get(class_name);
 	CFaction *faction = nullptr;
 	const int nargs = lua_gettop(l);
 	if (nargs == 2) {
@@ -1787,15 +1788,15 @@ static int CclGetFactionClassUnitType(lua_State *l)
 		faction = CFaction::Get(LuaToString(l, 3));
 	}
 	std::string unit_type_ident;
-	if (class_id != -1) {
-		int unit_type_id = CFaction::GetFactionClassUnitType(faction, class_id);
+	if (unit_class != nullptr) {
+		int unit_type_id = CFaction::GetFactionClassUnitType(faction, unit_class);
 		if (unit_type_id != -1) {
 			unit_type_ident = CUnitType::UnitTypes[unit_type_id]->Ident;
 		}
 	}
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
-		class_id = GetUpgradeClassIndexByName(class_name);
+		const int class_id = GetUpgradeClassIndexByName(class_name);
 		if (class_id != -1) {
 			int upgrade_id = CFaction::GetFactionClassUpgrade(faction, class_id);
 			if (upgrade_id != -1) {
@@ -2021,10 +2022,10 @@ static int CclDefineFaction(lua_State *l)
 					} else if (!strcmp(value, "weight")) {
 						force->Weight = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "unit-class")) {
-						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
+						const UnitClass *unit_class = UnitClass::Get(LuaToString(l, -1, k + 1));
 						++k;
 						int unit_quantity = LuaToNumber(l, -1, k + 1);
-						force->Units.push_back(std::pair<int, int>(unit_class, unit_quantity));
+						force->Units.push_back(std::pair<const UnitClass *, int>(unit_class, unit_quantity));
 					} else {
 						printf("\n%s\n", faction->GetIdent().utf8().get_data());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2050,7 +2051,7 @@ static int CclDefineFaction(lua_State *l)
 					value = LuaToString(l, -1, k + 1);
 					++k;
 					if (!strcmp(value, "unit-class")) {
-						int unit_class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
+						const UnitClass *unit_class = UnitClass::Get(LuaToString(l, -1, k + 1));
 						building_template->UnitClass = unit_class;
 						faction->AiBuildingTemplates.push_back(building_template);
 					} else if (!strcmp(value, "priority")) {

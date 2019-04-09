@@ -30,12 +30,22 @@
 #ifndef __AI_BUILDING_TEMPLATE_H__
 #define __AI_BUILDING_TEMPLATE_H__
 
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+class UnitClass;
+
+/*----------------------------------------------------------------------------
+--  Definition
+----------------------------------------------------------------------------*/
+
 class CAiBuildingTemplate
 {
 public:
-	int UnitClass = -1;			/// Building's unit class
+	const UnitClass *UnitClass = nullptr;	/// The building's unit class
 	int Priority = 100;
-	bool PerSettlement = false;	/// Whether the building should be constructed for each settlement
+	bool PerSettlement = false;			/// Whether the building should be constructed for each settlement
 };
 
 #endif

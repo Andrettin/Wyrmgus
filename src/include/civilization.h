@@ -61,6 +61,7 @@ class CPlayerColor;
 class CQuest;
 class CSpecies;
 class CUpgrade;
+class UnitClass;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -75,7 +76,7 @@ public:
 	
 	static constexpr const char *ClassIdentifier = "civilization";
 	
-	static int GetCivilizationClassUnitType(const CCivilization *civilization, const int class_id);
+	static int GetCivilizationClassUnitType(const CCivilization *civilization, const UnitClass *unit_class);
 	static int GetCivilizationClassUpgrade(const CCivilization *civilization, const int class_id);
 	static std::vector<CFiller> GetCivilizationUIFillers(const CCivilization *civilization);
 	
@@ -230,16 +231,16 @@ public:
 		return this->PersonalNames;
 	}
 
-	std::vector<std::string> GetUnitClassNames(const int class_id) const
+	std::vector<std::string> GetUnitClassNames(const UnitClass *unit_class) const
 	{
-		std::map<int, std::vector<std::string>>::const_iterator find_iterator = this->UnitClassNames.find(class_id);
+		std::map<const UnitClass *, std::vector<std::string>>::const_iterator find_iterator = this->UnitClassNames.find(unit_class);
 		
 		if (find_iterator != this->UnitClassNames.end() && !find_iterator->second.empty()) {
 			return find_iterator->second;
 		}
 		
 		if (this->ParentCivilization != nullptr) {
-			return this->ParentCivilization->GetUnitClassNames(class_id);
+			return this->ParentCivilization->GetUnitClassNames(unit_class);
 		}
 		
 		return std::vector<std::string>();
@@ -291,7 +292,7 @@ public:
 	std::map<int, int> ForceTypeWeights;	/// Weights for each force type
 	std::vector<CAiBuildingTemplate *> AiBuildingTemplates;	/// AI building templates
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
-	std::map<int, std::vector<std::string>> UnitClassNames;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
+	std::map<const UnitClass *, std::vector<std::string>> UnitClassNames;	/// Unit class names for the civilization, mapped to the unit class they pertain to, used for mechanical units, and buildings
 	std::vector<std::string> FamilyNames;		/// Family names for the civilization
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 	std::vector<std::string> ShipNames;			/// Ship names for the civilization
@@ -299,7 +300,7 @@ public:
 	std::vector<CSite *> Sites;					/// Sites used for this civilization if a randomly-generated one is required
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this civilization's minister title for each minister type and government type
 	std::map<std::string, std::map<CDate, bool>> HistoricalUpgrades;	/// historical upgrades of the faction, with the date of change
-	std::map<int, int> ClassUnitTypes;			/// the unit type slot of a particular class for the civilization
+	std::map<const UnitClass *, int> ClassUnitTypes;			/// the unit type slot of a particular class for the civilization
 	std::map<int, int> ClassUpgrades;			/// the upgrade slot of a particular class for the civilization
 	std::vector<CFiller> UIFillers;
 	std::map<int, IconConfig> ButtonIcons;		/// icons for button actions

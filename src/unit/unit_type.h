@@ -77,8 +77,9 @@ class CUniqueItem;
 class CVariable;
 class CWorld;
 //Wyrmgus end
-struct lua_State;
 class LuaCallback;
+class UnitClass;
+struct lua_State;
 
 constexpr int UnitSides = 8;
 constexpr int MaxAttackPos = 5;
@@ -614,9 +615,9 @@ public:
 	DistanceTypeType DistanceType;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
-	CUnitType *RestrictType = nullptr;
+	const CUnitType *RestrictType = nullptr;
 	std::string RestrictClassName;
-	int RestrictClass = -1;
+	const UnitClass *RestrictClass = nullptr;
 	bool CheckBuilder = false;
 	bool Diagonal = true;
 };
@@ -774,7 +775,7 @@ public:
 public:
 	CUnitType *Parent = nullptr;	/// Parent unit type
 	//Wyrmgus start
-	int Class = -1;					/// Class identifier (i.e. infantry, archer, etc.)
+	UnitClass *Class = nullptr;		/// Class identifier (i.e. infantry, archer, etc.)
 private:
 	CCivilization *Civilization = nullptr;	/// Which civilization this unit belongs to, if any
 	CFaction *Faction = nullptr;	/// Which faction this unit belongs to, if any
@@ -1115,8 +1116,6 @@ public:
 extern CUnitTypeVar UnitTypeVar;
 
 //Wyrmgus start
-extern std::vector<std::string> UnitTypeClasses; //list of unit type classes; built with CclDefineUnitType
-extern std::vector<std::vector<CUnitType *>> ClassUnitTypes; //list of unit types belonging to each class
 extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
 extern CUnitType *SettlementSiteUnitType;
 //Wyrmgus end
@@ -1131,9 +1130,6 @@ extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Up
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
 //Wyrmgus start
-extern int GetUnitTypeClassIndexByName(const std::string &class_name);
-extern int GetOrAddUnitTypeClassIndexByName(const std::string &class_name);
-extern void SetUnitTypeClassStringToIndex(const std::string &class_name, int class_id);
 extern int GetUpgradeClassIndexByName(const std::string &class_name);
 extern void SetUpgradeClassStringToIndex(const std::string &class_name, int class_id);
 

@@ -69,6 +69,7 @@
 #include "ui/icon.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type_variation.h"
 //Wyrmgus start
@@ -1748,14 +1749,14 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "Class")) {
-			if (type->Class != -1)  {
-				ClassUnitTypes[type->Class].erase(std::remove(ClassUnitTypes[type->Class].begin(), ClassUnitTypes[type->Class].end(), type), ClassUnitTypes[type->Class].end());
+			if (type->Class != nullptr)  {
+				type->Class->UnitTypes.erase(std::remove(type->Class->UnitTypes.begin(), type->Class->UnitTypes.end(), type), type->Class->UnitTypes.end());
 			}
 			
-			type->Class = GetOrAddUnitTypeClassIndexByName(LuaToString(l, -1));
+			type->Class = UnitClass::Get(LuaToString(l, -1));
 			
-			if (type->Class != -1 && std::find(ClassUnitTypes[type->Class].begin(), ClassUnitTypes[type->Class].end(), type) == ClassUnitTypes[type->Class].end()) {
-				ClassUnitTypes[type->Class].push_back(type);
+			if (type->Class != nullptr && std::find(type->Class->UnitTypes.begin(), type->Class->UnitTypes.end(), type) == type->Class->UnitTypes.end()) {
+				type->Class->UnitTypes.push_back(type);
 			}
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
@@ -1957,12 +1958,12 @@ static int CclDefineUnitType(lua_State *l)
 	}
 	
 	//Wyrmgus start
-	if (type->Class != -1) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
-		int class_id = type->Class;
+	if (type->Class != nullptr) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
+		const UnitClass *unit_class = type->Class;
 
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (CCivilization *civilization : CCivilization::GetAll()) {
-			for (std::map<int, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
+			for (std::map<const UnitClass *, int>::reverse_iterator iterator = civilization->ClassUnitTypes.rbegin(); iterator != civilization->ClassUnitTypes.rend(); ++iterator) {
 				if (iterator->second == type->Slot) {
 					civilization->ClassUnitTypes.erase(iterator->first);
 					break;
@@ -1970,7 +1971,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		}
 		for (CFaction *faction : CFaction::GetAll()) {
-			for (std::map<int, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
+			for (std::map<const UnitClass *, int>::reverse_iterator iterator = faction->ClassUnitTypes.rbegin(); iterator != faction->ClassUnitTypes.rend(); ++iterator) {
 				if (iterator->second == type->Slot) {
 					faction->ClassUnitTypes.erase(iterator->first);
 					break;
@@ -1978,11 +1979,11 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		}
 		
-		if (type->GetCivilization() != nullptr && class_id != -1) {
+		if (type->GetCivilization() != nullptr && unit_class != nullptr) {
 			if (type->GetFaction() != nullptr) {
-				type->GetFaction()->ClassUnitTypes[class_id] = type->Slot;
+				type->GetFaction()->ClassUnitTypes[unit_class] = type->Slot;
 			} else {
-				type->GetCivilization()->ClassUnitTypes[class_id] = type->Slot;
+				type->GetCivilization()->ClassUnitTypes[unit_class] = type->Slot;
 			}
 		}
 	}
@@ -2405,8 +2406,8 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Class")) {
 		if (type->ItemClass != -1) {
 			lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
-		} else if (type->Class != -1) {
-			lua_pushstring(l, UnitTypeClasses[type->Class].c_str());
+		} else if (type->Class != nullptr) {
+			lua_pushstring(l, type->Class->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

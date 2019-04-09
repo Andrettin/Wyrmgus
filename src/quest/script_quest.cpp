@@ -49,6 +49,7 @@
 #include "quest/dialogue.h"
 #include "script.h"
 #include "ui/icon.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 
@@ -219,8 +220,8 @@ static int CclDefineQuest(lua_State *l)
 						}
 						objective->Resource = resource;
 					} else if (!strcmp(value, "unit-class")) {
-						int unit_class = GetUnitTypeClassIndexByName(LuaToString(l, -1, k + 1));
-						if (unit_class == -1) {
+						const UnitClass *unit_class = UnitClass::Get(LuaToString(l, -1, k + 1));
+						if (unit_class == nullptr) {
 							LuaError(l, "Unit class doesn't exist.");
 						}
 						objective->UnitClass = unit_class;

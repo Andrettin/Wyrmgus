@@ -36,6 +36,13 @@
 
 #include "data_element.h"
 #include "data_type.h"
+#include "property.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+class CUnitType;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -48,6 +55,8 @@ public:
 
 public:
 	static constexpr const char *ClassIdentifier = "unit_class";
+	
+	std::vector<CUnitType *> UnitTypes;
 	
 protected:
 	static inline void _bind_methods() {}

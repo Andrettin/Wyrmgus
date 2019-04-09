@@ -46,6 +46,7 @@
 #include "map/tileset.h"
 #include "pathfinder/pathfinder.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
@@ -405,10 +406,9 @@ public:
 	{
 		data[UnitTypeEquivs[unit->Type->Slot]]++;
 		
-		int unit_class = unit->Type->Class;
-		if (unit_class != -1) {
-			for (size_t i = 0; i < ClassUnitTypes[unit_class].size(); ++i) {
-				const CUnitType *class_unit_type = ClassUnitTypes[unit_class][i];
+		const UnitClass *unit_class = unit->Type->Class;
+		if (unit_class != nullptr) {
+			for (const CUnitType *class_unit_type : unit_class->UnitTypes) {
 				if (class_unit_type != unit->Type) {
 					data[UnitTypeEquivs[class_unit_type->Slot]]++; //also increases for other units of the class; shouldn't be a problem because we assume that only one unit type per class would be requested
 				}
@@ -1161,7 +1161,7 @@ void AiForceManager::CheckUnits(int *counter)
 		for (unsigned int j = 0; j < force.UnitTypes.size(); ++j) {
 			const AiUnitType &aiut = force.UnitTypes[j];
 			const unsigned int t = aiut.Type->Slot;
-			const int unit_class = aiut.Type->Class;
+			const UnitClass *unit_class = aiut.Type->Class;
 			const int wantedCount = aiut.Want;
 			int e = AiPlayer->Player->GetUnitTypeAiActiveCount(CUnitType::UnitTypes[t]);
 			if (t < AiHelpers.Equiv.size()) {
@@ -1169,9 +1169,8 @@ void AiForceManager::CheckUnits(int *counter)
 					e += AiPlayer->Player->GetUnitTypeAiActiveCount(AiHelpers.Equiv[t][k]);
 				}
 			}
-			if (unit_class != -1) {
-				for (size_t k = 0; k < ClassUnitTypes[unit_class].size(); ++k) {
-					const CUnitType *class_unit_type = ClassUnitTypes[unit_class][k];
+			if (unit_class != nullptr) {
+				for (const CUnitType *class_unit_type : unit_class->UnitTypes) {
 					if (class_unit_type != aiut.Type) {
 						e += AiPlayer->Player->GetUnitTypeAiActiveCount(class_unit_type);
 					}
@@ -1911,8 +1910,8 @@ void AiForceManager::CheckForceRecruitment()
 				}
 				bool valid = true;
 				for (size_t j = 0; j < faction_force_templates[i]->Units.size(); ++j) {
-					int class_id = faction_force_templates[i]->Units[j].first;
-					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), class_id);
+					const UnitClass *unit_class = faction_force_templates[i]->Units[j].first;
+					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), unit_class);
 					CUnitType *type = nullptr;
 					if (unit_type_id != -1) {
 						type = CUnitType::UnitTypes[unit_type_id];
@@ -1947,8 +1946,8 @@ void AiForceManager::CheckForceRecruitment()
 				new_force.State = AiForceAttackingState_Waiting;
 				new_force.Role = AiForceRoleDefault;
 				for (size_t i = 0; i < force_template->Units.size(); ++i) {
-					int class_id = force_template->Units[i].first;
-					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), class_id);
+					const UnitClass *unit_class = force_template->Units[i].first;
+					int unit_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), unit_class);
 					CUnitType *type = nullptr;
 					if (unit_type_id != -1) {
 						type = CUnitType::UnitTypes[unit_type_id];

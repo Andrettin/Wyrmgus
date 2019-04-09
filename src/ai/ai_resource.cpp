@@ -50,6 +50,7 @@
 #include "pathfinder/pathfinder.h"
 #include "player.h"
 #include "unit/unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 #include "upgrade/dependency.h"
@@ -2153,7 +2154,7 @@ static void AiCheckPathwayConstruction()
 				const CUnit *depot = FindDepositNearLoc(*unit.Player, unit.tilePos + Vec2i((unit.Type->TileSize - 1) / 2), 32, unit.GivesResource, unit.MapLayer->ID);
 				if (depot) {
 					//create a worker to test the path; the worker can't be a rail one, or the path construction won't work
-					int worker_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), GetUnitTypeClassIndexByName("worker"));
+					int worker_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("worker"));
 					if (worker_type_id != -1) {
 						CUnitType *test_worker_type = CUnitType::UnitTypes[worker_type_id];
 						
@@ -2298,7 +2299,7 @@ void AiCheckSettlementConstruction()
 		return;
 	}
 
-	int town_hall_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), GetUnitTypeClassIndexByName("town-hall"));			
+	int town_hall_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("town-hall"));			
 	if (town_hall_type_id == -1) {
 		return;
 	}
@@ -2391,7 +2392,7 @@ void AiCheckDockConstruction()
 		return;
 	}
 
-	int dock_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), GetUnitTypeClassIndexByName("dock"));			
+	int dock_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("dock"));			
 	if (dock_type_id == -1) {
 		return;
 	}
@@ -2521,14 +2522,9 @@ void AiCheckBuildings()
 	std::vector<CAiBuildingTemplate *> potential_building_templates;
 	
 	int priority = 0;
-	std::vector<int> want_counter;
-	std::vector<int> have_counter;
-	std::vector<int> have_with_requests_counter;
-	for (size_t i = 0; i < UnitTypeClasses.size(); ++i) {
-		want_counter.push_back(0);
-		have_counter.push_back(-1);
-		have_with_requests_counter.push_back(-1);
-	}
+	std::map<const UnitClass *, int> want_counter;
+	std::map<const UnitClass *, int> have_counter;
+	std::map<const UnitClass *, int> have_with_requests_counter;
 	for (size_t i = 0; i < building_templates.size(); ++i) {
 		if (building_templates[i]->Priority < priority) {
 			break; //building templates are ordered by priority, so there is no need to go further
@@ -2547,9 +2543,12 @@ void AiCheckBuildings()
 			continue;
 		}
 		
+		if (want_counter.find(building_templates[i]->UnitClass) == want_counter.end()) {
+			want_counter[building_templates[i]->UnitClass] = 0;
+		}
 		want_counter[building_templates[i]->UnitClass]++;
 			
-		if (have_counter[building_templates[i]->UnitClass] == -1 || have_with_requests_counter[building_templates[i]->UnitClass] == -1) { //initialize values
+		if (have_counter.find(building_templates[i]->UnitClass) == have_counter.end() || have_with_requests_counter.find(building_templates[i]->UnitClass) == have_with_requests_counter.end()) { //initialize values
 			have_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, type, 0, false, true);
 			have_with_requests_counter[building_templates[i]->UnitClass] = AiGetUnitTypeCount(*AiPlayer, type, 0, true, true);
 		}
@@ -2588,7 +2587,7 @@ void AiCheckBuildings()
 
 static void AiCheckMinecartConstruction()
 {
-	int minecart_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), GetUnitTypeClassIndexByName("minecart"));
+	int minecart_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("minecart"));
 	if (minecart_type_id == -1) {
 		return;
 	}
@@ -2661,7 +2660,7 @@ static void AiCheckMinecartConstruction()
 
 static void AiCheckMinecartSalvaging()
 {
-	int minecart_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), GetUnitTypeClassIndexByName("minecart"));
+	int minecart_type_id = CFaction::GetFactionClassUnitType(AiPlayer->Player->GetFaction(), UnitClass::Get("minecart"));
 	if (minecart_type_id == -1) {
 		return;
 	}
