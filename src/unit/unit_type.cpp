@@ -1953,15 +1953,21 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_lumber_cost"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Costs[WoodCost]; });
 	ClassDB::bind_method(D_METHOD("get_stone_cost"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Costs[StoneCost]; });
 	ClassDB::bind_method(D_METHOD("get_coal_cost"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Costs[CoalCost]; });
+	ClassDB::bind_method(D_METHOD("get_food_demand"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[DEMAND_INDEX].Value; });
 	
 	ClassDB::bind_method(D_METHOD("get_damage"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[BASICDAMAGE_INDEX].Value; });
+	ClassDB::bind_method(D_METHOD("get_acid_damage"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[ACIDDAMAGE_INDEX].Value; });
+	ClassDB::bind_method(D_METHOD("get_fire_damage"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[FIREDAMAGE_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_hit_points"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[HP_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_armor"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[ARMOR_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_fire_resistance"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[FIRERESISTANCE_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_range"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_sight"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[SIGHTRANGE_INDEX].Value; });
+	ClassDB::bind_method(D_METHOD("get_day_sight_bonus"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[DAYSIGHTRANGEBONUS_INDEX].Value; });
+	ClassDB::bind_method(D_METHOD("get_night_sight_bonus"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[NIGHTSIGHTRANGEBONUS_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_accuracy"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[ACCURACY_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_evasion"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[EVASION_INDEX].Value; });
+	ClassDB::bind_method(D_METHOD("get_speed"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[SPEED_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_food_supply"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[SUPPLY_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_garrisoned_range_bonus"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[GARRISONEDRANGEBONUS_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_research_speed_bonus"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[RESEARCHSPEEDBONUS_INDEX].Value; });
@@ -1972,6 +1978,7 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("is_unit"), [](const CUnitType *unit_type){ return unit_type->IsUnitUnitType(); });
 	ClassDB::bind_method(D_METHOD("is_building"), [](const CUnitType *unit_type){ return unit_type->BoolFlag[BUILDING_INDEX].value; });
 	ClassDB::bind_method(D_METHOD("is_item"), [](const CUnitType *unit_type){ return unit_type->BoolFlag[ITEM_INDEX].value; });
+	ClassDB::bind_method(D_METHOD("can_attack"), [](const CUnitType *unit_type){ return unit_type->BoolFlag[CANATTACK_INDEX].value; });
 	ClassDB::bind_method(D_METHOD("has_regeneration_aura"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[REGENERATIONAURA_INDEX].Value; });
 }
 
