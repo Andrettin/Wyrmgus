@@ -78,6 +78,7 @@
 #include "ui/button_level.h"
 #include "ui/icon.h"
 #include "unit/historical_unit.h"
+#include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_structs.h"
 #include "world/plane.h"
@@ -136,6 +137,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CWord>();
 	ClassDB::register_class<CWorld>();
 	ClassDB::register_class<MissileType>();
+	ClassDB::register_class<UnitClass>();
 	
 	ClassDB::register_virtual_class<CConversibleColor>();
 	ClassDB::register_class<CHairColor>();
