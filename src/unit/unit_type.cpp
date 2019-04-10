@@ -1955,10 +1955,11 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_coal_cost"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Costs[CoalCost]; });
 	ClassDB::bind_method(D_METHOD("get_food_demand"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[DEMAND_INDEX].Value; });
 	
+	ClassDB::bind_method(D_METHOD("get_hit_points"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[HP_INDEX].Max; });
+	ClassDB::bind_method(D_METHOD("get_mana"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[MANA_INDEX].Max; });
 	ClassDB::bind_method(D_METHOD("get_damage"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[BASICDAMAGE_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_acid_damage"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[ACIDDAMAGE_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_fire_damage"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[FIREDAMAGE_INDEX].Value; });
-	ClassDB::bind_method(D_METHOD("get_hit_points"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[HP_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_armor"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[ARMOR_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_fire_resistance"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[FIRERESISTANCE_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_range"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value; });
