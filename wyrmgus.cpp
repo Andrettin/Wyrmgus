@@ -50,7 +50,7 @@ String Wyrmgus::GetVersion() const
 	return _version_str2;
 }
 
-void Wyrmgus::LuaCommand(String command)
+void Wyrmgus::LuaCommand(const String command)
 {
 	QueueLuaCommand(command.utf8().get_data());
 }
@@ -60,77 +60,7 @@ void Wyrmgus::SetOamlModule(Node *oaml_module)
 	this->OamlModule = static_cast<oamlGodotModule *>(oaml_module);
 }
 
-CHairColor *Wyrmgus::GetHairColor(String ident) const
-{
-	return CHairColor::Get(ident.utf8().get_data());
-}
-
-CPlayerColor *Wyrmgus::GetPlayerColor(String ident) const
-{
-	return CPlayerColor::Get(ident.utf8().get_data());
-}
-
-CSkinColor *Wyrmgus::GetSkinColor(String ident) const
-{
-	return CSkinColor::Get(ident.utf8().get_data());
-}
-
-CCampaign *Wyrmgus::GetCampaign(String ident) const
-{
-	return CCampaign::Get(ident.utf8().get_data());
-}
-
-Array Wyrmgus::GetCampaigns() const
-{
-	return VectorToGodotArray(CCampaign::GetAll());
-}
-
-void Wyrmgus::SetCurrentCampaign(String campaign_ident)
-{
-	CCampaign::SetCurrentCampaign(this->GetCampaign(campaign_ident));
-}
-
-CCampaign *Wyrmgus::GetCurrentCampaign() const
-{
-	return CCampaign::GetCurrentCampaign();
-}
-
-Array Wyrmgus::GetAchievements() const
-{
-	return VectorToGodotArray(CAchievement::GetAll());
-}
-
-Array Wyrmgus::GetUnitUnitTypes() const
-{
-	return VectorToGodotArray(CUnitType::GetUnitUnitTypes());
-}
-
-Array Wyrmgus::GetBuildingUnitTypes() const
-{
-	return VectorToGodotArray(CUnitType::GetBuildingUnitTypes());
-}
-
-Array Wyrmgus::GetItemUnitTypes() const
-{
-	return VectorToGodotArray(CUnitType::GetItemUnitTypes());
-}
-
-CPlayer *Wyrmgus::GetThisPlayer() const
-{
-	return CPlayer::GetThisPlayer();
-}
-
-CLiteraryText *Wyrmgus::GetLiteraryText(String ident) const
-{
-	return CLiteraryText::Get(ident.utf8().get_data());
-}
-
-Array Wyrmgus::GetLiteraryTexts() const
-{
-	return VectorToGodotArray(CLiteraryText::GetAll());
-}
-
-String Wyrmgus::NumberToRomanNumeral(unsigned number) const
+String Wyrmgus::NumberToRomanNumeral(const unsigned number) const
 {
 	return ::NumberToRomanNumeral(number);
 }
@@ -143,25 +73,26 @@ void Wyrmgus::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("set_oaml_module", "oaml_module"), &Wyrmgus::SetOamlModule);
 	
-	ClassDB::bind_method(D_METHOD("get_hair_color", "ident"), &Wyrmgus::GetHairColor);
-	ClassDB::bind_method(D_METHOD("get_player_color", "ident"), &Wyrmgus::GetPlayerColor);
-	ClassDB::bind_method(D_METHOD("get_skin_color", "ident"), &Wyrmgus::GetSkinColor);
+	ClassDB::bind_method(D_METHOD("get_hair_color", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CHairColor::Get(ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("get_player_color", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CPlayerColor::Get(ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("get_skin_color", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CSkinColor::Get(ident.utf8().get_data()); });
 	
-	ClassDB::bind_method(D_METHOD("get_campaign", "ident"), &Wyrmgus::GetCampaign);
-	ClassDB::bind_method(D_METHOD("get_campaigns"), &Wyrmgus::GetCampaigns);
-	ClassDB::bind_method(D_METHOD("set_current_campaign", "campaign"), &Wyrmgus::SetCurrentCampaign);
-	ClassDB::bind_method(D_METHOD("get_current_campaign"), &Wyrmgus::GetCurrentCampaign);
+	ClassDB::bind_method(D_METHOD("get_campaign", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CCampaign::Get(ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("get_campaigns"),[](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CCampaign::GetAll()); });
+	ClassDB::bind_method(D_METHOD("set_current_campaign", "campaign"), [](const Wyrmgus *wyrmgus, const String ident){ CCampaign::SetCurrentCampaign(CCampaign::Get(ident.utf8().get_data())); });
+	ClassDB::bind_method(D_METHOD("get_current_campaign"), [](const Wyrmgus *wyrmgus){ return CCampaign::GetCurrentCampaign(); });
 	
-	ClassDB::bind_method(D_METHOD("get_achievements"), &Wyrmgus::GetAchievements);
+	ClassDB::bind_method(D_METHOD("get_achievements"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CAchievement::GetAll()); });
 	
-	ClassDB::bind_method(D_METHOD("get_unit_unit_types"), &Wyrmgus::GetUnitUnitTypes);
-	ClassDB::bind_method(D_METHOD("get_building_unit_types"), &Wyrmgus::GetBuildingUnitTypes);
-	ClassDB::bind_method(D_METHOD("get_item_unit_types"), &Wyrmgus::GetItemUnitTypes);
+	ClassDB::bind_method(D_METHOD("get_unit_type", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return UnitTypeByIdent(ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("get_unit_unit_types"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CUnitType::GetUnitUnitTypes()); });
+	ClassDB::bind_method(D_METHOD("get_building_unit_types"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CUnitType::GetBuildingUnitTypes()); });
+	ClassDB::bind_method(D_METHOD("get_item_unit_types"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CUnitType::GetItemUnitTypes()); });
 	
-	ClassDB::bind_method(D_METHOD("get_this_player"), &Wyrmgus::GetThisPlayer);
+	ClassDB::bind_method(D_METHOD("get_this_player"), [](const Wyrmgus *wyrmgus){ return CPlayer::GetThisPlayer(); });
 	
-	ClassDB::bind_method(D_METHOD("get_literary_text", "ident"), &Wyrmgus::GetLiteraryText);
-	ClassDB::bind_method(D_METHOD("get_literary_texts"), &Wyrmgus::GetLiteraryTexts);
+	ClassDB::bind_method(D_METHOD("get_literary_text", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CLiteraryText::Get(ident.utf8().get_data()); });
+	ClassDB::bind_method(D_METHOD("get_literary_texts"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CLiteraryText::GetAll()); });
 
 	ClassDB::bind_method(D_METHOD("number_to_roman_numeral", "number"), &Wyrmgus::NumberToRomanNumeral);
 	
