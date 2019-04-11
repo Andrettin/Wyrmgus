@@ -1966,6 +1966,8 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_sight"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[SIGHTRANGE_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_day_sight_bonus"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[DAYSIGHTRANGEBONUS_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_night_sight_bonus"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[NIGHTSIGHTRANGEBONUS_INDEX].Value; });
+	ClassDB::bind_method(D_METHOD("get_charge_bonus"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[CHARGEBONUS_INDEX].Value; });
+	ClassDB::bind_method(D_METHOD("get_backstab_bonus"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[BACKSTAB_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_accuracy"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[ACCURACY_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_evasion"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[EVASION_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("get_speed"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[SPEED_INDEX].Value; });
@@ -1980,6 +1982,7 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("is_building"), [](const CUnitType *unit_type){ return unit_type->BoolFlag[BUILDING_INDEX].value; });
 	ClassDB::bind_method(D_METHOD("is_item"), [](const CUnitType *unit_type){ return unit_type->BoolFlag[ITEM_INDEX].value; });
 	ClassDB::bind_method(D_METHOD("can_attack"), [](const CUnitType *unit_type){ return unit_type->BoolFlag[CANATTACK_INDEX].value; });
+	ClassDB::bind_method(D_METHOD("has_leadership_aura"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[LEADERSHIPAURA_INDEX].Value; });
 	ClassDB::bind_method(D_METHOD("has_regeneration_aura"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Variables[REGENERATIONAURA_INDEX].Value; });
 }
 
