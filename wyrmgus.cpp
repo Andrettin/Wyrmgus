@@ -6,6 +6,7 @@
 
 #include "stratagus.h"
 
+#include "civilization.h"
 #include "hair_color.h"
 #include "literary_text.h"
 #include "player.h"
@@ -76,6 +77,8 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_hair_color", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CHairColor::Get(ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_player_color", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CPlayerColor::Get(ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_skin_color", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CSkinColor::Get(ident.utf8().get_data()); });
+	
+	ClassDB::bind_method(D_METHOD("get_civilization", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CCivilization::Get(ident.utf8().get_data()); });
 	
 	ClassDB::bind_method(D_METHOD("get_campaign", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CCampaign::Get(ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_campaigns"),[](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CCampaign::GetAll()); });
