@@ -393,8 +393,8 @@ std::string PascalCaseToSnakeCase(const std::string &str)
 	for (size_t i = 1; i < result.size(); ++i) {
 		if (isupper(result[i])) {
 			std::string replacement;
-			replacement += static_cast<char>(tolower(result[i]));
 			replacement += '_';
+			replacement += static_cast<char>(tolower(result[i]));
 			result.replace(i, 1, replacement);
 			++i; //because of the underline
 		}
