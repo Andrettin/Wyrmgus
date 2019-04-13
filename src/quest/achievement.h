@@ -64,11 +64,11 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("description", Description);
-		PROPERTY_KEY("character_level", CharacterLevel);
-		PROPERTY_KEY("difficulty", Difficulty);
-		PROPERTY_KEY("hidden", Hidden);
-		PROPERTY_KEY("unobtainable", Unobtainable);
+		REGISTER_PROPERTY(Description);
+		REGISTER_PROPERTY(CharacterLevel);
+		REGISTER_PROPERTY(Difficulty);
+		REGISTER_PROPERTY(Hidden);
+		REGISTER_PROPERTY(Unobtainable);
 		
 		return true;
 	}

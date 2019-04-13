@@ -38,6 +38,10 @@
 #include "data_type.h"
 
 /*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
@@ -51,13 +55,13 @@ public:
 private:
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("consumable", Consumable);
-		PROPERTY_KEY("two_handed", TwoHanded);
-		PROPERTY_KEY("thrusting_weapon", ThrustingWeapon);
-		PROPERTY_KEY("allow_arrows", AllowArrows);
-		PROPERTY_KEY("shield", Shield);
-		PROPERTY_KEY("special_property_required", SpecialPropertyRequired);
-		PROPERTY_KEY("shield_compatible", ShieldCompatible);
+		REGISTER_PROPERTY(Consumable);
+		REGISTER_PROPERTY(TwoHanded);
+		REGISTER_PROPERTY(ThrustingWeapon);
+		REGISTER_PROPERTY(AllowArrows);
+		REGISTER_PROPERTY(Shield);
+		REGISTER_PROPERTY(SpecialPropertyRequired);
+		REGISTER_PROPERTY(ShieldCompatible);
 		
 		return true;
 	}
@@ -77,7 +81,7 @@ public:
 	Property<bool> ShieldCompatible = false;	/// whether the item class is compatible with shields
 	
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

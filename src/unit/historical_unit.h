@@ -63,7 +63,7 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("quantity", Quantity);
+		REGISTER_PROPERTY(Quantity);
 		
 		return true;
 	}

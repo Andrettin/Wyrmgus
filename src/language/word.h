@@ -160,8 +160,8 @@ public:
 private:
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("language", Language);
-		PROPERTY_KEY("anglicized_name", AnglicizedName);
+		REGISTER_PROPERTY(Language);
+		REGISTER_PROPERTY(AnglicizedName);
 		
 		return true;
 	}

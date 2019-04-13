@@ -67,9 +67,9 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("description", Description);
-		PROPERTY_KEY("hidden", Hidden);
-		PROPERTY_KEY("sandbox", Sandbox);
+		REGISTER_PROPERTY(Description);
+		REGISTER_PROPERTY(Hidden);
+		REGISTER_PROPERTY(Sandbox);
 		
 		return true;
 	}

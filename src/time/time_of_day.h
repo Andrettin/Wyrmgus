@@ -58,10 +58,10 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("dawn", Dawn);
-		PROPERTY_KEY("day", Day);
-		PROPERTY_KEY("dusk", Dusk);
-		PROPERTY_KEY("night", Night);
+		REGISTER_PROPERTY(Dawn);
+		REGISTER_PROPERTY(Day);
+		REGISTER_PROPERTY(Dusk);
+		REGISTER_PROPERTY(Night);
 		
 		return true;
 	}

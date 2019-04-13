@@ -66,3 +66,8 @@ bool ItemClass::ProcessConfigDataProperty(const std::string &key, std::string va
 	
 	return true;
 }
+
+void ItemClass::_bind_methods()
+{
+	BIND_PROPERTIES();
+}

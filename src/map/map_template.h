@@ -91,12 +91,12 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("width", Width);
-		PROPERTY_KEY("height", Height);
-		PROPERTY_KEY("scale", Scale);
-		PROPERTY_KEY("priority", Priority);
-		PROPERTY_KEY("overland", Overland);
-		PROPERTY_KEY("output_terrain_image", OutputTerrainImage);
+		REGISTER_PROPERTY(Width);
+		REGISTER_PROPERTY(Height);
+		REGISTER_PROPERTY(Scale);
+		REGISTER_PROPERTY(Priority);
+		REGISTER_PROPERTY(Overland);
+		REGISTER_PROPERTY(OutputTerrainImage);
 		
 		return true;
 	}

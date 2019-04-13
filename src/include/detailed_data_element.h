@@ -64,10 +64,10 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("description", Description);
-		PROPERTY_KEY("quote", Quote);
-		PROPERTY_KEY("background", Background);
-		PROPERTY_KEY("icon", Icon);
+		REGISTER_PROPERTY(Description);
+		REGISTER_PROPERTY(Quote);
+		REGISTER_PROPERTY(Background);
+		REGISTER_PROPERTY(Icon);
 		
 		return true;
 	}

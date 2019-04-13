@@ -63,7 +63,7 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("cultural_deities", CulturalDeities);
+		REGISTER_PROPERTY(CulturalDeities);
 		
 		return true;
 	}

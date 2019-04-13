@@ -380,6 +380,29 @@ std::string FormatNumber(const int number)
 	return str;
 }
 
+std::string PascalCaseToSnakeCase(const std::string &str)
+{
+	if (str.empty()) {
+		return str;
+	}
+	
+	std::string result(str);
+	
+	result[0] = tolower(result[0]);
+	
+	for (size_t i = 1; i < result.size(); ++i) {
+		if (isupper(result[i])) {
+			std::string replacement;
+			replacement += static_cast<char>(tolower(result[i]));
+			replacement += '_';
+			result.replace(i, 1, replacement);
+			++i; //because of the underline
+		}
+	}
+	
+	return result;
+}
+
 std::string SnakeCaseToPascalCase(const std::string &str)
 {
 	if (str.empty()) {

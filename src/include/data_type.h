@@ -72,8 +72,8 @@ private: \
 	static inline std::map<std::string, std::function<PropertyCommonBase *(class_name *)>> Properties; \
 	static inline std::map<std::string, String> PropertyGetterPrefixes;
 	
-#define PROPERTY_KEY(property_key, property_variable) \
-	ThisClass::Properties.insert({property_key, std::function<PropertyCommonBase *(ThisClass *)>([](ThisClass *class_instance) -> PropertyCommonBase* { return &class_instance->property_variable; })});
+#define REGISTER_PROPERTY(property_variable) \
+	ThisClass::Properties.insert({PascalCaseToSnakeCase(#property_variable), std::function<PropertyCommonBase *(ThisClass *)>([](ThisClass *class_instance) -> PropertyCommonBase* { return &class_instance->property_variable; })});
 	
 #define BIND_PROPERTIES() \
 	for (std::map<std::string, std::function<PropertyCommonBase *(ThisClass *)>>::iterator iterator = ThisClass::Properties.begin(); iterator != ThisClass::Properties.end(); ++iterator) { \
@@ -114,6 +114,8 @@ template <typename T, typename O>
 class Property;
 
 class PropertyCommonBase;
+
+extern std::string PascalCaseToSnakeCase(const std::string &str);
 
 /*----------------------------------------------------------------------------
 --  Definition

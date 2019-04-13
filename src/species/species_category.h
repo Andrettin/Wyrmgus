@@ -63,7 +63,7 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("common_name", CommonName);
+		REGISTER_PROPERTY(CommonName);
 		
 		return true;
 	}

@@ -66,7 +66,7 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("major", Major);
+		REGISTER_PROPERTY(Major);
 		
 		return true;
 	}

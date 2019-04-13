@@ -137,6 +137,7 @@ inline Array VectorToGodotArray(const std::vector<T> &vector)
 
 extern String NumberToRomanNumeral(unsigned number);
 extern std::string FormatNumber(const int number);
+extern std::string PascalCaseToSnakeCase(const std::string &str);
 extern std::string SnakeCaseToPascalCase(const std::string &str);
 
 /*----------------------------------------------------------------------------

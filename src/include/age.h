@@ -66,8 +66,8 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("priority", Priority);
-		PROPERTY_KEY("year_boost", YearBoost);
+		REGISTER_PROPERTY(Priority);
+		REGISTER_PROPERTY(YearBoost);
 		
 		return true;
 	}

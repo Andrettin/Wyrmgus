@@ -114,7 +114,7 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("frame", Frame);
+		REGISTER_PROPERTY(Frame);
 		
 		return true;
 	}

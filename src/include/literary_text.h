@@ -65,18 +65,18 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		PROPERTY_KEY("hidden", Hidden);
-		PROPERTY_KEY("author", Author);
-		PROPERTY_KEY("translator", Translator);
-		PROPERTY_KEY("publisher", Publisher);
-		PROPERTY_KEY("license", License);
-		PROPERTY_KEY("notes", Notes);
-		PROPERTY_KEY("publication_year", PublicationYear);
-		PROPERTY_KEY("initial_page_number", InitialPageNumber);
-		PROPERTY_KEY("page_numbering_enabled", PageNumberingEnabled);
-		PROPERTY_KEY("lowercase_roman_numeral_page_numbering", LowercaseRomanNumeralPageNumbering);
-		PROPERTY_KEY("icon", Icon);
-		PROPERTY_KEY("sections", Sections);
+		REGISTER_PROPERTY(Hidden);
+		REGISTER_PROPERTY(Author);
+		REGISTER_PROPERTY(Translator);
+		REGISTER_PROPERTY(Publisher);
+		REGISTER_PROPERTY(License);
+		REGISTER_PROPERTY(Notes);
+		REGISTER_PROPERTY(PublicationYear);
+		REGISTER_PROPERTY(InitialPageNumber);
+		REGISTER_PROPERTY(PageNumberingEnabled);
+		REGISTER_PROPERTY(LowercaseRomanNumeralPageNumbering);
+		REGISTER_PROPERTY(Icon);
+		REGISTER_PROPERTY(Sections);
 		
 		PropertyGetterPrefixes["lowercase_roman_numeral_page_numbering"] = "has";
 		
