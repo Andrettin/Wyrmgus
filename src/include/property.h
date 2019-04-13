@@ -118,16 +118,6 @@ public:
 	}
 
 public:	
-	T &operator *()
-	{
-		if (this->Value == nullptr) {
-			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
-		}
-		
-		//get the underlying value
-		return *this->Value;
-	}
-
 	const PropertyBase<T> &operator =(const T &rhs)
 	{
 		this->Set(rhs);
@@ -265,16 +255,6 @@ protected:
 	}
 	
 public:
-	const T &operator *() const
-	{
-		if (this->Value == nullptr) {
-			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
-		}
-		
-		//get the underlying value
-		return *this->Value;
-	}
-	
 	ReturnType Get() const
 	{
 		//get the underlying value
@@ -490,16 +470,6 @@ protected:
 	}
 	
 public:
-	const T &operator *() const
-	{
-		if (this->Value == nullptr) {
-			throw std::runtime_error("Tried to get the underlying value from a property which has none.");
-		}
-		
-		//get the underlying value
-		return *this->Value;
-	}
-	
 	ModifiableReturnType Get() const
 	{
 		//get the underlying value
