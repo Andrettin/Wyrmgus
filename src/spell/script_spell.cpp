@@ -37,6 +37,7 @@
 
 #include "civilization.h"
 #include "faction.h"
+#include "item_class.h"
 #include "luacallback.h"
 #include "script.h"
 #include "sound/script_sound.h"
@@ -422,9 +423,9 @@ static int CclDefineSpell(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "item-spell")) {
-			const int item_class = GetItemClassIdByName(LuaToString(l, i + 1));
-			if (item_class != -1) {
-				spell->ItemSpell[item_class] = true;
+			const ItemClass *item_class = ItemClass::Get(LuaToString(l, i + 1));
+			if (item_class != nullptr) {
+				spell->ItemSpell.insert(item_class);
 			}
 		//Wyrmgus end
 		} else {

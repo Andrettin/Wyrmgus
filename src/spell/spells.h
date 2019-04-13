@@ -56,8 +56,9 @@ class CPlayer;
 class CSpell;
 class CUnit;
 class CUnitType;
-struct lua_State;
+class ItemClass;
 class MissileType;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -276,7 +277,7 @@ public:
 	SoundConfig SoundWhenCast;	/// Sound played if cast
 	
 	//Wyrmgus start
-	bool ItemSpell[MaxItemClasses];
+	std::set<const ItemClass *> ItemSpell;
 	//Wyrmgus end
 
 	bool IsCasterOnly() const

@@ -69,6 +69,7 @@ class CUnitTypeVariation;
 class CUpgrade;
 class CVariable;
 class CViewport;
+class ItemClass;
 class PathFinderData;
 struct lua_State;
 
@@ -385,7 +386,7 @@ public:
 	int GetModifiedVariable(const int index, const int variable_type = 0) const;
 	int GetReactionRange() const;
 	int GetItemSlotQuantity(int item_slot) const;
-	int GetCurrentWeaponClass() const;
+	const ItemClass *GetCurrentWeaponClass() const;
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
 	int GetDisplayPlayer() const;
 	int GetPrice() const;
@@ -405,11 +406,11 @@ public:
 	bool CanCastAnySpell() const;
 	bool CanAutoCastSpell(const CSpell *spell) const;
 	bool IsItemEquipped(const CUnit *item) const;
-	bool IsItemClassEquipped(int item_class) const;
+	bool IsItemClassEquipped(const ItemClass *item_class) const;
 	bool IsItemTypeEquipped(const CUnitType *item_type) const;
 	bool IsUniqueItemEquipped(const CUniqueItem *unique) const;
 	bool CanEquipItem(CUnit *item) const;
-	bool CanEquipItemClass(int item_class) const;
+	bool CanEquipItemClass(const ItemClass *item_class) const;
 	bool CanUseItem(CUnit *item) const;
 	bool IsItemSetComplete(const CUnit *item) const;
 	bool EquippingItemCompletesSet(const CUnit *item) const;

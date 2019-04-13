@@ -36,6 +36,7 @@
 #include "ui/popup.h"
 
 #include "game/trigger.h"
+#include "item_class.h"
 #include "player.h"
 #include "spell/spells.h"
 //Wyrmgus start
@@ -744,7 +745,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "UnitTypeClass")) {
 			condition->UnitClass = UnitClass::Get(LuaToString(l, -1));
 		} else if (!strcmp(key, "ItemClass")) {
-			condition->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
+			condition->ItemClass = ItemClass::Get(LuaToString(l, -1));
 		} else if (!strcmp(key, "CanStore")) {
 			condition->CanStore = GetResourceIdByName(LuaToString(l, -1));
 		} else if (!strcmp(key, "ImproveIncome")) {

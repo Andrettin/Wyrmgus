@@ -41,6 +41,8 @@
 #include "item.h"
 //Wyrmgus end
 
+#include <set>
+
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -67,6 +69,7 @@ class CUniqueItem;
 class CUnitType;
 class CUpgradeModifier;
 class CVariable;
+class ItemClass;
 struct lua_State;
 
 /**
@@ -145,10 +148,10 @@ public:
 	bool MagicSuffix = false;
 	bool RunicAffix = false;
 	bool UniqueOnly = false;		/// Whether (if this is a literary work) this should appear only on unique items (used, for instance, if a book has no copies of its text)
-	bool ItemPrefix[MaxItemClasses];
-	bool ItemSuffix[MaxItemClasses];
+	std::set<const ItemClass *> ItemPrefix;
+	std::set<const ItemClass *> ItemSuffix;
 	bool IncompatibleAffixes[UpgradeMax];
-	std::vector<int> WeaponClasses;		/// If isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
+	std::vector<const ItemClass *> WeaponClasses;	/// If isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
 	std::vector<std::string> Epithets;	/// Epithets when a character has a certain trait
 	CUnitType *Item = nullptr;
 	//Wyrmgus end
@@ -159,7 +162,7 @@ public:
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
 	int MaxLimit = 1;					/// Maximum amount of times this upgrade can be acquired as an individual upgrade
 	int MagicLevel = 0;					/// Magic level of an affix
-	int Work = -1;						/// Form in which was inscribed (i.e. scroll or book), if is a literary work
+	const ItemClass *Work = nullptr;	/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year = 0;						/// Year of publication, if is a literary work
 	CCharacter *Author = nullptr;		/// Author of this literary work (if it is one)
 	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade

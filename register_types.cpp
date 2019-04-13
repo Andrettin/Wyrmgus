@@ -45,6 +45,7 @@
 #include "faction.h"
 #include "game/trigger.h"
 #include "hair_color.h"
+#include "item_class.h"
 #include "language/language.h"
 #include "language/word.h"
 #include "literary_text.h"
@@ -136,6 +137,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CUpgrade>();
 	ClassDB::register_class<CWord>();
 	ClassDB::register_class<CWorld>();
+	ClassDB::register_class<ItemClass>();
 	ClassDB::register_class<MissileType>();
 	ClassDB::register_class<UnitClass>();
 	

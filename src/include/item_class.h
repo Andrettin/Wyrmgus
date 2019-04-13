@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_class.h - The unit class header file. */
+/**@name item_class.h - The item class header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UNIT_CLASS_H__
-#define __UNIT_CLASS_H__
+#ifndef __ITEM_CLASS_H__
+#define __ITEM_CLASS_H__
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -38,23 +38,43 @@
 #include "data_type.h"
 
 /*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-class CUnitType;
-
-/*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class UnitClass : public DataElement, public DataType<UnitClass>
+class ItemClass : public DataElement, public DataType<ItemClass>
 {
-	DATA_TYPE(UnitClass, DataElement)
+	DATA_TYPE(ItemClass, DataElement)
 
 public:
-	static constexpr const char *ClassIdentifier = "unit_class";
+	static constexpr const char *ClassIdentifier = "item_class";
 	
-	std::vector<CUnitType *> UnitTypes;
+private:
+	static inline bool InitializeClass()
+	{
+		PROPERTY_KEY("consumable", Consumable);
+		PROPERTY_KEY("two_handed", TwoHanded);
+		PROPERTY_KEY("thrusting_weapon", ThrustingWeapon);
+		PROPERTY_KEY("allow_arrows", AllowArrows);
+		PROPERTY_KEY("shield", Shield);
+		PROPERTY_KEY("special_property_required", SpecialPropertyRequired);
+		PROPERTY_KEY("shield_compatible", ShieldCompatible);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
+	
+public:
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
+	
+	Property<int> Slot = -1;				/// the item slot of the item class
+	Property<bool> Consumable = false;		/// whether the item class is consumable
+	Property<bool> TwoHanded = false;		/// whether the item class is a two-handed weapon
+	Property<bool> ThrustingWeapon = false;	/// whether the item class is a thrusting weapon
+	Property<bool> AllowArrows = false;		/// whether the item class allows arrows to be equipped
+	Property<bool> Shield = false;			/// whether the item class is a shield
+	Property<bool> SpecialPropertyRequired = false;	/// whether items of the item class must always have a special property (e.g. a magic affix)
+	Property<bool> ShieldCompatible = false;	/// whether the item class is compatible with shields
 	
 protected:
 	static inline void _bind_methods() {}

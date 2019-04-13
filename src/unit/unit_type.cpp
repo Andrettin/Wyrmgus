@@ -50,6 +50,7 @@
 //Wyrmgus end
 #include "faction.h"
 #include "iolib.h"
+#include "item_class.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/terrain_type.h"
@@ -786,11 +787,9 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 		this->CorpseType = nullptr;
 	} else if (key == "weapon_class") {
 		value = FindAndReplaceString(value, "_", "-");
-		const int weapon_class_id = GetItemClassIdByName(value);
-		if (weapon_class_id != -1) {
-			this->WeaponClasses.push_back(weapon_class_id);
-		} else {
-			fprintf(stderr, "Invalid weapon class: \"%s\".\n", value.c_str());
+		const ::ItemClass *weapon_class = ::ItemClass::Get(value);
+		if (weapon_class != nullptr) {
+			this->WeaponClasses.push_back(weapon_class);
 		}
 	} else if (key == "ai_drop") {
 		value = FindAndReplaceString(value, "_", "-");
@@ -802,11 +801,9 @@ bool CUnitType::ProcessConfigDataProperty(const std::string &key, std::string va
 		}
 	} else if (key == "item_class") {
 		value = FindAndReplaceString(value, "_", "-");
-		const int item_class_id = GetItemClassIdByName(value);
-		if (item_class_id != -1) {
-			this->ItemClass = item_class_id;
-		} else {
-			fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
+		const ::ItemClass *item_class = ::ItemClass::Get(value);
+		if (item_class != nullptr) {
+			this->ItemClass = item_class;
 		}
 	} else if (key == "species") {
 		value = FindAndReplaceString(value, "_", "-");
@@ -1578,11 +1575,11 @@ void CUnitType::SetParent(CUnitType *parent_type)
 		variation->Construction = parent_variation->Construction;
 		variation->UpgradesRequired = parent_variation->UpgradesRequired;
 		variation->UpgradesForbidden = parent_variation->UpgradesForbidden;
-		for (size_t i = 0; i < parent_variation->ItemClassesEquipped.size(); ++i) {
-			variation->ItemClassesEquipped.push_back(parent_variation->ItemClassesEquipped[i]);
+		for (const ::ItemClass *item_class : parent_variation->ItemClassesEquipped) {
+			variation->ItemClassesEquipped.push_back(item_class);
 		}
-		for (size_t i = 0; i < parent_variation->ItemClassesNotEquipped.size(); ++i) {
-			variation->ItemClassesNotEquipped.push_back(parent_variation->ItemClassesNotEquipped[i]);
+		for (const ::ItemClass *item_class : parent_variation->ItemClassesNotEquipped) {
+			variation->ItemClassesNotEquipped.push_back(item_class);
 		}
 		for (size_t i = 0; i < parent_variation->ItemsEquipped.size(); ++i) {
 			variation->ItemsEquipped.push_back(parent_variation->ItemsEquipped[i]);
@@ -1619,11 +1616,11 @@ void CUnitType::SetParent(CUnitType *parent_type)
 			variation->File = parent_variation->File;
 			variation->UpgradesRequired = parent_variation->UpgradesRequired;
 			variation->UpgradesForbidden = parent_variation->UpgradesForbidden;
-			for (size_t u = 0; u < parent_variation->ItemClassesEquipped.size(); ++u) {
-				variation->ItemClassesEquipped.push_back(parent_variation->ItemClassesEquipped[u]);
+			for (const ::ItemClass *item_class : parent_variation->ItemClassesEquipped) {
+				variation->ItemClassesEquipped.push_back(item_class);
 			}
-			for (size_t u = 0; u < parent_variation->ItemClassesNotEquipped.size(); ++u) {
-				variation->ItemClassesNotEquipped.push_back(parent_variation->ItemClassesNotEquipped[u]);
+			for (const ::ItemClass *item_class : parent_variation->ItemClassesNotEquipped) {
+				variation->ItemClassesNotEquipped.push_back(item_class);
 			}
 			for (size_t u = 0; u < parent_variation->ItemsEquipped.size(); ++u) {
 				variation->ItemsEquipped.push_back(parent_variation->ItemsEquipped[u]);
@@ -1939,6 +1936,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 void CUnitType::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_unit_class"), [](const CUnitType *unit_type){ return unit_type->Class; });
+	ClassDB::bind_method(D_METHOD("get_item_class"), [](const CUnitType *unit_type){ return const_cast<ItemClass *>(unit_type->ItemClass); });
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CUnitType::GetCivilization);
 	ClassDB::bind_method(D_METHOD("get_faction"), &CUnitType::GetFaction);
 	ClassDB::bind_method(D_METHOD("get_description"), &CUnitType::GetDescription);

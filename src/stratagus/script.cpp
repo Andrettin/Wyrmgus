@@ -54,6 +54,7 @@
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
+#include "item_class.h"
 #include "map/map.h"
 #include "map/site.h"
 #include "parameters.h"
@@ -1636,7 +1637,7 @@ std::string EvalString(const StringDesc *s)
 			if (type != nullptr) {
 				std::string str;
 				if ((**type).BoolFlag[ITEM_INDEX].value) {
-					str = GetItemClassNameById((**type).ItemClass).c_str();
+					str = (**type).ItemClass->Ident.c_str();
 				} else if ((**type).Class != nullptr) {
 					str = (**type).Class->Ident.c_str();
 				}

@@ -44,6 +44,7 @@
 #include "construct.h"
 #include "editor/editor.h"
 #include "faction.h"
+#include "item_class.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -834,16 +835,16 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "item-class-equipped")) {
 						std::string item_class_ident = LuaToString(l, -1, k + 1);
-						int item_class = GetItemClassIdByName(item_class_ident);
-						if (item_class != -1) {
+						const ItemClass *item_class = ItemClass::Get(item_class_ident);
+						if (item_class != nullptr) {
 							variation->ItemClassesEquipped.push_back(item_class);
 						} else {
 							LuaError(l, "Item class \"%s\" does not exist." _C_ item_class_ident.c_str());
 						}
 					} else if (!strcmp(value, "item-class-not-equipped")) {
 						std::string item_class_ident = LuaToString(l, -1, k + 1);
-						int item_class = GetItemClassIdByName(item_class_ident);
-						if (item_class != -1) {
+						const ItemClass *item_class = ItemClass::Get(item_class_ident);
+						if (item_class != nullptr) {
 							variation->ItemClassesNotEquipped.push_back(item_class);
 						} else {
 							LuaError(l, "Item class \"%s\" does not exist." _C_ item_class_ident.c_str());
@@ -1882,7 +1883,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "ItemClass")) {
-			type->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
+			type->ItemClass = ItemClass::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Species")) {
 			CSpecies *species = CSpecies::Get(LuaToString(l, -1));
 			if (species) {
@@ -1899,9 +1900,9 @@ static int CclDefineUnitType(lua_State *l)
 			type->WeaponClasses.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				int weapon_class_id = GetItemClassIdByName(LuaToString(l, -1, j + 1));
-				if (weapon_class_id != -1) {
-					type->WeaponClasses.push_back(weapon_class_id);
+				const ItemClass *weapon_class = ItemClass::Get(LuaToString(l, -1, j + 1));
+				if (weapon_class != nullptr) {
+					type->WeaponClasses.push_back(weapon_class);
 				} else { // Error
 					LuaError(l, "incorrect weapon class");
 				}
@@ -2404,8 +2405,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->Parent->Ident.c_str());
 		return 1;
 	} else if (!strcmp(data, "Class")) {
-		if (type->ItemClass != -1) {
-			lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
+		if (type->ItemClass != nullptr) {
+			lua_pushstring(l, type->ItemClass->Ident.c_str());
 		} else if (type->Class != nullptr) {
 			lua_pushstring(l, type->Class->Ident.c_str());
 		} else {
@@ -2532,25 +2533,31 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "ItemClass")) {
-		lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
+		if (type->ItemClass != nullptr) {
+			lua_pushstring(l, type->ItemClass->Ident.c_str());
+		} else {
+			lua_pushstring(l, type->ItemClass->Ident.c_str());
+		}
 		return 1;
 	} else if (!strcmp(data, "ItemSlot")) {
-		const int item_slot = GetItemClassSlot(type->ItemClass);
-		if (item_slot != -1) {
-			lua_pushstring(l, GetItemSlotNameById(item_slot).c_str());
+		if (type->ItemClass != nullptr && type->ItemClass->Slot != -1) {
+			lua_pushstring(l, GetItemSlotNameById(type->ItemClass->Slot).c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "ItemSlotId")) {
-		const int item_slot = GetItemClassSlot(type->ItemClass);
-		lua_pushnumber(l, item_slot);
+		if (type->ItemClass != nullptr) {
+			lua_pushnumber(l, type->ItemClass->Slot);
+		} else {
+			lua_pushnumber(l, -1);
+		}
 		return 1;
 	} else if (!strcmp(data, "WeaponClasses")) {
 		lua_createtable(l, type->WeaponClasses.size(), 0);
 		for (size_t i = 1; i <= type->WeaponClasses.size(); ++i)
 		{
-			lua_pushstring(l, GetItemClassNameById(type->WeaponClasses[i-1]).c_str());
+			lua_pushstring(l, type->WeaponClasses[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -2866,17 +2873,17 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Prefixes")) {
-		std::vector<CUpgrade *> prefixes;
+		std::vector<const CUpgrade *> prefixes;
 		for (size_t i = 0; i < type->Affixes.size(); ++i)
 		{
 			if (type->Affixes[i]->MagicPrefix) {
 				prefixes.push_back(type->Affixes[i]);
 			}
 		}
-		if (type->ItemClass != -1) {
-			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-				if (AllUpgrades[i]->MagicPrefix && AllUpgrades[i]->ItemPrefix[type->ItemClass]) {
-					prefixes.push_back(AllUpgrades[i]);
+		if (type->ItemClass != nullptr) {
+			for (const CUpgrade *upgrade : AllUpgrades) {
+				if (upgrade->MagicPrefix && upgrade->ItemPrefix.find(type->ItemClass) != upgrade->ItemPrefix.end()) {
+					prefixes.push_back(upgrade);
 				}
 			}
 		}
@@ -2896,10 +2903,10 @@ static int CclGetUnitTypeData(lua_State *l)
 				suffixes.push_back(type->Affixes[i]);
 			}
 		}
-		if (type->ItemClass != -1) {
-			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-				if (AllUpgrades[i]->MagicSuffix && AllUpgrades[i]->ItemSuffix[type->ItemClass]) {
-					suffixes.push_back(AllUpgrades[i]);
+		if (type->ItemClass != nullptr) {
+			for (CUpgrade *upgrade : AllUpgrades) {
+				if (upgrade->MagicSuffix && upgrade->ItemSuffix.find(type->ItemClass) != upgrade->ItemSuffix.end()) {
+					suffixes.push_back(upgrade);
 				}
 			}
 		}
@@ -2913,7 +2920,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Works")) {
 		std::vector<CUpgrade *> works;
-		if (type->ItemClass != -1) {
+		if (type->ItemClass != nullptr) {
 			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 				if (AllUpgrades[i]->Work == type->ItemClass && !AllUpgrades[i]->UniqueOnly) {
 					works.push_back(AllUpgrades[i]);

@@ -35,15 +35,11 @@
 
 #include "item.h"
 
-#include <ctype.h>
-
-#include <string>
-#include <map>
-
 #include "character.h"
 #include "config.h"
 #include "config_operator.h"
 #include "game/game.h"
+#include "item_class.h"
 #include "network/network.h"
 #include "parameters.h"
 #include "spell/spells.h"
@@ -53,6 +49,10 @@
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
+
+#include <ctype.h>
+#include <map>
+#include <string>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -116,167 +116,6 @@ std::string GetItemSlotNameById(int item_slot)
 	}
 
 	return "";
-}
-
-int GetItemClassIdByName(const std::string &item_class)
-{
-	if (item_class == "dagger") {
-		return DaggerItemClass;
-	} else if (item_class == "sword") {
-		return SwordItemClass;
-	} else if (item_class == "thrusting-sword") {
-		return ThrustingSwordItemClass;
-	} else if (item_class == "axe") {
-		return AxeItemClass;
-	} else if (item_class == "mace") {
-		return MaceItemClass;
-	} else if (item_class == "spear") {
-		return SpearItemClass;
-	} else if (item_class == "bow") {
-		return BowItemClass;
-	} else if (item_class == "throwing-axe") {
-		return ThrowingAxeItemClass;
-	} else if (item_class == "javelin") {
-		return JavelinItemClass;
-	} else if (item_class == "gun") {
-		return GunItemClass;
-	} else if (item_class == "shield") {
-		return ShieldItemClass;
-	} else if (item_class == "horn") {
-		return HornItemClass;
-	} else if (item_class == "helmet") {
-		return HelmetItemClass;
-	} else if (item_class == "armor") {
-		return ArmorItemClass;
-	} else if (item_class == "cloak") {
-		return CloakItemClass;
-	} else if (item_class == "gloves") {
-		return GlovesItemClass;
-	} else if (item_class == "belt") {
-		return BeltItemClass;
-	} else if (item_class == "boots") {
-		return BootsItemClass;
-	} else if (item_class == "amulet") {
-		return AmuletItemClass;
-	} else if (item_class == "ring") {
-		return RingItemClass;
-	} else if (item_class == "arrows") {
-		return ArrowsItemClass;
-	} else if (item_class == "food") {
-		return FoodItemClass;
-	} else if (item_class == "potion") {
-		return PotionItemClass;
-	} else if (item_class == "scroll") {
-		return ScrollItemClass;
-	} else if (item_class == "book") {
-		return BookItemClass;
-	}
-
-	return -1;
-}
-
-std::string GetItemClassNameById(int item_class)
-{
-	if (item_class == DaggerItemClass) {
-		return "dagger";
-	} else if (item_class == SwordItemClass) {
-		return "sword";
-	} else if (item_class == ThrustingSwordItemClass) {
-		return "thrusting-sword";
-	} else if (item_class == AxeItemClass) {
-		return "axe";
-	} else if (item_class == MaceItemClass) {
-		return "mace";
-	} else if (item_class == SpearItemClass) {
-		return "spear";
-	} else if (item_class == BowItemClass) {
-		return "bow";
-	} else if (item_class == ThrowingAxeItemClass) {
-		return "throwing-axe";
-	} else if (item_class == JavelinItemClass) {
-		return "javelin";
-	} else if (item_class == GunItemClass) {
-		return "gun";
-	} else if (item_class == ShieldItemClass) {
-		return "shield";
-	} else if (item_class == HornItemClass) {
-		return "horn";
-	} else if (item_class == HelmetItemClass) {
-		return "helmet";
-	} else if (item_class == ArmorItemClass) {
-		return "armor";
-	} else if (item_class == CloakItemClass) {
-		return "cloak";
-	} else if (item_class == GlovesItemClass) {
-		return "gloves";
-	} else if (item_class == BeltItemClass) {
-		return "belt";
-	} else if (item_class == BootsItemClass) {
-		return "boots";
-	} else if (item_class == AmuletItemClass) {
-		return "amulet";
-	} else if (item_class == RingItemClass) {
-		return "ring";
-	} else if (item_class == ArrowsItemClass) {
-		return "arrows";
-	} else if (item_class == FoodItemClass) {
-		return "food";
-	} else if (item_class == PotionItemClass) {
-		return "potion";
-	} else if (item_class == ScrollItemClass) {
-		return "scroll";
-	} else if (item_class == BookItemClass) {
-		return "book";
-	}
-
-	return "";
-}
-
-int GetItemClassSlot(int item_class)
-{
-	if (
-		item_class == DaggerItemClass
-		|| item_class == SwordItemClass
-		|| item_class == ThrustingSwordItemClass
-		|| item_class == AxeItemClass
-		|| item_class == MaceItemClass
-		|| item_class == SpearItemClass
-		|| item_class == BowItemClass
-		|| item_class == ThrowingAxeItemClass
-		|| item_class == JavelinItemClass
-		|| item_class == GunItemClass
-	) {
-		return WeaponItemSlot;
-	} else if (item_class == ShieldItemClass || item_class == HornItemClass) {
-		return ShieldItemSlot;
-	} else if (item_class == HelmetItemClass) {
-		return HelmetItemSlot;
-	} else if (item_class == ArmorItemClass || item_class == CloakItemClass) {
-		return ArmorItemSlot;
-	} else if (item_class == GlovesItemClass) {
-		return GlovesItemSlot;
-	} else if (item_class == BootsItemClass) {
-		return BootsItemSlot;
-	} else if (item_class == BeltItemClass) {
-		return BeltItemSlot;
-	} else if (item_class == AmuletItemClass) {
-		return AmuletItemSlot;
-	} else if (item_class == RingItemClass) {
-		return RingItemSlot;
-	} else if (item_class == ArrowsItemClass) {
-		return ArrowsItemSlot;
-	}
-
-	return -1;
-}
-
-bool IsItemClassConsumable(int item_class)
-{
-	if (item_class == FoodItemClass || item_class == PotionItemClass || item_class == ScrollItemClass || item_class == BookItemClass) {
-		return true;
-	}
-	
-	return false;
 }
 
 bool CUniqueItem::CanDrop() const
@@ -469,8 +308,8 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	if (is_equipped && this->Owner && GetItemClassSlot(this->Type->ItemClass) != -1) {
-		this->Owner->EquippedItems[GetItemClassSlot(this->Type->ItemClass)].push_back(this);
+	if (is_equipped && this->Owner && this->Type->ItemClass->Slot != -1) {
+		this->Owner->EquippedItems[this->Type->ItemClass->Slot].push_back(this);
 	}
 }
 

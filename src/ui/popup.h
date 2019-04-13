@@ -44,6 +44,7 @@
 class ButtonAction;
 class CFont;
 class CPopup;
+class ItemClass;
 class UnitClass;
 
 constexpr int MARGIN_X = 4;
@@ -73,7 +74,7 @@ public:
 	//Wyrmgus start
 	int UnitTypeType = -1;			/// unit type type (i.e. land, fly, etc.) of the button's unit type
 	const UnitClass *UnitClass = nullptr;	/// unit type class of the button's unit type
-	int ItemClass = -1;				/// item class of the button's item
+	const ItemClass *ItemClass = nullptr;	/// item class of the button's item
 	int CanStore = -1;				/// whether the button's unit type can store a particular resource
 	int ImproveIncome = -1;			/// whether the button's unit type improves the processing of a particular resource
 	CUpgrade *ResearchedUpgrade = nullptr;	/// whether the button's player has researched a particular upgrade

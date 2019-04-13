@@ -39,6 +39,7 @@
 #include "character.h"
 #include "commands.h"
 #include "iolib.h"
+#include "item_class.h"
 #include "luacallback.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -274,7 +275,7 @@ enum {
 				return;
 			}
 			PlayUnitSound(*goal, VoiceUsed);
-			if (goal->Type->BoolFlag[POWERUP_INDEX].value || IsItemClassConsumable(goal->Type->ItemClass)) { //only destroy item if it is consumable
+			if (goal->Type->BoolFlag[POWERUP_INDEX].value || (goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass->Consumable)) { //only destroy item if it is consumable
 				if (goal->Container == nullptr) {
 					goal->Remove(nullptr);
 					LetUnitDie(*goal);

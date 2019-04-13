@@ -21,7 +21,6 @@ class CUpgrade
 	int Costs[MaxCosts];
 	//Wyrmgus start
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];
-	int Work;
 	int Year;
 	//Wyrmgus end
 };

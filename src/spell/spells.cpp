@@ -50,6 +50,7 @@
 #include "config.h"
 #include "config_operator.h"
 #include "faction.h"
+#include "item_class.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -237,7 +238,7 @@ static bool PassCondition(const CUnit &caster, const CSpell &spell, const CUnit 
 	}
 	//Wyrmgus start
 	if (condition->ThrustingWeapon != CONDITION_TRUE) {
-		if ((condition->ThrustingWeapon == CONDITION_ONLY) ^ (caster.GetCurrentWeaponClass() == DaggerItemClass || caster.GetCurrentWeaponClass() == SwordItemClass || caster.GetCurrentWeaponClass() == ThrustingSwordItemClass || caster.GetCurrentWeaponClass() == SpearItemClass)) {
+		if ((condition->ThrustingWeapon == CONDITION_ONLY) ^ (caster.GetCurrentWeaponClass() != nullptr && caster.GetCurrentWeaponClass()->ThrustingWeapon)) {
 			return false;
 		}
 	}
@@ -296,9 +297,6 @@ CSpell::CSpell(int slot, const std::string &ident) :
 	this->Ident = ident;
 
 	memset(Costs, 0, sizeof(Costs));
-	//Wyrmgus start
-	memset(ItemSpell, 0, sizeof(ItemSpell));
-	//Wyrmgus end
 }
 
 /**
@@ -437,9 +435,9 @@ bool CSpell::ProcessConfigDataProperty(const std::string &key, std::string value
 		}
 	} else if (key == "item_spell") {
 		value = FindAndReplaceString(value, "_", "-");
-		const int item_class = GetItemClassIdByName(value);
-		if (item_class != -1) {
-			this->ItemSpell[item_class] = true;
+		const ItemClass *item_class = ItemClass::Get(value);
+		if (item_class != nullptr) {
+			this->ItemSpell.insert(item_class);
 		}
 	} else {
 		return false;

@@ -77,6 +77,7 @@ class CUniqueItem;
 class CVariable;
 class CWorld;
 //Wyrmgus end
+class ItemClass;
 class LuaCallback;
 class UnitClass;
 struct lua_State;
@@ -823,10 +824,10 @@ public:
 	//Wyrmgus start
 	int TrainQuantity = 0;								/// Quantity to be trained
 	int CostModifier = 0;								/// Cost modifier (cost increase for every unit of this type the player has)
-	int ItemClass = -1;									/// Item class (if the unit type is an item)
+	const ItemClass *ItemClass = nullptr;				/// Item class (if the unit type is an item)
 	CSpecies *Species = nullptr;
 	CTerrainType *TerrainType = nullptr;				/// The terrain type which the unit type becomes after being built
-	std::vector<int> WeaponClasses;						/// Weapon classes that the unit type can use (if the unit type uses a weapon)
+	std::vector<const ::ItemClass *> WeaponClasses;		/// Weapon classes that the unit type can use (if the unit type uses a weapon)
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles

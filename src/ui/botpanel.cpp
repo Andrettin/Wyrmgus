@@ -54,6 +54,7 @@
 //Wyrmgus end
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
+#include "item_class.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -439,7 +440,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	//Wyrmgus start
-	if (condition->Class && type && type->Class == nullptr && !(type->BoolFlag[ITEM_INDEX].value && type->ItemClass != -1)) {
+	if (condition->Class && type && type->Class == nullptr && !(type->BoolFlag[ITEM_INDEX].value && type->ItemClass != nullptr)) {
 		return false;
 	}
 	
@@ -509,7 +510,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Encyclopedia && type && type->Description.empty() && type->Background.empty() && type->Quote.empty() && (!type->BoolFlag[ITEM_INDEX].value || type->ItemClass == -1)) {
+	if (condition->Encyclopedia && type && type->Description.empty() && type->Background.empty() && type->Quote.empty() && (!type->BoolFlag[ITEM_INDEX].value || type->ItemClass == nullptr)) {
 		return false;
 	}
 	
@@ -677,7 +678,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Consumable != CONDITION_TRUE) {
-				if ((condition->Consumable == CONDITION_ONLY) ^ IsItemClassConsumable(unit.Type->ItemClass)) {
+				if ((condition->Consumable == CONDITION_ONLY) ^ (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Type->ItemClass->Consumable)) {
 					return false;
 				}
 			}
@@ -722,26 +723,26 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Weapon != CONDITION_TRUE) {
-				if ((condition->Weapon == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == WeaponItemSlot)) {
+				if ((condition->Weapon == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot == WeaponItemSlot)) {
 					return false;
 				}
 			}
 			if (condition->Shield != CONDITION_TRUE) {
-				if ((condition->Shield == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == ShieldItemSlot)) {
+				if ((condition->Shield == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot == ShieldItemSlot)) {
 					return false;
 				}
 			}
 			if (condition->Boots != CONDITION_TRUE) {
-				if ((condition->Boots == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == BootsItemSlot)) {
+				if ((condition->Boots == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot == BootsItemSlot)) {
 					return false;
 				}
 			}
 			if (condition->Arrows != CONDITION_TRUE) {
-				if ((condition->Arrows == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == ArrowsItemSlot)) {
+				if ((condition->Arrows == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot == ArrowsItemSlot)) {
 					return false;
 				}
 			}
-			if (condition->ItemClass != -1) {
+			if (condition->ItemClass != nullptr) {
 				if (condition->ItemClass != unit.Type->ItemClass) {
 					return false;
 				}

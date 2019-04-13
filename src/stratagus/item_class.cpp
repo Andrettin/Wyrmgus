@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_class.h - The unit class header file. */
+/**@name item_class.cpp - The item class source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,37 +27,42 @@
 //      02111-1307, USA.
 //
 
-#ifndef __UNIT_CLASS_H__
-#define __UNIT_CLASS_H__
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
-#include "data_type.h"
+#include "stratagus.h"
+
+#include "item_class.h"
+
+#include "config.h"
+#include "item.h"
 
 /*----------------------------------------------------------------------------
---  Declarations
+--  Functions
 ----------------------------------------------------------------------------*/
 
-class CUnitType;
-
-/*----------------------------------------------------------------------------
---  Definition
-----------------------------------------------------------------------------*/
-
-class UnitClass : public DataElement, public DataType<UnitClass>
+/**
+**	@brief	Process a property in the data provided by a configuration file
+**
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
+*/
+bool ItemClass::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	DATA_TYPE(UnitClass, DataElement)
-
-public:
-	static constexpr const char *ClassIdentifier = "unit_class";
+	if (key == "slot") {
+		value = FindAndReplaceString(value, "_", "-");
+		const int item_slot = GetItemSlotIdByName(value);
+		if (item_slot != -1) {
+			this->Slot = item_slot;
+		} else {
+			fprintf(stderr, "Invalid item slot: \"%s\".\n", value.c_str());
+		}
+	} else {
+		return false;
+	}
 	
-	std::vector<CUnitType *> UnitTypes;
-	
-protected:
-	static inline void _bind_methods() {}
-};
-
-#endif
+	return true;
+}

@@ -44,6 +44,7 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "item.h"
+#include "item_class.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "parameters.h"
@@ -716,13 +717,13 @@ bool CCharacter::IsSiblingOf(const std::string &sibling_ident) const
 
 bool CCharacter::IsItemEquipped(const CPersistentItem *item) const
 {
-	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	int item_slot = item->Type->ItemClass->Slot;
 	
 	if (item_slot == -1) {
 		return false;
 	}
 	
-	if (std::find(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), item) != EquippedItems[item_slot].end()) {
+	if (std::find(this->EquippedItems[item_slot].begin(), this->EquippedItems[item_slot].end(), item) != this->EquippedItems[item_slot].end()) {
 		return true;
 	}
 	

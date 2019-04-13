@@ -53,6 +53,7 @@ class CPlayerColorGraphic;
 class CSeason;
 class CTerrainType;
 class CUnitType;
+class ItemClass;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -93,8 +94,8 @@ public:
 
 	std::vector<const CUpgrade *> UpgradesRequired;		/// Upgrades required by variation
 	std::vector<const CUpgrade *> UpgradesForbidden;	/// If the player has one of these upgrades, the unit can't have this variation
-	std::vector<int> ItemClassesEquipped;
-	std::vector<int> ItemClassesNotEquipped;
+	std::vector<const ItemClass *> ItemClassesEquipped;
+	std::vector<const ItemClass *> ItemClassesNotEquipped;
 	std::vector<const CUnitType *> ItemsEquipped;
 	std::vector<const CUnitType *> ItemsNotEquipped;
 	std::vector<const CTerrainType *> Terrains;

@@ -67,44 +67,6 @@ enum ItemSlots {
 	MaxItemSlots
 };
 
-/**
-**  Indexes into item class array.
-*/
-enum ItemClasses {
-	DaggerItemClass,
-	SwordItemClass,
-	ThrustingSwordItemClass,
-	AxeItemClass,
-	MaceItemClass,
-	SpearItemClass,
-	BowItemClass,
-	ThrowingAxeItemClass,
-	JavelinItemClass,
-	GunItemClass,
-
-	ShieldItemClass,
-	HornItemClass,
-
-	HelmetItemClass,
-	ArmorItemClass,
-	CloakItemClass,
-	GlovesItemClass,
-	BeltItemClass,
-	BootsItemClass,
-
-	AmuletItemClass,
-	RingItemClass,
-	
-	ArrowsItemClass,
-
-	FoodItemClass,
-	PotionItemClass,
-	ScrollItemClass,
-	BookItemClass,
-
-	MaxItemClasses
-};
-
 class CUniqueItem
 {
 public:
@@ -158,10 +120,6 @@ extern std::vector<CUniqueItem *> UniqueItems;
 
 extern int GetItemSlotIdByName(const std::string &item_slot);
 extern std::string GetItemSlotNameById(int item_slot);
-extern int GetItemClassIdByName(const std::string &item_class);
-extern std::string GetItemClassNameById(int item_class);
-extern int GetItemClassSlot(int item_class);
-extern bool IsItemClassConsumable(int item_class);
 extern void CleanUniqueItems();
 extern CUniqueItem *GetUniqueItem(const std::string &item_ident);
 extern std::string GetItemEffectsString(const std::string &item_ident);

@@ -39,6 +39,7 @@
 #include "config.h"
 #include "config_operator.h"
 #include "construct.h"
+#include "item_class.h"
 #include "map/terrain_type.h"
 #include "mod.h"
 #include "time/season.h"
@@ -149,19 +150,15 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "item_class_equipped") {
 			value = FindAndReplaceString(value, "_", "-");
-			const int item_class = GetItemClassIdByName(value);
-			if (item_class != -1) {
+			const ItemClass *item_class = ItemClass::Get(value);
+			if (item_class != nullptr) {
 				this->ItemClassesEquipped.push_back(item_class);
-			} else {
-				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "item_class_not_equipped") {
 			value = FindAndReplaceString(value, "_", "-");
-			const int item_class = GetItemClassIdByName(value);
-			if (item_class != -1) {
+			const ItemClass *item_class = ItemClass::Get(value);
+			if (item_class != nullptr) {
 				this->ItemClassesNotEquipped.push_back(item_class);
-			} else {
-				fprintf(stderr, "Invalid item class: \"%s\".\n", value.c_str());
 			}
 		} else if (key == "item_equipped") {
 			value = FindAndReplaceString(value, "_", "-");

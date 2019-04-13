@@ -39,6 +39,7 @@
 #include "civilization.h"
 #include "faction.h"
 #include "grand_strategy.h"
+#include "item_class.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "map/site.h"
@@ -426,8 +427,8 @@ static int CclDefineCharacter(lua_State *l)
 						item->Identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
 						bool is_equipped = LuaToBoolean(l, -1, k + 1);
-						if (is_equipped && GetItemClassSlot(item->Type->ItemClass) != -1) {
-							character->EquippedItems[GetItemClassSlot(item->Type->ItemClass)].push_back(item);
+						if (is_equipped && item->Type->ItemClass->Slot != -1) {
+							character->EquippedItems[item->Type->ItemClass->Slot].push_back(item);
 						}
 					} else {
 						printf("\n%s\n", character->Ident.c_str());
@@ -786,8 +787,8 @@ static int CclDefineCustomHero(lua_State *l)
 						item->Identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
 						bool is_equipped = LuaToBoolean(l, -1, k + 1);
-						if (is_equipped && GetItemClassSlot(item->Type->ItemClass) != -1) {
-							hero->EquippedItems[GetItemClassSlot(item->Type->ItemClass)].push_back(item);
+						if (is_equipped && item->Type->ItemClass->Slot != -1) {
+							hero->EquippedItems[item->Type->ItemClass->Slot].push_back(item);
 						}
 					} else {
 						printf("\n%s\n", hero->Ident.c_str());

@@ -59,6 +59,7 @@
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
+#include "item_class.h"
 #include "language/language.h"
 #include "luacallback.h"
 #include "map/map.h"
@@ -889,7 +890,7 @@ void CUnit::HealingItemAutoUse()
 			continue;
 		}
 		
-		if (!IsItemClassConsumable(uins->Type->ItemClass)) {
+		if (uins->Type->ItemClass->Consumable == false) {
 			continue;
 		}
 		
@@ -1216,8 +1217,8 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 			}
 		}
 		
-		for (size_t j = 0; j < variation->ItemClassesNotEquipped.size(); ++j) {
-			if (this->IsItemClassEquipped(variation->ItemClassesNotEquipped[j])) {
+		for (const ItemClass *item_class : variation->ItemClassesNotEquipped) {
+			if (this->IsItemClassEquipped(item_class)) {
 				upgrades_check = false;
 				break;
 			}
@@ -1231,26 +1232,26 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		if (upgrades_check == false) {
 			continue;
 		}
-		for (size_t j = 0; j < variation->ItemClassesEquipped.size(); ++j) {
-			if (GetItemClassSlot(variation->ItemClassesEquipped[j]) == WeaponItemSlot) {
+		for (const ItemClass *item_class : variation->ItemClassesEquipped) {
+			if (item_class->Slot == WeaponItemSlot) {
 				requires_weapon = true;
-				if (IsItemClassEquipped(variation->ItemClassesEquipped[j])) {
+				if (this->IsItemClassEquipped(item_class)) {
 					found_weapon = true;
 				}
-			} else if (GetItemClassSlot(variation->ItemClassesEquipped[j]) == ShieldItemSlot) {
+			} else if (item_class->Slot == ShieldItemSlot) {
 				requires_shield = true;
-				if (IsItemClassEquipped(variation->ItemClassesEquipped[j])) {
+				if (this->IsItemClassEquipped(item_class)) {
 					found_shield = true;
 				}
 			}
 		}
 		for (size_t j = 0; j < variation->ItemsEquipped.size(); ++j) {
-			if (GetItemClassSlot(variation->ItemsEquipped[j]->ItemClass) == WeaponItemSlot) {
+			if (variation->ItemsEquipped[j]->ItemClass->Slot == WeaponItemSlot) {
 				requires_weapon = true;
 				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
 					found_weapon = true;
 				}
-			} else if (GetItemClassSlot(variation->ItemsEquipped[j]->ItemClass) == ShieldItemSlot) {
+			} else if (variation->ItemsEquipped[j]->ItemClass->Slot == ShieldItemSlot) {
 				requires_shield = true;
 				if (this->IsItemTypeEquipped(variation->ItemsEquipped[j])) {
 					found_shield = true;
@@ -1332,12 +1333,12 @@ void CUnit::ChooseButtonIcon(int button_action)
 			return;
 		}
 		
-		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->Type->ItemClass != BowItemClass && this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon != nullptr) {
+		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->Type->ItemClass->AllowArrows == false && this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon;
 			return;
 		}
 	} else if (button_action == ButtonStop) {
-		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->Type->ItemClass == ShieldItemClass && this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon != nullptr) {
+		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->Type->ItemClass->Shield == true && this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon;
 			return;
 		}
@@ -1379,7 +1380,7 @@ void CUnit::ChooseButtonIcon(int button_action)
 		if (this->Player->Allow.Upgrades[upgrade->ID] == 'R' && modifier->ApplyTo[this->Type->Slot] == 'X') {
 			if (
 				(
-					(button_action == ButtonAttack && ((upgrade->Weapon && upgrade->Item->ItemClass != BowItemClass) || upgrade->Arrows))
+					(button_action == ButtonAttack && ((upgrade->Weapon && upgrade->Item->ItemClass->AllowArrows == false) || upgrade->Arrows))
 					|| (button_action == ButtonStop && upgrade->Shield)
 					|| (button_action == ButtonMove && upgrade->Boots)
 				)
@@ -1405,7 +1406,7 @@ void CUnit::ChooseButtonIcon(int button_action)
 			return;
 		}
 	} else if (button_action == ButtonStop) {
-		if (this->Type->DefaultEquipment.find(ShieldItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->ItemClass == ShieldItemClass && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon != nullptr) {
+		if (this->Type->DefaultEquipment.find(ShieldItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->ItemClass->Shield == true && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon != nullptr) {
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon;
 			return;
 		}
@@ -1455,8 +1456,8 @@ void CUnit::ChooseButtonIcon(int button_action)
 
 void CUnit::EquipItem(CUnit &item, bool affect_character)
 {
-	int item_class = item.Type->ItemClass;
-	int item_slot = GetItemClassSlot(item_class);
+	const ItemClass *item_class = item.Type->ItemClass;
+	const int item_slot = item_class->Slot;
 	
 	if (item_slot == -1) {
 		fprintf(stderr, "Trying to equip item of type \"%s\", which has no item slot.\n", item.GetTypeName().c_str());
@@ -1473,7 +1474,13 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 			const CUpgrade *modifier_upgrade = AllUpgrades[modifier->UpgradeId];
 			if (
 				(modifier_upgrade->Weapon && Player->Allow.Upgrades[modifier_upgrade->ID] == 'R' && modifier->ApplyTo[Type->Slot] == 'X')
-				|| (modifier_upgrade->Ability && this->GetIndividualUpgrade(modifier_upgrade) && modifier_upgrade->WeaponClasses.size() > 0 && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end() && std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end())
+				|| (
+					modifier_upgrade->Ability
+					&& this->GetIndividualUpgrade(modifier_upgrade)
+					&& modifier_upgrade->WeaponClasses.size() > 0
+					&& std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), this->Type->WeaponClasses[0]) != modifier_upgrade->WeaponClasses.end()
+					&& std::find(modifier_upgrade->WeaponClasses.begin(), modifier_upgrade->WeaponClasses.end(), item_class) == modifier_upgrade->WeaponClasses.end()
+				)
 			) {
 				if (this->GetIndividualUpgrade(modifier_upgrade)) {
 					for (int i = 0; i < this->GetIndividualUpgrade(modifier_upgrade); ++i) {
@@ -1647,8 +1654,8 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		}
 	}
 
-	int item_class = item.Type->ItemClass;
-	int item_slot = GetItemClassSlot(item_class);
+	const ItemClass *item_class = item.Type->ItemClass;
+	const int item_slot = item_class->Slot;
 	
 	if (item_slot == -1) {
 		fprintf(stderr, "Trying to de-equip item of type \"%s\", which has no item slot.\n", item.GetTypeName().c_str());
@@ -2222,7 +2229,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 	
 	if (
 		this->Prefix == nullptr && this->Suffix == nullptr && this->Spell == nullptr && this->Work == nullptr && this->Elixir == nullptr
-		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == BookItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass || this->Type->ItemClass == HornItemClass || always_magic)
+		&& ((this->Type->ItemClass != nullptr && this->Type->ItemClass->SpecialPropertyRequired) || always_magic)
 	) { //scrolls, books, jewelry and horns must always have a property
 		this->GenerateSpecialProperties(dropper, dropper_player, allow_unique, sold_item, always_magic);
 	}
@@ -2231,15 +2238,15 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper, CPlayer *dropper_player, b
 void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUpgrade *> potential_prefixes;
-	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
-		if ((this->Type->ItemClass == -1 && this->Type->Affixes[i]->MagicPrefix) || (this->Type->ItemClass != -1 && this->Type->Affixes[i]->ItemPrefix[Type->ItemClass])) {
-			potential_prefixes.push_back(this->Type->Affixes[i]);
+	for (CUpgrade *affix : this->Type->Affixes) {
+		if ((this->Type->ItemClass == nullptr && affix->MagicPrefix) || (this->Type->ItemClass != nullptr && affix->ItemPrefix.find(this->Type->ItemClass) != affix->ItemPrefix.end())) {
+			potential_prefixes.push_back(affix);
 		}
 	}
 	if (dropper_player != nullptr) {
-		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependencies(AllUpgrades[i], dropper)) {
-				potential_prefixes.push_back(AllUpgrades[i]);
+		for (CUpgrade *upgrade : AllUpgrades) {
+			if (this->Type->ItemClass != nullptr && upgrade->ItemPrefix.find(this->Type->ItemClass) != upgrade->ItemPrefix.end() && CheckDependencies(upgrade, dropper)) {
+				potential_prefixes.push_back(upgrade);
 			}
 		}
 	}
@@ -2252,18 +2259,18 @@ void CUnit::GeneratePrefix(CUnit *dropper, CPlayer *dropper_player)
 void CUnit::GenerateSuffix(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUpgrade *> potential_suffixes;
-	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
-		if ((this->Type->ItemClass == -1 && this->Type->Affixes[i]->MagicSuffix) || (this->Type->ItemClass != -1 && this->Type->Affixes[i]->ItemSuffix[Type->ItemClass])) {
-			if (Prefix == nullptr || !this->Type->Affixes[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-				potential_suffixes.push_back(this->Type->Affixes[i]);
+	for (CUpgrade *affix : this->Type->Affixes) {
+		if ((this->Type->ItemClass == nullptr && affix->MagicSuffix) || (this->Type->ItemClass != nullptr && affix->ItemSuffix.find(this->Type->ItemClass) != affix->ItemSuffix.end())) {
+			if (this->Prefix == nullptr || !affix->IncompatibleAffixes[this->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+				potential_suffixes.push_back(affix);
 			}
 		}
 	}
 	if (dropper_player != nullptr) {
-		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependencies(AllUpgrades[i], dropper)) {
-				if (Prefix == nullptr || !AllUpgrades[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-					potential_suffixes.push_back(AllUpgrades[i]);
+		for (CUpgrade *upgrade : AllUpgrades) {
+			if (this->Type->ItemClass != nullptr && upgrade->ItemSuffix.find(this->Type->ItemClass) != upgrade->ItemSuffix.end() && CheckDependencies(upgrade, dropper)) {
+				if (this->Prefix == nullptr || !upgrade->IncompatibleAffixes[this->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+					potential_suffixes.push_back(upgrade);
 				}
 			}
 		}
@@ -2278,9 +2285,9 @@ void CUnit::GenerateSpell(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CSpell *> potential_spells;
 	if (dropper != nullptr) {
-		for (size_t i = 0; i < dropper->Type->DropSpells.size(); ++i) {
-			if (this->Type->ItemClass != -1 && dropper->Type->DropSpells[i]->ItemSpell[Type->ItemClass]) {
-				potential_spells.push_back(dropper->Type->DropSpells[i]);
+		for (CSpell *spell : dropper->Type->DropSpells) {
+			if (this->Type->ItemClass != nullptr && spell->ItemSpell.find(this->Type->ItemClass) != spell->ItemSpell.end()) {
+				potential_spells.push_back(spell);
 			}
 		}
 	}
@@ -2294,13 +2301,13 @@ void CUnit::GenerateWork(CUnit *dropper, CPlayer *dropper_player)
 {
 	std::vector<CUpgrade *> potential_works;
 	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
-		if (this->Type->ItemClass != -1 && this->Type->Affixes[i]->Work == this->Type->ItemClass && !this->Type->Affixes[i]->UniqueOnly) {
+		if (this->Type->ItemClass != nullptr && this->Type->Affixes[i]->Work == this->Type->ItemClass && !this->Type->Affixes[i]->UniqueOnly) {
 			potential_works.push_back(this->Type->Affixes[i]);
 		}
 	}
 	if (dropper_player != nullptr) {
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (this->Type->ItemClass != -1 && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependencies(AllUpgrades[i], dropper) && !AllUpgrades[i]->UniqueOnly) {
+			if (this->Type->ItemClass != nullptr && AllUpgrades[i]->Work == this->Type->ItemClass && CheckDependencies(AllUpgrades[i], dropper) && !AllUpgrades[i]->UniqueOnly) {
 				potential_works.push_back(AllUpgrades[i]);
 			}
 		}
@@ -5406,7 +5413,7 @@ int CUnit::GetItemSlotQuantity(int item_slot) const
 	
 	if ( //if the item are arrows and the weapon of this unit's type is not a bow, return false
 		item_slot == ArrowsItemSlot
-		&& Type->WeaponClasses[0] != BowItemClass
+		&& this->Type->WeaponClasses[0]->AllowArrows == false
 	) {
 		return 0;
 	}
@@ -5418,22 +5425,22 @@ int CUnit::GetItemSlotQuantity(int item_slot) const
 	return 1;
 }
 
-int CUnit::GetCurrentWeaponClass() const
+const ItemClass *CUnit::GetCurrentWeaponClass() const
 {
-	if (HasInventory() && EquippedItems[WeaponItemSlot].size() > 0) {
-		return EquippedItems[WeaponItemSlot][0]->Type->ItemClass;
+	if (this->HasInventory() && this->EquippedItems[WeaponItemSlot].size() > 0) {
+		return this->EquippedItems[WeaponItemSlot][0]->Type->ItemClass;
 	}
 	
-	return Type->WeaponClasses[0];
+	return this->Type->WeaponClasses[0];
 }
 
 int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool increase) const
 {
-	if (item->Type->ItemClass == -1) {
+	if (item->Type->ItemClass == nullptr) {
 		return 0;
 	}
 	
-	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	const int item_slot = item->Type->ItemClass->Slot;
 	if (item->Work == nullptr && item->Elixir == nullptr && (item_slot == -1 || this->GetItemSlotQuantity(item_slot) == 0 || !this->CanEquipItemClass(item->Type->ItemClass))) {
 		return 0;
 	}
@@ -5595,11 +5602,7 @@ int CUnit::GetPrice() const
 		cost += 1000;
 	}
 	if (this->Work != nullptr) {
-		if (this->Type->ItemClass == BookItemClass) {
-			cost += 5000;
-		} else {
-			cost += 1000;
-		}
+		cost += this->Work->MagicLevel * 1000;
 	}
 	if (this->Elixir != nullptr) {
 		cost += this->Elixir->MagicLevel * 1000;
@@ -5919,29 +5922,37 @@ bool CUnit::CanAutoCastSpell(const CSpell *spell) const
 
 bool CUnit::IsItemEquipped(const CUnit *item) const
 {
-	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	if (item->Type->ItemClass == nullptr) {
+		return false;
+	}
+	
+	const int item_slot = item->Type->ItemClass->Slot;
 	
 	if (item_slot == -1) {
 		return false;
 	}
 	
-	if (std::find(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), item) != EquippedItems[item_slot].end()) {
+	if (std::find(this->EquippedItems[item_slot].begin(), this->EquippedItems[item_slot].end(), item) != this->EquippedItems[item_slot].end()) {
 		return true;
 	}
 	
 	return false;
 }
 
-bool CUnit::IsItemClassEquipped(int item_class) const
+bool CUnit::IsItemClassEquipped(const ItemClass *item_class) const
 {
-	int item_slot = GetItemClassSlot(item_class);
+	if (item_class == nullptr) {
+		return false;
+	}
+	
+	const int item_slot = item_class->Slot;
 	
 	if (item_slot == -1) {
 		return false;
 	}
 	
-	for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
-		if (EquippedItems[item_slot][i]->Type->ItemClass == item_class) {
+	for (size_t i = 0; i < this->EquippedItems[item_slot].size(); ++i) {
+		if (this->EquippedItems[item_slot][i]->Type->ItemClass == item_class) {
 			return true;
 		}
 	}
@@ -5951,14 +5962,18 @@ bool CUnit::IsItemClassEquipped(int item_class) const
 
 bool CUnit::IsItemTypeEquipped(const CUnitType *item_type) const
 {
-	int item_slot = GetItemClassSlot(item_type->ItemClass);
+	if (item_type->ItemClass == nullptr) {
+		return false;
+	}
+	
+	const int item_slot = item_type->ItemClass->Slot;
 	
 	if (item_slot == -1) {
 		return false;
 	}
 	
-	for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
-		if (EquippedItems[item_slot][i]->Type == item_type) {
+	for (size_t i = 0; i < this->EquippedItems[item_slot].size(); ++i) {
+		if (this->EquippedItems[item_slot][i]->Type == item_type) {
 			return true;
 		}
 	}
@@ -5968,7 +5983,11 @@ bool CUnit::IsItemTypeEquipped(const CUnitType *item_type) const
 
 bool CUnit::IsUniqueItemEquipped(const CUniqueItem *unique) const
 {
-	int item_slot = GetItemClassSlot(unique->Type->ItemClass);
+	if (unique->Type->ItemClass == nullptr) {
+		return false;
+	}
+	
+	const int item_slot = unique->Type->ItemClass->Slot;
 		
 	if (item_slot == -1) {
 		return false;
@@ -5976,7 +5995,7 @@ bool CUnit::IsUniqueItemEquipped(const CUniqueItem *unique) const
 		
 	int item_equipped_quantity = 0;
 	for (size_t i = 0; i < this->EquippedItems[item_slot].size(); ++i) {
-		if (EquippedItems[item_slot][i]->Unique == unique) {
+		if (this->EquippedItems[item_slot][i]->Unique == unique) {
 			return true;
 		}
 	}
@@ -5994,53 +6013,47 @@ bool CUnit::CanEquipItem(CUnit *item) const
 		return false;
 	}
 	
-	if (!CanEquipItemClass(item->Type->ItemClass)) {
+	if (!this->CanEquipItemClass(item->Type->ItemClass)) {
 		return false;
 	}
 	
 	return true;
 }
 
-bool CUnit::CanEquipItemClass(int item_class) const
+bool CUnit::CanEquipItemClass(const ItemClass *item_class) const
 {
-	if (item_class == -1) {
+	if (item_class == nullptr) {
 		return false;
 	}
 	
-	if (GetItemClassSlot(item_class) == -1) { //can't equip items that don't correspond to an equippable slot
+	if (item_class->Slot == -1) { //can't equip items that don't correspond to an equippable slot
 		return false;
 	}
 	
-	if (GetItemClassSlot(item_class) == WeaponItemSlot && std::find(this->Type->WeaponClasses.begin(), this->Type->WeaponClasses.end(), item_class) == this->Type->WeaponClasses.end()) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
+	if (item_class->Slot == WeaponItemSlot && std::find(this->Type->WeaponClasses.begin(), this->Type->WeaponClasses.end(), item_class) == this->Type->WeaponClasses.end()) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
 		return false;
 	}
 	
 	if ( //if the item uses the shield (off-hand) slot, but that slot is unavailable for the weapon (because it is two-handed), return false
-		GetItemClassSlot(item_class) == ShieldItemSlot
+		item_class->Slot == ShieldItemSlot
 		&& this->Type->WeaponClasses.size() > 0
-		&& (
-			this->Type->WeaponClasses[0] == BowItemClass
-			// add other two-handed weapons here as necessary
-		)
+		&& this->Type->WeaponClasses[0]->TwoHanded
 	) {
 		return false;
 	}
 	
 	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return false
-		item_class == ShieldItemClass
+		item_class->Shield
 		&& (
 			Type->WeaponClasses.size() == 0
-			|| Type->WeaponClasses[0] == DaggerItemClass
-			|| Type->WeaponClasses[0] == ThrowingAxeItemClass
-			|| Type->WeaponClasses[0] == JavelinItemClass
-			|| Type->WeaponClasses[0] == GunItemClass
+			|| Type->WeaponClasses[0]->ShieldCompatible == false
 			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
 		)
 	) {
 		return false;
 	}
 	
-	if (this->GetItemSlotQuantity(GetItemClassSlot(item_class)) == 0) {
+	if (this->GetItemSlotQuantity(item_class->Slot) == 0) {
 		return false;
 	}
 	
@@ -6067,7 +6080,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 		return false;
 	}
 	
-	if (item->Type->BoolFlag[ITEM_INDEX].value && item->Type->ItemClass != FoodItemClass && item->Type->ItemClass != PotionItemClass && item->Type->ItemClass != ScrollItemClass && item->Type->ItemClass != BookItemClass) {
+	if (item->Type->BoolFlag[ITEM_INDEX].value && item->Type->ItemClass->Consumable == false) {
 		return false;
 	}
 	
@@ -6110,7 +6123,7 @@ bool CUnit::IsItemSetComplete(const CUnit *item) const
 bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 {
 	for (size_t i = 0; i < item->Unique->Set->UniqueItems.size(); ++i) {
-		int item_slot = GetItemClassSlot(item->Unique->Set->UniqueItems[i]->Type->ItemClass);
+		const int item_slot = item->Unique->Set->UniqueItems[i]->Type->ItemClass->Slot;
 		
 		if (item_slot == -1) {
 			return false;
@@ -6118,7 +6131,7 @@ bool CUnit::EquippingItemCompletesSet(const CUnit *item) const
 		
 		bool has_item_equipped = false;
 		for (size_t j = 0; j < this->EquippedItems[item_slot].size(); ++j) {
-			if (EquippedItems[item_slot][j]->Unique == item->Unique->Set->UniqueItems[i]) {
+			if (this->EquippedItems[item_slot][j]->Unique == item->Unique->Set->UniqueItems[i]) {
 				has_item_equipped = true;
 				break;
 			}
@@ -6141,7 +6154,7 @@ bool CUnit::DeequippingItemBreaksSet(const CUnit *item) const
 		return false;
 	}
 	
-	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	const int item_slot = item->Type->ItemClass->Slot;
 		
 	if (item_slot == -1) {
 		return false;
@@ -7571,7 +7584,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (!unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Type->BoolFlag[POWERUP_INDEX].value) { //only item and powerup units can be picked up
 		return false;
 	}
-	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && !IsItemClassConsumable(unit.Type->ItemClass)) { //only consumable items can be picked up as if they were power-ups for units with no inventory
+	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && unit.Type->ItemClass->Consumable == false) { //only consumable items can be picked up as if they were power-ups for units with no inventory
 		return false;
 	}
 	if (picker.CurrentAction() == UnitActionBuilt) { // Under construction

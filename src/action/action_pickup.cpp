@@ -41,6 +41,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "item_class.h"
 #include "luacallback.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -255,7 +256,7 @@ enum {
 			goal
 			&& (
 				goal->Type->BoolFlag[POWERUP_INDEX].value
-				|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && IsItemClassConsumable(goal->Type->ItemClass))
+				|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass->Consumable)
 			)
 		) {
 			if (!unit.CriticalOrder) {

@@ -59,6 +59,7 @@
 //Wyrmgus start
 #include "item.h"
 //Wyrmgus end
+#include "item_class.h"
 #include "map/map.h"
 #include "map/tileset.h"
 //Wyrmgus start
@@ -223,8 +224,6 @@ CUpgrade::CUpgrade(const std::string &ident)
 	//Wyrmgus start
 	memset(this->ScaledCosts, 0, sizeof(this->ScaledCosts));
 	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
-	memset(this->ItemPrefix, 0, sizeof(this->ItemPrefix));
-	memset(this->ItemSuffix, 0, sizeof(this->ItemSuffix));
 	memset(this->IncompatibleAffixes, 0, sizeof(this->IncompatibleAffixes));
 	//Wyrmgus end
 }
@@ -540,10 +539,8 @@ static int CclDefineUpgrade(lua_State *l)
 					upgrade->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
 					upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
 				}
-				for (int i = 0; i < MaxItemClasses; ++i) {
-					upgrade->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
-					upgrade->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
-				}
+				upgrade->ItemPrefix = parent_upgrade->ItemPrefix;
+				upgrade->ItemSuffix = parent_upgrade->ItemSuffix;
 				upgrade->MaxLimit = parent_upgrade->MaxLimit;
 				upgrade->MagicLevel = parent_upgrade->MagicLevel;
 				upgrade->Ability = parent_upgrade->Ability;
@@ -630,8 +627,8 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "UniqueOnly")) {
 			upgrade->UniqueOnly = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Work")) {
-			int work_type = GetItemClassIdByName(LuaToString(l, -1));
-			if (work_type != -1) {
+			const ItemClass *work_type = ItemClass::Get(LuaToString(l, -1));
+			if (work_type != nullptr) {
 				upgrade->Work = work_type;
 			} else {
 				LuaError(l, "Work item class doesn't exist.");
@@ -725,12 +722,12 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int item_class = GetItemClassIdByName(LuaToString(l, -1, j + 1));
-				if (item_class == -1) {
+				const ItemClass *item_class = ItemClass::Get(LuaToString(l, -1, j + 1));
+				if (item_class == nullptr) {
 					LuaError(l, "Item class doesn't exist.");
 				}
 				
-				upgrade->ItemPrefix[item_class] = true;
+				upgrade->ItemPrefix.insert(item_class);
 			}
 		} else if (!strcmp(value, "ItemSuffix")) {
 			if (!lua_istable(l, -1)) {
@@ -738,12 +735,12 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int item_class = GetItemClassIdByName(LuaToString(l, -1, j + 1));
-				if (item_class == -1) {
+				const ItemClass *item_class = ItemClass::Get(LuaToString(l, -1, j + 1));
+				if (item_class == nullptr) {
 					LuaError(l, "Item class doesn't exist.");
 				}
 
-				upgrade->ItemSuffix[item_class] = true;
+				upgrade->ItemSuffix.insert(item_class);
 			}
 		} else if (!strcmp(value, "IncompatibleAffixes")) {
 			if (!lua_istable(l, -1)) {
@@ -777,8 +774,8 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				int item_class = GetItemClassIdByName(LuaToString(l, -1, j + 1));
-				if (item_class == -1) {
+				const ItemClass *item_class = ItemClass::Get(LuaToString(l, -1, j + 1));
+				if (item_class == nullptr) {
 					LuaError(l, "Item class doesn't exist.");
 				}
 
@@ -1176,10 +1173,10 @@ static int CclGetRunicSuffixes(lua_State *l)
 
 static int CclGetLiteraryWorks(lua_State *l)
 {
-	std::vector<CUpgrade *> literary_works;
-	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (AllUpgrades[i]->Work != -1) {
-			literary_works.push_back(AllUpgrades[i]);
+	std::vector<const CUpgrade *> literary_works;
+	for (const CUpgrade *upgrade : AllUpgrades) {
+		if (upgrade->Work != nullptr) {
+			literary_works.push_back(upgrade);
 		}
 	}
 		
@@ -1268,11 +1265,11 @@ static int CclGetUpgradeData(lua_State *l)
 		} else {
 			LuaCheckArgs(l, 3);
 			std::string item_class_name = LuaToString(l, 3);
-			int item_class = GetItemClassIdByName(item_class_name);
-			if (item_class == -1) {
+			const ItemClass *item_class = ItemClass::Get(item_class_name);
+			if (item_class == nullptr) {
 				LuaError(l, "Item class \"%s\" doesn't exist." _C_ item_class_name.c_str());
 			}
-			lua_pushboolean(l, upgrade->ItemPrefix[item_class]);
+			lua_pushboolean(l, upgrade->ItemPrefix.find(item_class) != upgrade->ItemPrefix.end());
 			return 1;
 		}
 	} else if (!strcmp(data, "ItemSuffix")) {
@@ -1287,18 +1284,18 @@ static int CclGetUpgradeData(lua_State *l)
 		} else {
 			LuaCheckArgs(l, 3);
 			std::string item_class_name = LuaToString(l, 3);
-			int item_class = GetItemClassIdByName(item_class_name);
-			if (item_class == -1) {
+			const ItemClass *item_class = ItemClass::Get(item_class_name);
+			if (item_class == nullptr) {
 				LuaError(l, "Item class \"%s\" doesn't exist." _C_ item_class_name.c_str());
 			}
-			lua_pushboolean(l, upgrade->ItemSuffix[item_class]);
+			lua_pushboolean(l, upgrade->ItemSuffix.find(item_class) != upgrade->ItemSuffix.end());
 			return 1;
 		}
 	} else if (!strcmp(data, "AppliesTo")) { //to which unit types or item classes this upgrade applies
 		std::vector<std::string> applies_to;
-		for (int i = 0; i < MaxItemClasses; ++i) {
-			if (upgrade->ItemPrefix[i] || upgrade->ItemSuffix[i]) {
-				applies_to.push_back(GetItemClassNameById(i));
+		for (const ItemClass *item_class : ItemClass::GetAll()) {
+			if (upgrade->ItemPrefix.find(item_class) != upgrade->ItemPrefix.end() || upgrade->ItemSuffix.find(item_class) != upgrade->ItemSuffix.end()) {
+				applies_to.push_back(item_class->Ident);
 			}
 		}
 
