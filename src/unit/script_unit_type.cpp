@@ -44,7 +44,7 @@
 #include "construct.h"
 #include "editor/editor.h"
 #include "faction.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"

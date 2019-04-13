@@ -45,7 +45,7 @@
 #include "faction.h"
 #include "game/trigger.h"
 #include "hair_color.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "language/language.h"
 #include "language/word.h"
 #include "literary_text.h"

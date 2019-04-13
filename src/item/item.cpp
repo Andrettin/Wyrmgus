@@ -33,13 +33,13 @@
 
 #include "stratagus.h"
 
-#include "item.h"
+#include "item/item.h"
 
 #include "character.h"
 #include "config.h"
 #include "config_operator.h"
 #include "game/game.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "network/network.h"
 #include "parameters.h"
 #include "spell/spells.h"

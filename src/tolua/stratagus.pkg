@@ -11,7 +11,7 @@ $#include "grand_strategy.h"
 //Wyrmgus end
 $#include "iolib.h"
 //Wyrmgus start
-$#include "item.h"
+$#include "item/item.h"
 //Wyrmgus end
 $#include "map/map.h"
 $#include "map/minimap.h"

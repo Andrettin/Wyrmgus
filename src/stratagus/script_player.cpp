@@ -53,7 +53,7 @@
 #include "grand_strategy.h"
 //Wyrmgus end
 //Wyrmgus start
-#include "item.h"
+#include "item/item.h"
 //Wyrmgus end
 #include "language/language.h"
 #include "language/word.h"

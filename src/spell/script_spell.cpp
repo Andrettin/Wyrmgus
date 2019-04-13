@@ -37,7 +37,7 @@
 
 #include "civilization.h"
 #include "faction.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "luacallback.h"
 #include "script.h"
 #include "sound/script_sound.h"

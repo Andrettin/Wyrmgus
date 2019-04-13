@@ -72,6 +72,7 @@ class CButtonLevel;
 class CFaction;
 class CPlane;
 class CSpecies;
+class CSpell;
 class CTerrainType;
 class CUniqueItem;
 class CVariable;

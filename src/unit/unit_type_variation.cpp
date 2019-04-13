@@ -39,7 +39,7 @@
 #include "config.h"
 #include "config_operator.h"
 #include "construct.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "map/terrain_type.h"
 #include "mod.h"
 #include "time/season.h"

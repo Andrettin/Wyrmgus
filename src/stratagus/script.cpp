@@ -52,9 +52,9 @@
 #include "iocompat.h"
 #include "iolib.h"
 //Wyrmgus start
-#include "item.h"
+#include "item/item.h"
 //Wyrmgus end
-#include "item_class.h"
+#include "item/item_class.h"
 #include "map/map.h"
 #include "map/site.h"
 #include "parameters.h"

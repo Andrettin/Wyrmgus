@@ -39,7 +39,7 @@
 #include "civilization.h"
 #include "faction.h"
 #include "grand_strategy.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "map/site.h"

@@ -35,7 +35,6 @@
 ----------------------------------------------------------------------------*/
 
 //Wyrmgus start
-#include "item.h"
 #include "time/date.h"
 //Wyrmgus end
 #include "ui/icon_config.h"

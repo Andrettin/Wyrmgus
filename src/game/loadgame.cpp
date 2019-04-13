@@ -49,7 +49,7 @@
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "hair_color.h"
-#include "item.h"
+#include "item/item.h"
 #include "language/language.h"
 #include "literary_text.h"
 #include "map/map.h"
@@ -121,54 +121,32 @@ void CleanModules()
 {
 	EndReplayLog();
 	CleanMessages();
+	
+	for (const std::function<void()> &clear_function : ClassClearFunctions) {
+		clear_function();
+	}
 
-	CIcon::Clear();
 	CleanCursors();
 	CleanUserInterface();
 	CleanFonts();
 	CTrigger::ClearTriggers();
 	FreeAi();
-	CAchievement::Clear();
-	CAge::Clear();
 	CCalendar::ClearCalendars();
-	CCampaign::Clear();
 	CCharacter::ClearCharacters();
-	CCivilization::Clear();
 	CleanConstructions();
-	Currency::Clear();
 	CleanDecorations();
-	CDeity::Clear();
 	//Wyrmgus start
-	CDialogue::Clear();
-	CDeityDomain::Clear();
-	CDynasty::Clear();
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
-	CFaction::Clear();
-	CHistoricalUnit::Clear();
-	CLanguage::Clear();
-	CMapTemplate::Clear();
 	CleanMissiles();
-	CPantheon::Clear();
 	CPlane::ClearPlanes();
 	//Wyrmgus start
 	CleanProvinces();
 	CleanQuests();
-	//Wyrmgus end
-	CReligion::Clear();
-	CSchoolOfMagic::Clear();
-	CSite::Clear();
-	CSpecies::Clear();
-	CSpeciesCategory::Clear();
-	CSpeciesCategoryRank::Clear();
-	//Wyrmgus start
-	CLiteraryText::Clear();
 	CleanUniqueItems();
 	//Wyrmgus end
-	CTimeline::Clear();
 	CleanUnits();
 	CleanUnitTypes();
-	CWord::Clear();
 	CWorld::ClearWorlds();
 	CleanPlayers();
 	CleanSelections();
@@ -180,20 +158,11 @@ void CleanModules()
 	CMap::Map.Clean();
 	CMap::Map.CleanFogOfWar();
 	CTerrainType::ClearTerrainTypes();
-	CTimeOfDay::Clear();
-	CTimeOfDaySchedule::Clear();
-	CSeason::Clear();
-	CSeasonSchedule::Clear();
 	CleanReplayLog();
 	CSpell::ClearSpells();
 	FreePathfinder();
 
 	UnitTypeVar.Init(); // internal script. should be to a better place, don't find for restart.
-	
-	CPlayerColor::Clear();
-	CHairColor::Clear();
-	CSkinColor::Clear();
-	CResource::Clear();
 }
 
 /**

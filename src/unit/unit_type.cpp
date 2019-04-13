@@ -50,7 +50,7 @@
 //Wyrmgus end
 #include "faction.h"
 #include "iolib.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/terrain_type.h"

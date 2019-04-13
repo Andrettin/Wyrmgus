@@ -36,7 +36,7 @@
 #include "ui/popup.h"
 
 #include "game/trigger.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "player.h"
 #include "spell/spells.h"
 //Wyrmgus start

@@ -50,7 +50,7 @@
 #include "config.h"
 #include "config_operator.h"
 #include "faction.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"

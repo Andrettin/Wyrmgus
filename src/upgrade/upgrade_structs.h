@@ -37,9 +37,6 @@
 
 #include "data_element.h"
 #include "economy/resource.h"
-//Wyrmgus start
-#include "item.h"
-//Wyrmgus end
 
 #include <set>
 

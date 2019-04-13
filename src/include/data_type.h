@@ -117,6 +117,8 @@ class PropertyCommonBase;
 
 extern std::string PascalCaseToSnakeCase(const std::string &str);
 
+extern std::vector<std::function<void()>> ClassClearFunctions;
+
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
@@ -268,21 +270,25 @@ public:
 	
 private:
 	/**
-	**	@brief	Initialize the factory function for the class
+	**	@brief	Initialize the class
 	*/
-	static inline bool InitializeClassFactoryFunction()
+	static inline bool InitializeDataTypeClass()
 	{
+		//initialize the class factory function
 		if constexpr(!std::is_same_v<T, CCivilization> && !std::is_same_v<T, CFaction>) {
 			//FIXME: this conditional is only temporarily needed while the civilization and faction classes don't inherit from DataElement
-			CConfigData::DataTypeGetOrAddFunctions[T::ClassIdentifier] = std::function<DataElement *(const std::string &)>(DataType<T>::GetOrAdd);
+			CConfigData::DataTypeGetOrAddFunctions[T::ClassIdentifier] = std::function<DataElement *(const std::string &)>(T::GetOrAdd);
 		}
+		
+		//register the clear function of the class
+		ClassClearFunctions.push_back(std::function<void()>(T::Clear));
 		
 		return true;
 	}
 	
 	static inline std::vector<T *> Instances;
 	static inline std::map<std::string, T *> InstancesByIdent;
-	static inline bool ClassFactoryFunctionInitialized = DataType<T>::InitializeClassFactoryFunction();
+	static inline bool DataTypeClassInitialized = DataType<T>::InitializeDataTypeClass();
 	
 	friend T;
 };

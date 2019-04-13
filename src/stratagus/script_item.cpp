@@ -33,7 +33,7 @@
 
 #include "stratagus.h"
 
-#include "item.h"
+#include "item/item.h"
 
 #include "script.h"
 #include "spell/spells.h"

@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "item/item.h"
 #include "player.h"
 #include "unit/unit_type.h"
 #include "vec2i.h"

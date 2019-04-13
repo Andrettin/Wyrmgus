@@ -57,9 +57,9 @@
 #include "grand_strategy.h"
 //Wyrmgus end
 //Wyrmgus start
-#include "item.h"
+#include "item/item.h"
 //Wyrmgus end
-#include "item_class.h"
+#include "item/item_class.h"
 #include "language/language.h"
 #include "luacallback.h"
 #include "map/map.h"

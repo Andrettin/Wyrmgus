@@ -33,10 +33,10 @@
 
 #include "stratagus.h"
 
-#include "item_class.h"
+#include "item/item_class.h"
 
 #include "config.h"
-#include "item.h"
+#include "item/item.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -41,7 +41,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
-#include "item_class.h"
+#include "item/item_class.h"
 #include "luacallback.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
