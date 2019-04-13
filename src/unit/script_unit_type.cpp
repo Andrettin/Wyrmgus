@@ -2536,7 +2536,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		if (type->ItemClass != nullptr) {
 			lua_pushstring(l, type->ItemClass->Ident.c_str());
 		} else {
-			lua_pushstring(l, type->ItemClass->Ident.c_str());
+			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "ItemSlot")) {
