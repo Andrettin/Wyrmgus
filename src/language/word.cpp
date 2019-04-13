@@ -42,26 +42,27 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Process a property in the data provided by a configuration file
+**	@brief	Set the language of the word
 **
-**	@param	key		The property's key
-**	@param	value	The property's value
-**
-**	@return	True if the property can be processed, or false otherwise
+**	@param	language	The language to be set
 */
-bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
+void CWord::SetLanguage(CLanguage *language)
 {
-	if (key == "language") {
-		value = FindAndReplaceString(value, "_", "-");
-		CLanguage *language = CLanguage::Get(value);
-		if (language != nullptr) {
-			this->Language = language;
+	if (this->Language != nullptr) {
+		this->Language->Words.erase(std::remove(this->Language->Words.begin(), this->Language->Words.end(), this), this->Language->Words.end());
+		for (CLanguage *dialect : this->Language->Dialects) {
+			dialect->Words.erase(std::remove(dialect->Words.begin(), dialect->Words.end(), this), dialect->Words.end());
 		}
-	} else {
-		return false;
 	}
 	
-	return true;
+	*this->Language.Value = language;
+	
+	if (this->Language != nullptr) {
+		this->Language->Words.push_back(this);
+		for (CLanguage *dialect : this->Language->Dialects) {
+			dialect->Words.push_back(this); //copy the word over for dialects
+		}
+	}
 }
 
 bool CWord::HasMeaning(const String &meaning)
@@ -134,5 +135,5 @@ void CWord::RemoveFromVector(std::vector<CWord *> &word_vector)
 
 void CWord::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_language"), &CWord::GetLanguage);
+	BIND_PROPERTIES();
 }

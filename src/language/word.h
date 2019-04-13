@@ -157,54 +157,66 @@ class CWord : public DataElement, public DataType<CWord>
 public:
 	static constexpr const char *ClassIdentifier = "word";
 	
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
-	
-	CLanguage *GetLanguage() const
+private:
+	static inline bool InitializeClass()
 	{
-		return this->Language;
+		PROPERTY_KEY("language", Language);
+		PROPERTY_KEY("anglicized_name", AnglicizedName);
+		
+		return true;
 	}
 	
+	static inline bool ClassInitialized = InitializeClass();
+
+public:
 	bool HasMeaning(const String &meaning);
 	String GetNounInflection(const int grammatical_number, const int grammatical_case, const int word_junction_type = -1);
 	String GetVerbInflection(const int grammatical_number, const int grammatical_person, const int grammatical_tense, const int grammatical_mood);
 	String GetAdjectiveInflection(const int comparison_degree, const int article_type = -1, int grammatical_case = -1, const int grammatical_number = -1, const int grammatical_gender = -1);
 	String GetParticiple(int grammatical_tense);
 	void RemoveFromVector(std::vector<CWord *> &word_vector);
-
-private:
-	CLanguage *Language = nullptr;						/// The language the word belongs to
 	
+private:
+	void SetLanguage(CLanguage *language);
+
 public:
-	int Type = -1;										/// Word type
-	int Gender = -1;									/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
-	int GrammaticalNumber = -1;							/// Grammatical number (i.e. whether the word is necessarily plural or not)
-	bool Archaic = false;								/// Whether the word is archaic (whether it is used in current speech)
-	std::map<std::tuple<int, int>, String> NumberCaseInflections;	/// For nouns, mapped to grammatical number and grammatical case
-	std::map<std::tuple<int, int, int, int>, String> NumberPersonTenseMoodInflections;	/// For verbs, mapped to grammatical number, grammatical person, grammatical tense and grammatical mood
-	String ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// For adjectives
-	String Participles[MaxGrammaticalTenses];	/// For verbs
-	std::vector<String> Meanings;				/// Meanings of the word in English.
-	CWord *DerivesFrom = nullptr;    			/// From which word does this word derive
-	std::vector<CWord *> DerivesTo;				/// Which words derive from this word
-	CWord *CompoundElements[MaxAffixTypes];    	/// From which compound elements is this word formed
-	std::vector<CWord *> CompoundElementOf[MaxAffixTypes];	/// Which words are formed from this word as a compound element
+	Property<CLanguage *>Language {					/// the language the word belongs to
+		Property<CLanguage *>::ValueType(nullptr),
+		Property<CLanguage *>::SetterType([this](CLanguage *language) {
+			this->SetLanguage(language);
+		})
+	};
+	Property<String> AnglicizedName;				/// the anglicized version of the word
+	int Type = -1;									/// word type
+	int Gender = -1;								/// what is the gender of the noun or article (Masculine, Feminine or Neuter)
+	int GrammaticalNumber = -1;						/// grammatical number (i.e. whether the word is necessarily plural or not)
+	bool Archaic = false;							/// whether the word is archaic (whether it is used in current speech)
+	std::map<std::tuple<int, int>, String> NumberCaseInflections;	/// for nouns, mapped to grammatical number and grammatical case
+	std::map<std::tuple<int, int, int, int>, String> NumberPersonTenseMoodInflections;	/// for verbs, mapped to grammatical number, grammatical person, grammatical tense and grammatical mood
+	String ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// for adjectives
+	String Participles[MaxGrammaticalTenses];	/// for verbs
+	std::vector<String> Meanings;				/// meanings of the word in English.
+	CWord *DerivesFrom = nullptr;    			/// from which word does this word derive
+	std::vector<CWord *> DerivesTo;				/// which words derive from this word
+	CWord *CompoundElements[MaxAffixTypes];    	/// from which compound elements is this word formed
+	std::vector<CWord *> CompoundElementOf[MaxAffixTypes];	/// which words are formed from this word as a compound element
 	
 	// noun-specific variables
-	bool Uncountable = false;		/// Whether the noun is uncountable or not.
+	bool Uncountable = false;		/// whether the noun is uncountable or not.
 	
 	//pronoun and article-specific variables
-	String Nominative;				/// Nominative case for the pronoun (if any)
-	String Accusative;				/// Accusative case for the pronoun (if any)
-	String Dative;					/// Dative case for the pronoun (if any)
-	String Genitive;				/// Genitive case for the pronoun (if any)
+	String Nominative;				/// nominative case for the pronoun (if any)
+	String Accusative;				/// accusative case for the pronoun (if any)
+	String Dative;					/// dative case for the pronoun (if any)
+	String Genitive;				/// genitive case for the pronoun (if any)
 	
 	//article-specific variables
-	int ArticleType = -1;			/// Which article type this article belongs to
+	int ArticleType = -1;			/// which article type this article belongs to
 	
 	//numeral-specific variables
 	int Number = -1;
 	
-	String Mod;						/// To which mod (or map), if any, this word belongs
+	String Mod;						/// to which mod (or map), if any, this word belongs
 	
 	friend int CclDefineLanguageWord(lua_State *l);
 

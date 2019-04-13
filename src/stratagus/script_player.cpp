@@ -1289,12 +1289,7 @@ static int CclDefineLanguageWord(lua_State *l)
 			CLanguage *language = CLanguage::Get(LuaToString(l, -1));
 			
 			if (language) {
-				language->Words.push_back(word);
-				word->Language = language;
-				
-				for (size_t i = 0; i < language->Dialects.size(); ++i) { //copy the word over for dialects
-					language->Dialects[i]->Words.push_back(word);
-				}
+				word->SetLanguage(language);
 			} else {
 				LuaError(l, "Language not found.");
 			}

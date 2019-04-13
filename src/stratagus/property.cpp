@@ -36,6 +36,7 @@
 #include "property.h"
 
 #include "data_type.h"
+#include "language/language.h"
 #include "literary_text.h"
 #include "ui/icon.h"
 #include "unit/unit_type.h"
@@ -147,17 +148,20 @@ template const PropertyBase<int> &PropertyBase<int>::operator =(const std::strin
 template const PropertyBase<bool> &PropertyBase<bool>::operator =(const std::string &rhs);
 template const PropertyBase<String> &PropertyBase<String>::operator =(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator =(const std::string &rhs);
+template const PropertyBase<CLanguage *> &PropertyBase<CLanguage *>::operator =(const std::string &rhs);
 template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator =(const std::string &rhs);
 template const PropertyBase<std::vector<CUnitType *>> &PropertyBase<std::vector<CUnitType *>>::operator =(const std::string &rhs);
 template const PropertyBase<int> &PropertyBase<int>::operator +=(const std::string &rhs);
 template const PropertyBase<bool> &PropertyBase<bool>::operator +=(const std::string &rhs);
 template const PropertyBase<String> &PropertyBase<String>::operator +=(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator +=(const std::string &rhs);
+template const PropertyBase<CLanguage *> &PropertyBase<CLanguage *>::operator +=(const std::string &rhs);
 template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator +=(const std::string &rhs);
 template const PropertyBase<std::vector<CUnitType *>> &PropertyBase<std::vector<CUnitType *>>::operator +=(const std::string &rhs);
 template const PropertyBase<int> &PropertyBase<int>::operator -=(const std::string &rhs);
 template const PropertyBase<bool> &PropertyBase<bool>::operator -=(const std::string &rhs);
 template const PropertyBase<String> &PropertyBase<String>::operator -=(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator -=(const std::string &rhs);
+template const PropertyBase<CLanguage *> &PropertyBase<CLanguage *>::operator -=(const std::string &rhs);
 template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator -=(const std::string &rhs);
 template const PropertyBase<std::vector<CUnitType *>> &PropertyBase<std::vector<CUnitType *>>::operator -=(const std::string &rhs);
