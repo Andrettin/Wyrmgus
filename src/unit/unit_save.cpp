@@ -40,6 +40,7 @@
 #include "character.h"
 #include "construct.h"
 #include "iolib.h"
+#include "item/item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/site.h"

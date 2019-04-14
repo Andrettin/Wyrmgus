@@ -56,9 +56,7 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end
-//Wyrmgus start
 #include "item/item.h"
-//Wyrmgus end
 #include "item/item_class.h"
 #include "item/item_slot.h"
 #include "language/language.h"

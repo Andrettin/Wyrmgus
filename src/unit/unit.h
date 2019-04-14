@@ -34,7 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "item/item.h"
 #include "player.h"
 #include "unit/unit_type.h"
 #include "vec2i.h"
@@ -88,12 +87,8 @@ typedef COrder *COrderPtr;
 #define CANATTACK_BONUS   0x00080000
 #define AIPRIORITY_BONUS  0x04000000
 
-
-
 //the range in which experience is distributed
 constexpr int ExperienceRange = 6;
-
-
 
 /// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();
@@ -123,6 +118,7 @@ enum _directions_ {
 };
 
 constexpr int NextDirection = 32;	/// Next direction N->NE->E...
+
 #define UnitNotSeen 0x7fffffff		/// Unit not seen, used by CUnit::SeenFrame
 
 /// The big unit structure
@@ -331,7 +327,7 @@ public:
 	/// Returns true if unit is visible on minimap. Only for ThisPlayer.
 	bool IsVisibleOnMinimap() const;
 
-	// Returns true if unit is visible under radar (By player, or by shared vision)
+	/// Returns true if unit is visible under radar (By player, or by shared vision)
 	bool IsVisibleOnRadar(const CPlayer &pradar) const;
 
 	/// Returns true if unit is visible in a viewport. Only for ThisPlayer.

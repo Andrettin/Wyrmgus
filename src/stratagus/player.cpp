@@ -58,6 +58,7 @@
 #include "iocompat.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "item/item.h"
 //Wyrmgus start
 #include "grand_strategy.h"
 //Wyrmgus end

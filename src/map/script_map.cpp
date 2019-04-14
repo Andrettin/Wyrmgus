@@ -44,6 +44,7 @@
 #include "game/game.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "item/item.h"
 #include "map/map_layer.h"
 #include "map/map_template.h"
 #include "map/site.h"

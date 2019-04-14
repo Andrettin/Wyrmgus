@@ -62,11 +62,11 @@ static T ConvertFromString(const std::string &str)
 		return StringToBool(str);
 	} else if constexpr(std::is_same_v<T, String>) {
 		return String(str.c_str());
-	} else if constexpr(std::is_pointer_v<T> && std::is_base_of_v<DataType<std::remove_pointer_t<T>>, std::remove_pointer_t<T>>) {
+	} else if constexpr(std::is_pointer_v<T> && std::is_base_of_v<DataType<std::remove_const_t<std::remove_pointer_t<T>>>, std::remove_const_t<std::remove_pointer_t<T>>>) {
 		std::string ident = FindAndReplaceString(str, "_", "-");
-		return std::remove_pointer_t<T>::Get(ident);
+		return std::remove_const_t<std::remove_pointer_t<T>>::Get(ident);
 	} else {
-		fprintf(stderr, "Cannot convert from a string to the designated type.");
+		fprintf(stderr, "Cannot convert from a string to the designated type.\n");
 		return T();
 	}
 }
@@ -85,11 +85,11 @@ const PropertyBase<T> &PropertyBase<T>::operator =(const std::string &rhs)
 		std::is_same_v<T, int>
 		|| std::is_same_v<T, bool>
 		|| std::is_same_v<T, String>
-		|| (std::is_pointer_v<T> && std::is_base_of_v<DataType<std::remove_pointer_t<T>>, std::remove_pointer_t<T>>)
+		|| (std::is_pointer_v<T> && std::is_base_of_v<DataType<std::remove_const_t<std::remove_pointer_t<T>>>, std::remove_const_t<std::remove_pointer_t<T>>>)
 	) {
 		return *this = ConvertFromString<T>(rhs);
 	} else {
-		fprintf(stderr, "The operator = is not valid for this type.");
+		fprintf(stderr, "The operator = is not valid for this type.\n");
 		return *this;
 	}
 }
@@ -115,7 +115,7 @@ const PropertyBase<T> &PropertyBase<T>::operator +=(const std::string &rhs)
 		this->GetModifiable().push_back(new_value);
 		return *this;
 	} else {
-		fprintf(stderr, "The operator += is not valid for this type.");
+		fprintf(stderr, "The operator += is not valid for this type.\n");
 		return *this;
 	}
 }
@@ -140,7 +140,7 @@ const PropertyBase<T> &PropertyBase<T>::operator -=(const std::string &rhs)
 		this->GetModifiable().erase(std::remove(this->GetModifiable().begin(), this->GetModifiable().end(), new_value), this->GetModifiable().end());
 		return *this;
 	} else {
-		fprintf(stderr, "The operator -= is not valid for this type.");
+		fprintf(stderr, "The operator -= is not valid for this type.\n");
 		return *this;
 	}
 }

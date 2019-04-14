@@ -44,6 +44,7 @@
 #include "construct.h"
 #include "editor/editor.h"
 #include "faction.h"
+#include "item/item.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"
 #include "luacallback.h"

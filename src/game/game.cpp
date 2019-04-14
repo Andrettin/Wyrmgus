@@ -56,6 +56,7 @@
 //Wyrmgus end
 #include "iocompat.h"
 #include "iolib.h"
+#include "item/item.h"
 #include "literary_text.h"
 #include "map/map.h"
 #include "map/map_layer.h"

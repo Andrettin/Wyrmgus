@@ -35,7 +35,6 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_element.h"
-#include "item/item.h"
 #include "time/date.h"
 #include "ui/icon_config.h"
 

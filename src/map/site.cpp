@@ -39,6 +39,7 @@
 #include "config.h"
 #include "config_operator.h"
 #include "faction.h"
+#include "item/item.h"
 #include "map/map_template.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"

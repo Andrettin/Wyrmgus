@@ -39,6 +39,7 @@
 #include "civilization.h"
 #include "faction.h"
 #include "luacallback.h"
+#include "item/item.h"
 #include "map/map.h"
 #include "map/map_template.h"
 #include "map/site.h"
