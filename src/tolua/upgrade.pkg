@@ -8,10 +8,6 @@ class CUpgrade
 	std::string Quote;
 	std::string Background;
 	bool Ability;
-	bool Weapon;
-	bool Shield;
-	bool Boots;
-	bool Arrows;
 	bool MagicPrefix;
 	bool MagicSuffix;
 	bool RunicAffix;

@@ -64,60 +64,6 @@ std::vector<CUniqueItem *> UniqueItems;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-int GetItemSlotIdByName(const std::string &item_slot)
-{
-	if (item_slot == "weapon") {
-		return WeaponItemSlot;
-	} else if (item_slot == "shield") {
-		return ShieldItemSlot;
-	} else if (item_slot == "helmet") {
-		return HelmetItemSlot;
-	} else if (item_slot == "armor") {
-		return ArmorItemSlot;
-	} else if (item_slot == "gloves") {
-		return GlovesItemSlot;
-	} else if (item_slot == "boots") {
-		return BootsItemSlot;
-	} else if (item_slot == "belt") {
-		return BeltItemSlot;
-	} else if (item_slot == "amulet") {
-		return AmuletItemSlot;
-	} else if (item_slot == "ring") {
-		return RingItemSlot;
-	} else if (item_slot == "arrows") {
-		return ArrowsItemSlot;
-	}
-
-	return -1;
-}
-
-std::string GetItemSlotNameById(int item_slot)
-{
-	if (item_slot == WeaponItemSlot) {
-		return "weapon";
-	} else if (item_slot == ShieldItemSlot) {
-		return "shield";
-	} else if (item_slot == HelmetItemSlot) {
-		return "helmet";
-	} else if (item_slot == ArmorItemSlot) {
-		return "armor";
-	} else if (item_slot == GlovesItemSlot) {
-		return "gloves";
-	} else if (item_slot == BootsItemSlot) {
-		return "boots";
-	} else if (item_slot == BeltItemSlot) {
-		return "belt";
-	} else if (item_slot == AmuletItemSlot) {
-		return "amulet";
-	} else if (item_slot == RingItemSlot) {
-		return "ring";
-	} else if (item_slot == ArrowsItemSlot) {
-		return "arrows";
-	}
-
-	return "";
-}
-
 bool CUniqueItem::CanDrop() const
 {
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop
@@ -308,7 +254,7 @@ void CPersistentItem::ProcessConfigData(const CConfigData *config_data)
 		}
 	}
 	
-	if (is_equipped && this->Owner && this->Type->ItemClass->Slot != -1) {
+	if (is_equipped && this->Owner && this->Type->ItemClass->Slot != nullptr) {
 		this->Owner->EquippedItems[this->Type->ItemClass->Slot].push_back(this);
 	}
 }

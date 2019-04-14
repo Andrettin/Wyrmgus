@@ -49,24 +49,6 @@ class CUpgrade;
 class CSpell;
 class CVariable;
 
-/**
-**  Indexes into item class array.
-*/
-enum ItemSlots {
-	WeaponItemSlot,
-	ShieldItemSlot,
-	HelmetItemSlot,
-	ArmorItemSlot,
-	GlovesItemSlot,
-	BootsItemSlot,
-	BeltItemSlot,
-	AmuletItemSlot,
-	RingItemSlot,
-	ArrowsItemSlot,
-	
-	MaxItemSlots
-};
-
 class CUniqueItem
 {
 public:

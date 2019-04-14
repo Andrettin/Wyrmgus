@@ -45,6 +45,7 @@
 #include "editor/editor.h"
 #include "faction.h"
 #include "item/item_class.h"
+#include "item/item_slot.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -1036,13 +1037,13 @@ static int CclDefineUnitType(lua_State *l)
 				const int subargs = lua_rawlen(l, -1);
 				int image_layer = 0;
 				for (int k = 0; k < subargs; ++k) {
-					int item_slot = GetItemSlotIdByName(LuaToString(l, -1, k + 1));
+					const ItemSlot *item_slot = ItemSlot::Get(LuaToString(l, -1, k + 1));
 					++k;
 					CUnitType *default_equipment = UnitTypeByIdent(LuaToString(l, -1, k + 1));
-					if (default_equipment != nullptr) {
+					if (item_slot != nullptr && default_equipment != nullptr) {
 						type->DefaultEquipment[item_slot] = default_equipment;
 					} else { // Error
-						LuaError(l, "incorrect default equipment unit-type");
+						LuaError(l, "incorrect default equipment item slot or unit type");
 					}
 				}
 				lua_pop(l, 1);
@@ -2540,15 +2541,15 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "ItemSlot")) {
-		if (type->ItemClass != nullptr && type->ItemClass->Slot != -1) {
-			lua_pushstring(l, GetItemSlotNameById(type->ItemClass->Slot).c_str());
+		if (type->ItemClass != nullptr && type->ItemClass->Slot != nullptr) {
+			lua_pushstring(l, type->ItemClass->Slot->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "ItemSlotId")) {
-		if (type->ItemClass != nullptr) {
-			lua_pushnumber(l, type->ItemClass->Slot);
+		if (type->ItemClass != nullptr && type->ItemClass->Slot != nullptr) {
+			lua_pushnumber(l, type->ItemClass->Slot->GetIndex());
 		} else {
 			lua_pushnumber(l, -1);
 		}

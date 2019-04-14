@@ -71,6 +71,7 @@ class CUpgrade;
 class CVariable;
 class CViewport;
 class ItemClass;
+class ItemSlot;
 class PathFinderData;
 struct lua_State;
 
@@ -208,9 +209,9 @@ public:
 	const CUnitTypeVariation *GetVariation() const;
 	const CUnitTypeVariation *GetLayerVariation(const unsigned int image_layer) const;
 	void UpdateButtonIcons();
-	void ChooseButtonIcon(int button_action);
-	void EquipItem(CUnit &item, bool affect_character = true);
-	void DeequipItem(CUnit &item, bool affect_character = true);
+	void ChooseButtonIcon(const int button_action);
+	void EquipItem(CUnit *item, const bool affect_character = true);
+	void DeequipItem(CUnit *item, const bool affect_character = true);
 	void ReadWork(const CUpgrade *work, const bool affect_character = true);
 	void ConsumeElixir(const CUpgrade *elixir, const bool affect_character = true);
 	void ApplyAura(int aura_index);
@@ -386,7 +387,7 @@ public:
 	bool IsVariableEnabled(const int index) const;
 	int GetModifiedVariable(const int index, const int variable_type = 0) const;
 	int GetReactionRange() const;
-	int GetItemSlotQuantity(int item_slot) const;
+	int GetItemSlotQuantity(const ItemSlot *item_slot) const;
 	const ItemClass *GetCurrentWeaponClass() const;
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
 	int GetDisplayPlayer() const;
@@ -475,7 +476,7 @@ public:
 	} Resource; /// Resource still
 
 	//Wyrmgus start
-	std::vector<CUnit *> EquippedItems[MaxItemSlots];	/// Pointer to unit's equipped items, per slot
+	std::map<const ItemSlot *, std::vector<CUnit *>> EquippedItems;	/// Pointer to unit's equipped items, per slot
 	std::vector<CUnit *> SoldUnits;						/// units available for sale at this unit
 	//Wyrmgus end
 	

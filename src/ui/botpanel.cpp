@@ -55,6 +55,7 @@
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
 #include "item/item_class.h"
+#include "item/item_slot.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
@@ -723,22 +724,22 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Weapon != CONDITION_TRUE) {
-				if ((condition->Weapon == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot == WeaponItemSlot)) {
+				if ((condition->Weapon == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot != nullptr && unit.Type->ItemClass->Slot->Weapon)) {
 					return false;
 				}
 			}
 			if (condition->Shield != CONDITION_TRUE) {
-				if ((condition->Shield == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot == ShieldItemSlot)) {
+				if ((condition->Shield == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot != nullptr && unit.Type->ItemClass->Slot->Shield)) {
 					return false;
 				}
 			}
 			if (condition->Boots != CONDITION_TRUE) {
-				if ((condition->Boots == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot == BootsItemSlot)) {
+				if ((condition->Boots == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot != nullptr && unit.Type->ItemClass->Slot->Boots)) {
 					return false;
 				}
 			}
 			if (condition->Arrows != CONDITION_TRUE) {
-				if ((condition->Arrows == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot == ArrowsItemSlot)) {
+				if ((condition->Arrows == CONDITION_ONLY) ^ (unit.Type->ItemClass != nullptr && unit.Type->ItemClass->Slot != nullptr && unit.Type->ItemClass->Slot->Arrows)) {
 					return false;
 				}
 			}

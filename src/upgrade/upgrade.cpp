@@ -60,6 +60,7 @@
 #include "item/item.h"
 //Wyrmgus end
 #include "item/item_class.h"
+#include "item/item_slot.h"
 #include "map/map.h"
 #include "map/tileset.h"
 //Wyrmgus start
@@ -280,14 +281,12 @@ bool CUpgrade::ProcessConfigDataProperty(const std::string &key, std::string val
 		}
 	} else if (key == "ability") {
 		this->Ability = StringToBool(value);
-	} else if (key == "weapon") {
-		this->Weapon = StringToBool(value);
-	} else if (key == "shield") {
-		this->Shield = StringToBool(value);
-	} else if (key == "boots") {
-		this->Boots = StringToBool(value);
-	} else if (key == "arrows") {
-		this->Arrows = StringToBool(value);
+	} else if (key == "item_slot") {
+		value = FindAndReplaceString(value, "_", "-");
+		const ::ItemSlot *item_slot = ItemSlot::Get(value);
+		if (item_slot != nullptr) {
+			this->ItemSlot = item_slot;
+		}
 	} else if (key == "item") {
 		value = FindAndReplaceString(value, "_", "-");
 		CUnitType *item = UnitTypeByIdent(value);
@@ -544,10 +543,7 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->MaxLimit = parent_upgrade->MaxLimit;
 				upgrade->MagicLevel = parent_upgrade->MagicLevel;
 				upgrade->Ability = parent_upgrade->Ability;
-				upgrade->Weapon = parent_upgrade->Weapon;
-				upgrade->Shield = parent_upgrade->Shield;
-				upgrade->Boots = parent_upgrade->Boots;
-				upgrade->Arrows = parent_upgrade->Arrows;
+				upgrade->ItemSlot = parent_upgrade->ItemSlot;
 				upgrade->Item = parent_upgrade->Item;
 				upgrade->MagicPrefix = parent_upgrade->MagicPrefix;
 				upgrade->MagicSuffix = parent_upgrade->MagicSuffix;
@@ -610,14 +606,8 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Ability")) {
 			upgrade->Ability = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Weapon")) {
-			upgrade->Weapon = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Shield")) {
-			upgrade->Shield = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Boots")) {
-			upgrade->Boots = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Arrows")) {
-			upgrade->Arrows = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "ItemSlot")) {
+			upgrade->ItemSlot = ItemSlot::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "MagicPrefix")) {
 			upgrade->MagicPrefix = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "MagicSuffix")) {
@@ -1694,10 +1684,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					
 					//Wyrmgus start
 					if (
-						(AllUpgrades[um->UpgradeId]->Weapon && unit.EquippedItems[WeaponItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Shield && unit.EquippedItems[ShieldItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Boots && unit.EquippedItems[BootsItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Arrows && unit.EquippedItems[ArrowsItemSlot].size() > 0)
+						AllUpgrades[um->UpgradeId]->ItemSlot != nullptr
+						&& unit.EquippedItems.find(AllUpgrades[um->UpgradeId]->ItemSlot) != unit.EquippedItems.end()
+						&& unit.EquippedItems.find(AllUpgrades[um->UpgradeId]->ItemSlot)->second.size() > 0
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't apply the modifier to it
 						continue;
 					}
@@ -1990,10 +1979,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					
 					//Wyrmgus start
 					if (
-						(AllUpgrades[um->UpgradeId]->Weapon && unit.EquippedItems[WeaponItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Shield && unit.EquippedItems[ShieldItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Boots && unit.EquippedItems[BootsItemSlot].size() > 0)
-						|| (AllUpgrades[um->UpgradeId]->Arrows && unit.EquippedItems[ArrowsItemSlot].size() > 0)
+						AllUpgrades[um->UpgradeId]->ItemSlot != nullptr
+						&& unit.EquippedItems.find(AllUpgrades[um->UpgradeId]->ItemSlot) != unit.EquippedItems.end()
+						&& unit.EquippedItems.find(AllUpgrades[um->UpgradeId]->ItemSlot)->second.size() > 0
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't remove the modifier from it (it already doesn't have it)
 						continue;
 					}

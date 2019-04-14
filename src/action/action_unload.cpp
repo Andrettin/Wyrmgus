@@ -257,11 +257,11 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit, int landmass)
 	}
 	//Wyrmgus start
 	if (unit.Type->BoolFlag[ITEM_INDEX].value && transporter.HasInventory() && transporter.IsItemEquipped(&unit)) { //if the unit is an equipped item in the transporter's inventory, deequip it
-		transporter.DeequipItem(unit);
+		transporter.DeequipItem(&unit);
 	}
 	
 	if (!IsNetworkGame() && transporter.Character && transporter.Player->AiEnabled == false && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
-		CPersistentItem *item = transporter.Character->GetItem(unit);
+		CPersistentItem *item = transporter.Character->GetItem(&unit);
 		transporter.Character->Items.erase(std::remove(transporter.Character->Items.begin(), transporter.Character->Items.end(), item), transporter.Character->Items.end());
 		delete item;
 		SaveHero(transporter.Character);

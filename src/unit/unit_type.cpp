@@ -51,6 +51,7 @@
 #include "faction.h"
 #include "iolib.h"
 #include "item/item_class.h"
+#include "item/item_slot.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/terrain_type.h"
@@ -998,8 +999,8 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 			key = FindAndReplaceString(key, "_", "-");
 			value = FindAndReplaceString(value, "_", "-");
 			
-			int item_slot = GetItemSlotIdByName(key);
-			if (item_slot == -1) {
+			const ItemSlot *item_slot = ItemSlot::Get(key);
+			if (item_slot == nullptr) {
 				fprintf(stderr, "Invalid item slot for default equipment: \"%s\".\n", key.c_str());
 				return true;
 			}
@@ -1639,7 +1640,7 @@ void CUnitType::SetParent(CUnitType *parent_type)
 		this->ButtonIcons[iterator->first].Load();
 		this->ButtonIcons[iterator->first].Icon->Load();
 	}
-	for (std::map<int, CUnitType *>::iterator iterator = parent_type->DefaultEquipment.begin(); iterator != parent_type->DefaultEquipment.end(); ++iterator) {
+	for (std::map<const ItemSlot *, CUnitType *>::iterator iterator = parent_type->DefaultEquipment.begin(); iterator != parent_type->DefaultEquipment.end(); ++iterator) {
 		this->DefaultEquipment[iterator->first] = iterator->second;
 	}
 	this->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit

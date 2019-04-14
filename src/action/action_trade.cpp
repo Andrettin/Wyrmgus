@@ -212,9 +212,9 @@ enum {
 			}
 			if (unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && unit.CanEquipItem(goal)) { //if the item is an equipment, equip it (only for units with inventories), or deequip it (if it is already equipped)
 				if (!unit.IsItemEquipped(goal)) {
-					unit.EquipItem(*goal);
+					unit.EquipItem(goal);
 				} else {
-					unit.DeequipItem(*goal);
+					unit.DeequipItem(goal);
 				}
 			} else if (unit.CanUseItem(goal)) {
 				if (goal->ConnectingDestination != nullptr) {
@@ -281,7 +281,7 @@ enum {
 					LetUnitDie(*goal);
 				} else {
 					if (!IsNetworkGame() && goal->Container->Character && goal->Container->Player->AiEnabled == false && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
-						CPersistentItem *item = goal->Container->Character->GetItem(*goal);
+						CPersistentItem *item = goal->Container->Character->GetItem(goal);
 						goal->Container->Character->Items.erase(std::remove(goal->Container->Character->Items.begin(), goal->Container->Character->Items.end(), item), goal->Container->Character->Items.end());
 						delete item;
 						SaveHero(goal->Container->Character);

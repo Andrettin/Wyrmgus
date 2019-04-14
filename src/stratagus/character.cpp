@@ -717,13 +717,14 @@ bool CCharacter::IsSiblingOf(const std::string &sibling_ident) const
 
 bool CCharacter::IsItemEquipped(const CPersistentItem *item) const
 {
-	int item_slot = item->Type->ItemClass->Slot;
+	const ItemSlot *item_slot = item->Type->ItemClass->Slot;
 	
-	if (item_slot == -1) {
+	if (item_slot == nullptr) {
 		return false;
 	}
 	
-	if (std::find(this->EquippedItems[item_slot].begin(), this->EquippedItems[item_slot].end(), item) != this->EquippedItems[item_slot].end()) {
+	std::map<const ItemSlot *, std::vector<CPersistentItem *>>::const_iterator find_iterator = this->EquippedItems.find(item_slot);
+	if (find_iterator != this->EquippedItems.end() && std::find(find_iterator->second.begin(), find_iterator->second.end(), item) != find_iterator->second.end()) {
 		return true;
 	}
 	
@@ -816,12 +817,23 @@ IconConfig CCharacter::GetIcon() const
 	}
 }
 
-CPersistentItem *CCharacter::GetItem(CUnit &item) const
+CPersistentItem *CCharacter::GetItem(const CUnit *item) const
 {
-	for (size_t i = 0; i < this->Items.size(); ++i) {
-		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Work == item.Work && this->Items[i]->Elixir == item.Elixir && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound && this->Items[i]->Identified == item.Identified && this->IsItemEquipped(this->Items[i]) == item.Container->IsItemEquipped(&item)) {
-			if (this->Items[i]->Name.empty() || this->Items[i]->Name == item.Name) {
-				return this->Items[i];
+	for (CPersistentItem *persistent_item : this->Items) {
+		if (
+			persistent_item->Type == item->Type
+			&& persistent_item->Prefix == item->Prefix
+			&& persistent_item->Suffix == item->Suffix
+			&& persistent_item->Spell == item->Spell
+			&& persistent_item->Work == item->Work
+			&& persistent_item->Elixir == item->Elixir
+			&& persistent_item->Unique == item->Unique
+			&& persistent_item->Bound == item->Bound
+			&& persistent_item->Identified == item->Identified
+			&& this->IsItemEquipped(persistent_item) == item->Container->IsItemEquipped(item)
+		) {
+			if (persistent_item->Name.empty() || persistent_item->Name == item->Name) {
+				return persistent_item;
 			}
 		}
 	}

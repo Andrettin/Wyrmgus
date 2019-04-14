@@ -41,6 +41,8 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class ItemSlot;
+
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
@@ -55,6 +57,7 @@ public:
 private:
 	static inline bool InitializeClass()
 	{
+		REGISTER_PROPERTY(Slot);
 		REGISTER_PROPERTY(Consumable);
 		REGISTER_PROPERTY(TwoHanded);
 		REGISTER_PROPERTY(ThrustingWeapon);
@@ -69,9 +72,7 @@ private:
 	static inline bool ClassInitialized = InitializeClass();
 	
 public:
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
-	
-	Property<int> Slot = -1;				/// the item slot of the item class
+	Property<const ItemSlot *> Slot = nullptr;	/// the item slot of the item class
 	Property<bool> Consumable = false;		/// whether the item class is consumable
 	Property<bool> TwoHanded = false;		/// whether the item class is a two-handed weapon
 	Property<bool> ThrustingWeapon = false;	/// whether the item class is a thrusting weapon

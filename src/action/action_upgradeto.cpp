@@ -278,10 +278,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 	
 	//deequip the current equipment if they are incompatible with the new unit type
-	for (int i = 0; i < MaxItemSlots; ++i) {
-		for (size_t j = 0; j < unit.EquippedItems[i].size(); ++j) {
-			if (!unit.CanEquipItemClass(unit.EquippedItems[i][j]->Type->ItemClass)) {
-				unit.DeequipItem(*unit.EquippedItems[i][j]);
+	for (std::map<const ItemSlot *, std::vector<CUnit *>>::iterator iterator = unit.EquippedItems.begin(); iterator != unit.EquippedItems.end(); ++iterator) {
+		for (CUnit *equipped_item : iterator->second) {
+			if (!unit.CanEquipItemClass(equipped_item->Type->ItemClass)) {
+				unit.DeequipItem(equipped_item);
 			}
 		}
 	}

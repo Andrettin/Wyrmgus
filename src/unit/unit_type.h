@@ -79,6 +79,7 @@ class CVariable;
 class CWorld;
 //Wyrmgus end
 class ItemClass;
+class ItemSlot;
 class LuaCallback;
 class UnitClass;
 struct lua_State;
@@ -810,7 +811,7 @@ public:
 	std::string LightFile;			/// Light file
 	std::string LayerFiles[MaxImageLayers];	/// Layer files
 	std::map<int, IconConfig> ButtonIcons;				/// icons for button actions
-	std::map<int, CUnitType *> DefaultEquipment;		/// default equipment for the unit type, mapped to item slots
+	std::map<const ItemSlot *, CUnitType *> DefaultEquipment;	/// default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
 
 	int Width = 0;										/// Sprite width

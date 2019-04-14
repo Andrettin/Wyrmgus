@@ -261,7 +261,7 @@ public:
 		return PropertyBase<T>::Get();
 	}
 	
-	ReturnType operator ->()
+	ReturnType operator ->() const
 	{
 		return this->Get();
 	}

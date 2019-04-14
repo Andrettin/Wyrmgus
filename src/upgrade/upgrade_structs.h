@@ -67,6 +67,7 @@ class CUnitType;
 class CUpgradeModifier;
 class CVariable;
 class ItemClass;
+class ItemSlot;
 struct lua_State;
 
 /**
@@ -137,10 +138,7 @@ public:
 	std::string EffectsString;		/// Effects string of the upgrade
 	std::string RequirementsString;	/// Requirements string of the upgrade
 	bool Ability = false;
-	bool Weapon = false;
-	bool Shield = false;
-	bool Boots = false;
-	bool Arrows = false;
+	const ::ItemSlot *ItemSlot = nullptr;
 	bool MagicPrefix = false;
 	bool MagicSuffix = false;
 	bool RunicAffix = false;

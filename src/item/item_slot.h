@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name item_class.cpp - The item class source file. */
+/**@name item_slot.h - The item slot header file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -27,21 +27,50 @@
 //      02111-1307, USA.
 //
 
+#ifndef __ITEM_SLOT_H__
+#define __ITEM_SLOT_H__
+
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
-#include "item/item_class.h"
-
-#include "item/item_slot.h"
+#include "data_element.h"
+#include "data_type.h"
 
 /*----------------------------------------------------------------------------
---  Functions
+--  Definition
 ----------------------------------------------------------------------------*/
 
-void ItemClass::_bind_methods()
+class ItemSlot : public DataElement, public DataType<ItemSlot>
 {
-	BIND_PROPERTIES();
-}
+	DATA_TYPE(ItemSlot, DataElement)
+
+public:
+	static constexpr const char *ClassIdentifier = "item_slot";
+	
+private:
+	static inline bool InitializeClass()
+	{
+		REGISTER_PROPERTY(Quantity);
+		REGISTER_PROPERTY(Weapon);
+		REGISTER_PROPERTY(Shield);
+		REGISTER_PROPERTY(Boots);
+		REGISTER_PROPERTY(Arrows);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
+	
+public:
+	Property<int> Quantity = 1;			/// the quantity of slots provided for this item slot per unit/character
+	Property<bool> Weapon = false;		/// whether the item slot is the weapon item slot
+	Property<bool> Shield = false;		/// whether the item slot is the shield item slot
+	Property<bool> Boots = false;		/// whether the item slot is the boots item slot
+	Property<bool> Arrows = false;		/// whether the item slot is the arrows item slot
+	
+protected:
+	static void _bind_methods();
+};
+
+#endif

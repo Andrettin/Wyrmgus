@@ -64,6 +64,7 @@ class CSite;
 class CUnitType;
 class CUnit;
 class CUpgrade;
+class ItemSlot;
 class LuaCallback;
 struct lua_State;
 
@@ -149,7 +150,7 @@ public:
 	bool HasMajorDeity() const;
 	std::string GetFullName() const;
 	IconConfig GetIcon() const;
-	CPersistentItem *GetItem(CUnit &item) const;
+	CPersistentItem *GetItem(const CUnit *item) const;
 	void UpdateAttributes();
 	void SaveHistory(CFile &file);		/// Save generated history data for the character
 
@@ -180,7 +181,7 @@ public:
 	LuaCallback *Conditions = nullptr;
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
-	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
+	std::map<const ItemSlot *, std::vector<CPersistentItem *>> EquippedItems;	/// Equipped items of the character, per slot
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CFaction *> Factions;	/// Factions for which this character is available; if empty, this means all factions of the character's civilization can recruit them

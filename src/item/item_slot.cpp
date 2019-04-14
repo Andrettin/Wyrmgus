@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name item_class.cpp - The item class source file. */
+/**@name item_slot.cpp - The item slot source file. */
 //
 //      (c) Copyright 2019 by Andrettin
 //
@@ -33,15 +33,13 @@
 
 #include "stratagus.h"
 
-#include "item/item_class.h"
-
 #include "item/item_slot.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void ItemClass::_bind_methods()
+void ItemSlot::_bind_methods()
 {
 	BIND_PROPERTIES();
 }
