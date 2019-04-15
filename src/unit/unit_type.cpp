@@ -75,6 +75,7 @@
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end
+#include "upgrade/upgrade_modifier.h"
 #include "util.h"
 #include "video/video.h"
 
@@ -1931,8 +1932,125 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 	
 	return potential_names;
 }
-//Wyrmgus end
 
+std::vector<String> CUnitType::GetStatStrings() const
+{
+	std::vector<String> stat_strings;
+	
+	for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
+		if (
+			var != BASICDAMAGE_INDEX && var != PIERCINGDAMAGE_INDEX && var != THORNSDAMAGE_INDEX
+			&& var != FIREDAMAGE_INDEX && var != COLDDAMAGE_INDEX && var != ARCANEDAMAGE_INDEX && var != LIGHTNINGDAMAGE_INDEX
+			&& var != AIRDAMAGE_INDEX && var != EARTHDAMAGE_INDEX && var != WATERDAMAGE_INDEX && var != ACIDDAMAGE_INDEX
+			&& var != ARMOR_INDEX && var != FIRERESISTANCE_INDEX && var != COLDRESISTANCE_INDEX && var != ARCANERESISTANCE_INDEX && var != LIGHTNINGRESISTANCE_INDEX
+			&& var != AIRRESISTANCE_INDEX && var != EARTHRESISTANCE_INDEX && var != WATERRESISTANCE_INDEX && var != ACIDRESISTANCE_INDEX
+			&& var != HACKRESISTANCE_INDEX && var != PIERCERESISTANCE_INDEX && var != BLUNTRESISTANCE_INDEX
+			&& var != ACCURACY_INDEX && var != EVASION_INDEX && var != SPEED_INDEX && var != CHARGEBONUS_INDEX && var != BACKSTAB_INDEX
+			&& var != BONUSAGAINSTMOUNTED_INDEX && var != BONUSAGAINSTBUILDINGS_INDEX && var != BONUSAGAINSTAIR_INDEX && var != BONUSAGAINSTGIANTS_INDEX && var != BONUSAGAINSTDRAGONS_INDEX
+			&& var != HITPOINTHEALING_INDEX && var != HITPOINTBONUS_INDEX
+			&& var != SIGHTRANGE_INDEX && var != DAYSIGHTRANGEBONUS_INDEX && var != NIGHTSIGHTRANGEBONUS_INDEX
+			&& var != ATTACKRANGE_INDEX
+			&& var != HP_INDEX && var != MANA_INDEX && var != OWNERSHIPINFLUENCERANGE_INDEX
+			&& var != LEADERSHIPAURA_INDEX && var != REGENERATIONAURA_INDEX && var != HYDRATINGAURA_INDEX
+			&& var != ETHEREALVISION_INDEX && var != SPEEDBONUS_INDEX && var != SUPPLY_INDEX
+			&& var != TIMEEFFICIENCYBONUS_INDEX && var != RESEARCHSPEEDBONUS_INDEX && var != GARRISONEDRANGEBONUS_INDEX
+			&& var != KNOWLEDGEMAGIC_INDEX && var != KNOWLEDGEWARFARE_INDEX && var != KNOWLEDGEMINING_INDEX
+		) {
+			continue;
+		}
+		
+		if (
+			this->DefaultStat.Variables[var].Enable
+			&& (!this->BoolFlag[ITEM_INDEX].value || var != HP_INDEX) //don't show the HP for items, equippable items use the hit point bonus variable instead
+			&& (!this->BoolFlag[INDESTRUCTIBLE_INDEX].value || (var != HP_INDEX && var != ARMOR_INDEX && var != FIRERESISTANCE_INDEX && var != COLDRESISTANCE_INDEX && var != ARCANERESISTANCE_INDEX && var != LIGHTNINGRESISTANCE_INDEX && var != AIRRESISTANCE_INDEX && var != EARTHRESISTANCE_INDEX && var != WATERRESISTANCE_INDEX && var != ACIDRESISTANCE_INDEX && var != HACKRESISTANCE_INDEX && var != PIERCERESISTANCE_INDEX && var != BLUNTRESISTANCE_INDEX)) //don't show HP, armor or resistances for indestructible units
+			&& (this->BoolFlag[CANATTACK_INDEX].value || this->BoolFlag[ITEM_INDEX].value || var != ATTACKRANGE_INDEX) //don't show the attack range if the unit can't attack and it isn't an item
+			&& (this->TerrainType == nullptr || var != SIGHTRANGE_INDEX) //don't show the sight range range if the unit will become a terrain type when its construction is finished
+		) {
+			String stat_string;
+			
+			if (IsBooleanVariable(var) && this->DefaultStat.Variables[var].Value < 0) {
+				stat_string += "Lose ";
+			}
+			
+			if (!IsBooleanVariable(var)) {
+				if (this->BoolFlag[ITEM_INDEX].value && this->DefaultStat.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+					stat_string += "+";
+				}
+				
+				stat_string += std::to_string((long long) this->DefaultStat.Variables[var].Value).c_str();
+				
+				if (IsPercentageVariable(var)) {
+					stat_string += "%";
+				}
+				stat_string += " ";
+			}
+			
+			stat_string += GetVariableDisplayName(var).c_str();
+			
+			stat_strings.push_back(stat_string);
+			
+			if (this->DefaultStat.Variables[var].Increase != 0) {
+				String increase_stat_string;
+				if (this->DefaultStat.Variables[var].Increase > 0) {
+					increase_stat_string += "+";
+				}
+				increase_stat_string += std::to_string((long long) this->DefaultStat.Variables[var].Increase).c_str();
+				increase_stat_string += " ";
+
+				increase_stat_string += GetVariableDisplayName(var, true).c_str();
+				stat_strings.push_back(increase_stat_string);
+			}
+		}
+		
+		if (this->Elixir) {
+			for (const CUpgradeModifier *upgrade_modifier : this->Elixir->UpgradeModifiers) {
+				if (upgrade_modifier->Modifier.Variables[var].Value != 0) {
+					String stat_string;
+					
+					if (IsBooleanVariable(var) && upgrade_modifier->Modifier.Variables[var].Value < 0) {
+						stat_string += "Lose ";
+					}
+
+					if (!IsBooleanVariable(var)) {
+						if (upgrade_modifier->Modifier.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+							stat_string += "+";
+						}
+						stat_string += std::to_string((long long) upgrade_modifier->Modifier.Variables[var].Value).c_str();
+						if (IsPercentageVariable(var)) {
+							stat_string += "%";
+						}
+						stat_string += " ";
+					}
+
+					stat_string += GetVariableDisplayName(var).c_str();
+					
+					stat_strings.push_back(stat_string);
+				}
+				
+				if (upgrade_modifier->Modifier.Variables[var].Increase != 0) {
+					String stat_string;
+					
+					if (upgrade_modifier->Modifier.Variables[var].Increase > 0) {
+						stat_string += "+";
+					}
+					stat_string += std::to_string((long long) upgrade_modifier->Modifier.Variables[var].Increase).c_str();
+					stat_string += " ";
+												
+					stat_string += GetVariableDisplayName(var, true).c_str();
+					
+					stat_strings.push_back(stat_string);
+				}
+			}
+		}
+	}
+	
+	if (this->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
+		stat_strings.push_back(UnitTypeVar.BoolFlagNameLookup[INDESTRUCTIBLE_INDEX]);
+	}
+	
+	return stat_strings;
+}
+//Wyrmgus end
 
 void CUnitType::_bind_methods()
 {
@@ -1947,6 +2065,8 @@ void CUnitType::_bind_methods()
 	ClassDB::bind_method(D_METHOD("is_hidden_in_editor"), &CUnitType::IsHiddenInEditor);
 	ClassDB::bind_method(D_METHOD("get_icon"), &CUnitType::GetIcon);
 	ClassDB::bind_method(D_METHOD("get_terrain_type"), [](const CUnitType *unit_type){ return unit_type->TerrainType; });
+	
+	ClassDB::bind_method(D_METHOD("get_stat_strings"), [](const CUnitType *unit_type){ return VectorToGodotArray(unit_type->GetStatStrings()); });
 	
 	ClassDB::bind_method(D_METHOD("get_copper_cost"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Costs[CopperCost]; });
 	ClassDB::bind_method(D_METHOD("get_lumber_cost"), [](const CUnitType *unit_type){ return unit_type->DefaultStat.Costs[WoodCost]; });

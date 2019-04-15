@@ -44,6 +44,7 @@
 #include "video/color.h"
 
 #include <core/object.h>
+#include <core/ustring.h>
 
 #include <algorithm>
 #include <climits>
@@ -773,6 +774,8 @@ public:
 	std::string GeneratePersonalName(const CFaction *faction, const int gender) const;
 	bool IsPersonalNameValid(const std::string &name, const CFaction *faction, const int gender) const;
 	std::vector<std::string> GetPotentialPersonalNames(const CFaction *faction, const int gender) const;
+	
+	std::vector<String> GetStatStrings() const;
 	//Wyrmgus end
 
 public:
