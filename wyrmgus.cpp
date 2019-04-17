@@ -100,7 +100,7 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_literary_texts"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CLiteraryText::GetAll()); });
 	
 	ClassDB::bind_method(D_METHOD("get_planes"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CPlane::GetAll()); });
-	ClassDB::bind_method(D_METHOD("get_world"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CWorld::GetAll()); });
+	ClassDB::bind_method(D_METHOD("get_worlds"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CWorld::GetAll()); });
 
 	ClassDB::bind_method(D_METHOD("number_to_roman_numeral", "number"), &Wyrmgus::NumberToRomanNumeral);
 	
