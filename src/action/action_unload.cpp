@@ -41,6 +41,7 @@
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
+#include "item/item.h"
 #include "map/map.h"
 #include "map/map_layer.h"
 //Wyrmgus start
