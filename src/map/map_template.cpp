@@ -101,20 +101,16 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 {
 	if (key == "plane") {
 		value = FindAndReplaceString(value, "_", "-");
-		CPlane *plane = CPlane::GetPlane(value);
+		CPlane *plane = CPlane::Get(value);
 		if (plane) {
 			this->Plane = plane;
-		} else {
-			fprintf(stderr, "Plane \"%s\" does not exist.\n", value.c_str());
 		}
 	} else if (key == "world") {
 		value = FindAndReplaceString(value, "_", "-");
-		CWorld *world = CWorld::GetWorld(value);
+		CWorld *world = CWorld::Get(value);
 		if (world) {
 			this->World = world;
 			this->Plane = this->World->Plane;
-		} else {
-			fprintf(stderr, "World \"%s\" does not exist.\n", value.c_str());
 		}
 	} else if (key == "surface_layer") {
 		this->SurfaceLayer = std::stoi(value);

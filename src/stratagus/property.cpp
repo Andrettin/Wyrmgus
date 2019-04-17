@@ -39,8 +39,11 @@
 #include "item/item_slot.h"
 #include "language/language.h"
 #include "literary_text.h"
+#include "time/season_schedule.h"
+#include "time/time_of_day_schedule.h"
 #include "ui/icon.h"
 #include "unit/unit_type.h"
+#include "world/plane.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -150,6 +153,9 @@ template const PropertyBase<bool> &PropertyBase<bool>::operator =(const std::str
 template const PropertyBase<String> &PropertyBase<String>::operator =(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator =(const std::string &rhs);
 template const PropertyBase<CLanguage *> &PropertyBase<CLanguage *>::operator =(const std::string &rhs);
+template const PropertyBase<CPlane *> &PropertyBase<CPlane *>::operator =(const std::string &rhs);
+template const PropertyBase<CSeasonSchedule *> &PropertyBase<CSeasonSchedule *>::operator =(const std::string &rhs);
+template const PropertyBase<CTimeOfDaySchedule *> &PropertyBase<CTimeOfDaySchedule *>::operator =(const std::string &rhs);
 template const PropertyBase<ItemSlot *> &PropertyBase<ItemSlot *>::operator =(const std::string &rhs);
 template const PropertyBase<const ItemSlot *> &PropertyBase<const ItemSlot *>::operator =(const std::string &rhs);
 template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator =(const std::string &rhs);
@@ -159,6 +165,9 @@ template const PropertyBase<bool> &PropertyBase<bool>::operator +=(const std::st
 template const PropertyBase<String> &PropertyBase<String>::operator +=(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator +=(const std::string &rhs);
 template const PropertyBase<CLanguage *> &PropertyBase<CLanguage *>::operator +=(const std::string &rhs);
+template const PropertyBase<CPlane *> &PropertyBase<CPlane *>::operator +=(const std::string &rhs);
+template const PropertyBase<CSeasonSchedule *> &PropertyBase<CSeasonSchedule *>::operator +=(const std::string &rhs);
+template const PropertyBase<CTimeOfDaySchedule *> &PropertyBase<CTimeOfDaySchedule *>::operator +=(const std::string &rhs);
 template const PropertyBase<ItemSlot *> &PropertyBase<ItemSlot *>::operator +=(const std::string &rhs);
 template const PropertyBase<const ItemSlot *> &PropertyBase<const ItemSlot *>::operator +=(const std::string &rhs);
 template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator +=(const std::string &rhs);
@@ -168,6 +177,9 @@ template const PropertyBase<bool> &PropertyBase<bool>::operator -=(const std::st
 template const PropertyBase<String> &PropertyBase<String>::operator -=(const std::string &rhs);
 template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator -=(const std::string &rhs);
 template const PropertyBase<CLanguage *> &PropertyBase<CLanguage *>::operator -=(const std::string &rhs);
+template const PropertyBase<CPlane *> &PropertyBase<CPlane *>::operator -=(const std::string &rhs);
+template const PropertyBase<CSeasonSchedule *> &PropertyBase<CSeasonSchedule *>::operator -=(const std::string &rhs);
+template const PropertyBase<CTimeOfDaySchedule *> &PropertyBase<CTimeOfDaySchedule *>::operator -=(const std::string &rhs);
 template const PropertyBase<ItemSlot *> &PropertyBase<ItemSlot *>::operator -=(const std::string &rhs);
 template const PropertyBase<const ItemSlot *> &PropertyBase<const ItemSlot *>::operator -=(const std::string &rhs);
 template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator -=(const std::string &rhs);

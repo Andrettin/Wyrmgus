@@ -2999,7 +2999,7 @@ void UIHandleButtonUp(unsigned button)
 			if (button.Clicked) {
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-					CMap::Map.SetCurrentPlane(CPlane::Planes[i]);
+					CMap::Map.SetCurrentPlane(CPlane::Get(i));
 					if (button.Callback) {
 						button.Callback->action("");
 					}
@@ -3017,7 +3017,7 @@ void UIHandleButtonUp(unsigned button)
 			if (button.Clicked) {
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-					CMap::Map.SetCurrentWorld(CWorld::Worlds[i]);
+					CMap::Map.SetCurrentWorld(CWorld::Get(i));
 					if (button.Callback) {
 						button.Callback->action("");
 					}

@@ -162,7 +162,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			this->Icon.Icon->Load();
 		} else if (property.Key == "home_plane") {
 			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CPlane *plane = CPlane::GetPlane(value);
+			CPlane *plane = CPlane::Get(value);
 			if (plane) {
 				this->HomePlane = plane;
 			}

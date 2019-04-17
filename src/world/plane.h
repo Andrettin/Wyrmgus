@@ -34,9 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
 #include "detailed_data_element.h"
-
-#include <map>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -52,28 +51,38 @@ class CTimeOfDaySchedule;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CPlane : public DetailedDataElement
+class CPlane : public DetailedDataElement, public DataType<CPlane>
 {
-	GDCLASS(CPlane, DetailedDataElement)
+	DATA_TYPE(CPlane, DetailedDataElement)
 
 public:
-	static CPlane *GetPlane(const std::string &ident, const bool should_find = true);
-	static CPlane *GetOrAddPlane(const std::string &ident);
-	static void ClearPlanes();
-	
-	static std::vector<CPlane *> Planes;								/// Planes
-	static std::map<std::string, CPlane *> PlanesByIdent;
+	static constexpr const char *ClassIdentifier = "plane";
 
+private:
+	static inline bool InitializeClass()
+	{
+		REGISTER_PROPERTY(SeasonSchedule);
+		REGISTER_PROPERTY(TimeOfDaySchedule);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
+
+public:
+	static CPlane *Add(const std::string &ident);
+	static void Clear();
+	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 
-	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this plane's time of day schedule
-	CSeasonSchedule *SeasonSchedule = nullptr;							/// this plane's season schedule
-	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// Deity domains empowered in this plane
-	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic;				/// Schools of magic empowered in this plane
-	std::vector<CSpecies *> Species;									/// Species native to this plane
+	Property<CTimeOfDaySchedule *> TimeOfDaySchedule = nullptr;			/// this plane's time of day schedule
+	Property<CSeasonSchedule *> SeasonSchedule = nullptr;				/// this plane's season schedule
+	std::vector<CDeityDomain *> EmpoweredDeityDomains;					/// deity domains empowered in this plane
+	std::vector<CSchoolOfMagic *> EmpoweredSchoolsOfMagic;				/// schools of magic empowered in this plane
+	std::vector<CSpecies *> Species;									/// species native to this plane
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

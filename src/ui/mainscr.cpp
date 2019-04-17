@@ -958,7 +958,7 @@ void DrawMapLayerButtons()
 		if (UI.PlaneButtons[i].X != -1) {
 			DrawUIButton(UI.PlaneButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerPlane && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.PlaneButtons[i].Clicked || CMap::Map.GetCurrentPlane() == CPlane::Planes[i]) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.PlaneButtons[i].Clicked || CMap::Map.GetCurrentPlane() == CPlane::Get(i)) ? MI_FLAGS_CLICKED : 0),
 				UI.PlaneButtons[i].X, UI.PlaneButtons[i].Y,
 				UI.PlaneButtons[i].Text
 			);
@@ -969,7 +969,7 @@ void DrawMapLayerButtons()
 		if (UI.WorldButtons[i].X != -1) {
 			DrawUIButton(UI.WorldButtons[i].Style,
 				(ButtonAreaUnderCursor == ButtonAreaMapLayerWorld && ButtonUnderCursor == i ? MI_FLAGS_ACTIVE : 0)
-				| ((UI.WorldButtons[i].Clicked || CMap::Map.GetCurrentWorld() == CWorld::Worlds[i]) ? MI_FLAGS_CLICKED : 0),
+				| ((UI.WorldButtons[i].Clicked || CMap::Map.GetCurrentWorld() == CWorld::Get(i)) ? MI_FLAGS_CLICKED : 0),
 				UI.WorldButtons[i].X, UI.WorldButtons[i].Y,
 				UI.WorldButtons[i].Text
 			);
@@ -1230,9 +1230,9 @@ void DrawPopups()
 	*/
 	
 	if (ButtonAreaUnderCursor == ButtonAreaMapLayerPlane) {
-		DrawGenericPopup(CPlane::Planes[ButtonUnderCursor]->Name.utf8().get_data(), UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);
+		DrawGenericPopup(CPlane::Get(ButtonUnderCursor)->Name.utf8().get_data(), UI.PlaneButtons[ButtonUnderCursor].X, UI.PlaneButtons[ButtonUnderCursor].Y);
 	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerWorld) {
-		DrawGenericPopup(CWorld::Worlds[ButtonUnderCursor]->Name.utf8().get_data(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
+		DrawGenericPopup(CWorld::Get(ButtonUnderCursor)->Name.utf8().get_data(), UI.WorldButtons[ButtonUnderCursor].X, UI.WorldButtons[ButtonUnderCursor].Y);
 	} else if (ButtonAreaUnderCursor == ButtonAreaMapLayerSurfaceLayer) {
 		std::string surface_layer_string;
 		if (ButtonUnderCursor == 0) {

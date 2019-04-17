@@ -179,7 +179,7 @@ static int CclDefineProvince(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "World")) {
-			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
+			CWorld *world = CWorld::Get(LuaToString(l, -1));
 			if (world != nullptr) {
 				province->World = world;
 				world->Provinces.push_back(province);
@@ -383,7 +383,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "World")) {
-			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
+			CWorld *world = CWorld::Get(LuaToString(l, -1));
 			if (world != nullptr) {
 				tile->World = world;
 			} else {
@@ -614,7 +614,7 @@ static int CclGetPlaneData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string plane_ident = LuaToString(l, 1);
-	CPlane *plane = CPlane::GetPlane(plane_ident);
+	CPlane *plane = CPlane::Get(plane_ident);
 	if (!plane) {
 		LuaError(l, "Plane \"%s\" doesn't exist." _C_ plane_ident.c_str());
 	}
@@ -661,7 +661,7 @@ static int CclGetWorldData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string world_ident = LuaToString(l, 1);
-	CWorld *world = CWorld::GetWorld(world_ident);
+	CWorld *world = CWorld::Get(world_ident);
 	if (!world) {
 		LuaError(l, "World \"%s\" doesn't exist." _C_ world_ident.c_str());
 	}
@@ -754,10 +754,10 @@ static int CclGetProvinceData(lua_State *l)
 
 static int CclGetPlanes(lua_State *l)
 {
-	lua_createtable(l, CPlane::Planes.size(), 0);
-	for (size_t i = 1; i <= CPlane::Planes.size(); ++i)
+	lua_createtable(l, CPlane::GetAll().size(), 0);
+	for (size_t i = 1; i <= CPlane::GetAll().size(); ++i)
 	{
-		lua_pushstring(l, CPlane::Planes[i-1]->Ident.c_str());
+		lua_pushstring(l, CPlane::Get(i-1)->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -765,10 +765,10 @@ static int CclGetPlanes(lua_State *l)
 
 static int CclGetWorlds(lua_State *l)
 {
-	lua_createtable(l, CWorld::Worlds.size(), 0);
-	for (size_t i = 1; i <= CWorld::Worlds.size(); ++i)
+	lua_createtable(l, CWorld::GetAll().size(), 0);
+	for (size_t i = 1; i <= CWorld::GetAll().size(); ++i)
 	{
-		lua_pushstring(l, CWorld::Worlds[i-1]->Ident.c_str());
+		lua_pushstring(l, CWorld::Get(i-1)->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

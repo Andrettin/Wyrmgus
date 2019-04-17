@@ -98,8 +98,6 @@
 #include "upgrade/upgrade.h"
 #include "video/font.h"
 #include "video/video.h"
-#include "world/plane.h"
-#include "world/world.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -139,7 +137,6 @@ void CleanModules()
 	CleanGrandStrategyEvents();
 	//Wyrmgus end
 	CleanMissiles();
-	CPlane::ClearPlanes();
 	//Wyrmgus start
 	CleanProvinces();
 	CleanQuests();
@@ -147,7 +144,6 @@ void CleanModules()
 	//Wyrmgus end
 	CleanUnits();
 	CleanUnitTypes();
-	CWorld::ClearWorlds();
 	CleanPlayers();
 	CleanSelections();
 	CleanGroups();

@@ -148,7 +148,7 @@ static int CclDefineGrandStrategyEvent(lua_State *l)
 		} else if (!strcmp(value, "HistoricalYear")) {
 			event->HistoricalYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "World")) {
-			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
+			CWorld *world = CWorld::Get(LuaToString(l, -1));
 			if (world != nullptr) {
 				event->World = world;
 			} else {

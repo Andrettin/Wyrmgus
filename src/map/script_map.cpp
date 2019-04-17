@@ -237,8 +237,8 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument for \"layer-references\"");
 						}
 						lua_rawgeti(l, -1, z + 1);
-						CMap::Map.MapLayers[z]->Plane = CPlane::GetPlane(LuaToString(l, -1, 1), false);
-						CMap::Map.MapLayers[z]->World = CWorld::GetWorld(LuaToString(l, -1, 2), false);
+						CMap::Map.MapLayers[z]->Plane = CPlane::Get(LuaToString(l, -1, 1), false);
+						CMap::Map.MapLayers[z]->World = CWorld::Get(LuaToString(l, -1, 2), false);
 						CMap::Map.MapLayers[z]->SurfaceLayer = LuaToNumber(l, -1, 3);
 						lua_pop(l, 1);
 					}
@@ -953,10 +953,10 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 		map_template->SurfaceLayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>(ipos, unittype, layer, unique));
 	} else if (lua_isstring(l, 4)) {
 		std::string realm = LuaToString(l, 4);
-		if (CWorld::GetWorld(realm, false)) {
-			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>(ipos, unittype, CWorld::GetWorld(realm), unique));
-		} else if (CPlane::GetPlane(realm, false)) {
-			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>(ipos, unittype, CPlane::GetPlane(realm), unique));
+		if (CWorld::Get(realm, false)) {
+			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>(ipos, unittype, CWorld::Get(realm), unique));
+		} else if (CPlane::Get(realm, false)) {
+			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>(ipos, unittype, CPlane::Get(realm), unique));
 		} else {
 			LuaError(l, "incorrect argument");
 		}
@@ -1653,13 +1653,13 @@ static int CclDefineMapTemplate(lua_State *l)
 		if (!strcmp(value, "Name")) {
 			map_template->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Plane")) {
-			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
+			CPlane *plane = CPlane::Get(LuaToString(l, -1));
 			if (!plane) {
 				LuaError(l, "Plane doesn't exist.");
 			}
 			map_template->Plane = plane;
 		} else if (!strcmp(value, "World")) {
-			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
+			CWorld *world = CWorld::Get(LuaToString(l, -1));
 			if (!world) {
 				LuaError(l, "World doesn't exist.");
 			}
@@ -2068,14 +2068,14 @@ static int CclDefineTerrainFeature(lua_State *l)
 			}
 			terrain_feature->TerrainType = terrain;
 		} else if (!strcmp(value, "Plane")) {
-			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
+			CPlane *plane = CPlane::Get(LuaToString(l, -1));
 			if (plane != nullptr) {
 				terrain_feature->Plane = plane;
 			} else {
 				LuaError(l, "Plane doesn't exist.");
 			}
 		} else if (!strcmp(value, "World")) {
-			CWorld *world = CWorld::GetWorld(LuaToString(l, -1));
+			CWorld *world = CWorld::Get(LuaToString(l, -1));
 			if (world != nullptr) {
 				terrain_feature->World = world;
 				world->TerrainFeatures.push_back(terrain_feature);

@@ -337,11 +337,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			if (!define_only) {
 				missile_type->ProcessConfigData(config_data);
 			}
-		} else if (config_data->Tag == "plane") {
-			CPlane *plane = CPlane::GetOrAddPlane(ident);
-			if (!define_only) {
-				plane->ProcessConfigData(config_data);
-			}
 		} else if (config_data->Tag == "sound") {
 			if (!define_only) {
 				CSound::ProcessConfigData(config_data);
@@ -373,11 +368,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CUpgrade *upgrade = CUpgrade::New(ident);
 			if (!define_only) {
 				upgrade->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "world") {
-			CWorld *world = CWorld::GetOrAddWorld(ident);
-			if (!define_only) {
-				world->ProcessConfigData(config_data);
 			}
 		} else {
 			fprintf(stderr, "Invalid data type: \"%s\".\n", config_data->Tag.c_str());

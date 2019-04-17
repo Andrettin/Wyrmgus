@@ -38,65 +38,25 @@
 #include "config.h"
 #include "religion/deity_domain.h"
 #include "school_of_magic.h"
-#include "time/season_schedule.h"
-#include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CPlane *> CPlane::Planes;
-std::map<std::string, CPlane *> CPlane::PlanesByIdent;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a plane
-**
-**	@param	ident			The plane's string identifier
-**	@param	should_find		Whether it is an error if the plane could not be found; this is true by default
-**
-**	@return	The plane if found, or null otherwise
-*/
-CPlane *CPlane::GetPlane(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CPlane *>::const_iterator find_iterator = PlanesByIdent.find(ident);
-	
-	if (find_iterator != PlanesByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid plane: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a plane
+**	@brief	Add a plane
 **
 **	@param	ident	The plane's string identifier
 **
-**	@return	The plane if found, or a newly-created one otherwise
+**	@return	A newly-created plane
 */
-CPlane *CPlane::GetOrAddPlane(const std::string &ident)
+CPlane *CPlane::Add(const std::string &ident)
 {
-	CPlane *plane = GetPlane(ident, false);
-	
-	if (!plane) {
-		plane = new CPlane;
-		plane->Ident = ident;
-		plane->Index = Planes.size();
-		Planes.push_back(plane);
-		PlanesByIdent[ident] = plane;
-		UI.PlaneButtons.resize(Planes.size());
-		UI.PlaneButtons[plane->Index].X = -1;
-		UI.PlaneButtons[plane->Index].Y = -1;
-	}
+	CPlane *plane = DataType<CPlane>::Add(ident);
+	UI.PlaneButtons.resize(CPlane::GetAll().size());
+	UI.PlaneButtons[plane->GetIndex()].X = -1;
+	UI.PlaneButtons[plane->GetIndex()].Y = -1;
 	
 	return plane;
 }
@@ -104,12 +64,11 @@ CPlane *CPlane::GetOrAddPlane(const std::string &ident)
 /**
 **	@brief	Remove the existing planes
 */
-void CPlane::ClearPlanes()
+void CPlane::Clear()
 {
-	for (size_t i = 0; i < Planes.size(); ++i) {
-		delete Planes[i];
-	}
-	Planes.clear();
+	UI.PlaneButtons.clear();
+	
+	DataType<CPlane>::Clear();
 }
 
 /**
@@ -122,13 +81,7 @@ void CPlane::ClearPlanes()
 */
 bool CPlane::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "time_of_day_schedule") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->TimeOfDaySchedule = CTimeOfDaySchedule::Get(value);
-	} else if (key == "season_schedule") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->SeasonSchedule = CSeasonSchedule::Get(value);
-	} else if (key == "empowered_deity_domain") {
+	if (key == "empowered_deity_domain") {
 		value = FindAndReplaceString(value, "_", "-");
 		CDeityDomain *deity_domain = CDeityDomain::Get(value);
 		if (deity_domain) {
@@ -145,4 +98,9 @@ bool CPlane::ProcessConfigDataProperty(const std::string &key, std::string value
 	}
 	
 	return true;
+}
+
+void CPlane::_bind_methods()
+{
+	BIND_PROPERTIES();
 }

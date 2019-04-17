@@ -35,68 +35,26 @@
 
 #include "world/world.h"
 
-#include "config.h"
-#include "time/season_schedule.h"
-#include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
-#include "world/plane.h"
 #include "world/province.h"
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-std::vector<CWorld *> CWorld::Worlds;
-std::map<std::string, CWorld *> CWorld::WorldsByIdent;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	@brief	Get a world
-**
-**	@param	ident			The world's string identifier
-**	@param	should_find		Whether it is an error if the world could not be found; this is true by default
-**
-**	@return	The world if found, or null otherwise
-*/
-CWorld *CWorld::GetWorld(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CWorld *>::const_iterator find_iterator = WorldsByIdent.find(ident);
-	
-	if (find_iterator != WorldsByIdent.end()) {
-		return find_iterator->second;
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid world: \"%s\".\n", ident.c_str());
-	}
-	
-	return nullptr;
-}
-
-/**
-**	@brief	Get or add a world
+**	@brief	Add a world
 **
 **	@param	ident	The world's string identifier
 **
-**	@return	The world if found, or a newly-created one otherwise
+**	@return	A newly-created world
 */
-CWorld *CWorld::GetOrAddWorld(const std::string &ident)
+CWorld *CWorld::Add(const std::string &ident)
 {
-	CWorld *world = GetWorld(ident, false);
-	
-	if (!world) {
-		world = new CWorld;
-		world->Ident = ident;
-		world->Index = Worlds.size();
-		Worlds.push_back(world);
-		WorldsByIdent[ident] = world;
-		UI.WorldButtons.resize(Worlds.size());
-		UI.WorldButtons[world->Index].X = -1;
-		UI.WorldButtons[world->Index].Y = -1;
-	}
+	CWorld *world = DataType<CWorld>::Add(ident);
+	UI.WorldButtons.resize(CWorld::GetAll().size());
+	UI.WorldButtons[world->GetIndex()].X = -1;
+	UI.WorldButtons[world->GetIndex()].Y = -1;
 	
 	return world;
 }
@@ -104,42 +62,20 @@ CWorld *CWorld::GetOrAddWorld(const std::string &ident)
 /**
 **	@brief	Remove the existing worlds
 */
-void CWorld::ClearWorlds()
+void CWorld::Clear()
 {
-	for (size_t i = 0; i < Worlds.size(); ++i) {
-		for (size_t j = 0; j < Worlds[i]->Provinces.size(); ++j) {
-			delete Worlds[i]->Provinces[j];
+	for (CWorld *world : CWorld::GetAll()) {
+		for (CProvince *province : world->Provinces) {
+			delete province;
 		}
-		Worlds[i]->Provinces.clear();
-		
-		delete Worlds[i];
 	}
-	Worlds.clear();
-	WorldsByIdent.clear();
+	
+	UI.WorldButtons.clear();
+	
+	DataType<CWorld>::Clear();
 }
 
-/**
-**	@brief	Process a property in the data provided by a configuration file
-**
-**	@param	key		The property's key
-**	@param	value	The property's value
-**
-**	@return	True if the property can be processed, or false otherwise
-*/
-bool CWorld::ProcessConfigDataProperty(const std::string &key, std::string value)
+void CWorld::_bind_methods()
 {
-	if (key == "plane") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Plane = CPlane::GetPlane(value);
-	} else if (key == "time_of_day_schedule") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->TimeOfDaySchedule = CTimeOfDaySchedule::Get(value);
-	} else if (key == "season_schedule") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->SeasonSchedule = CSeasonSchedule::Get(value);
-	} else {
-		return false;
-	}
-
-	return true;
+	BIND_PROPERTIES();
 }

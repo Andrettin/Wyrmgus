@@ -34,9 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "data_type.h"
 #include "detailed_data_element.h"
-
-#include <map>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -53,29 +52,38 @@ class CTimeOfDaySchedule;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CWorld : public DetailedDataElement
+class CWorld : public DetailedDataElement, public DataType<CWorld>
 {
-	GDCLASS(CWorld, DetailedDataElement)
+	DATA_TYPE(CWorld, DetailedDataElement)
+	
+public:
+	static constexpr const char *ClassIdentifier = "world";
+
+private:
+	static inline bool InitializeClass()
+	{
+		REGISTER_PROPERTY(Plane);
+		REGISTER_PROPERTY(SeasonSchedule);
+		REGISTER_PROPERTY(TimeOfDaySchedule);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
 
 public:
-	static CWorld *GetWorld(const std::string &ident, const bool should_find = true);
-	static CWorld *GetOrAddWorld(const std::string &ident);
-	static void ClearWorlds();
+	static CWorld *Add(const std::string &ident);
+	static void Clear();
 	
-	static std::vector<CWorld *> Worlds;								/// Worlds
-	static std::map<std::string, CWorld *> WorldsByIdent;
-
-	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
-
-	CPlane *Plane = nullptr;
-	CTimeOfDaySchedule *TimeOfDaySchedule = nullptr;					/// this world's time of day schedule
-	CSeasonSchedule *SeasonSchedule = nullptr;							/// this world's season schedule
+	Property<CPlane *> Plane = nullptr;
+	Property<CTimeOfDaySchedule *> TimeOfDaySchedule = nullptr;			/// this world's time of day schedule
+	Property<CSeasonSchedule *> SeasonSchedule = nullptr;				/// this world's season schedule
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
 	std::vector<CSpecies *> Species;									/// Species in this world
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

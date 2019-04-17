@@ -3613,7 +3613,7 @@ static int CclDefineSpecies(lua_State *l)
 			species->ChildUpgrade = LuaToString(l, -1);
 		} else if (!strcmp(value, "HomePlane")) {
 			std::string plane_ident = LuaToString(l, -1);
-			CPlane *plane = CPlane::GetPlane(plane_ident);
+			CPlane *plane = CPlane::Get(plane_ident);
 			if (plane) {
 				species->HomePlane = plane;
 				plane->Species.push_back(species);
@@ -3622,7 +3622,7 @@ static int CclDefineSpecies(lua_State *l)
 			}
 		} else if (!strcmp(value, "Homeworld")) {
 			std::string world_ident = LuaToString(l, -1);
-			CWorld *world = CWorld::GetWorld(world_ident);
+			CWorld *world = CWorld::Get(world_ident);
 			if (world) {
 				species->Homeworld = world;
 				world->Species.push_back(species);

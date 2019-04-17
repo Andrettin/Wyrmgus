@@ -2336,7 +2336,7 @@ static int CclDefineDeity(lua_State *l)
 		} else if (!strcmp(value, "Quote")) {
 			deity->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "HomePlane")) {
-			CPlane *plane = CPlane::GetPlane(LuaToString(l, -1));
+			CPlane *plane = CPlane::Get(LuaToString(l, -1));
 			if (!plane) {
 				LuaError(l, "Plane doesn't exist.");
 			}
