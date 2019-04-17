@@ -78,4 +78,6 @@ void CWorld::Clear()
 void CWorld::_bind_methods()
 {
 	BIND_PROPERTIES();
+	
+	ClassDB::bind_method(D_METHOD("get_species"), [](const CWorld *world){ return VectorToGodotArray(world->Species); });
 }

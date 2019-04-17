@@ -64,16 +64,6 @@ bool CSpecies::ProcessConfigDataProperty(const std::string &key, std::string val
 		} else {
 			fprintf(stderr, "Invalid era: \"%s\".\n", value.c_str());
 		}
-	} else if (key == "sapient") {
-		this->Sapient = StringToBool(value);
-	} else if (key == "prehistoric") {
-		this->Prehistoric = StringToBool(value);
-	} else if (key == "category") {
-		value = FindAndReplaceString(value, "_", "-");
-		CSpeciesCategory *category = CSpeciesCategory::Get(value);
-		if (category) {
-			this->Category = category;
-		}
 	} else if (key == "scientific_name") {
 		this->ScientificName = value;
 	} else if (key == "child_upgrade") {
@@ -177,4 +167,9 @@ CSpecies *CSpecies::GetRandomEvolution(const CTerrainType *terrain_type) const
 	}
 	
 	return nullptr;
+}
+
+void CSpecies::_bind_methods()
+{
+	BIND_PROPERTIES();
 }

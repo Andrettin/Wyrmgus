@@ -39,6 +39,7 @@
 #include "item/item_slot.h"
 #include "language/language.h"
 #include "literary_text.h"
+#include "species/species_category.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/icon.h"
@@ -57,7 +58,7 @@
 **	@return	The converted variable
 */
 template <typename T>
-static T ConvertFromString(const std::string &str)
+T ConvertFromString(const std::string &str)
 {
 	if constexpr(std::is_same_v<T, int>) {
 		return std::stoi(str);
@@ -74,113 +75,16 @@ static T ConvertFromString(const std::string &str)
 	}
 }
 
-/**
-**	@brief	The operator for assignment of a string for a property
-**
-**	@param	rhs	The string which has to be converted to the property
-**
-**	@return	The property
-*/
-template <typename T>
-const PropertyBase<T> &PropertyBase<T>::operator =(const std::string &rhs)
-{
-	if constexpr(
-		std::is_same_v<T, int>
-		|| std::is_same_v<T, bool>
-		|| std::is_same_v<T, String>
-		|| (std::is_pointer_v<T> && std::is_base_of_v<DataType<std::remove_const_t<std::remove_pointer_t<T>>>, std::remove_const_t<std::remove_pointer_t<T>>>)
-	) {
-		return *this = ConvertFromString<T>(rhs);
-	} else {
-		fprintf(stderr, "The operator = is not valid for this type.\n");
-		return *this;
-	}
-}
-
-/**
-**	@brief	The operator for addition of a string for a property
-**
-**	@param	rhs	The string which has to be converted for the property
-**
-**	@return	The property
-*/
-template <typename T>
-const PropertyBase<T> &PropertyBase<T>::operator +=(const std::string &rhs)
-{
-	if constexpr(
-		std::is_same_v<T, int>
-		|| std::is_same_v<T, bool>
-		|| std::is_same_v<T, String>
-	) {
-		return *this += ConvertFromString<T>(rhs);
-	} else if constexpr(is_specialization_of<T, std::vector>::value) {
-		typename T::value_type new_value = ConvertFromString<typename T::value_type>(rhs);
-		this->GetModifiable().push_back(new_value);
-		return *this;
-	} else {
-		fprintf(stderr, "The operator += is not valid for this type.\n");
-		return *this;
-	}
-}
-
-/**
-**	@brief	The operator for subtraction of a string for a property
-**
-**	@param	rhs	The string which has to be converted for the property
-**
-**	@return	The property
-*/
-template <typename T>
-const PropertyBase<T> &PropertyBase<T>::operator -=(const std::string &rhs)
-{
-	if constexpr(
-		std::is_same_v<T, int>
-		|| std::is_same_v<T, bool>
-	) {
-		return *this -= ConvertFromString<T>(rhs);
-	} else if constexpr(is_specialization_of<T, std::vector>::value) {
-		typename T::value_type new_value = ConvertFromString<typename T::value_type>(rhs);
-		this->GetModifiable().erase(std::remove(this->GetModifiable().begin(), this->GetModifiable().end(), new_value), this->GetModifiable().end());
-		return *this;
-	} else {
-		fprintf(stderr, "The operator -= is not valid for this type.\n");
-		return *this;
-	}
-}
-
-template const PropertyBase<int> &PropertyBase<int>::operator =(const std::string &rhs);
-template const PropertyBase<bool> &PropertyBase<bool>::operator =(const std::string &rhs);
-template const PropertyBase<String> &PropertyBase<String>::operator =(const std::string &rhs);
-template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator =(const std::string &rhs);
-template const PropertyBase<CLanguage *> &PropertyBase<CLanguage *>::operator =(const std::string &rhs);
-template const PropertyBase<CPlane *> &PropertyBase<CPlane *>::operator =(const std::string &rhs);
-template const PropertyBase<CSeasonSchedule *> &PropertyBase<CSeasonSchedule *>::operator =(const std::string &rhs);
-template const PropertyBase<CTimeOfDaySchedule *> &PropertyBase<CTimeOfDaySchedule *>::operator =(const std::string &rhs);
-template const PropertyBase<ItemSlot *> &PropertyBase<ItemSlot *>::operator =(const std::string &rhs);
-template const PropertyBase<const ItemSlot *> &PropertyBase<const ItemSlot *>::operator =(const std::string &rhs);
-template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator =(const std::string &rhs);
-template const PropertyBase<std::vector<CUnitType *>> &PropertyBase<std::vector<CUnitType *>>::operator =(const std::string &rhs);
-template const PropertyBase<int> &PropertyBase<int>::operator +=(const std::string &rhs);
-template const PropertyBase<bool> &PropertyBase<bool>::operator +=(const std::string &rhs);
-template const PropertyBase<String> &PropertyBase<String>::operator +=(const std::string &rhs);
-template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator +=(const std::string &rhs);
-template const PropertyBase<CLanguage *> &PropertyBase<CLanguage *>::operator +=(const std::string &rhs);
-template const PropertyBase<CPlane *> &PropertyBase<CPlane *>::operator +=(const std::string &rhs);
-template const PropertyBase<CSeasonSchedule *> &PropertyBase<CSeasonSchedule *>::operator +=(const std::string &rhs);
-template const PropertyBase<CTimeOfDaySchedule *> &PropertyBase<CTimeOfDaySchedule *>::operator +=(const std::string &rhs);
-template const PropertyBase<ItemSlot *> &PropertyBase<ItemSlot *>::operator +=(const std::string &rhs);
-template const PropertyBase<const ItemSlot *> &PropertyBase<const ItemSlot *>::operator +=(const std::string &rhs);
-template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator +=(const std::string &rhs);
-template const PropertyBase<std::vector<CUnitType *>> &PropertyBase<std::vector<CUnitType *>>::operator +=(const std::string &rhs);
-template const PropertyBase<int> &PropertyBase<int>::operator -=(const std::string &rhs);
-template const PropertyBase<bool> &PropertyBase<bool>::operator -=(const std::string &rhs);
-template const PropertyBase<String> &PropertyBase<String>::operator -=(const std::string &rhs);
-template const PropertyBase<CIcon *> &PropertyBase<CIcon *>::operator -=(const std::string &rhs);
-template const PropertyBase<CLanguage *> &PropertyBase<CLanguage *>::operator -=(const std::string &rhs);
-template const PropertyBase<CPlane *> &PropertyBase<CPlane *>::operator -=(const std::string &rhs);
-template const PropertyBase<CSeasonSchedule *> &PropertyBase<CSeasonSchedule *>::operator -=(const std::string &rhs);
-template const PropertyBase<CTimeOfDaySchedule *> &PropertyBase<CTimeOfDaySchedule *>::operator -=(const std::string &rhs);
-template const PropertyBase<ItemSlot *> &PropertyBase<ItemSlot *>::operator -=(const std::string &rhs);
-template const PropertyBase<const ItemSlot *> &PropertyBase<const ItemSlot *>::operator -=(const std::string &rhs);
-template const PropertyBase<std::vector<CLiteraryText *>> &PropertyBase<std::vector<CLiteraryText *>>::operator -=(const std::string &rhs);
-template const PropertyBase<std::vector<CUnitType *>> &PropertyBase<std::vector<CUnitType *>>::operator -=(const std::string &rhs);
+template int ConvertFromString(const std::string &str);
+template bool ConvertFromString(const std::string &str);
+template String ConvertFromString(const std::string &str);
+template CIcon *ConvertFromString(const std::string &str);
+template CLanguage *ConvertFromString(const std::string &str);
+template CLiteraryText *ConvertFromString(const std::string &str);
+template CPlane *ConvertFromString(const std::string &str);
+template CSeasonSchedule *ConvertFromString(const std::string &str);
+template CSpeciesCategory *ConvertFromString(const std::string &str);
+template CTimeOfDaySchedule *ConvertFromString(const std::string &str);
+template CUnitType *ConvertFromString(const std::string &str);
+template ItemSlot *ConvertFromString(const std::string &str);
+template const ItemSlot *ConvertFromString(const std::string &str);

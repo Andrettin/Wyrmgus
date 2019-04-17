@@ -59,27 +59,24 @@ class CSpecies : public DetailedDataElement, public DataType<CSpecies>
 public:
 	static constexpr const char *ClassIdentifier = "species";
 	
+private:
+	static inline bool InitializeClass()
+	{
+		REGISTER_PROPERTY(Prehistoric);
+		REGISTER_PROPERTY(Sapient);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
+
+public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;
-	
-	CSpeciesCategory *GetCategory() const
-	{
-		return this->Category;
-	}
 	
 	String GetScientificName() const
 	{
 		return this->ScientificName.c_str();
-	}
-	
-	bool IsSapient() const
-	{
-		return this->Sapient;
-	}
-	
-	bool IsPrehistoric() const
-	{
-		return this->Prehistoric;
 	}
 	
 	CPlane *GetHomePlane() const
@@ -110,12 +107,14 @@ public:
 	bool CanEvolveToAUnitType(const CTerrainType *terrain = nullptr, const bool sapient_only = false) const;
 	CSpecies *GetRandomEvolution(const CTerrainType *terrain_type) const;
 	
+public:
+	ExposedProperty<CSpeciesCategory *> Category = nullptr;
 private:
-	CSpeciesCategory *Category = nullptr;
 	std::string ScientificName;		/// The scientific name of the species
 	int Era = -1;					/// Era ID
-	bool Sapient = false;			/// Whether the species is sapient
-	bool Prehistoric = false;		/// Whether the species is prehistoric or not
+public:
+	ExposedProperty<bool> Sapient = false;		/// whether the species is sapient
+	ExposedProperty<bool> Prehistoric = false;	/// whether the species is prehistoric or not
 public:
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 private:
@@ -131,7 +130,7 @@ private:
 	friend class CUnitType;	// necessary so that the unit type may set the species' type to itself
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

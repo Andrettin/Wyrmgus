@@ -57,6 +57,9 @@ extern bool StringToBool(const std::string &str);
 template <typename T>
 Array VectorToGodotArray(const std::vector<T> &vector);
 
+template <typename T>
+extern T ConvertFromString(const std::string &str);
+
 /*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
@@ -83,8 +86,10 @@ class PropertyBase : public PropertyCommonBase
 {
 public:
 	using ValueType = T;
-	using ReturnType = std::conditional_t<std::disjunction_v<std::is_same<T, String>, is_specialization_of<T, std::vector>>, const T &, const T>;
-	using ModifiableReturnType = std::conditional_t<std::disjunction_v<std::is_same<T, String>, is_specialization_of<T, std::vector>>, T &, T>;
+	using ReturnType = std::conditional_t<std::disjunction_v<std::is_fundamental<T>, std::is_pointer<T>>, const T, const T &>;
+	using ModifiableReturnType = std::conditional_t<std::disjunction_v<std::is_fundamental<T>, std::is_pointer<T>>, T, T &>;
+	using PointerType = std::conditional_t<std::is_pointer_v<T>, T, const std::add_pointer_t<T>>;
+	using ModifiablePointerType = std::conditional_t<std::is_pointer_v<T>, T, std::add_pointer_t<T>>;
 	using ArgumentType = const T &;
 	using GetterType = std::function<ReturnType()>;
 	using SetterType = std::function<void(ArgumentType)>;
@@ -136,7 +141,20 @@ public:
 	**
 	**	@return	The property
 	*/
-	virtual const PropertyBase<T> &operator =(const std::string &rhs) override;
+	virtual const PropertyBase<T> &operator =(const std::string &rhs) override
+	{
+		if constexpr(
+			std::is_same_v<T, int>
+			|| std::is_same_v<T, bool>
+			|| std::is_same_v<T, String>
+			|| std::is_pointer_v<T>
+		) {
+			return *this = ConvertFromString<T>(rhs);
+		} else {
+			fprintf(stderr, "The operator = is not valid for this type.\n");
+			return *this;
+		}
+	}
 	
 	const PropertyBase<T> &operator +=(const T &rhs)
 	{
@@ -149,7 +167,30 @@ public:
 		return *this += rhs.Get();
 	}
 	
-	virtual const PropertyBase<T> &operator +=(const std::string &rhs) override;
+	/**
+	**	@brief	The operator for addition of a string for a property
+	**
+	**	@param	rhs	The string which has to be converted for the property
+	**
+	**	@return	The property
+	*/
+	virtual const PropertyBase<T> &operator +=(const std::string &rhs) override
+	{
+		if constexpr(
+			std::is_same_v<T, int>
+			|| std::is_same_v<T, bool>
+			|| std::is_same_v<T, String>
+		) {
+			return *this += ConvertFromString<T>(rhs);
+		} else if constexpr(is_specialization_of<T, std::vector>::value) {
+			typename T::value_type new_value = ConvertFromString<typename T::value_type>(rhs);
+			this->GetModifiable().push_back(new_value);
+			return *this;
+		} else {
+			fprintf(stderr, "The operator += is not valid for this type.\n");
+			return *this;
+		}
+	}
 
 	const PropertyBase<T> &operator -=(const T &rhs)
 	{
@@ -162,7 +203,29 @@ public:
 		return *this -= rhs.Get();
 	}
 	
-	virtual const PropertyBase<T> &operator -=(const std::string &rhs) override;
+	/**
+	**	@brief	The operator for subtraction of a string for a property
+	**
+	**	@param	rhs	The string which has to be converted for the property
+	**
+	**	@return	The property
+	*/
+	virtual const PropertyBase<T> &operator -=(const std::string &rhs) override
+	{
+		if constexpr(
+			std::is_same_v<T, int>
+			|| std::is_same_v<T, bool>
+		) {
+			return *this -= ConvertFromString<T>(rhs);
+		} else if constexpr(is_specialization_of<T, std::vector>::value) {
+			typename T::value_type new_value = ConvertFromString<typename T::value_type>(rhs);
+			this->GetModifiable().erase(std::remove(this->GetModifiable().begin(), this->GetModifiable().end(), new_value), this->GetModifiable().end());
+			return *this;
+		} else {
+			fprintf(stderr, "The operator -= is not valid for this type.\n");
+			return *this;
+		}
+	}
 	
 	const PropertyBase<T> &operator *=(const T &rhs)
 	{
@@ -261,9 +324,15 @@ public:
 		return PropertyBase<T>::Get();
 	}
 	
-	ReturnType operator ->() const
+	PointerType operator ->() const
 	{
-		return this->Get();
+		if constexpr(std::is_pointer_v<T>) {
+			return this->Get();
+		} else if constexpr(!is_fundamental_v<T>) {
+			return &this->Get();
+		} else {
+			return nullptr;
+		}
 	}
 	
 	operator ReturnType() const
@@ -476,9 +545,26 @@ public:
 		return PropertyBase<T>::GetModifiable();
 	}
 	
-	ModifiableReturnType operator ->()
+	ModifiablePointerType operator ->()
 	{
-		return this->Get();
+		if constexpr(std::is_pointer_v<T>) {
+			return this->Get();
+		} else if constexpr(!is_fundamental_v<T>) {
+			return &this->Get();
+		} else {
+			return nullptr;
+		}
+	}
+	
+	PointerType operator ->() const
+	{
+		if constexpr(std::is_pointer_v<T>) {
+			return this->Get();
+		} else if constexpr(!is_fundamental_v<T>) {
+			return &this->Get();
+		} else {
+			return nullptr;
+		}
 	}
 	
 	operator ModifiableReturnType() const
