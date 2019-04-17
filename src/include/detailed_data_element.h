@@ -64,6 +64,7 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
+		REGISTER_PROPERTY(Hidden);
 		REGISTER_PROPERTY(Description);
 		REGISTER_PROPERTY(Quote);
 		REGISTER_PROPERTY(Background);
@@ -75,6 +76,7 @@ private:
 	static inline bool ClassInitialized = InitializeClass();
 	
 public:
+	Property<bool, DetailedDataElement> Hidden = false;			/// whether the data element is hidden
 	ExposedProperty<String, DetailedDataElement> Description;	/// the description of the data element from an in-game universe perspective
 	ExposedProperty<String, DetailedDataElement> Quote;			/// a quote relating to the data element
 	ExposedProperty<String, DetailedDataElement> Background;	/// the background of the data element, a description from a perspective outside of the game's universe
