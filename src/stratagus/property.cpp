@@ -39,7 +39,9 @@
 #include "item/item_slot.h"
 #include "language/language.h"
 #include "literary_text.h"
+#include "species/species.h"
 #include "species/species_category.h"
+#include "species/species_category_rank.h"
 #include "time/season_schedule.h"
 #include "time/time_of_day_schedule.h"
 #include "ui/icon.h"
@@ -83,7 +85,9 @@ template CLanguage *ConvertFromString(const std::string &str);
 template CLiteraryText *ConvertFromString(const std::string &str);
 template CPlane *ConvertFromString(const std::string &str);
 template CSeasonSchedule *ConvertFromString(const std::string &str);
+template CSpecies *ConvertFromString(const std::string &str);
 template CSpeciesCategory *ConvertFromString(const std::string &str);
+template CSpeciesCategoryRank *ConvertFromString(const std::string &str);
 template CTimeOfDaySchedule *ConvertFromString(const std::string &str);
 template CUnitType *ConvertFromString(const std::string &str);
 template ItemSlot *ConvertFromString(const std::string &str);

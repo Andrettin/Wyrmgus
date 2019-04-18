@@ -99,7 +99,9 @@ void Wyrmgus::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_literary_text", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CLiteraryText::Get(ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_literary_texts"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CLiteraryText::GetAll()); });
 	
+	ClassDB::bind_method(D_METHOD("get_plane", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CPlane::Get(ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_planes"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CPlane::GetAll()); });
+	ClassDB::bind_method(D_METHOD("get_world", "ident"), [](const Wyrmgus *wyrmgus, const String ident){ return CWorld::Get(ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_worlds"), [](const Wyrmgus *wyrmgus){ return VectorToGodotArray(CWorld::GetAll()); });
 
 	ClassDB::bind_method(D_METHOD("number_to_roman_numeral", "number"), &Wyrmgus::NumberToRomanNumeral);

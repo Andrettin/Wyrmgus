@@ -36,6 +36,10 @@
 #include "world/world.h"
 
 #include "ui/ui.h"
+#include "species/species.h"
+#include "time/season_schedule.h"
+#include "time/time_of_day_schedule.h"
+#include "world/plane.h"
 #include "world/province.h"
 
 /*----------------------------------------------------------------------------

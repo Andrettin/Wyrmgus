@@ -64,8 +64,6 @@ bool CSpecies::ProcessConfigDataProperty(const std::string &key, std::string val
 		} else {
 			fprintf(stderr, "Invalid era: \"%s\".\n", value.c_str());
 		}
-	} else if (key == "scientific_name") {
-		this->ScientificName = value;
 	} else if (key == "child_upgrade") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->ChildUpgrade = value;
@@ -102,7 +100,7 @@ bool CSpecies::ProcessConfigDataProperty(const std::string &key, std::string val
 	
 	return true;
 }
-	
+
 /**
 **	@brief	Initialize the species
 */

@@ -38,6 +38,9 @@
 #include "config.h"
 #include "religion/deity_domain.h"
 #include "school_of_magic.h"
+#include "species/species.h"
+#include "time/season_schedule.h"
+#include "time/time_of_day_schedule.h"
 #include "ui/ui.h"
 
 /*----------------------------------------------------------------------------
@@ -103,4 +106,6 @@ bool CPlane::ProcessConfigDataProperty(const std::string &key, std::string value
 void CPlane::_bind_methods()
 {
 	BIND_PROPERTIES();
+	
+	ClassDB::bind_method(D_METHOD("get_species"), [](const CPlane *plane){ return VectorToGodotArray(plane->Species); });
 }

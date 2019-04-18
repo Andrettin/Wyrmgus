@@ -62,8 +62,10 @@ public:
 private:
 	static inline bool InitializeClass()
 	{
+		REGISTER_PROPERTY(NamePlural);
 		REGISTER_PROPERTY(Prehistoric);
 		REGISTER_PROPERTY(Sapient);
+		REGISTER_PROPERTY(ScientificName);
 		
 		return true;
 	}
@@ -73,11 +75,6 @@ private:
 public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;
-	
-	String GetScientificName() const
-	{
-		return this->ScientificName.c_str();
-	}
 	
 	CPlane *GetHomePlane() const
 	{
@@ -108,10 +105,11 @@ public:
 	CSpecies *GetRandomEvolution(const CTerrainType *terrain_type) const;
 	
 public:
+	ExposedProperty<String> NamePlural;
 	ExposedProperty<CSpeciesCategory *> Category = nullptr;
+	ExposedProperty<String> ScientificName;		/// the scientific name of the species
 private:
-	std::string ScientificName;		/// The scientific name of the species
-	int Era = -1;					/// Era ID
+	int Era = -1;								/// era ID
 public:
 	ExposedProperty<bool> Sapient = false;		/// whether the species is sapient
 	ExposedProperty<bool> Prehistoric = false;	/// whether the species is prehistoric or not

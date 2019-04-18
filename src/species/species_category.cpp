@@ -52,13 +52,7 @@
 */
 bool CSpeciesCategory::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	if (key == "rank") {
-		value = FindAndReplaceString(value, "_", "-");
-		CSpeciesCategoryRank *rank = CSpeciesCategoryRank::Get(value);
-		if (rank) {
-			this->Rank = rank;
-		}
-	} else if (key == "lower_category") {
+	if (key == "lower_category") {
 		value = FindAndReplaceString(value, "_", "-");
 		CSpeciesCategory *category = CSpeciesCategory::Get(value);
 		if (category) {
@@ -77,4 +71,11 @@ bool CSpeciesCategory::ProcessConfigDataProperty(const std::string &key, std::st
 	}
 	
 	return true;
+}
+
+void CSpeciesCategory::_bind_methods()
+{
+	BIND_PROPERTIES();
+	
+	ClassDB::bind_method(D_METHOD("get_upper_category"), [](const CSpeciesCategory *category){ return category->UpperCategory; });
 }

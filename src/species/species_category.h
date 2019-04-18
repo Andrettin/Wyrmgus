@@ -64,6 +64,7 @@ private:
 	static inline bool InitializeClass()
 	{
 		REGISTER_PROPERTY(CommonName);
+		REGISTER_PROPERTY(CommonNamePlural);
 		
 		return true;
 	}
@@ -74,11 +75,6 @@ public:
 	static constexpr const char *ClassIdentifier = "species_category";
 	
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
-	
-	CSpeciesCategoryRank *GetRank() const
-	{
-		return this->Rank;
-	}
 	
 	const std::vector<CSpeciesCategory *> &GetLowerCategory() const
 	{
@@ -91,14 +87,15 @@ public:
 	}
 	
 	Property<String> CommonName;	/// the common name of members of the species category
+	Property<String> CommonNamePlural;	/// the plural of the common name of members of the species category
+	Property<CSpeciesCategoryRank *> Rank = nullptr;	/// the rank of the species category
 	
 private:
-	CSpeciesCategoryRank *Rank = nullptr;		/// the rank of the species category
 	std::vector<CSpeciesCategory *> LowerCategories;	/// the categories directly below this one
 	CSpeciesCategory *UpperCategory = nullptr;	/// the category directly above this one
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif
