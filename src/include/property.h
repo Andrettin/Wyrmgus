@@ -94,14 +94,19 @@ public:
 	using GetterType = std::function<ReturnType()>;
 	using SetterType = std::function<void(ArgumentType)>;
 	
+	using AdditionArgumentType = std::conditional_t<is_specialization_of_v<T, std::vector>, const contained_element_t<T> &, const T &>;
+	using RemovalArgumentType = std::conditional_t<is_specialization_of_v<T, std::vector>, const contained_element_t<T> &, const T &>;
+	using AdderType = std::function<void(AdditionArgumentType)>;
+	using RemoverType = std::function<void(RemovalArgumentType)>;
+	
 protected:
-	PropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
+	PropertyBase(const T &value, const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : Getter(getter), Setter(setter), Adder(adder), Remover(remover)
 	{
 		this->Value = new T;
 		*(this->Value) = value;
 	}
 	
-	PropertyBase(const GetterType &getter, const SetterType &setter) : Getter(getter), Setter(setter)
+	PropertyBase(const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : Getter(getter), Setter(setter), Adder(adder), Remover(remover)
 	{
 	}
 	
@@ -115,7 +120,7 @@ protected:
 public:
 	virtual Variant ToVariant() const override
 	{
-		if constexpr(is_specialization_of<T, std::vector>::value) {
+		if constexpr(is_specialization_of_v<T, std::vector>) {
 			return VectorToGodotArray(this->Get());
 		} else {
 			return Variant(this->Get());
@@ -158,7 +163,7 @@ public:
 	
 	const PropertyBase<T> &operator +=(const T &rhs)
 	{
-		this->Set(this->Get() + rhs);
+		this->Add(rhs);
 		return *this;
 	}
 	
@@ -182,9 +187,9 @@ public:
 			|| std::is_same_v<T, String>
 		) {
 			return *this += ConvertFromString<T>(rhs);
-		} else if constexpr(is_specialization_of<T, std::vector>::value) {
+		} else if constexpr(is_specialization_of_v<T, std::vector>) {
 			typename T::value_type new_value = ConvertFromString<typename T::value_type>(rhs);
-			this->GetModifiable().push_back(new_value);
+			this->Add(new_value);
 			return *this;
 		} else {
 			fprintf(stderr, "The operator += is not valid for this type.\n");
@@ -194,7 +199,7 @@ public:
 
 	const PropertyBase<T> &operator -=(const T &rhs)
 	{
-		this->Set(this->Get() - rhs);
+		this->Remove(rhs);
 		return *this;
 	}
 	
@@ -217,9 +222,9 @@ public:
 			|| std::is_same_v<T, bool>
 		) {
 			return *this -= ConvertFromString<T>(rhs);
-		} else if constexpr(is_specialization_of<T, std::vector>::value) {
+		} else if constexpr(is_specialization_of_v<T, std::vector>) {
 			typename T::value_type new_value = ConvertFromString<typename T::value_type>(rhs);
-			this->GetModifiable().erase(std::remove(this->GetModifiable().begin(), this->GetModifiable().end(), new_value), this->GetModifiable().end());
+			this->Remove(new_value);
 			return *this;
 		} else {
 			fprintf(stderr, "The operator -= is not valid for this type.\n");
@@ -290,6 +295,32 @@ public:
 		}
 	}
 	
+	void Add(AdditionArgumentType value)
+	{
+		if (this->Adder) {
+			this->Adder(value);
+		} else {
+			if constexpr(is_specialization_of_v<T, std::vector>) {
+				this->GetModifiable().push_back(value);
+			} else {
+				this->Set(this->Get() + value);
+			}
+		}
+	}
+	
+	void Remove(RemovalArgumentType value)
+	{
+		if (this->Remover) {
+			this->Remover(value);
+		} else {
+			if constexpr(is_specialization_of_v<T, std::vector>) {
+				this->GetModifiable().erase(std::remove(this->GetModifiable().begin(), this->GetModifiable().end(), value), this->GetModifiable().end());
+			} else {
+				this->Set(this->Get() - value);
+			}
+		}
+	}
+	
 protected:
 	ModifiableReturnType GetModifiable() const
 	{
@@ -303,17 +334,19 @@ protected:
 	T *Value = nullptr;
 	GetterType Getter;
 	SetterType Setter;
+	AdderType Adder;
+	RemoverType Remover;
 };
 
 template <typename T>
 class ProtectedPropertyBase : protected PropertyBase<T>
 {
 protected:
-	ProtectedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : PropertyBase(value, getter, setter)
+	ProtectedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(value, getter, setter, adder, remover)
 	{
 	}
 	
-	ProtectedPropertyBase(const GetterType &getter, const SetterType &setter) : PropertyBase(getter, setter)
+	ProtectedPropertyBase(const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(getter, setter, adder, remover)
 	{
 	}
 	
@@ -415,7 +448,7 @@ template <typename T, typename O>
 class Property : public ProtectedPropertyBase<T>
 {
 private:
-	Property(const T &value, const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(value, getter, setter)
+	Property(const T &value, const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(value, getter, setter, nullptr, nullptr)
 	{
 	}
 	
@@ -423,7 +456,7 @@ private:
 	{
 	}
 	
-	Property(const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(getter, setter)
+	Property(const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(getter, setter, nullptr, nullptr)
 	{
 	}
 	
@@ -438,7 +471,7 @@ template <typename O>
 class Property<String, O> : public ProtectedPropertyBase<String>
 {
 private:
-	Property(const String &value, const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(value, getter, setter)
+	Property(const String &value, const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(value, getter, setter, nullptr, nullptr)
 	{
 	}
 	
@@ -446,7 +479,7 @@ private:
 	{
 	}
 	
-	Property(const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(getter, setter)
+	Property(const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(getter, setter, nullptr, nullptr)
 	{
 	}
 	
@@ -477,27 +510,42 @@ class Property<std::vector<T>, O> : public ProtectedPropertyBase<std::vector<T>>
 	using GetterType = std::function<ReturnType()>;
 	using SetterType = std::function<void(ArgumentType)>;
 	
+	using AdditionArgumentType = const T &;
+	using RemovalArgumentType = const T &;
+	using AdderType = std::function<void(AdditionArgumentType)>;
+	using RemoverType = std::function<void(RemovalArgumentType)>;
+	
 private:
-	Property(const std::vector<T> &value, const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(value, getter, setter)
+	Property(const std::vector<T> &value, const GetterType &getter, const AdderType &adder = nullptr, const RemoverType &remover = nullptr) : ProtectedPropertyBase(value, getter, nullptr, adder, remover)
 	{
 	}
 	
-	Property(const std::vector<T> &value, const SetterType &setter = nullptr) : Property(value, nullptr, setter)
+	Property(const std::vector<T> &value, const AdderType &adder = nullptr, const RemoverType &remover = nullptr) : Property(value, nullptr, adder, remover)
 	{
 	}
 	
-	Property(const GetterType &getter, const SetterType &setter = nullptr) : ProtectedPropertyBase(getter, setter)
+	Property(const GetterType &getter, const AdderType &adder = nullptr, const RemoverType &remover = nullptr) : ProtectedPropertyBase(getter, nullptr, adder, remover)
 	{
 	}
 	
-	Property(const SetterType &setter = nullptr) : Property(std::vector<T>(), nullptr, setter)
+	Property(const AdderType &adder = nullptr, const RemoverType &remover = nullptr) : Property(std::vector<T>(), nullptr, adder, remover)
 	{
 	}
 	
 public:
+	typename std::vector<T>::const_reference operator [](typename std::vector<T>::size_type pos) const
+	{
+		return this->Get()[pos];
+	}
+	
 	bool empty() const
 	{
 		return this->Get().empty();
+	}
+	
+	typename std::vector<T>::size_type size() const
+	{
+		return this->Get().size();
 	}
 	
 	typename std::vector<T>::const_iterator begin() const
@@ -511,6 +559,21 @@ public:
 	}
 	
 private:
+	typename std::vector<T>::reference operator [](typename std::vector<T>::size_type pos)
+	{
+		return this->GetModifiable()[pos];
+	}
+	
+	void push_back(AdditionArgumentType value)
+	{
+		return this->Add(value);
+	}
+	
+	void clear()
+	{
+		return this->GetModifiable().clear();
+	}
+	
 	typename std::vector<T>::iterator begin()
 	{
 		return this->GetModifiable().begin();
@@ -528,13 +591,13 @@ template <typename T>
 class ExposedPropertyBase : public PropertyBase<T>
 {
 protected:
-	ExposedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter) : PropertyBase(getter, setter)
+	ExposedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(getter, setter, adder, remover)
 	{
 		this->Value = new T;
 		*(this->Value) = value;
 	}
 	
-	ExposedPropertyBase(const GetterType &getter, const SetterType &setter) : PropertyBase(getter, setter)
+	ExposedPropertyBase(const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(getter, setter, adder, remover)
 	{
 	}
 	
@@ -650,7 +713,7 @@ template <typename T, typename O>
 class ExposedProperty : public ExposedPropertyBase<T>
 {
 private:
-	ExposedProperty(const T &value, const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(value, getter, setter)
+	ExposedProperty(const T &value, const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(value, getter, setter, nullptr, nullptr)
 	{
 	}
 	
@@ -658,7 +721,7 @@ private:
 	{
 	}
 	
-	ExposedProperty(const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(getter, setter)
+	ExposedProperty(const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(getter, setter, nullptr, nullptr)
 	{
 	}
 	
@@ -680,7 +743,7 @@ template <typename O>
 class ExposedProperty<String, O> : public ExposedPropertyBase<String>
 {
 private:
-	ExposedProperty(const String &value, const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(value, getter, setter)
+	ExposedProperty(const String &value, const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(value, getter, setter, nullptr, nullptr)
 	{
 	}
 	
@@ -688,7 +751,7 @@ private:
 	{
 	}
 	
-	ExposedProperty(const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(getter, setter)
+	ExposedProperty(const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(getter, setter, nullptr, nullptr)
 	{
 	}
 	
@@ -731,31 +794,61 @@ class ExposedProperty<std::vector<T>, O> : public ExposedPropertyBase<std::vecto
 {
 	using ValueType = std::vector<T>;
 	using ReturnType = const std::vector<T> &;
-	using ArgumentType = const T &;
+	using ArgumentType = const std::vector<T> &;
 	using GetterType = std::function<ReturnType()>;
 	using SetterType = std::function<void(ArgumentType)>;
 	
+	using AdditionArgumentType = const T &;
+	using RemovalArgumentType = const T &;
+	using AdderType = std::function<void(AdditionArgumentType)>;
+	using RemoverType = std::function<void(RemovalArgumentType)>;
+	
 private:
-	ExposedProperty(const std::vector<T> &value, const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(value, getter, setter)
+	ExposedProperty(const std::vector<T> &value, const GetterType &getter, const AdderType &adder = nullptr, const RemoverType &remover = nullptr) : ExposedPropertyBase(value, getter, nullptr, adder, remover)
 	{
 	}
 	
-	ExposedProperty(const std::vector<T> &value, const SetterType &setter = nullptr) : ExposedProperty(value, nullptr, setter)
+	ExposedProperty(const std::vector<T> &value, const AdderType &adder = nullptr, const RemoverType &remover = nullptr) : ExposedProperty(value, nullptr, adder, remover)
 	{
 	}
 	
-	ExposedProperty(const GetterType &getter, const SetterType &setter = nullptr) : ExposedPropertyBase(getter, setter)
+	ExposedProperty(const GetterType &getter, const AdderType &adder = nullptr, const RemoverType &remover = nullptr) : ExposedPropertyBase(getter, nullptr, adder, remover)
 	{
 	}
 	
-	ExposedProperty(const SetterType &setter = nullptr) : ExposedProperty(std::vector<T>(), nullptr, setter)
+	ExposedProperty(const AdderType &adder = nullptr, const RemoverType &remover = nullptr) : ExposedProperty(std::vector<T>(), nullptr, adder, remover)
 	{
 	}
 	
 public:
+	typename std::vector<T>::reference operator [](typename std::vector<T>::size_type pos)
+	{
+		return this->GetModifiable()[pos];
+	}
+	
+	typename std::vector<T>::const_reference operator [](typename std::vector<T>::size_type pos) const
+	{
+		return this->Get()[pos];
+	}
+	
+	void push_back(AdditionArgumentType value)
+	{
+		return this->Add(value);
+	}
+	
+	void clear()
+	{
+		return this->GetModifiable().clear();
+	}
+	
 	bool empty() const
 	{
 		return this->Get().empty();
+	}
+	
+	typename std::vector<T>::size_type size() const
+	{
+		return this->Get().size();
 	}
 	
 	typename std::vector<T>::const_iterator begin() const
