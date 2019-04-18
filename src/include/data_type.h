@@ -270,6 +270,16 @@ public:
 	
 private:
 	/**
+	**	@brief	Update the indexes for the instances
+	*/
+	static inline void UpdateIndexes()
+	{
+		for (size_t i = 0; i < DataType<T>::Instances.size(); ++i) {
+			DataType<T>::Instances[i]->Index = static_cast<int>(i);
+		}
+	}
+	
+	/**
 	**	@brief	Initialize the class
 	*/
 	static inline bool InitializeDataTypeClass()

@@ -79,8 +79,18 @@ void CSpeciesCategoryRank::Initialize()
 {
 	this->Initialized = true;
 	
-	//check if the rank is linked properly to other ones, if all other ones have already been initialized
 	if (CSpeciesCategoryRank::AreAllInitialized()) {
+		//sort ranks from uppermost to lowermost
+		std::sort(CSpeciesCategoryRank::Instances.begin(), CSpeciesCategoryRank::Instances.end(), [](CSpeciesCategoryRank *a, CSpeciesCategoryRank *b) {
+			if (a->IsUpperThan(b)) {
+				return true;
+			} else {
+				return a->Ident < b->Ident;
+			}
+		});
+		CSpeciesCategoryRank::UpdateIndexes();
+		
+		//check if the rank is linked properly to other ones, if all other ones have already been initialized
 		//count of ranks linked to this one, plus itself
 		size_t linked_rank_count = 1;
 		

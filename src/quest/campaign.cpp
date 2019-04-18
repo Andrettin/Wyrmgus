@@ -193,6 +193,7 @@ void CCampaign::Initialize()
 				return a->Ident < b->Ident;
 			}
 		});
+		CCampaign::UpdateIndexes();
 	}
 }
 

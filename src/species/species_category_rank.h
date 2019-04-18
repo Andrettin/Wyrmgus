@@ -61,6 +61,52 @@ public:
 		return this->UpperRank;
 	}
 	
+	std::vector<CSpeciesCategoryRank *> GetAllUpperRanks() const
+	{
+		if (this->UpperRank == nullptr) {
+			return std::vector<CSpeciesCategoryRank *>();
+		}
+		
+		std::vector<CSpeciesCategoryRank *> upper_ranks = this->UpperRank->GetAllUpperRanks();
+		upper_ranks.push_back(this->UpperRank);
+		
+		return upper_ranks;
+	}
+	
+	std::vector<CSpeciesCategoryRank *> GetAllLowerRanks() const
+	{
+		if (this->LowerRank == nullptr) {
+			return std::vector<CSpeciesCategoryRank *>();
+		}
+		
+		std::vector<CSpeciesCategoryRank *> lower_ranks = this->LowerRank->GetAllLowerRanks();
+		lower_ranks.push_back(this->LowerRank);
+		
+		return lower_ranks;
+	}
+	
+	bool IsLowerThan(const CSpeciesCategoryRank *other_rank) const
+	{
+		std::vector<CSpeciesCategoryRank *> upper_ranks = this->GetAllUpperRanks();
+		
+		if (std::find(upper_ranks.begin(), upper_ranks.end(), other_rank) != upper_ranks.end()) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	bool IsUpperThan(const CSpeciesCategoryRank *other_rank) const
+	{
+		std::vector<CSpeciesCategoryRank *> lower_ranks = this->GetAllLowerRanks();
+		
+		if (std::find(lower_ranks.begin(), lower_ranks.end(), other_rank) != lower_ranks.end()) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 private:
 	CSpeciesCategoryRank *LowerRank = nullptr;	/// the rank directly below this one
 	CSpeciesCategoryRank *UpperRank = nullptr;	/// the rank directly above this one

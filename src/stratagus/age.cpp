@@ -145,6 +145,7 @@ void CAge::Initialize()
 				return a->Ident < b->Ident;
 			}
 		});
+		CAge::UpdateIndexes();
 	}
 }
 
