@@ -596,7 +596,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 static int CclSetBorderTerrain(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	CMap::Map.BorderTerrain = CTerrainType::GetTerrainType(LuaToString(l, 1));
+	CMap::Map.BorderTerrain = CTerrainType::Get(LuaToString(l, 1));
 
 	return 0;
 }
@@ -655,7 +655,7 @@ void SetTileTerrain(const std::string &terrain_ident, const Vec2i &pos, int valu
 		return;
 	}
 	
-	CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
+	CTerrainType *terrain = CTerrainType::Get(terrain_ident);
 	
 	if (!terrain) {
 		fprintf(stderr, "Terrain \"%s\" doesn't exist.\n", terrain_ident.c_str());
@@ -682,7 +682,7 @@ static int CclSetMapTemplateTileTerrain(lua_State *l)
 	std::string terrain_ident = LuaToString(l, 2);
 	CTerrainType *terrain = nullptr;
 	if (!terrain_ident.empty()) {
-		terrain = CTerrainType::GetTerrainType(terrain_ident);
+		terrain = CTerrainType::Get(terrain_ident);
 		if (!terrain) {
 			LuaError(l, "Terrain doesn't exist");
 		}
@@ -729,7 +729,7 @@ static int CclSetMapTemplatePathway(lua_State *l)
 	std::string terrain_ident = LuaToString(l, 2);
 	CTerrainType *terrain = nullptr;
 	if (!terrain_ident.empty()) {
-		terrain = CTerrainType::GetTerrainType(terrain_ident);
+		terrain = CTerrainType::Get(terrain_ident);
 		if (!terrain) {
 			LuaError(l, "Terrain doesn't exist");
 		}
@@ -1351,7 +1351,7 @@ static int CclDefineTerrainType(lua_State *l)
 	}
 
 	std::string terrain_ident = LuaToString(l, 1);
-	CTerrainType *terrain = CTerrainType::GetOrAddTerrainType(terrain_ident);
+	CTerrainType *terrain = CTerrainType::GetOrAdd(terrain_ident);
 	
 	std::string graphics_file;
 	std::string elevation_graphics_file;
@@ -1408,7 +1408,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *base_terrain = CTerrainType::GetOrAddTerrainType(LuaToString(l, -1, j + 1));
+				CTerrainType *base_terrain = CTerrainType::GetOrAdd(LuaToString(l, -1, j + 1));
 				if (base_terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
@@ -1420,7 +1420,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *border_terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+				CTerrainType *border_terrain = CTerrainType::Get(LuaToString(l, -1, j + 1));
 				if (border_terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
@@ -1435,7 +1435,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *border_terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+				CTerrainType *border_terrain = CTerrainType::Get(LuaToString(l, -1, j + 1));
 				if (border_terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
@@ -1450,7 +1450,7 @@ static int CclDefineTerrainType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *overlay_terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+				CTerrainType *overlay_terrain = CTerrainType::Get(LuaToString(l, -1, j + 1));
 				if (overlay_terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
@@ -1558,13 +1558,13 @@ static int CclDefineTerrainType(lua_State *l)
 				std::string transition_terrain_name = LuaToString(l, -1, j + 1);
 				CTerrainType *transition_terrain = nullptr;
 				if (transition_terrain_name != "any") {
-					transition_terrain = CTerrainType::GetTerrainType(transition_terrain_name);
+					transition_terrain = CTerrainType::Get(transition_terrain_name);
 					
 					if (transition_terrain == nullptr) {
 						LuaError(l, "Terrain doesn't exist.");
 					}
 				}
-				int transition_terrain_id = transition_terrain ? transition_terrain->ID : -1;
+				int transition_terrain_id = transition_terrain ? transition_terrain->GetIndex() : -1;
 				++j;
 				
 				int transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
@@ -1584,13 +1584,13 @@ static int CclDefineTerrainType(lua_State *l)
 				std::string transition_terrain_name = LuaToString(l, -1, j + 1);
 				CTerrainType *transition_terrain = nullptr;
 				if (transition_terrain_name != "any") {
-					transition_terrain = CTerrainType::GetTerrainType(transition_terrain_name);
+					transition_terrain = CTerrainType::Get(transition_terrain_name);
 					
 					if (transition_terrain == nullptr) {
 						LuaError(l, "Terrain doesn't exist.");
 					}
 				}
-				int transition_terrain_id = transition_terrain ? transition_terrain->ID : -1;
+				int transition_terrain_id = transition_terrain ? transition_terrain->GetIndex() : -1;
 				++j;
 				
 				int transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
@@ -1704,16 +1704,16 @@ static int CclDefineMapTemplate(lua_State *l)
 			}
 			map_template->SurfaceLayer = main_template->SurfaceLayer;
 		} else if (!strcmp(value, "BaseTerrainType")) {
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(LuaToString(l, -1));
+			CTerrainType *terrain_type = CTerrainType::Get(LuaToString(l, -1));
 			map_template->BaseTerrainType = terrain_type;
 		} else if (!strcmp(value, "BaseOverlayTerrainType")) {
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(LuaToString(l, -1));
+			CTerrainType *terrain_type = CTerrainType::Get(LuaToString(l, -1));
 			map_template->BaseOverlayTerrainType = terrain_type;
 		} else if (!strcmp(value, "BorderTerrainType")) {
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(LuaToString(l, -1));
+			CTerrainType *terrain_type = CTerrainType::Get(LuaToString(l, -1));
 			map_template->BorderTerrainType = terrain_type;
 		} else if (!strcmp(value, "SurroundingTerrainType")) {
-			CTerrainType *terrain_type = CTerrainType::GetTerrainType(LuaToString(l, -1));
+			CTerrainType *terrain_type = CTerrainType::Get(LuaToString(l, -1));
 			map_template->SurroundingTerrainType = terrain_type;
 		} else if (!strcmp(value, "GeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {
@@ -2062,7 +2062,7 @@ static int CclDefineTerrainFeature(lua_State *l)
 			}
 			TerrainFeatureColorToIndex[std::tuple<int, int, int>(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)] = terrain_feature->ID;
 		} else if (!strcmp(value, "TerrainType")) {
-			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1));
+			CTerrainType *terrain = CTerrainType::Get(LuaToString(l, -1));
 			if (!terrain) {
 				LuaError(l, "Terrain doesn't exist.");
 			}

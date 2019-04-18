@@ -2556,9 +2556,9 @@ void CEditor::Init()
 	//Wyrmgus start
 //	CMap::Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 	Editor.ShownTileTypes.clear();
-	for (size_t i = 0; i < CTerrainType::TerrainTypes.size(); ++i) {
-		if (!CTerrainType::TerrainTypes[i]->Hidden && CTerrainType::TerrainTypes[i]->PixelTileSize == CMap::Map.GetCurrentPixelTileSize()) {
-			Editor.ShownTileTypes.push_back(CTerrainType::TerrainTypes[i]);
+	for (CTerrainType *terrain_type : CTerrainType::GetAll()) {
+		if (!terrain_type->Hidden && terrain_type->PixelTileSize == CMap::Map.GetCurrentPixelTileSize()) {
+			Editor.ShownTileTypes.push_back(terrain_type);
 		}
 	}
 	//Wyrmgus end

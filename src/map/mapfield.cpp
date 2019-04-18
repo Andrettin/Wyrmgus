@@ -363,12 +363,12 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	CTerrainType *terrain = CTerrainType::GetTerrainType(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
+	CTerrainType *terrain = CTerrainType::Get(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
 	if (terrain->Overlay) {
 		if (terrain->Flags & MapFieldForest) {
-			this->SetTerrain(CTerrainType::GetTerrainType(tileset.solidTerrainTypes[3].TerrainName));
+			this->SetTerrain(CTerrainType::Get(tileset.solidTerrainTypes[3].TerrainName));
 		} else if (terrain->Flags & MapFieldRocks || terrain->Flags & MapFieldWaterAllowed) {
-			this->SetTerrain(CTerrainType::GetTerrainType(tileset.solidTerrainTypes[2].TerrainName));
+			this->SetTerrain(CTerrainType::Get(tileset.solidTerrainTypes[2].TerrainName));
 		}
 	}
 	this->SetTerrain(terrain);
@@ -543,7 +543,7 @@ void CMapField::parse(lua_State *l)
 			this->Terrain = terrain_feature->TerrainType;
 			this->TerrainFeature = terrain_feature;
 		} else {
-			this->Terrain = CTerrainType::GetTerrainType(terrain_ident);
+			this->Terrain = CTerrainType::Get(terrain_ident);
 		}
 	}
 	
@@ -554,7 +554,7 @@ void CMapField::parse(lua_State *l)
 			this->OverlayTerrain = overlay_terrain_feature->TerrainType;
 			this->TerrainFeature = overlay_terrain_feature;
 		} else {
-			this->OverlayTerrain = CTerrainType::GetTerrainType(overlay_terrain_ident);
+			this->OverlayTerrain = CTerrainType::Get(overlay_terrain_ident);
 		}
 	}
 	
@@ -563,12 +563,12 @@ void CMapField::parse(lua_State *l)
 	
 	std::string seen_terrain_ident = LuaToString(l, -1, 5);
 	if (!seen_terrain_ident.empty()) {
-		this->playerInfo.SeenTerrain = CTerrainType::GetTerrainType(seen_terrain_ident);
+		this->playerInfo.SeenTerrain = CTerrainType::Get(seen_terrain_ident);
 	}
 	
 	std::string seen_overlay_terrain_ident = LuaToString(l, -1, 6);
 	if (!seen_overlay_terrain_ident.empty()) {
-		this->playerInfo.SeenOverlayTerrain = CTerrainType::GetTerrainType(seen_overlay_terrain_ident);
+		this->playerInfo.SeenOverlayTerrain = CTerrainType::Get(seen_overlay_terrain_ident);
 	}
 	
 	this->SolidTile = LuaToNumber(l, -1, 7);
@@ -591,25 +591,25 @@ void CMapField::parse(lua_State *l)
 //		if (!strcmp(value, "explored")) {
 		if (!strcmp(value, "transition-tile")) {
 			++j;
-			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+			CTerrainType *terrain = CTerrainType::Get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
 			this->TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "overlay-transition-tile")) {
 			++j;
-			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+			CTerrainType *terrain = CTerrainType::Get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
 			this->OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "seen-transition-tile")) {
 			++j;
-			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+			CTerrainType *terrain = CTerrainType::Get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
 			this->playerInfo.SeenTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
 		} else if (!strcmp(value, "seen-overlay-transition-tile")) {
 			++j;
-			CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+			CTerrainType *terrain = CTerrainType::Get(LuaToString(l, -1, j + 1));
 			++j;
 			int tile_number = LuaToNumber(l, -1, j + 1);
 			this->playerInfo.SeenOverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));

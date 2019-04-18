@@ -337,7 +337,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 	
 	std::vector<CTerrainType *> allowed_terrains;
 	if (unit_type->BoolFlag[FAUNA_INDEX].value && unit_type->Species) { //if the unit is a fauna one, it has to start on terrain it is native to
-		for (CTerrainType *terrain_type : unit_type->Species->GetNativeTerrainTypes()) {
+		for (CTerrainType *terrain_type : unit_type->Species->NativeTerrainTypes) {
 			allowed_terrains.push_back(terrain_type);
 		}
 	}
@@ -345,7 +345,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, const CFaction *fac
 	for (size_t i = 0; i < unit_type->SpawnUnits.size(); ++i) {
 		CUnitType *spawned_type = unit_type->SpawnUnits[i];
 		if (spawned_type->BoolFlag[FAUNA_INDEX].value && spawned_type->Species) {
-			for (CTerrainType *terrain_type : spawned_type->Species->GetNativeTerrainTypes()) {
+			for (CTerrainType *terrain_type : spawned_type->Species->NativeTerrainTypes) {
 				allowed_terrains.push_back(terrain_type);
 			}
 		}
@@ -2067,7 +2067,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 		return;
 	}
 	
-	int terrain_id = terrain->ID;
+	int terrain_id = terrain->GetIndex();
 	
 	std::map<int, std::vector<int>> adjacent_terrain_directions;
 	
@@ -2082,19 +2082,19 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 					}
 					if (adjacent_terrain && terrain != adjacent_terrain) {
 						if (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), adjacent_terrain) != terrain->InnerBorderTerrains.end()) {
-							adjacent_terrain_directions[adjacent_terrain->ID].push_back(GetDirectionFromOffset(x_offset, y_offset));
+							adjacent_terrain_directions[adjacent_terrain->GetIndex()].push_back(GetDirectionFromOffset(x_offset, y_offset));
 						} else if (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), adjacent_terrain) == terrain->BorderTerrains.end()) { //if the two terrain types can't border, look for a third terrain type which can border both, and which treats both as outer border terrains, and then use for transitions between both tiles
 							for (size_t i = 0; i < terrain->BorderTerrains.size(); ++i) {
 								CTerrainType *border_terrain = terrain->BorderTerrains[i];
 								if (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), border_terrain) != terrain->InnerBorderTerrains.end() && std::find(adjacent_terrain->InnerBorderTerrains.begin(), adjacent_terrain->InnerBorderTerrains.end(), border_terrain) != adjacent_terrain->InnerBorderTerrains.end()) {
-									adjacent_terrain_directions[border_terrain->ID].push_back(GetDirectionFromOffset(x_offset, y_offset));
+									adjacent_terrain_directions[border_terrain->GetIndex()].push_back(GetDirectionFromOffset(x_offset, y_offset));
 									break;
 								}
 							}
 						}
 					}
 					if (!adjacent_terrain || (overlay && terrain != adjacent_terrain && std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), adjacent_terrain) == terrain->BorderTerrains.end())) { // happens if terrain is null or if it is an overlay tile which doesn't have a border with this one, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
-						adjacent_terrain_directions[CTerrainType::TerrainTypes.size()].push_back(GetDirectionFromOffset(x_offset, y_offset));
+						adjacent_terrain_directions[CTerrainType::GetAll().size()].push_back(GetDirectionFromOffset(x_offset, y_offset));
 					}
 				}
 			}
@@ -2103,7 +2103,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 	
 	for (std::map<int, std::vector<int>>::iterator iterator = adjacent_terrain_directions.begin(); iterator != adjacent_terrain_directions.end(); ++iterator) {
 		int adjacent_terrain_id = iterator->first;
-		CTerrainType *adjacent_terrain = adjacent_terrain_id < (int) CTerrainType::TerrainTypes.size() ? CTerrainType::TerrainTypes[adjacent_terrain_id] : nullptr;
+		CTerrainType *adjacent_terrain = adjacent_terrain_id < (int) CTerrainType::GetAll().size() ? CTerrainType::Get(adjacent_terrain_id) : nullptr;
 		int transition_type = GetTransitionType(iterator->second, terrain->AllowSingle);
 		
 		if (transition_type != -1) {
@@ -2152,7 +2152,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			
 			if (adjacent_terrain && found_transition) {
 				for (size_t i = 0; i != iterator->second.size(); ++i) {
-					adjacent_terrain_directions[CTerrainType::TerrainTypes.size()].erase(std::remove(adjacent_terrain_directions[CTerrainType::TerrainTypes.size()].begin(), adjacent_terrain_directions[CTerrainType::TerrainTypes.size()].end(), iterator->second[i]), adjacent_terrain_directions[CTerrainType::TerrainTypes.size()].end());
+					adjacent_terrain_directions[CTerrainType::GetAll().size()].erase(std::remove(adjacent_terrain_directions[CTerrainType::GetAll().size()].begin(), adjacent_terrain_directions[CTerrainType::GetAll().size()].end(), iterator->second[i]), adjacent_terrain_directions[CTerrainType::GetAll().size()].end());
 				}
 			}
 		}

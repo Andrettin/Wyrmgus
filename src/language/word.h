@@ -180,7 +180,7 @@ private:
 	void SetLanguage(CLanguage *language);
 
 public:
-	Property<CLanguage *>Language {					/// the language the word belongs to
+	Property<CLanguage *> Language {					/// the language the word belongs to
 		Property<CLanguage *>::ValueType(nullptr),
 		Property<CLanguage *>::SetterType([this](CLanguage *language) {
 			this->SetLanguage(language);

@@ -397,9 +397,9 @@ void CMinimap::UpdateTerrain(int z)
 	if (UseOpenGL) {
 		SDL_LockSurface(CMap::Map.TileGraphic->Surface);
 		//Wyrmgus start
-		for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-			if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
-				SDL_LockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(season)->Surface);
+		for (CTerrainType *terrain_type : CTerrainType::GetAll()) {
+			if (terrain_type->GetGraphics(season)) {
+				SDL_LockSurface(terrain_type->GetGraphics(season)->Surface);
 			}
 		}
 		//Wyrmgus end
@@ -546,9 +546,9 @@ void CMinimap::UpdateTerrain(int z)
 	}
 	SDL_UnlockSurface(CMap::Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-		if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
-			SDL_UnlockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(season)->Surface);
+	for (CTerrainType *terrain_type : CTerrainType::GetAll()) {
+		if (terrain_type->GetGraphics(season)) {
+			SDL_UnlockSurface(terrain_type->GetGraphics(season)->Surface);
 		}
 	}
 	//Wyrmgus end
@@ -617,9 +617,9 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	}
 	SDL_LockSurface(CMap::Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-		if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
-			SDL_LockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(season)->Surface);
+	for (CTerrainType *terrain_type : CTerrainType::GetAll()) {
+		if (terrain_type->GetGraphics(season)) {
+			SDL_LockSurface(terrain_type->GetGraphics(season)->Surface);
 		}
 	}
 	//Wyrmgus end
@@ -795,9 +795,9 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	}
 	SDL_UnlockSurface(CMap::Map.TileGraphic->Surface);
 	//Wyrmgus start
-	for (size_t i = 0; i != CTerrainType::TerrainTypes.size(); ++i) {
-		if (CTerrainType::TerrainTypes[i]->GetGraphics(season)) {
-			SDL_UnlockSurface(CTerrainType::TerrainTypes[i]->GetGraphics(season)->Surface);
+	for (CTerrainType *terrain_type : CTerrainType::GetAll()) {
+		if (terrain_type->GetGraphics(season)) {
+			SDL_UnlockSurface(terrain_type->GetGraphics(season)->Surface);
 		}
 	}
 	//Wyrmgus end

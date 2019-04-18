@@ -174,19 +174,15 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 		}
 	} else if (key == "base_terrain_type") {
 		value = FindAndReplaceString(value, "_", "-");
-		CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+		CTerrainType *terrain_type = CTerrainType::Get(value);
 		if (terrain_type) {
 			this->BaseTerrainType = terrain_type;
-		} else {
-			fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
 		}
 	} else if (key == "base_overlay_terrain_type") {
 		value = FindAndReplaceString(value, "_", "-");
-		CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+		CTerrainType *terrain_type = CTerrainType::Get(value);
 		if (terrain_type) {
 			this->BaseOverlayTerrainType = terrain_type;
-		} else {
-			fprintf(stderr, "Terrain type \"%s\" does not exist.\n", value.c_str());
 		}
 	} else {
 		return false;
@@ -1619,7 +1615,7 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 		
 		if (property.Key == "terrain_type") {
 			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			this->TerrainType = CTerrainType::GetTerrainType(value);
+			this->TerrainType = CTerrainType::Get(value);
 		} else if (property.Key == "seed_count") {
 			this->SeedCount = std::stoi(property.Value);
 		} else if (property.Key == "expansion_chance") {
@@ -1632,7 +1628,7 @@ void CGeneratedTerrain::ProcessConfigData(const CConfigData *config_data)
 			this->UseSubtemplateBordersAsSeeds = StringToBool(property.Value);
 		} else if (property.Key == "target_terrain_type") {
 			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			const CTerrainType *target_terrain_type = CTerrainType::GetTerrainType(value);
+			const CTerrainType *target_terrain_type = CTerrainType::Get(value);
 			if (target_terrain_type) {
 				this->TargetTerrainTypes.push_back(target_terrain_type);
 			}

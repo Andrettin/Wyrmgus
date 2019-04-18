@@ -39,6 +39,7 @@
 #include "item/item_slot.h"
 #include "language/language.h"
 #include "literary_text.h"
+#include "map/terrain_type.h"
 #include "species/species.h"
 #include "species/species_category.h"
 #include "species/species_category_rank.h"
@@ -88,6 +89,7 @@ template CSeasonSchedule *ConvertFromString(const std::string &str);
 template CSpecies *ConvertFromString(const std::string &str);
 template CSpeciesCategory *ConvertFromString(const std::string &str);
 template CSpeciesCategoryRank *ConvertFromString(const std::string &str);
+template CTerrainType *ConvertFromString(const std::string &str);
 template CTimeOfDaySchedule *ConvertFromString(const std::string &str);
 template CUnitType *ConvertFromString(const std::string &str);
 template ItemSlot *ConvertFromString(const std::string &str);

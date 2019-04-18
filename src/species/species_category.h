@@ -65,6 +65,7 @@ private:
 	{
 		REGISTER_PROPERTY(CommonName);
 		REGISTER_PROPERTY(CommonNamePlural);
+		REGISTER_PROPERTY(Rank);
 		
 		return true;
 	}

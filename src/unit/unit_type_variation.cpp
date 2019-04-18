@@ -178,13 +178,13 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "terrain") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+			const CTerrainType *terrain_type = CTerrainType::Get(value);
 			if (terrain_type != nullptr) {
 				this->Terrains.push_back(terrain_type);
 			}
 		} else if (key == "forbidden_terrain") {
 			value = FindAndReplaceString(value, "_", "-");
-			const CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
+			const CTerrainType *terrain_type = CTerrainType::Get(value);
 			if (terrain_type != nullptr) {
 				this->TerrainsForbidden.push_back(terrain_type);
 			}

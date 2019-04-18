@@ -869,7 +869,7 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "terrain")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
-						const CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
+						const CTerrainType *terrain = CTerrainType::Get(terrain_ident);
 						if (terrain) {
 							variation->Terrains.push_back(terrain);
 						} else {
@@ -877,7 +877,7 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "terrain-forbidden")) {
 						std::string terrain_ident = LuaToString(l, -1, k + 1);
-						const CTerrainType *terrain = CTerrainType::GetTerrainType(terrain_ident);
+						const CTerrainType *terrain = CTerrainType::Get(terrain_ident);
 						if (terrain) {
 							variation->TerrainsForbidden.push_back(terrain);
 						} else {
@@ -1893,7 +1893,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->Species->UnitType = type;
 			}
 		} else if (!strcmp(value, "TerrainType")) {
-			type->TerrainType = CTerrainType::GetTerrainType(LuaToString(l, -1));
+			type->TerrainType = CTerrainType::Get(LuaToString(l, -1));
 			if (!type->TerrainType) {
 				LuaError(l, "Terrain type doesn't exist.");
 			}
@@ -3635,7 +3635,7 @@ static int CclDefineSpecies(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				CTerrainType *terrain = CTerrainType::GetTerrainType(LuaToString(l, -1, j + 1));
+				CTerrainType *terrain = CTerrainType::Get(LuaToString(l, -1, j + 1));
 				if (terrain == nullptr) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
@@ -3717,10 +3717,10 @@ static int CclGetSpeciesData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Terrains")) {
-		lua_createtable(l, species->GetNativeTerrainTypes().size(), 0);
-		for (size_t i = 1; i <= species->GetNativeTerrainTypes().size(); ++i)
+		lua_createtable(l, species->NativeTerrainTypes.size(), 0);
+		for (size_t i = 1; i <= species->NativeTerrainTypes.size(); ++i)
 		{
-			lua_pushstring(l, species->GetNativeTerrainTypes()[i-1]->Ident.c_str());
+			lua_pushstring(l, species->NativeTerrainTypes[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

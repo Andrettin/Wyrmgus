@@ -35,6 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "data_element.h"
+#include "data_type.h"
 #include "vec2i.h"
 #include "video/color.h"
 
@@ -54,9 +55,9 @@ class CUnitType;
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CTerrainType : public DataElement
+class CTerrainType : public DataElement, public DataType<CTerrainType>
 {
-	GDCLASS(CTerrainType, DataElement)
+	DATA_TYPE(CTerrainType, DataElement)
 
 public:
 	CTerrainType()
@@ -69,14 +70,22 @@ public:
 	
 	~CTerrainType();
 	
-	static CTerrainType *GetTerrainType(const std::string &ident, const bool should_find = true);
-	static CTerrainType *GetOrAddTerrainType(const std::string &ident);
+public:
+	static constexpr const char *ClassIdentifier = "terrain_type";
+	
+private:
+	static inline bool InitializeClass()
+	{
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
+
+public:
 	static void LoadTerrainTypeGraphics();
-	static void ClearTerrainTypes();
+	static void Clear();
 	static unsigned long GetTerrainFlagByName(const std::string &flag_name);
 	
-	static std::vector<CTerrainType *>  TerrainTypes;
-	static std::map<std::string, CTerrainType *> TerrainTypesByIdent;
 	static std::map<std::string, CTerrainType *> TerrainTypesByCharacter;
 	static std::map<std::tuple<int, int, int>, CTerrainType *> TerrainTypesByColor;
 
@@ -86,7 +95,6 @@ public:
 	std::string Name;
 	std::string Character;
 	CColor Color;
-	int ID = -1;
 	int SolidAnimationFrames = 0;
 	int Resource = -1;
 	unsigned long Flags = 0;
@@ -113,7 +121,7 @@ public:
 	std::map<std::tuple<int, int>, std::vector<int>> AdjacentTransitionTiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 #endif

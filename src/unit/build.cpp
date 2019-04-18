@@ -454,7 +454,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 //Wyrmgus start
 void CBuildRestrictionTerrain::Init()
 {
-	this->RestrictTerrainType = CTerrainType::GetTerrainType(this->RestrictTerrainTypeName);
+	this->RestrictTerrainType = CTerrainType::Get(this->RestrictTerrainTypeName);
 }
 
 /**

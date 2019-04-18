@@ -81,19 +81,6 @@ bool CSpecies::ProcessConfigDataProperty(const std::string &key, std::string val
 			this->Homeworld = world;
 			world->Species.push_back(this);
 		}
-	} else if (key == "terrain_type") {
-		value = FindAndReplaceString(value, "_", "-");
-		CTerrainType *terrain_type = CTerrainType::GetTerrainType(value);
-		if (terrain_type) {
-			this->NativeTerrainTypes.push_back(terrain_type);
-		}
-	} else if (key == "evolves_from") {
-		value = FindAndReplaceString(value, "_", "-");
-		CSpecies *evolves_from = CSpecies::Get(value);
-		if (evolves_from) {
-			this->EvolvesFrom.push_back(evolves_from);
-			evolves_from->EvolvesTo.push_back(this);
-		}
 	} else {
 		return false;
 	}

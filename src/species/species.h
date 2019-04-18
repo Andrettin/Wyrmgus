@@ -62,7 +62,11 @@ public:
 private:
 	static inline bool InitializeClass()
 	{
+		REGISTER_PROPERTY(Category);
+		REGISTER_PROPERTY(EvolvesFrom);
+		REGISTER_PROPERTY(EvolvesTo);
 		REGISTER_PROPERTY(NamePlural);
+		REGISTER_PROPERTY(NativeTerrainTypes);
 		REGISTER_PROPERTY(Prehistoric);
 		REGISTER_PROPERTY(Sapient);
 		REGISTER_PROPERTY(ScientificName);
@@ -91,11 +95,6 @@ public:
 		return this->UnitType;
 	}
 	
-	const std::vector<CTerrainType *> &GetNativeTerrainTypes() const
-	{
-		return this->NativeTerrainTypes;
-	}
-	
 	bool IsNativeToTerrainType(const CTerrainType *terrain_type) const
 	{
 		return std::find(this->NativeTerrainTypes.begin(), this->NativeTerrainTypes.end(), terrain_type) != this->NativeTerrainTypes.end();
@@ -119,10 +118,33 @@ private:
 	CPlane *HomePlane = nullptr;
 	CWorld *Homeworld = nullptr;
 	CUnitType *UnitType = nullptr;
-	std::vector<CTerrainType *> NativeTerrainTypes;	/// in which terrains does this species live
-	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
-	std::vector<CSpecies *> EvolvesTo;		/// to which species this one can evolve
+public:
+	ExposedProperty<std::vector<CTerrainType *>> NativeTerrainTypes;	/// in which terrains does this species live
+	;	
+	ExposedProperty<std::vector<CSpecies *>> EvolvesFrom {		/// from which species this one can evolve
+		ExposedProperty<std::vector<CSpecies *>>::ValueType(),
+		ExposedProperty<std::vector<CSpecies *>>::AdderType([this](CSpecies *species) {
+			(*this->EvolvesFrom.Value).push_back(species);
+			(*species->EvolvesTo.Value).push_back(this);
+		}),
+		ExposedProperty<std::vector<CSpecies *>>::RemoverType([this](CSpecies *species) {
+			(*this->EvolvesFrom.Value).erase(std::remove((*this->EvolvesFrom.Value).begin(), (*this->EvolvesFrom.Value).end(), species), (*this->EvolvesFrom.Value).end());
+			(*species->EvolvesTo.Value).erase(std::remove((*species->EvolvesTo.Value).begin(), (*species->EvolvesTo.Value).end(), this), (*species->EvolvesTo.Value).end());
+		})
+	};
+	ExposedProperty<std::vector<CSpecies *>> EvolvesTo {		/// to which species this one can evolve
+		ExposedProperty<std::vector<CSpecies *>>::ValueType(),
+		ExposedProperty<std::vector<CSpecies *>>::AdderType([this](CSpecies *species) {
+			(*this->EvolvesTo.Value).push_back(species);
+			(*species->EvolvesFrom.Value).push_back(this);
+		}),
+		ExposedProperty<std::vector<CSpecies *>>::RemoverType([this](CSpecies *species) {
+			(*this->EvolvesTo.Value).erase(std::remove((*this->EvolvesTo.Value).begin(), (*this->EvolvesTo.Value).end(), species), (*this->EvolvesTo.Value).end());
+			(*species->EvolvesFrom.Value).erase(std::remove((*species->EvolvesFrom.Value).begin(), (*species->EvolvesFrom.Value).end(), this), (*species->EvolvesFrom.Value).end());
+		})
+	};
 	
+private:
 	friend int CclDefineSpecies(lua_State *l);
 	friend int CclDefineUnitType(lua_State *l);
 	friend class CUnitType;	// necessary so that the unit type may set the species' type to itself

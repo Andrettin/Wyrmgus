@@ -43,7 +43,6 @@
 #include "game/trigger.h"
 #include "iocompat.h"
 #include "iolib.h"
-#include "map/terrain_type.h"
 #include "missile/missile_type.h"
 #include "sound/sound.h"
 #include "spell/spells.h"
@@ -52,8 +51,6 @@
 #include "ui/button_level.h"
 #include "unit/unit_type.h"
 #include "util.h"
-#include "world/plane.h"
-#include "world/world.h"
 
 #include <fstream>
 #include <stdexcept>
@@ -345,11 +342,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CSpell *spell = CSpell::GetOrAddSpell(ident);
 			if (!define_only) {
 				spell->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "terrain_type") {
-			CTerrainType *terrain_type = CTerrainType::GetOrAddTerrainType(ident);
-			if (!define_only) {
-				terrain_type->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "trigger") {
 			CTrigger *trigger = CTrigger::GetOrAddTrigger(ident);
