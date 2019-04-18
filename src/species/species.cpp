@@ -38,6 +38,7 @@
 #include "config.h"
 #include "map/terrain_type.h"
 #include "species/species_category.h"
+#include "util.h"
 #include "world/plane.h"
 #include "world/province.h" //for the era get function
 #include "world/world.h"
@@ -126,6 +127,13 @@ bool CSpecies::CanEvolveToAUnitType(const CTerrainType *terrain_type, const bool
 	return false;
 }
 
+/**
+**	@brief	Get a random evolution for the species for a given terrain type
+**
+**	@param	terrain_type	The terrain type
+**
+**	@return	The evolution
+*/
 CSpecies *CSpecies::GetRandomEvolution(const CTerrainType *terrain_type) const
 {
 	std::vector<CSpecies *> potential_evolutions;
@@ -154,7 +162,26 @@ CSpecies *CSpecies::GetRandomEvolution(const CTerrainType *terrain_type) const
 	return nullptr;
 }
 
+/**
+**	@brief	Get all the categories the species ultimately belongs to (i.e. not only its own category, but also all upper categories of its category)
+**
+**	@return	The categories
+*/
+std::vector<CSpeciesCategory *> CSpecies::GetAllCategories() const
+{
+	if (this->Category == nullptr) {
+		return std::vector<CSpeciesCategory *>();
+	}
+	
+	std::vector<CSpeciesCategory *> categories = this->Category->GetAllUpperCategories();
+	categories.push_back(this->Category);
+	
+	return categories;
+}
+
 void CSpecies::_bind_methods()
 {
 	BIND_PROPERTIES();
+	
+	ClassDB::bind_method(D_METHOD("get_all_categories"), [](const CSpecies *species){ return VectorToGodotArray(species->GetAllCategories()); });
 }

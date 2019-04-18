@@ -87,6 +87,18 @@ public:
 		return this->UpperCategory;
 	}
 	
+	std::vector<CSpeciesCategory *> GetAllUpperCategories() const
+	{
+		if (this->UpperCategory == nullptr) {
+			return std::vector<CSpeciesCategory *>();
+		}
+		
+		std::vector<CSpeciesCategory *> upper_categories = this->UpperCategory->GetAllUpperCategories();
+		upper_categories.push_back(this->UpperCategory);
+		
+		return upper_categories;
+	}
+	
 	Property<String> CommonName;	/// the common name of members of the species category
 	Property<String> CommonNamePlural;	/// the plural of the common name of members of the species category
 	Property<CSpeciesCategoryRank *> Rank = nullptr;	/// the rank of the species category

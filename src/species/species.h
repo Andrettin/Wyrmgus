@@ -102,6 +102,7 @@ public:
 	
 	bool CanEvolveToAUnitType(const CTerrainType *terrain = nullptr, const bool sapient_only = false) const;
 	CSpecies *GetRandomEvolution(const CTerrainType *terrain_type) const;
+	std::vector<CSpeciesCategory *> GetAllCategories() const;
 	
 public:
 	ExposedProperty<String> NamePlural;

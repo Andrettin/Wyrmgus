@@ -37,6 +37,7 @@
 
 #include "config.h"
 #include "species/species_category_rank.h"
+#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -78,4 +79,5 @@ void CSpeciesCategory::_bind_methods()
 	BIND_PROPERTIES();
 	
 	ClassDB::bind_method(D_METHOD("get_upper_category"), [](const CSpeciesCategory *category){ return category->UpperCategory; });
+	ClassDB::bind_method(D_METHOD("get_all_upper_categories"), [](const CSpeciesCategory *category){ return VectorToGodotArray(category->GetAllUpperCategories()); });
 }
