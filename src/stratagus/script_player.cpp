@@ -56,6 +56,7 @@
 #include "item/item.h"
 //Wyrmgus end
 #include "language/language.h"
+#include "language/language_family.h"
 #include "language/word.h"
 //Wyrmgus start
 #include "luacallback.h"
@@ -1338,10 +1339,10 @@ static int CclDefineLanguageWord(lua_State *l)
 				if (word->DerivesFrom != nullptr) {
 					word->DerivesFrom->DerivesTo.push_back(word);
 				} else {
-					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->GetIdent().utf8().get_data() _C_ derives_from_word.utf8().get_data() _C_ derives_from_language->GetIdent().utf8().get_data() _C_ GetWordTypeNameById(derives_from_word_type).c_str());
+					fprintf(stderr, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist.\n", word->GetIdent().utf8().get_data(), derives_from_word.utf8().get_data(), derives_from_language->GetIdent().utf8().get_data(), GetWordTypeNameById(derives_from_word_type).c_str());
 				}
 			} else {
-				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->GetIdent().utf8().get_data());
+				fprintf(stderr, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect.\n", word->GetIdent().utf8().get_data());
 			}
 		} else if (!strcmp(value, "Replaces")) {
 			if (!lua_istable(l, -1)) {
@@ -2490,16 +2491,6 @@ static int CclDefineLanguage(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			language->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Family")) {
-			language->Family = LuaToString(l, -1);
-		} else if (!strcmp(value, "DialectOf")) {
-			CLanguage *parent_language = CLanguage::Get(LuaToString(l, -1));
-			if (parent_language) {
-				language->DialectOf = parent_language;
-				parent_language->Dialects.push_back(language);
-			} else {
-				LuaError(l, "Language not found.");
-			}
 		} else if (!strcmp(value, "NounEndings")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -3463,7 +3454,11 @@ static int CclGetLanguageData(lua_State *l)
 		lua_pushstring(l, language->Name.utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
-		lua_pushstring(l, language->Family.utf8().get_data());
+		if (language->Family != nullptr) {
+			lua_pushstring(l, language->Family->Name.utf8().get_data());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Words")) {
 		lua_createtable(l, language->Words.size(), 0);

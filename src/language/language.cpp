@@ -35,6 +35,7 @@
 
 #include "language/language.h"
 
+#include "language/language_family.h"
 #include "language/word.h"
 
 /*----------------------------------------------------------------------------
@@ -189,4 +190,5 @@ String CLanguage::TranslateName(const String &name) const
 
 void CLanguage::_bind_methods()
 {
+	BIND_PROPERTIES();
 }

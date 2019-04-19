@@ -42,6 +42,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CLanguageFamily;
 class CWord;
 
 /*----------------------------------------------------------------------------
@@ -55,6 +56,18 @@ class CLanguage : public DataElement, public DataType<CLanguage>
 public:
 	static constexpr const char *ClassIdentifier = "language";
 	
+private:
+	static inline bool InitializeClass()
+	{
+		REGISTER_PROPERTY(DialectOf);
+		REGISTER_PROPERTY(Family);
+		
+		return true;
+	}
+	
+	static inline bool ClassInitialized = InitializeClass();
+
+public:
 	CWord *GetWord(const String &name, const int word_type, const std::vector<String> &word_meanings) const;
 	String GetArticle(const int gender, const int grammatical_case, const int article_type, const int grammatical_number);
 	String GetNounEnding(const int grammatical_number, const int grammatical_case, int word_junction_type = -1);
@@ -64,14 +77,23 @@ public:
 	String TranslateName(const String &name) const;
 	
 public:
-	String Family;									/// Family of the language
+	Property<CLanguageFamily *> Family;				/// the family to which the language belongs
 	String NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
 	String AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
 	bool UsedByCivilizationOrFaction = false;
-	CLanguage *DialectOf = nullptr;	/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
-	std::vector<CLanguage *> Dialects;				/// Dialects of this language
-	std::vector<CWord *> Words;						/// Words of the language
-	std::map<String, std::vector<String>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
+	Property<CLanguage *> DialectOf {	/// of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
+		Property<CLanguage *>::ValueType(nullptr),
+		Property<CLanguage *>::SetterType([this](CLanguage *language) {
+			if (*this->DialectOf.Value != nullptr) {
+				this->DialectOf->Dialects.erase(std::remove(this->DialectOf->Dialects.begin(), this->DialectOf->Dialects.end(), this), this->DialectOf->Dialects.end());
+			}
+			*this->DialectOf.Value = language;
+			this->DialectOf->Dialects.push_back(this);
+		})
+	};
+	std::vector<CLanguage *> Dialects;				/// dialects of this language
+	std::vector<CWord *> Words;						/// words of the language
+	std::map<String, std::vector<String>> NameTranslations;	/// name translations; possible translations mapped to the name to be translated
 
 	friend int CclDefineLanguage(lua_State *l);
 	

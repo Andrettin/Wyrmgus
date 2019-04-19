@@ -48,6 +48,7 @@
 #include "item/item_class.h"
 #include "item/item_slot.h"
 #include "language/language.h"
+#include "language/language_family.h"
 #include "language/word.h"
 #include "literary_text.h"
 #include "literary_text_page.h"
@@ -115,6 +116,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CHistoricalUnit>();
 	ClassDB::register_class<CIcon>();
 	ClassDB::register_class<CLanguage>();
+	ClassDB::register_class<CLanguageFamily>();
 	ClassDB::register_class<CLiteraryText>();
 	ClassDB::register_class<CLiteraryTextPage>();
 	ClassDB::register_class<CMapTemplate>();

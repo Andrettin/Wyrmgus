@@ -38,6 +38,8 @@
 #include "data_type.h"
 #include "item/item_slot.h"
 #include "language/language.h"
+#include "language/language_family.h"
+#include "language/word.h"
 #include "literary_text.h"
 #include "map/terrain_type.h"
 #include "species/species.h"
@@ -83,6 +85,7 @@ template bool ConvertFromString(const std::string &str);
 template String ConvertFromString(const std::string &str);
 template CIcon *ConvertFromString(const std::string &str);
 template CLanguage *ConvertFromString(const std::string &str);
+template CLanguageFamily *ConvertFromString(const std::string &str);
 template CLiteraryText *ConvertFromString(const std::string &str);
 template CPlane *ConvertFromString(const std::string &str);
 template CSeasonSchedule *ConvertFromString(const std::string &str);
@@ -92,5 +95,6 @@ template CSpeciesCategoryRank *ConvertFromString(const std::string &str);
 template CTerrainType *ConvertFromString(const std::string &str);
 template CTimeOfDaySchedule *ConvertFromString(const std::string &str);
 template CUnitType *ConvertFromString(const std::string &str);
+template CWord *ConvertFromString(const std::string &str);
 template ItemSlot *ConvertFromString(const std::string &str);
 template const ItemSlot *ConvertFromString(const std::string &str);
