@@ -4356,60 +4356,6 @@ int GetForceTypeIdByName(const std::string &force_type)
 	return -1;
 }
 
-std::string GetWordTypeNameById(int word_type)
-{
-	if (word_type == WordTypeNoun) {
-		return "noun";
-	} else if (word_type == WordTypeVerb) {
-		return "verb";
-	} else if (word_type == WordTypeAdjective) {
-		return "adjective";
-	} else if (word_type == WordTypePronoun) {
-		return "pronoun";
-	} else if (word_type == WordTypeAdverb) {
-		return "adverb";
-	} else if (word_type == WordTypeConjunction) {
-		return "conjunction";
-	} else if (word_type == WordTypeAdposition) {
-		return "adposition";
-	} else if (word_type == WordTypeArticle) {
-		return "article";
-	} else if (word_type == WordTypeNumeral) {
-		return "numeral";
-	} else if (word_type == WordTypeAffix) {
-		return "affix";
-	}
-
-	return "";
-}
-
-int GetWordTypeIdByName(const std::string &word_type)
-{
-	if (word_type == "noun") {
-		return WordTypeNoun;
-	} else if (word_type == "verb") {
-		return WordTypeVerb;
-	} else if (word_type == "adjective") {
-		return WordTypeAdjective;
-	} else if (word_type == "pronoun") {
-		return WordTypePronoun;
-	} else if (word_type == "adverb") {
-		return WordTypeAdverb;
-	} else if (word_type == "conjunction") {
-		return WordTypeConjunction;
-	} else if (word_type == "adposition") {
-		return WordTypeAdposition;
-	} else if (word_type == "article") {
-		return WordTypeArticle;
-	} else if (word_type == "numeral") {
-		return WordTypeNumeral;
-	} else if (word_type == "affix") {
-		return WordTypeAffix;
-	}
-
-	return -1;
-}
-
 std::string GetArticleTypeNameById(int article_type)
 {
 	if (article_type == ArticleTypeNoArticle) {
@@ -4517,36 +4463,6 @@ int GetGrammaticalPersonIdByName(const std::string &grammatical_person)
 		return GrammaticalPersonSecondPerson;
 	} else if (grammatical_person == "third-person") {
 		return GrammaticalPersonThirdPerson;
-	}
-
-	return -1;
-}
-
-std::string GetGrammaticalGenderNameById(int grammatical_gender)
-{
-	if (grammatical_gender == GrammaticalGenderNoGender) {
-		return "no-gender";
-	} else if (grammatical_gender == GrammaticalGenderMasculine) {
-		return "masculine";
-	} else if (grammatical_gender == GrammaticalGenderFeminine) {
-		return "feminine";
-	} else if (grammatical_gender == GrammaticalGenderNeuter) {
-		return "neuter";
-	}
-
-	return "";
-}
-
-int GetGrammaticalGenderIdByName(const std::string &grammatical_gender)
-{
-	if (grammatical_gender == "no-gender") {
-		return GrammaticalGenderNoGender;
-	} else if (grammatical_gender == "masculine") {
-		return GrammaticalGenderMasculine;
-	} else if (grammatical_gender == "feminine") {
-		return GrammaticalGenderFeminine;
-	} else if (grammatical_gender == "neuter") {
-		return GrammaticalGenderNeuter;
 	}
 
 	return -1;

@@ -56,6 +56,10 @@ std::vector<std::function<void()>> ClassClearFunctions;
 */
 void DataElement::ProcessConfigData(const CConfigData *config_data)
 {
+	if (this->Initialized) {
+		fprintf(stderr, "Data element \"%s\" is being redefined.\n", this->Ident.c_str());
+	}
+	
 	List<PropertyInfo> property_list;
 	this->get_property_list(&property_list);
 	Map<StringName, PropertyInfo> properties_by_name;

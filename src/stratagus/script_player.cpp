@@ -55,9 +55,11 @@
 //Wyrmgus start
 #include "item/item.h"
 //Wyrmgus end
+#include "language/grammatical_gender.h"
 #include "language/language.h"
 #include "language/language_family.h"
 #include "language/word.h"
+#include "language/word_type.h"
 //Wyrmgus start
 #include "luacallback.h"
 //Wyrmgus end
@@ -1304,8 +1306,8 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 		} else if (!strcmp(value, "Type")) {
 			std::string word_type_name = LuaToString(l, -1);
-			int word_type = GetWordTypeIdByName(word_type_name);
-			if (word_type != -1) {
+			const CWordType *word_type = CWordType::Get(word_type_name);
+			if (word_type != nullptr) {
 				word->Type = word_type;
 			} else {
 				LuaError(l, "Word type \"%s\" doesn't exist." _C_ word_type_name.c_str());
@@ -1317,7 +1319,7 @@ static int CclDefineLanguageWord(lua_State *l)
 			int j = 0;
 			CLanguage *derives_from_language = CLanguage::Get(LuaToString(l, -1, j + 1));
 			++j;
-			int derives_from_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+			const CWordType *derives_from_word_type = CWordType::Get(LuaToString(l, -1, j + 1));
 			++j;
 			
 			std::vector<String> word_meanings;
@@ -1332,14 +1334,14 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 			lua_pop(l, 1);
 			
-			if (derives_from_language && derives_from_word_type != -1) {
+			if (derives_from_language && derives_from_word_type != nullptr) {
 				String derives_from_word = LuaToString(l, -1, j + 1);
 				word->DerivesFrom = derives_from_language->GetWord(derives_from_word, derives_from_word_type, word_meanings);
 				
 				if (word->DerivesFrom != nullptr) {
 					word->DerivesFrom->DerivesTo.push_back(word);
 				} else {
-					fprintf(stderr, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist.\n", word->GetIdent().utf8().get_data(), derives_from_word.utf8().get_data(), derives_from_language->GetIdent().utf8().get_data(), GetWordTypeNameById(derives_from_word_type).c_str());
+					fprintf(stderr, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist.\n", word->GetIdent().utf8().get_data(), derives_from_word.utf8().get_data(), derives_from_language->GetIdent().utf8().get_data(), derives_from_word_type->GetIdent().utf8().get_data());
 				}
 			} else {
 				fprintf(stderr, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect.\n", word->GetIdent().utf8().get_data());
@@ -1351,7 +1353,7 @@ static int CclDefineLanguageWord(lua_State *l)
 			int j = 0;
 			CLanguage *replaces_language = CLanguage::Get(LuaToString(l, -1, j + 1));
 			++j;
-			int replaces_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+			const CWordType *replaces_word_type = CWordType::Get(LuaToString(l, -1, j + 1));
 			++j;
 			
 			std::vector<String> word_meanings;
@@ -1366,12 +1368,12 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 			lua_pop(l, 1);
 			
-			if (replaces_language && replaces_word_type != -1) {
+			if (replaces_language && replaces_word_type != nullptr) {
 				String replaces_word = LuaToString(l, -1, j + 1);
 				replaces = replaces_language->GetWord(replaces_word, replaces_word_type, word_meanings);
 				
 				if (replaces == nullptr) {
-					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->GetIdent().utf8().get_data() _C_ replaces_word.utf8().get_data() _C_ replaces_language->GetIdent().utf8().get_data() _C_ GetWordTypeNameById(replaces_word_type).c_str());
+					LuaError(l, "Word \"%s\" is set to replace \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->GetIdent().utf8().get_data() _C_ replaces_word.utf8().get_data() _C_ replaces_language->GetIdent().utf8().get_data() _C_ replaces_word_type->GetIdent().utf8().get_data());
 				}
 			} else {
 				LuaError(l, "Word \"%s\"'s replace is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->GetIdent().utf8().get_data());
@@ -1391,7 +1393,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				
 				CLanguage *affix_language = CLanguage::Get(LuaToString(l, -1, j + 1)); // should be the same language as that of the word, but needs to be specified since the word's language may not have been set yet
 				++j;
-				int affix_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+				const CWordType *affix_word_type = CWordType::Get(LuaToString(l, -1, j + 1));
 				++j;
 				
 				std::vector<String> word_meanings;
@@ -1406,14 +1408,14 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				lua_pop(l, 1);
 
-				if (affix_language && affix_word_type != -1) {
+				if (affix_language && affix_word_type != nullptr) {
 					String affix_word = LuaToString(l, -1, j + 1);
 					word->CompoundElements[affix_type] = affix_language->GetWord(affix_word, affix_word_type, word_meanings);
 					
 					if (word->CompoundElements[affix_type] != nullptr) {
 						word->CompoundElements[affix_type]->CompoundElementOf[affix_type].push_back(word);
 					} else {
-						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->GetIdent().utf8().get_data() _C_ affix_word.utf8().get_data() _C_ affix_language->GetIdent().utf8().get_data() _C_ GetWordTypeNameById(affix_word_type).c_str());
+						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->GetIdent().utf8().get_data() _C_ affix_word.utf8().get_data() _C_ affix_language->GetIdent().utf8().get_data() _C_ affix_word_type->GetIdent().utf8().get_data());
 					}
 				} else {
 					LuaError(l, "Word \"%s\"'s compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ word->GetIdent().utf8().get_data());
@@ -1421,8 +1423,8 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 		} else if (!strcmp(value, "Gender")) {
 			std::string grammatical_gender_name = LuaToString(l, -1);
-			int grammatical_gender = GetGrammaticalGenderIdByName(grammatical_gender_name);
-			if (grammatical_gender != -1) {
+			const CGrammaticalGender *grammatical_gender = CGrammaticalGender::Get(grammatical_gender_name);
+			if (grammatical_gender != nullptr) {
 				word->Gender = grammatical_gender;
 			} else {
 				LuaError(l, "Grammatical gender \"%s\" doesn't exist." _C_ grammatical_gender_name.c_str());
@@ -1569,17 +1571,11 @@ static int CclDefineLanguageWord(lua_State *l)
 		}
 	}
 	
-	if (!word->Language) {
-		LuaError(l, "Word \"%s\" has not been assigned to any language" _C_ word->GetIdent().utf8().get_data());
-	}
-	
-	if (word->Type == -1) {
-		LuaError(l, "Word \"%s\" has no type" _C_ word->GetIdent().utf8().get_data());
-	}
-	
 	if (replaces != nullptr) {
 		word->Language->RemoveWord(replaces);
 	}
+	
+	word->Initialize();
 	
 	return 0;
 }
@@ -2551,8 +2547,8 @@ static int CclDefineLanguage(lua_State *l)
 				++k;
 				
 				std::string grammatical_gender_name = LuaToString(l, -1, k + 1);
-				int grammatical_gender = GetGrammaticalGenderIdByName(grammatical_gender_name);
-				if (grammatical_gender == -1) {
+				const CGrammaticalGender *grammatical_gender = CGrammaticalGender::Get(grammatical_gender_name);
+				if (grammatical_gender == nullptr) {
 					LuaError(l, "Grammatical gender \"%s\" doesn't exist." _C_ grammatical_gender_name.c_str());
 				}
 				++k;
@@ -3493,7 +3489,7 @@ static int CclGetLanguageWordData(lua_State *l)
 	
 	String word_name = LuaToString(l, 2);
 	std::vector<String> word_meanings;
-	const CWord *word = language->GetWord(word_name, -1, word_meanings);
+	const CWord *word = language->GetWord(word_name, nullptr, word_meanings);
 	if (word == nullptr) {
 		LuaError(l, "Word \"%s\" doesn't exist for the \"%s\" language." _C_ word_name.utf8().get_data() _C_ language_name.c_str());
 	}
@@ -3501,8 +3497,8 @@ static int CclGetLanguageWordData(lua_State *l)
 	const char *data = LuaToString(l, 3);
 
 	if (!strcmp(data, "Type")) {
-		if (word->Type != -1) {
-			lua_pushstring(l, GetWordTypeNameById(word->Type).c_str());
+		if (word->Type != nullptr) {
+			lua_pushstring(l, word->Type->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3515,8 +3511,8 @@ static int CclGetLanguageWordData(lua_State *l)
 		lua_pushstring(l, "");
 		return 1;
 	} else if (!strcmp(data, "Gender")) {
-		if (word->Gender != -1) {
-			lua_pushstring(l, GetGrammaticalGenderNameById(word->Gender).c_str());
+		if (word->Gender != nullptr) {
+			lua_pushstring(l, word->Gender->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

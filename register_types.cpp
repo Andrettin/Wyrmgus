@@ -47,9 +47,11 @@
 #include "hair_color.h"
 #include "item/item_class.h"
 #include "item/item_slot.h"
+#include "language/grammatical_gender.h"
 #include "language/language.h"
 #include "language/language_family.h"
 #include "language/word.h"
+#include "language/word_type.h"
 #include "literary_text.h"
 #include "literary_text_page.h"
 #include "map/map_template.h"
@@ -113,6 +115,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CDialogue>();
 	ClassDB::register_class<CDynasty>();
 	ClassDB::register_class<CFaction>();
+	ClassDB::register_class<CGrammaticalGender>();
 	ClassDB::register_class<CHistoricalUnit>();
 	ClassDB::register_class<CIcon>();
 	ClassDB::register_class<CLanguage>();
@@ -139,6 +142,7 @@ void register_wyrmgus_types()
 	ClassDB::register_class<CUnitType>();
 	ClassDB::register_class<CUpgrade>();
 	ClassDB::register_class<CWord>();
+	ClassDB::register_class<CWordType>();
 	ClassDB::register_class<CWorld>();
 	ClassDB::register_class<ItemClass>();
 	ClassDB::register_class<ItemSlot>();

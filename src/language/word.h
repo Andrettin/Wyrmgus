@@ -41,27 +41,14 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CGrammaticalGender;
 class CLanguage;
+class CWordType;
 struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Enumerations
 ----------------------------------------------------------------------------*/
-
-enum WordTypes {
-	WordTypeNoun,
-	WordTypeVerb,
-	WordTypeAdjective,
-	WordTypePronoun,
-	WordTypeAdverb,
-	WordTypeConjunction,
-	WordTypeAdposition,
-	WordTypeArticle,
-	WordTypeNumeral,
-	WordTypeAffix,
-	
-	MaxWordTypes
-};
 
 enum ArticleTypes {
 	ArticleTypeNoArticle,
@@ -95,15 +82,6 @@ enum GrammaticalPersons {
 	GrammaticalPersonThirdPerson,
 	
 	MaxGrammaticalPersons
-};
-
-enum GrammaticalGenders {
-	GrammaticalGenderNoGender,
-	GrammaticalGenderMasculine,
-	GrammaticalGenderFeminine,
-	GrammaticalGenderNeuter,
-	
-	MaxGrammaticalGenders
 };
 
 enum GrammaticalTenses {
@@ -160,8 +138,12 @@ public:
 private:
 	static inline bool InitializeClass()
 	{
-		REGISTER_PROPERTY(Language);
 		REGISTER_PROPERTY(AnglicizedName);
+		REGISTER_PROPERTY(DerivesFrom);
+		REGISTER_PROPERTY(Gender);
+		REGISTER_PROPERTY(Language);
+		REGISTER_PROPERTY(Meanings);
+		REGISTER_PROPERTY(Type);
 		
 		return true;
 	}
@@ -169,10 +151,11 @@ private:
 	static inline bool ClassInitialized = InitializeClass();
 
 public:
+	virtual void Initialize() override;
 	bool HasMeaning(const String &meaning);
 	String GetNounInflection(const int grammatical_number, const int grammatical_case, const int word_junction_type = -1);
 	String GetVerbInflection(const int grammatical_number, const int grammatical_person, const int grammatical_tense, const int grammatical_mood);
-	String GetAdjectiveInflection(const int comparison_degree, const int article_type = -1, int grammatical_case = -1, const int grammatical_number = -1, const int grammatical_gender = -1);
+	String GetAdjectiveInflection(const int comparison_degree, const int article_type = -1, int grammatical_case = -1, const int grammatical_number = -1, const CGrammaticalGender *grammatical_gender = nullptr);
 	String GetParticiple(int grammatical_tense);
 	void RemoveFromVector(std::vector<CWord *> &word_vector);
 	
@@ -187,16 +170,16 @@ public:
 		})
 	};
 	Property<String> AnglicizedName;				/// the anglicized version of the word
-	int Type = -1;									/// word type
-	int Gender = -1;								/// what is the gender of the noun or article (Masculine, Feminine or Neuter)
+	ExposedProperty<const CWordType *> Type = nullptr;	/// word type
+	ExposedProperty<const CGrammaticalGender *> Gender = nullptr;		/// what is the gender of the noun or article (Masculine, Feminine or Neuter)
 	int GrammaticalNumber = -1;						/// grammatical number (i.e. whether the word is necessarily plural or not)
 	bool Archaic = false;							/// whether the word is archaic (whether it is used in current speech)
 	std::map<std::tuple<int, int>, String> NumberCaseInflections;	/// for nouns, mapped to grammatical number and grammatical case
 	std::map<std::tuple<int, int, int, int>, String> NumberPersonTenseMoodInflections;	/// for verbs, mapped to grammatical number, grammatical person, grammatical tense and grammatical mood
 	String ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// for adjectives
 	String Participles[MaxGrammaticalTenses];	/// for verbs
-	std::vector<String> Meanings;				/// meanings of the word in English.
-	CWord *DerivesFrom = nullptr;    			/// from which word does this word derive
+	ExposedProperty<std::vector<String>> Meanings;		/// meanings of the word in English
+	ExposedProperty<CWord *> DerivesFrom = nullptr;    	/// from which word does this word derive
 	std::vector<CWord *> DerivesTo;				/// which words derive from this word
 	CWord *CompoundElements[MaxAffixTypes];    	/// from which compound elements is this word formed
 	std::vector<CWord *> CompoundElementOf[MaxAffixTypes];	/// which words are formed from this word as a compound element

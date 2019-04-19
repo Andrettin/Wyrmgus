@@ -35,12 +35,30 @@
 
 #include "language/word.h"
 
+#include "language/grammatical_gender.h"
 #include "language/language.h"
+#include "language/word_type.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**	@brief	Initialize the word
+*/
+void CWord::Initialize()
+{
+	if (this->Language == nullptr) {
+		fprintf(stderr, "Word \"%s\" has not been assigned to any language.\n", this->GetIdent().utf8().get_data());
+	}
+	
+	if (this->Type == nullptr) {
+		fprintf(stderr, "Word \"%s\" has no type.\n", this->GetIdent().utf8().get_data());
+	}
+	
+	this->Initialized = true;
+}
+	
 /**
 **	@brief	Set the language of the word
 **
@@ -88,7 +106,7 @@ String CWord::GetVerbInflection(const int grammatical_number, const int grammati
 	return this->Name;
 }
 
-String CWord::GetAdjectiveInflection(const int comparison_degree, const int article_type, int grammatical_case, const int grammatical_number, const int grammatical_gender)
+String CWord::GetAdjectiveInflection(const int comparison_degree, const int article_type, int grammatical_case, const int grammatical_number, const CGrammaticalGender *grammatical_gender)
 {
 	String inflected_word;
 	

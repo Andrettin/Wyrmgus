@@ -35,19 +35,21 @@
 
 #include "language/language.h"
 
+#include "language/grammatical_gender.h"
 #include "language/language_family.h"
 #include "language/word.h"
+#include "language/word_type.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CWord *CLanguage::GetWord(const String &name, const int word_type, const std::vector<String> &word_meanings) const
+CWord *CLanguage::GetWord(const String &name, const CWordType *word_type, const std::vector<String> &word_meanings) const
 {
 	for (CWord *word : this->Words) {
 		if (
 			word->Name == name
-			&& (word_type == -1 || word->Type == word_type)
+			&& (word_type == nullptr || word->Type == word_type)
 			&& (word_meanings.size() == 0 || word->Meanings == word_meanings)
 		) {
 			return word;
@@ -55,32 +57,6 @@ CWord *CLanguage::GetWord(const String &name, const int word_type, const std::ve
 	}
 
 	return nullptr;
-}
-
-String CLanguage::GetArticle(const int gender, const int grammatical_case, const int article_type, const int grammatical_number)
-{
-	for (const CWord *word : this->Words) {
-		if (word->Type != WordTypeArticle || word->ArticleType != article_type) {
-			continue;
-		}
-		
-		if (grammatical_number != -1 && word->GrammaticalNumber != -1 && word->GrammaticalNumber != grammatical_number) {
-			continue;
-		}
-		
-		if (gender == -1 || word->Gender == -1 || gender == word->Gender) {
-			if (grammatical_case == GrammaticalCaseNominative && !word->Nominative.empty()) {
-				return word->Nominative;
-			} else if (grammatical_case == GrammaticalCaseAccusative && !word->Accusative.empty()) {
-				return word->Accusative;
-			} else if (grammatical_case == GrammaticalCaseDative && !word->Dative.empty()) {
-				return word->Dative;
-			} else if (grammatical_case == GrammaticalCaseGenitive && !word->Genitive.empty()) {
-				return word->Genitive;
-			}
-		}
-	}
-	return "";
 }
 
 String CLanguage::GetNounEnding(const int grammatical_number, const int grammatical_case, int word_junction_type)
@@ -98,22 +74,18 @@ String CLanguage::GetNounEnding(const int grammatical_number, const int grammati
 	return "";
 }
 
-String CLanguage::GetAdjectiveEnding(const int article_type, const int grammatical_case, int grammatical_number, int grammatical_gender)
+String CLanguage::GetAdjectiveEnding(const int article_type, const int grammatical_case, int grammatical_number, const CGrammaticalGender *grammatical_gender)
 {
 	if (grammatical_number == -1) {
 		grammatical_number = GrammaticalNumberNoNumber;
 	}
 	
-	if (grammatical_gender == -1) {
-		grammatical_gender = GrammaticalGenderNoGender;
-	}
-	
 	if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender].empty()) {
 		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender];
-	} else if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender];
-	} else if (!this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender];
+	} else if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][nullptr].empty()) {
+		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][nullptr];
+	} else if (!this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][nullptr].empty()) {
+		return this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][nullptr];
 	}
 	
 	return "";
