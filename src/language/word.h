@@ -194,7 +194,9 @@ public:
 				this->DerivesFrom->DerivesTo.erase(std::remove(this->DerivesFrom->DerivesTo.begin(), this->DerivesFrom->DerivesTo.end(), this), this->DerivesFrom->DerivesTo.end());
 			}
 			*this->DerivesFrom.Value = word;
-			this->DerivesFrom->DerivesTo.push_back(this);
+			if (word != nullptr) {
+				word->DerivesTo.push_back(this);
+			}
 		})
 	};
 	std::vector<CWord *> DerivesTo;				/// which words derive from this word

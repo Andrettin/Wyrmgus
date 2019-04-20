@@ -59,23 +59,6 @@ CWord *CLanguage::GetWord(const String &name, const CWordType *word_type, const 
 	return nullptr;
 }
 
-String CLanguage::GetAdjectiveEnding(const int article_type, const int grammatical_case, int grammatical_number, const CGrammaticalGender *grammatical_gender)
-{
-	if (grammatical_number == -1) {
-		grammatical_number = GrammaticalNumberNoNumber;
-	}
-	
-	if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender];
-	} else if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][nullptr].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][nullptr];
-	} else if (!this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][nullptr].empty()) {
-		return this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][nullptr];
-	}
-	
-	return "";
-}
-
 void CLanguage::RemoveWord(CWord *word)
 {
 	if (std::find(this->Words.begin(), this->Words.end(), word) != this->Words.end()) {

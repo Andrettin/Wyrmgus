@@ -1336,9 +1336,10 @@ static int CclDefineLanguageWord(lua_State *l)
 			
 			if (derives_from_language && derives_from_word_type != nullptr) {
 				String derives_from_word = LuaToString(l, -1, j + 1);
-				word->DerivesFrom = derives_from_language->GetWord(derives_from_word, derives_from_word_type, word_meanings);
+				CWord *derives_from = derives_from_language->GetWord(derives_from_word, derives_from_word_type, word_meanings);
 				
-				if (word->DerivesFrom != nullptr) {
+				if (derives_from != nullptr) {
+					word->DerivesFrom = derives_from;
 					word->DerivesFrom->DerivesTo.push_back(word);
 				} else {
 					fprintf(stderr, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist.\n", word->GetIdent().utf8().get_data(), derives_from_word.utf8().get_data(), derives_from_language->GetIdent().utf8().get_data(), derives_from_word_type->GetIdent().utf8().get_data());
@@ -2487,42 +2488,6 @@ static int CclDefineLanguage(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			language->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "AdjectiveEndings")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				std::string article_type_name = LuaToString(l, -1, k + 1);
-				int article_type = GetArticleTypeIdByName(article_type_name);
-				if (article_type == -1) {
-					LuaError(l, "Article type \"%s\" doesn't exist." _C_ article_type_name.c_str());
-				}
-				++k;
-
-				std::string grammatical_case_name = LuaToString(l, -1, k + 1);
-				int grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
-				if (grammatical_case == -1) {
-					LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
-				}
-				++k;
-
-				std::string grammatical_number_name = LuaToString(l, -1, k + 1);
-				int grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
-				if (grammatical_number == -1) {
-					LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
-				}
-				++k;
-				
-				std::string grammatical_gender_name = LuaToString(l, -1, k + 1);
-				const CGrammaticalGender *grammatical_gender = CGrammaticalGender::Get(grammatical_gender_name);
-				if (grammatical_gender == nullptr) {
-					LuaError(l, "Grammatical gender \"%s\" doesn't exist." _C_ grammatical_gender_name.c_str());
-				}
-				++k;
-				
-				language->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender] = LuaToString(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "NameTranslations")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

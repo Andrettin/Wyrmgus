@@ -117,10 +117,6 @@ String CWord::GetAdjectiveInflection(const int comparison_degree, const int arti
 		inflected_word = this->Name;
 	}
 	
-	if (article_type != -1 && grammatical_case != GrammaticalCaseNoCase && this->ComparisonDegreeCaseInflections[comparison_degree][grammatical_case].empty()) {
-		inflected_word += this->Language->GetAdjectiveEnding(article_type, grammatical_case, grammatical_number, grammatical_gender);
-	}
-	
 	return inflected_word;
 }
 
