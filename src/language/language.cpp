@@ -59,21 +59,6 @@ CWord *CLanguage::GetWord(const String &name, const CWordType *word_type, const 
 	return nullptr;
 }
 
-String CLanguage::GetNounEnding(const int grammatical_number, const int grammatical_case, int word_junction_type)
-{
-	if (word_junction_type == -1) {
-		word_junction_type = WordJunctionTypeNoWordJunction;
-	}
-	
-	if (!this->NounEndings[grammatical_number][grammatical_case][word_junction_type].empty()) {
-		return this->NounEndings[grammatical_number][grammatical_case][word_junction_type];
-	} else if (!this->NounEndings[grammatical_number][grammatical_case][WordJunctionTypeNoWordJunction].empty()) {
-		return this->NounEndings[grammatical_number][grammatical_case][WordJunctionTypeNoWordJunction];
-	}
-	
-	return "";
-}
-
 String CLanguage::GetAdjectiveEnding(const int article_type, const int grammatical_case, int grammatical_number, const CGrammaticalGender *grammatical_gender)
 {
 	if (grammatical_number == -1) {

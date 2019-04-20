@@ -71,7 +71,6 @@ private:
 
 public:
 	CWord *GetWord(const String &name, const CWordType *word_type, const std::vector<String> &word_meanings) const;
-	String GetNounEnding(const int grammatical_number, const int grammatical_case, int word_junction_type = -1);
 	String GetAdjectiveEnding(const int article_type, const int grammatical_case, int grammatical_number, const CGrammaticalGender *grammatical_gender);
 	void RemoveWord(CWord *word);
 	
@@ -79,7 +78,6 @@ public:
 	
 public:
 	Property<CLanguageFamily *> Family;				/// the family to which the language belongs
-	String NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
 	std::map<int, std::map<int, std::map<int, std::map<const CGrammaticalGender *, String>>>> AdjectiveEndings;
 	bool UsedByCivilizationOrFaction = false;
 	Property<CLanguage *> DialectOf {	/// of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise

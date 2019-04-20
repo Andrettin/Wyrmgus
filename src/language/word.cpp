@@ -83,18 +83,13 @@ void CWord::SetLanguage(CLanguage *language)
 	}
 }
 
-bool CWord::HasMeaning(const String &meaning)
-{
-	return std::find(this->Meanings.begin(), this->Meanings.end(), meaning) != this->Meanings.end();
-}
-
-String CWord::GetNounInflection(const int grammatical_number, const int grammatical_case, const int word_junction_type)
+String CWord::GetNounInflection(const int grammatical_number, const int grammatical_case)
 {
 	if (this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case)) != this->NumberCaseInflections.end()) {
 		return this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case))->second;
 	}
 	
-	return this->Name + this->Language->GetNounEnding(grammatical_number, grammatical_case, word_junction_type);
+	return this->Name;
 }
 
 String CWord::GetVerbInflection(const int grammatical_number, const int grammatical_person, const int grammatical_tense, const int grammatical_mood)
@@ -136,19 +131,6 @@ String CWord::GetParticiple(const int grammatical_tense)
 	}
 	
 	return this->Name;
-}
-
-void CWord::RemoveFromVector(std::vector<CWord *> &word_vector)
-{
-	std::vector<CWord *> word_vector_copy = word_vector;
-	
-	if (std::find(word_vector.begin(), word_vector.end(), this) != word_vector.end()) {
-		word_vector.erase(std::remove(word_vector.begin(), word_vector.end(), this), word_vector.end());
-	}
-	
-	if (word_vector.size() == 0) { // if removing the word from the vector left it empty, undo the removal
-		word_vector = word_vector_copy;
-	}
 }
 
 void CWord::_bind_methods()
