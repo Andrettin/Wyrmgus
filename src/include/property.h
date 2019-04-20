@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "crtp.h"
 #include "data_type.h"
 #include "type_traits.h"
 
@@ -50,6 +51,9 @@
 ----------------------------------------------------------------------------*/
 
 class DataElement;
+
+template <typename T>
+class PropertyBase;
 
 extern std::string FindAndReplaceString(const std::string &text, const std::string &find, const std::string &replace);
 extern bool StringToBool(const std::string &str);
@@ -75,8 +79,6 @@ protected:
 	virtual const PropertyCommonBase &operator =(const std::string &rhs) = 0;
 	virtual const PropertyCommonBase &operator +=(const std::string &rhs) = 0;
 	virtual const PropertyCommonBase &operator -=(const std::string &rhs) = 0;
-	virtual const PropertyCommonBase &operator *=(const std::string &rhs) = 0;
-	virtual const PropertyCommonBase &operator /=(const std::string &rhs) = 0;
 	
 	friend DataElement;
 };
@@ -128,10 +130,35 @@ public:
 	}
 
 public:	
+	ReturnType Get() const
+	{
+		//get the underlying value
+		if (this->Getter) {
+			return this->Getter();
+		} else {
+			return *this->Value;
+		}
+	}
+	
+protected:
+	T *Value = nullptr;
+	GetterType Getter;
+	SetterType Setter;
+	AdderType Adder;
+	RemoverType Remover;
+};
+
+template <typename T, typename U>
+class ModifiablePropertyBase : public CRTP<U, ModifiablePropertyBase<T, U>>
+{
+protected:
+	ModifiablePropertyBase() {}
+
+public:
 	const PropertyBase<T> &operator =(const T &rhs)
 	{
 		this->Set(rhs);
-		return *this;
+		return this->GetUnderlying();
 	}
 	
 	const PropertyBase<T> &operator =(const PropertyBase<T> &rhs)
@@ -146,7 +173,7 @@ public:
 	**
 	**	@return	The property
 	*/
-	virtual const PropertyBase<T> &operator =(const std::string &rhs) override
+	const PropertyBase<T> &operator =(const std::string &rhs)
 	{
 		if constexpr(
 			std::is_same_v<T, int>
@@ -157,14 +184,14 @@ public:
 			return *this = ConvertFromString<T>(rhs);
 		} else {
 			fprintf(stderr, "The operator = is not valid for this type.\n");
-			return *this;
+			return this->GetUnderlying();
 		}
 	}
 	
 	const PropertyBase<T> &operator +=(const T &rhs)
 	{
 		this->Add(rhs);
-		return *this;
+		return this->GetUnderlying();
 	}
 	
 	const PropertyBase<T> &operator +=(const PropertyBase<T> &rhs)
@@ -179,7 +206,7 @@ public:
 	**
 	**	@return	The property
 	*/
-	virtual const PropertyBase<T> &operator +=(const std::string &rhs) override
+	const PropertyBase<T> &operator +=(const std::string &rhs)
 	{
 		if constexpr(
 			std::is_same_v<T, int>
@@ -190,17 +217,17 @@ public:
 		} else if constexpr(is_specialization_of_v<T, std::vector>) {
 			typename T::value_type new_value = ConvertFromString<typename T::value_type>(rhs);
 			this->Add(new_value);
-			return *this;
+			return this->GetUnderlying();
 		} else {
 			fprintf(stderr, "The operator += is not valid for this type.\n");
-			return *this;
+			return this->GetUnderlying();
 		}
 	}
 
 	const PropertyBase<T> &operator -=(const T &rhs)
 	{
 		this->Remove(rhs);
-		return *this;
+		return this->GetUnderlying();
 	}
 	
 	const PropertyBase<T> &operator -=(const PropertyBase<T> &rhs)
@@ -215,7 +242,7 @@ public:
 	**
 	**	@return	The property
 	*/
-	virtual const PropertyBase<T> &operator -=(const std::string &rhs) override
+	const PropertyBase<T> &operator -=(const std::string &rhs)
 	{
 		if constexpr(
 			std::is_same_v<T, int>
@@ -225,40 +252,28 @@ public:
 		} else if constexpr(is_specialization_of_v<T, std::vector>) {
 			typename T::value_type new_value = ConvertFromString<typename T::value_type>(rhs);
 			this->Remove(new_value);
-			return *this;
+			return this->GetUnderlying();
 		} else {
 			fprintf(stderr, "The operator -= is not valid for this type.\n");
-			return *this;
+			return this->GetUnderlying();
 		}
 	}
 	
 	const PropertyBase<T> &operator *=(const T &rhs)
 	{
-		this->Set(this->Get() * rhs);
-		return *this;
+		this->Set(this->GetUnderlying().Get() * rhs);
+		return this->GetUnderlying();
 	}
 	
 	const PropertyBase<T> &operator *=(const PropertyBase<T> &rhs)
 	{
 		return *this *= rhs.Get();
 	}
-	
-	virtual const PropertyBase<T> &operator *=(const std::string &rhs) override
-	{
-		if constexpr(std::is_same_v<T, int>) {
-			return *this *= std::stoi(rhs);
-		} else if constexpr(std::is_same_v<T, bool>) {
-			return *this *= StringToBool(rhs);
-		} else {
-			fprintf(stderr, "The operator *= is not valid for this type.");
-			return *this;
-		}
-	}
 
 	const PropertyBase<T> &operator /=(const T &rhs)
 	{
-		this->Set(this->Get() / rhs);
-		return *this;
+		this->Set(this->GetUnderlying().Get() / rhs);
+		return this->GetUnderlying();
 	}
 	
 	const PropertyBase<T> &operator /=(const PropertyBase<T> &rhs)
@@ -266,116 +281,61 @@ public:
 		return *this /= rhs.Get();
 	}
 	
-	virtual const PropertyBase<T> &operator /=(const std::string &rhs) override
-	{
-		if constexpr(std::is_same_v<T, int>) {
-			return *this /= std::stoi(rhs);
-		} else {
-			fprintf(stderr, "The operator /= is not valid for this type.");
-			return *this;
-		}
-	}
-
-	ReturnType Get() const
-	{
-		//get the underlying value
-		if (this->Getter) {
-			return this->Getter();
-		} else {
-			return *this->Value;
-		}
-	}
-	
 	void Set(const T &value)
 	{
-		if (this->Setter) {
-			this->Setter(value);
-		} else if (this->Value != nullptr && *this->Value != value) {
-			*this->Value = value;
+		if (this->GetUnderlying().Setter) {
+			this->GetUnderlying().Setter(value);
+		} else if (this->GetUnderlying().Value != nullptr && *this->GetUnderlying().Value != value) {
+			*this->GetUnderlying().Value = value;
 		}
 	}
 	
-	void Add(AdditionArgumentType value)
+	void Add(typename PropertyBase<T>::AdditionArgumentType value)
 	{
-		if (this->Adder) {
-			this->Adder(value);
+		if (this->GetUnderlying().Adder) {
+			this->GetUnderlying().Adder(value);
 		} else {
 			if constexpr(is_specialization_of_v<T, std::vector>) {
 				this->GetModifiable().push_back(value);
 			} else {
-				this->Set(this->Get() + value);
+				this->Set(this->GetUnderlying().Get() + value);
 			}
 		}
 	}
 	
-	void Remove(RemovalArgumentType value)
+	void Remove(typename PropertyBase<T>::RemovalArgumentType value)
 	{
-		if (this->Remover) {
-			this->Remover(value);
+		if (this->GetUnderlying().Remover) {
+			this->GetUnderlying().Remover(value);
 		} else {
 			if constexpr(is_specialization_of_v<T, std::vector>) {
 				this->GetModifiable().erase(std::remove(this->GetModifiable().begin(), this->GetModifiable().end(), value), this->GetModifiable().end());
 			} else {
-				this->Set(this->Get() - value);
+				this->Set(this->GetUnderlying().Get() - value);
 			}
 		}
 	}
 	
-protected:
-	ModifiableReturnType GetModifiable() const
+	typename PropertyBase<T>::ModifiableReturnType GetModifiable() const
 	{
-		if constexpr(std::is_reference_v<ReturnType>) {
-			return const_cast<ModifiableReturnType>(this->Get());
+		if constexpr(std::is_reference_v<typename PropertyBase<T>::ReturnType>) {
+			return const_cast<typename PropertyBase<T>::ModifiableReturnType>(this->GetUnderlying().Get());
 		} else {
-			return this->Get();
+			return this->GetUnderlying().Get();
 		}
 	}
-	
-	T *Value = nullptr;
-	GetterType Getter;
-	SetterType Setter;
-	AdderType Adder;
-	RemoverType Remover;
 };
 
-template <typename T>
-class ProtectedPropertyBase : protected PropertyBase<T>
+template <typename T, typename U>
+class ReadablePropertyBase : public CRTP<U, ReadablePropertyBase<T, U>>
 {
 protected:
-	ProtectedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(value, getter, setter, adder, remover)
-	{
-	}
-	
-	ProtectedPropertyBase(const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(getter, setter, adder, remover)
-	{
-	}
-	
+	ReadablePropertyBase() {}
+
 public:
-	ReturnType Get() const
-	{
-		//get the underlying value
-		return PropertyBase<T>::Get();
-	}
-	
-	PointerType operator ->() const
-	{
-		if constexpr(std::is_pointer_v<T>) {
-			return this->Get();
-		} else if constexpr(!is_fundamental_v<T>) {
-			return &this->Get();
-		} else {
-			return nullptr;
-		}
-	}
-	
-	operator ReturnType() const
-	{
-		return this->Get();
-	}
-	
 	bool operator ==(const T &rhs) const
 	{
-		return this->Get() == rhs;
+		return this->GetUnderlying().Get() == rhs;
 	}
 	
 	bool operator ==(const PropertyBase<T> &rhs) const
@@ -395,7 +355,7 @@ public:
 	
 	bool operator <(const T &rhs) const
 	{
-		return this->Get() < rhs;
+		return this->GetUnderlying().Get() < rhs;
 	}
 	
 	bool operator <(const PropertyBase<T> &rhs) const
@@ -405,7 +365,7 @@ public:
 	
 	T operator +(const T &rhs)
 	{
-		return this->Get() + rhs;
+		return this->GetUnderlying().Get() + rhs;
 	}
 	
 	T operator +(const PropertyBase<T> &rhs)
@@ -415,7 +375,7 @@ public:
 	
 	T operator -(const T &rhs)
 	{
-		return this->Get() - rhs;
+		return this->GetUnderlying().Get() - rhs;
 	}
 	
 	T operator -(const PropertyBase<T> &rhs)
@@ -425,7 +385,7 @@ public:
 	
 	T operator *(const T &rhs)
 	{
-		return this->Get() * rhs;
+		return this->GetUnderlying().Get() * rhs;
 	}
 	
 	T operator *(const PropertyBase<T> &rhs)
@@ -435,13 +395,124 @@ public:
 	
 	T operator /(const T &rhs)
 	{
-		return this->Get() / rhs;
+		return this->GetUnderlying().Get() / rhs;
 	}
 	
 	T operator /(const PropertyBase<T> &rhs)
 	{
 		return *this / rhs.Get();
 	}
+};
+
+template <typename T>
+class ProtectedPropertyBase : public PropertyBase<T>, protected ModifiablePropertyBase<T, ProtectedPropertyBase<T>>, public ReadablePropertyBase<T, ProtectedPropertyBase<T>>
+{
+protected:
+	ProtectedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(value, getter, setter, adder, remover)
+	{
+	}
+	
+	ProtectedPropertyBase(const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(getter, setter, adder, remover)
+	{
+	}
+
+protected:
+	ModifiablePointerType operator ->()
+	{
+		if constexpr(!is_fundamental_v<T>) {
+			return &this->Get();
+		} else {
+			return nullptr;
+		}
+	}
+	
+public:
+	PointerType operator ->() const
+	{
+		if constexpr(!is_fundamental_v<T>) {
+			return &this->Get();
+		} else {
+			return nullptr;
+		}
+	}
+	
+	operator ReturnType() const
+	{
+		return this->Get();
+	}
+	
+private:
+	virtual const PropertyBase<T> &operator =(const std::string &rhs) override
+	{
+		return ModifiablePropertyBase<T, ProtectedPropertyBase<T>>::operator =(rhs);
+	}
+	
+	virtual const PropertyBase<T> &operator +=(const std::string &rhs) override
+	{
+		return ModifiablePropertyBase<T, ProtectedPropertyBase<T>>::operator +=(rhs);
+	}
+
+	virtual const PropertyBase<T> &operator -=(const std::string &rhs) override
+	{
+		return ModifiablePropertyBase<T, ProtectedPropertyBase<T>>::operator -=(rhs);
+	}
+	
+	friend ModifiablePropertyBase<T, ProtectedPropertyBase<T>>;
+	friend ReadablePropertyBase<T, ProtectedPropertyBase<T>>;
+};
+
+template <typename T>
+class ProtectedPropertyBase<T *> : public PropertyBase<T *>, protected ModifiablePropertyBase<T *, ProtectedPropertyBase<T *>>, public ReadablePropertyBase<T *, ProtectedPropertyBase<T *>>
+{
+public:
+	using ValueType = typename PropertyBase<T *>::ValueType;
+	using PointerType = typename PropertyBase<T *>::PointerType;
+	using ReturnType = typename PropertyBase<T *>::ReturnType;
+	using ArgumentType = typename PropertyBase<T *>::ArgumentType;
+	using GetterType = typename PropertyBase<T *>::GetterType;
+	using SetterType = typename PropertyBase<T *>::SetterType;
+	
+	using AdderType = typename PropertyBase<T *>::AdderType;
+	using RemoverType = typename PropertyBase<T *>::RemoverType;
+	
+protected:
+	ProtectedPropertyBase(const ValueType &value, const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(value, getter, setter, adder, remover)
+	{
+	}
+	
+	ProtectedPropertyBase(const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(getter, setter, adder, remover)
+	{
+	}
+
+public:
+	PointerType operator ->() const
+	{
+		return this->Get();
+	}
+	
+	operator ReturnType() const
+	{
+		return this->Get();
+	}
+	
+private:
+	virtual const PropertyBase<ValueType> &operator =(const std::string &rhs) override
+	{
+		return ModifiablePropertyBase<ValueType, ProtectedPropertyBase<ValueType>>::operator =(rhs);
+	}
+	
+	virtual const PropertyBase<ValueType> &operator +=(const std::string &rhs) override
+	{
+		return ModifiablePropertyBase<ValueType, ProtectedPropertyBase<ValueType>>::operator +=(rhs);
+	}
+
+	virtual const PropertyBase<ValueType> &operator -=(const std::string &rhs) override
+	{
+		return ModifiablePropertyBase<ValueType, ProtectedPropertyBase<ValueType>>::operator -=(rhs);
+	}
+	
+	friend ModifiablePropertyBase<ValueType, ProtectedPropertyBase<ValueType>>;
+	friend ReadablePropertyBase<ValueType, ProtectedPropertyBase<ValueType>>;
 };
 
 template <typename T, typename O>
@@ -504,16 +575,16 @@ public:
 template <typename T, typename O>
 class Property<std::vector<T>, O> : public ProtectedPropertyBase<std::vector<T>>
 {
-	using ValueType = std::vector<T>;
-	using ReturnType = const std::vector<T> &;
-	using ArgumentType = const std::vector<T> &;
-	using GetterType = std::function<ReturnType()>;
-	using SetterType = std::function<void(ArgumentType)>;
+	using ValueType = typename PropertyBase<std::vector<T>>::ValueType;
+	using ReturnType = typename PropertyBase<std::vector<T>>::ReturnType;
+	using ArgumentType = typename PropertyBase<std::vector<T>>::ArgumentType;
+	using GetterType = typename PropertyBase<std::vector<T>>::GetterType;
+	using SetterType = typename PropertyBase<std::vector<T>>::SetterType;
 	
-	using AdditionArgumentType = const T &;
-	using RemovalArgumentType = const T &;
-	using AdderType = std::function<void(AdditionArgumentType)>;
-	using RemoverType = std::function<void(RemovalArgumentType)>;
+	using AdditionArgumentType = typename PropertyBase<std::vector<T>>::AdditionArgumentType;
+	using RemovalArgumentType = typename PropertyBase<std::vector<T>>::RemovalArgumentType;
+	using AdderType = typename PropertyBase<std::vector<T>>::AdderType;
+	using RemoverType = typename PropertyBase<std::vector<T>>::RemoverType;
 	
 private:
 	Property(const std::vector<T> &value, const GetterType &getter, const AdderType &adder = nullptr, const RemoverType &remover = nullptr) : ProtectedPropertyBase(value, getter, nullptr, adder, remover)
@@ -588,35 +659,32 @@ private:
 };
 
 template <typename T>
-class ExposedPropertyBase : public PropertyBase<T>
+class ExposedPropertyBase : public PropertyBase<T>, public ModifiablePropertyBase<T, ExposedPropertyBase<T>>, public ReadablePropertyBase<T, ExposedPropertyBase<T>>
 {
 protected:
-	ExposedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(getter, setter, adder, remover)
+	ExposedPropertyBase(const T &value, const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(value, getter, setter, adder, remover)
 	{
-		this->Value = new T;
-		*(this->Value) = value;
 	}
 	
 	ExposedPropertyBase(const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : PropertyBase(getter, setter, adder, remover)
 	{
 	}
-	
+
 public:
-	ModifiableReturnType Get() const
-	{
-		//get the underlying value
-		return PropertyBase<T>::GetModifiable();
-	}
-	
 	ModifiablePointerType operator ->()
 	{
 		if constexpr(std::is_pointer_v<T>) {
-			return this->Get();
+			return this->GetModifiable();
 		} else if constexpr(!is_fundamental_v<T>) {
-			return &this->Get();
+			return &this->GetModifiable();
 		} else {
 			return nullptr;
 		}
+	}
+	
+	operator ModifiableReturnType()
+	{
+		return this->GetModifiable();
 	}
 	
 	PointerType operator ->() const
@@ -630,80 +698,29 @@ public:
 		}
 	}
 	
-	operator ModifiableReturnType() const
+	operator ReturnType() const
 	{
 		return this->Get();
 	}
 	
-	bool operator ==(const T &rhs) const
+private:
+	virtual const PropertyBase<T> &operator =(const std::string &rhs) override
 	{
-		return this->Get() == rhs;
+		return ModifiablePropertyBase<T, ExposedPropertyBase<T>>::operator =(rhs);
 	}
 	
-	bool operator ==(const PropertyBase<T> &rhs) const
+	virtual const PropertyBase<T> &operator +=(const std::string &rhs) override
 	{
-		return *this == rhs.Get();
+		return ModifiablePropertyBase<T, ExposedPropertyBase<T>>::operator +=(rhs);
+	}
+
+	virtual const PropertyBase<T> &operator -=(const std::string &rhs) override
+	{
+		return ModifiablePropertyBase<T, ExposedPropertyBase<T>>::operator -=(rhs);
 	}
 	
-	bool operator !=(const T &rhs) const
-	{
-		return !(*this == rhs);
-	}
-	
-	bool operator !=(const PropertyBase<T> &rhs) const
-	{
-		return *this != rhs.Get();
-	}
-	
-	bool operator <(const T &rhs) const
-	{
-		return this->Get() < rhs;
-	}
-	
-	bool operator <(const PropertyBase<T> &rhs) const
-	{
-		return *this < rhs.Get();
-	}
-	
-	T operator +(const T &rhs)
-	{
-		return this->Get() + rhs;
-	}
-	
-	T operator +(const PropertyBase<T> &rhs)
-	{
-		return *this + rhs.Get();
-	}
-	
-	T operator -(const T &rhs)
-	{
-		return this->Get() - rhs;
-	}
-	
-	T operator -(const PropertyBase<T> &rhs)
-	{
-		return *this - rhs.Get();
-	}
-	
-	T operator *(const T &rhs)
-	{
-		return this->Get() * rhs;
-	}
-	
-	T operator *(const PropertyBase<T> &rhs)
-	{
-		return *this * rhs.Get();
-	}
-	
-	T operator /(const T &rhs)
-	{
-		return this->Get() / rhs;
-	}
-	
-	T operator /(const PropertyBase<T> &rhs)
-	{
-		return *this / rhs.Get();
-	}
+	friend ModifiablePropertyBase<T, ExposedPropertyBase<T>>;
+	friend ReadablePropertyBase<T, ExposedPropertyBase<T>>;
 };
 
 /**
@@ -730,7 +747,7 @@ private:
 	}
 	
 public:
-	const ExposedPropertyBase<T> &operator =(const T &rhs)
+	const PropertyBase<T> &operator =(const T &rhs)
 	{
 		this->Set(rhs);
 		return *this;
@@ -760,18 +777,18 @@ private:
 	}
 	
 public:
-	const ExposedPropertyBase<String> &operator =(const String &rhs)
+	const PropertyBase<String> &operator =(const String &rhs)
 	{
 		this->Set(rhs);
 		return *this;
 	}
 	
-	const ExposedPropertyBase<String> &operator =(const char *rhs)
+	const PropertyBase<String> &operator =(const char *rhs)
 	{
 		return *this = String(rhs);
 	}
 	
-	const ExposedPropertyBase<String> &operator =(const std::string &rhs)
+	const PropertyBase<String> &operator =(const std::string &rhs)
 	{
 		return *this = rhs.c_str();
 	}
@@ -792,16 +809,16 @@ public:
 template <typename T, typename O>
 class ExposedProperty<std::vector<T>, O> : public ExposedPropertyBase<std::vector<T>>
 {
-	using ValueType = std::vector<T>;
-	using ReturnType = const std::vector<T> &;
-	using ArgumentType = const std::vector<T> &;
-	using GetterType = std::function<ReturnType()>;
-	using SetterType = std::function<void(ArgumentType)>;
+	using ValueType = typename PropertyBase<std::vector<T>>::ValueType;
+	using ReturnType = typename PropertyBase<std::vector<T>>::ReturnType;
+	using ArgumentType = typename PropertyBase<std::vector<T>>::ArgumentType;
+	using GetterType = typename PropertyBase<std::vector<T>>::GetterType;
+	using SetterType = typename PropertyBase<std::vector<T>>::SetterType;
 	
-	using AdditionArgumentType = const T &;
-	using RemovalArgumentType = const T &;
-	using AdderType = std::function<void(AdditionArgumentType)>;
-	using RemoverType = std::function<void(RemovalArgumentType)>;
+	using AdditionArgumentType = typename PropertyBase<std::vector<T>>::AdditionArgumentType;
+	using RemovalArgumentType = typename PropertyBase<std::vector<T>>::RemovalArgumentType;
+	using AdderType = typename PropertyBase<std::vector<T>>::AdderType;
+	using RemoverType = typename PropertyBase<std::vector<T>>::RemoverType;
 	
 private:
 	ExposedProperty(const std::vector<T> &value, const GetterType &getter, const AdderType &adder = nullptr, const RemoverType &remover = nullptr) : ExposedPropertyBase(value, getter, nullptr, adder, remover)
@@ -863,12 +880,12 @@ public:
 	
 	typename std::vector<T>::iterator begin()
 	{
-		return this->Get().begin();
+		return this->GetModifiable().begin();
 	}
 	
 	typename std::vector<T>::iterator end()
 	{
-		return this->Get().end();
+		return this->GetModifiable().end();
 	}
 	
 	friend O;
