@@ -38,12 +38,6 @@
 #include <core/ustring.h>
 
 /*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-struct lua_State;
-
-/*----------------------------------------------------------------------------
 --  Definition
 ----------------------------------------------------------------------------*/
 
@@ -86,8 +80,6 @@ private:
 	int Number = -1;				/// the number of the page
 	CLiteraryTextPage *PreviousPage = nullptr;	/// the previous page
 	CLiteraryTextPage *NextPage = nullptr;	/// the next page
-	
-	friend int CclDefineText(lua_State *l);
 	
 protected:
 	static void _bind_methods();

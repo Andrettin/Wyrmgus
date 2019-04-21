@@ -36,7 +36,6 @@
 
 #include "data_element.h"
 #include "data_type.h"
-#include "property.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -44,7 +43,6 @@
 
 class CIcon;
 class CLiteraryTextPage;
-struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -65,20 +63,8 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		REGISTER_PROPERTY(Hidden);
-		REGISTER_PROPERTY(Author);
-		REGISTER_PROPERTY(Translator);
-		REGISTER_PROPERTY(Publisher);
-		REGISTER_PROPERTY(License);
-		REGISTER_PROPERTY(Notes);
-		REGISTER_PROPERTY(PublicationYear);
-		REGISTER_PROPERTY(InitialPageNumber);
-		REGISTER_PROPERTY(PageNumberingEnabled);
-		REGISTER_PROPERTY(LowercaseRomanNumeralPageNumbering);
 		REGISTER_PROPERTY(Icon);
 		REGISTER_PROPERTY(Sections);
-		
-		PropertyGetterPrefixes["lowercase_roman_numeral_page_numbering"] = "has";
 		
 		return true;
 	}
@@ -156,16 +142,16 @@ private:
 	void UpdateSectionPageNumbers() const;
 
 public:
-	Property<bool> Hidden = false;	/// whether the literary text is hidden
-	Property<String> Author;		/// author of the literary text
-	Property<String> Translator;	/// translator of the literary text
-	Property<String> Publisher;		/// publisher of the literary text
-	Property<String> License;		/// the open-source license the literary text is under, or public domain if that's the case
-	Property<String> Notes;			/// notes to appear on the cover of the literary text
-	Property<int> PublicationYear = 0;	/// year of publication
-	Property<int> InitialPageNumber = 0;	/// page number in which the literary text begins
-	Property<bool> PageNumberingEnabled = true;	/// whether page numbering is enabled for the literary text
-	Property<bool> LowercaseRomanNumeralPageNumbering = false;	/// whether page numbering should be depicted by lowercase Roman numerals
+	bool Hidden = false;	/// whether the literary text is hidden
+	String Author;			/// author of the literary text
+	String Translator;		/// translator of the literary text
+	String Publisher;		/// publisher of the literary text
+	String License;			/// the open-source license the literary text is under, or public domain if that's the case
+	String Notes;			/// notes to appear on the cover of the literary text
+	int PublicationYear = 0;	/// year of publication
+	int InitialPageNumber = 0;	/// page number in which the literary text begins
+	bool PageNumberingEnabled = true;	/// whether page numbering is enabled for the literary text
+	bool LowercaseRomanNumeralPageNumbering = false;	/// whether page numbering should be depicted by lowercase Roman numerals
 	Property<CIcon *> Icon {		/// the literary text's icon
 		Property<CIcon *>::ValueType(nullptr),
 		Property<CIcon *>::GetterType([this]() -> Property<CIcon *>::ReturnType {
@@ -185,9 +171,6 @@ private:
 	CLiteraryText *PreviousSection = nullptr;	/// the previous section to this one, if this is a section
 	CLiteraryText *NextSection = nullptr;	/// the next section to this one, if this is a section
 	std::vector<CLiteraryTextPage *> Pages;	/// pages of the literary text
-	
-public:
-	friend int CclDefineText(lua_State *l);
 	
 protected:
 	static void _bind_methods();
