@@ -5,6 +5,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <core/ustring.h>
 #include <scene/main/node.h>
 
 /*----------------------------------------------------------------------------
@@ -45,10 +46,16 @@ public:
 		return this->OamlModule;
 	}
 	
+	const String &GetUserDirectory() const
+	{
+		return this->UserDirectory;
+	}
+	
 	String NumberToRomanNumeral(const unsigned number) const;
 
 private:
 	oamlGodotModule *OamlModule = nullptr;
+	String UserDirectory;
 	
 protected:
 	static void _bind_methods();

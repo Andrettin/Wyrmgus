@@ -104,6 +104,7 @@
 //Wyrmgus start
 #include "world/province.h"
 //Wyrmgus end
+#include "wyrmgus.h"
 
 #include <png.h>
 
@@ -2315,6 +2316,17 @@ static int CclGetStratagusHomepage(lua_State *l)
 	return 1;
 }
 
+
+/**
+**	@brief	Get user directory
+*/
+static int CclGetUserDirectory(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushstring(l, Wyrmgus::GetInstance()->GetUserDirectory().utf8().get_data());
+	return 1;
+}
+
 /**
 **  Load the SavedGameInfo Header
 **
@@ -2378,6 +2390,7 @@ void LuaRegisterModules()
 
 	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
 	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);
+	lua_register(Lua, "GetUserDirectory", CclGetUserDirectory);
 
 	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
 

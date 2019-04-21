@@ -76,6 +76,10 @@ void Wyrmgus::_bind_methods()
 	
 	ClassDB::bind_method(D_METHOD("set_oaml_module", "oaml_module"), &Wyrmgus::SetOamlModule);
 	
+	ClassDB::bind_method(D_METHOD("set_user_directory", "user_directory"), [](Wyrmgus *wyrmgus, const String &user_directory){ wyrmgus->UserDirectory = user_directory; });
+	ClassDB::bind_method(D_METHOD("get_user_directory"), &Wyrmgus::GetUserDirectory);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "user_directory"), "set_user_directory", "get_user_directory");
+	
 	ClassDB::bind_method(D_METHOD("get_hair_color", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CHairColor::Get(ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_player_color", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CPlayerColor::Get(ident.utf8().get_data()); });
 	ClassDB::bind_method(D_METHOD("get_skin_color", "ident"), [](const Wyrmgus *wyrmgus, const String &ident){ return CSkinColor::Get(ident.utf8().get_data()); });
