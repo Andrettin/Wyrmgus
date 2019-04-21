@@ -48,6 +48,8 @@
 #include "commands.h"
 #include "config.h"
 #include "config_operator.h"
+#include "dependency/and_dependency.h"
+#include "dependency/dependency.h"
 #include "dynasty.h"
 //Wyrmgus start
 #include "editor/editor.h"
@@ -84,7 +86,6 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade_modifier.h"
 #include "util.h"
 

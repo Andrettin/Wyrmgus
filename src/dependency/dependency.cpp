@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name depend.cpp - The dependencies source file */
+/**@name dependency.cpp - The dependency source file */
 //
 //      (c) Copyright 2000-2019 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, Pali Rohár and Andrettin
@@ -34,20 +34,20 @@
 
 #include "stratagus.h"
 
-#include "upgrade/dependency.h"
+#include "dependency/dependency.h"
 
-#include "age.h"
-#include "character.h"
 #include "config.h"
 #include "config_operator.h"
+#include "dependency/and_dependency.h"
+#include "dependency/not_dependency.h"
+#include "dependency/or_dependency.h"
+#include "dependency/unit_type_dependency.h"
+#include "dependency/upgrade_dependency.h"
 #include "faction.h"
 #include "game/trigger.h"
-#include "map/map.h"
-#include "map/map_layer.h"
 #include "player.h"
 #include "religion/deity.h"
 #include "script.h"
-#include "time/season.h"
 #include "translate.h"
 #include "ui/button_action.h"
 #include "ui/interface.h"
@@ -98,332 +98,6 @@ bool CDependency::Check(const CUnit *unit, bool ignore_units) const
 	return this->Check(unit->Player, ignore_units);
 }
 
-void CAndDependency::ProcessConfigDataSection(const CConfigData *section)
-{
-	CDependency *dependency = nullptr;
-	if (section->Tag == "and") {
-		dependency = new CAndDependency;
-	} else if (section->Tag == "or") {
-		dependency = new COrDependency;
-	} else if (section->Tag == "not") {
-		dependency = new CNotDependency;
-	} else if (section->Tag == "unit_type") {
-		dependency = new CUnitTypeDependency;
-	} else if (section->Tag == "upgrade") {
-		dependency = new CUpgradeDependency;
-	} else if (section->Tag == "age") {
-		dependency = new CAgeDependency;
-	} else if (section->Tag == "character") {
-		dependency = new CCharacterDependency;
-	} else if (section->Tag == "season") {
-		dependency = new CSeasonDependency;
-	} else if (section->Tag == "trigger") {
-		dependency = new CTriggerDependency;
-	} else {
-		fprintf(stderr, "Invalid and dependency property: \"%s\".\n", section->Tag.c_str());
-		return;
-	}
-	dependency->ProcessConfigData(section);
-	this->Dependencies.push_back(dependency);
-}
-
-bool CAndDependency::Check(const CPlayer *player, bool ignore_units) const
-{
-	for (const CDependency *dependency : this->Dependencies) {
-		if (!dependency->Check(player, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-bool CAndDependency::Check(const CUnit *unit, bool ignore_units) const
-{
-	for (const CDependency *dependency : this->Dependencies) {
-		if (!dependency->Check(unit, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-void COrDependency::ProcessConfigDataSection(const CConfigData *section)
-{
-	CDependency *dependency = nullptr;
-	if (section->Tag == "and") {
-		dependency = new CAndDependency;
-	} else if (section->Tag == "or") {
-		dependency = new COrDependency;
-	} else if (section->Tag == "not") {
-		dependency = new CNotDependency;
-	} else if (section->Tag == "unit_type") {
-		dependency = new CUnitTypeDependency;
-	} else if (section->Tag == "upgrade") {
-		dependency = new CUpgradeDependency;
-	} else if (section->Tag == "age") {
-		dependency = new CAgeDependency;
-	} else if (section->Tag == "character") {
-		dependency = new CCharacterDependency;
-	} else if (section->Tag == "season") {
-		dependency = new CSeasonDependency;
-	} else if (section->Tag == "trigger") {
-		dependency = new CTriggerDependency;
-	} else {
-		fprintf(stderr, "Invalid or dependency property: \"%s\".\n", section->Tag.c_str());
-		return;
-	}
-	dependency->ProcessConfigData(section);
-	this->Dependencies.push_back(dependency);
-}
-
-bool COrDependency::Check(const CPlayer *player, bool ignore_units) const
-{
-	for (const CDependency *dependency : this->Dependencies) {
-		if (dependency->Check(player, ignore_units)) {
-			return true;
-		}
-	}
-	
-	return false;
-}
-
-bool COrDependency::Check(const CUnit *unit, bool ignore_units) const
-{
-	for (const CDependency *dependency : this->Dependencies) {
-		if (dependency->Check(unit, ignore_units)) {
-			return true;
-		}
-	}
-	
-	return false;
-}
-
-void CNotDependency::ProcessConfigDataSection(const CConfigData *section)
-{
-	CDependency *dependency = nullptr;
-	if (section->Tag == "and") {
-		dependency = new CAndDependency;
-	} else if (section->Tag == "or") {
-		dependency = new COrDependency;
-	} else if (section->Tag == "not") {
-		dependency = new CNotDependency;
-	} else if (section->Tag == "unit_type") {
-		dependency = new CUnitTypeDependency;
-	} else if (section->Tag == "upgrade") {
-		dependency = new CUpgradeDependency;
-	} else if (section->Tag == "age") {
-		dependency = new CAgeDependency;
-	} else if (section->Tag == "character") {
-		dependency = new CCharacterDependency;
-	} else if (section->Tag == "season") {
-		dependency = new CSeasonDependency;
-	} else if (section->Tag == "trigger") {
-		dependency = new CTriggerDependency;
-	} else {
-		fprintf(stderr, "Invalid not dependency property: \"%s\".\n", section->Tag.c_str());
-		return;
-	}
-	dependency->ProcessConfigData(section);
-	this->Dependencies.push_back(dependency);
-}
-
-bool CNotDependency::Check(const CPlayer *player, bool ignore_units) const
-{
-	for (const CDependency *dependency : this->Dependencies) {
-		if (dependency->Check(player, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-bool CNotDependency::Check(const CUnit *unit, bool ignore_units) const
-{
-	for (const CDependency *dependency : this->Dependencies) {
-		if (dependency->Check(unit, ignore_units)) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-void CUnitTypeDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "unit_type") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->UnitType = UnitTypeByIdent(value);
-		if (!this->UnitType) {
-			fprintf(stderr, "Invalid unit type: \"%s\".\n", value.c_str());
-		}
-	} else if (key == "count") {
-		this->Count = std::stoi(value);
-	} else {
-		fprintf(stderr, "Invalid unit type dependency property: \"%s\".\n", key.c_str());
-	}
-}
-
-bool CUnitTypeDependency::Check(const CPlayer *player, bool ignore_units) const
-{
-	if (ignore_units) {
-		return true;
-	}
-	
-	return player->GetUnitTypeCount(this->UnitType) >= this->Count;
-}
-
-std::string CUnitTypeDependency::GetString(const std::string &prefix) const
-{
-	std::string str = prefix + this->UnitType->GetName().utf8().get_data();
-	
-	if (this->Count > 1) {
-		str += '(' + std::to_string(this->Count) + ')';
-	}
-	
-	str += '\n';
-	
-	return str;
-}
-
-void CUpgradeDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "upgrade") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Upgrade = CUpgrade::Get(value);
-		if (!this->Upgrade) {
-			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-		}
-	} else {
-		fprintf(stderr, "Invalid upgrade dependency property: \"%s\".\n", key.c_str());
-	}
-}
-
-bool CUpgradeDependency::Check(const CPlayer *player, bool ignore_units) const
-{
-	return UpgradeIdAllowed(*player, this->Upgrade->ID) == 'R';
-}
-
-bool CUpgradeDependency::Check(const CUnit *unit, bool ignore_units) const
-{
-	return this->Check(unit->Player, ignore_units) || unit->GetIndividualUpgrade(this->Upgrade);
-}
-
-std::string CUpgradeDependency::GetString(const std::string &prefix) const
-{
-	std::string str = prefix + this->Upgrade->GetName().utf8().get_data() + '\n';
-	return str;
-}
-
-void CAgeDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "age") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Age = CAge::Get(value);
-	} else {
-		fprintf(stderr, "Invalid age dependency property: \"%s\".\n", key.c_str());
-	}
-}
-
-bool CAgeDependency::Check(const CPlayer *player, bool ignore_units) const
-{
-	return player->Age == this->Age;
-}
-
-std::string CAgeDependency::GetString(const std::string &prefix) const
-{
-	std::string str = prefix + this->Age->GetName().utf8().get_data() + '\n';
-	return str;
-}
-
-void CCharacterDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "character") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Character = CCharacter::GetCharacter(value);
-	} else {
-		fprintf(stderr, "Invalid character dependency property: \"%s\".\n", key.c_str());
-	}
-}
-
-bool CCharacterDependency::Check(const CPlayer *player, bool ignore_units) const
-{
-	return player->HasHero(this->Character);
-}
-
-bool CCharacterDependency::Check(const CUnit *unit, bool ignore_units) const
-{
-	return unit->Character == this->Character;
-}
-
-std::string CCharacterDependency::GetString(const std::string &prefix) const
-{
-	std::string str = prefix + this->Character->GetFullName() + '\n';
-	return str;
-}
-
-void CSeasonDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "season") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Season = CSeason::Get(value);
-	} else {
-		fprintf(stderr, "Invalid season dependency property: \"%s\".\n", key.c_str());
-	}
-}
-
-bool CSeasonDependency::Check(const CPlayer *player, bool ignore_units) const
-{
-	return CMap::Map.MapLayers[player->StartMapLayer]->GetSeason() == this->Season;
-}
-
-bool CSeasonDependency::Check(const CUnit *unit, bool ignore_units) const
-{
-	return unit->MapLayer->GetSeason() == this->Season;
-}
-
-std::string CSeasonDependency::GetString(const std::string &prefix) const
-{
-	std::string str = prefix + this->Season->GetName().utf8().get_data() + '\n';
-	return str;
-}
-
-void CTriggerDependency::ProcessConfigDataProperty(const std::pair<std::string, std::string> &property)
-{
-	const std::string &key = property.first;
-	std::string value = property.second;
-	if (key == "trigger") {
-		value = FindAndReplaceString(value, "_", "-");
-		this->Trigger = CTrigger::GetTrigger(value);
-	} else {
-		fprintf(stderr, "Invalid trigger dependency property: \"%s\".\n", key.c_str());
-	}
-}
-
-bool CTriggerDependency::Check(const CPlayer *player, bool ignore_units) const
-{
-	//checks whether a trigger has already fired
-	
-	return std::find(CTrigger::DeactivatedTriggers.begin(), CTrigger::DeactivatedTriggers.end(), this->Trigger->Ident) != CTrigger::DeactivatedTriggers.end(); //this works fine for global triggers, but for player triggers perhaps it should check only the player?
-}
-
-std::string CTriggerDependency::GetString(const std::string &prefix) const
-{
-	return std::string();
-}
-
 /**
 **  Check if this upgrade or unit is available.
 **
@@ -465,7 +139,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 	return rules;
 }
 
-bool CheckDependencies(const CUnitType *target, const CPlayer *player, bool ignore_units, bool is_predependency, bool is_neutral_use)
+bool CheckDependencies(const CUnitType *target, const CPlayer *player, const bool ignore_units, const bool is_predependency, const bool is_neutral_use)
 {
 	if (!is_predependency && !CheckDependencies(target, player, ignore_units, true, is_neutral_use)) {
 		return false;
@@ -482,7 +156,7 @@ bool CheckDependencies(const CUnitType *target, const CPlayer *player, bool igno
 	}
 }
 
-bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignore_units, bool is_predependency, bool is_neutral_use)
+bool CheckDependencies(const CUpgrade *target, const CPlayer *player, const bool ignore_units, const bool is_predependency, const bool is_neutral_use)
 {
 	if (!is_predependency && !CheckDependencies(target, player, ignore_units, true, is_neutral_use)) {
 		return false;
@@ -517,7 +191,7 @@ bool CheckDependencies(const CUpgrade *target, const CPlayer *player, bool ignor
 	}
 }
 
-bool CheckDependencies(const CUnitType *target, const CUnit *unit, bool ignore_units, bool is_predependency)
+bool CheckDependencies(const CUnitType *target, const CUnit *unit, const bool ignore_units, const bool is_predependency)
 {
 	if (!is_predependency && !CheckDependencies(target, unit, ignore_units, true)) {
 		return false;
@@ -534,7 +208,7 @@ bool CheckDependencies(const CUnitType *target, const CUnit *unit, bool ignore_u
 	}
 }
 
-bool CheckDependencies(const CUpgrade *target, const CUnit *unit, bool ignore_units, bool is_predependency)
+bool CheckDependencies(const CUpgrade *target, const CUnit *unit, const bool ignore_units, const bool is_predependency)
 {
 	if (!is_predependency && !CheckDependencies(target, unit, ignore_units, true)) {
 		return false;

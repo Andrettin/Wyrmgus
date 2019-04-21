@@ -46,6 +46,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
+#include "dependency/dependency.h"
 #include "economy/resource.h"
 #include "editor/editor.h"
 #include "faction.h"
@@ -93,7 +94,6 @@
 #include "unit/unit_class.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 //Wyrmgus start
 #include "util.h"

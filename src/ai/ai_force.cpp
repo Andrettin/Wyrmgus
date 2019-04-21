@@ -40,6 +40,7 @@
 #include "action/action_board.h"
 #include "ai/force_template.h"
 #include "commands.h"
+#include "dependency/dependency.h"
 #include "faction.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -49,7 +50,6 @@
 #include "unit/unit_class.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 
 /*----------------------------------------------------------------------------
 --  Types

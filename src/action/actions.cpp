@@ -63,6 +63,7 @@
 
 #include "animation/animation_die.h"
 #include "commands.h"
+#include "dependency/dependency.h"
 #include "luacallback.h"
 #include "map/map.h"
 #include "map/map_layer.h"
@@ -78,7 +79,6 @@
 #include "unit/unit_find.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

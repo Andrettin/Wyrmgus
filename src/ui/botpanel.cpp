@@ -47,6 +47,7 @@
 //Wyrmgus end
 #include "civilization.h"
 #include "commands.h"
+#include "dependency/dependency.h"
 #include "faction.h"
 #include "game/trigger.h"
 //Wyrmgus start
@@ -83,7 +84,6 @@
 //Wyrmgus end
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "video/font.h"
 #include "video/video.h"

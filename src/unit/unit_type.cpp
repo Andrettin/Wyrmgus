@@ -45,6 +45,8 @@
 #include "config.h"
 #include "config_operator.h"
 #include "construct.h"
+#include "dependency/and_dependency.h"
+#include "dependency/dependency.h"
 //Wyrmgus start
 #include "editor/editor.h" //for personal name generation
 //Wyrmgus end
@@ -71,7 +73,6 @@
 #include "ui/ui.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type_variation.h"
-#include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end

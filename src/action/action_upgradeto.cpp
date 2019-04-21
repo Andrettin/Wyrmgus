@@ -38,6 +38,7 @@
 #include "ai/ai.h"
 #include "animation/animation.h"
 #include "civilization.h"
+#include "dependency/dependency.h"
 #include "faction.h"
 //Wyrmgus start
 #include "game/game.h"
@@ -54,7 +55,6 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end

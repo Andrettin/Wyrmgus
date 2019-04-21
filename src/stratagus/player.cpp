@@ -47,6 +47,7 @@
 #include "civilization.h"
 #include "commands.h" //for faction setting
 //Wyrmgus end
+#include "dependency/dependency.h"
 #include "dynasty.h"
 #include "economy/currency.h"
 //Wyrmgus start
@@ -95,7 +96,6 @@
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
 //Wyrmgus end
-#include "upgrade/dependency.h"
 //Wyrmgus start
 #include "upgrade/upgrade.h"
 //Wyrmgus end

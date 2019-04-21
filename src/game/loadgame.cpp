@@ -38,6 +38,7 @@
 #include "character.h"
 #include "commands.h"
 #include "construct.h"
+#include "dependency/dependency.h"
 #include "game/replay.h"
 #include "game/trigger.h"
 //Wyrmgus start
@@ -65,7 +66,6 @@
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "video/font.h"
 #include "video/video.h"

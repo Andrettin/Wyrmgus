@@ -40,6 +40,7 @@
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
 //Wyrmgus end
+#include "dependency/dependency.h"
 #include "network/network.h"
 #include "player.h"
 #include "script.h"
@@ -47,7 +48,6 @@
 #include "ui/interface.h"
 #include "unit/unit.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 
 #include <stdio.h>

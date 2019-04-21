@@ -36,6 +36,8 @@
 #include "game/trigger.h"
 
 #include "config.h"
+#include "dependency/and_dependency.h"
+#include "dependency/dependency.h"
 #include "game/trigger_effect.h"
 #include "iolib.h"
 //Wyrmgus start
@@ -53,7 +55,6 @@
 #include "unit/unit.h"
 #include "unit/unit_find.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -143,6 +143,7 @@
 #include "action/action_attack.h"
 #include "civilization.h"
 #include "commands.h"
+#include "dependency/dependency.h"
 //Wyrmgus start
 #include "editor/editor.h"
 //Wyrmgus end
@@ -171,7 +172,6 @@
 //Wyrmgus end
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 
 /*----------------------------------------------------------------------------

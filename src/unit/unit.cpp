@@ -50,6 +50,7 @@
 #include "civilization.h"
 #include "commands.h"
 #include "construct.h"
+#include "dependency/dependency.h"
 #include "faction.h"
 #include "game/game.h"
 #include "editor/editor.h"
@@ -91,7 +92,6 @@
 #include "unit/unit_type.h"
 #include "unit/unit_type_variation.h"
 #include "unit/variable.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "upgrade/upgrade_modifier.h"
 //Wyrmgus start

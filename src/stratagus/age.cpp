@@ -37,12 +37,13 @@
 
 #include "config.h"
 #include "config_operator.h"
+#include "dependency/and_dependency.h"
+#include "dependency/dependency.h"
 #include "game/game.h"
 #include "mod.h"
 #include "player.h"
 #include "time/calendar.h"
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade_structs.h"
 #include "video/video.h"
 

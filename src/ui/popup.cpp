@@ -35,6 +35,7 @@
 
 #include "ui/popup.h"
 
+#include "dependency/dependency.h"
 #include "game/trigger.h"
 #include "item/item_class.h"
 #include "player.h"
@@ -52,7 +53,6 @@
 #include "unit/unit_manager.h"
 //Wyrmgus end
 #include "unit/unit_type.h"
-#include "upgrade/dependency.h"
 #include "upgrade/upgrade.h"
 #include "video/font.h"
 #include "video/video.h"
