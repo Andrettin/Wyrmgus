@@ -60,57 +60,13 @@ void DataElement::ProcessConfigData(const CConfigData *config_data)
 		fprintf(stderr, "Data element \"%s\" is being redefined.\n", this->Ident.c_str());
 	}
 	
-	List<PropertyInfo> property_list;
-	this->get_property_list(&property_list);
-	Map<StringName, PropertyInfo> properties_by_name;
-	for (List<PropertyInfo>::Element *element = property_list.front(); element != nullptr; element = element->next()) {
-		const PropertyInfo &property_info = element->get();
-		properties_by_name[property_info.name] = property_info;
-	}
-	
 	for (const CConfigProperty &config_property : config_data->Properties) {
-		Map<StringName, PropertyInfo>::Element *element = properties_by_name.find(config_property.Key.c_str());
-		if (element == nullptr) {
-			element = properties_by_name.find(("_" + config_property.Key).c_str());
-		}
-		
-		if (element != nullptr) {
-			const PropertyInfo &property_info = element->get();
-			bool ok;
-			Variant property_value;
-			if (property_info.type == Variant::STRING) {
-				if (config_property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for string property \"%s\": %i.\n", config_property.Key.c_str(), config_property.Operator);
-					continue;
-				}
-				
-				property_value = Variant(String(config_property.Value.c_str()));
-			} else if (property_info.type == Variant::INT) {
-				if (config_property.Operator == CConfigOperator::Assignment) {
-					property_value = Variant(std::stoi(config_property.Value));
-				} else if (config_property.Operator == CConfigOperator::Addition) {
-					property_value = Variant(int(this->get(property_info.name)) + std::stoi(config_property.Value));
-				} else if (config_property.Operator == CConfigOperator::Subtraction) {
-					property_value = Variant(int(this->get(property_info.name)) - std::stoi(config_property.Value));
-				}
-			} else if (property_info.type == Variant::BOOL) {
-				if (config_property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for boolean property \"%s\": %i.\n", config_property.Key.c_str(), config_property.Operator);
-					continue;
-				}
-				
-				property_value = Variant(StringToBool(config_property.Value));
-			} else {
-				fprintf(stderr, "Failed to set %s property \"%s\", as the variant type of the property is neither string, nor integer, nor boolean.\n", config_data->Tag.c_str(), config_property.Key.c_str());
+		try {
+			if (config_property.Process(*this)) {
 				continue;
 			}
-			
-			this->set(property_info.name, property_value, &ok);
-			if (!ok) {
-				fprintf(stderr, "Failed to set %s property \"%s\" to \"%s\".\n", config_data->Tag.c_str(), config_property.Key.c_str(), config_property.Value.c_str());
-			}
-			
-			continue;
+		} catch (std::exception &exception) {
+			fprintf(stderr, "%s\n", exception.what());
 		}
 		
 		PropertyCommonBase *property = this->GetProperty(config_property.Key);

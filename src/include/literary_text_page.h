@@ -53,8 +53,6 @@ public:
 		}
 	}
 
-	void ProcessConfigData(const CConfigData *config_data);
-	
 	const String &GetText() const
 	{
 		return this->Text;

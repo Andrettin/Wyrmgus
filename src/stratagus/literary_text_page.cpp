@@ -41,33 +41,6 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**	@brief	Process data provided by a configuration file
-**
-**	@param	config_data	The configuration data
-*/
-void CLiteraryTextPage::ProcessConfigData(const CConfigData *config_data)
-{
-	for (const CConfigProperty &property : config_data->Properties) {
-		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
-			continue;
-		}
-		
-		std::string key = property.Key;
-		std::string value = property.Value;
-		
-		if (key == "text") {
-			value = FindAndReplaceString(value, "_", "-");
-			this->Text = value.c_str();
-		} else if (key == "number") { // override the number given in the constructor
-			this->Number = std::stoi(value);
-		} else {
-			fprintf(stderr, "Invalid literary text property: \"%s\".\n", key.c_str());
-		}
-	}
-}
-
 void CLiteraryTextPage::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("set_text", "text"), [](CLiteraryTextPage *page, const String &text){ page->Text = text; });
