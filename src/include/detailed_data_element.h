@@ -64,10 +64,6 @@ private:
 	*/
 	static inline bool InitializeClass()
 	{
-		REGISTER_PROPERTY(Hidden);
-		REGISTER_PROPERTY(Description);
-		REGISTER_PROPERTY(Quote);
-		REGISTER_PROPERTY(Background);
 		REGISTER_PROPERTY(Icon);
 		
 		return true;
@@ -76,11 +72,34 @@ private:
 	static inline bool ClassInitialized = InitializeClass();
 	
 public:
-	Property<bool, DetailedDataElement> Hidden = false;			/// whether the data element is hidden
-	ExposedProperty<String, DetailedDataElement> Description;	/// the description of the data element from an in-game universe perspective
-	ExposedProperty<String, DetailedDataElement> Quote;			/// a quote relating to the data element
-	ExposedProperty<String, DetailedDataElement> Background;	/// the background of the data element, a description from a perspective outside of the game's universe
-	Property<CIcon *, DetailedDataElement> Icon = nullptr;		/// the icon of the data element
+	bool IsHidden() const
+	{
+		return this->Hidden;
+	}
+	
+	const String &GetDescription() const
+	{
+		return this->Description;
+	}
+	
+	const String &GetQuote() const
+	{
+		return this->Quote;
+	}
+	
+	const String &GetBackground() const
+	{
+		return this->Background;
+	}
+	
+private:
+	bool Hidden = false;	/// whether the data element is hidden
+protected: //these are protected because lua functions still use them
+	String Description;		/// the description of the data element from an in-game universe perspective
+	String Quote;			/// a quote relating to the data element
+	String Background;		/// the background of the data element, a description from a perspective outside of the game's universe
+public:
+	Property<CIcon *, DetailedDataElement> Icon = nullptr;	/// the icon of the data element
 	
 protected:
 	static void _bind_methods();

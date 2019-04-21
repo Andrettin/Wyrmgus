@@ -331,7 +331,7 @@
 				}
 			}
 			popupWidth += font.Width(spell->ManaCost);
-			popupWidth = std::max<int>(popupWidth, font.Width(spell->Name.utf8().get_data()) + 10);
+			popupWidth = std::max<int>(popupWidth, font.Width(spell->GetName().utf8().get_data()) + 10);
 		} else {
 			//Wyrmgus start
 //			popupWidth = font.Width(button.Hint) + 10;

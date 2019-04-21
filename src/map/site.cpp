@@ -239,5 +239,5 @@ std::string CSite::GetCulturalName(const CCivilization *civilization) const
 		}
 	}
 	
-	return this->Name.utf8().get_data();
+	return this->GetName().utf8().get_data();
 }

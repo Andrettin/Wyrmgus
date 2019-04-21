@@ -234,7 +234,7 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 
 	std::string work_name;
 	if (work != nullptr) {
-		work_name = work->Name.utf8().get_data();
+		work_name = work->GetName().utf8().get_data();
 	} else {
 		work_name = province->GenerateWorkName();
 		if (work_name.empty()) {
@@ -249,7 +249,7 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 	if (province->Owner == GrandStrategyGame.PlayerFaction || work != nullptr) { // only show foreign works that are predefined
 		std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work_name + "\", \"";
 		if (author != nullptr) {
-			work_creation_message += "The " + FullyDecapitalizeString(author->Type->Name.utf8().get_data()) + " " + author->GetFullName() + " ";
+			work_creation_message += "The " + FullyDecapitalizeString(author->Type->GetName().utf8().get_data()) + " " + author->GetFullName() + " ";
 		} else {
 			work_creation_message += "A sage ";
 		}
@@ -764,10 +764,10 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 			}
 			new_minister_message += this->Ministers[title]->GetFullName() + "!\\n\\n";
 			new_minister_message += "Type: ";
-			new_minister_message += this->Ministers[title]->Type->Name.utf8().get_data();
+			new_minister_message += this->Ministers[title]->Type->GetName().utf8().get_data();
 			new_minister_message += "\\n";
 			new_minister_message += "Trait: ";
-			new_minister_message += this->Ministers[title]->Trait->Name.utf8().get_data();
+			new_minister_message += this->Ministers[title]->Trait->GetName().utf8().get_data();
 			new_minister_message += "\\n";
 			new_minister_message += "\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
 			new_minister_message += "\") end;";
@@ -1109,7 +1109,7 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
 
 std::string CGrandStrategyHero::GetBestDisplayTitle()
 {
-	std::string best_title = this->Type->Name.utf8().get_data();
+	std::string best_title = this->Type->GetName().utf8().get_data();
 	int best_title_type = MaxCharacterTitles;
 	/*
 	for (size_t i = 0; i < this->Titles.size(); ++i) {

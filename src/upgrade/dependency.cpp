@@ -279,7 +279,7 @@ bool CUnitTypeDependency::Check(const CPlayer *player, bool ignore_units) const
 
 std::string CUnitTypeDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->UnitType->Name.utf8().get_data();
+	std::string str = prefix + this->UnitType->GetName().utf8().get_data();
 	
 	if (this->Count > 1) {
 		str += '(' + std::to_string(this->Count) + ')';
@@ -317,7 +317,7 @@ bool CUpgradeDependency::Check(const CUnit *unit, bool ignore_units) const
 
 std::string CUpgradeDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->Upgrade->Name.utf8().get_data() + '\n';
+	std::string str = prefix + this->Upgrade->GetName().utf8().get_data() + '\n';
 	return str;
 }
 
@@ -340,7 +340,7 @@ bool CAgeDependency::Check(const CPlayer *player, bool ignore_units) const
 
 std::string CAgeDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->Age->Name.utf8().get_data() + '\n';
+	std::string str = prefix + this->Age->GetName().utf8().get_data() + '\n';
 	return str;
 }
 
@@ -396,7 +396,7 @@ bool CSeasonDependency::Check(const CUnit *unit, bool ignore_units) const
 
 std::string CSeasonDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->Season->Name.utf8().get_data() + '\n';
+	std::string str = prefix + this->Season->GetName().utf8().get_data() + '\n';
 	return str;
 }
 

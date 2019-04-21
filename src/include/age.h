@@ -60,20 +60,6 @@ public:
 	
 	~CAge();
 	
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Priority);
-		REGISTER_PROPERTY(YearBoost);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
 public:
 	static constexpr const char *ClassIdentifier = "age";
 	
@@ -85,15 +71,27 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
+	int GetPriority() const
+	{
+		return this->Priority;
+	}
+	
+	int GetYearBoost() const
+	{
+		return this->YearBoost;
+	}
+	
 public:
 	CGraphic *G = nullptr;
-	Property<int> Priority = 0;
-	Property<int> YearBoost = 0;
+private:
+	int Priority = 0;
+	int YearBoost = 0;
+public:
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 /*----------------------------------------------------------------------------

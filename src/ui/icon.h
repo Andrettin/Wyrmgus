@@ -88,6 +88,7 @@ constexpr int IconCommandButton = 32;	/// is the icon a command button
 
 class ButtonStyle;
 class CPlayerColorGraphic;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -108,19 +109,6 @@ public:
 	
 	~CIcon();
 
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Frame);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
 public:
 	static constexpr const char *ClassIdentifier = "icon";
 	
@@ -141,6 +129,11 @@ public:
 					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, bool transparent = false, bool grayscale = false, int show_percent = 100) const;
 					  //Wyrmgus end
 
+	int GetFrame() const
+	{
+		return this->Frame;
+	}
+	
 	String GetFile() const
 	{
 		return this->File.c_str();
@@ -151,10 +144,14 @@ public:
 	CPlayerColorGraphic *GScale = nullptr;	/// icon when drawn grayscaled
 	std::string File;						/// the file containing the icon graphics
 	Vec2i Size = Vec2i(0, 0);				/// the size of the icon, in pixels
-	ExposedProperty<int> Frame = 0;			/// frame number in graphic
+private:
+	int Frame = 0;							/// frame number in graphic
+public:
 	//Wyrmgus start
 	bool Loaded = false;
 	//Wyrmgus end
+	
+	friend int CclDefineIcon(lua_State *l);
 
 protected:
 	static void _bind_methods();

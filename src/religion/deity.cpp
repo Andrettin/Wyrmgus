@@ -120,9 +120,7 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			continue;
 		}
 		
-		if (property.Key == "name") {
-			this->Name = property.Value;
-		} else if (property.Key == "pantheon") {
+		if (property.Key == "pantheon") {
 			std::string value = FindAndReplaceString(property.Value, "_", "-");
 			this->Pantheon = CPantheon::Get(value);
 		} else if (property.Key == "gender") {

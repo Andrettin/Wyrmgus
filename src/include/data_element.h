@@ -68,19 +68,8 @@ public:
 	}
 	
 private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Name);
-		
-		return true;
-	}
-
 	static inline std::map<std::string, std::function<PropertyCommonBase *(DataElement *)>> Properties;
 	static inline std::map<std::string, String> PropertyGetterPrefixes;
-	static inline bool ClassInitialized = InitializeClass();
 	
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data);
@@ -103,6 +92,16 @@ public:
 	String GetIdent() const
 	{
 		return this->Ident.c_str();
+	}
+	
+	/**
+	**	@brief	Get the data element's name
+	**
+	**	@return	The data element's name
+	*/
+	const String &GetName() const
+	{
+		return this->Name;
 	}
 	
 	/**
@@ -137,12 +136,12 @@ protected:
 	}
 	
 public:
-	ExposedProperty<String, DataElement> Name;	/// the name of the data element
-	
 	std::string Ident;	/// string identifier of the data element
+	
 protected:
 	int Index = -1;		/// index of the data element
 	bool Initialized = false;	/// whether the data element has been initialized
+	String Name;		/// the name of the data element
 	
 	friend DataType;
 

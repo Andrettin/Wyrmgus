@@ -129,7 +129,7 @@ void CIcon::Load()
 		GScale = G->Clone(true);
 	}
 	if (Frame >= G->NumFrames) {
-		DebugPrint("Invalid icon frame: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
+		fprintf(stderr, "Invalid icon frame: %s - %d\n", Ident.c_str(), Frame);
 		Frame = 0;
 	}
 	//Wyrmgus start
@@ -147,11 +147,11 @@ void CIcon::DrawIcon(const PixelPos &pos, const int player) const
 {
 	if (player != -1 ) {
 		//Wyrmgus start
-//		this->G->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y);
-		this->G->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y, true);
+//		this->G->DrawPlayerColorFrameClip(player, this->GetFrame(), pos.x, pos.y);
+		this->G->DrawPlayerColorFrameClip(player, this->GetFrame(), pos.x, pos.y, true);
 		//Wyrmgus end
 	} else {
-		this->G->DrawFrameClip(this->Frame, pos.x, pos.y);
+		this->G->DrawFrameClip(this->GetFrame(), pos.x, pos.y);
 	}
 }
 
@@ -164,9 +164,9 @@ void CIcon::DrawGrayscaleIcon(const PixelPos &pos, const int player) const
 {
 	if (this->GScale) {
 		if (player != -1) {
-			this->GScale->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y);
+			this->GScale->DrawPlayerColorFrameClip(player, this->GetFrame(), pos.x, pos.y);
 		} else {
-			this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
+			this->GScale->DrawFrameClip(this->GetFrame(), pos.x, pos.y);
 		}
 	}
 }
@@ -181,9 +181,9 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 {
 	// TO-DO: implement more effect types (clock-like)
 	if (this->GScale) {
-		this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
+		this->GScale->DrawFrameClip(this->GetFrame(), pos.x, pos.y);
 		const int height = (G->Height * (100 - percent)) / 100;
-		this->G->DrawSubClip(G->frame_map[Frame].x, G->frame_map[Frame].y + G->Height - height,
+		this->G->DrawSubClip(G->frame_map[this->GetFrame()].x, G->frame_map[this->GetFrame()].y + G->Height - height,
 							 G->Width, height, pos.x, pos.y + G->Height - height);
 	} else {
 		DebugPrint("Enable grayscale icon drawing in your game to achieve special effects for cooldown spell icons");
@@ -215,7 +215,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->G;
 	}
 	//Wyrmgus end
-	s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = this->Frame;
+	s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = this->GetFrame();
 	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
 		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;
 		s.Default.BorderColor = 0;
@@ -341,7 +341,11 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 
 void CIcon::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("set_frame", "frame"), [](CIcon *icon, const int frame){ icon->Frame = frame; });
+	ClassDB::bind_method(D_METHOD("get_frame"), &CIcon::GetFrame);
 	ClassDB::bind_method(D_METHOD("get_file"), &CIcon::GetFile);
+	
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "frame"), "set_frame", "get_frame");
 }
 
 /**

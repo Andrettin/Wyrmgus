@@ -49,6 +49,7 @@ class CIcon;
 class CPlayerColor;
 class CQuest;
 class CUnitType;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -58,23 +59,6 @@ class CAchievement : public DataElement, public DataType<CAchievement>
 {
 	DATA_TYPE(CAchievement, DataElement)
 	
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Description);
-		REGISTER_PROPERTY(CharacterLevel);
-		REGISTER_PROPERTY(Difficulty);
-		REGISTER_PROPERTY(Hidden);
-		REGISTER_PROPERTY(Unobtainable);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
 public:
 	static constexpr const char *ClassIdentifier = "achievement";
 	
@@ -83,9 +67,24 @@ public:
 	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value) override;
 	virtual void Initialize() override;
 	
-	CIcon *GetIcon() const
+	const String &GetDescription() const
 	{
-		return this->Icon.Icon;
+		return this->Description;
+	}
+	
+	int GetCharacterLevel() const
+	{
+		return this->CharacterLevel;
+	}
+	
+	int GetDifficulty() const
+	{
+		return this->Difficulty;
+	}
+	
+	bool IsHidden() const
+	{
+		return this->Hidden;
 	}
 	
 	bool IsObtained() const
@@ -96,6 +95,16 @@ public:
 	void Obtain(const bool save = true, const bool display = true);
 	bool CanObtain() const;
 	
+	bool IsUnobtainable() const
+	{
+		return this->Unobtainable;
+	}
+	
+	CIcon *GetIcon() const
+	{
+		return this->Icon.Icon;
+	}
+	
 	CPlayerColor *GetPlayerColor() const
 	{
 		return this->PlayerColor;
@@ -104,18 +113,21 @@ public:
 	int GetProgress() const;
 	int GetProgressMax() const;
 	
+private:
+	String Description;		/// description of the achievement
+	int CharacterLevel = 0;		/// character level required for the achievement
+	int Difficulty = -1;		/// which difficulty the achievement's requirements need to be done in
+	bool Hidden = false;		/// whether the achievement is hidden
+	bool Obtained = false;		/// whether the achievement has been obtained
+	bool Unobtainable = false;	/// whether this achievement can be obtained by checking for it or not
 public:
-	ExposedProperty<String> Description;		/// Description of the achievement
-	CPlayerColor *PlayerColor = nullptr;		/// Player color used for the achievement's icon
-	ExposedProperty<int> CharacterLevel = 0;	/// Character level required for the achievement
-	ExposedProperty<int> Difficulty = -1;		/// Which difficulty the achievement's requirements need to be done in
-	ExposedProperty<bool> Hidden = false;		/// Whether the achievement is hidden
-	bool Obtained = false;						/// Whether the achievement has been obtained
-	ExposedProperty<bool> Unobtainable = false;	/// Whether this achievement can be obtained by checking for it or not
-	IconConfig Icon;				/// Achievement's icon
-	const CCharacter *Character = nullptr;	/// Character related to the achievement's requirements
-	const CUnitType *CharacterType = nullptr;	/// Unit type required for a character to have for the achievement
-	std::vector<const CQuest *> RequiredQuests;	/// Quests required for obtaining this achievement
+	CPlayerColor *PlayerColor = nullptr;	/// player color used for the achievement's icon
+	IconConfig Icon;				/// achievement's icon
+	const CCharacter *Character = nullptr;	/// character related to the achievement's requirements
+	const CUnitType *CharacterType = nullptr;	/// unit type required for a character to have for the achievement
+	std::vector<const CQuest *> RequiredQuests;	/// quests required for obtaining this achievement
+	
+	friend int CclDefineAchievement(lua_State *l);
 
 protected:
 	static void _bind_methods();

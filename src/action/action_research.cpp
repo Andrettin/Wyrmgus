@@ -159,13 +159,13 @@ constexpr int CANCEL_RESEARCH_COSTS_FACTOR = 100;
 	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, (player.SpeedResearch + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value + unit.Variable[RESEARCHSPEEDBONUS_INDEX].Value) / SPEEDUP_FACTOR);
 	//Wyrmgus end
 	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
-		if (upgrade.Name.empty()) {
+		if (upgrade.GetName().empty()) {
 			//Wyrmgus start
 //			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
 			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), type.GetDefaultName(&player).c_str());
 			//Wyrmgus end
 		} else {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.Name.utf8().get_data());
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s: research complete"), upgrade.GetName().utf8().get_data());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			//Wyrmgus start

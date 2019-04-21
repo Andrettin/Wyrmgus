@@ -111,12 +111,7 @@ class CUpgrade : public DataElement
 	GDCLASS(CUpgrade, DataElement)
 	
 public:
-	// so that the class can be exposed to Godot
-	CUpgrade()
-	{
-	}
-	
-	CUpgrade(const std::string &ident);
+	CUpgrade(const std::string &ident = "");
 	~CUpgrade();
 
 	static CUpgrade *New(const std::string &ident);
@@ -171,6 +166,8 @@ public:
 	CIcon *Icon = nullptr;					/// icon to display to the user
 	CDependency *Predependency = nullptr;
 	CDependency *Dependency = nullptr;
+	
+	friend int CclDefineUpgrade(lua_State *l);
 
 protected:
 	static inline void _bind_methods() {}

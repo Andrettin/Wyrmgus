@@ -882,7 +882,7 @@ int SpellCast(CUnit &caster, const CSpell &spell, CUnit *target, const Vec2i &go
 		target = &caster;
 	}
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.Ident.c_str() _C_
-			   caster.Type->Name.utf8().get_data() _C_ target ? target->Type->Name.utf8().get_data() : "none" _C_ pos.x _C_ pos.y);
+			   caster.Type->GetName().utf8().get_data() _C_ target ? target->Type->GetName().utf8().get_data() : "none" _C_ pos.x _C_ pos.y);
 	if (CanCastSpell(caster, spell, target, pos, map_layer)) {
 		int cont = 1; // Should we recast the spell.
 		bool mustSubtractMana = true; // false if action which have their own calculation is present.

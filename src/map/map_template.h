@@ -54,6 +54,7 @@ class CTerrainType;
 class CUniqueItem;
 class CUnitType;
 class CWorld;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -161,6 +162,8 @@ public:
 	std::vector<CSite *> Sites;
 	std::map<std::pair<int, int>, CSite *> SitesByPosition;
 	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
+	
+	friend int CclDefineMapTemplate(lua_State *l);
 
 protected:
 	static inline void _bind_methods() {}

@@ -538,10 +538,10 @@ static int CclGetCampaignData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, campaign->Name.utf8().get_data());
+		lua_pushstring(l, campaign->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, campaign->Description.utf8().get_data());
+		lua_pushstring(l, campaign->GetDescription().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "StartYear")) {
 		lua_pushnumber(l, campaign->StartDate.Year);
@@ -554,10 +554,10 @@ static int CclGetCampaignData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
-		lua_pushboolean(l, campaign->Hidden);
+		lua_pushboolean(l, campaign->IsHidden());
 		return 1;
 	} else if (!strcmp(data, "Sandbox")) {
-		lua_pushboolean(l, campaign->Sandbox);
+		lua_pushboolean(l, campaign->IsSandbox());
 		return 1;
 	} else if (!strcmp(data, "RequiredQuests")) {
 		lua_createtable(l, campaign->RequiredQuests.size(), 0);
@@ -689,10 +689,10 @@ static int CclGetAchievementData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, achievement->Name.utf8().get_data());
+		lua_pushstring(l, achievement->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, achievement->Description.utf8().get_data());
+		lua_pushstring(l, achievement->GetDescription().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
 		lua_pushstring(l, achievement->GetPlayerColor()->GetIdent().utf8().get_data());
@@ -712,19 +712,19 @@ static int CclGetAchievementData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "CharacterLevel")) {
-		lua_pushnumber(l, achievement->CharacterLevel);
+		lua_pushnumber(l, achievement->GetCharacterLevel());
 		return 1;
 	} else if (!strcmp(data, "Difficulty")) {
-		lua_pushnumber(l, achievement->Difficulty);
+		lua_pushnumber(l, achievement->GetDifficulty());
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
-		lua_pushboolean(l, achievement->Hidden);
+		lua_pushboolean(l, achievement->IsHidden());
 		return 1;
 	} else if (!strcmp(data, "Obtained")) {
 		lua_pushboolean(l, achievement->IsObtained());
 		return 1;
 	} else if (!strcmp(data, "Unobtainable")) {
-		lua_pushboolean(l, achievement->Unobtainable);
+		lua_pushboolean(l, achievement->IsUnobtainable());
 		return 1;
 	} else if (!strcmp(data, "Progress")) {
 		lua_pushnumber(l, achievement->GetProgress());

@@ -2112,37 +2112,6 @@ static int CclDefineTerrainFeature(lua_State *l)
 }
 
 /**
-**  Define a timeline.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineTimeline(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	if (!lua_istable(l, 2)) {
-		LuaError(l, "incorrect argument (expected table)");
-	}
-
-	std::string timeline_ident = LuaToString(l, 1);
-	CTimeline *timeline = CTimeline::GetOrAdd(timeline_ident);
-	
-	//  Parse the list:
-	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		
-		if (!strcmp(value, "Name")) {
-			timeline->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "PointOfDivergence")) {
-			CclGetDate(l, &timeline->PointOfDivergence);
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-	
-	return 0;
-}
-
-/**
 **  Get map template data.
 **
 **  @param l  Lua state.
@@ -2160,7 +2129,7 @@ static int CclGetMapTemplateData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, map_template->Name.utf8().get_data());
+		lua_pushstring(l, map_template->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "World")) {
 		if (map_template->World != nullptr) {
@@ -2224,7 +2193,7 @@ static int CclGetSiteData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, site->Name.utf8().get_data());
+		lua_pushstring(l, site->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "PosX")) {
 		lua_pushnumber(l, site->Position.x);
@@ -2373,7 +2342,6 @@ void MapCclRegister()
 	lua_register(Lua, "DefineMapTemplate", CclDefineMapTemplate);
 	lua_register(Lua, "DefineSite", CclDefineSite);
 	lua_register(Lua, "DefineTerrainFeature", CclDefineTerrainFeature);
-	lua_register(Lua, "DefineTimeline", CclDefineTimeline);
 	lua_register(Lua, "GetMapTemplateData", CclGetMapTemplateData);
 	lua_register(Lua, "GetSiteData", CclGetSiteData);
 	lua_register(Lua, "GetTerrainFeatureData", CclGetTerrainFeatureData);

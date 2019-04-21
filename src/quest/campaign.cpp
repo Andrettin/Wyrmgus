@@ -223,9 +223,17 @@ bool CCampaign::IsAvailable() const
 
 void CCampaign::_bind_methods()
 {
-	BIND_PROPERTIES();
-	
+	ClassDB::bind_method(D_METHOD("set_description", "description"), [](CCampaign *campaign, const String &description){ campaign->Description = description; });
+	ClassDB::bind_method(D_METHOD("get_description"), &CCampaign::GetDescription);
+	ClassDB::bind_method(D_METHOD("set_hidden", "hidden"), [](CCampaign *campaign, const bool hidden){ campaign->Hidden = hidden; });
+	ClassDB::bind_method(D_METHOD("is_hidden"), &CCampaign::IsHidden);
+	ClassDB::bind_method(D_METHOD("set_sandbox", "sandbox"), [](CCampaign *campaign, const bool sandbox){ campaign->Sandbox = sandbox; });
+	ClassDB::bind_method(D_METHOD("is_sandbox"), &CCampaign::IsSandbox);
 	ClassDB::bind_method(D_METHOD("is_available"), &CCampaign::IsAvailable);
+	
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "description"), "set_description", "get_description");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "hidden"), "set_hidden", "is_hidden");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "sandbox"), "set_sandbox", "is_sandbox");
 }
 
 /**

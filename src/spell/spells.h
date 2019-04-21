@@ -285,6 +285,8 @@ public:
 		return !Range && Target == TargetSelf;
 	}
 	bool ForceUseAnimation = false;
+	
+	friend int CclDefineSpell(lua_State *l);
 
 protected:
 	static inline void _bind_methods() {}

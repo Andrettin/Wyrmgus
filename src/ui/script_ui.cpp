@@ -1214,7 +1214,7 @@ static int CclGetIconData(lua_State *l)
 		lua_pushstring(l, icon->File.c_str());
 		return 1;
 	} if (!strcmp(data, "Frame")) {
-		lua_pushnumber(l, icon->Frame);
+		lua_pushnumber(l, icon->GetFrame());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

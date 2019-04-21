@@ -1198,7 +1198,7 @@ static int CclGetUpgradeData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, upgrade->Name.utf8().get_data());
+		lua_pushstring(l, upgrade->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Class")) {
 		if (upgrade->Class != -1) {

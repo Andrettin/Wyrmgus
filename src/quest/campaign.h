@@ -61,21 +61,6 @@ class CCampaign : public DataElement, public DataType<CCampaign>
 {
 	DATA_TYPE(CCampaign, DataElement)
 	
-private:
-	/**
-	**	@brief	Initialize the class
-	*/
-	static inline bool InitializeClass()
-	{
-		REGISTER_PROPERTY(Description);
-		REGISTER_PROPERTY(Hidden);
-		REGISTER_PROPERTY(Sandbox);
-		
-		return true;
-	}
-	
-	static inline bool ClassInitialized = InitializeClass();
-	
 public:
 	static constexpr const char *ClassIdentifier = "campaign";
 	
@@ -91,6 +76,11 @@ public:
 	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
 	virtual void Initialize() override;
 	
+	const String &GetDescription() const
+	{
+		return this->Description;
+	}
+	
 	const CDate &GetStartDate() const
 	{
 		return this->StartDate;
@@ -105,12 +95,21 @@ public:
 	
 	bool IsAvailable() const;
 
-	ExposedProperty<String> Description;	/// Description of the campaign
+	bool IsHidden() const
+	{
+		return this->Hidden;
+	}
+
+	bool IsSandbox() const
+	{
+		return this->Sandbox;
+	}
+	
 private:
-	CDate StartDate;				/// The starting date of the campaign
-public:
-	ExposedProperty<bool> Hidden = false;	/// Whether the campaign is hidden
-	ExposedProperty<bool> Sandbox = false;	/// Whether the campaign is a sandbox one
+	String Description;		/// description of the campaign
+	CDate StartDate;		/// the starting date of the campaign
+	bool Hidden = false;	/// whether the campaign is hidden
+	bool Sandbox = false;	/// whether the campaign is a sandbox one
 private:
 	std::vector<CQuest *> RequiredQuests;	/// Quests required by the campaign
 	CFaction *Faction = nullptr;	/// Which faction the player plays as in the campaign

@@ -191,9 +191,7 @@ void CCalendar::ProcessConfigData(const CConfigData *config_data)
 		std::string key = property.Key;
 		std::string value = property.Value;
 		
-		if (key == "name") {
-			this->Name = value;
-		} else if (key == "base_calendar") {
+		if (key == "base_calendar") {
 			bool is_base_calendar = StringToBool(value);
 			if (is_base_calendar) {
 				CCalendar::BaseCalendar = this;

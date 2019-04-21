@@ -42,4 +42,18 @@
 void DetailedDataElement::_bind_methods()
 {
 	BIND_PROPERTIES();
+	
+	ClassDB::bind_method(D_METHOD("set_hidden", "hidden"), [](DetailedDataElement *detailed_data_element, const bool hidden){ detailed_data_element->Hidden = hidden; });
+	ClassDB::bind_method(D_METHOD("is_hidden"), &DetailedDataElement::IsHidden);
+	ClassDB::bind_method(D_METHOD("set_description", "description"), [](DetailedDataElement *detailed_data_element, const String &description){ detailed_data_element->Description = description; });
+	ClassDB::bind_method(D_METHOD("get_description"), &DetailedDataElement::GetDescription);
+	ClassDB::bind_method(D_METHOD("set_quote", "quote"), [](DetailedDataElement *detailed_data_element, const String &quote){ detailed_data_element->Quote = quote; });
+	ClassDB::bind_method(D_METHOD("get_quote"), &DetailedDataElement::GetQuote);
+	ClassDB::bind_method(D_METHOD("set_background", "background"), [](DetailedDataElement *detailed_data_element, const String &background){ detailed_data_element->Background = background; });
+	ClassDB::bind_method(D_METHOD("get_background"), &DetailedDataElement::GetBackground);
+	
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "hidden"), "set_hidden", "is_hidden");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "description"), "set_description", "get_description");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "quote"), "set_quote", "get_quote");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "background"), "set_background", "get_background");
 }

@@ -1208,7 +1208,7 @@ void CUnitType::Initialize()
 
 	// FIXME: try to simplify/combine the flags instead
 	if (this->MouseAction == MouseActionAttack && !this->CanAttack) {
-		fprintf(stderr, "Unit-type '%s': right-attack is set, but can-attack is not.\n", this->Name.utf8().get_data());
+		fprintf(stderr, "Unit-type '%s': right-attack is set, but can-attack is not.\n", this->GetName().utf8().get_data());
 	}
 	this->UpdateDefaultBoolFlags();
 	//Wyrmgus start
@@ -1809,7 +1809,7 @@ std::string CUnitType::GetDefaultName(const CPlayer *player) const
 	if (variation && !variation->TypeName.empty()) {
 		return variation->TypeName;
 	} else {
-		return this->Name.utf8().get_data();
+		return this->GetName().utf8().get_data();
 	}
 }
 
@@ -1842,7 +1842,7 @@ bool CUnitType::CanExperienceUpgradeTo(CUnitType *type) const
 
 std::string CUnitType::GetNamePlural() const
 {
-	return GetPluralForm(this->Name.utf8().get_data());
+	return GetPluralForm(this->GetName().utf8().get_data());
 }
 
 std::string CUnitType::GeneratePersonalName(const CFaction *faction, const int gender) const

@@ -532,7 +532,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	}
 	//Wyrmgus start
 	//I think it is too much to notify the player whenever an individual upgrade is completed
-//	player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s complete"), unit.Type->Name.c_str());
+//	player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s complete"), unit.Type->GetName().c_str());
 	//Wyrmgus end
 
 	//  Warn AI.

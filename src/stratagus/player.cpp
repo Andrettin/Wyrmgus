@@ -1395,11 +1395,11 @@ void CPlayer::SetAge(CAge *age)
 	
 	if (this == CPlayer::GetThisPlayer()) {
 		if (this->Age) {
-			UI.AgePanel.Text = this->Age->Name.utf8().get_data();
+			UI.AgePanel.Text = this->Age->GetName().utf8().get_data();
 			UI.AgePanel.G = this->Age->G;
 			
 			if (GameCycle > 0 && !SaveGameLoading) {
-				this->Notify(_("The %s has dawned upon us."), this->Age->Name.utf8().get_data());
+				this->Notify(_("The %s has dawned upon us."), this->Age->GetName().utf8().get_data());
 			}
 		} else {
 			UI.AgePanel.Text.clear();
@@ -1463,8 +1463,8 @@ void CPlayer::ShareUpgradeProgress(CPlayer &player, CUnit &unit)
 	if (potential_upgrades.size() > 0) {
 		CUpgrade *chosen_upgrade = potential_upgrades[SyncRand(potential_upgrades.size())];
 		
-		if (!chosen_upgrade->Name.empty()) {
-			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->Name.utf8().get_data(), this->Name.c_str());
+		if (!chosen_upgrade->GetName().empty()) {
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer->ID, _("%s acquired through contact with %s"), chosen_upgrade->GetName().utf8().get_data(), this->Name.c_str());
 		}
 		if (&player == CPlayer::GetThisPlayer()) {
 			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
@@ -2481,7 +2481,7 @@ void CPlayer::CompleteQuest(CQuest *quest)
 		
 		int icon_frame = 0;
 		if (quest->Icon.Icon != nullptr) {
-			icon_frame = quest->Icon.Icon->Frame;
+			icon_frame = quest->Icon.Icon->GetFrame();
 		}
 		
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", " + std::to_string((long long) icon_frame) + ") end;");

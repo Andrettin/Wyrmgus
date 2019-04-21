@@ -902,7 +902,7 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "weight")) {
 						variation->Weight = LuaToNumber(l, -1, k + 1);
 					} else {
-						printf("\n%s\n", type->Name.utf8().get_data());
+						printf("\n%s\n", type->GetName().utf8().get_data());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -1555,7 +1555,7 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "file-when-loaded")) {
 						res->FileWhenLoaded = LuaToString(l, -1, k + 1);
 					} else {
-						printf("\n%s\n", type->Name.utf8().get_data());
+						printf("\n%s\n", type->GetName().utf8().get_data());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -1954,7 +1954,7 @@ static int CclDefineUnitType(lua_State *l)
 					type->BoolFlag[index].value = LuaToBoolean(l, -1);
 				}
 			} else {
-				printf("\n%s\n", type->Name.utf8().get_data());
+				printf("\n%s\n", type->GetName().utf8().get_data());
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		}
@@ -2011,7 +2011,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	// FIXME: try to simplify/combine the flags instead
 	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
-		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->Name.utf8().get_data());
+		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->GetName().utf8().get_data());
 	}
 	type->UpdateDefaultBoolFlags();
 	//Wyrmgus start
@@ -2354,27 +2354,7 @@ static int CclGetUnitTypeName(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	const CUnitType *type = CclGetUnitType(l);
-	lua_pushstring(l, type->Name.utf8().get_data());
-	return 1;
-}
-
-/**
-**  Set the name of the unit-type structure.
-**
-**  @param l  Lua state.
-**
-**  @return   The name of the unit-type.
-*/
-static int CclSetUnitTypeName(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-
-	lua_pushvalue(l, 1);
-	CUnitType *type = CclGetUnitType(l);
-	lua_pop(l, 1);
-	type->Name = LuaToString(l, 2);
-
-	lua_pushvalue(l, 2);
+	lua_pushstring(l, type->GetName().utf8().get_data());
 	return 1;
 }
 
@@ -2397,7 +2377,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	}
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, type->Name.utf8().get_data());
+		lua_pushstring(l, type->GetName().utf8().get_data());
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "NamePlural")) {
@@ -3684,7 +3664,7 @@ static int CclGetSpeciesData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, species->Name.utf8().get_data());
+		lua_pushstring(l, species->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Category")) {
 		if (species->Category != nullptr) {
@@ -3749,7 +3729,7 @@ static int CclGetSpeciesCategoryData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, category->Name.utf8().get_data());
+		lua_pushstring(l, category->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "CommonName")) {
 		lua_pushstring(l, category->CommonName.utf8().get_data());
@@ -4154,7 +4134,6 @@ void UnitTypeCclRegister()
 	// unit type structure access
 	lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
 	lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
-	lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
 	lua_register(Lua, "GetUnitTypeData", CclGetUnitTypeData);
 	//Wyrmgus start
 	lua_register(Lua, "DefineSpecies", CclDefineSpecies);

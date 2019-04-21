@@ -51,6 +51,7 @@ class CUnit;
 class CUnitType;
 class CUniqueItem;
 class UnitClass;
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Definition
@@ -94,6 +95,8 @@ public:
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, int, const CFaction *>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
 	std::vector<std::tuple<CDate, CDate, const UnitClass *, CUniqueItem *, const CFaction *>> HistoricalBuildings;	/// Historical buildings, with start and end date
 	std::vector<std::tuple<CDate, CDate, const CUnitType *, CUniqueItem *, int>> HistoricalResources;	/// Historical resources, with start and end date; the integer at the end is the resource quantity
+	
+	friend int CclDefineSite(lua_State *l);
 
 protected:
 	static inline void _bind_methods() {}

@@ -3116,7 +3116,7 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "Currency")) {
 		const Currency *currency = p->GetCurrency();
 		if (currency) {
-			lua_pushstring(l, currency->Name.utf8().get_data());
+			lua_pushstring(l, currency->GetName().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3380,11 +3380,11 @@ static int CclGetLanguageData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, language->Name.utf8().get_data());
+		lua_pushstring(l, language->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
 		if (language->Family != nullptr) {
-			lua_pushstring(l, language->Family->Name.utf8().get_data());
+			lua_pushstring(l, language->Family->GetName().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3393,7 +3393,7 @@ static int CclGetLanguageData(lua_State *l)
 		lua_createtable(l, language->Words.size(), 0);
 		for (size_t i = 1; i <= language->Words.size(); ++i)
 		{
-			lua_pushstring(l, language->Words[i-1]->Name.utf8().get_data());
+			lua_pushstring(l, language->Words[i-1]->GetName().utf8().get_data());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3497,7 +3497,7 @@ static int CclGetDeityDomainData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, deity_domain->Name.utf8().get_data());
+		lua_pushstring(l, deity_domain->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Abilities")) {
 		lua_createtable(l, deity_domain->Abilities.size(), 0);
@@ -3532,11 +3532,11 @@ static int CclGetDeityData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, deity->Name.utf8().get_data());
+		lua_pushstring(l, deity->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Pantheon")) {
 		if (deity->Pantheon) {
-			lua_pushstring(l, deity->Pantheon->Name.utf8().get_data());
+			lua_pushstring(l, deity->Pantheon->GetName().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
