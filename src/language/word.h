@@ -171,8 +171,8 @@ public:
 	Property<String> AnglicizedName {					/// the anglicized version of the word
 		Property<String>::ValueType(),
 		Property<String>::GetterType([this]() -> Property<String>::ReturnType {
-			if (!(*this->AnglicizedName.Value).empty()) {
-				return (*this->AnglicizedName.Value);
+			if (!this->AnglicizedName.Value.empty()) {
+				return this->AnglicizedName.Value;
 			} else {
 				return this->Name;
 			}
@@ -190,10 +190,10 @@ public:
 	ExposedProperty<CWord *> DerivesFrom {    	/// from which word does this word derive
 		ExposedProperty<CWord *>::ValueType(nullptr),
 		ExposedProperty<CWord *>::SetterType([this](CWord *word) {
-			if (*this->DerivesFrom.Value != nullptr) {
+			if (this->DerivesFrom.Value != nullptr) {
 				this->DerivesFrom->DerivesTo.erase(std::remove(this->DerivesFrom->DerivesTo.begin(), this->DerivesFrom->DerivesTo.end(), this), this->DerivesFrom->DerivesTo.end());
 			}
-			*this->DerivesFrom.Value = word;
+			this->DerivesFrom.Value = word;
 			if (word != nullptr) {
 				word->DerivesTo.push_back(this);
 			}

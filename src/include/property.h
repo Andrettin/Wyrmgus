@@ -102,10 +102,8 @@ public:
 	using RemoverType = std::function<void(RemovalArgumentType)>;
 	
 protected:
-	PropertyBase(const T &value, const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : Getter(getter), Setter(setter), Adder(adder), Remover(remover)
+	PropertyBase(const T &value, const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : Value(value), Getter(getter), Setter(setter), Adder(adder), Remover(remover)
 	{
-		this->Value = new T;
-		*(this->Value) = value;
 	}
 	
 	PropertyBase(const GetterType &getter, const SetterType &setter, const AdderType &adder, const RemoverType &remover) : Getter(getter), Setter(setter), Adder(adder), Remover(remover)
@@ -114,9 +112,6 @@ protected:
 	
 	virtual ~PropertyBase()
 	{
-		if (this->Value) {
-			delete this->Value;
-		}
 	}
 
 public:
@@ -136,12 +131,12 @@ public:
 		if (this->Getter) {
 			return this->Getter();
 		} else {
-			return *this->Value;
+			return this->Value;
 		}
 	}
 	
 protected:
-	T *Value = nullptr;
+	T Value;
 	GetterType Getter;
 	SetterType Setter;
 	AdderType Adder;
@@ -285,8 +280,8 @@ public:
 	{
 		if (this->GetUnderlying().Setter) {
 			this->GetUnderlying().Setter(value);
-		} else if (this->GetUnderlying().Value != nullptr && *this->GetUnderlying().Value != value) {
-			*this->GetUnderlying().Value = value;
+		} else if (this->GetUnderlying().Value != value) {
+			this->GetUnderlying().Value = value;
 		}
 	}
 	

@@ -73,7 +73,7 @@ void CWord::SetLanguage(CLanguage *language)
 		}
 	}
 	
-	*this->Language.Value = language;
+	this->Language.Value = language;
 	
 	if (this->Language != nullptr) {
 		this->Language->Words.push_back(this);

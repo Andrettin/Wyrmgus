@@ -125,23 +125,23 @@ public:
 	ExposedProperty<std::vector<CSpecies *>> EvolvesFrom {		/// from which species this one can evolve
 		ExposedProperty<std::vector<CSpecies *>>::ValueType(),
 		ExposedProperty<std::vector<CSpecies *>>::AdderType([this](CSpecies *species) {
-			(*this->EvolvesFrom.Value).push_back(species);
-			(*species->EvolvesTo.Value).push_back(this);
+			this->EvolvesFrom.Value.push_back(species);
+			species->EvolvesTo.Value.push_back(this);
 		}),
 		ExposedProperty<std::vector<CSpecies *>>::RemoverType([this](CSpecies *species) {
-			(*this->EvolvesFrom.Value).erase(std::remove((*this->EvolvesFrom.Value).begin(), (*this->EvolvesFrom.Value).end(), species), (*this->EvolvesFrom.Value).end());
-			(*species->EvolvesTo.Value).erase(std::remove((*species->EvolvesTo.Value).begin(), (*species->EvolvesTo.Value).end(), this), (*species->EvolvesTo.Value).end());
+			this->EvolvesFrom.Value.erase(std::remove(this->EvolvesFrom.Value.begin(), this->EvolvesFrom.Value.end(), species), this->EvolvesFrom.Value.end());
+			species->EvolvesTo.Value.erase(std::remove(species->EvolvesTo.Value.begin(), species->EvolvesTo.Value.end(), this), species->EvolvesTo.Value.end());
 		})
 	};
 	ExposedProperty<std::vector<CSpecies *>> EvolvesTo {		/// to which species this one can evolve
 		ExposedProperty<std::vector<CSpecies *>>::ValueType(),
 		ExposedProperty<std::vector<CSpecies *>>::AdderType([this](CSpecies *species) {
-			(*this->EvolvesTo.Value).push_back(species);
-			(*species->EvolvesFrom.Value).push_back(this);
+			this->EvolvesTo.Value.push_back(species);
+			species->EvolvesFrom.Value.push_back(this);
 		}),
 		ExposedProperty<std::vector<CSpecies *>>::RemoverType([this](CSpecies *species) {
-			(*this->EvolvesTo.Value).erase(std::remove((*this->EvolvesTo.Value).begin(), (*this->EvolvesTo.Value).end(), species), (*this->EvolvesTo.Value).end());
-			(*species->EvolvesFrom.Value).erase(std::remove((*species->EvolvesFrom.Value).begin(), (*species->EvolvesFrom.Value).end(), this), (*species->EvolvesFrom.Value).end());
+			this->EvolvesTo.Value.erase(std::remove(this->EvolvesTo.Value.begin(), this->EvolvesTo.Value.end(), species), this->EvolvesTo.Value.end());
+			species->EvolvesFrom.Value.erase(std::remove(species->EvolvesFrom.Value.begin(), species->EvolvesFrom.Value.end(), this), species->EvolvesFrom.Value.end());
 		})
 	};
 	

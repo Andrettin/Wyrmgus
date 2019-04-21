@@ -155,8 +155,8 @@ public:
 	Property<CIcon *> Icon {		/// the literary text's icon
 		Property<CIcon *>::ValueType(nullptr),
 		Property<CIcon *>::GetterType([this]() -> Property<CIcon *>::ReturnType {
-			if (*this->Icon.Value != nullptr) {
-				return *this->Icon.Value;
+			if (this->Icon.Value != nullptr) {
+				return this->Icon.Value;
 			} else if (this->GetMainText() != nullptr) {
 				return this->GetMainText()->Icon;		
 			} else {

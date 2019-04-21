@@ -81,10 +81,10 @@ public:
 	Property<CLanguage *> DialectOf {	/// of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 		Property<CLanguage *>::ValueType(nullptr),
 		Property<CLanguage *>::SetterType([this](CLanguage *language) {
-			if (*this->DialectOf.Value != nullptr) {
+			if (this->DialectOf.Value != nullptr) {
 				this->DialectOf->Dialects.erase(std::remove(this->DialectOf->Dialects.begin(), this->DialectOf->Dialects.end(), this), this->DialectOf->Dialects.end());
 			}
-			*this->DialectOf.Value = language;
+			this->DialectOf.Value = language;
 			this->DialectOf->Dialects.push_back(this);
 		})
 	};
