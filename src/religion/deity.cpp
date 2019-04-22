@@ -108,113 +108,128 @@ void CDeity::Clear()
 }
 
 /**
-**	@brief	Process data provided by a configuration file
+**	@brief	Process a property in the data provided by a configuration file
 **
-**	@param	config_data	The configuration data
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
 */
-void CDeity::ProcessConfigData(const CConfigData *config_data)
+bool CDeity::ProcessConfigDataProperty(const std::string &key, std::string value)
 {
-	for (const CConfigProperty &property : config_data->Properties) {
-		if (property.Operator != CConfigOperator::Assignment) {
-			fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
-			continue;
+	if (key == "pantheon") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Pantheon = CPantheon::Get(value);
+	} else if (key == "gender") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Gender = GetGenderIdByName(value);
+	} else if (key == "major") {
+		this->Major = StringToBool(value);
+	} else if (key == "civilization") {
+		value = FindAndReplaceString(value, "_", "-");
+		CCivilization *civilization = CCivilization::Get(value);
+		if (civilization != nullptr) {
+			this->Civilizations.push_back(civilization);
+			civilization->Deities.push_back(this);
 		}
-		
-		if (property.Key == "pantheon") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			this->Pantheon = CPantheon::Get(value);
-		} else if (property.Key == "gender") {
-			this->Gender = GetGenderIdByName(property.Value);
-		} else if (property.Key == "major") {
-			this->Major = StringToBool(property.Value);
-		} else if (property.Key == "civilization") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CCivilization *civilization = CCivilization::Get(value);
-			if (civilization != nullptr) {
-				this->Civilizations.push_back(civilization);
-				civilization->Deities.push_back(this);
-			}
-		} else if (property.Key == "religion") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CReligion *religion = CReligion::Get(value);
-			if (religion) {
-				this->Religions.push_back(religion);
-			}
-		} else if (property.Key == "domain") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CDeityDomain *deity_domain = CDeityDomain::Get(value);
-			if (deity_domain) {
-				this->Domains.push_back(deity_domain);
-			}
-		} else if (property.Key == "description") {
-			this->Description = property.Value;
-		} else if (property.Key == "background") {
-			this->Background = property.Value;
-		} else if (property.Key == "quote") {
-			this->Quote = property.Value;
-		} else if (property.Key == "icon") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			this->Icon.Name = value;
-			this->Icon.Icon = nullptr;
-			this->Icon.Load();
-			this->Icon.Icon->Load();
-		} else if (property.Key == "home_plane") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CPlane *plane = CPlane::Get(value);
-			if (plane) {
-				this->HomePlane = plane;
-			}
-		} else if (property.Key == "deity_upgrade") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
-			if (upgrade) {
-				this->DeityUpgrade = upgrade;
-				CDeity::DeitiesByUpgrade[upgrade] = this;
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
-		} else if (property.Key == "character_upgrade") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CUpgrade *upgrade = CUpgrade::Get(value);
-			if (upgrade) {
-				this->CharacterUpgrade = upgrade;
-			} else {
-				fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
-			}
-		} else if (property.Key == "holy_order") {
-			std::string value = FindAndReplaceString(property.Value, "_", "-");
-			CFaction *holy_order = CFaction::Get(value);
-			if (holy_order) {
-				this->HolyOrders.push_back(holy_order);
-				holy_order->HolyOrderDeity = this;
-			}
+	} else if (key == "religion") {
+		value = FindAndReplaceString(value, "_", "-");
+		CReligion *religion = CReligion::Get(value);
+		if (religion) {
+			this->Religions.push_back(religion);
+		}
+	} else if (key == "domain") {
+		value = FindAndReplaceString(value, "_", "-");
+		CDeityDomain *deity_domain = CDeityDomain::Get(value);
+		if (deity_domain) {
+			this->Domains.push_back(deity_domain);
+		}
+	} else if (key == "description") {
+		this->Description = value;
+	} else if (key == "background") {
+		this->Background = value;
+	} else if (key == "quote") {
+		this->Quote = value;
+	} else if (key == "icon") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Icon.Name = value;
+		this->Icon.Icon = nullptr;
+		this->Icon.Load();
+		this->Icon.Icon->Load();
+	} else if (key == "home_plane") {
+		value = FindAndReplaceString(value, "_", "-");
+		CPlane *plane = CPlane::Get(value);
+		if (plane) {
+			this->HomePlane = plane;
+		}
+	} else if (key == "deity_upgrade") {
+		value = FindAndReplaceString(value, "_", "-");
+		CUpgrade *upgrade = CUpgrade::Get(value);
+		if (upgrade) {
+			this->DeityUpgrade = upgrade;
+			CDeity::DeitiesByUpgrade[upgrade] = this;
 		} else {
-			fprintf(stderr, "Invalid deity property: \"%s\".\n", property.Key.c_str());
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
 		}
+	} else if (key == "character_upgrade") {
+		value = FindAndReplaceString(value, "_", "-");
+		CUpgrade *upgrade = CUpgrade::Get(value);
+		if (upgrade) {
+			this->CharacterUpgrade = upgrade;
+		} else {
+			fprintf(stderr, "Invalid upgrade: \"%s\".\n", value.c_str());
+		}
+	} else if (key == "holy_order") {
+		value = FindAndReplaceString(value, "_", "-");
+		CFaction *holy_order = CFaction::Get(value);
+		if (holy_order) {
+			this->HolyOrders.push_back(holy_order);
+			holy_order->HolyOrderDeity = this;
+		}
+	} else {
+		return false;
 	}
 	
-	for (const CConfigData *section : config_data->Sections) {
-		if (section->Tag == "cultural_names") {
-			for (const CConfigProperty &property : section->Properties) {
-				if (property.Operator != CConfigOperator::Assignment) {
-					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
-					continue;
-				}
-				
-				std::string key = property.Key;
-				key = FindAndReplaceString(key, "_", "-");
-				
-				const CCivilization *civilization = CCivilization::Get(key);
-				
-				if (civilization) {
-					this->CulturalNames[civilization] = property.Value;
-				}
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CDeity::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "cultural_names") {
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
 			}
-		} else {
-			fprintf(stderr, "Invalid deity property: \"%s\".\n", section->Tag.c_str());
+			
+			std::string key = property.Key;
+			key = FindAndReplaceString(key, "_", "-");
+			
+			const CCivilization *civilization = CCivilization::Get(key);
+			
+			if (civilization) {
+				this->CulturalNames[civilization] = property.Value;
+			}
 		}
+	} else {
+		return false;
 	}
 	
+	return true;
+}
+
+/**
+**	@brief	Initialize the deity
+*/
+void CDeity::Initialize()
+{
 	if (this->Major && this->Domains.size() > MAJOR_DEITY_DOMAIN_MAX) { // major deities can only have up to three domains
 		this->Domains.resize(MAJOR_DEITY_DOMAIN_MAX);
 	} else if (!this->Major && this->Domains.size() > MINOR_DEITY_DOMAIN_MAX) { // minor deities can only have one domain
@@ -228,6 +243,8 @@ void CDeity::ProcessConfigData(const CConfigData *config_data)
 			}
 		}
 	}
+	
+	this->Initialized = true;
 }
 
 /**
