@@ -69,7 +69,6 @@ public:
 	
 private:
 	static inline std::map<std::string, std::function<PropertyCommonBase *(DataElement *)>> Properties;
-	static inline std::map<std::string, String> PropertyGetterPrefixes;
 	
 public:
 	virtual void ProcessConfigData(const CConfigData *config_data);

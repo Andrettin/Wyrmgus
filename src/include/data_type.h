@@ -70,7 +70,6 @@ protected: \
 	\
 private: \
 	static inline std::map<std::string, std::function<PropertyCommonBase *(class_name *)>> Properties; \
-	static inline std::map<std::string, String> PropertyGetterPrefixes;
 	
 #define REGISTER_PROPERTY(property_variable) \
 	ThisClass::Properties.insert({PascalCaseToSnakeCase(#property_variable), std::function<PropertyCommonBase *(ThisClass *)>([](ThisClass *class_instance) -> PropertyCommonBase* { return &class_instance->property_variable; })});
@@ -84,15 +83,10 @@ private: \
 		PropertyCommonBase *property = property_function(&temp_instance); \
 		String method_name; \
 		\
-		std::map<std::string, String>::iterator getter_prefix_find_iterator = ThisClass::PropertyGetterPrefixes.find(property_key); \
-		if (getter_prefix_find_iterator != ThisClass::PropertyGetterPrefixes.end()) { \
-			method_name += getter_prefix_find_iterator->second + "_"; \
+		if (dynamic_cast<PropertyBase<bool> *>(property)) { \
+			method_name += "is_"; \
 		} else { \
-			if (dynamic_cast<PropertyBase<bool> *>(property)) { \
-				method_name += "is_"; \
-			} else { \
-				method_name += "get_"; \
-			} \
+			method_name += "get_"; \
 		} \
 		\
 		method_name += property_key.c_str(); \
@@ -104,7 +98,6 @@ private: \
 ----------------------------------------------------------------------------*/
 
 class CCivilization;
-class CFaction;
 class DataElement;
 
 template <typename T, typename O>
@@ -285,8 +278,8 @@ private:
 	static inline bool InitializeDataTypeClass()
 	{
 		//initialize the class factory function
-		if constexpr(!std::is_same_v<T, CCivilization> && !std::is_same_v<T, CFaction>) {
-			//FIXME: this conditional is only temporarily needed while the civilization and faction classes don't inherit from DataElement
+		if constexpr(!std::is_same_v<T, CCivilization>) {
+			//FIXME: this conditional is only temporarily needed while the civilization classes doesn't inherit from DataElement
 			CConfigData::DataTypeGetOrAddFunctions[T::ClassIdentifier] = std::function<DataElement *(const std::string &)>(T::GetOrAdd);
 		}
 		
