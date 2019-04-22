@@ -759,6 +759,11 @@ public:
 		return !this->BoolFlag[BUILDING_INDEX].value && !this->BoolFlag[ITEM_INDEX].value && !this->BoolFlag[DECORATION_INDEX].value && !this->BoolFlag[VANISHES_INDEX].value;
 	}
 	
+	CSpecies *GetSpecies() const
+	{
+		return this->Species;
+	}
+	
 	//Wyrmgus start
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
 	void UpdateDefaultBoolFlags();
@@ -830,7 +835,9 @@ public:
 	int TrainQuantity = 0;								/// Quantity to be trained
 	int CostModifier = 0;								/// Cost modifier (cost increase for every unit of this type the player has)
 	const ItemClass *ItemClass = nullptr;				/// Item class (if the unit type is an item)
+private:
 	CSpecies *Species = nullptr;
+public:
 	CTerrainType *TerrainType = nullptr;				/// The terrain type which the unit type becomes after being built
 	std::vector<const ::ItemClass *> WeaponClasses;		/// Weapon classes that the unit type can use (if the unit type uses a weapon)
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)

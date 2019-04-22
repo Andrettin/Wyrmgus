@@ -40,6 +40,7 @@
 #include "language/grammatical_gender.h"
 #include "language/language.h"
 #include "language/word_type.h"
+#include "species/species.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -111,6 +112,37 @@ bool CWord::ProcessConfigDataSection(const CConfigData *section)
 			if (value_bool) {
 				this->PersonalNameWeights[gender_index] = 1;
 				this->Language->AddPersonalNameWord(this, gender_index);
+			}
+		}
+	} else if (section->Tag == "specimen_name") {
+		for (const CConfigData *sub_section : section->Sections) {
+			std::string species_ident = FindAndReplaceString(sub_section->Tag, "_", "-");
+			CSpecies *species = CSpecies::Get(species_ident);
+			
+			if (species == nullptr) {
+				continue;
+			}
+			
+			for (const CConfigProperty &property : sub_section->Properties) {
+				if (property.Operator != CConfigOperator::Assignment) {
+					fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+					continue;
+				}
+				
+				std::string key = FindAndReplaceString(property.Key, "_", "-");
+				const int gender_index = GetGenderIdByName(key);
+				
+				if (gender_index == -1) {
+					fprintf(stderr, "Invalid gender: \"%s\".\n", key.c_str());
+					continue;
+				}
+				
+				const bool value_bool = StringToBool(property.Value);
+				if (value_bool) {
+					this->SpecimenNameWeights[species][gender_index] = 1;
+					this->Language->AddSpecimenNameWord(this, species, gender_index);
+					species->AddSpecimenNameWord(this, gender_index);
+				}
 			}
 		}
 	} else if (section->Tag == "dependencies") {

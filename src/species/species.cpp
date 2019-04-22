@@ -179,6 +179,28 @@ std::vector<CSpeciesCategory *> CSpecies::GetAllCategories() const
 	return categories;
 }
 
+void CSpecies::AddSpecimenNameWord(CWord *word, const int gender)
+{
+	this->SpecimenNameWords[gender].push_back(word);
+	
+	if (this->Category != nullptr) {
+		this->Category->AddSpecimenNameWord(word, gender);
+	}
+}
+
+const std::vector<CWord *> &CSpecies::GetSpecimenNameWords(const int gender)
+{
+	if (!this->SpecimenNameWords[gender].empty()) {
+		return this->SpecimenNameWords[gender];
+	}
+	
+	if (this->Category != nullptr) {
+		return this->Category->GetSpecimenNameWords(gender);
+	}
+	
+	return this->SpecimenNameWords[gender];
+}
+
 void CSpecies::_bind_methods()
 {
 	BIND_PROPERTIES();

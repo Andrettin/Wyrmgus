@@ -1893,7 +1893,19 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 		}
 	}
 	
-	if (potential_names.size() == 0 && this->GetCivilization() != nullptr) {
+	if (potential_names.empty() && this->BoolFlag[FAUNA_INDEX].value && this->GetSpecies() != nullptr) {
+		const std::vector<CWord *> &specimen_name_words = this->GetSpecies()->GetSpecimenNameWords(gender);
+		if (!specimen_name_words.empty()) {
+			for (const CWord *name_word : specimen_name_words) {
+				const int weight = name_word->GetSpecimenNameWeight(this->GetSpecies(), gender);
+				for (int i = 0; i < weight; ++i) {
+					potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
+				}
+			}
+		}
+	}
+	
+	if (potential_names.empty() && this->GetCivilization() != nullptr) {
 		const CCivilization *civilization = this->GetCivilization();
 		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Slot == CFaction::GetFactionClassUnitType(faction, this->Class)) {
 			civilization = faction->Civilization;

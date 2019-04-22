@@ -74,6 +74,28 @@ bool CSpeciesCategory::ProcessConfigDataProperty(const std::string &key, std::st
 	return true;
 }
 
+void CSpeciesCategory::AddSpecimenNameWord(CWord *word, const int gender)
+{
+	this->SpecimenNameWords[gender].push_back(word);
+	
+	if (this->UpperCategory != nullptr) {
+		this->UpperCategory->AddSpecimenNameWord(word, gender);
+	}
+}
+
+const std::vector<CWord *> &CSpeciesCategory::GetSpecimenNameWords(const int gender)
+{
+	if (!this->SpecimenNameWords[gender].empty()) {
+		return this->SpecimenNameWords[gender];
+	}
+	
+	if (this->UpperCategory != nullptr) {
+		return this->UpperCategory->GetSpecimenNameWords(gender);
+	}
+	
+	return this->SpecimenNameWords[gender];
+}
+
 void CSpeciesCategory::_bind_methods()
 {
 	BIND_PROPERTIES();

@@ -98,7 +98,7 @@ bool CFaction::ProcessConfigDataProperty(const std::string &key, std::string val
 		if (player_color != nullptr) {
 			this->SecondaryColor = player_color;
 		}
-	} else if (key == "faction_upgrade") {
+	} else if (key == "icon") {
 		value = FindAndReplaceString(value, "_", "-");
 		this->Icon = CIcon::Get(value);
 	} else if (key == "faction_upgrade") {

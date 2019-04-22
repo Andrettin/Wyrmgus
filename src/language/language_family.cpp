@@ -83,6 +83,28 @@ const std::vector<CWord *> &CLanguageFamily::GetFamilyNameWords() const
 	return this->FamilyNameWords;
 }
 
+void CLanguageFamily::AddSpecimenNameWord(CWord *word, const CSpecies *species, const int gender)
+{
+	this->SpecimenNameWords[species][gender].push_back(word);
+	
+	if (this->Family != nullptr) {
+		this->Family->AddSpecimenNameWord(word, species, gender);
+	}
+}
+
+const std::vector<CWord *> &CLanguageFamily::GetSpecimenNameWords(const CSpecies *species, const int gender)
+{
+	if (!this->SpecimenNameWords[species][gender].empty()) {
+		return this->SpecimenNameWords[species][gender];
+	}
+	
+	if (this->Family != nullptr) {
+		return this->Family->GetSpecimenNameWords(species, gender);
+	}
+	
+	return this->SpecimenNameWords[species][gender];
+}
+
 void CLanguageFamily::AddShipNameWord(CWord *word)
 {
 	this->ShipNameWords.push_back(word);

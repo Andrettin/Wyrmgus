@@ -45,6 +45,7 @@ class CPlane;
 class CSpeciesCategory;
 class CTerrainType;
 class CUnitType;
+class CWord;
 class CWorld;
 struct lua_State;
 
@@ -104,6 +105,9 @@ public:
 	CSpecies *GetRandomEvolution(const CTerrainType *terrain_type) const;
 	std::vector<CSpeciesCategory *> GetAllCategories() const;
 	
+	void AddSpecimenNameWord(CWord *word, const int gender);
+	const std::vector<CWord *> &GetSpecimenNameWords(const int gender);
+	
 public:
 	ExposedProperty<String> NamePlural;
 	ExposedProperty<CSpeciesCategory *> Category = nullptr;
@@ -146,6 +150,8 @@ public:
 	};
 	
 private:
+	std::map<int, std::vector<CWord *>> SpecimenNameWords;	/// the words used for specimen name generation, mapped to the gender for which they can be used
+	
 	friend int CclDefineSpecies(lua_State *l);
 	friend int CclDefineUnitType(lua_State *l);
 	friend class CUnitType;	// necessary so that the unit type may set the species' type to itself

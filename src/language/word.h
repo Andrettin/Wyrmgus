@@ -44,6 +44,7 @@
 class CDependency;
 class CGrammaticalGender;
 class CLanguage;
+class CSpecies;
 class CWordType;
 struct lua_State;
 
@@ -180,6 +181,19 @@ public:
 		return this->FamilyNameWeight;
 	}
 	
+	int GetSpecimenNameWeight(const CSpecies *species, const int gender) const
+	{
+		std::map<const CSpecies *, std::map<int, int>>::const_iterator find_iterator = this->SpecimenNameWeights.find(species);
+		if (find_iterator != this->SpecimenNameWeights.end()) {
+			std::map<int, int>::const_iterator sub_find_iterator = find_iterator->second.find(gender);
+			if (sub_find_iterator != find_iterator->second.end()) {
+				return sub_find_iterator->second;
+			}
+		}
+		
+		return 0;
+	}
+	
 	int GetShipNameWeight() const
 	{
 		return this->ShipNameWeight;
@@ -197,7 +211,7 @@ public:
 	
 	bool IsProperName() const
 	{
-		return !this->PersonalNameWeights.empty() || this->FamilyNameWeight != 0 || this->ShipNameWeight != 0 || this->SettlementNameWeight != 0;
+		return !this->PersonalNameWeights.empty() || this->FamilyNameWeight != 0 || !this->SpecimenNameWeights.empty() || this->ShipNameWeight != 0 || this->SettlementNameWeight != 0;
 	}
 	
 private:
@@ -256,6 +270,7 @@ public:
 private:
 	std::map<int, int> PersonalNameWeights;	/// the weight of this word for personal name generation, mapped to each possible gender for the name generation
 	int FamilyNameWeight = 0;
+	std::map<const CSpecies *, std::map<int, int>> SpecimenNameWeights;	/// the weight of this word for name generation for species individuals, mapped to each possible gender for the name generation
 	int ShipNameWeight = 0;					/// the weight of this word for ship name generation
 	int SettlementNameWeight = 0;
 	

@@ -2508,8 +2508,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	*/
 	} else if (!strcmp(data, "Species")) {
-		if (type->Species != nullptr) {
-			lua_pushstring(l, type->Species->GetIdent().utf8().get_data());
+		if (type->GetSpecies() != nullptr) {
+			lua_pushstring(l, type->GetSpecies()->GetIdent().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3442,9 +3442,9 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 	}
 	
-	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->Species != nullptr && !unit.Type->Species->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
+	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->GetSpecies() != nullptr && !unit.Type->GetSpecies()->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
 		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
-		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->Species->ChildUpgrade));
+		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->GetSpecies()->ChildUpgrade));
 	}
 	//Wyrmgus end
 
