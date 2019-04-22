@@ -1187,16 +1187,12 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		bool requires_shield = false;
 		bool found_shield = false;
 		for (const CUpgrade *required_upgrade : variation->UpgradesRequired) {
-			if (required_upgrade->ItemSlot == nullptr) {
-				continue;
-			}
-			
-			if (required_upgrade->ItemSlot->Weapon) {
+			if (required_upgrade->ItemSlot != nullptr && required_upgrade->ItemSlot->Weapon) {
 				requires_weapon = true;
 				if (UpgradeIdentAllowed(*this->Player, required_upgrade->Ident.c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
 					found_weapon = true;
 				}
-			} else if (required_upgrade->ItemSlot->Shield) {
+			} else if (required_upgrade->ItemSlot != nullptr && required_upgrade->ItemSlot->Shield) {
 				requires_shield = true;
 				if (UpgradeIdentAllowed(*this->Player, required_upgrade->Ident.c_str()) == 'R' || this->GetIndividualUpgrade(required_upgrade)) {
 					found_shield = true;
