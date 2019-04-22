@@ -180,6 +180,16 @@ public:
 		return this->FamilyNameWeight;
 	}
 	
+	int GetShipNameWeight() const
+	{
+		return this->ShipNameWeight;
+	}
+	
+	int GetSettlementNameWeight() const
+	{
+		return this->SettlementNameWeight;
+	}
+	
 	String GetNounInflection(const int grammatical_number, const int grammatical_case);
 	String GetVerbInflection(const int grammatical_number, const int grammatical_person, const int grammatical_tense, const int grammatical_mood);
 	String GetAdjectiveInflection(const int comparison_degree, const int article_type = -1, int grammatical_case = -1, const int grammatical_number = -1, const CGrammaticalGender *grammatical_gender = nullptr);
@@ -242,6 +252,7 @@ private:
 	std::map<int, int> PersonalNameWeights;	/// the weight of this word for personal name generation, mapped to each possible gender for the name generation
 	int FamilyNameWeight = 0;
 	int ShipNameWeight = 0;					/// the weight of this word for ship name generation
+	int SettlementNameWeight = 0;
 	
 public:
 	CDependency *Predependency = nullptr;	/// the predependency for the word to be used as a personal name

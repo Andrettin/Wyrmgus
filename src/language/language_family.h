@@ -69,12 +69,18 @@ public:
 	const std::vector<CWord *> &GetPersonalNameWords(const int gender);
 	void AddFamilyNameWord(CWord *word);
 	const std::vector<CWord *> &GetFamilyNameWords() const;
+	void AddShipNameWord(CWord *word);
+	const std::vector<CWord *> &GetShipNameWords() const;
+	void AddSettlementNameWord(CWord *word);
+	const std::vector<CWord *> &GetSettlementNameWords() const;
 	
 	Property<CLanguageFamily *> Family;			/// the family to which this language family belongs
 	
 private:
 	std::map<int, std::vector<CWord *>> PersonalNameWords;	/// the words used for personal name generation, mapped to the gender for which they can be used
 	std::vector<CWord *> FamilyNameWords;
+	std::vector<CWord *> ShipNameWords;
+	std::vector<CWord *> SettlementNameWords;
 	
 protected:
 	static void _bind_methods();

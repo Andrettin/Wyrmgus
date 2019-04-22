@@ -83,6 +83,50 @@ const std::vector<CWord *> &CLanguageFamily::GetFamilyNameWords() const
 	return this->FamilyNameWords;
 }
 
+void CLanguageFamily::AddShipNameWord(CWord *word)
+{
+	this->ShipNameWords.push_back(word);
+	
+	if (this->Family != nullptr) {
+		this->Family->AddShipNameWord(word);
+	}
+}
+
+const std::vector<CWord *> &CLanguageFamily::GetShipNameWords() const
+{
+	if (!this->ShipNameWords.empty()) {
+		return this->ShipNameWords;
+	}
+	
+	if (this->Family != nullptr) {
+		return this->Family->GetShipNameWords();
+	}
+	
+	return this->ShipNameWords;
+}
+
+void CLanguageFamily::AddSettlementNameWord(CWord *word)
+{
+	this->SettlementNameWords.push_back(word);
+	
+	if (this->Family != nullptr) {
+		this->Family->AddSettlementNameWord(word);
+	}
+}
+
+const std::vector<CWord *> &CLanguageFamily::GetSettlementNameWords() const
+{
+	if (!this->SettlementNameWords.empty()) {
+		return this->SettlementNameWords;
+	}
+	
+	if (this->Family != nullptr) {
+		return this->Family->GetSettlementNameWords();
+	}
+	
+	return this->SettlementNameWords;
+}
+
 void CLanguageFamily::_bind_methods()
 {
 	BIND_PROPERTIES();

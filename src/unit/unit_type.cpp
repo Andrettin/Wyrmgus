@@ -1895,6 +1895,7 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 	
 	if (potential_names.size() == 0 && this->GetCivilization() != nullptr) {
 		const CCivilization *civilization = this->GetCivilization();
+		CLanguage *language = civilization->GetLanguage();
 		if (faction && civilization != faction->Civilization && civilization->GetSpecies() == faction->Civilization->GetSpecies() && this->Slot == CFaction::GetFactionClassUnitType(faction, this->Class)) {
 			civilization = faction->Civilization;
 		}
@@ -1906,8 +1907,6 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 		}
 		
 		if (this->BoolFlag[ORGANIC_INDEX].value) {
-			CLanguage *language = civilization->GetLanguage();
-			
 			if (language != nullptr) {
 				const std::vector<CWord *> &personal_name_words = language->GetPersonalNameWords(gender);
 				if (!personal_name_words.empty()) {
@@ -1917,8 +1916,6 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 							potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
 						}
 					}
-					
-					return potential_names;
 				}
 			}
 			
@@ -1944,6 +1941,18 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 				
 				if (civilization->GetShipNames().size() > 0) {
 					return civilization->GetShipNames();
+				}
+				
+				if (language != nullptr) {
+					const std::vector<CWord *> &ship_name_words = language->GetShipNameWords();
+					if (!ship_name_words.empty()) {
+						for (const CWord *name_word : ship_name_words) {
+							const int weight = name_word->GetShipNameWeight();
+							for (int i = 0; i < weight; ++i) {
+								potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
+							}
+						}
+					}
 				}
 			}
 		}

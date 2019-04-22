@@ -62,6 +62,20 @@ bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
 			this->FamilyNameWeight = 1;
 			this->Language->AddFamilyNameWord(this);
 		}
+	} else if (key == "ship_name") {
+		const bool value_bool = StringToBool(value);
+		
+		if (value_bool) {
+			this->ShipNameWeight = 1;
+			this->Language->AddShipNameWord(this);
+		}
+	} else if (key == "settlement_name") {
+		const bool value_bool = StringToBool(value);
+		
+		if (value_bool) {
+			this->SettlementNameWeight = 1;
+			this->Language->AddSettlementNameWord(this);
+		}
 	} else {
 		return false;
 	}
