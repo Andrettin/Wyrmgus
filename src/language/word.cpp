@@ -35,6 +35,8 @@
 
 #include "language/word.h"
 
+#include "character.h"
+#include "dependency/and_dependency.h"
 #include "language/grammatical_gender.h"
 #include "language/language.h"
 #include "language/word_type.h"
@@ -42,6 +44,70 @@
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	@brief	Process a property in the data provided by a configuration file
+**
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
+*/
+bool CWord::ProcessConfigDataProperty(const std::string &key, std::string value)
+{
+	if (key == "family_name") {
+		const bool value_bool = StringToBool(value);
+		
+		if (value_bool) {
+			this->FamilyNameWeight = 1;
+			this->Language->AddFamilyNameWord(this);
+		}
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+**	@brief	Process a section in the data provided by a configuration file
+**
+**	@param	section		The section
+**
+**	@return	True if the section can be processed, or false otherwise
+*/
+bool CWord::ProcessConfigDataSection(const CConfigData *section)
+{
+	if (section->Tag == "personal_name") {
+		for (const CConfigProperty &property : section->Properties) {
+			if (property.Operator != CConfigOperator::Assignment) {
+				fprintf(stderr, "Wrong operator enumeration index for property \"%s\": %i.\n", property.Key.c_str(), property.Operator);
+				continue;
+			}
+			
+			std::string key = FindAndReplaceString(property.Key, "_", "-");
+			const int gender_index = GetGenderIdByName(key);
+			
+			if (gender_index == -1) {
+				fprintf(stderr, "Invalid gender: \"%s\".\n", key.c_str());
+				continue;
+			}
+			
+			const bool value_bool = StringToBool(property.Value);
+			if (value_bool) {
+				this->PersonalNameWeights[gender_index] = 1;
+				this->Language->AddPersonalNameWord(this, gender_index);
+			}
+		}
+	} else if (section->Tag == "dependencies") {
+		this->Dependency = new CAndDependency;
+		this->Dependency->ProcessConfigData(section);
+	} else {
+		return false;
+	}
+	
+	return true;
+}
 
 /**
 **	@brief	Initialize the word
@@ -132,4 +198,8 @@ String CWord::GetParticiple(const int grammatical_tense)
 void CWord::_bind_methods()
 {
 	BIND_PROPERTIES();
+	
+	ClassDB::bind_method(D_METHOD("set_anglicized_name", "anglicized_name"), [](CWord *word, const String &anglicized_name){ word->AnglicizedName = anglicized_name; });
+	ClassDB::bind_method(D_METHOD("get_anglicized_name"), &CWord::GetAnglicizedName);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "anglicized_name"), "set_anglicized_name", "get_anglicized_name");
 }

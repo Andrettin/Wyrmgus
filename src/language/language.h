@@ -73,6 +73,11 @@ public:
 	CWord *GetWord(const String &name, const CWordType *word_type, const std::vector<String> &word_meanings) const;
 	void RemoveWord(CWord *word);
 	
+	void AddPersonalNameWord(CWord *word, const int gender);
+	const std::vector<CWord *> &GetPersonalNameWords(const int gender);
+	void AddFamilyNameWord(CWord *word);
+	const std::vector<CWord *> &GetFamilyNameWords() const;
+	
 	String TranslateName(const String &name) const;
 	
 public:
@@ -91,6 +96,10 @@ public:
 	std::vector<CLanguage *> Dialects;				/// dialects of this language
 	std::vector<CWord *> Words;						/// words of the language
 	std::map<String, std::vector<String>> NameTranslations;	/// name translations; possible translations mapped to the name to be translated
+	
+private:
+	std::map<int, std::vector<CWord *>> PersonalNameWords;	/// the words used for personal name generation, mapped to the gender for which they can be used
+	std::vector<CWord *> FamilyNameWords;
 
 	friend int CclDefineLanguage(lua_State *l);
 	

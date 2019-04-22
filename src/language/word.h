@@ -41,6 +41,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CDependency;
 class CGrammaticalGender;
 class CLanguage;
 class CWordType;
@@ -138,7 +139,6 @@ public:
 private:
 	static inline bool InitializeClass()
 	{
-		REGISTER_PROPERTY(AnglicizedName);
 		REGISTER_PROPERTY(DerivesFrom);
 		REGISTER_PROPERTY(Gender);
 		REGISTER_PROPERTY(Language);
@@ -151,7 +151,34 @@ private:
 	static inline bool ClassInitialized = InitializeClass();
 
 public:
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value);
+	virtual bool ProcessConfigDataSection(const CConfigData *section) override;
+	
 	virtual void Initialize() override;
+	
+	const String &GetAnglicizedName() const
+	{
+		if (!this->AnglicizedName.empty()) {
+			return this->AnglicizedName;
+		} else {
+			return this->GetName();
+		}
+	}
+	
+	int GetPersonalNameWeight(const int gender) const
+	{
+		std::map<int, int>::const_iterator find_iterator = this->PersonalNameWeights.find(gender);
+		if (find_iterator != this->PersonalNameWeights.end()) {
+			return find_iterator->second;
+		}
+		
+		return 0;
+	}
+	
+	int GetFamilyNameWeight() const
+	{
+		return this->FamilyNameWeight;
+	}
 	
 	String GetNounInflection(const int grammatical_number, const int grammatical_case);
 	String GetVerbInflection(const int grammatical_number, const int grammatical_person, const int grammatical_tense, const int grammatical_mood);
@@ -168,16 +195,9 @@ public:
 			this->SetLanguage(language);
 		})
 	};
-	Property<String> AnglicizedName {					/// the anglicized version of the word
-		Property<String>::ValueType(),
-		Property<String>::GetterType([this]() -> Property<String>::ReturnType {
-			if (!this->AnglicizedName.Value.empty()) {
-				return this->AnglicizedName.Value;
-			} else {
-				return this->Name;
-			}
-		})
-	};
+private:
+	String AnglicizedName;		/// the anglicized version of the word
+public:
 	ExposedProperty<const CWordType *> Type = nullptr;	/// word type
 	ExposedProperty<const CGrammaticalGender *> Gender = nullptr;		/// the grammatical gender of the noun or article
 	int GrammaticalNumber = -1;						/// grammatical number (i.e. whether the word is necessarily plural or not)
@@ -217,6 +237,15 @@ public:
 	
 	//numeral-specific variables
 	int Number = -1;
+	
+private:
+	std::map<int, int> PersonalNameWeights;	/// the weight of this word for personal name generation, mapped to each possible gender for the name generation
+	int FamilyNameWeight = 0;
+	int ShipNameWeight = 0;					/// the weight of this word for ship name generation
+	
+public:
+	CDependency *Predependency = nullptr;	/// the predependency for the word to be used as a personal name
+	CDependency *Dependency = nullptr;		/// the dependency for the word to be used as a personal name
 	
 	String Mod;						/// to which mod (or map), if any, this word belongs
 	

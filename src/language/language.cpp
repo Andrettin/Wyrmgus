@@ -66,6 +66,50 @@ void CLanguage::RemoveWord(CWord *word)
 	}
 }
 
+void CLanguage::AddPersonalNameWord(CWord *word, const int gender)
+{
+	this->PersonalNameWords[gender].push_back(word);
+	
+	if (this->Family != nullptr) {
+		this->Family->AddPersonalNameWord(word, gender);
+	}
+}
+
+const std::vector<CWord *> &CLanguage::GetPersonalNameWords(const int gender)
+{
+	if (!this->PersonalNameWords[gender].empty()) {
+		return this->PersonalNameWords[gender];
+	}
+	
+	if (this->Family != nullptr) {
+		return this->Family->GetPersonalNameWords(gender);
+	}
+	
+	return this->PersonalNameWords[gender];
+}
+
+void CLanguage::AddFamilyNameWord(CWord *word)
+{
+	this->FamilyNameWords.push_back(word);
+	
+	if (this->Family != nullptr) {
+		this->Family->AddFamilyNameWord(word);
+	}
+}
+
+const std::vector<CWord *> &CLanguage::GetFamilyNameWords() const
+{
+	if (!this->FamilyNameWords.empty()) {
+		return this->FamilyNameWords;
+	}
+	
+	if (this->Family != nullptr) {
+		return this->Family->GetFamilyNameWords();
+	}
+	
+	return this->FamilyNameWords;
+}
+
 /**
 **  "Translate" (that is, adapt) a proper name from one culture (civilization) to another.
 */

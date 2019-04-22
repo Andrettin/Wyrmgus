@@ -55,6 +55,8 @@
 #include "item/item_class.h"
 #include "item/item_slot.h"
 #include "luacallback.h"
+#include "language/language.h"
+#include "language/word.h"
 #include "map/map.h"
 #include "map/terrain_type.h"
 #include "map/tileset.h"
@@ -1904,6 +1906,22 @@ std::vector<std::string> CUnitType::GetPotentialPersonalNames(const CFaction *fa
 		}
 		
 		if (this->BoolFlag[ORGANIC_INDEX].value) {
+			CLanguage *language = civilization->GetLanguage();
+			
+			if (language != nullptr) {
+				const std::vector<CWord *> &personal_name_words = language->GetPersonalNameWords(gender);
+				if (!personal_name_words.empty()) {
+					for (const CWord *name_word : personal_name_words) {
+						const int weight = name_word->GetPersonalNameWeight(gender);
+						for (int i = 0; i < weight; ++i) {
+							potential_names.push_back(name_word->GetAnglicizedName().utf8().get_data());
+						}
+					}
+					
+					return potential_names;
+				}
+			}
+			
 			if (civilization->GetPersonalNames().find(NoGender) != civilization->GetPersonalNames().end()) {
 				for (size_t i = 0; i < civilization->GetPersonalNames().find(NoGender)->second.size(); ++i) {
 					potential_names.push_back(civilization->GetPersonalNames().find(NoGender)->second[i]);
