@@ -37,7 +37,7 @@
 
 #include "config.h"
 #include "config_operator.h"
-#include "mod.h"
+#include "module.h"
 #include "video/video.h"
 
 /*----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ bool CTimeOfDay::ProcessConfigDataSection(const CConfigData *section)
 			std::string value = property.Value;
 			
 			if (key == "file") {
-				file = CMod::GetCurrentModPath() + value;
+				file = CModule::GetCurrentPath() + value;
 			} else if (key == "width") {
 				size.x = std::stoi(value);
 			} else if (key == "height") {

@@ -41,7 +41,7 @@
 #include "construct.h"
 #include "item/item_class.h"
 #include "map/terrain_type.h"
-#include "mod.h"
+#include "module.h"
 #include "time/season.h"
 #include "ui/button_action.h"
 #include "ui/icon.h"
@@ -105,11 +105,11 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 		} else if (key == "type_name") {
 			this->TypeName = value;
 		} else if (key == "file") {
-			this->File = CMod::GetCurrentModPath() + value;
+			this->File = CModule::GetCurrentPath() + value;
 		} else if (key == "shadow_file") {
-			this->ShadowFile = CMod::GetCurrentModPath() + value;
+			this->ShadowFile = CModule::GetCurrentPath() + value;
 		} else if (key == "light_file") {
-			this->LightFile = CMod::GetCurrentModPath() + value;
+			this->LightFile = CModule::GetCurrentPath() + value;
 		} else if (key == "frame_width") {
 			this->FrameWidth = std::stoi(value);
 		} else if (key == "frame_height") {
@@ -226,7 +226,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				std::string value = property.Value;
 				
 				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
+					file = CModule::GetCurrentPath() + value;
 				} else if (key == "resource") {
 					value = FindAndReplaceString(value, "_", "-");
 					resource = GetResourceIdByName(value.c_str());
@@ -260,7 +260,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				std::string value = property.Value;
 				
 				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
+					file = CModule::GetCurrentPath() + value;
 				} else if (key == "resource") {
 					value = FindAndReplaceString(value, "_", "-");
 					resource = GetResourceIdByName(value.c_str());
@@ -294,7 +294,7 @@ void CUnitTypeVariation::ProcessConfigData(const CConfigData *config_data)
 				std::string value = property.Value;
 				
 				if (key == "file") {
-					file = CMod::GetCurrentModPath() + value;
+					file = CModule::GetCurrentPath() + value;
 				} else if (key == "image_layer") {
 					value = FindAndReplaceString(value, "_", "-");
 					image_layer = GetImageLayerIdByName(value);

@@ -50,6 +50,7 @@
 #include "map/terrain_type.h"
 #include "map/tile.h"
 #include "map/tileset.h"
+#include "module.h"
 #include "player.h"
 #include "quest/campaign.h"
 #include "quest/quest.h"
@@ -118,13 +119,13 @@ bool CMapTemplate::ProcessConfigDataProperty(const std::string &key, std::string
 			UI.SurfaceLayerButtons.resize(this->SurfaceLayer + 1);
 		}
 	} else if (key == "terrain_file") {
-		this->TerrainFile = value;
+		this->TerrainFile = CModule::GetCurrentPath() + value;
 	} else if (key == "overlay_terrain_file") {
-		this->OverlayTerrainFile = value;
+		this->OverlayTerrainFile = CModule::GetCurrentPath() + value;
 	} else if (key == "terrain_image") {
-		this->TerrainImage = value;
+		this->TerrainImage = CModule::GetCurrentPath() + value;
 	} else if (key == "overlay_terrain_image") {
-		this->OverlayTerrainImage = value;
+		this->OverlayTerrainImage = CModule::GetCurrentPath() + value;
 	} else if (key == "pixel_tile_width") {
 		this->PixelTileSize.x = std::stoi(value);
 	} else if (key == "pixel_tile_height") {

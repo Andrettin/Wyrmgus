@@ -59,7 +59,7 @@
 #include "map/terrain_type.h"
 #include "map/tileset.h"
 #include "missile/missile_type.h"
-#include "mod.h"
+#include "module.h"
 #include "player.h"
 #include "script.h"
 #include "sound/sound.h"
@@ -962,7 +962,7 @@ bool CUnitType::ProcessConfigDataSection(const CConfigData *section)
 			std::string value = property.Value;
 			
 			if (key == "file") {
-				this->File = CMod::GetCurrentModPath() + value;
+				this->File = CModule::GetCurrentPath() + value;
 			} else if (key == "width") {
 				this->Width = std::stoi(value);
 			} else if (key == "height") {

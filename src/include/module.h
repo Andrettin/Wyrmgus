@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name mod.cpp - The mod source file. */
+/**@name module.h - The module header file. */
 //
 //      (c) Copyright 2018-2019 by Andrettin
 //
@@ -27,30 +27,32 @@
 //      02111-1307, USA.
 //
 
+#ifndef __MODULE_H__
+#define __MODULE_H__
+
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
-#include "mod.h"
+#include <string>
 
 /*----------------------------------------------------------------------------
---  Variables
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-std::string CMod::CurrentModPath;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-void CMod::SetCurrentModPath(const std::string &path)
+class CModule
 {
-	CurrentModPath = path;
-}
+public:
+	static void SetCurrentPath(const std::string &path);
+	static std::string GetCurrentPath();
+	
+private:
+	static std::string CurrentPath;
+	
+public:
+	std::string Ident;									/// Ident of the module
+	std::string Name;									/// Name of the module
+	std::string Path;
+};
 
-std::string CMod::GetCurrentModPath()
-{
-	return CurrentModPath;
-}
+#endif

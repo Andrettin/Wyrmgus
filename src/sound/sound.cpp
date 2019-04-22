@@ -44,7 +44,7 @@
 #include "map/map.h"
 #include "map/map_layer.h"
 #include "map/tileset.h"
-#include "mod.h"
+#include "module.h"
 #include "missile/missile.h"
 #include "missile/missile_type.h"
 #include "sound/sound_server.h"
@@ -815,7 +815,7 @@ void CSound::ProcessConfigData(const CConfigData *config_data)
 		}
 		
 		if (property.Key == "file") {
-			std::string file = CMod::GetCurrentModPath() + property.Value;
+			std::string file = CModule::GetCurrentPath() + property.Value;
 			files.push_back(file);
 		} else if (property.Key == "group_sound") {
 			std::string value = FindAndReplaceString(property.Value, "_", "-");

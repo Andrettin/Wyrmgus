@@ -61,7 +61,7 @@ set(tolua_FILES
 	src/tolua/map.pkg
 	src/tolua/master.pkg
 	src/tolua/minimap.pkg
-	src/tolua/mod.pkg
+	src/tolua/module.pkg
 	src/tolua/network.pkg
 	src/tolua/pathfinder.pkg
 	src/tolua/player.pkg

@@ -40,7 +40,7 @@
 #include "dependency/and_dependency.h"
 #include "dependency/dependency.h"
 #include "game/game.h"
-#include "mod.h"
+#include "module.h"
 #include "player.h"
 #include "time/calendar.h"
 #include "unit/unit_type.h"
@@ -90,7 +90,7 @@ bool CAge::ProcessConfigDataSection(const CConfigData *section)
 			std::string value = property.Value;
 			
 			if (key == "file") {
-				file = CMod::GetCurrentModPath() + value;
+				file = CModule::GetCurrentPath() + value;
 			} else if (key == "width") {
 				size.x = std::stoi(value);
 			} else if (key == "height") {

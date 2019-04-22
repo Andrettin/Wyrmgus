@@ -1,0 +1,5 @@
+class CModule
+{
+	static void SetCurrentPath(const std::string path);
+	static std::string GetCurrentPath();
+};
