@@ -3199,7 +3199,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask, int sortmo
 		LuaError(l, "incorrect argument");
 	}
 	const char *userdir = lua_tostring(l, 1);
-	const int rel = args > 1 ? lua_toboolean(l, 2) : 0;
+	const bool is_absolute = ((args > 1) ? lua_toboolean(l, 2) : false);
 	int n = strlen(userdir);
 
 	int pathtype = 0; // path relative to stratagus dir
@@ -3225,7 +3225,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask, int sortmo
 			dir += GameName;
 		}
 		snprintf(directory, sizeof(directory), "%s/%s", dir.c_str(), userdir);
-	} else if (rel) {
+	} else if (is_absolute) {
 		std::string dir = LibraryFileName(userdir);
 		snprintf(directory, sizeof(directory), "%s", dir.c_str());
 		lua_pop(l, 1);
