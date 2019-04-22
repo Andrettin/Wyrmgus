@@ -1218,7 +1218,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 	}
 	
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
-		this->SetName(this->Faction->Name);
+		this->SetName(this->Faction->GetName().utf8().get_data());
 	}
 	if (this->Faction != nullptr) {
 		int color = -1;
@@ -1265,7 +1265,7 @@ void CPlayer::SetFaction(const CFaction *faction)
 			}
 		}
 	} else {
-		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %i of civilization \"%s\".\n", faction->Name.c_str(), this->Index, CCivilization::Get(this->Race)->GetIdent().utf8().get_data());
+		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %i of civilization \"%s\".\n", faction->GetName().utf8().get_data(), this->Index, CCivilization::Get(this->Race)->GetIdent().utf8().get_data());
 	}
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
@@ -4248,8 +4248,12 @@ void CPlayer::_bind_methods()
 
 void NetworkSetFaction(int player, const std::string &faction_name)
 {
-	const int faction = CFaction::GetIndex(faction_name);
-	SendCommandSetFaction(player, faction);
+	const CFaction *faction = CFaction::Get(faction_name);
+	int faction_index = -1;
+	if (faction != nullptr) {
+		faction_index = faction->GetIndex();
+	}
+	SendCommandSetFaction(player, faction_index);
 }
 
 int GetPlayerColorIndexByName(const std::string &player_color_name)

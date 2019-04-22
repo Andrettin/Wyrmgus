@@ -1196,8 +1196,8 @@ void CButtonPanel::Draw()
 			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon().Icon;
 		} else if (buttons[i].Action == ButtonResearch && buttons[i].Icon.Name.empty() && AllUpgrades[buttons[i].Value]->Icon) {
 			button_icon = AllUpgrades[buttons[i].Value]->Icon;
-		} else if (buttons[i].Action == ButtonFaction && buttons[i].Icon.Name.empty() && !CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[buttons[i].Value]->Icon.Name.empty()) {
-			button_icon = CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[buttons[i].Value]->Icon.Icon;
+		} else if (buttons[i].Action == ButtonFaction && buttons[i].Icon.Name.empty() && CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[buttons[i].Value]->GetIcon() != nullptr) {
+			button_icon = CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[buttons[i].Value]->GetIcon();
 		}
 		//Wyrmgus end
 		
@@ -1859,12 +1859,12 @@ void CButtonPanel::Update()
 					if (CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->DefiniteArticle) {
 						UnitButtonTable[i]->Hint += "the ";
 					}
-					UnitButtonTable[i]->Hint += CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->Name;
+					UnitButtonTable[i]->Hint += CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->GetName().utf8().get_data();
 					UnitButtonTable[i]->Description = "Changes your faction to ";
 					if (CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->DefiniteArticle) {
 						UnitButtonTable[i]->Description += "the ";
 					}
-					UnitButtonTable[i]->Description += CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->Name;
+					UnitButtonTable[i]->Description += CPlayer::GetThisPlayer()->GetFaction()->DevelopsTo[potential_faction_count]->GetName().utf8().get_data();
 				}
 				potential_faction_count += 1;
 			} else if (UnitButtonTable[i]->Action == ButtonBuy) {

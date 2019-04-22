@@ -39,7 +39,9 @@
 #include "civilization.h"
 #include "faction.h"
 #include "luacallback.h"
+#include "player.h"
 #include "player_color.h"
+#include "ui/icon.h"
 #include "unit/unit_class.h"
 
 /*----------------------------------------------------------------------------
@@ -61,11 +63,69 @@ CFaction::~CFaction()
 	if (this->Conditions) {
 		delete Conditions;
 	}
-
-	this->UIFillers.clear();
 }
 
-int CFaction::GetIndex(const std::string &faction_ident)
+/**
+**	@brief	Process a property in the data provided by a configuration file
+**
+**	@param	key		The property's key
+**	@param	value	The property's value
+**
+**	@return	True if the property can be processed, or false otherwise
+*/
+bool CFaction::ProcessConfigDataProperty(const std::string &key, std::string value)
+{
+	if (key == "civilization") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Civilization = CCivilization::Get(value);
+	} else if (key == "type") {
+		value = FindAndReplaceString(value, "_", "-");
+		const int faction_type = GetFactionTypeIdByName(value);
+		if (faction_type != -1) {
+			this->Type = faction_type;
+		} else {
+			fprintf(stderr, "Faction type \"%s\" doesn't exist.", value.c_str());
+		}
+	} else if (key == "primary_color") {
+		value = FindAndReplaceString(value, "_", "-");
+		CPlayerColor *player_color = CPlayerColor::Get(value);
+		if (player_color != nullptr) {
+			this->PrimaryColors.push_back(player_color);
+		}
+	} else if (key == "secondary_color") {
+		value = FindAndReplaceString(value, "_", "-");
+		CPlayerColor *player_color = CPlayerColor::Get(value);
+		if (player_color != nullptr) {
+			this->SecondaryColor = player_color;
+		}
+	} else if (key == "faction_upgrade") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->Icon = CIcon::Get(value);
+	} else if (key == "faction_upgrade") {
+		value = FindAndReplaceString(value, "_", "-");
+		this->FactionUpgrade = value;
+	} else if (key == "develops_from") {
+		value = FindAndReplaceString(value, "_", "-");
+		CFaction *other_faction = CFaction::Get(value);
+		if (other_faction != nullptr) {
+			this->DevelopsFrom.push_back(other_faction);
+			other_faction->DevelopsTo.push_back(this);
+		}
+	} else if (key == "develops_to") {
+		value = FindAndReplaceString(value, "_", "-");
+		CFaction *other_faction = CFaction::Get(value);
+		if (other_faction != nullptr) {
+			this->DevelopsTo.push_back(other_faction);
+			other_faction->DevelopsFrom.push_back(this);
+		}
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
+int CFaction::GetFactionIndex(const std::string &faction_ident)
 {
 	if (faction_ident.empty()) {
 		return -1;
@@ -244,8 +304,6 @@ const std::vector<std::string> &CFaction::GetShipNames() const
 
 void CFaction::_bind_methods()
 {
-	ClassDB::bind_method(D_METHOD("get_ident"), &CFaction::GetIdent);
-	ClassDB::bind_method(D_METHOD("get_name"), &CFaction::GetName);
 	ClassDB::bind_method(D_METHOD("get_primary_color"), &CFaction::GetPrimaryColor);
 	ClassDB::bind_method(D_METHOD("get_secondary_color"), &CFaction::GetSecondaryColor);
 }

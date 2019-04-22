@@ -73,6 +73,7 @@
 #include "unit/unit_type.h"
 //Wyrmgus end
 #include "video/font.h"
+#include "wyrmgus.h"
 
 #include <mutex>
 #include <queue>
@@ -3210,7 +3211,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask, int sortmo
 	// security: disallow all special characters
 	//Wyrmgus start
 //	if (strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) {
-	if ((strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) && (strstr(userdir, "workshop") == 0 || strstr(userdir, "content") == 0 || strstr(userdir, "370070") == 0)) { //special case for Wyrmsun's workshop folder
+	if ((strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) && (strstr(userdir, "workshop") == 0 || strstr(userdir, "content") == 0 || strstr(userdir, "370070") == 0) && strstr(userdir, Wyrmgus::GetInstance()->GetUserDirectory().utf8().get_data()) == 0) { //special case for Wyrmsun's workshop folder
 	//Wyrmgus end
 		LuaError(l, "Forbidden directory");
 	}

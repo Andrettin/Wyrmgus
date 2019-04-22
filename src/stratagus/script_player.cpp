@@ -1899,10 +1899,7 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "DefiniteArticle")) {
 			faction->DefiniteArticle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
-			faction->Icon.Name = LuaToString(l, -1);
-			faction->Icon.Icon = nullptr;
-			faction->Icon.Load();
-			faction->Icon.Icon->Load();
+			faction->Icon = CIcon::Get(LuaToString(l, -1));
 		} else if (!strcmp(value, "Currency")) {
 			Currency *currency = Currency::Get(LuaToString(l, -1));
 			faction->Currency = currency;
@@ -2619,22 +2616,22 @@ static int CclGetFactionData(lua_State *l)
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
-		lua_pushstring(l, faction->Name.c_str());
+		lua_pushstring(l, faction->GetName().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, faction->Description.c_str());
+		lua_pushstring(l, faction->GetDescription().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
-		lua_pushstring(l, faction->Quote.c_str());
+		lua_pushstring(l, faction->GetQuote().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
-		lua_pushstring(l, faction->Background.c_str());
+		lua_pushstring(l, faction->GetBackground().utf8().get_data());
 		return 1;
 	} else if (!strcmp(data, "Adjective")) {
 		if (!faction->Adjective.empty()) {
 			lua_pushstring(l, faction->Adjective.c_str());
 		} else {
-			lua_pushstring(l, faction->Name.c_str());
+			lua_pushstring(l, faction->GetName().utf8().get_data());
 		}
 		return 1;
 	} else if (!strcmp(data, "Type")) {

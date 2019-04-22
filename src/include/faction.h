@@ -36,11 +36,9 @@
 
 #include "character.h" // because of "MaxCharacterTitles"
 #include "data_type.h"
+#include "detailed_data_element.h"
 #include "time/date.h"
-#include "ui/icon_config.h"
 #include "ui/ui.h" // for the UI fillers
-
-#include <core/object.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -52,6 +50,7 @@ class Currency;
 class CDeity;
 class CDynasty;
 class CForceTemplate;
+class CIcon;
 class CPlayerColor;
 class CUpgrade;
 class CSite;
@@ -98,54 +97,21 @@ enum FactionTiers {
 --  Definition
 ----------------------------------------------------------------------------*/
 
-class CFaction : public Object, public DataType<CFaction>
+class CFaction : public DetailedDataElement, public DataType<CFaction>
 {
-	GDCLASS(CFaction, Object)
+	DATA_TYPE(CFaction, DetailedDataElement)
 	
 public:
 	~CFaction();
 	
 	static constexpr const char *ClassIdentifier = "faction";
 	
-	static int GetIndex(const std::string &faction_ident);
+	static int GetFactionIndex(const std::string &faction_ident);
 	static int GetFactionClassUnitType(const CFaction *faction, const UnitClass *unit_class);
 	static int GetFactionClassUpgrade(const CFaction *faction, const int class_id);
 	static std::vector<CFiller> GetFactionUIFillers(const CFaction *faction);
 	
-	/**
-	**	@brief	Get the faction's string identifier
-	**
-	**	@return	The faction's string identifier
-	*/
-	String GetIdent() const
-	{
-		return this->Ident.c_str();
-	}
-	
-	/**
-	**	@brief	Get the faction's index
-	**
-	**	@return	The faction's index
-	*/
-	int GetIndex() const
-	{
-		return this->Index;
-	}
-	
-	bool IsInitialized() const
-	{
-		return this->Initialized;
-	}
-
-	/**
-	**	@brief	Get the faction's name
-	**
-	**	@return	The faction's name
-	*/
-	String GetName() const
-	{
-		return this->Name.c_str();
-	}
+	virtual bool ProcessConfigDataProperty(const std::string &key, std::string value);
 	
 	/**
 	**	@brief	Get the faction's primary color with highest priority
@@ -181,6 +147,16 @@ public:
 		return this->SecondaryColor;
 	}
 	
+	/**
+	**	@brief	Get the faction's icon
+	**
+	**	@return	The faction's icon
+	*/
+	CIcon *GetIcon() const
+	{
+		return this->Icon;
+	}
+	
 	Currency *GetCurrency() const;
 	int GetUpgradePriority(const CUpgrade *upgrade) const;
 	int GetForceTypeWeight(int force_type) const;
@@ -188,15 +164,7 @@ public:
 	std::vector<CAiBuildingTemplate *> GetAiBuildingTemplates() const;
 	const std::vector<std::string> &GetShipNames() const;
 
-private:
-	std::string Ident;													/// faction string identifier
-	int Index = -1;														/// faction index
-	bool Initialized = false;
 public:
-	std::string Name;													/// faction name
-	std::string Description;											/// faction description
-	std::string Quote;													/// faction quote
-	std::string Background;												/// faction background
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string Adjective;												/// adjective pertaining to the faction
 	std::string DefaultAI = "land-attack";
@@ -207,8 +175,10 @@ public:
 	const CFaction *ParentFaction = nullptr;							/// the parent faction of this faction
 	bool Playable = true;												/// faction playability
 	bool DefiniteArticle = false;										/// whether the faction's name should be preceded by a definite article (e.g. "the Netherlands")
-	IconConfig Icon;													/// Faction's icon
-	Currency *Currency = nullptr;										/// The faction's currency
+private:
+	CIcon *Icon = nullptr;												/// the faction's icon
+	Currency *Currency = nullptr;										/// the faction's currency
+public:
 	CDeity *HolyOrderDeity = nullptr;									/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions = nullptr;
 private:
