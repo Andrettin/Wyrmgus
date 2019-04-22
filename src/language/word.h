@@ -195,6 +195,11 @@ public:
 	String GetAdjectiveInflection(const int comparison_degree, const int article_type = -1, int grammatical_case = -1, const int grammatical_number = -1, const CGrammaticalGender *grammatical_gender = nullptr);
 	String GetParticiple(int grammatical_tense);
 	
+	bool IsProperName() const
+	{
+		return !this->PersonalNameWeights.empty() || this->FamilyNameWeight != 0 || this->ShipNameWeight != 0 || this->SettlementNameWeight != 0;
+	}
+	
 private:
 	void SetLanguage(CLanguage *language);
 

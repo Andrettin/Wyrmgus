@@ -132,7 +132,7 @@ void CWord::Initialize()
 		fprintf(stderr, "Word \"%s\" has not been assigned to any language.\n", this->GetIdent().utf8().get_data());
 	}
 	
-	if (this->Type == nullptr) {
+	if (this->Type == nullptr && !this->IsProperName()) {
 		fprintf(stderr, "Word \"%s\" has no type.\n", this->GetIdent().utf8().get_data());
 	}
 	
