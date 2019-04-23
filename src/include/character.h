@@ -63,6 +63,7 @@ class CSite;
 class CUnitType;
 class CUnit;
 class CUpgrade;
+class CWord;
 class ItemSlot;
 class LuaCallback;
 struct lua_State;
@@ -164,8 +165,10 @@ public:
 	bool ViolentDeath = false;	/// If historical death was violent
 	bool Custom = false;		/// Whether this character is a custom hero
 	std::string Name;			/// Given name of the character
+	CWord *NameWord = nullptr;	/// the word for the character's name
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
 	std::string FamilyName;		/// Name of the character's family
+	CWord *FamilyNameWord = nullptr;	/// the word for the character's family name
 	std::string Description;	/// Description of the character from an in-game universe perspective
 	std::string Background;		/// Description of the character from a perspective outside of the game's universe
 	std::string Quote;			/// A quote relating to the character

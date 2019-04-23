@@ -45,6 +45,7 @@
 #include "iolib.h"
 #include "item/item.h"
 #include "item/item_class.h"
+#include "language/word.h"
 #include "map/historical_location.h"
 #include "map/map_template.h"
 #include "parameters.h"
@@ -184,9 +185,27 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		if (key == "name") {
 			this->Name = value;
 			name_changed = true;
+		} else if (key == "name_word") {
+			value = FindAndReplaceString(value, "_", "-");
+			CWord *name_word = CWord::Get(value);
+			if (name_word != nullptr) {
+				this->NameWord = name_word;
+				if (this->Name.empty()) {
+					this->Name = this->NameWord->GetAnglicizedName().utf8().get_data();
+				}
+			}
 		} else if (key == "family_name") {
 			this->FamilyName = value;
 			family_name_changed = true;
+		} else if (key == "family_name_word") {
+			value = FindAndReplaceString(value, "_", "-");
+			CWord *family_name_word = CWord::Get(value);
+			if (family_name_word != nullptr) {
+				this->FamilyNameWord = family_name_word;
+				if (this->FamilyName.empty()) {
+					this->FamilyName = this->FamilyNameWord->GetAnglicizedName().utf8().get_data();
+				}
+			}
 		} else if (key == "unit_type") {
 			value = FindAndReplaceString(value, "_", "-");
 			CUnitType *unit_type = UnitTypeByIdent(value);
@@ -462,6 +481,18 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 				this->Abilities.erase(std::remove(this->Abilities.begin(), this->Abilities.end(), ability_upgrade), this->Abilities.end());
 			}
 		}
+	}
+	
+	if (this->NameWord != nullptr) {
+		if (this->Type != nullptr && this->Type->GetSpecies() != nullptr && this->Type->BoolFlag[FAUNA_INDEX].value) {
+			this->NameWord->ChangeSpecimenNameWeight(this->Type->GetSpecies(), this->Gender, 1);
+		} else {
+			this->NameWord->ChangePersonalNameWeight(this->Gender, 1);
+		}
+	}
+
+	if (this->FamilyNameWord != nullptr) {
+		this->FamilyNameWord->ChangeFamilyNameWeight(1);
 	}
 
 	this->GenerateMissingDates();

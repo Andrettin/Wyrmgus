@@ -166,6 +166,8 @@ public:
 		}
 	}
 	
+	void ChangePersonalNameWeight(const int gender, const int change);
+	
 	int GetPersonalNameWeight(const int gender) const
 	{
 		std::map<int, int>::const_iterator find_iterator = this->PersonalNameWeights.find(gender);
@@ -176,10 +178,21 @@ public:
 		return 0;
 	}
 	
+	void ChangeFamilyNameWeight(const int change)
+	{
+		if (this->FamilyNameWeight != 0) {
+			this->FamilyNameWeight += change;
+		} else {
+			fprintf(stderr, "Tried to increase family name weight for word \"%s\", but the word is not set to be a family name.\n", this->GetIdent().utf8().get_data());
+		}
+	}
+	
 	int GetFamilyNameWeight() const
 	{
 		return this->FamilyNameWeight;
 	}
+	
+	void ChangeSpecimenNameWeight(const CSpecies *species, const int gender, const int change);
 	
 	int GetSpecimenNameWeight(const CSpecies *species, const int gender) const
 	{

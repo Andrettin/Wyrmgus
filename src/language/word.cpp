@@ -195,6 +195,31 @@ void CWord::SetLanguage(CLanguage *language)
 	}
 }
 
+void CWord::ChangePersonalNameWeight(const int gender, const int change)
+{
+	std::map<int, int>::iterator find_iterator = this->PersonalNameWeights.find(gender);
+	if (find_iterator != this->PersonalNameWeights.end()) {
+		find_iterator->second += change;
+	} else {
+		fprintf(stderr, "Tried to increase personal name weight for gender \"%s\" for word \"%s\", but the word is not set to be a personal name for that gender.\n", GetGenderNameById(gender).c_str(), this->GetIdent().utf8().get_data());
+	}
+}
+
+void CWord::ChangeSpecimenNameWeight(const CSpecies *species, const int gender, const int change)
+{
+	std::map<const CSpecies *, std::map<int, int>>::iterator find_iterator = this->SpecimenNameWeights.find(species);
+	if (find_iterator != this->SpecimenNameWeights.end()) {
+		std::map<int, int>::iterator sub_find_iterator = find_iterator->second.find(gender);
+		if (sub_find_iterator != find_iterator->second.end()) {
+			sub_find_iterator->second += change;
+		} else {
+			fprintf(stderr, "Tried to increase personal name weight for species \"%s\" and gender \"%s\" for word \"%s\", but the word is not set to be a specimen name for that species and gender combination.\n", species->GetIdent().utf8().get_data(), GetGenderNameById(gender).c_str(), this->GetIdent().utf8().get_data());
+		}
+	} else {
+		fprintf(stderr, "Tried to increase personal name weight for species \"%s\" for word \"%s\", but the word is not set to be a specimen name for that species.\n", species->GetIdent().utf8().get_data(), this->GetIdent().utf8().get_data());
+	}
+}
+
 String CWord::GetNounInflection(const int grammatical_number, const int grammatical_case)
 {
 	if (this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case)) != this->NumberCaseInflections.end()) {
