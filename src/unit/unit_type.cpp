@@ -2109,7 +2109,7 @@ void CUnitType::_bind_methods()
 {
 	ClassDB::bind_method(D_METHOD("get_unit_class"), [](const CUnitType *unit_type){ return unit_type->Class; });
 	ClassDB::bind_method(D_METHOD("get_item_class"), [](const CUnitType *unit_type){ return const_cast<ItemClass *>(unit_type->ItemClass); });
-	ClassDB::bind_method(D_METHOD("get_name_word"), [](const CUnitType *unit_type){ return const_cast<NameWord *>(unit_type->NameWord); });
+	ClassDB::bind_method(D_METHOD("get_name_word"), [](const CUnitType *unit_type){ return const_cast<CWord *>(unit_type->NameWord); });
 	ClassDB::bind_method(D_METHOD("get_civilization"), &CUnitType::GetCivilization);
 	ClassDB::bind_method(D_METHOD("get_faction"), &CUnitType::GetFaction);
 	ClassDB::bind_method(D_METHOD("get_description"), &CUnitType::GetDescription);
