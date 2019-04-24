@@ -2788,6 +2788,9 @@ static int CclGetPlayerData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, p->Name.c_str());
 		return 1;
+	} else if (!strcmp(data, "Type")) {
+		lua_pushnumber(l, p->Type);
+		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		if (p->Race != -1 && p->GetFaction() != nullptr) {
@@ -2822,6 +2825,12 @@ static int CclGetPlayerData(lua_State *l)
 		}
 		return 1;
 	//Wyrmgus end
+	} else if (!strcmp(data, "StartPosX")) {
+		lua_pushnumber(l, p->StartPos.x);
+		return 1;
+	} else if (!strcmp(data, "StartPosY")) {
+		lua_pushnumber(l, p->StartPos.y);
+		return 1;
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 3);
 
