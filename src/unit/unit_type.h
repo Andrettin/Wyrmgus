@@ -69,6 +69,7 @@ class CGraphic;
 class CPlayer;
 class CPlayerColorGraphic;
 class CUnitTypeVariation;
+class CWord;
 class MissileType;
 //Wyrmgus start
 class CButtonLevel;
@@ -588,6 +589,7 @@ public:
 	//Wyrmgus start
 	UnitClass *Class = nullptr;		/// Class identifier (i.e. infantry, archer, etc.)
 private:
+	const CWord *NameWord = nullptr;		/// the word for the unit type's name
 	CCivilization *Civilization = nullptr;	/// Which civilization this unit belongs to, if any
 	CFaction *Faction = nullptr;	/// Which faction this unit belongs to, if any
 public:
