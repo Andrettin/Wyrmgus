@@ -216,7 +216,7 @@ public:
 	friend void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name);
 
 protected:
-	static inline void _bind_methods() {}
+	static void _bind_methods();
 };
 
 /*----------------------------------------------------------------------------

@@ -846,6 +846,12 @@ void CCharacter::UpdateAttributes()
 	}
 }
 
+void CCharacter::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_name_word"), [](const CCharacter *character){ return character->NameWord; });
+	ClassDB::bind_method(D_METHOD("get_family_name_word"), [](const CCharacter *character){ return character->FamilyNameWord; });
+}
+
 int GetAttributeVariableIndex(int attribute)
 {
 	if (attribute == StrengthAttribute) {
