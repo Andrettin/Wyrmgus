@@ -101,7 +101,6 @@ void CleanModules()
 	CTrigger::ClearTriggers();
 	FreeAi();
 	CCalendar::ClearCalendars();
-	CCharacter::ClearCharacters();
 	CleanConstructions();
 	CleanDecorations();
 	//Wyrmgus start

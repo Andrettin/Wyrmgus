@@ -1470,7 +1470,7 @@ void CMapTemplate::ApplyUnits(const Vec2i &template_start_pos, const Vec2i &map_
 		}
 	}
 	
-	for (CCharacter *character : CCharacter::Characters) {
+	for (CCharacter *character : CCharacter::GetAll()) {
 		if (!character->CanAppear()) {
 			continue;
 		}

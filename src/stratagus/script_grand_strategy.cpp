@@ -99,7 +99,7 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Governor")) {
 		if (province->Governor != nullptr) {
-			lua_pushstring(l, province->Governor->GetFullName().c_str());
+			lua_pushstring(l, province->Governor->GetFullName().utf8().get_data());
 		} else {
 			lua_pushstring(l, "");
 		}

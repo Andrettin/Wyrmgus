@@ -84,7 +84,7 @@ bool CAchievement::ProcessConfigDataProperty(const std::string &key, std::string
 		this->Icon.Icon->Load();
 	} else if (key == "character") {
 		value = FindAndReplaceString(value, "_", "-");
-		const CCharacter *character = CCharacter::GetCharacter(value);
+		const CCharacter *character = CCharacter::Get(value);
 		if (character) {
 			this->Character = character;
 		}

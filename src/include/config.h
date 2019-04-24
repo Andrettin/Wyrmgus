@@ -70,6 +70,7 @@ private:
 public:
 	static void ProcessConfigData(const std::vector<CConfigData *> &config_data_list, const bool define_only);
 	
+	static inline std::map<std::string, std::function<DataElement *(const std::string &)>> DataTypeGetFunctions;	/// functions for getting data type instances, mapped to the string identifier of their respective class
 	static inline std::map<std::string, std::function<DataElement *(const std::string &)>> DataTypeGetOrAddFunctions;	/// functions for getting or adding data type instances, mapped to the string identifier of their respective class
 	
 	template <typename T>

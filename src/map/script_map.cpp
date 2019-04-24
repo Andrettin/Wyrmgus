@@ -895,7 +895,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 	std::string map_template_ident = LuaToString(l, 1);
 	CMapTemplate *map_template = CMapTemplate::GetOrAdd(map_template_ident);
 
-	CCharacter *hero = CCharacter::GetCharacter(LuaToString(l, 2));
+	CCharacter *hero = CCharacter::Get(LuaToString(l, 2));
 	if (hero == nullptr) {
 		LuaError(l, "Hero doesn't exist");
 	}

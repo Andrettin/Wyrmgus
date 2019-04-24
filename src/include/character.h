@@ -34,11 +34,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "data_element.h"
+#include "data_type.h"
+#include "detailed_data_element.h"
 #include "time/date.h"
 #include "ui/icon_config.h"
 
-#include <map>
 #include <tuple>
 
 /*----------------------------------------------------------------------------
@@ -109,9 +109,9 @@ enum CharacterTitles {
 	MaxCharacterTitles
 };
 
-class CCharacter : public DataElement
+class CCharacter : public DetailedDataElement, public DataType<CCharacter>
 {
-	GDCLASS(CCharacter, DataElement)
+	DATA_TYPE(CCharacter, DetailedDataElement)
 	
 public:
 	CCharacter()
@@ -119,16 +119,13 @@ public:
 		memset(Attributes, 0, sizeof(Attributes));
 	}
 	
-	static CCharacter *GetCharacter(const std::string &ident, const bool should_find = true);
-	static CCharacter *GetOrAddCharacter(const std::string &ident);
-	static void ClearCharacters();
+	~CCharacter();
+	
+	static constexpr const char *ClassIdentifier = "character";
+	
+	static void Clear();
 	static void GenerateCharacterHistory();		/// Generates history for characters
 	static void ResetCharacterHistory();		/// Removes generated history data from characters
-	
-	static std::vector<CCharacter *> Characters;
-	static std::map<std::string, CCharacter *> CharactersByIdent;
-	
-	~CCharacter();
 	
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	void GenerateHistory();
@@ -137,6 +134,17 @@ public:
 	void GenerateMissingDates();
 	int GetMartialAttribute() const;
 	int GetAttributeModifier(int attribute) const;
+	
+	const String &GetExtraName() const
+	{
+		return this->ExtraName;
+	}
+	
+	const String &GetFamilyName() const
+	{
+		return this->FamilyName;
+	}
+	
 	CReligion *GetReligion() const;
 	CLanguage *GetLanguage() const;
 	CCalendar *GetCalendar() const;
@@ -148,7 +156,7 @@ public:
 	bool CanAppear(bool ignore_neutral = false) const;
 	bool CanWorship() const;
 	bool HasMajorDeity() const;
-	std::string GetFullName() const;
+	String GetFullName() const;
 	IconConfig GetIcon() const;
 	CPersistentItem *GetItem(const CUnit *item) const;
 	void UpdateAttributes();
@@ -164,14 +172,12 @@ public:
 	int ExperiencePercent = 0;	/// Character's experience, as a percentage of the experience required to level up
 	bool ViolentDeath = false;	/// If historical death was violent
 	bool Custom = false;		/// Whether this character is a custom hero
-	std::string Name;			/// Given name of the character
+private:
 	CWord *NameWord = nullptr;	/// the word for the character's name
-	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
-	std::string FamilyName;		/// Name of the character's family
+	String ExtraName;			/// Extra given names of the character (used if necessary to differentiate from existing heroes)
+	String FamilyName;			/// Name of the character's family
 	CWord *FamilyNameWord = nullptr;	/// the word for the character's family name
-	std::string Description;	/// Description of the character from an in-game universe perspective
-	std::string Background;		/// Description of the character from a perspective outside of the game's universe
-	std::string Quote;			/// A quote relating to the character
+public:
 	std::string HairVariation;	/// Name of the character's hair variation
 	IconConfig Icon;					/// Character's icon
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
@@ -206,6 +212,8 @@ public:
 	std::vector<std::tuple<int, int, CProvince *, int>> HistoricalProvinceTitles;
 	
 	friend int CclDefineCharacter(lua_State *l);
+	friend int CclDefineCustomHero(lua_State *l);
+	friend void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::string &civilization_name, const std::string &new_hero_name, const std::string &new_hero_family_name);
 
 protected:
 	static inline void _bind_methods() {}

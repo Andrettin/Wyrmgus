@@ -49,7 +49,7 @@ void CCharacterDependency::ProcessConfigDataProperty(const std::pair<std::string
 	std::string value = property.second;
 	if (key == "character") {
 		value = FindAndReplaceString(value, "_", "-");
-		this->Character = CCharacter::GetCharacter(value);
+		this->Character = CCharacter::Get(value);
 	} else {
 		fprintf(stderr, "Invalid character dependency property: \"%s\".\n", key.c_str());
 	}
@@ -67,6 +67,6 @@ bool CCharacterDependency::Check(const CUnit *unit, const bool ignore_units) con
 
 std::string CCharacterDependency::GetString(const std::string &prefix) const
 {
-	std::string str = prefix + this->Character->GetFullName() + '\n';
+	std::string str = prefix + this->Character->GetFullName().utf8().get_data() + '\n';
 	return str;
 }

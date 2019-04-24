@@ -513,7 +513,7 @@ void CPlayer::Load(lua_State *l)
 						}
 						objective->Upgrade = upgrade;
 					} else if (!strcmp(value, "character")) {
-						CCharacter *character = CCharacter::GetCharacter(LuaToString(l, -1, n + 1));
+						CCharacter *character = CCharacter::Get(LuaToString(l, -1, n + 1));
 						if (!character) {
 							LuaError(l, "Character doesn't exist.");
 						}
@@ -2903,7 +2903,7 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "HasHero")) {
 		LuaCheckArgs(l, 3);
 		
-		CCharacter *hero = CCharacter::GetCharacter(LuaToString(l, 3));
+		CCharacter *hero = CCharacter::Get(LuaToString(l, 3));
 
 		lua_pushboolean(l, p->HasHero(hero));
 		return 1;

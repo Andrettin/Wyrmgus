@@ -280,6 +280,7 @@ private:
 		//initialize the class factory function
 		if constexpr(!std::is_same_v<T, CCivilization>) {
 			//FIXME: this conditional is only temporarily needed while the civilization classes doesn't inherit from DataElement
+			CConfigData::DataTypeGetFunctions[T::ClassIdentifier] = [](const std::string &ident) -> DataElement * { return T::Get(ident); };
 			CConfigData::DataTypeGetOrAddFunctions[T::ClassIdentifier] = std::function<DataElement *(const std::string &)>(T::GetOrAdd);
 		}
 		

@@ -71,8 +71,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CCharacter *> CCharacter::Characters;
-std::map<std::string, CCharacter *> CCharacter::CharactersByIdent;
 std::map<std::string, CCharacter *> CustomHeroes;
 CCharacter *CurrentCustomHero = nullptr;
 bool LoadingPersistentHeroes = false;
@@ -80,55 +78,6 @@ bool LoadingPersistentHeroes = false;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-CCharacter *CCharacter::GetCharacter(const std::string &ident, const bool should_find)
-{
-	std::map<std::string, CCharacter *>::const_iterator find_iterator = CCharacter::CharactersByIdent.find(ident);
-	
-	if (find_iterator != CCharacter::CharactersByIdent.end()) {
-		return find_iterator->second;
-	}
-
-	for (CCharacter *character : CCharacter::Characters) { // for backwards compatibility
-		if (character->GetFullName() == ident) {
-			return character;
-		}
-	}
-	
-	if (should_find) {
-		fprintf(stderr, "Invalid character: \"%s\".\n", ident.c_str());
-	}
-
-	return nullptr;
-}
-
-CCharacter *CCharacter::GetOrAddCharacter(const std::string &ident)
-{
-	CCharacter *character = CCharacter::GetCharacter(ident, false);
-	
-	if (!character) {
-		character = new CCharacter;
-		character->Ident = ident;
-		CCharacter::Characters.push_back(character);
-		CCharacter::CharactersByIdent[ident] = character;
-	}
-	
-	return character;
-}
-
-void CCharacter::ClearCharacters()
-{
-	for (CCharacter *character : CCharacter::Characters) {
-		delete character;
-	}
-	CCharacter::Characters.clear();
-	CCharacter::CharactersByIdent.clear();
-	
-	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-		delete iterator->second;
-	}
-	CustomHeroes.clear();
-}
 
 CCharacter::~CCharacter()
 {
@@ -145,16 +94,26 @@ CCharacter::~CCharacter()
 	}
 }
 
+void CCharacter::Clear()
+{
+	DataType<CCharacter>::Clear();
+	
+	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+		delete iterator->second;
+	}
+	CustomHeroes.clear();
+}
+
 void CCharacter::GenerateCharacterHistory()
 {
-	for (CCharacter *character : CCharacter::Characters) {
+	for (CCharacter *character : CCharacter::GetAll()) {
 		character->GenerateHistory();
 	}
 }
 
 void CCharacter::ResetCharacterHistory()
 {
-	for (CCharacter *character : CCharacter::Characters) {
+	for (CCharacter *character : CCharacter::GetAll()) {
 		character->ResetHistory();
 	}
 }
@@ -183,7 +142,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 		std::string value = property.Value;
 		
 		if (key == "name") {
-			this->Name = value;
+			this->Name = value.c_str();
 			name_changed = true;
 		} else if (key == "name_word") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -191,11 +150,11 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			if (name_word != nullptr) {
 				this->NameWord = name_word;
 				if (this->Name.empty()) {
-					this->Name = this->NameWord->GetAnglicizedName().utf8().get_data();
+					this->Name = this->NameWord->GetAnglicizedName();
 				}
 			}
 		} else if (key == "family_name") {
-			this->FamilyName = value;
+			this->FamilyName = value.c_str();
 			family_name_changed = true;
 		} else if (key == "family_name_word") {
 			value = FindAndReplaceString(value, "_", "-");
@@ -203,7 +162,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			if (family_name_word != nullptr) {
 				this->FamilyNameWord = family_name_word;
 				if (this->FamilyName.empty()) {
-					this->FamilyName = this->FamilyNameWord->GetAnglicizedName().utf8().get_data();
+					this->FamilyName = this->FamilyNameWord->GetAnglicizedName();
 				}
 			}
 		} else if (key == "unit_type") {
@@ -265,7 +224,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			this->ViolentDeath = StringToBool(value);
 		} else if (key == "father") {
 			value = FindAndReplaceString(value, "_", "-");
-			CCharacter *father = CCharacter::GetCharacter(value);
+			CCharacter *father = CCharacter::Get(value);
 			if (father) {
 				if (father->Gender == MaleGender || !father->Initialized) {
 					this->Father = father;
@@ -289,7 +248,7 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 			}
 		} else if (key == "mother") {
 			value = FindAndReplaceString(value, "_", "-");
-			CCharacter *mother = CCharacter::GetCharacter(value);
+			CCharacter *mother = CCharacter::Get(value);
 			if (mother) {
 				if (mother->Gender == FemaleGender || !mother->Initialized) {
 					this->Mother = mother;
@@ -320,12 +279,6 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 					this->GeneratedDeities.push_back(deity);
 				}
 			}
-		} else if (key == "description") {
-			this->Description = value;
-		} else if (key == "background") {
-			this->Background = value;
-		} else if (key == "quote") {
-			this->Quote = value;
 		} else if (key == "icon") {
 			value = FindAndReplaceString(value, "_", "-");
 			this->Icon.Name = value;
@@ -455,14 +408,14 @@ void CCharacter::ProcessConfigData(const CConfigData *config_data)
 	//use the character's name for name generation (do this only after setting all properties so that the type, civilization and gender will have been parsed if given
 	if (this->Type != nullptr && this->Type->BoolFlag[FAUNA_INDEX].value) {
 		if (name_changed) {
-			this->Type->PersonalNames[this->Gender].push_back(this->Name);
+			this->Type->PersonalNames[this->Gender].push_back(this->Name.utf8().get_data());
 		}
 	} else if (this->Civilization) {
 		if (name_changed) {
-			this->Civilization->PersonalNames[this->Gender].push_back(this->Name);
+			this->Civilization->PersonalNames[this->Gender].push_back(this->Name.utf8().get_data());
 		}
 		if (family_name_changed) {
-			this->Civilization->FamilyNames.push_back(this->FamilyName);
+			this->Civilization->FamilyNames.push_back(this->FamilyName.utf8().get_data());
 		}
 	}
 	
@@ -823,14 +776,14 @@ bool CCharacter::HasMajorDeity() const
 	return false;
 }
 
-std::string CCharacter::GetFullName() const
+String CCharacter::GetFullName() const
 {
-	std::string full_name = this->Name;
-	if (!this->ExtraName.empty()) {
-		full_name += " " + this->ExtraName;
+	String full_name = this->GetName();
+	if (!this->GetExtraName().empty()) {
+		full_name += " " + this->GetExtraName();
 	}
-	if (!this->FamilyName.empty()) {
-		full_name += " " + this->FamilyName;
+	if (!this->GetFamilyName().empty()) {
+		full_name += " " + this->GetFamilyName();
 	}
 	return full_name;
 }
@@ -915,7 +868,7 @@ CCharacter *GetCustomHero(const std::string &hero_ident)
 	}
 	
 	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { // for backwards compatibility
-		if (iterator->second->GetFullName() == hero_ident) {
+		if (iterator->second->GetFullName() == hero_ident.c_str()) {
 			return iterator->second;
 		}
 	}
@@ -928,7 +881,7 @@ CCharacter *GetCustomHero(const std::string &hero_ident)
 */
 void SaveHeroes()
 {
-	for (CCharacter *character : CCharacter::Characters) { //save characters
+	for (CCharacter *character : CCharacter::GetAll()) { //save characters
 		SaveHero(character);
 	}
 
@@ -974,7 +927,7 @@ void SaveHero(CCharacter *hero)
 	std::string old_path = path;
 	path += hero->Ident;
 	path += ".lua";
-	old_path += hero->GetFullName();
+	old_path += hero->GetFullName().utf8().get_data();
 	old_path += ".lua";
 	if (CanAccessFile(old_path.c_str())) {
 		unlink(old_path.c_str());
@@ -987,15 +940,15 @@ void SaveHero(CCharacter *hero)
 	}
 
 	if (!hero->Custom) {
-		fprintf(fd, "DefineCharacter(\"%s\", {\n", hero->Ident.c_str());
+		fprintf(fd, "DefineCharacter(\"%s\", {\n", hero->GetIdent().utf8().get_data());
 	} else {
-		fprintf(fd, "DefineCustomHero(\"%s\", {\n", hero->Ident.c_str());
-		fprintf(fd, "\tName = \"%s\",\n", hero->Name.c_str());
-		if (!hero->ExtraName.empty()) {
-			fprintf(fd, "\tExtraName = \"%s\",\n", hero->ExtraName.c_str());
+		fprintf(fd, "DefineCustomHero(\"%s\", {\n", hero->GetIdent().utf8().get_data());
+		fprintf(fd, "\tName = \"%s\",\n", hero->GetName().utf8().get_data());
+		if (!hero->GetExtraName().empty()) {
+			fprintf(fd, "\tExtraName = \"%s\",\n", hero->GetExtraName().utf8().get_data());
 		}
-		if (!hero->FamilyName.empty()) {
-			fprintf(fd, "\tFamilyName = \"%s\",\n", hero->FamilyName.c_str());
+		if (!hero->GetFamilyName().empty()) {
+			fprintf(fd, "\tFamilyName = \"%s\",\n", hero->GetFamilyName().utf8().get_data());
 		}
 		if (hero->Gender != NoGender) {
 			fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(hero->Gender).c_str());
@@ -1259,8 +1212,8 @@ void ChangeCustomHeroCivilization(const std::string &hero_full_name, const std::
 			int new_unit_type_id = CCivilization::GetCivilizationClassUnitType(hero->Civilization, hero->Type->Class);
 			if (new_unit_type_id != -1) {
 				hero->Type = CUnitType::UnitTypes[new_unit_type_id];
-				hero->Name = new_hero_name;
-				hero->FamilyName = new_hero_family_name;
+				hero->Name = new_hero_name.c_str();
+				hero->FamilyName = new_hero_family_name.c_str();
 				SaveHero(hero);
 				
 				CustomHeroes.erase(hero_full_name);

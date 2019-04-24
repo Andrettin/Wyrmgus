@@ -281,10 +281,16 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			continue;
 		}
 		
-		std::map<std::string, std::function<DataElement *(const std::string &)>>::iterator find_iterator = CConfigData::DataTypeGetOrAddFunctions.find(config_data->Tag);
+		//only load the history for characters that are already in the character database
+		const std::map<std::string, std::function<DataElement *(const std::string &)>> &function_map = LoadingHistory ? CConfigData::DataTypeGetFunctions : CConfigData::DataTypeGetOrAddFunctions;
 		
-		if (find_iterator != CConfigData::DataTypeGetOrAddFunctions.end()) {
+		std::map<std::string, std::function<DataElement *(const std::string &)>>::const_iterator find_iterator = function_map.find(config_data->Tag);
+		
+		if (find_iterator != function_map.end()) {
 			DataElement *data_element = find_iterator->second(ident);
+			if (!data_element) {
+				continue;
+			}
 			if (!define_only) {
 				data_element->ProcessConfigData(config_data);
 			}
@@ -311,20 +317,6 @@ void CConfigData::ProcessConfigData(const std::vector<CConfigData *> &config_dat
 			CCalendar *calendar = CCalendar::GetOrAddCalendar(ident);
 			if (!define_only) {
 				calendar->ProcessConfigData(config_data);
-			}
-		} else if (config_data->Tag == "character") {
-			CCharacter *character = nullptr;
-			if (LoadingHistory) {
-				//only load the history for characters that are already in the character database
-				character = CCharacter::GetCharacter(ident);
-			} else {
-				character = CCharacter::GetOrAddCharacter(ident);
-			}
-			if (!character) {
-				continue;
-			}
-			if (!define_only) {
-				character->ProcessConfigData(config_data);
 			}
 		} else if (config_data->Tag == "missile_type") {
 			MissileType *missile_type = MissileTypeByIdent(ident);

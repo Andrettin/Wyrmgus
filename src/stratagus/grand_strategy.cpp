@@ -158,7 +158,7 @@ void CGrandStrategyGame::DoTurn()
 	for (int i = (works_size - 1); i >= 0; --i) {
 		CGrandStrategyHero *author = nullptr;
 		if (this->UnpublishedWorks[i]->Author != nullptr) {
-			author = this->GetHero(this->UnpublishedWorks[i]->Author->GetFullName());
+			author = this->GetHero(this->UnpublishedWorks[i]->Author->GetFullName().utf8().get_data());
 			if (author != nullptr && !author->IsAlive()) {
 				continue;
 			}
@@ -175,7 +175,7 @@ void CGrandStrategyGame::DoTurn()
 		) {
 			bool characters_existed = true;
 			for (size_t j = 0; j < this->UnpublishedWorks[i]->Characters.size(); ++j) {
-				CGrandStrategyHero *hero = this->GetHero(this->UnpublishedWorks[i]->Characters[j]->GetFullName());
+				CGrandStrategyHero *hero = this->GetHero(this->UnpublishedWorks[i]->Characters[j]->GetFullName().utf8().get_data());
 				
 				if (hero == nullptr || !hero->Existed) {
 					characters_existed = false;
@@ -249,7 +249,7 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 	if (province->Owner == GrandStrategyGame.PlayerFaction || work != nullptr) { // only show foreign works that are predefined
 		std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work_name + "\", \"";
 		if (author != nullptr) {
-			work_creation_message += "The " + FullyDecapitalizeString(author->Type->GetName().utf8().get_data()) + " " + author->GetFullName() + " ";
+			work_creation_message += "The " + FullyDecapitalizeString(author->Type->GetName().utf8().get_data()) + " " + author->GetFullName().utf8().get_data() + " ";
 		} else {
 			work_creation_message += "A sage ";
 		}
@@ -631,7 +631,7 @@ std::string CGrandStrategyProvince::GenerateWorkName()
 	}
 	
 	if (potential_heroes.size() > 0 && SyncRand(10) != 0) { // 9 chances out of 10 that a literary work will use a hero's name as a basis
-		work_name += potential_heroes[SyncRand(potential_heroes.size())]->Name;
+		work_name += potential_heroes[SyncRand(potential_heroes.size())]->GetName().utf8().get_data();
 		if (work_name.substr(work_name.size() - 1, 1) != "s") {
 			work_name += "s";
 		}
@@ -754,7 +754,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 		
 		if (this == GrandStrategyGame.PlayerFaction) {
 			std::string new_minister_message = "if (GenericDialog ~= nil) then GenericDialog(\"";
-//			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->GetFullName();
+//			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->GetFullName().utf8().get_data();
 			new_minister_message += "\", \"";
 //			new_minister_message += "A new " + FullyDecapitalizeString(this->GetCharacterTitle(title, this->Ministers[title]->Gender));
 			if (title == CharacterTitleHeadOfState) {
@@ -762,7 +762,8 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 			} else {
 				new_minister_message += " has been appointed, ";
 			}
-			new_minister_message += this->Ministers[title]->GetFullName() + "!\\n\\n";
+			new_minister_message += this->Ministers[title]->GetFullName().utf8().get_data();
+			new_minister_message += "!\\n\\n";
 			new_minister_message += "Type: ";
 			new_minister_message += this->Ministers[title]->Type->GetName().utf8().get_data();
 			new_minister_message += "\\n";
@@ -779,7 +780,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 		}
 		
 		if (this->IsAlive() && (hero->Province == nullptr || hero->Province->Owner != this)) { // if the hero's province is not owned by this faction, move him to a random province owned by this faction
-			this->GetRandomProvinceWeightedByPopulation()->SetHero(hero->GetFullName(), hero->State);
+			this->GetRandomProvinceWeightedByPopulation()->SetHero(hero->GetFullName().utf8().get_data(), hero->State);
 		}
 	}
 }
@@ -793,25 +794,25 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
 			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->Gender == MaleGender) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
-				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName());
+				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName().utf8().get_data());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ministers[title]->Siblings.size(); ++i) { // now check for male siblings of the current ruler
 			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible() && this->Ministers[title]->Siblings[i]->Gender == MaleGender) {
-				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName());
+				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName().utf8().get_data());
 				return;
 			}
 		}		
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) { //check again for children, but now allow for inheritance regardless of gender
 			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible()) {
-				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName());
+				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName().utf8().get_data());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ministers[title]->Siblings.size(); ++i) { //check again for siblings, but now allow for inheritance regardless of gender
 			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible()) {
-				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName());
+				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName().utf8().get_data());
 				return;
 			}
 		}
@@ -845,7 +846,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 		}
 	}
 	if (best_candidate != nullptr) {
-		this->SetMinister(title, best_candidate->GetFullName());
+		this->SetMinister(title, best_candidate->GetFullName().utf8().get_data());
 		return;
 	}
 
@@ -1011,7 +1012,7 @@ bool CGrandStrategyHero::IsVisible()
 
 bool CGrandStrategyHero::IsGenerated()
 {
-	return !this->Custom && CCharacter::GetCharacter(this->GetFullName()) == nullptr;
+	return !this->Custom && CCharacter::Get(this->GetFullName().utf8().get_data()) == nullptr;
 }
 
 bool CGrandStrategyHero::IsEligibleForTitle(int title)
@@ -1612,7 +1613,7 @@ std::string GetFactionMinister(std::string civilization_name, std::string factio
 	}
 	
 	if (GrandStrategyGame.Factions[civilization->GetIndex()][faction]->Ministers[title] != nullptr) {
-		return GrandStrategyGame.Factions[civilization->GetIndex()][faction]->Ministers[title]->GetFullName();
+		return GrandStrategyGame.Factions[civilization->GetIndex()][faction]->Ministers[title]->GetFullName().utf8().get_data();
 	} else {
 		return "";
 	}
