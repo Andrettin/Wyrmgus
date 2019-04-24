@@ -705,7 +705,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	// Slot identifier
 	const char *str = LuaToString(l, 1);
-	CUnitType *type = CUnitType::Get(str);
+	CUnitType *type = CUnitType::Get(str, false);
 	int redefine;
 	if (type) {
 		redefine = 1;
